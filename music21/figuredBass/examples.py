@@ -16,7 +16,7 @@ from music21 import interval
 from music21 import meter
 from music21 import stream
 
-from music21.figuredBass import realizer2
+from music21.figuredBass import realizer
 from music21.figuredBass import rules
 from music21 import tinyNotation
 
@@ -43,7 +43,7 @@ def exampleA():
     >>> #_DOCS_SHOW fbRealization2.generateRandomRealization().show()
     '''
     s = tinyNotation.TinyNotationStream("C2 D2_6 E2_6 F2_6 C#2_b7,5,3 D2 BB2_#6,5,3 C2_6 AA#2_7,5,#3 BB1_6,4 BB2_7,#5,#3 E1.", "3/2")
-    return realizer2.figuredBassFromStream(s)
+    return realizer.figuredBassFromStream(s)
 
 def exampleB():
     '''
@@ -51,7 +51,7 @@ def exampleB():
     '''
     s = tinyNotation.TinyNotationStream("D4 A4_7,5,#3 B-4 F4_6 G4_6 AA4_7,5,#3 D2", "4/4")
     s.insert(0, key.Key('d'))
-    return realizer2.figuredBassFromStream(s)
+    return realizer.figuredBassFromStream(s)
         
 def exampleC():
     '''
@@ -59,7 +59,7 @@ def exampleC():
     '''
     s = tinyNotation.TinyNotationStream("FF#4 GG#4_#6 AA4_6 FF#4 BB4_6,5 C#4_7,5,#3 F#2", "4/4")
     s.insert(0, key.Key('f#'))
-    return realizer2.figuredBassFromStream(s)
+    return realizer.figuredBassFromStream(s)
 
 def exampleD():
     '''
@@ -91,28 +91,28 @@ def exampleD():
     '''
     s = tinyNotation.TinyNotationStream("BB4 C#4_#6 D4_6 E2 E#4_7,5,#3 F#2_6,4 F#4_5,#3 G2 E4_6 F#2_6,4 E4_#4,2 D2_6 EE4_7,5,#3 AA2.", "3/4")
     s.insert(0, key.Key('b'))
-    return realizer2.figuredBassFromStream(s)
+    return realizer.figuredBassFromStream(s)
 
 def V43ResolutionExample():
     s = tinyNotation.TinyNotationStream("D2 E2_4,3 D2 E2_4,3 F#1_6", "4/4")
     s.insert(0, key.Key('D'))
-    return realizer2.figuredBassFromStream(s)
+    return realizer.figuredBassFromStream(s)
 
 def viio65ResolutionExample():
     s = tinyNotation.TinyNotationStream("D2 E2_6,b5 D2 E2_6,b5 F#1_6", "4/4")
     s.insert(0, key.Key('D'))
-    return realizer2.figuredBassFromStream(s)
+    return realizer.figuredBassFromStream(s)
 
 def augmentedSixthRealizationExample():
     s = tinyNotation.TinyNotationStream("D4 BB-4_8,6,3 AA2_# D4 BB-4_8,#6,3 AA2_# D4 BB-4_#6,4,3 AA2_# D4 BB-4_#6,5,3 AA2_# D4 BB-4_#6,5,3 AA2_6,4", "4/4")
     s.insert(0, key.Key('d'))
-    return realizer2.figuredBassFromStream(s)
+    return realizer.figuredBassFromStream(s)
     
 def twelveBarBlues():
-    fb = realizer2.FiguredBassLine(key.Key('B-'), meter.TimeSignature('4/4'))
+    fb = realizer.FiguredBassLine(key.Key('B-'), meter.TimeSignature('4/4'))
     s = tinyNotation.TinyNotationStream("BB-1 E-1 BB-1 BB-1_7 E-1 E-1 BB-1 BB-1_7 F1_7 G1_6 BB-1 BB-1")
     s.insert(0, key.Key('B-'))
-    return realizer2.figuredBassFromStream(s)
+    return realizer.figuredBassFromStream(s)
 
 # -----------------------------------------------------------------
 # METHODS FOR GENERATION OF BLUES VAMPS
