@@ -25,7 +25,7 @@ from music21 import stream
 from music21.figuredBass import notation
 from music21.figuredBass import realizerScale
 from music21.figuredBass import rules
-from music21.figuredBass import segment2
+from music21.figuredBass import segment
 
 def figuredBassFromStream(streamPart):
     '''
@@ -37,9 +37,9 @@ def figuredBassFromStream(streamPart):
     same line.
     
     >>> from music21 import tinyNotation
-    >>> from music21.figuredBass import realizer2
+    >>> from music21.figuredBass import realizer
     >>> s = tinyNotation.TinyNotationStream('C4 D8_6 E8_6 F4 G4_7 C1', '4/4')
-    >>> fb = realizer2.figuredBassFromStream(s)
+    >>> fb = realizer.figuredBassFromStream(s)
     >>> fbRules = rules.Rules()
     >>> fbRules.partMovementLimits = [(1,4)] #Soprano pitch movements limited to 4 semitones (M3) 
     >>> fbRealization = fb.realize(fbRules)
@@ -133,7 +133,7 @@ class FiguredBassLine:
     def realize(self, fbRules = rules.Rules()):
         segmentList = []
         for (bassNote, notationString) in self.fbList:
-            correspondingSegment = segment2.Segment(self.fbScale, bassNote, notationString, fbRules)
+            correspondingSegment = segment.Segment(self.fbScale, bassNote, notationString, fbRules)
             segmentList.append(correspondingSegment)
 
         for segmentIndex in range(len(segmentList) - 1):
