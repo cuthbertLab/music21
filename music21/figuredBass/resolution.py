@@ -255,7 +255,7 @@ def diminishedSeventhToMajorTonic(dimPossib, doubledRoot = False):
     >>> resPossibAb = resolution2.diminishedSeventhToMajorTonic(dimPossibA, True)
     >>> resPossibAb
     (A4, D4, F#3, D3)
-    >>> resolution2.showResolutions(dimPossibA, resPossibAa, dimPossibA, resPossibAb)
+    >>> #_DOCS_SHOW resolution2.showResolutions(dimPossibA, resPossibAa, dimPossibA, resPossibAb)
     '''
     dim7chord = chord.Chord(dimPossib)
     root = dim7chord.root()
@@ -290,7 +290,7 @@ def diminishedSeventhToMinorTonic(dimPossib, doubledRoot = False):
     >>> resPossibAb = resolution2.diminishedSeventhToMinorTonic(dimPossibA, True)
     >>> resPossibAb
     (A4, D4, F3, D3)
-    >>> resolution2.showResolutions(dimPossibA, resPossibAa, dimPossibA, resPossibAb)
+    >>> #_DOCS_SHOW resolution2.showResolutions(dimPossibA, resPossibAa, dimPossibA, resPossibAb)
     '''
     dim7chord = chord.Chord(dimPossib)
     root = dim7chord.root()
@@ -322,7 +322,7 @@ def diminishedSeventhToMajorSubdominant(dimPossib):
     >>> resPossibA = resolution2.diminishedSeventhToMajorSubdominant(dimPossibA)
     >>> resPossibA
     (B4, D4, G3, D3)
-    >>> resolution2.showResolutions(dimPossibA, resPossibA)
+    >>> #_DOCS_SHOW resolution2.showResolutions(dimPossibA, resPossibA)
     '''
     dim7chord = chord.Chord(dimPossib)
     root = dim7chord.root()
@@ -352,7 +352,7 @@ def diminishedSeventhToMinorSubdominant(dimPossib):
     >>> resPossibA = resolution2.diminishedSeventhToMinorSubdominant(dimPossibA)
     >>> resPossibA
     (B-4, D4, G3, D3)
-    >>> resolution2.showResolutions(dimPossibA, resPossibA)
+    >>> #_DOCS_SHOW resolution2.showResolutions(dimPossibA, resPossibA)
     '''
     dim7chord = chord.Chord(dimPossib)
     root = dim7chord.root()
