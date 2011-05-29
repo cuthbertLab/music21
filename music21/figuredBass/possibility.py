@@ -33,16 +33,16 @@ def voiceCrossing(possibA):
     lower pitches in order for there to be no voice crossing.
     
     >>> from music21.pitch import Pitch
-    >>> from music21.figuredBass import possibility2
+    >>> from music21.figuredBass import possibility
     >>> C4 = Pitch('C4')
     >>> E4 = Pitch('E4')
     >>> C5 = Pitch('C5')
     >>> G5 = Pitch('G5')
     >>> possibA1 = (C5, G5, E4)
-    >>> possibility2.voiceCrossing(possibA1)
+    >>> possibility.voiceCrossing(possibA1)
     True
     >>> possibA2 = (C5, E4, C4)
-    >>> possibility2.voiceCrossing(possibA2)
+    >>> possibility.voiceCrossing(possibA2)
     False 
     '''
     hasVoiceCrossing = False
@@ -65,7 +65,7 @@ def isIncomplete(possibA, pitchNamesToContain):
     raised.
     
     >>> from music21.pitch import Pitch
-    >>> from music21.figuredBass import possibility2
+    >>> from music21.figuredBass import possibility
     >>> C3 = Pitch('C3')
     >>> E4 = Pitch('E4')
     >>> G4 = Pitch('G4')
@@ -73,16 +73,16 @@ def isIncomplete(possibA, pitchNamesToContain):
     >>> Bb5 = Pitch('B-5')
     >>> pitchNamesA1 = ['C', 'E', 'G']
     >>> possibA1 = (C5, G4, E4, C3)
-    >>> possibility2.isIncomplete(possibA1, pitchNamesA1)
+    >>> possibility.isIncomplete(possibA1, pitchNamesA1)
     False
     >>> possibA2 = (Bb5, G4, E4, C3)
-    >>> possibility2.isIncomplete(possibA2, pitchNamesA1)
+    >>> possibility.isIncomplete(possibA2, pitchNamesA1)
     Traceback (most recent call last):
     PossibilityException: (B-5, G4, E4, C3) contains pitch names not found in pitchNamesToContain.
     >>> pitchNamesA2 = ['C', 'E', 'G', 'B-']
-    >>> possibility2.isIncomplete(possibA2, pitchNamesA2)
+    >>> possibility.isIncomplete(possibA2, pitchNamesA2)
     False
-    >>> possibility2.isIncomplete(possibA1, pitchNamesA2)
+    >>> possibility.isIncomplete(possibA1, pitchNamesA2)
     True
     ''' 
     isIncomplete = False
@@ -111,17 +111,17 @@ def upperPartsWithinLimit(possibA, maxSemitoneSeparation = 12):
     just the right hand. 
     
     >>> from music21.pitch import Pitch
-    >>> from music21.figuredBass import possibility2
+    >>> from music21.figuredBass import possibility
     >>> C3 = Pitch('C3')
     >>> E3 = Pitch('E3')
     >>> E4 = Pitch('E4')
     >>> G4 = Pitch('G4')
     >>> C5 = Pitch('C5')
     >>> possibA1 = (C5, G4, E4, C3)
-    >>> possibility2.upperPartsWithinLimit(possibA1)
+    >>> possibility.upperPartsWithinLimit(possibA1)
     True
     >>> possibA2 = (C5, G4, E3, C3)
-    >>> possibility2.upperPartsWithinLimit(possibA2)
+    >>> possibility.upperPartsWithinLimit(possibA2)
     False
     '''
     upperPartsWithinLimit = True
@@ -153,14 +153,14 @@ def parallelFifths(possibA, possibB):
     two shared parts of possibA and possibB.
  
     >>> from music21.pitch import Pitch
-    >>> from music21.figuredBass import possibility2
+    >>> from music21.figuredBass import possibility
     >>> C3 = Pitch('C3')
     >>> D3 = Pitch('D3')
     >>> G3 = Pitch('G3')
     >>> A3 = Pitch('A3')
     >>> possibA1 = (G3, C3)
     >>> possibB1 = (A3, D3)
-    >>> possibility2.parallelFifths(possibA1, possibB1)
+    >>> possibility.parallelFifths(possibA1, possibB1)
     True
     '''
     hasParallelFifths = False
@@ -193,7 +193,7 @@ def parallelOctaves(possibA, possibB):
     shared parts of possibA and possibB.
     
     >>> from music21.pitch import Pitch
-    >>> from music21.figuredBass import possibility2
+    >>> from music21.figuredBass import possibility
     >>> C3 = Pitch('C3')
     >>> D3 = Pitch('D3')
     >>> G3 = Pitch('G3')
@@ -202,11 +202,11 @@ def parallelOctaves(possibA, possibB):
     >>> D4 = Pitch('D4')
     >>> possibA1 = (G3, C3)
     >>> possibB1 = (A3, D3)
-    >>> possibility2.parallelOctaves(possibA1, possibB1)
+    >>> possibility.parallelOctaves(possibA1, possibB1)
     False
     >>> possibA2 = (C4, C3)
     >>> possibB2 = (D4, D3)
-    >>> possibility2.parallelOctaves(possibA2, possibB2)
+    >>> possibility.parallelOctaves(possibA2, possibB2)
     True
     '''
     hasParallelOctaves = False
@@ -240,7 +240,7 @@ def hiddenFifth(possibA, possibB):
     elements of each possibility.
     
     >>> from music21.pitch import Pitch
-    >>> from music21.figuredBass import possibility2
+    >>> from music21.figuredBass import possibility
     >>> C3 = Pitch('C3')
     >>> D3 = Pitch('D3')
     >>> E5 = Pitch('E5')
@@ -248,10 +248,10 @@ def hiddenFifth(possibA, possibB):
     >>> Ab5 = Pitch('A-5')
     >>> possibA1 = (E5, C3)
     >>> possibB1 = (A5, D3)
-    >>> possibility2.hiddenFifth(possibA1, possibB1)
+    >>> possibility.hiddenFifth(possibA1, possibB1)
     True
     >>> possibB2 = (Ab5, D3)
-    >>> possibility2.hiddenFifth(possibA1, possibB2)
+    >>> possibility.hiddenFifth(possibA1, possibB2)
     False
     '''
     hasHiddenFifth = False
@@ -279,14 +279,14 @@ def hiddenOctave(possibA, possibB):
     and last elements of each possibility.
 
     >>> from music21.pitch import Pitch
-    >>> from music21.figuredBass import possibility2
+    >>> from music21.figuredBass import possibility
     >>> C3 = Pitch('C3')
     >>> D3 = Pitch('D3')
     >>> A5 = Pitch('A5')
     >>> D6 = Pitch('D6')
     >>> possibA1 = (A5, C3)
     >>> possibB1 = (D6, D3)
-    >>> possibility2.hiddenOctave(possibA1, possibB1)
+    >>> possibility.hiddenOctave(possibA1, possibB1)
     True
     '''
     hasHiddenOctave = False
@@ -313,7 +313,7 @@ def voiceOverlap(possibA, possibB):
     of possibA and possibB.
     
     >>> from music21.pitch import Pitch
-    >>> from music21.figuredBass import possibility2
+    >>> from music21.figuredBass import possibility
     >>> C4 = Pitch('C4')
     >>> D4 = Pitch('D4')
     >>> E4 = Pitch('E4')
@@ -323,14 +323,14 @@ def voiceOverlap(possibA, possibB):
     >>> C5 = Pitch('C5')
     >>> possibA1 = (C5, G4, E4, C4)
     >>> possibB1 = (B4, F4, D4, D4)
-    >>> possibility2.voiceOverlap(possibA1, possibB1)
+    >>> possibility.voiceOverlap(possibA1, possibB1)
     False
     >>> possibB2 = (F4, F4, D4, D4)
-    >>> possibility2.voiceOverlap(possibA1, possibB2)
+    >>> possibility.voiceOverlap(possibA1, possibB2)
     True
-    >>> possibility2.voiceCrossing(possibA1)
+    >>> possibility.voiceCrossing(possibA1)
     False
-    >>> possibility2.voiceCrossing(possibB2)
+    >>> possibility.voiceCrossing(possibB2)
     False
     '''
     hasVoiceOverlap = False
@@ -349,7 +349,7 @@ def voiceOverlap(possibA, possibB):
 def partMovementsWithinLimits(possibA, possibB, partMovementLimits = []):
     '''
     >>> from music21.pitch import Pitch
-    >>> from music21.figuredBass import possibility2
+    >>> from music21.figuredBass import possibility
     >>> C4 = Pitch('C4')
     >>> D4 = Pitch('D4')
     >>> E4 = Pitch('E4')
@@ -361,10 +361,10 @@ def partMovementsWithinLimits(possibA, possibB, partMovementLimits = []):
     >>> partMovementLimits = [(1, 2)]
     >>> possibA1 = (C5, G4, E4, C4)
     >>> possibB1 = (B4, F4, D4, D4)
-    >>> possibility2.partMovementsWithinLimits(possibA1, possibB1, partMovementLimits)
+    >>> possibility.partMovementsWithinLimits(possibA1, possibB1, partMovementLimits)
     True
     >>> possibB2 = (A4, F4, D4, D4)
-    >>> possibility2.partMovementsWithinLimits(possibA1, possibB2, partMovementLimits)
+    >>> possibility.partMovementsWithinLimits(possibA1, possibB2, partMovementLimits)
     False
     '''
     withinLimits = True
@@ -384,7 +384,7 @@ def partPairs(possibA, possibB):
     Groups together pitches of possibA and possibB which correspond to the same part.
 
     >>> from music21.pitch import Pitch
-    >>> from music21.figuredBass import possibility2
+    >>> from music21.figuredBass import possibility
     >>> C4 = Pitch('C4')
     >>> D4 = Pitch('D4')
     >>> E4 = Pitch('E4')
@@ -394,9 +394,9 @@ def partPairs(possibA, possibB):
     >>> C5 = Pitch('C5')
     >>> possibA1 = (C5, G4, E4, C4)
     >>> possibB1 = (B4, F4, D4, D4)
-    >>> possibility2.partPairs(possibA1, possibA1)
+    >>> possibility.partPairs(possibA1, possibA1)
     [(C5, C5), (G4, G4), (E4, E4), (C4, C4)]
-    >>> possibility2.partPairs(possibA1, possibB1)
+    >>> possibility.partPairs(possibA1, possibB1)
     [(C5, B4), (G4, F4), (E4, D4), (C4, D4)]
     '''
     return list(itertools.izip(possibA, possibB))
