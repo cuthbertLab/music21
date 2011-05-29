@@ -11,34 +11,38 @@
 import music21
 import unittest
 
-from music21 import interval
+from music21 import pitch
 
 class Rules:
     def __init__(self):
         '''
         >>> from music21.figuredBass import rules
         >>> fbRules = rules.Rules()
-        >>> fbRules.allowParallelFifths = True
+        >>> fbRules.forbidParallelFifths = False
         '''
+        self.maxPitch = pitch.Pitch('B5')
+        self.numParts = 4
+                
         #Single Possibility rules
-        self.allowIncompletePossibilities = False
+        self.forbidIncompletePossibilities = True
         self.upperPartsMaxSemitoneSeparation = 12
-        self.filterPitchesByRange = True
-        self.allowVoiceCrossing = False
+        self.forbidVoiceCrossing = True
         
         #Consecutive Possibility rules
-        self.allowParallelFifths = False
-        self.allowParallelOctaves = False
-        self.allowHiddenFifths = False
-        self.allowHiddenOctaves = False
-        self.allowVoiceOverlap = False
+        self.forbidParallelFifths = True
+        self.forbidParallelOctaves = True
+        self.forbidHiddenFifths = True
+        self.forbidHiddenOctaves = True
+        self.forbidVoiceOverlap = True
+        self.partMovementLimits = []
 
-        #Special Resolution rules
+        #Special resolution rules
         self.resolveDominantSeventhProperly = True
         self.resolveDiminishedSeventhProperly = True
         self.resolveAugmentedSixthProperly = True
         self.doubledRootInDim7 = False
-        
+
+
 class FiguredBassRulesException(music21.Music21Exception):
     pass
 
