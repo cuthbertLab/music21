@@ -17,8 +17,6 @@ from music21 import pitch
 from music21 import key
 from music21 import note
 
-MAX_PITCH = pitch.Pitch('B5')
-
 shorthandNotation = {(None,) : (5,3),
                      (5,) : (5,3),
                      (6,) : (6,3),
