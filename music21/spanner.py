@@ -1526,6 +1526,99 @@ class Test(unittest.TestCase):
         self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
 
+    def testRepeatBracketD(self):
+        from music21 import note, spanner, stream, bar
+
+        p = stream.Part()
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c4'), 4)
+        p.append(m1)
+        
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note('d#4'), 4)
+        p.append(m2)
+        
+        m3 = stream.Measure()
+        m3.repeatAppend(note.Note('g#4'), 4)
+        m3.rightBarline = bar.Repeat(direction='end')
+        p.append(m3)
+        rb1 = spanner.RepeatBracket(number=1)
+        rb1.addComponents(m2, m3)
+        self.assertEqual(len(rb1), 2)
+        p.insert(0, rb1)
+        
+        m4 = stream.Measure()
+        m4.repeatAppend(note.Note('a4'), 4)
+        p.append(m4)
+        
+        m5 = stream.Measure()
+        m5.repeatAppend(note.Note('b4'), 4)
+        m5.rightBarline = bar.Repeat(direction='end')
+        p.append(m5)
+        
+        rb2 = spanner.RepeatBracket(number=2)
+        rb2.addComponents(m4, m5)
+        self.assertEqual(len(rb2), 2)
+        p.insert(0, rb2)
+        
+        m6 = stream.Measure()
+        m6.repeatAppend(note.Note('a4'), 4)
+        p.append(m6)
+        
+        m7 = stream.Measure()
+        m7.repeatAppend(note.Note('b4'), 4)
+        p.append(m7)
+        
+        m8 = stream.Measure()
+        m8.repeatAppend(note.Note('a4'), 4)
+        m8.rightBarline = bar.Repeat(direction='end')
+        p.append(m8)
+        
+        rb3 = spanner.RepeatBracket(number=3)
+        rb3.addComponents(m6, m8)
+        self.assertEqual(len(rb3), 2)
+        p.insert(0, rb3)
+        
+        
+        m9 = stream.Measure()
+        m9.repeatAppend(note.Note('a4'), 4)
+        p.append(m9)
+        
+        m10 = stream.Measure()
+        m10.repeatAppend(note.Note('b4'), 4)
+        p.append(m10)
+        
+        m11 = stream.Measure()
+        m11.repeatAppend(note.Note('a4'), 4)
+        p.append(m11)
+        
+        m12 = stream.Measure()
+        m12.repeatAppend(note.Note('a4'), 4)
+        m12.rightBarline = bar.Repeat(direction='end')
+        p.append(m12)
+        
+        rb4 = spanner.RepeatBracket(number=4)
+        rb4.addComponents(m9, m10, m11, m12)
+        self.assertEqual(len(rb4), 4)
+        p.insert(0, rb4)
+        
+        #p.show()        
+        # all spanners should be at the part level
+        self.assertEqual(len(p.getElementsByClass('Measure')), 12)
+        self.assertEqual(len(p.spanners), 4)
+
+        self.assertEqual(rb3.getOffsetsBySite(p), [20.0, 28.0])
+        self.assertEqual(rb3.getDurationBySite(p).quarterLength, 12.0)
+
+        # have the offsets of the start of each measure
+        self.assertEqual(rb4.getOffsetsBySite(p), [32.0, 36.0, 40.0, 44.0])
+        self.assertEqual(rb4.getDurationBySite(p).quarterLength, 16.0)
+# 
+#         raw = p.musicxml
+#         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
+#         self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
+#         self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+
 
 
 
