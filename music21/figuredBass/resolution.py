@@ -10,7 +10,7 @@ from music21 import stream
 def dominantSeventhToMajorTonic(domPossib, resolveV43toI6 = False):
     '''
     >>> from music21.figuredBass.fbPitch import HashablePitch
-    >>> from music21.figuredBass import resolution2
+    >>> from music21.figuredBass import resolution
     >>> G2 = HashablePitch('G2')
     >>> C3 = HashablePitch('C3')
     >>> E3 = HashablePitch('E3')
@@ -23,25 +23,25 @@ def dominantSeventhToMajorTonic(domPossib, resolveV43toI6 = False):
     >>> D5 = HashablePitch('D5')
     >>> E5 = HashablePitch('E5')
     >>> domPossibA1 = (D5, F4, B3, G2)
-    >>> resPossibA1 = resolution2.dominantSeventhToMajorTonic(domPossibA1)
+    >>> resPossibA1 = resolution.dominantSeventhToMajorTonic(domPossibA1)
     >>> resPossibA1
     (C5, E4, C4, C3)
-    >>> #_DOCS_SHOW resolution2.ShowResolutions(domPossibA1, resPossibA1)
+    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA1, resPossibA1)
     
     >>> domPossibA2 = (Bb3, G3, E3, C3)
-    >>> resPossibA2 = resolution2.dominantSeventhToMajorTonic(domPossibA2)
+    >>> resPossibA2 = resolution.dominantSeventhToMajorTonic(domPossibA2)
     >>> resPossibA2
     (A3, F3, F3, F3)
-    >>> #_DOCS_SHOW resolution2.ShowResolutions(domPossibA2, resPossibA2)
+    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA2, resPossibA2)
     
     >>> domPossibA3 = (E5, Bb4, C4, G3)
-    >>> resPossibA3a = resolution2.dominantSeventhToMajorTonic(domPossibA3, False)
+    >>> resPossibA3a = resolution.dominantSeventhToMajorTonic(domPossibA3, False)
     >>> resPossibA3a
     (F5, A4, C4, F3)
-    >>> resPossibA3b = resolution2.dominantSeventhToMajorTonic(domPossibA3, True)
+    >>> resPossibA3b = resolution.dominantSeventhToMajorTonic(domPossibA3, True)
     >>> resPossibA3b
     (F5, C5, C4, A3)
-    >>> #_DOCS_SHOW resolution2.ShowResolutions(domPossibA3, resPossibA3a, domPossibA3, resPossibA3b)
+    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA3, resPossibA3a, domPossibA3, resPossibA3b)
     '''
     V7chord = chord.Chord(domPossib)   
     root = V7chord.root()
@@ -65,7 +65,7 @@ def dominantSeventhToMajorTonic(domPossib, resolveV43toI6 = False):
 def dominantSeventhToMinorTonic(domPossib, resolveV43toi6 = False):
     '''
     >>> from music21.figuredBass.fbPitch import HashablePitch
-    >>> from music21.figuredBass import resolution2
+    >>> from music21.figuredBass import resolution
     >>> G2 = HashablePitch('G2')
     >>> C3 = HashablePitch('C3')
     >>> E3 = HashablePitch('E3')
@@ -78,25 +78,25 @@ def dominantSeventhToMinorTonic(domPossib, resolveV43toi6 = False):
     >>> D5 = HashablePitch('D5')
     >>> E5 = HashablePitch('E5')
     >>> domPossibA1 = (D5, F4, B3, G2)
-    >>> resPossibA1 = resolution2.dominantSeventhToMinorTonic(domPossibA1)
+    >>> resPossibA1 = resolution.dominantSeventhToMinorTonic(domPossibA1)
     >>> resPossibA1
     (C5, E-4, C4, C3)
-    >>> #_DOCS_SHOW resolution2.ShowResolutions(domPossibA1, resPossibA1)
+    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA1, resPossibA1)
     
     >>> domPossibA2 = (Bb3, G3, E3, C3)
-    >>> resPossibA2 = resolution2.dominantSeventhToMinorTonic(domPossibA2)
+    >>> resPossibA2 = resolution.dominantSeventhToMinorTonic(domPossibA2)
     >>> resPossibA2
     (A-3, F3, F3, F3)
-    >>> #_DOCS_SHOW resolution2.ShowResolutions(domPossibA2, resPossibA2)
+    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA2, resPossibA2)
     
     >>> domPossibA3 = (E5, Bb4, C4, G3)
-    >>> resPossibA3a = resolution2.dominantSeventhToMinorTonic(domPossibA3, False)
+    >>> resPossibA3a = resolution.dominantSeventhToMinorTonic(domPossibA3, False)
     >>> resPossibA3a
     (F5, A-4, C4, F3)
-    >>> resPossibA3b = resolution2.dominantSeventhToMinorTonic(domPossibA3, True)
+    >>> resPossibA3b = resolution.dominantSeventhToMinorTonic(domPossibA3, True)
     >>> resPossibA3b
     (F5, C5, C4, A-3)
-    >>> #_DOCS_SHOW resolution2.ShowResolutions(domPossibA3, resPossibA3a, domPossibA3, resPossibA3b)
+    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA3, resPossibA3a, domPossibA3, resPossibA3b)
     '''
     V7chord = chord.Chord(domPossib)   
     root = V7chord.root()
@@ -121,16 +121,16 @@ def dominantSeventhToMinorTonic(domPossib, resolveV43toi6 = False):
 def dominantSeventhToMajorSubmediant(domPossib):
     '''
     >>> from music21.figuredBass.fbPitch import HashablePitch
-    >>> from music21.figuredBass import resolution2
+    >>> from music21.figuredBass import resolution
     >>> G2 = HashablePitch('G2')
     >>> B3 = HashablePitch('B3')
     >>> F4 = HashablePitch('F4')
     >>> D5 = HashablePitch('D5')
     >>> domPossibA1 = (D5, F4, B3, G2)
-    >>> resPossibA1 = resolution2.dominantSeventhToMajorSubmediant(domPossibA1)
+    >>> resPossibA1 = resolution.dominantSeventhToMajorSubmediant(domPossibA1)
     >>> resPossibA1
     (C5, E-4, C4, A-2)
-    >>> #_DOCS_SHOW resolution2.ShowResolutions(domPossibA1, resPossibA1)    
+    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA1, resPossibA1)    
     '''
     V7chord = chord.Chord(domPossib)   
     root = V7chord.root()
@@ -152,16 +152,16 @@ def dominantSeventhToMajorSubmediant(domPossib):
 def dominantSeventhToMinorSubmediant(domPossib):
     '''
     >>> from music21.figuredBass.fbPitch import HashablePitch
-    >>> from music21.figuredBass import resolution2
+    >>> from music21.figuredBass import resolution
     >>> G2 = HashablePitch('G2')
     >>> B3 = HashablePitch('B3')
     >>> F4 = HashablePitch('F4')
     >>> D5 = HashablePitch('D5')
     >>> domPossibA1 = (D5, F4, B3, G2)
-    >>> resPossibA1 = resolution2.dominantSeventhToMinorSubmediant(domPossibA1)
+    >>> resPossibA1 = resolution.dominantSeventhToMinorSubmediant(domPossibA1)
     >>> resPossibA1
     (C5, E4, C4, A2)
-    >>> #_DOCS_SHOW resolution2.ShowResolutions(domPossibA1, resPossibA1)    
+    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA1, resPossibA1)    
     '''
     V7chord = chord.Chord(domPossib)   
     root = V7chord.root()
@@ -183,16 +183,16 @@ def dominantSeventhToMinorSubmediant(domPossib):
 def dominantSeventhToMajorSubdominant(domPossib):
     '''
     >>> from music21.figuredBass.fbPitch import HashablePitch
-    >>> from music21.figuredBass import resolution2
+    >>> from music21.figuredBass import resolution
     >>> G2 = HashablePitch('G2')
     >>> B3 = HashablePitch('B3')
     >>> F4 = HashablePitch('F4')
     >>> D5 = HashablePitch('D5')
     >>> domPossibA1 = (D5, F4, B3, G2)
-    >>> resPossibA1 = resolution2.dominantSeventhToMajorSubdominant(domPossibA1)
+    >>> resPossibA1 = resolution.dominantSeventhToMajorSubdominant(domPossibA1)
     >>> resPossibA1
     (C5, F4, C4, A2)
-    >>> #_DOCS_SHOW resolution2.ShowResolutions(domPossibA1, resPossibA1)    
+    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA1, resPossibA1)    
     '''
     V7chord = chord.Chord(domPossib)   
     root = V7chord.root()
@@ -213,16 +213,16 @@ def dominantSeventhToMajorSubdominant(domPossib):
 def dominantSeventhToMinorSubdominant(domPossib):
     '''
     >>> from music21.figuredBass.fbPitch import HashablePitch
-    >>> from music21.figuredBass import resolution2
+    >>> from music21.figuredBass import resolution
     >>> G2 = HashablePitch('G2')
     >>> B3 = HashablePitch('B3')
     >>> F4 = HashablePitch('F4')
     >>> D5 = HashablePitch('D5')
     >>> domPossibA1 = (D5, F4, B3, G2)
-    >>> resPossibA1 = resolution2.dominantSeventhToMinorSubdominant(domPossibA1)
+    >>> resPossibA1 = resolution.dominantSeventhToMinorSubdominant(domPossibA1)
     >>> resPossibA1
     (C5, F4, C4, A-2)
-    >>> #_DOCS_SHOW resolution2.ShowResolutions(domPossibA1, resPossibA1)    
+    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA1, resPossibA1)    
     '''
     V7chord = chord.Chord(domPossib)   
     root = V7chord.root()
@@ -243,19 +243,19 @@ def dominantSeventhToMinorSubdominant(domPossib):
 def diminishedSeventhToMajorTonic(dimPossib, doubledRoot = False):
     '''
     >>> from music21.figuredBass.fbPitch import HashablePitch
-    >>> from music21.figuredBass import resolution2
+    >>> from music21.figuredBass import resolution
     >>> Cs3 = HashablePitch('C#3')
     >>> G3 = HashablePitch('G3')
     >>> E4 = HashablePitch('E4')
     >>> Bb4 = HashablePitch('B-4')
     >>> dimPossibA = (Bb4, E4, G3, Cs3)
-    >>> resPossibAa = resolution2.diminishedSeventhToMajorTonic(dimPossibA, False)
+    >>> resPossibAa = resolution.diminishedSeventhToMajorTonic(dimPossibA, False)
     >>> resPossibAa
     (A4, F#4, F#3, D3)
-    >>> resPossibAb = resolution2.diminishedSeventhToMajorTonic(dimPossibA, True)
+    >>> resPossibAb = resolution.diminishedSeventhToMajorTonic(dimPossibA, True)
     >>> resPossibAb
     (A4, D4, F#3, D3)
-    >>> #_DOCS_SHOW resolution2.showResolutions(dimPossibA, resPossibAa, dimPossibA, resPossibAb)
+    >>> #_DOCS_SHOW resolution.showResolutions(dimPossibA, resPossibAa, dimPossibA, resPossibAb)
     '''
     dim7chord = chord.Chord(dimPossib)
     root = dim7chord.root()
@@ -278,19 +278,19 @@ def diminishedSeventhToMajorTonic(dimPossib, doubledRoot = False):
 def diminishedSeventhToMinorTonic(dimPossib, doubledRoot = False):
     '''
     >>> from music21.figuredBass.fbPitch import HashablePitch
-    >>> from music21.figuredBass import resolution2
+    >>> from music21.figuredBass import resolution
     >>> Cs3 = HashablePitch('C#3')
     >>> G3 = HashablePitch('G3')
     >>> E4 = HashablePitch('E4')
     >>> Bb4 = HashablePitch('B-4')
     >>> dimPossibA = (Bb4, E4, G3, Cs3)
-    >>> resPossibAa = resolution2.diminishedSeventhToMinorTonic(dimPossibA, False)
+    >>> resPossibAa = resolution.diminishedSeventhToMinorTonic(dimPossibA, False)
     >>> resPossibAa
     (A4, F4, F3, D3)
-    >>> resPossibAb = resolution2.diminishedSeventhToMinorTonic(dimPossibA, True)
+    >>> resPossibAb = resolution.diminishedSeventhToMinorTonic(dimPossibA, True)
     >>> resPossibAb
     (A4, D4, F3, D3)
-    >>> #_DOCS_SHOW resolution2.showResolutions(dimPossibA, resPossibAa, dimPossibA, resPossibAb)
+    >>> #_DOCS_SHOW resolution.showResolutions(dimPossibA, resPossibAa, dimPossibA, resPossibAb)
     '''
     dim7chord = chord.Chord(dimPossib)
     root = dim7chord.root()
@@ -313,16 +313,16 @@ def diminishedSeventhToMinorTonic(dimPossib, doubledRoot = False):
 def diminishedSeventhToMajorSubdominant(dimPossib):
     '''
     >>> from music21.figuredBass.fbPitch import HashablePitch
-    >>> from music21.figuredBass import resolution2
+    >>> from music21.figuredBass import resolution
     >>> Cs3 = HashablePitch('C#3')
     >>> G3 = HashablePitch('G3')
     >>> E4 = HashablePitch('E4')
     >>> Bb4 = HashablePitch('B-4')
     >>> dimPossibA = (Bb4, E4, G3, Cs3)
-    >>> resPossibA = resolution2.diminishedSeventhToMajorSubdominant(dimPossibA)
+    >>> resPossibA = resolution.diminishedSeventhToMajorSubdominant(dimPossibA)
     >>> resPossibA
     (B4, D4, G3, D3)
-    >>> #_DOCS_SHOW resolution2.showResolutions(dimPossibA, resPossibA)
+    >>> #_DOCS_SHOW resolution.showResolutions(dimPossibA, resPossibA)
     '''
     dim7chord = chord.Chord(dimPossib)
     root = dim7chord.root()
@@ -343,16 +343,16 @@ def diminishedSeventhToMajorSubdominant(dimPossib):
 def diminishedSeventhToMinorSubdominant(dimPossib):
     '''
     >>> from music21.figuredBass.fbPitch import HashablePitch
-    >>> from music21.figuredBass import resolution2
+    >>> from music21.figuredBass import resolution
     >>> Cs3 = HashablePitch('C#3')
     >>> G3 = HashablePitch('G3')
     >>> E4 = HashablePitch('E4')
     >>> Bb4 = HashablePitch('B-4')
     >>> dimPossibA = (Bb4, E4, G3, Cs3)
-    >>> resPossibA = resolution2.diminishedSeventhToMinorSubdominant(dimPossibA)
+    >>> resPossibA = resolution.diminishedSeventhToMinorSubdominant(dimPossibA)
     >>> resPossibA
     (B-4, D4, G3, D3)
-    >>> #_DOCS_SHOW resolution2.showResolutions(dimPossibA, resPossibA)
+    >>> #_DOCS_SHOW resolution.showResolutions(dimPossibA, resPossibA)
     '''
     dim7chord = chord.Chord(dimPossib)
     root = dim7chord.root()
