@@ -1598,10 +1598,10 @@ class Chord(note.NotRest):
         >>> c5 = chord.Chord(['A-4','C5','F#6', 'C5', 'F#7'])
         >>> c5.isItalianAugmentedSixth(restrictDoublings = True)
         False        
-        
+        >>> c5.isItalianAugmentedSixth(restrictDoublings = False)
+        True
         '''
         ### It+6 => Minor sixth scale step in bass, tonic, raised 4th + doubling of tonic note.
-        pass
         augSixthChord = self.removeRedundantPitchNames(inPlace = False)
         
         ### Chord must be in first inversion.
@@ -1631,11 +1631,12 @@ class Chord(note.NotRest):
             if not (samplePitch == bass or samplePitch == root or samplePitch == tonic):
                 return False
 
-        # only the tonic can be doubled...        
-        for samplePitch in self.pitches:
-            if not (samplePitch.nameWithOctave == bass.nameWithOctave or samplePitch.nameWithOctave == root.nameWithOctave or samplePitch.nameWithOctave == tonic.nameWithOctave):
-                if samplePitch.name != tonic.name:
-                    return False
+        if restrictDoublings:
+            # only the tonic can be doubled...        
+            for samplePitch in self.pitches:
+                if not (samplePitch.nameWithOctave == bass.nameWithOctave or samplePitch.nameWithOctave == root.nameWithOctave or samplePitch.nameWithOctave == tonic.nameWithOctave):
+                    if samplePitch.name != tonic.name:
+                        return False
     
         return True
 
