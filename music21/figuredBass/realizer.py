@@ -45,7 +45,7 @@ def figuredBassFromStream(streamPart):
     >>> fbRealization = fb.realize(fbRules)
     >>> fbRealization.getNumSolutions()
     127
-    >>> fbRealization.generateRandomRealizations(20).show()
+    >>> #_DOCS_SHOW fbRealization.generateRandomRealizations(20).show()
     '''
     sf = streamPart.flat
     sfn = sf.notes
