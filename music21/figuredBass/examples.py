@@ -15,10 +15,9 @@ from music21 import key
 from music21 import interval
 from music21 import meter
 from music21 import stream
-
+from music21 import tinyNotation
 from music21.figuredBass import realizer
 from music21.figuredBass import rules
-from music21 import tinyNotation
 
 def exampleA():
     '''
