@@ -108,7 +108,6 @@ def augmentedSixthRealizationExample():
     return realizer.figuredBassFromStream(s)
     
 def twelveBarBlues():
-    fb = realizer.FiguredBassLine(key.Key('B-'), meter.TimeSignature('4/4'))
     s = tinyNotation.TinyNotationStream("BB-1 E-1 BB-1 BB-1_7 E-1 E-1 BB-1 BB-1_7 F1_7 G1_6 BB-1 BB-1")
     s.insert(0, key.Key('B-'))
     return realizer.figuredBassFromStream(s)
