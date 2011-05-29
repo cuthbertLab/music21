@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
-# Name:         possibility2.py
+# Name:         possibility.py
 # Purpose:      music21 class to define rule checking methods for a possibility
 #                represented as a tuple.
 # Authors:      Jose Cabal-Ugaz
