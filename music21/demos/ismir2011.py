@@ -150,8 +150,8 @@ def testChinaEuropeFull():
 def testChinaEuropeSimpler():
     import orange, orngTree
 
-    trainData = orange.ExampleTable('folkTrain.tab')
-    testData  = orange.ExampleTable('folkTest.tab')
+    trainData = orange.ExampleTable('ismir2011_fb_folkTrain.tab')
+    testData  = orange.ExampleTable('ismir2011_fb_folkTest.tab')
 
     majClassifier = orange.MajorityLearner(trainData)
     knnClassifier = orange.kNNLearner(trainData)
@@ -306,7 +306,7 @@ def exampleD():
     eD.showRandomRealizations(20)
     
 def fbFeatureExtraction():
-    exampleFB = converter.parse('d:/desktop/example1b.xml')
+    exampleFB = converter.parse('ismir2011_fb_example1a.xml')
     fe1 = features.jSymbolic.\
          PitchClassDistributionFeature(exampleFB)
     print fe1.extract().vector
@@ -324,8 +324,8 @@ def fbFeatureExtraction():
     exampleFB.parts[0][2].append(y)
     
     fb1 = figuredBass.realizer.figuredBassFromStream(exampleFB.parts[1])
-    fb1.realize()
-    sol1 = fb1.generateRandomRealization()
+    realization = fb1.realize()
+    sol1 = realization.generateRandomRealization()
     
     exampleFBOut = stream.Score()
     exampleFBOut.insert(0, exampleFB.parts[0])
@@ -340,7 +340,7 @@ def fbFeatureExtraction():
 #testTrecentoSimpler()
 #prepareTrecentoCadences()
 #figuredBassScale()
-#fbFeatureExtraction()
+fbFeatureExtraction()
 #testChinaEuropeSimpler()
 
 #prepareChinaEurope2()

@@ -104,7 +104,7 @@ def addLyricsToBassNote(bassNote, notationString):
             spacesInFront += ' '
         bassNote.addLyric(spacesInFront + fs, applyRaw = True)
 
-class FiguredBassLine:
+class FiguredBassLine(object):
     '''
     '''
     def __init__(self, inKey = key.Key('C'), inTime = meter.TimeSignature('4/4')):
@@ -168,7 +168,7 @@ class FiguredBassLine:
         return True
 
 
-class Realization():
+class Realization(object):
     def __init__(self, segmentList, inKey, inTime):
         self.segmentList = segmentList
         self.inKey = inKey

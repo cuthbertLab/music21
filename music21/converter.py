@@ -789,7 +789,7 @@ class Converter(object):
             elif 'Time Signature:' in dataStr and 'm1' in dataStr:
                 format = 'romanText'
             else:
-                raise ConverterException('no such format found for: %s' % dataStr)
+                raise ConverterException('File not found or no such format found for: %s' % dataStr)
 
         self._setConverter(format)
         self._converter.parseData(dataStr, number=number)
