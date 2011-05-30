@@ -220,7 +220,7 @@ class Enumeration(object):
     '''
     def __init__(self, enumList): 
         lookup = { } 
-        reverseLookup = { } 
+        reverseLookup = {} 
         i = 0 
         uniqueNames = [ ] 
         uniqueValues = [ ] 
@@ -404,6 +404,9 @@ class MidiEvent(object):
         # if a noteOn, store the note off, and vice versa
         self.correspondingEvent = None
 
+        # store and pass on a running status if found
+        self.runningStatusByte = None
+
     def __cmp__(self, other): 
         return cmp(self.time, other.time) 
     
@@ -515,7 +518,56 @@ class MidiEvent(object):
         self._parameter1 = d2
         self._parameter2 = d1 # d1 is msb here
         
+    def _parseChannelVoiceMessage(self, str, runningStatusByte=None):
+        '''
+        running status byte is one char.
+        '''
+        # x, y, and z define characteristics of the first two chars
+        # for x: The left nybble (4 bits) contains the actual command, and the right nibble contains the midi channel number on which the command will be executed.
+        if runningStatusByte is None:
+            x = ord(str[0]) # return the char number
+            y = x & 0xF0  # bitwise and to derive channel number
+            z = ord(str[1])
+            thirdByte = str[2] 
+        else: # if using running status
+            x = ord(runningStatusByte) # return the char number
+            y = x & 0xF0  # bitwise and to derive channel number
+            z = ord(str[0])
+            thirdByte = str[1] 
 
+        # note channel 15 may map wrong:
+        #>>> 0x0F & 0x0F + 1
+        #0
+        self.channel = (x & 0x0F) + 1  # this is same as y + 1
+        self.type = channelVoiceMessages.whatis(y) 
+        #environLocal.printDebug(['MidiEvent.read()', self.type])
+        if (self.type == "PROGRAM_CHANGE" or 
+            self.type == "CHANNEL_KEY_PRESSURE"): 
+            self.data = z 
+            if runningStatusByte is None:
+                return str[2:] 
+            else:
+                return str[1:] 
+        elif (self.type == "CONTROLLER_CHANGE"):
+            # for now, do nothing with this data
+            # for a note, str[2] is velocity; here, it is the control value
+            self.pitch = z # this is the controller id
+            self.velocity = ord(thirdByte) # this is the controller value
+            if runningStatusByte is None:
+                return str[3:] 
+            else:
+                return str[2:] 
+        else: 
+            self.pitch = z
+            # read the third chart toi get velocity 
+            self.velocity = ord(thirdByte) 
+            # each MidiChannel object is accessed here
+            # using that channel, data for each event is added or 
+            # removed 
+            if runningStatusByte is None:
+                return str[3:] 
+            else:
+                return str[2:] 
 
     def read(self, time, str): 
         '''Read a MIDI event.
@@ -536,35 +588,7 @@ class MidiEvent(object):
 
         #environLocal.printDebug(['MidiEvent.read(): trying to parse a MIDI event, looking at first two chars:', 'repr(x)', repr(x), 'charToBinary(str[0])', charToBinary(str[0]), 'charToBinary(str[1])', charToBinary(str[1])])
         if channelVoiceMessages.hasValue(y): 
-            self.channel = (x & 0x0F) + 1  # this is same as y + 1
-            self.type = channelVoiceMessages.whatis(y) 
-            #environLocal.printDebug(['MidiEvent.read()', self.type])
-            if (self.type == "PROGRAM_CHANGE" or 
-                self.type == "CHANNEL_KEY_PRESSURE"): 
-                self.data = z 
-                return str[2:] # only used x and z; return remainder
-            elif (self.type == "CONTROLLER_CHANGE"):
-                # for now, do nothing with this data
-                # for a note, str[2] is velocity; here, it is the control value
-                self.pitch = z # this is the controller id
-                self.velocity = ord(str[2]) # this is the controller value
-                return str[3:] 
-            else: 
-                self.pitch = z
-                # read the third chart toi get velocity 
-                self.velocity = ord(str[2]) 
-                # each MidiChannel object is accessed here
-                # using that channel, data for each event is added or 
-                # removed 
-
-                # this is not necessary for reading/writing files
-                #channel = self.track.channels[self.channel - 1] 
-#                 if (self.type == "NOTE_OFF" or 
-#                     (self.velocity == 0 and self.type == "NOTE_ON")): 
-#                     channel.noteOff(self.pitch, self.time) 
-#                 elif self.type == "NOTE_ON": 
-#                     channel.noteOn(self.pitch, self.time, self.velocity) 
-                return str[3:] 
+            return self._parseChannelVoiceMessage(str)
 
         elif y == 0xB0 and channelModeMessages.hasValue(z): 
             self.channel = (x & 0x0F) + 1 
@@ -583,8 +607,8 @@ class MidiEvent(object):
 
         # SEQUENCE_TRACK_NAME is here
         elif x == 0xFF: 
+            # TODO: this may be an indicator of running status
             #environLocal.printDebug(['MidiEvent.read(): got a variable length meta event', charToBinary(str[0])])
-
             if not metaEvents.hasValue(z): 
                 environLocal.printDebug(["unknown meta event: FF %02X" % z])
                 sys.stdout.flush() 
@@ -595,10 +619,20 @@ class MidiEvent(object):
             # return remainder
             return str[length:] 
         else:
+            # in most cases, these are happening b/c running status is in effect
             environLocal.printDebug(['got unknown midi event type', repr(x), 'charToBinary(str[0])', charToBinary(str[0]), 'charToBinary(str[1])', charToBinary(str[1])])
+
+            # emulate running status; set to note on for channel 1 for now
+#             if self.runningStatusByte is None:
+#                 rsb = self.runningStatusByte
+#             else:
+#                 rsb = chr(0x90)
+#             post = self._parseChannelVoiceMessage(str, runningStatusByte=rsb)
+#             return post
+
             raise MidiException("Unknown midi event type")
-            # return everything but the first character
-            #return str[1:] # 
+            #return everything but the first character
+            return str[1:] # 
 
 
     def write(self): 
@@ -1294,6 +1328,13 @@ class Test(unittest.TestCase):
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
+
+    def testImportWithRunningStatus(self):
+        from music21 import converter
+        # TODO: testing files with running status
+        # dealing with midi files that use running status compression
+        #s = converter.parse('/Volumes/xdisc/_sync/_x/libMidi/testProblem/Iron_Man.mid')
+        #s.show()
 
 
 #-------------------------------------------------------------------------------
