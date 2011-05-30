@@ -1139,7 +1139,7 @@ class Pitch(music21.Music21Object):
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
     }
-    def __init__(self, name=None):
+    def __init__(self, name=None, **keywords):
         '''Create a Pitch.
 
         Optional parameter name should include a step and accidental character(s)
@@ -1164,6 +1164,16 @@ class Pitch(music21.Music21Object):
         <accidental double-flat>
         >>> p3.octave
         3
+        
+        
+        Just about everything can be specified in keywords too:
+        
+        
+        >>> p4 = pitch.Pitch(name = 'C', accidental = '#', octave = 7, microtone = -30)
+        >>> p4.fullName
+        'C7-sharp (-30c)'
+        
+        
         '''
         music21.Music21Object.__init__(self)
 
@@ -1201,6 +1211,28 @@ class Pitch(music21.Music21Object):
         # the fundamental attribute stores an optional pitch
         # that defines the fundamental used to create this Pitch
         self.fundamental = None
+
+        # override just about everything with keywords
+        # necessary for ImmutablePitch objects
+        if len(keywords) > 0:
+            if 'name' in keywords:
+                self._setName(keywords['name']) # set based on string
+            if 'octave' in keywords:
+                self._octave = keywords['octave']
+            if 'accidental' in keywords:
+                if isinstance(keywords['accidental'], Accidental):
+                    self.accidental = keywords['accidental']
+                else:
+                    self.accidental = Accidental(keywords['accidental'])
+            if 'microtone' in keywords:
+                if isinstance(keywords['microtone'], Microtone):
+                    self.microtone = keywords['microtone']
+                else:
+                    self.microtone = Microtone(keywords['microtone'])
+            if 'pitchClass' in keywords:
+                self._setPitchClass(keywords['pitchClass'])
+            if 'fundamental' in keywords:
+                self.fundamental = keywords['fundamental']
 
     def __repr__(self):
         name = self.nameWithOctave
@@ -1339,8 +1371,10 @@ class Pitch(music21.Music21Object):
             self._microtone = Microtone(value)
         elif value is None: # set to zero
             self._microtone = Microtone(0)
-        else: # assume a microtone object
+        elif isinstance(value, Microtone):
             self._microtone = value
+        else:
+            raise PitchException("Cannot get a microtone object from %s", value)
         # look for microtones of 0 and set-back to None
 
 #         if common.almostEquals(self._microtone.cents, 0.0):
@@ -1367,11 +1401,21 @@ class Pitch(music21.Music21Object):
         >>> p.microtone = '(-12c' # adjustment in cents     
         >>> p
         E-4(-12c)
+        >>> p.microtone = pitch.Microtone(-30)
+        >>> p
+        E-4(-30c)
+        
         ''')
 
 
     def isTwelveTone(self):
-        '''Return a boolean describing if this Pitch is Twelve Tone: either has a non-zero microtonal adjustment or has a quarter tone accidental.
+        '''
+        Return True if this Pitch is 
+        one of the twelve tones available on a piano
+        keyboard. Returns False if it instead 
+        has a non-zero microtonal adjustment or 
+        has a quarter tone accidental.
+
 
         >>> from music21 import *
         >>> p = pitch.Pitch('g4')
@@ -1380,9 +1424,10 @@ class Pitch(music21.Music21Object):
         >>> p.microtone = -20
         >>> p.isTwelveTone()
         False
-
-        >>> p = pitch.Pitch('g~4')
-        >>> p.isTwelveTone()
+        
+        
+        >>> p2 = pitch.Pitch('g~4')
+        >>> p2.isTwelveTone()
         False            
         '''
         if self.accidental is not None:
@@ -1692,8 +1737,19 @@ class Pitch(music21.Music21Object):
         24
 
 
+        Note that like ps (pitchSpace), MIDI notes do not distinguish between 
+        sharps and flats, etc.
 
-        Midi values are also constrained to the space 0-127.  Higher or lower
+
+        >>> dSharp = pitch.Pitch('D#4')
+        >>> dSharp.midi
+        63
+        >>> eFlat = pitch.Pitch('E-4')
+        >>> eFlat.midi
+        63
+        
+
+        Midi values are constrained to the space 0-127.  Higher or lower
         values will be transposed octaves to fit in this space.
 
 
@@ -1701,10 +1757,19 @@ class Pitch(music21.Music21Object):
         >>> veryHighFHalfFlat = pitch.Pitch("F")
         >>> veryHighFHalfFlat.octave = 12
         >>> veryHighFHalfFlat.accidental = pitch.Accidental('half-flat')
+        >>> veryHighFHalfFlat
+        F`12
         >>> veryHighFHalfFlat.ps
         160.5
         >>> veryHighFHalfFlat.midi
         125
+        
+        
+        >>> notAsHighNote = pitch.Pitch()
+        >>> notAsHighNote.ps = veryHighFHalfFlat.midi
+        >>> notAsHighNote
+        F9
+
 
 
         Note that the conversion of improper midi values to proper
@@ -1866,7 +1931,10 @@ class Pitch(music21.Music21Object):
             return name
 
     fullName = property(_getFullName, 
-        doc = '''Return the most complete representation of this Pitch, providing name, octave, accidental, and any microtonal adjustments. 
+        doc = '''
+        Return the most complete representation of this Pitch, 
+        providing name, octave, accidental, and any 
+        microtonal adjustments. 
 
         >>> from music21 import *
         >>> p = pitch.Pitch('A-3')
@@ -2312,6 +2380,7 @@ class Pitch(music21.Music21Object):
         '7thH/A4'
         >>> h7.harmonicString('A3')
         '14thH/A3'
+
         
         >>> h2 = h7.getHarmonic(2)
         >>> h2
@@ -2352,11 +2421,23 @@ class Pitch(music21.Music21Object):
 
 
     def harmonicFromFundamental(self, fundamental):
-        '''Given another Pitch as a fundamental, find the harmonic of that pitch that is equal to this Pitch. 
+        '''
+        Given another Pitch as a fundamental, find the harmonic 
+        of that pitch that is equal to this Pitch. 
 
-        Returns a tuple of harmonic number, and fundamental Pitch. 
 
-        Microtones applied to the fundamental are irrelevant, as the fundamental may be microtonally shifted to find a match to this Pitch.         
+        Returns a tuple of harmonic number and the number of cents that
+        the first Pitch object would have to be shifted to be the exact
+        harmonic of this fundamental. 
+
+
+        Microtones applied to the fundamental are irrelevant, 
+        as the fundamental may be microtonally shifted to find a match to this Pitch.         
+
+
+        Example: G4 is the third harmonic of C3, albeit 2 cents flatter than
+        the true 3rd harmonic.
+        
 
         >>> from music21 import *
         >>> p = pitch.Pitch('g4')
@@ -2366,6 +2447,22 @@ class Pitch(music21.Music21Object):
         >>> p.microtone = p.harmonicFromFundamental(f)[1] # adjust microtone
         >>> int(f.getHarmonic(3).frequency) == int(p.frequency)
         True
+
+
+        
+        The shift from B-5 to the 7th harmonic of C3 is more substantial
+        and likely to be noticed by the audience.  To make p the 7th harmonic
+        it'd have to be lowered by 31 cents.  Note that the
+        second argument is a float, but because the default rounding of
+        music21 is to the nearest cent, the .0 is not a significant digit.
+        I.e. it might be more like 31.3 cents.
+        
+
+        >>> p = pitch.Pitch('B-5')
+        >>> f = pitch.Pitch('C3')
+        >>> p.harmonicFromFundamental(f)
+        (7, -31.0)
+        
         '''
         
         if common.isStr(fundamental):
@@ -2442,23 +2539,35 @@ class Pitch(music21.Music21Object):
 
 
     def harmonicString(self, fundamental=None):
-        '''Return a string representation of a harmonic equivalence. 
+        '''
+        Return a string representation of a harmonic equivalence. 
+
+
+        N.B. this has nothing to do with what string a string player
+        would use to play the harmonic on.  (Perhaps should be 
+        renamed).
+        
+
 
         >>> from music21 import *
         >>> pitch.Pitch('g4').harmonicString('c3')
         '3rdH(-2c)/C3'
         
+        
         >>> pitch.Pitch('c4').harmonicString('c3')
         '2ndH/C3'
+        
         
         >>> p = pitch.Pitch('c4')
         >>> p.microtone = 20 # raise 20 
         >>> p.harmonicString('c3')
         '2ndH(+20c)/C3'
         
+        
         >>> p.microtone = -20 # lower 20 
         >>> p.harmonicString('c3')
         '2ndH(-20c)/C3'
+        
         
         >>> p = pitch.Pitch('c4')
         >>> f = pitch.Pitch('c3')
@@ -2469,15 +2578,16 @@ class Pitch(music21.Music21Object):
         >>> p.harmonicString(f)
         '2ndH(-20c)/C3(+20c)'
         
+        
         >>> p = pitch.Pitch('A4')
         >>> p.microtone = 69
         >>> p.harmonicString('c2')
         '7thH/C2'
         
+        
         >>> p = pitch.Pitch('A4')
         >>> p.harmonicString('c2')
         '7thH(-69c)/C2'
-
         '''
         if fundamental is None:
             if self.fundamental is None:
@@ -2751,24 +2861,29 @@ class Pitch(music21.Music21Object):
 
 
     def getEnharmonic(self, inPlace=False):
-        '''Returns a new Pitch that is the(/an) enharmonic equivalent of this Pitch.
+        '''
+        Returns a new Pitch that is the(/an) enharmonic equivalent of this Pitch.
+    
     
         N.B.: n1.name == getEnharmonic(getEnharmonic(n1)).name is not necessarily true.
-        For instance: getEnharmonic(E##) => F#; getEnharmonic(F#) => G-
-                  or: getEnharmonic(A--) => G; getEnharmonic(G) => F##
-        However, for all cases not involving double sharps or flats (and even many that do)
-        getEnharmonic(getEnharmonic(n)) = n
+        For instance: 
+        
+            getEnharmonic(E##) => F#; getEnharmonic(F#) => G-
+            
+            getEnharmonic(A--) => G; getEnharmonic(G) => F##
+
+
+        However, for all cases not involving double sharps or flats 
+        (and even many that do), getEnharmonic(getEnharmonic(n)) = n
     
-        Enharmonics of the following are defined:
+    
+        For the most ambiguous cases, it's good to know that these are the enharmonics:
+        
                C <-> B#, D <-> C##, E <-> F-; F <-> E#, G <-> F##, A <-> B--, B <-> C-
+    
     
         However, isEnharmonic() for A## and B certainly returns true.
     
-        OMIT_FROM_DOCS
-        Perhaps a getFirstNEnharmonics(n) needs to be defined which returns a list of the
-        first n Enharmonics according to a particular algorithm, moving into triple sharps, etc.
-        if need be.  Or getAllCommonEnharmonics(note) which returns all possible enharmonics that
-        do not involve triple or more accidentals.
 
         >>> from music21 import *
         >>> p = pitch.Pitch('d#')
@@ -2777,6 +2892,11 @@ class Pitch(music21.Music21Object):
         >>> p = pitch.Pitch('e-8')
         >>> p.getEnharmonic()
         D#8
+        
+        
+        Other tests:
+        
+        
         >>> pitch.Pitch('c-3').getEnharmonic()
         B2
         >>> pitch.Pitch('e#2').getEnharmonic()
@@ -2785,11 +2905,32 @@ class Pitch(music21.Music21Object):
         G-2
         >>> pitch.Pitch('c##5').getEnharmonic()
         D5
-        >>> pitch.Pitch('g3').getEnharmonic() # presently does not alter
-        G3
+        >>> pitch.Pitch('g3').getEnharmonic() 
+        F##3
+        >>> pitch.Pitch('B7').getEnharmonic()
+        C-8
+
+
+        Octaveless Pitches remain octaveless:
+        
+
         >>> p = pitch.Pitch('a-')
-        >>> p.getEnharmonic() # should not have octave
+        >>> p.getEnharmonic()
         G#
+        >>> p = pitch.Pitch('B#')
+        >>> p.getEnharmonic()
+        C
+
+
+
+    
+    
+        OMIT_FROM_DOCS
+        Perhaps a getFirstNEnharmonics(n) needs to be defined which returns a list of the
+        first n Enharmonics according to a particular algorithm, moving into triple sharps, etc.
+        if need be.  Or getAllCommonEnharmonics(note) which returns all possible enharmonics that
+        do not involve triple or more accidentals.
+
         '''
         psRef = self.ps
         if inPlace:
@@ -2804,8 +2945,18 @@ class Pitch(music21.Music21Object):
             elif post.accidental.alter < 0:
                 post.getLowerEnharmonic(inPlace=True)
             else: # assume some direction, perhaps using a dictionary
-                post.getLowerEnharmonic(inPlace=True)
+                if self.step in ['C','D','G']:               
+                    post.getLowerEnharmonic(inPlace=True)
+                else:
+                    post.getHigherEnharmonic(inPlace=True)
 
+        else:
+            if self.step in ['C','D','G']:               
+                post.getLowerEnharmonic(inPlace=True)
+            else:
+                post.getHigherEnharmonic(inPlace=True)
+
+        
         if inPlace:
             return None
         else:
@@ -2931,6 +3082,12 @@ class Pitch(music21.Music21Object):
         >>> lowC = dPitch.transpose('m-23')
         >>> lowC
         C#-1
+        
+        
+        >>> otherPitch = pitch.Pitch('D2')
+        >>> otherPitch.transpose('m-23', inPlace = True)
+        >>> otherPitch
+        C#-1
         '''
         #environLocal.printDebug(['Pitch.transpose()', value])
         if hasattr(value, 'diatonic'): # its an Interval class with a DiatonicInterval class
@@ -2943,9 +3100,7 @@ class Pitch(music21.Music21Object):
             p = intervalObj.transposePitch(self)
             # can setName with nameWithOctave to recreate all essential
             # pitch attributes
-            # NOTE: in some cases this may not return exactly the proper config
-            
-            # TODO -- DOES NOT WORK IF OCTAVE IS NEGATIVE.  A, -2 = A-flat 2!
+            # NOTE: in some cases this may not return exactly the proper config            
             self._setName(p.name)
             self._setOctave(p.octave)
             # manually copy accidental object

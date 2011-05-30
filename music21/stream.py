@@ -3701,6 +3701,7 @@ class Stream(music21.Music21Object):
         a single measure of 4/4 is created by from a stream
         containing only three quarter notes:        
         
+        
         >>> from music21 import *
         >>> sSrc = stream.Stream()
         >>> sSrc.append(note.QuarterNote('C4'))
@@ -3718,6 +3719,7 @@ class Stream(music21.Music21Object):
         
         Notice that the last measure is incomplete -- makeMeasures
         does not fill up incomplete measures.
+
         
         We can also check that the measure created has
         the correct TimeSignature:
@@ -4064,11 +4066,21 @@ class Stream(music21.Music21Object):
 
     def makeTies(self, meterStream=None, inPlace=True, 
         displayTiedAccidentals=False):
-        '''Given a stream containing measures, examine each element in the Stream. If the elements duration extends beyond the measures boundary, create a tied entity, placing the split Note in the next Measure.
+        '''
+        Given a stream containing measures, examine each element in the 
+        Stream. If the elements duration extends beyond the measure's boundary, 
+        create a tied entity, placing the split Note in the next Measure.
 
-        Note that his method assumes that there is appropriate space in the next Measure: this will not shift Note, but instead allocate them evenly over barlines. Generall, makeMeasures is called prior to calling this method.
+
+        Note that this method assumes that there is appropriate space 
+        in the next Measure: this will not shift Note objects, but instead allocate 
+        them evenly over barlines. Generally, makeMeasures is called prior 
+        to calling this method.
+
     
-        If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
+        If `inPlace` is True, this is done in-place; 
+        if `inPlace` is False, this returns a modified deep copy.
+
 
         >>> from music21 import *
                 
@@ -4080,6 +4092,7 @@ class Stream(music21.Music21Object):
         >>> x = d.makeMeasures()
         >>> x = x.makeTies()
     
+
         OMIT_FROM_DOCS
         TODO: take a list of clases to act as filter on what elements are tied.
 
@@ -7669,6 +7682,14 @@ class Measure(Stream):
         # on input
         self.layoutWidth = None
 
+
+#    def makeMeasures(self, dummy = None, dummy = None, inPlace = False):
+#        '''
+#        Overrides the makeMeasures routine in 
+#        Stream to allow makeNotation() [which calls makeMeasures] to
+#        be called on a Measure object
+#        '''
+        
 
     def addRepeat(self):
         # TODO: write

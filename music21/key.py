@@ -91,6 +91,9 @@ def sharpsToPitch(sharpCount):
     >>> k1.accidental
     <accidental sharp>
     '''
+    if sharpCount is None:
+        sharpCount = 0 # fix for C major
+    
     if sharpCount in _sharpsToPitchCache.keys():
         # return a deepcopy of the pitch
         return copy.deepcopy(_sharpsToPitchCache[sharpCount])

@@ -626,7 +626,7 @@ class Note(NotRest):
             if isinstance(arguments[0], pitch.Pitch):
                 self.pitch = arguments[0]
             else: # assume first arg is pitch
-                self.pitch = pitch.Pitch(arguments[0]) 
+                self.pitch = pitch.Pitch(arguments[0], **keywords) 
         else: # supply a default pitch
             self.pitch = pitch.Pitch('C4')
 

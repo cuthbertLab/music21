@@ -283,7 +283,7 @@ class Test(unittest.TestCase):
         self.assertEqual(TM1.value, "Lebhaft")
         
 
-    def testUnicdoe(self):
+    def testUnicode(self):
 
         from music21 import tempo
         # test with no arguments
