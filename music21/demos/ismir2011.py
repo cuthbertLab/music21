@@ -305,7 +305,7 @@ def exampleD():
     eD.realize()
     eD.showRandomRealizations(20)
     
-def featureExtraction():
+def fbFeatureExtraction():
     exampleFB = converter.parse('d:/desktop/example1b.xml')
     fe1 = features.jSymbolic.\
          PitchClassDistributionFeature(exampleFB)
@@ -340,7 +340,7 @@ def featureExtraction():
 #testTrecentoSimpler()
 #prepareTrecentoCadences()
 #figuredBassScale()
-#featureExtraction()
+#fbFeatureExtraction()
 #testChinaEuropeSimpler()
 
 #prepareChinaEurope2()
