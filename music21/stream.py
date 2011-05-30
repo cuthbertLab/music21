@@ -1375,7 +1375,6 @@ class Stream(music21.Music21Object):
         '''Given a `target` object, replace all references of that object with 
         references to the supplied `replacement` object.
 
-        
 
         If `allTargetSites` is True (as it is by default), all sites that 
         have a reference for the replacement will be similarly changed. 
@@ -1384,6 +1383,8 @@ class Stream(music21.Music21Object):
         # get all indices in this Stream that match
         if common.isNum(target): # matching object id number
             iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
+        elif target is None:
+            raise StreamException('received a target of None as a candidate for replacement.')
         else: # matching object directly
             iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
 
@@ -2449,7 +2450,7 @@ class Stream(music21.Music21Object):
         #tempFlat = self.flat
         #environLocal.printDebug(['measures(): post flat call', self, 'len(self.flat)', len(self.flat)])
 
-        # spanners may be store at the container level, not w/n a measure
+        # spanners may be store at the container/Part level, not w/n a measure
         # if they are within the Measure, or a voice, they will be transfered
         # below
         mStreamSpanners = self.spanners
@@ -2460,7 +2461,7 @@ class Stream(music21.Music21Object):
         returnObj.mergeAttributes(self) # get id and groups
         srcObj = self
 
-        # if we have no Measure defined, call makeNotation
+        # if we have no Measures defined, call makeNotation
         # this will  return a deepcopy of all objects
         if len(mStream) == 0:
             mStream = self.makeNotation(inPlace=False)
@@ -2470,12 +2471,14 @@ class Stream(music21.Music21Object):
             # TODO: make sure that makeNotation copies spanners
             mStreamSpanners = mStream.spanners
 
+        # create for storage and processing
+        spannerBundle = spanner.SpannerBundle()
         if gatherSpanners:
             for sp in mStreamSpanners:
                 #environLocal.printDebug(['copying spanner to returnObj', sp])
-                # store in flat locations? could also be end elements?
-                returnObj.insert(sp.getOffsetBySite(mStreamSpanners), sp)
-                #environLocal.printDebug(['Stream.measrues: copying spanners:', sp])
+                # store for latter processing
+                spannerBundle.append(sp)
+
 
         for m in mStream.elements:
             #environLocal.printDebug(['m', m])
@@ -2537,10 +2540,16 @@ class Stream(music21.Music21Object):
 
                 #environLocal.printDebug(['startOffset', startOffset, 'startMeasure', startMeasure])
 
+                # get offset before doing spanner updates; not sure why yet
+                oldOffset = m.getOffsetBySite(srcObj)
+
                 # create a new Measure container, but populate it 
                 # with the same elements
                 mNew = Measure()
                 mNew.mergeAttributes(m)
+
+                # replace any spanner associations with this measure
+                spannerBundle.replaceComponent(m, mNew)
 
                 # will only set on first time through
                 if startMeasureNew is None:
@@ -2553,7 +2562,6 @@ class Stream(music21.Music21Object):
                 for e in m._endElements:
                     mNew.storeAtEnd(e)
 
-                oldOffset = m.getOffsetBySite(srcObj)
                 # subtract the offset of the first measure
                 # this will be zero in the first usage
                 newOffset = oldOffset - startOffset
@@ -2578,6 +2586,13 @@ class Stream(music21.Music21Object):
             else:
                 pass
                 #environLocal.printDebug(['measures(): cannot find requested class in stream:', className])
+
+        if gatherSpanners:
+            for sp in spannerBundle:
+                # can use old offsets of spanners, even though components
+                # have been updated
+                returnObj.insert(sp.getOffsetBySite(mStreamSpanners), sp)
+                #environLocal.printDebug(['Stream.measrues: copying spanners:', sp])
 
         #environLocal.printDebug(['len(returnObj.flat)', len(returnObj.flat)])
         return returnObj
@@ -3069,11 +3084,11 @@ class Stream(music21.Music21Object):
             {0.0} <music21.note.Note B->
             {1.5} <music21.note.Note A->
         {2.0} <music21.stream.Measure 2 offset=2.0>
-            {2.0} <music21.key.KeySignature of 5 sharps>
-            {2.0} <music21.note.Note G#>
-            {2.5} <music21.note.Note A#>
-            {3.0} <music21.note.Note B>
-            {3.5} <music21.note.Note A#>
+            {0.0} <music21.key.KeySignature of 5 sharps>
+            {0.0} <music21.note.Note G#>
+            {0.5} <music21.note.Note A#>
+            {1.0} <music21.note.Note B>
+            {1.5} <music21.note.Note A#>
         '''
         keySigSearch = self.flat.getElementsByClass(key.KeySignature)
         
@@ -14157,11 +14172,16 @@ class Test(unittest.TestCase):
         from music21 import corpus
         # test getting spanners after .measures extraction
         s = corpus.parse('opus74no1', 3)
-        post = s.measures(68,81)
+        post = s.parts[0].measures(68,81)
+
         # two per part
-        self.assertEqual(len(post.parts[0].getElementsByClass('RepeatBracket')), 2)
-        # TODO: this is not yet showing repeat brackets
+        rbSpanners = post.getElementsByClass('RepeatBracket')
+        self.assertEqual(len(rbSpanners), 2)
         #post.parts[0].show()
+        firstComponentIds = [id(x) for x in rbSpanners[0].getComponents()]
+        secondComponentIds = [id(x) for x in rbSpanners[1].getComponents()]
+        #self.assertEqual()
+        # TODO: compare ids of new measures
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

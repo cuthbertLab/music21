@@ -2753,15 +2753,6 @@ spirit</words>
         s = corpus.parse('opus74no1', 3)
         # there are 2 for each part, totaling 8
         self.assertEqual(len(s.flat.getElementsByClass('RepeatBracket')), 8)
-        #for e in s.flat.getElementsByClass('RepeatBracket'):
-        #s.show()
-        raw = s.parts[0].musicxml
-        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="1" type="stop"/>""")>1, True)    
-
-        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
-
         # can get for each part as spanners are stored in Part now
         raw = s.parts[1].musicxml
         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
@@ -2771,8 +2762,19 @@ spirit</words>
         self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
 
         # TODO: need to test getting repeat brackets after measure extraction
-        
+        #s.parts[0].show() # 72 through 77
+        sSub = s.parts[0].measures(72, 77)
+        # 2 repeat brackets are gathered b/c they are stored at the Part by 
+        # default
+        rbSpanners = sSub.getElementsByClass('RepeatBracket')
+        self.assertEqual(len(rbSpanners), 2)
 
+        for m in sSub:
+            print m, id(m)
+        for rb in rbSpanners:
+            print rb, [id(x) for x in rb.getComponents()]
+
+        #sSub.show('t')
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
