@@ -14183,6 +14183,35 @@ class Test(unittest.TestCase):
         #self.assertEqual()
         # TODO: compare ids of new measures
 
+
+    def testMeasureGrouping(self):
+        from music21 import corpus
+        def parseMeasures(piece):
+            #The measures of the piece, for a unique extraction
+            voicesMeasures = []
+            for part in piece.parts:
+                # not all things in a Part are Measure objects; you might
+                # also find Instruments and Spanners, for example.
+                # thus, filter by Measure first to get the highest measure number
+                mMax = part.getElementsByClass('Measure')[-1].number
+                # the measures() method returns more than just measures; 
+                # it the Part it returns includes Slurs, that may reside at the
+                # Part level
+                voicesMeasures.append(part.measures(0, mMax))
+        
+            #The problem itself : print a measure to check if len(notes) == 0
+            for voice in voicesMeasures:
+                # only get the Measures, not everything in the Part
+                for meas in voice.getElementsByClass('Measure'):
+                    # some Measures contain Voices, some do not
+                    # do get all notes regardless of Voices, take a flat measure
+                    self.assertEqual(len(meas.flat.notesAndRests) != 0, True)
+        piece = corpus.parse('haydn/opus74no2/movement3.xml')
+        parseMeasures(piece)        
+        piece = corpus.parse('bach/bwv7.7')
+        parseMeasures(piece)
+
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
