@@ -19,6 +19,7 @@ see http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e
 import unittest, doctest
 import unicodedata
 import sys, os, string, types
+import struct
 
 try:
     import StringIO # python 2 
@@ -74,6 +75,25 @@ def charToBinary(char):
     return zerofix + binary
 
 
+def intsToHexString(intList):
+    '''Convert a list of integers into a hex string, suitable for testing MIDI encoding.
+    
+    >>> from music21 import *
+    >>> # note on, middle c, 120 velocity
+    >>> midi.intsToHexString([144, 60, 120])
+    '\\x90<x'
+    '''
+    # note off are 128 to 143
+    # note on messages are decimal 144 to 159
+    post = ''
+    for i in intList:
+        # B is an unsigned char
+        # this forces values between 0 and 255
+        # the same as chr(int)
+        post += struct.pack(">B", i)
+    return post
+    
+
 def getNumber(str, length): 
     '''Return the value of a string byte from and 8-bit string. Then, return the remaining string.
 
@@ -120,7 +140,6 @@ def getVariableLengthNumber(str):
 
     >>> getVariableLengthNumber('\\xff\\x7f')
     (16383, '')
-
     '''
     # from http://faydoc.tripod.com/formats/mid.htm
     # This allows the number to be read one byte at a time, and when you see a msb of 0, you know that it was the last (least significant) byte of the number.
@@ -136,7 +155,6 @@ def getVariableLengthNumber(str):
         if not (x & 0x80): 
             #environLocal.printDebug(['getVariableLengthNumber: depth read into string: %s' % i])
             return sum, str[i:] 
-
 
 def getNumbersAsList(str):
     '''Translate each char into a number, return in a list. Used for reading data messages where each byte encodes a different discrete value. 
@@ -194,7 +212,6 @@ def putVariableLengthNumber(x):
     lst.reverse() 
     lst[-1] = chr(ord(lst[-1]) & 0x7f) 
     return string.join(lst, "") 
-
 
 def putNumbersAsList(numList):
     '''Translate a list of numbers into a character byte strings. Used for encoding data messages where each byte encodes a different discrete value. 
@@ -299,55 +316,6 @@ metaEvents = Enumeration([("SEQUENCE_NUMBER", 0x00),
                           ("KEY_SIGNATURE", 0x59), 
                           ("SEQUENCER_SPECIFIC_META_EVENT", 0x7F)]) 
 
-
-
-# def register_note(track_index, channel_index, pitch, velocity, 
-#                   keyDownTime, keyUpTime): 
-# 
-#     """ 
-#     register_note() is a hook that can be overloaded from a script that 
-#     imports this module. Here is how you might do that, if you wanted to 
-#     store the notes as tuples in a list. Including the distinction 
-#     between track and channel offers more flexibility in assigning voices. 
-#     import midi 
-#     notelist = [ ] 
-#     def register_note(t, c, p, v, t1, t2): 
-#         notelist.append((t, c, p, v, t1, t2)) 
-#     midi.register_note = register_note 
-#     """ 
-#     pass 
-
-
-
-# class MidiChannel(object): 
-#     '''A channel (together with a track) provides the continuity connecting 
-#     a NOTE_ON event with its corresponding NOTE_OFF event. Together, those 
-#     define the beginning and ending times for a Note.
-# 
-#     >>> mc = MidiChannel(0, 0)
-#     ''' 
-#     
-#     def __init__(self, track, index): 
-#         self.index = index 
-#         self.track = track 
-#         self.pitches = {} # store pairs of time and velocity
-# 
-#     def __repr__(self): 
-#         return "<MIDI channel %d>" % self.index 
-
-#     def noteOn(self, pitch, time, velocity): 
-#         self.pitches[pitch] = (time, velocity) 
-# 
-#     def noteOff(self, pitch, time): 
-#         # find and remove form dictionary
-#         if pitch in self.pitches: 
-#             keyDownTime, velocity = self.pitches[pitch] 
-#             #register_note(self.track.index, self.index, pitch, velocity, 
-#             #              keyDownTime, time) 
-#             del self.pitches[pitch] 
-
-
-
 #-------------------------------------------------------------------------------
 class MidiEvent(object): 
     '''A model of a MIDI event, including note-on, note-off, program change, controller change, any many others.
@@ -429,7 +397,6 @@ class MidiEvent(object):
                 r = r + ", " + attrib + "=" + repr(getattr(self, attrib)) 
         return r + ">" 
     
-
     # provide parameter access to pitch and velocity
     def _setPitch(self, value):
         self._parameter1 = value
@@ -520,7 +487,31 @@ class MidiEvent(object):
         
     def _parseChannelVoiceMessage(self, str, runningStatusByte=None):
         '''
-        running status byte is one char.
+        >>> from music21 import *
+        >>> mt = midi.MidiTrack(1)
+        >>> me1 = midi.MidiEvent(mt)
+        >>> remainder = me1._parseChannelVoiceMessage(midi.intsToHexString([144, 60, 120]))
+        >>> me1.channel
+        1
+        >>> remainder = me1._parseChannelVoiceMessage(midi.intsToHexString([145, 60, 120]))
+        >>> me1.channel
+        2
+        >>> me1.type
+        'NOTE_ON'
+        >>> me1.pitch
+        60
+        >>> me1.velocity
+        120
+
+        >>> # testing with an incomplete message
+        >>> me2 = midi.MidiEvent(mt)
+        >>> remainder = me2._parseChannelVoiceMessage(midi.intsToHexString([55, 106, 60, 120]), runningStatusByte=chr(145))
+        >>> len(remainder) == 2 # only take out two values
+        True
+        >>> me2.type, me2.channel
+        ('NOTE_ON', 2)
+        >>> me2.pitch, me2.velocity
+        (55, 106)
         '''
         # x, y, and z define characteristics of the first two chars
         # for x: The left nybble (4 bits) contains the actual command, and the right nibble contains the midi channel number on which the command will be executed.
@@ -558,7 +549,7 @@ class MidiEvent(object):
             else:
                 return str[2:] 
         else: 
-            self.pitch = z
+            self.pitch = z # the second byte
             # read the third chart toi get velocity 
             self.velocity = ord(thirdByte) 
             # each MidiChannel object is accessed here
@@ -1254,7 +1245,6 @@ class Test(unittest.TestCase):
 
         mt = MidiTrack(1)
 
-            
 #(0 - 16383). The pitch value affects all playing notes on the current channel. Values below 8192 decrease the pitch, while values above 8192 increase the pitch. The pitch range may vary from instrument to instrument, but is usually +/-2 semi-tones.
         #pbValues = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50] 
         pbValues = [0, 25, 0, 50, 0, 100, 0, 150, 0, 200] 
