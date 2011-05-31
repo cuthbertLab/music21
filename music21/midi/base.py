@@ -1319,11 +1319,20 @@ class Test(unittest.TestCase):
         mf.close()
 
     def testImportWithRunningStatus(self):
-        from music21 import converter
-        # TODO: testing files with running status
+        from music21 import converter, common
+
+        dir = common.getPackageDir(relative=False, remapSep=os.sep)
+        for fp in dir:
+            if fp.endswith('midi'):
+                break
+        dirLib = os.path.join(fp, 'testPrimitive')
+        # a simple file created in athenacl
+        fp = os.path.join(dirLib, 'test09.mid')
         # dealing with midi files that use running status compression
-        s = converter.parse('/Volumes/xdisc/_sync/_x/libMidi/testProblem/Iron_Man.mid')
-        #s.show()
+        s = converter.parse(fp)
+        self.assertEqual(len(s.parts), 2)
+        self.assertEqual(len(s.parts[0].notes), 711)
+        self.assertEqual(len(s.parts[1].notes), 855)
 
 
 #-------------------------------------------------------------------------------
