@@ -1,5 +1,14 @@
+#!/usr/bin/python
+#-------------------------------------------------------------------------------
+# Name:         resolution.py
+# Purpose:      Defines standard resolutions for possibility instances
+# Authors:      Jose Cabal-Ugaz
+#
+# Copyright:    (c) 2011 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+
 import copy
-import itertools
 import music21
 import unittest
 
@@ -7,13 +16,42 @@ from music21 import chord
 from music21 import note
 from music21 import stream
 
+'''
+Resolution methods. Note that the methods are speed-enhanced, 
+they assume that the possibilities provided correctly correspond
+to them and may ask for more information that would be asked for
+if designed to stand alone.
+'''
+
 def augmentedSixthToDominant(augSixthPossib, augSixthType):
     '''
+    Italian augmented 6ths not currently supported.
+    
+    >>> from music21.figuredBass.fbPitch import HashablePitch
+    >>> from music21.figuredBass import resolution
+    >>> Bb2 = HashablePitch('B-2')
+    >>> D4 = HashablePitch('D4')
+    >>> E4 = HashablePitch('E4')
+    >>> Es4 = HashablePitch('E#4')
+    >>> F4 = HashablePitch('F4')
+    >>> G4 = HashablePitch('G4')
+    >>> Gs4 = HashablePitch('G#4')
+    >>> iv6 = (G4, D4, D4, Bb2)
+    >>> itAug6 = (Gs4, D4, D4, Bb2)
+    >>> frAug6 = (Gs4, E4, D4, Bb2)
+    >>> grAug6 = (Gs4, F4, D4, Bb2)
+    >>> swAug6 = (Gs4, Es4, D4, Bb2)
+    >>> resolution.augmentedSixthToDominant(frAug6, 1)
+    (A4, E4, C#4, A2)
+    >>> resolution.augmentedSixthToDominant(grAug6, 2)
+    (A4, E4, C#4, A2)
+    >>> resolution.augmentedSixthToDominant(swAug6, 3)
+    (A4, E4, C#4, A2)
     '''
     #Type 0: Italian, type 1: French, type 2: German, type 3: Swiss
     augSixthChord = chord.Chord(augSixthPossib)
     augSixthChord.removeRedundantPitchNames()
-    if augSixthType == 1:
+    if augSixthType == 1 or augSixthType == 3:
         augSixthChord.root(augSixthChord.getChordStep(3))
     
     bass = augSixthChord.bass()
@@ -23,17 +61,40 @@ def augmentedSixthToDominant(augSixthPossib, augSixthType):
     howToResolve = \
     [(lambda p: p.name == bass.name, '-m2'),
     (lambda p: p.name == root.name, 'm2'),
-    (lambda p: p.name == tonic.name and not augSixthType == 0, '-m2'),
+    (lambda p: p.name == tonic.name, '-m2'),
+    (lambda p: augSixthType == 3, 'd1'),
     (lambda p: augSixthType == 2, '-m2')]
 
     return resolvePitches(augSixthPossib, howToResolve)
 
 def augmentedSixthToMajorTonic(augSixthPossib, augSixthType):
     '''
+    Italian augmented 6ths not currently supported.
+
+    >>> from music21.figuredBass.fbPitch import HashablePitch
+    >>> from music21.figuredBass import resolution
+    >>> Bb2 = HashablePitch('B-2')
+    >>> D4 = HashablePitch('D4')
+    >>> E4 = HashablePitch('E4')
+    >>> Es4 = HashablePitch('E#4')
+    >>> F4 = HashablePitch('F4')
+    >>> G4 = HashablePitch('G4')
+    >>> Gs4 = HashablePitch('G#4')
+    >>> iv6 = (G4, D4, D4, Bb2)
+    >>> itAug6 = (Gs4, D4, D4, Bb2)
+    >>> frAug6 = (Gs4, E4, D4, Bb2)
+    >>> grAug6 = (Gs4, F4, D4, Bb2)
+    >>> swAug6 = (Gs4, Es4, D4, Bb2)
+    >>> resolution.augmentedSixthToMajorTonic(frAug6, 1)
+    (A4, F#4, D4, A2)
+    >>> resolution.augmentedSixthToMajorTonic(grAug6, 2)
+    (A4, F#4, D4, A2)    
+    >>> resolution.augmentedSixthToMajorTonic(swAug6, 3)
+    (A4, F#4, D4, A2)    
     '''
     augSixthChord = chord.Chord(augSixthPossib)
     augSixthChord.removeRedundantPitchNames()
-    if augSixthType == 1:
+    if augSixthType == 1 or augSixthType == 3:
         augSixthChord.root(augSixthChord.getChordStep(3))
     
     bass = augSixthChord.bass()
@@ -43,17 +104,41 @@ def augmentedSixthToMajorTonic(augSixthPossib, augSixthType):
     howToResolve = \
     [(lambda p: p.name == bass.name, '-m2'),
     (lambda p: p.name == root.name, 'm2'),
+    (lambda p: p.name == tonic.name, 'P1'),
     (lambda p: augSixthType == 1, 'M2'),
-    (lambda p: augSixthType == 2, 'A1')]
+    (lambda p: augSixthType == 2, 'A1'),
+    (lambda p: augSixthType == 3, 'm2')]
 
     return resolvePitches(augSixthPossib, howToResolve)
 
 def augmentedSixthToMinorTonic(augSixthPossib, augSixthType):
     '''
+    Italian augmented 6ths not currently supported.
+
+    >>> from music21.figuredBass.fbPitch import HashablePitch
+    >>> from music21.figuredBass import resolution
+    >>> Bb2 = HashablePitch('B-2')
+    >>> D4 = HashablePitch('D4')
+    >>> E4 = HashablePitch('E4')
+    >>> Es4 = HashablePitch('E#4')
+    >>> F4 = HashablePitch('F4')
+    >>> G4 = HashablePitch('G4')
+    >>> Gs4 = HashablePitch('G#4')
+    >>> iv6 = (G4, D4, D4, Bb2)
+    >>> itAug6 = (Gs4, D4, D4, Bb2)
+    >>> frAug6 = (Gs4, E4, D4, Bb2)
+    >>> grAug6 = (Gs4, F4, D4, Bb2)
+    >>> swAug6 = (Gs4, Es4, D4, Bb2)
+    >>> resolution.augmentedSixthToMinorTonic(frAug6, 1)
+    (A4, F4, D4, A2)
+    >>> resolution.augmentedSixthToMinorTonic(grAug6, 2)
+    (A4, F4, D4, A2)
+    >>> resolution.augmentedSixthToMinorTonic(swAug6, 3)
+    (A4, F4, D4, A2)    
     '''
     augSixthChord = chord.Chord(augSixthPossib)
     augSixthChord.removeRedundantPitchNames()
-    if augSixthType == 1:
+    if augSixthType == 1 or augSixthType == 3:
         augSixthChord.root(augSixthChord.getChordStep(3))
     
     bass = augSixthChord.bass()
@@ -63,7 +148,9 @@ def augmentedSixthToMinorTonic(augSixthPossib, augSixthType):
     howToResolve = \
     [(lambda p: p.name == bass.name, '-m2'),
     (lambda p: p.name == root.name, 'm2'),
-    (lambda p: augSixthType == 1, 'm2')]
+    (lambda p: p.name == tonic.name, 'P1'),
+    (lambda p: augSixthType == 1, 'm2'),
+    (lambda p: augSixthType == 3, 'd2')]
     
     return resolvePitches(augSixthPossib, howToResolve)
 
@@ -99,7 +186,7 @@ def dominantSeventhToMajorTonic(domPossib, resolveV43toI6 = False):
     >>> resPossibA3a
     (F5, A4, C4, F3)
     >>> resPossibA3b = resolution.dominantSeventhToMajorTonic(domPossibA3, True)
-    >>> resPossibA3b
+    >>> resPossibA3b    
     (F5, C5, C4, A3)
     >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA3, resPossibA3a, domPossibA3, resPossibA3b)
     '''
