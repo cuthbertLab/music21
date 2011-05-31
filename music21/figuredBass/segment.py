@@ -53,8 +53,13 @@ class Segment:
         '''
         (willRunOnlyIfTrue, methodToRun, isCorrectSoln, optionalArgs)
         '''
+        isItalianAugmentedSixth = self.segmentChord.isItalianAugmentedSixth()
+        if isItalianAugmentedSixth:
+            self.environRules.warn("Augmented sixth resolution: It+6 resolution being derived through consecutive possibility methods.")
+            
         consecPossibRules = \
-        [(fbRules._upperPartsRemainSame, possibility.upperPartsSame, True),
+        [(fbRules.resolveAugmentedSixthProperly and isItalianAugmentedSixth, possibility.couldBeItalianA6Resolution, True),
+         (fbRules._upperPartsRemainSame, possibility.upperPartsSame, True),
          (fbRules.forbidVoiceOverlap, possibility.voiceOverlap, False),
          (True, possibility.partMovementsWithinLimits, True, [fbRules.partMovementLimits]),
          (fbRules.forbidParallelFifths, possibility.parallelFifths, False),
@@ -191,7 +196,6 @@ class Segment:
     def resolveAugmentedSixthSegment(self, segmentB):
         augSixthChord = self.segmentChord
         if augSixthChord.isItalianAugmentedSixth():
-            self.environRules.warn("Augmented sixth resolution: It+6 resolution not yet supported. Executing ordinary resolution.")
             return self.resolveOrdinarySegment(segmentB)
         elif augSixthChord.isFrenchAugmentedSixth():
             augSixthType = 1
