@@ -2831,9 +2831,7 @@ class Stream(music21.Music21Object):
                 ts = meter.TimeSignature('%s/%s' % (defaults.meterNumerator, 
                                    defaults.meterDenominatorBeatType))
                 post.insert(0, ts)
-
         #environLocal.printDebug(['getTimeSignatures(): final result:', post[0]])
-
         return post
         
 
@@ -4275,8 +4273,8 @@ class Stream(music21.Music21Object):
             if m.timeSignature is not None:
                 lastTimeSignature = m.timeSignature
             if lastTimeSignature is None:
+                environLocal.printDebug(['makeBeams(): lastTimeSignature is None: cannot process'])
                 raise StreamException('cannot proces beams in a Measure without a time signature')
-            #environLocal.printDebug(['makeBeams(): lastTimeSignature', lastTimeSignature])
             noteGroups = []
             if m.hasVoices():
                 for v in m.voices:
@@ -4303,7 +4301,7 @@ class Stream(music21.Music21Object):
                 durSum = sum([d.quarterLength for d in durList])
                 barQL = lastTimeSignature.barDuration.quarterLength
     
-                if durSum > barQL:
+                if not common.almostEquals(durSum, barQL) and durSum > barQL:
                     environLocal.printDebug(['attempting makeBeams with a bar that contains durations that sum greater than bar duration (%s > %s)' % (durSum, barQL)])
                     continue
             
@@ -7686,6 +7684,7 @@ class Measure(Stream):
         self.layoutWidth = None
 
 
+# NOTE: it is necessary to define an overridden makeNotation, as done below. 
 #    def makeMeasures(self, dummy = None, dummy = None, inPlace = False):
 #        '''
 #        Overrides the makeMeasures routine in 
@@ -7744,10 +7743,18 @@ class Measure(Stream):
             m = deepcopy(self)
         else:
             m = self
-
+        
         m.makeAccidentals(searchKeySignatureByContext=True, inPlace=True)
-        # makeTies is for cross-bar associations
+        # makeTies is for cross-bar associations, and cannot be used
+        # at just the measure level
         #m.makeTies(meterStream, inPlace=True)
+
+        # must have a time signature before calling make beams
+        if m.timeSignature is None:
+            # get a time signature if not defined, searching the context if 
+            # necessary
+            m.timeSignature = m.getTimeSignatures(searchContext=True, returnDefault=True)[0] # a Stream; get the first element
+        environLocal.printDebug(['have time signature', m.timeSignature])
         try:
             m.makeBeams(inPlace=True)
         except StreamException:
@@ -14271,7 +14278,10 @@ class Test(unittest.TestCase):
                         ['<accidental sharp>', '<accidental sharp>', '<accidental sharp>', '<accidental sharp>', '<accidental natural>', 'None', 'None', 'None', 'None', 'None'])
         self.assertEqual([n.pitch.accidental.displayStatus for n in m.notes[:5]], [True, False, False, False, True])
         
-        #m.show()
+        raw = m.musicxml
+        self.assertEqual(raw.find('<beam number="1">begin</beam>') > 0, True)
+        self.assertEqual(raw.find('<tuplet bracket="yes" placement="above"') > 0, True)
+
 
 
 #-------------------------------------------------------------------------------
