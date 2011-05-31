@@ -25,50 +25,64 @@ from music21.figuredBass import possibility
 from music21.figuredBass import resolution
 from music21.figuredBass import rules
 
-_MOD = 'segment2.py'
+_MOD = 'segment.py'
 
 class Segment:
     def __init__(self, fbScale, bassNote = note.Note('C3'), notationString = '', fbRules = rules.Rules()):
         self.fbScale = fbScale
         self.bassNote = bassNote
-        self.notationString = notationString
-        self.pitchNamesInChord = self.fbScale.getPitchNames(self.bassNote.pitch, self.notationString)
-        self.compileAllRules(fbRules)
+        self.pitchNamesInChord = self.fbScale.getPitchNames(self.bassNote.pitch, notationString)
+        self.allPitchesAboveBass = getPitches(self.pitchNamesInChord, self.bassNote.pitch, fbRules.maxPitch)
         self.environRules = environment.Environment(_MOD)
+        self.segmentChord = chord.Chord(self.allPitchesAboveBass)
+        self.numParts = fbRules.numParts        
+        self.compileAllRules(fbRules)
 
-    def compileAllRules(self, fbRules = rules.Rules()):
+    def singlePossibilityRules(self, fbRules = rules.Rules()):
         '''
         (willRunOnlyIfTrue, methodToRun, isCorrectSoln, optionalArgs)
         '''
-        self.allPitchesAboveBass = getPitches(self.pitchNamesInChord, self.bassNote.pitch, fbRules.maxPitch)
-        self.segmentChord = chord.Chord(self.allPitchesAboveBass)
-        self.numParts = fbRules.numParts
-
-        singlePossibilityRules = \
+        singlePossibRules = \
         [(fbRules.forbidIncompletePossibilities, possibility.isIncomplete, False, [self.pitchNamesInChord]),
          (True, possibility.upperPartsWithinLimit, True, [fbRules.upperPartsMaxSemitoneSeparation]),
          (fbRules.forbidVoiceCrossing, possibility.voiceCrossing, False)]
-
-        consecutivePossibilityRules = \
-        [(fbRules.forbidVoiceOverlap, possibility.voiceOverlap, False),
+        
+        return singlePossibRules
+    
+    def consecutivePossibilityRules(self, fbRules = rules.Rules()):
+        '''
+        (willRunOnlyIfTrue, methodToRun, isCorrectSoln, optionalArgs)
+        '''
+        consecPossibRules = \
+        [(fbRules._upperPartsRemainSame, possibility.upperPartsSame, True),
+         (fbRules.forbidVoiceOverlap, possibility.voiceOverlap, False),
          (True, possibility.partMovementsWithinLimits, True, [fbRules.partMovementLimits]),
          (fbRules.forbidParallelFifths, possibility.parallelFifths, False),
          (fbRules.forbidParallelOctaves, possibility.parallelOctaves, False),
          (fbRules.forbidHiddenFifths, possibility.hiddenFifth, False),
          (fbRules.forbidHiddenOctaves, possibility.hiddenOctave, False)]
-
+        
+        return consecPossibRules
+    
+    def specialResolutionRules(self, fbRules = rules.Rules()):
+        '''
+        (willRunOnlyIfTrue, methodToRun, optionalArgs)
+        '''
         isDominantSeventh = self.segmentChord.isDominantSeventh()
         isDiminishedSeventh = self.segmentChord.isDiminishedSeventh()
         isAugmentedSixth = self.segmentChord.isAugmentedSixth()
 
-        specialResolutionRules = \
+        specialResRules = \
         [(fbRules.resolveDominantSeventhProperly and isDominantSeventh, self.resolveDominantSeventhSegment),
          (fbRules.resolveDiminishedSeventhProperly and isDiminishedSeventh, self.resolveDiminishedSeventhSegment, [fbRules.doubledRootInDim7]),
          (fbRules.resolveAugmentedSixthProperly and isAugmentedSixth, self.resolveAugmentedSixthSegment)]
         
-        self.singlePossibilityRuleChecking = self.compileRules(singlePossibilityRules)
-        self.consecutivePossibilityRuleChecking = self.compileRules(consecutivePossibilityRules)
-        self.specialResolutionRuleChecking = self.compileRules(specialResolutionRules, 3)
+        return specialResRules
+        
+    def compileAllRules(self, fbRules = rules.Rules()):
+        self.singlePossibilityRuleChecking = self.compileRules(self.singlePossibilityRules(fbRules))
+        self.consecutivePossibilityRuleChecking = self.compileRules(self.consecutivePossibilityRules(fbRules))
+        self.specialResolutionRuleChecking = self.compileRules(self.specialResolutionRules(fbRules), 3)
         return
     
     def compileRules(self, rulesList, maxLength = 4):
@@ -176,16 +190,15 @@ class Segment:
 
     def resolveAugmentedSixthSegment(self, segmentB):
         augSixthChord = self.segmentChord
-        if augSixthChord.isFrenchAugmentedSixth():
+        if augSixthChord.isItalianAugmentedSixth():
+            self.environRules.warn("Augmented sixth resolution: It+6 resolution not yet supported. Executing ordinary resolution.")
+            return self.resolveOrdinarySegment(segmentB)
+        elif augSixthChord.isFrenchAugmentedSixth():
             augSixthType = 1
         elif augSixthChord.isGermanAugmentedSixth():
             augSixthType = 2
-        elif augSixthChord.isItalianAugmentedSixth():
-            self.environRules.warn("Augmented sixth resolution: It+6 resolution not yet supported. Executing ordinary resolution.")
-            return self.resolveOrdinarySegment(segmentB)
         elif augSixthChord.isSwissAugmentedSixth():
-            self.environRules.warn("Augmented sixth resolution: Sw+6 resolution not yet supported. Executing ordinary resolution.")
-            return self.resolveOrdinarySegment(segmentB)
+            augSixthType = 3
         else:
             self.environRules.warn("Augmented sixth resolution: Augmented sixth type not supported. Executing ordinary resolution.")
             return self.resolveOrdinarySegment(segmentB)
@@ -217,6 +230,14 @@ class Segment:
     
         raise SegmentException("No standard resolution available.")
 
+class NonChordSegment(Segment):
+    def __init__(self, fbScale, bassNote = note.Note('D3'), pitchNamesAboveBass = ['C', 'E', 'G'], fbRules = rules.Rules()):
+        self.fbScale = fbScale
+        self.bassNote = bassNote
+        self.allPitchesAboveBass = getPitches(pitchNamesAboveBass, bassNote.pitch, fbRules.maxPitch)        
+        self.pitchNamesInChord = pitchNamesAboveBass + [self.bassNote.pitch.name]
+        self.compileAllRules(fbRules)
+    
 # HELPER METHODS
 # --------------
 def getPitches(pitchNames, bassPitch = pitch.Pitch('C3'), maxPitch = pitch.Pitch('C8')):
@@ -224,7 +245,9 @@ def getPitches(pitchNames, bassPitch = pitch.Pitch('C3'), maxPitch = pitch.Pitch
     iter2 = itertools.imap(lambda x: fbPitch.HashablePitch(x[0] + str(x[1])), iter1)
     iter3 = itertools.ifilterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)
     iter4 = itertools.ifilterfalse(lambda samplePitch: samplePitch > maxPitch, iter3)
-    return list(iter4)
+    allPitches = list(iter4)
+    allPitches.sort()
+    return allPitches
 
 class SegmentException(music21.Music21Exception):
     pass
