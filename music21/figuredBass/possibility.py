@@ -376,7 +376,37 @@ def partMovementsWithinLimits(possibA, possibB, partMovementLimits = []):
             return withinLimits
 
     return withinLimits
+
+def upperPartsSame(possibA, possibB):
+    '''
+    Returns True if the upper parts are the same.
+    False otherwise.
     
+    >>> from music21.pitch import Pitch
+    >>> from music21.figuredBass import possibility
+    >>> C4 = Pitch('C4')
+    >>> D4 = Pitch('D4')
+    >>> E4 = Pitch('E4')
+    >>> F4 = Pitch('F4')
+    >>> G4 = Pitch('G4')
+    >>> B4 = Pitch('B4')
+    >>> C5 = Pitch('C5')
+    >>> possibA1 = (C5, G4, E4, C4)
+    >>> possibB1 = (B4, F4, D4, D4)
+    >>> possibB2 = (C5, G4, E4, D4)
+    >>> possibility.upperPartsSame(possibA1, possibB1)
+    False
+    >>> possibility.upperPartsSame(possibA1, possibB2)
+    True
+    '''
+    pairsList = partPairs(possibA, possibB)
+    
+    for (pitchA, pitchB) in pairsList[0:-1]:
+        if not (pitchA == pitchB):
+            return False
+        
+    return True
+
 # HELPER METHODS
 # --------------
 def partPairs(possibA, possibB):
