@@ -41,6 +41,8 @@ class Rules:
         self.resolveDiminishedSeventhProperly = True
         self.resolveAugmentedSixthProperly = True
         self.doubledRootInDim7 = False
+        
+        self._upperPartsRemainSame = False
 
 
 class FiguredBassRulesException(music21.Music21Exception):
