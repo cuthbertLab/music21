@@ -11,6 +11,7 @@ import copy
 import music21
 import unittest
 
+from music21 import converter
 from music21 import key
 from music21 import interval
 from music21 import meter
@@ -42,22 +43,6 @@ def exampleA():
     >>> #_DOCS_SHOW fbRealization2.generateRandomRealization().show()
     '''
     s = tinyNotation.TinyNotationStream("C2 D2_6 E2_6 F2_6 C#2_b7,5,3 D2 BB2_#6,5,3 C2_6 AA#2_7,5,#3 BB1_6,4 BB2_7,#5,#3 E1.", "3/2")
-    return realizer.figuredBassFromStream(s)
-
-def exampleB():
-    '''
-    Retrieved from page 114 of 'The Music Theory Handbook' by Marjorie Merryman.
-    '''
-    s = tinyNotation.TinyNotationStream("D4 A4_7,5,#3 B-4 F4_6 G4_6 AA4_7,5,#3 D2", "4/4")
-    s.insert(0, key.Key('d'))
-    return realizer.figuredBassFromStream(s)
-        
-def exampleC():
-    '''
-    Retrieved from page 114 of 'The Music Theory Handbook' by Marjorie Merryman.
-    '''
-    s = tinyNotation.TinyNotationStream("FF#4 GG#4_#6 AA4_6 FF#4 BB4_6,5 C#4_7,5,#3 F#2", "4/4")
-    s.insert(0, key.Key('f#'))
     return realizer.figuredBassFromStream(s)
 
 def exampleD():
@@ -92,6 +77,22 @@ def exampleD():
     s.insert(0, key.Key('b'))
     return realizer.figuredBassFromStream(s)
 
+def exampleB():
+    '''
+    Retrieved from page 114 of 'The Music Theory Handbook' by Marjorie Merryman.
+    '''
+    s = tinyNotation.TinyNotationStream("D4 A4_7,5,#3 B-4 F4_6 G4_6 AA4_7,5,#3 D2", "4/4")
+    s.insert(0, key.Key('d'))
+    return realizer.figuredBassFromStream(s)
+        
+def exampleC():
+    '''
+    Retrieved from page 114 of 'The Music Theory Handbook' by Marjorie Merryman.
+    '''
+    s = tinyNotation.TinyNotationStream("FF#4 GG#4_#6 AA4_6 FF#4 BB4_6,5 C#4_7,5,#3 F#2", "4/4")
+    s.insert(0, key.Key('f#'))
+    return realizer.figuredBassFromStream(s)
+
 def V43ResolutionExample():
     s = tinyNotation.TinyNotationStream("D2 E2_4,3 D2 E2_4,3 F#1_6", "4/4")
     s.insert(0, key.Key('D'))
@@ -103,7 +104,7 @@ def viio65ResolutionExample():
     return realizer.figuredBassFromStream(s)
 
 def augmentedSixthRealizationExample():
-    s = tinyNotation.TinyNotationStream("D4 BB-4_8,6,3 AA2_# D4 BB-4_8,#6,3 AA2_# D4 BB-4_#6,4,3 AA2_# D4 BB-4_#6,5,3 AA2_# D4 BB-4_#6,5,3 AA2_6,4", "4/4")
+    s = tinyNotation.TinyNotationStream("D4 BB-4_8,6,3 AA2_# D4 BB-4_8,#6,3 AA2_# D4 BB-4_#6,4,3 AA2_# D4 BB-4_#6,5,3 AA2_# D4 BB-4_#6,5,3 AA2_6,4 D4 BB-4_#6,#4,3 AA2_#", "4/4")
     s.insert(0, key.Key('d'))
     return realizer.figuredBassFromStream(s)
     
