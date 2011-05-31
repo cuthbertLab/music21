@@ -71,7 +71,7 @@ def repeatToMx(r):
     return mxBarline
 
 def mxToRepeat(mxBarline, inputM21=None):
-    '''Given an mxBarline, fille the necessary parameters
+    '''Given an mxBarline, file the necessary parameters
 
     >>> from music21 import *
     >>> mxRepeat = musicxml.Repeat()

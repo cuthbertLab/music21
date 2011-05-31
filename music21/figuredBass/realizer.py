@@ -147,6 +147,25 @@ class FiguredBassLine(object):
 
         self.trimAllMovements(segmentList)
         return Realization(segmentList, self.inKey, self.inTime)
+
+    def generateRandomRealization(self):         
+        '''
+        Generates a random solution as a stream.Score()  # deprecated!!!
+        '''
+        return self.realize().generateRandomRealization()
+
+    def showRandomRealization(self):         
+        '''
+        Shows a random solution in musicxml  # deprecated!!!
+        '''
+        return self.realize().generateRandomRealization().show()
+
+
+    def showRandomRealization(self):         
+        '''
+        Generates a random solution as a stream.Score()
+        '''
+        return self.realize().generateRandomRealization().show()
         
     def trimAllMovements(self, segmentList):
         segmentList.reverse()

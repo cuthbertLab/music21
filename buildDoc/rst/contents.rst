@@ -72,6 +72,9 @@ Module Reference
    moduleFeaturesBase
    moduleFeaturesJSymbolic
    moduleFeaturesNative
+   moduleFiguredBassNotation
+   moduleFiguredBassPossibility
+   moduleFiguredBassResolution
    moduleGraph
    moduleKey
    moduleInstrument

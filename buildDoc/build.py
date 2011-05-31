@@ -56,6 +56,10 @@ from music21.features import base as features
 from music21.features import jSymbolic as featuresJSymbolic
 from music21.features import native as featuresNative
 
+from music21.figuredBass import notation as fbNotation
+from music21.figuredBass import possibility as fbPossibility
+from music21.figuredBass import resolution as fbResolution
+
 from music21 import graph
 from music21 import key
 from music21 import instrument
@@ -152,6 +156,10 @@ MODULES = [
     features,
     featuresJSymbolic,
     featuresNative,
+    
+    fbNotation,
+    fbPossibility,
+    fbResolution,
     
     graph,
     key,

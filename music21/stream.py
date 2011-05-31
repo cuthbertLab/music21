@@ -6830,7 +6830,7 @@ class Stream(music21.Music21Object):
 
         >>> from music21 import *  
         >>> s1 = tinyNotation.TinyNotationStream("c4 d' r b b'", "3/4")
-        >>> #_DOCS_HIDE s1.show()    
+        >>> #_DOCS_SHOW s1.show()    
 
         
         

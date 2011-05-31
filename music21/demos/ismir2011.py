@@ -306,7 +306,7 @@ def exampleD():
     eD.showRandomRealizations(20)
     
 def fbFeatureExtraction():
-    exampleFB = converter.parse('ismir2011_fb_example1a.xml')
+    exampleFB = converter.parse('ismir2011_fb_example1b.xml')
     fe1 = features.jSymbolic.\
          PitchClassDistributionFeature(exampleFB)
     print fe1.extract().vector
@@ -324,8 +324,8 @@ def fbFeatureExtraction():
     exampleFB.parts[0][2].append(y)
     
     fb1 = figuredBass.realizer.figuredBassFromStream(exampleFB.parts[1])
-    realization = fb1.realize()
-    sol1 = realization.generateRandomRealization()
+    #realization = fb1.realize()
+    sol1 = fb1.generateRandomRealization()
     
     exampleFBOut = stream.Score()
     exampleFBOut.insert(0, exampleFB.parts[0])

@@ -47,8 +47,17 @@ def durationToMidi(d):
         d.updateQuarterLength()
     return int(round(d.quarterLength * defaults.ticksPerQuarter))
 
-def midiToDuration(ticks, ticksPerQuarter=None, inputM21=None):
+def midiToDuration(ticks, ticksPerQuarter=None, inputM21DurationObject=None):
     '''    
+    Converts a number of MIDI Ticks to a music21 duration.Duration() object.
+    
+    
+    Optional parameters include ticksPerQuarter -- in case something other
+    than the default.ticksPerQuarter (1024) is used in this file.  And
+    it can take a music21 duration.Duration() object to modify (this is
+    what 
+    
+    
     >>> from music21 import *
     >>> d = midi.translate.midiToDuration(1024)
     >>> d
@@ -56,11 +65,11 @@ def midiToDuration(ticks, ticksPerQuarter=None, inputM21=None):
     >>> d.type
     'quarter'
     '''
-    if inputM21 == None:
+    if inputM21DurationObject is None:
         from music21 import duration
         d = duration.Duration()
     else:
-        d = inputM21
+        d = inputM21DurationObject
 
     if ticksPerQuarter == None:
         ticksPerQuarter = defaults.ticksPerQuarter

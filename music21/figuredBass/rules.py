@@ -13,7 +13,7 @@ import unittest
 
 from music21 import pitch
 
-class Rules:
+class Rules(object):
     def __init__(self):
         '''
         >>> from music21.figuredBass import rules

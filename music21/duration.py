@@ -2412,7 +2412,7 @@ class Duration(DurationCommon):
             ticks = value
             ticksPerQuarter = defaults.ticksPerQuarter
 
-        return midiTranslate.midiToDuration(ticks, ticksPerQuarter, inputM21=self)
+        return midiTranslate.midiToDuration(ticks, ticksPerQuarter, inputM21DurationObject=self)
 
         # given a value in ticks
 #         self._qtrLength = float(ticks) / ticksPerQuarter
@@ -2421,17 +2421,40 @@ class Duration(DurationCommon):
 
 
     midi = property(_getMidi, _setMidi, 
-        doc='''Get or set a duration value in MIDI ticks. MIDI duration values are measured in ticks per quarter. The music21 default ticks per quarter setting is set in defaults.py.
+        doc='''
+        Get or set a duration value in MIDI ticks. 
+        MIDI duration values are measured in ticks per quarter. 
+        The music21 default ticks per quarter setting is set in 
+        defaults.py (1024 by default).
 
-        >>> d = Duration()
+
+        >>> from music21 import *
+        >>> d = duration.Duration()
         >>> d.midi = 1024
         >>> d.type
         'quarter'
         >>> d.type = '16th'
-        >>> d.midi
-        256
         >>> d.quarterLength
         0.25
+        >>> d.midi
+        256
+
+
+        More complex rhythms can also be set automatically:
+        
+        
+        >>> d2 = duration.Duration()
+        >>> d2.midi = 1200
+        >>> d2.type
+        'complex'
+        >>> d2.quarterLength
+        1.171875
+        >>> d2.components
+        [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.125>, <music21.duration.DurationUnit 0.046875>]
+        >>> d2.components[2].type
+        '128th'
+        >>> d2.components[2].dots
+        1
         ''')
 
 
