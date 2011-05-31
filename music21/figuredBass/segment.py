@@ -42,8 +42,14 @@ class Segment:
         '''
         (willRunOnlyIfTrue, methodToRun, isCorrectSoln, optionalArgs)
         '''
+        forbidIncompletePossibilities = fbRules.forbidIncompletePossibilities
+        isItalianAugmentedSixth = self.segmentChord.isItalianAugmentedSixth()
+        if isItalianAugmentedSixth and fbRules.resolveAugmentedSixthProperly and not forbidIncompletePossibilities:
+            self.environRules.warn("Augmented sixth resolution: fbRules forbidIncompletePossibilities set to True for It+6 resolution.")
+            forbidIncompletePossibilities = True
+        
         singlePossibRules = \
-        [(fbRules.forbidIncompletePossibilities, possibility.isIncomplete, False, [self.pitchNamesInChord]),
+        [(forbidIncompletePossibilities, possibility.isIncomplete, False, [self.pitchNamesInChord]),
          (True, possibility.upperPartsWithinLimit, True, [fbRules.upperPartsMaxSemitoneSeparation]),
          (fbRules.forbidVoiceCrossing, possibility.voiceCrossing, False)]
         
