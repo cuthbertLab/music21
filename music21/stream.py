@@ -4165,6 +4165,10 @@ class Stream(music21.Music21Object):
             #environLocal.printDebug(['makeTies() dealing with measure', m, 'mNextAdd', mNextAdd])
             # for each measure, go through each element and see if its
             # duraton fits in the bar that contains it
+
+            # if there are voices, we must look at voice id values to only
+            # connect ties to components in the same voice, assuming there
+            # are voices in the next measure
             mStart, mEnd = 0, lastTimeSignature.barDuration.quarterLength
             if m.hasVoices():
                 bundle = m.voices
@@ -4480,7 +4484,6 @@ class Stream(music21.Music21Object):
                 pitchPast += pGroup
 
         return returnObj
-
 
 
     def makeNotation(self, meterStream=None, refStreamOrTimeRange=None,
@@ -7734,6 +7737,28 @@ class Measure(Stream):
         self.layoutWidth = other.layoutWidth
 
     #---------------------------------------------------------------------------
+    def makeNotation(self, inPlace=False):
+        environLocal.printDebug(['Measure.makeNotation'])
+        # assuming we are not trying to get context of previous measure
+        if not inPlace: # make a copy
+            m = deepcopy(self)
+        else:
+            m = self
+
+        m.makeAccidentals(searchKeySignatureByContext=True, inPlace=True)
+        # makeTies is for cross-bar associations
+        #m.makeTies(meterStream, inPlace=True)
+        try:
+            m.makeBeams(inPlace=True)
+        except StreamException:
+            # this is a result of makeMeaures not getting everything 
+            # note to measure allocation right
+            environLocal.printDebug(['skipping makeBeams exception', 
+                                    StreamException])
+        m.makeTupletBrackets(inPlace=True)
+        return m
+
+
     def barDurationProportion(self, barDuration=None):
         '''Return a floating point value greater than 0 showing the proportion of the bar duration that is filled based on the highest time of all elements. 0.0 is empty, 1.0 is filled; 1.5 specifies of an overflow of half. 
 
@@ -14231,6 +14256,22 @@ class Test(unittest.TestCase):
         parseMeasures(piece)        
         piece = corpus.parse('bach/bwv7.7')
         parseMeasures(piece)
+
+
+    def testMakeNotationByMeasuresA(self):
+        from music21 import stream
+        m = stream.Measure()
+        m.repeatAppend(note.Note('c#', quarterLength=.5), 4)
+        m.repeatAppend(note.Note('c', quarterLength=1/3.), 6)
+        # calls makeAccidentals, makeBeams, makeTuplets
+        m.makeNotation(inPlace=True)
+
+        # after running, there should only be two displayed accidentals
+        self.assertEqual([str(n.pitch.accidental) for n in m.notes], 
+                        ['<accidental sharp>', '<accidental sharp>', '<accidental sharp>', '<accidental sharp>', '<accidental natural>', 'None', 'None', 'None', 'None', 'None'])
+        self.assertEqual([n.pitch.accidental.displayStatus for n in m.notes[:5]], [True, False, False, False, True])
+        
+        #m.show()
 
 
 #-------------------------------------------------------------------------------
