@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2010 The music21 Project
+# Copyright:    (c) 2010-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -41,7 +41,6 @@ def offsetToMidi(o):
     '''Convert an offset value to MIDI ticks.
     '''
     return int(round(o * defaults.ticksPerQuarter))
-
 
 def durationToMidi(d):
     if d._quarterLengthNeedsUpdating:
@@ -204,8 +203,15 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     else:
         raise TranslateException('cannot handle MIDI event list in the form: %r', eventList)
 
-    n.duration.midi = (tOff - tOn), ticksPerQuarter
     n.pitch.midi = eOn.pitch
+    # here we are handling an occasional error that probably should not happen
+    # TODO: handle chords
+    if (tOff - tOn) != 0:
+        n.duration.midi = (tOff - tOn), ticksPerQuarter
+    else:       
+        environLocal.printDebug(['cannot translate found midi event with zero duration:', eOn, n])
+        # for now, substitute 1
+        n.quarterLength = 1
 
     return n
 
@@ -386,7 +392,12 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
 
     c.pitches = pitches
     # can simply use last-assigned pair of tOff, tOn
-    c.duration.midi = (tOff - tOn), ticksPerQuarter
+    if (tOff - tOn) != 0:
+        c.duration.midi = (tOff - tOn), ticksPerQuarter
+    else:
+        environLocal.printDebug(['cannot translate found midi event with zero duration:', eventList, c])
+        # for now, substitute 1
+        c.quarterLength = 1    
     return c
 
 

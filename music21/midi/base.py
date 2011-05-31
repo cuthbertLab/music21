@@ -6,7 +6,7 @@
 #               Christopher Ariza
 #               (Will Ware -- see docs)
 #
-# Copyright:    (c) 2010 The music21 Project
+# Copyright:    (c) 2010-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
@@ -1334,6 +1334,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].notes), 711)
         self.assertEqual(len(s.parts[1].notes), 855)
 
+        #for n in s.parts[0].notes:
+        #    print n, n.quarterLength
+        #s.show()
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
