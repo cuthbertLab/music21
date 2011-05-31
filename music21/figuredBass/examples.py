@@ -113,6 +113,11 @@ def twelveBarBlues():
     s.insert(0, key.Key('B-'))
     return realizer.figuredBassFromStream(s)
 
+def italianA6RealizationExample():
+    s = tinyNotation.TinyNotationStream("D4 BB-4_#6,3 AA2_# D4 BB-4_#6,3 AA2_6,4 D4 BB-4_#6,3 AA2_#6,4")
+    s.insert(0, key.Key('d'))
+    return realizer.figuredBassFromStream(s)
+
 # -----------------------------------------------------------------
 # METHODS FOR GENERATION OF BLUES VAMPS
 def generateBoogieVamp(sampleScore):
