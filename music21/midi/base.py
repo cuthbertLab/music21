@@ -373,7 +373,7 @@ class MidiEvent(object):
         self.correspondingEvent = None
 
         # store and pass on a running status if found
-        self.runningStatusByte = None
+        self.lastStatusByte = None
 
     def __cmp__(self, other): 
         return cmp(self.time, other.time) 
@@ -485,7 +485,7 @@ class MidiEvent(object):
         self._parameter1 = d2
         self._parameter2 = d1 # d1 is msb here
         
-    def _parseChannelVoiceMessage(self, str, runningStatusByte=None):
+    def _parseChannelVoiceMessage(self, str):
         '''
         >>> from music21 import *
         >>> mt = midi.MidiTrack(1)
@@ -502,52 +502,27 @@ class MidiEvent(object):
         60
         >>> me1.velocity
         120
-
-        >>> # testing with an incomplete message
-        >>> me2 = midi.MidiEvent(mt)
-        >>> remainder = me2._parseChannelVoiceMessage(midi.intsToHexString([55, 106, 60, 120]), runningStatusByte=chr(145))
-        >>> len(remainder) == 2 # only take out two values
-        True
-        >>> me2.type, me2.channel
-        ('NOTE_ON', 2)
-        >>> me2.pitch, me2.velocity
-        (55, 106)
         '''
         # x, y, and z define characteristics of the first two chars
         # for x: The left nybble (4 bits) contains the actual command, and the right nibble contains the midi channel number on which the command will be executed.
-        if runningStatusByte is None:
-            x = ord(str[0]) # return the char number
-            y = x & 0xF0  # bitwise and to derive channel number
-            z = ord(str[1])
-            thirdByte = str[2] 
-        else: # if using running status
-            x = ord(runningStatusByte) # return the char number
-            y = x & 0xF0  # bitwise and to derive channel number
-            z = ord(str[0])
-            thirdByte = str[1] 
+        x = ord(str[0]) # return the char number
+        y = x & 0xF0  # bitwise and to derive channel number
+        z = ord(str[1])
+        thirdByte = str[2] 
 
-        # note channel 15 may map wrong:
-        #>>> 0x0F & 0x0F + 1
-        #0
         self.channel = (x & 0x0F) + 1  # this is same as y + 1
         self.type = channelVoiceMessages.whatis(y) 
         #environLocal.printDebug(['MidiEvent.read()', self.type])
         if (self.type == "PROGRAM_CHANGE" or 
             self.type == "CHANNEL_KEY_PRESSURE"): 
             self.data = z 
-            if runningStatusByte is None:
-                return str[2:] 
-            else:
-                return str[1:] 
+            return str[2:] 
         elif (self.type == "CONTROLLER_CHANGE"):
             # for now, do nothing with this data
             # for a note, str[2] is velocity; here, it is the control value
             self.pitch = z # this is the controller id
             self.velocity = ord(thirdByte) # this is the controller value
-            if runningStatusByte is None:
-                return str[3:] 
-            else:
-                return str[2:] 
+            return str[3:] 
         else: 
             self.pitch = z # the second byte
             # read the third chart toi get velocity 
@@ -555,15 +530,22 @@ class MidiEvent(object):
             # each MidiChannel object is accessed here
             # using that channel, data for each event is added or 
             # removed 
-            if runningStatusByte is None:
-                return str[3:] 
-            else:
-                return str[2:] 
+            return str[3:] 
 
     def read(self, time, str): 
         '''Read a MIDI event.
 
         The `time` value is the number of ticks into the Track at which this event happens. This is derived from reading data the level of the track.
+
+        >>> # all note-on messages (144-159) can be found
+        >>> 145 & 0xF0 # testing message type extraction
+        144
+        >>> 146 & 0xF0 # testing message type extraction
+        144
+        >>> (144 & 0x0F) + 1 # getting the channel
+        1
+        >>> (159 & 0x0F) + 1 # getting the channel
+        16
         '''
         if len(str) < 2:
             # often what we have here are null events:
@@ -573,11 +555,32 @@ class MidiEvent(object):
 
         # x, y, and z define characteristics of the first two chars
         # for x: The left nybble (4 bits) contains the actual command, and the right nibble contains the midi channel number on which the command will be executed.
-        x = ord(str[0]) # given a string representation, return the char number
-        y = x & 0xF0  # bitwise and to derive channel number
+        x = ord(str[0]) # given a string representation, get decimal number
+
+        # detect running status: if the status byte is less than 128, its 
+        # not a status byte, but a data byte
+        if x < 128:
+            # environLocal.printDebug(['MidiEvent.read(): found running status even data', 'self.lastStatusByte:', self.lastStatusByte])
+
+            if self.lastStatusByte is not None:
+                rsb = self.lastStatusByte
+            else: # provide a default
+                rsb = chr(0x90)
+            #post = self._parseChannelVoiceMessage(str, runningStatusByte=rsb)
+            #return post
+            # add the running status byte to the front of the string 
+            # and process as before
+            str = rsb + str
+            x = ord(str[0]) # given a string representation, get decimal number
+        else:
+            # store last status byte
+            self.lastStatusByte = str[0]
+
+        y = x & 0xF0  # bitwise and to derive message type
         z = ord(str[1]) 
 
         #environLocal.printDebug(['MidiEvent.read(): trying to parse a MIDI event, looking at first two chars:', 'repr(x)', repr(x), 'charToBinary(str[0])', charToBinary(str[0]), 'charToBinary(str[1])', charToBinary(str[1])])
+
         if channelVoiceMessages.hasValue(y): 
             return self._parseChannelVoiceMessage(str)
 
@@ -588,7 +591,8 @@ class MidiEvent(object):
                 self.data = (ord(str[2]) == 0x7F) 
             elif self.type == "MONO_MODE_ON": 
                 self.data = ord(str[2]) 
-            return str[3:] 
+            return str[3:]
+
         elif x == 0xF0 or x == 0xF7: 
             self.type = {0xF0: "F0_SYSEX_EVENT", 
                          0xF7: "F7_SYSEX_EVENT"}[x] 
@@ -598,7 +602,6 @@ class MidiEvent(object):
 
         # SEQUENCE_TRACK_NAME is here
         elif x == 0xFF: 
-            # TODO: this may be an indicator of running status
             #environLocal.printDebug(['MidiEvent.read(): got a variable length meta event', charToBinary(str[0])])
             if not metaEvents.hasValue(z): 
                 environLocal.printDebug(["unknown meta event: FF %02X" % z])
@@ -610,16 +613,8 @@ class MidiEvent(object):
             # return remainder
             return str[length:] 
         else:
-            # in most cases, these are happening b/c running status is in effect
+            # an uncaught message
             environLocal.printDebug(['got unknown midi event type', repr(x), 'charToBinary(str[0])', charToBinary(str[0]), 'charToBinary(str[1])', charToBinary(str[1])])
-
-            # emulate running status; set to note on for channel 1 for now
-#             if self.runningStatusByte is None:
-#                 rsb = self.runningStatusByte
-#             else:
-#                 rsb = chr(0x90)
-#             post = self._parseChannelVoiceMessage(str, runningStatusByte=rsb)
-#             return post
 
             raise MidiException("Unknown midi event type")
             #return everything but the first character
@@ -836,6 +831,7 @@ class MidiTrack(object):
         trackStr = str[:length] 
         remainder = str[length:] 
 
+        ePrevious = None
         while trackStr: 
             # shave off the time stamp from the event
             delta_t = DeltaTime(self) 
@@ -844,8 +840,10 @@ class MidiTrack(object):
             # this is the offset that this event happens at, in ticks
             timeCandidate = time + dt 
     
-            # pass self to even, set this MidiTrack as the track for this event
+            # pass self to event, set this MidiTrack as the track for this event
             e = MidiEvent(self) 
+            if ePrevious is not None: # set the last status byte
+                e.lastStatusByte = ePrevious.lastStatusByte
             # some midi events may raise errors; simply skip for now
             try:
                 trackStrCandidate = e.read(timeCandidate, trackStrCandidate) 
@@ -857,10 +855,11 @@ class MidiTrack(object):
                 continue
             # only set after trying to read, which may raise exception
             time = timeCandidate
-            trackStr = trackStrCandidate
+            trackStr = trackStrCandidate # remainder string
             # only append if we get this far
             self.events.append(delta_t) 
             self.events.append(e) 
+            ePrevious = e
 
         return remainder # remainder string after extrating track data
     
@@ -1323,7 +1322,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         # TODO: testing files with running status
         # dealing with midi files that use running status compression
-        #s = converter.parse('/Volumes/xdisc/_sync/_x/libMidi/testProblem/Iron_Man.mid')
+        s = converter.parse('/Volumes/xdisc/_sync/_x/libMidi/testProblem/Iron_Man.mid')
         #s.show()
 
 
