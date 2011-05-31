@@ -14,6 +14,7 @@ import music21
 import unittest
 
 from music21 import voiceLeading
+from music21 import interval
 
 '''
 For other classes in fbRealizer, a possibility is a tuple, represented as follows:
@@ -405,6 +406,99 @@ def upperPartsSame(possibA, possibB):
         if not (pitchA == pitchB):
             return False
         
+    return True
+
+def couldBeItalianA6Resolution(possibA, possibB):
+    '''
+    Returns True if possibA is an Italian A6 chord and 
+    possibB could possibly be an acceptable resolution.
+
+    Doublings are always restricted in this method.
+    
+    >>> from music21.pitch import Pitch
+    >>> from music21.figuredBass import possibility
+    >>> A2 = Pitch('A2')
+    >>> Bb2 = Pitch('B-2')
+    >>> Cs4 = Pitch('C#4')    
+    >>> D4 = Pitch('D4')
+    >>> E4 = Pitch('E4')
+    >>> Fs4 = Pitch('F#4')
+    >>> Gs4 = Pitch('G#4')
+    >>> A4 = Pitch('A4')
+    >>> possibA1 = (Gs4, D4, D4, Bb2)
+    >>> possibB1 = (A4, Cs4, E4, A2)
+    >>> possibB2 = (A4, E4, Cs4, A2)
+    >>> possibB3 = (A4, D4, Fs4, A2)
+    >>> possibility.couldBeItalianA6Resolution(possibA1, possibB1)
+    True
+    >>> possibility.couldBeItalianA6Resolution(possibA1, possibB1)
+    True
+    >>> possibility.couldBeItalianA6Resolution(possibA1, possibB3)
+    True
+
+    Returns False if possibA is not an Italian A6 chord.
+    >>> possibility.couldBeItalianA6Resolution(possibB1, possibB3)
+    False
+    >>> possibA2 = (Gs4, E4, D4, Bb2)
+    >>> possibility.couldBeItalianA6Resolution(possibA2, possibB2)
+    False
+    
+    The method is called "couldBeItalianA6Resolution" as opposed
+    to "isItalianA6Resolution" because it is designed to work in
+    tandem with "parallelOctaves" and "isIncomplete" in a Segment.
+    Consider the following examples with possibA1 above as the
+    augmented sixth chord to resolve.
+    >>> possibB4 = (A4, D4, D4, A2) #No 3rd
+    >>> possibility.couldBeItalianA6Resolution(possibA1, possibB4)
+    True
+    >>> possibB5 = (A4, Cs4, Cs4, A2) #No 5th, parallel octaves
+    >>> possibility.couldBeItalianA6Resolution(possibA1, possibB5)
+    True
+    '''
+    # Part 1: Check if possibA is A6 chord, and if it is properly formed.
+    bass = possibA[-1]
+    root = None
+    rootIndex = 0
+    for pitchA in possibA[0:-1]:
+        if not (pitchA.ps - bass.ps) % 12 == 10:
+            rootIndex += 1
+            continue
+        br = interval.Interval(bass, pitchA)
+        isAugmentedSixth = (br.directedSimpleName == 'A6')
+        if isAugmentedSixth:
+            root = pitchA
+            break
+    if root == None:
+        return False
+    tonic = bass.transpose('M3')
+    #Restrict doublings, It+6
+    for pitchIndex in range(len(possibA) - 1):
+        if pitchIndex == rootIndex:
+            continue
+        pitchA = possibA[pitchIndex]
+        if not pitchA.name == tonic.name:
+            return False
+    
+    #Part 2: If possibA is Italian A6 chord, check that it resolves properly in possibB.
+    fifth = root.transpose('m2')
+    pairsList = partPairs(possibA, possibB)
+    (bassA, bassB) = pairsList[-1]
+    (rootA, rootB) = pairsList[rootIndex]
+    if not (bassB.name == fifth.name and rootB.name == fifth.name):
+        return False
+    if not (bassB.ps - bassA.ps == -1.0 and rootB.ps - rootA.ps == 1.0):
+        return False
+    allowedIntervalNames = ['M3','m3','M2','m-2']
+    for pitchIndex in range(len(pairsList) - 1):
+        if pitchIndex == rootIndex:
+            continue
+        (tonicA, tonicB) = pairsList[pitchIndex]
+        if tonicA == tonicB:
+            continue
+        tt = interval.Interval(tonicA, tonicB)
+        if not tt.directedSimpleName in allowedIntervalNames:
+            return False
+    
     return True
 
 # HELPER METHODS
