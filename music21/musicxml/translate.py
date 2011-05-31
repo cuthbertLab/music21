@@ -1990,24 +1990,31 @@ def measureToMusicXML(m):
     '''
     from music21 import stream, duration
     # search for time signatures, either defined locally or in context
-    found = m.getTimeSignatures(returnDefault=False)
-    if len(found) == 0:
-        try:
-            ts = m.bestTimeSignature()
-        # may raise an exception if cannot find a rational match
-        except stream.StreamException:
-            ts = None # get the default
-    else:
-        ts = found[0]
+
+    environLocal.printDebug(['measureToMusicXML', m]) 
+
+    m = m.makeNotation(inPlace=False)
+
+# this is now in Measure.makeNotation
+#     found = m.getTimeSignatures(returnDefault=False)
+#     if len(found) == 0:
+#         try:
+#             ts = m.bestTimeSignature()
+#         # may raise an exception if cannot find a rational match
+#         except stream.StreamException:
+#             ts = None # get the default
+#     else:
+#         ts = found[0]
+
     # might similarly look for key signature, instrument, and clef
     # must copy here b/c do not want to alter original, and need to set
     # new objects in some cases (time signature, etc)
-    mCopy = copy.deepcopy(m)    
-    if ts != None:
-        mCopy.timeSignature = ts
+#     mCopy = copy.deepcopy(m)    
+#     if ts != None:
+#         mCopy.timeSignature = ts
 
-    out = stream.Stream()
-    out.append(mCopy)
+    out = stream.Part()
+    out.append(m)
     # call the musicxml property on Stream
     return out.musicxml
 
@@ -2028,6 +2035,7 @@ def streamPartToMx(s, instObj=None, meterStream=None,
     The `meterStream`, if provides a template of meters. 
     '''
     from music21 import spanner
+    from music21 import stream
 
     #environLocal.printDebug(['calling Stream._getMXPart'])
     # note: meterStream may have TimeSignature objects from an unrelated
@@ -2070,7 +2078,7 @@ def streamPartToMx(s, instObj=None, meterStream=None,
         #                measureStream.flat.getAllContextsByClass('Spanner'))
         # only getting spanners at this level
         spannerBundle = spanner.SpannerBundle(measureStream.flat)
-
+    # if this is a Measure, see if it needs makeNotation
     else: # there are measures
         # check that first measure has any atributes in outer Stream
         # this is for non-standard Stream formations (some kern imports)
@@ -2095,6 +2103,8 @@ def streamPartToMx(s, instObj=None, meterStream=None,
 
 def streamToMx(s, spannerBundle=None):
     '''Create and return a musicxml Score object. 
+
+    This is the most common entry point for conversion of a Stream to MusicXML. This method is called on Stream from the musicxml property. 
 
     >>> from music21 import *
     >>> n1 = note.Note()
@@ -2131,7 +2141,7 @@ def streamToMx(s, spannerBundle=None):
     # search context probably should always be True here
     # to search container first, we need a non-flat version
     # searching a flattened version, we will get contained and non-container
-    # this meter  stream is passed to makeMeasures()
+    # this meter  stream is passed to makeNotation()
     meterStream = s.getTimeSignatures(searchContext=False,
                     sortByCreationTime=False, returnDefault=False) 
     #environLocal.printDebug(['streamToMx: post meterStream search', meterStream, meterStream[0]])
@@ -2146,10 +2156,8 @@ def streamToMx(s, spannerBundle=None):
 
     if s.hasPartLikeStreams():
         #environLocal.printDebug('Stream._getMX: interpreting multipart')
-
         # making a deepcopy, as we are going to edit internal objs
         partStream = copy.deepcopy(s)
-
         # must set spanner after copying
         if spannerBundle is None: 
             # no spanner bundle provided, get one from the flat stream

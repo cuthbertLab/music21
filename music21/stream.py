@@ -7634,7 +7634,6 @@ class Measure(Stream):
     All properties of a Measure that are Music21 objects are found as part of 
     the Stream's elements. 
     '''
-
     isMeasure = True
 
     # define order to present names in documentation; use strings
@@ -7737,7 +7736,24 @@ class Measure(Stream):
 
     #---------------------------------------------------------------------------
     def makeNotation(self, inPlace=False):
+        '''This method calls a sequence of Stream methods on this Measure to prepare notation.
+
+        If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
+
+        >>> from music21 import *
+        >>> m = stream.Measure()
+        >>> n1 = note.Note('g#')
+        >>> n2 = note.Note('g')
+        >>> m.append([n1, n2])
+        >>> m.makeNotation(inPlace=True)
+        >>> m.notes[1].pitch.accidental
+        <accidental natural>
+        '''
+
         environLocal.printDebug(['Measure.makeNotation'])
+
+        # TODO: this probably needs to look to see what processes need to be done; for example, existing beaming may be destroyed. 
+
         # assuming we are not trying to get context of previous measure
         if not inPlace: # make a copy
             m = deepcopy(self)
@@ -7753,7 +7769,20 @@ class Measure(Stream):
         if m.timeSignature is None:
             # get a time signature if not defined, searching the context if 
             # necessary
-            m.timeSignature = m.getTimeSignatures(searchContext=True, returnDefault=True)[0] # a Stream; get the first element
+            contextMeters = m.getTimeSignatures(searchContext=True, 
+                            returnDefault=False)
+            defaultMeters = m.getTimeSignatures(searchContext=False, 
+                            returnDefault=True)
+            if len(contextMeters) > 0:
+                ts = contextMeters[0]
+            else:
+                try:
+                    ts = self.bestTimeSignature()
+                except (StreamException, meter.MeterException): 
+                    # there must be one here
+                    ts = defaultMeters[0]
+            m.timeSignature = ts # a Stream; get the first element
+
         environLocal.printDebug(['have time signature', m.timeSignature])
         try:
             m.makeBeams(inPlace=True)
@@ -7763,8 +7792,11 @@ class Measure(Stream):
             environLocal.printDebug(['skipping makeBeams exception', 
                                     StreamException])
         m.makeTupletBrackets(inPlace=True)
-        return m
 
+        if not inPlace: 
+            return m
+        else:
+            return None
 
     def barDurationProportion(self, barDuration=None):
         '''Return a floating point value greater than 0 showing the proportion of the bar duration that is filled based on the highest time of all elements. 0.0 is empty, 1.0 is filled; 1.5 specifies of an overflow of half. 
@@ -14282,7 +14314,14 @@ class Test(unittest.TestCase):
         self.assertEqual(raw.find('<beam number="1">begin</beam>') > 0, True)
         self.assertEqual(raw.find('<tuplet bracket="yes" placement="above"') > 0, True)
 
-
+    def testMakeNotationByMeasuresB(self):
+        from music21 import stream
+        m = stream.Measure()
+        m.repeatAppend(note.Note('c#', quarterLength=.5), 4)
+        m.repeatAppend(note.Note('c', quarterLength=1/3.), 6)
+        raw = m.musicxml
+        self.assertEqual(raw.find('<beam number="1">begin</beam>') > 0, True)
+        self.assertEqual(raw.find('<tuplet bracket="yes" placement="above"') > 0, True)
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
