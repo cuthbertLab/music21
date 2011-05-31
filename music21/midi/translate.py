@@ -49,9 +49,17 @@ def durationToMidi(d):
     return int(round(d.quarterLength * defaults.ticksPerQuarter))
 
 def midiToDuration(ticks, ticksPerQuarter=None, inputM21=None):
+    '''    
+    >>> from music21 import *
+    >>> d = midi.translate.midiToDuration(1024)
+    >>> d
+    <music21.duration.Duration 1.0>
+    >>> d.type
+    'quarter'
+    '''
     if inputM21 == None:
         from music21 import duration
-        d = duration.Duration
+        d = duration.Duration()
     else:
         d = inputM21
 
