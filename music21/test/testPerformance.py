@@ -334,11 +334,7 @@ class Test(unittest.TestCase):
 #                  '2011.02.28': 2.944, 
 #                 }),
 
-
-
-
-
-            ]:
+            ]: # end of long for loop
 
             t = common.Timer()
             t.start()
@@ -364,11 +360,9 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) == 1: # normal conditions
+        # sys.arg test options will be used in mainTest()
         music21.mainTest(Test)
 
-    elif len(sys.argv) > 1:
-        a = Test()
-        a.testGetElements()
 
 #------------------------------------------------------------------------------
 # eof

@@ -331,7 +331,7 @@ class CallGraph:
         #self.callTest = TestParseABC
         #self.callTest = TestMusicXMLObjectTypeChecking
         #self.callTest = TestGetContextByClass
-        self.callTest = TestParseRNText
+        self.callTest = TestMakeMeasures
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 

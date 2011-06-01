@@ -1707,18 +1707,8 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import sys
 
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-    elif len(sys.argv) > 1:
-        t = Test()
-
-        #t.testNoteParse()
-
-        #t.testMuseDataDirectory()
-
-        #t.testStage1Basic()
-
-        t.testGetLyrics()
+    # sys.arg test options will be used in mainTest()
+    music21.mainTest(Test)
 
 
 #------------------------------------------------------------------------------
