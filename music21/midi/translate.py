@@ -646,7 +646,7 @@ def midiEventsToKeySignature(eventList):
     else:
         sharpCount = post[0]
 
-    environLocal.printDebug(['midiEventsToKeySignature', post, sharpCount])
+    #environLocal.printDebug(['midiEventsToKeySignature', post, sharpCount])
 
     # first value is number of sharp, or neg for number of flat
     ks = key.KeySignature(sharpCount)
@@ -781,7 +781,7 @@ def _streamToPackets(s, trackId=1):
             lastInstrument = obj
             sub = instrumentToMidiEvents(obj, includeDeltaTime=False)
         else: # other objects may have already been added
-            environLocal.printDebug(['streamToMidiTrack: skipping', obj])
+            #environLocal.printDebug(['streamToMidiTrack: skipping', obj])
             continue
 
         # all events: delta/note-on/delta/note-off
@@ -848,7 +848,7 @@ def _processPackets(packets):
 def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None):
     '''Given a list of packets, sort all packets and add proper delta times. Optionally filters packets by track Id. 
     '''
-    environLocal.printDebug(['_packetsToEvents', 'got packets:', len(packetsSrc)])
+    #environLocal.printDebug(['_packetsToEvents', 'got packets:', len(packetsSrc)])
     # add delta times
     # first, collect only the packets for this track id
     packets = []
@@ -874,12 +874,12 @@ def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None):
         if t < 0:
             raise TranslateException('got a negative delta time')
         dt = midiModule.DeltaTime(midiTrack, time=t, channel=me.channel)
-        environLocal.printDebug(['packetsByOffset', p])
+        #environLocal.printDebug(['packetsByOffset', p])
         events.append(dt)
         events.append(me)
         lastOffset = p['offset']
 
-    environLocal.printDebug(['_packetsToEvents', 'total events:', len(events)])
+    #environLocal.printDebug(['_packetsToEvents', 'total events:', len(events)])
 
     return events
 
@@ -898,7 +898,7 @@ def streamToMidiTrack(inputM21, instObj=None, trackId=1):
     >>> len(mt.events)
     20
     '''
-    environLocal.printDebug(['streamToMidiTrack()'])
+    #environLocal.printDebug(['streamToMidiTrack()'])
 
     s, instObj = _prepareStream(inputM21, instObj)
     mt = midiModule.MidiTrack(trackId)
@@ -1061,7 +1061,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     >>> len(s.notesAndRests)
     9
     '''
-    environLocal.printDebug(['midiTrackToStream(): got midi track: events', len(mt.events), 'ticksPerQuarter', ticksPerQuarter])
+    #environLocal.printDebug(['midiTrackToStream(): got midi track: events', len(mt.events), 'ticksPerQuarter', ticksPerQuarter])
 
     if inputM21 == None:
         from music21 import stream
@@ -1103,11 +1103,11 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
             continue
         elif (not mt.events[i].isDeltaTime() and not 
             mt.events[i+1].isDeltaTime()):
-            environLocal.printDebug(['midiTrackToStream(): got two non delta times in a row'])
+            #environLocal.printDebug(['midiTrackToStream(): got two non delta times in a row'])
             i += 1
             continue
         elif mt.events[i].isDeltaTime() and mt.events[i+1].isDeltaTime():
-            environLocal.printDebug(['midiTrackToStream(): got two delta times in a row'])
+            #environLocal.printDebug(['midiTrackToStream(): got two delta times in a row'])
             i += 1
             continue
         else:
@@ -1164,11 +1164,10 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
 
     # first create meta events
     for t, obj in metaEvents:
-        environLocal.printDebug(['insert midi meta event:', t, obj])
+        #environLocal.printDebug(['insert midi meta event:', t, obj])
         s.insert(t / float(ticksPerQuarter), obj)
 
-
-    environLocal.printDebug(['midiTrackToStream(): found notes ready for Stream import', len(notes)])
+    #environLocal.printDebug(['midiTrackToStream(): found notes ready for Stream import', len(notes)])
 
     # collect notes with similar start times into chords
     # create a composite list of both notes and chords

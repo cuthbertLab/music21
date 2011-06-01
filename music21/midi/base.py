@@ -824,7 +824,7 @@ class MidiTrack(object):
             raise MidiException('badly formed midi string: missing leading MTrk')
         # get the 4 chars after the MTrk encoding
         length, str = getNumber(str[4:], 4)      
-        environLocal.printDebug(['MidiTrack.read(): got chunk size', length])   
+        #environLocal.printDebug(['MidiTrack.read(): got chunk size', length])   
         self.length = length 
 
         # all event data is in the track str
@@ -991,7 +991,7 @@ class MidiFile(object):
         else: 
             self.ticksPerQuarterNote = division & 0x7FFF 
 
-        environLocal.printDebug(['MidiFile.readstr(): got midi file format:', self.format, 'with specified number of tracks:', numTracks, 'ticksPerSecond:', self.ticksPerSecond, 'ticksPerQuarterNote:', self.ticksPerQuarterNote])
+        #environLocal.printDebug(['MidiFile.readstr(): got midi file format:', self.format, 'with specified number of tracks:', numTracks, 'ticksPerSecond:', self.ticksPerSecond, 'ticksPerQuarterNote:', self.ticksPerQuarterNote])
 
         for i in range(numTracks): 
             trk = MidiTrack(i) # sets the MidiTrack index parameters

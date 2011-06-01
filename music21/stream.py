@@ -4457,7 +4457,7 @@ class Stream(music21.Music21Object):
 
         # need to move through notes in order
         # NOTE: this may or may have sub-streams that are not being examined
-        noteStream = returnObj.sorted.notes
+        noteStream = returnObj.sorted.notesAndRests
 
         # get chords, notes, and rests
         for i in range(len(noteStream)):
