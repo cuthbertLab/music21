@@ -355,15 +355,21 @@ class ExpanderException(Exception):
     pass
 
 class Expander(object):
-    '''Expand a single Part or Part-like stream with repeats.
-    '''
+    '''Expand a single Part or Part-like Stream with repeats. Nested repeats given with :class:`~music21.bar.Repeat` objects, or repeats and sections designated with :class:`~music21.repeat.RepeatExpression` objects, are all expanded.
 
+    This class is a utility processor. Direct usage is more commonly from the :meth:`~music21.stream.Stream.expandRepeats` method.
+    '''
     def __init__(self, streamObj):
         self._src = streamObj
-        # get and store the source measure count
+        # get and store the source measure count; this is presumed to
+        # be a Stream with Measures
         self._srcMeasureStream = self._src.getElementsByClass('Measure')
         # store all top-level non Measure elements for later insertion
         self._srcNotMeasureStream = self._src.getElementsNotOfClass('Measure')
+
+        # see if there are any repeat brackets
+        self._repeatBrackets = self._src.flat.getElementsByClass(
+                   'RepeatBracket')
 
         self._srcMeasureCount = len(self._srcMeasureStream)
         if self._srcMeasureCount == 0:
@@ -2034,13 +2040,20 @@ class Test(unittest.TestCase):
         self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
 
+        ex = Expander(s.parts[0])
+        self.assertEqual(len(ex._repeatBrackets), 2)
+
 
     def testRepeatsEndingsB(self):
         from music21 import corpus
         # last alternate endings in last bars
         # need to add import from abc
         s = corpus.parse('SmugglersReel')
-        #s.show()
+        #s.parts[0].show()
+        ex = Expander(s.parts[0])
+        self.assertEqual(len(ex._repeatBrackets), 2)
+
+        #post = ex.process()
 
 
 

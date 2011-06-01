@@ -5983,12 +5983,9 @@ class Stream(music21.Music21Object):
 
 
     def expandRepeats(self, copySpanners=True):
-        '''Expand all repeats, as well as all repeat indications given by text expressions such as D.C. al Segno.
+        '''Expand this Stream with repeats. Nested repeats given with :class:`~music21.bar.Repeat` objects, or repeats and sections designated with :class:`~music21.repeat.RepeatExpression` objects, are all expanded.
 
         This method always returns a new Stream, with deepcopies of all contained elements at all levels.
-    
-        NOTE: This preliminary implementation only handles repeats designated with repeat signs.
-
         '''
         if not self.hasMeasures():
             raise StreamException('cannot process repeats on Stream that does not contian measures')
@@ -5997,9 +5994,11 @@ class Stream(music21.Music21Object):
         post = ex.process()
 
         # copy all non-repeats
+        # do not copy repeat brackets
         for e in self.getElementsNotOfClass('Measure'):
-            eNew = copy.deepcopy(e) # assume that this is needed
-            post.insert(e.getOffsetBySite(self), eNew)
+            if 'RepeatBracket' not in e.classes:
+                eNew = copy.deepcopy(e) # assume that this is needed
+                post.insert(e.getOffsetBySite(self), eNew)
 
         # all elements at this level and in measures have been copied; now we 
         # need to reconnect spanners
