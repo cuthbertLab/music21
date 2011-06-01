@@ -1789,7 +1789,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             # and end of repeat bracket designations
             mxEndingObj = mxBarline.get('endingObj')
             if mxEndingObj is not None:
-                environLocal.printDebug(['found mxEndingObj', mxEndingObj, 'm', m]) 
+                #environLocal.printDebug(['found mxEndingObj', mxEndingObj, 'm', m]) 
                 # get all incomplete spanners of the appropriate class that are
                 # not complete
                 rbSpanners = spannerBundle.getByClassComplete(
@@ -1807,7 +1807,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     spannerBundle.append(rb)
                 # if we have any incomplete, this must be the end
                 else:
-                    environLocal.printDebug(['matching RepeatBracket spanner', 'len(rbSpanners)', len(rbSpanners)])
+                    #environLocal.printDebug(['matching RepeatBracket spanner', 'len(rbSpanners)', len(rbSpanners)])
                     rb = rbSpanners[0] # get RepeatBracket
                     # try to add this measure; may be the same
                     rb.addComponents(m)
@@ -2092,6 +2092,10 @@ def streamPartToMx(s, instObj=None, meterStream=None,
             if len(outerKeySignatures) > 0:
                 measureStream[0].keySignature = outerKeySignatures[0]
 
+        # see if accidentals can be processed
+        if not measureStream.haveAccidentalsBeenMade():
+            measureStream.makeAccidentals(inPlace=True)
+
     # for each measure, call .mx to get the musicxml representation
     for obj in measureStream:
         #mxPart.append(obj.mx)
@@ -2115,7 +2119,7 @@ def streamToMx(s, spannerBundle=None):
     >>> mxScore = musicxml.translate.streamToMx(s1)
     >>> mxPartList = mxScore.get('partList')
     '''
-    environLocal.printDebug(['streamToMx:'])
+    #environLocal.printDebug(['streamToMx:'])
     from music21 import spanner
 
     if len(s) == 0:

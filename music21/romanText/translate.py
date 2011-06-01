@@ -189,10 +189,10 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
             #environLocal.printDebug(['handling measure token:', t])
 
             if t.variantNumber is not None:
-                environLocal.printDebug(['skipping variant: %s' % t])
+                #environLocal.printDebug(['skipping variant: %s' % t])
                 continue
             if t.variantLetter is not None:
-                environLocal.printDebug(['skipping variant: %s' % t])
+                #environLocal.printDebug(['skipping variant: %s' % t])
                 continue
 
             # if this measure number is more than 1 greater than the last

@@ -667,7 +667,7 @@ class Accidental(music21.Music21Object):
     ('sharp', 1.0, '#')
 
     '''
-    # manager by properties
+    # managed by properties
     _displayType = "normal" # always, never, unless-repeated, even-tied
     _displayStatus = None # None, True, False
 
@@ -912,10 +912,12 @@ class Accidental(music21.Music21Object):
         self._displayStatus = value
     
     displayStatus = property(_getDisplayStatus, _setDisplayStatus, 
-        doc = '''Given the displayType, should 
-        this accidental be displayed?
+        doc = '''Given the displayType, should this accidental be displayed?
+
+        In general, a display status of None is assumed to mean that no high-level processing of accidentals has happened. 
+
         Can be True, False, or None if not defined. For contexts where
-        the next program down the line cannot evaluate displayType
+        the next program down the line cannot evaluate displayType.
         ''')
 
 

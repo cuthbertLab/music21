@@ -16,7 +16,7 @@ import copy, types, random
 import doctest, unittest
 import sys
 from copy import deepcopy
-
+import itertools
 
 import music21 # needed to do fully-qualified isinstance name checking
 
@@ -44,6 +44,7 @@ from music21 import spanner
 from music21 import tie
 from music21 import metadata
 from music21 import repeat
+
 
 from music21 import environment
 _MOD = "stream.py"
@@ -1750,9 +1751,7 @@ class Stream(music21.Music21Object):
         for e in self._endElements:
             eClasses = e.classes # store once, as this is property call
             for className in classFilterList:
-
                 if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
-
                     found.storeAtEnd(e, ignoreSort=True)
                     break # match first class and break to next e
 
@@ -4489,6 +4488,16 @@ class Stream(music21.Music21Object):
 
         return returnObj
 
+
+    def haveAccidentalsBeenMade(self):
+        # could be called: hasAccidentalDisplayStatusSet
+        '''If Accidentals.displayStatus is None for all contained pitches, it as assumed that accidentals have not been set for display and/or makeAccidentals has not been run. If any Accidental has displayStatus other than None, this method returns True, regardless of if makeAccidentals has actually been run.
+        '''
+        for p in self.pitches:
+            if p.accidental is not None:
+                if p.accidental.displayStatus is not None:
+                    return True
+        return False
 
     def makeNotation(self, meterStream=None, refStreamOrTimeRange=None,
                         inPlace=False):
@@ -8675,7 +8684,7 @@ class Score(Stream):
         else:
             raise StreamException('incorrect voiceAllocation format: %s' % voiceAllocation)
 
-        environLocal.printDebug(['partsToVoices() bundle:', bundle]) 
+        #environLocal.printDebug(['partsToVoices() bundle:', bundle]) 
 
         s = Score()
         s.metadata = self.metadata
@@ -11134,7 +11143,7 @@ class Test(unittest.TestCase):
         p.repeatAppend(tuplet2, 7)
         ex = p.makeNotation().measures(2,4)
         #ex.show()
-
+        
         display = [n.pitch.accidental.displayStatus for n in ex.flat.notes]
         self.assertEqual(display, [True, False, False, False, False, False, True, False, False, False, True, True, False, False])
 
@@ -11611,7 +11620,7 @@ class Test(unittest.TestCase):
         for scalar in [.5, 1.5, 2, .25]:
             #n = note.Note()
             part = Part()
-            environLocal.printDebug(['testAugmentOrDiminishCorpus()', 'pre augment or diminish', 'ex', ex, 'id(ex)', id(ex)])
+            #environLocal.printDebug(['testAugmentOrDiminishCorpus()', 'pre augment or diminish', 'ex', ex, 'id(ex)', id(ex)])
             for n in ex.augmentOrDiminish(scalar, inPlace=False):
                 part.append(n)
             s.insert(0, part)
@@ -12028,7 +12037,7 @@ class Test(unittest.TestCase):
         for x in s4._yieldElementsUpward([], streamsOnly=False, 
             skipDuplicates=True):
             match.append(x.id)
-            environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
+            #environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         # notice that this does not get the nonConatainers for 2b
         self.assertEqual(match, ['2c', 'n(1a)', '1a', '2a', '2b'] )
 
@@ -13654,12 +13663,12 @@ class Test(unittest.TestCase):
         # look at individual measure; check counts; these should not
         # change after measure extraction
         m1Raw = p1.getElementsByClass('Measure')[1]
-        environLocal.printDebug(['m1Raw', m1Raw])
+        #environLocal.printDebug(['m1Raw', m1Raw])
         self.assertEqual(len(m1Raw.flat), 8)
 
         #m1Raw.show('t')
         m2Raw = p1.getElementsByClass('Measure')[2]
-        environLocal.printDebug(['m2Raw', m2Raw])
+        #environLocal.printDebug(['m2Raw', m2Raw])
         self.assertEqual(len(m2Raw.flat), 9)
 
         # get a measure from this part
@@ -13669,12 +13678,12 @@ class Test(unittest.TestCase):
         # look at individual measure; check counts; these should not
         # change after measure extraction
         m1Raw = p1.getElementsByClass('Measure')[1]
-        environLocal.printDebug(['m1Raw', m1Raw])
+        #environLocal.printDebug(['m1Raw', m1Raw])
         self.assertEqual(len(m1Raw.flat), 8)
 
         #m1Raw.show('t')
         m2Raw = p1.getElementsByClass('Measure')[2]
-        environLocal.printDebug(['m2Raw', m2Raw])
+        #environLocal.printDebug(['m2Raw', m2Raw])
         self.assertEqual(len(m2Raw.flat), 9)
 
         #m2Raw.show('t')
@@ -13941,11 +13950,11 @@ class Test(unittest.TestCase):
             if beatStr not in melismaByBeat.keys():
                 melismaByBeat[beatStr] = []
             melismaByBeat[beatStr].append(dur)
-            environLocal.printDebug(['start note:', n, 'beat:', beatStr, 'slured duration:', dur])
+            #environLocal.printDebug(['start note:', n, 'beat:', beatStr, 'slured duration:', dur])
 
         for beatStr in sorted(melismaByBeat.keys()):
             avg = sum(melismaByBeat[beatStr]) / len(melismaByBeat[beatStr])
-            environLocal.printDebug(['melisma beat:', beatStr.ljust(6), 'average duration:', avg])
+            #environLocal.printDebug(['melisma beat:', beatStr.ljust(6), 'average duration:', avg])
 
 
 
@@ -14372,6 +14381,31 @@ class Test(unittest.TestCase):
         raw = m.musicxml
         self.assertEqual(raw.find('<beam number="1">begin</beam>') > 0, True)
         self.assertEqual(raw.find('<tuplet bracket="yes" placement="above"') > 0, True)
+
+    def testHaveAccidentalsBeenMadeA(self):
+        from music21 import stream
+        m = stream.Measure()
+        m.append(note.Note('c#'))
+        m.append(note.Note('c'))
+        m.append(note.Note('c#'))
+        m.append(note.Note('c'))
+        #m.show() on musicxml output, accidentals will be made
+        self.assertEqual(m.haveAccidentalsBeenMade(), False)
+        m.makeAccidentals()
+        self.assertEqual(m.haveAccidentalsBeenMade(), True)
+
+    def testHaveAccidentalsBeenMadeB(self):
+        from music21 import stream
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c#'), 4)
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note('c'), 4)
+        p = stream.Part()
+        p.append([m1, m2])
+        #p.show()
+        # test result of xml output to make sure a natural has been hadded
+        raw = p.musicxml
+        self.assertEqual(raw.find('<accidental>natural</accidental>') > 0, True)
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

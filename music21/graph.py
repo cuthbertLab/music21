@@ -111,7 +111,7 @@ FORMATS = ['horizontalbar', 'histogram', 'scatter', 'scatterweighted',
 def userFormatsToFormat(value):
     '''Replace possible user format strings with defined format names as used herein. Returns string unaltered if no match.
     '''
-    environLocal.printDebug(['calling user userFormatsToFormat:', value])
+    #environLocal.printDebug(['calling user userFormatsToFormat:', value])
     value = value.lower()
     value = value.replace(' ', '')
     if value in ['bar', 'horizontal', 'horizontalbar', 'pianoroll', 'piano']:
@@ -3369,7 +3369,7 @@ def _getPlotsToMake(*args, **keywords):
     if 'values' in keywords:
         values = keywords['values'] # should be a list
 
-    environLocal.printDebug(['got args pre conversion', args])
+    #environLocal.printDebug(['got args pre conversion', args])
 
     # if no args, use pianoroll
     if len(args) == 0 and format == '' and values == []:
@@ -3392,7 +3392,7 @@ def _getPlotsToMake(*args, **keywords):
     # make sure we have a list
     values = list(values)
 
-    environLocal.printDebug(['got args post conversion', 'format', format, 'values', values])
+    #environLocal.printDebug(['got args post conversion', 'format', format, 'values', values])
 
     # clean data and process synonyms
     # will return unaltered if no change
@@ -3415,7 +3415,7 @@ def _getPlotsToMake(*args, **keywords):
             plotClassNameValues = [x.lower() for x in plotClassName.values]
             plotClassNameFormat = plotClassName.format.lower()
             if plotClassNameFormat == format.lower():
-                environLocal.printDebug(['matching format', format])
+                #environLocal.printDebug(['matching format', format])
                 # see if a matching set of values is specified
                 # normally plots need to match all values 
                 match = []

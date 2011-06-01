@@ -1329,8 +1329,7 @@ def midiFileToStream(mf, inputM21=None):
     >>> len(s.flat.notesAndRests)
     9
     '''
-
-    environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
+    #environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
 
     from music21 import stream
     if inputM21 == None:
