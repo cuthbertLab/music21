@@ -4439,7 +4439,6 @@ class Stream(music21.Music21Object):
         # see if there is any key signatures to add to altered pitches
         if alteredPitches == None:
             alteredPitches = []
-
         addAlteredPitches = []
         if isinstance(useKeySignature, key.KeySignature):
             addAlteredPitches = useKeySignature.alteredPitches
@@ -4451,7 +4450,6 @@ class Stream(music21.Music21Object):
                 # assume we want the first found; in some cases it is possible
                 # that this may not be true
                 addAlteredPitches = ksStream[0].alteredPitches
-
         alteredPitches += addAlteredPitches
         #environLocal.printDebug(['processing makeAccidentals() with alteredPitches:', alteredPitches])
 
@@ -4459,15 +4457,23 @@ class Stream(music21.Music21Object):
         # NOTE: this may or may have sub-streams that are not being examined
         noteStream = returnObj.sorted.notesAndRests
 
+        #environLocal.printDebug(['alteredPitches', alteredPitches])
+        #environLocal.printDebug(['pitchPast', pitchPast])
+
         # get chords, notes, and rests
         for i in range(len(noteStream)):
+            isFirstOfMeasure = False
+            if i == 0:
+                isFirstOfMeasure = True
+
             e = noteStream[i]
             if isinstance(e, note.Note):
                 e.pitch.updateAccidentalDisplay(pitchPast, alteredPitches,
                     cautionaryPitchClass=cautionaryPitchClass,
                     cautionaryAll=cautionaryAll,
                     overrideStatus=overrideStatus,
-                    cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat)
+                    cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+                    isFirstOfMeasure=isFirstOfMeasure)
                 pitchPast.append(e.pitch)
             elif isinstance(e, chord.Chord):
                 pGroup = e.pitches
@@ -4478,7 +4484,7 @@ class Stream(music21.Music21Object):
                     p.updateAccidentalDisplay(pitchPast, alteredPitches, 
                         cautionaryPitchClass=cautionaryPitchClass, cautionaryAll=cautionaryAll,
                         overrideStatus=overrideStatus,
-                    cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat)
+                    cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,                    isFirstOfMeasure=isFirstOfMeasure)
                 pitchPast += pGroup
 
         return returnObj
@@ -11069,6 +11075,68 @@ class Test(unittest.TestCase):
         self.assertEqual(c1.pitches[1].accidental, None)
         self.assertEqual(c1.pitches[2].accidental, None)
 
+    def testMakeAccidentalsB(self):
+        from music21 import corpus
+        s = corpus.parse('monteverdi/madrigal.5.3.rntxt')
+        m34 = s.parts[0].getElementsByClass('Measure')[33]
+        c = m34.getElementsByClass('Chord')
+        # assuming not showing accidental b/c of key
+        self.assertEqual(str(c[1].pitches), '[B-4, D5, F5]')
+        # because of key
+        self.assertEqual(str(c[1].pitches[0].accidental.displayStatus), 'False')
+
+        s = corpus.parse('monteverdi/madrigal.5.4.rntxt')
+        m74 = s.parts[0].getElementsByClass('Measure')[73]
+        c = m74.getElementsByClass('Chord')
+        # has correct pitches but natural not showing on C
+        self.assertEqual(str(c[0].pitches), '[C5, E5, G5]')
+        self.assertEqual(str(c[0].pitches[0].accidental), 'None')
+
+    def testMakeAccidentalsC(self):
+        from music21 import stream, meter
+
+        # this isolates the case where a new measure uses an accidental
+        # that was used in a past measure
+
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('f4'), 2)
+        m1.repeatAppend(note.Note('f#4'), 2)
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note('f#4'), 4)
+
+        ex = stream.Part()
+        ex.append([m1, m2])
+        # without applying make accidentals, all sharps are shown
+        self.assertEqual(len(ex.flat.notes), 8)
+        self.assertEqual(len(ex.flat.notes[2:]), 6)
+        #ex.flat.notes[2:].show()
+
+        # all sharps, no display status is showing
+        acc = [str(n.pitch.accidental) for n in ex.flat.notes[2:]]
+        self.assertEqual(acc, ['<accidental sharp>', '<accidental sharp>', '<accidental sharp>', '<accidental sharp>', '<accidental sharp>', '<accidental sharp>'])
+        display = [n.pitch.accidental.displayStatus for n in ex.flat.notes[2:]]        
+        self.assertEqual(display, [None, None, None, None, None, None])
+
+        # call make accidentals
+        # cautionaryNotImmediateRepeat=True is default
+        # cautionaryPitchClass=True is default
+        ex.makeAccidentals(inPlace=True)
+
+        display = [n.pitch.accidental.displayStatus for n in ex.flat.notes[2:]]
+        # need the second true b/c it is the start of a new measure
+        self.assertEqual(display, [True, False, True, False, False, False])
+
+        p = stream.Part()
+        p.insert(0, meter.TimeSignature('2/4'))
+        tuplet1 = note.Note("E-4", quarterLength=1.0/3.0)
+        tuplet2 = note.Note("F#4", quarterLength=2.0/3.0)
+        p.repeatAppend(tuplet1, 16)
+        p.repeatAppend(tuplet2, 7)
+        ex = p.makeNotation().measures(2,4)
+        #ex.show()
+
+        display = [n.pitch.accidental.displayStatus for n in ex.flat.notes]
+        self.assertEqual(display, [True, False, False, False, False, False, True, False, False, False, True, True, False, False])
 
 
     def testMakeAccidentalsWithKeysInMeasures(self):
@@ -13943,23 +14011,6 @@ class Test(unittest.TestCase):
 
         self.assertEqual([n.offset for n in mStream[5].notesAndRests], [0.0, 0.5, 1.0, 1.5, 2.0, 3.0])
 
-
-    def testMakeAccidentalsB(self):
-        from music21 import corpus
-        s = corpus.parse('monteverdi/madrigal.5.3.rntxt')
-        m34 = s.parts[0].getElementsByClass('Measure')[33]
-        c = m34.getElementsByClass('Chord')
-        # assuming not showing accidental b/c of key
-        self.assertEqual(str(c[1].pitches), '[B-4, D5, F5]')
-        # because of key
-        self.assertEqual(str(c[1].pitches[0].accidental.displayStatus), 'False')
-
-        s = corpus.parse('monteverdi/madrigal.5.4.rntxt')
-        m74 = s.parts[0].getElementsByClass('Measure')[73]
-        c = m74.getElementsByClass('Chord')
-        # has correct pitches but natural not showing on C
-        self.assertEqual(str(c[0].pitches), '[C5, E5, G5]')
-        self.assertEqual(str(c[0].pitches[0].accidental), 'None')
 
     def testDerivationA(self):
         from music21 import stream, corpus

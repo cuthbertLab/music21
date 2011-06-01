@@ -549,7 +549,7 @@ class MuseDataPart(object):
             self.stage = self._determineStage()
         if self.stage == 1:
             self.src = self._scrubStage1(self.src)
-        environLocal.printDebug(['MuseDataPart: stage:', self.stage])
+        #environLocal.printDebug(['MuseDataPart: stage:', self.stage])
 
     def __repr__(self):
         return '<music21.musedata.MuseDataPart>'
@@ -873,7 +873,7 @@ class MuseDataPart(object):
         if self.stage == 1:
             # combine the two lines into one, all space separated
             record = self.src[6].strip() + ' ' + self.src[7].strip()
-            environLocal.printDebug(['got attributes record:', record])
+            #environLocal.printDebug(['got attributes record:', record])
             return record
         else:
             i = 11 # start with index 11, move to line tt starts with $
@@ -1163,7 +1163,7 @@ class MuseDataPart(object):
                 # data here is divisions per bar; need to divide by ts
                 # quarter length
                 self._divisionsPerQuarterNote = data / ts.barDuration.quarterLength
-                environLocal.printDebug(['stage1: self._divisionsPerQuarterNote', self._divisionsPerQuarterNote])
+                #environLocal.printDebug(['stage1: self._divisionsPerQuarterNote', self._divisionsPerQuarterNote])
             else:
                 # '$ K:-3   Q:4   T:3/4   C:22', 'Q:'
                 self._divisionsPerQuarterNote = int(

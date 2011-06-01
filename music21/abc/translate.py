@@ -62,10 +62,10 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         # first, split into a list of Measures; if there is only metadata and 
         # one measure, that means that no measures are defined
         barHandlers = abcHandler.splitByMeasure()
-        environLocal.printDebug(['barHandlers', len(barHandlers)])
+        #environLocal.printDebug(['barHandlers', len(barHandlers)])
         # merge loading meta data with each bar that preceedes it
         mergedHandlers = abcModule.mergeLeadingMetaData(barHandlers)
-        environLocal.printDebug(['mergedHandlers', len(mergedHandlers)])
+        #environLocal.printDebug(['mergedHandlers', len(mergedHandlers)])
     else: # simply stick in a single list
         mergedHandlers = [abcHandler] 
 
@@ -168,7 +168,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                     clefObj, transposition = t.getClefObject()
                     if clefObj != None: 
                         clefSet = False
-                        environLocal.printDebug(['found clef in key token:', t, clefObj, transposition])
+                        #environLocal.printDebug(['found clef in key token:', t, clefObj, transposition])
                         if useMeasures:  # assume at start of measures
                             dst.clef = clefObj
                         else:
@@ -337,7 +337,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     else:
         s = inputM21
 
-    environLocal.printDebug(['abcToStreamOpus: got number', number])
+    #environLocal.printDebug(['abcToStreamOpus: got number', number])
 
     # returns a dictionary of numerical key
     if abcHandler.definesReferenceNumbers():

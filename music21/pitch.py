@@ -3315,7 +3315,8 @@ class Pitch(music21.Music21Object):
 
     def updateAccidentalDisplay(self, pitchPast=[], alteredPitches=[],
             cautionaryPitchClass=True, cautionaryAll=False, 
-            overrideStatus=False, cautionaryNotImmediateRepeat=True):
+            overrideStatus=False, cautionaryNotImmediateRepeat=True,
+            isFirstOfMeasure=False):
         '''
         Given a list of Pitch objects in `pitchPast`, 
         determine if this pitch's Accidental object needs 
@@ -3335,6 +3336,9 @@ class Pitch(music21.Music21Object):
 
 
         If `cautionaryNotImmediateRepeat` is True, cautionary accidentals will be displayed for an altered pitch even if that pitch had already been displayed as altered. 
+
+        
+        If this Pitch is the first of a Measure, set `isFirstOfMeasure` to True. The first altered accidental of new Measure will generally always need to be displayed.
 
         >>> from music21 import *
 
@@ -3374,6 +3378,11 @@ class Pitch(music21.Music21Object):
                 self.accidental.displayStatus in [True, False]): 
                 return # exit: already set, do not override
 
+        # if the pitch is the first of a measure, has an accidental, it is not an altered key signature pitch, and it is not a natural, it should always be set to display
+        if isFirstOfMeasure and self.accidental != None and not self._nameInKeySignature(alteredPitches):
+            self.accidental.displayStatus = True
+            return # do not search past
+
         if len(pitchPast) == 0:
             # if we have no past, we always need to show the accidental, 
             # unless this accidental is in the alteredPitches list
@@ -3397,7 +3406,6 @@ class Pitch(music21.Music21Object):
                 if self.accidental == None:
                     self.accidental = Accidental('natural')
                 self.accidental.displayStatus = True
-
             return # do not search past
 
         # here tied and always are treated the same; we assume that
@@ -3412,6 +3420,7 @@ class Pitch(music21.Music21Object):
             self.accidental.displayStatus = True
             return # do not search past
 
+        # the pitch past closest to this pitch
         iNearest = len(pitchPast) - 1
         # store if a match was found and display set from past pitches
         setFromPitchPast = False 
@@ -3445,7 +3454,7 @@ class Pitch(music21.Music21Object):
                 octaveMatch = False
 
             # repeats of the same accidentally immediately following
-            # if An to An or A# to A#: do not need unless repeats requested
+            # if An to An or A# to A#: do not need unless repeats requested,
             # regardless of if 'unless-repeated' is set, this will catch 
             # a repeated case
             

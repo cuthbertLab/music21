@@ -2054,7 +2054,7 @@ def mergeLeadingMetaData(barHandlers):
             mCount += 1
         else:
             metadataPos.append(i)
-    environLocal.printDebug(['mergeLeadingMetaData()', 'metadataPosList', metadataPos, 'mCount', mCount])
+    #environLocal.printDebug(['mergeLeadingMetaData()', 'metadataPosList', metadataPos, 'mCount', mCount])
     # merge meta data into bars for processing
     mergedHandlers = []
     if mCount <= 1: # if only one true measure, do not create measures
