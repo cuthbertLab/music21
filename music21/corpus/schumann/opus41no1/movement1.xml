@@ -6842,9 +6842,6 @@
 		</measure>
 		<measure number="131">
 			<print new-system="yes"/>
-			<barline location="left">
-				<ending type="start" number=""/>
-			</barline>
 			<note>
 				<pitch>
 					<step>A</step>
@@ -6881,9 +6878,6 @@
 					<tied type="start"/>
 				</notations>
 			</note>
-			<barline location="right">
-				<ending type="discontinue" number=""/>
-			</barline>
 		</measure>
 		<measure number="132">
 			<note>
@@ -25321,9 +25315,6 @@
 		</measure>
 		<measure number="131">
 			<print new-system="yes"/>
-			<barline location="left">
-				<ending type="start" number=""/>
-			</barline>
 			<note>
 				<pitch>
 					<step>C</step>
@@ -25355,9 +25346,6 @@
 					<tied type="start"/>
 				</notations>
 			</note>
-			<barline location="right">
-				<ending type="discontinue" number=""/>
-			</barline>
 		</measure>
 		<measure number="132">
 			<note>
@@ -42132,9 +42120,6 @@
 		</measure>
 		<measure number="131">
 			<print new-system="yes"/>
-			<barline location="left">
-				<ending type="start" number=""/>
-			</barline>
 			<note>
 				<pitch>
 					<step>F</step>
@@ -42180,9 +42165,6 @@
 					<tied type="start"/>
 				</notations>
 			</note>
-			<barline location="right">
-				<ending type="discontinue" number=""/>
-			</barline>
 		</measure>
 		<measure number="132">
 			<note>
@@ -59181,9 +59163,6 @@
 		</measure>
 		<measure number="131">
 			<print new-system="yes"/>
-			<barline location="left">
-				<ending type="start" number=""/>
-			</barline>
 			<note>
 				<pitch>
 					<step>C</step>
@@ -59222,9 +59201,6 @@
 					<tied type="start"/>
 				</notations>
 			</note>
-			<barline location="right">
-				<ending type="discontinue" number=""/>
-			</barline>
 		</measure>
 		<measure number="132">
 			<note>

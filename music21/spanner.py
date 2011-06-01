@@ -1180,6 +1180,7 @@ class Test(unittest.TestCase):
         self.assertEqual(rb1.getOffsetsBySite(p), [4.0, 8.0])
         self.assertEqual(rb1.getDurationBySite(p).quarterLength, 8.0)
 
+        #p.show()
         raw = p.musicxml
         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    

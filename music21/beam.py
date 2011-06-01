@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -139,6 +139,7 @@ class Beam(object):
     mx = property(_getMX, _setMX)    
 
 
+#-------------------------------------------------------------------------------
 class Beams(object):
     '''
     The Beams object stores in it attribute beamsList (a list) all

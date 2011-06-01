@@ -2033,15 +2033,36 @@ class Test(unittest.TestCase):
         #         <ending number="2" type="discontinue"/>
 
         s = converter.parse(testPrimitive.repeatBracketsA)
+
         raw = s.musicxml
         self.assertEqual(raw.find("<repeat direction=")>1, True)    
         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="1" type="stop"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)   
+ 
+        # TODO: after calling .musicxml, repeat brackets are getting lost
+        #s.show()        
+#         raw = s.musicxml
+#         self.assertEqual(raw.find("<repeat direction=")>1, True)    
+#         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
+#         self.assertEqual(raw.find("""<ending number="1" type="stop"/>""")>1, True)    
+#         self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+#         self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)   
+
+        # 
+        #TODO: make sure that deepcopy gets spanners
+        s1 = copy.deepcopy(s)
+        #s.show()
+
+        #s1.show()
+        raw = s1.musicxml
 
         ex = Expander(s.parts[0])
         self.assertEqual(len(ex._repeatBrackets), 2)
+
+
+        
 
 
     def testRepeatsEndingsB(self):

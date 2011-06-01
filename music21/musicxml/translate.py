@@ -2092,9 +2092,35 @@ def streamPartToMx(s, instObj=None, meterStream=None,
             if len(outerKeySignatures) > 0:
                 measureStream[0].keySignature = outerKeySignatures[0]
 
-        # see if accidentals can be processed
-        if not measureStream.haveAccidentalsBeenMade():
-            measureStream.makeAccidentals(inPlace=True)
+        # see if accidentals/beams can be processed
+        haveDeepCopy = False
+
+        # TODO: when this runs, spanners are not being copied
+        
+
+#         if not measureStream.haveAccidentalsBeenMade():
+#             measureStream = measureStream.makeAccidentals(inPlace=False)
+#             haveDeepCopy = True
+#             # must get new spanners
+#             spannerBundle = spanner.SpannerBundle(measureStream.flat)
+            #print measureStream
+#         if not measureStream.haveBeamsBeenMade():
+#             # if making beams, have to make a deep copy, as modifying notes
+#             try:
+#                 if haveDeepCopy:
+#                     measureStream.makeBeams(inPlace=True)
+#                 else:
+#                     measureStream = measureStream.makeBeams(inPlace=False)
+#                     # must get new spanners
+#                     spannerBundle = spanner.SpannerBundle(measureStream.flat)
+# 
+#             # should match stream.StreamException, but was not
+#             #except stream.StreamException:
+#             except Exception:
+#                 # this is a result of makeMeaures not getting everything 
+#                 # note to measure allocation right
+#                 environLocal.printDebug(['skipping makeBeams exception', 
+#                                         Exception])
 
     # for each measure, call .mx to get the musicxml representation
     for obj in measureStream:
