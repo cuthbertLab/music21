@@ -87,7 +87,7 @@ class Spanner(music21.Music21Object):
         return ''.join(msg)
 
     def __deepcopy__(self, memo=None):
-        '''This produces a new, independent object containing references to the same components.
+        '''This produces a new, independent object containing references to the same components. Components linked in this Spanner must be manually re-set, likely using the replaceComponent() method.
 
         >>> from music21 import *
         >>> n1 = note.Note('g')
@@ -108,15 +108,12 @@ class Spanner(music21.Music21Object):
         for name in self.__dict__.keys():
             if name.startswith('__'):
                 continue
-
             part = getattr(self, name)
-
             # functionality duplicated from Music21Object
             if name == '_activeSite':
                 #environLocal.printDebug(['creating parent reference'])
                 newValue = self.activeSite # keep a reference, not a deepcopy
                 setattr(new, name, newValue)
-
             # do not deepcopy _components, as this will copy the 
             # contained objects
             elif name == '_components':
@@ -126,7 +123,6 @@ class Spanner(music21.Music21Object):
                 #environLocal.printDebug(['Spanner.__deepcopy__', name])
                 newValue = copy.deepcopy(part, memo)
                 setattr(new, name, newValue)
-    
         # do after all other copying
         new._idLastDeepCopyOf = id(self)
         return new
@@ -213,9 +209,8 @@ class Spanner(music21.Music21Object):
         # from the Component object
         post = []
         for c in self._components:
-            objRef = c
-            if objRef is not None:
-                post.append(id(objRef))
+            if c is not None:
+                post.append(id(c))
         return post
 
     def addComponents(self, components, *arguments, **keywords):  
@@ -251,9 +246,16 @@ class Spanner(music21.Music21Object):
             if not self._components.hasElement(c): # not already in storage
                 self._components.append(c)
             else:
+                pass
                 # it makes sense to not have multiple copies
-                environLocal.printDebug(['attempting to add an object (%s) that is already found in the SpannerStorage stream of spaner %s; this may not be an erorr.' % (c, self)])
+                #environLocal.printDebug(['attempting to add an object (%s) that is already found in the SpannerStorage stream of spaner %s; this may not be an erorr.' % (c, self)])
 
+    def hasComponent(self, component):  
+        '''Return True if this Spanner has the component.'''
+        for c in self._components:
+            if id(c) == id(component):
+                return True
+        return False
 
     def replaceComponent(self, old, new):
         '''When copying a Spanner, we need to update the spanner with new references for copied components. Given the old component, this method will replace the old with the new.
@@ -272,25 +274,22 @@ class Spanner(music21.Music21Object):
         '''
         if old is None:
             return None # do nothing
-
         if common.isNum(old):
             # this does not work for object ids
-            e = self._components.getElementById(old)
+            e = self._components.getElementByObjectId(old)
+            #environLocal.printDebug(['current Spanner.componentIds()', self.getComponentIds()])
+            #environLocal.printDebug(['Spanner.replaceComponent:', 'getElementById result', e, 'old target', old])
             if e is not None:
-                self._components.replace(e, new)
+                #environLocal.printDebug(['Spanner.replaceComponent:', 'old', e, 'new', new])
+                # do not do all Sites: only care about this one
+                self._components.replace(e, new, allTargetSites=False)
         else:
-            self._components.replace(old, new)
+            # do not do all Sites: only care about this one
+            self._components.replace(old, new, allTargetSites=False)
+            #environLocal.printDebug(['Spanner.replaceComponent:', 'old', e, 'new', new])
 
-        # get index form id list; 
-#         indexTarget = self.getComponentIds().index(idTarget)
-#         self._components[indexTarget] = Component(new)
         #environLocal.printDebug(['replaceComponent()', 'id(old)', id(old), 'id(new)', id(new)])
 
-#     def __del__(self):
-#         '''On deletion, remove this reference from Spanners.
-#         '''
-#         self._spanners.remove(self)
-# 
 
     def isFirst(self, component):
         '''Given a component, is it first?
@@ -605,7 +604,6 @@ class SpannerBundle(object):
         #post = self.__class__() # return a bundle of spanners that had changes
         for sp in self._storage:
             #environLocal.printDebug(['looking at spanner', sp, sp.getComponentIds()])
-
             # must check to see if this id is in this spanner
             if idTarget in sp.getComponentIds():
                 sp.replaceComponent(old, new)
@@ -721,10 +719,10 @@ class RepeatBracket(Spanner):
     >>> m = stream.Measure()
     >>> sp = spanner.RepeatBracket(m, number=1)
     >>> sp # can be one or more measures
-    <music21.spanner.RepeatBrack 1 <music21.stream.Measure 0 offset=0.0>>
+    <music21.spanner.RepeatBracket 1 <music21.stream.Measure 0 offset=0.0>>
     >>> sp.number = 3
     >>> sp # can be one or more measures
-    <music21.spanner.RepeatBrack 3 <music21.stream.Measure 0 offset=0.0>>
+    <music21.spanner.RepeatBracket 3 <music21.stream.Measure 0 offset=0.0>>
     >>> sp.getNumberList() # the list of repeat numbers
     [3]
     >>> sp.number = '1-3' # range of repeats
@@ -788,7 +786,7 @@ class RepeatBracket(Spanner):
     def __repr__(self):
         msg = Spanner.__repr__(self)
         if self.number is not None:
-            msg = msg.replace(self._reprHead, '<music21.spanner.RepeatBrack %s ' % self.number)
+            msg = msg.replace(self._reprHead, '<music21.spanner.RepeatBracket %s ' % self.number)
         else:
             msg = msg.replace(self._reprHead, '<music21.spanner.RepeatBracket ')
         return msg
@@ -1273,11 +1271,86 @@ class Test(unittest.TestCase):
         # have the offsets of the start of each measure
         self.assertEqual(rb4.getOffsetsBySite(p), [32.0, 36.0, 40.0, 44.0])
         self.assertEqual(rb4.getDurationBySite(p).quarterLength, 16.0)
-# 
-#         raw = p.musicxml
-#         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
-#         self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
-#         self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+
+        raw = p.musicxml
+        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+        
+        p1 = copy.deepcopy(p)
+        raw = p1.musicxml
+        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+
+        p2 = copy.deepcopy(p1)
+        raw = p2.musicxml
+        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+    
+
+    def testRepeatBracketE(self):
+        from music21 import note, spanner, stream, bar
+
+        p = stream.Part()
+        m1 = stream.Measure(number=1)
+        m1.repeatAppend(note.Note('c4'), 1)
+        p.append(m1)
+        m2 = stream.Measure(number=2)
+        m2.repeatAppend(note.Note('d#4'), 1) 
+        p.append(m2)
+        
+        m3 = stream.Measure(number=3)
+        m3.repeatAppend(note.Note('g#4'), 1)
+        m3.rightBarline = bar.Repeat(direction='end')
+        p.append(m3)
+        p.append(spanner.RepeatBracket(m3, number=1))
+        
+        m4 = stream.Measure(number=4)
+        m4.repeatAppend(note.Note('a4'), 1)
+        m4.rightBarline = bar.Repeat(direction='end')
+        p.append(m4)
+        p.append(spanner.RepeatBracket(m4, number=2))
+        
+        m5 = stream.Measure(number=5)
+        m5.repeatAppend(note.Note('b4'), 1)
+        m5.rightBarline = bar.Repeat(direction='end')
+        p.append(m5)
+        p.append(spanner.RepeatBracket(m5, number=3))
+        
+        m6 = stream.Measure(number=6)
+        m6.repeatAppend(note.Note('c#5'), 1)
+        p.append(m6)
+        
+        # all spanners should be at the part level
+        self.assertEqual(len(p.spanners), 3)
+
+        # try copying once
+        p1 = copy.deepcopy(p)
+        self.assertEqual(len(p1.spanners), 3)
+        m5 = p1.getElementsByClass('Measure')[-2]
+        sp3 = p1.spanners[2]
+        self.assertEqual(sp3.hasComponent(m5), True)
+#         for m in p1.getElementsByClass('Measure'):
+#             print m, id(m)
+#         for sp in p1.spanners:
+#             print sp, id(sp), [c for c in sp.getComponentIds()]
+        #p1.show()
+
+        p2 = copy.deepcopy(p1)
+        self.assertEqual(len(p2.spanners), 3)
+        m5 = p2.getElementsByClass('Measure')[-2]
+        sp3 = p2.spanners[2]
+        self.assertEqual(sp3.hasComponent(m5), True)
+
+
+        p3 = copy.deepcopy(p2)
+        self.assertEqual(len(p3.spanners), 3)
+        m5 = p3.getElementsByClass('Measure')[-2]
+        sp3 = p3.spanners[2]
+        self.assertEqual(sp3.hasComponent(m5), True)
+
 
 
 

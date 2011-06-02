@@ -664,7 +664,9 @@ class Stream(music21.Music21Object):
 
 
     def getElementByObjectId(self, objId):
-        '''Low-level tool to get an element based only on the object id. This does not yet handle ElementWrapper objects
+        '''Low-level tool to get an element based only on the object id. This does not yet handle ElementWrapper objects.
+
+        This is not the same as getElementById, which refers to the id attribute which may be manually set and not unique. 
         '''
         # TODO: refactor to handle possibility of multiple values
         for e in self._elements:
@@ -808,13 +810,6 @@ class Stream(music21.Music21Object):
         '''
         #environLocal.printDebug(['Stream calling __deepcopy__', self])
 
-        # get all spanners at or below this level in a spanner bundle
-        # it is possible to get spanners above this level too, by using 
-        # getAllContextsByClass, but this would orphan the spanner from 
-        # its container 
-        # what happens here is that every time a Stream is copied, the 
-        # all spanners bubble-up to the top of the point of copy; it is 
-        # these that are copied
 #         spannerBundle = spanner.SpannerBundle()
 #         for sp in self.flat.spanners:
 #         #for sp in self.flat.getAllContextsByClass('Spanner'):
@@ -848,6 +843,9 @@ class Stream(music21.Music21Object):
                 continue # skip for now
             elif name == '_elements':
                 # must manually add elements to 
+                # spanner are copied here in the same manner as all contained
+                # elements; their components, however, are not copied, and 
+                # must be replaced
                 for e in self._elements: 
                     #environLocal.printDebug(['deepcopy()', e, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e), 'e.activeSite', e.activeSite, 'e.getSites()', e.getSites(), 'e.getSiteIds()', e.getSiteIds()], format='block')
                     # this will work for all with __deepcopy___
@@ -856,7 +854,6 @@ class Stream(music21.Music21Object):
                     # user here to provide new offset
                     new.insert(e.getOffsetBySite(old), newElement, 
                                ignoreSort=True)
-
             elif name == '_endElements':
                 # must manually add elements to 
                 for e in self._endElements: 
@@ -865,12 +862,10 @@ class Stream(music21.Music21Object):
                     # get the old offset from the activeSite Stream     
                     # user here to provide new offset
                     new.storeAtEnd(newElement, ignoreSort=True)
-                
             elif isinstance(part, Stream):
                 environLocal.printDebug(['found stream in dict keys', self,
                     part, name])
                 raise StreamException('streams as attributes requires special handling')
-
             # use copy.deepcopy on all other elements, including contexts    
             else: 
                 #environLocal.printDebug(['forced to use copy.deepcopy:',
@@ -885,13 +880,18 @@ class Stream(music21.Music21Object):
         # after copying all elements
         # get all spanners at all levels from new: 
         # these have references to old objects
-        # NOTE: it is likely that this only needs to be done at the highest
+        # it is likely that this only needs to be done at the highest
         # level of recursion, not on component Streams
         spannerBundle = spanner.SpannerBundle(new.flat.spanners)
         # iterate over complete semi flat (need containers); find
         # all new/old pairs
         for e in new.semiFlat:
+            if 'Spanner' in e.classes:
+                continue # we never update Spanners
+            #environLocal.printDebug(['__deepcopy__ attempt element update for spanners', 'new element', e, 'id(e)', id(e), 'e._idLastDeepCopyOf', e._idLastDeepCopyOf])
             # update based on last id, new object
+            # TODO: possible optimization by looking only elements that have
+            # a spanner in their defined contexts
             spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
 
         return new
@@ -1388,6 +1388,8 @@ class Stream(music21.Music21Object):
             raise StreamException('received a target of None as a candidate for replacement.')
         else: # matching object directly
             iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
+
+        #environLocal.printDebug(['Stream.replace()', 'target', target, id(target), 'replacement', replacement, id(replacement), 'iMatch', iMatch])
 
         # target can be given as an obj id number
         if common.isNum(target):
@@ -1951,7 +1953,7 @@ class Stream(music21.Music21Object):
 
     def getElementById(self, id, classFilter=None):
         '''Returns the first encountered element for a given id. Return None
-        if no match
+        if no match. Note: this uses the id attribute stored on elements, which may not be the same as id(e). 
 
         >>> from music21 import *
 
