@@ -275,7 +275,7 @@ class Spanner(music21.Music21Object):
         if old is None:
             return None # do nothing
         if common.isNum(old):
-            # this does not work for object ids
+            # this must be id(obj), not obj.id
             e = self._components.getElementByObjectId(old)
             #environLocal.printDebug(['current Spanner.componentIds()', self.getComponentIds()])
             #environLocal.printDebug(['Spanner.replaceComponent:', 'getElementById result', e, 'old target', old])

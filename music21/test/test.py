@@ -151,9 +151,7 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False):
             if 'external' in testGroup or 'testExternal' in testGroup:
                 unitTestCases.append(module.TestExternal)
 
-
-
-        # for each Test class, add load this into a suite
+        # for each Test class, load this into a suite
         for testCase in unitTestCases:
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(testCase)
             s1.addTests(s2)
