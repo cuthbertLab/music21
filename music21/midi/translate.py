@@ -10,6 +10,8 @@
 #-------------------------------------------------------------------------------
 
 
+#Quantization takes place on the stream...
+
 
 import unittest
 import math
@@ -1047,6 +1049,9 @@ def streamToMidiTrack(inputM21, instObj=None, trackId=1):
 def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     inputM21=None):
     '''
+    Note that quantization takes place in stream.py since it's useful not just for MIDI.
+
+
     >>> from music21 import *
     >>> import os
     >>> fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid')

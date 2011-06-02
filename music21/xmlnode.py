@@ -104,7 +104,19 @@ class XMLNode(object):
 
 
     def _getComponents(self):
-        '''Get all sub-components, in order. This may be XMLNode subclasses, or may be simple entities. Simple entities do not have attributes and are only used as containers for character data. These entities are generally not modelled as objects '''
+        '''
+        Get all sub-components, in order. 
+        These may be XMLNode subclasses, or may be simple entities. 
+ 
+        
+        Simple entities do not have attributes and are only used 
+        as containers for character data. These entities are generally 
+        not modeled as objects.
+        
+        
+        The xmlnode.XMLNode._getComponents() method just returns
+        an empty list.  Subclasses override this method.
+        '''
         return []
 
 
@@ -119,13 +131,17 @@ class XMLNode(object):
 
     #---------------------------------------------------------------------------
     def _convertNameCrossReference(self, name):
-        '''Define mappings from expected MusicXML names and specially named attributes in object.
+        '''
+        Define mappings from expected MusicXML names and specially named attributes in object.
         Return a list of zero or 1 name
         
-        Specialize in sublcasses as needed, calling this base class to get
-        general defaults
+        
+        Specialize in subclasses as needed, calling this base class to get
+        general defaults.
+
 
         All options need to be lower case.
+
 
         >>> a = XMLNode()
         >>> a._convertNameCrossReference('characterData')

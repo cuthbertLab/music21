@@ -212,6 +212,9 @@ class Stream(music21.Music21Object):
         else:
             return music21.Music21Object.__repr__(self)
 
+    # def show(self...    --- see base.py calls .write(
+
+
     #---------------------------------------------------------------------------
     # sequence like operations
 
@@ -5054,7 +5057,7 @@ class Stream(music21.Music21Object):
 
     def _getFlat(self):
         '''
-        A very important property that returns a new Stream 
+        A very important read-only property that returns a new Stream 
         that has all sub-containers "flattened" within it,
         that is, it returns a new Stream where no elements nest within 
         other elements.
@@ -5793,6 +5796,7 @@ class Stream(music21.Music21Object):
                 restoreActiveSites=True, 
                 classFilter=classFilterList):
             e.transpose(value, inPlace=True)            
+
 
         if not inPlace:
             return post

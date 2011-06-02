@@ -1,11 +1,11 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
-# Name:         musicxml.translate.py
+# Name:         musicxml/translate.py
 # Purpose:      Translate MusicXML and music21 objects
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2010 The music21 Project
+# Copyright:    (c) 2010-11 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -1097,7 +1097,9 @@ def chordToMx(c):
     return mxNoteList
 
 def mxToChord(mxNoteList, inputM21=None):
-    '''Given an a list of mxNotes, fill the necessary parameters
+    '''
+    Given an a list of mxNotes, fill the necessary parameters
+
 
     >>> from music21 import *
     >>> a = musicxml.Note()
@@ -1132,7 +1134,7 @@ def mxToChord(mxNoteList, inputM21=None):
     for mxNote in mxNoteList:
         # extract pitch pbjects     
         p = pitch.Pitch()
-        p.mx = mxNote # will extract pitch info form mxNote
+        p.mx = mxNote # will extract pitch info from mxNote
         pitches.append(p)
 
         if len(mxNote.tieList) > 0:
@@ -1144,6 +1146,10 @@ def mxToChord(mxNoteList, inputM21=None):
             ties.append(None)
     # set all at once
     c.pitches = pitches
+
+    # set beams from first note of chord
+    c.beams.mx = mxNoteList[0].beamList
+
 
     # set ties based on pitches
     for i, t in enumerate(ties):
@@ -1197,11 +1203,15 @@ def noteToMxNotes(n, spannerBundle=None):
         #environLocal.printDebug(['noteToMxNotes(): spannerBundle post-filter by component:', spannerBundle])
 
     mxNoteList = []
+    pitchMx = n.pitch.mx
+    noteColor = n.color
+
     for mxNote in n.duration.mx: # returns a list of mxNote objs
         # merge method returns a new object
-        mxNote = mxNote.merge(n.pitch.mx)
+        mxNote = mxNote.merge(pitchMx)
         # get color from within .editorial using attribute
-        mxNote.set('color', n.color)
+        if noteColor != "":
+            mxNote.set('color', noteColor)
         if n.hideObjectOnPrint == True:
             mxNote.set('printObject', "no")
         mxNoteList.append(mxNote)
@@ -1231,24 +1241,24 @@ def noteToMxNotes(n, spannerBundle=None):
     # this is setting the same beams for each part of this 
     # note; this may not be correct, as we may be dividing the note into
     # more than one part
-    for mxNote in mxNoteList:
-        if n.beams != None:
-            mxNote.beamList = n.beams.mx
+    nBeams = n.beams
+    if nBeams:
+        nBeamsMx = n.beams.mx
+        for mxNote in mxNoteList:
+            mxNote.beamList = nBeamsMx
 
     # if we have any articulations, they only go on the first of any 
     # component notes
     mxArticulations = musicxmlMod.Articulations()
-    for i in range(len(n.articulations)):
-        obj = n.articulations[i] # returns mxArticulationMark
-        mxArticulations.append(obj.mx) # append to mxArticulations
+    for artObj in n.articulations:
+        mxArticulations.append(artObj.mx) # returns mxArticulationMark to append to mxArticulations
     if len(mxArticulations) > 0:
         mxNoteList[0].notationsObj.componentList.append(mxArticulations)
 
     # notations and articulations are mixed in musicxml
-    for i in range(len(n.expressions)):
-        obj = n.expressions[i]
-        if hasattr(obj, 'mx'):
-            mxNoteList[0].notationsObj.componentList.append(obj.mx)
+    for expObj in n.expressions:
+        if hasattr(expObj, 'mx'):
+            mxNoteList[0].notationsObj.componentList.append(expObj.mx)
 
     if spannerBundle is not None:
         # already filtered for just the spanner that have this note as
@@ -1492,6 +1502,7 @@ def measureToMx(m, spannerBundle=None):
         divisions = mxAttributes.divisions
         for v in m.voices:
             # iterate over each object in this voice
+            voiceId = v.id
             offsetMeasureNote = 0 # offset of notes w/n measure  
             for obj in v.flat:
                 classes = obj.classes # store result of property call once
@@ -1499,7 +1510,7 @@ def measureToMx(m, spannerBundle=None):
                     offsetMeasureNote += obj.quarterLength
                     objList = noteToMxNotes(obj, spannerBundle=spannerBundle)
                     for sub in objList:
-                        sub.voice = v.id # the voice id is the voice number
+                        sub.voice = voiceId # the voice id is the voice number
                     mxMeasure.componentList += objList
                 elif 'GeneralNote' in classes:
                     # increment offset before getting mx, as this way a single
@@ -1509,7 +1520,7 @@ def measureToMx(m, spannerBundle=None):
                     objList = obj.mx
                     # need to set voice for each contained mx object
                     for sub in objList:
-                        sub.voice = v.id # the voice id is the voice number
+                        sub.voice = voiceId # the voice id is the voice number
                     mxMeasure.componentList += objList
             # create backup object configured to duration of accumulated
             # notes, meaning that we always return to the start of the measure
@@ -2025,14 +2036,18 @@ def measureToMusicXML(m):
 # Streams
 
 
-def streamPartToMx(s, instObj=None, meterStream=None,
+def streamPartToMx(part, instObj=None, meterStream=None,
                    refStreamOrTimeRange=None, spannerBundle=None):
-    '''If there are Measures within this stream, use them to create and
+    '''
+    If there are Measures within this stream, use them to create and
     return an MX Part and ScorePart. 
 
-    An `instObj` may be assigned from caller; this Instrument is pre-collected from this Stream in order to configure id and midi-channel values. 
 
-    The `meterStream`, if provides a template of meters. 
+    An `instObj` may be assigned from caller; this Instrument is pre-collected 
+    from this Stream in order to configure id and midi-channel values. 
+
+
+    The `meterStream`, if given, provides a template of meters. 
     '''
     from music21 import spanner
     from music21 import stream
@@ -2042,7 +2057,7 @@ def streamPartToMx(s, instObj=None, meterStream=None,
     # Stream.
     if instObj is None:
         # see if an instrument is defined in this or a parent stream
-        instObj = s.getInstrument()
+        instObj = part.getInstrument()
     # must set a unique part id, if not already assigned
     if instObj.partId == None:
         instObj.partIdRandomize()
@@ -2062,11 +2077,11 @@ def streamPartToMx(s, instObj=None, meterStream=None,
     # get a stream of measures
     # if flat is used here, the Measure is not obtained
     # may need to be semi flat?
-    measureStream = s.getElementsByClass('Measure')
+    measureStream = part.getElementsByClass('Measure')
     if len(measureStream) == 0:
         # try to add measures if none defined
         # returns a new stream w/ new Measures but the same objects
-        measureStream = s.makeNotation(meterStream=meterStream,
+        measureStream = part.makeNotation(meterStream=meterStream,
                         refStreamOrTimeRange=refStreamOrTimeRange)
         #environLocal.printDebug(['Stream._getMXPart: post makeNotation, length', len(measureStream)])
 
@@ -2084,11 +2099,11 @@ def streamPartToMx(s, instObj=None, meterStream=None,
         # this is for non-standard Stream formations (some kern imports)
         # that place key/clef information in the containing stream
         if measureStream[0].clef == None:
-            outerClefs = s.getElementsByClass('Clef')
+            outerClefs = part.getElementsByClass('Clef')
             if len(outerClefs) > 0:
                 measureStream[0].clef = outerClefs[0]
         if measureStream[0].keySignature == None:
-            outerKeySignatures = s.getElementsByClass('KeySignature')
+            outerKeySignatures = part.getElementsByClass('KeySignature')
             if len(outerKeySignatures) > 0:
                 measureStream[0].keySignature = outerKeySignatures[0]
 
@@ -2132,9 +2147,14 @@ def streamPartToMx(s, instObj=None, meterStream=None,
 
 
 def streamToMx(s, spannerBundle=None):
-    '''Create and return a musicxml Score object. 
+    '''
+    Create and return a musicxml Score object. 
 
-    This is the most common entry point for conversion of a Stream to MusicXML. This method is called on Stream from the musicxml property. 
+
+    This is the most common entry point for 
+    conversion of a Stream to MusicXML. This method is 
+    called on Stream from the musicxml property. 
+
 
     >>> from music21 import *
     >>> n1 = note.Note()
@@ -2823,7 +2843,3 @@ if __name__ == "__main__":
 
 #------------------------------------------------------------------------------
 # eof
-
-
-
-
