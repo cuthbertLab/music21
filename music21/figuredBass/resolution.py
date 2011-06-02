@@ -193,7 +193,6 @@ def dominantSeventhToMajorTonic(domPossib, resolveV43toI6 = False):
     V7chord = chord.Chord(domPossib)   
     root = V7chord.root()
     bass = V7chord.bass()
-    inversion = V7chord.inversion()
     rootName = root.name
     thirdName = transpose(root,'M3').name
     fifthName = transpose(root,'P5').name
@@ -248,12 +247,10 @@ def dominantSeventhToMinorTonic(domPossib, resolveV43toi6 = False):
     V7chord = chord.Chord(domPossib)   
     root = V7chord.root()
     bass = V7chord.bass()
-    inversion = V7chord.inversion()
     rootName = root.name
     thirdName = transpose(root,'M3').name
     fifthName = transpose(root,'P5').name
     seventhName = transpose(root,'m7').name
-    resolveV43toi6 = (inversion == 2 and resolveV43toi6)
 
     howToResolve = \
     [(lambda p: p.name == rootName and p == bass, 'P4'),
@@ -282,7 +279,6 @@ def dominantSeventhToMajorSubmediant(domPossib):
     V7chord = chord.Chord(domPossib)   
     root = V7chord.root()
     bass = V7chord.bass()
-    inversion = V7chord.inversion()
     rootName = root.name
     thirdName = transpose(root,'M3').name
     fifthName = transpose(root,'P5').name
@@ -313,7 +309,6 @@ def dominantSeventhToMinorSubmediant(domPossib):
     V7chord = chord.Chord(domPossib)   
     root = V7chord.root()
     bass = V7chord.bass()
-    inversion = V7chord.inversion()
     rootName = root.name
     thirdName = transpose(root,'M3').name
     fifthName = transpose(root,'P5').name
@@ -344,7 +339,6 @@ def dominantSeventhToMajorSubdominant(domPossib):
     V7chord = chord.Chord(domPossib)   
     root = V7chord.root()
     bass = V7chord.bass()
-    inversion = V7chord.inversion()
     rootName = root.name
     thirdName = transpose(root,'M3').name
     fifthName = transpose(root,'P5').name
@@ -374,7 +368,6 @@ def dominantSeventhToMinorSubdominant(domPossib):
     V7chord = chord.Chord(domPossib)   
     root = V7chord.root()
     bass = V7chord.bass()
-    inversion = V7chord.inversion()
     rootName = root.name
     thirdName = transpose(root,'M3').name
     fifthName = transpose(root,'P5').name
@@ -407,7 +400,6 @@ def diminishedSeventhToMajorTonic(dimPossib, doubledRoot = False):
     dim7chord = chord.Chord(dimPossib)
     root = dim7chord.root()
     bass = dim7chord.bass()
-    inversion = dim7chord.inversion()
     rootName = root.name
     thirdName = transpose(root,'m3').name
     fifthName = transpose(root,'d5').name
@@ -442,7 +434,6 @@ def diminishedSeventhToMinorTonic(dimPossib, doubledRoot = False):
     dim7chord = chord.Chord(dimPossib)
     root = dim7chord.root()
     bass = dim7chord.bass()
-    inversion = dim7chord.inversion()
     rootName = root.name
     thirdName = transpose(root,'m3').name
     fifthName = transpose(root,'d5').name
@@ -474,7 +465,6 @@ def diminishedSeventhToMajorSubdominant(dimPossib):
     dim7chord = chord.Chord(dimPossib)
     root = dim7chord.root()
     bass = dim7chord.bass()
-    inversion = dim7chord.inversion()
     rootName = root.name
     thirdName = transpose(root,'m3').name
     fifthName = transpose(root,'d5').name
@@ -504,7 +494,6 @@ def diminishedSeventhToMinorSubdominant(dimPossib):
     dim7chord = chord.Chord(dimPossib)
     root = dim7chord.root()
     bass = dim7chord.bass()
-    inversion = dim7chord.inversion()
     rootName = root.name
     thirdName = transpose(root,'m3').name
     fifthName = transpose(root,'d5').name
@@ -516,6 +505,7 @@ def diminishedSeventhToMinorSubdominant(dimPossib):
             
     return resolvePitches(dimPossib, howToResolve)
 
+'''
 transpositionsTable = {}
 def transpose(samplePitch, intervalString):
     args = (samplePitch, intervalString)
@@ -524,11 +514,10 @@ def transpose(samplePitch, intervalString):
     transposedPitch = samplePitch.transpose(intervalString)
     transpositionsTable[(samplePitch, intervalString)] = transposedPitch
     return transposedPitch
-
 '''
+
 def transpose(samplePitch, intervalString):
     return samplePitch.transpose(intervalString)
-'''
 
 def resolvePitches(possibToResolve, howToResolve):
     howToResolve.append((lambda p: True, 'P1'))
