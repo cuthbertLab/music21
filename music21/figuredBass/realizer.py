@@ -15,12 +15,14 @@ import itertools
 import music21
 import random
 import unittest
+import warnings
 
 from music21 import chord
 from music21 import clef
 from music21 import key
 from music21 import meter
 from music21 import note
+from music21 import pitch
 from music21 import stream
 from music21.figuredBass import notation
 from music21.figuredBass import realizerScale
@@ -29,23 +31,31 @@ from music21.figuredBass import segment
 
 def figuredBassFromStream(streamPart):
     '''
-    Takes a music21.stream Part (or another music21.stream Stream subclass) 
-    and returns a FiguredBass object whose bass notes have Notations taken 
-    from the lyrics in the source stream. This method along with the solve 
-    method provide the easiest way of converting from a notated version of 
-    a figured bass (such as in a MusicXML file) to a realized version of the 
-    same line.
+    Takes a :class:`~music21.stream.Part` (or another :class:`~music21.stream.Stream` subclass) 
+    and returns a :class:`~music21.figuredBass.realizer.FiguredBassLine` object whose bass notes 
+    have notations taken from the lyrics in the source stream. This method along with the
+    :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize` method provide the easiest 
+    way of converting from a notated version of a figured bass (such as in a MusicXML file) to 
+    a realized version of the same line.
     
+    
+    .. note:: This example corresponds to example 1b in "fbREALIZER: AUTOMATIC FIGURED BASS REALIZATION FOR 
+    MUSIC INFORMATION RETRIEVAL IN music21," which was submitted for consideration for the 12th International 
+    Society for Music Information Retrieval Conference (`ISMIR 2011 <http://ismir2011.ismir.net/>`_).
+        
     >>> from music21 import tinyNotation
     >>> from music21.figuredBass import realizer
-    >>> s = tinyNotation.TinyNotationStream('C4 D8_6 E8_6 F4 G4_7 C1', '4/4')
+    >>> s = tinyNotation.TinyNotationStream('C4 D8_6 E8_6 F4 G4_7 c1', '4/4')
     >>> fb = realizer.figuredBassFromStream(s)
     >>> fbRules = rules.Rules()
-    >>> fbRules.partMovementLimits = [(1,4)] #Soprano pitch movements limited to 4 semitones (M3) 
+    >>> fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]
     >>> fbRealization = fb.realize(fbRules)
     >>> fbRealization.getNumSolutions()
-    127
-    >>> #_DOCS_SHOW fbRealization.generateRandomRealizations(20).show()
+    13
+    >>> #_DOCS_SHOW fbRealization.generateRandomRealizations(8).show()
+    
+    .. image:: images/fbRealizer_fbStreamPart.*
+        :width: 700
     '''
     sf = streamPart.flat
     sfn = sf.notes
@@ -72,7 +82,6 @@ def figuredBassFromStream(streamPart):
         ts = tsList[0]
     
     fb = FiguredBassLine(myKey, ts)
-    fb.addNotationAsLyrics = False
     
     for n in sfn:
         if len(n.lyrics) > 0:
@@ -83,14 +92,33 @@ def figuredBassFromStream(streamPart):
     
     return fb
 
-figuredBassFromStreamPart = figuredBassFromStream
-
+def figuredBassFromStreamPart(streamPart):
+    '''
+    Deprecated. Use :meth:`~music21.figuredBass.realizer.figuredBassFromStream` instead.
+    '''
+    warnings.warn("The method figuredBassFromStreamPart() is deprecated. Use figuredBassFromStream().", DeprecationWarning)
+    return figuredBassFromStream(streamPart)
+    
 def addLyricsToBassNote(bassNote, notationString):
     '''
     Takes in a bassNote and a corresponding notationString as arguments. 
     Adds the parsed notationString as lyrics to the bassNote, which is 
     useful when displaying the figured bass in external software.
+    
+    >>> from music21.figuredBass import realizer
+    >>> from music21 import note
+    >>> n1 = note.Note('G3')
+    >>> realizer.addLyricsToBassNote(n1, "6,4")
+    >>> n1.lyrics[0].text
+    '6'
+    >>> n1.lyrics[1].text
+    '4'
+    >>> #_DOCS_SHOW n1.show()
+    
+    .. image:: images/fbRealizer_lyrics.*
+        :width: 150
     '''
+    bassNote.lyrics = []
     n = notation.Notation(notationString)
     if len(n.figureStrings) == 0:
         return
@@ -104,10 +132,16 @@ def addLyricsToBassNote(bassNote, notationString):
             spacesInFront += ' '
         bassNote.addLyric(spacesInFront + fs, applyRaw = True)
 
+_DOC_ORDER = [figuredBassFromStream, figuredBassFromStreamPart, addLyricsToBassNote]
+
 class FiguredBassLine(object):
-    '''
-    '''
     def __init__(self, inKey = key.Key('C'), inTime = meter.TimeSignature('4/4')):
+        '''
+        >>> from music21.figuredBass import realizer
+        >>> from music21 import key
+        >>> from music21 import meter
+        >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
+        '''
         self.inKey = inKey
         self.inTime = inTime
         self.fbScale = realizerScale.FiguredBassScale(inKey.pitchFromDegree(1), inKey.mode)
@@ -115,11 +149,34 @@ class FiguredBassLine(object):
         self.addNotationAsLyrics = True
     
     def addElement(self, bassNote, notationString = ''):
+        '''
+        >>> from music21.figuredBass import realizer
+        >>> from music21 import key
+        >>> from music21 import meter
+        >>> from music21 import note
+        >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
+        >>> fbLine.addElement(note.Note('B2'))
+        >>> fbLine.addElement(note.Note('C#3'), "6")
+        >>> fbLine.addElement(note.Note('D#3'), "6")
+        >>> fbLine.fbList
+        [(<music21.note.Note B>, ''), (<music21.note.Note C#>, '6'), (<music21.note.Note D#>, '6')]
+        '''
         self.fbList.append((bassNote, notationString))
         if self.addNotationAsLyrics:
             addLyricsToBassNote(bassNote, notationString)
     
     def generateBassLine(self):
+        '''
+        >>> from music21.figuredBass import realizer
+        >>> from music21 import key
+        >>> from music21 import meter
+        >>> from music21 import note
+        >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
+        >>> fbLine.addElement(note.Note('B2'))
+        >>> fbLine.addElement(note.Note('C#3'), "6")
+        >>> fbLine.addElement(note.Note('D#3'), "6")
+        >>> #_DOCS_SHOW fbLine.generateBassLine().show()
+        '''
         bassLine = stream.Part()
         bassLine.append(copy.deepcopy(self.inTime))
         bassLine.append(key.KeySignature(self.inKey.sharps))
@@ -130,10 +187,27 @@ class FiguredBassLine(object):
             
         return bassLine
     
-    def realize(self, fbRules = rules.Rules()):
+    def realize(self, fbRules = rules.Rules(), numParts = 4, maxPitch = pitch.Pitch('B5')):
+        '''
+        >>> from music21.figuredBass import realizer
+        >>> from music21.figuredBass import rules
+        >>> from music21 import key
+        >>> from music21 import meter
+        >>> from music21 import note
+        >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
+        >>> fbLine.addElement(note.Note('B2'))
+        >>> fbLine.addElement(note.Note('C#3'), "6")
+        >>> fbLine.addElement(note.Note('D#3'), "6")
+        >>> fbRules = rules.Rules()
+        >>> fbLine.realize(fbRules).getNumSolutions()
+        208
+        >>> fbRules.forbidVoiceOverlap = False
+        >>> fbLine.realize(fbRules).getNumSolutions()
+        7908
+        '''
         segmentList = []
         for (bassNote, notationString) in self.fbList:
-            correspondingSegment = segment.Segment(self.fbScale, bassNote, notationString, fbRules)
+            correspondingSegment = segment.Segment(bassNote, notationString, self.fbScale, fbRules, numParts, maxPitch)
             segmentList.append(correspondingSegment)
 
         for segmentIndex in range(len(segmentList) - 1):
@@ -150,23 +224,49 @@ class FiguredBassLine(object):
 
     def generateRandomRealization(self):         
         '''
-        Generates a random solution as a stream.Score()  # deprecated!!!
-        '''
-        return self.realize().generateRandomRealization()
-
-    def showRandomRealization(self):         
-        '''
-        Shows a random solution in musicxml  # deprecated!!!
-        '''
-        return self.realize().generateRandomRealization().show()
-
-
-    def showRandomRealization(self):         
-        '''
-        Generates a random solution as a stream.Score()
-        '''
-        return self.realize().generateRandomRealization().show()
+        Generates a random realization of a figured bass as a music21.stream Score, 
+        with the default rules set and a soprano line limited to stepwise motion.
         
+        This method exists for backwards compatibility. Instead, use the realize()
+        method which returns a Resolution. Then, call generateRandomRealization() on
+        the Resolution.
+        '''
+        warnings.warn("The method generateRandomRealization() is deprecated. Use realize() instead and call generateRandomRealization() on the result.", DeprecationWarning)
+        fbRules = rules.Rules()
+        fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]        
+        return self.realize(fbRules).generateRandomRealization()
+
+    def showRandomRealization(self):         
+        '''
+        Displays a random realization of a figured bass as a musicxml in external software, 
+        with the default rules set and a soprano line limited to stepwise motion.
+        
+        This method exists for backwards compatibility. Instead, use the realize()
+        method which returns a Resolution. Then, call generateRandomRealization().show()
+        on the Resolution.
+        '''
+        warnings.warn("The method showRandomRealization() is deprecated. Use realize() instead and call generateRandomRealization().show() on the result.", DeprecationWarning)
+        fbRules = rules.Rules()
+        fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]
+        return self.realize(fbRules).generateRandomRealization().show()
+            
+    def showAllRealizations(self):
+        '''
+        Displays all realizations of a figured bass as a musicxml in external software, 
+        with the default rules set and a soprano line limited to stepwise motion.
+        
+        This method exists for backwards compatibility. Instead, use the realize()
+        method which returns a Resolution. Then, call generateAllRealizations().show()
+        on the Resolution.
+        
+        fbRules = rules.Rules()
+        fbRules.partMovementLimits = [(1,2),(2,12),(3,12)
+        '''
+        warnings.warn("The method showAllRealizations() is deprecated. Use realize() instead and call generateAllRealizations().show() on the result.", DeprecationWarning)
+        fbRules = rules.Rules()
+        fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]
+        return self.realize(fbRules).generateAllRealizations().show()
+    
     def trimAllMovements(self, segmentList):
         segmentList.reverse()
         for segmentIndex in range(1, len(segmentList) - 1):
@@ -186,6 +286,7 @@ class FiguredBassLine(object):
         segmentList.reverse()
         return True
 
+#FiguredBass = FiguredBassLine
 
 class Realization(object):
     def __init__(self, segmentList, inKey, inTime):
