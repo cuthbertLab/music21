@@ -814,11 +814,10 @@ class DefinedContexts(object):
             value = self._definedContexts[idKey]['offset']
         except KeyError:
             raise DefinedContextsException("Could not find the object with id %d in the Site marked with idKey %d" % (id(self), idKey))
-        # stored string are summed to be attributes of the stored object
+        # stored string are assummed to be attributes of the stored object
         if isinstance(value, str):
             if value not in ['highestTime', 'lowestOffset', 'highestOffset']:
                 raise DefinedContextsException('attempted to set a bound offset with a string attribute that is not supported: %s' % value)
-
             if WEAKREF_ACTIVE:
                 obj = common.unwrapWeakref(self._definedContexts[idKey]['obj'])
             else:
@@ -901,12 +900,7 @@ class DefinedContexts(object):
             #post = self._definedContexts[siteId]['offset']
         except DefinedContextsException: # the site id is not valid
             environLocal.printDebug(['getOffsetBySite: trying to get an offset by a site failed; self:', self, 'site:', site, 'defined contexts:', self._definedContexts])
-
-#             self.purgeLocations()
-#             environLocal.printDebug(['post purge locations', self, 'site:', site, 'defined contexts:', self._definedContexts])
-
             raise # re-raise Exception
-
         if post is None: # 
             raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % siteId)
         #self._definedContexts[siteId]['offset']

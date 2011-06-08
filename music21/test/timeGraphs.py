@@ -293,8 +293,6 @@ class TestGetContextByClass(CallTest):
                     post = n.getContextByClass(key.KeySignature)
             
 
-
-
 class TestParseRNText(CallTest):
 
     def __init__(self):
@@ -305,6 +303,24 @@ class TestParseRNText(CallTest):
         self.t.runParseMonteverdiRNText()
 
 
+#-------------------------------------------------------------------------------
+class TestMusicXMLMultiPartOutput(CallTest):
+
+    def __init__(self):
+        from music21 import note, stream
+        self.s = stream.Score()
+        for i in range(10): # parts
+            p = stream.Part()
+            for j in range(10): # measures
+                m = stream.Measure()
+                m.append(note.Note(type='quarter'))
+                p.append(m)
+            self.s.insert(0, p)
+        #self.s.show()
+
+    def testFocus(self):
+        # get musicxml string
+        post = self.s.musicxml
 
 
 
@@ -331,7 +347,8 @@ class CallGraph:
         #self.callTest = TestParseABC
         #self.callTest = TestMusicXMLObjectTypeChecking
         #self.callTest = TestGetContextByClass
-        self.callTest = TestMakeMeasures
+        #self.callTest = TestMakeMeasures
+        self.callTest = TestMusicXMLMultiPartOutput
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
