@@ -10,6 +10,7 @@
 #-------------------------------------------------------------------------------
 
 import collections
+import copy
 import itertools
 import music21
 import unittest
@@ -22,34 +23,109 @@ from music21 import pitch
 from music21 import scale
 from music21.figuredBass import fbPitch
 from music21.figuredBass import possibility
+from music21.figuredBass import realizerScale
 from music21.figuredBass import resolution
 from music21.figuredBass import rules
 
 _MOD = 'segment.py'
 
-class Segment:
-    def __init__(self, fbScale, bassNote = note.Note('C3'), notationString = '', fbRules = rules.Rules()):
-        self.fbScale = fbScale
-        self.bassNote = bassNote
-        self.pitchNamesInChord = self.fbScale.getPitchNames(self.bassNote.pitch, notationString)
-        self.allPitchesAboveBass = getPitches(self.pitchNamesInChord, self.bassNote.pitch, fbRules.maxPitch)
-        self.environRules = environment.Environment(_MOD)
-        self.segmentChord = chord.Chord(self.allPitchesAboveBass)
-        self.numParts = fbRules.numParts        
-        self.compileAllRules(fbRules)
+class Segment(object):
+    _DOC_ORDER = ['allSinglePossibilities', 'singlePossibilityRules', 'allCorrectSinglePossibilities',
+                  'consecutivePossibilityRules', 'specialResolutionRules', 'allCorrectConsecutivePossibilities',
+                  'resolveDominantSeventhSegment', 'resolveDiminishedSeventhSegment', 'resolveAugmentedSixthSegment']
+    _DOC_ATTR = {'bassNote': 'A :class:`~music21.note.Note` whose pitch forms the bass of each possibility.',
+                 'numParts': '''The number of parts (including the bass) that possibilities should contain, which 
+                 comes directly from :attr:`~music21.figuredBass.rules.Rules.numParts` in the Rules object.''',
+                 'pitchNamesInChord': '''A list of allowable pitch names. This is derived from bassNote.pitch and notationString
+                 using :meth:`~music21.figuredBass.realizerScale.FiguredBassScale.getPitchNames`.''',
+                 'allPitchesAboveBass': '''A list of allowable pitches in the upper parts of a possibility. This is derived using 
+                 :meth:`~music21.figuredBass.segment.getPitches`, providing bassNote.pitch, :attr:`~music21.figuredBass.rules.Rules.maxPitch` 
+                 from the Rules object, and :attr:`~music21.figuredBass.segment.Segment.pitchNamesInChord` as arguments.''',
+                 'segmentChord': ':attr:`~music21.figuredBass.segment.Segment.allPitchesAboveBass` represented as a :class:`~music21.chord.Chord`.',
+                 'fbRules': 'A deepcopy of the :class:`~music21.figuredBass.rules.Rules` object provided.',
+                 }
 
+    def __init__(self, bassNote = note.Note('C3'), notationString = "", fbScale = realizerScale.FiguredBassScale(), fbRules = rules.Rules(), numParts = 4, maxPitch = pitch.Pitch('B5')):
+        '''
+        A Segment corresponds to a 1:1 realization of a bassNote and notationString of a :class:`~music21.figuredBass.realizer.FiguredBassLine`.
+        It is created by passing six arguments: a :class:`~music21.figuredBass.realizerScale.FiguredBassScale`, a bassNote, a notationString,
+        a :class:`~music21.figuredBass.rules.Rules` object, a number of parts and a maximum pitch. Realizations of a Segment are represented 
+        as possibility tuples (see :mod:`~music21.figuredBass.possibility` for more details). 
+        
+        Functions in Python's `itertools <http://docs.python.org/library/itertools.html>`_ module are used extensively. Methods 
+        which generate possibilities or possibility progressions return iterators, which are turned into lists in the examples 
+        for display purposes only.
+        
+        
+        Here, a Segment is created using the default values: a FiguredBassScale in C, a bassNote of C3, an empty notationString, and a default
+        Rules object.
+        
+        >>> from music21.figuredBass import segment
+        >>> s1 = segment.Segment()
+        >>> s1.bassNote
+        <music21.note.Note C>
+        >>> s1.numParts
+        4
+        >>> s1.pitchNamesInChord
+        ['C', 'E', 'G']
+        >>> s1.allPitchesAboveBass
+        [C3, E3, G3, C4, E4, G4, C5, E5, G5]
+        >>> s1.segmentChord
+        <music21.chord.Chord C3 E3 G3 C4 E4 G4 C5 E5 G5>
+        '''
+        self.bassNote = bassNote
+        self.fbRules = copy.deepcopy(fbRules)
+        self.numParts = numParts
+        self._maxPitch = maxPitch
+        self.pitchNamesInChord = fbScale.getPitchNames(self.bassNote.pitch, notationString)
+        self.allPitchesAboveBass = getPitches(self.pitchNamesInChord, self.bassNote.pitch, self._maxPitch)
+        self.segmentChord = chord.Chord(self.allPitchesAboveBass)
+        self._environRules = environment.Environment(_MOD)
+    
+    #-------------------------------------------------------------------------------
+    # EXTERNAL METHODS
+    
     def singlePossibilityRules(self, fbRules = rules.Rules()):
         '''
-        (willRunOnlyIfTrue, methodToRun, isCorrectSoln, optionalArgs)
-        '''
-        forbidIncompletePossibilities = fbRules.forbidIncompletePossibilities
-        isItalianAugmentedSixth = self.segmentChord.isItalianAugmentedSixth()
-        if isItalianAugmentedSixth and fbRules.resolveAugmentedSixthProperly and not forbidIncompletePossibilities:
-            self.environRules.warn("Augmented sixth resolution: fbRules forbidIncompletePossibilities set to True for It+6 resolution.")
-            forbidIncompletePossibilities = True
+        A framework for storing single possibility rules and methods to be applied
+        in :meth:`~music21.figuredBass.segment.Segment.allCorrectSinglePossibilities`.
+        Takes in a :class:`~music21.figuredBass.rules.Rules` object, fbRules.
         
+        
+        Items are added within this method in the following form:
+        
+        
+        (willRunOnlyIfTrue, methodToRun, keepSolnsWhichReturn, optionalArgs)
+
+
+        These items are compiled internally when :meth:`~music21.figuredBass.segment.Segment.allCorrectSinglePossibilities`
+        is called on a Segment. Here, the compilation of rules and methods bases on a default fbRules is shown.
+        
+        >>> from music21.figuredBass import segment
+        >>> segmentA = segment.Segment()
+        >>> allSingleRules = segmentA.singlePossibilityRules()
+        >>> segment.printRules(allSingleRules)
+        Will run:  Method:                       Keep solutions which return:  Arguments:
+        True       isIncomplete                  False                         ['C', 'E', 'G']
+        True       upperPartsWithinLimit         True                          12
+        True       voiceCrossing                 False                         None
+        
+        
+        Here, a modified fbRules is provided, which allows for incomplete possibilities.
+        
+        
+        >>> from music21.figuredBass import rules
+        >>> fbRules = rules.Rules()
+        >>> fbRules.forbidIncompletePossibilities = False
+        >>> allSingleRules = segmentA.singlePossibilityRules(fbRules)
+        >>> segment.printRules(allSingleRules)
+        Will run:  Method:                       Keep solutions which return:  Arguments:
+        False      isIncomplete                  False                         ['C', 'E', 'G']
+        True       upperPartsWithinLimit         True                          12
+        True       voiceCrossing                 False                         None
+        '''        
         singlePossibRules = \
-        [(forbidIncompletePossibilities, possibility.isIncomplete, False, [self.pitchNamesInChord]),
+        [(fbRules.forbidIncompletePossibilities, possibility.isIncomplete, False, [self.pitchNamesInChord]),
          (True, possibility.upperPartsWithinLimit, True, [fbRules.upperPartsMaxSemitoneSeparation]),
          (fbRules.forbidVoiceCrossing, possibility.voiceCrossing, False)]
         
@@ -57,14 +133,60 @@ class Segment:
     
     def consecutivePossibilityRules(self, fbRules = rules.Rules()):
         '''
-        (willRunOnlyIfTrue, methodToRun, isCorrectSoln, optionalArgs)
+        A framework for storing consecutive possibility rules and methods to be applied
+        in :meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`.
+        Takes in a :class:`~music21.figuredBass.rules.Rules` object, fbRules.
+        
+        
+        Items are added within this method in the following form:
+        
+        
+        (willRunOnlyIfTrue, methodToRun, keepSolnsWhichReturn, optionalArgs)
+        
+                
+        These items are compiled internally when :meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`
+        is called on a Segment. Here, the compilation of rules and methods bases on a default fbRules is shown.
+        
+        >>> from music21.figuredBass import segment
+        >>> segmentA = segment.Segment()
+        >>> allConsecRules = segmentA.consecutivePossibilityRules()
+        >>> segment.printRules(allConsecRules)
+        Will run:  Method:                       Keep solutions which return:  Arguments:
+        False      couldBeItalianA6Resolution    True                          None
+        False      upperPartsSame                True                          None
+        True       voiceOverlap                  False                         None
+        True       partMovementsWithinLimits     True                          []
+        True       parallelFifths                False                         None
+        True       parallelOctaves               False                         None
+        True       hiddenFifth                   False                         None
+        True       hiddenOctave                  False                         None
+        
+        
+        Now, a modified fbRules is provided, allowing hidden octaves and
+        voice overlap, and limiting the soprano line to stepwise motion.
+        
+        
+        >>> from music21.figuredBass import rules
+        >>> fbRules = rules.Rules()
+        >>> fbRules.forbidVoiceOverlap = False
+        >>> fbRules.forbidHiddenOctaves = False
+        >>> fbRules.partMovementLimits.append((1,2))
+        >>> allConsecRules = segmentA.consecutivePossibilityRules(fbRules)
+        >>> printRules(allConsecRules)
+        Will run:  Method:                       Keep solutions which return:  Arguments:
+        False      couldBeItalianA6Resolution    True                          None
+        False      upperPartsSame                True                          None
+        False      voiceOverlap                  False                         None
+        True       partMovementsWithinLimits     True                          [(1, 2)]
+        True       parallelFifths                False                         None
+        True       parallelOctaves               False                         None
+        True       hiddenFifth                   False                         None
+        False      hiddenOctave                  False                         None
         '''
         isItalianAugmentedSixth = self.segmentChord.isItalianAugmentedSixth()
-        if isItalianAugmentedSixth:
-            self.environRules.warn("Augmented sixth resolution: It+6 resolution being derived through consecutive possibility methods.")
             
         consecPossibRules = \
-        [(fbRules.resolveAugmentedSixthProperly and isItalianAugmentedSixth, possibility.couldBeItalianA6Resolution, True),
+        [(fbRules.resolveAugmentedSixthProperly and isItalianAugmentedSixth, possibility.couldBeItalianA6Resolution, True),# [_unpackSeventhChord(self.segmentChord)]),
          (fbRules._upperPartsRemainSame, possibility.upperPartsSame, True),
          (fbRules.forbidVoiceOverlap, possibility.voiceOverlap, False),
          (True, possibility.partMovementsWithinLimits, True, [fbRules.partMovementLimits]),
@@ -77,7 +199,69 @@ class Segment:
     
     def specialResolutionRules(self, fbRules = rules.Rules()):
         '''
+        A framework for storing methods which perform special resolutions
+        on Segments. Unlike the methods in 
+        :meth:`~music21.figuredBass.segment.Segment.singlePossibilityRules` and
+        :meth:`~music21.figuredBass.segment.Segment.consecutivePossibilityRules`,
+        these methods deal with the Segment itself, and rely on submethods
+        to resolve the individual possibilities accordingly depending on what
+        the resolution Segment is. 
+        
+        
+        Items are added within this method in the following form:
+   
+
         (willRunOnlyIfTrue, methodToRun, optionalArgs)
+        
+        
+        These items are compiled internally when :meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`
+        is called on a Segment. Here, the compilation of rules and methods based on a default fbRules is shown.
+        
+        >>> from music21.figuredBass import segment
+        >>> segmentA = segment.Segment()
+        >>> allSpecialResRules = segmentA.specialResolutionRules()
+        >>> printRules(allSpecialResRules, maxLength = 3)
+        Will run:  Method:                          Arguments:
+        False      resolveDominantSeventhSegment    None
+        False      resolveDiminishedSeventhSegment  False
+        False      resolveAugmentedSixthSegment     None
+        
+        
+        Dominant Seventh Segment:
+        
+        
+        >>> from music21 import note
+        >>> segmentA = segment.Segment(bassNote = note.Note('B2'), notationString = "6,5")
+        >>> allSpecialResRules = segmentA.specialResolutionRules()
+        >>> printRules(allSpecialResRules, maxLength = 3)
+        Will run:  Method:                          Arguments:
+        True       resolveDominantSeventhSegment    None
+        False      resolveDiminishedSeventhSegment  False
+        False      resolveAugmentedSixthSegment     None
+        
+        
+        Fully-Diminished Seventh Segment:
+        
+        
+        >>> segmentA = segment.Segment(bassNote = note.Note('B2'), notationString = "-7")
+        >>> allSpecialResRules = segmentA.specialResolutionRules()
+        >>> printRules(allSpecialResRules, maxLength = 3)
+        Will run:  Method:                          Arguments:
+        False      resolveDominantSeventhSegment    None
+        True       resolveDiminishedSeventhSegment  False
+        False      resolveAugmentedSixthSegment     None
+        
+        
+        Augmented Sixth Segment:
+        
+        
+        >>> segmentA = segment.Segment(bassNote = note.Note('A-2'), notationString = "#6,b5")
+        >>> allSpecialResRules = segmentA.specialResolutionRules()
+        >>> printRules(allSpecialResRules, maxLength = 3)
+        Will run:  Method:                          Arguments:
+        False      resolveDominantSeventhSegment    None
+        False      resolveDiminishedSeventhSegment  False
+        True       resolveAugmentedSixthSegment     None
         '''
         isDominantSeventh = self.segmentChord.isDominantSeventh()
         isDiminishedSeventh = self.segmentChord.isDiminishedSeventh()
@@ -90,61 +274,44 @@ class Segment:
         
         return specialResRules
         
-    def compileAllRules(self, fbRules = rules.Rules()):
-        self.singlePossibilityRuleChecking = self.compileRules(self.singlePossibilityRules(fbRules))
-        self.consecutivePossibilityRuleChecking = self.compileRules(self.consecutivePossibilityRules(fbRules))
-        self.specialResolutionRuleChecking = self.compileRules(self.specialResolutionRules(fbRules), 3)
-        return
-    
-    def compileRules(self, rulesList, maxLength = 4):
-        ruleChecking = collections.defaultdict(list)
-        for ruleIndex in range(len(rulesList)):
-            args = []
-            if len(rulesList[ruleIndex]) == maxLength:
-                args = rulesList[ruleIndex][-1]
-            if maxLength == 4:
-                (shouldRunMethod, method, isCorrect) = rulesList[ruleIndex][0:3]
-                ruleChecking[shouldRunMethod].append((method, isCorrect, args))
-            elif maxLength == 3:
-                (shouldRunMethod, method) = rulesList[ruleIndex][0:2]
-                ruleChecking[shouldRunMethod].append((method, args))
-        
-        return ruleChecking
-    
-    def allSinglePossibilities(self):
-        iterables = [self.allPitchesAboveBass] * (self.numParts - 1)
-        iterables.append([fbPitch.HashablePitch(self.bassNote.pitch.nameWithOctave)])
-        return itertools.product(*iterables)
-    
-    def allCorrectSinglePossibilities(self):
-        allA = self.allSinglePossibilities()
-        return itertools.ifilter(lambda possibA: self.isCorrectSinglePossibility(possibA), allA)
-            
-    def isCorrectSinglePossibility(self, possibA):
-        for (method, isCorrect, args) in self.singlePossibilityRuleChecking[True]:
-            if not (method(possibA, *args) == isCorrect):
-                return False
-        return True
-
-    def allCorrectConsecutivePossibilities(self, segmentB):
-        for (resolutionMethod, args) in self.specialResolutionRuleChecking[True]:
-            return resolutionMethod(segmentB, *args)    
-        return self.resolveOrdinarySegment(segmentB)
-    
-    def resolveOrdinarySegment(self, segmentB):
-        correctA = self.allCorrectSinglePossibilities()
-        correctB = segmentB.allCorrectSinglePossibilities()
-        correctAB = itertools.product(correctA, correctB)
-        return itertools.ifilter(lambda possibAB: self.isCorrectConsecutivePossibility(possibA = possibAB[0], possibB = possibAB[1]), correctAB)        
-    
-    def isCorrectConsecutivePossibility(self, possibA, possibB):
-        for (method, isCorrect, args) in self.consecutivePossibilityRuleChecking[True]:
-            if not (method(possibA, possibB, *args) == isCorrect):
-                return False
-        return True
-    
     def resolveDominantSeventhSegment(self, segmentB):
+        '''
+        Can resolve a Segment whose :attr:`~music21.figuredBass.segment.Segment.segmentChord`
+        spells out a dominant seventh chord. If no applicable method in
+        :mod:`~music21.figuredBass.resolution` can be used, the Segment is resolved
+        as an ordinary Segment.
+        
+        
+        >>> from music21.figuredBass import segment
+        >>> from music21 import note
+        >>> segmentA = segment.Segment(bassNote = note.Note('G2'), notationString = "7")
+        >>> allDomPossib = segmentA.allCorrectSinglePossibilities()
+        >>> allDomPossibList = list(allDomPossib)
+        >>> len(allDomPossibList)
+        8
+        >>> allDomPossibList[2]
+        (D4, B3, F3, G2)
+        >>> allDomPossibList[5]
+        (D5, B4, F4, G2)
+        >>> allDomPossibList[7] # Soprano pitch of resolution (C6) exceeds default maxPitch of B5, filtered out.
+        (B5, F5, D5, G2)
+        
+        
+        >>> segmentB = segment.Segment(bassNote = note.Note('C3'), notationString = "")
+        >>> domResPairs = segmentA.resolveDominantSeventhSegment(segmentB)
+        >>> domResPairsList = list(domResPairs)
+        >>> len(domResPairsList)
+        7
+        >>> domResPairsList[2]
+        ((D4, B3, F3, G2), (C4, C4, E3, C3))
+        >>> domResPairsList[5]
+        ((D5, B4, F4, G2), (C5, C5, E4, C3))
+        '''
         domChord = self.segmentChord
+        if not domChord.isDominantSeventh():
+            #Put here for stand-alone purposes.
+            raise SegmentException("Dominant seventh resolution: Not a dominant seventh Segment.")
+        domChordInfo = _unpackSeventhChord(domChord)
         dominantScale = scale.MajorScale().derive(domChord)
         minorScale = dominantScale.getParallelMinor()
         
@@ -158,22 +325,59 @@ class Segment:
         resInversion = (resChord.inversion())
         resolveV43toI6 = domInversion and resInversion == 1
         
+        if domChord.inversion() == 0 and resChord.root().name == tonic.name and (resChord.isMajorTriad() or resChord.isMinorTriad()):
+            # V7 to I resolutions are always incomplete, with a missing fifth.
+            segmentB.fbRules.forbidIncompletePossibilities = False
+            
         dominantResolutionMethods = \
-        [(resChord.root().name == tonic.name and resChord.isMajorTriad(), resolution.dominantSeventhToMajorTonic, [resolveV43toI6]),
-         (resChord.root().name == tonic.name and resChord.isMinorTriad(), resolution.dominantSeventhToMinorTonic, [resolveV43toI6]),
-         (resChord.root().name == majSubmediant.name and resChord.isMinorTriad() and domInversion == 0, resolution.dominantSeventhToMinorSubmediant),
-         (resChord.root().name == minSubmediant.name and resChord.isMajorTriad() and domInversion == 0, resolution.dominantSeventhToMajorSubmediant),
-         (resChord.root().name == subdominant.name and resChord.isMajorTriad() and domInversion == 0, resolution.dominantSeventhToMajorSubdominant),
-         (resChord.root().name == subdominant.name and resChord.isMinorTriad() and domInversion == 0, resolution.dominantSeventhToMinorSubdominant)]
+        [(resChord.root().name == tonic.name and resChord.isMajorTriad(), resolution.dominantSeventhToMajorTonic, [resolveV43toI6, domChordInfo]),
+         (resChord.root().name == tonic.name and resChord.isMinorTriad(), resolution.dominantSeventhToMinorTonic, [resolveV43toI6, domChordInfo]),
+         (resChord.root().name == majSubmediant.name and resChord.isMinorTriad() and domInversion == 0, resolution.dominantSeventhToMinorSubmediant, [domChordInfo]),
+         (resChord.root().name == minSubmediant.name and resChord.isMajorTriad() and domInversion == 0, resolution.dominantSeventhToMajorSubmediant, [domChordInfo]),
+         (resChord.root().name == subdominant.name and resChord.isMajorTriad() and domInversion == 0, resolution.dominantSeventhToMajorSubdominant, [domChordInfo]),
+         (resChord.root().name == subdominant.name and resChord.isMinorTriad() and domInversion == 0, resolution.dominantSeventhToMinorSubdominant, [domChordInfo])]
         
         try:
-            return self.resolveSpecialSegment(dominantResolutionMethods)
+            return self._resolveSpecialSegment(segmentB, dominantResolutionMethods)
         except SegmentException:
-            self.environRules.warn("Dominant seventh resolution: No proper resolution available. Executing ordinary resolution.")
-            return self.resolveOrdinarySegment(segmentB)
+            self._environRules.warn("Dominant seventh resolution: No proper resolution available. Executing ordinary resolution.")
+            return self._resolveOrdinarySegment(segmentB)
     
-    def resolveDiminishedSeventhSegment(self, segmentB, doubledRoot):
+    def resolveDiminishedSeventhSegment(self, segmentB, doubledRoot = False):
+        '''
+        Can resolve a Segment whose :attr:`~music21.figuredBass.segment.Segment.segmentChord`
+        spells out a diminished seventh chord. If no applicable method in
+        :mod:`~music21.figuredBass.resolution` can be used, the Segment is resolved
+        as an ordinary Segment.
+        
+        >>> from music21.figuredBass import segment
+        >>> from music21 import note
+        >>> segmentA = segment.Segment(bassNote = note.Note('B2'), notationString = "b7")
+        >>> allDimPossib = segmentA.allCorrectSinglePossibilities()
+        >>> allDimPossibList = list(allDimPossib)
+        >>> len(allDimPossibList)
+        7
+        >>> allDimPossibList[4]
+        (D5, A-4, F4, B2)
+        >>> allDimPossibList[6]
+        (A-5, F5, D5, B2)
+        
+        
+        >>> segmentB = segment.Segment(bassNote = note.Note('C3'), notationString = "")
+        >>> dimResPairs = segmentA.resolveDiminishedSeventhSegment(segmentB)
+        >>> dimResPairsList = list(dimResPairs)
+        >>> len(dimResPairsList)
+        7
+        >>> dimResPairsList[4]
+        ((D5, A-4, F4, B2), (E5, G4, E4, C3))
+        >>> dimResPairsList[6]
+        ((A-5, F5, D5, B2), (G5, E5, E5, C3))
+        '''
         dimChord = self.segmentChord
+        if not dimChord.isDiminishedSeventh():
+            #Put here for stand-alone purposes.
+            raise SegmentException("Diminished seventh resolution: Not a diminished seventh Segment.")
+        dimChordInfo = _unpackSeventhChord(dimChord)
         dimScale = scale.HarmonicMinorScale().deriveByDegree(7, dimChord.root())
         minorScale = dimScale.getParallelMinor()
         
@@ -188,21 +392,57 @@ class Segment:
                 doubledRoot = False
 
         diminishedResolutionMethods = \
-        [(resChord.root().name == tonic.name and resChord.isMajorTriad(), resolution.diminishedSeventhToMajorTonic, [doubledRoot]),
-         (resChord.root().name == tonic.name and resChord.isMinorTriad(), resolution.diminishedSeventhToMinorTonic, [doubledRoot]),
-         (resChord.root().name == subdominant.name and resChord.isMajorTriad(), resolution.diminishedSeventhToMajorSubdominant),
-         (resChord.root().name == subdominant.name and resChord.isMinorTriad(), resolution.diminishedSeventhToMinorSubdominant)]
+        [(resChord.root().name == tonic.name and resChord.isMajorTriad(), resolution.diminishedSeventhToMajorTonic, [doubledRoot, dimChordInfo]),
+         (resChord.root().name == tonic.name and resChord.isMinorTriad(), resolution.diminishedSeventhToMinorTonic, [doubledRoot, dimChordInfo]),
+         (resChord.root().name == subdominant.name and resChord.isMajorTriad(), resolution.diminishedSeventhToMajorSubdominant, [dimChordInfo]),
+         (resChord.root().name == subdominant.name and resChord.isMinorTriad(), resolution.diminishedSeventhToMinorSubdominant, [dimChordInfo])]
         
         try:
-            return self.resolveSpecialSegment(diminishedResolutionMethods)
+            return self._resolveSpecialSegment(segmentB, diminishedResolutionMethods)
         except SegmentException:
-            self.environRules.warn("Diminished seventh resolution: No proper resolution available. Executing ordinary resolution.")
-            return self.resolveOrdinarySegment(segmentB)
+            self._environRules.warn("Diminished seventh resolution: No proper resolution available. Executing ordinary resolution.")
+            return self._resolveOrdinarySegment(segmentB)
 
     def resolveAugmentedSixthSegment(self, segmentB):
+        '''
+        Can resolve a Segment whose :attr:`~music21.figuredBass.segment.Segment.segmentChord` spells out a 
+        French, German, or Swiss augmented sixth chord. Italian augmented sixth Segments are solved as an
+        ordinary Segment using :meth:`~music21.figuredBass.possibility.couldBeItalianA6Resolution`. If no
+        applicable method in :mod:`~music21.figuredBass.resolution` can be used, the Segment is resolved
+        as an ordinary Segment.
+        
+        
+        >>> from music21.figuredBass import segment
+        >>> from music21 import note
+        >>> segmentA = segment.Segment(bassNote = note.Note("A-2"), notationString = "#6,b5,3")
+        >>> segmentA.pitchNamesInChord # spell out a Gr+6 chord
+        ['A-', 'C', 'E-', 'F#']
+        >>> allAugSixthPossib = segmentA.allCorrectSinglePossibilities()
+        >>> allAugSixthPossibList = list(allAugSixthPossib)
+        >>> len(allAugSixthPossibList)
+        7
+        >>> allAugSixthPossibList[1]
+        (C4, F#3, E-3, A-2)
+        >>> allAugSixthPossibList[4]
+        (C5, F#4, E-4, A-2)
+        
+        
+        >>> segmentB = segment.Segment(bassNote = note.Note("G2"), notationString = "")
+        >>> allAugResPossibPairs = segmentA.resolveAugmentedSixthSegment(segmentB)
+        >>> allAugResPossibPairsList = list(allAugResPossibPairs)
+        >>> len(allAugResPossibPairsList)
+        7
+        >>> allAugResPossibPairsList[1]
+        ((C4, F#3, E-3, A-2), (B3, G3, D3, G2))
+        >>> allAugResPossibPairsList[4]
+        ((C5, F#4, E-4, A-2), (B4, G4, D4, G2))
+        '''
         augSixthChord = self.segmentChord
+        if not augSixthChord.isAugmentedSixth():
+            #Put here for stand-alone purposes.
+            raise SegmentException("Augmented sixth resolution: Not an augmented sixth Segment.")
         if augSixthChord.isItalianAugmentedSixth():
-            return self.resolveOrdinarySegment(segmentB)
+            return self._resolveOrdinarySegment(segmentB)
         elif augSixthChord.isFrenchAugmentedSixth():
             augSixthType = 1
         elif augSixthChord.isGermanAugmentedSixth():
@@ -210,36 +450,231 @@ class Segment:
         elif augSixthChord.isSwissAugmentedSixth():
             augSixthType = 3
         else:
-            self.environRules.warn("Augmented sixth resolution: Augmented sixth type not supported. Executing ordinary resolution.")
-            return self.resolveOrdinarySegment(segmentB)
+            self._environRules.warn("Augmented sixth resolution: Augmented sixth type not supported. Executing ordinary resolution.")
+            return self._resolveOrdinarySegment(segmentB)
 
-        tonic = resolution.transpose(augSixthChord.bass(), 'M3')
+        tonic = resolution._transpose(augSixthChord.bass(), 'M3')
         majorScale = scale.MajorScale(tonic)
         minorScale = scale.MinorScale(tonic)
         resChord = segmentB.segmentChord
+        augSixthChordInfo = _unpackSeventhChord(augSixthChord)
 
         augmentedSixthResolutionMethods = \
-        [(resChord.inversion() == 2 and resChord.root().name == tonic.name and resChord.isMajorTriad(), resolution.augmentedSixthToMajorTonic, [augSixthType]),
-         (resChord.inversion() == 2 and resChord.root().name == tonic.name and resChord.isMinorTriad(), resolution.augmentedSixthToMinorTonic, [augSixthType]),
-         (majorScale.pitchFromDegree(5).name == resChord.bass().name and resChord.isMajorTriad(), resolution.augmentedSixthToDominant, [augSixthType])]
+        [(resChord.inversion() == 2 and resChord.root().name == tonic.name and resChord.isMajorTriad(), resolution.augmentedSixthToMajorTonic, [augSixthType, augSixthChordInfo]),
+         (resChord.inversion() == 2 and resChord.root().name == tonic.name and resChord.isMinorTriad(), resolution.augmentedSixthToMinorTonic, [augSixthType, augSixthChordInfo]),
+         (majorScale.pitchFromDegree(5).name == resChord.bass().name and resChord.isMajorTriad(), resolution.augmentedSixthToDominant, [augSixthType, augSixthChordInfo])]
         
         try:
-            return self.resolveSpecialSegment(augmentedSixthResolutionMethods)
+            return self._resolveSpecialSegment(segmentB, augmentedSixthResolutionMethods)
         except SegmentException:
-            self.environRules.warn("Augmented sixth resolution: No proper resolution available. Executing ordinary resolution.")
-            return self.resolveOrdinarySegment(segmentB)
+            self._environRules.warn("Augmented sixth resolution: No proper resolution available. Executing ordinary resolution.")
+            return self._resolveOrdinarySegment(segmentB)
     
-    def resolveSpecialSegment(self, specialResolutionMethods):
-        resolutionMethodExecutor = self.compileRules(specialResolutionMethods, 3)
+    def allSinglePossibilities(self):
+        '''
+        Returns an iterator through a set of naive possibilities for
+        a Segment, using :attr:`~music21.figuredBass.segment.Segment.numParts`,
+        the pitch of :attr:`~music21.figuredBass.segment.Segment.bassNote`, and
+        :attr:`~music21.figuredBass.segment.Segment.allPitchesAboveBass`.
+                
+        >>> from music21.figuredBass import segment
+        >>> segmentA = segment.Segment()
+        >>> allPossib = segmentA.allSinglePossibilities()
+        >>> allPossib.__class__
+        <type 'itertools.product'>
+        
+        
+        The number of naive possibilities is always the length of 
+        :attr:`~music21.figuredBass.segment.Segment.allPitchesAboveBass`
+        raised to the (:attr:`~music21.figuredBass.segment.Segment.numParts` - 1)
+        power. The power is 1 less than the number of parts because
+        the bass pitch is constant.
+        
+        
+        >>> allPossibList = list(allPossib)
+        >>> len(segmentA.allPitchesAboveBass)
+        9
+        >>> segmentA.numParts
+        4
+        >>> len(segmentA.allPitchesAboveBass) ** (segmentA.numParts-1)
+        729
+        >>> len(allPossibList)
+        729
+        >>> allPossibList[81]
+        (E3, C3, C3, C3)
+        >>> allPossibList[275]
+        (C4, C4, G4, C3)
+        >>> allPossibList[426]
+        (G4, G3, C4, C3)
+        '''
+        iterables = [self.allPitchesAboveBass] * (self.numParts - 1)
+        iterables.append([fbPitch.HashablePitch(self.bassNote.pitch.nameWithOctave)])
+        return itertools.product(*iterables)
+    
+    def allCorrectSinglePossibilities(self):
+        '''
+        Uses :meth:`~music21.figuredBass.segment.Segment.allSinglePossibilities` and
+        returns an iterator through a set of correct possibilities for
+        a Segment, all possibilities which pass all filters in 
+        :meth:`~music21.figuredBass.segment.Segment.singlePossibilityRules`.
+
+                
+        >>> from music21.figuredBass import segment
+        >>> segmentA = segment.Segment()
+        >>> allPossib = segmentA.allSinglePossibilities()
+        >>> allCorrectPossib = segmentA.allCorrectSinglePossibilities()
+        
+        
+        Most of the 729 naive possibilities were filtered out using the default rules set,
+        leaving only 21.
+        
+        
+        >>> allPossibList = list(allPossib)
+        >>> len(allPossibList)
+        729
+        >>> allCorrectPossibList = list(allCorrectPossib)
+        >>> len(allCorrectPossibList)
+        21
+        >>> allCorrectPossibList[5]
+        (E4, G3, G3, C3)
+        >>> allCorrectPossibList[12]
+        (C5, G4, E4, C3)
+        >>> allCorrectPossibList[20]
+        (G5, G5, E5, C3)
+        '''
+        self._singlePossibilityRuleChecking = _compileRules(self.singlePossibilityRules(self.fbRules))
+        allA = self.allSinglePossibilities()
+        return itertools.ifilter(lambda possibA: self._isCorrectSinglePossibility(possibA), allA)
+             
+    def allCorrectConsecutivePossibilities(self, segmentB):
+        '''
+        Returns an iterator through correct (possibA, possibB) pairs.
+        
+        
+        * If segmentA (self) is a special Segment, meaning that one of the Segment 
+        resolution methods in :meth:`~music21.figuredBass.segment.Segment.specialResolutionRules` 
+        needs to be applied, then this method returns every correct possibility of segmentA 
+        matched up with exactly one resolution possibility.
+        
+
+        * If segmentA is an ordinary, non-special Segment, then this method returns every 
+        combination of correct possibilities of segmentA and correct possibilities of segmentB 
+        which passes all filters in :meth:`~music21.figuredBass.segment.Segment.consecutivePossibilityRules`.
+        
+        
+        Two notes on segmentA being a special Segment:
+        
+        
+        1) By default resolution possibilities are not filtered using :meth:`~music21.figuredBass.segment.Segment.singlePossibilityRules`
+        rules of segmentB. Filter by setting :attr:`~music21.figuredBass.rules.Rules.applySinglePossibRulesToResolution` to True.
+        
+        
+        2) By default, (possibA, possibB) pairs are not filtered using :meth:`~music21.figuredBass.segment.Segment.consecutivePossibilityRules`
+        rules of segmentA. Filter by setting :attr:`~music21.figuredBass.rules.Rules.applyConsecutivePossibRulesToResolution` to True.
+    
+        >>> from music21.figuredBass import segment
+        >>> from music21 import note
+        >>> segmentA = segment.Segment(bassNote = note.Note('C3'), notationString = "")
+        >>> segmentB = segment.Segment(bassNote = note.Note('D3'), notationString = "4,3")
+        
+        
+        Here, an ordinary resolution is being executed, because segmentA is an ordinary Segment.
+        
+        
+        >>> consecPairs1 = segmentA.allCorrectConsecutivePossibilities(segmentB)
+        >>> consecPairsList1 = list(consecPairs1)
+        >>> len(consecPairsList1)
+        31
+        >>> consecPairsList1[29]
+        ((G5, G5, E5, C3), (G5, F5, B4, D3))
+
+
+        Here, a special resolution is being executed, because segmentA below is a
+        special Segment.
+        
+
+        >>> segmentA = segment.Segment(bassNote = note.Note('D3'), notationString = "4,3")
+        >>> segmentB = segment.Segment(bassNote = note.Note('C3'), notationString = "")
+        >>> consecPairs2 = segmentA.allCorrectConsecutivePossibilities(segmentB)
+        >>> consecPairsList2 = list(consecPairs2)
+        >>> len(consecPairsList2)
+        6
+        >>> consecPairsList2[5]
+        ((G5, F5, B4, D3), (G5, E5, C5, C3))
+        '''
+        if not (self.numParts == segmentB.numParts):
+            raise SegmentException("Two segments with unequal numParts cannot be compared.")
+        self._specialResolutionRuleChecking = _compileRules(self.specialResolutionRules(self.fbRules), 3)
+        for (resolutionMethod, args) in self._specialResolutionRuleChecking[True]:
+            return resolutionMethod(segmentB, *args)
+        return self._resolveOrdinarySegment(segmentB)
+ 
+    #-------------------------------------------------------------------------------
+    # INTERNAL METHODS
+
+    def _isCorrectSinglePossibility(self, possibA):
+        '''
+        Takes in a possibility (possibA) from a segmentA (self) and returns True 
+        if the possibility is correct given
+        :meth:`~music21.figuredBass.segment.Segment.singlePossibilityRules`
+        from segmentA.
+        '''
+        for (method, isCorrect, args) in self._singlePossibilityRuleChecking[True]:
+            if not (method(possibA, *args) == isCorrect):
+                return False
+        return True
+
+    def _isCorrectConsecutivePossibility(self, possibA, possibB):
+        '''
+        Takes in a (possibA, possibB) pair from a segmentA (self) and segmentB,
+        and returns True if the pair is correct given
+        :meth:`~music21.figuredBass.segment.Segment.consecutivePossibilityRules`
+        from segmentA.
+        '''
+        for (method, isCorrect, args) in self._consecutivePossibilityRuleChecking[True]:
+            if not (method(possibA, possibB, *args) == isCorrect):
+                return False
+        return True
+    
+    def _resolveOrdinarySegment(self, segmentB):
+        '''
+        An ordinary segment is defined as a segment which needs no special resolution, where the
+        segment does not spell out a special chord, for example, a dominant seventh.
+        
+        
+        Finds iterators through all possibA and possibB by calling
+        :meth:`~music21.figuredBass.segment.Segment.allCorrectSinglePossibilities` 
+        on self (segmentA) and segmentB, respectively.
+        Returns an iterator through (possibA, possibB) pairs for which
+        :meth:`~music21.figuredBass.segment.Segment._isCorrectConsecutivePossibility` returns True.
+        
+        >>> from music21.figuredBass import segment
+        '''
+        self._consecutivePossibilityRuleChecking = _compileRules(self.consecutivePossibilityRules(self.fbRules))
+        correctA = self.allCorrectSinglePossibilities()
+        correctB = segmentB.allCorrectSinglePossibilities()
+        correctAB = itertools.product(correctA, correctB)
+        return itertools.ifilter(lambda possibAB: self._isCorrectConsecutivePossibility(possibA = possibAB[0], possibB = possibAB[1]), correctAB)        
+
+    def _resolveSpecialSegment(self, segmentB, specialResolutionMethods):
+        resolutionMethodExecutor = _compileRules(specialResolutionMethods, 3)
         for (resolutionMethod, args) in resolutionMethodExecutor[True]:
             iterables = []
             for arg in args:
                 iterables.append(itertools.repeat(arg))
             resolutions = itertools.imap(resolutionMethod, self.allCorrectSinglePossibilities(), *iterables)
-            return itertools.izip(self.allCorrectSinglePossibilities(), resolutions)
-    
+            correctAB = itertools.izip(self.allCorrectSinglePossibilities(), resolutions)
+            correctAB = itertools.ifilter(lambda possibAB: possibility.pitchesWithinLimit(possibA = possibAB[1], maxPitch = segmentB._maxPitch), correctAB)
+            if self.fbRules.applyConsecutivePossibRulesToResolution:
+                correctAB = itertools.ifilter(lambda possibAB: self._isCorrectConsecutivePossibility(possibA = possibAB[0], possibB = possibAB[1]), correctAB)
+            if self.fbRules.applySinglePossibRulesToResolution:
+                segmentB._singlePossibilityRuleChecking = _compileRules(segmentB.singlePossibilityRules(segmentB.fbRules))               
+                correctAB = itertools.ifilter(lambda possibAB: segmentB._isCorrectSinglePossibility(possibA = possibAB[1]), correctAB)
+            return correctAB
+
         raise SegmentException("No standard resolution available.")
 
+'''
 class NonChordSegment(Segment):
     def __init__(self, fbScale, bassNote = note.Note('D3'), pitchNamesAboveBass = ['C', 'E', 'G'], fbRules = rules.Rules()):
         self.fbScale = fbScale
@@ -247,10 +682,24 @@ class NonChordSegment(Segment):
         self.allPitchesAboveBass = getPitches(pitchNamesAboveBass, bassNote.pitch, fbRules.maxPitch)        
         self.pitchNamesInChord = pitchNamesAboveBass + [self.bassNote.pitch.name]
         self.compileAllRules(fbRules)
+'''
     
 # HELPER METHODS
 # --------------
-def getPitches(pitchNames, bassPitch = pitch.Pitch('C3'), maxPitch = pitch.Pitch('C8')):
+def getPitches(pitchNames = ['C','E','G'], bassPitch = pitch.Pitch('C3'), maxPitch = pitch.Pitch('C8')):
+    '''
+    Given a list of pitchNames, a bassPitch, and a maxPitch, returns a sorted list of
+    pitches between the two limits (inclusive) which correspond to items in pitchNames.
+    
+    >>> from music21.figuredBass import segment
+    >>> from music21 import pitch
+    >>> segment.getPitches()
+    [C3, E3, G3, C4, E4, G4, C5, E5, G5, C6, E6, G6, C7, E7, G7, C8]
+    >>> segment.getPitches(['G', 'B', 'D', 'F'], bassPitch = pitch.Pitch('B2'))
+    [B2, D3, F3, G3, B3, D4, F4, G4, B4, D5, F5, G5, B5, D6, F6, G6, B6, D7, F7, G7, B7]
+    >>> segment.getPitches(['F##','A#','C#'], bassPitch = pitch.Pitch('A#3'))
+    [A#3, C#4, F##4, A#4, C#5, F##5, A#5, C#6, F##6, A#6, C#7, F##7, A#7]
+    '''
     iter1 = itertools.product(pitchNames, range(maxPitch.octave + 1))
     iter2 = itertools.imap(lambda x: fbPitch.HashablePitch(x[0] + str(x[1])), iter1)
     iter3 = itertools.ifilterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)
@@ -258,6 +707,72 @@ def getPitches(pitchNames, bassPitch = pitch.Pitch('C3'), maxPitch = pitch.Pitch
     allPitches = list(iter4)
     allPitches.sort()
     return allPitches
+
+def _unpackSeventhChord(seventhChord):
+    bass = seventhChord.bass()
+    root = seventhChord.root()
+    third = seventhChord.getChordStep(3)
+    fifth = seventhChord.getChordStep(5)
+    seventh = seventhChord.getChordStep(7)
+    seventhChordInfo = [bass, root, third, fifth, seventh]
+    return seventhChordInfo
+
+def _compileRules(rulesList, maxLength = 4):
+    ruleChecking = collections.defaultdict(list)
+    for ruleIndex in range(len(rulesList)):
+        args = []
+        if len(rulesList[ruleIndex]) == maxLength:
+            args = rulesList[ruleIndex][-1]
+        if maxLength == 4:
+            (shouldRunMethod, method, isCorrect) = rulesList[ruleIndex][0:3]
+            ruleChecking[shouldRunMethod].append((method, isCorrect, args))
+        elif maxLength == 3:
+            (shouldRunMethod, method) = rulesList[ruleIndex][0:2]
+            ruleChecking[shouldRunMethod].append((method, args))
+    
+    return ruleChecking
+
+def printRules(rulesList, maxLength = 4):
+    '''
+    Method which can print to the console rules inputted into
+    :meth:`~music21.figuredBass.segment.Segment.singlePossibilityRules`,
+    :meth:`~music21.figuredBass.segment.Segment.consecutivePossibilityRules`, and
+    :meth:`~music21.figuredBass.segment.Segment.specialResolutionRules`.
+    For the first two methods, maxLength is 4. For the third method, maxLength is 3.
+    
+    OMIT_FROM_DOCS
+    maxLength is the maximum length of a rule, a rule which includes arguments, because arguments are optional.
+    '''
+    MAX_SIZE = 30
+    for rule in rulesList:
+        if len(rule[1].__name__) >= MAX_SIZE:
+            MAX_SIZE = len(rule[1].__name__) + 2
+    if maxLength == 4:
+        print "{0:11}{1:{maxSize}}{2:30}{3}".format("Will run:", "Method:", "Keep solutions which return:", "Arguments:", maxSize = MAX_SIZE)
+    elif maxLength == 3:
+        print "{0:11}{1:{maxSize}}{2}".format("Will run:", "Method:", "Arguments:", maxSize = MAX_SIZE)     
+           
+    for ruleIndex in range(len(rulesList)):
+        ruleToPrint = None
+        args = []
+        if len(rulesList[ruleIndex]) == maxLength:
+            args = rulesList[ruleIndex][-1]
+        if len(args) == 0:
+            argsString = "None"
+        else:        
+            argsString = ""
+            for itemIndex in range(len(args)):
+                argsString += str(args[itemIndex])
+                if not itemIndex == len(args) - 1:
+                    argsString += ", " 
+        if maxLength == 4:
+            (shouldRunMethod, method, isCorrect) = rulesList[ruleIndex][0:3]
+            ruleToPrint = "{0:11}{1:{maxSize}}{2:30}{3}".format(str(shouldRunMethod), method.__name__, str(isCorrect), argsString, maxSize = MAX_SIZE)
+        elif maxLength == 3:
+            (shouldRunMethod, method) = rulesList[ruleIndex][0:2]
+            ruleToPrint = "{0:11}{1:{maxSize}}{2}".format(str(shouldRunMethod), method.__name__, argsString, maxSize = MAX_SIZE)
+        print ruleToPrint   
+
 
 class SegmentException(music21.Music21Exception):
     pass
