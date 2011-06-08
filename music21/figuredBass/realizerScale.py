@@ -5,21 +5,19 @@
 #                a figured bass scale
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    (c) 2010 The music21 Project
+# Copyright:    (c) 2010-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+import copy
+import itertools
 import music21
 import unittest
-import copy
 
 from music21 import note
 from music21 import pitch
 from music21 import key
 from music21 import scale
-from music21 import chord
-from music21 import common
-from music21 import roman
 from music21.figuredBass import notation
 
 scaleModes = {'major' : scale.MajorScale,
@@ -28,15 +26,20 @@ scaleModes = {'major' : scale.MajorScale,
               'phrygian' : scale.PhrygianScale,
               'hypophrygian' : scale.HypophrygianScale}
 
-class FiguredBassScale:
-    def __init__(self, scaleValue = "C", scaleMode = 'major'):
+#-------------------------------------------------------------------------------
+
+class FiguredBassScale(object):
+    _DOC_ATTR = {'realizerScale': 'A :class:`~music21.scale.Scale` based on the desired value and mode.',
+                 'keySig': 'A :class:`~music21.key.KeySignature` corresponding to the scale value and mode.'}
+    
+    def __init__(self, scaleValue = 'C', scaleMode = 'major'):
         '''
-        Used to represent the concept of a figured bass scale, with a
-        scale value (key) and a scale type (major is default).
+        Acts as a wrapper for :class:`~music21.scale.Scale`. Used to represent the
+        concept of a figured bass scale, with a scale value and mode.
         
-        Other scale types: minor, dorian, phrygian, hypophrygian
         
-        An exception is raised if an invalid scale type is provided.
+        Accepted scale types: major, minor, dorian, phrygian, and hypophrygian.
+        A FiguredBassScale is raised if an invalid scale type is provided.
         '''
         try:
             foo = scaleModes[scaleMode]
@@ -46,21 +49,21 @@ class FiguredBassScale:
             raise FiguredBassScaleException("Unsupported scale type-> " + scaleMode)
     
     def getPitchNames(self, bassPitch, notationString=''):
-        '''
-        Given a bass pitch and a corresponding notation string,
-        returns a list of corresponding pitch names.
-        
-        >>> from music21 import *
-        >>> fbScale = FiguredBassScale('C')
+        '''        
+        Takes a bassPitch and notationString and returns a list of corresponding
+        pitch names based on the scale value and mode above and inclusive of the 
+        bassPitch name. 
+
+        >>> from music21.figuredBass import realizerScale
+        >>> fbScale = realizerScale.FiguredBassScale()
         >>> fbScale.getPitchNames('D3', '6')
         ['D', 'F', 'B']
         >>> fbScale.getPitchNames('G3')
         ['G', 'B', 'D']
         >>> fbScale.getPitchNames('B3', '6,#5')
         ['B', 'D', 'F#', 'G']
-        >>> fbScale.getPitchNames('C#3', '-7') #Fully diminished seventh chord
+        >>> fbScale.getPitchNames('C#3', '-7') # Fully diminished seventh chord
         ['C#', 'E', 'G', 'B-']
-
         '''
         bassPitch = convertToPitch(bassPitch) #Convert string to pitch (if necessary)
         bassSD = self.realizerScale.getScaleDegreeFromPitch(bassPitch)
@@ -88,23 +91,25 @@ class FiguredBassScale:
     
     def getSamplePitches(self, bassPitch, notationString = ''):
         '''
-        Given a bass pitch and a corresponding notation string,
-        returns a list of corresponding pitches within the octave
-        above the bass pitch.
+        Returns all pitches for a bassPitch and notationString within
+        an octave of the bassPitch, inclusive of the bassPitch but
+        exclusive at the upper bound. In other words, this method 
+        returns the most compact complete chord implied by the bassPitch
+        and its figures.
         
-        >>> from music21 import *
-        >>> fbScale = FiguredBassScale('C')
-        >>> fbScale.getSamplePitches('D3', '6') #First inversion triad
+        >>> from music21.figuredBass import realizerScale
+        >>> fbScale = realizerScale.FiguredBassScale()
+        >>> fbScale.getSamplePitches('D3', '6') # First inversion triad
         [D3, F3, B3]
-        >>> fbScale.getSamplePitches('G3') #Root position triad
+        >>> fbScale.getSamplePitches('G3') # Root position triad
         [G3, B3, D4]
-        >>> fbScale.getSamplePitches('B3', '6,5') #First inversion seventh chord
+        >>> fbScale.getSamplePitches('B3', '6,5') # First inversion seventh chord
         [B3, D4, F4, G4]
-        >>> fbScale.getSamplePitches('F3', '-6,-') #Neapolitan chord
+        >>> fbScale.getSamplePitches('F3', '-6,-') # Neapolitan chord
         [F3, A-3, D-4]
-        >>> fbScale.getSamplePitches('C5', '4,3') #Second inversion seventh chord
+        >>> fbScale.getSamplePitches('C5', '4,3') # Second inversion seventh chord
         [C5, E5, F5, A5]
-        >>> fbScale.getSamplePitches('C#3', '-7') #Fully diminished seventh chord
+        >>> fbScale.getSamplePitches('C#3', '-7') # Fully diminished seventh chord
         [C#3, E3, G3, B-3]
         '''
         bassPitch = convertToPitch(bassPitch) #Convert string to pitch (if necessary)
@@ -115,40 +120,34 @@ class FiguredBassScale:
         
     def getPitches(self, bassPitch, notationString = '', maxPitch=pitch.Pitch('B5')):
         '''
-        Given a bass pitch and a corresponding notation string,
-        returns a list of corresponding pitches, located at the
-        specified intervals above the bassPitch according to said
-        notation.
+        Takes in a bassPitch, a notationString, and a maxPitch representing the highest
+        possible pitch that can be returned. Returns a sorted list of pitches which
+        correspond to the pitches of each specific pitch name found through getPitchNames
+        that fall between the bassPitch and the maxPitch, inclusive.
 
-        >>> from music21 import *
-        >>> fbScale = FiguredBassScale('C')
-        >>> fbScale.getPitches('C3') #Root position triad
+        >>> from music21.figuredBass import realizerScale
+        >>> fbScale = realizerScale.FiguredBassScale()
+        >>> fbScale.getPitches('C3') # Root position triad
         [C3, E3, G3, C4, E4, G4, C5, E5, G5]
-        >>> fbScale.getPitches('D3', '6') #First inversion triad
+        >>> fbScale.getPitches('D3', '6') # First inversion triad
         [D3, F3, B3, D4, F4, B4, D5, F5, B5]
-        >>> fbScale.getPitches(pitch.Pitch('G3'), '7', 'F4') #Root position seventh chord
+        >>> fbScale.getPitches(pitch.Pitch('G3'), '7', 'F4') # Root position seventh chord
         [G3, B3, D4, F4]
         '''
         bassPitch = convertToPitch(bassPitch)
         maxPitch = convertToPitch(maxPitch)
-        
         pitchNames = self.getPitchNames(bassPitch, notationString)
-        octaveLimit = maxPitch.octave
-        allPitches = []
-        for pitchName in pitchNames:
-            for i in range(1, octaveLimit + 1):
-                allPitches.append(pitch.Pitch(pitchName + str(i)))
+        iter1 = itertools.product(pitchNames, range(maxPitch.octave + 1))
+        iter2 = itertools.imap(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)
+        iter3 = itertools.ifilterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)
+        iter4 = itertools.ifilterfalse(lambda samplePitch: samplePitch > maxPitch, iter3)
+        allPitches = list(iter4)
+        allPitches.sort()
+        return allPitches
     
-        pitchesAboveNote = []
-        for givenPitch in allPitches:
-            if not (givenPitch < bassPitch) and not (givenPitch > maxPitch):
-                pitchesAboveNote.append(givenPitch)
-        
-        pitchesAboveNote.sort()
-        return pitchesAboveNote
+    def __repr__(self):
+        return "<music21.figuredBass.realizerScale FiguredBassScale>"
     
-        
-
     
 class FiguredBassScaleException(music21.Music21Exception):
     pass
@@ -158,13 +157,13 @@ class FiguredBassScaleException(music21.Music21Exception):
 # Helper Methods
 def convertToPitch(pitchString):
     '''
-    Converts a pitch string to a music21 pitch, only if necessary.
+    Converts a pitchString to a :class:`~music21.pitch.Pitch`, only if necessary.
     
-    >>> from music21 import *
+    >>> from music21.figuredBass import realizerScale
     >>> pitchString = 'C5'
-    >>> convertToPitch(pitchString)
+    >>> realizerScale.convertToPitch(pitchString)
     C5
-    >>> convertToPitch(pitch.Pitch('E4')) #does nothing
+    >>> realizerScale.convertToPitch(pitch.Pitch('E4')) # does nothing
     E4
     '''
     if isinstance(pitchString, pitch.Pitch):
@@ -190,4 +189,3 @@ if __name__ == "__main__":
 
 #------------------------------------------------------------------------------
 # eof
-
