@@ -7,6 +7,22 @@
 # Copyright:    (c) 2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+'''
+.. note:: The terminology, V43, viio, iv, etc. are explained more fully in *The Music Theory Handbook*
+by Marjorie Merryman.
+
+
+This module contains methods which can properly resolve 
+`dominant seventh <http://en.wikipedia.org/wiki/Dominant_seventh_chord>`_, 
+`diminished seventh <http://en.wikipedia.org/wiki/Diminished_seventh_chord>`_, and 
+`augmented sixth <http://en.wikipedia.org/wiki/Augmented_sixth_chord>`_
+chords expressed as possibilities (See :mod:`~music21.figuredBass.possibility`).
+Although these methods can stand alone, they are speed-enhanced for instances
+of :class:`~music21.figuredBass.segment.Segment`, where there are many 
+possibilities formed around the same chord. If provided with additional
+arguments, the methods only :meth:`~music21.pitch.Pitch.transpose` each 
+:class:`~music21.pitch.Pitch` in a possibility by the appropriate interval.
+'''
 
 import copy
 import music21
@@ -16,171 +32,258 @@ from music21 import chord
 from music21 import note
 from music21 import stream
 
-'''
-Resolution methods. Note that the methods are speed-enhanced, 
-they assume that the possibilities provided correctly correspond
-to them and may ask for more information that would be asked for
-if designed to stand alone.
-'''
-
-def augmentedSixthToDominant(augSixthPossib, augSixthType):
+def augmentedSixthToDominant(augSixthPossib, augSixthType = None, augSixthChordInfo = None):
     '''
-    Italian augmented 6ths not currently supported.
+    Resolves French (augSixthType = 1), German (augSixthType = 2), and Swiss (augSixthType = 3)
+    augmented sixth chords to the root position dominant triad.
     
-    >>> from music21.figuredBass.fbPitch import HashablePitch
+    
+    Proper Italian augmented sixth resolutions not supported within this method.
+    
+    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
-    >>> Bb2 = HashablePitch('B-2')
-    >>> D4 = HashablePitch('D4')
-    >>> E4 = HashablePitch('E4')
-    >>> Es4 = HashablePitch('E#4')
-    >>> F4 = HashablePitch('F4')
-    >>> G4 = HashablePitch('G4')
-    >>> Gs4 = HashablePitch('G#4')
+    >>> Bb2 = pitch.Pitch('B-2')
+    >>> D4 = pitch.Pitch('D4')
+    >>> E4 = pitch.Pitch('E4')
+    >>> Es4 = pitch.Pitch('E#4')
+    >>> F4 = pitch.Pitch('F4')
+    >>> G4 = pitch.Pitch('G4')
+    >>> Gs4 = pitch.Pitch('G#4')
     >>> iv6 = (G4, D4, D4, Bb2)
     >>> itAug6 = (Gs4, D4, D4, Bb2)
     >>> frAug6 = (Gs4, E4, D4, Bb2)
     >>> grAug6 = (Gs4, F4, D4, Bb2)
     >>> swAug6 = (Gs4, Es4, D4, Bb2)
-    >>> resolution.augmentedSixthToDominant(frAug6, 1)
+    >>> frRes = resolution.augmentedSixthToDominant(frAug6)
+    >>> frRes
     (A4, E4, C#4, A2)
-    >>> resolution.augmentedSixthToDominant(grAug6, 2)
+    >>> grRes = resolution.augmentedSixthToDominant(grAug6)
+    >>> grRes
     (A4, E4, C#4, A2)
-    >>> resolution.augmentedSixthToDominant(swAug6, 3)
+    >>> swRes = resolution.augmentedSixthToDominant(swAug6)
+    >>> swRes
     (A4, E4, C#4, A2)
-    '''
-    #Type 0: Italian, type 1: French, type 2: German, type 3: Swiss
-    augSixthChord = chord.Chord(augSixthPossib)
-    augSixthChord.removeRedundantPitchNames()
-    if augSixthType == 1 or augSixthType == 3:
-        augSixthChord.root(augSixthChord.getChordStep(3))
+    >>> #_DOCS_SHOW resolution.showResolutions(frAug6, frRes, grAug6, grRes, swAug6, swRes)
     
-    bass = augSixthChord.bass()
-    root = augSixthChord.root()
-    tonic = augSixthChord.getChordStep(5)
+        .. image:: images/fbResolution_a6toV.*
+            :width: 700
+
+
+    Above: French, German, and Swiss resolutions, respectively.
+    '''
+    if augSixthChordInfo == None:
+        augSixthChord = chord.Chord(augSixthPossib)
+        if not augSixthChord.isAugmentedSixth():
+            raise ResolutionException("Possibility is not an augmented sixth chord.")
+        augSixthChordInfo = _unpackSeventhChord(chord.Chord(augSixthPossib))
+ 
+    if augSixthType == None:
+        if augSixthChord.isItalianAugmentedSixth():
+            raise ResolutionException("Italian augmented sixth resolution not supported in this method.")
+        elif augSixthChord.isFrenchAugmentedSixth():
+            augSixthType = 1
+        elif augSixthChord.isGermanAugmentedSixth():
+            augSixthType = 2
+        elif augSixthChord.isSwissAugmentedSixth():
+            augSixthType = 3
+
+    if augSixthType == 1 or augSixthType == 3:
+        [bass, other, root, third, fifth] = augSixthChordInfo # other == sixth
+    elif augSixthType == 2:
+        [bass, root, third, fifth, other] = augSixthChordInfo # other == seventh
     
     howToResolve = \
     [(lambda p: p.name == bass.name, '-m2'),
     (lambda p: p.name == root.name, 'm2'),
-    (lambda p: p.name == tonic.name, '-m2'),
-    (lambda p: augSixthType == 3, 'd1'),
-    (lambda p: augSixthType == 2, '-m2')]
+    (lambda p: p.name == fifth.name, '-m2'),
+    (lambda p: p.name == other.name and augSixthType == 3, 'd1'),
+    (lambda p: p.name == other.name and augSixthType == 2, '-m2')]
 
-    return resolvePitches(augSixthPossib, howToResolve)
+    return _resolvePitches(augSixthPossib, howToResolve)
 
-def augmentedSixthToMajorTonic(augSixthPossib, augSixthType):
+def augmentedSixthToMajorTonic(augSixthPossib, augSixthType = None, augSixthChordInfo = None):
     '''
-    Italian augmented 6ths not currently supported.
-
-    >>> from music21.figuredBass.fbPitch import HashablePitch
+    Resolves French (augSixthType = 1), German (augSixthType = 2), and Swiss (augSixthType = 3)
+    augmented sixth chords to the major tonic 6,4.
+    
+    
+    Proper Italian augmented sixth resolutions not supported within this method.
+    
+    >>> from music21 import pitch 
     >>> from music21.figuredBass import resolution
-    >>> Bb2 = HashablePitch('B-2')
-    >>> D4 = HashablePitch('D4')
-    >>> E4 = HashablePitch('E4')
-    >>> Es4 = HashablePitch('E#4')
-    >>> F4 = HashablePitch('F4')
-    >>> G4 = HashablePitch('G4')
-    >>> Gs4 = HashablePitch('G#4')
+    >>> Bb2 = pitch.Pitch('B-2')
+    >>> D4 = pitch.Pitch('D4')
+    >>> E4 = pitch.Pitch('E4')
+    >>> Es4 = pitch.Pitch('E#4')
+    >>> F4 = pitch.Pitch('F4')
+    >>> G4 = pitch.Pitch('G4')
+    >>> Gs4 = pitch.Pitch('G#4')
     >>> iv6 = (G4, D4, D4, Bb2)
     >>> itAug6 = (Gs4, D4, D4, Bb2)
     >>> frAug6 = (Gs4, E4, D4, Bb2)
     >>> grAug6 = (Gs4, F4, D4, Bb2)
     >>> swAug6 = (Gs4, Es4, D4, Bb2)
-    >>> resolution.augmentedSixthToMajorTonic(frAug6, 1)
+    >>> frRes = resolution.augmentedSixthToMajorTonic(frAug6)
+    >>> frRes
     (A4, F#4, D4, A2)
-    >>> resolution.augmentedSixthToMajorTonic(grAug6, 2)
+    >>> grRes = resolution.augmentedSixthToMajorTonic(grAug6)
+    >>> grRes
     (A4, F#4, D4, A2)    
-    >>> resolution.augmentedSixthToMajorTonic(swAug6, 3)
-    (A4, F#4, D4, A2)    
+    >>> swRes = resolution.augmentedSixthToMajorTonic(swAug6)
+    >>> swRes
+    (A4, F#4, D4, A2)
+    >>> #_DOCS_SHOW resolution.showResolutions(frAug6, frRes, grAug6, grRes, swAug6, swRes)
+    
+        .. image:: images/fbResolution_a6toI.*
+            :width: 700
+
+
+    Above: French, German, and Swiss resolutions, respectively.
     '''
-    augSixthChord = chord.Chord(augSixthPossib)
-    augSixthChord.removeRedundantPitchNames()
+    if augSixthChordInfo == None:
+        augSixthChord = chord.Chord(augSixthPossib)
+        if not augSixthChord.isAugmentedSixth():
+            raise ResolutionException("Possibility is not an augmented sixth chord.")
+        augSixthChordInfo = _unpackSeventhChord(chord.Chord(augSixthPossib))
+
+    if augSixthType == None:
+        if augSixthChord.isItalianAugmentedSixth():
+            raise ResolutionException("Italian augmented sixth resolution not supported in this method.")
+        elif augSixthChord.isFrenchAugmentedSixth():
+            augSixthType = 1
+        elif augSixthChord.isGermanAugmentedSixth():
+            augSixthType = 2
+        elif augSixthChord.isSwissAugmentedSixth():
+            augSixthType = 3
+ 
     if augSixthType == 1 or augSixthType == 3:
-        augSixthChord.root(augSixthChord.getChordStep(3))
-    
-    bass = augSixthChord.bass()
-    root = augSixthChord.root()
-    tonic = augSixthChord.getChordStep(5)
-    
+        [bass, other, root, third, fifth] = augSixthChordInfo # other == sixth
+    elif augSixthType == 2:
+        [bass, root, third, fifth, other] = augSixthChordInfo # other == seventh
+        
     howToResolve = \
     [(lambda p: p.name == bass.name, '-m2'),
     (lambda p: p.name == root.name, 'm2'),
-    (lambda p: p.name == tonic.name, 'P1'),
-    (lambda p: augSixthType == 1, 'M2'),
-    (lambda p: augSixthType == 2, 'A1'),
-    (lambda p: augSixthType == 3, 'm2')]
+    (lambda p: p.name == fifth.name, 'P1'),
+    (lambda p: p.name == other.name and augSixthType == 1, 'M2'),
+    (lambda p: p.name == other.name and augSixthType == 2, 'A1'),
+    (lambda p: p.name == other.name and augSixthType == 3, 'm2')]
 
-    return resolvePitches(augSixthPossib, howToResolve)
+    return _resolvePitches(augSixthPossib, howToResolve)
 
-def augmentedSixthToMinorTonic(augSixthPossib, augSixthType):
+def augmentedSixthToMinorTonic(augSixthPossib, augSixthType = None, augSixthChordInfo = None):
     '''
-    Italian augmented 6ths not currently supported.
-
-    >>> from music21.figuredBass.fbPitch import HashablePitch
+    Resolves French (augSixthType = 1), German (augSixthType = 2), and Swiss (augSixthType = 3)
+    augmented sixth chords to the minor tonic 6,4.
+    
+    
+    Proper Italian augmented sixth resolutions not supported within this method.
+    
+    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
-    >>> Bb2 = HashablePitch('B-2')
-    >>> D4 = HashablePitch('D4')
-    >>> E4 = HashablePitch('E4')
-    >>> Es4 = HashablePitch('E#4')
-    >>> F4 = HashablePitch('F4')
-    >>> G4 = HashablePitch('G4')
-    >>> Gs4 = HashablePitch('G#4')
+    >>> Bb2 = pitch.Pitch('B-2')
+    >>> D4 = pitch.Pitch('D4')
+    >>> E4 = pitch.Pitch('E4')
+    >>> Es4 = pitch.Pitch('E#4')
+    >>> F4 = pitch.Pitch('F4')
+    >>> G4 = pitch.Pitch('G4')
+    >>> Gs4 = pitch.Pitch('G#4')
     >>> iv6 = (G4, D4, D4, Bb2)
     >>> itAug6 = (Gs4, D4, D4, Bb2)
     >>> frAug6 = (Gs4, E4, D4, Bb2)
     >>> grAug6 = (Gs4, F4, D4, Bb2)
     >>> swAug6 = (Gs4, Es4, D4, Bb2)
-    >>> resolution.augmentedSixthToMinorTonic(frAug6, 1)
+    >>> frRes = resolution.augmentedSixthToMinorTonic(frAug6)
+    >>> frRes
     (A4, F4, D4, A2)
-    >>> resolution.augmentedSixthToMinorTonic(grAug6, 2)
+    >>> grRes = resolution.augmentedSixthToMinorTonic(grAug6)
+    >>> grRes
     (A4, F4, D4, A2)
-    >>> resolution.augmentedSixthToMinorTonic(swAug6, 3)
-    (A4, F4, D4, A2)    
-    '''
-    augSixthChord = chord.Chord(augSixthPossib)
-    augSixthChord.removeRedundantPitchNames()
-    if augSixthType == 1 or augSixthType == 3:
-        augSixthChord.root(augSixthChord.getChordStep(3))
+    >>> swRes = resolution.augmentedSixthToMinorTonic(swAug6)
+    >>> swRes
+    (A4, F4, D4, A2)  
+    >>> #_DOCS_SHOW resolution.showResolutions(frAug6, frRes, grAug6, grRes, swAug6, swRes)
+
+        .. image:: images/fbResolution_a6toIm.*
+            :width: 700
+   
     
-    bass = augSixthChord.bass()
-    root = augSixthChord.root()
-    tonic = augSixthChord.getChordStep(5)
+    Above: French, German, and Swiss resolutions, respectively.  
+    '''
+    if augSixthChordInfo == None:
+        augSixthChord = chord.Chord(augSixthPossib)
+        if not augSixthChord.isAugmentedSixth():
+            raise ResolutionException("Possibility is not an augmented sixth chord.")
+        augSixthChordInfo = _unpackSeventhChord(chord.Chord(augSixthPossib))
+
+    if augSixthType == None:
+        if augSixthChord.isItalianAugmentedSixth():
+            raise ResolutionException("Italian augmented sixth resolution not supported in this method.")
+        elif augSixthChord.isFrenchAugmentedSixth():
+            augSixthType = 1
+        elif augSixthChord.isGermanAugmentedSixth():
+            augSixthType = 2
+        elif augSixthChord.isSwissAugmentedSixth():
+            augSixthType = 3
+ 
+    if augSixthType == 1 or augSixthType == 3:
+        [bass, other, root, third, fifth] = augSixthChordInfo # other == sixth
+    elif augSixthType == 2:
+        [bass, root, third, fifth, other] = augSixthChordInfo # other == seventh
     
     howToResolve = \
     [(lambda p: p.name == bass.name, '-m2'),
     (lambda p: p.name == root.name, 'm2'),
-    (lambda p: p.name == tonic.name, 'P1'),
-    (lambda p: augSixthType == 1, 'm2'),
-    (lambda p: augSixthType == 3, 'd2')]
+    (lambda p: p.name == fifth.name, 'P1'),
+    (lambda p: p.name == other.name and augSixthType == 1, 'm2'),
+    (lambda p: p.name == other.name and augSixthType == 3, 'd2')]
     
-    return resolvePitches(augSixthPossib, howToResolve)
+    return _resolvePitches(augSixthPossib, howToResolve)
 
-def dominantSeventhToMajorTonic(domPossib, resolveV43toI6 = False):
+def dominantSeventhToMajorTonic(domPossib, resolveV43toI6 = False, domChordInfo = None):
     '''
-    >>> from music21.figuredBass.fbPitch import HashablePitch
+    Resolves a dominant seventh chord in root position or any of its
+    inversions to the major tonic, in root position or first inversion.
+        
+    
+    The second inversion (4,3) dominant seventh chord can resolve to 
+    the tonic in either inversion. This is controlled by
+    resolveV43toI6, and is set to True by :meth:`~music21.figuredBass.segment.Segment.resolveDominantSeventhSegment`
+    only when the :attr:`~music21.figuredBass.segment.Segment.segmentChord`
+    of a :class:`~music21.figuredBass.segment.Segment`
+    spells out a dominant seventh chord in second inversion.
+    
+    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
-    >>> G2 = HashablePitch('G2')
-    >>> C3 = HashablePitch('C3')
-    >>> E3 = HashablePitch('E3')
-    >>> G3 = HashablePitch('G3')
-    >>> Bb3 = HashablePitch('B-3')
-    >>> B3 = HashablePitch('B3')
-    >>> C4 = HashablePitch('C4')
-    >>> F4 = HashablePitch('F4')
-    >>> Bb4 = HashablePitch('B-4')
-    >>> D5 = HashablePitch('D5')
-    >>> E5 = HashablePitch('E5')
+    >>> G2 = pitch.Pitch('G2')
+    >>> C3 = pitch.Pitch('C3')
+    >>> E3 = pitch.Pitch('E3')
+    >>> G3 = pitch.Pitch('G3')
+    >>> Bb3 = pitch.Pitch('B-3')
+    >>> B3 = pitch.Pitch('B3')
+    >>> C4 = pitch.Pitch('C4')
+    >>> F4 = pitch.Pitch('F4')
+    >>> Bb4 = pitch.Pitch('B-4')
+    >>> D5 = pitch.Pitch('D5')
+    >>> E5 = pitch.Pitch('E5')
     >>> domPossibA1 = (D5, F4, B3, G2)
     >>> resPossibA1 = resolution.dominantSeventhToMajorTonic(domPossibA1)
     >>> resPossibA1
     (C5, E4, C4, C3)
-    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA1, resPossibA1)
-    
+    >>> #_DOCS_SHOW resolution.showResolutions(domPossibA1, resPossibA1)
+
+    .. image:: images/fbResolution_V7toI_1.*
+            :width: 150
+
     >>> domPossibA2 = (Bb3, G3, E3, C3)
     >>> resPossibA2 = resolution.dominantSeventhToMajorTonic(domPossibA2)
     >>> resPossibA2
     (A3, F3, F3, F3)
-    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA2, resPossibA2)
-    
+    >>> #_DOCS_SHOW resolution.showResolutions(domPossibA2, resPossibA2)
+
+    .. image:: images/fbResolution_V7toI_2.*
+            :width: 150
+
     >>> domPossibA3 = (E5, Bb4, C4, G3)
     >>> resPossibA3a = resolution.dominantSeventhToMajorTonic(domPossibA3, False)
     >>> resPossibA3a
@@ -188,53 +291,73 @@ def dominantSeventhToMajorTonic(domPossib, resolveV43toI6 = False):
     >>> resPossibA3b = resolution.dominantSeventhToMajorTonic(domPossibA3, True)
     >>> resPossibA3b    
     (F5, C5, C4, A3)
-    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA3, resPossibA3a, domPossibA3, resPossibA3b)
+    >>> #_DOCS_SHOW resolution.showResolutions(domPossibA3, resPossibA3a, domPossibA3, resPossibA3b)
+
+    .. image:: images/fbResolution_V7toI_3.*
+            :width: 200
     '''
-    V7chord = chord.Chord(domPossib)   
-    root = V7chord.root()
-    bass = V7chord.bass()
-    rootName = root.name
-    thirdName = transpose(root,'M3').name
-    fifthName = transpose(root,'P5').name
-    seventhName = transpose(root,'m7').name
+    if domChordInfo == None:
+        domChord = chord.Chord(domPossib)
+        if not domChord.isDominantSeventh():
+            raise ResolutionException("Possibility is not a dominant seventh chord.")
+        domChordInfo = _unpackSeventhChord(chord.Chord(domPossib))
+    [bass, root, third, fifth, seventh] = domChordInfo
     
     howToResolve = \
-    [(lambda p: p.name == rootName and p == bass, 'P4'),
-    (lambda p: p.name == thirdName, 'm2'),
-    (lambda p: p.name == fifthName and resolveV43toI6, 'M2'),
-    (lambda p: p.name == fifthName, '-M2'),
-    (lambda p: p.name == seventhName and resolveV43toI6, 'M2'),
-    (lambda p: p.name == seventhName, '-m2')]
+    [(lambda p: p.name == root.name and p == bass, 'P4'),
+    (lambda p: p.name == third.name, 'm2'),
+    (lambda p: p.name == fifth.name and resolveV43toI6, 'M2'),
+    (lambda p: p.name == fifth.name, '-M2'),
+    (lambda p: p.name == seventh.name and resolveV43toI6, 'M2'),
+    (lambda p: p.name == seventh.name, '-m2')]
     
-    return resolvePitches(domPossib, howToResolve)
+    return _resolvePitches(domPossib, howToResolve)
 
-def dominantSeventhToMinorTonic(domPossib, resolveV43toi6 = False):
+def dominantSeventhToMinorTonic(domPossib, resolveV43toi6 = False, domChordInfo = None):
     '''
-    >>> from music21.figuredBass.fbPitch import HashablePitch
+    Resolves a dominant seventh chord in root position or any of its
+    inversions to the minor tonic, in root position or first inversion,
+    accordingly.
+
+
+    The second inversion (4,3) dominant seventh chord can resolve to 
+    the tonic in either inversion. This is controlled by
+    resolveV43toi6, and is set to True by :meth:`~music21.figuredBass.segment.Segment.resolveDominantSeventhSegment`
+    only when the :attr:`~music21.figuredBass.segment.Segment.segmentChord`
+    of a :class:`~music21.figuredBass.segment.Segment`
+    spells out a dominant seventh chord in second inversion.
+
+    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
-    >>> G2 = HashablePitch('G2')
-    >>> C3 = HashablePitch('C3')
-    >>> E3 = HashablePitch('E3')
-    >>> G3 = HashablePitch('G3')
-    >>> Bb3 = HashablePitch('B-3')
-    >>> B3 = HashablePitch('B3')
-    >>> C4 = HashablePitch('C4')
-    >>> F4 = HashablePitch('F4')
-    >>> Bb4 = HashablePitch('B-4')
-    >>> D5 = HashablePitch('D5')
-    >>> E5 = HashablePitch('E5')
+    >>> G2 = pitch.Pitch('G2')
+    >>> C3 = pitch.Pitch('C3')
+    >>> E3 = pitch.Pitch('E3')
+    >>> G3 = pitch.Pitch('G3')
+    >>> Bb3 = pitch.Pitch('B-3')
+    >>> B3 = pitch.Pitch('B3')
+    >>> C4 = pitch.Pitch('C4')
+    >>> F4 = pitch.Pitch('F4')
+    >>> Bb4 = pitch.Pitch('B-4')
+    >>> D5 = pitch.Pitch('D5')
+    >>> E5 = pitch.Pitch('E5')
     >>> domPossibA1 = (D5, F4, B3, G2)
     >>> resPossibA1 = resolution.dominantSeventhToMinorTonic(domPossibA1)
     >>> resPossibA1
     (C5, E-4, C4, C3)
-    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA1, resPossibA1)
-    
+    >>> #_DOCS_SHOW resolution.showResolutions(domPossibA1, resPossibA1)
+
+    .. image:: images/fbResolution_V7toIm_1.*
+            :width: 150
+
     >>> domPossibA2 = (Bb3, G3, E3, C3)
     >>> resPossibA2 = resolution.dominantSeventhToMinorTonic(domPossibA2)
     >>> resPossibA2
     (A-3, F3, F3, F3)
-    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA2, resPossibA2)
+    >>> #_DOCS_SHOW resolution.showResolutions(domPossibA2, resPossibA2)
     
+    .. image:: images/fbResolution_V7toIm_2.*
+            :width: 150
+
     >>> domPossibA3 = (E5, Bb4, C4, G3)
     >>> resPossibA3a = resolution.dominantSeventhToMinorTonic(domPossibA3, False)
     >>> resPossibA3a
@@ -242,152 +365,193 @@ def dominantSeventhToMinorTonic(domPossib, resolveV43toi6 = False):
     >>> resPossibA3b = resolution.dominantSeventhToMinorTonic(domPossibA3, True)
     >>> resPossibA3b
     (F5, C5, C4, A-3)
-    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA3, resPossibA3a, domPossibA3, resPossibA3b)
+    >>> #_DOCS_SHOW resolution.showResolutions(domPossibA3, resPossibA3a, domPossibA3, resPossibA3b)
+
+    .. image:: images/fbResolution_V7toIm_3.*
+            :width: 200
     '''
-    V7chord = chord.Chord(domPossib)   
-    root = V7chord.root()
-    bass = V7chord.bass()
-    rootName = root.name
-    thirdName = transpose(root,'M3').name
-    fifthName = transpose(root,'P5').name
-    seventhName = transpose(root,'m7').name
+    if domChordInfo == None:
+        domChord = chord.Chord(domPossib)
+        if not domChord.isDominantSeventh():
+            raise ResolutionException("Possibility is not a dominant seventh chord.")
+        domChordInfo = _unpackSeventhChord(chord.Chord(domPossib))
+    [bass, root, third, fifth, seventh] = domChordInfo
 
     howToResolve = \
-    [(lambda p: p.name == rootName and p == bass, 'P4'),
-    (lambda p: p.name == thirdName, 'm2'),
-    (lambda p: p.name == fifthName and resolveV43toi6, 'm2'),
-    (lambda p: p.name == fifthName, '-M2'),
-    (lambda p: p.name == seventhName and resolveV43toi6, 'M2'),
-    (lambda p: p.name == seventhName, '-M2')]
+    [(lambda p: p.name == root.name and p == bass, 'P4'),
+    (lambda p: p.name == third.name, 'm2'),
+    (lambda p: p.name == fifth.name and resolveV43toi6, 'm2'),
+    (lambda p: p.name == fifth.name, '-M2'),
+    (lambda p: p.name == seventh.name and resolveV43toi6, 'M2'),
+    (lambda p: p.name == seventh.name, '-M2')]
     
-    return resolvePitches(domPossib, howToResolve)
+    return _resolvePitches(domPossib, howToResolve)
 
-def dominantSeventhToMajorSubmediant(domPossib):
+def dominantSeventhToMajorSubmediant(domPossib, domChordInfo = None):
     '''
-    >>> from music21.figuredBass.fbPitch import HashablePitch
+    Resolves a dominant seventh chord in root position to the 
+    major submediant (VI) in root position.
+    
+    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
-    >>> G2 = HashablePitch('G2')
-    >>> B3 = HashablePitch('B3')
-    >>> F4 = HashablePitch('F4')
-    >>> D5 = HashablePitch('D5')
+    >>> G2 = pitch.Pitch('G2')
+    >>> B3 = pitch.Pitch('B3')
+    >>> F4 = pitch.Pitch('F4')
+    >>> D5 = pitch.Pitch('D5')
     >>> domPossibA1 = (D5, F4, B3, G2)
     >>> resPossibA1 = resolution.dominantSeventhToMajorSubmediant(domPossibA1)
     >>> resPossibA1
     (C5, E-4, C4, A-2)
-    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA1, resPossibA1)    
+    >>> #_DOCS_SHOW resolution.showResolutions(domPossibA1, resPossibA1)
+
+    .. image:: images/fbResolution_V7toVI.*
+            :width: 150
     '''
-    V7chord = chord.Chord(domPossib)   
-    root = V7chord.root()
-    bass = V7chord.bass()
-    rootName = root.name
-    thirdName = transpose(root,'M3').name
-    fifthName = transpose(root,'P5').name
-    seventhName = transpose(root,'m7').name
+    if domChordInfo == None:
+        domChord = chord.Chord(domPossib)
+        if not domChord.isDominantSeventh():
+            raise ResolutionException("Possibility is not a dominant seventh chord.")
+        domChordInfo = _unpackSeventhChord(chord.Chord(domPossib))
+        if not domChord.inversion() == 0:
+            raise ResolutionException("Possibility must be in root position.")
+    [bass, root, third, fifth, seventh] = domChordInfo
 
     howToResolve = \
-    [(lambda p: p.name == rootName, 'm2'),
-    (lambda p: p.name == thirdName, 'm2'),
-    (lambda p: p.name == fifthName, '-M2'),
-    (lambda p: p.name == seventhName, '-M2')]
+    [(lambda p: p.name == root.name, 'm2'),
+    (lambda p: p.name == third.name, 'm2'),
+    (lambda p: p.name == fifth.name, '-M2'),
+    (lambda p: p.name == seventh.name, '-M2')]
     
-    return resolvePitches(domPossib, howToResolve)
+    return _resolvePitches(domPossib, howToResolve)
 
-def dominantSeventhToMinorSubmediant(domPossib):
+def dominantSeventhToMinorSubmediant(domPossib, domChordInfo = None):
     '''
-    >>> from music21.figuredBass.fbPitch import HashablePitch
+    Resolves a dominant seventh chord in root position to the 
+    minor submediant (vi) in root position.
+
+    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
-    >>> G2 = HashablePitch('G2')
-    >>> B3 = HashablePitch('B3')
-    >>> F4 = HashablePitch('F4')
-    >>> D5 = HashablePitch('D5')
+    >>> G2 = pitch.Pitch('G2')
+    >>> B3 = pitch.Pitch('B3')
+    >>> F4 = pitch.Pitch('F4')
+    >>> D5 = pitch.Pitch('D5')
     >>> domPossibA1 = (D5, F4, B3, G2)
     >>> resPossibA1 = resolution.dominantSeventhToMinorSubmediant(domPossibA1)
     >>> resPossibA1
     (C5, E4, C4, A2)
-    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA1, resPossibA1)    
+    >>> #_DOCS_SHOW resolution.showResolutions(domPossibA1, resPossibA1)   
+
+    .. image:: images/fbResolution_V7toVIm.*
+            :width: 150 
     '''
-    V7chord = chord.Chord(domPossib)   
-    root = V7chord.root()
-    bass = V7chord.bass()
-    rootName = root.name
-    thirdName = transpose(root,'M3').name
-    fifthName = transpose(root,'P5').name
-    seventhName = transpose(root,'m7').name
+    if domChordInfo == None:
+        domChord = chord.Chord(domPossib)
+        if not domChord.isDominantSeventh():
+            raise ResolutionException("Possibility is not a dominant seventh chord.")
+        domChordInfo = _unpackSeventhChord(chord.Chord(domPossib))
+        if not domChord.inversion() == 0:
+            raise ResolutionException("Possibility must be in root position.")
+    [bass, root, third, fifth, seventh] = domChordInfo
 
     howToResolve = \
-    [(lambda p: p.name == rootName, 'M2'),
-    (lambda p: p.name == thirdName, 'm2'),
-    (lambda p: p.name == fifthName, '-M2'),
-    (lambda p: p.name == seventhName, '-m2')]
+    [(lambda p: p.name == root.name, 'M2'),
+    (lambda p: p.name == third.name, 'm2'),
+    (lambda p: p.name == fifth.name, '-M2'),
+    (lambda p: p.name == seventh.name, '-m2')]
     
-    return resolvePitches(domPossib, howToResolve)
+    return _resolvePitches(domPossib, howToResolve)
 
-def dominantSeventhToMajorSubdominant(domPossib):
+def dominantSeventhToMajorSubdominant(domPossib, domChordInfo = None):
     '''
-    >>> from music21.figuredBass.fbPitch import HashablePitch
+    Resolves a dominant seventh chord in root position
+    to the major subdominant (IV) in first inversion.
+    
+    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
-    >>> G2 = HashablePitch('G2')
-    >>> B3 = HashablePitch('B3')
-    >>> F4 = HashablePitch('F4')
-    >>> D5 = HashablePitch('D5')
+    >>> G2 = pitch.Pitch('G2')
+    >>> B3 = pitch.Pitch('B3')
+    >>> F4 = pitch.Pitch('F4')
+    >>> D5 = pitch.Pitch('D5')
     >>> domPossibA1 = (D5, F4, B3, G2)
     >>> resPossibA1 = resolution.dominantSeventhToMajorSubdominant(domPossibA1)
     >>> resPossibA1
     (C5, F4, C4, A2)
-    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA1, resPossibA1)    
+    >>> #_DOCS_SHOW resolution.showResolutions(domPossibA1, resPossibA1)    
+
+    .. image:: images/fbResolution_V7toIV.*
+            :width: 150 
     '''
-    V7chord = chord.Chord(domPossib)   
-    root = V7chord.root()
-    bass = V7chord.bass()
-    rootName = root.name
-    thirdName = transpose(root,'M3').name
-    fifthName = transpose(root,'P5').name
-    seventhName = transpose(root,'m7').name
+    if domChordInfo == None:
+        domChord = chord.Chord(domPossib)
+        if not domChord.isDominantSeventh():
+            raise ResolutionException("Possibility is not a dominant seventh chord.")
+        domChordInfo = _unpackSeventhChord(chord.Chord(domPossib))
+        if not domChord.inversion() == 0:
+            raise ResolutionException("Possibility must be in root position.")
+    [bass, root, third, fifth, seventh] = domChordInfo
 
     howToResolve = \
-    [(lambda p: p.name == rootName, 'M2'),
-    (lambda p: p.name == thirdName, 'm2'),
-    (lambda p: p.name == fifthName, '-M2')]
+    [(lambda p: p.name == root.name, 'M2'),
+    (lambda p: p.name == third.name, 'm2'),
+    (lambda p: p.name == fifth.name, '-M2')]
         
-    return resolvePitches(domPossib, howToResolve)
+    return _resolvePitches(domPossib, howToResolve)
 
-def dominantSeventhToMinorSubdominant(domPossib):
+def dominantSeventhToMinorSubdominant(domPossib, domChordInfo = None):
     '''
-    >>> from music21.figuredBass.fbPitch import HashablePitch
+    Resolves a dominant seventh chord in root position
+    to the minor subdominant (iv) in first inversion.
+
+    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
-    >>> G2 = HashablePitch('G2')
-    >>> B3 = HashablePitch('B3')
-    >>> F4 = HashablePitch('F4')
-    >>> D5 = HashablePitch('D5')
+    >>> G2 = pitch.Pitch('G2')
+    >>> B3 = pitch.Pitch('B3')
+    >>> F4 = pitch.Pitch('F4')
+    >>> D5 = pitch.Pitch('D5')
     >>> domPossibA1 = (D5, F4, B3, G2)
     >>> resPossibA1 = resolution.dominantSeventhToMinorSubdominant(domPossibA1)
     >>> resPossibA1
     (C5, F4, C4, A-2)
-    >>> #_DOCS_SHOW resolution.ShowResolutions(domPossibA1, resPossibA1)    
+    >>> #_DOCS_SHOW resolution.showResolutions(domPossibA1, resPossibA1)
+
+    .. image:: images/fbResolution_V7toIVm.*
+            :width: 150     
     '''
-    V7chord = chord.Chord(domPossib)   
-    root = V7chord.root()
-    bass = V7chord.bass()
-    rootName = root.name
-    thirdName = transpose(root,'M3').name
-    fifthName = transpose(root,'P5').name
-    seventhName = transpose(root,'m7').name
+    if domChordInfo == None:
+        domChord = chord.Chord(domPossib)
+        if not domChord.isDominantSeventh():
+            raise ResolutionException("Possibility is not a dominant seventh chord.")
+        domChordInfo = _unpackSeventhChord(chord.Chord(domPossib))
+        if not domChord.inversion() == 0:
+            raise ResolutionException("Possibility must be in root position.")
+    [bass, root, third, fifth, seventh] = domChordInfo
 
     howToResolve = \
-    [(lambda p: p.name == rootName, 'm2'),
-    (lambda p: p.name == thirdName, 'm2'),
-    (lambda p: p.name == fifthName, '-M2')]
+    [(lambda p: p.name == root.name, 'm2'),
+    (lambda p: p.name == third.name, 'm2'),
+    (lambda p: p.name == fifth.name, '-M2')]
         
-    return resolvePitches(domPossib, howToResolve)
+    return _resolvePitches(domPossib, howToResolve)
 
-def diminishedSeventhToMajorTonic(dimPossib, doubledRoot = False):
+def diminishedSeventhToMajorTonic(dimPossib, doubledRoot = False, dimChordInfo = None):
     '''
-    >>> from music21.figuredBass.fbPitch import HashablePitch
+    Resolves a fully diminished seventh chord to the major tonic,
+    in root position or either inversion.
+    
+    
+    The resolution of the diminished seventh chord can have a 
+    doubled third (standard resolution) or a doubled root
+    (alternate resolution), because the third of the diminished
+    chord can either rise or fall. The desired resolution is
+    attained using doubledRoot, and is set by 
+    :meth:`~music21.figuredBass.segment.Segment.resolveDiminishedSeventhSegment`.
+    
+    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
-    >>> Cs3 = HashablePitch('C#3')
-    >>> G3 = HashablePitch('G3')
-    >>> E4 = HashablePitch('E4')
-    >>> Bb4 = HashablePitch('B-4')
+    >>> Cs3 = pitch.Pitch('C#3')
+    >>> G3 = pitch.Pitch('G3')
+    >>> E4 = pitch.Pitch('E4')
+    >>> Bb4 = pitch.Pitch('B-4')
     >>> dimPossibA = (Bb4, E4, G3, Cs3)
     >>> resPossibAa = resolution.diminishedSeventhToMajorTonic(dimPossibA, False)
     >>> resPossibAa
@@ -396,32 +560,45 @@ def diminishedSeventhToMajorTonic(dimPossib, doubledRoot = False):
     >>> resPossibAb
     (A4, D4, F#3, D3)
     >>> #_DOCS_SHOW resolution.showResolutions(dimPossibA, resPossibAa, dimPossibA, resPossibAb)
-    '''
-    dim7chord = chord.Chord(dimPossib)
-    root = dim7chord.root()
-    bass = dim7chord.bass()
-    rootName = root.name
-    thirdName = transpose(root,'m3').name
-    fifthName = transpose(root,'d5').name
-    seventhName = transpose(root,'d7').name
-
-    howToResolve = \
-    [(lambda p: p.name == rootName, 'm2'),
-    (lambda p: p.name == thirdName and doubledRoot, '-M2'),
-    (lambda p: p.name == thirdName, 'M2'),
-    (lambda p: p.name == fifthName, '-m2'),
-    (lambda p: p.name == seventhName, '-m2')]
-        
-    return resolvePitches(dimPossib, howToResolve)
     
-def diminishedSeventhToMinorTonic(dimPossib, doubledRoot = False):
+    .. image:: images/fbResolution_vii7toI.*
+            :width: 200 
     '''
-    >>> from music21.figuredBass.fbPitch import HashablePitch
+    if dimChordInfo == None:
+        dimChord = chord.Chord(dimPossib)
+        if not dimChord.isDiminishedSeventh():
+            raise ResolutionException("Possibility is not a fully diminished seventh chord.")
+        dimChordInfo = _unpackSeventhChord(chord.Chord(dimPossib))
+    [bass, root, third, fifth, seventh] = dimChordInfo
+    
+    howToResolve = \
+    [(lambda p: p.name == root.name, 'm2'),
+    (lambda p: p.name == third.name and doubledRoot, '-M2'),
+    (lambda p: p.name == third.name, 'M2'),
+    (lambda p: p.name == fifth.name, '-m2'),
+    (lambda p: p.name == seventh.name, '-m2')]
+        
+    return _resolvePitches(dimPossib, howToResolve)
+    
+def diminishedSeventhToMinorTonic(dimPossib, doubledRoot = False, dimChordInfo = None):
+    '''
+    Resolves a fully diminished seventh chord to the minor tonic,
+    in root position or either inversion.
+
+
+    The resolution of the diminished seventh chord can have a 
+    doubled third (standard resolution) or a doubled root
+    (alternate resolution), because the third of the diminished
+    chord can either rise or fall. The desired resolution is
+    attained using doubledRoot, and is set by 
+    :meth:`~music21.figuredBass.segment.Segment.resolveDiminishedSeventhSegment`.
+    
+    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
-    >>> Cs3 = HashablePitch('C#3')
-    >>> G3 = HashablePitch('G3')
-    >>> E4 = HashablePitch('E4')
-    >>> Bb4 = HashablePitch('B-4')
+    >>> Cs3 = pitch.Pitch('C#3')
+    >>> G3 = pitch.Pitch('G3')
+    >>> E4 = pitch.Pitch('E4')
+    >>> Bb4 = pitch.Pitch('B-4')
     >>> dimPossibA = (Bb4, E4, G3, Cs3)
     >>> resPossibAa = resolution.diminishedSeventhToMinorTonic(dimPossibA, False)
     >>> resPossibAa
@@ -430,80 +607,92 @@ def diminishedSeventhToMinorTonic(dimPossib, doubledRoot = False):
     >>> resPossibAb
     (A4, D4, F3, D3)
     >>> #_DOCS_SHOW resolution.showResolutions(dimPossibA, resPossibAa, dimPossibA, resPossibAb)
-    '''
-    dim7chord = chord.Chord(dimPossib)
-    root = dim7chord.root()
-    bass = dim7chord.bass()
-    rootName = root.name
-    thirdName = transpose(root,'m3').name
-    fifthName = transpose(root,'d5').name
-    seventhName = transpose(root,'d7').name
 
+    .. image:: images/fbResolution_vii7toIm.*
+            :width: 200
+    '''
+    if dimChordInfo == None:
+        dimChord = chord.Chord(dimPossib)
+        if not dimChord.isDiminishedSeventh():
+            raise ResolutionException("Possibility is not a fully diminished seventh chord.")
+        dimChordInfo = _unpackSeventhChord(chord.Chord(dimPossib))
+    [bass, root, third, fifth, seventh] = dimChordInfo
+    
     howToResolve = \
-    [(lambda p: p.name == rootName, 'm2'),
-    (lambda p: p.name == thirdName and doubledRoot, '-M2'),
-    (lambda p: p.name == thirdName, 'm2'),
-    (lambda p: p.name == fifthName, '-M2'),
-    (lambda p: p.name == seventhName, '-m2')]
+    [(lambda p: p.name == root.name, 'm2'),
+    (lambda p: p.name == third.name and doubledRoot, '-M2'),
+    (lambda p: p.name == third.name, 'm2'),
+    (lambda p: p.name == fifth.name, '-M2'),
+    (lambda p: p.name == seventh.name, '-m2')]
         
-    return resolvePitches(dimPossib, howToResolve)
+    return _resolvePitches(dimPossib, howToResolve)
 
-def diminishedSeventhToMajorSubdominant(dimPossib):
+def diminishedSeventhToMajorSubdominant(dimPossib, dimChordInfo = None):
     '''
-    >>> from music21.figuredBass.fbPitch import HashablePitch
+    Resolves a fully diminished seventh chord to the
+    major subdominant (IV).
+    
+    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
-    >>> Cs3 = HashablePitch('C#3')
-    >>> G3 = HashablePitch('G3')
-    >>> E4 = HashablePitch('E4')
-    >>> Bb4 = HashablePitch('B-4')
+    >>> Cs3 = pitch.Pitch('C#3')
+    >>> G3 = pitch.Pitch('G3')
+    >>> E4 = pitch.Pitch('E4')
+    >>> Bb4 = pitch.Pitch('B-4')
     >>> dimPossibA = (Bb4, E4, G3, Cs3)
     >>> resPossibA = resolution.diminishedSeventhToMajorSubdominant(dimPossibA)
     >>> resPossibA
     (B4, D4, G3, D3)
     >>> #_DOCS_SHOW resolution.showResolutions(dimPossibA, resPossibA)
-    '''
-    dim7chord = chord.Chord(dimPossib)
-    root = dim7chord.root()
-    bass = dim7chord.bass()
-    rootName = root.name
-    thirdName = transpose(root,'m3').name
-    fifthName = transpose(root,'d5').name
-    seventhName = transpose(root,'d7').name
 
+    .. image:: images/fbResolution_vii7toIV.*
+            :width: 150
+    '''
+    if dimChordInfo == None:
+        dimChord = chord.Chord(dimPossib)
+        if not dimChord.isDiminishedSeventh():
+            raise ResolutionException("Possibility is not a fully diminished seventh chord.")
+        dimChordInfo = _unpackSeventhChord(chord.Chord(dimPossib))
+    [bass, root, third, fifth, seventh] = dimChordInfo
+    
     howToResolve = \
-    [(lambda p: p.name == rootName, 'm2'),
-    (lambda p: p.name == thirdName, '-M2'),
-    (lambda p: p.name == seventhName, 'A1')]
+    [(lambda p: p.name == root.name, 'm2'),
+    (lambda p: p.name == third.name, '-M2'),
+    (lambda p: p.name == seventh.name, 'A1')]
         
-    return resolvePitches(dimPossib, howToResolve)
+    return _resolvePitches(dimPossib, howToResolve)
 
-def diminishedSeventhToMinorSubdominant(dimPossib):
+def diminishedSeventhToMinorSubdominant(dimPossib, dimChordInfo = None):
     '''
-    >>> from music21.figuredBass.fbPitch import HashablePitch
+    Resolves a fully diminished seventh chord to the
+    minor subdominant (iv).
+
+    >>> from music21 import pitch
     >>> from music21.figuredBass import resolution
-    >>> Cs3 = HashablePitch('C#3')
-    >>> G3 = HashablePitch('G3')
-    >>> E4 = HashablePitch('E4')
-    >>> Bb4 = HashablePitch('B-4')
+    >>> Cs3 = pitch.Pitch('C#3')
+    >>> G3 = pitch.Pitch('G3')
+    >>> E4 = pitch.Pitch('E4')
+    >>> Bb4 = pitch.Pitch('B-4')
     >>> dimPossibA = (Bb4, E4, G3, Cs3)
     >>> resPossibA = resolution.diminishedSeventhToMinorSubdominant(dimPossibA)
     >>> resPossibA
     (B-4, D4, G3, D3)
     >>> #_DOCS_SHOW resolution.showResolutions(dimPossibA, resPossibA)
-    '''
-    dim7chord = chord.Chord(dimPossib)
-    root = dim7chord.root()
-    bass = dim7chord.bass()
-    rootName = root.name
-    thirdName = transpose(root,'m3').name
-    fifthName = transpose(root,'d5').name
-    seventhName = transpose(root,'d7').name
 
+    .. image:: images/fbResolution_vii7toIVm.*
+            :width: 150
+    '''
+    if dimChordInfo == None:
+        dimChord = chord.Chord(dimPossib)
+        if not dimChord.isDiminishedSeventh():
+            raise ResolutionException("Possibility is not a fully diminished seventh chord.")
+        dimChordInfo = _unpackSeventhChord(chord.Chord(dimPossib))
+    [bass, root, third, fifth, seventh] = dimChordInfo
+    
     howToResolve = \
-    [(lambda p: p.name == rootName, 'm2'),
-    (lambda p: p.name == thirdName, '-M2')]
+    [(lambda p: p.name == root.name, 'm2'),
+    (lambda p: p.name == third.name, '-M2')]
             
-    return resolvePitches(dimPossib, howToResolve)
+    return _resolvePitches(dimPossib, howToResolve)
 
 '''
 transpositionsTable = {}
@@ -516,21 +705,12 @@ def transpose(samplePitch, intervalString):
     return transposedPitch
 '''
 
-def transpose(samplePitch, intervalString):
-    return samplePitch.transpose(intervalString)
-
-def resolvePitches(possibToResolve, howToResolve):
-    howToResolve.append((lambda p: True, 'P1'))
-    resPitches = []
-    for samplePitch in possibToResolve:
-        for (expression, intervalString) in howToResolve:
-            if expression(samplePitch):
-                resPitches.append(transpose(samplePitch, intervalString))
-                break
-        
-    return tuple(resPitches)
-
 def showResolutions(*allPossib):
+    '''
+    Takes in possibilities as arguments and adds them in order
+    to a :class:`~music21.stream.Score` which is then displayed
+    in external software.
+    '''
     upperParts = stream.Part()
     bassLine = stream.Part()
     for possibA in allPossib:
@@ -544,7 +724,46 @@ def showResolutions(*allPossib):
     score.insert(0, upperParts)
     score.insert(0, bassLine)
     score.show()
-    
+        
+#----------------------------------------------
+# INTERNAL METHODS
+
+def _transpose(samplePitch, intervalString):
+    return samplePitch.transpose(intervalString)
+
+def _resolvePitches(possibToResolve, howToResolve):
+    '''
+    Takes in a possibility to resolve and a list of (lambda function, intervalString)
+    pairs and tranposes each pitch by the intervalString corresponding to the lambda
+    function that returns True when applied to the pitch.
+    '''
+    howToResolve.append((lambda p: True, 'P1'))
+    resPitches = []
+    for samplePitch in possibToResolve:
+        for (expression, intervalString) in howToResolve:
+            if expression(samplePitch):
+                resPitches.append(_transpose(samplePitch, intervalString))
+                break
+        
+    return tuple(resPitches)
+
+def _unpackSeventhChord(seventhChord):
+    bass = seventhChord.bass()
+    root = seventhChord.root()
+    third = seventhChord.getChordStep(3)
+    fifth = seventhChord.getChordStep(5)
+    seventh = seventhChord.getChordStep(7)
+    seventhChordInfo = [bass, root, third, fifth, seventh]
+    return seventhChordInfo
+
+
+_DOC_ORDER = [augmentedSixthToDominant,
+              augmentedSixthToMajorTonic, augmentedSixthToMinorTonic,
+              dominantSeventhToMajorTonic, dominantSeventhToMinorTonic, 
+              dominantSeventhToMajorSubmediant, dominantSeventhToMinorSubmediant,
+              dominantSeventhToMajorSubdominant, dominantSeventhToMinorSubdominant,
+              diminishedSeventhToMajorTonic, diminishedSeventhToMinorTonic,
+              diminishedSeventhToMajorSubdominant, diminishedSeventhToMinorSubdominant]
 
 #-------------------------------------------------------------------------------
 class ResolutionException(music21.Music21Exception):
