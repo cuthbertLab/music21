@@ -31,37 +31,118 @@ shorthandNotation = {(None,) : (5,3),
                      }
 
 class Notation(object):
+    '''
+    Breaks apart and stores the information in a figured bass notation
+    column, which is a string of figures, each associated with a number
+    and an optional modifier. The figures are delimited using commas.
+    Examples include "7,5,#3", "6,4", and "6,4+,2".
+    
+    
+    Valid modifiers include those accepted by :class:`~music21.pitch.Accidental`,
+    such as #, -, and n, as well as those which can correspond to one, such as +,
+    /, and b.
+    
+    
+    .. note:: If a figure has a modifier but no number, the number is assumed to be
+    3.
+    
+    
+    Notation also translates many forms of shorthand notation into longhand. It understands
+    all the forms of shorthand notation listed below. This is true even if a number is accompanied
+    by a modifier, or if a stand-alone modifier implies a 3.
+    
+    
+    * "" or "5" -> "5,3"
+    
+            
+    * "6" -> "6,3"
+    
+    
+    * "7" -> "7,5,3"
+    
+    
+    * "6,5" -> "6,5,3"
+    
+    
+    * "4,3" -> "6,4,3"
+    
+    
+    * "4,2" or "2" -> "6,4,2"
+    
+    
+    * "9" -> "9,7,5,3"
+    
+    
+    * "11" -> "11,9,7,5,3"
+    
+    
+    * "13" -> "13,11,9,7,5,3"
+    
+    
+    Figures are saved in order from left to right as found in the notationColumn.
+    
+    >>> from music21.figuredBass import notation
+    >>> n1 = notation.Notation("4+,2")
+    >>> n1.notationColumn
+    '4+,2'
+    >>> n1.figureStrings
+    ['4+', '2']
+    >>> n1.origNumbers
+    (4, 2)
+    >>> n1.origModStrings
+    ('+', None)
+    >>> n1.numbers
+    (6, 4, 2)
+    >>> n1.modifierStrings
+    (None, '+', None)
+    >>> n1.modifiers
+    (<modifier None None>, <modifier + <accidental sharp>>, <modifier None None>)
+    >>> n1.figures[0]
+    <music21.figuredBass.notation Figure 6 <modifier None None>>
+    >>> n1.figures[1]
+    <music21.figuredBass.notation Figure 4 <modifier + <accidental sharp>>>
+    >>> n1.figures[2]
+    <music21.figuredBass.notation Figure 2 <modifier None None>>
+    
+    
+    Here, a stand-alone # is being passed to Notation.
+    
+    
+    >>> n2 = notation.Notation("#")
+    >>> n2.numbers
+    (5, 3)
+    >>> n2.modifiers
+    (<modifier None None>, <modifier # <accidental sharp>>)
+    >>> n2.figures[0]
+    <music21.figuredBass.notation Figure 5 <modifier None None>>
+    >>> n2.figures[1]
+    <music21.figuredBass.notation Figure 3 <modifier # <accidental sharp>>>
+    
+    
+    Now, a stand-alone b is being passed to Notation as part of a larger notationColumn.
+    
+    
+    >>> n3 = notation.Notation("b6,b")
+    >>> n3.numbers
+    (6, 3)
+    >>> n3.modifiers
+    (<modifier b <accidental flat>>, <modifier b <accidental flat>>)
+    >>> n3.figures[0]
+    <music21.figuredBass.notation Figure 6 <modifier b <accidental flat>>>
+    >>> n3.figures[1]
+    <music21.figuredBass.notation Figure 3 <modifier b <accidental flat>>>
+    '''
+    _DOC_ORDER = ['notationColumn', 'figureStrings', 'numbers', 'modifiers', 'figures', 'origNumbers', 'origModStrings', 'modifierStrings']
+    _DOC_ATTR = {'modifiers': 'A list of :class:`~music21.figuredBass.notation.Modifier` objects associated with the expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
+                 'notationColumn': 'A string of figures delimited by commas, each associated with a number and an optional modifier.',
+                 'modifierStrings': 'The modifiers associated with the expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`, as strings.',
+                 'figureStrings': 'A list of figures derived from the original :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
+                 'origNumbers': 'The numbers associated with the original :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
+                 'numbers': 'The numbers associated with the expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
+                 'origModStrings': 'The modifiers associated with the original :attr:`~music21.figuredBass.notation.Notation.notationColumn`, as strings.',
+                 'figures': 'A list of :class:`~music21.figuredBass.notation.Figure` objects associated with figures in the expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.'}
+    
     def __init__(self, notationColumn = ""):
-        '''
-        Convenience class for representing a figured bass notation column.
-        
-        >>> from music21 import *
-        >>> from music21.figuredBass import notation as n
-        >>> n1 = n.Notation('')
-        >>> n1.figures
-        [<music21.figuredBass.notation Figure 5 <modifier None None>>, <music21.figuredBass.notation Figure 3 <modifier None None>>]
-        >>> n2 = n.Notation('#')
-        >>> n2.figures
-        [<music21.figuredBass.notation Figure 5 <modifier None None>>, <music21.figuredBass.notation Figure 3 <modifier # <accidental sharp>>>]
-        >>> n3 = n.Notation('-6,-')
-        >>> n3.figures
-        [<music21.figuredBass.notation Figure 6 <modifier - <accidental flat>>>, <music21.figuredBass.notation Figure 3 <modifier - <accidental flat>>>]
-        >>> n3b = n.Notation('b6,b')
-        >>> n3b.figures
-        [<music21.figuredBass.notation Figure 6 <modifier b <accidental flat>>>, <music21.figuredBass.notation Figure 3 <modifier b <accidental flat>>>]
-        >>> n3b.numbers
-        (6, 3)
-
-        
-        OMIT_FROM_DOCS
-        >>> n4 = n.Notation('4,2+')
-        >>> n4.figures[0]
-        <music21.figuredBass.notation Figure 6 <modifier None None>>
-        >>> n4.figures[1]
-        <music21.figuredBass.notation Figure 4 <modifier None None>>
-        >>> n4.figures[2]
-        <music21.figuredBass.notation Figure 2 <modifier + <accidental sharp>>>
-        '''
         #Parse notation string
         self.notationColumn = notationColumn
         self.figureStrings = None
@@ -255,9 +336,25 @@ class NotationException(music21.Music21Exception):
 #-------------------------------------------------------------------------------
 class Figure(object):
     '''
-    A figure consists of a number with its modifier,
-    if applicable.
+    A Figure is created by providing a number and a modifierString. The
+    modifierString is turned into a :class:`~music21.figuredBass.notation.Modifier`,
+    and a ModifierException is raised if the modifierString is not valid.
+    
+    >>> from music21.figuredBass import notation
+    >>> f1 = notation.Figure(4, '+')
+    >>> f1.number
+    4
+    >>> f1.modifierString
+    '+'
+    >>> f1.modifier
+    <modifier + <accidental sharp>>
+    >>> f1
+    <music21.figuredBass.notation Figure 4 <modifier + <accidental sharp>>>
     '''
+    _DOC_ATTR = {'number': 'A number associated with an expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
+                 'modifierString': 'A modifier string associated with an expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
+                 'modifier': 'A :class:`~music21.figuredBass.notation.Modifier` associated with an expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.'}
+    
     def __init__(self, number, modifierString=''):
         self.number = number
         self.modifierString = modifierString
@@ -278,6 +375,49 @@ specialModifiers = {'+' : '#',
                     }
 
 class Modifier(object):
+    '''
+    Turns a modifierString (a modifier in a :attr:`~music21.figuredBass.notation.Notation.notationColumn`)
+    to an :class:`~music21.pitch.Accidental`.
+    
+    
+    Accepted inputs are those accepted by Accidental, as well as the following:
+    
+    
+    * '+' or '\\' -> '#'
+    
+    
+    * 'b' or '/' -> '-'
+
+    
+    >>> from music21.figuredBass import notation
+    >>> m1a = notation.Modifier("#")
+    >>> m1a.modifierString
+    '#'
+    >>> m1a.accidental
+    <accidental sharp>
+    
+    
+    Providing a + in place of a sharp, we get the same result for the accidental.
+    
+    
+    >>> m2a = notation.Modifier("+")
+    >>> m2a.accidental
+    <accidental sharp>
+    
+    
+    If None or "" is provided for modifierString, then the accidental is None.
+    
+    
+    >>> m2a = notation.Modifier(None)
+    >>> m2a.accidental == None
+    True
+    >>> m2b = notation.Modifier("")
+    >>> m2b.accidental == None
+    True
+    '''
+    _DOC_ATTR = {'modifierString': 'A modifier string associated with an expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
+                 'accidental': ' A :class:`~music21.pitch.Accidental` corresponding to :attr:`~music21.figuredBass.notation.Modifier.modifierString`'}
+
     def __init__(self, modifierString):
         self.modifierString = modifierString
         self.accidental = self._toAccidental()
@@ -305,7 +445,7 @@ class Modifier(object):
         >>> m5.accidental
         <accidental flat>
         '''
-        if self.modifierString == None:
+        if self.modifierString == None or len(self.modifierString) == 0:
             return None
         
         a = pitch.Accidental()
@@ -322,18 +462,18 @@ class Modifier(object):
     
     def modifyPitchName(self, pitchNameToAlter):
         '''
-        Given a pitch name, modify its accidental accordingly.
+        Given a pitch name, modify its accidental given the Modifier's 
+        :attr:`~music21.figuredBass.notation.Modifier.accidental`.
         
-        >>> from music21 import *
-        >>> from music21.figuredBass import notation as n
-        >>> m1 = n.Modifier('#')
-        >>> m2 = n.Modifier('-')
-        >>> m3 = n.Modifier('n')
-        >>> m1.modifyPitchName('D') #Sharp
+        >>> from music21.figuredBass import notation
+        >>> m1 = notation.Modifier('#')
+        >>> m2 = notation.Modifier('-')
+        >>> m3 = notation.Modifier('n')
+        >>> m1.modifyPitchName('D') # Sharp
         'D#'
-        >>> m2.modifyPitchName('F') #Flat
+        >>> m2.modifyPitchName('F') # Flat
         'F-'
-        >>> m3.modifyPitchName('C#') #Natural
+        >>> m3.modifyPitchName('C#') # Natural
         'C'
         '''
         pitchToAlter = pitch.Pitch(pitchNameToAlter)
@@ -342,29 +482,30 @@ class Modifier(object):
     
     def modifyPitch(self, pitchToAlter, inPlace=False):
         '''
-        Given a pitch, modify its accidental accordingly.
+        Given a :class:`~music21.pitch.Pitch`, modify its :attr:`~music21.pitch.Pitch.accidental`
+        given the Modifier's :attr:`~music21.figuredBass.notation.Modifier.accidental`.
         
-        >>> from music21 import *
-        >>> from music21.figuredBass import notation as n
-        >>> m1 = n.Modifier('#')
-        >>> m2 = n.Modifier('-')
-        >>> m3 = n.Modifier('n')
-        >>> p1 = pitch.Pitch('D5')
-        >>> m1.modifyPitch(p1) #Sharp
+        >>> from music21 import pitch
+        >>> from music21.figuredBass import notation
+        >>> m1 = notation.Modifier('#')
+        >>> m2 = notation.Modifier('-')
+        >>> m3 = notation.Modifier('n')
+        >>> p1a = pitch.Pitch('D5')
+        >>> m1.modifyPitch(p1a) # Sharp
         D#5
-        >>> m2.modifyPitch(p1) #Flat
+        >>> m2.modifyPitch(p1a) # Flat
         D-5
-        >>> p15 = pitch.Pitch('D#5')
-        >>> m3.modifyPitch(p15)
+        >>> p1b = pitch.Pitch('D#5')
+        >>> m3.modifyPitch(p1b)
         D5
          
         OMIT_FROM_DOCS
-        >>> m4 = n.Modifier('##')
-        >>> m5 = n.Modifier('--')
+        >>> m4 = notation.Modifier('##')
+        >>> m5 = notation.Modifier('--')
         >>> p2 = pitch.Pitch('F5')
-        >>> m4.modifyPitch(p2) #Double Sharp
+        >>> m4.modifyPitch(p2) # Double Sharp
         F##5
-        >>> m5.modifyPitch(p2) #Double Flat
+        >>> m5.modifyPitch(p2) # Double Flat
         F--5
         '''
         if not inPlace:
@@ -396,20 +537,29 @@ class ModifierException(music21.Music21Exception):
 # Helper Methods
 def convertToPitch(pitchString):
     '''
-    Converts a pitch string to a music21 pitch, only if necessary.
+    Converts a pitchString to a :class:`~music21.pitch.Pitch`, only if necessary.
+    This method is identical to the one in :mod:`~music21.figuredBass.realizerScale`.
     
-    >>> from music21 import *
+    >>> from music21.figuredBass import realizerScale
     >>> pitchString = 'C5'
-    >>> convertToPitch(pitchString)
+    >>> realizerScale.convertToPitch(pitchString)
     C5
-    >>> convertToPitch(pitch.Pitch('E4')) #does nothing
+    >>> realizerScale.convertToPitch(pitch.Pitch('E4')) # does nothing
     E4
     '''
-    pitchValue = pitchString
-    if type(pitchString) == str:
-        pitchValue = pitch.Pitch(pitchString)
-    return pitchValue
+    if isinstance(pitchString, pitch.Pitch):
+        return pitchString
+    
+    if isinstance(pitchString, str):
+        try:
+            return pitch.Pitch(pitchString)
+        except:
+            raise ValueError("Cannot convert string " + pitchString + " to a music21 Pitch.")
+    
+    raise TypeError("Cannot convert " + pitchString + " to a music21 Pitch.")
 
+
+_DOC_ORDER = [Notation, Modifier, Figure]
 #-------------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
