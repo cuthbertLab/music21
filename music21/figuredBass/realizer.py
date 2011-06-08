@@ -289,7 +289,14 @@ class FiguredBassLine(object):
 #FiguredBass = FiguredBassLine
 
 class Realization(object):
+    _DOC_ORDER = ['getNumSolutions', 'generateRandomRealization', 'generateRandomRealizations', 'generateAllRealizations',
+                  'getAllPossibilityProgressions', 'getRandomPossibilityProgression', 'generateRealizationFromPossibilityProgression']
     def __init__(self, segmentList, inKey, inTime):
+        '''
+        Returned by :class:`~music21.figuredBass.realizer.FiguredBassLine` after calling
+        :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`. Allows for the 
+        retrieval of unique realizations as a :class:`~music21.stream.Score`.
+        '''
         self.segmentList = segmentList
         self.inKey = inKey
         self.inTime = inTime
@@ -297,6 +304,12 @@ class Realization(object):
         self.keyboardStyleOutput = True
 
     def getNumSolutions(self):
+        '''
+        Returns the number of unique realizations for a Realization by calculating
+        the total number of paths through a string of Segment movements. This is 
+        faster and more efficient than compiling each unique realization into a 
+        list, adding it to a master list, and then taking the length of the master list. 
+        '''
         self.segmentList.reverse()
         pathList = {}
         for segmentIndex in range(1, len(self.segmentList)):
@@ -321,7 +334,14 @@ class Realization(object):
     
     def getAllPossibilityProgressions(self):
         '''
-        Returns all the valid possibility progressions.
+        Compiles each unique possibility progression, a valid progression through
+        a string of Segment instances, adding it to a master list. Returns the 
+        master list.
+
+        
+        .. warning:: This method is unoptimized, and may take a prohibitive amount
+        of time for a Realization which has more than hundreds of thousands of
+        unique realizations.
         '''
         currMovements = self.segmentList[0].movements
         progressions = []
@@ -344,7 +364,8 @@ class Realization(object):
     
     def getRandomPossibilityProgression(self):
         '''
-        Returns a random valid possibility progression.
+        Returns a random unique possibility progression, a valid progression
+        through a string of Segment instances.
         '''
         progression = []
         currMovements = self.segmentList[0].movements
@@ -411,6 +432,13 @@ class Realization(object):
         return sol
 
     def generateAllRealizations(self):
+        '''
+        Generates all realizations as a :class:`~music21.stream.Score`.
+        
+        
+        .. warning:: This method is unoptimized, and may take a prohibitive amount
+        of time for a Realization which has more than tens of unique realizations.
+        '''
         allSols = stream.Score()
         bassLine = stream.Part()
         possibilityProgressions = self.getAllPossibilityProgressions()
@@ -467,11 +495,18 @@ class Realization(object):
 
     def generateRandomRealization(self):
         '''
-        Generates a random solution as a stream.Score()
+        Generates a random realization as a :class:`~music21.stream.Score`.
         '''
         return self.generateRandomRealizations(1)
 
     def generateRandomRealizations(self, amountToShow = 20):
+        '''
+        Generates *amountToShow* realizations as a :class:`~music21.stream.Score`.
+        
+
+        .. warning:: This method is unoptimized, and may take a prohibitive amount
+        of time if amountToShow is in the hundreds.
+        '''
         if amountToShow > self.getNumSolutions():
             return self.generateAllRealizations()
         allSols = stream.Score()
