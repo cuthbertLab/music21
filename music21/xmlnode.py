@@ -265,34 +265,29 @@ class XMLNode(object):
         # if attrs are the same, these are instances of same class
         if localAttr == otherAttr:
             for i in range(len(localAttr)):
-                # neither are defined 
-                if (self.get(localAttr[i]) == None and 
-                    other.get(otherAttr[i]) == None):
-                    pass
+                # get() may be expensive; do once
+                attrLocal = self.get(localAttr[i])
+                attrOther = other.get(otherAttr[i])
+                # neither are defined; do not need to tests
+#                 if (attrLocal is None and attrOther is None):
+#                     pass
                 # local is defined
-                elif (self.get(localAttr[i]) != None and 
-                    other.get(otherAttr[i]) == None):
+                if (attrLocal is not None and attrOther is None):
                     pass # already set as this is a copy of self
-
                 # other is defined
-                elif (self.get(localAttr[i]) == None and 
-                    other.get(otherAttr[i]) != None):
-                    new.set(otherAttr[i], other.get(otherAttr[i]))
-
+                elif (attrLocal is None and attrOther is not None):
+                    new.set(otherAttr[i], attrOther)
                 # other is defined as an empty list
                 # note that this may contain component objects
-                elif (self.get(localAttr[i]) == [] and 
-                    other.get(otherAttr[i]) != []):
-                    new.set(otherAttr[i], other.get(otherAttr[i]))
+                elif (attrLocal == [] and attrOther != []):
+                    new.set(otherAttr[i], attrOther)
 
-                # both are defined; this will not match an empty list
-                elif (self.get(localAttr[i]) == None and 
-                    other.get(otherAttr[i]) == None):
-                    if favorSelf:
-                        pass # already set as this ia copy
-                        # new.set(localAttr[i], self.get(localAttr[i]))
-                    else:
-                        new.set(otherAttr[i], otherAttr.get(otherAttr[i]))
+#                 elif (attrLocal is None and attrOther is None):
+#                     if favorSelf:
+#                         pass # already set as this ia copy
+#                         # new.set(localAttr[i], self.get(localAttr[i]))
+#                     else:
+#                         new.set(otherAttr[i], otherAttr.get(otherAttr[i]))
         else:
             raise XMLNodeException('cannot merge: %s, %s' % (self, other))
             #print _MOD, 
@@ -343,8 +338,11 @@ class XMLNode(object):
     def get(self, name):
         '''Get a data attrbiute from this XMLNode. If available in the attribute dictionary, return this first. If available as an object attribute, return this second. 
         '''
-        if name in self._attr.keys():
+        #if name in self._attr.keys():
+        try: # try from dictionary
             return self._attr[name]
+        except KeyError:
+            pass
 
         # try direct access
         try:

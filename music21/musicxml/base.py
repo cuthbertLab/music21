@@ -1631,7 +1631,7 @@ class Note(MusicXMLElement):
         '''
         if isinstance(other, Pitch): 
             # if local pitch is None
-            if self.pitchObj == None:
+            if self.pitchObj is None:
                 new.pitchObj = other
             # if local pitch is not None, new already has it from copy
             # only set of favorSelf is not true
