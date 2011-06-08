@@ -12,23 +12,23 @@ import music21
 import unittest
 
 
-doc_forbidIncompletePossibilities = 'True by default. If True, :meth:`~music21.figuredBass.possibility.isIncomplete` is applied, and all possibA which return True are filtered out.'
-doc_upperPartsMaxSemitoneSeparation = '''12 by default. :meth:`~music21.figuredBass.possibility.upperPartsWithinLimit` is applied with the argument (number in semitones) and all possibA 
-which return False are filtered out. If set to None, rule is not applied.'''
-doc_forbidVoiceCrossing = 'True by default. If True, :meth:`~music21.figuredBass.possibility.voiceCrossing` is applied, and all possibA which return True are filtered out.'
+doc_forbidIncompletePossibilities = 'True by default. If True, :meth:`~music21.figuredBass.possibility.isIncomplete` is applied to all possibA, and all those possibilities for which the method returns False are retained.'
+doc_upperPartsMaxSemitoneSeparation = '''12 by default. A number, in semitones, representing the maxSemitoneSeparation argument provided to :meth:`~music21.figuredBass.possibility.upperPartsWithinLimit`. 
+Method is applied to all possibA, and all those possibilities for which the method returns True are retained.'''
+doc_forbidVoiceCrossing = 'True by default. If True, :meth:`~music21.figuredBass.possibility.voiceCrossing` is applied to all possibA, and all those possibilities for which the method returns False are retained.'
 singlePossibilityDoc = [('forbidIncompletePossibilities', doc_forbidIncompletePossibilities),
                         ('upperPartsMaxSemitoneSeparation', doc_upperPartsMaxSemitoneSeparation),
                         ('forbidVoiceCrossing', doc_forbidVoiceCrossing)]  
 singlePossibilityDoc.sort()
 
 
-doc_parallelFifths = 'True by default. If True, :meth:`~music21.figuredBass.possibility.parallelFifths` is applied, and all (possibA, possibB) pairs which return False are filtered out.'
-doc_parallelOctaves = 'True by default. If True, :meth:`~music21.figuredBass.possibility.parallelOctaves` is applied, and all (possibA, possibB) pairs which return False are filtered out.'
-doc_hiddenFifths = 'True by default. If True, :meth:`~music21.figuredBass.possibility.hiddenFifth` is applied, and all (possibA, possibB) pairs which return False are filtered out.'
-doc_hiddenOctaves = 'True by default. If True, :meth:`~music21.figuredBass.possibility.hiddenOctave` is applied, and all (possibA, possibB) pairs which return False are filtered out.'
-doc_voiceOverlap = 'True by default. If True, :meth:`~music21.figuredBass.possibility.voiceOverlap` is applied, and all (possibA, possibB) pairs which return False are filtered out.'
-doc_partMovementLimits = '''[] (empty list) by default. (partNumber, maxSeparation) pairs provided as arguments to :meth:`~music21.figuredBass.possibility.partMovementsWithinLimits`, 
-and all (possibA, possibB) pairs which return False are filtered out.'''
+doc_parallelFifths = 'True by default. If True, :meth:`~music21.figuredBass.possibility.parallelFifths` is applied to all (possibA, possibB) pairs, and all those pairs for which the method returns False are retained.'
+doc_parallelOctaves = 'True by default. If True, :meth:`~music21.figuredBass.possibility.parallelOctaves` is applied to all (possibA, possibB) pairs, and all those pairs for which the method returns False are retained.'
+doc_hiddenFifths = 'True by default. If True, :meth:`~music21.figuredBass.possibility.hiddenFifth` is applied to all (possibA, possibB) pairs, and all those pairs for which the method returns False are retained.'
+doc_hiddenOctaves = 'True by default. If True, :meth:`~music21.figuredBass.possibility.hiddenOctave` is applied to all (possibA, possibB) pairs, and all those pairs for which the method returns False are retained.'
+doc_voiceOverlap = 'True by default. If True, :meth:`~music21.figuredBass.possibility.voiceOverlap` is applied to all (possibA, possibB) pairs, and all those pairs for which the method returns False are retained.'
+doc_partMovementLimits = '''[] (empty list) by default. Contains (partNumber, maxSeparation) pairs provided as arguments to :meth:`~music21.figuredBass.possibility.partMovementsWithinLimits`. 
+Method is applied to all (possibA, possibB) pairs, and all those pairs for which the method returns True are retained.'''
 consecPossibilityDoc = [('forbidParallelFifths', doc_parallelFifths),
                         ('forbidParallelOctaves', doc_parallelOctaves),
                         ('forbidHiddenFifths', doc_hiddenFifths),
@@ -38,13 +38,13 @@ consecPossibilityDoc = [('forbidParallelFifths', doc_parallelFifths),
 consecPossibilityDoc.sort()
 
 
-doc_domSeventh = 'True by default. If True, resolves dominant seventh Segments properly by using :meth:`~music21.figuredBass.segment.Segment.resolveDominantSeventhSegment`.'
-doc_dimSeventh = 'True by default. If True, resolves fully-diminished seventh Segments properly by using :meth:`~music21.figuredBass.segment.Segment.resolveDiminishedSeventhSegment`'
-doc_augSixth = 'True by default. If True, resolves augmented sixth Segments properly by using :meth:`~music21.figuredBass.segment.Segment.resolveAugmentedSixthSegment`.'
-doc_doubledRootInDim7 = '''False by default. If True, diminished seventh resolutions to the tonic will contain a doubled root, as opposed to a doubled third.
+doc_domSeventh = 'True by default. If True, Segments whose :attr:`~music21.figuredBass.segment.Segment.segmentChord` spells out a dominant seventh chord are resolved properly by using :meth:`~music21.figuredBass.segment.Segment.resolveDominantSeventhSegment`.'
+doc_dimSeventh = 'True by default. If True, Segments whose :attr:`~music21.figuredBass.segment.Segment.segmentChord` spells out a fully-diminished seventh chord are resolved properly by using :meth:`~music21.figuredBass.segment.Segment.resolveDiminishedSeventhSegment`.'
+doc_augSixth = 'True by default. If True, Segments whose :attr:`~music21.figuredBass.segment.Segment.segmentChord` spells out an augmented sixth chord are resolved properly by using :meth:`~music21.figuredBass.segment.Segment.resolveAugmentedSixthSegment`.'
+doc_doubledRootInDim7 = '''False by default. If True, Diminished seventh resolutions to the tonic will contain a doubled *root*, as opposed to a doubled *third*.
 Rule is ignored (determined in context) if :attr:`~music21.figuredBass.segment.Segment.segmentChord` is in first inversion.'''
-doc_singleToRes = 'False by default. If True, apply single possibility rules to resolution possibilities.'
-doc_consecToRes = 'False by default. If True, apply consecutive possibility rules between (specialPossib, resPossib) pairs.'
+doc_singleToRes = 'False by default. If True, single possibility rules are applied to resolution possibilities.'
+doc_consecToRes = 'False by default. If True, consecutive possibility rules are applied between (specialPossib, resPossib) pairs.'
 specialResDoc = [('resolveDominantSeventhProperly', doc_domSeventh),
                  ('resolveDiminishedSeventhProperly', doc_dimSeventh),
                  ('resolveAugmentedSixthProperly', doc_augSixth),
@@ -56,7 +56,7 @@ specialResDoc.sort()
 
 class Rules(object):
     #Attributes in rules should just point to their corresponding methods in possibility
-    _DOC_ORDER =  [x[0] for x in singlePossibilityDoc] + [y[0] for y in consecPossibilityDoc] + [z[0] for z in specialResDoc]
+    _DOC_ORDER =  [_x[0] for _x in singlePossibilityDoc] + [_y[0] for _y in consecPossibilityDoc] + [_z[0] for _z in specialResDoc]
     _DOC_ATTR = dict(singlePossibilityDoc + consecPossibilityDoc + specialResDoc)
 
     def __init__(self):
@@ -69,16 +69,18 @@ class Rules(object):
         The rules are categorized in an identical manner to methods in :mod:`~music21.figuredBass.possibility`:
         
         
-        1) Single Possibility Rules. These rules apply to any possibility within a single Segment (possibA). 
+        1) Single Possibility Rules. These rules apply to any possibility within a single Segment (possibA), and
+        are applied in finding correct possibilities for a Segment in :meth:`~music21.figuredBass.segment.Segment.allCorrectSinglePossibilities`.
 
 
         2) Consecutive Possibility Rules. These rules apply between any correct single possibility in segmentA 
         (possibA) and any correct single possibility in segmentB (possibB), segmentB coming directly after segmentA.
+        They are applied in finding correct (possibA, possibB) pairs between two Segments in :meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`.
 
         
         3) Special Resolution Rules. These rules apply to Segments whose :attr:`~music21.figuredBass.segment.Segment.segmentChord` is an
-        augmented sixth, dominant seventh, or diminished seventh chord.
-        
+        augmented sixth, dominant seventh, or diminished seventh chord, and are applied as necessary in 
+        :meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`.
         
         
         >>> from music21.figuredBass import rules
