@@ -1031,8 +1031,7 @@ def chordToMx(c):
             mxNote = copy.deepcopy(mxNoteBase)
 
             #mxNote.pitch = None # clear before each iteration
-            
-            mxNote = mxNote.merge(pitchObj.mx)
+            mxNote = mxNote.merge(pitchObj.mx, returnDeepcopy=False)
             if chordPos > 0:
                 mxNote.set('chord', True)
             # get color from within .editorial using attribute
@@ -2294,7 +2293,7 @@ def streamToMx(s, spannerBundle=None):
     mxScoreDefault.set('identification', mxIdDefault)
 
     # merge metadata derived with default created
-    mxScore = mxScore.merge(mxScoreDefault)
+    mxScore = mxScore.merge(mxScoreDefault, returnDeepcopy=False)
 
     mxPartList = musicxmlMod.PartList()
     mxScore.set('partList', mxPartList)
