@@ -1627,7 +1627,7 @@ class Note(MusicXMLElement):
         self.set('duration', defaults.divisionsPerQuarter)
 
     def _mergeSpecial(self, new, other, favorSelf=True):
-        '''Provide handling of merging when given an object of a different class.
+        '''Provide handling of merging when given an object of a different class. This change is done in place. 
         '''
         if isinstance(other, Pitch): 
             # if local pitch is None

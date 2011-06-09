@@ -1031,6 +1031,7 @@ def chordToMx(c):
             mxNote = copy.deepcopy(mxNoteBase)
 
             #mxNote.pitch = None # clear before each iteration
+            
             mxNote = mxNote.merge(pitchObj.mx)
             if chordPos > 0:
                 mxNote.set('chord', True)
@@ -1207,8 +1208,8 @@ def noteToMxNotes(n, spannerBundle=None):
     noteColor = n.color
 
     for mxNote in n.duration.mx: # returns a list of mxNote objs
-        # merge method returns a new object
-        mxNote = mxNote.merge(pitchMx)
+        # merge method returns a new object; but can use existing here
+        mxNote = mxNote.merge(pitchMx, returnDeepcopy=False)
         # get color from within .editorial using attribute
         if noteColor != "":
             mxNote.set('color', noteColor)

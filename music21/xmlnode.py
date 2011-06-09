@@ -241,7 +241,7 @@ class XMLNode(object):
         '''
         pass
 
-    def merge(self, other, favorSelf=True):
+    def merge(self, other, favorSelf=True, returnDeepcopy=True):
         '''Given another similar or commonly used XMLNode object, combine
         all attributes and return a new object.
 
@@ -255,7 +255,10 @@ class XMLNode(object):
         if not isinstance(other, XMLNode):
             raise XMLNodeException('can only merge with other nodes')
 
-        new = copy.deepcopy(self)
+        if returnDeepcopy:
+            new = copy.deepcopy(self)
+        else:
+            new = self
 
         localAttr = self._publicAttributes()
         otherAttr = other._publicAttributes()
@@ -312,14 +315,24 @@ class XMLNode(object):
         
 
     def set(self, name, value):
-        if name in self._attr.keys():
+        '''Set an attribute, using either the name of the attribute, a name that can be converter, or a direct attribute on the object. 
+        '''
+        #if name in self._attr.keys():
+        try:    
+            junk = self._attr[name] # will raise error
             self._attr[name] = value
             return
+        except KeyError:
+            pass
 
         nameDst = self._convertNameToXml(name)
-        if nameDst in self._attr.keys():
+        #if nameDst in self._attr.keys():
+        try:
+            junk = self._attr[nameDst] # will raise error
             self._attr[nameDst] = value
             return
+        except KeyError:
+            pass
 
         match = False
         candidates = []
@@ -332,6 +345,7 @@ class XMLNode(object):
             if hasattr(self, candidate):
                 setattr(self, candidate, value)
                 match = True
+                break
         if not match:
             raise XMLNodeException('this object does not have a %s (or %s) attribute' % (name, candidates))
         
@@ -339,7 +353,7 @@ class XMLNode(object):
         '''Get a data attrbiute from this XMLNode. If available in the attribute dictionary, return this first. If available as an object attribute, return this second. 
         '''
         #if name in self._attr.keys():
-        try: # try from dictionary
+        try:
             return self._attr[name]
         except KeyError:
             pass

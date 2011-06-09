@@ -348,7 +348,8 @@ class CallGraph:
         #self.callTest = TestMusicXMLObjectTypeChecking
         #self.callTest = TestGetContextByClass
         #self.callTest = TestMakeMeasures
-        self.callTest = TestMusicXMLMultiPartOutput
+        #self.callTest = TestMusicXMLMultiPartOutput
+        self.callTest = TestMusicXMLOutputScore
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
