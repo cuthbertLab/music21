@@ -152,7 +152,6 @@ class Segment(object):
         >>> allConsecRules = segmentA.consecutivePossibilityRules()
         >>> segment.printRules(allConsecRules)
         Will run:  Method:                       Keep solutions which return:  Arguments:
-        False      couldBeItalianA6Resolution    True                          None
         False      upperPartsSame                True                          None
         True       voiceOverlap                  False                         None
         True       partMovementsWithinLimits     True                          []
@@ -160,7 +159,8 @@ class Segment(object):
         True       parallelOctaves               False                         None
         True       hiddenFifth                   False                         None
         True       hiddenOctave                  False                         None
-        
+        False      couldBeItalianA6Resolution    True                          [C3, C3, E3, G3], True
+    
         
         Now, a modified fbRules is provided, allowing hidden octaves and
         voice overlap, and limiting the soprano line to stepwise motion.
@@ -174,7 +174,6 @@ class Segment(object):
         >>> allConsecRules = segmentA.consecutivePossibilityRules(fbRules)
         >>> printRules(allConsecRules)
         Will run:  Method:                       Keep solutions which return:  Arguments:
-        False      couldBeItalianA6Resolution    True                          None
         False      upperPartsSame                True                          None
         False      voiceOverlap                  False                         None
         True       partMovementsWithinLimits     True                          [(1, 2)]
@@ -182,18 +181,19 @@ class Segment(object):
         True       parallelOctaves               False                         None
         True       hiddenFifth                   False                         None
         False      hiddenOctave                  False                         None
+        False      couldBeItalianA6Resolution    True                          [C3, C3, E3, G3], True
         '''
         isItalianAugmentedSixth = self.segmentChord.isItalianAugmentedSixth()
             
         consecPossibRules = \
-        [(fbRules.resolveAugmentedSixthProperly and isItalianAugmentedSixth, possibility.couldBeItalianA6Resolution, True),# [_unpackSeventhChord(self.segmentChord)]),
-         (fbRules._upperPartsRemainSame, possibility.upperPartsSame, True),
+        [(fbRules._upperPartsRemainSame, possibility.upperPartsSame, True),
          (fbRules.forbidVoiceOverlap, possibility.voiceOverlap, False),
          (True, possibility.partMovementsWithinLimits, True, [fbRules.partMovementLimits]),
          (fbRules.forbidParallelFifths, possibility.parallelFifths, False),
          (fbRules.forbidParallelOctaves, possibility.parallelOctaves, False),
          (fbRules.forbidHiddenFifths, possibility.hiddenFifth, False),
-         (fbRules.forbidHiddenOctaves, possibility.hiddenOctave, False)]
+         (fbRules.forbidHiddenOctaves, possibility.hiddenOctave, False),
+         (fbRules.resolveAugmentedSixthProperly and isItalianAugmentedSixth, possibility.couldBeItalianA6Resolution, True, [_unpackTriad(self.segmentChord), fbRules.restrictDoublingsInItalianA6Resolution]),]
         
         return consecPossibRules
     
@@ -604,6 +604,8 @@ class Segment(object):
         '''
         if not (self.numParts == segmentB.numParts):
             raise SegmentException("Two segments with unequal numParts cannot be compared.")
+        if not (self._maxPitch == segmentB._maxPitch):
+            raise SegmentException("Two segments with unequal maxPitch cannot be compared.")
         self._specialResolutionRuleChecking = _compileRules(self.specialResolutionRules(self.fbRules), 3)
         for (resolutionMethod, args) in self._specialResolutionRuleChecking[True]:
             return resolutionMethod(segmentB, *args)
@@ -716,6 +718,14 @@ def _unpackSeventhChord(seventhChord):
     seventh = seventhChord.getChordStep(7)
     seventhChordInfo = [bass, root, third, fifth, seventh]
     return seventhChordInfo
+
+def _unpackTriad(threePartChord):
+    bass = threePartChord.bass()
+    root = threePartChord.root()
+    third = threePartChord.getChordStep(3)
+    fifth = threePartChord.getChordStep(5)
+    threePartChordInfo = [bass, root, third, fifth]
+    return threePartChordInfo
 
 def _compileRules(rulesList, maxLength = 4):
     ruleChecking = collections.defaultdict(list)
