@@ -144,6 +144,8 @@ class Notation(object):
     
     def __init__(self, notationColumn = ""):
         #Parse notation string
+        if notationColumn == None:
+            notationColumn = ""
         self.notationColumn = notationColumn
         self.figureStrings = None
         self.origNumbers = None
