@@ -45,12 +45,15 @@ doc_doubledRootInDim7 = '''False by default. If True, Diminished seventh resolut
 Rule is ignored (determined in context) if :attr:`~music21.figuredBass.segment.Segment.segmentChord` is in first inversion.'''
 doc_singleToRes = 'False by default. If True, single possibility rules are applied to resolution possibilities.'
 doc_consecToRes = 'False by default. If True, consecutive possibility rules are applied between (specialPossib, resPossib) pairs.'
+doc_doublings = '''True by default. If True, then doublings in the It+6 chord are limited to the tonic, or fifth. Setting this to False allows doubling of the root or third, most likely
+through parallel unisons if :attr:`~music21.figuredBass.rules.Rules.forbidParallelOctaves` is set to True.'''
 specialResDoc = [('resolveDominantSeventhProperly', doc_domSeventh),
                  ('resolveDiminishedSeventhProperly', doc_dimSeventh),
                  ('resolveAugmentedSixthProperly', doc_augSixth),
                  ('doubledRootInDim7', doc_doubledRootInDim7),
                  ('applySinglePossibRulesToResolution', doc_singleToRes),
-                 ('applyConsecutivePossibRulesToResolution', doc_consecToRes)]
+                 ('applyConsecutivePossibRulesToResolution', doc_consecToRes),
+                 ('restrictDoublingsInItalianA6Resolution', doc_doublings)]
 specialResDoc.sort()
 
 
@@ -108,6 +111,7 @@ class Rules(object):
         self.doubledRootInDim7 = False
         self.applySinglePossibRulesToResolution = False
         self.applyConsecutivePossibRulesToResolution = False
+        self.restrictDoublingsInItalianA6Resolution = True
         
         self._upperPartsRemainSame = False
     
