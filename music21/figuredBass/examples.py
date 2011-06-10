@@ -109,7 +109,8 @@ def exampleD():
             :width: 700
 
     Now, the restriction on voice overlap is lifted, which is common in keyboard-style
-    figured bass, and fbLine is realized again.
+    figured bass, and fbLine is realized again. Voice overlap can be seen in the fourth
+    measure. 
     
     
     >>> fbRules.forbidVoiceOverlap = False
@@ -229,7 +230,7 @@ def V43ResolutionExample():
     '''
     The dominant 4,3 can resolve to either the tonic 5,3 or tonic 6,3. The proper resolution
     is dependent on the bass note of the tonic, and is determined in context, as shown in the
-    following figured bass resolution.
+    following figured bass realization.
 
     >>> from music21.figuredBass import examples
     >>> fbLine = examples.V43ResolutionExample()
@@ -248,7 +249,7 @@ def viio65ResolutionExample():
     For a fully diminished seventh chord resolving to the tonic, the resolution chord
     can contain either a doubled third (standard resolution) or a doubled tonic (alternate
     resolution), depending on whether the third of the diminished chord rises or falls.
-    The user can control this in a Rules object by modifying doubledRootInDim7.
+    The user can control this in a Rules object by modifying :attr:`~music21.figuredBass.rules.Rules.doubledRootInDim7`.
     However, when resolving a diminished 6,5, the third is found in the bass and the
     proper resolution is determined in context, regardless of user preference.
     
@@ -294,7 +295,7 @@ def augmentedSixthResolutionExample():
 def italianA6ResolutionExample():
     '''
     The Italian augmented sixth chord (It+6) is the only augmented sixth chord to consist of only three
-    pitch names, and when represented in four parts, the tonic is doubled. The tonic resolve up, down or 
+    pitch names, and when represented in four parts, the tonic is doubled. The tonic can resolve up, down or 
     stay the same, and in four parts, the two tonics always resolve differently, resulting in two equally 
     acceptable resolutions. An alternate approach to resolving the It+6 chord was taken, such that an It+6 
     chord could map internally to two different resolutions. Every other special resolution in fbRealizer 
