@@ -8,6 +8,37 @@
 # Copyright:    (c) 2011 The music21 Project    
 # License:      LGPL
 #-------------------------------------------------------------------------------
+'''
+This module, the heart of fbRealizer, is all about realizing a bass line of (bassNote, notationString)
+pairs. All it takes to create well-formed realizations of a bass line is a few lines of music21 code, 
+from start to finish. See :class:`~music21.figuredBass.realizer.FiguredBassLine` for more details.
+
+>>> from music21.figuredBass import realizer
+>>> from music21 import note
+>>> fbLine = realizer.FiguredBassLine()
+>>> fbLine.addElement(note.Note('C3'))
+>>> fbLine.addElement(note.Note('D3'), '4,3')
+>>> fbLine.addElement(note.Note('C3', quarterLength = 2.0))
+>>> allSols = fbLine.realize()
+>>> allSols.getNumSolutions()
+30
+>>> #_DOCS_SHOW allSols.generateRandomRealizations(14).show()
+
+    .. image:: images/fbRealizer_intro.*
+        :width: 500
+        
+
+The same can be accomplished by taking the notes and notations from a :class:`~music21.stream.Stream`.
+See :meth:`~music21.figuredBass.realizer.figuredBassFromStream` for more details.
+
+
+>>> from music21 import tinyNotation
+>>> s = tinyNotation.TinyNotationStream("C4 D4_4,3 C2")
+>>> fbLine = realizer.figuredBassFromStream(s)
+>>> allSols2 = fbLine.realize()
+>>> allSols2.getNumSolutions()
+30
+'''
 
 import collections
 import copy
@@ -15,10 +46,10 @@ import itertools
 import music21
 import random
 import unittest
-import warnings
 
 from music21 import chord
 from music21 import clef
+from music21 import environment
 from music21 import key
 from music21 import meter
 from music21 import note
@@ -28,6 +59,8 @@ from music21.figuredBass import notation
 from music21.figuredBass import realizerScale
 from music21.figuredBass import rules
 from music21.figuredBass import segment
+
+_MOD = 'realizer.py'
 
 def figuredBassFromStream(streamPart):
     '''
@@ -55,7 +88,7 @@ def figuredBassFromStream(streamPart):
     >>> #_DOCS_SHOW fbRealization.generateRandomRealizations(8).show()
     
     .. image:: images/fbRealizer_fbStreamPart.*
-        :width: 700
+        :width: 500
     '''
     sf = streamPart.flat
     sfn = sf.notes
@@ -96,10 +129,11 @@ def figuredBassFromStreamPart(streamPart):
     '''
     Deprecated. Use :meth:`~music21.figuredBass.realizer.figuredBassFromStream` instead.
     '''
-    warnings.warn("The method figuredBassFromStreamPart() is deprecated. Use figuredBassFromStream().", DeprecationWarning)
+    _environRules = environment.Environment(_MOD)
+    _environRules.warn("The method figuredBassFromStreamPart() is deprecated. Use figuredBassFromStream().", DeprecationWarning)
     return figuredBassFromStream(streamPart)
     
-def addLyricsToBassNote(bassNote, notationString):
+def addLyricsToBassNote(bassNote, notationString = None):
     '''
     Takes in a bassNote and a corresponding notationString as arguments. 
     Adds the parsed notationString as lyrics to the bassNote, which is 
@@ -116,7 +150,7 @@ def addLyricsToBassNote(bassNote, notationString):
     >>> #_DOCS_SHOW n1.show()
     
     .. image:: images/fbRealizer_lyrics.*
-        :width: 150
+        :width: 100
     '''
     bassNote.lyrics = []
     n = notation.Notation(notationString)
@@ -132,41 +166,40 @@ def addLyricsToBassNote(bassNote, notationString):
             spacesInFront += ' '
         bassNote.addLyric(spacesInFront + fs, applyRaw = True)
 
-_DOC_ORDER = [figuredBassFromStream, figuredBassFromStreamPart, addLyricsToBassNote]
 
 class FiguredBassLine(object):
+    '''
+    A FiguredBassLine is an interface for realization of a line of (bassNote, notationString) pairs.
+    Currently, only 1:1 realization is supported, meaning that every bassNote is realized and the 
+    :attr:`~music21.note.Note.quarterLength` of a realization above a bassNote is identical to that
+    of the bassNote.
+    '''
+    _DOC_ORDER = ['addElement', 'generateBassLine', 'realize']
+    _DOC_ATTR = {'inKey': 'A :class:`~music21.key.Key` which implies a scale value, scale mode, and key signature for a :class:`~music21.figuredBass.realizerScale.FiguredBassScale`.',
+                 'inTime': 'A :class:`~music21.meter.TimeSignature` which specifies the time signature of realizations outputted to a :class:`~music21.stream.Score`.'}    
+    
     def __init__(self, inKey = key.Key('C'), inTime = meter.TimeSignature('4/4')):
         '''
         >>> from music21.figuredBass import realizer
         >>> from music21 import key
         >>> from music21 import meter
         >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
+        >>> fbLine.inKey
+        <music21.key.Key of B major>
+        >>> fbLine.inTime
+        <music21.meter.TimeSignature 3/4>
         '''
         self.inKey = inKey
         self.inTime = inTime
-        self.fbScale = realizerScale.FiguredBassScale(inKey.pitchFromDegree(1), inKey.mode)
-        self.fbList = []
-        self.addNotationAsLyrics = True
+        self._fbScale = realizerScale.FiguredBassScale(inKey.pitchFromDegree(1), inKey.mode)
+        self._fbList = []
     
-    def addElement(self, bassNote, notationString = ''):
+    def addElement(self, bassNote, notationString = None):
         '''
-        >>> from music21.figuredBass import realizer
-        >>> from music21 import key
-        >>> from music21 import meter
-        >>> from music21 import note
-        >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
-        >>> fbLine.addElement(note.Note('B2'))
-        >>> fbLine.addElement(note.Note('C#3'), "6")
-        >>> fbLine.addElement(note.Note('D#3'), "6")
-        >>> fbLine.fbList
-        [(<music21.note.Note B>, ''), (<music21.note.Note C#>, '6'), (<music21.note.Note D#>, '6')]
-        '''
-        self.fbList.append((bassNote, notationString))
-        if self.addNotationAsLyrics:
-            addLyricsToBassNote(bassNote, notationString)
-    
-    def generateBassLine(self):
-        '''
+        Use this method to add (bassNote, notationString) pairs to the bass line. Elements
+        are realized in the order they are added.
+        
+        
         >>> from music21.figuredBass import realizer
         >>> from music21 import key
         >>> from music21 import meter
@@ -176,19 +209,49 @@ class FiguredBassLine(object):
         >>> fbLine.addElement(note.Note('C#3'), "6")
         >>> fbLine.addElement(note.Note('D#3'), "6")
         >>> #_DOCS_SHOW fbLine.generateBassLine().show()
+        
+        .. image:: images/fbRealizer_bassLine.*
+            :width: 200
+        '''
+        self._fbList.append((bassNote, notationString))
+        addLyricsToBassNote(bassNote, notationString)
+    
+    def generateBassLine(self):
+        '''
+        Generates the bass line as a :class:`~music21.stream.Score`.
+        
+        >>> from music21.figuredBass import realizer
+        >>> from music21 import key
+        >>> from music21 import meter
+        >>> from music21 import note
+        >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
+        >>> fbLine.addElement(note.Note('B2'))
+        >>> fbLine.addElement(note.Note('C#3'), "6")
+        >>> fbLine.addElement(note.Note('D#3'), "6")
+        >>> #_DOCS_SHOW fbLine.generateBassLine().show()
+        
+        .. image:: images/fbRealizer_bassLine.*
+            :width: 200
         '''
         bassLine = stream.Part()
         bassLine.append(copy.deepcopy(self.inTime))
         bassLine.append(key.KeySignature(self.inKey.sharps))
 
         bassLine.append(clef.BassClef())
-        for (bassNote, notationString) in self.fbList:
+        for (bassNote, notationString) in self._fbList:
             bassLine.append(bassNote)
             
         return bassLine
     
     def realize(self, fbRules = rules.Rules(), numParts = 4, maxPitch = pitch.Pitch('B5')):
         '''
+        Creates a :class:`~music21.figuredBass.segment.Segment` for each (bassNote, notationString) pair
+        added through :meth:`~music21.figuredBass.realizer.FiguredBassLine.addElement`. Each Segment is associated
+        with the :class:`~music21.figuredBass.rules.Rules` object provided, meaning that rules are
+        universally applied across all Segments. The number of parts in a realization
+        (including the bass) can be controlled through numParts, and the maximum pitch present can
+        likewise be controlled through maxPitch. Returns a :class:`~music21.figuredBass.realizer.Realization`.
+        
         >>> from music21.figuredBass import realizer
         >>> from music21.figuredBass import rules
         >>> from music21 import key
@@ -199,15 +262,17 @@ class FiguredBassLine(object):
         >>> fbLine.addElement(note.Note('C#3'), "6")
         >>> fbLine.addElement(note.Note('D#3'), "6")
         >>> fbRules = rules.Rules()
-        >>> fbLine.realize(fbRules).getNumSolutions()
+        >>> r1 = fbLine.realize(fbRules)
+        >>> r1.getNumSolutions()
         208
         >>> fbRules.forbidVoiceOverlap = False
-        >>> fbLine.realize(fbRules).getNumSolutions()
+        >>> r2 = fbLine.realize(fbRules)
+        >>> r2.getNumSolutions()
         7908
         '''
         segmentList = []
-        for (bassNote, notationString) in self.fbList:
-            correspondingSegment = segment.Segment(bassNote, notationString, self.fbScale, fbRules, numParts, maxPitch)
+        for (bassNote, notationString) in self._fbList:
+            correspondingSegment = segment.Segment(bassNote, notationString, self._fbScale, fbRules, numParts, maxPitch)
             segmentList.append(correspondingSegment)
 
         for segmentIndex in range(len(segmentList) - 1):
@@ -219,19 +284,20 @@ class FiguredBassLine(object):
             for (possibA, possibB) in listAB:
                 segmentA.movements[possibA].append(possibB)
 
-        self.trimAllMovements(segmentList)
-        return Realization(segmentList, self.inKey, self.inTime)
+        self._trimAllMovements(segmentList)
+        return Realization(realizedSegmentList = segmentList, inKey = self.inKey, inTime = self.inTime)
 
     def generateRandomRealization(self):         
         '''
-        Generates a random realization of a figured bass as a music21.stream Score, 
+        Generates a random realization of a figured bass as a :class:`~music21.stream.Score`, 
         with the default rules set and a soprano line limited to stepwise motion.
         
-        This method exists for backwards compatibility. Instead, use the realize()
-        method which returns a Resolution. Then, call generateRandomRealization() on
-        the Resolution.
+        
+        .. note:: Deprecated. Use :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`
+        which returns a :class:`~music21.figuredBass.realizer.Realization`. Then, call :meth:`~music21.figuredBass.realizer.Realization.generateRandomRealization`.
         '''
-        warnings.warn("The method generateRandomRealization() is deprecated. Use realize() instead and call generateRandomRealization() on the result.", DeprecationWarning)
+        _environRules = environment.Environment(_MOD)
+        _environRules.warn("The method generateRandomRealization() is deprecated. Use realize() instead and call generateRandomRealization() on the result.", DeprecationWarning)
         fbRules = rules.Rules()
         fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]        
         return self.realize(fbRules).generateRandomRealization()
@@ -241,11 +307,13 @@ class FiguredBassLine(object):
         Displays a random realization of a figured bass as a musicxml in external software, 
         with the default rules set and a soprano line limited to stepwise motion.
         
-        This method exists for backwards compatibility. Instead, use the realize()
-        method which returns a Resolution. Then, call generateRandomRealization().show()
-        on the Resolution.
+        
+        .. note:: Deprecated. Use :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`
+        which returns a :class:`~music21.figuredBass.realizer.Realization`. Then, call :meth:`~music21.figuredBass.realizer.Realization.generateRandomRealization`
+        followed by a call to :meth:`~music21.base.Music21Object.show`.
         '''
-        warnings.warn("The method showRandomRealization() is deprecated. Use realize() instead and call generateRandomRealization().show() on the result.", DeprecationWarning)
+        _environRules = environment.Environment(_MOD)
+        _environRules.warn("The method showRandomRealization() is deprecated. Use realize() instead and call generateRandomRealization().show() on the result.", DeprecationWarning)
         fbRules = rules.Rules()
         fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]
         return self.realize(fbRules).generateRandomRealization().show()
@@ -255,19 +323,32 @@ class FiguredBassLine(object):
         Displays all realizations of a figured bass as a musicxml in external software, 
         with the default rules set and a soprano line limited to stepwise motion.
         
-        This method exists for backwards compatibility. Instead, use the realize()
-        method which returns a Resolution. Then, call generateAllRealizations().show()
-        on the Resolution.
         
-        fbRules = rules.Rules()
-        fbRules.partMovementLimits = [(1,2),(2,12),(3,12)
+        .. note:: Deprecated. Use :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`
+        which returns a :class:`~music21.figuredBass.realizer.Realization`. Then, call :meth:`~music21.figuredBass.realizer.Realization.generateAllRealizations`
+        followed by a call to :meth:`~music21.base.Music21Object.show`.
+        
+
+        .. warning:: This method is unoptimized, and may take a prohibitive amount
+        of time for a Realization which has more than tens of unique realizations.
         '''
-        warnings.warn("The method showAllRealizations() is deprecated. Use realize() instead and call generateAllRealizations().show() on the result.", DeprecationWarning)
+        _environRules = environment.Environment(_MOD)
+        _environRules.warn("The method showAllRealizations() is deprecated. Use realize() instead and call generateAllRealizations().show() on the result.", DeprecationWarning)
         fbRules = rules.Rules()
         fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]
         return self.realize(fbRules).generateAllRealizations().show()
     
-    def trimAllMovements(self, segmentList):
+    def _trimAllMovements(self, segmentList):
+        '''
+        Each :class:`~music21.figuredBass.segment.Segment` which resolves to another
+        defines a list of movements, nextMovements. Keys for nextMovements are correct
+        single possibilities of the current Segment. For a given key, a value is a list
+        of correct single possibilities in the subsequent Segment representing acceptable
+        movements between the two. There may be movements in a string of Segments which
+        directly or indirectly lead nowhere. This method is designed to be called on
+        a list of Segments **after** movements are found, as happens in 
+        :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`.
+        '''
         segmentList.reverse()
         for segmentIndex in range(1, len(segmentList) - 1):
             movementsAB = segmentList[segmentIndex + 1].movements
@@ -289,31 +370,51 @@ class FiguredBassLine(object):
 #FiguredBass = FiguredBassLine
 
 class Realization(object):
+    '''
+    Returned by :class:`~music21.figuredBass.realizer.FiguredBassLine` after calling
+    :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`. Allows for the 
+    retrieval of unique realizations as a :class:`~music21.stream.Score`.
+    
+    
+    See the :mod:`~music21.figuredBass.examples` module for examples of generation
+    of realizations.
+    '''
     _DOC_ORDER = ['getNumSolutions', 'generateRandomRealization', 'generateRandomRealizations', 'generateAllRealizations',
                   'getAllPossibilityProgressions', 'getRandomPossibilityProgression', 'generateRealizationFromPossibilityProgression']
-    def __init__(self, segmentList, inKey, inTime):
-        '''
-        Returned by :class:`~music21.figuredBass.realizer.FiguredBassLine` after calling
-        :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`. Allows for the 
-        retrieval of unique realizations as a :class:`~music21.stream.Score`.
-        '''
-        self.segmentList = segmentList
-        self.inKey = inKey
-        self.inTime = inTime
-        self.keySig = key.KeySignature(self.inKey.sharps)
+    _DOC_ATTR = {'keyboardStyleOutput': '''True by default. If True, generated realizations are represented in keyboard style, with two staves. If False,
+    realizations are represented in chorale style with n staves, where n is the number of parts. SATB if n = 4.'''}
+    def __init__(self, **fbLineOutputs):
+        # fbLineOutputs always will have three elements, checks are for sphinx documentation only.
+        if 'realizedSegmentList' in fbLineOutputs:
+            self._segmentList = fbLineOutputs['realizedSegmentList']
+        if 'inKey' in fbLineOutputs:
+            self._inKey = fbLineOutputs['inKey']
+            self._keySig = key.KeySignature(self._inKey.sharps)
+        if 'inTime' in fbLineOutputs:
+            self._inTime = fbLineOutputs['inTime']
         self.keyboardStyleOutput = True
 
     def getNumSolutions(self):
         '''
         Returns the number of unique realizations for a Realization by calculating
-        the total number of paths through a string of Segment movements. This is 
-        faster and more efficient than compiling each unique realization into a 
-        list, adding it to a master list, and then taking the length of the master list. 
+        the total number of paths through a string of :class:`~music21.figuredBass.segment.Segment`
+        movements. This is faster and more efficient than compiling each unique realization into a 
+        list, adding it to a master list, and then taking the length of the master list.
+        
+        >>> from music21.figuredBass import examples
+        >>> fbLine = examples.exampleB()
+        >>> fbRealization = fbLine.realize()
+        >>> fbRealization.getNumSolutions()
+        422
+        >>> fbLine2 = examples.exampleC()
+        >>> fbRealization2 = fbLine2.realize()
+        >>> fbRealization2.getNumSolutions()
+        833
         '''
-        self.segmentList.reverse()
+        self._segmentList.reverse()
         pathList = {}
-        for segmentIndex in range(1, len(self.segmentList)):
-            segmentA = self.segmentList[segmentIndex]
+        for segmentIndex in range(1, len(self._segmentList)):
+            segmentA = self._segmentList[segmentIndex]
             newPathList = {}
             if len(pathList.keys()) == 0:
                 for possibA in segmentA.movements.keys():
@@ -329,29 +430,31 @@ class Realization(object):
         numSolutions = 0
         for possibA in pathList.keys():
             numSolutions += pathList[possibA]  
-        self.segmentList.reverse()
+        self._segmentList.reverse()
         return numSolutions
     
     def getAllPossibilityProgressions(self):
         '''
         Compiles each unique possibility progression, a valid progression through
-        a string of Segment instances, adding it to a master list. Returns the 
-        master list.
+        a string of :class:`~music21.figuredBass.segment.Segment` instances, adding 
+        it to a master list. Returns the master list.
 
+        See :mod:`~music21.figuredBass.possibility` for more details on possibilities.
+    
         
         .. warning:: This method is unoptimized, and may take a prohibitive amount
         of time for a Realization which has more than hundreds of thousands of
         unique realizations.
         '''
-        currMovements = self.segmentList[0].movements
+        currMovements = self._segmentList[0].movements
         progressions = []
         for possibA in currMovements.keys():
             possibBList = currMovements[possibA]
             for possibB in possibBList:
                 progressions.append([possibA, possibB])
 
-        for segmentIndex in range(1, len(self.segmentList)-1):
-            currMovements = self.segmentList[segmentIndex].movements
+        for segmentIndex in range(1, len(self._segmentList)-1):
+            currMovements = self._segmentList[segmentIndex].movements
             for progIndex in range(len(progressions)):
                 prog = progressions.pop(0)
                 possibB = prog[-1]
@@ -365,15 +468,17 @@ class Realization(object):
     def getRandomPossibilityProgression(self):
         '''
         Returns a random unique possibility progression, a valid progression
-        through a string of Segment instances.
+        through a string of :class:`~music21.figuredBass.segment.Segment` instances.
+        
+        See :mod:`~music21.figuredBass.possibility` for more details on possibilities.
         '''
         progression = []
-        currMovements = self.segmentList[0].movements
+        currMovements = self._segmentList[0].movements
         prevPossib = random.sample(currMovements.keys(), 1)[0]
         progression.append(prevPossib)
         
-        for segmentIndex in range(0, len(self.segmentList)-1):
-            currMovements = self.segmentList[segmentIndex].movements
+        for segmentIndex in range(0, len(self._segmentList)-1):
+            currMovements = self._segmentList[segmentIndex].movements
             nextPossib = random.sample(currMovements[prevPossib], 1)[0]
             progression.append(nextPossib)
             prevPossib = nextPossib
@@ -382,23 +487,23 @@ class Realization(object):
 
     def generateRealizationFromPossibilityProgression(self, possibilityProgression):
         '''
-        Generates a solution as a stream.Score() given a possibility progression.        
+        Generates a realization as a :class:`~music21.stream.Score` given a possibility progression.        
         '''
         sol = stream.Score()
         
         bassLine = stream.Part()
-        bassLine.append(copy.deepcopy(self.inTime))
-        bassLine.append(copy.deepcopy(self.keySig))
+        bassLine.append(copy.deepcopy(self._inKey))
+        bassLine.append(copy.deepcopy(self._keySig))
         
         if self.keyboardStyleOutput:
             rightHand = stream.Part()
             sol.insert(0, rightHand)
-            rightHand.append(copy.deepcopy(self.inTime))
-            rightHand.append(copy.deepcopy(self.keySig))
+            rightHand.append(copy.deepcopy(self._inKey))
+            rightHand.append(copy.deepcopy(self._keySig))
     
-            for segmentIndex in range(len(self.segmentList)):
+            for segmentIndex in range(len(self._segmentList)):
                 possibA = possibilityProgression[segmentIndex]
-                bassNote = self.segmentList[segmentIndex].bassNote
+                bassNote = self._segmentList[segmentIndex].bassNote
                 bassLine.append(copy.deepcopy(bassNote))  
                 rhPitches = possibA[0:-1]                           
                 rhChord = chord.Chord(rhPitches)
@@ -410,13 +515,13 @@ class Realization(object):
             for partNumber in range(len(possibilityProgression[0]) - 1):
                 fbPart = stream.Part()
                 sol.insert(0, fbPart)
-                fbPart.append(copy.deepcopy(self.inTime))
-                fbPart.append(copy.deepcopy(self.keySig))
+                fbPart.append(copy.deepcopy(self._inKey))
+                fbPart.append(copy.deepcopy(self._keySig))
                 upperParts.append(fbPart)
 
-            for segmentIndex in range(len(self.segmentList)):
+            for segmentIndex in range(len(self._segmentList)):
                 possibA = possibilityProgression[segmentIndex]
-                bassNote = self.segmentList[segmentIndex].bassNote
+                bassNote = self._segmentList[segmentIndex].bassNote
                 bassLine.append(copy.deepcopy(bassNote))  
 
                 for partNumber in range(len(possibA) - 1):
@@ -449,13 +554,13 @@ class Realization(object):
             allSols.insert(0, rightHand)
             
             for possibilityProgression in possibilityProgressions:
-                bassLine.append(copy.deepcopy(self.inTime))
-                bassLine.append(copy.deepcopy(self.keySig))
-                rightHand.append(copy.deepcopy(self.inTime))
-                rightHand.append(copy.deepcopy(self.keySig))
-                for segmentIndex in range(len(self.segmentList)):
+                bassLine.append(copy.deepcopy(self._inKey))
+                bassLine.append(copy.deepcopy(self._keySig))
+                rightHand.append(copy.deepcopy(self._inKey))
+                rightHand.append(copy.deepcopy(self._keySig))
+                for segmentIndex in range(len(self._segmentList)):
                     possibA = possibilityProgression[segmentIndex]
-                    bassNote = self.segmentList[segmentIndex].bassNote
+                    bassNote = self._segmentList[segmentIndex].bassNote
                     bassLine.append(copy.deepcopy(bassNote))  
                     rhPitches = possibA[0:-1]                           
                     rhChord = chord.Chord(rhPitches)
@@ -471,15 +576,15 @@ class Realization(object):
                 upperParts.append(fbPart)
                 
             for possibilityProgression in possibilityProgressions:
-                bassLine.append(copy.deepcopy(self.inTime))
-                bassLine.append(copy.deepcopy(self.keySig))
+                bassLine.append(copy.deepcopy(self._inKey))
+                bassLine.append(copy.deepcopy(self._keySig))
                 for upperPart in upperParts:
-                    upperPart.append(copy.deepcopy(self.inTime))
-                    upperPart.append(copy.deepcopy(self.keySig))
+                    upperPart.append(copy.deepcopy(self._inKey))
+                    upperPart.append(copy.deepcopy(self._keySig))
 
-                for segmentIndex in range(len(self.segmentList)):
+                for segmentIndex in range(len(self._segmentList)):
                     possibA = possibilityProgression[segmentIndex]
-                    bassNote = self.segmentList[segmentIndex].bassNote
+                    bassNote = self._segmentList[segmentIndex].bassNote
                     bassLine.append(copy.deepcopy(bassNote))
                     for partNumber in range(len(possibA) - 1):
                         n1 = note.Note(possibA[partNumber])
@@ -499,15 +604,15 @@ class Realization(object):
         '''
         return self.generateRandomRealizations(1)
 
-    def generateRandomRealizations(self, amountToShow = 20):
+    def generateRandomRealizations(self, amountToGenerate = 20):
         '''
-        Generates *amountToShow* realizations as a :class:`~music21.stream.Score`.
+        Generates *amountToGenerate* realizations as a :class:`~music21.stream.Score`.
         
 
         .. warning:: This method is unoptimized, and may take a prohibitive amount
-        of time if amountToShow is in the hundreds.
+        of time if amountToGenerate is in the hundreds.
         '''
-        if amountToShow > self.getNumSolutions():
+        if amountToGenerate > self.getNumSolutions():
             return self.generateAllRealizations()
         allSols = stream.Score()
         bassLine = stream.Part()
@@ -516,15 +621,15 @@ class Realization(object):
             rightHand = stream.Part()
             allSols.insert(0, rightHand)
             
-            for solutionCounter in range(amountToShow):
-                bassLine.append(copy.deepcopy(self.inTime))
-                bassLine.append(copy.deepcopy(self.keySig))
-                rightHand.append(copy.deepcopy(self.inTime))
-                rightHand.append(copy.deepcopy(self.keySig))
+            for solutionCounter in range(amountToGenerate):
+                bassLine.append(copy.deepcopy(self._inKey))
+                bassLine.append(copy.deepcopy(self._keySig))
+                rightHand.append(copy.deepcopy(self._inKey))
+                rightHand.append(copy.deepcopy(self._keySig))
                 possibilityProgression = self.getRandomPossibilityProgression()
-                for segmentIndex in range(len(self.segmentList)):
+                for segmentIndex in range(len(self._segmentList)):
                     possibA = possibilityProgression[segmentIndex]
-                    bassNote = self.segmentList[segmentIndex].bassNote
+                    bassNote = self._segmentList[segmentIndex].bassNote
                     bassLine.append(copy.deepcopy(bassNote))  
                     rhPitches = possibA[0:-1]                           
                     rhChord = chord.Chord(rhPitches)
@@ -539,17 +644,17 @@ class Realization(object):
                 allSols.insert(0, fbPart)
                 upperParts.append(fbPart)
                 
-            for solutionCounter in range(amountToShow):
-                bassLine.append(copy.deepcopy(self.inTime))
-                bassLine.append(copy.deepcopy(self.keySig))
+            for solutionCounter in range(amountToGenerate):
+                bassLine.append(copy.deepcopy(self._inKey))
+                bassLine.append(copy.deepcopy(self._keySig))
                 for upperPart in upperParts:
-                    upperPart.append(copy.deepcopy(self.inTime))
-                    upperPart.append(copy.deepcopy(self.keySig))
+                    upperPart.append(copy.deepcopy(self._inKey))
+                    upperPart.append(copy.deepcopy(self._keySig))
 
                 possibilityProgression = self.getRandomPossibilityProgression()
-                for segmentIndex in range(len(self.segmentList)):
+                for segmentIndex in range(len(self._segmentList)):
                     possibA = possibilityProgression[segmentIndex]
-                    bassNote = self.segmentList[segmentIndex].bassNote
+                    bassNote = self._segmentList[segmentIndex].bassNote
                     bassLine.append(copy.deepcopy(bassNote))
                     for partNumber in range(len(possibA) - 1):
                         n1 = note.Note(possibA[partNumber])
@@ -563,7 +668,9 @@ class Realization(object):
         allSols.insert(0, bassLine)
         return allSols        
 
-         
+
+_DOC_ORDER = [figuredBassFromStream, figuredBassFromStreamPart, addLyricsToBassNote, FiguredBassLine, Realization]
+
 class FiguredBassLineException(music21.Music21Exception):
     pass
     
