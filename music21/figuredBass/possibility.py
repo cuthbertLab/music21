@@ -70,6 +70,7 @@ import itertools
 import music21
 import unittest
 
+from music21 import chord
 from music21 import interval
 from music21 import pitch
 from music21 import voiceLeading
@@ -195,6 +196,34 @@ def upperPartsWithinLimit(possibA, maxSemitoneSeparation = 12):
     return upperPartsWithinLimit
 
 def pitchesWithinLimit(possibA, maxPitch = pitch.Pitch('B5')):
+    '''
+    Returns True if all pitches in possibA are less than or equal to
+    the maxPitch provided. Comparisons between pitches are done using pitch
+    comparison methods, which are based on pitch space values 
+    (see :class:`~music21.pitch.Pitch`).
+    
+    
+    Used in :class:`~music21.figuredBass.segment.Segment` to filter
+    resolutions of special Segments which can have pitches exceeeding
+    the universal maxPitch of a :class:`~music21.figuredBass.realizer.FiguredBassLine`.
+    
+    
+    >>> from music21.figuredBass import possibility
+    >>> from music21.figuredBass import resolution
+    >>> from music21 import pitch
+    >>> G2 = pitch.Pitch('G2')
+    >>> D4 = pitch.Pitch('D4')
+    >>> F5 = pitch.Pitch('F5')
+    >>> B5 = pitch.Pitch('B5')
+    >>> domPossib = (B5, F5, D4, G2)
+    >>> possibility.pitchesWithinLimit(domPossib)
+    True
+    >>> resPossib = resolution.dominantSeventhToMajorTonic(domPossib)
+    >>> resPossib # Contains C6 > B5
+    (C6, E5, C4, C3)
+    >>> possibility.pitchesWithinLimit(resPossib)
+    False 
+    '''
     for givenPitch in possibA:
         if givenPitch > maxPitch:
             return False
@@ -253,8 +282,8 @@ def parallelFifths(possibA, possibB):
     
     Now, the tenor moves instead to F3. The interval between
     D3 and F3 is a minor third. The bass and tenor parts 
-    don't form parallel fifths. The soprano part doesn't form
-    parallel fifths with either the bass or tenor parts. The
+    don't form parallel fifths. The soprano part forms parallel
+    fifths with neither the bass nor tenor parts. The
     two possibilities, therefore, have no parallel fifths.
     
     
@@ -376,7 +405,7 @@ def hiddenFifth(possibA, possibB):
     
     If sopranoPitchA and bassPitchA in possibA move to a sopranoPitchB
     and bassPitchB in possibB in similar motion, and the simple interval 
-    between sopranoPitchB and bassPitchB is that of a perfect octave, 
+    between sopranoPitchB and bassPitchB is that of a perfect fifth, 
     then this constitutes a hidden octave between the two possibilities.
     
     >>> from music21 import pitch
@@ -526,7 +555,7 @@ def voiceOverlap(possibA, possibB):
 
     
     In the above example, possibA has G4 in the bass and B4 in the soprano.
-    If the bass moves up to C5 in possibB, that would constitute vocice overlap
+    If the bass moves up to C5 in possibB, that would constitute voice overlap
     because the bass in possibB would be higher than the soprano in possibA.
     
     >>> from music21 import pitch
@@ -630,8 +659,6 @@ def partMovementsWithinLimits(possibA, possibB, partMovementLimits = []):
 
 def upperPartsSame(possibA, possibB):
     '''
-    
-    
     Returns True if the upper parts are the same.
     False otherwise.
     
@@ -660,12 +687,14 @@ def upperPartsSame(possibA, possibB):
         
     return True
 
-def couldBeItalianA6Resolution(possibA, possibB):
+def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo = None, restrictDoublings = True):
     '''
-    Returns True if possibA is an Italian A6 chord and 
-    possibB could possibly be an acceptable resolution.
-
-    Doublings are always restricted in this method.
+    Speed-enhanced but designed to stand alone. Returns True if possibA is an Italian A6 chord 
+    and possibB could possibly be an acceptable resolution. If restrictDoublings is set to True,
+    only the tonic can be doubled. Setting restrictDoublings to False opens up the chance
+    that the root or the third can be doubled. Controlled in the :class:`~music21.figuredBass.rules.Rules`
+    object by :attr:`~music21.figuredBass.rules.Rules.restrictDoublingsInItalianA6Resolution`.    
+    
     
     >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
@@ -688,31 +717,94 @@ def couldBeItalianA6Resolution(possibA, possibB):
     >>> possibility.couldBeItalianA6Resolution(possibA1, possibB3)
     True
 
-    Returns False if possibA is not an Italian A6 chord.
-    >>> possibility.couldBeItalianA6Resolution(possibB1, possibB3)
-    False
+
+    A PossibilityException is raised if possibA is not an Italian A6 chord, but this only
+    applies only if threePartChordInfo = None, because otherwise the chord information is 
+    coming from :class:`~music21.figuredBass.segment.Segment` and the fact that possibA is 
+    an It+6 chord is assumed.
+    
+    
     >>> possibA2 = (Gs4, E4, D4, Bb2)
+    >>> possibB2 = (A4, E4, Cs4, A2)
     >>> possibility.couldBeItalianA6Resolution(possibA2, possibB2)
-    False
+    Traceback (most recent call last):
+    PossibilityException: possibA does not spell out an It+6 chord.
+    
     
     The method is called "couldBeItalianA6Resolution" as opposed
     to "isItalianA6Resolution" because it is designed to work in
-    tandem with "parallelOctaves" and "isIncomplete" in a Segment.
-    Consider the following examples with possibA1 above as the
+    tandem with :meth:`~music21.figuredBass.possibility.parallelOctaves`
+    and :meth:`~music21.figuredBass.possibility.isIncomplete` in
+    a Segment. Consider the following examples with possibA1 above as the
     augmented sixth chord to resolve.
-    >>> possibB4 = (A4, D4, D4, A2) #No 3rd
+    
+    
+    >>> possibA1 = (Gs4, D4, D4, Bb2)
+    >>> possibB4 = (A4, D4, D4, A2) # No 3rd
+    >>> possibB5 = (A4, Cs4, Cs4, A2) # No 5th
     >>> possibility.couldBeItalianA6Resolution(possibA1, possibB4)
     True
-    >>> possibB5 = (A4, Cs4, Cs4, A2) #No 5th, parallel octaves
-    >>> possibility.couldBeItalianA6Resolution(possibA1, possibB5)
+    >>> possibility.couldBeItalianA6Resolution(possibA1, possibB5)  # parallel octaves
     True
     
-    >>> D3 = pitch.Pitch('D3')
-    >>> Fs3 = pitch.Pitch('F#3')
-    >>> possibA2 = (Gs4, D4, D3, Bb2)
-    >>> possibB6 = (A4, D4, Fs3, A2)
-    >>> possibility.couldBeItalianA6Resolution(possibA2, possibB6)
+    
+    >>> possibA3 = (Gs4, Gs4, D4, Bb2)
+    >>> possibB6 = (A4, A4, Cs4, A2)
+    >>> possibility.couldBeItalianA6Resolution(possibA3, possibB6, restrictDoublings = True)
+    False
+    >>> possibility.couldBeItalianA6Resolution(possibA3, possibB6, restrictDoublings = False)
     True
+    '''
+    if threePartChordInfo == None:
+        augSixthChord = chord.Chord(possibA)
+        if not augSixthChord.isItalianAugmentedSixth():
+            raise PossibilityException("possibA does not spell out an It+6 chord.")
+        bass = augSixthChord.bass()
+        root = augSixthChord.root()
+        third = augSixthChord.getChordStep(3)
+        fifth = augSixthChord.getChordStep(5)
+        threePartChordInfo = [bass, root, third, fifth]
+            
+    allowedIntervalNames = ['M3','m3','M2','m-2']
+    rootResolved = False
+    [bass, root, third, fifth] = threePartChordInfo
+    for pitchIndex in range(len(possibA)):
+        pitchA = possibA[pitchIndex]
+        pitchB = possibB[pitchIndex]
+        if pitchA.name == fifth.name:
+            if pitchA == pitchB:
+                continue
+            if abs(pitchA.ps - pitchB.ps) > 4.0:
+                return False
+            tt = interval.Interval(pitchA, pitchB)
+            if not tt.directedSimpleName in allowedIntervalNames:
+                return False
+        elif pitchA.name == bass.name and pitchA == bass:
+            if not (pitchA.ps - pitchB.ps) == 1.0:
+                return False
+            i = interval.Interval(pitchA, pitchB)
+            if not i.directedName == 'm-2':
+                return False
+        elif pitchA.name == root.name:
+            if rootResolved == True and restrictDoublings:
+                # there can't be more than one root
+                return False
+            if not (pitchB.ps - pitchA.ps) == 1.0:
+                return False
+            i = interval.Interval(pitchA, pitchB)
+            if not i.directedName == 'm2':
+                return False
+            rootResolved = True
+        elif pitchA.name == third.name:
+            if restrictDoublings:
+                # there can't be more than one third, which is in the bass.
+                return False
+            if not (pitchA.ps - pitchB.ps) == 1.0:
+                return False
+            i = interval.Interval(pitchA, pitchB)
+            if not i.directedName == 'm-2':
+                return False
+
     '''
     # Part 1: Check if possibA is A6 chord, and if it is properly formed.
     bass = possibA[-1]
@@ -727,8 +819,6 @@ def couldBeItalianA6Resolution(possibA, possibB):
         if isAugmentedSixth:
             root = pitchA
             break
-    if root == None:
-        return False
     tonic = bass.transpose('M3')
     #Restrict doublings, It+6
     for pitchIndex in range(len(possibA) - 1):
@@ -737,7 +827,7 @@ def couldBeItalianA6Resolution(possibA, possibB):
         pitchA = possibA[pitchIndex]
         if not pitchA.name == tonic.name:
             return False
-    
+
     #Part 2: If possibA is Italian A6 chord, check that it resolves properly in possibB.
     fifth = root.transpose('m2')
     pairsList = partPairs(possibA, possibB)
@@ -757,6 +847,7 @@ def couldBeItalianA6Resolution(possibA, possibB):
         tt = interval.Interval(tonicA, tonicB)
         if not tt.directedSimpleName in allowedIntervalNames:
             return False
+    '''
     
     return True
 
@@ -786,7 +877,7 @@ def partPairs(possibA, possibB):
     return list(itertools.izip(possibA, possibB))
 
 
-singlePossibilityMethods = [isIncomplete, upperPartsWithinLimit, voiceCrossing]
+singlePossibilityMethods = [voiceCrossing, isIncomplete, upperPartsWithinLimit, pitchesWithinLimit]
 singlePossibilityMethods.sort(None, lambda x: x.__name__)
 consequentPossibilityMethods = [parallelFifths, parallelOctaves, hiddenFifth, hiddenOctave, voiceOverlap, 
                                   partMovementsWithinLimits, upperPartsSame, couldBeItalianA6Resolution]
