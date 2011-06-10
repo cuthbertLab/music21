@@ -52,7 +52,7 @@ class Notation(object):
     by a modifier, or if a stand-alone modifier implies a 3.
     
     
-    * "" or "5" -> "5,3"
+    * None, "" or "5" -> "5,3"
     
             
     * "6" -> "6,3"
@@ -357,7 +357,7 @@ class Figure(object):
                  'modifierString': 'A modifier string associated with an expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
                  'modifier': 'A :class:`~music21.figuredBass.notation.Modifier` associated with an expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.'}
     
-    def __init__(self, number, modifierString = None):
+    def __init__(self, number = 1, modifierString = None):
         self.number = number
         self.modifierString = modifierString
         self.modifier = Modifier(modifierString)
@@ -379,7 +379,7 @@ specialModifiers = {'+' : '#',
 class Modifier(object):
     '''
     Turns a modifierString (a modifier in a :attr:`~music21.figuredBass.notation.Notation.notationColumn`)
-    to an :class:`~music21.pitch.Accidental`.
+    to an :class:`~music21.pitch.Accidental`. A ModifierException is raised if the modifierString is not valid.
     
     
     Accepted inputs are those accepted by Accidental, as well as the following:
@@ -418,7 +418,7 @@ class Modifier(object):
     True
     '''
     _DOC_ATTR = {'modifierString': 'A modifier string associated with an expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'accidental': ' A :class:`~music21.pitch.Accidental` corresponding to :attr:`~music21.figuredBass.notation.Modifier.modifierString`'}
+                 'accidental': ' A :class:`~music21.pitch.Accidental` corresponding to :attr:`~music21.figuredBass.notation.Modifier.modifierString`.'}
 
     def __init__(self, modifierString = None):
         self.modifierString = modifierString
@@ -561,8 +561,7 @@ def convertToPitch(pitchString):
     raise TypeError("Cannot convert " + pitchString + " to a music21 Pitch.")
 
 
-_DOC_ORDER = [Notation, Modifier, Figure]
-#-------------------------------------------------------------------------------
+_DOC_ORDER = [Notation, Figure, Modifier]
 
 class Test(unittest.TestCase):
 
