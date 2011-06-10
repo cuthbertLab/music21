@@ -45,7 +45,7 @@ class Segment(object):
                  'fbRules': 'A deepcopy of the :class:`~music21.figuredBass.rules.Rules` object provided.',
                  }
 
-    def __init__(self, bassNote = note.Note('C3'), notationString = "", fbScale = realizerScale.FiguredBassScale(), fbRules = rules.Rules(), numParts = 4, maxPitch = pitch.Pitch('B5')):
+    def __init__(self, bassNote = note.Note('C3'), notationString = None, fbScale = realizerScale.FiguredBassScale(), fbRules = rules.Rules(), numParts = 4, maxPitch = pitch.Pitch('B5')):
         '''
         A Segment corresponds to a 1:1 realization of a bassNote and notationString of a :class:`~music21.figuredBass.realizer.FiguredBassLine`.
         It is created by passing six arguments: a :class:`~music21.figuredBass.realizerScale.FiguredBassScale`, a bassNote, a notationString,
