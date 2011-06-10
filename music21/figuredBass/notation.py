@@ -142,7 +142,7 @@ class Notation(object):
                  'origModStrings': 'The modifiers associated with the original :attr:`~music21.figuredBass.notation.Notation.notationColumn`, as strings.',
                  'figures': 'A list of :class:`~music21.figuredBass.notation.Figure` objects associated with figures in the expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.'}
     
-    def __init__(self, notationColumn = ""):
+    def __init__(self, notationColumn = None):
         #Parse notation string
         if notationColumn == None:
             notationColumn = ""
@@ -357,7 +357,7 @@ class Figure(object):
                  'modifierString': 'A modifier string associated with an expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
                  'modifier': 'A :class:`~music21.figuredBass.notation.Modifier` associated with an expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.'}
     
-    def __init__(self, number, modifierString=''):
+    def __init__(self, number, modifierString = None):
         self.number = number
         self.modifierString = modifierString
         self.modifier = Modifier(modifierString)
@@ -420,7 +420,7 @@ class Modifier(object):
     _DOC_ATTR = {'modifierString': 'A modifier string associated with an expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
                  'accidental': ' A :class:`~music21.pitch.Accidental` corresponding to :attr:`~music21.figuredBass.notation.Modifier.modifierString`'}
 
-    def __init__(self, modifierString):
+    def __init__(self, modifierString = None):
         self.modifierString = modifierString
         self.accidental = self._toAccidental()
     
