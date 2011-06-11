@@ -65,7 +65,7 @@ def augmentedSixthToDominant(augSixthPossib, augSixthType = None, augSixthChordI
     (A4, E4, C#4, A2)
     >>> #_DOCS_SHOW resolution.showResolutions(frAug6, frRes, grAug6, grRes, swAug6, swRes)
     
-        .. image:: images/fbResolution_a6toV.*
+        .. image:: images/figuredBass/fbResolution_a6toV.*
             :width: 700
 
 
@@ -134,7 +134,7 @@ def augmentedSixthToMajorTonic(augSixthPossib, augSixthType = None, augSixthChor
     (A4, F#4, D4, A2)
     >>> #_DOCS_SHOW resolution.showResolutions(frAug6, frRes, grAug6, grRes, swAug6, swRes)
     
-        .. image:: images/fbResolution_a6toI.*
+        .. image:: images/figuredBass/fbResolution_a6toI.*
             :width: 700
 
 
@@ -204,7 +204,7 @@ def augmentedSixthToMinorTonic(augSixthPossib, augSixthType = None, augSixthChor
     (A4, F4, D4, A2)  
     >>> #_DOCS_SHOW resolution.showResolutions(frAug6, frRes, grAug6, grRes, swAug6, swRes)
 
-        .. image:: images/fbResolution_a6toIm.*
+        .. image:: images/figuredBass/fbResolution_a6toIm.*
             :width: 700
    
     
@@ -272,7 +272,7 @@ def dominantSeventhToMajorTonic(domPossib, resolveV43toI6 = False, domChordInfo 
     (C5, E4, C4, C3)
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA1, resPossibA1)
 
-    .. image:: images/fbResolution_V7toI_1.*
+    .. image:: images/figuredBass/fbResolution_V7toI_1.*
             :width: 150
 
     >>> domPossibA2 = (Bb3, G3, E3, C3)
@@ -281,7 +281,7 @@ def dominantSeventhToMajorTonic(domPossib, resolveV43toI6 = False, domChordInfo 
     (A3, F3, F3, F3)
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA2, resPossibA2)
 
-    .. image:: images/fbResolution_V7toI_2.*
+    .. image:: images/figuredBass/fbResolution_V7toI_2.*
             :width: 150
 
     >>> domPossibA3 = (E5, Bb4, C4, G3)
@@ -293,7 +293,7 @@ def dominantSeventhToMajorTonic(domPossib, resolveV43toI6 = False, domChordInfo 
     (F5, C5, C4, A3)
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA3, resPossibA3a, domPossibA3, resPossibA3b)
 
-    .. image:: images/fbResolution_V7toI_3.*
+    .. image:: images/figuredBass/fbResolution_V7toI_3.*
             :width: 200
     '''
     if domChordInfo == None:
@@ -346,7 +346,7 @@ def dominantSeventhToMinorTonic(domPossib, resolveV43toi6 = False, domChordInfo 
     (C5, E-4, C4, C3)
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA1, resPossibA1)
 
-    .. image:: images/fbResolution_V7toIm_1.*
+    .. image:: images/figuredBass/fbResolution_V7toIm_1.*
             :width: 150
 
     >>> domPossibA2 = (Bb3, G3, E3, C3)
@@ -355,7 +355,7 @@ def dominantSeventhToMinorTonic(domPossib, resolveV43toi6 = False, domChordInfo 
     (A-3, F3, F3, F3)
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA2, resPossibA2)
     
-    .. image:: images/fbResolution_V7toIm_2.*
+    .. image:: images/figuredBass/fbResolution_V7toIm_2.*
             :width: 150
 
     >>> domPossibA3 = (E5, Bb4, C4, G3)
@@ -367,7 +367,7 @@ def dominantSeventhToMinorTonic(domPossib, resolveV43toi6 = False, domChordInfo 
     (F5, C5, C4, A-3)
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA3, resPossibA3a, domPossibA3, resPossibA3b)
 
-    .. image:: images/fbResolution_V7toIm_3.*
+    .. image:: images/figuredBass/fbResolution_V7toIm_3.*
             :width: 200
     '''
     if domChordInfo == None:
@@ -404,7 +404,7 @@ def dominantSeventhToMajorSubmediant(domPossib, domChordInfo = None):
     (C5, E-4, C4, A-2)
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA1, resPossibA1)
 
-    .. image:: images/fbResolution_V7toVI.*
+    .. image:: images/figuredBass/fbResolution_V7toVI.*
             :width: 150
     '''
     if domChordInfo == None:
@@ -441,7 +441,7 @@ def dominantSeventhToMinorSubmediant(domPossib, domChordInfo = None):
     (C5, E4, C4, A2)
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA1, resPossibA1)   
 
-    .. image:: images/fbResolution_V7toVIm.*
+    .. image:: images/figuredBass/fbResolution_V7toVIm.*
             :width: 150 
     '''
     if domChordInfo == None:
@@ -478,7 +478,7 @@ def dominantSeventhToMajorSubdominant(domPossib, domChordInfo = None):
     (C5, F4, C4, A2)
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA1, resPossibA1)    
 
-    .. image:: images/fbResolution_V7toIV.*
+    .. image:: images/figuredBass/fbResolution_V7toIV.*
             :width: 150 
     '''
     if domChordInfo == None:
@@ -514,7 +514,7 @@ def dominantSeventhToMinorSubdominant(domPossib, domChordInfo = None):
     (C5, F4, C4, A-2)
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA1, resPossibA1)
 
-    .. image:: images/fbResolution_V7toIVm.*
+    .. image:: images/figuredBass/fbResolution_V7toIVm.*
             :width: 150     
     '''
     if domChordInfo == None:
@@ -561,7 +561,7 @@ def diminishedSeventhToMajorTonic(dimPossib, doubledRoot = False, dimChordInfo =
     (A4, D4, F#3, D3)
     >>> #_DOCS_SHOW resolution.showResolutions(dimPossibA, resPossibAa, dimPossibA, resPossibAb)
     
-    .. image:: images/fbResolution_vii7toI.*
+    .. image:: images/figuredBass/fbResolution_vii7toI.*
             :width: 200 
     '''
     if dimChordInfo == None:
@@ -608,7 +608,7 @@ def diminishedSeventhToMinorTonic(dimPossib, doubledRoot = False, dimChordInfo =
     (A4, D4, F3, D3)
     >>> #_DOCS_SHOW resolution.showResolutions(dimPossibA, resPossibAa, dimPossibA, resPossibAb)
 
-    .. image:: images/fbResolution_vii7toIm.*
+    .. image:: images/figuredBass/fbResolution_vii7toIm.*
             :width: 200
     '''
     if dimChordInfo == None:
@@ -644,7 +644,7 @@ def diminishedSeventhToMajorSubdominant(dimPossib, dimChordInfo = None):
     (B4, D4, G3, D3)
     >>> #_DOCS_SHOW resolution.showResolutions(dimPossibA, resPossibA)
 
-    .. image:: images/fbResolution_vii7toIV.*
+    .. image:: images/figuredBass/fbResolution_vii7toIV.*
             :width: 150
     '''
     if dimChordInfo == None:
@@ -678,7 +678,7 @@ def diminishedSeventhToMinorSubdominant(dimPossib, dimChordInfo = None):
     (B-4, D4, G3, D3)
     >>> #_DOCS_SHOW resolution.showResolutions(dimPossibA, resPossibA)
 
-    .. image:: images/fbResolution_vii7toIVm.*
+    .. image:: images/figuredBass/fbResolution_vii7toIVm.*
             :width: 150
     '''
     if dimChordInfo == None:
