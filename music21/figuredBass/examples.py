@@ -43,7 +43,7 @@ def exampleA():
     >>> fbLine = examples.exampleA()
     >>> #_DOCS_SHOW fbLine.generateBassLine().show()
     
-    .. image:: images/fbExamples_bassLineA.*
+    .. image:: images/figuredBass/fbExamples_bassLineA.*
             :width: 700
 
     The following is a realization of fbLine in four parts using the default rules set.
@@ -59,7 +59,7 @@ def exampleA():
     360
     >>> #_DOCS_SHOW fbRealization1.generateRandomRealization().show()
     
-    .. image:: images/fbExamples_sol1A.*
+    .. image:: images/figuredBass/fbExamples_sol1A.*
             :width: 700
 
 
@@ -74,7 +74,7 @@ def exampleA():
     3713168
     >>> #_DOCS_SHOW fbRealization2.generateRandomRealization().show()
     
-    .. image:: images/fbExamples_sol2A.*
+    .. image:: images/figuredBass/fbExamples_sol2A.*
         :width: 700
     '''
     s = tinyNotation.TinyNotationStream("C2 D2_6 E2_6 F2_6 C#2_b7,5,3 D2 BB2_#6,5,3 C2_6 AA#2_7,5,#3 BB1_6,4 BB2_7,#5,#3 E1.", "3/2")
@@ -89,7 +89,7 @@ def exampleD():
     >>> fbLine = examples.exampleD()
     >>> #_DOCS_SHOW fbLine.generateBassLine().show()
     
-    .. image:: images/fbExamples_bassLineD.*
+    .. image:: images/figuredBass/fbExamples_bassLineD.*
             :width: 700
 
     The following is a realization of fbLine in four parts using the default rules set.
@@ -105,7 +105,7 @@ def exampleD():
     1560
     >>> #_DOCS_SHOW fbRealization1.generateRandomRealization().show()
 
-    .. image:: images/fbExamples_sol1D.*
+    .. image:: images/figuredBass/fbExamples_sol1D.*
             :width: 700
 
     Now, the restriction on voice overlap is lifted, which is common in keyboard-style
@@ -119,7 +119,7 @@ def exampleD():
     109006
     >>> #_DOCS_SHOW fbRealization2.generateRandomRealization().show()
 
-    .. image:: images/fbExamples_sol2D.*
+    .. image:: images/figuredBass/fbExamples_sol2D.*
             :width: 700
 
     Now, the restriction on voice overlap is reset, but the restriction on the upper parts
@@ -134,7 +134,7 @@ def exampleD():
     >>> fbRealization3.keyboardStyleOutput = False
     >>> #_DOCS_SHOW fbRealization3.generateRandomRealization().show()
     
-    .. image:: images/fbExamples_sol3D.*
+    .. image:: images/figuredBass/fbExamples_sol3D.*
             :width: 700
     '''
     s = tinyNotation.TinyNotationStream("BB4 C#4_#6 D4_6 E2 E#4_7,5,#3 F#2_6,4 F#4_5,#3 G2 E4_6 F#2_6,4 E4_#4,2 D2_6 EE4_7,5,#3 AA2.", "3/4")
@@ -149,7 +149,7 @@ def exampleB():
     >>> fbLine = examples.exampleB()
     >>> #_DOCS_SHOW fbLine.generateBassLine().show()
     
-    .. image:: images/fbExamples_bassLineB.*
+    .. image:: images/figuredBass/fbExamples_bassLineB.*
         :width: 700
 
     First, fbLine is realized with the default rules set.
@@ -160,7 +160,7 @@ def exampleB():
     422
     >>> #_DOCS_SHOW fbRealization1.generateRandomRealization().show()
     
-    .. image:: images/fbExamples_sol1B.*
+    .. image:: images/figuredBass/fbExamples_sol1B.*
         :width: 700
 
 
@@ -176,7 +176,7 @@ def exampleB():
     205054
     >>> #_DOCS_SHOW fbRealization2.generateRandomRealization().show()
 
-    .. image:: images/fbExamples_sol2B.*
+    .. image:: images/figuredBass/fbExamples_sol2B.*
         :width: 700
     '''
     s = tinyNotation.TinyNotationStream("D4 A4_7,5,#3 B-4 F4_6 G4_6 AA4_7,5,#3 D2", "4/4")
@@ -190,7 +190,7 @@ def exampleC():
     >>> fbLine = examples.exampleC()
     >>> #_DOCS_SHOW fbLine.generateBassLine().show()
     
-    .. image:: images/fbExamples_bassLineC.*
+    .. image:: images/figuredBass/fbExamples_bassLineC.*
         :width: 700
 
     First, fbLine is realized with the default rules set.
@@ -201,7 +201,7 @@ def exampleC():
     833
     >>> #_DOCS_SHOW fbRealization1.generateRandomRealization().show()
     
-    .. image:: images/fbExamples_sol1C.*
+    .. image:: images/figuredBass/fbExamples_sol1C.*
         :width: 700
 
 
@@ -219,7 +219,7 @@ def exampleC():
     2427
     >>> #_DOCS_SHOW fbRealization2.generateRandomRealization().show()
     
-    .. image:: images/fbExamples_sol2C.*
+    .. image:: images/figuredBass/fbExamples_sol2C.*
         :width: 700
     '''
     s = tinyNotation.TinyNotationStream("FF#4 GG#4_#6 AA4_6 FF#4 BB4_6,5 C#4_7,5,#3 F#2", "4/4")
@@ -237,7 +237,7 @@ def V43ResolutionExample():
     >>> fbRealization = fbLine.realize()
     >>> #_DOCS_SHOW fbRealization.generateRandomRealization().show()
     
-    .. image:: images/fbExamples_V43.*
+    .. image:: images/figuredBass/fbExamples_V43.*
         :width: 350
     '''
     s = tinyNotation.TinyNotationStream("D2 E2_4,3 D2_5,3 E2_4,3 F#1_6,3", "4/4")
@@ -264,7 +264,7 @@ def viio65ResolutionExample():
     >>> fbRealization = fbLine.realize()
     >>> #_DOCS_SHOW fbRealization.generateRandomRealization().show()
     
-    .. image:: images/fbExamples_vii65.*
+    .. image:: images/figuredBass/fbExamples_vii65.*
         :width: 700
     '''
     s = tinyNotation.TinyNotationStream("D2 E2_6,b5 D2 E2_6,b5 F#1_6", "4/4")
@@ -285,7 +285,7 @@ def augmentedSixthResolutionExample():
     >>> fbRealization = fbLine.realize()
     >>> #_DOCS_SHOW fbRealization.generateRandomRealization().show()
 
-    .. image:: images/fbExamples_a6.*
+    .. image:: images/figuredBass/fbExamples_a6.*
         :width: 700   
     '''
     s = tinyNotation.TinyNotationStream("D4 BB-4_8,#6,3 AA2_# D4 BB-4_#6,4,3 AA2_# D4 BB-4_#6,5,3 AA2_# D4 BB-4_#6,#4,3 AA2_# D4 BB-4_#6,5,3 AA2_6,4", "4/4")
@@ -317,7 +317,7 @@ def italianA6ResolutionExample():
     >>> fbRealization.keyboardStyleOutput = False
     >>> #_DOCS_SHOW fbRealization.generateRandomRealization().show()
     
-    .. image:: images/fbExamples_it+6.*
+    .. image:: images/figuredBass/fbExamples_it+6.*
         :width: 700
     '''
     s = tinyNotation.TinyNotationStream("D4 BB-4_#6,3 AA2_# D4 BB-4_#6,3 AA2_6,4 D4 BB-4_#6,3 AA2_#6,4")
@@ -343,7 +343,7 @@ def twelveBarBlues():
     >>> bluesLine = examples.twelveBarBlues()
     >>> #_DOCS_SHOW bluesLine.generateBassLine().show()
     
-    .. image:: images/fbExamples_bluesBassLine.*
+    .. image:: images/figuredBass/fbExamples_bluesBassLine.*
         :width: 700   
 
     >>> fbRules = rules.Rules()
@@ -354,7 +354,7 @@ def twelveBarBlues():
     2224978 
     >>> #_DOCS_SHOW blRealization.generateRandomRealization().show()
     
-    .. image:: images/fbExamples_twelveBarBlues.*
+    .. image:: images/figuredBass/fbExamples_twelveBarBlues.*
         :width: 700   
     '''
     s = tinyNotation.TinyNotationStream("BB-1 E-1 BB-1 BB-1_7 E-1 E-1 BB-1 BB-1_7 F1_7 G1_6 BB-1 BB-1")
@@ -375,7 +375,7 @@ def generateBoogieVamp(blRealization = None, numRepeats = 5):
     >>> from music21.figuredBass import examples
     >>> #_DOCS_SHOW examples.generateBoogieVamp(numRepeats = 1).show()
     
-    .. image:: images/fbExamples_boogieVamp.*
+    .. image:: images/figuredBass/fbExamples_boogieVamp.*
         :width: 700   
     '''
     if blRealization == None:
@@ -418,7 +418,7 @@ def generateTripletBlues(blRealization = None, numRepeats = 5): #12/8
     >>> from music21.figuredBass import examples
     >>> #_DOCS_SHOW examples.generateTripletBlues(numRepeats = 1).show()
 
-    .. image:: images/fbExamples_tripletBlues.*
+    .. image:: images/figuredBass/fbExamples_tripletBlues.*
         :width: 700   
     '''
     if blRealization == None:
