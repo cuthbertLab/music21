@@ -56,9 +56,15 @@ from music21.features import base as features
 from music21.features import jSymbolic as featuresJSymbolic
 from music21.features import native as featuresNative
 
+from music21.figuredBass import examples as fbExamples
+from music21.figuredBass import fbPitch
 from music21.figuredBass import notation as fbNotation
 from music21.figuredBass import possibility as fbPossibility
+from music21.figuredBass import realizer as fbRealizer
+from music21.figuredBass import realizerScale as fbRealizerScale
 from music21.figuredBass import resolution as fbResolution
+from music21.figuredBass import rules as fbRules
+from music21.figuredBass import segment as fbSegment
 
 from music21 import graph
 from music21 import key
@@ -157,9 +163,15 @@ MODULES = [
     featuresJSymbolic,
     featuresNative,
     
+    fbExamples,
+    fbPitch,
     fbNotation,
     fbPossibility,
+    fbRealizer,
+    fbRealizerScale,
     fbResolution,
+    fbRules,
+    fbSegment,
     
     graph,
     key,
