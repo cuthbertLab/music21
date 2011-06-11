@@ -490,13 +490,13 @@ class Realization(object):
         sol = stream.Score()
         
         bassLine = stream.Part()
-        bassLine.append(copy.deepcopy(self._inKey))
+        bassLine.append(copy.deepcopy(self._inTime))
         bassLine.append(copy.deepcopy(self._keySig))
         
         if self.keyboardStyleOutput:
             rightHand = stream.Part()
             sol.insert(0, rightHand)
-            rightHand.append(copy.deepcopy(self._inKey))
+            rightHand.append(copy.deepcopy(self._inTime))
             rightHand.append(copy.deepcopy(self._keySig))
     
             for segmentIndex in range(len(self._segmentList)):
@@ -513,7 +513,7 @@ class Realization(object):
             for partNumber in range(len(possibilityProgression[0]) - 1):
                 fbPart = stream.Part()
                 sol.insert(0, fbPart)
-                fbPart.append(copy.deepcopy(self._inKey))
+                fbPart.append(copy.deepcopy(self._inTime))
                 fbPart.append(copy.deepcopy(self._keySig))
                 upperParts.append(fbPart)
 
@@ -552,9 +552,9 @@ class Realization(object):
             allSols.insert(0, rightHand)
             
             for possibilityProgression in possibilityProgressions:
-                bassLine.append(copy.deepcopy(self._inKey))
+                bassLine.append(copy.deepcopy(self._inTime))
                 bassLine.append(copy.deepcopy(self._keySig))
-                rightHand.append(copy.deepcopy(self._inKey))
+                rightHand.append(copy.deepcopy(self._inTime))
                 rightHand.append(copy.deepcopy(self._keySig))
                 for segmentIndex in range(len(self._segmentList)):
                     possibA = possibilityProgression[segmentIndex]
@@ -574,10 +574,10 @@ class Realization(object):
                 upperParts.append(fbPart)
                 
             for possibilityProgression in possibilityProgressions:
-                bassLine.append(copy.deepcopy(self._inKey))
+                bassLine.append(copy.deepcopy(self._inTime))
                 bassLine.append(copy.deepcopy(self._keySig))
                 for upperPart in upperParts:
-                    upperPart.append(copy.deepcopy(self._inKey))
+                    upperPart.append(copy.deepcopy(self._inTime))
                     upperPart.append(copy.deepcopy(self._keySig))
 
                 for segmentIndex in range(len(self._segmentList)):
@@ -620,9 +620,9 @@ class Realization(object):
             allSols.insert(0, rightHand)
             
             for solutionCounter in range(amountToGenerate):
-                bassLine.append(copy.deepcopy(self._inKey))
+                bassLine.append(copy.deepcopy(self._inTime))
                 bassLine.append(copy.deepcopy(self._keySig))
-                rightHand.append(copy.deepcopy(self._inKey))
+                rightHand.append(copy.deepcopy(self._inTime))
                 rightHand.append(copy.deepcopy(self._keySig))
                 possibilityProgression = self.getRandomPossibilityProgression()
                 for segmentIndex in range(len(self._segmentList)):
@@ -643,10 +643,10 @@ class Realization(object):
                 upperParts.append(fbPart)
                 
             for solutionCounter in range(amountToGenerate):
-                bassLine.append(copy.deepcopy(self._inKey))
+                bassLine.append(copy.deepcopy(self._inTime))
                 bassLine.append(copy.deepcopy(self._keySig))
                 for upperPart in upperParts:
-                    upperPart.append(copy.deepcopy(self._inKey))
+                    upperPart.append(copy.deepcopy(self._inTime))
                     upperPart.append(copy.deepcopy(self._keySig))
 
                 possibilityProgression = self.getRandomPossibilityProgression()
