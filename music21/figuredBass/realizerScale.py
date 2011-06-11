@@ -40,6 +40,13 @@ class FiguredBassScale(object):
         
         Accepted scale types: major, minor, dorian, phrygian, and hypophrygian.
         A FiguredBassScale is raised if an invalid scale type is provided.
+        
+        >>> from music21.figuredBass import realizerScale
+        >>> fbScale = realizerScale.FiguredBassScale()
+        >>> fbScale.realizerScale
+        <music21.scale.MajorScale C major>
+        >>> fbScale.keySig
+        <music21.key.KeySignature of no sharps or flats>
         '''
         try:
             foo = scaleModes[scaleMode]
@@ -123,7 +130,7 @@ class FiguredBassScale(object):
         Takes in a bassPitch, a notationString, and a maxPitch representing the highest
         possible pitch that can be returned. Returns a sorted list of pitches which
         correspond to the pitches of each specific pitch name found through getPitchNames
-        that fall between the bassPitch and the maxPitch, inclusive.
+        that fall between the bassPitch and the maxPitch, inclusive of both.
 
         >>> from music21.figuredBass import realizerScale
         >>> fbScale = realizerScale.FiguredBassScale()
