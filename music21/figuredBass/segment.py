@@ -79,7 +79,7 @@ class Segment(object):
         self._maxPitch = maxPitch
         self.pitchNamesInChord = fbScale.getPitchNames(self.bassNote.pitch, notationString)
         self.allPitchesAboveBass = getPitches(self.pitchNamesInChord, self.bassNote.pitch, self._maxPitch)
-        self.segmentChord = chord.Chord(self.allPitchesAboveBass)
+        self.segmentChord = chord.Chord(self.allPitchesAboveBass, quarterLength = bassNote.quarterLength)
         self._environRules = environment.Environment(_MOD)
     
     #-------------------------------------------------------------------------------
