@@ -550,7 +550,7 @@ def voiceOverlap(possibA, possibB):
     a lower part in possibA. 
 
 
-        .. image:: images/fbPossib_voiceOverlap.*
+        .. image:: images/figuredBass/fbPossib_voiceOverlap.*
             :width: 75
 
     
