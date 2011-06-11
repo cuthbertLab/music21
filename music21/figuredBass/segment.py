@@ -52,7 +52,7 @@ class Segment(object):
         a :class:`~music21.figuredBass.rules.Rules` object, a number of parts and a maximum pitch. Realizations of a Segment are represented 
         as possibility tuples (see :mod:`~music21.figuredBass.possibility` for more details). 
         
-        Functions in Python's `itertools <http://docs.python.org/library/itertools.html>`_ module are used extensively. Methods 
+        Methods in Python's `itertools <http://docs.python.org/library/itertools.html>`_ module are used extensively. Methods 
         which generate possibilities or possibility progressions return iterators, which are turned into lists in the examples 
         for display purposes only.
         
