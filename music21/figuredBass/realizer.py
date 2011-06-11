@@ -171,8 +171,8 @@ class FiguredBassLine(object):
     '''
     A FiguredBassLine is an interface for realization of a line of (bassNote, notationString) pairs.
     Currently, only 1:1 realization is supported, meaning that every bassNote is realized and the 
-    :attr:`~music21.note.Note.quarterLength` of a realization above a bassNote is identical to that
-    of the bassNote.
+    :attr:`~music21.note.GeneralNote.quarterLength` or duration of a realization above a bassNote 
+    is identical to that of the bassNote.
     '''
     _DOC_ORDER = ['addElement', 'generateBassLine', 'realize']
     _DOC_ATTR = {'inKey': 'A :class:`~music21.key.Key` which implies a scale value, scale mode, and key signature for a :class:`~music21.figuredBass.realizerScale.FiguredBassScale`.',
@@ -246,10 +246,10 @@ class FiguredBassLine(object):
     def realize(self, fbRules = rules.Rules(), numParts = 4, maxPitch = pitch.Pitch('B5')):
         '''
         Creates a :class:`~music21.figuredBass.segment.Segment` for each (bassNote, notationString) pair
-        added through :meth:`~music21.figuredBass.realizer.FiguredBassLine.addElement`. Each Segment is associated
+        added using :meth:`~music21.figuredBass.realizer.FiguredBassLine.addElement`. Each Segment is associated
         with the :class:`~music21.figuredBass.rules.Rules` object provided, meaning that rules are
         universally applied across all Segments. The number of parts in a realization
-        (including the bass) can be controlled through numParts, and the maximum pitch present can
+        (including the bass) can be controlled through numParts, and the maximum pitch can
         likewise be controlled through maxPitch. Returns a :class:`~music21.figuredBass.realizer.Realization`.
         
         >>> from music21.figuredBass import realizer
@@ -290,7 +290,7 @@ class FiguredBassLine(object):
     def generateRandomRealization(self):         
         '''
         Generates a random realization of a figured bass as a :class:`~music21.stream.Score`, 
-        with the default rules set and a soprano line limited to stepwise motion.
+        with the default rules set **and** a soprano line limited to stepwise motion.
         
         
         .. note:: Deprecated. Use :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`
@@ -305,7 +305,7 @@ class FiguredBassLine(object):
     def showRandomRealization(self):         
         '''
         Displays a random realization of a figured bass as a musicxml in external software, 
-        with the default rules set and a soprano line limited to stepwise motion.
+        with the default rules set **and** a soprano line limited to stepwise motion.
         
         
         .. note:: Deprecated. Use :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`
@@ -321,7 +321,7 @@ class FiguredBassLine(object):
     def showAllRealizations(self):
         '''
         Displays all realizations of a figured bass as a musicxml in external software, 
-        with the default rules set and a soprano line limited to stepwise motion.
+        with the default rules set **and** a soprano line limited to stepwise motion.
         
         
         .. note:: Deprecated. Use :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`
@@ -373,11 +373,16 @@ class Realization(object):
     '''
     Returned by :class:`~music21.figuredBass.realizer.FiguredBassLine` after calling
     :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`. Allows for the 
-    retrieval of unique realizations as a :class:`~music21.stream.Score`.
+    generation of realizations as a :class:`~music21.stream.Score`.
     
     
-    See the :mod:`~music21.figuredBass.examples` module for examples of generation
+    See the :mod:`~music21.figuredBass.examples` module for examples on the generation
     of realizations.
+    
+    
+    .. note:: A possibility progression is a valid progression through a string of 
+    :class:`~music21.figuredBass.segment.Segment` instances.
+    See :mod:`~music21.figuredBass.possibility` for more details on possibilities.
     '''
     _DOC_ORDER = ['getNumSolutions', 'generateRandomRealization', 'generateRandomRealizations', 'generateAllRealizations',
                   'getAllPossibilityProgressions', 'getRandomPossibilityProgression', 'generateRealizationFromPossibilityProgression']
@@ -396,7 +401,7 @@ class Realization(object):
 
     def getNumSolutions(self):
         '''
-        Returns the number of unique realizations for a Realization by calculating
+        Returns the number of solutions (unique realizations) to a Realization by calculating
         the total number of paths through a string of :class:`~music21.figuredBass.segment.Segment`
         movements. This is faster and more efficient than compiling each unique realization into a 
         list, adding it to a master list, and then taking the length of the master list.
@@ -435,16 +440,12 @@ class Realization(object):
     
     def getAllPossibilityProgressions(self):
         '''
-        Compiles each unique possibility progression, a valid progression through
-        a string of :class:`~music21.figuredBass.segment.Segment` instances, adding 
+        Compiles each unique possibility progression, adding 
         it to a master list. Returns the master list.
-
-        See :mod:`~music21.figuredBass.possibility` for more details on possibilities.
-    
+        
         
         .. warning:: This method is unoptimized, and may take a prohibitive amount
-        of time for a Realization which has more than hundreds of thousands of
-        unique realizations.
+        of time for a Realization which has more than 200,000 solutions.
         '''
         currMovements = self._segmentList[0].movements
         progressions = []
@@ -467,10 +468,7 @@ class Realization(object):
     
     def getRandomPossibilityProgression(self):
         '''
-        Returns a random unique possibility progression, a valid progression
-        through a string of :class:`~music21.figuredBass.segment.Segment` instances.
-        
-        See :mod:`~music21.figuredBass.possibility` for more details on possibilities.
+        Returns a random unique possibility progression.
         '''
         progression = []
         currMovements = self._segmentList[0].movements
@@ -538,11 +536,11 @@ class Realization(object):
 
     def generateAllRealizations(self):
         '''
-        Generates all realizations as a :class:`~music21.stream.Score`.
+        Generates all unique realizations as a :class:`~music21.stream.Score`.
         
         
         .. warning:: This method is unoptimized, and may take a prohibitive amount
-        of time for a Realization which has more than tens of unique realizations.
+        of time for a Realization which has more than 100 solutions.
         '''
         allSols = stream.Score()
         bassLine = stream.Part()
@@ -600,17 +598,17 @@ class Realization(object):
 
     def generateRandomRealization(self):
         '''
-        Generates a random realization as a :class:`~music21.stream.Score`.
+        Generates a random unique realization as a :class:`~music21.stream.Score`.
         '''
         return self.generateRandomRealizations(1)
 
     def generateRandomRealizations(self, amountToGenerate = 20):
         '''
-        Generates *amountToGenerate* realizations as a :class:`~music21.stream.Score`.
+        Generates *amountToGenerate* unique realizations as a :class:`~music21.stream.Score`.
         
 
         .. warning:: This method is unoptimized, and may take a prohibitive amount
-        of time if amountToGenerate is in the hundreds.
+        of time if amountToGenerate is more than 100.
         '''
         if amountToGenerate > self.getNumSolutions():
             return self.generateAllRealizations()
