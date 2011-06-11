@@ -24,7 +24,7 @@ from start to finish. See :class:`~music21.figuredBass.realizer.FiguredBassLine`
 30
 >>> #_DOCS_SHOW allSols.generateRandomRealizations(14).show()
 
-    .. image:: images/fbRealizer_intro.*
+    .. image:: images/figuredBass/fbRealizer_intro.*
         :width: 500
         
 
@@ -87,7 +87,7 @@ def figuredBassFromStream(streamPart):
     13
     >>> #_DOCS_SHOW fbRealization.generateRandomRealizations(8).show()
     
-    .. image:: images/fbRealizer_fbStreamPart.*
+    .. image:: images/figuredBass/fbRealizer_fbStreamPart.*
         :width: 500
     '''
     sf = streamPart.flat
@@ -149,7 +149,7 @@ def addLyricsToBassNote(bassNote, notationString = None):
     '4'
     >>> #_DOCS_SHOW n1.show()
     
-    .. image:: images/fbRealizer_lyrics.*
+    .. image:: images/figuredBass/fbRealizer_lyrics.*
         :width: 100
     '''
     bassNote.lyrics = []
@@ -210,7 +210,7 @@ class FiguredBassLine(object):
         >>> fbLine.addElement(note.Note('D#3'), "6")
         >>> #_DOCS_SHOW fbLine.generateBassLine().show()
         
-        .. image:: images/fbRealizer_bassLine.*
+        .. image:: images/figuredBass/fbRealizer_bassLine.*
             :width: 200
         '''
         self._fbList.append((bassNote, notationString))
@@ -230,7 +230,7 @@ class FiguredBassLine(object):
         >>> fbLine.addElement(note.Note('D#3'), "6")
         >>> #_DOCS_SHOW fbLine.generateBassLine().show()
         
-        .. image:: images/fbRealizer_bassLine.*
+        .. image:: images/figuredBass/fbRealizer_bassLine.*
             :width: 200
         '''
         bassLine = stream.Part()
