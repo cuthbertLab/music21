@@ -349,17 +349,22 @@ class FiguredBassLine(object):
         a list of Segments **after** movements are found, as happens in 
         :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`.
         '''
-        segmentList.reverse()
-        for segmentIndex in range(1, len(segmentList) - 1):
-            movementsAB = segmentList[segmentIndex + 1].movements
-            movementsBC = segmentList[segmentIndex].movements
-            eliminated = []
-            for (possibB, possibCList) in movementsBC.items():
-                if len(possibCList) == 0:
-                    del movementsBC[possibB]
-            for (possibA, possibBList) in movementsAB.items():
-                movementsAB[possibA] = list(itertools.ifilter(lambda possibB: movementsBC.has_key(possibB), possibBList))
-                
+        if len(segmentList) >= 3:
+            segmentList.reverse()
+            for segmentIndex in range(1, len(segmentList) - 1):
+                movementsAB = segmentList[segmentIndex + 1].movements
+                movementsBC = segmentList[segmentIndex].movements
+                eliminated = []
+                for (possibB, possibCList) in movementsBC.items():
+                    if len(possibCList) == 0:
+                        del movementsBC[possibB]
+                for (possibA, possibBList) in movementsAB.items():
+                    movementsAB[possibA] = list(itertools.ifilter(lambda possibB: movementsBC.has_key(possibB), possibBList))
+        elif len(segmentList) == 2:
+            movementsAB = segmentList[0].movements
+        else:
+            return True
+
         for (possibA, possibBList) in movementsAB.items():
             if len(possibBList) == 0:
                 del movementsAB[possibA]
