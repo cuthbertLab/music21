@@ -55,7 +55,7 @@ def pitchedPhase(cycles=None, show=False):
         sMod.notesAndRests[-1].quarterLength += increment
         
         randInterval = random.randint(-12,12)
-        sMod.transpose(randInterval, inPlace=True)
+        #sMod.transpose(randInterval, inPlace=True)
         sPost.parts[1].append(sMod)
 
 

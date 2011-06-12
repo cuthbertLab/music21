@@ -465,6 +465,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
+    exampleA().realize().generateRandomRealization().show()
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

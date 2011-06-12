@@ -367,6 +367,9 @@ class Stream(music21.Music21Object):
         # a slight performance optimization: not creating unless needed
         if len(self._cache) > 0:
             self._cache = common.defHash()
+        if self.activeSite is not None:
+            self.activeSite._elementsChanged()
+
 
     def _getElements(self):
         # this method is now important, in that it combines self._elements
@@ -485,6 +488,10 @@ class Stream(music21.Music21Object):
         [C, C, C, C, C, C, C, C, C, C, G, G, G, G, G, G, G, G, G, G]
         >>> d.__class__.__name__
         'Part'
+        
+        
+        KNOWN BUG: end elements are not preserved.
+        
         '''
         s = self.__class__()
         s.autoSort = self.autoSort
@@ -745,9 +752,13 @@ class Stream(music21.Music21Object):
             return iMatch[0] # only need first returned index
 
     def remove(self, target, firstMatchOnly=True):
-        '''Remove an object from this Stream. Additionally, this Stream is removed from the object's sites in :class:`~music21.base.DefinedContexts`.
+        '''
+        Remove an object from this Stream. Additionally, this Stream is 
+        removed from the object's sites in :class:`~music21.base.DefinedContexts`.
+
 
         By default, only the first match is removed. This can be adjusted with the `firstMatchOnly` parameters. 
+
 
         >>> from music21 import *
         >>> s = stream.Stream()
@@ -764,6 +775,14 @@ class Stream(music21.Music21Object):
         >>> s.remove(n3)
         >>> [e for e in s] == [n2]
         True
+
+
+        No error is raised if the target is not found.
+        
+
+        >>> s.remove(n3)
+        
+        
         '''
         iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
         match = []
@@ -4829,12 +4848,14 @@ class Stream(music21.Music21Object):
                     # get a new note
                     # we should not continue searching Measures
                     break 
+            returnObj._elementsChanged()
             return returnObj
 
         else:
             for i in posDelete:
                 # removing the note from notes
                 junk = notes.pop(i)
+            notes._elementsChanged()
             return notes
 
 
@@ -5196,26 +5217,26 @@ class Stream(music21.Music21Object):
         >>> r.flat[124].offset
         444.0
         '''
-#         reCache = False
-#         if self._cache["flat"] == None:
-#             reCache = True
-#         # see if the ached Stream has cahced elements: if not, this
-#         # likely means that they have changed and that that Stream is no 
-#         # longer a good cached stream
-#         elif len(self._cache["flat"]._cache) == 0:
-#             reCache = True
+#        reCache = False
+#        if self._cache["flat"] == None:
+#            reCache = True
+#        # see if the cached Stream has cached elements: if not, this
+#        # likely means that they have changed and that that Stream is no 
+#        # longer a good cached stream
+#        elif len(self._cache["flat"]._cache) == 0:
+#            reCache = True
+#
+#        if reCache:
+#            #environLocal.printDebug(['reCache: flat', reCache, 'self', self])
+##            if self.isFlat:
+##                self._cache["flat"] = self
+##            else:
+#                self._cache["flat"] = self._getFlatOrSemiFlat(
+#                retainContainers=False)
+#
+#        #environLocal.printDebug(['cached: flat', self._cache["flat"], id(self._cache["flat"]), 'len', len(self._cache["flat"])])
 # 
-#         if reCache:
-#             #environLocal.printDebug(['reCache: flat', reCache, 'self', self])
-#             if self.isFlat:
-#                 self._cache["flat"] = self
-#             else:
-#                 self._cache["flat"] = self._getFlatOrSemiFlat(
-#                 retainContainers=False)
-# 
-#         #environLocal.printDebug(['cached: flat', self._cache["flat"], id(self._cache["flat"]), 'len', len(self._cache["flat"])])
-# 
-#         return self._cache["flat"]
+#        return self._cache["flat"]
 
         return self._getFlatOrSemiFlat(retainContainers=False)
 
@@ -6050,9 +6071,15 @@ class Stream(music21.Music21Object):
 
     def sliceByQuarterLengths(self, quarterLengthList, target=None, 
         addTies=True, inPlace=False):
-        '''Slice all :class:`~music21.duration.Duration` objects on all Notes of this Stream. Duration are sliced according to values provided in `quarterLengthList` list. If the sum of these values is less than the Duration, the values are accumulated in a loop to try to fill the Duration. If a match cannot be found, an Exception is raised. 
+        '''
+        Slice all :class:`~music21.duration.Duration` objects on all Notes of this Stream. 
+        Duration are sliced according to values provided in `quarterLengthList` list. 
+        If the sum of these values is less than the Duration, the values are accumulated 
+        in a loop to try to fill the Duration. If a match cannot be found, an 
+        Exception is raised. 
 
-        If `target` == None, the entire Stream is processed. Otherwise, only the element specified is manipulated. 
+        If `target` == None, the entire Stream is processed. Otherwise, only the element 
+        specified is manipulated. 
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -6064,12 +6091,14 @@ class Stream(music21.Music21Object):
             for m in returnObj.getElementsByClass('Measure'):
                 m.sliceByQuarterLengths(quarterLengthList, 
                     target=target, addTies=addTies, inPlace=True)
+            returnObj._elementsChanged()
             return returnObj # exit
 
         if returnObj.hasPartLikeStreams():
             for p in returnObj.getElementsByClass('Part'):
                 p.sliceByQuarterLengths(quarterLengthList, 
                     target=target, addTies=addTies, inPlace=True)
+            returnObj._elementsChanged()
             return returnObj # exit
     
         if not common.isListLike(quarterLengthList):
@@ -6115,6 +6144,7 @@ class Stream(music21.Music21Object):
                 returnObj.insert(oInsert, eNew)
                 oInsert += eNew.quarterLength
 
+        returnObj._elementsChanged()
         return returnObj
 
 
@@ -6132,6 +6162,7 @@ class Stream(music21.Music21Object):
             # call on component measures
             for m in returnObj.getElementsByClass('Measure'):
                 m.sliceByGreatestDivisor(addTies=addTies, inPlace=True)
+            returnObj._elementsChanged()
             return returnObj # exit
     
         uniqueQuarterLengths = []
@@ -6147,7 +6178,8 @@ class Stream(music21.Music21Object):
         # process in place b/c a copy, if necessary, has already been made                            
         returnObj.sliceByQuarterLengths(quarterLengthList=[divisor],
             target=None, addTies=addTies, inPlace=True)
-
+        
+        returnObj._elementsChanged()
         return returnObj
 
 
@@ -6763,7 +6795,7 @@ class Stream(music21.Music21Object):
                 vGroups.append(sortedSelf)
 
         for v in vGroups:
-            for e in v._elements:
+            for e in v.elements:
                 if (lastWasNone is False and skipGaps is False and 
                     e.offset > lastEnd):
                     if not noNone:
@@ -8616,7 +8648,8 @@ class Score(Stream):
                     m = p # treat the entire part as one measure
                 m.sliceByQuarterLengths(quarterLengthList=[divisor],
                     target=None, addTies=addTies, inPlace=True)
-
+        
+        returnObj._elementsChanged()
         return returnObj
 
 
@@ -8669,6 +8702,7 @@ class Score(Stream):
         post = returnObj.flat.makeChords(includePostWindow=True, 
             removeRedundantPitches=True,
             gatherArticulations=True, gatherExpressions=True, inPlace=True)
+        post._elementsChanged()
         return post
 
     def partsToVoices(self, voiceAllocation=2, permitOneVoicePerPart=False):
@@ -10654,9 +10688,9 @@ class Test(unittest.TestCase):
         post = s2.flat.getElementAtOrBefore(0, [clef.Clef])
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
-        # s1 is in s2; but s1.flat is not in s2!
+        # s1 is in s2; but s1.flat is not in s2! -- not true if isFlat is true
         self.assertEqual(s2.getOffsetByElement(s1), 0.0)
-        self.assertEqual(s2.getOffsetByElement(s1.flat), None)
+        #  self.assertEqual(s2.getOffsetByElement(s1.flat), None)  == 0.0
 
 
         # this does not work; the clef is in s2; its not in a context of s2
@@ -13264,7 +13298,7 @@ class Test(unittest.TestCase):
         s = copy.deepcopy(sSrc)
         for p in s.parts:
             p.sliceByGreatestDivisor(inPlace=True, addTies=True)
-            p.makeBeams(inPlace=True)
+            #p.makeBeams(inPlace=True)  # uncomment when debugging, otherwise just slows down the test
         #s.show()
         # parts have different numbers of notes, as splitting is done on 
         # a note per note basis
@@ -13379,11 +13413,10 @@ class Test(unittest.TestCase):
         self.assertEqual([e.offset for e in post.parts[0].flat.notesAndRests], [0.0, 3.0, 3.5, 4.5, 5.0, 6.0, 6.5, 7.5, 8.5, 9.0, 10.5, 12.0, 15.0, 16.5, 17.5, 18.0, 18.5, 19.0, 19.5, 20.0, 20.5, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 30.0, 33.0, 34.5, 35.5, 36.0, 37.5, 38.0, 39.0, 40.0, 41.0, 42.0, 43.5, 45.0, 45.5, 46.5, 47.0, 48.0, 49.5, 51.0, 51.5, 52.0, 52.5, 53.0, 53.5, 54.0, 55.5, 57.0, 58.5])
 
         post = post.chordify()
-        self.assertEqual([e.offset for e in post.notesAndRests], [0.0, 3.0, 3.5, 4.5, 5.0, 5.5, 6.0, 6.5, 7.5, 8.5, 9.0, 10.5, 12.0, 15.0, 16.5, 17.5, 18.0, 18.5, 19.0, 19.5, 20.0, 20.5, 21.0, 21.5, 22.0, 22.5, 23.0, 23.5, 24.0, 24.5, 25.0, 25.5, 26.0, 26.5, 27.0, 30.0, 33.0, 34.5, 35.5, 36.0, 37.5, 38.0, 39.0, 40.0, 40.5, 41.0, 42.0, 43.5, 45.0, 45.5, 46.0, 46.5, 47.0, 47.5, 48.0, 49.5, 51.0, 51.5, 52.0, 52.5, 53.0, 53.5, 54.0, 54.5, 55.0, 55.5, 56.0, 56.5, 57.0, 58.5, 59.5])
+        self.assertEqual([e.offset for e in post.notes], [0.0, 3.0, 3.5, 4.5, 5.0, 5.5, 6.0, 6.5, 7.5, 8.5, 9.0, 10.5, 12.0, 15.0, 16.5, 17.5, 18.0, 18.5, 19.0, 19.5, 20.0, 20.5, 21.0, 21.5, 22.0, 22.5, 23.0, 23.5, 24.0, 24.5, 25.0, 25.5, 26.0, 26.5, 27.0, 30.0, 33.0, 34.5, 35.5, 36.0, 37.5, 38.0, 39.0, 40.0, 40.5, 41.0, 42.0, 43.5, 45.0, 45.5, 46.0, 46.5, 47.0, 47.5, 48.0, 49.5, 51.0, 51.5, 52.0, 52.5, 53.0, 53.5, 54.0, 54.5, 55.0, 55.5, 56.0, 56.5, 57.0, 58.5, 59.5])
+        self.assertEqual(len(post.getElementsByClass('Chord')), 71)  # Careful! one version of the caching is screwing up m. 20 which definitely should not have rests in it -- was creating 69 notes, not 71.
 
-        self.assertEqual(len(post.getElementsByClass('Chord')), 71)
-
-# this is not write [0.0, 6.0, 6.5, 7.5, 8.0, 8.5, 12.0, 12.5, 13.5, 14.5, 18.0, 19.5, 24.0, 30.0, 31.5, 32.5, 36.0, 36.5, 37.0, 37.5, 38.0, 38.5, 42.0, 42.5, 43.0, 43.5, 44.0, 44.5, 48.0, 48.5, 49.0, 49.5, 50.0, 50.5, 54.0, 60.0, 66.0, 67.5, 68.5, 72.0, 73.5, 74.0, 78.0, 79.0, 79.5, 80.0, 84.0, 85.5, 90.0, 90.5, 91.0, 91.5, 92.0, 92.5, 96.0, 97.5, 102.0, 102.5, 103.0, 103.5, 104.0, 104.5, 108.0, 108.5, 109.0, 109.5, 110.0, 110.5, 114.0, 115.5, 116.5] 
+# this is not right [0.0, 6.0, 6.5, 7.5, 8.0, 8.5, 12.0, 12.5, 13.5, 14.5, 18.0, 19.5, 24.0, 30.0, 31.5, 32.5, 36.0, 36.5, 37.0, 37.5, 38.0, 38.5, 42.0, 42.5, 43.0, 43.5, 44.0, 44.5, 48.0, 48.5, 49.0, 49.5, 50.0, 50.5, 54.0, 60.0, 66.0, 67.5, 68.5, 72.0, 73.5, 74.0, 78.0, 79.0, 79.5, 80.0, 84.0, 85.5, 90.0, 90.5, 91.0, 91.5, 92.0, 92.5, 96.0, 97.5, 102.0, 102.5, 103.0, 103.5, 104.0, 104.5, 108.0, 108.5, 109.0, 109.5, 110.0, 110.5, 114.0, 115.5, 116.5] 
 
     def testChordifyRests(self):
         # test that chordify does not choke on rests

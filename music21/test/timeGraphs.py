@@ -40,7 +40,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class CallTest:
+class CallTest(object):
     '''Base class for timed tests
     '''
     def __init__(self):
@@ -332,13 +332,14 @@ class CallGraph:
 
     def __init__(self):
         self.excludeList = ['pycallgraph.*','re.*','sre_*', 'copy*', '*xlrd*']
-        #excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
+        self.excludeList += ['*xmlnode*']
+        #self.excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
 
         # set class  to test here
         #self.callTest = TestMakeTies
         #self.callTest = TestMakeAccidentals
         #self.callTest = TestMusicXMLOutputParts
-        #self.callTest = TestMusicXMLOutputScore
+        self.callTest = TestMusicXMLOutputScore
 
         #self.callTest = TestABCImport
         #self.callTest = TestMetadataBundle
@@ -349,7 +350,6 @@ class CallGraph:
         #self.callTest = TestGetContextByClass
         #self.callTest = TestMakeMeasures
         #self.callTest = TestMusicXMLMultiPartOutput
-        self.callTest = TestMusicXMLOutputScore
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
@@ -370,7 +370,7 @@ class CallGraph:
         pycallgraph.stop_trace()
         pycallgraph.make_dot_graph(fp)
 
-        print('elpased time: %s' % t)
+        print('elapsed time: %s' % t)
         # open the completed file
         environLocal.launch('png', fp)
 
