@@ -275,16 +275,22 @@ class FiguredBassLine(object):
             correspondingSegment = segment.Segment(bassNote, notationString, self._fbScale, fbRules, numParts, maxPitch)
             segmentList.append(correspondingSegment)
 
-        for segmentIndex in range(len(segmentList) - 1):
-            segmentA = segmentList[segmentIndex]
-            segmentB = segmentList[segmentIndex + 1]
-            correctAB = segmentA.allCorrectConsecutivePossibilities(segmentB)
-            segmentA.movements = collections.defaultdict(list)
-            listAB = list(correctAB)
-            for (possibA, possibB) in listAB:
-                segmentA.movements[possibA].append(possibB)
+        if len(segmentList) >= 2:
+            for segmentIndex in range(len(segmentList) - 1):
+                segmentA = segmentList[segmentIndex]
+                segmentB = segmentList[segmentIndex + 1]
+                correctAB = segmentA.allCorrectConsecutivePossibilities(segmentB)
+                segmentA.movements = collections.defaultdict(list)
+                listAB = list(correctAB)
+                for (possibA, possibB) in listAB:
+                    segmentA.movements[possibA].append(possibB)
+            self._trimAllMovements(segmentList)
+        elif len(segmentList) == 1:
+            segmentA = segmentList[0]
+            segmentA.correctA = list(segmentA.allCorrectSinglePossibilities())
+        elif len(segmentList) == 0:
+            raise FiguredBassLineException("No (bassNote, notationString) pairs to realize.")
 
-        self._trimAllMovements(segmentList)
         return Realization(realizedSegmentList = segmentList, inKey = self.inKey, inTime = self.inTime)
 
     def generateRandomRealization(self):         
@@ -349,7 +355,9 @@ class FiguredBassLine(object):
         a list of Segments **after** movements are found, as happens in 
         :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`.
         '''
-        if len(segmentList) >= 3:
+        if len(segmentList) == 1 or len(segmentList) == 2:
+            return True
+        elif len(segmentList) >= 3:
             segmentList.reverse()
             for segmentIndex in range(1, len(segmentList) - 1):
                 movementsAB = segmentList[segmentIndex + 1].movements
@@ -360,17 +368,13 @@ class FiguredBassLine(object):
                         del movementsBC[possibB]
                 for (possibA, possibBList) in movementsAB.items():
                     movementsAB[possibA] = list(itertools.ifilter(lambda possibB: movementsBC.has_key(possibB), possibBList))
-        elif len(segmentList) == 2:
-            movementsAB = segmentList[0].movements
-        else:
-            return True
 
-        for (possibA, possibBList) in movementsAB.items():
-            if len(possibBList) == 0:
-                del movementsAB[possibA]
-                
-        segmentList.reverse()
-        return True
+            for (possibA, possibBList) in movementsAB.items():
+                if len(possibBList) == 0:
+                    del movementsAB[possibA]
+                    
+            segmentList.reverse()
+            return True
 
 #FiguredBass = FiguredBassLine
 
@@ -421,6 +425,9 @@ class Realization(object):
         >>> fbRealization2.getNumSolutions()
         833
         '''
+        if len(self._segmentList) == 1:
+            return len(self._segmentList[0].correctA)
+        # What if there's only one (bassNote, notationString)?
         self._segmentList.reverse()
         pathList = {}
         for segmentIndex in range(1, len(self._segmentList)):
@@ -452,8 +459,13 @@ class Realization(object):
         .. warning:: This method is unoptimized, and may take a prohibitive amount
         of time for a Realization which has more than 200,000 solutions.
         '''
-        currMovements = self._segmentList[0].movements
         progressions = []
+        if len(self._segmentList) == 1:
+            for possibA in self._segmentList[0].correctA:
+                progressions.append([possibA])
+            return progressions
+        
+        currMovements = self._segmentList[0].movements
         for possibA in currMovements.keys():
             possibBList = currMovements[possibA]
             for possibB in possibBList:
@@ -476,6 +488,11 @@ class Realization(object):
         Returns a random unique possibility progression.
         '''
         progression = []
+        if len(self._segmentList) == 1:
+            possibA = random.sample(self._segmentList[0].correctA, 1)[0]
+            progression.append(possibA)
+            return progression
+        
         currMovements = self._segmentList[0].movements
         prevPossib = random.sample(currMovements.keys(), 1)[0]
         progression.append(prevPossib)
