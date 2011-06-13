@@ -252,6 +252,12 @@ class FiguredBassLine(object):
         (including the bass) can be controlled through numParts, and the maximum pitch can
         likewise be controlled through maxPitch. Returns a :class:`~music21.figuredBass.realizer.Realization`.
         
+        
+        If this methods is called without having provided any (bassNote, notationString) pairs,
+        a FiguredBassLineException is raised. If only one pair is provided, the Realization will
+        contain :meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`
+        for the one note.
+        
         >>> from music21.figuredBass import realizer
         >>> from music21.figuredBass import rules
         >>> from music21 import key
