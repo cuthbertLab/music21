@@ -145,7 +145,7 @@ class Stream(music21.Music21Object):
     >>> p1.append(note.Rest()) # quarter rest
     >>> s2 = stream.Stream([c1, n1, p1])
     >>> s2.show('text')
-    {0.0} <music21.clef.TrebleClef object at 0x...>
+    {0.0} <music21.clef.TrebleClef>
     {0.0} <music21.stream.Part embeddedPart>
         {0.0} <music21.note.Rest rest>
     {1.0} <music21.note.Note E->
@@ -912,9 +912,8 @@ class Stream(music21.Music21Object):
                 continue # we never update Spanners
             #environLocal.printDebug(['__deepcopy__ attempt element update for spanners', 'new element', e, 'id(e)', id(e), 'e._idLastDeepCopyOf', e._idLastDeepCopyOf])
             # update based on last id, new object
-            # TODO: possible optimization by looking only elements that have
-            # a spanner in their defined contexts
-            spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
+            if e.hasSpannerSite():
+                spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
 
         return new
 
@@ -2572,6 +2571,9 @@ class Stream(music21.Music21Object):
                 mNew.mergeAttributes(m)
 
                 # replace any spanner associations with this measure
+                # should be able to look ahead, 
+                # but this results in shifted offsets in some cases
+                #if m.hasSpannerSite():
                 spannerBundle.replaceComponent(m, mNew)
 
                 # will only set on first time through
@@ -3079,11 +3081,11 @@ class Stream(music21.Music21Object):
         >>> qj = corpus.parse('ciconia/quod_jactatur').parts[0]
         >>> qj.measures(1,2).show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.clef.Treble8vbClef object at 0x...>
+            {0.0} <music21.clef.Treble8vbClef>
             {0.0} <music21.instrument.Instrument P1: MusicXML Part: Grand Piano>
             {0.0} <music21.key.KeySignature of 1 flat>
             {0.0} <music21.meter.TimeSignature 2/4>
-            {0.0} <music21.layout.SystemLayout object at 0x...>
+            {0.0} <music21.layout.SystemLayout>
             {0.0} <music21.note.Note C>
             {1.5} <music21.note.Note D>
         {2.0} <music21.stream.Measure 2 offset=2.0>
@@ -3097,11 +3099,11 @@ class Stream(music21.Music21Object):
         >>> qj2 = qj.invertDiatonic(note.Note('F4'), inPlace = False)
         >>> qj2.measures(1,2).show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.clef.Treble8vbClef object at 0x...>
+            {0.0} <music21.clef.Treble8vbClef>
             {0.0} <music21.instrument.Instrument P1: MusicXML Part: Grand Piano>
             {0.0} <music21.key.KeySignature of 3 flats>
             {0.0} <music21.meter.TimeSignature 2/4>
-            {0.0} <music21.layout.SystemLayout object at 0x...>
+            {0.0} <music21.layout.SystemLayout>
             {0.0} <music21.note.Note B->
             {1.5} <music21.note.Note A->
         {2.0} <music21.stream.Measure 2 offset=2.0>
@@ -3732,7 +3734,7 @@ class Stream(music21.Music21Object):
         >>> sMeasures.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.meter.TimeSignature 4/4>
-            {0.0} <music21.clef.TrebleClef object at 0x...>
+            {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
             {2.0} <music21.note.Note E>
@@ -3761,7 +3763,7 @@ class Stream(music21.Music21Object):
         >>> sMeasuresTwoFour.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.meter.TimeSignature 2/4>
-            {0.0} <music21.clef.TrebleClef object at 0x...>
+            {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
         {2.0} <music21.stream.Measure 2 offset=2.0>
@@ -3804,7 +3806,7 @@ class Stream(music21.Music21Object):
         >>> partWithMeasures.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.meter.TimeSignature 3/4>
-            {0.0} <music21.clef.TrebleClef object at 0x...>
+            {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.note.Note D#>
         {3.0} <music21.stream.Measure 2 offset=3.0>
             {0.0} <music21.note.Note D#>

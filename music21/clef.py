@@ -44,6 +44,10 @@ class Clef(music21.Music21Object):
         # mxl has an attribute forr clefOctaveChange, and integer to show 
         # transposing clefs
 
+    def __repr__(self):
+        # get just the clef name of this instance
+        return "<music21.clef.%s>" % str(self.__class__).split('.')[-1][:-2]
+
     def _getMX(self):
         '''Given a music21 Clef object, return a MusicXML Clef object.
 
@@ -51,6 +55,8 @@ class Clef(music21.Music21Object):
 
         >>> from music21 import *
         >>> b = clef.GClef()
+        >>> b
+        <music21.clef.GClef>
         >>> a = b.mx
         >>> a.get('sign')
         'G'

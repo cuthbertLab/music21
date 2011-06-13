@@ -68,6 +68,8 @@ class SystemLayout(music21.Music21Object):
             if key.lower() == 'isnew':
                 self.isNew = keywords[key]
 
+    def __repr__(self):
+        return "<music21.layout.SystemLayout>"
 
     #---------------------------------------------------------------------------
     def _getMX(self):

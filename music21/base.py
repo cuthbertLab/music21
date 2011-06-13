@@ -237,7 +237,7 @@ class DefinedContexts(object):
         for idKey in self._definedContexts.keys():
             dict = self._definedContexts[idKey]
             new.add(dict['obj'], offset=dict['offset'], timeValue=dict['time'],
-                    idKey=idKey)
+                    idKey=idKey, classString=dict['class'])
         return new
 
     #---------------------------------------------------------------------------
@@ -412,7 +412,8 @@ class DefinedContexts(object):
             return obj
         
 
-    def add(self, obj, offset=None, timeValue=None, idKey=None):
+    def add(self, obj, offset=None, timeValue=None, idKey=None,
+         classString=None):
         '''Add a reference to the DefinedContexts collection. 
         if offset is None, it is interpreted as a context
         if offset is a value, it is intereted as location
@@ -434,6 +435,11 @@ class DefinedContexts(object):
         # a None object will have a key of None
         # do not need to set this as is default
 
+        # get class before getting weak ref
+        if classString is None:
+            if hasattr(obj, 'classes'):
+                classString = obj.classes[0] # get last class
+
         #environLocal.printDebug(['adding obj', obj, idKey])
         objRef = self._prepareObject(obj, isLocation)
 
@@ -451,8 +457,9 @@ class DefinedContexts(object):
             # a known location
 
         dict = {}
-        dict['obj'] = objRef
+        dict['obj'] = objRef # a weak ref
         dict['offset'] = offset # offset can be None for contexts
+        dict['class'] = classString 
 
         # NOTE: this may not give sub-second resolution on some platforms
         if timeValue is None:
@@ -460,9 +467,6 @@ class DefinedContexts(object):
             self._timeIndex += 1 # increment for next usage
         else:
             dict['time'] = timeValue
-
-        # TODO: store id() and class name for matching without unwrapping
-        # weakref!
 
         if updateNotAdd: # add new/missing information to dictionary
             self._definedContexts[idKey].update(dict)
@@ -706,6 +710,35 @@ class DefinedContexts(object):
             if match:
                 found.append(obj)
         return found
+
+
+    def hasSpannerSite(self):
+        '''Return True if this object is found in any Spanner. This is determined by looking for a SpannerStorage Stream class as a Site.
+        '''
+        for idKey in self._locationKeys:
+            if self._definedContexts[idKey]['class'] == 'SpannerStorage':
+                return True
+        return False
+
+# the long way to do this
+#         from music21 import stream
+#         for idKey in self._locationKeys:
+#             objRef = self._definedContexts[idKey]['obj']
+#             if objRef is None:
+#                 continue
+#             if not WEAKREF_ACTIVE: 
+#                 obj = objRef
+#             else:
+#                 obj = common.unwrapWeakref(objRef)
+#             if obj is None:
+#                 continue
+#             if hasattr(obj, 'classes'):
+#                 if 'SpannerStorage' in obj.classes:
+#                     return True
+#             elif isinstance(obj, stream.SpannerStorage):
+#                 return True
+#         return False
+
 
     def isSite(self, obj):
         '''Given an object, determine if it is a site stored in this DefinedContexts. This will return False if the object is simply a context and not a location
@@ -1677,8 +1710,8 @@ class Music21Object(JSONSerializer):
         ...    if 'GClef' in t.classes and 'TrebleClef' not in t.classes:
         ...        s2.insert(t)
         >>> s2.show('text')
-        {10.0} <music21.clef.GClef object at 0x...>
-        {30.0} <music21.clef.FrenchViolinClef object at 0x...>    
+        {10.0} <music21.clef.GClef>
+        {30.0} <music21.clef.FrenchViolinClef>    
         ''')
     
     #---------------------------------------------------------------------------
@@ -1916,6 +1949,27 @@ class Music21Object(JSONSerializer):
                 post.append(obj)
         return post
 
+    def hasSpannerSite(self):
+        '''Return True if this object is found in any Spanner. This is determined by looking for a SpannerStorage Stream class as a Site.
+
+        >>> from music21 import *
+        >>> n1 = note.Note()
+        >>> n2 = note.Note()
+        >>> n3 = note.Note()
+        >>> sp1 = spanner.Slur(n1, n2)
+        >>> n1.getSpannerSites() == [sp1]
+        True
+        >>> sp2 = spanner.Slur(n2, n1)
+        >>> n1.hasSpannerSite()
+        True
+        >>> n2.hasSpannerSite()
+        True
+        >>> n3.hasSpannerSite()
+        False
+        '''
+        return self._definedContexts.hasSpannerSite()
+
+
     def getSpannerSites(self):
         '''Return a list of all sites that are Spanner or Spanner subclasses. This provides a way for objects to be aware of what Spanners they reside in. Note that Spanners are not Stream subclasses, but Music21Objects that are composed with a specialized Stream subclass, SapnnerStroage
 
@@ -1936,7 +1990,6 @@ class Music21Object(JSONSerializer):
         for obj in found:
             post.append(obj.spannerParent)
         return post
-
 
     def removeLocationBySite(self, site):
         '''Remove a location in the :class:`~music21.base.DefinedContexts` object.
