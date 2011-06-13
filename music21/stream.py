@@ -352,6 +352,19 @@ class Stream(music21.Music21Object):
         >>> a.isFlat
         False
         '''
+        # if this Stream is a flat representation of something, and its 
+        # elements have changed, than we must clear the cache of that 
+        # parent; we can do that by calling _elementsChanged on
+        # flattened representation of
+        if self.flattenedRepresentationOf is not None:
+            self.flattenedRepresentationOf._elementsChanged()
+
+        # may not always need to clear cache of the active site, but may 
+        # be a good idea; may need to intead clear all sites            
+        if self.activeSite is not None:
+            self.activeSite._elementsChanged()
+
+        # clear these attributes for setting later
         self.isSorted = False
         self.isFlat = True
         # do not need to look in _endElements, as no Streams
@@ -367,8 +380,6 @@ class Stream(music21.Music21Object):
         # a slight performance optimization: not creating unless needed
         if len(self._cache) > 0:
             self._cache = common.defHash()
-        if self.activeSite is not None:
-            self.activeSite._elementsChanged()
 
 
     def _getElements(self):
@@ -5012,9 +5023,6 @@ class Stream(music21.Music21Object):
         # note that copy.copy() in some cases seems to not cause secondary
         # problems that self.__class__() does
         sNew = copy.copy(self)
-        #sNew = self.__class__
-
-        # call with container as first arg, not self
         sNew._derivation = derivation.Derivation(sNew)
         sNew.setDerivation(self)
         if retainContainers:
@@ -5079,6 +5087,18 @@ class Stream(music21.Music21Object):
     
 
     def _getFlat(self):
+        reCache = False
+        if self._cache['flat'] is None:
+           reCache = True
+        if reCache:
+           self._cache['flat'] = self._getFlatOrSemiFlat(retainContainers=False)
+        #environLocal.printDebug(['cached: flat', self._cache["flat"], id(self._cache["flat"]), 'len', len(self._cache["flat"])])
+        return self._cache['flat']
+
+        # non cached approach
+        #return self._getFlatOrSemiFlat(retainContainers=False)
+
+    flat = property(_getFlat, doc=
         '''
         A very important read-only property that returns a new Stream 
         that has all sub-containers "flattened" within it,
@@ -5218,31 +5238,7 @@ class Stream(music21.Music21Object):
         125
         >>> r.flat[124].offset
         444.0
-        '''
-#        reCache = False
-#        if self._cache["flat"] == None:
-#            reCache = True
-#        # see if the cached Stream has cached elements: if not, this
-#        # likely means that they have changed and that that Stream is no 
-#        # longer a good cached stream
-#        elif len(self._cache["flat"]._cache) == 0:
-#            reCache = True
-#
-#        if reCache:
-#            #environLocal.printDebug(['reCache: flat', reCache, 'self', self])
-##            if self.isFlat:
-##                self._cache["flat"] = self
-##            else:
-#                self._cache["flat"] = self._getFlatOrSemiFlat(
-#                retainContainers=False)
-#
-#        #environLocal.printDebug(['cached: flat', self._cache["flat"], id(self._cache["flat"]), 'len', len(self._cache["flat"])])
-# 
-#        return self._cache["flat"]
-
-        return self._getFlatOrSemiFlat(retainContainers=False)
-
-    flat = property(_getFlat)
+        ''')
 
 
     def _getSemiFlat(self):
@@ -7849,7 +7845,7 @@ class Measure(Stream):
                     ts = defaultMeters[0]
             m.timeSignature = ts # a Stream; get the first element
 
-        environLocal.printDebug(['have time signature', m.timeSignature])
+        #environLocal.printDebug(['have time signature', m.timeSignature])
         try:
             m.makeBeams(inPlace=True)
         except StreamException:

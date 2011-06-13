@@ -1171,9 +1171,7 @@ def generalNoteToMusicXML(n):
     >>> post[-100:].replace('\\n', '')
     '/type>        <dot/>        <notations/>      </note>    </measure>  </part></score-partwise>'
     '''
-
     from music21 import stream, duration
-
     # make a copy, as we this process will change tuple types
     nCopy = copy.deepcopy(n)
     duration.updateTupletType(nCopy.duration) # modifies in place
@@ -2108,39 +2106,17 @@ def streamPartToMx(part, instObj=None, meterStream=None,
                 measureStream[0].keySignature = outerKeySignatures[0]
 
         # see if accidentals/beams can be processed
-        haveDeepCopy = False
         if not measureStream.haveAccidentalsBeenMade():
             measureStream.makeAccidentals(inPlace=True)
-            #haveDeepCopy = True
-            # must get new spanners
-            #spannerBundle = spanner.SpannerBundle(measureStream.flat)
-            #print measureStream
-
         if not measureStream.haveBeamsBeenMade():
             # if making beams, have to make a deep copy, as modifying notes
             try:
                 measureStream.makeBeams(inPlace=True)
             except: # cannot match StreamException, must catch all
                 pass
-
         if spannerBundle is None:
             spannerBundle = spanner.SpannerBundle(measureStream.flat)
 
-#             try:
-#                 if haveDeepCopy:
-#                     measureStream.makeBeams(inPlace=True)
-#                 else:
-#                     measureStream = measureStream.makeBeams(inPlace=False)
-#                     # must get new spanners
-#                     spannerBundle = spanner.SpannerBundle(measureStream.flat)
-# # 
-# #             # should match stream.StreamException, but was not
-# #             #except stream.StreamException:
-#             except Exception:
-#                 # this is a result of makeMeaures not getting everything 
-#                 # note to measure allocation right
-#                 environLocal.printDebug(['skipping makeBeams exception', 
-#                                         Exception])
 
     # for each measure, call .mx to get the musicxml representation
     for obj in measureStream:
@@ -2435,6 +2411,8 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
         for staffCount in _getUniqueStaffKeys(staffReferenceList):
             partIdStaff = '%s-Staff%s' % (partId, staffCount)
             #environLocal.printDebug(['partIdStaff', partIdStaff])
+            # this deepcopy is necessary, as we will remove components
+            # in each staff that do not belong
             streamPartStaff = copy.deepcopy(streamPart)
             # assign this as a PartStaff, a subclass of Part
             streamPartStaff.__class__ = stream.PartStaff
