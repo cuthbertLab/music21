@@ -1875,7 +1875,7 @@ class Music21Object(JSONSerializer):
         self._definedContexts.add(site, offset)
 
     def getSites(self):
-        '''Return a list of all objects that store a location for this object. Will remove None, the default empty site placeholder. 
+        '''Return a list of all objects that store a location for this object. Will inlcude None, the default empty site placeholder. 
 
         >>> from music21 import note, stream
         >>> s1 = stream.Stream()

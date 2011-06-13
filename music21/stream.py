@@ -361,8 +361,11 @@ class Stream(music21.Music21Object):
 
         # may not always need to clear cache of the active site, but may 
         # be a good idea; may need to intead clear all sites            
-        if self.activeSite is not None:
-            self.activeSite._elementsChanged()
+        #if self.activeSite is not None:
+        #    self.activeSite._elementsChanged()
+        for site in self.getSites():
+            if site is not None:
+                site._elementsChanged()
 
         # clear these attributes for setting later
         self.isSorted = False
@@ -1443,8 +1446,8 @@ class Stream(music21.Music21Object):
             # sites defined by the target and add them to the replacement
             # this would not put them in those locations elements, however
 
-            # remove this location from old; this will also adjust the activeSite
-            # assignment if necessary
+            # remove this location from old; this will also adjust the 
+            # activeSite assignment if necessary
             target.removeLocationBySite(self)
 
         # elements have changed
@@ -3124,7 +3127,13 @@ class Stream(music21.Music21Object):
             {1.0} <music21.note.Note B>
             {1.5} <music21.note.Note A#>
         '''
-        keySigSearch = self.flat.getElementsByClass(key.KeySignature)
+        if inPlace == True:
+            returnStream = self
+        else:
+            returnStream = copy.deepcopy(self)
+
+
+        keySigSearch = returnStream.flat.getElementsByClass(key.KeySignature)
         
         quickSearch = True
         if len(keySigSearch) == 0:
@@ -3134,21 +3143,17 @@ class Stream(music21.Music21Object):
         else:
             quickSearch = False
         
-        if inPlace == True:
-            returnStream = self
-        else:
-            returnStream = copy.deepcopy(self)
-        
-        
         inversionDNN = inversionNote.diatonicNoteNum
         for n in returnStream.flat.notes:
             n.pitch.diatonicNoteNum = (2*inversionDNN) - n.pitch.diatonicNoteNum
             if quickSearch is True:
                 n.pitch.accidental = ourKey.accidentalByStep(n.pitch.step)
             else:
-                n.pitch.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.pitch.step)
+                n.pitch.accidental = n.getContextByClass(
+                    key.KeySignature).accidentalByStep(n.pitch.step)
             if n.pitch.accidental is not None:
                 n.pitch.accidental.displayStatus = None
+
 #            if n.step != 'B':
 #                n.pitch.accidental = None
 #            else:
@@ -4047,6 +4052,9 @@ class Stream(music21.Music21Object):
         else:
             returnObj = self
 
+        # changes elements
+        returnObj._elementsChanged()
+
         #environLocal.printDebug(['makeRests(): object lowestOffset, highestTime', oLow, oHigh])
         if refStreamOrTimeRange == None: # use local
             oLowTarget = 0
@@ -4141,7 +4149,10 @@ class Stream(music21.Music21Object):
             returnObj = self
         if len(returnObj) == 0:
             raise StreamException('cannot process an empty stream')        
-    
+
+        # changes elements
+        returnObj._elementsChanged()
+
         # get measures from this stream
         measureStream = returnObj.getElementsByClass('Measure')
         if len(measureStream) == 0:
@@ -5041,8 +5052,8 @@ class Stream(music21.Music21Object):
         for e in self._elements:
             #environLocal.printDebug(['_getFlatOrSemiFlat', 'processing e:', e])
             # check for stream instance instead
+
             # if this element is a Stream, recurse
-            #if isinstance(e, Stream): 
             if hasattr(e, "elements"): 
                 #environLocal.printDebug(['_getFlatOrSemiFlat', '!!! processing substream:', e])
 
@@ -5054,20 +5065,21 @@ class Stream(music21.Music21Object):
                     # this was the activeSite was the caller; thus, the activeSite here
                     # should not be set
                     sNew.insert(recurseStreamOffset, e, setActiveSite=False)
+                    # this may be a cached version;
                     recurseStream = e.semiFlat
+                    #recurseStream = e._getFlatOrSemiFlat(retainContainers=True)
                 else:
                     recurseStream = e.flat
                 
                 #environLocal.printDebug("recurseStreamOffset: " + str(e.id) + " " + str(recurseStreamOffset))
                 # recurse Stream is the flat or semiFlat contents of a Stream
                 # contained within the caller
-                for subEl in recurseStream:
-                    oldOffset = subEl.getOffsetBySite(recurseStream)
-                    sNew.insert(oldOffset + recurseStreamOffset, subEl)
+                for eSub in recurseStream:
+                    #environLocal.printDebug(['subElement', id(eSub), 'inserted in', sNew, 'id(sNew)', id(sNew)])
 
-                    #environLocal.printDebug(['subElement', id(subEl), 'inserted in', sNew, 'id(sNew)', id(sNew)])
-
-            # if element not a stream
+                    oldOffset = eSub.getOffsetBySite(recurseStream)
+                    sNew.insert(oldOffset + recurseStreamOffset, eSub)
+            # if element not a Stream
             else:
                 # insert into new stream at offset in old stream
                 sNew.insert(e.getOffsetBySite(self), e)
@@ -5242,6 +5254,15 @@ class Stream(music21.Music21Object):
 
 
     def _getSemiFlat(self):
+#         reCache = False
+#         if self._cache['semiFlat'] is None:
+#            reCache = True
+#         if reCache:
+#            self._cache['semiFlat'] = self._getFlatOrSemiFlat(
+#                                     retainContainers=True)
+#         #environLocal.printDebug(['cached: flat', self._cache["flat"], id(self._cache["flat"]), 'len', len(self._cache["flat"])])
+#         return self._cache['semiFlat']
+
         return self._getFlatOrSemiFlat(retainContainers = True)
 
 
@@ -14495,6 +14516,71 @@ class Test(unittest.TestCase):
         #p.show()
         self.assertEqual(p.haveBeamsBeenMade(), False)
         self.assertEqual(raw.find('<beam number="1">end</beam>') > 0, True)
+
+
+
+    def testFlatCachingA(self):
+        from music21 import corpus
+        s = corpus.parse('bwv66.6')
+        flat1 = s.flat
+        flat2 = s.flat
+        self.assertEqual(id(flat1), id(flat2))
+
+        flat1.insert(0, note.Note('g'))
+        self.assertNotEqual(id(flat1), s.flat)
+
+# not yet working
+#         flat1 = s.semiFlat
+#         flat2 = s.semiFlat
+#         self.assertEqual(id(flat1), id(flat2))
+# 
+#         flat1.insert(0, note.Note('g'))
+#         self.assertNotEqual(id(flat1), s.semiFlat)
+
+
+    def testFlatCachingB(self):
+        from music21 import corpus
+        sSrc = corpus.parse('bach/bwv13.6.xml')
+        sPart = sSrc.getElementById('Alto')
+        ts = meter.TimeSignature('6/8')
+
+#         for n in sPart.flat.notesAndRests:
+#             bs = n.beatStr
+
+        environLocal.printDebug(['calling makeMeasures'])
+        sPartFlat = sPart.flat
+        notesAndRests = sPartFlat.notesAndRests
+        sMeasures = sPart.flat.notesAndRests.makeMeasures(ts)
+
+        for n in sMeasures.flat.notesAndRests:
+            bs = n.beatStr
+
+    def testFlatCachingC(self):
+
+        from music21 import corpus, stream, key
+        qj = corpus.parse('ciconia/quod_jactatur').parts[0]
+        idFlat1 = id(qj.flat)
+        environLocal.printDebug(['idFlat1', idFlat1])
+
+        k1 = qj.flat.getElementsByClass(key.KeySignature)[0]
+        qj.flat.replace(k1, key.KeySignature(-3))
+
+        idFlat2 = id(qj.flat)
+        environLocal.printDebug(['idFlat2', idFlat2])
+
+        m1 = qj.getElementsByClass(stream.Measure)[1]
+        #m1.show('t')
+        #m1.insert(0, key.KeySignature(5))
+        qj[1].insert(0, key.KeySignature(5))
+        #qj._elementsChanged()
+        keySigSearch = qj.flat.getElementsByClass(key.KeySignature)
+
+        for n in qj.flat.notes:
+            junk = n.getContextByClass(key.KeySignature)
+            #print junk
+
+        qj2 = qj.invertDiatonic(note.Note('F4'), inPlace = False)
+        qj2.measures(1,2).show('text')
 
 
 
