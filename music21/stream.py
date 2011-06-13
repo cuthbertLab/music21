@@ -6533,7 +6533,9 @@ class Stream(music21.Music21Object):
     def _getMusicXML(self):
         '''Provide a complete MusicXML representation. 
         '''
-        mxScore = self._getMX()
+        # always make a deepcopy before processing musicxml
+        post = copy.deepcopy(self)
+        mxScore = post._getMX()
         return mxScore.xmlStr()
 
     musicxml = property(_getMusicXML,
@@ -8288,7 +8290,8 @@ class Measure(Stream):
     def _getMusicXML(self):
         '''Provide a complete MusicXML representation of the measure. 
         '''
-        return musicxmlTranslate.measureToMusicXML(self)
+        post = copy.deepcopy(self)
+        return musicxmlTranslate.measureToMusicXML(post)
 
     musicxml = property(_getMusicXML)
 
@@ -14440,66 +14443,63 @@ class Test(unittest.TestCase):
         self.assertEqual(raw.find('<beam number="1">begin</beam>') > 0, True)
         self.assertEqual(raw.find('<tuplet bracket="yes" placement="above"') > 0, True)
 
-# TODO: temporarily commented out for other testing
-#     def testHaveAccidentalsBeenMadeA(self):
-#         from music21 import stream
-#         m = stream.Measure()
-#         m.append(note.Note('c#'))
-#         m.append(note.Note('c'))
-#         m.append(note.Note('c#'))
-#         m.append(note.Note('c'))
-#         #m.show() on musicxml output, accidentals will be made
-#         self.assertEqual(m.haveAccidentalsBeenMade(), False)
-#         m.makeAccidentals()
-#         self.assertEqual(m.haveAccidentalsBeenMade(), True)
-# 
-#     def testHaveAccidentalsBeenMadeB(self):
-#         from music21 import stream
-#         m1 = stream.Measure()
-#         m1.repeatAppend(note.Note('c#'), 4)
-#         m2 = stream.Measure()
-#         m2.repeatAppend(note.Note('c'), 4)
-#         p = stream.Part()
-#         p.append([m1, m2])
-#         #p.show()
-#         # test result of xml output to make sure a natural has been hadded
-#         raw = p.musicxml
-#         self.assertEqual(raw.find('<accidental>natural</accidental>') > 0, True)
-#         # make sure original is not chagned
-#         self.assertEqual(p.haveAccidentalsBeenMade(), False)
-# 
-# 
-#     def testHaveBeamsBeenMadeA(self):
-#         from music21 import stream, meter
-#         m1 = stream.Measure()
-#         m1.timeSignature = meter.TimeSignature('4/4')
-#         m1.repeatAppend(note.Note('c#', quarterLength=.5), 8)
-#         m2 = stream.Measure()
-#         m2.repeatAppend(note.Note('c', quarterLength=.5), 8)
-#         p = stream.Part()
-#         p.append([m1, m2])
-#         self.assertEqual(p.haveBeamsBeenMade(), False)
-#         p.makeBeams(inPlace=True)
-#         self.assertEqual(p.haveBeamsBeenMade(), True)
-# 
-#         #p.show()
-# 
-#     def testHaveBeamsBeenMadeA(self):
-#         from music21 import stream, meter
-#         m1 = stream.Measure()
-#         m1.timeSignature = meter.TimeSignature('4/4')
-#         m1.repeatAppend(note.Note('c#', quarterLength=.5), 8)
-#         m2 = stream.Measure()
-#         m2.repeatAppend(note.Note('c', quarterLength=.5), 8)
-#         p = stream.Part()
-#         p.append([m1, m2])
-#         self.assertEqual(p.haveBeamsBeenMade(), False)
-#         raw = p.musicxml
-#         # after getting musicxml, make sure that we have not changed the source
-#         #p.show()
-#         self.assertEqual(p.haveBeamsBeenMade(), False)
-#         self.assertEqual(raw.find('<beam number="1">end</beam>') > 0, True)
-# 
+    def testHaveAccidentalsBeenMadeA(self):
+        from music21 import stream
+        m = stream.Measure()
+        m.append(note.Note('c#'))
+        m.append(note.Note('c'))
+        m.append(note.Note('c#'))
+        m.append(note.Note('c'))
+        #m.show() on musicxml output, accidentals will be made
+        self.assertEqual(m.haveAccidentalsBeenMade(), False)
+        m.makeAccidentals()
+        self.assertEqual(m.haveAccidentalsBeenMade(), True)
+ 
+    def testHaveAccidentalsBeenMadeB(self):
+        from music21 import stream
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note('c#'), 4)
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note('c'), 4)
+        p = stream.Part()
+        p.append([m1, m2])
+        #p.show()
+        # test result of xml output to make sure a natural has been hadded
+        raw = p.musicxml
+        self.assertEqual(raw.find('<accidental>natural</accidental>') > 0, True)
+        # make sure original is not chagned
+        self.assertEqual(p.haveAccidentalsBeenMade(), False)
+
+    def testHaveBeamsBeenMadeA(self):
+        from music21 import stream, meter
+        m1 = stream.Measure()
+        m1.timeSignature = meter.TimeSignature('4/4')
+        m1.repeatAppend(note.Note('c#', quarterLength=.5), 8)
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note('c', quarterLength=.5), 8)
+        p = stream.Part()
+        p.append([m1, m2])
+        self.assertEqual(p.haveBeamsBeenMade(), False)
+        p.makeBeams(inPlace=True)
+        self.assertEqual(p.haveBeamsBeenMade(), True)
+
+
+    def testHaveBeamsBeenMadeB(self):
+        from music21 import stream, meter
+        m1 = stream.Measure()
+        m1.timeSignature = meter.TimeSignature('4/4')
+        m1.repeatAppend(note.Note('c#', quarterLength=.5), 8)
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note('c', quarterLength=.5), 8)
+        p = stream.Part()
+        p.append([m1, m2])
+        self.assertEqual(p.haveBeamsBeenMade(), False)
+        raw = p.musicxml
+        # after getting musicxml, make sure that we have not changed the source
+        #p.show()
+        self.assertEqual(p.haveBeamsBeenMade(), False)
+        self.assertEqual(raw.find('<beam number="1">end</beam>') > 0, True)
+
 
 
 #-------------------------------------------------------------------------------

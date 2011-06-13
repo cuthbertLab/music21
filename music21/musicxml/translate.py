@@ -2109,18 +2109,23 @@ def streamPartToMx(part, instObj=None, meterStream=None,
 
         # see if accidentals/beams can be processed
         haveDeepCopy = False
-
-        # TODO: when this runs, spanners are not being copied
-        
-
-#         if not measureStream.haveAccidentalsBeenMade():
-#             measureStream = measureStream.makeAccidentals(inPlace=False)
-#             haveDeepCopy = True
-#             # must get new spanners
-#             spannerBundle = spanner.SpannerBundle(measureStream.flat)
+        if not measureStream.haveAccidentalsBeenMade():
+            measureStream.makeAccidentals(inPlace=True)
+            #haveDeepCopy = True
+            # must get new spanners
+            #spannerBundle = spanner.SpannerBundle(measureStream.flat)
             #print measureStream
-#         if not measureStream.haveBeamsBeenMade():
-#             # if making beams, have to make a deep copy, as modifying notes
+
+        if not measureStream.haveBeamsBeenMade():
+            # if making beams, have to make a deep copy, as modifying notes
+            try:
+                measureStream.makeBeams(inPlace=True)
+            except: # cannot match StreamException, must catch all
+                pass
+
+        if spannerBundle is None:
+            spannerBundle = spanner.SpannerBundle(measureStream.flat)
+
 #             try:
 #                 if haveDeepCopy:
 #                     measureStream.makeBeams(inPlace=True)
@@ -2128,9 +2133,9 @@ def streamPartToMx(part, instObj=None, meterStream=None,
 #                     measureStream = measureStream.makeBeams(inPlace=False)
 #                     # must get new spanners
 #                     spannerBundle = spanner.SpannerBundle(measureStream.flat)
-# 
-#             # should match stream.StreamException, but was not
-#             #except stream.StreamException:
+# # 
+# #             # should match stream.StreamException, but was not
+# #             #except stream.StreamException:
 #             except Exception:
 #                 # this is a result of makeMeaures not getting everything 
 #                 # note to measure allocation right
@@ -2206,8 +2211,12 @@ def streamToMx(s, spannerBundle=None):
 
     if s.hasPartLikeStreams():
         #environLocal.printDebug('Stream._getMX: interpreting multipart')
+
         # making a deepcopy, as we are going to edit internal objs
-        partStream = copy.deepcopy(s)
+        # NOTE: a deepcopy has already been made; do not copy again
+        #partStream = copy.deepcopy(s)
+        partStream = s
+
         # must set spanner after copying
         if spannerBundle is None: 
             # no spanner bundle provided, get one from the flat stream
