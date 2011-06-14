@@ -726,7 +726,7 @@ def mxToDynamic(mxDirection, inputM21=None):
     else:
         d = inputM21
 
-    # can probably replace this with mxDirection.getDynamicMark()'
+    # can probably replace this with mxDirection.getDynamicMark()
     # need to test
     mxDynamics = None
     for mxObj in mxDirection:
@@ -735,15 +735,15 @@ def mxToDynamic(mxDirection, inputM21=None):
                 if isinstance(mxObjSub, musicxmlMod.Dynamics):
                     mxDynamics = mxObjSub
     if mxDynamics == None:
-        raise dynamics.DynamicException('when importing a Dyanmics object from MusicXML, did not find a DyanmicMark')            
+        raise dynamics.DynamicException('when importing a Dynamics object from MusicXML, did not find a DynamicMark')            
     if len(mxDynamics) > 1:
-        raise dynamics.DynamicException('when importing a Dyanmics object from MusicXML, found more than one DyanmicMark contained')
+        raise dynamics.DynamicException('when importing a Dynamics object from MusicXML, found more than one DynamicMark contained')
 
     # palcement is found in outermost object
     if mxDirection.get('placement') is not None:
         d._positionPlacement = mxDirection.get('placement') 
 
-    # the tag is the dynmic mark value
+    # the tag is the dynamic mark value
     mxDynamicMark = mxDynamics.componentList[0].get('tag')
     d.value = mxDynamicMark
     for dst, src in [('_positionDefaultX', 'default-x'), 
@@ -756,7 +756,7 @@ def mxToDynamic(mxDirection, inputM21=None):
 
 
 def textExpressionToMx(te):
-    '''Convert a TextExpression to a MusicXML mxDirectoin type.
+    '''Convert a TextExpression to a MusicXML mxDirection type.
     returns a musicxml.Direction object
 
     >>> from music21 import *
