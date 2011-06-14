@@ -494,7 +494,12 @@ class Test(unittest.TestCase):
         self.assertEqual(m1.barDuration.quarterLength, 3.0)
         # filled with two quarter notes
         self.assertEqual(m1.duration.quarterLength, 2.0)
+        m1.show('t')
         # notes are shown as being on beat 2 and 3
+        environLocal.printDebug(['m1.notesAndRests.activeSite', m1.notesAndRests.activeSite])
+        environLocal.printDebug(['m1.notesAndRests[0].activeSite', m1.notesAndRests[0].activeSite])
+
+        #self.assertEqual(m1.notesAndRests.activeSite)
         self.assertEqual(m1.notesAndRests[0]._getMeasureOffset(), 1.0)
         self.assertEqual(m1.notesAndRests[0].beat, 2.0)
         self.assertEqual(m1.notesAndRests[1]._getMeasureOffset(), 2.0)

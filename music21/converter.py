@@ -403,11 +403,11 @@ class ConverterMusicXML(object):
         '''Load all parts from a MusicXML object representation.
         This determines the order parts are found in the stream
         '''
-        t = common.Timer()
-        t.start()
+        #t = common.Timer()
+        #t.start()
         self._stream.mx = self._mxScore
-        t.stop()
-        environLocal.printDebug(['music21 object creation time:', t])
+        #t.stop()
+        #environLocal.printDebug(['music21 object creation time:', t])
 
     def _getStream(self):
         return self._stream
@@ -462,8 +462,8 @@ class ConverterMusicXML(object):
             # check if this pickle is up to date
             if (hasattr(c.score, 'm21Version') and 
                 c.score.m21Version >= musicxml.VERSION_MINIMUM):
-                environLocal.printDebug(['pickled file version is compatible',
-                c.score.m21Version])
+                pass
+                #environLocal.printDebug(['pickled file version is compatible', c.score.m21Version])
             else:
                 try:
                     environLocal.printDebug(['pickled file version is not compatible', c.score.m21Version])

@@ -200,6 +200,8 @@ class DefinedContexts(object):
         # this is used to be able to descern the order of context as added
         self._timeIndex = 0
 
+        self._cachedSites = []
+
     def __len__(self):
         '''Return the total number of references.
 
@@ -422,6 +424,8 @@ class DefinedContexts(object):
 
         '''
         # NOTE: this is a performance critical method
+        # must clear
+        self._cachedSites = []
 
         isLocation = False # 'contexts'
         if offset is not None: 
@@ -430,7 +434,7 @@ class DefinedContexts(object):
         # note: if we want both context and locations to exists
         # for the same object, may need to append character code to id
 
-        if idKey is None and obj != None:
+        if idKey is None and obj is not None:
             idKey = id(obj)
         # a None object will have a key of None
         # do not need to set this as is default
@@ -499,6 +503,9 @@ class DefinedContexts(object):
         2
 
         '''
+        # must clear
+        self._cachedSites = []
+
         siteId = None
         if site is not None: 
             siteId = id(site)
@@ -514,6 +521,9 @@ class DefinedContexts(object):
     def removeById(self, idKey):
         '''Remove a defined contexts entry by id key, which is id() of the object. 
         '''
+        # must clear
+        self._cachedSites = []
+
         if idKey == None:
             raise Exception('trying to remove None idKey')
         del self._definedContexts[idKey]
@@ -2674,12 +2684,11 @@ class Music21Object(JSONSerializer):
             # collect activeSite unless activeSite is None;
             # if so, try to get rootDerivation
             candidate = focus.activeSite
-            environLocal.printDebug(['_getDerivationHierarchy(): activeSite found:', candidate])
+            #environLocal.printDebug(['_getDerivationHierarchy(): activeSite found:', candidate])
             if candidate is None: # nothing more to derive
                 # if this is a Stream, we might find a root derivation
                 if hasattr(focus, 'rootDerivation'):
-                    environLocal.printDebug(['_getDerivationHierarchy(): found rootDerivation:', focus.rootDerivation])
-
+                    #environLocal.printDebug(['_getDerivationHierarchy(): found rootDerivation:', focus.rootDerivation])
                     alt = focus.rootDerivation
                     if alt is None:
                         return post

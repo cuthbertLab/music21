@@ -423,7 +423,7 @@ class Graph(object):
                         ax.set_xticks(values)
                         # using center alignment to account for odd spacing in 
                         # accidentals
-                        environLocal.printDebug(['setting labels', labels])
+                        #environLocal.printDebug(['setting labels', labels])
                         ax.set_xticklabels(labels, fontsize=self.tickFontSize,
                             family=self.fontFamily, 
                          horizontalalignment=self.xTickLabelHorizontalAlignment, verticalalignment=self.xTickLabelVerticalAlignment, 
@@ -3398,7 +3398,7 @@ def _getPlotsToMake(*args, **keywords):
     # will return unaltered if no change
     format = userFormatsToFormat(format) 
     values = userValuesToValues(values)
-    environLocal.printDebug(['plotStream: format, values', format, values])
+    #environLocal.printDebug(['plotStream: format, values', format, values])
 
     plotMake = []
     if format.lower() == 'all':
@@ -3522,7 +3522,7 @@ def plotStream(streamObj, *args, **keywords):
 
     plotMake = _getPlotsToMake(*args, **keywords)
 
-    environLocal.printDebug(['plotClassName found', plotMake])
+    #environLocal.printDebug(['plotClassName found', plotMake])
     for plotClassName in plotMake:
         obj = plotClassName(streamObj, *args, **keywords)
         obj.process()

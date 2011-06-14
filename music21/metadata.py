@@ -1575,7 +1575,7 @@ class Metadata(music21.Music21Object):
         mxWork = musicxml.Work()
         match = False
         if self.title not in [None, '']:
-            environLocal.printDebug(['_getMX, got title', self.title])
+            #environLocal.printDebug(['_getMX, got title', self.title])
             match = True
             mxWork.set('workTitle', str(self.title))
             #mxWork.set('workNumber', None)

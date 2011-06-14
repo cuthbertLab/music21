@@ -323,6 +323,16 @@ class TestMusicXMLMultiPartOutput(CallTest):
         post = self.s.musicxml
 
 
+#-------------------------------------------------------------------------------
+class TestGetElementsByClass(CallTest):
+
+    def __init__(self):
+        from music21 import corpus
+        self.s = corpus.parse('bwv66.6')
+
+    def testFocus(self):
+        found = self.s.flat.notes
+
 
 
 
@@ -332,14 +342,14 @@ class CallGraph:
 
     def __init__(self):
         self.excludeList = ['pycallgraph.*','re.*','sre_*', 'copy*', '*xlrd*']
-        self.excludeList += ['*xmlnode*']
+        #self.excludeList += ['*xmlnode*']
         #self.excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
 
         # set class  to test here
         #self.callTest = TestMakeTies
         #self.callTest = TestMakeAccidentals
         #self.callTest = TestMusicXMLOutputParts
-        self.callTest = TestMusicXMLOutputScore
+        #self.callTest = TestMusicXMLOutputScore
 
         #self.callTest = TestABCImport
         #self.callTest = TestMetadataBundle
@@ -350,6 +360,7 @@ class CallGraph:
         #self.callTest = TestGetContextByClass
         #self.callTest = TestMakeMeasures
         #self.callTest = TestMusicXMLMultiPartOutput
+        self.callTest = TestGetElementsByClass
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 

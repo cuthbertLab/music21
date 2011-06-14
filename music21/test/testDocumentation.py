@@ -317,7 +317,8 @@ class Test(unittest.TestCase):
         from music21 import stream, corpus
         src = corpus.parse('bach/bwv323.xml')
         ex = src.getElementById('Soprano').flat.notesAndRests[:20]
-        
+        environLocal.printDebug(["id(src.getElementById('Soprano').flat.notesAndRests)", id(src.getElementById('Soprano').flat.notesAndRests)])        
+
         s = stream.Score()
         for scalar, t in [(1, 'p1'), (2, 'p-5'), (.5, 'p-11'), (1.5, -24)]:
             part = ex.augmentOrDiminish(scalar, inPlace=False)
@@ -326,7 +327,10 @@ class Test(unittest.TestCase):
         post = s.musicxml
         #s.show()
         # all parts have the same number of notes
-        for i in range(3):
+        #s.show('t')
+        for i in range(4):
+            environLocal.printDebug(['len(s)', len(s)])        
+
             self.assertEqual(len(s.parts[i].flat.notesAndRests), 20) 
 
         self.assertEqual(len(s.parts[0].measures(1,4).flat.notesAndRests), 9) 
@@ -564,22 +568,9 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    import sys
+    # sys.arg test options will be used in mainTest()
+    music21.mainTest(Test)
 
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-    elif len(sys.argv) > 1:
-        t = Test()
-
-
-        #t.testExamplesA()
-
-        t.testOverviewMeterB()
-        #t.testExamplesB()
-        #t.testExamplesC()
-
-        #t.testExamplesD()
-        #t.testExamplesE()
 
 
 #------------------------------------------------------------------------------

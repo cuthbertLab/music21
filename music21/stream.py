@@ -394,7 +394,7 @@ class Stream(music21.Music21Object):
         if self._cache["elements"] == None:
             # this list concatenation may take time; thus, only do when
             # _elementsChanged has been called
-            self._cache["elements"] =  self._elements + self._endElements
+            self._cache["elements"] = self._elements + self._endElements
 
         return self._cache["elements"]
 
@@ -2652,7 +2652,7 @@ class Stream(music21.Music21Object):
         # we must be able to obtain a measure from this (not a flat) 
         # representation (e.g., this is a Stream or Part, not a Score)
         if len(self.getElementsByClass('Measure')) >= 1:
-            environLocal.printDebug(['got measures from getElementsByClass'])
+            #environLocal.printDebug(['got measures from getElementsByClass'])
             s = self.measures(measureNumber, measureNumber, collect=collect)
             if len(s) == 0:
                 return None
@@ -2662,7 +2662,7 @@ class Stream(music21.Music21Object):
                 m.derivationMethod = 'measure'
                 return m
         else:   
-            environLocal.printDebug(['got not measures from getElementsByClass'])
+            #environLocal.printDebug(['got not measures from getElementsByClass'])
             return None
 
 
@@ -5034,6 +5034,7 @@ class Stream(music21.Music21Object):
         # note that copy.copy() in some cases seems to not cause secondary
         # problems that self.__class__() does
         sNew = copy.copy(self)
+            
         sNew._derivation = derivation.Derivation(sNew)
         sNew.setDerivation(self)
         if retainContainers:
@@ -5099,12 +5100,8 @@ class Stream(music21.Music21Object):
     
 
     def _getFlat(self):
-        reCache = False
         if self._cache['flat'] is None:
-           reCache = True
-        if reCache:
            self._cache['flat'] = self._getFlatOrSemiFlat(retainContainers=False)
-        #environLocal.printDebug(['cached: flat', self._cache["flat"], id(self._cache["flat"]), 'len', len(self._cache["flat"])])
         return self._cache['flat']
 
         # non cached approach
@@ -5254,13 +5251,12 @@ class Stream(music21.Music21Object):
 
 
     def _getSemiFlat(self):
-#         reCache = False
+        # TODO: this does not work yet, as some Streams try to 
+        # place elements in Streams that already have elements
+        # see test/testDocumentation.py testOverviewMeterB
 #         if self._cache['semiFlat'] is None:
-#            reCache = True
-#         if reCache:
 #            self._cache['semiFlat'] = self._getFlatOrSemiFlat(
 #                                     retainContainers=True)
-#         #environLocal.printDebug(['cached: flat', self._cache["flat"], id(self._cache["flat"]), 'len', len(self._cache["flat"])])
 #         return self._cache['semiFlat']
 
         return self._getFlatOrSemiFlat(retainContainers = True)
@@ -6564,10 +6560,23 @@ class Stream(music21.Music21Object):
         '''
         see property `notesAndRests`, below
         '''
+        if self._cache['notesAndRests'] is None:
+            #environLocal.printDebug(['updating noteAndRests cache:', str(self), id(self)])
+            # as this Stream will be retained, we do not want it to be 
+            # the same class as the source, thus, do not return subclass
+            if self.isMeasure:
+                returnStreamSubClass = False
+            else:
+                returnStreamSubClass = True
+            self._cache['notesAndRests'] = self.getElementsByClass(
+                                          ['GeneralNote', 'Chord'], 
+                            returnStreamSubClass=returnStreamSubClass)
+        return self._cache['notesAndRests']
+
         #return self.getElementsByClass([note.GeneralNote, chord.Chord])
         # using string class names is import for some test contexts where
         # absolute class name matching fails
-        return self.getElementsByClass(['GeneralNote', 'Chord'])
+        #return self.getElementsByClass(['GeneralNote', 'Chord'])
 
     notesAndRests = property(_getNotesAndRests, doc='''
         The notesAndRests property of a Stream returns a new Stream object
@@ -6607,9 +6616,14 @@ class Stream(music21.Music21Object):
         '''
         see property `notes`, below
         '''
+        if self._cache['notes'] is None:
+           self._cache['notes'] = self.getElementsByClass(['NotRest'], 
+                                  returnStreamSubClass=False)
+        return self._cache['notes']
+
         #Rests are a subclass of GeneralNote, and thus General Note cannot
         # be used here
-        return self.getElementsByClass(['NotRest'])
+        #return self.getElementsByClass(['NotRest'])
 
     notes = property(_getNotes, doc='''
         The notes property of a Stream returns a new Stream object
@@ -14234,11 +14248,10 @@ class Test(unittest.TestCase):
         
         # after extraction and changing activeSite, cannot find
         n = s.flat.notesAndRests[0]
-        self.assertEqual([str(e.__class__) for e in n.derivationHierarchy], [] )
+        self.assertEqual([common.classToClassStr(e.__class__) for e in n.derivationHierarchy], ['Score', 'Score']  )
         
         # still cannot get hierarchy
         self.assertEqual([str(e.__class__) for e in s.parts[0].derivationHierarchy], [])
-
 
 
     def testMakeMeasuresTimeSignatures(self):
