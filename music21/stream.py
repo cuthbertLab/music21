@@ -338,7 +338,7 @@ class Stream(music21.Music21Object):
     # adding and editing Elements and Streams -- all need to call _elementsChanged
     # most will set isSorted to False
 
-    def _elementsChanged(self):
+    def _elementsChanged(self, updateIsFlat=True, clearIsSorted=True):
         '''
         Call any time _elements is changed. Called by methods that add or change
         elements.
@@ -364,21 +364,25 @@ class Stream(music21.Music21Object):
         #if self.activeSite is not None:
         #    self.activeSite._elementsChanged()
         for site in self.getSites():
+            # if this Stream is a location in a Site, those sites are not flat
+            # assume that sorting does not need to be changed
             if site is not None:
-                site._elementsChanged()
+                site._elementsChanged(updateIsFlat=False, clearIsSorted=False)
 
         # clear these attributes for setting later
-        self.isSorted = False
-        self.isFlat = True
-        # do not need to look in _endElements, as no Streams
-        # should be found there (they have a Duration)
-        for e in self._elements:
-            # only need to find one case, and if so, no longer flat
-            # fastest method here is isinstance()
-            if isinstance(e, Stream): 
-            #if hasattr(e, 'elements'):
-                self.isFlat = False
-                break
+        if clearIsSorted:
+            self.isSorted = False
+
+        if updateIsFlat:
+            self.isFlat = True
+            # do not need to look in _endElements
+            for e in self._elements:
+                # only need to find one case, and if so, no longer flat
+                # fastest method here is isinstance()
+                if isinstance(e, Stream): 
+                #if hasattr(e, 'elements'):
+                    self.isFlat = False
+                    break
         # resetting the cache removes lowest and highest time storage
         # a slight performance optimization: not creating unless needed
         if len(self._cache) > 0:

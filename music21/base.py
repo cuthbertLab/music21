@@ -200,7 +200,9 @@ class DefinedContexts(object):
         # this is used to be able to descern the order of context as added
         self._timeIndex = 0
 
-        self._cachedSites = []
+        # cache for performance
+        self._lastID = -1 # cannot be None
+        self._lastOffset = None
 
     def __len__(self):
         '''Return the total number of references.
@@ -400,6 +402,8 @@ class DefinedContexts(object):
         '''
         self._definedContexts = {} 
         self._locationKeys = []
+        self._lastID = -1 # cannot be None
+        self._lastOffset = None
 
     def _prepareObject(self, obj, domain):
         '''Prepare an object for storage. May be stored as a standard refernce or as a weak reference.
@@ -424,8 +428,6 @@ class DefinedContexts(object):
 
         '''
         # NOTE: this is a performance critical method
-        # must clear
-        self._cachedSites = []
 
         isLocation = False # 'contexts'
         if offset is not None: 
@@ -504,7 +506,8 @@ class DefinedContexts(object):
 
         '''
         # must clear
-        self._cachedSites = []
+        self._lastID = -1 # cannot be None
+        self._lastOffset = None
 
         siteId = None
         if site is not None: 
@@ -522,7 +525,8 @@ class DefinedContexts(object):
         '''Remove a defined contexts entry by id key, which is id() of the object. 
         '''
         # must clear
-        self._cachedSites = []
+        self._lastID = -1 # cannot be None
+        self._lastOffset = None
 
         if idKey == None:
             raise Exception('trying to remove None idKey')
@@ -868,6 +872,10 @@ class DefinedContexts(object):
         >>> aLocations._getOffsetBySiteId(id(bSite))
         234
         '''
+        # NOTE: this is a core method called very frequently
+        if idKey == self._lastID:
+            return self._lastOffset
+
         try:
             value = self._definedContexts[idKey]['offset']
         except KeyError:
@@ -881,10 +889,13 @@ class DefinedContexts(object):
             else:
                 obj = self._definedContexts[idKey]['obj']
             # offset value is an attribute string
+            # canot cache these values as may change outside of definedcontexts
             return getattr(obj, value)
-        # if value is not a string, it is a proper offset
-        else:
-            return value
+        # if value is not a string, it is a numerical offset
+        self._lastID = idKey
+        self._lastOffset = value
+        return value
+
 
     def getOffsets(self):
         '''Return a list of all offsets.
@@ -959,8 +970,9 @@ class DefinedContexts(object):
         except DefinedContextsException: # the site id is not valid
             environLocal.printDebug(['getOffsetBySite: trying to get an offset by a site failed; self:', self, 'site:', site, 'defined contexts:', self._definedContexts])
             raise # re-raise Exception
-        if post is None: # 
-            raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % siteId)
+
+#         if post is None:
+#             raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % siteId)
         #self._definedContexts[siteId]['offset']
         return post
 
@@ -982,8 +994,8 @@ class DefinedContexts(object):
         '''
         post = self._getOffsetBySiteId(siteId) 
         #post = self._definedContexts[siteId]['offset']
-        if post == None: # 
-            raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % siteId)
+#         if post is None: # 
+#             raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % siteId)
         return post
 
 
@@ -1007,11 +1019,13 @@ class DefinedContexts(object):
         DefinedContextsException: ...
         '''
         siteId = None
-        if site != None:
+        if site is not None:
             siteId = id(site)
         # will raise an index error if the siteId does not exist
         try:
             self._definedContexts[siteId]['offset'] = value
+            self._lastID = siteId
+            self._lastOffset = value
         except KeyError:
             raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % site)
             
@@ -1023,6 +1037,8 @@ class DefinedContexts(object):
         '''
         try:
             self._definedContexts[siteId]['offset'] = value
+            self._lastID = siteId
+            self._lastOffset = value
         except KeyError:
             raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % site)
 
@@ -1045,6 +1061,7 @@ class DefinedContexts(object):
         >>> aSite == aLocations.getSiteByOffset(23)
         True
         '''
+
         match = None
         for siteId in self._definedContexts.keys():
             # might need to use almost equals here
@@ -1265,9 +1282,6 @@ class DefinedContexts(object):
                 setattr(obj, attrName, value) # if attr already exists
             except AttributeError:
                 pass
-
-#     def find(self, classList, recursive=True, hasAttr=None):
-#         pass
 
 
 
@@ -2320,7 +2334,7 @@ class Music21Object(JSONSerializer):
             return self._definedContexts.getOffsetBySite(None)
         else:
             # try to look for it in all objects
-            environLocal.printDebug(['doing a manual parent search: problably means that id(self.activeSite) (%s) is not equal to self._activeSiteId (%s)' % (id(self.activeSite), self._activeSiteId)])
+            environLocal.printDebug(['doing a manual parent search: probably means that id(self.activeSite) (%s) is not equal to self._activeSiteId (%s)' % (id(self.activeSite), self._activeSiteId)])
             offset = self._definedContexts.getOffsetByObjectMatch(self.activeSite)
             return offset
 
