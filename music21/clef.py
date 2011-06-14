@@ -46,7 +46,8 @@ class Clef(music21.Music21Object):
 
     def __repr__(self):
         # get just the clef name of this instance
-        return "<music21.clef.%s>" % str(self.__class__).split('.')[-1][:-2]
+        return "<music21.clef.%s>" % common.classToClassStr(self.__class__)
+        #return "<music21.clef.%s>" % str(self.__class__).split('.')[-1][:-2]
 
     def _getMX(self):
         '''Given a music21 Clef object, return a MusicXML Clef object.
@@ -152,6 +153,8 @@ class Clef(music21.Music21Object):
     mx = property(_getMX, _setMX)
 
 
+
+#-------------------------------------------------------------------------------
 class PercussionClef(Clef):
     pass
 

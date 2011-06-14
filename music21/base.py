@@ -690,26 +690,41 @@ class DefinedContexts(object):
         True
         '''
         found = []
+        if not isinstance(className, str):
+            className = common.classToClassStr(className)
+
         for idKey in self._locationKeys:
-            objRef = self._definedContexts[idKey]['obj']
-            if objRef is None:
-                continue
-            if not WEAKREF_ACTIVE: # leave None alone
-                obj = objRef
-            else:
-                obj = common.unwrapWeakref(objRef)
-            match = False
-            if common.isStr(className):
-                if hasattr(obj, 'classes'):
-                    if className in obj.classes:
-                        match = True
-                elif type(obj).__name__.lower() == className.lower():
-                    match = True
-            elif isinstance(obj, className):
-                match = True
-            if match:
+            classStr = self._definedContexts[idKey]['class']
+            if classStr == className:
+                objRef = self._definedContexts[idKey]['obj']
+                if not WEAKREF_ACTIVE: # leave None alone
+                    obj = objRef
+                else:
+                    obj = common.unwrapWeakref(objRef)
                 found.append(obj)
         return found
+            
+#         found = []
+#         for idKey in self._locationKeys:
+#             objRef = self._definedContexts[idKey]['obj']
+#             if objRef is None:
+#                 continue
+#             if not WEAKREF_ACTIVE: # leave None alone
+#                 obj = objRef
+#             else:
+#                 obj = common.unwrapWeakref(objRef)
+#             match = False
+#             if common.isStr(className):
+#                 if hasattr(obj, 'classes'):
+#                     if className in obj.classes:
+#                         match = True
+#                 elif type(obj).__name__.lower() == className.lower():
+#                     match = True
+#             elif isinstance(obj, className):
+#                 match = True
+#             if match:
+#                 found.append(obj)
+#         return found
 
 
     def hasSpannerSite(self):
@@ -1537,13 +1552,6 @@ class Music21Object(JSONSerializer):
     }
 
     def __init__(self, *arguments, **keywords):
-
-        # an offset keyword arg should set the offset in location
-        # not in a local parameter
-#         if "offset" in keywords and not self.offset:
-#             self.offset = keywords["offset"]
-
-        self._overriddenLily = None
         # None is stored as the internal location of an obj w/o a parent
         self._activeSite = None
         # cached id in case the weakref has gone away...
@@ -1551,6 +1559,9 @@ class Music21Object(JSONSerializer):
     
         # if this element has been copied, store the id() of the last source
         self._idLastDeepCopyOf = None
+
+        # store classes once when called
+        self._classes = None 
 
         if "id" in keywords and not self.id:
             self.id = keywords["id"]            
@@ -1582,6 +1593,10 @@ class Music21Object(JSONSerializer):
         if "activeSite" in keywords and self.activeSite is None:
             self.activeSite = keywords["activeSite"]
         
+        # only for an output format
+        self._overriddenLily = None
+
+
 
     def mergeAttributes(self, other):
         '''
@@ -1682,8 +1697,9 @@ class Music21Object(JSONSerializer):
 #             return False
 
     def _getClasses(self):
-        # TODO: cache this as a stored list?
-        return [x.__name__ for x in self.__class__.mro()] 
+        if self._classes is None:
+            self._classes = [x.__name__ for x in self.__class__.mro()] 
+        return self._classes    
 
     classes = property(_getClasses, 
         doc='''Returns a list containing the names (strings, not objects) of classes that this 

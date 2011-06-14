@@ -536,6 +536,18 @@ def toUnicode(usrStr):
     return usrStr
 
 
+def classToClassStr(classObj):
+    '''Convert a class object to a class string.
+
+    >>> from music21 import *
+    >>> classToClassStr(note.Note)
+    'Note'
+    >>> classToClassStr(chord.Chord)
+    'Chord'
+    '''
+    # remove closing quotes
+    return str(classObj).split('.')[-1][:-2]
+
 def getNumFromStr(usrStr, numbers='0123456789'):
     '''Given a string, extract any numbers. Return two strings, the numbers (as strings) and the remaining characters.
 
