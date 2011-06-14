@@ -737,7 +737,7 @@ def mxToDynamic(mxDirection, inputM21=None):
     if mxDynamics == None:
         raise dynamics.DynamicException('when importing a Dynamics object from MusicXML, did not find a DynamicMark')            
     if len(mxDynamics) > 1:
-        raise dynamics.DynamicException('when importing a Dynamics object from MusicXML, found more than one DynamicMark contained')
+        raise dynamics.DynamicException('when importing a Dynamics object from MusicXML, found more than one DynamicMark contained, namely %s' % str(mxDynamics))
 
     # palcement is found in outermost object
     if mxDirection.get('placement') is not None:
