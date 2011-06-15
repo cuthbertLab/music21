@@ -339,7 +339,8 @@ class Stream(music21.Music21Object):
     # adding and editing Elements and Streams -- all need to call _elementsChanged
     # most will set isSorted to False
 
-    def _elementsChanged(self, updateIsFlat=True, clearIsSorted=True):
+    def _elementsChanged(self, updateIsFlat=True, clearIsSorted=True, 
+        memo=None):
         '''
         Call any time _elements is changed. Called by methods that add or change
         elements.
@@ -353,22 +354,30 @@ class Stream(music21.Music21Object):
         >>> a.isFlat
         False
         '''
+        if memo is None:
+            memo = []
+        memo.append(id(self))
         # if this Stream is a flat representation of something, and its 
         # elements have changed, than we must clear the cache of that 
         # parent; we can do that by calling _elementsChanged on
         # flattened representation of
         if self.flattenedRepresentationOf is not None:
-            self.flattenedRepresentationOf._elementsChanged()
+            self.flattenedRepresentationOf._elementsChanged(memo=memo)
 
         # may not always need to clear cache of the active site, but may 
         # be a good idea; may need to intead clear all sites            
         #if self.activeSite is not None:
         #    self.activeSite._elementsChanged()
-        for site in self.getSites():
+        for site in self.getSites(idExclude=memo):
             # if this Stream is a location in a Site, those sites are not flat
             # assume that sorting does not need to be changed
             if site is not None:
-                site._elementsChanged(updateIsFlat=False, clearIsSorted=False)
+                # some sites may have been added to memo in this loop
+                if id(site) in memo:
+                    #environLocal.printDebug(['found site even after passing memo', 'memo', memo, 'id(site)', id(site)])
+                    continue
+                site._elementsChanged(updateIsFlat=False, clearIsSorted=False, 
+                    memo=memo)
 
         # clear these attributes for setting later
         if clearIsSorted:
@@ -456,13 +465,15 @@ class Stream(music21.Music21Object):
         False
         '''
         self._elements[key] = value
-        storedIsFlat = self.isFlat
-        self._elementsChanged()
 
         if isinstance(value, Stream): 
+            # know that this is now not flat
+            self._elementsChanged(updateIsFlat=False) # set manualy
             self.isFlat = False
         else:
-            self.isFlat = storedIsFlat
+            # cannot be sure if this is flat, as we do not know if
+            # we replaced a Stream at this index
+            self._elementsChanged() 
 
 
     def __delitem__(self, key):
@@ -814,7 +825,8 @@ class Stream(music21.Music21Object):
                 match.append(self._endElements.pop(i-baseElementCount))
 
         if len(iMatch) > 0:
-            self._elementsChanged()
+            # removing an object will never change the sort status
+            self._elementsChanged(clearIsSorted=False)
 
         # after removing, need to remove self from locations reference 
         # and from activeSite reference, if set; this is taken care of with the 
@@ -840,7 +852,7 @@ class Stream(music21.Music21Object):
         else: # its in the _endElements 
             post = self._endElements.pop(index - eLen)
 
-        self._elementsChanged()
+        self._elementsChanged(clearIsSorted=False)
         # remove self from locations here only if
         # there are no further locations
         post.removeLocationBySite(self)
@@ -1218,7 +1230,8 @@ class Stream(music21.Music21Object):
         # could also do self.elements = self.elements + [element]
         #self._elements.append(element)  
         self._endElements.append(element)  
-        self._elementsChanged() 
+        # Streams cannot reside in end elements, thus do not update is flat
+        self._elementsChanged(updateIsFlat=False) 
 
 
     #---------------------------------------------------------------------------
@@ -4057,9 +4070,6 @@ class Stream(music21.Music21Object):
         else:
             returnObj = self
 
-        # changes elements
-        returnObj._elementsChanged()
-
         #environLocal.printDebug(['makeRests(): object lowestOffset, highestTime', oLow, oHigh])
         if refStreamOrTimeRange == None: # use local
             oLowTarget = 0
@@ -4107,7 +4117,10 @@ class Stream(music21.Music21Object):
         # with auto sort no longer necessary. 
         
         #returnObj.elements = returnObj.sorted.elements
-        self.isSorted = False
+        #self.isSorted = False
+        # changes elements
+        returnObj._elementsChanged()
+
         return returnObj
 
 
@@ -4154,9 +4167,6 @@ class Stream(music21.Music21Object):
             returnObj = self
         if len(returnObj) == 0:
             raise StreamException('cannot process an empty stream')        
-
-        # changes elements
-        returnObj._elementsChanged()
 
         # get measures from this stream
         measureStream = returnObj.getElementsByClass('Measure')
@@ -4278,6 +4288,9 @@ class Stream(music21.Music21Object):
                         elif overshot > 0:
                             environLocal.printDebug(['makeTies() found and skipping extremely small overshot into next measure', overshot])
             mCount += 1
+
+        # changes elements
+        returnObj._elementsChanged()
 
         return returnObj
     
@@ -4913,44 +4926,61 @@ class Stream(music21.Music21Object):
         >>> [n.name for n in s]
         ['A', 'B']
         '''
-        self._elements.sort(
-            cmp=lambda x,y: cmp(
-                x.getOffsetBySite(self), y.getOffsetBySite(self)
-                ) or cmp(x.priority, y.priority) or 
-                cmp(x.classSortOrder, y.classSortOrder)
-            )
-        self._endElements.sort(
-            cmp=lambda x,y: cmp(x.priority, y.priority) or 
-                cmp(x.classSortOrder, y.classSortOrder)
-            )
-        # as sorting changes order, elements have changed 
-        self._elementsChanged()
-        self.isSorted = True
+        # trust if this is sorted: do not sort again
+        if not self.isSorted:
+            self._elements.sort(
+                cmp=lambda x,y: cmp(
+                    x.getOffsetBySite(self), y.getOffsetBySite(self)
+                    ) or cmp(x.priority, y.priority) or 
+                    cmp(x.classSortOrder, y.classSortOrder)
+                )
+            self._endElements.sort(
+                cmp=lambda x,y: cmp(x.priority, y.priority) or 
+                    cmp(x.classSortOrder, y.classSortOrder)
+                )
+            # as sorting changes order, elements have changed; 
+            # need to clear cache, but flat status is the same
+            self._elementsChanged(updateIsFlat=False, clearIsSorted=False)
+            self.isSorted = True
 
 
     def _getSorted(self):
-        # get a shallow copy of elements list
-        post = copy.copy(self._elements) # already a copy
-#         post.sort(cmp=lambda x,y: cmp(x.getOffsetBySite(self),
-#             y.getOffsetBySite(self)) or 
-#             cmp(x.priority, y.priority) or 
-#             cmp(x.classSortOrder, y.classSortOrder)
-#             )
-        # get a shallow copy of the Stream itself
-        newStream = copy.copy(self)
-        # assign directly to _elements, as we do not need to call 
-        # _elementsChanged()
-        newStream._elements = post
-        for e in post:
-            e.addLocation(newStream, e.getOffsetBySite(self))
-            # need to explicitly set activeSite
-            e.activeSite = newStream 
-#         newStream.isSorted = True
+        if self._cache['sorted'] is None:
+            shallowElements = copy.copy(self._elements) # already a copy
+            shallowEndElements = copy.copy(self._endElements) # already a copy
+            s = copy.copy(self)
+            # assign directly to _elements, as we do not need to call 
+            # _elementsChanged()
+            s._elements = shallowElements
+            s._endElements = shallowEndElements
+    
+            for e in shallowElements + shallowEndElements:
+                e.addLocation(s, e.getOffsetBySite(self))
+                # need to explicitly set activeSite
+                e.activeSite = s 
+            # now just sort this stream in place; this will update the 
+            # isSorted attribute and sort only if not already sorted
+            s.sort()
+            self._cache['sorted'] = s
+        return self._cache['sorted']
 
-        # now just sort this stream in place; this will update the 
-        # isSorted attribute
-        newStream.sort()
-        return newStream
+        # get a shallow copy of elements list
+#         shallowElements = copy.copy(self._elements) # already a copy
+#         shallowEndElements = copy.copy(self._endElements) # already a copy
+#         newStream = copy.copy(self)
+#         # assign directly to _elements, as we do not need to call 
+#         # _elementsChanged()
+#         newStream._elements = shallowElements
+#         newStream._endElements = shallowEndElements
+# 
+#         for e in shallowElements + shallowEndElements:
+#             e.addLocation(newStream, e.getOffsetBySite(self))
+#             # need to explicitly set activeSite
+#             e.activeSite = newStream 
+#         # now just sort this stream in place; this will update the 
+#         # isSorted attribute and sort only if not already sorted
+#         newStream.sort()
+#         return newStream
     
     sorted = property(_getSorted, doc='''
         Returns a new Stream where all the elements are sorted according to offset time, then

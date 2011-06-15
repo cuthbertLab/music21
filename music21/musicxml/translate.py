@@ -2196,15 +2196,17 @@ def streamToMx(s, spannerBundle=None):
         #environLocal.printDebug('Stream._getMX: interpreting multipart')
         # NOTE: a deepcopy has already been made; do not copy again
         #partStream = copy.deepcopy(s)
-        partStream = s
+        #partStream = s
 
         # must set spanner after copying
         if spannerBundle is None: 
             # no spanner bundle provided, get one from the flat stream
-            spannerBundle = spanner.SpannerBundle(partStream.flat)
+            spannerBundle = spanner.SpannerBundle(s.flat)
             #environLocal.printDebug(['streamToMx(), hasPartLikeStreams(): loaded spannerBundle of size:', len(spannerBundle), 'id(spannerBundle)', id(spannerBundle)])
 
-        for obj in partStream.getElementsByClass('Stream'):
+        streamOfStreams = s.getElementsByClass('Stream')
+
+        for obj in streamOfStreams:
             # may need to copy element here
             # apply this streams offset to elements
             obj.transferOffsetToElements() 
@@ -2216,15 +2218,14 @@ def streamToMx(s, spannerBundle=None):
 
         # would like to do something like this but cannot
         # replace object inside of the stream
-        for obj in partStream.getElementsByClass('Stream'):
+        for obj in streamOfStreams:
             obj.makeRests(refStreamOrTimeRange, inPlace=True)
 
-        #environLocal.printDebug(['Stream._getMX(): handling multi-part Stream of length:', len(partStream)])
         count = 0
         midiChannelList = []
-        for obj in partStream.getElementsByClass('Stream'):
+        for obj in streamOfStreams:
             count += 1
-            if count > len(partStream):
+            if count > len(streamOfStreams):
                 raise TranslateException('infinite stream encountered')
 
             # only things that can be treated as parts are in finalStream

@@ -659,7 +659,7 @@ class DefinedContexts(object):
 
     #---------------------------------------------------------------------------
     # for dealing with locations
-    def getSites(self):
+    def getSites(self, idExclude=None):
         '''Get all defined contexts that are locations; unwrap from weakrefs
 
         >>> from music21 import *
@@ -674,9 +674,14 @@ class DefinedContexts(object):
         >>> len(aContexts.getSites()) == 2
         True
         '''
+        if idExclude is None:
+            idExclude = [] # else, assume a list
         # use pre-collected keys
         post = []
         for idKey in self._locationKeys:
+            if idKey in idExclude:
+                continue
+
             try:
                 objRef = self._definedContexts[idKey]['obj']
             except KeyError:
@@ -1959,8 +1964,10 @@ class Music21Object(JSONSerializer):
         '''
         self._definedContexts.add(site, offset)
 
-    def getSites(self):
+    def getSites(self, idExclude=None):
         '''Return a list of all objects that store a location for this object. Will inlcude None, the default empty site placeholder. 
+
+        If `idExclude` is provided, matching site ids will not be returned.
 
         >>> from music21 import note, stream
         >>> s1 = stream.Stream()
@@ -1971,7 +1978,7 @@ class Music21Object(JSONSerializer):
         >>> n.getSites() == [None, s1, s2]
         True
         '''
-        return self._definedContexts.getSites()
+        return self._definedContexts.getSites(idExclude=idExclude)
 
     def getSiteIds(self):
         '''Return a list of all site Ids, or the id() value of the sites of this object. 
