@@ -14577,13 +14577,13 @@ class Test(unittest.TestCase):
         from music21 import corpus, stream, key
         qj = corpus.parse('ciconia/quod_jactatur').parts[0]
         idFlat1 = id(qj.flat)
-        environLocal.printDebug(['idFlat1', idFlat1])
+        #environLocal.printDebug(['idFlat1', idFlat1])
 
         k1 = qj.flat.getElementsByClass(key.KeySignature)[0]
         qj.flat.replace(k1, key.KeySignature(-3))
 
         idFlat2 = id(qj.flat)
-        environLocal.printDebug(['idFlat2', idFlat2])
+        #environLocal.printDebug(['idFlat2', idFlat2])
 
         m1 = qj.getElementsByClass(stream.Measure)[1]
         #m1.show('t')

@@ -735,8 +735,7 @@ class GraphColorGridLegend(Graph):
         for i in range(len(self.data)):
             rowLabel = self.data[i][0]
             rowData = self.data[i][1]
-
-            environLocal.printDebug(['rowLabel', rowLabel, i])
+            #environLocal.printDebug(['rowLabel', rowLabel, i])
 
             positions = []
             heights = []
@@ -868,21 +867,22 @@ class GraphHorizontalBar(Graph):
         xMin = min(xPoints)
         xMax = max(xPoints) 
         xRange = xMax - xMin
-
-        environLocal.printDebug(['got xMin, xMax for points', xMin, xMax, ])
+        #environLocal.printDebug(['got xMin, xMax for points', xMin, xMax, ])
 
         self.setAxisRange('y', (0, len(keys) * self._barSpace))
         self.setAxisRange('x', (xMin, xMax), pad=True)
         self.setTicks('y', yTicks)  
 
-        rangeStep = int(xMin+int(round(xRange/10)))
-        if rangeStep == 0:
-            rangeStep = 1
-        for x in range(int(math.floor(xMin)), 
-                       int(round(math.ceil(xMax))), 
-                       rangeStep):
-            xTicks.append([x, '%s' % x])
-        self.setTicks('x', xTicks)  
+        # first, see if ticks have been set externally
+        if 'ticks' in self.axis['x'].keys() and len(self.axis['x']['ticks']) == 0:
+            rangeStep = int(xMin+int(round(xRange/10)))
+            if rangeStep == 0:
+                rangeStep = 1
+            for x in range(int(math.floor(xMin)), 
+                           int(round(math.ceil(xMax))), 
+                           rangeStep):
+                xTicks.append([x, '%s' % x])
+            self.setTicks('x', xTicks)  
 
         #environLocal.printDebug([yTicks])
         self._adjustAxisSpines(ax)
@@ -1317,15 +1317,15 @@ class Graph3DPolygonBars(Graph):
         # this actually appears as the w
         #g.setAxisRange('x', (xValues[0], xValues[-1]))
         self.setAxisRange('x', (min(xVals), max(xVals)))
-        environLocal.printDebug(['3d axis range, x:', min(xVals), max(xVals)])
+        #environLocal.printDebug(['3d axis range, x:', min(xVals), max(xVals)])
 
         # z values here end up being height of the graph
         self.setAxisRange('z', (min(yVals), max(yVals)))
-        environLocal.printDebug(['3d axis range, z (from y):', min(yVals), max(yVals)])
+        #environLocal.printDebug(['3d axis range, z (from y):', min(yVals), max(yVals)])
 
         # y values are the z of the graph, the depth
         self.setAxisRange('y', (min(zVals), max(zVals)))
-        environLocal.printDebug(['3d axis range, y (from z):', min(zVals), max(zVals)])
+        #environLocal.printDebug(['3d axis range, y (from z):', min(zVals), max(zVals)])
 
 #         self.axis['x']['range'] =  min(xVals), max(xVals)
 #         # swap y for z
@@ -1765,13 +1765,11 @@ class PlotStream(object):
         # Measure obtained through contexts
         # look at measures first, as this will always be faster
         #environLocal.printDebug(['ticksOffset: about to call measure offset', self.streamObj])
-
+        offsetMap = {}
         if self.streamObj.hasPartLikeStreams():
             # if we have part-like sub streams; we can assume that all parts
             # have parallel measures start times here for simplicity
             # take the top part 
-            environLocal.printDebug(['found partLikeStreams', self.streamObj.parts[0]])
-
             offsetMap = self.streamObj.parts[0].measureOffsetMap(
                         ['Measure'])
         elif self.streamObj.hasMeasures():
@@ -1785,7 +1783,6 @@ class PlotStream(object):
             self._axisLabelUsesMeasures = False
 
         #environLocal.printDebug(['ticksOffset: got offset map keys', offsetMap.keys(), self._axisLabelUsesMeasures])
-
 
         ticks = [] # a list of graphed value, string label pairs
         if len(offsetMap.keys()) > 0:
@@ -2602,11 +2599,6 @@ class PlotScatterPitchClassOffset(PlotScatter):
         self.fx = lambda n:n.offset
         self.fxTicks = self.ticksOffset
 
-#         if 'xLog' not in keywords:
-#             xLog = False
-#         else:
-#             xLog = keywords['xLog']
-
         # will use self.fx and self.fxTick to extract data
         self.data, xTicks, yTicks = self._extractData()
 
@@ -2697,8 +2689,6 @@ class PlotHorizontalBar(PlotStream):
         self.fxTicks = self.ticksOffset
 
     def _extractData(self):
-        # TODO: add support for chords
-        # find listing for any single pitch name
         dataUnique = {}
         xValues = []
         # collect data
@@ -2783,9 +2773,11 @@ class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
 
         self.fy = lambda n:n.pitchClass
         self.fyTicks = self.ticksPitchClassUsage
-        self.fxTicks = self.ticksOffset
+        self.fxTicks = self.ticksOffset # this a method
 
         self.data, xTicks, yTicks = self._extractData()
+
+        #environLocal.printDebug(['PlotHorizontalBarPitchClassOffset', 'post processing xTicks', xTicks])
 
         self.graph = GraphHorizontalBar(*args, **keywords)
         self.graph.setData(self.data)
@@ -4326,12 +4318,18 @@ class Test(unittest.TestCase):
         data = [('bar%s' % x, {'a':3,'b':2,'c':1}) for x in range(10)]
         g.setData(data)
         g.process()
-# 
         streamList = ['bach/bwv66.6', 'hwv56/movement3-05.md', 'bach/bwv324.xml']
         feList = ['ql1', 'ql2', 'ql3']
 
         p = PlotFeatures(streamList, featureExtractors=feList, doneAction=None)
         p.process()
+
+
+#     def testMeasureNumbersA(self):
+#         from music21 import corpus, graph
+#         s = corpus.parse('bwv66.6')
+#         p = graph.PlotHorizontalBarPitchClassOffset(s)
+#         #p.process()
 
 
     def xtestGraphVerticalBar(self):
