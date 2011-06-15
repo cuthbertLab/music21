@@ -4324,7 +4324,7 @@ class Stream(music21.Music21Object):
             if m.timeSignature is not None:
                 lastTimeSignature = m.timeSignature
             if lastTimeSignature is None:
-                environLocal.printDebug(['makeBeams(): lastTimeSignature is None: cannot process'])
+                #environLocal.printDebug(['makeBeams(): lastTimeSignature is None: cannot process'])
                 raise StreamException('cannot proces beams in a Measure without a time signature')
             noteGroups = []
             if m.hasVoices():
@@ -10802,7 +10802,7 @@ class Test(unittest.TestCase):
         post = s1FlatCopy.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
-        environLocal.printDebug(['s1.activeSite', s1.activeSite])
+        #environLocal.printDebug(['s1.activeSite', s1.activeSite])
         s1Measures = s1.makeMeasures()
         self.assertEqual(isinstance(s1Measures[0].clef, clef.AltoClef), True)
 

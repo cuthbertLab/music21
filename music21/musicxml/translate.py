@@ -1078,15 +1078,17 @@ def chordToMx(c):
 
     # if we have any articulations, they only go on the first of any 
     # component notes
-    mxArticulations = None
+    mxArticulations = musicxmlMod.Articulations()
     for i in range(len(c.articulations)):
         obj = c.articulations[i]
         if hasattr(obj, 'mx'):
-            if i == 0: # assign first
-                mxArticulations = obj.mx # mxArt... stores more than one artic
-            else: # concatenate any remaining
-                mxArticulations += obj.mx
-    if mxArticulations != None:
+#             if i == 0: # assign first
+#                 mxArticulations = obj.mx # mxArt... stores more than one artic
+#             else: # concatenate any remaining
+#                 mxArticulations += obj.mx
+            mxArticulations.append(obj.mx)
+    #if mxArticulations != None:
+    if len(mxArticulations) > 0:
         mxNoteList[0].notationsObj.componentList.append(mxArticulations)
 
     # notations and articulations are mixed in musicxml
@@ -2004,7 +2006,7 @@ def measureToMusicXML(m):
     from music21 import stream, duration
     # search for time signatures, either defined locally or in context
 
-    environLocal.printDebug(['measureToMusicXML', m]) 
+    #environLocal.printDebug(['measureToMusicXML', m]) 
 
     m = m.makeNotation(inPlace=False)
 
@@ -2818,10 +2820,10 @@ spirit</words>
         rbSpanners = sSub.getElementsByClass('RepeatBracket')
         self.assertEqual(len(rbSpanners), 2)
 
-        for m in sSub:
-            print m, id(m)
-        for rb in rbSpanners:
-            print rb, [id(x) for x in rb.getComponents()]
+#         for m in sSub:
+#             print m, id(m)
+#         for rb in rbSpanners:
+#             print rb, [id(x) for x in rb.getComponents()]
 
         #sSub.show('t')
 
