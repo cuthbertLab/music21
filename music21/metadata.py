@@ -254,7 +254,8 @@ class Text(music21.JSONSerializer):
     def __str__(self):
         #print type(self._data)
         if isinstance(self._data, unicode):
-            return str(self._data.encode('utf-8'))
+            # not sure if this should be wrapped in in str() call
+            return self._data.encode('utf-8')
         else:
             return str(self._data)
 

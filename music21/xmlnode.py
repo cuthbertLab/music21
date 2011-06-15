@@ -450,7 +450,11 @@ class XMLNode(object):
 
         # if self.charData is defined, this is a text component of this tag
         if self.charData != None:
-            node.appendChild(doc.createTextNode(str(self.charData)))
+            try:
+                node.appendChild(doc.createTextNode(str(self.charData)))
+            except UnicodeEncodeError:                
+                # try raw data
+                node.appendChild(doc.createTextNode(self.charData))
 
         for component in self._getComponents():
             if component == None: continue

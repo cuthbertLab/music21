@@ -699,7 +699,7 @@ def dynamicToMx(d):
     return mxDirection
 
 
-def mxToDynamic(mxDirection, inputM21=None):
+def mxToDynamicList(mxDirection):
     '''
     Given an mxDirection, load instance
 
@@ -716,15 +716,12 @@ def mxToDynamic(mxDirection, inputM21=None):
     >>> a.mx = mxDirection
     >>> a.value
     'ff'
+    >>> a.englishName
+    'very loud'
     >>> a._positionDefaultY
     -20
     '''
-
     from music21 import dynamics
-    if inputM21 is None:
-        d = dynamics.Dynamic()
-    else:
-        d = inputM21
 
     # can probably replace this with mxDirection.getDynamicMark()
     # need to test
@@ -736,23 +733,27 @@ def mxToDynamic(mxDirection, inputM21=None):
                     mxDynamics = mxObjSub
     if mxDynamics == None:
         raise dynamics.DynamicException('when importing a Dynamics object from MusicXML, did not find a DynamicMark')            
-    if len(mxDynamics) > 1:
-        raise dynamics.DynamicException('when importing a Dynamics object from MusicXML, found more than one DynamicMark contained, namely %s' % str(mxDynamics))
+#     if len(mxDynamics) > 1:
+#         raise dynamics.DynamicException('when importing a Dynamics object from MusicXML, found more than one DynamicMark contained, namely %s' % str(mxDynamics))
 
-    # palcement is found in outermost object
-    if mxDirection.get('placement') is not None:
-        d._positionPlacement = mxDirection.get('placement') 
-
-    # the tag is the dynamic mark value
-    mxDynamicMark = mxDynamics.componentList[0].get('tag')
-    d.value = mxDynamicMark
-    for dst, src in [('_positionDefaultX', 'default-x'), 
-                     ('_positionDefaultY', 'default-y'), 
-                     ('_positionRelativeX', 'relative-x'),
-                     ('_positionRelativeY', 'relative-y')]:
-        if mxDynamics.get(src) is not None:
-            setattr(d, dst, mxDynamics.get(src))
-    return d
+    post = []
+    for sub in mxDynamics.componentList:
+        d = dynamics.Dynamic()
+        # palcement is found in outermost object
+        if mxDirection.get('placement') is not None:
+            d._positionPlacement = mxDirection.get('placement') 
+    
+        # the tag is the dynamic mark value
+        mxDynamicMark = sub.get('tag')
+        d.value = mxDynamicMark
+        for dst, src in [('_positionDefaultX', 'default-x'), 
+                         ('_positionDefaultY', 'default-y'), 
+                         ('_positionRelativeX', 'relative-x'),
+                         ('_positionRelativeY', 'relative-y')]:
+            if mxDynamics.get(src) is not None:
+                setattr(d, dst, mxDynamics.get(src))
+        post.append(d)
+    return post
 
 
 def textExpressionToMx(te):
@@ -1936,11 +1937,14 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             # will return 0 if not defined
             offsetDirection = mxToOffset(mxObj, divisions)
             if mxObj.getDynamicMark() is not None:
-                d = dynamics.Dynamic()
-                d.mx = mxObj
-                _addToStaffReference(mxObj, d, staffReference)
-                #m.insert(offsetMeasureNote, d)
-                m.insert(offsetMeasureNote + offsetDirection, d)
+                #d = dynamics.Dynamic()
+                #d.mx = mxObj
+                # in rare cases there may be more than one dynamic in the same
+                # direction
+                for d in mxToDynamicList(mxObj):
+                    _addToStaffReference(mxObj, d, staffReference)
+                    #m.insert(offsetMeasureNote, d)
+                    m.insert(offsetMeasureNote + offsetDirection, d)
             if mxObj.getWedge() is not None:
                 w = dynamics.Wedge()
                 w.mx = mxObj     

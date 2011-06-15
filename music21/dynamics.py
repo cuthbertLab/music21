@@ -116,18 +116,9 @@ class Dynamic(music21.Music21Object):
 
         if not common.isStr(value):
             # assume it is a number, try to convert
-            value = dynamicStrFromDecimal(value)
-
-        self.value = value
-        if self.value in longNames:
-            self.longName = longNames[self.value]
+            self.value = dynamicStrFromDecimal(value)
         else:
-            self.longName = None
-
-        if self.value in englishNames:
-            self.englishName = englishNames[self.value]
-        else:
-            self.englishName = None
+            self.value = value # will use property
 
         # for position, as musicxml, all units are in tenths of interline space
         # position is needed as default positions are often incorrect
@@ -141,6 +132,26 @@ class Dynamic(music21.Music21Object):
 
     def __repr__(self):
         return "<music21.dynamics.Dynamic %s >" % self.value
+
+
+    def _getValue(self):
+        return self._value
+
+    def _setValue(self, value):
+        self._value = value
+        if self._value in longNames:
+            self.longName = longNames[self._value]
+        else:
+            self.longName = None
+
+        if self._value in englishNames:
+            self.englishName = englishNames[self._value]
+        else:
+            self.englishName = None
+
+    value = property(_getValue, _setValue, 
+        doc = '''Get or set the value of this dynamic, which sets the long and english names of this Dynamic.
+        ''')
 
 
     def _getPositionVertical(self):
@@ -172,7 +183,13 @@ class Dynamic(music21.Music21Object):
         return musicxmlTranslate.dynamicToMx(self)
 
     def _setMX(self, mxDirection):
-        musicxmlTranslate.mxToDynamic(mxDirection, self)
+        # if applied in this fashion, only one dynamic can be set
+        dynamicList = musicxmlTranslate.mxToDynamicList(mxDirection)
+        target = dynamicList[0] # just get first in this case
+        # manually transfer attrs to self
+        for attr in ['value', '_positionPlacement', '_positionDefaultX', '_positionDefaultY', '_positionRelativeX', '_positionRelativeY']:
+            setattr(self, attr, (getattr(target, attr)))
+
 
     mx = property(_getMX, _setMX)
 
