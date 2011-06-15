@@ -1029,9 +1029,8 @@ def chordToMx(c):
         chordPos = 0
         mxNoteChordGroup = []
         for pitchObj in c.pitches:
+            # copy here, before merge
             mxNote = copy.deepcopy(mxNoteBase)
-
-            #mxNote.pitch = None # clear before each iteration
             mxNote = mxNote.merge(pitchObj.mx, returnDeepcopy=False)
             if chordPos > 0:
                 mxNote.set('chord', True)
@@ -1176,6 +1175,8 @@ def generalNoteToMusicXML(n):
     '''
     from music21 import stream, duration
     # make a copy, as we this process will change tuple types
+    # this method is called infrequently, and only for display of a single 
+    # note
     nCopy = copy.deepcopy(n)
     duration.updateTupletType(nCopy.duration) # modifies in place
 
@@ -2193,8 +2194,6 @@ def streamToMx(s, spannerBundle=None):
 
     if s.hasPartLikeStreams():
         #environLocal.printDebug('Stream._getMX: interpreting multipart')
-
-        # making a deepcopy, as we are going to edit internal objs
         # NOTE: a deepcopy has already been made; do not copy again
         #partStream = copy.deepcopy(s)
         partStream = s

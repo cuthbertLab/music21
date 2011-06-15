@@ -302,7 +302,8 @@ class Stream(music21.Music21Object):
             found = self.__class__()
             for e in self.elements[key]:
                 found.insert(e.getOffsetBySite(self), e)
-            found._elementsChanged()
+            # each insert calls this; does not need to be done here
+            #found._elementsChanged()
             return found
 
         elif common.isStr(key):
@@ -6530,7 +6531,7 @@ class Stream(music21.Music21Object):
         >>> mxScore = str1.mx
         '''
         #environLocal.printDebug('calling Stream._getMX')
-        # returns an mxScore object
+        # returns an mxScore object; a deepcopy has already been made
         return musicxmlTranslate.streamToMx(self)
 
     def _setMXPart(self, mxScore, partId):
@@ -6551,6 +6552,7 @@ class Stream(music21.Music21Object):
         '''Provide a complete MusicXML representation. 
         '''
         # always make a deepcopy before processing musicxml
+        # this should only be done once
         post = copy.deepcopy(self)
         mxScore = post._getMX()
         return mxScore.xmlStr()
@@ -7783,15 +7785,6 @@ class Measure(Stream):
         # on input
         self.layoutWidth = None
 
-
-# NOTE: it is necessary to define an overridden makeNotation, as done below. 
-#    def makeMeasures(self, dummy = None, dummy = None, inPlace = False):
-#        '''
-#        Overrides the makeMeasures routine in 
-#        Stream to allow makeNotation() [which calls makeMeasures] to
-#        be called on a Measure object
-#        '''
-        
 
     def addRepeat(self):
         # TODO: write

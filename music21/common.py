@@ -1546,8 +1546,7 @@ def unwrapWeakref(referent):
     True
     '''
     if type(referent) is weakref.ref:
-        unwrapped = referent()
-        return unwrapped # could be None if referent has gone away!
+        return referent()
     else:
         return referent
     

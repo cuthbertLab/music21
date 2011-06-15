@@ -359,8 +359,8 @@ class CallGraph:
         #self.callTest = TestMusicXMLObjectTypeChecking
         #self.callTest = TestGetContextByClass
         #self.callTest = TestMakeMeasures
-        #self.callTest = TestMusicXMLMultiPartOutput
-        self.callTest = TestGetElementsByClass
+        self.callTest = TestMusicXMLMultiPartOutput
+        #self.callTest = TestGetElementsByClass
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
@@ -371,7 +371,7 @@ class CallGraph:
         ct = self.callTest()
 
         # start timer
-        print('starting test')
+        print('%s starting test' % _MOD)
         t = common.Timer()
         t.start()
 

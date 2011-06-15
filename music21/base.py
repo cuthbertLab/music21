@@ -240,6 +240,8 @@ class DefinedContexts(object):
         new = self.__class__()
         for idKey in self._definedContexts.keys():
             dict = self._definedContexts[idKey]
+            if dict['isDead']:
+                continue # do not copy dead references
             new.add(dict['obj'], offset=dict['offset'], timeValue=dict['time'],
                     idKey=idKey, classString=dict['class'])
         return new
@@ -380,7 +382,7 @@ class DefinedContexts(object):
 
             # check if unwrapped, unwrap
             obj = common.unwrapWeakref(self._definedContexts[idKey]['obj'])
-            if obj != None:
+            if obj is not None:
                 newKey = id(obj)
             else:
                 newKey = None
@@ -466,6 +468,7 @@ class DefinedContexts(object):
         dict['obj'] = objRef # a weak ref
         dict['offset'] = offset # offset can be None for contexts
         dict['class'] = classString 
+        dict['isDead'] = False # store to access w/o unwrapping
 
         # NOTE: this may not give sub-second resolution on some platforms
         if timeValue is None:
@@ -524,9 +527,10 @@ class DefinedContexts(object):
     def removeById(self, idKey):
         '''Remove a defined contexts entry by id key, which is id() of the object. 
         '''
-        # must clear
-        self._lastID = -1 # cannot be None
-        self._lastOffset = None
+        # must clear if removing
+        if idKey == self._lastID:
+            self._lastID = -1 # cannot be None
+            self._lastOffset = None
 
         if idKey == None:
             raise Exception('trying to remove None idKey')
@@ -574,7 +578,7 @@ class DefinedContexts(object):
 
 
     def get(self, locationsTrail=False, sortByCreationTime=False,
-            priorityTarget=None, autoPurge=True):
+            priorityTarget=None):
         '''Get references; unwrap from weakrefs; order, based on dictionary keys, is from most recently added to least recently added.
 
         The `locationsTrail` option forces locations to come after all other defined contexts.
@@ -582,8 +586,6 @@ class DefinedContexts(object):
         The `sortByCreationTime` option will sort objects by creation time, where most-recently assigned objects are returned first. 
 
         If `priorityTarget` is defined, this object will be placed first in the list of objects.
-
-        If `autoPurge` is True, this method automatically removes dead weak-refs. Thus, every time locations are gotten, any dead weakrefs are removed. This provides a modest performance boost. 
 
         >>> from music21 import *
         >>> import time
@@ -613,7 +615,7 @@ class DefinedContexts(object):
             keyRepository = self._definedContexts.keys()
 
         post = [] 
-        purgeKeys = []
+        #purgeKeys = []
         
         # get partitioned lost of all, w/ locations last if necessary
         if locationsTrail:
@@ -632,21 +634,21 @@ class DefinedContexts(object):
         for key in keys:
             dict = self._definedContexts[key]
             # check for None object; default location, not a weakref, keep
-            if dict['obj'] == None:
+            if dict['obj'] is None:
                 post.append(dict['obj'])
             elif WEAKREF_ACTIVE:
                 obj = common.unwrapWeakref(dict['obj'])
                 if obj is None: # dead ref
-                    purgeKeys.append(key)
+                    dict['isDead'] = True
                 else:
                     post.append(obj)
             else:
                 post.append(dict['obj'])
 
         # remove dead references
-        if autoPurge:
-            for key in purgeKeys:
-                self.removeById(key)
+#         if autoPurge:
+#             for key in purgeKeys:
+#                 self.removeById(key)
 
         if priorityTarget is not None:
             if priorityTarget in post:
@@ -676,13 +678,25 @@ class DefinedContexts(object):
         post = []
         for idKey in self._locationKeys:
             try:
-                s1 = self._definedContexts[idKey]['obj']
+                objRef = self._definedContexts[idKey]['obj']
             except KeyError:
                 raise DefinedContextsException('no such site: %s' % idKey)
-            if s1 is None or WEAKREF_ACTIVE == False: # leave None alone
-                post.append(s1)
+
+            # skip dead references
+            if self._definedContexts[idKey]['isDead']:
+                continue
+
+            #if s1 is None: # hwt keep none?
+            if idKey is None:
+                post.append(None) # keep None as site
+            elif not WEAKREF_ACTIVE: # leave None alone
+                post.append(objRef)
             else:
-                post.append(common.unwrapWeakref(s1))
+                obj = common.unwrapWeakref(objRef)
+                if obj is None:
+                    self._definedContexts[idKey]['isDead'] = True
+                    continue
+                post.append(obj)
         return post
     
 
@@ -708,6 +722,8 @@ class DefinedContexts(object):
             className = common.classToClassStr(className)
 
         for idKey in self._locationKeys:
+            if self._definedContexts[idKey]['isDead']:
+                continue 
             classStr = self._definedContexts[idKey]['class']
             if classStr == className:
                 objRef = self._definedContexts[idKey]['obj']
@@ -824,7 +840,7 @@ class DefinedContexts(object):
         # may want to convert to tuple to avoid user editing?
         return self._locationKeys
 
-    def purgeLocations(self):
+    def purgeLocations(self, rescanIsDead=False):
         '''Clean all locations that refer to objects that no longer exist.
 
         >>> class Mock(Music21Object): pass
@@ -838,22 +854,44 @@ class DefinedContexts(object):
         >>> del aSite
         >>> len(aLocations)
         2
-        >>> aLocations.purgeLocations()
+        >>> aLocations.purgeLocations(rescanIsDead=True)
         >>> len(aLocations)
         1
         '''
-        match = []
+        if rescanIsDead:
+            for idKey in self._locationKeys:
+                if idKey is None: 
+                    continue
+                if self._definedContexts[idKey]['isDead']:
+                    continue # already marked
+                if WEAKREF_ACTIVE:
+                    obj = common.unwrapWeakref(
+                        self._definedContexts[idKey]['obj'])
+                else:
+                    obj = self._definedContexts[idKey]['obj']
+                if obj is None: # if None, it no longer exists
+                    self._definedContexts[idKey]['isDead'] = True
+
+        # use previously set isDead entry, so as not to
+        # unwrap all references
         for idKey in self._locationKeys:
-            if idKey == None: 
+            if idKey is None: 
                 continue
-            if WEAKREF_ACTIVE:
-                obj = common.unwrapWeakref(self._definedContexts[idKey]['obj'])
-            else:
-                obj = self._definedContexts[idKey]['obj']
-            if obj == None: # if None, it no longer exists
-                match.append(idKey)
-        for id in match:
-            self.removeById(id)
+            if self._definedContexts[idKey]['isDead']:
+                self.removeById(idKey)
+
+#         match = []
+#         for idKey in self._locationKeys:
+#             if idKey == None: 
+#                 continue
+#             if WEAKREF_ACTIVE:
+#                 obj = common.unwrapWeakref(self._definedContexts[idKey]['obj'])
+#             else:
+#                 obj = self._definedContexts[idKey]['obj']
+#             if obj == None: # if None, it no longer exists
+#                 match.append(idKey)
+#         for id in match:
+#             self.removeById(id)
 
     def _getOffsetBySiteId(self, idKey):
         '''Main method for getting an offset from a location key.
@@ -934,12 +972,17 @@ class DefinedContexts(object):
         '''
         for idKey in self._definedContexts.keys():
             dict = self._definedContexts[idKey]
+            if dict['isDead']: # cal alway skip
+                continue
             # must unwrap references before comparison
             #if common.isWeakref(dict['obj']):
             if WEAKREF_ACTIVE:
                 compareObj = common.unwrapWeakref(dict['obj'])
             else:
                 compareObj = dict['obj']
+            if compareObj is None:
+                dict['isDead'] = True
+                continue
             if id(compareObj) == id(obj):
                 return self._getOffsetBySiteId(idKey) #dict['offset']
         raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % obj)
@@ -1066,10 +1109,12 @@ class DefinedContexts(object):
         for siteId in self._definedContexts.keys():
             # might need to use almost equals here
             if self._definedContexts[siteId]['offset'] == offset:
+                if self._definedContexts[siteId]['isDead']:
+                    return None
                 match = self._definedContexts[siteId]['obj']
                 break
         if WEAKREF_ACTIVE:
-            if match is None:
+            if match is None: # this is a dead erfs
                 return match
             elif not common.isWeakref(match):
                 raise DefinedContextsException('site on coordinates is not a weak ref: %s' % match)
@@ -2076,11 +2121,6 @@ class Music21Object(JSONSerializer):
         '''Remove references to all locations in objects that no longer exist.
         '''
         self._definedContexts.purgeLocations()
-
-#     def clearLocations(self):
-#         '''Clear all locations stored by this object.
-#         '''
-#         self._definedContexts.clearLocations()
 
 
     def getContextByClass(self, className, serialReverseSearch=True,
