@@ -1273,15 +1273,15 @@ is that typos of keys etc. are harder to detect (and some run speed tradeoff I'm
 Advantage is coding time and fewer type errors while coding.
 '''
 
-class defHash(dict):
+class DefaultHash(dict):
     '''A replacement for dictionaries that behave a bit more like perl hashes.  
-    No more KeyErrors. The difference between defHash and defaultdict is that the 
+    No more KeyErrors. The difference between DefaultHash and defaultdict is that the 
     Dict values come first in the definition and that default can be set to 
     None (which it is) or to any object.
     
     If you want a factory that makes hashes with a particular different default, use:
     
-        falsehash = lambda h = None: defHash(h, default = False)
+        falsehash = lambda h = None: DefaultHash(h, default = False)
         a = falsehash({"A": falsehash(), "B": falsehash()})
         print(a["A"]["hi"]) # returns False
     
@@ -1290,11 +1290,11 @@ class defHash(dict):
 
     if callDefault is True then the default is called:
     
-        defHash(default = list, callDefault = True)
+        DefaultHash(default = list, callDefault = True)
         
     will create a new List for each element
     '''
-    def __init__(self, hash = None, default = None, callDefault = False):
+    def __init__(self, hash = None, default=None, callDefault=False):
         if hash:
             dict.__init__(self, hash)
         else:
@@ -1308,7 +1308,7 @@ class defHash(dict):
         try:
             return dict.__getitem__(self, key)
         except KeyError:
-            if self.callDefault is False:
+            if not self.callDefault:
                 return self.default
             else:
                 dict.__setitem__(self, key, self.default())

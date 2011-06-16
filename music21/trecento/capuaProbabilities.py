@@ -45,8 +45,8 @@ def multipleFindsame(total = 10000):
 def countCadencePercentages():
     ballatas = cadencebook.BallataSheet()
     totalPieces = 0.0
-    firstNoteTotal = common.defHash(default = 0)
-    lastNoteTotal = common.defHash(default = 0)
+    firstNoteTotal = common.DefaultHash(default = 0)
+    lastNoteTotal = common.DefaultHash(default = 0)
     
     for thisWork in ballatas:
         incipit = thisWork.incipit

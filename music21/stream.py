@@ -202,7 +202,7 @@ class Stream(music21.Music21Object):
         # from which this was taken
         self.flattenedRepresentationOf = None 
         
-        self._cache = common.defHash()
+        self._cache = common.DefaultHash()
 
         if givenElements is not None:
             for e in givenElements:
@@ -404,7 +404,7 @@ class Stream(music21.Music21Object):
         # resetting the cache removes lowest and highest time storage
         # a slight performance optimization: not creating unless needed
         if len(self._cache) > 0:
-            self._cache = common.defHash()
+            self._cache = common.DefaultHash()
 
 
     def _getElements(self):
@@ -413,7 +413,7 @@ class Stream(music21.Music21Object):
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
 
-        if self._cache["elements"] == None:
+        if self._cache["elements"] is None:
             # this list concatenation may take time; thus, only do when
             # _elementsChanged has been called
             self._cache["elements"] = self._elements + self._endElements
@@ -940,7 +940,9 @@ class Stream(music21.Music21Object):
         # these have references to old objects
         # it is likely that this only needs to be done at the highest
         # level of recursion, not on component Streams
-        spannerBundle = spanner.SpannerBundle(new.flat.spanners)
+        #spannerBundle = spanner.SpannerBundle(new.flat.spanners)
+        spannerBundle = new.spannerBundle
+
         # iterate over complete semi flat (need containers); find
         # all new/old pairs
         for e in new.semiFlat:
@@ -2462,7 +2464,7 @@ class Stream(music21.Music21Object):
         
         
         '''
-        offsetsRepresented = common.defHash()
+        offsetsRepresented = common.DefaultHash()
         for el in self.elements:
             if not offsetsRepresented[el.offset]:
                 offsetsRepresented[el.offset] = []
@@ -2509,17 +2511,14 @@ class Stream(music21.Music21Object):
         #tempFlat = self.flat
         #environLocal.printDebug(['measures(): post flat call', self, 'len(self.flat)', len(self.flat)])
 
-        # spanners may be store at the container/Part level, not w/n a measure
-        # if they are within the Measure, or a voice, they will be transfered
-        # below
-        mStreamSpanners = self.spanners
-
         returnObj = self.__class__()
         returnObj.setDerivation(self)
         returnObj.derivationMethod = 'measures'
         returnObj.mergeAttributes(self) # get id and groups
         srcObj = self
 
+        # create empty bundle in case not created by other means
+        spannerBundle = spanner.SpannerBundle()
         # if we have no Measures defined, call makeNotation
         # this will  return a deepcopy of all objects
         if len(mStream) == 0:
@@ -2528,15 +2527,23 @@ class Stream(music21.Music21Object):
             srcObj = mStream
             # get spanners from make notation, as this will be a copy
             # TODO: make sure that makeNotation copies spanners
-            mStreamSpanners = mStream.spanners
+            #mStreamSpanners = mStream.spanners
+            spannerBundle = srcObj.spannerBundle
+
+        # spanners may be store at the container/Part level, not w/n a measure
+        # if they are within the Measure, or a voice, they will be transfered
+        # below
+        #mStreamSpanners = self.spanners
+        if gatherSpanners:
+            spannerBundle = srcObj.spannerBundle
 
         # create for storage and processing
-        spannerBundle = spanner.SpannerBundle()
-        if gatherSpanners:
-            for sp in mStreamSpanners:
-                #environLocal.printDebug(['copying spanner to returnObj', sp])
-                # store for latter processing
-                spannerBundle.append(sp)
+#         spannerBundle = spanner.SpannerBundle()
+#         if gatherSpanners:
+#             for sp in mStreamSpanners:
+#                 #environLocal.printDebug(['copying spanner to returnObj', sp])
+#                 # store for latter processing
+#                 spannerBundle.append(sp)
 
 
         for m in mStream.elements:
@@ -2653,7 +2660,9 @@ class Stream(music21.Music21Object):
             for sp in spannerBundle:
                 # can use old offsets of spanners, even though components
                 # have been updated
-                returnObj.insert(sp.getOffsetBySite(mStreamSpanners), sp)
+                #returnObj.insert(sp.getOffsetBySite(mStreamSpanners), sp)
+                returnObj.insert(sp.getOffsetBySite(srcObj.flat), sp)
+
                 #environLocal.printDebug(['Stream.measrues: copying spanners:', sp])
 
         #environLocal.printDebug(['len(returnObj.flat)', len(returnObj.flat)])
@@ -5083,7 +5092,7 @@ class Stream(music21.Music21Object):
 
         # storing .elements in here necessitates
         # create a new, independent cache instance in the flat representation
-        sNew._cache = common.defHash()
+        sNew._cache = common.DefaultHash()
         sNew._elements = []
         sNew._endElements = []
         sNew._elementsChanged()
@@ -5332,6 +5341,16 @@ class Stream(music21.Music21Object):
         >>> sf[0][0]
         <music21.note.Note C>
         
+        ''')
+
+
+    def _getSpannerBundle(self):
+        if self._cache['spannerBundle'] is None:
+           self._cache['spannerBundle'] = spanner.SpannerBundle(self.flat.spanners)
+        return self._cache['spannerBundle']
+
+    spannerBundle = property(_getSpannerBundle, 
+        doc = '''A high-level object or Spanner management.
         ''')
 
 
@@ -6110,7 +6129,8 @@ class Stream(music21.Music21Object):
         # need to reconnect spanners
         if copySpanners:
             environLocal.printDebug(['Stream.expandRepeats', 'copying spanners'])
-            spannerBundle = spanner.SpannerBundle(post.flat.spanners)
+            #spannerBundle = spanner.SpannerBundle(post.flat.spanners)
+            spannerBundle = post.spannerBundle
             # iterate over complete semi flat (need containers); find
             # all new/old pairs
             for e in post.semiFlat:
@@ -8611,7 +8631,8 @@ class Score(Stream):
             # get spanners at highest level, not by Part
             post.insert(0, p.expandRepeats(copySpanners=False))
 
-        spannerBundle = spanner.SpannerBundle(post.flat.spanners)
+        #spannerBundle = spanner.SpannerBundle(post.flat.spanners)
+        spannerBundle = post.spannerBundle
         # iterate over complete semi flat (need containers); find
         # all new/old pairs
         for e in post.semiFlat:

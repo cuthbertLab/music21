@@ -2201,7 +2201,8 @@ def streamToMx(s, spannerBundle=None):
         # must set spanner after copying
         if spannerBundle is None: 
             # no spanner bundle provided, get one from the flat stream
-            spannerBundle = spanner.SpannerBundle(s.flat)
+            #spannerBundle = spanner.SpannerBundle(s.flat)
+            spannerBundle = s.spannerBundle
             #environLocal.printDebug(['streamToMx(), hasPartLikeStreams(): loaded spannerBundle of size:', len(spannerBundle), 'id(spannerBundle)', id(spannerBundle)])
 
         streamOfStreams = s.getElementsByClass('Stream')
@@ -2263,7 +2264,8 @@ def streamToMx(s, spannerBundle=None):
 
         if spannerBundle is None: 
             # no spanner bundle provided, get one from the flat stream
-            spannerBundle = spanner.SpannerBundle(s.flat)
+            #spannerBundle = spanner.SpannerBundle(s.flat)
+            spannerBundle = s.spannerBundle
             #environLocal.printDebug(['streamToMx(): loaded spannerBundle of size:', len(spannerBundle), 'id(spannerBundle)', id(spannerBundle)])
 
         mxComponents.append(streamPartToMx(s,

@@ -244,7 +244,7 @@ class Test(unittest.TestCase):
         score1 = music21.converter.parseFile("dicterliebe1.xml")
         monoScore = score1.chordsToNotes()    # returns a new Stream
         notePairs = monoScore.getAllSimultaneousNotes()  # returns a list of Tuples intervals = interval.generateFromNotePairs(notePairs)
-        intervals2 = common.defHash(default = 0) 
+        intervals2 = common.DefaultHash(default = 0) 
         for thisInt in intervals2:
             if thisInt.name != "P1":
                 intervals2[thisInt.name] += 1

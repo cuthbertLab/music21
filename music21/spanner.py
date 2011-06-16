@@ -148,7 +148,7 @@ class Spanner(music21.Music21Object):
         return self._components.__getitem__(key)
 
     def __len__(self):
-        return len(self._components)
+        return len(self._components._elements)
 
 
     def getComponents(self):

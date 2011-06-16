@@ -2310,8 +2310,9 @@ class Music21Object(JSONSerializer):
     
     def _setActiveSite(self, site):
         #environLocal.printDebug(['_setActiveSite() called:', 'self', self, 'site', site])
+        # NOTE: this is a performance intensive call
         siteId = None
-        if site != None: 
+        if site is not None: 
             siteId = id(site)
             # check that the activeSite is not already set to this object
             # this avoids making another weakref

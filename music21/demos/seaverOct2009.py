@@ -57,7 +57,7 @@ def simple3():
     
     #  semiFlat lets me get all Measures no matter where they reside in the tree structure
     measureStream = parse(testFiles.mazurka6).semiFlat[Measure]
-    rhythmicHash = common.defHash(default = list, callDefault = True )
+    rhythmicHash = common.DefaultHash(default = list, callDefault = True )
 
     for thisMeasure in measureStream:
         if not almostEquals(thisMeasure.duration.quarterLength, 3.0):

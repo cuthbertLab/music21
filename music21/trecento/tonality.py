@@ -25,9 +25,9 @@ from music21 import lily
 from music21.lily import lilyString
 from music21.trecento import capua
 from music21.trecento import polyphonicSnippet
-from music21.common import defHash
+from music21.common import DefaultHash
 
-ph = lambda h = {}: defHash(h, default = False)
+ph = lambda h = {}: DefaultHash(h, default = False)
 
 class TonalityCounter(object):
     '''

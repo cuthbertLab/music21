@@ -232,7 +232,7 @@ class TinyNotationNote(object):
     LYRIC   = compile('\_(.*)')
 
 
-    def __init__(self, stringRep, storedDict = common.defHash(default = False)):
+    def __init__(self, stringRep, storedDict = common.DefaultHash(default = False)):
         noteObj = None
         storedtie = None
         self.debug = False
