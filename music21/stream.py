@@ -195,6 +195,9 @@ class Stream(music21.Music21Object):
         self.autoSort = True
         self.isFlat = True  # does it have no embedded Streams
 
+        # experimental
+        self._mutable = True
+
         # when deriving a flat stream, store a reference to the non-flat Stream          
         # from which this was taken
         self.flattenedRepresentationOf = None 
@@ -354,6 +357,10 @@ class Stream(music21.Music21Object):
         >>> a.isFlat
         False
         '''
+        # experimental: may not last
+#         if not self._mutable:
+#             return 
+
         if memo is None:
             memo = []
         memo.append(id(self))
@@ -366,18 +373,19 @@ class Stream(music21.Music21Object):
 
         # may not always need to clear cache of the active site, but may 
         # be a good idea; may need to intead clear all sites            
-        #if self.activeSite is not None:
-        #    self.activeSite._elementsChanged()
-        for site in self.getSites(idExclude=memo):
-            # if this Stream is a location in a Site, those sites are not flat
-            # assume that sorting does not need to be changed
-            if site is not None:
-                # some sites may have been added to memo in this loop
-                if id(site) in memo:
-                    #environLocal.printDebug(['found site even after passing memo', 'memo', memo, 'id(site)', id(site)])
-                    continue
-                site._elementsChanged(updateIsFlat=False, clearIsSorted=False, 
-                    memo=memo)
+        if self.activeSite is not None:
+            self.activeSite._elementsChanged()
+
+#         for site in self.getSites(idExclude=memo):
+#             # if this Stream is a location in a Site, those sites are not flat
+#             # assume that sorting does not need to be changed
+#             if site is not None:
+#                 # some sites may have been added to memo in this loop
+#                 if id(site) in memo:
+#                     #environLocal.printDebug(['found site even after passing memo', 'memo', memo, 'id(site)', id(site)])
+#                     continue
+#                 site._elementsChanged(updateIsFlat=False, clearIsSorted=False, 
+#                     memo=memo)
 
         # clear these attributes for setting later
         if clearIsSorted:
@@ -409,7 +417,6 @@ class Stream(music21.Music21Object):
             # this list concatenation may take time; thus, only do when
             # _elementsChanged has been called
             self._cache["elements"] = self._elements + self._endElements
-
         return self._cache["elements"]
 
         #return self._elements + self._endElements
@@ -880,13 +887,12 @@ class Stream(music21.Music21Object):
             # all subclasses of Music21Object that define their own
             # __deepcopy__ methods must be sure to not try to copy activeSite
             if name == '_activeSite':
-                newValue = self.activeSite # keep a reference, not a deepcopy
-                setattr(new, name, newValue)
+                # keep a reference, not a deepcopy
+                setattr(new, name, self.activeSite)
             # attributes that require special handling
             elif name == 'flattenedRepresentationOf':
                 # keep a reference, not a deepcopy
-                newValue = self.flattenedRepresentationOf
-                setattr(new, name, newValue)
+                setattr(new, name, self.flattenedRepresentationOf)
             elif name == '_derivation':
                 # keep the old ancestor but need to update the conainer
                 newValue = copy.deepcopy(self._derivation)
@@ -923,9 +929,8 @@ class Stream(music21.Music21Object):
             else: 
                 #environLocal.printDebug(['forced to use copy.deepcopy:',
                 #    self, name, part])
-                newValue = copy.deepcopy(part, memo)
                 #setattr() will call the set method of a named property.
-                setattr(new, name, newValue)
+                setattr(new, name, copy.deepcopy(part, memo))
 
         # do after all other copying
         new._idLastDeepCopyOf = id(self)
@@ -5056,7 +5061,6 @@ class Stream(music21.Music21Object):
         >>> z[2].name, z[3].name
         ('C#', 'E')
 
-
         ''')        
 
         
@@ -6584,6 +6588,10 @@ class Stream(music21.Music21Object):
         # always make a deepcopy before processing musicxml
         # this should only be done once
         post = copy.deepcopy(self)
+# experimental tests
+#         for obj in post.recurse(streamsOnly=True):
+#             obj._mutable = False
+
         mxScore = post._getMX()
         return mxScore.xmlStr()
 
@@ -14640,6 +14648,16 @@ class Test(unittest.TestCase):
             'Measure')[3].notes[3].beatStr
         environLocal.printDebug(['beatStr', beatStr])
 
+
+    def testDeepCopyLocations(self):
+        from music21 import stream, note
+        s1 = stream.Stream()
+        n1 = note.Note()
+        s1.append(n1)
+        print [id(x) for x in n1.getSites()]
+        s2 = copy.deepcopy(s1)
+        #print s2[0].getSites()
+        print [id(x) for x in s2[0].getSites()]
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

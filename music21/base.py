@@ -218,7 +218,9 @@ class DefinedContexts(object):
 
     def __deepcopy__(self, memo=None):
         '''This produces a new, independent DefinedContexts object.
-        This does not, however, deepcopy site references stored therein
+        This does not, however, deepcopy site references stored therein.
+
+        All sites, however, are passed on to the new deepcopy, which means that in a deepcopy of a Stream that contains Notes, the copied Note will have the former site as a location.
 
         >>> import copy
         >>> class Mock(Music21Object): pass
@@ -237,6 +239,10 @@ class DefinedContexts(object):
         the not copying object references here may be a problem
         seems to be a problem in copying Streams before pickling
         '''
+        #TODO: it may be a problem that sites are being transferred to deep
+        #copies; this functionality is used at times in context searches, but
+        # might be a performance hog.
+
         new = self.__class__()
         for idKey in self._definedContexts.keys():
             dict = self._definedContexts[idKey]
@@ -806,8 +812,7 @@ class DefinedContexts(object):
         '''
         if id(obj) in self._locationKeys:
             return True
-        else:
-            return False
+        return False
 
     def hasSiteId(self, siteId):
         '''Return True or False if this DefinedContexts object already has this site id defined as a location
@@ -826,8 +831,7 @@ class DefinedContexts(object):
         '''
         if siteId in self._locationKeys:
             return True
-        else:
-            return False
+        return False
 
     def getSiteIds(self):
         '''Return a list of all site Ids.
@@ -1177,6 +1181,8 @@ class DefinedContexts(object):
 
         # TODO: can optimize search of defined contexts if we store in advance
         # all class names; then weakrefs will not have to be used
+        # presently storing top-most class, but checking this will not permit
+        # matching sub-classes
         objs = self.get(locationsTrail=True,  
                         sortByCreationTime=sortByCreationTime,
                         priorityTarget=priorityTarget)

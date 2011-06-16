@@ -311,16 +311,36 @@ class TestMusicXMLMultiPartOutput(CallTest):
         self.s = stream.Score()
         for i in range(10): # parts
             p = stream.Part()
-            for j in range(10): # measures
+            for j in range(1): # measures
                 m = stream.Measure()
                 m.append(note.Note(type='quarter'))
                 p.append(m)
+            p._mutable = False
             self.s.insert(0, p)
+
+        for obj in self.s.recurse(streamsOnly=True):
+            obj._mutable = False
+
         #self.s.show()
 
     def testFocus(self):
         # get musicxml string
         post = self.s.musicxml
+
+
+class TestCommonContextSearches(CallTest):
+
+    def __init__(self):
+        from music21 import corpus
+        self.s = corpus.parse('bwv66.6')
+
+    def testFocus(self):
+        ts = self.s.parts[0].getElementsByClass(
+            'Measure')[3].getContextByClass('TimeSignature')
+        #environLocal.printDebug(['ts', ts])
+
+        #beatStr = self.s.parts[0].getElementsByClass(
+        #    'Measure')[3].notes[3].beatStr
 
 
 #-------------------------------------------------------------------------------
@@ -342,7 +362,8 @@ class CallGraph:
 
     def __init__(self):
         self.excludeList = ['pycallgraph.*','re.*','sre_*', 'copy*', '*xlrd*']
-        #self.excludeList += ['*xmlnode*']
+        # these have been shown to be very fast
+        self.excludeList += ['*xmlnode*', 'xml.dom.*', 'codecs.*']
         #self.excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
 
         # set class  to test here
@@ -359,8 +380,11 @@ class CallGraph:
         #self.callTest = TestMusicXMLObjectTypeChecking
         #self.callTest = TestGetContextByClass
         #self.callTest = TestMakeMeasures
-        self.callTest = TestMusicXMLMultiPartOutput
         #self.callTest = TestGetElementsByClass
+
+        self.callTest = TestMusicXMLMultiPartOutput
+        #self.callTest = TestCommonContextSearches
+
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
