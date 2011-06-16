@@ -1152,7 +1152,7 @@ class DefinedContexts(object):
         >>> #time.sleep(.05)
         >>> aContexts.add(bObj)
         >>> # we get the most recently added object first
-        >>> aContexts.getByClass('mock', sortByCreationTime=True) == bObj
+        >>> aContexts.getByClass('Mock', sortByCreationTime=True) == bObj
         True
         >>> aContexts.getByClass(Mock, sortByCreationTime=True) == bObj
         True
@@ -1184,9 +1184,9 @@ class DefinedContexts(object):
             #environLocal.printDebug(['memo', memo])
             if obj is None: 
                 continue # a None context, or a dead reference
-            # TODO: look for classes attribute
             if common.isStr(className):
-                if type(obj).__name__.lower() == className.lower():
+                #if type(obj).__name__.lower() == className.lower():
+                if className in obj.classes:
                     post = obj       
                     break
             elif isinstance(obj, className):
@@ -2146,6 +2146,8 @@ class Music21Object(JSONSerializer):
 
         The `prioritizeActiveSite` parameter searches the objects parent before any other object. 
         '''
+        from music21 import stream # needed for exception matching
+
         #environLocal.printDebug(['call getContextByClass from:', self, 'parent:', self.activeSite, 'callerFirst:', callerFirst, 'prioritizeActiveSite', prioritizeActiveSite])
     
         # this method will be called recursively on all object levels, ascending
@@ -2167,10 +2169,15 @@ class Music21Object(JSONSerializer):
         if serialReverseSearch:
 
             # if this is a Stream and we have a caller, see if we 
-            # can get the offset from within this Stream       
+            # can get the offset from within this Stream of the caller 
             # first, see if this element is even in this Stream     
             getOffsetOfCaller = False
-            if hasattr(self, "elements") and callerFirst is not None: 
+            skipGetOffsetOfCaller = False
+            if (hasattr(self, "elements") and callerFirst is not None): 
+                #and id(self.semiFlat) not in memo.keys()): 
+                # memo check above is needed for string operational contexts
+                # where cached semiFlat generation raises an error
+
                 # find the offset of the callerFirst
                 # if this is a Stream, we need to find the offset relative
                 # to this Stream; it may only be available within a semiFlat
@@ -2178,15 +2185,23 @@ class Music21Object(JSONSerializer):
 
                 # this semiFlat name will be used in the getOffsetOfCaller 
                 # branch below
-                semiFlat = self.semiFlat
+
+                #environLocal.printDebug(['getContextByClass, serialReverseSearch', 'requesting semi flat from self:', id(self)])
+                try:
+                    semiFlat = self.semiFlat
+                except stream.StreamException:
+                    # in some testing environments this semiFlat or flat
+                    # will try to place the same object in the same stream; cannot yet localize the problem; skipping is ok
+                    skipGetOffsetOfCaller = True                    
+
                 # see if this element is in this Stream; 
-                if semiFlat.hasElement(callerFirst): 
-                    getOffsetOfCaller = True
-                else:
-                    if hasattr(callerFirst, 'flattenedRepresentationOf'):
-                        if callerFirst.flattenedRepresentationOf is not None:
+                if not skipGetOffsetOfCaller:
+                    if semiFlat.hasElement(callerFirst): 
+                        getOffsetOfCaller = True
+                    else:
+                        if (hasattr(callerFirst, 'flattenedRepresentationOf') and callerFirst.flattenedRepresentationOf is not None):
                             if semiFlat.hasElement(
-                            callerFirst.flattenedRepresentationOf):
+                                callerFirst.flattenedRepresentationOf):
                                 getOffsetOfCaller = True
 
             if getOffsetOfCaller:
@@ -2206,13 +2221,13 @@ class Music21Object(JSONSerializer):
                     #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from the callers flattenedRepresentationOf attribute', 'self', self, 'callerFirst', callerFirst])
 
                     # Thanks Johannes Emerich [public@johannes.emerich.de] !
-                    if callerFirst.flattenedRepresentationOf != None:
+                    if callerFirst.flattenedRepresentationOf is not None:
                         unFlat = callerFirst.flattenedRepresentationOf
                         offsetOfCaller = semiFlat.getOffsetByElement(unFlat)
 
                 # if the offset has been found, get element at  or before
                 # this offset
-                if offsetOfCaller != None:
+                if offsetOfCaller is not None:
                     post = semiFlat.getElementAtOrBefore(offsetOfCaller, 
                                [className])
 
@@ -4518,7 +4533,7 @@ class Test(unittest.TestCase):
         n2 = copy.deepcopy(n1)
         self.assertEqual(n2._idLastDeepCopyOf, id(n1))
 
-    
+
 #     def testWeakElementWrapper(self):
 #         from music21 import note
 #         n = note.Note('g2')

@@ -963,10 +963,10 @@ class Stream(music21.Music21Object):
             idElement = id(element)
             for e in self._elements:
                 if idElement == id(e):
-                    raise StreamException('the object (%s) is already found in this Stream (%s)' % (element, self))
+                    raise StreamException('the object (%s, id()=%s) is already found in this Stream (%s, id()=%s)' % (element, id(element), self, id(self)))
             for e in self._endElements:
                 if idElement == id(e):
-                    raise StreamException('the object (%s) is already found in this Stream (%s)' % (element, self))
+                    raise StreamException('the object (%s, id()=%s) is already found in this Stream (%s, id()=%s)' % (element, id(element), self, id(self)))
             
         # if we do not purge locations here, we may have ids() for 
         # Stream that no longer exist stored in the locations entry
@@ -5289,12 +5289,12 @@ class Stream(music21.Music21Object):
         # TODO: this does not work yet, as some Streams try to 
         # place elements in Streams that already have elements
         # see test/testDocumentation.py testOverviewMeterB
-#         if self._cache['semiFlat'] is None:
-#            self._cache['semiFlat'] = self._getFlatOrSemiFlat(
-#                                     retainContainers=True)
-#         return self._cache['semiFlat']
+        if self._cache['semiFlat'] is None:
+           self._cache['semiFlat'] = self._getFlatOrSemiFlat(
+                                    retainContainers=True)
+        return self._cache['semiFlat']
 
-        return self._getFlatOrSemiFlat(retainContainers = True)
+        #return self._getFlatOrSemiFlat(retainContainers = True)
 
 
     semiFlat = property(_getSemiFlat, doc='''
@@ -14622,6 +14622,23 @@ class Test(unittest.TestCase):
         qj2 = qj.invertDiatonic(note.Note('F4'), inPlace = False)
         qj2.measures(1,2).show('text')
 
+
+    def testSemiFlatCachingA(self):
+
+        from music21 import corpus      
+        s = corpus.parse('bwv66.6')
+        ssf1 = s.semiFlat
+        environLocal.printDebug(['ssf1', id(ssf1)])
+        ssf2 = s.semiFlat
+        environLocal.printDebug(['ssf2', id(ssf2)])
+
+        ts = s.parts[0].getElementsByClass(
+            'Measure')[3].getContextByClass('TimeSignature')
+        environLocal.printDebug(['ts', ts])
+
+        beatStr = s.parts[0].getElementsByClass(
+            'Measure')[3].notes[3].beatStr
+        environLocal.printDebug(['beatStr', beatStr])
 
 
 #-------------------------------------------------------------------------------
