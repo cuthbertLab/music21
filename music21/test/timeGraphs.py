@@ -343,6 +343,17 @@ class TestCommonContextSearches(CallTest):
         #    'Measure')[3].notes[3].beatStr
 
 
+class TestBigMusicXML(CallTest):
+
+    def __init__(self):
+        from music21 import corpus
+        self.s = corpus.parse('opus41no1')
+
+    def testFocus(self):
+        post = self.s.musicxml
+
+
+
 #-------------------------------------------------------------------------------
 class TestGetElementsByClass(CallTest):
 
@@ -382,8 +393,9 @@ class CallGraph:
         #self.callTest = TestMakeMeasures
         #self.callTest = TestGetElementsByClass
 
-        self.callTest = TestMusicXMLMultiPartOutput
+        #self.callTest = TestMusicXMLMultiPartOutput
         #self.callTest = TestCommonContextSearches
+        self.callTest = TestBigMusicXML
 
 
     def run(self):

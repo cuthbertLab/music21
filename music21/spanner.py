@@ -11,6 +11,7 @@
 
 import unittest
 import copy
+import itertools
 
 import music21
 from music21 import common
@@ -173,10 +174,13 @@ class Spanner(music21.Music21Object):
         True
         '''
         post = []
-        for c in self._components:
-            objRef = c
-            if objRef is not None:
-                post.append(objRef)
+        # use low-level _elements access for speed; do not need to set
+        # active sit or iterator
+        # must pass into a new list
+        for c in self._components._elements:
+#             objRef = c
+#             if objRef is not None:
+            post.append(c)
         return post
 
     def getComponentsByClass(self, classFilterList):
@@ -194,12 +198,12 @@ class Spanner(music21.Music21Object):
         '''
         # returns a Stream; pack in a list
         postStream = self._components.getElementsByClass(classFilterList)
-        post = []
-        for c in postStream:
-            objRef = c
-            if objRef is not None:
-                post.append(objRef)
-        return post
+#         post = []
+#         for c in postStream:
+#             post.append(objRef)
+
+        # return raw elements list for speed; attached to a temporary stream
+        return postStream._elements
 
     def getComponentIds(self):
         '''Return all id() for all stored objects.
@@ -207,11 +211,11 @@ class Spanner(music21.Music21Object):
         '''
         # this does not unwrap weakrefs, but simply gets the stored id 
         # from the Component object
-        post = []
-        for c in self._components:
-            if c is not None:
-                post.append(id(c))
-        return post
+#         post = []
+#         for c in self._components._elements:
+#             post.append(id(c))
+#         return post
+        return [id(c) for c in self._components._elements]
 
     def addComponents(self, components, *arguments, **keywords):  
         '''Associate one or more components with this Spanner.
@@ -252,7 +256,7 @@ class Spanner(music21.Music21Object):
 
     def hasComponent(self, component):  
         '''Return True if this Spanner has the component.'''
-        for c in self._components:
+        for c in self._components._elements:
             if id(c) == id(component):
                 return True
         return False
@@ -314,7 +318,7 @@ class Spanner(music21.Music21Object):
 
         '''
         idTarget = id(component)
-        objRef = self._components[0]
+        objRef = self._components._elements[0]
         if id(objRef) == idTarget:
             return True
         return False
@@ -340,7 +344,7 @@ class Spanner(music21.Music21Object):
         '''Given a component, is it last?  Returns True or False
         '''
         idTarget = id(component)
-        objRef = self._components[-1]
+        objRef = self._components._elements[-1]
 
         if id(objRef) == idTarget:
             return True
@@ -364,7 +368,7 @@ class Spanner(music21.Music21Object):
         True
 
         '''
-        objRef = self._components[-1]
+        objRef = self._components.elements[-1]
         return objRef
 
 
@@ -383,7 +387,7 @@ class Spanner(music21.Music21Object):
         '''
         post = []
         idSite = id(site)
-        for c in self._components:
+        for c in self._components._elements:
             # getting site ids is fast, as weakrefs do not have to be unpacked
             if idSite in c.getSiteIds():
                 o = c.getOffsetBySite(site)
@@ -404,10 +408,9 @@ class Spanner(music21.Music21Object):
         post = []
         idSite = id(site)
         offsetComponent = [] # store pairs
-        for c in self._components:
+        for c in self._components._elements:
         #for c in self.getComponents():
             objRef = c
-
             if idSite in objRef.getSiteIds():
                 o = objRef.getOffsetBySite(site)
                 offsetComponent.append([o, objRef])
@@ -580,6 +583,7 @@ class SpannerBundle(object):
         >>> sb.getByComponent(n2).list == [su1, su2]
         True
         '''
+        # NOTE: this is a performance critical operation
         idTarget = id(component)
         post = self.__class__()
         for sp in self._storage:
