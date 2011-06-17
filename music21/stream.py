@@ -79,6 +79,7 @@ class StreamIterator(object):
             raise StopIteration
         # here, the .elements property concatenates both ._elements and 
         # ._endElements; this may be a performance detriment
+        #environLocal.printDebug(['self.srcStream', self.srcStream, self.index, 'len(self.srcStream)', len(self.srcStream), 'len(self._endElements)', len(self.srcStream._endElements), 'len(self.srcStream._elements)', len(self.srcStream._elements), 'len(self.srcStream.elements)', len(self.srcStream.elements)])
         post = self.srcStream.elements[self.index]
         # here, the activeSite of extracted element is being set to Stream
         # that is the source of the iteration
@@ -357,9 +358,9 @@ class Stream(music21.Music21Object):
         >>> a.isFlat
         False
         '''
-        # experimental: may not last
-#         if not self._mutable:
-#             return 
+        # experimental
+        if not self._mutable:
+            return 
 
         if memo is None:
             memo = []
@@ -659,11 +660,34 @@ class Stream(music21.Music21Object):
         >>> s.hasElement(n1)
         True
         '''
+        objId = id(obj)
         for e in self._elements:
-            if id(e) == id(obj): 
+            if id(e) == objId: 
                 return True
         for e in self._endElements:
-            if id(e) == id(obj): 
+            if id(e) == objId: 
+                return True
+        return False
+
+
+    def hasElementByObjectId(self, objId):
+        '''Return True if an element object id, provided as an argument, is contained in this Stream.
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('g#')
+        >>> s.append(n1)
+        >>> s.hasElementByObjectId(id(n1))
+        True
+        >>> s.hasElementByObjectId(id(n2))
+        False
+        '''
+        for e in self._elements:
+            if id(e) == objId: 
+                return True
+        for e in self._endElements:
+            if id(e) == objId: 
                 return True
         return False
 
@@ -890,6 +914,10 @@ class Stream(music21.Music21Object):
                 # keep a reference, not a deepcopy
                 setattr(new, name, self.activeSite)
             # attributes that require special handling
+            elif name == '_definedContexts':
+                newValue = copy.deepcopy(part, memo)
+                newValue.containedById = id(new)
+                setattr(new, name, newValue)
             elif name == 'flattenedRepresentationOf':
                 # keep a reference, not a deepcopy
                 setattr(new, name, self.flattenedRepresentationOf)
@@ -1785,6 +1813,8 @@ class Stream(music21.Music21Object):
         '''
         # TODO: could add `domain` parameter to allow searching only _elements, 
         # or _endElements, or both; possible performance hit
+
+        # TODO: attempted caching of all getelements by class searches, but without a significant performance boost. 
 
         if returnStreamSubClass:
             found = self.__class__()
@@ -3734,7 +3764,7 @@ class Stream(music21.Music21Object):
     ''')
 
     def makeMeasures(self, meterStream=None, refStreamOrTimeRange=None,
-        inPlace=False):
+        searchContext=False, inPlace=False):
         '''
         Takes a stream and places all of its elements into 
         measures (:class:`~music21.stream.Measure` objects) 
@@ -3909,7 +3939,8 @@ class Stream(music21.Music21Object):
         # presently, this only gets the first clef
         # may need to store a clefStream and access changes in clefs
         # as is done with meterStream
-        clefStream = srcObj.getClefs(searchActiveSite=True, searchContext=True,
+        clefStream = srcObj.getClefs(searchActiveSite=True, 
+                        searchContext=searchContext,
                         returnDefault=True)
         clefObj = clefStream[0]
 
@@ -5486,6 +5517,29 @@ class Stream(music21.Music21Object):
         else:
             raise StreamException('no such direction: %s' % direction)
 
+
+    def makeImmutable(self):
+        '''Clean this Stream: for self and all elements, purge all dead locations and remove all non-contained sites. Further, restore all active sites
+        '''
+        # TODO: experimental
+        self._mutable = False
+        for e in self._yieldElementsDownward(streamsOnly=False,     
+            restoreActiveSites=True):
+            #e.purgeLocations(rescanIsDead=True)
+            e.removeNonContainedLocations()
+            if isinstance(e, Stream):
+                e._mutable = False
+
+    def makeMutable(self, recurse=True):
+        self._mutable = True
+        if recurse:
+            for e in self._yieldElementsDownward(streamsOnly=True,     
+                restoreActiveSites=True):
+                # do not recurse, as will get all Stream
+                e.makeMutable(recurse=False)            
+        self._elementsChanged()
+
+
     #---------------------------------------------------------------------------
     # duration and offset methods and properties
     
@@ -6374,7 +6428,8 @@ class Stream(music21.Music21Object):
         '''Return a boolean value showing if this Stream contains Measures
         '''
         post = False
-        for obj in self:
+        # do not need to look in endElements
+        for obj in self._elements:
             # if obj is a Part, we have multi-parts
             if 'Measure' in obj.classes:
                 post = True
@@ -6386,7 +6441,8 @@ class Stream(music21.Music21Object):
         '''Return a boolean value showing if this Stream contains Voices
         '''
         post = False
-        for obj in self:
+        # do not need to look in endElements
+        for obj in self._elements:
             # if obj is a Part, we have multi-parts
             if 'Voice' in obj.classes:
                 post = True
@@ -6398,7 +6454,8 @@ class Stream(music21.Music21Object):
         '''Return a boolean value showing if this Stream contains multiple Parts, or Part-like sub-Streams. 
         '''
         multiPart = False
-        for obj in self:
+        # do not need to look in endElements
+        for obj in self._elements:
             # if obj is a Part, we have multi-parts
             if isinstance(obj, Part):
                 multiPart = True
@@ -6608,6 +6665,8 @@ class Stream(music21.Music21Object):
         # always make a deepcopy before processing musicxml
         # this should only be done once
         post = copy.deepcopy(self)
+        post.makeImmutable()
+        
 # experimental tests
 #         for obj in post.recurse(streamsOnly=True):
 #             obj._mutable = False
@@ -8632,7 +8691,7 @@ class Score(Stream):
             post.insert(0, p.expandRepeats(copySpanners=False))
 
         #spannerBundle = spanner.SpannerBundle(post.flat.spanners)
-        spannerBundle = post.spannerBundle
+        spannerBundle = post.spannerBundle # use property
         # iterate over complete semi flat (need containers); find
         # all new/old pairs
         for e in post.semiFlat:
@@ -10866,7 +10925,7 @@ class Test(unittest.TestCase):
 
         s3copy = copy.deepcopy(s3)
         #s1Measures = s3copy[0].makeMeasures()
-        s1Measures = s3copy.getElementsByClass('Stream')[0].makeMeasures()
+        s1Measures = s3copy.getElementsByClass('Stream')[0].makeMeasures(searchContext=True)
         self.assertEqual(isinstance(s1Measures[0].clef, clef.AltoClef), True)
         #s1Measures.show() # these show the proper clefs
 
@@ -14649,7 +14708,7 @@ class Test(unittest.TestCase):
             #print junk
 
         qj2 = qj.invertDiatonic(note.Note('F4'), inPlace = False)
-        qj2.measures(1,2).show('text')
+        #qj2.measures(1,2).show('text')
 
 
     def testSemiFlatCachingA(self):

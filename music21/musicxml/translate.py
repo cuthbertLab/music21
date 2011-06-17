@@ -1500,7 +1500,7 @@ def measureToMx(m, spannerBundle=None):
     
     # need to handle objects in order when creating musicxml 
     # we thus assume that objects are sorted here
-
+    
     if m.hasVoices():
         # store divisions for use in calculating backup of voices 
         divisions = mxAttributes.divisions
@@ -2086,6 +2086,9 @@ def streamPartToMx(part, instObj=None, meterStream=None,
     # may need to be semi flat?
     measureStream = part.getElementsByClass('Measure')
     if len(measureStream) == 0:
+
+        part.makeMutable() # must mutate
+
         # try to add measures if none defined
         # returns a new stream w/ new Measures but the same objects
         measureStream = part.makeNotation(meterStream=meterStream,
@@ -2099,17 +2102,20 @@ def streamPartToMx(part, instObj=None, meterStream=None,
         #spannerBundle = spanner.SpannerBundle(
         #                measureStream.flat.getAllContextsByClass('Spanner'))
         # only getting spanners at this level
-        spannerBundle = spanner.SpannerBundle(measureStream.flat)
+        #spannerBundle = spanner.SpannerBundle(measureStream.flat)
+        spannerBundle = measureStream.spannerBundle
     # if this is a Measure, see if it needs makeNotation
     else: # there are measures
         # check that first measure has any atributes in outer Stream
         # this is for non-standard Stream formations (some kern imports)
         # that place key/clef information in the containing stream
         if measureStream[0].clef == None:
+            measureStream[0].makeMutable() # must mutate
             outerClefs = part.getElementsByClass('Clef')
             if len(outerClefs) > 0:
                 measureStream[0].clef = outerClefs[0]
         if measureStream[0].keySignature == None:
+            measureStream[0].makeMutable() # must mutate
             outerKeySignatures = part.getElementsByClass('KeySignature')
             if len(outerKeySignatures) > 0:
                 measureStream[0].keySignature = outerKeySignatures[0]

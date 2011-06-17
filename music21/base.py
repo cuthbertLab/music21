@@ -189,8 +189,7 @@ class DefinedContexts(object):
     All defined contexts are stored as dictionaries in a dictionary. The outermost dictionary stores objects 
 
     '''
-
-    def __init__(self):
+    def __init__(self, containedById=None):
         # a dictionary of dictionaries
         self._definedContexts = {} 
         # store idKeys in lists for easy access
@@ -199,6 +198,9 @@ class DefinedContexts(object):
         # store an index of numbers for tagging the time of defined contexts; 
         # this is used to be able to descern the order of context as added
         self._timeIndex = 0
+
+        # pass a reference to the object that contains this
+        self.containedById = containedById
 
         # cache for performance
         self._lastID = -1 # cannot be None
@@ -901,6 +903,31 @@ class DefinedContexts(object):
 #                 match.append(idKey)
 #         for id in match:
 #             self.removeById(id)
+
+
+    def removeNonContainedLocations(self):
+        '''Remove all locations in which the object that contains this DefinedContexts object is not actually stored within 
+        '''
+        remove = []
+        for idKey in self._locationKeys:
+            if idKey is None: 
+                continue
+            if self._definedContexts[idKey]['isDead']:
+                continue # already marked
+            if WEAKREF_ACTIVE:
+                obj = common.unwrapWeakref(
+                    self._definedContexts[idKey]['obj'])
+            else:
+                obj = self._definedContexts[idKey]['obj']
+            if obj is None: # if None, it no longer exists
+                self._definedContexts[idKey]['isDead'] = True
+                continue
+            if not obj.hasElementByObjectId(self.containedById):
+                #environLocal.printDebug(['removeNonContainedLocations', 'obj', obj, 'does not contain id', self.containedById])
+                remove.append(idKey)
+        for idKey in remove:
+            self.removeById(idKey)
+
 
     def _getOffsetBySiteId(self, idKey):
         '''Main method for getting an offset from a location key.
@@ -1665,7 +1692,7 @@ class Music21Object(JSONSerializer):
         if "locations" in keywords and self._definedContexts is None:
             self._definedContexts = keywords["locations"]
         else:
-            self._definedContexts = DefinedContexts()
+            self._definedContexts = DefinedContexts(containedById=id(self))
             # set up a default location for self at zero
             # use None as the name of the site
             self._definedContexts.add(None, 0.0)
@@ -1734,7 +1761,12 @@ class Music21Object(JSONSerializer):
             # attributes that require special handling
             if name == '_activeSite':
                 #environLocal.printDebug(['creating parent reference'])
-                newValue = self.activeSite # keep a reference, not a deepcopy
+                # keep a reference, not a deepcopy
+                setattr(new, name, self.activeSite)
+            # use _definedContexts own __deepcopy__, but set contained by id
+            elif name == '_definedContexts':
+                newValue = copy.deepcopy(part, memo)
+                newValue.containedById = id(new)
                 setattr(new, name, newValue)
             # this is an error check, particularly for object that inherit
             # this object and place a Stream as an attribute
@@ -2130,10 +2162,16 @@ class Music21Object(JSONSerializer):
             self._setActiveSite(None)
 
 
-    def purgeLocations(self):
+    def purgeLocations(self, rescanIsDead=False):
         '''Remove references to all locations in objects that no longer exist.
         '''
-        self._definedContexts.purgeLocations()
+        self._definedContexts.purgeLocations(rescanIsDead=rescanIsDead)
+
+
+    def removeNonContainedLocations(self):
+        '''Remove all locations in which this object does not actually reside as an element.
+        '''
+        self._definedContexts.removeNonContainedLocations()
 
 
     def getContextByClass(self, className, serialReverseSearch=True,
@@ -4540,6 +4578,29 @@ class Test(unittest.TestCase):
         n2 = copy.deepcopy(n1)
         self.assertEqual(n2._idLastDeepCopyOf, id(n1))
 
+
+    def testContainedById(self):
+        from music21 import note, stream
+        n = note.Note()
+        self.assertEqual(id(n), n._definedContexts.containedById)
+
+        n1 = note.Note()
+        s1 = stream.Stream()
+        s1.append(n1)
+        s2 = copy.deepcopy(s1)
+        n2 = s2[0]
+        self.assertEqual(s2.hasElement(n1), False)
+        self.assertEqual(s2.hasElement(n2), True)
+
+        # yet, n2 still has a site from n1, as locations are transferred
+        # in deep copying
+        self.assertEqual(n2.hasContext(s1), True)
+        self.assertEqual(n2._definedContexts.containedById, id(n2))
+
+        # we can clean this up with the following
+        n2.removeNonContainedLocations()
+        self.assertEqual(n2.hasContext(s1), False)
+        self.assertEqual(n2.hasContext(s2), True)
 
 #     def testWeakElementWrapper(self):
 #         from music21 import note

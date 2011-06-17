@@ -117,7 +117,11 @@ class Spanner(music21.Music21Object):
             # functionality duplicated from Music21Object
             if name == '_activeSite':
                 #environLocal.printDebug(['creating parent reference'])
-                newValue = self.activeSite # keep a reference, not a deepcopy
+                # keep a reference, not a deepcopy
+                setattr(new, name, self.activeSite)
+            elif name == '_definedContexts':
+                newValue = copy.deepcopy(part, memo)
+                newValue.containedById = id(new)
                 setattr(new, name, newValue)
             # do not deepcopy _components, as this will copy the 
             # contained objects
