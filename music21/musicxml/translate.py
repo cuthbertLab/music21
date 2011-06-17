@@ -235,7 +235,6 @@ def tieToMx(t):
     mxTie.set('type', musicxmlTieType) # start, stop
     mxTieList.append(mxTie) # goes on mxNote.tieList
 
-
     if t.type == 'continue':
         mxTie = musicxmlMod.Tie()
         mxTie.set('type', 'start')
@@ -1193,13 +1192,14 @@ def noteToMxNotes(n, spannerBundle=None):
     #Attributes of notes are merged from different locations: first from the 
     #duration objects, then from the pitch objects. Finally, GeneralNote 
     #attributes are added.
-
     if spannerBundle is not None:
         # this will get all spanners that participate with this note
         if len(spannerBundle) > 0:
-            pass
+            pass # assume have already gathered
             #environLocal.printDebug(['noteToMxNotes(): spannerBundle pre-filter:', spannerBundle, 'spannerBundle[0]', spannerBundle[0], 'id(spannerBundle[0])', id(spannerBundle[0]), 'spannerBundle[0].getComponentIds()', spannerBundle[0].getComponentIds(), 'id(n)', id(n)])
 
+        # get a new spanner bundle that only has components relevant to this 
+        # note.
         spannerBundle = spannerBundle.getByComponent(n)
 
         #environLocal.printDebug(['noteToMxNotes(): spannerBundle post-filter by component:', spannerBundle])
@@ -1220,12 +1220,14 @@ def noteToMxNotes(n, spannerBundle=None):
 
     # note: lyric only applied to first note
     for lyricObj in n.lyrics:
-        mxNoteList[0].lyricList.append(lyricObj.mx)
+        #mxNoteList[0].lyricList.append(lyricObj.mx)
+        mxNoteList[0].lyricList.append(lyricToMx(lyricObj))
 
     # if this note, not a component duration, but this note has a tie, 
     # need to add this to the last-encountered mxNote
     if n.tie is not None:
-        mxTieList, mxTiedList = n.tie.mx # get mxl objs from tie obj
+        #mxTieList, mxTiedList = n.tie.mx # get mxl objs from tie obj
+        mxTieList, mxTiedList = tieToMx(n.tie)
         # if starting or continuing tie, add to last mxNote in mxNote list
         if n.tie.type in ['start', 'continue']:
             mxNoteList[-1].tieList += mxTieList

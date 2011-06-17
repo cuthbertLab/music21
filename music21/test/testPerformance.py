@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -292,16 +292,16 @@ class Test(unittest.TestCase):
 #                 {'2010.09.20': 7.706, 
 #                 }),
 # 
-#             (self.runMusicxmlOutScoreBeethoven, 
-#                 {'2010.09.20': 33.273, 
-#                  '2010.10.07': 11.9290, 
-#                 }),
-# 
-
-
-            (self.runCreatePitches, 
-                {'2011.04.12': 31.071, 
+            (self.runMusicxmlOutScoreBeethoven, 
+                {'2010.09.20': 33.273, 
+                 '2010.10.07': 11.9290, 
                 }),
+
+
+# 
+#             (self.runCreatePitches, 
+#                 {'2011.04.12': 31.071, 
+#                 }),
 
 
 #             (self.runParseHaydn, 

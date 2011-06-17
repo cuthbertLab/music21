@@ -43,6 +43,8 @@ class Spanner(music21.Music21Object):
     def __init__(self, *arguments, **keywords):
         music21.Music21Object.__init__(self)
 
+        self._cache = common.DefaultHash()    
+
         # store this so subclasses can replace
         self._reprHead = '<music21.spanner.Spanner '
 
@@ -78,7 +80,7 @@ class Spanner(music21.Music21Object):
         # will mark that all parts have been gathered. 
         self.completeStatus = False
 
-    
+
     def __repr__(self):
         msg = [self._reprHead]
         for c in self.getComponents():
@@ -108,6 +110,8 @@ class Spanner(music21.Music21Object):
         old = self
         for name in self.__dict__.keys():
             if name.startswith('__'):
+                continue
+            if name == '_cache':
                 continue
             part = getattr(self, name)
             # functionality duplicated from Music21Object
@@ -207,15 +211,15 @@ class Spanner(music21.Music21Object):
 
     def getComponentIds(self):
         '''Return all id() for all stored objects.
-
         '''
-        # this does not unwrap weakrefs, but simply gets the stored id 
-        # from the Component object
 #         post = []
 #         for c in self._components._elements:
 #             post.append(id(c))
 #         return post
-        return [id(c) for c in self._components._elements]
+        if self._cache['componentIds'] is None:
+            self._cache['componentIds'] = [id(c) for c in self._components._elements]
+        return self._cache['componentIds']
+
 
     def addComponents(self, components, *arguments, **keywords):  
         '''Associate one or more components with this Spanner.
@@ -246,13 +250,16 @@ class Spanner(music21.Music21Object):
         for c in components:
             # create a component instance for each
             #self._components.append(Component(c))
-
             if not self._components.hasElement(c): # not already in storage
                 self._components.append(c)
             else:
                 pass
                 # it makes sense to not have multiple copies
                 #environLocal.printDebug(['attempting to add an object (%s) that is already found in the SpannerStorage stream of spaner %s; this may not be an erorr.' % (c, self)])
+
+        # always clear cache
+        if self._cache > 0:
+            self._cache = common.DefaultHash()
 
     def hasComponent(self, component):  
         '''Return True if this Spanner has the component.'''
@@ -291,6 +298,10 @@ class Spanner(music21.Music21Object):
             # do not do all Sites: only care about this one
             self._components.replace(old, new, allTargetSites=False)
             #environLocal.printDebug(['Spanner.replaceComponent:', 'old', e, 'new', new])
+
+        # always clear cache
+        if self._cache > 0:
+            self._cache = common.DefaultHash()
 
         #environLocal.printDebug(['replaceComponent()', 'id(old)', id(old), 'id(new)', id(new)])
 
@@ -449,6 +460,7 @@ class SpannerBundle(object):
     '''
 
     def __init__(self, *arguments, **keywords):
+        self._cache = common.DefaultHash()    
         self._storage = []
         for arg in arguments:
             if common.isListLike(arg):
@@ -464,6 +476,8 @@ class SpannerBundle(object):
     
     def append(self, other):
         self._storage.append(other)
+        if self._cache > 0:
+            self._cache = common.DefaultHash()
 
     def __len__(self):
         return len(self._storage)
@@ -496,6 +510,8 @@ class SpannerBundle(object):
             self._storage.remove(item)
         else:
             raise SpannerBundleException('cannot match object for removal: %s' % item)
+        if self._cache > 0:
+            self._cache = common.DefaultHash()
 
     def __repr__(self):
         return '<music21.spanner.SpannerBundle of size %s>' % self.__len__()
@@ -532,11 +548,16 @@ class SpannerBundle(object):
         >>> len(sb.getByIdLocal(2))
         1
         '''
-        post = self.__class__()
-        for sp in self._storage:
-            if sp.idLocal == idLocal:
-                post.append(sp)
-        return post
+        cacheKey = 'idLocal-%s' % idLocal
+        if self._cache[cacheKey] is None:
+            post = self.__class__()
+            for sp in self._storage:
+                if sp.idLocal == idLocal:
+                    post.append(sp)
+            self._cache[cacheKey] = post
+        return self._cache[cacheKey]
+
+
 
     def getByCompleteStatus(self, completeStatus):
         '''Get spanners by matching status of `completeStatus` to the same attribute
@@ -557,6 +578,7 @@ class SpannerBundle(object):
         >>> sb2[0] == su1
         True
         '''
+        # cannot cache, as complete status may change internally
         post = self.__class__()
         for sp in self._storage:
             if sp.completeStatus == completeStatus:
@@ -584,12 +606,22 @@ class SpannerBundle(object):
         True
         '''
         # NOTE: this is a performance critical operation
+#         idTarget = id(component)
+#         post = self.__class__()
+#         for sp in self._storage: # storage is a list
+#             if idTarget in sp.getComponentIds():
+#                 post.append(sp)
+#         return post
+
         idTarget = id(component)
-        post = self.__class__()
-        for sp in self._storage:
-            if idTarget in sp.getComponentIds():
-                post.append(sp)
-        return post
+        cacheKey = 'getByComponent-%s' % idTarget
+        if self._cache[cacheKey] is None:
+            post = self.__class__()
+            for sp in self._storage: # storage is a list
+                if idTarget in sp.getComponentIds():
+                    post.append(sp)
+            self._cache[cacheKey] = post
+        return self._cache[cacheKey]
 
 
     def replaceComponent(self, old, new):
@@ -613,8 +645,9 @@ class SpannerBundle(object):
                 sp.replaceComponent(old, new)
                 #post.append(sp)
                 #environLocal.printDebug(['replaceComponent()', sp, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new)])
-        #return post
 
+        if self._cache > 0:
+            self._cache = common.DefaultHash()
 
     def getByClass(self, className):
         '''Given a spanner class, return a bundle of all Spanners of the desired class. 
@@ -632,15 +665,30 @@ class SpannerBundle(object):
         >>> sb.getByClass('StaffGroup').list == [su2]
         True
         '''
-        post = self.__class__()
-        for sp in self._storage:
-            if common.isStr(className):
-                if className in sp.classes:
-                    post.append(sp)
-            else:
-                if isinstance(sp, className):
-                    post.append(sp)
-        return post
+        # NOTE: this is called very frequently: optimize
+#         post = self.__class__()
+#         for sp in self._storage:
+#             if common.isStr(className):
+#                 if className in sp.classes:
+#                     post.append(sp)
+#             else:
+#                 if isinstance(sp, className):
+#                     post.append(sp)
+#         return post
+
+        cacheKey = 'getByClass-%s' % className
+        if self._cache[cacheKey] is None:
+            post = self.__class__()
+            for sp in self._storage:
+                if common.isStr(className):
+                    if className in sp.classes:
+                        post.append(sp)
+                else:
+                    if isinstance(sp, className):
+                        post.append(sp)
+            self._cache[cacheKey] = post
+        return self._cache[cacheKey]
+
 
     def getByComponentAndClass(self, component, className):
         '''Get all Spanners that both contain the component and match the provided class. 
