@@ -890,7 +890,7 @@ class Stream(music21.Music21Object):
         return post
 
     def __deepcopy__(self, memo=None):
-        '''This produces a new, independent object.
+        '''Deepcopy the stream from copy.deepcopy()
         '''
         #environLocal.printDebug(['Stream calling __deepcopy__', self])
 
@@ -1814,7 +1814,7 @@ class Stream(music21.Music21Object):
         # TODO: could add `domain` parameter to allow searching only _elements, 
         # or _endElements, or both; possible performance hit
 
-        # TODO: attempted caching of all getelements by class searches, but without a significant performance boost. 
+        # TODO: attempted caching of all getelements by class searches, but without a significant performance boost. see below.
 
         if returnStreamSubClass:
             found = self.__class__()
@@ -1853,6 +1853,45 @@ class Stream(music21.Music21Object):
         found.autoSort = self.autoSort
         return found
 
+# experimental: caching all returns
+#         cacheKey = 'getElementsByClass-%s-%s' % (classFilterList, returnStreamSubClass)
+# 
+#         if self._cache[cacheKey] is None:
+#             if returnStreamSubClass:
+#                 found = self.__class__()
+#             else:
+#                 found = Stream()
+#             found.setDerivation(self)
+#             found.derivationMethod = 'getElementsByClass'
+#     
+#             # much faster in the most common case than calling common.isListLike
+#             if not isinstance(classFilterList, (list, tuple)):
+#                 classFilterList = tuple([classFilterList])
+#     
+#             if not self.isSorted and self.autoSort:
+#                 self.sort() # will set isSorted to True
+#     
+#             # need both _elements and _endElements
+#             for e in self._elements:
+#                 eClasses = e.classes # store once, as this is property call
+#                 for className in classFilterList:
+#                     # new method uses string matching of .classes attribute
+#                     # temporarily check to see if this is a string
+#                     if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
+#                         found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
+#                         break # match first class and break to next e
+#             for e in self._endElements:
+#                 eClasses = e.classes # store once, as this is property call
+#                 for className in classFilterList:
+#                     if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
+#                         found.storeAtEnd(e, ignoreSort=True)
+#                         break # match first class and break to next e
+#             # if this stream was sorted, the resultant stream is sorted
+#             found.isSorted = self.isSorted
+#             # passing on auto sort status may or may not be what is needed here
+#             found.autoSort = self.autoSort
+#             self._cache[cacheKey] = found # store in cache
+#         return self._cache[cacheKey]
 
     def getElementsNotOfClass(self, classFilterList):
         '''Return a list of all Elements that do not match the one or more classes in the `classFilterList`. A single class can be provided to the `classFilterList` parameter.
@@ -4972,7 +5011,8 @@ class Stream(music21.Music21Object):
         ['A', 'B']
         '''
         # trust if this is sorted: do not sort again
-        if not self.isSorted:
+        # experimental
+        if not self.isSorted and self._mutable:
             self._elements.sort(
                 cmp=lambda x,y: cmp(
                     x.getOffsetBySite(self), y.getOffsetBySite(self)
@@ -5107,6 +5147,9 @@ class Stream(music21.Music21Object):
     def _getFlatOrSemiFlat(self, retainContainers):
         '''The `retainContainers` option, if True, returns a semiFlat version: containers are not discarded in flattening.
         '''
+        # TODO: try getting both flat and semi flat at same time
+        # as a performance boost
+
         #environLocal.printDebug(['_getFlatOrSemiFlat(): self', self, 'self.activeSite', self.activeSite])       
 
         # this copy will have a shared locations object
@@ -5128,7 +5171,6 @@ class Stream(music21.Music21Object):
         sNew._endElements = []
         sNew._elementsChanged()
 
-        #environLocal.printDebug(['_getFlatOrSemiFlat(), sNew id', id(sNew)])
         for e in self._elements:
             #environLocal.printDebug(['_getFlatOrSemiFlat', 'processing e:', e])
             # check for stream instance instead
@@ -5172,15 +5214,108 @@ class Stream(music21.Music21Object):
         # here, we store the source stream from which this stream was derived
         # TODO: this should probably be a weakref
         sNew.flattenedRepresentationOf = self #common.wrapWeakref(self)
-
-#         environLocal.printDebug(['_getFlatOrSemiFlat: break2: self', self, 'self.activeSite', self.activeSite])       
-
         return sNew
     
 
+    def _getFlatFromSemiFlat(self):
+        '''If the semiflat form is available, derive flat from semiflat.
+        '''  
+        # this must not be None!  
+        sf = self._cache['semiFlat']
+        sNew = copy.copy(sf)
+        sNew._derivation = derivation.Derivation()
+        # unwrapping a weak ref here
+        # get common container and ancestor
+        sNew._derivation.setContainer(sf._derivation.getContainer())
+        sNew.setDerivation(sf._derivation.getAncestor())
+        sNew.derivationMethod = 'flat'
+        # create a new, independent cache instance in the flat representation
+        sNew._cache = common.DefaultHash()
+        sNew._elements = []
+        sNew._endElements = []
+        sNew._elementsChanged() # clear caches
+        for e in self._elements:
+            # if this element is a Stream, recurse
+            if hasattr(e, "elements"): 
+                continue
+            sNew.insert(e.getOffsetBySite(self), e)
+        # endElements should never be Streams
+        for e in self._endElements:
+            sNew.storeAtEnd(e)
+        sNew.isFlat = True
+        # here, we store the source stream from which this stream was derived
+        sNew.flattenedRepresentationOf = sf.flattenedRepresentationOf
+        return sNew
+
+#     def _getFlatAndSemiFlat(self):
+#         '''The `retainContainers` option, if True, returns a semiFlat version: containers are not discarded in flattening.
+#         '''
+#         # this copy will have a shared locations object
+#         # note that copy.copy() in some cases seems to not cause secondary
+#         # problems that self.__class__() does
+#         sNew = copy.copy(self)
+#         sNew._derivation = derivation.Derivation(sNew)
+#         sNew.setDerivation(self)
+# 
+#         sNewSemi = copy.copy(self)
+#         sNewSemi._derivation = derivation.Derivation(sNewSemi)
+#         sNewSemi.setDerivation(self)            
+# 
+#         sNew.derivationMethod = 'flat'
+#         sNewSemi.derivationMethod = 'semiFlat'
+# 
+#         # storing .elements in here necessitates
+#         # create a new, independent cache instance in the flat representation
+#         sNew._cache = common.DefaultHash()
+#         sNew._elements = []
+#         sNew._endElements = []
+#         sNew._elementsChanged()
+# 
+#         sNewSemi._cache = common.DefaultHash()
+#         sNewSemi._elements = []
+#         sNewSemi._endElements = []
+#         sNewSemi._elementsChanged()
+# 
+#         for e in self._elements:
+#             # if this element is a Stream, recurse
+#             if hasattr(e, "elements"): 
+#                 recurseStreamOffset = e.getOffsetBySite(self)
+#                 # add Stream to semiFlat
+#                 sNewSemi.insert(recurseStreamOffset, e, setActiveSite=False)
+#                 recurseStream = e.semiFlat                
+#                 for eSub in recurseStream:
+#                     oldOffset = eSub.getOffsetBySite(recurseStream)
+#                     # do not copy Stream in semiFlat to elements; 
+#                     # this simulates subflat
+#                     if not hasattr(eSub, "elements"):
+#                         sNew.insert(oldOffset + recurseStreamOffset, eSub)
+#                         sNewSemi.insert(oldOffset + recurseStreamOffset, eSub)
+#                     else: # add Streams too to semi
+#                         sNewSemi.insert(oldOffset + recurseStreamOffset, eSub)
+#             else: # if element not a Stream
+#                 # insert into new stream at offset in old stream
+#                 sNew.insert(e.getOffsetBySite(self), e)
+#                 sNewSemi.insert(e.getOffsetBySite(self), e)
+#         # endElements should never be Streams
+#         for e in self._endElements:
+#             sNew.storeAtEnd(e)
+#             sNewSemi.storeAtEnd(e)
+#         sNew.isFlat = True
+#         # should this be marked as flat? it has Streams!
+#         sNewSemi.isFlat = False
+#         # here, we store the source stream from which this stream was derived
+#         sNew.flattenedRepresentationOf = self #common.wrapWeakref(self)
+#         sNewSemi.flattenedRepresentationOf = self #common.wrapWeakref(self)
+#         return sNew, sNewSemi
+
+
     def _getFlat(self):
         if self._cache['flat'] is None:
-           self._cache['flat'] = self._getFlatOrSemiFlat(retainContainers=False)
+            if self._cache['semiFlat'] is not None:
+                self._cache['flat'] = self._getFlatFromSemiFlat()
+            else:
+                self._cache['flat'] = self._getFlatOrSemiFlat(
+                                      retainContainers=False)
         return self._cache['flat']
 
         # non cached approach
