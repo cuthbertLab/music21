@@ -40,6 +40,8 @@ class Spanner(music21.Music21Object):
     >>> sp1._components.spannerParent == sp1
     True
     '''
+    isSpanner = True
+
     def __init__(self, *arguments, **keywords):
         music21.Music21Object.__init__(self)
 
@@ -624,7 +626,7 @@ class SpannerBundle(object):
         cacheKey = 'getByComponent-%s' % idTarget
         if self._cache[cacheKey] is None:
             post = self.__class__()
-            for sp in self._storage: # storage is a list
+            for sp in self._storage: # storage is a list of spanners
                 if idTarget in sp.getComponentIds():
                     post.append(sp)
             self._cache[cacheKey] = post

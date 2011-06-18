@@ -894,8 +894,9 @@ class Stream(music21.Music21Object):
     def __deepcopy__(self, memo=None):
         '''Deepcopy the stream from copy.deepcopy()
         '''
-        #environLocal.printDebug(['Stream calling __deepcopy__', self])
+        # NOTE: this is a performance critical operation
 
+        #environLocal.printDebug(['Stream calling __deepcopy__', self])
 #         spannerBundle = spanner.SpannerBundle()
 #         for sp in self.flat.spanners:
 #         #for sp in self.flat.getAllContextsByClass('Spanner'):
@@ -941,7 +942,9 @@ class Stream(music21.Music21Object):
                     newElement = copy.deepcopy(e, memo)
                     # get the old offset from the activeSite Stream     
                     # user here to provide new offset
-                    new.insert(e.getOffsetBySite(old), newElement, 
+                    #new.insert(e.getOffsetBySite(old), newElement, 
+                    #           ignoreSort=True)
+                    new._insertCore(e.getOffsetBySite(old), newElement, 
                                ignoreSort=True)
             elif name == '_endElements':
                 # must manually add elements to 
@@ -950,16 +953,13 @@ class Stream(music21.Music21Object):
                     newElement = copy.deepcopy(e, memo)
                     # get the old offset from the activeSite Stream     
                     # user here to provide new offset
-                    new.storeAtEnd(newElement, ignoreSort=True)
-            elif isinstance(part, Stream):
-                environLocal.printDebug(['found stream in dict keys', self,
-                    part, name])
-                raise StreamException('streams as attributes requires special handling')
+                    new._storeAtEndCore(newElement)
+#             elif isinstance(part, Stream):
+#                 environLocal.printDebug(['found stream in dict keys', self,
+#                     part, name])
+#                 raise StreamException('streams as attributes requires special handling')
             # use copy.deepcopy on all other elements, including contexts    
             else: 
-                #environLocal.printDebug(['forced to use copy.deepcopy:',
-                #    self, name, part])
-                #setattr() will call the set method of a named property.
                 setattr(new, name, copy.deepcopy(part, memo))
 
         # do after all other copying
@@ -976,13 +976,13 @@ class Stream(music21.Music21Object):
         # iterate over complete semi flat (need containers); find
         # all new/old pairs
         for e in new.semiFlat:
-            if 'Spanner' in e.classes:
+            #if 'Spanner' in e.classes:
+            if e.isSpanner:
                 continue # we never update Spanners
             #environLocal.printDebug(['__deepcopy__ attempt element update for spanners', 'new element', e, 'id(e)', id(e), 'e._idLastDeepCopyOf', e._idLastDeepCopyOf])
             # update based on last id, new object
             if e.hasSpannerSite():
                 spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
-
         return new
 
     #---------------------------------------------------------------------------
@@ -1010,6 +1010,27 @@ class Stream(music21.Music21Object):
         # note that dead locations are also purged from DefinedContexts during
         # all get() calls. 
         element.purgeLocations()
+
+
+    def _insertCore(self, offset, element, ignoreSort=False, 
+        setActiveSite=True):
+        '''For fast processing: no checks, just insertion. Only be used in contexts that we know we have a proper, single element.
+        '''
+        #environLocal.printDebug(['_insertCore', 'self', self, 'offset', offset, 'element', element])
+        #self._addElementPreProcess(element)
+
+        element.addLocation(self, offset)
+        # need to explicitly set the activeSite of the element
+        if setActiveSite:
+            element.activeSite = self
+
+        storeSorted = False 
+        if ignoreSort is False:
+            if self.isSorted is True and self.highestTime <= offset:
+                storeSorted = True
+        # will be sorted later
+        self._elements.append(element)  
+        return storeSorted
 
 
     def insert(self, offsetOrItemOrList, itemOrNone=None, 
@@ -1110,23 +1131,40 @@ class Stream(music21.Music21Object):
         # checks of element is self; possibly performs additional checks
         self._addElementPreProcess(element)
 
-        element.addLocation(self, offset)
-        # need to explicitly set the activeSite of the element
-        if setActiveSite:
-            element.activeSite = self 
+#         element.addLocation(self, offset)
+#         # need to explicitly set the activeSite of the element
+#         if setActiveSite:
+#             element.activeSite = self 
+#         if ignoreSort is False:
+#             if self.isSorted is True and self.highestTime <= offset:
+#                 storeSorted = True
+#             else:
+#                 storeSorted = False
+#         # could also do self.elements = self.elements + [element]
+#         self._elements.append(element)  
 
-        if ignoreSort is False:
-            if self.isSorted is True and self.highestTime <= offset:
-                storeSorted = True
-            else:
-                storeSorted = False
+        storeSorted = self._insertCore(offset, element, 
+                     ignoreSort=ignoreSort, setActiveSite=setActiveSite)
 
-        # could also do self.elements = self.elements + [element]
-        self._elements.append(element)  
         self._elementsChanged() 
 
         if ignoreSort is False:
             self.isSorted = storeSorted
+
+
+    def _appendCore(self, element):
+        '''Low level appending; does not error check, determine elements changed, or similar operations.
+        '''
+        # NOTE: this is not called by append, as that for is specialized
+        # for loops
+        element.addLocation(self, highestTime)
+        # need to explicitly set the activeSite of the element
+        element.activeSite = self 
+        self._elements.append(element)  
+        # does not change sorted state
+        if element.duration is not None:
+            self.highestTime += element.duration.quarterLength
+
 
     def append(self, others):
         '''
@@ -1195,14 +1233,6 @@ class Stream(music21.Music21Object):
             others = [others]
 
         for item in others:    
-
-            # if not an element, embed
-#             if not isinstance(item, music21.Music21Object): 
-#                 environLocal.printDebug(['wrapping item in ElementWrapper:', item])
-#                 element = music21.ElementWrapper(item)
-#             else:
-#                 element = item
-
             try:
                 item.isStream # will raise attribute error if not m21 obj
                 element = item
@@ -1211,7 +1241,6 @@ class Stream(music21.Music21Object):
                 environLocal.printDebug(['wrapping item in ElementWrapper:', item])
                 element = music21.ElementWrapper(item)
 
-    
             self._addElementPreProcess(element)
     
             # add this Stream as a location for the new elements, with the 
@@ -1235,6 +1264,18 @@ class Stream(music21.Music21Object):
         self._elementsChanged()         
         self.isSorted = storeSorted
 
+
+
+    def _storeAtEndCore(self, element):
+        '''Core method for adding end elements. To be called by other methods.
+        '''
+        self._addElementPreProcess(element)
+        element.addLocation(self, 'highestTime')
+        # need to explicitly set the activeSite of the element
+        element.activeSite = self 
+        # could also do self.elements = self.elements + [element]
+        #self._elements.append(element)  
+        self._endElements.append(element)  
 
 
     def storeAtEnd(self, itemOrList, ignoreSort=False):
@@ -1273,19 +1314,18 @@ class Stream(music21.Music21Object):
 #             element = item
 
         # cannot support elements with Durations in the highest time list
-        if element.duration != None and element.duration.quarterLength != 0:
+        if element.duration is not None and element.duration.quarterLength != 0:
             raise StreamException('cannot insert an object with a non-zero Duration into the highest time elements list')
 
         # checks of element is self; possibly performs additional checks
         self._addElementPreProcess(element)
 
-        element.addLocation(self, 'highestTime')
-        # need to explicitly set the activeSite of the element
-        element.activeSite = self 
+#         element.addLocation(self, 'highestTime')
+#         # need to explicitly set the activeSite of the element
+#         element.activeSite = self 
+#         self._endElements.append(element)  
 
-        # could also do self.elements = self.elements + [element]
-        #self._elements.append(element)  
-        self._endElements.append(element)  
+        self._storeAtEndCore(element)
         # Streams cannot reside in end elements, thus do not update is flat
         self._elementsChanged(updateIsFlat=False) 
 
@@ -1875,7 +1915,8 @@ class Stream(music21.Music21Object):
             eClasses = e.classes # store once, as this is property call
             for className in classFilterList:
                 if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
-                    found.storeAtEnd(e, ignoreSort=True)
+                    #found.storeAtEnd(e, ignoreSort=True)
+                    found._storeAtEndCore(e)
                     break # match first class and break to next e
 
         # if this stream was sorted, the resultant stream is sorted
@@ -1981,7 +2022,8 @@ class Stream(music21.Music21Object):
                 if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
                     break # if a match to any of the classes, break
                 # only insert after all no match to all classes   
-                found.storeAtEnd(e, ignoreSort=True)
+                #found.storeAtEnd(e, ignoreSort=True)
+                found._storeAtEndCore(e)
 
         # if this stream was sorted, the resultant stream is sorted
         found.isSorted = self.isSorted
@@ -2035,8 +2077,8 @@ class Stream(music21.Music21Object):
         for e in self._endElements:
             for g in groupFilterList:
                 if hasattr(e, "groups") and g in e.groups:
-                    returnStream.storeAtEnd(e, ignoreSort=True)
-                    #returnStream.append(myEl)
+                    #returnStream.storeAtEnd(e, ignoreSort=True)
+                    returnStream._storeAtEndCore(e)
         returnStream.isSorted = self.isSorted
         return returnStream
 
@@ -2718,7 +2760,7 @@ class Stream(music21.Music21Object):
                 # replace any spanner associations with this measure
                 # should be able to look ahead, 
                 # but this results in shifted offsets in some cases
-                #if m.hasSpannerSite():
+                #if mNew.hasSpannerSite():
                 spannerBundle.replaceComponent(m, mNew)
 
                 # will only set on first time through
@@ -2730,7 +2772,8 @@ class Stream(music21.Music21Object):
                 for e in m._elements:
                     mNew.insert(e)
                 for e in m._endElements:
-                    mNew.storeAtEnd(e)
+                    #mNew.storeAtEnd(e)
+                    mNew._storeAtEndCore(e)
 
                 # subtract the offset of the first measure
                 # this will be zero in the first usage
@@ -3266,7 +3309,6 @@ class Stream(music21.Music21Object):
         else:
             returnStream = copy.deepcopy(self)
 
-
         keySigSearch = returnStream.flat.getElementsByClass(key.KeySignature)
         
         quickSearch = True
@@ -3280,9 +3322,9 @@ class Stream(music21.Music21Object):
         inversionDNN = inversionNote.diatonicNoteNum
         for n in returnStream.flat.notes:
             n.pitch.diatonicNoteNum = (2*inversionDNN) - n.pitch.diatonicNoteNum
-            if quickSearch is True:
+            if quickSearch: # use previously found
                 n.pitch.accidental = ourKey.accidentalByStep(n.pitch.step)
-            else:
+            else: # use context search
                 n.pitch.accidental = n.getContextByClass(
                     key.KeySignature).accidentalByStep(n.pitch.step)
             if n.pitch.accidental is not None:
@@ -3499,7 +3541,8 @@ class Stream(music21.Music21Object):
         for e in self._endElements:
             o = e.getOffsetBySite(self)
             if (o >= foundOffset - before and o < foundEnd + after):
-                display.storeAtEnd(e)
+                #display.storeAtEnd(e)
+                display._storeAtEndCore(e)
 
         return display
 
@@ -3779,9 +3822,11 @@ class Stream(music21.Music21Object):
                 b.insert(e)
         for e in found._endElements:
             if fx(e):
-                a.storeAtEnd(e)
+                #a.storeAtEnd(e)
+                a._storeAtEndCore(e)
             else:
-                b.storeAtEnd(e)
+                #b.storeAtEnd(e)
+                b._storeAtEndCore(e)
         return a, b
             
 
@@ -5237,7 +5282,9 @@ class Stream(music21.Music21Object):
                     # this will change the activeSite of e to be sNew, previously
                     # this was the activeSite was the caller; thus, the activeSite here
                     # should not be set
-                    sNew.insert(recurseStreamOffset, e, setActiveSite=False)
+                    #sNew.insert(recurseStreamOffset, e, setActiveSite=False)
+                    sNew._insertCore(recurseStreamOffset, e,     
+                        setActiveSite=False)
                     # this may be a cached version;
                     recurseStream = e.semiFlat
                     #recurseStream = e._getFlatOrSemiFlat(retainContainers=True)
@@ -5249,17 +5296,22 @@ class Stream(music21.Music21Object):
                 # contained within the caller
                 for eSub in recurseStream:
                     #environLocal.printDebug(['subElement', id(eSub), 'inserted in', sNew, 'id(sNew)', id(sNew)])
+                    #oldOffset = 
+                    #sNew.insert(eSub.getOffsetBySite(recurseStream) + 
+                    #    recurseStreamOffset, eSub)
+                    sNew._insertCore(eSub.getOffsetBySite(recurseStream) + 
+                        recurseStreamOffset, eSub)
 
-                    oldOffset = eSub.getOffsetBySite(recurseStream)
-                    sNew.insert(oldOffset + recurseStreamOffset, eSub)
             # if element not a Stream
             else:
                 # insert into new stream at offset in old stream
-                sNew.insert(e.getOffsetBySite(self), e)
+                #sNew.insert(e.getOffsetBySite(self), e)
+                sNew._insertCore(e.getOffsetBySite(self), e)
     
         # highest time elements should never be Streams
         for e in self._endElements:
-            sNew.storeAtEnd(e)
+            #sNew.storeAtEnd(e)
+            sNew._storeAtEndCore(e)
 
         sNew.isFlat = True
         # here, we store the source stream from which this stream was derived
@@ -5293,7 +5345,8 @@ class Stream(music21.Music21Object):
             sNew.insert(e.getOffsetBySite(self), e)
         # endElements should never be Streams
         for e in self._endElements:
-            sNew.storeAtEnd(e)
+            #sNew.storeAtEnd(e)
+            sNew._storeAtEndCore(e)
         sNew.isFlat = True
         # here, we store the source stream from which this stream was derived
         sNew.flattenedRepresentationOf = sf.flattenedRepresentationOf
@@ -6388,7 +6441,8 @@ class Stream(music21.Music21Object):
             # all new/old pairs
             for e in post.semiFlat:
                 # update based on last id, new object
-                spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
+                if e.hasSpannerSite:
+                    spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
 
         return post
         
@@ -8878,7 +8932,7 @@ class Score(Stream):
 
         This method always returns a new Stream, with deepcopies of all contained elements at all level.
     
-        NOTE: This is still a preliminary implementation. 
+        NOTE: This implementation is still incomplete.
         '''
         post = Score()
         # this calls on Music21Object, transfers id, groups
@@ -8899,8 +8953,8 @@ class Score(Stream):
         # all new/old pairs
         for e in post.semiFlat:
             # update based on last id, new object
-            spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
-
+            if e.hasSpannerSite():
+                spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
         return post
         
 

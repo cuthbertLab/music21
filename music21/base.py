@@ -1197,7 +1197,7 @@ class DefinedContexts(object):
         # isntance. Nontheless, if this is the first caller, it is the first
         # caller. 
         if callerFirst == None: # this is the first caller
-            callerFirst = self
+            callerFirst = self # set DefinedContexts as caller first
         if memo == None:
             memo = {} # intialize
 
@@ -1618,8 +1618,10 @@ class Music21Object(JSONSerializer):
     _priority = 0
     classSortOrder = 20  # default classSortOrder
     hideObjectOnPrint = False
+    # these values permit fast class comparisons for performance crtical cases
     isStream = False
     isWrapper = False
+    isSpanner = False
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['searchParentByAttr', 'getContextAttr', 'setContextAttr']
@@ -2140,10 +2142,9 @@ class Music21Object(JSONSerializer):
         True
         '''
         if not self._definedContexts.isSite(site):
-            raise Music21ObjectException('supplied object (%s) is not a site in this object.')
+            raise Music21ObjectException('supplied site (%s) is not a site in this object: %s' % (site, self))
         self._definedContexts.remove(site)
         # if parent is set to that site, reassign to None
-
         if self._getActiveSite() == site:
             self._setActiveSite(None)
 
@@ -2208,8 +2209,13 @@ class Music21Object(JSONSerializer):
 
         if callerFirst is None: # this is the first caller
             callerFirst = self
+#         elif isinstance(callerFirst, DefinedContexts):
+#             # if caller first is DefinedContexts, nothing to do here
+#             return None
+
         if memo is None:
             memo = {} # intialize
+            memo[id(self)] = self
 
         post = None
         # first, if this obj is a Stream, we see if the class exists at or
@@ -2222,8 +2228,10 @@ class Music21Object(JSONSerializer):
             getOffsetOfCaller = False
             skipGetOffsetOfCaller = False
             #if (hasattr(self, "elements") and callerFirst is not None): 
-            if self.isStream and callerFirst is not None: 
-                #and id(self.semiFlat) not in memo.keys()): 
+            #if self.isStream and callerFirst is not None: 
+
+            if (self.isStream and callerFirst is not None and not 
+                isinstance(callerFirst, DefinedContexts)): 
                 # memo check above is needed for string operational contexts
                 # where cached semiFlat generation raises an error
 
@@ -2235,20 +2243,32 @@ class Music21Object(JSONSerializer):
                 # this semiFlat name will be used in the getOffsetOfCaller 
                 # branch below
 
-                #environLocal.printDebug(['getContextByClass, serialReverseSearch', 'requesting semi flat from self:', id(self)])
-                try:
-                    semiFlat = self.semiFlat
-                except stream.StreamException:
-                    # in some testing environments this semiFlat or flat
-                    # will try to place the same object in the same stream; cannot yet localize the problem; skipping is ok
-                    skipGetOffsetOfCaller = True                    
+                #environLocal.printDebug(['getContextByClass, serialReverseSearch', 'requesting semi flat from self:', self, id(self)])
+
+                # need to look for problematic cases where a semiFlat
+                # stores a Stream that has already been examined
+                # for now, cannot use cached semiFlat: leads to infinite loops
+                # TODO: get cached semiFlat to work if possible
+                #semiFlat = self.semiFlat
+                semiFlat = self._getFlatOrSemiFlat(retainContainers=True)
+
+                # when using old insert method, got an error that we were
+                # trying to add an object that already existed in a Stream
+#                 try:
+#                     semiFlat = self.semiFlat
+#                 except stream.StreamException:
+#                     # in some testing environments this semiFlat or flat
+#                     # will try to place the same object in the same stream; cannot yet localize the problem; skipping is ok
+#                     skipGetOffsetOfCaller = True                    
 
                 # see if this element is in this Stream; 
                 if not skipGetOffsetOfCaller:
                     if semiFlat.hasElement(callerFirst): 
                         getOffsetOfCaller = True
                     else:
-                        if (hasattr(callerFirst, 'flattenedRepresentationOf') and callerFirst.flattenedRepresentationOf is not None):
+                        #if (hasattr(callerFirst, 'flattenedRepresentationOf') and callerFirst.flattenedRepresentationOf is not None):
+                        if (callerFirst.isStream and 
+                            callerFirst.flattenedRepresentationOf is not None):
                             if semiFlat.hasElement(
                                 callerFirst.flattenedRepresentationOf):
                                 getOffsetOfCaller = True
@@ -2265,8 +2285,9 @@ class Music21Object(JSONSerializer):
                 # but this object knows nothing about a flat version of the 
                 # caller (it cannot get an offset of the caller, which we need
                 # to do the serial reverse search)
-                if offsetOfCaller is None and hasattr(
-                    callerFirst, 'flattenedRepresentationOf'):
+                #if offsetOfCaller is None and hasattr(
+                #    callerFirst, 'flattenedRepresentationOf'):
+                if offsetOfCaller is None and callerFirst.isStream:
                     #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from the callers flattenedRepresentationOf attribute', 'self', self, 'callerFirst', callerFirst])
 
                     # Thanks Johannes Emerich [public@johannes.emerich.de] !
