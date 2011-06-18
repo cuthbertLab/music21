@@ -158,6 +158,7 @@ class Stream(music21.Music21Object):
     '''
 
     # TODO: this and similar attributes are to replaced by checks to .classes
+    isStream = True
     isMeasure = False
 
     # define order to present names in documentation; use strings
@@ -398,7 +399,8 @@ class Stream(music21.Music21Object):
             for e in self._elements:
                 # only need to find one case, and if so, no longer flat
                 # fastest method here is isinstance()
-                if isinstance(e, Stream): 
+                #if isinstance(e, Stream): 
+                if e.isStream:
                 #if hasattr(e, 'elements'):
                     self.isFlat = False
                     break
@@ -1193,12 +1195,22 @@ class Stream(music21.Music21Object):
             others = [others]
 
         for item in others:    
+
             # if not an element, embed
-            if not isinstance(item, music21.Music21Object): 
+#             if not isinstance(item, music21.Music21Object): 
+#                 environLocal.printDebug(['wrapping item in ElementWrapper:', item])
+#                 element = music21.ElementWrapper(item)
+#             else:
+#                 element = item
+
+            try:
+                item.isStream # will raise attribute error if not m21 obj
+                element = item
+            #if not isinstance(item, music21.Music21Object): 
+            except AttributeError:
                 environLocal.printDebug(['wrapping item in ElementWrapper:', item])
                 element = music21.ElementWrapper(item)
-            else:
-                element = item
+
     
             self._addElementPreProcess(element)
     
@@ -1210,8 +1222,11 @@ class Stream(music21.Music21Object):
             self._elements.append(element)  
 
             # this should look to the contained object duration
-            if (hasattr(element, "duration") and 
-                hasattr(element.duration, "quarterLength")):
+#             if (hasattr(element, "duration") and 
+#                 hasattr(element.duration, "quarterLength")):
+            if element.duration is not None:
+                #hasattr(element.duration, "quarterLength")):
+
                 # increment highestTime by quarterlength
                 highestTime += element.duration.quarterLength
 
@@ -1245,11 +1260,17 @@ class Stream(music21.Music21Object):
         else:
             item = itemOrList
 
-        # if not a Music21Object, embed
-        if not isinstance(item, music21.Music21Object): 
-            element = music21.ElementWrapper(item)
-        else:
+        try:
+            item.isStream # will raise attribute error
             element = item
+        except AttributeError: # need to wrap 
+            element = music21.ElementWrapper(item)
+
+        # if not a Music21Object, embed
+#         if not isinstance(item, music21.Music21Object): 
+#             element = music21.ElementWrapper(item)
+#         else:
+#             element = item
 
         # cannot support elements with Durations in the highest time list
         if element.duration != None and element.duration.quarterLength != 0:
@@ -1350,8 +1371,9 @@ class Stream(music21.Music21Object):
         2
         '''
         # need to find the highest time after the insert  
-        if itemOrNone != None: # we have an offset and an element
-            if hasattr(itemOrNone, 'duration') and itemOrNone.duration != None:
+        if itemOrNone is not None: # we have an offset and an element
+            #if hasattr(itemOrNone, 'duration') and itemOrNone.duration is not None:
+            if itemOrNone.duration is not None:
                 dur = itemOrNone.duration.quarterLength
             else:
                 dur = 0.0
@@ -1365,17 +1387,19 @@ class Stream(music21.Music21Object):
             while i < len(offsetOrItemOrList):
                 o = offsetOrItemOrList[i]
                 e = offsetOrItemOrList[i+1]
-                if hasattr(e, 'duration')  and e.duration != None:
+                #if hasattr(e, 'duration')  and e.duration is not None:
+                if e.duration is not None:
                     dur = e.duration.quarterLength
                 else:
                     dur = 0.0
                 if o + dur > highestTimeInsert:
                     highestTimeInsert = o + dur
-                if o < lowestOffsetInsert or lowestOffsetInsert == None:
+                if o < lowestOffsetInsert or lowestOffsetInsert is None:
                     lowestOffsetInsert = o
                 i += 2
         else: # using native offset
-            if hasattr(offsetOrItemOrList, 'duration'):
+            #if hasattr(offsetOrItemOrList, 'duration'):
+            if offsetOrItemOrList.duration is not None:
                 dur = offsetOrItemOrList.duration.quarterLength
             else:
                 dur = 0.0
@@ -1540,7 +1564,8 @@ class Stream(music21.Music21Object):
             else:
                 indent = ''
 
-            if isinstance(element, Stream):
+            #if isinstance(element, Stream):
+            if element.isStream:
                 msg.append(indent + "{" + off + "} " + element.__repr__())
                 msg.append(self._recurseRepr(element, 
                            prefixSpaces + insertSpaces, 
@@ -1584,10 +1609,12 @@ class Stream(music21.Music21Object):
         '''
         #environLocal.printDebug(['calling setupPickleScaffold()', self])
         for element in self.elements:
-            if hasattr(element, "elements"): # recurse time:
+            #if hasattr(element, "elements"): # recurse time:
+            if element.isStream:
                 element.setupPickleScaffold() # recurse
             #if hasattr(element, "unwrapWeakref"): # recurse time:
-            elif isinstance(element, music21.Music21Object):
+            #elif isinstance(element, music21.Music21Object):
+            else:
                 element.freezeIds()
                 element.unwrapWeakref()
         self.freezeIds()
@@ -1611,10 +1638,12 @@ class Stream(music21.Music21Object):
         self.wrapWeakref()
         self.unfreezeIds()
         for element in self.elements:
-            if hasattr(element, "elements"): # recurse time:
+            #if hasattr(element, "elements"): # recurse time:
+            if element.isStream:
                 element.teardownPickleScaffold()
-            elif hasattr(element, "unwrapWeakref"): # recurse time:
+            #elif hasattr(element, "unwrapWeakref"): # recurse time:
             #elif isinstance(element, music21.Music21Object):
+            else:
                 #environLocal.printDebug(['processing music21 obj', element])
                 element.wrapWeakref()
                 element.unfreezeIds()
@@ -1768,10 +1797,12 @@ class Stream(music21.Music21Object):
             if classFilter is None:
                 e.groups.append(group)
             else:
-                if hasattr(e, "elements"): # stream type
+                #if hasattr(e, "elements"): # stream type
+                if e.isStream:
                     if isinstance(e, classFilter):
                         e.groups.append(group)
-                elif hasattr(e, "obj"): # element type
+                #elif hasattr(e, "obj"): # element wrapper type
+                if e.isWrapper:
                     if isinstance(e.obj, classFilter):
                         e.groups.append(group)
                 else: # music21 type
@@ -2071,7 +2102,8 @@ class Stream(music21.Music21Object):
         for e in self.elements:
             # must compare id(), not elements directly
             # TODO: need to test with ElementWrapper
-            if isinstance(e, music21.ElementWrapper):
+            #if isinstance(e, music21.ElementWrapper):
+            if e.isWrapper:
                 compareObj = e.obj
             else:
                 compareObj = e
@@ -3014,7 +3046,8 @@ class Stream(music21.Music21Object):
             instObj = post[0] # get first
         else:
             if searchActiveSite:
-                if isinstance(self.activeSite, Stream) and self.activeSite != self:
+                #if isinstance(self.activeSite, Stream) and self.activeSite != self:
+                if self.activeSite is not None and self.activeSite.isStream and self.activeSite is not self:
                     #environLocal.printDebug(['searching activeSite Stream', 
                     #    self, self.activeSite])
                     instObj = self.activeSite.getInstrument(
@@ -3347,11 +3380,18 @@ class Stream(music21.Music21Object):
         >>> a[9].offset
         36.0
         '''
-        # if not an element, embed
-        if not isinstance(item, music21.Music21Object): 
-            element = music21.ElementWrapper(item)
-        else:
+        try:
+            item.isStream
             element = item
+        #if not isinstance(item, music21.Music21Object): 
+        except AttributeError:
+            element = music21.ElementWrapper(item)
+
+        # if not an element, embed
+#         if not isinstance(item, music21.Music21Object): 
+#             element = music21.ElementWrapper(item)
+#         else:
+#             element = item
             
         for i in range(0, numberOfTimes):
             self.append(deepcopy(element))
@@ -3377,11 +3417,19 @@ class Stream(music21.Music21Object):
         if not common.isListLike(offsets): 
             raise StreamException('must provide a lost of offsets, not %s' % offsets)
 
-        if not isinstance(item, music21.Music21Object): 
+        try:
+            item.isStream
+            element = item
+        #if not isinstance(item, music21.Music21Object): 
+        except AttributeError:
             # if not an element, embed
             element = music21.ElementWrapper(item)
-        else:
-            element = item
+
+#         if not isinstance(item, music21.Music21Object): 
+#             # if not an element, embed
+#             element = music21.ElementWrapper(item)
+#         else:
+#             element = item
 
         for offset in offsets:
             elementCopy = deepcopy(element)
@@ -3759,7 +3807,8 @@ class Stream(music21.Music21Object):
                 # do not include barlines
                 if isinstance(e, bar.Barline):
                     continue
-                if hasattr(e, 'duration') and e.duration is not None:
+                #if hasattr(e, 'duration') and e.duration is not None:
+                if e.duration is not None:
                     dur = e.duration.quarterLength
                 else:
                     dur = 0 
@@ -4325,7 +4374,8 @@ class Stream(music21.Music21Object):
                 for e in v:
                     #environLocal.printDebug(['Stream.makeTies() iterating over elements in measure', m, e])
     
-                    if hasattr(e, 'duration') and e.duration is not None:
+                    #if hasattr(e, 'duration') and e.duration is not None:
+                    if e.duration is not None:
                         # check to see if duration is within Measure
                         eOffset = e.getOffsetBySite(v)
                         eEnd = eOffset + e.duration.quarterLength
@@ -4778,8 +4828,8 @@ class Stream(music21.Music21Object):
         qLenTotal = returnObj.duration.quarterLength
         elements = []
         for element in returnObj.getElementsByClass(objName):
-            if not hasattr(element, 'duration'):
-                raise StreamException('can only process objects with duration attributes')
+#             if not hasattr(element, 'duration'):
+#                 raise StreamException('can only process objects with duration attributes')
             if element.duration is None:
                 element.duration = duration.Duration()
             elements.append(element)
@@ -5176,7 +5226,8 @@ class Stream(music21.Music21Object):
             # check for stream instance instead
 
             # if this element is a Stream, recurse
-            if hasattr(e, "elements"): 
+            #if hasattr(e, "elements"): 
+            if e.isStream:
                 #environLocal.printDebug(['_getFlatOrSemiFlat', '!!! processing substream:', e])
 
                 recurseStreamOffset = e.getOffsetBySite(self)
@@ -5236,7 +5287,8 @@ class Stream(music21.Music21Object):
         sNew._elementsChanged() # clear caches
         for e in self._elements:
             # if this element is a Stream, recurse
-            if hasattr(e, "elements"): 
+            #if hasattr(e, "elements"): 
+            if e.isStream:
                 continue
             sNew.insert(e.getOffsetBySite(self), e)
         # endElements should never be Streams
@@ -5554,7 +5606,8 @@ class Stream(music21.Music21Object):
             if restoreActiveSites:
                 e.activeSite = self
 
-            if hasattr(e, 'elements'):
+            #if hasattr(e, 'elements'):
+            if e.isStream:
                 # this returns a generator, so need to iterate over it
                 # to get results
                 for y in e._yieldElementsDownward(streamsOnly=streamsOnly, restoreActiveSites=restoreActiveSites, classFilter=classFilter):
@@ -5595,7 +5648,8 @@ class Stream(music21.Music21Object):
         # may need to make sure that activeSite is correctly assigned
         p = self.activeSite
         # if a activeSite exists, its always a stream!
-        if p != None and hasattr(p, 'elements'):
+        #if p != None and hasattr(p, 'elements'):
+        if p is not None and p.isStream:
             # using indices so as to not to create an iterator and new locations/activeSites
             # here we access the private _elements, again: no iterator
             for i in range(len(p._elements)):
@@ -5605,7 +5659,8 @@ class Stream(music21.Music21Object):
 
                 # not a Stream; may or may not have a activeSite;
                 # its possible that it may have activeSite not identified elsewhere
-                if not hasattr(e, 'elements'):
+                #if not hasattr(e, 'elements'):
+                if not e.isStream:
                     if not streamsOnly:
                         if id(e) not in memo:
                             yield e
@@ -5615,8 +5670,11 @@ class Stream(music21.Music21Object):
                 # for each element in the activeSite that is a Stream, 
                 # look at the activeSites
                 # if the activeSites are a Stream, recurse
-                elif (hasattr(e, 'elements') and e.activeSite != None 
-                    and hasattr(e.activeSite, 'elements')):
+                #elif (hasattr(e, 'elements') and e.activeSite != None 
+                #    and hasattr(e.activeSite, 'elements')):
+
+                elif (e.isStream and e.activeSite is not None and 
+                    e.activeSite.isStream):
 
                     # this returns a generator, so need to iterate over it
                     # to get results
@@ -5662,7 +5720,8 @@ class Stream(music21.Music21Object):
             restoreActiveSites=True):
             #e.purgeLocations(rescanIsDead=True)
             e.removeNonContainedLocations()
-            if isinstance(e, Stream):
+            #if isinstance(e, Stream):
+            if e.isStream:
                 e._mutable = False
 
     def makeMutable(self, recurse=True):
@@ -5752,8 +5811,9 @@ class Stream(music21.Music21Object):
             return 0.0
         elif self.isSorted is True:
             eLast = self._elements[-1]
-            if hasattr(eLast, "duration") and hasattr(eLast.duration,
-                    "quarterLength"):
+            #if hasattr(eLast, "duration") and hasattr(eLast.duration,
+            #        "quarterLength"):
+            if eLast.duration is not None:
                 self._cache["HighestTime"] = (eLast.getOffsetBySite(self) + 
                     eLast.duration.quarterLength)
             else:
@@ -5761,8 +5821,9 @@ class Stream(music21.Music21Object):
         else:
             max = None
             for e in self._elements:
-                if hasattr(e, "duration") and hasattr(e.duration, 
-                        "quarterLength"):
+                if e.duration is not None:
+                #if hasattr(e, "duration") and hasattr(e.duration, 
+                #        "quarterLength"):
                     candidateOffset = (e.getOffsetBySite(self) + 
                                  e.duration.quarterLength)
                 else:
@@ -6162,7 +6223,8 @@ class Stream(music21.Music21Object):
             # need to look for embedded Streams, and call this method
             # on them, with inPlace == True, as already copied if 
             # inPlace is != True
-            if hasattr(e, "elements"): # recurse time:
+            #if hasattr(e, "elements"): # recurse time:
+            if e.isStream:
                 e.scaleOffsets(amountToScale, 
                                anchorZero=anchorZeroRecurse, 
                                anchorZeroRecurse=anchorZeroRecurse,
@@ -6188,9 +6250,11 @@ class Stream(music21.Music21Object):
         for e in returnObj._elements:
             # check if its a Stream, first, as duration is dependent
             # and do not want to override
-            if hasattr(e, "elements"): # recurse time:
+            #if hasattr(e, "elements"): # recurse time:
+            if e.isStream:
                 e.scaleDurations(amountToScale)
-            elif hasattr(e, 'duration'):
+            #elif hasattr(e, 'duration'):
+            else:
                 if e.duration != None:
                     # inPlace is True as a  copy has already been made if nec
                     e.duration.augmentOrDiminish(amountToScale, inPlace=True)
@@ -6589,6 +6653,10 @@ class Stream(music21.Music21Object):
         '''Return a boolean value showing if this Stream contains multiple Parts, or Part-like sub-Streams. 
         '''
         multiPart = False
+
+        if self.isFlat: # if flat, does not have parts!
+            return False 
+
         # do not need to look in endElements
         for obj in self._elements:
             # if obj is a Part, we have multi-parts
@@ -11724,7 +11792,8 @@ class Test(unittest.TestCase):
             for e in s:
                 sub = []
                 sub.append(e.offset)
-                if hasattr(e, 'elements'):
+                #if hasattr(e, 'elements'):
+                if e.isStream:
                     sub.append(offsetMap(e))
                 post.append(sub)
             return post

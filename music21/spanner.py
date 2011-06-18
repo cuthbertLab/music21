@@ -254,6 +254,8 @@ class Spanner(music21.Music21Object):
         for c in components:
             # create a component instance for each
             #self._components.append(Component(c))
+            if c is None:
+                continue
             if not self._components.hasElement(c): # not already in storage
                 self._components.append(c)
             else:
@@ -471,7 +473,8 @@ class SpannerBundle(object):
                 for e in arg:
                     self._storage.append(e)    
             # take a Stream and use its .spanners property to get all spanners            
-            elif 'Stream' in arg.classes:
+            #elif 'Stream' in arg.classes:
+            elif arg.isStream:
                 for e in arg.spanners:
                     self._storage.append(e)
             # assume its a spanner

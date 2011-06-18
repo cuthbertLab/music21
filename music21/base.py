@@ -453,7 +453,8 @@ class DefinedContexts(object):
 
         # get class before getting weak ref
         if classString is None:
-            if hasattr(obj, 'classes'):
+            if obj is not None:
+                #if hasattr(obj, 'classes'):
                 classString = obj.classes[0] # get last class
 
         #environLocal.printDebug(['adding obj', obj, idKey])
@@ -1238,17 +1239,17 @@ class DefinedContexts(object):
                 # access public method to recurse
                 if id(obj) not in memo.keys():
                     # if the object is a Musci21Object
-                    if hasattr(obj, 'getContextByClass'):
-                        # store this object as having been searched
-                        memo[id(obj)] = obj
-                        post = obj.getContextByClass(className,
-                               serialReverseSearch=serialReverseSearch,
-                               callerFirst=callerFirst, 
-                               sortByCreationTime=sortByCreationTime, 
-                               prioritizeActiveSite=prioritizeActiveSite,
-                               memo=memo)
-                        if post != None:
-                            break
+                    #if hasattr(obj, 'getContextByClass'):
+                    # store this object as having been searched
+                    memo[id(obj)] = obj
+                    post = obj.getContextByClass(className,
+                           serialReverseSearch=serialReverseSearch,
+                           callerFirst=callerFirst, 
+                           sortByCreationTime=sortByCreationTime, 
+                           prioritizeActiveSite=prioritizeActiveSite,
+                           memo=memo)
+                    if post != None:
+                        break
                     else: # this is not a music21 object
                         pass
                         #environLocal.printDebug['cannot call getContextByClass on obj stored in DefinedContext:', obj]
@@ -1302,13 +1303,13 @@ class DefinedContexts(object):
             # defined contexts [sic!]
             if id(obj) not in memo.keys():
                 # if the object is a Musci21Object
-                if hasattr(obj, 'getContextByClass'):
-                    # store this object as having been searched
-                    memo[id(obj)] = obj
-                    # will add values to found
-                    #environLocal.printDebug(['getAllByClass()', 'about to call getAllContextsByClass', 'found', found, 'obj', obj])
-                    obj.getAllContextsByClass(className, found=found,
-                        idFound=idFound, memo=memo)
+                #if hasattr(obj, 'getContextByClass'):
+                # store this object as having been searched
+                memo[id(obj)] = obj
+                # will add values to found
+                #environLocal.printDebug(['getAllByClass()', 'about to call getAllContextsByClass', 'found', found, 'obj', obj])
+                obj.getAllContextsByClass(className, found=found,
+                    idFound=idFound, memo=memo)
         # returning found, but not necessary
         return found
 
@@ -1617,6 +1618,8 @@ class Music21Object(JSONSerializer):
     _priority = 0
     classSortOrder = 20  # default classSortOrder
     hideObjectOnPrint = False
+    isStream = False
+    isWrapper = False
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['searchParentByAttr', 'getContextAttr', 'setContextAttr']
@@ -1770,7 +1773,8 @@ class Music21Object(JSONSerializer):
                 setattr(new, name, newValue)
             # this is an error check, particularly for object that inherit
             # this object and place a Stream as an attribute
-            elif hasattr(part, '_elements'):
+            elif name == '_elements':
+            #elif hasattr(part, '_elements'):
                 environLocal.printDebug(['found stream in dict keys', self,
                     part, name])
                 raise Music21Exception('streams as attributes requires special handling when deepcopying')
@@ -2217,7 +2221,8 @@ class Music21Object(JSONSerializer):
             # first, see if this element is even in this Stream     
             getOffsetOfCaller = False
             skipGetOffsetOfCaller = False
-            if (hasattr(self, "elements") and callerFirst is not None): 
+            #if (hasattr(self, "elements") and callerFirst is not None): 
+            if self.isStream and callerFirst is not None: 
                 #and id(self.semiFlat) not in memo.keys()): 
                 # memo check above is needed for string operational contexts
                 # where cached semiFlat generation raises an error
@@ -2308,7 +2313,8 @@ class Music21Object(JSONSerializer):
 
         post = None
         # if this obj is a Stream
-        if hasattr(self, "elements"): 
+        if self.isStream:
+        #if hasattr(self, "elements"): 
             semiFlat = self.semiFlat
             # this memos updates to not exclude redundancies
             # TODO: check if getContextByClass can be improved
@@ -3335,6 +3341,8 @@ class ElementWrapper(Music21Object):
     obj = None
     _id = None
 
+    isWrapper = True
+
     _DOC_ORDER = ['obj']
     _DOC_ATTR = {
     'obj': 'The object this wrapper wraps.',
@@ -3492,6 +3500,7 @@ class ElementWrapper(Music21Object):
         '''
         if self._unlinkedDuration is not None:
             return self._unlinkedDuration
+        # getting from an object wrapper:
         elif hasattr(self, "obj") and hasattr(self.obj, 'duration'):
             return self.obj.duration
         else:
