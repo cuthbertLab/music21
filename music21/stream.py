@@ -791,7 +791,8 @@ class Stream(music21.Music21Object):
             if id(elements[i]) == objId:
                 iMatch.append(i)
             # for object wrappers
-            elif (hasattr(elements[i], "obj") and obj == elements[i].obj):
+            #elif (hasattr(elements[i], "obj") and obj == elements[i].obj):
+            elif elements[i].isWrapper and objId == id(elements[i].obj):
                 iMatch.append(i)
             if firstMatchOnly and len(iMatch) > 0:
                 break
@@ -1019,7 +1020,7 @@ class Stream(music21.Music21Object):
         #environLocal.printDebug(['_insertCore', 'self', self, 'offset', offset, 'element', element])
         #self._addElementPreProcess(element)
 
-        element.addLocation(self, offset)
+        element.addLocation(self, float(offset))
         # need to explicitly set the activeSite of the element
         if setActiveSite:
             element.activeSite = self
@@ -3525,7 +3526,7 @@ class Stream(music21.Music21Object):
                     foundOffset = elements[i].getOffsetBySite(self)
                     foundEnd = foundOffset + elements[i].duration.quarterLength                        
             else:
-                if b is searchElement or (hasattr(b, "obj") and b.obj is searchElement):
+                if (b is searchElement or b.isWrapper and b.obj is searchElement):
                     found = i
                     foundOffset = elements[i].getOffsetBySite(self)
                     foundEnd = foundOffset + elements[i].duration.quarterLength
@@ -6727,7 +6728,7 @@ class Stream(music21.Music21Object):
                 break
             # if components are streams of Notes or Measures, 
             # than assume this is like a Part
-            elif 'Stream' in obj.classes and (
+            elif obj.isStream and (
                 len(obj.getElementsByClass('Measure')) > 0 or len(obj.notesAndRests) > 0):
                 multiPart = True
                 break # only need one

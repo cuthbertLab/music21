@@ -141,7 +141,8 @@ class ActivityMatch(object):
             entrySrc = entry['src']
             # there may be multiple dst:
 
-            if hasattr(entrySrc, 'pitches'): # a chord
+            #if hasattr(entrySrc, 'pitches'): # a chord
+            if entrySrc.isChord:
                 sub = entrySrc.pitches
             else:   
                 sub = [entrySrc]

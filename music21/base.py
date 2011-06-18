@@ -2209,9 +2209,9 @@ class Music21Object(JSONSerializer):
 
         if callerFirst is None: # this is the first caller
             callerFirst = self
-#         elif isinstance(callerFirst, DefinedContexts):
-#             # if caller first is DefinedContexts, nothing to do here
-#             return None
+        elif isinstance(callerFirst, DefinedContexts):
+            # if caller first is DefinedContexts, nothing to do here
+            return None
 
         if memo is None:
             memo = {} # intialize
@@ -2230,8 +2230,10 @@ class Music21Object(JSONSerializer):
             #if (hasattr(self, "elements") and callerFirst is not None): 
             #if self.isStream and callerFirst is not None: 
 
-            if (self.isStream and callerFirst is not None and not 
-                isinstance(callerFirst, DefinedContexts)): 
+#             if (self.isStream and callerFirst is not None and not 
+#                 isinstance(callerFirst, DefinedContexts)): 
+            if (self.isStream and callerFirst is not None): 
+
                 # memo check above is needed for string operational contexts
                 # where cached semiFlat generation raises an error
 

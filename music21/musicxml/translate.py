@@ -1715,7 +1715,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             ts = meter.TimeSignature()
             ts.mx = mxSub
             _addToStaffReference(mxSub, ts, staffReference)
-            m.insert(0, ts)
+            m._insertCore(0, ts)
             #m.timeSignature = meter.TimeSignature()
             #m.timeSignature.mx = mxSub
     if mxAttributesInternal is True and len(mxAttributes.clefList) != 0:
@@ -1723,7 +1723,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             cl = clef.Clef()
             cl.mx = mxSub
             _addToStaffReference(mxSub, cl, staffReference)
-            m.insert(0, cl)
+            m._insertCore(0, cl)
             #m.clef = clef.Clef()
             #m.clef.mx = mxSub
     if mxAttributesInternal is True and len(mxAttributes.keyList) != 0:
@@ -1731,7 +1731,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             ks = key.KeySignature()
             ks.mx = mxSub
             _addToStaffReference(mxSub, ks, staffReference)
-            m.insert(0, ks)
+            m._insertCore(0, ks)
             #m.keySignature = key.KeySignature()
             #m.keySignature.mx = mxSub
 
@@ -1749,7 +1749,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
         for id in mxMeasure.getVoiceIndices():
             v = stream.Voice()
             v.id = id
-            m.insert(0, v)
+            m._insertCore(0, v)
     else:
         useVoices = False
 
@@ -1789,7 +1789,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             sl = layout.SystemLayout()
             sl.mx = mxPrint
             # store at zero position
-            m.insert(0, sl)
+            m._insertCore(0, sl)
 
         elif isinstance(mxObj, musicxmlMod.Barline):
             # repeat is a tag found in the barline object
@@ -1883,9 +1883,9 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     n = mxToNote(mxNote, spannerBundle=spannerBundle)
                     _addToStaffReference(mxNote, n, staffReference)
                     if useVoices:
-                        m.voices[mxNote.voice].insert(offsetMeasureNote, n)
+                        m.voices[mxNote.voice]._insertCore(offsetMeasureNote, n)
                     else:
-                        m.insert(offsetMeasureNote, n)
+                        m._insertCore(offsetMeasureNote, n)
                     offsetIncrement = n.quarterLength
 
                     for mxLyric in mxNote.lyricList:
@@ -1903,9 +1903,9 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 _addToStaffReference(mxNote, n, staffReference)
                 #m.insert(offsetMeasureNote, n)
                 if useVoices:
-                    m.voices[mxNote.voice].insert(offsetMeasureNote, n)
+                    m.voices[mxNote.voice]._insertCore(offsetMeasureNote, n)
                 else:
-                    m.insert(offsetMeasureNote, n)
+                    m._insertCore(offsetMeasureNote, n)
                 offsetIncrement = n.quarterLength
 
             # if we we have notes in the note list and the next
@@ -1924,9 +1924,9 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
 
                 _addToStaffReference(mxNoteList, c, staffReference)
                 if useVoices:
-                    m.voices[mxNote.voice].insert(offsetMeasureNote, c)
+                    m.voices[mxNote.voice]._insertCore(offsetMeasureNote, c)
                 else:
-                    m.insert(offsetMeasureNote, c)
+                    m._insertCore(offsetMeasureNote, c)
                 mxNoteList = [] # clear for next chord
                 mxLyricList = []
 
@@ -1949,21 +1949,21 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 for d in mxToDynamicList(mxObj):
                     _addToStaffReference(mxObj, d, staffReference)
                     #m.insert(offsetMeasureNote, d)
-                    m.insert(offsetMeasureNote + offsetDirection, d)
+                    m._insertCore(offsetMeasureNote + offsetDirection, d)
             if mxObj.getWedge() is not None:
                 w = dynamics.Wedge()
                 w.mx = mxObj     
                 _addToStaffReference(mxObj, w, staffReference)
-                m.insert(offsetMeasureNote, w)
+                m._insertCore(offsetMeasureNote, w)
 
             if mxObj.getSegno() is not None:
                 rm = mxToSegno(mxObj.getSegno())
                 _addToStaffReference(mxObj, rm, staffReference)
-                m.insert(offsetMeasureNote, rm)
+                m._insertCore(offsetMeasureNote, rm)
             if mxObj.getCoda() is not None:
                 rm = mxToCoda(mxObj.getCoda())
                 _addToStaffReference(mxObj, rm, staffReference)
-                m.insert(offsetMeasureNote, rm)
+                m._insertCore(offsetMeasureNote, rm)
 
             if mxObj.getWords() is not None:
                 #environLocal.printDebug(['found mxWords object', mxObj])
@@ -1980,10 +1980,10 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                         # the repeat expression stores a copy of the text
                         # expression within it; replace it here on insertion
                         _addToStaffReference(mxObj, re, staffReference)
-                        m.insert(offsetMeasureNote + offsetDirection, re)
+                        m._insertCore(offsetMeasureNote + offsetDirection, re)
                     else:
                         _addToStaffReference(mxObj, te, staffReference)
-                        m.insert(offsetMeasureNote + offsetDirection, te)
+                        m._insertCore(offsetMeasureNote + offsetDirection, te)
 
     #environLocal.printDebug(['staffReference', staffReference])
     # if we have voices and/or if we used backup/forward, we may have
@@ -1992,6 +1992,8 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
         for v in m.voices:
             if len(v) > 0: # do not bother with empty voices
                 v.makeRests(inPlace=True)
+
+    m._elementsChanged()
     return m, staffReference
 
 def measureToMusicXML(m):
@@ -2196,7 +2198,6 @@ def streamToMx(s, spannerBundle=None):
         meterStream = s.flat.getTimeSignatures(searchContext=False,
                     sortByCreationTime=True, returnDefault=True) 
 
-
     # we need independent sub-stream elements to shift in presentation
     highestTime = 0
 
@@ -2212,9 +2213,7 @@ def streamToMx(s, spannerBundle=None):
             #spannerBundle = spanner.SpannerBundle(s.flat)
             spannerBundle = s.spannerBundle
             #environLocal.printDebug(['streamToMx(), hasPartLikeStreams(): loaded spannerBundle of size:', len(spannerBundle), 'id(spannerBundle)', id(spannerBundle)])
-
         streamOfStreams = s.getElementsByClass('Stream')
-
         for obj in streamOfStreams:
             # may need to copy element here
             # apply this streams offset to elements
@@ -2371,7 +2370,7 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     # set part id to stream best name
     if instrumentObj.bestName() is not None:
         streamPart.id = instrumentObj.bestName()
-    streamPart.insert(instrumentObj) # add instrument at zero offset
+    streamPart._insertCore(0, instrumentObj) # add instrument at zero offset
 
     staffReferenceList = []
     # offset is in quarter note length
@@ -2392,7 +2391,7 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
                                defaults.meterDenominatorBeatType))
             lastTimeSignature = ts
         # add measure to stream at current offset for this measure
-        streamPart.insert(oMeasure, m)
+        streamPart._insertCore(oMeasure, m)
 
         # note: we cannot assume that the time signature properly
         # describes the offsets w/n this bar. need to look at 
@@ -2450,7 +2449,7 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
 
             streamPartStaff.addGroupForElements(partIdStaff) 
             streamPartStaff.groups.append(partIdStaff) 
-            s.insert(0, streamPartStaff)
+            s._insertCore(0, streamPartStaff)
     else:
         streamPart.addGroupForElements(partId) # set group for components 
         streamPart.groups.append(partId) # set group for stream itself
@@ -2464,14 +2463,15 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
         # as is down below
         rm = []
         for sp in spannerBundle.getByCompleteStatus(True):
-            streamPart.insert(0, sp)
+            streamPart._insertCore(0, sp)
             rm.append(sp)
         # remove from original spanner bundle
         for sp in rm:
             spannerBundle.remove(sp)
     
-        s.insert(0, streamPart)
+        s._insertCore(0, streamPart)
 
+    s._elementsChanged()
     # when adding parts to this Score
     # this assumes all start at the same place
     # even if there is only one part, it will be placed in a Stream
@@ -2508,18 +2508,19 @@ def mxToStream(mxScore, spannerBundle=None, inputM21=None):
     # these means that both Parts and other objects live on Stream.
     md = metadata.Metadata()
     md.mx = mxScore
-    s.insert(0, md)
+    s._insertCore(0, md)
 
     # only insert complete spanners; at each level possible, complete spanners
     # are inserted into either the Score or the Part
     # storing complet Part spanners in a Part permits extracting parts with spanners
     rm = []
     for sp in spannerBundle.getByCompleteStatus(True):
-        s.insert(0, sp)
+        s._insertCore(0, sp)
         rm.append(sp)
     for sp in rm:
         spannerBundle.remove(sp)
 
+    s._elementsChanged()
     return s
 
 
