@@ -4306,21 +4306,22 @@ class Stream(music21.Music21Object):
                 r.duration.quarterLength = qLen
                 #environLocal.printDebug(['makeRests(): add rests', r, r.duration])
                 # place at oLowTarget to reach to oLow
-                v.insert(oLowTarget, r)
+                v._insertCore(oLowTarget, r)
             qLen = oHighTarget - oHigh
             if qLen > 0:
                 r = note.Rest()
                 r.duration.quarterLength = qLen
                 # place at oHigh to reach to oHighTarget
-                v.insert(oHigh, r)
+                v._insertCore(oHigh, r)
             if fillGaps:
                 gapStream = v.findGaps()
                 if gapStream != None:
                     for e in gapStream:
                         r = note.Rest()
                         r.duration.quarterLength = e.duration.quarterLength
-                        v.insert(e.offset, r)
-            v.isSorted = False
+                        v._insertCore(e.offset, r)
+            v._elementsChanged()
+            #v.isSorted = False
 
         # with auto sort no longer necessary. 
         
@@ -4486,6 +4487,7 @@ class Stream(music21.Music21Object):
 
                             #eRemain.activeSite = mNext 
                             # manually set activeSite   
+                            # cannot use _insertCore here
                             dst.insert(0, eRemain)
     
                             # we are not sure that this element fits 
@@ -4500,7 +4502,6 @@ class Stream(music21.Music21Object):
 
         # changes elements
         returnObj._elementsChanged()
-
         return returnObj
     
 
@@ -5372,11 +5373,12 @@ class Stream(music21.Music21Object):
             #if hasattr(e, "elements"): 
             if e.isStream:
                 continue
-            sNew.insert(e.getOffsetBySite(self), e)
+            sNew._insertCore(e.getOffsetBySite(self), e)
         # endElements should never be Streams
         for e in self._endElements:
             #sNew.storeAtEnd(e)
             sNew._storeAtEndCore(e)
+        sNew._elementsChanged()
         sNew.isFlat = True
         # here, we store the source stream from which this stream was derived
         sNew.flattenedRepresentationOf = sf.flattenedRepresentationOf
@@ -6557,7 +6559,7 @@ class Stream(music21.Music21Object):
             oInsert = e.getOffsetBySite(returnObj)
             returnObj.remove(e)
             for eNew in post:
-                returnObj.insert(oInsert, eNew)
+                returnObj._insertCore(oInsert, eNew)
                 oInsert += eNew.quarterLength
 
         returnObj._elementsChanged()
@@ -6666,8 +6668,9 @@ class Stream(music21.Music21Object):
                     # only need to insert eNext, as eComplete was modified
                     # in place due to retainOrigin option 
                     # insert at o, not oCut (duration into element)
-                    returnObj.insert(o, eNext)
+                    returnObj._insertCore(o, eNext)
                     oStartNext = o
+        returnObj._elementsChanged()
         return returnObj
 
 
