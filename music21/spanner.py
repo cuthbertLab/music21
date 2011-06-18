@@ -259,12 +259,13 @@ class Spanner(music21.Music21Object):
             if c is None:
                 continue
             if not self._components.hasElement(c): # not already in storage
-                self._components.append(c)
+                self._components._appendCore(c)
             else:
                 pass
                 # it makes sense to not have multiple copies
                 #environLocal.printDebug(['attempting to add an object (%s) that is already found in the SpannerStorage stream of spaner %s; this may not be an erorr.' % (c, self)])
 
+        self._components._elementsChanged()
         # always clear cache
         if self._cache > 0:
             self._cache = common.DefaultHash()

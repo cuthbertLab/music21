@@ -1992,8 +1992,9 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
         for v in m.voices:
             if len(v) > 0: # do not bother with empty voices
                 v.makeRests(inPlace=True)
-
+            v._elementsChanged()
     m._elementsChanged()
+
     return m, staffReference
 
 def measureToMusicXML(m):

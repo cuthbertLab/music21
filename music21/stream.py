@@ -1015,7 +1015,9 @@ class Stream(music21.Music21Object):
 
     def _insertCore(self, offset, element, ignoreSort=False, 
         setActiveSite=True):
-        '''For fast processing: no checks, just insertion. Only be used in contexts that we know we have a proper, single element.
+        '''For fast processing: no checks, just insertion. Only be used in contexts that we know we have a proper, single Music21Object. Best for usage when taking objects in a known Stream and creating a new Stream
+
+        When using this method, the caller is responsible for calling Stream._elementsChanged after all operations are completed.
         '''
         #environLocal.printDebug(['_insertCore', 'self', self, 'offset', offset, 'element', element])
         #self._addElementPreProcess(element)
@@ -1155,16 +1157,20 @@ class Stream(music21.Music21Object):
 
     def _appendCore(self, element):
         '''Low level appending; does not error check, determine elements changed, or similar operations.
+
+        When using this method, the caller is responsible for calling Stream._elementsChanged after all operations are completed.
         '''
-        # NOTE: this is not called by append, as that for is specialized
+        # NOTE: this is not called by append, as that is desigend 
+        # for is specialized
         # for loops
-        element.addLocation(self, highestTime)
+        element.addLocation(self, self.highestTime)
         # need to explicitly set the activeSite of the element
         element.activeSite = self 
         self._elements.append(element)  
         # does not change sorted state
         if element.duration is not None:
-            self.highestTime += element.duration.quarterLength
+            self._setHighestTime(self.highestTime + 
+                element.duration.quarterLength)
 
 
     def append(self, others):
@@ -1264,6 +1270,7 @@ class Stream(music21.Music21Object):
         storeSorted = self.isSorted    
         self._elementsChanged()         
         self.isSorted = storeSorted
+        self._setHighestTime(highestTime)
 
 
 
@@ -1909,7 +1916,8 @@ class Stream(music21.Music21Object):
                 # new method uses string matching of .classes attribute
                 # temporarily check to see if this is a string
                 if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
-                    found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
+                    found._insertCore(e.getOffsetBySite(self), e,
+                        ignoreSort=True)
                     break # match first class and break to next e
 
         for e in self._endElements:
@@ -1920,6 +1928,7 @@ class Stream(music21.Music21Object):
                     found._storeAtEndCore(e)
                     break # match first class and break to next e
 
+        found._elementsChanged()
         # if this stream was sorted, the resultant stream is sorted
         found.isSorted = self.isSorted
         # passing on auto sort status may or may not be what is needed here
@@ -2015,7 +2024,7 @@ class Stream(music21.Music21Object):
                 if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
                     break # if a match to any of the classes, break
                 # only insert after all no match to all classes   
-                found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
+                found._insertCore(e.getOffsetBySite(self), e, ignoreSort=True)
 
         for e in self._endElements:
             eClasses = e.classes # store once, as this is property call
@@ -2027,6 +2036,7 @@ class Stream(music21.Music21Object):
                 found._storeAtEndCore(e)
 
         # if this stream was sorted, the resultant stream is sorted
+        found._elementsChanged(clearIsSorted=False)
         found.isSorted = self.isSorted
         return found
 
@@ -2073,13 +2083,15 @@ class Stream(music21.Music21Object):
         for e in self._elements:
             for g in groupFilterList:
                 if hasattr(e, "groups") and g in e.groups:
-                    returnStream.insert(e.getOffsetBySite(self),
-                                        e, ignoreSort = True)
+                    returnStream._insertCore(e.getOffsetBySite(self),
+                                        e, ignoreSort=True)
         for e in self._endElements:
             for g in groupFilterList:
                 if hasattr(e, "groups") and g in e.groups:
                     #returnStream.storeAtEnd(e, ignoreSort=True)
                     returnStream._storeAtEndCore(e)
+
+        returnStream._elementsChanged(clearIsSorted=False)
         returnStream.isSorted = self.isSorted
         return returnStream
 
@@ -2335,7 +2347,6 @@ class Stream(music21.Music21Object):
         found.setDerivation(self)
         found.derivationMethod = 'getElementsByOffset'
 
-
         # need both _elements and _endElements
         for e in self.elements:
             match = False
@@ -2370,7 +2381,10 @@ class Stream(music21.Music21Object):
                 match = False
 
             if match is True:
-                found.insert(e)
+                #found.insert(e)
+                found._insertCore(offset, e)
+
+        found._elementsChanged()
         return found
 
 
@@ -2771,7 +2785,7 @@ class Stream(music21.Music21Object):
                 # transfer elements to the new measure; these are not copies
                 # this might contain voices and/or spanners
                 for e in m._elements:
-                    mNew.insert(e)
+                    mNew.insert(e) # NOTE: cannot use _insertCore here
                 for e in m._endElements:
                     #mNew.storeAtEnd(e)
                     mNew._storeAtEndCore(e)
@@ -2779,8 +2793,9 @@ class Stream(music21.Music21Object):
                 # subtract the offset of the first measure
                 # this will be zero in the first usage
                 newOffset = oldOffset - startOffset
-                returnObj.insert(newOffset, mNew)
+                returnObj._insertCore(newOffset, mNew)
 
+                mNew._elementsChanged()
                 #environLocal.printDebug(['old/new offset', oldOffset, newOffset])
 
         # manipulate startMeasure to add desired context objects
@@ -2796,7 +2811,7 @@ class Stream(music21.Music21Object):
             if found != None:
                 # only insert into measure new
                 # TODO: may want to deepcopy inserted object here
-                startMeasureNew.insert(0, found)
+                startMeasureNew._insertCore(0, found)
             else:
                 pass
                 #environLocal.printDebug(['measures(): cannot find requested class in stream:', className])
@@ -2806,10 +2821,12 @@ class Stream(music21.Music21Object):
                 # can use old offsets of spanners, even though components
                 # have been updated
                 #returnObj.insert(sp.getOffsetBySite(mStreamSpanners), sp)
-                returnObj.insert(sp.getOffsetBySite(srcObj.flat), sp)
+                returnObj._insertCore(sp.getOffsetBySite(srcObj.flat), sp)
 
                 #environLocal.printDebug(['Stream.measrues: copying spanners:', sp])
 
+        # used _insertcore
+        returnObj._elementsChanged()
         #environLocal.printDebug(['len(returnObj.flat)', len(returnObj.flat)])
         return returnObj
 
@@ -3476,8 +3493,8 @@ class Stream(music21.Music21Object):
 
         for offset in offsets:
             elementCopy = deepcopy(element)
-            self.insert(offset, elementCopy)
-
+            self._insertCore(offset, elementCopy)
+        self._elementsChanged()
 
 
     def extractContext(self, searchElement, before = 4.0, after = 4.0, 
@@ -3537,14 +3554,14 @@ class Stream(music21.Music21Object):
         for e in self._elements:
             o = e.getOffsetBySite(self)
             if (o >= foundOffset - before and o < foundEnd + after):
-                display.insert(o, e)
+                display._insertCore(o, e)
 
         for e in self._endElements:
             o = e.getOffsetBySite(self)
             if (o >= foundOffset - before and o < foundEnd + after):
                 #display.storeAtEnd(e)
                 display._storeAtEndCore(e)
-
+        display._elementsChanged()
         return display
 
 
@@ -3729,7 +3746,7 @@ class Stream(music21.Music21Object):
                 if removeRedundantPitches:
                     c.removeRedundantPitches(inPlace=True)
                 # insert chord at start location
-                returnObj.insert(o, c)
+                returnObj._insertCore(o, c)
 
             # only add rests if no notes
             elif len(subRest) > 0:
@@ -3738,7 +3755,7 @@ class Stream(music21.Music21Object):
                 # remove old rests if in place
                 for rOld in subRest:
                     returnObj.remove(rOld)
-                returnObj.insert(o, r)
+                returnObj._insertCore(o, r)
 
             #environLocal.printDebug(['len of returnObj', len(returnObj)])
 
@@ -3754,6 +3771,9 @@ class Stream(music21.Music21Object):
             # end While loop conditions
             if o > oTerminate:
                 break
+
+        returnObj._elementsChanged()
+
         return returnObj
 
 # not defined on Stream yet, as not clear what it should do
@@ -3818,9 +3838,9 @@ class Stream(music21.Music21Object):
             found = self
         for e in found._elements:
             if fx(e):
-                a.insert(e) # provide an offset here
+                a._insertCore(e.getOffsetBySite(found), e) # provide an offset here
             else:
-                b.insert(e)
+                b._insertCore(e.getOffsetBySite(found), e)
         for e in found._endElements:
             if fx(e):
                 #a.storeAtEnd(e)
@@ -3828,6 +3848,8 @@ class Stream(music21.Music21Object):
             else:
                 #b.storeAtEnd(e)
                 b._storeAtEndCore(e)
+        a._elementsChanged()
+        b._elementsChanged()
         return a, b
             
 
@@ -4145,19 +4167,19 @@ class Stream(music21.Music21Object):
             for voiceIndex in range(voiceCount):
                 v = Voice()
                 v.id = voiceIndex # id is voice index, starting at 0
-                m.insert(0, v)
+                m._insertCore(0, v)
 
             # avoid an infinite loop
             if thisTimeSignature.barDuration.quarterLength == 0:
                 raise StreamException('time signature has no duration')    
-            post.insert(o, m) # insert measure
+            post._insertCore(o, m) # insert measure
             # increment by meter length
             o += thisTimeSignature.barDuration.quarterLength 
             if o >= oMax: # may be zero
                 break # if length of this measure exceedes last offset
             else:
                 measureCount += 1
-        
+
         # populate measures with elements
         for ob in offsetMap:
             start, end, e, voiceIndex = ob['offset'], ob['endTime'], ob['element'], ob['voiceIndex']
@@ -4203,10 +4225,17 @@ class Stream(music21.Music21Object):
                 continue
 
             #environLocal.printDebug(['makeMeasures()', 'inserting', oNew, e])
+            # NOTE: cannot use _insertCore here for some reason
             if voiceIndex == None:
                 m.insert(oNew, e)
             else: # insert into voice specified by the voice index
                 m.voices[voiceIndex].insert(oNew, e)
+
+#         for m in post._elements:
+#             for v in m.voices:
+#                 v._elementsChanged()
+#             m._elementsChanged()
+        post._elementsChanged()
 
         return post # returns a new stream populated w/ new measure streams
 
@@ -5831,6 +5860,11 @@ class Stream(music21.Music21Object):
         >>> stream1.highestTime
         12.0
         ''')
+
+    def _setHighestTime(self, value):
+        '''For internal use only.
+        '''
+        self._cache["HighestTime"] = value
 
     def _getHighestTime(self):
         '''returns the largest offset plus duration.
@@ -10977,7 +11011,7 @@ class Test(unittest.TestCase):
         post = s2.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
-        environLocal.printDebug(['_definedContexts.get() of s1', s1._definedContexts.get()])
+        #environLocal.printDebug(['_definedContexts.get() of s1', s1._definedContexts.get()])
 
 
         # attempting to move the substream into a new stream
