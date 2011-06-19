@@ -311,7 +311,7 @@ class TestMusicXMLMultiPartOutput(CallTest):
         self.s = stream.Score()
         for i in range(10): # parts
             p = stream.Part()
-            for j in range(1): # measures
+            for j in range(10): # measures
                 m = stream.Measure()
                 m.append(note.Note(type='quarter'))
                 p.append(m)
@@ -393,9 +393,9 @@ class CallGraph:
         #self.callTest = TestMakeMeasures
         #self.callTest = TestGetElementsByClass
 
-        #self.callTest = TestMusicXMLMultiPartOutput
+        self.callTest = TestMusicXMLMultiPartOutput
         #self.callTest = TestCommonContextSearches
-        self.callTest = TestBigMusicXML
+        #self.callTest = TestBigMusicXML
 
 
     def run(self):

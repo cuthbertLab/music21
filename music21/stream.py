@@ -1160,9 +1160,8 @@ class Stream(music21.Music21Object):
 
         When using this method, the caller is responsible for calling Stream._elementsChanged after all operations are completed.
         '''
-        # NOTE: this is not called by append, as that is desigend 
-        # for is specialized
-        # for loops
+        # NOTE: this is not called by append, as that is optimized 
+        # for looping multiple elements
         element.addLocation(self, self.highestTime)
         # need to explicitly set the activeSite of the element
         element.activeSite = self 
@@ -1262,7 +1261,6 @@ class Stream(music21.Music21Object):
 #                 hasattr(element.duration, "quarterLength")):
             if element.duration is not None:
                 #hasattr(element.duration, "quarterLength")):
-
                 # increment highestTime by quarterlength
                 highestTime += element.duration.quarterLength
 
@@ -1270,7 +1268,7 @@ class Stream(music21.Music21Object):
         storeSorted = self.isSorted    
         self._elementsChanged()         
         self.isSorted = storeSorted
-        self._setHighestTime(highestTime)
+        self._setHighestTime(highestTime) # call after to store in cache
 
 
 

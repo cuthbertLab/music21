@@ -131,9 +131,9 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
 def _processPending(hasVoices, pendingRecords, eLast, m, vActive):
     e = _musedataRecordListToNoteOrChord(pendingRecords, eLast)
     if hasVoices:
-        vActive.append(e)
+        vActive._appendCore(e)
     else:
-        m.append(e)
+        m._appendCore(e)
     return e
 
 def musedataPartToStreamPart(museDataPart, inputM21=None):
@@ -236,9 +236,9 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
                 r = note.Rest()
                 r.quarterLength = mdr.getQuarterLength()
                 if hasVoices:
-                    vActive.append(r)
+                    vActive._appendCore(r)
                 else:
-                    m.append(r)
+                    m._appendCore(r)
                 eLast = r
                 continue
             # a note is note as chord, but may have chord tones
@@ -276,16 +276,20 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
         # may be bending elements in a voice to append to a measure
         if vActive is not None and len(vActive) > 0:
-            m.insert(0, vActive)
+            vActive._elementsChanged()
+            m._insertCore(0, vActive)
+
+        m._elementsChanged()
 
         if barCount == 0 and m.timeSignature != None: # easy case
             # can only do this b/c ts is defined
             if m.barDurationProportion() < 1.0:
                 m.padAsAnacrusis()
                 environLocal.printDebug(['incompletely filled Measure found on musedata import; interpreting as a anacrusis:', 'padingLeft:', m.paddingLeft])
-        p.append(m)
+        p._appendCore(m)
         barCount += 1
 
+    p._elementsChanged()
     # for now, make all imports a c-score on import; 
     tInterval = museDataPart.getTranspositionIntervalObject()
     #environLocal.printDebug(['got transposition interval', p.id, tInterval])

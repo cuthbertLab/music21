@@ -157,13 +157,13 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                         if useMeasures: # assume at start of measures
                             dst.timeSignature = ts
                         else:
-                            dst.append(ts)
+                            dst._appendCore(ts)
                 elif t.isKey():
                     ks = t.getKeySignatureObject()
                     if useMeasures:  # assume at start of measures
                         dst.keySignature = ks
                     else:
-                        dst.append(ks)
+                        dst._appendCore(ks)
                     # check for clef information sometimes stored in key
                     clefObj, transposition = t.getClefObject()
                     if clefObj != None: 
@@ -172,7 +172,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                         if useMeasures:  # assume at start of measures
                             dst.clef = clefObj
                         else:
-                            dst.append(clefObj)
+                            dst._appendCore(clefObj)
                         postTransposition = transposition
 
             # as ABCChord is subclass of ABCNote, handle first
@@ -192,7 +192,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                     if c.pitches[pIndex].accidental == None:
                         continue
                     c.pitches[pIndex].accidental.displayStatus = accStatusList[pIndex]
-                dst.append(c)
+                dst._appendCore(c)
 
                 #ql += t.quarterLength
     
@@ -205,8 +205,9 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                         n.accidental.displayStatus = t.accidentalDisplayStatus
 
                 n.quarterLength = t.quarterLength
-                dst.append(n)
+                dst._appendCore(n)
 
+        dst._elementsChanged()
 
         # append measure to part; in the case of trailing meta data
         # dst may be part, even though useMeasures is True
@@ -219,7 +220,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                 if dst.barDurationProportion() < 1.0:
                     dst.padAsAnacrusis()
                     #environLocal.printDebug(['incompletely filled Measure found on abc import; interpreting as a anacrusis:', 'padingLeft:', dst.paddingLeft])
-            p.append(dst)
+            p._appendCore(dst)
 
 
     # clefs are not typically defined, but if so, are set to the first measure
@@ -228,8 +229,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         if useMeasures:  # assume at start of measures
             p.getElementsByClass('Measure')[0].clef = p.flat.bestClef()
         else:
-            p.insert(0, p.bestClef())
-
+            p._insertCore(0, p.bestClef())
 
     if postTransposition != 0:
         p.transpose(postTransposition, inPlace=True)
@@ -243,12 +243,12 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     # copy spanners into topmost container; here, a part
     rm = []
     for sp in spannerBundle.getByCompleteStatus(True):
-        p.insert(0, sp)
+        p._insertCore(0, sp)
         rm.append(sp)
     # remove from original spanner bundle
     for sp in rm:
         spannerBundle.remove(sp)
-
+    p._elementsChanged()
 
     s.insert(0, p)
     return s

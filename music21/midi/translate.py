@@ -1202,7 +1202,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                     c = chord.Chord()
                     c._setMidiEvents(chordSub, ticksPerQuarter)
                     o = notes[i][0][0] / float(ticksPerQuarter)
-                    s.insert(o, c)
+                    s._insertCore(o, c)
                     iSkip = len(chordSub)
                     chordSub = None
                 else: # just append the note
@@ -1213,11 +1213,13 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                     # the time is the first value in the first pair
                     # need to round, as floating point error is likely
                     o = notes[i][0][0] / float(ticksPerQuarter)
-                    s.insert(o, n)
+                    s._insertCore(o, n)
                     iSkip = 1
                 break # exit secondary loop
         i += iSkip
                     
+    s._elementsChanged()
+
 #     environLocal.printDebug(['got notes:'])
 #     for e in notes:
 #         print e
