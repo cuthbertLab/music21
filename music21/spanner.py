@@ -641,14 +641,20 @@ class SpannerBundle(object):
 
         If no replacements are found, no errors are raised.
         '''
-        #environLocal.printDebug(['SpannerBundle.replaceComponent()', 'old', old, 'new', new])
+        #environLocal.printDebug(['SpannerBundle.replaceComponent()', 'old', old, 'new', new, 'len(self._storage)', len(self._storage)])
 
+# TODO: should return this, but get strange errors
+#         if len(self._storage) == 0:
+#             return
+
+        # this call is affecting objects
         if common.isNum(old): # assume this is an id
             idTarget = old
         else:
             idTarget = id(old)
+
         #post = self.__class__() # return a bundle of spanners that had changes
-        for sp in self._storage:
+        for sp in self._storage: # a list
             #environLocal.printDebug(['looking at spanner', sp, sp.getComponentIds()])
             # must check to see if this id is in this spanner
             if idTarget in sp.getComponentIds():

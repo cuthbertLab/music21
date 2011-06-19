@@ -1814,6 +1814,36 @@ class Music21Object(JSONSerializer):
 #         else:
 #             return False
 
+    def isClassOrSubclass(self, classFilterList):
+        '''Given a class filter list, which may have strings or class objects, determine if this class is of the provided classes or a subclass
+        '''
+        # NOTE: this is a performance critical operation
+        # only accept lists or tuple
+
+        # in case classFilterList is a tuple of classes, can try right away
+        # do not change, as performance critical
+#         try:
+#             if isinstance(self, classFilterList):
+#                 return True
+#         except TypeError:
+#             pass
+
+        eClasses = self.classes # get cached from property
+        for className in classFilterList:
+            # new method uses string matching of .classes attribute
+            # temporarily check to see if this is a string
+            #if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
+            if className in eClasses:
+                return True
+            try: # className may be a string or a Class
+                if isinstance(self, className):
+                    return True
+            # catch TypeError: isinstance() arg 2 must be a class, type, or tuple of classes and types
+            except TypeError:
+                continue        
+        return False
+
+
     def _getClasses(self):
         if self._classes is None:
             self._classes = [x.__name__ for x in self.__class__.mro()] 
@@ -2297,9 +2327,12 @@ class Music21Object(JSONSerializer):
                         unFlat = callerFirst.flattenedRepresentationOf
                         offsetOfCaller = semiFlat.getOffsetByElement(unFlat)
 
-                # if the offset has been found, get element at  or before
+                # if the offset has been found, get element at or before
                 # this offset
                 if offsetOfCaller is not None:
+                    # NOTE: if there are two elements of the same class here
+                    # we are getting based only sort order, which may not be 
+                    # what we want
                     post = semiFlat.getElementAtOrBefore(offsetOfCaller, 
                                [className])
 

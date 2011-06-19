@@ -445,6 +445,7 @@ def isNum(usrData):
     False
     '''
     try:
+        # TODO: this may have unexpected consequences: find
         x = usrData + 0
         return True
     except:

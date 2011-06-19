@@ -105,7 +105,7 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
             else:
                 pNext = None
 
-            environLocal.printDebug(['examining pitch', p, 'pNext', pNext, 'pLast', pLast, 'e.getOffsetBySite(sourceClean)', e.getOffsetBySite(sourceClean)])
+            #environLocal.printDebug(['examining pitch', p, 'pNext', pNext, 'pLast', pLast, 'e.getOffsetBySite(sourceClean)', e.getOffsetBySite(sourceClean)])
             collect = False
             # first, see if this is a degreeLast
             if directionLast is None:
@@ -119,7 +119,7 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
             # if this is not a scale degree, this is the end of a collection
             if d is None:
                 clearCollect = True
-                environLocal.printDebug(['not collecting pitch', 'd', d, 'p', p])
+                #environLocal.printDebug(['not collecting pitch', 'd', d, 'p', p])
 
             # second, see if the degrees are consecutive with the last
             else:
@@ -141,7 +141,7 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
                     stepSize=stepSize,
                     comparisonAttribute=comparisonAttribute) and directionLast in [None, 'ascending']:
 
-                    environLocal.printDebug(['found ascending degree', 'degreeLast', degreeLast, 'd', d])
+                    #environLocal.printDebug(['found ascending degree', 'degreeLast', degreeLast, 'd', d])
                     collect = True
                     directionLast = 'ascending'
 
@@ -149,7 +149,7 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
                     stepSize=stepSize,
                     comparisonAttribute=comparisonAttribute) and directionLast in [None, 'descending']:
 
-                    environLocal.printDebug(['found descending degree', 'degreeLast', degreeLast, 'd', d])
+                    #environLocal.printDebug(['found descending degree', 'degreeLast', degreeLast, 'd', d])
                     collect = True
                     directionLast = 'descending'
 
@@ -160,11 +160,11 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
                     # this is a degree, so we want to keep it for the 
                     # next potential sequence
                     clearCollectKeepLast = True
-                    environLocal.printDebug(['no conditions matched for pitch', p, 'collect = False, clearCollectKeepLAst = True'])
+                    #environLocal.printDebug(['no conditions matched for pitch', p, 'collect = False, clearCollectKeepLAst = True'])
 
                 # gather pitch and degree
                 if collect:
-                    environLocal.printDebug(['collecting pitch', 'd', d, 'p', p])
+                    #environLocal.printDebug(['collecting pitch', 'd', d, 'p', p])
                     collDegrees.add(d)
                     collPitches.append(p)
                     collElements.append(e)
@@ -179,15 +179,16 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
             # this makes gathering greedy
             if targetScale.isNext(pNext, p, directionLast, stepSize=1,
                     comparisonAttribute=comparisonAttribute):
-                environLocal.printDebug(['matched degree count but next pitch is in scale and direction', 'collDegrees', collDegrees])
+                pass
+                #environLocal.printDebug(['matched degree count but next pitch is in scale and direction', 'collDegrees', collDegrees])
             else:
-                environLocal.printDebug(['matched degree count', 'collDegrees', collDegrees, 'pNext', pNext])
+                #environLocal.printDebug(['matched degree count', 'collDegrees', collDegrees, 'pNext', pNext])
                 match = True
 
         if match:
             # collected matched elements into a stream
             post = stream.Stream()
-            environLocal.printDebug(['processing match', 'adding collElements', 'collPitches', collPitches])
+            #environLocal.printDebug(['processing match', 'adding collElements', 'collPitches', collPitches])
 
             for e in collElements:
                 # use source offset positions
@@ -212,7 +213,7 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
                     clearCollect = True
 
         if clearCollect:
-            environLocal.printDebug(['clearCollect'])
+            #environLocal.printDebug(['clearCollect'])
 
             degreeLast = None
             directionLast = None
@@ -224,7 +225,7 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
         # case where we need to keep the element that broke
         # the chain; as in a leep to a new degree in the scale
         if clearCollectKeepLast:
-            environLocal.printDebug(['clearCollectKeepLast'])
+            #environLocal.printDebug(['clearCollectKeepLast'])
 
             #degreeLast = None keep
             # always clear direction last
