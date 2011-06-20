@@ -165,6 +165,7 @@ class GeneralNote(music21.Music21Object):
     'tie': 'either None or a :class:`~music21.note.Tie` object.'
     }    
     def __init__(self, *arguments, **keywords):
+
         tempDuration = duration.Duration(**keywords)
         music21.Music21Object.__init__(self, duration = tempDuration)
         self._duration = tempDuration
@@ -600,9 +601,7 @@ class Note(NotRest):
     establishing equality.  It may in the future.
 
 
-    
     '''
-
     isNote = True
     isUnpitched = False
     isRest = False

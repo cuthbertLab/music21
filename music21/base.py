@@ -246,12 +246,29 @@ class DefinedContexts(object):
         # might be a performance hog.
 
         new = self.__class__()
+        locations = [] #self._locationKeys[:]
+
         for idKey in self._definedContexts.keys():
             dict = self._definedContexts[idKey]
             if dict['isDead']:
                 continue # do not copy dead references
-            new.add(dict['obj'], offset=dict['offset'], timeValue=dict['time'],
-                    idKey=idKey, classString=dict['class'])
+
+# faster than using .add
+#             new.add(dict['obj'], offset=dict['offset'], timeValue=dict['time'],
+#                     idKey=idKey, classString=dict['class'])
+            post = {}
+            post['obj'] = dict['obj'] # already a weak ref
+            post['offset'] = dict['offset']
+            if post['offset'] is not None:
+                locations.append(idKey) # if offset not None, a location
+
+            post['time'] = dict['time'] # assume still valid
+            post['class'] = dict['class']
+            post['isDead'] = False
+            new._definedContexts[idKey] = post
+
+        new._locationKeys = locations
+        new._timeIndex = self._timeIndex # keep for coherency
         return new
 
     #---------------------------------------------------------------------------
@@ -415,7 +432,7 @@ class DefinedContexts(object):
         self._lastID = -1 # cannot be None
         self._lastOffset = None
 
-    def _prepareObject(self, obj, domain):
+    def _prepareObject(self, obj):
         '''Prepare an object for storage. May be stored as a standard refernce or as a weak reference.
         '''
         # can have this perform differently based on domain
@@ -439,57 +456,103 @@ class DefinedContexts(object):
         '''
         # NOTE: this is a performance critical method
 
-        isLocation = False # 'contexts'
-        if offset is not None: 
-            isLocation = True # 'locations'
-
-        # note: if we want both context and locations to exists
-        # for the same object, may need to append character code to id
-
-        if idKey is None and obj is not None:
-            idKey = id(obj)
         # a None object will have a key of None
         # do not need to set this as is default
 
-        # get class before getting weak ref
-        if classString is None:
-            if obj is not None:
-                #if hasattr(obj, 'classes'):
-                classString = obj.classes[0] # get last class
-
+        if idKey is None and obj is not None:
+            idKey = id(obj)
+        if offset is not None: # a location, not a context
+            if idKey not in self._locationKeys: 
+                self._locationKeys.append(idKey)
         #environLocal.printDebug(['adding obj', obj, idKey])
-        objRef = self._prepareObject(obj, isLocation)
+        # weak refs were being passed in __deepcopy__ calling this method
+        # __deepcopy__ no longer call this method, so we can assume that
+        # we will not get weakrefs
+
+        if obj is None:
+            objRef = None
+        else:
+            classString = obj.classes[0] # get last class
+            objRef = self._prepareObject(obj)
 
         updateNotAdd = False
         if idKey in self._definedContexts.keys():
             updateNotAdd = True
 
-        if isLocation: # the dictionary may already be a context
-            if not updateNotAdd: # already know that it is new (not an update)
-                self._locationKeys.append(idKey)
-            # this may be a context that is now a location
-            elif idKey not in self._locationKeys: 
-                self._locationKeys.append(idKey)
-            # otherwise, this is attempting to define a new offset for 
-            # a known location
+        if updateNotAdd:
+            dict = self._definedContexts[idKey]
+        else:
+            dict = {}
 
-        dict = {}
         dict['obj'] = objRef # a weak ref
         dict['offset'] = offset # offset can be None for contexts
         dict['class'] = classString 
         dict['isDead'] = False # store to access w/o unwrapping
-
-        # NOTE: this may not give sub-second resolution on some platforms
+        # time is a numeric count, not a real time measure
         if timeValue is None:
             dict['time'] = self._timeIndex
             self._timeIndex += 1 # increment for next usage
         else:
             dict['time'] = timeValue
 
-        if updateNotAdd: # add new/missing information to dictionary
-            self._definedContexts[idKey].update(dict)
-        else: # add:
+        if not updateNotAdd: # add new/missing information to dictionary
             self._definedContexts[idKey] = dict
+
+
+
+# old method: about the same performance; may double weakref
+#         isLocation = False # 'contexts'
+#         if offset is not None: 
+#             isLocation = True # 'locations'
+# 
+#         # note: if we want both context and locations to exists
+#         # for the same object, may need to append character code to id
+# 
+#         if idKey is None and obj is not None:
+#             idKey = id(obj)
+#         # a None object will have a key of None
+#         # do not need to set this as is default
+# 
+#         # get class before getting weak ref
+#         if classString is None:
+#             if obj is not None:
+#                 #if hasattr(obj, 'classes'):
+#                 classString = obj.classes[0] # get last class
+# 
+#         #environLocal.printDebug(['adding obj', obj, idKey])
+#         objRef = self._prepareObject(obj, isLocation)
+# 
+#         updateNotAdd = False
+#         if idKey in self._definedContexts.keys():
+#             updateNotAdd = True
+# 
+#         if isLocation: # the dictionary may already be a context
+#             if not updateNotAdd: # already know that it is new (not an update)
+#                 self._locationKeys.append(idKey)
+#             # this may be a context that is now a location
+#             elif idKey not in self._locationKeys: 
+#                 self._locationKeys.append(idKey)
+#             # otherwise, this is attempting to define a new offset for 
+#             # a known location
+#         dict = {}
+#         dict['obj'] = objRef # a weak ref
+#         dict['offset'] = offset # offset can be None for contexts
+#         dict['class'] = classString 
+#         dict['isDead'] = False # store to access w/o unwrapping
+# 
+#         # time is a numeric count, not a real time measure
+#         if timeValue is None:
+#             dict['time'] = self._timeIndex
+#             self._timeIndex += 1 # increment for next usage
+#         else:
+#             dict['time'] = timeValue
+# 
+#         if updateNotAdd: # add new/missing information to dictionary
+#             self._definedContexts[idKey].update(dict)
+#         else: # add:
+#             self._definedContexts[idKey] = dict
+
+
 
     def remove(self, site):
         '''Remove the object (a context or location site) specified from DefinedContexts. Object provided can be a location site or a defined context. 
@@ -2410,7 +2473,6 @@ class Music21Object(JSONSerializer):
     def _setActiveSite(self, site):
         #environLocal.printDebug(['_setActiveSite() called:', 'self', self, 'site', site])
         # NOTE: this is a performance intensive call
-        siteId = None
         if site is not None: 
             siteId = id(site)
             # check that the activeSite is not already set to this object
@@ -2418,9 +2480,11 @@ class Music21Object(JSONSerializer):
             if self._activeSiteId == siteId:
                 return
 
-        if site is not None and not self._definedContexts.hasSiteId(siteId):
-            self._definedContexts.add(site, self.offset, idKey=siteId) 
-        
+            if not self._definedContexts.hasSiteId(siteId):
+                self._definedContexts.add(site, self.offset, idKey=siteId) 
+        else:
+            siteId = None
+
         if WEAKREF_ACTIVE:
             if site is None: # leave None alone
                 self._activeSite = None
@@ -3490,11 +3554,9 @@ class ElementWrapper(Music21Object):
         (False, True)
         '''
         new = self.__copy__()
-
         # this object needs a new locations object
-        new._definedContexts = copy.deepcopy(self._definedContexts)
+        new._definedContexts = copy.deepcopy(self._definedContexts, memo=memo)
         new.obj = copy.deepcopy(self.obj)
-
         new._idLastDeepCopyOf = id(self)
         return new
 
