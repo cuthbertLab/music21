@@ -534,6 +534,8 @@ class Stream(music21.Music21Object):
         
         '''
         # TODO: check class of other first
+        if other is None or not isinstance(other, Stream):
+            raise TypeError('cannot concatenate a Strema to a non-Stream')
 
         s = self.__class__()
         s.autoSort = self.autoSort
@@ -2834,10 +2836,11 @@ class Stream(music21.Music21Object):
                 mNew.mergeAttributes(m)
 
                 # replace any spanner associations with this measure
-                # should be able to look ahead, 
-                # but this results in shifted offsets in some cases
-                #if mNew.hasSpannerSite():
-                spannerBundle.replaceComponent(m, mNew)
+                if len(spannerBundle) > 0:
+                    spannerBundle.replaceComponent(m, mNew)
+
+                # active sites get mangled somewhere
+                m.restoreActiveSites()
 
                 # will only set on first time through
                 if startMeasureNew is None:
@@ -5852,6 +5855,14 @@ class Stream(music21.Music21Object):
                 classFilter=classFilter)]
         else:
             raise StreamException('no such direction: %s' % direction)
+
+
+    def restoreActiveSites(self):   
+        '''Restore all active sites for all elements from this Stream downward.
+        '''
+        for e in self._yieldElementsDownward(streamsOnly=False,     
+            restoreActiveSites=True):
+            pass
 
 
     def makeImmutable(self):

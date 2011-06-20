@@ -1675,26 +1675,25 @@ class Music21Object(JSONSerializer):
         # store classes once when called
         self._classes = None 
 
-        if "id" in keywords and not self.id:
+
+        if "id" in keywords:
             self.id = keywords["id"]            
         else:
             self.id = id(self)
-        
-        if "duration" in keywords and self.duration is None:
-            self.duration = keywords["duration"]
-        else:
-            self.duration = duration.Duration(0)
-        
-        if "groups" in keywords and keywords["groups"] is not None and \
-            (not hasattr(self, "groups") or self.groups is None):
-            self.groups = keywords["groups"]
-        elif not hasattr(self, "groups"):
-            self.groups = Groups()
-        elif self.groups is None:
-            self.groups = Groups()
 
-        # TODO: key word should be definedContexts
-        if "locations" in keywords and self._definedContexts is None:
+        # a duration object is not created until the .duration property is
+        # accessed with _getDuration(); this is a performance optimization
+        if "duration" in keywords:
+            self.duration = keywords["duration"]
+#         else:
+#             self.duration = duration.Duration(0)
+
+        if "groups" in keywords and keywords["groups"] is not None:
+            self.groups = keywords["groups"]
+        else:
+            self.groups = Groups()
+        
+        if "locations" in keywords:
             self._definedContexts = keywords["locations"]
         else:
             self._definedContexts = DefinedContexts(containedById=id(self))
@@ -1702,9 +1701,9 @@ class Music21Object(JSONSerializer):
             # use None as the name of the site
             self._definedContexts.add(None, 0.0)
 
-        if "activeSite" in keywords and self.activeSite is None:
+        if "activeSite" in keywords:
             self.activeSite = keywords["activeSite"]
-        
+
         # only for an output format
         self._overriddenLily = None
 
@@ -1775,11 +1774,11 @@ class Music21Object(JSONSerializer):
                 setattr(new, name, newValue)
             # this is an error check, particularly for object that inherit
             # this object and place a Stream as an attribute
-            elif name == '_elements':
-            #elif hasattr(part, '_elements'):
-                environLocal.printDebug(['found stream in dict keys', self,
-                    part, name])
-                raise Music21Exception('streams as attributes requires special handling when deepcopying')
+#             elif name == '_elements':
+#             #elif hasattr(part, '_elements'):
+#                 environLocal.printDebug(['found stream in dict keys', self,
+#                     part, name])
+#                 raise Music21Exception('streams as attributes requires special handling when deepcopying')
             else: # use copy.deepcopy, will call __deepcopy__ if available
                 newValue = copy.deepcopy(part, memo)
                 #setattr() will call the set method of a named property.
@@ -2575,6 +2574,9 @@ class Music21Object(JSONSerializer):
         Gets the DurationObject of the object or None
 
         '''
+        # lazy duration creation
+        if self._duration is None:
+            self._duration = duration.Duration(0)
         return self._duration
 
     def _setDuration(self, durationObj):

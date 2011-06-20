@@ -1229,9 +1229,14 @@ class Tuplet(object):
 class DurationCommon(object):
     '''A base class for both Duration and DurationUnit objects.
     '''
+    #def __init__(self):
+    _classes = None
 
+    # this functionality is on Music21Object; added here for comparisons
     def _getClasses(self):
-        return [x.__name__ for x in self.__class__.mro()] 
+        if self._classes is None:
+            self._classes = [x.__name__ for x in self.__class__.mro()] 
+        return self._classes
 
     classes = property(_getClasses, doc='''Returns a list containing the names (strings, not objects) of classes that this 
         object belongs to -- starting with the object's class name and going up the mro()
@@ -1902,15 +1907,14 @@ class Duration(DurationCommon):
                 self.quarterLength = arguments[0]
             else:
                 self.addDurationUnit(DurationUnit(arguments[0]))
+
         if 'dots' in keywords:
             storeDots = keywords['dots']
         else:
             storeDots = 0
-            
         if "components" in keywords:
             self.components = keywords["components"]
             self._quarterLengthNeedsUpdating = True
-
         if 'type' in keywords:
             du = DurationUnit(keywords['type'])
             if storeDots > 0:
@@ -1919,7 +1923,7 @@ class Duration(DurationCommon):
         # permit as keyword so can be passed from notes
         if 'quarterLength' in keywords:
             self.quarterLength = keywords['quarterLength']
-      
+
         # linkages are a list of things used to connect durations.  
         # If undefined, Ties are used.  Other sorts of things could be 
         # dotted-ties, arrows, none, etc. As of Sep. 2008 -- not used.
@@ -1927,6 +1931,8 @@ class Duration(DurationCommon):
             self.linkages = keywords["linkages"]
         else:
             self.linkages = []
+
+
         
     def __repr__(self):
         '''Provide a representation.
