@@ -2839,6 +2839,17 @@ spirit</words>
 
         #sSub.show('t')
 
+
+    def testImportGraceNotesA(self):
+        # test importing from muscixml
+        from music21.musicxml import testPrimitive
+        from music21 import converter, repeat
+        s = converter.parse(testPrimitive.graceNotes24a)
+
+        #s.show()
+
+
+
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     music21.mainTest(Test)

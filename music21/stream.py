@@ -528,10 +528,7 @@ class Stream(music21.Music21Object):
         [C, C, C, C, C, C, C, C, C, C, G, G, G, G, G, G, G, G, G, G]
         >>> d.__class__.__name__
         'Part'
-        
-        
-        KNOWN BUG: end elements are not preserved.
-        
+                
         '''
         # TODO: check class of other first
         if other is None or not isinstance(other, Stream):
@@ -546,6 +543,12 @@ class Stream(music21.Music21Object):
             s.insert(e.getOffsetBySite(self), e)
         for e in other._elements:
             s.insert(e.getOffsetBySite(other), e)
+
+        for e in self._endElements:
+            s.storeAtEnd(e)
+        for e in other._endElements:
+            s.storeAtEnd(e)
+
         #s._elementsChanged()
         return s
 
@@ -1175,6 +1178,8 @@ class Stream(music21.Music21Object):
         '''Low level appending; does not error check, determine elements changed, or similar operations.
 
         When using this method, the caller is responsible for calling Stream._elementsChanged after all operations are completed.
+
+        This method does not adjust priority values for grace notes.
         '''
         # NOTE: this is not called by append, as that is optimized 
         # for looping multiple elements
@@ -1272,11 +1277,18 @@ class Stream(music21.Music21Object):
             element.activeSite = self 
             self._elements.append(element)  
 
-            # this should look to the contained object duration
-#             if (hasattr(element, "duration") and 
-#                 hasattr(element.duration, "quarterLength")):
-            if element.duration is not None:
-                #hasattr(element.duration, "quarterLength")):
+            if element.duration.quarterLength == 0: 
+                # it might be a grace note
+                if 'NotRest' in element.classes and element.isGrace:
+                    # no change to highestTime is needed
+                    graces = self._getGracesAtOffset(highestTime)
+                    #hp = self._highestPriorityAtOffset(highestTime, 
+                    #                    gracesOnly=True)
+                    #environLocal.printDebug(['got highest priority: hp'])
+                    if len(graces) > 1:
+                        hp = max([g.priority for g in graces])
+                        element.priority = hp + 1 # increment
+            else:
                 # increment highestTime by quarterlength
                 highestTime += element.duration.quarterLength
 
@@ -2263,6 +2275,34 @@ class Stream(music21.Music21Object):
                     return element
         return None
 
+
+    def _getGracesAtOffset(self, offset):
+        '''Get all grace Notes or Chords that reside at a single offset and return these in a list. This is a utility method that may be made public if useful. This has less features than getElementsByOffset(), and must be as fast as possible, as will be called often in appending and inserting elements.
+        '''
+        post = []
+        # we assume for now that grace notes are not found as endElements 
+        for e in self._elements:
+            o = e.getOffsetBySite(self)
+            if common.almostEquals(o, offset):
+                # must be subclass of NotRest
+                if 'NotRest' in e.classes:
+                    if e.isGrace:
+                        post.append(e)
+        return post
+
+    def _highestPriorityAtOffset(self, offset, gracesOnly=False):
+        '''Return the highes priority for all graces found at a specific offset.
+        This may be a public method if useful.
+        '''
+        if gracesOnly:
+            found = self._getGracesAtOffset(offset)
+            if found == []:
+                return None
+        else:
+            raise StreamException('not implemented')
+        return max([g.priority for g in found])
+
+
     def getElementsByOffset(self, offsetStart, offsetEnd=None,
                     includeEndBoundary=True, mustFinishInSpan=False, 
                     mustBeginInSpan=True):
@@ -2389,11 +2429,9 @@ class Stream(music21.Music21Object):
         # need both _elements and _endElements
         for e in self.elements:
             match = False
-            # better to specify site of offset source
             offset = e.getOffsetBySite(self)
-            #offset = e.offset
-
             dur = e.duration
+
             if dur is None or mustFinishInSpan is False:
                 eEnd = offset
             else:
@@ -2418,9 +2456,7 @@ class Stream(music21.Music21Object):
                     match = True
             else: # 
                 match = False
-
-            if match is True:
-                #found.insert(e)
+            if match:
                 found._insertCore(offset, e)
 
         found._elementsChanged()
@@ -2659,23 +2695,16 @@ class Stream(music21.Music21Object):
                     e = elements[i]
                     e.activeSite = self
                     return e
-
-#                 for cl in classList:
-#                     if isinstance(elements[i], cl): 
-#                         el = elements[i]
-#                         el.activeSite = self
-#                         return el
             return None
 
 
     def groupElementsByOffset(self, returnDict = False):
         '''
-        returns a List of lists in which each entry in the
+        Returns a List of lists in which each entry in the
         main list is a list of elements occurring at the same time.
         list is ordered by offset (since we need to sort the list
         anyhow in order to group the elements), so there is
-        no need to call stream.sorted before running this,
-        but it can't hurt.        
+        no need to call stream.sorted before running this.
         
         it is DEFINITELY a feature that this method does not
         find elements within substreams that have the same
@@ -5204,13 +5233,13 @@ class Stream(music21.Music21Object):
         # experimental
         if not self.isSorted and self._mutable:
             self._elements.sort(
-                cmp=lambda x,y: cmp(
+                cmp=lambda x, y: cmp(
                     x.getOffsetBySite(self), y.getOffsetBySite(self)
                     ) or cmp(x.priority, y.priority) or 
                     cmp(x.classSortOrder, y.classSortOrder)
                 )
             self._endElements.sort(
-                cmp=lambda x,y: cmp(x.priority, y.priority) or 
+                cmp=lambda x, y: cmp(x.priority, y.priority) or 
                     cmp(x.classSortOrder, y.classSortOrder)
                 )
             # as sorting changes order, elements have changed; 
@@ -15038,34 +15067,24 @@ class Test(unittest.TestCase):
         flat1.insert(0, note.Note('g'))
         self.assertNotEqual(id(flat1), s.flat)
 
-# not yet working
-#         flat1 = s.semiFlat
-#         flat2 = s.semiFlat
-#         self.assertEqual(id(flat1), id(flat2))
-# 
-#         flat1.insert(0, note.Note('g'))
-#         self.assertNotEqual(id(flat1), s.semiFlat)
-
 
     def testFlatCachingB(self):
         from music21 import corpus
         sSrc = corpus.parse('bach/bwv13.6.xml')
         sPart = sSrc.getElementById('Alto')
         ts = meter.TimeSignature('6/8')
-
 #         for n in sPart.flat.notesAndRests:
 #             bs = n.beatStr
-
         environLocal.printDebug(['calling makeMeasures'])
         sPartFlat = sPart.flat
         notesAndRests = sPartFlat.notesAndRests
         sMeasures = sPart.flat.notesAndRests.makeMeasures(ts)
-
+        target = []
         for n in sMeasures.flat.notesAndRests:
-            bs = n.beatStr
+            target.append(n.beatStr)
+        self.assertEqual(target, ['1', '1 2/3', '2 1/3', '1', '1 2/3', '2 1/3', '1', '1 2/3', '2 1/3', '2 2/3', '1', '1 1/3', '1 2/3', '2', '2 1/3', '1', '1 2/3', '1', '1 2/3', '2 1/3', '1', '1 2/3', '2 1/3', '1', '1', '1 2/3', '2 1/3', '1', '1 2/3', '2 1/3', '1 2/3', '2 1/3', '1', '1 1/3', '1 2/3', '2', '2 1/3', '2 2/3', '1', '1 1/3', '1 2/3', '2 1/3', '1', '1 2/3', '2 1/3', '1', '1 1/3', '1 2/3', '2 1/3', '2 2/3', '1', '1 2/3', '2', '2 1/3'])
 
     def testFlatCachingC(self):
-
         from music21 import corpus, stream, key
         qj = corpus.parse('ciconia/quod_jactatur').parts[0]
         idFlat1 = id(qj.flat)
@@ -15097,28 +15116,104 @@ class Test(unittest.TestCase):
         from music21 import corpus      
         s = corpus.parse('bwv66.6')
         ssf1 = s.semiFlat
-        environLocal.printDebug(['ssf1', id(ssf1)])
         ssf2 = s.semiFlat
-        environLocal.printDebug(['ssf2', id(ssf2)])
+        self.assertEqual(id(ssf1), id(ssf2))
 
         ts = s.parts[0].getElementsByClass(
             'Measure')[3].getContextByClass('TimeSignature')
-        environLocal.printDebug(['ts', ts])
+        self.assertEqual(str(ts), '4/4')
+        #environLocal.printDebug(['ts', ts])
 
         beatStr = s.parts[0].getElementsByClass(
             'Measure')[3].notes[3].beatStr
-        environLocal.printDebug(['beatStr', beatStr])
+        self.assertEqual(beatStr, '3')
+        #environLocal.printDebug(['beatStr', beatStr])
+
+#     def testDeepCopyLocations(self):
+#         from music21 import stream, note
+#         s1 = stream.Stream()
+#         n1 = note.Note()
+#         s1.append(n1)
+#         print [id(x) for x in n1.getSites()]
+#         s2 = copy.deepcopy(s1)
+#         #print s2[0].getSites()
+#         print [id(x) for x in s2[0].getSites()]
 
 
-    def testDeepCopyLocations(self):
-        from music21 import stream, note
-        s1 = stream.Stream()
-        n1 = note.Note()
-        s1.append(n1)
-        print [id(x) for x in n1.getSites()]
-        s2 = copy.deepcopy(s1)
-        #print s2[0].getSites()
-        print [id(x) for x in s2[0].getSites()]
+    def testGraceNoteSortingA(self):
+        from music21 import note, stream
+
+        n1 = note.Note('C', type='16th')
+        n2 = note.Note('D', type='16th')
+        n3 = note.Note('E', type='16th')
+        n4 = note.Note('F', type='16th')
+        n5 = note.Note('G', type='16th')
+
+        s = stream.Stream()
+  
+        n1.makeGrace()
+        s.append(n1)
+        n2.makeGrace()
+        s.append(n2)
+
+        s.append(n3)
+
+        n4.makeGrace()
+        s.append(n4)
+        s.append(n5)
+
+        self.assertEqual(s._getGracesAtOffset(0), [n1, n2])
+        self.assertEqual(s._getGracesAtOffset(.25), [n4])
+
+        match = [(n.name, n.offset, n.quarterLength, n.priority) for n in s]
+        self.assertEqual(match, 
+       [('C', 0.0, 0.0, -100), 
+        ('D', 0.0, 0.0, -99), 
+        ('E', 0.0, 0.25, 0), 
+        ('F', 0.25, 0.0, -100), 
+        ('G', 0.25, 0.25, 0)])
+
+
+    def testGraceNoteSortingB(self):
+        from music21 import note, stream
+
+        n1 = note.Note('C', type='16th')
+        n2 = note.Note('D', type='16th')
+        n3 = note.Note('E', type='16th')
+        n4 = note.Note('F', type='16th')
+        n5 = note.Note('G', type='16th')
+        s = stream.Stream()
+  
+        n1.makeGrace()
+        s.append(n1)
+        n2.makeGrace()
+        s.append(n2)
+        n3.makeGrace()
+        s.append(n3)
+
+        s.append(n4)
+        n5.makeGrace() # grace at end
+        s.append(n5)
+
+        #s.show('t')
+
+        self.assertEqual(s._getGracesAtOffset(0), [n1, n2, n3])
+        self.assertEqual(s._getGracesAtOffset(.25), [n5])
+
+        match = [(n.name, n.offset, n.quarterLength, n.priority) for n in s]
+        self.assertEqual(match, 
+       [('C', 0.0, 0.0, -100), 
+        ('D', 0.0, 0.0, -99), 
+        ('E', 0.0, 0.0, -98), 
+        ('F', 0.0, 0.25, 0), 
+        ('G', 0.25, 0.0, -100)])
+
+        # add a clef; test sorting
+        # problem: this sorts priority before class
+#         c1 = clef.AltoClef()
+#         s.insert(0, c1)
+#         s.show('t')
+#         self.assertEqual(c1, s[0]) # should be first
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

@@ -2021,12 +2021,17 @@ class Duration(DurationCommon):
             raise DurationException("zero DurationUnits in components: cannt link or unlink")
 
     def _isLinked(self):
+        # reset _cachedIsLinked to None when components have changed
         if self._cachedIsLinked is None:
             if len(self._components) > 0:
                 # if there are components, determine linked status from them
                 for c in self._components:
                     if c.isLinked:
-                        return True
+                        self._cachedIsLinked = True
+                        break
+                    else:
+                        self._cachedIsLinked = False
+                        break
             else: # there are no components, than it is linked (default)
                 self._cachedIsLinked = True            
         return self._cachedIsLinked
@@ -2158,15 +2163,19 @@ class Duration(DurationCommon):
         # not linked; yet a component must be present to provide a type
         self._qtrLength = value
         if len(self._components) == 0:
-            if self._qtrLength == 0:
+            if self._qtrLength == 0: # if not set create a default
                 self._components.append(ZeroDuration())
             else:
                 du = DurationUnit() # will get default quarter
                 du.unlink()
                 self._components.append(du)
-        else: # keep components, simply unlink
+        # keep components, simply unlink; quarter lengths stored will
+        # not be included in this elements quater length
+        else: 
             for c in self._components:
-                c.unlink()    
+                c.unlink()
+        # reach ahead and set cached is linked: no need to check components
+        self._cachedIsLinked = False
 
     def _updateComponents(self):
         '''This method will re-construct components and thus is not 

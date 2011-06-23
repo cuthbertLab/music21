@@ -176,18 +176,13 @@ class Groups(list):
 
 
 
-
-
 #-------------------------------------------------------------------------------
 class DefinedContexts(object):
-    '''An object, stored within a Music21Object, that stores references to a collection of objects that may be contextually relevant.
+    '''An object, stored within a Music21Object, that stores (weak) references to a collection of objects that may be contextually relevant to this object.
 
-    Some of these objects are locations; these DefinedContext additional store an offset value, used for determining position within a Stream. 
+    Some of these objects are locations, or Streams that contain this object. In this case the DefinedContexts object stores an offset value, used for determining position within a Stream. 
 
-    DefinedContexts are one of many ways that context can be found; context can also be found through searching (using objects in DefinedContexts). 
-
-    All defined contexts are stored as dictionaries in a dictionary. The outermost dictionary stores objects 
-
+    All defined contexts are stored as dictionaries in a dictionary. The outermost dictionary stores objects.
     '''
     def __init__(self, containedById=None):
         # a dictionary of dictionaries
@@ -243,7 +238,7 @@ class DefinedContexts(object):
         '''
         #TODO: it may be a problem that sites are being transferred to deep
         #copies; this functionality is used at times in context searches, but
-        # might be a performance hog.
+        # may be a performance hog.
 
         new = self.__class__()
         locations = [] #self._locationKeys[:]
@@ -252,10 +247,6 @@ class DefinedContexts(object):
             dict = self._definedContexts[idKey]
             if dict['isDead']:
                 continue # do not copy dead references
-
-# faster than using .add
-#             new.add(dict['obj'], offset=dict['offset'], timeValue=dict['time'],
-#                     idKey=idKey, classString=dict['class'])
             post = {}
             post['obj'] = dict['obj'] # already a weak ref
             post['offset'] = dict['offset']
@@ -302,9 +293,8 @@ class DefinedContexts(object):
                 post = common.unwrapWeakref(self._definedContexts[idKey]['obj'])
                 self._definedContexts[idKey]['obj'] = post
 
-
     def wrapWeakref(self):
-        '''Wrap any and all weakrefs stored.
+        '''Wrap all stored objects with weakrefs.
 
         >>> class Mock(Music21Object): pass
         >>> aObj = Mock()
@@ -328,10 +318,8 @@ class DefinedContexts(object):
                 post = common.wrapWeakref(self._definedContexts[idKey]['obj'])
                 self._definedContexts[idKey]['obj'] = post
 
-
-
     def freezeIds(self):
-        '''Temporarily replace are stored keys with a different value.
+        '''Temporarily replace all stored keys (object ids) with a temporary values suitable for usage in pickling.
 
         >>> class Mock(Music21Object): pass
         >>> aObj = Mock()
@@ -346,33 +334,25 @@ class DefinedContexts(object):
         False
         '''
         # need to store self._locationKeys as well
-
         post = {}
         postLocationKeys = []
         for idKey in self._definedContexts.keys():
-
             # make a random UUID
             if idKey != None:
                 newKey = uuid.uuid4()
             else:
                 newKey = idKey # keep None
-
             # might want to store old id?
             #environLocal.printDebug(['freezing key:', idKey, newKey])
-
             if idKey in self._locationKeys:
                 postLocationKeys.append(newKey)
-            
             post[newKey] = self._definedContexts[idKey]
-
         self._definedContexts = post
         self._locationKeys = postLocationKeys
-
         #environLocal.printDebug(['post freezeids', self._definedContexts])
 
-
     def unfreezeIds(self):
-        '''Restore keys to be the id() of the object they contain
+        '''Restore keys to be the id() of the object they contain.
 
         >>> class Mock(Music21Object): pass
         >>> aObj = Mock()
@@ -400,11 +380,9 @@ class DefinedContexts(object):
         True
         '''
         #environLocal.printDebug(['defined context entering unfreeze ids', self._definedContexts])
-
         post = {}
         postLocationKeys = []
         for idKey in self._definedContexts.keys():
-
             # check if unwrapped, unwrap
             obj = common.unwrapWeakref(self._definedContexts[idKey]['obj'])
             if obj is not None:
@@ -412,11 +390,9 @@ class DefinedContexts(object):
             else:
                 newKey = None
             #environLocal.printDebug(['unfreezing key:', idKey, newKey])
-
             if idKey in self._locationKeys:
                 postLocationKeys.append(newKey)
             post[newKey] = self._definedContexts[idKey]
-
         self._definedContexts = post
         self._locationKeys = postLocationKeys
 
@@ -443,7 +419,6 @@ class DefinedContexts(object):
         # a normal reference, return unaltered
         else:
             return obj
-        
 
     def add(self, obj, offset=None, timeValue=None, idKey=None,
          classString=None):
@@ -458,7 +433,6 @@ class DefinedContexts(object):
 
         # a None object will have a key of None
         # do not need to set this as is default
-
         if idKey is None and obj is not None:
             idKey = id(obj)
         if offset is not None: # a location, not a context
@@ -494,13 +468,11 @@ class DefinedContexts(object):
             self._timeIndex += 1 # increment for next usage
         else:
             dict['time'] = timeValue
-
         if not updateNotAdd: # add new/missing information to dictionary
             self._definedContexts[idKey] = dict
 
 
-
-# old method: about the same performance; may double weakref
+# old method: about the same performance; may weakref a weakref
 #         isLocation = False # 'contexts'
 #         if offset is not None: 
 #             isLocation = True # 'locations'
@@ -1648,23 +1620,20 @@ class JSONSerializer(object):
         f.close()
 
 
-
-
-
 #-------------------------------------------------------------------------------
 class Music21Object(JSONSerializer):
     '''
     Base class for all music21 objects.
     
-    All music21 objects encode 7 pieces of information:
+    All music21 objects numerous pieces of information:
     
     (1) id: identification string unique to the objects container (optional)
     (2) groups: a Groups object: which is a list of strings identifying 
                     internal subcollections
                     (voices, parts, selections) to which this element belongs
     (3) duration: Duration object representing the length of the object
-    (4) parent: a reference or weakreference to a currently active Location
-    (5) offset: a floating point value, generally in quarter lengths, specifying the position of the object in parent 
+    (4) activeSite: a weakreference to the currently active Location
+    (5) offset: a floating point value, generally in quarter lengths, specifying the position of the object in a site. 
     (6) priority: int representing the position of an object among all
                     objects at the same offset.
 
@@ -1678,7 +1647,7 @@ class Music21Object(JSONSerializer):
     _duration = None
     _definedContexts = None
     id = None
-    _priority = 0
+    _priority = 0 # default is zero
     classSortOrder = 20  # default classSortOrder
     hideObjectOnPrint = False
     # these values permit fast class comparisons for performance crtical cases
@@ -1770,8 +1739,6 @@ class Music21Object(JSONSerializer):
         # only for an output format
         self._overriddenLily = None
 
-
-
     def mergeAttributes(self, other):
         '''
         Merge all elementary, static attributes. Namely, 
@@ -1780,8 +1747,6 @@ class Music21Object(JSONSerializer):
         '''
         self.id = other.id
         self.groups = copy.deepcopy(other.groups)
-
-
 
     def __deepcopy__(self, memo=None):
         '''
@@ -1852,35 +1817,11 @@ class Music21Object(JSONSerializer):
         return new
 
 
-#     def isClass(self, className):
-#         '''
-#         DEPRECATED: DO NOT USE!
-#         
-#         Returns a boolean value depending on if the object is a particular class or not.
-#         
-#         In Music21Object, it just returns the result of `isinstance`. For Elements it will return True if the embedded object is of the given class.  Thus, best to use it throughout music21 and only use isinstance if you really want to see if something is an ElementWrapper or not.
-# 
-#         >>> from music21 import *
-#         >>> n = note.Note()
-#         >>> n.isClass(note.Note)
-#         True
-#         >>> e = ElementWrapper(3.2)
-#         >>> e.isClass(note.Note)
-#         False
-#         >>> e.isClass(float)
-#         True
-# 
-#         '''
-#         if isinstance(self, className):
-#             return True
-#         else:
-#             return False
-
     def isClassOrSubclass(self, classFilterList):
-        '''Given a class filter list, which may have strings or class objects, determine if this class is of the provided classes or a subclass
+        '''Given a class filter list (and only a list), which may have strings or class objects, determine if this class is of the provided classes or a subclasses. 
         '''
         # NOTE: this is a performance critical operation
-        # only accept lists or tuple
+        # for performance, only accept lists or tuples
 
         # in case classFilterList is a tuple of classes, can try right away
         # do not change, as performance critical
@@ -3473,7 +3414,9 @@ class ElementWrapper(Music21Object):
     def __init__(self, obj):
         Music21Object.__init__(self)
         self.obj = obj # object stored here        
-        self._unlinkedDuration = None
+        # the unlinkedDuration is the duration that is inherited from 
+        # Music21Object
+        #self._unlinkedDuration = None
 
 
     def __copy__(self):
@@ -3618,13 +3561,11 @@ class ElementWrapper(Music21Object):
         Traceback (most recent call last):
         AttributeError: 'KindaStupid' object has no attribute 'duration'
         '''
-        if self._unlinkedDuration is not None:
-            return self._unlinkedDuration
         # getting from an object wrapper:
-        elif hasattr(self, "obj") and hasattr(self.obj, 'duration'):
+        if hasattr(self.obj, 'duration'):
             return self.obj.duration
         else:
-            return None
+            return Music21Object._getDuration(self)
 
     def _setDuration(self, durationObj):
         '''
@@ -3632,12 +3573,13 @@ class ElementWrapper(Music21Object):
         '''
         if not hasattr(durationObj, "quarterLength"):
             raise Exception('this must be a Duration object, not %s' % durationObj)
-        
+
         if hasattr(self.obj, 'duration'):
             # if a number assume it is a quarter length
             self.obj.duration = durationObj
         else:
-            self._unlinkedDuration = durationObj
+            #self._unlinkedDuration = durationObj
+            Music21Object._setDuration(self, durationObj)
             
     duration = property(_getDuration, _setDuration)
 
@@ -3781,220 +3723,6 @@ class ElementWrapper(Music21Object):
             return False
 
 
-
-
-
-#-------------------------------------------------------------------------------
-# class WeakElementWrapper(Music21Object):
-#     '''An element wraps a :class:`~music21.base.Music21Object` and stores it as a weak reference.
-#     
-#     The object stored within ElementWrapper is available from the the :attr:`~music21.base.ElementWrapper.obj` property.
-#     
-#     Providing an object at initialization is mandatory. 
-#     '''
-# 
-#     _DOC_ORDER = ['obj']
-#     _DOC_ATTR = {
-#     'obj': 'The object this wrapper wraps.',
-#     }
-# 
-#     def __init__(self, obj):
-#         self._obj = None # actual storage
-#         # store object id() for comparison without unwrapping
-#         self._objId = None
-#         # must define above first, before calling this
-#         Music21Object.__init__(self)
-#         self._setObj(obj) # object set with property
-#         self._unlinkedDuration = None
-# 
-#     def _setObj(self, obj):
-#         self._objId = id(obj)
-#         self._obj = common.wrapWeakref(obj)
-#         environLocal.printDebug(['setting object', obj])
-# 
-#     def _getObj(self):
-#         return common.unwrapWeakref(self._obj)
-# 
-#     obj = property(_getObj, _setObj)
-# 
-#     # for serialization, need to wrap and unwrap weakrefs
-#     def freezeIds(self):
-#         pass
-# 
-#     def unfreezeIds(self):
-#         pass
-# 
-#     def __copy__(self):
-#         '''
-#         Makes a copy of this element with a reference
-#         to the SAME object but with unlinked offset, priority
-#         and a cloned Groups object
-#         '''
-#         # will be None if obj has gone out of scope
-#         if self.obj is None:
-#             return None
-#         # this calls a new class with a dereferenced copy
-#         new = self.__class__(self.obj)
-#         for name in self.__dict__.keys():
-#             if name.startswith('__'):
-#                 continue
-#             part = getattr(self, name)
-#             newValue = part # just provide a reference
-#             setattr(new, name, newValue)
-# 
-#         # it is assumed that we need new objects for groups, contexts
-#         # and locations in order to position / group this object
-#         # independently
-#         new.groups = copy.deepcopy(self.groups)
-#         new._definedContexts = copy.deepcopy(self._definedContexts)
-#         return new
-# 
-#     def __deepcopy__(self, memo=None):
-#         '''
-#         '''
-#         new = self.__copy__()
-#         new._idLastDeepCopyOf = id(self)
-#         return new
-# 
-# 
-#     def _getClasses(self):
-#         # if stored object is not None, return its classes
-#         objRef = self.obj
-#         if objRef is not None:
-#             return [x.__name__ for x in objRef.__class__.mro()] 
-#         else:
-#             return [x.__name__ for x in self.__class__.mro()] 
-# 
-#     classes = property(_getClasses, 
-#         doc='''Returns a list containing the names (strings, not objects) of classes that are found in the object contained in this wrapper
-#     
-#         >>> from music21 import *
-#         >>> n1 = note.QuarterNote()
-#         >>> wew = WeakElementWrapper(n1)
-#         >>> wew.classes[:5]
-#         ['QuarterNote', 'Note', 'NotRest', 'GeneralNote', 'Music21Object']
-#         >>> del n1
-#         >>> wew.classes
-#         ['WeakElementWrapper', 'Music21Object', 'JSONSerializer', 'object']
-#         ''')
-# 
-# 
-# 
-#     #---------------------------------------------------------------------------
-#     # properties
-# 
-#     def getId(self):
-#         objRef = self.obj
-#         if objRef is not None:
-#             if hasattr(objRef, "id"):
-#                 return objRef.id
-#         return None
-# 
-#     def setId(self, newId):
-#         objRef = self.obj
-#         if objRef is not None:
-#             if hasattr(objRef, "id"):
-#                 objRef.id = newId
-# 
-#     id = property(getId, setId)
-# 
-# 
-#     def _getDuration(self):
-#         '''
-#         Gets the duration of the WeakElementWrapper (if separately set), but
-#         normal returns the duration of the component object if available, otherwise returns None.
-#         '''
-#         objRef = self.obj
-#         if self._unlinkedDuration is not None:
-#             #environLocal.printDebug(['returning unlinkedDuration'])
-#             return self._unlinkedDuration
-#         elif objRef is not None and hasattr(objRef, 'duration'):
-#             #environLocal.printDebug(['returning objRef.duration'])
-#             return objRef.duration
-#         else:
-#             #environLocal.printDebug(['get get duration; returning None'])
-#             return None
-# 
-#     def _setDuration(self, durationObj):
-#         '''
-#         Set the offset as a quarterNote length
-#         '''
-#         #environLocal.printDebug(['calling _setDuration', 'durationObj', durationObj])
-#         if not hasattr(durationObj, "quarterLength"):
-#             raise Exception('this must be a Duration object, not %s' % durationObj)
-#         objRef = self.obj        
-#         if objRef is not None and hasattr(objRef, 'duration'):
-#             # if a number assume it is a quarter length
-#             objRef.duration = durationObj
-#         else:
-#             self._unlinkedDuration = durationObj
-#             
-#     duration = property(_getDuration, _setDuration)
-# 
-#     offset = property(Music21Object._getOffset, Music21Object._setOffset)
-# 
-#     #---------------------------------------------------------------------------
-#     def __repr__(self):
-#         shortObj = (str(self.obj))[0:30]
-#         if len(str(self.obj)) > 30:
-#             shortObj += "..."
-#         if self.id is not None:
-#             return '<%s id=%s offset=%s obj="%s">' % \
-#                 (self.__class__.__name__, self.id, self.offset, shortObj)
-#         else:
-#             return '<%s offset=%s obj="%s">' % \
-#                 (self.__class__.__name__, self.offset, shortObj)
-# 
-# 
-#     def __eq__(self, other):
-#         '''Test WeakElementWrapper equality
-# 
-#         >>> import note
-#         >>> n1 = note.Note("C#")
-#         >>> a = WeakElementWrapper(n1)
-#         >>> a.offset = 3.0
-#         >>> b = WeakElementWrapper(n1)
-#         >>> b.offset = 1.0
-#         >>> a == b # offset does not matter here
-#         True
-#         '''
-#         if hasattr(other, "obj"):
-#             if self.obj == other.obj:
-#                 return True
-#         return False
-# 
-#     def __ne__(self, other):
-#         '''
-#         '''
-#         return not self.__eq__(other)
-# 
-#     def __getattr__(self, name):
-#         '''This method is only called when __getattribute__() fails.
-#         Using this also avoids the potential recursion problems of subclassing
-#         __getattribute__()_
-#         
-#         see: http://stackoverflow.com/questions/371753/python-using-getattribute-method for examples
-# 
-#         >>> import note
-#         >>> n1 = note.Note("C#4")
-#         >>> a = WeakElementWrapper(n1)
-#         >>> a.pitch.nameWithOctave
-#         'C#4'
-#         >>> del n1
-#         >>> a.pitch.nameWithOctave
-#         Traceback (most recent call last):
-#         AttributeError: Could not get attribute 'pitch'
-#         >>> a.obj == None
-#         True
-#         '''
-#         storedobj = self._getObj()
-#         if name == 'obj': # return unwrapped object
-#             return storedobj
-# 
-#         if storedobj is None:
-#             raise AttributeError("Could not get attribute '" + name + "'")
-#         else:
-#             return object.__getattribute__(storedobj, name)
 
 
 

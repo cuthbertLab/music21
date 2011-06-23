@@ -565,6 +565,50 @@ class NotRest(GeneralNote):
     def __init__(self, *arguments, **keywords):
         GeneralNote.__init__(self, **keywords)
 
+    def _isGrace(self):
+        # duration must not be linked and quarterLength must be zero
+        if self.duration.quarterLength == 0 and not self.duration.isLinked:
+            return True
+        return False
+
+    isGrace = property(_isGrace, doc='''
+        Return a boolean if this NotRest is a grace Note or Chord.
+        ''')
+
+    def makeGrace(self, inPlace=True):
+        '''Make this Note or Chord a grace note. This unlinks the Duration object and sets the unlinked quarterLength to zero.
+
+        >>> from music21 import *
+        >>> n = note.Note('g#', type='16th')
+        >>> n.duration.type, n.quarterLength
+        ('16th', 0.25)
+        >>> n.isGrace
+        False
+        >>> n.makeGrace()
+        >>> n.isGrace
+        True
+        >>> n.duration.isLinked
+        False
+        >>> n.duration.type, n.quarterLength
+        ('16th', 0.0)
+
+        '''
+        if inPlace:
+            returnObj = self
+        else:
+            returnObj = copy.deepcopy(self)
+
+        returnObj.duration.setQuarterLengthUnlinked(0.0)
+        # if no priority yet set, set to -100
+        # this is the default for new grace notes
+        # this assumes that there will not be more than 100 grace notes
+        # at the same offset position
+        if returnObj.priority == 0:
+            returnObj.priority = -100
+        if not inPlace:
+            return returnObj
+        # else return None
+
 
 #-------------------------------------------------------------------------------
 class NoteException(Exception):
