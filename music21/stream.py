@@ -2790,15 +2790,6 @@ class Stream(music21.Music21Object):
             #spannerBundle = copy.deepcopy(srcObj.spannerBundle)
             spannerBundle = srcObj.spannerBundle
 
-        # create for storage and processing
-#         spannerBundle = spanner.SpannerBundle()
-#         if gatherSpanners:
-#             for sp in mStreamSpanners:
-#                 #environLocal.printDebug(['copying spanner to returnObj', sp])
-#                 # store for latter processing
-#                 spannerBundle.append(sp)
-
-
         for m in mStream.elements:
             #environLocal.printDebug(['m', m])
             # mId is a tuple of measure nmber and any suffix
@@ -6572,7 +6563,7 @@ class Stream(music21.Music21Object):
         # all elements at this level and in measures have been copied; now we 
         # need to reconnect spanners
         if copySpanners:
-            environLocal.printDebug(['Stream.expandRepeats', 'copying spanners'])
+            #environLocal.printDebug(['Stream.expandRepeats', 'copying spanners'])
             #spannerBundle = spanner.SpannerBundle(post.flat.spanners)
             spannerBundle = post.spannerBundle
             # iterate over complete semi flat (need containers); find

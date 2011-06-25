@@ -401,7 +401,7 @@ class Expander(object):
         lb = m.leftBarline
         rb = m.rightBarline
         if lb is not None and 'Repeat' in lb.classes:
-            environLocal.printDebug(['inserting new barline: %s' % newStyle])
+            #environLocal.printDebug(['inserting new barline: %s' % newStyle])
             m.leftBarline = bar.Barline(newStyle)
         if rb is not None and 'Repeat' in rb.classes:
             m.rightBarline = bar.Barline(newStyle)
@@ -470,7 +470,7 @@ class Expander(object):
         # for now, only accepting one segno
         sumDs = (self._dsCount + self._dsacCount + 
                 self._dsafCount + self._asCount)
-        environLocal.printDebug(['_daCapoOrSegno', sumDc, sumDs])
+        #environLocal.printDebug(['_daCapoOrSegno', sumDc, sumDs])
         if sumDc == 1 and sumDs == 0:
             return DaCapo
         elif sumDs == 1 and sumDc == 0:
@@ -513,17 +513,17 @@ class Expander(object):
 
         # if dc, there can be no codas
         if self._dcCount == 1 and self._codaCount == 0:
-            environLocal.printDebug(['returning true on dc'])
+            #environLocal.printDebug(['returning true on dc'])
             return True
 
         # if we have a da capo al fine, must have one fine
         elif self._dcafCount == 1 and self._fineCount == 1:
-            environLocal.printDebug(['returning true on dcaf'])
+            #environLocal.printDebug(['returning true on dcaf'])
             return True
 
         # if we have a da capo al coda, must have two coda signs
         elif self._dcacCount == 1 and self._codaCount == 2:
-            environLocal.printDebug(['returning true on dcac'])
+            #environLocal.printDebug(['returning true on dcac'])
             return True
 
         # return false for all other cases
@@ -585,15 +585,22 @@ class Expander(object):
                 environLocal.printDebug(['repeat brackets are not numbered consecutively'])
                 return False
         # there needs to be repeat after each bracket
+        spannedMeasureIds = []
         for rb in self._repeatBrackets:
             # get the last, which is a measure, see if it has a repeat
             m = rb.getLast()
+            # check that they do not overlap: look at all components (starts
+            # and ends) and make sure that none have been found already
+            for m in rb.getComponents():
+                if id(m) in spannedMeasureIds:
+                    environLocal.printDebug(['found overlapping repeat brackets'])
+                    return False
+                spannedMeasureIds.append(id(m))
             rb = m.rightBarline
             if rb is None or 'Repeat' not in rb.classes:
                 environLocal.printDebug(['repeat brackets are not terminated with a repeat barline'])
                 return False
 
-        # check that they do not overlap
         return True
 
 
@@ -695,7 +702,7 @@ class Expander(object):
         # need to gather everything that is not a Meausre (e.g., Instrument)
         # and add copies to new
         repeatIndices = self._findInnermostRepeatIndices(streamObj)
-        environLocal.printDebug(['got new repeat indices:', repeatIndices])
+        #environLocal.printDebug(['got new repeat indices:', repeatIndices])
 
         # renumber measures starting with the first number found here
         number = streamObj[0].number
@@ -707,13 +714,13 @@ class Expander(object):
         i = 0
         while i < len(streamObj):
         #for i in range(len(streamObj)):
-            environLocal.printDebug(['processing measure index:', i, 'repeatIndices', repeatIndices])
+            #environLocal.printDebug(['processing measure index:', i, 'repeatIndices', repeatIndices])
             # if this index is the start of the repeat
             if i == repeatIndices[0]:
                 mLast, mEndBarline, repeatTimes = self._getEndRepeatBar(
                     streamObj, repeatIndices[-1])
                 for times in range(repeatTimes):
-                    environLocal.printDebug(['repeat times:', times])    
+                    #environLocal.printDebug(['repeat times:', times])    
                     # copy the range of measures; this will include the first
                     # always copying from the same source
                     for j in repeatIndices:
@@ -803,9 +810,9 @@ class Expander(object):
             #post.show('t')
             post = self._processInnermostRepeatBars(post)
             #post.show('t')
-            if self._hasRepeat(post):                        
-                environLocal.printDebug([
-                    'process() calling: self._findInnermostRepeatIndices(post)', self._findInnermostRepeatIndices(post)])
+            if self._hasRepeat(post):   
+                pass                     
+                #environLocal.printDebug(['process() calling: self._findInnermostRepeatIndices(post)', self._findInnermostRepeatIndices(post)])
             else:
                 break # nothing left to process
         return post
@@ -865,7 +872,7 @@ class Expander(object):
         if number is None:
             number = 1
 
-        environLocal.printDebug(['_processRepeatExpressionAndRepeats', 'index segments', indexSegments])
+        #environLocal.printDebug(['_processRepeatExpressionAndRepeats', 'index segments', indexSegments])
         # recType.repeatAfterJump
 
         # build segments form the source, copying as necessary, and 
@@ -2134,12 +2141,138 @@ class Test(unittest.TestCase):
         rb2.number = 2
         self.assertEqual(ex._repeatBracketsAreCoherent(), True)
 
+        self.assertEqual(ex._repeatBarsAreCoherent(), True)
+
+        #p.show()
+
+
+    def testRepeatEndingsB(self):
+        from music21 import stream, note, spanner, bar
+
+        p = stream.Part()
+        m1 = stream.Measure()
+        m1.append(note.Note('c4', type='whole'))
+        m2 = stream.Measure()
+        m2.append(note.Note('d4', type='whole'))
+        m3 = stream.Measure()
+        m3.append(note.Note('e4', type='whole'))
+        m4 = stream.Measure()
+        m4.append(note.Note('f4', type='whole'))
+        m5 = stream.Measure()
+        m5.append(note.Note('g4', type='whole'))
+
+        p.append([m1, m2, m3, m4, m5])
+        rb1 = spanner.RepeatBracket([m2, m3], number=1)
+        m3.rightBarline = bar.Repeat()
+        self.assertEqual(rb1.hasComponent(m2), True)
+        self.assertEqual(rb1.hasComponent(m3), True)
+        p.append(rb1)
+
+        rb2 = spanner.RepeatBracket(m4, number=2)
+        self.assertEqual(rb2.hasComponent(m4), True)
+        m4.rightBarline = bar.Repeat()
+        p.append(rb2)
+
+        ex = Expander(p)
+        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+        
+        # if we change the numbers no longer cohereent
+        rb2.number = 30
+        self.assertEqual(ex._repeatBracketsAreCoherent(), False)
+        rb2.number = 2
+        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+        rb1.number = 2
+        rb2.number = 1
+        self.assertEqual(ex._repeatBracketsAreCoherent(), False)
+
+        rb1.number = 1
+        rb2.number = 2
+        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+
+        self.assertEqual(ex._repeatBarsAreCoherent(), True)
+
         #p.show()
 
 
 
+    def testRepeatEndingsC(self):
+        from music21 import stream, note, spanner, bar
 
-    def testRepeatsEndingsC(self):
+        p = stream.Part()
+        m1 = stream.Measure()
+        m1.append(note.Note('c4', type='whole'))
+        m2 = stream.Measure()
+        m2.append(note.Note('d4', type='whole'))
+        m3 = stream.Measure()
+        m3.append(note.Note('e4', type='whole'))
+        m4 = stream.Measure()
+        m4.append(note.Note('f4', type='whole'))
+        m5 = stream.Measure()
+        m5.append(note.Note('g4', type='whole'))
+
+        p.append([m1, m2, m3, m4, m5])
+        rb1 = spanner.RepeatBracket([m2, m3], number=1)
+        p.append(rb1)
+
+        ex = Expander(p)
+        self.assertEqual(ex._repeatBracketsAreCoherent(), False)
+
+        m3.rightBarline = bar.Repeat()
+        # coherent after setting the barline
+        ex = Expander(p)
+        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+
+        rb2 = spanner.RepeatBracket(m4, number=2)
+        p.append(rb2)
+        ex = Expander(p)
+        self.assertEqual(ex._repeatBracketsAreCoherent(), False)
+
+        m4.rightBarline = bar.Repeat()
+        ex = Expander(p)
+        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+
+
+
+    def testRepeatEndingsD(self):
+        from music21 import stream, note, spanner, bar
+
+        p = stream.Part()
+        m1 = stream.Measure()
+        m1.append(note.Note('c4', type='whole'))
+        m2 = stream.Measure()
+        m2.append(note.Note('d4', type='whole'))
+        m3 = stream.Measure()
+        m3.append(note.Note('e4', type='whole'))
+        m4 = stream.Measure()
+        m4.append(note.Note('f4', type='whole'))
+        m5 = stream.Measure()
+        m5.append(note.Note('g4', type='whole'))
+
+        p.append([m1, m2, m3, m4, m5])
+        rb1 = spanner.RepeatBracket([m2, m3], number=1)
+        p.append(rb1)
+        m3.rightBarline = bar.Repeat()
+
+        ex = Expander(p)
+        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+        # overlapping at m3
+        rb2 = spanner.RepeatBracket([m3, m4], number=2)
+        p.append(rb2)
+        m4.rightBarline = bar.Repeat()
+        ex = Expander(p)
+        self.assertEqual(ex._repeatBracketsAreCoherent(), False)
+        # can fix overlap
+        rb2.replaceComponent(m3, m5)
+        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+
+
+
+
+
+
+
+
+    def testRepeatsEndingsX(self):
         from music21 import corpus
         # last alternate endings in last bars
         # need to add import from abc
