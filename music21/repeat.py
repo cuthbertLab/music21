@@ -566,6 +566,37 @@ class Expander(object):
         return False
         
 
+    def _repeatBracketsAreCoherent(self):
+        '''Check if repeat brackets are coherent.
+        '''
+        # the numbers must be consecutive
+        if len(self._repeatBrackets) == 0:
+            return True
+        # accept if any single repeat bracket        
+        if len(self._repeatBrackets) == 1:
+            pass
+        elif len(self._repeatBrackets) > 1:
+            # spanner numbers must be in order, integers, and consecutive
+            match = [x+1 for x in range(len(self._repeatBrackets))]
+            target = []
+            for rb in self._repeatBrackets:
+                target.append(int(rb.number))
+            if match != target:
+                environLocal.printDebug(['repeat brackets are not numbered consecutively'])
+                return False
+        # there needs to be repeat after each bracket
+        for rb in self._repeatBrackets:
+            # get the last, which is a measure, see if it has a repeat
+            m = rb.getLast()
+            rb = m.rightBarline
+            if rb is None or 'Repeat' not in rb.classes:
+                environLocal.printDebug(['repeat brackets are not terminated with a repeat barline'])
+                return False
+
+        # check that they do not overlap
+        return True
+
+
     def _hasRepeat(self, streamObj):
         '''Return True if this Stream of Measures has a repeat pair left to process.
         '''
@@ -2043,38 +2074,86 @@ class Test(unittest.TestCase):
  
         # TODO: after calling .musicxml, repeat brackets are getting lost
         #s.show()        
-#         raw = s.musicxml
-#         self.assertEqual(raw.find("<repeat direction=")>1, True)    
-#         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
-#         self.assertEqual(raw.find("""<ending number="1" type="stop"/>""")>1, True)    
-#         self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
-#         self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)   
+        raw = s.musicxml
+        self.assertEqual(raw.find("<repeat direction=")>1, True)    
+        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="1" type="stop"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)   
 
-        # 
-        #TODO: make sure that deepcopy gets spanners
         s1 = copy.deepcopy(s)
         #s.show()
 
         #s1.show()
         raw = s1.musicxml
-
-        ex = Expander(s.parts[0])
+        ex = Expander(s1.parts[0])
         self.assertEqual(len(ex._repeatBrackets), 2)
 
 
+
+    def testRepeatEndingsB(self):
+        from music21 import stream, note, spanner, bar
+
+        p = stream.Part()
+        m1 = stream.Measure()
+        m1.append(note.Note('c4', type='whole'))
+        m2 = stream.Measure()
+        m2.append(note.Note('d4', type='whole'))
+        m3 = stream.Measure()
+        m3.append(note.Note('e4', type='whole'))
+        m4 = stream.Measure()
+        m4.append(note.Note('f4', type='whole'))
+        m5 = stream.Measure()
+        m5.append(note.Note('g4', type='whole'))
+
+        p.append([m1, m2, m3, m4, m5])
+        rb1 = spanner.RepeatBracket([m2, m3], number=1)
+        m3.rightBarline = bar.Repeat()
+        self.assertEqual(rb1.hasComponent(m2), True)
+        self.assertEqual(rb1.hasComponent(m3), True)
+        p.append(rb1)
+
+        rb2 = spanner.RepeatBracket(m4, number=2)
+        self.assertEqual(rb2.hasComponent(m4), True)
+        m4.rightBarline = bar.Repeat()
+        p.append(rb2)
+
+        ex = Expander(p)
+        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
         
+        # if we change the numbers no longer cohereent
+        rb2.number = 30
+        self.assertEqual(ex._repeatBracketsAreCoherent(), False)
+        rb2.number = 2
+        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+        rb1.number = 2
+        rb2.number = 1
+        self.assertEqual(ex._repeatBracketsAreCoherent(), False)
+
+        rb1.number = 1
+        rb2.number = 2
+        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+
+        #p.show()
 
 
-    def testRepeatsEndingsB(self):
+
+
+    def testRepeatsEndingsC(self):
         from music21 import corpus
         # last alternate endings in last bars
         # need to add import from abc
         s = corpus.parse('SmugglersReel')
         #s.parts[0].show()
         ex = Expander(s.parts[0])
+        # this is a Stream resulting form getElements
         self.assertEqual(len(ex._repeatBrackets), 2)
 
-        #post = ex.process()
+        post = ex.process()
+
+
+
+
 
 
 

@@ -2163,7 +2163,7 @@ class Duration(DurationCommon):
         # not linked; yet a component must be present to provide a type
         self._qtrLength = value
         if len(self._components) == 0:
-            if self._qtrLength == 0: # if not set create a default
+            if self._qtrLength == 0.0: # if not set create a default
                 self._components.append(ZeroDuration())
             else:
                 du = DurationUnit() # will get default quarter

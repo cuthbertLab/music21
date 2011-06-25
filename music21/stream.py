@@ -1287,7 +1287,10 @@ class Stream(music21.Music21Object):
                     #environLocal.printDebug(['got highest priority: hp'])
                     if len(graces) > 1:
                         hp = max([g.priority for g in graces])
-                        element.priority = hp + 1 # increment
+                        # if highest priority found is greater than known
+                        # must change what we have
+                        if hp >= element.priority:
+                            element.priority = hp + 1 # increment
             else:
                 # increment highestTime by quarterlength
                 highestTime += element.duration.quarterLength
@@ -8752,6 +8755,11 @@ class Measure(Stream):
         else: # assume an Barline object
             barlineObj.location = 'right'
 
+        # if a repeat, setup direction if not assigned
+        if 'Repeat' in barlineObj.classes:
+            #environLocal.printDebug(['got barline obj w/ direction', barlineObj.direction])
+            if barlineObj.direction in ['start', None]:
+                barlineObj.direction = 'end'
         oldRightBarline = self._getRightBarline()
 
         if oldRightBarline is not None:

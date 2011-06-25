@@ -171,10 +171,10 @@ class Repeat(repeat.RepeatMark, Barline):
     '''
     _repeatDots = None # not sure what this is for; inherited from old modles
 
-    def __init__(self, style=None, direction='start', times=None):
+    def __init__(self, style='light-heavy', direction='start', times=None):
         Barline.__init__(self, style=style)
 
-        self._direction = None 
+        self._direction = None # either start or end
         self._times = None  # if an end, how many repeats
 
         # start is forward, end is backward in musicxml
