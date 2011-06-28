@@ -805,14 +805,25 @@ class RepeatBracket(Spanner):
 
         self._number = None
         self._numberRange = [] # store a range, inclusive of the single number assignment
+        self._numberSpanIsAdjacent = None
         if 'number' in keywords.keys():
             self.number = keywords['number']
 
     # property to enforce numerical numbers
     def _getNumber(self):
-        return self._number
+        '''This must return a string, as we may have single numbers or lists. For a raw numerical list, use getNumberList() below.
+        '''
+        if len(self._numberRange) == 1:
+            return str(self._number)
+        else:
+            if self._numberSpanIsAdjacent:
+                return '%s, %s' % (self._numberRange[0], self._numberRange[-1])
+            else: # range of values
+                return '%s-%s' % (self._numberRange[0], self._numberRange[-1])
 
     def _setNumber(self, value):
+        '''Set the bracket number. There may be range of values provided
+        '''
         if value in ['', None]:
             # assume this is 1 
             self._numberRange = [1]
@@ -830,6 +841,12 @@ class RepeatBracket(Spanner):
             if '-' in value:
                 start, end = value.split('-')
                 self._numberRange = range(int(start), int(end)+1)
+                self._numberSpanIsAdjacent = False
+            elif ',' in value: # assuming only two values
+                start, end = value.split(',')
+                self._numberRange = range(int(start), int(end)+1)
+                # mark as contiguous numbers
+                self._numberSpanIsAdjacent = True
             elif value.isdigit():
                 self._numberRange.append(int(value))
             else:
@@ -848,6 +865,12 @@ class RepeatBracket(Spanner):
 
     def getNumberList(self):
         '''Get a contiguous list of repeat numbers that are applicable for this instance.
+
+        >>> from music21 import *
+        >>> rb = spanner.RepeatBracket()
+        >>> rb.number = '1,2'
+        >>> rb.getNumberList()
+        [1, 2]
         '''
         return self._numberRange
 

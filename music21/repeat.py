@@ -577,16 +577,22 @@ class Expander(object):
             pass
         elif len(self._repeatBrackets) > 1:
             # spanner numbers must be in order, integers, and consecutive
-            match = [x+1 for x in range(len(self._repeatBrackets))]
+            # get a list of max values for each repeat bracket
+            maxValues = [max(x.getNumberList()) for x in self._repeatBrackets]
+            # then get range from 1 to max of all maxes. 
+            match = range(1, max(maxValues)+1) 
             target = []
             for rb in self._repeatBrackets:
-                target.append(int(rb.number))
+                # number here may be a string 1,2
+                # get number list will return inclusive values; i.e., 1,3 will
+                # return 1, 2, 3
+                target += rb.getNumberList()
             if match != target:
-                environLocal.printDebug(['repeat brackets are not numbered consecutively'])
+                environLocal.printDebug(['repeat brackets are not numbered consecutively: %s, %s' % (match, target)])
                 return False
-        # there needs to be repeat after each bracket
+        # there needs to be repeat after each bracket except the last
         spannedMeasureIds = []
-        for rb in self._repeatBrackets:
+        for rbCount, rb in enumerate(self._repeatBrackets):
             # get the last, which is a measure, see if it has a repeat
             m = rb.getLast()
             # check that they do not overlap: look at all components (starts
@@ -598,8 +604,12 @@ class Expander(object):
                 spannedMeasureIds.append(id(m))
             rb = m.rightBarline
             if rb is None or 'Repeat' not in rb.classes:
-                environLocal.printDebug(['repeat brackets are not terminated with a repeat barline'])
-                return False
+                # all but the last must have repeat bars; except if we just
+                # have one bracket
+                if (len(self._repeatBrackets) == 1 or 
+                    rbCount < len(self._repeatBrackets) - 1):
+                    environLocal.printDebug(['repeat brackets are not terminated with a repeat barline'])
+                    return False
 
         return True
 
@@ -2213,7 +2223,8 @@ class Test(unittest.TestCase):
         p.append([m1, m2, m3, m4, m5])
         rb1 = spanner.RepeatBracket([m2, m3], number=1)
         p.append(rb1)
-
+        # one repeat bracket w/o a repeat bar; makes no sense, should be 
+        # rejected
         ex = Expander(p)
         self.assertEqual(ex._repeatBracketsAreCoherent(), False)
 
@@ -2222,10 +2233,11 @@ class Test(unittest.TestCase):
         ex = Expander(p)
         self.assertEqual(ex._repeatBracketsAreCoherent(), True)
 
+        # a second repeat bracket need not have a repeat ending
         rb2 = spanner.RepeatBracket(m4, number=2)
         p.append(rb2)
         ex = Expander(p)
-        self.assertEqual(ex._repeatBracketsAreCoherent(), False)
+        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
 
         m4.rightBarline = bar.Repeat()
         ex = Expander(p)
@@ -2268,7 +2280,7 @@ class Test(unittest.TestCase):
 
 
     def testRepeatEndingsE(self):
-        '''Expanding two endings without a start repeat
+        '''Expanding two endings (1,2, then 3) without a start repeat
         '''
         from music21 import stream, note, spanner, bar
 
@@ -2285,16 +2297,16 @@ class Test(unittest.TestCase):
         m5.append(note.Note('g4', type='whole'))
 
         p.append([m1, m2, m3, m4, m5])
-        rb1 = spanner.RepeatBracket([m2, m3], number=1)
+        rb1 = spanner.RepeatBracket([m2, m3], number='1,2')
         m3.rightBarline = bar.Repeat()
         p.append(rb1)
-        rb2 = spanner.RepeatBracket(m4, number=2)
-        m4.rightBarline = bar.Repeat()
+        rb2 = spanner.RepeatBracket(m4, number=3)
+        # second ending may not have repeat
         p.append(rb2)
-
         #p.show()
 
         ex = Expander(p)
+        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
 
 
 
