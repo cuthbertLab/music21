@@ -568,6 +568,8 @@ class Expander(object):
 
     def _repeatBracketsAreCoherent(self):
         '''Check if repeat brackets are coherent.
+
+        This must be done for each group of brackets, not for the entire Stream.
         '''
         # the numbers must be consecutive
         if len(self._repeatBrackets) == 0:
@@ -577,17 +579,22 @@ class Expander(object):
             pass
         elif len(self._repeatBrackets) > 1:
             # spanner numbers must be in order, integers, and consecutive
-            # get a list of max values for each repeat bracket
-            maxValues = [max(x.getNumberList()) for x in self._repeatBrackets]
-            # then get range from 1 to max of all maxes. 
-            match = range(1, max(maxValues)+1) 
             target = []
             for rb in self._repeatBrackets:
                 # number here may be a string 1,2
                 # get number list will return inclusive values; i.e., 1,3 will
                 # return 1, 2, 3
                 target += rb.getNumberList()
-            if match != target:
+            match = True # if passes all tests
+            if target[0] != 1:
+                match = False # must start with 1
+            for i, n in enumerate(target):
+                if i < len(target) - 1:
+                    nNext = target[i+1]
+                    if nNext - n > 1: # must be consecutive, can be neg
+                        match = False
+                        break
+            if not match:
                 environLocal.printDebug(['repeat brackets are not numbered consecutively: %s, %s' % (match, target)])
                 return False
         # there needs to be repeat after each bracket except the last
@@ -635,8 +642,10 @@ class Expander(object):
     
     def _findInnermostRepeatIndices(self, streamObj):
         '''Find the innermost repeat bars. Return raw index values.
-        For a single measure, this might be [2, 2]
+        For a single measure, this could be [2, 2]
         For many contiguous measures, this might be [2, 3, 4, 5]
+
+        The provided Stream must be a Stream only of Measures. 
         '''
         # need to find only the first open and closed pair
         startIndices = []
@@ -674,10 +683,61 @@ class Expander(object):
         return barRepeatIndices
 
 
+    def _groupRepeatBracketIndices(self, streamObj):
+        '''Return a list of all indices that are involved in a repeat bracket; group these into logical groups by repeat number. There may be more than one group per Stream.
+        ''' 
+        groups = []
+        mEnumerated = [x for x in enumerate(streamObj)]
+
+        # use known self._repeatBrackets and correlate with indices
+        # store numbers to find when we have a new group
+        foundRBNumbers = []
+        groupIndices = {'repeatBrackets':[], 'measureIndices':[]}
+        i = 0
+        #for i in range(len(streamObj)):
+        while i < len(streamObj):
+            m = streamObj[i]
+            shiftedIndex = False
+            for rb in self._repeatBrackets:
+                match = False
+                if rb.isFirst(m): # for this rb, is this the first measures
+                    if rb.getNumberList()[0] in foundRBNumbers:
+                        # we have a new group
+                        groups.append(groupIndices)
+                        foundRBNumbers = []
+                        groupIndices = {'repeatBrackets':[], 'measureIndices':[]}
+                    # store rb numbers to monitor when we are in a new group
+                    foundRBNumbers += rb.getNumberList() # concat list
+                    #groupIndices['measureIndices'].append(i)
+                    # need to jump to the index of the last measure this 
+                    # rb contains; need to add indices for measures found within
+                    groupIndices['repeatBrackets'].append(rb)
+                    mLast = rb.getLast()
+                    for iSub, mSub in mEnumerated:
+                        # when we are at or higher index then our 
+                        # current context
+                        # need to include
+                        if iSub >= i and id(mSub) != id(mLast): 
+                            groupIndices['measureIndices'].append(iSub)
+                        elif id(mLast) == id(mSub): # add last
+                            groupIndices['measureIndices'].append(iSub)
+                            i = iSub + 1 # go to next index in outer loop
+                            shiftedIndex = True
+                            match = True
+                            break
+                if match:
+                    break
+            if not shiftedIndex:
+                i += 1
+        if len(groupIndices) > 0:
+            groups.append(groupIndices)
+        return groups
+            
+
     def _getEndRepeatBar(self, streamObj, index):
         '''Get the last measure to be processed in the repeat, as well as the measure that has the end barline. These may not be the same: if an end repeat bar is placed on the left of a measure that is not actually being copied. 
 
-        The `index` parameter is the index of the last measure to be copied. The streamObj expects to only have Measures. 
+        The `index` parameter is the index of the last measure to be copied. The streamObj must only have Measures. 
         '''
         mLast = streamObj[index]
         rb = mLast.rightBarline
@@ -702,6 +762,7 @@ class Expander(object):
         if repeatTimes is None:
             repeatTimes = 2
         return mLast, mEndBarline, repeatTimes
+
 
     def _processInnermostRepeatBars(self, streamObj):
         '''Process and return a new Stream of Measures, likely a Part.
@@ -797,6 +858,11 @@ class Expander(object):
         if not self._repeatBarsAreCoherent():
             environLocal.printDebug('repeat bars not coherent')
             return False
+
+        if not self._repeatBracketsAreCoherent():
+            environLocal.printDebug('repeat brackets are not coherent')
+            return False
+
         if match is not None:
             if match == DaCapo:
                 if not self._daCapoIsCoherent():
@@ -2156,7 +2222,7 @@ class Test(unittest.TestCase):
         #p.show()
 
 
-    def testRepeatEndingsB(self):
+    def testRepeatEndingsB2(self):
         from music21 import stream, note, spanner, bar
 
         p = stream.Part()
@@ -2307,6 +2373,71 @@ class Test(unittest.TestCase):
 
         ex = Expander(p)
         self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+        self.assertEqual(ex.isExpandable(), True)
+
+
+        self.assertEqual(ex._findInnermostRepeatIndices(p), [0, 1, 2])
+        # get groups of brackets; note that this does not get the end
+        post = ex._groupRepeatBracketIndices(p)
+        self.assertEqual(post[0]['measureIndices'], [1, 2, 3])
+
+        
+
+    def testRepeatEndingsF(self):
+        '''Two sets of two endings (1,2, then 3) without a start repeat
+        '''
+        from music21 import stream, note, spanner, bar
+
+        p = stream.Part()
+        m1 = stream.Measure()
+        m1.append(note.Note('c4', type='whole'))
+        m2 = stream.Measure()
+        m2.append(note.Note('d4', type='whole'))
+        m3 = stream.Measure()
+        m3.append(note.Note('e4', type='whole'))
+        m4 = stream.Measure()
+        m4.append(note.Note('f4', type='whole'))
+        m5 = stream.Measure()
+        m5.append(note.Note('g4', type='whole'))
+        m6 = stream.Measure()
+        m6.append(note.Note('a4', type='whole'))
+        m7 = stream.Measure()
+        m7.append(note.Note('b4', type='whole'))
+        m8 = stream.Measure()
+        m8.append(note.Note('c5', type='whole'))
+
+        p.append([m1, m2, m3, m4, m5, m6, m7, m8])
+        rb1 = spanner.RepeatBracket([m2, m3], number='1,2')
+        m3.rightBarline = bar.Repeat()
+        p.append(rb1)
+        rb2 = spanner.RepeatBracket(m4, number=3)
+        p.append(rb2)
+
+        # second group
+        m5.leftBarline = bar.Repeat()
+        m6.rightBarline = bar.Repeat()
+        rb3 = spanner.RepeatBracket(m6, number='1-3')
+        p.append(rb3)
+        m7.rightBarline = bar.Repeat()
+        rb4 = spanner.RepeatBracket(m7, number=4)
+        p.append(rb4)
+        rb5 = spanner.RepeatBracket(m8, number=5)
+        p.append(rb5)
+        # second ending may not have repeat
+        #p.show()
+
+        ex = Expander(p)
+        #self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+#         self.assertEqual(ex.isExpandable(), True)
+# 
+#         self.assertEqual(ex._findInnermostRepeatIndices(p), [0, 1, 2])
+#         # get groups of brackets
+        # returns a list of dictionaries
+        post = ex._groupRepeatBracketIndices(p)
+        self.assertEqual(post[0]['measureIndices'], [1, 2, 3])
+        self.assertEqual(post[1]['measureIndices'], [5, 6, 7])
+
+
 
 
 
