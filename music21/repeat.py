@@ -2261,13 +2261,40 @@ class Test(unittest.TestCase):
         m4.rightBarline = bar.Repeat()
         ex = Expander(p)
         self.assertEqual(ex._repeatBracketsAreCoherent(), False)
-        # can fix overlap
+        # can fix overlap even after insertion
         rb2.replaceComponent(m3, m5)
         self.assertEqual(ex._repeatBracketsAreCoherent(), True)
 
 
 
+    def testRepeatEndingsE(self):
+        '''Expanding two endings without a start repeat
+        '''
+        from music21 import stream, note, spanner, bar
 
+        p = stream.Part()
+        m1 = stream.Measure()
+        m1.append(note.Note('c4', type='whole'))
+        m2 = stream.Measure()
+        m2.append(note.Note('d4', type='whole'))
+        m3 = stream.Measure()
+        m3.append(note.Note('e4', type='whole'))
+        m4 = stream.Measure()
+        m4.append(note.Note('f4', type='whole'))
+        m5 = stream.Measure()
+        m5.append(note.Note('g4', type='whole'))
+
+        p.append([m1, m2, m3, m4, m5])
+        rb1 = spanner.RepeatBracket([m2, m3], number=1)
+        m3.rightBarline = bar.Repeat()
+        p.append(rb1)
+        rb2 = spanner.RepeatBracket(m4, number=2)
+        m4.rightBarline = bar.Repeat()
+        p.append(rb2)
+
+        #p.show()
+
+        ex = Expander(p)
 
 
 
