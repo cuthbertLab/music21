@@ -542,24 +542,24 @@ class Expander(object):
         # if al segno, there can be no codas, and one segno
         if (self._asCount == 1 and self._segnoCount == 1 and 
             self._codaCount == 0):
-            environLocal.printDebug(['returning true on as'])
+            #environLocal.printDebug(['returning true on as'])
             return True
 
         if (self._dsCount == 1 and self._segnoCount == 1 and 
             self._codaCount == 0):
-            environLocal.printDebug(['returning true on ds'])
+            #environLocal.printDebug(['returning true on ds'])
             return True
 
         # if we have a da capo al fine, must have one fine
         elif (self._dsafCount == 1 and self._codaCount == 0 and 
             self._segnoCount == 1 and self._fineCount == 1):
-            environLocal.printDebug(['returning true on dsaf'])
+            #environLocal.printDebug(['returning true on dsaf'])
             return True
 
         # if we have a da capo al coda, must have two coda signs
         elif (self._dsacCount == 1 and self._codaCount == 2 and 
             self._segnoCount == 1 and self._fineCount == 0):
-            environLocal.printDebug(['returning true on dsac'])
+            #environLocal.printDebug(['returning true on dsac'])
             return True
 
         # return false for all other cases
@@ -757,7 +757,7 @@ class Expander(object):
             repeatTimes = rb.times
         else:
             # try the next measure
-            if len(streamObj) < index:
+            if index >= len(streamObj) - 1:
                 raise ExpanderException('cannot find an end Repeat bar after the given end: %s' % index)
 
             mEndBarline = streamObj[index+1]
@@ -794,15 +794,14 @@ class Expander(object):
         #environLocal.printDebug(['got new repeat indices:', repeatIndices])
 
         # renumber measures starting with the first number found here
-        number = streamObj[0].number
-        if number is None:
-            number = 1
+#         number = streamObj[0].number
+#         if number is None:
+#             number = 1
         # handling of end repeat as left barline
         stripFirstNextMeasure = False
         # use index values instead of an interator
         i = 0
         while i < len(streamObj):
-        #for i in range(len(streamObj)):
             #environLocal.printDebug(['processing measure index:', i, 'repeatIndices', repeatIndices])
             # if this index is the start of the repeat
             if i == repeatIndices[0]:
@@ -830,14 +829,15 @@ class Expander(object):
                         #environLocal.printDebug(['got j, repeatIndicies', j, repeatIndices])
                         if j in [repeatIndices[0], repeatIndices[-1]]:
                             self._stripRepeatBarlines(mSub)
-                        mSub.number = number
+                        #mSub.number = number
                         # only keep repeat expressions found at the end  
                         # only remove anything if we have 2 or more repeats
                         # and this is not the last time 
                         if repeatTimes >= 2 and times < repeatTimes - 1: 
                             self._stripRepeatExpressions(mSub)
                         new.append(mSub)
-                        number += 1
+                        # renumber at end
+                        #number += 1
                 # check if need to clear repeats from next bar
                 if mLast is not mEndBarline:
                     stripFirstNextMeasure = True
@@ -847,17 +847,29 @@ class Expander(object):
             else:
                 # iterate through each measure, always add first
                 if not returnExpansionOnly:
-                    m = copy.deepcopy(streamObj[i])
+                    # TODO: this deepcopy is necessary to avoid a problem in 
+                    # testExpandRepeatH; the copy is not actually used, but
+                    # for some reason removes an id clash when inserting into
+                    # new
+                    junk = copy.deepcopy(streamObj[i])
+                    # cannot deepcopy here, as we might orphan a spanner
+                    # attached to bracket after this repeat segment
+                    m = streamObj[i]
+                    #environLocal.printDebug(['about to insert m into new', 'id(m)', id(m), 'new', id(new), 'all ids:', [id(e) for e in new]])
+                    #if new.hasElementByObjectId(id(m)):
+                    #    environLocal.printDebug(['stream already has measure that was not copied in this pass', m])
+                        #m = copy.deepcopy(streamObj[i])
+                        #new.show('t')
                     if stripFirstNextMeasure:
+                        #environLocal.printDebug(['got stripFirstNextMeasure'])
                         self._stripRepeatBarlines(m)
                         # change in source too
                         self._stripRepeatBarlines(streamObj[i])
                         stripFirstNextMeasure = False
-                    m.number = number
+                    # renumber at end
+                    #m.number = number
                     new.append(m) # this may be the first version
-                # not sure if we should increment number if not returning
-                # complete stream
-                number += 1
+                #number += 1
                 i += 1
         # return the complete stream with just the expanded measures
         return new
@@ -905,12 +917,13 @@ class Expander(object):
                     groupFocus = group
                     break
                 else:
-                    environLocal.printDebug(['rb does not have as component', 'rb', rb, 'mEnd', mEnd])
+                    environLocal.printDebug(['rb does not have measure as component', 'rb', rb, 'mEnd', mEnd])
             if groupFocus is not None:
                 break
 
         # if the innermost measures are not part of a group, process normally
         if groupFocus is None:
+            #environLocal.printDebug(['cannot find innermost in a group:', 'innermost', innermost, 'groupFocus', groupFocus])
             return self._processInnermostRepeatBars(streamObj)
         else: # have innermost in a bracket
             rBrackets = groupFocus['repeatBrackets']
@@ -969,7 +982,7 @@ class Expander(object):
                 boundaries.append(data)
 
             for data in boundaries:
-                environLocal.printDebug(['processing data bundle:', data])
+                #environLocal.printDebug(['processing data bundle:', data])
 
                 # each number in a racket corresponds to one or more repeat
                 # find indices to process and times based on repeat brackets
@@ -1052,7 +1065,7 @@ class Expander(object):
 
 
     def _processRecursiveRepeatBars(self, streamObj):
-        '''Recursively expand any number of nested repeat bars
+        '''Recursively expand any number of nested repeat bars. Will also expand all repeat brackets.
         '''
         # this assumes just a stream of measures
         # assume already copied
@@ -1172,18 +1185,17 @@ class Expander(object):
         if not self.isExpandable():
             raise ExpanderException('cannot expand Stream: badly formed repeats or repeat expressions')
 
-        # this copy is not necessary, as we are not altering the outer
-        # stream, but copying components
+        # need to copy source measures, as may later measures before copying
+        # them, and this can result in orphaned spanners
+        srcStream = copy.deepcopy(self._srcMeasureStream) 
+        #srcStream = self._srcMeasureStream
+        # after copying, update repeat brackets (as spanners)
+        for m in srcStream:
+            # processes uses the spanner bundle stored on this Stream
+            self._repeatBrackets.spannerBundle.replaceComponent(
+                m._idLastDeepCopyOf, m)
 
-#         srcStream = copy.deepcopy(self._srcMeasureStream) 
-#         #srcStream = self._srcMeasureStream
-#         # after copying, update repeat brackets (as spanners)
-#         for m in srcStream:
-#             # processes uses the spanner bundle stored on this Stream
-#             self._repeatBrackets.spannerBundle.replaceComponent(
-#                 m._idLastDeepCopyOf, m)
-
-        srcStream = self._srcMeasureStream
+        #srcStream = self._srcMeasureStream
             
 
         #post = copy.deepcopy(self._srcMeasureStream)
@@ -1678,7 +1690,6 @@ class Test(unittest.TestCase):
             m.timeSignature = meter.TimeSignature('1/4')
             for j, p in enumerate(pitches):
                 m.append(note.Note(p.transpose(i*3), quarterLength=dur[j]))
-        
             m.leftBarline = bar.Repeat(direction='start')
             rb = bar.Repeat(direction='end')
             rb.times = repeatTimesCycle[i%len(repeatTimesCycle)]
@@ -1697,6 +1708,8 @@ class Test(unittest.TestCase):
         #s.show()    
         
         s1 = s.expandRepeats()
+        #s1.show()
+
         self.assertEqual(len(s1), 18)            
         # first bar is an A, but repeat is zero, will be removed
         self.assertEqual(str(s1.flat.pitches[0]), 'C3')
@@ -2758,37 +2771,31 @@ class Test(unittest.TestCase):
         p.append(rb2)
         m4.rightBarline = bar.Repeat()
 
-        rb3 = spanner.RepeatBracket(m5, number=4)
-        p.append(rb3)
-
 
         # second group
-#         m5.leftBarline = bar.Repeat()
-#         m6.rightBarline = bar.Repeat()
-#         rb3 = spanner.RepeatBracket(m6, number='1-3')
-#         p.append(rb3)
-#         m7.rightBarline = bar.Repeat()
-#         rb4 = spanner.RepeatBracket(m7, number=4)
-#         p.append(rb4)
-#         rb5 = spanner.RepeatBracket(m8, number=5)
-#         p.append(rb5)
+        m5.leftBarline = bar.Repeat()
+        m6.rightBarline = bar.Repeat()
+        rb3 = spanner.RepeatBracket(m6, number='1-3')
+        p.append(rb3)
+        m7.rightBarline = bar.Repeat()
+        rb4 = spanner.RepeatBracket(m7, number=4)
+        p.append(rb4)
+        rb5 = spanner.RepeatBracket(m8, number=5)
+        p.append(rb5)
         # second ending may not have repeat
         #p.show()
 
 
         #p.show()
         ex = Expander(p)
-#         self.assertEqual(ex.isExpandable(), True)
-#         post = ex.process()
-#         environLocal.printDebug(['post process', [n.name for n in post.flat.notes]])
+        self.assertEqual(ex.isExpandable(), True)
+        post = ex.process()
+        #post.show()
 # 
-#         self.assertEqual(len(post), 12)
-#         self.assertEqual([n.name for n in post.flat.notes], 
-#             ['C', 'D', 'E', 'C', 'D', 'E', 'C', 'F', 'G', 'A', 'B', 'C'])
-#  
-# 
-
-
+        self.assertEqual(len(post), 18)
+        self.assertEqual([n.name for n in post.flat.notes], 
+            ['C', 'D', 'E', 'C', 'D', 'E', 'C', 'F', 'G', 'A', 'G', 'A', 'G', 'A', 'G', 'B', 'G', 'C'])
+ 
 
     def testRepeatEndingsImportedA(self):
 
@@ -2812,9 +2819,9 @@ class Test(unittest.TestCase):
         ex = Expander(s.parts[0])
         # this is a Stream resulting form getElements
         self.assertEqual(len(ex._repeatBrackets), 2)
-
+        #s.show()
         post = ex.process()
-
+        #post.show()
 
 
 

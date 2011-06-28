@@ -1794,7 +1794,8 @@ class Music21Object(JSONSerializer):
             if name == '_activeSite':
                 #environLocal.printDebug(['creating parent reference'])
                 # keep a reference, not a deepcopy
-                setattr(new, name, self.activeSite)
+                # do not use activeSite property; simply use same weak ref obj
+                setattr(new, name, self._activeSite)
             # use _definedContexts own __deepcopy__, but set contained by id
             elif name == '_definedContexts':
                 newValue = copy.deepcopy(part, memo)

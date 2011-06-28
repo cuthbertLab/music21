@@ -474,7 +474,15 @@ class Stream(music21.Music21Object):
         >>> a.isFlat
         False
         '''
+        # remove old value at this position
+        oldValue = self._elements[key]
+        oldValue.removeLocationBySite(self)
+
+        # assign in new position
         self._elements[key] = value
+        value.activeSite = self
+        # must get native offset
+        value.addLocation(self, value.offset)
 
         if isinstance(value, Stream): 
             # know that this is now not flat
@@ -935,7 +943,8 @@ class Stream(music21.Music21Object):
             # __deepcopy__ methods must be sure to not try to copy activeSite
             if name == '_activeSite':
                 # keep a reference, not a deepcopy
-                setattr(new, name, self.activeSite)
+                # do not use property: .activeSite; set to same weakref obj
+                setattr(new, name, self._activeSite)
             # attributes that require special handling
             elif name == '_definedContexts':
                 newValue = copy.deepcopy(part, memo)
