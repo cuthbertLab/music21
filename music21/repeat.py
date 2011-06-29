@@ -910,14 +910,15 @@ class Expander(object):
             mEnd = streamObj[innermost[-1]]
             for rb in rBrackets:
                 if id(rb) in repeatBracketsMemo.keys():
-                    environLocal.printDebug(['skipping rb as in memo keys:', rb])   
+                    #environLocal.printDebug(['skipping rb as in memo keys:', rb])   
                     break # do not need to look at components         
                 elif rb.hasComponent(mStart) or rb.hasComponent(mEnd):
-                    environLocal.printDebug(['matched rb as component' ])
+                    #environLocal.printDebug(['matched rb as component' ])
                     groupFocus = group
                     break
                 else:
-                    environLocal.printDebug(['rb does not have measure as component', 'rb', rb, 'mEnd', mEnd])
+                    pass
+                    #environLocal.printDebug(['rb does not have measure as component', 'rb', rb, 'mEnd', mEnd])
             if groupFocus is not None:
                 break
 
@@ -997,7 +998,7 @@ class Expander(object):
                     out = self._processInnermostRepeatBars(streamObj,     
                            repeatIndices=data['validIndices'], repeatTimes=repeatTimes, 
                            returnExpansionOnly=True) 
-                    environLocal.printDebug(['got bracket segment:', [n.name for n in out.flat.pitches]])
+                    #environLocal.printDebug(['got bracket segment:', [n.name for n in out.flat.pitches]])
                     streamBracketRepeats.append(out)
                     # highest index will always be the last copied, up until end
                     highestIndexRepeated = max(data['validIndices'])
@@ -1188,6 +1189,9 @@ class Expander(object):
         # need to copy source measures, as may later measures before copying
         # them, and this can result in orphaned spanners
         srcStream = copy.deepcopy(self._srcMeasureStream) 
+        # these must by copied, otherwise we have the original still
+        self._repeatBrackets = copy.deepcopy(self._repeatBrackets)
+
         #srcStream = self._srcMeasureStream
         # after copying, update repeat brackets (as spanners)
         for m in srcStream:
@@ -2797,6 +2801,84 @@ class Test(unittest.TestCase):
             ['C', 'D', 'E', 'C', 'D', 'E', 'C', 'F', 'G', 'A', 'G', 'A', 'G', 'A', 'G', 'B', 'G', 'C'])
  
 
+    def testRepeatEndingsJ(self):
+        '''Two sets of two endings (1,2, then 3) without a start repeat
+        '''
+        from music21 import stream, note, spanner, bar
+
+        p = stream.Part()
+        m1 = stream.Measure(number=1)
+        m1.append(note.Note('c4', type='whole'))
+        m2 = stream.Measure(number=2)
+        m2.append(note.Note('d4', type='whole'))
+        m3 = stream.Measure(number=3)
+        m3.append(note.Note('e4', type='whole'))
+        m4 = stream.Measure(number=4)
+        m4.append(note.Note('f4', type='whole'))
+        m5 = stream.Measure(number=5)
+        m5.append(note.Note('g4', type='whole'))
+        m6 = stream.Measure(number=6)
+        n1 = note.Note('a4', type='half')
+        n2 = note.Note('a4', type='half')
+        m6.append([n1, n2])
+        m7 = stream.Measure(number=7)
+        m7.append(note.Note('b4', type='whole'))
+        m8 = stream.Measure(number=8)
+        m8.append(note.Note('c5', type='whole'))
+        
+        m9 = stream.Measure(number=9)
+        m9.append(note.Note('d5', type='whole'))
+        m10 = stream.Measure(number=10)
+        m10.append(note.Note('e5', type='whole'))
+        m11 = stream.Measure(number=11)
+        m11.append(note.Note('f5', type='whole'))
+        m12 = stream.Measure(number=12)
+        m12.append(note.Note('g5', type='whole'))
+        
+        p.append([m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12])
+        
+        rb1 = spanner.RepeatBracket([m2, m3], number='1,2')
+        p.append(rb1)
+        m3.rightBarline = bar.Repeat()
+        
+        rb2 = spanner.RepeatBracket(m4, number=3)
+        p.append(rb2)
+        
+        # second group
+        m5.leftBarline = bar.Repeat()
+        m6.leftBarline = bar.Repeat() # nested repeat
+        m6.rightBarline = bar.Repeat()
+        
+        rb3 = spanner.RepeatBracket(m7, number='1-3')
+        p.append(rb3)
+        m7.rightBarline = bar.Repeat()
+        
+        rb4 = spanner.RepeatBracket([m8, m10], number='4,5')
+        p.append(rb4)
+        m10.rightBarline = bar.Repeat()
+        
+        rb5 = spanner.RepeatBracket([m11], number='6')
+        p.append(rb5) # not a repeat per se
+        
+        #p.show()
+        
+        
+        #         ex = Expander(p)
+        #         self.assertEqual(ex.isExpandable(), True)
+        #         post = ex.process()
+        #         post.show()
+        
+        post = p.expandRepeats()
+        self.assertEqual(len(post), 37)
+        #post.show()
+
+# # 
+#         self.assertEqual(len(post), 18)
+#         self.assertEqual([n.name for n in post.flat.notes], 
+#             ['C', 'D', 'E', 'C', 'D', 'E', 'C', 'F', 'G', 'A', 'G', 'A', 'G', 'A', 'G', 'B', 'G', 'C'])
+ 
+
+
     def testRepeatEndingsImportedA(self):
 
         from music21 import corpus
@@ -2824,10 +2906,23 @@ class Test(unittest.TestCase):
         #post.show()
 
 
+    def testRepeatEndingsImportedC(self):
+        
+        
+        from music21 import stream, converter, abc
+        from music21.abc import testFiles
+        
+        s = converter.parse(testFiles.mysteryReel)
+        #s.show()
+        post = s.expandRepeats()    
+        #post.show()
+        self.assertEqual(len(post.parts[0]), 32)
 
+#         s = converter.parse(testFiles.hectorTheHero)
+#         s.show()
+#         post = s.expandRepeats()    
 
-
-
+        
 
 if __name__ == "__main__":
     music21.mainTest(Test)
