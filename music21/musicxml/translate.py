@@ -2840,6 +2840,20 @@ spirit</words>
         #sSub.show('t')
 
 
+    def testImportVoicesA(self):
+        # testing problematic voice imports
+        
+        from music21.musicxml import testPrimitive
+        from music21 import converter
+
+        s = converter.parse(testPrimitive.mixedVoices1a)
+        self.assertEqual(len(s.parts), 2)
+
+
+#         s = converter.parse(testPrimitive.mixedVoices1b)
+#         s = converter.parse(testPrimitive.mixedVoices2)
+
+
     def testImportGraceNotesA(self):
         # test importing from muscixml
         from music21.musicxml import testPrimitive
