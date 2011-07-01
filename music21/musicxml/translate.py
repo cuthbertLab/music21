@@ -2848,6 +2848,7 @@ spirit</words>
 
         s = converter.parse(testPrimitive.mixedVoices1a)
         self.assertEqual(len(s.parts), 2)
+        self.assertEqual(len(s.parts[0].voices), 2)
 
 
 #         s = converter.parse(testPrimitive.mixedVoices1b)
