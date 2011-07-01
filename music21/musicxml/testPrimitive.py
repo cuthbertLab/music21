@@ -13647,15 +13647,6 @@ mixedVoices1a = """<?xml version="1.0" encoding="UTF-8"?>
   <!--=========================================================-->
   <part id="P1">
     <measure number="1" width="313">
-      <print>
-        <system-layout>
-          <system-margins>
-            <left-margin>70</left-margin>
-            <right-margin>620</right-margin>
-          </system-margins>
-          <top-system-distance>172</top-system-distance>
-        </system-layout>
-      </print>
       <attributes>
         <divisions>2</divisions>
         <key>
@@ -13704,6 +13695,8 @@ mixedVoices1a = """<?xml version="1.0" encoding="UTF-8"?>
           </ornaments>
         </notations>
       </note>
+
+      <!-- here, we are going to a new staff, but also going to a new voice -->
       <backup>
         <duration>6</duration>
       </backup>

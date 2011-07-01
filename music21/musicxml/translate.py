@@ -2378,7 +2378,6 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     oMeasure = 0.0
     lastTimeSignature = None
     for mxMeasure in mxPart:
-
         m, staffReference = mxToMeasure(mxMeasure, spannerBundle=spannerBundle)
         # there will be one for each measure
         staffReferenceList.append(staffReference)
@@ -2417,7 +2416,7 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
                 mOffsetShift = lastTimeSignature.barDuration.quarterLength 
         oMeasure += mOffsetShift
 
-    # if we have multiple staves defined, add more parts
+    # if we have multiple staves defined, add more parts, and transfer elements
     # note: this presently has to look at _idLastDeepCopyOf to get matches
     # to find removed elements after copying; this is probably not the
     # best way to do this. 
@@ -2437,16 +2436,20 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
             for i, staffReference in enumerate(staffReferenceList):
                 staffExclude = _getStaffExclude(staffReference, staffCount)
                 m = mStream[i]
-                # may need to look for elements in voices as well
                 for eRemove in staffExclude:
                     for eMeasure in m:
                         if eMeasure._idLastDeepCopyOf == id(eRemove):
                             m.remove(eMeasure)
                     for v in m.voices:
                         v.remove(eRemove)
-                        for eVoice in v:
+                        for eVoice in v.elements:
                             if eVoice._idLastDeepCopyOf == id(eRemove):
                                 v.remove(eVoice)
+                # after adjusting voices see of voices can be reduced or
+                # removed
+                #environLocal.printDebug(['calling flattenUnnecessaryVoices: voices before:', len(m.voices)])
+                m.flattenUnnecessaryVoices(force=False, inPlace=True)
+                #environLocal.printDebug(['calling flattenUnnecessaryVoices: voices after:', len(m.voices)])
 
             streamPartStaff.addGroupForElements(partIdStaff) 
             streamPartStaff.groups.append(partIdStaff) 
@@ -2846,10 +2849,33 @@ spirit</words>
         from music21.musicxml import testPrimitive
         from music21 import converter
 
+        # this 2 part segments was importing multiple voices within
+        # a measure, even though there was no data in the second voice
         s = converter.parse(testPrimitive.mixedVoices1a)
         self.assertEqual(len(s.parts), 2)
-        self.assertEqual(len(s.parts[0].voices), 2)
+        # there are voices, but they have been removed
+        self.assertEqual(len(s.parts[0].getElementsByClass(
+            'Measure')[0].voices), 0)
 
+        #s.parts[0].show('t')
+        #self.assertEqual(len(s.parts[0].voices), 2)
+
+
+        s = converter.parse(testPrimitive.mixedVoices1b)
+        self.assertEqual(len(s.parts), 2)
+        self.assertEqual(len(s.parts[0].getElementsByClass(
+            'Measure')[0].voices), 0)
+        #s.parts[0].show('t')
+
+        # this case, there were 4, but there should be 2
+        s = converter.parse(testPrimitive.mixedVoices2)
+        self.assertEqual(len(s.parts), 2)
+        self.assertEqual(len(s.parts[0].getElementsByClass(
+            'Measure')[0].voices), 2)
+        self.assertEqual(len(s.parts[1].getElementsByClass(
+            'Measure')[0].voices), 2)
+
+        #s.parts[0].show('t')
 
 #         s = converter.parse(testPrimitive.mixedVoices1b)
 #         s = converter.parse(testPrimitive.mixedVoices2)

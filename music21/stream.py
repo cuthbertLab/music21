@@ -8234,6 +8234,52 @@ class Stream(music21.Music21Object):
 
 
 
+    def flattenUnnecessaryVoices(self, force=False, inPlace=True):
+        '''If this Stream defines one or more internal voices, do the following:
+
+        If there is more than one voice, and a voice has no elements, remove that voice.
+
+        If there is only one voice left that has elements, place those elements in the parent Stream.
+
+        If `force` is True, even if there is more than one Voice left, all voices will be flattened.
+        '''
+        if len(self.voices) == 0:
+            return None # do not make copy; return immediately
+
+        if not inPlace: # make a copy
+            returnObj = deepcopy(self)
+        else:
+            returnObj = self
+
+        voices = returnObj.voices
+
+        # collect voices for removal and for flattening
+        remove = []
+        flatten = []
+        for v in returnObj.voices:
+            if len(v) == 0: # might add other criteria
+                remove.append(v)
+            else: 
+                flatten.append(v)
+        for v in remove:
+            returnObj.remove(v)
+
+        if len(flatten) == 1 or force: # always flatten 1
+            for v in flatten: # usually one unless force 
+                # get offset of voice in returnObj
+                shiftOffset = v.getOffsetBySite(returnObj)
+                for e in v.elements:
+                    # insert shift + offset w/ voice
+                    returnObj._insertCore(shiftOffset + e.getOffsetBySite(v), e)   
+                returnObj.remove(v)
+
+        returnObj._elementsChanged()
+        if not inPlace:
+            return returnObj    
+        else:
+            return None
+
+
 #-------------------------------------------------------------------------------
 class Voice(Stream):
     '''
@@ -15146,6 +15192,64 @@ class Test(unittest.TestCase):
 #         s2 = copy.deepcopy(s1)
 #         #print s2[0].getSites()
 #         print [id(x) for x in s2[0].getSites()]
+
+
+    def testFlattenUnnecessaryVoicesA(self):
+        from music21 import stream
+        s = stream.Stream()
+        v1 = stream.Voice()
+        v2 = stream.Voice()
+        s.insert(0, v1)
+        s.insert(0, v2)
+
+        self.assertEqual(len(s.voices), 2)
+        s.flattenUnnecessaryVoices(inPlace=True)
+        # as empty, are removed
+        self.assertEqual(len(s.voices), 0)
+        
+        # next case: one voice empty, other with notes
+        s = stream.Stream()
+        v1 = stream.Voice()
+        v2 = stream.Voice()
+        n1 = note.Note()
+        n2 = note.Note()
+        v1.insert(10, n1)
+        v1.insert(20, n2)
+        
+        s.insert(50, v1) # need to test inclusion of this offset
+        s.insert(50, v2)
+
+        self.assertEqual(len(s.voices), 2)
+        s.flattenUnnecessaryVoices(inPlace=True)
+        # as empty, are removed
+        self.assertEqual(len(s.voices), 0)
+        self.assertEqual(len(s.notes), 2)
+        self.assertEqual(n1.getOffsetBySite(s), 60)
+        self.assertEqual(n2.getOffsetBySite(s), 70)
+
+
+        # last case: two voices with notes
+        s = stream.Stream()
+        v1 = stream.Voice()
+        v2 = stream.Voice()
+        n1 = note.Note()
+        n2 = note.Note()
+        n3 = note.Note()
+        v1.insert(10, n1)
+        v1.insert(20, n2)
+        v2.insert(20, n3)
+        
+        s.insert(50, v1) # need to test inclusion of this offset
+        s.insert(50, v2)
+
+        self.assertEqual(len(s.voices), 2)
+        s.flattenUnnecessaryVoices(inPlace=True)
+        # none are removed by default
+        self.assertEqual(len(s.voices), 2)
+        # can force
+        s.flattenUnnecessaryVoices(force=True, inPlace=True)
+        self.assertEqual(len(s.voices), 0)
+        self.assertEqual(len(s.notes), 3)
 
 
     def testGraceNoteSortingA(self):
