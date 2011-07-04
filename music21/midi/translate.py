@@ -88,12 +88,11 @@ def midiToDuration(ticks, ticksPerQuarter=None, inputM21DurationObject=None):
 # utility functions for getting commonly used event
 
 
-def getStartEvents(mt=None, instrumentObj=None):
+def _getStartEvents(mt=None, instrumentObj=None):
     '''Provide a list of events found at the beginning of a track.
 
     A MidiTrack reference can be provided via the `mt` parameter.
     '''
-
     # TODO: may need to provide channel as argument
 
     events = []
@@ -299,7 +298,7 @@ def noteToMidiFile(inputM21):
     '''
     n = inputM21
     mt = midiModule.MidiTrack(1)
-    mt.events += getStartEvents(mt)
+    mt.events += _getStartEvents(mt)
     mt.events += noteToMidiEvents(n)
     mt.events += getEndEvents(mt)
 
@@ -491,7 +490,7 @@ def chordToMidiFile(inputM21):
     c = inputM21
 
     mt = midiModule.MidiTrack(1)
-    mt.events += getStartEvents(mt)
+    mt.events += _getStartEvents(mt)
     mt.events += chordToMidiEvents(c)
     mt.events += getEndEvents(mt)
 
@@ -710,7 +709,7 @@ def keySignatureToMidiEvents(ks, includeDeltaTime=True):
 # Streams
 
 def _prepareStream(streamObj, instObj=None):
-    '''Prepare a Stream for MIDI processing. This includes removing ties, flattening, and finding a first instrument of necessary. An optional `instObj` parameter can be provided 
+    '''Prepare a Stream for MIDI processing. This includes removing ties, flattening, and finding a first instrument if necessary. An optional `instObj` parameter can be provided 
     '''
     if instObj is None:
         # see if an instrument is defined in this or a parent stream
@@ -736,7 +735,7 @@ def _prepareStream(streamObj, instObj=None):
 
 
 def _getPacket(trackId, offset, midiEvent, obj, lastInstrument=None):
-    '''Pack a dictionary of parameters for each event. Packets are used for sorting and configuring all note events.
+    '''Pack a dictionary of parameters for each event. Packets are used for sorting and configuring all note events. Includes offset, any cent shift, the midi event, and the source object.
     '''
     post = {}
     post['trackId'] = trackId
@@ -752,6 +751,8 @@ def _getPacket(trackId, offset, midiEvent, obj, lastInstrument=None):
 
 def _streamToPackets(s, trackId=1):
     '''Convert a Stream to packets. This assumes that the Stream has already been flattened, ties have been stripped, and instruments, if necessary, have been added. 
+
+    In converting from a Stream to MIDI, this is called first, resulting in a collection of packets by offset. Then, packets to events is called.
     '''
     # store all events by offset by offset without delta times
     # as (absTime, event)
@@ -786,6 +787,8 @@ def _streamToPackets(s, trackId=1):
             #environLocal.printDebug(['streamToMidiTrack: skipping', obj])
             continue
 
+        # we process sub here, which is a list of midi events
+        # for each event, we create a packet representation
         # all events: delta/note-on/delta/note-off
         # strip delta times
         packets = []
@@ -799,7 +802,9 @@ def _streamToPackets(s, trackId=1):
                             offsetToMidi(obj.getOffsetBySite(s)), 
                             midiEvent, obj=obj, lastInstrument=lastInstrument)
                 packets.append(p)
-            else: # if its a note_off, use the duration to shift offset
+            # if its a note_off, use the duration to shift offset
+            # midi events have already been created; 
+            else: 
                 p = _getPacket(trackId, 
                     offsetToMidi(obj.getOffsetBySite(s)) + durationToMidi(obj.duration), 
                     midiEvent, obj=obj, lastInstrument=lastInstrument)
@@ -808,10 +813,7 @@ def _streamToPackets(s, trackId=1):
 
     # add events to the list
     # need to convert add delta times for all events
-
-    packetsByOffset.sort(
-        cmp=lambda x,y: cmp(x['offset'], y['offset'])
-        )
+    packetsByOffset.sort(cmp=lambda x,y: cmp(x['offset'], y['offset']))
 
     # return packets and stream, as this flat stream should be retained
     return packetsByOffset
@@ -840,15 +842,24 @@ def _streamToPackets(s, trackId=1):
 # you think?
 
 
-def _processPackets(packets):
+def _processPackets(packets, channels=None):
     '''Given a list of packets, assign each to a channel. Do each track one at time, based on the track id. Shift to different channels if a pitch bend is necessary. Keep track of which channels are available. Need to insert a program change in the empty channel to based on last instrument. Insert pitch bend messages as well, one for start of event, one for end of event.
+
+    The `channels` argument is a list of channels to use.
     '''
-    pass
+    if channels is None:
+        channels = range(0, 10) + range(11, 17) # all but 10
+    post = packets
+    return post
 
 
 
-def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None):
+def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None, channels=None):
     '''Given a list of packets, sort all packets and add proper delta times. Optionally filters packets by track Id. 
+
+    At this stage MIDI event objects have been created. The key process here is finding the adjacent time between events and adding DeltaTime events before each MIDI event. 
+
+    If `trackIdFilter` is not None, process only packets with a matching track id. this can be used to filter out events associated with a track. 
     '''
     #environLocal.printDebug(['_packetsToEvents', 'got packets:', len(packetsSrc)])
     # add delta times
@@ -861,9 +872,10 @@ def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None):
     else:
         packets = packetsSrc
 
-    packets.sort(
-        cmp=lambda x,y: cmp(x['offset'], y['offset'])
-        )
+    packets = _processPackets(packets)
+
+    # note: this sort may be redundant
+    packets.sort(cmp=lambda x,y: cmp(x['offset'], y['offset']))
 
     events = []
     lastOffset = 0
@@ -871,7 +883,6 @@ def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None):
         me = p['midiEvent']
         if me.time is None:
             me.time = 0
-
         t = p['offset'] - lastOffset
         if t < 0:
             raise TranslateException('got a negative delta time')
@@ -880,9 +891,7 @@ def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None):
         events.append(dt)
         events.append(me)
         lastOffset = p['offset']
-
     #environLocal.printDebug(['_packetsToEvents', 'total events:', len(events)])
-
     return events
 
 
@@ -901,11 +910,11 @@ def streamToMidiTrack(inputM21, instObj=None, trackId=1):
     20
     '''
     #environLocal.printDebug(['streamToMidiTrack()'])
-
     s, instObj = _prepareStream(inputM21, instObj)
+    # assume one track per Stream
     mt = midiModule.MidiTrack(trackId)
 
-    mt.events += getStartEvents(mt, instObj) # gets track name
+    mt.events += _getStartEvents(mt, instObj) # gets track name
     packetsByOffset = _streamToPackets(s, trackId)
    
     mt.events += _packetsToEvents(mt, packetsByOffset, trackIdFilter=trackId)
@@ -946,7 +955,7 @@ def streamToMidiTrack(inputM21, instObj=None, trackId=1):
 #     # each part will become midi track
 #     # the 1 here becomes the midi track index
 #     mt = midiModule.MidiTrack(1)
-#     mt.events += midiModule.getStartEvents(mt, instObj.partName)
+#     mt.events += midiModule._getStartEvents(mt, instObj.partName)
 # 
 #     # initial time is start of this Stream
 #     #t = self.offset * defaults.ticksPerQuarter
@@ -1609,6 +1618,20 @@ class Test(unittest.TestCase):
         #s.show('midi')
 
         
+
+    def testMicrotonalOutputA(self):
+        from music21 import stream, note
+
+        s = stream.Stream()
+        s.append(note.Note('c4', type='half')) 
+        s.append(note.Note('c~4', type='half')) 
+        s.append(note.Note('c#4', type='half')) 
+        s.append(note.Note('c#~4', type='half')) 
+        s.append(note.Note('d4', type='half')) 
+
+        mts = streamsToMidiTracks(s)
+        #s.show('midi')
+
 
 
 if __name__ == "__main__":

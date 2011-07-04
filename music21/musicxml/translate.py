@@ -2848,7 +2848,7 @@ spirit</words>
         
         from music21.musicxml import testPrimitive
         from music21 import converter
-
+        
         # this 2 part segments was importing multiple voices within
         # a measure, even though there was no data in the second voice
         s = converter.parse(testPrimitive.mixedVoices1a)
@@ -2856,17 +2856,17 @@ spirit</words>
         # there are voices, but they have been removed
         self.assertEqual(len(s.parts[0].getElementsByClass(
             'Measure')[0].voices), 0)
-
+        
         #s.parts[0].show('t')
         #self.assertEqual(len(s.parts[0].voices), 2)
-
-
+        
+        
         s = converter.parse(testPrimitive.mixedVoices1b)
         self.assertEqual(len(s.parts), 2)
         self.assertEqual(len(s.parts[0].getElementsByClass(
             'Measure')[0].voices), 0)
         #s.parts[0].show('t')
-
+        
         # this case, there were 4, but there should be 2
         s = converter.parse(testPrimitive.mixedVoices2)
         self.assertEqual(len(s.parts), 2)
