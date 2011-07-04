@@ -746,8 +746,8 @@ def _getPacket(trackId, offset, midiEvent, obj, lastInstrument=None):
     post['obj'] = obj # keep a reference to the source object
     post['centShift'] = midiEvent.centShift
     # allocate channel later
-    post['channel'] = None
-    if midiEvent.type != 'NOTE_OFF':
+    #post['channel'] = None
+    if midiEvent.type != 'NOTE_OFF' and obj is not None:
         # store duration so as to calculate when the 
         # channel/pitch bend can be freed
         post['duration'] = durationToMidi(obj.duration)
@@ -841,10 +841,6 @@ def _streamToPackets(s, trackId=1):
 # channel, send the midi patch change and pitch bend info to that channel and
 # update the free-after-offset time to be endTime.  If there are no channels
 # free, we find the first one whose free-after-offset < currentNote.offset and we
-# put a midi-patch change and/or pitchbend change there and assign the note to
-# that channel, and set free-after-offset.  Only if there are no free channels
-# after that would we raise an exception.
-
 
 def _processPackets(packets, channels=None):
     '''Given a list of packets, assign each to a channel. Do each track one at time, based on the track id. Shift to different channels if a pitch bend is necessary. Keep track of which channels are available. Need to insert a program change in the empty channel to based on last instrument. Insert pitch bend messages as well, one for start of event, one for end of event.
@@ -855,18 +851,92 @@ def _processPackets(packets, channels=None):
         # range starts at 1, not zero
         allChannels = range(1, 10) + range(11, 17) # all but 10
     usedChannels = {} # dict of (start, stop) : channel
+    post = []
+
+    alreadyProcessed = [] # store already processed packets
     for p in packets:
+        # only need note_ons, as stored correspondingEvent attr can be used
+        # to get noteOff
+        if p['midiEvent'].type not in ['NOTE_ON']:
+            post.append(p)
+
+            if p['midiEvent'].type in ['NOTE_OFF']:
+                if p['centShift'] is not None:
+                    # channels should be updated
+                    me = midiModule.MidiEvent(p['midiEvent'].track, 
+                                    type="PITCH_BEND", channel=ch)
+                    # note off stores note on's pitch; invert here
+                    me.setPitchBend(-p['centShift']) 
+                    pBendEnd = _getPacket(p['midiEvent'].track, 
+                        p['offset'], me, 
+                        obj=None, lastInstrument=None)
+                    post.append(pBendEnd)
+
+            continue # store and continue
+
+        # set default channel of 1
+        if p['midiEvent'].channel is None:
+            p['midiEvent'].channel = 1
+
         #print p['midiEvent'], p
         if p['centShift'] is not None:
-            pass
             # find a free channel       
             # add pitch change at start of Note, cancel pitch change at end
-        else:
-            # channel here could be None
-            usedChannels[(p['offset'], p['offset']+p['duration'])] = p['channel']
-            
+            o = p['offset']
+            channelExclude = [] # channels that cannot be used
+            # iterate through all, found any existing that last during this
+            # event
+            for key in usedChannels.keys():
+                start, stop = key
+                if o >= start and o < stop:
+                    channelExclude += usedChannels[key]
+                # cannot break early
+            # get a new channel if necessary
+            if channelExclude is not []: # only change if necessary
+                ch = None     
+                for x in allChannels:
+                    if x not in channelExclude:
+                        ch = x
+                        break
+                if ch is None:
+                    raise TranslateException('no channels available for microtone')
+                p['midiEvent'].channel = ch
+                # change channel of note off
+                p['midiEvent'].correspondingEvent.channel = ch
+            else: # use the existing channel
+                ch = p['midiEvent'].channel
 
-    post = packets
+            # add pitch bend
+            me = midiModule.MidiEvent(p['midiEvent'].track, 
+                                    type="PITCH_BEND", channel=ch)
+            me.setPitchBend(p['centShift'])
+            pBendStart = _getPacket(p['midiEvent'].track, 
+                o, me, # keep offset here
+                obj=None, lastInstrument=None)
+            post.append(pBendStart)
+
+            # removal of pitch bend will happen above with note off
+
+        else: # no cent shift; store existing channel
+            # channel here could be None; keep as is
+            ch = p['midiEvent'].channel
+
+        key = (p['offset'], p['offset']+p['duration'])
+        if key not in usedChannels.keys():
+            usedChannels[key] = []
+        if ch not in usedChannels[key]:
+            usedChannels[key].append(ch)
+                            
+        post.append(p)
+
+    # this sort is necessary
+    post.sort(cmp=lambda x,y: cmp(x['offset'], y['offset']))
+    for p in post:
+        pass
+        #environLocal.printDebug(['proceessed packet', p])
+
+    #post = packets
+
     return post
 
 
@@ -891,8 +961,8 @@ def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None, channels=None):
 
     packets = _processPackets(packets)
 
-    # note: this sort may be redundant
-    packets.sort(cmp=lambda x,y: cmp(x['offset'], y['offset']))
+    # sprting now happens in processPackets
+    #packets.sort(cmp=lambda x,y: cmp(x['offset'], y['offset']))
 
     events = []
     lastOffset = 0
@@ -903,6 +973,7 @@ def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None, channels=None):
         t = p['offset'] - lastOffset
         if t < 0:
             raise TranslateException('got a negative delta time')
+        # set the channel from the midi event
         dt = midiModule.DeltaTime(midiTrack, time=t, channel=me.channel)
         #environLocal.printDebug(['packetsByOffset', p])
         events.append(dt)
@@ -1646,9 +1717,11 @@ class Test(unittest.TestCase):
         s.append(note.Note('c#~4', type='half')) 
         s.append(note.Note('d4', type='half')) 
 
+        #mts = streamsToMidiTracks(s)
+
+        s.insert(0, note.Note('g~3', quarterLength=2)) 
         mts = streamsToMidiTracks(s)
         #s.show('midi')
-
 
 
 if __name__ == "__main__":
