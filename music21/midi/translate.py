@@ -736,15 +736,26 @@ def _prepareStream(streamObj, instObj=None):
 
 def _getPacket(trackId, offset, midiEvent, obj, lastInstrument=None):
     '''Pack a dictionary of parameters for each event. Packets are used for sorting and configuring all note events. Includes offset, any cent shift, the midi event, and the source object.
+
+    Offset and duration values stored here are MIDI ticks, not quarter lengths.
     '''
     post = {}
     post['trackId'] = trackId
-    post['offset'] = offset
+    post['offset'] = offset # offset values are in midi ticks
     post['midiEvent'] = midiEvent
     post['obj'] = obj # keep a reference to the source object
     post['centShift'] = midiEvent.centShift
     # allocate channel later
     post['channel'] = None
+    if midiEvent.type != 'NOTE_OFF':
+        # store duration so as to calculate when the 
+        # channel/pitch bend can be freed
+        post['duration'] = durationToMidi(obj.duration)
+    # note offs will have the same object ref, and seem like the have a 
+    # duration when they do not
+    else: 
+        post['duration'] = 0
+
     # store last m21 instrument object
     post['lastInstrument'] = lastInstrument
     return post
@@ -820,9 +831,7 @@ def _streamToPackets(s, trackId=1):
 
 
 # what  we can do is keep a tuple for each moment in the offset map:
-# 
-# (channel, midi-patch, fractional-part-of-alter, free-after-offset)
-# 
+# (channel, midi-patch, fractional-part-of-alter, free-after-offset) 
 # when we encounter a pitch object, we see what its midi-patch and
 # fractional-part-of-alter is,
 # then we see if there is already a channel that matches that.  If so, we assign
@@ -835,11 +844,6 @@ def _streamToPackets(s, trackId=1):
 # put a midi-patch change and/or pitchbend change there and assign the note to
 # that channel, and set free-after-offset.  Only if there are no free channels
 # after that would we raise an exception.
-# 
-# It seems like conceptually in this model, MidiChannel should be a Stream
-# subclass that represents notes in a particular MidiChannel but also contains
-# MidiPatchChange objects and MidiPitchBend objects.  All in midi.py -- what do
-# you think?
 
 
 def _processPackets(packets, channels=None):
@@ -848,7 +852,20 @@ def _processPackets(packets, channels=None):
     The `channels` argument is a list of channels to use.
     '''
     if channels is None:
-        channels = range(0, 10) + range(11, 17) # all but 10
+        # range starts at 1, not zero
+        allChannels = range(1, 10) + range(11, 17) # all but 10
+    usedChannels = {} # dict of (start, stop) : channel
+    for p in packets:
+        #print p['midiEvent'], p
+        if p['centShift'] is not None:
+            pass
+            # find a free channel       
+            # add pitch change at start of Note, cancel pitch change at end
+        else:
+            # channel here could be None
+            usedChannels[(p['offset'], p['offset']+p['duration'])] = p['channel']
+            
+
     post = packets
     return post
 
