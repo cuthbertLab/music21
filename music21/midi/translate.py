@@ -858,13 +858,14 @@ def _processPackets(packets, channels=None):
         # only need note_ons, as stored correspondingEvent attr can be used
         # to get noteOff
         if p['midiEvent'].type not in ['NOTE_ON']:
-            post.append(p)
-
+            post.append(p) # add the non note_on packet first
+            # if this is a note off, and has a cent shift, need to add
+            # a pitch bend in reverse to that of the note on. 
             if p['midiEvent'].type in ['NOTE_OFF']:
                 if p['centShift'] is not None:
-                    # channels should be updated
+                    # channels should be updated already
                     me = midiModule.MidiEvent(p['midiEvent'].track, 
-                                    type="PITCH_BEND", channel=ch)
+                        type="PITCH_BEND", channel=p['midiEvent'].channel)
                     # note off stores note on's pitch; invert here
                     me.setPitchBend(-p['centShift']) 
                     pBendEnd = _getPacket(p['midiEvent'].track, 
@@ -910,8 +911,8 @@ def _processPackets(packets, channels=None):
             me = midiModule.MidiEvent(p['midiEvent'].track, 
                                     type="PITCH_BEND", channel=ch)
             me.setPitchBend(p['centShift'])
-            pBendStart = _getPacket(p['midiEvent'].track, 
-                o, me, # keep offset here
+            pBendStart = _getPacket(trackId=p['trackId'], 
+                offset=o, midiEvent=me, # keep offset here
                 obj=None, lastInstrument=None)
             post.append(pBendStart)
 
@@ -931,6 +932,7 @@ def _processPackets(packets, channels=None):
 
     # this sort is necessary
     post.sort(cmp=lambda x,y: cmp(x['offset'], y['offset']))
+    # diagnostic display
     for p in post:
         pass
         #environLocal.printDebug(['proceessed packet', p])
@@ -1719,9 +1721,9 @@ class Test(unittest.TestCase):
 
         #mts = streamsToMidiTracks(s)
 
-        s.insert(0, note.Note('g~3', quarterLength=2)) 
+        #s.insert(0, note.Note('g~3', quarterLength=2)) 
         mts = streamsToMidiTracks(s)
-        #s.show('midi')
+        #s.show('midi', app='Logic Express')
 
 
 if __name__ == "__main__":

@@ -390,10 +390,13 @@ class MidiEvent(object):
         if self.type in ['NOTE_ON', 'NOTE_OFF']:
             attrList = ["pitch", "velocity"]
         else:
-            attrList = ["data"]
+            if self._parameter2 is None:
+                attrList = ['data']
+            else: # show both parameters, for pitch bend
+                attrList = ['_parameter1', '_parameter2']
 
         for attrib in attrList: 
-            if getattr(self, attrib) != None: 
+            if getattr(self, attrib) is not None: 
                 r = r + ", " + attrib + "=" + repr(getattr(self, attrib)) 
         return r + ">" 
     

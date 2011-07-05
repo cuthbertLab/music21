@@ -2805,12 +2805,12 @@ class Music21Object(JSONSerializer):
 
 
     def _reprText(self):
-        '''Retrun a text representation possible with line breaks. This methods can be overridden by subclasses to provide alternative text representations.
+        '''Return a text representation possible with line breaks. This methods can be overridden by subclasses to provide alternative text representations.
         '''
         return self.__repr__()
 
     def _reprTextLine(self):
-        '''Retrun a text representation without line breaks. This methods can be overridden by subclasses to provide alternative text representations.
+        '''Return a text representation without line breaks. This methods can be overridden by subclasses to provide alternative text representations.
         '''
         return self.__repr__()
 

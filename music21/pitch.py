@@ -1442,9 +1442,47 @@ class Pitch(music21.Music21Object):
 
     def getCentShiftFromMidi(self):
         '''Get cent deviation of this pitch from MIDI pitch.
-        '''
-        return (self.ps - self.midi) * 100
 
+        >>> from music21 import *
+        >>> p = pitch.Pitch('c~4')
+        >>> p.midi # midi values automatically round up
+        61 
+        >>> p.getCentShiftFromMidi()
+        50
+        >>> p = pitch.Pitch('c#4')
+        >>> p.microtone = -25
+        >>> p.getCentShiftFromMidi()
+        -25
+
+        >>> p = pitch.Pitch('c#~4')
+        >>> p.getCentShiftFromMidi()
+        50
+        >>> p.microtone = 3
+        >>> p.getCentShiftFromMidi()
+        53
+
+        >>> p = pitch.Pitch('c`4') # quarter tone flat
+        >>> p.getCentShiftFromMidi()
+        -50
+        >>> p.microtone = 3
+        >>> p.getCentShiftFromMidi()
+        -47
+        '''
+        #return (self.ps - self.midi) * 100 # wrong way
+        #return int(round(self._getAlter() * 100))
+
+        # see if we have a quarter tone alter
+
+        # if a quarter tone, get necessary shift above or below the 
+        # standard accidental
+        shift = 0
+        if self.accidental is not None:
+            if self.accidental.name in ['half-sharp', 'one-and-a-half-sharp']:
+                shift = 50
+            elif self.accidental.name in ['half-flat', 'one-and-a-half-flat']:
+                shift = -50
+    
+        return int(round(shift + self.microtone.cents))
 
     def _getAlter(self):
         post = 0
