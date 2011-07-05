@@ -392,7 +392,7 @@ class MidiEvent(object):
         else:
             if self._parameter2 is None:
                 attrList = ['data']
-            else: # show both parameters, for pitch bend
+            else:
                 attrList = ['_parameter1', '_parameter2']
 
         for attrib in attrList: 

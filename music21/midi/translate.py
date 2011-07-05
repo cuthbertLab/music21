@@ -88,7 +88,7 @@ def midiToDuration(ticks, ticksPerQuarter=None, inputM21DurationObject=None):
 # utility functions for getting commonly used event
 
 
-def _getStartEvents(mt=None, instrumentObj=None):
+def _getStartEvents(mt=None, instrumentObj=None, channel=1):
     '''Provide a list of events found at the beginning of a track.
 
     A MidiTrack reference can be provided via the `mt` parameter.
@@ -101,11 +101,11 @@ def _getStartEvents(mt=None, instrumentObj=None):
     else:
         partName = instrumentObj.bestName()
 
-    dt = midiModule.DeltaTime(mt)
+    dt = midiModule.DeltaTime(mt, channel=channel)
     dt.time = 0
     events.append(dt)
 
-    me = midiModule.MidiEvent(mt)
+    me = midiModule.MidiEvent(mt, channel=channel)
     me.type = "SEQUENCE_TRACK_NAME"
     me.time = 0 # always at zero?
     me.data = partName
@@ -140,7 +140,7 @@ def getEndEvents(mt=None, channelNumber=1):
     '''
     events = []
 
-    dt = midiModule.DeltaTime(mt)
+    dt = midiModule.DeltaTime(mt, channel=channelNumber)
     dt.time = 0
     events.append(dt)
 
@@ -226,18 +226,18 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     return n
 
 
-def noteToMidiEvents(inputM21, includeDeltaTime=True):
+def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
     '''Translate Note to four MIDI events.
 
     >>> from music21 import *
     >>> n1 = note.Note()
     >>> eventList = noteToMidiEvents(n1)
     >>> eventList
-    [<MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=60, velocity=0>]
+    [<MidiEvent DeltaTime, t=0, track=None, channel=1>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=1>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=60, velocity=0>]
     >>> n1.duration.quarterLength = 2.5
     >>> eventList = noteToMidiEvents(n1)
     >>> eventList
-    [<MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=2560, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=60, velocity=0>]
+    [<MidiEvent DeltaTime, t=0, track=None, channel=1>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=2560, track=None, channel=1>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=60, velocity=0>]
     '''
     n = inputM21
 
@@ -245,16 +245,17 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True):
     eventList = []
 
     if includeDeltaTime:
-        dt = midiModule.DeltaTime(mt)
+        dt = midiModule.DeltaTime(mt, channel=channel)
         dt.time = 0 # set to zero; will be shifted later as necessary
         # add to track events
         eventList.append(dt)
 
     me1 = midiModule.MidiEvent(mt)
     me1.type = "NOTE_ON"
-    me1.channel = 1
+    me1.channel = channel
     me1.time = None # not required
-    me1.pitch = n.midi
+    #me1.pitch = n.midi
+    me1.pitch = n.pitch.getMidiPreCentShift() # will shift later, do not round
     if not n.pitch.isTwelveTone():
         me1.centShift = n.pitch.getCentShiftFromMidi()
     me1.velocity = 90 # default, can change later
@@ -262,16 +263,17 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True):
 
     if includeDeltaTime:
         # add note off / velocity zero message
-        dt = midiModule.DeltaTime(mt)
+        dt = midiModule.DeltaTime(mt, channel=channel)
         dt.time = n.duration.midi
         # add to track events
         eventList.append(dt)
 
     me2 = midiModule.MidiEvent(mt)
     me2.type = "NOTE_OFF"
-    me2.channel = 1
+    me2.channel = channel
     me2.time = None #d
-    me2.pitch = n.midi
+    #me2.pitch = n.midi
+    me2.pitch = n.pitch.getMidiPreCentShift() # will shift later, do not round
     me2.pitchSpace = n.ps
     if not n.pitch.isTwelveTone():
         me2.centShift = n.pitch.getCentShiftFromMidi()
@@ -294,7 +296,7 @@ def noteToMidiFile(inputM21):
     >>> n1.quarterLength = 6
     >>> mf = noteToMidiFile(n1)
     >>> mf.tracks[0].events
-    [<MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=''>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=6144, track=1, channel=None>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=60, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]
+    [<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=''>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=6144, track=1, channel=1>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=60, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]
     '''
     n = inputM21
     mt = midiModule.MidiTrack(1)
@@ -866,10 +868,11 @@ def _processPackets(packets, channels=None):
                     # channels should be updated already
                     me = midiModule.MidiEvent(p['midiEvent'].track, 
                         type="PITCH_BEND", channel=p['midiEvent'].channel)
-                    # note off stores note on's pitch; invert here
-                    me.setPitchBend(-p['centShift']) 
-                    pBendEnd = _getPacket(p['midiEvent'].track, 
-                        p['offset'], me, 
+                    # note off stores note on's pitch; do not invert, simply
+                    # set to zero
+                    me.setPitchBend(0) 
+                    pBendEnd = _getPacket(trackId=p['trackId'], 
+                        offset=p['offset'], midiEvent=me, 
                         obj=None, lastInstrument=None)
                     post.append(pBendEnd)
 
@@ -933,12 +936,11 @@ def _processPackets(packets, channels=None):
     # this sort is necessary
     post.sort(cmp=lambda x,y: cmp(x['offset'], y['offset']))
     # diagnostic display
-    for p in post:
-        pass
-        #environLocal.printDebug(['proceessed packet', p])
+#     for p in post:
+#         pass
+#         environLocal.printDebug(['proceessed packet', p])
 
     #post = packets
-
     return post
 
 
@@ -1349,16 +1351,23 @@ def streamsToMidiTracks(inputM21):
     # Streams that do not start at same time
 
     # temporary channel allocation
-    channels = range(1,10) + range(11,17) # skip 10
+    #channels = range(1,10) + range(11,17) # skip 10
+
+
+    # TODO: for each part, need to find what channels have been autoassigned, 
+    # and pass in a list of channels that are available for usage 
+    # pitch bend allocations will use up new channels; need to determine
+    # wich are free for each Stream
+
 
     if s.hasPartLikeStreams():
         for obj in s.getElementsByClass('Stream'):
             mt = streamToMidiTrack(obj)
-            mt.setChannel(channels.pop(0))
+            # and only allocate free channels
+            #mt.setChannel(channels.pop(0))
             midiTracks.append(mt)
     else: # just get this single stream
         mt = streamToMidiTrack(s)
-        mt.setChannel(channels.pop(0))
         midiTracks.append(mt)
     return midiTracks
 
@@ -1498,7 +1507,7 @@ class Test(unittest.TestCase):
         
         # get and compare just the time signatures
         mtAlt = streamToMidiTrack(s.getElementsByClass('TimeSignature'))
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=''>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x03\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=3072, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x05\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=5120, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=''>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x03\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=3072, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x05\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=5120, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
         self.assertEqual(str(mtAlt.events), match)
 
 
@@ -1541,13 +1550,13 @@ class Test(unittest.TestCase):
         mts = streamToMidiTrack(soprano)
 
         # first note-on is not delayed, even w anacrusis
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=u'Soprano'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=66, velocity=90>]"""
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=u'Soprano'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=66, velocity=90>]"""
        
 
         self.assertEqual(str(mts.events[:10]), match)
 
         # first note-on is not delayed, even w anacrusis
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=u'Alto'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=62, velocity=90>]"""
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=u'Alto'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=62, velocity=90>]"""
 
         alto = s.parts['alto']
         mta = streamToMidiTrack(alto)
@@ -1626,6 +1635,7 @@ class Test(unittest.TestCase):
 
         # its the same as before
         match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=65, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=66, velocity=90>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=61, velocity=90>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=58, velocity=90>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=54, velocity=90>, <MidiEvent DeltaTime, t=1024, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=66, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=61, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=58, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=54, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
+
 
         self.assertEqual(str(mtList[0].events[-20:]), match)
 
@@ -1721,9 +1731,15 @@ class Test(unittest.TestCase):
 
         #mts = streamsToMidiTracks(s)
 
-        #s.insert(0, note.Note('g~3', quarterLength=2)) 
+        s.insert(0, note.Note('g2', quarterLength=10)) 
         mts = streamsToMidiTracks(s)
+
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=61, velocity=90>, <MidiEvent DeltaTime, t=2048, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=61, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=2>, <MidiEvent PITCH_BEND, t=0, track=1, channel=2, _parameter1=0, _parameter2=80>, <MidiEvent DeltaTime, t=0, track=1, channel=2>, <MidiEvent NOTE_ON, t=0, track=1, channel=2, pitch=61, velocity=90>, <MidiEvent DeltaTime, t=2048, track=1, channel=2>, <MidiEvent NOTE_OFF, t=0, track=1, channel=2, pitch=61, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=2>, <MidiEvent PITCH_BEND, t=0, track=1, channel=2, _parameter1=0, _parameter2=64>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=62, velocity=90>, <MidiEvent DeltaTime, t=2048, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=43, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=62, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
+        self.assertEqual(str(mts[0].events[-20:]), match)
+
+
         #s.show('midi', app='Logic Express')
+        #s.show('midi')
 
 
 if __name__ == "__main__":

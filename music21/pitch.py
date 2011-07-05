@@ -1481,7 +1481,6 @@ class Pitch(music21.Music21Object):
                 shift = 50
             elif self.accidental.name in ['half-flat', 'one-and-a-half-flat']:
                 shift = -50
-    
         return int(round(shift + self.microtone.cents))
 
     def _getAlter(self):
@@ -1740,6 +1739,24 @@ class Pitch(music21.Music21Object):
         else:
             value = roundedPS
         return value
+
+    def getMidiPreCentShift(self):
+        '''If pitch bend will be used to adjust MIDI values, the given pitch values for microtones should go to the nearest non-microtonal pitch value, not rounded up or down. This method is used in MIDI output generation.
+
+        >>> from music21 import *
+        >>> p = pitch.Pitch('c~4')
+        >>> p.getMidiPreCentShift()
+        60
+        >>> p = pitch.Pitch('c#4')
+        >>> p.getMidiPreCentShift()
+        61
+        >>> p.microtone = 65
+        >>> p.getMidiPreCentShift()
+        61
+        >>> p.getCentShiftFromMidi()
+        65
+        '''
+        return int(((round(self.ps, 2) * 100) - self.getCentShiftFromMidi()) * .01)
 
     def _setMidi(self, value):
         '''
