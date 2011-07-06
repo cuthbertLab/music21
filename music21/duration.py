@@ -787,19 +787,40 @@ class TupletException(Exception):
     pass
 
 class Tuplet(object):
-    '''A tuplet object is a representation of one or more ratios that modify duration values and are stored in Duration objects.
+    '''
+    A tuplet object is a representation of a musical tuplet (like a
+    triplet).  It expresses a ratio that 
+    modifies duration values and are stored in Duration objects in 
+    a "tuple" (immutable list; since there can be nested tuplets) in
+    the duration's .tuplets property.
+    
 
     The primary representation uses two pairs of note numbers and durations. 
 
-    The first pair of note numbers and durations describes the representation within the tuplet, or the value presented by the context. This is called "actual." In a standard 8th note triplet this would be 3, eighth. Attributes are `numberNotesActual`, `durationActual`.
 
-    The second pair of note numbers and durations describes the space that would have been occupied in a normal context. This is called "normal." In a standard 8th note triplet this would be 2, eighth. Attributes are `numberNotesNormal`, `durationNormal`.
+    The first pair of note numbers and durations describes the representation 
+    within the tuplet, or the value presented by the context. This is 
+    called "actual." In a standard 8th note triplet this would be 3, eighth. 
+    Attributes are `numberNotesActual`, `durationActual`.
 
-    If duration values are not provided, the `durationActual` and `durationNormal` are assumed to be eighth.
 
-    If only one duration, either `durationActual` or `durationNormal`, is provided, both are set to the same value.
+    The second pair of note numbers and durations describes the space that would 
+    have been occupied in a normal context. This is called "normal." In a 
+    standard 8th note triplet this would be 2, eighth. Attributes 
+    are `numberNotesNormal`, `durationNormal`.
 
-    Note that this is a duration modifier, or a generator of ratios to scale quarterLength values in Duration objects.
+
+    If duration values are not provided, the `durationActual` and `durationNormal` 
+    are assumed to be eighths.
+
+
+    If only one duration, either `durationActual` or `durationNormal`, is 
+    provided, both are set to the same value.
+
+
+    Note that this is a duration modifier, or a generator of ratios to scale 
+    quarterLength values in Duration objects.
+
 
 
     >>> from music21 import duration
@@ -814,9 +835,11 @@ class Tuplet(object):
     16th
     >>> print(myTup2.tupletMultiplier())
     0.666...
+
     
     Tuplets may be frozen, in which case they become immutable. Tuplets
     which are attached to Durations are automatically frozen
+
     
     >>> myTup.frozen = True
     >>> myTup.tupletActual = [3, 2]
@@ -831,8 +854,10 @@ class Tuplet(object):
     ...
     TupletException: A frozen tuplet (or one attached to a duration) is immutable
     
+
     OMIT_FROM_DOCS
-    We should also have a tupletGroup
+    We should also have a tupletGroup spanner.
+
 
     object that groups note objects into larger groups.
     # TODO: use __setattr__ to freeze all properties, and make a metaclass
@@ -897,13 +922,13 @@ class Tuplet(object):
         else:
             self.durationNormal = DurationUnit("eighth") 
 
-        # start/stop, or startStop: for mxl bracket/group drawing 
-        # startStop is not used in musicxml, but is encoded as two notations
+        # Type is start, stop, or startStop: determines whether to start or stop the bracket/group drawing 
+        # startStop is not used in musicxml, it will be encoded as two notations (start + stop) in musicxml
         self.type = None   
         self.bracket = True # true or false
         self.placement = "above" # above or below
         self.tupletActualShow = "number" # could be "number","type", or "none"
-        self.tupletNormalShow = None
+        self.tupletNormalShow = None # for ratios?
 
         # this attribute is not yet used anywhere
         #self.nestedInside = ""  # could be a tuplet object
@@ -1152,7 +1177,9 @@ class Tuplet(object):
         mxTimeModification.set('actual-notes', self.numberNotesActual)
         mxTimeModification.set('normal-notes', self.numberNotesNormal)
         mxTimeModification.set('normal-type', self.durationNormal.type)
-
+        if self.durationNormal.dots > 0: # only one dot supported...
+            mxTimeModification.set('normal-dot', True)
+            
 
 #         environLocal.printDebug(['_getMX(), found tuplet type:', self.type, 'bracket:', self.bracket, self])
 
@@ -1178,7 +1205,9 @@ class Tuplet(object):
                 if type == 'start':
                     mxTuplet.set('bracket', musicxmlMod.booleanToYesNo(
                                  self.bracket)) 
-                    mxTuplet.set('placement', self.placement) 
+                    mxTuplet.set('placement', self.placement)
+                    if self.tupletActualShow == 'none':
+                        mxTuplet.set('show-number', 'none') 
                 # append each
                 mxTupletList.append(mxTuplet)
 
@@ -2082,7 +2111,7 @@ class Duration(DurationCommon):
     def _isComplex(self):
         if len(self.components) > 1:
             return True
-        for dur in self.components:
+#        for dur in self.components:
             #environLocal.printDebug(['dur in components', dur])
             # any one unlinked component means this is complex
             if dur._link == False:

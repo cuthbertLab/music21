@@ -49,7 +49,7 @@ def repeatToMx(r):
     '''
     mxBarline = musicxmlMod.Barline()
     if r.style is not None:
-        mxBarline.set('barStyle', r.style)
+        mxBarline.set('barStyle', r.musicXMLBarStyle)
 
     if r.location is not None:
         mxBarline.set('location', r.location)
@@ -84,9 +84,11 @@ def mxToRepeat(mxBarline, inputM21=None):
     >>> b = bar.Repeat()
     >>> b.mx = mxBarline
     >>> b.style
-    'light-heavy'
+    'final'
     >>> b.direction
     'start'
+    >>> b.mx.get('barStyle')
+    'light-heavy'
     '''
     from music21 import bar
     if inputM21 == None:
@@ -223,7 +225,11 @@ def pitchToMusicXML(p):
 # Ties
 
 def tieToMx(t):
-    '''Translate a music21 :class:`~music21.tie.Tie` object to MusicXML :class:`~music21.musicxml.Tie` and :class:`~music21.musicxml.Tied` objects as two component lists.
+    '''
+    Translate a music21 :class:`~music21.tie.Tie` object to 
+    MusicXML :class:`~music21.musicxml.Tie` (representing sound) and 
+    :class:`~music21.musicxml.Tied` (representing notation) 
+    objects as two component lists.
 
     '''
     mxTieList = []
@@ -241,13 +247,15 @@ def tieToMx(t):
         mxTieList.append(mxTie) # goes on mxNote.tieList
 
     mxTiedList = []
-    mxTied = musicxmlMod.Tied()
-    mxTied.set('type', musicxmlTieType) # start, stop
-    mxTiedList.append(mxTied) # goes on mxNote.notationsObj list
-    if t.type == 'continue':
+    if t.style != 'hidden': # tie style -- dotted and dashed not supported yet        
         mxTied = musicxmlMod.Tied()
-        mxTied.set('type', 'start')
-        mxTiedList.append(mxTied) 
+        mxTied.set('type', musicxmlTieType) # start, stop
+        mxTiedList.append(mxTied) # goes on mxNote.notationsObj list
+    if t.type == 'continue':
+        if t.style != 'hidden': # tie style -- dotted and dashed not supported yet        
+            mxTied = musicxmlMod.Tied()
+            mxTied.set('type', 'start')
+            mxTiedList.append(mxTied) 
     
     #environLocal.printDebug(['mxTieList', mxTieList])
     return mxTieList, mxTiedList
@@ -462,17 +470,37 @@ def durationToMx(d):
     if d.dotGroups is not None and len(d.dotGroups) > 1:
         d = d.splitDotGroups()
 
-    for dur in d.components:
+    if d.isLinked == True or len(d.components) > 1: # most common case...
+        for dur in d.components:
+            mxDivisions = int(defaults.divisionsPerQuarter * 
+                              dur.quarterLength)
+            mxType = duration.typeToMusicXMLType(dur.type)
+            # check if name is not in collection of MusicXML names, which does 
+            # not have maxima, etc.
+            mxDotList = []
+            # only presently looking at first dot group
+            # also assuming that these are integer values
+            # need to handle fractional dots differently
+            for x in range(int(dur.dots)):
+                # only need to create object
+                mxDotList.append(musicxmlMod.Dot())
+    
+            mxNote = musicxmlMod.Note()
+            mxNote.set('duration', mxDivisions)
+            mxNote.set('type', mxType)
+            mxNote.set('dotList', mxDotList)
+            post.append(mxNote)
+    else: # simple duration that is unlinked
         mxDivisions = int(defaults.divisionsPerQuarter * 
-                          dur.quarterLength)
-        mxType = duration.typeToMusicXMLType(dur.type)
+                          d.quarterLength)
+        mxType = duration.typeToMusicXMLType(d.type)
         # check if name is not in collection of MusicXML names, which does 
         # not have maxima, etc.
         mxDotList = []
         # only presently looking at first dot group
         # also assuming that these are integer values
         # need to handle fractional dots differently
-        for x in range(int(dur.dots)):
+        for x in range(int(d.dots)):
             # only need to create object
             mxDotList.append(musicxmlMod.Dot())
 
@@ -480,10 +508,10 @@ def durationToMx(d):
         mxNote.set('duration', mxDivisions)
         mxNote.set('type', mxType)
         mxNote.set('dotList', mxDotList)
-        post.append(mxNote)
+        post.append(mxNote)    
 
-    # second pass for ties if more than one components
-    # this assumes that all component are tied
+        # second pass for ties if more than one components
+        # this assumes that all component are tied
 
     for i in range(len(d.components)):
         dur = d.components[i]
@@ -1216,6 +1244,8 @@ def noteToMxNotes(n, spannerBundle=None):
             mxNote.set('color', noteColor)
         if n.hideObjectOnPrint == True:
             mxNote.set('printObject', "no")
+            mxNote.set('printSpacing', "yes")
+
         mxNoteList.append(mxNote)
 
     # note: lyric only applied to first note
@@ -1400,6 +1430,9 @@ def restToMxNotes(r):
         mxNote.set('rest', mxRest)
         # get color from within .editorial using attribute
         mxNote.set('color', r.color)
+        if r.hideObjectOnPrint == True:
+            mxNote.set('printObject', "no")
+            mxNote.set('printSpacing', "yes")        
         mxNoteList.append(mxNote)
     return mxNoteList
 

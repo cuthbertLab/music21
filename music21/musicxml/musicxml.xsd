@@ -981,15 +981,20 @@ The arrow shapes differ from triangle and inverted triangle by being centered on
 	
 	<xs:simpleType name="show-tuplet">
 		<xs:annotation>
-			<xs:documentation>The show-tuplet type indicates whether to show a part of a tuplet relating to the tuplet-actual element, both  the tuplet-actual and tuplet-normal elements, or neither.</xs:documentation>
+			<xs:documentation>
+				The show-tuplet type indicates whether to show a part of
+				a tuplet relating to the tuplet-actual element, both the
+				tuplet-actual and tuplet-normal elements, or neither.
+			</xs:documentation>
 		</xs:annotation>
 		<xs:restriction base="xs:token">
-			<xs:enumeration value="actual"/>
-			<xs:enumeration value="both"/>
-			<xs:enumeration value="none"/>
+			<xs:enumeration value="actual" />
+			<xs:enumeration value="both" />
+			<xs:enumeration value="none" />
+			<xs:enumeration value="value"></xs:enumeration>
 		</xs:restriction>
 	</xs:simpleType>
-	
+
 	<xs:simpleType name="stem-value">
 		<xs:annotation>
 			<xs:documentation>The stem type represents the notated stem direction.</xs:documentation>

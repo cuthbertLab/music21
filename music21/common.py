@@ -300,7 +300,8 @@ almostEqual = almostEquals
 
 
 def nearestCommonFraction(x, grain=1e-2):
-    '''Given a value that suggests a floating point fraction, like .33, return a float that provides greater specification, such as .333333333
+    '''Given a value that suggests a floating point fraction, like .33, 
+    return a float that provides greater specification, such as .333333333
         
     >>> from music21 import *
     >>> common.nearestCommonFraction(.333) == 1/3.

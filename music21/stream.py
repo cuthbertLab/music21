@@ -8775,7 +8775,10 @@ class Measure(Stream):
     leftBarline = property(_getLeftBarline, _setLeftBarline, 
         doc = '''
         Get or set the left barline, or the Barline object 
-        found at offset zero of the Measure.
+        found at offset zero of the Measure.  Can be set either with a string
+        representing barline style or a bar.Barline() object or None.  
+        Note that not all bars have
+        barline objects here -- regular barlines don't need them.
         ''')   
 
     def _getRightBarline(self):
@@ -8821,11 +8824,11 @@ class Measure(Stream):
         doc = '''Get or set the right barline, or the Barline object found at the offset equal to the bar duration. 
 
         >>> from music21 import *
-        >>> b = bar.Barline('light-heavy')
+        >>> b = bar.Barline('final')
         >>> m = stream.Measure()
         >>> m.rightBarline = b
         >>> m.rightBarline.style
-        'light-heavy'
+        'final'
         
         
         OMIT_FROM_DOCS

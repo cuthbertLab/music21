@@ -1272,7 +1272,8 @@ class Clef(MusicXMLElement):
 
 class Direction(MusicXMLElementList):
     '''One or more Direction objects are found in measures, after an attributes
-    object. Within the Direction object may be a number of objects, including DirectionType, Sound.
+    object. Within the Direction object may be a number of objects, 
+    including DirectionType, Sound.
     '''
     def __init__(self):
         MusicXMLElementList.__init__(self)

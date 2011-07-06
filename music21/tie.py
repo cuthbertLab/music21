@@ -24,11 +24,12 @@ class Tie(object):
     >>> from music21 import *
     >>> note1 = note.Note()
     >>> note1.tie = tie.Tie("start")
-    >>> note1.tieStyle = "normal" # or could be dotted or dashed
+    >>> note1.tie.style = "normal" # default; could also be "dotted" or "dashed" or "hidden"
     >>> note1.tie.type
     'start'
     >>> note1.tie
     <music21.tie.Tie start>
+
 
     Differences from MusicXML:
        notes do not need to know if they are tied from a
@@ -37,9 +38,11 @@ class Tie(object):
        you need a tie stop on n2
        one tie with "continue" implies tied from and tied to
 
+
        optional (to know what notes are next:)
           .to = note()   # not implimented yet, b/c of garbage coll.
           .from = note()
+
 
     OMIT_FROM_DOCS
     (question: should notes be able to be tied to multiple notes
@@ -50,6 +53,7 @@ class Tie(object):
     def __init__(self, tievalue = 'start'):
         #music21.Music21Object.__init__(self)
         self.type = tievalue
+        self.style = "normal"
 
     # investigate using weak-refs for .to and .from
 

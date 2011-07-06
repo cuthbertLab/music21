@@ -2103,7 +2103,19 @@ class TimeSignature(music21.Music21Object):
     ['1', '1 1/3', '1 2/3', '2', '2 1/3', '2 2/3']
 
 
-    Numerous attributes of TimeSignature objects can be configured, including the multi-level partitioning of independent :class:`~music21.meter.MeterSequence` objects for beat, beam, accent, and display. For complete control, direct configuration of :attr:`~music21.meter.TimeSignature.beatSequence`, :attr:`~music21.meter.TimeSignature.beamSequence`, :attr:`~music21.meter.TimeSignature.accentSequence`, and :attr:`~music21.meter.TimeSignature.displaySequence` is necessary. Some high-level shortcuts are provided. For example, to set a different number of beats, the :attr:`~music21.meter.TimeSignature.beatCount` property can be set with a new value.
+    Numerous attributes of TimeSignature objects 
+    can be configured, including the multi-level 
+    partitioning of independent :class:`~music21.meter.MeterSequence` 
+    objects for beat, beam, accent, and display. 
+    For complete control, direct configuration of 
+    :attr:`~music21.meter.TimeSignature.beatSequence`, 
+    :attr:`~music21.meter.TimeSignature.beamSequence`, 
+    :attr:`~music21.meter.TimeSignature.accentSequence`, 
+    and :attr:`~music21.meter.TimeSignature.displaySequence` 
+    is allowed. Some high-level shortcuts are provided. 
+    For example, to set a different number of beats, 
+    the :attr:`~music21.meter.TimeSignature.beatCount` 
+    property can be set with a new value.
 
 
     >>> ts = meter.TimeSignature('6/8')
@@ -2200,7 +2212,7 @@ class TimeSignature(music21.Music21Object):
             # skip 6 numerators; covered above
             elif self.numerator in [18] and favorCompound: # sextuple meters
                 self.beatSequence.partition([3,3,3,3,3,3])
-            else: # case of odd meters: 5, 7
+            else: # case of odd meters: 11, 13
                 self.beatSequence.partition(self.numerator)
 
         # if a compound meter has been given
@@ -2214,8 +2226,17 @@ class TimeSignature(music21.Music21Object):
     def _setDefaultBeamPartitions(self):
         '''This sets default beam partitions when partitionRequest is None.
         '''
+        
+        # beam short measures of 8ths, 16ths, or 32nds all together
+        if self.denominator == 8 and self.numerator in [1,2,3]:
+            pass # doing nothing will beam all together
+        elif self.denominator == 16 and self.numerator in [1,2,3,4,5]:
+            pass
+        elif self.denominator == 32 and self.numerator in [1,2,3,4,5,6,7,8,9,10,11]:
+            pass
+        
         # more general, based only on numerator
-        if self.numerator in [2, 3, 4]:
+        elif self.numerator in [2, 3, 4]:
             self.beamSequence.partition(self.numerator)
             # if denominator is 4, subdivide each partition
             if self.denominator in [4]:
@@ -2409,7 +2430,9 @@ class TimeSignature(music21.Music21Object):
         return self.beamSequence.numerator
 
     numerator = property(_getNumerator, 
-        doc = '''Return the numerator of the TimeSignature as a number.
+        doc = '''
+        Return the numerator of the TimeSignature as a number.
+        To set the numerator, change beatCount.
 
         >>> from music21 import *
         >>> ts = TimeSignature('3/4')
@@ -2421,7 +2444,9 @@ class TimeSignature(music21.Music21Object):
         return self.beamSequence.denominator
 
     denominator = property(_getDenominator,
-        doc = '''Return the denominator of the TimeSignature as a number
+        doc = '''
+        Return the denominator of the TimeSignature as a number
+
 
         >>> from music21 import *
         >>> ts = TimeSignature('3/4')

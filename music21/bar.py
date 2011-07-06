@@ -34,51 +34,84 @@ class BarException(Exception):
 
 # store alternative names for styles; use this dictionary for translation
 # reference
-barStyleDict = {
-    'regular': [], 
-    'dotted': [], 
-    'dashed': [], 
-    'heavy': [], 
-    'light-light': ['double'],              
-    'light-heavy': ['final'], 
-    'heavy-light': [], 
-    'heavy-heavy': [], 
-    'tick': [],
-    'short': [], 
-    'none': [],
-        }
+barStyleList = ['regular', 'dotted', 'dashed', 'heavy', 'double', 'final', 
+                'heavy-light', 'heavy-heavy', 'tick', 'short', 'none']
+barStyleDict = {'light-light': 'double',
+                'light-heavy': 'final', }
+reverseBarStyleDict = {'double': 'light-light',
+                       'final': 'light-heavy', }
 
 
-def styleToBarStyle(value):
-    '''Convert a bar style into a standard form.
-
-    >>> styleToBarStyle('regular')
-    'regular'
-    >>> styleToBarStyle('final')
-    'light-heavy'
-
+def styleToMusicXMLBarStyle(value):
     '''
-    if value == None:
-        return 'none' # for now, return with string
-    if value.lower() in barStyleDict.keys():
-        return value.lower()
-    for key in barStyleDict.keys():
-        for alt in barStyleDict[key]: # look at all aternatives
-            if alt.lower() == value.lower():
-                return key
+    Convert a music21 barline name into the musicxml name -- 
+    essentially just changes the names of 'double' and 'final'
+    to 'light-light' and 'light-heavy'
+
+
+    Does not do error checking to make sure it's a valid name,
+    since setting the style on a Barline object already does that.
+    
+
+    >>> styleToMusicXMLBarStyle('final')
+    'light-heavy'
+    >>> styleToMusicXMLBarStyle('regular')
+    'regular'
+    '''
+    if value.lower() in reverseBarStyleDict:
+        return reverseBarStyleDict[value.lower()]
+    else:
+        return value
+
+def standardizeBarStyle(value):
+    '''
+    Standardizes bar style names.
+    
+    converts all names to lower case, None to 'regular',
+    and 'light-light' to 'double' and 'light-heavy' to 'final',
+    raises an error for unknown styles.
+    '''  
+    if value is None:
+        return 'regular' # for now, return with string
+
+    value = value.lower()
+    
+    if value in barStyleList:
+        return value
+    elif value in barStyleDict:
+        return barStyleDict[value]
     # if not match
-    raise BarException('cannot process styel: %s' % value)
+    else:
+        raise BarException('cannot process style: %s' % value)
  
 
 #-------------------------------------------------------------------------------
 class Barline(music21.Music21Object):
-    '''A the representation of a barline. Barlines are conventionally assigned to Measure objects using the leftBarline and rightBarline attributes.
+    '''A representation of a barline. 
+    Barlines are conventionally assigned to Measure objects 
+    using the leftBarline and rightBarline attributes.
+
 
     >>> from music21 import *
-    >>> bl = bar.Barline(style='dashed')
+    >>> bl = bar.Barline('double')
     >>> bl
-    <music21.bar.Barline style=dashed>
+    <music21.bar.Barline style=double>
 
+
+    The style can also just be set via a keyword of "style".  Or if no style is specified, 
+    a regular barline is returned.  Location can also be explicitly stored, but it's not
+    needed except for musicxml translation:
+
+
+    >>> bl2 = bar.Barline(style='dashed')
+    >>> bl2
+    <music21.bar.Barline style=dashed>
+    >>> bl3 = bar.Barline()
+    >>> bl3
+    <music21.bar.Barline style=regular>
+    >>> bl4 = bar.Barline(style='final', location='right')
+    >>> bl4
+    <music21.bar.Barline style=final>
     '''
     validStyles = barStyleDict.keys()
 
@@ -87,14 +120,15 @@ class Barline(music21.Music21Object):
     
     classSortOrder = -5 
 
-    def __init__(self, style = None):
+    def __init__(self, style = None, location = None):
         music21.Music21Object.__init__(self)
 
         # this will raise an exception on error from property
         self.style = style
 
-        # this parameter does not seem to be needed in this object
-        self.location = None # can be left, right, middle, None
+        # location is primarily stored in the stream as leftBarline or rightBarline
+        # but can also be stored here.
+        self.location = location # musicxml values: can be left, right, middle, None
 
     def __repr__(self):
         return "<music21.bar.Barline style=%s>" % (self.style)
@@ -104,14 +138,17 @@ class Barline(music21.Music21Object):
 
     def _setStyle(self, value):
         # will raise exception on error
-        self._style = styleToBarStyle(value)
+        self._style = standardizeBarStyle(value)
 
     style = property(_getStyle, _setStyle, 
         doc = '''Get and set the Barline style property.
 
         >>> b = Barline()
         ''')
-
+    def _musicXMLBarStyle(self):
+        return styleToMusicXMLBarStyle(self.style)
+    
+    musicXMLBarStyle = property(_musicXMLBarStyle)
 
     def _getMX(self):
         '''
@@ -122,7 +159,7 @@ class Barline(music21.Music21Object):
 
         '''
         mxBarline = musicxml.Barline()
-        mxBarline.set('barStyle', self.style)
+        mxBarline.set('barStyle', self.musicXMLBarStyle)
         if self.location != None:
             mxBarline.set('location', self.location)
         return mxBarline
@@ -136,7 +173,7 @@ class Barline(music21.Music21Object):
         >>> b = Barline()
         >>> b.mx = mxBarline
         >>> b.style
-        'light-light'
+        'double'
         '''
         self.style = mxBarline.get('barStyle')
         location = mxBarline.get('location')

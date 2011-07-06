@@ -1676,7 +1676,7 @@ class Test(unittest.TestCase):
         s.insert(0, n)
 
         c = chord.Chord(['d','f','a'], type='half')
-        c.pitches[1].microtone = -15
+        c.pitches[1].microtone = -50
         s.append(c)
 
         pos = s.highestTime

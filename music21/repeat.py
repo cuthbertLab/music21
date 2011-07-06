@@ -13,7 +13,7 @@
 '''
 This module provides the base class for all RepeatMark objects: entities that denote repeats.
 
-Some RepeatMark objects are Expression objecs; others are Bar objects. 
+Some RepeatMark objects are Expression objects; others are Bar objects. 
 '''
 import copy
 import doctest, unittest
