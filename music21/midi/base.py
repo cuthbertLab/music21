@@ -375,6 +375,18 @@ class MidiEvent(object):
         # store and pass on a running status if found
         self.lastStatusByte = None
 
+        # need to store a sort order based on type
+        self.sortOrder = 0
+        self.updateSortOrder()
+    
+
+    def updateSortOrder(self):
+        # update based on type; type may be set after init
+        if self.type == 'PITCH_BEND': #go before note events
+            self.sortOrder = -10
+        if self.type == 'NOTE_OFF': # should come before pitch bend
+            self.sortOrder = -20
+
     def __cmp__(self, other): 
         return cmp(self.time, other.time) 
     
