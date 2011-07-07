@@ -355,7 +355,7 @@ class MidiEvent(object):
     '''
     
     def __init__(self, track, type=None, time=None, channel=None): 
-        self.track = track 
+        self.track = track  # a MidiTrack object
         self.type = type
         self.time = time
         self.channel = channel
