@@ -1208,44 +1208,55 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     #composite = []
     chordSub = None
     i = 0
-    while i < len(notes):
-        # look at each note; get on time and event
-        on, off = notes[i]
-        t, e = on
-        # go through all following notes
-        for j in range(i+1, len(notes)):
-            # look at each on time event
-            onSub, offSub = notes[j]
-            tSub, eSub = onSub
-            # can set a tolerance for chordSubing; here at 1/16th
-            # of a quarter
-            if tSub - t <= ticksPerQuarter / 16:
-                if chordSub == None: # start a new one
-                    chordSub = [notes[i]]
-                chordSub.append(notes[j])
-                continue # keep looing
-            else: # no more matches; assuming chordSub tones are contiguous
-                if chordSub != None:
-                    #composite.append(chordSub)
-                    # create a chord here
-                    c = chord.Chord()
-                    c._setMidiEvents(chordSub, ticksPerQuarter)
-                    o = notes[i][0][0] / float(ticksPerQuarter)
-                    s._insertCore(o, c)
-                    iSkip = len(chordSub)
-                    chordSub = None
-                else: # just append the note
-                    #composite.append(notes[i])
-                    # create a note here
-                    n = note.Note()
-                    n._setMidiEvents(notes[i], ticksPerQuarter)
-                    # the time is the first value in the first pair
-                    # need to round, as floating point error is likely
-                    o = notes[i][0][0] / float(ticksPerQuarter)
-                    s._insertCore(o, n)
-                    iSkip = 1
-                break # exit secondary loop
-        i += iSkip
+    if len(notes) > 1:
+        while i < len(notes):
+            # look at each note; get on time and event
+            on, off = notes[i]
+            t, e = on
+            #environLocal.printDebug(['on, off', on, off, 'i', i, 'len(notes)', len(notes)])
+            # go through all following notes; if there is only 1 note, this will 
+            # not exectue
+            for j in range(i+1, len(notes)):
+                # look at each on time event
+                onSub, offSub = notes[j]
+                tSub, eSub = onSub
+                # can set a tolerance for chordSubing; here at 1/16th
+                # of a quarter
+                if tSub - t <= ticksPerQuarter / 16:
+                    if chordSub == None: # start a new one
+                        chordSub = [notes[i]]
+                    chordSub.append(notes[j])
+                    continue # keep looping
+                else: # no more matches; assuming chordSub tones are contiguous
+                    if chordSub != None:
+                        #composite.append(chordSub)
+                        # create a chord here
+                        c = chord.Chord()
+                        c._setMidiEvents(chordSub, ticksPerQuarter)
+                        o = notes[i][0][0] / float(ticksPerQuarter)
+                        s._insertCore(o, c)
+                        iSkip = len(chordSub)
+                        chordSub = None
+                    else: # just append the note
+                        #composite.append(notes[i])
+                        # create a note here
+                        n = note.Note()
+                        n._setMidiEvents(notes[i], ticksPerQuarter)
+                        # the time is the first value in the first pair
+                        # need to round, as floating point error is likely
+                        o = notes[i][0][0] / float(ticksPerQuarter)
+                        s._insertCore(o, n)
+                        iSkip = 1
+                    break # exit secondary loop
+            i += iSkip
+
+    else: # rare case of just one note
+        n = note.Note()
+        n._setMidiEvents(notes[0], ticksPerQuarter)
+        # the time is the first value in the first pair
+        # need to round, as floating point error is likely
+        o = notes[0][0][0] / float(ticksPerQuarter)
+        s._insertCore(o, n)
                     
     s._elementsChanged()
 
