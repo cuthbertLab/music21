@@ -976,7 +976,6 @@ class Test(unittest.TestCase):
         if len(cadenceA.srcStreams) >= 2:
             srcStream1    = cadenceA.srcStreams[0]
             srcStream2    = cadenceA.srcStreams[1]  ## ignore 3rd voice for now...
-    #        twoStreams1 = twoStreams.TwoStreamComparer(srcStream1, srcStream2)
     #    raise("hi?")
     #    clearFicta(srcStream1)
     #    compareThreeFictas(srcStream1, srcStream2)

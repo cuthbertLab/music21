@@ -23,36 +23,36 @@ from music21 import tempo
 import unittest, doctest
 
 allowableStrettoIntervals = { 
-        -8: [(interval.GenericInterval(3), True), 
-             (interval.GenericInterval(-3), True),
-             (interval.GenericInterval(5), False),
-             (interval.GenericInterval(-4), False),
-             (interval.GenericInterval(1), True)],
-        8:  [(interval.GenericInterval(3), True), 
-             (interval.GenericInterval(-3), True),
-             (interval.GenericInterval(5), False),
-             (interval.GenericInterval(4), False),
-             (interval.GenericInterval(1), True)],
-        -5: [(interval.GenericInterval(-3), True), 
-             (interval.GenericInterval(-5), False),
-             (interval.GenericInterval(2), True),
-             (interval.GenericInterval(4), False),
-             (interval.GenericInterval(1), True)],
-        5:  [(interval.GenericInterval(3), True), 
-             (interval.GenericInterval(5), False),
-             (interval.GenericInterval(-2), True),
-             (interval.GenericInterval(-4), False),
-             (interval.GenericInterval(1), True)],
-        -4: [(interval.GenericInterval(3), True), 
-             (interval.GenericInterval(5), False),
-             (interval.GenericInterval(2), False),
-             (interval.GenericInterval(-2), True),
-             (interval.GenericInterval(-4), False)],
-        4:  [(interval.GenericInterval(-3), True), 
-             (interval.GenericInterval(-5), False),
-             (interval.GenericInterval(2), True),
-             (interval.GenericInterval(-2), False),
-             (interval.GenericInterval(4), False)],
+        -8: [(3, True), 
+             (-3, True),
+             (5, False),
+             (-4, False),
+             (1, True)],
+        8:  [(3, True), 
+             (-3, True),
+             (5, False),
+             (4, False),
+             (1, True)],
+        -5: [(-3, True), 
+             (-5, False),
+             (2, True),
+             (4, False),
+             (1, True)],
+        5:  [(3, True), 
+             (5, False),
+             (-2, True),
+             (-4, False),
+             (1, True)],
+        -4: [(3, True), 
+             (5, False),
+             (2, False),
+             (-2, True),
+             (-4, False)],
+        4:  [(-3, True), 
+             (-5, False),
+             (2, True),
+             (-2, False),
+             (4, False)],
     }
 
 
@@ -114,6 +114,7 @@ class MensuralNote(music21.note.Note):
         '''
         set the modern duration from 
         '''
+        pass
 
 def setBarlineStyle(score, newStyle, oldStyle = 'regular', inPlace = True):
     '''
@@ -234,9 +235,36 @@ def convertHouseStyle(score, durationScale = 2, barlineStyle = 'tick', tieTransf
 
 
 def cummingSchubertStrettoFuga(score):
-    pass
-
-
+    '''
+    evaluates how well a given score works as a Stretto fuga would work at different intervals
+    '''
+    lastInterval = None
+    sn = score.flat.notes
+    strettoKeys = {8: 0, -8: 0, 5: 0, -5: 0, 4: 0, -4: 0}
+    
+    for i in range(len(sn)-1):
+        thisInt = interval.notesToInterval(sn[i], sn[i+1])
+        thisGeneric = thisInt.generic.directed
+        for strettoType in [8, -8, 5, -5, 4, -4]:
+            strettoAllowed = [x[0] for x in allowableStrettoIntervals[strettoType]] #inefficent but who cares
+            repeatAllowed = [x[1] for x in allowableStrettoIntervals[strettoType]]
+            for j in range(len(strettoAllowed)):
+                thisStrettoAllowed = strettoAllowed[j]
+                if thisGeneric == thisStrettoAllowed:
+                    if thisGeneric != lastInterval:
+                        strettoKeys[strettoType] += 1
+                    elif thisGeneric == lastInterval and repeatAllowed[j] is True:
+                        strettoKeys[strettoType] += 1
+            
+        lastInterval = thisGeneric
+    if score.title:
+        print score.title
+    
+    print "intv.\tcount\tpercent"
+    for l in sorted(strettoKeys.keys()):
+        print ("%2d\t%3d\t%2d%%" % (l, strettoKeys[l], strettoKeys[l]*100/len(sn)-1))
+    print "\n"
+        
 class MedRenException(music21.Music21Exception):
     pass
 
@@ -279,13 +307,45 @@ class TestExternal(unittest.TestCase):
         n1.duration.quarterLength = 2.0
         s.append([n1, n2])
 
-    def testAll(self):
+    def xtestPythagSharps(self):
+        from music21 import corpus
+        gloria = corpus.parse('luca/gloria')
+        p = gloria.parts[0].flat
+        for n in p.notes:
+            if n.name == 'F#':
+                n.pitch.microtone = 20
+            elif n.name == 'C#':
+                n.pitch.microtone = 20
+            elif n.step != 'B' and n.accidental is not None and n.accidental.name == 'flat':
+                n.pitch.microtone = -20
+        mts = music21.midi.translate.streamsToMidiTracks(p)
+
+        p.show('midi')
+
+    def xtestAll(self):
         from music21 import corpus
         gloria = corpus.parse('luca/gloria')
         gloriaNew = convertHouseStyle(gloria)
-        print gloriaNew.write()
-        #gloriaNew.show()
+        gloriaNew.show()
+
+
+def testStretto():
+    from music21 import converter
+    salve = converter.parse("A4 A G A D A G F E F G F E D", '4/4') # salveRegina liber 276 (pdf 400)
+    adTe = converter.parse("D4 F A G G F A E G F E D G C D E D G F E D", '4/4') # ad te clamamus
+    etJesum = converter.parse("D4 AA C D D D E E D D C G F E D G F E D C D", '4/4') 
+    salve.title = "Salve Regina (opening)LU p. 276"
+    adTe.title = "...ad te clamamus"
+    etJesum.title = "...et Jesum"
+    for piece in [salve, adTe, etJesum]:
+        cummingSchubertStrettoFuga(piece)        
 
 
 if __name__ == '__main__':
-    music21.mainTest(TestExternal)
+    testStretto()
+
+#    music21.mainTest(TestExternal)
+    almaRedemptoris = converter.parse("C4 E F G A G G G A B c G", '4/4') #liber 277 (pdf401)
+    puer = converter.parse('G4 d d d e d c c d c e d d', '4/4') # puer natus est 408 (pdf 554)
+    almaRedemptoris.title = "Alma Redemptoris Mater LU p. 277"
+    puer.title = "Puer Natus Est Nobis"

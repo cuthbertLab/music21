@@ -1735,17 +1735,17 @@ class Test(unittest.TestCase):
 
         #mts = streamsToMidiTracks(s)
 
-        s.insert(0, note.Note('g2', quarterLength=20)) 
+        s.insert(0, note.Note('g3', quarterLength=10)) 
         mts = streamsToMidiTracks(s)
 
-#         match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=61, velocity=90>, <MidiEvent DeltaTime, t=4096, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=61, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=2>, <MidiEvent PITCH_BEND, t=0, track=1, channel=2, _parameter1=0, _parameter2=80>, <MidiEvent DeltaTime, t=0, track=1, channel=2>, <MidiEvent NOTE_ON, t=0, track=1, channel=2, pitch=61, velocity=90>, <MidiEvent DeltaTime, t=4096, track=1, channel=2>, <MidiEvent NOTE_OFF, t=0, track=1, channel=2, pitch=61, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=2>, <MidiEvent PITCH_BEND, t=0, track=1, channel=2, _parameter1=0, _parameter2=64>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=62, velocity=90>, <MidiEvent DeltaTime, t=4096, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=43, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=62, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
+#         match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=61, velocity=90>, <MidiEvent DeltaTime, t=2048, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=61, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=2>, <MidiEvent PITCH_BEND, t=0, track=1, channel=2, _parameter1=0, _parameter2=80>, <MidiEvent DeltaTime, t=0, track=1, channel=2>, <MidiEvent NOTE_ON, t=0, track=1, channel=2, pitch=61, velocity=90>, <MidiEvent DeltaTime, t=2048, track=1, channel=2>, <MidiEvent NOTE_OFF, t=0, track=1, channel=2, pitch=61, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=2>, <MidiEvent PITCH_BEND, t=0, track=1, channel=2, _parameter1=0, _parameter2=64>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=62, velocity=90>, <MidiEvent DeltaTime, t=2048, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=55, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=62, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
 #         self.assertEqual(str(mts[0].events[-20:]), match)
 # 
 # 
 #         #s.show('midi', app='Logic Express')
 #         s.show('midi')
 
-
+        #print s.write('midi')
     def testMicrotonalOutputB(self):
         # a two-part stream
         from music21 import stream, note
@@ -1771,7 +1771,7 @@ class Test(unittest.TestCase):
         # is in effect
         mts = streamsToMidiTracks(s)
         #s.show('midi', app='Logic Express')
-        #s.show('midi')
+        s.show('midi')
 
 
 

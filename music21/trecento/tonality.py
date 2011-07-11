@@ -202,7 +202,7 @@ def anonBallataTonality(show = True):
         print(tCounter.output)
         print("Generating Lilypond PNG of all pieces where the first note of the tenor is the same pitchclass as the last note of Cadence A")
         print("It might take a while, esp. on the first Lilypond run...")
-        tCounter.displayLily.showPNG()
+        #tCounter.displayLily.showPNG()
 
 def sacredTonality(show = True):
     '''
@@ -232,7 +232,7 @@ def sacredTonality(show = True):
     tCounter.run()
     if show is True:
         print(tCounter.output)
-        tCounter.displayLily.showPNG()
+        #tCounter.displayLily.showPNG()
 
 def testAll(show = True, fast = False):
         sacredTonality(show)
@@ -254,7 +254,7 @@ class TestExternal(unittest.TestCase):
         testAll(show = True, fast = False)
  
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    music21.mainTest(TestExternal)
 
 
 #------------------------------------------------------------------------------

@@ -941,7 +941,7 @@ class ABCNote(ABCToken):
             accString += 'n' # m21 symbols
 
         # if there is an explicit accidental, regardless of key, it should
-        # be shown: this works for naturals well
+        # be shown: this will works for naturals well
         if accString != '':
             accidentalDisplayStatus = True
         # if we do not have a key signature, and have accidentals, set to None

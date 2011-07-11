@@ -886,7 +886,7 @@ class MidiTrack(object):
         for e in self.events: 
             # this writes both delta time and message events
             ew = e.write()
-            str = str + ew 
+            str = str + ew
         return "MTrk" + putNumber(len(str), 4) + str 
     
     def __repr__(self): 
