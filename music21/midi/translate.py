@@ -15,6 +15,7 @@
 
 import unittest
 import math
+import copy
 
 import music21
 from music21 import midi as midiModule
@@ -217,7 +218,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     if (tOff - tOn) != 0:
         n.duration.midi = (tOff - tOn), ticksPerQuarter
     else:       
-        environLocal.printDebug(['cannot translate found midi event with zero duration:', eOn, n])
+        #environLocal.printDebug(['cannot translate found midi event with zero duration:', eOn, n])
         # for now, substitute 1
         n.quarterLength = 1
 
@@ -405,7 +406,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     if (tOff - tOn) != 0:
         c.duration.midi = (tOff - tOn), ticksPerQuarter
     else:
-        environLocal.printDebug(['cannot translate found midi event with zero duration:', eventList, c])
+        #environLocal.printDebug(['cannot translate found midi event with zero duration:', eventList, c])
         # for now, substitute 1
         c.quarterLength = 1    
     return c
@@ -1249,8 +1250,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                         iSkip = 1
                     break # exit secondary loop
             i += iSkip
-
-    else: # rare case of just one note
+    elif len(notes) == 1: # rare case of just one note
         n = note.Note()
         n._setMidiEvents(notes[0], ticksPerQuarter)
         # the time is the first value in the first pair
@@ -1259,10 +1259,6 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
         s._insertCore(o, n)
                     
     s._elementsChanged()
-
-#     environLocal.printDebug(['got notes:'])
-#     for e in notes:
-#         print e
 
     # quantize to nearest 16th
     if quantizePost:    
@@ -1372,9 +1368,12 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
     '''
     from music21 import stream
     if inputM21 == None:
-        s = stream.Stream()
+        s = stream.Score()
     else:
         s = inputM21
+
+    # store common elements such as time sig, key sig from conductor
+    conductorTrack = stream.Stream()
 
     for mt in midiTracks:
         # not all tracks have notes defined; only creates parts for those
@@ -1383,14 +1382,24 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
 
         if mt.hasNotes(): 
             streamPart = stream.Part() # create a part instance for each part
-            streamPart._setMidiTracksPart(mt,
-                ticksPerQuarter=ticksPerQuarter, quantizePost=quantizePost)
+            midiTrackToStream(mt, ticksPerQuarter, quantizePost, 
+                              inputM21=streamPart)
+#             streamPart._setMidiTracksPart(mt,
+#                 ticksPerQuarter=ticksPerQuarter, quantizePost=quantizePost)
             s.insert(0, streamPart)
         else:
             # note: in some cases a track such as this might have metadata
             # such as the time sig, tempo, or other parameters
-            environLocal.printDebug(['skipping midi track with no notes', mt])
-    
+            midiTrackToStream(mt, ticksPerQuarter, quantizePost, 
+                              inputM21=conductorTrack)
+    #environLocal.printDebug(['show() conductorTrack elements'])
+    # if we have time sig/key sig elements, add to each part
+    for p in s.getElementsByClass('Stream'):
+        for e in conductorTrack.getElementsByClass(
+                            ('TimeSignature', 'KeySignature')):
+            # create a deepcopy of the element so a flat does not cause
+            # multiple references of the same
+            p.insert(e.getOffsetBySite(conductorTrack), copy.deepcopy(e))
     return s
 
 
@@ -1450,7 +1459,9 @@ def midiFileToStream(mf, inputM21=None):
     else:
         # create a stream for each tracks   
         # may need to check if tracks actually have event data
-        s._setMidiTracks(mf.tracks, mf.ticksPerQuarterNote)
+        midiTracksToStreams(mf.tracks, 
+            ticksPerQuarter=mf.ticksPerQuarterNote, inputM21=s)
+        #s._setMidiTracks(mf.tracks, mf.ticksPerQuarterNote)
 
     return s
 

@@ -6982,31 +6982,31 @@ class Stream(music21.Music21Object):
         '''
         return midiTranslate.streamToMidiTrack(self, instObj)
 
-    def _setMidiTracksPart(self, mt, ticksPerQuarter=None, quantizePost=True):
-        '''Given a MIDI track, configure a Stream.
-        '''
-        # pass self as reference to configure this object
-        midiTranslate.midiTrackToStream(mt, ticksPerQuarter, quantizePost, self)
+#     def _setMidiTracksPart(self, mt, ticksPerQuarter=None, quantizePost=True):
+#         '''Given a MIDI track, configure a Stream.
+#         '''
+#         # pass self as reference to configure this object
+#         midiTranslate.midiTrackToStream(mt, ticksPerQuarter, quantizePost, self)
 
     def _getMidiTracks(self):
         return midiTranslate.streamsToMidiTracks(self)
 
-    def _setMidiTracks(self, midiTracks, ticksPerQuarter=None):
-        midiTranslate.midiTracksToStreams(midiTracks, 
-            ticksPerQuarter=ticksPerQuarter, inputM21=self)
+#     def _setMidiTracks(self, midiTracks, ticksPerQuarter=None):
+#         midiTranslate.midiTracksToStreams(midiTracks, 
+#             ticksPerQuarter=ticksPerQuarter, inputM21=self)
 
 
-    midiTracks = property(_getMidiTracks, _setMidiTracks, 
-        doc='''Get or set this Stream from a list of :class:`music21.midi.base.MidiTracks` objects.
-
-        >>> from music21 import *
-        >>> s = stream.Stream()
-        >>> n = note.Note('g#3')
-        >>> n.quarterLength = .5
-        >>> s.repeatAppend(n, 6)
-        >>> len(s.midiTracks[0].events)
-        30
-        ''')
+#     midiTracks = property(_getMidiTracks, _setMidiTracks, 
+#         doc='''Get or set this Stream from a list of :class:`music21.midi.base.MidiTracks` objects.
+# 
+#         >>> from music21 import *
+#         >>> s = stream.Stream()
+#         >>> n = note.Note('g#3')
+#         >>> n.quarterLength = .5
+#         >>> s.repeatAppend(n, 6)
+#         >>> len(s.midiTracks[0].events)
+#         30
+#         ''')
 
     def _getMidiFile(self):
         '''Return a complete :class:`music21.midi.base.MidiFile` object based on the Stream.
@@ -12754,11 +12754,15 @@ class Test(unittest.TestCase):
             #self.assertEqual(triples, match)
         
 
+        from music21.midi import translate as midiTranslate
+
         s = Stream()
         n = note.Note('g#3')
         n.quarterLength = .5
         s.repeatAppend(n, 6)
-        post = s.midiTracks # get a lost 
+        #post = s.midiTracks # get a lost 
+        post = midiTranslate.streamsToMidiTracks(s)
+
         self.assertEqual(len(post[0].events), 30)
         # must be an even number
         self.assertEqual(len(post[0].events) % 2, 0)
