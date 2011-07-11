@@ -3732,11 +3732,6 @@ class Stream(music21.Music21Object):
         
         
         '''
-        # gather lyrics as an option
-
-        # define classes that are gathered; assume they have pitches
-        matchClasses = ['Note', 'Chord', 'Rest']
-
         if not inPlace: # make a copy
             # since we do not return Scores, this probably should always be 
             # a Stream
@@ -3771,8 +3766,19 @@ class Stream(music21.Music21Object):
                     inPlace=True)
             return returnObj # exit
 
+
+        # TODO: gather lyrics as an option
+
+        # define classes that are gathered; assume they have pitches
+        # matchClasses = ['Note', 'Chord', 'Rest']
+        matchClasses = ['Note', 'Chord']
         o = 0.0 # start at zero
         oTerminate = returnObj.highestOffset
+
+        # get temporar boundaries for making rests
+        preHighestTime = returnObj.highestTime
+        preLowestOffset = returnObj.lowestOffset
+        #environLocal.printDebug(['got preLowest, preHighest', preLowestOffset, preHighestTime])
 
         while True: 
             # get all notes within the start and the minwindow size
@@ -3781,6 +3787,7 @@ class Stream(music21.Music21Object):
             sub = returnObj.getElementsByOffset(oStart, oEnd,
                     includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)  
             subNotes = sub.getElementsByClass(matchClasses) # get once for speed         
+            #environLocal.printDebug(['subNotes', subNotes])
 
             qlMax = None 
             # get the max duration found from within the window
@@ -3795,7 +3802,7 @@ class Stream(music21.Music21Object):
             # window
             # so: if ql > min window, gather notes between 
             # oStart + minimumWindowSize and oStart + qlMax
-            if (includePostWindow and qlMax != None 
+            if (includePostWindow and qlMax is not None 
                 and qlMax > minimumWindowSize):
                 subAdd = returnObj.getElementsByOffset(oStart+minimumWindowSize,
                         oStart+qlMax,
@@ -3803,14 +3810,16 @@ class Stream(music21.Music21Object):
                 # concatenate any additional notes found
                 subNotes += subAdd.getElementsByClass(matchClasses)
 
-            subRest = []
-            for e in subNotes:
-                if 'Rest' in e.classes:
-                    subRest.append(e)
-            if len(subRest) > 0:
-                # remove from subNotes
-                for e in subRest:
-                    subNotes.remove(e)
+#             subRest = []
+#             for e in subNotes:
+#                 environLocal.printDebug(['e in subNotes', e])
+#                 if 'Rest' in e.classes:
+#                     subRest.append(e)
+#             environLocal.printDebug(['got rests', subRest])
+#             if len(subRest) > 0:
+#                 # remove from subNotes
+#                 for e in subRest:
+#                     subNotes.remove(e)
                 
             # make subNotes into a chord
             if len(subNotes) > 0:
@@ -3836,7 +3845,8 @@ class Stream(music21.Music21Object):
                 # always remove all the previous elements      
                 for n in subNotes:
                     returnObj.remove(n)
-                for r in subRest:
+                # remove all rests found in source
+                for r in returnObj.getElementsByClass('Rest'):
                     returnObj.remove(r)
 
                 if removeRedundantPitches:
@@ -3845,13 +3855,13 @@ class Stream(music21.Music21Object):
                 returnObj._insertCore(o, c)
 
             # only add rests if no notes
-            elif len(subRest) > 0:
-                r = note.Rest()
-                r.quarterLength = qlMax
-                # remove old rests if in place
-                for rOld in subRest:
-                    returnObj.remove(rOld)
-                returnObj._insertCore(o, r)
+#             elif len(subRest) > 0:
+#                 r = note.Rest()
+#                 r.quarterLength = qlMax
+#                 # remove old rests if in place
+#                 for rOld in subRest:
+#                     returnObj.remove(rOld)
+#                 returnObj._insertCore(o, r)
 
             #environLocal.printDebug(['len of returnObj', len(returnObj)])
 
@@ -3868,6 +3878,11 @@ class Stream(music21.Music21Object):
             if o > oTerminate:
                 break
 
+        # makeRests to fill any gaps produced by stripping
+        #environLocal.printDebug(['pre makeRests show()'])
+        returnObj.makeRests(
+            refStreamOrTimeRange=(preLowestOffset, preHighestTime), 
+                        fillGaps=True, inPlace=True)
         returnObj._elementsChanged()
 
         return returnObj
@@ -4375,7 +4390,7 @@ class Stream(music21.Music21Object):
             returnObj = self
 
         #environLocal.printDebug(['makeRests(): object lowestOffset, highestTime', oLow, oHigh])
-        if refStreamOrTimeRange == None: # use local
+        if refStreamOrTimeRange is None: # use local
             oLowTarget = 0
             oHighTarget = returnObj.highestTime
         elif isinstance(refStreamOrTimeRange, Stream):
@@ -4386,7 +4401,7 @@ class Stream(music21.Music21Object):
         elif common.isListLike(refStreamOrTimeRange):
             oLowTarget = min(refStreamOrTimeRange)
             oHighTarget = max(refStreamOrTimeRange)
-            #environLocal.printDebug(['refStream used in makeRests', oLowTarget, oHighTarget, len(refStreamOrTimeRange)])
+            #environLocal.printDebug(['offsets used in makeRests', oLowTarget, oHighTarget, len(refStreamOrTimeRange)])
 
         if returnObj.hasVoices():
             bundle = returnObj.voices
@@ -4394,8 +4409,11 @@ class Stream(music21.Music21Object):
             bundle = [returnObj]
 
         for v in bundle:
+            v._elementsChanged() # required to get correct offset times
             oLow = v.lowestOffset
             oHigh = v.highestTime
+
+            # create rest from start to end
             qLen = oLow - oLowTarget
             if qLen > 0:
                 r = note.Rest()
@@ -4403,12 +4421,17 @@ class Stream(music21.Music21Object):
                 #environLocal.printDebug(['makeRests(): add rests', r, r.duration])
                 # place at oLowTarget to reach to oLow
                 v._insertCore(oLowTarget, r)
+
+            # create rest from end to highest
             qLen = oHighTarget - oHigh
+            #environLocal.printDebug(['v', v, oHigh, oHighTarget, 'qLen', qLen])
             if qLen > 0:
                 r = note.Rest()
                 r.duration.quarterLength = qLen
                 # place at oHigh to reach to oHighTarget
                 v._insertCore(oHigh, r)
+            v._elementsChanged() # must update otherwise might add double r
+
             if fillGaps:
                 gapStream = v.findGaps()
                 if gapStream != None:
@@ -4418,6 +4441,7 @@ class Stream(music21.Music21Object):
                         v._insertCore(e.offset, r)
             v._elementsChanged()
             #v.isSorted = False
+            #environLocal.printDebug(['post makeRests show()', v])
 
         # with auto sort no longer necessary. 
         
@@ -8169,7 +8193,7 @@ class Stream(music21.Music21Object):
         else: # if no measure or voices, get one part
             partCount = 1 
 
-        environLocal.printDebug(['voicesToParts(): got partCount', partCount])
+        #environLocal.printDebug(['voicesToParts(): got partCount', partCount])
 
         # create parts, naming ids by voice id?
         for sub in range(partCount):
@@ -13464,16 +13488,17 @@ class Test(unittest.TestCase):
         s.insert(1, n2) # overlapping, starting after n1 but finishing before
         s.insert(2, n3)
         s.insert(3, n4) # overlapping, starting after n3 but finishing before
-
+        #s.makeRests(fillGaps=True)
         # this results in two chords; n2 and n4 are effectively shifted 
         # to the start of n1 and n3
         sMod = s.makeChords(inPlace=False)
+        #sMod.show()
         s.makeChords(inPlace=True)   
         for sEval in [s, sMod]:
             # have three chords, even though 1 only has more than 1 pitch
             # might change this?
             self.assertEqual(len(sEval.getElementsByClass('Chord')), 3)
-            self.assertEqual([c.offset for c in sEval], [0.0, 1.0, 3.0] )
+            self.assertEqual([c.offset for c in sEval], [0.0, 0.5, 1.0, 2.5, 3.0] )
 
 
     def testMakeChordsBuiltC(self):
@@ -13514,6 +13539,42 @@ class Test(unittest.TestCase):
         self.assertEquals([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[1].pitches], ['E4', 'E4', 'F#4'] )
             
 
+
+    def testMakeChordsBuiltD(self):
+        # attempt to isolate case 
+        from music21 import note, stream
+        
+        p1 = stream.Part()
+        p1.append([note.Note('G4', quarterLength=2), 
+                   note.Note('B4', quarterLength=2), 
+                   note.Note('C4', quarterLength=4),
+                   note.Rest(quarterLength=1),
+                   note.Note('C4', quarterLength=1),
+                   note.Note('B4', quarterLength=1),
+                   note.Note('A4', quarterLength=1),
+
+                ])
+
+        p2 = stream.Part()
+        p2.append([note.Note('A3', quarterLength=4),
+                   note.Note('F3', quarterLength=4),])
+
+        p3 = stream.Part()
+        p3.append([note.Rest(quarterLength=8),
+                   note.Rest(quarterLength=4),
+        ])
+
+
+        s = stream.Score()
+        s.insert([0, p1])
+        s.insert([0, p2])
+        s.insert([0, p3])
+
+        post = s.flat.makeChords()
+        #post.show('t')
+        self.assertEqual(len(post.getElementsByClass('Rest')), 1)
+        self.assertEqual(len(post.getElementsByClass('Chord')), 5)
+        #post.show()
 
 
     def testMakeChordsImported(self):
@@ -14066,9 +14127,11 @@ class Test(unittest.TestCase):
         score = stream.Score()
         score.insert(0, p1)
         score.insert(0, p2)
-
-        # parts retain their characteristics, rests are retained in position
+        # parts retain their characteristics
+        # rests are recast
         scoreChords = score.makeChords()
+        #scoreChords.show()
+
         self.assertEqual(len(scoreChords.parts[0].flat), 5)
         self.assertEqual(len(scoreChords.parts[0].flat.getElementsByClass(
             'Chord')), 3)
@@ -15330,6 +15393,10 @@ class Test(unittest.TestCase):
 #         s.insert(0, c1)
 #         s.show('t')
 #         self.assertEqual(c1, s[0]) # should be first
+
+
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
