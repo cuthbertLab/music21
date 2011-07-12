@@ -16,30 +16,36 @@ of octave repeating and non-octave repeating scales built by network of
 :class:`~music21.interval.Interval` objects as modeled in 
 :class:`~music21.intervalNetwork.BoundIntervalNetwork`.
 
+
 The main public interface to these resources are subclasses of
 :class:`~music21.scale.ConcreteScale`, such as 
 :class:`~music21.scale.MajorScale`, :class:`~music21.scale.MinorScale`, 
 and :class:`~music21.scale.MelodicMinorScale`.
 
+
 More unusual scales are also available, such as 
 :class:`~music21.scale.OctatonicScale`, 
 :class:`~music21.scale.SieveScale`, and :class:`~music21.scale.RagMarwa`.
+
 
 All :class:`~music21.scale.ConcreteScale` subclasses provide the ability 
 to get a pitches across any range, get a pitch for scale step, get a 
 scale step for pitch, and, for any given pitch ascend or descend to the 
 next pitch. In all cases :class:`~music21.pitch.Pitch` objects are returned.
 
+
 >>> from music21 import *
 >>> sc1 = scale.MajorScale('a')
 >>> sc1.getPitches('g2', 'g4')
 [G#2, A2, B2, C#3, D3, E3, F#3, G#3, A3, B3, C#4, D4, E4, F#4]
+
 
 >>> sc2 = scale.MelodicMinorScale('a')
 >>> sc2.getPitches('g2', 'g4', direction='descending')
 [G4, F4, E4, D4, C4, B3, A3, G3, F3, E3, D3, C3, B2, A2, G2]
 >>> sc2.getPitches('g2', 'g4', direction='ascending')
 [G#2, A2, B2, C3, D3, E3, F#3, G#3, A3, B3, C4, D4, E4, F#4]
+
 
 >>> # a sieve-based scale using Xenakis's representation of the Major scale
 >>> sc3 = scale.SieveScale('a', '(-3@2 & 4) | (-3@1 & 4@1) | (3@2 & 4@2) | (-3 & 4@3)')
@@ -101,7 +107,9 @@ class Scale(music21.Music21Object):
         return False
 
     isConcrete = property(_isConcrete, 
-        doc = '''To be concrete, a Scale must have a defined tonic. An abstract Scale is not Concrete, nor is a Concrete scale without a defined tonic.
+        doc = '''To be concrete, a Scale must have a defined tonic. 
+        An abstract Scale is not Concrete, nor is a Concrete scale 
+        without a defined tonic.
         ''')
 
     def _extractPitchList(self, other, comparisonAttribute='nameWithOctave'):
@@ -151,11 +159,20 @@ class Scale(music21.Music21Object):
 
 #-------------------------------------------------------------------------------
 class AbstractScale(Scale):
-    '''An abstract scale is specific scale formation, but does not have a defined pitch collection or pitch reference. For example, all Major scales can be represented by an AbstractScale; a ConcreteScale, however, is a specific Major Scale, such as G Major. 
+    '''
+    An abstract scale is specific scale formation, but does not have a 
+    defined pitch collection or pitch reference. For example, all Major 
+    scales can be represented by an AbstractScale; a ConcreteScale, 
+    however, is a specific Major Scale, such as G Major. 
 
-    These classes provide an interface to, and create and manipulate, the stored :class:`~music21.intervalNetwork.BoundIntervalNetwork` object. Thus, they are rarely created or manipulated directly by most users.
+    These classes provide an interface to, and create and manipulate, 
+    the stored :class:`~music21.intervalNetwork.BoundIntervalNetwork` 
+    object. Thus, they are rarely created or manipulated directly by 
+    most users.
 
-    The AbstractScale additionally stores an `_alteredDegrees` dictionary. Subclasses can define altered nodes in AbstractScale that are passed to the :class:`~music21.intervalNetwork.BoundIntervalNetwork`.
+    The AbstractScale additionally stores an `_alteredDegrees` dictionary. 
+    Subclasses can define altered nodes in AbstractScale that are passed 
+    to the :class:`~music21.intervalNetwork.BoundIntervalNetwork`.
 
     '''
     def __init__(self):
@@ -241,7 +258,10 @@ class AbstractScale(Scale):
 
     def getIntervals(self, stepOfPitch=None,      
          minPitch=None, maxPitch=None, direction=DIRECTION_ASCENDING, reverse=False):
-        '''Realize the abstract scale as a list of pitch objects, given a pitch object, the step of that pitch object, and a min and max pitch.
+        '''
+        Realize the abstract scale as a list of pitch 
+        objects, given a pitch object, the step of 
+        that pitch object, and a min and max pitch.
         '''
         if self._net is None:
             raise ScaleException('no network is defined.')
@@ -308,7 +328,9 @@ class AbstractScale(Scale):
 
     def nextPitch(self, pitchReference, nodeName, pitchOrigin,
              direction=DIRECTION_ASCENDING, stepSize=1, getNeighbor=True):
-        '''Expose functionality from :class:`~music21.intervalNetwork.BoundIntervalNetwork`, passing on the stored alteredDegrees dictionary.
+        '''
+        Expose functionality from :class:`~music21.intervalNetwork.BoundIntervalNetwork`, 
+        passing on the stored alteredDegrees dictionary.
         '''
         post = self._net.nextPitch(
             pitchReference=pitchReference, 
@@ -324,7 +346,8 @@ class AbstractScale(Scale):
 
     def getNewTonicPitch(self, pitchReference, nodeName, 
         direction=DIRECTION_ASCENDING, minPitch=None, maxPitch=None):
-        '''Define a pitch target and a node. 
+        '''
+        Define a pitch target and a node. 
         '''
         post = self._net.getPitchFromNodeDegree(
             pitchReference=pitchReference, 
@@ -340,7 +363,7 @@ class AbstractScale(Scale):
 
     #---------------------------------------------------------------------------
     def getScalaStorage(self, direction=DIRECTION_ASCENDING):
-        '''Get interval sequeeunce
+        '''Get interval sequence
         '''
         # get one octave of intervals
         ss = scala.ScalaStorage()
@@ -710,7 +733,14 @@ class AbstractCyclicalScale(AbstractScale):
 
 
 class AbstractOctaveRepeatingScale(AbstractScale):
-    '''A scale of any size built with an interval list that assumes octave completion. An additional interval to complete the octave will be added to the provided intervals. This does not guarantee that the octave will be repeated in one octave, only the next octave above the last interval will be provided. 
+    '''
+    A scale of any size built with an interval list 
+    that assumes octave completion. An additional 
+    interval to complete the octave will be added 
+    to the provided intervals. This does not guarantee 
+    that the octave will be repeated in one octave, 
+    only the next octave above the last interval will 
+    be provided. 
     '''
     def __init__(self, mode=None):
         AbstractScale.__init__(self)
@@ -971,9 +1001,15 @@ class AbstractWeightedHexatonicBlues(AbstractScale):
 
 #-------------------------------------------------------------------------------
 class ConcreteScale(Scale):
-    '''A concrete scale is specific scale formation with a defined pitch collection (a `tonic` Pitch) that may or may not be bound by specific range. For example, a specific Major Scale, such as G Major, from G2 to G4.
+    '''
+    A concrete scale is specific scale formation with 
+    a defined pitch collection (a `tonic` Pitch) that 
+    may or may not be bound by specific range. For 
+    example, a specific Major Scale, such as G 
+    Major, from G2 to G4.
 
-    This class is not generally used directly but is used as a base class for all concrete scales.
+    This class is not generally used directly but is used 
+    as a base class for all concrete scales.
     '''
 
     isConcrete = True
@@ -1004,7 +1040,9 @@ class ConcreteScale(Scale):
 
 
     def _isConcrete(self):
-        '''To be concrete, a Scale must have a defined tonic. An abstract Scale is not Concrete
+        '''
+        To be concrete, a Scale must have a 
+        defined tonic. An abstract Scale is not Concrete
         '''
         if self._tonic is None:
             return False
@@ -1077,7 +1115,8 @@ class ConcreteScale(Scale):
         return not self.__eq__(other)
 
     def _getName(self):
-        '''Return or construct the name of this scale
+        '''
+        Return or construct the name of this scale
         '''
         if self._tonic is None:
             return " ".join(['Abstract', self.type]) 
@@ -1182,7 +1221,9 @@ class ConcreteScale(Scale):
 
     def getPitches(self, minPitch=None, maxPitch=None, 
         direction=DIRECTION_ASCENDING):
-        '''Return a list of Pitch objects, using a deepcopy of a cached version if available. 
+        '''
+        Return a list of Pitch objects, using a 
+        deepcopy of a cached version if available. 
 
         '''
         # get from interval network of abstract scale
@@ -1219,20 +1260,28 @@ class ConcreteScale(Scale):
 
     def getChord(self, minPitch=None, maxPitch=None, 
         direction=DIRECTION_ASCENDING, **keywords):
-        '''Return a realized chord containing all the pitches in this scale within a particular inclusive range defined by two pitches.
+        '''
+        Return a realized chord containing all the 
+        pitches in this scale within a particular 
+        inclusive range defined by two pitches.
 
-        All keyword arguments are passed on to the Chord, permitting specification of `quarterLength` and similar parameters.
+        All keyword arguments are passed on to the 
+        Chord, permitting specification of 
+        `quarterLength` and similar parameters.
         '''
         from music21 import chord
         return chord.Chord(self.getPitches(minPitch=minPitch, maxPitch=maxPitch, direction=direction), **keywords)
 
     chord = property(getChord, 
-        doc = '''Return a Chord object form this harmony over a default range
+        doc = '''Return a Chord object from this harmony over a default range.  
+        Use the `getChord()` method if you need greater control over the
+        parameters of the chord.
         ''')
 
     def pitchFromDegree(self, degree, minPitch=None, maxPitch=None, 
         direction=DIRECTION_ASCENDING, equateTermini=True):        
-        '''Given a scale degree, return a deepcopy of the appropriate pitch. 
+        '''
+        Given a scale degree, return a deepcopy of the appropriate pitch. 
 
         >>> from music21 import *
         >>> sc = scale.MajorScale('e-')
@@ -1270,7 +1319,10 @@ class ConcreteScale(Scale):
 
     def pitchesFromScaleDegrees(self, degreeTargets, minPitch=None, 
         maxPitch=None, direction=DIRECTION_ASCENDING):        
-        '''Given one or more scale degrees, return a list of all matches over the entire range. 
+        '''
+        Given one or more scale degrees, return a list 
+        of all matches over the entire range. 
+
 
         >>> from music21 import *
         >>> sc = scale.MajorScale('e-')
@@ -1296,7 +1348,9 @@ class ConcreteScale(Scale):
 
     def intervalBetweenDegrees(self, degreeStart, degreeEnd, 
         direction=DIRECTION_ASCENDING, equateTermini=True):
-        '''Given two degrees, provide the interval
+        '''
+        Given two degrees, provide the interval as an interval.Interval object.
+
 
         >>> from music21 import *
         >>> sc = scale.MajorScale('e-')
@@ -1317,9 +1371,15 @@ class ConcreteScale(Scale):
 
     def getScaleDegreeFromPitch(self, pitchTarget, 
             direction=DIRECTION_ASCENDING, comparisonAttribute='name'):
-        '''For a given pitch, return the appropriate scale degree. If no scale degree is available, None is returned.
+        '''
+        For a given pitch, return the appropriate scale degree. 
+        If no scale degree is available, None is returned.
 
-        Note -- by default comparse on NAME not on PitchClass because this is used so commonly by tonal functions
+
+        Note -- by default it will find based on note name not on 
+        PitchClass because this is used so commonly by tonal functions.
+        So if it's important that D# and E- are the same, set the
+        comparisonAttribute to `pitchClass`
         
 
         >>> from music21 import *
@@ -1353,13 +1413,26 @@ class ConcreteScale(Scale):
 
     def next(self, pitchOrigin=None, direction='ascending', stepSize=1, 
         getNeighbor=True):
-        '''Get the next pitch given a `pitchOrigin` or None. If the `pitchOrigin` is None, the tonic pitch is returned. This is useful when starting a chain of iterative calls. 
+        '''
+        Get the next pitch above (or if direction is 'descending', below) 
+        a `pitchOrigin` or None. If the `pitchOrigin` is None, the tonic pitch is 
+        returned. This is useful when starting a chain of iterative calls. 
 
-        The `direction` attribute may be either ascending or descending. Default is `ascending`. Optionally, positive or negative integers may be provided as directional stepSize scalars.
 
-        An optional `stepSize` argument can be used to set the number of scle steps that are stepped through.
+        The `direction` attribute may be either ascending or descending. 
+        Default is `ascending`. Optionally, positive or negative integers 
+        may be provided as directional stepSize scalars.
 
-        The `getNeighbor` will return a pitch from the scale if `pitchOrigin` is not in the scale. This value can be True, 'ascending', or 'descending'.
+
+        An optional `stepSize` argument can be used to set the number 
+        of scale steps that are stepped through.  Thus, .next(stepSize=2)
+        will give not the next pitch in the scale, but the next after this one.
+        
+
+        The `getNeighbor` will return a pitch from the scale 
+        if `pitchOrigin` is not in the scale. This value can be 
+        True, 'ascending', or 'descending'.
+
 
         >>> from music21 import *
         >>> sc = scale.MajorScale('e-')
@@ -1369,6 +1442,16 @@ class ConcreteScale(Scale):
         G5
         >>> sc.next('e-6', stepSize=3)
         A-6
+        
+        
+        This uses the getNeighbor attribute to 
+        find the next note above f#5 in the E-flat
+        major scale:
+        
+        
+        >>> sc.next('f#5')
+        G5
+
 
         >>> from music21 import *
         >>> sc = scale.HarmonicMinorScale('g')
