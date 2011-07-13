@@ -2516,6 +2516,11 @@ class Test(unittest.TestCase):
 
 
 
+    def intervalMicrotonesB(self):
+        from music21 import interval, note
+        i = interval.notesToInterval(note.Note('c4'), note.Note('c#4'))
+        self.assertEqual(str(i), '<music21.interval.Interval A1>')
+
 
 
 #-------------------------------------------------------------------------------

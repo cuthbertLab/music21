@@ -288,6 +288,7 @@ class AbstractScale(Scale):
             else:
                 self.octaveDuplicating == False
         
+        environLocal.printDebug(['intervalList', intervalList])
         self._net = intervalNetwork.BoundIntervalNetwork(intervalList,
                     octaveDuplicating=self.octaveDuplicating)
 
@@ -3224,6 +3225,16 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         s.insert(0, p1)
         s.insert(0, p2)
         #s.show()
+
+
+    def testConcreteScaleA(self):
+        # testing of arbitrary concrete scales
+        from music21 import scale       
+        sc = scale.ConcreteScale(pitches = ["C#3", "E-3", "F3",
+"G3", "B3", "D~4", "F#4", "A4", "C#5"])
+        self.assertEqual(str(sc.getTonic()), 'C#3')
+        self.assertEqual(str(sc.pitches), '[C#4, E-4, F4, G4, B4, D~5, F#5, A5, C#6]')
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

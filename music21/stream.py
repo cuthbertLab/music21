@@ -6977,10 +6977,10 @@ class Stream(music21.Music21Object):
 
     #---------------------------------------------------------------------------
 
-    def _getMidiTracksPart(self, instObj=None):
-        '''Returns a :class:`music21.midi.base.MidiTrack` object based on the content of this Stream.
-        '''
-        return midiTranslate.streamToMidiTrack(self, instObj)
+#     def _getMidiTracksPart(self, instObj=None):
+#         '''Returns a :class:`music21.midi.base.MidiTrack` object based on the content of this Stream.
+#         '''
+#         return midiTranslate.streamToMidiTrack(self, instObj)
 
 #     def _setMidiTracksPart(self, mt, ticksPerQuarter=None, quantizePost=True):
 #         '''Given a MIDI track, configure a Stream.
@@ -6988,8 +6988,8 @@ class Stream(music21.Music21Object):
 #         # pass self as reference to configure this object
 #         midiTranslate.midiTrackToStream(mt, ticksPerQuarter, quantizePost, self)
 
-    def _getMidiTracks(self):
-        return midiTranslate.streamsToMidiTracks(self)
+#     def _getMidiTracks(self):
+#         return midiTranslate.streamsToMidiTracks(self)
 
 #     def _setMidiTracks(self, midiTracks, ticksPerQuarter=None):
 #         midiTranslate.midiTracksToStreams(midiTracks, 

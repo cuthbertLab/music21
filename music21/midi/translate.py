@@ -112,7 +112,8 @@ def _getStartEvents(mt=None, channel=1, instrumentObj=None):
 
     # additional allocation of instruments may happen elsewhere
     if instrumentObj is not None and instrumentObj.midiProgram is not None:
-        sub = instrumentToMidiEvents(instrumentObj, includeDeltaTime=True)
+        sub = instrumentToMidiEvents(instrumentObj, includeDeltaTime=True, 
+                                    channel=channel)
 #         for e in sub:
 #             e.time = 0
         events += sub
@@ -514,7 +515,7 @@ def instrumentToMidiEvents(inputM21, includeDeltaTime=True,
 
     events = []
     if includeDeltaTime:
-        dt = midiModule.DeltaTime(mt)
+        dt = midiModule.DeltaTime(mt, channel=channel)
         dt.time = 0
         events.append(dt)
 
@@ -841,27 +842,15 @@ def _streamToPackets(s, trackId=1):
     return packetsByOffset
 
 
-# what  we can do is keep a tuple for each moment in the offset map:
-# (channel, midi-patch, fractional-part-of-alter, free-after-offset) 
-# when we encounter a pitch object, we see what its midi-patch and
-# fractional-part-of-alter is,
-# then we see if there is already a channel that matches that.  If so, we assign
-# that channel to this note and if this note's endTime is > free-after-offset, we
-# set free-after-offset to be endTime.  If there isn't a channel for this
-# midi-patch/fpoa and there are channels free, then we add an entry for that
-# channel, send the midi patch change and pitch bend info to that channel and
-# update the free-after-offset time to be endTime.  If there are no channels
-# free, we find the first one whose free-after-offset < currentNote.offset and we
-
-def _processPackets(packets, channels=None):
+def _processPackets(packets, channelForInstrument={}, channelsDyanmic=[], 
+        initChannelForTrack={}):
     '''Given a list of packets, assign each to a channel. Do each track one at time, based on the track id. Shift to different channels if a pitch bend is necessary. Keep track of which channels are available. Need to insert a program change in the empty channel to based on last instrument. Insert pitch bend messages as well, one for start of event, one for end of event.
 
     The `channels` argument is a list of channels to use.
     '''
-    if channels is None:
-        # range starts at 1, not zero
-        allChannels = range(1, 10) + range(11, 17) # all but 10
-    usedChannels = {} # dict of (start, stop, usedChannel) : channel
+    #allChannels = range(1, 10) + range(11, 17) # all but 10
+
+    uniqueChannelEvents = {} # dict of (start, stop, usedChannel) : channel
     post = []
     usedTracks = []
 
@@ -871,6 +860,9 @@ def _processPackets(packets, channels=None):
         # must use trackId, as .track on MidiEvent is not yet set
         if p['trackId'] not in usedTracks:
             usedTracks.append(p['trackId'])
+
+        # set default channel for all packets
+        p['midiEvent'].channel = p['initChannel']
 
         # only need note_ons, as stored correspondingEvent attr can be used
         # to get noteOff
@@ -893,15 +885,6 @@ def _processPackets(packets, channels=None):
                     #environLocal.printDebug(['adding pitch bend', pBendEnd])
             continue # store and continue
 
-        # set default channel of 1
-        if p['midiEvent'].channel is None:
-            p['midiEvent'].channel = 1
-
-        #print p['midiEvent'], p
-        # if this note has a microtonal change, or if the channel of this
-        # event is being used by a sustained pitch-bent event
-        #if p['centShift'] is not None:
-
         # find a free channel       
         # if necessary, add pitch change at start of Note, 
         # cancel pitch change at end
@@ -911,11 +894,11 @@ def _processPackets(packets, channels=None):
         channelExclude = [] # channels that cannot be used
         centShift = p['centShift'] # may be None
 
-        #environLocal.printDebug(['\n\noffset', o, 'oEnd', oEnd, 'centShift', centShift])
+        environLocal.printDebug(['\n\noffset', o, 'oEnd', oEnd, 'centShift', centShift])
 
         # iterate through all past events/channels, and find all
         # that are active and have a pitch bend
-        for key in usedChannels.keys():
+        for key in uniqueChannelEvents.keys():
             start, stop, usedChannel = key
             # if offset (start time) is in this range of a found event
             # or if any start or stop is within this span
@@ -928,7 +911,7 @@ def _processPackets(packets, channels=None):
                 ) : 
                 # if there is a cent shift active in the already used channel
                 #environLocal.printDebug(['matchedOffset overlap'])
-                centShiftList = usedChannels[key]
+                centShiftList = uniqueChannelEvents[key]
                 if len(centShiftList) > 0:
                     # only add if unique
                     if usedChannel not in channelExclude:
@@ -941,21 +924,22 @@ def _processPackets(packets, channels=None):
                             # cannot break early w/o sorting
 
         # if no channels are excluded, get a new channel
-        #environLocal.printDebug(['channelExclude', channelExclude])
-        if channelExclude is not []: # only change if necessary
+        environLocal.printDebug(['post process channelExclude', channelExclude])
+        if len(channelExclude) > 0: # only change if necessary
             ch = None       
             # iterate in order over all channels: lower will be added first
-            for x in allChannels:
+            for x in channelsDyanmic:
                 if x not in channelExclude:
                     ch = x
                     break
             if ch is None:
                 raise TranslateException('no channels available for microtone')
             p['midiEvent'].channel = ch
-            # change channel of note off
+            # change channel of note off; this is used above to turn off pbend
             p['midiEvent'].correspondingEvent.channel = ch
         else: # use the existing channel
             ch = p['midiEvent'].channel
+        environLocal.printDebug(['assigning channel', ch, 'channelsDynamic', channelsDyanmic, "p['initChannel']", p['initChannel']])
 
         if centShift is not None:
             # add pitch bend
@@ -971,37 +955,39 @@ def _processPackets(packets, channels=None):
 
         # key includes channel, so that durations can span once in each channel
         key = (p['offset'], p['offset']+p['duration'], ch)
-        if key not in usedChannels.keys():
+        if key not in uniqueChannelEvents.keys():
             # need to count multiple instances of events on the same
             # span and in the same channel (fine if all have the same pitchbend
-            usedChannels[key] = [] 
+            uniqueChannelEvents[key] = [] 
         # always add the cent shift if it is not None
         if centShift is not None:
-            usedChannels[key].append(centShift)
+            uniqueChannelEvents[key].append(centShift)
         post.append(p) # add packet/ done after ch change or bend addition
-
-        #environLocal.printDebug(['usedChannels', usedChannels])
-
+        environLocal.printDebug(['uniqueChannelEvents', uniqueChannelEvents])
 
     # this is called once at completion
-    #environLocal.printDebug(['usedChannels', usedChannels])
+    #environLocal.printDebug(['uniqueChannelEvents', uniqueChannelEvents])
 
     # after processing, collect all channels used
     foundChannels = []
-    for start, stop, usedChannel in usedChannels.keys(): # a list
+    for start, stop, usedChannel in uniqueChannelEvents.keys(): # a list
         if usedChannel not in foundChannels:
             foundChannels.append(usedChannel)
 #         for ch in chList:
 #             if ch not in foundChannels:
 #                 foundChannels.append(ch)
-    #environLocal.printDebug(['foundChannels', foundChannels])
+    environLocal.printDebug(['foundChannels', foundChannels])
     #environLocal.printDebug(['usedTracks', usedTracks])
 
+
+    # post processing of entire packet collection
     # for all used channels, create a zero pitch bend at time zero
-    for ch in foundChannels:
-        trackId = usedTracks[0] # not sure what track to use
+    #for ch in foundChannels:
+    # for each track, places a pitch bend in its initChannel
+    for trackId in usedTracks:
+        ch = initChannelForTrack[trackId]
         # use None for track; will get updated later
-        me = midiModule.MidiEvent(track=None, type="PITCH_BEND", channel=ch)
+        me = midiModule.MidiEvent(track=trackId, type="PITCH_BEND", channel=ch)
         me.setPitchBend(0) 
         pBendEnd = _getPacket(trackId=trackId, 
             offset=0, midiEvent=me, obj=None, lastInstrument=None)
@@ -1024,10 +1010,12 @@ def _processPackets(packets, channels=None):
 
 
 
-def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None, channels=None):
+def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None):
     '''Given a list of packets, sort all packets and add proper delta times. Optionally filters packets by track Id. 
 
-    At this stage MIDI event objects have been created. The key process here is finding the adjacent time between events and adding DeltaTime events before each MIDI event. 
+    At this stage MIDI event objects have been created. The key process here is finding the adjacent time between events and adding DeltaTime events before each MIDI event.
+
+    Delta time channel values are derived from the the previous midi event. 
 
     If `trackIdFilter` is not None, process only packets with a matching track id. this can be used to filter out events associated with a track. 
     '''
@@ -1060,42 +1048,44 @@ def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None, channels=None):
     #environLocal.printDebug(['_packetsToEvents', 'total events:', len(events)])
     return events
 
-# TODO: use of this function should be removed. instead, use
+# DEPRECIATED: use of this function should be removed. instead, use
 # streamsToMidiTracks and get the first element of the list
 # this is necessary for allocating channels independent of track partitions
-def streamToMidiTrack(inputM21, instObj=None, trackId=1, channels=None):
-    '''Returns a :class:`music21.midi.base.MidiTrack` object based on the content of this Stream.
-
-    This assumes that this Stream has only one Part. For Streams that contain sub-streams, use streamToMidiTracks.
-
-    >>> from music21 import *
-    >>> s = stream.Stream()
-    >>> n = note.Note('g#')
-    >>> n.quarterLength = .5
-    >>> s.repeatAppend(n, 4)
-    >>> mt = streamToMidiTrack(s)
-    >>> len(mt.events)
-    22
-    '''
-    #environLocal.printDebug(['streamToMidiTrack()'])
-    s, instObj = _prepareStream(inputM21, instObj)
-    # assume one track per Stream
-    mt = midiModule.MidiTrack(trackId)
-
-    # gets track name from instrument object
-    mt.events += _getStartEvents(mt, channel=1, instrumentObj=instObj) 
-    # convert stream to packets, attaching track id
-    packets = _streamToPackets(s, trackId)
-    # routine that dynamically assigns channels and adds microtones and 
-    # program changes
-    packets = _processPackets(packets, channels=channels)
-    # here events are created
-    mt.events += _packetsToEvents(mt, packets, trackIdFilter=trackId)
-    # must update all events with a ref to this MidiTrack
-
-    mt.updateEvents()
-    mt.events += getEndEvents(mt)
-    return mt
+# def streamToMidiTrack(inputM21, instObj=None, trackId=1, channels=None):
+#     '''Returns a :class:`music21.midi.base.MidiTrack` object based on the content of this Stream.
+# 
+#     This assumes that this Stream has only one Part. For Streams that contain sub-streams, use streamsToMidiTracks.
+# 
+#     DEPRECIATED: use of this function should be removed. instead, use streamsToMidiTracks and get the first element of the list this is necessary for allocating channels independent of track partitions.
+# 
+#     >>> from music21 import *
+#     >>> s = stream.Stream()
+#     >>> n = note.Note('g#')
+#     >>> n.quarterLength = .5
+#     >>> s.repeatAppend(n, 4)
+#     >>> mt = streamsToMidiTracks(s)[0]
+#     >>> len(mt.events)
+#     22
+#     '''
+#     #environLocal.printDebug(['streamToMidiTrack()'])
+#     s, instObj = _prepareStream(inputM21, instObj)
+#     # assume one track per Stream
+#     mt = midiModule.MidiTrack(trackId)
+# 
+#     # gets track name from instrument object
+#     mt.events += _getStartEvents(mt, channel=1, instrumentObj=instObj) 
+#     # convert stream to packets, attaching track id
+#     packets = _streamToPackets(s, trackId)
+#     # routine that dynamically assigns channels and adds microtones and 
+#     # program changes
+#     packets = _processPackets(packets)
+#     # here events are created
+#     mt.events += _packetsToEvents(mt, packets, trackIdFilter=trackId)
+#     # must update all events with a ref to this MidiTrack
+# 
+#     mt.updateEvents()
+#     mt.events += getEndEvents(mt)
+#     return mt
 
 
 def packetsToMidiTrack(packets, trackId=1, channels=None):
@@ -1112,8 +1102,7 @@ def packetsToMidiTrack(packets, trackId=1, channels=None):
     # update based on primary ch   
     mt.events += _getStartEvents(mt, channel=primaryChannel) 
     # track id here filters 
-    mt.events += _packetsToEvents(mt, packets, trackIdFilter=trackId,         
-                    channels=channels)
+    mt.events += _packetsToEvents(mt, packets, trackIdFilter=trackId)
     # must update all events with a ref to this MidiTrack
     mt.updateEvents() # sets this track as .track for all events
     mt.events += getEndEvents(mt, channel=primaryChannel)
@@ -1329,26 +1318,7 @@ def streamsToMidiTracks(inputM21):
     # Streams that do not start at same time
 
     # temporary channel allocation
-    #channels = range(1,10) + range(11,17) # skip 10
-
-
-    # TODO: for each part, need to find what channels have been autoassigned, 
-    # and pass in a list of channels that are available for usage 
-    # pitch bend allocations will use up new channels; need to determine
-    # wich are free for each Stream
-
-#     trackCount = 1
-#     if s.hasPartLikeStreams():
-#         for obj in s.getElementsByClass('Stream'):
-#             mt = streamToMidiTrack(obj, instObj=None, trackId=trackCount)
-#             # and only allocate free channels
-#             #mt.setChannel(channels.pop(0))
-#             midiTracks.append(mt)
-#             trackCount += 1
-#     else: # just get this single stream
-#         mt = streamToMidiTrack(s, instObj=None, trackId=trackCount)
-#         midiTracks.append(mt)
-#     return midiTracks
+    allChannels = range(1, 10) + range(11, 17) # all but 10
 
     # store streams in uniform list
     procList = []
@@ -1360,44 +1330,103 @@ def streamsToMidiTracks(inputM21):
 
     # first, create all packets by track
     packetStorage = {}
+    allUniqueInstruments = [] # store program numbers
     trackCount = 1
     for s in procList:
         s = s.stripTies(inPlace=False, matchByPitch=False, 
             retainContainers=True)
         s = s.flat.sorted
-        # get a first instrument
+
+        # get a first instrument; iterate over rest
         iStream = s.getElementsByClass('Instrument')
         if len(iStream) > 0 and iStream[0].getOffsetBySite(s) == 0:
             instObj = iStream[0]
         else:
             instObj = None
+        # get all unique instrument ids
+        if len(iStream) > 0:
+            for i in iStream:
+                if i.midiProgram not in allUniqueInstruments:
+                    allUniqueInstruments.append(i.midiProgram)
+        else: # get None as a placeholder for detaul
+            if None not in allUniqueInstruments:
+                allUniqueInstruments.append(None)
 
         # store packets in dictionary; keys are trackids
         packetStorage[trackCount] = {}
-        packetStorage[trackCount]['packets'] = _streamToPackets(s, 
+        packetStorage[trackCount]['rawPackets'] = _streamToPackets(s, 
                                                trackId=trackCount)
         packetStorage[trackCount]['initInstrument'] = instObj
         trackCount += 1
 
+    channelForInstrument = {} # the instrument is the key
+    channelsDyanmic = [] # remaining channels
+    # create an entry for all unique instruments, assign channels
+    # for each instrument, assign a channel; if we go above 16, that is fine
+    # we just cannot use it and will take modulus later
+    channelsAssigned = []
+    for i, iPgm in enumerate(allUniqueInstruments): # values are program numbers
+        # the the key is the program number; the values is the start channel
+        if i < len(allChannels) - 1: # save at least on dynamic channel
+            channelForInstrument[iPgm] = allChannels[i]
+            channelsAssigned.append(allChannels[i])
+        else: # just use 1, and deal with the mess: cannot allocate
+            channelForInstrument[iPgm] = allChannels[0]
+            channelsAssigned.append(allChannels[0])
+            
+    # get the dynamic channels, or those not assigned
+    for ch in allChannels:
+        if ch not in channelsAssigned:
+            channelsDyanmic.append(ch)
+
+    environLocal.printDebug(['channelForInstrument', channelForInstrument, 'channelsDyanmic', channelsDyanmic, 'allChannels', allChannels, 'allUniqueInstruments', allUniqueInstruments])
+
+    initChannelForTrack = {}
+    # update packets with first channel
+    for key, bundle in packetStorage.items():
+        initChannelForTrack[key] = None # key is channel id
+        bundle['initChannel'] = None # set for bundle too
+        for p in bundle['rawPackets']:
+            # get instrument
+            instObj = bundle['initInstrument']
+
+            if instObj is None:
+                initCh = channelForInstrument[None]
+            else: # use midi program
+                initCh = channelForInstrument[instObj.midiProgram]
+            p['initChannel'] = initCh
+            # only set for bundle once
+            if bundle['initChannel'] is None:
+                bundle['initChannel'] = initCh
+                initChannelForTrack[key] = initCh
+
     # combine all packets for processing of channel allocation 
     netPackets = []
     for bundle in packetStorage.values():
-        netPackets += bundle['packets']
+        netPackets += bundle['rawPackets']
 
     # process all channel assignments for all packets together
-    netPackets = _processPackets(netPackets)
+    netPackets = _processPackets(netPackets, 
+        channelForInstrument=channelForInstrument, 
+        channelsDyanmic=channelsDyanmic, 
+        initChannelForTrack=initChannelForTrack)
 
-    environLocal.printDebug(['got netPackets:', len(netPackets), 'packetStorage keys', packetStorage.keys()])
+    environLocal.printDebug(['got netPackets:', len(netPackets), 'packetStorage keys (tracks)', packetStorage.keys()])
     # build each track, sorting out the appropriate packets based on track
     # ids
     for trackId in packetStorage.keys():   
+
+        initChannel = packetStorage[trackId]['initChannel']
         instObj = packetStorage[trackId]['initInstrument']
         # TODO: for a given track id, need to find start/end channel
         mt = midiModule.MidiTrack(trackId) 
-        mt.events += _getStartEvents(mt, channel=1, instrumentObj=instObj) 
-        mt.events += _packetsToEvents(mt, netPackets, 
-                    trackIdFilter=trackId, channels=None)
-        mt.events += getEndEvents(mt)
+        # need to pass preferred channel here
+        mt.events += _getStartEvents(mt, channel=initChannel, 
+                                    instrumentObj=instObj) 
+        # note that netPackets is must be passed here, and then be filtered
+        # packets have been added to net packets
+        mt.events += _packetsToEvents(mt, netPackets, trackIdFilter=trackId)
+        mt.events += getEndEvents(mt, channel=initChannel)
         mt.updateEvents()
     # need to filter out packets only for the desired tracks
         midiTracks.append(mt)
@@ -1546,16 +1575,16 @@ class Test(unittest.TestCase):
         s.insert(8, meter.TimeSignature('2/4'))
 
         
-        mt = streamToMidiTrack(s)
+        mt = streamsToMidiTracks(s)[0]
         #self.assertEqual(str(mt.events), match)
         self.assertEqual(len(mt.events), 92)
 
         #s.show('midi')
         
         # get and compare just the time signatures
-        mtAlt = streamToMidiTrack(s.getElementsByClass('TimeSignature'))
+        mtAlt = streamsToMidiTracks(s.getElementsByClass('TimeSignature'))[0]
 
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=''>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x03\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=3072, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x05\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=5120, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=''>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x03\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=3072, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x05\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=5120, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
         self.assertEqual(str(mtAlt.events), match)
 
 
@@ -1579,11 +1608,11 @@ class Test(unittest.TestCase):
         s.insert(3, key.KeySignature(-5))
         s.insert(8, key.KeySignature(6))
 
-        mt = streamToMidiTrack(s)
+        mt = streamsToMidiTracks(s)[0]
         self.assertEqual(len(mt.events), 98)
 
         #s.show('midi')
-        mtAlt = streamToMidiTrack(s.getElementsByClass('TimeSignature'))
+        mtAlt = streamsToMidiTracks(s.getElementsByClass('TimeSignature'))[0]
 
 
 
@@ -1598,13 +1627,13 @@ class Test(unittest.TestCase):
         mts = streamsToMidiTracks(soprano)[0] # get one
 
         # first note-on is not delayed, even w anacrusis
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=u'Soprano'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>]"""
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=u'Soprano'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>]"""
        
 
         self.assertEqual(str(mts.events[:5]), match)
 
         # first note-on is not delayed, even w anacrusis
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=u'Alto'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x01'>]"""
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=u'Alto'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x01'>]"""
 
         alto = s.parts['alto']
         mta = streamsToMidiTracks(alto)[0]
@@ -1619,7 +1648,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(mtList), 1)
 
         # its the same as before
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=u'Soprano'>, <MidiEvent DeltaTime, t=0, track=1, channel=None>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>]"""
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=u'Soprano'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>]"""
 
         self.assertEqual(str(mtList[0].events[:12]), match)
 
@@ -1706,7 +1735,7 @@ class Test(unittest.TestCase):
             s.insert(o, n)
             o = o + step
 
-        mt = streamToMidiTrack(s)
+        mt = streamsToMidiTracks(s)[0]
 
         #s.plot('pianoroll')
         #s.show('midi')
@@ -1731,7 +1760,7 @@ class Test(unittest.TestCase):
         s.insert(pos, note.Note('e'))
         s.insert(pos, note.Note('b'))
 
-        mt = streamToMidiTrack(s)
+        mt = streamsToMidiTracks(s)[0]
 
         #s.show('midi')
 
@@ -1810,11 +1839,8 @@ class Test(unittest.TestCase):
         s.insert(0, p1)
         s.insert(0, p2)
 
-        # TODO: this is not changing channels, likely due to non
-        # pitch shifted packets not looking to see if a pitichshift
-        # is in effect
         mts = streamsToMidiTracks(s)
-        self.assertEqual(mts[0].getChannels(),  [1, 2])
+        self.assertEqual(mts[0].getChannels(),  [1])
         self.assertEqual(mts[1].getChannels(),  [1, 2])
         #print mts
         #s.show('midi', app='Logic Express')
@@ -1826,7 +1852,7 @@ class Test(unittest.TestCase):
         s.insert(0, p1)
 
         mts = streamsToMidiTracks(s)
-        self.assertEqual(mts[0].getChannels(),  [1, 2])
+        self.assertEqual(mts[0].getChannels(),  [1])
         self.assertEqual(mts[1].getChannels(),  [1, 2])
 
 
@@ -1838,8 +1864,8 @@ class Test(unittest.TestCase):
         iList = [instrument.Harpsichord,  instrument.Viola, 
                     instrument.ElectricGuitar, instrument.Flute]
 
-        # number of notes, index
-        pmtr = [(8, .5, 'C2'), (4, 1, 'G3'), (16, .25, 'E4'), (6, .75, 'C6')]
+        # number of notes, ql, pitch
+        pmtr = [(8, 1, 'C6'), (4, 2, 'G3'), (2, 4, 'E4'), (6, 1.25, 'C5')]
 
         s = stream.Score()
         for i, inst in enumerate(iList):
@@ -1851,9 +1877,13 @@ class Test(unittest.TestCase):
                 p.append(note.Note(pitchName, quarterLength=ql))
             s.insert(0, p)
 
+        #s.show('midi')
         mts = streamsToMidiTracks(s)
-        #self.assertEqual(mts[0].getChannels(),  [1, 2])
-        #self.assertEqual(mts[1].getChannels(),  [1, 2])
+        #print mts[0]
+        self.assertEqual(mts[0].getChannels(),  [1])
+        self.assertEqual(mts[1].getChannels(),  [2])
+        self.assertEqual(mts[2].getChannels(),  [3])
+        self.assertEqual(mts[3].getChannels(),  [4])
 
 
 

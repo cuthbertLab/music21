@@ -124,7 +124,7 @@ class Instrument(music21.Music21Object):
     def autoAssignMidiChannel(self, usedChannels=[]):
         '''
         Assign an unused midi channel given a list of
-        used ones.
+        used channels.
 
         assigns the number to self.midiChannel and returns
         it as an int.
@@ -151,6 +151,7 @@ class Instrument(music21.Music21Object):
         Traceback (most recent call last):
         InstrumentException: we are out of midi channels! help!
         '''
+        # NOTE: this is used in musicxml output, not in midi output
         maxMidi = 16
         filter = []
         for e in usedChannels:
