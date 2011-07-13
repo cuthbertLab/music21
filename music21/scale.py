@@ -267,7 +267,8 @@ class AbstractScale(Scale):
         intervalList = []
         for i in range(len(pitchList) - 1):
             intervalList.append(interval.notesToInterval(pitchList[i], pitchList[i+1]))
-        if pitchList[-1].name == pitchList[0].name: # octave is given
+        if pitchList[-1].name == pitchList[0].name: # the completion of the scale has been given.
+            print ("hi %s " % pitchList)
             if abs(pitchList[-1].ps - pitchList[0].ps) == 12:
                 self.octaveDuplicating == True
             else:
@@ -309,10 +310,13 @@ class AbstractScale(Scale):
 
     def getRealization(self, pitchObj, stepOfPitch,      
          minPitch=None, maxPitch=None, direction=DIRECTION_ASCENDING, reverse=False):
-        '''Realize the abstract scale as a list of pitch objects, given a pitch object, the step of that pitch object, and a min and max pitch.
+        '''
+        Realize the abstract scale as a list of pitch objects, 
+        given a pitch object, the step of that pitch object, 
+        and a min and max pitch.
         '''
         if self._net is None:
-            raise ScaleException('no netowrk is defined.')
+            raise ScaleException('no BoundIntervalNetwork is defined by this "scale".')
 
         post = self._net.realizePitch(pitchObj, stepOfPitch, 
             minPitch=minPitch, maxPitch=maxPitch,
@@ -1095,11 +1099,13 @@ class ConcreteScale(Scale):
     
     
     >>> from music21 import *
-    >>> complexscale = scale.ConcreteScale(tonic = "E-3", pitches = ["C#3", "E-3", "F3", "G3", "B3", "D~4", "F#4", "A4", "C#5"])
+    >>> complexscale = scale.ConcreteScale(pitches = ["C#3", "E-3", "F3", "G3", "B3", "D~4", "F#4", "A4", "C#5"])
     >>> complexscale.getTonic()
-    E-3
+    C#3
     >>> complexscale.next("G3", direction=scale.DIRECTION_DESCENDING)
     F3
+    >>> complexscale.getPitches("C3","C7")
+    [A6, G6, F6, D#6, B5, G#5, E~5, C#5]
     >>> complexscale.getPitches("C7","C5")
     [A6, G6, F6, D#6, B5, G#5, E~5, C#5]
     
@@ -1120,11 +1126,6 @@ class ConcreteScale(Scale):
         # determine whether this is a limited range
         self.boundRange = False
 
-
-        if pitches is not None and common.isListLike(pitches) and len(pitches) > 0:
-            self._abstract = AbstractScale()
-            self._abstract.buildNetworkFromPitches(pitches)
-
         if tonic is None and pitches is not None and common.isListLike(pitches) and len(pitches) > 0:
             tonic = pitches[0]
 
@@ -1141,6 +1142,12 @@ class ConcreteScale(Scale):
         else: # assume this is a pitch object
             self._tonic = tonic
 
+        if pitches is not None and common.isListLike(pitches) and len(pitches) > 0:
+            self._abstract = AbstractScale()
+            self._abstract.buildNetworkFromPitches(pitches)
+            if tonic in pitches:
+                self._abstract.tonicDegree = pitches.index(tonic) + 1
+            
 
     def _isConcrete(self):
         '''

@@ -1516,11 +1516,18 @@ class BoundIntervalNetwork(IntervalNetwork):
 
     def realize(self, pitchReference, nodeId=None, minPitch=None, maxPitch=None, 
         direction=DIRECTION_ASCENDING, alteredDegrees={}, reverse=False):
-        '''Realize the nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
+        '''
+        Realize the nodes of this network based on a pitch assigned to a 
+        valid `nodeId`, where `nodeId` can be specified by integer 
+        (starting from 1) or key (a tuple of origin, destination keys). 
 
-        Without a min or max pitch, the given pitch reference is assigned to the designated node, and then both ascends to the terminus and descends to the terminus.
+        Without a min or max pitch, the given pitch reference is assigned 
+        to the designated node, and then both ascends to the terminus and 
+        descends to the terminus.
 
-        The `alteredDegrees` dictionary permits creating mappings between node degree and direction and :class:`~music21.interval.Interval` based transpositions. 
+        The `alteredDegrees` dictionary permits creating mappings between 
+        node degree and direction and :class:`~music21.interval.Interval` 
+        based transpositions. 
 
         Returns two lists, a list of pitches, and a list of Node keys. 
 
@@ -1669,7 +1676,10 @@ class BoundIntervalNetwork(IntervalNetwork):
     def realizePitch(self, pitchReference, nodeId=None, minPitch=None,
         maxPitch=None, direction=DIRECTION_ASCENDING, alteredDegrees={}, 
         reverse=False):
-        '''Realize the native nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
+        '''
+        Realize the native nodes of this network based on a pitch 
+        assigned to a valid `nodeId`, where `nodeId` can be specified by integer 
+        (starting from 1) or key (a tuple of origin, destination keys). 
 
         The nodeId, when a simple, linear network, can be used as a scale degree value starting from one.
 
@@ -1686,14 +1696,24 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net.realizePitch(pitch.Pitch('G3'), 7) # G3 is the seventh (scale) degree
         [A-2, B-2, C3, D-3, E-3, F3, G3, A-3]
 
-        >>> net.realizePitch(pitch.Pitch('G3'), 1) # seventh (scale) degree
-        [G3, A3, B3, C4, D4, E4, F#4, G4]
-
         >>> net.realizePitch(pitch.Pitch('f#3'), 1, 'f2', 'f3') 
         [E#2, F#2, G#2, A#2, B2, C#3, D#3, E#3]
 
         >>> net.realizePitch(pitch.Pitch('a#2'), 7, 'c6', 'c7') 
         [C#6, D#6, E6, F#6, G#6, A#6, B6]
+
+
+        Circle of fifths
+        
+
+        >>> edgeList = ['P5', 'P5', 'P5', 'P5', 'P5', 'P5', 'd6', 'P5', 'P5', 'P5', 'P5', 'P5']
+        >>> net5ths = BoundIntervalNetwork()
+        >>> net5ths.fillBiDirectedEdges(edgeList)
+        >>> net5ths.realizePitch(pitch.Pitch('C1'))
+        [C1, G1, D2, A2, E3, B3, F#4, D-5, A-5, E-6, B-6, F7, C8]
+        >>> net5ths.realizePitch(pitch.Pitch('C2'))
+        [C2, G2, D3, A3, E4, B4, F#5, D-6, A-6, E-7, B-7, F8, C9]
+
         '''
         return self.realize(pitchReference=pitchReference, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch, direction=direction, alteredDegrees=alteredDegrees, reverse=reverse)[0] # just return first component
 
