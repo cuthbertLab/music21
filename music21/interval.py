@@ -2521,6 +2521,9 @@ class Test(unittest.TestCase):
         i = interval.notesToInterval(note.Note('c4'), note.Note('c#4'))
         self.assertEqual(str(i), '<music21.interval.Interval A1>')
 
+        i = interval.notesToInterval(note.Note('c4'), note.Note('c~4'))
+        self.assertEqual(str(i), '<music21.interval.Interval A1>')
+
 
 
 #-------------------------------------------------------------------------------
