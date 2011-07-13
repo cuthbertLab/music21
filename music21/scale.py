@@ -3245,26 +3245,26 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         from music21 import scale       
         sc = scale.ConcreteScale(pitches = ["C#3", "E-3", "F3", "G3", "B3", "D~4", "F#4", "A4", "C#5"])
         self.assertEqual(str(sc.getTonic()), 'C#3')
-
+        
         self.assertEqual(sc.abstract.octaveDuplicating, False)
-
+        
         self.assertEqual(str(sc.pitches), 
             '[C#3, E-3, F3, G3, B3, D~4, F#4, A4, C#5]')
-
+        
         self.assertEqual(str(sc.getPitches('C#3', 'C#5')), 
             '[C#3, E-3, F3, G3, B3, D~4, F#4, A4, C#5]')
-
+        
         self.assertEqual(str(sc.getPitches('C#1', 'C#5')), 
             '[C#1, E-1, F1, G1, B1, D~2, F#2, A2, C#3, E-3, F3, G3, B3, D~4, F#4, A4, C#5]')
-
+        
         # a portio of the scale
         self.assertEqual(str(sc.getPitches('C#4', 'C#5')), 
             '[D~4, F#4, A4, C#5]')
-
+        
         self.assertEqual(str(sc.getPitches('C#7', 'C#5')), 
             '[C#7, A6, F#6, D~6, B5, G5, F5, E-5, C#5]')
-
-
+        
+        
         sc = scale.ConcreteScale(pitches = ["C#3", "E-3", "F3", "G3", "B3", "C#4"])
         self.assertEqual(str(sc.getTonic()), 'C#3')
         self.assertEqual(sc.abstract.octaveDuplicating, True)
