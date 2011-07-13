@@ -509,21 +509,18 @@ def chordToMidiFile(inputM21):
 #-------------------------------------------------------------------------------
 def instrumentToMidiEvents(inputM21, includeDeltaTime=True, 
                             midiTrack=None, channel=1):
-
     inst = inputM21
     mt = midiTrack # midi track 
-
     events = []
     if includeDeltaTime:
         dt = midiModule.DeltaTime(mt, channel=channel)
         dt.time = 0
         events.append(dt)
-
     me = midiModule.MidiEvent(mt)
     me.type = "PROGRAM_CHANGE"
     me.time = 0 
     me.channel = channel
-    me.data = inst.midiProgram
+    me.data = inst.midiProgram # key step
     events.append(me)
     return events
 
@@ -767,7 +764,7 @@ def _getPacket(trackId, offset, midiEvent, obj, lastInstrument=None):
     else: 
         post['duration'] = 0
 
-    # store last m21 instrument object
+    # store last m21 instrument object, as needed to reset program changes
     post['lastInstrument'] = lastInstrument
     return post
 
@@ -803,7 +800,7 @@ def _streamToPackets(s, trackId=1):
             sub = keySignatureToMidiEvents(obj, includeDeltaTime=False)
         # first instrument will have been gathered above with get start elements
         elif 'Instrument' in classes:
-            lastInstrument = obj
+            lastInstrument = obj # store last instrument
             sub = instrumentToMidiEvents(obj, includeDeltaTime=False)
         else: # other objects may have already been added
             continue
@@ -832,7 +829,8 @@ def _streamToPackets(s, trackId=1):
                 packets.append(p)
         packetsByOffset += packets
 
-    # sorting is not necessary here; remove after testing
+    # sorting is useful here, as we need these to be in order to assign last
+    # instrument
     packetsByOffset.sort(
         cmp=lambda x,y: cmp(x['offset'], y['offset']) or
                         cmp(x['midiEvent'].sortOrder, y['midiEvent'].sortOrder)
@@ -937,6 +935,20 @@ def _processPackets(packets, channelForInstrument={}, channelsDyanmic=[],
             p['midiEvent'].channel = ch
             # change channel of note off; this is used above to turn off pbend
             p['midiEvent'].correspondingEvent.channel = ch
+
+            # TODO: must add program change, as we are now in a new 
+            # channel; regardless of if we have a pitch bend (we may
+            # move channels for a different reason  
+            if p['lastInstrument'] is not None:
+                meList = instrumentToMidiEvents(inputM21=p['lastInstrument'], 
+                    includeDeltaTime=False, 
+                    midiTrack=p['midiEvent'].track, channel=ch)
+                pgmChangePacket = _getPacket(trackId=p['trackId'], 
+                    offset=o, midiEvent=meList[0], # keep offset here
+                    obj=None, lastInstrument=None)
+                post.append(pgmChangePacket)
+
+
         else: # use the existing channel
             ch = p['midiEvent'].channel
         environLocal.printDebug(['assigning channel', ch, 'channelsDynamic', channelsDyanmic, "p['initChannel']", p['initChannel']])
@@ -1886,7 +1898,33 @@ class Test(unittest.TestCase):
         self.assertEqual(mts[3].getChannels(),  [4])
 
 
+    def testMicrotonalOutputD(self):
+        # test instrument assignments with microtones
+        from music21 import instrument, stream, note
 
+        iList = [instrument.Harpsichord,  instrument.Viola, 
+                    instrument.ElectricGuitar, instrument.Flute]
+
+        # number of notes, ql, pitch
+        pmtr = [(8, 1, ['C6']), (4, 2, ['G3', 'G~3']), (2, 4, ['E4', 'E5']), (6, 1.25, ['C5'])]
+
+        s = stream.Score()
+        for i, inst in enumerate(iList):
+            p = stream.Part()
+            p.insert(0, inst()) # must call instrument to create instance
+
+            number, ql, pitchNameList = pmtr[i]
+            for j in range(number):
+                p.append(note.Note(pitchNameList[j%len(pitchNameList)], quarterLength=ql))
+            s.insert(0, p)
+
+        #s.show('midi')
+        mts = streamsToMidiTracks(s)
+        #print mts[0]
+        self.assertEqual(mts[0].getChannels(),  [1])
+        self.assertEqual(mts[1].getChannels(),  [2, 5])
+        self.assertEqual(mts[2].getChannels(),  [3, 6])
+        self.assertEqual(mts[3].getChannels(),  [4, 6])
 
         #s.show('midi')
 
