@@ -1090,6 +1090,21 @@ class ConcreteScale(Scale):
     >>> myscale.getPitches("E-5","G-7")
     [E-5, G-5, A5, C6, E-6, G-6, A6, C7, E-7, G-7]
     
+    
+    A scale that lasts two octaves and uses quarter tones (D~)
+    
+    
+    >>> from music21 import *
+    >>> complexscale = scale.ConcreteScale(tonic = "E-3", pitches = ["C#3", "E-3", "F3", "G3", "B3", "D~4", "F#4", "A4", "C#5"])
+    >>> complexscale.getTonic()
+    E-3
+    >>> complexscale.next("G3", direction=scale.DIRECTION_DESCENDING)
+    F3
+    >>> complexscale.getPitches("C7","C5")
+    [A6, G6, F6, D#6, B5, G#5, E~5, C#5]
+    
+    
+    
     '''
 
     isConcrete = True
@@ -1308,7 +1323,7 @@ class ConcreteScale(Scale):
 
 
     def getPitches(self, minPitch=None, maxPitch=None, 
-        direction=DIRECTION_ASCENDING):
+        direction=None):
         '''
         Return a list of Pitch objects, using a 
         deepcopy of a cached version if available. 
@@ -1327,10 +1342,23 @@ class ConcreteScale(Scale):
                 pitchObj = self._tonic
             stepOfPitch = self._abstract.tonicDegree
 
-            if direction == DIRECTION_DESCENDING:
+            if common.isStr(minPitch):
+                minPitch = pitch.Pitch(minPitch)
+            if common.isStr(maxPitch):
+                maxPitch = pitch.Pitch(maxPitch)
+            
+
+            if minPitch > maxPitch and direction is None:
+                reverse = True
+                (minPitch, maxPitch) = (maxPitch, minPitch)
+            elif direction == DIRECTION_DESCENDING:
                 reverse = True # reverse presentation so pitches go high to low
             else:
                 reverse = False
+
+            if direction is None:
+                direction = DIRECTION_ASCENDING
+
 
             # this creates new pitches on each call
             return self._abstract.getRealization(pitchObj, 
@@ -1560,7 +1588,7 @@ class ConcreteScale(Scale):
         # allow numerical directions
         if common.isNum(direction):
             if direction != 0:
-                # treat as a postive or negative step scalar
+                # treat as a positive or negative step scalar
                 if direction > 0:
                     stepScalar = direction
                     direction = DIRECTION_ASCENDING
@@ -3046,7 +3074,7 @@ class Test(unittest.TestCase):
         # degree 4 is always the blues note in this model
         self.assertEqual(str(sc.pitchFromDegree(4)), 'F#4')
 
-        # this should alway work, regardless of what scales is 
+        # this should always work, regardless of what scale is 
         # realized
         for trial in range(30):
             self.assertEqual(str(sc.next('f#3', 'ascending')) in ['G3', 'F#3'], True)
