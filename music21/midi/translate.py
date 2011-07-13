@@ -1830,6 +1830,29 @@ class Test(unittest.TestCase):
         self.assertEqual(mts[1].getChannels(),  [1, 2])
 
 
+
+    def testMicrotonalOutputC(self):
+        # test instrument assignments
+        from music21 import instrument, stream, note
+
+        iList = [instrument.Harpsichord,  instrument.Viola, 
+                    instrument.ElectricGuitar, instrument.Flute]
+
+        # number of notes, index
+        pmtr = [(8, .5, 'C2'), (4, 1, 'G3'), (16, .25, 'E4'), (6, .75, 'C6')]
+
+        s = stream.Score()
+        for i, inst in enumerate(iList):
+            p = stream.Part()
+            p.insert(0, inst()) # must call instrument to create instance
+
+            number, ql, pitchName = pmtr[i]
+            for j in range(number):
+                p.append(note.Note(pitchName, quarterLength=ql))
+            s.insert(0, p)
+
+        #s.show('midi')
+
 if __name__ == "__main__":
     music21.mainTest(Test)
 
