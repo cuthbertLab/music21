@@ -861,12 +861,14 @@ def _processPackets(packets, channels=None):
     if channels is None:
         # range starts at 1, not zero
         allChannels = range(1, 10) + range(11, 17) # all but 10
-    usedChannels = {} # dict of (start, stop) : channel
+    usedChannels = {} # dict of (start, stop, usedChannel) : channel
     post = []
     usedTracks = []
 
     for p in packets:
         #environLocal.printDebug(['_processPackets', p['midiEvent'].track, p['trackId']])
+
+        # must use trackId, as .track on MidiEvent is not yet set
         if p['trackId'] not in usedTracks:
             usedTracks.append(p['trackId'])
 
@@ -874,8 +876,8 @@ def _processPackets(packets, channels=None):
         # to get noteOff
         if p['midiEvent'].type not in ['NOTE_ON']:
             post.append(p) # add the non note_on packet first
-            # if this is a note off, and has a cent shift, need to add
-            # a pitch bend in reverse to that of the note on. 
+            # if this is a note off, and has a cent shift, need to 
+            # rest the pitch bend back to 0 cents
             if p['midiEvent'].type in ['NOTE_OFF']:
                 if p['centShift'] is not None:
                     # channels should be updated already
@@ -888,6 +890,7 @@ def _processPackets(packets, channels=None):
                         offset=p['offset'], midiEvent=me, 
                         obj=None, lastInstrument=None)
                     post.append(pBendEnd)
+                    #environLocal.printDebug(['adding pitch bend', pBendEnd])
             continue # store and continue
 
         # set default channel of 1
@@ -895,62 +898,102 @@ def _processPackets(packets, channels=None):
             p['midiEvent'].channel = 1
 
         #print p['midiEvent'], p
-        if p['centShift'] is not None:
-            # find a free channel       
-            # add pitch change at start of Note, cancel pitch change at end
-            o = p['offset']
-            channelExclude = [] # channels that cannot be used
-            # iterate through all, found any existing that last during this
-            # event
-            for key in usedChannels.keys():
-                start, stop = key
-                if o >= start and o < stop: # found an offset that is used
-                    channelExclude += usedChannels[key]
-                # cannot break early
-            # get a new channel if necessary
-            if channelExclude is not []: # only change if necessary
-                ch = None     
-                for x in allChannels:
-                    if x not in channelExclude:
-                        ch = x
-                        break
-                if ch is None:
-                    raise TranslateException('no channels available for microtone')
-                p['midiEvent'].channel = ch
-                # change channel of note off
-                p['midiEvent'].correspondingEvent.channel = ch
-            else: # use the existing channel
-                ch = p['midiEvent'].channel
+        # if this note has a microtonal change, or if the channel of this
+        # event is being used by a sustained pitch-bent event
+        #if p['centShift'] is not None:
 
+        # find a free channel       
+        # if necessary, add pitch change at start of Note, 
+        # cancel pitch change at end
+        o = p['offset']
+        oEnd = p['offset']+p['duration']
+
+        channelExclude = [] # channels that cannot be used
+        centShift = p['centShift'] # may be None
+
+        #environLocal.printDebug(['\n\noffset', o, 'oEnd', oEnd, 'centShift', centShift])
+
+        # iterate through all past events/channels, and find all
+        # that are active and have a pitch bend
+        for key in usedChannels.keys():
+            start, stop, usedChannel = key
+            # if offset (start time) is in this range of a found event
+            # or if any start or stop is within this span
+            #if o >= start and o < stop: # found an offset that is used
+
+            if ( (start >= o and start < oEnd) or
+                 (stop > o and stop < oEnd) or
+                 (start <= o and stop > o) or
+                 (start < oEnd and stop > oEnd)
+                ) : 
+                # if there is a cent shift active in the already used channel
+                #environLocal.printDebug(['matchedOffset overlap'])
+                centShiftList = usedChannels[key]
+                if len(centShiftList) > 0:
+                    # only add if unique
+                    if usedChannel not in channelExclude:
+                        channelExclude.append(usedChannel)
+                # or if this event has shift, then we can exclude
+                # the channel already used without a shift
+                elif centShift is not None:
+                    if usedChannel not in channelExclude:
+                        channelExclude.append(usedChannel)
+                            # cannot break early w/o sorting
+
+        # if no channels are excluded, get a new channel
+        #environLocal.printDebug(['channelExclude', channelExclude])
+        if channelExclude is not []: # only change if necessary
+            ch = None       
+            # iterate in order over all channels: lower will be added first
+            for x in allChannels:
+                if x not in channelExclude:
+                    ch = x
+                    break
+            if ch is None:
+                raise TranslateException('no channels available for microtone')
+            p['midiEvent'].channel = ch
+            # change channel of note off
+            p['midiEvent'].correspondingEvent.channel = ch
+        else: # use the existing channel
+            ch = p['midiEvent'].channel
+
+        if centShift is not None:
             # add pitch bend
             me = midiModule.MidiEvent(p['midiEvent'].track, 
                                     type="PITCH_BEND", channel=ch)
-            me.setPitchBend(p['centShift'])
+            me.setPitchBend(centShift)
             pBendStart = _getPacket(trackId=p['trackId'], 
                 offset=o, midiEvent=me, # keep offset here
                 obj=None, lastInstrument=None)
             post.append(pBendStart)
+            #environLocal.printDebug(['adding pitch bend', me])
             # removal of pitch bend will happen above with note off
 
-        else: # no cent shift; store existing channel
-            # channel here could be None; keep as is
-            ch = p['midiEvent'].channel
-
-        key = (p['offset'], p['offset']+p['duration'])
+        # key includes channel, so that durations can span once in each channel
+        key = (p['offset'], p['offset']+p['duration'], ch)
         if key not in usedChannels.keys():
-            usedChannels[key] = []
-        if ch not in usedChannels[key]:
-            usedChannels[key].append(ch)
-                            
+            # need to count multiple instances of events on the same
+            # span and in the same channel (fine if all have the same pitchbend
+            usedChannels[key] = [] 
+        # always add the cent shift if it is not None
+        if centShift is not None:
+            usedChannels[key].append(centShift)
         post.append(p) # add packet/ done after ch change or bend addition
 
+        #environLocal.printDebug(['usedChannels', usedChannels])
+
+
+    # this is called once at completion
     #environLocal.printDebug(['usedChannels', usedChannels])
 
+    # after processing, collect all channels used
     foundChannels = []
-    for chList in usedChannels.values(): # a list
-        for ch in chList:
-            if ch not in foundChannels:
-                foundChannels.append(ch)
+    for start, stop, usedChannel in usedChannels.keys(): # a list
+        if usedChannel not in foundChannels:
+            foundChannels.append(usedChannel)
+#         for ch in chList:
+#             if ch not in foundChannels:
+#                 foundChannels.append(ch)
     #environLocal.printDebug(['foundChannels', foundChannels])
     #environLocal.printDebug(['usedTracks', usedTracks])
 
@@ -963,12 +1006,15 @@ def _processPackets(packets, channels=None):
         pBendEnd = _getPacket(trackId=trackId, 
             offset=0, midiEvent=me, obj=None, lastInstrument=None)
         post.append(pBendEnd)
-
+        #environLocal.printDebug(['adding pitch bend for found channels', me])
     # this sort is necessary
     post.sort(
         cmp=lambda x,y: cmp(x['offset'], y['offset']) or
                         cmp(x['midiEvent'].sortOrder, y['midiEvent'].sortOrder)
         )
+
+    # TODO: for each track, add an additional silent event to make sure
+    # entire duration gets played
 
     # diagnostic display
     #for p in post: environLocal.printDebug(['proceessed packet', p])
@@ -1279,9 +1325,6 @@ def streamsToMidiTracks(inputM21):
     # return a list of MidiTrack objects
     midiTracks = []
 
-    # TODO: may add a conductor track that contains
-    # time signature, tempo, and other meta data
-
     # TODO: may need to shift all time values to accomodate 
     # Streams that do not start at same time
 
@@ -1315,7 +1358,7 @@ def streamsToMidiTracks(inputM21):
     else:
         procList.append(s) # add single
 
-    # first, create packets by track
+    # first, create all packets by track
     packetStorage = {}
     trackCount = 1
     for s in procList:
@@ -1336,7 +1379,7 @@ def streamsToMidiTracks(inputM21):
         packetStorage[trackCount]['initInstrument'] = instObj
         trackCount += 1
 
-    # combine all packets
+    # combine all packets for processing of channel allocation 
     netPackets = []
     for bundle in packetStorage.values():
         netPackets += bundle['packets']
@@ -1371,10 +1414,8 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
         s = stream.Score()
     else:
         s = inputM21
-
     # store common elements such as time sig, key sig from conductor
     conductorTrack = stream.Stream()
-
     for mt in midiTracks:
         # not all tracks have notes defined; only creates parts for those
         # that do
@@ -1504,13 +1545,16 @@ class Test(unittest.TestCase):
         s.insert(3, meter.TimeSignature('5/4'))
         s.insert(8, meter.TimeSignature('2/4'))
 
+        
         mt = streamToMidiTrack(s)
+        #self.assertEqual(str(mt.events), match)
         self.assertEqual(len(mt.events), 92)
 
         #s.show('midi')
         
         # get and compare just the time signatures
         mtAlt = streamToMidiTrack(s.getElementsByClass('TimeSignature'))
+
         match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=''>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x03\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=3072, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x05\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=5120, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
         self.assertEqual(str(mtAlt.events), match)
 
@@ -1763,16 +1807,27 @@ class Test(unittest.TestCase):
 
         # order here matters: this needs to be fixed
         s = stream.Score()
+        s.insert(0, p1)
+        s.insert(0, p2)
+
+        # TODO: this is not changing channels, likely due to non
+        # pitch shifted packets not looking to see if a pitichshift
+        # is in effect
+        mts = streamsToMidiTracks(s)
+        self.assertEqual(mts[0].getChannels(),  [1, 2])
+        self.assertEqual(mts[1].getChannels(),  [1, 2])
+        #print mts
+        #s.show('midi', app='Logic Express')
+        #s.show('midi')
+
+        # recreate with different order
+        s = stream.Score()
         s.insert(0, p2)
         s.insert(0, p1)
 
-        # TODO: this is not changing channels, likely due to non
-        # pitch shifted packets not looking to see if a tichshift
-        # is in effect
         mts = streamsToMidiTracks(s)
-        #s.show('midi', app='Logic Express')
-        s.show('midi')
-
+        self.assertEqual(mts[0].getChannels(),  [1, 2])
+        self.assertEqual(mts[1].getChannels(),  [1, 2])
 
 
 if __name__ == "__main__":

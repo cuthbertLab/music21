@@ -918,6 +918,14 @@ class MidiTrack(object):
         for e in self.events:
             e.channel = value
 
+    def getChannels(self):
+        '''Get all channels used in this Track.
+        '''
+        post = []
+        for e in self.events:
+            if e.channel not in post:
+                post.append(e.channel)
+        return post            
 
 
 class MidiFile(object):

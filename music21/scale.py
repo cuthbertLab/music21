@@ -2197,7 +2197,7 @@ class CyclicalScale(ConcreteScale):
 
 
 class ChromaticScale(ConcreteScale):
-    '''A concrete cyclical scale, based on a cycle of intervals. These intervals do not have to be octave completing, and thus may produce scales that do no
+    '''A concrete cyclical scale, based on a cycle of half steps. These intervals do not have to be octave completing, and thus may produce scales that do no
 
     >>> from music21 import *
     >>> sc = scale.ChromaticScale('g2') 
