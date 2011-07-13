@@ -1851,6 +1851,13 @@ class Test(unittest.TestCase):
                 p.append(note.Note(pitchName, quarterLength=ql))
             s.insert(0, p)
 
+        mts = streamsToMidiTracks(s)
+        self.assertEqual(mts[0].getChannels(),  [1, 2])
+        self.assertEqual(mts[1].getChannels(),  [1, 2])
+
+
+
+
         #s.show('midi')
 
 if __name__ == "__main__":
