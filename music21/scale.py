@@ -268,11 +268,15 @@ class AbstractScale(Scale):
         for i in range(len(pitchList) - 1):
             intervalList.append(interval.notesToInterval(pitchList[i], pitchList[i+1]))
         if pitchList[-1].name == pitchList[0].name: # the completion of the scale has been given.
-            print ("hi %s " % pitchList)
-            if abs(pitchList[-1].ps - pitchList[0].ps) == 12:
-                self.octaveDuplicating == True
+            #print ("hi %s " % pitchList)
+            # this scale is only octave duplicating if the top note is exactly
+            # 1 octave above the bottom; if it spans more thane one active, 
+            # all notes must be identical in each octave
+            #if abs(pitchList[-1].ps - pitchList[0].ps) == 12:
+            if (interval.notesToInterval(pitchList[0], pitchList[-1]).simpleName == 'P8'):
+                self.octaveDuplicating = True
             else:
-                self.octaveDuplicating == False
+                self.octaveDuplicating = False
         else:
             p = copy.deepcopy(pitchList[0])
             if pitchList[-1] > pitchList[0]: # ascending
@@ -1106,9 +1110,9 @@ class ConcreteScale(Scale):
     >>> complexscale.next("G3", direction=scale.DIRECTION_DESCENDING)
     F3
     >>> complexscale.getPitches("C3","C7")
-    [A6, G6, F6, D#6, B5, G#5, E~5, C#5]
+    [C#3, E-3, F3, G3, B3, D~4, F#4, A4, C#5, E-5, F5, G5, B5, D~6, F#6, A6]
     >>> complexscale.getPitches("C7","C5")
-    [A6, G6, F6, D#6, B5, G#5, E~5, C#5]
+    [A6, F#6, D~6, B5, G5, F5, E-5, C#5]
     
     
     
@@ -3233,8 +3237,27 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         sc = scale.ConcreteScale(pitches = ["C#3", "E-3", "F3",
 "G3", "B3", "D~4", "F#4", "A4", "C#5"])
         self.assertEqual(str(sc.getTonic()), 'C#3')
-        self.assertEqual(str(sc.pitches), '[C#4, E-4, F4, G4, B4, D~5, F#5, A5, C#6]')
 
+        self.assertEqual(sc.abstract.octaveDuplicating, False)
+
+        self.assertEqual(str(sc.pitches), 
+            '[C#3, E-3, F3, G3, B3, D~4, F#4, A4, C#5]')
+
+        self.assertEqual(str(sc.getPitches('C#3', 'C#5')), 
+            '[C#3, E-3, F3, G3, B3, D~4, F#4, A4, C#5]')
+
+        self.assertEqual(str(sc.getPitches('C#1', 'C#5')), 
+            '[C#1, E-1, F1, G1, B1, D~2, F#2, A2, C#3, E-3, F3, G3, B3, D~4, F#4, A4, C#5]')
+
+        # a portio of the scale
+        self.assertEqual(str(sc.getPitches('C#4', 'C#5')), 
+            '[D~4, F#4, A4, C#5]')
+
+        self.assertEqual(str(sc.getPitches('C#7', 'C#5')), 
+            '[C#7, A6, F#6, D~6, B5, G5, F5, E-5, C#5]')
+
+
+        
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
