@@ -353,11 +353,17 @@ class IntervalNetwork(object):
 
 
 class BoundIntervalNetwork(IntervalNetwork):
-    '''A graph of undefined Pitch nodes connected by a defined, ordered list of :class:`~music21.interval.Interval` objects as edges. 
+    '''
+    A graph of undefined Pitch nodes connected by a defined, 
+    ordered list of :class:`~music21.interval.Interval` objects as edges. 
 
-    An `octaveDuplicating` boolean, if defined, can be used to optimize pitch realization routines. 
 
-    The `deterministic` boolean, if defined, can be used to declare that there is no probabilistic or multi-pathway segments of this network. 
+    An `octaveDuplicating` boolean, if defined, can be used 
+    to optimize pitch realization routines. 
+
+
+    The `deterministic` boolean, if defined, can be used to declare that there 
+    is no probabilistic or multi-pathway segments of this network. 
     '''
 
     def __init__(self, edgeList=None, octaveDuplicating=False, 
@@ -431,9 +437,11 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 
     def fillBiDirectedEdges(self, edgeList):
-        '''Given an ordered list of bi-directed edges given as :class:`~music21.interval.Interval` 
+        '''
+        Given an ordered list of bi-directed edges given as :class:`~music21.interval.Interval` 
         specifications, create and define appropriate Nodes. This 
         assumes that all edges are bidirected and all all edges are in order.
+    
     
         >>> from music21 import *
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
@@ -444,12 +452,14 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net.degreeMin, net.degreeMax
         (1, 8)
 
+
         >>> # using another fill method creates a new network
         >>> net.fillBiDirectedEdges(['M3', 'M3', 'M3'])
         >>> net.realizePitch('g4')
         [G4, B4, D#5, G5]
         >>> net.degreeMin, net.degreeMax
         (1, 4)
+
 
         >>> net.fillBiDirectedEdges([interval.Interval('M3'), interval.Interval('M3'), interval.Interval('M3')])
         >>> net.realizePitch('c2')
@@ -491,7 +501,8 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 
     def fillDirectedEdges(self, ascendingEdgeList, descendingEdgeList):
-        '''Given two lists of edges, one for ascending :class:`~music21.interval.Interval` objects and 
+        '''
+        Given two lists of edges, one for ascending :class:`~music21.interval.Interval` objects and 
         another for  descending, construct appropriate Nodes and Edges.
 
         Note that the descending :class:`~music21.interval.Interval` ojbects should be given in ascending form. 

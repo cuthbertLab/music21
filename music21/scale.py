@@ -224,6 +224,73 @@ class AbstractScale(Scale):
         '''
         pass
 
+    def buildNetworkFromPitches(self, pitchList):
+        '''
+        Builds the network (list of motions) for an abstract scale from a list of pitch.Pitch objects.  If
+        the concluding note (usually the "octave") is not given, then it'll be created automatically.
+        
+        
+        Here we treat the augmented triad as a scale:
+        
+        
+        >>> from music21 import *
+        >>> p1 = pitch.Pitch("C4")
+        >>> p2 = pitch.Pitch("E4")
+        >>> p3 = pitch.Pitch("G#4")
+        >>> absc = scale.AbstractScale()
+        >>> absc.buildNetworkFromPitches([p1, p2, p3])
+        >>> absc.octaveDuplicating
+        True
+        >>> absc._net
+        <music21.intervalNetwork.BoundIntervalNetwork object at 0x...>
+        
+        
+        Now see it return a new "scale" of the augmentedTriad on D5
+        
+        
+        >>> absc._net.realizePitch('D5')
+        [D5, F#5, A#5, D6]
+        
+        '''
+        pitchListReal = []
+        for p in pitchList:
+            if common.isStr(p):
+                pitchListReal.append(pitch.Pitch(p))
+            elif hasattr(p, 'classes') and 'GeneralNote' in p.classes:
+                pitchListReal.append(p.pitch)
+            else: # assume this is a pitch object
+                pitchListReal.append(p)
+        pitchList = pitchListReal
+
+        if not common.isListLike(pitchList) or len(pitchList) < 1:
+            raise ScaleException("Cannot build a network from this pitch list: %s" % pitchList)
+        intervalList = []
+        for i in range(len(pitchList) - 1):
+            intervalList.append(interval.notesToInterval(pitchList[i], pitchList[i+1]))
+        if pitchList[-1].name == pitchList[0].name: # octave is given
+            if abs(pitchList[-1].ps - pitchList[0].ps) == 12:
+                self.octaveDuplicating == True
+            else:
+                self.octaveDuplicating == False
+        else:
+            p = copy.deepcopy(pitchList[0])
+            if pitchList[-1] > pitchList[0]: # ascending
+                while p.ps < pitchList[-1].ps:
+                    p.octave += 1
+            else:
+                while p.ps < pitchList[-1].ps:
+                    p.octave += -1
+            
+            intervalList.append(interval.notesToInterval(pitchList[-1], p))
+            if abs(p.ps - pitchList[0].ps) == 12:
+                self.octaveDuplicating == True
+            else:
+                self.octaveDuplicating == False
+        
+        self._net = intervalNetwork.BoundIntervalNetwork(intervalList,
+                    octaveDuplicating=self.octaveDuplicating)
+
+
 
     def getDegreeMaxUnique(self):
         '''Return the maximum number of scale steps, or the number to use as a 
@@ -1008,13 +1075,26 @@ class ConcreteScale(Scale):
     example, a specific Major Scale, such as G 
     Major, from G2 to G4.
 
-    This class is not generally used directly but is used 
-    as a base class for all concrete scales.
+    This class is can either be used directly or more
+    commonly as a base class for all concrete scales.
+    
+    Here we treat a diminished triad as a scale:
+    
+    
+    >>> from music21 import *
+    >>> myscale = scale.ConcreteScale(pitches = ["C4", "E-4", "G-4", "A4"])
+    >>> myscale.getTonic()
+    C4
+    >>> myscale.next("G-2")
+    A2
+    >>> myscale.getPitches("E-5","G-7")
+    [E-5, G-5, A5, C6, E-6, G-6, A6, C7, E-7, G-7]
+    
     '''
 
     isConcrete = True
 
-    def __init__(self, tonic=None):
+    def __init__(self, tonic=None, pitches = None):
         Scale.__init__(self)
 
         self.type = 'Concrete'
@@ -1022,8 +1102,16 @@ class ConcreteScale(Scale):
         # subclasses might use multiple abstract scales?
         self._abstract = None
 
-        # determine wether this is a limited range
+        # determine whether this is a limited range
         self.boundRange = False
+
+
+        if pitches is not None and common.isListLike(pitches) and len(pitches) > 0:
+            self._abstract = AbstractScale()
+            self._abstract.buildNetworkFromPitches(pitches)
+
+        if tonic is None and pitches is not None and common.isListLike(pitches) and len(pitches) > 0:
+            tonic = pitches[0]
 
         # here, tonic is a pitch
         # the abstract scale defines what step the tonic is expected to be 
@@ -1141,7 +1229,7 @@ class ConcreteScale(Scale):
         '''Return the tonic. 
 
         >>> from music21 import *
-        >>> sc = scale.ConcreteScale('e-4')
+        >>> sc = scale.ConcreteScale(tonic = 'e-4')
         >>> sc.getTonic()
         E-4
         '''
