@@ -44,11 +44,18 @@ class RepeatExpressionException(music21.Music21Exception):
 
 class RepeatExpression(RepeatMark, expressions.Expression):
     '''
-    This class models any mark added to a Score to mark repeat start and end points that are designated by text expressions or symbols.
+    This class models any mark added to a Score to mark 
+    repeat start and end points that are designated by 
+    text expressions or symbols.
 
-    Repeat(Barlin) objects are not RepeatExpression objects, but both are RepeatMark subclasses. 
+    Repeat(Barline) objects are not RepeatExpression objects, 
+    but both are RepeatMark subclasses. 
 
-    This class stores internally a :class:`~music21.expressions.TextExpression`. This object is used for rendering text output in translation. A properly configured TextExpression object can also be used to create an instance of a RepeatExpressions.
+    This class stores internally a 
+    :class:`~music21.expressions.TextExpression`. This object 
+    is used for rendering text output in translation. A 
+    properly configured TextExpression object can also be 
+    used to create an instance of a RepeatExpressions.
     '''
     def __init__(self):
         expressions.Expression.__init__(self)
@@ -142,7 +149,10 @@ class RepeatExpression(RepeatMark, expressions.Expression):
 
 
 class RepeatExpressionMarker(RepeatExpression):
-    '''Some repeat expressions are markers of positions in the score; these classes model those makers, such as Coda, Segno, and Fine.
+    '''
+    Some repeat expressions are markers of positions 
+    in the score; these classes model those makers, 
+    such as Coda, Segno, and Fine.
     '''
     def __init__(self):
         RepeatExpression.__init__(self)
@@ -203,7 +213,10 @@ class Fine(RepeatExpressionMarker):
 
 
 class RepeatExpressionCommand(RepeatExpression):
-    '''Some repeat expressions are commands, instructing the reader to go somewhere else. DaCapo and related are examples.
+    '''
+    Some repeat expressions are commands, instructing 
+    the reader to go somewhere else. DaCapo and 
+    related are examples.
     '''
     def __init__(self):
         RepeatExpression.__init__(self)
@@ -215,7 +228,11 @@ class RepeatExpressionCommand(RepeatExpression):
 
 
 class DaCapo(RepeatExpressionCommand):
-    '''The Da Capo command, indicating a return to the beginning and a continuation to the end. By default, `repeatAfterJump` is False, indicating that any repeats encountered on the Da Capo repeat not be repeated. 
+    '''
+    The Da Capo command, indicating a return to the beginning 
+    and a continuation to the end. By default, 
+    `repeatAfterJump` is False, indicating that any repeats 
+    encountered on the Da Capo repeat not be repeated. 
     '''
     def __init__(self, text=None):
         RepeatExpressionCommand.__init__(self)
@@ -228,7 +245,13 @@ class DaCapo(RepeatExpressionCommand):
 
 
 class DaCapoAlFine(RepeatExpressionCommand):
-    '''The Da Capo al Fine command, indicating a return to the beginning and a continuation to the :class:`~music21.repeat.Fine` object. By default, `repeatAfterJump` is False, indicating that any repeats encountered on the Da Capo repeat not be repeated. 
+    '''
+    The Da Capo al Fine command, indicating a return to 
+    the beginning and a continuation to the 
+    :class:`~music21.repeat.Fine` object. By default, 
+    `repeatAfterJump` is False, indicating that any 
+    repeats encountered on the Da Capo repeat not 
+    be repeated. 
 
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlFine()
@@ -244,7 +267,14 @@ class DaCapoAlFine(RepeatExpressionCommand):
 
 
 class DaCapoAlCoda(RepeatExpressionCommand):
-    '''The Da Capo al Coda command, indicating a return to the beginning and a continuation to the :class:`~music21.repeat.Coda` object. The music resumes at a second :class:`~music21.repeat.Coda` object. By default, `repeatAfterJump` is False, indicating that any repeats encountered on the Da Capo repeat not be repeated. 
+    '''
+    The Da Capo al Coda command, indicating a return 
+    to the beginning and a continuation to the 
+    :class:`~music21.repeat.Coda` object. The music 
+    resumes at a second :class:`~music21.repeat.Coda` 
+    object. By default, `repeatAfterJump` is False, 
+    indicating that any repeats encountered on the 
+    Da Capo repeat not be repeated. 
 
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlCoda() 
@@ -260,7 +290,8 @@ class DaCapoAlCoda(RepeatExpressionCommand):
 
 
 class AlSegno(RepeatExpressionCommand):
-    '''Jump to the sign. Presumably a forward jump, not a repeat.
+    '''
+    Jump to the sign. Presumably a forward jump, not a repeat.
 
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlFine()
@@ -275,7 +306,11 @@ class AlSegno(RepeatExpressionCommand):
 
 
 class DalSegno(RepeatExpressionCommand):
-    '''The Dal Segno command, indicating a return to the segno and a continuation to the end. By default, `repeatAfterJump` is False, indicating that any repeats encountered on the Da Capo repeat not be repeated. 
+    '''
+    The Dal Segno command, indicating a return to the segno 
+    and a continuation to the end. By default, `repeatAfterJump` 
+    is False, indicating that any repeats encountered on 
+    the Da Capo repeat not be repeated. 
 
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlFine()
@@ -289,7 +324,12 @@ class DalSegno(RepeatExpressionCommand):
             self.setText(self._textAlternatives[0])
 
 class DalSegnoAlFine(RepeatExpressionCommand):
-    '''The Dal Segno al Fine command, indicating a return to the segno and a continuation to the :class:`~music21.repeat.Fine` object. By default, `repeatAfterJump` is False, indicating that any repeats encountered on the Dal Segno repeat not be repeated. 
+    '''
+    The Dal Segno al Fine command, indicating a return to the 
+    segno and a continuation to the :class:`~music21.repeat.Fine` 
+    object. By default, `repeatAfterJump` is False, indicating 
+    that any repeats encountered on the Dal Segno repeat not 
+    be repeated. 
 
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlFine()
@@ -303,7 +343,13 @@ class DalSegnoAlFine(RepeatExpressionCommand):
             self.setText(self._textAlternatives[0])
 
 class DalSegnoAlCoda(RepeatExpressionCommand):
-    '''The Dal Segno al Coda command, indicating a return to the beginning and a continuation to the :class:`~music21.repeat.Coda` object. The music resumes at a second :class:`~music21.repeat.Coda` object. By default, `repeatAfterJump` is False, indicating that any repeats encountered on the Da Segno repeat not be repeated. 
+    '''
+    The Dal Segno al Coda command, indicating a return to the 
+    beginning and a continuation to the :class:`~music21.repeat.Coda` 
+    object. The music resumes at a second 
+    :class:`~music21.repeat.Coda` object. By default, 
+    `repeatAfterJump` is False, indicating that any repeats encountered 
+    on the Da Segno repeat not be repeated. 
 
     >>> from music21 import *
     >>> rm = repeat.DaCapoAlCoda() 
@@ -355,9 +401,14 @@ class ExpanderException(Exception):
     pass
 
 class Expander(object):
-    '''Expand a single Part or Part-like Stream with repeats. Nested repeats given with :class:`~music21.bar.Repeat` objects, or repeats and sections designated with :class:`~music21.repeat.RepeatExpression` objects, are all expanded.
+    '''
+    Expand a single Part or Part-like Stream with repeats. Nested 
+    repeats given with :class:`~music21.bar.Repeat` objects, or 
+    repeats and sections designated with 
+    :class:`~music21.repeat.RepeatExpression` objects, are all expanded.
 
-    This class is a utility processor. Direct usage is more commonly from the :meth:`~music21.stream.Stream.expandRepeats` method.
+    This class is a utility processor. Direct usage is more commonly 
+    from the :meth:`~music21.stream.Stream.expandRepeats` method.
     '''
     def __init__(self, streamObj):
         self._src = streamObj
@@ -394,7 +445,9 @@ class Expander(object):
 
 
     def _stripRepeatBarlines(self, m, newStyle='light-light'):
-        '''Given a measure, strip barlines if they are repeats, and replace with Barlines that are of the same style. Modify in place.
+        '''
+        Given a measure, strip barlines if they are repeats, and 
+        replace with Barlines that are of the same style. Modify in place.
         '''
         # bar import repeat to make Repeat inherit from RepeatMark
         from music21 import bar
@@ -407,7 +460,9 @@ class Expander(object):
             m.rightBarline = bar.Barline(newStyle)
 
     def _stripRepeatExpressions(self, streamObj):
-        '''Given a Stream of measures or a Measure, strip all RepeatExpression objects in place.
+        '''
+        Given a Stream of measures or a Measure, strip all RepeatExpression 
+        objects in place.
         '''
         if not streamObj.hasMeasures():
             # it probably is a measure; place in temporary containers
@@ -422,7 +477,8 @@ class Expander(object):
                 m.remove(e)
 
     def _repeatBarsAreCoherent(self):
-        '''Check that all repeat bars are paired properly.
+        '''
+        Check that all repeat bars are paired properly.
         '''
         startCount = 0
         endCount = 0
@@ -464,7 +520,10 @@ class Expander(object):
 
 
     def _daCapoOrSegno(self):
-        '''Return a DaCapo if this is any form of DaCapo; return a Segno if this is any form of Segno. Return None if incoherent.
+        '''
+        Return a DaCapo if this is any form of DaCapo; return 
+        a Segno if this is any form of Segno. Return None if 
+        incoherent.
         '''
         sumDc = self._dcCount + self._dcafCount + self._dcacCount
         # for now, only accepting one segno
@@ -479,7 +538,10 @@ class Expander(object):
             return None
         
     def _getRepeatExpressionCommandType(self):
-        '''Return the class of the repeat expression command. This should only be called if it has been determine that there is one repeat command in this Stream.
+        '''
+        Return the class of the repeat expression command. This should 
+        only be called if it has been determine that there is one 
+        repeat command in this Stream.
         '''
         if self._dcCount == 1:
             return 'DaCapo'
@@ -569,9 +631,14 @@ class Expander(object):
 
 
     def _groupRepeatBracketIndices(self, streamObj):
-        '''Return a list of dictionaries that contains two entries: one for all indices that are involved with a collection of repeat bracket, and the repeat brackets themselves.
+        '''
+        Return a list of dictionaries that contains two 
+        entries: one for all indices that are involved with 
+        a collection of repeat bracket, and the repeat brackets 
+        themselves.
 
-        This is used to handle when there are more than one group of repeat brackets per Stream. 
+        This is used to handle when there are more than 
+        one group of repeat brackets per Stream. 
         ''' 
         groups = []
         mEnumerated = [x for x in enumerate(streamObj)]
@@ -682,7 +749,9 @@ class Expander(object):
 
 
     def _hasRepeat(self, streamObj):
-        '''Return True if this Stream of Measures has a repeat pair left to process.
+        '''
+        Return True if this Stream of Measures has a repeat 
+        pair still to process.
         '''
         #environLocal.printDebug(['hasRepeat', streamObj])
         for i in range(len(streamObj)):
@@ -701,9 +770,11 @@ class Expander(object):
 
     
     def _findInnermostRepeatIndices(self, streamObj):
-        '''Find the innermost repeat bars. Return raw index values.
+        '''
+        Find the innermost repeat bars. Return raw index values.
         For a single measure, this could be [2, 2]
         For many contiguous measures, this might be [2, 3, 4, 5]
+
 
         The provided Stream must be a Stream only of Measures. 
         '''
@@ -744,9 +815,16 @@ class Expander(object):
 
 
     def _getEndRepeatBar(self, streamObj, index):
-        '''Get the last measure to be processed in the repeat, as well as the measure that has the end barline. These may not be the same: if an end repeat bar is placed on the left of a measure that is not actually being copied. 
+        '''
+        Get the last measure to be processed in the repeat, 
+        as well as the measure that has the end barline. 
+        These may not be the same: if an end repeat bar is 
+        placed on the left of a measure that is not actually 
+        being copied. 
 
-        The `index` parameter is the index of the last measure to be copied. The streamObj must only have Measures. 
+
+        The `index` parameter is the index of the last 
+        measure to be copied. The streamObj must only have Measures. 
         '''
         mLast = streamObj[index]
         rb = mLast.rightBarline
@@ -775,11 +853,16 @@ class Expander(object):
 
     def _processInnermostRepeatBars(self, streamObj, repeatIndices=None, 
         repeatTimes=None, returnExpansionOnly=False):
-        '''Process and return a new Stream of Measures, likely a Part.
+        '''
+        Process and return a new Stream of Measures, likely a Part.
 
-        If `repeatIndices` are given, only these indices will be copied. All inclusive indices must be listed, not just the start and end.
 
-        If `returnExpansionOnly` is True, only the expanded portion is returned, the rest of the Stream is not retained. 
+        If `repeatIndices` are given, only these indices will be copied. 
+        All inclusive indices must be listed, not just the start and end.
+
+
+        If `returnExpansionOnly` is True, only the expanded portion is 
+        returned, the rest of the Stream is not retained. 
         '''
         # get class from src
         new = streamObj.__class__()
@@ -878,9 +961,14 @@ class Expander(object):
 
     def _processInnermostRepeatsAndBrackets(self, streamObj, 
         repeatBracketsMemo=None):
-        '''Return a new complete Stream with repeats and brackets expanded.
+        '''
+        Return a new complete Stream with repeats and brackets 
+        expanded.
 
-        The `repeatBracketsMemo` is a dictionary that stores id(rb): rb entries for all RepeatBrackets.
+
+        The `repeatBracketsMemo` is a dictionary that stores 
+        id(rb): rb entries for all RepeatBrackets.
+
 
         This is not recursively applied.
         '''
@@ -1020,7 +1108,10 @@ class Expander(object):
 
 
     def _getRepeatExpressionIndex(self, streamObj, target):
-        '''Return a list of index position of a Measure given a stream of measures. This requires the provided stream to only have measures. 
+        '''
+        Return a list of index position of a Measure given a 
+        stream of measures. This requires the provided stream 
+        to only have measures. 
         '''
         post = []
         for i, m in enumerate(streamObj):
@@ -1036,7 +1127,10 @@ class Expander(object):
 
 
     def isExpandable(self):
-        '''Return True or False if this Stream is expandable, that is, if it has balanced repeats or sensible da copo or dal segno indications. 
+        '''
+        Return True or False if this Stream is expandable, that is, 
+        if it has balanced repeats or sensible da copo or dal segno
+        indications. 
         '''
         match = self._daCapoOrSegno()
         # if neither repeats nor segno/capo, than not expandable
@@ -1066,7 +1160,9 @@ class Expander(object):
 
 
     def _processRecursiveRepeatBars(self, streamObj):
-        '''Recursively expand any number of nested repeat bars. Will also expand all repeat brackets.
+        '''
+        Recursively expand any number of nested repeat bars. 
+        Will also expand all repeat brackets.
         '''
         # this assumes just a stream of measures
         # assume already copied
@@ -1089,10 +1185,9 @@ class Expander(object):
 
 
     def _processRepeatExpressionAndRepeats(self, streamObj):
-        '''Process and return a new Stream of Measures, likely a Part.
+        '''
+        Process and return a new Stream of Measures, likely a Part.
         Expand any repeat expressions found within.
-
-        streamObj 
         '''
         # should already be a stream of measures
         # assume already copied
@@ -1181,7 +1276,10 @@ class Expander(object):
 
 
     def process(self):
-        '''Process all repeats. Note that this processing only happens for Measures contained in the given Stream. Other objects in that Stream are neither processed nor copied. 
+        '''
+        Process all repeats. Note that this processing only 
+        happens for Measures contained in the given Stream. 
+        Other objects in that Stream are neither processed nor copied. 
         '''
         if not self.isExpandable():
             raise ExpanderException('cannot expand Stream: badly formed repeats or repeat expressions')
