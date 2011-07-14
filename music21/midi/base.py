@@ -927,6 +927,16 @@ class MidiTrack(object):
                 post.append(e.channel)
         return post            
 
+    def getProgramChanges(self):
+        '''Get all unique program changes used in this Track, sorted.
+        '''
+        post = []
+        for e in self.events:
+            if e.type == 'PROGRAM_CHANGE':
+                if e.data not in post:
+                    post.append(e.data)
+        return post            
+
 
 class MidiFile(object):
     '''

@@ -111,26 +111,13 @@ def _getStartEvents(mt=None, channel=1, instrumentObj=None):
     events.append(me)
 
     # additional allocation of instruments may happen elsewhere
+    # this may lead to two program changes happening at time zero
+    # however, this assures that the program change happens before the 
+    # the clearing of the pitch bend data
     if instrumentObj is not None and instrumentObj.midiProgram is not None:
         sub = instrumentToMidiEvents(instrumentObj, includeDeltaTime=True, 
                                     channel=channel)
-#         for e in sub:
-#             e.time = 0
         events += sub
-
-#         dt = DeltaTime(mt)
-#         dt.time = 0
-#         events.append(dt)
-#     
-#         environLocal.printDebug(['adding program change: %s' % partProgram])
-#         me = MidiEvent(mt)
-#         me.type = "PROGRAM_CHANGE"
-#         me.time = 0 
-#         me.channel = 1
-#         me.data = partProgram
-#         events.append(me)
-
-    #environLocal.printDebug(['got start events', events])
 
     return events
 
@@ -1922,9 +1909,17 @@ class Test(unittest.TestCase):
         mts = streamsToMidiTracks(s)
         #print mts[0]
         self.assertEqual(mts[0].getChannels(),  [1])
+        self.assertEqual(mts[0].getProgramChanges(),  [6])
+
         self.assertEqual(mts[1].getChannels(),  [2, 5])
+        self.assertEqual(mts[1].getProgramChanges(),  [41])
+
         self.assertEqual(mts[2].getChannels(),  [3, 6])
+        self.assertEqual(mts[2].getProgramChanges(),  [26])
+        #print mts[2]
+
         self.assertEqual(mts[3].getChannels(),  [4, 6])
+        self.assertEqual(mts[3].getProgramChanges(),  [73])
 
         #s.show('midi')
 
