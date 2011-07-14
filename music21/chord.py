@@ -373,6 +373,7 @@ class Chord(note.NotRest):
             self._chordTablesAddressNeedsUpdating = True
         self._pitches = []
         # assume we have pitch objects here
+        # TODO: individual ties are not being retained here
         for p in value:
             self._pitches.append({'pitch':p})
 

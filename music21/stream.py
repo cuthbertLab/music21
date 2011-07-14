@@ -6977,37 +6977,6 @@ class Stream(music21.Music21Object):
 
     #---------------------------------------------------------------------------
 
-#     def _getMidiTracksPart(self, instObj=None):
-#         '''Returns a :class:`music21.midi.base.MidiTrack` object based on the content of this Stream.
-#         '''
-#         return midiTranslate.streamToMidiTrack(self, instObj)
-
-#     def _setMidiTracksPart(self, mt, ticksPerQuarter=None, quantizePost=True):
-#         '''Given a MIDI track, configure a Stream.
-#         '''
-#         # pass self as reference to configure this object
-#         midiTranslate.midiTrackToStream(mt, ticksPerQuarter, quantizePost, self)
-
-#     def _getMidiTracks(self):
-#         return midiTranslate.streamsToMidiTracks(self)
-
-#     def _setMidiTracks(self, midiTracks, ticksPerQuarter=None):
-#         midiTranslate.midiTracksToStreams(midiTracks, 
-#             ticksPerQuarter=ticksPerQuarter, inputM21=self)
-
-
-#     midiTracks = property(_getMidiTracks, _setMidiTracks, 
-#         doc='''Get or set this Stream from a list of :class:`music21.midi.base.MidiTracks` objects.
-# 
-#         >>> from music21 import *
-#         >>> s = stream.Stream()
-#         >>> n = note.Note('g#3')
-#         >>> n.quarterLength = .5
-#         >>> s.repeatAppend(n, 6)
-#         >>> len(s.midiTracks[0].events)
-#         30
-#         ''')
-
     def _getMidiFile(self):
         '''Return a complete :class:`music21.midi.base.MidiFile` object based on the Stream.
 
@@ -7218,7 +7187,8 @@ class Stream(music21.Music21Object):
             # case of a Note or note-like object
             if hasattr(e, "pitch"):
                 post.append(e.pitch)
-            # both Chords and Stream have a pitches properties            
+            # both Chords and Stream have a pitches properties; this just
+            # causes a recursive pitch gatherns            
             elif hasattr(e, "pitches"):
                 for thisPitch in e.pitches:
                     post.append(thisPitch)
@@ -7231,13 +7201,13 @@ class Stream(music21.Music21Object):
         Returns all :class:`~music21.pitch.Pitch` objects found in any 
         element in the Stream as a Python List. Elements such as 
         Streams, and Chords will have their Pitch objects accumulated as 
-        well. For that reason, a flat representation may not be required. 
+        well. For that reason, a flat representation is not required. 
 
 
         Pitch objects are returned in a List, not a Stream.  This usage
-        differs from the notes property, but makes sense since Pitch
-        objects are usually durationless.  (That's the main difference
-        between them and :class:`music21.note.Note` objects)
+        differs from the .notes property, but makes sense since Pitch
+        objects usually have by default a Duration of zero. This is an important difference
+        between them and :class:`music21.note.Note` objects.
 
 
         >>> from music21 import corpus

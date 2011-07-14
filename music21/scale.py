@@ -1323,6 +1323,47 @@ class ConcreteScale(Scale):
         # may need to clear cache here
         return post
 
+    def tune(self, streamObj, minPitch=None, maxPitch=None, direction=None):
+        '''Given a Stream object containing Pitches, match all pitch names and or pitch space values and replace the target pitch with copies of pitches stored in this scale.
+
+        This is always applied recursively to all sub-Streams. 
+        '''
+        # we may use a directed or subset of the scale to tune
+        # in the future, we might even match contour or direction
+        pitchColl = self.getPitches(minPitch=minPitch, maxPitch=maxPitch,
+                    direction=direction)
+        pitchCollNames = [p.name for p in pitchColl]
+        #for p in streamObj.pitches: # this is always recursive
+        for e in streamObj.flat.notes: # get notes and chords
+
+            if e.isChord:
+                src = e.pitches
+            else:
+                src = [e.pitch]
+
+            dst = [] # store dst in a list of resetting chord pitches
+            for p in src:
+                # some pitches might be quarter / 3/4 tones; need to convert
+                # these to microtonal representations so that we can directly
+                # compare pitch names
+                pAlt = p.convertQuarterTonesToMicrotones(inPlace=False)
+                # need to permit enharmonic comparisons: G# and A- should 
+                # in most cases match
+                if pAlt.name in pitchCollNames:
+                    # get the index from the names and extract the pitch
+                    pDst = pitchColl[pitchCollNames.index(p.name)]
+                    # get a deep copy for each note
+                    dst.append(copy.deepcopy(pDst))    
+            # reassign the changed pitch
+            if len(dst) > 0:
+                if e.isChord:
+                    # note: we may not have matched all pitches
+                    e.pitches = dst
+                else: # only one
+                    e.pitch = dst[0]
+
+
+
     def romanNumeral(self, degree):
         '''Return a RomanNumeral object built on the specified scale degree.
 
@@ -3270,7 +3311,28 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         self.assertEqual(sc.abstract.octaveDuplicating, True)
 
 
+
+    def testTuneA(self):
         
+        # fokker_12.scl  Fokker's 7-limit 12-tone just scale
+        # pyth_12.scl                    12  12-tone Pythagorean scale
+        from music21 import corpus, scale
+
+        s = corpus.parse('bwv66.6')
+        p1 = s.parts[0]
+        #p1.show('midi')
+
+        self.assertEqual(str(p1.pitches), '[C#5, B4, A4, B4, C#5, E5, C#5, B4, A4, C#5, A4, B4, G#4, F#4, A4, B4, B4, F#4, E4, A4, B4, C#5, C#5, A4, B4, C#5, A4, G#4, F#4, G#4, F#4, F#4, F#4, F#4, F#4, E#4, F#4]')
+
+        sc = ScalaScale('C4', 'fokker_12.scl')
+        self.assertEqual(str(sc.pitches), '[C4, D-4(+19c), D4(+4c), D~4(+17c), E4(-14c), F4(-2c), F#4(-10c), G4(+2c), A-4(+21c), G##4(-16c), A~4(+19c), B4(-12c), C5]')
+        sc.tune(s)
+
+        p1 = s.parts[0]
+        # problem of not matching enhamronics
+        self.assertEqual(str(p1.pitches), '[C#5, B4(-12c), A4, B4(-12c), C#5, E4(-14c), C#5, B4(-12c), A4, C#5, A4, B4(-12c), G#4, F#4(-10c), A4, B4(-12c), B4(-12c), F#4(-10c), E4(-14c), A4, B4(-12c), C#5, C#5, A4, B4(-12c), C#5, A4, G#4, F#4(-10c), G#4, F#4(-10c), F#4(-10c), F#4(-10c), F#4(-10c), F#4(-10c), E#4, F#4(-10c)]')
+        #p1.show('midi')
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
