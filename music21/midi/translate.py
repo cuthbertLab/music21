@@ -846,18 +846,20 @@ def _processPackets(packets, channelForInstrument={}, channelsDyanmic=[],
         if p['trackId'] not in usedTracks:
             usedTracks.append(p['trackId'])
 
-        # set default channel for all packets
-        p['midiEvent'].channel = p['initChannel']
-
         # only need note_ons, as stored correspondingEvent attr can be used
         # to get noteOff
         if p['midiEvent'].type not in ['NOTE_ON']:
+            # set all not note-off messages to init channel
+            if p['midiEvent'].type not in ['NOTE_OFF']:
+                p['midiEvent'].channel = p['initChannel']
             post.append(p) # add the non note_on packet first
             # if this is a note off, and has a cent shift, need to 
             # rest the pitch bend back to 0 cents
             if p['midiEvent'].type in ['NOTE_OFF']:
+                environLocal.printDebug(['got note-off', p['midiEvent']])
+                # cent shift is set for note on and note off
                 if p['centShift'] is not None:
-                    # channels should be updated already
+                    # do not set channel, as already set
                     me = midiModule.MidiEvent(p['midiEvent'].track, 
                         type="PITCH_BEND", channel=p['midiEvent'].channel)
                     # note off stores note on's pitch; do not invert, simply
@@ -869,6 +871,9 @@ def _processPackets(packets, channelForInstrument={}, channelsDyanmic=[],
                     post.append(pBendEnd)
                     #environLocal.printDebug(['adding pitch bend', pBendEnd])
             continue # store and continue
+
+        # set default channel for all packets
+        p['midiEvent'].channel = p['initChannel']
 
         # find a free channel       
         # if necessary, add pitch change at start of Note, 
@@ -918,10 +923,12 @@ def _processPackets(packets, channelForInstrument={}, channelsDyanmic=[],
                     ch = x
                     break
             if ch is None:
-                raise TranslateException('no channels available for microtone')
+                raise TranslateException('no unused channels available for microtone/instrument assignment')
             p['midiEvent'].channel = ch
             # change channel of note off; this is used above to turn off pbend
             p['midiEvent'].correspondingEvent.channel = ch
+            environLocal.printDebug(['set channel of correspondingEvent:', 
+                                p['midiEvent'].correspondingEvent])
 
             # TODO: must add program change, as we are now in a new 
             # channel; regardless of if we have a pitch bend (we may
@@ -938,6 +945,9 @@ def _processPackets(packets, channelForInstrument={}, channelsDyanmic=[],
 
         else: # use the existing channel
             ch = p['midiEvent'].channel
+            # always set corresponding event to the same channel
+            p['midiEvent'].correspondingEvent.channel = ch
+
         environLocal.printDebug(['assigning channel', ch, 'channelsDynamic', channelsDyanmic, "p['initChannel']", p['initChannel']])
 
         if centShift is not None:
@@ -1468,7 +1478,8 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
                             ('TimeSignature', 'KeySignature')):
             # create a deepcopy of the element so a flat does not cause
             # multiple references of the same
-            p.insert(e.getOffsetBySite(conductorTrack), copy.deepcopy(e))
+            eventCopy = copy.deepcopy(e)
+            p.insert(e.getOffsetBySite(conductorTrack), eventCopy)
     return s
 
 
@@ -1922,6 +1933,97 @@ class Test(unittest.TestCase):
         self.assertEqual(mts[3].getProgramChanges(),  [73])
 
         #s.show('midi')
+
+
+    def testMicrotonalOutputE(self):
+
+        from music21 import corpus, stream, interval
+        s = corpus.parse('bwv66.6')
+        p1 = s.parts[0]
+        p2 = copy.deepcopy(p1)
+        t = interval.Interval(0.5) # a sharp p4
+        p2.transpose(t, inPlace=True)
+        post = stream.Score()
+        post.insert(0, p1)
+        post.insert(0, p2)
+
+        #post.show('midi')
+
+        mts = streamsToMidiTracks(post)
+        self.assertEqual(mts[0].getChannels(),  [1])
+        self.assertEqual(mts[0].getProgramChanges(),  [0])
+        self.assertEqual(mts[1].getChannels(),  [1, 2])
+        self.assertEqual(mts[1].getProgramChanges(),  [0])
+
+        #post.show('midi', app='Logic Express')
+
+    def testMicrotonalOutputF(self):
+
+        from music21 import corpus, stream, interval
+        s = corpus.parse('bwv66.6')
+        p1 = s.parts[0]
+        p2 = copy.deepcopy(p1)
+        p3 = copy.deepcopy(p1)
+
+        t1 = interval.Interval(12.5) # a sharp p4
+        t2 = interval.Interval(-12.25) # a sharp p4
+        p2.transpose(t1, inPlace=True)
+        p3.transpose(t2, inPlace=True)
+        post = stream.Score()
+        post.insert(0, p1)
+        post.insert(0, p2)
+        post.insert(0, p3)
+
+        #post.show('midi')
+
+        mts = streamsToMidiTracks(post)
+        self.assertEqual(mts[0].getChannels(),  [1])
+        self.assertEqual(mts[0].getProgramChanges(),  [0])
+        self.assertEqual(mts[1].getChannels(),  [1, 2])
+        self.assertEqual(mts[1].getProgramChanges(),  [0])
+        self.assertEqual(mts[2].getChannels(),  [1, 2, 3])
+        self.assertEqual(mts[2].getProgramChanges(),  [0])
+
+        #post.show('midi', app='Logic Express')
+
+    def testMicrotonalOutputG(self):
+
+        from music21 import corpus, stream, interval, instrument
+        s = corpus.parse('bwv66.6')
+        p1 = s.parts[0]
+        p1.remove(p1.getElementsByClass('Instrument')[0])
+        p2 = copy.deepcopy(p1)
+        p3 = copy.deepcopy(p1)
+
+        t1 = interval.Interval(12.5) # a sharp p4
+        t2 = interval.Interval(-7.25) # a sharp p4
+        p2.transpose(t1, inPlace=True)
+        p3.transpose(t2, inPlace=True)
+        post = stream.Score()
+        p1.insert(0, instrument.Dulcimer())
+        post.insert(0, p1)
+        p2.insert(0, instrument.Trumpet())
+        post.insert(0.125, p2)
+        p3.insert(0, instrument.ElectricGuitar())
+        post.insert(0.25, p3)
+
+        #post.show('midi')
+
+        mts = streamsToMidiTracks(post)
+        self.assertEqual(mts[0].getChannels(),  [1])
+        self.assertEqual(mts[0].getProgramChanges(),  [15])
+
+        self.assertEqual(mts[1].getChannels(),  [2, 4])
+        self.assertEqual(mts[1].getProgramChanges(),  [56])
+
+        #print mts[2]
+        self.assertEqual(mts[2].getChannels(),  [3, 4, 5])
+        self.assertEqual(mts[2].getProgramChanges(),  [26])
+
+        #post.show('midi', app='Logic Express')
+
+
+
 
 if __name__ == "__main__":
     music21.mainTest(Test)
