@@ -1338,7 +1338,7 @@ class ConcreteScale(Scale):
 
             if e.isChord:
                 src = e.pitches
-            else:
+            else: # simulate a lost
                 src = [e.pitch]
 
             dst = [] # store dst in a list of resetting chord pitches
@@ -1349,11 +1349,12 @@ class ConcreteScale(Scale):
                 pAlt = p.convertQuarterTonesToMicrotones(inPlace=False)
                 # need to permit enharmonic comparisons: G# and A- should 
                 # in most cases match
-                if pAlt.name in pitchCollNames:
-                    # get the index from the names and extract the pitch
-                    pDst = pitchColl[pitchCollNames.index(p.name)]
-                    # get a deep copy for each note
-                    dst.append(copy.deepcopy(pDst))    
+                for pEnh in [pAlt]:
+                    if pAlt.name in pitchCollNames:
+                        # get the index from the names and extract the pitch
+                        pDst = pitchColl[pitchCollNames.index(p.name)]
+                        # get a deep copy for each note
+                        dst.append(copy.deepcopy(pDst))    
             # reassign the changed pitch
             if len(dst) > 0:
                 if e.isChord:

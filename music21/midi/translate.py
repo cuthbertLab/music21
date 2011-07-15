@@ -1994,7 +1994,7 @@ class Test(unittest.TestCase):
         p1.remove(p1.getElementsByClass('Instrument')[0])
         p2 = copy.deepcopy(p1)
         p3 = copy.deepcopy(p1)
-
+        
         t1 = interval.Interval(12.5) # a sharp p4
         t2 = interval.Interval(-7.25) # a sharp p4
         p2.transpose(t1, inPlace=True)
@@ -2006,16 +2006,16 @@ class Test(unittest.TestCase):
         post.insert(0.125, p2)
         p3.insert(0, instrument.ElectricGuitar())
         post.insert(0.25, p3)
-
+        
         #post.show('midi')
-
+        
         mts = streamsToMidiTracks(post)
         self.assertEqual(mts[0].getChannels(),  [1])
         self.assertEqual(mts[0].getProgramChanges(),  [15])
-
+        
         self.assertEqual(mts[1].getChannels(),  [2, 4])
         self.assertEqual(mts[1].getProgramChanges(),  [56])
-
+        
         #print mts[2]
         self.assertEqual(mts[2].getChannels(),  [3, 4, 5])
         self.assertEqual(mts[2].getProgramChanges(),  [26])
