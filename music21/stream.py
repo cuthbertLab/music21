@@ -1804,14 +1804,22 @@ class Stream(music21.Music21Object):
 
 
     def analyze(self, *args, **keywords):
-        '''Given an analysis method, return an analysis on this Stream.
+        '''
+        Runs a particular analytical method on the contents of the
+        stream to find its ambitus (range) or key.
 
-        For details on arguments, see :func:`~music21.analysis.discrete.analyzeStream`.
 
-        Available plots include the following:
-    
         ambitus -- runs :class:`~music21.analysis.discrete.Ambitus`
-        key -- :class:`~music21.analysis.discrete.KrumhanslSchmuckler`
+        key -- runs :class:`~music21.analysis.discrete.KrumhanslSchmuckler`
+
+
+        Some of these methods can take additional arguments.  For details on 
+        these arguments, see 
+        :func:`~music21.analysis.discrete.analyzeStream`.
+
+
+        Example:
+
 
         >>> from music21 import *
         >>> s = corpus.parse('bach/bwv66.6')
@@ -1819,6 +1827,52 @@ class Stream(music21.Music21Object):
         <music21.interval.Interval m21>
         >>> s.analyze('key')
         <music21.key.Key of F# minor>
+        
+        
+        Example: music21 allows you to automatically run an 
+        analysis to get the key of a piece or excerpt not 
+        based on the key signature but instead on the 
+        frequency with which some notes are used as opposed 
+        to others (first described by Carol Krumhansl).  For 
+        instance, a piece with mostly Cs and Gs, some Fs, 
+        and Ds, but fewer G#s, C#s, etc. is more likely to 
+        be in the key of C major than in D-flat major 
+        (or A minor, etc.).  You can easily get this analysis 
+        from a stream by running:
+
+
+        >>> myStream = corpus.parse('luca/gloria') 
+        >>> analyzedKey = myStream.analyze('key') 
+        >>> analyzedKey
+        <music21.key.Key of F major>
+        
+        
+        analyzedKey is a :class:`~music21.key.Key`
+        object with a few extra parameters.  
+        correlationCoefficient shows how well this key fits the 
+        profile of a piece in that key:
+        
+        
+        >>> analyzedKey.correlationCoefficient
+        0.86715...
+        
+        
+        alternateInterpretations is a list of the other 
+        possible interpretations sorted from most likely to least:
+        
+        
+        >>> analyzedKey.alternateInterpretations
+        [<music21.key.Key of D minor>, <music21.key.Key of C major>, <music21.key.Key of G minor>,...]
+        
+        
+        Each of these can be examined in turn to see its correlation coefficient:
+        
+        
+        >>> analyzedKey.alternateInterpretations[1].correlationCoefficient
+        0.788528...
+        >>> analyzedKey.alternateInterpretations[22].correlationCoefficient
+        -0.86728...
+        
         '''
 
         from music21.analysis import discrete
