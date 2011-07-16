@@ -1349,12 +1349,21 @@ class ConcreteScale(Scale):
                 pAlt = p.convertQuarterTonesToMicrotones(inPlace=False)
                 # need to permit enharmonic comparisons: G# and A- should 
                 # in most cases match
-                for pEnh in [pAlt]:
-                    if pAlt.name in pitchCollNames:
-                        # get the index from the names and extract the pitch
-                        pDst = pitchColl[pitchCollNames.index(p.name)]
+                testEnharmonics = []
+                testEnharmonics.append(pAlt.getHigherEnharmonic(inPlace=False))
+                testEnharmonics.append(pAlt.getLowerEnharmonic(inPlace=False))
+                testEnharmonics.append(pAlt.simplifyEnharmonic(inPlace=False))
+
+                for pEnh in testEnharmonics:
+                    if pEnh.name in pitchCollNames:
+                        # get the index from the names and extract the pitch by
+                        # index
+                        pDst = pitchColl[pitchCollNames.index(pEnh.name)]
                         # get a deep copy for each note
-                        dst.append(copy.deepcopy(pDst))    
+                        pDstNew = copy.deepcopy(pDst)
+                        pDstNew.octave = pEnh.octave # copy octave
+                        # need to adjust enharmonic
+                        dst.append(pDstNew)    
             # reassign the changed pitch
             if len(dst) > 0:
                 if e.isChord:
@@ -3331,7 +3340,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
         p1 = s.parts[0]
         # problem of not matching enhamronics
-        self.assertEqual(str(p1.pitches), '[C#5, B4(-12c), A4, B4(-12c), C#5, E4(-14c), C#5, B4(-12c), A4, C#5, A4, B4(-12c), G#4, F#4(-10c), A4, B4(-12c), B4(-12c), F#4(-10c), E4(-14c), A4, B4(-12c), C#5, C#5, A4, B4(-12c), C#5, A4, G#4, F#4(-10c), G#4, F#4(-10c), F#4(-10c), F#4(-10c), F#4(-10c), F#4(-10c), E#4, F#4(-10c)]')
+        self.assertEqual(str(p1.pitches), '[D-5(+19c), B4(-12c), G##4(-16c), B4(-12c), D-5(+19c), E5(-14c), D-5(+19c), B4(-12c), G##4(-16c), D-5(+19c), G##4(-16c), B4(-12c), A-4(+21c), F#4(-10c), G##4(-16c), B4(-12c), B4(-12c), F#4(-10c), E4(-14c), G##4(-16c), B4(-12c), D-5(+19c), D-5(+19c), G##4(-16c), B4(-12c), D-5(+19c), G##4(-16c), A-4(+21c), F#4(-10c), A-4(+21c), F#4(-10c), F#4(-10c), F#4(-10c), F#4(-10c), F#4(-10c), F4(-2c), F#4(-10c)]')
         #p1.show('midi')
 
 

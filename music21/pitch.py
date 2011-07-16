@@ -2978,16 +2978,6 @@ class Pitch(music21.Music21Object):
         >>> p.getEnharmonic()
         C
 
-
-
-    
-    
-        OMIT_FROM_DOCS
-        Perhaps a getFirstNEnharmonics(n) needs to be defined which returns a list of the
-        first n Enharmonics according to a particular algorithm, moving into triple sharps, etc.
-        if need be.  Or getAllCommonEnharmonics(note) which returns all possible enharmonics that
-        do not involve triple or more accidentals.
-
         '''
         psRef = self.ps
         if inPlace:
@@ -3031,6 +3021,53 @@ class Pitch(music21.Music21Object):
 # def areQuarterToneEnharmonics(note1, note2):
 #     pass
 
+
+#         OMIT_FROM_DOCS
+#         Perhaps a getFirstNEnharmonics(n) needs to be defined which returns a list of the
+#         first n Enharmonics according to a particular algorithm, moving into triple sharps, etc.
+#         if need be.  Or getAllCommonEnharmonics(note) which returns all possible enharmonics that
+#         do not involve triple or more accidentals.
+# 
+    def getAllCommmonEnharmonics(self, alterLimit=2):
+        '''Return all common unique enharmonics for a pitch, or those that do not involve more than two accidentals.
+
+        >>> from music21 import *
+        >>> p = pitch.Pitch('c#3')
+        >>> p.getAllCommmonEnharmonics()
+        [D-3, B##2]
+        >>> p = pitch.Pitch('g-6')
+        >>> p.getAllCommmonEnharmonics()
+        [F#6, E##6]
+        >>> p.getAllCommmonEnharmonics(alterLimit=3)
+        [A---6, F#6, E##6]
+        '''
+        post = []
+        c = self.simplifyEnharmonic(inPlace=False)
+        if c.name != self.name:
+            post.append(c)
+        # iterative scan upward
+        c = self
+        while True:
+            try:
+                c = c.getHigherEnharmonic(inPlace=False)
+            except AccidentalException:
+                break # ran out of accidentals
+            if abs(c.accidental.alter) > alterLimit:
+                break
+            if c not in post:
+                post.append(c)
+        # iterative scan downward
+        c = self
+        while True:
+            try:
+                c = c.getLowerEnharmonic(inPlace=False)
+            except AccidentalException:
+                break # ran out of accidentals
+            if abs(c.accidental.alter) > alterLimit:
+                break
+            if c not in post:
+                post.append(c)
+        return post
 
 
     #---------------------------------------------------------------------------
