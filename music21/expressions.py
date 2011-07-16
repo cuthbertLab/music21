@@ -604,6 +604,101 @@ class InvertedTurn(Turn):
     def __init__(self):
         Turn.__init__(self)
         self.size = self.size.reverse()
+        
+class GeneralAppoggiatura(Ornament):
+    direction = ""  # up or down -- up means the grace note is below and goes up to the actual note
+    size = None # music21.interval.Interval (General, etc.) class
+    
+    def __init__(self):
+        Ornament.__init__(self)
+        self.size = music21.interval.Interval(2)
+        
+    def realize(self, srcObject):
+        '''
+        realize an appoggiatura
+        
+        returns a three-element tuple.
+        The first is the notes that the grace note was converted to.
+        The second is the rest of the note
+        The third is an empty list (since there are no notes at the end of an appoggiatura)
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note("C4")
+        >>> n1.quarterLength = 0.5
+        >>> a1 = expressions.Appoggiatura()
+        >>> a1.realize(n1)
+        (<music21.note.Note D>, <music21.note.Note C>, [])
+        
+        >>> from music21 import *
+        >>> n2 = note.Note("C4")
+        >>> n2.quarterLength = 1
+        >>> a2 = expressions.HalfStepInvertedAppoggiatura()
+        >>> a2.realize(n2)
+        (<music21.note.Note B>, <music21.note.Note C>, [])
+        
+        '''
+        
+        if self.direction != 'up' and self.direction != 'down':
+            raise ExpressionException("Cannot realize an Appoggiatura if I do not know its direction")
+        if self.size == "":
+            raise ExpressionException("Cannot realize an Appoggiatura if there is no size given")
+        if srcObject.duration == None or srcObject.duration.quarterLength == 0:
+            raise ExpressionException("Cannot steal time from an object with no duration")
+
+        newDuration = srcObject.duration.quarterLength / 2
+        if self.direction == "down":
+            transposeInterval = self.size
+        else:
+            transposeInterval = self.size.reverse()
+            
+        
+        appogNote = copy.deepcopy(srcObject)
+        appogNote.duration.quarterLength = newDuration
+        appogNote.transpose(transposeInterval, inPlace = True)
+        
+        remainderNote = copy.deepcopy(srcObject)
+        remainderNote.duration.quarterLength = newDuration
+        
+        
+        currentKeySig = srcObject.getContextByClass(music21.key.KeySignature)
+        if currentKeySig is None:
+            currentKeySig = music21.key.KeySignature(0)
+
+
+        #TODO clear just mordent here...
+        return (appogNote, remainderNote, [])
+
+class Appoggiatura(GeneralAppoggiatura):
+    direction = "down"
+    def __init__(self):
+        GeneralAppoggiatura.__init__(self)
+
+class HalfStepAppoggiatura(Appoggiatura):
+    def __init__(self):
+        Appoggiatura.__init__(self)
+        self.size = music21.interval.Interval("m2")
+        
+class WholeStepAppoggiatura(Appoggiatura):
+    def __init__(self):
+        Appoggiatura.__init__(self)
+        self.size = music21.interval.Interval("M2")
+        
+class InvertedAppoggiatura(GeneralAppoggiatura):
+    direction = "up"
+    def __init__(self):
+        GeneralAppoggiatura.__init__(self)
+
+class HalfStepInvertedAppoggiatura(InvertedAppoggiatura):
+    def __init__(self):
+        InvertedAppoggiatura.__init__(self)
+        self.size = music21.interval.Interval("m2")
+        
+class WholeStepInvertedAppoggiatura(InvertedAppoggiatura):
+    def __init__(self):
+        InvertedAppoggiatura.__init__(self)
+        self.size = music21.interval.Interval("M2")
+
 
 
 
