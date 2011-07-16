@@ -1349,11 +1349,8 @@ class ConcreteScale(Scale):
                 pAlt = p.convertQuarterTonesToMicrotones(inPlace=False)
                 # need to permit enharmonic comparisons: G# and A- should 
                 # in most cases match
-                testEnharmonics = []
-                testEnharmonics.append(pAlt.getHigherEnharmonic(inPlace=False))
-                testEnharmonics.append(pAlt.getLowerEnharmonic(inPlace=False))
-                testEnharmonics.append(pAlt.simplifyEnharmonic(inPlace=False))
-
+                testEnharmonics = pAlt.getAllCommmonEnharmonics(alterLimit=2)
+                testEnharmonics.append(pAlt)
                 for pEnh in testEnharmonics:
                     if pEnh.name in pitchCollNames:
                         # get the index from the names and extract the pitch by
@@ -1363,7 +1360,17 @@ class ConcreteScale(Scale):
                         pDstNew = copy.deepcopy(pDst)
                         pDstNew.octave = pEnh.octave # copy octave
                         # need to adjust enharmonic
-                        dst.append(pDstNew)    
+                        pDstNewEnh = pDstNew.getAllCommmonEnharmonics(
+                                     alterLimit=2)
+                        match = None
+                        for x in pDstNewEnh:
+                            # try to match enharmonic with original alt
+                            if x.name == pAlt.name:
+                                match = x
+                        if match is None: # get original
+                            dst.append(pDstNew)
+                        else:
+                            dst.append(match)
             # reassign the changed pitch
             if len(dst) > 0:
                 if e.isChord:
@@ -2815,7 +2822,7 @@ class Test(unittest.TestCase):
 
         
         # as single interval cycle, all are 1
-        environLocal.printDebug(['calling get scale degree from pitch'])
+        #environLocal.printDebug(['calling get scale degree from pitch'])
         self.assertEqual(sc.getScaleDegreeFromPitch('g4'), 1)
         self.assertEqual(sc.getScaleDegreeFromPitch('b-2', 
             direction=DIRECTION_ASCENDING), 1)
@@ -3340,8 +3347,27 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
         p1 = s.parts[0]
         # problem of not matching enhamronics
-        self.assertEqual(str(p1.pitches), '[D-5(+19c), B4(-12c), G##4(-16c), B4(-12c), D-5(+19c), E5(-14c), D-5(+19c), B4(-12c), G##4(-16c), D-5(+19c), G##4(-16c), B4(-12c), A-4(+21c), F#4(-10c), G##4(-16c), B4(-12c), B4(-12c), F#4(-10c), E4(-14c), G##4(-16c), B4(-12c), D-5(+19c), D-5(+19c), G##4(-16c), B4(-12c), D-5(+19c), G##4(-16c), A-4(+21c), F#4(-10c), A-4(+21c), F#4(-10c), F#4(-10c), F#4(-10c), F#4(-10c), F#4(-10c), F4(-2c), F#4(-10c)]')
+        self.assertEqual(str(p1.pitches), '[C#5(+19c), B4(-12c), A4(-16c), B4(-12c), C#5(+19c), E5(-14c), C#5(+19c), B4(-12c), A4(-16c), C#5(+19c), A4(-16c), B4(-12c), G#4(+21c), F#4(-10c), A4(-16c), B4(-12c), B4(-12c), F#4(-10c), E4(-14c), A4(-16c), B4(-12c), C#5(+19c), C#5(+19c), A4(-16c), B4(-12c), C#5(+19c), A4(-16c), G#4(+21c), F#4(-10c), G#4(+21c), F#4(-10c), F#4(-10c), F#4(-10c), F#4(-10c), F#4(-10c), E#4(-2c), F#4(-10c)]')
         #p1.show('midi')
+
+
+    def testTuneB(self):
+        
+        # fokker_12.scl  Fokker's 7-limit 12-tone just scale
+        # pyth_12.scl                    12  12-tone Pythagorean scale
+        from music21 import corpus, scale
+
+        s = corpus.parse('bwv66.6')
+        sc = ScalaScale('C4', 'fokker_12.scl')
+        self.assertEqual(str(sc.pitches), '[C4, D-4(+19c), D4(+4c), D~4(+17c), E4(-14c), F4(-2c), F#4(-10c), G4(+2c), A-4(+21c), G##4(-16c), A~4(+19c), B4(-12c), C5]')
+
+        sc.tune(s)
+        #s.show('midi')
+        self.assertEqual(str(s.parts[0].pitches), '[C#5(+19c), B4(-12c), A4(-16c), B4(-12c), C#5(+19c), E5(-14c), C#5(+19c), B4(-12c), A4(-16c), C#5(+19c), A4(-16c), B4(-12c), G#4(+21c), F#4(-10c), A4(-16c), B4(-12c), B4(-12c), F#4(-10c), E4(-14c), A4(-16c), B4(-12c), C#5(+19c), C#5(+19c), A4(-16c), B4(-12c), C#5(+19c), A4(-16c), G#4(+21c), F#4(-10c), G#4(+21c), F#4(-10c), F#4(-10c), F#4(-10c), F#4(-10c), F#4(-10c), E#4(-2c), F#4(-10c)]')
+
+        self.assertEqual(str(s.parts[1].pitches), '[E4(-14c), F#4(-10c), E4(-14c), E4(-14c), E4(-14c), E4(-14c), A4(-16c), G#4(+21c), E4(-14c), G#4(+21c), F#4(-10c), G#4(+21c), E#4(-2c), C#4(+19c), F#4(-10c), F#4(-10c), E4(-14c), D#4, C#4(+19c), C#4(+19c), F#4(-10c), E4(-14c), E4(-14c), A4(-16c), F#4(-10c), F#4(-10c), G#4(+21c), F#4(-10c), F#4(-10c), E#4(-2c), F#4(-10c), F#3(-10c), C#4(+19c), C#4(+19c), D4(+4c), E4(-14c), D4(+4c), C#4(+19c), B3(-12c), C#4(+19c), D4(+4c), C#4(+19c)]')
+
+
 
 
 #-------------------------------------------------------------------------------

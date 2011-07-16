@@ -3052,10 +3052,13 @@ class Pitch(music21.Music21Object):
                 c = c.getHigherEnharmonic(inPlace=False)
             except AccidentalException:
                 break # ran out of accidentals
-            if abs(c.accidental.alter) > alterLimit:
-                break
+            if c.accidental is not None:
+                if abs(c.accidental.alter) > alterLimit:
+                    break
             if c not in post:
                 post.append(c)
+            else: # we are looping
+                break
         # iterative scan downward
         c = self
         while True:
@@ -3063,10 +3066,13 @@ class Pitch(music21.Music21Object):
                 c = c.getLowerEnharmonic(inPlace=False)
             except AccidentalException:
                 break # ran out of accidentals
-            if abs(c.accidental.alter) > alterLimit:
-                break
+            if c.accidental is not None:
+                if abs(c.accidental.alter) > alterLimit:
+                    break
             if c not in post:
                 post.append(c)
+            else: # we are looping
+                break
         return post
 
 
