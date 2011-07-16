@@ -1324,7 +1324,11 @@ class ConcreteScale(Scale):
         return post
 
     def tune(self, streamObj, minPitch=None, maxPitch=None, direction=None):
-        '''Given a Stream object containing Pitches, match all pitch names and or pitch space values and replace the target pitch with copies of pitches stored in this scale.
+        '''
+        Given a Stream object containing Pitches, match all pitch names 
+        and or pitch space values and replace the target pitch with 
+        copies of pitches stored in this scale.
+
 
         This is always applied recursively to all sub-Streams. 
         '''
@@ -3367,8 +3371,32 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
         self.assertEqual(str(s.parts[1].pitches), '[E4(-14c), F#4(-10c), E4(-14c), E4(-14c), E4(-14c), E4(-14c), A4(-16c), G#4(+21c), E4(-14c), G#4(+21c), F#4(-10c), G#4(+21c), E#4(-2c), C#4(+19c), F#4(-10c), F#4(-10c), E4(-14c), D#4, C#4(+19c), C#4(+19c), F#4(-10c), E4(-14c), E4(-14c), A4(-16c), F#4(-10c), F#4(-10c), G#4(+21c), F#4(-10c), F#4(-10c), E#4(-2c), F#4(-10c), F#3(-10c), C#4(+19c), C#4(+19c), D4(+4c), E4(-14c), D4(+4c), C#4(+19c), B3(-12c), C#4(+19c), D4(+4c), C#4(+19c)]')
 
+    def testTunePythag(self):
+        '''
+        Applies a pythagorean tuning to a section of D. Luca's Gloria
+        and then uses Marchetto da Padova's very sharp #s and very flat
+        flats (except B-flat) to inflect the accidentals
+        '''
+        
+        from music21 import corpus, scale, instrument
 
-
+        s = corpus.parse('luca/gloria').measures(70,79)
+        for p in s:
+            inst = p.flat.getElementsByClass(instrument.Instrument)[0]
+            inst.midiProgram = 52
+        sc = ScalaScale('F2', 'pyth_12.scl')
+        sc.tune(s)
+        for p in s.flat.pitches:
+            if p.accidental is not None:
+                if p.accidental.name == 'sharp':
+                    p.microtone = p.microtone.cents + 45
+                elif p.accidental.name == 'flat' and p.step == 'B':
+                    p.microtone = p.microtone.cents - 20
+                elif p.accidental.name == 'flat':
+                    p.microtone = p.microtone.cents - 45
+        #s = s.transpose("P-4")
+        #print s[0].measure(77).notes[1].microtone
+        #s.show('midi')
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
