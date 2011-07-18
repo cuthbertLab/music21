@@ -125,6 +125,10 @@ class MetronomeMark(TempoMark):
     def __repr__(self):
         return "<music21.tempo.MetronomeMark %s>" % str(self.number)
 
+
+
+
+
 def interpolateElements(element1, element2, sourceStream, 
     destinationStream, autoAdd = True):
     '''

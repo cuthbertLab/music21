@@ -2914,6 +2914,17 @@ spirit</words>
 #         s = converter.parse(testPrimitive.mixedVoices2)
 
 
+
+    def testImportMetronomeMarksA(self):
+
+        from music21.musicxml import testPrimitive
+        from music21 import converter, repeat
+        s = converter.parse(testPrimitive.metronomeMarks31c)
+
+        #s.show()
+
+
+
     def testImportGraceNotesA(self):
         # test importing from muscixml
         from music21.musicxml import testPrimitive

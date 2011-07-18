@@ -956,7 +956,7 @@ class MidiFile(object):
     
     def open(self, filename, attrib="rb"): 
         '''Open a MIDI file path for reading or writing.
-
+    
         For writing to a MIDI file, `attrib` should be "wb".
         '''
         if attrib not in ['rb', 'wb']:
