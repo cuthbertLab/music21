@@ -3394,7 +3394,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
                     p.microtone = p.microtone.cents - 20
                 elif p.accidental.name == 'flat':
                     p.microtone = p.microtone.cents - 45
-        s.show()
+        #s.show()
         #s = s.transpose("P-4")
         #print s[0].measure(77).notes[1].microtone
         #s.show('midi')
