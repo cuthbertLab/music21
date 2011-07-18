@@ -8696,6 +8696,7 @@ class Measure(Stream):
         >>> a.clef.sign
         'F'
         '''
+        # if clef is None; remove object?
         oldClef = self._getClef()
         if oldClef is not None:
             environLocal.printDebug(['removing clef', oldClef])

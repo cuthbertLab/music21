@@ -1090,12 +1090,13 @@ def kernTandamToControl(tandam):
         metronomeMark = tandam[3:]
         try:
             metronomeMark = float(metronomeMark)
-            MM = music21.tempo.MetronomeMark(metronomeMark)    
+            MM = music21.tempo.MetronomeMark(number=metronomeMark)    
             return MM
         except ValueError:
-            metronomeMark = re.sub('^\[','',metronomeMark)
-            metronomeMark = re.sub(']\s*$','',metronomeMark)
-            MS = music21.tempo.TempoText(metronomeMark)
+            # assuming that metronomeMark here is text now 
+            metronomeMark = re.sub('^\[','', metronomeMark)
+            metronomeMark = re.sub(']\s*$','', metronomeMark)
+            MS = music21.tempo.MetronomeMark(text=metronomeMark)
             return MS
     elif tandam.startswith("*M"):
         meterType = tandam[2:]

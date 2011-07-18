@@ -1455,6 +1455,13 @@ class MetronomeMark(MusicXMLElement):
         MusicXMLElement.__init__(self)
 
 
+class Sound(MusicXMLElement):
+    '''A direction type used to store a large variety of performance indications.
+    '''
+    def __init__(self, charData=None):
+        MusicXMLElement.__init__(self)
+        # attrs: sound
+
 
 class Offset(MusicXMLElement):
     '''A musicxml <offset> element can be found defined in the <direction> element. the charData stores a number that is the shift in divisions from the location of the tag. 

@@ -13,11 +13,14 @@
 '''This module defines objects for describing tempo and changes in tempo.
 '''
 
+from __future__ import unicode_literals
+
 import unittest, doctest
 
 import music21
 import music21.note
-import music21.common
+from music21 import common
+from music21 import duration
 
 
 from music21 import environment
@@ -46,109 +49,261 @@ defaultTempoValues = {
 
 
 
+#-------------------------------------------------------------------------------
+class TempoException(Exception):
+    pass
 
+
+#-------------------------------------------------------------------------------
 class TempoIndication(music21.Music21Object):
     '''A generic base class for all tempo indications to inherit. Can be used to filter out all types of tempo indications. 
     '''
+    classSortOrder = 1
+
     def __init__(self):
         music21.Music21Object.__init__(self)
-    
 
+
+
+# TODO: needs to model text expression like display parameters
 class TempoText(TempoIndication):
     '''
     >>> import music21
     >>> tm = music21.tempo.TempoText("adagio")
-    >>> tm.value
+    >>> tm.text
     'adagio'
     
 
     Common marks such as "adagio," "moderato," "molto allegro," etc.
     get sensible default values.  If not found, uses a default of 90:
 
-
-    >>> tm.number
-    52
-    >>> tm2 = music21.tempo.TempoText(u"très vite")
-    >>> tm2.value.endswith('vite')
-    True
-    >>> tm2.value == u'très vite'   # TODO: Make sure is working again....
-    True
-    >>> tm3 = music21.tempo.TempoText("extremely, wicked fast!")
-    >>> tm3.number
-    90
     '''
-    
-    classSortOrder = 1
-    number = 90
     _DOC_ALL_INHERITED = False
 
-    def __init__(self, value = None):
+    def __init__(self, text=None):
         TempoIndication.__init__(self)
+        
+        self.text = None
+        if text is not None:
+            try:
+                self.text = str(text) 
+            except UnicodeEncodeError: # if it is already unicode
+                self.text = text
 
-        if music21.common.isNum(value):
-            self.value = str(value)
-            self.number = value
-        else:
-            self.value = value
-            if value is None:
-                pass
-            elif value.lower() in defaultTempoValues.keys():
-                self.number = defaultTempoValues[value.lower()]
-            elif value in defaultTempoValues.keys():
-                self.number = defaultTempoValues[value]
-            else:
-                pass
-                #print 'cannot match value', value
-                #environLocal.printDebug(['cannot match', value.decode('utf-8')])    
+#         if music21.common.isNum(value):
+#             self.value = str(value)
+#             self.number = value
+#         else:
+#             self.value = value
+#             if value is None:
+#                 pass
+#             elif value.lower() in defaultTempoValues.keys():
+#                 self.number = defaultTempoValues[value.lower()]
+#             elif value in defaultTempoValues.keys():
+#                 self.number = defaultTempoValues[value]
+#             else:
+#                 pass
+#                 #print 'cannot match value', value
+#                 #environLocal.printDebug(['cannot match', value.decode('utf-8')])    
     
     def __repr__(self):
-        return "<%s %s>" % (self.__class__.__name__, self.value)
+        return "<%s %s>" % (self.__class__.__name__, self.text)
 
 
+    def getMetronomeMark(self):
+        '''Return a MetronomeMark object that is configured from this objects Text.
 
-class MetronomeMark(TempoText):
+        >>> from music21 import *
+        >>> tt = tempo.TempoText("slow")
+        >>> mm = tt.getMetronomeMark()
+        >>> mm.number
+        52
+        '''
+        return MetronomeMark(text=self.text)
+
+
+class MetronomeMark(TempoIndication):
     '''
-    A way of specifying only a particular tempo and referent and (optionally) a text description
+    A way of specifying a particular tempo with a text string, a referent (a duration) and a number.
+
+    The `referent` attribute is a Duration object. As this object is a Music21Object, it also has a .duration property object.
     
     >>> from music21 import *
-    >>> a = tempo.MetronomeMark(40, note.HalfNote(), "slow")
+    >>> a = tempo.MetronomeMark("slow", 40, note.HalfNote())
     >>> a.number
     40
     >>> a.referent
     <music21.duration.Duration 2.0>
     >>> a.referent.type
     'half'
-    >>> a.value
+    >>> a.text
     'slow'
-    '''
-    # TODO: 
-    def __init__(self, number = 60, referent = None, value = None):
-        if value is not None:
-            TempoText.__init__(self, value)
-        else:
-            TempoText.__init__(self, number)
 
-        self.number = number
+    >>> mm = tempo.MetronomeMark('adagio')
+    >>> mm.number
+    52
+    >>> mm.numberImplicit
+    True
+
+    >>> tm2 = music21.tempo.MetronomeMark(u"très vite")
+    >>> tm2.text.endswith('vite')
+    True
+    >>> tm2.number
+    144
+
+    >>> tm2 = music21.tempo.MetronomeMark(number=200)
+    >>> tm2.text
+    'prestissimo'
+    >>> tm2.referent
+    <music21.duration.Duration 1.0>
+    '''
+
+# 
+#     >>> tm3 = music21.tempo.TempoText("extremely, wicked fast!")
+#     >>> tm3.number
+#     90
+
+
+    def __init__(self, text=None, number=None, referent=None):
+        TempoIndication.__init__(self)
+
+        self.number = number # may be None
+        self.numberImplicit = None
+        if self.number is not None:
+            self.numberImplicit = False
+
+        self._tempoText = None # set with property text
+        if text is not None: # use property to create object if necessary
+            self.text = text
+        self.textImplicit = None
+
         if referent is not None and 'Duration' not in referent.classes:
             self.referent = referent.duration
+        elif common.isNum(referent): # assume ql value
+            self.referent = duration.Duration(referent)
         else:
             self.referent = referent # should be a music21.duration.Duration object or a Music21Object with a duration or None
-    
+
+        # if referent is None, set a default quarter note duration
+        if self.referent is None:
+            self.referent = duration.Duration(type='quarter')
+
+        # try to set number from text if not defined
+        if self.number is None and self._tempoText is not None:
+            self.number = self._getDefaultNumber(self._tempoText)
+            if self.number is not None: # only if set
+                self.numberImplicit = True
+        # set text
+        if self._tempoText is None and self.number is not None:
+            self.text = self._getDefaultText(self.number) # use property
+            if self.text is not None:
+                self.textImplicit = True
+
+        # need to store a sounding value for the case where where
+        # a sounding different is different than the number given in the MM
+        self.soundingReferentsPerMinute = None
+
+
+    def _getText(self):
+        if self._tempoText is None:
+            return None
+        return self._tempoText.text
+
+    def _setText(self, value):
+        if value is None:
+            self._tempoText = None
+        elif isinstance(value, TempoText):
+            self._tempoText = value
+        else:
+            self._tempoText = TempoText(value)
+
+    text = property(_getText, _setText, doc = 
+        '''Get or set a text string for this MetronomeMark. Internally implemented as a TempoText object. 
+        ''')
+
     def __repr__(self):
+        #if self.text is None
         return "<music21.tempo.MetronomeMark %s>" % str(self.number)
 
+    def _getDefaultNumber(self, tempoText):
+        '''Given a tempo text expression or an TempoText, get the default number.
+
+        >>> from music21 import *
+        >>> mm = MetronomeMark()
+        >>> mm._getDefaultNumber('schnell')
+        132
+        >>> mm._getDefaultNumber('adagio')
+        52
+        '''
+        if isinstance(tempoText, TempoText):
+            tempoStr = tempoText.text
+        else:
+            tempoStr = tempoText
+        post = None # returned if no match
+        if tempoStr.lower() in defaultTempoValues.keys():
+            post = defaultTempoValues[tempoStr.lower()]
+        # an exact match
+        elif tempoStr in defaultTempoValues.keys():
+            post = defaultTempoValues[tempoStr]
+        return post
+
+    def _getDefaultText(self, number, spread=2):
+        '''Given a tempo number try to get a text expression; presently only looks for approximate matches
+
+        The `spread` value is a +/- shift around the default tempo indications defined in defaultTempoValues
+
+        >>> from music21 import *
+        >>> mm = MetronomeMark()
+        >>> mm._getDefaultText(90)
+        u'moderate'
+        >>> mm._getDefaultText(201)
+        u'prestissimo'
+        '''
+        if common.isNum(number):
+            tempoNumber = number
+        else: # try to convert
+            tempoNumber = float(number)
+        post = None # returned if no match
+        # get a items and sort
+        matches = []
+        for tempoStr, tempoValue in defaultTempoValues.items():
+            matches.append([tempoValue, tempoStr])
+        matches.sort()
+        environLocal.printDebug(['matches', matches])
+        post = None
+        for tempoValue, tempoStr in matches:
+            if (tempoNumber >= (tempoValue-spread) and tempoNumber <= 
+                (tempoValue+spread)): # found a match
+                post = tempoStr
+                break 
+        return post
 
 
+
+#-------------------------------------------------------------------------------
 class MetricModulation(TempoIndication):
-    '''A class for representing the relationship between two MetronomeMarks. Generally this relationship is one of equality:
+    '''A class for representing the relationship between two MetronomeMarks. Generally this relationship is one of equality.
+
+    The `classicalStyle` attribute determines of the first MetronomeMark describes the new tempo, not the old (the reverse of expected usage).
+
+    The `maintainBeat` attribute determines if, after an equality statement, the beat is maintained. 
     '''
-    # classicalStyle
-    # arrows   left/right
     def __init__(self, value = None):
         TempoIndication.__init__(self)
 
+        self.classicalStyle = False 
+        self.maintainBeat = False
+        self.transitionSymbol = '=' # accept different symbols
+        # some old formats use arrows
+        self.arrowDirection = None # can be left or right as well
+
+        # store two MetronomeMark objects
+        self._leftMetronome = None
+        self._rightMetronome = None
 
 
+
+#-------------------------------------------------------------------------------
 def interpolateElements(element1, element2, sourceStream, 
     destinationStream, autoAdd = True):
     '''
@@ -300,11 +455,11 @@ class Test(unittest.TestCase):
 
 
     def testSetup(self):
-        MM1 = MetronomeMark(60, music21.note.QuarterNote() )
+        MM1 = MetronomeMark(number=60, referent=music21.note.QuarterNote())
         self.assertEqual(MM1.number, 60)
 
         TM1 = TempoText("Lebhaft")
-        self.assertEqual(TM1.value, "Lebhaft")
+        self.assertEqual(TM1.text, "Lebhaft")
         
 
     def testUnicode(self):
@@ -313,13 +468,19 @@ class Test(unittest.TestCase):
         # test with no arguments
         tm = music21.tempo.TempoText()
 
-        tm = music21.tempo.TempoText("adagio")
+        #environLocal.printDebug(['testing tempo instantion', tm])
 
-        self.assertEqual(tm.number, 52)
+        tm = music21.tempo.TempoText("adagio")
+        mm = music21.tempo.MetronomeMark("adagio")
+        self.assertEqual(mm.number, 52)
+        self.assertEqual(mm.numberImplicit, True)
+
+        self.assertEqual(mm.number, 52)
         tm2 = music21.tempo.TempoText(u"très vite")
 
-        self.assertEqual(tm2.value, u'très vite')
-        self.assertEqual(tm2.number, 144)
+        self.assertEqual(tm2.text, u'très vite')
+        mm = tm2.getMetronomeMark()
+        self.assertEqual(mm.number, 144)
 
         
 
