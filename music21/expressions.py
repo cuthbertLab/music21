@@ -1,10 +1,11 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         expressions.py
 # Purpose:      notation mods
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
+#               Neena Parikh
 #
 # Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL

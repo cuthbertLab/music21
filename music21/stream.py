@@ -4187,6 +4187,25 @@ class Stream(music21.Music21Object):
         'Part'
         
         
+        Demonstrate what makeMeasures will do with inPlace == True:
+        
+        
+        >>> sScr = stream.Stream()
+        >>> sScr.insert(0, clef.TrebleClef())
+        >>> sScr.insert(0, meter.TimeSignature('3/4'))
+        >>> sScr.append(note.Note('C4', quarterLength = 3.0))
+        >>> sScr.append(note.Note('D4', quarterLength = 3.0))
+        >>> sScr.makeMeasures(inPlace = True)
+        >>> sScr.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.meter.TimeSignature 3/4>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.note.Note C>
+        {3.0} <music21.stream.Measure 2 offset=3.0>
+            {0.0} <music21.note.Note D>
+        
+        
+        
         If after running makeMeasures you run makeTies, it will also split 
         long notes into smaller notes with ties.  Lyrics and articulations
         are attached to the first note.  Expressions (fermatas,
@@ -4336,7 +4355,7 @@ class Stream(music21.Music21Object):
 
             # avoid an infinite loop
             if thisTimeSignature.barDuration.quarterLength == 0:
-                raise StreamException('time signature has no duration')    
+                raise StreamException('time signature %s has no duration' % thisTimeSignature)    
             post._insertCore(o, m) # insert measure
             # increment by meter length
             o += thisTimeSignature.barDuration.quarterLength 
@@ -4402,8 +4421,12 @@ class Stream(music21.Music21Object):
 #             m._elementsChanged()
         post._elementsChanged()
 
-        return post # returns a new stream populated w/ new measure streams
-
+        if inPlace == False:
+            return post # returns a new stream populated w/ new measure streams
+        else:
+            self.elements = []
+            for x in post.sorted:
+                self.insert(x.getOffsetBySite(post), x)
 
     def makeRests(self, refStreamOrTimeRange=None, fillGaps=False,
         inPlace=True):
@@ -11494,7 +11517,18 @@ class Test(unittest.TestCase):
 
             partOffset += partOffsetShift
 
-            
+    def testMakeMeasuresInPlace(self):
+        from music21 import clef, meter, note
+        sScr = Stream()
+        sScr.insert(0, clef.TrebleClef())
+        sScr.insert(0, meter.TimeSignature('3/4'))
+        sScr.append(note.Note('C4', quarterLength = 3.0))
+        sScr.append(note.Note('D4', quarterLength = 3.0))
+        sScr.makeMeasures(inPlace = True)
+        self.assertEqual(len(sScr.getElementsByClass(Measure)), 2)
+        self.assertEqual(sScr.measure(1).notes[0].name, 'C')
+        self.assertEqual(sScr.measure(2).notes[0].name, 'D')
+       
 
 
     def testMakeMeasuresMeterStream(self):

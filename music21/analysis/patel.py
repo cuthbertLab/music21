@@ -76,6 +76,7 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     Stream.melodicIntervals() for determining how to find consecutive
     intervals.
     
+    
     >>> from music21 import *
     >>> s2 = converter.parse('C4 D E F# G#', '4/4').notesAndRests
     >>> analysis.patel.melodicIntervalVariability(s2)
