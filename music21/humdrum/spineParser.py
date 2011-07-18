@@ -1095,7 +1095,7 @@ def kernTandamToControl(tandam):
         except ValueError:
             metronomeMark = re.sub('^\[','',metronomeMark)
             metronomeMark = re.sub(']\s*$','',metronomeMark)
-            MS = music21.tempo.TempoMark(metronomeMark)
+            MS = music21.tempo.TempoText(metronomeMark)
             return MS
     elif tandam.startswith("*M"):
         meterType = tandam[2:]

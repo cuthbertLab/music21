@@ -44,10 +44,20 @@ defaultTempoValues = {
      'prestissimo': 200
      }
 
-class TempoMark(music21.Music21Object):
+
+
+
+class TempoIndication(music21.Music21Object):
+    '''A generic base class for all tempo indications to inherit. Can be used to filter out all types of tempo indications. 
+    '''
+    def __init__(self):
+        music21.Music21Object.__init__(self)
+    
+
+class TempoText(TempoIndication):
     '''
     >>> import music21
-    >>> tm = music21.tempo.TempoMark("adagio")
+    >>> tm = music21.tempo.TempoText("adagio")
     >>> tm.value
     'adagio'
     
@@ -58,12 +68,12 @@ class TempoMark(music21.Music21Object):
 
     >>> tm.number
     52
-    >>> tm2 = music21.tempo.TempoMark(u"très vite")
+    >>> tm2 = music21.tempo.TempoText(u"très vite")
     >>> tm2.value.endswith('vite')
     True
     >>> tm2.value == u'très vite'   # TODO: Make sure is working again....
     True
-    >>> tm3 = music21.tempo.TempoMark("extremely, wicked fast!")
+    >>> tm3 = music21.tempo.TempoText("extremely, wicked fast!")
     >>> tm3.number
     90
     '''
@@ -73,7 +83,8 @@ class TempoMark(music21.Music21Object):
     _DOC_ALL_INHERITED = False
 
     def __init__(self, value = None):
-        music21.Music21Object.__init__(self)
+        TempoIndication.__init__(self)
+
         if music21.common.isNum(value):
             self.value = str(value)
             self.number = value
@@ -95,7 +106,7 @@ class TempoMark(music21.Music21Object):
 
 
 
-class MetronomeMark(TempoMark):
+class MetronomeMark(TempoText):
     '''
     A way of specifying only a particular tempo and referent and (optionally) a text description
     
@@ -110,11 +121,12 @@ class MetronomeMark(TempoMark):
     >>> a.value
     'slow'
     '''
+    # TODO: 
     def __init__(self, number = 60, referent = None, value = None):
         if value is not None:
-            TempoMark.__init__(self, value)
+            TempoText.__init__(self, value)
         else:
-            TempoMark.__init__(self, number)
+            TempoText.__init__(self, number)
 
         self.number = number
         if referent is not None and 'Duration' not in referent.classes:
@@ -126,6 +138,14 @@ class MetronomeMark(TempoMark):
         return "<music21.tempo.MetronomeMark %s>" % str(self.number)
 
 
+
+class MetricModulation(TempoIndication):
+    '''A class for representing the relationship between two MetronomeMarks. Generally this relationship is one of equality:
+    '''
+    # classicalStyle
+    # arrows   left/right
+    def __init__(self, value = None):
+        TempoIndication.__init__(self)
 
 
 
@@ -283,7 +303,7 @@ class Test(unittest.TestCase):
         MM1 = MetronomeMark(60, music21.note.QuarterNote() )
         self.assertEqual(MM1.number, 60)
 
-        TM1 = TempoMark("Lebhaft")
+        TM1 = TempoText("Lebhaft")
         self.assertEqual(TM1.value, "Lebhaft")
         
 
@@ -291,12 +311,12 @@ class Test(unittest.TestCase):
 
         from music21 import tempo
         # test with no arguments
-        tm = music21.tempo.TempoMark()
+        tm = music21.tempo.TempoText()
 
-        tm = music21.tempo.TempoMark("adagio")
+        tm = music21.tempo.TempoText("adagio")
 
         self.assertEqual(tm.number, 52)
-        tm2 = music21.tempo.TempoMark(u"très vite")
+        tm2 = music21.tempo.TempoText(u"très vite")
 
         self.assertEqual(tm2.value, u'très vite')
         self.assertEqual(tm2.number, 144)
@@ -305,7 +325,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [TempoMark, MetronomeMark, interpolateElements]
+_DOC_ORDER = [TempoText, MetronomeMark, interpolateElements]
 
 
 if __name__ == "__main__":

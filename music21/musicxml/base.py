@@ -1447,6 +1447,15 @@ class Words(MusicXMLElement):
         # char data stores the text to be displayed
         self.charData = charData
 
+
+class MetronomeMark(MusicXMLElement):
+    '''A direction type used to store tempo indications, consisting of a <beat-unit> tag (a duration) as well as a <per-unit> tag (a number)
+    '''
+    def __init__(self, charData=None):
+        MusicXMLElement.__init__(self)
+
+
+
 class Offset(MusicXMLElement):
     '''A musicxml <offset> element can be found defined in the <direction> element. the charData stores a number that is the shift in divisions from the location of the tag. 
     '''
