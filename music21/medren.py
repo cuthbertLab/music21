@@ -322,7 +322,7 @@ class TestExternal(unittest.TestCase):
 
         p.show('midi')
 
-    def xtestAll(self):
+    def testHouseStyle(self):
         from music21 import corpus
         gloria = corpus.parse('luca/gloria')
         gloriaNew = convertHouseStyle(gloria)
@@ -342,10 +342,8 @@ def testStretto():
 
 
 if __name__ == '__main__':
-    testStretto()
-
-#    music21.mainTest(TestExternal)
-    almaRedemptoris = converter.parse("C4 E F G A G G G A B c G", '4/4') #liber 277 (pdf401)
-    puer = converter.parse('G4 d d d e d c c d c e d d', '4/4') # puer natus est 408 (pdf 554)
-    almaRedemptoris.title = "Alma Redemptoris Mater LU p. 277"
-    puer.title = "Puer Natus Est Nobis"
+    music21.mainTest(TestExternal)
+#    almaRedemptoris = converter.parse("C4 E F G A G G G A B c G", '4/4') #liber 277 (pdf401)
+#    puer = converter.parse('G4 d d d e d c c d c e d d', '4/4') # puer natus est 408 (pdf 554)
+#    almaRedemptoris.title = "Alma Redemptoris Mater LU p. 277"
+#    puer.title = "Puer Natus Est Nobis"

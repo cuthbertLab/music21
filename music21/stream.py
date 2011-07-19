@@ -540,7 +540,7 @@ class Stream(music21.Music21Object):
         '''
         # TODO: check class of other first
         if other is None or not isinstance(other, Stream):
-            raise TypeError('cannot concatenate a Strema to a non-Stream')
+            raise TypeError('cannot concatenate a Stream with a non-Stream')
 
         s = self.__class__()
         s.autoSort = self.autoSort
@@ -1043,9 +1043,18 @@ class Stream(music21.Music21Object):
 
     def _insertCore(self, offset, element, ignoreSort=False, 
         setActiveSite=True):
-        '''For fast processing: no checks, just insertion. Only be used in contexts that we know we have a proper, single Music21Object. Best for usage when taking objects in a known Stream and creating a new Stream
+        '''
+        A faster way of inserting elements that does no checks, 
+        just insertion. 
+        
+        
+        Only be used in contexts that we know we have a proper, single Music21Object. 
+        Best for usage when taking objects in a known Stream and creating a new Stream
 
-        When using this method, the caller is responsible for calling Stream._elementsChanged after all operations are completed.
+
+        When using this method, the caller is responsible for calling Stream._elementsChanged 
+        after all operations are completed.
+        
         '''
         #environLocal.printDebug(['_insertCore', 'self', self, 'offset', offset, 'element', element])
         #self._addElementPreProcess(element)
@@ -1069,13 +1078,16 @@ class Stream(music21.Music21Object):
         '''
         Inserts an item(s) at the given offset(s). 
 
+
         If `ignoreSort` is True then the inserting does not
         change whether the Stream is sorted or not (much faster if you're going to be inserting dozens
         of items that don't change the sort status)
 
+
         The `setActiveSite` parameter should nearly always be True; only for 
         advanced Stream manipulation would you not change 
         the activeSite after inserting an element. 
+
         
         Has three forms: in the two argument form, inserts an element at the given offset:
 
@@ -1084,7 +1096,7 @@ class Stream(music21.Music21Object):
         
         >>> st1 = stream.Stream()
         >>> st1.insert(32, note.Note("B-"))
-        >>> st1._getHighestOffset()
+        >>> st1.highestOffset
         32.0
 
         
@@ -1184,9 +1196,14 @@ class Stream(music21.Music21Object):
 
 
     def _appendCore(self, element):
-        '''Low level appending; does not error check, determine elements changed, or similar operations.
+        '''
+        Low level appending; like `_insertCore` does not error check, 
+        determine elements changed, or similar operations.
 
-        When using this method, the caller is responsible for calling Stream._elementsChanged after all operations are completed.
+
+        When using this method, the caller is responsible for calling 
+        Stream._elementsChanged after all operations are completed.
+
 
         This method does not adjust priority values for grace notes.
         '''
@@ -1204,14 +1221,22 @@ class Stream(music21.Music21Object):
 
     def append(self, others):
         '''
-        Add Music21Objects (including other Streams) to the Stream 
-        (or multiple if passed a list)
-        with offset equal to the highestTime (that is the latest "release" of an object), 
-        that is, directly after the last element ends. 
+        Add a Music21Object (including another Stream) to the end of the current Stream.
+        
+        
+        If given a list, will append each element in order after the previous one.
+        
+        
+        The "end" of the stream is determined by the `highestTime` property
+        (that is the latest "release" of an object, or directly after the last
+        element ends). 
+
 
         if the objects are not Music21Objects, they are wrapped in ElementWrappers
 
+
         runs fast for multiple addition and will preserve isSorted if True
+
 
         >>> from music21 import *
 
@@ -1510,7 +1535,7 @@ class Stream(music21.Music21Object):
             gap = o - lowestOffsetInsert
             if gap < 0: # no shifting necessary
                 continue 
-            # only process elments whose offsets are after the lowest insert
+            # only process elements whose offsets are after the lowest insert
             if lowestGap == None or gap < lowestGap:
                 lowestGap = gap
                 lowestElementToShift = e
@@ -4888,7 +4913,8 @@ class Stream(music21.Music21Object):
     def makeAccidentals(self, pitchPast=None, useKeySignature=True, 
         alteredPitches=None, searchKeySignatureByContext=False, 
         cautionaryPitchClass=True, cautionaryAll=False, inPlace=True, overrideStatus=False, cautionaryNotImmediateRepeat=True): 
-        '''A method to set and provide accidentals given varous conditions and contexts.
+        '''
+        A method to set and provide accidentals given various conditions and contexts.
 
         If `useKeySignature` is True, a :class:`~music21.key.KeySignature` will be searched for in this Stream or this Stream's defined contexts. An alternative KeySignature can be supplied with this object and used for temporary pitch processing. 
 
@@ -4983,9 +5009,12 @@ class Stream(music21.Music21Object):
 
     def makeNotation(self, meterStream=None, refStreamOrTimeRange=None,
                         inPlace=False):
-        '''This method calls a sequence of Stream methods on this Stream to prepare notation, including creating Measures if necessary, creating ties, beams, and accidentals.
+        '''
+        This method calls a sequence of Stream methods on this Stream to prepare notation, including creating Measures if necessary, creating ties, beams, and accidentals.
+
 
         If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
+
 
         >>> from music21 import *
         >>> s = stream.Stream()
@@ -5052,8 +5081,10 @@ class Stream(music21.Music21Object):
         The last duration of the last object is assigned to extend to the 
         end of the Stream.
 
+
         If `inPlace` is True, this is done in-place; if `inPlace` is 
         False, this returns a modified deep copy.
+
         
         >>> from music21 import *
         
@@ -5073,6 +5104,7 @@ class Stream(music21.Music21Object):
         >>> len(sort1)
         6
     
+
         >>> stream2 = sort1.flat.extendDuration(note.GeneralNote)
         >>> len(stream2)
         6
@@ -5132,8 +5164,10 @@ class Stream(music21.Music21Object):
         equal to that of all tied constituents. Lastly, 
         remove the formerly-tied notes.
 
+
         This method can be used on Stream and Stream subclasses. 
         When used on a Score, Parts and Measures are retained. 
+
 
         If `retainContainers` is False (by default), this method only 
         returns Note objects; Measures and other structures are stripped 
@@ -5142,13 +5176,16 @@ class Stream(music21.Music21Object):
         :class:`~music21.stream.Measure` Streams, and get back a 
         multi-Measure structure.
 
+
         Presently, this only works if tied notes are sequentual; ultimately
         this will need to look at .to and .from attributes (if they exist)
+
 
         In some cases (under makeMeasures()) a continuation note will not have a 
         Tie object with a stop attribute set. In that case, we need to look
         for sequential notes with matching pitches. The `matchByPitch` option can 
         be used to use this technique. 
+
 
         >>> from music21 import *
 
@@ -6053,8 +6090,8 @@ class Stream(music21.Music21Object):
         Note the difference between this property and highestTime
         which gets the end time of the highestOffset
 
-        >>> from music21 import *
 
+        >>> from music21 import *
         >>> stream1 = stream.Stream()
         >>> for offset in [0, 4, 8]:
         ...     n = note.WholeNote('G#')

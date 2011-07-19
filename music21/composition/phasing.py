@@ -144,7 +144,7 @@ def partPari(show = True):
     s.insert(0, mtied)
     s.insert(0, bass)
     
-    for p in s.getElementsByClass(stream.Part):
+    for p in s.parts:
         p.getElementsByClass(stream.Measure)[-1].rightBarline = bar.Barline('final')
 
     if show == True:
