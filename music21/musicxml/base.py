@@ -53,7 +53,6 @@ VERSION_MINIMUM = (0, 3, 5)
 # unicode and python issues
 # http://evanjones.ca/python-utf8.html
 
-# TODO: handle direction-type metronome, beat-unit, etc.; test 31c
 # TODO: deal with grace notes, in particular duration handling
 # TODO: add print <print new-system="yes"/>
 
@@ -228,6 +227,7 @@ class TagLib(object):
 ('grace', False, Grace),  
 
 # this position is not based on measured tag usage
+('sound', False, Sound),  
 ('words', True, Words),  
 ('offset', True),  # no object
 ('print', False, Print),  
@@ -236,6 +236,11 @@ class TagLib(object):
 ('right-margin', True),  
 ('left-margin', True),  
 ('system-distance', True),  
+
+('metronome', False, Metronome), # no char data
+('beat-unit', True, BeatUnit),
+('beat-unit-dot', False, BeatUnitDot),
+('beat-minute', True, PerMinute),
 
 ('time-modification', False, TimeModification), 
 ('actual-notes', True), 
@@ -1311,12 +1316,30 @@ class Direction(MusicXMLElementList):
         True
         '''
         for directionType in self.componentList:
+            # <sound> tags are the only ones that are in direction
+            # that are not wrapped in a direction-type attribute
+            if isinstance(directionType, Sound):
+                continue 
             for obj in directionType:
                 if isinstance(obj, Dynamics):
                     for subobj in obj:
                         if isinstance(subobj, DynamicMark):
                             return subobj
         return None
+
+
+    def _getObjectsContainedInDirectionType(self, classMatch):
+        '''Get one or more objects contained in a direction type stored in this Direction. 
+        '''
+        post = []
+        for directionType in self.componentList:
+            if isinstance(directionType, Sound):
+                continue 
+            for obj in directionType:
+                if isinstance(obj, classMatch):
+                    post.append(obj)
+        return post
+
 
     def getWedge(self):
         '''Search this direction and determine if it contains a dynamic mark.
@@ -1329,10 +1352,18 @@ class Direction(MusicXMLElementList):
         >>> a.getWedge() != None
         True
         '''
-        for directionType in self.componentList:
-            for obj in directionType:
-                if isinstance(obj, Wedge):
-                    return obj
+        found = self._getObjectsContainedInDirectionType(Wedge)
+        if len(found) > 0:
+            return found[0]
+        else:
+            return None
+
+#         for directionType in self.componentList:
+#             if isinstance(directionType, Sound):
+#                 continue 
+#             for obj in directionType:
+#                 if isinstance(obj, Wedge):
+#                     return obj
         return None
 
     def getWords(self):
@@ -1348,15 +1379,23 @@ class Direction(MusicXMLElementList):
         >>> a.getWords()[0].charData
         'crescendo'
         '''
-        post = [] # return a lost
-        for directionType in self.componentList:
-            for obj in directionType:
-                if isinstance(obj, Words):
-                    post.append(obj)
-        if len(post) > 0:
-            return post
+        found = self._getObjectsContainedInDirectionType(Words)
+        if len(found) > 0:
+            return found # return the lost
         else:
             return None
+
+#         post = [] # return a lost
+#         for directionType in self.componentList:
+#             if isinstance(directionType, Sound):
+#                 continue 
+#             for obj in directionType:
+#                 if isinstance(obj, Words):
+#                     post.append(obj)
+#         if len(post) > 0:
+#             return post
+#         else:
+#             return None
 
     def getCoda(self):
         '''Search this direction and determine if it contains a coda mark.
@@ -1369,11 +1408,19 @@ class Direction(MusicXMLElementList):
         >>> a.getCoda() != None
         True
         '''
-        for directionType in self.componentList:
-            for obj in directionType:
-                if isinstance(obj, Coda):
-                    return obj
-        return None
+        found = self._getObjectsContainedInDirectionType(Coda)
+        if len(found) > 0:
+            return found[0] 
+        else:
+            return None
+
+#         for directionType in self.componentList:
+#             if isinstance(directionType, Sound):
+#                 continue 
+#             for obj in directionType:
+#                 if isinstance(obj, Coda):
+#                     return obj
+#         return None
 
     def getSegno(self):
         '''Search this direction and determine if it contains a segno mark.
@@ -1386,18 +1433,26 @@ class Direction(MusicXMLElementList):
         >>> a.getSegno() != None
         True
         '''
-        for directionType in self.componentList:
-            for obj in directionType:
-                if isinstance(obj, Segno):
-                    return obj
-        return None
+        found = self._getObjectsContainedInDirectionType(Segno)
+        if len(found) > 0:
+            return found[0] 
+        else:
+            return None
+
+#         for directionType in self.componentList:
+#             if isinstance(directionType, Sound):
+#                 continue 
+#             for obj in directionType:
+#                 if isinstance(obj, Segno):
+#                     return obj
+#         return None
 
 
 class DirectionType(MusicXMLElementList):
     '''DirectionType stores objects like Pedal, dynamics, wedge, and words
     '''
     def __init__(self):
-        MusicXMLElementList.__init__(self)
+        MusicXMLElementList.__init__(self)        
         self._tag = 'direction-type'
         # attributes
         # elements
@@ -1441,26 +1496,75 @@ class Words(MusicXMLElement):
         self._attr['valign'] = None # top, middle, bottom
 
         # text-rotation and text-decoration did not seem work on finale reader
-        # import
-
-        # elements
         # char data stores the text to be displayed
         self.charData = charData
 
 
-class MetronomeMark(MusicXMLElement):
+class Metronome(MusicXMLElementList):
     '''A direction type used to store tempo indications, consisting of a <beat-unit> tag (a duration) as well as a <per-unit> tag (a number)
     '''
     def __init__(self, charData=None):
+        MusicXMLElementList.__init__(self)
+        self._tag = 'metronome'
+        self.charData = charData # no char data is stored
+        # attributes
+        self._attr['parentheses'] = None # comma sep. list
+
+        # elements; on the component list is stored pairs of 
+        # <beat-unit> and <per-minute> tags; up to two may be stored
+        # may also be a <beat-unit-dot> tag after <beat unit>
+        # <metronome-beam>
+
+        # a subgroup may be the following; these are not implemented
+        # <metronome-note>
+        #   <metronome-relation>
+        self.componentList = []
+
+class BeatUnit(MusicXMLElement):
+    '''Part of <metronome> tags
+    '''
+    def __init__(self, charData=None):
         MusicXMLElement.__init__(self)
+        self._tag = 'beat-unit'
+        self.charData = charData # char data is quarter/half/etc
+        # attributes
+
+class BeatUnitDot(MusicXMLElement):
+    '''Part of <metronome> tags
+    '''
+    def __init__(self):
+        MusicXMLElement.__init__(self)
+        self._tag = 'beat-unit-dot'
+        # no char data, no attributes; many may be used for double dots
+
+class PerMinute(MusicXMLElement):
+    '''Part of <metronome> tags
+    '''
+    def __init__(self, charData=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'per-minute'
+        self.charData = charData # char data is the per minute time
+
+
 
 
 class Sound(MusicXMLElement):
     '''A direction type used to store a large variety of performance indications.
+
+    These tags seem to be found most often in <direction> tags, usually following a symbolic definition. For example, MetronomeMark definitions are often followed by a <sound> definition.
+
+    Other <sound> tags are found after the <attributes> tag in a measure, often defining tempo. 
     '''
     def __init__(self, charData=None):
         MusicXMLElement.__init__(self)
-        # attrs: sound
+        self._tag = 'sound'
+        
+        self._attr['tempo'] = None # a number in bpm where beat is quarter
+        self._attr['dynamics'] = None # can be a value 1 through 127
+        self._attr['damper-pedal'] = None # can be yes/no
+        # when used with a pizzacto attribute, can define a midi-instrument
+        self._attr['pizzicato'] = None # can be yes/no
+
 
 
 class Offset(MusicXMLElement):
@@ -2238,6 +2342,12 @@ class Handler(xml.sax.ContentHandler):
         self._graceObj = None
         self._wedgeObj = None
         self._wordsObj = None
+        self._soundObj = None
+
+        self._metronomeObj = None
+        self._beatUnitObj = None
+        self._beatUnitDotObj = None
+        self._perMinuteObj = None
 
         self._printObj = None
         self._systemLayoutObj = None
@@ -2302,7 +2412,6 @@ class Handler(xml.sax.ContentHandler):
 #                 #environLocal.printDebug(['got', self._currentObj])
 #                 self._currentObj.loadAttrs(attrs)
 #                 self._currentObj = None
-
         
         # place most commonly used tags first
         if name == 'note':
@@ -2465,6 +2574,24 @@ class Handler(xml.sax.ContentHandler):
         elif name == 'fermata':
             self._fermataObj = Fermata()
             self._fermataObj.loadAttrs(attrs)
+
+
+        elif name == 'sound':
+            self._soundObj = Sound()
+            self._soundObj.loadAttrs(attrs)
+
+        elif name == 'metronome':  # branch location not optimized
+            self._metronomeObj = Metronome()
+            self._metronomeObj.loadAttrs(attrs) # parenthesis is only
+
+        elif name == 'beat-unit':  
+            self._beatUnitObj = BeatUnit() # no attrs
+
+        elif name == 'beat-unit-dot':  
+            self._beatUnitDotObj = BeatUnitDot() # no attrs
+
+        elif name == 'per-minute':  
+            self._perMinuteObj = PerMinute() # no attrs
 
 
         elif name == 'score-partwise':
@@ -2668,9 +2795,8 @@ class Handler(xml.sax.ContentHandler):
             self._notationsObj.componentList.append(self._tiedObj)
             self._tiedObj = None
 
-
         elif name == 'direction':
-            # only append of direction has components
+            # only append if direction has components
             if self._directionObj.componentList != []:
                 self._measureObj.componentList.append(self._directionObj)
             self._directionObj = None
@@ -2716,6 +2842,54 @@ class Handler(xml.sax.ContentHandler):
             self._ornamentsObj.append(self._trillMarkObj)
             self._trillMarkObj = None
 
+
+        elif name == 'sound':
+            # sound can be store either in a Measure (less common) or in a
+            # <direction> (not a <direction-type>)
+            # if a direction obj is open, add there
+            if self._directionObj is not None:
+                environLocal.printDebug(['inserting <sound> into _directionObj'])
+                self._directionObj.componentList.append(self._soundObj)
+            elif self._measureObj is not None:
+                self._measureObj.componentList.append(self._soundObj)
+                environLocal.printDebug(['inserting <sound> into _measureObj'])
+            self._soundObj = None
+
+
+        elif name == 'metronome':  # branch location not optimized
+            if self._directionTypeObj is not None: 
+                environLocal.printDebug(['closing Metronome'])
+                self._directionTypeObj.componentList.append(self._metronomeObj)
+            else:
+                raise MusicXMLException('missing a direction tyoe container for a Metronome: %s' % self._metronomeObj)
+            self._metronomeObj = None
+
+        elif name == 'beat-unit':  
+            if self._metronomeObj is not None: 
+                self._beatUnitObj.charData = self._currentTag.charData
+                self._metronomeObj.componentList.append(self._beatUnitObj)
+                environLocal.printDebug(['adding beat-unit to metronome'])
+            else:
+                raise MusicXMLException('found a <beat-unit> tag without a metronome object to store it within: %s' % self._beatUnitObj)
+            self._beatUnitObj = None
+
+        elif name == 'beat-unit-dot':  
+            # no char data
+            if self._metronomeObj is not None: 
+                self._metronomeObj.componentList.append(self._beatUnitDotObj)
+                environLocal.printDebug(['adding beat-unit-dot to metronome'])
+            else:
+                raise MusicXMLException('found a <beat-unit-dot> tag without a metronome object to store it within: %s' % self._beatUnitObj)
+            self._beatUnitDotObj = None
+
+        elif name == 'per-minute':
+            if self._metronomeObj is not None: 
+                self._perMinuteObj.charData = self._currentTag.charData
+                self._metronomeObj.componentList.append(self._perMinuteObj)
+                environLocal.printDebug(['adding beat-unit to metronome'])
+            else:
+                raise MusicXMLException('found a <per-minute> tag without a metronome object to store it within: %s' % self._perMinuteObj)
+            self._perMinuteObj = None
 
 
         elif name == 'time-modification': 
@@ -2822,7 +2996,7 @@ class Handler(xml.sax.ContentHandler):
 
 
         elif name == 'words':
-            if self._directionTypeObj != None: 
+            if self._directionTypeObj is not None: 
                 #environLocal.printDebug(['closing Words', 'self._wordsObj.charData',  self._wordsObj.charData])
                 # must manually attach collected charData
                 self._wordsObj.charData = self._currentTag.charData

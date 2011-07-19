@@ -1791,7 +1791,10 @@ directions31a = """<?xml version="1.0" encoding="UTF-8"?>
     <measure number="12">
       <direction>
         <direction-type>
-          <metronome><beat-unit>quarter</beat-unit><per-minute>60</per-minute></metronome>
+          <metronome>
+            <beat-unit>quarter</beat-unit>
+            <per-minute>60</per-minute>
+          </metronome>
         </direction-type>
       </direction>
       <note>

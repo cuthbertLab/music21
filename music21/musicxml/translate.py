@@ -567,10 +567,6 @@ def durationToMusicXML(d):
     '''
     from music21 import duration, note
 
-    # todo: this is not yet implemented in music21 note objects; to do
-    #mxNotehead = musicxmlMod.Notehead()
-    #mxNotehead.set('charData', defaults.noteheadUnpitched)
-
     # make a copy, as we this process will change tuple types
     dCopy = copy.deepcopy(d)
     # this update is done in note output
@@ -1235,6 +1231,11 @@ def noteToMxNotes(n, spannerBundle=None):
     mxNoteList = []
     pitchMx = n.pitch.mx
     noteColor = n.color
+
+    # todo: this is not yet implemented in music21 note objects; to do
+    #mxNotehead = musicxmlMod.Notehead()
+    #mxNotehead.set('charData', defaults.noteheadUnpitched)
+
 
     for mxNote in n.duration.mx: # returns a list of mxNote objs
         # merge method returns a new object; but can use existing here
