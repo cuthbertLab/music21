@@ -39,6 +39,70 @@ class TranslateException(Exception):
 
 
 
+
+def mxToTempoIndication(mxMetronome, mxWords=None):
+    '''Given an mxMetronome, convert to either a TempoIndication subclass, either a tempo.MetronomeMark or tempo.MetricModulation. 
+
+    >>> from music21 import *
+    >>> m = musicxml.Metronome()
+    >>> bu = musicxml.BeatUnit('half')
+    >>> pm = musicxml.PerMinute(125)
+    >>> m.append(bu)
+    >>> m.append(pm)
+    >>> musicxml.translate.mxToTempoIndication(m)
+    <music21.tempo.MetronomeMark <music21.duration.Duration 1.0>=125.0>
+
+    '''
+    from music21 import tempo, duration
+
+    # get lists of durations and texts
+    durations = []
+    numbers = [] 
+
+    dActive = None
+    for mxObj in mxMetronome.componentList:
+        if isinstance(mxObj, musicxmlMod.BeatUnit):
+            # if we have not yet stored the dActive
+            if dActive is not None:
+                durations.append(dActive)
+                dActive = None # clear
+            type = duration.musicXMLTypeToType(mxObj.charData)
+            dActive = duration.Duration(type=type)
+        if isinstance(mxObj, musicxmlMod.BeatUnitDot):
+            if dActive is None:
+                raise TranslateException('encountered metronome components out of order')
+            dActive.dots += 1 # add one dot each time these are encountered
+        # should come last
+        if isinstance(mxObj, musicxmlMod.PerMinute):            
+            # store as a number
+            if mxObj.charData != '':
+                numbers.append(float(mxObj.charData))
+
+
+    if mxMetronome.isMetricModulation():
+        mm = tempo.MetricModulation()
+        # create two metronome marks and set
+    else:
+        mm = tempo.MetronomeMark()
+        if len(numbers) > 0:
+            mm.number = numbers[0]
+        if len(durations) > 0:
+            mm.referent = durations[0]
+        # TODO: set text if defined in words
+        if mxWords is not None:
+            pass
+
+    return mm
+
+
+def tempoIndicationToMx(mxMetronome):
+    '''
+    '''
+    # if writing just a sound tag, place an empty words tag in a durection type and then follow with sound declaration
+    mxMetro = musicxmlMod.Metronome()
+
+
+
 def repeatToMx(r):
     '''
     >>> from music21 import *
@@ -1825,6 +1889,11 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             # store at zero position
             m._insertCore(0, sl)
 
+        # <sound> tags may be found in the Measure, used to define tempo
+        elif isinstance(mxObj, musicxmlMod.Sound):
+            environLocal.printDebug(['found musicxmlMod.Sound object in mxMeasure'])
+            pass
+
         elif isinstance(mxObj, musicxmlMod.Barline):
             # repeat is a tag found in the barline object
             mxBarline = mxObj
@@ -1999,7 +2068,16 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 _addToStaffReference(mxObj, rm, staffReference)
                 m._insertCore(offsetMeasureNote, rm)
 
+            if mxObj.getMetronome() is not None:
+                mm = mxToTempoIndication(mxObj.getMetronome())
+                _addToStaffReference(mxObj, mm, staffReference)
+                # need to look for metronome marks defined above
+                # and look for text defined below
+                m._insertCore(offsetMeasureNote, mm)
+
             if mxObj.getWords() is not None:
+                # TODO: need to look for tempo words if we have a metro
+
                 #environLocal.printDebug(['found mxWords object', mxObj])
                 # convert into a list of TextExpression objects
 
@@ -2920,8 +2998,15 @@ spirit</words>
 
         from music21.musicxml import testPrimitive
         from music21 import converter, repeat
-        s = converter.parse(testPrimitive.metronomeMarks31c)
 
+        # has metronome marks defined, not with sound tag
+        s = converter.parse(testPrimitive.metronomeMarks31c)
+        # get all tempo indications
+        mms = s.flat.getElementsByClass('TempoIndication')
+        self.assertEqual(len(mms) > 3, True)
+
+        # has only sound tempo=x tag
+        s = converter.parse(testPrimitive.articulations01)
         #s.show()
 
 

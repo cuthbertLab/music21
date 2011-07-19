@@ -1302,6 +1302,7 @@ class Direction(MusicXMLElementList):
         c.append(('offset', self.offset)) 
         return c
 
+
     def getDynamicMark(self):
         '''Search this direction and determine if it contains a dynamic mark, return, otherwise, return None
 
@@ -1327,7 +1328,6 @@ class Direction(MusicXMLElementList):
                             return subobj
         return None
 
-
     def _getObjectsContainedInDirectionType(self, classMatch):
         '''Get one or more objects contained in a direction type stored in this Direction. 
         '''
@@ -1339,6 +1339,24 @@ class Direction(MusicXMLElementList):
                 if isinstance(obj, classMatch):
                     post.append(obj)
         return post
+
+
+    def getMetronome(self):
+        '''Search this direction and determine if it contains a dynamic mark.
+
+        >>> a = Direction()
+        >>> b = DirectionType()
+        >>> c = Metronome()
+        >>> b.append(c)
+        >>> a.append(b)
+        >>> a.getMetronome() != None
+        True
+        '''
+        found = self._getObjectsContainedInDirectionType(Metronome)
+        if len(found) > 0:
+            return found[0] # only return one fo rnow
+        else:
+            return None
 
 
     def getWedge(self):
@@ -1502,6 +1520,13 @@ class Words(MusicXMLElement):
 
 class Metronome(MusicXMLElementList):
     '''A direction type used to store tempo indications, consisting of a <beat-unit> tag (a duration) as well as a <per-unit> tag (a number)
+
+    >>> from music21 import *
+    >>> m = musicxml.Metronome()
+    >>> bu1 = musicxml.BeatUnit('half')
+    >>> m.append(bu1)
+    >>> m.isMetricModulation()
+    False
     '''
     def __init__(self, charData=None):
         MusicXMLElementList.__init__(self)
@@ -1514,11 +1539,31 @@ class Metronome(MusicXMLElementList):
         # <beat-unit> and <per-minute> tags; up to two may be stored
         # may also be a <beat-unit-dot> tag after <beat unit>
         # <metronome-beam>
-
         # a subgroup may be the following; these are not implemented
         # <metronome-note>
         #   <metronome-relation>
         self.componentList = []
+
+    def isMetricModulation(self):
+        '''Return True if this Metronome defines a metric modulation. If there are more than on <beat-unit> tag, than this is True
+
+        >>> from music21 import *
+        >>> m = musicxml.Metronome()
+        >>> bu1 = musicxml.BeatUnit('half')
+        >>> bu2 = musicxml.BeatUnit('quarter')
+        >>> m.append(bu1)
+        >>> m.append(bu2)
+        >>> m.isMetricModulation()
+        True
+
+        '''
+        count = 0
+        for c in self.componentList:
+            if isinstance(c, BeatUnit):
+                count += 1
+                if count >= 2:
+                    return True
+        return False
 
 class BeatUnit(MusicXMLElement):
     '''Part of <metronome> tags
@@ -2868,7 +2913,7 @@ class Handler(xml.sax.ContentHandler):
             if self._metronomeObj is not None: 
                 self._beatUnitObj.charData = self._currentTag.charData
                 self._metronomeObj.componentList.append(self._beatUnitObj)
-                environLocal.printDebug(['adding beat-unit to metronome'])
+                environLocal.printDebug(['adding <beat-unit> to metronome'])
             else:
                 raise MusicXMLException('found a <beat-unit> tag without a metronome object to store it within: %s' % self._beatUnitObj)
             self._beatUnitObj = None
@@ -2877,7 +2922,7 @@ class Handler(xml.sax.ContentHandler):
             # no char data
             if self._metronomeObj is not None: 
                 self._metronomeObj.componentList.append(self._beatUnitDotObj)
-                environLocal.printDebug(['adding beat-unit-dot to metronome'])
+                environLocal.printDebug(['adding <beat-unit-dot> to metronome'])
             else:
                 raise MusicXMLException('found a <beat-unit-dot> tag without a metronome object to store it within: %s' % self._beatUnitObj)
             self._beatUnitDotObj = None
@@ -2886,7 +2931,7 @@ class Handler(xml.sax.ContentHandler):
             if self._metronomeObj is not None: 
                 self._perMinuteObj.charData = self._currentTag.charData
                 self._metronomeObj.componentList.append(self._perMinuteObj)
-                environLocal.printDebug(['adding beat-unit to metronome'])
+                environLocal.printDebug(['adding <per-minute> to metronome'])
             else:
                 raise MusicXMLException('found a <per-minute> tag without a metronome object to store it within: %s' % self._perMinuteObj)
             self._perMinuteObj = None

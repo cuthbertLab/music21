@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-10 The music21 Project
+# Copyright:    (c) 2009-11 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -157,47 +157,52 @@ class MetronomeMark(TempoIndication):
     >>> tm2.referent
     <music21.duration.Duration 1.0>
     '''
-
 # 
 #     >>> tm3 = music21.tempo.TempoText("extremely, wicked fast!")
 #     >>> tm3.number
 #     90
 
-
     def __init__(self, text=None, number=None, referent=None):
         TempoIndication.__init__(self)
 
-        self.number = number # may be None
+        self._number = number # may be None
         self.numberImplicit = None
-        if self.number is not None:
+        if self._number is not None:
             self.numberImplicit = False
 
         self._tempoText = None # set with property text
+        self.textImplicit = None
         if text is not None: # use property to create object if necessary
             self.text = text
-        self.textImplicit = None
+        
 
-        if referent is not None and 'Duration' not in referent.classes:
+        if referent is None: 
+            # if referent is None, set a default quarter note duration
+            self.referent = duration.Duration(type='quarter')
+        elif 'Duration' not in referent.classes:
+            # try get duration object, like from Note
             self.referent = referent.duration
+        elif 'Duration' in referent.classes:
+            self.referent = referent # should be a music21.duration.Duration object or a Music21Object with a duration or None
         elif common.isNum(referent): # assume ql value
             self.referent = duration.Duration(referent)
         else:
-            self.referent = referent # should be a music21.duration.Duration object or a Music21Object with a duration or None
+            raise TempoException('unhandled condition')
 
-        # if referent is None, set a default quarter note duration
-        if self.referent is None:
-            self.referent = duration.Duration(type='quarter')
+        # set implicit values if necessary
+        self._updateNumberFromText()
+        self._updateTextFromNumber()
 
         # try to set number from text if not defined
-        if self.number is None and self._tempoText is not None:
-            self.number = self._getDefaultNumber(self._tempoText)
-            if self.number is not None: # only if set
-                self.numberImplicit = True
-        # set text
-        if self._tempoText is None and self.number is not None:
-            self.text = self._getDefaultText(self.number) # use property
-            if self.text is not None:
-                self.textImplicit = True
+#         if self._number is None and self._tempoText is not None:
+#             self._number = self._getDefaultNumber(self._tempoText)
+#             if self._number is not None: # only if set
+#                 self.numberImplicit = True
+#         # set text
+#         if self._tempoText is None and self.number is not None:
+#             self.text = self._getDefaultText(self.number) # use property
+#             if self.text is not None:
+#                 self.textImplicit = True
 
         # need to store a sounding value for the case where where
         # a sounding different is different than the number given in the MM
@@ -209,21 +214,62 @@ class MetronomeMark(TempoIndication):
             return None
         return self._tempoText.text
 
-    def _setText(self, value):
+    def _setText(self, value, updateNumberFromText=True):
         if value is None:
             self._tempoText = None
         elif isinstance(value, TempoText):
             self._tempoText = value
+            self.textImplicit = False # must set here
         else:
             self._tempoText = TempoText(value)
+            self.textImplicit = False # must set here
+
+        if updateNumberFromText:
+            self._updateNumberFromText()
 
     text = property(_getText, _setText, doc = 
         '''Get or set a text string for this MetronomeMark. Internally implemented as a TempoText object. 
         ''')
 
+
+    def _getNumber(self):
+        return self._number # may be None
+    
+    def _setNumber(self, value, updateTextFromNumber=True):
+        if not common.isNum(value):
+            raise TempoException('cannot set number to a string')
+        self._number = value
+        self.numberImplicit = False
+        if updateTextFromNumber:
+            self._updateTextFromNumber()
+
+    number = property(_getNumber, _setNumber, doc =
+        '''Get and set the number, or the numerical value of the Metronome. 
+        ''')
+
     def __repr__(self):
-        #if self.text is None
-        return "<music21.tempo.MetronomeMark %s>" % str(self.number)
+        if self.text is None:
+            return "<music21.tempo.MetronomeMark %s=%s>" % (self.referent, str(self.number))
+        else:
+            return "<music21.tempo.MetronomeMark %s %s=%s>" % (self.text, self.referent, str(self.number))
+
+    def _updateTextFromNumber(self):
+        '''Update text if number is given and text is not defined
+        '''
+        if self._tempoText is None and self._number is not None:
+            self._setText(self._getDefaultText(self._number), 
+                            updateNumberFromText=False)
+            if self.text is not None:
+                self.textImplicit = True
+
+    def _updateNumberFromText(self):
+        '''Update number if text is given and number is not defined 
+        '''
+        if self._number is None and self._tempoText is not None:
+            self._number = self._getDefaultNumber(self._tempoText)
+            if self._number is not None: # only if set
+                self.numberImplicit = True
+
 
     def _getDefaultNumber(self, tempoText):
         '''Given a tempo text expression or an TempoText, get the default number.
@@ -269,7 +315,7 @@ class MetronomeMark(TempoIndication):
         for tempoStr, tempoValue in defaultTempoValues.items():
             matches.append([tempoValue, tempoStr])
         matches.sort()
-        environLocal.printDebug(['matches', matches])
+        #environLocal.printDebug(['matches', matches])
         post = None
         for tempoValue, tempoStr in matches:
             if (tempoNumber >= (tempoValue-spread) and tempoNumber <= 
@@ -483,6 +529,53 @@ class Test(unittest.TestCase):
         self.assertEqual(mm.number, 144)
 
         
+    def testMetronomeMarkA(self):
+        from music21 import tempo
+        mm = tempo.MetronomeMark()
+        mm.number = 52 # should implicitly set text
+        self.assertEqual(mm.text, 'adagio')
+        self.assertEqual(mm.textImplicit, True)
+        mm.text = 'slowish'
+        self.assertEqual(mm.text, 'slowish')
+        self.assertEqual(mm.textImplicit, False)
+        # default
+        self.assertEqual(mm.referent.quarterLength, 1.0)
+
+        # setting the text first        
+        mm = tempo.MetronomeMark()
+        mm.text = 'presto'
+        self.assertEqual(mm.text, 'presto')
+        self.assertEqual(mm.number, 168)
+        self.assertEqual(mm.numberImplicit, True)
+        mm.number = 200
+        self.assertEqual(mm.number, 200)
+        self.assertEqual(mm.numberImplicit, False)        
+        # still have default
+        self.assertEqual(mm.referent.quarterLength, 1.0)
+
+
+    def testMetronomeMarkB(self):
+        from music21 import tempo
+        mm = tempo.MetronomeMark()
+        # with no args these are set to None
+        self.assertEqual(mm.numberImplicit, None)
+        self.assertEqual(mm.textImplicit, None)
+
+
+        mm = tempo.MetronomeMark(number=100)
+        self.assertEqual(mm.number, 100)
+        self.assertEqual(mm.numberImplicit, False)
+        self.assertEqual(mm.text, None)
+        # not set
+        self.assertEqual(mm.textImplicit, None)
+
+        mm = tempo.MetronomeMark(number=101, text='rapido')
+        self.assertEqual(mm.number, 101)
+        self.assertEqual(mm.numberImplicit, False)
+        self.assertEqual(mm.text, 'rapido')
+        self.assertEqual(mm.textImplicit, False)
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
