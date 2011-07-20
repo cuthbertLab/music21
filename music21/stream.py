@@ -5074,6 +5074,60 @@ class Stream(music21.Music21Object):
 
 
 
+    def realizeOrnaments(self):
+        '''
+        Realize all ornaments on a stream
+
+        
+        Creates a new stream that contains all realized ornaments in addition
+        to other elements in the original stream.
+
+        
+        >>> from music21 import *
+        >>> s1 = stream.Stream()
+        >>> m1 = stream.Measure()
+        >>> m1.timeSignature = meter.TimeSignature("4/4")
+        >>> n1 = note.WholeNote("C4")
+        >>> n1.expressions.append(expressions.Mordent())
+        >>> m1.append(n1)
+        >>> m2 = stream.Measure()
+        >>> n2 = note.WholeNote("D4")
+        >>> m2.append(n2)
+        >>> s1.append(m1)
+        >>> s1.append(m2)
+        >>> s1.recurse()
+        [<music21.stream.Stream ...>, <music21.stream.Measure 0 offset=0.0>, <music21.meter.TimeSignature 4/4>, <music21.note.Note C>, <music21.stream.Measure 0 offset=4.0>, <music21.note.Note D>]
+        >>> s2 = s1.realizeOrnaments()
+        >>> s2.recurse()
+        [<music21.stream.Stream ...>, <music21.stream.Measure 0 offset=0.0>, <music21.meter.TimeSignature 4/4>, <music21.note.Note C>, <music21.note.Note B>, <music21.note.Note C>, <music21.stream.Measure 0 offset=4.0>, <music21.note.Note D>] 
+        
+        '''
+        newStream = self.__class__()
+        
+        # IF this streamObj contains more streams (ie, a Part that contains multiple measures)
+        if len(self.recurse(streamsOnly=True)) > 1:
+            i = 0
+            for innerStream in self.recurse(streamsOnly=True):
+                if i > 0:
+                    newStream.append(innerStream.realizeOrnaments())
+                i = i + 1
+        else:
+            for element in self:
+                if hasattr(element, "expressions"):
+                    realized = False
+                    for exp in element.expressions:
+                        if hasattr(exp, "realize"): 
+                            newNotes = exp.realize(element)
+                            realized = True
+                            for n in newNotes: newStream.append(n)
+                    if not realized:
+                        newStream.append(element)
+                else:
+                    newStream.append(element)
+        
+        return newStream
+
+
     def extendDuration(self, objName, inPlace=True):
         '''Given a Stream and an object class name, go through the Stream 
         and find each instance of the desired object. The time between 
@@ -9748,62 +9802,6 @@ class SpannerStorage(Stream):
 
 
 
-#-------------------------------------------------------------------------------
-
-def realizeOrnaments(srcObject):
-    '''
-    Realize all ornaments on a stream
-    
-    Creates a new stream that contains all realized ornaments in addition
-    to other elements in the original stream.
-    
-    >>> from music21 import *
-    >>> s1 = stream.Stream()
-    >>> m1 = stream.Measure()
-    >>> m1.timeSignature = meter.TimeSignature("4/4")
-    >>> n1 = note.WholeNote("C4")
-    >>> n1.expressions.append(expressions.Mordent())
-    >>> m1.append(n1)
-    >>> m2 = stream.Measure()
-    >>> n2 = note.WholeNote("D4")
-    >>> m2.append(n2)
-    >>> s1.append(m1)
-    >>> s1.append(m2)
-    >>> s1.recurse()
-    [<music21.stream.Stream ...>, <music21.stream.Measure 0 offset=0.0>, <music21.meter.TimeSignature 4/4>, <music21.note.Note C>, <music21.stream.Measure 0 offset=4.0>, <music21.note.Note D>]
-    >>> s2 = stream.realizeOrnaments(s1)
-    >>> s2.recurse()
-    [<music21.stream.Stream ...>, <music21.stream.Measure 0 offset=0.0>, <music21.meter.TimeSignature 4/4>, <music21.note.Note C>, <music21.note.Note B>, <music21.note.Note C>, <music21.stream.Measure 0 offset=4.0>, <music21.note.Note D>]
-
-    
-    
-    '''
-    newStream = srcObject.__class__()
-    
-    # IF this streamObj contains more streams (ie, a Part that contains multiple measures)
-    if len(srcObject.recurse(streamsOnly=True)) > 1:
-        i = 0
-        for innerStream in srcObject.recurse(streamsOnly=True):
-            if i > 0:
-                newStream.append(music21.stream.realizeOrnaments(innerStream))
-            i = i + 1
-        
-        
-    else:
-        for element in srcObject:
-            if hasattr(element, "expressions"):
-                realized = False
-                for exp in element.expressions:
-                    if hasattr(exp, "realize"): 
-                        newNotes = exp.realize(element)
-                        realized = True
-                        for n in newNotes: newStream.append(n)
-                if not realized:
-                    newStream.append(element)
-            else:
-                newStream.append(element)
-    
-    return newStream
 
 
 

@@ -42,6 +42,8 @@ from music21.corpus.beethoven import opus59no1
 from music21.corpus.beethoven import opus59no2
 from music21.corpus.beethoven import opus59no3
 
+from music21.corpus import cpebach
+
 from music21.corpus import essenFolksong
 from music21.corpus import ciconia
 from music21.corpus import josquin
@@ -379,6 +381,7 @@ MODULES = [
             bwv892,
             bwv893,
 
+            cpebach,
 
     ]
 
@@ -400,6 +403,7 @@ COMPOSERS = [
     ('airdsAirs', 'Aird\'s Airs'),
     ('bach', 'Johann Sebastian Bach'),
     ('beethoven', 'Ludwig van Beethoven'),
+    ('cpebach', 'C.P.E. Bach'),
     ('ciconia', 'Johannes Ciconia'),
     ('essenFolksong', 'Essen Folksong Collection'),
     ('handel', 'George Frideric Handel'),

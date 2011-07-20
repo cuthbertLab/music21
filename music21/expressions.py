@@ -771,7 +771,7 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
     
-    def testRealize(self):
+    def xtestRealize(self):
         from music21 import note
         from music21 import stream
         n1 = note.Note("D4")
@@ -789,7 +789,7 @@ class Test(unittest.TestCase):
         self.assertEqual(st1n[2].quarterLength, 3.75)
         
 
-    def testGetRepeatExpression(self):
+    def xtestGetRepeatExpression(self):
         from music21 import stream, expressions, repeat
 
         te = expressions.TextExpression('lightly')
@@ -823,7 +823,7 @@ class Test(unittest.TestCase):
         re = te.getRepeatExpression()
         self.assertEqual(re.getTextExpression().content, 'd.s. al fine')
 
-    def testExpandTurns(self):
+    def xtestExpandTurns(self):
         from music21 import note, stream, clef, key, meter
         p1 = stream.Part()
         m1 = stream.Measure()
@@ -843,7 +843,7 @@ class Test(unittest.TestCase):
         #print realizeOrnaments(n1)
         #print realizeOrnaments(n2)
     
-    def testExpandTrills(self):
+    def xtestExpandTrills(self):
         from music21 import note, stream, clef, key, meter
         p1 = stream.Part()
         m1 = stream.Measure()
@@ -857,6 +857,11 @@ class Test(unittest.TestCase):
         #print realizeOrnaments(n1)
         
 
+    def testCPEBachRealizeOrnaments(self):
+        from music21 import corpus
+        cpe = corpus.parse('cpebach/h186').parts[0].measures(1,4)
+        cpe2 = cpe.realizeOrnaments()
+        #cpe2.show()
 
 if __name__ == "__main__":
     music21.mainTest(Test)
