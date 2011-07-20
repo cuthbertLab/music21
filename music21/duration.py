@@ -445,6 +445,11 @@ def quarterLengthToDurations(qLen, link=True):
 
     >>> quarterLengthToDurations(.18333333333333)
     [<music21.duration.DurationUnit 0.125>, <music21.duration.DurationUnit 0.03125>, <music21.duration.DurationUnit 0.015625>, <music21.duration.DurationUnit 0.0078125>]
+
+
+    >>> quarterLengthToDurations(0.0)
+    [<music21.duration.ZeroDuration>]
+
     '''
     post = []
     typeLargest = None # largest found type that is less than
@@ -455,7 +460,7 @@ def quarterLengthToDurations(qLen, link=True):
 
     ## CUTHBERT: TRIED INCREASING 0.0 to < 0.005 but did not help...
     elif common.almostEqual(qLen, 0.0):
-        post.append(ZeroDuration) # this is a DurationUnit subclass
+        post.append(ZeroDuration()) # this is a DurationUnit subclass
         return post
     
     # try match to type, get next lowest
@@ -1855,12 +1860,25 @@ class DurationUnit(DurationCommon):
 
 #-------------------------------------------------------------------------------
 class ZeroDuration(DurationUnit):
-    
+    '''
+    Represents any Music21 element that does not last any length of time.
+    '''
     def __init__(self):
         DurationUnit.__init__(self)
         self.unlink()
         self.type = 'zero'
         self.quarterLength = 0.0
+
+    def __repr__(self):
+        '''Return a string representation.
+
+        >>> from music21 import *
+        >>> zDur = duration.ZeroDuration()
+        >>> repr(zDur)
+        '<music21.duration.ZeroDuration>'
+        '''
+        return '<music21.duration.ZeroDuration>'
+
 
 #-------------------------------------------------------------------------------
 class DurationException(Exception):
@@ -1994,9 +2012,11 @@ class Duration(DurationCommon):
         '''Test equality. Note: this may not work with Tuplets until we 
         define equality tests for tuplets.
 
-        >>> aDur = Duration('quarter')
-        >>> bDur = Duration('16th') 
-        >>> cDur = Duration('16th') 
+
+        >>> from music21 import *
+        >>> aDur = duration.Duration('quarter')
+        >>> bDur = duration.Duration('16th') 
+        >>> cDur = duration.Duration('16th') 
         >>> aDur == bDur
         False
         >>> cDur == bDur        
@@ -2016,9 +2036,10 @@ class Duration(DurationCommon):
     def __ne__(self, other):
         '''Test not equality.
 
-        >>> aDur = Duration('quarter')
-        >>> bDur = Duration('16th') 
-        >>> cDur = Duration('16th') 
+        >>> from music21 import *
+        >>> aDur = duration.Duration('quarter')
+        >>> bDur = duration.Duration('16th') 
+        >>> cDur = duration.Duration('16th') 
         >>> aDur != bDur
         True
         >>> cDur != bDur        
@@ -2040,14 +2061,16 @@ class Duration(DurationCommon):
             raise DurationException("zero DurationUnits in components: cannt link or unlink")
 
     def unlink(self):
-        '''Unlink all components
+        '''
+        Unlink all components allowing the type, dots, etc., to not be the same as the
+        normal representation in quarterLength units.
         '''
         if len(self._components) >= 1:
             for c in self._components:
                 c.unlink()
             self._cachedIsLinked = False
         else: # there may be components and still a zero type
-            raise DurationException("zero DurationUnits in components: cannt link or unlink")
+            raise DurationException("zero DurationUnits in components: cannot link or unlink")
 
     def _isLinked(self):
         # reset _cachedIsLinked to None when components have changed
@@ -2066,12 +2089,25 @@ class Duration(DurationCommon):
         return self._cachedIsLinked
 
     isLinked = property(_isLinked, doc = '''
-        Return a boolean describing this duration is linked or not.s
+        Return a boolean describing this duration is linked or not.
+        The `isLinked` of the first component in a complex duration
+        determines the link status for the entire Duration
+        
 
         >>> from music21 import *
-        >>> d = duration.Duration()
+        >>> d = duration.Duration(2.0)
+        >>> d.type
+        'half'
+        >>> d.quarterLength
+        2.0
         >>> d.isLinked
         True
+        >>> d.unlink()
+        >>> d.quarterLength = 4.0
+        >>> d.type
+        'half'
+        >>> d.isLinked
+        False
         ''')
 
 
@@ -2119,27 +2155,38 @@ class Duration(DurationCommon):
         else: return False
     
     isComplex = property(_isComplex,
-        doc='''Property defining if this Duration has more than one DurationUnit object on the `component` list.
+        doc='''
+        Returns True if this Duration has more than one DurationUnit object on the `component` list.
+        That is to say if it's a single Duration that need multiple tied noteheads to represent.
+        
 
-        >>> aDur = Duration()
+        >>> from music21 import *
+        >>> aDur = duration.Duration()
         >>> aDur.quarterLength = 1.375
         >>> aDur.isComplex
         True
         >>> len(aDur.components)
         2
+        >>> aDur.components
+        [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.375>]
+        
 
-        >>> aDur = Duration()
-        >>> aDur.quarterLength = 1.6666666
-        >>> aDur.isComplex
+        >>> bDur = duration.Duration()
+        >>> bDur.quarterLength = 1.6666666
+        >>> bDur.isComplex
         True
-        >>> len(aDur.components)
+        >>> len(bDur.components)
         2
+        >>> bDur.components
+        [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.6666...>]
 
-        >>> aDur = Duration()
-        >>> aDur.quarterLength = .25
-        >>> aDur.isComplex
+
+
+        >>> cDur = duration.Duration()
+        >>> cDur.quarterLength = .25
+        >>> cDur.isComplex
         False
-        >>> len(aDur.components)
+        >>> len(cDur.components)
         1
         ''')
 
@@ -2153,7 +2200,18 @@ class Duration(DurationCommon):
         return self._qtrLength
         
     def _setQuarterLength(self, value):
-        '''Set the quarter note length to the specified value.
+        '''
+        sets the QuarterLength
+        '''
+        
+        if self._qtrLength != value:
+            self._qtrLength = value            
+            self._componentsNeedUpdating = True
+            self._quarterLengthNeedsUpdating = False
+
+    quarterLength = property(_getQuarterLength, _setQuarterLength, doc='''
+        Returns the quarter note length or Sets the quarter note length to the specified value.
+        
         
         Currently (if the value is different from what is already stored)
         this wipes out any existing components, not preserving
@@ -2161,7 +2219,9 @@ class Duration(DurationCommon):
         setting Duration to 1.75 will NOT dot the last eighth note, but
         instead give you a single double-dotted half note.
 
-        >>> a = Duration()
+
+        >>> from music21 import *
+        >>> a = duration.Duration()
         >>> a.quarterLength = 3.5
         >>> a.quarterLength 
         3.5
@@ -2176,14 +2236,8 @@ class Duration(DurationCommon):
         ...    print(unitSpec(thisUnit))
         (2.0, 'half', 0, None, None, None)
         (0.5, 'eighth', 0, None, None, None)
-        '''
-        
-        if self._qtrLength != value:
-            self._qtrLength = value            
-            self._componentsNeedUpdating = True
-            self._quarterLengthNeedsUpdating = False
-
-    quarterLength = property(_getQuarterLength, _setQuarterLength)         
+   
+    ''')         
     
     def setQuarterLengthUnlinked(self, value):
         '''Set the quarter note length to the specified value.
@@ -2235,7 +2289,9 @@ class Duration(DurationCommon):
 
     def _setType(self, value):
         '''Set the type length to the specified value.
-        >>> a = Duration()
+
+        >>> from music21 import *
+        >>> a = duration.Duration()
         >>> a.type = 'half'
         >>> a.quarterLength 
         2.0
@@ -2302,7 +2358,8 @@ class Duration(DurationCommon):
 
         Having this as a method permits error checking.
 
-        >>> a = Duration()
+        >>> from music21 import *
+        >>> a = duration.Duration()
         >>> a.type = 'quarter'
         >>> a.dots = 1
         >>> a.quarterLength
@@ -2327,7 +2384,7 @@ class Duration(DurationCommon):
 
     def _getDotGroups(self):
         '''
-        Returns the tuple of dotGroups in the Duration
+        Returns the tuple of dotGroups in the first DurationUnit
         if it is a simple Duration.  Otherwise raises error.
         '''
         if self._componentsNeedUpdating == True:
@@ -2343,13 +2400,9 @@ class Duration(DurationCommon):
     def _setDotGroups(self, value):
         '''Set dotGroups if a list, as first element
 
+
         Having this as a method permits error checking.
 
-        >>> a = Duration()
-        >>> a.type = 'half'
-        >>> a.dotGroups = [1,1]
-        >>> a.quarterLength
-        4.5
         '''
         if not common.isListLike(value):
             raise DurationException('only list-like dotGroups values can be used with this method.')
@@ -2362,12 +2415,26 @@ class Duration(DurationCommon):
         else: # there must be 1 or more components
             raise DurationException("zero DurationUnits in components")        
 
-    dotGroups = property(_getDotGroups, _setDotGroups)
+    dotGroups = property(_getDotGroups, _setDotGroups, doc='''
+        See the explanation under :class:`~music21.duration.DurationUnit` about
+        what dotGroups (medieval dotted-dotted notes are).  In a complex
+        duration, only the dotGroups of the first component matter
+        
+
+        >>> from music21 import duration
+        >>> a = duration.Duration()
+        >>> a.type = 'half'
+        >>> a.dotGroups = [1,1]
+        >>> a.quarterLength
+        4.5
+
+    ''')
 
     def splitDotGroups(self):
         '''
         splits a dotGroup-duration (of 1 component) into a new duration of two
         components.  Returns a new duration
+        
         
         Probably does not handle properly tuplets of dot-groups.  Never seen one, so probably okay.
 
@@ -2697,10 +2764,11 @@ class Duration(DurationCommon):
 
     def clear(self):
         ''' 
-        Permit all componets to be removed. 
+        Permit all components to be removed. 
         (It is not clear yet if this is needed)
 
-        >>> a = Duration()
+        >>> from music21 import *
+        >>> a = duration.Duration()
         >>> a.quarterLength = 4
         >>> a.type
         'whole'
@@ -2716,9 +2784,14 @@ class Duration(DurationCommon):
     def addDurationUnit(self, dur, link=True):
         ''' 
         Add a DurationUnit or a Duration's components to this Duration.
+        Does not simplify the Duration.  For instance, adding two
+        quarter notes results in two tied quarter notes, not one half note.
+        See `consolidate` below for more info on how to do that.
+        
 
-        >>> a = Duration('quarter')
-        >>> b = Duration('quarter')
+        >>> from music21 import *
+        >>> a = duration.Duration('quarter')
+        >>> b = duration.Duration('quarter')
         >>> a.addDurationUnit(b)
         >>> a.quarterLength
         2.0
@@ -2744,13 +2817,17 @@ class Duration(DurationCommon):
             self._quarterLengthNeedsUpdating = True
 
     def consolidate(self):
-        '''Given a Duration with multiple components, consolidate into a single
+        '''
+        Given a Duration with multiple components, consolidate into a single
         Duration. This can only be based on quarterLength; this is 
-        destructive: information is lost from coponents.
+        destructive: information is lost from components.
 
+        
         This cannot be done for all Durations, as DurationUnits cannot express all durations
 
-        >>> a = Duration()
+        
+        >>> from music21 import *
+        >>> a = duration.Duration()
         >>> a.fill(['quarter', 'half', 'quarter'])
         >>> a.quarterLength
         4.0
@@ -2762,7 +2839,10 @@ class Duration(DurationCommon):
         >>> len(a.components)
         1
         
+        
         But it gains a type!
+        
+        
         >>> a.type
         'whole'
         '''
@@ -2803,7 +2883,8 @@ class Duration(DurationCommon):
         usage.
 
 
-        >>> aDur = Duration()
+        >>> from music21 import *
+        >>> aDur = duration.Duration()
         >>> aDur.quarterLength = 1.5 # dotted quarter
         >>> aDur.augmentOrDiminish(2)
         >>> aDur.quarterLength
@@ -2813,7 +2894,11 @@ class Duration(DurationCommon):
         >>> aDur.dots
         1
 
-        >>> bDur = Duration()
+        
+        A complex duration that cannot be expressed as a single notehead (component)
+
+
+        >>> bDur = duration.Duration()
         >>> bDur.quarterLength = 2.125 # requires components
         >>> len(bDur.components)
         2
@@ -2858,15 +2943,13 @@ class Duration(DurationCommon):
 
         Note that for 0 and the last value, the object is returned.
 
+        >>> from music21 import *
         >>> components = []
+        >>> components.append(duration.Duration('quarter'))
+        >>> components.append(duration.Duration('quarter'))
+        >>> components.append(duration.Duration('quarter'))
 
-        TODO: remove "for x in [1,1,1]" notation; it's confusing (Perl-like)
-              better is just to copy and paste three times.  Very easy to see what
-              is happening.
-        
-        >>> for x in [1,1,1]: 
-        ...   components.append(Duration('quarter'))
-        >>> a = Duration()
+        >>> a = duration.Duration()
         >>> a.components = components
         >>> a.updateQuarterLength()
         >>> a.quarterLength
@@ -2878,10 +2961,14 @@ class Duration(DurationCommon):
         >>> a.componentIndexAtQtrPosition(2.5)
         2
 
+
         this is odd behavior:
+
         e.g. given d1, d2, d3 as 3 quarter notes and
         self.components = [d1, d2, d3]
+
         then
+
         self.componentIndexAtQtrPosition(1.5) == d2
         self.componentIndexAtQtrPosition(2.0) == d3
         self.componentIndexAtQtrPosition(2.5) == d3
@@ -2930,12 +3017,17 @@ class Duration(DurationCommon):
         For a valid component index value, this returns the quarter note offset
         at which that component would start.
 
+
         This does not handle fractional arguments.
 
+
+        >>> from music21 import *
         >>> components = []
-        >>> for x in [1,1,1]: 
-        ...    components.append(Duration('quarter'))
-        >>> a = Duration()
+        >>> components.append(duration.Duration('quarter'))
+        >>> components.append(duration.Duration('quarter'))
+        >>> components.append(duration.Duration('quarter'))
+
+        >>> a = duration.Duration()
         >>> a.components = components
         >>> a.updateQuarterLength()
         >>> a.quarterLength
@@ -2961,13 +3053,15 @@ class Duration(DurationCommon):
         '''Given a quarter position within a component, divide that 
         component into two components.
 
-        >>> a = Duration()
+
+        >>> from music21 import *
+        >>> a = duration.Duration()
         >>> a.clear() # need to remove default
         >>> components = []
 
-        >>> a.addDurationUnit(Duration('quarter'))
-        >>> a.addDurationUnit(Duration('quarter'))
-        >>> a.addDurationUnit(Duration('quarter'))
+        >>> a.addDurationUnit(duration.Duration('quarter'))
+        >>> a.addDurationUnit(duration.Duration('quarter'))
+        >>> a.addDurationUnit(duration.Duration('quarter'))
 
         >>> a.quarterLength
         3.0
@@ -3087,7 +3181,7 @@ class Test(unittest.TestCase):
         pass
 
     def testCopyAndDeepcopy(self):
-        '''Test copyinng all objects defined in this module
+        '''Test copying all objects defined in this module
         '''
         import sys, types, copy
         for part in sys.modules[self.__module__].__dict__.keys():
