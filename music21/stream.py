@@ -5105,9 +5105,11 @@ class Stream(music21.Music21Object):
         newStream = self.__class__()
         
         # IF this streamObj contains more streams (ie, a Part that contains multiple measures)
-        if len(self.recurse(streamsOnly=True)) > 1:
+        recurse = self.recurse(streamsOnly = True)
+        
+        if len(recurse) > 1:
             i = 0
-            for innerStream in self.recurse(streamsOnly=True):
+            for innerStream in recurse:
                 if i > 0:
                     newStream.append(innerStream.realizeOrnaments())
                 i = i + 1
