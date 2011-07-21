@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         demos/monteverdi.py
 # Purpose:      Bellairs Workshop on Monteverdi Madrigals, Barbados, Feb 2011

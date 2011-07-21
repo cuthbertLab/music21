@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         correlate.py
 # Purpose:      Stream analyzer designed to correlate and graph two properties

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         nemcog.py
 # Purpose:      Demonstrations for the New England Music Cognition meeting

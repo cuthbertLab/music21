@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         smt2010.py
 # Purpose:      Demonstrations for the SMT 2010 poster session

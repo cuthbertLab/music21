@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0 obj="<mus...">
   {0.0} <music21.humdrum.MiscTandam **kern humdrum control>
   {0.0} <music21.humdrum.MiscTandam *staff2 humdrum control>

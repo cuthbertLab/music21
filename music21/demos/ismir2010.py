@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         ismir2010.py
 # Purpose:      Examples for ISMIR 2010 paper

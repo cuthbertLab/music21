@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         bar.py
 # Purpose:      music21 classes for representing bars, repeats, and related

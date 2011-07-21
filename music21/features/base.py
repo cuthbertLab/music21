@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         features/base.py
 # Purpose:      Feature extractors base classes.

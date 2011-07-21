@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         midi.base.py
 # Purpose:      music21 classes for dealing with midi data

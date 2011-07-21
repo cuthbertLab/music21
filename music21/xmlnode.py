@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         xmlnode.py
 # Purpose:      Base class for SAX-based xml objects

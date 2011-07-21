@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         base.py
 # Purpose:      Music21 base classes and important utilities
@@ -287,9 +287,7 @@ class DefinedContexts(object):
         for idKey in self._definedContexts.keys():
             if WEAKREF_ACTIVE:
             #if common.isWeakref(self._definedContexts[idKey]['obj']):
-
                 #environLocal.printDebug(['unwrapping:', self._definedContexts[idKey]['obj']])
-
                 post = common.unwrapWeakref(self._definedContexts[idKey]['obj'])
                 self._definedContexts[idKey]['obj'] = post
 
@@ -314,7 +312,6 @@ class DefinedContexts(object):
                 continue # always skip None
             if not common.isWeakref(self._definedContexts[idKey]['obj']):
                 #environLocal.printDebug(['wrapping:', self._definedContexts[idKey]['obj']])
-
                 post = common.wrapWeakref(self._definedContexts[idKey]['obj'])
                 self._definedContexts[idKey]['obj'] = post
 
@@ -1707,7 +1704,6 @@ class Music21Object(JSONSerializer):
         # store classes once when called
         self._classes = None 
 
-
         if "id" in keywords:
             self.id = keywords["id"]            
         else:
@@ -2713,6 +2709,9 @@ class Music21Object(JSONSerializer):
         if self._activeSite is not None:
             #environLocal.printDebug(['freezeIds: adjusting _activeSiteId', self._activeSite])
             self._activeSiteId = uuid.uuid4() # a place holder
+
+        if self._idLastDeepCopyOf is not None:
+            self._idLastDeepCopyOf = None # clear
 
 
     def unfreezeIds(self):

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:          sieve.py
 # Purpose:       sieve opperations, after Iannis Xenakis.

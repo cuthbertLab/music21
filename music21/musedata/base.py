@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         musedata.base.py
 # Purpose:      music21 classes for dealing with MuseData

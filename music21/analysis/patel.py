@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         patel.py
 # Purpose:      Tools for testing Aniruddh D. Patel's analysis theories

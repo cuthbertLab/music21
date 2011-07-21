@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         testDocumentation.py
 # Purpose:      tests from or derived from the Documentation

@@ -175,7 +175,6 @@ class MetronomeMark(TempoIndication):
         self.textImplicit = None
         if text is not None: # use property to create object if necessary
             self.text = text
-        
 
         self.parentheses = parentheses 
 

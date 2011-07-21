@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         romanText/base.py
 # Purpose:      music21 classes for processing roman numeral analysis text files

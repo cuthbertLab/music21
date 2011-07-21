@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         converter.py
 # Purpose:      Provide a common way to create Streams from any data music21
@@ -263,7 +263,6 @@ class StreamFreezer(object):
         # cannot get data from stream, as offsets are broken
         streamStr = str(time.time())
         return os.path.join(dir, 'm21-' + common.getMd5(streamStr) + '.p')
-
 
     #---------------------------------------------------------------------------
     def writePickle(self, fp=None):
@@ -960,14 +959,14 @@ def parse(value, *args, **keywords):
 
 
 def freeze(streamObj, fp=None):
-    '''Given a file path, attempt to parse the file into a Stream.
+    '''Given a StreamObject and a file path, pickle and store the Stream to a file.
     '''
     v = StreamFreezer(streamObj)
     return v.writePickle(fp) # returns fp
 
 
 def unfreeze(fp):
-    '''Given a file path, attempt to parse the file into a Stream.
+    '''Given a file path of a pickled Stream, attempt to parse the file into a Stream.
     '''
     v = StreamFreezer()
     v.openPickle(fp)

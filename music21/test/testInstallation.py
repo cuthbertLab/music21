@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         testInstallation.py
 # Purpose:      Controller for automated download, install, and testing.

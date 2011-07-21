@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         base40.py
 # Purpose:      Base40/Music21 Pitch/Interval Translator

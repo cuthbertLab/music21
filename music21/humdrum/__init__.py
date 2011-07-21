@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         humdrum.__init__.py
 # Purpose:      base module for emulating Humdrum functionality in music21

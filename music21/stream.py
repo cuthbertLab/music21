@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         stream.py
 # Purpose:      base classes for dealing with groups of positioned objects
@@ -1708,7 +1709,7 @@ class Stream(music21.Music21Object):
 
     def setupPickleScaffold(self):
         '''Prepare this stream and all of its contents for pickling, that
-        is, storing on disk.
+        is, serializing and storing an object representation on disk.
 
         >>> from music21 import *
 
@@ -1759,19 +1760,6 @@ class Stream(music21.Music21Object):
                 element.wrapWeakref()
                 element.unfreezeIds()
 
-#     def writePickle(self, fp):
-#         f = open(fp, 'wb') # binary
-#         # a negative protocol value will get the highest protocol; 
-#         # this is generally desirable 
-#         pickleMod.dump(self, f, protocol=-1)
-#         f.close()
-# 
-# 
-#     def openPickle(self, fp):
-#         # not sure this will work
-#         f = open(fp, 'rb')
-#         self = pickleMod.load(f)
-#         f.close()
 
 
     #---------------------------------------------------------------------------

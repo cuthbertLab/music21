@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         abc.base.py
 # Purpose:      music21 classes for dealing with abc data

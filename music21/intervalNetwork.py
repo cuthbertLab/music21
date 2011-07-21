@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         intervalNetwork.py
 # Purpose:      A graph of intervals, for scales and harmonies. 

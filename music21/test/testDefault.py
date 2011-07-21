@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         testDefault.py
 # Purpose:      Controller for all tests in music21 in the default Environment.

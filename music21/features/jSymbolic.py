@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         features.jSymbolic.py
 # Purpose:      music21 functions for simple feature extraction

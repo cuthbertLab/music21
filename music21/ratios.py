@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         ratios.py
 # Purpose:      interval ratios; possible to be moved

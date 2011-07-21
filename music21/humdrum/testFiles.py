@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import re
 
 fakeTest = re.sub("\s\s\s\s+", "\t", \

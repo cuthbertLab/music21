@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         scala/__init__.py
 # Purpose:      Interface and representation of Scala scale files

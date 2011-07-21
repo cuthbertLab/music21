@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         graph.py
 # Purpose:      Classes for graphing in matplotlib and/or other graphing tools.

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         stream.py
 # Purpose:      base clases for dealing with groups of positioned objects

@@ -1,4 +1,5 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 
 '''
 counterpoint -- set of tools for dealing with Species Counterpoint and 

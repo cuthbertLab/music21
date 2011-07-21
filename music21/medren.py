@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         medren.py
 # Purpose:      classes for dealing with medieval and Renaissance Music
