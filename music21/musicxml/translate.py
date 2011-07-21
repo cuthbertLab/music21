@@ -2171,7 +2171,9 @@ def measureToMusicXML(m):
 
     #environLocal.printDebug(['measureToMusicXML', m]) 
 
-    m = m.makeNotation(inPlace=False)
+    # we already have a deep copy passed in, which happens in 
+    # stream.Measure._getMusicXML()
+    m.makeNotation(inPlace=True)
 
 # this is now in Measure.makeNotation
 #     found = m.getTimeSignatures(returnDefault=False)
