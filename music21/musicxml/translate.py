@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         musicxml/translate.py
 # Purpose:      Translate MusicXML and music21 objects
@@ -50,7 +50,7 @@ def mxToTempoIndication(mxMetronome, mxWords=None):
     >>> m.append(bu)
     >>> m.append(pm)
     >>> musicxml.translate.mxToTempoIndication(m)
-    <music21.tempo.MetronomeMark <music21.duration.Duration 1.0>=125.0>
+    <music21.tempo.MetronomeMark Quarter=125.0>
 
     '''
     from music21 import tempo, duration
