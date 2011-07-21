@@ -44,7 +44,7 @@ class Derivation(object):
         self._method = None
         # ancestor should be stored as a weak ref
         self._ancestor = None
-        #self._ancestorId = None # store id to optimize w/o unwrapping
+        self._ancestorId = None # store id to optimize w/o unwrapping
 
         # set container; can handle None
         self.setContainer(container)
@@ -61,9 +61,8 @@ class Derivation(object):
     def getContainer(self):
         return common.unwrapWeakref(self._container)
 
-
     def setAncestor(self, ancestor):
-        # for now, ancestor is not a weak ref
+        # for now, ancestor is not a weak ref        
         if ancestor is None:
             self._ancestorId = None
             self._ancestor = None
@@ -94,6 +93,40 @@ class Derivation(object):
         new.setAncestor(self.getAncestor())
         return new
 
+
+    def unwrapWeakref(self):
+        '''Unwrap any and all weakrefs stored.
+
+        >>> from music21 import *  
+        >>> s1 = stream.Stream()
+        >>> s2 = stream.Stream()
+        >>> d1 = derivation.Derivation(s1) # sets container
+        >>> d1.setAncestor(s2)
+        >>> common.isWeakref(d1._container)
+        True
+        >>> d1.unwrapWeakref()
+        >>> common.isWeakref(d1._container)
+        False
+        '''
+        post = common.unwrapWeakref(self._container)
+        self._container = post
+#         post = common.unwrapWeakref(self._ancestor)
+#         self._ancestor = post
+
+
+    def wrapWeakref(self):
+        '''Wrap all stored objects with weakrefs.
+        '''
+        if not common.isWeakref(self._container):
+            # update id in case it has changed
+            self._containerId = id(self._container) 
+            post = common.wrapWeakref(self._container)
+            self._container = post
+
+#         if not common.isWeakref(self._ancestor):
+#             self._ancestorId = id(self._ancestor)             
+#             post = common.wrapWeakref(self._ancestor)
+#             self._ancestor = post
 
 
 

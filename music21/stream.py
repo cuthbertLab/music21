@@ -1724,14 +1724,13 @@ class Stream(music21.Music21Object):
             #if hasattr(element, "elements"): # recurse time:
             if element.isStream:
                 element.setupPickleScaffold() # recurse
-            #if hasattr(element, "unwrapWeakref"): # recurse time:
-            #elif isinstance(element, music21.Music21Object):
             else:
                 element.freezeIds()
                 element.unwrapWeakref()
         self.freezeIds()
         self.unwrapWeakref()
-
+        # for contained objects that have weak refs
+        self._derivation.unwrapWeakref()
 
     def teardownPickleScaffold(self):
         '''After rebuilding this stream from pickled storage, prepare this as a normal Stream.
@@ -1746,7 +1745,7 @@ class Stream(music21.Music21Object):
         >>> a.teardownPickleScaffold()
         '''
         #environLocal.printDebug(['calling teardownPickleScaffold'])
-
+        self._derivation.wrapWeakref()
         self.wrapWeakref()
         self.unfreezeIds()
         for element in self.elements:
@@ -1759,7 +1758,6 @@ class Stream(music21.Music21Object):
                 #environLocal.printDebug(['processing music21 obj', element])
                 element.wrapWeakref()
                 element.unfreezeIds()
-
 
 
     #---------------------------------------------------------------------------

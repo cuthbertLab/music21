@@ -253,9 +253,9 @@ class StreamFreezer(object):
     '''
 
     def __init__(self, streamObj=None):
-        # may want to make a copy, as we are destructively modifying
-        self.stream = streamObj
-        #self.stream = copy.deepcopy(streamObj)
+        # must make a deepcopy, as we will be altering DefinedContexts
+        self.stream = copy.deepcopy(streamObj)
+        #self.stream = streamObj
 
     def _getPickleFp(self, dir):
         if dir == None:
