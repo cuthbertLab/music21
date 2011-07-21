@@ -252,9 +252,9 @@ class MetronomeMark(TempoIndication):
 
     def __repr__(self):
         if self.text is None:
-            return "<music21.tempo.MetronomeMark %s=%s>" % (self.referent, str(self.number))
+            return "<music21.tempo.MetronomeMark %s=%s>" % (self.referent.fullName, str(self.number))
         else:
-            return "<music21.tempo.MetronomeMark %s %s=%s>" % (self.text, self.referent, str(self.number))
+            return "<music21.tempo.MetronomeMark %s %s=%s>" % (self.text, self.referent.fullName, str(self.number))
 
     def _updateTextFromNumber(self):
         '''Update text if number is given and text is not defined
@@ -536,7 +536,7 @@ class Test(unittest.TestCase):
 
         
     def testMetronomeMarkA(self):
-        from music21 import tempo
+        from music21 import tempo, duration
         mm = tempo.MetronomeMark()
         mm.number = 52 # should implicitly set text
         self.assertEqual(mm.text, 'adagio')
@@ -550,6 +550,7 @@ class Test(unittest.TestCase):
         # setting the text first        
         mm = tempo.MetronomeMark()
         mm.text = 'presto'
+        mm.referent = duration.Duration(3.0)
         self.assertEqual(mm.text, 'presto')
         self.assertEqual(mm.number, 168)
         self.assertEqual(mm.numberImplicit, True)
@@ -557,7 +558,8 @@ class Test(unittest.TestCase):
         self.assertEqual(mm.number, 200)
         self.assertEqual(mm.numberImplicit, False)        
         # still have default
-        self.assertEqual(mm.referent.quarterLength, 1.0)
+        self.assertEqual(mm.referent.quarterLength, 3.0)
+        self.assertEqual(repr(mm), '<music21.tempo.MetronomeMark presto Dotted Half=200>')
 
 
     def testMetronomeMarkB(self):
