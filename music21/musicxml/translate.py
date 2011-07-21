@@ -96,18 +96,18 @@ def mxToTempoIndication(mxMetronome, mxWords=None):
 
 
 def tempoIndicationToMx(ti):
-    '''Given a music21 MetronomeMark or MetricModulation, produce a musicxml Metronome tag. 
+    '''Given a music21 MetronomeMark or MetricModulation, produce a musicxml Metronome tag wrapped in a <direction> tag.
 
     >>> from music21 import *
     >>> mm = tempo.MetronomeMark("slow", 40, note.HalfNote())
     >>> mxList = musicxml.translate.tempoIndicationToMx(mm)
     >>> mxList
-    [<metronome parentheses=False <beat-unit charData=half> <per-minute charData=40>>]
+    [<direction <direction-type <metronome parentheses=no <beat-unit charData=half> <per-minute charData=40>>>>]
 
     >>> mm = tempo.MetronomeMark("slow", 40, duration.Duration(quarterLength=1.5))
     >>> mxList = musicxml.translate.tempoIndicationToMx(mm)
     >>> mxList
-    [<metronome parentheses=False <beat-unit charData=quarter> <beat-unit-dot > <per-minute charData=40>>]
+    [<direction <direction-type <metronome parentheses=no <beat-unit charData=quarter> <beat-unit-dot > <per-minute charData=40>>>>]
 
     '''
     from music21 import duration
@@ -116,7 +116,10 @@ def tempoIndicationToMx(ti):
     mxMetro = musicxmlMod.Metronome()
 
     # all have this attribute
-    mxMetro.set('parentheses', ti.parentheses) # only attribute
+    if ti.parentheses:
+        mxMetro.set('parentheses', 'yes') # only attribute
+    else:
+        mxMetro.set('parentheses', 'no') # only attribute
 
     durs = [] # duration objects
     numbers = [] # tempi
@@ -126,6 +129,7 @@ def tempoIndicationToMx(ti):
         numbers.append(ti.number)
     elif 'MetricModulation' in ti.classes:
         pass
+        return []
         # add two ti.referents from each contained
         # check that len of numbers is == to len of durs; required here
 
@@ -143,10 +147,17 @@ def tempoIndicationToMx(ti):
     for mxSub in mxComponents:
         mxMetro.componentList.append(mxSub)
 
-    mxObjects = [] # need to add Words object for text if present
-    mxObjects.append(mxMetro)    
+    # wrap in mxDirection
+    mxDirectionType = musicxmlMod.DirectionType()
+    mxDirectionType.append(mxMetro)
+    # TODO: add sound tag here for actual realized tempo in bpm
+    mxDirection = musicxmlMod.Direction()
+    mxDirection.append(mxDirectionType)
 
+    mxObjects = [] # need to add Words object for text if present
+    mxObjects.append(mxDirection)    
     return mxObjects
+
 
 def repeatToMx(r):
     '''
@@ -1705,7 +1716,19 @@ def measureToMx(m, spannerBundle=None):
                 mxDirection.offset = mxOffset 
                 mxMeasure.insert(0, mxDirection)
 
-            # TODO: look for other RepeatExpressions.
+            elif 'MetronomeMark' in classes or 'MetricModulation' in classes:
+                environLocal.printDebug(['measureToMx: found:', obj])
+
+                # convert m21 offset to mxl divisions
+                mxOffset = int(defaults.divisionsPerQuarter * 
+                           obj.getOffsetBySite(mFlat))
+                # get a lost of objects: may be a text expression + metro
+                mxList = tempoIndicationToMx(obj)
+                for mxDirection in mxList: # a list of mxdirections
+                    mxDirection.offset = mxOffset 
+                    # use offset positioning, can insert at zero
+                    mxMeasure.insert(0, mxDirection)
+                    #mxMeasure.componentList.append(mxObj)
 
             elif 'TextExpression' in classes:
                 # convert m21 offset to mxl divisions
@@ -1725,7 +1748,6 @@ def measureToMx(m, spannerBundle=None):
                 mxDirection.offset = mxOffset 
                 # place at zero position, as offset value determines horizontal position, not location amongst notes
                 mxMeasure.insert(0, mxDirection)
-
 
             else: # other objects may have already been added
                 pass
@@ -3052,9 +3074,70 @@ spirit</words>
         mms = s.flat.getElementsByClass('TempoIndication')
         self.assertEqual(len(mms) > 3, True)
 
+        #s.show()
+
         # has only sound tempo=x tag
         s = converter.parse(testPrimitive.articulations01)
         #s.show()
+
+
+    def testExportMetronomeMarksA(self):
+        from music21 import stream, note, tempo
+        p = stream.Part()
+        p.repeatAppend(note.Note('g#3'), 8)
+        # default quarter assumed
+        p.insert(0, tempo.MetronomeMark(number=121.6))
+
+        raw = p.musicxml
+        match1 = '<beat-unit>quarter</beat-unit>'
+        match2 = '<per-minute>121.6</per-minute>'
+        self.assertEqual(raw.find(match1) > 0, True)
+        self.assertEqual(raw.find(match2) > 0, True)
+
+    def testExportMetronomeMarksB(self):
+        from music21 import stream, note, tempo, duration
+
+        p = stream.Part()
+        p.repeatAppend(note.Note('g#3'), 8)
+        # default quarter assumed
+        p.insert(0, tempo.MetronomeMark(number=222.2, 
+                referent=duration.Duration(quarterLength=.75)))
+        #p.show()
+        raw = p.musicxml
+        match1 = '<beat-unit>eighth</beat-unit>'
+        match2 = '<beat-unit-dot/>'
+        match3 = '<per-minute>222.2</per-minute>'
+        self.assertEqual(raw.find(match1) > 0, True)
+        self.assertEqual(raw.find(match2) > 0, True)
+        self.assertEqual(raw.find(match3) > 0, True)
+
+    def testExportMetronomeMarksC(self):
+        from music21 import stream, note, tempo, duration
+
+        # set metronome positions at different offsets in a measure or part
+    
+        p = stream.Part()
+        p.repeatAppend(note.Note('g#3'), 8)
+        # default quarter assumed
+        p.insert(0, tempo.MetronomeMark(number=222.2, 
+                referent=duration.Duration(quarterLength=.75)))
+        p.insert(3, tempo.MetronomeMark(number=106, parentheses=True))
+        p.insert(7, tempo.MetronomeMark(number=93, 
+                referent=duration.Duration(quarterLength=.25)))
+        #p.show()
+        
+        raw = p.musicxml
+        match1 = '<beat-unit>eighth</beat-unit>'
+        match2 = '<beat-unit-dot/>'
+        match3 = '<per-minute>222.2</per-minute>'
+        match4 = '<metronome parentheses="yes">'
+        match5 = '<metronome parentheses="no">'
+        self.assertEqual(raw.find(match1) > 0, True)
+        self.assertEqual(raw.find(match2) > 0, True)
+        self.assertEqual(raw.find(match3) > 0, True)
+        self.assertEqual(raw.count(match4) == 1, True)
+        self.assertEqual(raw.count(match5) == 2, True)
+        
 
 
 

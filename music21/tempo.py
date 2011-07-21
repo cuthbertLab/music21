@@ -162,7 +162,8 @@ class MetronomeMark(TempoIndication):
 #     >>> tm3.number
 #     90
 
-    def __init__(self, text=None, number=None, referent=None):
+    def __init__(self, text=None, number=None, referent=None, 
+        parentheses=False):
         TempoIndication.__init__(self)
 
         self._number = number # may be None
@@ -176,7 +177,7 @@ class MetronomeMark(TempoIndication):
             self.text = text
         
 
-        self.parentheses = False 
+        self.parentheses = parentheses 
 
         if referent is None: 
             # if referent is None, set a default quarter note duration
