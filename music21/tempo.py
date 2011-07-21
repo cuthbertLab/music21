@@ -176,6 +176,8 @@ class MetronomeMark(TempoIndication):
             self.text = text
         
 
+        self.parentheses = False 
+
         if referent is None: 
             # if referent is None, set a default quarter note duration
             self.referent = duration.Duration(type='quarter')
@@ -342,6 +344,9 @@ class MetricModulation(TempoIndication):
         self.transitionSymbol = '=' # accept different symbols
         # some old formats use arrows
         self.arrowDirection = None # can be left or right as well
+
+        # showing parens or not
+        self.parentheses = False 
 
         # store two MetronomeMark objects
         self._leftMetronome = None

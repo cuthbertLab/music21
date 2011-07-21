@@ -9438,6 +9438,8 @@ class Score(Stream):
         addTies currently does not work for pitches in Chords
         
         '''
+        # TODO: need to handle flat Streams contained in a Stream   
+        # even if those component Stream do not have Measures
         returnObj = deepcopy(self)
 
         mStream = returnObj.parts[0].getElementsByClass('Measure')

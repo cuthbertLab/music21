@@ -95,13 +95,58 @@ def mxToTempoIndication(mxMetronome, mxWords=None):
     return mm
 
 
-def tempoIndicationToMx(mxMetronome):
+def tempoIndicationToMx(ti):
+    '''Given a music21 MetronomeMark or MetricModulation, produce a musicxml Metronome tag. 
+
+    >>> from music21 import *
+    >>> mm = tempo.MetronomeMark("slow", 40, note.HalfNote())
+    >>> mxList = musicxml.translate.tempoIndicationToMx(mm)
+    >>> mxList
+    [<metronome parentheses=False <beat-unit charData=half> <per-minute charData=40>>]
+
+    >>> mm = tempo.MetronomeMark("slow", 40, duration.Duration(quarterLength=1.5))
+    >>> mxList = musicxml.translate.tempoIndicationToMx(mm)
+    >>> mxList
+    [<metronome parentheses=False <beat-unit charData=quarter> <beat-unit-dot > <per-minute charData=40>>]
+
     '''
-    '''
+    from music21 import duration
+
     # if writing just a sound tag, place an empty words tag in a durection type and then follow with sound declaration
     mxMetro = musicxmlMod.Metronome()
 
+    # all have this attribute
+    mxMetro.set('parentheses', ti.parentheses) # only attribute
 
+    durs = [] # duration objects
+    numbers = [] # tempi
+    if 'MetronomeMark' in ti.classes:
+        durs.append(ti.referent)
+        # check t1.numberImplicit ?
+        numbers.append(ti.number)
+    elif 'MetricModulation' in ti.classes:
+        pass
+        # add two ti.referents from each contained
+        # check that len of numbers is == to len of durs; required here
+
+    mxComponents = []
+    for i, d in enumerate(durs):
+        # charData of BeatUnit is the type string
+        mxSub = musicxmlMod.BeatUnit(duration.typeToMusicXMLType(d.type))
+        mxComponents.append(mxSub)
+        for x in range(d.dots):
+            mxComponents.append(musicxmlMod.BeatUnitDot())
+        if len(numbers) > 0:
+            mxComponents.append(musicxmlMod.PerMinute(numbers[0]))
+        
+    # simply add sub to components of mxMetro
+    for mxSub in mxComponents:
+        mxMetro.componentList.append(mxSub)
+
+    mxObjects = [] # need to add Words object for text if present
+    mxObjects.append(mxMetro)    
+
+    return mxObjects
 
 def repeatToMx(r):
     '''
