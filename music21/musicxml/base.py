@@ -1,10 +1,11 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         musicxml/base.py
 # Purpose:      MusicXML objects for conversion to and from music21
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''This module defines an object representation of MusicXML, used for converting to and from MusicXML and music21.
