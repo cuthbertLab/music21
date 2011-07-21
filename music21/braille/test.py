@@ -18,8 +18,7 @@ def melodyA():
     Library of Congress
     Washington, D.C. 20542 1979
     '''
-    bm = stream.Score()
-    #bm.append(meter.TimeSignature('3/4'))
+    bm = stream.Part()
     m1 = stream.Measure()
     m1.append(meter.TimeSignature('3/4'))
     m1.append(note.Note('C4'))    
@@ -37,8 +36,28 @@ def melodyA():
     bm.append([m1, m2, m3, m4])
     return bm
     
-if __name__ == '__main__':    
-    t = translate.translateLine(melodyA())
+def melodyB():
+    '''
+    Same source as before.
+    '''
+    bm = stream.Part()
+    bm.append(meter.TimeSignature('3/4'))
+    bm.append(note.Note('C4', quarterLength = 3.0))
+    bm.append(note.Note('F4', quarterLength = 3.0))
+    bm.append(note.Note('D4', quarterLength = 3.0))
+    bm.append(note.Note('G4', quarterLength = 2.0))
+    bm.append(note.Note('F4'))
+    bm.append(note.Note('E4'))
+    bm.append(note.Note('E4'))
+    bm.append(note.Note('E4'))
+    bm.append(note.Note('E4'))
+    bm.append(note.Note('D4'))
+    bm.append(note.Note('E4'))
+    return bm
+
+
+if __name__ == '__main__':
+    t = translate.translateLine(melodyB())
     f = codecs.open('tester.txt', encoding='utf-8', mode='w+')
     f.write(t)
     f.close()
