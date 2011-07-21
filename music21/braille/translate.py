@@ -1,42 +1,48 @@
+# -*- coding: utf-8 -*-
+
+
+import music21
+import unittest
+
 from music21 import pitch
 from music21 import note
 from music21 import stream
 from music21 import interval
 
-c = {0.5: u'\u2819',
-     1.0: u'\u2839',
-     2.0: u'\u281D',
-     4.0: u'\u283D'}
+c = {'eighth':  u'\u2819',
+     'quarter': u'\u2839',
+     'half':    u'\u281D',
+     'whole':   u'\u283D'}
 
-d = {0.5: u'\u2811',
-     1.0: u'\u2831',
-     2.0: u'\u2815',
-     4.0: u'\u2835'}
+d = {'eighth':  u'\u2811',
+     'quarter': u'\u2831',
+     'half':    u'\u2815',
+     'whole':   u'\u2835'}
 
-e = {0.5: u'\u280B',
-     1.0: u'\u282B',
-     2.0: u'\u280F',
-     4.0: u'\u282F'}
+e = {'eighth':  u'\u280B',
+     'quarter': u'\u282B',
+     'half':    u'\u280F',
+     'whole':   u'\u282F'}
 
-f = {0.5: u'\u281B',
-     1.0: u'\u283B',
-     2.0: u'\u281F',
-     4.0: u'\u283F'}
+f = {'eighth':  u'\u281B',
+     'quarter': u'\u283B',
+     'half':    u'\u281F',
+     'whole':   u'\u283F'}
 
-g = {0.5: u'\u2813',
-     1.0: u'\u2833',
-     2.0: u'\u2817',
-     4.0: u'\u2837'}
+g = {'eighth':  u'\u2813',
+     'quarter': u'\u2833',
+     'half':    u'\u2817',
+     'whole':   u'\u2837'}
 
-a = {0.5: u'\u280A',
-     1.0: u'\u282A',
-     2.0: u'\u280E',
-     4.0: u'\u282E'}
+a = {'eighth':  u'\u280A',
+     'quarter': u'\u282A',
+     'half':    u'\u280E',
+     'whole':   u'\u282E'}
 
-b = {0.5: u'\u281A',
-     1.0: u'\u283A',
-     2.0: u'\u281E',
-     4.0: u'\u283E'}
+b = {'eighth':  u'\u281A',
+     'quarter': u'\u283A',
+     'half':    u'\u281E',
+     'whole':   u'\u283E'}
 
 pitchNameToNotes = {'C': c,
                     'D': d,
@@ -46,10 +52,10 @@ pitchNameToNotes = {'C': c,
                     'A': a,
                     'B': b}
 
-qlEquivalent = {0.03125: 0.5,
-                0.0625: 1.0,
-                0.125: 2.0,
-                0.25: 4.0}
+typeEquivalent = {'128th': 'eighth',
+                  '64th': 'quarter',
+                  '32nd': 'half',
+                  '16th': 'whole'}
 
 octave = {1: u'\u2808',
           2: u'\u2818',
@@ -59,13 +65,30 @@ octave = {1: u'\u2808',
           6: u'\u2830',
           7: u'\u2820'}
 
+accidental = {'sharp':          u'\u2829',
+              'double-sharp':   u'\u2829\u2829',
+              'flat':           u'\u2823',
+              'double-flat':    u'\u2823\u2823',
+              'natural':        u'\u2821'}
+
 def translateLine(sampleLine = stream.Part()):
+    if len(sampleLine.getElementsByClass('Measure')) == 0:
+        sampleLine = sampleLine.makeMeasures(inPlace = False)
+
+    mn = 0    
+    for measure in sampleLine:
+        for sampleNote in measure.flat.notes:
+            sampleNote._brailleMeasureNumber = mn
+        mn += 1
+    
     allNotes = sampleLine.flat.notes 
     previousNote = allNotes[0]
     translation = []
     translation.append(translateNote(sampleNote = previousNote, withOctave = True))
-    
+
     for nextNote in allNotes[1:]:
+        if not(nextNote._brailleMeasureNumber == previousNote._brailleMeasureNumber):
+            translation.append(u'\u2800') #space
         i = interval.notesToInterval(previousNote, nextNote)
         isSixthOrGreater = i.generic.undirected >= 6
         isFourthOrFifth = i.generic.undirected == 4 or i.generic.undirected == 5
@@ -75,28 +98,53 @@ def translateLine(sampleLine = stream.Part()):
             wo = True
         translation.append(translateNote(sampleNote = nextNote, withOctave = wo))
         previousNote = nextNote
+
     return ''.join(translation)
 
 def translateNote(sampleNote = note.Note('C4'), withOctave = False):
-    pitchNameDict = pitchNameToNotes[sampleNote.name]
-    nameWithLength = None
-    try:
-        nameWithLength = pitchNameDict[sampleNote.quarterLength]
-    except KeyError:
-        try:
-            nameWithLength = pitchNameDict[qlEquivalent[sampleNote.quarterLength]]
-        except KeyError:
-            raise Exception("Cannot translate quarterLength to braille.")
-
+    pitchNameDict = pitchNameToNotes[sampleNote.step]
+    translation = []
     if withOctave:
-        octaveNumber = octave[sampleNote.octave]
-        return octaveNumber + nameWithLength
+        translation.append(octave[sampleNote.octave])
     
-    return nameWithLength
+    if not(sampleNote.step == sampleNote.name):
+        try:
+            translation.append(accidental[sampleNote.accidental.name])
+        except KeyError:
+            raise BrailleTranslateException("Accidental type cannot be translated to braille.")
+    
+    try:
+        if sampleNote.duration.type in typeEquivalent.keys():
+            nameWithLength = pitchNameDict[typeEquivalent[sampleNote.duration.type]]
+        else:
+            nameWithLength = pitchNameDict[sampleNote.duration.type]
+
+        translation.append(nameWithLength) 
+        for dot in range(sampleNote.duration.dots):
+            translation.append(u'\u2804') #dot          
+    except KeyError:
+        raise BrailleTranslateException("Note duration cannot be translated to braille.")
         
+    return ''.join(translation)
+
+
 def translateAccidental():
     pass
 
 
-if __name__ == '__main__':
-    print translateNote(withOctave = True)
+
+class BrailleTranslateException(music21.Music21Exception):
+    pass
+    
+#-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+if __name__ == "__main__":
+    print translateNote(note.Note('C##4', quarterLength = 2.0))
+    #music21.mainTest(Test)
+
+#------------------------------------------------------------------------------
+# eof
