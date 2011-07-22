@@ -1719,7 +1719,11 @@ class Stream(music21.Music21Object):
         >>> a.repeatAppend(n, 10)
         >>> a.setupPickleScaffold()
         '''
-        #environLocal.printDebug(['calling setupPickleScaffold()', self])
+    # not sure if this is the problem
+#         if hasattr(self, '__weakref__'):
+#             del self.__weakref__
+
+        environLocal.printDebug(['calling setupPickleScaffold()', self])
         for element in self.elements:
             #if hasattr(element, "elements"): # recurse time:
             if element.isStream:
@@ -1749,11 +1753,8 @@ class Stream(music21.Music21Object):
         self.wrapWeakref()
         self.unfreezeIds()
         for element in self.elements:
-            #if hasattr(element, "elements"): # recurse time:
             if element.isStream:
                 element.teardownPickleScaffold()
-            #elif hasattr(element, "unwrapWeakref"): # recurse time:
-            #elif isinstance(element, music21.Music21Object):
             else:
                 #environLocal.printDebug(['processing music21 obj', element])
                 element.wrapWeakref()

@@ -1573,6 +1573,22 @@ def isWeakref(referent):
         return False
 
 
+def findWeakRef(target):
+    '''Given an object or composition of objects, find an attribute that is a weakref. This is a diagnostic tool.
+    '''
+    for attrName in dir(target):
+        try:
+            attr = getattr(target, attrName)
+        except:
+            print 'exception on attribute access: %s' % attrName
+        if isWeakref(attr):
+            print 'found weakref', attr, attrName, 'of target:', target
+        if isinstance(attr, (list, tuple)):
+            for x in attr:
+                findWeakRef(x)
+#         elif isinstance(attr, dict):
+#             for x in attr.keys():
+#                 findWeakRef(attr[x])
 
 
 #-------------------------------------------------------------------------------

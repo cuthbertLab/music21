@@ -44,10 +44,12 @@ import time
 import copy
 import zipfile
 
-try:
-    import cPickle as pickleMod
-except ImportError:
-    import pickle as pickleMod
+# try:
+#     import cPickle as pickleMod
+# except ImportError:
+#     import pickle as pickleMod
+
+import pickle as pickleMod
 
 
 import music21
@@ -255,7 +257,12 @@ class StreamFreezer(object):
     def __init__(self, streamObj=None):
         # must make a deepcopy, as we will be altering DefinedContexts
         self.stream = copy.deepcopy(streamObj)
+        # call _elementsChanged to clear cache
+        self.stream._elementsChanged()
         #self.stream = streamObj
+
+#         for x in dir(self.stream):
+#             test = getattr(
 
     def _getPickleFp(self, dir):
         if dir == None:
@@ -277,9 +284,7 @@ class StreamFreezer(object):
             dir = environLocal.getRootTempDir()
             fp = os.path.join(dir, fp)
 
-        #self.stream._printDefinedContexts()
         self.stream.setupPickleScaffold()
-        #self.stream._printDefinedContexts()
 
         environLocal.printDebug(['writing fp', fp])
         f = open(fp, 'wb') # binary
@@ -960,6 +965,10 @@ def parse(value, *args, **keywords):
 
 def freeze(streamObj, fp=None):
     '''Given a StreamObject and a file path, pickle and store the Stream to a file.
+
+    If no file path is given, a temporary file is used.
+
+    The file path is returned.
     '''
     v = StreamFreezer(streamObj)
     return v.writePickle(fp) # returns fp

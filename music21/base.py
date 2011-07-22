@@ -284,6 +284,7 @@ class DefinedContexts(object):
         >>> common.isWeakref(aContexts._definedContexts[id(bObj)]['obj'])
         False
         '''
+        self.purgeLocations(rescanIsDead=True)
         for idKey in self._definedContexts.keys():
             if WEAKREF_ACTIVE:
             #if common.isWeakref(self._definedContexts[idKey]['obj']):
@@ -1080,7 +1081,7 @@ class DefinedContexts(object):
             post = self._getOffsetBySiteId(siteId) 
             #post = self._definedContexts[siteId]['offset']
         except DefinedContextsException: # the site id is not valid
-            environLocal.printDebug(['getOffsetBySite: trying to get an offset by a site failed; self:', self, 'site:', site, 'defined contexts:', self._definedContexts])
+            #environLocal.printDebug(['getOffsetBySite: trying to get an offset by a site failed; self:', self, 'site:', site, 'defined contexts:', self._definedContexts])
             raise # re-raise Exception
 
 #         if post is None:
@@ -2643,7 +2644,7 @@ class Music21Object(JSONSerializer):
     
 
     #---------------------------------------------------------------------------
-    # temporary storage setup routines; public interfdace
+    # temporary storage setup routines; public interface
 
     def unwrapWeakref(self):
         '''Public interface to operation on DefinedContexts.
@@ -2657,10 +2658,12 @@ class Music21Object(JSONSerializer):
         >>> aM21Obj.unwrapWeakref()
 
         '''
+        #environLocal.printDebug(['unwrapWeakref on:', self])
         self._definedContexts.unwrapWeakref()
         # doing direct access; not using property parent, as filters
         # through global WEAKREF_ACTIVE setting
-        self._activeSite = common.unwrapWeakref(self._activeSite)
+        if self._activeSite is not None:
+            self._activeSite = common.unwrapWeakref(self._activeSite)
 
     def wrapWeakref(self):
         '''Public interface to operation on DefinedContexts.
