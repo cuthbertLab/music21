@@ -150,6 +150,58 @@ def partPari(show = True):
     if show == True:
         s.show()
 
+def pendulumMusic(show = True):
+    from music21 import scale, pitch, stream, note, chord, clef, tempo, duration
+    jMax = 400.0
+    
+    p = pitch.Pitch("C1")
+    octo = scale.OctatonicScale(p)
+    s = stream.Score()
+    parts = [stream.Part(), stream.Part(), stream.Part(), stream.Part()]
+    parts[0].insert(0, clef.Treble8vaClef())
+    parts[1].insert(0, clef.TrebleClef())
+    parts[2].insert(0, clef.BassClef())
+    parts[3].insert(0, clef.Bass8vbClef())
+    for i in range(8):
+        j = 1.0
+        while j < jMax:
+            ps = p.ps
+            if ps > 84:
+                active = 0
+            elif ps >= 60:
+                active = 1
+            elif ps >= 36:
+                active = 2
+            elif ps < 36:
+                active = 3
+            
+            establishedChords = parts[active].getElementsByOffset(j)
+            if len(establishedChords) == 0:
+                c = chord.Chord([p])
+                c.duration.type = '32nd'
+                parts[active].insert(j, c)
+            else:
+                c = establishedChords[0]
+                pitches = c.pitches
+                pitches.append(p)
+                c.pitches = pitches
+            j += (8+(8-i))/8.0
+        p = octo.next(p, stepSize = 7)
+            
+
+    parts[0].insert(0, tempo.MetronomeMark(number = 120, referent = duration.Duration(2.0)))
+    for i in range(4):
+        parts[i].insert(jMax + 4.0, note.Rest(quarterLength=4.0))
+        parts[i].makeRests(fillGaps=True, inPlace=True)
+        parts[i] = parts[i].makeNotation()
+        s.insert(0, parts[i])
+    
+    if show == True:
+        s.show('text')
+        s.show('midi')
+        s.show()
+ 
+
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
    
@@ -171,12 +223,16 @@ class TestExternal(unittest.TestCase):
         pass
    
 
-    def testBasic(self, cycles=8, show=True):
+    def xtestBasic(self, cycles=8, show=True):
         # run a reduced version
         pitchedPhase(cycles=cycles, show=show)
 
-    def testArvoPart(self, show=True):
+    def xtestArvoPart(self, show=True):
         partPari(show)
+
+    def testPendulumMusic(self, show=True):  
+        pendulumMusic(show)
+    
         
 if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions
