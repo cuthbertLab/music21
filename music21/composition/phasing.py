@@ -150,21 +150,38 @@ def partPari(show = True):
     if show == True:
         s.show()
 
-def pendulumMusic(show = True):
-    from music21 import scale, pitch, stream, note, chord, clef, tempo, duration
-    jMax = 400.0
+def pendulumMusic(show = True, 
+                  loopLength = 160.0, 
+                  totalLoops = 1, 
+                  maxNotesPerLoop = 40,
+                  totalParts = 16,
+                  scaleStepSize = 3,
+                  scaleType = scale.OctatonicScale,
+                  startingPitch = 'C1'
+                  ):
+    from music21 import scale, pitch, stream, note, chord, clef, tempo, duration, metadata
     
-    p = pitch.Pitch("C1")
-    octo = scale.OctatonicScale(p)
+    totalLoops = totalLoops * 1.01
+    jMax = loopLength * totalLoops
+    
+    
+    p = pitch.Pitch(startingPitch)
+    if isinstance(scaleType, scale.Scale):
+        octo = scaleType
+    else:
+        octo = scaleType(p)
     s = stream.Score()
+    s.metadata = metadata.Metadata()
+    s.metadata.title = 'Pendulum Waves'
+    s.metadata.composer = 'inspired by http://www.youtube.com/watch?v=yVkdfJ9PkRQ'
     parts = [stream.Part(), stream.Part(), stream.Part(), stream.Part()]
     parts[0].insert(0, clef.Treble8vaClef())
     parts[1].insert(0, clef.TrebleClef())
     parts[2].insert(0, clef.BassClef())
     parts[3].insert(0, clef.Bass8vbClef())
-    for i in range(8):
+    for i in range(totalParts):
         j = 1.0
-        while j < jMax:
+        while j < (jMax+1.0):
             ps = p.ps
             if ps > 84:
                 active = 0
@@ -175,23 +192,26 @@ def pendulumMusic(show = True):
             elif ps < 36:
                 active = 3
             
-            establishedChords = parts[active].getElementsByOffset(j)
+            jQuant = round(j*8)/8.0
+
+            establishedChords = parts[active].getElementsByOffset(jQuant)
             if len(establishedChords) == 0:
                 c = chord.Chord([p])
                 c.duration.type = '32nd'
-                parts[active].insert(j, c)
+                parts[active].insert(jQuant, c)
             else:
                 c = establishedChords[0]
                 pitches = c.pitches
                 pitches.append(p)
                 c.pitches = pitches
-            j += (8+(8-i))/8.0
-        p = octo.next(p, stepSize = 7)
+            j += loopLength/(maxNotesPerLoop - totalParts + i)
+            #j += (8+(8-i))/8.0
+        p = octo.next(p, stepSize = scaleStepSize)
             
 
     parts[0].insert(0, tempo.MetronomeMark(number = 120, referent = duration.Duration(2.0)))
     for i in range(4):
-        parts[i].insert(jMax + 4.0, note.Rest(quarterLength=4.0))
+        parts[i].insert(int((jMax + 4.0)/4)*4, note.Rest(quarterLength=4.0))
         parts[i].makeRests(fillGaps=True, inPlace=True)
         parts[i] = parts[i].makeNotation()
         s.insert(0, parts[i])
@@ -231,8 +251,25 @@ class TestExternal(unittest.TestCase):
         partPari(show)
 
     def testPendulumMusic(self, show=True):  
-        pendulumMusic(show)
-    
+        #pendulumMusic(show)
+#        pendulumMusic(show = True, 
+#                  loopLength = 210.0, 
+#                  totalLoops = 1, 
+#                  maxNotesPerLoop = 70,
+#                  totalParts = 64,
+#                  scaleStepSize = 1,
+#                  scaleType = scale.ChromaticScale,
+#                  startingPitch = 'C1',
+#                  )
+        pendulumMusic(show = True, 
+                  loopLength = 210.0, 
+                  totalLoops = 1, 
+                  maxNotesPerLoop = 70,
+                  totalParts = 12,
+                  scaleStepSize = 5,
+                  scaleType = scale.ScalaScale('C3', '13-19.scl'),
+                  startingPitch = 'C2',
+                  )
         
 if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions
