@@ -15,13 +15,13 @@
 
 from __future__ import unicode_literals
 
-import unittest, doctest
+import unittest, doctest, copy
 
 import music21
 import music21.note
 from music21 import common
 from music21 import duration
-
+from music21 import expressions
 
 from music21 import environment
 _MOD = "tempo.py"
@@ -64,8 +64,7 @@ class TempoIndication(music21.Music21Object):
         music21.Music21Object.__init__(self)
 
 
-
-# TODO: needs to model text expression like display parameters
+#-------------------------------------------------------------------------------
 class TempoText(TempoIndication):
     '''
     >>> import music21
@@ -83,31 +82,44 @@ class TempoText(TempoIndication):
     def __init__(self, text=None):
         TempoIndication.__init__(self)
         
-        self.text = None
+        #self.text = None # the actual string
+        self._textExpression = None # a stored object
+        self._textJustification = 'center'
+
         if text is not None:
-            try:
+            try: # use property
                 self.text = str(text) 
             except UnicodeEncodeError: # if it is already unicode
                 self.text = text
-
-#         if music21.common.isNum(value):
-#             self.value = str(value)
-#             self.number = value
-#         else:
-#             self.value = value
-#             if value is None:
-#                 pass
-#             elif value.lower() in defaultTempoValues.keys():
-#                 self.number = defaultTempoValues[value.lower()]
-#             elif value in defaultTempoValues.keys():
-#                 self.number = defaultTempoValues[value]
-#             else:
-#                 pass
-#                 #print 'cannot match value', value
-#                 #environLocal.printDebug(['cannot match', value.decode('utf-8')])    
     
     def __repr__(self):
         return "<%s %s>" % (self.__class__.__name__, self.text)
+
+    def _getText(self):
+        '''Get the text used for this expression.
+        '''
+        return self._textExpression.content
+
+    def _setText(self, value):
+        '''Set the text of this repeat expression. This is also the primary way that the stored TextExpression object is created.
+        '''
+        if self._textExpression is None:
+            self._textExpression = expressions.TextExpression(value)
+            self.applyTextFormatting()
+        else:
+            self._textExpression.content = value
+
+    text = property(_getText, _setText, doc = '''
+        Get or set the text.
+
+        >>> import music21
+        >>> tm = music21.tempo.TempoText("adagio")
+        >>> tm.text
+        'adagio'
+        >>> tm.getTextExpression()
+        <music21.expressions.TextExpression "adagio">
+        ''')
+
 
 
     def getMetronomeMark(self):
@@ -120,6 +132,50 @@ class TempoText(TempoIndication):
         52
         '''
         return MetronomeMark(text=self.text)
+
+
+    def getTextExpression(self):
+        '''Return a TextExpression object for this text.
+        '''
+        if self._textExpression is None:
+            return None
+        else:
+            return copy.deepcopy(self._textExpression)
+
+    def setTextExpression(self, vale):
+        '''Given a text expression, extract the text
+        '''
+        self._textExpression = value
+        self.applyTextFormatting()
+
+        
+    def applyTextFormatting(self, te=None):
+        '''Apply the default text formatting to the text expression version of of this repeat
+        '''
+        if te is None: # use the stored version if possible
+            te = self._textExpression
+        te.justify = self._textJustification
+        return te
+
+    def isValidText(self, value):
+        '''Return True or False if the supplied text could be used for this TempoText.  
+        '''
+        def stripText(s):
+            # remove all spaces, punctuation, and make lower
+            s = s.strip()
+            s = s.replace(' ', '')
+            s = s.replace('.', '')
+            s = s.lower()
+            return s
+        # TODO: compare to known tempo marks
+#         for candidate in self._textAlternatives:
+#             candidate = stripText(candidate)
+#             value = stripText(value)
+#             if value == candidate:
+#                 return True
+        return False
+
+
 
 
 class MetronomeMark(TempoIndication):

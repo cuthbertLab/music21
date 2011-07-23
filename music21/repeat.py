@@ -121,11 +121,10 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         '''Return a copy of the TextExpression stored in this object.
         '''
         # whenever getting, set justifation
-        self._textJustification
+        #self._textJustification
         if self._textExpression is None:
             return None
         else:
-            # first, apply defaults 
             return copy.deepcopy(self._textExpression)
 
     def isValidText(self, value):
