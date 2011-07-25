@@ -49,6 +49,36 @@ defaultTempoValues = {
 
 
 
+def convertTempoAtBeat(numberSrc, quarterLengthBeatSrc, 
+                       quarterLengthBeatDst=1.0):
+    '''Convert from one tempo to another, each possibly with different beat units.
+
+    >>> from music21 import *
+    >>> tempo.convertTempoAtBeat(60, 1, 2) # 60 bpm at quarter, going to half
+    30.0
+    >>> tempo.convertTempoAtBeat(60, 1, .25) # 60 bpm at quarter, going to 16th
+    240.0
+    >>> tempo.convertTempoAtBeat(60, 1.5, 1) # 60 at dotted quarter, get quarter
+    90.0
+    >>> tempo.convertTempoAtBeat(60, 1.5, 2) # 60 at dotted quarter, get half
+    45.0
+    >>> tempo.convertTempoAtBeat(60, 1.5, 1/3.) # 60 at dotted quarter, get trip
+    270.0
+
+    '''
+    # find duration in seconds of of quarter length
+    srcDurPerBeat = 60.0 / numberSrc
+    # convert to dur for one quarter length
+    dur = srcDurPerBeat * (1.0 / quarterLengthBeatSrc)
+    # multiply dur by dst quarter
+    dstDurPerBeat = dur * float(quarterLengthBeatDst)
+    #environLocal.printDebug(['dur', dur, 'dstDurPerBeat', dstDurPerBeat])
+    # find tempo
+    return 60.0 / dstDurPerBeat
+
+
+
+
 #-------------------------------------------------------------------------------
 class TempoException(Exception):
     pass
@@ -77,8 +107,6 @@ class TempoText(TempoIndication):
     get sensible default values.  If not found, uses a default of 90:
 
     '''
-    _DOC_ALL_INHERITED = False
-
     def __init__(self, text=None):
         TempoIndication.__init__(self)
 
@@ -253,22 +281,35 @@ class MetronomeMark(TempoIndication):
         self._updateNumberFromText()
         self._updateTextFromNumber()
 
-        # try to set number from text if not defined
-#         if self._number is None and self._tempoText is not None:
-#             self._number = self._getDefaultNumber(self._tempoText)
-#             if self._number is not None: # only if set
-#                 self.numberImplicit = True
-#         # set text
-#         if self._tempoText is None and self.number is not None:
-#             self.text = self._getDefaultText(self.number) # use property
-#             if self.text is not None:
-#                 self.textImplicit = True
-
         # need to store a sounding value for the case where where
         # a sounding different is different than the number given in the MM
-        self.soundingReferentsPerMinute = None
+        self._numberSounding = None
 
 
+    def __repr__(self):
+        if self.text is None:
+            return "<music21.tempo.MetronomeMark %s=%s>" % (self.referent.fullName, str(self.number))
+        else:
+            return "<music21.tempo.MetronomeMark %s %s=%s>" % (self.text, self.referent.fullName, str(self.number))
+
+    def _updateTextFromNumber(self):
+        '''Update text if number is given and text is not defined
+        '''
+        if self._tempoText is None and self._number is not None:
+            self._setText(self._getDefaultText(self._number), 
+                            updateNumberFromText=False)
+            if self.text is not None:
+                self.textImplicit = True
+
+    def _updateNumberFromText(self):
+        '''Update number if text is given and number is not defined 
+        '''
+        if self._number is None and self._tempoText is not None:
+            self._number = self._getDefaultNumber(self._tempoText)
+            if self._number is not None: # only if set
+                self.numberImplicit = True
+
+    # properties and conversions
     def _getText(self):
         if self._tempoText is None:
             return None
@@ -307,28 +348,21 @@ class MetronomeMark(TempoIndication):
         '''Get and set the number, or the numerical value of the Metronome. 
         ''')
 
-    def __repr__(self):
-        if self.text is None:
-            return "<music21.tempo.MetronomeMark %s=%s>" % (self.referent.fullName, str(self.number))
-        else:
-            return "<music21.tempo.MetronomeMark %s %s=%s>" % (self.text, self.referent.fullName, str(self.number))
 
-    def _updateTextFromNumber(self):
-        '''Update text if number is given and text is not defined
-        '''
-        if self._tempoText is None and self._number is not None:
-            self._setText(self._getDefaultText(self._number), 
-                            updateNumberFromText=False)
-            if self.text is not None:
-                self.textImplicit = True
+    #--------------------------------------------------------------------------
+        
 
-    def _updateNumberFromText(self):
-        '''Update number if text is given and number is not defined 
+    def getQuarterBPM(self):
+        '''Get a BPM where the beat is a quarter; must look and adjust from current beat
         '''
-        if self._number is None and self._tempoText is not None:
-            self._number = self._getDefaultNumber(self._tempoText)
-            if self._number is not None: # only if set
-                self.numberImplicit = True
+        pass
+
+    def setQuarterBPM(self, value, setNumber=True):
+        '''Given a value in BPM, use it to set the value of this MetroneMark. BPM values are assumed to be refer only to quarter notes; different beat values, if definded here, will be scaled
+        '''
+        if not setNumber:
+            # convert this to a quarter bpm
+            return self._numberSounding
 
 
     def _getDefaultNumber(self, tempoText):
@@ -570,10 +604,6 @@ def interpolateElements(element1, element2, sourceStream,
             el.setOffsetBySite(destinationStream, destinationOffset)
                 
     
-
-class TempoException(Exception):
-    pass
-
 
 
 

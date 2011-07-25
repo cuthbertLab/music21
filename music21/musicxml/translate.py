@@ -158,7 +158,8 @@ def tempoIndicationToMx(ti):
         # wrap in mxDirection
         mxDirectionType = musicxmlMod.DirectionType()
         mxDirectionType.append(mxMetro)
-        # TODO: add sound tag here for actual realized tempo in bpm
+        # TODO: add sound tag here; for actual realized tempo in bpm
+        # this goes inside the direction tag but not in direction type tag
         mxDirection = musicxmlMod.Direction()
         mxDirection.append(mxDirectionType)
         mxObjects.append(mxDirection)    
@@ -3175,7 +3176,6 @@ spirit</words>
         raw = p.musicxml
         self.assertEqual(raw.find(match1) > 0, False)
         self.assertEqual(raw.find(match2) > 0, True)
-
 
         p = stream.Part()
         p.repeatAppend(note.Note('g#3'), 8)
