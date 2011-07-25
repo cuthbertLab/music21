@@ -1,4 +1,17 @@
-from music21 import *
+# -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
+# Name:         noteworthy/translate.py
+# Purpose:      translates Noteworthy Composer's NWCTXT format
+#
+# Authors:      Jordi Bartolome
+#               Michael Scott Cuthbert
+#
+# Copyright:    (c) 2011 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+
+from music21 import duration, note, pitch, clef, meter, stream, tie, key, repeat
+from music21 import bar, chord, dynamics, spanner
 
 
 class classNote:    
@@ -354,7 +367,7 @@ class classSign:
         return meas        
 
 class classChord:
-    def caseChord(self, dictionaries, line, meas, totlength, al, SLUR, SLURbeginning, SLUR1st, TIED, TIED1st, lyrics, lyr, coun):
+    def caseChord(self, dictionaries, line, meas, totlength, al, SLUR, SLURbeginning, SLUR1st, TIED, TIED1st, lyrics, lyr, coun, actualclef):
         sl = 0
         ti = 0
         ERR = 0
@@ -743,101 +756,117 @@ class classLyrics:
 # initializations
 
 #file = open("Part_OWeisheit.nwctxt")
-file = open("NWCTEXT_Really_complete_example_file.nwctxt")
 
-data = file.readlines()
-data2 = data
-file.close()
-totalscore = stream.Score()
-part = stream.Part()
-meas = stream.Measure()
-actualclef = "G"
-counter = 0
-fl = 0
-start = 0
-alte = 0
-numparts = 0
-totlength = 0
-newclef = 1
-SLUR = 0
-SLUR1st = 0
-SLURbeginning = 0
-TIED = 0
-TIED1st = 0
-lyr = 0
-coun = 0
-lyrics = []
-text = []
-dictionary = {"Whole":4, "Half": 2, "4th":1, "8th":0.5, "16th":0.25, "32nd":0.125, "64th":0.0625, 0:0}
-dictionaryrest = {"Whole\n":4, "Half\n": 2, "4th\n":1, "8th\n":0.5, "16th\n":0.25, "32nd\n":0.125, "64th\n":0.0625}
-dictionarytrip = {4:"Whole", 2:"Half", 1:"4th", 0.5:"eighth", 0.25: "16th", 0.125: "32nd", 0.0625:"64th", 0:0}
-dictionaryTreble = {1:"C", 2:"D", 3:"E", 4:"F", 5:"G", 6:"A", 7:"B", "octave":5}
-dictionaryBass = {-1:"C", 0:"D", 1:"E", 2:"F", 3:"G", 4:"A", 5:"B", "octave":3}
-dictionaryAlto = {0:"C", 1:"D", 2:"E", 3:"F", 4:"G", 5:"A", 6:"B", "octave":4}
-dictionaryTenor = {-5:"C", -4:"D", -3:"E", -2:"F", -1:"G", 0:"A", 1:"B", "octave":3}
-dictionarysharp = {1:"F", 2:"C", 3:"G", 4:"D", 5:"A", 6:"E", 7:"B"}
-dictionarybemol = {1:"B", 2:"E", 3:"A", 4:"D", 5:"G", 6:"C", 7:"F"}
-dictionaries = {"dictionary":dictionary, "dictionaryrest":dictionaryrest, "dictionarytrip": dictionarytrip, "dictionaryTreble":dictionaryTreble, "dictionaryAlto":dictionaryAlto, "dictionaryTenor":dictionaryTenor, "dictionaryBass":dictionaryBass, "dictionarysharp":dictionarysharp, "dictionarybemol":dictionarybemol}
 
-notes = classNote()
-clefs = classClef()
-rests = classRest()
-keys = classKey()
-sign = classSign()
-ch = classChord()
-np = classPart()
-rep = classRep()
-dc = classDCalFine()
-dyn = classDyn()
-dynam = classDynamics()
-lyri = classLyrics()      
+def parseFile(filePath):
+    file = open(filePath)
+    dataList = file.readlines()
+    file.close()
+    return parseList(dataList)
+    
+def parseString(data):
+    dataList = data.splitlines()
+    return parseList(dataList)
 
-# Main
-for pi in data:
-    for word in pi.split('|'):
-        counter += 1
-        text.append(word)
-        if word == "Note":  
-            meas, totlength, SLUR, SLURbeginning , SLUR1st, TIED, TIED1st = notes.caseNote(dictionaries, pi, meas, actualclef, totlength, alte, SLUR, SLURbeginning, SLUR1st, TIED, TIED1st, lyrics, lyr, coun)
-            coun = coun + 1
-        if word == "Clef":
-            meas, actualclef = clefs.caseClef(pi, meas, start, totlength)
-            start = 1
-        if word == "Rest":
-            meas, totlength = rests.caseRest(dictionaries, pi, meas, totlength)
-        if word == "Key":
-            meas, alte = keys.caseKey(pi, meas, totlength, actualclef)
-        if word == "TimeSig":
-            meas = sign.caseSign(pi, meas, totlength)
-        if word == "Chord":
-            meas, totlength, SLUR, SLURbeginning , SLUR1st, TIED, TIED1st = ch.caseChord(dictionaries, pi, meas, totlength, alte, SLUR, SLURbeginning, SLUR1st, TIED, TIED1st, lyrics, lyr, coun)
-            coun = coun + 1
-        if word == "AddStaff":
-            numparts = numparts + 1
-            part, meas, totalscore, totlength = np.caseParts(fl, part, meas, totalscore, totlength)
-            fl = 1  
-            alte = 0  
-            lyr = 0
-            coun = 0            
-        if word == "Lyric1":
-            lyr = 1
-            lyrics = lyri.caseLyrics(pi)
-        if word == "Bar":
-            part, meas = rep.caseRep(pi, part, meas, totlength)
-        if word == "Flow":
-            meas = dc.caseDCalFine(pi, meas)
-        if word == "DynamicVariance":
-            meas = dyn.caseDyn(pi, meas)
-        if word == "Dynamic":
-            meas = dynam.caseDynamics(pi, meas)
-        if word == "Bar\n":
-            part.append(meas)
-            meas = stream.Measure()
-        
-# Add the last Stuff 
-totalscore.insert(0, part)
+def parseList(data):
+    totalscore = stream.Score()
+    part = stream.Part()
+    meas = stream.Measure()
+    actualclef = "G"
+    counter = 0
+    fl = 0
+    start = 0
+    alte = 0
+    numparts = 0
+    totlength = 0
+    newclef = 1
+    SLUR = 0
+    SLUR1st = 0
+    SLURbeginning = 0
+    TIED = 0
+    TIED1st = 0
+    lyr = 0
+    coun = 0
+    lyrics = []
+    text = []
+    dictionary = {"Whole":4, "Half": 2, "4th":1, "8th":0.5, "16th":0.25, "32nd":0.125, "64th":0.0625, 0:0}
+    dictionaryrest = {"Whole\n":4, "Half\n": 2, "4th\n":1, "8th\n":0.5, "16th\n":0.25, "32nd\n":0.125, "64th\n":0.0625}
+    dictionarytrip = {4:"Whole", 2:"Half", 1:"4th", 0.5:"eighth", 0.25: "16th", 0.125: "32nd", 0.0625:"64th", 0:0}
+    dictionaryTreble = {1:"C", 2:"D", 3:"E", 4:"F", 5:"G", 6:"A", 7:"B", "octave":5}
+    dictionaryBass = {-1:"C", 0:"D", 1:"E", 2:"F", 3:"G", 4:"A", 5:"B", "octave":3}
+    dictionaryAlto = {0:"C", 1:"D", 2:"E", 3:"F", 4:"G", 5:"A", 6:"B", "octave":4}
+    dictionaryTenor = {-5:"C", -4:"D", -3:"E", -2:"F", -1:"G", 0:"A", 1:"B", "octave":3}
+    dictionarysharp = {1:"F", 2:"C", 3:"G", 4:"D", 5:"A", 6:"E", 7:"B"}
+    dictionarybemol = {1:"B", 2:"E", 3:"A", 4:"D", 5:"G", 6:"C", 7:"F"}
+    dictionaries = {"dictionary":dictionary, "dictionaryrest":dictionaryrest, "dictionarytrip": dictionarytrip, "dictionaryTreble":dictionaryTreble, "dictionaryAlto":dictionaryAlto, "dictionaryTenor":dictionaryTenor, "dictionaryBass":dictionaryBass, "dictionarysharp":dictionarysharp, "dictionarybemol":dictionarybemol}
+    
+    notes = classNote()
+    clefs = classClef()
+    rests = classRest()
+    keys = classKey()
+    sign = classSign()
+    ch = classChord()
+    np = classPart()
+    rep = classRep()
+    dc = classDCalFine()
+    dyn = classDyn()
+    dynam = classDynamics()
+    lyri = classLyrics()      
+    
+    # Main
+    for pi in data:
+        for word in pi.split('|'):
+            counter += 1
+            text.append(word)
+            if word == "Note":  
+                meas, totlength, SLUR, SLURbeginning , SLUR1st, TIED, TIED1st = notes.caseNote(dictionaries, pi, meas, actualclef, totlength, alte, SLUR, SLURbeginning, SLUR1st, TIED, TIED1st, lyrics, lyr, coun)
+                coun = coun + 1
+            if word == "Clef":
+                meas, actualclef = clefs.caseClef(pi, meas, start, totlength)
+                start = 1
+            if word == "Rest":
+                meas, totlength = rests.caseRest(dictionaries, pi, meas, totlength)
+            if word == "Key":
+                meas, alte = keys.caseKey(pi, meas, totlength, actualclef)
+            if word == "TimeSig":
+                meas = sign.caseSign(pi, meas, totlength)
+            if word == "Chord":
+                meas, totlength, SLUR, SLURbeginning , SLUR1st, TIED, TIED1st = ch.caseChord(dictionaries, pi, meas, totlength, alte, SLUR, SLURbeginning, SLUR1st, TIED, TIED1st, lyrics, lyr, coun, actualclef)
+                coun = coun + 1
+            if word == "AddStaff":
+                numparts = numparts + 1
+                part, meas, totalscore, totlength = np.caseParts(fl, part, meas, totalscore, totlength)
+                fl = 1  
+                alte = 0  
+                lyr = 0
+                coun = 0            
+            if word == "Lyric1":
+                lyr = 1
+                lyrics = lyri.caseLyrics(pi)
+            if word == "Bar":
+                part, meas = rep.caseRep(pi, part, meas, totlength)
+            if word == "Flow":
+                meas = dc.caseDCalFine(pi, meas)
+            if word == "DynamicVariance":
+                meas = dyn.caseDyn(pi, meas)
+            if word == "Dynamic":
+                meas = dynam.caseDynamics(pi, meas)
+            if word == "Bar\n":
+                part.append(meas)
+                meas = stream.Measure()
+            
+    # Add the last Stuff 
+    totalscore.insert(0, part)
+    
+    #print "SHOW"  
+    return totalscore
+    
+    
+    #environlocal.printDebug('word',[variable])
 
-#print "SHOW"  
-totalscore.show()  
-
-#environlocal.printDebug('word',[variable])
+if __name__ == '__main__':
+    import os
+    nwcTranslatePath = os.path.dirname(__file__)
+    paertPath = nwcTranslatePath + os.path.sep + 'verySimple.nwctxt' #'Part_OWeisheit.nwctxt'
+    myScore = parseFile(paertPath)
+    myScore.show('text')
