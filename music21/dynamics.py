@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -27,9 +27,9 @@ environLocal = environment.Environment(_MOD)
 
 
 
-shortNames = ['pppppp','ppppp','pppp','ppp','pp','p','mp', 
-                  'mf','f', 'fp', 'sf','ff','fff','ffff','fffff','ffffff']
-longNames  = {'ppp': 'pianississimo',
+shortNames = ['pppppp', 'ppppp', 'pppp', 'ppp', 'pp', 'p', 'mp',
+                  'mf', 'f', 'fp', 'sf', 'ff', 'fff', 'ffff', 'fffff', 'ffffff']
+longNames = {'ppp': 'pianississimo',
               'pp': 'pianissimo',
               'p': 'piano',
               'mp': 'mezzopiano',
@@ -41,7 +41,7 @@ longNames  = {'ppp': 'pianississimo',
               'fff': 'fortississimo'}
 
 ## could be really useful for automatic description of musical events
-englishNames  = {'ppp': 'extremely soft',
+englishNames = {'ppp': 'extremely soft',
                  'pp': 'very soft',
                  'p': 'soft',
                  'mp': 'moderately soft',
@@ -112,7 +112,7 @@ class Dynamic(music21.Music21Object):
     
     classSortOrder = 10
     
-    def __init__(self, value = None):
+    def __init__(self, value=None):
         music21.Music21Object.__init__(self)
 
         if not common.isStr(value):
@@ -150,8 +150,8 @@ class Dynamic(music21.Music21Object):
         else:
             self.englishName = None
 
-    value = property(_getValue, _setValue, 
-        doc = '''Get or set the value of this dynamic, which sets the long and english names of this Dynamic.
+    value = property(_getValue, _setValue,
+        doc='''Get or set the value of this dynamic, which sets the long and english names of this Dynamic.
         ''')
 
 
@@ -168,8 +168,8 @@ class Dynamic(music21.Music21Object):
                 raise TextExpressionException('Not a supported size: %s' % value)
             self._positionDefaultY = value
     
-    positionVertical = property(_getPositionVertical, _setPositionVertical, 
-        doc = '''Get or set the the vertical position, where 0 is the top line of the staff and units are in 10ths of a staff space.
+    positionVertical = property(_getPositionVertical, _setPositionVertical,
+        doc='''Get or set the the vertical position, where 0 is the top line of the staff and units are in 10ths of a staff space.
 
         >>> from music21 import *
         >>> te = expressions.TextExpression()
@@ -215,7 +215,7 @@ class Wedge(music21.Music21Object):
     '''Object model of crescendeo/decrescendo wedges.
     '''
     
-    def __init__(self, value = None):
+    def __init__(self, value=None):
         music21.Music21Object.__init__(self)
         # use inherited duration to show length n time
         # these correspond to start and stop
@@ -370,7 +370,7 @@ class Test(unittest.TestCase):
         selections = ['pp', 'f', 'mf', 'fff']
         positions = [-20, 0, 20]
         for i in range(10):
-            d = dynamics.Dynamic(selections[i%len(selections)])
+            d = dynamics.Dynamic(selections[i % len(selections)])
             #d.positionVertical = positions[i%len(positions)]
             s.append(d)
             s.append(note.Note('c1'))
@@ -381,12 +381,12 @@ class Test(unittest.TestCase):
         from music21 import stream, note, expressions, layout, dynamics
         s = stream.Stream()
         for i in range(6):
-            m = stream.Measure(number=i+1)
+            m = stream.Measure(number=i + 1)
             m.append(layout.SystemLayout(isNew=True))
             m.append(note.Rest(type='whole'))
             s.append(m)
         for m in s.getElementsByClass('Measure'):
-            offsets = [x*.25 for x in range(16)]
+            offsets = [x * .25 for x in range(16)]
             random.shuffle(offsets)
             offsets = offsets[:4]
             for o in offsets:
