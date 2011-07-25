@@ -46,7 +46,8 @@ __all__ = ['base',
            'abc', 'abj', 'analysis', 'composition', 'configure',
            'counterpoint', 'corpus', 
            'demos', 'doc', 'figuredBass', 'humdrum', 
-           'lily', 'musicxml', 'romanText', 'test', 'trecento', 'midi', 
+           'lily', 'musicxml', 
+           'noteworthy','romanText', 'test', 'trecento', 'midi', 
            
            # individual modules
            'articulations', 'bar',

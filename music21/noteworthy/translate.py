@@ -789,6 +789,8 @@ def parseList(data):
     coun = 0
     lyrics = []
     text = []
+    measWasAppended = False
+    
     dictionary = {"Whole":4, "Half": 2, "4th":1, "8th":0.5, "16th":0.25, "32nd":0.125, "64th":0.0625, 0:0}
     dictionaryrest = {"Whole\n":4, "Half\n": 2, "4th\n":1, "8th\n":0.5, "16th\n":0.25, "32nd\n":0.125, "64th\n":0.0625}
     dictionarytrip = {4:"Whole", 2:"Half", 1:"4th", 0.5:"eighth", 0.25: "16th", 0.125: "32nd", 0.0625:"64th", 0:0}
@@ -821,41 +823,59 @@ def parseList(data):
             if word == "Note":  
                 meas, totlength, SLUR, SLURbeginning , SLUR1st, TIED, TIED1st = notes.caseNote(dictionaries, pi, meas, actualclef, totlength, alte, SLUR, SLURbeginning, SLUR1st, TIED, TIED1st, lyrics, lyr, coun)
                 coun = coun + 1
-            if word == "Clef":
+                measWasAppended = False
+            elif word == "Clef":
                 meas, actualclef = clefs.caseClef(pi, meas, start, totlength)
                 start = 1
-            if word == "Rest":
+                measWasAppended = False
+            elif word == "Rest":
                 meas, totlength = rests.caseRest(dictionaries, pi, meas, totlength)
-            if word == "Key":
+                measWasAppended = False
+            elif word == "Key":
                 meas, alte = keys.caseKey(pi, meas, totlength, actualclef)
-            if word == "TimeSig":
+                measWasAppended = False
+            elif word == "TimeSig":
                 meas = sign.caseSign(pi, meas, totlength)
-            if word == "Chord":
+                measWasAppended = False
+            elif word == "Chord":
                 meas, totlength, SLUR, SLURbeginning , SLUR1st, TIED, TIED1st = ch.caseChord(dictionaries, pi, meas, totlength, alte, SLUR, SLURbeginning, SLUR1st, TIED, TIED1st, lyrics, lyr, coun, actualclef)
                 coun = coun + 1
-            if word == "AddStaff":
+                measWasAppended = False
+            elif word == "AddStaff":
                 numparts = numparts + 1
                 part, meas, totalscore, totlength = np.caseParts(fl, part, meas, totalscore, totlength)
                 fl = 1  
                 alte = 0  
                 lyr = 0
                 coun = 0            
-            if word == "Lyric1":
+                measWasAppended = False
+            elif word == "Lyric1":
                 lyr = 1
                 lyrics = lyri.caseLyrics(pi)
-            if word == "Bar":
+                measWasAppended = False
+            elif word == "Bar":
                 part, meas = rep.caseRep(pi, part, meas, totlength)
-            if word == "Flow":
+                measWasAppended = False
+            elif word == "Flow":
                 meas = dc.caseDCalFine(pi, meas)
-            if word == "DynamicVariance":
+                measWasAppended = False
+            elif word == "DynamicVariance":
                 meas = dyn.caseDyn(pi, meas)
-            if word == "Dynamic":
+                measWasAppended = False
+
+            elif word == "Dynamic":
                 meas = dynam.caseDynamics(pi, meas)
-            if word == "Bar\n":
+                measWasAppended = False
+
+            elif word == "Bar\n":
                 part.append(meas)
                 meas = stream.Measure()
-            
+                measWasAppended = True
+                
     # Add the last Stuff 
+    if measWasAppended == False:
+        part.append(meas)
+    
     totalscore.insert(0, part)
     
     #print "SHOW"  
@@ -868,5 +888,6 @@ if __name__ == '__main__':
     import os
     nwcTranslatePath = os.path.dirname(__file__)
     paertPath = nwcTranslatePath + os.path.sep + 'verySimple.nwctxt' #'Part_OWeisheit.nwctxt'
+    #myScore = parseFile('d:/desktop/SONG1.nwctxt')
     myScore = parseFile(paertPath)
     myScore.show('text')

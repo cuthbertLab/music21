@@ -16,17 +16,21 @@ whether from disk, from the web, or from text, into
 music21.stream.:class:`~music21.stream.Score` objects (or
 other similar stream objects).  
 
+
 The most powerful and easy to use tool is the :func:`~music21.converter.parse` 
 function. Simply provide a filename, URL, or text string and, if the format 
 is supported, a :class:`~music21.stream.Score` will be returned. 
+
 
 This is the most general public interface for all formats.  Programmers
 adding their own formats to the system should provide an interface here to
 their own parsers (such as humdrum, musicxml, etc.)
 
+
 The second and subsequent times that a file is loaded it will likely be much
 faster since we store a parsed version of each file as a "pickle" object in
 the temp folder on the disk.
+
 
 >>> from music21 import *
 >>> #_DOCS_SHOW s = converter.parse('d:/mydocs/schubert.krn')
@@ -77,6 +81,7 @@ from music21.musedata import translate as musedataTranslate
 from music21.romanText import base as romanTextModule
 from music21.romanText import translate as romanTextTranslate
 
+from music21.noteworthy import translate as noteworthyTranslate
 
 from music21 import environment
 _MOD = 'converter.py'
@@ -387,6 +392,45 @@ class ConverterTinyNotation(object):
         tnStr = f.read()
         f.close()
         self.stream = tinyNotation.TinyNotationStream(tnStr)
+
+
+class ConverterNoteworthy(object):
+    '''Simple class wrapper for parsing NoteworthyComposer data provided in a file or in a string.
+    '''
+
+    def __init__(self):
+        self.stream = None
+
+    #---------------------------------------------------------------------------
+    def parseData(self, nwcData):
+        r'''Open Noteworthy data from a string or list
+
+        >>> nwcData = "!NoteWorthyComposer(2.0)\n|AddStaff\n|Clef|Type:Treble\n|Note|Dur:Whole|Pos:1^"
+        >>> c = ConverterNoteworthy()
+        >>> c.parseData(nwcData)
+        >>> c.stream.show('text')
+        '''
+        self.stream = noteworthyTranslate.parseString(nwcData)
+
+
+    def parseFile(self, fp):
+        '''
+        Open Noteworthy data (as nwctxt) from a file path.
+        
+        
+        A testfile (in the noteworthy translation directory
+        
+        
+        >>> from music21 import *
+        >>> import os
+        >>> nwcTranslatePath = os.path.dirname(noteworthy.translate.__file__)
+        >>> filePath = nwcTranslatePath + os.path.sep + 'Part_OWeisheit.nwctxt'
+
+        >>> c = ConverterNoteworthy()
+        >>> c.parseFile(filePath)
+        >>> #_DOCS_SHOW c.stream.show()        
+        '''
+        self.stream = noteworthyTranslate.parseFile(fp)
 
 
 #-------------------------------------------------------------------------------

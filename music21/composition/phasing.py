@@ -251,7 +251,7 @@ class TestExternal(unittest.TestCase):
         partPari(show)
 
     def testPendulumMusic(self, show=True):  
-        #pendulumMusic(show)
+        pendulumMusic(show)
 #        pendulumMusic(show = True, 
 #                  loopLength = 210.0, 
 #                  totalLoops = 1, 
