@@ -239,6 +239,14 @@ class TextExpression(Expression, text.TextFormat):
         return None
 
 
+    def getTempoText(self):
+        # TODO: if this TextExpression, once imported, can be a tempo
+        # text object, create and return
+        pass
+
+
+
+
 #-------------------------------------------------------------------------------
 class Ornament(Expression):
     connectedToPrevious = True  

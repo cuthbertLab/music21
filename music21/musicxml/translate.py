@@ -102,31 +102,28 @@ def tempoIndicationToMx(ti):
     >>> mm = tempo.MetronomeMark("slow", 40, note.HalfNote())
     >>> mxList = musicxml.translate.tempoIndicationToMx(mm)
     >>> mxList
-    [<direction <direction-type <metronome parentheses=no <beat-unit charData=half> <per-minute charData=40>>>>]
+    [<direction <direction-type <metronome parentheses=no <beat-unit charData=half> <per-minute charData=40>>>>, <direction <direction-type <words default-y=45.0 font-weight=bold justify=left charData=slow>>>]
 
     >>> mm = tempo.MetronomeMark("slow", 40, duration.Duration(quarterLength=1.5))
     >>> mxList = musicxml.translate.tempoIndicationToMx(mm)
     >>> mxList
-    [<direction <direction-type <metronome parentheses=no <beat-unit charData=quarter> <beat-unit-dot > <per-minute charData=40>>>>]
+    [<direction <direction-type <metronome parentheses=no <beat-unit charData=quarter> <beat-unit-dot > <per-minute charData=40>>>>, <direction <direction-type <words default-y=45.0 font-weight=bold justify=left charData=slow>>>]
 
     '''
     from music21 import duration
 
     # if writing just a sound tag, place an empty words tag in a durection type and then follow with sound declaration
-    mxMetro = musicxmlMod.Metronome()
-
-    # all have this attribute
-    if ti.parentheses:
-        mxMetro.set('parentheses', 'yes') # only attribute
-    else:
-        mxMetro.set('parentheses', 'no') # only attribute
 
     durs = [] # duration objects
     numbers = [] # tempi
+    hideNumericalMetro = [] # if numbers implicit, hide metro; a lost
     if 'MetronomeMark' in ti.classes:
-        durs.append(ti.referent)
-        # check t1.numberImplicit ?
-        numbers.append(ti.number)
+        if ti.numberImplicit or ti.number is None:
+            #environLocal.printDebug(['found numberImplict', ti.numberImplicit])
+            hideNumericalMetro.append(True) 
+        else:
+            durs.append(ti.referent)
+            numbers.append(ti.number)
     elif 'MetricModulation' in ti.classes:
         pass
         return []
@@ -142,20 +139,37 @@ def tempoIndicationToMx(ti):
             mxComponents.append(musicxmlMod.BeatUnitDot())
         if len(numbers) > 0:
             mxComponents.append(musicxmlMod.PerMinute(numbers[0]))
-        
-    # simply add sub to components of mxMetro
-    for mxSub in mxComponents:
-        mxMetro.componentList.append(mxSub)
 
-    # wrap in mxDirection
-    mxDirectionType = musicxmlMod.DirectionType()
-    mxDirectionType.append(mxMetro)
-    # TODO: add sound tag here for actual realized tempo in bpm
-    mxDirection = musicxmlMod.Direction()
-    mxDirection.append(mxDirectionType)
+    # store all accumulated mxDirection objects
+    mxObjects = [] 
 
-    mxObjects = [] # need to add Words object for text if present
-    mxObjects.append(mxDirection)    
+    if not hideNumericalMetro:
+        mxMetro = musicxmlMod.Metronome()
+        # all have this attribute
+        if ti.parentheses:
+            mxMetro.set('parentheses', 'yes') # only attribute
+        else:
+            mxMetro.set('parentheses', 'no') # only attribute        
+        # simply add sub to components of mxMetro
+        # if there are no components this may only be a text indication
+        for mxSub in mxComponents:
+            mxMetro.componentList.append(mxSub)
+    
+        # wrap in mxDirection
+        mxDirectionType = musicxmlMod.DirectionType()
+        mxDirectionType.append(mxMetro)
+        # TODO: add sound tag here for actual realized tempo in bpm
+        mxDirection = musicxmlMod.Direction()
+        mxDirection.append(mxDirectionType)
+        mxObjects.append(mxDirection)    
+
+
+    # if there is an explicit text entry, add to list of mxObjets
+    if ti.getTextExpression(returnImplicit=False) is not None:
+        mxDirection = textExpressionToMx(
+                      ti.getTextExpression(returnImplicit=False))
+        mxObjects.append(mxDirection)    
+
     return mxObjects
 
 
@@ -1717,7 +1731,7 @@ def measureToMx(m, spannerBundle=None):
                 mxMeasure.insert(0, mxDirection)
 
             elif 'MetronomeMark' in classes or 'MetricModulation' in classes:
-                environLocal.printDebug(['measureToMx: found:', obj])
+                #environLocal.printDebug(['measureToMx: found:', obj])
 
                 # convert m21 offset to mxl divisions
                 mxOffset = int(defaults.divisionsPerQuarter * 
@@ -3138,6 +3152,42 @@ spirit</words>
         self.assertEqual(raw.count(match4) == 1, True)
         self.assertEqual(raw.count(match5) == 2, True)
         
+
+    def testExportMetronomeMarksD(self):
+        from music21 import stream, note, tempo
+        p = stream.Part()
+        p.repeatAppend(note.Note('g#3'), 8)
+        # default quarter assumed
+        p.insert(0, tempo.MetronomeMark('super fast', number=222.2))
+
+        match1 = '<words default-y="45.0" font-weight="bold" justify="left">super fast</words>'
+        match2 = '<per-minute>222.2</per-minute>'
+        raw = p.musicxml
+        self.assertEqual(raw.find(match1) > 0, True)
+        self.assertEqual(raw.find(match2) > 0, True)
+
+        p = stream.Part()
+        p.repeatAppend(note.Note('g#3'), 8)
+        # text does not show when implicit
+        p.insert(0, tempo.MetronomeMark(number=132))
+        match1 = '<words default-y="45.0" font-weight="bold" justify="left">fast</words>'
+        match2 = '<per-minute>132</per-minute>'
+        raw = p.musicxml
+        self.assertEqual(raw.find(match1) > 0, False)
+        self.assertEqual(raw.find(match2) > 0, True)
+
+
+        p = stream.Part()
+        p.repeatAppend(note.Note('g#3'), 8)
+        mm = tempo.MetronomeMark('very slowly')
+        self.assertEqual(mm.number, None)
+        p.insert(0, mm)
+        # text but no number
+        match1 = '<words default-y="45.0" font-weight="bold" justify="left">very slowly</words>'
+        match2 = '<per-minute>'
+        raw = p.musicxml
+        self.assertEqual(raw.find(match1) > 0, True)
+        self.assertEqual(raw.find(match2) > 0, False)
 
 
 

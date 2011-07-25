@@ -81,10 +81,10 @@ class TempoText(TempoIndication):
 
     def __init__(self, text=None):
         TempoIndication.__init__(self)
-        
-        #self.text = None # the actual string
+
+        # store text in a TextExpression instance        
         self._textExpression = None # a stored object
-        self._textJustification = 'center'
+        self._textJustification = 'left'
 
         if text is not None:
             try: # use property
@@ -110,7 +110,7 @@ class TempoText(TempoIndication):
             self._textExpression.content = value
 
     text = property(_getText, _setText, doc = '''
-        Get or set the text.
+        Get or set the text as a string.
 
         >>> import music21
         >>> tm = music21.tempo.TempoText("adagio")
@@ -119,8 +119,6 @@ class TempoText(TempoIndication):
         >>> tm.getTextExpression()
         <music21.expressions.TextExpression "adagio">
         ''')
-
-
 
     def getMetronomeMark(self):
         '''Return a MetronomeMark object that is configured from this objects Text.
@@ -133,28 +131,32 @@ class TempoText(TempoIndication):
         '''
         return MetronomeMark(text=self.text)
 
-
-    def getTextExpression(self):
+    def getTextExpression(self, numberImplicit=False):
         '''Return a TextExpression object for this text.
         '''
         if self._textExpression is None:
             return None
         else:
+            self.applyTextFormatting(numberImplicit=numberImplicit)
             return copy.deepcopy(self._textExpression)
 
     def setTextExpression(self, vale):
-        '''Given a text expression, extract the text
+        '''Given a TextExpression, set it in this object.
         '''
         self._textExpression = value
         self.applyTextFormatting()
-
         
-    def applyTextFormatting(self, te=None):
+    def applyTextFormatting(self, te=None, numberImplicit=False):
         '''Apply the default text formatting to the text expression version of of this repeat
         '''
         if te is None: # use the stored version if possible
             te = self._textExpression
         te.justify = self._textJustification
+        te.style = 'bold'
+        if numberImplicit:
+            te.positionVertical = 20 # if not showing number
+        else:
+            te.positionVertical = 45 # 4.5 staff lines above
         return te
 
     def isValidText(self, value):
@@ -177,7 +179,7 @@ class TempoText(TempoIndication):
 
 
 
-
+#-------------------------------------------------------------------------------
 class MetronomeMark(TempoIndication):
     '''
     A way of specifying a particular tempo with a text string, a referent (a duration) and a number.
@@ -286,7 +288,7 @@ class MetronomeMark(TempoIndication):
             self._updateNumberFromText()
 
     text = property(_getText, _setText, doc = 
-        '''Get or set a text string for this MetronomeMark. Internally implemented as a TempoText object. 
+        '''Get or set a text string for this MetronomeMark. Internally implemented as a TempoText object, which stores the text in a TextExpression object. 
         ''')
 
 
@@ -381,6 +383,43 @@ class MetronomeMark(TempoIndication):
                 post = tempoStr
                 break 
         return post
+
+
+    def getTextExpression(self, returnImplicit=False):
+        '''If there is a TextExpression available that is not implicit, return it; otherwise, return None.
+
+        >>> from music21 import *
+        >>> mm = MetronomeMark('presto')
+        >>> mm.number
+        168
+        >>> mm.numberImplicit
+        True
+        >>> mm.getTextExpression()
+        <music21.expressions.TextExpression "presto">
+        >>> mm.textImplicit
+        False
+
+        >>> mm = MetronomeMark(number=90)
+        >>> mm.numberImplicit
+        False
+        >>> mm.textImplicit     
+        True
+        >>> mm.getTextExpression() == None
+        True
+        >>> mm.getTextExpression(returnImplicit=True)
+        <music21.expressions.TextExpression "moderate">
+        '''
+        if self._tempoText is None:
+            return None
+        # if explicit, always return; if implicit, return if returnImplicit true
+        if not self.textImplicit or (self.textImplicit and returnImplicit): 
+            # adjust position if number is implicit; pass number implicit
+            return self._tempoText.getTextExpression(
+                numberImplicit=self.numberImplicit)
+
+
+
+
 
 
 

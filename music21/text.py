@@ -233,7 +233,7 @@ class TextFormat(object):
         self._size = value
 
     size = property(_getSize, _setSize, 
-        doc = '''Get or set the style, as normal, italic, bold, and bolditalic.
+        doc = '''Get or set the size.
 
         >>> from music21 import *
         >>> tf = TextFormat()
