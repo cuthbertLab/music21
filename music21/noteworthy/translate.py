@@ -12,6 +12,7 @@
 
 from music21 import duration, note, pitch, clef, meter, stream, tie, key, repeat
 from music21 import bar, chord, dynamics, spanner
+import unittest, doctest
 
 
 class classNote:    
@@ -882,12 +883,19 @@ def parseList(data):
     return totalscore
     
     
-    #environlocal.printDebug('word',[variable])
+class Test(unittest.TestCase):
+    
+    def runTest(self):
+        pass
+    def testBasic(self):
+        print "here"
 
 if __name__ == '__main__':
-    import os
-    nwcTranslatePath = os.path.dirname(__file__)
-    paertPath = nwcTranslatePath + os.path.sep + 'verySimple.nwctxt' #'Part_OWeisheit.nwctxt'
-    #myScore = parseFile('d:/desktop/SONG1.nwctxt')
-    myScore = parseFile(paertPath)
-    myScore.show('text')
+#    import os
+#    nwcTranslatePath = os.path.dirname(__file__)
+#    paertPath = nwcTranslatePath + os.path.sep + 'verySimple.nwctxt' #'Part_OWeisheit.nwctxt'
+#    myScore = parseFile(paertPath)
+#    myScore.show('text')
+    import music21
+    music21.mainTest(Test)
+
