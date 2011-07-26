@@ -409,6 +409,9 @@ class ConverterNoteworthy(object):
         >>> c = ConverterNoteworthy()
         >>> c.parseData(nwcData)
         >>> c.stream.show('text')
+        {0.0} <music21.stream.Part ...>
+            {0.0} <music21.stream.Measure 0 offset=0.0>
+                {0.0} <music21.note.Note C>
         '''
         self.stream = noteworthyTranslate.parseString(nwcData)
 

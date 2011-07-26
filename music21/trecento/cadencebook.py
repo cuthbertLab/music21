@@ -595,7 +595,7 @@ class TestExternal(unittest.TestCase):
     def runTest(self):
         pass
     
-    def testCredo(self):
+    def xtestCredo(self):
         '''
         testing a Credo in and Lilypond out
         '''
@@ -606,7 +606,7 @@ class TestExternal(unittest.TestCase):
         inc1 = credo1.snippets[4]
         inc1.lily.showPNG()
 
-    def testSnippetShow(self):
+    def xtestSnippetShow(self):
         '''
         testing a fake snippet in and MusicXML out
         '''
@@ -618,9 +618,20 @@ class TestExternal(unittest.TestCase):
 #       TODO: Make FrontPaddedCadence a subclass of Score!
 #        fpc1.show()
 
+    def testVirelais(self):
+        '''
+        test showing a virelai's incipit to see if it works
+        '''
+        virelaisSheet = TrecentoSheet(sheetname = 'virelais')
+        thisVirelai = virelaisSheet.makeWork(4)
+        if thisVirelai.title != "":
+            print thisVirelai.title
+            thisVirelai.incipit.asScore().show('musicxml')
+
+        
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    music21.mainTest(TestExternal, 'noDocTest')
 
 
 #------------------------------------------------------------------------------
