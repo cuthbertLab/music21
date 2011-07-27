@@ -3219,10 +3219,10 @@ spirit</words>
 
         #s.show()
         
-    def testNoteheadConverserion(self):
+    def testNoteheadConversion(self):
         # test to ensure notehead functionality
         
-        from music21 import *
+        from music21 import note
         n = note.Note('c3')
         n.notehead = 'diamond'
         
