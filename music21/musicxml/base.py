@@ -2074,7 +2074,7 @@ class Notehead(MusicXMLElement):
         # character data 
         self.charData = None
 
-# valid note heads values
+# valid notehead values
 #"slash", "triangle", "diamond", "square", "cross", "x" , "circle-x", "inverted, triangle", "arrow down", "arrow up", "slashed", "back slashed", "normal", "cluster", "none", "do", "re", "mi", "fa", "so", "la", "ti" 
 
 class Dot(MusicXMLElement):

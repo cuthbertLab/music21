@@ -1340,10 +1340,24 @@ def generalNoteToMusicXML(n):
 
     out = stream.Stream()
     out.append(nCopy)
+
     # call the musicxml property on Stream
     return out.musicxml
     
+def noteheadToMxNotehead(n, spannerBundle=None):
+    '''Translate a music21 :class:`~music21.note.Note` object into a musicxml.Notehead object.
+    '''
+    
+    mxNotehead = musicxmlMod.Notehead()
 
+	#Ensures that the music21 notehead value is supported by MusicXML, and then sets the MusicXML notehead's 'charaData' to the value of the Music21 notehead.
+    supportedValues = ['slash', 'triangle', 'diamond', 'square', 'cross', 'x' , 'circle-x', 'inverted', 'triangle', 'arrow down', 'arrow up', 'slashed', 'back slashed', 'normal', 'cluster', 'none', 'do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'circle dot', 'left triangle', 'rectangle']
+    if n.notehead not in supportedValues:
+        raise NoteheadException('This notehead type is not supported by MusicXML.')
+    else:
+        mxNotehead.set('charData', n.notehead)
+        
+    return mxNotehead
 
 def noteToMxNotes(n, spannerBundle=None):
     '''Translate a music21 :class:`~music21.note.Note` into a list of :class:`~music21.musicxml.Note` objects.
@@ -1430,6 +1444,8 @@ def noteToMxNotes(n, spannerBundle=None):
         if hasattr(expObj, 'mx'):
             mxNoteList[0].notationsObj.componentList.append(expObj.mx)
 
+    
+
     if spannerBundle is not None:
         # already filtered for just the spanner that have this note as
         # a component
@@ -1449,7 +1465,11 @@ def noteToMxNotes(n, spannerBundle=None):
                 continue
 
             mxNoteList[0].notationsObj.componentList.append(mxSlur)
-    
+            
+    #Adds the notehead type if it is not set to the default 'normal'.
+    if n.notehead != 'normal':
+       mxNoteList[0].noteheadObj = noteheadToMxNotehead(n)
+
     return mxNoteList
 
 
@@ -3198,8 +3218,18 @@ spirit</words>
         s = converter.parse(testPrimitive.graceNotes24a)
 
         #s.show()
-
-
+        
+    def testNoteheadConverserion(self):
+        # test to ensure notehead functionality
+        
+        from music21 import *
+        n = note.Note('c3')
+        n.notehead = 'diamond'
+        
+        out = n.musicxml
+        match1 = '<notehead>diamond</notehead>'
+        self.assertEqual(out.find(match1) > 0, True)
+        
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

@@ -564,7 +564,19 @@ class NotRest(GeneralNote):
     
     def __init__(self, *arguments, **keywords):
         GeneralNote.__init__(self, **keywords)
+        self._notehead = 'normal'
 
+    def _getNotehead(self):
+        '''Return the Notehead type.
+        '''
+        return self._notehead
+
+    def _setNotehead(self, value):
+
+        self._notehead = value
+
+    notehead = property(_getNotehead, _setNotehead)
+    
     def _isGrace(self):
         # duration must not be linked and quarterLength must be zero
         if self.duration.quarterLength == 0 and not self.duration.isLinked:
