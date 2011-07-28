@@ -423,8 +423,10 @@ class MetronomeMark(TempoIndication):
 
 
     #--------------------------------------------------------------------------
-    def getQuarterBPM(self):
+    def getQuarterBPM(self, useNumberSounding=True):
         '''Get a BPM value where the beat is a quarter; must convert from the defined beat to a quarter beat. Will return None if no beat number is defined.
+
+        This mostly used for generating MusicXML <sound> tags when necessary.
 
         >>> from music21 import *
         >>> mm = MetronomeMark(number=60, referent='half')
@@ -434,6 +436,9 @@ class MetronomeMark(TempoIndication):
         >>> mm.getQuarterBPM()
         60.0
         '''
+        if useNumberSounding and self.numberSounding is not None:
+            return convertTempoAtBeat(self.numberSounding, 
+                self.referent.quarterLength, 1.0)
         if self.number is not None:
             # target quarter length is always 1.0
             return convertTempoAtBeat(self.number, 

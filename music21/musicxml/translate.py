@@ -102,33 +102,42 @@ def tempoIndicationToMx(ti):
     >>> mm = tempo.MetronomeMark("slow", 40, note.HalfNote())
     >>> mxList = musicxml.translate.tempoIndicationToMx(mm)
     >>> mxList
-    [<direction <direction-type <metronome parentheses=no <beat-unit charData=half> <per-minute charData=40>>>>, <direction <direction-type <words default-y=45.0 font-weight=bold justify=left charData=slow>>>]
+    [<direction <direction-type <metronome parentheses=no <beat-unit charData=half> <per-minute charData=40>>> <sound tempo=80.0>>, <direction <direction-type <words default-y=45.0 font-weight=bold justify=left charData=slow>>>]
 
     >>> mm = tempo.MetronomeMark("slow", 40, duration.Duration(quarterLength=1.5))
     >>> mxList = musicxml.translate.tempoIndicationToMx(mm)
     >>> mxList
-    [<direction <direction-type <metronome parentheses=no <beat-unit charData=quarter> <beat-unit-dot > <per-minute charData=40>>>>, <direction <direction-type <words default-y=45.0 font-weight=bold justify=left charData=slow>>>]
+    [<direction <direction-type <metronome parentheses=no <beat-unit charData=quarter> <beat-unit-dot > <per-minute charData=40>>> <sound tempo=60.0>>, <direction <direction-type <words default-y=45.0 font-weight=bold justify=left charData=slow>>>]
 
     '''
     from music21 import duration
 
     # if writing just a sound tag, place an empty words tag in a durection type and then follow with sound declaration
 
+    # storing lists to accomodate metric modulations
     durs = [] # duration objects
     numbers = [] # tempi
     hideNumericalMetro = [] # if numbers implicit, hide metro; a lost
+    # store the last value necessary as a sounding tag in bpm
+    soundingQuarterBPM = None 
     if 'MetronomeMark' in ti.classes:
+        # will not show a number of implicit
         if ti.numberImplicit or ti.number is None:
             #environLocal.printDebug(['found numberImplict', ti.numberImplicit])
             hideNumericalMetro.append(True) 
         else:
             durs.append(ti.referent)
             numbers.append(ti.number)
+        # determine number sounding; first, get from numberSounding, then
+        # number (if implicit, that is fine); get in terms of quarter bpm
+        soundingQuarterBPM = ti.getQuarterBPM()
+        
     elif 'MetricModulation' in ti.classes:
         pass
         return []
         # add two ti.referents from each contained
         # check that len of numbers is == to len of durs; required here
+        # soundingQuarterBPM should be obtained from the last MetronomeMark
 
     mxComponents = []
     for i, d in enumerate(durs):
@@ -158,12 +167,17 @@ def tempoIndicationToMx(ti):
         # wrap in mxDirection
         mxDirectionType = musicxmlMod.DirectionType()
         mxDirectionType.append(mxMetro)
-        # TODO: add sound tag here; for actual realized tempo in bpm
-        # this goes inside the direction tag but not in direction type tag
+
         mxDirection = musicxmlMod.Direction()
         mxDirection.append(mxDirectionType)
-        mxObjects.append(mxDirection)    
 
+        # sound tag goes last, in mxDirection, not mxDirectionType
+        if soundingQuarterBPM is not None:
+            mxSound = musicxmlMod.Sound()
+            mxSound.set('tempo', soundingQuarterBPM)
+            mxDirection.append(mxSound)
+
+        mxObjects.append(mxDirection)    
 
     # if there is an explicit text entry, add to list of mxObjets
     if ti.getTextExpression(returnImplicit=False) is not None:
@@ -3212,6 +3226,21 @@ spirit</words>
         raw = p.musicxml
         self.assertEqual(raw.find(match1) > 0, True)
         self.assertEqual(raw.find(match2) > 0, False)
+
+
+    def testExportMetronomeMarksE(self):
+        '''Test writing of sound tags
+        '''
+        from music21 import stream, note, tempo
+        p = stream.Part()
+        p.repeatAppend(note.Note('g#3'), 8)
+        # default quarter assumed
+        p.insert(0, tempo.MetronomeMark('super slow', number=30.2))
+
+        raw = p.musicxml    
+        match1 = '<sound tempo="30.2"/>'
+        self.assertEqual(raw.find(match1) > 0, True)
+        #p.show()
 
 
 

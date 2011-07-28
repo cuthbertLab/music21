@@ -1296,11 +1296,25 @@ class Direction(MusicXMLElementList):
 
 
     def _getComponents(self):
+        # need to look for sound tags stored on componentList and place
+        # them at the very end of all components, after offset
         c = []
         c.append(('staff', self.staff))
-        c = c + self.componentList
+
+        soundTag = None
+        for i, sub in enumerate(self.componentList):
+            if isinstance(sub, Sound):
+                soundTag = sub
+            else: # store others in order
+                c.append(sub)
+        #c = c + self.componentList
+
         # this position is conventional, not necessarily the most common
         c.append(('offset', self.offset)) 
+        # if there is a sound tag, it needs to go after offset
+        if soundTag is not None:
+            c.append(soundTag)
+
         return c
 
 
@@ -2894,17 +2908,17 @@ class Handler(xml.sax.ContentHandler):
             # <direction> (not a <direction-type>)
             # if a direction obj is open, add there
             if self._directionObj is not None:
-                environLocal.printDebug(['inserting <sound> into _directionObj'])
+                #environLocal.printDebug(['inserting <sound> into _directionObj'])
                 self._directionObj.componentList.append(self._soundObj)
             elif self._measureObj is not None:
                 self._measureObj.componentList.append(self._soundObj)
-                environLocal.printDebug(['inserting <sound> into _measureObj'])
+                #environLocal.printDebug(['inserting <sound> into _measureObj'])
             self._soundObj = None
 
 
         elif name == 'metronome':  # branch location not optimized
             if self._directionTypeObj is not None: 
-                environLocal.printDebug(['closing Metronome'])
+                #environLocal.printDebug(['closing Metronome'])
                 self._directionTypeObj.componentList.append(self._metronomeObj)
             else:
                 raise MusicXMLException('missing a direction tyoe container for a Metronome: %s' % self._metronomeObj)
@@ -2914,7 +2928,7 @@ class Handler(xml.sax.ContentHandler):
             if self._metronomeObj is not None: 
                 self._beatUnitObj.charData = self._currentTag.charData
                 self._metronomeObj.componentList.append(self._beatUnitObj)
-                environLocal.printDebug(['adding <beat-unit> to metronome'])
+                #environLocal.printDebug(['adding <beat-unit> to metronome'])
             else:
                 raise MusicXMLException('found a <beat-unit> tag without a metronome object to store it within: %s' % self._beatUnitObj)
             self._beatUnitObj = None
@@ -2923,7 +2937,7 @@ class Handler(xml.sax.ContentHandler):
             # no char data
             if self._metronomeObj is not None: 
                 self._metronomeObj.componentList.append(self._beatUnitDotObj)
-                environLocal.printDebug(['adding <beat-unit-dot> to metronome'])
+                #environLocal.printDebug(['adding <beat-unit-dot> to metronome'])
             else:
                 raise MusicXMLException('found a <beat-unit-dot> tag without a metronome object to store it within: %s' % self._beatUnitObj)
             self._beatUnitDotObj = None
@@ -2932,7 +2946,7 @@ class Handler(xml.sax.ContentHandler):
             if self._metronomeObj is not None: 
                 self._perMinuteObj.charData = self._currentTag.charData
                 self._metronomeObj.componentList.append(self._perMinuteObj)
-                environLocal.printDebug(['adding <per-minute> to metronome'])
+                #environLocal.printDebug(['adding <per-minute> to metronome'])
             else:
                 raise MusicXMLException('found a <per-minute> tag without a metronome object to store it within: %s' % self._perMinuteObj)
             self._perMinuteObj = None
