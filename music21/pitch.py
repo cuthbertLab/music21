@@ -3426,7 +3426,7 @@ class Pitch(music21.Music21Object):
         Changes to this Pitch object's Accidental object are made in-place.
 
 
-        The `alteredPitches` list supplies pitches from a :class:`music21.key.KeySignature` object using the :attr:`~music21.key.KeySignature.alteredPitches` property. 
+        The `alteredPitches` list supplies pitches from a :class:`~music21.key.KeySignature` object using the :attr:`~music21.key.KeySignature.alteredPitches` property. 
 
 
         If `cautionaryPitchClass` is True, comparisons to past accidentals are made regardless of register. That is, if a past sharp is found two octaves above a present natural, a natural sign is still displayed. 
