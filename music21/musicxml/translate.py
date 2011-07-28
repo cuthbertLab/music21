@@ -3231,7 +3231,7 @@ spirit</words>
     def testExportMetronomeMarksE(self):
         '''Test writing of sound tags
         '''
-        from music21 import stream, note, tempo
+        from music21 import stream, note, tempo, meter
         p = stream.Part()
         p.repeatAppend(note.Note('g#3'), 8)
         # default quarter assumed
@@ -3241,6 +3241,33 @@ spirit</words>
         match1 = '<sound tempo="30.2"/>'
         self.assertEqual(raw.find(match1) > 0, True)
         #p.show()
+
+
+        p = stream.Part()
+        p.repeatAppend(note.Note('g#3'), 14)
+        # default quarter assumed
+        p.insert(meter.TimeSignature('2/4'))
+        p.insert(0, tempo.MetronomeMark(number=30))
+        p.insert(2, tempo.MetronomeMark(number=60))
+        p.insert(4, tempo.MetronomeMark(number=120))
+        p.insert(6, tempo.MetronomeMark(number=240))
+        p.insert(8, tempo.MetronomeMark(number=240, referent=.75))
+        p.insert(10, tempo.MetronomeMark(number=240, referent=.5))
+        p.insert(12, tempo.MetronomeMark(number=240, referent=.25))
+        #p.show()
+
+        raw = p.musicxml    
+        match1 = '<sound tempo="30.0"/>'
+        self.assertEqual(raw.find(match1) > 0, True)
+        match2 = '<sound tempo="60.0"/>'
+        self.assertEqual(raw.find(match2) > 0, True)
+        match3 = '<sound tempo="120.0"/>'
+        self.assertEqual(raw.find(match3) > 0, True)
+        match4 = '<sound tempo="240.0"/>'
+        self.assertEqual(raw.find(match4) > 0, True)
+        # from the dotted value
+        match5 = '<sound tempo="180.0"/>'
+        self.assertEqual(raw.find(match5) > 0, True)
 
 
 
