@@ -9,17 +9,19 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+import collections
 import music21
 import unittest
-import collections
 
-from music21 import pitch
-from music21 import note
 from music21 import chord
-from music21 import stream
+from music21 import instrument
 from music21 import interval
 from music21 import key
 from music21 import meter
+from music21 import note
+from music21 import pitch
+from music21 import stream
+from music21 import tempo
 
 c = {'128th':   u'\u2819',
      '64th':    u'\u2839',
@@ -156,6 +158,83 @@ rests = {'128th':   u'\u282d',
 
 barlines = {'light-heavy': u'\u2823\u2805',
             'light-light': u'\u2823\u2805\u2804'}
+
+alphabet = {'a': u'\u2801',
+            'b': u'\u2803',
+            'c': u'\u2809',
+            'd': u'\u2819',
+            'e': u'\u2811',
+            'f': u'\u280b',
+            'g': u'\u281b',
+            'h': u'\u2813',
+            'i': u'\u280a',
+            'j': u'\u281a',
+            'k': u'\u2805',
+            'l': u'\u2807',
+            'm': u'\u280d',
+            'n': u'\u281d',
+            'o': u'\u2815',
+            'p': u'\u280f',
+            'q': u'\u281f',
+            'r': u'\u2817',
+            's': u'\u280e',
+            't': u'\u281e',
+            'u': u'\u2825',
+            'v': u'\u2827',
+            'w': u'\u283a',
+            'x': u'\u282d',
+            'y': u'\u283d',
+            'z': u'\u2835',
+            '!': u'\u2816',
+            '\'': u'\u2804',
+            ',': u'\u2802',
+            '-': u'\u2834',
+            '.': u'\u2832',
+            '?': u'\u2826'}
+
+def instrumentToBraille(sampleInstrument = instrument.Instrument()):
+    return wordStringToBraille(sampleInstrument.bestName())
+
+def tempoTextToBraille(sampleTempoText = tempo.TempoText("adagio")):
+    return wordStringToBraille(sampleTempoText.text)
+
+def metronomeMarkToBraille(sampleMetronomeMark = tempo.MetronomeMark(number = 80, referent = note.HalfNote())):
+    metroTrans = []
+    metroTrans.append(c[sampleMetronomeMark.referent.type])
+    metroTrans.append(u'\u2836')
+    metroTrans.append(u'\u283c')
+    for digit in str(sampleMetronomeMark.number):
+        metroTrans.append(numbers[int(digit)])
+    
+    return ''.join(metroTrans)
+
+def wordStringToBraille(sampleWordString = "Lento assai, cantante e tranquillo", returnSplit = False):
+    # Can return either:
+    # 1) The entire expression
+    # 2) A divided expression
+    
+    wordStringTrans = []
+    allWords = sampleWordString.split()
+    for word in allWords:
+        wordStringTrans.append(wordToBraille(word))
+        
+    if returnSplit:
+        return wordStringTrans
+    else:
+        return u'\u2800'.join(wordStringTrans)
+
+def wordToBraille(sampleWord = 'andante'):
+    '''
+    >>> from music21.braille import translate
+    '''
+    wordTrans = []
+    for letter in sampleWord:
+        if letter.isupper():
+            wordTrans.append(u'\u2820' + alphabet[letter.lower()])
+        else:
+            wordTrans.append(alphabet[letter])
+        
+    return ''.join(wordTrans)
 
 def keySigToBraille(sampleKeySig = key.KeySignature(1)):
     '''
@@ -390,9 +469,6 @@ def partToBraille(samplePart = stream.Part()):
             allLines[lineIndex] = u'\u2800\u2800' + mtb
     
     allLines[lineIndex] = allLines[lineIndex].ljust(40, u'\u2800')
-    
-    for i in range(0, lineIndex + 1):
-        print allLines[i]
     return allLines
     
 
