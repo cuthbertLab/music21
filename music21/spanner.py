@@ -8,6 +8,17 @@
 # Copyright:    (c) 2010-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+'''
+A spanner is a music21 object that represents a connection usually between 
+two or more music21 objects that might live in different streams but need 
+some sort of connection between them.  A slur is one type of spanner -- it might
+connect notes in different Measure objects or even between different parts.
+
+
+This package defines some of the most common spanners.  Other spanners
+can be found in modules such as :ref:`dynamics` (for things such as crescendos)
+or in :ref:`meter` (a ritardando for instance).
+'''
 
 import unittest
 import copy
@@ -32,10 +43,30 @@ class SpannerBundleException(Exception):
 #-------------------------------------------------------------------------------
 class Spanner(music21.Music21Object):
     '''
-    Spanner objects live on Streams as other Music21Objects, but store connections between one or more Music21Objects.
+    Spanner objects live on Streams as other Music21Objects, but 
+    store connections between one or more Music21Objects.
+
+
+    Most of the time you will want to subclass Spanner
+    for specific purposes.  In the first demo, we create
+    a spanner to represent a written-out accelerando, such
+    as Elliott Carter uses in his second string quartet
+
 
     >>> from music21 import *
-    >>> sp1 = spanner.Spanner()
+    >>> class CarterAccelerandoSign(spanner.Spanner):
+    ...    pass
+    >>> n1 = note.Note('C4')
+    >>> n2 = note.Note('D4')
+    >>> n3 = note.Note('E4')
+    >>> sp1 = CarterAccelerandoSign(n1, n2, n3) # or as a list: [n1, n2, n3]
+    >>> sp1.getComponents()
+    [<music21.note.Note C>, <music21.note.Note D>, <music21.note.Note E>]
+
+    
+    
+    OMIT_FROM_DOCS
+    
     >>> # assert that components Stream subclass is linked to container
     >>> sp1._components.spannerParent == sp1
     True

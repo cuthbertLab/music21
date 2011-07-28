@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         stream.py
-# Purpose:      base clases for dealing with groups of positioned objects
+# Name:         dynamics.py
+# Purpose:      Module for dealing with dynamics changes.
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
@@ -11,7 +11,8 @@
 #-------------------------------------------------------------------------------
 
 '''
-Classes and functions for creating and manipulating dynamic symbols. Rather than subclasses, the :class:`~music21.dynamics.Dynamic` object is often specialized by parameters. 
+Classes and functions for creating and manipulating dynamic symbols. Rather than 
+subclasses, the :class:`~music21.dynamics.Dynamic` object is often specialized by parameters. 
 '''
 
 import unittest, doctest
@@ -91,7 +92,9 @@ class WedgeException(Exception):
 
 
 class Dynamic(music21.Music21Object):
-    '''Object representation of Dyanmics.
+    '''
+    Object representation of Dynamics.
+    
     
     >>> from music21 import *
     >>> pp1 = dynamics.Dynamic('pp')
@@ -102,12 +105,32 @@ class Dynamic(music21.Music21Object):
     >>> pp1.englishName
     'very soft'
     
+    
     Dynamics can also be specified on a 0 to 1 scale with 1 being the 
     loudest (see dynamicStrFromDecimal() above)
+    
     
     >>> pp2 = dynamics.Dynamic(0.15) # on 0 to 1 scale
     >>> pp2.value
     'pp'
+    
+    
+    Dynamics can be placed anywhere in a stream.
+    
+    
+    >>> s = stream.Stream()
+    >>> s.insert(0, note.HalfNote('E-4'))
+    >>> s.insert(2, note.HalfNote('F#5'))
+    >>> s.insert(0, dynamics.Dynamic('pp'))
+    >>> s.insert(1, dynamics.Dynamic('mf'))
+    >>> s.insert(3, dynamics.Dynamic('fff'))
+    >>> #_DOCS_SHOW s.show()
+    
+    
+    .. image:: images/dynamics_simple.*
+        :width: 344
+
+    
     '''
     
     classSortOrder = 10
@@ -400,7 +423,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Dynamic, Wedge]
+_DOC_ORDER = [Dynamic, Wedge, dynamicStrFromDecimal]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

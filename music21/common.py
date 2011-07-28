@@ -37,6 +37,7 @@ fileExtensions = {
     'midi' : {'input': ['mid', 'midi'], 'output': 'mid'},
      # note: this is setting .zip as default mapping to musedata
     'musedata' : {'input': ['md', 'musedata', 'zip'], 'output': 'md'},
+    'noteworthytext': {'input': ['nwctxt'], 'output': 'nwctxt'},
     'lilypond' : {'input': ['ly', 'lily', 'lily.png', 'lily.pdf', 'lilypond.png', 'lilypong.pdf'], 'output': 'ly'},
     'finale' : {'input': ['mus'], 'output': 'mus'},
     'humdrum' : {'input': ['krn'], 'output': 'krn'},

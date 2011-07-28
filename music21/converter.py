@@ -263,7 +263,7 @@ class StreamFreezer(object):
         # must make a deepcopy, as we will be altering DefinedContexts
         self.stream = copy.deepcopy(streamObj)
         # call _elementsChanged to clear cache
-        self.stream._elementsChanged()
+        #self.stream._elementsChanged()
         #self.stream = streamObj
 
 #         for x in dir(self.stream):
@@ -395,7 +395,29 @@ class ConverterTinyNotation(object):
 
 
 class ConverterNoteworthy(object):
-    '''Simple class wrapper for parsing NoteworthyComposer data provided in a file or in a string.
+    '''
+    Simple class wrapper for parsing NoteworthyComposer data provided in a file or in a string.
+
+
+    Gets data with the file format .nwctxt
+    
+    
+    Users should not need this routine.  The basic format is
+    
+    
+    >>> from music21 import *
+    >>> import os #_DOCS_HIDE
+    >>> nwcTranslatePath = os.path.dirname(noteworthy.translate.__file__) #_DOCS_HIDE 
+    >>> paertPath = nwcTranslatePath + os.path.sep + 'Part_OWeisheit.nwctxt' #_DOCS_HIDE 
+    >>> #_DOCS_SHOW paertPath = converter.parse('d:/desktop/arvo_part_o_weisheit.nwctxt')
+    >>> paertStream = converter.parse(paertPath)
+    >>> len(paertStream.parts)
+    4
+    
+    
+    For developers: see the documentation for :meth:`parseData` and :meth:`parseFile`
+    to see the low-level usage.
+    
     '''
 
     def __init__(self):
@@ -416,19 +438,17 @@ class ConverterNoteworthy(object):
         self.stream = noteworthyTranslate.parseString(nwcData)
 
 
-    def parseFile(self, fp):
+    def parseFile(self, fp, number=None):
         '''
         Open Noteworthy data (as nwctxt) from a file path.
         
-        
-        A testfile (in the noteworthy translation directory
-        
+                
         
         >>> from music21 import *
-        >>> import os
-        >>> nwcTranslatePath = os.path.dirname(noteworthy.translate.__file__)
-        >>> filePath = nwcTranslatePath + os.path.sep + 'Part_OWeisheit.nwctxt'
-
+        >>> import os #_DOCS_HIDE
+        >>> nwcTranslatePath = os.path.dirname(noteworthy.translate.__file__) #_DOCS_HIDE
+        >>> filePath = nwcTranslatePath + os.path.sep + 'Part_OWeisheit.nwctxt' #_DOCS_HIDE
+        >>> #_DOCS_SHOW paertPath = converter.parse('d:/desktop/arvo_part_o_weisheit.nwctxt') 
         >>> c = ConverterNoteworthy()
         >>> c.parseFile(filePath)
         >>> #_DOCS_SHOW c.stream.show()        
@@ -689,7 +709,7 @@ class ConverterRomanText(object):
 
 #-------------------------------------------------------------------------------
 class ConverterMuseData(object):
-    '''Simple class wrapper for parsing ABC.
+    '''Simple class wrapper for parsing MuseData.
     '''
 
     def __init__(self):
@@ -760,7 +780,8 @@ class ConverterMuseData(object):
 
 #-------------------------------------------------------------------------------
 class Converter(object):
-    '''A class used for converting all supported data formats into music21 objects. 
+    '''
+    A class used for converting all supported data formats into music21 objects. 
 
     Not a subclass, but a wrapper for different converter objects based on format.
     '''
@@ -783,6 +804,9 @@ class Converter(object):
             self._converter = ConverterABC()
         elif format == 'musedata':
             self._converter = ConverterMuseData()
+        elif format == 'noteworthytext':
+            self._converter = ConverterNoteworthy()
+        
         elif format == 'text': # based on extension
             # presently, all text files are treated as roman text
             # may need to handle various text formats
@@ -798,7 +822,13 @@ class Converter(object):
         return os.path.join(dir, 'm21-' + common.getMd5(url) + ext)
 
     def parseFile(self, fp, number=None, format=None, forceSource=False):
-        '''Given a file path, parse and store a music21 Stream.
+        '''
+        Given a file path, parse and store a music21 Stream.
+        
+        
+        If format is None then look up the format from the file 
+        extension using `common.findFormatFile`.
+        
         '''
         #environLocal.printDebug(['attempting to parseFile', fp])
         if not os.path.exists(fp):

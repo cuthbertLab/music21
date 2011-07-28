@@ -1345,7 +1345,9 @@ def generalNoteToMusicXML(n):
     return out.musicxml
     
 def noteheadToMxNotehead(n, spannerBundle=None):
-    '''Translate a music21 :class:`~music21.note.Note` object into a musicxml.Notehead object.
+    '''
+    Translate a music21 :class:`~music21.note.Note` object 
+    into a musicxml.Notehead object.
     '''
     
     mxNotehead = musicxmlMod.Notehead()
@@ -1360,7 +1362,9 @@ def noteheadToMxNotehead(n, spannerBundle=None):
     return mxNotehead
 
 def noteToMxNotes(n, spannerBundle=None):
-    '''Translate a music21 :class:`~music21.note.Note` into a list of :class:`~music21.musicxml.Note` objects.
+    '''
+    Translate a music21 :class:`~music21.note.Note` into a 
+    list of :class:`~music21.musicxml.Note` objects.
     '''
     #Attributes of notes are merged from different locations: first from the 
     #duration objects, then from the pitch objects. Finally, GeneralNote 
