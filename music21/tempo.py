@@ -3,8 +3,8 @@
 # Name:         tempo.py
 # Purpose:      Classes and tools relating to tempo
 #
-# Authors:      Michael Scott Cuthbert
-#               Christopher Ariza
+# Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
 #
 # Copyright:    (c) 2009-11 The music21 Project
 # License:      LGPL
@@ -51,7 +51,7 @@ defaultTempoValues = {
 
 def convertTempoAtBeat(numberSrc, quarterLengthBeatSrc, 
                        quarterLengthBeatDst=1.0):
-    '''Convert from one tempo to another, each possibly with different beat units.
+    '''Convert between equivalent tempi, where the speed stays the same but the beat referent and number chnage.
 
     >>> from music21 import *
     >>> tempo.convertTempoAtBeat(60, 1, 2) # 60 bpm at quarter, going to half
@@ -264,18 +264,23 @@ class MetronomeMark(TempoIndication):
 
         self.parentheses = parentheses 
 
+
+        self._referent = None # set with property
         if referent is None: 
             # if referent is None, set a default quarter note duration
-            self.referent = duration.Duration(type='quarter')
-        elif 'Duration' not in referent.classes:
-            # try get duration object, like from Note
-            self.referent = referent.duration
-        elif 'Duration' in referent.classes:
-            self.referent = referent # should be a music21.duration.Duration object or a Music21Object with a duration or None
-        elif common.isNum(referent): # assume ql value
-            self.referent = duration.Duration(referent)
-        else:
-            raise TempoException('unhandled condition')
+            referent = duration.Duration(type='quarter')
+        self.referent = referent # use property
+
+        # assume ql value or a type string
+#         elif common.isNum(referent) or common.isStr(referent): 
+#             self.referent = duration.Duration(referent)
+#         elif 'Duration' not in referent.classes:
+#             # try get duration object, like from Note
+#             self.referent = referent.duration
+#         elif 'Duration' in referent.classes:
+#             self.referent = referent # should be a music21.duration.Duration object or a Music21Object with a duration or None
+#         else:
+#             raise TempoException('unhandled condition')
 
         # set implicit values if necessary
         self._updateNumberFromText()
@@ -284,7 +289,6 @@ class MetronomeMark(TempoIndication):
         # need to store a sounding value for the case where where
         # a sounding different is different than the number given in the MM
         self._numberSounding = None
-
 
     def __repr__(self):
         if self.text is None:
@@ -309,6 +313,30 @@ class MetronomeMark(TempoIndication):
             if self._number is not None: # only if set
                 self.numberImplicit = True
 
+    #--------------------------------------------------------------------------
+    def _getReferent(self):
+        return self._referent
+    
+    def _setReferent(self, value):
+        if value is None: # this may be better not here
+            # if referent is None, set a default quarter note duration
+            self._referent = duration.Duration(type='quarter')
+        # assume ql value or a type string
+        elif common.isNum(value) or common.isStr(value): 
+            self._referent = duration.Duration(value)
+        elif 'Duration' not in value.classes:
+            # try get duration object, like from Note
+            self._referent = value.duration
+        elif 'Duration' in value.classes:
+            self._referent = value # should be a music21.duration.Duration object or a Music21Object with a duration or None
+        else:
+            raise TempoException('Cannot get a Duration from the supplied object: %s', value)
+
+    referent = property(_getReferent, _setReferent, doc=
+        '''Get or set the referent, or the Duration object that is the reference for the tempo value in BPM.
+        ''')        
+
+
     # properties and conversions
     def _getText(self):
         if self._tempoText is None:
@@ -329,7 +357,15 @@ class MetronomeMark(TempoIndication):
             self._updateNumberFromText()
 
     text = property(_getText, _setText, doc = 
-        '''Get or set a text string for this MetronomeMark. Internally implemented as a TempoText object, which stores the text in a TextExpression object. 
+        '''Get or set a text string for this MetronomeMark. Internally implemented as a :class:`~music21.tempo.TempoText` object, which stores the text in a :class:`~music21.expression.TextExpression` object. 
+
+        >>> from music21 import *
+        >>> mm = tempo.MetronomeMark(number=120)
+        >>> mm.text == None 
+        True
+        >>> mm.text = 'medium fast'
+        >>> mm.text
+        'medium fast'
         ''')
 
 
@@ -346,23 +382,81 @@ class MetronomeMark(TempoIndication):
 
     number = property(_getNumber, _setNumber, doc =
         '''Get and set the number, or the numerical value of the Metronome. 
+
+        >>> from music21 import *
+        >>> mm = tempo.MetronomeMark('slow')
+        >>> mm.number
+        52
+        >>> mm.numberImplicit
+        True
+        >>> mm.number = 52.5
+        >>> mm.number       
+        52.5
+        >>> mm.numberImplicit
+        False
+        ''')
+
+
+    def _getNumberSounding(self):
+        return self._numberSounding # may be None
+    
+    def _setNumberSounding(self, value):
+        if not common.isNum(value):
+            raise TempoException('cannot set numberSounding to a string')
+        self._numberSounding = value
+
+    numberSounding = property(_getNumberSounding, _setNumberSounding, doc =
+        '''Get and set the numberSounding, or the numerical value of the Metronome that is used for playback independent of display. If numberSounding is None number is assumed to be numberSounding. 
+
+        >>> from music21 import *
+        >>> mm = tempo.MetronomeMark('slow')
+        >>> mm.number
+        52
+        >>> mm.numberImplicit
+        True
+        >>> mm.numberSounding == None
+        True
+        >>> mm.numberSounding = 120
+        >>> mm.numberSounding
+        120
         ''')
 
 
     #--------------------------------------------------------------------------
-        
-
     def getQuarterBPM(self):
-        '''Get a BPM where the beat is a quarter; must look and adjust from current beat
+        '''Get a BPM value where the beat is a quarter; must convert from the defined beat to a quarter beat. Will return None if no beat number is defined.
+
+        >>> from music21 import *
+        >>> mm = MetronomeMark(number=60, referent='half')
+        >>> mm.getQuarterBPM()
+        120.0
+        >>> mm.referent = 'quarter'
+        >>> mm.getQuarterBPM()
+        60.0
         '''
-        pass
+        if self.number is not None:
+            # target quarter length is always 1.0
+            return convertTempoAtBeat(self.number, 
+                self.referent.quarterLength, 1.0)
+        return None
+
 
     def setQuarterBPM(self, value, setNumber=True):
         '''Given a value in BPM, use it to set the value of this MetroneMark. BPM values are assumed to be refer only to quarter notes; different beat values, if definded here, will be scaled
+
+        >>> from music21 import *
+        >>> mm = MetronomeMark(number=60, referent='half')
+        >>> mm.setQuarterBPM(240) # set to 240 for a quarter
+        >>> mm.number  # a half is half as fast
+        120.0
         '''
+        # assuming a quarter value coming in, what is with our current beat
+        value = convertTempoAtBeat(value, 1.0, self.referent.quarterLength)
         if not setNumber:
             # convert this to a quarter bpm
-            return self._numberSounding
+            self._numberSounding = value
+        else: # go through property so as to set implicit status
+            self.number = value
 
 
     def _getDefaultNumber(self, tempoText):
@@ -480,6 +574,10 @@ class MetricModulation(TempoIndication):
         # store two MetronomeMark objects
         self._leftMetronome = None
         self._rightMetronome = None
+
+
+
+
 
 
 
