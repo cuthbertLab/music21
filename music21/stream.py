@@ -5090,6 +5090,7 @@ class Stream(music21.Music21Object):
         
         '''
         newStream = self.__class__()
+        newStream.offset = self.offset
         
         # IF this streamObj contains more streams (ie, a Part that contains multiple measures)
         recurse = self.recurse(streamsOnly = True)
