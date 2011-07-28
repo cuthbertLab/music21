@@ -8,6 +8,23 @@ from music21 import stream
 from music21 import meter
 from music21 import note
 from music21 import key
+from music21 import meter
+from music21 import tinyNotation
+
+def example2_1():
+    bm = tinyNotation.TinyNotationStream("g8 r8 e8 f8 r8 a8 g8 r8 f8 e8 r8 r8 e8 r8 c8 d8 r8 f8 e8 r8 d8 c8 r8 r8 \
+    d8 r8 f8 e8 r8 g8 f8 g8 a8 g8 r8 r8 a8 r8 f8 g8 r8 e8 f8 e8 d8 c8 r8 r8")
+    bm.insert(0, key.KeySignature(0))
+    bm.insert(0, meter.TimeSignature('3/8'))
+    bm.makeMeasures(inPlace = True)
+    return bm
+
+def example2_2():
+    bm = tinyNotation.TinyNotationStream("r8 r8 r8 d8 d8 c8 B8 d8 c8 B8 A8 c8 B8 A8 G8 B8 A8 A8 D8 r8 E8 E8 G8 E8 D8 E8 G8 B8 D8 C8 B8 A8 G8 G8 G8 r8")
+    bm.insert(0, key.KeySignature(0))
+    bm.insert(0, meter.TimeSignature('4/8'))
+    bm.makeMeasures(inPlace = True)
+    return bm
 
 def melodyA():
     '''
@@ -88,5 +105,10 @@ def melodyC():
 if __name__ == '__main__':
     from music21 import corpus
     jmf = corpus.parse('bach/bwv227.1.xml') # Jesu meine freude
+    #jmf.show('text')
     t = translate.partToBraille(jmf[1])
-    print t
+    #f = codecs.open('jesu meine freude.txt', encoding='utf-8', mode='w+')
+    for i in sorted(t.keys()):
+        print t[i]
+        #f.write(t[i] + u"\n")
+    #f.close()
