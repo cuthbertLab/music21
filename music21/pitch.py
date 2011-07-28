@@ -85,13 +85,13 @@ def convertPitchClassToNumber(ps):
     replace it with the default pitch class representation.
 
     >>> from music21 import *
-    >>> convertPitchClassToNumber(3)
+    >>> pitch.convertPitchClassToNumber(3)
     3
-    >>> convertPitchClassToNumber('a')
+    >>> pitch.convertPitchClassToNumber('a')
     10
-    >>> convertPitchClassToNumber('B')
+    >>> pitch.convertPitchClassToNumber('B')
     11
-    >>> convertPitchClassToNumber('3')
+    >>> pitch.convertPitchClassToNumber('3')
     3
     '''
     if common.isNum(ps):

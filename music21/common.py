@@ -1622,8 +1622,8 @@ def stripAccents(inputString):
     
     >>> from music21 import common
     >>> s = u'tr\u00e8s vite'
-    >>> print s
-    très vite
+    >>> u'\u00e8' in s
+    True
     >>> common.stripAccents(s)
     u'tres vite'
     '''
