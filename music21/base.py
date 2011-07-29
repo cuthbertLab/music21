@@ -39,8 +39,9 @@ under the module "base":
 '''
 
 #-------------------------------------------------------------------------------
+# string and tuple must be the same
 VERSION_STR = "0.3.7.a11"
-VERSION = (0, 3, 6)  # increment any time picked versions will be obsolete or other significant changes have been made
+VERSION = (0, 3, 7)
 #-------------------------------------------------------------------------------
 
 import copy
