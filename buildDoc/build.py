@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009-10 The music21 Project
+# Copyright:    (c) 2009-11 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -35,6 +35,8 @@ from music21.analysis import windowed as analysisWindowed
 from music21 import articulations
 from music21 import base
 from music21 import beam
+from music21.braille import translate as brailleTranslate
+
 from music21 import clef
 from music21 import chord
 from music21 import common
@@ -87,6 +89,9 @@ from music21.romanText import base as romanText
 from music21.romanText import translate as romanTextTranslate
 
 from music21 import note
+
+from music21.noteworthy import translate as noteworthyTranslate
+
 from music21 import pitch
 from music21 import roman
 from music21 import repeat
@@ -144,6 +149,7 @@ MODULES = [
     articulations,
     base,
     beam,
+    brailleTranslate,
     clef, 
     common, 
 
@@ -193,6 +199,8 @@ MODULES = [
     musicxmlTranslate,
 
     note, 
+    noteworthyTranslate,
+
     pitch,
     roman, 
     romanText,

@@ -342,7 +342,7 @@ def fbFeatureExtraction():
 #testTrecentoSimpler()
 #prepareTrecentoCadences()
 #figuredBassScale()
-fbFeatureExtraction()
+#fbFeatureExtraction()
 #testChinaEuropeSimpler()
 
 #prepareChinaEurope2()

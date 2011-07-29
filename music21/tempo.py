@@ -814,7 +814,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [TempoText, MetronomeMark, interpolateElements]
+_DOC_ORDER = [MetronomeMark, TempoText, MetricModulation, interpolateElements]
 
 
 if __name__ == "__main__":

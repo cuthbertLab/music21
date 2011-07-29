@@ -39,7 +39,7 @@ under the module "base":
 '''
 
 #-------------------------------------------------------------------------------
-VERSION_STR = "0.3.6.a10"
+VERSION_STR = "0.3.7.a11"
 VERSION = (0, 3, 6)  # increment any time picked versions will be obsolete or other significant changes have been made
 #-------------------------------------------------------------------------------
 

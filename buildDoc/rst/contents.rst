@@ -58,6 +58,7 @@ Module Reference
    moduleArticulations
    moduleBase
    moduleBeam
+   moduleBrailleTranslate
    moduleClef
    moduleCommon
    moduleCompositionPhasing
@@ -96,6 +97,7 @@ Module Reference
    moduleMusedataBase40
    moduleMusicxmlTranslate
    moduleNote
+   moduleNoteworthyTranslate
    modulePitch
    moduleRoman
    moduleRomanTextBase

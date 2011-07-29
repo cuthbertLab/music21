@@ -8,9 +8,16 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+
+'''Objects for exporting music21 data as braille.
+'''
+
+
 import collections
 import music21
 import unittest
+
+
 
 from music21 import chord
 from music21 import instrument
