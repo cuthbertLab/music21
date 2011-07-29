@@ -3,8 +3,8 @@
 # Name:         scale.py
 # Purpose:      music21 classes for representing scales
 #
-# Authors:      Michael Scott Cuthbert
-#               Christopher Ariza
+# Authors:      Christopher Ariza
+#               Michael Scott Cuthbert               
 #               Jose Cabal-Ugaz
 #
 # Copyright:    (c) 2009-2011 The music21 Project

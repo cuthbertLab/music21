@@ -172,7 +172,7 @@ class ArchiveManager(object):
                 # or, return a list of strings
                 # alternative, a different method might return one at a time
                 mdd = musedataModule.MuseDataDirectory(f.namelist())
-                environLocal.printDebug(['mdd object, namelist', mdd, f.namelist])
+                #environLocal.printDebug(['mdd object, namelist', mdd, f.namelist])
 
                 post = []
                 for subFp in mdd.getPaths():
@@ -310,7 +310,7 @@ class StreamFreezer(object):
             dir = environLocal.getRootTempDir()
             fp = os.path.join(dir, fp)
 
-        environLocal.printDebug(['opening fp', fp])
+        #environLocal.printDebug(['opening fp', fp])
         f = open(fp, 'rb')
         storage = pickleMod.load(f)
         f.close()
@@ -518,7 +518,7 @@ class ConverterMusicXML(object):
 
         c = musicxml.Document()
         if format == 'pickle':
-            environLocal.printDebug(['opening pickled file', fpDst])
+            #environLocal.printDebug(['opening pickled file', fpDst])
             try:
                 c.openPickle(fpDst)
             except (ImportError, EOFError):
@@ -526,7 +526,7 @@ class ConverterMusicXML(object):
                 pickleError = True
                 writePickle = True
                 if formatSrc == 'musicxml':
-                    environLocal.printDebug([msg], environLocal)
+                    #environLocal.printDebug([msg], environLocal)
                     fpDst = fp # set to orignal file path
                 else:
                     raise ConverterException(msg)
@@ -645,7 +645,7 @@ class ConverterABC(object):
 
         If `number` is provided, and this ABC file defines multiple works with a X: tag, just the specified work will be returned. 
         '''
-        environLocal.printDebug(['ConverterABC.parseFile: got number', number])
+        #environLocal.printDebug(['ConverterABC.parseFile: got number', number])
 
         af = abcModule.ABCFile()
         af.open(fp)
@@ -760,7 +760,7 @@ class ConverterMuseData(object):
             for fp in fpList:
                 mdw.addFile(fp)
 
-        environLocal.printDebug(['ConverterMuseData: mdw file count', len(mdw.files)])
+        #environLocal.printDebug(['ConverterMuseData: mdw file count', len(mdw.files)])
 
         musedataTranslate.museDataWorkToStreamScore(mdw, self._stream)
 
@@ -1481,7 +1481,7 @@ class Test(unittest.TestCase):
         fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid')
         s = parseFile(fp)
         #s.show()
-        environLocal.printDebug(['\nopening fp', fp])
+        #environLocal.printDebug(['\nopening fp', fp])
 
         self.assertEqual(len(s.flat.getElementsByClass(note.Note)), 2)
         self.assertEqual(len(s.flat.getElementsByClass(chord.Chord)), 3)
@@ -1495,7 +1495,7 @@ class Test(unittest.TestCase):
         s = parseFile(fp)
         #s.show()
 
-        environLocal.printDebug(['\nopening fp', fp])
+        #environLocal.printDebug(['\nopening fp', fp])
 
         #s.show()
         dList = [n.quarterLength for n in s.flat.notesAndRests[:30]]

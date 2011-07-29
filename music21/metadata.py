@@ -997,7 +997,8 @@ class Contributor(music21.JSONSerializer):
         if mxCreatorType != None and mxCreatorType in ROLES:
             self.role = mxCreatorType
         else: # roles are not defined in musicxml
-            environLocal.printDebug(['_setMX:', 'received unknown Contributor role: %s' % mxCreatorType])
+            pass
+            #environLocal.printDebug(['_setMX:', 'received unknown Contributor role: %s' % mxCreatorType])
         # remove any whitespace found
         self.name = mxCreator.get('charData').strip()
 
@@ -1624,7 +1625,7 @@ class Metadata(music21.Music21Object):
         mxWork = mxScore.get('workObj')
         if mxWork != None: # may be set to none
             self.title = mxWork.get('workTitle')
-            environLocal.printDebug(['_setMX, got title', self.title])
+            #environLocal.printDebug(['_setMX, got title', self.title])
             self.number = mxWork.get('workNumber')
             self.opusNumber = mxWork.get('opus')
 

@@ -1300,7 +1300,7 @@ class Stream(music21.Music21Object):
                 element = item
             #if not isinstance(item, music21.Music21Object): 
             except AttributeError:
-                environLocal.printDebug(['wrapping item in ElementWrapper:', item])
+                #environLocal.printDebug(['wrapping item in ElementWrapper:', item])
                 element = music21.ElementWrapper(item)
 
             self._addElementPreProcess(element)
@@ -1723,7 +1723,7 @@ class Stream(music21.Music21Object):
 #         if hasattr(self, '__weakref__'):
 #             del self.__weakref__
 
-        environLocal.printDebug(['calling setupPickleScaffold()', self])
+        #environLocal.printDebug(['calling setupPickleScaffold()', self])
         for element in self.elements:
             #if hasattr(element, "elements"): # recurse time:
             if element.isStream:
@@ -4703,7 +4703,7 @@ class Stream(music21.Music21Object):
                             # completely in the next measure, thus, need to 
                             # continue processing each measure
                             if mNextAdd:
-                                environLocal.printDebug(['makeTies() inserting mNext into returnObj', mNext])
+                                #environLocal.printDebug(['makeTies() inserting mNext into returnObj', mNext])
                                 returnObj.insert(mNext.offset, mNext)
                         elif overshot > 0:
                             environLocal.printDebug(['makeTies() found and skipping extremely small overshot into next measure', overshot])
@@ -4786,7 +4786,7 @@ class Stream(music21.Music21Object):
                 barQL = lastTimeSignature.barDuration.quarterLength
     
                 if not common.almostEquals(durSum, barQL) and durSum > barQL:
-                    environLocal.printDebug(['attempting makeBeams with a bar that contains durations that sum greater than bar duration (%s > %s)' % (durSum, barQL)])
+                    #environLocal.printDebug(['attempting makeBeams with a bar that contains durations that sum greater than bar duration (%s > %s)' % (durSum, barQL)])
                     continue
             
                 # getBeams can take a list of Durations; however, this cannot
@@ -5043,8 +5043,8 @@ class Stream(music21.Music21Object):
         except StreamException:
             # this is a result of makeMeaures not getting everything 
             # note to measure allocation right
-            environLocal.printDebug(['skipping makeBeams exception', 
-                                    StreamException])
+            #environLocal.printDebug(['skipping makeBeams exception', StreamException])
+            pass
 
         # note: this needs to be after makeBeams, as placing this before
         # makeBeams was causing the duration's tuplet to loose its type setting
@@ -5334,7 +5334,7 @@ class Stream(music21.Music21Object):
                     # an open tie, not connected to anything
                     # should be an error; presently, just skipping
                     #raise StreamException('cannot consolidate ties when only one tie is present', notes[posConnected[0]])
-                    environLocal.printDebug(['cannot consolidate ties when only one tie is present', notes[posConnected[0]]])
+                    #environLocal.printDebug(['cannot consolidate ties when only one tie is present', notes[posConnected[0]]])
                     posConnected = [] 
                     continue
 
@@ -6406,7 +6406,7 @@ class Stream(music21.Music21Object):
         '''
         oldMetadata = self._getMetadata()
         if oldMetadata is not None:
-            environLocal.printDebug(['removing old metadata', oldMetadata])
+            #environLocal.printDebug(['removing old metadata', oldMetadata])
             junk = self.pop(self.index(oldMetadata))
 
         if metadataObj != None and isinstance(metadataObj, metadata.Metadata):
@@ -8565,7 +8565,7 @@ class Measure(Stream):
         <accidental natural>
         '''
 
-        environLocal.printDebug(['Measure.makeNotation'])
+        #environLocal.printDebug(['Measure.makeNotation'])
 
         # TODO: this probably needs to look to see what processes need to be done; for example, existing beaming may be destroyed. 
 
@@ -8604,8 +8604,8 @@ class Measure(Stream):
         except StreamException:
             # this is a result of makeMeaures not getting everything 
             # note to measure allocation right
-            environLocal.printDebug(['skipping makeBeams exception', 
-                                    StreamException])
+            pass
+            #environLocal.printDebug(['skipping makeBeams exception', StreamException])
         m.makeTupletBrackets(inPlace=True)
 
         if not inPlace: 
@@ -8679,7 +8679,8 @@ class Measure(Stream):
             # this will shift all elements
             #self.shiftElements(shift, classFilterList=[note.GeneralNote])
         else:
-            environLocal.printDebug(['padAsAnacrusis() called; however, no anacrusis shift necessary:', barDuration.quarterLength, proportion])
+            pass
+            #environLocal.printDebug(['padAsAnacrusis() called; however, no anacrusis shift necessary:', barDuration.quarterLength, proportion])
 
     #---------------------------------------------------------------------------
     def bestTimeSignature(self):
@@ -8806,7 +8807,7 @@ class Measure(Stream):
         # if clef is None; remove object?
         oldClef = self._getClef()
         if oldClef is not None:
-            environLocal.printDebug(['removing clef', oldClef])
+            #environLocal.printDebug(['removing clef', oldClef])
             junk = self.pop(self.index(oldClef))
         self.insert(0, clefObj)
 
@@ -10053,7 +10054,7 @@ class Test(unittest.TestCase):
             elif part in ['Test', 'TestExternal']:
                 continue
             elif callable(part):
-                environLocal.printDebug(['testing copying on', part])
+                #environLocal.printDebug(['testing copying on', part])
                 obj = getattr(module, part)()
                 a = copy.copy(obj)
                 b = copy.deepcopy(obj)
@@ -10196,7 +10197,7 @@ class Test(unittest.TestCase):
             midStream.insert(srcNew)
 
         self.assertEqual(len(midStream), 4)
-        environLocal.printDebug(['pre flat of mid stream'])
+        #environLocal.printDebug(['pre flat of mid stream'])
         self.assertEqual(len(midStream.flat), 24)
 #        self.assertEqual(len(midStream.getOverlaps()), 0)
         mfs = midStream.flat.sorted
@@ -11166,7 +11167,7 @@ class Test(unittest.TestCase):
         m1 = a.parts[0].getElementsByClass('Measure')[1]
         mOffsetMap = m1.measureOffsetMap(note.Note)
         # offset here is that of measure that originally contained this note
-        environLocal.printDebug(['m1', m1, 'mOffsetMap', mOffsetMap])
+        #environLocal.printDebug(['m1', m1, 'mOffsetMap', mOffsetMap])
         self.assertEqual(sorted(mOffsetMap.keys()), [4.0] )
 
         m2 = a.parts[0].getElementsByClass('Measure')[2]
@@ -11744,13 +11745,13 @@ class Test(unittest.TestCase):
         s1 = Stream()
         s1.insert(n1)
 
-        environLocal.printDebug(['n1.siteIds after one insertion', n1, n1.getSites(), n1.getSiteIds()])
+        #environLocal.printDebug(['n1.siteIds after one insertion', n1, n1.getSites(), n1.getSiteIds()])
 
 
         s2 = Stream()
         s2.insert(s1)
 
-        environLocal.printDebug(['n1.siteIds after container insertion', n1, n1.getSites(), n1.getSiteIds()])
+        #environLocal.printDebug(['n1.siteIds after container insertion', n1, n1.getSites(), n1.getSiteIds()])
 
         s2Flat = s2.flat
 
@@ -14853,7 +14854,7 @@ class Test(unittest.TestCase):
         p = stream.Part()
         #p.append(instrument.Voice())
         p.append(note.Note("D#4"))
-        environLocal.printDebug([p.offsetMap])
+        #environLocal.printDebug([p.offsetMap])
 
 
     def testStripTiesBuiltB(self):
@@ -15348,7 +15349,7 @@ class Test(unittest.TestCase):
         ts = meter.TimeSignature('6/8')
 #         for n in sPart.flat.notesAndRests:
 #             bs = n.beatStr
-        environLocal.printDebug(['calling makeMeasures'])
+        #environLocal.printDebug(['calling makeMeasures'])
         sPartFlat = sPart.flat
         notesAndRests = sPartFlat.notesAndRests
         sMeasures = sPart.flat.notesAndRests.makeMeasures(ts)

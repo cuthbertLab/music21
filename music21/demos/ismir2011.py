@@ -147,7 +147,9 @@ def testChinaEuropeFull():
                     mismatch += 1
             print('%s %s: misclassified %s/%s of %s' % (cStr, cName, mismatch, len(matchData),  matchStr))
 
-def testChinaEuropeSimpler():
+
+# this test requires orange and related files
+def xtestChinaEuropeSimpler():
     import orange, orngTree
 
     trainData = orange.ExampleTable('ismir2011_fb_folkTrain.tab')

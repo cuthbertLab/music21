@@ -839,7 +839,7 @@ class Test(unittest.TestCase):
         #s = corpus.parse('madrigal.3.1.rntxt')
 
         for e in s._yieldElementsDownward(streamsOnly=False):
-            environLocal.printDebug(['activeSite:', e, e.activeSite])
+            #environLocal.printDebug(['activeSite:', e, e.activeSite])
             if 'KeySignature' in e.classes:
                 e.activeSite.remove(e)
 

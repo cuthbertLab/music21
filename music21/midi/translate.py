@@ -856,7 +856,7 @@ def _processPackets(packets, channelForInstrument={}, channelsDyanmic=[],
             # if this is a note off, and has a cent shift, need to 
             # rest the pitch bend back to 0 cents
             if p['midiEvent'].type in ['NOTE_OFF']:
-                environLocal.printDebug(['got note-off', p['midiEvent']])
+                #environLocal.printDebug(['got note-off', p['midiEvent']])
                 # cent shift is set for note on and note off
                 if p['centShift'] is not None:
                     # do not set channel, as already set
@@ -884,7 +884,7 @@ def _processPackets(packets, channelForInstrument={}, channelsDyanmic=[],
         channelExclude = [] # channels that cannot be used
         centShift = p['centShift'] # may be None
 
-        environLocal.printDebug(['\n\noffset', o, 'oEnd', oEnd, 'centShift', centShift])
+        #environLocal.printDebug(['\n\noffset', o, 'oEnd', oEnd, 'centShift', centShift])
 
         # iterate through all past events/channels, and find all
         # that are active and have a pitch bend
@@ -914,7 +914,7 @@ def _processPackets(packets, channelForInstrument={}, channelsDyanmic=[],
                             # cannot break early w/o sorting
 
         # if no channels are excluded, get a new channel
-        environLocal.printDebug(['post process channelExclude', channelExclude])
+        #environLocal.printDebug(['post process channelExclude', channelExclude])
         if len(channelExclude) > 0: # only change if necessary
             ch = None       
             # iterate in order over all channels: lower will be added first
@@ -927,8 +927,8 @@ def _processPackets(packets, channelForInstrument={}, channelsDyanmic=[],
             p['midiEvent'].channel = ch
             # change channel of note off; this is used above to turn off pbend
             p['midiEvent'].correspondingEvent.channel = ch
-            environLocal.printDebug(['set channel of correspondingEvent:', 
-                                p['midiEvent'].correspondingEvent])
+            #environLocal.printDebug(['set channel of correspondingEvent:', 
+                                #p['midiEvent'].correspondingEvent])
 
             # TODO: must add program change, as we are now in a new 
             # channel; regardless of if we have a pitch bend (we may
@@ -948,7 +948,7 @@ def _processPackets(packets, channelForInstrument={}, channelsDyanmic=[],
             # always set corresponding event to the same channel
             p['midiEvent'].correspondingEvent.channel = ch
 
-        environLocal.printDebug(['assigning channel', ch, 'channelsDynamic', channelsDyanmic, "p['initChannel']", p['initChannel']])
+        #environLocal.printDebug(['assigning channel', ch, 'channelsDynamic', channelsDyanmic, "p['initChannel']", p['initChannel']])
 
         if centShift is not None:
             # add pitch bend
@@ -972,7 +972,7 @@ def _processPackets(packets, channelForInstrument={}, channelsDyanmic=[],
         if centShift is not None:
             uniqueChannelEvents[key].append(centShift)
         post.append(p) # add packet/ done after ch change or bend addition
-        environLocal.printDebug(['uniqueChannelEvents', uniqueChannelEvents])
+        #environLocal.printDebug(['uniqueChannelEvents', uniqueChannelEvents])
 
     # this is called once at completion
     #environLocal.printDebug(['uniqueChannelEvents', uniqueChannelEvents])
@@ -985,7 +985,7 @@ def _processPackets(packets, channelForInstrument={}, channelsDyanmic=[],
 #         for ch in chList:
 #             if ch not in foundChannels:
 #                 foundChannels.append(ch)
-    environLocal.printDebug(['foundChannels', foundChannels])
+    #environLocal.printDebug(['foundChannels', foundChannels])
     #environLocal.printDebug(['usedTracks', usedTracks])
 
 
@@ -1191,7 +1191,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
             continue
         else:
             # cannot pair delta time to the next event; skip by 1
-            environLocal.printDebug(['cannot pair to delta time', mt.events[i]])
+            #environLocal.printDebug(['cannot pair to delta time', mt.events[i]])
             i += 1
             continue
 
@@ -1224,7 +1224,8 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                 i, j = match
                 notes.append([events[i], events[j]])
             else:
-                environLocal.printDebug(['midiTrackToStream(): cannot find a note off for a note on', e])
+                pass
+                #environLocal.printDebug(['midiTrackToStream(): cannot find a note off for a note on', e])
         else:
             if e.type == 'TIME_SIGNATURE':
                 # time signature should be 4 bytes
@@ -1388,7 +1389,7 @@ def streamsToMidiTracks(inputM21):
         if ch not in channelsAssigned:
             channelsDyanmic.append(ch)
 
-    environLocal.printDebug(['channelForInstrument', channelForInstrument, 'channelsDyanmic', channelsDyanmic, 'allChannels', allChannels, 'allUniqueInstruments', allUniqueInstruments])
+    #environLocal.printDebug(['channelForInstrument', channelForInstrument, 'channelsDyanmic', channelsDyanmic, 'allChannels', allChannels, 'allUniqueInstruments', allUniqueInstruments])
 
     initChannelForTrack = {}
     # update packets with first channel
@@ -1420,7 +1421,7 @@ def streamsToMidiTracks(inputM21):
         channelsDyanmic=channelsDyanmic, 
         initChannelForTrack=initChannelForTrack)
 
-    environLocal.printDebug(['got netPackets:', len(netPackets), 'packetStorage keys (tracks)', packetStorage.keys()])
+    #environLocal.printDebug(['got netPackets:', len(netPackets), 'packetStorage keys (tracks)', packetStorage.keys()])
     # build each track, sorting out the appropriate packets based on track
     # ids
     for trackId in packetStorage.keys():   

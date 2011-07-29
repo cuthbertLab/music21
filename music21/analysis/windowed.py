@@ -259,7 +259,7 @@ class WindowedAnalysis(object):
                 windowSizes.append(totalWindow)
 
         for i in windowSizes:
-            environLocal.printDebug(['processing window:', i])
+            #environLocal.printDebug(['processing window:', i])
             # each of these results are lists, where len is based on 
             soln, colorn = self._analyze(i, windowType=windowType) 
             # store lists of results in a list of lists

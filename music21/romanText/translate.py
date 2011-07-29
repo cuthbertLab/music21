@@ -172,7 +172,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
         elif t.isTimeSignature():
             tsCurrent = meter.TimeSignature(t.data)
             tsSet = False
-            environLocal.printDebug(['tsCurrent:', tsCurrent])
+            #environLocal.printDebug(['tsCurrent:', tsCurrent])
         elif t.isKeySignature():
             if t.data == "":
                 keySigCurrent = key.KeySignature(0)
@@ -181,10 +181,10 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
             else:
                 pass 
                 # better to print a message
-                environLocal.printDebug(['still need to write a generic RomanText KeySignature routine.  this is just temporary'])
+                #environLocal.printDebug(['still need to write a generic RomanText KeySignature routine.  this is just temporary'])
                 #raise TranslateRomanTextException("still need to write a generic RomanText KeySignature routine.  this is just temporary")
             keySigSet = False
-            environLocal.printDebug(['keySigCurrent:', keySigCurrent])
+            #environLocal.printDebug(['keySigCurrent:', keySigCurrent])
             foundAKeySignatureSoFar = True
         elif t.isMeasure():
             #environLocal.printDebug(['handling measure token:', t])
@@ -316,7 +316,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                             rn = roman.RomanNumeral(a.src, copy.deepcopy(kCurrent))
                         except (roman.RomanNumeralException, 
                             common.Music21CommonException): 
-                            environLocal.printDebug('cannot create RN from: %s' % a.src)
+                            #environLocal.printDebug('cannot create RN from: %s' % a.src)
                             rn = note.Note() # create placeholder 
                         if pivotChordPossible == False:
                             # probably best to find duration

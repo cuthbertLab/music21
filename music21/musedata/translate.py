@@ -285,7 +285,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
             # can only do this b/c ts is defined
             if m.barDurationProportion() < 1.0:
                 m.padAsAnacrusis()
-                environLocal.printDebug(['incompletely filled Measure found on musedata import; interpreting as a anacrusis:', 'padingLeft:', m.paddingLeft])
+                #environLocal.printDebug(['incompletely filled Measure found on musedata import; interpreting as a anacrusis:', 'padingLeft:', m.paddingLeft])
         p._appendCore(m)
         barCount += 1
 

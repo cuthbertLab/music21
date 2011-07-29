@@ -2011,7 +2011,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
 
         # <sound> tags may be found in the Measure, used to define tempo
         elif isinstance(mxObj, musicxmlMod.Sound):
-            environLocal.printDebug(['found musicxmlMod.Sound object in mxMeasure'])
+            #environLocal.printDebug(['found musicxmlMod.Sound object in mxMeasure'])
             pass
 
         elif isinstance(mxObj, musicxmlMod.Barline):

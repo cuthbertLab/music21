@@ -1358,7 +1358,7 @@ class MuseDataWork(object):
 
         for fp in fpList:
             mdf = MuseDataFile()
-            environLocal.printDebug('processing MuseData file: %s' % fp)
+            #environLocal.printDebug('processing MuseData file: %s' % fp)
             mdf.open(fp)
             mdf.read()  # process string and break into parts
             mdf.close()
@@ -1564,7 +1564,7 @@ class Test(unittest.TestCase):
         dirLib = os.path.join(fp, 'test01')
         for fn in ['01.md', '02.md', '03.md', '04.md', '05.md']:
             fp = os.path.join(dirLib, fn)
-            environLocal.printDebug([fp])
+            #environLocal.printDebug([fp])
 
             mdw.addFile(fp)
 

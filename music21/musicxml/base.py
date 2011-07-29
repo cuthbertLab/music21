@@ -3394,8 +3394,8 @@ class Document(object):
     def _load(self, fileLike, file=True, audit=False):
         saxparser = self._getParser()
 
-        t = common.Timer()
-        t.start()
+        #t = common.Timer()
+        #t.start()
 
         # call the handler with tagLib
         h = Handler(self.tagLib) 
@@ -3414,8 +3414,8 @@ class Document(object):
             fileLikeOpen.close()
         fileLikeOpen.close()
 
-        t.stop()
-        environLocal.printDebug(['parsing time:', t])
+        #t.stop()
+        #environLocal.printDebug(['parsing time:', t])
 
         if audit:
             ok, msg = self.tagLib.audit() # audit tags
