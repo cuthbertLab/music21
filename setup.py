@@ -87,7 +87,7 @@ def writeManifestTemplate(fpPackageDir):
     dst = os.path.join(fpPackageDir, 'MANIFEST.in')
     msg = []
     
-    msg.append('global-include *.py *.txt *.xml *.krn *.mxl *.pdf *.html *.css *.js *.png *.xls *.mid *.abc *.json *.md *.zip *.rntxt *.command *.scl\n')
+    msg.append('global-include *.py *.txt *.xml *.krn *.mxl *.pdf *.html *.css *.js *.png *.xls *.mid *.abc *.json *.md *.zip *.rntxt *.command *.scl *.nwctxt \n')
     # order matters: remove dist and buildDoc directories after global include
     # adding .py to this list gets the obsolete dir
 

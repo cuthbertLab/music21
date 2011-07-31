@@ -1239,6 +1239,8 @@ def getPackageData():
     '''Return a list of package data in the format specified by setup.py. This creates a very inclusive list of all data types. 
     '''
     # include these extensions for all directories, even if they are not normally there.
+    # also need to update writeManifestTemplate() in setup.py when adding
+    # new file extensions
     ext = ['txt', 'xml', 'krn', 'mxl', 'html', 'png', 
            'css', 'js', 'pdf', 'xls', 'mid', 'abc', 'json', 'md', 
            'zip', 'rntxt', 'command', 'scl', 'nwctxt']

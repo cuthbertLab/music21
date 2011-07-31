@@ -1770,8 +1770,8 @@ class PlotStream(object):
             # if we have part-like sub streams; we can assume that all parts
             # have parallel measures start times here for simplicity
             # take the top part 
-            offsetMap = self.streamObj.parts[0].measureOffsetMap(
-                        ['Measure'])
+            offsetMap = self.streamObj.getElementsByClass(
+                'Stream')[0].measureOffsetMap(['Measure'])
         elif self.streamObj.hasMeasures():
             offsetMap = self.streamObj.measureOffsetMap([stream.Measure])
         else:
