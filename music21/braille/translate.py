@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#!/usr/bin/python
 #-------------------------------------------------------------------------------
 # Name:         translate.py
 # Purpose:      music21 class which allows translation of music21 objects to braille.
@@ -17,8 +18,7 @@ import collections
 import music21
 import unittest
 
-
-
+from music21 import bar
 from music21 import chord
 from music21 import instrument
 from music21 import interval
@@ -162,8 +162,8 @@ rests = {'128th':   u'\u282d',
          'half':    u'\u2825',
          'whole':   u'\u280d'}
 
-barlines = {'light-heavy': u'\u2823\u2805',
-            'light-light': u'\u2823\u2805\u2804'}
+barlines = {'final': u'\u2823\u2805',
+            'double': u'\u2823\u2805\u2804'}
 
 alphabet = {'a': u'\u2801',
             'b': u'\u2803',
@@ -229,6 +229,11 @@ def wordStringToBraille(sampleWordString = "Lento assai, cantante e tranquillo",
     else:
         return u'\u2800'.join(wordStringTrans)
 
+# Have a method which gets a part, flattens it, and finds
+# What do I do now?
+
+# Tempo text + metronome mark + key signature + time signature (Not necessarily all of them)
+
 def wordToBraille(sampleWord = 'andante'):
     '''
     >>> from music21.braille import translate
@@ -242,7 +247,7 @@ def wordToBraille(sampleWord = 'andante'):
         
     return ''.join(wordTrans)
 
-def keySigToBraille(sampleKeySig = key.KeySignature(1)):
+def keySigToBraille(sampleKeySig = key.KeySignature(0)):
     '''
     Takes in a :class:`~music21.key.KeySignature` and returns its
     representation in braille as a string in utf-8 unicode.
@@ -340,9 +345,11 @@ def noteToBraille(sampleNote = note.Note('C4'), showOctave = True):
         noteTrans.append(nameWithLength) 
         for dot in range(sampleNote.duration.dots):
             noteTrans.append(u'\u2804')
+        if not sampleNote.tie == None:
+            noteTrans.append(u'\u2808\u2809')
         return ''.join(noteTrans)
     except KeyError:
-        raise BrailleTranslateException("Note duration cannot be translated to braille.")
+        raise BrailleTranslateException("Note duration '" + sampleNote.duration.type + "' cannot be translated to braille.")
 
 def restToBraille(sampleRest = note.Rest()):
     '''
@@ -351,7 +358,7 @@ def restToBraille(sampleRest = note.Rest()):
     
     
     Currently, only supports single rests with or without dots.
-    Compound rests are not supported.
+    Complex rests are not supported.
     
     >>> from music21.braille import translate
     >>> from music21 import note
@@ -386,24 +393,26 @@ def measureToBraille(sampleMeasure = stream.Measure(), showLeadingOctave = True)
     designation. Other notes in the measure carry an octave designation only if applicable.
     (See :meth:`~music21.braille.translate.showOctaveWithNote`.)    
     '''
-    # only valid for notes and rests
     measureTrans = []
-    allNotesAndRests = sampleMeasure.flat.notesAndRests
     previousNote = None
     
-    for generalNote in allNotesAndRests:
-        if generalNote.isNote == True:
+    for element in sampleMeasure:
+        if isinstance(element, note.Note):
             if previousNote == None:
                 doShowOctave = showLeadingOctave
             else:
-                doShowOctave = showOctaveWithNote(previousNote, generalNote)
-            measureTrans.append(noteToBraille(sampleNote = generalNote, showOctave = doShowOctave))
-            previousNote = generalNote
-        elif generalNote.isRest == True:
-            measureTrans.append(restToBraille(sampleRest = generalNote))
-        else:
-            raise BrailleTranslateException("General note cannot be translated to braille.")
-
+                doShowOctave = showOctaveWithNote(previousNote, element)
+            measureTrans.append(noteToBraille(sampleNote = element, showOctave = doShowOctave))
+            previousNote = element
+        elif isinstance(element, note.Rest):
+            if element.duration == sampleMeasure.duration:
+                # if the rest lasts the entire measure, then use whole note rest.
+                measureTrans.append(restToBraille(sampleRest = note.Rest(quarterLength = 4.0)))
+            else:
+                measureTrans.append(restToBraille(sampleRest = element))
+        elif isinstance(element, bar.Barline):
+            measureTrans.append(barlines[element.style])            
+    
     return ''.join(measureTrans)
 
 def showOctaveWithNote(previousNote = note.Note('C3'), currentNote = note.Note('D3')):
@@ -449,11 +458,23 @@ def partToBraille(samplePart = stream.Part()):
     lineIndex = 0
     
     allMeasures = samplePart.getElementsByClass('Measure')
-    ks = keySigToBraille(allMeasures[0].getKeySignatures()[0])
-    ts = timeSigToBraille(allMeasures[0].getTimeSignatures()[0])
-    allLines[lineIndex] = unicode(ks + ts).center(40, u'\u2800')
-    lineIndex += 1
+    ks = allMeasures[0].keySignature
+    ts = allMeasures[0].timeSignature
     
+    if ks == None:
+        ks_braille = keySigToBraille()
+    else:
+        ks_braille = keySigToBraille(ks)
+    
+    if not (ts == None):
+        ts_braille = timeSigToBraille(ts)
+        allLines[lineIndex] = unicode(ks_braille + ts_braille).center(40, u'\u2800')
+        lineIndex += 1
+    else:
+        if not len(ks_braille) == 0:
+            allLines[lineIndex] = unicode(ks_braille).center(40, u'\u2800')
+            lineIndex += 1
+
     allLines[lineIndex] = u'\u283c' + numbers[allMeasures[0].number]
     previousNote = None
     
