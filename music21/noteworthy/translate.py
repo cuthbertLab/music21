@@ -23,19 +23,25 @@ from music21 import bar
 from music21 import chord
 from music21 import dynamics
 from music21 import spanner
+
+
+from music21.noteworthy import base as noteworthyModule
+
 import unittest, doctest
 
-def translateNote(dictionaries, line, meas, currentclef, al, SLUR, SLURbeginning, SLUR1st, TIED, TIED1st, lyrics, lyr, coun):
+
+
+
+def translateNote(line, meas, currentclef, al, SLUR, SLURbeginning, SLUR1st, TIED, TIED1st, lyrics, lyr, coun):
         '''
         Translation of a music21 note from a NWC note.       
         >>> from music21 import *
-        >>> dictionary = {"Whole":4,"Half":2,"4th":1,"8th":0.5,"16th":0.25,"32nd":0.125,"64th":0.0625,0:0}
-        >>> dictionaryTreble = {1:"C", 2:"D", 3:"E", 4:"F", 5:"G", 6:"A", 7:"B", "octave":5}
-        >>> dictionaries = {"dictionary":dictionary,"dictionaryTreble":dictionaryTreble}
-        >>> measure,  slur_flag, slur_beginning, slur_1st, tied_flag, tied_1st = noteworthy.translate.translateNote(dictionaries,"|Note|Dur:Half|Pos:-3",stream.Measure(),"G", 0, 0, 0, 0, 0, 0, "Hi", 1, 0)
+        >>> measure,  slur_flag, slur_beginning, slur_1st, tied_flag, tied_1st = noteworthy.translate.translateNote("|Note|Dur:Half|Pos:-3",stream.Measure(),"G", 0, 0, 0, 0, 0, 0, "Hi", 1, 0)
         >>> measure[0]
         <music21.note.Note F>        
         '''   
+        dictionaries = noteworthyModule.dictionaries
+    
         sl = 0
         ti = 0
         ERR = 0
@@ -80,10 +86,10 @@ def translateNote(dictionaries, line, meas, currentclef, al, SLUR, SLURbeginning
                             durat.tuplets = (tup,)  
                             lengthnote = durat.quarterLength 
                         else:
-                            lengthnote = dictionaries["dictionary"][parts[0]]                                                                                                         
+                            lengthnote = dictionaries["dictionaryNoteLength"][parts[0]]                                                                                                         
                     
                 else:
-                    lengthnote = dictionaries["dictionary"][dur]
+                    lengthnote = dictionaries["dictionaryNoteLength"][dur]
                 #print lengthnote
                 
             if i == 4:
@@ -279,17 +285,33 @@ def translateNote(dictionaries, line, meas, currentclef, al, SLUR, SLURbeginning
             SLUR = 1            
         return meas, SLUR, SLURbeginning, SLUR1st, TIED, TIED1st
     
-def translateRest(dictionaries, line, meas):
-    '''
-    Translation of a music21 rest.     
+def translateRest(line, meas):
+    r'''
+    Translation of a music21 rest.  Adds the rest to the given measure.
+    
+    
     >>> from music21 import *
-    >>> dictionaryrest = {"Whole":4,"Half":2,"4th":1,"8th":0.5,"16th":0.25,"32nd":0.125,"64th":0.0625}
-    >>> dictionaries = {"dictionaryrest":dictionaryrest}
-    >>> measure = noteworthy.translate.translateRest(dictionaries,"|Rest|Dur:4th",stream.Measure())
-    >>> measure[0]
-    <music21.note.Rest rest>        
+    >>> measureIn = stream.Measure()
+    >>> measureIn.append(note.HalfNote("C#4"))
+    
+    >>> measureOut = noteworthy.translate.translateRest("|Rest|Dur:4th\n", measureIn)
+    >>> measureOut.show('text')
+    {0.0} <music21.note.Note C#>
+    {2.0} <music21.note.Rest rest>     
+    
+    
+    Note that measureOut is really the same as measureIn now.
+    
+    
+    >>> measureOut is measureIn
+    True
+    >>> measureIn.show('text')
+    {0.0} <music21.note.Note C#>
+    {2.0} <music21.note.Rest rest>     
+    
     '''   
     #print "REST"
+    dictionaries = noteworthyModule.dictionaries
     i = 1
     for word in line.split('|'):
         if i == 3:
@@ -301,7 +323,8 @@ def translateRest(dictionaries, line, meas):
   
 def createClef(line, meas):
     '''
-    Adding a new clef in the score.        
+    Adding a new clef in the score.       
+     
     >>> from music21 import *
     >>> measure, currentclef = noteworthy.translate.createClef("|Clef|Type:Treble",stream.Measure())
     >>> measure
@@ -364,11 +387,18 @@ def createClef(line, meas):
 
 def createKey(line, meas):
     '''
-    Adding a new key signature in the score.        
+    Adds a new key signature to the given measure.  Returns the measure and the number of sharps (negative for flats)
+    
+    
     >>> from music21 import *
-    >>> measure, currentclef = noteworthy.translate.createKey("|Clef|Type:Treble",stream.Measure())
-    >>> measure
-    <music21.stream.Measure 0 offset=0.0>       
+    >>> measureIn = stream.Measure()
+    >>> measureIn.append(note.Rest(quarterLength = 3.0))
+    >>> measureOut, fourSharps = noteworthy.translate.createKey("|Key|Signature:F#,C#,G#,D#", measureIn)
+    >>> fourSharps
+    4
+    >>> measureOut.show('text')
+    {0.0} <music21.note.Rest rest>
+    {3.0} <music21.key.KeySignature of 4 sharps>
     '''  
     i = 1
     for word in line.split('|'):
@@ -411,17 +441,16 @@ def createTimeSignature(line, meas):
         i = i + 1
     return meas        
 
-def translateChord(dictionaries, line, meas, al, SLUR, SLURbeginning, SLUR1st, TIED, TIED1st, lyrics, lyr, coun, currentclef):
+def translateChord(line, meas, al, SLUR, SLURbeginning, SLUR1st, TIED, TIED1st, lyrics, lyr, coun, currentclef):
     '''
     Translation of a music21 chord from a NWC one.      
     >>> from music21 import *
-    >>> dictionary = {"Whole":4,"Half":2,"4th":1,"8th":0.5,"16th":0.25,"32nd":0.125,"64th":0.0625,0:0}
-    >>> dictionaryTreble = {1:"C", 2:"D", 3:"E", 4:"F", 5:"G", 6:"A", 7:"B", "octave":5}
-    >>> dictionaries = {"dictionary":dictionary,"dictionaryTreble":dictionaryTreble}
-    >>> measure,  slur_flag, slur_beginning, slur_1st, tied, tied_1st = noteworthy.translate.translateChord(dictionaries,"|Chord|Dur:4th|Pos:1,3,5",stream.Measure(),0, 0, 0, 0, 0, 0, "Hi", 1, 0,"G")
+    >>> measure,  slur_flag, slur_beginning, slur_1st, tied, tied_1st = noteworthy.translate.translateChord("|Chord|Dur:4th|Pos:1,3,5",stream.Measure(),0, 0, 0, 0, 0, 0, "Hi", 1, 0,"G")
     >>> measure[0]
     <music21.chord.Chord C5 E5 G5>        
     ''' 
+    dictionaries = noteworthyModule.dictionaries
+    
     sl = 0
     ti = 0
     ERR = 0
@@ -462,10 +491,10 @@ def translateChord(dictionaries, line, meas, al, SLUR, SLURbeginning, SLUR1st, T
                         durat.tuplets = (tup,)  
                         lengthnote = durat.quarterLength 
                     else:
-                        lengthnote = dictionaries["dictionary"][parts[0]]        
+                        lengthnote = dictionaries["dictionaryNoteLength"][parts[0]]        
                 
             else:
-                lengthnote = dictionaries["dictionary"][dur]
+                lengthnote = dictionaries["dictionaryNoteLength"][dur]
         if i == 4:                
             res2 = word.split(':')
             pos = res2[1]
@@ -629,18 +658,9 @@ def translateChord(dictionaries, line, meas, al, SLUR, SLURbeginning, SLUR1st, T
         i = i + 1
 
     if ERR == 0:
-        if len(nt) == 2:
-            n1 = chord.Chord([acord[0], acord[1]], quarterLength=lengthnote)
-        if len(nt) == 3:
-            n1 = chord.Chord([acord[0], acord[1], acord[2]], quarterLength=lengthnote)
-        if len(nt) == 4:
-            n1 = chord.Chord([acord[0], acord[1], acord[2], acord[3]], quarterLength=lengthnote)
-        if len(nt) == 5:
-            n1 = chord.Chord([acord[0], acord[1], acord[2], acord[3], acord[4]], quarterLength=lengthnote)
-        if len(nt) == 6:
-            n1 = chord.Chord([acord[0], acord[1], acord[2], acord[3], acord[4], acord[5]], quarterLength=lengthnote)
-        if len(nt) == 7:
-            n1 = chord.Chord([acord[0], acord[1], acord[2], acord[3], acord[4], acord[5], acord[6]], quarterLength=lengthnote)
+        if len(nt) >= 2:
+            pitches = acord[0:len(nt)]
+            n1 = chord.Chord(pitches, quarterLength=lengthnote)
         
         # Add lyrics
         if lyr == 1 and coun < len(lyrics):
@@ -853,6 +873,28 @@ def parseString(data):
     return parseList(dataList)
 
 def parseList(data):
+    r'''
+    Parses a list where each element is a line from a nwctxt file.
+    
+    Returns a :class:`~music21.stream.Score` object
+    
+    
+    >>> from music21 import *
+    >>> data = []
+    >>> data.append("!NoteWorthyComposer(2.0)")
+    >>> data.append("|AddStaff|")
+    >>> data.append("|Clef|Type:Bass")
+    >>> data.append("|TimeSig|Signature:4/4")
+    >>> data.append("|Note|Dur:Whole|Pos:1")
+    >>> s = noteworthy.translate.parseList(data)
+    >>> s.show('text')
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.clef.Clef Bass>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note E>
+
+    '''
     totalscore = stream.Score()
     part = stream.Part()
     meas = stream.Measure()
@@ -874,16 +916,6 @@ def parseList(data):
     text = []
     measWasAppended = False
     
-    dictionary = {"Whole":4, "Half": 2, "4th":1, "8th":0.5, "16th":0.25, "32nd":0.125, "64th":0.0625, 0:0}
-    dictionaryrest = {"Whole\n":4, "Half\n": 2, "4th\n":1, "8th\n":0.5, "16th\n":0.25, "32nd\n":0.125, "64th\n":0.0625}
-    dictionarytrip = {4:"Whole", 2:"Half", 1:"4th", 0.5:"eighth", 0.25: "16th", 0.125: "32nd", 0.0625:"64th", 0:0}
-    dictionaryTreble = {1:"C", 2:"D", 3:"E", 4:"F", 5:"G", 6:"A", 7:"B", "octave":5}
-    dictionaryBass = {-1:"C", 0:"D", 1:"E", 2:"F", 3:"G", 4:"A", 5:"B", "octave":3}
-    dictionaryAlto = {0:"C", 1:"D", 2:"E", 3:"F", 4:"G", 5:"A", 6:"B", "octave":4}
-    dictionaryTenor = {-5:"C", -4:"D", -3:"E", -2:"F", -1:"G", 0:"A", 1:"B", "octave":3}
-    dictionarysharp = {1:"F", 2:"C", 3:"G", 4:"D", 5:"A", 6:"E", 7:"B"}
-    dictionarybemol = {1:"B", 2:"E", 3:"A", 4:"D", 5:"G", 6:"C", 7:"F"}
-    dictionaries = {"dictionary":dictionary, "dictionaryrest":dictionaryrest, "dictionarytrip": dictionarytrip, "dictionaryTreble":dictionaryTreble, "dictionaryAlto":dictionaryAlto, "dictionaryTenor":dictionaryTenor, "dictionaryBass":dictionaryBass, "dictionarysharp":dictionarysharp, "dictionarybemol":dictionarybemol}
    
     
     # Main
@@ -892,7 +924,7 @@ def parseList(data):
             counter += 1
             text.append(word)
             if word == "Note":  
-                meas, SLUR, SLURbeginning , SLUR1st, TIED, TIED1st = translateNote(dictionaries, pi, meas, currentclef, alte, SLUR, SLURbeginning, SLUR1st, TIED, TIED1st, lyrics, lyr, coun)
+                meas, SLUR, SLURbeginning , SLUR1st, TIED, TIED1st = translateNote(pi, meas, currentclef, alte, SLUR, SLURbeginning, SLUR1st, TIED, TIED1st, lyrics, lyr, coun)
                 coun = coun + 1
                 measWasAppended = False
             elif word == "Clef":
@@ -900,7 +932,7 @@ def parseList(data):
                 start = 1
                 measWasAppended = False
             elif word == "Rest":
-                meas = translateRest(dictionaries, pi, meas)
+                meas = translateRest(pi, meas)
                 measWasAppended = False
             elif word == "Key":
                 meas, alte = createKey(pi, meas)
@@ -909,7 +941,7 @@ def parseList(data):
                 meas = createTimeSignature(pi, meas)
                 measWasAppended = False
             elif word == "Chord":
-                meas, SLUR, SLURbeginning , SLUR1st, TIED, TIED1st = translateChord(dictionaries, pi, meas, alte, SLUR, SLURbeginning, SLUR1st, TIED, TIED1st, lyrics, lyr, coun, currentclef)
+                meas, SLUR, SLURbeginning , SLUR1st, TIED, TIED1st = translateChord(pi, meas, alte, SLUR, SLURbeginning, SLUR1st, TIED, TIED1st, lyrics, lyr, coun, currentclef)
                 coun = coun + 1
                 measWasAppended = False
             elif word == "AddStaff":

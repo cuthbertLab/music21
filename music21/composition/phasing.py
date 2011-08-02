@@ -217,7 +217,7 @@ def pendulumMusic(show = True,
         s.insert(0, parts[i])
     
     if show == True:
-        s.show('text')
+        #s.show('text')
         s.show('midi')
         s.show()
  
@@ -261,16 +261,16 @@ class TestExternal(unittest.TestCase):
 #                  scaleType = scale.ChromaticScale,
 #                  startingPitch = 'C1',
 #                  )
-        pendulumMusic(show = True, 
-                  loopLength = 210.0, 
-                  totalLoops = 1, 
-                  maxNotesPerLoop = 70,
-                  totalParts = 12,
-                  scaleStepSize = 5,
-                  scaleType = scale.ScalaScale('C3', '13-19.scl'),
-                  startingPitch = 'C2',
-                  )
-        
+#        pendulumMusic(show = True, 
+#                  loopLength = 210.0, 
+#                  totalLoops = 1, 
+#                  maxNotesPerLoop = 70,
+#                  totalParts = 12,
+#                  scaleStepSize = 5,
+#                  scaleType = scale.ScalaScale('C3', '13-19.scl'),
+#                  startingPitch = 'C2',
+#                  )
+#        
 if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions
         music21.mainTest(TestExternal)
