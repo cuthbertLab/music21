@@ -96,11 +96,9 @@ def translateNote(line, meas, currentclef, al, SLUR, SLURbeginning, SLUR1st, TIE
                 res2 = word.split(':')
                 pos = res2[1]
                 alteration = ""
-                #print "POSITIONNN"
                 flag = 0                
                 for kk in range(len(pos)):
                     if pos[kk - 1] == "^":
-                        #print "cas TIED"
                         r = pos.split('^')                        
                         pos = r[0]
                         flag = 1
@@ -322,15 +320,15 @@ def translateRest(line, meas):
     return meas   
   
 def createClef(line, meas):
-    '''
+    r'''
     Adding a new clef in the score.       
      
     >>> from music21 import *
-    >>> measure, currentclef = noteworthy.translate.createClef("|Clef|Type:Treble",stream.Measure())
-    >>> measure
-    <music21.stream.Measure 0 offset=0.0>       
+    >>> measureIn = stream.Measure()
+    >>> measureOut, currentclef = noteworthy.translate.createClef("|Clef|Type:Treble\n", measureIn)
+    >>> measureOut.show('text')
+    {0.0} <music21.clef.TrebleClef>      
     '''  
-    #print "Clef!"
     i = 1
     octave = 0
     for word in line.split('|'):
@@ -813,8 +811,8 @@ def createDynamics(line, meas):
     '''
     Adding dynamics like "fff", "pp", ... to the measure.    
     >>> from music21 import *
-    >>> meas = noteworthy.translate.createDynamics("|Dynamic|Style:fff|Pos:-8",stream.Measure())
-    >>> meas[0]
+    >>> measure = noteworthy.translate.createDynamics("|Dynamic|Style:fff|Pos:-8",stream.Measure())
+    >>> measure[0]
     <music21.dynamics.Dynamic fff >      
     '''  
     # Dynamic case
@@ -883,14 +881,14 @@ def parseList(data):
     >>> data = []
     >>> data.append("!NoteWorthyComposer(2.0)")
     >>> data.append("|AddStaff|")
-    >>> data.append("|Clef|Type:Bass")
+    >>> data.append("|Clef|Type:Bass\n")
     >>> data.append("|TimeSig|Signature:4/4")
     >>> data.append("|Note|Dur:Whole|Pos:1")
     >>> s = noteworthy.translate.parseList(data)
     >>> s.show('text')
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 0 offset=0.0>
-            {0.0} <music21.clef.Clef Bass>
+            {0.0} <music21.clef.BassClef>
             {0.0} <music21.meter.TimeSignature 4/4>
             {0.0} <music21.note.Note E>
 
@@ -914,8 +912,7 @@ def parseList(data):
     coun = 0
     lyrics = []
     text = []
-    measWasAppended = False
-    
+    measWasAppended = False  
    
     
     # Main
