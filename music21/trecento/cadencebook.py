@@ -623,7 +623,7 @@ class TestExternal(unittest.TestCase):
         test showing a virelai's incipit to see if it works
         '''
         virelaisSheet = TrecentoSheet(sheetname = 'virelais')
-        thisVirelai = virelaisSheet.makeWork(31)
+        thisVirelai = virelaisSheet.makeWork(54)
         if thisVirelai.title != "":
             print thisVirelai.title
             thisVirelai.incipit.asScore().show('musicxml')
