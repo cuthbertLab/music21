@@ -4899,7 +4899,9 @@ class Stream(music21.Music21Object):
 
     def makeAccidentals(self, pitchPast=None, useKeySignature=True, 
         alteredPitches=None, searchKeySignatureByContext=False, 
-        cautionaryPitchClass=True, cautionaryAll=False, inPlace=True, overrideStatus=False, cautionaryNotImmediateRepeat=True): 
+        cautionaryPitchClass=True, cautionaryAll=False, inPlace=True, 
+        overrideStatus=False, cautionaryNotImmediateRepeat=True,
+        lastNoteWasTied=False): 
         '''
         A method to set and provide accidentals given various conditions and contexts.
 
@@ -4914,6 +4916,9 @@ class Stream(music21.Music21Object):
         If `overrideStatus` is True, this method will ignore any current `displayStatus` stetting found on the Accidental. By default this does not happen. If `displayStatus` is set to None, the Accidental's `displayStatus` is set. 
 
         If `cautionaryNotImmediateRepeat` is True, cautionary accidentals will be displayed for an altered pitch even if that pitch had already been displayed as altered. 
+
+        If `lastNoteWasTied` is True, assume that the first note of the stream was tied
+        to the previous note.
 
         The :meth:`~music21.pitch.Pitch.updateAccidentalDisplay` method is used to determine if an accidental is necessary.
 
@@ -4995,12 +5000,15 @@ class Stream(music21.Music21Object):
         return False
 
     def makeNotation(self, meterStream=None, refStreamOrTimeRange=None,
-                        inPlace=False):
+                        inPlace=False, **makeAccidentalsKeywords):
         '''
         This method calls a sequence of Stream methods on this Stream to prepare notation, including creating Measures if necessary, creating ties, beams, and accidentals.
 
 
         If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
+
+
+        makeAccidentalsKeywords can be a dict specifying additional parameters to send to makeAccidentals
 
 
         >>> from music21 import *
@@ -5014,8 +5022,12 @@ class Stream(music21.Music21Object):
         '''
         # only use inPlace arg on first usage
         measureStream = self.makeMeasures(meterStream=meterStream,
-            refStreamOrTimeRange=refStreamOrTimeRange, inPlace=inPlace)
-
+                                          refStreamOrTimeRange=refStreamOrTimeRange, 
+                                          inPlace=inPlace)
+            
+        if inPlace == True:
+            measureStream = self
+          
         #environLocal.printDebug(['Stream.makeNotation(): post makeMeasures, length', len(measureStream)])
 
         # for now, calling makeAccidentals once per measures       
@@ -5029,10 +5041,10 @@ class Stream(music21.Music21Object):
                 ksLast = m.keySignature
             if i > 0:
                 m.makeAccidentals(measureStream[i-1].pitches,
-                    useKeySignature=ksLast, searchKeySignatureByContext=False)
+                    useKeySignature=ksLast, searchKeySignatureByContext=False, **makeAccidentalsKeywords)
             else:
                 m.makeAccidentals(useKeySignature=ksLast, 
-                    searchKeySignatureByContext=False)
+                    searchKeySignatureByContext=False, **makeAccidentalsKeywords)
 
         #environLocal.printDebug(['makeNotation(): meterStream:', meterStream, meterStream[0]])
         measureStream.makeTies(meterStream, inPlace=True)
@@ -10038,6 +10050,27 @@ class TestExternal(unittest.TestCase):
         bMeasure = aMeasure.makeBeams()
         bMeasure.show()
 
+class Test2(unittest.TestCase):
+    
+    def runTest(self):
+        pass
+    
+    
+    def testMakeAccidentalsTies(self):
+        '''
+        tests to make sure that Accidental display status is correct after a tie.
+        '''
+        from music21 import tinyNotation
+        bm = tinyNotation.TinyNotationStream("c'2 b-2~ b-4 c#'4~ c#'4 b-4", "4/4")
+        bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+        allNotes = bm.flat.notes
+        self.assertEqual(allNotes[0].accidental, None)
+        self.assertEqual(allNotes[1].accidental.displayStatus, True)
+        self.assertEqual(allNotes[2].accidental.displayStatus, False)
+        self.assertEqual(allNotes[3].accidental.displayStatus, True)
+        self.assertEqual(allNotes[4].accidental.displayStatus, False)
+        self.assertEqual(allNotes[5].accidental.displayStatus, True)
+
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
@@ -11993,6 +12026,9 @@ class Test(unittest.TestCase):
         
         display = [n.pitch.accidental.displayStatus for n in ex.flat.notes]
         self.assertEqual(display, [True, False, False, False, False, False, True, False, False, False, True, True, False, False])
+
+
+            
 
 
     def testMakeAccidentalsWithKeysInMeasures(self):
