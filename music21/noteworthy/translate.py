@@ -950,7 +950,7 @@ def parseList(data):
     totalscore.insert(0, part)
     
     #print "SHOW"  
-    totalscore.show('text')
+    #totalscore.show('text')
     #totalscore.show()
     return totalscore   
 
