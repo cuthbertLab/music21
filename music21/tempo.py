@@ -42,7 +42,7 @@ defaultTempoValues = {
      'fast': 132,
      'schnell': 132,
      'molto allegro': 144,
-     u'très vite': 144,
+     'très vite': 144,
      'presto': 168,
      'prestissimo': 200
      }
@@ -102,16 +102,11 @@ class TempoIndication(music21.Music21Object):
 
 #-------------------------------------------------------------------------------
 class TempoText(TempoIndication):
-    '''
+    '''    
     >>> import music21
     >>> tm = music21.tempo.TempoText("adagio")
-    >>> tm.text
-    'adagio'
-    
-
-    Common marks such as "adagio," "moderato," "molto allegro," etc.
-    get sensible default values.  If not found, uses a default of 90:
-
+    >>> print tm.text
+    adagio
     '''
     def __init__(self, text=None):
         TempoIndication.__init__(self)
@@ -121,10 +116,12 @@ class TempoText(TempoIndication):
         self._textJustification = 'left'
 
         if text is not None:
-            try: # use property
-                self.text = str(text) 
-            except UnicodeEncodeError: # if it is already unicode
-                self.text = text
+            self.text = text
+
+#            try: # use property
+#                self.text = str(text) 
+#            except UnicodeEncodeError: # if it is already unicode
+#                self.text = text
     
     def __repr__(self):
         return "<%s %s>" % (self.__class__.__name__, self.text)
@@ -146,10 +143,15 @@ class TempoText(TempoIndication):
     text = property(_getText, _setText, doc = '''
         Get or set the text as a string.
 
+
+        Depending on whether "from __future__ import unicode_literals" is turned on, 
+        this might give a unicode literal (u'adagio')
+        
+
         >>> import music21
         >>> tm = music21.tempo.TempoText("adagio")
-        >>> tm.text
-        'adagio'
+        >>> print tm.text
+        adagio
         >>> tm.getTextExpression()
         <music21.expressions.TextExpression "adagio">
         ''')
@@ -220,6 +222,10 @@ class MetronomeMark(TempoIndication):
 
     The `referent` attribute is a Duration object. As this object is a Music21Object, it also has a .duration property object.
     
+    The `text` attribute will usually return a unicode string.  If you use "from __future__ import unicode_literals" this
+    will not be a problem at all.
+    
+    
     >>> from music21 import *
     >>> a = tempo.MetronomeMark("slow", 40, note.HalfNote())
     >>> a.number
@@ -228,8 +234,12 @@ class MetronomeMark(TempoIndication):
     <music21.duration.Duration 2.0>
     >>> a.referent.type
     'half'
-    >>> a.text
-    'slow'
+    >>> print a.text
+    slow
+
+
+    Some text marks will automatically suggest a number.
+
 
     >>> mm = tempo.MetronomeMark('adagio')
     >>> mm.number
@@ -237,17 +247,32 @@ class MetronomeMark(TempoIndication):
     >>> mm.numberImplicit
     True
 
-    >>> tm2 = music21.tempo.MetronomeMark(u"très vite")
+
+    For certain numbers, a text value can be set implicitly
+
+
+    >>> tm2 = tempo.MetronomeMark(number=200)
+    >>> print tm2.text
+    prestissimo
+    >>> tm2.referent
+    <music21.duration.Duration 1.0>
+
+
+
+    Unicode values sometimes are hard to work with.  Here's an example that works...
+
+
+    >>> marking = "très vite"
+    >>> print marking
+    très vite
+    >>> print tempo.defaultTempoValues[marking]
+    144
+    >>> tm2 = tempo.MetronomeMark(marking)
     >>> tm2.text.endswith('vite')
     True
     >>> tm2.number
     144
 
-    >>> tm2 = music21.tempo.MetronomeMark(number=200)
-    >>> tm2.text
-    'prestissimo'
-    >>> tm2.referent
-    <music21.duration.Duration 1.0>
     '''
 # 
 #     >>> tm3 = music21.tempo.TempoText("extremely, wicked fast!")
@@ -354,13 +379,14 @@ class MetronomeMark(TempoIndication):
     text = property(_getText, _setText, doc = 
         '''Get or set a text string for this MetronomeMark. Internally implemented as a :class:`~music21.tempo.TempoText` object, which stores the text in a :class:`~music21.expression.TextExpression` object. 
 
+        >>> from __future__ import unicode_literals
         >>> from music21 import *
         >>> mm = tempo.MetronomeMark(number=120)
         >>> mm.text == None 
         True
         >>> mm.text = 'medium fast'
-        >>> mm.text
-        'medium fast'
+        >>> print mm.text
+        medium fast
         ''')
 
 
