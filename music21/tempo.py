@@ -474,10 +474,10 @@ class MetronomeMark(TempoIndication):
         else:
             tempoStr = tempoText
         post = None # returned if no match
-        if tempoStr.lower() in defaultTempoValues.keys():
+        if tempoStr.lower() in defaultTempoValues:
             post = defaultTempoValues[tempoStr.lower()]
         # an exact match
-        elif tempoStr in defaultTempoValues.keys():
+        elif tempoStr in defaultTempoValues:
             post = defaultTempoValues[tempoStr]
         return post
 

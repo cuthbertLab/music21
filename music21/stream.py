@@ -4897,11 +4897,12 @@ class Stream(music21.Music21Object):
         return returnObj
 
 
-    def makeAccidentals(self, pitchPast=None, useKeySignature=True, 
-        alteredPitches=None, searchKeySignatureByContext=False, 
-        cautionaryPitchClass=True, cautionaryAll=False, inPlace=True, 
-        overrideStatus=False, cautionaryNotImmediateRepeat=True,
-        lastNoteWasTied=False): 
+    def makeAccidentals(self, pitchPast=None, pitchPastMeasure=None,
+                        useKeySignature=True, 
+                        alteredPitches=None, searchKeySignatureByContext=False, 
+                        cautionaryPitchClass=True, cautionaryAll=False, inPlace=True, 
+                        overrideStatus=False, cautionaryNotImmediateRepeat=True,
+                        lastNoteWasTied=False): 
         '''
         A method to set and provide accidentals given various conditions and contexts.
 
@@ -4918,7 +4919,7 @@ class Stream(music21.Music21Object):
         If `cautionaryNotImmediateRepeat` is True, cautionary accidentals will be displayed for an altered pitch even if that pitch had already been displayed as altered. 
 
         If `lastNoteWasTied` is True, assume that the first note of the stream was tied
-        to the previous note.
+        to the previous note.  TODO: make more robust for tied chords with only some pitches tied...
 
         The :meth:`~music21.pitch.Pitch.updateAccidentalDisplay` method is used to determine if an accidental is necessary.
 
@@ -4935,6 +4936,8 @@ class Stream(music21.Music21Object):
         # need to reset these lists unless values explicitly provided
         if pitchPast == None:
             pitchPast = []
+        if pitchPastMeasure == None:
+            pitchPastMeasure = []
         # see if there is any key signatures to add to altered pitches
         if alteredPitches == None:
             alteredPitches = []
@@ -4961,30 +4964,44 @@ class Stream(music21.Music21Object):
 
         # get chords, notes, and rests
         for i in range(len(noteStream)):
-            isFirstOfMeasure = False
-            if i == 0:
-                isFirstOfMeasure = True
-
             e = noteStream[i]
             if isinstance(e, note.Note):
-                e.pitch.updateAccidentalDisplay(pitchPast, alteredPitches,
+                e.pitch.updateAccidentalDisplay(
+                    pitchPast=pitchPast, 
+                    pitchPastMeasure=pitchPastMeasure,
+                    alteredPitches=alteredPitches,
                     cautionaryPitchClass=cautionaryPitchClass,
                     cautionaryAll=cautionaryAll,
                     overrideStatus=overrideStatus,
                     cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
-                    isFirstOfMeasure=isFirstOfMeasure)
+                    lastNoteWasTied=lastNoteWasTied)
                 pitchPast.append(e.pitch)
+                if e.tie is not None and e.tie.type != 'stop':
+                    lastNoteWasTied = True
+                else:
+                    lastNoteWasTied = False
             elif isinstance(e, chord.Chord):
                 pGroup = e.pitches
                 # add all chord elements to past first
                 # when reading a chord, this will apply an accidental 
                 # if pitches in the chord suggest an accidental
                 for p in pGroup:
-                    p.updateAccidentalDisplay(pitchPast, alteredPitches, 
-                        cautionaryPitchClass=cautionaryPitchClass, cautionaryAll=cautionaryAll,
-                        overrideStatus=overrideStatus,
-                    cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,                    isFirstOfMeasure=isFirstOfMeasure)
+                    p.updateAccidentalDisplay(
+                            pitchPast=pitchPast, 
+                            pitchPastMeasure=pitchPastMeasure,
+                            alteredPitches=alteredPitches,
+                            cautionaryPitchClass=cautionaryPitchClass, cautionaryAll=cautionaryAll,
+                            overrideStatus=overrideStatus,
+                            cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,                    
+                            lastNoteWasTied=lastNoteWasTied,
+                            )
+                if e.tie is not None and e.tie.type != 'stop':
+                    lastNoteWasTied = True
+                else:
+                    lastNoteWasTied = False
                 pitchPast += pGroup
+            else:
+                lastNoteWasTied = False
 
         return returnObj
 
@@ -5040,8 +5057,16 @@ class Stream(music21.Music21Object):
             if m.keySignature != None:
                 ksLast = m.keySignature
             if i > 0:
-                m.makeAccidentals(measureStream[i-1].pitches,
-                    useKeySignature=ksLast, searchKeySignatureByContext=False, **makeAccidentalsKeywords)
+                if len(measureStream[i-1]) > 0 \
+                    and hasattr(measureStream[i-1][-1], "tie") \
+                    and measureStream[i-1][-1].tie is not None \
+                    and measureStream[i-1][-1].tie.type != 'stop':
+                    lastNoteWasTied = True
+                else:
+                    lastNoteWasTied = False
+                m.makeAccidentals(pitchPastMeasure=measureStream[i-1].pitches,
+                    useKeySignature=ksLast, searchKeySignatureByContext=False, 
+                    lastNoteWasTied = lastNoteWasTied, **makeAccidentalsKeywords)
             else:
                 m.makeAccidentals(useKeySignature=ksLast, 
                     searchKeySignatureByContext=False, **makeAccidentalsKeywords)
@@ -9084,7 +9109,9 @@ class Part(Stream):
     def makeAccidentals(self, alteredPitches = None, 
          cautionaryPitchClass=True,
          cautionaryAll=False, inPlace=True, 
-         overrideStatus = False, cautionaryNotImmediateRepeat=True):
+         overrideStatus = False, 
+         cautionaryNotImmediateRepeat=True,
+         lastNoteWasTied=False):
         '''
         This overridden method of Stream.makeAccidentals 
         provides the management of passing pitches from 
@@ -9105,17 +9132,27 @@ class Part(Stream):
             # if beyond the first measure, use the pitches from the last
             # measure for context
             if i > 0:
-                pitchPast = measureStream[i-1].pitches
+                pitchPastMeasure = measureStream[i-1].pitches
+                if len(measureStream[i-1]) > 0 \
+                        and hasattr(measureStream[i-1][-1], "tie") \
+                        and measureStream[i-1][-1].tie is not None \
+                        and measureStream[i-1][-1].tie.type != 'stop':
+                    lastNoteWasTied = True
+                else:
+                    lastNoteWasTied = False
             else:
-                pitchPast = None
-            m.makeAccidentals(pitchPast = pitchPast,
+                pitchPastMeasure = None
+                lastNoteWasTied = False
+
+            m.makeAccidentals(pitchPastMeasure = pitchPastMeasure,
                     useKeySignature=ksLast, alteredPitches=alteredPitches,
                     searchKeySignatureByContext=False,
                     cautionaryPitchClass = cautionaryPitchClass,
                     cautionaryAll = cautionaryAll,
                     inPlace = True, # always, has have a copy or source
                     overrideStatus = overrideStatus,
-                    cautionaryNotImmediateRepeat = cautionaryNotImmediateRepeat)
+                    cautionaryNotImmediateRepeat = cautionaryNotImmediateRepeat,
+                    lastNoteWasTied = lastNoteWasTied)
         if not inPlace: 
             return returnObj
         else: # in place
@@ -10049,27 +10086,6 @@ class TestExternal(unittest.TestCase):
         aMeasure.repeatAppend(aNote,16)
         bMeasure = aMeasure.makeBeams()
         bMeasure.show()
-
-class Test2(unittest.TestCase):
-    
-    def runTest(self):
-        pass
-    
-    
-    def testMakeAccidentalsTies(self):
-        '''
-        tests to make sure that Accidental display status is correct after a tie.
-        '''
-        from music21 import tinyNotation
-        bm = tinyNotation.TinyNotationStream("c'2 b-2~ b-4 c#'4~ c#'4 b-4", "4/4")
-        bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
-        allNotes = bm.flat.notes
-        self.assertEqual(allNotes[0].accidental, None)
-        self.assertEqual(allNotes[1].accidental.displayStatus, True)
-        self.assertEqual(allNotes[2].accidental.displayStatus, False)
-        self.assertEqual(allNotes[3].accidental.displayStatus, True)
-        self.assertEqual(allNotes[4].accidental.displayStatus, False)
-        self.assertEqual(allNotes[5].accidental.displayStatus, True)
 
 
 #-------------------------------------------------------------------------------
@@ -12056,7 +12072,18 @@ class Test(unittest.TestCase):
         # TODO: add tests
         #s.show()
 
-
+    def testMakeAccidentalsTies(self):
+        '''
+        tests to make sure that Accidental display status is correct after a tie.
+        '''
+        from music21 import tinyNotation
+        bm = tinyNotation.TinyNotationStream("c#'2 b-2~ b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8", "4/4")
+        bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+        allNotes = bm.flat.notes
+        #      0C#  1B-~  | 2B-   3C#~  4C#    5B-   6C#    7B-~   8B-~   9B-
+        ds = [True, True, False, True, False, True, False, False, False, False]
+        for i in range(len(allNotes)):
+            self.assertEqual(allNotes[i].accidental.displayStatus, ds[i], "%d failed, %s != %s" % (i, allNotes[i].accidental.displayStatus, ds[i]))
 
 
     def testScaleOffsetsBasic(self):

@@ -3413,18 +3413,23 @@ class Pitch(music21.Music21Object):
             self.accidental.displayStatus = value 
 
 
-    def updateAccidentalDisplay(self, pitchPast=[], alteredPitches=[],
+    def updateAccidentalDisplay(self, pitchPast=[], pitchPastMeasure=[],
+                                alteredPitches=[],
             cautionaryPitchClass=True, cautionaryAll=False, 
             overrideStatus=False, cautionaryNotImmediateRepeat=True,
-            isFirstOfMeasure=False):
+            lastNoteWasTied=False,
+            ):
         '''
-        Given a list of Pitch objects in `pitchPast`, 
+        Given an ordered list of Pitch objects in `pitchPast`, 
         determine if this pitch's Accidental object needs 
         to be created or updated with a natural or other cautionary accidental.
 
 
         Changes to this Pitch object's Accidental object are made in-place.
 
+        `pitchPast` is a list of pitches preceeding this pitch
+        
+        `pitchPastMeasure` is a list of pitches preceeding this pitch but in a previous measure
 
         The `alteredPitches` list supplies pitches from a :class:`~music21.key.KeySignature` object using the :attr:`~music21.key.KeySignature.alteredPitches` property. 
 
@@ -3432,13 +3437,18 @@ class Pitch(music21.Music21Object):
         If `cautionaryPitchClass` is True, comparisons to past accidentals are made regardless of register. That is, if a past sharp is found two octaves above a present natural, a natural sign is still displayed. 
 
 
-        If `overrideStatus` is True, this method will ignore any current `displayStatus` stetting found on the Accidental. By default this does not happen. If `displayStatus` is set to None, the Accidental's `displayStatus` is set. 
+        If `overrideStatus` is True, this method will ignore any current 
+        `displayStatus` stetting found on the Accidental. By default this 
+        does not happen. If `displayStatus` is set to None, the 
+        Accidental's `displayStatus` is set. 
 
 
-        If `cautionaryNotImmediateRepeat` is True, cautionary accidentals will be displayed for an altered pitch even if that pitch had already been displayed as altered. 
+        If `cautionaryNotImmediateRepeat` is True, cautionary accidentals will be displayed 
+        for an altered pitch even if that pitch had already been displayed as altered. 
 
-        
-        If this Pitch is the first of a Measure, set `isFirstOfMeasure` to True. The first altered accidental of new Measure will generally always need to be displayed.
+
+        If `lastNoteWasTied` is True then this note will be treated as immediately following a tie.
+
 
         >>> from music21 import *
 
@@ -3466,24 +3476,32 @@ class Pitch(music21.Music21Object):
         # we might permit pitchPast to contain a list of pitches, to represent
         # a simultaneity?
 
+        # should we display accidental if no previous accidentals have been displayed
+        # i.e. if it's the first instance of an accidental after a tie
+        displayAccidentalIfNoPreviousAccidentals = False
+
+        pitchPastAll = pitchPastMeasure + pitchPast
+
 
         if overrideStatus == False: # go with what we have defined
-            if self.accidental == None:
+            if self.accidental is None:
                 pass # no accidental defined; we may need to add one
-            elif (self.accidental != None and 
-                self.accidental.displayStatus == None): # not set; need to set  
+            elif self.accidental.displayStatus == None: # not set; need to set  
                 # configure based on displayStatus alone, continue w/ normal
                 pass
             elif (self.accidental != None and 
                 self.accidental.displayStatus in [True, False]): 
                 return # exit: already set, do not override
 
-        # if the pitch is the first of a measure, has an accidental, it is not an altered key signature pitch, and it is not a natural, it should always be set to display
-        if isFirstOfMeasure and self.accidental != None and not self._nameInKeySignature(alteredPitches):
-            self.accidental.displayStatus = True
-            return # do not search past
+        if lastNoteWasTied == True:
+            if self.accidental is not None:
+                if self.accidental.displayType != 'even-tied':
+                    self.accidental.displayStatus = False
+                return
+            else:
+                return # exit: nothing more to do
 
-        if len(pitchPast) == 0:
+        if len(pitchPastAll) == 0:
             # if we have no past, we always need to show the accidental, 
             # unless this accidental is in the alteredPitches list
             if (self.accidental != None 
@@ -3494,15 +3512,15 @@ class Pitch(music21.Music21Object):
                     self.accidental.displayStatus = False
 
             # in case display set to True and in alteredPitches, makeFalse
-            elif (self.accidental != None and 
-            self.accidental.displayStatus == True and
-            self._nameInKeySignature(alteredPitches)):
+            elif (self.accidental != None 
+                  and self.accidental.displayStatus == True 
+                  and self._nameInKeySignature(alteredPitches)):
                 self.accidental.displayStatus = False
 
             # if no accidental or natural but matches step in key sig
             # we need to show or add or an accidental
             elif ((self.accidental == None or self.accidental.name == 'natural')
-            and self._stepInKeySignature(alteredPitches)):
+                  and self._stepInKeySignature(alteredPitches)):
                 if self.accidental == None:
                     self.accidental = Accidental('natural')
                 self.accidental.displayStatus = True
@@ -3511,8 +3529,9 @@ class Pitch(music21.Music21Object):
         # here tied and always are treated the same; we assume that
         # making ties sets the displayStatus, and thus we would not be 
         # overriding that display status here
-        if cautionaryAll or (self.accidental != None 
-        and self.accidental.displayType in ['even-tied', 'always']): 
+        if (cautionaryAll or 
+            (self.accidental != None 
+             and self.accidental.displayType in ['even-tied', 'always'])): 
             # show all no matter
             if self.accidental == None:
                 self.accidental = Accidental('natural')
@@ -3521,26 +3540,50 @@ class Pitch(music21.Music21Object):
             return # do not search past
 
         # the pitch past closest to this pitch
-        iNearest = len(pitchPast) - 1
+        iNearest = len(pitchPastAll) - 1
         # store if a match was found and display set from past pitches
         setFromPitchPast = False 
+
+        if cautionaryPitchClass: # warn no mater what octave; thus create new without oct
+            pSelf = Pitch(self.name)
+            pSelf.accidental = self.accidental
+        else:
+            pSelf = self
+
+        #where does the line divide between in measure and out of measure
+        outOfMeasureLength = len(pitchPastMeasure)
 
         # need to step through pitchPast in reverse
         # comparing this pitch to the past pitches; if we find a match
         # in terms of name, then decide what to do
-        for i in reversed(range(len(pitchPast))): 
+
+        
+        for i in reversed(range(len(pitchPastAll))):
+            
+            # is the past pitch in the measure or out of the measure?
+            if i < outOfMeasureLength:
+                pPastInMeasure = False
+            else:
+                pPastInMeasure = True
+            
+            # if the pitch is the first of a measure, has an accidental, 
+            # it is not an altered key signature pitch, 
+            # and it is not a natural, it should always be set to display
+            if (pPastInMeasure == False
+                and self.accidental != None 
+                and not self._nameInKeySignature(alteredPitches)):
+                self.accidental.displayStatus = True
+                return # do not search past
+             
             # create Pitch objects for comparison; remove pitch space
             # information if we are only doing a pitch class comparison
             if cautionaryPitchClass: # no octave; create new without oct
-                pPast = Pitch(pitchPast[i].name)
-                pSelf = Pitch(self.name)
+                pPast = Pitch(pitchPastAll[i].name)
                 # must manually assign reference to the same accidentals
                 # as name alone will not transfer display status
-                pPast.accidental = pitchPast[i].accidental
-                pSelf.accidental = self.accidental
+                pPast.accidental = pitchPastAll[i].accidental
             else: # cautionary in terms of pitch space; must match exact
-                pPast = pitchPast[i]
-                pSelf = self
+                pPast = pitchPastAll[i]
 
             # if we do not match steps (A and A#), we can continue
             if pPast.stepWithOctave != pSelf.stepWithOctave:
@@ -3548,7 +3591,7 @@ class Pitch(music21.Music21Object):
 
             # store whether these match at the same octave; needed for some
             # comparisons even if not matching pitchSpace
-            if self.octave == pitchPast[i].octave:
+            if self.octave == pitchPastAll[i].octave:
                 octaveMatch = True
             else:
                 octaveMatch = False
@@ -3558,12 +3601,14 @@ class Pitch(music21.Music21Object):
             # regardless of if 'unless-repeated' is set, this will catch 
             # a repeated case
             
-            if (i == iNearest and pPast.accidental != None 
-            and pSelf.accidental != None 
-            and pPast.accidental.name == pSelf.accidental.name):
+            if (i == iNearest 
+                and pPast.accidental != None 
+                and pSelf.accidental != None 
+                and pPast.accidental.name == pSelf.accidental.name):
+                
                 # if not in the same octave, and not in the key sig, do show accidental
                 if (not self._nameInKeySignature(alteredPitches) 
-                and not octaveMatch):
+                    and not octaveMatch):
                     self.accidental.displayStatus = True
                 else:
                     self.accidental.displayStatus = False
@@ -3571,17 +3616,16 @@ class Pitch(music21.Music21Object):
                 break
 
             # if An to A: do not need another natural
-            # yet, if we are against the key sig, then we need another natural
-            # this may or may not be an immediate repeat of the same pitch
+            # yet, if we are against the key sig, then we need another natural if in another octave
             elif (pPast.accidental != None 
-            and pPast.accidental.name == 'natural' 
-            and (pSelf.accidental == None 
-            or pSelf.accidental.name == 'natural')):
+                  and pPast.accidental.name == 'natural' 
+                  and (pSelf.accidental == None 
+                       or pSelf.accidental.name == 'natural')):
                 if i == iNearest: # an immediate repeat; do not show
                     # unless we are altering the key signature and in 
                     # a different register
                     if (self._stepInKeySignature(alteredPitches) 
-                    and not octaveMatch):
+                        and not octaveMatch):
                         if self.accidental == None:
                             self.accidental = Accidental('natural')
                         self.accidental.displayStatus = True
@@ -3591,7 +3635,7 @@ class Pitch(music21.Music21Object):
                 # if we match the step in a key signature and we want 
                 # cautionary not immediate repeated
                 elif (self._stepInKeySignature(alteredPitches) 
-                and cautionaryNotImmediateRepeat):
+                      and cautionaryNotImmediateRepeat):
                     if self.accidental == None:
                         self.accidental = Accidental('natural')
                     self.accidental.displayStatus = True
@@ -3606,26 +3650,27 @@ class Pitch(music21.Music21Object):
             # if A# to A, or A- to A, but not A# to A#
             # we use stepWithOctave though not necessarily a ps comparison
             elif (pPast.accidental != None 
-            and pPast.accidental.name != 'natural' 
-            and (pSelf.accidental == None 
-            or pSelf.accidental.displayStatus == False)):
+                  and pPast.accidental.name != 'natural' 
+                  and (pSelf.accidental == None 
+                       or pSelf.accidental.displayStatus == False)):
                 if self.accidental == None:
                     self.accidental = Accidental('natural')
                 self.accidental.displayStatus = True
                 setFromPitchPast = True
                 break
 
-            # if An or A or to A#: need to make sure display is set
+            # if An or A to A#: need to make sure display is set
             elif ((pPast.accidental == None 
-            or pPast.accidental.name == 'natural') and pSelf.accidental != None 
-            and pSelf.accidental.name != 'natural'):
+                   or pPast.accidental.name == 'natural') 
+                  and pSelf.accidental != None 
+                  and pSelf.accidental.name != 'natural'):
                 self.accidental.displayStatus = True
                 setFromPitchPast = True
                 break
 
             # if A- or An to A#: need to make sure display is set
             elif (pPast.accidental != None and pSelf.accidental != None 
-            and pPast.accidental.name != pSelf.accidental.name):
+                  and pPast.accidental.name != pSelf.accidental.name):
                 self.accidental.displayStatus = True
                 setFromPitchPast = True
                 break
@@ -3642,26 +3687,43 @@ class Pitch(music21.Music21Object):
             # if A# to A# and not immediately repeated:
             # default is to show accidental
             # if cautionaryNotImmediateRepeat is False, will not be shown
-            elif (i != iNearest and pPast.accidental != None and
-                pSelf.accidental != None and pPast.accidental.name == 
-                pSelf.accidental.name):
-                if not cautionaryNotImmediateRepeat: # do not show
+            elif (i != iNearest and pPast.accidental != None 
+                  and pSelf.accidental != None 
+                  and pPast.accidental.name == pSelf.accidental.name):
+                if (cautionaryNotImmediateRepeat == False 
+                    and pPast.accidental.displayStatus != False): 
+                    # do not show (unless previous note's accidental wasn't displayed
+                    # because of a tie or some other reason)
                     # result will be False, do not need to check altered tones
                     self.accidental.displayStatus = False
+                    displayAccidentalIfNoPreviousAccidentals = False
+                    setFromPitchPast = True
+                    break
+                elif pPast.accidental.displayStatus == False:
+                    # in case of ties...
+                    displayAccidentalIfNoPreviousAccidentals = True
                 else:
                     if not self._nameInKeySignature(alteredPitches):
                         self.accidental.displayStatus = True
                     else:
                         self.accidental.displayStatus = False
-                setFromPitchPast = True
-                break
+                    setFromPitchPast = True
+                    break
             else:
                 pass
 
         # if we have no previous matches for this pitch and there is 
         # an accidental: show, unless in alteredPitches
         # cases of displayAlways and related are matched above
-        if not setFromPitchPast and self.accidental != None:
+        if displayAccidentalIfNoPreviousAccidentals == True:
+            # not the first pitch of this nameWithOctave in the measure
+            # but, because of ties, the first to be displayed
+            if not self._nameInKeySignature(alteredPitches):
+                self.accidental.displayStatus = True
+            else:
+                self.accidental.displayStatus = False
+            displayAccidentalIfNoPreviousAccidentals = False #just to be sure
+        elif not setFromPitchPast and self.accidental != None:
             if not self._nameInKeySignature(alteredPitches):
                 self.accidental.displayStatus = True
             else:
@@ -3790,37 +3852,37 @@ class Test(unittest.TestCase):
 
                 #environLocal.printDebug(['accidental test:', p, pName, pDisplayStatus, 'target:', targetName, targetDisplayStatus]) # test
                 self.assertEqual(pName, targetName)
-                self.assertEqual(pDisplayStatus, targetDisplayStatus)
+                self.assertEqual(pDisplayStatus, targetDisplayStatus, "%d: %s display: %s, target %s" % (i, p, pDisplayStatus, targetDisplayStatus))
 
         # alternating, in a sequence, same pitch space
         pList = [Pitch('a#3'), Pitch('a3'), Pitch('a#3'), 
-        Pitch('a3'), Pitch('a#3')]
+                 Pitch('a3'), Pitch('a#3')]
         result = [('sharp', True), ('natural', True), ('sharp', True), 
-        ('natural', True), ('sharp', True)]
+                  ('natural', True), ('sharp', True)]
         proc(pList, [])        
         compare(pList, result)
 
         # alternating, in a sequence, different pitch space
         pList = [Pitch('a#2'), Pitch('a6'), Pitch('a#1'), 
-        Pitch('a5'), Pitch('a#3')]
+                 Pitch('a5'), Pitch('a#3')]
         result = [('sharp', True), ('natural', True), ('sharp', True), 
-        ('natural', True), ('sharp', True)]
+                  ('natural', True), ('sharp', True)]
         proc(pList, [])        
         compare(pList, result)
 
         # alternating, after gaps
         pList = [Pitch('a-2'), Pitch('g3'), Pitch('a5'), 
-        Pitch('a#5'), Pitch('g-3'), Pitch('a3')]
+                 Pitch('a#5'), Pitch('g-3'), Pitch('a3')]
         result = [('flat', True), (None, None), ('natural', True), 
-        ('sharp', True), ('flat', True), ('natural', True)]
+                  ('sharp', True), ('flat', True), ('natural', True)]
         proc(pList, [])        
         compare(pList, result)
 
         # repeats of the same: show at different registers
         pList = [Pitch('a-2'), Pitch('a-2'), Pitch('a-5'), 
-        Pitch('a#5'), Pitch('a#3'), Pitch('a3'), Pitch('a2')]
+                 Pitch('a#5'), Pitch('a#3'), Pitch('a3'), Pitch('a2')]
         result = [('flat', True), ('flat', False), ('flat', True), 
-        ('sharp', True), ('sharp', True), ('natural', True), (None, None)]
+                  ('sharp', True), ('sharp', True), ('natural', True), (None, None)]
         proc(pList, [])        
         compare(pList, result)
 
