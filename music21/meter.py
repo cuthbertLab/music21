@@ -2131,6 +2131,24 @@ class TimeSignature(music21.Music21Object):
     0.5
     >>> ts.beatDivisionCountName
     'Simple'
+    
+    
+    >>> tsCommon = meter.TimeSignature('c')  # or common
+    >>> tsCommon.beatCount
+    4
+    >>> tsCommon.denominator
+    4
+    >>> tsCommon.symbol
+    'common'
+    
+    
+    >>> tsCut = meter.TimeSignature("cut")
+    >>> tsCut.beatCount
+    2
+    >>> tsCut.denominator
+    2
+    >>> tsCut.symbol
+    'cut'
     '''
 
     classSortOrder = 4
@@ -2344,6 +2362,14 @@ class TimeSignature(music21.Music21Object):
 
         # used for drawing the time signature symbol
         # this is the only one that can be  unlinked
+        if common.isStr(value) and (value.lower() == 'common' or value.lower() == 'c'):
+            value = '4/4'
+            self.symbol = 'common'
+        elif common.isStr(value) and value.lower() == 'cut':
+            value = '2/2'
+            self.symbol = 'cut'
+        
+        
         self.displaySequence = MeterSequence(value)
         self.summedNumerator = self.displaySequence.summedNumerator
 
