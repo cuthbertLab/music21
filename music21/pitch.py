@@ -3434,7 +3434,9 @@ class Pitch(music21.Music21Object):
         The `alteredPitches` list supplies pitches from a :class:`~music21.key.KeySignature` object using the :attr:`~music21.key.KeySignature.alteredPitches` property. 
 
 
-        If `cautionaryPitchClass` is True, comparisons to past accidentals are made regardless of register. That is, if a past sharp is found two octaves above a present natural, a natural sign is still displayed. 
+        If `cautionaryPitchClass` is True, comparisons to past accidentals 
+        are made regardless of register. That is, if a past sharp is found two 
+        octaves above a present natural, a natural sign is still displayed. 
 
 
         If `overrideStatus` is True, this method will ignore any current 
@@ -3689,7 +3691,8 @@ class Pitch(music21.Music21Object):
             # if cautionaryNotImmediateRepeat is False, will not be shown
             elif (i != iNearest and pPast.accidental != None 
                   and pSelf.accidental != None 
-                  and pPast.accidental.name == pSelf.accidental.name):
+                  and pPast.accidental.name == pSelf.accidental.name
+                  and pPast.octave == pSelf.octave):
                 if (cautionaryNotImmediateRepeat == False 
                     and pPast.accidental.displayStatus != False): 
                     # do not show (unless previous note's accidental wasn't displayed
