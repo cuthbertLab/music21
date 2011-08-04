@@ -90,7 +90,7 @@ class TinyNotationStream(stream.Stream):
     but simplified somewhat and an optional time signature string (or TimeSignature object).
     
     example in 3/4:
-    >>> stream1 = TinyNotationStream("E4 r f# g=lastG trip{b-8 a g} c", "3/4")
+    >>> stream1 = TinyNotationStream("E4 r f# g=lastG trip{b-8 a g} c4~ c", "3/4")
     >>> stream1.show('text')
     {0.0} <music21.meter.TimeSignature 3/4>
     {0.0} <music21.note.Note E>
@@ -101,6 +101,7 @@ class TinyNotationStream(stream.Stream):
     {4.33333333333} <music21.note.Note A>
     {4.66666666667} <music21.note.Note G>
     {5.0} <music21.note.Note C>
+    {6.0} <music21.note.Note C>
 
 
     >>> stream1.getElementById("lastG").step
@@ -109,6 +110,10 @@ class TinyNotationStream(stream.Stream):
     True
     >>> stream1.notesAndRests[0].octave
     3    
+    >>> stream1.notes[-2].tie.type
+    'start'
+    >>> stream1.notes[-1].tie.type
+    'stop'
     '''
 
     TRIP    = compile('trip\{')
@@ -135,7 +140,8 @@ class TinyNotationStream(stream.Stream):
                   'beginTuplet': False,
                   'endTuplet': False,
                   'lastDuration': None, 
-                  'barDuration': barDuration }
+                  'barDuration': barDuration,
+                  'lastNoteTied': False, }
 
         for thisNoteStr in noteStrs:
             if self.TRIP.match(thisNoteStr):
@@ -178,7 +184,7 @@ class TinyNotationStream(stream.Stream):
         for thisNote in noteList:
             self.append(thisNote)
         
-    def getNote(self, stringRep, storedDict = {}):
+    def getNote(self, stringRep, storedDict = common.DefaultHash()):
         '''
         called out so as to be subclassable
         '''
@@ -232,7 +238,7 @@ class TinyNotationNote(object):
     LYRIC   = compile('\_(.*)')
 
 
-    def __init__(self, stringRep, storedDict = common.DefaultHash(default = False)):
+    def __init__(self, stringRep = None, storedDict = common.DefaultHash(default = False)):
         noteObj = None
         storedtie = None
         self.debug = False
@@ -241,6 +247,11 @@ class TinyNotationNote(object):
             if self.debug is True: print("FOUND FRONT TIE")
             stringRep = self.PRECTIE.sub("", stringRep)
             storedtie = music21.tie.Tie("stop")
+            storedDict['lastNoteTied'] = False
+
+        elif storedDict['lastNoteTied'] is True:
+            storedtie = music21.tie.Tie("stop")
+            storedDict['lastNoteTied'] = False
 
         x = self.customPitchMatch(stringRep, storedDict)
         
@@ -261,7 +272,8 @@ class TinyNotationNote(object):
         else:
             raise TinyNotationException("could not get pitch information from " + str(stringRep))
 
-        if storedtie: noteObj.tie = storedtie
+        if storedtie: 
+            noteObj.tie = storedtie
 
         ## get duration
         usedLastDuration = False
@@ -286,8 +298,13 @@ class TinyNotationNote(object):
         
         ## get ties
         if self.TIE.search(stringRep):
-            if self.debug is True: print("FOUND TIE")
-            noteObj.tie = music21.tie.Tie("start")
+            if self.debug is True: 
+                print("FOUND TIE")
+            storedDict['lastNoteTied'] = True
+            if noteObj.tie is None:
+                noteObj.tie = music21.tie.Tie("start")
+            else:
+                noteObj.tie.type = 'continue'
         
         ## use dict to set tuplets
         if (storedDict['inTrip'] == True or storedDict['inQuad'] == True) and usedLastDuration == False:
