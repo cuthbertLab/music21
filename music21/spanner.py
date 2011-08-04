@@ -16,8 +16,8 @@ connect notes in different Measure objects or even between different parts.
 
 
 This package defines some of the most common spanners.  Other spanners
-can be found in modules such as :ref:`dynamics` (for things such as crescendos)
-or in :ref:`meter` (a ritardando for instance).
+can be found in modules such as :ref:`moduleDynamics` (for things such as crescendos)
+or in :ref:`moduleMeter` (a ritardando for instance).
 '''
 
 import unittest
@@ -1479,7 +1479,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER = [Spanner]
 
 
 if __name__ == "__main__":

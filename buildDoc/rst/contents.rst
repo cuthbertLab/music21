@@ -108,6 +108,7 @@ Module Reference
    moduleSearch
    moduleSerial
    moduleSieve
+   moduleSpanner
    moduleStream
    moduleTempo
    moduleTinyNotation

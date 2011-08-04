@@ -12080,10 +12080,20 @@ class Test(unittest.TestCase):
         bm = tinyNotation.TinyNotationStream("c#'2 b-2~ b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8", "4/4")
         bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
         allNotes = bm.flat.notes
-        #      0C#  1B-~  | 2B-   3C#~  4C#    5B-   6C#    7B-~   8B-~   9B-
-        ds = [True, True, False, True, False, True, False, False, False, False]
+        #      0C#  1B-~  | 2B-  4C#~  5C#    6B-     7C#    8B-~   9B-~   10B-
+        ds = [True, True, False, True, False, False, False, False, False, False]
         for i in range(len(allNotes)):
             self.assertEqual(allNotes[i].accidental.displayStatus, ds[i], "%d failed, %s != %s" % (i, allNotes[i].accidental.displayStatus, ds[i]))
+
+
+#        # add another B-flat just after the tied one...
+#        bm = tinyNotation.TinyNotationStream("c#'2 b-2~ b-8 b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8", "4/4")
+#        bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+#        allNotes = bm.flat.notes
+#        #      0C#  1B-~  | 2B-   3B-  4C#~  5C#    6B-     7C#    8B-~   9B-~  | 10B-
+#        ds = [True, True, False, True, True, False, False, False, False, False, False]
+#        for i in range(len(allNotes)):
+#            self.assertEqual(allNotes[i].accidental.displayStatus, ds[i], "%d failed, %s != %s" % (i, allNotes[i].accidental.displayStatus, ds[i]))
 
 
     def testScaleOffsetsBasic(self):

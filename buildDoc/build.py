@@ -103,6 +103,7 @@ from music21.scala import base as scala
 from music21 import search
 from music21 import serial
 from music21 import sieve
+from music21 import spanner
 from music21 import stream
 
 from music21 import tempo
@@ -212,6 +213,7 @@ MODULES = [
     search,
     serial,     
     sieve,   
+    spanner,
     stream,     
   
     tempo,     
