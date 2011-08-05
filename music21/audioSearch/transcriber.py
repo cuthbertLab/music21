@@ -30,6 +30,24 @@ environLocal = environment.Environment(_MOD)
 
 def runTranscribe(show = True, plot = True, useMic = True, 
                   seconds = 10.0, useScale = scale.ChromaticScale('C4')):
+    '''
+    runs all the methods to record from audio for `seconds` length (default 10.0)
+    and transcribe the resulting melody.
+    
+    
+    if `useMic` is false it will load a file from disk.
+    
+    
+    if `show` is True then the score will be displayed.
+
+
+    if `plot` is True then a Tk graph of the frequencies will be displayed.
+    
+    
+    a different scale besides the chromatic scale can be specified by setting `useScale`.
+    See :ref:`moduleScale` for a list of allowable scales. (or a custom one can be given).
+    Microtonal scales are totally accepted, as are retuned scales where A != 440hz.
+    '''
     #beginning - recording or not
     WAVE_FILENAME = "chrom2.wav"
     
@@ -50,6 +68,7 @@ def runTranscribe(show = True, plot = True, useMic = True,
         matplotlib.pyplot.plot(listplot)
         matplotlib.pyplot.show()
     environLocal.printDebug("* END")
+    return myScore
 
 if __name__ == '__main__':
     runTranscribe(show = True, plot = True, seconds = 20.0)
