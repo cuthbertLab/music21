@@ -11936,9 +11936,6 @@ class Test(unittest.TestCase):
         post = m3.getKeySignatures()
         self.assertEqual(post[0], ks3)
 
-
-
-
     def testMakeAccidentalsA(self):
         '''Test accidental display setting
         '''
@@ -12016,7 +12013,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(ex.flat.notes[2:]), 6)
         #ex.flat.notes[2:].show()
 
-        # all sharps, no display status is showing
+        # all sharps, unknown display status (displayStatus == None)
         acc = [str(n.pitch.accidental) for n in ex.flat.notes[2:]]
         self.assertEqual(acc, ['<accidental sharp>', '<accidental sharp>', '<accidental sharp>', '<accidental sharp>', '<accidental sharp>', '<accidental sharp>'])
         display = [n.pitch.accidental.displayStatus for n in ex.flat.notes[2:]]        
@@ -12035,13 +12032,16 @@ class Test(unittest.TestCase):
         p.insert(0, meter.TimeSignature('2/4'))
         tuplet1 = note.Note("E-4", quarterLength=1.0/3.0)
         tuplet2 = note.Note("F#4", quarterLength=2.0/3.0)
-        p.repeatAppend(tuplet1, 16)
+        p.repeatAppend(tuplet1, 10)
         p.repeatAppend(tuplet2, 7)
-        ex = p.makeNotation().measures(2,4)
+        ex = p.makeNotation()
         #ex.show()
         
         display = [n.pitch.accidental.displayStatus for n in ex.flat.notes]
-        self.assertEqual(display, [True, False, False, False, False, False, True, False, False, False, True, True, False, False])
+        self.assertEqual(display, [1,0,0, 0,0,0,   1,0,0, 0, 1,  1, 0, 0,  1, 0, 0])
+
+
+
 
 
             
@@ -12080,20 +12080,20 @@ class Test(unittest.TestCase):
         bm = tinyNotation.TinyNotationStream("c#'2 b-2~ b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8", "4/4")
         bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
         allNotes = bm.flat.notes
-        #      0C#  1B-~  | 2B-  4C#~  5C#    6B-     7C#    8B-~   9B-~   10B-
-        ds = [True, True, False, True, False, False, False, False, False, False]
+        #      0C#  1B-~  | 2B-  3C#~  4C#    6B-     7C#    8B-~   9B-~   10B-
+        ds = [True, True, False, True, False, True, False, False, False, False]
         for i in range(len(allNotes)):
             self.assertEqual(allNotes[i].accidental.displayStatus, ds[i], "%d failed, %s != %s" % (i, allNotes[i].accidental.displayStatus, ds[i]))
 
 
-#        # add another B-flat just after the tied one...
-#        bm = tinyNotation.TinyNotationStream("c#'2 b-2~ b-8 b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8", "4/4")
-#        bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
-#        allNotes = bm.flat.notes
-#        #      0C#  1B-~  | 2B-   3B-  4C#~  5C#    6B-     7C#    8B-~   9B-~  | 10B-
-#        ds = [True, True, False, True, True, False, False, False, False, False, False]
-#        for i in range(len(allNotes)):
-#            self.assertEqual(allNotes[i].accidental.displayStatus, ds[i], "%d failed, %s != %s" % (i, allNotes[i].accidental.displayStatus, ds[i]))
+        # add another B-flat just after the tied one...
+        bm = tinyNotation.TinyNotationStream("c#'2 b-2~ b-8 b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8", "4/4")
+        bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+        allNotes = bm.flat.notes
+        #      0C#  1B-~  | 2B-   3B-  4C#~  5C#    6B-     7C#    8B-~   9B-~  | 10B-
+        ds = [True, True, False, True, True, False, False, False, False, False, False]
+        for i in range(len(allNotes)):
+            self.assertEqual(allNotes[i].accidental.displayStatus, ds[i], "%d failed, %s != %s" % (i, allNotes[i].accidental.displayStatus, ds[i]))
 
 
     def testScaleOffsetsBasic(self):
@@ -15620,6 +15620,16 @@ class Test(unittest.TestCase):
 #         s.show('t')
 #         self.assertEqual(c1, s[0]) # should be first
 
+class Test2(unittest.TestCase):
+    '''
+    short tests because Test is taking too long but running from command line removes the debugger
+    '''
+
+    def runTest(self):
+        pass
+
+    def testNothing(self):
+        pass
 
 
 
@@ -15631,7 +15641,6 @@ _DOC_ORDER = [Stream, Measure]
 
 
 if __name__ == "__main__":
-    # sys.arg test options will be used in mainTest()
     music21.mainTest(Test)
 
 

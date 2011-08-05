@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-11 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
@@ -43,6 +43,8 @@ import music21.stream
 from music21 import common
 from music21.humdrum import testFiles, canonicalOutput
 from music21.dynamics import Dynamic, Wedge
+
+import os
 
 spinePathIndicators = ["*+", "*-", "*^", "*v", "*x", "*"]
 
@@ -565,7 +567,7 @@ class KernSpine(HumdrumSpine):
                 pass
             elif eventC.startswith('*'):
                 ## control processing
-                tempObject = kernTandamToControl(eventC)
+                tempObject = kernTandamToObject(eventC)
                 if tempObject is not None:
                     thisObject = tempObject
             elif eventC.startswith('='):
@@ -615,6 +617,8 @@ class KernSpine(HumdrumSpine):
                     self.music21Objects.append(thisObject)
                 else:
                     thisContainer.append(thisObject)
+
+        ## move things before first measure to first measure!
 
 class DynamSpine(HumdrumSpine):
     def parse(self):
@@ -930,12 +934,16 @@ def hdStringToNote(contents):
     elif contents.count('\\'):
         thisObject.stemDirection = "down"        
     
-    # 3.2.7 Duration
+    # 3.2.7 Duration +
     # 3.2.8 N-Tuplets
     foundNumber = re.search("(\d+)", contents)
     if foundNumber:
         durationType = int(foundNumber.group(1))
-        if durationType in duration.typeFromNumDict:
+        if durationType == 0:
+            thisObject.duration.type = 'breve'
+            if contents.count('.'):
+                thisObject.duration.dots = contents.count('.')
+        elif durationType in duration.typeFromNumDict:
             thisObject.duration.type = duration.typeFromNumDict[durationType]
             if contents.count('.'):
                 thisObject.duration.dots = contents.count('.')
@@ -1060,9 +1068,15 @@ def hdStringToMeasure(contents):
     return m1
 
 
-def kernTandamToControl(tandam):
+def kernTandamToObject(tandam):
     '''
     kern uses *M5/4  *clefG2 etc, to control processing
+    
+    
+    >>> from music21 import *
+    >>> m = humdrum.spineParser.kernTandamToObject('*M3/1')
+    >>> m
+    <music21.meter.TimeSignature 3/1>
     '''
     # TODO: Cover more tandam controls as they're found
     tandam = str(tandam)
@@ -1244,6 +1258,13 @@ class Test(unittest.TestCase):
                 
         self.assertEqual(GsharpCount, 34)
 #       masterStream.show('text')
+        
+    def testParseSineNomine(self):
+        from music21 import converter
+        parserPath = os.path.dirname(__file__)
+        sineNominePath = parserPath + os.path.sep + 'Missa_Sine_nomine-Kyrie.krn'
+        myScore = converter.parse(sineNominePath)
+
         
 if __name__ == "__main__":
     music21.mainTest(Test)
