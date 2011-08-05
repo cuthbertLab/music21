@@ -6728,9 +6728,19 @@ class Stream(music21.Music21Object):
 
     def quantize(self, quarterLengthDivisors=[4, 3], 
             processOffsets=True, processDurations=False):
-        '''Quantize time values in this Stream by snapping offsets and/or durations to the nearest multiple of a quarter length value given as one or more divisors of 1 quarter length. The quantized value found closest to a divisor multiple will be used.
+        '''
+        Quantize time values in this Stream by snapping offsets 
+        and/or durations to the nearest multiple of a quarter length value 
+        given as one or more divisors of 1 quarter length. The quantized 
+        value found closest to a divisor multiple will be used.
 
-        The `quarterLengthDivisors` provides a flexible way to provide quantization settings. For example, [2] will snap all events to eighth note grid. [4, 3] will snap events to sixteenth notes and eighth note triplets, whichever is closer. [4, 6] will snap events to sixteenth notes and sixteenth note triplets. 
+
+        The `quarterLengthDivisors` provides a flexible way to provide quantization 
+        settings. For example, [2] will snap all events to eighth note grid. 
+        [4, 3] will snap events to sixteenth notes and eighth note triplets, 
+        whichever is closer. [4, 6] will snap events to sixteenth notes and 
+        sixteenth note triplets. 
+
 
         >>> from music21 import *
         >>> n = note.Note()

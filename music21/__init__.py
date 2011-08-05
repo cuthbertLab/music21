@@ -43,7 +43,8 @@ see trecento/xlrd/licenses.py for the complete disclaimer and conditions
 __all__ = ['base', 
 
            # sub folders
-           'abc', 'abj', 'analysis', 'composition', 'configure',
+           'abc', 'abj', 'analysis', 'audioSearch',
+           'composition', 'configure',
            'counterpoint', 'corpus', 
            'demos', 'doc', 'figuredBass', 'humdrum', 
            'lily', 'musicxml', 
