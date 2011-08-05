@@ -12038,14 +12038,7 @@ class Test(unittest.TestCase):
         #ex.show()
         
         display = [n.pitch.accidental.displayStatus for n in ex.flat.notes]
-        self.assertEqual(display, [1,0,0, 0,0,0,   1,0,0, 0, 1,  1, 0, 0,  1, 0, 0])
-
-
-
-
-
-            
-
+        self.assertEqual(display, [1,0,0, 0,0,0,   1,0,0, 0, 1,  1, 0, 0,  1, 0, 0])         
 
     def testMakeAccidentalsWithKeysInMeasures(self):
         scale1 = ['c4', 'd4', 'e4', 'f4', 'g4', 'a4', 'b4', 'c5']
@@ -12094,6 +12087,21 @@ class Test(unittest.TestCase):
         ds = [True, True, False, True, True, False, False, False, False, False, False]
         for i in range(len(allNotes)):
             self.assertEqual(allNotes[i].accidental.displayStatus, ds[i], "%d failed, %s != %s" % (i, allNotes[i].accidental.displayStatus, ds[i]))
+
+    def testMakeAccidentalsOctaveKS(self):
+        from music21 import key
+        s = Stream()
+        k = key.KeySignature(-3)
+        s.append(k)
+        s.append(note.Note('B-2'))
+        s.append(note.Note('B-1'))
+        for n in s.notes:
+            self.assertEqual(n.accidental.displayStatus, None)
+
+        s.makeAccidentals(inPlace = True)
+        for n in s.notes:
+            self.assertEqual(n.accidental.displayStatus, False)
+
 
 
     def testScaleOffsetsBasic(self):
@@ -15630,9 +15638,6 @@ class Test2(unittest.TestCase):
 
     def testNothing(self):
         pass
-
-
-
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
