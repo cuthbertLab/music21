@@ -4,12 +4,14 @@
 
 
 import music21
-
+from music21 import metadata
 from music21.note import Note
 from music21 import interval
+from music21 import search
 from music21.lily import LilyString
 
 from music21.trecento import cadencebook
+from music21.trecento import trecentoCadence
 from re import match
 
 class IntervalSearcher(object):
@@ -186,7 +188,26 @@ def findUpDown(n1, n2, n3):
     if i2.diatonic.generic.simpleDirected != -2: return False
     return True
 
-if __name__ == "__main__":
+def audioVirelaiSearch():
+    from music21 import audioSearch
+    from music21.audioSearch import transcriber
+    from music21 import search
+    virelaisSheet = cadencebook.TrecentoSheet(sheetname = 'virelais')
+    
+    virelaiCantuses = []
+    for i in range(2, 54):
+        thisVirelai = virelaisSheet.makeWork(i)
+        if thisVirelai.title != "":
+            vc = thisVirelai.incipit.asScore().getElementsByClass(music21.trecento.trecentoCadence.TrecentoCadenceStream)[0]
+            vc.insert(0, metadata.Metadata(title = thisVirelai.title))
+            virelaiCantuses.append(vc)
+    searchScore = transcriber.runTranscribe(show = False, plot = False, seconds = 12.0)
+    l = search.approximateNoteSearch(searchScore, virelaiCantuses)
+    for i in l:
+        print i.metadata.title, i.matchProbability
+    l[0].show()
+
+def savedSearches():
 #    searchForIntervals("E4 C4 C4 B3") # Assisi 187.1
 #    searchForIntervals("D4 C4 C4 C4")   # Assisi 187.2
 #    searchForIntervals("D4 A3 A3 A3 B3 C4") # Donna si to fallito TEST
@@ -206,7 +227,10 @@ if __name__ == "__main__":
     #searchForIntervals("D4 B4 D4 C4 D4") # cadence formula from 15th c. that Lisa Cotton was searching for in earlier sources -- none found
     #searchForIntervals("G4 A4 G4 F4 E4 F4 G4 E4") # Prague XVII.J.17-14_1r piece 1 -- possible contrafact -- no correct matches
     searchForIntervals("G4 A4 B4 G4 F4 G4 F4 E4") # Prague XVII.J.17-14_1r piece 2 -- possible contrafact -- no matches
-    pass
+
+
+if __name__ == "__main__":
+    audioVirelaiSearch()
 
 
 
