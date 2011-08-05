@@ -248,6 +248,11 @@ def translateNoteToByte(n):
     '''
     if n.isRest:
         return chr(200)
+    elif n.isChord:
+        if len(n.pitches) > 0:
+            return chr(int(n.pitches[0].ps))
+        else:
+            return chr(200)
     else:
         return chr(int(n.ps))
 
