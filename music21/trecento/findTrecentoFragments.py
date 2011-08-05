@@ -201,7 +201,7 @@ def audioVirelaiSearch():
             vc = thisVirelai.incipit.asScore().getElementsByClass(music21.trecento.trecentoCadence.TrecentoCadenceStream)[0]
             vc.insert(0, metadata.Metadata(title = thisVirelai.title))
             virelaiCantuses.append(vc)
-    searchScore = transcriber.runTranscribe(show = False, plot = False, seconds = 12.0)
+    searchScore = transcriber.runTranscribe(show = False, plot = False, seconds = 12.0, saveFile = False)
     l = search.approximateNoteSearch(searchScore, virelaiCantuses)
     for i in l:
         print i.metadata.title, i.matchProbability

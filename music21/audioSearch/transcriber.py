@@ -29,7 +29,7 @@ environLocal = environment.Environment(_MOD)
 
 
 def runTranscribe(show = True, plot = True, useMic = True, 
-                  seconds = 10.0, useScale = scale.ChromaticScale('C4')):
+                  seconds = 10.0, useScale = scale.ChromaticScale('C4'), saveFile = True):
     '''
     runs all the methods to record from audio for `seconds` length (default 10.0)
     and transcribe the resulting melody.
@@ -49,7 +49,10 @@ def runTranscribe(show = True, plot = True, useMic = True,
     Microtonal scales are totally accepted, as are retuned scales where A != 440hz.
     '''
     #beginning - recording or not
-    WAVE_FILENAME = "chrom2.wav"
+    if saveFile != False:
+        WAVE_FILENAME = "chrom2.wav"
+    else:
+        WAVE_FILENAME = False
     
     time_start = time()
     freqFromAQList = getFrequenciesFromAudio(record = useMic, length = seconds, waveFilename = WAVE_FILENAME)
