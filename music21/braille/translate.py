@@ -2,7 +2,7 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
 # Name:         translate.py
-# Purpose:      music21 class which allows translation of music21 objects to braille.
+# Purpose:      music21 class which allows translation of music21 data to braille.
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    (c) 2011 The music21 Project
@@ -10,7 +10,8 @@
 #-------------------------------------------------------------------------------
 
 
-'''Objects for exporting music21 data as braille.
+'''
+Objects for exporting music21 data as braille.
 '''
 
 
@@ -36,7 +37,8 @@ c = {'128th':   u'\u2819',
      'eighth':  u'\u2819',
      'quarter': u'\u2839',
      'half':    u'\u281d',
-     'whole':   u'\u283d'}
+     'whole':   u'\u283d',
+     'breve':   u'\u283d\u2818\u2809\u283d'}
 
 d = {'128th':   u'\u2811',
      '64th':    u'\u2831',
@@ -45,7 +47,8 @@ d = {'128th':   u'\u2811',
      'eighth':  u'\u2811',
      'quarter': u'\u2831',
      'half':    u'\u2815',
-     'whole':   u'\u2835'}
+     'whole':   u'\u2835',
+     'breve':   u'\u2835\u2818\u2809\u2835'}
 
 e = {'128th':   u'\u280b',
      '64th':    u'\u282b',
@@ -54,7 +57,8 @@ e = {'128th':   u'\u280b',
      'eighth':  u'\u280b',
      'quarter': u'\u282b',
      'half':    u'\u280f',
-     'whole':   u'\u282f'}
+     'whole':   u'\u282f',
+     'breve':   u'\u282f\u2818\u2809\u282f'}
 
 f = {'128th':   u'\u281b',
      '64th':    u'\u283b',
@@ -63,7 +67,8 @@ f = {'128th':   u'\u281b',
      'eighth':  u'\u281b',
      'quarter': u'\u283b',
      'half':    u'\u281f',
-     'whole':   u'\u283f'}
+     'whole':   u'\u283f',
+     'breve':   u'\u283f\u2818\u2809\u283f'}
 
 g = {'128th':   u'\u2813',
      '64th':    u'\u2833',
@@ -72,7 +77,8 @@ g = {'128th':   u'\u2813',
      'eighth':  u'\u2813',
      'quarter': u'\u2833',
      'half':    u'\u2817',
-     'whole':   u'\u2837'}
+     'whole':   u'\u2837',
+     'breve':   u'\u2837\u2818\u2809\u2837'}
 
 a = {'128th':   u'\u280a',
      '64th':    u'\u282a',
@@ -81,7 +87,8 @@ a = {'128th':   u'\u280a',
      'eighth':  u'\u280a',
      'quarter': u'\u282a',
      'half':    u'\u280e',
-     'whole':   u'\u282e'}
+     'whole':   u'\u282e',
+     'breve':   u'\u282e\u2818\u2809\u282e'}
 
 b = {'128th':   u'\u281a',
      '64th':    u'\u283a',
@@ -90,7 +97,8 @@ b = {'128th':   u'\u281a',
      'eighth':  u'\u281a',
      'quarter': u'\u283a',
      'half':    u'\u281e',
-     'whole':   u'\u283e'}
+     'whole':   u'\u283e',
+     'breve':   u'\u283e\u2818\u2809\u283e'}
 
 pitchNameToNotes = {'C': c,
                     'D': d,
@@ -100,13 +108,15 @@ pitchNameToNotes = {'C': c,
                     'A': a,
                     'B': b}
 
-octaves = {1: u'\u2808',
+octaves = {0: u'\u2808\u2808',
+           1: u'\u2808',
            2: u'\u2818',
            3: u'\u2838',
            4: u'\u2810',
            5: u'\u2828',
            6: u'\u2830',
-           7: u'\u2820'}
+           7: u'\u2820',
+           8: u'\u2820\u2820'}
 
 accidentals = {'sharp':          u'\u2829',
                'double-sharp':   u'\u2829\u2829',
@@ -160,7 +170,8 @@ rests = {'128th':   u'\u282d',
          'eighth':  u'\u282d',
          'quarter': u'\u2827',
          'half':    u'\u2825',
-         'whole':   u'\u280d'}
+         'whole':   u'\u280d',
+         'breve':   u'\u280d\u2818\u2809\u280d'}
 
 barlines = {'final': u'\u2823\u2805',
             'double': u'\u2823\u2805\u2804'}
@@ -198,54 +209,122 @@ alphabet = {'a': u'\u2801',
             '.': u'\u2832',
             '?': u'\u2826'}
 
+symbols = {'space': u'\u2800',
+           'double-space': u'\u2800\u2800',
+           'number': u'\u283c',
+           'dot': u'\u2804',
+           'tie': u'\u2808\u2809',
+           'uppercase': u'\u2820',
+           'metronome': u'\u2836',
+           'common': u'\u2828\u2809',
+           'cut': u'\u2838\u2809'}
+
+def headingToBraille(sampleTempoText = tempo.TempoText("Allegretto"), sampleKeySig = key.KeySignature(5), sampleTimeSig = meter.TimeSignature('3/8'),
+                     sampleMetronomeMark = tempo.MetronomeMark(number = 135, referent = note.EighthNote())):
+    
+    kts_braille = keyAndTimeSigToBraille(sampleKeySig = sampleKeySig, sampleTimeSig = sampleTimeSig)
+    tt_braille = tempoTextToBraille(sampleTempoText = sampleTempoText)
+    mm_braille = metronomeMarkToBraille(sampleMetronomeMark = sampleMetronomeMark)
+    
+    mm_kts_braille = None
+    if not kts_braille == None:
+        if not mm_braille == None:
+            mm_kts_braille = mm_braille + symbols['space'] + kts_braille
+        else:
+            mm_kts_braille = kts_braille
+            
+    tt_mm_kts_braille = None
+    if not tt_braille == None:
+        if not mm_kts_braille == None:
+            allLines = tt_braille.splitlines()
+            if len(allLines) == 1 and len(allLines[0]) + len(mm_kts_braille) + 1 <= 34:
+                tt_mm_kts_braille = (allLines[0] + symbols['space'] + mm_kts_braille).center(40, symbols['space'])
+            else:
+                allLines.append(mm_kts_braille)
+                tt_mm_kts_braille = []
+                for line in allLines:
+                    tt_mm_kts_braille.append(line.center(40, symbols['space']))
+                tt_mm_kts_braille = u"\n".join(tt_mm_kts_braille)
+        else:
+            tt_mm_kts_braille = tt_braille
+    else:
+        if not mm_kts_braille == None:
+            tt_mm_kts_braille = mm_kts_braille.center(40, symbols['space'])
+    
+    return tt_mm_kts_braille
+
+def numberToBraille(sampleNumber = 12):
+    '''
+    >>> from music21.braille import translate
+    >>> translate.numberToBraille(sampleNumber = 12)
+    u'\u283c\u2801\u2803'
+    >>> translate.numberToBraille(sampleNumber = 7)
+    u'\u283c\u281b'
+    >>> translate.numberToBraille(sampleNumber = 37)
+    u'\u283c\u2809\u281b'
+    '''
+    numberTrans = []
+    numberTrans.append(symbols['number'])
+    for digit in str(sampleNumber):
+        numberTrans.append(numbers[int(digit)])
+    
+    return ''.join(numberTrans)
+
 def instrumentToBraille(sampleInstrument = instrument.Instrument()):
     return wordStringToBraille(sampleInstrument.bestName())
 
-def tempoTextToBraille(sampleTempoText = tempo.TempoText("adagio")):
-    return wordStringToBraille(sampleTempoText.text)
-
-def metronomeMarkToBraille(sampleMetronomeMark = tempo.MetronomeMark(number = 80, referent = note.HalfNote())):
-    metroTrans = []
-    metroTrans.append(c[sampleMetronomeMark.referent.type])
-    metroTrans.append(u'\u2836')
-    metroTrans.append(u'\u283c')
-    for digit in str(sampleMetronomeMark.number):
-        metroTrans.append(numbers[int(digit)])
-    
-    return ''.join(metroTrans)
-
-def wordStringToBraille(sampleWordString = "Lento assai, cantante e tranquillo", returnSplit = False):
-    # Can return either:
-    # 1) The entire expression
-    # 2) A divided expression
-    
-    wordStringTrans = []
-    allWords = sampleWordString.split()
-    for word in allWords:
-        wordStringTrans.append(wordToBraille(word))
+def tempoTextToBraille(sampleTempoText = tempo.TempoText("Lento assai, cantante e tranquillo")):
+    if sampleTempoText == None:
+        return None
         
-    if returnSplit:
-        return wordStringTrans
-    else:
-        return u'\u2800'.join(wordStringTrans)
+    allPhrases = sampleTempoText.text.split(",")
+    braillePhrases = []
+    for samplePhrase in allPhrases:
+        allWords = samplePhrase.split()
+        phraseTrans = []
+        for sampleWord in allWords:
+            brailleWord = wordToBraille(sampleWord)
+            if not (len(phraseTrans) + len(brailleWord) + 1 > 34):
+                phraseTrans.append(brailleWord)
+                phraseTrans.append(symbols['space'])
+            else:
+                phraseTrans.append(u"\n")
+                phraseTrans.append(brailleWord)
+                phraseTrans.append(symbols['space'])
+        braillePhrases.append(u"".join(phraseTrans[0:-1]))
+    
+    brailleText = []
+    for braillePhrase in braillePhrases:
+        brailleText.append(braillePhrase)
+        brailleText.append(alphabet[","])
+        brailleText.append(u"\n")
+        
+    brailleText = brailleText[0:-2]
+    brailleText.append(alphabet["."]) # literary period
+    return u"".join(brailleText)
 
-# Have a method which gets a part, flattens it, and finds
-# What do I do now?
-
-# Tempo text + metronome mark + key signature + time signature (Not necessarily all of them)
-
-def wordToBraille(sampleWord = 'andante'):
+def wordToBraille(sampleWord = 'Andante'):
     '''
     >>> from music21.braille import translate
     '''
     wordTrans = []
     for letter in sampleWord:
         if letter.isupper():
-            wordTrans.append(u'\u2820' + alphabet[letter.lower()])
+            wordTrans.append(symbols['uppercase'] + alphabet[letter.lower()])
         else:
             wordTrans.append(alphabet[letter])
         
     return ''.join(wordTrans)
+
+def metronomeMarkToBraille(sampleMetronomeMark = tempo.MetronomeMark(number = 80, referent = note.HalfNote())):
+    if sampleMetronomeMark == None:
+        return None
+    metroTrans = []
+    metroTrans.append(noteToBraille(note.Note('C4', quarterLength = sampleMetronomeMark.referent.quarterLength), showOctave = False))
+    metroTrans.append(symbols['metronome'])
+    metroTrans.append(numberToBraille(sampleMetronomeMark.number))
+    
+    return ''.join(metroTrans)
 
 def keySigToBraille(sampleKeySig = key.KeySignature(0)):
     '''
@@ -279,8 +358,14 @@ def timeSigToBraille(sampleTimeSig = meter.TimeSignature('3/4')):
     >>> translate.timeSigToBraille(sampleTimeSig = meter.TimeSignature('4/4'))
     u'\u283c\u2819\u2832'
     '''
+    if len(sampleTimeSig.symbol) != 0:
+        if sampleTimeSig.symbol == 'common':
+            return symbols['common']
+        elif sampleTimeSig.symbol == 'cut':
+            return symbols['cut']
+
     timeSigTrans = []
-    numberSign = u'\u283c'
+    numberSign = symbols['number']
     timeSigTrans.append(numberSign)
     
     beatCount = str(sampleTimeSig.numerator)
@@ -290,6 +375,27 @@ def timeSigToBraille(sampleTimeSig = meter.TimeSignature('3/4')):
     timeSigTrans.append(beatUnits[sampleTimeSig.denominator])
     
     return ''.join(timeSigTrans)
+
+def keyAndTimeSigToBraille(sampleKeySig = key.KeySignature(0), sampleTimeSig = meter.TimeSignature('3/4')):
+    '''
+    Takes in a :class:`~music21.key.KeySignature` and :class:`~music21.meter.TimeSignature`.
+    Returns a unicode string corresponding to the combined key/time signature in braille.
+    Returns None if both the key and time signature are None, or if the time signature is
+    None and the key signature corresponds to no sharps or flats.
+    '''
+    if (sampleTimeSig == None) and (sampleKeySig == None or sampleKeySig.sharps == 0):
+        return None
+    
+    if sampleKeySig == None:
+        ks_braille = keySigToBraille()
+    else:
+        ks_braille = keySigToBraille(sampleKeySig)
+
+    if not (sampleTimeSig == None):
+        ts_braille = timeSigToBraille(sampleTimeSig)
+        return ks_braille + ts_braille
+    else:
+        return ks_braille
     
 def noteToBraille(sampleNote = note.Note('C4'), showOctave = True):
     '''
@@ -344,9 +450,9 @@ def noteToBraille(sampleNote = note.Note('C4'), showOctave = True):
         nameWithLength = notesInStep[sampleNote.duration.type]
         noteTrans.append(nameWithLength) 
         for dot in range(sampleNote.duration.dots):
-            noteTrans.append(u'\u2804')
-        if not sampleNote.tie == None:
-            noteTrans.append(u'\u2808\u2809')
+            noteTrans.append(symbols['dot'])
+        if not sampleNote.tie == None and not sampleNote.tie.type == 'stop':
+            noteTrans.append(symbols['tie'])
         return ''.join(noteTrans)
     except KeyError:
         raise BrailleTranslateException("Note duration '" + sampleNote.duration.type + "' cannot be translated to braille.")
@@ -378,7 +484,7 @@ def restToBraille(sampleRest = note.Rest()):
         simpleRest = rests[sampleRest.duration.type]
         restTrans.append(simpleRest)
         for dot in range(sampleRest.duration.dots):
-            restTrans.append(u'\u2804')
+            restTrans.append(symbols['dot'])
         return ''.join(restTrans)
     except KeyError:
         raise BrailleTranslateException("Rest duration cannot be translated to braille.")
@@ -458,44 +564,51 @@ def partToBraille(samplePart = stream.Part()):
     lineIndex = 0
     
     allMeasures = samplePart.getElementsByClass('Measure')
-    ks = allMeasures[0].keySignature
-    ts = allMeasures[0].timeSignature
+    tt = None
+    try:
+        tt = allMeasures[0].getElementsByClass('TempoText')[0]
+    except IndexError:
+        pass
     
-    if ks == None:
-        ks_braille = keySigToBraille()
-    else:
-        ks_braille = keySigToBraille(ks)
+    mm = None
+    try:
+        mm = allMeasures[0].getElementsByClass('MetronomeMark')[0]
+    except IndexError:
+        pass
+
+    tt_mm_kts_braille = headingToBraille(sampleKeySig = allMeasures[0].keySignature, sampleTimeSig = allMeasures[0].timeSignature,
+                                         sampleTempoText = tt, sampleMetronomeMark = mm)
     
-    if not (ts == None):
-        ts_braille = timeSigToBraille(ts)
-        allLines[lineIndex] = unicode(ks_braille + ts_braille).center(40, u'\u2800')
-        lineIndex += 1
-    else:
-        if not len(ks_braille) == 0:
-            allLines[lineIndex] = unicode(ks_braille).center(40, u'\u2800')
+    if not tt_mm_kts_braille == None:
+        for sampleLine in tt_mm_kts_braille.splitlines():
+            allLines[lineIndex] = tt_mm_kts_braille
             lineIndex += 1
 
-    allLines[lineIndex] = u'\u283c' + numbers[allMeasures[0].number]
-    previousNote = None
+    allLines[lineIndex] = symbols['number'] + numbers[allMeasures[0].number]
+    previousNote = None    
     
     for measure in allMeasures:
+        if measure.keyIsNew and measure.timeSignatureIsNew:
+            pass
+        if measure.keyIsNew:
+            pass
+        if measure.timeSignatureIsNew:
+            pass
         showOctave = True
         if not len(measure.flat.notes) == 0:
-            if previousNote == None:
-                showOctave = True
-            else:
+            if not previousNote == None:
                 showOctave = showOctaveWithNote(previousNote, measure.flat.notes[0])
             previousNote = measure.flat.notes[-1]
         mtb = measureToBraille(measure, showLeadingOctave = showOctave)
         if not(len(allLines[lineIndex]) + len(mtb) + 1) > 40:
-            allLines[lineIndex] += (u'\u2800' + mtb)
+            allLines[lineIndex] += (symbols['space'] + mtb)
         else:
-            allLines[lineIndex] = allLines[lineIndex].ljust(40, u'\u2800')
+            allLines[lineIndex] = allLines[lineIndex].ljust(40, symbols['space'])
             lineIndex += 1
             mtb = measureToBraille(measure, showLeadingOctave = True)  
-            allLines[lineIndex] = u'\u2800\u2800' + mtb
+            allLines[lineIndex] = symbols['double-space'] + mtb
     
-    allLines[lineIndex] = allLines[lineIndex].ljust(40, u'\u2800')
+    allLines[lineIndex] = allLines[lineIndex].ljust(40, symbols['space'])
     return allLines
     
 
