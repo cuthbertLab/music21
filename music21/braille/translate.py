@@ -148,6 +148,15 @@ keySignatures = {-7:    u'\u283c\u281b\u2823',
                  6:     u'\u283c\u280b\u2829',
                  7:     u'\u283c\u281b\u2829'}
 
+naturals = {0: u'',
+            1: u'\u2821',
+            2: u'\u2821\u2821',
+            3: u'\u2821\u2821\u2821',
+            4: u'\u283c\u2819\u2821',
+            5: u'\u283c\u2811\u2821',
+            6: u'\u283c\u280b\u2821',
+            7: u'\u283c\u281b\u2821'}
+
 numbers = {0: u'\u281a',
            1: u'\u2801',
            2: u'\u2803',
@@ -217,8 +226,25 @@ symbols = {'space': u'\u2800',
            'uppercase': u'\u2820',
            'metronome': u'\u2836',
            'common': u'\u2828\u2809',
-           'cut': u'\u2838\u2809'}
+           'cut': u'\u2838\u2809',
+           'music_hyphen': u'\u2810',
+           'music_asterisk': u'\u281c\u2822\u2814',
+           'music_parenthesis': u''}
 
+def keySigChangeToBraille(oldKeySig = key.KeySignature(-3), newKeySig = key.KeySignature(0)):
+    if oldKeySig.sharps == newKeySig.sharps:
+        raise BrailleTranslateException("No key signature change!")
+    changeTrans = []
+    
+    if newKeySig.sharps == 0 or oldKeySig.sharps == 0 or \
+        not (oldKeySig.sharps / abs(oldKeySig.sharps) == newKeySig.sharps / abs(newKeySig.sharps)):
+        changeTrans.append(naturals[abs(oldKeySig.sharps)])
+    elif not (abs(oldKeySig.sharps) < abs(newKeySig.sharps)): 
+        changeTrans.append(naturals[abs(oldKeySig.sharps - newKeySig.sharps)])
+
+    changeTrans.append(keySigToBraille(newKeySig))
+    return ''.join(changeTrans)
+    
 def headingToBraille(sampleTempoText = tempo.TempoText("Allegretto"), sampleKeySig = key.KeySignature(5), sampleTimeSig = meter.TimeSignature('3/8'),
                      sampleMetronomeMark = tempo.MetronomeMark(number = 135, referent = note.EighthNote())):
     
@@ -581,20 +607,36 @@ def partToBraille(samplePart = stream.Part()):
     
     if not tt_mm_kts_braille == None:
         for sampleLine in tt_mm_kts_braille.splitlines():
-            allLines[lineIndex] = tt_mm_kts_braille
+            allLines[lineIndex] = sampleLine
             lineIndex += 1
 
     allLines[lineIndex] = symbols['number'] + numbers[allMeasures[0].number]
-    previousNote = None    
+    previousNote = None
+    previousMeasure = None
+    
+    previousKeySig = allMeasures[0].keySignature
+    if previousKeySig is None:
+        previousKeySig = key.KeySignature(0)
     
     for measure in allMeasures:
-        if measure.keyIsNew and measure.timeSignatureIsNew:
-            pass
-        if measure.keyIsNew:
-            pass
-        if measure.timeSignatureIsNew:
-            pass
         showOctave = True
+        if not previousMeasure == None:
+            thingsToAdd = []
+            if not(measure.keySignature == None) and not(measure.keySignature == previousKeySig):
+                previousNote = None
+                thingsToAdd.append(keySigChangeToBraille(oldKeySig = previousKeySig, newKeySig = measure.keySignature))
+                previousKeySig = measure.keySignature
+            if not measure.timeSignature == None:
+                previousNote = None
+                thingsToAdd.append(timeSigToBraille(sampleTimeSig = measure.timeSignature))
+            if not len(thingsToAdd) == 0:
+                kts_braille = ''.join(thingsToAdd)
+                if not(len(allLines[lineIndex]) + len(kts_braille) + 1) > 40:
+                    allLines[lineIndex] += (symbols['space'] + kts_braille)
+                else:
+                    allLines[lineIndex] = allLines[lineIndex].ljust(40, symbols['space'])
+                    lineIndex += 1
+                    allLines[lineIndex] = symbols['double-space'] + kts_braille
         if not len(measure.flat.notes) == 0:
             if not previousNote == None:
                 showOctave = showOctaveWithNote(previousNote, measure.flat.notes[0])
@@ -607,6 +649,7 @@ def partToBraille(samplePart = stream.Part()):
             lineIndex += 1
             mtb = measureToBraille(measure, showLeadingOctave = True)  
             allLines[lineIndex] = symbols['double-space'] + mtb
+        previousMeasure = measure
     
     allLines[lineIndex] = allLines[lineIndex].ljust(40, symbols['space'])
     return allLines
