@@ -3400,6 +3400,13 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         #print s[0].measure(77).notes[1].microtone
         #s.show('midi')
 
+
+    def testChromaticScaleA(self):
+
+        cs = ChromaticScale('c4')
+        self.assertEqual(str(cs.pitches), '[C4, D-4, D4, E-4, F-4, F4, G-4, G4, A-4, A4, B-4, C-5, C5]')
+        
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [ConcreteScale, AbstractScale]
