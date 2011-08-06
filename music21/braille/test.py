@@ -928,10 +928,10 @@ def example7_11():
     for numRest in range(2):
         bm[0].pop(2)
     bm[0].padAsAnacrusis()
-    for measure in bm:
-        measure.number -= 1
     bm[0].pop(0)
     bm[-1].append(bar.Barline('final'))
+    for measure in bm:
+        measure.number -= 1
     bm.measure(7).notes[3].accidental = pitch.Accidental()
     return bm
 
@@ -1120,25 +1120,110 @@ def drill8_1():
     bm.insert(0, meter.TimeSignature('c'))
     bm.insert(0, tempo.TempoText("Andante maestoso"))
     bm.insert(0, tempo.MetronomeMark(number = 92, referent = note.QuarterNote()))
-    bm.makeNotation(inPlace = True)
+    bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[-1].append(bar.Barline('final'))
     return bm
 
 def drill8_2():
+    '''
+    >>> from music21.braille import translate
+    >>> inBraille = translate.partToBraille(drill8_2())
+    >>> inBraille[0] == "⠀⠀⠀⠀⠀⠀⠀⠀⠠⠊⠝⠀⠎⠞⠗⠊⠉⠞⠀⠞⠊⠍⠑⠲⠀⠣⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+    True
+    >>> inBraille[1] == "⠼⠁⠀⠸⠋⠭⠘⠚⠭⠸⠋⠭⠀⠡⠫⠻⠩⠻⠀⠓⠭⠑⠭⠓⠭⠀⠪⠳⠻⠀⠋⠭⠙⠭⠊⠭⠀⠀⠀⠀"
+    True
+    >>> inBraille[2] == "⠀⠀⠡⠘⠪⠺⠡⠺⠀⠙⠑⠭⠋⠭⠘⠚⠀⠸⠋⠡⠋⠭⠛⠭⠩⠛⠀⠓⠑⠭⠓⠭⠊⠀⠊⠓⠭⠛⠭⠋"
+    True
+    >>> inBraille[3] == "⠀⠀⠸⠑⠙⠺⠈⠺⠀⠘⠏⠄⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+    True
+    '''
     bm = tinyNotation.TinyNotationStream("E-8 r8 BB-8 r8 E-8 r8 En4 F4 F#4 G8 r8 D8 r8 G8 r8 A-4 G4 F4\
     E-8 r8 C8 r8 AA-8 r8 AAn4 BB-4 BBn4 C8 D8 r8 E-8 r8 BB-8 E-8 En8 r8 F8 r8 F#8\
-    G8 D8 r8 G8 r8 A-8 A-8 G8 r8 F8 r8 E-8 D8 C8 BB-4 BB-4 EE-2.")
+    G8 D8 r8 G8 r8 A-8 A-8 G8 r8 F8 r8 E-8 D8 C8 BB-4 BB-4 EE-2.", "3/4")
     bm.insert(0, meter.TimeSignature("3/4"))
     bm.insert(0, key.KeySignature(-3))
     bm.insert(0, tempo.TempoText("In strict time"))
-    bm.makeNotation(inPlace = True)
+    bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[-1].append(bar.Barline('final'))
     bm[-2].notes[-1].transpose('P-8', inPlace = True)
     bm.measure(7).notes[-1].accidental.displayStatus = False # flat not strictly necessary
-    bm.show()
+    bm.measure(11).notes[-1].accidental.displayStatus = False # flat not necessary (never?)
+    return bm
+
+def drill8_3():
+    '''
+    >>> from music21.braille import translate
+    >>> inBraille = translate.partToBraille(drill8_3())
+    >>> inBraille[0] == "⠀⠀⠀⠀⠀⠀⠀⠀⠠⠉⠕⠝⠀⠙⠑⠇⠊⠉⠁⠞⠑⠵⠵⠁⠲⠀⠼⠑⠩⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀"
+    True
+    >>> inBraille[1] == "⠼⠚⠀⠨⠑⠙⠀⠺⠄⠈⠉⠚⠑⠓⠀⠳⠄⠻⠭⠀⠫⠄⠈⠉⠋⠑⠐⠓⠀⠨⠱⠙⠱⠭⠀⠀⠀⠀⠀⠀"
+    True
+    >>> inBraille[2] == "⠀⠀⠐⠊⠓⠊⠚⠊⠚⠀⠙⠑⠋⠛⠓⠊⠀⠚⠛⠑⠓⠋⠐⠚⠀⠨⠻⠑⠋⠑⠙⠀⠚⠛⠨⠑⠺⠛⠀⠀"
+    True
+    >>> inBraille[3] == "⠀⠀⠐⠑⠛⠚⠹⠊⠀⠞⠄⠈⠉⠀⠺⠄⠭⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+    True
+    '''
+    bm = tinyNotation.TinyNotationStream("r2 d'#8 c'#8 b4.~ b8 d'#8 g'#8 g'#4. f'#4 r8 e'4.~ e'8 d'#8 g#8 d'#4 c'#8 d'#4 r8 a#8 g#8 a#8 b8 a#8 b8\
+    c'#8 d'#8 e'8 f'#8 g'#8 a'#8 b'8 f'#8 d'#8 g'#8 e'8 b8 f'#4 d'#8 e'8 d'#8 c'#8 b8 f#8 d'#8 b4 f#8 d#8 f#8 b8 c'#4 a#8 b2.~ b4. r8", "6/8")
+    bm.insert(0, key.KeySignature(5))
+    bm.insert(0, tempo.TempoText("Con delicatezza"))
+    bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+    bm[-1].append(bar.Barline('final'))
+    bm[0].pop(4)
+    bm[0].padAsAnacrusis()
+    for measure in bm:
+        measure.number -= 1
+    return bm
+
+def drill8_4():
+    '''
+    >>> from music21.braille import translate
+    >>> inBraille = translate.partToBraille(drill8_4())
+    >>> inBraille[0] == "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠛⠗⠁⠵⠊⠕⠎⠕⠲⠀⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+    True
+    >>> inBraille[1] == "⠼⠁⠀⠸⠎⠄⠄⠓⠀⠟⠫⠱⠀⠫⠄⠛⠳⠫⠀⠩⠝⠱⠧⠀⠘⠎⠄⠄⠡⠚⠀⠩⠹⠄⠑⠫⠳⠀⠀⠀"
+    True
+    >>> inBraille[2] == "⠀⠀⠸⠻⠳⠪⠻⠀⠕⠄⠄⠭⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+    True
+    '''
+    bm = tinyNotation.TinyNotationStream("A2.. G8 F2 E4 D4 E4. F8 G4 E4 C#2 D4 r4 AA2.. BBn8 C#4. D8 E4 G4 F4 G4 A4 F4 D2.. r8", "4/4")
+    bm.insert(0, key.KeySignature(-1))
+    bm.insert(0, tempo.TempoText("Grazioso"))
+    bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+    bm[-1].append(bar.Barline('final'))
+    return bm
+
+def drill8_5():
+    '''
+    >>> from music21.braille import translate
+    >>> inBraille = translate.partToBraille(drill8_5())
+    >>> inBraille[0] == "⠀⠀⠀⠀⠀⠀⠀⠠⠃⠑⠝⠀⠍⠁⠗⠉⠁⠞⠕⠲⠀⠝⠶⠼⠁⠁⠃⠀⠣⠣⠸⠉⠀⠀⠀⠀⠀⠀⠀⠀"
+    True
+    >>> inBraille[1] == "⠼⠚⠀⠨⠻⠫⠀⠕⠺⠳⠀⠨⠏⠹⠐⠻⠀⠨⠟⠫⠱⠀⠝⠐⠻⠻⠀⠗⠻⠳⠀⠎⠨⠱⠹⠀⠺⠪⠺⠹"
+    True
+    >>> inBraille[2] == "⠀⠀⠨⠕⠫⠻⠀⠗⠫⠹⠀⠟⠱⠺⠀⠨⠏⠹⠐⠻⠀⠨⠕⠺⠺⠀⠝⠺⠹⠀⠱⠺⠹⠱⠀⠺⠹⠺⠪⠀"
+    True
+    >>> inBraille[3] == "⠀⠀⠐⠞⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+    True
+    '''
+    bm = tinyNotation.TinyNotationStream("r2 f'4 e'-4 d'2 b-4 g4 e'-2 c'4 f4 f'2 e'-4 d'4 c'2 f4 f4 g2 f4 g4\
+    a2 d'4 c'4 b-4 a4 b-4 c'4 d'2 e'-4 f'4 g'2 e'-4 c'4 f'2 d'4 b-4\
+    e'-2 c'4 f4 d'2 b-4 b-4 c'2 b-4 c'4 d'4 b-4 c'4 d'4 b-4 c'4 b-4 a4 b-2", "cut")
+    bm.insert(0, key.KeySignature(-2))
+    bm.insert(0, tempo.TempoText("Ben marcato"))
+    bm.insert(0, tempo.MetronomeMark(number = 112, referent = note.HalfNote()))
+    bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+    bm[-1].append(bar.Barline('final'))
+    bm[0].pop(5)
+    bm[0].padAsAnacrusis()
+    for measure in bm:
+        measure.number -= 1
     return bm
 
 #-------------------------------------------------------------------------------
+# Chapter 10: Changes of Signature; the Braille Music Hyphen, Asterisk, and 
+# Parenthesis; Clef Signs
+
 def example10_1():
     bm = stream.Part()
     
@@ -1157,7 +1242,6 @@ def example10_1():
     m2.append(meter.TimeSignature('2/4'))
     m2.append(note.Note('A-4'))
     m2.append(note.Note('G4'))
-    m2.append(bar.Barline('light-light'))
     bm.append(m2)
     
     m3 = stream.Measure(number = 3)
@@ -1175,7 +1259,6 @@ def example10_1():
     m4.append(note.Note('A-4'))
     m4.append(note.Note('G4'))
     m4.append(note.Note('F4'))
-    m4.append(bar.Barline('light-light'))
     bm.append(m4)
     
     m5 = stream.Measure(number = 5)
@@ -1190,10 +1273,18 @@ def example10_1():
     
     m6 = stream.Measure(number = 6)
     m6.append(note.Note('C4', quarterLength = 3.0))
-    m6.append(bar.Barline('final'))
     bm.append(m6)
 
-    bm.makeAccidentals()
+    bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+    bm[1].append(bar.Barline('double'))
+    bm[3].append(bar.Barline('double'))
+    bm[5].append(bar.Barline('final'))
+
+    for m in bm.getElementsByClass('Measure'):
+        print m.keySignature
+        print m.timeSignature
+        print
+    
     return bm
 
 #-------------------------------------------------------------------------------
@@ -1203,7 +1294,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    #t = translate.partToBraille(example6_8())
+    #t = translate.partToBraille(example10_1())
     #for i in sorted(t.keys()):
     #    print t[i]
     music21.mainTest(Test)
