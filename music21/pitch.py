@@ -2849,7 +2849,7 @@ class Pitch(music21.Music21Object):
                 self.octave = None
             return None
 
-    def simplifyEnharmonic(self, inPlace=False):
+    def simplifyEnharmonic(self, inPlace=False, mostCommon=False):
         '''
         Returns a new Pitch (or sets the current one if inPlace is True)
         that is either the same as the current pitch or has fewer
@@ -2859,8 +2859,18 @@ class Pitch(music21.Music21Object):
         algorithm that might take your piece far into the realm of
         double or triple flats or sharps.
         
+        
+        If mostCommon is set to true, then the most commonly used 
+        enharmonic spelling is chosen (that is, the one that appears
+        first in key signatures as you move away from C on the circle
+        of fifths).  Thus G-flat becomes F#, A# becomes B-flat,
+        D# becomes E-flat, D-flat becomes C#, G# and A-flat are left
+        alone.
+        
+        
         TODO: should be called automatically after ChromaticInterval
         transpositions.
+        
         
         >>> from music21 import *
         >>> p1 = pitch.Pitch("B#5")
@@ -2876,6 +2886,18 @@ class Pitch(music21.Music21Object):
         >>> p4 = p3.transpose(interval.Interval('-A5'))
         >>> p4.simplifyEnharmonic()
         F#2
+
+
+        Setting mostCommon = True simplifies enharmonics
+        even further.
+
+
+        >>> pList = [pitch.Pitch("A#4"), pitch.Pitch("B-4"), pitch.Pitch("G-4"), pitch.Pitch("F#4")]
+        >>> [p.simplifyEnharmonic(mostCommon = True) for p in pList]
+        [B-4, B-4, F#4, F#4]
+
+
+
 
         
         Note that pitches with implicit octaves retain their implicit octaves.
@@ -2911,6 +2933,22 @@ class Pitch(music21.Music21Object):
                 returnObj.ps = self.ps
                 if saveOctave is None:
                     returnObj.octave = None
+
+        if mostCommon == True:
+            if returnObj.name == 'D#':
+                returnObj.step = 'E'
+                returnObj.accidental = Accidental('flat')
+            elif returnObj.name == 'A#':
+                returnObj.step = 'B'
+                returnObj.accidental = Accidental('flat')
+            elif returnObj.name == 'G-':
+                returnObj.step = 'F'
+                returnObj.accidental = Accidental('sharp')
+            elif returnObj.name == 'D-':
+                returnObj.step = 'C'
+                returnObj.accidental = Accidental('sharp')
+        
+        
         if inPlace:
             return None
         else:

@@ -658,7 +658,8 @@ class AbstractDiatonicScale(AbstractScale):
         else:
             raise ScaleException('cannot create a scale of the following mode:' % mode)
         self._net = intervalNetwork.BoundIntervalNetwork(intervalList, 
-                    octaveDuplicating=self.octaveDuplicating)
+                    octaveDuplicating=self.octaveDuplicating,
+                    pitchSimplification=None)
 
 
 class AbstractOctatonicScale(AbstractScale):
@@ -693,7 +694,8 @@ class AbstractOctatonicScale(AbstractScale):
         else:
             raise ScaleException('cannot create a scale of the following mode:' % mode)
         self._net = intervalNetwork.BoundIntervalNetwork(intervalList,
-                                octaveDuplicating=self.octaveDuplicating)
+                                octaveDuplicating=self.octaveDuplicating,
+                                pitchSimplification='maxAccidental')
         # might also set weights for tonic and dominant here
 
 
@@ -716,7 +718,8 @@ class AbstractHarmonicMinorScale(AbstractScale):
         self.tonicDegree = 1
         self.dominantDegree = 5
         self._net = intervalNetwork.BoundIntervalNetwork(intervalList, 
-                        octaveDuplicating=self.octaveDuplicating)
+                        octaveDuplicating=self.octaveDuplicating,
+                        pitchSimplification=None)
 
         # raise the seventh in all directions
         # 7 here is scale step/degree, not node id
@@ -785,7 +788,8 @@ class AbstractMelodicMinorScale(AbstractScale):
 #                 )
 
         self._net = intervalNetwork.BoundIntervalNetwork(
-                        octaveDuplicating=self.octaveDuplicating)
+                        octaveDuplicating=self.octaveDuplicating,
+                        pitchSimplification=None)
         # using representation stored in interval network
         #self._net.fillArbitrary(nodes, edges)
         self._net.fillMelodicMinor()
@@ -934,7 +938,8 @@ class AbstractRagAsawari(AbstractScale):
                 )
 
         self._net = intervalNetwork.BoundIntervalNetwork(
-                        octaveDuplicating=self.octaveDuplicating)
+                        octaveDuplicating=self.octaveDuplicating,
+                        pitchSimplification='mostCommon')
         # using representation stored in interval network
         self._net.fillArbitrary(nodes, edges)
 
@@ -1018,7 +1023,8 @@ class AbstractRagMarwa(AbstractScale):
                 )
 
         self._net = intervalNetwork.BoundIntervalNetwork(
-                        octaveDuplicating=self.octaveDuplicating)
+                        octaveDuplicating=self.octaveDuplicating,
+                        )
         # using representation stored in interval network
         self._net.fillArbitrary(nodes, edges)
 
@@ -1075,7 +1081,8 @@ class AbstractWeightedHexatonicBlues(AbstractScale):
 
         self._net = intervalNetwork.BoundIntervalNetwork(
                         octaveDuplicating=self.octaveDuplicating, 
-                        deterministic=self.deterministic)
+                        deterministic=self.deterministic,
+                        pitchSimplification='simplifyEnharmonic')
         # using representation stored in interval network
         self._net.fillArbitrary(nodes, edges)
 
@@ -2402,9 +2409,9 @@ class ChromaticScale(ConcreteScale):
     >>> from music21 import *
     >>> sc = scale.ChromaticScale('g2') 
     >>> sc.pitches
-    [G2, A-2, A2, B-2, C-3, C3, D-3, D3, E-3, F-3, F3, G-3, G3]
+    [G2, A-2, A2, B-2, B2, C3, C#3, D3, E-3, E3, F3, F#3, G3]
     >>> sc.getPitches('g2', 'g6') 
-    [G2, A-2, A2, B-2, C-3, C3, D-3, D3, E-3, F-3, F3, G-3, G3, A-3, A3, B-3, C-4, C4, D-4, D4, E-4, F-4, F4, G-4, G4, A-4, A4, B-4, C-5, C5, D-5, D5, E-5, F-5, F5, G-5, G5, A-5, A5, B-5, C-6, C6, D-6, D6, E-6, F-6, F6, G-6, G6]
+    [G2, A-2, A2, B-2, B2, C3, C#3, D3, E-3, E3, F3, F#3, G3, A-3, A3, B-3, B3, C4, C#4, D4, E-4, E4, F4, F#4, G4, A-4, A4, B-4, B4, C5, C#5, D5, E-5, E5, F5, F#5, G5, A-5, A5, B-5, B5, C6, C#6, D6, E-6, E6, F6, F#6, G6]
     >>> sc.abstract.getDegreeMaxUnique()
     12
     >>> sc.pitchFromDegree(1) 
@@ -2416,7 +2423,7 @@ class ChromaticScale(ConcreteScale):
     >>> sc.pitchFromDegree(8) 
     D3
     >>> sc.pitchFromDegree(12) 
-    G-3
+    F#3
     >>> sc.getScaleDegreeFromPitch('g2', comparisonAttribute='pitchClass')
     1
     >>> sc.getScaleDegreeFromPitch('F#6', comparisonAttribute='pitchClass')
@@ -2426,6 +2433,7 @@ class ChromaticScale(ConcreteScale):
         ConcreteScale.__init__(self, tonic=tonic)
         self._abstract = AbstractCyclicalScale(mode=['m2','m2','m2',
             'm2','m2','m2', 'm2','m2','m2','m2','m2','m2'])
+        self._abstract._net.pitchSimplification = 'mostCommon'
         self.type = 'Chromatic'
 
 
@@ -3404,7 +3412,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
     def testChromaticScaleA(self):
 
         cs = ChromaticScale('c4')
-        self.assertEqual(str(cs.pitches), '[C4, D-4, D4, E-4, F-4, F4, G-4, G4, A-4, A4, B-4, C-5, C5]')
+        self.assertEqual(str(cs.pitches), '[C4, C#4, D4, E-4, E4, F4, F#4, G4, A-4, A4, B-4, B4, C5]')
         
 
 #-------------------------------------------------------------------------------

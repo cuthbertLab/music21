@@ -26,24 +26,28 @@ users of 64-bit windows and 64-bit python should download the amd64 port
  
 
 '''
-###
-# to download pyaudio for windows 64-bit go to http://www.lfd.uci.edu/~gohlke/pythonlibs/
-# users of 64-bit windows but 32-bit python should download the win32 port
-# users of 64-bit windows and 64-bit python should download the amd64 port
-# requires portaudio to be installed http://www.portaudio.com/download.html
-
-try:
-    import pyaudio
-    recordFormat = pyaudio.paInt16
-except ImportError:
-    pyaudio = None # will raise an error when called below
-    recordFormat = None
-
 import time
 import unittest, doctest
 import wave
 import music21
 from music21 import common
+
+
+_missingImport = []
+
+###
+# to download pyaudio for windows 64-bit go to http://www.lfd.uci.edu/~gohlke/pythonlibs/
+# users of 64-bit windows but 32-bit python should download the win32 port
+# users of 64-bit windows and 64-bit python should download the amd64 port
+# requires portaudio to be installed http://www.portaudio.com/download.html
+try:
+    import pyaudio
+    recordFormat = pyaudio.paInt16
+except ImportError:
+    pyaudio = None
+    recordFormat = 8 # pyaudio.paInt16
+
+    _missingImport.append('pyaudio')
 
 recordChannels = 1
 recordSampleRate = 44100
@@ -126,7 +130,7 @@ _DOC_ORDER = []
 
 
 if __name__ == "__main__":
-    music21.mainTest(TestExternal, 'noDocTest')
+    music21.mainTest(Test, 'noDocTest')
 
 
 #------------------------------------------------------------------------------

@@ -364,10 +364,22 @@ class BoundIntervalNetwork(IntervalNetwork):
 
     The `deterministic` boolean, if defined, can be used to declare that there 
     is no probabilistic or multi-pathway segments of this network. 
+    
+    
+    The `pitchSimplification` method specifies how to simplify the pitches
+    if they spiral out into double and triple sharps, etc.  The default is
+    'maxAccidental' which specifies that each note can have at most one
+    accidental; double-flats and sharps are not allowed.  The other choices
+    are 'simplifyEnharmonic' (which also converts C-, F-, B#, and E# to
+    B, E, C, and F respectively, see :meth:`~music21.pitch.Pitch.simplifyEnharmonic),
+    'mostCommon' (which adds to simplifyEnharmonic the requirement that the
+    most common accidential forms be used, so A# becomes B-, G- becomes 
+    F#, etc. the only ambiguity allowed is that both G# and A- are acceptable),
+    and None (or 'none') which does not do any simplification.
     '''
 
     def __init__(self, edgeList=None, octaveDuplicating=False, 
-            deterministic=True):
+            deterministic=True, pitchSimplification='maxAccidental'):
         IntervalNetwork.__init__(self)
 
         # store each edge with and index that is incremented when added
@@ -388,6 +400,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         # define if pitches duplicate each octave
         self.octaveDuplicating = octaveDuplicating
         self.deterministic = deterministic
+
+        self.pitchSimplification = pitchSimplification  # could be 'simplifyEnharmonic', 'mostCommon' or None 
 
         # store segments
         self._ascendingCache = {}
@@ -1083,7 +1097,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
             if match:
                 #environLocal.printDebug(['matched direction', direction])
-                pPost = alteredDegrees[n.degree]['interval'].transposePitch(p, maxAccidental=1)
+                pPost = self.transposePitchAndApplySimplification(alteredDegrees[n.degree]['interval'], p)
                 return pPost
         # return pitch unaltered
         else:
@@ -1099,8 +1113,8 @@ class BoundIntervalNetwork(IntervalNetwork):
             #TODO: need to take direction into account
             # do reverse transposition
             if nodeObj.degree in alteredDegrees.keys():
-                p = alteredDegrees[nodeObj.degree][
-                    'interval'].reverse().transposePitch(pitchObj, maxAccidental=1)
+                p = self.transposePitchAndApplySimplification(
+                            alteredDegrees[nodeObj.degree]['interval'].reverse(), pitchObj)
                 return p
 
         return None
@@ -1199,9 +1213,9 @@ class BoundIntervalNetwork(IntervalNetwork):
 
             # for now, only taking first edge
             if direction == DIRECTION_ASCENDING:
-                p = intervalObj.transposePitch(p, maxAccidental=1)
+                p = self.transposePitchAndApplySimplification(intervalObj, p)
             else:
-                p = intervalObj.reverse().transposePitch(p, maxAccidental=1)
+                p = self.transposePitchAndApplySimplification(intervalObj.reverse(), p)
             pCollect = self._processAlteredNodes(alteredDegrees=alteredDegrees, 
                        n=n, p=p, direction=direction)
 
@@ -1345,7 +1359,7 @@ class BoundIntervalNetwork(IntervalNetwork):
                 intervalObj = postEdge[0].interval # get first
                 n = postNode[0] # n is passed on
 
-            p = intervalObj.transposePitch(p, maxAccidental=1)
+            p = self.transposePitchAndApplySimplification(intervalObj, p)
             pCollect = p
 
             pCollect = self._processAlteredNodes(alteredDegrees=alteredDegrees, 
@@ -1497,7 +1511,7 @@ class BoundIntervalNetwork(IntervalNetwork):
                 intervalObj = postEdge[0].interval # get first
                 n = postNode[0] # n is passed on
 
-            p = intervalObj.reverse().transposePitch(p, maxAccidental=1)
+            p = self.transposePitchAndApplySimplification(intervalObj.reverse(), p)
             pCollect = self._processAlteredNodes(alteredDegrees=alteredDegrees, 
                        n=n, p=p, direction=DIRECTION_DESCENDING)
 
@@ -2489,6 +2503,75 @@ class BoundIntervalNetwork(IntervalNetwork):
         sortList.reverse() # want most amtches first
         return sortList[:resultsReturned]  
 
+    def transposePitchAndApplySimplification(self, intervalObj, pitchObj):
+        '''
+        transposes the pitch according to the given interval object and
+        uses the simplification of the `pitchSimplification` property
+        to simplify it afterwards.
+        
+        
+        
+        >>> from music21 import *
+        >>> b = intervalNetwork.BoundIntervalNetwork()
+        >>> b.pitchSimplification # default
+        'maxAccidental' 
+        >>> i = interval.Interval('m2')
+        >>> p = pitch.Pitch("C4")
+        >>> allPitches = []
+        >>> for j in range(15):
+        ...    p = b.transposePitchAndApplySimplification(i, p)
+        ...    allPitches.append(p)
+        >>> allPitches
+        [D-4, D4, E-4, F-4, F4, G-4, G4, A-4, A4, B-4, C-5, C5, D-5, D5, E-5]
+        
+        
+        >>> b.pitchSimplification = 'mostCommon'
+        >>> p = pitch.Pitch("C4")
+        >>> allPitches = []
+        >>> for j in range(15):
+        ...    p = b.transposePitchAndApplySimplification(i, p)
+        ...    allPitches.append(p)
+        >>> allPitches
+        [C#4, D4, E-4, E4, F4, F#4, G4, A-4, A4, B-4, B4, C5, C#5, D5, E-5]
+
+
+        PitchSimplifcation can also be specified in the creation of the BoundIntervalNetwork object
+
+
+        >>> b = intervalNetwork.BoundIntervalNetwork(pitchSimplification = None)
+        >>> p = pitch.Pitch("C4")
+        >>> allPitches = []
+        >>> for j in range(5):
+        ...    p = b.transposePitchAndApplySimplification(i, p)
+        ...    allPitches.append(p)
+        >>> allPitches
+        [D-4, E--4, F--4, G---4, A----4]
+
+
+
+        Note that beyond quadruple flats or sharps, pitchSimplification is automatic:
+        
+        
+        >>> p
+        A----4
+        >>> b.transposePitchAndApplySimplification(i, p)
+        F#4
+
+
+        '''
+        if self.pitchSimplification == 'maxAccidental':
+            pPost = intervalObj.transposePitch(pitchObj, maxAccidental=1)
+        else:
+            pPost = intervalObj.transposePitch(pitchObj)
+            if self.pitchSimplification == 'simplifyEnharmonic':
+                pPost.simplifyEnharmonic(inPlace = True)
+            elif self.pitchSimplification == 'mostCommon':
+                pPost.simplifyEnharmonic(inPlace = True, mostCommon = True)
+            elif self.pitchSimplification == 'none' or self.pitchSimplification == None:
+                pass
+            else:
+                raise IntervalNetworkException('unknown pitchSimplification type %s, allowable values are "maxAccidental" (default), "simplifyEnharmonic", "mostCommon", or None (or "none")' % self.simplifyEnharmonic)
+        return pPost
 
 
 

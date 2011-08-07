@@ -81,6 +81,11 @@ try:
 except ImportError:
     _missingImport.append('PIL')
 
+try:
+    import pyaudio
+except ImportError:
+    _missingImport.append('pyaudio')
+
 # try:
 #     import abjad
 # except ImportError:

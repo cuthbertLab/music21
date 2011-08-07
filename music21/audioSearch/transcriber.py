@@ -13,11 +13,20 @@
 
 import copy
 import math
-import matplotlib.pyplot
-
 import random
 import sys
 from time import time
+
+_missingImport = []
+try:
+    import matplotlib.pyplot
+except ImportError:
+    _missingImport.append('matplotlib')
+
+if len(_missingImport) > 0:
+    if environLocal['warnings'] in [1, '1', True]:
+        pass
+        #environLocal.warn(common.getMissingImportStr(_missingImport), header='music21:')
 
 # note to Jordi -- music21 modules cannot import * -- only in docs
 from music21 import environment

@@ -1,5 +1,17 @@
 from music21 import *
-import numpy
+
+_missingImport = []
+
+try:
+    import numpy
+except ImportError:
+    _missingImport.append('numpy')
+
+if len(_missingImport) > 0:
+    if environLocal['warnings'] in [1, '1', True]:
+        pass
+        #environLocal.warn(common.getMissingImportStr(_missingImport), header='music21:')
+
 import time
 
 def recognizeLuca():

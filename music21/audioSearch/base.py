@@ -12,12 +12,7 @@
 
 import copy
 import math
-import matplotlib.mlab # for find
-import matplotlib.pyplot
 import wave
-import numpy
-
-import scipy.signal 
 import unittest, doctest
 
 import music21.scale
@@ -30,6 +25,29 @@ environLocal = environment.Environment(_MOD)
 
 audioChunkLength = 1024
 recordSampleRate = 44100
+
+_missingImport = []
+try:
+    import matplotlib.mlab # for find
+    import matplotlib.pyplot
+except ImportError:
+    _missingImport.append('matplotlib')
+
+try:    
+    import numpy
+except ImportError:
+    _missingImport.append('numpy')
+
+try:
+    import scipy.signal 
+except ImportError:
+    _missingImport.append('scipy')
+
+if len(_missingImport) > 0:
+    if environLocal['warnings'] in [1, '1', True]:
+        pass
+        #environLocal.warn(common.getMissingImportStr(_missingImport), header='music21:')
+
 
 
 def freq_from_autocorr(sig, fs):
@@ -162,7 +180,7 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
     ...      print normalizeInputFrequency(fq, thresholds, pitches)
     (440.0, A4)
     (523.25113..., C5)
-    (277.18263..., D-5)
+    (277.18263..., C#5)
     (293.66476..., D5)
     '''
     if ((thresholds is None and pitches is not None)
