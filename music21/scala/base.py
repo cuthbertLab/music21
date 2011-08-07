@@ -22,6 +22,10 @@ To create a :class:`~music21.scale.ScalaScale` instance, simply provide a root p
 >>> mbiraScales = scala.search('mbira')
 >>> mbiraScales
 ['mbira_banda.scl', 'mbira_banda2.scl', 'mbira_gondo.scl', 'mbira_kunaka.scl', 'mbira_kunaka2.scl', 'mbira_mude.scl', 'mbira_mujuru.scl', 'mbira_zimb.scl']
+
+
+Most people
+
 >>> sc = scale.ScalaScale('a4', mbiraScales[0])
 >>> sc.pitches
 [A4, B4(-15c), C#5(-11c), D#5(-7c), E~5(+6c), F#5(+14c), G~5(+1c), B-5(+2c)]
@@ -356,14 +360,17 @@ def parse(target):
     >>> [str(i) for i in ss.getIntervalSequence()]
     ['<music21.interval.Interval m2 (+14c)>', '<music21.interval.Interval M2 (+36c)>', '<music21.interval.Interval M2>', '<music21.interval.Interval m2 (+37c)>', '<music21.interval.Interval M2 (-49c)>', '<music21.interval.Interval M2 (-6c)>', '<music21.interval.Interval M2 (-36c)>']
 
-    >>> scala.parse('junk') == None
+
+    >>> scala.parse('incorrectFileName.scl') == None
     True
+
 
     >>> ss = scala.parse('barbourChrom1')
     >>> ss.description
     u"Barbour's #1 Chromatic"
     >>> ss.fileName
     'barbour_chrom1.scl'
+
 
     >>> ss = scala.parse('blackj_gws.scl')
     >>> ss.description

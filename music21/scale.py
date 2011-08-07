@@ -1081,8 +1081,7 @@ class AbstractWeightedHexatonicBlues(AbstractScale):
 
         self._net = intervalNetwork.BoundIntervalNetwork(
                         octaveDuplicating=self.octaveDuplicating, 
-                        deterministic=self.deterministic,
-                        pitchSimplification='simplifyEnharmonic')
+                        deterministic=self.deterministic,)
         # using representation stored in interval network
         self._net.fillArbitrary(nodes, edges)
 
@@ -2499,14 +2498,44 @@ class SieveScale(ConcreteScale):
 
 
 class ScalaScale(ConcreteScale):
-    '''A scale created from a Scala scale .scl file. Any file in the Scala archive can be given by name. Additionally, a file path to a Scala .scl file, or a raw string representation, can be used. 
+    '''
+    A scale created from a Scala scale .scl file. Any file 
+    in the Scala archive can be given by name. Additionally, a file 
+    path to a Scala .scl file, or a raw string representation, can be used. 
+
 
     >>> sc = ScalaScale('g4', 'mbira banda')
     >>> sc.pitches
     [G4, A4(-15c), B4(-11c), C#5(-7c), D~5(+6c), E5(+14c), F~5(+1c), A-5(+2c)]
 
+
+    if only a single string is given and it's too long to be a tonic
+    or it ends in .scl, assume it's the name of a scala scale and
+    set the tonic to C4
+
+
+    >>> sc = ScalaScale('pelog_9')
+    >>> sc.pitches
+    [C4, D`4(-17c), D~4(+17c), F~4(-17c), G`4(+17c), A-4, A~4(-17c), C5]
+
+
+    If no scale with that name can be found then it raises an exception:
+
+
+    >>> sc = ScalaScale('badFileName.scl')
+    Traceback (most recent call last):
+    ScaleException: Could not find a file named badFileName.scl in the scala database
+
     '''
     def __init__(self, tonic=None, scalaString=None):
+        if (tonic is not None and scalaString is None and common.isStr(tonic) 
+            and (len(tonic) >= 4 or tonic.endswith('scl')) ):
+            # just a scale was wanted
+            scalaString = tonic
+            tonic = 'C4'
+             
+        
+        
         ConcreteScale.__init__(self, tonic=tonic)
 
         self._scalaStorage = None
@@ -2521,7 +2550,10 @@ class ScalaScale(ConcreteScale):
             # try to load a named scale from a file path or stored
             # on the scala archive
             # returns None or a scala storage object
-            self._scalaStorage = scala.parse(scalaString)
+            readFile = scala.parse(scalaString)
+            if readFile is None:
+                raise ScaleException("Could not find a file named %s in the scala database" % scalaString)
+            self._scalaStorage = readFile
         else: # grab a default
             self._scalaStorage = scala.parse('fj-12tet.scl')    
         self._abstract = AbstractCyclicalScale(

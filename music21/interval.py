@@ -1125,12 +1125,14 @@ class ChromaticInterval(music21.Music21Object):
         '''Given a Chromatic interval, return a Diatonic interval object of the
         same size. 
         
+        
         While there is more than one Generic Interval for any given chromatic 
         interval, this is needed to to permit easy chromatic specification of 
         Interval objects.  No augmented or diminished intervals are returned
         except for for interval of 6 which returns a diminished fifth, not
         augmented fourth.
 
+        
         >>> from music21 import *
 
         >>> aInterval = interval.ChromaticInterval(5)
@@ -1154,6 +1156,33 @@ class ChromaticInterval(music21.Music21Object):
         specifier, generic = convertSemitoneToSpecifierGeneric(self.semitones)
         return DiatonicInterval(specifier, generic)
     
+    def transposePitch(self, p, reverse=False, clearAccidentalDisplay=True):
+        '''Given a :class:`~music21.pitch.Pitch`  object, return a new, 
+        transposed Pitch, that is transformed 
+        according to this ChromaticInterval. 
+
+
+        Because ChromaticIntervals do not take into account diatonic spelling,
+        the new Pitch is simplified to the most common intervals.  See
+        :meth:`~music21.pitch.Pitch.simplifyEnharmonic` with mostCommon = True
+        to see the results.
+        
+        
+        >>> from music21 import *
+        >>> ci = interval.ChromaticInterval(6)
+        >>> p = pitch.Pitch("E#4")
+        >>> p2 = ci.transposePitch(p)
+        >>> p2
+        B4
+        >>> p3 = ci.transposePitch(p2)
+        >>> p3
+        F5
+        '''
+        pps = p.ps
+        newPitch = copy.deepcopy(p)
+        newPitch.ps = pps + self.semitones
+        return newPitch
+
 
 #-------------------------------------------------------------------------------
 def _stringToDiatonicChromatic(value):
