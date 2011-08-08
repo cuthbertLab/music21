@@ -64,7 +64,6 @@ def convertTempoByReferent(numberSrc, quarterLengthBeatSrc,
     45.0
     >>> tempo.convertTempoByReferent(60, 1.5, 1/3.) # 60 at dotted quarter, get trip
     270.0
-
     '''
     # find duration in seconds of of quarter length
     srcDurPerBeat = 60.0 / numberSrc
@@ -80,7 +79,7 @@ def convertTempoByReferent(numberSrc, quarterLengthBeatSrc,
 
 def convertTempoByNumber(numberSrc, quarterLengthBeatSrc, 
                        numberDst):
-    '''Convert between equivalent tempi, where the speed stays the same but the beat referent and number chnage.
+    '''Convert between equivalent tempi, where the speed stays the same but the beat referent and number change.
     '''
     pass
 
@@ -220,7 +219,9 @@ class MetronomeMark(TempoIndication):
     '''
     A way of specifying a particular tempo with a text string, a referent (a duration) and a number.
 
-    The `referent` attribute is a Duration object. As this object is a Music21Object, it also has a .duration property object.
+    The `referent` attribute is a Duration object, or a string duration type or a floating-point quarter-length value used to create a Duration.
+
+    MetronomeMarks, as Music21Object subclasses, also have .duration object property independent of the `referent`. 
     
     The `text` attribute will usually return a unicode string.  If you use "from __future__ import unicode_literals" this
     will not be a problem at all.
@@ -274,7 +275,6 @@ class MetronomeMark(TempoIndication):
     144
 
     '''
-# 
 #     >>> tm3 = music21.tempo.TempoText("extremely, wicked fast!")
 #     >>> tm3.number
 #     90
@@ -294,7 +294,6 @@ class MetronomeMark(TempoIndication):
             self.text = text
 
         self.parentheses = parentheses 
-
 
         self._referent = None # set with property
         if referent is None: 
@@ -572,7 +571,7 @@ class MetronomeMark(TempoIndication):
                 numberImplicit=self.numberImplicit)
 
     #--------------------------------------------------------------------------
-    def getEquivalentByReferent(self, durationOrQuarterLength):
+    def getEquivalentByReferent(self, referent):
         '''Return a new MetronomeMark object that has an equivalent speed but different number and referent values based on a supplied quarterLength.
 
         >>> from music21 import *
@@ -582,10 +581,13 @@ class MetronomeMark(TempoIndication):
         >>> mm1.getEquivalentByReferent(duration.Duration('half'))
         <music21.tempo.MetronomeMark Half=30.0>
         '''
-        if common.isNum(durationOrQuarterLength): # assume quarter length
-            quarterLength = durationOrQuarterLength 
+        if common.isNum(referent): # assume quarter length
+            quarterLength = referent 
+        elif common.isStr(referent): # try to get quarter len    
+            d = duration.Duration(referent)
+            quarterLength = d.quarterLength
         else: # TODO: test if a Duration
-            quarterLength = durationOrQuarterLength.quarterLength
+            quarterLength = referent.quarterLength
             
         newNumber = convertTempoByReferent(self.number, 
                         self.referent.quarterLength, quarterLength)
@@ -594,11 +596,17 @@ class MetronomeMark(TempoIndication):
                              referent=duration.Duration(quarterLength))
 
 
-    def getEquivalentByNumber(self, durationOrQuarterLength):
+    def getEquivalentByNumber(self, number):
         '''Return a new MetronomeMark object that has an equivalent speed but different number and referent values based on a supplied tempo number.
 
         '''
         pass
+
+    def getMaintainedNumberWithReferent(self, referent):
+        '''Return a new MetronomeMark object that has an equivalent number but a new referent.
+        '''
+        return MetronomeMark(text=self.text, number=self.number, 
+                             referent=referent)
 
 #-------------------------------------------------------------------------------
 class MetricModulation(TempoIndication):
@@ -630,7 +638,8 @@ class MetricModulation(TempoIndication):
     def _setLeftMetronome(self, value):
         if value is None:
             pass # allow setting as None
-        elif not isinstance(value, MetronomeMark):
+        elif not isinstance(value, (MetronomeMark, 
+                                    music21.tempo.MetronomeMark)):
             raise TempoException('leftMetronome property must be set with a MetronomeMark instance')
         self._leftMetronome = value
 
@@ -655,7 +664,8 @@ class MetricModulation(TempoIndication):
     def _setRightMetronome(self, value):
         if value is None:
             pass # allow setting as None
-        elif not isinstance(value, MetronomeMark):
+        elif not isinstance(value, (MetronomeMark, 
+                                    music21.tempo.MetronomeMark)):
             raise TempoException('rightMetronome property must be set with a MetronomeMark instance')
         self._rightMetronome = value
 
@@ -679,7 +689,7 @@ class MetricModulation(TempoIndication):
 
 
 
-    def setEqualityByReferent(self, side=None, durationOrQuarterLength=1.0):
+    def setEqualityByReferent(self, side=None, referent=1.0):
         '''Set the other side of the metric modulation to an equality; side can be specified, or of one side is None, that side will be set.  
 
         >>> from music21 import *
@@ -701,12 +711,27 @@ class MetricModulation(TempoIndication):
 
         if side == 'right':
             self._rightMetronome = self._leftMetronome.getEquivalentByReferent(
-                                   durationOrQuarterLength)
+                                   referent)
         elif side == 'left':
             self._leftMetronome = self._rightMetronome.getEquivalentByReferent(
-                                   durationOrQuarterLength)
+                                   referent)
         
 
+    def setOtherByReferent(self, side=None, referent=1.0):
+        '''Set the other side of the metric modulation not based on equality, but on a direct translation of tempo. 
+        '''
+        if side is None:
+            if self._leftMetronome is None:
+                side = 'left'
+            elif self._rightMetronome is None:
+                side = 'right'
+        if side not in ['left', 'right']:
+            raise TempoException('cannot set equality for a side of %s' % side)
+        if side == 'right':
+            self._rightMetronome = self._leftMetronome.getMaintainedNumberWithReferent(referent)
+        elif side == 'left':
+            self._leftMetronome = self._rightMetronome.getMaintainedNumberWithReferent(referent)
+        
         
 
 
@@ -935,6 +960,34 @@ class Test(unittest.TestCase):
         self.assertEqual(mm.textImplicit, False)
 
 
+
+
+    def testMetronomeModulationA(self):
+        # need to create a mm without a speed
+        from music21 import tempo
+
+        # want to say that an eighth is becoming the speed of a sixteenth
+        mm1 = tempo.MetronomeMark(referent=.5, number=120)
+        mm2 = tempo.MetronomeMark(referent='16th')
+        
+        mmod1 = MetricModulation()
+        mmod1.leftMetronome = mm1
+        mmod1.rightMetronome = mm2
+        
+        # this works, but the new value is set to None
+        self.assertEqual(str(mmod1), '<music21.tempo.MetricModulation <music21.tempo.MetronomeMark Eighth=120>=<music21.tempo.MetronomeMark 16th=None>>')
+
+        # we can get the same result by using setEqualityByReferent()
+        mm1 = tempo.MetronomeMark(referent=.5, number=120)
+        mmod1 = MetricModulation()
+        mmod1.leftMetronome = mm1
+        # will automatically set right mm, as presently is None
+        mmod1.setOtherByReferent(referent='16th')
+        # should get the same result as above, but with defined value
+        self.assertEqual(str(mmod1), '<music21.tempo.MetricModulation <music21.tempo.MetronomeMark Eighth=120>=<music21.tempo.MetronomeMark 16th=120>>')
+        # the effective speed as been slowed by this modulation
+        self.assertEqual(mmod1.leftMetronome.getQuarterBPM(), 60.0)
+        self.assertEqual(mmod1.rightMetronome.getQuarterBPM(), 30.0)
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

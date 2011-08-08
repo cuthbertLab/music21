@@ -3271,6 +3271,19 @@ spirit</words>
 
 
 
+    def testMetricModulationA(self):
+        
+        from music21.musicxml import testPrimitive
+        from music21 import converter, repeat
+
+        # has metronome marks defined, not with sound tag
+#         s = converter.parse(testPrimitive.metronomeMarks31c)
+#         # get all tempo indications
+#         mms = s.flat.getElementsByClass('TempoIndication')
+#         self.assertEqual(len(mms) > 3, True)
+
+        #s.show()
+
     def testImportGraceNotesA(self):
         # test importing from muscixml
         from music21.musicxml import testPrimitive
