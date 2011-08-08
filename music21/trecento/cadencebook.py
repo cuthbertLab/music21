@@ -618,7 +618,7 @@ class TestExternal(unittest.TestCase):
 #       TODO: Make FrontPaddedCadence a subclass of Score!
 #        fpc1.show()
 
-    def testVirelais(self):
+    def xtestVirelais(self):
         '''
         test showing a virelai's incipit to see if it works
         '''
@@ -627,6 +627,16 @@ class TestExternal(unittest.TestCase):
         if thisVirelai.title != "":
             print thisVirelai.title
             thisVirelai.incipit.asScore().show('musicxml')
+    
+    def testRondeaux(self):
+        '''
+        test showing a rondeaux's incipit to see if it works
+        '''
+        rondeauxSheet = TrecentoSheet(sheetname = 'rondeaux')
+        thisRondeaux = rondeauxSheet.makeWork(41)
+        if thisRondeaux.title != "":
+            print thisRondeaux.title
+            thisRondeaux.incipit.asScore().show('musicxml')
 
         
 
