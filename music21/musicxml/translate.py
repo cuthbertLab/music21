@@ -117,27 +117,35 @@ def tempoIndicationToMx(ti):
     # storing lists to accomodate metric modulations
     durs = [] # duration objects
     numbers = [] # tempi
-    hideNumericalMetro = [] # if numbers implicit, hide metro; a lost
+    hideNumericalMetro = False # if numbers implicit, hide metro
+    hideNumber = [] # hide the number after equal, e.g., quarter=120, hide 120
     # store the last value necessary as a sounding tag in bpm
-    soundingQuarterBPM = None 
+    soundingQuarterBPM = False 
     if 'MetronomeMark' in ti.classes:
         # will not show a number of implicit
         if ti.numberImplicit or ti.number is None:
             #environLocal.printDebug(['found numberImplict', ti.numberImplicit])
-            hideNumericalMetro.append(True) 
+            hideNumericalMetro = True
         else:
             durs.append(ti.referent)
             numbers.append(ti.number)
+            hideNumber.append(False)
         # determine number sounding; first, get from numberSounding, then
         # number (if implicit, that is fine); get in terms of quarter bpm
         soundingQuarterBPM = ti.getQuarterBPM()
         
     elif 'MetricModulation' in ti.classes:
-        pass
-        return []
-        # add two ti.referents from each contained
-        # check that len of numbers is == to len of durs; required here
+        # may need to reverse order if classical style or otherwise
+        # may want to show first number
+        hideNumericalMetro = False # must show for metric modulation
+        for sub in [ti.leftMetronome, ti.rightMetronome]:    
+            hideNumber.append(True) # cannot show numbers in a metric mod
+            durs.append(sub.referent)
+            numbers.append(sub.number)
         # soundingQuarterBPM should be obtained from the last MetronomeMark
+        soundingQuarterBPM = ti.rightMetronome.getQuarterBPM()
+
+        #environLocal.printDebug(['found metric modulation', ti, durs, numbers])
 
     mxComponents = []
     for i, d in enumerate(durs):
@@ -147,7 +155,10 @@ def tempoIndicationToMx(ti):
         for x in range(d.dots):
             mxComponents.append(musicxmlMod.BeatUnitDot())
         if len(numbers) > 0:
-            mxComponents.append(musicxmlMod.PerMinute(numbers[0]))
+            if not hideNumber[i]:
+                mxComponents.append(musicxmlMod.PerMinute(numbers[0]))
+
+    #environLocal.printDebug(['mxComponents', mxComponents])
 
     # store all accumulated mxDirection objects
     mxObjects = [] 
@@ -167,7 +178,6 @@ def tempoIndicationToMx(ti):
         # wrap in mxDirection
         mxDirectionType = musicxmlMod.DirectionType()
         mxDirectionType.append(mxMetro)
-
         mxDirection = musicxmlMod.Direction()
         mxDirection.append(mxDirectionType)
 
@@ -180,10 +190,12 @@ def tempoIndicationToMx(ti):
         mxObjects.append(mxDirection)    
 
     # if there is an explicit text entry, add to list of mxObjets
-    if ti.getTextExpression(returnImplicit=False) is not None:
-        mxDirection = textExpressionToMx(
-                      ti.getTextExpression(returnImplicit=False))
-        mxObjects.append(mxDirection)    
+    # for now, only getting text expressions for non-metric mods
+    if 'MetronomeMark' in ti.classes:
+        if ti.getTextExpression(returnImplicit=False) is not None:
+            mxDirection = textExpressionToMx(
+                          ti.getTextExpression(returnImplicit=False))
+            mxObjects.append(mxDirection)    
 
     return mxObjects
 
@@ -1771,15 +1783,14 @@ def measureToMx(m, spannerBundle=None):
 
             elif 'MetronomeMark' in classes or 'MetricModulation' in classes:
                 #environLocal.printDebug(['measureToMx: found:', obj])
-
                 # convert m21 offset to mxl divisions
                 mxOffset = int(defaults.divisionsPerQuarter * 
                            obj.getOffsetBySite(mFlat))
-                # get a lost of objects: may be a text expression + metro
+                # get a list of objects: may be a text expression + metro
                 mxList = tempoIndicationToMx(obj)
                 for mxDirection in mxList: # a list of mxdirections
                     mxDirection.offset = mxOffset 
-                    # use offset positioning, can insert at zero
+                    # uses internal offset positioning, can insert at zero
                     mxMeasure.insert(0, mxDirection)
                     #mxMeasure.componentList.append(mxObj)
 
@@ -3273,16 +3284,48 @@ spirit</words>
 
     def testMetricModulationA(self):
         
-        from music21.musicxml import testPrimitive
-        from music21 import converter, repeat
+        from music21 import stream, note, tempo
 
-        # has metronome marks defined, not with sound tag
-#         s = converter.parse(testPrimitive.metronomeMarks31c)
-#         # get all tempo indications
-#         mms = s.flat.getElementsByClass('TempoIndication')
-#         self.assertEqual(len(mms) > 3, True)
+        s = stream.Stream()
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note(duration=1), 4)    
+        mm1 = tempo.MetronomeMark(number=60.0)
+        m1.insert(0, mm1)
 
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note(duration=1), 4)    
+        # tempo.MetronomeMark(number=120.0)
+        mmod1 = tempo.MetricModulation()
+        # assign with an equivalent statement of the eight
+        mmod1.leftMetronome = mm1.getEquivalentByReferent(.5)
+        # set the other side of eq based on the desired  referent
+        mmod1.setOtherByReferent(referent='quarter')
+        m2.insert(0, mmod1)
+
+        m3 = stream.Measure()
+        m3.repeatAppend(note.Note(duration=1), 4)    
+        mmod2 = tempo.MetricModulation()
+        # assign with an equivalent statement of the eight
+        mmod2.leftMetronome = mmod1.rightMetronome.getEquivalentByReferent(1.5)
+        # set the other side of eq based on the desired  referent
+        mmod2.setOtherByReferent(referent=1)
+        m3.insert(0, mmod2)
+
+        s.append([m1, m2, m3])
+        raw = s.musicxml
+
+        match = '<sound tempo="60.0"/>'
+        self.assertEqual(raw.find(match) > 0, True)
+        match = '<per-minute>60.0</per-minute>'
+        self.assertEqual(raw.find(match) > 0, True)
+        match = '<sound tempo="120.0"/>'
+        self.assertEqual(raw.find(match) > 0, True)
+        match = '<sound tempo="80.0"/>'
+        self.assertEqual(raw.find(match) > 0, True)
+
+        #s.show('t')
         #s.show()
+
 
     def testImportGraceNotesA(self):
         # test importing from muscixml
