@@ -5034,7 +5034,7 @@ class Stream(music21.Music21Object):
         return False
 
     def makeNotation(self, meterStream=None, refStreamOrTimeRange=None,
-                        inPlace=False, **makeAccidentalsKeywords):
+                        inPlace=False, **subroutineKeywords):
         '''
         This method calls a sequence of Stream methods on this Stream to prepare notation, including creating Measures if necessary, creating ties, beams, and accidentals.
 
@@ -5053,6 +5053,8 @@ class Stream(music21.Music21Object):
         >>> sMeasures = s.makeNotation()
         >>> len(sMeasures.getElementsByClass('Measure'))
         4
+        >>> sMeasures.getElementsByClass('Measure')[-1].rightBarline.style
+        'final'
         '''
         # determine what is the object to work on first
         if inPlace:
@@ -5060,6 +5062,13 @@ class Stream(music21.Music21Object):
         else:
             measureStream = copy.deepcopy(self)
 
+        '''
+        if 'lastBarline' in subroutineKeywords:
+            lastBarlineType = subroutineKeywords['lastBarline']
+        else:
+            lastBarlineType = 'final'
+        '''
+        
         # only use inPlace arg on first usage
         if not self.hasMeasures():
             # if this is not inPlace, it will return a newStream; if  
@@ -5067,7 +5076,7 @@ class Stream(music21.Music21Object):
             # use inPlace=True, as already established above
             measureStream.makeMeasures(meterStream=meterStream,
                 refStreamOrTimeRange=refStreamOrTimeRange, 
-                inPlace=True)
+                inPlace=True)#, lastBarline = lastBarlineType)
           
         #environLocal.printDebug(['Stream.makeNotation(): post makeMeasures, length', len(measureStream)])
 
@@ -5092,10 +5101,10 @@ class Stream(music21.Music21Object):
                     m.makeAccidentals(
                         pitchPastMeasure=measureStream[i-1].pitches,
                         useKeySignature=ksLast, searchKeySignatureByContext=False, 
-                        lastNoteWasTied = lastNoteWasTied, **makeAccidentalsKeywords)
+                        lastNoteWasTied = lastNoteWasTied, **subroutineKeywords)
                 else:
                     m.makeAccidentals(useKeySignature=ksLast, 
-                        searchKeySignatureByContext=False, **makeAccidentalsKeywords)
+                        searchKeySignatureByContext=False, **subroutineKeywords)
 
         #environLocal.printDebug(['makeNotation(): meterStream:', meterStream, meterStream[0]])
         measureStream.makeTies(meterStream, inPlace=True)
@@ -9035,7 +9044,7 @@ class Measure(Stream):
             barlineObj.location = 'right'
 
         # if a repeat, setup direction if not assigned
-        if 'Repeat' in barlineObj.classes:
+        if barlineObj is not None and 'Repeat' in barlineObj.classes:
             #environLocal.printDebug(['got barline obj w/ direction', barlineObj.direction])
             if barlineObj.direction in ['start', None]:
                 barlineObj.direction = 'end'
@@ -9056,6 +9065,8 @@ class Measure(Stream):
         >>> from music21 import *
         >>> b = bar.Barline('final')
         >>> m = stream.Measure()
+        >>> print m.rightBarline
+        None
         >>> m.rightBarline = b
         >>> m.rightBarline.style
         'final'
