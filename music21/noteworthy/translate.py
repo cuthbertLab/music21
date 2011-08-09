@@ -329,6 +329,7 @@ def createClef(line, meas):
     >>> measureOut.show('text')
     {0.0} <music21.clef.TrebleClef>      
     '''  
+    currentclef = None
     i = 1
     octave = 0
     for word in line.split('|'):
@@ -381,6 +382,8 @@ def createClef(line, meas):
                     currentclef = "BASS8up"                   
                     #octave = 1                           
         i = i + 1
+    if currentclef is None:
+        raise NoteworthyTranslateException('Did not find a clef in line, %s' % line)
     return meas, currentclef
 
 def createKey(line, meas):
@@ -896,7 +899,7 @@ def parseList(data):
     totalscore = stream.Score()
     part = stream.Part()
     meas = stream.Measure()
-    currentclef = "G"
+    currentclef = "TREBLE"
     counter = 0
     fl = 0
     start = 0
