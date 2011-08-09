@@ -3291,7 +3291,7 @@ spirit</words>
         m1.repeatAppend(note.Note(duration=1), 4)    
         mm1 = tempo.MetronomeMark(number=60.0)
         m1.insert(0, mm1)
-
+        
         m2 = stream.Measure()
         m2.repeatAppend(note.Note(duration=1), 4)    
         # tempo.MetronomeMark(number=120.0)
@@ -3301,16 +3301,15 @@ spirit</words>
         # set the other side of eq based on the desired  referent
         mmod1.setOtherByReferent(referent='quarter')
         m2.insert(0, mmod1)
-
+        
         m3 = stream.Measure()
         m3.repeatAppend(note.Note(duration=1), 4)    
         mmod2 = tempo.MetricModulation()
-        # assign with an equivalent statement of the eight
         mmod2.leftMetronome = mmod1.rightMetronome.getEquivalentByReferent(1.5)
         # set the other side of eq based on the desired  referent
         mmod2.setOtherByReferent(referent=1)
         m3.insert(0, mmod2)
-
+        
         s.append([m1, m2, m3])
         raw = s.musicxml
 

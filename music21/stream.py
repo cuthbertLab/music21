@@ -5037,13 +5037,20 @@ class Stream(music21.Music21Object):
         >>> len(sMeasures.getElementsByClass('Measure'))
         4
         '''
-        # only use inPlace arg on first usage
-        measureStream = self.makeMeasures(meterStream=meterStream,
-                                          refStreamOrTimeRange=refStreamOrTimeRange, 
-                                          inPlace=inPlace)
-            
-        if inPlace == True:
+        # determine what is the object to work on first
+        if inPlace:
             measureStream = self
+        else:
+            measureStream = copy.deepcopy(self)
+
+        # only use inPlace arg on first usage
+        if not self.hasMeasures():
+            # if this is inPlace, it will return a newStream; if not 
+            # inPlace, this returns None
+            # use inPlace=True, as already established above
+            measureStream.makeMeasures(meterStream=meterStream,
+                refStreamOrTimeRange=refStreamOrTimeRange, 
+                inPlace=True)
           
         #environLocal.printDebug(['Stream.makeNotation(): post makeMeasures, length', len(measureStream)])
 
