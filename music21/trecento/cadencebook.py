@@ -637,6 +637,8 @@ class TestExternal(unittest.TestCase):
         if thisRondeaux.title != "":
             print thisRondeaux.title
             thisRondeaux.incipit.asScore().show('musicxml')
+    
+
 
         
 
