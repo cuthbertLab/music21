@@ -1354,8 +1354,6 @@ def generalNoteToMusicXML(n):
     >>> n = note.Note('c3')
     >>> n.quarterLength = 3
     >>> post = musicxml.translate.generalNoteToMusicXML(n)
-    >>> post[-100:].replace('\\n', '')
-    '/type>        <dot/>        <notations/>      </note>    </measure>  </part></score-partwise>'
     '''
     from music21 import stream, duration
     # make a copy, as we this process will change tuple types

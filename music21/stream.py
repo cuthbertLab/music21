@@ -4097,7 +4097,7 @@ class Stream(music21.Music21Object):
     ''')
 
     def makeMeasures(self, meterStream=None, refStreamOrTimeRange=None,
-        searchContext=False, inPlace=False):
+        searchContext=False, innerBarline=None, lastBarline='final', inPlace=False):
         '''
         Takes a stream and places all of its elements into 
         measures (:class:`~music21.stream.Measure` objects) 
@@ -4111,7 +4111,7 @@ class Stream(music21.Music21Object):
         if `inPlace` is False, this returns a modified deep copy.
 
 
-        Two advanced features are provided:
+        Many advanced features are provided:
     
         
         (1) If a `meterStream` is provided, the TimeSignatures in this
@@ -4130,7 +4130,13 @@ class Stream(music21.Music21Object):
         Part from the Score as a `refStreamOrTimeRange` to make sure
         that the appropriate measures of rests are added at either side.
 
-               
+        
+        (3) If `innerBarline` is not None, the specified Barline object or string-specification of Barline style will be used to create Barline objects between every created Measure. The default is None.
+
+        (4) If `lastBarline` is not None, the specified Barline object or string-specification of Barline style will be used to create a Barline objects at the end of the last Measure. The default is 'final'.
+
+        The `searchContext` parameter determines whether or not context searches are used to find Clef and other notation objects. 
+
         Here is a simple example of makeMeasures: 
         a single measure of 4/4 is created by from a stream
         containing only three quarter notes:        
@@ -4144,11 +4150,12 @@ class Stream(music21.Music21Object):
         >>> sMeasures = sSrc.makeMeasures()
         >>> sMeasures.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.meter.TimeSignature 4/4>
             {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
             {2.0} <music21.note.Note E>
+            {3.0} <music21.bar.Barline style=final>
         
         
         Notice that the last measure is incomplete -- makeMeasures
@@ -4179,6 +4186,7 @@ class Stream(music21.Music21Object):
             {1.0} <music21.note.Note D>
         {2.0} <music21.stream.Measure 2 offset=2.0>
             {0.0} <music21.note.Note E>        
+            {1.0} <music21.bar.Barline style=final>
 
 
         Let us put 10 quarter notes in a Part. 
@@ -4215,7 +4223,7 @@ class Stream(music21.Music21Object):
             {0.0} <music21.note.Note C>
         {3.0} <music21.stream.Measure 2 offset=3.0>
             {0.0} <music21.note.Note D>
-        
+            {3.0} <music21.bar.Barline style=final>    
         
         
         If after running makeMeasures you run makeTies, it will also split 
@@ -4242,6 +4250,8 @@ class Stream(music21.Music21Object):
             {0.0} <music21.note.Note D#>
         {6.0} <music21.stream.Measure 3 offset=6.0>
             {0.0} <music21.note.Note D#>
+            {1.5} <music21.bar.Barline style=final>
+
         >>> allNotes = partWithMeasures.flat.notes
         >>> [allNotes[0].articulations, allNotes[1].articulations, allNotes[2].articulations]
         [[<music21.articulations.Staccato>], [], []]
@@ -4427,18 +4437,28 @@ class Stream(music21.Music21Object):
             else: # insert into voice specified by the voice index
                 m.voices[voiceIndex].insert(oNew, e)
 
-#         for m in post._elements:
-#             for v in m.voices:
-#                 v._elementsChanged()
-#             m._elementsChanged()
         post._elementsChanged()
 
-        if inPlace == False:
+        # set barlines if necessary
+        lastIndex = len(post.getElementsByClass('Measure')) - 1
+        for i, m in enumerate(post.getElementsByClass('Measure')):
+            if i != lastIndex:
+                if innerBarline not in ['regular', None]:
+                    m.rightBarline = innerBarline
+            else:
+                if lastBarline not in ['regular', None]:
+                    m.rightBarline = lastBarline
+
+        if not inPlace:
             return post # returns a new stream populated w/ new measure streams
-        else:
-            self.elements = []
-            for x in post.sorted:
-                self.insert(x.getOffsetBySite(post), x)
+        else: # clear the stored elements list of this Stream and repopulate
+            # with Measures created above
+            self._elements = [] 
+            self._endElements = []
+            self._elementsChanged()
+            for e in post.sorted:
+                self.insert(e.getOffsetBySite(post), e)
+
 
     def makeRests(self, refStreamOrTimeRange=None, fillGaps=False,
         inPlace=True):
@@ -11424,8 +11444,8 @@ class Test(unittest.TestCase):
         self.assertEqual(isinstance(post[0], clef.AltoClef), True)
 
 
-        # this all woroks fine
-        sMeasures = s2.makeMeasures()
+        # this all works fine
+        sMeasures = s2.makeMeasures(lastBarline='regular')
         self.assertEqual(len(sMeasures), 1)
         self.assertEqual(len(sMeasures.getElementsByClass('Measure')), 1) # one measure
         self.assertEqual(len(sMeasures[0]), 3) 
@@ -11724,6 +11744,44 @@ class Test(unittest.TestCase):
         # need to call make ties to allocate notes
         sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies()
         self.assertEqual(len(sPartitioned), 1)
+
+    def testMakeMeasuresWithBarlines(self):
+        '''Test makeMeasures with optional barline parameters.
+        '''
+        from music21 import note, stream, bar, meter
+        s = stream.Stream()
+        s.repeatAppend(note.Note(quarterLength=.5), 20)
+        s.insert(0, meter.TimeSignature('5/8'))
+
+        # default is no normal barlines, but a final barline
+        barred1 = s.makeMeasures()
+        self.assertEqual(
+            str(barred1.getElementsByClass('Measure')[-1].rightBarline),
+            '<music21.bar.Barline style=final>')
+        #barred1.show()
+
+        barred2 = s.makeMeasures(innerBarline='dashed', lastBarline='double')
+        match = [str(m.rightBarline) for m in 
+            barred2.getElementsByClass('Measure')]
+        self.assertEqual(match, ['<music21.bar.Barline style=dashed>', '<music21.bar.Barline style=dashed>', '<music21.bar.Barline style=dashed>', '<music21.bar.Barline style=double>'])
+        #barred2.show()
+
+        # try using bar objects
+        bar1 = bar.Barline('none')
+        bar2 = bar.Barline('short')
+        barred3 = s.makeMeasures(innerBarline=bar1, lastBarline=bar2)
+        #barred3.show()
+        match = [str(m.rightBarline) for m in 
+            barred3.getElementsByClass('Measure')]
+        self.assertEqual(match, ['<music21.bar.Barline style=none>', '<music21.bar.Barline style=none>', '<music21.bar.Barline style=none>', '<music21.bar.Barline style=short>'])
+
+        # setting to None will not set a barline object at all        
+        barred4 = s.makeMeasures(innerBarline=None, lastBarline=None)
+        match = [str(m.rightBarline) for m in 
+            barred4.getElementsByClass('Measure')]
+        self.assertEqual(match, ['None', 'None', 'None', 'None'] )
+
+
 
     def testRemove(self):
         '''Test removing components from a Stream.
@@ -13519,7 +13577,7 @@ class Test(unittest.TestCase):
         sSub.augmentOrDiminish(2, inPlace=True)
 
         # explicitly call make measures and make ties
-        mStream = sSub.makeMeasures()
+        mStream = sSub.makeMeasures(lastBarline=None)
         mStream.makeTies(inPlace=True)
 
         self.assertEqual(len(mStream.flat), 45)
