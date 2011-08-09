@@ -4962,11 +4962,11 @@ class Stream(music21.Music21Object):
         #environLocal.printDebug(['pitchPast', pitchPast])
 
         # get chords, notes, and rests
-        for i in range(len(noteStream)):
-            e = noteStream[i]
+#         for i in range(len(noteStream)):
+#             e = noteStream[i]
+        for i, e in enumerate(noteStream):
             if isinstance(e, note.Note):
-                e.pitch.updateAccidentalDisplay(
-                    pitchPast=pitchPast, 
+                e.pitch.updateAccidentalDisplay(pitchPast=pitchPast, 
                     pitchPastMeasure=pitchPastMeasure,
                     alteredPitches=alteredPitches,
                     cautionaryPitchClass=cautionaryPitchClass,
@@ -4985,15 +4985,13 @@ class Stream(music21.Music21Object):
                 # when reading a chord, this will apply an accidental 
                 # if pitches in the chord suggest an accidental
                 for p in pGroup:
-                    p.updateAccidentalDisplay(
-                            pitchPast=pitchPast, 
-                            pitchPastMeasure=pitchPastMeasure,
-                            alteredPitches=alteredPitches,
-                            cautionaryPitchClass=cautionaryPitchClass, cautionaryAll=cautionaryAll,
-                            overrideStatus=overrideStatus,
-                            cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,                    
-                            lastNoteWasTied=lastNoteWasTied,
-                            )
+                    p.updateAccidentalDisplay(pitchPast=pitchPast, 
+                        pitchPastMeasure=pitchPastMeasure,
+                        alteredPitches=alteredPitches,
+                        cautionaryPitchClass=cautionaryPitchClass, cautionaryAll=cautionaryAll,
+                        overrideStatus=overrideStatus,
+                      cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,                    
+                        lastNoteWasTied=lastNoteWasTied)
                 if e.tie is not None and e.tie.type != 'stop':
                     lastNoteWasTied = True
                 else:
@@ -12057,6 +12055,22 @@ class Test(unittest.TestCase):
         
         display = [n.pitch.accidental.displayStatus for n in ex.flat.notes]
         self.assertEqual(display, [1,0,0, 0,0,0,   1,0,0, 0, 1,  1, 0, 0,  1, 0, 0])         
+
+    def testMakeAccidentalsD(self):
+        from music21 import stream, note, meter
+        p1 = stream.Part()
+        m1 = stream.Measure()
+        m1.append(meter.TimeSignature('4/4'))
+        m1.append(note.HalfNote('C#'))
+        m1.append(note.HalfNote('C#'))
+        m1.rightBarline = 'final'
+        p1.append(m1)
+        p1.makeNotation(inPlace=True)
+    
+        match = [p.accidental.displayStatus for p in p1.pitches]
+        self.assertEqual(match, [True, False])
+        m = p1.measure(1)
+        self.assertEqual(str(m.rightBarline), '<music21.bar.Barline style=final>')
 
     def testMakeAccidentalsWithKeysInMeasures(self):
         scale1 = ['c4', 'd4', 'e4', 'f4', 'g4', 'a4', 'b4', 'c5']
