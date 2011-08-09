@@ -4898,11 +4898,10 @@ class Stream(music21.Music21Object):
 
 
     def makeAccidentals(self, pitchPast=None, pitchPastMeasure=None,
-                        useKeySignature=True, 
-                        alteredPitches=None, searchKeySignatureByContext=False, 
-                        cautionaryPitchClass=True, cautionaryAll=False, inPlace=True, 
-                        overrideStatus=False, cautionaryNotImmediateRepeat=True,
-                        lastNoteWasTied=False): 
+        useKeySignature=True,  alteredPitches=None, 
+        searchKeySignatureByContext=False, cautionaryPitchClass=True,
+        cautionaryAll=False, inPlace=True, overrideStatus=False,
+        cautionaryNotImmediateRepeat=True, lastNoteWasTied=False): 
         '''
         A method to set and provide accidentals given various conditions and contexts.
 
@@ -5045,7 +5044,7 @@ class Stream(music21.Music21Object):
 
         # only use inPlace arg on first usage
         if not self.hasMeasures():
-            # if this is inPlace, it will return a newStream; if not 
+            # if this is not inPlace, it will return a newStream; if  
             # inPlace, this returns None
             # use inPlace=True, as already established above
             measureStream.makeMeasures(meterStream=meterStream,
@@ -5058,25 +5057,27 @@ class Stream(music21.Music21Object):
         # pitches from last measure are passed
         # this needs to be called before makeTies
         # note that this functionality is also placed in Part
-        ksLast = None
-        for i in range(len(measureStream)):
-            m = measureStream[i]
-            if m.keySignature != None:
-                ksLast = m.keySignature
-            if i > 0:
-                if len(measureStream[i-1]) > 0 \
-                    and hasattr(measureStream[i-1][-1], "tie") \
-                    and measureStream[i-1][-1].tie is not None \
-                    and measureStream[i-1][-1].tie.type != 'stop':
-                    lastNoteWasTied = True
+        if not measureStream.haveAccidentalsBeenMade():
+            ksLast = None
+            for i in range(len(measureStream)):
+                m = measureStream[i]
+                if m.keySignature != None:
+                    ksLast = m.keySignature
+                if i > 0:
+                    if (len(measureStream[i-1]) > 0 
+                        and hasattr(measureStream[i-1][-1], "tie") 
+                        and measureStream[i-1][-1].tie is not None 
+                        and measureStream[i-1][-1].tie.type != 'stop'):
+                        lastNoteWasTied = True
+                    else:
+                        lastNoteWasTied = False
+                    m.makeAccidentals(
+                        pitchPastMeasure=measureStream[i-1].pitches,
+                        useKeySignature=ksLast, searchKeySignatureByContext=False, 
+                        lastNoteWasTied = lastNoteWasTied, **makeAccidentalsKeywords)
                 else:
-                    lastNoteWasTied = False
-                m.makeAccidentals(pitchPastMeasure=measureStream[i-1].pitches,
-                    useKeySignature=ksLast, searchKeySignatureByContext=False, 
-                    lastNoteWasTied = lastNoteWasTied, **makeAccidentalsKeywords)
-            else:
-                m.makeAccidentals(useKeySignature=ksLast, 
-                    searchKeySignatureByContext=False, **makeAccidentalsKeywords)
+                    m.makeAccidentals(useKeySignature=ksLast, 
+                        searchKeySignatureByContext=False, **makeAccidentalsKeywords)
 
         #environLocal.printDebug(['makeNotation(): meterStream:', meterStream, meterStream[0]])
         measureStream.makeTies(meterStream, inPlace=True)
