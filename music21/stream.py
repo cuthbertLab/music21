@@ -3394,7 +3394,7 @@ class Stream(music21.Music21Object):
             # returns a single element match
             #post = self.__class__()
             obj = self.getContextByClass(clef.Clef)
-            if obj != None:
+            if obj is not None:
                 post.append(obj)
 
         # get a default and/or place default at zero if nothing at zero

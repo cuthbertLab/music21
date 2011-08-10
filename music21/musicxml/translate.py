@@ -138,12 +138,12 @@ def tempoIndicationToMx(ti):
         # may need to reverse order if classical style or otherwise
         # may want to show first number
         hideNumericalMetro = False # must show for metric modulation
-        for sub in [ti.leftMetronome, ti.rightMetronome]:    
+        for sub in [ti.oldMetronome, ti.newMetronome]:    
             hideNumber.append(True) # cannot show numbers in a metric mod
             durs.append(sub.referent)
             numbers.append(sub.number)
         # soundingQuarterBPM should be obtained from the last MetronomeMark
-        soundingQuarterBPM = ti.rightMetronome.getQuarterBPM()
+        soundingQuarterBPM = ti.newMetronome.getQuarterBPM()
 
         #environLocal.printDebug(['found metric modulation', ti, durs, numbers])
 
@@ -3295,7 +3295,7 @@ spirit</words>
         # tempo.MetronomeMark(number=120.0)
         mmod1 = tempo.MetricModulation()
         # assign with an equivalent statement of the eight
-        mmod1.leftMetronome = mm1.getEquivalentByReferent(.5)
+        mmod1.oldMetronome = mm1.getEquivalentByReferent(.5)
         # set the other side of eq based on the desired  referent
         mmod1.setOtherByReferent(referent='quarter')
         m2.insert(0, mmod1)
@@ -3303,7 +3303,7 @@ spirit</words>
         m3 = stream.Measure()
         m3.repeatAppend(note.Note(duration=1), 4)    
         mmod2 = tempo.MetricModulation()
-        mmod2.leftMetronome = mmod1.rightMetronome.getEquivalentByReferent(1.5)
+        mmod2.oldMetronome = mmod1.newMetronome.getEquivalentByReferent(1.5)
         # set the other side of eq based on the desired  referent
         mmod2.setOtherByReferent(referent=1)
         m3.insert(0, mmod2)
