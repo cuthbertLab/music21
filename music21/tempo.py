@@ -110,8 +110,7 @@ class TempoIndication(music21.Music21Object):
         <music21.tempo.MetronomeMark Quarter=120>
         '''
 
-        environLocal.printDebug(['getPreviousMetronomeMark'])
-
+        #environLocal.printDebug(['getPreviousMetronomeMark'])
         # search for TempoIndication objects, not just MetronomeMark objects
         found = None
         # must provide getElementBefore, as will otherwise return self
@@ -707,10 +706,15 @@ class MetricModulation(TempoIndication):
         if self._oldMetronome is not None:
             mm = self._oldMetronome.getEquivalentByReferent(value)
         else:
-            # try sto do a context search and get the last MetronomeMark
-            pass        
-
-        self._oldMetronome = mm
+            # try to do a context search and get the last MetronomeMark
+            mm = self.getPreviousMetronomeMark()
+            if mm is not None:
+                # replace with an equivalent based on a provided value
+                mm = mm.getEquivalentByReferent(value)
+        if mm is not None:
+            self._oldMetronome = mm
+        else:
+            raise TempoException('cannot set old MetronomeMark from provided value.')
 
     def _getOldReferent(self):
         if self._oldMetronome is not None:
@@ -1124,6 +1128,32 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str(mm3.getPreviousMetronomeMark()), '<music21.tempo.MetronomeMark adagio 16th=52>')
 
+    def testSetReferrentA(self):
+        '''Test setting referrents directly via context searches.
+        '''
+        from music21 import note, stream, tempo
+        p = stream.Part()
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note(quarterLength=1), 4)
+        m2 = copy.deepcopy(m1)
+        m3 = copy.deepcopy(m2)
+
+        mm1 = tempo.MetronomeMark(number=92)
+        m1.insert(0, mm1)
+
+        mm2 = tempo.MetricModulation()
+        m2.insert(0, mm2)
+
+        p.append([m1, m2, m3])
+
+        mm2.oldReferent = .25
+        self.assertEqual(str(mm2.oldMetronome), 
+            '<music21.tempo.MetronomeMark moderate 16th=368.0>')
+        mm2.setOtherByReferent(referent=2)
+        self.assertEqual(str(mm2.newMetronome), 
+            '<music21.tempo.MetronomeMark moderate Half=368.0>')
+
+        #p.show()
 
 
 #-------------------------------------------------------------------------------
