@@ -55,6 +55,7 @@ class TrecentoSheet(object):
     ...     print thisKyrie.title
     Questa Fanc.
     Kyrie Summe Clementissime
+    Kyrie rondello
     '''
 
     sheetname = "fischer_caccia"
