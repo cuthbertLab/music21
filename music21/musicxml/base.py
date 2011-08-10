@@ -2089,7 +2089,7 @@ class Notehead(MusicXMLElement):
         self.charData = None
 
 # valid notehead values
-#"slash", "triangle", "diamond", "square", "cross", "x" , "circle-x", "inverted, triangle", "arrow down", "arrow up", "slashed", "back slashed", "normal", "cluster", "none", "do", "re", "mi", "fa", "so", "la", "ti" 
+#"slash", "triangle", "diamond", "square", "cross", "x" , "circle-x", "inverted triangle", "arrow down", "arrow up", "slashed", "back slashed", "normal", "cluster", "none", "do", "re", "mi", "fa", "so", "la", "ti" 
 
 class Dot(MusicXMLElement):
     def __init__(self, type=None):

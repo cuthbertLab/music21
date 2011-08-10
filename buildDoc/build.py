@@ -1550,7 +1550,6 @@ class Documentation(RestructuredWriter):
         '''
         if format not in FORMATS:
             raise Exception, 'bad format'
-
         self.writeModuleReference()    
         self.writeGeneratedChapters()    
         self.writeContents()    
@@ -1574,8 +1573,8 @@ class Documentation(RestructuredWriter):
                 raise BuildException("Building documentation requires the Sphinx toolkit. Download it by typing 'easy_install -U Sphinx' at the command line or at http://sphinx.pocoo.org/")
             sphinxList = ['sphinx', '-E', '-b', format, '-d', self.dirBuildDoctrees,
                          self.dirRst, dirOut] 
-            sphinx.main(sphinxList)
-    
+            statusCode = sphinx.main(sphinxList)
+
         if format == 'html':
             if pathLaunch.find('\\'):
                 pass

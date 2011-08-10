@@ -127,7 +127,8 @@ class Chord(note.NotRest):
             if isinstance(n, music21.pitch.Pitch):
                 self._pitches.append({'pitch':n})
             elif isinstance(n, music21.note.Note):
-                self._pitches.append({'pitch':n.pitch})
+                self._pitches.append({'pitch':n.pitch,
+                                      'notehead':n.notehead})
             elif isinstance(n, Chord):
                 for p in n.pitches:
                     # this might better make a deepcopy of the pitch
@@ -455,8 +456,10 @@ class Chord(note.NotRest):
         return None
 
     def setTie(self, t, pitchTarget):
-        '''Given a pitch in this Chord, return an associated Tie object, or return None if not defined for that Pitch.
-
+        '''Given a tie object and a pitch in this Chord,
+        set the pitch's tie attribute in this chord to that tie type.
+        
+        
         >>> from music21 import *
         >>> c1 = chord.Chord(['d3', 'e-4', 'b-4'])
         >>> t1 = tie.Tie('start')
@@ -502,6 +505,61 @@ class Chord(note.NotRest):
         if not match:
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
 
+    def getNotehead(self, p):
+        '''Given a pitch in this Chord, return an associated Notehead attribute, or return 'normal' if not defined for that Pitch.
+
+
+        If the pitch is not found, None will be returned. 
+        
+        
+        >>> from music21 import *
+        >>> n1 = note.Note('D4')
+        >>> n2 = note.Note('G4')
+        >>> n2.notehead = 'diamond'
+        >>> c1 = chord.Chord([n1, n2])
+        >>> c1.getNotehead(c1.pitches[1])
+        'diamond'
+        >>> c1.getNotehead(c1.pitches[0]) 
+        'normal'
+        >>> c1.getNotehead(pitch.Pitch('A#6')) is None
+        True
+        
+        '''
+        
+        for d in self._pitches:
+            # this is an equality comparison, not object
+            if d['pitch'] == p:
+                if 'notehead' in d.keys():
+                    return d['notehead']
+                else:
+                    return 'normal'
+        return None
+
+    def setNotehead(self, nh, pitchTarget):
+        '''Given a notehead attribute as a string and a pitch object in this Chord, set the notehead attribute of that pitch to the value of that notehead.
+
+        >>> from music21 import *
+        >>> n1 = note.Note('D4')
+        >>> n2 = note.Note('G4')
+        >>> c1 = chord.Chord([n1, n2])
+        >>> c1.setNotehead('diamond', c1.pitches[1]) # just to g
+        >>> c1.getNotehead(c1.pitches[1])
+        'diamond'
+        >>> c1.getNotehead(c1.pitches[0])
+        'normal'
+        
+        '''
+        # assign to first pitch by default
+        if pitchTarget is None and len(self._pitches) > 0: # if no pitch target
+            pitchTarget = self._pitches[0]['pitch']
+        match = False
+        for d in self._pitches:
+            if d['pitch'] == pitchTarget:
+                d['notehead'] = nh
+                match = True
+                break
+        if not match:
+            raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
 
     def _getPitchNames(self):
         return [d['pitch'].name for d in self._pitches]
@@ -3449,7 +3507,7 @@ class Test(unittest.TestCase):
         out = out.replace(' ', '')
         out = out.replace('\n', '')
         #print out
-        self.assertEqual(out.find("""<pitch><step>A</step><octave>4</octave></pitch><duration>15120</duration><tietype="start"/><type>quarter</type><dot/><notations><tiedtype="start"/></notations>"""), 1149)
+        self.assertEqual(out.find("""<pitch><step>A</step><octave>4</octave></pitch><duration>15120</duration><tietype="start"/><type>quarter</type><dot/><notehead>normal</notehead><notations><tiedtype="start"/></notations>"""), 1176)
 
         
     def testTiesB(self):

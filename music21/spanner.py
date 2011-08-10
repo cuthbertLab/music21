@@ -1118,7 +1118,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sb2), 2)
         self.assertEqual(sb2[0], su3)
         self.assertEqual(sb2[1], su4)
-
+        
 
     def testDeepcopySpanner(self):
         from music21 import spanner, note

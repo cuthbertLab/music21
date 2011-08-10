@@ -1203,6 +1203,20 @@ def chordToMx(c):
     True
     >>> mxNoteList[2].get('chord')
     True
+    
+    >>> from music21 import *
+    >>> g = note.Note('c4')
+    >>> g.notehead = 'diamond'
+    >>> h = pitch.Pitch('g3')
+    >>> i = chord.Chord([h, g])
+    >>> i.quarterLength = 2
+    >>> listOfMxNotes = i.mx
+    >>> listOfMxNotes[0].get('chord')
+    False
+    >>> listOfMxNotes[1].noteheadObj.get('charData')
+    'diamond'
+    
+    
     '''
     #environLocal.printDebug(['chordToMx', c])
     mxNoteList = []
@@ -1220,6 +1234,10 @@ def chordToMx(c):
                 mxNote.set('chord', True)
             # get color from within .editorial using attribute
             mxNote.set('color', c.color)
+            # get notehead object
+            nh = c.getNotehead(pitchObj)
+            mxNote.noteheadObj = noteheadToMxNotehead(pitchObj, overRiddenNotehead = nh)
+            
 
             # only add beam to first note in group
             if c.beams != None and chordPos == 0:
@@ -1303,6 +1321,27 @@ def mxToChord(mxNoteList, inputM21=None):
     >>> c.mx = [a, b]
     >>> len(c.pitches)
     2
+    
+    >>> from music21 import *
+    >>> a = musicxml.Note()
+    >>> a.setDefaults()
+    >>> nh1 = musicxml.Notehead()
+    >>> nh1.set('charData', 'diamond')
+    >>> a.noteheadObj = nh1
+    >>> b = musicxml.Note()
+    >>> b.setDefaults()
+    >>> b.set('chord', True)
+    >>> m = musicxml.Measure()
+    >>> m.setDefaults()
+    >>> a.external['measure'] = m # assign measure for divisions ref
+    >>> a.external['divisions'] = m.external['divisions']
+    >>> b.external['measure'] = m # assign measure for divisions ref
+    >>> b.external['divisions'] = m.external['divisions']
+    >>> c = musicxml.translate.mxToChord([a, b])
+    >>> c.getNotehead(c.pitches[0])
+    'diamond'
+    
+    
     '''
     from music21 import chord
     from music21 import pitch
@@ -1317,11 +1356,17 @@ def mxToChord(mxNoteList, inputM21=None):
     c.duration.mx = mxNoteList[0]
     pitches = []
     ties = [] # store equally spaced list; use None if not defined
+    noteheads = [] # store notehead attributes that correspond with pitches
+    
     for mxNote in mxNoteList:
         # extract pitch pbjects     
         p = pitch.Pitch()
         p.mx = mxNote # will extract pitch info from mxNote
         pitches.append(p)
+        
+        #extract notehead objects
+        nh = mxNote.get('noteheadObj')
+        noteheads.append(nh)
 
         if len(mxNote.tieList) > 0:
             tieObj = tie.Tie() # m21 tie object
@@ -1342,6 +1387,15 @@ def mxToChord(mxNoteList, inputM21=None):
         if t is not None:
             # provide pitch to assign tie to based on index number
             c.setTie(t, pitches[i])
+            
+    #set notehead based on pitches
+    index = 0
+    for obj in noteheads:
+        if obj !=None:
+            c.setNotehead(obj.charData, c.pitches[index])
+        index+=1
+        
+    return c
 
 
 #-------------------------------------------------------------------------------
@@ -1368,20 +1422,49 @@ def generalNoteToMusicXML(n):
     # call the musicxml property on Stream
     return out.musicxml
     
-def noteheadToMxNotehead(n, spannerBundle=None):
+def noteheadToMxNotehead(obj, spannerBundle=None, overRiddenNotehead = None):
     '''
-    Translate a music21 :class:`~music21.note.Note` object 
+    Translate a music21 :class:`~music21.note.Note` object or :class:`~music21.pitch.Pitch` object to a
     into a musicxml.Notehead object.
+    
+    
+    If a pitch object is given then (since it doesn't store its own notehead)
+    the notehead must be given via overRiddenNotehead.
+
+
+    >>> from music21 import *
+    >>> n = note.Note('C#4')
+    >>> n.notehead = 'diamond'
+    >>> mxN = musicxml.translate.noteheadToMxNotehead(n)
+    >>> mxN.get('charData')
+    'diamond'
+
+
+    >>> p = pitch.Pitch('E--5')
+    >>> mxN2 = musicxml.translate.noteheadToMxNotehead(p, overRiddenNotehead = 'slash')
+    >>> mxN2.get('charData')
+    'slash'
     '''
     
     mxNotehead = musicxmlMod.Notehead()
 
 	#Ensures that the music21 notehead value is supported by MusicXML, and then sets the MusicXML notehead's 'charaData' to the value of the Music21 notehead.
-    supportedValues = ['slash', 'triangle', 'diamond', 'square', 'cross', 'x' , 'circle-x', 'inverted', 'triangle', 'arrow down', 'arrow up', 'slashed', 'back slashed', 'normal', 'cluster', 'none', 'do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'circle dot', 'left triangle', 'rectangle']
-    if n.notehead not in supportedValues:
+    supportedValues = ['slash', 'triangle', 'diamond', 'square', 'cross', 'x' , 'circle-x', 'inverted triangle', 'arrow down', 'arrow up', 'slashed', 'back slashed', 'normal', 'cluster', 'none', 'do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'circle dot', 'left triangle', 'rectangle']
+    nh = None
+    if 'Pitch' in obj.classes:
+        if overRiddenNotehead is None:
+            nh = 'normal'
+        else:
+            nh = overRiddenNotehead
+    elif hasattr(obj, 'notehead'):
+        nh = obj.notehead
+    else:
+        nh = 'normal'
+    
+    if nh not in supportedValues:
         raise NoteheadException('This notehead type is not supported by MusicXML.')
     else:
-        mxNotehead.set('charData', n.notehead)
+        mxNotehead.set('charData', nh)
         
     return mxNotehead
 
@@ -1598,7 +1681,11 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
                 
 
             #environLocal.printDebug(['got slur:', su, mxObj.get('placement'), mxObj.get('number')])
-
+    
+    # gets the notehead object from the mxNote and sets value of the music21 note to the value of the notehead object        
+    mxNotehead = mxNote.get('noteheadObj')
+    if mxNotehead != None:
+        n.notehead = mxNotehead.charData
 
     return n
 
@@ -3336,12 +3423,101 @@ spirit</words>
         # test to ensure notehead functionality
         
         from music21 import note
+        from music21.musicxml import translate
         n = note.Note('c3')
         n.notehead = 'diamond'
         
         out = n.musicxml
         match1 = '<notehead>diamond</notehead>'
         self.assertEqual(out.find(match1) > 0, True)
+        
+    def testNoteheadSmorgasbord(self):
+        # tests the of many different types of noteheads
+        
+        from music21 import note, stream, expressions
+        from music21.musicxml import translate
+        p = stream.Part()
+        n = note.Note('c3')
+        n.notehead = 'diamond'
+        tn = expressions.TextExpression('diamond')
+        m = note.Note('c3')
+        m.notehead = 'cross'
+        tm = expressions.TextExpression('cross')
+        l = note.Note('c3')
+        l.notehead = 'triangle'
+        tl = expressions.TextExpression('triangle')
+        k = note.Note('c3')
+        k.notehead = 'circle-x'
+        tk = expressions.TextExpression('circle-x')
+        j = note.Note('c3')
+        j.notehead = 'x'
+        tj = expressions.TextExpression('x')
+        i = note.Note('c3')
+        i.notehead = 'slash'
+        ti = expressions.TextExpression('slash')
+        h = note.Note('c3')
+        h.notehead = 'square'
+        th = expressions.TextExpression('square')
+        g = note.Note('c3')
+        g.notehead = 'arrow down'
+        tg = expressions.TextExpression('arrow down')
+        f = note.Note('c3')
+        f.notehead = 'inverted triangle'
+        tf = expressions.TextExpression('inverted triangle')
+        f.addLyric('inverted triangle')
+        e = note.Note('c3')
+        e.notehead = 'back slashed'
+        te = expressions.TextExpression('back slashed')
+        d = note.Note('c3')
+        d.notehead = 'fa'
+        td = expressions.TextExpression('fa')
+        c = note.Note('c3')
+        c.notehead = 'normal'
+        tc = expressions.TextExpression('normal')
+        
+        noteList = [tc, c, tn, n, th, h, tl, l, tf, f, tg, g, te, e, ti, i, tj, j, tm, m, tk, k, td, d]
+        for note in noteList:
+            p.append(note)
+            
+        #p.show()
+    
+    
+    def testMusicXMLNoteheadtoMusic21Notehead(self):
+        # test to ensure noteheads can be imported from MusicXML
+        
+        from music21 import note, converter
+        from music21.musicxml import translate
+        
+        n = note.Note('c3')
+        n.notehead = 'cross'
+        noteMusicXML = n.musicxml
+        m = converter.parse(noteMusicXML)
+        self.assertEqual(m.flat.notes[0].notehead, 'cross')
+        
+        #m.show()
+        
+    def testNoteheadWithTies(self):
+        #what happens when you have notes with two different noteheads tied together?
+        
+        from music21 import note, converter, spanner, stream, tie
+        from music21.musicxml import translate
+        
+        n1 = note.Note('c3')
+        n1.notehead = 'diamond'
+        n1.tie = tie.Tie('start')
+        n2 = note.Note('c3')
+        n2.notehead = 'cross'
+        n2.tie = tie.Tie('end')
+        p = stream.Part()
+        p.append(n1)
+        p.append(n2)
+        
+        xml = p.musicxml
+        m = converter.parse(xml)
+        self.assertEqual(m.flat.notes[0].notehead, 'diamond')
+        self.assertEqual(m.flat.notes[1].notehead, 'cross')
+        
+        #m.show()
         
 
 if __name__ == "__main__":
