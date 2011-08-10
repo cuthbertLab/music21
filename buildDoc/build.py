@@ -1577,8 +1577,12 @@ class Documentation(RestructuredWriter):
             sphinx.main(sphinxList)
     
         if format == 'html':
+            if pathLaunch.find('\\'):
+                pass
+            else:
+                if pathLaunch.startswith('/'):
+                    pathLaunch = 'file://' + pathLaunch
             webbrowser.open(pathLaunch)
-
 
 class BuildException(Exception):
     pass

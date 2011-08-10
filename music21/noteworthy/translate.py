@@ -293,10 +293,12 @@ def translateRest(line, meas):
     >>> measureIn = stream.Measure()
     >>> measureIn.append(note.HalfNote("C#4"))
     
-    >>> measureOut = noteworthy.translate.translateRest("|Rest|Dur:4th\n", measureIn)
+    >>> measureOut = noteworthy.translate.translateRest("|Rest|Dur:8th\n", measureIn)
+    >>> measureOut = noteworthy.translate.translateRest("|Rest|Dur:4th\n", measureOut)
     >>> measureOut.show('text')
     {0.0} <music21.note.Note C#>
     {2.0} <music21.note.Rest rest>     
+    {2.5} <music21.note.Rest rest>     
     
     
     Note that measureOut is really the same as measureIn now.
@@ -307,17 +309,16 @@ def translateRest(line, meas):
     >>> measureIn.show('text')
     {0.0} <music21.note.Note C#>
     {2.0} <music21.note.Rest rest>     
-    
+    {2.5} <music21.note.Rest rest>     
     '''   
     #print "REST"
     dictionaries = noteworthyModule.dictionaries
-    i = 1
-    for word in line.split('|'):
-        if i == 3:
-            res = word.split(':')
-            r = note.Rest(quarterLength=dictionaries["dictionaryrest"][res[1]])
-            meas.append(r)
-        i = i + 1
+    try:
+        res = line.split('|')[2].split(':')[1].rstrip()
+    except:
+        raise NoteworthyTranslateException('cannot find a rest in this line: %s ' % line)
+    r = note.Rest(quarterLength=dictionaries["dictionaryNoteLength"][res])
+    meas.append(r)
     return meas   
   
 def createClef(line, meas):
