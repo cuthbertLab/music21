@@ -2548,10 +2548,11 @@ class Stream(music21.Music21Object):
         Return one element or None if no elements are at or preceded by this 
         offset. 
 
+        If the `classList` parameter is provided with a list of class names or strings, the only objects that will returned are objects that are instances of these classes or subclasses of these classes. 
+
         >>> from music21 import *
 
         >>> stream1 = stream.Stream()
-
         >>> x = note.Note('D4')
         >>> x.id = 'x'
         >>> y = note.Note('E4')
@@ -2630,36 +2631,6 @@ class Stream(music21.Music21Object):
         # NOTE: this is a performance critical method
         # TODO: need to deal with more than on object the same
         # offset and span from the source
-
-# method that uses sorted Stream
-#         candidates = []
-#         # get sorted Stream
-#         if not self.isSorted:
-#             sortedStream = self.sorted
-#         else:
-#             sortedStream = self
-# 
-#         for e in sortedStream.elements:
-#             if classList is not None:
-#                 if not e.isClassOrSubclass(classList):
-#                     continue
-#             # if looking for 30 and found 20, span will be 10
-#             # if looking for 30 and found 50, span will be -20
-#             span = offset - e.getOffsetBySite(sortedStream)
-#             #environLocal.printDebug(['e span check', span, 'offset', offset, 'e.offset', e.offset, 'e.getOffsetBySite(self)', e.getOffsetBySite(sortedStream), 'e', e])
-#             if span < 0: # the e is after this offset
-#                 break # no further looking is necessary
-#             candidates.append((span, e))
-# 
-#         #environLocal.printDebug(['getElementAtOrBefore(), e candidates', candidates])
-#         if len(candidates) > 0:
-#             #candidates.sort()
-#             candidates[-1][1].activeSite = self
-#             return candidates[-1][1]
-#         else:
-#             return None
-
-# non sorted method
         candidates = []
         nearestTrailSpan = offset # start with max time
 
@@ -2691,6 +2662,69 @@ class Stream(music21.Music21Object):
             return None
 
 
+    def getElementBeforeOffset(self, offset, classList=None):
+        '''Get element before (and not at) a provided offset.
+
+        If the `classList` parameter is provided with a list of class names or strings, the only objects that will returned are objects that are instances of these classes or subclasses of these classes. 
+
+        >>> from music21 import *
+        >>> stream1 = stream.Stream()
+        >>> x = note.Note('D4')
+        >>> x.id = 'x'
+        >>> y = note.Note('E4')
+        >>> y.id = 'y'
+        >>> z = note.Rest()
+        >>> z.id = 'z'
+        >>> stream1.insert(20, x)
+        >>> stream1.insert(10, y)
+        >>> stream1.insert( 0, z)
+
+        >>> b = stream1.getElementBeforeOffset(21)
+        >>> b.offset, b.id
+        (20.0, 'x')
+        >>> b = stream1.getElementBeforeOffset(20)
+        >>> b.offset, b.id
+        (10.0, 'y')
+
+        >>> b = stream1.getElementBeforeOffset(10)
+        >>> b.offset, b.id
+        (0.0, 'z')
+
+        >>> b = stream1.getElementBeforeOffset(0)
+        >>> b == None
+        True
+        >>> b = stream1.getElementBeforeOffset(0.1)
+        >>> b.offset, b.id
+        (0.0, 'z')
+        '''
+        # NOTE: this is a performance critical method
+        candidates = []
+        nearestTrailSpan = offset # start with max time
+
+        # need both _elements and _endElements
+        for e in self.elements:
+            #eClasses = e.classes # store once, as this is property call
+            if classList is not None:
+                if not e.isClassOrSubclass(classList):
+                    continue
+            span = offset - e.getOffsetBySite(self)
+            #environLocal.printDebug(['e span check', span, 'offset', offset, 'e.offset', e.offset, 'e.getOffsetBySite(self)', e.getOffsetBySite(self), 'e', e])
+            # by forcing <= here, we are sure to get offsets not at zero
+            if span <= 0: # the e is after this offset
+                continue
+            else: # do this comparison because may be out of order
+                if span <= nearestTrailSpan:
+                    candidates.append((span, e))
+                    nearestTrailSpan = span
+        #environLocal.printDebug(['getElementBeforeOffset(), e candidates', candidates])
+        if len(candidates) > 0:
+            candidates.sort() # TODO: this sort has side effects
+            candidates[0][1].activeSite = self
+            return candidates[0][1]
+        else:
+            return None
+
+
     def getElementAtOrAfter(self, offset, classList=None):
         '''Given an offset, find the element at this offset, or with the offset
         greater than and nearest to.
@@ -2699,12 +2733,6 @@ class Stream(music21.Music21Object):
         '''
         raise Exception("not yet implemented")
 
-    def getElementBeforeOffset(self, offset, classList=None):
-        '''Get element before a provided offset
-
-        TODO: write this
-        '''
-        raise Exception("not yet implemented")
 
     def getElementAfterOffset(self, offset, classList = None):
         '''Get element after a provided offset
@@ -15654,6 +15682,49 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.notes), 3)
 
 
+    def testGetElementBeforeOffsetA(self):
+        from music21 import note, stream
+        s = stream.Stream()
+        n1 = note.Note()
+        n2 = note.Note()
+        n3 = note.Note()
+        s.insert(0, n1)
+        s.insert(3, n2)
+        s.insert(5, n3)
+
+        self.assertEqual(s.getElementBeforeOffset(5), n2)
+        self.assertEqual(s.getElementBeforeOffset(5.1), n3)
+        self.assertEqual(s.getElementBeforeOffset(3), n1)
+        self.assertEqual(s.getElementBeforeOffset(3.2), n2)
+        self.assertEqual(s.getElementBeforeOffset(0), None)
+        self.assertEqual(s.getElementBeforeOffset(0.3), n1)
+
+        self.assertEqual(s.getElementBeforeOffset(5, ['Note']), n2)
+        self.assertEqual(s.getElementBeforeOffset(0.3, ['GeneralNote']), n1)
+
+    def testGetElementBeforeOffsetB(self):
+        from music21 import note, stream, clef
+        s = stream.Stream()
+        # fill with clefs to test class matching
+        n1 = note.Note()
+        n2 = note.Note()
+        n3 = note.Note()
+        s.insert(0, n1)
+        s.insert(0, clef.SopranoClef())
+        s.insert(2, clef.BassClef())
+        s.insert(3, n2)
+        s.insert(3, clef.TrebleClef())
+        s.insert(3.1, clef.TenorClef())
+        s.insert(5, n3)
+
+        self.assertEqual(s.getElementBeforeOffset(5, ['Note']), n2)
+        self.assertEqual(s.getElementBeforeOffset(5.1, ['Note']), n3)
+        self.assertEqual(s.getElementBeforeOffset(3, ['Note']), n1)
+        self.assertEqual(s.getElementBeforeOffset(3.2, ['Note']), n2)
+        self.assertEqual(s.getElementBeforeOffset(0, ['Note']), None)
+        self.assertEqual(s.getElementBeforeOffset(0.3, ['Note']), n1)
+
+
     def testGraceNoteSortingA(self):
         from music21 import note, stream
 
@@ -15728,6 +15799,10 @@ class Test(unittest.TestCase):
 #         s.insert(0, c1)
 #         s.show('t')
 #         self.assertEqual(c1, s[0]) # should be first
+
+
+
+
 
 class Test2(unittest.TestCase):
     '''

@@ -1822,7 +1822,7 @@ class Music21Object(JSONSerializer):
 
 
     def isClassOrSubclass(self, classFilterList):
-        '''Given a class filter list (and only a list), which may have strings or class objects, determine if this class is of the provided classes or a subclasses. 
+        '''Given a class filter list (a list or tuple must be submitted), which may have strings or class objects, determine if this class is of the provided classes or a subclasses. 
         '''
         # NOTE: this is a performance critical operation
         # for performance, only accept lists or tuples
