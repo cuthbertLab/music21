@@ -1215,6 +1215,8 @@ class DefinedContexts(object):
 
         If `priorityTarget` is specified, this location will be searched first. The `prioritizeActiveSite` is pased to to any recursively called getContextByClass() calls. 
 
+        The `getElementMethod` is a string that selects which Stream method is used to get elements for searching with getElementsByClass() calls. 
+
         >>> class Mock(Music21Object): pass
         >>> import time
         >>> aObj = Mock()
@@ -2234,6 +2236,9 @@ class Music21Object(JSONSerializer):
         The `callerFirst` is the first object from which this method was called. This is needed in order to determine the final offset from which to search. 
 
         The `prioritizeActiveSite` parameter searches the objects parent before any other object. 
+
+        The `getElementMethod` is a string that selects which Stream method is used to get elements for searching. The strings 'getElementAtOrBefore' and 'getElementBeforeOffset' are currently accepted. 
+
         '''
         from music21 import stream # needed for exception matching
 
@@ -4490,7 +4495,7 @@ class Test(unittest.TestCase):
         mm2 = tempo.MetronomeMark(number=150, referent=.5)
         m2.insert(0, mm2)
         p.append([m1, m2])
-
+        
         # if done with default args, we get the same object, as we are using
         # getElementAtOrBefore
         self.assertEqual(str(mm2.getContextByClass('MetronomeMark')),     
