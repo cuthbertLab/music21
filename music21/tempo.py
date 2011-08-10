@@ -98,7 +98,7 @@ class TempoIndication(music21.Music21Object):
     def __init__(self):
         music21.Music21Object.__init__(self)
 
-    def getLastTempoIndication(self):
+    def getPreviousMetronomeMark(self):
         '''Do activeSite and context searches to try to find the last relevant MetronomeMark or MetricModulation object. If a MetricModulation mark is found, return the new MetronomeMark, or the last relevant.
 
         >>> from music21 import *
@@ -106,29 +106,19 @@ class TempoIndication(music21.Music21Object):
         >>> s.insert(0, tempo.MetronomeMark(number=120))
         >>> mm1 = MetronomeMark(number=90)
         >>> s.insert(20, mm1)
+        >>> mm1.getPreviousMetronomeMark()
+        <music21.tempo.MetronomeMark Quarter=120>
         '''
-#         >>> mm1.getLastTempoIndication()
-#         <music21.tempo.MetronomeMark moderate Quarter=90>
 
-        environLocal.printDebug(['getLastTempoIndication'])
+        environLocal.printDebug(['getPreviousMetronomeMark'])
 
         # search for TempoIndication objects, not just MetronomeMark objects
         found = None
-#         if self.activeSite is not None:
-#             candidates = self.activeSite.getElementsByClass('TempoIndication')
-#             if len(candidates) > 0:
-#                 environLocal.printDebug(['getLastTempoIndication: found via activeSite search:', candidates])
-#                 # get all indicies in reverse from the length
-#                 for i in range(len(candidates)-1, -1, -1):
-#                     found = candidates[i]
-#                     if found is self:
-#                         continue
-#                     else:
-#                         break
-        if found is None:
-            obj = self.getContextByClass('TempoIndication')
-            if obj is not None:
-                found = obj
+        # must provide getElementBefore, as will otherwise return self
+        obj = self.getContextByClass('TempoIndication', 
+              getElementMethod='getElementBeforeOffset')
+        if obj is not None:
+            found = obj
         if found is None:           
             return None # nothing to do
         if 'MetricModulation' in found.classes:
@@ -1051,7 +1041,7 @@ class Test(unittest.TestCase):
         mm1 = tempo.MetronomeMark(referent=.5, number=120)
         mm2 = tempo.MetronomeMark(referent='16th')
         
-        mmod1 = MetricModulation()
+        mmod1 = tempo.MetricModulation()
         mmod1.oldMetronome = mm1
         mmod1.newMetronome = mm2
         
@@ -1071,7 +1061,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mmod1.newMetronome.getQuarterBPM(), 30.0)
 
 
-    def testGetLastTempoIndicationA(self):
+    def testGetPreviousMetronomeMarkA(self):
         import copy
         from music21 import note, stream, tempo
 
@@ -1085,8 +1075,54 @@ class Test(unittest.TestCase):
         mm2 = tempo.MetronomeMark(number=150, referent=.5)
         m2.insert(0, mm2)
         p.append([m1, m2])
-        #self.assertEqual(str(mm2.getLastTempoIndication()), '')
+        self.assertEqual(str(mm2.getPreviousMetronomeMark()), '<music21.tempo.MetronomeMark adagio 16th=50>')
         #p.show()
+
+
+    def testGetPreviousMetronomeMarkB(self):
+        import copy
+        from music21 import note, stream, tempo
+
+        # test using a tempo text, will return a default metrone mark if possible
+        p = stream.Part()
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note(quarterLength=1), 4)
+        m2 = copy.deepcopy(m1)
+        mm1 = tempo.TempoText("slow")
+        m1.insert(0, mm1)
+        mm2 = tempo.MetronomeMark(number=150, referent=.5)
+        m2.insert(0, mm2)
+        p.append([m1, m2])
+        self.assertEqual(str(mm2.getPreviousMetronomeMark()), '<music21.tempo.MetronomeMark slow Quarter=52>')
+        #p.show()
+
+
+    def testGetPreviousMetronomeMarkC(self):
+        import copy
+        from music21 import note, stream, tempo
+
+        # test using a metric modulation
+        p = stream.Part()
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note(quarterLength=1), 4)
+        m2 = copy.deepcopy(m1)
+        m3 = copy.deepcopy(m2)
+
+        mm1 = tempo.MetronomeMark("slow")
+        m1.insert(0, mm1)
+
+        mm2 = tempo.MetricModulation()
+        mm2.oldMetronome = tempo.MetronomeMark(referent=1, number=52)
+        mm2.setOtherByReferent(referent='16th')
+        m2.insert(0, mm2)
+
+        mm3 = tempo.MetronomeMark(number=150, referent=.5)
+        m3.insert(0, mm3)
+
+        p.append([m1, m2, m3])
+        #p.show()
+
+        self.assertEqual(str(mm3.getPreviousMetronomeMark()), '<music21.tempo.MetronomeMark adagio 16th=52>')
 
 
 
