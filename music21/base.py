@@ -1204,7 +1204,8 @@ class DefinedContexts(object):
 
     def getByClass(self, className, serialReverseSearch=True, callerFirst=None,
              sortByCreationTime=False, prioritizeActiveSite=False, 
-             priorityTarget=None, memo=None):
+             priorityTarget=None, getElementMethod='getElementAtOrBefore', 
+             memo=None):
         '''Return the most recently added reference based on className. Class name can be a string or the class name.
 
         This will recursively search the defined contexts of existing defined contexts.
@@ -1286,6 +1287,7 @@ class DefinedContexts(object):
                            callerFirst=callerFirst, 
                            sortByCreationTime=sortByCreationTime, 
                            prioritizeActiveSite=prioritizeActiveSite,
+                           getElementMethod=getElementMethod,
                            memo=memo)
                     if post != None:
                         break
@@ -2217,7 +2219,8 @@ class Music21Object(JSONSerializer):
 
 
     def getContextByClass(self, className, serialReverseSearch=True,
-                          callerFirst=None, sortByCreationTime=False, prioritizeActiveSite=True, memo=None):
+            callerFirst=None, sortByCreationTime=False, prioritizeActiveSite=True, getElementMethod='getElementAtOrBefore', 
+            memo=None):
         '''Search both DefinedContexts as well as associated objects to find a matching class. Returns None if not match is found. 
 
         The a reference to the caller is required to find the offset of the 
@@ -2340,9 +2343,15 @@ class Music21Object(JSONSerializer):
                     # NOTE: if there are two elements of the same class here
                     # we are getting based only sort order, which may not be 
                     # what we want
-                    post = semiFlat.getElementAtOrBefore(offsetOfCaller, 
+                    if getElementMethod == 'getElementAtOrBefore':
+                        post = semiFlat.getElementAtOrBefore(offsetOfCaller, 
                                [className])
-
+                    elif getElementMethod == 'getElementBeforeOffset':
+                        #environLocal.printDebug(['getContextByClass(): using getElementsBeforeOffset'])
+                        post = semiFlat.getElementBeforeOffset(offsetOfCaller, 
+                               [className])
+                    else:
+                        raise Music21ObjectException('cannot get element with requested method: %s' % getElementMethod)
                 #environLocal.printDebug([self, 'results of serialReverseSearch:', post, '; searching for:', className, '; starting from offset', offsetOfCaller])
 
         if post is None: # still no match
@@ -2356,7 +2365,7 @@ class Music21Object(JSONSerializer):
                    # make the priorityTarget the parent, meaning we search
                    # this object first
                    prioritizeActiveSite=prioritizeActiveSite, 
-                   priorityTarget=priorityTarget, memo=memo)
+                   priorityTarget=priorityTarget,  getElementMethod=getElementMethod, memo=memo)
 
         return post
 
@@ -4467,6 +4476,32 @@ class Test(unittest.TestCase):
         n2.removeNonContainedLocations()
         self.assertEqual(n2.hasContext(s1), False)
         self.assertEqual(n2.hasContext(s2), True)
+
+
+    def testGetContextByClassA(self):
+        from music21 import stream, note, clef, tempo
+
+        p = stream.Part()
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note(quarterLength=1), 4)
+        m2 = copy.deepcopy(m1)
+        mm1 = tempo.MetronomeMark(number=50, referent=.25)
+        m1.insert(0, mm1)
+        mm2 = tempo.MetronomeMark(number=150, referent=.5)
+        m2.insert(0, mm2)
+        p.append([m1, m2])
+
+        # if done with default args, we get the same object, as we are using
+        # getElementAtOrBefore
+        self.assertEqual(str(mm2.getContextByClass('MetronomeMark')),     
+            '<music21.tempo.MetronomeMark Eighth=150>')
+        # if we provide the getElementMethod parameter, we can use 
+        # getElementBeforeOffset
+        self.assertEqual(str(mm2.getContextByClass('MetronomeMark',                     
+            getElementMethod='getElementBeforeOffset')),
+            '<music21.tempo.MetronomeMark adagio 16th=50>')
+
+
 
 #     def testWeakElementWrapper(self):
 #         from music21 import note

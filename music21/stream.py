@@ -2662,6 +2662,15 @@ class Stream(music21.Music21Object):
             return None
 
 
+    def getElementAtOrAfter(self, offset, classList=None):
+        '''Given an offset, find the element at this offset, or with the offset
+        greater than and nearest to.
+
+        TODO: write this
+        '''
+        raise Exception("not yet implemented")
+
+
     def getElementBeforeOffset(self, offset, classList=None):
         '''Get element before (and not at) a provided offset.
 
@@ -2724,14 +2733,6 @@ class Stream(music21.Music21Object):
         else:
             return None
 
-
-    def getElementAtOrAfter(self, offset, classList=None):
-        '''Given an offset, find the element at this offset, or with the offset
-        greater than and nearest to.
-
-        TODO: write this
-        '''
-        raise Exception("not yet implemented")
 
 
     def getElementAfterOffset(self, offset, classList = None):
