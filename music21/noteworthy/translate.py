@@ -10,6 +10,7 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+from music21.base import Music21Exception
 from music21 import duration
 from music21 import note
 from music21 import pitch
@@ -328,6 +329,15 @@ def createClef(line, meas):
     >>> measureOut, currentclef = noteworthy.translate.createClef("|Clef|Type:Treble\n", measureIn)
     >>> measureOut.show('text')
     {0.0} <music21.clef.TrebleClef>      
+
+
+    If no clef can be found then it raises a NoteworthyTranslate exception
+
+
+    >>> measureOut, currentclef = noteworthy.translate.createClef("|Clef|Type:OBonobo\n", measureIn)
+    Traceback (most recent call last):
+    NoteworthyTranslateException: Did not find a clef in line, |Clef|Type:OBonobo
+
     '''  
     currentclef = None
     i = 1
@@ -985,6 +995,9 @@ def parseList(data):
     #totalscore.show('text')
     #totalscore.show()
     return totalscore   
+
+class NoteworthyTranslateException(Music21Exception):
+    pass
 
 
 class Test(unittest.TestCase):

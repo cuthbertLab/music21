@@ -37,7 +37,7 @@ from music21 import chordTables
 from music21 import environment
 _MOD = "chord.py"
 environLocal = environment.Environment(_MOD)
-
+from music21 import tie
 
 #-------------------------------------------------------------------------------
 class ChordException(Exception):
@@ -438,6 +438,14 @@ class Chord(note.NotRest):
         True
         '''
         for d in self._pitches:
+            # this is an object comparison, not equality
+            if d['pitch'] is p:
+                if 'tie' in d.keys():
+                    return d['tie']
+                else:
+                    return None
+        
+        for d in self._pitches:
             # this is an equality comparison, not object
             if d['pitch'] == p:
                 if 'tie' in d.keys():
@@ -450,21 +458,47 @@ class Chord(note.NotRest):
         '''Given a pitch in this Chord, return an associated Tie object, or return None if not defined for that Pitch.
 
         >>> from music21 import *
-        >>> c1 = chord.Chord(['d', 'e-', 'b-'])
+        >>> c1 = chord.Chord(['d3', 'e-4', 'b-4'])
         >>> t1 = tie.Tie('start')
-        >>> c1.setTie(t1, c1.pitches[2]) # just to b-
+        >>> c1.setTie(t1, 'b-4') # or it can be done with a pitch.Pitch object
         >>> c1.getTie(c1.pitches[2]) == t1
         True
+        
+
+
+        Setting a tie with a chord with the same pitch twice requires
+        getting the exact pitch object out to be sure which one...
+        
+
+        >>> c2 = chord.Chord(['D4','D4'])
+        >>> secondD4 = c2.pitches[1]
+        >>> c2.setTie('start', secondD4)
+        >>> for i in [0,1]:
+        ...    print c2.getTie(c2.pitches[i])
+        None
+        <music21.tie.Tie start>
+        
         '''
         # assign to first pitch by default
         if pitchTarget is None and len(self._pitches) > 0: # if no pitch target
             pitchTarget = self._pitches[0]['pitch']
+        elif common.isStr(pitchTarget):
+            pitchTarget = pitch.Pitch(pitchTarget)
+        
+        if common.isStr(t):
+            t = tie.Tie(t)
+        
         match = False
         for d in self._pitches:
-            if d['pitch'] == pitchTarget:
+            if d['pitch'] is pitchTarget:
                 d['tie'] = t
                 match = True
-                break
+        if match is False:
+            for d in self._pitches:
+                if d['pitch'] == pitchTarget:
+                    d['tie'] = t
+                    match = True
+                    break
         if not match:
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
 
@@ -3429,6 +3463,15 @@ class Test(unittest.TestCase):
                 c.setTie(tie.Tie('start'), c.pitches[pos])
             s.append(c)
         #s.show()
+    def testTiesC(self):
+        c2 = Chord(['D4','D4'])
+        secondD4 = c2.pitches[1]
+        c2.setTie('start', secondD4)
+        self.assertEqual('tie' in c2._pitches[0], False)
+        self.assertEqual(c2._pitches[1]['tie'].type, 'start')
+
+
+
 
     def testChordQuality(self):
         from music21 import chord
