@@ -801,6 +801,35 @@ class MetricModulation(TempoIndication):
 
         ''')
 
+    #---------------------------------------------------------------------------
+    # high-level configuration methods
+
+    def updateByContext(self):
+        '''Update this metric modulation based on the context, or the surrounding MetronomeMarks or MetricModulations. The object needs to reside in a Stream for this to be effective. 
+        '''
+        # try to set old number from last; there must be a partially
+        # defined metronome mark already assigned; or create one at quarter?
+        mmLast = self.getPreviousMetronomeMark()
+        mmOld = None
+        if mmLast is not None:
+            #mmLastNumber = mmLast.number
+            # replace with an equivalent based on a provided value
+            if (self._oldMetronome is not None and 
+                self._oldMetronome.referent is not None):
+                mmOld = mmLast.getEquivalentByReferent(
+                        self._oldMetronome.referent)
+            else:
+                mmOld = MetronomeMark(referent=mmLast.referent, 
+                                      number=mmLast.number)
+        if mmOld is not None:
+            self._oldMetronome = mmOld
+        # if we have an a new referent, then update number
+        mmNew = None
+        if (self._newMetronome is not None and 
+            self._newMetronome.referent is not None and 
+            self._oldMetronome.number is not None):
+            self._newMetronome.number = self._oldMetronome.number
+
 
     def setEqualityByReferent(self, side=None, referent=1.0):
         '''Set the other side of the metric modulation to an equality; side can be specified, or if one side is None, that side will be set.  
@@ -1192,6 +1221,55 @@ class Test(unittest.TestCase):
             '<music21.tempo.MetronomeMark moderate Half=368.0>')
 
         #p.show()
+
+
+    def testSetReferrentB(self):
+        from music21 import stream, note, tempo
+        s = stream.Stream()
+        mm1 = tempo.MetronomeMark(number=60)
+        s.append(mm1)
+        s.repeatAppend(note.Note(quarterLength=1), 2)
+        s.repeatAppend(note.Note(quarterLength=.5), 4)
+
+        mmod1 = tempo.MetricModulation()
+        mmod1.oldReferent = .5 # can use Duration objects
+        mmod1.newReferent = 'quarter' # can use Duration objects
+        s.append(mmod1)
+        mmod1.updateByContext()
+
+        self.assertEqual(str(mmod1.oldMetronome.referent), '<music21.duration.Duration 0.5>')
+        self.assertEqual(mmod1.oldMetronome.number, 120)
+        self.assertEqual(str(mmod1.newMetronome), '<music21.tempo.MetronomeMark Quarter=120.0>')
+
+        s.append(note.Note())
+        s.repeatAppend(note.Note(quarterLength=1.5), 2)
+
+        #s.show()
+
+    def testSetReferrentC(self):
+        from music21 import stream, note, tempo
+        s = stream.Stream()
+        mm1 = tempo.MetronomeMark(number=60)
+        s.append(mm1)
+        s.repeatAppend(note.Note(quarterLength=1), 2)
+        s.repeatAppend(note.Note(quarterLength=.5), 4)
+
+        mmod1 = tempo.MetricModulation()
+        s.append(mmod1)
+        # even with we have no assigned metronome, update context will create
+        mmod1.updateByContext()
+
+        self.assertEqual(str(mmod1.oldMetronome.referent), '<music21.duration.Duration 1.0>')
+        self.assertEqual(mmod1.oldMetronome.number, 60) # value form last mm
+        # still have not set new
+        self.assertEqual(mmod1.newMetronome, None)
+
+        mmod1.newReferent = .25
+        self.assertEqual(str(mmod1.newMetronome), '<music21.tempo.MetronomeMark 16th=60>')
+
+        s.append(note.Note())
+        s.repeatAppend(note.Note(quarterLength=1.5), 2)
+
 
 
 #-------------------------------------------------------------------------------
