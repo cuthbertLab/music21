@@ -3241,8 +3241,12 @@ spirit</words>
         match = '<metronomeparentheses="yes">'
         self.assertEqual(raw.find(match) > 0, True)
 
-        #s.show()
-        # TODO: look for files that only have sound tags:
+
+    def testImportMetronomeMarksB(self):
+        pass
+        # TODO: look for files that only have sound tags and create MetronomeMarks
+        # need to look for bundling of Words text expressions with tempo
+
         # has only sound tempo=x tag
         #s = converter.parse(testPrimitive.articulations01)
         #s.show()
