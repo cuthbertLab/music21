@@ -714,7 +714,9 @@ class MetricModulation(TempoIndication):
         if mm is not None:
             self._oldMetronome = mm
         else:
-            raise TempoException('cannot set old MetronomeMark from provided value.')
+            # create a new metronome mark with a referent, but not w/ a value
+            self._oldMetronome = MetronomeMark(referent=value)
+            #raise TempoException('cannot set old MetronomeMark from provided value.')
 
     def _getOldReferent(self):
         if self._oldMetronome is not None:
@@ -763,9 +765,45 @@ class MetricModulation(TempoIndication):
         ''')
 
 
+    def _setNewReferent(self, value):
+        if value is None:
+            raise TempoException('cannot set new referent to None')
+        # of oldMetronome is defined, get new metronome from old
+        mm = None
+        if self._newMetronome is not None:
+            # if metro defined, get based on new referent
+            mm = self._newMetronome.getEquivalentByReferent(value)
+        elif self._oldMetronome is not None:
+            # get a new mm with the same number but a new referent
+            mm = self._oldMetronome.getMaintainedNumberWithReferent(value)
+        else:
+            # create a new metronome mark with a referent, but not w/ a value
+            mm = MetronomeMark(referent=value)
+            #raise TempoException('cannot set old MetronomeMark from provided value.')
+        self._newMetronome = mm
+
+    def _getNewReferent(self):
+        if self._newMetronome is not None:
+            return self._newMetronome.referent
+
+    newReferent = property(_getNewReferent, _setNewReferent, doc=
+        '''Get or set the referent of the new MetronomeMark. 
+
+        >>> from music21 import *
+        >>> mm1 = tempo.MetronomeMark(number=60, referent=1)
+        >>> mmod1 = tempo.MetricModulation()
+        >>> mmod1.newMetronome = mm1
+        >>> mmod1.newMetronome
+        <music21.tempo.MetronomeMark Quarter=60>
+        >>> mmod1.newReferent = .25
+        >>> mmod1.newMetronome
+        <music21.tempo.MetronomeMark 16th=240.0>
+
+        ''')
+
 
     def setEqualityByReferent(self, side=None, referent=1.0):
-        '''Set the other side of the metric modulation to an equality; side can be specified, or of one side is None, that side will be set.  
+        '''Set the other side of the metric modulation to an equality; side can be specified, or if one side is None, that side will be set.  
 
         >>> from music21 import *
         >>> mm1 = tempo.MetronomeMark(number=60, referent=1)
@@ -793,7 +831,7 @@ class MetricModulation(TempoIndication):
         
 
     def setOtherByReferent(self, side=None, referent=1.0):
-        '''Set the other side of the metric modulation not based on equality, but on a direct translation of tempo. 
+        '''Set the other side of the metric modulation not based on equality, but on a direct translation of the tempo value. 
         '''
         if side is None:
             if self._oldMetronome is None:

@@ -2625,8 +2625,6 @@ class Stream(music21.Music21Object):
         #<music21.note.Note D4>
         # FAILS, returns the clef!
 
-
-
         '''
         # NOTE: this is a performance critical method
         # TODO: need to deal with more than on object the same
