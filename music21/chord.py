@@ -527,6 +527,14 @@ class Chord(note.NotRest):
         '''
         
         for d in self._pitches:
+            # this is an object comparison, not equality
+            if d['pitch'] is p:
+                if 'notehead' in d.keys():
+                    return d['notehead']
+                else:
+                    return 'normal'
+                
+        for d in self._pitches:
             # this is an equality comparison, not object
             if d['pitch'] == p:
                 if 'notehead' in d.keys():
@@ -548,16 +556,37 @@ class Chord(note.NotRest):
         >>> c1.getNotehead(c1.pitches[0])
         'normal'
         
+        If a chord has two of the same pitch, but each associated with a different notehead, then
+        object equality must be used to distinguish between the two.
+        
+        
+        >>> c2 = chord.Chord(['D4','D4'])
+        >>> secondD4 = c2.pitches[1]
+        >>> c2.setNotehead('diamond', secondD4)
+        >>> for i in [0,1]:
+        ...    print c2.getNotehead(c2.pitches[i])
+        normal
+        diamond
+
         '''
         # assign to first pitch by default
         if pitchTarget is None and len(self._pitches) > 0: # if no pitch target
             pitchTarget = self._pitches[0]['pitch']
+        elif common.isStr(pitchTarget):
+            pitchTarget = pitch.Pitch(pitchTarget)    
+            
         match = False
         for d in self._pitches:
-            if d['pitch'] == pitchTarget:
+            if d['pitch'] is pitchTarget:
                 d['notehead'] = nh
                 match = True
-                break
+        if match is False:
+            for d in self._pitches:
+                if d['pitch'] == pitchTarget:
+                    d['notehead'] = nh
+                    match = True
+                    break
+                
         if not match:
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
 

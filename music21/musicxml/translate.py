@@ -1341,7 +1341,6 @@ def mxToChord(mxNoteList, inputM21=None):
     >>> c.getNotehead(c.pitches[0])
     'diamond'
     
-    
     '''
     from music21 import chord
     from music21 import pitch
