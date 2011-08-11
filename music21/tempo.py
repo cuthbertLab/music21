@@ -1219,9 +1219,7 @@ class Test(unittest.TestCase):
         mm2.setOtherByReferent(referent=2)
         self.assertEqual(str(mm2.newMetronome), 
             '<music21.tempo.MetronomeMark moderate Half=368.0>')
-
         #p.show()
-
 
     def testSetReferrentB(self):
         from music21 import stream, note, tempo
@@ -1230,23 +1228,65 @@ class Test(unittest.TestCase):
         s.append(mm1)
         s.repeatAppend(note.Note(quarterLength=1), 2)
         s.repeatAppend(note.Note(quarterLength=.5), 4)
-
+        
         mmod1 = tempo.MetricModulation()
         mmod1.oldReferent = .5 # can use Duration objects
         mmod1.newReferent = 'quarter' # can use Duration objects
         s.append(mmod1)
         mmod1.updateByContext()
-
+        
         self.assertEqual(str(mmod1.oldMetronome.referent), '<music21.duration.Duration 0.5>')
         self.assertEqual(mmod1.oldMetronome.number, 120)
         self.assertEqual(str(mmod1.newMetronome), '<music21.tempo.MetronomeMark Quarter=120.0>')
-
+        
         s.append(note.Note())
         s.repeatAppend(note.Note(quarterLength=1.5), 2)
-
+        
+        mmod2 = tempo.MetricModulation()
+        mmod2.oldReferent = 1.5 
+        mmod2.newReferent = 'quarter' # can use Duration objects
+        s.append(mmod2)
+        mmod2.updateByContext()
+        self.assertEqual(str(mmod2.oldMetronome), '<music21.tempo.MetronomeMark Dotted Quarter=80.0>')
+        self.assertEqual(str(mmod2.newMetronome), '<music21.tempo.MetronomeMark Quarter=80.0>')
+    
+        #s.repeatAppend(note.Note(), 4)
         #s.show()
 
     def testSetReferrentC(self):
+        from music21 import stream, note, tempo
+        s = stream.Stream()
+        mm1 = tempo.MetronomeMark(number=60)
+        s.append(mm1)
+        s.repeatAppend(note.Note(quarterLength=1), 2)
+        s.repeatAppend(note.Note(quarterLength=.5), 4)
+        
+        mmod1 = tempo.MetricModulation()
+        s.append(mmod1)
+        mmod1.oldReferent = .5 # can use Duration objects
+        mmod1.newReferent = 'quarter' # can use Duration objects
+        
+        self.assertEqual(str(mmod1.oldMetronome.referent), '<music21.duration.Duration 0.5>')
+        self.assertEqual(mmod1.oldMetronome.number, 120)
+        self.assertEqual(str(mmod1.newMetronome), '<music21.tempo.MetronomeMark Quarter=120.0>')
+        
+        s.append(note.Note())
+        s.repeatAppend(note.Note(quarterLength=1.5), 2)
+        
+        mmod2 = tempo.MetricModulation()
+        s.append(mmod2)
+        mmod2.oldReferent = 1.5 
+        mmod2.newReferent = 'quarter' # can use Duration objects
+        
+        self.assertEqual(str(mmod2.oldMetronome), '<music21.tempo.MetronomeMark Dotted Quarter=80.0>')
+        self.assertEqual(str(mmod2.newMetronome), '<music21.tempo.MetronomeMark Quarter=80.0>')
+        
+        s.repeatAppend(note.Note(), 4)
+        
+        #s.show()
+
+
+    def testSetReferrentD(self):
         from music21 import stream, note, tempo
         s = stream.Stream()
         mm1 = tempo.MetronomeMark(number=60)
@@ -1266,7 +1306,6 @@ class Test(unittest.TestCase):
 
         mmod1.newReferent = .25
         self.assertEqual(str(mmod1.newMetronome), '<music21.tempo.MetronomeMark 16th=60>')
-
         s.append(note.Note())
         s.repeatAppend(note.Note(quarterLength=1.5), 2)
 
