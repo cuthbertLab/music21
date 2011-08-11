@@ -644,11 +644,41 @@ class MetronomeMark(TempoIndication):
 
 #-------------------------------------------------------------------------------
 class MetricModulation(TempoIndication):
-    '''A class for representing the relationship between two MetronomeMarks. Generally this relationship is one of equality.
+    '''A class for representing the relationship between two MetronomeMarks. Generally this relationship is one of equality, where the number is maintained but the referent that number is applied to changes. 
+
+    The basic definition of a MetricModulation is given by supplying two MetronomeMarks, one for the oldMetronome, the other for the newMetronome. High level properties, oldReferent and newReferent, and convenience methods permit only setting the referent. 
 
     The `classicalStyle` attribute determines of the first MetronomeMark describes the new tempo, not the old (the reverse of expected usage).
 
     The `maintainBeat` attribute determines if, after an equality statement, the beat is maintained. This is relevant for moving from 3/4 to 6/8, for example. 
+
+    >>> from music21 import *
+    >>> s = stream.Stream()
+    >>> mm1 = tempo.MetronomeMark(number=60)
+    >>> s.append(mm1)
+    >>> s.repeatAppend(note.Note(quarterLength=1), 2)
+    >>> s.repeatAppend(note.Note(quarterLength=.5), 4)
+
+    >>> mmod1 = tempo.MetricModulation()
+    >>> mmod1.oldReferent = .5 # can use Duration objects
+    >>> mmod1.newReferent = 'quarter' # can use Duration objects
+    >>> s.append(mmod1)
+    >>> mmod1.updateByContext() # get number from last MetronomeMark on Stream
+    >>> mmod1.newMetronome
+    <music21.tempo.MetronomeMark Quarter=120.0>
+
+    >>> s.append(note.Note())
+    >>> s.repeatAppend(note.Note(quarterLength=1.5), 2)
+
+    >>> mmod2 = tempo.MetricModulation()
+    >>> s.append(mmod2) # if the obj is added to Stream, can set referents 
+    >>> mmod2.oldReferent = 1.5 # will get number from previous MetronomeMark
+    >>> mmod2.newReferent = 'quarter'
+    >>> mmod2.newMetronome
+    <music21.tempo.MetronomeMark Quarter=80.0>
+
+    >>> s.repeatAppend(note.Note(), 4)
+
     '''
     def __init__(self):
         TempoIndication.__init__(self)
