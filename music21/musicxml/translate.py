@@ -50,11 +50,9 @@ def mxToTempoIndication(mxMetronome, mxWords=None):
     >>> m.append(bu)
     >>> m.append(pm)
     >>> musicxml.translate.mxToTempoIndication(m)
-    <music21.tempo.MetronomeMark Quarter=125.0>
-
+    <music21.tempo.MetronomeMark Half=125.0>
     '''
     from music21 import tempo, duration
-
     # get lists of durations and texts
     durations = []
     numbers = [] 
@@ -62,27 +60,31 @@ def mxToTempoIndication(mxMetronome, mxWords=None):
     dActive = None
     for mxObj in mxMetronome.componentList:
         if isinstance(mxObj, musicxmlMod.BeatUnit):
-            # if we have not yet stored the dActive
-            if dActive is not None:
-                durations.append(dActive)
-                dActive = None # clear
             type = duration.musicXMLTypeToType(mxObj.charData)
             dActive = duration.Duration(type=type)
+            durations.append(dActive)
         if isinstance(mxObj, musicxmlMod.BeatUnitDot):
             if dActive is None:
                 raise TranslateException('encountered metronome components out of order')
             dActive.dots += 1 # add one dot each time these are encountered
         # should come last
-        if isinstance(mxObj, musicxmlMod.PerMinute):            
+        if isinstance(mxObj, musicxmlMod.PerMinute):      
+            #environLocal.printDebug(['found PerMinute', mxObj])
             # store as a number
             if mxObj.charData != '':
                 numbers.append(float(mxObj.charData))
 
-
     if mxMetronome.isMetricModulation():
         mm = tempo.MetricModulation()
-        # create two metronome marks and set
+        #environLocal.printDebug(['found metric modulaton:', 'durations', durations])
+        if len(durations) < 2:
+            raise TranslateException('found incompletely specified musicxml metric moduation: less than 2 duration defined')
+        # all we have are referents, no values are defined in musicxml
+        # will need to update context after adding to Stream
+        mm.oldReferent = durations[0]
+        mm.newReferent = durations[1]
     else:
+        #environLocal.printDebug(['found metronome mark:', 'numbers', numbers])
         mm = tempo.MetronomeMark()
         if len(numbers) > 0:
             mm.number = numbers[0]
@@ -92,6 +94,10 @@ def mxToTempoIndication(mxMetronome, mxWords=None):
         if mxWords is not None:
             pass
 
+    paren = mxMetronome.get('parentheses')
+    if paren is not None:
+        if paren in ['yes']:
+            mm.parentheses = True
     return mm
 
 
@@ -2082,7 +2088,6 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
 
         # NOTE: tests have shown that using isinstance() here is much faster
         # than checking the .tag attribute.
-
         # check for backup and forward first
         if isinstance(mxObj, musicxmlMod.Backup):
             # resolve as quarterLength, subtract from measure offset
@@ -2094,7 +2099,6 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             #environLocal.printDebug(['found mxl forward:', mxObj.duration, 'divisions', divisions])
             offsetMeasureNote += float(mxObj.duration) / float(divisions)
             continue
-
         elif isinstance(mxObj, musicxmlMod.Print):
             # mxPrint objects may be found in a Measure's componetns
             # contain system layout information
@@ -2168,7 +2172,6 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 mxNoteNext = mxObjNext
             else:
                 mxNoteNext = None
-
             if mxNote.get('print-object') == 'no':
                 #environLocal.printDebug(['got mxNote with printObject == no', 'measure number', m.number])
                 continue
@@ -2252,7 +2255,6 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             # only increment Chords after completion
             offsetMeasureNote += offsetIncrement
 
-        # load dynamics into Measure, not into Voice
         # mxDirections can be dynamics, repeat expressions, text expressions
         elif isinstance(mxObj, musicxmlMod.Direction):
 #                 mxDynamicsFound, mxWedgeFound = m._getMxDynamics(mxObj)
@@ -2284,6 +2286,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 m._insertCore(offsetMeasureNote, rm)
 
             if mxObj.getMetronome() is not None:
+                #environLocal.printDebug(['got getMetronome', mxObj.getMetronome()])
                 mm = mxToTempoIndication(mxObj.getMetronome())
                 _addToStaffReference(mxObj, mm, staffReference)
                 # need to look for metronome marks defined above
@@ -2469,6 +2472,9 @@ def streamPartToMx(part, instObj=None, meterStream=None,
     for obj in measureStream:
         #mxPart.append(obj.mx)
         mxPart.append(measureToMx(obj, spannerBundle=spannerBundle))
+
+    # might to post processing after adding all measures to the Stream
+    # TODO: need to find all MetricModulations and updateByContext
 
     # mxScorePart contains mxInstrument
     return mxScorePart, mxPart
@@ -3210,22 +3216,35 @@ spirit</words>
 #         s = converter.parse(testPrimitive.mixedVoices2)
 
 
-
     def testImportMetronomeMarksA(self):
-
         from music21.musicxml import testPrimitive
         from music21 import converter, repeat
-
         # has metronome marks defined, not with sound tag
         s = converter.parse(testPrimitive.metronomeMarks31c)
         # get all tempo indications
         mms = s.flat.getElementsByClass('TempoIndication')
         self.assertEqual(len(mms) > 3, True)
+        #s.show()
+        raw = s.musicxml.replace(' ', '').replace('\n', '')
+        match = '<beat-unit>long</beat-unit><per-minute>100.0</per-minute>'
+        self.assertEqual(raw.find(match) > 0, True)
+
+        match = '<beat-unit>quarter</beat-unit><beat-unit-dot/><per-minute>100.0</per-minute>'
+        self.assertEqual(raw.find(match) > 0, True)
+
+        match = '<beat-unit>long</beat-unit><beat-unit>32nd</beat-unit><beat-unit-dot/>'
+        self.assertEqual(raw.find(match) > 0, True)
+
+        match = '<beat-unit>quarter</beat-unit><beat-unit-dot/><beat-unit>half</beat-unit><beat-unit-dot/>'
+        self.assertEqual(raw.find(match) > 0, True)
+
+        match = '<metronomeparentheses="yes">'
+        self.assertEqual(raw.find(match) > 0, True)
 
         #s.show()
-
+        # TODO: look for files that only have sound tags:
         # has only sound tempo=x tag
-        s = converter.parse(testPrimitive.articulations01)
+        #s = converter.parse(testPrimitive.articulations01)
         #s.show()
 
 
@@ -3261,9 +3280,7 @@ spirit</words>
 
     def testExportMetronomeMarksC(self):
         from music21 import stream, note, tempo, duration
-
         # set metronome positions at different offsets in a measure or part
-    
         p = stream.Part()
         p.repeatAppend(note.Note('g#3'), 8)
         # default quarter assumed
@@ -3367,7 +3384,6 @@ spirit</words>
 
 
     def testMetricModulationA(self):
-        
         from music21 import stream, note, tempo
 
         s = stream.Stream()

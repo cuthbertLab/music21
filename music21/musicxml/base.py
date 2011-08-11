@@ -241,7 +241,7 @@ class TagLib(object):
 ('metronome', False, Metronome), # no char data
 ('beat-unit', True, BeatUnit),
 ('beat-unit-dot', False, BeatUnitDot),
-('beat-minute', True, PerMinute),
+('per-minute', True, PerMinute),
 
 ('time-modification', False, TimeModification), 
 ('actual-notes', True), 
@@ -1355,7 +1355,6 @@ class Direction(MusicXMLElementList):
                     post.append(obj)
         return post
 
-
     def getMetronome(self):
         '''Search this direction and determine if it contains a dynamic mark.
 
@@ -1372,7 +1371,6 @@ class Direction(MusicXMLElementList):
             return found[0] # only return one fo rnow
         else:
             return None
-
 
     def getWedge(self):
         '''Search this direction and determine if it contains a dynamic mark.
@@ -1534,7 +1532,7 @@ class Words(MusicXMLElement):
 
 
 class Metronome(MusicXMLElementList):
-    '''A direction type used to store tempo indications, consisting of a <beat-unit> tag (a duration) as well as a <per-unit> tag (a number)
+    '''A direction type used to store tempo indications, consisting of a <beat-unit> tag (a duration) as well as a <per-unit> tag (a number). Also used to store metric modulations. 
 
     >>> from music21 import *
     >>> m = musicxml.Metronome()

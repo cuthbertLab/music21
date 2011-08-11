@@ -1158,7 +1158,7 @@ class Test(unittest.TestCase):
             # get keys from first part
             keyStream = s.parts[0].flat.getElementsByClass(key.KeySignature)
             keyObj = keyStream[0]
-            environLocal.printDebug([keyObj])
+            #environLocal.printDebug([keyObj])
 
 
     def testEssenImport(self):
