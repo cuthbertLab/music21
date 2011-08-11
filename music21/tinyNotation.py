@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         tinyNotation.py
-# Purpose:      A simply notation input format.
+# Purpose:      A simple notation input format.
 #
 # Authors:      Michael Scott Cuthbert
 #
@@ -10,44 +10,49 @@
 #-------------------------------------------------------------------------------
 
 
-'''tinyNotation -- a simple way of specifying single line melodies
+'''tinyNotation is a simple way of specifying single line melodies
 that uses a notation somewhat similar to Lilypond but with WAY fewer 
 options.  It was originally developed to notate trecento (medieval Italian)
 music, but it is pretty useful for a lot of short examples, so we have
 made it a generally supported music21 format
+
 
 N.B.: TinyNotation is not meant to expand to cover every single case.  Instead
 it is meant to be subclassable to extend to the cases *your* project needs.
 See for instance the harmony examples in HarmonyStream and HarmonyNote
 or the Trecento specific examples in trecento/cadencebook.py
 
+
 Here are the most important rules:
 
+
 Note names are: a,b,c,d,e,f,g and r for rest
+
 
 Flats, sharps, and naturals are notated as #,- (not b), and (if needed) n.  
 If the accidental is above the staff (i.e., editorial), enclose it in 
 parentheses: (#), etc.  Make sure that flats in the key signatures are
 explicitly specified.  
 
+
 Note octaves are specified as follows:
 
+
     CC to BB = from C below bass clef to second-line B in bass clef
-
     C to B = from bass clef C to B below middle C.
-
     c  to b = from middle C to the middle of treble clef
-
     c' to b' = from C in treble clef to B above treble clef
     
     Octaves below and above these are specified by further doublings of
     letter (CCC) or apostrophes (c'') -- this is one of the note name
     standards found in many music theory books.
 
+
 After the note name, a number may be placed indicating the note 
 length: 1 = whole note, 2 = half, 4 = quarter, 8 = eighth, 16 = sixteenth.  
 etc.  If the number is omitted then it is assumed to be the same 
 as the previous note.  I.e., c8 B c d  is a string of eighth notes.
+
 
 After the number, a ~ can be placed to show a tie to the next note.  
 A "." indicates a dotted note.  (If you are entering
@@ -56,12 +61,15 @@ first letter of sentences" is turned off under "Tools->AutoCorrect,"
 otherwise the next letter will be capitalized, and the octave will
 be screwed up.
 
+
 For triplets use this notation:  trip{c4 d8}  indicating that these 
 two notes both have "3s" over them.  For 4 in the place of 3, 
 use quad{c16 d e8}.  No other tuplets are supported.
 
+
 Again, see the HarmonyStream (below) and trecento.cadencebook examples
 to see how to make TinyNotation useful for your own needs.
+
 
 (Currently, final notes with fermatas (or any very long final note), 
 take 0 for the note length.  But expect this to disappear from the
@@ -86,10 +94,14 @@ from music21 import pitch
 
 
 class TinyNotationStream(stream.Stream):
-    '''A TinyNotationStream takes in a string representation similar to Lilypond format
+    '''
+    A TinyNotationStream takes in a string representation similar to Lilypond format
     but simplified somewhat and an optional time signature string (or TimeSignature object).
     
+    
     example in 3/4:
+    
+    
     >>> stream1 = TinyNotationStream("E4 r f# g=lastG trip{b-8 a g} c4~ c", "3/4")
     >>> stream1.show('text')
     {0.0} <music21.meter.TimeSignature 3/4>
@@ -183,6 +195,7 @@ class TinyNotationStream(stream.Stream):
             self.append(timeSignature)
         for thisNote in noteList:
             self.append(thisNote)
+    
         
     def getNote(self, stringRep, storedDict = common.DefaultHash()):
         '''
@@ -190,21 +203,63 @@ class TinyNotationStream(stream.Stream):
         '''
         return TinyNotationNote(stringRep, storedDict)
 
+
 class TinyNotationNote(object):
     ''' 
+    Class defining a single note in TinyNotation.  The "note" attribute
+    returns a :class:`~music21.note.Note` object.
+
+
+    See docs for :class:`~music21.tinyNotation.TinyNotationStream` for
+    usage.
+    
+
+    Simple example:
+
+
     >>> from music21 import *
-    >>> tcN = tinyNotation.TinyNotationNote("AA-4.~=aflat_hel-")
-    >>> note1 = tcN.note
-    >>> note1.name
+    >>> tnN = tinyNotation.TinyNotationNote("c8")
+    >>> m21Note = tnN.note
+    >>> m21Note
+    <music21.note.Note C>
+    >>> m21Note.octave
+    4
+    >>> m21Note.duration
+    <music21.duration.Duration 0.5>
+    
+    
+    Very complex example:
+
+
+    >>> tnN = tinyNotation.TinyNotationNote("AA-4.~=aflat_hel-")
+    >>> m21Note = tnN.note
+    >>> m21Note.name
     'A-'
-    >>> note1.octave
+    >>> m21Note.octave
     2
-    >>> note1.lyric
+    >>> m21Note.lyric
     'hel'
-    >>> note1.id
+    >>> m21Note.id
     'aflat'
 
+
+
+    The optional third element is a dictionary of stored information
+    from previous notes that might affect parsing of this note.
+    
+    
+    >>> storedDict = {}
+    >>> storedDict['lastNoteTied'] = True
+    >>> storedDict['inTrip'] = True
+    >>> tnN = tinyNotation.TinyNotationNote("d''#4", storedDict)
+    >>> tnN.note.tie
+    <music21.tie.Tie stop>
+    >>> tnN.note.duration.quarterLength
+    0.6666666...
+
+
     OMIT_FROM_DOCS
+
     
     >>> tcn2 = tinyNotation.TinyNotationNote("c''##16").note
     >>> tcn2.accidental
@@ -213,6 +268,7 @@ class TinyNotationNote(object):
     6
     >>> tcn2.quarterLength
     0.25
+
 
     >>> tcn3 = tinyNotation.TinyNotationNote("d''(---)16").note
     >>> tcn3.editorial.ficta
@@ -243,13 +299,17 @@ class TinyNotationNote(object):
         storedtie = None
         self.debug = False
         
+        if stringRep is None:
+            raise TinyNotationException('Cannot return a note without some parameters')
+        
+        
         if self.PRECTIE.match(stringRep):
             if self.debug is True: print("FOUND FRONT TIE")
             stringRep = self.PRECTIE.sub("", stringRep)
             storedtie = music21.tie.Tie("stop")
             storedDict['lastNoteTied'] = False
 
-        elif storedDict['lastNoteTied'] is True:
+        elif 'lastNoteTied' in storedDict and storedDict['lastNoteTied'] is True:
             storedtie = music21.tie.Tie("stop")
             storedDict['lastNoteTied'] = False
 
@@ -307,20 +367,21 @@ class TinyNotationNote(object):
                 noteObj.tie.type = 'continue'
         
         ## use dict to set tuplets
-        if (storedDict['inTrip'] == True or storedDict['inQuad'] == True) and usedLastDuration == False:
+        if ((('inTrip' in storedDict and storedDict['inTrip'] == True) or 
+             ('inQuad' in storedDict and storedDict['inQuad'] == True)) and usedLastDuration == False):
             newTup = music21.duration.Tuplet()
             newTup.durationActual.type = noteObj.duration.type
             newTup.durationNormal.type = noteObj.duration.type
-            if storedDict['inQuad'] == True:
+            if 'inQuad' in storedDict and storedDict['inQuad'] == True:
                 newTup.numNotesActual = 4.0
                 newTup.numNotesNormal = 3.0            
-            if storedDict['beginTuplet']:
+            if 'beginTuplet' in storedDict and storedDict['beginTuplet'] == True:
                 newTup.type = "start"
             noteObj.duration.appendTuplet(newTup)
 
-        if (storedDict['inTrip'] == True and storedDict['endTuplet']):
-            noteObj.duration.tuplets[0].type = "stop"
-        if (storedDict['inQuad'] == True and storedDict['endTuplet']):
+        if ((('inTrip' in storedDict and storedDict['inTrip'] == True) or
+             ('inQuad' in storedDict and storedDict['inQuad'] == True)) and 
+             ('endTuplet' in storedDict and storedDict['endTuplet'] == True)):
             noteObj.duration.tuplets[0].type = "stop"
         
         storedDict['lastDuration'] = noteObj.duration
