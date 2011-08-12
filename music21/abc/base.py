@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2010 The music21 Project
+# Copyright:    (c) 2010-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
@@ -64,13 +64,9 @@ _pitchTranslationCache = {}
 #-------------------------------------------------------------------------------
 # note inclusion of w: for lyrics
 reMetadataTag = re.compile('[A-Zw]:')
-
 rePitchName = re.compile('[a-gA-Gz]')
-
 reChordSymbol = re.compile('"[^"]*"') # non greedy
-
 reChord = re.compile('[.*?]') # non greedy
-
 
 
 #-------------------------------------------------------------------------------
@@ -242,6 +238,12 @@ class ABCMetadata(ABCToken):
             return True
         return False
 
+    def isTempo(self):
+        '''Returns True if the tag is "Q" for tempo, False otherwise.
+        '''
+        if self.tag == 'Q': 
+            return True
+        return False
 
     def _getTimeSignatureParameters(self):
         '''If there is a time signature representation available, 
@@ -269,6 +271,7 @@ class ABCMetadata(ABCToken):
         >>> am.preParse()
         >>> am._getTimeSignatureParameters()
         (4, 4, 'normal')
+
         '''
         if not self.isMeter():
             raise ABCTokenException('no time signature associated with this meta-data')
@@ -398,14 +401,11 @@ class ABCMetadata(ABCToken):
                                    ('min', 'minor'),
                                   ]:
                 if match in modeCandidate:
-                    mode = modeStr
-    
+                    mode = modeStr    
         # not yet implemented: checking for additional chromatic alternations
         # e.g.: K:D =c would write the key signature as two sharps 
         # (key of D) but then mark every  c  as  natural
- 
         return key.pitchToSharps(standardKeyStr, mode), mode
-
 
     def getKeySignatureObject(self):
         '''
@@ -458,6 +458,76 @@ class ABCMetadata(ABCToken):
 
 
 
+    def getMetronomeMarkObject(self):
+        '''Extract any tempo parameters stored in a tmepo metadata token.
+
+        >>> from music21 import *
+        >>> am = abc.ABCMetadata('Q: "Allegro" 1/4=120')
+        >>> am.preParse()
+        >>> am.getMetronomeMarkObject()
+        <music21.tempo.MetronomeMark Allegro Quarter=120.0>
+
+        >>> am = abc.ABCMetadata('Q: 3/8=50 "Slowly"')
+        >>> am.preParse()
+        >>> am.getMetronomeMarkObject()
+        <music21.tempo.MetronomeMark Slowly Dotted Quarter=50.0>
+
+        >>> am = abc.ABCMetadata('Q:1/2=120')
+        >>> am.preParse()
+        >>> am.getMetronomeMarkObject()
+        <music21.tempo.MetronomeMark animato Half=120.0>
+
+        >>> am = abc.ABCMetadata('Q:1/4 3/8 1/4 3/8=40')
+        >>> am.preParse()
+        >>> am.getMetronomeMarkObject()
+        <music21.tempo.MetronomeMark grave Whole tied to Quarter (5.0 total QL)=40.0>
+        '''
+        if not self.isTempo():
+            raise ABCTokenException('no tempo associated with this meta-data')
+        mmObj = None
+        from music21 import tempo
+        # see if there is a text expression in quotes
+        tempoStr = None
+        if '"' in self.data:
+            tempoStr = []
+            nonText = []
+            open = False
+            for char in self.data:
+                if char == '"' and not open:
+                    open = True
+                    continue
+                if char == '"' and open:
+                    open = False
+                    continue
+                if open:
+                    tempoStr.append(char)
+                else: # gather all else
+                    nonText.append(char) 
+            tempoStr = ''.join(tempoStr).strip()
+            nonText = ''.join(nonText).strip()
+        else:
+            nonText = self.data.strip()
+
+        # get a symbolic and numerical value if available
+        number = None
+        referent = None
+        if '=' in nonText:
+            durs, number = nonText.split('=')
+            number = float(number)
+            # there may be more than one dur divided by a space
+            referent = 0.0 # in quarter lengths
+            for dur in durs.split(' '):
+                n, d = dur.split('/')
+                referent += (float(n) / float(d)) * 4
+
+        #print nonText, tempoStr
+        if tempoStr is not None or number is not None:
+            mmObj = tempo.MetronomeMark(text=tempoStr, number=number,
+                                    referent=referent)
+        # returns None if not defined
+        return mmObj
+
+
     def getDefaultQuarterLength(self):
         '''If there is a quarter length representation available, return it as a floating point value
 
@@ -502,7 +572,7 @@ class ABCMetadata(ABCToken):
             return (float(n) / d) * 4
             
         elif self.isMeter():
-            # meter auto-set a default not length
+            # if meter auto-set a default not length
             parameters = self._getTimeSignatureParameters()
             if parameters == None:
                 return .5 # TODO: assume default, need to configure
