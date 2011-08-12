@@ -32,7 +32,7 @@ import wave
 import music21
 from music21 import common
 
-
+import sys
 _missingImport = []
 
 ###
@@ -44,6 +44,11 @@ try:
     import pyaudio
     recordFormat = pyaudio.paInt16
 except ImportError:
+    pyaudio = None
+    recordFormat = 8 # pyaudio.paInt16
+
+    _missingImport.append('pyaudio')
+except SystemExit:
     pyaudio = None
     recordFormat = 8 # pyaudio.paInt16
 
@@ -131,7 +136,5 @@ _DOC_ORDER = []
 
 if __name__ == "__main__":
     music21.mainTest(Test, 'noDocTest')
-
-
 #------------------------------------------------------------------------------
 # eof
