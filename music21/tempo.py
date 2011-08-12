@@ -28,7 +28,7 @@ _MOD = "tempo.py"
 environLocal = environment.Environment(_MOD)
 
 
-# all lowercase, even german
+# all lowercase, even german, for string comparison
 defaultTempoValues = {
      'larghissimo': 16, 
      'largamente': 32, 
@@ -559,17 +559,25 @@ class MetronomeMark(TempoIndication):
         132
         >>> mm._getDefaultNumber('adagio')
         56
+        >>> mm._getDefaultNumber('Largo e piano')
+        46
         '''
         if isinstance(tempoText, TempoText):
             tempoStr = tempoText.text
         else:
             tempoStr = tempoText
         post = None # returned if no match
-        if tempoStr.lower() in defaultTempoValues:
+        if tempoStr.lower() in defaultTempoValues.keys():
             post = defaultTempoValues[tempoStr.lower()]
         # an exact match
         elif tempoStr in defaultTempoValues:
             post = defaultTempoValues[tempoStr]
+        # look for partial matches
+        if post is None:
+            for word in tempoStr.split(' '):
+                for key in defaultTempoValues.keys():
+                    if key == word.lower():
+                        post = defaultTempoValues[key]
         return post
 
     def _getDefaultText(self, number, spread=2):

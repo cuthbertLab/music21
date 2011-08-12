@@ -199,7 +199,11 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
             # look for a tempo indication
             directive = mdm.parent.getDirective()
             if directive is not None:
-                pass
+                tt = tempo.TempoText(directive)
+                # if this appears to be a tempo indication, than get metro
+                if tt.isCommonTempoText():
+                    mm = tt.getMetronomeMark()
+                    m.insert(0, mm)
 
         # get all records; may be notes or note components
         mdrObjs = mdm.getRecords()
@@ -565,6 +569,24 @@ class Test(unittest.TestCase):
         self.assertEqual([n.nameWithOctave for n in s.parts[0].getElementsByClass('Measure')[0].notes], ['A4', 'B4'])
 
         self.assertEqual([n.offset for n in s.parts[2].getElementsByClass('Measure')[0].notes], [0.0, 1.0, 2.0])
+
+
+
+    def testMuseDataImportTempoA(self):
+        from music21 import corpus
+        # a small file
+        s = corpus.parse('movement2-09.md')
+        self.assertEqual(len(s.parts), 5)
+        # the tempo is found in the 4th part here
+        self.assertEqual(str(
+            s.parts[3].flat.getElementsByClass('TempoIndication')[0]), 
+            '<music21.tempo.MetronomeMark Largo e piano Quarter=46>')
+        #s.show()
+
+        s = corpus.parse('movement2-07.md')
+        self.assertEqual(str(
+            s.flat.getElementsByClass('TempoIndication')[0]), 
+            '<music21.tempo.MetronomeMark Largo Quarter=46>')
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

@@ -707,7 +707,7 @@ class MuseDataPart(object):
             if alphas == '':
                 return None
             else:
-                return alphas
+                return alphas.strip()
 
 
     def getSource(self):
