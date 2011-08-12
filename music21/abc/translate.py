@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2010 The music21 Project
+# Copyright:    (c) 2010-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
@@ -28,9 +28,6 @@ from music21.abc import base as abcModule
 from music21 import environment
 _MOD = 'abc.translate.py'
 environLocal = environment.Environment(_MOD)
-
-
-
 
 
 
@@ -120,7 +117,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                     if mh.leftBarToken.isRepeatBracket() == 2:
                         rb.completeStatus = True                        
 
-            if mh.rightBarToken != None:
+            if mh.rightBarToken is not None:
                 bRight = mh.rightBarToken.getBarObject()
                 if bRight != None:
                     dst.rightBarline = bRight
@@ -174,6 +171,9 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                         else:
                             dst._appendCore(clefObj)
                         postTransposition = transposition
+                elif t.isTempo():
+                    mmObj = t.getMetronomeMarkObject()
+                    dst._appendCore(mmObj)
 
             # as ABCChord is subclass of ABCNote, handle first
             elif isinstance(t, abcModule.ABCChord):
@@ -652,6 +652,34 @@ class Test(unittest.TestCase):
         s = corpus.parse('JollyTinkersReel')
         self.assertEqual(len(s.flat.getElementsByClass('RepeatBracket')), 4)
         
+
+    def testMetronomeMarkA(self):
+
+        from music21.abc import testFiles
+        from music21 import converter
+        s = converter.parse(testFiles.fullRiggedShip)
+        mmStream = s.flat.getElementsByClass('TempoIndication')
+        self.assertEqual(len(mmStream), 1)
+        self.assertEqual(str(mmStream[0]), '<music21.tempo.MetronomeMark Quarter=100.0>')
+
+        s = converter.parse(testFiles.aleIsDear)
+        mmStream = s.flat.getElementsByClass('TempoIndication')
+        # this is a two-part pieces, and this is being added for each part
+        # not sure if this is a problem
+        self.assertEqual(len(mmStream), 2)
+        self.assertEqual(str(mmStream[0]), '<music21.tempo.MetronomeMark Quarter=211.0>')
+
+        s = converter.parse(testFiles.theBeggerBoy)
+        mmStream = s.flat.getElementsByClass('TempoIndication')
+        # this is a two-part pieces, and this is being added for each part
+        # not sure if this is a problem
+        self.assertEqual(len(mmStream), 1)
+        self.assertEqual(str(mmStream[0]), '<music21.tempo.MetronomeMark maestoso Quarter=90.0>')
+
+        #s.show()
+
+
+
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

@@ -457,7 +457,6 @@ class ABCMetadata(ABCToken):
         return clefObj, t
 
 
-
     def getMetronomeMarkObject(self):
         '''Extract any tempo parameters stored in a tmepo metadata token.
 
@@ -481,6 +480,12 @@ class ABCMetadata(ABCToken):
         >>> am.preParse()
         >>> am.getMetronomeMarkObject()
         <music21.tempo.MetronomeMark grave Whole tied to Quarter (5.0 total QL)=40.0>
+
+        >>> am = abc.ABCMetadata('Q:90')
+        >>> am.preParse()
+        >>> am.getMetronomeMarkObject()
+        <music21.tempo.MetronomeMark maestoso Quarter=90.0>
+
         '''
         if not self.isTempo():
             raise ABCTokenException('no tempo associated with this meta-data')
@@ -511,14 +516,17 @@ class ABCMetadata(ABCToken):
         # get a symbolic and numerical value if available
         number = None
         referent = None
-        if '=' in nonText:
-            durs, number = nonText.split('=')
-            number = float(number)
-            # there may be more than one dur divided by a space
-            referent = 0.0 # in quarter lengths
-            for dur in durs.split(' '):
-                n, d = dur.split('/')
-                referent += (float(n) / float(d)) * 4
+        if len(nonText) > 0:
+            if '=' in nonText:
+                durs, number = nonText.split('=')
+                number = float(number)
+                # there may be more than one dur divided by a space
+                referent = 0.0 # in quarter lengths
+                for dur in durs.split(' '):
+                    n, d = dur.split('/')
+                    referent += (float(n) / float(d)) * 4
+            else: # assume we just have a quarter definition, e.g., Q:90
+                number = float(nonText)
 
         #print nonText, tempoStr
         if tempoStr is not None or number is not None:
