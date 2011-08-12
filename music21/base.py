@@ -4504,7 +4504,7 @@ class Test(unittest.TestCase):
         # getElementBeforeOffset
         self.assertEqual(str(mm2.getContextByClass('MetronomeMark',                     
             getElementMethod='getElementBeforeOffset')),
-            '<music21.tempo.MetronomeMark adagio 16th=50>')
+            '<music21.tempo.MetronomeMark lento 16th=50>')
 
 
 
