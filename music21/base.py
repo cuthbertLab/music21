@@ -85,6 +85,9 @@ try:
     import pyaudio
 except ImportError:
     _missingImport.append('pyaudio')
+except SystemExit:
+    _missingImport.append('pyaudio')
+    sys.stderr.write('pyaudio is installed but PortAudio is not -- re-download pyaudio at http://people.csail.mit.edu/hubert/pyaudio/')
 
 # try:
 #     import abjad

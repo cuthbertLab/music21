@@ -286,7 +286,7 @@ class PartitionedName(object):
             #data = inspect.formatargspec()
             argStr = []
             # defaults is an ordered list in same order as args
-            # varargs and keywwords are the names of * and ** args respectively
+            # varargs and keywords are the names of * and ** args respectively
             args, varargs, keywords, defaults = data 
             # get index offset to when defaults start
             if defaults != None:
@@ -301,7 +301,10 @@ class PartitionedName(object):
                 
                 if defaults != None and p >= offset:
                     default = defaults[p-offset]
-                    argStr.append('%s=%s' % (arg, default))
+                    if isinstance(default, basestring):
+                        argStr.append('%s=\'%s\'' % (arg, default))
+                    else:
+                        argStr.append('%s=%s' % (arg, default))
                 else:
                     argStr.append('%s' % (arg))
             # add position/keyword args 

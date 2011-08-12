@@ -83,10 +83,11 @@ Module Reference
    moduleFiguredBassRules
    moduleFiguredBassSegment
    moduleGraph
-   moduleKey
+   moduleHumdrumSpineParser
    moduleInstrument
    moduleInterval
    moduleIntervalNetwork
+   moduleKey
    moduleMedren
    moduleMeter
    moduleMetadata

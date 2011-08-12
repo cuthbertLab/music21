@@ -74,11 +74,11 @@ class HumdrumDataCollection(object):
 
 
     LIMITATION:    
-    Spines cannot change definition (**exclusive interpretations) mid-spine.
+    Spines cannot change definition (\*\*exclusive interpretations) mid-spine.
     
     
-    So if you start off with **kern, the rest of the spine needs to be 
-    **kern (actually, the first exclusive interpretation for a spine is 
+    So if you start off with \*\*kern, the rest of the spine needs to be 
+    \*\*kern (actually, the first exclusive interpretation for a spine is 
     used throughout)
 
 
@@ -148,7 +148,7 @@ class HumdrumDataCollection(object):
         
         
         The difference between the dataStream and self.eventList
-        are the following:
+        are the following::
         
             * Blank lines are skipped.
             * !!! lines become :class:`~music21.humdrum.spineParser.GlobalReference` objects
@@ -156,7 +156,7 @@ class HumdrumDataCollection(object):
             * all other lines become :class:`~music21.humdrum.spineParser.SpineLine` objects
             
         
-        returns eventList in addition to setting it as self.eventList
+        Returns eventList in addition to setting it as self.eventList.
         
         
         >>> from music21 import *
@@ -359,14 +359,22 @@ class HumdrumDataCollection(object):
         
 
         When we check for spinePathData we look for the following spine 
-        path indicators (from HumdrumDoc):
+        path indicators (from HumdrumDoc)::
+            
+            
+            *+    add a new spine (to the right of the current spine) 
+            
+            *-    terminate a current spine                           
+            
+            *^    split a spine (into two)                            
+            
+            *v    join (two or more) spines into one                  
+            
+            *x    exchange the position of two spines                 
+            
+            *     do nothing                                          
         
-            : *+    add a new spine (to the right of the current spine)
-            : *-    terminate a current spine 
-            : *^    split a spine (into two)
-            : *v    join (two or more) spines into one
-            : *x    exchange the position of two spines
-            : *     do nothing
+        
         '''
 
         
@@ -508,10 +516,18 @@ class HumdrumFile(HumdrumDataCollection):
 
 class HumdrumLine(object):    
     '''
-    HumdrumLine is a dummy class for subclassing SpineLine, 
-    GlobalComment, and GlobalReference classes
+    HumdrumLine is a dummy class for subclassing 
+    :class:`~music21.humdrum.spineParser.SpineLine`, 
+    :class:`~music21.humdrum.spineParser.GlobalComment`, and 
+    :class:`~music21.humdrum.spineParser.GlobalReference` classes
     all of which represent one horizontal line of 
-    text in a HumdrumFile that are aware of their positions
+    text in a :class:`~music21.humdrum.spineParser.HumdrumDataCollection` 
+    that is aware of its 
+    position in the file.
+    
+    
+    See the documentation for the specific classes mentioned above
+    for more details.
     '''
     isReference = False
     isGlobal = False
@@ -525,8 +541,8 @@ class SpineLine(HumdrumLine):
     and not Global elements.
     
     
-    Takes in a position (line number in file) and a string of
-    contents.
+    Takes in a position (line number in file, excluding blank lines) 
+    and a string of contents.
     
     
     >>> from music21 import *
@@ -560,28 +576,35 @@ class GlobalReference(HumdrumLine):
     
     
     In humdrum it is represented by three exclamation points 
-    followed by non-whitespace followed by a colon.  Examples:
+    followed by non-whitespace followed by a colon.  Examples::
     
     
         !!!COM: Stravinsky, Igor Fyodorovich
+
         !!!CDT: 1882/6/17/-1971/4/6
+
         !!!ODT: 1911//-1913//; 1947//
+
         !!!OPT@@RUS: Vesna svyashchennaya
+
         !!!OPT@FRE: Le sacre du printemps
 
 
-    The GlobalReference object takes two inputs:
+    The GlobalReference object takes two inputs::
 
 
         position (line number in the humdrum file)
+        
         contents (string of contents)
 
 
-    And stores them as three attributes:
+    And stores them as three attributes::
 
 
         position (as above)
+        
         code: non-whitespace code (usually three letters)
+        
         contents (string of contents)
 
 
@@ -627,7 +650,9 @@ class GlobalComment(HumdrumLine):
     In humdrum it is represented by two exclamation points (and usually one space)
     
     
-    The GlobalComment object takes two inputs and stores them as attributes:
+    The GlobalComment object takes two inputs and stores them as attributes::
+    
+    
         position (line number in the humdrum file)
         contents (string of contents)
         value    (contents minus !!)
@@ -683,7 +708,7 @@ class ProtoSpine(object):
 class HumdrumSpine(object):
     '''
     A HumdrumSpine is a representation of a generic HumdrumSpine
-    regardless of **definition after spine path indicators have
+    regardless of \*\*definition after spine path indicators have
     been simplified. 
     
     
@@ -886,7 +911,7 @@ class HumdrumSpine(object):
 
 class KernSpine(HumdrumSpine):
     '''
-    A KernSpine is a type of humdrum spine with the **kern
+    A KernSpine is a type of humdrum spine with the \*\*kern
     attribute set and thus events are processed as if they
     are kern notes
     '''
@@ -957,7 +982,7 @@ class KernSpine(HumdrumSpine):
 
 class DynamSpine(HumdrumSpine):
     '''
-    A DynamSpine is a type of humdrum spine with the **dynam
+    A DynamSpine is a type of humdrum spine with the \*\*dynam
     attribute set and thus events are processed as if they
     are dynamics.
     '''
@@ -1016,7 +1041,7 @@ class SpineEvent(object):
     
     
 
-    These attributes are optional but likely to be very helpful:
+    These attributes are optional but likely to be very helpful::
     
         position -- event position in the file
         protoSpineId -- ProtoSpine id (0 to N)
@@ -1054,7 +1079,7 @@ class SpineEvent(object):
 
     def toNote(self):
         '''
-        parse the object as a **kern note and return the a
+        parse the object as a \*\*kern note and return the a
         :class:`~music21.note.Note` object (or Rest, or Chord)
         
         
@@ -1500,10 +1525,10 @@ def hdStringToMeasure(contents):
         m1.rightBarline.style = "light-light"
         if contents.count(':') > 1:
             m1.rightBarline.repeat_dots = "both"
-            ## cannot specify single repeat does without styles
+            ## cannot specify single repeat dots without styles
         if contents == "==|":
             raise HumdrumException \
-                ("Cannot import a double bar visually rendered as a single bar")
+                ("Cannot import a double bar visually rendered as a single bar -- not sure exactly what that would mean anyhow.")
     
     if contents.count(';'):
         m1.rightBarline.pause = music21.expressions.Fermata()
