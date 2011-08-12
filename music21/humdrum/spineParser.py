@@ -1286,7 +1286,7 @@ def hdStringToNote(contents):
     '''
     returns a music21.note.Note (or Rest or Unpitched, etc.) 
     matching the current SpineEvent.
-    Does not check to see that it is sane or part of a **kern spine, etc.
+    Does not check to see that it is sane or part of a \*\*kern spine, etc.
     '''
     
     # http://www.lib.virginia.edu/artsandmedia/dmmc/Music/Humdrum/kern_hlp.html#kern

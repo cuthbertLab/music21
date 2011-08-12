@@ -443,8 +443,7 @@ class PartitionedModule(PartitionedName):
         >>> a.getNames('classes')
         ['Pitch', 'Accidental', 'Microtone']
         >>> a.getNames('functions')    
-        ['convertFqToPs', 'convertHarmonicToCents', 'convertNameToPitchClass', 'convertNameToPs', 'convertPitchClassToNumber', 'convertPitchClassToStr', 'convertPsToFq', 'convertPsToOct', 'convertPsToStep', 'convertStepToPs']
-
+        ['convertCentsToAlterAndCents', 'convertFqToPs', 'convertHarmonicToCents', 'convertNameToPitchClass', 'convertNameToPs', 'convertPitchClassToNumber', 'convertPitchClassToStr', 'convertPsToFq', 'convertPsToOct', 'convertPsToStep', 'convertStepToPs']
         '''
 
         post = []
@@ -489,8 +488,10 @@ class PartitionedModule(PartitionedName):
 
 #-------------------------------------------------------------------------------
 class PartitionedClass(PartitionedName):
-    '''Given an evaluated class name as an argument, mange and present
+    '''
+    Given an evaluated class name as an argument, manage and present
     All data for all attributes, methods, and properties.
+
 
     Note that this only gets data attributes that are defined outside
     of the __init__ definition of the Class. 
@@ -542,7 +543,9 @@ class PartitionedClass(PartitionedName):
         self._sort()
 
     def _sort(self):
-        '''Sort _data, self.namesMroIndex, and self.names by placing anything defined in self.srcNameEval first.
+        '''
+        Sort _data, self.namesMroIndex, and self.names by placing anything 
+        defined in self.srcNameEval first.
         '''
         namesSupply = self.names[:]
 
@@ -583,12 +586,16 @@ class PartitionedClass(PartitionedName):
 
 
     def _createMroLive(self):
-        '''Try to create the mro order but with live objects.
+        '''
+        Try to create the mro order but with live objects.
+
 
         >>> from music21 import pitch
         >>> a = PartitionedClass(pitch.Pitch)
         >>> len(a._createMroLive())
         4
+        >>> print a._createMroLive()
+        [C, <music21.base.Music21Object object at 0x...>, <music21.base.JSONSerializer object at 0x...>, <object object at 0x...>]
         '''
         post = []
         for entry in self.mro:
@@ -631,7 +638,10 @@ class PartitionedClass(PartitionedName):
         return post
 
     def findMroIndex(self, partName):
-        '''Given an partName, find from where (in the list of methods) the part is derived. Returns an index number value.
+        '''
+        Given an partName, find from where (in the list of methods) 
+        the part is derived. Returns an index number value.
+
 
         >>> from music21 import pitch
         >>> a = PartitionedClass(pitch.Pitch)
@@ -645,6 +655,9 @@ class PartitionedClass(PartitionedName):
         return mroIndex
 
     def mroIndices(self):
+        '''
+        returns a list in the range of the length of self.mro
+        '''
         return range(len(self.mro))
 
     def lastMroIndex(self):
@@ -661,11 +674,11 @@ class PartitionedClass(PartitionedName):
         >>> from music21 import pitch
         >>> a = PartitionedClass(pitch.Pitch)
         >>> a.getElement('midi')
-        Attribute(name='midi', kind='property', defining_class=<class 'music21.pitch.Pitch'>, object=<property object...
+        Attribute(name='midi', kind='property', defining_class=<class 'music21.pitch.Pitch'>, object=<property object...>)
         >>> a.getElement('id')
         Attribute(name='id', kind='data', defining_class=<class 'music21.base.Music21Object'>, object=None)
         >>> a.getElement('_getDiatonicNoteNum')
-        Attribute(name='_getDiatonicNoteNum', kind='method', defining_class=<class 'music21.pitch.Pitch'>, object=<function...
+        Attribute(name='_getDiatonicNoteNum', kind='method', defining_class=<class 'music21.pitch.Pitch'>, object=<function...>)
 
         '''
         if partName not in self.names:
@@ -683,16 +696,29 @@ class PartitionedClass(PartitionedName):
 
 
     def getDoc(self, partName):
-        '''
+        r'''
+        Get the documentation for
+        an attribute or method and
+        return it as a literal string.
+        
+        
         >>> from music21 import pitch
         >>> a = PartitionedClass(pitch.Pitch)
         >>> a.getDoc('__init__')[:15]
         'Create a Pitch.'
 
+
         >>> from music21 import editorial
         >>> b = PartitionedClass(editorial.Comment)
         >>> b.getDoc('__init__')
         u'No documentation.'
+
+
+        >>> from music21.humdrum import spineParser
+        >>> c = PartitionedClass(spineParser.SpineCollection)
+        >>> c.getDoc('addSpine')
+        '\n        creates a new spine in the collection and returns it.\n        \n        \n        By default, the underlying music21 class of the spine is\n        :class:`~music21.stream.Part`.  This can be...'
+
         '''
         element = self.getElement(partName)
 
@@ -753,11 +779,11 @@ class PartitionedClass(PartitionedName):
         True
 
         >>> a.getNames('method', mroIndex=0)
-        ['__init__', 'convertMicrotonesToQuarterTones', 'convertQuarterTonesToMicrotones', 'getCentShiftFromMidi', 'getEnharmonic', 'getHarmonic', 'getHigherEnharmonic', 'getLowerEnharmonic', 'harmonicAndFundamentalFromPitch', 'harmonicAndFundamentalStringFromPitch', 'harmonicFromFundamental', 'harmonicString', 'inheritDisplay', 'isEnharmonic', 'isTwelveTone', 'lilyNoOctave', 'setAccidentalDisplay', 'simplifyEnharmonic', 'transpose', 'transposeAboveTarget', 'transposeBelowTarget', 'updateAccidentalDisplay']
+        ['__init__', 'convertMicrotonesToQuarterTones', 'convertQuarterTonesToMicrotones', 'getAllCommmonEnharmonics', 'getCentShiftFromMidi', 'getEnharmonic', 'getHarmonic', 'getHigherEnharmonic', 'getLowerEnharmonic', 'getMidiPreCentShift', 'harmonicAndFundamentalFromPitch', 'harmonicAndFundamentalStringFromPitch', 'harmonicFromFundamental', 'harmonicString', 'inheritDisplay', 'isEnharmonic', 'isTwelveTone', 'lilyNoOctave', 'setAccidentalDisplay', 'simplifyEnharmonic', 'transpose', 'transposeAboveTarget', 'transposeBelowTarget', 'updateAccidentalDisplay']
         >>> a.getNames('data', mroIndex=0)
         ['fundamental', 'implicitAccidental', 'defaultOctave']
         >>> a.getNames('data', mroIndex=1)
-        ['classSortOrder', 'hideObjectOnPrint', 'id', 'groups']
+        ['classSortOrder', 'hideObjectOnPrint', 'id', 'isSpanner', 'isStream', 'isWrapper', 'groups']
         >>> a.getNames('data', mroIndex=a.lastMroIndex())
         []
 
@@ -771,7 +797,7 @@ class PartitionedClass(PartitionedName):
         >>> len(a.getNames('methods')) > 10
         True
         >>> a.getNames('attributes', 1)
-        ['hideObjectOnPrint', 'id', 'groups']
+        ['hideObjectOnPrint', 'id', 'isSpanner', 'isStream', 'isWrapper', 'groups']
 
         >>> from music21 import serial
         >>> a = PartitionedClass(serial.RowSchoenbergOp23No5)
@@ -780,7 +806,7 @@ class PartitionedClass(PartitionedName):
         >>> a.getNames('data', 1) # returns empty b/c defined here
         []
         >>> a.mroLive[1]
-        <music21.serial.HistoricalTwelveToneRow...
+        <music21.serial.HistoricalTwelveToneRow...>
 
         '''
         post = []
@@ -931,10 +957,19 @@ class RestructuredWriter(object):
 
 
     def formatDocString(self, doc, indent='', modName=None):
-        '''Given a docstring, clean it up for RST presentation.
+        r'''
+        Given a docstring, clean it up for RST presentation.
+
 
         Note: can use inspect.getdoc() or inspect.cleandoc(); though
         we need customized approach demonstrated here.
+
+
+        >>> rsw = RestructuredWriter()
+        >>> rsw.formatDocString("hello #_DOCS_HIDE\n" +\
+        ...                     "#_DOCS_SHOW there")
+        u' there \n'
+
         '''
         if doc == None:
             return ''
@@ -1738,6 +1773,7 @@ Set all notes to the correct notes for a key using the note's Context:
 
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':
+    #sys.argv.append('test')
     if len(sys.argv) == 2 and sys.argv[1] == 'test':
         music21.mainTest(Test)
         buildDoc = False
