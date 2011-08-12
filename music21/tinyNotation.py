@@ -273,6 +273,13 @@ class TinyNotationNote(object):
     >>> tcn3 = tinyNotation.TinyNotationNote("d''(---)16").note
     >>> tcn3.editorial.ficta
     <accidental triple-flat>
+    
+    
+    Test instantiating without any parameters:
+    
+    
+    >>> tcn4 = tinyNotation.TinyNotationNote()
+    
     '''
     
     REST    = compile('r')
@@ -295,9 +302,19 @@ class TinyNotationNote(object):
 
 
     def __init__(self, stringRep = None, storedDict = common.DefaultHash(default = False)):
+        self.debug = False
+        self.stringRep = stringRep
+        self.storedDict = storedDict
+        self._note = None
+        
+    def _getNote(self):
+        if self._note is not None:
+            return self._note
         noteObj = None
         storedtie = None
-        self.debug = False
+
+        stringRep = self.stringRep
+        storedDict = self.storedDict
         
         if stringRep is None:
             raise TinyNotationException('Cannot return a note without some parameters')
@@ -418,7 +435,10 @@ class TinyNotationNote(object):
         if self.LYRIC.search(stringRep):
             noteObj.lyric = self.LYRIC.search(stringRep).group(1)
             
-        self.note = noteObj
+        self._note = noteObj
+        return self._note
+    
+    note = property(_getNote)
 
     def getDots(self, stringRep, noteObj):
         '''

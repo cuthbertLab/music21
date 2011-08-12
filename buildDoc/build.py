@@ -69,10 +69,14 @@ from music21.figuredBass import rules as fbRules
 from music21.figuredBass import segment as fbSegment
 
 from music21 import graph
-from music21 import key
+from music21.humdrum import spineParser as humdrumSpineParser
+
 from music21 import instrument
 from music21 import interval
 from music21 import intervalNetwork
+
+
+from music21 import key
 
 from music21 import medren
 from music21 import metadata
@@ -181,11 +185,12 @@ MODULES = [
     fbSegment,
     
     graph,
-    key,
+    humdrumSpineParser,
     instrument,
     interval, 
     intervalNetwork,
-    
+    key,
+
     medren,
     meter, 
     metadata,
