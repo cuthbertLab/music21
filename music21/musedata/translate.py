@@ -143,6 +143,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
     from music21 import meter
     from music21 import key
     from music21 import note
+    from music21 import tempo
 
     if inputM21 == None:
         s = stream.Score()
