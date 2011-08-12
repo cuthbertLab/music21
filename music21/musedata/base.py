@@ -612,23 +612,27 @@ class MuseDataPart(object):
         return ''.join(post)
 
 
-    def _getAlphasFollowingTag(self, line, tag):
+    def _getAlphasFollowingTag(self, line, tag, keepSpace=False, 
+        keepCase=False):
         '''
         >>> from music21 import *
         >>> mdp = music21.musedata.MuseDataPart()
         >>> mdp._getAlphasFollowingTag('Group memberships: sound, score', 'Group memberships:')
         'sound,score'
         '''
-        line = line.lower()
-        tag = tag.lower()
+        if not keepCase:
+            line = line.lower()
+            tag = tag.lower()
         post = []
         if tag in line:
             i = line.find(tag) + len(tag)
             while i < len(line):
                 if line[i].isalpha():
                     post.append(line[i])
-                elif line[i].isspace():
+                elif line[i].isspace() and not keepSpace:
                     pass
+                elif line[i].isspace() and keepSpace:
+                    post.append(line[i])
                 elif line[i] in ',': # chars to permit
                     post.append(line[i])
                 else: # anything other than space ends gather
@@ -681,7 +685,30 @@ class MuseDataPart(object):
             return self.src[1][6:].strip()
         else:
             return self._getDigitsFollowingTag(self.src[4], 'MV#:')
-            
+
+
+    def getDirective(self):
+        '''The directive field is generally used to store tempo indications.This indication, however, is frequently not provided.
+
+        >>> from music21 import *
+        >>> from music21.musedata import testFiles
+        >>> mdw = musedata.MuseDataWork()
+        >>> mdw.addString(testFiles.hwv56_movement1_17)
+        >>> mdw.getParts()[3].getDirective()
+        'Largo e piano'
+        '''
+        if self.stage == 1:
+            # nothing seems to be defined in stage 1
+            return None
+        else:
+            line = self._getAttributesRecord()
+            alphas = self._getAlphasFollowingTag(line, 'D:', keepSpace=True, 
+                                              keepCase=True)
+            if alphas == '':
+                return None
+            else:
+                return alphas
+
 
     def getSource(self):
         '''
@@ -728,7 +755,6 @@ class MuseDataPart(object):
         else:
             return self.src[6]
 
-
     def getMovementTitle(self):
         '''
         >>> from music21 import *
@@ -742,7 +768,6 @@ class MuseDataPart(object):
             return None
         else:
             return self.src[7]
-
 
     def getPartName(self):
         '''
@@ -759,7 +784,6 @@ class MuseDataPart(object):
             return None
         else:
             return self.src[8].strip()
-
 
     def getGroupMemberships(self):
         '''
@@ -811,7 +835,6 @@ class MuseDataPart(object):
                 return None
             else:
                 return int(raw)
-
 
     def getGroupMembershipNumber(self, membership='score'):
         '''
@@ -1669,7 +1692,6 @@ class Test(unittest.TestCase):
         mdw = MuseDataWork()
         mdw.addString(testFiles.bachContrapunctus1_part1)
         mdw.addString(testFiles.bachContrapunctus1_part2)
-
         
         mdpObjs = mdw.getParts()
 

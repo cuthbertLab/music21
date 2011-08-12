@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009-11 The music21 Project
+# Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -30,16 +30,28 @@ environLocal = environment.Environment(_MOD)
 
 # all lowercase, even german
 defaultTempoValues = {
+     'larghissimo': 42, # need number
+     'grave': 42, # need number
+     'lento': 42, # need number
+     'larghetto': 42, # need number
      'molto adagio': 40,
+     'adagietto': 47, # need number
      'adagio': 52,
      'slow': 52,
+     'largo': 40, # need number
      'langsam': 52,
      'andante': 72,
+     'andante moderato': 83, # need number
+     'andantino': 83, # need number
      'moderato': 90,
      'moderate': 90,
      'allegretto': 108,
+     'allegro moderator': 128, # need number
      'allegro': 132,
+     'allegrissimo': 140, # need number
      'fast': 132,
+     'vivace': 150, # need number
+     'vivacissimo': 150, # need number
      'schnell': 132,
      'molto allegro': 144,
      'très vite': 144,
@@ -227,8 +239,21 @@ class TempoText(TempoIndication):
             te.positionVertical = 45 # 4.5 staff lines above
         return te
 
-    def isValidText(self, value):
-        '''Return True or False if the supplied text could be used for this TempoText.  
+    def isCommonTempoText(self, value=None):
+        '''Return True or False if the supplied text seems like a plausible Tempo indications be used for this TempoText.  
+
+        >>> from music21 import *
+        >>> tt = tempo.TempoText("adagio")
+        >>> tt.isCommonTempoText()
+        True
+
+        >>> tt = tempo.TempoText("Largo e piano")
+        >>> tt.isCommonTempoText()
+        True
+
+        >>> tt = tempo.TempoText("undulating")
+        >>> tt.isCommonTempoText()
+        False
         '''
         def stripText(s):
             # remove all spaces, punctuation, and make lower
@@ -237,12 +262,16 @@ class TempoText(TempoIndication):
             s = s.replace('.', '')
             s = s.lower()
             return s
-        # TODO: compare to known tempo marks
-#         for candidate in self._textAlternatives:
-#             candidate = stripText(candidate)
-#             value = stripText(value)
-#             if value == candidate:
-#                 return True
+        # if not provided, use stored text
+        if value is None:
+            value = self._textExpression.content
+
+        for candidate in defaultTempoValues.keys():
+            candidate = stripText(candidate)
+            value = stripText(value)
+            # simply look for membership, not a complete match
+            if value in candidate or candidate in value:
+                return True
         return False
 
 

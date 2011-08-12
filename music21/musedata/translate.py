@@ -188,13 +188,17 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
             # get bar from next measure definition
             m.rightBarline = mdmNext.getBarObject()
 
-        if barCount == 0: # only for first
+        if barCount == 0: # only for when no bars are defined
             # the parent of the measure is the part
             c = mdm.parent.getClefObject()
             if c != None:
                 m.clef = mdm.parent.getClefObject()
             m.timeSignature = mdm.parent.getTimeSignatureObject()
             m.keySignature = mdm.parent.getKeySignature()
+            # look for a tempo indication
+            directive = mdm.parent.getDirective()
+            if directive is not None:
+                pass
 
         # get all records; may be notes or note components
         mdrObjs = mdm.getRecords()
