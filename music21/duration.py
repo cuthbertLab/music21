@@ -1801,6 +1801,10 @@ class DurationUnit(DurationCommon):
             dotStr = 'Double Dotted'
         elif dots == 3:
             dotStr = 'Triple Dotted'
+        elif dots == 4:
+            dotStr = 'Quadruple Dotted'
+        elif dots > 4:
+            dotStr = ('%d-Times Dotted' % dots)
         else:   
             dotStr = None
 
@@ -1815,11 +1819,18 @@ class DurationUnit(DurationCommon):
             #environLocal.printDebug(['tupletStr', tupletStr, tuplets])
 
         msg = []
-        if dotStr is not None:
-            msg.append('%s ' % dotStr)
-
         # type added here
         typeStr = self._getType()
+        if dots >= 2 or (typeStr != 'longa' and typeStr != 'maxima'):
+            if dotStr is not None:
+                msg.append('%s ' % dotStr)
+        else:
+            if dots == 0:
+                msg.append('Imperfect ')
+            elif dots == 1:
+                msg.append('Perfect ')
+
+        #
         if typeStr[0] in ['1', '2', '3', '5', '6']:
             pass # do nothing with capitalization
         else:
@@ -1858,6 +1869,15 @@ class DurationUnit(DurationCommon):
         >>> d.fullName
         'Half'
 
+
+        >>> d = duration.DurationUnit()
+        >>> d.type = 'longa'
+        >>> d.fullName
+        'Imperfect Longa'
+        
+        >>> d.dots = 1
+        >>> d.fullName
+        'Perfect Longa'
         ''')
 
 

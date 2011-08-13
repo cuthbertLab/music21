@@ -1271,6 +1271,32 @@ def hdStringToNote(contents):
     returns a music21.note.Note (or Rest or Unpitched, etc.) 
     matching the current SpineEvent.
     Does not check to see that it is sane or part of a \*\*kern spine, etc.
+
+
+    New rhythmic extensions defined in
+    http://wiki.humdrum.org/index.php/Rational_rhythms
+    are fully implemented:
+
+
+    >>> n = hdStringToNote("CC3%2")
+    >>> n.duration.quarterLength
+    2.6666666...
+    >>> n.duration.fullName
+    'Whole Triplet (2.67QL)'
+    
+    >>> n = hdStringToNote("e-00.")
+    >>> n.duration.quarterLength
+    24.0
+    >>> n.duration.fullName
+    'Perfect Longa'
+    
+    >>> n = hdStringToNote("F#000")
+    >>> n.duration.quarterLength
+    32.0
+    >>> n.duration.fullName
+    'Imperfect Maxima'
+    
+
     '''
     
     # http://www.lib.virginia.edu/artsandmedia/dmmc/Music/Humdrum/kern_hlp.html#kern
@@ -1388,10 +1414,27 @@ def hdStringToNote(contents):
     
     # 3.2.7 Duration +
     # 3.2.8 N-Tuplets
+    foundRational = re.search("(\d+)\%(\d+)", contents)
     foundNumber = re.search("(\d+)", contents)
-    if foundNumber:
+    if foundRational:
+        durationFirst = int(foundRational.group(1))
+        durationSecond = float(foundRational.group(2))
+        thisObject.duration.quarterLength = 4*durationSecond/durationFirst
+        if contents.count('.'):
+            thisObject.duration.dots = contents.count('.')            
+        
+    elif foundNumber:
+        durationString = foundNumber.group(1)
         durationType = int(foundNumber.group(1))
-        if durationType == 0:
+        if durationString == '000': # for larger values, see http://wiki.humdrum.org/index.php/Rational_rhythms
+            thisObject.duration.type = 'maxima'
+            if contents.count('.'):
+                thisObject.duration.dots = contents.count('.')            
+        elif durationString == '00': # for larger values, see http://wiki.humdrum.org/index.php/Rational_rhythms
+            thisObject.duration.type = 'longa'
+            if contents.count('.'):
+                thisObject.duration.dots = contents.count('.')            
+        elif durationType == 0:
             thisObject.duration.type = 'breve'
             if contents.count('.'):
                 thisObject.duration.dots = contents.count('.')
