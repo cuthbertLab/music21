@@ -946,7 +946,7 @@ class DataSet(object):
                 try:
                     fReturned = fe.extract()
                 except: # for now take any error
-                    environLocal.warn(['failed feature extactor:', fe])
+                    environLocal.printDebug(['failed feature extactor:', fe])
                     # provide a blank feature extactor
                     fReturned = fe.getBlankFeature()
 
@@ -1224,7 +1224,7 @@ class Test(unittest.TestCase):
 
 
     def testFeatureFail(self):
-
+        import music21
         from music21 import stream, features
 
         featureExtractors = ['p10', 'p11', 'p12', 'p13']
@@ -1238,7 +1238,8 @@ class Test(unittest.TestCase):
         
         # create problematic streams
         s = stream.Stream()
-        s.append(None) # will create a wrapper
+        #s.append(None) # will create a wrapper -- NOT ANYMORE
+        s.append(music21.ElementWrapper(None))
         ds.addData(s, classValue='Monteverdi')
         ds.addData(s, classValue='Handel')
         

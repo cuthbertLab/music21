@@ -17,7 +17,7 @@ This overview will illustrate key features of music21's Stream. For complete doc
 Appending and Inserting Objects into Streams
 ---------------------------------------------
 
-Streams provide a way to structure and position music21 objects both hierarchically (as Streams nested within Streams) and temporally (as objects and Streams placed in time). Objects stored on lists are called elements, and must be either a :class:`~music21.base.Music21Object` or an object contained within a :class:`~music21.base.ElementWrapper`. Streams store their objects internally on a list called :attr:`~music21.stream.Stream.elements`, though direct manipulation of this list is rarely needed. 
+Streams provide a way to structure and position music21 objects both hierarchically (as Streams nested within Streams) and temporally (as objects and Streams placed in time). Objects stored on lists are called elements, and be a :class:`~music21.base.Music21Object` (almost everything in music21 is a Music21Object, such as Note, Chord, TimeSignature, etc.).  If you want to put an object that's not a Music21Object in a Stream, put it in an :class:`~music21.base.ElementWrapper`. Streams store their objects internally on a list called :attr:`~music21.stream.Stream.elements`, though direct manipulation of this list is rarely needed. 
 
 The most common application of Streams is as a place to store Notes. For an introduction to Notes, see :ref:`overviewNotes`; for complete documentation on Notes, see :ref:`moduleNote`.
 

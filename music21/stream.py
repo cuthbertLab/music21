@@ -181,10 +181,10 @@ class Stream(music21.Music21Object):
     def __init__(self, givenElements=None, *args, **keywords):
         music21.Music21Object.__init__(self)
 
-        # self._elements stores ElementWrapper and Music21Object objects. 
+        # self._elements stores Music21Object objects. 
         self._elements = [] 
 
-        # self._endElements stores ElementWrapper and Music21Object found at
+        # self._endElements stores Music21Objects found at
         # the highestTime of this Stream. 
         self._endElements = [] 
 
@@ -261,7 +261,7 @@ class Stream(music21.Music21Object):
 
 
     def __getitem__(self, key):
-        '''Get an ElementWrapper from the stream in current order; sorted if isSorted is True,
+        '''Get a Music21Object from the stream in current order; sorted if isSorted is True,
         but not necessarily.
         
         if an int is given, returns that index
@@ -765,7 +765,7 @@ class Stream(music21.Music21Object):
 
 
     def getElementByObjectId(self, objId):
-        '''Low-level tool to get an element based only on the object id. This does not yet handle ElementWrapper objects.
+        '''Low-level tool to get an element based only on the object id.
 
         This is not the same as getElementById, which refers to the id attribute which may be manually set and not unique. 
         '''
@@ -1168,7 +1168,7 @@ class Stream(music21.Music21Object):
 
         # if not a Music21Object, embed
         if not isinstance(item, music21.Music21Object): 
-            element = music21.ElementWrapper(item)
+            raise StreamException('to put a non Music21Object in a stream, create a music21.ElementWrapper for the item') #element = music21.ElementWrapper(item)
         else:
             element = item
 
@@ -1233,7 +1233,6 @@ class Stream(music21.Music21Object):
         element ends). 
 
 
-        if the objects are not Music21Objects, they are wrapped in ElementWrappers
 
 
         runs fast for multiple addition and will preserve isSorted if True
@@ -1301,7 +1300,7 @@ class Stream(music21.Music21Object):
             #if not isinstance(item, music21.Music21Object): 
             except AttributeError:
                 #environLocal.printDebug(['wrapping item in ElementWrapper:', item])
-                element = music21.ElementWrapper(item)
+                raise StreamException('cannot append a non Music21Object. wrap it in a music21.ElementWrapper(item) first')
 
             self._addElementPreProcess(element)
     
@@ -1377,8 +1376,8 @@ class Stream(music21.Music21Object):
             item.isStream # will raise attribute error
             element = item
         except AttributeError: # need to wrap 
-            element = music21.ElementWrapper(item)
-
+            #element = music21.ElementWrapper(item)
+            raise StreamException('to put a non Music21Object in a stream, create a music21.ElementWrapper for the item')
         # if not a Music21Object, embed
 #         if not isinstance(item, music21.Music21Object): 
 #             element = music21.ElementWrapper(item)
@@ -3634,8 +3633,8 @@ class Stream(music21.Music21Object):
             element = item
         #if not isinstance(item, music21.Music21Object): 
         except AttributeError:
-            element = music21.ElementWrapper(item)
-
+            #element = music21.ElementWrapper(item)
+            raise StreamException('to put a non Music21Object in a stream, create a music21.ElementWrapper for the item')
         # if not an element, embed
 #         if not isinstance(item, music21.Music21Object): 
 #             element = music21.ElementWrapper(item)
@@ -3672,8 +3671,8 @@ class Stream(music21.Music21Object):
         #if not isinstance(item, music21.Music21Object): 
         except AttributeError:
             # if not an element, embed
-            element = music21.ElementWrapper(item)
-
+            #element = music21.ElementWrapper(item)
+            raise StreamException('to put a non Music21Object in a stream, create a music21.ElementWrapper for the item')
 #         if not isinstance(item, music21.Music21Object): 
 #             # if not an element, embed
 #             element = music21.ElementWrapper(item)
@@ -6407,10 +6406,8 @@ class Stream(music21.Music21Object):
 
     def _getDuration(self):
         '''
-        Gets the duration of the ElementWrapper (if separately set), but
-        normal returns the duration of the component object if available, otherwise
-        returns None.
-
+        Gets the duration of the whole stream (generally the highestTime, but can be set
+        independently).
         '''
 
         if self._unlinkedDuration is not None:
@@ -7959,7 +7956,7 @@ class Stream(music21.Music21Object):
         for e in sortedElements:
 
             if e.offset > highestCurrentEndTime:
-                gapElement = music21.ElementWrapper(obj = None)
+                gapElement = music21.Music21Object() #ElementWrapper(obj = None)
                 gapQuarterLength = e.offset - highestCurrentEndTime
                 if gapQuarterLength <= minimumQuarterLength:
                     #environLocal.printDebug(['findGaps(): skipping very small gap:', gapQuarterLength])

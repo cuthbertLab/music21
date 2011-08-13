@@ -1295,9 +1295,9 @@ class DefinedContexts(object):
         # is called from a Music21Object, not directly on the DefinedContexts
         # isntance. Nontheless, if this is the first caller, it is the first
         # caller. 
-        if callerFirst == None: # this is the first caller
+        if callerFirst is None: # this is the first caller
             callerFirst = self # set DefinedContexts as caller first
-        if memo == None:
+        if memo is None:
             memo = {} # intialize
 
         post = None
@@ -3627,7 +3627,7 @@ class ElementWrapper(Music21Object):
     'obj': 'The object this wrapper wraps.',
     }
 
-    def __init__(self, obj):
+    def __init__(self, obj = None):
         Music21Object.__init__(self)
         self.obj = obj # object stored here        
         # the unlinkedDuration is the duration that is inherited from 
@@ -3635,7 +3635,7 @@ class ElementWrapper(Music21Object):
         #self._unlinkedDuration = None
 
 
-    def __copy__(self):
+    def x__copy__(self):
         '''
         Makes a copy of this element with a reference
         to the SAME object but with unlinked offset, priority
@@ -3681,7 +3681,7 @@ class ElementWrapper(Music21Object):
         new._definedContexts = copy.deepcopy(self._definedContexts)
         return new
 
-    def __deepcopy__(self, memo=None):
+    def x__deepcopy__(self, memo=None):
         '''
         similar to copy but also does a deepcopy of
         the object as well.
@@ -3744,7 +3744,7 @@ class ElementWrapper(Music21Object):
         else:
             self._id = newId
 
-    id = property (getId, setId)
+    xid = property (getId, setId)
 
 
     def _getDuration(self):
@@ -3786,9 +3786,9 @@ class ElementWrapper(Music21Object):
             #self._unlinkedDuration = durationObj
             Music21Object._setDuration(self, durationObj)
             
-    duration = property(_getDuration, _setDuration, doc='')
+    xduration = property(_getDuration, _setDuration, doc='')
 
-    offset = property(Music21Object._getOffset, Music21Object._setOffset)
+    xoffset = property(Music21Object._getOffset, Music21Object._setOffset)
 
     #---------------------------------------------------------------------------
     def __repr__(self):
@@ -3828,7 +3828,6 @@ class ElementWrapper(Music21Object):
         if not hasattr(other, "obj") or \
            not hasattr(other, "offset") or \
            not hasattr(other, "priority") or \
-           not hasattr(other, "id") or \
            not hasattr(other, "groups") or \
            not hasattr(other, "activeSite") or \
            not hasattr(other, "duration"):
@@ -3838,9 +3837,7 @@ class ElementWrapper(Music21Object):
         if (self.obj == other.obj and \
             self.offset == other.offset and \
             self.priority == other.priority and \
-            self.id == other.id and \
             self.groups == other.groups and \
-            self.activeSite == other.activeSite and \
             self.duration == self.duration):
             return True
         else:
@@ -3852,7 +3849,7 @@ class ElementWrapper(Music21Object):
         return not self.__eq__(other)
 
 
-    def __setattr__(self, name, value):
+    def x__setattr__(self, name, value):
         #environLocal.printDebug(['calling __setattr__ of ElementWrapper', name, value])
 
         # if in the ElementWrapper already, set that first
@@ -3868,7 +3865,7 @@ class ElementWrapper(Music21Object):
         else:  
             object.__setattr__(self, name, value)
 
-    def __getattr__(self, name):
+    def x__getattr__(self, name):
         '''This method is only called when __getattribute__() fails.
         Using this also avoids the potential recursion problems of subclassing
         __getattribute__()_
@@ -4691,8 +4688,8 @@ class Test(unittest.TestCase):
             '<music21.tempo.MetronomeMark lento 16th=50>')
 
     def xtestGetActiveSiteTimeSignature(self):
+        import music21
         from music21 import stream, meter, note
-
         class Wave_read(object): #_DOCS_HIDE
             def getnchannels(): return 2 #_DOCS_HIDE
     
@@ -4701,18 +4698,19 @@ class Test(unittest.TestCase):
         s.show('t')
         for i in range(0,2):
             soundFile = Wave_read() #_DOCS_HIDE
-            el = ElementWrapper(soundFile)
+            el = music21.Music21Object() # music21.ElementWrapper(soundFile)
             print el
             self.assertEqual(el.obj, soundFile)
             s.insert(i, el)
 #            s.insert(i, note.Note())    
 
         print 'outer container', s
-        for j in s.getElementsByClass('ElementWrapper'):
-        #for j in s.getElementsByClass('Note'):
-            print j, j.activeSite, j.getSites()#, #j.beatStrength
-#             if j.beatStrength > 0.4:
-#                 print j.offset, j.beatStrength, j.obj.getnchannels()
+        sm = s.makeMeasures()
+        for j in sm.flat: #.getElementsByClass('ElementWrapper'):
+            if isinstance(j, music21.ElementWrapper) is True or isinstance(j, music21.Music21Object) is True:
+                print j.beatStrength
+                if j.beatStrength > 0.4:
+                    print j.offset#, j.obj.getnchannels()
 
 
 

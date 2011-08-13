@@ -2045,16 +2045,24 @@ class Duration(DurationCommon):
         False
         >>> cDur == bDur        
         True
+        
+        >>> dDur = duration.ZeroDuration()
+        >>> eDur = duration.ZeroDuration()
+        >>> dDur == eDur
+        True
         '''
         if other == None or not isinstance(other, DurationCommon):
             return False
 
         if self.isComplex == other.isComplex:
-            if self.type == other.type:
-                if self.dots == other.dots:
-                    if self.tuplets == other.tuplets:
-                        if self.quarterLength == other.quarterLength:
-                            return True
+            if len(self.components) == len(other.components):
+                if len(self.components) == 0:
+                    return True
+                elif self.type == other.type:
+                    if self.dots == other.dots:
+                        if self.tuplets == other.tuplets:
+                            if self.quarterLength == other.quarterLength:
+                                return True
         return False
 
     def __ne__(self, other):
