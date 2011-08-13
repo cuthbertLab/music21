@@ -1085,6 +1085,10 @@ class SpineCollection(object):
     A SpineCollection is a set of Spines with relationships to each 
     other and where their position attributes indicate
     simultaneous onsets.
+
+
+    When you iterate over a SpineCollection, it goes from right to
+    left, since that's the order that humdrum expects.
     '''
 
     def __init__(self): 
@@ -1093,16 +1097,16 @@ class SpineCollection(object):
         self.spineReclassDone = False
         
     def __iter__(self):
-        '''Resets the counter to 0 so that iteration is correct'''
-        self.iterIndex = 0
+        '''Resets the counter to len(self.spines) so that iteration is correct'''
+        self.iterIndex = len(self.spines) - 1
         return self
 
     def next(self):
-        '''Returns the current spine and increments the iteration index.'''
-        if self.iterIndex == len(self.spines):
+        '''Returns the current spine and decrements the iteration index.'''
+        if self.iterIndex == 0:
             raise StopIteration
         thisSpine = self.spines[self.iterIndex]
-        self.iterIndex += 1
+        self.iterIndex -= 1
         return thisSpine
         
     def addSpine(self, streamClass = music21.stream.Part):
@@ -1758,7 +1762,7 @@ class Test(unittest.TestCase):
         parserPath = os.path.dirname(__file__)
         sineNominePath = parserPath + os.path.sep + 'Missa_Sine_nomine-Kyrie.krn'
         myScore = converter.parse(sineNominePath)
-
+        #myScore.show()
         
 if __name__ == "__main__":
     music21.mainTest(Test)
