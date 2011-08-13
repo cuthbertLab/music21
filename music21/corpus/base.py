@@ -1009,6 +1009,453 @@ def getBachChorales(extList='xml'):
 
 bachChorales = getBachChorales('xml')
 
+class BachChoraleList(object):
+    '''
+    A searchable list of BachChorales by various numbering systems:
+    
+    Note that multiple chorales share the same title, so it's best to
+    iterate over one of the other lists to get them all.
+
+
+    >>> from music21 import *
+    >>> bcl = corpus.BachChoraleList()
+    >>> info358 = bcl.byBudapest[358]
+    >>> for key in info358.keys():
+    ...   print key, info358[key]
+    budapest 358
+    bwv 431
+    title Wenn wir in höchsten Nöten sein
+    notes None
+    baerenreiter 68
+    riemenschneider 68
+    kalmus 358
+    >>> #_DOCS_SHOW c = corpus.parse('bach/bwv' + str(info358['bwv']))
+    >>> #_DOCS_SHOW c.show() # shows Bach BWV431    
+    '''
+    def __init__(self):
+        self.prepareList()
+        
+    def prepareList(self):
+        '''
+        puts a list of Bach Chorales into dicts of dicts called
+        
+        self.byBudapest
+        self.byBWV
+        self.byRiemenschneider
+        
+        etc.
+        '''
+        # From http://en.wikipedia.org/wiki/List_of_chorale_harmonisations_by_Johann_Sebastian_Bach
+        # CC license. http://en.wikipedia.org/wiki/WP:CC-BY-SA
+        allCat = r'''|Was Gott tut, das ist wohlgetan||250||339||346||342||347||1st Wedding Chorale in this group
+        |-
+        |Sei Lob und Ehr' dem höchsten Gut||251||89||328||91||329||2nd Wedding Chorale in this group; melody known as "Es ist das Heil uns kommen her"
+        |-
+        |Nun danket alle Gott||252||258||329||258||330||3rd Wedding Chorale in this group
+        |-
+        |Ach bleib bei uns, Herr Jesu Christ||253||1||177||1||177||&nbsp;
+        |-
+        |Ach Gott, erhör' mein Seufzen||254||2||186||2||186||&nbsp;
+        |-
+        |Ach Gott und Herr||255||3||40||4||40||&nbsp;
+        |-
+        |Ach lieben Christen, seid getrost||256||385||31||385||31||&nbsp;
+        |-
+        |Wär Gott nicht mit uns diese Zeit||257||388||284||386||285||melody known as "Wo Gott der Herr nicht bei uns hält"
+        |-
+        |Wo Gott der Herr nicht bei uns hält||258||383||335||387||336||No. 63 in Schemelli
+        |-
+        |Ach, was soll ich Sünder machen||259||10||39||10||39||&nbsp;
+        |-
+        |Allein Gott in der Höh' sei Ehr'||260||12||249||16||249||&nbsp;
+        |-
+        |Allein zu dir, Herr Jesu Christ||261||15||358||18||359||&nbsp;
+        |-
+        |Alle Menschen müssen sterben||262||17||153||13||153||&nbsp;
+        |-
+        |Alles ist an Gottes Segen||263||19||128||19||128||&nbsp;
+        |-
+        |Als der gütige Gott||264||20||159||20||159||&nbsp;
+        |-
+        |Als Jesus Christus in der Nacht||265||21||180||21||180||&nbsp;
+        |-
+        |Als vierzig Tag nach Ostern||266||22||208||22||208||&nbsp;
+        |-
+        |An Wasserflüssen Babylon||267||23||5||23||5||&nbsp;
+        |-
+        |Auf, auf, mein Herz, und du mein ganzer Sinn||268||24||124||24||124||&nbsp;
+        |-
+        |Aus meines Herzens Grunde||269||30||1||30||1||&nbsp;
+        |-
+        |Befiehl du deine Wege||270||157||285||162||286||melody known as "Herzlich tut mich verlangen"
+        |-
+        |Befiehl du deine Wege||271||158||366||163||367||melody known as "Herzlich tut mich verlangen"
+        |-
+        |Befiehl du deine Wege||272||32||339||32||340||&nbsp;
+        |-
+        |Christ, der du bist der helle Tag||273||33||230||33||230||&nbsp;
+        |-
+        |Christe, der du bist Tag und Licht||274||34||245||44||245||&nbsp;
+        |-
+        |Christe, du Beistand deiner Kreuzgemeinde||275||35||210||45||210||&nbsp;
+        |-
+        |Christ ist erstanden||276||36||197||35||197||&nbsp;
+        |-
+        |Christ lag in Todes Banden||277||38||15||39||15||&nbsp;
+        |-
+        |Christ lag in Todesbanden||278||39||370||40||371||&nbsp;
+        |-
+        |Christ lag in Todesbanden||279||40||261||37||261||&nbsp;
+        |-
+        |Christ, unser Herr, zum Jordan kam||280||43||65||43||66||&nbsp;
+        |-
+        |Christus, der ist mein Leben||281||46||7||47||6||&nbsp;
+        |-
+        |Christus, der ist mein Leben||282||47||315||48||316||BWV 95 Christus, der ist mein Leben (opening chorus)
+        |-
+        |Christus, der uns selig macht||283||48||198||51||198||&nbsp;
+        |Christus, der uns selig macht||283||48||306||51||307||&nbsp;
+        |-
+        |Christus ist erstanden, hat überwunden||284||51||200||52||200||&nbsp;
+        |-
+        |Da der Herr Christ zu Tische saß||285||52||196||53||196||&nbsp;
+        |-
+        |Danket dem Herren||286||53||228||55||228||&nbsp;
+        |-
+        |Dank sei Gott in der Höhe||287||54||310||54||311||&nbsp;
+        |-
+        |Das alte Jahr vergangen ist||288||55||162||56||162||&nbsp;
+        |-
+        |Das alte Jahr vergangen ist||289||56||313||57||314||&nbsp;
+        |-
+        |Das walt' Gott Vater und Gott Sohn||290||58||224||59||224||&nbsp;
+        |-
+        |Das walt' mein Gott, Vater, Sohn und heiliger Geist||291||59||75||60||75||&nbsp;
+        |-
+        |Den Vater dort oben||292||60||239||61||239||&nbsp;
+        |-
+        |Der du bist drei in Einigkeit||293||61||154||62||154||&nbsp;
+        |-
+        |Der Tag, der ist so freudenreich||294||62||158||63||158||&nbsp;
+        |-
+        |Des heil'gen Geistes reiche Gnad'||295||63||207||64||207||&nbsp;
+        |-
+        |Die Nacht ist kommen||296||64||231||65||231||&nbsp;
+        |-
+        |Die Sonn' hat sich mit ihrem Glanz||297||65||232||66||232||&nbsp;
+        |-
+        |Dies sind die heil'gen zehn Gebot'||298||66||127||67||127||&nbsp;
+        |-
+        |Dir, dir, Jehova, will ich singen||299||67||209||68||209||Notebook for Anna Magdalena Bach
+        |-
+        |Du grosser Schmerzensmann||300||70||164||71||167||&nbsp;
+        |-
+        |Du, o schönes Weltgebäude||301||71||137||73||134||&nbsp;
+        |-
+        |Ein feste Burg ist unser Gott||302||74||20||76||20||&nbsp;
+        |-
+        |Ein feste Burg ist unser Gott||303||75||250||77||250||&nbsp;
+        |-
+        |Eins ist Not! ach Herr, dies Eine||304||77||280||78||280||&nbsp;
+        |-
+        |Erbarm' dich mein, o Herre Gott||305||78||33||79||34||&nbsp;
+        |-
+        |Erstanden ist der heil'ge Christ||306||85||176||86||176||&nbsp;
+        |-
+        |Es ist gewisslich an der Zeit||307||262||260||262||260||&nbsp;
+        |-
+        |Es spricht der Unweisen Mund wohl||308||92||27||93||27||&nbsp;
+        |-
+        |Es stehn vor Gottes Throne||309||93||166||94||166||&nbsp;
+        |-
+        |Es wird schier der letzte Tag herkommen||310||94||238||95||238||&nbsp;
+        |-
+        |Es woll' uns Gott genädig sein||311||95||16||97||16||&nbsp;
+        |-
+        |Es woll' uns Gott genädig sein||312||96||351||98||352||&nbsp;
+        |-
+        |Für Freuden lasst uns springen||313||106||163||107||163||&nbsp;
+        |-
+        |Gelobet seist du, Jesu Christ||314||107||287||112||288||&nbsp;
+        |-
+        |Gib dich zufrieden und sei stille||315||111||271||113||271||&nbsp;
+        |-
+        |Gott, der du selber bist das Licht||316||112||225||114||225||&nbsp;
+        |-
+        |Gott, der Vater, wohn' uns bei||317||113||134||115||135||&nbsp;
+        |-
+        |Gottes Sohn ist kommen||318||115||18||120||18||&nbsp;
+        |-
+        |Gott hat das Evangelium||319||116||181||117||181||&nbsp;
+        |-
+        |Gott lebet noch||320||117||234||118||234||No. 37 in Schemelli
+        |-
+        |Gottlob, es geht nunmehr zu Ende||321||118||192||121||192||&nbsp;
+        |-
+        |Gott sei gelobet und gebenedeiet / Meine Seele erhebet den Herrn||322||119||70||119||70||&nbsp;
+        |-
+        |Gott sei uns gnädig||323||120||319||239||320||melody better known as "Meine Seele erhebt den Herren" – the "German Magnificat" or "Tonus peregrinus"
+        |-
+        |Meine Seele erhebet den Herrn||324||121||130||240||130||&nbsp;
+        |-
+        |Heilig, heilig||325||123||235||122||235||or Sanctus, Sanctus, Dominus Deus Sabaoth
+        |Heilig, heilig||325||123||318||122||319||or Sanctus, Sanctus, Dominus Deus Sabaoth
+        |-
+        |Herr Gott, dich loben alle wir||326||129||167||129||164||&nbsp;
+        |-
+        |Vor deinen Thron tret' ich hiermit||327||132||333||130||334||or "Herr Gott, dich loben alle wir"
+        |-
+        |Herr, Gott, dich loben wir||328||133||205||133||205||&nbsp;
+        |-
+        |Herr, ich denk' an jene Zeit||329||136||212||134||212||&nbsp;
+        |-
+        |Herr, ich habe missgehandelt||330||137||35||135||33||&nbsp;
+        |-
+        |Herr, ich habe missgehandelt||331||138||286||136||287||&nbsp;
+        |-
+        |Herr Jesu Christ, dich zu uns wend||332||139||136||137||136||&nbsp;
+        |-
+        |Herr Jesu Christ, du hast bereit't||333||140||226||138||226||&nbsp;
+        |-
+        |Herr Jesu Christ, du höchstes Gut||334||141||73||142||73||&nbsp;
+        |-
+        |Herr Jesu Christ (or O Jesu Christ), mein's Lebens Licht (or O Jesu, du mein Bräutigam)||335||145||236||143||295||BWV 118 O Jesu Christ, mein's Lebens Licht
+        |-
+        |Herr Jesu Christ, wahr'r Mensch und Gott||336||146||189||145||189||&nbsp;
+        |-
+        |Herr, nun lass in Frieden||337||148||190||146||190||&nbsp;
+        |-
+        |Herr, straf mich nicht in deinem Zorn||338||149||221||147||221||&nbsp;
+        |-
+        |Herr, wie du willst, so schick's mit mir or Wer in dem Schutz des Höchsten||339||151||144||149||144||&nbsp;
+        |Herr, wie du willst, so schick's mit mir or Wer in dem Schutz des Höchsten||339||151||144||149||318||&nbsp;
+        |-
+        |Herzlich lieb hab ich dich, o Herr||340||152||277||153||277||&nbsp;
+        |-
+        |Heut' ist, o Mensch, ein grosser Trauertag||341||170||168||168||168||&nbsp;
+        |-
+        |Heut' triumphieret Gottes Sohn||342||171||79||169||79||&nbsp;
+        |-
+        |Hilf, Gott, dass mir's gelinge||343||172||199||170||199||&nbsp;
+        |Hilf, Gott, dass mir's gelinge||343||172||301||170||302||&nbsp;
+        |-
+        |Hilf, Herr Jesu, lass gelingen||344||173||155||171||155||&nbsp;
+        |-
+        |Ich bin ja, Herr, in deiner Macht||345||174||251||172||251||&nbsp;
+        |-
+        |Ich dank' dir Gott für all' Wohltat||346||175||223||173||223||&nbsp;
+        |-
+        |Ich dank' dir, lieber Herre||347||176||2||175||2||&nbsp;
+        |-
+        |Ich dank' dir, lieber Herre||348||177||272||176||272||&nbsp;
+        |-
+        |Ich dank' dir schon durch deinen Sohn||349||179||188||177||188||&nbsp;
+        |-
+        |Ich danke dir, o Gott, in deinem Throne||350||180||229||178||229||&nbsp;
+        |-
+        |Ich hab' mein' Sach' Gott heimgestellt||351||182||19||180||19||&nbsp;
+        |-
+        |Jesu, der du meine Seele||352||185||37||192||37||&nbsp;
+        |-
+        |Jesu, der du meine Seele||353||186||269||193||269||&nbsp;
+        |-
+        |Jesu, der du meine Seele||354||187||368||194||369||&nbsp;
+        |-
+        |Jesu, der du selbsten wohl||355||189||169||195||169||&nbsp;
+        |-
+        |Jesu, du mein liebstes Leben||356||190||243||196||243||&nbsp;
+        |-
+        |Jesu, Jesu, du bist mein||357||191||244||197||244||No. 53 in Schemelli
+        |-
+        |Jesu, meine Freude||358||195||355||207||356||&nbsp;
+        |-
+        |Jesu, meiner Seelen Wonne||359||363||364||372||365||melody known as "Werde munter, mein Gemüte"
+        |-
+        |Jesu, meiner Freuden Freude||360||364||349||373||350||melody known as "Werde munter, mein Gemüte"
+        |-
+        |Jesu, meines Herzens Freud'||361||202||264||208||264||&nbsp;
+        |-
+        |Jesu, nun sei gepreiset||362||203||252||211||252||&nbsp;
+        |-
+        |Jesus Christus, unser Heiland||363||206||30||212||30||&nbsp;
+        |-
+        |Jesus Christus, unser Heiland||364||207||174||213||174||&nbsp;
+        |-
+        |Jesus, meine Zuversicht||365||208||175||215||175||&nbsp;
+        |-
+        |Ihr Gestirn', ihr hohlen Lüfte||366||210||161||183||161||&nbsp;
+        |-
+        |In allen meinen Taten||367||211||140||184||140||&nbsp;
+        |-
+        |In dulci jubilo||368||215||143||188||143||&nbsp;
+        |-
+        |Keinen hat Gott verlassen||369||217||129||216||129||&nbsp;
+        |-
+        |Komm, Gott Schöpfer, heiliger Geist||370||218||187||217||187||&nbsp;
+        |-
+        |Kyrie, Gott Vater in Ewigkeit||371||225||132||222||132||&nbsp;
+        |-
+        |Lass, o Herr, dein Ohr sich neigen||372||226||218||223||218||&nbsp;
+        |-
+        |Liebster Jesu, wir sind hier||373||228||131||226||131||&nbsp;
+        |-
+        |Lobet den Herren, denn er ist freundlich||374||232||227||229||227||&nbsp;
+        |-
+        |Lobt Gott, ihr Christen, allzugleich||375||233||276||232||276||&nbsp;
+        |-
+        |Lobt Gott, ihr Christen, allzugleich||376||234||341||233||342||&nbsp;
+        |-
+        |Mach's mit mir, Gott, nach deiner Güt'||377||237||44||236||44||&nbsp;
+        |-
+        |Meine Augen schliess' ich jetzt||378||240||258||237||258||&nbsp;
+        |-
+        |Meinen Jesum lass' ich nicht, Jesus||379||241||151||247||151||&nbsp;
+        |-
+        |Meinen Jesum lass' ich nicht, weil||380||242||298||246||299||&nbsp;
+        |-
+        |Meines Lebens letzte Zeit||381||248||345||248||346||&nbsp;
+        |-
+        |Mit Fried' und Freud' ich fahr' dahin||382||249||49||251||49||&nbsp;
+        |-
+        |Mitten wir im Leben sind||383||252||214||252||214||&nbsp;
+        |-
+        |Nicht so traurig, nicht so sehr||384||253||149||253||149||&nbsp;
+        |-
+        |Nun bitten wir den heiligen Geist||385||254||36||256||36||&nbsp;
+        |-
+        |Nun danket alle Gott||386||257||32||259||32||Leuthen Chorale
+        |-
+        |Nun freut euch, Gottes Kinder all'||387||260||185||260||185||&nbsp;
+        |-
+        |Nun freut euch, lieben Christen g'mein||388||261||183||263||183||&nbsp;
+        |-
+        |Nun lob', mein' Seel', den Herren||389||269||268||271||268||&nbsp;
+        |-
+        |Nun lob', mein Seel', den Herren||390||270||295||272||296||&nbsp;
+        |-
+        |Nun preiset alle Gottes Barmherzigkeit||391||273||222||273||222||&nbsp;
+        |-
+        |Nun ruhen alle Wälder||392||298||288||295||289||melody known as "Innsbruck, ich muss dich lassen"/"O Welt ich muss dich lassen"
+        |-
+        |O Welt, sieh hier dein Leben||393||289||275||296||275||melody known as "Innsbruck, ich muss dich lassen"/"O Welt ich muss dich lassen"
+        |-
+        |O Welt, sieh hier dein Leben||394||290||365||297||366||melody known as "Innsbruck, ich muss dich lassen"/"O Welt ich muss dich lassen"
+        |-
+        |O Welt, sieh hier dein Leben||395||291||362||298||363||&nbsp;
+        |-
+        |Nun sich der Tag geendet hat||396||274||240||274||240||&nbsp;
+        |-
+        |O Ewigkeit, du Donnerwort||397||275||274||276||274||BWV 513 & Notebook for Anna Magdalena Bach
+        |-
+        |O Gott, du frommer Gott||398||277||311||282||312||BWV 197a "Ehre sei Gott in der Höhe" ("Ich freue mich in dir")
+        |-
+        |O Gott, du frommer Gott||399||282||314||277||315||&nbsp;
+        |-
+        |O Herzensangst, o Bangigkeit||400||284||173||284||173||&nbsp;
+        |-
+        |O Lamm Gottes, unschuldig||401||285||165||285||165||&nbsp;
+        |-
+        |O Mensch, bewein' dein' Sünde gross||402||286||201||286||201||&nbsp;
+        |O Mensch, bewein' dein' Sünde gross||402||286||305||286||306||&nbsp;
+        |-
+        |O Mensch, schaue Jesum Christum an||403||287||203||287||203||&nbsp;
+        |-
+        |O Traurigkeit, o Herzeleid||404||288||60||288||57||&nbsp;
+        |-
+        |O wie selig seid ihr doch, ihr Frommen||405||299||213||299||213||No. 65 in Schemelli
+        |-
+        |O wie selig seid ihr doch, ihr Frommen||406||300||219||300||219||&nbsp;
+        |-
+        |O wir armen Sünder||407||301||202||301||202||&nbsp;
+        |-
+        |Schaut, ihr Sünder||408||303||171||303||171||&nbsp;
+        |-
+        |Seelen-Bräutigam||409||0||5||306||141||Actally 5a in Bärenreiter, not in Kalmus
+        |-
+        |Sei gegrüsset, Jesu gütig||410||307||172||308||172||No. 22 in Schemelli
+        |-
+        |Singet dem Herrn ein neues Lied||411||309||246||310||246||&nbsp;
+        |-
+        |So gibst du nun, mein Jesu, gute Nacht||412||310||206||311||206||No. 26 in Schemelli
+        |-
+        |Sollt' ich meinem Gott nicht singen||413||311||220||312||220||No. 18 in Schemelli
+        |-
+        |Uns ist ein Kindlein heut' gebor'n||414||313||148||0||148||Not in Musica Budapest
+        |-
+        |Valet will ich dir geben||415||314||24||315||24||&nbsp;
+        |-
+        |Vater unser im Himmelreich||416||316||47||319||47||BWV 245
+        |-
+        |Von Gott will ich nicht lassen||417||324||363||326||364||&nbsp;
+        |-
+        |Von Gott will ich nicht lassen||418||325||331||327||332||&nbsp;
+        |-
+        |Von Gott will ich nicht lassen||419||326||114||328||114||&nbsp;
+        |-
+        |Warum betrübst du dich, mein Herz||420||331||145||332||145||&nbsp;
+        |-
+        |Warum betrübst du dich, mein Herz||421||332||299||333||300||&nbsp;
+        |-
+        |Warum sollt' ich mich denn grämen||422||334||356||335||357||&nbsp;
+        |-
+        |Was betrübst du dich, mein Herze||423||336||237||336||237||&nbsp;
+        |-
+        |Was bist du doch, o Seele, so betrübet||424||337||193||337||193||No. 55 in Schemelli
+        |-
+        |Was willst du dich, o meine Seele||425||349||241||350||241||&nbsp;
+        |-
+        |Weltlich Ehr' und zeitlich Gut||426||351||211||351||211||&nbsp;
+        |-
+        |Wenn ich in Angst und Not||427||352||147||352||147||&nbsp;
+        |-
+        |Wenn mein Stündlein vorhanden ist||428||353||321||355||322||&nbsp;
+        |-
+        |Wenn mein Stündlein vorhanden ist||429||354||51||356||52||&nbsp;
+        |-
+        |Wenn mein Stündlein vorhanden ist||430||355||350||357||351||&nbsp;
+        |-
+        |Wenn wir in höchsten Nöten sein||431||358||68||358||68||&nbsp;
+        |-
+        |Wenn wir in höchsten Nöten sein||432||359||247||359||247||&nbsp;
+        |-
+        |Wer Gott vertraut, hat wohl gebaut||433||366||135||360||137||&nbsp;
+        |-
+        |Wer nur den lieben Gott läßt walten||434||367||146||367||146||&nbsp;
+        |-
+        |Wie bist du, Seele, in mir so gar betrübt||435||374||242||374||242||&nbsp;
+        |-
+        |Wie schön leuchtet der Morgenstern||436||375||278||378||278||&nbsp;
+        |-
+        |Wir glauben all' an einen Gott||437||382||133||382||133||&nbsp;
+        |-
+        |Wo Gott zum Haus nicht gibt sein' Gunst||438||389||157||388||157||&nbsp;'''
+    
+        self.byTitle = {}
+        self.byBWV = {}
+        self.byKalmus = {}
+        self.byBaerenreiter = {}
+        self.byBudapest = {}
+        self.byRiemenschneider = {}
+        
+        for line in allCat.splitlines():
+            line = line.strip()
+            if line.startswith('|-'):
+                continue
+            else:
+                line = line[1:]
+                (title,bwv,kalmus,baerenreiter,budapest,riemenschneider,notes) = line.split('||')
+                if notes == u'&nbsp;':
+                    notes = None
+                lineDict = {'title': title, 'bwv': int(bwv),'kalmus': int(kalmus),
+                            'baerenreiter': int(baerenreiter), 'budapest': int(budapest),
+                            'riemenschneider': int(riemenschneider), 'notes': notes} 
+                self.byTitle[title] = lineDict
+                self.byBWV[int(bwv)] = lineDict
+                self.byKalmus[int(kalmus)] = lineDict
+                self.byBaerenreiter[int(baerenreiter)] = lineDict
+                self.byBudapest[int(budapest)] = lineDict
+                self.byRiemenschneider[int(riemenschneider)] = lineDict
+                
 
 def getHandelMessiah(extList='md'):
     '''Return the file name of all of handel's messiah.
