@@ -369,7 +369,7 @@ class Stream(music21.Music21Object):
         memo.append(id(self))
         # if this Stream is a flat representation of something, and its 
         # elements have changed, than we must clear the cache of that 
-        # parent; we can do that by calling _elementsChanged on
+        # ancestor; we can do that by calling _elementsChanged on
         # flattened representation of
         if self.flattenedRepresentationOf is not None:
             self.flattenedRepresentationOf._elementsChanged(memo=memo)
@@ -8498,11 +8498,12 @@ class Stream(music21.Music21Object):
     def flattenUnnecessaryVoices(self, force=False, inPlace=True):
         '''If this Stream defines one or more internal voices, do the following:
 
-        If there is more than one voice, and a voice has no elements, remove that voice.
-
-        If there is only one voice left that has elements, place those elements in the parent Stream.
-
-        If `force` is True, even if there is more than one Voice left, all voices will be flattened.
+        * If there is more than one voice, and a voice has no elements, 
+          remove that voice.
+        * If there is only one voice left that has elements, place those 
+          elements in the parent Stream.
+        * If `force` is True, even if there is more than one Voice left, 
+          all voices will be flattened.
         '''
         if len(self.voices) == 0:
             return None # do not make copy; return immediately

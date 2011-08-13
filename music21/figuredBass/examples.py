@@ -16,9 +16,11 @@ object which can generate realizations as instances of :class:`~music21.stream.S
 in external software such as MuseScore or Finale by calling :meth:`~music21.base.Music21Object.show`.
 
 
-.. note:: :meth:`~music21.figuredBass.examples.exampleA` is example 2 and :meth:`~music21.figuredBass.examples.exampleD` is example 5 
-in "fbREALIZER: AUTOMATIC FIGURED BASS REALIZATION FOR MUSIC INFORMATION RETRIEVAL IN music21," which was submitted for 
-consideration for the 12th International Society for Music Information Retrieval Conference (`ISMIR 2011 <http://ismir2011.ismir.net/>`_).
+.. note:: :meth:`~music21.figuredBass.examples.exampleA` is example 2 and :meth:`~music21.figuredBass.examples.exampleD` 
+      is example 5 in "fbREALIZER: AUTOMATIC FIGURED BASS REALIZATION FOR MUSIC 
+      INFORMATION RETRIEVAL IN music21," which was submitted for consideration for the 
+      12th International Society for Music Information Retrieval Conference 
+      (`ISMIR 2011 <http://ismir2011.ismir.net/>`_).
 '''
 
 import copy

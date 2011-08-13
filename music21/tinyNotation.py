@@ -10,7 +10,8 @@
 #-------------------------------------------------------------------------------
 
 
-'''tinyNotation is a simple way of specifying single line melodies
+'''
+tinyNotation is a simple way of specifying single line melodies
 that uses a notation somewhat similar to Lilypond but with WAY fewer 
 options.  It was originally developed to notate trecento (medieval Italian)
 music, but it is pretty useful for a lot of short examples, so we have
@@ -25,51 +26,39 @@ or the Trecento specific examples in trecento/cadencebook.py
 
 Here are the most important rules:
 
+1. Note names are: a,b,c,d,e,f,g and r for rest
+2. Flats, sharps, and naturals are notated as #,- (not b), and (if needed) n.  
+   If the accidental is above the staff (i.e., editorial), enclose it in 
+   parentheses: (#), etc.  Make sure that flats in the key signatures are
+   explicitly specified.  
+3. Note octaves are specified as follows::
 
-Note names are: a,b,c,d,e,f,g and r for rest
-
-
-Flats, sharps, and naturals are notated as #,- (not b), and (if needed) n.  
-If the accidental is above the staff (i.e., editorial), enclose it in 
-parentheses: (#), etc.  Make sure that flats in the key signatures are
-explicitly specified.  
-
-
-Note octaves are specified as follows:
-
-
-    CC to BB = from C below bass clef to second-line B in bass clef
-    C to B = from bass clef C to B below middle C.
-    c  to b = from middle C to the middle of treble clef
-    c' to b' = from C in treble clef to B above treble clef
+     CC to BB = from C below bass clef to second-line B in bass clef
+     C to B = from bass clef C to B below middle C.
+     c  to b = from middle C to the middle of treble clef
+     c' to b' = from C in treble clef to B above treble clef
     
-    Octaves below and above these are specified by further doublings of
-    letter (CCC) or apostrophes (c'') -- this is one of the note name
-    standards found in many music theory books.
+   Octaves below and above these are specified by further doublings of
+   letter (CCC) or apostrophes (c'') -- this is one of the note name
+   standards found in many music theory books.
+4. After the note name, a number may be placed indicating the note 
+   length: 1 = whole note, 2 = half, 4 = quarter, 8 = eighth, 16 = sixteenth.  
+   etc.  If the number is omitted then it is assumed to be the same 
+   as the previous note.  I.e., c8 B c d  is a string of eighth notes.
+5. After the number, a ~ can be placed to show a tie to the next note.  
+   A "." indicates a dotted note.  (If you are entering
+   data via Excel or other spreadsheet, be sure that "capitalize the 
+   first letter of sentences" is turned off under "Tools->AutoCorrect,"
+   otherwise the next letter will be capitalized, and the octave will
+   be screwed up.)
+6. For triplets use this notation:  `trip{c4 d8}`  indicating that these 
+   two notes both have "3s" over them.  For 4 in the place of 3, 
+   use `quad{c16 d e8}`.  No other tuplets are supported.
 
 
-After the note name, a number may be placed indicating the note 
-length: 1 = whole note, 2 = half, 4 = quarter, 8 = eighth, 16 = sixteenth.  
-etc.  If the number is omitted then it is assumed to be the same 
-as the previous note.  I.e., c8 B c d  is a string of eighth notes.
-
-
-After the number, a ~ can be placed to show a tie to the next note.  
-A "." indicates a dotted note.  (If you are entering
-data via Excel or other spreadsheet, be sure that "capitalize the 
-first letter of sentences" is turned off under "Tools->AutoCorrect,"
-otherwise the next letter will be capitalized, and the octave will
-be screwed up.
-
-
-For triplets use this notation:  trip{c4 d8}  indicating that these 
-two notes both have "3s" over them.  For 4 in the place of 3, 
-use quad{c16 d e8}.  No other tuplets are supported.
-
-
-Again, see the HarmonyStream (below) and trecento.cadencebook examples
+Again, see the :class:`~music21.tinyNotation.HarmonyStream` (below) and 
+trecento.cadencebook examples
 to see how to make TinyNotation useful for your own needs.
-
 
 (Currently, final notes with fermatas (or any very long final note), 
 take 0 for the note length.  But expect this to disappear from the
@@ -95,11 +84,13 @@ from music21 import pitch
 
 class TinyNotationStream(stream.Stream):
     '''
-    A TinyNotationStream takes in a string representation similar to Lilypond format
-    but simplified somewhat and an optional time signature string (or TimeSignature object).
+    A TinyNotationStream takes in a string representation 
+    similar to Lilypond format
+    but simplified somewhat and an optional time signature 
+    string (or TimeSignature object).
     
     
-    example in 3/4:
+    Example in 3/4:
     
     
     >>> stream1 = TinyNotationStream("E4 r f# g=lastG trip{b-8 a g} c4~ c", "3/4")
@@ -114,7 +105,6 @@ class TinyNotationStream(stream.Stream):
     {4.66666666667} <music21.note.Note G>
     {5.0} <music21.note.Note C>
     {6.0} <music21.note.Note C>
-
 
     >>> stream1.getElementById("lastG").step
     'G'
@@ -199,7 +189,8 @@ class TinyNotationStream(stream.Stream):
         
     def getNote(self, stringRep, storedDict = common.DefaultHash()):
         '''
-        called out so as to be subclassable
+        called out so as to be subclassable, returns a 
+        :class:`~music21.tinyNotation.TinyNotationNote` object
         '''
         return TinyNotationNote(stringRep, storedDict)
 
@@ -245,7 +236,7 @@ class TinyNotationNote(object):
 
 
     The optional third element is a dictionary of stored information
-    from previous notes that might affect parsing of this note.
+    from previous notes that might affect parsing of this note:
     
     
     >>> storedDict = {}
@@ -442,7 +433,7 @@ class TinyNotationNote(object):
 
     def getDots(self, stringRep, noteObj):
         '''
-        subclassable method to set the dots attributes of 
+        Subclassable method to set the dots attributes of 
         the duration object.
         
         It is subclassed in music21.trecento.cadencebook.TrecentoNote
@@ -473,7 +464,10 @@ class TinyNotationNote(object):
 
 class HarmonyStream(TinyNotationStream):
     '''
-    example of subclassing TinyNotationStream to include a possible harmonic representation of the note
+    HarmonyStream provides an
+    example of subclassing :class:`~music21.tinyNotation.TinyNotationStream`
+    to include harmonies and lyrics encoded in a simple format.
+    
 
     >>> michelle = "c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle "
     >>> michelle += "G4*E-*_these c_are A-_words G_that "

@@ -148,7 +148,7 @@ class HumdrumDataCollection(object):
         
         
         The difference between the dataStream and self.eventList
-        are the following::
+        are the following:
         
             * Blank lines are skipped.
             * !!! lines become :class:`~music21.humdrum.spineParser.GlobalReference` objects
@@ -363,15 +363,10 @@ class HumdrumDataCollection(object):
             
             
             *+    add a new spine (to the right of the current spine) 
-            
             *-    terminate a current spine                           
-            
-            *^    split a spine (into two)                            
-            
-            *v    join (two or more) spines into one                  
-            
-            *x    exchange the position of two spines                 
-            
+            *^    split a spine (into two)
+            *v    join (two or more) spines into one                 
+            *x    exchange the position of two spines
             *     do nothing                                          
         
         
@@ -578,34 +573,23 @@ class GlobalReference(HumdrumLine):
     In humdrum it is represented by three exclamation points 
     followed by non-whitespace followed by a colon.  Examples::
     
-    
         !!!COM: Stravinsky, Igor Fyodorovich
-
         !!!CDT: 1882/6/17/-1971/4/6
-
         !!!ODT: 1911//-1913//; 1947//
-
         !!!OPT@@RUS: Vesna svyashchennaya
-
         !!!OPT@FRE: Le sacre du printemps
-
 
     The GlobalReference object takes two inputs::
 
-
-        position (line number in the humdrum file)
-        
-        contents (string of contents)
+        position   line number in the humdrum file
+        contents   string of contents
 
 
     And stores them as three attributes::
 
-
-        position (as above)
-        
-        code: non-whitespace code (usually three letters)
-        
-        contents (string of contents)
+        position: as above
+        code:     non-whitespace code (usually three letters)
+        contents: string of contents
 
 
     >>> from music21 import *
@@ -1181,7 +1165,7 @@ class SpineCollection(object):
         '''
         changes the classes of HumdrumSpines to more specific types 
         (KernSpine, DynamicSpine)
-        according to their spineType (**kern, **dynam)
+        according to their spineType (e.g., \*\*kern, \*\*dynam)
         '''                     
         for thisSpine in self.spines:
             if thisSpine.spineType == "kern":
@@ -1538,13 +1522,21 @@ def hdStringToMeasure(contents):
 
 def kernTandamToObject(tandam):
     '''
-    kern uses *M5/4  *clefG2 etc, to control processing
+    Kern uses symbols such as `\*M5/4` and `\*clefG2`, etc., to control processing
     
+    This method converts them to music21 objects.
     
     >>> from music21 import *
     >>> m = humdrum.spineParser.kernTandamToObject('*M3/1')
     >>> m
     <music21.meter.TimeSignature 3/1>
+    
+    
+    Unknown objects are converted to MiscTandem objects:
+    
+    >>> m2 = humdrum.spineParser.kernTandamToObject('*TandyUnk')
+    >>> m2
+    <music21.humdrum.spineParser.MiscTandam *TandyUnk humdrum control>
     '''
     # TODO: Cover more tandam controls as they're found
     if tandam in spinePathIndicators:
@@ -1625,7 +1617,7 @@ class MiscTandam(music21.Music21Object):
         music21.Music21Object.__init__(self)
         self.tandam = tandam
     def __repr__(self):
-        return "<music21.humdrum.MiscTandam %s humdrum control>" % self.tandam
+        return "<music21.humdrum.spineParser.MiscTandam %s humdrum control>" % self.tandam
            
 class Test(unittest.TestCase):
 

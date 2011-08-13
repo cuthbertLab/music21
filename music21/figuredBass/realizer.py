@@ -73,8 +73,8 @@ def figuredBassFromStream(streamPart):
     
     
     .. note:: This example corresponds to example 1b in "fbREALIZER: AUTOMATIC FIGURED BASS REALIZATION FOR 
-    MUSIC INFORMATION RETRIEVAL IN music21," which was submitted for consideration for the 12th International 
-    Society for Music Information Retrieval Conference (`ISMIR 2011 <http://ismir2011.ismir.net/>`_).
+         MUSIC INFORMATION RETRIEVAL IN music21," which was submitted for consideration for the 12th International 
+         Society for Music Information Retrieval Conference (`ISMIR 2011 <http://ismir2011.ismir.net/>`_).
         
     >>> from music21 import tinyNotation
     >>> from music21.figuredBass import realizer
@@ -306,7 +306,7 @@ class FiguredBassLine(object):
         
         
         .. note:: Deprecated. Use :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`
-        which returns a :class:`~music21.figuredBass.realizer.Realization`. Then, call :meth:`~music21.figuredBass.realizer.Realization.generateRandomRealization`.
+            which returns a :class:`~music21.figuredBass.realizer.Realization`. Then, call :meth:`~music21.figuredBass.realizer.Realization.generateRandomRealization`.
         '''
         _environRules = environment.Environment(_MOD)
         _environRules.warn("The method generateRandomRealization() is deprecated. Use realize() instead and call generateRandomRealization() on the result.", DeprecationWarning)
@@ -321,8 +321,8 @@ class FiguredBassLine(object):
         
         
         .. note:: Deprecated. Use :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`
-        which returns a :class:`~music21.figuredBass.realizer.Realization`. Then, call :meth:`~music21.figuredBass.realizer.Realization.generateRandomRealization`
-        followed by a call to :meth:`~music21.base.Music21Object.show`.
+            which returns a :class:`~music21.figuredBass.realizer.Realization`. Then, call :meth:`~music21.figuredBass.realizer.Realization.generateRandomRealization`
+            followed by a call to :meth:`~music21.base.Music21Object.show`.
         '''
         _environRules = environment.Environment(_MOD)
         _environRules.warn("The method showRandomRealization() is deprecated. Use realize() instead and call generateRandomRealization().show() on the result.", DeprecationWarning)
@@ -337,12 +337,12 @@ class FiguredBassLine(object):
         
         
         .. note:: Deprecated. Use :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`
-        which returns a :class:`~music21.figuredBass.realizer.Realization`. Then, call :meth:`~music21.figuredBass.realizer.Realization.generateAllRealizations`
-        followed by a call to :meth:`~music21.base.Music21Object.show`.
+            which returns a :class:`~music21.figuredBass.realizer.Realization`. Then, call :meth:`~music21.figuredBass.realizer.Realization.generateAllRealizations`
+            followed by a call to :meth:`~music21.base.Music21Object.show`.
         
 
         .. warning:: This method is unoptimized, and may take a prohibitive amount
-        of time for a Realization which has more than tens of unique realizations.
+            of time for a Realization which has more than tens of unique realizations.
         '''
         _environRules = environment.Environment(_MOD)
         _environRules.warn("The method showAllRealizations() is deprecated. Use realize() instead and call generateAllRealizations().show() on the result.", DeprecationWarning)
@@ -396,8 +396,8 @@ class Realization(object):
     
     
     .. note:: A possibility progression is a valid progression through a string of 
-    :class:`~music21.figuredBass.segment.Segment` instances.
-    See :mod:`~music21.figuredBass.possibility` for more details on possibilities.
+        :class:`~music21.figuredBass.segment.Segment` instances.
+        See :mod:`~music21.figuredBass.possibility` for more details on possibilities.
     '''
     _DOC_ORDER = ['getNumSolutions', 'generateRandomRealization', 'generateRandomRealizations', 'generateAllRealizations',
                   'getAllPossibilityProgressions', 'getRandomPossibilityProgression', 'generateRealizationFromPossibilityProgression']
@@ -463,7 +463,7 @@ class Realization(object):
         
         
         .. warning:: This method is unoptimized, and may take a prohibitive amount
-        of time for a Realization which has more than 200,000 solutions.
+            of time for a Realization which has more than 200,000 solutions.
         '''
         progressions = []
         if len(self._segmentList) == 1:
@@ -568,7 +568,7 @@ class Realization(object):
         
         
         .. warning:: This method is unoptimized, and may take a prohibitive amount
-        of time for a Realization which has more than 100 solutions.
+            of time for a Realization which has more than 100 solutions.
         '''
         allSols = stream.Score()
         bassLine = stream.Part()
@@ -636,7 +636,7 @@ class Realization(object):
         
 
         .. warning:: This method is unoptimized, and may take a prohibitive amount
-        of time if amountToGenerate is more than 100.
+            of time if amountToGenerate is more than 100.
         '''
         if amountToGenerate > self.getNumSolutions():
             return self.generateAllRealizations()

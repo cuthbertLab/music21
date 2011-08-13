@@ -326,8 +326,8 @@ def createClef(line, meas):
     Add a new clef to the current measure and return the measure.
     
     
-    Clef lines should look like: |Clef|Type:ClefType  or
-    |Clef|Type:ClefType|OctaveShift:Octave Down (or Up)
+    Clef lines should look like: \|Clef\|Type:ClefType  or
+    \|Clef\|Type:ClefType\|OctaveShift:Octave Down (or Up)
            
      
     >>> from music21 import *

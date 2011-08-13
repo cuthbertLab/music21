@@ -43,8 +43,8 @@ class Notation(object):
     /, and b.
     
     
-    .. note:: If a figure has a modifier but no number, the number is assumed to be
-    3.
+    .. note:: If a figure has a modifier but no number, the number is 
+        assumed to be 3.
     
     
     Notation also translates many forms of shorthand notation into longhand. It understands

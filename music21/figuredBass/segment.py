@@ -552,25 +552,25 @@ class Segment(object):
         
         
         * If segmentA (self) is a special Segment, meaning that one of the Segment 
-        resolution methods in :meth:`~music21.figuredBass.segment.Segment.specialResolutionRules` 
-        needs to be applied, then this method returns every correct possibility of segmentA 
-        matched up with exactly one resolution possibility.
+          resolution methods in :meth:`~music21.figuredBass.segment.Segment.specialResolutionRules` 
+          needs to be applied, then this method returns every correct possibility of segmentA 
+          matched up with exactly one resolution possibility.
         
 
         * If segmentA is an ordinary, non-special Segment, then this method returns every 
-        combination of correct possibilities of segmentA and correct possibilities of segmentB 
-        which passes all filters in :meth:`~music21.figuredBass.segment.Segment.consecutivePossibilityRules`.
+          combination of correct possibilities of segmentA and correct possibilities of segmentB 
+          which passes all filters in :meth:`~music21.figuredBass.segment.Segment.consecutivePossibilityRules`.
         
         
         Two notes on segmentA being a special Segment:
         
         
-        1) By default resolution possibilities are not filtered using :meth:`~music21.figuredBass.segment.Segment.singlePossibilityRules`
-        rules of segmentB. Filter by setting :attr:`~music21.figuredBass.rules.Rules.applySinglePossibRulesToResolution` to True.
+        1. By default resolution possibilities are not filtered using :meth:`~music21.figuredBass.segment.Segment.singlePossibilityRules`
+           rules of segmentB. Filter by setting :attr:`~music21.figuredBass.rules.Rules.applySinglePossibRulesToResolution` to True.
         
         
-        2) By default, (possibA, possibB) pairs are not filtered using :meth:`~music21.figuredBass.segment.Segment.consecutivePossibilityRules`
-        rules of segmentA. Filter by setting :attr:`~music21.figuredBass.rules.Rules.applyConsecutivePossibRulesToResolution` to True.
+        2. By default, (possibA, possibB) pairs are not filtered using :meth:`~music21.figuredBass.segment.Segment.consecutivePossibilityRules`
+           rules of segmentA. Filter by setting :attr:`~music21.figuredBass.rules.Rules.applyConsecutivePossibRulesToResolution` to True.
     
         >>> from music21.figuredBass import segment
         >>> from music21 import note

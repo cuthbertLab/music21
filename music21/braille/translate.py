@@ -448,18 +448,19 @@ def showOctaveWithNote(previousNote = note.Note('C3'), currentNote = note.Note('
     
     Rules:
     
+    * If currentNote is found within a second or third 
+      of previousNote, currentNote does not
+      carry an octave designation.
     
-    * If currentNote is found within a second or third of previousNote, currentNote does not
-    carry an octave designation.
+    * If currentNote is found a sixth or 
+      more away from previousNote, currentNote does carry 
+      an octave designation.
     
-    
-    * If currentNote is found a sixth or more away from previousNote, currentNote does carry 
-    an octave designation.
-    
-    
-    * If currentNote is found within a fourth or fifth of previousNote, currentNote carries
-    an octave designation if and only if currentNote and previousNote are not found in the
-    same octave.
+    * If currentNote is found within a fourth or fifth 
+      of previousNote, currentNote carries
+      an octave designation if and only if currentNote and 
+      previousNote are not found in the
+      same octave.
     '''
     i = interval.notesToInterval(previousNote, currentNote)
     isSixthOrGreater = i.generic.undirected >= 6

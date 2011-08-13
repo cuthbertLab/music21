@@ -967,8 +967,9 @@ class RestructuredWriter(object):
 
         >>> rsw = RestructuredWriter()
         >>> rsw.formatDocString("hello #_DOCS_HIDE\n" +\
-        ...                     "#_DOCS_SHOW there")
-        u' there \n'
+        ...                     "#_DOCS_SHOW there\n" +\
+        ...                     "user!")
+        u' there\nuser!\n\n'
 
         '''
         if doc == None:
@@ -984,18 +985,25 @@ class RestructuredWriter(object):
         docTestImportPackageReplace = """>>> from music21 import *"""
 
         lines = doc.split('\n')
+        baselineStrip = self.getBaselineStrip(lines)
+        lenBaselineStrip = len(baselineStrip)
+
         sub = []
         for lineSrc in lines:
-            line = lineSrc.strip()
+            line = lineSrc.rstrip()
+            if line.startswith(baselineStrip):
+                line = line[lenBaselineStrip:]
 
             if OMIT_STR in line: # permit blocking doctest examples
                 break # do not gather any more lines
             elif HIDE_LINE_STR in line: # do not show in docs
                 continue
             elif SHOW_LINE_STR in line: # do not show in docs
-                line = line.replace(SHOW_LINE_STR, '')
-                # there may be two spaces after this removal; replace
-                line = line.replace('  ', ' ')
+                lineNew = line.replace(' ' + SHOW_LINE_STR + ' ', ' ')
+                if lineNew == line:
+                    line = line.replace(SHOW_LINE_STR, ' ')
+                else:
+                    line = lineNew
 
             match = False
             for stub in rstExclude:
@@ -1026,51 +1034,117 @@ class RestructuredWriter(object):
         post = []
         for i in range(len(sub)):
             line = sub[i]
-            if line == '' and i != 0 and sub[i-1] == '':
+            if line == '': #and i != 0 and sub[i-1] == '':
                 post.append(None) # will be replaced with line breaks
-            elif line == '':
-                pass
+            #elif line == '':
+            #    pass
             else: 
                 post.append(line)
 
         # create final message; add proper line breaks and indentation
-        msg = [indent] # can add indent here
+        msg = [] # can add indent here
         inExamples = False # are we now in a code example?
+        lookForTwoConsecutiveNewlines = False # have we found two newlines in a row, canceling inExamples
+        addWordJoinerToPreviousLine = False
         for line in post:
             if line == None: # insert breaks from two spaces
-                msg.append('\n\n' + indent) # can add indent here
+                addWordJoinerToPreviousLine = False
+                if inExamples == False or lookForTwoConsecutiveNewlines == True:
+                    inExamples = False
+                    lookForTwoConsecutiveNewlines = False
+                    msg.append('\n') # can add indent here
+                else:
+                    lookForTwoConsecutiveNewlines = True
+                    if inExamples == True:
+                        addWordJoinerToPreviousLine = True
+                    msg.append('\n') # can add indent here
+#                    else: # in examples, allow for a line break that doesn't exit the text...en quad space
+#                        msg.append(indent + u'\u2060 \n') # can add indent here
             elif line.startswith('>>>'): # python examples
+                if addWordJoinerToPreviousLine == True:
+                    msg[-1] = indent + u'\u2060 \n'
+                    addWordJoinerToPreviousLine = False
                 if inExamples == False:
                     space = '\n\n'
                     # if import is the module import, replace with package
                     if line.startswith(docTestImportPackage):
                         # can try to mark up import here
-                        msg.append(space + indent + docTestImportPackageReplace)
+                        msg.append(space + indent + docTestImportPackageReplace + '\n')
                     else: # if no import is given, assume we need a mod import
                         # need only one return after first line
-                        msg.append(space + indent + line)
+                        msg.append(space + indent + line + '\n')
                     inExamples = True
                 else:
-                    space = '\n'
-                    msg.append(space + indent + line)
+                    msg.append(indent + line + '\n')
             # images should be at the same indent level
             elif line.strip().startswith('.. image::'):
                 # additional \n are necessary here; were added previously
                 # above; indent is important here: if incorrect, the docutils
                 # interprets as the end of the docs
-                msg.append('\n\n\n' + indent + line)
+                msg.append('\n\n\n' + indent + line + '\n')
+                addWordJoinerToPreviousLine = False
+                inExamples = False
             elif line.strip().startswith(':width:'):
                 # width must be indented in an additional line
-                msg.append('\n' + indent + '    ' + line + '\n')
+                msg.append(indent + '    ' + line + '\n\n')
+                addWordJoinerToPreviousLine = False
+                inExamples = False
+
             else: # continuing an existing line
-                if not inExamples:
-                    msg.append(line + ' ')
-                else: # assume we are in examples; 
-                # need to get python lines that do not start with delim
-                    msg.append('\n' + indent + line + ' ')
+                addWordJoinerToPreviousLine = False
+                msg.append(indent + line + '\n')
         msg.append('\n')
 
         return ''.join(msg)
+
+    def getBaselineStrip(self, lines):
+        r'''
+        returns a string of the number of spaces to remove from
+        a docstring, which is the baseline of the number of indented
+        characters at the beginning of a line.
+        
+        
+        The baseline strip is the number of spaces before the first
+        line of text, or if it is zero, the number of spaces after
+        the second line of text.  This way both common ways of writing
+        multiline docstrings is permitted.
+        
+        
+        >>> rsw = RestructuredWriter()
+        >>> lines = ['this is a doc', '    this is also a doc']
+        >>> rsw.getBaselineStrip(lines)
+        u'    '
+        >>> lines = ['','        this docstring begins w/ 8 spaces', '              third is more indented']
+        >>> rsw.getBaselineStrip(lines)
+        u'        '
+        >>> lines = ['this doc starts right away','','','  and after two blank lines gets going...']
+        >>> rsw.getBaselineStrip(lines)
+        u'  '
+
+        '''
+        lengthStrip = 0
+        if len(lines) == 0:
+            return ''
+        elif len(lines) == 1:
+            stripL0 = lines[0].lstrip()
+            lengthStrip = len(lines[0]) - len(stripL0)
+        else:
+            stripL0 = lines[0].lstrip()
+            if len(stripL0) > 0 and (len(lines[0]) - len(stripL0)) > 0:
+                lengthStrip = len(lines[0]) - len(stripL0)
+            if lengthStrip == 0:
+                for i in range(1, len(lines)):
+                    l = lines[i]
+                    if l.strip() == "":
+                        continue
+                    stripL = l.lstrip()
+                    lengthStrip = len(l) - len(stripL)
+                    break
+
+        returnLine = u''
+        for i in range(lengthStrip):
+            returnLine += u' '
+        return returnLine
 
 
 #-------------------------------------------------------------------------------
@@ -1678,7 +1752,10 @@ class Test(unittest.TestCase):
             :width: 400
 
 
-        Set all notes to the correct notes for a key using the note's Context:        
+        Set all notes to the correct notes for a key using the note's Context::
+        
+            * fix this
+            * fix that
         
         
         >>> from music21 import *
@@ -1721,38 +1798,44 @@ class Test(unittest.TestCase):
         '''
 
         post = rw.formatDocString(pre)
+        #print post
 
-        match = """Given a step (C, D, E, F, etc.) return the accidental for that note in this key (using the natural minor for minor) or None if there is none. 
+        match = """Given a step (C, D, E, F, etc.) return the accidental
+for that note in this key (using the natural minor for minor)
+or None if there is none.
+
 
 >>> from music21 import *
 >>> g = key.KeySignature(1)
 >>> g.accidentalByStep("F")
-<accidental sharp> 
+<accidental sharp>
 >>> g.accidentalByStep("G")
 >>> f = KeySignature(-1)
 >>> bbNote = note.Note("B-5")
 >>> f.accidentalByStep(bbNote.step)
-<accidental flat> 
+<accidental flat>
 
+Fix a wrong note in F-major:
 
-Fix a wrong note in F-major: 
 
 
 >>> wrongBNote = note.Note("B#4")
 >>> if f.accidentalByStep(wrongBNote.step) != wrongBNote.accidental:
-...    wrongBNote.accidental = f.accidentalByStep(wrongBNote.step) 
+...    wrongBNote.accidental = f.accidentalByStep(wrongBNote.step)
 >>> wrongBNote
-<music21.note.Note B-> 
+<music21.note.Note B->
 
 
 
 
 .. image:: images/keyAccidentalByStep.*
-    :width: 400
+        :width: 400
 
 
+Set all notes to the correct notes for a key using the note's Context::
+    * fix this
+    * fix that
 
-Set all notes to the correct notes for a key using the note's Context: 
 
 
 >>> from music21 import *
@@ -1764,9 +1847,12 @@ Set all notes to the correct notes for a key using the note's Context:
 >>> s1.append(note.WholeNote("A"))
 >>> s1.append(note.WholeNote("F#"))
 >>> for n in s1.notesAndRests:
-...    n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step) 
+...    n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
 >>> s1.show()
 """
+        self.maxDiff = None
+        #print post.strip()
+        #print match.strip()
         self.assertEqual(post.strip(), match.strip())
 
 

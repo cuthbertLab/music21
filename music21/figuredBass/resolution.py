@@ -9,7 +9,7 @@
 #-------------------------------------------------------------------------------
 '''
 .. note:: The terminology, V43, viio, iv, etc. are explained more fully in *The Music Theory Handbook*
-by Marjorie Merryman.
+     by Marjorie Merryman.
 
 
 This module contains methods which can properly resolve 

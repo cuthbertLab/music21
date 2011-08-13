@@ -17,7 +17,7 @@ the last element of each possibility is the bass.
 
 
 .. note:: fbRealizer supports voice crossing, so the order of pitches from lowest
-to highest may not correspond to the ordering of parts.
+    to highest may not correspond to the ordering of parts.
 
 
 Here, a possibility is created. G5 is in the highest part, and C4 is the bass. The highest

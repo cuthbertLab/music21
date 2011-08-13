@@ -371,7 +371,7 @@ class BoundIntervalNetwork(IntervalNetwork):
     'maxAccidental' which specifies that each note can have at most one
     accidental; double-flats and sharps are not allowed.  The other choices
     are 'simplifyEnharmonic' (which also converts C-, F-, B#, and E# to
-    B, E, C, and F respectively, see :meth:`~music21.pitch.Pitch.simplifyEnharmonic),
+    B, E, C, and F respectively, see :meth:`~music21.pitch.Pitch.simplifyEnharmonic`),
     'mostCommon' (which adds to simplifyEnharmonic the requirement that the
     most common accidential forms be used, so A# becomes B-, G- becomes 
     F#, etc. the only ambiguity allowed is that both G# and A- are acceptable),
@@ -466,14 +466,12 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net.degreeMin, net.degreeMax
         (1, 8)
 
-
         >>> # using another fill method creates a new network
         >>> net.fillBiDirectedEdges(['M3', 'M3', 'M3'])
         >>> net.realizePitch('g4')
         [G4, B4, D#5, G5]
         >>> net.degreeMin, net.degreeMax
         (1, 4)
-
 
         >>> net.fillBiDirectedEdges([interval.Interval('M3'), interval.Interval('M3'), interval.Interval('M3')])
         >>> net.realizePitch('c2')
@@ -594,22 +592,24 @@ class BoundIntervalNetwork(IntervalNetwork):
     def fillArbitrary(self, nodes, edges):
         '''Fill any arbitrary network given node and edge definitions.
 
-        Nodes must be defined by a dictionary of id and degree values. There must be a terminusLow and terminusHigh id as string.
+        Nodes must be defined by a dictionary of id and degree values. There must be a terminusLow and terminusHigh id as string::
 
-        nodes = ({'id':'terminusLow', 'degree':1},
-                 {'id':0, 'degree':2},
-                 {'id':'terminusHigh', 'degree':3},
-                )
+            nodes = ({'id':'terminusLow', 'degree':1},
+                     {'id':0, 'degree':2},
+                     {'id':'terminusHigh', 'degree':3},
+                    )
 
-        Edges must be defined by a dictionary of :class:`~music21.interval.Interval` strings and connections. Id values will be automatically assigned. Each connection must define direction and pairs of valid node ids. 
+        Edges must be defined by a dictionary of :class:`~music21.interval.Interval` strings and connections. Id values will be automatically assigned. Each connection must define direction and pairs of valid node ids::
 
-        edges = ({'interval':'m2', connections:(
-                        ['terminusLow', 0, 'bi'],
-                    )},
-                {'interval':'M3', connections:(
-                        [0, 'terminusHigh', 'bi'],
-                    )},
-                )
+            edges = ({'interval':'m2', connections:(
+                            ['terminusLow', 0, 'bi'],
+                        )},
+                    {'interval':'M3', connections:(
+                            [0, 'terminusHigh', 'bi'],
+                        )},
+                    )
+
+
         >>> from music21 import *
         >>> nodes = ({'id':'terminusLow', 'degree':1}, {'id':0, 'degree':2}, {'id':'terminusHigh', 'degree':3})
         >>> edges = ({'interval':'m2', 'connections':(['terminusLow', 0, 'bi'],)},{'interval':'M3', 'connections':([0, 'terminusHigh', 'bi'],)},)
@@ -2181,7 +2181,6 @@ class BoundIntervalNetwork(IntervalNetwork):
         1
         >>> net.getRelativeNodeDegree('f2', 1, 'e--6') # could be 4 or 1
         1
-
 
         >>> net.realizePitch('f6', 1, 'f2', 'f6')
         [G#2, C#3, F#3, B3, E4, A4, D5, G5, C6, F6]

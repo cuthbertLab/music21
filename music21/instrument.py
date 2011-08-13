@@ -1534,8 +1534,12 @@ class Test(unittest.TestCase):
         # piano spans are joined together
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
         self.assertEqual(len(post.parts[0].notes), 12)
+        offsetList = []
+        ppn = post.parts[0].notes
+        for n in ppn:
+            offsetList.append(n.offset)
 
-        self.assertEqual([n.offset for n in post.parts[0].notes], [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 9.0, 10.0, 11.0, 12.0, 13.0, 20.0])
+        self.assertEqual(offsetList, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 9.0, 10.0, 11.0, 12.0, 13.0, 20.0])
 
 
     def testPartitionByInstrumentF(self):

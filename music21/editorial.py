@@ -26,13 +26,13 @@ class CommentException(Exception):
 class NoteEditorial(object):
     '''Editorial comments and special effects that can be applied to notes
     Standard ones are stored as attributes.  Non-standard/one-off effects are
-    stored in the dict called "misc"::
+    stored in the dict called "misc":
     
     >>> from music21 import *
     >>> a = editorial.NoteEditorial()
     >>> a.color = "blue"  # a standard editorial effect
     >>> a.misc['backgroundHighlight'] = 'yellow'  # non-standard.
-    
+
     
     Every GeneralNote object already has a NoteEditorial object
     attached to it at object.editorial.  Normally you will just change that
@@ -41,7 +41,7 @@ class NoteEditorial(object):
     For instance, take the case where a scribe 
     wrote F in the score, knowing that a good singer would automatically
     sing F-sharp instead.  We can store the editorial
-    suggestion to sing F-sharp as a "musica ficta" accidental object::
+    suggestion to sing F-sharp as a "musica ficta" accidental object:
     
     
     >>> fictaSharp = pitch.Accidental("Sharp")

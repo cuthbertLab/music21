@@ -816,8 +816,8 @@ class GraphHorizontalBar(Graph):
         >>> a.setData(data)
         >>> a.process()
 
-    .. image:: images/GraphHorizontalBar.*
-        :width: 600
+        .. image:: images/GraphHorizontalBar.*
+            :width: 600
 
         '''
         Graph.__init__(self, *args, **keywords)
@@ -3465,32 +3465,27 @@ def plotStream(streamObj, *args, **keywords):
 
     Available plots include the following:
 
-    :class:`~music21.graph.PlotHistogramPitchSpace`
-    :class:`~music21.graph.PlotHistogramPitchClass`
-    :class:`~music21.graph.PlotHistogramQuarterLength`
+    * :class:`~music21.graph.PlotHistogramPitchSpace`
+    * :class:`~music21.graph.PlotHistogramPitchClass`
+    * :class:`~music21.graph.PlotHistogramQuarterLength`
+    * :class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`
+    * :class:`~music21.graph.PlotScatterPitchClassQuarterLength`
+    * :class:`~music21.graph.PlotScatterPitchClassOffset`
+    * :class:`~music21.graph.PlotScatterPitchSpaceDynamicSymbol`
+    * :class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`
+    * :class:`~music21.graph.PlotHorizontalBarPitchClassOffset`
+    * :class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`
+    * :class:`~music21.graph.PlotScatterWeightedPitchClassQuarterLength`
+    * :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol`
+    * :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`
+    * :class:`~music21.graph.PlotWindowedKrumhanslSchmuckler`
+    * :class:`~music21.graph.PlotWindowedKrumhanslKessler`
+    * :class:`~music21.graph.PlotWindowedAardenEssen`
+    * :class:`~music21.graph.PlotWindowedSimpleWeights`
+    * :class:`~music21.graph.PlotWindowedBellmanBudge`
+    * :class:`~music21.graph.PlotWindowedTemperleyKostkaPayne`
+    * :class:`~music21.graph.PlotWindowedAmbitus`
 
-    :class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`
-    :class:`~music21.graph.PlotScatterPitchClassQuarterLength`
-    :class:`~music21.graph.PlotScatterPitchClassOffset`
-    :class:`~music21.graph.PlotScatterPitchSpaceDynamicSymbol`
-
-    :class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`
-    :class:`~music21.graph.PlotHorizontalBarPitchClassOffset`
-
-    :class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`
-    :class:`~music21.graph.PlotScatterWeightedPitchClassQuarterLength`
-    :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol`
-
-    :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`
-
-    :class:`~music21.graph.PlotWindowedKrumhanslSchmuckler`
-    :class:`~music21.graph.PlotWindowedKrumhanslKessler`
-    :class:`~music21.graph.PlotWindowedAardenEssen`
-    :class:`~music21.graph.PlotWindowedSimpleWeights`
-    :class:`~music21.graph.PlotWindowedBellmanBudge`
-    :class:`~music21.graph.PlotWindowedTemperleyKostkaPayne`
-
-    :class:`~music21.graph.PlotWindowedAmbitus`
 
     >>> from music21 import *
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE

@@ -365,9 +365,11 @@ def quarterLengthToDurations(qLen, link=True):
 
     (All quarterLengths can, technically, be notated as a single unit given a complex enough tuplet, but we don't like doing that).
     
-    This is mainly a utility function. Much faster for many purposes is:
+    This is mainly a utility function. Much faster for many purposes is something like::
+    
        d = Duration()
        d.quarterLength = 251.231312
+    
     and then let Duration automatically create Duration Components as necessary.
 
     These examples use unitSpec() to get a concise summary of the contents
@@ -1323,10 +1325,12 @@ class DurationUnit(DurationCommon):
     be expressed by a single graphical unit in Brahms's shorthand, it can be modeled
     by a single DurationUnit of unliked graphical/temporal representation.
 
-    Additional types are needed beyond those in Duration: 'zero' type for zero-length
-     durations and 'unexpressable' 
-    type for anything that cannot be expressed as a single notation unit, and thus 
-    needs a full Duration object (such as 2.5 quarterLengths.)
+    Additional types are needed beyond those in Duration::
+
+        * 'zero' type for zero-length durations 
+        * 'unexpressible' type for anything that cannot 
+          be expressed as a single notation unit, and thus 
+          needs a full Duration object (such as 2.5 quarterLengths.)
     '''
   
     def __init__(self, prototype='quarter'):
@@ -1899,7 +1903,7 @@ class Duration(DurationCommon):
     Multiple DurationUnits in a single Duration may be used 
     to express tied notes, or may be used to split duration 
     across barlines or beam groups. Some Duration objects are 
-    not expressable as a single notation unit. 
+    not expressible as a single notation unit. 
 
 
     Duration objects are not Music21Objects. Duration objects share 

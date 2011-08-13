@@ -695,7 +695,9 @@ class ABCBar(ABCToken):
             return False
 
     def isRepeatBracket(self):
-        '''Return true if this defines a repeat bracket for an alternat eending
+        '''Return true if this defines a repeat bracket for an alternate ending
+        
+        
         >>> from music21 import *
         >>> ab = abc.ABCBar('[2')
         >>> ab.parse()

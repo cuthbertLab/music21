@@ -213,7 +213,8 @@ class DefinedContexts(object):
     def __len__(self):
         '''Return the total number of references.
 
-        >>> class Mock(Music21Object): pass
+        >>> class Mock(Music21Object): 
+        ...     pass
         >>> aObj = Mock()
         >>> aContexts = DefinedContexts()
         >>> aContexts.add(aObj)
@@ -229,7 +230,8 @@ class DefinedContexts(object):
         All sites, however, are passed on to the new deepcopy, which means that in a deepcopy of a Stream that contains Notes, the copied Note will have the former site as a location.
 
         >>> import copy
-        >>> class Mock(Music21Object): pass
+        >>> class Mock(Music21Object): 
+        ...     pass
         >>> aObj = Mock()
         >>> aContexts = DefinedContexts()
         >>> aContexts.add(aObj)
@@ -277,7 +279,8 @@ class DefinedContexts(object):
     def unwrapWeakref(self):
         '''Unwrap any and all weakrefs stored.
 
-        >>> class Mock(Music21Object): pass
+        >>> class Mock(Music21Object): 
+        ...     pass
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> aContexts = DefinedContexts()
@@ -304,7 +307,8 @@ class DefinedContexts(object):
     def wrapWeakref(self):
         '''Wrap all stored objects with weakrefs.
 
-        >>> class Mock(Music21Object): pass
+        >>> class Mock(Music21Object): 
+        ...     pass
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> aContexts = DefinedContexts()
@@ -328,7 +332,8 @@ class DefinedContexts(object):
     def freezeIds(self):
         '''Temporarily replace all stored keys (object ids) with a temporary values suitable for usage in pickling.
 
-        >>> class Mock(Music21Object): pass
+        >>> class Mock(Music21Object): 
+        ...     pass
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> aContexts = DefinedContexts()
@@ -361,7 +366,8 @@ class DefinedContexts(object):
     def unfreezeIds(self):
         '''Restore keys to be the id() of the object they contain.
 
-        >>> class Mock(Music21Object): pass
+        >>> class Mock(Music21Object): 
+        ...     pass
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> cObj = Mock()
@@ -536,7 +542,8 @@ class DefinedContexts(object):
     def remove(self, site):
         '''Remove the object (a context or location site) specified from DefinedContexts. Object provided can be a location site or a defined context. 
 
-        >>> class Mock(Music21Object): pass
+        >>> class Mock(Music21Object): 
+        ...     pass
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> cSite = Mock()
@@ -605,13 +612,13 @@ class DefinedContexts(object):
     def _keysByTime(self, newFirst=True):
         '''Get keys sorted by creation time, where most recent are first if `newFirst` is True. else, most recent are last.
 
-        >>> from music21 import *
-        >>> import time
-        >>> class Mock(Music21Object): pass
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     pass
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> cObj = Mock()
-        >>> aContexts = DefinedContexts()
+        >>> aContexts = music21.DefinedContexts()
         >>> aContexts.add(cObj, 345)
         >>> aContexts.add(aObj)
         >>> aContexts.add(bObj)
@@ -638,17 +645,16 @@ class DefinedContexts(object):
 
         If `priorityTarget` is defined, this object will be placed first in the list of objects.
 
-        >>> from music21 import *
-        >>> import time
-        >>> class Mock(Music21Object): pass
+
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     pass
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> cObj = Mock()
-        >>> aContexts = DefinedContexts()
+        >>> aContexts = music21.DefinedContexts()
         >>> aContexts.add(cObj, 345) # a locations
-        >>> #time.sleep(.05)
         >>> aContexts.add(aObj)
-        >>> #time.sleep(.05)
         >>> aContexts.add(bObj)
         >>> aContexts.get() == [cObj, aObj, bObj]
         True
@@ -713,11 +719,12 @@ class DefinedContexts(object):
     def getSites(self, idExclude=None):
         '''Get all defined contexts that are locations; unwrap from weakrefs
 
-        >>> from music21 import *
-        >>> class Mock(Music21Object): pass
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     pass
         >>> aObj = Mock()
         >>> bObj = Mock()
-        >>> aContexts = DefinedContexts()
+        >>> aContexts = music21.DefinedContexts()
         >>> aContexts.add(aObj, 234)
         >>> aContexts.add(bObj, 3000)
         >>> len(aContexts._locationKeys) == 2
@@ -758,13 +765,17 @@ class DefinedContexts(object):
 
     def getSitesByClass(self, className):
         '''Return sites that match the provided class.
+        
+        Input can be either a Class object or a string
 
-        >>> from music21 import *
-        >>> class Mock(Music21Object): pass
+        >>> import music21
+        >>> from music21 import stream
+        >>> class Mock(music21.Music21Object): 
+        ...     pass
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> cObj = stream.Stream()
-        >>> aContexts = DefinedContexts()
+        >>> aContexts = music21.DefinedContexts()
         >>> aContexts.add(aObj, 234)
         >>> aContexts.add(bObj, 3000)
         >>> aContexts.add(cObj, 200)
@@ -814,7 +825,10 @@ class DefinedContexts(object):
 
 
     def hasSpannerSite(self):
-        '''Return True if this object is found in any Spanner. This is determined by looking for a SpannerStorage Stream class as a Site.
+        '''
+        Return True if this object is found in 
+        any Spanner. This is determined by looking for 
+        a SpannerStorage Stream class as a Site.
         '''
         for idKey in self._locationKeys:
             if self._definedContexts[idKey]['class'] == 'SpannerStorage':
@@ -842,12 +856,17 @@ class DefinedContexts(object):
 
 
     def isSite(self, obj):
-        '''Given an object, determine if it is a site stored in this DefinedContexts. This will return False if the object is simply a context and not a location
-
-        >>> class Mock(Music21Object): pass
+        '''
+        Given an object, determine if it is a site stored 
+        in this DefinedContexts. This will return False 
+        if the object is simply a context and not a location.
+        
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     pass
         >>> aSite = Mock()
         >>> bSite = Mock()
-        >>> aLocations = DefinedContexts()
+        >>> aLocations = music21.DefinedContexts()
         >>> aLocations.add(aSite, 0)
         >>> aLocations.add(bSite) # a context
         >>> aLocations.isSite(aSite)
@@ -860,10 +879,14 @@ class DefinedContexts(object):
         return False
 
     def hasSiteId(self, siteId):
-        '''Return True or False if this DefinedContexts object already has this site id defined as a location
+        '''Return True or False if this 
+        DefinedContexts object already has 
+        this site id defined as a location
 
-        >>> from music21 import *; import music21
-        >>> class Mock(Music21Object): pass
+
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     pass
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> dc = music21.DefinedContexts()
@@ -881,8 +904,9 @@ class DefinedContexts(object):
     def getSiteIds(self):
         '''Return a list of all site Ids.
 
-        >>> from music21 import *; import music21
-        >>> class Mock(Music21Object): pass
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     pass
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> dc = music21.DefinedContexts()
@@ -897,12 +921,14 @@ class DefinedContexts(object):
     def purgeLocations(self, rescanIsDead=False):
         '''Clean all locations that refer to objects that no longer exist.
 
-        >>> class Mock(Music21Object): pass
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     pass
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> cSite = Mock()
         >>> dSite = Mock()
-        >>> aLocations = DefinedContexts()
+        >>> aLocations = music21.DefinedContexts()
         >>> aLocations.add(aSite, 0)
         >>> aLocations.add(cSite) # a context
         >>> del aSite
@@ -975,13 +1001,15 @@ class DefinedContexts(object):
     def _getOffsetBySiteId(self, idKey):
         '''Main method for getting an offset from a location key.
 
-        >>> class Mock(Music21Object): pass
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     pass
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> cSite = Mock()
         >>> dSite = Mock()
         >>> eSite = Mock()
-        >>> aLocations = DefinedContexts()
+        >>> aLocations = music21.DefinedContexts()
         >>> aLocations.add(aSite, 0)
         >>> aLocations.add(cSite) # a context
         >>> aLocations.add(bSite, 234) # can add at same offset or another
@@ -1017,12 +1045,15 @@ class DefinedContexts(object):
     def getOffsets(self):
         '''Return a list of all offsets.
 
-        >>> class Mock(Music21Object): pass
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     pass
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> cSite = Mock()
         >>> dSite = Mock()
-        >>> aLocations = DefinedContexts()
+        
+        >>> aLocations = music21.DefinedContexts()
         >>> aLocations.add(aSite, 0)
         >>> aLocations.add(cSite) # a context
         >>> aLocations.add(bSite, 234) # can add at same offset or another
@@ -1035,13 +1066,19 @@ class DefinedContexts(object):
 
 
     def getOffsetByObjectMatch(self, obj):
-        '''For a given object return the offset using a direct object match. The stored id value is not used; instead, the id() of both the stored object reference and the supplied objet is used. 
+        '''For a given object return the 
+        offset using a direct object match. 
+        The stored id value is not used; 
+        instead, the id() of both the stored 
+        object reference and the supplied 
+        object is used. 
 
-        >>> class Mock(Music21Object): pass
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     pass
         >>> aSite = Mock()
         >>> bSite = Mock()
-        >>> cParent = Mock()
-        >>> aLocations = DefinedContexts()
+        >>> aLocations = music21.DefinedContexts()
         >>> aLocations.add(aSite, 23)
         >>> aLocations.add(bSite, 121.5)
         >>> aLocations.getOffsetBySite(aSite)
@@ -1067,13 +1104,18 @@ class DefinedContexts(object):
         raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % obj)
 
     def getOffsetBySite(self, site):
-        '''For a given site return its offset. The None site is permitted. The id() of the site is used to find the offset. 
+        '''For a given site return this
+        DefinedContexts' 
+        offset in it. The None site is 
+        permitted. The id() of the site is used to find the offset. 
 
-        >>> class Mock(Music21Object): pass
+
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     pass
         >>> aSite = Mock()
         >>> bSite = Mock()
-        >>> cParent = Mock()
-        >>> aLocations = DefinedContexts()
+        >>> aLocations = music21.DefinedContexts()
         >>> aLocations.add(aSite, 23)
         >>> aLocations.add(bSite, 121.5)
         >>> aLocations.getOffsetBySite(aSite)
@@ -1102,11 +1144,12 @@ class DefinedContexts(object):
     def getOffsetBySiteId(self, siteId):
         '''For a given site id, return its offset.
 
-        >>> class Mock(Music21Object): pass
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...    pass
         >>> aSite = Mock()
         >>> bSite = Mock()
-        >>> cParent = Mock()
-        >>> aLocations = DefinedContexts()
+        >>> aLocations = music21.DefinedContexts()
         >>> aLocations.add(aSite, 23)
         >>> aLocations.add(bSite, 121.5)
         >>> aLocations.getOffsetBySiteId(id(aSite))
@@ -1126,19 +1169,24 @@ class DefinedContexts(object):
         done with add, but the difference is that if the site is not in 
         DefinedContexts, it will raise an exception.
         
-        >>> class Mock(Music21Object): pass
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     pass
+        
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> cSite = Mock()
-        >>> aLocations = DefinedContexts()
+        
+        >>> aLocations = music21.DefinedContexts()
         >>> aLocations.add(aSite, 23)
         >>> aLocations.add(bSite, 121.5)
         >>> aLocations.setOffsetBySite(aSite, 20)
         >>> aLocations.getOffsetBySite(aSite)
         20
+        
         >>> aLocations.setOffsetBySite(cSite, 30)        
         Traceback (most recent call last):
-        DefinedContextsException: ...
+        DefinedContextsException: an entry for this object (<...Mock object at 0x...>) is not stored in DefinedContexts
         '''
         siteId = None
         if site is not None:
@@ -1153,9 +1201,11 @@ class DefinedContexts(object):
             
 
     def setOffsetBySiteId(self, siteId, value):
-        '''Set an offset by siteId. This assumes that the site is valid, is best used for advanced, performance critical usage only.
+        '''Set an offset by siteId. This assumes that 
+        the site is valid, is best used for advanced, 
+        performance critical usage only.
 
-        The `siteId` parameter can be None
+        The `siteId` parameter can be None.
         '''
         try:
             self._definedContexts[siteId]['offset'] = value
@@ -1166,18 +1216,20 @@ class DefinedContexts(object):
 
 
     def getSiteByOffset(self, offset):
-        '''For a given offset return the parent
+        '''For a given offset return the site that fits it
 
-        # More than one parent may have the same offset; 
-        # this can return the last site added by sorting time
+        More than one Site may have the same offset; 
+        this at one point returned the last site added by sorting time,
+        but now we use a dict, so there's no guarantee that the 
+        one you want will be there -- need orderedDicts!
 
-        No - now we use a dict, so there's no guarantee that the one you want will be there -- need orderedDicts!
-
-        >>> class Mock(Music21Object): pass
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     pass
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> cSite = Mock()
-        >>> aLocations = DefinedContexts()
+        >>> aLocations = music21.DefinedContexts()
         >>> aLocations.add(aSite, 23)
         >>> aLocations.add(bSite, 23121.5)
         >>> aSite == aLocations.getSiteByOffset(23)
@@ -1220,11 +1272,13 @@ class DefinedContexts(object):
 
         The `getElementMethod` is a string that selects which Stream method is used to get elements for searching with getElementsByClass() calls. 
 
-        >>> class Mock(Music21Object): pass
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     pass
         >>> import time
         >>> aObj = Mock()
         >>> bObj = Mock()
-        >>> aContexts = DefinedContexts()
+        >>> aContexts = music21.DefinedContexts()
         >>> aContexts.add(aObj)
         >>> #time.sleep(.05)
         >>> aContexts.add(bObj)
@@ -1309,13 +1363,17 @@ class DefinedContexts(object):
 
 
     def getAllByClass(self, className, found=None, idFound=None, memo=None):
-        '''Return all known references of a given class found in any association with this DefinedContexts.
+        '''Return all known references of a given class found 
+        in any association with this DefinedContexts.
 
-        This will recursively search the defined contexts of existing defined contexts, and return a list of all objects that match the given class.
+        This will recursively search the defined contexts 
+        of existing defined contexts, and return a list of all 
+        objects that match the given class.
 
-        >>> from music21 import *; import music21
-        >>> class Mock(Music21Object): pass
-        >>> import time
+
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...    pass
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> dc = music21.DefinedContexts()
@@ -1363,12 +1421,14 @@ class DefinedContexts(object):
         '''Given an attribute name, search all objects and find the first
         that matches this attribute name; then return a reference to this attribute.
 
-        >>> class Mock(Music21Object): attr1=234
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     attr1 = 234
         >>> aObj = Mock()
         >>> aObj.attr1 = 234
         >>> bObj = Mock()
         >>> bObj.attr1 = 98
-        >>> aContexts = DefinedContexts()
+        >>> aContexts = music21.DefinedContexts()
         >>> aContexts.add(aObj)
         >>> len(aContexts)
         1
@@ -1393,11 +1453,13 @@ class DefinedContexts(object):
         '''Given an attribute name, search all objects and find the first
         that matches this attribute name; then return a reference to this attribute.
 
-        >>> class Mock(Music21Object): attr1=234
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     attr1 = 234
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> bObj.attr1 = 98
-        >>> aContexts = DefinedContexts()
+        >>> aContexts = music21.DefinedContexts()
         >>> aContexts.add(aObj)
         >>> aContexts.add(bObj)
         >>> aContexts.setAttrByName('attr1', 'test')
@@ -1636,22 +1698,22 @@ class Music21Object(JSONSerializer):
     '''
     Base class for all music21 objects.
     
-    All music21 objects numerous pieces of information:
+    All music21 objects have six pieces of information:    
     
-    (1) id: identification string unique to the objects container (optional)
-    (2) groups: a Groups object: which is a list of strings identifying 
-                    internal subcollections
-                    (voices, parts, selections) to which this element belongs
-    (3) duration: Duration object representing the length of the object
-    (4) activeSite: a weakreference to the currently active Location
-    (5) offset: a floating point value, generally in quarter lengths, specifying the position of the object in a site. 
-    (6) priority: int representing the position of an object among all
-                    objects at the same offset.
+    1. id: identification string unique to the objects container (optional)
+    2. groups: a Groups object: which is a list of strings identifying 
+       internal subcollections (voices, parts, selections) to which this element belongs
+    3. duration: Duration object representing the length of the object
+    4. activeSite: a weakreference to the currently active Location
+    5. offset: a floating point value, generally in quarter lengths, specifying the position of the object in a site. 
+    6. priority: int representing the position of an object among all
+       objects at the same offset.
 
     Contexts, locations, and offsets are stored in a  :class:`~music21.base.DefinedContexts` object. Locations specify connections of this object to one location in a Stream subclass. Contexts are weakrefs for current objects that are associated with this object (similar to locations but without an offset)
 
 
     Each of these may be passed in as a named keyword to any music21 object.
+    
     Some of these may be intercepted by the subclassing object (e.g., duration within Note)
     '''
 
@@ -1667,7 +1729,7 @@ class Music21Object(JSONSerializer):
     isSpanner = False
 
     # define order to present names in documentation; use strings
-    _DOC_ORDER = ['searchParentByAttr', 'getContextAttr', 'setContextAttr']
+    _DOC_ORDER = ['searchActiveSiteByAttr', 'getContextAttr', 'setContextAttr']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
     'id': 'Unique identification string.',
@@ -1707,7 +1769,7 @@ class Music21Object(JSONSerializer):
     }
 
     def __init__(self, *arguments, **keywords):
-        # None is stored as the internal location of an obj w/o a parent
+        # None is stored as the internal location of an obj w/o any sites
         self._activeSite = None
         # cached id in case the weakref has gone away...
         self._activeSiteId = None 
@@ -1802,7 +1864,7 @@ class Music21Object(JSONSerializer):
             part = getattr(self, name)
             # attributes that require special handling
             if name == '_activeSite':
-                #environLocal.printDebug(['creating parent reference'])
+                #environLocal.printDebug(['creating activeSite reference'])
                 # keep a reference, not a deepcopy
                 # do not use activeSite property; simply use same weak ref obj
                 setattr(new, name, self._activeSite)
@@ -1896,30 +1958,30 @@ class Music21Object(JSONSerializer):
     # look at this object for an atttribute; if not here
     # look up to activeSite
 
-    def searchParentByAttr(self, attrName):
+    def searchActiveSiteByAttr(self, attrName):
         '''If this element is contained within a Stream or other Music21 element, 
-        searchParentByAttr() permits searching attributes of higher-level
-        objects. The first encountered match is returned, or None if no match. All parents are recursively searched upward. 
+        searchActiveSiteByAttr() permits searching attributes of higher-level
+        objects. The first encountered match is returned, or None if no match. All activeSites are recursively searched upward. 
 
         OMIT_FROM_DOCS
         this presently only searches upward; it does not search other lower level leafs in a container
 
         this was formerly called SeachParent, but we might do other types 
-        of parent searches
+        of searches
         '''
         found = None
         try:
             found = getattr(self.activeSite, attrName)
         except AttributeError:
             # not sure of passing here is the best action
-            environLocal.printDebug(['searchParentByAttr call raised attribute error for attribute:', attrName])
+            environLocal.printDebug(['searchActiveSiteByAttr call raised attribute error for attribute:', attrName])
             pass
         if found is None:
-            found = self.activeSite.searchParentByAttr(attrName)
+            found = self.activeSite.searchActiveSiteByAttr(attrName)
         return found
         
 
-#     def searchParentByClass(self, classFilterList)
+#     def searchActiveSiteByClass(self, classFilterList)
 #         '''
 #         The first encountered result is returned. 
 #         '''
@@ -1962,9 +2024,11 @@ class Music21Object(JSONSerializer):
         This should only be used for advanced processing of known site 
         that already has been added.
 
-        >>> class Mock(Music21Object): pass
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     pass
         >>> aSite = Mock()
-        >>> a = Music21Object()
+        >>> a = music21.Music21Object()
         >>> a.addLocation(aSite, 20)
         >>> a.setOffsetBySite(aSite, 30)
         >>> a.getOffsetBySite(aSite)
@@ -1977,10 +2041,12 @@ class Music21Object(JSONSerializer):
         '''Given the name of an attribute, search Conctexts and return 
         the best match.
 
-        >>> class Mock(Music21Object): attr1=234
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     attr1 = 234
         >>> aObj = Mock()
         >>> aObj.attr1 = 'test'
-        >>> a = Music21Object()
+        >>> a = music21.Music21Object()
         >>> a.addContext(aObj)
         >>> a.getContextAttr('attr1')
         'test'
@@ -1991,10 +2057,12 @@ class Music21Object(JSONSerializer):
         '''Given the name of an attribute, search Conctexts and return 
         the best match.
 
-        >>> class Mock(Music21Object): attr1=234
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     attr1 = 234
         >>> aObj = Mock()
         >>> aObj.attr1 = 'test'
-        >>> a = Music21Object()
+        >>> a = music21.Music21Object()
         >>> a.addContext(aObj)
         >>> a.getContextAttr('attr1')
         'test'
@@ -2007,10 +2075,12 @@ class Music21Object(JSONSerializer):
     def addContext(self, obj):
         '''Add an ojbect to the :class:`~music21.base.DefinedContexts` object. For adding a location, use :meth:`~music21.base.Music21Object.addLocation`.
 
-        >>> class Mock(Music21Object): attr1=234
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     attr1 = 234
         >>> aObj = Mock()
         >>> aObj.attr1 = 'test'
-        >>> a = Music21Object()
+        >>> a = music21.Music21Object()
         >>> a.addContext(aObj)
         >>> a.getContextAttr('attr1')
         'test'
@@ -2018,14 +2088,18 @@ class Music21Object(JSONSerializer):
         return self._definedContexts.add(obj)
 
     def hasContext(self, obj):
-        '''Return a Boolean if an object reference is stored in the object's DefinedContexts object.
+        '''
+        Return a Boolean if an object reference is stored 
+        in the object's DefinedContexts object.
 
         This checks both all locations as well as all sites. 
 
-        >>> class Mock(Music21Object): attr1=234
+        >>> import music21
+        >>> class Mock(music21.Music21Object): 
+        ...     attr1 = 234
         >>> aObj = Mock()
         >>> aObj.attr1 = 'test'
-        >>> a = Music21Object()
+        >>> a = music21.Music21Object()
         >>> a.addContext(aObj)
         >>> a.hasContext(aObj)
         True
@@ -2041,21 +2115,33 @@ class Music21Object(JSONSerializer):
             return False
 
     def addLocation(self, site, offset):
-        '''Add a location to the :class:`~music21.base.DefinedContexts` object. The supplied object is a reference to the object (the site) that contains an offset of this object.  For example, if this Music21Object was Note, the site would be a Stream (or Stream subclass) and the offset would be a number for the offset. 
+        '''
+        Add a location to the :class:`~music21.base.DefinedContexts` object. 
+        The supplied object is a reference to the object (the site) that 
+        contains an offset of this object.  For example, if this 
+        Music21Object was Note, the site would be a Stream (or Stream 
+        subclass) and the offset would be a number for the offset. 
 
-        This is only for advanced location method and is not a complete or sufficient way to add an object to a Stream. 
+
+        This is only for advanced location method and is not a complete 
+        or sufficient way to add an object to a Stream. 
+
 
         >>> from music21 import note, stream
         >>> s = stream.Stream()
-        >>> n = note.Note()
+        >>> n = note.Note('E-5')
         >>> n.addLocation(s, 10)
         '''
         self._definedContexts.add(site, offset)
 
     def getSites(self, idExclude=None):
-        '''Return a list of all objects that store a location for this object. Will inlcude None, the default empty site placeholder. 
+        '''Return a list of all objects that store 
+        a location for this object. Will inlcude None, 
+        the default empty site placeholder. 
+
 
         If `idExclude` is provided, matching site ids will not be returned.
+
 
         >>> from music21 import note, stream
         >>> s1 = stream.Stream()
@@ -2069,13 +2155,17 @@ class Music21Object(JSONSerializer):
         return self._definedContexts.getSites(idExclude=idExclude)
 
     def getSiteIds(self):
-        '''Return a list of all site Ids, or the id() value of the sites of this object. 
+        '''Return a list of all site Ids, or the 
+        id() value of the sites of this object. 
         '''
         return self._definedContexts.getSiteIds()
 
 
     def getCommonSiteIds(self, other):
-        '''Given another music21 object, return a list of all common site ids. Do not include the default empty site, None. 
+        '''Given another music21 object, return a 
+        list of all common site ids. Do not include 
+        the default empty site, None. 
+
 
         >>> from music21 import note, stream
         >>> s1 = stream.Stream()
@@ -2102,7 +2192,8 @@ class Music21Object(JSONSerializer):
         return post
 
     def getCommonSites(self, other):
-        '''Given another object, return a lost of all common sites. 
+        '''Given another object, return a list of all sites
+        in common between the two objects. 
 
         >>> from music21 import note, stream
         >>> s1 = stream.Stream()
@@ -2130,7 +2221,11 @@ class Music21Object(JSONSerializer):
         return post
 
     def hasSpannerSite(self):
-        '''Return True if this object is found in any Spanner. This is determined by looking for a SpannerStorage Stream class as a Site.
+        '''Return True if this object is found in 
+        any Spanner (i.e. has any spanners attached). 
+        This is determined by looking 
+        for a SpannerStorage Stream class as a Site.
+
 
         >>> from music21 import *
         >>> n1 = note.Note()
@@ -2151,7 +2246,12 @@ class Music21Object(JSONSerializer):
 
 
     def getSpannerSites(self):
-        '''Return a list of all sites that are Spanner or Spanner subclasses. This provides a way for objects to be aware of what Spanners they reside in. Note that Spanners are not Stream subclasses, but Music21Objects that are composed with a specialized Stream subclass, SapnnerStroage
+        '''Return a list of all sites that are 
+        Spanner or Spanner subclasses. This provides a way for 
+        objects to be aware of what Spanners they 
+        reside in. Note that Spanners are not Stream 
+        subclasses, but Music21Objects that are composed with 
+        a specialized Stream subclass, SapnnerStroage
 
         >>> from music21 import *
         >>> n1 = note.Note()
@@ -2174,7 +2274,8 @@ class Music21Object(JSONSerializer):
     def removeLocationBySite(self, site):
         '''Remove a location in the :class:`~music21.base.DefinedContexts` object.
 
-        This is only for advanced location method and is not a complete or sufficient way to remove an object from a Stream. 
+        This is only for advanced location method and
+        is not a complete or sufficient way to remove an object from a Stream. 
 
         >>> from music21 import note, stream
         >>> s = stream.Stream()
@@ -2188,13 +2289,14 @@ class Music21Object(JSONSerializer):
         if not self._definedContexts.isSite(site):
             raise Music21ObjectException('supplied site (%s) is not a site in this object: %s' % (site, self))
         self._definedContexts.remove(site)
-        # if parent is set to that site, reassign to None
+        # if activeSite is set to that site, reassign to None
         if self._getActiveSite() == site:
             self._setActiveSite(None)
 
 
     def removeLocationBySiteId(self, siteId):
-        '''Remove a location in the :class:`~music21.base.DefinedContexts` object by id.
+        '''Remove a location in the 
+        :class:`~music21.base.DefinedContexts` object by id.
 
         >>> from music21 import note, stream
         >>> s = stream.Stream()
@@ -2218,7 +2320,8 @@ class Music21Object(JSONSerializer):
 
 
     def removeNonContainedLocations(self):
-        '''Remove all locations in which this object does not actually reside as an element.
+        '''Remove all locations in which this object does not 
+        actually reside as an element.
         '''
         self._definedContexts.removeNonContainedLocations()
 
@@ -2226,7 +2329,8 @@ class Music21Object(JSONSerializer):
     def getContextByClass(self, className, serialReverseSearch=True,
             callerFirst=None, sortByCreationTime=False, prioritizeActiveSite=True, getElementMethod='getElementAtOrBefore', 
             memo=None):
-        '''Search both DefinedContexts as well as associated objects to find a matching class. Returns None if not match is found. 
+        '''Search both DefinedContexts as well as associated objects 
+        to find a matching class. Returns None if not match is found. 
 
         The a reference to the caller is required to find the offset of the 
         object of the caller. This is needed for serialReverseSearch.
@@ -2236,20 +2340,23 @@ class Music21Object(JSONSerializer):
         if we need a flat representation, the caller needs to be the source 
         Stream, not its DefinedContexts reference.
 
-        The `callerFirst` is the first object from which this method was called. This is needed in order to determine the final offset from which to search. 
+        The `callerFirst` is the first object from which this method 
+        was called. This is needed in order to determine the final offset from which to search. 
 
-        The `prioritizeActiveSite` parameter searches the objects parent before any other object. 
+        The `prioritizeActiveSite` parameter searches the object's activeSite 
+        before any other object. By default this is True
 
-        The `getElementMethod` is a string that selects which Stream method is used to get elements for searching. The strings 'getElementAtOrBefore' and 'getElementBeforeOffset' are currently accepted. 
+        The `getElementMethod` is a string that selects which Stream method is used to 
+        get elements for searching. The strings 'getElementAtOrBefore' and 'getElementBeforeOffset' are currently accepted. 
 
         '''
         from music21 import stream # needed for exception matching
 
-        #environLocal.printDebug(['call getContextByClass from:', self, 'parent:', self.activeSite, 'callerFirst:', callerFirst, 'prioritizeActiveSite', prioritizeActiveSite])
+        #environLocal.printDebug(['call getContextByClass from:', self, 'activeSite:', self.activeSite, 'callerFirst:', callerFirst, 'prioritizeActiveSite', prioritizeActiveSite])
     
         # this method will be called recursively on all object levels, ascending
         # thus, to do serial reverse search we need to 
-        # look at parent flat and track back to first encountered class match
+        # look at activeSite.flat and track back to first encountered class match
         if prioritizeActiveSite:
             priorityTarget = self.activeSite
         else:
@@ -2364,13 +2471,13 @@ class Music21Object(JSONSerializer):
 
         if post is None: # still no match
             # this will call this method on all defined contexts, including
-            # locations (one of which must be the parent)
+            # locations (one of which must be the activeSite)
             # if this is a stream, this will be the next level up, recursing
             # a reference to the callerFirst is continuall passed
             post = self._definedContexts.getByClass(className,
                    serialReverseSearch=serialReverseSearch,
                    callerFirst=callerFirst, sortByCreationTime=sortByCreationTime, 
-                   # make the priorityTarget the parent, meaning we search
+                   # make the priorityTarget the activeSite, meaning we search
                    # this object first
                    prioritizeActiveSite=prioritizeActiveSite, 
                    priorityTarget=priorityTarget,  getElementMethod=getElementMethod, memo=memo)
@@ -2381,8 +2488,9 @@ class Music21Object(JSONSerializer):
 
     def getAllContextsByClass(self, className, found=None, idFound=None,
                              memo=None):
-        '''Search both DefinedContexts as well as associated objects to find all matchinging classes. Returns [] if not match is found. 
-
+        '''Search both DefinedContexts as well as associated 
+        objects to find all matchinging classes. 
+        Returns [] if not match is found. 
         '''
         if memo is None:
             memo = {} # intialize
@@ -2460,7 +2568,31 @@ class Music21Object(JSONSerializer):
 
 
     activeSite = property(_getActiveSite, _setActiveSite, 
-        doc='''A reference to the most-recent object used to contain this object. In most cases, this will be a Stream or Stream sub-class. In most cases, an object's parent attribute is automatically set when an the object is attached to a Stream. 
+        doc='''A reference to the most-recent object used to 
+        contain this object. In most cases, this will be a 
+        Stream or Stream sub-class. In most cases, an object's 
+        activeSite attribute is automatically set when an the 
+        object is attached to a Stream.
+        
+        
+        >>> from music21 import *
+        >>> n = note.Note("C#4")
+        >>> p = stream.Part()
+        >>> p.insert(20.0, n)
+        >>> n.activeSite is p
+        True
+        >>> n.offset
+        20.0
+        
+        >>> m = stream.Measure()
+        >>> m.insert(10.0, n)
+        >>> n.activeSite is m
+        True
+        >>> n.offset
+        10.0
+        >>> n.activeSite = p
+        >>> n.offset
+        20.0
         ''')
 
     def addLocationAndActiveSite(self, offset, activeSite, 
@@ -2476,9 +2608,10 @@ class Music21Object(JSONSerializer):
 
         Testing script (N.B. manipulates Stream._elements directly -- so not to be emulated)
 
-        >>> from stream import Stream
+        >>> import music21
+        >>> from music21.stream import Stream
         >>> st1 = Stream()
-        >>> o1 = Music21Object()
+        >>> o1 = music21.Music21Object()
         >>> st1_wr = common.wrapWeakref(st1)
         >>> offset = 20.0
         >>> st1._elements = [o1]
@@ -2491,7 +2624,7 @@ class Music21Object(JSONSerializer):
         activeSiteId = id(activeSite)
         self._definedContexts.add(activeSite, offset, idKey=activeSiteId) 
         
-        # if the current parent is already set, nothing to do
+        # if the current activeSite is already set, nothing to do
         # do not create a new weakref 
         if self._activeSiteId == activeSiteId:
             return 
@@ -2514,26 +2647,26 @@ class Music21Object(JSONSerializer):
         # been provided for that activeSite; when self.offset is called, 
         # the first case here would match
 
-        parentId = None
+        activeSiteId = None
         if self.activeSite is not None:
-            parentId = id(self.activeSite)
+            activeSiteId = id(self.activeSite)
         elif self._activeSiteId is not None:
-            parentId = self._activeSiteId
+            activeSiteId = self._activeSiteId
         
-        if parentId is not None and self._definedContexts.hasSiteId(parentId):
-        # if parentId is not None and parentId in self._definedContexts.coordinates:
-            return self._definedContexts.getOffsetBySiteId(parentId)
-            #return self._definedContexts.coordinates[parentId]['offset']
+        if activeSiteId is not None and self._definedContexts.hasSiteId(activeSiteId):
+        # if activeSiteId is not None and activeSiteId in self._definedContexts.coordinates:
+            return self._definedContexts.getOffsetBySiteId(activeSiteId)
+            #return self._definedContexts.coordinates[activeSiteId]['offset']
         elif self.activeSite is None: # assume we want self
             return self._definedContexts.getOffsetBySite(None)
         else:
             # try to look for it in all objects
-            environLocal.printDebug(['doing a manual parent search: probably means that id(self.activeSite) (%s) is not equal to self._activeSiteId (%s)' % (id(self.activeSite), self._activeSiteId)])
+            environLocal.printDebug(['doing a manual activeSite search: probably means that id(self.activeSite) (%s) is not equal to self._activeSiteId (%s)' % (id(self.activeSite), self._activeSiteId)])
             offset = self._definedContexts.getOffsetByObjectMatch(self.activeSite)
             return offset
 
             environLocal.printDebug(['self._definedContexts', self._definedContexts._definedContexts])
-            raise Exception('request within %s for offset cannot be made with parent of %s (id: %s)' % (self.__class__, self.activeSite, parentId))            
+            raise Exception('request within %s for offset cannot be made with activeSite of %s (id: %s)' % (self.__class__, self.activeSite, activeSiteId))            
 
     def _setOffset(self, value):
         '''Set the offset for the activeSite. 
@@ -2557,7 +2690,7 @@ class Music21Object(JSONSerializer):
 
         # using _activeSiteId offers a considerable speed boost, as we
         # do not have to unwrap a weakref of self.activeSite to get the id()
-        # of parent
+        # of activeSite
         self._definedContexts.setOffsetBySiteId(self._activeSiteId, offset) 
 
     
@@ -2656,8 +2789,8 @@ class Music21Object(JSONSerializer):
         note at the same offset.  This produces the familiar order of 
         materials at the start of a musical score.
         
-        >>> from music21 import *
-        >>> a = base.Music21Object()
+        >>> import music21
+        >>> a = music21.Music21Object()
         >>> a.priority = 3
         >>> a.priority = 'high'
         Traceback (most recent call last):
@@ -2672,8 +2805,9 @@ class Music21Object(JSONSerializer):
     def unwrapWeakref(self):
         '''Public interface to operation on DefinedContexts.
 
-        >>> aM21Obj = Music21Object()
-        >>> bM21Obj = Music21Object()
+        >>> import music21
+        >>> aM21Obj = music21.Music21Object()
+        >>> bM21Obj = music21.Music21Object()
         >>> aM21Obj.offset = 30
         >>> aM21Obj.getOffsetBySite(None)
         30.0
@@ -2683,7 +2817,7 @@ class Music21Object(JSONSerializer):
         '''
         #environLocal.printDebug(['unwrapWeakref on:', self])
         self._definedContexts.unwrapWeakref()
-        # doing direct access; not using property parent, as filters
+        # doing direct access; not using property activeSite, as filters
         # through global WEAKREF_ACTIVE setting
         if self._activeSite is not None:
             self._activeSite = common.unwrapWeakref(self._activeSite)
@@ -2691,8 +2825,9 @@ class Music21Object(JSONSerializer):
     def wrapWeakref(self):
         '''Public interface to operation on DefinedContexts.
 
-        >>> aM21Obj = Music21Object()
-        >>> bM21Obj = Music21Object()
+        >>> import music21
+        >>> aM21Obj = music21.Music21Object()
+        >>> bM21Obj = music21.Music21Object()
         >>> aM21Obj.offset = 30
         >>> aM21Obj.getOffsetBySite(None)
         30.0
@@ -2702,7 +2837,7 @@ class Music21Object(JSONSerializer):
         '''
         self._definedContexts.wrapWeakref()
 
-        # doing direct access; not using property parent, as filters
+        # doing direct access; not using property activeSite, as filters
         # through global WEAKREF_ACTIVE setting
         self._activeSite = common.wrapWeakref(self._activeSite)
         # this is done both here and in unfreezeIds()
@@ -2715,18 +2850,19 @@ class Music21Object(JSONSerializer):
     def freezeIds(self):
         '''Temporarily replace are stored keys with a different value.
 
-        >>> aM21Obj = Music21Object()
-        >>> bM21Obj = Music21Object()
+        >>> import music21
+        >>> aM21Obj = music21.Music21Object()
+        >>> bM21Obj = music21.Music21Object()
         >>> aM21Obj.offset = 30
         >>> aM21Obj.getOffsetBySite(None)
         30.0
         >>> bM21Obj.addLocationAndActiveSite(50, aM21Obj)   
         >>> bM21Obj.activeSite != None
         True
-        >>> oldParentId = bM21Obj._activeSiteId
+        >>> oldActiveSiteId = bM21Obj._activeSiteId
         >>> bM21Obj.freezeIds()
-        >>> newParentId = bM21Obj._activeSiteId
-        >>> oldParentId == newParentId
+        >>> newActiveSiteId = bM21Obj._activeSiteId
+        >>> oldActiveSiteId == newActiveSiteId
         False
         '''
         self._definedContexts.freezeIds()
@@ -2743,22 +2879,23 @@ class Music21Object(JSONSerializer):
     def unfreezeIds(self):
         '''Restore keys to be the id() of the object they contain
 
-        >>> aM21Obj = Music21Object()
-        >>> bM21Obj = Music21Object()
+        >>> import music21
+        >>> aM21Obj = music21.Music21Object()
+        >>> bM21Obj = music21.Music21Object()
         >>> aM21Obj.offset = 30
         >>> aM21Obj.getOffsetBySite(None)
         30.0
         >>> bM21Obj.addLocationAndActiveSite(50, aM21Obj)   
         >>> bM21Obj.activeSite != None
         True
-        >>> oldParentId = bM21Obj._activeSiteId
+        >>> oldActiveSiteId = bM21Obj._activeSiteId
         >>> bM21Obj.freezeIds()
-        >>> newParentId = bM21Obj._activeSiteId
-        >>> oldParentId == newParentId
+        >>> newActiveSiteId = bM21Obj._activeSiteId
+        >>> oldActiveSiteId == newActiveSiteId
         False
         >>> bM21Obj.unfreezeIds()
-        >>> postParentId = bM21Obj._activeSiteId
-        >>> oldParentId == postParentId
+        >>> postActiveSiteId = bM21Obj._activeSiteId
+        >>> oldActiveSiteId == postActiveSiteId
         True
         '''
         #environLocal.printDebug(['unfreezing ids', self])
@@ -2830,24 +2967,32 @@ class Music21Object(JSONSerializer):
 
 
     def _reprText(self):
-        '''Return a text representation possible with line breaks. This methods can be overridden by subclasses to provide alternative text representations.
+        '''
+        Return a text representation possible with line 
+        breaks. This methods can be overridden by subclasses 
+        to provide alternative text representations.
         '''
         return self.__repr__()
 
     def _reprTextLine(self):
-        '''Return a text representation without line breaks. This methods can be overridden by subclasses to provide alternative text representations.
+        '''
+        Return a text representation without line breaks. This 
+        methods can be overridden by subclasses to provide 
+        alternative text representations.
         '''
         return self.__repr__()
 
     def show(self, fmt=None, app=None):
         '''
-        Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user's Environment 
+        Displays an object in a format provided by the 
+        fmt argument or, if not provided, the format set in the user's Environment 
 
-        Valid formats include (but are not limited to):
-          xml (musicxml)
-          text
-          lily.png
-          lily.pdf
+        Valid formats include (but are not limited to)::
+            xml (musicxml)
+            text
+            midi
+            lily.png
+            lily.pdf
 
         OMIT_FROM_DOCS        
         This might need to return the file path.
@@ -2917,7 +3062,10 @@ class Music21Object(JSONSerializer):
         return post
 
     derivationHierarchy = property(_getDerivationHierarchy, 
-        doc = '''Return a list of Stream subclasses that this Stream is contained within. This provides a way of seeing Streams contained within Streams.
+        doc = '''
+        Return a list of Stream subclasses that this Stream 
+        is contained within. This provides a way of seeing 
+        Streams contained within Streams.
 
         >>> from music21 import *
         >>> s = corpus.parse('bach/bwv66.6')
@@ -2929,7 +3077,8 @@ class Music21Object(JSONSerializer):
     def splitAtQuarterLength(self, quarterLength, retainOrigin=True, 
         addTies=True, displayTiedAccidentals=False):
         '''
-        Split an Element into two Elements at a provided QuarterLength into the Element.
+        Split an Element into two Elements at a provided 
+        QuarterLength into the Element.
 
         >>> from music21 import *
         >>> a = note.Note('C#5')
@@ -3244,10 +3393,10 @@ class Music21Object(JSONSerializer):
         '''
 
         if self.activeSite != None and self.activeSite.isMeasure:
-            environLocal.printDebug(['found parent as Measure, using for offset'])
+            environLocal.printDebug(['found activeSite as Measure, using for offset'])
             offsetLocal = self.getOffsetBySite(self.activeSite)
         else:
-            #environLocal.printDebug(['did not find parent as Measure, doing context search', 'self.activeSite', self.activeSite])
+            #environLocal.printDebug(['did not find activeSite as Measure, doing context search', 'self.activeSite', self.activeSite])
             # testing sortByCreationTime == true; this may be necessary
             # as we often want the most recent measure
             m = self.getContextByClass('Measure', sortByCreationTime=True, prioritizeActiveSite=False)
@@ -3273,7 +3422,7 @@ class Music21Object(JSONSerializer):
         True
         >>> m.timeSignature = meter.TimeSignature('4/4')
         >>> m.repeatAppend(n, 2)
-        >>> m[1].activeSite # here we get the parent, but not in m.notes
+        >>> m[1].activeSite # here we get the activeSite, but not in m.notes
         <music21.stream.Measure 0 offset=0.0>
 
         >>> m.notes[0]._getBeat()
@@ -3283,12 +3432,15 @@ class Music21Object(JSONSerializer):
         '''
         ts = self.getContextByClass('TimeSignature')
         if ts == None:
-            raise Music21ObjectException('this Note does not have a TimeSignature in DefinedContexts')                    
+            raise Music21ObjectException('this object does not have a TimeSignature in DefinedContexts')                    
         return ts.getBeatProportion(self._getMeasureOffset())
 
 
     beat = property(_getBeat,  
-        doc = '''Return the beat of this Note as found in the most recently positioned Measure. Beat values count from 1 and contain a floating-point designation between 0 and 1 to show proportional progress through the beat.
+        doc = '''Return the beat of this object as found in the most 
+        recently positioned Measure. Beat values count from 1 and 
+        contain a floating-point designation between 0 and 1 to 
+        show proportional progress through the beat.
 
         >>> from music21 import *
         >>> n = note.Note()
@@ -3310,12 +3462,15 @@ class Music21Object(JSONSerializer):
         ts = self.getContextByClass('TimeSignature')
         #environLocal.printDebug(['_getBeatStr(): found ts:', ts])
         if ts == None:
-            raise Music21ObjectException('this Note does not have a TimeSignature in DefinedContexts')                    
+            raise Music21ObjectException('this object does not have a TimeSignature in DefinedContexts')                    
         return ts.getBeatProportionStr(self._getMeasureOffset())
 
 
     beatStr = property(_getBeatStr,  
-        doc = '''Return a string representation of the beat of this Note as found in the most recently positioned Measure. Beat values count from 1 and contain a fractional designation to show progress through the beat.
+        doc = '''Return a string representation of the beat of 
+        this object as found in the most recently positioned 
+        Measure. Beat values count from 1 and contain a 
+        fractional designation to show progress through the beat.
 
         >>> from music21 import *
         >>> n = note.Note()
@@ -3332,7 +3487,9 @@ class Music21Object(JSONSerializer):
 
 
     def _getBeatDuration(self):
-        '''Return a :class:`~music21.duration.Duration` of the beat active for this Note as found in the most recently positioned Measure.
+        '''Return a :class:`~music21.duration.Duration` of the beat 
+        active for this object as found in the most recently 
+        positioned Measure.
 
         >>> from music21 import *
         >>> n = note.Note()
@@ -3347,11 +3504,11 @@ class Music21Object(JSONSerializer):
         '''
         ts = self.getContextByClass('TimeSignature')
         if ts == None:
-            raise Music21ObjectException('this Note does not have a TimeSignature in DefinedContexts')
+            raise Music21ObjectException('this object does not have a TimeSignature in DefinedContexts')
         return ts.getBeatDuration(self._getMeasureOffset())
 
     beatDuration = property(_getBeatDuration,  
-        doc = '''Return a :class:`~music21.duration.Duration` of the beat active for this Note as found in the most recently positioned Measure.
+        doc = '''Return a :class:`~music21.duration.Duration` of the beat active for this object as found in the most recently positioned Measure.
 
         >>> from music21 import *
         >>> n = note.Note()
@@ -3369,7 +3526,7 @@ class Music21Object(JSONSerializer):
 
 
     def _getBeatStrength(self):
-        '''Return an accent weight based on local Measure and TimeSignature. If the offset of this Note does not match a defined accent weight, a minimum accent weight will be returned.
+        '''Return an accent weight based on local Measure and TimeSignature. If the offset of this object does not match a defined accent weight, a minimum accent weight will be returned.
 
         >>> from music21 import *
         >>> n = note.Note("D#7")
@@ -3389,13 +3546,18 @@ class Music21Object(JSONSerializer):
         '''
         ts = self.getContextByClass('TimeSignature')
         if ts == None:
-            raise Music21ObjectException('this Note does not have a TimeSignature in DefinedContexts')                    
+            raise Music21ObjectException('this object does not have a TimeSignature in DefinedContexts')                    
         return ts.getAccentWeight(self._getMeasureOffset(),
                forcePositionMatch=True)
 
 
     beatStrength = property(_getBeatStrength,  
-        doc = '''Return the metrical accent of this Note in the most recently positioned Measure. Accent values are between zero and one, and are derived from the local TimeSignature's accent MeterSequence weights. If the offset of this Note does not match a defined accent weight, a minimum accent weight will be returned.
+        doc = '''Return the metrical accent of this object
+        in the most recently positioned Measure. Accent values 
+        are between zero and one, and are derived from the local 
+        TimeSignature's accent MeterSequence weights. If the offset 
+        of this object does not match a defined accent weight, a 
+        minimum accent weight will be returned.
 
         >>> from music21 import *
         >>> n = note.Note()
@@ -3451,11 +3613,11 @@ class ElementWrapper(Music21Object):
         to the SAME object but with unlinked offset, priority
         and a cloned Groups object
 
-        >>> import note
+        >>> import music21
         >>> import duration
-        >>> n = note.Note('A')
+        >>> textStr = "hello there"
         
-        >>> a = ElementWrapper(obj = n)
+        >>> a = music21.ElementWrapper(obj = textStr)
         >>> a.offset = duration.Duration("quarter")
         >>> a.groups.append("flute")
 
@@ -3498,11 +3660,12 @@ class ElementWrapper(Music21Object):
         
         (name is all lowercase to go with copy.deepcopy convention)
 
-        >>> import copy    
+        >>> import copy 
+        >>> import music21   
         >>> from music21 import note, duration
         >>> n = note.Note('A')
         
-        >>> a = ElementWrapper(obj = n)
+        >>> a = music21.ElementWrapper(obj = n)
         >>> a.offset = 1.0 # duration.Duration("quarter")
         >>> a.groups.append("flute")
 
@@ -3562,12 +3725,15 @@ class ElementWrapper(Music21Object):
         normal returns the duration of the component object if available, otherwise
         returns None.
 
+        TODO: Delete Example -- no need with notes.  ca. 2009!
+
+        >>> import music21
         >>> import note
         >>> n = note.Note('F#')
         >>> n.quarterLength = 2.0
         >>> n.duration.quarterLength 
         2.0
-        >>> el1 = ElementWrapper(n)
+        >>> el1 = music21.ElementWrapper(n)
         >>> el1.duration.quarterLength
         2.0
 
@@ -3628,17 +3794,18 @@ class ElementWrapper(Music21Object):
     def __eq__(self, other):
         '''Test ElementWrapper equality
 
+        >>> import music21
         >>> import note
         >>> n = note.Note("C#")
-        >>> a = ElementWrapper(n)
+        >>> a = music21.ElementWrapper(n)
         >>> a.offset = 3.0
-        >>> b = ElementWrapper(n)
+        >>> b = music21.ElementWrapper(n)
         >>> b.offset = 3.0
         >>> a == b
         True
         >>> a is not b
         True
-        >>> c = ElementWrapper(n)
+        >>> c = music21.ElementWrapper(n)
         >>> c.offset = 2.0
         >>> c.offset
         2.0
@@ -3712,8 +3879,9 @@ class ElementWrapper(Music21Object):
         but does not require position, priority, or activeSite to be the same
         In other words, is essentially the same object in a different context
              
+        >>> import music21
         >>> import note
-        >>> aE = ElementWrapper(obj = note.Note("A-"))
+        >>> aE = music21.ElementWrapper(obj = note.Note("A-"))
         >>> aE.id = "aflat-Note"
         >>> aE.groups.append("out-of-range")
         >>> aE.offset = 4.0
@@ -3766,7 +3934,7 @@ class Test(unittest.TestCase):
         pass
 
     def testCopyAndDeepcopy(self):
-        '''Test copyinng all objects defined in this module
+        '''Test copying all objects defined in this module
         '''
         import sys, types, copy
         for part in sys.modules[self.__module__].__dict__.keys():
@@ -4034,7 +4202,7 @@ class Test(unittest.TestCase):
         a = corpus.parse('bach/bwv324.xml')
         measures = a.parts[0].getElementsByClass('Measure') # measures of first part
 
-        # the parent of measures[1] is set to the new output stream
+        # the activeSite of measures[1] is set to the new output stream
         self.assertEqual(measures[1].activeSite, measures)
         # the source Part should still be a context of this measure
         self.assertEqual(measures[1].hasContext(a.parts[0]), True)
@@ -4148,7 +4316,7 @@ class Test(unittest.TestCase):
 
         # for stream and Stream subclass, overridden methods not yet
         # specialzied
-        # _getMeasureOffset gets the offset within the parent
+        # _getMeasureOffset gets the offset within the activeSite
         # this shows that measure offsets are accommodating pickup
         post = []
         for m in p1.getElementsByClass('Measure'):
@@ -4263,7 +4431,7 @@ class Test(unittest.TestCase):
     
         # append to Score
         s.append(m2)
-        # m2 can now find a time signature by looking to parent stream
+        # m2 can now find a time signature by looking to activeSite stream
         self.assertEqual(m2.duration.quarterLength, 4.0)
         # highest time of score takes into account new measure
         self.assertEqual(s.highestTime, 5.0)
@@ -4278,7 +4446,7 @@ class Test(unittest.TestCase):
     
         # add to stream
         s.append(m3)
-        # m3 can now find a time signature by looking to parent stream
+        # m3 can now find a time signature by looking to activeSite stream
         self.assertEqual(m2.duration.quarterLength, 4.0)
         # highest time of score takes into account new measure
         self.assertEqual(s.highestTime, 8.0)
