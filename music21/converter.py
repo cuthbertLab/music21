@@ -42,10 +42,12 @@ the temp folder on the disk.
 
 import doctest
 import unittest
-import os
-import urllib
-import time
+
 import copy
+import os
+import re
+import time
+import urllib
 import zipfile
 
 # try:
@@ -878,15 +880,52 @@ class Converter(object):
 
 
     def parseURL(self, url, format=None, number=None):
-        '''Given a url, download and parse the file into a music21 Stream.
+        '''Given a url, download and parse the file 
+        into a music21 Stream stored in the `stream`
+        property of the converter object.
 
-        Note that this checks the user Environment `autoDownlaad` setting before downloading. 
+        Note that this checks the user Environment 
+        `autoDownlaad` setting before downloading. 
+        
+        As a convenience method, links to Wikifonia main
+        page for a piece are redirected to the musicxml
+        (n.b., it is up to you to determine if any piece
+        on Wikifonia is in or out of copyright in your
+        juristiction).
+        
+        
+        Demonstration of rewrite ability for URLs.
+        Actual URL is http://static.wikifonia.org/4391/musicxml.xml
+        but the URL below is what's shown on the browser, so either
+        is accepted.
+        
+        
+        >>> from music21 import *
+        >>> jeanieLightBrownURL = 'http://www.wikifonia.org/node/4391'
+        >>> c = converter.Converter()
+        >>> c.parseURL(jeanieLightBrownURL)
+        >>> jeanieStream = c.stream
+        >>> jeanieStream.parts[0].measure(2).show('text')
+        {0.0} <music21.bar.Repeat direction=start>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.instrument.Instrument P1:...>
+        {0.0} <music21.key.KeySignature of no sharps or flats>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.note.Note C>
+        {3.0} <music21.note.Note A>
         '''
         autoDownload = environLocal['autoDownload']
         if autoDownload == 'allow':
             pass
         elif autoDownload in ['deny', 'ask']:
             raise ConverterException("""automatic downloading of URLs is presently set to "%s"; configure your Environment "autoDownload" setting to "allow" to permit automatic downloading: environment.set('autoDownload', 'allow')""" % autoDownload)
+
+        # If we give the URL to a Wikifonia main page,
+        # redirect to musicxml page:
+        matchedWikifonia = re.search("www.wikifonia.org/node/(\d+)", url)
+        if matchedWikifonia:
+            url = 'http://static.wikifonia.org/' + matchedWikifonia.group(1) + '/musicxml.xml'
+
 
         # this format check is here first to see if we can find the format
         # in the url; if forcing a format we do not need this

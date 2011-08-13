@@ -900,7 +900,7 @@ class KernSpine(HumdrumSpine):
     are kern notes
     '''
     def parse(self):
-        thisContainer = None # hdStringToMeasure('=0')
+        thisContainer = hdStringToMeasure('=0')
         inTuplet = False
         lastNote = None
         
@@ -917,13 +917,18 @@ class KernSpine(HumdrumSpine):
             elif eventC.startswith('='):
                 ## barline/measure processing
                 oldContainer = thisContainer
-                thisContainer = hdStringToMeasure(eventC)
-                if oldContainer is not None:
+                thisContainer = hdStringToMeasure(eventC, oldContainer)
+                # deal with pickups
+                if "Measure" in oldContainer.classes and oldContainer.number == 0:
+                    if len(oldContainer.flat.notesAndRests) > 0:
+                        self.stream.append(oldContainer)
+                    else: #nothing but tandem things that belong in m. 1
+                        for i in oldContainer.flat:
+                            thisContainer.append(i)
+                else:
                     self.stream.append(oldContainer)
-                    
-                    # deal with pickups
-                    if "Measure" in oldContainer.classes and oldContainer.number is None:
-                        oldContainer.number = thisContainer.number - 1
+
+
             elif eventC.startswith('!'):
                 ## TODO: process comments
                 pass
@@ -962,6 +967,8 @@ class KernSpine(HumdrumSpine):
                 else:
                     thisContainer.append(thisObject)
 
+        if len(thisContainer.getElementsNotOfClass(bar.Barline)) > 0:
+            self.stream.append(thisContainer)
         ## move things before first measure to first measure!
 
 class DynamSpine(HumdrumSpine):
@@ -1103,7 +1110,7 @@ class SpineCollection(object):
 
     def next(self):
         '''Returns the current spine and decrements the iteration index.'''
-        if self.iterIndex == 0:
+        if self.iterIndex < 0:
             raise StopIteration
         thisSpine = self.spines[self.iterIndex]
         self.iterIndex -= 1
@@ -1488,7 +1495,7 @@ def hdStringToNote(contents):
     
     return thisObject
 
-def hdStringToMeasure(contents):
+def hdStringToMeasure(contents, previousMeasure = None):
     '''
     kern uses an equals sign followed by processing instructions to
     create new measures.  Here is how...
@@ -1496,74 +1503,80 @@ def hdStringToMeasure(contents):
     m1 = music21.stream.Measure()
     rematchMN = re.search("(\d+)([a-z]?)", contents)
 
-    #m1.setrightBarline()
-    barline = bar.Barline()
-    m1.rightBarline = barline
-        
-    
+
     if rematchMN:
         m1.number = int(rematchMN.group(1))
         if rematchMN.group(2):
             m1.numberSuffix = rematchMN.group(2)
 
+    #m1.setrightBarline()
+    barline = bar.Barline()        
+
     if contents.count('-'):
-        m1.rightBarline.style = "none"
+        barline.style = "none"
     elif contents.count('\''):
-        m1.rightBarline.style = "short"
+        barline.style = "short"
     elif contents.count('`'):
-        m1.rightBarline.style = "tick"
+        barline.style = "tick"
     elif contents.count('||'):
-        m1.rightBarline.style = "light-light"
+        barline.style = "double"
         if contents.count(':') > 1:
-            m1.rightBarline.repeat_dots = "both"
+            barline.repeat_dots = "both"
         elif contents.count(':|'):
-            m1.rightBarline.repeat_dots = "left"
+            barline.repeat_dots = "left"
         elif contents.count('|:'):
-            m1.rightBarline.repeat_dots = "right"
+            barline.repeat_dots = "right"
     elif contents.count('!!'):
-        m1.rightBarline.style = "heavy-heavy"
+        barline.style = "heavy-heavy"
         if contents.count(':') > 1:
-            m1.rightBarline.repeat_dots = "both"
+            barline.repeat_dots = "both"
         elif contents.count(':!'):
-            m1.rightBarline.repeat_dots = "left"
+            barline.repeat_dots = "left"
         elif contents.count('!:'):
-            m1.rightBarline.repeat_dots = "right"
+            barline.repeat_dots = "right"
     elif contents.count('|!'):
-        m1.rightBarline.style = "light-heavy"
+        barline.style = "final"
         if contents.count(':') > 1:
-            m1.rightBarline.repeat_dots = "both"
+            barline.repeat_dots = "both"
         elif contents.count(':|'):
-            m1.rightBarline.repeat_dots = "left"
+            barline.repeat_dots = "left"
         elif contents.count('!:'):
-            m1.rightBarline.repeat_dots = "right"
+            barline.repeat_dots = "right"
     elif contents.count('!|'):
-        m1.rightBarline.style = "heavy-light"
+        barline.style = "heavy-light"
         if contents.count(':') > 1:
-            m1.rightBarline.repeat_dots = "both"
+            barline.repeat_dots = "both"
         elif contents.count(':!'):
-            m1.rightBarline.repeat_dots = "left"
+            barline.repeat_dots = "left"
         elif contents.count('|:'):
-            m1.rightBarline.repeat_dots = "right"
+            barline.repeat_dots = "right"
     elif contents.count('|'):
-        m1.rightBarline.style = "regular"
+        barline.style = "regular"
         if contents.count(':') > 1:
-            m1.rightBarline.repeat_dots = "both"
+            barline.repeat_dots = "both"
         elif contents.count(':|'):
-            m1.rightBarline.repeat_dots = "left"
+            barline.repeat_dots = "left"
         elif contents.count('|:'):
-            m1.rightBarline.repeat_dots = "right"
+            barline.repeat_dots = "right"
     elif contents.count('=='):
-        m1.rightBarline.style = "light-light"
+        barline.style = "double"
         if contents.count(':') > 1:
-            m1.rightBarline.repeat_dots = "both"
+            barline.repeat_dots = "both"
             ## cannot specify single repeat dots without styles
         if contents == "==|":
             raise HumdrumException \
                 ("Cannot import a double bar visually rendered as a single bar -- not sure exactly what that would mean anyhow.")
-    
-    if contents.count(';'):
-        m1.rightBarline.pause = music21.expressions.Fermata()
 
+    if contents.count(';'):
+        barline.pause = music21.expressions.Fermata()
+
+
+    if previousMeasure is not None:
+        previousMeasure.rightBarline = barline
+    else:
+        m1.leftBarline = barline
+
+    
     return m1
 
 
@@ -1705,14 +1718,17 @@ class Test(unittest.TestCase):
         self.assertEqual(b.accidental.name, "double-sharp")
         self.assertEqual(b.duration.dots, 0)
         self.assertEqual(b.duration.tuplets[0].durationNormal.dots, 2)
-        
-        m1 = hdStringToMeasure("=29a;:|:")
+    
+    def testMeasureBoundaries(self):
+        from music21 import stream
+        m0 = stream.Measure()
+        m1 = hdStringToMeasure("=29a;:|:", m0)
         self.assertEqual(m1.number, 29)
         self.assertEqual(m1.numberSuffix, "a")
-        self.assertEqual(m1.rightBarline.style, "regular")
-        self.assertEqual(m1.rightBarline.repeat_dots, "both")
-        assert m1.rightBarline.pause is not None
-        assert isinstance(m1.rightBarline.pause, music21.expressions.Fermata)
+        self.assertEqual(m0.rightBarline.style, "regular")
+        self.assertEqual(m0.rightBarline.repeat_dots, "both")
+        assert m0.rightBarline.pause is not None
+        assert isinstance(m0.rightBarline.pause, music21.expressions.Fermata)
 
     def xtestFakePiece(self):
         '''

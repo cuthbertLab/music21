@@ -763,6 +763,11 @@ class MetricModulation(TempoIndication):
         <music21.tempo.MetronomeMark larghetto Quarter=60>
         >>> mmod1 = tempo.MetricModulation()
         >>> mmod1.oldMetronome = mm1
+
+
+        Note that we do need to have a proper MetronomeMark instance to figure this out:
+
+
         >>> mmod1.oldMetronome = 'junk'
         Traceback (most recent call last):
         TempoException: oldMetronome property must be set with a MetronomeMark instance
@@ -875,7 +880,9 @@ class MetricModulation(TempoIndication):
     # high-level configuration methods
 
     def updateByContext(self):
-        '''Update this metric modulation based on the context, or the surrounding MetronomeMarks or MetricModulations. The object needs to reside in a Stream for this to be effective. 
+        '''Update this metric modulation based on the context, 
+        or the surrounding MetronomeMarks or MetricModulations. 
+        The object needs to reside in a Stream for this to be effective. 
         '''
         # try to set old number from last; there must be a partially
         # defined metronome mark already assigned; or create one at quarter?
@@ -902,7 +909,9 @@ class MetricModulation(TempoIndication):
 
 
     def setEqualityByReferent(self, side=None, referent=1.0):
-        '''Set the other side of the metric modulation to an equality; side can be specified, or if one side is None, that side will be set.  
+        '''Set the other side of the metric modulation to 
+        an equality; side can be specified, or if one side 
+        is None, that side will be set.  
 
         >>> from music21 import *
         >>> mm1 = tempo.MetronomeMark(number=60, referent=1)
