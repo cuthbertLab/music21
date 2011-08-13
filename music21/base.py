@@ -2073,7 +2073,7 @@ class Music21Object(JSONSerializer):
         return self._definedContexts.setAttrByName(attrName, value)
 
     def addContext(self, obj):
-        '''Add an ojbect to the :class:`~music21.base.DefinedContexts` object. For adding a location, use :meth:`~music21.base.Music21Object.addLocation`.
+        '''Add an object to the :class:`~music21.base.DefinedContexts` object. For adding a location, use :meth:`~music21.base.Music21Object.addLocation`.
 
         >>> import music21
         >>> class Mock(music21.Music21Object): 
@@ -3578,12 +3578,40 @@ class Music21Object(JSONSerializer):
 #-------------------------------------------------------------------------------
 class ElementWrapper(Music21Object):
     '''
-    An element wraps any object that is not a :class:`~music21.base.Music21Object`, so that that object can
+    An element wraps any object that is not a 
+    :class:`~music21.base.Music21Object`, so that that object can
     be positioned within a :class:`~music21.stream.Stream`.
     
-    The object stored within ElementWrapper is available from the the :attr:`~music21.base.ElementWrapper.obj` attribute.
+    The object stored within ElementWrapper is available from 
+    the the :attr:`~music21.base.ElementWrapper.obj` attribute.
     
     Providing an object at initialization is mandatory. 
+
+
+    OMIT_FROM_DOCS
+
+    >>> import music21
+    >>> from music21 import stream, meter
+    >>> #_DOCS_SHOW import wave
+    >>> import random
+    >>> class Wave_read(object): #_DOCS_HIDE
+    ...    def getnchannels(): return 2 #_DOCS_HIDE
+    
+    >>> s = stream.Stream()
+    >>> s.append(meter.TimeSignature('fast 6/8'))
+    >>> for i in range(10):
+    ...    soundFile = Wave_read() #_DOCS_HIDE
+    ...    #_DOCS_SHOW soundFile = wave.open('thisSound_' + str(random.randInt(20)) + '.wav')
+    ...    el = music21.ElementWrapper(soundFile)
+    ...    s.insert(i, el)
+    
+    >>> for j in s.getElementsByClass('ElementWrapper'):
+    ...    pass
+    ...    #if j.beatStrength > 0.4:
+    ...    #    pass
+    
+
+
 
     OMIT_FROM_DOCS
     because in the new (29/11/2009) object model, ElementWrapper should only be used
@@ -3615,7 +3643,7 @@ class ElementWrapper(Music21Object):
 
         >>> import music21
         >>> import duration
-        >>> textStr = "hello there"
+        >>> textStr = "flutter"
         
         >>> a = music21.ElementWrapper(obj = textStr)
         >>> a.offset = duration.Duration("quarter")
@@ -3721,23 +3749,8 @@ class ElementWrapper(Music21Object):
 
     def _getDuration(self):
         '''
-        Gets the duration of the ElementWrapper (if separately set), but
-        normal returns the duration of the component object if available, otherwise
-        returns None.
-
-        TODO: Delete Example -- no need with notes.  ca. 2009!
-
-        >>> import music21
-        >>> import note
-        >>> n = note.Note('F#')
-        >>> n.quarterLength = 2.0
-        >>> n.duration.quarterLength 
-        2.0
-        >>> el1 = music21.ElementWrapper(n)
-        >>> el1.duration.quarterLength
-        2.0
-
-        ADVANCED FEATURE TO SET DURATION OF ELEMENTS AND STREAMS SEPARATELY
+        Gets or sets the duration of the ElementWrapper.
+        
         >>> class KindaStupid(object):
         ...     pass
         >>> ks1 = ElementWrapper(KindaStupid())
@@ -3773,7 +3786,7 @@ class ElementWrapper(Music21Object):
             #self._unlinkedDuration = durationObj
             Music21Object._setDuration(self, durationObj)
             
-    duration = property(_getDuration, _setDuration)
+    duration = property(_getDuration, _setDuration, doc='')
 
     offset = property(Music21Object._getOffset, Music21Object._setOffset)
 
@@ -4676,6 +4689,22 @@ class Test(unittest.TestCase):
         self.assertEqual(str(mm2.getContextByClass('MetronomeMark',                     
             getElementMethod='getElementBeforeOffset')),
             '<music21.tempo.MetronomeMark lento 16th=50>')
+
+    def xtestGetActiveSiteTimeSignature(self):
+        from music21 import stream, meter
+        class Wave_read(object): #_DOCS_HIDE
+            def getnchannels(): return 2 #_DOCS_HIDE
+    
+        s = stream.Stream()
+        s.append(meter.TimeSignature('fast 6/8'))
+        for i in range(2,20):
+            soundFile = Wave_read() #_DOCS_HIDE
+            el = ElementWrapper(soundFile)
+            s.insert(i, el)
+    
+        for j in s.getElementsByClass('ElementWrapper'):
+            if j.beatStrength > 0.4:
+                print j.offset, j.beatStrength, j.obj.getnchannels()
 
 
 
