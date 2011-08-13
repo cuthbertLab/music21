@@ -4691,20 +4691,28 @@ class Test(unittest.TestCase):
             '<music21.tempo.MetronomeMark lento 16th=50>')
 
     def xtestGetActiveSiteTimeSignature(self):
-        from music21 import stream, meter
+        from music21 import stream, meter, note
+
         class Wave_read(object): #_DOCS_HIDE
             def getnchannels(): return 2 #_DOCS_HIDE
     
         s = stream.Stream()
         s.append(meter.TimeSignature('fast 6/8'))
-        for i in range(2,20):
+        s.show('t')
+        for i in range(0,2):
             soundFile = Wave_read() #_DOCS_HIDE
             el = ElementWrapper(soundFile)
+            print el
+            self.assertEqual(el.obj, soundFile)
             s.insert(i, el)
-    
+#            s.insert(i, note.Note())    
+
+        print 'outer container', s
         for j in s.getElementsByClass('ElementWrapper'):
-            if j.beatStrength > 0.4:
-                print j.offset, j.beatStrength, j.obj.getnchannels()
+        #for j in s.getElementsByClass('Note'):
+            print j, j.activeSite, j.getSites()#, #j.beatStrength
+#             if j.beatStrength > 0.4:
+#                 print j.offset, j.beatStrength, j.obj.getnchannels()
 
 
 
