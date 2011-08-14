@@ -826,6 +826,9 @@ class MetricModulation(TempoIndication):
 
     def _getNewMetronome(self):
         # before returning the referent, see if we can update the number
+        if self._newMetronome is not None:
+            if self._newMetronome.number is None:
+                self.updateByContext()
         return self._newMetronome
 
     newMetronome = property(_getNewMetronome, _setNewMetronome, doc=
@@ -1409,6 +1412,20 @@ class Test(unittest.TestCase):
         self.assertEqual(mmod1.oldMetronome.number, 140)
         self.assertEqual(mmod1.newMetronome.number, 140)
         
+
+        s = stream.Stream()
+        mm1 = tempo.MetronomeMark(number=70)
+        s.append(mm1)
+        s.repeatAppend(note.Note(quarterLength=1), 2) 
+        s.repeatAppend(note.Note(quarterLength=.5), 4)
+        
+        # make sure it works in reverse too
+        mmod1 = tempo.MetricModulation()
+        mmod1.oldReferent = 'eighth'
+        mmod1.newReferent = 'half'
+        s.append(mmod1)
+        self.assertEqual(mmod1.newMetronome.number, 140)
+        self.assertEqual(mmod1.oldMetronome.number, 140)
 
 
 
