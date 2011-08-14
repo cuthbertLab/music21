@@ -752,6 +752,9 @@ class MetricModulation(TempoIndication):
         self._oldMetronome = value
 
     def _getOldMetronome(self):
+        if self._oldMetronome is not None:
+            if self._oldMetronome.number is None:
+                self.updateByContext()
         return self._oldMetronome
 
     oldMetronome = property(_getOldMetronome, _setOldMetronome, doc=
@@ -822,6 +825,7 @@ class MetricModulation(TempoIndication):
         self._newMetronome = value
 
     def _getNewMetronome(self):
+        # before returning the referent, see if we can update the number
         return self._newMetronome
 
     newMetronome = property(_getNewMetronome, _setNewMetronome, doc=
@@ -1387,6 +1391,24 @@ class Test(unittest.TestCase):
         self.assertEqual(str(mmod1.newMetronome), '<music21.tempo.MetronomeMark larghetto 16th=60>')
         s.append(note.Note())
         s.repeatAppend(note.Note(quarterLength=1.5), 2)
+
+
+    def testSetReferrentE(self):
+        from music21 import stream, tempo, note
+
+        s = stream.Stream()
+        mm1 = tempo.MetronomeMark(number=70)
+        s.append(mm1)
+        s.repeatAppend(note.Note(quarterLength=1), 2) 
+        s.repeatAppend(note.Note(quarterLength=.5), 4)
+        
+        mmod1 = tempo.MetricModulation()
+        mmod1.oldReferent = 'eighth'
+        mmod1.newReferent = 'half'
+        s.append(mmod1)
+        self.assertEqual(mmod1.oldMetronome.number, 140)
+        self.assertEqual(mmod1.newMetronome.number, 140)
+        
 
 
 
