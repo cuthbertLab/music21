@@ -3803,6 +3803,46 @@ class Pitch(music21.Music21Object):
             if self._stepInKeySignature(alteredPitches):
                 self.accidental = Accidental('natural')
                 self.accidental.displayStatus = True
+                
+    def getHarmonicChord(self, chord):
+        '''Given a chord, determines whether the chord constitutes a string harmonic and then
+        returns the proper sounding pitch.
+        
+        
+        '''
+        
+        #Takes in a chord, finds the interval between the notes
+        pitchList = chord.getPitches()
+        isStringHarmonic = False
+        
+        if chord.getNotehead(pitchList[1]) == 'diamond':
+            isStringHarmonic = True 
+        
+        if isStringHarmonic == True:
+            interval = interval.notesToChromatic(pitchList[0], pitchList[1])
+            if interval == 12:
+                soundingPitch = pitchList[0].getHarmonic(2)
+            elif interval == 7:
+                soundingPitch = pitchList[0].getHarmonic(3)
+            elif interval == 5:
+                soundingPitch = pitchList[0].getHarmonic(4)
+            elif interval == 4:
+                soundingPitch = pitchList[0].getHarmonic(5)
+            elif interval == 3:
+                soundingPitch = pitchList[0].getHarmonic(6) 
+            elif interval == 6:
+                soundingPitch = pitchList[0].getHarmonic(7)
+            elif interval == 8:
+                soundingPitch = pitchList[0].getHarmonic(8)
+            
+        noteOut = note.Note(soundingPitch.getNameWithOctave)
+        noteOut.noteheadParen = True
+        noteOut.noteheadFill = 'filled'
+        
+        
+            
+        
+        
 
 
 

@@ -1427,14 +1427,16 @@ def generalNoteToMusicXML(n):
     # call the musicxml property on Stream
     return out.musicxml
     
-def noteheadToMxNotehead(obj, spannerBundle=None, overRiddenNotehead = None):
+def noteheadToMxNotehead(obj, spannerBundle=None, overRiddenNotehead = None, overRiddenNoteheadFill = None, overRiddenNoteheadParen = None):
     '''
     Translate a music21 :class:`~music21.note.Note` object or :class:`~music21.pitch.Pitch` object to a
     into a musicxml.Notehead object.
     
     
     If a pitch object is given then (since it doesn't store its own notehead)
-    the notehead must be given via overRiddenNotehead.
+    the notehead must be given as a string via overRiddenNotehead. Similarly, because a pitch
+    can't store information about any other attributes (such as fill status or whether or not
+    it's on parentheses), that information is passed in from overRiddenNoteheadAttr.
 
 
     >>> from music21 import *
@@ -1449,6 +1451,20 @@ def noteheadToMxNotehead(obj, spannerBundle=None, overRiddenNotehead = None):
     >>> mxN2 = musicxml.translate.noteheadToMxNotehead(p, overRiddenNotehead = 'slash')
     >>> mxN2.get('charData')
     'slash'
+    
+    
+    >>> p2 = pitch.Pitch('C3')
+    >>> mxN3 = musicxml.translate.noteheadToMxNotehead(p2, overRiddenNotehead = 'diamond', overRiddenNoteheadFill = 'no', overRiddenNoteheadParen = 'yes')
+    >>> mxN3._attr['filled']
+    'no'
+    >>> mxN3._attr['parentheses']
+    'yes'
+    
+    >>> n1 = note.Note('c3')
+    >>> n1.notehead = 'diamond'
+    >>> n1.noteheadParen = 'yes'
+    >>> n1.noteheadFill = 'no'
+    >>> print n1.musicxml
     '''
     
     mxNotehead = musicxmlMod.Notehead()
@@ -1456,6 +1472,9 @@ def noteheadToMxNotehead(obj, spannerBundle=None, overRiddenNotehead = None):
 	#Ensures that the music21 notehead value is supported by MusicXML, and then sets the MusicXML notehead's 'charaData' to the value of the Music21 notehead.
     supportedValues = ['slash', 'triangle', 'diamond', 'square', 'cross', 'x' , 'circle-x', 'inverted triangle', 'arrow down', 'arrow up', 'slashed', 'back slashed', 'normal', 'cluster', 'none', 'do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'circle dot', 'left triangle', 'rectangle']
     nh = None
+    nhFill = 'default'
+    nhParen = False
+    
     if 'Pitch' in obj.classes:
         if overRiddenNotehead is None:
             nh = 'normal'
@@ -1465,11 +1484,37 @@ def noteheadToMxNotehead(obj, spannerBundle=None, overRiddenNotehead = None):
         nh = obj.notehead
     else:
         nh = 'normal'
+        
+    if 'Pitch' in obj.classes:
+        if overRiddenNoteheadFill is None:
+            nhFill = 'default'
+        else:
+            nhFill = overRiddenNoteheadFill
+    elif hasattr(obj, 'noteheadFill'):
+        nhFill = obj.noteheadFill
+    else:
+        nhFill = 'default'
+        
+    if 'Pitch' in obj.classes:
+        if overRiddenNoteheadParen is None:
+            nhParen = False
+        else:
+            nhParen = overRiddenNoteheadParen
+    elif hasattr(obj, 'noteheadParen'):
+        nhParen = obj.noteheadParen
+    else:
+        nhParen = False
     
     if nh not in supportedValues:
         raise NoteheadException('This notehead type is not supported by MusicXML.')
     else:
         mxNotehead.set('charData', nh)
+        
+    if nhFill != 'default':
+        mxNotehead._attr['filled'] = nhFill
+    
+    if nhParen != False:
+        mxNotehead._attr['parentheses'] = nhParen
         
     return mxNotehead
 

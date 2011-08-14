@@ -565,6 +565,8 @@ class NotRest(GeneralNote):
     def __init__(self, *arguments, **keywords):
         GeneralNote.__init__(self, **keywords)
         self._notehead = 'normal'
+        self._noteheadFill = 'default'
+        self._noteheadParen = False
 
     def _getNotehead(self):
         '''Return the Notehead type.
@@ -576,6 +578,28 @@ class NotRest(GeneralNote):
         self._notehead = value
 
     notehead = property(_getNotehead, _setNotehead)
+    
+    def _getNoteheadFill(self):
+        '''Return the Notehead fill type.
+        '''
+        return self._noteheadFill
+
+    def _setNoteheadFill(self, value):
+
+        self._noteheadFill = value
+
+    noteheadFill = property(_getNoteheadFill, _setNoteheadFill)
+    
+    def _getNoteheadParen(self):
+        '''Return whether or not the notehead has parenthesis around it.
+        '''
+        return self._noteheadParen
+
+    def _setNoteheadParen(self, value):
+
+        self._noteheadParen = value
+
+    noteheadParen = property(_getNoteheadParen, _setNoteheadParen)
     
     def _isGrace(self):
         # duration must not be linked and quarterLength must be zero
