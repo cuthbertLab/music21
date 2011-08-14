@@ -818,10 +818,6 @@ class Stream(music21.Music21Object):
         for i in range(len(elements)):
             if id(elements[i]) == objId:
                 iMatch.append(i)
-            # for object wrappers
-            #elif (hasattr(elements[i], "obj") and obj == elements[i].obj):
-            elif elements[i].isWrapper and objId == id(elements[i].obj):
-                iMatch.append(i)
             if firstMatchOnly and len(iMatch) > 0:
                 break
         return iMatch
@@ -1949,17 +1945,8 @@ class Stream(music21.Music21Object):
             if classFilter is None:
                 e.groups.append(group)
             else:
-                #if hasattr(e, "elements"): # stream type
-                if e.isStream:
-                    if isinstance(e, classFilter):
-                        e.groups.append(group)
-                #elif hasattr(e, "obj"): # element wrapper type
-                if e.isWrapper:
-                    if isinstance(e.obj, classFilter):
-                        e.groups.append(group)
-                else: # music21 type
-                    if isinstance(e, classFilter):
-                        e.groups.append(group)
+                if isinstance(e, classFilter):
+                    e.groups.append(group)
 
 
     #---------------------------------------------------------------------------
@@ -2284,9 +2271,6 @@ class Stream(music21.Music21Object):
             # must compare id(), not elements directly
             # NOTE: we need to compare the wrapper, not the stored object
             # in order to do context searches. 
-            #if e.isWrapper:
-            #    compareObj = e.obj
-            #else:
             compareObj = e
             if id(compareObj) == id(obj):
                 post = obj.getOffsetBySite(self)
@@ -3733,7 +3717,7 @@ class Stream(music21.Music21Object):
                     foundOffset = elements[i].getOffsetBySite(self)
                     foundEnd = foundOffset + elements[i].duration.quarterLength                        
             else:
-                if (b is searchElement or b.isWrapper and b.obj is searchElement):
+                if b is searchElement:
                     found = i
                     foundOffset = elements[i].getOffsetBySite(self)
                     foundEnd = foundOffset + elements[i].duration.quarterLength

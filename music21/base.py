@@ -1726,7 +1726,6 @@ class Music21Object(JSONSerializer):
     hideObjectOnPrint = False
     # these values permit fast class comparisons for performance crtical cases
     isStream = False
-    isWrapper = False
     isSpanner = False
 
     # define order to present names in documentation; use strings
@@ -3638,32 +3637,45 @@ class ElementWrapper(Music21Object):
     
     The object stored within ElementWrapper is available from 
     the the :attr:`~music21.base.ElementWrapper.obj` attribute.
+    All the attributes of the stored object (except .id and
+    anything else that conflicts with a Music21Object attribute)
+    are gettable and settable by querying the ElementWrapper.
+    This feature makes it possible easily to mix Music21Objects
+    and non-Music21Objects with similarly named attributes in the
+    same Stream.
     
-    Providing an object at initialization is mandatory. 
+    
+    This example inserts 10 random wave files into a music21
+    Stream and then reports their filename and number of 
+    audio channels (in this example, it's always 2) if they
+    fall on a strong beat in fast 6/8
 
-
-    OMIT_FROM_DOCS
 
     >>> import music21
     >>> from music21 import stream, meter
     >>> #_DOCS_SHOW import wave
     >>> import random
     >>> class Wave_read(object): #_DOCS_HIDE
-    ...    def getnchannels(): return 2 #_DOCS_HIDE
+    ...    def getnchannels(self): return 2 #_DOCS_HIDE
     
     >>> s = stream.Stream()
     >>> s.append(meter.TimeSignature('fast 6/8'))
     >>> for i in range(10):
+    ...    fileName = 'thisSound_' + str(random.randint(1,20)) + '.wav'
+    ...    fileName = 'thisSound_' + str(1+((i * 100) % 19)) + '.wav' #_DOCS_HIDE #make a more predictable "random" set.
     ...    soundFile = Wave_read() #_DOCS_HIDE
-    ...    #_DOCS_SHOW soundFile = wave.open('thisSound_' + str(random.randInt(20)) + '.wav')
+    ...    #_DOCS_SHOW soundFile = wave.open(fileName)
+    ...    soundFile.fileName = fileName
     ...    el = music21.ElementWrapper(soundFile)
     ...    s.insert(i, el)
-    
+
     >>> for j in s.getElementsByClass('ElementWrapper'):
-    ...    pass
-    ...    #if j.beatStrength > 0.4:
-    ...    #    pass
-    
+    ...    if j.beatStrength > 0.4:
+    ...        print j.offset, j.beatStrength, j.getnchannels(), j.fileName
+    0.0 1.0 2 thisSound_1.wav
+    3.0 1.0 2 thisSound_16.wav
+    6.0 1.0 2 thisSound_12.wav
+    9.0 1.0 2 thisSound_8.wav    
 
 
 
@@ -3673,8 +3685,6 @@ class ElementWrapper(Music21Object):
     '''
     obj = None
     _id = None
-
-    isWrapper = True
 
     _DOC_ORDER = ['obj']
     _DOC_ATTR = {
@@ -3689,160 +3699,7 @@ class ElementWrapper(Music21Object):
         #self._unlinkedDuration = None
 
 
-    def x__copy__(self):
-        '''
-        Makes a copy of this element with a reference
-        to the SAME object but with unlinked offset, priority
-        and a cloned Groups object
 
-        >>> import music21
-        >>> import duration
-        >>> textStr = "flutter"
-        
-        >>> a = music21.ElementWrapper(obj = textStr)
-        >>> a.offset = duration.Duration("quarter")
-        >>> a.groups.append("flute")
-
-        >>> b = copy.copy(a)
-        >>> b.offset = duration.Duration("half")
-        
-        '''
-#         >>> a.obj.accidental = "-"
-#         >>> b.name
-#         'A-'
-#         >>> a.obj is b.obj
-#         True
-
-#         >>> a.offset.quarterLength
-#         1.0
-#         >>> a.groups[0] = "bassoon"
-#         >>> ("flute" in a.groups, "flute" in b.groups)
-#         (False, True)
-
-        new = self.__class__(self.obj)
-        #for name in dir(self):
-        for name in self.__dict__.keys():
-            if name.startswith('__'):
-                continue
-            part = getattr(self, name)
-            newValue = part # just provide a reference
-            setattr(new, name, newValue)
-
-        # it is assumed that we need new objects for groups, contexts
-        # and locations in order to position / group this object
-        # independently
-        new.groups = copy.deepcopy(self.groups)
-        new._definedContexts = copy.deepcopy(self._definedContexts)
-        return new
-
-    def x__deepcopy__(self, memo=None):
-        '''
-        similar to copy but also does a deepcopy of
-        the object as well.
-        
-        (name is all lowercase to go with copy.deepcopy convention)
-
-        >>> import copy 
-        >>> import music21   
-        >>> from music21 import note, duration
-        >>> n = note.Note('A')
-        
-        >>> a = music21.ElementWrapper(obj = n)
-        >>> a.offset = 1.0 # duration.Duration("quarter")
-        >>> a.groups.append("flute")
-
-        >>> b = copy.deepcopy(a)
-        >>> b.offset = 2.0 # duration.Duration("half")
-        
-        >>> a.obj is b.obj
-        False
-        >>> a.obj.accidental = "-"
-        >>> b.obj.name
-        'A'
-        >>> a.offset
-        1.0
-        >>> b.offset
-        2.0
-        >>> a.groups[0] = "bassoon"
-        >>> ("flute" in a.groups, "flute" in b.groups)
-        (False, True)
-        '''
-        new = self.__copy__()
-        # this object needs a new locations object
-        new._definedContexts = copy.deepcopy(self._definedContexts, memo=memo)
-        new.obj = copy.deepcopy(self.obj)
-        new._idLastDeepCopyOf = id(self)
-        return new
-
-
-
-
-    #---------------------------------------------------------------------------
-    # properties
-
-    def getId(self):
-        if self.obj is not None:
-            if hasattr(self.obj, "id"):
-                return self.obj.id
-            else:
-                return self._id
-        else:
-            return self._id
-
-    def setId(self, newId):
-        if self.obj is not None:
-            if hasattr(self.obj, "id"):
-                self.obj.id = newId
-            else:
-                self._id = newId
-        else:
-            self._id = newId
-
-    xid = property (getId, setId)
-
-
-    def _getDuration(self):
-        '''
-        Gets or sets the duration of the ElementWrapper.
-        
-        >>> class KindaStupid(object):
-        ...     pass
-        >>> ks1 = ElementWrapper(KindaStupid())
-        >>> ks1.obj.duration
-        Traceback (most recent call last):
-        AttributeError: 'KindaStupid' object has no attribute 'duration'
-        
-        >>> import duration
-        >>> ks1.duration = duration.Duration("whole")
-        >>> ks1.duration.quarterLength
-        4.0
-        >>> ks1.obj.duration  # still not defined
-        Traceback (most recent call last):
-        AttributeError: 'KindaStupid' object has no attribute 'duration'
-        '''
-        # getting from an object wrapper:
-        if hasattr(self.obj, 'duration'):
-            return self.obj.duration
-        else:
-            return Music21Object._getDuration(self)
-
-    def _setDuration(self, durationObj):
-        '''
-        Set the offset as a quarterNote length
-        '''
-        if not hasattr(durationObj, "quarterLength"):
-            raise Exception('this must be a Duration object, not %s' % durationObj)
-
-        if hasattr(self.obj, 'duration'):
-            # if a number assume it is a quarter length
-            self.obj.duration = durationObj
-        else:
-            #self._unlinkedDuration = durationObj
-            Music21Object._setDuration(self, durationObj)
-            
-    xduration = property(_getDuration, _setDuration, doc='')
-
-    xoffset = property(Music21Object._getOffset, Music21Object._setOffset)
 
     #---------------------------------------------------------------------------
     def __repr__(self):
@@ -3903,7 +3760,7 @@ class ElementWrapper(Music21Object):
         return not self.__eq__(other)
 
 
-    def x__setattr__(self, name, value):
+    def __setattr__(self, name, value):
         #environLocal.printDebug(['calling __setattr__ of ElementWrapper', name, value])
 
         # if in the ElementWrapper already, set that first
@@ -3919,7 +3776,7 @@ class ElementWrapper(Music21Object):
         else:  
             object.__setattr__(self, name, value)
 
-    def x__getattr__(self, name):
+    def __getattr__(self, name):
         '''This method is only called when __getattribute__() fails.
         Using this also avoids the potential recursion problems of subclassing
         __getattribute__()_
@@ -3937,19 +3794,12 @@ class ElementWrapper(Music21Object):
 
     def isTwin(self, other):
         '''A weaker form of equality.  a.isTwin(b) is true if
-        a and b store either the same object OR objects that are equal
-        and a.groups == b.groups 
-        and a.id == b.id (or both are none) and duration are equal.
-        but does not require position, priority, or activeSite to be the same
-        In other words, is essentially the same object in a different context
+        a and b store either the same object OR objects that are equal.
+        In other words, it is essentially the same object in a different context
              
         >>> import music21
         >>> import note
-        >>> aE = music21.ElementWrapper(obj = note.Note("A-"))
-        >>> aE.id = "aflat-Note"
-        >>> aE.groups.append("out-of-range")
-        >>> aE.offset = 4.0
-        >>> aE.priority = 4
+        >>> aE = music21.ElementWrapper(obj = "hello")
         
         >>> bE = copy.copy(aE)
         >>> aE is bE
@@ -3966,23 +3816,13 @@ class ElementWrapper(Music21Object):
         >>> aE.isTwin(bE)
         True
         '''
-        if not hasattr(other, "obj") or \
-           not hasattr(other, "id") or \
-           not hasattr(other, "duration") or \
-           not hasattr(other, "groups"):
+        if not hasattr(other, "obj"):
             return False
 
-        if (self.obj == other.obj and \
-            self.id == other.id and \
-            self.duration == self.duration and \
-            self.groups == other.groups):
+        if (self.obj is other.obj or self.obj == other.obj):
             return True
         else:
             return False
-
-
-
-
 
 
 
@@ -4771,13 +4611,13 @@ class Test(unittest.TestCase):
         import music21
         from music21 import stream, meter, note
         class Wave_read(object): #_DOCS_HIDE
-            def getnchannels(): return 2 #_DOCS_HIDE
+            def getnchannels(self): return 2 #_DOCS_HIDE
     
         s = stream.Stream()
         s.append(meter.TimeSignature('fast 6/8'))
         #s.show('t')
         storage = []
-        for i in range(0,2):
+        for i in range(0,6):
             soundFile = Wave_read() #_DOCS_HIDE
             #el = music21.Music21Object() # 
             el = music21.ElementWrapper(soundFile)
@@ -4792,13 +4632,17 @@ class Test(unittest.TestCase):
             #print 'get offset by element', s.getOffsetByElement(ew)
 
 #        print 'outer container', s
-        sm = s.makeMeasures()
-        match = []
-        for j in sm.flat: #.getElementsByClass('ElementWrapper'):
-            if isinstance(j, music21.ElementWrapper) is True or isinstance(j, music21.Music21Object) is True:
-                #print j
-                match.append(j.beatStrength)
-        self.assertEqual(match, [1.0, 1.0, 1.0, 0.25, 0.25])
+        matchOffset = []
+        matchBeatStrength = []
+        matchAudioChannels = []
+
+        for j in s.getElementsByClass('ElementWrapper'):
+            matchOffset.append(j.offset)
+            matchBeatStrength.append(j.beatStrength)
+            matchAudioChannels.append(j.getnchannels())
+        self.assertEqual(matchOffset, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
+        self.assertEqual(matchBeatStrength, [1.0, 0.25, 0.25, 1.0, 0.25, 0.25])
+        self.assertEqual(matchAudioChannels, [2, 2, 2, 2, 2, 2])
 
 
 #     def testWeakElementWrapper(self):

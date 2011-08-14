@@ -779,11 +779,11 @@ class PartitionedClass(PartitionedName):
         True
 
         >>> a.getNames('method', mroIndex=0)
-        ['__init__', 'convertMicrotonesToQuarterTones', 'convertQuarterTonesToMicrotones', 'getAllCommmonEnharmonics', 'getCentShiftFromMidi', 'getEnharmonic', 'getHarmonic', 'getHigherEnharmonic', 'getLowerEnharmonic', 'getMidiPreCentShift', 'harmonicAndFundamentalFromPitch', 'harmonicAndFundamentalStringFromPitch', 'harmonicFromFundamental', 'harmonicString', 'inheritDisplay', 'isEnharmonic', 'isTwelveTone', 'lilyNoOctave', 'setAccidentalDisplay', 'simplifyEnharmonic', 'transpose', 'transposeAboveTarget', 'transposeBelowTarget', 'updateAccidentalDisplay']
+        ['__init__', 'convertMicrotonesToQuarterTones', 'convertQuarterTonesToMicrotones', 'getAllCommmonEnharmonics', 'getCentShiftFromMidi', 'getEnharmonic', 'getHarmonic', 'getHarmonicChord', 'getHigherEnharmonic', 'getLowerEnharmonic', 'getMidiPreCentShift', 'harmonicAndFundamentalFromPitch', 'harmonicAndFundamentalStringFromPitch', 'harmonicFromFundamental', 'harmonicString', 'inheritDisplay', 'isEnharmonic', 'isTwelveTone', 'lilyNoOctave', 'setAccidentalDisplay', 'simplifyEnharmonic', 'transpose', 'transposeAboveTarget', 'transposeBelowTarget', 'updateAccidentalDisplay']
         >>> a.getNames('data', mroIndex=0)
         ['fundamental', 'implicitAccidental', 'defaultOctave']
         >>> a.getNames('data', mroIndex=1)
-        ['classSortOrder', 'hideObjectOnPrint', 'id', 'isSpanner', 'isStream', 'isWrapper', 'groups']
+        ['classSortOrder', 'hideObjectOnPrint', 'id', 'isSpanner', 'isStream', 'groups']
         >>> a.getNames('data', mroIndex=a.lastMroIndex())
         []
 
@@ -797,7 +797,7 @@ class PartitionedClass(PartitionedName):
         >>> len(a.getNames('methods')) > 10
         True
         >>> a.getNames('attributes', 1)
-        ['hideObjectOnPrint', 'id', 'isSpanner', 'isStream', 'isWrapper', 'groups']
+        ['hideObjectOnPrint', 'id', 'isSpanner', 'isStream', 'groups']
 
         >>> from music21 import serial
         >>> a = PartitionedClass(serial.RowSchoenbergOp23No5)
@@ -1726,7 +1726,7 @@ class Test(unittest.TestCase):
         or None if there is none.
 
         >>> from music21 import *
-        
+
         >>> g = key.KeySignature(1)
         >>> g.accidentalByStep("F")
         <accidental sharp>
@@ -1805,17 +1805,24 @@ for that note in this key (using the natural minor for minor)
 or None if there is none.
 
 
+
 >>> from music21 import *
+⁠ 
 >>> g = key.KeySignature(1)
 >>> g.accidentalByStep("F")
 <accidental sharp>
 >>> g.accidentalByStep("G")
+
+
+
 >>> f = KeySignature(-1)
 >>> bbNote = note.Note("B-5")
 >>> f.accidentalByStep(bbNote.step)
 <accidental flat>
 
+
 Fix a wrong note in F-major:
+
 
 
 
@@ -1828,13 +1835,17 @@ Fix a wrong note in F-major:
 
 
 
+
 .. image:: images/keyAccidentalByStep.*
         :width: 400
 
 
+
 Set all notes to the correct notes for a key using the note's Context::
+
     * fix this
     * fix that
+
 
 
 
