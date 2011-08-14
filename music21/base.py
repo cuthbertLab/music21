@@ -44,14 +44,15 @@ VERSION_STR = "0.3.7.a11"
 VERSION = (0, 3, 7)
 #-------------------------------------------------------------------------------
 
+import codecs
 import copy
-import unittest, doctest
+import inspect
+import math
+import json
 import sys
 import types
-import inspect
+import unittest, doctest
 import uuid
-import json
-import codecs
 
 from music21 import common
 from music21 import environment
@@ -3543,12 +3544,43 @@ class Music21Object(JSONSerializer):
         0.25
         >>> m.notes[8]._getBeatStrength()
         0.5
+        
+        
+        Test not using measures
+        
+
+        >>> n = note.Note("E--3")
+        >>> n.quarterLength = 2
+        >>> s = stream.Stream()
+        >>> s.isMeasure
+        False
+        >>> s.insert(0, meter.TimeSignature('2/2'))
+        >>> s.repeatAppend(n, 16)
+        >>> s.notes[0]._getBeatStrength()
+        1.0
+        >>> s.notes[1]._getBeatStrength()
+        0.5
+        >>> s.notes[4]._getBeatStrength()
+        1.0
+        >>> s.notes[5]._getBeatStrength()
+        0.5
+        
+        
         '''
+        from music21.meter import MeterException
         ts = self.getContextByClass('TimeSignature')
         if ts == None:
             raise Music21ObjectException('this object does not have a TimeSignature in DefinedContexts')                    
-        return ts.getAccentWeight(self._getMeasureOffset(),
+        #if self.activeSite is not None and self.activeSite.isStream is True and self.activeSite.isMeasure is True:
+        try:
+            return ts.getAccentWeight(self._getMeasureOffset(),
                forcePositionMatch=True)
+        except MeterException:
+            currentOffset = self.offset
+            tsOffset = ts.offset
+            offsetInHypotheticalMeasure = (currentOffset-tsOffset) % ts.barDuration.quarterLength
+            return ts.getAccentWeight(offsetInHypotheticalMeasure,
+                   forcePositionMatch=True)
 
 
     beatStrength = property(_getBeatStrength,  
@@ -3572,6 +3604,28 @@ class Music21Object(JSONSerializer):
         >>> [m.notes[i].beatStrength for i in range(6)]
         [1.0, 0.25, 0.25, 0.5, 0.25, 0.25]
 
+
+        We can also get the beatStrength for elements not in 
+        a measure, if the enclosing stream has a :class:`~music21.meter.TimeSignature`.
+        We just assume that the time signature carries through to
+        hypothetical following measures:
+        
+
+        >>> n = note.QuarterNote("E--3")
+        >>> s = stream.Stream()
+        >>> s.insert(0.0, meter.TimeSignature('2/2'))
+        >>> s.repeatAppend(n, 12)
+        >>> [s.notes[i].beatStrength for i in range(12)]        
+        [1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25]
+        
+        
+        Changing the meter changes the output, of course:
+        
+        >>> s.insert(4.0, meter.TimeSignature('3/4'))
+        >>> [s.notes[i].beatStrength for i in range(12)]        
+        [1.0, 0.25, 0.5, 0.25, 1.0, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 0.5]
+        
+        
         ''')
 
 
@@ -4737,7 +4791,7 @@ class Test(unittest.TestCase):
             self.assertEqual(s.hasElement(ew), True)
             #print 'get offset by element', s.getOffsetByElement(ew)
 
-        print 'outer container', s
+#        print 'outer container', s
         sm = s.makeMeasures()
         match = []
         for j in sm.flat: #.getElementsByClass('ElementWrapper'):

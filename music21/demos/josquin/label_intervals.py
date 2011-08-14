@@ -20,9 +20,9 @@ def displayIntervals(file):
             i = interval.Interval(p, c.pitches[len(c.pitches)-1])
             notation = i.semiSimpleName
             c.addLyric(notation,j+3)
-            if notation in dissonant_intervals:
+            if c.isConsonant() is False:                
                c.addLyric('d',7)
-               if c.offset % 4 == 0:
+               if c.beatStrength >= .5:
                   c.addLyric('sbd',7)
    sJosquinPiece.insert(0,rJosquinPiece)
    sJosquinPiece.show()

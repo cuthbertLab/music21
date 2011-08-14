@@ -556,7 +556,7 @@ class MeterTerminal(object):
 
     def _getDuration(self):
         '''
-        barDuration gets or sets a duration value that
+        duration gets or sets a duration value that
         is equal in length to the totalLength
         
         >>> from music21 import *

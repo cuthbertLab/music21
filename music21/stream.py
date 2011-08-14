@@ -6281,15 +6281,16 @@ class Stream(music21.Music21Object):
         elif len(self._elements) == 0:
             self._cache["HighestTime"] = 0.0
             return 0.0
-        elif self.isSorted is True:
-            eLast = self._elements[-1]
-            #if hasattr(eLast, "duration") and hasattr(eLast.duration,
-            #        "quarterLength"):
-            if eLast.duration is not None:
-                self._cache["HighestTime"] = (eLast.getOffsetBySite(self) + 
-                    eLast.duration.quarterLength)
-            else:
-                self._cache["HighestTime"] = eLast.getOffsetBySite(self)
+#        #take the case where a whole note appears a 0.0, but a textExpression (ql=0) at 0.25 -- isSorted would be true, but highestTime should be 4.0 not 0.25
+#        elif self.isSorted is True:
+#            eLast = self._elements[-1]
+#            #if hasattr(eLast, "duration") and hasattr(eLast.duration,
+#            #        "quarterLength"):
+#            if eLast.duration is not None:
+#                self._cache["HighestTime"] = (eLast.getOffsetBySite(self) + 
+#                    eLast.duration.quarterLength)
+#            else:
+#                self._cache["HighestTime"] = eLast.getOffsetBySite(self)
         else:
             max = None
             for e in self._elements:
@@ -9587,7 +9588,7 @@ class Score(Stream):
                     displayTiedAccidentals=displayTiedAccidentals )
 
         # do in place as already a copy has been made
-        post = returnObjFlat.makeChords(includePostWindow=True, 
+        post = returnObj.flat.makeChords(includePostWindow=True, 
             removeRedundantPitches=True,
             gatherArticulations=True, gatherExpressions=True, inPlace=True)
         post._elementsChanged()
