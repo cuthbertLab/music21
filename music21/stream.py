@@ -3873,7 +3873,6 @@ class Stream(music21.Music21Object):
         preHighestTime = returnObj.highestTime
         preLowestOffset = returnObj.lowestOffset
         #environLocal.printDebug(['got preLowest, preHighest', preLowestOffset, preHighestTime])
-
         while True: 
             # get all notes within the start and the minwindow size
             oStart = o
@@ -9588,7 +9587,7 @@ class Score(Stream):
                     displayTiedAccidentals=displayTiedAccidentals )
 
         # do in place as already a copy has been made
-        post = returnObj.flat.makeChords(includePostWindow=True, 
+        post = returnObjFlat.makeChords(includePostWindow=True, 
             removeRedundantPitches=True,
             gatherArticulations=True, gatherExpressions=True, inPlace=True)
         post._elementsChanged()

@@ -1118,7 +1118,7 @@ class Attributes(MusicXMLElement):
         return c
 
     def setDefaultDivisions(self):
-        '''Utility to just set the divisioins parameters
+        '''Utility to just set the divisions parameters
         '''
         self.set('divisions', defaults.divisionsPerQuarter)
 

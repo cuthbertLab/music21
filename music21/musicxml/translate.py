@@ -515,7 +515,7 @@ def mxToDuration(mxNote, inputM21):
     from music21 import duration
 
     if inputM21 == None:
-        d = duration.Duration
+        d = duration.Duration()
     else:
         d = inputM21
 
@@ -525,8 +525,9 @@ def mxToDuration(mxNote, inputM21):
 
     mxDivisions = mxNote.external['divisions']
     if mxNote.duration != None: 
-        if mxNote.get('type') != None:
-            type = duration.musicXMLTypeToType(mxNote.get('type'))
+        tempType = mxNote.get('type')
+        if tempType != None:
+            type = duration.musicXMLTypeToType(tempType)
             forceRaw = False
         else: # some rests do not define type, and only define duration
             type = None # no type to get, must use raw
@@ -548,13 +549,13 @@ def mxToDuration(mxNote, inputM21):
         else:
             tup = None
 
-        # two ways to create durations, raw and cooked
-        durRaw = duration.Duration() # raw just uses qLen
-        # the qLen set here may not be computable, but is not immediately
-        # computed until setting components
-        durRaw.quarterLength = qLen
-
         if forceRaw:
+            # two ways to create durations, raw and cooked
+            durRaw = duration.Duration() # raw just uses qLen
+            # the qLen set here may not be computable, but is not immediately
+            # computed until setting components
+            durRaw.quarterLength = qLen
+
             #environLocal.printDebug(['forced to use raw duration', durRaw])
             try:
                 d.components = durRaw.components
@@ -573,7 +574,7 @@ def mxToDuration(mxNote, inputM21):
 
             #environLocal.printDebug(['got durRaw, durCooked:', durRaw, durCooked])
             if durUnit.quarterLength != durCooked.quarterLength:
-                environLocal.printDebug(['error in stored MusicXML representaiton and duration value', durRaw, durCooked])
+                environLocal.printDebug(['error in stored MusicXML representation and duration value', qL, durCooked])
             # old way just used qLen
             #self.quarterLength = qLen
             d.components = durCooked.components
@@ -1464,7 +1465,6 @@ def noteheadToMxNotehead(obj, spannerBundle=None, overRiddenNotehead = None, ove
     >>> n1.notehead = 'diamond'
     >>> n1.noteheadParen = 'yes'
     >>> n1.noteheadFill = 'no'
-    >>> print n1.musicxml
     '''
     
     mxNotehead = musicxmlMod.Notehead()
