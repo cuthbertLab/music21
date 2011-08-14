@@ -2282,10 +2282,12 @@ class Stream(music21.Music21Object):
         # the offset of end element is always highest time
         for e in self.elements:
             # must compare id(), not elements directly
-            if e.isWrapper:
-                compareObj = e.obj
-            else:
-                compareObj = e
+            # NOTE: we need to compare the wrapper, not the stored object
+            # in order to do context searches. 
+            #if e.isWrapper:
+            #    compareObj = e.obj
+            #else:
+            compareObj = e
             if id(compareObj) == id(obj):
                 post = obj.getOffsetBySite(self)
                 break

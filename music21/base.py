@@ -4687,7 +4687,33 @@ class Test(unittest.TestCase):
             getElementMethod='getElementBeforeOffset')),
             '<music21.tempo.MetronomeMark lento 16th=50>')
 
-    def xtestGetActiveSiteTimeSignature(self):
+
+    def testElementWrapperOffsetAccess(self):
+        import music21
+        from music21 import stream, meter, note
+
+        class Mock(object): pass
+
+        s = stream.Stream()
+        s.append(meter.TimeSignature('fast 6/8'))
+        storage = []
+        for i in range(0,2):
+            mock = Mock() 
+            el = music21.ElementWrapper(mock)
+            storage.append(el)
+            s.insert(i, el)
+
+        for ew in storage:
+            self.assertEqual(s.hasElement(ew), True)
+
+        match = [e.getOffsetBySite(s) for e in storage]
+        self.assertEqual(match, [0.0, 1.0])
+
+        self.assertEqual(s.getOffsetByElement(storage[0]), 0.0)
+        self.assertEqual(s.getOffsetByElement(storage[1]), 1.0)
+
+
+    def testGetActiveSiteTimeSignature(self):
         import music21
         from music21 import stream, meter, note
         class Wave_read(object): #_DOCS_HIDE
@@ -4695,23 +4721,30 @@ class Test(unittest.TestCase):
     
         s = stream.Stream()
         s.append(meter.TimeSignature('fast 6/8'))
-        s.show('t')
+        #s.show('t')
+        storage = []
         for i in range(0,2):
             soundFile = Wave_read() #_DOCS_HIDE
-            el = music21.Music21Object() # music21.ElementWrapper(soundFile)
-            print el
+            #el = music21.Music21Object() # 
+            el = music21.ElementWrapper(soundFile)
+            storage.append(el)
+            #print el
             self.assertEqual(el.obj, soundFile)
             s.insert(i, el)
 #            s.insert(i, note.Note())    
 
+        for ew in storage:
+            self.assertEqual(s.hasElement(ew), True)
+            #print 'get offset by element', s.getOffsetByElement(ew)
+
         print 'outer container', s
         sm = s.makeMeasures()
+        match = []
         for j in sm.flat: #.getElementsByClass('ElementWrapper'):
             if isinstance(j, music21.ElementWrapper) is True or isinstance(j, music21.Music21Object) is True:
-                print j.beatStrength
-                if j.beatStrength > 0.4:
-                    print j.offset#, j.obj.getnchannels()
-
+                #print j
+                match.append(j.beatStrength)
+        self.assertEqual(match, [1.0, 1.0, 1.0, 0.25, 0.25])
 
 
 #     def testWeakElementWrapper(self):
