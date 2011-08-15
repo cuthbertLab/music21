@@ -3157,6 +3157,50 @@ class Stream(music21.Music21Object):
         return map
 
 
+    def _getFinalBarline(self):
+        # if we have part-like streams, process each part
+        if self.hasPartLikeStreams():
+            post = []
+            for p in self.getElementsByClass('Stream'):
+                post.append(p._getFinalBarline())
+            return post # a list of barlines
+        # core routines for a single Stream
+        else:
+            if self.hasMeasures():
+                return self.getElementsByClass('Measure')[-1].rightBarline
+            else:
+                raise StreamException('cannot get a final barline from this Stream if no Measures are defined. Add Measures or call makeMeasures() first.')
+
+    def _setFinalBarline(self, value):
+        # if we have part-like streams, process each part
+        if self.hasPartLikeStreams():
+            if not common.isListLike(value):
+                value = [value]
+            for i, p in enumerate(self.getElementsByClass('Stream')):
+                # set final barline w/ mod iteration of value list
+                bl = value[i%len(value)]
+                #environLocal.printDebug(['enumerating measures', i, p, 'setting barline', bl])
+                p._setFinalBarline(bl)
+        else:
+            # core routines for a single Stream
+            if self.hasMeasures():
+                self.getElementsByClass('Measure')[-1].rightBarline = value
+            else:
+                raise StreamException('cannot set a final barline on this Stream (%s) if no Measures are defined. Add Measures or call makeMeasures() first.' % self)
+
+    finalBarline = property(_getFinalBarline, _setFinalBarline, doc='''
+        Get or set the final barline of this Stream's Measures, if and only if there are Measures defined as elements in this Stream. This method will not create Measures if non exist. Setting a final barline to a Stream that does not have Measure will raise an exception.
+
+        This property also works on Scores that contain one or more Parts. In that case a lost of barlines can be used to set the final barline. 
+
+        >>> from music21 import *
+        >>> s = corpus.parse('bwv66.6')
+        >>> s.finalBarline = 'none'     
+        >>> s.finalBarline
+        [<music21.bar.Barline style=none>, <music21.bar.Barline style=none>, <music21.bar.Barline style=none>, <music21.bar.Barline style=none>]
+
+        ''')
+
 
     def _getVoices(self):
         '''        
@@ -15705,6 +15749,44 @@ class Test(unittest.TestCase):
         self.assertEqual(s.getElementBeforeOffset(3.2, ['Note']), n2)
         self.assertEqual(s.getElementBeforeOffset(0, ['Note']), None)
         self.assertEqual(s.getElementBeforeOffset(0.3, ['Note']), n1)
+
+
+    def testFinalBarlinePropertyA(self):
+        from music21 import stream, note
+
+        s = stream.Stream()
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note(quarterLength=2.0), 2)
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note(quarterLength=2.0), 2)
+        s.append([m1, m2])
+        
+        s.finalBarline = 'dotted'
+        self.assertEqual(str(s.getElementsByClass('Measure')[-1].rightBarline), '<music21.bar.Barline style=dotted>')
+        self.assertEqual(str(s.finalBarline), '<music21.bar.Barline style=dotted>')
+        
+        s.finalBarline = 'final'
+        self.assertEqual(str(s.getElementsByClass('Measure')[-1].rightBarline), '<music21.bar.Barline style=final>')
+        
+        self.assertEqual(str(s.finalBarline), '<music21.bar.Barline style=final>')
+        #s.show()
+
+
+    def testFinalBarlinePropertyB(self):
+        from music21 import stream, corpus
+        s = corpus.parse('bwv66.6')
+        sop = s.parts[0]
+        self.assertEqual(str(sop.finalBarline), '<music21.bar.Barline style=final>')
+        sop.finalBarline = 'double'
+        self.assertEqual(str(sop.finalBarline), '<music21.bar.Barline style=double>')
+        
+        # process entire Score
+        s.finalBarline = 'tick'
+        self.assertEqual(str(s.finalBarline), '[<music21.bar.Barline style=tick>, <music21.bar.Barline style=tick>, <music21.bar.Barline style=tick>, <music21.bar.Barline style=tick>]')
+        
+        # can set a heterogenous final barlines
+        s.finalBarline = ['final', 'none']
+        self.assertEqual(str(s.finalBarline), '[<music21.bar.Barline style=final>, <music21.bar.Barline style=none>, <music21.bar.Barline style=final>, <music21.bar.Barline style=none>]')
 
 
     def testGraceNoteSortingA(self):
