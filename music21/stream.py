@@ -14553,6 +14553,27 @@ class Test(unittest.TestCase):
             'Chord')[1].pitches), '[D2, D#3]')
 
 
+    def testChordifyA(self):
+        from music21 import stream, note, expressions   
+        p1 = stream.Part()
+        p1.insert(0, note.Note(quarterLength=12.0))
+        p1.insert(0.25, expressions.TextExpression('test'))
+        self.assertEqual(p1.highestTime, 12.0)
+        p2 = stream.Part()
+        p2.repeatAppend(note.Note('g4'), 12)
+        
+        s = stream.Score()
+        s.insert(0, p1)
+        s.insert(0, p2)
+        post = s.chordify()
+        self.assertEqual(len(post.getElementsByClass('Chord')), 12)
+        self.assertEqual(str(post.getElementsByClass('Chord')[0].pitches), 
+            '[C4, G4]')
+        #post.show()
+        #s.show()
+
+
+
 
     def testOpusSearch(self):
         from music21 import corpus
