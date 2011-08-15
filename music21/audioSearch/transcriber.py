@@ -28,17 +28,16 @@ if len(_missingImport) > 0:
         pass
         #environLocal.warn(common.getMissingImportStr(_missingImport), header='music21:')
 
-# note to Jordi -- music21 modules cannot import * -- only in docs
 from music21 import environment
 from music21 import scale, stream, note, pitch
 from music21.audioSearch.base import *
 from music21.audioSearch import recording
 _MOD = 'audioSearch/transcriber.py'
 environLocal = environment.Environment(_MOD)
-
-
-def runTranscribe(show = True, plot = True, useMic = True, 
-                  seconds = 10.0, useScale = scale.ChromaticScale('C4'), saveFile = True):
+                                       
+                                       
+def runTranscribe(show=True, plot=True, useMic=True,
+                  seconds=10.0, useScale=scale.ChromaticScale('C4'), saveFile=True):
     '''
     runs all the methods to record from audio for `seconds` length (default 10.0)
     and transcribe the resulting melody.
@@ -59,19 +58,20 @@ def runTranscribe(show = True, plot = True, useMic = True,
     '''
     #beginning - recording or not
     if saveFile != False:
-        WAVE_FILENAME = "chrom2.wav"
+        WAVE_FILENAME = "ex.wav"
     else:
         WAVE_FILENAME = False
     
+    # the rest of the score
     time_start = time()
-    freqFromAQList = getFrequenciesFromAudio(record = useMic, length = seconds, waveFilename = WAVE_FILENAME)
+    freqFromAQList, wv, totsamp, samp = getFrequenciesFromAudio(record=useMic, length=seconds, waveFilename=WAVE_FILENAME, entireFile=False, wv=None)
     detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale)
-    smoothFrequencies(detectedPitchesFreq)
+    detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
     (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
-    
-    (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
-    myScore = notesAndDurationsToStream(notesList, durationList)    
+    (notesList, durationList, total_notes) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
+    myScore, length_part = notesAndDurationsToStream(notesList, durationList, BEGINNING=True)    
     environLocal.printDebug('Time elapsed: %.3f s' % (time() - time_start))
+
 
     if show == True:
         myScore.show()        
@@ -83,7 +83,7 @@ def runTranscribe(show = True, plot = True, useMic = True,
     return myScore
 
 if __name__ == '__main__':
-    runTranscribe(show = True, plot = True, seconds = 20.0)
+    runTranscribe(show=True, plot=True, seconds=120.0)
 
 #------------------------------------------------------------------------------
 # eof
