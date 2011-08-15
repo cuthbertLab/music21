@@ -429,6 +429,33 @@ class Stream(music21.Music21Object):
         '''
         TODO: this should be removed, as this is a bad way to add elements, as locations are not set properly. 
 
+        '''
+        if (not common.isListLike(value) and hasattr(value, 'isStream') and 
+            value.isStream):
+            self._elements = value._elements
+            for e in self._elements:
+                e.addLocation(self, e.getOffsetBySite(value))
+                e.activeSite = self
+
+            self._endElements = value._endElements
+            for e in self._endElements:
+                e.addLocation(self, e.getOffsetBySite(value))
+                e.activeSite = self
+            self._elementsChanged()
+        else:
+            # replace the complete elements list
+            self._elements = value
+            for e in self._elements:
+                e.addLocation(self, e.offset)
+                e.activeSite = self
+            self._elementsChanged()
+        return value
+        
+    elements = property(_getElements, _setElements, 
+        doc='''The low-level storage list of all Streams. Directly getting, setting, and manipulating this list is reserved for advanced usage.
+
+        When setting .elements, a list of Music21Objects can be provided, or a complete Stream. If a complete Stream is provided, elements are extracted from that Stream. This has the advantage of transferring offset correctly and geting _endElements. 
+
         >>> from music21 import *
         >>> a = stream.Stream()
         >>> a.repeatInsert(note.Note("C"), range(10))
@@ -443,16 +470,11 @@ class Stream(music21.Music21Object):
         False
         >>> a.isFlat
         True
-        >>> a.elements = b.elements
+        >>> a.elements = b # assigning from a Stream
         >>> a.isFlat
         False
-        '''
-        self._elements = value
-        self._elementsChanged()
-        return value
-        
-    elements = property(_getElements, _setElements, 
-        doc='''The low-level storage list of all Streams. Directly getting, setting, and manipulating this list is reserved for advanced usage. 
+        >>> len(a.flat.notes) == len(b.flat.notes) == 20
+        True
         ''')
 
     def __setitem__(self, key, value):
@@ -16024,6 +16046,57 @@ class Test(unittest.TestCase):
 #         self.assertEqual(c1, s[0]) # should be first
 
 
+
+    def testStreamElementsComparison(self):
+        from music21 import stream, note
+        s1  = stream.Stream()
+        s1.repeatAppend(note.Note(), 7)
+        n1 = note.Note()
+        s1.append(n1)
+
+        s2 = stream.Stream()
+        s2.elements = s1.elements
+        match = []
+        for e in s2.elements:
+            match.append(e.getOffsetBySite(s2))
+        self.assertEqual(match, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0])
+        # have the same object in each stream
+        self.assertEqual(id(s2[-1]), id(s1[-1]))
+
+        s3 = stream.Stream()
+
+        s4 = stream.Stream()
+        s4.insert(25, n1) # active site is now changed
+
+        s3.elements = s1.elements
+        match = []
+        for e in s3.elements:
+            match.append(e.getOffsetBySite(s3))
+        # this is not desirable but results from setting of last active site
+        # before elements assignment
+        self.assertEqual(match, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 25.0])
+
+        #s3.elements = s1[:].elements
+        s3 = s1[:]
+        match = []
+        for e in s3.elements:
+            match.append(e.getOffsetBySite(s3))
+        self.assertEqual(match, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0])
+
+        # this resets active site, so we get the right offsets on element 
+        # assignment
+        s3.elements = s1[:].elements
+        match = []
+        for e in s3.elements:
+            match.append(e.getOffsetBySite(s3))
+        self.assertEqual(match, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0])
+
+        s5 = stream.Stream()
+        s5.elements = s1
+        match = []
+        for e in s5.elements:
+            match.append(e.getOffsetBySite(s5))
+        self.assertEqual(match, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0])
 
 
 
