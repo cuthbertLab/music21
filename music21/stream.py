@@ -870,7 +870,6 @@ class Stream(music21.Music21Object):
 
         >>> s.remove(n3)
         
-        
         '''
         iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
         match = []
@@ -891,7 +890,6 @@ class Stream(music21.Music21Object):
         # Music21Object method
         for obj in match:
             obj.removeLocationBySite(self)
-
 
     def pop(self, index):
         '''Return and remove the object found at the user-specified index value. Index values are those found in `elements` and are not necessary offset order. 
@@ -915,6 +913,47 @@ class Stream(music21.Music21Object):
         # there are no further locations
         post.removeLocationBySite(self)
         return post
+
+
+    def removeByClass(self, classFilterList):
+        '''Remove all elements from the Stream based on one or more classes given in a list.
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> s.append(meter.TimeSignature('4/4'))
+        >>> s.repeatAppend(note.Note("C"), 8)
+        >>> len(s)
+        9
+        >>> s.removeByClass('GeneralNote')
+        >>> len(s)
+        1
+        >>> len(s.notes)
+        0
+        '''
+        if not common.isListLike(classFilterList):
+            classFilterList = [classFilterList]
+        # process main elements
+        indexList = []
+        for i, e in enumerate(self._elements):
+            if e.isClassOrSubclass(classFilterList):
+                indexList.append(i)                        
+        for i in reversed(indexList):
+            post = self._elements.pop(i)
+            post.removeLocationBySite(self)
+
+        # process end elements
+        indexList = []
+        for i, e in enumerate(self._endElements):
+            if e.isClassOrSubclass(classFilterList):
+                indexList.append(i)                        
+        for i in reversed(indexList):
+            post = self._endElements.pop(i)
+            post.removeLocationBySite(self)
+
+        # call elements changed once; sorted arrangement has not changed
+        self._elementsChanged(clearIsSorted=False)
+
+
 
     def __deepcopy__(self, memo=None):
         '''Deepcopy the stream from copy.deepcopy()
@@ -4001,7 +4040,6 @@ class Stream(music21.Music21Object):
             refStreamOrTimeRange=(preLowestOffset, preHighestTime), 
                         fillGaps=True, inPlace=True)
         returnObj._elementsChanged()
-
         return returnObj
 
 # not defined on Stream yet, as not clear what it should do
@@ -7456,8 +7494,6 @@ class Stream(music21.Music21Object):
         {2.0} <music21.chord.Chord A B->       
         ''')
 
-
-
     def _getPitches(self):
         '''
         documented as part of property `pitches`, below.
@@ -9588,9 +9624,7 @@ class Score(Stream):
                     if o not in uniqueOffsets:
                         uniqueOffsets.append(o)
             #environLocal.printDebug(['chordify: uniqueOffsets for all parts, m', uniqueOffsets, i])
-
             uniqueOffsets = sorted(uniqueOffsets)
-
             for p in allParts:
                 # get one measure at a time
                 if p.hasMeasures():
@@ -9606,6 +9640,12 @@ class Score(Stream):
         post = returnObj.flat.makeChords(includePostWindow=True, 
             removeRedundantPitches=True,
             gatherArticulations=True, gatherExpressions=True, inPlace=True)
+
+        # get a measure stream from the top voice
+        # assume we can manipulate this these measures as already have deepcopy
+#         for m in mStream.getElementsByClass('Measure'):
+#             pass                    
+
         post._elementsChanged()
         return post
 
@@ -11855,6 +11895,25 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s), 2)
         # activeSite is Now sent to None
         self.assertEqual(n1.activeSite, None)
+
+
+    def testRemoveByClass(self):
+        from music21 import stream, clef, note
+
+        s = stream.Stream()
+        s.repeatAppend(clef.BassClef(), 2)
+        s.repeatAppend(note.Note(), 2)
+        s.repeatAppend(clef.TrebleClef(), 2)
+
+        self.assertEqual(len(s), 6)
+        s.removeByClass('BassClef')
+        self.assertEqual(len(s), 4)
+        self.assertEqual(len(s.notes), 2)
+        s.removeByClass(clef.Clef)
+        self.assertEqual(len(s), 2)
+        self.assertEqual(len(s.notes), 2)
+        s.removeByClass(['Music21Object'])
+        self.assertEqual(len(s.notes), 0)
 
 
     def testReplace(self):
@@ -14470,6 +14529,7 @@ class Test(unittest.TestCase):
         self.assertEqual([e.offset for e in post.parts[0].flat.notesAndRests], [0.0, 3.0, 3.5, 4.5, 5.0, 6.0, 6.5, 7.5, 8.5, 9.0, 10.5, 12.0, 15.0, 16.5, 17.5, 18.0, 18.5, 19.0, 19.5, 20.0, 20.5, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 30.0, 33.0, 34.5, 35.5, 36.0, 37.5, 38.0, 39.0, 40.0, 41.0, 42.0, 43.5, 45.0, 45.5, 46.5, 47.0, 48.0, 49.5, 51.0, 51.5, 52.0, 52.5, 53.0, 53.5, 54.0, 55.5, 57.0, 58.5])
 
         post = post.chordify()
+        #post.show()
         self.assertEqual([e.offset for e in post.notes], [0.0, 3.0, 3.5, 4.5, 5.0, 5.5, 6.0, 6.5, 7.5, 8.5, 9.0, 10.5, 12.0, 15.0, 16.5, 17.5, 18.0, 18.5, 19.0, 19.5, 20.0, 20.5, 21.0, 21.5, 22.0, 22.5, 23.0, 23.5, 24.0, 24.5, 25.0, 25.5, 26.0, 26.5, 27.0, 30.0, 33.0, 34.5, 35.5, 36.0, 37.5, 38.0, 39.0, 40.0, 40.5, 41.0, 42.0, 43.5, 45.0, 45.5, 46.0, 46.5, 47.0, 47.5, 48.0, 49.5, 51.0, 51.5, 52.0, 52.5, 53.0, 53.5, 54.0, 54.5, 55.0, 55.5, 56.0, 56.5, 57.0, 58.5, 59.5])
         self.assertEqual(len(post.getElementsByClass('Chord')), 71)  # Careful! one version of the caching is screwing up m. 20 which definitely should not have rests in it -- was creating 69 notes, not 71.
 
@@ -14557,7 +14617,25 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.getElementsByClass('Chord')), 12)
         self.assertEqual(str(post.getElementsByClass('Chord')[0].pitches), 
             '[C4, G4]')
+
+
+        p1 = stream.Part()
+        p1.insert(0, note.Note(quarterLength=12.0))
+        p1.insert(0.25, expressions.TextExpression('test'))
+        self.assertEqual(p1.highestTime, 12.0)
+        p2 = stream.Part()
+        p2.repeatAppend(note.Note('g4', quarterLength=6.0), 2)
+        #p2.repeatAppend(note.Note('g4'), 12)
+        
+        s = stream.Score()
+        s.insert(0, p1)
+        s.insert(0, p2)
+        post = s.chordify()
+        self.assertEqual(len(post.getElementsByClass('Chord')), 2)
+        self.assertEqual(str(post.getElementsByClass('Chord')[0].pitches), 
+            '[C4, G4]')
         #post.show()
+
         #s.show()
 
     def testChordifyB(self):
