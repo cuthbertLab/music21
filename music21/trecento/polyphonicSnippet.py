@@ -1,4 +1,6 @@
 import copy
+import unittest, doctest
+
 
 import music21
 from music21 import meter
@@ -7,48 +9,105 @@ from music21 import note
 from music21 import stream
 
 
-class PolyphonicSnippet(music21.Music21Object):
-    def __init__(self, fiveExcelCells, parentPiece):
-        if len(fiveExcelCells) != 5:
-            raise Exception("Need five Excel Cells to make a PolyphonicSnippet object")
-        self.streams = fiveExcelCells[0:3]  # first three
-        self.cadenceType = fiveExcelCells[3]
-        self.timeSig = meter.TimeSignature(fiveExcelCells[4])
-        self.parentPiece = parentPiece
-        self.cantus = self.streams[0]
-        self.tenor  = self.streams[1]
-        self.contratenor = self.streams[2]
-        
-        if self.contratenor == "": 
-            self.contratenor = None
-            self.streams.pop(2)
-        if self.tenor == "": 
-            self.tenor = None
-            self.streams.pop(1)
-        if self.cantus == "": 
-            self.cantus = None
-            self.streams.pop(0)
+class PolyphonicSnippet(stream.Score):
+    '''
+    a polyphonic snippet is a little Score-ette that represents an incipit or a cadence or something of that sort of a piece
+    
+    it is initialized with the contents of five excel cells -- the first three represent the notation of the 
+    cantus, tenor, and contratenor, respectively.  the fourth is the cadence type (optional), the fifth
+    is the time signature if not the same as the time signature of the parentPiece.
+    
 
-    def asScore(self):
-        '''
-        returns a music21.stream.Score from the polyphonic snippet.
-        '''
-        myScore = stream.Score()
+    >>> from music21 import *
+    >>> cantus = trecento.trecentoCadence.TrecentoCadenceStream("c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8", '6/8')
+    >>> tenor = trecento.trecentoCadence.TrecentoCadenceStream("F1. f2. e4. d", '6/8')
+    >>> ps = trecento.polyphonicSnippet.PolyphonicSnippet([cantus, tenor, None, "8-8", "6/8"], parentPiece = "mom")
+    >>> ps.elements
+    [<music21.stream.Part ...>, <music21.stream.Part ...>]
+    >>> ps.elements[0] is cantus
+    True
+    >>> #_DOCS_SHOW ps.show()
+    
+    
+    
+    .. image:: images/trecento-polyphonicSnippet1.*
+            :width: 450
+
+    
+    
+    OMIT_FROM_DOCS
+    
+    >>> dummy = trecento.polyphonicSnippet.PolyphonicSnippet()
+    >>> dummy.elements
+    []
+    >>> dumClass = dummy.__class__
+    >>> dumClass
+    <class 'music21.trecento.polyphonicSnippet.PolyphonicSnippet'>
+    >>> dumdum = dumClass()
+    >>> dumdum.__class__
+    <class 'music21.trecento.polyphonicSnippet.PolyphonicSnippet'>
+    >>> ps2 = ps.__class__()
+    >>> ps2.elements
+    []
+    
+    >>> dummy2 = trecento.polyphonicSnippet.Incipit()
+    >>> dummy2.elements
+    []
+    
+    '''
+    
+    def __init__(self, fiveExcelCells = [], parentPiece = None):
+        stream.Score.__init__(self)
+        if fiveExcelCells != []:        
+            if len(fiveExcelCells) != 5:
+                raise Exception("Need five Excel Cells to make a PolyphonicSnippet object")
+    
+            self.partStreams = fiveExcelCells[0:3]  # first three
+            for part in self.partStreams:
+                if part is not None:
+                    part.__class__ = stream.Part
             
-        myScore.insert(0, self.timeSig)
-        if self.cantus is not None:
-            if hasattr(self, 'frontPadLine'):
-                self.frontPadLine(self.cantus)
-            myScore.insert(0, self.cantus)
-        if self.contratenor is not None:
-            if hasattr(self, 'frontPadLine'):
-                self.frontPadLine(self.contratenor)
-            myScore.insert(0, self.contratenor)
-        if self.tenor is not None:
-            if hasattr(self, 'frontPadLine'):
-                self.frontPadLine(self.tenor)
-            myScore.insert(0, self.tenor)
-        return myScore
+            
+            self.cadenceType = fiveExcelCells[3]
+            self.timeSig = meter.TimeSignature(fiveExcelCells[4])
+            self.parentPiece = parentPiece
+            self.cantus = self.partStreams[0]
+            self.tenor  = self.partStreams[1]
+            self.contratenor = self.partStreams[2]
+            
+            if self.contratenor == "": 
+                self.contratenor = None
+                self.partStreams.pop(2)
+            if self.tenor == "": 
+                self.tenor = None
+                self.partStreams.pop(1)
+            if self.cantus == "": 
+                self.cantus = None
+                self.partStreams.pop(0)
+    
+            self._appendParts()
+
+    def _appendParts(self):
+        '''
+        appends each of the partStreams to the current score.
+        '''
+        foundTs = False
+        for thisVoice in [self.cantus, self.contratenor, self.tenor]:        
+            # thisVoice is a type of stream.Stream()
+            
+            if thisVoice is not None:
+                if hasattr(self, 'frontPadLine'):
+                    self.frontPadLine(thisVoice)
+                elif hasattr(self, 'backPadLine'):
+                    self.backPadLine(thisVoice)
+                if foundTs == False and len(thisVoice.getElementsByClass(meter.TimeSignature)) > 0:
+                    foundTs = True
+                thisVoice.makeNotation(inPlace = True)
+                self.insert(0, thisVoice)
+                
+        if foundTs == False:
+            self.insert(0, self.timeSig)
+        self.rightBarline = 'final'
 
         
 
@@ -79,12 +138,12 @@ class PolyphonicSnippet(music21.Music21Object):
         return lilyOut
     
     def _getLily(self):
-        theseStreams = self.streams
+        thesepartStreams = self.partStreams
         timeSig = self.timeSig
 
         lilyOut = lilyModule.LilyString("\\score {\n")
         lilyOut += "<< \\time " + str(timeSig) + "\n"
-        for thisStream in theseStreams:
+        for thisStream in thesepartStreams:
             lilyOut += self.lilyFromStream(thisStream)
 
         lilyOut += ">>\n"
@@ -93,15 +152,9 @@ class PolyphonicSnippet(music21.Music21Object):
 
     lily = property(_getLily)
 
-class Incipit(PolyphonicSnippet):
-    pass
-
-class FrontPaddedCadence(PolyphonicSnippet):
-    cadenceName = ""
-
     def findLongestCadence(self):
         longestLineLength = 0
-        for thisStream in self.streams:
+        for thisStream in self.partStreams:
             if thisStream is None:
                 continue
             thisLength = thisStream.duration.quarterLength
@@ -113,9 +166,39 @@ class FrontPaddedCadence(PolyphonicSnippet):
     def measuresShort(self, thisStream):
         timeSigLength = self.timeSig.barDuration.quarterLength
         thisStreamLength = thisStream.duration.quarterLength
-        shortness = self.longestLineLength - thisStreamLength
+        shortness = self.findLongestCadence() - thisStreamLength
         shortmeasures = shortness/timeSigLength
         return shortmeasures
+
+
+
+class Incipit(PolyphonicSnippet):
+
+    def backPadLine(self, thisStream):
+        '''
+        Pads a Stream with a bunch of rests at the
+        end to make it the same length as the longest line
+
+        
+        '''
+        shortmeasures = int(self.measuresShort(thisStream))
+
+        if (shortmeasures > 0):
+            shortDuration = self.timeSig.barDuration
+
+            for i in range(0, shortmeasures):
+                newRest = note.Rest()
+                newRest.duration = copy.deepcopy(shortDuration)
+                newRest.transparent = 1
+                thisStream.append(newRest)
+                if i == 0:
+                    newRest.startTransparency = 1
+                elif i == (shortmeasures - 1):
+                    newRest.stopTransparency = 1
+
+
+class FrontPaddedCadence(PolyphonicSnippet):
+    cadenceName = ""
 
     def frontPadLine(self, thisStream):
         '''Pads a line with a bunch of rests at the
@@ -138,7 +221,6 @@ class FrontPaddedCadence(PolyphonicSnippet):
                     newRest.startTransparency = 1
                 elif i == (shortmeasures - 1):
                     newRest.stopTransparency = 1
-            thisStream.elements = thisStream.sorted.elements
 
     def header(self):
         headOut = " \\header { \n piece = \"" + self.parentPiece.title
@@ -150,10 +232,19 @@ class FrontPaddedCadence(PolyphonicSnippet):
     def __init__(self, fiveExcelCells, parentPiece):
         PolyphonicSnippet.__init__(self, fiveExcelCells, parentPiece)
         self.findLongestCadence()
-        for thisStream in self.streams:
+        for thisStream in self.partStreams:
             self.frontPadLine(thisStream)
+
+
+class Test(unittest.TestCase):
+    pass
+
+    def runTest(self):
+        pass
 
 
 #------------------------------------------------------------------------------
 # eof
 
+if __name__ == "__main__":
+    music21.mainTest(Test)

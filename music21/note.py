@@ -816,7 +816,8 @@ class Note(NotRest):
         self.pitch.name = value
 
     name = property(_getName, _setName, 
-        doc = '''Return or set the pitch name from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.name`.
+        doc = '''Return or set the pitch name from the :class:`~music21.pitch.Pitch` object. 
+        See :attr:`~music21.pitch.Pitch.name`.
         ''')
 
     def _getNameWithOctave(self): 

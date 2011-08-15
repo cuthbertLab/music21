@@ -192,7 +192,62 @@ class BallataSheet(TrecentoSheet):
 class KyrieSheet(TrecentoSheet):
     sheetname = "kyrie"
 class GloriaSheet(TrecentoSheet):
-    sheetname = "gloria"    
+    '''
+    shortcut to a worksheet containing all the known 14th and early 15th c.
+    French, Spanish, and Italian Gloria's openings of the Et in Terra, Dominus Deus,
+    Qui Tollis, encoded along with the ends of the Cum Sancto and Amen.
+    
+    
+    2011-August: all encoded except some very fragmentary pieces.
+    
+    
+    >>> from music21 import *
+    >>> cadenceSpreadSheet = trecento.cadencebook.GloriaSheet()
+    >>> gloriaNo20 = cadenceSpreadSheet.makeWork(20)
+    >>> incipit = gloriaNo20.incipit
+    >>> incipit.show('text')
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.meter.TimeSignature 2/4>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.note.Note D>
+        {2.0} <music21.stream.Measure 2 offset=2.0>
+            {0.0} <music21.note.Note D>
+        ...
+        {16.0} <music21.stream.Measure 9 offset=16.0>
+            {0.0} <music21.note.Rest rest>
+            {2.0} <music21.bar.Barline style=final>
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.meter.TimeSignature 2/4>
+            {0.0} <music21.clef.BassClef>
+            {0.0} <music21.note.Note D>
+        {2.0} <music21.stream.Measure 2 offset=2.0>
+            {0.0} <music21.note.Note F#>
+        ...
+        {16.0} <music21.stream.Measure 9 offset=16.0>
+            {0.0} <music21.note.Note B>
+            {2.0} <music21.bar.Barline style=final>
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.meter.TimeSignature 2/4>
+            {0.0} <music21.clef.BassClef>
+            {0.0} <music21.note.Note D>
+        {2.0} <music21.stream.Measure 2 offset=2.0>
+            {0.0} <music21.note.Note D>
+        ...
+        {16.0} <music21.stream.Measure 9 offset=16.0>
+            {0.0} <music21.note.Note E>
+            {2.0} <music21.bar.Barline style=final>
+    
+    '''
+
+    sheetname = "gloria"
+
+    def makeWork(self, rownumber = 1):
+        rowvalues = self.sheet.row_values(rownumber - 1)
+        return Gloria(rowvalues, self.rowDescriptions)
+
 class CredoSheet(TrecentoSheet):
     sheetname = "credo"
 class SanctusSheet(TrecentoSheet):
@@ -209,21 +264,27 @@ class TrecentoCadenceWork(object):
     and another containing a description for each column (generally, the excel header row)
     
     
-    contains the following attributes:
+    contains the following attributes::
     
-        fisherNum    -- the work number assigned by Kurt von Fischer (only applies to pieces discovered before 1956)
-        title        -- may contain unicode characters
+        fisherNum     -- the work number assigned by Kurt von Fischer (only applies to pieces discovered before 1956)
+        title         -- may contain unicode characters
         composer      -- "." = anonymous
         encodedVoices -- a string representing the number of voices, a period, then the number of texted voices
-        pmfcVol      -- the volume of Polyphonic Music of the Fourteenth Century where the piece might be found (if any)
+        pmfcVol       -- the volume of Polyphonic Music of the Fourteenth Century where the piece might be found (if any)
         pmfcPageStart -- the initial page number in that PMFC volume 
         pmfcPageEnd   -- the final page number
         timeSignBegin -- the starting time signature (as a string) for the piece
         entryNotes    -- comments
 
-    '''
+    attributes shared with all members of the class::
+    
+        beginSnippetPositions -- a list of the excel spreadsheet columns in which an incipit of some section can be found. (default = [8])
+        endSnippetPositions   -- a list of the excel spreadsheet columns in which an cadence of some section can be found. (default = [])
+    
 
-    snippetPositions = []
+    '''
+    beginSnippetPositions = [8]
+    endSnippetPositions = []
     
     def __init__(self, rowvalues = [], rowDescriptions = []):
         self.rowvalues     = rowvalues
@@ -304,8 +365,9 @@ class TrecentoCadenceWork(object):
                 continue
             if thisSnippet.cantus is None:
                 continue
-            ss = thisSnippet.asScore()
-            timeSig = ss.getElementsByClass(meter.TimeSignature)[0]
+            ss = thisSnippet
+            
+            timeSig = ss.flat.getElementsByClass(meter.TimeSignature)[0]
             for partNumber, snippetPart in enumerate(ss.getElementsByClass('TrecentoCadenceStream')):
                 if currentTs is None:
                     ctsNumerator = 0
@@ -356,11 +418,11 @@ class TrecentoCadenceWork(object):
             return Incipit(rowBlock, self)
 
     incipit = property(_getIncipit)
-
+ 
     def getOtherSnippets(self):
         '''
-        returns a list of bits of music notation encoded as
-        FrontPaddedCadence objects.  That is, usually, all but the incipit
+        returns a list of bits of music notation that are not the actual
+        incipits of the piece.
 
 
         >>> from music21 import *
@@ -373,18 +435,24 @@ class TrecentoCadenceWork(object):
         <music21.trecento.polyphonicSnippet.FrontPaddedCadence object at 0x...>
          
         '''
-
-        snippetPositions = self.snippetPositions ## overridden in class Ballata
-        if snippetPositions == []:
-            snippetPositions = range(12, len(self.rowvalues)-1, 5)
+        beginSnippetPositions = self.beginSnippetPositions
+        endSnippetPositions = self.endSnippetPositions ## overridden in class Ballata
+        if endSnippetPositions == []:
+            endSnippetPositions = range(12, len(self.rowvalues)-1, 5)
         returnSnips = []
-        for i in snippetPositions:
-            thisSnippet = self.getSnippetAtPosition(i)
+        for i in beginSnippetPositions:
+            if i == beginSnippetPositions[0]:
+                continue
+            thisSnippet = self.getSnippetAtPosition(i, type="begin")
+            if thisSnippet is not None:
+                returnSnips.append(thisSnippet)
+        for i in endSnippetPositions:
+            thisSnippet = self.getSnippetAtPosition(i, type="end")
             if thisSnippet is not None:
                 returnSnips.append(thisSnippet)
         return returnSnips
 
-    def getSnippetAtPosition(self, snippetPosition):
+    def getSnippetAtPosition(self, snippetPosition, type="end"):
         '''
         gets a "snippet" which is a collection of up to 3 lines of music, a timeSignature
         and a description of the cadence.
@@ -403,7 +471,7 @@ class TrecentoCadenceWork(object):
                     return None  ## need a timesig
                 thisBlock[4] = self.timeSigBegin
             self.convertBlockToStreams(thisBlock)
-            if self.isIncipitType(snippetPosition):
+            if type == 'begin':
                 return Incipit(thisBlock, self)
             else:
                 return FrontPaddedCadence(thisBlock, self)
@@ -447,21 +515,6 @@ class TrecentoCadenceWork(object):
 #                except Exception, (value):
 #                    raise Exception("Unknown Problems in line %s: specifically %s" % (thisVoice,  value))
 
-    def isIncipitType(self, columnNumber):
-        '''There are two types of PolyphonicSnippets: 
-        those that start together and those that end together.
-        
-        
-        IncipitTypes start together
-        FrontPaddedCadences end together.
-        
-        
-        override this function in your subclass to specify
-        which columns in your excel Workbook contain incipit types
-        and which contain other snippets.
-        '''
-        if columnNumber in [8]: return True
-        return False
 
     def allCadences(self):
         '''
@@ -572,7 +625,18 @@ class Ballata(TrecentoCadenceWork):
     
     Overrides the locations of the column numbers in which one finds the cadences.
     '''
-    snippetPositions = [12, 17, 22]
+    beginSnippetPositions = [8]
+    endSnippetPositions = [12, 17, 22]
+    
+
+class Gloria(TrecentoCadenceWork):
+    '''
+    Class representing a fourteenth-century Gloria.
+    
+    Overrides the locations of the column numbers in which one finds the cadences.
+    '''
+    beginSnippetPositions = [8, 12, 17]
+    endSnippetPositions = [22, 27]
     
 
 class Test(unittest.TestCase):
@@ -627,9 +691,9 @@ class TestExternal(unittest.TestCase):
         thisVirelai = virelaisSheet.makeWork(54)
         if thisVirelai.title != "":
             print thisVirelai.title
-            thisVirelai.incipit.asScore().show('musicxml')
+            thisVirelai.incipit.show('musicxml')
     
-    def testRondeaux(self):
+    def xtestRondeaux(self):
         '''
         test showing a rondeaux's incipit to see if it works
         '''
@@ -637,8 +701,16 @@ class TestExternal(unittest.TestCase):
         thisRondeaux = rondeauxSheet.makeWork(41)
         if thisRondeaux.title != "":
             print thisRondeaux.title
-            thisRondeaux.incipit.asScore().show('musicxml')
+            thisRondeaux.incipit.show('musicxml')
     
+    def testGloria(self):
+        '''
+        test showing a Gloria's incipit to see if it works
+        '''
+        gloriaS = GloriaSheet()
+        thisGloria = gloriaS.makeWork(20)
+        if thisGloria.title != "":
+            thisGloria.asScore().show()
 
 
         

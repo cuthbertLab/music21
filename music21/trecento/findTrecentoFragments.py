@@ -210,6 +210,14 @@ def audioVirelaiSearch():
         print i.metadata.title, i.matchProbability
     l[0].show()
 
+def findSimilarGloriaParts():
+    '''
+    Looks in the list of Gloria incipits, cadences, etc. and tries to find ones which are very similar
+    to each other.
+    '''
+    
+
+
 def savedSearches():
 #    searchForIntervals("E4 C4 C4 B3") # Assisi 187.1
 #    searchForIntervals("D4 C4 C4 C4")   # Assisi 187.2

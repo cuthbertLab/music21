@@ -18,6 +18,7 @@ import unittest, doctest
 import music21.scale
 import music21.pitch
 from music21 import search
+from music21 import features
 from music21 import environment, converter
 from music21 import metadata, note, stream
 from music21.audioSearch import recording
@@ -460,8 +461,9 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
 
 #    environLocal.printDebug("Total notes recorded %d " % total_notes)
 #    environLocal.printDebug("Total rests recorded %d " % total_rests)
-    
-    return notesList, durationList, total_notes
+    print len(notesList), total_notes
+
+    return notesList, durationList
 
 
 def quantizeDuration(length):
@@ -497,12 +499,17 @@ def quantizeDuration(length):
     return finalLength / 100
 
 
-def quarterLengthEstimation(durationList, musicalFigure=None):
+def quarterLengthEstimation(durationList, mostRepeatedQuarterLength = 1.0):
     '''
     takes a list of lengths of notes (measured in
     audio samples) and tries to estimate using
     matplotlib.pyplot.hist what the length of a
     quarter note should be in this list.
+    
+    If mostRepeatedQuarterLength is another number, it still returns the
+    estimated length of a quarter note, but chooses it so that the most
+    common note in durationList will be the other note.  See example 2:
+    :
     
     
     Returns a float -- and not an int.
@@ -512,6 +519,16 @@ def quarterLengthEstimation(durationList, musicalFigure=None):
     >>> durationList = [20, 19, 10, 30, 6, 21]
     >>> audioSearch.quarterLengthEstimation(durationList)
     20.625    
+    
+    
+    Example 2: suppose these are the inputted durations for a
+    score where most of the notes are half notes.  Show how long
+    a quarter note should be:
+    
+    >>> audioSearch.quarterLengthEstimation(durationList, mostRepeatedQuarterLength = 2.0)
+    10.3125    
+
+
     ''' 
     dl = copy.copy(durationList)
     dl.append(0)
@@ -522,11 +539,9 @@ def quarterLengthEstimation(durationList, musicalFigure=None):
     while pdf[i] != max(pdf):
         i = i - 1
     qle = (bins[i] + bins[i + 1]) / 2.0
-    
-    if musicalFigure == None:
-        musicalFigure = 2 # Default: quarter note
-        
-    qle = qle * math.pow(2, musicalFigure) / 4 # it normalizes the length to a quarter note
+            
+    binPosition = 0 - math.log(mostRepeatedQuarterLength, 2)
+    qle = qle * math.pow(2, binPosition) # it normalizes the length to a quarter note
         
     #environLocal.printDebug("QUARTER ESTIMATION")
     #environLocal.printDebug("bins %s " % bins)
@@ -537,7 +552,8 @@ def quarterLengthEstimation(durationList, musicalFigure=None):
 
 
     
-def notesAndDurationsToStream(notesList, durationList, scNotes=None, lastNotePosition=None, BEGINNING=None, lengthFixed=None, qle=None):
+def notesAndDurationsToStream(notesList, durationList, scNotes=None, lastNotePosition=None, 
+                              removeRestsAtBeginning=True, lengthFixed=None, qle=None):
     '''
     take a list of :class:`~music21.note.Note` objects or rests
     and an equally long list of how long
@@ -575,56 +591,21 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None, lastNotePos
     # It could take into account the changes of tempo during the song, but it
     # will take more processing time
     if scNotes != None and lengthFixed == False:
-        i = 0    
-        n16 = 0
-        n8 = 0
-        n4 = 0
-        n2 = 0
-        n1 = 0
-        while i + lastNotePosition < len(scNotes) and i < len(notesList):
-            if scNotes[i + lastNotePosition + 1].quarterLength == 4:
-                n1 = n1 + 1
-            elif scNotes[i + lastNotePosition + 1].quarterLength == 2:
-                n2 = n2 + 1
-            elif scNotes[i + lastNotePosition + 1].quarterLength == 1:
-                n4 = n4 + 1
-            elif scNotes[i + lastNotePosition + 1].quarterLength == 0.5:
-                n8 = n8 + 1
-            elif scNotes[i + lastNotePosition + 1].quarterLength == 0.25:
-                n16 = n16 + 1
-            i = i + 1
-        i = 0
-        block = [n1, n2, n4, n8, n16]
-        valueMax = max(block)
-        while block[i] != max(block):
-            i = i + 1
-        block.pop(i)
-        if max(block) < 0.5 * valueMax and len(notesList) > 5: #it means there are the double of one type.            
-            musicalFigure = i # i=0 -> sixteenth note, i=1 -> eighth note, i=2 -> quarter...
-            print "LENGTH FIXED!!!!!!!!!!!!!!!!!!!!! "
-            # quarterLengthEstimation     
-            lengthFixed = True
-            qle = quarterLengthEstimation(durationList, musicalFigure)
-        else:
-            qle = quarterLengthEstimation(durationList)
-            print "NOT DEFINED"
-    else: 
-        "ALREADY DEFINED"
-        
-    if scNotes == None: # this is for the transcriber 
+        fe = features.native.MostCommonNoteQuarterLength(scNotes)
+        mostCommon = fe.extract().vector[0]
+        qle = quarterLengthEstimation(durationList, mostCommon)
+    elif scNotes == None: # this is for the transcriber 
         qle = quarterLengthEstimation(durationList)    
 
-    if BEGINNING == None: # to avoid rests at the beginning of the score! - for the transcriber
-        BEGINNING = False
     for i in range(len(durationList)): 
         actualDuration = quantizeDuration(durationList[i] / qle)
         notesList[i].quarterLength = actualDuration
-        if (BEGINNING == True) and (notesList[i].name == "rest"):
+        if (removeRestsAtBeginning == True) and (notesList[i].name == "rest"):
             #print "SILENCE!!"
             pass
         else: 
             p2.append(notesList[i])
-            BEGINNING = False        
+            removeRestsAtBeginning = False        
     sc = stream.Score()
     sc.metadata = metadata.Metadata()
     sc.metadata.title = 'Automatic Music21 Transcription'
@@ -634,7 +615,7 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None, lastNotePos
         return sc, len(p2)
     else: #case follower
         print "LENGTH?", lengthFixed
-        return sc, len(p2), lengthFixed, qle
+        return sc, lengthFixed, qle
 
 def decisionProcess(list, notePrediction, beginningData, lastNotePosition, countdown):
     '''
@@ -692,14 +673,14 @@ def matchingNotes(scoreNotes, myScore, numberNotesRecording, notePrediction, las
         iterations = int((math.floor(len(scoreNotes) / hop)) - math.ceil(tn_window / hop)) 
     print "number of iterations", iterations, hop, tn_window, len(scoreNotes)
 
-    scNotes = copy.deepcopy(scoreNotes)
-    scNotes = converter.parse(" ".join(scNotes), "4/4")
-    sN = copy.deepcopy(scNotes)
+    #scNotes = copy.deepcopy(scoreNotes)
+    #scNotes = converter.parse(" ".join(scNotes), "4/4")
+    #sN = copy.deepcopy(scNotes)
     #scNotes.elements = sN.elements[i * hop + 1 :i * hop + tn_recording + 1 ] #the [0] is the key 
     for i in range(iterations):
-       # scNotes = copy.deepcopy(scoreNotes)
-       # scNotes = converter.parse(" ".join(scNotes), "4/4")
-        scNotes.elements = sN.elements[i * hop + 1 :i * hop + tn_recording + 1 ] #the [0] is the key 
+        scNotes = copy.deepcopy(scoreNotes)
+        scNotes = converter.parse(" ".join(scNotes), "4/4")
+        scNotes.elements = scNotes.elements[i * hop + 1 :i * hop + tn_recording + 1 ] #the [0] is the key 
         name = "%d" % i
         #print "inici", i * hop + 1, i * hop + tn_recording + 1 
         beginningData.append(i * hop + 1)

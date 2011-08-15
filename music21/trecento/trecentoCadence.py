@@ -9,8 +9,15 @@ from music21.tinyNotation import *
 
 class TrecentoCadenceStream(TinyNotationStream):
     '''
-    Subclass of Tiny Notation that calls TrecentoCadenceNote instead of TinyNotationNote
-    '''
+    Subclass of Tiny Notation that calls TrecentoCadenceNote instead of TinyNotationNote    
+    
+    >>> from music21 import *
+    >>> dLucaGloriaIncipit = trecento.trecentoCadence.TrecentoCadenceStream("c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8", '6/8')
+    >>> dLucaGloriaIncipit.makeMeasures(inPlace = True)
+    >>> dLucaGloriaIncipit.rightBarline = 'final'
+    >>> dLucaGloriaIncipit.elements
+    [<music21.stream.Measure 1 offset=0.0>, <music21.stream.Measure 2 offset=3.0>, <music21.stream.Measure 3 offset=6.0>]
+    '''    
     def getNote(self, stringRep, storedDict = {}):
         try:
             tcN = TrecentoCadenceNote(stringRep, storedDict)
@@ -77,7 +84,7 @@ class TestExternal(unittest.TestCase):
         #    print note.sendNoteInfo(thisNote)
         #    print "--------"
         self.assertAlmostEqual(st.duration.quarterLength, 6.0)
-        st.lily.showPNG()
+        st.show()
     
 if __name__ == "__main__":
     music21.mainTest(Test, TestExternal)

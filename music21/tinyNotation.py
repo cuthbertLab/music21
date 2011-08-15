@@ -185,7 +185,7 @@ class TinyNotationStream(stream.Stream):
             self.append(timeSignature)
         for thisNote in noteList:
             self.append(thisNote)
-    
+                
         
     def getNote(self, stringRep, storedDict = common.DefaultHash()):
         '''

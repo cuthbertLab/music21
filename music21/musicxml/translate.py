@@ -549,13 +549,14 @@ def mxToDuration(mxNote, inputM21):
             tup = None
 
         # two ways to create durations, raw and cooked
-        durRaw = duration.Duration() # raw just uses qLen
-        # the qLen set here may not be computable, but is not immediately
-        # computed until setting components
-        durRaw.quarterLength = qLen
-
+   
         if forceRaw:
             #environLocal.printDebug(['forced to use raw duration', durRaw])
+            durRaw = duration.Duration() # raw just uses qLen
+            # the qLen set here may not be computable, but is not immediately
+            # computed until setting components
+            durRaw.quarterLength = qLen
+
             try:
                 d.components = durRaw.components
             except duration.DurationException:
@@ -571,9 +572,8 @@ def mxToDuration(mxNote, inputM21):
                 durUnit.appendTuplet(tup)
             durCooked = duration.Duration(components=[durUnit])
 
-            #environLocal.printDebug(['got durRaw, durCooked:', durRaw, durCooked])
             if durUnit.quarterLength != durCooked.quarterLength:
-                environLocal.printDebug(['error in stored MusicXML representaiton and duration value', durRaw, durCooked])
+                environLocal.printDebug(['error in stored MusicXML representaiton and duration value', durCooked])
             # old way just used qLen
             #self.quarterLength = qLen
             d.components = durCooked.components

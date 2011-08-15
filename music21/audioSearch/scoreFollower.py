@@ -29,13 +29,12 @@ _MOD = 'audioSearch/transcriber.py'
 environLocal = environment.Environment(_MOD)
 
 
-def runscoreFollower(show=True, plot=True, useMic=False,
+def runscoreFollower(show=True, scoreStream=None, plot=True, useMic=False,
                   seconds=15.0, useScale=scale.ChromaticScale('C4')):
     '''
     I'll think about it.
     '''
-    scoreNotes = ["f'#4", "e'", "d'", "c'#", "b", "a", "b", "c'#", "d'", "c'#", "b", "a", "g", "f#", "g", "e", "d8", "f#", "a", "g", "f#", "d", "f#", "e", "d", "B", "d", "a", "g", "b", "a", "g", "f#", "d", "e", "c'#", "d'", "f'#", "a'", "a", "b", "g", "a", "f#", "d", "d'16", "e'", "d'8", "c'#", "d'16", "c'#", "d'", "d", "c#", "a", "e", "f#", "d", "d'", "c'#", "b", "c'#", "f'#", "a'", "b'", "g'", "f'#", "e'", "g'", "f'#", "e'", "d'", "c'#", "b", "a", "g", "f#", "e", "g", "f#", "e", "d", "e", "f#", "g", "a", "e", "a", "g", "f#", "b", "a", "g", "a", "g", "f#", "e", "d", "B", "b", "c'#", "d'", "c'#", "b", "a", "g", "f#", "e", "b", "a", "b", "a", "g", "f#8", "f'#", "e'4", "d'", "f'#", "b'4", "a'", "b'", "c'#'", "d''8", "d'", "c'#4", "b", "d'"]
-    scNotes = converter.parse(" ".join(scoreNotes), "4/4")
+    scoreNotesOnly = scoreStream.flat.notesAndRests
     WAVE_FILENAME = "xmas.wav"    
     lastNotePosition = 0
     offset = 0
@@ -50,16 +49,17 @@ def runscoreFollower(show=True, plot=True, useMic=False,
     begin = True
     lengthFixed = False
     qle = None
-    while(lastNotePosition < len(scNotes)) and (totsamples < totalfile) and (END_OF_SCORE == False):
-        print "ANEM PER AQUI *****************", lastNotePosition, len(scNotes), "en percent %d %%" % (lastNotePosition * 100 / len(scNotes)), "new", notePrediction
+    while(lastNotePosition < len(scoreNotesOnly)) and (totsamples < totalfile) and (END_OF_SCORE == False):
+        print "ANEM PER AQUI *****************", lastNotePosition, len(scoreNotesOnly), "en percent %d %%" % (lastNotePosition * 100 / len(scoreNotesOnly)), "new", notePrediction
         freqFromAQList, wvfd, totsamples, totalfile = getFrequenciesFromAudio(record=useMic, length=seconds_recording, waveFilename=WAVE_FILENAME, wholeFile=False, wv=wvfd, totsamples=totsamples)
         time_start = time()
         #print "MOSTRES LLEGIDES:       ----  %d/%d = %d º/o" % (totsamples, totalfile, totsamples * 100 / totalfile)
         detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale)
         detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
         (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
-        (notesList, durationList, total_notes) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
-        myScore, numberNotesRecording, lengthFixed, qle = notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, lastNotePosition=lastNotePosition, lengthFixed=lengthFixed, qle=qle) 
+        (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
+        myScore, lengthFixed, qle = notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, lastNotePosition=lastNotePosition, lengthFixed=lengthFixed, qle=qle) 
+        numberNotesRecording = len(myScore.flat.notesAndRests)
         print "FORA", lengthFixed
         #myScore.show('text')
         totalLengthPeriod, lastNotePosition, prob, END_OF_SCORE, result, countdown = matchingNotes(scoreNotes, myScore, numberNotesRecording, notePrediction, lastNotePosition, result, countdown)
@@ -120,7 +120,9 @@ def runscoreFollower(show=True, plot=True, useMic=False,
 if __name__ == '__main__':
     #scoreNotes = ["d8", "b8", "a8", "g8", "d2", "b8", "a8", "g8", "e2", "c'8", "b8", "a8", "f#2", "d8", "e8", "d8", "c8", "a8", "b8", "r4", "d4", "b4", "a4", "g4", "d4", "b4", "a4", "g4", "e4", "c4", "b4", "a4", "d4", "e4", "d4", "c4", "a4", "g4", "b4", "d4", "g4", "a4", "b4", "c4", "b4", "a4", "b4", "a4", "d4", "b4", "d4", "g4", "a4", "b4", "c4", "b4", "d4", "c4", "a4", "g4"]
     #scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
-    runscoreFollower(show=True, plot=True, useMic=True, seconds=10.0)
+    scoreNotes = ["f'#4", "e'", "d'", "c'#", "b", "a", "b", "c'#", "d'", "c'#", "b", "a", "g", "f#", "g", "e", "d8", "f#", "a", "g", "f#", "d", "f#", "e", "d", "B", "d", "a", "g", "b", "a", "g", "f#", "d", "e", "c'#", "d'", "f'#", "a'", "a", "b", "g", "a", "f#", "d", "d'16", "e'", "d'8", "c'#", "d'16", "c'#", "d'", "d", "c#", "a", "e", "f#", "d", "d'", "c'#", "b", "c'#", "f'#", "a'", "b'", "g'", "f'#", "e'", "g'", "f'#", "e'", "d'", "c'#", "b", "a", "g", "f#", "e", "g", "f#", "e", "d", "e", "f#", "g", "a", "e", "a", "g", "f#", "b", "a", "g", "a", "g", "f#", "e", "d", "B", "b", "c'#", "d'", "c'#", "b", "a", "g", "f#", "e", "b", "a", "b", "a", "g", "f#8", "f'#", "e'4", "d'", "f'#", "b'4", "a'", "b'", "c'#'", "d''8", "d'", "c'#4", "b", "d'"]
+    scNotes = converter.parse(" ".join(scoreNotes), "4/4")
+    runscoreFollower(show=True, scoreStream=scNotes, plot=True, useMic=True, seconds=10.0)
 
 #------------------------------------------------------------------------------
 # eof
