@@ -115,7 +115,7 @@ from music21 import tinyNotation
 from music21 import xmlnode
 
 from music21.trecento import cadencebook as trecentoCadencebook
-
+from music21.trecento import polyphonicSnippet as trecentoPolyphonicSnippet
 
 #from music21 import environment #redundant
 _MOD = "doc.build.py"
@@ -224,9 +224,11 @@ MODULES = [
     tempo,     
     tinyNotation,
 
+    trecentoPolyphonicSnippet,
+
     xmlnode, 
 
-
+    
 # trecento
 #    trecentoCadencebook
 ]
@@ -1536,6 +1538,8 @@ class Documentation(RestructuredWriter):
                              'advancedGraphing', 
                              ]
         self.chaptersDeveloper = ['documenting',
+                                  'usingEclipse'
+                                  
                              ]
     
         self.chaptersModuleRef = [] # to be populated

@@ -113,6 +113,7 @@ Module Reference
    moduleStream
    moduleTempo
    moduleTinyNotation
+   moduleTrecentoPolyphonicSnippet
    moduleXmlnode
 
 
@@ -123,5 +124,6 @@ Developer Reference
    :maxdepth: 2
 
    documenting
+   usingEclipse
 
 

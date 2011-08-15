@@ -11,7 +11,10 @@ First, download and install the appropriate version of Eclipse from the followin
 
 **1A. Get PyDev for Eclipse**
 
-PyDev is a Python IDE for Eclipse, which may be used in Python, Jython, and IronPython development. Make sure you have installed PyDev: 			http://pydev.org/updates
+PyDev is a Python IDE for Eclipse, which may be used in Python, Jython, 
+and IronPython development. Make sure you have installed PyDev http://pydev.org/updates
+
+
 
 **1B. Get Subclipse**
 

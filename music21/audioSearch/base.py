@@ -656,7 +656,7 @@ def decisionProcess(list, notePrediction, beginningData, lastNotePosition, count
     return position, countdown
 
 
-def matchingNotes(scoreNotes, myScore, numberNotesRecording, notePrediction, lastNotePosition, result, countdown):
+def matchingNotes(scoreStream, transcribedScore, numberNotesRecording, notePrediction, lastNotePosition, result, countdown):
     '''
     '''
     # Analyzing streams
@@ -670,17 +670,18 @@ def matchingNotes(scoreNotes, myScore, numberNotesRecording, notePrediction, las
     if hop == 0:
         iterations = 1
     else:
-        iterations = int((math.floor(len(scoreNotes) / hop)) - math.ceil(tn_window / hop)) 
-    print "number of iterations", iterations, hop, tn_window, len(scoreNotes)
+        iterations = int((math.floor(len(scoreStream) / hop)) - math.ceil(tn_window / hop)) 
+    print "number of iterations", iterations, hop, tn_window, len(scoreStream)
 
-    #scNotes = copy.deepcopy(scoreNotes)
+    #scNotes = copy.deepcopy(scoreStream)
     #scNotes = converter.parse(" ".join(scNotes), "4/4")
     #sN = copy.deepcopy(scNotes)
     #scNotes.elements = sN.elements[i * hop + 1 :i * hop + tn_recording + 1 ] #the [0] is the key 
     for i in range(iterations):
-        scNotes = copy.deepcopy(scoreNotes)
-        scNotes = converter.parse(" ".join(scNotes), "4/4")
-        scNotes.elements = scNotes.elements[i * hop + 1 :i * hop + tn_recording + 1 ] #the [0] is the key 
+        scNotes = scoreStream[i * hop + 1 :i * hop + tn_recording + 1 ] 
+        #scNotes = copy.deepcopy(scoreStream)
+        #scNotes = converter.parse(" ".join(scNotes), "4/4")
+        #scNotes.elements = scNotes.elements[i * hop + 1 :i * hop + tn_recording + 1 ] #the [0] is the key 
         name = "%d" % i
         #print "inici", i * hop + 1, i * hop + tn_recording + 1 
         beginningData.append(i * hop + 1)
@@ -688,19 +689,22 @@ def matchingNotes(scoreNotes, myScore, numberNotesRecording, notePrediction, las
         scNotes.id = name
         totScores.append(scNotes)  
 
-    l = search.approximateNoteSearch(myScore.flat.notes, totScores)
+    l = search.approximateNoteSearch(transcribedScore.flat.notes, totScores)
 #    print "printo prob", len(totScores)  
 #    for i in l:
 #        print i.id, i.matchProbability#, totScores[i]
         
     #decision process    
-    if notePrediction > len(scoreNotes) - tn_recording - hop - 1:
-        print "PETARIA", notePrediction, len(scoreNotes) - tn_recording - hop - 1, len(scoreNotes), tn_recording, hop
-        notePrediction = len(scoreNotes) - tn_recording - hop - 1
+    if notePrediction > len(scoreStream) - tn_recording - hop - 1:
+        print "PETARIA", notePrediction, len(scoreStream) - tn_recording - hop - 1, len(scoreStream), tn_recording, hop
+        notePrediction = len(scoreStream) - tn_recording - hop - 1
         END_OF_SCORE = True
         print "************++++ LAST PART OF THE SCORE ++++**************"
     position, countdown = decisionProcess(l, notePrediction, beginningData, lastNotePosition, countdown)
-        
+    try:
+        print "measure: " + l[position][0].measureNumber     
+    except:
+        pass
     totalLength = 0
     
     number = int(l[position].id)
@@ -716,14 +720,14 @@ def matchingNotes(scoreNotes, myScore, numberNotesRecording, notePrediction, las
 
     if countdown == 0:   
         lastNotePosition = beginningData[number] + lengthData[number] #- 1
-    if lastNotePosition < len(scoreNotes) / 4:
-        print "--------------------------1", lastNotePosition, len(scoreNotes) / 4, len(scoreNotes)
-    elif lastNotePosition < len(scoreNotes) / 2:
-        print "--------------------------2", lastNotePosition, len(scoreNotes) / 2, len(scoreNotes)
-    elif lastNotePosition < len(scoreNotes) * 3 / 4:
-        print "--------------------------2", lastNotePosition, len(scoreNotes) * 3 / 4, len(scoreNotes)
+    if lastNotePosition < len(scoreStream) / 4:
+        print "--------------------------1", lastNotePosition, len(scoreStream) / 4, len(scoreStream)
+    elif lastNotePosition < len(scoreStream) / 2:
+        print "--------------------------2", lastNotePosition, len(scoreStream) / 2, len(scoreStream)
+    elif lastNotePosition < len(scoreStream) * 3 / 4:
+        print "--------------------------2", lastNotePosition, len(scoreStream) * 3 / 4, len(scoreStream)
     else: 
-        print "--------------------------2", lastNotePosition, len(scoreNotes), len(scoreNotes)
+        print "--------------------------2", lastNotePosition, len(scoreStream), len(scoreStream)
         
     return totalLength, lastNotePosition, l[0].matchProbability, END_OF_SCORE, result, countdown
     
