@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2010 The music21 Project
+# Copyright:    (c) 2010-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -350,8 +350,6 @@ class Test(unittest.TestCase):
         
         self.assertEqual(total, 28) # returns 28
 
-
-
         # finding adjacent chords from a specific root
         from music21 import corpus, stream, note
         
@@ -360,7 +358,8 @@ class Test(unittest.TestCase):
         #s.show()        
         # Reduce the work to a series of simultaneities, then extract only
         # the resultant Chords
-        chords = s.chordify().getElementsByClass('Chord')
+        chords = s.chordify().flat.getElementsByClass('Chord')
+        self.assertEqual(len(chords), 51)
         # Create a Stream for display
         display = stream.Stream()
         # Iterate through the chords by index and a Chord

@@ -135,7 +135,7 @@ This example creates a chordal reduction of a polyphonic work and then searches 
     s = corpus.parseWork('bwv66.6')    
     # Reduce the work to a series of simultaneities, then extract only
     # the resultant Chords
-    chords = s.chordify().getElementsByClass('Chord')
+    chords = s.chordify().flat.getElementsByClass('Chord')
     # Create a Stream for display
     display = stream.Stream()
     # Iterate through the chords by index and a Chord

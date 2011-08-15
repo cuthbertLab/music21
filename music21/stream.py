@@ -9602,6 +9602,7 @@ class Score(Stream):
         
         '''
         # TODO: need to handle flat Streams contained in a Stream   
+        # TODO: need to handle voices
         # even if those component Stream do not have Measures
         returnObj = deepcopy(self)
 
@@ -9643,11 +9644,39 @@ class Score(Stream):
 
         # get a measure stream from the top voice
         # assume we can manipulate this these measures as already have deepcopy
-#         for m in mStream.getElementsByClass('Measure'):
-#             pass                    
+        # the Part may not have had any Measures;
+        if len(mStream) > 0: 
+            for i, m in enumerate(mStream.getElementsByClass('Measure')):
+                # get highest time before removal
+                mQl = m.duration.quarterLength
+                # TODO: remove any Streams (aka Voices) found in the Measure
+                m.removeByClass('GeneralNote')
+                # get offset in original measure
+                mOffsetStart = m.getOffsetBySite(returnObj.parts[0])        
+                mOffsetEnd = mOffsetStart + mQl
+                # not sure if this properly manages padding
+    
+                # place all notes in their new location if offsets match
+                # TODO: this iterates over all notes at each iteration!
+                for e in post.notes: # assume all elements should move
+                    # these are flat offset values 
+                    o = e.getOffsetBySite(post)
+                    #environLocal.printDebug(['iterating elements', o, e])
+                    if o >= mOffsetStart and o < mOffsetEnd:
+                        # get offset in relation to inside of Measure
+                        localOffset = o - mOffsetStart
+                        #environLocal.printDebug(['inserting element', e, 'at', o, 'in', m, 'localOffset', localOffset])
+                        m.insert(localOffset, e)
+                m._elementsChanged()
+            # populate measures by looking at flat offsets
+            return mStream
+        else: # place in a single flat Stream
+            post._elementsChanged()
+            return post
 
-        post._elementsChanged()
-        return post
+        #post._elementsChanged()
+        #return mStream
+        #return post
 
     def partsToVoices(self, voiceAllocation=2, permitOneVoicePerPart=False):
         '''Given a multi-part :class:`~music21.stream.Score`, return a new Score that combines parts into voices. 
@@ -14466,7 +14495,6 @@ class Test(unittest.TestCase):
 
 
     def testSliceAtOffsetsImported(self):
-
         from music21 import corpus, converter
         sSrc = corpus.parse('bwv66.6')
 
@@ -14485,7 +14513,6 @@ class Test(unittest.TestCase):
 
 
     def testSliceByBeatBuilt(self):
-
         from music21 import stream, note, meter
         s = stream.Stream()
         ts1 = meter.TimeSignature('3/4')
@@ -14507,10 +14534,7 @@ class Test(unittest.TestCase):
         s1 = s.sliceByBeat()
         self.assertEqual([(e.offset, e.quarterLength) for e in s1.notesAndRests], [(0.0, 1.5), (1.5, 1.5)] )
 
-
-
     def testSliceByBeatImported(self):
-
         from music21 import corpus, converter
         sSrc = corpus.parse('bwv66.6')
         post = sSrc.parts[0].sliceByBeat()
@@ -14522,24 +14546,21 @@ class Test(unittest.TestCase):
         from music21 import stream, corpus
         s = corpus.parse('gloria')
         #s.show()
-        post = s.measures(0,20, gatherSpanners=False)
+        post = s.measures(0, 20, gatherSpanners=False)
         # somehow, this is doubling measures
         #post.show()
 
         self.assertEqual([e.offset for e in post.parts[0].flat.notesAndRests], [0.0, 3.0, 3.5, 4.5, 5.0, 6.0, 6.5, 7.5, 8.5, 9.0, 10.5, 12.0, 15.0, 16.5, 17.5, 18.0, 18.5, 19.0, 19.5, 20.0, 20.5, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 30.0, 33.0, 34.5, 35.5, 36.0, 37.5, 38.0, 39.0, 40.0, 41.0, 42.0, 43.5, 45.0, 45.5, 46.5, 47.0, 48.0, 49.5, 51.0, 51.5, 52.0, 52.5, 53.0, 53.5, 54.0, 55.5, 57.0, 58.5])
 
         post = post.chordify()
+        #post.show('t')
         #post.show()
-        self.assertEqual([e.offset for e in post.notes], [0.0, 3.0, 3.5, 4.5, 5.0, 5.5, 6.0, 6.5, 7.5, 8.5, 9.0, 10.5, 12.0, 15.0, 16.5, 17.5, 18.0, 18.5, 19.0, 19.5, 20.0, 20.5, 21.0, 21.5, 22.0, 22.5, 23.0, 23.5, 24.0, 24.5, 25.0, 25.5, 26.0, 26.5, 27.0, 30.0, 33.0, 34.5, 35.5, 36.0, 37.5, 38.0, 39.0, 40.0, 40.5, 41.0, 42.0, 43.5, 45.0, 45.5, 46.0, 46.5, 47.0, 47.5, 48.0, 49.5, 51.0, 51.5, 52.0, 52.5, 53.0, 53.5, 54.0, 54.5, 55.0, 55.5, 56.0, 56.5, 57.0, 58.5, 59.5])
-        self.assertEqual(len(post.getElementsByClass('Chord')), 71)  # Careful! one version of the caching is screwing up m. 20 which definitely should not have rests in it -- was creating 69 notes, not 71.
-
-# this is not right [0.0, 6.0, 6.5, 7.5, 8.0, 8.5, 12.0, 12.5, 13.5, 14.5, 18.0, 19.5, 24.0, 30.0, 31.5, 32.5, 36.0, 36.5, 37.0, 37.5, 38.0, 38.5, 42.0, 42.5, 43.0, 43.5, 44.0, 44.5, 48.0, 48.5, 49.0, 49.5, 50.0, 50.5, 54.0, 60.0, 66.0, 67.5, 68.5, 72.0, 73.5, 74.0, 78.0, 79.0, 79.5, 80.0, 84.0, 85.5, 90.0, 90.5, 91.0, 91.5, 92.0, 92.5, 96.0, 97.5, 102.0, 102.5, 103.0, 103.5, 104.0, 104.5, 108.0, 108.5, 109.0, 109.5, 110.0, 110.5, 114.0, 115.5, 116.5] 
+        self.assertEqual([e.offset for e in post.flat.notes], [0.0, 3.0, 3.5, 4.5, 5.0, 5.5, 6.0, 6.5, 7.5, 8.5, 9.0, 10.5, 12.0, 15.0, 16.5, 17.5, 18.0, 18.5, 19.0, 19.5, 20.0, 20.5, 21.0, 21.5, 22.0, 22.5, 23.0, 23.5, 24.0, 24.5, 25.0, 25.5, 26.0, 26.5, 27.0, 30.0, 33.0, 34.5, 35.5, 36.0, 37.5, 38.0, 39.0, 40.0, 40.5, 41.0, 42.0, 43.5, 45.0, 45.5, 46.0, 46.5, 47.0, 47.5, 48.0, 49.5, 51.0, 51.5, 52.0, 52.5, 53.0, 53.5, 54.0, 54.5, 55.0, 55.5, 56.0, 56.5, 57.0, 58.5, 59.5])
+        self.assertEqual(len(post.flat.getElementsByClass('Chord')), 71)  # Careful! one version of the caching is screwing up m. 20 which definitely should not have rests in it -- was creating 69 notes, not 71.
 
     def testChordifyRests(self):
         # test that chordify does not choke on rests
-
         from music21 import stream, note
-
         p1 = stream.Part()
         for p, ql in [(None, 2), ('d2',2), (None, 2), ('e3',2), ('f3', 2)]:
             if p == None:
@@ -14666,6 +14687,10 @@ class Test(unittest.TestCase):
         s.insert(0, p2)
         #s.show()
         post = s.chordify()
+        self.assertEqual(len(post.getElementsByClass('Measure')), 2)
+        m1 = post.getElementsByClass('Measure')[0]
+        # test that padding has been maintained
+        self.assertEqual(m1.paddingLeft, 3.0)
         #post.show()
         
 
@@ -14679,8 +14704,10 @@ class Test(unittest.TestCase):
         self.assertEqual(m1.duration.quarterLength, 1.0)
         self.assertEqual([e.offset for e in m1.notes], [0.0])
         #s.parts[0].show()
-#         post = s.chordify()
-#         post.show()
+        post = s.chordify()
+        self.assertEqual(post.getElementsByClass('Measure')[0].paddingLeft, 3.0)
+        #self.assertEqual(len(post.flat), 3)
+        #post.show()
 
 
 

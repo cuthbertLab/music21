@@ -299,7 +299,8 @@ class StreamForms(object):
             return self._forms['chordify']
 
         elif key in ['chordify.getElementsByClass.Chord']:
-            x = self.__getitem__('chordify').getElementsByClass('Chord')
+            # need flat here, as chordify might return Measures
+            x = self.__getitem__('chordify').flat.getElementsByClass('Chord')
             self._forms['chordify.getElementsByClass.Chord'] = x
             return self._forms['chordify.getElementsByClass.Chord']
 
@@ -1146,7 +1147,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(di['flat.notes']), 30)
 
         #di['chordify'].show('t')
-        self.assertEqual(len(di['chordify']), 43)
+        self.assertEqual(len(di['chordify']), 5)
         self.assertEqual(len(di['chordify.getElementsByClass.Chord']), 24)
 
 
