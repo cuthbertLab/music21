@@ -560,13 +560,27 @@ class NotRest(GeneralNote):
     # unspecified means that there may be a stem, but its orientation
     # has not been declared. 
     # TODO: import from MusicXML
-    stemDirection = "unspecified"
     
     def __init__(self, *arguments, **keywords):
         GeneralNote.__init__(self, **keywords)
         self._notehead = 'normal'
         self._noteheadFill = 'default'
         self._noteheadParen = False
+        self._stemDirection = 'unspecified'
+        
+    def _getStemDirection(self):
+        '''Returns the stem direction.
+        '''
+        return self._stemDirection
+    
+    def _setStemDirection(self, direction):
+        '''Sets the stem direction to the specified value.
+        
+        Accepted values are 'up', 'down', 'noStem', 'double', or 'unspecified'.
+        '''
+        self._stemDirection = direction
+        
+    stemDirection = property(_getStemDirection, _setStemDirection)
 
     def _getNotehead(self):
         '''Return the Notehead type.
@@ -574,7 +588,8 @@ class NotRest(GeneralNote):
         return self._notehead
 
     def _setNotehead(self, value):
-
+        '''Sets the notehead to the specified value.
+        '''
         self._notehead = value
 
     notehead = property(_getNotehead, _setNotehead)

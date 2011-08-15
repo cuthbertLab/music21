@@ -1634,6 +1634,14 @@ def noteToMxNotes(n, spannerBundle=None):
     #Adds the notehead type if it is not set to the default 'normal'.
     if n.notehead != 'normal':
        mxNoteList[0].noteheadObj = noteheadToMxNotehead(n)
+    
+    #If the stem direction is not 'unspecified'    
+    if n.stemDirection != 'unspecified':
+        if n.stemDirection == 'noStem':
+            mxNoteList[0].stem = 'none'
+        else:
+            mxNoteList[0].stem = n.stemDirection
+        
 
     return mxNoteList
 
@@ -1675,6 +1683,10 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
     n.pitch.mx = mxNote # required info will be taken from entire note
     n.duration.mx = mxNote
     n.beams.mx = mxNote.beamList
+    
+    mxStem = mxNote.get('stem')
+    if mxStem != None:
+        n.stemDirection = mxStem
 
     # can use mxNote.tieList instead
     mxTieList = mxNote.get('tieList')
@@ -3586,6 +3598,36 @@ spirit</words>
         self.assertEqual(m.flat.notes[1].notehead, 'cross')
         
         #m.show()
+        
+    def testStemDirection(self):
+        #testing the ability to changing stem directions
+        
+        from music21 import note, converter, spanner, stream, tie
+        from music21.musicxml import translate
+        
+        n1 = note.Note('c3')
+        n1.notehead = 'diamond'
+        n1._setStemDirection('double')
+        p = stream.Part()
+        p.append(n1)
+        xml = p.musicxml
+        match1 = '<stem>double</stem>'
+        self.assertEqual(xml.find(match1) > 0, True)
+    
+    def testStemDirImport(self):
+        
+        from music21 import note, converter, spanner, stream, tie
+        from music21.musicxml import translate
+        
+        n1 = note.Note('c3')
+        n1.notehead = 'diamond'
+        n1._setStemDirection('double')
+        p = stream.Part()
+        p.append(n1)
+        
+        xml = p.musicxml
+        m = converter.parse(xml)
+        self.assertEqual(m.flat.notes[0].stemDirection, 'double')
         
 
 if __name__ == "__main__":
