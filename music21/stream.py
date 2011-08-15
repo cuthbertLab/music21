@@ -1218,18 +1218,13 @@ class Stream(music21.Music21Object):
 
     def append(self, others):
         '''
-        Add a Music21Object (including another Stream) to the end of the current Stream.
-        
+        Add a Music21Object (including another Stream) to the end of the current Stream.        
         
         If given a list, will append each element in order after the previous one.
         
-        
         The "end" of the stream is determined by the `highestTime` property
         (that is the latest "release" of an object, or directly after the last
-        element ends). 
-
-
-
+        element ends).
 
         runs fast for multiple addition and will preserve isSorted if True
 
@@ -7136,68 +7131,58 @@ class Stream(music21.Music21Object):
     def hasMeasures(self):
         '''Return a boolean value showing if this Stream contains Measures
         '''
-        post = False
-        # do not need to look in endElements
-        for obj in self._elements:
-            # if obj is a Part, we have multi-parts
-            if 'Measure' in obj.classes:
-                post = True
-                break # only need one
-        return post
+        if self._cache['hasMeasures'] is None:
+            post = False
+            # do not need to look in endElements
+            for obj in self._elements:
+                # if obj is a Part, we have multi-parts
+                if 'Measure' in obj.classes:
+                    post = True
+                    break # only need one
+            self._cache['hasMeasures'] = post
+        return self._cache['hasMeasures']
 
 
     def hasVoices(self):
         '''Return a boolean value showing if this Stream contains Voices
         '''
-        post = False
-        # do not need to look in endElements
-        for obj in self._elements:
-            # if obj is a Part, we have multi-parts
-            if 'Voice' in obj.classes:
-                post = True
-                break # only need one
-        return post
+        if self._cache['hasVoices'] is None:
+            post = False
+            # do not need to look in endElements
+            for obj in self._elements:
+                # if obj is a Part, we have multi-parts
+                if 'Voice' in obj.classes:
+                    post = True
+                    break # only need one
+            self._cache['hasVoices'] = post
+        return self._cache['hasVoices']
 
 
     def hasPartLikeStreams(self):
         '''Return a boolean value showing if this Stream contains multiple Parts, or Part-like sub-Streams. 
         '''
-        multiPart = False
+        if self._cache['hasPartLikeStreams'] is None:
+            multiPart = False
+            if not self.isFlat: # if flat, does not have parts!
+                # do not need to look in endElements
+                for obj in self._elements:
+                    # if obj is a Part, we have multi-parts
+                    if obj.isClassOrSubclass(['Part']):
+                        multiPart = True
+                        break
+                    if obj.isClassOrSubclass(['Measure', 'Voice']):
+                        multiPart = False
+                        break
+                    # if components are streams of Notes or Measures, 
+                    # than assume this is like a Part
+                    elif obj.isStream and (
+                        len(obj.getElementsByClass('Measure')) > 0 or len(obj.notesAndRests) > 0):
+                        multiPart = True
+                        break # only need one
+            self._cache['hasPartLikeStreams'] = multiPart
+        return self._cache['hasPartLikeStreams']
 
-        if self.isFlat: # if flat, does not have parts!
-            return False 
-
-        # do not need to look in endElements
-        for obj in self._elements:
-            # if obj is a Part, we have multi-parts
-            if obj.isClassOrSubclass(['Part']):
-                multiPart = True
-                break
-            if obj.isClassOrSubclass(['Measure', 'Voice']):
-                multiPart = False
-                break
-
-#             if isinstance(obj, Part):
-#                 multiPart = True
-#                 break # only need one
-#             # if components are Measures, self is a part
-#             elif isinstance(obj, Measure):
-#                 multiPart = False
-#                 break # only need one
-#             # if voices are present not multipart
-#             elif isinstance(obj, Voice):
-#                 multiPart = False
-#                 break
-            # if components are streams of Notes or Measures, 
-            # than assume this is like a Part
-            elif obj.isStream and (
-                len(obj.getElementsByClass('Measure')) > 0 or len(obj.notesAndRests) > 0):
-                multiPart = True
-                break # only need one
-        return multiPart
-
-
-
+    #---------------------------------------------------------------------------
     def _getLily(self):
         '''Returns the stream translated into Lilypond format.'''
         if self._overriddenLily is not None:
@@ -7368,6 +7353,8 @@ class Stream(music21.Music21Object):
         ''')
 
 
+
+    #---------------------------------------------------------------------------
     def _getNotesAndRests(self):
         '''
         see property `notesAndRests`, below
@@ -8628,6 +8615,7 @@ class Measure(Stream):
         # the paddingLeft is used by TimeSignature objects to determine beat
         # position; paddingRight defines a QL from the end of the time signature
         # to the last valid offset
+        # paddingLeft is used to define pickup/anacrusis bars
         self.paddingLeft = 0
         self.paddingRight = 0
 
@@ -8780,7 +8768,7 @@ class Measure(Stream):
         return self.highestTime / barDuration.quarterLength
 
     def padAsAnacrusis(self):
-        '''Given an incompletely filled Measure, adjust the paddingLeft value to to represent contained events as shifted to fill the left-most duration of the bar.
+        '''Given an incompletely filled Measure, adjust the paddingLeft value to to represent contained events as shifted to fill the right-most duration of the bar.
 
         Calling this method will overwrite any previously set paddingLeft value, based on the current TimeSignature-derived `barDuration` attribute. 
 
@@ -9581,9 +9569,9 @@ class Score(Stream):
         # even if those component Stream do not have Measures
         returnObj = deepcopy(self)
 
+        allParts = returnObj.getElementsByClass('Part')
         mStream = returnObj.parts[0].getElementsByClass('Measure')
         mCount = len(mStream)
-        allParts = returnObj.getElementsByClass('Part')
         if mCount == 0:
             mCount = 1 # treat as a single measure
         for i in range(mCount): # may be 1
@@ -14571,6 +14559,51 @@ class Test(unittest.TestCase):
             '[C4, G4]')
         #post.show()
         #s.show()
+
+    def testChordifyB(self):
+        from music21 import stream, note, meter
+        p1 = stream.Part()
+        m1a = stream.Measure()
+        m1a.timeSignature = meter.TimeSignature('4/4')
+        m1a.insert(0, note.Note())
+        m1a.padAsAnacrusis()
+        self.assertEqual(m1a.paddingLeft, 3.0)
+        #m1a.paddingLeft = 3.0 # a quarter pickup
+        m2a = stream.Measure()     
+        m2a.repeatAppend(note.Note(), 4)
+        p1.append([m1a, m2a])
+
+        p2 = stream.Part()
+        m1b = stream.Measure()
+        m1b.timeSignature = meter.TimeSignature('4/4')
+        m1b.repeatAppend(note.Rest(), 1)
+        m1b.padAsAnacrusis()
+        self.assertEqual(m1b.paddingLeft, 3.0)
+        m2b = stream.Measure()
+        m2b.repeatAppend(note.Note('g4'), 4)
+        p2.append([m1b, m2b])
+
+        s = stream.Score()
+        s.insert(0, p1)
+        s.insert(0, p2)
+        #s.show()
+        post = s.chordify()
+        #post.show()
+        
+
+    def testChordifyC(self):
+        from music21 import stream, note, expressions, corpus
+        s = corpus.parse('schoenberg/opus19/movement6')
+        #s.show()
+        m1 = s.parts[0].getElementsByClass('Measure')[0]
+        self.assertEqual(m1.highestTime, 1.0)
+        self.assertEqual(m1.paddingLeft, 3.0)
+        self.assertEqual(m1.duration.quarterLength, 1.0)
+        self.assertEqual([e.offset for e in m1.notes], [0.0])
+        #s.parts[0].show()
+#         post = s.chordify()
+#         post.show()
+
 
 
 

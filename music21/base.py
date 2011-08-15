@@ -3400,7 +3400,7 @@ class Music21Object(JSONSerializer):
             # testing sortByCreationTime == true; this may be necessary
             # as we often want the most recent measure
             m = self.getContextByClass('Measure', sortByCreationTime=True, prioritizeActiveSite=False)
-            if m != None:
+            if m is not None:
                 #environLocal.printDebug(['using found Measure for offset access'])            
                 offsetLocal = self.getOffsetBySite(m) + m.paddingLeft
 
