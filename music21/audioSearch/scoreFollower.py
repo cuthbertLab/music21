@@ -62,7 +62,7 @@ def runscoreFollower(show=True, plot=True, useMic=False,
         myScore, numberNotesRecording, lengthFixed, qle = notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, lastNotePosition=lastNotePosition, lengthFixed=lengthFixed, qle=qle) 
         print "FORA", lengthFixed
         #myScore.show('text')
-        totalLengthPeriod, lastNotePosition, prob, END_OF_SCORE, result, countdown = matchingNotes(scNotes, myScore, numberNotesRecording, notePrediction, lastNotePosition, result, countdown)
+        totalLengthPeriod, lastNotePosition, prob, END_OF_SCORE, result, countdown = matchingNotes(scoreNotes, myScore, numberNotesRecording, notePrediction, lastNotePosition, result, countdown)
         if countdown >= 5:
             END_OF_SCORE = True # Exit due to bad recognition or rests
             print "Exit due to bad recognition or rests"
@@ -80,6 +80,11 @@ def runscoreFollower(show=True, plot=True, useMic=False,
                 notePrediction = int(slots + lastNotePosition)
             else:
                 print "!!!!!!!!!COUNTDOWN!!!!!!", countdown
+                if countdown == 2:
+                    print "SEARCH IN ALL THE SCORE; MAYBE THE MUSICIAN HAS STARTED FROM THE BEGINNING"
+                    lastNotePosition = 0
+                    notePrediction = 0
+                    
             #new note?
             lengthForward = 0
             offset = 0        

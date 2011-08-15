@@ -666,6 +666,8 @@ def decisionProcess(list, notePrediction, beginningData, lastNotePosition, count
     if list[position].matchProbability < 0.6 or len(list) == 1: #the latter for the all-rest case
         print "ARE YOU SURE YOU ARE PLAYING THE RIGHT SONG??"
         countdown = countdown + 1
+        if countdown == 2:
+            print "SEARCH IN THE WHOLE SCORE!!!"
     else:
         countdown = 0
     if dist > 20:
@@ -690,11 +692,14 @@ def matchingNotes(scoreNotes, myScore, numberNotesRecording, notePrediction, las
         iterations = int((math.floor(len(scoreNotes) / hop)) - math.ceil(tn_window / hop)) 
     print "number of iterations", iterations, hop, tn_window, len(scoreNotes)
 
-    
+    scNotes = copy.deepcopy(scoreNotes)
+    scNotes = converter.parse(" ".join(scNotes), "4/4")
+    sN = copy.deepcopy(scNotes)
+    #scNotes.elements = sN.elements[i * hop + 1 :i * hop + tn_recording + 1 ] #the [0] is the key 
     for i in range(iterations):
-        scNotes = copy.deepcopy(scoreNotes)
-        scNotes = converter.parse(" ".join(scNotes), "4/4")
-        scNotes.elements = scNotes.elements[i * hop + 1 :i * hop + tn_recording + 1 ] #the [0] is the key 
+       # scNotes = copy.deepcopy(scoreNotes)
+       # scNotes = converter.parse(" ".join(scNotes), "4/4")
+        scNotes.elements = sN.elements[i * hop + 1 :i * hop + tn_recording + 1 ] #the [0] is the key 
         name = "%d" % i
         #print "inici", i * hop + 1, i * hop + tn_recording + 1 
         beginningData.append(i * hop + 1)
