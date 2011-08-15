@@ -552,7 +552,7 @@ class RomanNumeral(chord.Chord):
             thisChordStep = chordStepsToExamine[i]
             thisCorrect = correctSemitones[i]
             thisSemis = self.semitonesFromChordStep(thisChordStep)
-            if thisSemis == 0:
+            if thisSemis is None:
                 continue
             if thisSemis != thisCorrect:
                 faultyPitch = self.getChordStep(thisChordStep)

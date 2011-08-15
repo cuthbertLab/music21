@@ -58,29 +58,24 @@ class Chord(note.NotRest):
     Or you can combine already created Notes or Pitches:
 
     
-    >>> C = note.Note()
-    >>> C.name = 'C'
-    >>> E = note.Note()
-    >>> E.name = 'E'
-    >>> G = note.Note()
-    >>> G.name = 'G'
+    >>> Cnote = note.Note()
+    >>> Cnote.name = 'C'
+    >>> Enote = note.Note()
+    >>> Enote.name = 'E'
+    >>> Gnote = note.Note()
+    >>> Gnote.name = 'G'
     
 
     And then create a chord with note objects:    
 
 
-    >>> cmaj = chord.Chord([C, E, G])
+    >>> cmaj = chord.Chord([Cnote, Enote, Gnote])
 
     
     Chord has the ability to determine the root of a chord, as well as the bass note of a chord.
     In addition, Chord is capable of determining what type of chord a particular chord is, whether
     it is a triad or a seventh, major or minor, etc, as well as what inversion the chord is in. 
     
-    
-    NOTE: For now, the examples used in documentation give chords made from notes that are not
-    defined. In the future, it may be possible to define a chord without first creating notes,
-    but for now note that notes that appear in chords are simply shorthand instead of creating notes
-    for use in examples
     
     '''
     
@@ -1015,7 +1010,7 @@ class Chord(note.NotRest):
         '''
         Returns the number of semitones (mod12) above the root
         that the chordStep lies (i.e., 3 = third of the chord; 5 = fifth, etc.)
-        if one exists.  Or False if it does not exist.
+        if one exists.  Or None if it does not exist.
         
         You can optionally specify a note.Note object to try as the root.  It does
         not change the Chord.root object.  We use these methods to figure out
@@ -1047,48 +1042,76 @@ class Chord(note.NotRest):
         4
         >>> cchord.semitonesFromChordStep(5) # C to G
         7
-        >>> cchord.semitonesFromChordStep(6) # will return False
-        False
+        >>> print cchord.semitonesFromChordStep(6) # will return None
+        None
 
         >>> achord = chord.Chord(['a2', 'c4', 'c#5', 'e#7'])
         >>> achord.semitonesFromChordStep(3) # returns the semitones to the FIRST third.
         3
         >>> achord.semitonesFromChordStep(5) 
         8
-        >>> achord.semitonesFromChordStep(2) # will return False
-        False
+        >>> print achord.semitonesFromChordStep(2) # will return None
+        None
 
         '''
         tempInt = self.intervalFromChordStep(chordStep, testRoot)
-        if tempInt is False:
-            return False
+        if tempInt is None:
+            return None
         else:
             return tempInt.chromatic.mod12
     
     def _getThird(self):
-        '''shortcut for getChordStep(3)'''
+        '''shortcut for getChordStep(3)
+        
+        >>> from music21 import *
+        >>> cMaj1stInv = chord.Chord(['E3','C4','G5'])
+        >>> cMaj1stInv.third
+        E3
+        >>> cMaj1stInv.third.octave
+        3        
+        '''
         return self.getChordStep(3)
 
     third = property(_getThird)
 
     def _getFifth(self):
-        '''shortcut for getChordStep(5)'''
+        '''shortcut for getChordStep(5)
+        
+        >>> from music21 import *
+        >>> cMaj1stInv = chord.Chord(['E3','C4','G5'])
+        >>> cMaj1stInv.fifth
+        G5
+        >>> cMaj1stInv.fifth.midi
+        79
+
+        
+        '''
         return self.getChordStep(5)
     
     fifth = property(_getFifth)
     
     def _getSeventh(self):
-        '''shortcut for getChordStep(7)'''
+        '''shortcut for getChordStep(7)
+        
+        >>> from music21 import *
+        >>> bDim7_2ndInv = chord.Chord(['F2','A-3','B4','D5'])
+        >>> bDim7_2ndInv.seventh
+        A-3
+        '''
         return self.getChordStep(7)
     
     seventh = property(_getSeventh)
     
     def getChordStep(self, chordStep, testRoot = None):
         '''
-        Exactly like semitonesFromChordStep, except it returns the (first) pitch at the 
-        provided scaleDegree instead of the number of semitones.
+        Returns the (first) pitch at the 
+        provided scaleDegree (Thus, it's exactly like semitonesFromChordStep, except it 
+        instead of the number of semitones.)
         
-        example:
+        Returns None if none can be found.
+        
+        Example:
+        
         >>> from music21 import *
         >>> cmaj = chord.Chord(['C','E','G#'])
         >>> cmaj.getChordStep(3) # will return the third of the chord
@@ -1096,8 +1119,8 @@ class Chord(note.NotRest):
         >>> gis = cmaj.getChordStep(5) # will return the fifth of the chord
         >>> gis.name
         'G#'
-        >>> cmaj.getChordStep(6)
-        False
+        >>> print cmaj.getChordStep(6)
+        None
         '''
         if (testRoot is None):
             testRoot = self.root()
@@ -1107,7 +1130,7 @@ class Chord(note.NotRest):
             thisInterval = interval.notesToInterval(testRoot, thisPitch)
             if (thisInterval.diatonic.generic.mod7 == chordStep):
                 return thisPitch
-        return False
+        return None
     
     def intervalFromChordStep(self, chordStep, testRoot = None):
         '''Exactly like semitonesFromChordStep, except it returns the interval itself instead of the number
@@ -1122,8 +1145,8 @@ class Chord(note.NotRest):
         <music21.interval.Interval M3>
         >>> cmaj.intervalFromChordStep(5) #will return the interval between C and G
         <music21.interval.Interval P5>
-        >>> cmaj.intervalFromChordStep(6) #will return False
-        False
+        >>> print cmaj.intervalFromChordStep(6)
+        None
         '''
         if (testRoot is None):
             try:
@@ -1139,7 +1162,7 @@ class Chord(note.NotRest):
             if (thisInterval.diatonic.generic.mod7 == chordStep):
                 return thisInterval
 
-        return False
+        return None
 
     def hasRepeatedChordStep(self, chordStep, testRoot = None):
         '''Returns True if chordStep above testRoot (or self.root()) has two
@@ -1176,6 +1199,7 @@ class Chord(note.NotRest):
         scale degrees, return false.
         
         example:
+        
         >>> from music21 import *
         >>> cchord = chord.Chord (['C', 'E', 'E-', 'G'])
         >>> other = chord.Chord (['C', 'E', 'F-', 'G'])
@@ -1194,6 +1218,7 @@ class Chord(note.NotRest):
         "Contains vs. Is": A dominant-seventh chord contains a triad.
         
         example:
+        
         >>> from music21 import *
         >>> cchord = chord.Chord(['C', 'E', 'G'])
         >>> other = chord.Chord(['C', 'D', 'E', 'F', 'G'])
@@ -1204,8 +1229,6 @@ class Chord(note.NotRest):
         >>> scale = chord.Chord(['C', 'D-', 'E', 'F#', 'G', 'A#', 'B'])
         >>> scale.containsTriad() #returns True
         True
-
-
         '''
         try:
             third = self.third
@@ -1213,7 +1236,7 @@ class Chord(note.NotRest):
         except ChordException:
             return True  # the only reason it cannot find a third or a fifth is that there is a complete 7-note diatonic scale present.
 
-        if (third is False or fifth is False):
+        if (third is None or fifth is None):
             return False
         else:
             return True
@@ -1226,6 +1249,7 @@ class Chord(note.NotRest):
         equivalent to either of those notes. Only returns True if triad is spelled correctly.
         
         example:
+        
         >>> from music21 import *
         >>> cchord = chord.Chord(['C', 'E', 'G'])
         >>> other = chord.Chord(['C', 'D', 'E', 'F', 'G'])
@@ -1239,7 +1263,6 @@ class Chord(note.NotRest):
         >>> incorrectlySpelled.pitches[1].getEnharmonic(inPlace = True)
         >>> incorrectlySpelled.isTriad()
         True
-
         '''
         try:
             third = self.third
@@ -1247,7 +1270,7 @@ class Chord(note.NotRest):
         except ChordException:
             return False
 
-        if (third is False or fifth is False):
+        if (third is None or fifth is None):
             return False
         
         for thisPitch in self.pitches:
@@ -1263,8 +1286,10 @@ class Chord(note.NotRest):
         return True
 
     def containsSeventh(self):
-        ''' returns True if the chord contains at least one of each of Third, Fifth, and Seventh.
+        ''' 
+        Returns True if the chord contains at least one of each of Third, Fifth, and Seventh.
         raises an exception if the Root can't be determined
+        
         
         >>> from music21 import *
         >>> cchord = chord.Chord(['C', 'E', 'G', 'B'])
@@ -1279,18 +1304,20 @@ class Chord(note.NotRest):
         fifth = self.fifth
         seventh = self.seventh
 
-        if (third is False or fifth is False or seventh is False):
+        if (third is None or fifth is None or seventh is None):
             return False
         else:
             return True
         
 
     def isSeventh(self):
-        '''Returns True if chord contains at least one of each of Third, Fifth, and Seventh,
+        '''
+        Returns True if chord contains at least one of each of Third, Fifth, and Seventh,
         and every note in the chord is a Third, Fifth, or Seventh, such that there are no 
         repeated scale degrees (ex: E and E-). Else return false.
         
-        example:
+        Example:
+        
         >>> from music21 import *
         >>> cchord = chord.Chord(['C', 'E', 'G', 'B'])
         >>> other = chord.Chord(['C', 'D', 'E', 'F', 'G', 'B'])
@@ -1306,7 +1333,7 @@ class Chord(note.NotRest):
         except ChordException:
             return False
 
-        if (third is False or fifth is False or seventh is False):
+        if (third is None or fifth is None or seventh is None):
             return False
 
         if self.hasAnyRepeatedDiatonicNote():
@@ -1320,12 +1347,14 @@ class Chord(note.NotRest):
         return True
 
     def isMajorTriad(self):
-        '''Returns True if chord is a Major Triad, that is, if it contains only notes that are
+        '''
+        Returns True if chord is a Major Triad, that is, if it contains only notes that are
         either in unison with the root, a major third above the root, or a perfect fifth above the 
         root. Additionally, must contain at least one of each third and fifth above the root.
         Chord must be spelled correctly. Otherwise returns false.
         
-        example:
+        Example:
+        
         >>> from music21 import *
         >>> cchord = chord.Chord(['C', 'E', 'G'])
         >>> other = chord.Chord(['C', 'G'])
@@ -1339,7 +1368,7 @@ class Chord(note.NotRest):
             fifth = self.fifth
         except ChordException:
             return False
-        if (third == False or fifth == False):
+        if (third is None or fifth is None):
             return False
  
         ### TODO: rewrite so that [C,E+++,G---] does not return True
@@ -1352,12 +1381,14 @@ class Chord(note.NotRest):
         return True
 
     def isMinorTriad(self):
-        '''Returns True if chord is a Minor Triad, that is, if it contains only notes that are
+        '''
+        Returns True if chord is a Minor Triad, that is, if it contains only notes that are
         either in unison with the root, a minor third above the root, or a perfect fifth above the 
         root. Additionally, must contain at least one of each third and fifth above the root.
         Chord must be spelled correctly. Otherwise returns false.
         
-        example:
+        Example:
+        
         >>> from music21 import *
         >>> cchord = chord.Chord(['C', 'E-', 'G'])
         >>> other = chord.Chord(['C', 'E', 'G'])
@@ -1371,7 +1402,7 @@ class Chord(note.NotRest):
             fifth = self.fifth
         except ChordException:
             return False
-        if (third == False or fifth == False):
+        if (third is None or fifth is None):
             return False
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(self.root(), thisPitch)
@@ -1410,7 +1441,7 @@ class Chord(note.NotRest):
         except ChordException:
             return False
         
-        if (third == False):
+        if (third is None):
             return False
  
         for thisPitch in self.pitches:
@@ -1444,7 +1475,7 @@ class Chord(note.NotRest):
             third = self.third
         except ChordException:
             return False
-        if (third == False):
+        if (third is None):
             return False
  
         for thisPitch in self.pitches:
@@ -1478,7 +1509,7 @@ class Chord(note.NotRest):
         except ChordException:
             return False
         
-        if (third is False or fifth is False):
+        if (third is None or fifth is None):
             return False
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(self.root(), thisPitch)
@@ -1493,7 +1524,7 @@ class Chord(note.NotRest):
         root. Additionally, must contain at least one of each third and fifth above the root.
         Chord might NOT seem to have to be spelled correctly because incorrectly spelled Augmented Triads are
         usually augmented triads in some other inversion (e.g. C-E-Ab is a 2nd inversion aug triad; C-Fb-Ab
-        is 1st inversion).  However, B#-Fb-Ab does return false as expeccted). 
+        is 1st inversion).  However, B#-Fb-Ab does return False as expeccted). 
         
         Returns false if is not an augmented triad.
         
@@ -1525,7 +1556,7 @@ class Chord(note.NotRest):
         except ChordException:
             return False
 
-        if (third == False or fifth == False):
+        if (third is None or fifth is None):
             return False
                 
         for thisPitch in self.pitches:
@@ -1552,7 +1583,7 @@ class Chord(note.NotRest):
         except ChordException:
             return False
                 
-        if (third == False or fifth == False or seventh == False):
+        if (third is None or fifth is None or seventh is None):
             return False
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(self.root(), thisPitch)
@@ -1580,7 +1611,7 @@ class Chord(note.NotRest):
         except ChordException:
             return False
         
-        if (third is False or fifth is False or seventh is False):
+        if (third is None or fifth is None or seventh is None):
             return False
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(self.root(), thisPitch)
@@ -1617,7 +1648,7 @@ class Chord(note.NotRest):
         except ChordException:
             return False
         
-        if (third is False or fifth is False or seventh is False):
+        if (third is None or fifth is None or seventh is None):
             return False
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(self.root(), thisPitch)
@@ -1653,7 +1684,7 @@ class Chord(note.NotRest):
                 fifth = True
             elif (thisInterval.chromatic.mod12 == 9):
                 seventh = True
-        if (third is False or fifth is False or seventh is False):
+        if (third is None or fifth is None or seventh is None):
             return False
         
         return True
@@ -1764,16 +1795,37 @@ class Chord(note.NotRest):
         return True
 
     def isFrenchAugmentedSixth(self):        
+        '''
+        Returns True if the chord is a French augmented sixth chord 
+        (flat 6th scale degree in bass, tonic, second scale degree, and raised 4th).
+        
+        
+        N.B. The findRoot() method of music21.chord Chord determines 
+        the root based on the note with
+        the most thirds above it. However, under this definition, a 
+        1st-inversion french augmented sixth chord
+        resembles a second inversion chord, not the first inversion 
+        subdominant chord it is based
+        upon. We fix this by adjusting the root. First, however, we 
+        check to see if the chord is
+        in second inversion to begin with, otherwise its not 
+        a Fr+6 chord. This is to avoid ChordException errors.
+        
+        
+        >>> from music21 import *
+        >>> fr6a = chord.Chord(['A-3','C4','D4','F#4'])
+        >>> fr6a.isFrenchAugmentedSixth()
+        True
+        >>> fr6b = chord.Chord(['A-3','C4','E--4','F#4'])
+        >>> fr6b.isFrenchAugmentedSixth()
+        False
+
+        '''
+        
         augSixthChord = self.removeRedundantPitchNames(inPlace = False)
     
         ### Fr+6 => Minor sixth scale step in bass, tonic, raised 4th + second scale degree.
         
-        ### The findRoot() method of music21.chord Chord determines the root based on the note with
-        ### the most thirds above it. However, under this definition, a french augmented sixth chord
-        ### resembles a second inversion chord, not the first inversion subdominant chord it is based
-        ### upon. We fix this by adjusting the root. First, however, we check to see if the chord is
-        ### in second inversion to begin with, otherwise its not a Fr+6 chord. This is to avoid 
-        ### ChordException errors.
         if not augSixthChord.inversion() == 2:
             return False    
         augSixthChord.root(augSixthChord.getChordStep(3))
@@ -2039,7 +2091,7 @@ class Chord(note.NotRest):
         elif self.hasRepeatedChordStep(3):
             #environLocal.printDebug('self.hasRepeatedChordStep(3)', self.hasRepeatedChordStep(3))
             return "other"
-        elif fifth is False:
+        elif fifth is None:
             if third == 4:
                 return "major"
             elif third == 3:
@@ -2142,7 +2194,7 @@ class Chord(note.NotRest):
         except ChordException:
             return None
         
-        if self.isSeventh() or self.seventh is not False:
+        if self.isSeventh() or self.seventh is not None:
             if inv == 0:
                 return 7
             elif inv == 1:
@@ -2163,12 +2215,16 @@ class Chord(note.NotRest):
             else:
                 raise ChordException("Not a normal inversion")
         else:
-            raise ChordException("Not a triad")
+            raise ChordException("Not a triad or Seventh, cannot determine inversion.")
  
     def closedPosition(self, forceOctave=None, inPlace=False):
-        '''Returns a new Chord object with the same pitch classes, but now in closed position.
+        '''Returns a new Chord object with the same pitch classes, 
+        but now in closed position.
 
-        If `forcedOctave` is provided, the bass of the chord will be shifted to that provided octave.
+        If `forcedOctave` is provided, the bass of the chord will 
+        be shifted to that provided octave.
+
+        If inPlace is True then the original chord is returned with new pitches.
 
         >>> from music21 import *
         >>> chord1 = chord.Chord(["C#4", "G5", "E6"])
@@ -2180,9 +2236,14 @@ class Chord(note.NotRest):
         >>> str(c2.closedPosition(2).pitches)
         '[C#2, E2, G2]'
 
-        >>> c2 = chord.Chord(["C#4", "G5", "E6"])
-        >>> str(c2.closedPosition(6).pitches)
+        >>> c3 = chord.Chord(["C#4", "G5", "E6"])
+        >>> str(c3.closedPosition(6).pitches)
         '[C#6, E6, G6]'
+
+        >>> c4 = chord.Chord(["C#4", "C5", "F7"])
+        >>> c4.closedPosition(4, inPlace = True)
+        >>> str(c4.pitches)
+        '[C#4, F4, C5]'
         '''
         #environLocal.printDebug(['calling closedPosition()', inPlace])
         if inPlace:
@@ -2213,9 +2274,12 @@ class Chord(note.NotRest):
                 p.octave -= 1      
 
         # if not inPlace, creates a second new chord object!
-        return returnObj.sortAscending(inPlace=True) 
+        if inPlace == False:
+            return returnObj.sortAscending(inPlace=True) 
+        else:
+            returnObj.sortAscending(inPlace = True)
 
-    def semiClosedPosition(self):
+    def _semiClosedPosition(self):
         '''
         TODO: Write
         
@@ -3115,8 +3179,8 @@ class Test(unittest.TestCase):
         HighAFlat.octave = 5
         
         chord2 = Chord([MiddleC, HighEFlat, LowG, HighAFlat])
-        assert chord1.third is not False
-        assert chord1.fifth is not False
+        assert chord1.third is not None
+        assert chord1.fifth is not None
         assert chord1.containsTriad()  == True
         assert chord1.isTriad() == True
         assert chord2.containsTriad() == True
@@ -3194,10 +3258,10 @@ class Test(unittest.TestCase):
         
         chord13 = Chord([MiddleC, MiddleE, LowG, LowGFlat])
         
-        assert chord13.getChordStep(5) is not False
+        assert chord13.getChordStep(5) is not None
         assert chord13.hasRepeatedChordStep(5) == True
         assert chord13.hasAnyRepeatedDiatonicNote() == True
-        assert chord13.getChordStep(2) == False
+        assert chord13.getChordStep(2) is None
         assert chord13.containsTriad() == True
         assert chord13.isTriad() == False
         
