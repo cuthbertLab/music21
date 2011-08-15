@@ -3804,40 +3804,66 @@ class Pitch(music21.Music21Object):
                 self.accidental = Accidental('natural')
                 self.accidental.displayStatus = True
                 
-    def getHarmonicChord(self, chord):
+    def getStringHarmonic(self, chordIn):
         '''Given a chord, determines whether the chord constitutes a string harmonic and then
-        returns the proper sounding pitch.
-        
+        returns a new chord with the proper sounding pitch added.
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note('d3')
+        >>> n2 = note.Note('g3')
+        >>> n2.notehead = 'diamond'
+        >>> n2.noteheadFill = 'no'
+        >>> p1 = pitch.Pitch('d3')
+        >>> harmChord = chord.Chord([n1, n2])
+        >>> newChord = p1.getStringHarmonic(harmChord)
+        >>> pitchList = newChord.pitches
+        >>> pitchList
+        [D3, G3, D5]
         
         '''
         
         #Takes in a chord, finds the interval between the notes
-        pitchList = chord.getPitches()
+        from music21 import note, pitch, chord
+        
+        pitchList = chordIn.pitches
         isStringHarmonic = False
         
-        if chord.getNotehead(pitchList[1]) == 'diamond':
+        if chordIn.getNotehead(pitchList[1]) == 'diamond':
             isStringHarmonic = True 
-        
-        if isStringHarmonic == True:
-            interval = interval.notesToChromatic(pitchList[0], pitchList[1])
-            if interval == 12:
-                soundingPitch = pitchList[0].getHarmonic(2)
-            elif interval == 7:
-                soundingPitch = pitchList[0].getHarmonic(3)
-            elif interval == 5:
-                soundingPitch = pitchList[0].getHarmonic(4)
-            elif interval == 4:
-                soundingPitch = pitchList[0].getHarmonic(5)
-            elif interval == 3:
-                soundingPitch = pitchList[0].getHarmonic(6) 
-            elif interval == 6:
-                soundingPitch = pitchList[0].getHarmonic(7)
-            elif interval == 8:
-                soundingPitch = pitchList[0].getHarmonic(8)
             
-        noteOut = note.Note(soundingPitch.getNameWithOctave)
+        if isStringHarmonic == True:
+            chordInt = interval.notesToChromatic(pitchList[0], pitchList[1])
+            
+            if chordInt.intervalClass == 12:
+                soundingPitch = pitchList[0].getHarmonic(2)
+            elif chordInt.intervalClass == 7:
+                soundingPitch = pitchList[0].getHarmonic(3)
+            elif chordInt.intervalClass == 5:
+                soundingPitch = pitchList[0].getHarmonic(4)
+            elif chordInt.intervalClass == 4:
+                soundingPitch = pitchList[0].getHarmonic(5)
+            elif chordInt.intervalClass == 3:
+                soundingPitch = pitchList[0].getHarmonic(6) 
+            elif chordInt.intervalClass == 6:
+                soundingPitch = pitchList[0].getHarmonic(7)
+            elif chordInt.intervalClass == 8:
+                soundingPitch = pitchList[0].getHarmonic(8)
+            else:
+                #make this give an error or something
+                soundingPitch = pitchList[0]
+            
+        noteOut = note.Note(soundingPitch.nameWithOctave)
         noteOut.noteheadParen = True
         noteOut.noteheadFill = 'filled'
+        pitchList.append(noteOut.pitch)
+        
+        #to do: make note small and get rid of stem
+        
+        chordOut = chord.Chord(pitchList)
+        
+        return chordOut
+        
         
         
             
@@ -4380,7 +4406,8 @@ class Test(unittest.TestCase):
             p.frequency = fq
             pList.append(p)
         self.assertEqual(str(pList), '[A4, A~4(+21c), B`4(-11c), B4(+4c), B~4(+17c), C~5(-22c), C#5(-14c), C#~5(-7c), C##5(-2c), D~5(+1c), E-5(+3c), E`5(+3c), E5(+2c), E~5(-1c), F5(-4c), F~5(-9c), F#5(-16c), F#~5(-23c), F#~5(+19c), G5(+10c), G~5(-1c), G#5(-12c), G#~5(-24c), G#~5(+14c)]')
-
+        
+        
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Pitch, Accidental]
