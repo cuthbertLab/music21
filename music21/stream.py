@@ -3157,6 +3157,7 @@ class Stream(music21.Music21Object):
         return map
 
 
+
     def _getVoices(self):
         '''        
         '''
@@ -4108,7 +4109,7 @@ class Stream(music21.Music21Object):
     ''')
 
     def makeMeasures(self, meterStream=None, refStreamOrTimeRange=None,
-        searchContext=False, innerBarline=None, lastBarline='final', inPlace=False):
+        searchContext=False, innerBarline=None, finalBarline='final', inPlace=False):
         '''
         Takes a stream and places all of its elements into 
         measures (:class:`~music21.stream.Measure` objects) 
@@ -4144,7 +4145,7 @@ class Stream(music21.Music21Object):
         
         (3) If `innerBarline` is not None, the specified Barline object or string-specification of Barline style will be used to create Barline objects between every created Measure. The default is None.
 
-        (4) If `lastBarline` is not None, the specified Barline object or string-specification of Barline style will be used to create a Barline objects at the end of the last Measure. The default is 'final'.
+        (4) If `finalBarline` is not None, the specified Barline object or string-specification of Barline style will be used to create a Barline objects at the end of the last Measure. The default is 'final'.
 
         The `searchContext` parameter determines whether or not context searches are used to find Clef and other notation objects. 
 
@@ -4457,8 +4458,8 @@ class Stream(music21.Music21Object):
                 if innerBarline not in ['regular', None]:
                     m.rightBarline = innerBarline
             else:
-                if lastBarline not in ['regular', None]:
-                    m.rightBarline = lastBarline
+                if finalBarline not in ['regular', None]:
+                    m.rightBarline = finalBarline
 
         if not inPlace:
             return post # returns a new stream populated w/ new measure streams
@@ -5073,12 +5074,10 @@ class Stream(music21.Music21Object):
         else:
             measureStream = copy.deepcopy(self)
 
-        '''
-        if 'lastBarline' in subroutineKeywords:
-            lastBarlineType = subroutineKeywords['lastBarline']
-        else:
-            lastBarlineType = 'final'
-        '''
+#         if 'finalBarline' in subroutineKeywords:
+#             lastBarlineType = subroutineKeywords['finalBarline']
+#         else:
+#             lastBarlineType = 'final'
         
         # only use inPlace arg on first usage
         if not self.hasMeasures():
@@ -5087,7 +5086,7 @@ class Stream(music21.Music21Object):
             # use inPlace=True, as already established above
             measureStream.makeMeasures(meterStream=meterStream,
                 refStreamOrTimeRange=refStreamOrTimeRange, 
-                inPlace=True)#, lastBarline = lastBarlineType)
+                inPlace=True)#, finalBarline = lastBarlineType)
           
         #environLocal.printDebug(['Stream.makeNotation(): post makeMeasures, length', len(measureStream)])
 
@@ -11467,7 +11466,7 @@ class Test(unittest.TestCase):
 
 
         # this all works fine
-        sMeasures = s2.makeMeasures(lastBarline='regular')
+        sMeasures = s2.makeMeasures(finalBarline='regular')
         self.assertEqual(len(sMeasures), 1)
         self.assertEqual(len(sMeasures.getElementsByClass('Measure')), 1) # one measure
         self.assertEqual(len(sMeasures[0]), 3) 
@@ -11782,7 +11781,7 @@ class Test(unittest.TestCase):
             '<music21.bar.Barline style=final>')
         #barred1.show()
 
-        barred2 = s.makeMeasures(innerBarline='dashed', lastBarline='double')
+        barred2 = s.makeMeasures(innerBarline='dashed', finalBarline='double')
         match = [str(m.rightBarline) for m in 
             barred2.getElementsByClass('Measure')]
         self.assertEqual(match, ['<music21.bar.Barline style=dashed>', '<music21.bar.Barline style=dashed>', '<music21.bar.Barline style=dashed>', '<music21.bar.Barline style=double>'])
@@ -11791,14 +11790,14 @@ class Test(unittest.TestCase):
         # try using bar objects
         bar1 = bar.Barline('none')
         bar2 = bar.Barline('short')
-        barred3 = s.makeMeasures(innerBarline=bar1, lastBarline=bar2)
+        barred3 = s.makeMeasures(innerBarline=bar1, finalBarline=bar2)
         #barred3.show()
         match = [str(m.rightBarline) for m in 
             barred3.getElementsByClass('Measure')]
         self.assertEqual(match, ['<music21.bar.Barline style=none>', '<music21.bar.Barline style=none>', '<music21.bar.Barline style=none>', '<music21.bar.Barline style=short>'])
 
         # setting to None will not set a barline object at all        
-        barred4 = s.makeMeasures(innerBarline=None, lastBarline=None)
+        barred4 = s.makeMeasures(innerBarline=None, finalBarline=None)
         match = [str(m.rightBarline) for m in 
             barred4.getElementsByClass('Measure')]
         self.assertEqual(match, ['None', 'None', 'None', 'None'] )
@@ -13599,7 +13598,7 @@ class Test(unittest.TestCase):
         sSub.augmentOrDiminish(2, inPlace=True)
 
         # explicitly call make measures and make ties
-        mStream = sSub.makeMeasures(lastBarline=None)
+        mStream = sSub.makeMeasures(finalBarline=None)
         mStream.makeTies(inPlace=True)
 
         self.assertEqual(len(mStream.flat), 45)
