@@ -1239,7 +1239,6 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    print translate.partToBraille(example11_1(), segmentStartMeasureNumbers = [9])
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
