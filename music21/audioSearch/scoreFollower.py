@@ -37,7 +37,6 @@ def runscoreFollower(show=True, scoreStream=None, plot=True, useMic=False,
     scoreNotesOnly = scoreStream.flat.notesAndRests
     WAVE_FILENAME = "xmas.wav"    
     lastNotePosition = 0
-    offset = 0
     totsamples = 0
     totalfile = 10
     notePrediction = 0
@@ -46,7 +45,7 @@ def runscoreFollower(show=True, scoreStream=None, plot=True, useMic=False,
     seconds_recording = 10
     countdown = 0
     END_OF_SCORE = False
-    begin = True
+    begins = True
     lengthFixed = False
     qle = None
     while(lastNotePosition < len(scoreNotesOnly)) and (totsamples < totalfile) and (END_OF_SCORE == False):
@@ -58,11 +57,12 @@ def runscoreFollower(show=True, scoreStream=None, plot=True, useMic=False,
         detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
         (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
         (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
-        myScore, lengthFixed, qle = notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, lastNotePosition=lastNotePosition, lengthFixed=lengthFixed, qle=qle) 
-        numberNotesRecording = len(myScore.flat.notesAndRests)
+        scNotes = scoreStream[lastNotePosition:lastNotePosition + len(notesList)]
+        print "long", lastNotePosition, lastNotePosition + len(notesList)
+        transcribedScore, lengthFixed, qle = notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, lengthFixed=lengthFixed, qle=qle) 
         print "FORA", lengthFixed
-        #myScore.show('text')
-        totalLengthPeriod, lastNotePosition, prob, END_OF_SCORE, result, countdown = matchingNotes(scoreStream, myScore, numberNotesRecording, notePrediction, lastNotePosition, result, countdown)
+        #transcribedScore.show('text')
+        totalLengthPeriod, lastNotePosition, prob, END_OF_SCORE, result, countdown = matchingNotes(scoreStream, transcribedScore, notePrediction, lastNotePosition, result, countdown)
         if countdown >= 5:
             END_OF_SCORE = True # Exit due to bad recognition or rests
             print "Exit due to bad recognition or rests"
@@ -74,40 +74,35 @@ def runscoreFollower(show=True, scoreStream=None, plot=True, useMic=False,
         slots = 0 # will be the number of slots of the score during the processing time        
         if END_OF_SCORE == False:
             while middleRhythm < extraLength:
-                middleRhythm = middleRhythm + scNotes[lastNotePosition + slots + 1].quarterLength
+                middleRhythm = middleRhythm + scoreNotesOnly[lastNotePosition + slots].quarterLength
                 slots = slots + 1                
             if countdown == 0:
                 notePrediction = int(slots + lastNotePosition)
             else:
                 print "!!!!!!!!!COUNTDOWN!!!!!!", countdown
                 if countdown == 2:
-                    print "SEARCH IN ALL THE SCORE; MAYBE THE MUSICIAN HAS STARTED FROM THE BEGINNING"
+                    print "SEARCHING IN ALL THE SCORE; MAYBE THE MUSICIAN HAS STARTED FROM THE BEGINNING"
                     lastNotePosition = 0
                     notePrediction = 0
                     
             #new note?
             lengthForward = 0
-            offset = 0        
-#            while(lastNotePosition + offset < len(scNotes))and(lengthForward < extraLength):
-#                lengthForward = lengthForward + scNotes[lastNotePosition + offset].quarterLength
-#                offset = offset + 1   
-            if prob < 0.7 and begin == True: #to avoid silence at the beginning
+            if prob < 0.7 and begins == True: #to avoid silence at the beginning
                 lastNotePosition = 0
-                offset = 0
                 notePrediction = 0
                 lengthFixed = False
                 print "Silence or noise at the beginning"
             else:
-                begin = False
+                begins = False
                 print "GO!"
                 seconds_recording = seconds # not needed
-            #environLocal.printDebug('Time elapsed: %.3f s' % (time() - time_start))
-            if useMic == False: # reading from the disc (only for TESTSSSSS)
+
+            if useMic == False: # reading from the disc (only for TESTS)
                 fre, wv, totsamples, totalfile = getFrequenciesFromAudio(record=False, length=processing_time, waveFilename='xmas.wav', entireFile=False, wv=wvfd, totsamples=totsamples)
                 print "MOSTRES LLEGIDES ABAIX:       ----  %d/%d = %d º/o" % (totsamples, totalfile, totsamples * 100 / totalfile)
             
     if show == True:
-        #myScore.show()    
+        #transcribedScore.show()    
         pass    
     result.show('text')
     result.show()
@@ -115,7 +110,7 @@ def runscoreFollower(show=True, scoreStream=None, plot=True, useMic=False,
         matplotlib.pyplot.plot(listplot)
         matplotlib.pyplot.show()
     environLocal.printDebug("* END")
-    return myScore
+    return transcribedScore
 
 if __name__ == '__main__':
     #scoreNotes = ["d8", "b8", "a8", "g8", "d2", "b8", "a8", "g8", "e2", "c'8", "b8", "a8", "f#2", "d8", "e8", "d8", "c8", "a8", "b8", "r4", "d4", "b4", "a4", "g4", "d4", "b4", "a4", "g4", "e4", "c4", "b4", "a4", "d4", "e4", "d4", "c4", "a4", "g4", "b4", "d4", "g4", "a4", "b4", "c4", "b4", "a4", "b4", "a4", "d4", "b4", "d4", "g4", "a4", "b4", "c4", "b4", "d4", "c4", "a4", "g4"]

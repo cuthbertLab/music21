@@ -499,7 +499,7 @@ def quantizeDuration(length):
     return finalLength / 100
 
 
-def quarterLengthEstimation(durationList, mostRepeatedQuarterLength = 1.0):
+def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
     '''
     takes a list of lengths of notes (measured in
     audio samples) and tries to estimate using
@@ -539,7 +539,9 @@ def quarterLengthEstimation(durationList, mostRepeatedQuarterLength = 1.0):
     while pdf[i] != max(pdf):
         i = i - 1
     qle = (bins[i] + bins[i + 1]) / 2.0
-            
+    
+    if mostRepeatedQuarterLength == 0:
+        mostRepeatedQuarterLength = 1.0
     binPosition = 0 - math.log(mostRepeatedQuarterLength, 2)
     qle = qle * math.pow(2, binPosition) # it normalizes the length to a quarter note
         
@@ -552,7 +554,7 @@ def quarterLengthEstimation(durationList, mostRepeatedQuarterLength = 1.0):
 
 
     
-def notesAndDurationsToStream(notesList, durationList, scNotes=None, lastNotePosition=None, 
+def notesAndDurationsToStream(notesList, durationList, scNotes=None,
                               removeRestsAtBeginning=True, lengthFixed=None, qle=None):
     '''
     take a list of :class:`~music21.note.Note` objects or rests
@@ -592,7 +594,9 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None, lastNotePos
     # will take more processing time
     if scNotes != None and lengthFixed == False:
         fe = features.native.MostCommonNoteQuarterLength(scNotes)
-        mostCommon = fe.extract().vector[0]
+        mostCommon = fe.extract().vector[0]        
+        print "mostCommon", mostCommon
+        
         qle = quarterLengthEstimation(durationList, mostCommon)
     elif scNotes == None: # this is for the transcriber 
         qle = quarterLengthEstimation(durationList)    
@@ -629,8 +633,9 @@ def decisionProcess(list, notePrediction, beginningData, lastNotePosition, count
     while i < len(list) and beginningData[int(list[i].id)] < notePrediction:
         i = i + 1
         position = i
-    if len(list) == 1: # it happens when you don't play anything during recording period
+    if len(list) == 1: # it happens when you don't play anything during a recording period
         position = 0
+        print "it happens when you don't play anything during a recording period"
 
     dist = math.fabs(beginningData[0] - notePrediction)
     for i in range(len(list)):
@@ -643,12 +648,10 @@ def decisionProcess(list, notePrediction, beginningData, lastNotePosition, count
     #print "ERRORS", position, len(list), lastNotePosition, list[position].matchProbability , beginningData[int(list[position].id)]
     if position < len(list) and beginningData[int(list[position].id)] <= lastNotePosition:
         print " error ? ", beginningData[int(list[position].id)], lastNotePosition    
-    print "DECISION: %d amb prob %f i dist %f i comenca a %f" % (position, list[position].matchProbability, dist, beginningData[int(list[position].id)])
+    print "DECISION: %d prob %f  distance %f  starts at %f" % (position, list[position].matchProbability, dist, beginningData[int(list[position].id)])
     if list[position].matchProbability < 0.6 or len(list) == 1: #the latter for the all-rest case
         print "ARE YOU SURE YOU ARE PLAYING THE RIGHT SONG??"
         countdown = countdown + 1
-        if countdown == 2:
-            print "SEARCH IN THE WHOLE SCORE!!!"
     else:
         countdown = 0
     if dist > 20:
@@ -656,11 +659,11 @@ def decisionProcess(list, notePrediction, beginningData, lastNotePosition, count
     return position, countdown
 
 
-def matchingNotes(scoreStream, transcribedScore, numberNotesRecording, notePrediction, lastNotePosition, result, countdown):
+def matchingNotes(scoreStream, transcribedScore, notePrediction, lastNotePosition, result, countdown):#i'll remove "result" soon
     '''
     '''
     # Analyzing streams
-    tn_recording = int(numberNotesRecording)
+    tn_recording = int(len(transcribedScore.flat.notesAndRests))
     totScores = []
     beginningData = []
     lengthData = []
@@ -689,7 +692,7 @@ def matchingNotes(scoreStream, transcribedScore, numberNotesRecording, notePredi
         scNotes.id = name
         totScores.append(scNotes)  
 
-    l = search.approximateNoteSearch(transcribedScore.flat.notes, totScores)
+    listOfParts = search.approximateNoteSearch(transcribedScore.flat.notes, totScores)
 #    print "printo prob", len(totScores)  
 #    for i in l:
 #        print i.id, i.matchProbability#, totScores[i]
@@ -700,36 +703,37 @@ def matchingNotes(scoreStream, transcribedScore, numberNotesRecording, notePredi
         notePrediction = len(scoreStream) - tn_recording - hop - 1
         END_OF_SCORE = True
         print "************++++ LAST PART OF THE SCORE ++++**************"
-    position, countdown = decisionProcess(l, notePrediction, beginningData, lastNotePosition, countdown)
+    position, countdown = decisionProcess(listOfParts, notePrediction, beginningData, lastNotePosition, countdown)
     try:
-        print "measure: " + l[position][0].measureNumber     
+        print "measure: " + listOfParts[position][0].measureNumber     
     except:
         pass
-    totalLength = 0
     
-    number = int(l[position].id)
-    result.append(l[number])
-    #print "APPEND", l[number]
-    #print "TROS SCORE", lengthData[number], "LEN DATA[number]", len(totScores[number]), "length totScores[number]"
-
-#    for t in range(len(totScores[number])):
-#        print totScores[number][t]
-#    print "beginningData", beginningData[number], "lenTotScores"
+    totalLength = 0    
+    number = int(listOfParts[position].id)
+    if result != None:
+        result.append(listOfParts[number])
+    
+    if countdown != 0:
+        probabilityHit = 0
+    else:
+        probabilityHit = listOfParts[position].matchProbability
     for i in range(len(totScores[number])):
         totalLength = totalLength + totScores[number][i].quarterLength
 
     if countdown == 0:   
-        lastNotePosition = beginningData[number] + lengthData[number] #- 1
-    if lastNotePosition < len(scoreStream) / 4:
-        print "--------------------------1", lastNotePosition, len(scoreStream) / 4, len(scoreStream)
-    elif lastNotePosition < len(scoreStream) / 2:
-        print "--------------------------2", lastNotePosition, len(scoreStream) / 2, len(scoreStream)
-    elif lastNotePosition < len(scoreStream) * 3 / 4:
-        print "--------------------------2", lastNotePosition, len(scoreStream) * 3 / 4, len(scoreStream)
-    else: 
-        print "--------------------------2", lastNotePosition, len(scoreStream), len(scoreStream)
+        lastNotePosition = beginningData[number] + lengthData[number]
         
-    return totalLength, lastNotePosition, l[0].matchProbability, END_OF_SCORE, result, countdown
+#    if lastNotePosition < len(scoreStream) / 4:
+#        print "--------------------------1", lastNotePosition, len(scoreStream) / 4, len(scoreStream)
+#    elif lastNotePosition < len(scoreStream) / 2:
+#        print "--------------------------2", lastNotePosition, len(scoreStream) / 2, len(scoreStream)
+#    elif lastNotePosition < len(scoreStream) * 3 / 4:
+#        print "--------------------------2", lastNotePosition, len(scoreStream) * 3 / 4, len(scoreStream)
+#    else: 
+#        print "--------------------------2", lastNotePosition, len(scoreStream), len(scoreStream)
+        
+    return totalLength, lastNotePosition, probabilityHit, END_OF_SCORE, result, countdown #i'll remove "result" later,it's only to see if it works
     
 class AudioSearchException(music21.Music21Exception):
     pass

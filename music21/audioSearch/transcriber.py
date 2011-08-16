@@ -64,7 +64,7 @@ def runTranscribe(show=True, plot=True, useMic=True,
     
     # the rest of the score
     time_start = time()
-    freqFromAQList, wv, totsamp, samp = getFrequenciesFromAudio(record=useMic, length=seconds, waveFilename=WAVE_FILENAME, entireFile=False, wv=None)
+    freqFromAQList, wv, totsamp, samp = getFrequenciesFromAudio(record=useMic, length=seconds, waveFilename=WAVE_FILENAME, wholeFile=False, wv=None)
     detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale)
     detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
     (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
