@@ -20,7 +20,7 @@ def applyCapua(thisWork):
         applyCapuaSnippet(thisSnippet)
 
 def applyCapuaSnippet(thisPolyphonicSnippet):
-    for thisStream in thisPolyphonicSnippet.streams:
+    for thisStream in thisPolyphonicSnippet.parts:
         applyCapuaStream(thisStream)
 
 def applyCapuaStream(thisStream):
@@ -44,7 +44,7 @@ def capuaRuleOne(srcStream):
     '''
     numChanged = 0
     
-    ssn = srcStream.notesAndRests
+    ssn = srcStream.flat.notesAndRests
     for i in range(0, len(ssn)-2):
         n1 = ssn[i]
         n2 = ssn[i+1]
@@ -100,7 +100,7 @@ def capuaRuleTwo(srcStream):
     '''
     numChanged = 0
 
-    ssn = srcStream.notesAndRests
+    ssn = srcStream.flat.notesAndRests
     for i in range(0, len(ssn)-3):
         n1 = ssn[i]
         n2 = ssn[i+1]
@@ -167,7 +167,7 @@ def capuaRuleThree(srcStream):
     '''
     numChanged = 0
     
-    ssn = srcStream.notesAndRests
+    ssn = srcStream.flat.notesAndRests
     for i in range(0, len(ssn)-2):
         n1 = ssn[i]
         n2 = ssn[i+1]
@@ -216,7 +216,7 @@ def capuaRuleFourA(srcStream):
     '''
     numChanged = 0
 
-    ssn = srcStream.notesAndRests
+    ssn = srcStream.flat.notesAndRests
     for i in range(0, len(ssn)-2):
         n1 = ssn[i]
         n2 = ssn[i+1]
@@ -266,7 +266,7 @@ def capuaRuleFourB(srcStream):
     returns the number of times a note was changed.
     '''
     numChanged = 0
-    ssn = srcStream.notesAndRests
+    ssn = srcStream.flat.notesAndRests
     for i in range(0, len(ssn)-2):
         n1 = ssn[i]
         n2 = ssn[i+1]
@@ -317,7 +317,7 @@ def clearFicta(srcStream1):
     '''In the given srcStream, moves anything under note.editorial.ficta into
     note.editorial.misc under "saved-ficta".'''
 
-    for n2 in srcStream1.notes:
+    for n2 in srcStream1.flat.notes:
         if  n2.editorial.ficta is not None:
             n2.editorial.misc["saved-ficta"] = n2.editorial.ficta
         n2.editorial.ficta = None   
@@ -952,12 +952,12 @@ class Test(unittest.TestCase):
         ballataObj = cadencebook.BallataSheet()
         pieceObj   = ballataObj.makeWork(pieceNum)
         applyCapua(pieceObj)
-        srcStream    = pieceObj.snippets[0].streams[0]
-        cmpStream    = pieceObj.snippets[0].streams[1]  ## ignore 3rd voice for now...
+        srcStream    = pieceObj.snippets[0].parts[0].flat.notes
+        cmpStream    = pieceObj.snippets[0].parts[1].flat.notes  ## ignore 3rd voice for now...
         srcStream.attachIntervalsBetweenStreams(cmpStream)
 
         outList = []
-        for note in srcStream.notes:
+        for note in srcStream:
             if note.editorial.harmonicInterval is not None:
                 outList.append(note.name)
                 outList.append(note.editorial.harmonicInterval.simpleName)
@@ -967,15 +967,15 @@ class Test(unittest.TestCase):
         self.assertEqual(outList, [u'A', 'P5', u'A', 'M6', u'G', 'P5', u'G', 'm6', u'A', 'm7', u'F', 'd5', '<accidental sharp>', u'G', 'm6', u'A', 'P1', u'B', 'M6', u'A', 'P5', u'G', 'm7', u'G', 'm6', u'F', 'd5', u'E', 'M3', u'D', 'P1'])
 
 
-    def run1test(self):
+    def testRun1(self):
         ballataSht = cadencebook.BallataSheet()
         pieceObj   = ballataSht.makeWork(20)  ## N.B. -- we now use Excel column numbers
-        if pieceObj.incipitClass() is None:
+        if pieceObj.incipit is None:
             return None
-        cadenceA   = pieceObj.cadenceAClass()
-        if len(cadenceA.srcStreams) >= 2:
-            srcStream1    = cadenceA.srcStreams[0]
-            srcStream2    = cadenceA.srcStreams[1]  ## ignore 3rd voice for now...
+        cadenceA   = pieceObj.cadenceA
+        if len(cadenceA.parts) >= 2:
+            srcStream1    = cadenceA.parts[0]
+            srcStream2    = cadenceA.parts[1]  ## ignore 3rd voice for now...
     #    raise("hi?")
     #    clearFicta(srcStream1)
     #    compareThreeFictas(srcStream1, srcStream2)
@@ -1041,7 +1041,7 @@ class Test(unittest.TestCase):
 #        assert n13.editorial.color == "green"
 #        assert stream1.lily.strip() == r'''\clef "treble" \color "yellow" d'4 \color "yellow" e'4 \ficta \color "green" fis'!4 \color "yellow" g'4'''
 
-    def testRuleFrequency(self):        
+    def xtestRuleFrequency(self):        
         import time
         #print time.ctime()
         (num1, num2, num3, num4a, num4b) = ruleFrequency()
