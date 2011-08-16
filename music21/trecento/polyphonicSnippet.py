@@ -26,6 +26,8 @@ class PolyphonicSnippet(stream.Score):
     [<music21.stream.Part ...>, <music21.stream.Part ...>]
     >>> ps.elements[0] is cantus
     True
+    >>> ps.elements[0].classes
+    ['Part', 'TrecentoCadenceStream', 'TinyNotationStream', 'Stream', 'Music21Object', 'JSONSerializer', 'object']
     >>> #_DOCS_SHOW ps.show()
     
     
@@ -64,9 +66,9 @@ class PolyphonicSnippet(stream.Score):
     
             self.partStreams = fiveExcelCells[0:3]  # first three
             for part in self.partStreams:
-                if part is not None:
+                if part is not None and hasattr(part, 'isStream') and part.isStream == True:
                     part.__class__ = stream.Part
-            
+                    part.classes.insert(0, 'Part')
             
             self.cadenceType = fiveExcelCells[3]
             self.timeSig = meter.TimeSignature(fiveExcelCells[4])
@@ -173,6 +175,7 @@ class PolyphonicSnippet(stream.Score):
 
 
 class Incipit(PolyphonicSnippet):
+    snippetName = ""
 
     def backPadLine(self, thisStream):
         '''
@@ -197,8 +200,8 @@ class Incipit(PolyphonicSnippet):
                     newRest.stopTransparency = 1
 
 
-class FrontPaddedCadence(PolyphonicSnippet):
-    cadenceName = ""
+class FrontPaddedSnippet(PolyphonicSnippet):
+    snippetName = ""
 
     def frontPadLine(self, thisStream):
         '''Pads a line with a bunch of rests at the
@@ -224,8 +227,8 @@ class FrontPaddedCadence(PolyphonicSnippet):
 
     def header(self):
         headOut = " \\header { \n piece = \"" + self.parentPiece.title
-        if (self.cadenceName):
-            headOut += " -- " + self.cadenceName + " "
+        if (self.snippetName):
+            headOut += " -- " + self.snippetName + " "
         headOut += " \" \n}\n";
         return headOut
 
@@ -233,7 +236,8 @@ class FrontPaddedCadence(PolyphonicSnippet):
         PolyphonicSnippet.__init__(self, fiveExcelCells, parentPiece)
         self.findLongestCadence()
         for thisStream in self.partStreams:
-            self.frontPadLine(thisStream)
+            if thisStream is not None:
+                self.frontPadLine(thisStream)
 
 
 class Test(unittest.TestCase):

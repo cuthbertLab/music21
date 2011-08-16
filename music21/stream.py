@@ -2044,7 +2044,10 @@ class Stream(music21.Music21Object):
 
         # NOTE: this is a performance critical operation 
         if returnStreamSubClass:
-            found = self.__class__()
+            try:
+                found = self.__class__()
+            except TypeError:
+                found = Stream()
         else:
             found = Stream()
         found.setDerivation(self)

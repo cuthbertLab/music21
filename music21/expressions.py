@@ -104,7 +104,11 @@ class TextExpressionException(ExpressionException):
 
 
 class TextExpression(Expression, text.TextFormat):
-    '''A TextExpression is a word, phrase, or similar bit of text that is positioned in a Stream or Measure. Conventional expressive indications are text like "agitato" or "con fuoco."
+    '''
+    A TextExpression is a word, phrase, or similar 
+    bit of text that is positioned in a Stream or Measure. 
+    Conventional expressive indications are text 
+    like "agitato" or "con fuoco."
 
     >>> from music21 import *
     >>> te = expressions.TextExpression('testing')
@@ -195,6 +199,10 @@ class TextExpression(Expression, text.TextFormat):
         if value is None:
             self._positionDefaultY = None
         else:
+            if value == 'above':
+                value = 10.0
+            elif value == 'below':
+                value = -70.0
             try:
                 value = float(value)
             except (ValueError):
@@ -202,13 +210,26 @@ class TextExpression(Expression, text.TextFormat):
             self._positionDefaultY = value
     
     positionVertical = property(_getPositionVertical, _setPositionVertical, 
-        doc = '''Get or set the the vertical position, where 0 is the top line of the staff and units are in 10ths of a staff space.
+        doc = '''
+        Get or set the the vertical position, where 0 
+        is the top line of the staff and units 
+        are in 10ths of a staff space.
+
+        Other legal positions are 'above' and 'below' which
+        are synonyms for 10 and -70 respectively (for 5-line
+        staves; other staves are not yet implemented)
+
 
         >>> from music21 import *
         >>> te = expressions.TextExpression()
         >>> te.positionVertical = 10
         >>> te.positionVertical
         10.0
+        
+        
+        >>> te.positionVertical = 'below'
+        >>> te.positionVertical
+        -70.0
         ''')
 
 

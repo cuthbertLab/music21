@@ -18,12 +18,14 @@ for working with this encoding, including transforming it into music21 Streams.
 import doctest
 import unittest
 import random
+import re
 import os
 
 import music21
 import music21.duration
 from music21.duration import DurationException
 
+from music21 import expressions
 from music21 import lily
 from music21 import metadata
 from music21 import meter
@@ -58,8 +60,8 @@ class TrecentoSheet(object):
     Kyrie rondello
     '''
 
-    sheetname = "fischer_caccia"
     filename  = "cadences.xls"
+    sheetname = "fischer_caccia"
     
     def __init__(self, **keywords):
         if ("filename" in keywords): 
@@ -361,21 +363,26 @@ class TrecentoCadenceWork(object):
         for thisSnippet in bs:
             if thisSnippet is None:
                 continue
-            if thisSnippet.tenor is None:
+            if thisSnippet.tenor is None and thisSnippet.cantus is None and thisSnippet.contratenor is None:
                 continue
-            if thisSnippet.cantus is None:
-                continue
-            ss = thisSnippet
-            
-            timeSig = ss.flat.getElementsByClass(meter.TimeSignature)[0]
-            for partNumber, snippetPart in enumerate(ss.getElementsByClass('TrecentoCadenceStream')):
-                if currentTs is None:
-                    ctsNumerator = 0
-                else:
-                    ctsNumerator = currentTs.numerator
-                if timeSig.numerator != ctsNumerator and partNumber == 0:
-                    s.append(timeSig)
-                    currentTs = timeSig
+            timeSig = thisSnippet.flat.getElementsByClass(meter.TimeSignature)[0]
+            for partNumber, snippetPart in enumerate(thisSnippet.getElementsByClass('TrecentoCadenceStream')):
+                if thisSnippet.snippetName != "" and partNumber == self.totalVoices - 1:
+                    textEx = expressions.TextExpression(thisSnippet.snippetName)
+                    textEx.positionVertical = 'below'
+                    if 'FrontPaddedSnippet' in thisSnippet.classes:
+                        if snippetPart.hasMeasures():
+                            snippetPart.getElementsByClass('Measure')[-1].insert(0, textEx)
+                        else:
+                            snippetPart.append(textEx)
+                    else:
+                        if snippetPart.hasMeasures():
+                            snippetPart.getElementsByClass('Measure')[0].insert(0, textEx)
+                        else:
+                            snippetPart.insert(0, textEx)
+#                if currentTs is None or timeSig != currentTs:
+#                    s.append(timeSig)
+#                    currentTs = timeSig
                 try:
                     currentScorePart = s.parts[partNumber]
                 except IndexError:
@@ -407,15 +414,15 @@ class TrecentoCadenceWork(object):
         >>> accur = bs.makeWork(2)
         >>> accurIncipit = accur.incipit
         >>> print(accurIncipit)
-        <music21.trecento.polyphonicSnippet.Incipit object at 0x...>
+        <music21.trecento.polyphonicSnippet.Incipit ...>
         '''
         rowBlock = self.rowvalues[8:12]
         rowBlock.append(self.rowvalues[7])
         if (rowBlock[0] == "" or self.timeSigBegin == ""):
             return None
         else: 
-            self.convertBlockToStreams(rowBlock)
-            return Incipit(rowBlock, self)
+            blockOut = self.convertBlockToStreams(rowBlock)
+            return Incipit(blockOut, self)
 
     incipit = property(_getIncipit)
  
@@ -431,8 +438,8 @@ class TrecentoCadenceWork(object):
         >>> accurSnippets = accur.getOtherSnippets()
         >>> for thisSnip in accurSnippets:
         ...     print(thisSnip)
-        <music21.trecento.polyphonicSnippet.FrontPaddedCadence object at 0x...>
-        <music21.trecento.polyphonicSnippet.FrontPaddedCadence object at 0x...>
+        <music21.trecento.polyphonicSnippet.FrontPaddedSnippet ...>
+        <music21.trecento.polyphonicSnippet.FrontPaddedSnippet ...>
          
         '''
         beginSnippetPositions = self.beginSnippetPositions
@@ -445,10 +452,16 @@ class TrecentoCadenceWork(object):
                 continue
             thisSnippet = self.getSnippetAtPosition(i, type="begin")
             if thisSnippet is not None:
+                thisSnippet.snippetName = self.rowDescriptions[i]
+                thisSnippet.snippetName = re.sub('cad\b','cadence', thisSnippet.snippetName)
+                thisSnippet.snippetName = re.sub('\s*C$','', thisSnippet.snippetName)
                 returnSnips.append(thisSnippet)
         for i in endSnippetPositions:
             thisSnippet = self.getSnippetAtPosition(i, type="end")
             if thisSnippet is not None:
+                thisSnippet.snippetName = self.rowDescriptions[i]
+                thisSnippet.snippetName = re.sub('cad ','cadence ', thisSnippet.snippetName)
+                thisSnippet.snippetName = re.sub('\s*C$','', thisSnippet.snippetName)
                 returnSnips.append(thisSnippet)
         return returnSnips
 
@@ -461,7 +474,7 @@ class TrecentoCadenceWork(object):
         >>> bs = trecento.cadencebook.BallataSheet()
         >>> accur = bs.makeWork(2)
         >>> print(accur.getSnippetAtPosition(12))
-        <music21.trecento.polyphonicSnippet.FrontPaddedCadence object at 0x...>
+        <music21.trecento.polyphonicSnippet.FrontPaddedSnippet ...>
         '''
         
         if self.rowvalues[snippetPosition].strip() != "":
@@ -470,51 +483,53 @@ class TrecentoCadenceWork(object):
                 if self.timeSigBegin == "":
                     return None  ## need a timesig
                 thisBlock[4] = self.timeSigBegin
-            self.convertBlockToStreams(thisBlock)
+            blockOut = self.convertBlockToStreams(thisBlock)
             if type == 'begin':
-                return Incipit(thisBlock, self)
+                return Incipit(blockOut, self)
             else:
-                return FrontPaddedCadence(thisBlock, self)
+                return FrontPaddedSnippet(blockOut, self)
 
     def convertBlockToStreams(self, thisBlock):
         '''
-        Takes a block of music information and converts it to a 
-        list of Streams and other information
+        Takes a block of music information (in :class:`~music21.trecento.trecentoCadence.TrecentoCadenceStream` notation)
+        and returns a list of Streams and other information
         
         
         >>> from music21 import *
         >>> block1 = ['e4 f g a', 'g4 a b cc', '', 'no-cadence', '2/4']
         >>> bs = trecento.cadencebook.BallataSheet()
         >>> dummyPiece = bs.makeWork(2)
-        >>> dummyPiece.convertBlockToStreams(block1)
-        >>> for x in block1:
+        >>> blockStreams = dummyPiece.convertBlockToStreams(block1)
+        >>> for x in blockStreams:
         ...     print(x)
         <music21.trecento.trecentoCadence.TrecentoCadenceStream ...>
         <music21.trecento.trecentoCadence.TrecentoCadenceStream ...>
-        <BLANKLINE>
+        None
         no-cadence
         2/4
-        >>> block1[0].show('text')
+        >>> blockStreams[0].show('text')
         {0.0} <music21.meter.TimeSignature 2/4>
         {0.0} <music21.note.Note E>
         {1.0} <music21.note.Note F>
         {2.0} <music21.note.Note G>
         {3.0} <music21.note.Note A>
-        <BLANKLINE> 
         '''
-        
+        returnBlock = [None, None, None, None, None]
         currentTimeSig = thisBlock[4]
+        returnBlock[4] = currentTimeSig
+        returnBlock[3] = thisBlock[3]
         for i in range(0,3):
             thisVoice = thisBlock[i]
             thisVoice = thisVoice.strip()
             if (thisVoice):
                 try:
-                    thisBlock[i] = trecentoCadence.TrecentoCadenceStream(thisVoice, currentTimeSig)
+                    returnBlock[i] = trecentoCadence.TrecentoCadenceStream(thisVoice, currentTimeSig)
                 except DurationException, (value):
                     raise DurationException("Problems in line %s: specifically %s" % (thisVoice,  value))
 #                except Exception, (value):
 #                    raise Exception("Unknown Problems in line %s: specifically %s" % (thisVoice,  value))
 
+        return returnBlock
 
     def allCadences(self):
         '''
@@ -537,7 +552,7 @@ class TrecentoCadenceWork(object):
         except IndexError:
             return None
         if fc is not None:
-            fc.cadenceName = "A section cadence"
+            fc.snippetName = "A section cadence"
         return fc
 
     cadenceA = property(_cadenceAClass)
@@ -552,7 +567,7 @@ class TrecentoCadenceWork(object):
         except IndexError:
             return None
         if fc is not None:
-            fc.cadenceName = "B section cadence (1st or only ending)"
+            fc.snippetName = "B section cadence (1st or only ending)"
         return fc
 
     cadenceB = property(_cadenceB1Class)
@@ -567,7 +582,7 @@ class TrecentoCadenceWork(object):
         except IndexError:
             return None        
         if fc is not None:
-            fc.cadenceName = "B section cadence (2nd ending)"
+            fc.snippetName = "B section cadence (2nd ending)"
         return fc
 
     cadenceBClos = property(_cadenceB2Class)
@@ -653,8 +668,18 @@ class Test(unittest.TestCase):
         block1 = ['e4 f g a', 'g4 a b cc', '', 'no-cadence', '2/4']
         bs = BallataSheet()
         dummyPiece = bs.makeWork(2)
-        dummyPiece.convertBlockToStreams(block1)
-        self.assertTrue(isinstance(block1[0], stream.Stream))
+        block2 = dummyPiece.convertBlockToStreams(block1)
+        self.assertTrue(isinstance(block2[0], stream.Stream))
+        
+    def testLoadScore(self):
+        deduto = BallataSheet().workByTitle('deduto')
+        self.assertEqual(deduto.title, u'Deduto sey a quel')
+#        for s in deduto.snippets:
+#            s.show('text')
+        dedutoScore = deduto.asScore()
+        dedutoScore.show()
+        pass
+    
 
 class TestExternal(unittest.TestCase):
     def runTest(self):
@@ -678,9 +703,8 @@ class TestExternal(unittest.TestCase):
         block1 = ['e4 f g a', 'g4 a b cc', '', 'no-cadence', '2/4']
         bs = BallataSheet()
         dummyPiece = bs.makeWork(2)
-        dummyPiece.convertBlockToStreams(block1)
-        fpc1 = FrontPaddedCadence(block1, dummyPiece)
-#       TODO: Make FrontPaddedCadence a subclass of Score!
+        block2 = dummyPiece.convertBlockToStreams(block1)
+        fpc1 = FrontPaddedSnippet(block2, dummyPiece)
 #        fpc1.show()
 
     def xtestVirelais(self):
@@ -716,7 +740,7 @@ class TestExternal(unittest.TestCase):
         
 
 if __name__ == "__main__":
-    music21.mainTest(TestExternal, 'noDocTest')
+    music21.mainTest(TestExternal)
 
 
 #------------------------------------------------------------------------------
