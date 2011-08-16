@@ -3405,7 +3405,7 @@ class Music21Object(JSONSerializer):
                 offsetLocal = self.getOffsetBySite(m) + m.paddingLeft
 
             else: # hope that we get the right one
-                environLocal.printDebug(['_getMeasureOffset(): cannot find a Measure; using standard offset access'])
+                #environLocal.printDebug(['_getMeasureOffset(): cannot find a Measure; using standard offset access'])
                 offsetLocal = self.offset
 
         #environLocal.printDebug(['_getMeasureOffset(): found local offset as:', offsetLocal, self])
@@ -3566,20 +3566,26 @@ class Music21Object(JSONSerializer):
         
         
         '''
-        from music21.meter import MeterException
+        #from music21.meter import MeterException
         ts = self.getContextByClass('TimeSignature')
-        if ts == None:
+        if ts is None:
             raise Music21ObjectException('this object does not have a TimeSignature in DefinedContexts')                    
-        #if self.activeSite is not None and self.activeSite.isStream is True and self.activeSite.isMeasure is True:
-        try:
-            return ts.getAccentWeight(self._getMeasureOffset(),
-               forcePositionMatch=True)
-        except MeterException:
-            currentOffset = self.offset
-            tsOffset = ts.offset
-            offsetInHypotheticalMeasure = (currentOffset-tsOffset) % ts.barDuration.quarterLength
-            return ts.getAccentWeight(offsetInHypotheticalMeasure,
-                   forcePositionMatch=True)
+
+#         environLocal.printDebug(['_getBeatStrength(): calling getAccentWeight()', 'self._getMeasureOffset()', self._getMeasureOffset(), 'ts', ts, 'ts.getAccentWeight', accentWeight])
+
+# 
+        mOffset = self._getMeasureOffset()
+
+        if mOffset < ts.barDuration.quarterLength:
+            return ts.getAccentWeight(mOffset, forcePositionMatch=True, 
+                permitMeterModulus=False)
+        else:
+            # must get offset relative to not just start of Stream, but the last
+            # time signature
+            offsetMeterModulus = ((mOffset - ts._getMeasureOffset()) % 
+                                  ts.barDuration.quarterLength)
+            return ts.getAccentWeight(offsetMeterModulus, 
+                                      forcePositionMatch=True)
 
 
     beatStrength = property(_getBeatStrength,  
@@ -3623,7 +3629,6 @@ class Music21Object(JSONSerializer):
         >>> s.insert(4.0, meter.TimeSignature('3/4'))
         >>> [s.notes[i].beatStrength for i in range(12)]        
         [1.0, 0.25, 0.5, 0.25, 1.0, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 0.5]
-        
         
         ''')
 
@@ -4243,6 +4248,25 @@ class Test(unittest.TestCase):
             post.append(n.beatDuration)
         self.assertEqual(post, [None, None, None, None, None, None, None, None, None, None] )
 
+
+    def testGetBeatStrengthA(self):
+        from music21 import stream, note, meter
+
+        n = note.Note('g')
+        n.quarterLength = 1
+        s = stream.Stream()
+        s.insert(0, meter.TimeSignature('4/4'))
+        s.repeatAppend(n, 8)
+        match = []
+        self.assertEqual([e.beatStrength for e in s.notes], [1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25])
+
+        n = note.QuarterNote("E--3")
+        s = stream.Stream()
+        s.insert(0.0, meter.TimeSignature('2/2'))
+        s.repeatAppend(n, 12)
+        match = [s.notes[i].beatStrength for i in range(12)]        
+        self.assertEqual([1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25], match)
+        
 
     def testMeaureNumberAccess(self):
         '''Test getting measure numebr data from various Music21Objects.

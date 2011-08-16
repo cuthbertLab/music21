@@ -1979,9 +1979,11 @@ class MeterSequence(MeterTerminal):
         return match
 
 
-    def positionToSpan(self, qLenPos):
+    def positionToSpan(self, qLenPos, permitMeterModulus=False):
         '''Given a lenPos, return the span of the active region.
         Only applies to the top most level of partitions
+
+        If `permitMeterModulus` is True, quarter length positions greater than the duration of the Meter will be accepted as the modulus of the total meter duration. 
 
         >>> from music21 import *
         >>> a = meter.MeterSequence('3/4', 3)
@@ -1989,14 +1991,20 @@ class MeterSequence(MeterTerminal):
         (0, 1.0)
         >>> a.positionToSpan(1.5)
         (1.0, 2.0)
+        >>> a.positionToSpan(4.5, permitMeterModulus=True)
+        (1.0, 2.0)
 
         '''
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
-            #environLocal.printDebug(['exceeding range:', self, 'self.duration', self.duration])
-            raise MeterException('cannot access qLenPos %s when total duration is %s and ts is %s' % (qLenPos, self.duration.quarterLength, self))
+            if not permitMeterModulus:
+                #environLocal.printDebug(['exceeding range:', self, 'self.duration', self.duration])
+                raise MeterException('cannot access qLenPos %s when total duration is %s and ts is %s' % (qLenPos, self.duration.quarterLength, self))
+            else:
+                #environLocal.printDebug(['positionToSpan', 'got qLenPos old', qLenPos])
+                qLenPos = qLenPos % self.duration.quarterLength
+                #environLocal.printDebug(['positionToSpan', 'got qLenPos old', qLenPos])
         
         iMatch = self.positionToIndex(qLenPos)
-        
         pos = 0
         for i in range(len(self)):
             if i == iMatch:
@@ -2004,6 +2012,7 @@ class MeterSequence(MeterTerminal):
                 end = pos + self[i].duration.quarterLength
             else:
                 pos += self[i].duration.quarterLength
+        #environLocal.printDebug(['start, end', start, end])
         return start, end
 
     def positionToWeight(self, qLenPos):
@@ -3090,10 +3099,13 @@ class TimeSignature(music21.Music21Object):
         for i in range(len(msLevel)):
             msLevel[i].weight = weightList[i % len(weightList)]
 
-    def getAccentWeight(self, qLenPos, level=0, forcePositionMatch=False):
+    def getAccentWeight(self, qLenPos, level=0, forcePositionMatch=False,     
+        permitMeterModulus=False):
         '''Given a qLenPos,  return an accent level. In general, accents are assumed to define only a first-level weight. 
 
-        If `forcePositionMatch` is True, an accent will only returned if the provided qLenPos is a near exact match to the provided quarter length. Otherwise, half of the minimum quarter length will be provided.
+        If `forcePositionMatch` is True, an accent will only be returned if the provided qLenPos is a near exact match to the provided quarter length. Otherwise, half of the minimum quarter length will be provided.
+
+        If `permitMeterModulus` is True, quarter length positions greater than the duration of the Meter will be accepted as the modulus of the total meter duration. 
 
         >>> from music21 import *
         >>> ts1 = meter.TimeSignature('3/4')
@@ -3103,14 +3115,19 @@ class TimeSignature(music21.Music21Object):
 
         # might store this weight every time it is set, rather than
         # getting it here
-        minWeight = min([mt.weight for mt in self.accentSequence._partition]) * .5
-
+        minWeight = min(
+                    [mt.weight for mt in self.accentSequence._partition]) * .5
         msLevel = self.accentSequence.getLevel(level)
 
         if forcePositionMatch:
             # only return values for qLen positions that are at the start
             # of a span; for those that are not, we need to return a minWeight
-            localSpan = msLevel.positionToSpan(qLenPos)
+            localSpan = msLevel.positionToSpan(qLenPos, 
+                        permitMeterModulus=permitMeterModulus)
+            if permitMeterModulus:
+                environLocal.printDebug([' self.duration.quarterLength',  self.duration.quarterLength, 'self.barDuration.quar', self.barDuration.quarterLength])
+                qLenPos = qLenPos % self.barDuration.quarterLength
+
             if not common.almostEquals(qLenPos, localSpan[0]):
                 return minWeight
         return msLevel[msLevel.positionToIndex(qLenPos)].weight
