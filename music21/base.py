@@ -3411,6 +3411,18 @@ class Music21Object(JSONSerializer):
         #environLocal.printDebug(['_getMeasureOffset(): found local offset as:', offsetLocal, self])
         return offsetLocal
 
+    def _getMeasureOffsetOrHypotheticalMeasureOffset(self, ts):
+        '''Return the measure offset based on Measure and TimeSignature, if they exist, otherwise based on meter modulus of TimeSignature. This assumes that a TimeSignature has already been found
+        '''
+        mOffset = self._getMeasureOffset()
+        if mOffset < ts.barDuration.quarterLength:
+            return mOffset
+        else:
+            # must get offset relative to not just start of Stream, but the last
+            # time signature
+            return ((mOffset - ts._getMeasureOffset()) % 
+                                  ts.barDuration.quarterLength)
+
     def _getBeat(self):
         '''Return a beat designation based on local Measure and TimeSignature
 
@@ -3572,20 +3584,11 @@ class Music21Object(JSONSerializer):
             raise Music21ObjectException('this object does not have a TimeSignature in DefinedContexts')                    
 
 #         environLocal.printDebug(['_getBeatStrength(): calling getAccentWeight()', 'self._getMeasureOffset()', self._getMeasureOffset(), 'ts', ts, 'ts.getAccentWeight', accentWeight])
+        #mOffset = self._getMeasureOffset()
 
-# 
-        mOffset = self._getMeasureOffset()
-
-        if mOffset < ts.barDuration.quarterLength:
-            return ts.getAccentWeight(mOffset, forcePositionMatch=True, 
-                permitMeterModulus=False)
-        else:
-            # must get offset relative to not just start of Stream, but the last
-            # time signature
-            offsetMeterModulus = ((mOffset - ts._getMeasureOffset()) % 
-                                  ts.barDuration.quarterLength)
-            return ts.getAccentWeight(offsetMeterModulus, 
-                                      forcePositionMatch=True)
+        return ts.getAccentWeight(
+            self._getMeasureOffsetOrHypotheticalMeasureOffset(ts), 
+                forcePositionMatch=True, permitMeterModulus=False)
 
 
     beatStrength = property(_getBeatStrength,  
