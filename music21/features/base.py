@@ -1147,7 +1147,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(di['flat.notes']), 30)
 
         #di['chordify'].show('t')
-        self.assertEqual(len(di['chordify']), 5)
+        self.assertEqual(len(di['chordify']), 6)
         self.assertEqual(len(di['chordify.getElementsByClass.Chord']), 24)
 
 

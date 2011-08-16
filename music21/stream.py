@@ -3435,8 +3435,7 @@ class Stream(music21.Music21Object):
         totalNotes = 0
         totalHeight = 0
 
-        notes = self.getElementsByClass(note.GeneralNote)
-
+        notes = self.getElementsByClass('GeneralNote')
         def findHeight(p):
             height = p.diatonicNoteNum
             if p.diatonicNoteNum > 33: # a4
@@ -4064,11 +4063,105 @@ class Stream(music21.Music21Object):
         returnObj._elementsChanged()
         return returnObj
 
-# not defined on Stream yet, as not clear what it should do
-#     def chordify(self):
-#         '''Split all duration in all parts, if multi-part, by all unique offsets. All simultaneous durations are then gathered into single chords. 
-#         '''
-#         pass
+
+    def chordify(self, addTies=True, displayTiedAccidentals=False):
+        '''
+        Create a chordal reduction of polyphonic music, where each change to a new pitch results in a new chord. If a Score or Part of Measures is provided, a Stream of Measures will be returned. If a flat Stream of notes, or a Score of such Streams is provided, no Measures will be returned. 
+
+        This functionlaity works by splitgin all Durations in all parts, if multi-part, by all unique offsets. All simultaneous durations are 
+        then gathered into single chords. 
+        
+        The `addTies` parameter currently does not work for pitches in Chords.
+        
+        '''
+        # TODO: need to handle flat Streams contained in a Stream   
+        # TODO: need to handle voices
+        # even if those component Stream do not have Measures
+        returnObj = deepcopy(self)
+
+        if returnObj.hasPartLikeStreams():
+            allParts = returnObj.getElementsByClass('Stream')
+        else: # simulate a list of Streams
+            allParts = [returnObj]
+
+        mStream = allParts[0].getElementsByClass('Measure')
+        mCount = len(mStream)
+        if mCount == 0:
+            mCount = 1 # treat as a single measure
+        for i in range(mCount): # may be 1
+            # first, collect all unique offsets for each measure
+            uniqueOffsets = []
+            for p in allParts:
+                if p.hasMeasures():
+                    m = p.getElementsByClass('Measure')[i]
+                else:
+                    m = p # treat the entire part as one measure
+                mFlatNotes = m.flat.notesAndRests
+                for e in mFlatNotes:
+                    # offset values here will be relative to the Measure
+                    # must get flat in case we have voices
+                    o = e.getOffsetBySite(mFlatNotes)
+                    if o not in uniqueOffsets:
+                        uniqueOffsets.append(o)
+            #environLocal.printDebug(['chordify: uniqueOffsets for all parts, m', uniqueOffsets, i])
+            uniqueOffsets = sorted(uniqueOffsets)
+            for p in allParts:
+                # get one measure at a time
+                if p.hasMeasures():
+                    m = p.getElementsByClass('Measure')[i]
+                else:
+                    m = p # treat the entire part as one measure
+                # working with a copy, in place can be true
+                m.sliceAtOffsets(offsetList=uniqueOffsets, addTies=addTies, 
+                    inPlace=True,
+                    displayTiedAccidentals=displayTiedAccidentals )
+
+        # do in place as already a copy has been made
+        post = returnObj.flat.makeChords(includePostWindow=True, 
+            removeRedundantPitches=True,
+            gatherArticulations=True, gatherExpressions=True, inPlace=True)
+
+        # get a measure stream from the top voice
+        # assume we can manipulate this these measures as already have deepcopy
+        # the Part may not have had any Measures;
+        if len(mStream) > 0: 
+            for i, m in enumerate(mStream.getElementsByClass('Measure')):
+                # get highest time before removal
+                mQl = m.duration.quarterLength
+                # remove any Streams (aka Voices) found in the Measure
+                m.removeByClass('GeneralNote')
+                m.removeByClass('Stream')
+                # get offset in original measure
+                mOffsetStart = m.getOffsetBySite(allParts[0])        
+                mOffsetEnd = mOffsetStart + mQl
+                # not sure if this properly manages padding
+    
+                # place all notes in their new location if offsets match
+                # TODO: this iterates over all notes at each iteration!
+                for e in post.notes: # assume all elements should move
+                    # these are flat offset values 
+                    o = e.getOffsetBySite(post)
+                    #environLocal.printDebug(['iterating elements', o, e])
+                    if o >= mOffsetStart and o < mOffsetEnd:
+                        # get offset in relation to inside of Measure
+                        localOffset = o - mOffsetStart
+                        #environLocal.printDebug(['inserting element', e, 'at', o, 'in', m, 'localOffset', localOffset])
+                        m.insert(localOffset, e)
+                # call for each measure
+                m._elementsChanged()
+            # call this post now
+            post = mStream
+        else: # place in a single flat Stream
+            post._elementsChanged()
+
+        if hasattr(returnObj, 'metadata') and returnObj.metadata is not None:
+            post.insert(0, returnObj.metadata)
+        return post
+
+
+        #post._elementsChanged()
+        #return mStream
+        #return post
 
 
     def splitByClass(self, classObj, fx):
@@ -9612,94 +9705,6 @@ class Score(Stream):
         returnObj._elementsChanged()
         return returnObj
 
-
-    def chordify(self, addTies=True, displayTiedAccidentals=False):
-        '''
-        Split all Durations in all parts, if multi-part, 
-        by all unique offsets. All simultaneous durations are 
-        then gathered into single chords. 
-        
-        
-        addTies currently does not work for pitches in Chords
-        
-        '''
-        # TODO: need to handle flat Streams contained in a Stream   
-        # TODO: need to handle voices
-        # even if those component Stream do not have Measures
-        returnObj = deepcopy(self)
-
-        allParts = returnObj.getElementsByClass('Part')
-        mStream = returnObj.parts[0].getElementsByClass('Measure')
-        mCount = len(mStream)
-        if mCount == 0:
-            mCount = 1 # treat as a single measure
-        for i in range(mCount): # may be 1
-            # first, collect all unique offsets for each measure
-            uniqueOffsets = []
-            for p in allParts:
-                if p.hasMeasures():
-                    m = p.getElementsByClass('Measure')[i]
-                else:
-                    m = p # treat the entire part as one measure
-                for e in m.notesAndRests:
-                    # offset values here will be relative to the Measure
-                    o = e.getOffsetBySite(m)
-                    if o not in uniqueOffsets:
-                        uniqueOffsets.append(o)
-            #environLocal.printDebug(['chordify: uniqueOffsets for all parts, m', uniqueOffsets, i])
-            uniqueOffsets = sorted(uniqueOffsets)
-            for p in allParts:
-                # get one measure at a time
-                if p.hasMeasures():
-                    m = p.getElementsByClass('Measure')[i]
-                else:
-                    m = p # treat the entire part as one measure
-                # working with a copy, in place can be true
-                m.sliceAtOffsets(offsetList=uniqueOffsets, addTies=addTies, 
-                    inPlace=True,
-                    displayTiedAccidentals=displayTiedAccidentals )
-
-        # do in place as already a copy has been made
-        post = returnObj.flat.makeChords(includePostWindow=True, 
-            removeRedundantPitches=True,
-            gatherArticulations=True, gatherExpressions=True, inPlace=True)
-
-        # get a measure stream from the top voice
-        # assume we can manipulate this these measures as already have deepcopy
-        # the Part may not have had any Measures;
-        if len(mStream) > 0: 
-            for i, m in enumerate(mStream.getElementsByClass('Measure')):
-                # get highest time before removal
-                mQl = m.duration.quarterLength
-                # TODO: remove any Streams (aka Voices) found in the Measure
-                m.removeByClass('GeneralNote')
-                # get offset in original measure
-                mOffsetStart = m.getOffsetBySite(returnObj.parts[0])        
-                mOffsetEnd = mOffsetStart + mQl
-                # not sure if this properly manages padding
-    
-                # place all notes in their new location if offsets match
-                # TODO: this iterates over all notes at each iteration!
-                for e in post.notes: # assume all elements should move
-                    # these are flat offset values 
-                    o = e.getOffsetBySite(post)
-                    #environLocal.printDebug(['iterating elements', o, e])
-                    if o >= mOffsetStart and o < mOffsetEnd:
-                        # get offset in relation to inside of Measure
-                        localOffset = o - mOffsetStart
-                        #environLocal.printDebug(['inserting element', e, 'at', o, 'in', m, 'localOffset', localOffset])
-                        m.insert(localOffset, e)
-                m._elementsChanged()
-            # populate measures by looking at flat offsets
-            return mStream
-        else: # place in a single flat Stream
-            post._elementsChanged()
-            return post
-
-        #post._elementsChanged()
-        #return mStream
-        #return post
-
     def partsToVoices(self, voiceAllocation=2, permitOneVoicePerPart=False):
         '''Given a multi-part :class:`~music21.stream.Score`, return a new Score that combines parts into voices. 
 
@@ -14731,8 +14736,45 @@ class Test(unittest.TestCase):
         #self.assertEqual(len(post.flat), 3)
         #post.show()
 
+        # make sure we do not have any voices after chordifying  
+        match = []
+        for m in post.getElementsByClass('Measure'):
+            self.assertEqual(m.hasVoices(), False)
+            match.append(len(m.pitches))
+        self.assertEqual(match, [3, 9, 9, 25, 25, 21, 12, 7, 24, 26])
 
 
+    def testChordifyD(self):
+        from music21 import stream, note
+        # test on a Stream of Streams.
+        s1 = stream.Stream()
+        s1.repeatAppend(note.Note(quarterLength=3), 4)
+        s2 = stream.Stream()
+        s2.repeatAppend(note.Note('g4', quarterLength=2), 6)
+        s3 = stream.Stream()
+        s3.insert(0, s1)
+        s3.insert(0, s2)
+
+        post = s3.chordify()
+        self.assertEqual(len(post.getElementsByClass('Chord')), 8)
+
+    def testChordifyE(self):
+        from music21 import stream, note
+        s1 = stream.Stream()
+        m1 = stream.Measure()
+        v1 = stream.Voice()
+        v1.repeatAppend(note.Note('g4', quarterLength=1.5), 3)
+        v2 = stream.Voice()
+        v2.repeatAppend(note.Note(quarterLength=1), 6)
+        m1.insert(0, v1)
+        m1.insert(0, v2)
+        #m1.timeSignature = m1.flat.bestTimeSignature()
+        #self.assertEqual(str(m1.timeSignature), '')
+        s1.append(m1)
+        #s1.show()
+        post = s1.chordify()
+        #post.show()
+        self.assertEqual(len(post.flat.getElementsByClass('Chord')), 7)
 
 
     def testOpusSearch(self):
