@@ -1068,7 +1068,6 @@ def partToBraille(samplePart = stream.Part(), segmentStartMeasureNumbers = [], c
             if not(sampleMeasure.keySignature == outgoingKeySig):
                 outgoingKeySig = sampleMeasure.keySignature
 
-    #bt.fillLastLine()
     return bt
 
 #-------------------------------------------------------------------------------
