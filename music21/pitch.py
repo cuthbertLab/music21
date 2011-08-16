@@ -3816,11 +3816,12 @@ class Pitch(music21.Music21Object):
         >>> n2.noteheadFill = 'no'
         >>> p1 = pitch.Pitch('d3')
         >>> harmChord = chord.Chord([n1, n2])
+        >>> harmChord.quarterLength = 1
         >>> newChord = p1.getStringHarmonic(harmChord)
+        >>> newChord.quarterLength = 1
         >>> pitchList = newChord.pitches
         >>> pitchList
         [D3, G3, D5]
-        
         '''
         
         #Takes in a chord, finds the interval between the notes
@@ -3856,11 +3857,15 @@ class Pitch(music21.Music21Object):
         noteOut = note.Note(soundingPitch.nameWithOctave)
         noteOut.noteheadParen = True
         noteOut.noteheadFill = 'filled'
-        pitchList.append(noteOut.pitch)
+        noteOut.stemDirection = 'noStem'
         
-        #to do: make note small and get rid of stem
+        note1 = note.Note(pitchList[0].nameWithOctave)
+        note2 = note.Note(pitchList[1].nameWithOctave)
+        note2.notehead = chordIn.getNotehead(pitchList[1])
         
-        chordOut = chord.Chord(pitchList)
+        #to do: make note small
+        
+        chordOut = chord.Chord([note1, note2, noteOut])
         
         return chordOut
         

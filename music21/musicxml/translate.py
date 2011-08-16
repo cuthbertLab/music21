@@ -1244,6 +1244,10 @@ def chordToMx(c):
             nh = c.getNotehead(pitchObj)
             mxNote.noteheadObj = noteheadToMxNotehead(pitchObj, overRiddenNotehead = nh)
             
+            #get the stem direction
+            stemDir = c.getStemDirection(pitchObj)
+            mxNote.stem = stemDir
+            
 
             # only add beam to first note in group
             if c.beams != None and chordPos == 0:
@@ -1362,6 +1366,7 @@ def mxToChord(mxNoteList, inputM21=None):
     pitches = []
     ties = [] # store equally spaced list; use None if not defined
     noteheads = [] # store notehead attributes that correspond with pitches
+    stemDirs = [] # store stem direction attributes that correspond with pitches
     
     for mxNote in mxNoteList:
         # extract pitch pbjects     
@@ -1372,6 +1377,10 @@ def mxToChord(mxNoteList, inputM21=None):
         #extract notehead objects
         nh = mxNote.get('noteheadObj')
         noteheads.append(nh)
+        
+        #extract stem directions
+        stemDir = mxNote.get('stem')
+        stemDirs.append(stemDir)
 
         if len(mxNote.tieList) > 0:
             tieObj = tie.Tie() # m21 tie object
@@ -1399,6 +1408,14 @@ def mxToChord(mxNoteList, inputM21=None):
         if obj !=None:
             c.setNotehead(obj.charData, c.pitches[index])
         index+=1
+        
+    #set stem direction based upon pitches
+    index2 = 0
+    for obj2 in stemDirs:
+        if obj2 != 'unspecified':
+            c.setStemDirection(obj2, c.pitches[index2])
+        index2+=1
+            
         
     return c
 
@@ -3628,6 +3645,29 @@ spirit</words>
         xml = p.musicxml
         m = converter.parse(xml)
         self.assertEqual(m.flat.notes[0].stemDirection, 'double')
+    
+    def testChordalStemDirImport(self):
+        
+        #NB: Finale apparently will not display a pitch that is a member of a chord without a stem
+        #unless all chord members are without stems.
+        
+        from music21 import note, converter, spanner, stream, tie, chord
+        from music21.musicxml import translate
+        
+        n1 = note.Note('f3')
+        n1.notehead = 'diamond'
+        n1.stemDirection ='down'
+        n2 = note.Note('c4')
+        n2.stemDirection ='noStem'
+        c = chord.Chord([n1, n2])
+        c.quarterLength = 2
+        xml = c.musicxml
+        input = converter.parse(xml)
+        chordResult = input.flat.notes[0]
+        self.assertEqual(chordResult.getStemDirection(chordResult.pitches[0]), 'down')
+        self.assertEqual(chordResult.getStemDirection(chordResult.pitches[1]), 'noStem')
+        
+        
         
 
 if __name__ == "__main__":

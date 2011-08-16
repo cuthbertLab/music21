@@ -123,7 +123,8 @@ class Chord(note.NotRest):
                 self._pitches.append({'pitch':n})
             elif isinstance(n, music21.note.Note):
                 self._pitches.append({'pitch':n.pitch,
-                                      'notehead':n.notehead})
+                                      'notehead':n.notehead,
+                                      'stem': n.stemDirection})
             elif isinstance(n, Chord):
                 for p in n.pitches:
                     # this might better make a deepcopy of the pitch
@@ -500,6 +501,91 @@ class Chord(note.NotRest):
         if not match:
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
 
+   
+    
+    def getStemDirection(self, p):
+        '''Given a pitch in this Chord, return an associated stem attribute, or return 'unspecified' if not defined for that Pitch.
+
+
+        If the pitch is not found, None will be returned. 
+        
+        
+        >>> from music21 import *
+        >>> n1 = note.Note('D4')
+        >>> n2 = note.Note('G4')
+        >>> n2.stemDirection = 'double'
+        >>> c1 = chord.Chord([n1, n2])
+        >>> c1.getStemDirection(c1.pitches[1])
+        'double'
+        >>> c1.getStemDirection(c1.pitches[0]) 
+        'unspecified'
+        
+        '''
+        
+        for d in self._pitches:
+            # this is an object comparison, not equality
+            if d['pitch'] is p:
+                if 'stem' in d.keys():
+                    return d['stem']
+                else:
+                    return 'unspecified'
+                
+        for d in self._pitches:
+            # this is an equality comparison, not object
+            if d['pitch'] == p:
+                if 'stem' in d.keys():
+                    return d['stem']
+                else:
+                    return 'unspecified'
+        return None
+    
+    def setStemDirection(self, stem, pitchTarget):
+        '''Given a stem attribute as a string and a pitch object in this Chord, set the stem attribute of that pitch to the value of that stem.
+
+        >>> from music21 import *
+        >>> n1 = note.Note('D4')
+        >>> n2 = note.Note('G4')
+        >>> c1 = chord.Chord([n1, n2])
+        >>> c1.setStemDirection('double', c1.pitches[1]) # just to g
+        >>> c1.getStemDirection(c1.pitches[1])
+        'double'
+        >>> c1.getStemDirection(c1.pitches[0])
+        'unspecified'
+        
+        If a chord has two of the same pitch, but each associated with a different stem, then
+        object equality must be used to distinguish between the two.
+        
+        
+        >>> c2 = chord.Chord(['D4','D4'])
+        >>> secondD4 = c2.pitches[1]
+        >>> c2.setStemDirection('double', secondD4)
+        >>> for i in [0,1]:
+        ...    print c2.getStemDirection(c2.pitches[i])
+        unspecified
+        double
+
+        '''
+        # assign to first pitch by default
+        if pitchTarget is None and len(self._pitches) > 0: # if no pitch target
+            pitchTarget = self._pitches[0]['pitch']
+        elif common.isStr(pitchTarget):
+            pitchTarget = pitch.Pitch(pitchTarget)    
+            
+        match = False
+        for d in self._pitches:
+            if d['pitch'] is pitchTarget:
+                d['stem'] = stem
+                match = True
+        if match is False:
+            for d in self._pitches:
+                if d['pitch'] == pitchTarget:
+                    d['stem'] = stem
+                    match = True
+                    break
+                
+        if not match:
+            raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
+        
     def getNotehead(self, p):
         '''Given a pitch in this Chord, return an associated Notehead attribute, or return 'normal' if not defined for that Pitch.
 
@@ -585,6 +671,7 @@ class Chord(note.NotRest):
         if not match:
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
 
+
     def _getPitchNames(self):
         return [d['pitch'].name for d in self._pitches]
 
@@ -613,8 +700,6 @@ class Chord(note.NotRest):
         >>> c.pitchNames
         ['C', 'G']
         ''')
-
-
 
     def _getChordTablesAddress(self):
         '''
@@ -3600,7 +3685,7 @@ class Test(unittest.TestCase):
         out = out.replace(' ', '')
         out = out.replace('\n', '')
         #print out
-        self.assertEqual(out.find("""<pitch><step>A</step><octave>4</octave></pitch><duration>15120</duration><tietype="start"/><type>quarter</type><dot/><notehead>normal</notehead><notations><tiedtype="start"/></notations>"""), 1176)
+        self.assertEqual(out.find("""<pitch><step>A</step><octave>4</octave></pitch><duration>15120</duration><tietype="start"/><type>quarter</type><dot/><stem>up</stem><notehead>normal</notehead><notations><tiedtype="start"/></notations>"""), 1191)
 
         
     def testTiesB(self):
