@@ -42,8 +42,7 @@ def example2_1():
     ⠀⠀⠐⠋⠭⠓⠀⠛⠓⠊⠀⠓⠭⠭⠀⠊⠭⠛⠀⠓⠭⠋⠀⠛⠋⠑⠀⠙⠭⠭⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀
     '''
     bm = tinyNotation.TinyNotationStream("g8 r8 e8 f8 r8 a8 g8 r8 f8 e8 r8 r8 e8 r8 c8 d8 r8 f8 e8 r8 d8 c8 r8 r8 \
-    d8 r8 f8 e8 r8 g8 f8 g8 a8 g8 r8 r8 a8 r8 f8 g8 r8 e8 f8 e8 d8 c8 r8 r8")
-    bm.insert(0, meter.TimeSignature('3/8'))
+    d8 r8 f8 e8 r8 g8 f8 g8 a8 g8 r8 r8 a8 r8 f8 g8 r8 e8 f8 e8 d8 c8 r8 r8", "3/8")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[0].pop(0) # remove time signature
     bm[-1].rightBarline = bar.Barline('final')
@@ -57,8 +56,7 @@ def example2_2():
     ⠀⠀⠸⠓⠓⠓⠭⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
     bm = tinyNotation.TinyNotationStream("r8 r8 r8 d8 d8 c8 B8 d8 c8 B8 A8 c8 B8 A8 G8 B8 A8 A8 D8 r8 E8 E8 G8 E8 \
-    D8 E8 G8 B8 d8 c8 B8 A8 G8 G8 G8 r8")
-    bm.insert(0, meter.TimeSignature('4/8'))
+    D8 E8 G8 B8 d8 c8 B8 A8 G8 G8 G8 r8", "4/8")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     for numRest in range(3):
         bm[0].pop(2)
@@ -77,8 +75,7 @@ def example2_3():
     ⠀⠀⠐⠊⠛⠀⠋⠑⠀⠙⠚⠀⠙⠭⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
     bm = tinyNotation.TinyNotationStream("e8 e8 g8 a8 g8 f8 e8 g8 f8 e8 d8 f8 e8 c8 d8 r8 e8 e8 f8 f8 g8 a8 b8 c'8 \
-    a8 f8 e8 d8 c8 B8 c8 r8")
-    bm.insert(0, meter.TimeSignature('2/8'))
+    a8 f8 e8 d8 c8 B8 c8 r8", "2/8")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[0].pop(0) # remove time signature
     bm[-1].rightBarline = bar.Barline('final')
@@ -92,8 +89,7 @@ def example2_4():
     ⠀⠀⠸⠊⠋⠊⠀⠙⠚⠊⠀⠊⠚⠙⠀⠑⠭⠭⠀⠋⠑⠙⠀⠚⠋⠚⠀⠊⠭⠊⠀⠊⠭⠭⠣⠅⠀⠀⠀⠀
     '''
     bm = tinyNotation.TinyNotationStream("A8 c8 e8 d8 c8 B8 c8 r8 B8 A8 r8 r8 B8 B8 c8 d8 c8 B8 A8 r8 A8 B8 r8 r8 \
-    A8 E8 A8 c8 B8 A8 A8 B8 c8 d8 r8 r8 e8 d8 c8 B8 E8 B8 A8 r8 A8 A8 r8 r8")
-    bm.insert(0, meter.TimeSignature('3/8'))
+    A8 E8 A8 c8 B8 A8 A8 B8 c8 d8 r8 r8 e8 d8 c8 B8 E8 B8 A8 r8 A8 A8 r8 r8", "3/8")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[7].rightBarline = bar.Barline('double')
     bm[-1].rightBarline = bar.Barline('final')
@@ -108,8 +104,7 @@ def example2_5():
     ⠀⠀⠐⠓⠋⠙⠋⠀⠛⠭⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
     bm = tinyNotation.TinyNotationStream("r8 r8 d'8 e'8 f'8 c'8 a8 c'8 d'8 c'8 a8 c'8 a8 c'8 a8 g8 e8 g8 f8 r8 \
-    d8 e8 f8 d8 c8 d8 e8 f8 g8 e8 c8 e8 f8 r8")
-    bm.insert(0, meter.TimeSignature('4/8'))
+    d8 e8 f8 d8 c8 d8 e8 f8 g8 e8 c8 e8 f8 r8", "4/8")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     for numRest in range(2):
         bm[0].pop(2)
@@ -128,8 +123,7 @@ def example2_6():
     ⠀⠀⠸⠛⠋⠋⠋⠭⠭⠀⠑⠋⠑⠓⠛⠑⠀⠙⠋⠑⠙⠭⠭⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
     bm = tinyNotation.TinyNotationStream("G8 G8 G8 G8 E8 F8 A8 G8 G8 G8 r8 G8 A8 A8 A8 c8 B8 A8 A8 G8 G8 G8 r8 r8 \
-    G8 F8 F8 F8 r8 r8 F8 E8 E8 E8 r8 r8 D8 E8 D8 G8 F8 D8 C8 E8 D8 C8 r8 r8")
-    bm.insert(0, meter.TimeSignature('6/8'))
+    G8 F8 F8 F8 r8 r8 F8 E8 E8 E8 r8 r8 D8 E8 D8 G8 F8 D8 C8 E8 D8 C8 r8 r8", "6/8")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[-1].rightBarline = bar.Barline('final')
     bm[0].pop(0)
@@ -143,8 +137,7 @@ def example2_7():
     ⠀⠀⠐⠛⠭⠛⠊⠭⠊⠀⠓⠭⠓⠓⠊⠚⠀⠑⠙⠙⠙⠭⠭⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
     bm = tinyNotation.TinyNotationStream("e8 r8 e8 f8 r8 f8 d8 r8 d8 e8 r8 e8 c8 d8 e8 g8 f8 e8 e8 d8 d8 d8 r8 r8 \
-    c8 r8 c8 e8 r8 e8 f8 r8 f8 a8 r8 a8 g8 r8 g8 g8 a8 b8 d'8 c'8 c'8 c'8 r8 r8")
-    bm.insert(0, meter.TimeSignature('6/8'))
+    c8 r8 c8 e8 r8 e8 f8 r8 f8 a8 r8 a8 g8 r8 g8 g8 a8 b8 d'8 c'8 c'8 c'8 r8 r8", "6/8")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[-1].rightBarline = bar.Barline('final')
     bm[0].pop(0)
@@ -161,7 +154,7 @@ def example3_1():
     ⠀⠀⠐⠳⠱⠳⠧⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
     bm = tinyNotation.TinyNotationStream("d'4 b4 g4 b4 c'4 b4 a4 r4 b4 g4 e4 g4 d4 B4 d4 r4 e4 g4 a4 g4 d4 g4 b4 \
-    d'4 e'4 d'4 c'4 a4 g4 d4 g4 r4")
+    d'4 e'4 d'4 c'4 a4 g4 d4 g4 r4", "4/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[-1].rightBarline = bar.Barline('final')
     bm[0].pop(0)
@@ -175,7 +168,7 @@ def example3_2():
     ⠀⠀⠸⠱⠫⠻⠧⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
     bm = tinyNotation.TinyNotationStream("A4 F4 C4 F4 G4 E4 C4 E4 F4 G4 A4 F4 D4 E4 F4 r4 G4 A4 G4 C4 F4 A4 c4 d4 \
-    c4 A4 G4 C4 D4 E4 F4 r4")
+    c4 A4 G4 C4 D4 E4 F4 r4", "4/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[-1].rightBarline = bar.Barline('final')
     bm[0].pop(0)
@@ -189,8 +182,7 @@ def example3_3():
     ⠀⠀⠐⠪⠧⠀⠳⠄⠓⠀⠻⠱⠀⠹⠫⠀⠹⠧⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
     bm = tinyNotation.TinyNotationStream("g4 e4 a4 g4 f4 r4 d4 r4 c4. c8 d4. d8 e4 r4 c4 r4 g4 g4 a4 b4 c'4 r4 a4 r4 \
-    g4. g8 f4 d4 c4 e4 c4 r4")
-    bm.insert(0, meter.TimeSignature('2/4'))
+    g4. g8 f4 d4 c4 e4 c4 r4", "2/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[-1].rightBarline = bar.Barline('final')
     bm[0].pop(0)
@@ -204,7 +196,7 @@ def example3_4():
     ⠀⠀⠸⠪⠓⠛⠋⠛⠳⠀⠻⠱⠹⠧⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
     bm = tinyNotation.TinyNotationStream("E4 C8 D8 E4 r4 F4 A8 F8 E4 r4 D4 E8 F8 G8 E8 C4 D4 D4 G4 r4 \
-    F4 E8 D8 E4 r4 G4 F8 E8 F4 r4 A4 G8 F8 E8 F8 G4 F4 D4 C4 r4")
+    F4 E8 D8 E4 r4 G4 F8 E8 F4 r4 A4 G8 F8 E8 F8 G4 F4 D4 C4 r4", "4/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[-1].rightBarline = bar.Barline('final')
     bm[0].pop(0)
@@ -218,7 +210,7 @@ def example3_5():
     ⠀⠀⠐⠳⠳⠻⠫⠀⠻⠪⠻⠧⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
     bm = tinyNotation.TinyNotationStream("f4. c8 d4 e4 f4. g8 a4 f4 a4 c'4 d'4 c'4 a4 f4 g4 r4 \
-    g4. e8 c4 e4 f4. c8 f4 a4 g4 g4 f4 e4 f4 a4 f4 r4")
+    g4. e8 c4 e4 f4. c8 f4 a4 g4 g4 f4 e4 f4 a4 f4 r4", "4/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[3].rightBarline = bar.Barline('double')
     bm[-1].rightBarline = bar.Barline('final')
@@ -233,8 +225,7 @@ def example3_6():
     ⠀⠀⠐⠚⠙⠑⠹⠊⠀⠳⠓⠳⠭⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
     bm = tinyNotation.TinyNotationStream("g4 g8 d4 d8 g4 b8 d'8 b8 g8 a4 a8 a8 b8 c'8 b4 b8 g4 r8 a4 a8 d4 d8 g4 b8 a4 c'8\
-    b8 c'8 d'8 c'4 a8 g4 g8 g4 r8")
-    bm.insert(0, meter.TimeSignature('3/4'))
+    b8 c'8 d'8 c'4 a8 g4 g8 g4 r8", "3/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[-1].rightBarline = bar.Barline('final')
     bm[0].pop(0)
@@ -249,7 +240,7 @@ def example4_1():
     >>> print translate.partToBraille(example4_1())
     ⠼⠁⠀⠐⠝⠏⠀⠕⠟⠀⠏⠗⠀⠟⠎⠀⠗⠞⠀⠎⠝⠀⠞⠕⠀⠝⠥⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
-    bm = tinyNotation.TinyNotationStream("c2 e2 d2 f2 e2 g2 f2 a2 g2 b2 a2 c'2 b2 d'2 c'2 r2")
+    bm = tinyNotation.TinyNotationStream("c2 e2 d2 f2 e2 g2 f2 a2 g2 b2 a2 c'2 b2 d'2 c'2 r2", "4/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[-1].rightBarline = bar.Barline('final')
     bm[0].pop(0)
@@ -261,7 +252,7 @@ def example4_2():
     >>> print translate.partToBraille(example4_2())
     ⠼⠁⠀⠸⠟⠎⠀⠗⠝⠀⠱⠹⠱⠫⠀⠟⠥⠀⠕⠟⠀⠝⠟⠀⠫⠻⠳⠪⠀⠟⠥⠣⠅⠀⠀⠀⠀⠀⠀⠀
     '''
-    bm = tinyNotation.TinyNotationStream("F2 A2 G2 C2 D4 C4 D4 E4 F2 r2 D2 F2 C2 F2 E4 F4 G4 A4 F2 r2")
+    bm = tinyNotation.TinyNotationStream("F2 A2 G2 C2 D4 C4 D4 E4 F2 r2 D2 F2 C2 F2 E4 F4 G4 A4 F2 r2", "4/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[-1].rightBarline = bar.Barline('final')
     bm[0].pop(0)
@@ -277,8 +268,7 @@ def example4_3():
     '''
     bm = tinyNotation.TinyNotationStream("c2 c4 d8 c8 B8 c8 d4 e2 e4 f8 e8 d8 e8 f4 g2 g4 a8 g8 f8 g8 a4 \
     b8 a8 g8 a8 b8 d'8 c'4 r2 e'2 e'4 d'8 c'8 b8 c'8 d'4 c'2 c'4 b8 a8 g8 a8 b4 a2 a4 g8 f8 e8 f8 g4 \
-    f8 e8 d8 e8 f8 d8 c4 r2")
-    bm.insert(0, meter.TimeSignature('3/4'))
+    f8 e8 d8 e8 f8 d8 c4 r2", "3/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[-1].rightBarline = bar.Barline('final')
     bm[0].pop(0)
@@ -291,9 +281,9 @@ def example4_4():
     >>> print translate.measureToBraille(measure1, showLeadingOctave = False)
     ⠟⠈⠉⠻⠄⠛
     '''
-    bm = tinyNotation.TinyNotationStream("f2~ f4. f8")
+    bm = tinyNotation.TinyNotationStream("f2~ f4. f8", "4/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
-    bm[0].pop(0)
+    bm[0].pop(1)
     bm[-1].rightBarline = None
     return bm
 
@@ -304,10 +294,9 @@ def example4_5():
     >>> print translate.measureToBraille(measure1, showLeadingOctave = False)
     ⠳⠄⠈⠉⠓⠊⠓
     '''
-    bm = tinyNotation.TinyNotationStream("g4.~ g8 a8 g8")
-    bm.insert(0, meter.TimeSignature("3/4"))
+    bm = tinyNotation.TinyNotationStream("g4.~ g8 a8 g8", "3/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
-    bm[0].pop(0)
+    bm[0].pop(1)
     bm[-1].rightBarline = None
     return bm
 
@@ -322,8 +311,7 @@ def example4_6():
     >>> print translate.measureToBraille(measure2, showLeadingOctave = False)
     ⠗⠧
     '''
-    bm = tinyNotation.TinyNotationStream("g2 g4~ g2 r4")
-    bm.insert(0, meter.TimeSignature("3/4"))
+    bm = tinyNotation.TinyNotationStream("g2 g4~ g2 r4", "3/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[0].pop(0)
     bm[-1].rightBarline = None
@@ -337,8 +325,7 @@ def example4_7():
     ⠀⠀⠐⠎⠪⠀⠪⠳⠻⠀⠏⠻⠀⠕⠫⠀⠝⠄⠈⠉⠀⠝⠄⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
     bm = tinyNotation.TinyNotationStream("g2. e2. c2. e2. c4 d4 e4 g4 f4 e4 d2.~ d2.\
-    e2 e4 e4 f4 g4 a2 a4 a4 g4 f4 e2 f4 d2 e4 c2.~ c2.")
-    bm.insert(0, meter.TimeSignature("3/4"))
+    e2 e4 e4 f4 g4 a2 a4 a4 g4 f4 e2 f4 d2 e4 c2.~ c2.", "3/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[-1].rightBarline = bar.Barline('final')
     bm[0].pop(0)
@@ -355,7 +342,7 @@ def example5_1():
     ⠼⠁⠀⠨⠽⠀⠮⠀⠿⠀⠮⠀⠽⠀⠵⠀⠽⠈⠉⠀⠽⠀⠵⠀⠯⠀⠿⠀⠵⠀⠽⠀⠷⠀⠿⠈⠉⠀⠀⠀
     ⠀⠀⠨⠿⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
-    bm = tinyNotation.TinyNotationStream("c'1 a1 f1 a1 c'1 d'1 c'1~ c'1 d'1 e'1 f'1 d'1 c'1 g'1 f'1~ f'1")
+    bm = tinyNotation.TinyNotationStream("c'1 a1 f1 a1 c'1 d'1 c'1~ c'1 d'1 e'1 f'1 d'1 c'1 g'1 f'1~ f'1", "4/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[-1].rightBarline = bar.Barline('final')
     bm[0].pop(0)
@@ -368,7 +355,7 @@ def example5_2():
     ⠼⠁⠀⠸⠽⠀⠯⠀⠷⠀⠮⠀⠾⠀⠮⠀⠷⠈⠉⠀⠷⠀⠮⠀⠽⠀⠮⠀⠿⠀⠷⠀⠾⠀⠷⠀⠯⠀⠿⠀
     ⠀⠀⠸⠮⠀⠿⠀⠵⠀⠾⠀⠵⠀⠽⠈⠉⠀⠽⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
-    bm = tinyNotation.TinyNotationStream("C1 E1 G1 A1 B1 A1 G1~ G1 A1 c1 A1 F1 G1 B1 G1 E1 F1 A1 F1 D1 BB1 D1 C1~ C1")
+    bm = tinyNotation.TinyNotationStream("C1 E1 G1 A1 B1 A1 G1~ G1 A1 c1 A1 F1 G1 B1 G1 E1 F1 A1 F1 D1 BB1 D1 C1~ C1", "4/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[-1].rightBarline = bar.Barline('final')
     bm[0].pop(0)
@@ -380,8 +367,7 @@ def example5_3():
     >>> print translate.partToBraille(example5_3())
     ⠼⠁⠀⠍⠐⠗⠀⠗⠗⠗⠀⠳⠳⠍⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
-    bm = tinyNotation.TinyNotationStream("r1 g2 g2 g2 g2 g4 g4 r1")
-    bm.insert(0, meter.TimeSignature("3/2"))
+    bm = tinyNotation.TinyNotationStream("r1 g2 g2 g2 g2 g4 g4 r1", "3/2")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[-1].rightBarline = bar.Barline('final')
     bm[0].pop(0)
@@ -395,7 +381,7 @@ def example5_4():
     ⠀⠀⠸⠽⠀⠍⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
     bm = tinyNotation.TinyNotationStream("E2 F2 G1 E2 D2 C1 D2 E2 F2 E2 D1 r1 \
-    C2 D2 E1 F2 G2 A1 G2 F2 E2 D2 C1 r1")
+    C2 D2 E1 F2 G2 A1 G2 F2 E2 D2 C1 r1", "4/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[-1].rightBarline = bar.Barline('final')
     bm[0].pop(0)
@@ -409,8 +395,7 @@ def example5_5():
     ⠀⠀⠸⠳⠫⠹⠀⠻⠥⠀⠍⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
     bm = tinyNotation.TinyNotationStream("F2. r2. A2. r2. F4 G4 A4 c4 A4 F4 G4 r2 r2. \
-    E2. r2. G2. r2. C4 D4 E4 G4 E4 C4 F4 r2 r2.")
-    bm.insert(0, meter.TimeSignature("3/4"))
+    E2. r2. G2. r2. C4 D4 E4 G4 E4 C4 F4 r2 r2.", "3/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[-1].rightBarline = bar.Barline('final')
     bm[0].pop(0)
@@ -439,7 +424,7 @@ def example5_6():
 # The following examples (as well as the rest of the examples in the chapter) don't work correctly yet.
 #
 def example5_7a():
-    bm = tinyNotation.TinyNotationStream("r1 r1 r1 r1 r1")
+    bm = tinyNotation.TinyNotationStream("r1 r1 r1 r1 r1", "4/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[0].pop(0)
     return bm
@@ -479,7 +464,7 @@ def example6_2():
     '''
     bm = tinyNotation.TinyNotationStream("g#4 f##4 g#2")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
-    bm[0].pop(0)
+    bm[0].pop(1)
     bm[-1].rightBarline = None
     return bm
 
@@ -675,7 +660,7 @@ def example7_3a():
     '''
     bm = tinyNotation.TinyNotationStream("c4 e4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
-    bm[0].pop(0)
+    bm[0].pop(1)
     bm[-1].rightBarline = None
     return bm
 
@@ -687,7 +672,7 @@ def example7_3b():
     '''
     bm = tinyNotation.TinyNotationStream("c'2. a4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
-    bm[0].pop(0)
+    bm[0].pop(1)
     bm[-1].rightBarline = None
     return bm
 
@@ -697,9 +682,9 @@ def example7_4a():
     >>> print translate.measureToBraille(example7_4a()[0])
     ⠐⠝⠐⠎
     '''
-    bm = tinyNotation.TinyNotationStream("c2 a2")
+    bm = tinyNotation.TinyNotationStream("c2 a2", "4/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
-    bm[0].pop(0)
+    bm[0].pop(1)
     bm[-1].rightBarline = None
     return bm
 
@@ -709,9 +694,9 @@ def example7_4b():
     >>> print translate.measureToBraille(example7_4b()[0])
     ⠨⠝⠐⠏
     '''
-    bm = tinyNotation.TinyNotationStream("c'2 e2")
+    bm = tinyNotation.TinyNotationStream("c'2 e2", "4/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
-    bm[0].pop(0)
+    bm[0].pop(1)
     bm[-1].rightBarline = None
     return bm
 
@@ -723,7 +708,7 @@ def example7_5a():
     '''
     bm = tinyNotation.TinyNotationStream("C2 F2")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
-    bm[0].pop(0)
+    bm[0].pop(1)
     bm[-1].rightBarline = None
     return bm
 
@@ -735,7 +720,7 @@ def example7_5b():
     '''
     bm = tinyNotation.TinyNotationStream("f2 c'2")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
-    bm[0].pop(0)
+    bm[0].pop(1)
     bm[-1].rightBarline = None
     return bm
 
@@ -840,7 +825,7 @@ def example7_10():
     ⠀⠀⠐⠎⠥⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
     bm = tinyNotation.TinyNotationStream("a4 e'4 a'4 e'4 c'#8 f'#8 e'8 a8 b4 e'4 d'8 a8 f#8 d'8 c'#8 a8 e8 c'#8 b8 f#8 g#8 a8 b4 e4\
-    a4 a4 f'#4 e'4 d'4 d'4 b'4 a'4 a'8 c'#8 g'#8 f'#8 e'8 e8 c'#8 b8 a2 r2")
+    a4 a4 f'#4 e'4 d'4 d'4 b'4 a'4 a'8 c'#8 g'#8 f'#8 e'8 e8 c'#8 b8 a2 r2", "4/4")
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[0].pop(0)
     bm[-1].rightBarline = bar.Barline('final')
@@ -1054,8 +1039,7 @@ def drill8_1():
     ⠀⠀⠨⠪⠓⠛⠫⠱⠀⠹⠊⠚⠝⠣⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     '''
     bm = tinyNotation.TinyNotationStream("a2 g8 f8 e4 d4 e4 f8 g8 a4 g4 c'8 b8 a4 g4 f4. e8 d2\
-    c4 e4 a4 e'4 e'4 d'4 c'8 b8 a4 a'4 g'8 f'8 e'4 d'4 c'4 a8 b8 c'2")
-    bm.insert(0, meter.TimeSignature('c'))
+    c4 e4 a4 e'4 e'4 d'4 c'8 b8 a4 a'4 g'8 f'8 e'4 d'4 c'4 a8 b8 c'2", "c")
     bm.insert(0, tempo.TempoText("Andante maestoso"))
     bm.insert(0, tempo.MetronomeMark(number = 92, referent = note.QuarterNote()))
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
@@ -1074,7 +1058,6 @@ def drill8_2():
     bm = tinyNotation.TinyNotationStream("E-8 r8 BB-8 r8 E-8 r8 En4 F4 F#4 G8 r8 D8 r8 G8 r8 A-4 G4 F4\
     E-8 r8 C8 r8 AA-8 r8 AAn4 BB-4 BBn4 C8 D8 r8 E-8 r8 BB-8 E-8 En8 r8 F8 r8 F#8\
     G8 D8 r8 G8 r8 A-8 A-8 G8 r8 F8 r8 E-8 D8 C8 BB-4 BB-4 EE-2.", "3/4")
-    bm.insert(0, meter.TimeSignature("3/4"))
     bm.insert(0, key.KeySignature(-3))
     bm.insert(0, tempo.TempoText("In strict time"))
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
@@ -1209,6 +1192,23 @@ def example10_1():
     bm.append(m6)
 
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)    
+    return bm
+
+def example10_5():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example10_5())
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠐⠳⠄⠛⠫⠀⠸⠺⠐⠺⠳⠀⠟⠣⠅⠄⠐⠀⠐⠳⠀⠨⠫⠄⠑⠹⠀⠱⠐⠳⠡⠺⠀⠀⠀⠀⠀
+    ⠀⠀⠨⠱⠹⠣⠅⠄⠐⠀⠼⠙⠣⠀⠨⠹⠀⠪⠄⠓⠻⠀⠹⠨⠹⠡⠐⠫⠀⠟⠄⠣⠅⠀⠀⠀⠀⠀⠀⠀
+    '''
+    bm = tinyNotation.TinyNotationStream("g4. f8 e-4 B-4 b-4 g4 f2 g4 e'-4. d'8 c'4 d'4 g4 bn4\
+    d'4 c'4 c'4 a-4. g8 f4 c4 c'4 en4 f2.", "3/4")
+    bm.insert(0, key.KeySignature(-3))
+    bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+    bm[2].insert(1, bar.Barline('double'))
+    bm[5].insert(2, bar.Barline('double'))
+    bm[5].insert(2, key.KeySignature(-4))
     return bm
 
 #-------------------------------------------------------------------------------
