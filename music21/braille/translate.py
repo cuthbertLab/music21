@@ -842,6 +842,27 @@ def restToBraille(sampleRest = note.Rest()):
     except KeyError:
         raise BrailleTranslateException("Rest duration cannot be translated to braille.")
 
+def extractBrailleHeading(sampleMeasure = stream.Measure()):
+    '''
+    Method to extract a braille heading from a measure. A heading
+    consists of a TempoText, a MetronomeMark, a Key Signature and
+    a Time Signature, although not all need be included.
+    '''
+    tt = None
+    try:
+        tt = sampleMeasure.getElementsByClass('TempoText')[0]
+    except IndexError:
+        pass
+    
+    mm = None
+    try:
+        mm = sampleMeasure.getElementsByClass('MetronomeMark')[0]
+    except IndexError:
+        pass
+
+    return headingToBraille(sampleKeySig = sampleMeasure.keySignature, sampleTimeSig = sampleMeasure.timeSignature, 
+                            sampleTempoText = tt, sampleMetronomeMark = mm)
+
 #-------------------------------------------------------------------------------
 # music21 streams to BrailleText objects.
 
@@ -859,7 +880,7 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
     the measure itself.
     
     
-    * isFirstOfSection: False by default. If set to True, a heading (see :meth:`~music21.braille.translate.extractBrailleHeading`)
+    * isFirstOfSegment: False by default. If set to True, a heading (see :meth:`~music21.braille.translate.extractBrailleHeading`)
     and a measure number precede the rest of the contents of the measure.
     
     
@@ -878,9 +899,9 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
         showLeadingOctave = True
         
     try:
-        isFirstOfSection = measureKeywords['isFirstOfSection']
+        isFirstOfSegment = measureKeywords['isFirstOfSegment']
     except KeyError:
-        isFirstOfSection = False
+        isFirstOfSegment = False
         
     try:
         outgoingKeySig = measureKeywords['outgoingKeySig']
@@ -899,7 +920,7 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
         startOffset = sampleMeasure.lowestOffset
         endTime = sampleMeasure.highestTime
         offsets.append((startOffset, endTime))
-        if isFirstOfSection:
+        if isFirstOfSegment:
             try:
                 kts_braille[startOffset] = u''.join([extractBrailleHeading(sampleMeasure), u'\n', symbols['number'], numbers[sampleMeasure.number]])
             except BrailleTranslateException:
@@ -919,7 +940,7 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
             if not startOffset == endTime:
                 offsets.append((startOffset, endTime))
                 startOffset = endTime
-            if not isFirstOfSection or not startOffset == 0.0:
+            if not isFirstOfSegment or not startOffset == 0.0:
                 try:
                     kts_braille[startOffset] = keyAndTimeSigToBraille(sampleKeySig = ks, sampleTimeSig = ts, outgoingKeySig = outgoingKeySig)
                 except BrailleTranslateException:
@@ -935,7 +956,7 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
         groupingTrans = []
         newKeyOrTimeSig = False
         try:
-            if isFirstOfSection and startOffset == 0.0:
+            if isFirstOfSegment and startOffset == 0.0:
                 bt.addElement(headingWithNumber = kts_braille[startOffset])
             else:
                 bt.addElement(keyOrTimeSig = kts_braille[startOffset])
@@ -947,7 +968,7 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
             sampleMeasure.getElementsByOffset(offsetStart = startOffset, offsetEnd = endTime, mustFinishInSpan = True)
         withHyphen = not(endTime == sampleMeasure.highestTime)
         if not(showLeadingOctave == True):
-            if not(isFirstGrouping) or (isFirstGrouping and isFirstOfSection) or (isFirstGrouping and newKeyOrTimeSig):
+            if not(isFirstGrouping) or (isFirstGrouping and isFirstOfSegment) or (isFirstGrouping and newKeyOrTimeSig):
                 showLeadingOctave = True
         noteGrouping = offsetGrouping.getElementsByClass([note.Note, note.Rest, bar.Barline])
         if len(noteGrouping) == 0:
@@ -1006,7 +1027,7 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
         
     return bt
 
-def partToBraille(samplePart = stream.Part(), cancelOutgoingKeySig = True):
+def partToBraille(samplePart = stream.Part(), segmentStartMeasureNumbers = [], cancelOutgoingKeySig = True):
     '''
     Given a :class:`~music21.stream.Part`, returns the appropriate braille 
     characters as a string in utf-8 unicode.
@@ -1018,7 +1039,7 @@ def partToBraille(samplePart = stream.Part(), cancelOutgoingKeySig = True):
     bt = BrailleText()
     partTrans = []
     allMeasures = samplePart.getElementsByClass('Measure')
-    measureToBraille(allMeasures[0], isFirstOfSection = True, precedingBrailleText = bt)
+    measureToBraille(allMeasures[0], isFirstOfSegment = True, precedingBrailleText = bt)
     precedingNote = None
     if cancelOutgoingKeySig:
         outgoingKeySig = allMeasures[0].keySignature
@@ -1034,7 +1055,10 @@ def partToBraille(samplePart = stream.Part(), cancelOutgoingKeySig = True):
             showLeadingOctave = showOctaveWithNote(previousNote = precedingNote, currentNote = firstNote)
         else:
             showLeadingOctave = None
-        measureToBraille(sampleMeasure, showLeadingOctave = showLeadingOctave, outgoingKeySig = outgoingKeySig, precedingBrailleText = bt)
+        if sampleMeasure.number in segmentStartMeasureNumbers:
+            measureToBraille(sampleMeasure, showLeadingOctave = showLeadingOctave, outgoingKeySig = outgoingKeySig, precedingBrailleText = bt, isFirstOfSegment = True)
+        else:
+            measureToBraille(sampleMeasure, showLeadingOctave = showLeadingOctave, outgoingKeySig = outgoingKeySig, precedingBrailleText = bt)
         newLineNumber = bt.lineNumber
         if not(newLineNumber == oldLineNumber):
             precedingNote = None 
@@ -1044,32 +1068,8 @@ def partToBraille(samplePart = stream.Part(), cancelOutgoingKeySig = True):
             if not(sampleMeasure.keySignature == outgoingKeySig):
                 outgoingKeySig = sampleMeasure.keySignature
 
-    bt.fillLastLine()
+    #bt.fillLastLine()
     return bt
-
-#-------------------------------------------------------------------------------
-
-def extractBrailleHeading(sampleMeasure = stream.Measure()):
-    '''
-    Method to extract a braille heading from a measure. A heading
-    consists of a TempoText, a MetronomeMark, a Key Signature and
-    a Time Signature, although not all need be included.
-    '''
-    tt = None
-    try:
-        tt = sampleMeasure.getElementsByClass('TempoText')[0]
-    except IndexError:
-        pass
-    
-    mm = None
-    try:
-        mm = sampleMeasure.getElementsByClass('MetronomeMark')[0]
-    except IndexError:
-        pass
-
-    return headingToBraille(sampleKeySig = sampleMeasure.keySignature, sampleTimeSig = sampleMeasure.timeSignature, 
-                            sampleTempoText = tt, sampleMetronomeMark = mm)
-    
 
 #-------------------------------------------------------------------------------
 # Translation between braille unicode and ASCII/other symbols.
