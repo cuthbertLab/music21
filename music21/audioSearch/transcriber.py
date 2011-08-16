@@ -68,8 +68,8 @@ def runTranscribe(show=True, plot=True, useMic=True,
     detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale)
     detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
     (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
-    (notesList, durationList, total_notes) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
-    myScore, length_part = notesAndDurationsToStream(notesList, durationList, BEGINNING=True)    
+    (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
+    myScore, length_part = notesAndDurationsToStream(notesList, durationList, removeRestsAtBeginning=True)    
     environLocal.printDebug('Time elapsed: %.3f s' % (time() - time_start))
 
 
@@ -83,7 +83,7 @@ def runTranscribe(show=True, plot=True, useMic=True,
     return myScore
 
 if __name__ == '__main__':
-    runTranscribe(show=True, plot=True, seconds=120.0)
+    runTranscribe(show=True, plot=True, seconds=20.0)
 
 #------------------------------------------------------------------------------
 # eof
