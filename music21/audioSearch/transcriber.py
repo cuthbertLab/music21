@@ -11,6 +11,8 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+import unittest
+
 import copy
 import math
 import random
@@ -55,16 +57,23 @@ def runTranscribe(show=True, plot=True, useMic=True,
     a different scale besides the chromatic scale can be specified by setting `useScale`.
     See :ref:`moduleScale` for a list of allowable scales. (or a custom one can be given).
     Microtonal scales are totally accepted, as are retuned scales where A != 440hz.
+
     '''
     #beginning - recording or not
     if saveFile != False:
-        WAVE_FILENAME = "ex.wav"
+        if saveFile == True:
+            WAVE_FILENAME = "ex.wav"
+        else:
+            WAVE_FILENAME = saveFile
     else:
         WAVE_FILENAME = False
     
     # the rest of the score
     time_start = time()
-    freqFromAQList, wv, totsamp, samp = getFrequenciesFromAudio(record=useMic, length=seconds, waveFilename=WAVE_FILENAME, wholeFile=False, wv=None)
+    if useMic is True:
+        freqFromAQList = getFrequenciesFromMicrophone(length=seconds, storeWaveFilename =WAVE_FILENAME)
+    else:
+        freqFromAQList = getFrequenciesFromAudioFile(waveFilename = WAVE_FILENAME)
     detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale)
     detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
     (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
@@ -82,10 +91,23 @@ def runTranscribe(show=True, plot=True, useMic=True,
     environLocal.printDebug("* END")
     return myScore
 
-if __name__ == '__main__':
-    runTranscribe(show=True, plot=True, seconds=20.0)
+class TestExternal(unittest.TestCase):
+    pass
+
+    def runTest(self):
+        pass
+    
+    def testTranscribePachelbel(self):
+        myScore = runTranscribe(useMic=False, saveFile='pachelbel.wav', plot=False, show=False)
+        myScore.show()
+
+    def xtestRunTranscribe(self):
+        runTranscribe(show=True, plot=True, seconds=20.0)
+
+
+if __name__ == "__main__":
+    music21.mainTest(TestExternal)
+
 
 #------------------------------------------------------------------------------
 # eof
-
-

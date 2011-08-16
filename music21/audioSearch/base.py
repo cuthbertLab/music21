@@ -17,6 +17,7 @@ import unittest, doctest
 
 import music21.scale
 import music21.pitch
+from music21 import common
 from music21 import search
 from music21 import features
 from music21 import environment, converter
@@ -251,19 +252,74 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=music21.scale.MajorS
     return detectedPitchObjects, listplot
 
 
-def getFrequenciesFromAudio(record=True, length=10.0, waveFilename='xmas.wav', wholeFile=True, wv=None, totsamples=None):
+#class AudioFrequencies(object):
+#    def __init__(self):
+#        self.allFrequencies = []
+#        self.waveFilehandle = None
+        
+def getFrequenciesFromMicrophone(length=10.0, storeWaveFilename = None):
+    '''
+    records for length (=seconds) a set of frequencies from the microphone.
+    
+    If storeWaveFilename is not None, then it will store the recording on disk
+    in a wave file.
+    
+    Returns a list of frequencies detected.
+    
+    
+    TODO -- find a way to test... or at least demo
+    '''
+    
+    storedWaveSampleList = []
+    environLocal.printDebug("* start recording")
+    storedWaveSampleList = recording.samplesFromRecording(seconds=length,
+                                                          storeFile=storeWaveFilename,
+                                                          recordChunkLength=audioChunkLength)
+    environLocal.printDebug("* stop recording")
+    
+    freqFromAQList = []
+    
+    for data in storedWaveSampleList:
+        samps = numpy.fromstring(data, dtype=numpy.int16)
+        freqFromAQList.append(freq_from_autocorr(samps, recordSampleRate))  
+    return freqFromAQList
+
+
+def getFrequenciesFromAudioFile(waveFilename = 'xmas.wav'):
+    '''
+    gets a list of frequencies from a complete audio file.
+    '''
+    storedWaveSampleList = []
+    environLocal.printDebug("* reading entire file from disk")
+    try:
+        wv = wave.open(waveFilename, 'r')
+    except IOError:
+        raise AudioSearchException("Cannot open %s for reading, does not exist" % waveFilename)
+    
+    #modify it to read the entire file
+    for i in range(wv.getnframes() / audioChunkLength):        
+        data = wv.readframes(audioChunkLength)
+        storedWaveSampleList.append(data)
+    
+    freqFromAQList = []        
+    for data in storedWaveSampleList:
+        samps = numpy.fromstring(data, dtype=numpy.int16)
+        freqFromAQList.append(freq_from_autocorr(samps, recordSampleRate))  
+    wv.close()
+    
+    return freqFromAQList
+    
+    
+def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle = 'xmas.wav', length=10.0, startSample = 0):
     '''
     It calculates the fundamental frequency at every instant of time of an audio signal 
     extracted either from the microphone or from an already recorded song. 
     It uses a period of time defined by the variable "length" in seconds.
     
-    It returns a list with the frequencies and a variable with the file descriptor either 
-    of the audio file or the microphone.
+    It returns a list with the frequencies, a variable with the file descriptor, and the end sample position.
     
     >>> from music21 import *
-    >>> audioChunkLength = 1024
-    >>> recordSampleRate = 44100
-    >>> frequencyList, fd, totsamples, samplesFile= getFrequenciesFromAudio(record=False, length=1.0, waveFilename='pachelbel.wav', wholeFile=False,totsamples=0)
+    >>> frequencyList, pachelbelFileHandle, currentSample  = getFrequenciesFromPartialAudioFile('pachelbel.wav', length=1.0)
     >>> for i in range(5):
     ...     print frequencyList[i]
     143.627689055
@@ -271,58 +327,53 @@ def getFrequenciesFromAudio(record=True, length=10.0, waveFilename='xmas.wav', w
     211.004784689
     4700.31347962
     2197.94311194
+    >>> print currentSample  # should be near 44100, but probably not exact
+    44032
+
+
+    Now read the next 1 second...
+    
+    >>> frequencyList, pachelbelFileHandle, currentSample  = getFrequenciesFromPartialAudioFile(pachelbelFileHandle, length=1.0, startSample = currentSample)
+    >>> for i in range(5):
+    ...     print frequencyList[i]
+    279.957393084
+    262.49836266
+    267.785942519
+    248.196781746
+    300.904207641
+    >>> print currentSample  # should be exactly double the previous
+    88064
+
+
     '''
-    storedWaveSampleList = []
-    if record == True:
-        environLocal.printDebug("* start recording")
-        storedWaveSampleList = recording.samplesFromRecording(seconds=length,
-                                                              storeFile=waveFilename,
-                                                              recordChunkLength=audioChunkLength)
-        environLocal.printDebug("* stop recording")
-        
-        freqFromAQList = []
-        
-        for data in storedWaveSampleList:
-            samps = numpy.fromstring(data, dtype=numpy.int16)
-            freqFromAQList.append(freq_from_autocorr(samps, recordSampleRate))  
-        return freqFromAQList, wv , 0, 10
-        
-    elif wholeFile == True:
-        environLocal.printDebug("* reading entire file from disk")
+    if common.isStr(waveFilenameOrHandle):
+        # waveFilenameOrHandle is a filename
+        waveFilename = waveFilenameOrHandle
         try:
-            wv = wave.open(waveFilename, 'r')
+            waveHandle = wave.open(waveFilename, 'r')
         except IOError:
             raise AudioSearchException("Cannot open %s for reading, does not exist" % waveFilename)
-        
-        #modify it to read the entire file
-        for i in range(wv.getnframes() / audioChunkLength):        
-            data = wv.readframes(audioChunkLength)
+    else:
+        # waveFilenameOrHandle is a filehandle
+        waveHandle = waveFilenameOrHandle
+
+    storedWaveSampleList = []
+       
+    environLocal.printDebug("* reading file from disk a part of the song")
+    for i in range(int(math.floor(length * recordSampleRate / audioChunkLength))):        
+        startSample = startSample + audioChunkLength
+        if startSample < waveHandle.getnframes():
+            data = waveHandle.readframes(audioChunkLength)
             storedWaveSampleList.append(data)
-        
-        freqFromAQList = []        
-        for data in storedWaveSampleList:
-            samps = numpy.fromstring(data, dtype=numpy.int16)
-            freqFromAQList.append(freq_from_autocorr(samps, recordSampleRate))  
-        return freqFromAQList, wv   
+    freqFromAQList = []
     
-    else:   
-        environLocal.printDebug("* reading file from disk a part of the song")
-        if wv == None:
-            try:
-                wv = wave.open(waveFilename, 'r')
-            except IOError:
-                raise AudioSearchException("Cannot open %s for reading, does not exist" % waveFilename)
-        for i in range(int(math.floor(length * recordSampleRate / audioChunkLength))):        
-            totsamples = totsamples + audioChunkLength
-            if totsamples < wv.getnframes():
-                data = wv.readframes(audioChunkLength)
-                storedWaveSampleList.append(data)
-        freqFromAQList = []
+    for data in storedWaveSampleList:
+        samps = numpy.fromstring(data, dtype=numpy.int16)
+        freqFromAQList.append(freq_from_autocorr(samps, recordSampleRate))  
+
+    endSample = startSample    
+    return (freqFromAQList, waveHandle, endSample)
         
-        for data in storedWaveSampleList:
-            samps = numpy.fromstring(data, dtype=numpy.int16)
-            freqFromAQList.append(freq_from_autocorr(samps, recordSampleRate))  
-        return freqFromAQList, wv, totsamples, wv.getnframes()
 
 def detectPitchFrequencies(freqFromAQList, useScale=music21.scale.MajorScale('C4')):
     '''
@@ -658,82 +709,6 @@ def decisionProcess(list, notePrediction, beginningData, lastNotePosition, count
         print "Excessive distance....? dist=%d" % dist
     return position, countdown
 
-
-def matchingNotes(scoreStream, transcribedScore, notePrediction, lastNotePosition, result, countdown):#i'll remove "result" soon
-    '''
-    '''
-    # Analyzing streams
-    tn_recording = int(len(transcribedScore.flat.notesAndRests))
-    totScores = []
-    beginningData = []
-    lengthData = []
-    END_OF_SCORE = False
-    tn_window = int(math.ceil(tn_recording * 1.1)) # take 10% more of samples
-    hop = int(math.ceil(tn_window / 4))
-    if hop == 0:
-        iterations = 1
-    else:
-        iterations = int((math.floor(len(scoreStream) / hop)) - math.ceil(tn_window / hop)) 
-    print "number of iterations", iterations, hop, tn_window, len(scoreStream)
-
-    #scNotes = copy.deepcopy(scoreStream)
-    #scNotes = converter.parse(" ".join(scNotes), "4/4")
-    #sN = copy.deepcopy(scNotes)
-    #scNotes.elements = sN.elements[i * hop + 1 :i * hop + tn_recording + 1 ] #the [0] is the key 
-    for i in range(iterations):
-        scNotes = scoreStream[i * hop + 1 :i * hop + tn_recording + 1 ] 
-        #scNotes = copy.deepcopy(scoreStream)
-        #scNotes = converter.parse(" ".join(scNotes), "4/4")
-        #scNotes.elements = scNotes.elements[i * hop + 1 :i * hop + tn_recording + 1 ] #the [0] is the key 
-        name = "%d" % i
-        #print "inici", i * hop + 1, i * hop + tn_recording + 1 
-        beginningData.append(i * hop + 1)
-        lengthData.append(tn_recording)
-        scNotes.id = name
-        totScores.append(scNotes)  
-
-    listOfParts = search.approximateNoteSearch(transcribedScore.flat.notes, totScores)
-#    print "printo prob", len(totScores)  
-#    for i in l:
-#        print i.id, i.matchProbability#, totScores[i]
-        
-    #decision process    
-    if notePrediction > len(scoreStream) - tn_recording - hop - 1:
-        print "PETARIA", notePrediction, len(scoreStream) - tn_recording - hop - 1, len(scoreStream), tn_recording, hop
-        notePrediction = len(scoreStream) - tn_recording - hop - 1
-        END_OF_SCORE = True
-        print "************++++ LAST PART OF THE SCORE ++++**************"
-    position, countdown = decisionProcess(listOfParts, notePrediction, beginningData, lastNotePosition, countdown)
-    try:
-        print "measure: " + listOfParts[position][0].measureNumber     
-    except:
-        pass
-    
-    totalLength = 0    
-    number = int(listOfParts[position].id)
-    if result != None:
-        result.append(listOfParts[number])
-    
-    if countdown != 0:
-        probabilityHit = 0
-    else:
-        probabilityHit = listOfParts[position].matchProbability
-    for i in range(len(totScores[number])):
-        totalLength = totalLength + totScores[number][i].quarterLength
-
-    if countdown == 0:   
-        lastNotePosition = beginningData[number] + lengthData[number]
-        
-#    if lastNotePosition < len(scoreStream) / 4:
-#        print "--------------------------1", lastNotePosition, len(scoreStream) / 4, len(scoreStream)
-#    elif lastNotePosition < len(scoreStream) / 2:
-#        print "--------------------------2", lastNotePosition, len(scoreStream) / 2, len(scoreStream)
-#    elif lastNotePosition < len(scoreStream) * 3 / 4:
-#        print "--------------------------2", lastNotePosition, len(scoreStream) * 3 / 4, len(scoreStream)
-#    else: 
-#        print "--------------------------2", lastNotePosition, len(scoreStream), len(scoreStream)
-        
-    return totalLength, lastNotePosition, probabilityHit, END_OF_SCORE, result, countdown #i'll remove "result" later,it's only to see if it works
     
 class AudioSearchException(music21.Music21Exception):
     pass

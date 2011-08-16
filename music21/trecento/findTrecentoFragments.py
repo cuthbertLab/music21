@@ -199,12 +199,13 @@ def audioVirelaiSearch():
         thisVirelai = virelaisSheet.makeWork(i)
         if thisVirelai.title != "":
             try:
-                vc = thisVirelai.incipit.getElementsByClass(music21.trecento.trecentoCadence.TrecentoCadenceStream)[0]
+                vc = thisVirelai.incipit.getElementsByClass('Part')[0]
                 vc.insert(0, metadata.Metadata(title = thisVirelai.title))
                 virelaiCantuses.append(vc)
             except IndexError:
                 pass
     searchScore = transcriber.runTranscribe(show = False, plot = False, seconds = 10.0, saveFile = False)
+    searchScore.show()
     l = search.approximateNoteSearch(searchScore, virelaiCantuses)
     for i in l:
         print i.metadata.title, i.matchProbability

@@ -291,6 +291,16 @@ def almostEquals(x, y = 0.0, grain=1e-7):
     The following four routines work for comparisons between floats that are normally inconsistent.
     
     almostEquals(x, y) -- returns True if x and y are within 0.0000001 of each other
+
+
+    >>> from music21 import common
+    >>> common.almostEquals(1.000000001, 1)
+    True 
+    >>> common.almostEquals(1.001, 1)
+    False
+    >>> common.almostEquals(1.001, 1, grain=0.1)
+    True
+    
     '''
     
     if abs(x - y) < grain: 
