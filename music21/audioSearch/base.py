@@ -319,7 +319,11 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle = 'xmas.wav', length
     It returns a list with the frequencies, a variable with the file descriptor, and the end sample position.
     
     >>> from music21 import *
-    >>> frequencyList, pachelbelFileHandle, currentSample  = getFrequenciesFromPartialAudioFile('pachelbel.wav', length=1.0)
+    >>> #_DOCS_SHOW readFile = 'pachelbel.wav' 
+    >>> import os #_DOCS_HIDE
+    >>> readPath = os.path.dirname(__file__) #_DOCS_HIDE
+    >>> readFile = readPath + os.path.sep + 'pachelbel.wav' #_DOCS_HIDE
+    >>> frequencyList, pachelbelFileHandle, currentSample  = getFrequenciesFromPartialAudioFile(readFile, length=1.0)
     >>> for i in range(5):
     ...     print frequencyList[i]
     143.627689055

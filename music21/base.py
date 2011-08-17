@@ -78,6 +78,13 @@ except ImportError:
     _missingImport.append('numpy')
 
 try:
+    import scipy
+except ImportError:
+    _missingImport.append('scipy')
+
+
+
+try:
     import PIL
 except ImportError:
     _missingImport.append('PIL')
