@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         audioSearch.scoreFollower.py
-# Purpose:      ...
+# Purpose:      Detection of the position in the score in real time  
 #
 #
 # Authors:      Jordi Bartolome
@@ -79,15 +79,15 @@ class ScoreFollower(object):
 
 
     def repeatTranscription(self):  
-        print "ANEM PER AQUI *****************", 
-        print self.lastNotePosition, len(self.scoreNotesOnly), 
-        print "en percent %d %%" % (self.lastNotePosition * 100 / len(self.scoreNotesOnly)), 
+        print "ANEM PER AQUI *****************",
+        print self.lastNotePosition, len(self.scoreNotesOnly),
+        print "en percent %d %%" % (self.lastNotePosition * 100 / len(self.scoreNotesOnly)),
         print " this search begins at: ", self.startSearchAtSlot
 
         if self.useMic == True:
             freqFromAQList = getFrequenciesFromMicrophone(length=self.seconds_recording, storeWaveFilename=None)
         else:
-            freqFromAQList, self.waveFile, self.currentSample = getFrequenciesFromPartialAudioFile(self.waveFile, length=self.seconds_recording, startSample = self.currentSample)
+            freqFromAQList, self.waveFile, self.currentSample = getFrequenciesFromPartialAudioFile(self.waveFile, length=self.seconds_recording, startSample=self.currentSample)
             if self.totalFile == 0:
                 self.totalFile = self.waveFile.getnframes()
         
@@ -133,31 +133,161 @@ class ScoreFollower(object):
         return exitType
 
     def updatePosition(self, prob, totalLengthPeriod, time_start):
+        '''
+        It updates the position in which the scoreFollower starts to search at, 
+        and the predicted position in which the new fragment of the score should start.
+        It updates these positions taking into account the value of the "countdown", and if is the
+        beginning of the song or not.
+        
+        It returns the exitType, which determines whether the scoreFollower has to stop (and why) or not.
+        
+        
+        See example of a bad prediction at the beginning of the song:
+        
+        >>> from music21 import *
+        >>> from time import time
+        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
+        >>> ScF = ScoreFollower(scoreStream=scNotes)        
+        >>> ScF.begins = True
+        >>> ScF.startSearchAtSlot = 15
+        >>> prob = 0.5 # bad prediction
+        >>> totalLengthPeriod = 15
+        >>> time_start = time()
+        >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
+        Silence or noise at the beginning
+        >>> print ScF.startSearchAtSlot
+        0
+        
+        
+        Different examples for different countdowns:
+        
+        Countdown = 0:
+        The last matching was good, so it calculates the position in which it starts
+        to search at, and the position in which the music should start.
+        
+        >>> from music21 import *
+        >>> from time import time
+        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
+        >>> ScF = ScoreFollower(scoreStream=scNotes)   
+        >>> ScF.scoreNotesOnly = scNotes.flat.notesAndRests
+        >>> ScF.begins = False
+        >>> ScF.countdown = 0
+        >>> ScF.startSearchAtSlot = 15
+        >>> ScF.lastNotePosition = 38
+        >>> ScF.predictedNotePosition = 19
+        >>> ScF.seconds_recording = 10
+        >>> prob = 0.8
+        >>> totalLengthPeriod = 25
+        >>> time_start = time()
+        >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
+        Countdown = 0
+        >>> print ScF.startSearchAtSlot
+        38
+        >>> ScF.predictedNotePosition >=38
+        True
+        
+        Countdown = 1: 
+        Now it doesn't change the slot in which it starts to search at.
+        It also predicts the position in which the music should start.
+        
+        >>> from music21 import *
+        >>> from time import time
+        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
+        >>> ScF = ScoreFollower(scoreStream=scNotes)   
+        >>> ScF.scoreNotesOnly = scNotes.flat.notesAndRests
+        >>> ScF.begins = False
+        >>> ScF.countdown = 1
+        >>> ScF.startSearchAtSlot = 15
+        >>> ScF.lastNotePosition = 15
+        >>> ScF.predictedNotePosition = 19
+        >>> ScF.seconds_recording = 10
+        >>> prob = 0.8
+        >>> totalLengthPeriod = 25
+        >>> time_start = time()
+        >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
+        Countdown = 1
+        >>> print ScF.startSearchAtSlot
+        15
+        >>> ScF.predictedNotePosition > 15
+        True
+        
+        
+        Countdown = 2: 
+        Now it starts searching at the beginning of the page of the screen.
+        The note prediction is also the beginning of the page.
+        
+        >>> from music21 import *
+        >>> from time import time
+        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
+        >>> ScF = ScoreFollower(scoreStream=scNotes)   
+        >>> ScF.scoreNotesOnly = scNotes.flat.notesAndRests
+        >>> ScF.begins = False
+        >>> ScF.countdown = 2
+        >>> ScF.startSearchAtSlot = 15
+        >>> ScF.lastNotePosition = 15
+        >>> ScF.predictedNotePosition = 19
+        >>> ScF.seconds_recording = 10
+        >>> prob = 0.8
+        >>> totalLengthPeriod = 25
+        >>> time_start = time()
+        >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
+        Countdown = 2
+        SEARCHING IN ALL THE SCORE; MAYBE THE MUSICIAN HAS STARTED FROM THE BEGINNING
+        >>> print ScF.startSearchAtSlot
+        0
+        >>> print ScF.predictedNotePosition
+        0                
+
+        Countdown = 5: 
+        Now it stops the program         
+        
+        >>> from music21 import *
+        >>> from time import time
+        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
+        >>> ScF = ScoreFollower(scoreStream=scNotes)   
+        >>> ScF.scoreNotesOnly = scNotes.flat.notesAndRests
+        >>> ScF.begins = False
+        >>> ScF.countdown = 5
+        >>> ScF.startSearchAtSlot = 15
+        >>> ScF.lastNotePosition = 15
+        >>> ScF.predictedNotePosition = 19
+        >>> ScF.seconds_recording = 10
+        >>> prob = 0.8
+        >>> totalLengthPeriod = 25
+        >>> time_start = time()
+        >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
+        Exit due to bad recognition or rests
+        >>> print exitType
+        countdownExceeded
+        '''
         exitType = False
         
         if self.begins == False:
             if self.countdown == 0:
                 # successfully matched last note; predict next position.
+                print "Countdown = %d" % self.countdown
                 self.startSearchAtSlot = self.lastNotePosition
-                self.predictedNotePosition = self.predictNextNotePosition(totalLengthPeriod, time_start)
+                processing_time = time() - time_start
+                self.predictedNotePosition = self.predictNextNotePosition(totalLengthPeriod, processing_time)
             elif self.countdown == 1:
-                print "!!!!!!!!!COUNTDOWN!!!!!!", self.countdown
-                self.predictedNotePosition = self.predictNextNotePosition(totalLengthPeriod, time_start)
-    
+                print "Countdown = %d" % self.countdown
+                totalSeconds = 2 * (time() - time_start) + self.seconds_recording
+                self.predictedNotePosition = self.predictNextNotePosition(totalLengthPeriod, totalSeconds)
                 # do nothing to startSearch or predicted note position
             elif self.countdown >= 2 and self.countdown < 5:
-                print "!!!!!!!!!COUNTDOWN!!!!!!", self.countdown
+                print "Countdown = %d" % self.countdown
                 print "SEARCHING IN ALL THE SCORE; MAYBE THE MUSICIAN HAS STARTED FROM THE BEGINNING"
                 firstSlot = self.getFirstSlotOnScreen()
                 self.lastNotePosition = firstSlot
                 self.startSearchAtSlot = firstSlot
-                self.predictedNotePosition = self.predictNextNotePosition(totalLengthPeriod, time_start)
+                processing_time = time() - time_start
+                self.predictedNotePosition = self.predictNextNotePosition(totalLengthPeriod, processing_time)
                 self.lengthFixed = False
             else: # self.countdown >= 5:
                 print "Exit due to bad recognition or rests"
                 exitType = 'countdownExceeded'
         else:  # at beginning
-            if prob < 0.7: #to avoid silence at the beginning
+            if prob < 0.7: #to avoid rests at the beginning
                 self.lastNotePosition = 0
                 self.startSearchAtSlot = 0
                 self.lengthFixed = False
@@ -180,9 +310,8 @@ class ScoreFollower(object):
         '''
         return 0
 
-    def predictNextNotePosition(self, totalLengthPeriod, time_start):
-        processing_time = time() - time_start
-        extraLength = totalLengthPeriod * processing_time / self.seconds_recording
+    def predictNextNotePosition(self, totalLengthPeriod, totalSeconds):        
+        extraLength = totalLengthPeriod * totalSeconds / self.seconds_recording
         middleRhythm = 0
         slots = 0
         
@@ -196,6 +325,7 @@ class ScoreFollower(object):
 
     def matchingNotes(self, scoreStream, transcribedScore, notePrediction, lastNotePosition, result, countdown):#i'll remove "result" soon
         '''
+        
         '''
         # Analyzing streams
         tn_recording = int(len(transcribedScore.flat.notesAndRests))
@@ -209,32 +339,19 @@ class ScoreFollower(object):
             iterations = 1
         else:
             iterations = int((math.floor(len(scoreStream) / hop)) - math.ceil(tn_window / hop)) 
-        print "number of iterations", iterations, hop, tn_window, len(scoreStream)
-    
-        #scNotes = copy.deepcopy(scoreStream)
-        #scNotes = converter.parse(" ".join(scNotes), "4/4")
-        #sN = copy.deepcopy(scNotes)
-        #scNotes.elements = sN.elements[i * hop + 1 :i * hop + tn_recording + 1 ] #the [0] is the key 
+        
         for i in range(iterations):
             scNotes = scoreStream[i * hop + 1 :i * hop + tn_recording + 1 ] 
-            #scNotes = copy.deepcopy(scoreStream)
-            #scNotes = converter.parse(" ".join(scNotes), "4/4")
-            #scNotes.elements = scNotes.elements[i * hop + 1 :i * hop + tn_recording + 1 ] #the [0] is the key 
             name = "%d" % i
-            #print "inici", i * hop + 1, i * hop + tn_recording + 1 
             beginningData.append(i * hop + 1)
             lengthData.append(tn_recording)
             scNotes.id = name
             totScores.append(scNotes)  
     
         listOfParts = search.approximateNoteSearch(transcribedScore.flat.notes, totScores)
-    #    print "printo prob", len(totScores)  
-    #    for i in l:
-    #        print i.id, i.matchProbability#, totScores[i]
             
         #decision process    
         if notePrediction > len(scoreStream) - tn_recording - hop - 1:
-            print "PETARIA", notePrediction, len(scoreStream) - tn_recording - hop - 1, len(scoreStream), tn_recording, hop
             notePrediction = len(scoreStream) - tn_recording - hop - 1
             END_OF_SCORE = True
             print "************++++ LAST PART OF THE SCORE ++++**************"
@@ -272,13 +389,25 @@ class ScoreFollower(object):
 
 
 
+class TestExternal(unittest.TestCase):
+    pass
+
+    def runTest(self):
+        pass
+    
+    def xtestRunScoreFollower(self):
+        #scoreNotes = ["d8", "b8", "a8", "g8", "d2", "b8", "a8", "g8", "e2", "c'8", "b8", "a8", "f#2", "d8", "e8", "d8", "c8", "a8", "b8", "r4", "d4", "b4", "a4", "g4", "d4", "b4", "a4", "g4", "e4", "c4", "b4", "a4", "d4", "e4", "d4", "c4", "a4", "g4", "b4", "d4", "g4", "a4", "b4", "c4", "b4", "a4", "b4", "a4", "d4", "b4", "d4", "g4", "a4", "b4", "c4", "b4", "d4", "c4", "a4", "g4"]
+        #scoreNotes = ["f'#4", "e'", "d'", "c'#", "b", "a", "b", "c'#", "d'", "c'#", "b", "a", "g", "f#", "g", "e", "d8", "f#", "a", "g", "f#", "d", "f#", "e", "d", "B", "d", "a", "g", "b", "a", "g", "f#", "d", "e", "c'#", "d'", "f'#", "a'", "a", "b", "g", "a", "f#", "d", "d'16", "e'", "d'8", "c'#", "d'16", "c'#", "d'", "d", "c#", "a", "e", "f#", "d", "d'", "c'#", "b", "c'#", "f'#", "a'", "b'", "g'", "f'#", "e'", "g'", "f'#", "e'", "d'", "c'#", "b", "a", "g", "f#", "e", "g", "f#", "e", "d", "e", "f#", "g", "a", "e", "a", "g", "f#", "b", "a", "g", "a", "g", "f#", "e", "d", "B", "b", "c'#", "d'", "c'#", "b", "a", "g", "f#", "e", "b", "a", "b", "a", "g", "f#8", "f'#", "e'4", "d'", "f'#", "b'4", "a'", "b'", "c'#'", "d''8", "d'", "c'#4", "b", "d'"]
+        #scNotes = converter.parse(" ".join(scoreNotes), "4/4")
+        scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
+        ScF = ScoreFollower(scoreStream=scNotes)
+        ScF.runScoreFollower(show=True, plot=False, useMic=True, seconds=10.0)
+    
+
+
 if __name__ == '__main__':
-    #scoreNotes = ["d8", "b8", "a8", "g8", "d2", "b8", "a8", "g8", "e2", "c'8", "b8", "a8", "f#2", "d8", "e8", "d8", "c8", "a8", "b8", "r4", "d4", "b4", "a4", "g4", "d4", "b4", "a4", "g4", "e4", "c4", "b4", "a4", "d4", "e4", "d4", "c4", "a4", "g4", "b4", "d4", "g4", "a4", "b4", "c4", "b4", "a4", "b4", "a4", "d4", "b4", "d4", "g4", "a4", "b4", "c4", "b4", "d4", "c4", "a4", "g4"]
-    scoreNotes = ["f'#4", "e'", "d'", "c'#", "b", "a", "b", "c'#", "d'", "c'#", "b", "a", "g", "f#", "g", "e", "d8", "f#", "a", "g", "f#", "d", "f#", "e", "d", "B", "d", "a", "g", "b", "a", "g", "f#", "d", "e", "c'#", "d'", "f'#", "a'", "a", "b", "g", "a", "f#", "d", "d'16", "e'", "d'8", "c'#", "d'16", "c'#", "d'", "d", "c#", "a", "e", "f#", "d", "d'", "c'#", "b", "c'#", "f'#", "a'", "b'", "g'", "f'#", "e'", "g'", "f'#", "e'", "d'", "c'#", "b", "a", "g", "f#", "e", "g", "f#", "e", "d", "e", "f#", "g", "a", "e", "a", "g", "f#", "b", "a", "g", "a", "g", "f#", "e", "d", "B", "b", "c'#", "d'", "c'#", "b", "a", "g", "f#", "e", "b", "a", "b", "a", "g", "f#8", "f'#", "e'4", "d'", "f'#", "b'4", "a'", "b'", "c'#'", "d''8", "d'", "c'#4", "b", "d'"]
-    scNotes = converter.parse(" ".join(scoreNotes), "4/4")
-    #scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
-    ScF = ScoreFollower(scoreStream=scNotes)
-    ScF.runScoreFollower(show=True, plot=False, useMic=True, seconds=10.0)
+    music21.mainTest(TestExternal)
+
 
 #------------------------------------------------------------------------------
 # eof

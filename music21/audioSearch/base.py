@@ -53,34 +53,26 @@ if len(_missingImport) > 0:
 
 
 
-def freq_from_autocorr(sig, fs):
+def autocorrelationFunction(recordedSignal, recordSampleRate):
     '''  
     It converts the temporal domain into a frequency domain. In order to do that, it
-    uses the autocorrelation function, which finds the periodicities of the signal
+    uses the autocorrelation function, which finds periodicities in the signal
     in the temporal domain and, consequently, obtains the frequency in each instant 
     of time.
-    
-    I took part of this code from internet, and I modified a little bit to 
-    adapt it to our algorithm.
     '''
-    
-    # Calculate autocorrelation (same thing as convolution, but with one input 
-    # reversed in time), and throw away the negative lags
-    sig = numpy.array(sig)
-    #print str(sig)
-    corr = scipy.signal.fftconvolve(sig, sig[::-1], mode='full')
-    corr = corr[len(corr) / 2:]
-    
-    # Find the first low point
-    d = numpy.diff(corr)
-    start = matplotlib.mlab.find(d > 0)[0]
-    
-    # Find the next peak after the low point (other than 0 lag).  This bit is 
-    # not reliable for long signals, due to the desired peak occurring between 
-    # samples, and other peaks appearing higher.
-    peak = numpy.argmax(corr[start:]) + start
-    px, py = parabolic(corr, peak)
-    return fs / px
+
+    recordedSignal = numpy.array(recordedSignal)
+    correlation = scipy.signal.fftconvolve(recordedSignal, recordedSignal[::-1], mode='full')
+    lengthCorrelation = len(correlation) / 2
+    correlation = correlation[lengthCorrelation:]
+    difference = numpy.diff(correlation) #  Calculates the difference between slots
+
+    beginning = matplotlib.mlab.find(difference > 0)[0]
+
+    peak = numpy.argmax(correlation[beginning:]) + beginning
+    vertex = interpolation(correlation, peak)
+    finalResult = recordSampleRate / vertex
+    return finalResult
 
 def prepareThresholds(useScale=music21.scale.ChromaticScale('C4')):
     '''
@@ -132,34 +124,24 @@ def prepareThresholds(useScale=music21.scale.ChromaticScale('C4')):
     return scPitchesThreshold, scPitches
 
 
-def parabolic(f, x):
+def interpolation(correlation, peak):
     '''
-    Quadratic interpolation for estimating the true position of an
+    Interpolation for estimating the true position of an
     inter-sample maximum when nearby samples are known.
-
    
-    f is a vector and x is an index for that vector.
-
+    Correlation is a vector and peak is an index for that vector.
    
-    Returns (vx, vy), the coordinates of the vertex of a parabola that goes
-    through point x and its two neighbors.
-   
-
-    Example:
-    Defining a vector f with a local maximum at index 3 (= 6), find local
-    maximum if points 2, 3, and 4 actually defined a parabola.
-
+    Returns the x coordinate of the vertex of that parabola.
 
     >>> from music21 import *
     >>> import numpy
     >>> f = [2, 3, 1, 6, 4, 2, 3, 1]
-    >>> audioSearch.parabolic(f, numpy.argmax(f))
-    (3.214285714285..., 6.160714285714...)
-   
+    >>> audioSearch.interpolation(f, numpy.argmax(f))
+    3.21428571...   
     '''
-    xv = 1.0 / 2.0 * (f[x - 1] - f[x + 1]) / (f[x - 1] - 2.0 * f[x] + f[x + 1]) + x
-    yv = f[x] - 1.0 / 4.0 * (f[x - 1] - f[x + 1]) * (xv - x)
-    return (xv, yv)
+    vertex = (correlation[peak - 1] - correlation[peak + 1]) / (correlation[peak - 1] - 2.0 * correlation[peak] + correlation[peak + 1])
+    vertex = vertex * 0.5 + peak
+    return vertex
 
 
 
@@ -252,12 +234,8 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=music21.scale.MajorS
     return detectedPitchObjects, listplot
 
 
-#class AudioFrequencies(object):
-#    def __init__(self):
-#        self.allFrequencies = []
-#        self.waveFilehandle = None
         
-def getFrequenciesFromMicrophone(length=10.0, storeWaveFilename = None):
+def getFrequenciesFromMicrophone(length=10.0, storeWaveFilename=None):
     '''
     records for length (=seconds) a set of frequencies from the microphone.
     
@@ -281,11 +259,11 @@ def getFrequenciesFromMicrophone(length=10.0, storeWaveFilename = None):
     
     for data in storedWaveSampleList:
         samps = numpy.fromstring(data, dtype=numpy.int16)
-        freqFromAQList.append(freq_from_autocorr(samps, recordSampleRate))  
+        freqFromAQList.append(autocorrelationFunction(samps, recordSampleRate))  
     return freqFromAQList
 
 
-def getFrequenciesFromAudioFile(waveFilename = 'xmas.wav'):
+def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     '''
     gets a list of frequencies from a complete audio file.
     '''
@@ -304,13 +282,13 @@ def getFrequenciesFromAudioFile(waveFilename = 'xmas.wav'):
     freqFromAQList = []        
     for data in storedWaveSampleList:
         samps = numpy.fromstring(data, dtype=numpy.int16)
-        freqFromAQList.append(freq_from_autocorr(samps, recordSampleRate))  
+        freqFromAQList.append(autocorrelationFunction(samps, recordSampleRate))  
     wv.close()
     
     return freqFromAQList
     
     
-def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle = 'xmas.wav', length=10.0, startSample = 0):
+def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='xmas.wav', length=10.0, startSample=0):
     '''
     It calculates the fundamental frequency at every instant of time of an audio signal 
     extracted either from the microphone or from an already recorded song. 
@@ -330,21 +308,20 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle = 'xmas.wav', length
     99.0835452019
     211.004784689
     4700.31347962
-    2197.94311194
+    280.166765932
     >>> print currentSample  # should be near 44100, but probably not exact
     44032
-
 
     Now read the next 1 second...
     
     >>> frequencyList, pachelbelFileHandle, currentSample  = getFrequenciesFromPartialAudioFile(pachelbelFileHandle, length=1.0, startSample = currentSample)
     >>> for i in range(5):
     ...     print frequencyList[i]
-    279.957393084
-    262.49836266
-    267.785942519
-    248.196781746
-    300.904207641
+    1039.11088678
+    832.502678838
+    739.558476039
+    741.555921421
+    741.920964565
     >>> print currentSample  # should be exactly double the previous
     88064
 
@@ -373,7 +350,7 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle = 'xmas.wav', length
     
     for data in storedWaveSampleList:
         samps = numpy.fromstring(data, dtype=numpy.int16)
-        freqFromAQList.append(freq_from_autocorr(samps, recordSampleRate))  
+        freqFromAQList.append(autocorrelationFunction(samps, recordSampleRate))  
 
     endSample = startSample    
     return (freqFromAQList, waveHandle, endSample)
@@ -462,15 +439,15 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
     
     
     N.B. the returned list is NOT a :class:`~music21.stream.Stream`.    
+    
+    >>> from music21 import *
+    >>> 
     '''
-    # detecting notes
-    #environLocal.printDebug("* joining identical consecutive pitches")
     
     #initialization
     REST_FREQUENCY = 10
     detectedPitchObjects[0].frequency = REST_FREQUENCY
-    #JUST_PITCHES = False # If you only want the pitches define it True
-    
+
     #detecting the length of each note 
     j = 0
     good = 0
@@ -516,7 +493,6 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
 
 #    environLocal.printDebug("Total notes recorded %d " % total_notes)
 #    environLocal.printDebug("Total rests recorded %d " % total_rests)
-    print len(notesList), total_notes
 
     return notesList, durationList
 
@@ -690,8 +666,7 @@ def decisionProcess(list, notePrediction, beginningData, lastNotePosition, count
         position = i
     if len(list) == 1: # it happens when you don't play anything during a recording period
         position = 0
-        print "it happens when you don't play anything during a recording period"
-
+        
     dist = math.fabs(beginningData[0] - notePrediction)
     for i in range(len(list)):
         #print "UU", beginningData[int(list[i].id)], lastNotePosition, notePrediction

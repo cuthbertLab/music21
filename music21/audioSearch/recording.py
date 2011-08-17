@@ -58,11 +58,11 @@ recordChannels = 1
 recordSampleRate = 44100
 recordChunkLength = 1024
 
-def samplesFromRecording(seconds = 10.0, storeFile = True, 
-                recordFormat = recordFormat, 
-                recordChannels = recordChannels,
-                recordSampleRate = recordSampleRate,
-                recordChunkLength = 1024):
+def samplesFromRecording(seconds=10.0, storeFile=True,
+                recordFormat=recordFormat,
+                recordChannels=recordChannels,
+                recordSampleRate=recordSampleRate,
+                recordChunkLength=1024):
     '''
     records `seconds` length of sound in the given format (default Wave)
     and optionally stores it to disk using the filename of `storeFile`
@@ -80,7 +80,7 @@ def samplesFromRecording(seconds = 10.0, storeFile = True,
                     input=True,
                     frames_per_buffer=recordChunkLength)
 
-    recordingLength = int(recordSampleRate*float(seconds)/recordChunkLength)
+    recordingLength = int(recordSampleRate * float(seconds) / recordChunkLength)
     
     storedWaveSampleList = []
 
@@ -110,6 +110,9 @@ def samplesFromRecording(seconds = 10.0, storeFile = True,
             raise AudioSearchException("Cannot open %s for writing." % waveFilename)
     return storedWaveSampleList
 
+
+
+
 #------------------------------------------
 class Test(unittest.TestCase):
     
@@ -125,7 +128,7 @@ class TestExternal(unittest.TestCase):
         '''
         record one second of data and print 10 records
         '''
-        sampleList = samplesFromRecording(seconds = 1, storeFile = False)
+        sampleList = samplesFromRecording(seconds=1, storeFile=False)
         print sampleList[30:40]
 
 

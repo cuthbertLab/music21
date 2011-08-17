@@ -41,7 +41,7 @@ environLocal = environment.Environment(_MOD)
                                        
                                        
 def runTranscribe(show=True, plot=True, useMic=True,
-                  seconds=10.0, useScale=scale.ChromaticScale('C4'), saveFile=True):
+                  seconds=20.0, useScale=scale.ChromaticScale('C4'), saveFile=True):
     '''
     runs all the methods to record from audio for `seconds` length (default 10.0)
     and transcribe the resulting melody.
@@ -73,16 +73,14 @@ def runTranscribe(show=True, plot=True, useMic=True,
     # the rest of the score
     time_start = time()
     if useMic is True:
-        freqFromAQList = getFrequenciesFromMicrophone(length=seconds, storeWaveFilename =WAVE_FILENAME)
+        freqFromAQList = getFrequenciesFromMicrophone(length=seconds, storeWaveFilename=WAVE_FILENAME)
     else:
-        freqFromAQList = getFrequenciesFromAudioFile(waveFilename = WAVE_FILENAME)
+        freqFromAQList = getFrequenciesFromAudioFile(waveFilename=WAVE_FILENAME)
     detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale)
     detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
     (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
     (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
     myScore, length_part = notesAndDurationsToStream(notesList, durationList, removeRestsAtBeginning=True)    
-    environLocal.printDebug('Time elapsed: %.3f s' % (time() - time_start))
-
 
     if show == True:
         myScore.show()        
@@ -99,12 +97,14 @@ class TestExternal(unittest.TestCase):
     def runTest(self):
         pass
     
-    def testTranscribePachelbel(self):
-        myScore = runTranscribe(useMic=False, saveFile='pachelbel.wav', plot=False, show=False)
-        myScore.show()
-
     def xtestRunTranscribe(self):
         runTranscribe(show=True, plot=True, seconds=20.0)
+    
+    def testTranscribePachelbel(self):
+        myScore = runTranscribe(useMic=False, saveFile='pachelbel.wav', plot=False, show=False)
+        #myScore.show()
+
+
 
 
 if __name__ == "__main__":
