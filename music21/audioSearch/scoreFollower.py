@@ -297,7 +297,7 @@ class ScoreFollower(object):
                 print "GO!"
         
         return exitType
-        
+         
 
 
     def getFirstSlotOnScreen(self):
