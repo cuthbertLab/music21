@@ -42,6 +42,27 @@ class TrecentoCadenceNote(TinyNotationNote):
 
 class Test(unittest.TestCase):
 
+    def runTest(self):
+        pass
+    
+    def testCopyAndDeepcopy(self):
+        '''Test copying all objects defined in this module
+        '''
+        import sys
+        for part in sys.modules[self.__module__].__dict__.keys():
+            if part.startswith('_') or part.startswith('__'):
+                continue
+            elif part in ['Test', 'TestExternal']:
+                continue
+            elif callable(part):
+                #environLocal.printDebug(['testing copying on', part])
+                obj = getattr(module, part)()
+                a = copy.copy(obj)
+                b = copy.deepcopy(obj)
+                self.assertNotEqual(a, obj)
+                self.assertNotEqual(b, obj)
+
+
     def testTrecentoNote(self):
         cn = TrecentoCadenceNote('AA-4.~')
         a = cn.note # returns the stored music21 note.
@@ -74,6 +95,8 @@ class TestExternal(unittest.TestCase):
     '''
     These objects generate PNGs, etc.
     '''
+    def runTest(self):
+        pass
     
     def testTrecentoLine(self):
         '''

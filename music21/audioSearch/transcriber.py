@@ -18,6 +18,7 @@ import math
 import random
 import sys
 from time import time
+from music21 import environment
 
 _missingImport = []
 try:
@@ -26,6 +27,7 @@ except ImportError:
     _missingImport.append('matplotlib')
 
 if len(_missingImport) > 0:
+    environLocal = environment.Environment()
     if environLocal['warnings'] in [1, '1', True]:
         pass
         #environLocal.warn(common.getMissingImportStr(_missingImport), header='music21:')

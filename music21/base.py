@@ -1213,7 +1213,7 @@ class DefinedContexts(object):
             self._lastID = siteId
             self._lastOffset = value
         except KeyError:
-            raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % site)
+            raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % siteId)
 
 
     def getSiteByOffset(self, offset):

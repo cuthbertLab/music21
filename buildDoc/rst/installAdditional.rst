@@ -20,6 +20,10 @@ additional python libraries, and install them just as you did with
 music21 above.  If you don't feel like installing them now, no worries:
 you can always install them later.
 
+It's best not to install these until you have music21 working without
+the external modules.
+
+
 
 Python Imaging Library (PIL)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -28,12 +32,31 @@ The Python Imaging Library provides resources for transforming
 and editing graphics files.  Without this library, the output from
 Lilypond is less good.
 
+Windows 32-bit can download from:
 http://www.pythonware.com/products/pil
 
 Users of 64-bit windows will want to install from the site below.
-Intel 64-bit users will want the win32
+The paradox is that if you are using 64-bit windows but 32-bit Python
+(as most people will) you will probably want to download the 32-bit install
+(x86) rather than the 64-bit (AMD64).
 
 http://www.lfd.uci.edu/~gohlke/pythonlibs/
+
+
+PIL has been a particular problem on the Mac over the past few years.
+If it's particularly important to you
+Mac Users may to download MacPorts from
+http://www.macports.org/install.php .  After installing, 
+open up a terminal and type:
+"sudo port -v selfupdate"  then when that is done install with
+"sudo port install py27-pil" (replace with py26-pil if you are
+on python2.6.)  This method takes a while but at least it is safe.
+However, it does install a whole nother copy of python on your
+computer which might have its own problems...  Then type:
+"sudo port select python python27" to use the new version of python
+(if you hate it, type "sudo port select python python27-apple" to get
+back)
+
 
 
 Matplotlib
@@ -51,6 +74,10 @@ numpy and scipy from:
 http://www.lfd.uci.edu/~gohlke/pythonlibs/
 
 
+
+pyaudio
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Allows for recording within python.  
 
 
 
@@ -111,18 +138,15 @@ automatically if Lilypond is installed on your system.  Download it at:
 http://lilypond.org/
 
 
-Eclipse + PyDev
+Eclipse + PyDev + SVN
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Eclipse is a free, open-source integrated development environment (IDE),
 essentially a program that makes writing (and finding bugs in) other 
 programs much easier.  Eclipse is set up primarily for editing in Java,
 but the add-in PyDev makes it extremely powerful for creating Python scripts
-as well.  First download Eclipse at:
+as well.  In addition, the SVN features of Eclipse let you stay updated
+with the latest versions of music21.  Eclipse + PyDev + SVN is the
+only supported method for developers to contribute to music21.  
 
-http://www.eclipse.org/
-
-Then follow the "Quick Install" instructions in the right-hand column of:
-
-http://pydev.org/download.html
-
+Details are at :ref:`usingEclipse`
 

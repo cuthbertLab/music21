@@ -216,8 +216,6 @@ class GloriaSheet(TrecentoSheet):
         {2.0} <music21.stream.Measure 2 offset=2.0>
             {0.0} <music21.note.Note D>
         ...
-        {16.0} <music21.stream.Measure 9 offset=16.0>
-            {0.0} <music21.note.Rest rest>
             {2.0} <music21.bar.Barline style=final>
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -288,7 +286,11 @@ class TrecentoCadenceWork(object):
     beginSnippetPositions = [8]
     endSnippetPositions = []
     
-    def __init__(self, rowvalues = [], rowDescriptions = []):
+    def __init__(self, rowvalues = None, rowDescriptions = None):
+        if rowvalues == None:
+            rowvalues = ["", "", "", "", "", "", "", "", "", "", "", "", ""]
+        if rowDescriptions == None:
+            rowDescriptions = ["Catalog Number", "Title", "Composer", "EncodedVoices", "PMFC/CMM Vol.", "PMFC Page Start", "PMFC Page End", "Time Signature Beginning", "Incipit C", "Incipit T", "Incipit Ct", "Incipit Type", "Notes"]
         self.rowvalues     = rowvalues
         self.rowDescriptions = rowDescriptions
         self.fischerNum    = rowvalues[0]
@@ -589,15 +591,21 @@ class TrecentoCadenceWork(object):
 
     def getAllStreams(self):
         '''
-        Get all streams in the work, losing association with
+        Get all streams in the work as a List, losing association with
         the other polyphonic units.
+        
+        >>> from music21 import *
+        >>> b = trecento.cadencebook.BallataSheet().makeWork(20)
+        >>> sList = b.getAllStreams()
+        >>> sList
+        [<music21.stream.Part ...>, <music21.stream.Part ...>, ...] 
         
         '''
         snippets = self.snippets
         streams = []
         for thisPolyphonicSnippet in snippets:
             if thisPolyphonicSnippet is not None:
-                PSStreams = thisPolyphonicSnippet.streams
+                PSStreams = thisPolyphonicSnippet.parts
                 for thisStream in PSStreams:
                     streams.append(thisStream)
         return streams
@@ -658,6 +666,34 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+    def testCopyAndDeepcopy(self):
+        '''Test copying all objects defined in this module
+        '''
+        import sys
+        for part in sys.modules[self.__module__].__dict__.keys():
+            if part.startswith('_') or part.startswith('__'):
+                continue
+            elif part in ['Test', 'TestExternal']:
+                continue
+            elif callable(part):
+                #environLocal.printDebug(['testing copying on', part])
+                obj = getattr(module, part)()
+                a = copy.copy(obj)
+                b = copy.deepcopy(obj)
+                self.assertNotEqual(a, obj)
+                self.assertNotEqual(b, obj)
+
+    def testTrecentoCadenceWorkCopying(self):
+        w = TrecentoCadenceWork()
+        w1 = copy.copy(w)
+        w2 = copy.deepcopy(w)
+
+    def testTrecentoCadenceWorkFromSheetCopying(self):
+        w = BallataSheet().makeWork(331)
+        w1 = copy.copy(w)
+        w2 = copy.deepcopy(w)
+
+
     def testGetSnippets(self):
         bs = BallataSheet()
         accur = bs.makeWork(2)
@@ -671,14 +707,6 @@ class Test(unittest.TestCase):
         block2 = dummyPiece.convertBlockToStreams(block1)
         self.assertTrue(isinstance(block2[0], stream.Stream))
         
-    def testLoadScore(self):
-        deduto = BallataSheet().workByTitle('deduto')
-        self.assertEqual(deduto.title, u'Deduto sey a quel')
-#        for s in deduto.snippets:
-#            s.show('text')
-        dedutoScore = deduto.asScore()
-        dedutoScore.show()
-        pass
     
 
 class TestExternal(unittest.TestCase):
@@ -736,11 +764,18 @@ class TestExternal(unittest.TestCase):
         if thisGloria.title != "":
             thisGloria.asScore().show()
 
+    def testAsScore(self):
+        deduto = BallataSheet().workByTitle('deduto')
+        self.assertEqual(deduto.title, u'Deduto sey a quel')
+#        for s in deduto.snippets:
+#            s.show('text')
+        dedutoScore = deduto.asScore()
+        dedutoScore.show()
+        pass
 
-        
 
 if __name__ == "__main__":
-    music21.mainTest(TestExternal)
+    music21.mainTest(Test, TestExternal)
 
 
 #------------------------------------------------------------------------------

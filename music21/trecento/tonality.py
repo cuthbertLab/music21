@@ -1,3 +1,14 @@
+# -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
+# Name:         tonality.py
+# Purpose:      Methods for exploring Tonality in the Trecento
+#
+# Authors:      Michael Scott Cuthbert
+#
+# Copyright:    (c) 2007-2011 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+
 '''
 music21.trecento.tonality
 
@@ -37,8 +48,8 @@ class TonalityCounter(object):
     tonalities of the works.
 
 
-    streamNumber can be 0 (cantus), 1 (tenor, default), or 2
-    (contratenor), or very rarely 3 (fourth voice).
+    streamName can be "C" (cantus), "T" (tenor, default), or "Ct"
+    (contratenor), or very rarely "4" (fourth voice).
     
     
     cadenceName can be "A" or "B" (which by default uses the
@@ -78,9 +89,9 @@ class TonalityCounter(object):
     <BLANKLINE>
     '''
     
-    def __init__(self, worksList, streamNumber = 1, cadenceName = "A"):
+    def __init__(self, worksList, streamName = "T", cadenceName = "A"):
         self.worksList = worksList
-        self.streamNumber = streamNumber
+        self.streamName = streamName
         self.cadenceName = cadenceName
         self.output = ""
         self.displayLily = ""
@@ -89,6 +100,7 @@ class TonalityCounter(object):
     def run(self):
         allLily = lily.LilyString()
         output = ""
+        streamName = self.streamName
         
         myDict = ph({'A': ph(), 'B': ph(), 'C': ph(), 'D': ph(), 'E': ph(), 'F': ph(), 'G': ph()})
         for thisWork in self.worksList:
@@ -98,7 +110,10 @@ class TonalityCounter(object):
                 cadence = thisWork.cadenceA
             elif self.cadenceName == "B":
                 cadence = thisWork.cadenceBclos
-                if (cadence is None or cadence.streams is None or len(cadence.streams) <= self.streamNumber):
+                try:
+                    if (cadence is None or cadence.parts[streamName] is None):
+                        cadence = thisWork.cadenceB
+                except KeyError:
                     cadence = thisWork.cadenceB
             elif isinstance(self.cadenceName, int):
                 try:
@@ -107,16 +122,18 @@ class TonalityCounter(object):
                     continue
             else:
                 raise Exception("Cannot deal with cadence type %s" % self.cadenceName)
-                    
-
-            if (incip is None or incip.streams is None or len(incip.streams) <= self.streamNumber):
+            
+            if incip is None or cadence is None:
                 continue
-            if (cadence is None or cadence.streams is None or len(cadence.streams) <= self.streamNumber):
+            try:
+                incipSN = incip.parts[streamName]
+                cadenceSN = cadence.parts[streamName]
+            except KeyError:
                 continue
-
+            
             try:           
-                firstNote = incip.streams[self.streamNumber].pitches[0]                
-                cadenceNote  = cadence.streams[self.streamNumber].pitches[-1]
+                firstNote = incipSN.pitches[0]                
+                cadenceNote  = cadenceSN.pitches[-1]
             except IndexError:
                 output += thisWork.title + "\n"
                 continue
@@ -151,7 +168,7 @@ class TonalityCounter(object):
 def landiniTonality(show = True):
     '''
     generates information about the tonality of Landini's ballate using
-    the tenor (streamNumber = 1) and the A cadence (which we would believe
+    the tenor (streamName = "T") and the A cadence (which we would believe
     would end the piece)
     
     '''
@@ -161,7 +178,7 @@ def landiniTonality(show = True):
     for thisWork in ballataObj:
         if thisWork.composer == "Landini":
             worksList.append(thisWork)
-    tCounter = TonalityCounter(worksList, streamNumber = 1, cadenceName = "A")
+    tCounter = TonalityCounter(worksList, streamName = "T", cadenceName = "A")
     tCounter.run()
     if show is True:
         print(tCounter.output)
@@ -170,16 +187,103 @@ def nonLandiniTonality(show = True):
     '''
     generates information about the tonality of not anonymous ballate 
     that are not by Francesco (Landini) using
-    the tenor (streamNumber = 1) and the A cadence (which we would believe
-    would end the piece)    
+    the tenor (streamName = "T") and the A cadence (which we would believe
+    would end the piece)
+    
+    >>> from music21 import *
+    >>> #_DOCS_SHOW trecento.tonality.nonLandiniTonality(show = True)
+    
+    
+    Prints something like this::
+    
+    
+                     Deduto sey a quel    C    F
+                      A pianger l'ochi    C    D
+                  Con dogliosi martire    E    D
+              De[h], vogliateme oldire    C    G
+                Madonna, io me ramento    C    D
+                          Or tolta pur    F    A
+                    I' senti' matutino    G    C
+                         Ad ogne vento    C    C
+                  ...
+                  etc...
+                  ...
+                Donna, perche mi veggi    G    D
+             Lasso! grav' è 'l partire    F    F
+                          La vaga luce    G    F
+                Lena virtù et sperança    F    D
+                         Ma' ria avere    C    F
+                    Non c'è rimasa fe'    G    D
+                        Or sie che può    G    D
+                       Perchè vendetta    F    D
+                  Perch'i' non sep(p)i    G    D
+                 Poc' [h]anno di mirar    F    D
+                 S'amor in cor gentile    F    C
+                    Se per virtù amor,    C    G
+                       Sofrir m'estuet    A    C
+                     Una cosa di veder    G    D
+                  Vago et benigno amor    G    D
+                         L'adorno viso    C    G
+                       Già molte volte    G    C
+                  O me! al cor dolente    D    D
+                Benchè lontan mi trovi    A    D
+                   Dicovi per certança    G    G
+               Ferito già d'un amoroso    A    D
+                      Movit' a pietade    D    D
+                       Non voler donna    A    D
+              Sol mi trafig(g)e 'l cor    C    C
+                 Se le lagrime antique    F    F
+        ****    A    A    1
+                A    C    3
+                A    D   15
+                A diff   18
+                B    F    1
+                B diff    1
+                C    A    1
+        ****    C    C   10
+                C    D    4
+                C    F    2
+                C    G    4
+                C diff   11
+                D    A    1
+                D    C    6
+        ****    D    D   16
+                D    F    4
+                D    G   10
+                D diff   21
+                E    C    2
+                E    D    1
+                E    F    1
+                E diff    4
+                F    A    2
+                F    B    1
+                F    C    3
+                F    D    8
+        ****    F    F   11
+                F    G    4
+                F diff   18
+                G    A    1
+                G    B    1
+                G    C   12
+                G    D   15
+                G    E    1
+                G    F    1
+        ****    G    G   11
+                G diff   31
+        Total Same   49 32.0%
+        Total Diff  104 68.0%
+
+    
     '''
 
     ballataObj  = cadencebook.BallataSheet()
     worksList = []
     for thisWork in ballataObj:
+        if show == True:
+            print thisWork.title
         if thisWork.composer != "Landini" and thisWork.composer != ".":
             worksList.append(thisWork)
-    tCounter = TonalityCounter(worksList, streamNumber = 1, cadenceName = "A")
+    tCounter = TonalityCounter(worksList, streamName = "T", cadenceName = "A")
     tCounter.run()
     if show is True:
         print(tCounter.output)
@@ -190,13 +294,14 @@ def anonBallataTonality(show = True):
     keeps track of how often they are the same and how often they are different.
     
     And then generates a PNG of the incipit and first cadence of all the ones that are the same.
+
     '''
     ballataObj  = cadencebook.BallataSheet()
     worksList = []
     for thisWork in ballataObj:
         if thisWork.composer == ".":
             worksList.append(thisWork)
-    tCounter = TonalityCounter(worksList, streamNumber = 1, cadenceName = "A")
+    tCounter = TonalityCounter(worksList, streamName = "T", cadenceName = "A")
     tCounter.run()
     if show is True:
         print(tCounter.output)
@@ -211,10 +316,9 @@ def sacredTonality(show = True):
 
 
     note that we only have a very very few sacred pieces encoded at this point so
-    the results are NOT statistically significant.
+    the results are NOT statistically significant, but it's very fast for testing.
 
 
-    And then generates a PNG of the incipit and cadence of all the ones that are the same.
     '''
     
     kyrieObj  = cadencebook.KyrieSheet()
@@ -228,7 +332,7 @@ def sacredTonality(show = True):
                  sanctusObj.makeWork(2),
                  agnusObj.makeWork(2) ]
 
-    tCounter = TonalityCounter(worksList, streamNumber = 1, cadenceName = -1)
+    tCounter = TonalityCounter(worksList, streamName = "T", cadenceName = -1)
     tCounter.run()
     if show is True:
         print(tCounter.output)
@@ -254,7 +358,7 @@ class TestExternal(unittest.TestCase):
         testAll(show = True, fast = False)
  
 if __name__ == "__main__":
-    music21.mainTest(TestExternal)
+    music21.mainTest(Test) #External)
 
 
 #------------------------------------------------------------------------------
