@@ -4140,7 +4140,8 @@ class Stream(music21.Music21Object):
                 # not sure if this properly manages padding
     
                 # place all notes in their new location if offsets match
-                # TODO: this iterates over all notes at each iteration!
+                # TODO: this iterates over all notes at each iteration; can be faster      
+                # TODO: needs to be Notes and Rests
                 for e in post.notes: # assume all elements should move
                     # these are flat offset values 
                     o = e.getOffsetBySite(post)

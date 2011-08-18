@@ -3381,7 +3381,7 @@ class Music21Object(JSONSerializer):
         ''')  
 
 
-    def _getMeasureOffset(self):
+    def _getMeasureOffset(self, includeMeasurePadding=True):
         '''Try to obtain the nearest Measure that contains this object, and return the offset within that Measure.
 
         If a Measure is found, and that Measure has padding defined as `paddingLeft`, padding will be added to the native offset gathered from the object. 
@@ -3408,8 +3408,11 @@ class Music21Object(JSONSerializer):
             # as we often want the most recent measure
             m = self.getContextByClass('Measure', sortByCreationTime=True, prioritizeActiveSite=False)
             if m is not None:
-                #environLocal.printDebug(['using found Measure for offset access'])            
-                offsetLocal = self.getOffsetBySite(m) + m.paddingLeft
+                #environLocal.printDebug(['using found Measure for offset access'])     
+                if includeMeasurePadding:       
+                    offsetLocal = self.getOffsetBySite(m) + m.paddingLeft
+                else:
+                    offsetLocal = self.getOffsetBySite(m)
 
             else: # hope that we get the right one
                 #environLocal.printDebug(['_getMeasureOffset(): cannot find a Measure; using standard offset access'])
@@ -3418,17 +3421,47 @@ class Music21Object(JSONSerializer):
         #environLocal.printDebug(['_getMeasureOffset(): found local offset as:', offsetLocal, self])
         return offsetLocal
 
-    def _getMeasureOffsetOrHypotheticalMeasureOffset(self, ts):
-        '''Return the measure offset based on Measure and TimeSignature, if they exist, otherwise based on meter modulus of TimeSignature. This assumes that a TimeSignature has already been found
+    def _getMeasureOffsetOrMeterModulusOffset(self, ts):
+        '''Return the measure offset based on a Measure, if it exists, otherwise based on meter modulus of the TimeSignature. This assumes that a TimeSignature has already been found.
+
+        >>> from music21 import *
+        >>> m = stream.Measure()
+        >>> ts1 = meter.TimeSignature('3/4')
+        >>> m.insert(0, ts1)
+        >>> n1 = note.Note()
+        >>> m.insert(2, n1)
+        >>> n1._getMeasureOffsetOrMeterModulusOffset(ts1) 
+        2.0
+        >>> n2 = note.Note()
+        >>> m.insert(4, n2) # exceeding the range of the Measure gets a modulus
+        >>> n1._getMeasureOffsetOrMeterModulusOffset(ts1) 
+        2.0
+
+        Can be applied to Notes in a Stream with a TimeSignature.
+
+        >>> ts2 = meter.TimeSignature('5/4')
+        >>> s2 = stream.Stream()
+        >>> s2.insert(0, ts2)
+        >>> n3 = note.Note()
+        >>> s2.insert(3, n3)
+        >>> n3._getMeasureOffsetOrMeterModulusOffset(ts2) 
+        3.0
+        >>> n4 = note.Note()
+        >>> s2.insert(5, n4)
+        >>> n4._getMeasureOffsetOrMeterModulusOffset(ts2) 
+        0.0
         '''
+        #environLocal.printDebug(['_getMeasureOffsetOrMeterModulusOffset', self, ts, 'ts._getMeasureOffset()', ts._getMeasureOffset(), 'self._getMeasureOffset()', self._getMeasureOffset()])
         mOffset = self._getMeasureOffset()
-        if mOffset < ts.barDuration.quarterLength:
+        tsMeasureOffset = ts._getMeasureOffset(includeMeasurePadding=False)
+        if (mOffset + tsMeasureOffset) < ts.barDuration.quarterLength:
             return mOffset
         else:
             # must get offset relative to not just start of Stream, but the last
             # time signature
-            return ((mOffset - ts._getMeasureOffset()) % 
-                                  ts.barDuration.quarterLength)
+            post = ((mOffset - tsMeasureOffset) % ts.barDuration.quarterLength)
+            #environLocal.printDebug(['result', post])
+            return post
 
     def _getBeat(self):
         '''Return a beat designation based on local Measure and TimeSignature
@@ -3452,7 +3485,8 @@ class Music21Object(JSONSerializer):
         ts = self.getContextByClass('TimeSignature')
         if ts == None:
             raise Music21ObjectException('this object does not have a TimeSignature in DefinedContexts')                    
-        return ts.getBeatProportion(self._getMeasureOffset())
+        return ts.getBeatProportion(
+            self._getMeasureOffsetOrMeterModulusOffset(ts))
 
 
     beat = property(_getBeat,  
@@ -3474,6 +3508,11 @@ class Music21Object(JSONSerializer):
         >>> [m.notes[i].beat for i in range(6)]
         [1.0, 1.3333333..., 1.666666666..., 2.0, 2.33333333..., 2.66666...]
 
+        >>> s = stream.Stream()
+        >>> s.insert(0, meter.TimeSignature('3/4'))
+        >>> s.repeatAppend(note.Note(), 8)
+        >>> [n.beat for n in s.notes]
+        [1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0]
         ''')
 
 
@@ -3482,7 +3521,8 @@ class Music21Object(JSONSerializer):
         #environLocal.printDebug(['_getBeatStr(): found ts:', ts])
         if ts == None:
             raise Music21ObjectException('this object does not have a TimeSignature in DefinedContexts')                    
-        return ts.getBeatProportionStr(self._getMeasureOffset())
+        return ts.getBeatProportionStr(
+            self._getMeasureOffsetOrMeterModulusOffset(ts))
 
 
     beatStr = property(_getBeatStr,  
@@ -3502,6 +3542,12 @@ class Music21Object(JSONSerializer):
         >>> m.timeSignature = meter.TimeSignature('6/8')
         >>> [m.notes[i].beatStr for i in range(6)]
         ['1', '1 1/3', '1 2/3', '2', '2 1/3', '2 2/3']
+
+        >>> s = stream.Stream()
+        >>> s.insert(0, meter.TimeSignature('3/4'))
+        >>> s.repeatAppend(note.Note(), 8)
+        >>> [n.beatStr for n in s.notes]
+        ['1', '2', '3', '1', '2', '3', '1', '2']
         ''')
 
 
@@ -3524,10 +3570,13 @@ class Music21Object(JSONSerializer):
         ts = self.getContextByClass('TimeSignature')
         if ts == None:
             raise Music21ObjectException('this object does not have a TimeSignature in DefinedContexts')
-        return ts.getBeatDuration(self._getMeasureOffset())
+        return ts.getBeatDuration(
+            self._getMeasureOffsetOrMeterModulusOffset(ts))
 
     beatDuration = property(_getBeatDuration,  
         doc = '''Return a :class:`~music21.duration.Duration` of the beat active for this object as found in the most recently positioned Measure.
+
+        If extending beyond the Measure, or in a Stream with a TimeSignature, the meter modulus value will be returned. 
 
         >>> from music21 import *
         >>> n = note.Note()
@@ -3541,6 +3590,12 @@ class Music21Object(JSONSerializer):
         >>> m.timeSignature = meter.TimeSignature('6/8')
         >>> [m.notes[i].beatDuration.quarterLength for i in range(6)]
         [1.5, 1.5, 1.5, 1.5, 1.5, 1.5]
+
+        >>> s = stream.Stream()
+        >>> s.insert(0, meter.TimeSignature('2/4+3/4'))
+        >>> s.repeatAppend(note.Note(), 8)
+        >>> [n.beatDuration.quarterLength for n in s.notes]
+        [2.0, 2.0, 3.0, 3.0, 3.0, 2.0, 2.0, 3.0]
         ''')
 
 
@@ -3594,7 +3649,7 @@ class Music21Object(JSONSerializer):
         #mOffset = self._getMeasureOffset()
 
         return ts.getAccentWeight(
-            self._getMeasureOffsetOrHypotheticalMeasureOffset(ts), 
+            self._getMeasureOffsetOrMeterModulusOffset(ts), 
                 forcePositionMatch=True, permitMeterModulus=False)
 
 
@@ -4677,6 +4732,47 @@ class Test(unittest.TestCase):
         self.assertEqual(matchOffset, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
         self.assertEqual(matchBeatStrength, [1.0, 0.25, 0.25, 1.0, 0.25, 0.25])
         self.assertEqual(matchAudioChannels, [2, 2, 2, 2, 2, 2])
+
+    
+    def testGetMeasureOffsetOrMeterModulusOffsetA(self):
+        # test getting metric position in a Stream with a TS
+        from music21 import stream, note, meter
+
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 12)
+        s.insert(0, meter.TimeSignature('3/4'))
+        
+        match = [n.beat for n in s.notes]
+        self.assertEqual(match, [1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0, 3.0])
+        
+        match = [n.beatStr for n in s.notes]
+        self.assertEqual(match, ['1', '2', '3', '1', '2', '3', '1', '2', '3', '1', '2', '3'])
+        
+        match = [n.beatDuration.quarterLength for n in s.notes]
+        self.assertEqual(match, [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] )
+        
+        match = [n.beatStrength for n in s.notes]
+        self.assertEqual(match, [1.0, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 0.5, 0.5] )
+
+    def testGetMeasureOffsetOrMeterModulusOffsetB(self):
+        from music21 import stream, note, meter
+
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 12)
+        s.insert(0.0, meter.TimeSignature('3/4'))
+        s.insert(3.0, meter.TimeSignature('4/4'))
+        s.insert(7.0, meter.TimeSignature('2/4'))
+        
+        match = [n.beat for n in s.notes]
+        self.assertEqual(match, [1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 1.0, 2.0, 1.0])
+        
+        match = [n.beatStr for n in s.notes]
+        self.assertEqual(match, ['1', '2', '3', '1', '2', '3', '4', '1', '2', '1', '2', '1'])
+        
+        match = [n.beatStrength for n in s.notes]
+        self.assertEqual(match, [1.0, 0.5, 0.5, 1.0, 0.25, 0.5, 0.25, 1.0, 0.5, 1.0, 0.5, 1.0])
+
+
 
 
 #     def testWeakElementWrapper(self):
