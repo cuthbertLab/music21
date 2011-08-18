@@ -280,6 +280,11 @@ class TempoText(TempoIndication):
 
 
 #-------------------------------------------------------------------------------
+class MetronomeMarkException(TempoException):
+    pass
+
+
+#-------------------------------------------------------------------------------
 class MetronomeMark(TempoIndication):
     '''
     A way of specifying a particular tempo with a text string, a referent (a duration) and a number.
@@ -681,6 +686,69 @@ class MetronomeMark(TempoIndication):
         '''
         return MetronomeMark(text=self.text, number=self.number, 
                              referent=referent)
+
+
+
+    #---------------------------------------------------------------------------
+    # real-time realization
+
+    def secondsPerQuarter(self):
+        '''Return the duration in seconds for each quarter length (not necessarily the referent) of this MetronomeMark.
+
+        >>> from music21 import tempo
+        >>> mm1 = tempo.MetronomeMark(referent=1.0, number=60.0)
+        >>> mm1.secondsPerQuarter()
+        1.0
+        >>> mm1 = tempo.MetronomeMark(referent=2.0, number=60.0)
+        >>> mm1.secondsPerQuarter()
+        0.5
+        >>> mm1 = tempo.MetronomeMark(referent=2.0, number=30.0)
+        >>> mm1.secondsPerQuarter()
+        1.0
+        '''
+        qbpm = self.getQuarterBPM()
+        if qbpm is not None:
+            return 60.0 / self.getQuarterBPM()
+        else:
+            raise MetronomeMarkException('cannot derive seconds as getQuarterBPM() returns None')
+
+
+    def durationToSeconds(self, durationOrQuarterLength):
+        '''Given a duration specified as a :class:`~music21.duration.Duration` object or a quarter length, return the resultant time in seconds at the tempo specified by this MetronomeMark.
+
+        >>> from music21 import tempo
+        >>> mm1 = tempo.MetronomeMark(referent=1.0, number=60.0)
+        >>> mm1.durationToSeconds(60)
+        60.0
+        >>> mm1.durationToSeconds(duration.Duration('16th'))
+        0.25
+        '''
+        if common.isNum(durationOrQuarterLength):
+            ql = durationOrQuarterLength
+        else: # assume a duration object
+            ql = durationOrQuarterLength.quarterLength
+        # get time per quarter
+        return self.secondsPerQuarter() * ql
+
+
+    def secondsToDuration(self, seconds):
+        '''Given a duration in seconds, return a :class:`~music21.duration.Duration` object equal to that time.
+
+        >>> from music21 import tempo
+        >>> mm1 = tempo.MetronomeMark(referent=1.0, number=60.0)
+        >>> mm1.secondsToDuration(0.25)
+        <music21.duration.Duration 0.25>
+        >>> mm1.secondsToDuration(0.5).type
+        'eighth'
+        >>> mm1.secondsToDuration(1)
+        <music21.duration.Duration 1.0>
+        '''
+        if not common.isNum(seconds) or seconds <= 0.0:
+            raise MetronomeMarkException('seconds must be a number greater than zero')
+        ql = seconds / self.secondsPerQuarter()
+        return duration.Duration(quarterLength=ql)
+        
+
 
 #-------------------------------------------------------------------------------
 class MetricModulationException(TempoException):
@@ -1466,6 +1534,30 @@ class Test(unittest.TestCase):
 
         self.assertEqual(mmod1.number, 140)
 
+
+
+    def testSecondsPerQuarterA(self):
+
+        from music21 import tempo, note, stream
+        mm = tempo.MetronomeMark(referent=1.0, number=120.0)
+        self.assertEqual(mm.secondsPerQuarter(), 0.5)
+        self.assertEqual(mm.durationToSeconds(120), 60.0)
+        self.assertEqual(mm.secondsToDuration(60.0).quarterLength, 120.0)
+
+        mm = tempo.MetronomeMark(referent=0.5, number=120.0)
+        self.assertEqual(mm.secondsPerQuarter(), 1.0)
+        self.assertEqual(mm.durationToSeconds(60), 60.0)
+        self.assertEqual(mm.secondsToDuration(60.0).quarterLength, 60.0)
+
+        mm = tempo.MetronomeMark(referent=2.0, number=120.0)
+        self.assertEqual(mm.secondsPerQuarter(), 0.25)
+        self.assertEqual(mm.durationToSeconds(240), 60.0)
+        self.assertEqual(mm.secondsToDuration(60.0).quarterLength, 240.0)
+        
+        mm = tempo.MetronomeMark(referent=1.5, number=120.0)
+        self.assertAlmostEqual(mm.secondsPerQuarter(), 1/3.)
+        self.assertEqual(mm.durationToSeconds(180), 60.0)
+        self.assertEqual(mm.secondsToDuration(60.0).quarterLength, 180.0)
 
 
 #-------------------------------------------------------------------------------

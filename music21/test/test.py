@@ -172,6 +172,10 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False):
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':
 
+    import sys
+    reload(sys)
+    sys.setdefaultencoding("UTF-8")
+
     # if optional command line args are given, assume they are  
     # test group arguments
     if len(sys.argv) >= 2:
