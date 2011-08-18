@@ -4141,8 +4141,7 @@ class Stream(music21.Music21Object):
     
                 # place all notes in their new location if offsets match
                 # TODO: this iterates over all notes at each iteration; can be faster      
-                # TODO: needs to be Notes and Rests
-                for e in post.notes: # assume all elements should move
+                for e in post.notesAndRests:
                     # these are flat offset values 
                     o = e.getOffsetBySite(post)
                     #environLocal.printDebug(['iterating elements', o, e])
@@ -14746,6 +14745,7 @@ class Test(unittest.TestCase):
             self.assertEqual(m.hasVoices(), False)
             match.append(len(m.pitches))
         self.assertEqual(match, [3, 9, 9, 25, 25, 21, 12, 7, 24, 26])
+        self.assertEqual(len(post.flat.getElementsByClass('Rest')), 5)
 
 
     def testChordifyD(self):
