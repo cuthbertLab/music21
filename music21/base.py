@@ -3483,7 +3483,7 @@ class Music21Object(JSONSerializer):
         3.0
         '''
         ts = self.getContextByClass('TimeSignature')
-        if ts == None:
+        if ts is None:
             raise Music21ObjectException('this object does not have a TimeSignature in DefinedContexts')                    
         return ts.getBeatProportion(
             self._getMeasureOffsetOrMeterModulusOffset(ts))
@@ -3519,7 +3519,7 @@ class Music21Object(JSONSerializer):
     def _getBeatStr(self):
         ts = self.getContextByClass('TimeSignature')
         #environLocal.printDebug(['_getBeatStr(): found ts:', ts])
-        if ts == None:
+        if ts is None:
             raise Music21ObjectException('this object does not have a TimeSignature in DefinedContexts')                    
         return ts.getBeatProportionStr(
             self._getMeasureOffsetOrMeterModulusOffset(ts))
@@ -3568,7 +3568,7 @@ class Music21Object(JSONSerializer):
         <music21.duration.Duration 1.0>
         '''
         ts = self.getContextByClass('TimeSignature')
-        if ts == None:
+        if ts is None:
             raise Music21ObjectException('this object does not have a TimeSignature in DefinedContexts')
         return ts.getBeatDuration(
             self._getMeasureOffsetOrMeterModulusOffset(ts))
@@ -3697,6 +3697,52 @@ class Music21Object(JSONSerializer):
         
         ''')
 
+
+
+    def _setSeconds(self, value):
+        ti = self.getContextByClass('TempoIndication')
+        if ti is None:
+            raise Music21ObjectException('this object does not have a TempoIndication in DefinedContexts')
+        # three possible sources of metric information; need to get a mm
+        if 'MetricModulation' in ti.classes:
+            mm = ti.newMetronome
+        elif 'MetronomeMark' in ti.classes:
+            mm = ti
+        elif 'TempoText' in ti.classes:
+            mm = ti.getMetronomeMark()
+        self.duration = mm.secondsToDuration(value)
+
+
+    def _getSeconds(self):
+        # do not search of duration is zero
+        if self.duration is None or self.duration.quarterLength == 0.0:
+            return 0.0
+
+        ti = self.getContextByClass('TempoIndication')
+        if ti is None:
+            raise Music21ObjectException('this object does not have a TempoIndication in DefinedContexts')
+        # three possible sources of metric information; need to get a mm
+        if 'MetricModulation' in ti.classes:
+            mm = ti.newMetronome
+        elif 'MetronomeMark' in ti.classes:
+            mm = ti
+        elif 'TempoText' in ti.classes:
+            mm = ti.getMetronomeMark()
+
+        # once we have mm, simply pass in this duration
+        return mm.durationToSeconds(self.duration)
+
+    seconds = property(_getSeconds, _setSeconds, doc = '''
+        Get or set the the duration of this object in seconds, assuming that this object has a :class:`~music21.tempo.MetronomeMark` or :class:`~music21.tempo.MetricModulation` in its past context.
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> s.repeatAppend(note.Note(), 12)
+        >>> s.insert(0, tempo.MetronomeMark(number=120))
+        >>> s.insert(6, tempo.MetronomeMark(number=240))
+        >>> [n.seconds for n in s.notes]
+        [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+        ''')
 
 #-------------------------------------------------------------------------------
 class ElementWrapper(Music21Object):
@@ -4773,6 +4819,36 @@ class Test(unittest.TestCase):
         self.assertEqual(match, [1.0, 0.5, 0.5, 1.0, 0.25, 0.5, 0.25, 1.0, 0.5, 1.0, 0.5, 1.0])
 
 
+
+    def testSecondsPropertyA(self):
+        from music21 import stream, note, tempo
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 12)
+        s.insert(0, tempo.MetronomeMark(number=120))
+        
+        self.assertEqual([n.seconds for n in s.notes], [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
+        
+        # changing tempo mid-stream
+        s.insert(6, tempo.MetronomeMark(number=240))
+        self.assertEqual([n.seconds for n in s.notes], [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25])
+        
+        # adding notes based on seconds
+        s = stream.Stream()
+        s.insert(0, tempo.MetronomeMark(number=120))
+        s.append(note.Note())
+        s.notes[0].seconds = 2.0
+        self.assertEqual(s.notes[0].quarterLength, 4.0)
+        
+        s.append(note.Note())
+        s.notes[1].seconds = 0.5
+        self.assertEqual(s.notes[1].quarterLength, 1.0)
+        self.assertEqual(s.duration.quarterLength, 5.0)
+        
+        s.append(tempo.MetronomeMark(number=30))
+        s.append(note.Note())
+        s.notes[2].seconds = 0.5
+        self.assertEqual(s.notes[2].quarterLength, 0.25)
+        self.assertEqual(s.duration.quarterLength, 5.25)
 
 
 #     def testWeakElementWrapper(self):

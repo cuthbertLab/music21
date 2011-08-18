@@ -135,7 +135,7 @@ class GeneralNote(music21.Music21Object):
     
     Keywords can be passed to
     a GeneralNote which are then passed to the
-    underlying :class:`music21.duration.Duration`.  
+    underlying :class:`~music21.duration.Duration`.  
     These keywords might be listed like
     type='16th', dots=2 etc. to create a
     double-dotted sixteenth note.

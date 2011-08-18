@@ -6599,8 +6599,6 @@ class Stream(music21.Music21Object):
             self._cache["Duration"].quarterLength = self.highestTime
             return self._cache["Duration"]
 
-
-
     def _setDuration(self, durationObj):
         '''
         Set the total duration of the Stream independently of the highestTime  
@@ -6653,6 +6651,65 @@ class Stream(music21.Music21Object):
         >>> a.highestTime
         4.0
         ''')
+
+
+    def _setSeconds(self, value):
+        # setting the seconds on a Stream for now is the same as on a 
+        # Music21Object, which reassigns Duration
+        Music21Object._setSeconds(self, value)
+
+    def _getSeconds(self):
+        # need to find all tempo indications and the number of quarter lengths
+        # under each
+        tiStream = self.getElementsByClass('TempoIndication')
+        if len(tiStream) == 0:
+            raise StreamException('cannot get a seconds duration when no TempoIndication classes are found in this Stream.')
+
+        offsetMetronomeMarkPairs = []
+        for ti in tiStream:
+            o = ti.getOffsetBySite(self)
+            # get the desired metronome mark
+            if 'MetricModulation' in ti.classes:
+                mm = ti.newMetronome
+            elif 'MetronomeMark' in ti.classes:
+                mm = ti
+            elif 'TempoText' in ti.classes:
+                mm = ti.getMetronomeMark()
+            offsetMetronomeMarkPairs.append([o, mm])
+
+        sec = 0.0
+        for i, (o, mm) in enumerate(offsetMetronomeMarkPairs):
+            if i == 0 and o > 0.0: 
+                raise StreamException('cannot calculate total seconds, as no tempo is defined from the 0.0 offset position.')
+            # handle only one mm right away
+            if len(offsetMetronomeMarkPairs) == 1: 
+                sec += mm.durationToSeconds(self.highestTime)
+                break
+            oStart, mmStart = o, mm
+            # if not the last ti, get the next by index to get the offset
+            if i < len(offsetMetronomeMarkPairs) - 1:
+                # cases of two or more remain
+                oEnd, mmEnd = offsetMetronomeMarkPairs[i+1]
+            else: # at the last            
+                oEnd = self.highestTime
+            sec += mmStart.durationToSeconds(oEnd-oStart)
+
+        return sec
+
+
+    seconds = property(_getSeconds, _setSeconds, doc = '''
+        Get or set the the duration of this Stream in seconds, assuming that this object contains a :class:`~music21.tempo.MetronomeMark` or :class:`~music21.tempo.MetricModulation`.
+
+        >>> from music21 import *
+        >>> s = corpus.parse('bwv66.6') # piece without a tempo
+        >>> sFlat = s.flat 
+        >>> sFlat.insert(0, tempo.MetronomeMark('adagio'))
+        >>> sFlat.seconds
+        38.57142857...
+        ''')
+
+
+
 
 
 
@@ -16143,6 +16200,65 @@ class Test(unittest.TestCase):
         for e in s5.elements:
             match.append(e.getOffsetBySite(s5))
         self.assertEqual(match, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0])
+
+
+    def testSecondsPropertyA(self):
+        from music21 import stream, note, tempo
+
+        # simple case of one tempo
+        s = stream.Stream()
+        s.insert(0, tempo.MetronomeMark(number=60))
+        s.repeatAppend(note.Note(), 60) 
+        self.assertEqual(s.seconds, 60.0)
+        
+        s = stream.Stream()
+        s.insert(0, tempo.MetronomeMark(number=90))
+        s.repeatAppend(note.Note(), 60) 
+        self.assertEqual(s.seconds, 40.0)
+        
+        s = stream.Stream()
+        s.insert(0, tempo.MetronomeMark(number=120))
+        s.repeatAppend(note.Note(), 60) 
+        self.assertEqual(s.seconds, 30.0)
+        
+        # changing tempo mid-stream
+        s = stream.Stream()
+        s.insert(0, tempo.MetronomeMark(number=60))
+        s.repeatAppend(note.Note(), 60) 
+        s.insert(30, tempo.MetronomeMark(number=120))
+        # 30 notes at 60, 30 notes at 120
+        self.assertEqual(s.seconds, 30.0 + 15.0)
+        
+        s = stream.Stream()
+        s.insert(0, tempo.MetronomeMark(number=60))
+        s.repeatAppend(note.Note(), 60) 
+        s.insert(15, tempo.MetronomeMark(number=120))
+        s.insert(30, tempo.MetronomeMark(number=240))
+        s.insert(45, tempo.MetronomeMark(number=480))
+        
+        # 15 notes at 60, 15 notes at 120, 15 at 240, 15 at 480
+        self.assertEqual(s.seconds, 15.0 + 7.5 + 3.75 + 1.875)
+
+
+    def testSecondsPropertyB(self):
+
+        from music21 import corpus, tempo
+
+        s = corpus.parse('bwv66.6')
+        sFlat = s.flat 
+        # we have not tempo
+        self.assertEqual(len(sFlat.getElementsByClass('TempoIndication')), 0)
+        sFlat.insert(0, tempo.MetronomeMark('adagio'))
+        self.assertAlmostEquals(sFlat.seconds, 38.57142857)
+        
+        sFlat.removeByClass('TempoIndication')        
+        sFlat.insert(0, tempo.MetronomeMark('presto'))
+        self.assertAlmostEquals(sFlat.seconds, 11.73913043)
+        
+        sFlat.removeByClass('TempoIndication')        
+        sFlat.insert(0, tempo.MetronomeMark('prestissimo'))
+        self.assertAlmostEquals(sFlat.seconds, 10.38461538)
+
 
 
 
