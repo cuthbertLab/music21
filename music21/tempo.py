@@ -890,32 +890,34 @@ class MetricModulation(TempoIndication):
 
 
     def _getNumber(self):
-        nNew = self._newMetronome.number
-#         nOld = self._oldMetronome.number
-#         if nOld != nNew:
-#             raise MetricModulationException('can get a number when not defined for both MetricModulation objects')
-        return nNew 
+        if self._newMetronome is not None:
+            return self._newMetronome.number 
     
-    def _setNumber(self, value, updateTextFromNumber=True):
-        if not common.isNum(value):
-            raise MetricModulationException('cannot set number to a string')
-        self._newMetronome.number = value
-        # need to convert number to context of existing referrent
-        self._oldMetronome.number = value
+#     def _setNumber(self, value, updateTextFromNumber=True):
+#         if not common.isNum(value):
+#             raise MetricModulationException('cannot set number to a string')
+#         self._newMetronome.number = value
+#         self._oldMetronome.number = value
 
-    number = property(_getNumber, _setNumber, doc =
-        '''Get and set the number of the MetricModulation, simultaneously changing both the old and new MetronomeMarks.
+    number = property(_getNumber, doc =
+        '''Get and the number of the MetricModulation, or the number assigned to the new MetronomeMark.
 
         >>> from music21 import *
-        >>> mm1 = tempo.MetronomeMark(number=60, referent=1)
+        >>> s = stream.Stream()
+        >>> mm1 = tempo.MetronomeMark(number=60)
+        >>> s.append(mm1)
+        >>> s.repeatAppend(note.Note(quarterLength=1), 2)
+        >>> s.repeatAppend(note.Note(quarterLength=.5), 4)
+    
         >>> mmod1 = tempo.MetricModulation()
-        >>> mmod1.oldMetronome = mm1
-        >>> mmod1.oldMetronome
-        <music21.tempo.MetronomeMark larghetto Quarter=60>
-        >>> mmod1.oldReferent = .25
-        >>> mmod1.oldMetronome
-        <music21.tempo.MetronomeMark larghetto 16th=240.0>
-
+        >>> mmod1.oldReferent = .5 # can use Duration objects
+        >>> mmod1.newReferent = 'quarter' 
+        >>> s.append(mmod1)
+        >>> mmod1.updateByContext() 
+        >>> mmod1.newMetronome
+        <music21.tempo.MetronomeMark animato Quarter=120.0>
+        >>> mmod1.number        
+        120.0
         ''')
 
     #---------------------------------------------------------------------------
@@ -1461,6 +1463,8 @@ class Test(unittest.TestCase):
         s.append(mmod1)
         self.assertEqual(mmod1.newMetronome.number, 140)
         self.assertEqual(mmod1.oldMetronome.number, 140)
+
+        self.assertEqual(mmod1.number, 140)
 
 
 
