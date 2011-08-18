@@ -113,6 +113,22 @@ class TempoIndication(music21.Music21Object):
     def __init__(self):
         music21.Music21Object.__init__(self)
 
+    def getSoundingMetronomeMark(self, found=None):
+        '''Get the appropriate MetronomeMark from anu sort of TempoIndication, regardless of class.
+        '''
+        if found is None:
+            found = self
+
+        if 'MetricModulation' in found.classes:
+            return found.newMetronome
+        elif 'MetronomeMark' in found.classes:
+            return found
+        elif 'TempoText' in found.classes:
+            return found.getMetronomeMark()
+        else:
+            raise TempoException('cannot derive a MetronomeMark from this TempoIndication: %s' % found)
+
+
     def getPreviousMetronomeMark(self):
         '''Do activeSite and context searches to try to find the last relevant MetronomeMark or MetricModulation object. If a MetricModulation mark is found, return the new MetronomeMark, or the last relevant.
 
@@ -131,20 +147,9 @@ class TempoIndication(music21.Music21Object):
         # must provide getElementBefore, as will otherwise return self
         obj = self.getContextByClass('TempoIndication', 
               getElementMethod='getElementBeforeOffset')
-        if obj is not None:
-            found = obj
-        if found is None:           
+        if obj is None:
             return None # nothing to do
-        if 'MetricModulation' in found.classes:
-            return found.newMetronome
-        elif 'MetronomeMark' in found.classes:
-            return found
-        elif 'TempoText' in found.classes:
-            return found.getMetronomeMark()
-        else:
-            raise TempoException('cannot derive a MetronomeMark from the found TempoIndication: %s' % found)
-
-
+        return self.getSoundingMetronomeMark(obj)
 
 
 #-------------------------------------------------------------------------------

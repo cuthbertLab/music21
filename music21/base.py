@@ -3703,15 +3703,8 @@ class Music21Object(JSONSerializer):
         ti = self.getContextByClass('TempoIndication')
         if ti is None:
             raise Music21ObjectException('this object does not have a TempoIndication in DefinedContexts')
-        # three possible sources of metric information; need to get a mm
-        if 'MetricModulation' in ti.classes:
-            mm = ti.newMetronome
-        elif 'MetronomeMark' in ti.classes:
-            mm = ti
-        elif 'TempoText' in ti.classes:
-            mm = ti.getMetronomeMark()
+        mm = ti.getSoundingMetronomeMark()
         self.duration = mm.secondsToDuration(value)
-
 
     def _getSeconds(self):
         # do not search of duration is zero
@@ -3721,14 +3714,7 @@ class Music21Object(JSONSerializer):
         ti = self.getContextByClass('TempoIndication')
         if ti is None:
             raise Music21ObjectException('this object does not have a TempoIndication in DefinedContexts')
-        # three possible sources of metric information; need to get a mm
-        if 'MetricModulation' in ti.classes:
-            mm = ti.newMetronome
-        elif 'MetronomeMark' in ti.classes:
-            mm = ti
-        elif 'TempoText' in ti.classes:
-            mm = ti.getMetronomeMark()
-
+        mm = ti.getSoundingMetronomeMark()
         # once we have mm, simply pass in this duration
         return mm.durationToSeconds(self.duration)
 

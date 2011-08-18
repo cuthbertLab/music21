@@ -6659,28 +6659,39 @@ class Stream(music21.Music21Object):
         Music21Object._setSeconds(self, value)
 
     def _getSeconds(self):
+        getTempoFromContext = False
+
         # need to find all tempo indications and the number of quarter lengths
         # under each
         tiStream = self.getElementsByClass('TempoIndication')
-        if len(tiStream) == 0:
-            raise StreamException('cannot get a seconds duration when no TempoIndication classes are found in this Stream.')
-
         offsetMetronomeMarkPairs = []
-        for ti in tiStream:
-            o = ti.getOffsetBySite(self)
-            # get the desired metronome mark
-            if 'MetricModulation' in ti.classes:
-                mm = ti.newMetronome
-            elif 'MetronomeMark' in ti.classes:
-                mm = ti
-            elif 'TempoText' in ti.classes:
-                mm = ti.getMetronomeMark()
-            offsetMetronomeMarkPairs.append([o, mm])
 
-        sec = 0.0
+        if len(tiStream) == 0:
+            getTempoFromContext = True
+        else:
+            for ti in tiStream:
+                o = ti.getOffsetBySite(self)
+                # get the desired metronome mark from any of ti classes
+                mm = ti.getSoundingMetronomeMark()
+                offsetMetronomeMarkPairs.append([o, mm])
+
         for i, (o, mm) in enumerate(offsetMetronomeMarkPairs):
             if i == 0 and o > 0.0: 
-                raise StreamException('cannot calculate total seconds, as no tempo is defined from the 0.0 offset position.')
+                getTempoFromContext = True
+            break # just need first
+
+        if getTempoFromContext:
+            ti = self.getContextByClass('TempoIndication')
+            if ti is None:
+                raise StreamException('cannot get a seconds duration when no TempoIndication classes are found in or before this Stream.')
+            else: # insert at zero offset position, even though coming from 
+                # outside this stream
+                mm = ti.getSoundingMetronomeMark()
+                offsetMetronomeMarkPairs = [
+                    [0.0, mm]] + offsetMetronomeMarkPairs
+            
+        sec = 0.0
+        for i, (o, mm) in enumerate(offsetMetronomeMarkPairs):
             # handle only one mm right away
             if len(offsetMetronomeMarkPairs) == 1: 
                 sec += mm.durationToSeconds(self.highestTime)
@@ -16259,8 +16270,36 @@ class Test(unittest.TestCase):
         sFlat.insert(0, tempo.MetronomeMark('prestissimo'))
         self.assertAlmostEquals(sFlat.seconds, 10.38461538)
 
+    def testSecondsPropertyC(self):
+        from music21 import stream, note, meter, tempo
 
+        s = stream.Stream()
+        m1 = stream.Measure()
+        m1.timeSignature = meter.TimeSignature('3/4')
+        mm = tempo.MetronomeMark(number=60)
+        m1.insert(0, mm)
+        m1.insert(note.Note(quarterLength=3))
+        s.append(m1)
+        
+        m2 = stream.Measure()
+        m2.timeSignature = meter.TimeSignature('5/4')
+        m2.insert(note.Note(quarterLength=5))
+        s.append(m2)
+        
+        m3 = stream.Measure()
+        m3.timeSignature = meter.TimeSignature('2/4')
+        m3.insert(note.Note(quarterLength=2))
+        s.append(m3)
+        
+        self.assertEqual([m.seconds for m in s.getElementsByClass('Measure')], [3.0, 5.0, 2.0])
+        
+        mm.number = 120
+        self.assertEqual([m.seconds for m in s.getElementsByClass('Measure')], [1.5, 2.5, 1.0])
+        
+        mm.number = 30
+        self.assertEqual([m.seconds for m in s.getElementsByClass('Measure')], [6.0, 10.0, 4.0])
 
+            
 
 class Test2(unittest.TestCase):
     '''
