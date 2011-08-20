@@ -22,7 +22,6 @@ or in :ref:`moduleMeter` (a ritardando for instance).
 
 import unittest
 import copy
-import itertools
 
 import music21
 from music21 import common
@@ -46,9 +45,12 @@ class Spanner(music21.Music21Object):
     Spanner objects live on Streams as other Music21Objects, but 
     store connections between one or more Music21Objects.
 
-
     Most of the time you will want to subclass Spanner
-    for specific purposes.  In the first demo, we create
+    for specific purposes.  
+
+    Commonly used Spanner subclasses include the :class:`~music21.spanner.Slur`, :class:`~music21.spanner.RepeatBracket`, :class:`~music21.spanner.Crescendo`, and :class:`~music21.spanner.Diminuendo`.
+
+    In the first demo, we create
     a spanner to represent a written-out accelerando, such
     as Elliott Carter uses in his second string quartet
 
@@ -495,6 +497,8 @@ class Spanner(music21.Music21Object):
 #-------------------------------------------------------------------------------
 class SpannerBundle(object):
     '''A utility object for collecting and processing collections of Spanner objects. This is necessary because often processing routines that happen at many different levels need access to the same collection of spanners. 
+
+    Because SpannerBundles are so commonly used with :class:`~music21.stream.Stream` objects, the Stream has a :attr:`~music21.stream.Stream.spannerBundle` property that stores and caches a SpannerBundle of the Stream.
 
     If a Stream or Stream subclass is provided as an argument, all Spanners on this Stream will be accumulated herein. 
     '''
@@ -991,43 +995,47 @@ class Diminuendo(DynamicWedge):
         return post
 
 
+#-------------------------------------------------------------------------------
+class StaffGroup(Spanner):
+    '''A StaffGroup defines a collection of one or more Parts, specifying that they should be shown together with a bracket, brace, or other symbol, and may have a common name.
+    '''
+    def __init__(self, *arguments, **keywords):
+        Spanner.__init__(self, *arguments, **keywords)
+
+        self.name = None # if this group has a name
+        self.abbreviation = None 
+        self.symbol = None # can be bracket, line
+        # determines if barlines are grouped through; this is group barline
+        # in musicxml
+        self.barTogether = False
+
+
+
+#-------------------------------------------------------------------------------
+# other ideas for spanners
+
 
 
 
 # associate two or more notes to be beamed together
 # use a stored time signature to apply beaming values 
-class BeamingGroup(Spanner):
-    pass
-
-
-
-
-# association of staffs
-# designates bracket or brace or combination of many
-class StaffGroup(Spanner):
-    pass
-
-
+# class BeamingGroup(Spanner):
+#     pass
 
 
 # optionally define one or more Streams as a staff
 # provide settings for staff presentation such as number lines
 # presentation of part name?
-class Staff(Spanner):
-    pass
-
-# 2 parts in on staff
-# 1 parts w/ staves
-
+# class Staff(Spanner):
+#     pass
 
 # collection of measures within a Score
-class System(Spanner):
-    pass
-
-
-# association of all measures or streams on a page
-class Page(Spanner):
-    pass
+# class System(Spanner):
+#     pass
+# 
+# # association of all measures or streams on a page
+# class Page(Spanner):
+#     pass
 
 
 

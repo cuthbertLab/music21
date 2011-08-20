@@ -3577,7 +3577,20 @@ spirit</words>
             p.append(note)
             
         #p.show()
-    
+        raw = p.musicxml    
+        self.assertEqual(raw.find('<notehead>diamond</notehead>') > 0, True)
+        self.assertEqual(raw.find('<notehead>square</notehead>') > 0, True)
+        self.assertEqual(raw.find('<notehead>triangle</notehead>') > 0, True)
+        self.assertEqual(raw.find('<notehead>inverted triangle</notehead>') > 0, True)
+        self.assertEqual(raw.find('<notehead>arrow down</notehead>') > 0, True)
+        self.assertEqual(raw.find('<notehead>back slashed</notehead>') > 0, True)
+        self.assertEqual(raw.find('<notehead>slash</notehead>') > 0, True)
+        self.assertEqual(raw.find('<notehead>x</notehead>') > 0, True)
+        self.assertEqual(raw.find('<notehead>cross</notehead>') > 0, True)
+        self.assertEqual(raw.find('<notehead>circle-x</notehead>') > 0, True)
+        self.assertEqual(raw.find('<notehead>fa</notehead>') > 0, True)
+
+
     
     def testMusicXMLNoteheadtoMusic21Notehead(self):
         # test to ensure noteheads can be imported from MusicXML
@@ -3668,6 +3681,13 @@ spirit</words>
         self.assertEqual(chordResult.getStemDirection(chordResult.pitches[1]), 'noStem')
         
         
+
+    def testStaffGroupsA(self):
+        from music21.musicxml import testPrimitive
+        from music21 import converter, spanner
+        
+        s = converter.parse(testPrimitive.staffGroupsNested41d)
+
         
 
 if __name__ == "__main__":

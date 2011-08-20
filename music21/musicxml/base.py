@@ -816,6 +816,8 @@ class Software(MusicXMLElement):
 
 
 class PartList(MusicXMLElementList):
+    '''The PartList defines the parts, as well as their names and abbreviations. Additionally, the order of this list is used as a way specifying arrangements of brackets and/or braces that group parts in partGroup objects. The order of this list thus matters. 
+    '''
     def __init__(self):
         MusicXMLElementList.__init__(self)
         self._tag = 'part-list'
@@ -832,15 +834,15 @@ class PartGroup(MusicXMLElement):
         MusicXMLElement.__init__(self)
         self._tag = 'part-group'
         # attributes
-        self._attr['type'] = None
-        self._attr['number'] = None
+        self._attr['type'] = None # start or stop; one of each
+        self._attr['number'] = None # id number used to link start/stop
         # simple elements
         self.groupName = None
         self.groupNameDisplay = None
         self.groupAbbreviation = None
         self.groupAbbreviationDisplay = None
-        self.groupSymbol = None
-        self.groupBarline = None
+        self.groupSymbol = None # bracket, line, 
+        self.groupBarline = None # yes, no
         self.groupTime = None # empty element / boolean value
 
     def _getComponents(self):
@@ -869,7 +871,7 @@ class ScorePart(MusicXMLElement):
         self._attr['id'] = None
         # simple elements
         self.partName = None
-        self.partAbbreviation = None
+        self.partAbbreviation = None # used on subsequent lines
         # component objects
         self.scoreInstrumentList = [] # list of objects
         self.midiInstrumentList = [] # list of objects
