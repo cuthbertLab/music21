@@ -238,11 +238,11 @@ class Wedge(music21.Music21Object):
     '''Object model of crescendeo/decrescendo wedges.
     '''
     
-    def __init__(self, value=None):
+    def __init__(self, type=None):
         music21.Music21Object.__init__(self)
         # use inherited duration to show length n time
         # these correspond to start and stop
-        self.type = None # crescendo, stop, or diminuendo
+        self.type = type # crescendo, stop, or diminuendo
         self.spread = None
 
         # all musicxml-related positioning
