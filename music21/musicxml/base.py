@@ -645,6 +645,33 @@ class Score(MusicXMLElementList):
                 post[part.get('id')] = part.get('part-name')
         return post
 
+    def getPartGroupData(self):
+        '''Get part groups organized by part id in dictionaries.
+        '''
+        open = []
+        closed = []
+        # the parts list object contains both ScorePart and PartGroup objs
+        for p in self.partListObj:
+            if isinstance(p, PartGroup):
+                n = p.get('number')
+                type = p.get('type')
+                if type == 'start':
+                    coll = {}
+                    coll['number'] = n
+                    coll['scorePartIds'] = []
+                    open.append(coll)
+                elif type == 'stop':
+                    for c in open:
+                        if c['number'] == n:
+                            open.remove(c)
+                            closed.append(c)
+                            break
+            elif isinstance(p, ScorePart):
+                # add to all open collections
+                for c in open:
+                    c['scorePartIds'].append(p)
+        return closed
+
     def getInstrument(self, partId):
         '''Get an instrument from a part
 
@@ -668,7 +695,6 @@ class Score(MusicXMLElementList):
                     break
         return inst
 
-
     def getPart(self, partId):
         ''' Get a part, given an id.
 
@@ -679,9 +705,7 @@ class Score(MusicXMLElementList):
         >>> isinstance(c, Part)
         True
         '''
-
         idFound = None
-
         partNames = self.getPartNames()    
         if partId in partNames.keys():
             idFound = partId
@@ -694,7 +718,7 @@ class Score(MusicXMLElementList):
                 elif partId.lower() == partNames[id].lower(): 
                     idFound = id
                     break
-        if idFound == None:
+        if idFound is None:
             raise MusicXMLException('no part with id %s' % partId)
         # get part objects
         partObj = None
@@ -830,6 +854,8 @@ class PartList(MusicXMLElementList):
 
 
 class PartGroup(MusicXMLElement):
+    '''The PartGroup tag is stored in the PartList, intermingled with ScorePart tags and other definitions.
+    '''
     def __init__(self):
         MusicXMLElement.__init__(self)
         self._tag = 'part-group'

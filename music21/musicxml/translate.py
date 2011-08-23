@@ -2921,6 +2921,10 @@ def mxToStream(mxScore, spannerBundle=None, inputM21=None):
             spannerBundle=spannerBundle, inputM21=s)
         #s._setMXPart(mxScore, partName)
 
+
+    # get part/staff groups
+    environLocal.printDebug(['partgroups:', mxScore.getPartGroupData()])
+
     # add metadata object; this is placed after all other parts now
     # these means that both Parts and other objects live on Stream.
     md = metadata.Metadata()
@@ -2929,7 +2933,7 @@ def mxToStream(mxScore, spannerBundle=None, inputM21=None):
 
     # only insert complete spanners; at each level possible, complete spanners
     # are inserted into either the Score or the Part
-    # storing complet Part spanners in a Part permits extracting parts with spanners
+    # storing complete Part spanners in a Part permits extracting parts with spanners
     rm = []
     for sp in spannerBundle.getByCompleteStatus(True):
         s._insertCore(0, sp)
@@ -3687,6 +3691,7 @@ spirit</words>
         from music21 import converter, spanner
         
         s = converter.parse(testPrimitive.staffGroupsNested41d)
+        raw = s.musicxml
 
         
 
