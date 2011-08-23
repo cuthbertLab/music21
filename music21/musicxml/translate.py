@@ -2833,6 +2833,7 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     # note: this presently has to look at _idLastDeepCopyOf to get matches
     # to find removed elements after copying; this is probably not the
     # best way to do this. 
+    streamPartStaff = None
     if mxPart.getStavesCount() > 1:
         # get staves will return a number, between 1 and count
         #for staffCount in range(mxPart.getStavesCount()):
@@ -2892,6 +2893,10 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     # when adding parts to this Score
     # this assumes all start at the same place
     # even if there is only one part, it will be placed in a Stream
+    if streamPartStaff is not None:
+        return streamPartStaff
+    else:
+        return streamPart
 
 
 def mxToStream(mxScore, spannerBundle=None, inputM21=None):
@@ -2910,20 +2915,33 @@ def mxToStream(mxScore, spannerBundle=None, inputM21=None):
         s = stream.Score()
     else:
         s = inputM21
-
     if spannerBundle == None:
         spannerBundle = spanner.SpannerBundle()
 
-    partNames = mxScore.getPartNames().keys()
-    partNames.sort()
-    for partName in partNames: # part names are part ids
-        mxToStreamPart(mxScore, partId=partName, 
+    partIdDictionary = mxScore.getPartNames()
+    # values are part names
+    partNameIds = partIdDictionary.keys()
+    partNameIds.sort()
+    for partId in partNameIds: # part names are part ids
+        # NOTE: setting partId not partId: might change
+        # return the part; however, it is still already attached to the Score
+        part = mxToStreamPart(mxScore, partId=partId, 
             spannerBundle=spannerBundle, inputM21=s)
-        #s._setMXPart(mxScore, partName)
-
+        # update dictionary to store music21 part
+        partIdDictionary[partId] = part
 
     # get part/staff groups
-    environLocal.printDebug(['partgroups:', mxScore.getPartGroupData()])
+    #environLocal.printDebug(['partgroups:', mxScore.getPartGroupData()])
+    partGroupData = mxScore.getPartGroupData()
+    for partGroup in partGroupData: # a list of dictionaries
+        # create music21 spanner StaffGroup
+        # TODO: need to add attributes, parameters
+        sg = spanner.StaffGroup()
+        for partId in partGroup['scorePartIds']:
+            # get music21 part from partIdDictionary
+            sg.addComponents(partIdDictionary[partId])
+        sg.completeStatus = True
+        spannerBundle.append(sg) # will be added to the Score
 
     # add metadata object; this is placed after all other parts now
     # these means that both Parts and other objects live on Stream.
@@ -3691,7 +3709,8 @@ spirit</words>
         from music21 import converter, spanner
         
         s = converter.parse(testPrimitive.staffGroupsNested41d)
-        raw = s.musicxml
+        self.assertEqual(len(s.getElementsByClass('StaffGroup')), 2)
+        #raw = s.musicxml
 
         
 

@@ -647,6 +647,8 @@ class Score(MusicXMLElementList):
 
     def getPartGroupData(self):
         '''Get part groups organized by part id in dictionaries.
+
+        Returns a list of dictionaries, each dictionary containing number, a list of part ids, and a mx PartGroup object.
         '''
         open = []
         closed = []
@@ -659,6 +661,7 @@ class Score(MusicXMLElementList):
                     coll = {}
                     coll['number'] = n
                     coll['scorePartIds'] = []
+                    coll['partGroup'] = p
                     open.append(coll)
                 elif type == 'stop':
                     for c in open:
@@ -667,9 +670,8 @@ class Score(MusicXMLElementList):
                             closed.append(c)
                             break
             elif isinstance(p, ScorePart):
-                # add to all open collections
-                for c in open:
-                    c['scorePartIds'].append(p)
+                for c in open: # add to all open collections
+                    c['scorePartIds'].append(p.get('id'))
         return closed
 
     def getInstrument(self, partId):

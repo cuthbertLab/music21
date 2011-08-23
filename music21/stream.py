@@ -6239,10 +6239,8 @@ class Stream(music21.Music21Object):
             except IndexError:
                 # this may happen in the number of elements has changed
                 continue
-
             if restoreActiveSites:
                 e.activeSite = self
-
             #if hasattr(e, 'elements'):
             if e.isStream:
                 # this returns a generator, so need to iterate over it
@@ -6254,7 +6252,6 @@ class Stream(music21.Music21Object):
                             yield y
                     else:
                         yield y
-
             # its an element on the Stream that is not a Stream
             else:
                 if not streamsOnly:
@@ -6276,7 +6273,8 @@ class Stream(music21.Music21Object):
         # TODO: add support for filter list
         # TODO: add add end elements
 
-        if id(self) not in memo:
+        # must exclude spanner storage, as might be found
+        if id(self) not in memo and 'SpannerStorage' not in self.classes:
             yield self
             #environLocal.printDebug(['memoing:', self, memo])
             if skipDuplicates:
@@ -6286,7 +6284,7 @@ class Stream(music21.Music21Object):
         p = self.activeSite
         # if a activeSite exists, its always a stream!
         #if p != None and hasattr(p, 'elements'):
-        if p is not None and p.isStream:
+        if p is not None and p.isStream and 'SpannerStorage' not in p.classes:
             # using indices so as to not to create an iterator and new locations/activeSites
             # here we access the private _elements, again: no iterator
             for i in range(len(p._elements)):
@@ -6303,7 +6301,6 @@ class Stream(music21.Music21Object):
                             yield e
                             if skipDuplicates:
                                 memo.append(id(e))
-
                 # for each element in the activeSite that is a Stream, 
                 # look at the activeSites
                 # if the activeSites are a Stream, recurse
@@ -6311,8 +6308,7 @@ class Stream(music21.Music21Object):
                 #    and hasattr(e.activeSite, 'elements')):
 
                 elif (e.isStream and e.activeSite is not None and 
-                    e.activeSite.isStream):
-
+                    e.activeSite.isStream and 'SpannerStorage' not in e.classes):
                     # this returns a generator, so need to iterate over it
                     # to get results
                     # e.activeSite will be yielded at top of recurse
@@ -15662,7 +15658,7 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         # default
         rElements = s.recurse()
-        self.assertEqual(len(rElements), 235)
+        self.assertEqual(len(rElements), 236)
 
         rElements = s.recurse(streamsOnly=True)
         self.assertEqual(len(rElements), 45)
@@ -15689,8 +15685,8 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         m1 = s[2][1] # cannot use parts here as breaks active site
         rElements = m1.recurse(direction='upward')
-        self.assertEqual([str(e.classes[0]) for e in rElements], ['Measure', 'Instrument', 'Part', 'Metadata', 'Score', 'Part', 'Part', 'Part', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure'])
-        self.assertEqual(len(rElements), 17)
+        self.assertEqual([str(e.classes[0]) for e in rElements], ['Measure', 'Instrument', 'Part', 'Metadata', 'Part', 'Score', 'Part', 'Part', 'StaffGroup', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure', 'Measure'])
+        self.assertEqual(len(rElements), 18)
 
 
 
