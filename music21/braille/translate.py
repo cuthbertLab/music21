@@ -20,6 +20,7 @@ import unittest
 
 from music21 import bar
 from music21 import chord
+from music21 import dynamics
 from music21 import instrument
 from music21 import interval
 from music21 import key
@@ -228,7 +229,9 @@ symbols = {'space': u'\u2800',
            'cut': u'\u2838\u2809',
            'music_hyphen': u'\u2810',
            'music_asterisk': u'\u281c\u2822\u2814',
-           'music_parenthesis': u''}
+           'rh_keyboard': u'\u2805\u281c',
+           'lh_keyboard': u'\u2807\u281c',
+           'word': u'\u281c'}
 
 ascii_chars = {u'\u2800': ' ',
                u'\u2801': 'A',
@@ -913,6 +916,16 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
     except KeyError:
         bt = BrailleText()
         
+    try:
+        isRightHand = measureKeywords['isRightHand']
+    except KeyError:
+        isRightHand = False
+        
+    try:
+        isLeftHand = measureKeywords['isLeftHand']
+    except KeyError:
+        isLeftHand = False
+        
     keyOrTimeSig = sampleMeasure.getElementsByClass([key.KeySignature, meter.TimeSignature])
     offsets = []
     kts_braille = {}
@@ -949,7 +962,7 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
                 kts_braille[startOffset] = u''.join([extractBrailleHeading(sampleMeasure), u'\n', symbols['number'], numbers[sampleMeasure.number]])
         endTime = sampleMeasure.highestTime
         offsets.append((startOffset, endTime))
-
+    
     isFirstGrouping = True
     measureTrans = []
     for (startOffset, endTime) in offsets:
@@ -970,7 +983,7 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
         if not(showLeadingOctave == True):
             if not(isFirstGrouping) or (isFirstGrouping and isFirstOfSegment) or (isFirstGrouping and newKeyOrTimeSig):
                 showLeadingOctave = True
-        noteGrouping = offsetGrouping.getElementsByClass([note.Note, note.Rest, bar.Barline])
+        noteGrouping = offsetGrouping.getElementsNotOfClass([key.KeySignature, meter.TimeSignature])
         if len(noteGrouping) == 0:
             continue
         try:
@@ -989,6 +1002,11 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
                         subGroupingTrans.append(restToBraille(sampleRest = note.Rest(quarterLength = 4.0)))
                     else:
                         subGroupingTrans.append(restToBraille(sampleRest = element))
+                elif isinstance(element, dynamics.Dynamic):
+                    subGroupingTrans.append(symbols['word'])
+                    subGroupingTrans.append(wordToBraille(element.value))
+                    previousNote = None
+                    showLeadingOctave = True
                 elif isinstance(element, bar.Barline):
                     if not(element.offset == startOffset):
                         subGroupingTrans.append(barlines[element.style])
@@ -1015,6 +1033,11 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
                         subGroupingTrans.append(restToBraille(sampleRest = note.Rest(quarterLength = 4.0)))
                     else:
                         subGroupingTrans.append(restToBraille(sampleRest = element))
+                elif isinstance(element, dynamics.Dynamic):
+                    subGroupingTrans.append(symbols['word'])
+                    subGroupingTrans.append(wordToBraille(element.value))
+                    previousNote = None
+                    showLeadingOctave = True
                 elif isinstance(element, bar.Barline):
                     if not(element.offset == startOffset):
                         subGroupingTrans.append(barlines[element.style])
@@ -1069,6 +1092,7 @@ def partToBraille(samplePart = stream.Part(), segmentStartMeasureNumbers = [], c
                 outgoingKeySig = sampleMeasure.keySignature
 
     return bt
+
 
 #-------------------------------------------------------------------------------
 # Translation between braille unicode and ASCII/other symbols.
