@@ -141,4 +141,4 @@ A new console window will open in the lower portion of the Eclipse interface and
 Errors concerning additional packages may appear; if so, refer to :ref:`installAdditional` to install them. Most modules in music21 will still function without them, however. If other errors persist, contact the music21 staff for assistance: http://groups.google.com/group/music21list
 
 
-Once you have verified that the install completed successfully, head to: :ref:`quickStart`
+Once you have verified that the install completed successfully, open music21/configure.py and follow the prompts, if you have not done so already. See :ref:`environment` for more information on configuring user settings. Otherwise, head to: :ref:`quickStart`
