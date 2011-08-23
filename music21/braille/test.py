@@ -17,6 +17,7 @@ from music21.braille import translate
 
 from music21 import bar
 from music21 import clef
+from music21 import dynamics
 from music21 import key
 from music21 import meter
 from music21 import note
@@ -27,12 +28,17 @@ from music21 import tinyNotation
 
 # Introduction to Braille Music Transcription, Second Edition
 #-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# PART ONE
+# Basic Procedures and Transcribing Single-Staff Music
+#
+#-------------------------------------------------------------------------------
+# Chapter 2: Eighth Notes, the Eighth Rest, and Other Basic Signs
+#
 # NOTE: Octave marks which precede the first note in a line of braille music
 # are omitted in Chapters 2-6 in the transcription manual because the concept is
 # not introduced until Chapter 7. They are NOT omitted in the examples below,
 # however, because they are required in transcription.
-# 
-# Chapter 2: Eighth Notes, the Eighth Rest, and Other Basic Signs
 
 def example2_1():
     '''
@@ -1207,8 +1213,8 @@ def example10_5():
     bm.insert(0, key.KeySignature(-3))
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     bm[2].insert(1, bar.Barline('double'))
-    bm[5].insert(2, bar.Barline('double'))
     bm[5].insert(2, key.KeySignature(-4))
+    bm[5].insert(2, bar.Barline('double'))
     return bm
 
 #-------------------------------------------------------------------------------
@@ -1231,6 +1237,138 @@ def example11_1():
     bm.insert(0, key.KeySignature(2))
     bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
     return bm
+
+#-------------------------------------------------------------------------------
+# Chapter 12: Slurs (Phrasing)
+
+def example12_1():
+    bm = tinyNotation.TinyNotationStream("g4. f8=s e4 d4 g4 f4 e4 r4 f4 g4 a4 b4 c'4 d'4 c'4 r4", "4/4")
+    bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+    return bm
+
+#-------------------------------------------------------------------------------
+# Chapter 13: Words, Abbreviations, Letters, and Phrases of Expression
+
+def example13_1():
+    bm = tinyNotation.TinyNotationStream("f2 e4 e4 d4 c4 a4. b-8 a4 g4 c8 d8 e8 f8 g4 f4 e4 f2.", "3/4")
+    bm.insert(0, key.KeySignature(-1))
+    bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+    bm[1].insert(2.0, dynamics.Dynamic('p'))
+    bm[3].insert(1.0, dynamics.Dynamic('mf'))
+    return bm
+
+def example13_2():
+    bm = tinyNotation.TinyNotationStream("", "4/4")
+    bm.insert(0, key.KeySignature(1))
+    
+def example13_3():
+    bm = tinyNotation.TinyNotationStream("a1 a1 a1 a1", "c")
+    bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+    bm[-1].rightBarline = None
+    return bm
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# PART TWO
+# Transcribing Two- and Three-Staff Music
+#
+#-------------------------------------------------------------------------------
+# Chapter 24: Bar-over-Bar Format
+
+def example24_1a():
+    '''
+    >>> from music21.braille import thinkdifferent
+    >>> #print thinkdifferent.keyboardPartsToBraille(example24_1a()).splitlines()[1]
+    '''
+    rightHand = tinyNotation.TinyNotationStream("c2 e2", "4/4")
+    leftHand = tinyNotation.TinyNotationStream("r1", "4/4")
+    rightHand.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+    leftHand.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+    rightHand[-1].rightBarline = None
+    leftHand[-1].rightBarline = None
+    rightHand[-1].insert(0.0, dynamics.Dynamic('f'))
+    keyboardPart = stream.Part()
+    keyboardPart.append(rightHand)
+    keyboardPart.append(leftHand)
+    return keyboardPart
+
+def example24_1b():
+    '''
+    >>> from music21.braille import thinkdifferent
+    >>> #print thinkdifferent.keyboardPartsToBraille(example24_1b())
+    '''
+    rightHand = tinyNotation.TinyNotationStream("r2", "2/4")
+    leftHand = tinyNotation.TinyNotationStream("C8 r8 E8 r8", "2/4")
+    rightHand.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+    leftHand.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+    rightHand[-1].rightBarline = None
+    leftHand[-1].rightBarline = None
+    rightHand[-1].insert(0.0, dynamics.Dynamic('f'))
+    keyboardPart = stream.Part()
+    keyboardPart.append(rightHand)
+    keyboardPart.append(leftHand)
+    return keyboardPart
+
+def example24_2():
+    '''
+    >>> from music21.braille import thinkdifferent
+    >>> print thinkdifferent.keyboardPartsToBraille(example24_2())
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠁⠀⠅⠜⠨⠙⠐⠓⠋⠓⠀⠐⠛⠓⠋⠊⠀⠐⠓⠛⠋⠑⠀⠐⠋⠋⠑⠭⠀⠐⠋⠑⠋⠓⠀⠐⠛⠓⠊⠛
+    ⠀⠀⠇⠜⠸⠙⠓⠐⠙⠚⠀⠸⠊⠚⠙⠙⠀⠸⠚⠊⠓⠚⠀⠐⠙⠙⠚⠓⠀⠐⠙⠭⠣⠺⠀⠸⠊⠭⠙⠭
+    ⠛⠀⠅⠜⠐⠋⠓⠓⠛⠀⠐⠏⠣⠅
+    ⠀⠀⠇⠜⠐⠙⠭⠚⠓⠀⠐⠝⠣⠅
+    '''
+    rightHand = tinyNotation.TinyNotationStream("c'8 g8 e8 g8 f8 g8 e8 a8 g8 f8 e8 d8 e8 e8 d8 r8 e8 d8 e8 g8 f8 g8 a8 f8 e8 g8 g8 f8 e2", "2/4")
+    leftHand  = tinyNotation.TinyNotationStream("C8 G8 c8 B8 A8 B8 c8 c8 B8 A8 G8 B8 c8 c8 B8 G8 c8 r8 B-4 A8 r8 c8 r8 c8 r8 B8 G8 c2", "2/4")
+    rightHand.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+    leftHand.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+    keyboardPart = stream.Part()
+    keyboardPart.append(rightHand)
+    keyboardPart.append(leftHand)
+    return keyboardPart
+
+def example24_3():
+    rightHand = tinyNotation.TinyNotationStream("r2 d'4 d'8 e'-8 d'8 c'8 b-8 a8 g2~ b-4", "3/4")
+    leftHand  = tinyNotation.TinyNotationStream("r2 B-8 A8 G8 r8 B-8 r8 d8 r8 G8 A8 B-8 c8 d4", "3/4")
+    rightHand.insert(0, key.KeySignature(-2))
+    leftHand.insert(0, key.KeySignature(-2))
+    rightHand.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+    leftHand.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+    rightHand[0].pop(3)
+    rightHand[0].padAsAnacrusis()
+    leftHand[0].pop(3)
+    leftHand[0].padAsAnacrusis()
+    for m in rightHand:
+        m.number -= 1
+    for m in leftHand:
+        m.number -= 1
+    rightHand[-1].rightBarline = None
+    leftHand[-1].rightBarline = None
+    keyboardPart = stream.Part()
+    keyboardPart.append(rightHand)
+    keyboardPart.append(leftHand)
+    return keyboardPart
+
+def example24_4():
+    rightHand = tinyNotation.TinyNotationStream("d'16 b16 a16 f#16 e4~ e16 d16 A16 d16 e4 c#16 B16 c#16 d16 e16 g16 f#16 e16 f#16 e16 f#16 g16 a16 b16 c'#16 d'16\
+    e'16 d'16 c#'16 b16 a16 g16 f#16 e16 d2", "4/4")
+    leftHand  = tinyNotation.TinyNotationStream("d'4~ d'16 c'#16 b16 g16 f#4~ f#16 g16 b16 g16 a4 c'#4 d'8 d'16 e'16 f'#16 g'16 e'16 f'#16\
+    g'4 c'#4 r16 a16 f#16 e16 d4", "4/4")
+    rightHand.transpose('P8', inPlace = True)
+    rightHand.insert(0, key.KeySignature(2))
+    leftHand.insert(0, key.KeySignature(2))
+    rightHand.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+    leftHand.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+    for m in rightHand:
+        m.number += 8
+    for m in leftHand:
+        m.number += 8
+    keyboardPart = stream.Part()
+    keyboardPart.append(rightHand)
+    keyboardPart.append(leftHand)
+    return keyboardPart
+ 
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
