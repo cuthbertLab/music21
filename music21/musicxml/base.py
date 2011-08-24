@@ -869,7 +869,7 @@ class PartGroup(MusicXMLElement):
         self.groupNameDisplay = None
         self.groupAbbreviation = None
         self.groupAbbreviationDisplay = None
-        self.groupSymbol = None # bracket, line, 
+        self.groupSymbol = None # bracket, line, brace
         self.groupBarline = None # yes, no
         self.groupTime = None # empty element / boolean value
 

@@ -38,6 +38,14 @@ class TranslateException(Exception):
     pass
 
 
+def configureStaffGroupFromMxPartGroup(staffGroup, mxPartGroup):
+    '''Given an already instantiated spanner.StaffGroup, configure it with parameters from an mxPartGroup.
+    '''
+    staffGroup.name = mxPartGroup.get('groupName')
+    staffGroup.abbreviation = mxPartGroup.get('groupAbbreviation')
+    staffGroup.symbol = mxPartGroup.get('groupSymbol')
+    staffGroup.barTogether = mxPartGroup.get('groupBarline')
+    staffGroup.completeStatus = True
 
 
 def mxToTempoIndication(mxMetronome, mxWords=None):
@@ -2935,12 +2943,13 @@ def mxToStream(mxScore, spannerBundle=None, inputM21=None):
     partGroupData = mxScore.getPartGroupData()
     for partGroup in partGroupData: # a list of dictionaries
         # create music21 spanner StaffGroup
-        # TODO: need to add attributes, parameters
         sg = spanner.StaffGroup()
         for partId in partGroup['scorePartIds']:
             # get music21 part from partIdDictionary
             sg.addComponents(partIdDictionary[partId])
-        sg.completeStatus = True
+        # use configuration routine to transfer/set attributes;
+        # sets complete status as well
+        configureStaffGroupFromMxPartGroup(sg, partGroup['partGroup'])
         spannerBundle.append(sg) # will be added to the Score
 
     # add metadata object; this is placed after all other parts now
@@ -3711,8 +3720,14 @@ spirit</words>
         s = converter.parse(testPrimitive.staffGroupsNested41d)
         self.assertEqual(len(s.getElementsByClass('StaffGroup')), 2)
         #raw = s.musicxml
+        sg1 = s.getElementsByClass('StaffGroup')[0]
+        self.assertEqual(sg1.symbol, 'brace')
+        self.assertEqual(sg1.barTogether, True)
 
-        
+        sg2 = s.getElementsByClass('StaffGroup')[1]
+        self.assertEqual(sg2.symbol, 'line')
+        self.assertEqual(sg2.barTogether, True)
+            
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

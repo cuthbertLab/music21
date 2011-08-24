@@ -1004,12 +1004,55 @@ class StaffGroup(Spanner):
 
         self.name = None # if this group has a name
         self.abbreviation = None 
-        self.symbol = None # can be bracket, line
+        self._symbol = None # can be bracket, line
         # determines if barlines are grouped through; this is group barline
         # in musicxml
-        self.barTogether = False
+        self._barTogether = False
 
+    #---------------------------------------------------------------------------
+    def _getBarTogether(self):
+        return self._barTogether    
 
+    def _setBarTogether(self, value):
+        if value is None:
+            pass # do nothing for now; could set a default
+        elif value in ['yes', True]:
+            self._barTogether = True
+        elif value in ['no', False]:
+            self._barTogether = False
+        else:
+            raise SpannerException('the bar together value %s is not acceptable' % value)
+
+    barTogether = property(_getBarTogether, _setBarTogether, doc = '''
+        Get or set the barTogether value, with either Boolean values or yes or no strings.
+
+        >>> from music21 import *
+        >>> sg = spanner.StaffGroup()
+        >>> sg.barTogether = 'yes'
+        >>> sg.barTogether
+        True
+        ''')
+
+    def _getSymbol(self):
+        return self._symbol    
+
+    def _setSymbol(self, value):
+        if value is None or str(value).lower() == 'none':
+            self._symbol = None
+        elif value.lower() in ['brace', 'line', 'bracket']:
+            self._symbol = value.lower()
+        else:
+            raise SpannerException('the symbol value %s is not acceptable' % value)
+        
+    symbol = property(_getSymbol, _setSymbol, doc = '''
+        Get or set the symbol value, with either Boolean values or yes or no strings.
+
+        >>> from music21 import *
+        >>> sg = spanner.StaffGroup()
+        >>> sg.symbol = 'Brace'
+        >>> sg.symbol
+        'brace'
+        ''')
 
 #-------------------------------------------------------------------------------
 # other ideas for spanners
