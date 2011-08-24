@@ -145,6 +145,7 @@ class ScoreFollower(object):
         >>> ScF = ScoreFollower(scoreStream=scNotes)        
         >>> ScF.begins = True
         >>> ScF.startSearchAtSlot = 15
+        >>> ScF.countdown = 0
         >>> prob = 0.5 # bad prediction
         >>> totalLengthPeriod = 15
         >>> time_start = time()
@@ -216,7 +217,7 @@ class ScoreFollower(object):
         >>> print ScF.startSearchAtSlot
         0
         >>> print ScF.predictedNotePosition
-        0                
+        0
 
         Countdown = 5: 
         Now it stops the program         
@@ -252,8 +253,7 @@ class ScoreFollower(object):
                 firstSlot = self.getFirstSlotOnScreen()
                 self.lastNotePosition = firstSlot
                 self.startSearchAtSlot = firstSlot
-                processing_time = time() - time_start
-                self.predictedNotePosition = self.predictNextNotePosition(totalLengthPeriod, processing_time)
+                self.predictedNotePosition = firstSlot
                 self.lengthFixed = False
             else: # self.countdown >= 5:
                 #print "Exit due to bad recognition or rests"

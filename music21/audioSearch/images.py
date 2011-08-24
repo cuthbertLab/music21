@@ -2,6 +2,8 @@ from music21 import corpus
 from music21 import converter
 from music21 import environment
 from music21 import scale, stream, note, pitch
+import threading
+import Queue as queue
 from music21.audioSearch.base import *
 from music21.audioSearch import recording
 from music21.audioSearch import scoreFollower
@@ -20,7 +22,7 @@ class SFApp():
         self.frame.pack()
         self.master.wm_title("Score follower - music21")
         
-        nameSong = 'test_pages_'#'d luca gloria_Page_'        
+        nameSong = 'scores/test_pages_'#'d luca gloria_Page_'        
         self.firstNotePage = [0, 46, 78, 88, 90, 111]
         self.totalPagesScore = len(self.firstNotePage)
         self.pageCounter = 1
@@ -197,16 +199,34 @@ class SFApp():
         self.scoreFollower = ScF        
         self.master.after(1000, self.continueScoreFollower)
         
+        #parameters for the thread 2
+        self.dummyQueue=queue.Queue()
+        self.sampleQueue=queue.Queue()
+        
  
     def continueScoreFollower(self):
-        ScF = self.scoreFollower       
+        self.ScF = self.scoreFollower       
         if self.result is False:
-            lastNoteString = 'at: ' + str(ScF.lastNotePosition) + ' countdown: ' + str(ScF.countdown) 
-            self.result = ScF.repeatTranscription()
-            self.textVar3.set(lastNoteString)
-            self.master.after(1000, self.continueScoreFollower)
-            if ScF.lastNotePosition > 20:
-                print "change page"
+            self.lastNoteString = 'at: ' + str(self.ScF.lastNotePosition) + ' countdown: ' + str(self.ScF.countdown) 
+            #self.result = ScF.repeatTranscription()
+            self.rt=RecordThread(self.dummyQueue,self.sampleQueue,self.ScF)
+            self.rt.daemon=True
+            self.variable=1
+            print "Started at",time.time()
+            self.rt.start() # the 2nd thread starts here
+            print "ja ha engegat"
+            self.dummyQueue.put("Start")
+            print 'inteento',self.rt.variable
+            self.master.after(12000,self.analyzeRecording)
+
+            
+    def analyzeRecording(self):
+        self.rt.outQueue.get()
+        print 'he passat la barrera'
+        self.textVar3.set(self.lastNoteString)
+        self.master.after(1000, self.continueScoreFollower)
+        if self.ScF.lastNotePosition > 20:
+            print "change page"
         else:
             self.textVar3.set("done!")
  
@@ -214,6 +234,27 @@ class SFApp():
         self.result = "stopManually"
         print "Stop botton pressed!"  
 
+
+class RecordThread(threading.Thread):
+    def __init__(self,inQueue,outQueue,ScF):
+        threading.Thread.__init__(self)
+        self.inQueue=inQueue
+        self.outQueue=outQueue
+        self.l=[]
+        self.ScF=ScF
+        
+    def run(self):
+        print "recorder waiting for start command"
+#        print 'variable' , self.variable
+        self.variable=6
+        startCommand=self.inQueue.get()
+        print "start command received: recording!"
+        self.result = self.ScF.repeatTranscription()
+        self.outQueue.put(1)
+        self.outQueue.task_done()
+
+
+        
 
 
 #class TestExternal(unittest.TestCase):
