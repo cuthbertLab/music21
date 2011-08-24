@@ -79,7 +79,7 @@ class ScoreFollower(object):
 
 
     def repeatTranscription(self):  
-        print "ANEM PER AQUI *****************",
+        print "WE STAY AT:  *****************",
         print self.lastNotePosition, len(self.scoreNotesOnly),
         print "en percent %d %%" % (self.lastNotePosition * 100 / len(self.scoreNotesOnly)),
         print " this search begins at: ", self.startSearchAtSlot
@@ -98,10 +98,7 @@ class ScoreFollower(object):
         (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, self.useScale)
         (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
         scNotes = self.scoreStream[self.lastNotePosition:self.lastNotePosition + len(notesList)]
-        print "long", self.lastNotePosition, self.lastNotePosition + len(notesList)
         transcribedScore, self.lengthFixed, self.qle = notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, lengthFixed=self.lengthFixed, qle=self.qle) 
-        print "FORA", self.lengthFixed
-        #transcribedScore.show('text')
         totalLengthPeriod, self.lastNotePosition, prob, END_OF_SCORE, self.result, self.countdown = self.matchingNotes(self.scoreStream, transcribedScore, self.startSearchAtSlot, self.lastNotePosition, self.result, self.countdown)
 
         if END_OF_SCORE == True:
@@ -112,16 +109,14 @@ class ScoreFollower(object):
         # estimate position, or exit if we can't at all...
         exitType = self.updatePosition(prob, totalLengthPeriod, time_start)
         if exitType != False:
-            print "exiting based on five countdowns"
-            
+            print "exiting based on five countdowns"            
             return self.result 
             #return exitType
 
         if self.useMic == False: # reading from the disc (only for TESTS)
             # skip ahead the processing time.
             freqFromAQList, junk, self.currentSample = getFrequenciesFromPartialAudioFile(self.waveFile, length=self.processing_time, startSample=self.currentSample)
-            # print "MOSTRES LLEGIDES ABAIX:       ----  %d/%d = %d º/o" % (totsamples, totalfile, totsamples * 100 / totalfile)
-
+           
         if self.lastNotePosition > len(self.scoreNotesOnly):
             print "finishedPerforming"
             exitType = self.result
@@ -154,7 +149,6 @@ class ScoreFollower(object):
         >>> totalLengthPeriod = 15
         >>> time_start = time()
         >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
-        Silence or noise at the beginning
         >>> print ScF.startSearchAtSlot
         0
         
@@ -165,10 +159,7 @@ class ScoreFollower(object):
         The last matching was good, so it calculates the position in which it starts
         to search at, and the position in which the music should start.
         
-        >>> from music21 import *
-        >>> from time import time
-        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
-        >>> ScF = ScoreFollower(scoreStream=scNotes)   
+        >>> ScF = ScoreFollower(scoreStream=scNotes)
         >>> ScF.scoreNotesOnly = scNotes.flat.notesAndRests
         >>> ScF.begins = False
         >>> ScF.countdown = 0
@@ -180,7 +171,6 @@ class ScoreFollower(object):
         >>> totalLengthPeriod = 25
         >>> time_start = time()
         >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
-        Countdown = 0
         >>> print ScF.startSearchAtSlot
         38
         >>> ScF.predictedNotePosition >=38
@@ -190,11 +180,7 @@ class ScoreFollower(object):
         Now it doesn't change the slot in which it starts to search at.
         It also predicts the position in which the music should start.
         
-        >>> from music21 import *
-        >>> from time import time
-        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
-        >>> ScF = ScoreFollower(scoreStream=scNotes)   
-        >>> ScF.scoreNotesOnly = scNotes.flat.notesAndRests
+        >>> ScF = ScoreFollower(scoreStream=scNotes)
         >>> ScF.begins = False
         >>> ScF.countdown = 1
         >>> ScF.startSearchAtSlot = 15
@@ -205,7 +191,6 @@ class ScoreFollower(object):
         >>> totalLengthPeriod = 25
         >>> time_start = time()
         >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
-        Countdown = 1
         >>> print ScF.startSearchAtSlot
         15
         >>> ScF.predictedNotePosition > 15
@@ -216,11 +201,8 @@ class ScoreFollower(object):
         Now it starts searching at the beginning of the page of the screen.
         The note prediction is also the beginning of the page.
         
-        >>> from music21 import *
-        >>> from time import time
-        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
-        >>> ScF = ScoreFollower(scoreStream=scNotes)   
-        >>> ScF.scoreNotesOnly = scNotes.flat.notesAndRests
+
+        >>> ScF = ScoreFollower(scoreStream=scNotes)
         >>> ScF.begins = False
         >>> ScF.countdown = 2
         >>> ScF.startSearchAtSlot = 15
@@ -231,8 +213,6 @@ class ScoreFollower(object):
         >>> totalLengthPeriod = 25
         >>> time_start = time()
         >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
-        Countdown = 2
-        SEARCHING IN ALL THE SCORE; MAYBE THE MUSICIAN HAS STARTED FROM THE BEGINNING
         >>> print ScF.startSearchAtSlot
         0
         >>> print ScF.predictedNotePosition
@@ -241,11 +221,7 @@ class ScoreFollower(object):
         Countdown = 5: 
         Now it stops the program         
         
-        >>> from music21 import *
-        >>> from time import time
-        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
-        >>> ScF = ScoreFollower(scoreStream=scNotes)   
-        >>> ScF.scoreNotesOnly = scNotes.flat.notesAndRests
+        >>> ScF = ScoreFollower(scoreStream=scNotes)
         >>> ScF.begins = False
         >>> ScF.countdown = 5
         >>> ScF.startSearchAtSlot = 15
@@ -256,7 +232,6 @@ class ScoreFollower(object):
         >>> totalLengthPeriod = 25
         >>> time_start = time()
         >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
-        Exit due to bad recognition or rests
         >>> print exitType
         countdownExceeded
         '''
@@ -265,18 +240,15 @@ class ScoreFollower(object):
         if self.begins == False:
             if self.countdown == 0:
                 # successfully matched last note; predict next position.
-                print "Countdown = %d" % self.countdown
                 self.startSearchAtSlot = self.lastNotePosition
                 processing_time = time() - time_start
                 self.predictedNotePosition = self.predictNextNotePosition(totalLengthPeriod, processing_time)
             elif self.countdown == 1:
-                print "Countdown = %d" % self.countdown
                 totalSeconds = 2 * (time() - time_start) + self.seconds_recording
                 self.predictedNotePosition = self.predictNextNotePosition(totalLengthPeriod, totalSeconds)
                 # do nothing to startSearch or predicted note position
             elif self.countdown >= 2 and self.countdown < 5:
-                print "Countdown = %d" % self.countdown
-                print "SEARCHING IN ALL THE SCORE; MAYBE THE MUSICIAN HAS STARTED FROM THE BEGINNING"
+                #print "SEARCHING IN ALL THE SCORE; MAYBE THE MUSICIAN HAS STARTED FROM THE BEGINNING"
                 firstSlot = self.getFirstSlotOnScreen()
                 self.lastNotePosition = firstSlot
                 self.startSearchAtSlot = firstSlot
@@ -284,17 +256,21 @@ class ScoreFollower(object):
                 self.predictedNotePosition = self.predictNextNotePosition(totalLengthPeriod, processing_time)
                 self.lengthFixed = False
             else: # self.countdown >= 5:
-                print "Exit due to bad recognition or rests"
+                #print "Exit due to bad recognition or rests"
+                environLocal.printDebug("COUNTDOWN = 5")
                 exitType = 'countdownExceeded'
         else:  # at beginning
             if prob < 0.7: #to avoid rests at the beginning
                 self.lastNotePosition = 0
                 self.startSearchAtSlot = 0
                 self.lengthFixed = False
-                print "Silence or noise at the beginning"
+                environLocal.printDebug("Silence or noise at the beginning")
             else:  # got some good notes at the beginning!
                 self.begins = False
                 print "GO!"
+            if self.countdown >= 5:
+                exitType = "5consecutiveCountdownsBeginning"
+                
         
         return exitType
          
@@ -310,7 +286,28 @@ class ScoreFollower(object):
         '''
         return 0
 
-    def predictNextNotePosition(self, totalLengthPeriod, totalSeconds):        
+    def predictNextNotePosition(self, totalLengthPeriod, totalSeconds):     
+        '''
+        It predicts the position in which the first note of the following recording
+        note should start, taking into account the processing time of the computer.
+        It has two inputs: totalLengthPeriod, that is the number of pulses or beats in the 
+        recorded audio, and totalSeconds, that is the length in seconds of the processing time.
+        
+        It returns a number with the position of the predicted note in the score.
+        
+        >>> from music21 import *
+        >>> from time import time
+        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes        
+        >>> ScF = ScoreFollower(scoreStream=scNotes)  
+        >>> ScF.scoreNotesOnly = ScF.scoreStream.flat.notesAndRests 
+        >>> ScF.lastNotePosition = 14
+        >>> ScF.seconds_recording = 10
+        >>> totalLengthPeriod = 8
+        >>> totalSeconds = 2
+        >>> predictedStartPosition = ScF.predictNextNotePosition(totalLengthPeriod, totalSeconds)
+        >>> print predictedStartPosition
+        16
+        '''   
         extraLength = totalLengthPeriod * totalSeconds / self.seconds_recording
         middleRhythm = 0
         slots = 0
@@ -323,7 +320,7 @@ class ScoreFollower(object):
                 
 
 
-    def matchingNotes(self, scoreStream, transcribedScore, notePrediction, lastNotePosition, result, countdown):#i'll remove "result" soon
+    def matchingNotes(self, scoreStream, transcribedScore, notePrediction, lastNotePosition, result, countdown):
         '''
         
         '''
@@ -354,7 +351,7 @@ class ScoreFollower(object):
         if notePrediction > len(scoreStream) - tn_recording - hop - 1:
             notePrediction = len(scoreStream) - tn_recording - hop - 1
             END_OF_SCORE = True
-            print "************++++ LAST PART OF THE SCORE ++++**************"
+            environLocal.printDebug("**********++++ LAST PART OF THE SCORE ++++***********")
         position, countdown = decisionProcess(listOfParts, notePrediction, beginningData, lastNotePosition, countdown)
         try:
             print "measure: " + listOfParts[position][0].measureNumber     
@@ -375,17 +372,8 @@ class ScoreFollower(object):
     
         if countdown == 0:   
             lastNotePosition = beginningData[number] + lengthData[number]
-            
-    #    if lastNotePosition < len(scoreStream) / 4:
-    #        print "--------------------------1", lastNotePosition, len(scoreStream) / 4, len(scoreStream)
-    #    elif lastNotePosition < len(scoreStream) / 2:
-    #        print "--------------------------2", lastNotePosition, len(scoreStream) / 2, len(scoreStream)
-    #    elif lastNotePosition < len(scoreStream) * 3 / 4:
-    #        print "--------------------------2", lastNotePosition, len(scoreStream) * 3 / 4, len(scoreStream)
-    #    else: 
-    #        print "--------------------------2", lastNotePosition, len(scoreStream), len(scoreStream)
-            
-        return totalLength, lastNotePosition, probabilityHit, END_OF_SCORE, result, countdown #i'll remove "result" later,it's only to see if it works
+                   
+        return totalLength, lastNotePosition, probabilityHit, END_OF_SCORE, result, countdown
 
 
 
@@ -411,5 +399,3 @@ if __name__ == '__main__':
 
 #------------------------------------------------------------------------------
 # eof
-
-

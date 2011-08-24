@@ -59,6 +59,17 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
     uses the autocorrelation function, which finds periodicities in the signal
     in the temporal domain and, consequently, obtains the frequency in each instant 
     of time.
+    
+    
+    >>> from music21 import *
+    >>> wv = wave.open("test_audio.wav",'r')
+    >>> data = wv.readframes(1024)
+    >>> samps = numpy.fromstring(data, dtype=numpy.int16)
+    >>> finalResult = autocorrelationFunction(samps, 44100)
+    >>> wv.close()
+    >>> print finalResult
+    143.6276...
+
     '''
 
     recordedSignal = numpy.array(recordedSignal)
@@ -66,7 +77,6 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
     lengthCorrelation = len(correlation) / 2
     correlation = correlation[lengthCorrelation:]
     difference = numpy.diff(correlation) #  Calculates the difference between slots
-
     beginning = matplotlib.mlab.find(difference > 0)[0]
 
     peak = numpy.argmax(correlation[beginning:]) + beginning
@@ -208,6 +218,14 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=music21.scale.MajorS
     
     To-do: only return the former.  The latter can be generated in other ways.
     
+    >>> from music21 import *
+    >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes        
+    >>> freqFromAQList = getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
+    >>> detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale=scale.ChromaticScale('C4'))
+    >>> detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
+    >>> (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))
+    >>> print detectedPitchObjects
+    [A5, A5, A5, D5, D4, B4, A4, F4, E-4, C#3, B3, B3, B3, A3, G3, F3, F3, E3, F#3, F#3,...]   
     '''
     
     detectedPitchObjects = []
@@ -266,6 +284,12 @@ def getFrequenciesFromMicrophone(length=10.0, storeWaveFilename=None):
 def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     '''
     gets a list of frequencies from a complete audio file.
+    
+    
+    >>> from music21 import *
+    >>> freq = getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
+    >>> print freq
+    [143.627689055..., 99.083545201..., 211.004784688..., 4700.313479623..., ...]
     '''
     storedWaveSampleList = []
     environLocal.printDebug("* reading entire file from disk")
@@ -386,6 +410,13 @@ def smoothFrequencies(detectedPitchesFreq, smoothLevels=7, inPlace=True):
     '''
     It smooths the shape of the signal in order to avoid false detections in the fundamental
     frequency.
+    
+    
+    >>> from music21 import *
+    >>> inputPitches=[440, 440, 440, 440, 442, 443, 441, 470, 440, 441, 440, 442, 440, 440, 440, 397, 440, 440, 440, 442, 443, 441, 440, 440, 440, 440, 440, 442, 443, 441, 440, 440]
+    >>> result=smoothFrequencies(inputPitches)
+    >>> print result
+    [440, 440, 440, 440, 445, 445, 446, 446, 442, 442, 441, 441, 434, 433, 432, 430, 436, 437, 438, 439, 439, 439, 439, 439, 439, 440, 440, 440, 440, 440, 440, 440]
     '''
     dpf = detectedPitchesFreq
     if inPlace == True:
@@ -393,13 +424,7 @@ def smoothFrequencies(detectedPitchesFreq, smoothLevels=7, inPlace=True):
     else:
         detectedPitchesFreq = copy.copy(dpf)
 
-    ### Jordi -- are you sure that this does what you want it to?
-    
-    ## Now yes! I forgot to implement the beginning and the end
-    # I could implement it in a better way, but I think it doesn't affect too much
-    # Are only 7+7 samples ... i'll implement it better in the future! 
     #smoothing
-    
     beginning = 0
     ends = 0
     
@@ -439,9 +464,20 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
     
     
     N.B. the returned list is NOT a :class:`~music21.stream.Stream`.    
-    
+
+
+
     >>> from music21 import *
-    >>> 
+    >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes        
+    >>> freqFromAQList = getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
+    >>> detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale=scale.ChromaticScale('C4'))
+    >>> detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
+    >>> (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))
+    >>> (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
+    >>> print notesList
+    [<music21.note.Rest rest>, <music21.note.Note C>, <music21.note.Note C>, <music21.note.Note D>, <music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>, ...]
+    >>> print durationList
+    [72, 6, 14, 23, 34, 40, 27, 36, 35, 15, 17, 15, 6, 33, 22, 13, 16, 39, 35, 38, 27, 27, 27, 8]
     '''
     
     #initialization
@@ -490,10 +526,6 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
         good = 0
         valid_note = False
         j = j + 1
-
-#    environLocal.printDebug("Total notes recorded %d " % total_notes)
-#    environLocal.printDebug("Total rests recorded %d " % total_rests)
-
     return notesList, durationList
 
 
@@ -626,7 +658,6 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
     if scNotes != None and lengthFixed == False:
         fe = features.native.MostCommonNoteQuarterLength(scNotes)
         mostCommon = fe.extract().vector[0]        
-        print "mostCommon", mostCommon
         
         qle = quarterLengthEstimation(durationList, mostCommon)
     elif scNotes == None: # this is for the transcriber 
@@ -636,7 +667,6 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
         actualDuration = quantizeDuration(durationList[i] / qle)
         notesList[i].quarterLength = actualDuration
         if (removeRestsAtBeginning == True) and (notesList[i].name == "rest"):
-            #print "SILENCE!!"
             pass
         else: 
             p2.append(notesList[i])
@@ -649,15 +679,60 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
     if scNotes == None:   # Case transcriber
         return sc, len(p2)
     else: #case follower
-        print "LENGTH?", lengthFixed
         return sc, lengthFixed, qle
 
 def decisionProcess(list, notePrediction, beginningData, lastNotePosition, countdown):
     '''
-    It decides which one of the given parts of the score matches better with recorded part of the song.
-    If there is not a part of the score with a good probability to be the correct part,
+    It decides which of the given parts of the score has a better matching with 
+    the recorded part of the song.
+    If there is not a part of the score with a high probability to be the correct part,
     it starts a "countdown" in order stop the score following if the bad matching persists.   
     In this case, it does not match the recorded part of the song with any part of the score.
+    
+    Inputs: List, contains all the possible parts of the score, sorted from the 
+    higher probability to be the best matching at the beginning to the lowest probability.
+    notePrediction is the position of the score in which the next note should start.
+    beginningData is a list with all the beginnings of the used fragments of the score to find
+    the best matching.
+    lastNotePosition is the position of the score in which the last matched fragment of the 
+    score finishes.
+    Countdown is a counter of consecutive errors in the matching process.
+    
+    Outputs: It returns the beginning of the best matching fragment of 
+    score and the countdown.
+    
+    
+    
+    >>> from music21 import *
+    >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes    
+    >>> scoreStream = scNotes    
+    >>> freqFromAQList = getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
+    >>> detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale=scale.ChromaticScale('C4'))
+    >>> detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
+    >>> (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))
+    >>> (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
+    >>> transcribedScore, lengthFixed, qle = notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, lengthFixed=False, qle=None)
+    >>> hop = 6
+    >>> tn_recording = 24
+    >>> totScores = []
+    >>> beginningData = []
+    >>> lengthData = []
+    >>> for i in range(4):
+    ...     scNotes = scoreStream[i * hop + 1 :i * hop + tn_recording + 1 ] 
+    ...     name = "%d" % i
+    ...     beginningData.append(i * hop + 1)
+    ...     lengthData.append(tn_recording)
+    ...     scNotes.id = name
+    ...     totScores.append(scNotes)  
+    >>> listOfParts = search.approximateNoteSearch(transcribedScore.flat.notes, totScores)
+    >>> notePrediction = 0
+    >>> lastNotePosition = 0
+    >>> countdown = 0
+    >>> positionInList, countdown = decisionProcess(listOfParts, notePrediction, beginningData, lastNotePosition, countdown)
+    >>> print positionInList
+    0
+    >>> print countdown # the result is 1 because the used song is completely different than the score!!
+    1
     '''
     i = 0
     position = 0
@@ -669,23 +744,21 @@ def decisionProcess(list, notePrediction, beginningData, lastNotePosition, count
         
     dist = math.fabs(beginningData[0] - notePrediction)
     for i in range(len(list)):
-        #print "UU", beginningData[int(list[i].id)], lastNotePosition, notePrediction
         if (list[i].matchProbability >= 0.9 * list[0].matchProbability) and (beginningData[int(list[i].id)] > lastNotePosition): #let's take a 90%
             if math.fabs(beginningData[int(list[i].id)] - notePrediction) < dist:
                 dist = math.fabs(beginningData[int(list[i].id)] - notePrediction)
-                position = i  
-                print "NICE!"
+                position = i 
+                environLocal.printDebug("NICE") 
     #print "ERRORS", position, len(list), lastNotePosition, list[position].matchProbability , beginningData[int(list[position].id)]
     if position < len(list) and beginningData[int(list[position].id)] <= lastNotePosition:
-        print " error ? ", beginningData[int(list[position].id)], lastNotePosition    
-    print "DECISION: %d prob %f  distance %f  starts at %f" % (position, list[position].matchProbability, dist, beginningData[int(list[position].id)])
+        environLocal.printDebug(" error ? ", beginningData[int(list[position].id)], lastNotePosition)
     if list[position].matchProbability < 0.6 or len(list) == 1: #the latter for the all-rest case
-        print "ARE YOU SURE YOU ARE PLAYING THE RIGHT SONG??"
+        environLocal.printDebug("ARE YOU SURE YOU ARE PLAYING THE RIGHT SONG??")
         countdown = countdown + 1
     else:
         countdown = 0
     if dist > 20:
-        print "Excessive distance....? dist=%d" % dist
+        environLocal.printDebug("Excessive distance....? dist=%d" % dist)
     return position, countdown
 
     

@@ -98,7 +98,7 @@ class TestExternal(unittest.TestCase):
         pass
     
     def xtestRunTranscribe(self):
-        runTranscribe(show=True, plot=True, seconds=20.0)
+        runTranscribe(show=False, plot=False, saveFile='new_song.wav', seconds=10.0)
     
     def testTranscribePachelbel(self):
         myScore = runTranscribe(useMic=False, saveFile='pachelbel.wav', plot=False, show=False)
