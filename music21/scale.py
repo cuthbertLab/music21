@@ -3422,7 +3422,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         from music21 import corpus, scale, instrument
 
         s = corpus.parse('luca/gloria').measures(70,79)
-        for p in s:
+        for p in s.parts:
             inst = p.flat.getElementsByClass(instrument.Instrument)[0]
             inst.midiProgram = 52
         sc = ScalaScale('F2', 'pyth_12.scl')

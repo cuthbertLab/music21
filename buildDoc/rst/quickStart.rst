@@ -70,7 +70,7 @@ To import, or parse, a score stored in the corpus, use the :mod:`music21.corpus.
 We will the use the :func:`~music21.corpus.base.parseWork` method to translate the file (a MusicXML or humdrum file) into music21 objects.
 
 >>> from music21 import *
->>> sBach = corpus.parseWork('bach/bwv7.7')
+>>> sBach = corpus.parse('bach/bwv7.7')
 
 The score is returned as a music21 :class:`~music21.stream.Score`, which is a type (subclass) of a music21 :class:`~music21.stream.Stream`. 
 
@@ -114,19 +114,19 @@ the components of a Stream in a text format, with the optional
 
 Once the score has been parsed, we can access its components, as with all Streams, in multiple ways. A Score often, but not always, includes :class:`~music21.stream.Part` objects (specialized Streams that contain Measures) and a :class:`~music21.metadata.Metadata` object.
 
-The components of a Stream can be accessed as a list of elements accessed by index values. Index values in Python, as common in many programming languages, count from zero. Using the Python len() method, We can see that the Score as five components, index numbers 0 through 4. 
+The components of a Stream can be accessed as a list of elements accessed by index values. Index values in Python, as common in many programming languages, count from zero. Using the Python len() method, We can see that the Score as six components, index numbers 0 through 4. 
 
 >>> len(sBach)
-5
+6
 >>> sBach[0]
-<music21.stream.Part object at 0x1b67cb0>
+<music21.metadata.Metadata object at 0x5aefcb0>
 >>> sBach[1]
-<music21.stream.Part object at 0x19b40b0>
+<music21.stream.Part Soprano>
 
 Components of a Stream subclass, filtered by class type, are made available through property names. For example, all of the Part objects of this Score can be accessed with the :attr:`~music21.stream.Score.parts` property.
 
 >>> len(sBach.parts)
-5
+4
 
 We can view one of these Parts by accessing the appropriate component and calling the show() method.
 

@@ -43,7 +43,7 @@ class Test(unittest.TestCase):
         from music21 import stream, corpus, note
         sBach = corpus.parse('bach/bwv7.7')
         # with metadata
-        self.assertEquals(len(sBach), 5)
+        self.assertEquals(len(sBach), 6)
         self.assertEquals(len(sBach.parts), 4)
 
         select = sBach.parts[0].measures(2,4)

@@ -532,9 +532,7 @@ class DataInstance(object):
         >>> s = corpus.parse('bwv66.6')
         >>> di = features.DataInstance(s)
         >>> len(di['flat'])
-        192
-        >>> len(di['flat'])
-        192
+        193
         >>> len(di['flat.pitches'])
         163
         >>> len(di['flat.notes'])
