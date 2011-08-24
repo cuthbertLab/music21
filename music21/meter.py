@@ -2844,7 +2844,7 @@ class TimeSignature(music21.Music21Object):
             for n in srcList:
                 durList.append(n.duration)
             srcStream = srcList
-        else: # a lost of durations
+        else: # a list of durations
             durList = srcList
             srcStream = None
 
@@ -2852,7 +2852,7 @@ class TimeSignature(music21.Music21Object):
             raise MeterException('length of durList must be 2 or greater, not %s' % len(durList))
 
         pos = 0 # assume we are always starting at zero w/n this meter
-        beamsList = [] # hold complted Beams objects
+        beamsList = [] # hold completed Beams objects
         for i in range(len(durList)):
             # if a dur cannot be beamable under any circumstance, replace 
             # it with None; this includes Rests
@@ -2903,7 +2903,7 @@ class TimeSignature(music21.Music21Object):
                     durNext = durList[i+1]
                     beamNext = beamsList[i+1]
 
-                if i == 0: # previous
+                if i == 0: # first note in measure
                     durPrevious = None
                     beamPrevious = None
                 else:
@@ -2918,7 +2918,7 @@ class TimeSignature(music21.Music21Object):
                 archetypeSpan = archetype.positionToSpan(start)
                 #environLocal.printDebug(['at level, got archetype span', depth,
                 #                         archetypeSpan])
-                if beamNext == None: # last
+                if beamNext == None: # last note or before a non-beamable note (half, whole, etc.)
                     archetypeSpanNext = None
                 else:
                     archetypeSpanNext = archetype.positionToSpan(startNext)
