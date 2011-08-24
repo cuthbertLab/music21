@@ -204,7 +204,9 @@ def audioVirelaiSearch():
                 virelaiCantuses.append(vc)
             except IndexError:
                 pass
-    searchScore = transcriber.runTranscribe(show = False, plot = False, seconds = 10.0, saveFile = False)
+    #searchScore = transcriber.runTranscribe(show = False, plot = False, seconds = 10.0, saveFile = False)
+    from music21 import converter
+    searchScore = converter.parse("c'4 a8 a4 g8 b4. d'4. c8 b a g f4", '6/8')
     searchScore.show()
     l = search.approximateNoteSearch(searchScore, virelaiCantuses)
     for i in l:

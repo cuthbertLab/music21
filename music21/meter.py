@@ -2837,6 +2837,14 @@ class TimeSignature(music21.Music21Object):
         >>> c = a.getBeams(b)
         >>> print(c)
         [<music21.beam.Beams <music21.beam.Beam 1/start>>, <music21.beam.Beams <music21.beam.Beam 1/continue>>, <music21.beam.Beams <music21.beam.Beam 1/stop>>, <music21.beam.Beams <music21.beam.Beam 1/start>>, <music21.beam.Beams <music21.beam.Beam 1/continue>>, <music21.beam.Beams <music21.beam.Beam 1/stop>>]
+
+
+        >>> fourFour = TimeSignature('4/4')
+        >>> d = duration.Duration
+        >>> dList = [d('eighth'), d('quarter'), d('eighth'), d('eighth'), d('quarter'), d('eighth')]
+        >>> beamList = fourFour.getBeams(dList)
+        >>> print(beamList)
+        [None, None, None, None, None, None]
         '''
 
         if isinstance(srcList, music21.Music21Object):
@@ -2910,6 +2918,14 @@ class TimeSignature(music21.Music21Object):
                     durPrevious = durList[i-1]
                     beamPrevious = beamsList[i-1]
 
+                if beamNext is None and beamPrevious is None:
+                    # sandwiched between two unbeamables = no beams
+                    # delete beams, increment position, and continue loop
+                    beamsList[i] = None
+                    pos += dur.quarterLength
+                    continue
+
+
                 # get an archetype of the MeterSequence for this level
                 # level is depth, starting at zero
                 archetype = self.beamSequence.getLevel(depth)
@@ -2931,6 +2947,7 @@ class TimeSignature(music21.Music21Object):
                     beamsList[i] = None # replace with None! 
                     pos += dur.quarterLength
                     continue
+
 
 
                 # determine beamType
@@ -2955,26 +2972,41 @@ class TimeSignature(music21.Music21Object):
                 # start or have a partial left beam
                 # or, if beam number was not active in last beams 
                 elif beamPrevious == None or beamNumber not in beamPrevious.getNumbers():
-                    beamType = 'start'
-
-                    # case of where we need a partial left:
-                    # if the next start value is outside of this span (or at the 
-                    # the greater boundary of this span), and we did not have a 
-                    # beam or beam number in the previous beam
-
-                    # may need to check: beamNext != None and 
-                    #   beamNumber in beamNext.getNumbers()
-                    # note: it is cretical that we check archetypeSpan here
-                    # not archetypeSpanNext
-                    if (common.greaterThanOrEqual(startNext, 
-                        archetypeSpan[1])):
+                    if beamNext == None:
+                        beamsList[i] = None
+                        pos += dur.quarterLength
+                        continue
+                    elif (common.greaterThanOrEqual(startNext, 
+                        archetypeSpan[1])):                    
+                        # case of where we need a partial left:
+                        # if the next start value is outside of this span (or at the 
+                        # the greater boundary of this span), and we did not have a 
+                        # beam or beam number in the previous beam
+    
+                        # may need to check: beamNext != None and 
+                        #   beamNumber in beamNext.getNumbers()
+                        # note: it is critical that we check archetypeSpan here
+                        # not archetypeSpanNext
                         #environLocal.printDebug(['matching partial left'])
                         beamType = 'partial-left'
+                    else:
+                        beamType = 'start'
 
-                # last beams was active, last beamNumber was active,                # and it was stopped or was a partial-left
+
+                # last beams was active, last beamNumber was active,                
+                # and it was stopped or was a partial-left
                 elif (beamPrevious != None and 
                     beamNumber in beamPrevious.getNumbers() and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left']):
-                    beamType = 'start'
+                    if beamNext != None:
+                        beamType = 'start'
+                    else: 
+                        # next note cannot be beamed so 
+                        # clear beams, increment position and continue loop
+                        beamsList[i] = None
+                        pos += dur.quarterLength
+                        continue
+
+
 
                 # if no beam is defined next (we know this already)
                 # then must stop
@@ -3015,6 +3047,17 @@ class TimeSignature(music21.Music21Object):
 
                 # increment position and continue loop
                 pos += dur.quarterLength
+
+        ## clear elements that have partial beams with no full beams:
+        
+        for i in range(len(beamsList)):
+            if beamsList[i] == None:
+                continue
+            allTypes = beamsList[i].getTypes()
+            if 'start' not in allTypes and 'stop' not in allTypes and 'continue' not in allTypes:
+                # nothing but partials
+                beamsList[i] = None
+
 
         return beamsList
 
@@ -3962,6 +4005,16 @@ class Test(unittest.TestCase):
         self.assertEqual(str(ts.beatSequence), '{{1/8+1/8+1/8}+{1/8+1/8+1/8}}')
 
                 
+    def testMixedDurationsBeams(self):
+        fourFour = TimeSignature('4/4')
+        d = duration.Duration
+        dList = [d('eighth'), d('quarter'), d('eighth'), d('eighth'), d('quarter'), d('eighth')]
+        beamList = fourFour.getBeams(dList)
+        self.assertEqual(beamList, [None, None, None, None, None, None])
+        
+        dList = [d('eighth'), d('quarter'), d('eighth'), d('eighth'), d('eighth'), d('quarter')]
+        beamList = fourFour.getBeams(dList)
+        self.assertEqual(repr(beamList), '[None, None, None, <music21.beam.Beams <music21.beam.Beam 1/start>>, <music21.beam.Beams <music21.beam.Beam 1/stop>>, None]')
 
 
 #-------------------------------------------------------------------------------
