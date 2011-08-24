@@ -33,6 +33,32 @@ class ClefException(Exception):
 
 #-------------------------------------------------------------------------------
 class Clef(music21.Music21Object):
+    '''
+    A Clef is a basic music21 object for representing musical clefs
+    (Treble, Bass, etc.)
+    
+    
+    Some clefs only represent the graphical element of the clef, 
+    such as G clef, which is subclassed by TrebleClef() and FrenchViolinClef().
+    
+    
+    >>> from music21 import *
+    >>> tc = clef.TrebleClef()
+    >>> tc.sign
+    'G'
+    >>> tc.line
+    2
+    
+    
+    Most clefs also have a "lowest note" function which represents the
+    :ref:`~music21.pitch.Pitch.diatonicNoteNum` of the note. (Where C4,C#4,C##4,C-4
+    etc. = 29, all types of D4 = 30, etc.)
+    
+    >>> tc.lowestLine
+    31
+    
+    '''
+    
     classSortOrder = 0
 
     def __init__(self):

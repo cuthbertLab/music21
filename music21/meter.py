@@ -2972,10 +2972,13 @@ class TimeSignature(music21.Music21Object):
                 # start or have a partial left beam
                 # or, if beam number was not active in last beams 
                 elif beamPrevious == None or beamNumber not in beamPrevious.getNumbers():
-                    if beamNext == None:
+                    if beamNumber == 1 and beamNext == None:
                         beamsList[i] = None
                         pos += dur.quarterLength
                         continue
+                    elif beamNext == None and beamNumber > 1:
+                        beamType = 'partial-left'    
+                    
                     elif (common.greaterThanOrEqual(startNext, 
                         archetypeSpan[1])):                    
                         # case of where we need a partial left:
@@ -2996,15 +2999,19 @@ class TimeSignature(music21.Music21Object):
                 # last beams was active, last beamNumber was active,                
                 # and it was stopped or was a partial-left
                 elif (beamPrevious != None and 
-                    beamNumber in beamPrevious.getNumbers() and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left']):
-                    if beamNext != None:
+                    beamNumber in beamPrevious.getNumbers() and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left'] and
+                    beamNext != None):
                         beamType = 'start'
-                    else: 
-                        # next note cannot be beamed so 
-                        # clear beams, increment position and continue loop
-                        beamsList[i] = None
-                        pos += dur.quarterLength
-                        continue
+
+
+                # last note had beams but stopped, next note cannot be beamed to  was active, last beamNumber was active,                
+                # and it was stopped or was a partial-left
+                elif (beamPrevious != None and 
+                    beamNumber in beamPrevious.getNumbers() and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left'] and
+                    beamNext == None):
+                        beamType = 'partial-left'  # will be deleted later in the script
+
+
 
 
 
@@ -4016,6 +4023,26 @@ class Test(unittest.TestCase):
         beamList = fourFour.getBeams(dList)
         self.assertEqual(repr(beamList), '[None, None, None, <music21.beam.Beams <music21.beam.Beam 1/start>>, <music21.beam.Beams <music21.beam.Beam 1/stop>>, None]')
 
+    def testMixedDurationBeams2(self):
+        from music21 import stream, tinyNotation
+        bm = tinyNotation.TinyNotationStream('b8 c16 r e. d32', '3/8')
+        bm2 = bm.makeNotation()
+        beamList = [n.beams for n in bm2.flat.notes]
+        self.assertEqual(repr(beamList), '[<music21.beam.Beams <music21.beam.Beam 1/start>>, <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/left>>, <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>, <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>/<music21.beam.Beam 3/partial/left>>]')
+
+        bm = tinyNotation.TinyNotationStream("b16 c' b a g f# g r", '2/4')
+        bm2 = bm.makeNotation()
+        beamList = [n.beams for n in bm2.flat.notes]
+        beamListRepr = [str(i) + repr(beamList[i]) for i in range(len(beamList))]  
+        self.maxDiff = 2000      
+        self.assertEqual(beamListRepr, ['0<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>',
+                                        '1<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>',
+                                        '2<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>',
+                                        '3<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>',
+                                        '4<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>',
+                                        '5<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>',
+                                        '6<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/left>>',
+                                        ])
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

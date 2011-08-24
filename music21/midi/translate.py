@@ -1401,7 +1401,10 @@ def streamsToMidiTracks(inputM21):
             instObj = bundle['initInstrument']
 
             if instObj is None:
-                initCh = channelForInstrument[None]
+                try:
+                    initCh = channelForInstrument[None]
+                except KeyError:
+                    initCh = 0  # CUTHBERT ADD -- Not sure if this works...
             else: # use midi program
                 initCh = channelForInstrument[instObj.midiProgram]
             p['initChannel'] = initCh

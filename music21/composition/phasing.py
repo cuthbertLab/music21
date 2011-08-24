@@ -82,7 +82,11 @@ def partPari(show = True):
     '''
     s = stream.Score()
     cminor = key.Key('c')
+    #real Paert
     main = converter.parse("E-1 C D E- F G F E- D C D E- G A- F G E- F G F E- D F G c B- c G A- B- c B- A- B- G c e- d c d c B- A- G F E- F G c E- F G E- D E- F E- D C E- G F E- C F E- D C E- D C D C~ C", '4/4')
+    
+    # fake Paert
+    #main = converter.parse("E-1 F G A- G F c d e- G A- F E- D d e- c B- A- c d A- G F G F A- B- A- c d A- B- c B- A- G F G F E-~ E-", '4/4')
     main.__class__ = stream.Part
     main.transpose('P8', inPlace=True)
     main.insert(0, cminor)
@@ -102,7 +106,13 @@ def partPari(show = True):
     top = copy.deepcopy(main.flat)
     main.insert(0, clef.Treble8vbClef())
     middle = copy.deepcopy(main.flat)
+    
+    
     cMinorArpeg = scale.ConcreteScale(pitches = ["C2","E-2","G2"])
+    # dummy test on other data
+    #myA = pitch.Pitch("A2")
+    #myA.microtone = -15
+    #cMinorArpeg = scale.ConcreteScale(pitches = ["C2", "E`2", "F~2", myA])
     
     lastNote = top.notes[-1]
     top.remove(lastNote)
@@ -247,10 +257,10 @@ class TestExternal(unittest.TestCase):
         # run a reduced version
         pitchedPhase(cycles=cycles, show=show)
 
-    def xtestArvoPart(self, show=True):
+    def testArvoPart(self, show=True):
         partPari(show)
 
-    def testPendulumMusic(self, show=True):  
+    def xtestPendulumMusic(self, show=True):  
         pendulumMusic(show)
 #        pendulumMusic(show = True, 
 #                  loopLength = 210.0, 
