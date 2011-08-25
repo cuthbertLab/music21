@@ -1134,6 +1134,392 @@ def drill8_5():
     return bm
 
 #-------------------------------------------------------------------------------
+# Chapter 9: Fingering
+
+def example9_1():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example9_1(), measureNumberWithHeading = False, recenterHeading = True)
+    ⠀⠀⠀⠀⠣⠼⠃⠲⠀⠀⠀
+    ⠐⠪⠂⠳⠇⠀⠻⠄⠃⠙⠁
+    '''
+    bm = tinyNotation.TinyNotationStream("a4 g f. c8", "2/4")
+    bm.insert(0, key.KeySignature(-1))
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[-1].rightBarline = None
+    bm[0].notes[0].fingering = '4'
+    bm[0].notes[1].fingering = '3'
+    bm[1].notes[0].fingering = '2'
+    bm[1].notes[1].fingering = '1'
+    return bm
+
+def example9_2():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example9_2(), measureNumberWithHeading = False, recenterHeading = True)
+    ⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
+    ⠨⠻⠂⠋⠇⠑⠃⠙⠁⠚⠃⠈⠉⠀⠺⠭⠊⠙⠚
+    '''
+    bm = tinyNotation.TinyNotationStream("f'4 e'-8 d' c' b-~ b-4 r8 a c' b-", "3/4")
+    bm.insert(0, key.KeySignature(-2))
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[-1].rightBarline = None 
+    bm[0].notes[0].fingering = '4'
+    bm[0].notes[1].fingering = '3'
+    bm[0].notes[2].fingering = '2'
+    bm[0].notes[3].fingering = '1'
+    bm[0].notes[4].fingering = '2'
+    return bm
+    
+def example9_3():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example9_3(), measureNumberWithHeading = False, recenterHeading = True)
+    ⠀⠀⠀⠀⠼⠋⠦⠀⠀⠀⠀⠀
+    ⠐⠝⠄⠁⠈⠉⠀⠹⠄⠻⠃⠓
+    '''
+    bm = tinyNotation.TinyNotationStream("c2.~ c4. f4 g8", "6/8")
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[-1].rightBarline = None 
+    bm[0].notes[0].fingering = '1'
+    bm[1].notes[1].fingering = '2'
+    return bm
+
+def example9_4a():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example9_4a(), measureNumberWithHeading = False, recenterHeading = True)
+    ⠀⠩⠩⠼⠉⠲⠀
+    ⠐⠕⠃⠉⠁⠸⠻
+    '''
+    bm = tinyNotation.TinyNotationStream("d2 F#4", "3/4")
+    bm.insert(0, key.KeySignature(2))
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[-1].rightBarline = None 
+    bm[0].notes[0].fingering = '2-1'
+    return bm
+
+def example9_4b():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example9_4b(), measureNumberWithHeading = False, recenterHeading = True)
+    ⠀⠼⠉⠲⠀⠀  
+    ⠐⠝⠇⠉⠁⠳
+    '''
+    bm = tinyNotation.TinyNotationStream("c2 g4", "3/4")
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[-1].rightBarline = None 
+    bm[0].notes[0].fingering = '3-1'
+    return bm
+
+def example9_5a():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example9_5a(), measureNumberWithHeading = False, recenterHeading = True)
+    ⠀⠀⠼⠃⠲⠀⠀⠀
+    ⠐⠙⠋⠓⠨⠙⠅⠂
+    '''
+    bm = tinyNotation.TinyNotationStream("c8 e g c'", "2/4")
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[-1].rightBarline = None 
+    bm[0].notes[3].fingering = '5|4'
+    return bm
+
+def example9_5b():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example9_5b(), measureNumberWithHeading = False, recenterHeading = True, upperFirstInNoteFingering = False)
+    ⠀⠀⠀⠀⠀⠼⠋⠦⠀⠀⠀⠀⠀⠀
+    ⠐⠑⠃⠇⠙⠁⠃⠑⠃⠇⠫⠄⠇⠂
+    '''
+    bm = tinyNotation.TinyNotationStream("d8 c d e4.", "6/8")
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[-1].rightBarline = None 
+    bm[0].notes[0].fingering = '3|2'
+    bm[0].notes[1].fingering = '2|1'
+    bm[0].notes[2].fingering = '3|2'
+    bm[0].notes[3].fingering = '4|3'
+    return bm
+  
+def example9_6():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example9_6(), measureNumberWithHeading = False, recenterHeading = True, upperFirstInNoteFingering = True) 
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠐⠻⠃⠁⠪⠁⠃⠀⠨⠱⠠⠂⠻⠂⠅⠀⠻⠂⠇⠫⠇⠃
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example9_6(), measureNumberWithHeading = False, recenterHeading = True, upperFirstInNoteFingering = False)
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠐⠻⠁⠃⠪⠃⠁⠀⠨⠱⠂⠠⠻⠅⠂⠀⠻⠇⠂⠫⠃⠇
+    '''
+    bm = tinyNotation.TinyNotationStream("f#4 a d' f'# f'# e'", "2/4")
+    bm.insert(0, key.KeySignature(2))
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[-1].rightBarline = None 
+    bm[0].notes[0].fingering = '2,1'
+    bm[0].notes[1].fingering = '1,2'
+    bm[1].notes[0].fingering = 'x,4'
+    bm[1].notes[1].fingering = '4,5'
+    bm[2].notes[0].fingering = '4,3'
+    bm[2].notes[1].fingering = '3,2'
+    return bm
+
+def drill9_1():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(drill9_1())
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠁⠇⠇⠑⠛⠗⠑⠞⠞⠕⠲⠀⠣⠣⠣⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠚⠀⠐⠓⠃⠊⠀⠺⠄⠈⠉⠚⠓⠁⠚⠀⠱⠄⠅⠈⠉⠑⠙⠚⠀⠪⠓⠫⠃⠛⠁⠀⠳⠄⠃⠭⠊⠚⠀
+    ⠀⠀⠨⠹⠄⠈⠉⠙⠊⠁⠙⠃⠀⠫⠄⠇⠈⠉⠋⠑⠃⠛⠂⠀⠋⠑⠙⠚⠂⠊⠛⠃⠁⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠐⠫⠄⠁⠃⠈⠉⠋⠣⠅
+    '''
+    bm = tinyNotation.TinyNotationStream("r2 g8 a- b-4.~ b-8 g b- d'4.~ d'8 c' b- a-4 g8 e-4 f8 g4. r8 a- b-\
+    c'4.~ c'8 a- c' e'-4.~ e'-8 d' f' e'- d' c' b- a- f e-4.~ e-8", "6/8")
+    bm.insert(0, tempo.TempoText("Allegretto"))
+    bm.insert(0, key.KeySignature(-3))
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[0].pop(4)
+    bm[0].padAsAnacrusis()
+    for m in bm:
+        m.number -= 1
+    bm[0].notes[0].fingering = '2'
+    bm[1].notes[2].fingering = '1'
+    bm[2].notes[0].fingering = '5'
+    bm[3].notes[2].fingering = '2'
+    bm[3].notes[3].fingering = '1'
+    bm[4].notes[0].fingering = '2'
+    bm[5].notes[2].fingering = '1'
+    bm[5].notes[3].fingering = '2'
+    bm[6].notes[0].fingering = '3'
+    bm[6].notes[2].fingering = '2'
+    bm[6].notes[3].fingering = '4'
+    bm[7].notes[3].fingering = '4'
+    bm[7].notes[5].fingering = '2|1'
+    bm[8].notes[0].fingering = '1|2'
+    return bm
+
+def drill9_2():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(drill9_2())
+    ⠀⠀⠀⠀⠀⠀⠀⠠⠁⠙⠁⠛⠊⠕⠀⠑⠀⠍⠕⠇⠞⠕⠀⠇⠑⠛⠁⠞⠕⠲⠀⠨⠉⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠐⠎⠃⠈⠉⠊⠓⠊⠨⠑⠅⠂⠀⠙⠂⠇⠚⠇⠁⠨⠋⠅⠂⠑⠂⠇⠙⠇⠃⠛⠅⠫⠂⠈⠉⠀⠀
+    ⠀⠀⠨⠋⠛⠋⠐⠚⠁⠙⠃⠑⠇⠐⠊⠁⠚⠀⠙⠐⠓⠁⠎⠃⠉⠇⠈⠉⠊⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠐⠓⠨⠙⠂⠚⠇⠊⠃⠨⠑⠂⠙⠇⠚⠃⠨⠋⠂⠀⠕⠇⠈⠉⠑⠓⠅⠛⠙⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠨⠑⠋⠐⠚⠁⠙⠃⠱⠇⠐⠊⠁⠓⠃⠀⠎⠄⠁⠈⠉⠊⠭⠣⠅
+    '''
+    bm = tinyNotation.TinyNotationStream("a2~ a8 g a d' c' b e' d' c' f' e'4~ e'8 f' e' b c' d' a b c' g a2~ a8 f\
+    g c' b a d' c' b e' d'2~ d'8 g' f' c' d' e' b c' d'4 a8 g a2.~ a8 r", "c")
+    bm.insert(0, tempo.TempoText("Adagio e molto legato"))
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[0].notes[0].fingering = '2'
+    bm[0].notes[4].fingering = '5|4'
+    bm[1].notes[0].fingering = '4|3'
+    bm[1].notes[1].fingering = '3|1'
+    bm[1].notes[2].fingering = '5|4'
+    bm[1].notes[3].fingering = '4|3'
+    bm[1].notes[4].fingering = '3|2'
+    bm[1].notes[5].fingering = '5'
+    bm[1].notes[6].fingering = '4'
+    bm[2].notes[3].fingering = '1'
+    bm[2].notes[4].fingering = '2'
+    bm[2].notes[5].fingering = '3'
+    bm[2].notes[6].fingering = '1'
+    bm[3].notes[1].fingering = '1'
+    bm[3].notes[2].fingering = '2-3'
+    bm[3].notes[4].fingering = '1'
+    bm[4].notes[1].fingering = '4'
+    bm[4].notes[2].fingering = '3'
+    bm[4].notes[3].fingering = '2'
+    bm[4].notes[4].fingering = '4'
+    bm[4].notes[5].fingering = '3'
+    bm[4].notes[6].fingering = '2'
+    bm[4].notes[7].fingering = '4'
+    bm[5].notes[0].fingering = '3'
+    bm[5].notes[2].fingering = '5'
+    bm[6].notes[2].fingering = '1'
+    bm[6].notes[3].fingering = '2'
+    bm[6].notes[4].fingering = '3'
+    bm[6].notes[5].fingering = '1'
+    bm[6].notes[6].fingering = '2'
+    bm[7].notes[0].fingering = '1'
+    return bm
+
+def drill9_3():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(drill9_3())
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠍⠕⠙⠑⠗⠁⠞⠕⠲⠀⠩⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠘⠺⠇⠂⠙⠃⠇⠑⠁⠃⠀⠋⠂⠁⠛⠠⠇⠓⠠⠁⠊⠁⠃⠀⠺⠇⠁⠙⠠⠇⠑⠁⠃⠀⠀⠀⠀
+    ⠀⠀⠐⠋⠇⠁⠛⠠⠃⠓⠁⠁⠛⠃⠃⠀⠫⠇⠁⠑⠁⠃⠙⠠⠇⠀⠚⠠⠁⠊⠁⠃⠓⠠⠇⠛⠠⠂⠀⠀
+    ⠀⠀⠸⠫⠂⠁⠑⠁⠄⠙⠃⠄⠀⠑⠁⠁⠙⠃⠃⠚⠁⠇⠩⠊⠃⠂⠀⠞⠁⠇⠣⠅
+    '''
+    bm = tinyNotation.TinyNotationStream("BB4 C#8 D E F# G A B4 c#8 d e f# g f# e4 d8 c#\
+    B A G F# E4 D8 C# D C# BB AA# BB2", "2/4")
+    bm.insert(0, key.KeySignature(2))
+    bm.insert(0, tempo.TempoText("Moderato"))
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[2].insert(0, clef.TrebleClef())
+    bm[5].insert(0, clef.BassClef())
+    # measure 1 fingerings
+    bm[0].notes[0].fingering = '3,4'
+    bm[0].notes[1].fingering = '2,3'
+    bm[0].notes[2].fingering = '1,2'
+    # measure 2 fingerings
+    bm[1].notes[0].fingering = '4,1'
+    bm[1].notes[1].fingering = 'x,3'
+    bm[1].notes[2].fingering = 'x,1'
+    bm[1].notes[3].fingering = '1,2'
+    # measure 3 fingerings
+    bm[2].notes[0].fingering = '3,1'
+    bm[2].notes[1].fingering = 'x,3'
+    bm[2].notes[2].fingering = '1,2'
+    # measure 4 fingerings    
+    bm[3].notes[0].fingering = '3,1'
+    bm[3].notes[1].fingering = 'x,2'
+    bm[3].notes[2].fingering = '1,1'
+    bm[3].notes[3].fingering = '2,2'
+    # measure 5 fingerings
+    bm[4].notes[0].fingering = '3,1'
+    bm[4].notes[1].fingering = '1,2'
+    bm[4].notes[2].fingering = 'x,3'
+    # measure 6 fingerings
+    bm[5].notes[0].fingering = 'x,1'
+    bm[5].notes[1].fingering = '1,2'
+    bm[5].notes[2].fingering = 'x,3'
+    bm[5].notes[3].fingering = 'x,4'
+    # measure 7 fingerings
+    bm[6].notes[0].fingering = '4,1'
+    bm[6].notes[1].fingering = '1,x'
+    bm[6].notes[2].fingering = '2,x'
+    # measure 8 fingerings
+    bm[7].notes[0].fingering = '1,1'
+    bm[7].notes[1].fingering = '2,2'
+    bm[7].notes[2].fingering = '1,3'
+    bm[7].notes[3].fingering = '2,4'
+    # measure 9 fingerings
+    bm[8].notes[0].fingering = '1,3'
+    return bm
+    
+def drill9_4():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(drill9_4())
+    ⠀⠀⠀⠀⠀⠀⠀⠠⠝⠕⠞⠀⠞⠕⠕⠀⠋⠁⠎⠞⠲⠀⠹⠶⠼⠁⠚⠚⠀⠩⠼⠑⠦⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠸⠋⠩⠑⠃⠋⠛⠃⠑⠀⠺⠸⠫⠇⠓⠀⠓⠃⠛⠇⠓⠊⠚⠃⠀⠺⠁⠘⠺⠅⠚⠁⠀⠀⠀⠀⠀
+    ⠀⠀⠘⠑⠓⠚⠁⠓⠅⠚⠂⠀⠸⠫⠃⠳⠁⠛⠀⠋⠘⠚⠸⠓⠋⠘⠚⠀⠸⠫⠁⠘⠫⠅⠋⠂⠀⠀⠀⠀
+    ⠀⠀⠘⠫⠇⠭⠋⠃⠋⠁⠀⠑⠇⠋⠃⠋⠇⠋⠃⠋⠁⠀⠋⠇⠋⠃⠫⠇⠋⠃⠀⠫⠁⠈⠉⠋⠭⠭⠣⠅
+    '''
+    bm = tinyNotation.TinyNotationStream("E8 D# E F# D# BB4 E G8 G F# G A B B4 BB BB8 DD GG BB GG BB E4 G F#8\
+    E BB G E BB E4 EE EE8 EE4 r8 EE8 EE DD EE EE EE EE EE EE EE4 EE8 EE4~ EE8 r8 r", "5/8")
+    bm.insert(0, key.KeySignature(1))
+    bm.insert(0, tempo.MetronomeMark(number = 100, referent = note.QuarterNote()))
+    bm.insert(0, tempo.TempoText("Not too fast"))
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    # measure 1 fingerings
+    bm[0].notes[1].fingering = '2'
+    bm[0].notes[3].fingering = '2'
+    # measure 2 fingerings
+    bm[1].notes[1].fingering = '3'
+    # measure 3 fingerings
+    bm[2].notes[0].fingering = '2'
+    bm[2].notes[1].fingering = '3'
+    bm[2].notes[4].fingering = '2'
+    # measure 4 fingerings    
+    bm[3].notes[0].fingering = '1'
+    bm[3].notes[1].fingering = '5'
+    bm[3].notes[2].fingering = '1'
+    # measure 5 fingerings
+    bm[4].notes[2].fingering = '1'
+    bm[4].notes[3].fingering = '5'
+    bm[4].notes[4].fingering = '4'
+    # measure 6 fingerings
+    bm[5].notes[0].fingering = '2'
+    bm[5].notes[1].fingering = '1'
+    # measure 8 fingerings
+    bm[7].notes[0].fingering = '1'
+    bm[7].notes[1].fingering = '5'
+    bm[7].notes[2].fingering = '4'
+    # measure 9 fingerings
+    bm[8].notes[0].fingering = '3'
+    bm[8].notes[1].fingering = '2'
+    bm[8].notes[2].fingering = '1'
+    # measure 10 fingerings
+    bm[9].notes[0].fingering = '3'
+    bm[9].notes[1].fingering = '2'
+    bm[9].notes[2].fingering = '3'
+    bm[9].notes[3].fingering = '2'
+    bm[9].notes[4].fingering = '1'
+    # measure 11 fingerings
+    bm[10].notes[0].fingering = '3'
+    bm[10].notes[1].fingering = '2'
+    bm[10].notes[2].fingering = '3'
+    bm[10].notes[3].fingering = '2'
+    # measure 12 fingerings
+    bm[11].notes[0].fingering = '1'
+    return bm
+
+def drill9_5():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(drill9_5())
+    ⠀⠀⠀⠀⠀⠠⠇⠊⠛⠓⠞⠇⠽⠂⠀⠁⠇⠍⠕⠎⠞⠀⠊⠝⠀⠕⠝⠑⠲⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠐⠛⠅⠸⠊⠁⠩⠓⠃⠊⠁⠙⠊⠀⠐⠓⠸⠚⠃⠊⠁⠚⠃⠑⠇⠚⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠐⠓⠙⠡⠚⠙⠐⠊⠐⠙⠁⠀⠣⠐⠚⠐⠙⠁⠡⠚⠃⠙⠇⠣⠚⠃⠙⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠸⠊⠁⠙⠃⠐⠊⠅⠐⠙⠁⠡⠚⠃⠑⠇⠀⠙⠁⠐⠊⠂⠩⠓⠇⠊⠂⠙⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠐⠙⠐⠚⠂⠊⠇⠚⠙⠚⠀⠊⠨⠑⠅⠙⠂⠊⠇⠓⠃⠙⠁⠀⠟⠄⠃⠣⠅
+    '''
+    bm = tinyNotation.TinyNotationStream("f8 A G# A c A g B- A B- d B- g c Bn c a c b- c Bn c B- c\
+    A c a c Bn d c a g# a c' a c b- a b- c' b- a d' c' a g c f2.", "3/4")
+    bm.insert(0, key.KeySignature(-1))
+    bm.insert(0, tempo.TempoText("Lightly, almost in one"))
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[1].notes[0].accidental.displayStatus = False
+    # measure 1 fingerings
+    bm[0].notes[0].fingering = '5'
+    bm[0].notes[1].fingering = '1'
+    bm[0].notes[2].fingering = '2'
+    bm[0].notes[3].fingering = '1'
+    # measure 2 fingerings
+    bm[1].notes[1].fingering = '2'
+    bm[1].notes[2].fingering = '1'
+    bm[1].notes[3].fingering = '2'
+    bm[1].notes[4].fingering = '3'
+    bm[1].notes[5].fingering = '2'
+    # measure 3 fingerings
+    bm[2].notes[5].fingering = '1'
+    # measure 4 fingerings    
+    bm[3].notes[1].fingering = '1'
+    bm[3].notes[2].fingering = '2'
+    bm[3].notes[3].fingering = '3'
+    bm[3].notes[4].fingering = '2'
+    bm[3].notes[5].fingering = '3'
+    # measure 5 fingerings
+    bm[4].notes[0].fingering = '1'
+    bm[4].notes[1].fingering = '2'
+    bm[4].notes[2].fingering = '5'
+    bm[4].notes[3].fingering = '1'
+    bm[4].notes[4].fingering = '2'
+    bm[4].notes[5].fingering = '3'
+    # measure 6 fingerings
+    bm[5].notes[0].fingering = '1'
+    bm[5].notes[1].fingering = '4'
+    bm[5].notes[2].fingering = '3'
+    bm[5].notes[3].fingering = '4'
+    # measure 7 fingerings
+    bm[6].notes[1].fingering = '4'
+    bm[6].notes[2].fingering = '3'
+    # measure 8 fingerings
+    bm[7].notes[1].fingering = '5'
+    bm[7].notes[2].fingering = '4'
+    bm[7].notes[3].fingering = '3'
+    bm[7].notes[4].fingering = '2'
+    bm[7].notes[5].fingering = '1'
+    # measure 12 fingerings
+    bm[8].notes[0].fingering = '2'
+    return bm
+
+#-------------------------------------------------------------------------------
 # Chapter 10: Changes of Signature; the Braille Music Hyphen, Asterisk, and 
 # Parenthesis; Clef Signs
 
@@ -1601,9 +1987,9 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    #print example15_6b().haveBeamsBeenMade()
-    #ex = example24_4()
-    #print translate.keyboardPartsToBraille(ex)
+    #ex = drill9_5()
+    #ex.show()
+    #print translate.partToBraille(ex, upperFirstInNoteFingering = True)
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
