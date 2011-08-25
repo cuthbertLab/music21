@@ -15,6 +15,7 @@ Objects for exporting music21 data as braille.
 
 
 import collections
+import copy
 import music21
 import unittest
 
@@ -30,6 +31,8 @@ from music21 import note
 from music21 import pitch
 from music21 import stream
 from music21 import tempo
+
+UPPER_FIRST_IN_NOTE_FINGERING = None
 
 c = {'128th':   u'\u2819',
      '64th':    u'\u2839',
@@ -186,6 +189,12 @@ rests = {'128th':   u'\u282d',
 barlines = {'final': u'\u2823\u2805',
             'double': u'\u2823\u2805\u2804'}
 
+fingerMarks = {'1': u'\u2801',
+               '2': u'\u2803',
+               '3': u'\u2807',
+               '4': u'\u2802',
+               '5': u'\u2805'}
+
 bowingSymbols = {}
 
 beforeNoteExpr = {'staccato': u'\u2826',
@@ -242,7 +251,10 @@ symbols = {'space': u'\u2800',
            'rh_keyboard': u'\u2805\u281c',
            'lh_keyboard': u'\u2807\u281c',
            'word': u'\u281c',
-           'triplet': u'\u2806'}
+           'triplet': u'\u2806',
+           'finger_change': u'\u2809',
+           'first_set_missing_fingermark': u'\u2820',
+           'second_set_missing_fingermark': u'\u2804'}
 
 ascii_chars = {u'\u2800': ' ',
                u'\u2801': 'A',
@@ -414,8 +426,9 @@ class BrailleText():
                         self.allLines[self.lineNumber] += symbols['music_hyphen']
                         self.linePos += 1
                     self.allLines[self.lineNumber] += symbols['space']
+                    self.linePos += 1
                 self.allLines[self.lineNumber] += keyOrTimeSig
-                self.linePos += len(keyOrTimeSig) + 1
+                self.linePos += len(keyOrTimeSig)
             return
         if 'noteGrouping' in elementKeywords:
             noteGrouping = elementKeywords['noteGrouping']
@@ -435,8 +448,9 @@ class BrailleText():
                         self.allLines[self.lineNumber] += symbols['music_hyphen']
                         self.linePos += 1
                     self.allLines[self.lineNumber] += symbols['space']
+                    self.linePos += 1
                 self.allLines[self.lineNumber] += noteGrouping
-                self.linePos += len(noteGrouping) + 1
+                self.linePos += len(noteGrouping)
             return
         if 'pair' in elementKeywords:
             (measureNumber, rh_braille, lh_braille) = elementKeywords['pair']
@@ -737,6 +751,8 @@ def headingToBraille(sampleTempoText = tempo.TempoText("Allegretto"), sampleKeyS
             allLines = tt_braille.splitlines()
             if len(allLines) == 1 and len(allLines[0]) + len(mm_kts_braille) + 1 <= 34:
                 tt_mm_kts_braille = (allLines[0] + symbols['space'] + mm_kts_braille).center(40, symbols['space'])
+            elif len(allLines) == 2 and len(allLines[0]) + len(allLines[1]) + len(mm_kts_braille) + 2 <= 34:
+                tt_mm_kts_braille = symbols['space'].join([allLines[0], allLines[1], mm_kts_braille]).center(40, symbols['space'])
             else:
                 allLines.append(mm_kts_braille)
                 tt_mm_kts_braille = []
@@ -882,7 +898,18 @@ def noteToBraille(sampleNote = note.Note('C4'), showOctave = True):
                 noteTrans.append(beforeNoteExpr[a._mxName])
             except KeyError:
                 pass
-            
+        
+    # order of symbols:
+    # -----------------
+    # accidental
+    # octave mark
+    # note name with duration
+    # dot(s)
+    # finger mark
+    # tie
+    
+    # accidental
+    # ----------
     if not(sampleNote.accidental == None):
         if not(sampleNote.accidental.displayStatus == False):
             try:
@@ -890,15 +917,29 @@ def noteToBraille(sampleNote = note.Note('C4'), showOctave = True):
             except KeyError:
                 raise BrailleTranslateException("Accidental type cannot be translated to braille.")  
     
+    # octave mark
+    # -----------
     if showOctave:
         noteTrans.append(octaves[sampleNote.octave])
 
     notesInStep = pitchNameToNotes[sampleNote.step]  
     try:
-        nameWithLength = notesInStep[sampleNote.duration.type]
-        noteTrans.append(nameWithLength) 
+        # note name with duration
+        # -----------------------
+        nameWithDuration = notesInStep[sampleNote.duration.type]
+        noteTrans.append(nameWithDuration)
+        # dot(s)
+        # ------
         for dot in range(sampleNote.duration.dots):
             noteTrans.append(symbols['dot'])
+        # finger mark
+        # -----------
+        try:
+            noteTrans.append(noteFingeringToBraille(sampleNote.fingering, upperFirstInFingering = UPPER_FIRST_IN_NOTE_FINGERING))
+        except AttributeError:
+            pass
+        # tie
+        # ---
         if not sampleNote.tie == None and not sampleNote.tie.type == 'stop':
             noteTrans.append(symbols['tie'])
         return ''.join(noteTrans)
@@ -936,6 +977,48 @@ def restToBraille(sampleRest = note.Rest()):
         return ''.join(restTrans)
     except KeyError:
         raise BrailleTranslateException("Rest duration cannot be translated to braille.")
+
+def noteFingeringToBraille(sampleNoteFingering = '1', upperFirstInFingering = True):
+    if len(sampleNoteFingering) == 1:
+        return fingerMarks[sampleNoteFingering]
+    trans = []
+    change = sampleNoteFingering.split('-')
+    if len(change) == 2:
+        trans.append(fingerMarks[change[0]])
+        trans.append(symbols['finger_change'])
+        trans.append(fingerMarks[change[1]])
+    
+    choice = sampleNoteFingering.split('|')
+    if len(choice) == 2:
+        if upperFirstInFingering:
+            trans.append(fingerMarks[choice[0]])
+            trans.append(fingerMarks[choice[1]])
+        else: # lower fingering first
+            trans.append(fingerMarks[choice[1]])
+            trans.append(fingerMarks[choice[0]])
+        
+    pair = sampleNoteFingering.split(',')
+    if len(pair) == 2:
+        try:
+            upper = fingerMarks[pair[0]]
+        except KeyError:
+            upper = symbols['first_set_missing_fingermark']
+        try:
+            lower = fingerMarks[pair[1]]
+        except KeyError:
+            lower = symbols['second_set_missing_fingermark']
+            
+        if upperFirstInFingering:
+            trans.append(upper)
+            trans.append(lower)
+        else: # lower fingering first
+            trans.append(lower)
+            trans.append(upper)
+            
+    if len(trans) == 0:
+        raise BrailleTranslateException("Cannot translate note fingering: " + sampleNoteFingering)
+
+    return u"".join(trans)
 
 def extractBrailleHeading(sampleMeasure = stream.Measure()):
     '''
@@ -989,6 +1072,7 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
     
     * precedingBrailleText: None by default. If provided a BrailleText object, the
     measure contents are added to it, otherwise a new BrailleText object is created.
+    
     
     >>> from music21.braille import translate
     '''
@@ -1116,6 +1200,10 @@ def partToBraille(samplePart = stream.Part(), **partKeywords):
     * measureNumberWithHeading: True by default.
         
     
+    * upperFirstInNoteFingering: True by default. When provided a choice fingering for 
+    a note, if set to True, provides upper fingering followed by lower fingering.
+    
+    
     A thing to keep in mind: there is a 40 braille character limit per line.
     All spaces are filled in with empty six-cell braille characters. 
     '''
@@ -1138,6 +1226,12 @@ def partToBraille(samplePart = stream.Part(), **partKeywords):
         recenterHeading = partKeywords['recenterHeading']
     except KeyError:
         recenterHeading = False
+        
+    global UPPER_FIRST_IN_NOTE_FINGERING
+    try:
+        UPPER_FIRST_IN_NOTE_FINGERING = partKeywords['upperFirstInNoteFingering']
+    except KeyError:
+        UPPER_FIRST_IN_NOTE_FINGERING = True
         
     bt = BrailleText()
     partTrans = []
@@ -1173,7 +1267,8 @@ def partToBraille(samplePart = stream.Part(), **partKeywords):
 
     if recenterHeading:
         bt.recenterHeading()
-        
+    
+    UPPER_FIRST_IN_NOTE_FINGERING = None
     return bt
 
 def keyboardPartsToBraille(keyboardStyle = stream.Part()):
@@ -1246,7 +1341,8 @@ def beamGroupToBraille(sampleBeamGroup = stream.Measure(), showLeadingOctave = T
     trans.append(noteToBraille(previousNote, showOctave = showLeadingOctave))
     for currentNote in sampleBeamGroup[1:]:
         if isinstance(currentNote, note.Note):
-            newNote = note.Note(currentNote.pitch, quarterLength = 0.5)
+            newNote = copy.deepcopy(currentNote)
+            newNote.quarterLength = 0.5
             doShowOctave = showOctaveWithNote(previousNote, currentNote)
             trans.append(noteToBraille(newNote, showOctave = doShowOctave))
             previousNote = currentNote
