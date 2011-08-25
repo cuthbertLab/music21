@@ -48,6 +48,17 @@ def configureStaffGroupFromMxPartGroup(staffGroup, mxPartGroup):
     staffGroup.completeStatus = True
 
 
+def configureMxPartGroupFromStaffGroup(staffGroup):
+    '''Create and configure an mxPartGroup object from a staff group spanner. Note that this object is not completely formed by this procedure.
+    '''
+    mxPartGroup = musicxml.StaffGroup()    
+    mxPartGroup.set(staffGroup.name)
+    mxPartGroup.set(staffGroup.abbreviation)
+    mxPartGroup.set(staffGroup.symbol)
+    mxPartGroup.set(staffGroup.barTogether)
+    return mxPartGroup
+
+
 def mxToTempoIndication(mxMetronome, mxWords=None):
     '''Given an mxMetronome, convert to either a TempoIndication subclass, either a tempo.MetronomeMark or tempo.MetricModulation. 
 
@@ -2570,7 +2581,6 @@ def streamToMx(s, spannerBundle=None):
     '''
     Create and return a musicxml Score object. 
 
-
     This is the most common entry point for 
     conversion of a Stream to MusicXML. This method is 
     called on Stream from the musicxml property. 
@@ -2625,9 +2635,6 @@ def streamToMx(s, spannerBundle=None):
 
     if s.hasPartLikeStreams():
         #environLocal.printDebug('Stream._getMX: interpreting multipart')
-        # NOTE: a deepcopy has already been made; do not copy again
-        #partStream = copy.deepcopy(s)
-        #partStream = s
 
         # must set spanner after copying
         if spannerBundle is None: 
@@ -2718,12 +2725,16 @@ def streamToMx(s, spannerBundle=None):
     mxScore = mxScore.merge(mxScoreDefault, returnDeepcopy=False)
 
     mxPartList = musicxmlMod.PartList()
-    mxScore.set('partList', mxPartList)
-
+    # mxComponents is just a list 
+    # TODO: add mxStaff groups here
     for mxScorePart, mxPart in mxComponents:
         mxPartList.append(mxScorePart)
-        mxScore.append(mxPart)
 
+    for mxScorePart, mxPart in mxComponents:
+        mxScore.append(mxPart) # mxParts go on component list
+
+    # set the mxPartList
+    mxScore.set('partList', mxPartList)
     return mxScore
 
 def _getUniqueStaffKeys(staffReferenceList):
