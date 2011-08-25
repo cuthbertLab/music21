@@ -21,6 +21,7 @@ import unittest
 
 from music21 import bar
 from music21 import chord
+from music21 import clef
 from music21 import duration
 from music21 import dynamics
 from music21 import instrument
@@ -32,7 +33,8 @@ from music21 import pitch
 from music21 import stream
 from music21 import tempo
 
-UPPER_FIRST_IN_NOTE_FINGERING = None
+UPPER_FIRST_IN_NOTE_FINGERING = True
+SHOW_CLEF_SIGNS = False
 
 c = {'128th':   u'\u2819',
      '64th':    u'\u2839',
@@ -194,6 +196,11 @@ fingerMarks = {'1': u'\u2801',
                '3': u'\u2807',
                '4': u'\u2802',
                '5': u'\u2805'}
+
+clefSigns = {'treble': u'\u281c\u280c\u2807',
+             'bass': u'\u281c\u283c\u2807',
+             'alto': u'\u281c\u282c\u2807',
+             'tenor': u'\u281c\u282c\u2810\u2807'}
 
 bowingSymbols = {}
 
@@ -1020,6 +1027,72 @@ def noteFingeringToBraille(sampleNoteFingering = '1', upperFirstInFingering = Tr
 
     return u"".join(trans)
 
+def noteGroupingsToBraille(sampleMeasure = stream.Measure(), showLeadingOctave = True):
+    '''
+    Notes, rests, barlines, and dynamics in a measure stream to braille.
+    Returns a list of note groupings for a stream.
+    Right now, those are divisions based on locations of double barlines.
+    '''
+    allNoteGroupings = []
+    noteGroupingTrans = []
+    previousNote = None
+    previousElement = None
+    for element in sampleMeasure:
+        if SHOW_CLEF_SIGNS and isinstance(element, clef.Clef):
+            if isinstance(element, clef.TrebleClef):
+                noteGroupingTrans.append(clefSigns['treble'])
+                previousNote = None
+                showLeadingOctave = True
+            elif isinstance(element, clef.BassClef):
+                noteGroupingTrans.append(clefSigns['bass'])
+                previousNote = None
+                showLeadingOctave = True
+            elif isinstance(element, clef.AltoClef):
+                noteGroupingTrans.append(clefSigns['alto'])
+                previousNote = None
+                showLeadingOctave = True
+            elif isinstance(element, clef.TenorClef):
+                noteGroupingTrans.append(clefSigns['tenor'])
+                previousNote = None
+                showLeadingOctave = True
+        if isinstance(element, stream.Measure):
+            if previousNote == None:
+                doShowOctave = showLeadingOctave
+            else:
+                doShowOctave = showOctaveWithNote(previousNote, element.notes[0])
+            isPrecededByRest = False
+            if not(previousElement == None) and isinstance(previousElement, note.Rest) and previousElement.duration.type == element.notes[0].duration.type:
+                isPrecededByRest = True
+            noteGroupingTrans.append(beamGroupToBraille(sampleBeamGroup = element, showLeadingOctave = doShowOctave, isPrecededByRest = isPrecededByRest))
+            previousNote = element.notes[-1]
+        elif isinstance(element, note.Note):
+            if previousNote == None:
+                doShowOctave = showLeadingOctave
+            else:
+                doShowOctave = showOctaveWithNote(previousNote, element)
+            noteGroupingTrans.append(noteToBraille(sampleNote = element, showOctave = doShowOctave))
+            previousNote = element                
+        elif isinstance(element, note.Rest):
+            if element.duration == sampleMeasure.duration:
+                noteGroupingTrans.append(restToBraille(sampleRest = note.Rest(quarterLength = 4.0)))
+            else:
+                noteGroupingTrans.append(restToBraille(sampleRest = element))
+        elif isinstance(element, dynamics.Dynamic):
+            noteGroupingTrans.append(symbols['word'])
+            noteGroupingTrans.append(wordToBraille(element.value))
+            previousNote = None
+            showLeadingOctave = True
+        elif isinstance(element, bar.Barline):
+            noteGroupingTrans.append(barlines[element.style])
+            allNoteGroupings.append(u"".join(noteGroupingTrans))
+            noteGroupingTrans = []
+            previousNote = None
+            showLeadingOctave = True
+        previousElement = element
+    if not(len(noteGroupingTrans) == 0):
+        allNoteGroupings.append(u"".join(noteGroupingTrans))
+    return allNoteGroupings
+
 def extractBrailleHeading(sampleMeasure = stream.Measure()):
     '''
     Method to extract a braille heading from a measure. A heading
@@ -1233,6 +1306,12 @@ def partToBraille(samplePart = stream.Part(), **partKeywords):
     except KeyError:
         UPPER_FIRST_IN_NOTE_FINGERING = True
         
+    global SHOW_CLEF_SIGNS
+    try:
+        SHOW_CLEF_SIGNS = partKeywords['showClefSigns']
+    except KeyError:
+        SHOW_CLEF_SIGNS = False
+        
     bt = BrailleText()
     partTrans = []
     allMeasures = samplePart.getElementsByClass('Measure')
@@ -1268,7 +1347,8 @@ def partToBraille(samplePart = stream.Part(), **partKeywords):
     if recenterHeading:
         bt.recenterHeading()
     
-    UPPER_FIRST_IN_NOTE_FINGERING = None
+    SHOW_CLEF_SIGNS = False
+    UPPER_FIRST_IN_NOTE_FINGERING = True
     return bt
 
 def keyboardPartsToBraille(keyboardStyle = stream.Part()):
@@ -1349,55 +1429,6 @@ def beamGroupToBraille(sampleBeamGroup = stream.Measure(), showLeadingOctave = T
         elif isinstance(currentNote, note.Rest):
             noteGroupingTrans.append(restToBraille(sampleRest = element))
     return u"".join(trans)
-
-def noteGroupingsToBraille(sampleMeasure = stream.Measure(), showLeadingOctave = True):
-    '''
-    Notes, rests, barlines, and dynamics in a measure stream to braille.
-    Returns a list of note groupings for a stream.
-    Right now, those are divisions based on locations of double barlines.
-    '''
-    allNoteGroupings = []
-    noteGroupingTrans = []
-    previousNote = None
-    previousElement = None
-    for element in sampleMeasure.getElementsByClass([note.Note, note.Rest, stream.Measure, bar.Barline, dynamics.Dynamic]):
-        if isinstance(element, stream.Measure):
-            if previousNote == None:
-                doShowOctave = showLeadingOctave
-            else:
-                doShowOctave = showOctaveWithNote(previousNote, element.notes[0])
-            isPrecededByRest = False
-            if not(previousElement == None) and isinstance(previousElement, note.Rest) and previousElement.duration.type == element.notes[0].duration.type:
-                isPrecededByRest = True
-            noteGroupingTrans.append(beamGroupToBraille(sampleBeamGroup = element, showLeadingOctave = doShowOctave, isPrecededByRest = isPrecededByRest))
-            previousNote = element.notes[-1]
-        elif isinstance(element, note.Note):
-            if previousNote == None:
-                doShowOctave = showLeadingOctave
-            else:
-                doShowOctave = showOctaveWithNote(previousNote, element)
-            noteGroupingTrans.append(noteToBraille(sampleNote = element, showOctave = doShowOctave))
-            previousNote = element                
-        elif isinstance(element, note.Rest):
-            if element.duration == sampleMeasure.duration:
-                noteGroupingTrans.append(restToBraille(sampleRest = note.Rest(quarterLength = 4.0)))
-            else:
-                noteGroupingTrans.append(restToBraille(sampleRest = element))
-        elif isinstance(element, dynamics.Dynamic):
-            noteGroupingTrans.append(symbols['word'])
-            noteGroupingTrans.append(wordToBraille(element.value))
-            previousNote = None
-            showLeadingOctave = True
-        elif isinstance(element, bar.Barline):
-            noteGroupingTrans.append(barlines[element.style])
-            allNoteGroupings.append(u"".join(noteGroupingTrans))
-            noteGroupingTrans = []
-            previousNote = None
-            showLeadingOctave = True
-        previousElement = element
-    if not(len(noteGroupingTrans) == 0):
-        allNoteGroupings.append(u"".join(noteGroupingTrans))
-    return allNoteGroupings
 
 #-------------------------------------------------------------------------------
 # Translation between braille unicode and ASCII/other symbols.
