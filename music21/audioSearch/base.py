@@ -77,11 +77,14 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
     lengthCorrelation = len(correlation) / 2
     correlation = correlation[lengthCorrelation:]
     difference = numpy.diff(correlation) #  Calculates the difference between slots
-    beginning = matplotlib.mlab.find(difference > 0)[0]
-
-    peak = numpy.argmax(correlation[beginning:]) + beginning
-    vertex = interpolation(correlation, peak)
-    finalResult = recordSampleRate / vertex
+    positiveDifferences=matplotlib.mlab.find(difference > 0)
+    if len(positiveDifferences)==0:
+        finalResult=10 # Rest
+    else:
+        beginning = positiveDifferences[0]
+        peak = numpy.argmax(correlation[beginning:]) + beginning
+        vertex = interpolation(correlation, peak)
+        finalResult = recordSampleRate / vertex
     return finalResult
 
 def prepareThresholds(useScale=music21.scale.ChromaticScale('C4')):
