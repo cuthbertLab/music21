@@ -1619,6 +1619,40 @@ def example10_6():
     bm[3].insert(2.0, bar.Barline('double'))
     return bm
 
+def example10_9():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example10_9(), recenterHeading = True, showClefSigns = False)
+    ⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠘⠺⠸⠻⠺⠐⠻⠀⠺⠱⠹⠪⠀⠾⠣⠅
+    >>> print translate.partToBraille(example10_9(), recenterHeading = True, showClefSigns = True)
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠜⠼⠇⠘⠺⠸⠻⠺⠜⠌⠇⠐⠻⠀⠺⠱⠹⠪⠀⠾⠣⠅
+    '''
+    bm = tinyNotation.TinyNotationStream("BB-4 F B- f b- d' c' a b-1", "4/4")
+    bm.insert(0, key.KeySignature(-2))
+    bm.insert(0, clef.BassClef())
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[0].insert(3.0, clef.TrebleClef())
+    return bm
+
+def example10_10():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example10_10(), recenterHeading = True, showClefSigns = False)
+    ⠀⠀⠀⠀⠀⠀⠩⠩⠩⠼⠋⠦⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠐⠊⠋⠊⠚⠙⠑⠀⠋⠛⠓⠪⠄⠣⠅
+    >>> print translate.partToBraille(example10_10(), recenterHeading = True, showClefSigns = True)
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠩⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠜⠬⠇⠐⠊⠋⠊⠚⠙⠑⠀⠜⠌⠇⠨⠋⠛⠓⠪⠄⠣⠅
+    '''
+    bm = tinyNotation.TinyNotationStream("a8 e a b c'# d' e' f'# g'# a'4.", "6/8")
+    bm.insert(0, key.KeySignature(3))
+    bm.insert(0, clef.AltoClef())
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[1].insert(0.0, clef.TrebleClef())
+    return bm
+
 #-------------------------------------------------------------------------------
 # Chapter 11: Segments for Single-Line Instrumental Music, Format for the 
 # Beginning of a Composition or Movement
@@ -1987,9 +2021,9 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    #ex = drill9_5()
+    #ex = example10_10()
     #ex.show()
-    #print translate.partToBraille(ex, upperFirstInNoteFingering = True)
+    #print translate.partToBraille(ex, recenterHeading = True, showClefSigns = True)
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
