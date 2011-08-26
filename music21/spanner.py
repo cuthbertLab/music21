@@ -502,7 +502,6 @@ class SpannerBundle(object):
 
     If a Stream or Stream subclass is provided as an argument, all Spanners on this Stream will be accumulated herein. 
     '''
-
     def __init__(self, *arguments, **keywords):
         self._cache = common.DefaultHash()    
         self._storage = []
@@ -1008,6 +1007,12 @@ class StaffGroup(Spanner):
         # determines if barlines are grouped through; this is group barline
         # in musicxml
         self._barTogether = False
+
+        if 'symbol' in keywords.keys():
+            self.symbol = keywords['symbol'] # user property
+
+        if 'barTogether' in keywords.keys():
+            self.barTogether = keywords['barTogether'] # user property
 
     #---------------------------------------------------------------------------
     def _getBarTogether(self):

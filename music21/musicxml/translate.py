@@ -51,11 +51,11 @@ def configureStaffGroupFromMxPartGroup(staffGroup, mxPartGroup):
 def configureMxPartGroupFromStaffGroup(staffGroup):
     '''Create and configure an mxPartGroup object from a staff group spanner. Note that this object is not completely formed by this procedure.
     '''
-    mxPartGroup = musicxml.StaffGroup()    
-    mxPartGroup.set(staffGroup.name)
-    mxPartGroup.set(staffGroup.abbreviation)
-    mxPartGroup.set(staffGroup.symbol)
-    mxPartGroup.set(staffGroup.barTogether)
+    mxPartGroup = musicxmlMod.PartGroup()    
+    mxPartGroup.set('groupName', staffGroup.name)
+    mxPartGroup.set('groupAbbreviation', staffGroup.abbreviation)
+    mxPartGroup.set('groupSymbol', staffGroup.symbol)
+    mxPartGroup.set('groupBarline', staffGroup.barTogether)
     return mxPartGroup
 
 
@@ -2686,10 +2686,11 @@ def streamToMx(s, spannerBundle=None):
             # force this instrument into this part
             # meterStream is only used here if there are no measures
             # defined in this part
-            mxComponents.append(streamPartToMx(obj, instObj=inst, 
-                meterStream=meterStream, 
-                refStreamOrTimeRange=refStreamOrTimeRange, 
-                spannerBundle=spannerBundle))
+            mxScorePart, mxPart = streamPartToMx(obj, instObj=inst, 
+                        meterStream=meterStream, 
+                        refStreamOrTimeRange=refStreamOrTimeRange, 
+                        spannerBundle=spannerBundle)
+            mxComponents.append([mxScorePart, mxPart, obj])
             #mxComponents.append(obj._getMXPart(inst, meterStream, refStreamOrTimeRange))
 
     else: # assume this is the only part
@@ -2703,10 +2704,9 @@ def streamToMx(s, spannerBundle=None):
             #spannerBundle = spanner.SpannerBundle(s.flat)
             spannerBundle = s.spannerBundle
             #environLocal.printDebug(['streamToMx(): loaded spannerBundle of size:', len(spannerBundle), 'id(spannerBundle)', id(spannerBundle)])
-
-        mxComponents.append(streamPartToMx(s,
-                meterStream=meterStream, 
-                spannerBundle=spannerBundle))
+        mxScorePart, mxPart = streamPartToMx(s, meterStream=meterStream, 
+                              spannerBundle=spannerBundle)
+        mxComponents.append([mxScorePart, mxPart, s])
 
     # create score and part list
     # try to get mxScore from lead meta data first
@@ -2726,11 +2726,41 @@ def streamToMx(s, spannerBundle=None):
 
     mxPartList = musicxmlMod.PartList()
     # mxComponents is just a list 
-    # TODO: add mxStaff groups here
-    for mxScorePart, mxPart in mxComponents:
-        mxPartList.append(mxScorePart)
+    # returns a spanner bundle
+    staffGroups = spannerBundle.getByClass('StaffGroup') 
+    #environLocal.printDebug(['got staff groups', staffGroups])
 
-    for mxScorePart, mxPart in mxComponents:
+    # first, find which parts are start/end of partGroups
+    partGroupIndexRef = {} # have id be key
+    partGroupIndex = 1 # start by 1 by convetion
+    for mxScorePart, mxPart, p in mxComponents:
+        # check for first
+        for sg in staffGroups:
+            if sg.isFirst(p):
+                mxPartGroup = configureMxPartGroupFromStaffGroup(sg)
+                mxPartGroup.set('type', 'start')
+                mxPartGroup.set('number', partGroupIndex)
+                # assign the spanner in the dictionary
+                partGroupIndexRef[partGroupIndex] = sg
+                partGroupIndex += 1 # increment for next usage
+                mxPartList.append(mxPartGroup)
+        # add score part
+        mxPartList.append(mxScorePart)
+        # check for last
+        for sg in staffGroups:
+            if sg.isLast(p):
+                # find the spanner in the dictionary already-assigned
+                for key, value in partGroupIndexRef.items():
+                    if value is sg:
+                        activeIndex = key
+                        break
+                mxPartGroup = musicxmlMod.PartGroup()
+                mxPartGroup.set('type', 'stop')
+                mxPartGroup.set('number', activeIndex)
+                mxPartList.append(mxPartGroup)
+
+    # addition of parts must simply be in the same order as above
+    for mxScorePart, mxPart, p in mxComponents:
         mxScore.append(mxPart) # mxParts go on component list
 
     # set the mxPartList
@@ -3739,6 +3769,34 @@ spirit</words>
         self.assertEqual(sg2.symbol, 'line')
         self.assertEqual(sg2.barTogether, True)
             
+
+    def testStaffGroupsB(self):
+        from music21 import stream, note, spanner
+        p1 = stream.Part()
+        p2 = stream.Part()
+        p3 = stream.Part()
+        p4 = stream.Part()
+        sg1 = spanner.StaffGroup([p1, p2], symbol='brace')
+        sg2 = spanner.StaffGroup([p3, p4], symbol='bracket')
+        s = stream.Score()
+        s.insert([0, p1, 0, p2, 0, p3, 0, p4, 0, sg1, 0, sg2])
+        #s.show()
+
+        raw = s.musicxml
+        match = '<group-symbol>brace</group-symbol>'
+        self.assertEqual(raw.find(match) > 0, True)
+        match = '<group-symbol>bracket</group-symbol>'
+        self.assertEqual(raw.find(match) > 0, True)
+        match = '<part-group number="1" type="start">'
+        self.assertEqual(raw.find(match) > 0, True)
+        match = '<part-group number="1" type="stop"/>'
+        self.assertEqual(raw.find(match) > 0, True)
+        match = '<part-group number="2" type="start">'
+        self.assertEqual(raw.find(match) > 0, True)
+        match = '<part-group number="2" type="stop"/>'
+        self.assertEqual(raw.find(match) > 0, True)
+
+
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
