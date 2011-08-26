@@ -28,6 +28,12 @@ import time
 import math
  
  
+ 
+ 
+ 
+ # TO DO
+ # the same name for the score and the song!!!!
+ 
 class SFApp():
    
     def __init__(self, master):
@@ -49,11 +55,10 @@ class SFApp():
         self.hits = 0
         self.isMoving = False
         self.firstTime = True
-        self.stop = False
         
         self.sizeButton = 11
-        self.x = 300#800
-        self.y = 500#1200 
+        self.x = 700#300#800
+        self.y = 900#500#1200 
         self.separation = math.floor(self.x / 8)
         self.newSize = [self.x, self.y]
         self.positionxLeft = math.floor(self.x / 2)
@@ -106,7 +111,6 @@ class SFApp():
                 if self.firstTime == True:
                     self.button2 = Tkinter.Button(master, text="Start SF", width=self.sizeButton,command=self.startScoreFollower, bg='green')
                     self.button2.grid(row=5,column=3)
-                    #self.button2.pack()#(side=Tkinter.BOTTOM)
                     
                     self.button3 = Tkinter.Button(master, text="1st page", width=self.sizeButton,command=self.goTo1stPage)
                     self.button3.grid(row=4,column=3)
@@ -128,7 +132,7 @@ class SFApp():
                     
                     self.button6 = Tkinter.Button(master, text="STOP SF", width=self.sizeButton,command=self.stopScoreFollower, bg='red')
                     self.button6.grid(row=5,column=4)
-                    
+                                        
                     self.textVarComments = Tkinter.StringVar()
                     self.textVarComments.set('Comments') 
                     self.label2 = Tkinter.Label(master, textvariable=self.textVarComments)
@@ -274,6 +278,10 @@ class SFApp():
         
        
     def startScoreFollower(self):
+        
+        self.button2 = Tkinter.Button(self.master, text="Start SF", width=self.sizeButton,command=self.startScoreFollower,state='disable', bg='green')
+        self.button2.grid(row=5,column=3)
+        
         #scoreNotes = ["f'#4", "e'", "d'", "c'#", "b", "a", "b", "c'#", "d'", "c'#", "b", "a", "g", "f#", "g", "e", "d8", "f#", "a", "g", "f#", "d", "f#", "e", "d", "B", "d", "a", "g", "b", "a", "g", "f#", "d", "e", "c'#", "d'", "f'#", "a'", "a", "b", "g", "a", "f#", "d", "d'16", "e'", "d'8", "c'#", "d'16", "c'#", "d'", "d", "c#", "a", "e", "f#", "d", "d'", "c'#", "b", "c'#", "f'#", "a'", "b'", "g'", "f'#", "e'", "g'", "f'#", "e'", "d'", "c'#", "b", "a", "g", "f#", "e", "g", "f#", "e", "d", "e", "f#", "g", "a", "e", "a", "g", "f#", "b", "a", "g", "a", "g", "f#", "e", "d", "B", "b", "c'#", "d'", "c'#", "b", "a", "g", "f#", "e", "b", "a", "b", "a", "g", "f#8", "f'#", "e'4", "d'", "f'#", "b'4", "a'", "b'", "c'#'", "d''8", "d'", "c'#4", "b", "d'"]
         #scNotes = converter.parse(" ".join(scoreNotes), "4/4")
         scNotes = corpus.parse(self.nameRecordedSong).parts[0].flat.notes
@@ -288,6 +296,7 @@ class SFApp():
         ScF.begins = True
         ScF.countdown = 0
         self.firstTimeSF = True
+        self.stop = False
         
         # decision lastNotePosition taking into account the beginning of the first page displayed
         ScF.lastNotePosition = self.pageMeasureNumbers[self.currentPage - 1]
@@ -295,15 +304,17 @@ class SFApp():
         ScF.result = False
         self.textVar3.set('recording in 1 sec!')
        
-        self.scoreFollower = ScF        
-        self.master.after(1000, self.continueScoreFollower)
-        
+        self.scoreFollower = ScF     
         #parameters for the thread 2
         self.dummyQueue=queue.Queue()
         self.sampleQueue=queue.Queue()
         self.dummyQueue2=queue.Queue()
         self.sampleQueue2=queue.Queue()
         self.firstAnalysis = True
+        self.continueScoreFollower()   
+        #self.master.after(1000, self.continueScoreFollower)
+        
+
  
     def continueScoreFollower(self):
         self.ScF = self.scoreFollower       
@@ -313,19 +324,18 @@ class SFApp():
             self.rt=RecordThread(self.dummyQueue,self.sampleQueue,self.ScF)            
             self.rt.daemon=True
             self.rt.start() # the 2nd thread starts here
-            print "ja ha engegat"
             self.dummyQueue.put("Start")            
-            self.master.after(12000,self.analyzeRecording)
+            self.master.after(6000,self.analyzeRecording)
         else:
+            self.button2.destroy() 
+            self.button2 = Tkinter.Button(self.master, text="Start SF", width=self.sizeButton,command=self.startScoreFollower,bg='green')
+            self.button2.grid(row=5,column=3)
             self.textVarComments.set('END!! %s' %(self.rt.resultInThread))
 
             
     def analyzeRecording(self):
         self.rt.outQueue.get()
-        print "no ho entenc!!!!!! ",self.stop,self.firstTimeSF,self.rt.resultInThread
-        print 'he passat la barrera'
-        self.textVar3.set(self.lastNoteString)
-         
+        self.textVar3.set(self.lastNoteString)         
         print "****",self.ScF.lastNotePosition,self.beginningPages[self.currentPage-1],self.currentPage,self.ScF.lastNotePosition < self.beginningPages[self.currentPage-1]
         if self.currentPage <= self.totalPagesScore:            
             if self.ScF.lastNotePosition < self.beginningPages[self.currentPage-1] or self.ScF.lastNotePosition >= self.beginningPages[self.currentPage+1]: # case in which the musician plays a note in a not displayed page

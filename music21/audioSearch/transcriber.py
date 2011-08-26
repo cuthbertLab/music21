@@ -76,6 +76,7 @@ def runTranscribe(show=True, plot=True, useMic=True,
         freqFromAQList = getFrequenciesFromMicrophone(length=seconds, storeWaveFilename=WAVE_FILENAME)
     else:
         freqFromAQList = getFrequenciesFromAudioFile(waveFilename=WAVE_FILENAME)
+        
     detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale)
     detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
     (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
@@ -88,7 +89,8 @@ def runTranscribe(show=True, plot=True, useMic=True,
     if plot == True:
         matplotlib.pyplot.plot(listplot)
         matplotlib.pyplot.show()
-    environLocal.printDebug("* END")
+    environLocal.printDebug("* END")    
+        
     return myScore
 
 class TestExternal(unittest.TestCase):
