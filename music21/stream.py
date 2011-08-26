@@ -5295,7 +5295,7 @@ class Stream(music21.Music21Object):
                 m = measureStream[i]
                 if m.keySignature != None:
                     ksLast = m.keySignature
-                if i > 0:
+                if i > 0 and m.keySignature == None:
                     if (len(measureStream[i-1]) > 0 
                         and hasattr(measureStream[i-1][-1], "tie") 
                         and measureStream[i-1][-1].tie is not None 
