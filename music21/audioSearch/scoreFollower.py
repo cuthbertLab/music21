@@ -79,10 +79,11 @@ class ScoreFollower(object):
 
 
     def repeatTranscription(self):  
-        print "WE STAY AT:  *****************",
+        print "WE STAY AT:  *****",
         print self.lastNotePosition, len(self.scoreNotesOnly),
         print "en percent %d %%" % (self.lastNotePosition * 100 / len(self.scoreNotesOnly)),
-        print " this search begins at: ", self.startSearchAtSlot
+        print " this search begins at: ", self.startSearchAtSlot,
+        print "countdown %d" %self.countdown
 
         if self.useMic == True:
             freqFromAQList = getFrequenciesFromMicrophone(length=self.seconds_recording, storeWaveFilename=None)
@@ -215,6 +216,28 @@ class ScoreFollower(object):
         >>> time_start = time()
         >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
         >>> print ScF.startSearchAtSlot
+        15
+        >>> print ScF.predictedNotePosition
+        39
+        
+        
+        Countdown = 4: 
+        Now it starts searching at the beginning of the page of the screen.
+        The note prediction is also the beginning of the page.
+        
+
+        >>> ScF = ScoreFollower(scoreStream=scNotes)
+        >>> ScF.begins = False
+        >>> ScF.countdown = 4
+        >>> ScF.startSearchAtSlot = 15
+        >>> ScF.lastNotePosition = 15
+        >>> ScF.predictedNotePosition = 19
+        >>> ScF.seconds_recording = 10
+        >>> prob = 0.8
+        >>> totalLengthPeriod = 25
+        >>> time_start = time()
+        >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
+        >>> print ScF.startSearchAtSlot
         0
         >>> print ScF.predictedNotePosition
         0
@@ -248,7 +271,10 @@ class ScoreFollower(object):
                 totalSeconds = 2 * (time() - time_start) + self.seconds_recording
                 self.predictedNotePosition = self.predictNextNotePosition(totalLengthPeriod, totalSeconds)
                 # do nothing to startSearch or predicted note position
-            elif self.countdown >= 2 and self.countdown < 5:
+            elif self.countdown == 2:
+                totalSeconds = 3 * (time() - time_start) + self.seconds_recording
+                self.predictedNotePosition = self.predictNextNotePosition(totalLengthPeriod, totalSeconds)               
+            elif self.countdown > 2 and self.countdown < 5:
                 #print "SEARCHING IN ALL THE SCORE; MAYBE THE MUSICIAN HAS STARTED FROM THE BEGINNING"
                 firstSlot = self.getFirstSlotOnScreen()
                 self.lastNotePosition = firstSlot
@@ -367,6 +393,7 @@ class ScoreFollower(object):
             probabilityHit = 0
         else:
             probabilityHit = listOfParts[position].matchProbability
+            
         for i in range(len(totScores[number])):
             totalLength = totalLength + totScores[number][i].quarterLength
     
