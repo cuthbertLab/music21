@@ -1006,13 +1006,17 @@ class StaffGroup(Spanner):
         self._symbol = None # can be bracket, line
         # determines if barlines are grouped through; this is group barline
         # in musicxml
-        self._barTogether = False
+        self._barTogether = True
 
         if 'symbol' in keywords.keys():
             self.symbol = keywords['symbol'] # user property
-
         if 'barTogether' in keywords.keys():
             self.barTogether = keywords['barTogether'] # user property
+        if 'name' in keywords.keys():
+            self.name = keywords['name'] # user property
+        if 'abbreviation' in keywords.keys():
+            self.name = keywords['abbreviation'] # user property
+
 
     #---------------------------------------------------------------------------
     def _getBarTogether(self):

@@ -55,7 +55,12 @@ def configureMxPartGroupFromStaffGroup(staffGroup):
     mxPartGroup.set('groupName', staffGroup.name)
     mxPartGroup.set('groupAbbreviation', staffGroup.abbreviation)
     mxPartGroup.set('groupSymbol', staffGroup.symbol)
-    mxPartGroup.set('groupBarline', staffGroup.barTogether)
+    if staffGroup.barTogether in [True]:
+        mxPartGroup.set('groupBarline', 'yes')
+    elif staffGroup.barTogether in [False]:
+        mxPartGroup.set('groupBarline', 'no')
+
+    environLocal.printDebug(['configureMxPartGroupFromStaffGroup: mxPartGroup', mxPartGroup])
     return mxPartGroup
 
 
@@ -3773,13 +3778,22 @@ spirit</words>
     def testStaffGroupsB(self):
         from music21 import stream, note, spanner
         p1 = stream.Part()
+        p1.repeatAppend(note.Note(), 8)
         p2 = stream.Part()
         p3 = stream.Part()
         p4 = stream.Part()
-        sg1 = spanner.StaffGroup([p1, p2], symbol='brace')
-        sg2 = spanner.StaffGroup([p3, p4], symbol='bracket')
+        p5 = stream.Part()
+        p6 = stream.Part()
+        p7 = stream.Part()
+        p8 = stream.Part()
+        
+        sg1 = spanner.StaffGroup([p1, p2], symbol='brace', name='marimba')
+        sg2 = spanner.StaffGroup([p3, p4], symbol='bracket', name='xlophone')
+        sg3 = spanner.StaffGroup([p5, p6], symbol='line', barTogether=False)
+        sg4 = spanner.StaffGroup([p5, p6, p7], symbol='line', barTogether=False)
+        
         s = stream.Score()
-        s.insert([0, p1, 0, p2, 0, p3, 0, p4, 0, sg1, 0, sg2])
+        s.insert([0, p1, 0, p2, 0, p3, 0, p4, 0, p5, 0, p6, 0, p7, 0, p8, 0, sg1, 0, sg2, 0, sg3, 0, sg4])
         #s.show()
 
         raw = s.musicxml
