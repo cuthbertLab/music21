@@ -30,11 +30,14 @@ from music21 import key
 from music21 import meter
 from music21 import note
 from music21 import pitch
+from music21 import spanner
 from music21 import stream
 from music21 import tempo
 
 UPPER_FIRST_IN_NOTE_FINGERING = True
 SHOW_CLEF_SIGNS = False
+SLUR_LONG_PHRASE_WITH_BRACKETS = False
+SHOW_SLURS_AND_TIES_TOGETHER = False
 
 c = {'128th':   u'\u2819',
      '64th':    u'\u2839',
@@ -261,7 +264,12 @@ symbols = {'space': u'\u2800',
            'triplet': u'\u2806',
            'finger_change': u'\u2809',
            'first_set_missing_fingermark': u'\u2820',
-           'second_set_missing_fingermark': u'\u2804'}
+           'second_set_missing_fingermark': u'\u2804',
+           'opening_single_slur': u'\u2809',
+           'opening_double_slur': u'\u2809\u2809',
+           'closing_double_slur': u'\u2809',
+           'opening_bracket_slur': u'\u2830\u2803',
+           'closing_bracket_slur': u'\u2818\u2806'}
 
 ascii_chars = {u'\u2800': ' ',
                u'\u2801': 'A',
@@ -899,6 +907,7 @@ def noteToBraille(sampleNote = note.Note('C4'), showOctave = True):
     noteTrans = []
     
     # articulations
+    # -------------
     if not len(sampleNote.articulations) == 0:    
         for a in sampleNote.articulations:
             try:
@@ -906,15 +915,43 @@ def noteToBraille(sampleNote = note.Note('C4'), showOctave = True):
             except KeyError:
                 pass
         
-    # order of symbols:
-    # -----------------
-    # accidental
-    # octave mark
-    # note name with duration
-    # dot(s)
-    # finger mark
-    # tie
+
+    beginLongSlur = False
+    endLongSlur = False
+    shortSlur = False
+    if sampleNote.hasSpannerSite():
+        for sp in sampleNote.getSpannerSites():
+            if isinstance(sp, spanner.Slur):
+                try:
+                    delta = abs(sp[1].index - sp[0].index) + 1
+                    if delta > 4:
+                        if sp.isFirst(sampleNote):
+                            beginLongSlur = True
+                        elif sp.isLast(sampleNote) and SLUR_LONG_PHRASE_WITH_BRACKETS:
+                            endLongSlur = True
+                    else:
+                        if sp.isFirst(sampleNote):
+                            shortSlur = True
+                except AttributeError:
+                    pass
+    else:
+        try:
+            shortSlur = sampleNote.isPartOfShortSlur
+        except AttributeError:
+            pass
+        try:
+            endLongSlur = sampleNote.endLongSlur
+        except AttributeError:
+            pass
     
+    # opening bracket slur
+    # closing bracket slur (if also beginning of next long slur)
+    # --------------------
+    if beginLongSlur and SLUR_LONG_PHRASE_WITH_BRACKETS:
+        noteTrans.append(symbols['opening_bracket_slur'])
+    if endLongSlur and beginLongSlur and SLUR_LONG_PHRASE_WITH_BRACKETS:
+        noteTrans.append(symbols['closing_bracket_slur'])
+        
     # accidental
     # ----------
     if not(sampleNote.accidental == None):
@@ -945,6 +982,21 @@ def noteToBraille(sampleNote = note.Note('C4'), showOctave = True):
             noteTrans.append(noteFingeringToBraille(sampleNote.fingering, upperFirstInFingering = UPPER_FIRST_IN_NOTE_FINGERING))
         except AttributeError:
             pass
+        # single slur
+        # closing double slur
+        # opening double slur
+        # closing bracket slur (unless note also has beginning long slur)
+        # ----------------------------------
+        if shortSlur:
+            noteTrans.append(symbols['opening_single_slur'])
+        if not(endLongSlur and beginLongSlur and SLUR_LONG_PHRASE_WITH_BRACKETS):
+            if not SLUR_LONG_PHRASE_WITH_BRACKETS:
+                if endLongSlur:
+                    noteTrans.append(symbols['closing_double_slur'])
+                elif beginLongSlur:
+                    noteTrans.append(symbols['opening_double_slur'])
+            elif endLongSlur and SLUR_LONG_PHRASE_WITH_BRACKETS:
+                noteTrans.append(symbols['closing_bracket_slur'])
         # tie
         # ---
         if not sampleNote.tie == None and not sampleNote.tie.type == 'stop':
@@ -1055,7 +1107,7 @@ def noteGroupingsToBraille(sampleMeasure = stream.Measure(), showLeadingOctave =
                 noteGroupingTrans.append(clefSigns['tenor'])
                 previousNote = None
                 showLeadingOctave = True
-        if isinstance(element, stream.Measure):
+        elif isinstance(element, stream.Measure):
             if previousNote == None:
                 doShowOctave = showLeadingOctave
             else:
@@ -1088,6 +1140,12 @@ def noteGroupingsToBraille(sampleMeasure = stream.Measure(), showLeadingOctave =
             noteGroupingTrans = []
             previousNote = None
             showLeadingOctave = True
+        else:
+            continue
+        if SHOW_CLEF_SIGNS and isinstance(previousElement, clef.Clef):            
+            for dots in binary_dots[noteGroupingTrans[-1][0]]:
+                if (dots == '10' or dots == '11'):
+                    noteGroupingTrans.insert(-1, symbols['dot'])
         previousElement = element
     if not(len(noteGroupingTrans) == 0):
         allNoteGroupings.append(u"".join(noteGroupingTrans))
@@ -1206,7 +1264,8 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
                 try:
                     kts_braille[startOffset] = keyAndTimeSigToBraille(sampleKeySig = ks, sampleTimeSig = ts, outgoingKeySig = outgoingKeySig)
                 except BrailleTranslateException:
-                    pass
+                    if not(ks == None) and ks.sharps == 0 and outgoingKeySig == None:
+                        kts_braille[startOffset] =  None
             else:
                 kts_braille[startOffset] = u''.join([extractBrailleHeading(sampleMeasure)])
         endTime = sampleMeasure.highestTime
@@ -1224,7 +1283,12 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
                 withHyphen = False
                 if not isFirstGrouping:
                     withHyphen = True
-                bt.addElement(keyOrTimeSig = kts_braille[startOffset], withHyphen = withHyphen)
+                try:
+                    bt.addElement(keyOrTimeSig = kts_braille[startOffset], withHyphen = withHyphen)
+                except TypeError: # kts_braille[startOffset] == None
+                    # new key of no sharps or flats, no cancelling of outgoing key sig after double bar, 
+                    # but octave mark still needed. (very rare case)
+                    pass
             newKeyOrTimeSig = True
         except KeyError:
             pass
@@ -1258,7 +1322,7 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
         
     return bt
 
-def partToBraille(samplePart = stream.Part(), **partKeywords): 
+def partToBraille(samplePart = stream.Part(), **keywords): 
     '''
     Given a :class:`~music21.stream.Part`, returns the appropriate braille 
     characters as a string in utf-8 unicode.
@@ -1280,38 +1344,35 @@ def partToBraille(samplePart = stream.Part(), **partKeywords):
     A thing to keep in mind: there is a 40 braille character limit per line.
     All spaces are filled in with empty six-cell braille characters. 
     '''
-    try:
-        segmentStartMeasureNumbers = partKeywords['segmentStartMeasureNumbers']
-    except KeyError:
-        segmentStartMeasureNumbers = []
-        
-    try:
-        cancelOutgoingKeySig = partKeywords['cancelOutgoingKeySig']
-    except KeyError:
-        cancelOutgoingKeySig = True
-    
-    try:
-        measureNumberWithHeading = partKeywords['measureNumberWithHeading']
-    except KeyError:
-        measureNumberWithHeading = True
-        
-    try:
-        recenterHeading = partKeywords['recenterHeading']
-    except KeyError:
-        recenterHeading = False
-        
+    segmentStartMeasureNumbers = []
+    cancelOutgoingKeySig = True
+    measureNumberWithHeading = True
+    recenterHeading = False
+
+    if 'segmentStartMeasureNumbers' in keywords:
+        segmentStartMeasureNumbers = keywords['segmentStartMeasureNumbers']
+    if 'cancelOutgoingKeySig' in keywords:
+        cancelOutgoingKeySig = keywords['cancelOutgoingKeySig']
+    if 'measureNumberWithHeading' in keywords:
+        measureNumberWithHeading = keywords['measureNumberWithHeading']
+    if 'recenterHeading' in keywords:
+        recenterHeading = keywords['recenterHeading']
+
     global UPPER_FIRST_IN_NOTE_FINGERING
-    try:
-        UPPER_FIRST_IN_NOTE_FINGERING = partKeywords['upperFirstInNoteFingering']
-    except KeyError:
-        UPPER_FIRST_IN_NOTE_FINGERING = True
-        
     global SHOW_CLEF_SIGNS
-    try:
-        SHOW_CLEF_SIGNS = partKeywords['showClefSigns']
-    except KeyError:
-        SHOW_CLEF_SIGNS = False
-        
+    global SLUR_LONG_PHRASE_WITH_BRACKETS
+    global SHOW_SLURS_AND_TIES_TOGETHER
+
+    if 'upperFirstInNoteFingering' in keywords:
+        UPPER_FIRST_IN_NOTE_FINGERING = keywords['upperFirstInNoteFingering']
+    if 'showClefSigns' in keywords:
+        SHOW_CLEF_SIGNS = keywords['showClefSigns']
+    if 'slurLongPhraseWithBrackets' in keywords:
+        SLUR_LONG_PHRASE_WITH_BRACKETS = keywords['slurLongPhraseWithBrackets']
+    if 'showSlursAndTiesTogether' in keywords:
+        SHOW_SLURS_AND_TIES_TOGETHER = keywords['showSlursAndTiesTogether']
+    
+    prepareNotesWithSlurs(samplePart = samplePart)
     bt = BrailleText()
     partTrans = []
     allMeasures = samplePart.getElementsByClass('Measure')
@@ -1347,9 +1408,28 @@ def partToBraille(samplePart = stream.Part(), **partKeywords):
     if recenterHeading:
         bt.recenterHeading()
     
-    SHOW_CLEF_SIGNS = False
     UPPER_FIRST_IN_NOTE_FINGERING = True
+    SHOW_CLEF_SIGNS = False
+    SLUR_LONG_PHRASE_WITH_BRACKETS = False
+    SHOW_SLURS_AND_TIES_TOGETHER = False
     return bt
+
+def prepareNotesWithSlurs(samplePart = stream.Part()):
+    if not len(samplePart.spannerBundle) > 0:
+        return
+    allNotes = samplePart.flat.notes
+    for slur in samplePart.spannerBundle.getByClass(spanner.Slur):
+        slur[0].index = allNotes.index(slur[0])
+        slur[1].index = allNotes.index(slur[1])
+        delta = abs(slur[1].index - slur[0].index) + 1
+        if delta == 3:
+            allNotes[slur[0].index + 1].isPartOfShortSlur = True
+        if delta == 4:
+            allNotes[slur[0].index + 1].isPartOfShortSlur = True
+            allNotes[slur[0].index + 2].isPartOfShortSlur = True
+        if delta > 4:
+            if not SLUR_LONG_PHRASE_WITH_BRACKETS:
+                allNotes[slur[1].index - 1].endLongSlur = True
 
 def keyboardPartsToBraille(keyboardStyle = stream.Part()):
     '''
