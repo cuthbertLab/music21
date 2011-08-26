@@ -734,7 +734,7 @@ def decisionProcess(list, notePrediction, beginningData, lastNotePosition, count
     >>> positionInList, countdown = decisionProcess(listOfParts, notePrediction, beginningData, lastNotePosition, countdown)
     >>> print positionInList
     0
-    >>> print countdown # the result is 1 because the used song is completely different than the score!!
+    >>> print countdown # the result is 1 because the used song is completely different from the score!!
     1
     '''
     i = 0
@@ -748,7 +748,6 @@ def decisionProcess(list, notePrediction, beginningData, lastNotePosition, count
     dist = math.fabs(beginningData[0] - notePrediction)
     for i in range(len(list)):
         if (list[i].matchProbability >= 0.9 * list[0].matchProbability) and (beginningData[int(list[i].id)] > lastNotePosition): #let's take a 90%
-            print 'good'
             if math.fabs(beginningData[int(list[i].id)] - notePrediction) < dist:
                 dist = math.fabs(beginningData[int(list[i].id)] - notePrediction)
                 position = i 
@@ -758,17 +757,15 @@ def decisionProcess(list, notePrediction, beginningData, lastNotePosition, count
     if position < len(list) and beginningData[int(list[position].id)] <= lastNotePosition:
         environLocal.printDebug(" error ? ", beginningData[int(list[position].id)], lastNotePosition)
     if list[position].matchProbability < 0.6 or len(list) == 1: #the latter for the all-rest case
-        print "doesn't match"
         environLocal.printDebug("ARE YOU SURE YOU ARE PLAYING THE RIGHT SONG??")
         countdown = countdown + 1
+
     elif dist > 20 and countdown==0:
         countdown +=1
         environLocal.printDebug("Excessive distance....? dist=%d" % dist)
-        print 'distance'
     else:
         countdown = 0
-        print 'restart countdwn'
-        
+  
     return position, countdown
 
     

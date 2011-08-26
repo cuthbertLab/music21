@@ -43,7 +43,7 @@ class ScoreFollower(object):
         self.lastNotePosition = 0
         self.startSearchAtSlot = 0
         self.predictedNotePosition = 0
-        self.result = stream.Part()
+        self.countdown = 0
         self.END_OF_SCORE = False
         self.lengthFixed = False
         self.qle = None
@@ -57,25 +57,23 @@ class ScoreFollower(object):
           
         self.begins = True
         self.seconds_recording = seconds
-        self.countdown = 0
+        
         self.useMic = useMic
         self.useScale = useScale
         
-        result = False
-        while(result is False): 
-            result = self.repeatTranscription()
-    
+        self.result = False
+        while(self.result is False): 
+            self.result = self.repeatTranscription()    
               
         if show == True:
             #transcribedScore.show()    
             pass    
-        result.show('text')
-        result.show()
+
         if plot == True:
             matplotlib.pyplot.plot(listplot)
             matplotlib.pyplot.show()
         environLocal.printDebug("* END")
-        return result
+        return self.result
 
 
     def repeatTranscription(self):  
@@ -100,19 +98,15 @@ class ScoreFollower(object):
         (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
         scNotes = self.scoreStream[self.lastNotePosition:self.lastNotePosition + len(notesList)]
         transcribedScore, self.lengthFixed, self.qle = notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, lengthFixed=self.lengthFixed, qle=self.qle) 
-        totalLengthPeriod, self.lastNotePosition, prob, END_OF_SCORE, self.result, self.countdown = self.matchingNotes(self.scoreStream, transcribedScore, self.startSearchAtSlot, self.lastNotePosition, self.result, self.countdown)
+        totalLengthPeriod, self.lastNotePosition, prob, END_OF_SCORE = self.matchingNotes(self.scoreStream, transcribedScore, self.startSearchAtSlot, self.lastNotePosition)
 
         if END_OF_SCORE == True:
-            exitType = self.result  #"endOfScore"
+            exitType = "endOfScore"  #"endOfScore"
             return exitType
 
 
         # estimate position, or exit if we can't at all...
         exitType = self.updatePosition(prob, totalLengthPeriod, time_start)
-        if exitType != False:
-            print "exiting based on five countdowns"            
-            return self.result 
-            #return exitType
 
         if self.useMic == False: # reading from the disc (only for TESTS)
             # skip ahead the processing time.
@@ -120,12 +114,12 @@ class ScoreFollower(object):
            
         if self.lastNotePosition > len(self.scoreNotesOnly):
             print "finishedPerforming"
-            exitType = self.result
+            exitType = "finishedPerforming"
         elif (self.useMic == False and self.currentSample >= self.totalFile):
             print "waveFileEOF"
-            exitType = self.result # 
-        else:
-            exitType = False
+            exitType = "waveFileEOF"
+        
+        print "El que retorna el repeater",exitType
         return exitType
 
     def updatePosition(self, prob, totalLengthPeriod, time_start):
@@ -268,10 +262,11 @@ class ScoreFollower(object):
                 processing_time = time() - time_start
                 self.predictedNotePosition = self.predictNextNotePosition(totalLengthPeriod, processing_time)
             elif self.countdown == 1:
-                totalSeconds = 2 * (time() - time_start) + self.seconds_recording
-                self.predictedNotePosition = self.predictNextNotePosition(totalLengthPeriod, totalSeconds)
                 # do nothing to startSearch or predicted note position
+                totalSeconds = 2 * (time() - time_start) + self.seconds_recording
+                self.predictedNotePosition = self.predictNextNotePosition(totalLengthPeriod, totalSeconds)                
             elif self.countdown == 2:
+                # another chance to match notes
                 totalSeconds = 3 * (time() - time_start) + self.seconds_recording
                 self.predictedNotePosition = self.predictNextNotePosition(totalLengthPeriod, totalSeconds)               
             elif self.countdown > 2 and self.countdown < 5:
@@ -295,8 +290,7 @@ class ScoreFollower(object):
                 self.begins = False
                 print "GO!"
             if self.countdown >= 5:
-                exitType = "5consecutiveCountdownsBeginning"
-                
+                exitType = "5consecutiveCountdownsBeginning"               
         
         return exitType
          
@@ -346,7 +340,7 @@ class ScoreFollower(object):
                 
 
 
-    def matchingNotes(self, scoreStream, transcribedScore, notePrediction, lastNotePosition, result, countdown):
+    def matchingNotes(self, scoreStream, transcribedScore, notePrediction, lastNotePosition): 
         '''
         
         '''
@@ -378,7 +372,7 @@ class ScoreFollower(object):
             notePrediction = len(scoreStream) - tn_recording - hop - 1
             END_OF_SCORE = True
             environLocal.printDebug("**********++++ LAST PART OF THE SCORE ++++***********")
-        position, countdown = decisionProcess(listOfParts, notePrediction, beginningData, lastNotePosition, countdown)
+        position, self.countdown = decisionProcess(listOfParts, notePrediction, beginningData, lastNotePosition, self.countdown)
         try:
             print "measure: " + listOfParts[position][0].measureNumber     
         except:
@@ -386,10 +380,8 @@ class ScoreFollower(object):
         
         totalLength = 0    
         number = int(listOfParts[position].id)
-        if result != None:
-            result.append(listOfParts[number])
         
-        if countdown != 0:
+        if self.countdown != 0:
             probabilityHit = 0
         else:
             probabilityHit = listOfParts[position].matchProbability
@@ -397,10 +389,10 @@ class ScoreFollower(object):
         for i in range(len(totScores[number])):
             totalLength = totalLength + totScores[number][i].quarterLength
     
-        if countdown == 0:   
+        if self.countdown == 0:   
             lastNotePosition = beginningData[number] + lengthData[number]
                    
-        return totalLength, lastNotePosition, probabilityHit, END_OF_SCORE, result, countdown
+        return totalLength, lastNotePosition, probabilityHit, END_OF_SCORE
 
 
 
