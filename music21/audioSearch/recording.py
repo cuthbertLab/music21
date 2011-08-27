@@ -26,13 +26,18 @@ users of 64-bit windows and 64-bit python should download the amd64 port
  
 
 '''
+import os
+import sys
 import time
 import unittest, doctest
 import wave
+
 import music21
 from music21 import common
+from music21 import environment
+_MOD = "chant.py"
+environLocal = environment.Environment(_MOD)
 
-import sys
 _missingImport = []
 
 ###
@@ -96,7 +101,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
         if common.isStr(storeFile):
             waveFilename = storeFile
         else:
-            waveFilename = 'chrom2.wav'
+            waveFilename = environLocal.getRootTempDir() + os.path.sep + 'recordingTemp.wav'
         ### write recording to disk
         data = ''.join(storedWaveSampleList)
         try:

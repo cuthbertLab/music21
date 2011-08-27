@@ -12,6 +12,7 @@
 
 import copy
 import math
+import os
 import wave
 import unittest, doctest
 
@@ -325,7 +326,7 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     return freqFromAQList
     
     
-def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='xmas.wav', length=10.0, startSample=0):
+def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0, startSample=0):
     '''
     It calculates the fundamental frequency at every instant of time of an audio signal 
     extracted either from the microphone or from an already recorded song. 
@@ -364,6 +365,9 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='xmas.wav', length=1
 
 
     '''
+    if waveFilenameOrHandle == 'temp':
+        waveFilenameOrHandle = environLocal.getRootTempDir() + os.path.sep + 'temp.wav'
+        
     if common.isStr(waveFilenameOrHandle):
         # waveFilenameOrHandle is a filename
         waveFilename = waveFilenameOrHandle

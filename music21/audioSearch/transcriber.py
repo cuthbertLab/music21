@@ -15,10 +15,18 @@ import unittest
 
 import copy
 import math
+import os
 import random
 import sys
 from time import time
+
+from music21 import scale, stream, note, pitch
+from music21.audioSearch.base import *
+from music21.audioSearch import recording
 from music21 import environment
+_MOD = 'audioSearch/transcriber.py'
+environLocal = environment.Environment(_MOD)
+
 
 _missingImport = []
 try:
@@ -27,18 +35,10 @@ except ImportError:
     _missingImport.append('matplotlib')
 
 if len(_missingImport) > 0:
-    environLocal = environment.Environment()
     if environLocal['warnings'] in [1, '1', True]:
         pass
         #environLocal.warn(common.getMissingImportStr(_missingImport), header='music21:')
 
-from music21 import environment
-from music21 import scale, stream, note, pitch
-from music21.audioSearch.base import *
-from music21.audioSearch import recording
-_MOD = 'audioSearch/transcriber.py'
-environLocal = environment.Environment(_MOD)
-                                       
                                        
 def runTranscribe(show=True, plot=True, useMic=True,
                   seconds=20.0, useScale=scale.ChromaticScale('C4'), saveFile=True):
@@ -64,7 +64,7 @@ def runTranscribe(show=True, plot=True, useMic=True,
     #beginning - recording or not
     if saveFile != False:
         if saveFile == True:
-            WAVE_FILENAME = "ex.wav"
+            WAVE_FILENAME = environLocal.getRootTempDir() + os.path.sep + 'ex.wav'
         else:
             WAVE_FILENAME = saveFile
     else:
@@ -100,10 +100,12 @@ class TestExternal(unittest.TestCase):
         pass
     
     def xtestRunTranscribe(self):
-        runTranscribe(show=False, plot=False, saveFile='new_song.wav', seconds=10.0)
+        saveFile = environLocal.getRootTempDir() + os.path.sep + 'new_song.wav'
+        runTranscribe(show=False, plot=False, saveFile=saveFile, seconds=10.0)
     
-    def testTranscribePachelbel(self):
-        myScore = runTranscribe(useMic=False, saveFile='pachelbel.wav', plot=False, show=False)
+    def xtestTranscribePachelbel(self):
+        saveFile = environLocal.getRootTempDir() + os.path.sep + 'pachelbel.wav'
+        myScore = runTranscribe(useMic=False, saveFile=saveFile, plot=False, show=False)
         #myScore.show()
 
 

@@ -26,7 +26,6 @@ _missingImport = []
 try:
     from PIL import Image as PILImage
     from PIL import ImageTk as PILImageTk
-    from PIL import ImageOps as PILImageOps
 except ImportError:
     _missingImport.append('PIL')
 

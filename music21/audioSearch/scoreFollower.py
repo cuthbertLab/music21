@@ -15,6 +15,7 @@ import copy
 import math
 import matplotlib.pyplot
 
+import os
 import random
 import sys
 from time import time
@@ -36,7 +37,7 @@ class ScoreFollower(object):
             self.scoreNotesOnly = scoreStream.flat.notesAndRests
         else:
             self.scoreNotesOnly = None
-        self.waveFile = 'xmas.wav'
+        self.waveFile = environLocal.getRootTempDir() + os.path.sep + 'scoreFollowerTemp.wav'
         self.lastNotePostion = 0
         self.currentSample = 0
         self.totalFile = 0
