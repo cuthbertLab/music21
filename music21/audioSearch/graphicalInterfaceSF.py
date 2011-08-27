@@ -24,6 +24,7 @@ from music21.audioSearch import scoreFollower
 import Tkinter
 from PIL import Image as PILImage
 from PIL import ImageTk as PILImageTk
+from PIL import ImageOps as PILImageOps
 import time
 import math
  
@@ -57,8 +58,8 @@ class SFApp():
         self.firstTime = True
         
         self.sizeButton = 11
-        self.x = 700#300#800
-        self.y = 900#500#1200 
+        self.x = 600#300#800
+        self.y = 780#500#1200 
         self.separation = math.floor(self.x / 8)
         self.newSize = [self.x, self.y]
         self.positionxLeft = math.floor(self.x / 2)
@@ -141,7 +142,7 @@ class SFApp():
                     self.firstTime = False
                 
 
-            except:
+            except IOError:
                 print 'no he pogut'
                 print 'nom',self.scoreNameSong
 
@@ -161,10 +162,80 @@ class SFApp():
         for i in range(self.totalPagesScore):            
             namePage = '%s%d.%s' % (str(self.scoreNameSong), i + 1,self.format)
             self.listNamePages.append(namePage)
-            self.pagesScore.append(PILImage.open(namePage))
-            self.pagesScore[i] = self.pagesScore[i].resize(self.newSize)
+            pilPage = PILImage.open(namePage)
+            if pilPage.mode != "RGB":
+                pilPage = pilPage.convert("RGB")
+            pilPage = self.cropBorder(pilPage)
+            self.pagesScore.append(pilPage.resize(self.newSize, PILImage.ANTIALIAS))
             self.phimage.append(PILImageTk.PhotoImage(self.pagesScore[i]))                 
       
+    def cropBorder(self, img, minColor=240, maxColor=256):
+        colorRange = range(minColor, maxColor)
+        data = img.getdata()
+
+        resX = img.size[0]
+        resY = img.size[1]
+        leftCut = 0
+        topCut = 0
+        bottomCut = 0
+        rightCut = 0
+
+        #Find top
+        for i in range(0, len(data), 4):
+            if data[i][0] not in colorRange and data[i][1] not in colorRange and data[i][2] not in colorRange:
+                topCut = int(i/resX)
+                break     
+        #Find bottom
+        for i in range(len(data)-1, 0, -4):
+            if data[i][0] not in colorRange and data[i][1] not in colorRange and data[i][2] not in colorRange:
+                bottomCut = int((len(data) - i)/resX)
+                break     
+                  
+        #Find left
+        stop = False
+        for xPos in range(0, resX, 4):  # check every 4th pixel
+            for yPos in range(0, resY, 4): 
+                pixelPosition = yPos * resX + xPos
+                if data[pixelPosition][0] not in colorRange and \
+                   data[pixelPosition][1] not in colorRange and \
+                   data[pixelPosition][2] not in colorRange:
+                    leftCut = xPos                 
+                    stop = True
+                    break                   
+            if stop:
+                break
+
+        #Find right
+        stop = False
+        for xPos in range(resX-1, 0, -4):  # check every 4th pixel
+            for yPos in range(0, resY, 4): 
+                pixelPosition = yPos * resX + xPos
+                if data[pixelPosition][0] not in colorRange and \
+                   data[pixelPosition][1] not in colorRange and \
+                   data[pixelPosition][2] not in colorRange:
+                    rightCut = resX - xPos + 1                 
+                    stop = True
+                    break
+            if stop:
+                break
+
+        margin = int(resX * 0.03) # leave border 3% of the size
+
+        leftCut = leftCut - margin 
+        topCut = topCut - margin
+        bottomCut = bottomCut - margin
+        rightCut = rightCut - margin
+        if leftCut < 0: 
+            leftCut = 0
+        if topCut < 0: 
+            topCut = 0
+        if bottomCut < 0:
+            bottomCut = 0
+        if rightCut < 0:
+            rightCut = 0
+        print (leftCut, topCut, rightCut, bottomCut)
+        img = img.crop((leftCut, topCut, resX-rightCut, resY-bottomCut)) 
+        return img
         
         
     def initializeScore(self):
