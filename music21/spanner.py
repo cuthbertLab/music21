@@ -704,7 +704,7 @@ class SpannerBundle(object):
 
         >>> from music21 import *
         >>> su1 = spanner.Slur()
-        >>> su2 = spanner.StaffGroup()
+        >>> su2 = layout.StaffGroup()
         >>> sb = spanner.SpannerBundle()
         >>> sb.append(su1)
         >>> sb.append(su2)
@@ -750,7 +750,7 @@ class SpannerBundle(object):
 
         >>> from music21 import *
         >>> su1 = spanner.Slur()
-        >>> su2 = spanner.StaffGroup()
+        >>> su2 = layout.StaffGroup()
         >>> su2.idLocal = 3
         >>> sb = spanner.SpannerBundle()
         >>> sb.append(su1)
@@ -770,7 +770,7 @@ class SpannerBundle(object):
         >>> from music21 import *
         >>> su1 = spanner.Slur()
         >>> su1.completeStatus = True
-        >>> su2 = spanner.StaffGroup()
+        >>> su2 = layout.StaffGroup()
         >>> su3 = spanner.Slur()
         >>> su3.completeStatus = False
         >>> sb = spanner.SpannerBundle()
@@ -994,74 +994,6 @@ class Diminuendo(DynamicWedge):
         return post
 
 
-#-------------------------------------------------------------------------------
-class StaffGroup(Spanner):
-    '''A StaffGroup defines a collection of one or more Parts, specifying that they should be shown together with a bracket, brace, or other symbol, and may have a common name.
-    '''
-    def __init__(self, *arguments, **keywords):
-        Spanner.__init__(self, *arguments, **keywords)
-
-        self.name = None # if this group has a name
-        self.abbreviation = None 
-        self._symbol = None # can be bracket, line
-        # determines if barlines are grouped through; this is group barline
-        # in musicxml
-        self._barTogether = True
-
-        if 'symbol' in keywords.keys():
-            self.symbol = keywords['symbol'] # user property
-        if 'barTogether' in keywords.keys():
-            self.barTogether = keywords['barTogether'] # user property
-        if 'name' in keywords.keys():
-            self.name = keywords['name'] # user property
-        if 'abbreviation' in keywords.keys():
-            self.name = keywords['abbreviation'] # user property
-
-
-    #---------------------------------------------------------------------------
-    def _getBarTogether(self):
-        return self._barTogether    
-
-    def _setBarTogether(self, value):
-        if value is None:
-            pass # do nothing for now; could set a default
-        elif value in ['yes', True]:
-            self._barTogether = True
-        elif value in ['no', False]:
-            self._barTogether = False
-        else:
-            raise SpannerException('the bar together value %s is not acceptable' % value)
-
-    barTogether = property(_getBarTogether, _setBarTogether, doc = '''
-        Get or set the barTogether value, with either Boolean values or yes or no strings.
-
-        >>> from music21 import *
-        >>> sg = spanner.StaffGroup()
-        >>> sg.barTogether = 'yes'
-        >>> sg.barTogether
-        True
-        ''')
-
-    def _getSymbol(self):
-        return self._symbol    
-
-    def _setSymbol(self, value):
-        if value is None or str(value).lower() == 'none':
-            self._symbol = None
-        elif value.lower() in ['brace', 'line', 'bracket']:
-            self._symbol = value.lower()
-        else:
-            raise SpannerException('the symbol value %s is not acceptable' % value)
-        
-    symbol = property(_getSymbol, _setSymbol, doc = '''
-        Get or set the symbol value, with either Boolean values or yes or no strings.
-
-        >>> from music21 import *
-        >>> sg = spanner.StaffGroup()
-        >>> sg.symbol = 'Brace'
-        >>> sg.symbol
-        'brace'
-        ''')
 
 #-------------------------------------------------------------------------------
 # other ideas for spanners
@@ -1103,12 +1035,12 @@ class Test(unittest.TestCase):
     def testBasic(self):
 
         # how parts might be grouped
-        from music21 import stream, spanner, note
+        from music21 import stream, spanner, note, layout
         s = stream.Score()
         p1 = stream.Part()
         p2 = stream.Part()
 
-        sg1 = StaffGroup(p1, p2)
+        sg1 = layout.StaffGroup(p1, p2)
 
         # place all on Stream
         s.insert(0, p1)

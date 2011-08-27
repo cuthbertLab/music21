@@ -28,7 +28,7 @@ import unittest, doctest
 import music21
 from music21 import musicxml
 from music21 import common
-
+from music21 import spanner
 
 
 #-------------------------------------------------------------------------------
@@ -372,6 +372,87 @@ class SystemLayout(music21.Music21Object):
             self.distance = float(mxSystemLayout.systemDistance)
 
     mx = property(_getMX, _setMX)    
+
+
+#-------------------------------------------------------------------------------
+class StaffGroupException(spanner.SpannerException):
+    pass
+
+
+#-------------------------------------------------------------------------------
+class StaffGroup(spanner.Spanner):
+    '''A StaffGroup defines a collection of one or more Parts, specifying that they should be shown together with a bracket, brace, or other symbol, and may have a common name.
+    '''
+    def __init__(self, *arguments, **keywords):
+        spanner.Spanner.__init__(self, *arguments, **keywords)
+
+        self.name = None # if this group has a name
+        self.abbreviation = None 
+        self._symbol = None # can be bracket, line
+        # determines if barlines are grouped through; this is group barline
+        # in musicxml
+        self._barTogether = True
+
+        if 'symbol' in keywords.keys():
+            self.symbol = keywords['symbol'] # user property
+        if 'barTogether' in keywords.keys():
+            self.barTogether = keywords['barTogether'] # user property
+        if 'name' in keywords.keys():
+            self.name = keywords['name'] # user property
+        if 'abbreviation' in keywords.keys():
+            self.name = keywords['abbreviation'] # user property
+
+
+    #---------------------------------------------------------------------------
+    def _getBarTogether(self):
+        return self._barTogether    
+
+    def _setBarTogether(self, value):
+        if value is None:
+            pass # do nothing for now; could set a default
+        elif value in ['yes', True]:
+            self._barTogether = True
+        elif value in ['no', False]:
+            self._barTogether = False
+        else:
+            raise StaffGroupException('the bar together value %s is not acceptable' % value)
+
+    barTogether = property(_getBarTogether, _setBarTogether, doc = '''
+        Get or set the barTogether value, with either Boolean values or yes or no strings.
+
+        >>> from music21 import *
+        >>> sg = layout.StaffGroup()
+        >>> sg.barTogether = 'yes'
+        >>> sg.barTogether
+        True
+        ''')
+
+    def _getSymbol(self):
+        return self._symbol    
+
+    def _setSymbol(self, value):
+        if value is None or str(value).lower() == 'none':
+            self._symbol = None
+        elif value.lower() in ['brace', 'line', 'bracket']:
+            self._symbol = value.lower()
+        else:
+            raise StaffGroupException('the symbol value %s is not acceptable' % value)
+        
+    symbol = property(_getSymbol, _setSymbol, doc = '''
+        Get or set the symbol value, with either Boolean values or yes or no strings.
+
+        >>> from music21 import *
+        >>> sg = layout.StaffGroup()
+        >>> sg.symbol = 'Brace'
+        >>> sg.symbol
+        'brace'
+        ''')
+
+
+
+
+
+
 
 
 

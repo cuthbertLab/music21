@@ -60,7 +60,7 @@ def configureMxPartGroupFromStaffGroup(staffGroup):
     elif staffGroup.barTogether in [False]:
         mxPartGroup.set('groupBarline', 'no')
 
-    environLocal.printDebug(['configureMxPartGroupFromStaffGroup: mxPartGroup', mxPartGroup])
+    #environLocal.printDebug(['configureMxPartGroupFromStaffGroup: mxPartGroup', mxPartGroup])
     return mxPartGroup
 
 
@@ -2998,6 +2998,7 @@ def mxToStream(mxScore, spannerBundle=None, inputM21=None):
 
     from music21 import metadata
     from music21 import spanner
+    from music21 import layout
 
     if inputM21 == None:
         from music21 import stream
@@ -3024,7 +3025,7 @@ def mxToStream(mxScore, spannerBundle=None, inputM21=None):
     partGroupData = mxScore.getPartGroupData()
     for partGroup in partGroupData: # a list of dictionaries
         # create music21 spanner StaffGroup
-        sg = spanner.StaffGroup()
+        sg = layout.StaffGroup()
         for partId in partGroup['scorePartIds']:
             # get music21 part from partIdDictionary
             sg.addComponents(partIdDictionary[partId])
@@ -3811,7 +3812,7 @@ spirit</words>
             
 
     def testStaffGroupsB(self):
-        from music21 import stream, note, spanner
+        from music21 import stream, note, spanner, layout
         p1 = stream.Part()
         p1.repeatAppend(note.Note(), 8)
         p2 = stream.Part()
@@ -3822,10 +3823,10 @@ spirit</words>
         p7 = stream.Part()
         p8 = stream.Part()
         
-        sg1 = spanner.StaffGroup([p1, p2], symbol='brace', name='marimba')
-        sg2 = spanner.StaffGroup([p3, p4], symbol='bracket', name='xlophone')
-        sg3 = spanner.StaffGroup([p5, p6], symbol='line', barTogether=False)
-        sg4 = spanner.StaffGroup([p5, p6, p7], symbol='line', barTogether=False)
+        sg1 = layout.StaffGroup([p1, p2], symbol='brace', name='marimba')
+        sg2 = layout.StaffGroup([p3, p4], symbol='bracket', name='xlophone')
+        sg3 = layout.StaffGroup([p5, p6], symbol='line', barTogether=False)
+        sg4 = layout.StaffGroup([p5, p6, p7], symbol='line', barTogether=False)
         
         s = stream.Score()
         s.insert([0, p1, 0, p2, 0, p3, 0, p4, 0, p5, 0, p6, 0, p7, 0, p8, 0, sg1, 0, sg2, 0, sg3, 0, sg4])
