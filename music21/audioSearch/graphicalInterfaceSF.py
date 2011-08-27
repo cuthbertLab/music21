@@ -18,16 +18,22 @@ from music21 import environment
 from music21 import scale, stream, note, pitch
 import threading
 import Queue as queue
+import Tkinter
+import time
+import math
+
+_missingImport = []
+try:
+    from PIL import Image as PILImage
+    from PIL import ImageTk as PILImageTk
+    from PIL import ImageOps as PILImageOps
+except ImportError:
+    _missingImport.append('PIL')
+
+ 
 from music21.audioSearch.base import *
 from music21.audioSearch import recording
 from music21.audioSearch import scoreFollower
-import Tkinter
-from PIL import Image as PILImage
-from PIL import ImageTk as PILImageTk
-from PIL import ImageOps as PILImageOps
-import time
-import math
- 
  
  
  
@@ -38,16 +44,18 @@ import math
 class SFApp():
    
     def __init__(self, master):
+        if 'PIL' in _missingImport:
+            raise music21.Music21Exception("Need PIL installed to run Score Follower")
         self.master = master
         self.frame = Tkinter.Frame(master)
         #self.frame.pack()
         self.master.wm_title("Score follower - music21")
         
-        self.scoreNameSong = 'scores/d luca gloria_Page_'    #'scores/test_pages_' #scores/d luca gloria_Page_'        
+        self.scoreNameSong = 'scores/d luca gloria_Page_' #'d:/desktop/Saint-Saens-Clarinet-Sonata/Saint-Saens-Clarinet-Sonata_Page_'  #'scores/test_pages_'         
         self.format='tiff'#'jpg'
-        self.nameRecordedSong = 'luca/gloria'
-        self.pageMeasureNumbers = [1,23,50,81,104,126] # the last one is the last note of the score
-        self.totalPagesScore = len(self.pageMeasureNumbers)-1
+        self.nameRecordedSong = 'luca/gloria' #'d:/desktop/Saint-Saens-Clarinet-Sonata/saint-saens.xml'#
+        self.pageMeasureNumbers = [] # get directly from score - the last one is the last note of the score
+        self.totalPagesScore = 1
         self.currentPage = 1
         self.pagesScore = []     
         self.phimage = []
@@ -60,107 +68,47 @@ class SFApp():
         self.sizeButton = 11
         self.x = 600#300#800
         self.y = 780#500#1200 
-        self.separation = math.floor(self.x / 8)
-        self.newSize = [self.x, self.y]
-        self.positionxLeft = math.floor(self.x / 2)
-        self.positionyLeft = math.floor(self.y / 2)
-        self.positionxRight = math.floor(1.5 * self.x + self.separation)
-        self.positionyRight = math.floor(self.y / 2) 
-        self.positionx3rd = math.floor(2.5 * self.x + 2 * self.separation)
-        self.positiony3rd = math.floor(self.y / 2)
-        self.sizeCanvasx = 2 * self.x + self.separation
-        self.sizeCanvasy = self.y
-        
+    
+        self.filenameRequest()
+
+    def filenameRequest(self):
+        master = self.master
         self.textVarName = Tkinter.StringVar()
-        box = Tkinter.Entry(master,width=2*self.sizeButton,textvariable=self.textVarName)
-        self.textVarName.set('scores/d luca gloria_Page_')
-        box.grid(row=0,column=3,columnspan=2)
+        self.box = Tkinter.Entry(master, width=2*self.sizeButton, textvariable=self.textVarName)
+        self.textVarName.set(self.scoreNameSong)
+        self.box.grid(row=0,column=3,columnspan=2)
         #box.pack()
-        
-        
-        def callback():
-            try:
-                self.scoreNameSong = box.get()
-                self.initializeName()                
-
-                self.canvas1 = Tkinter.Canvas(master, borderwidth=1, width=self.sizeCanvasx, height=self.sizeCanvasy, bg="black")
-                self.canvas1.create_image(self.positionxLeft, self.positionyLeft, image=self.phimage[0], tag='leftImage')
-                
-                if self.totalPagesScore >= 2:
-                    self.canvas1.create_image(self.positionxRight, self.positionyRight, image=self.phimage[1], tag='rightImage')
-                self.canvas1.grid(row=1,column=0,columnspan=3,rowspan=7)
-                #self.canvas1.pack()#(side='left')       
-                self.initializeScore()
-                self.textVarTitle = Tkinter.StringVar()
-                self.textVarTitle.set('%s' %self.scoreNameSong) 
-                self.labelTitle = Tkinter.Label(master, textvariable=self.textVarTitle)
-                self.labelTitle.grid(row=0,column=1)
-                
-                self.textVar2 = Tkinter.StringVar()
-                self.textVar2.set('Right page: %d/%d' % (self.currentPage + 1, self.totalPagesScore)) 
-                self.label2 = Tkinter.Label(master, textvariable=self.textVar2)
-                self.label2.grid(row=0,column=2,sticky=Tkinter.E)
-                #self.label2.pack(side=Tkinter.RIGHT)
-                
-                self.textVar1 = Tkinter.StringVar()
-                self.textVar1.set('Left page: %d/%d' % (self.currentPage, self.totalPagesScore))            
-                self.label1 = Tkinter.Label(master, textvariable=self.textVar1)
-                self.label1.grid(row=0,column=0,sticky=Tkinter.W)
-                
-                self.textVar3.set('That is a good song! :)')
-                
-                if self.firstTime == True:
-                    self.button2 = Tkinter.Button(master, text="Start SF", width=self.sizeButton,command=self.startScoreFollower, bg='green')
-                    self.button2.grid(row=5,column=3)
-                    
-                    self.button3 = Tkinter.Button(master, text="1st page", width=self.sizeButton,command=self.goTo1stPage)
-                    self.button3.grid(row=4,column=3)
-                    #self.button3.pack()#(side=Tkinter.BOTTOM)
-                    
-                    self.button3 = Tkinter.Button(master, text="Last page", width=self.sizeButton,command=self.goToLastPage)
-                    self.button3.grid(row=4,column=4)
-                    
-                    self.button4 = Tkinter.Button(master, text="Forward", width=self.sizeButton,command=self.pageForward)
-                    self.button4.grid(row=3,column=4)
-                    #self.button4.pack()
-                    
-                    self.button7 = Tkinter.Button(master, text="Backward", width=self.sizeButton,command=self.pageBackward)
-                    self.button7.grid(row=3,column=3)
-                    #self.button7.pack()
-                    
-                    self.button5 = Tkinter.Button(master, text="MOVE", width=self.sizeButton,command=self.moving, bg='beige')
-                    self.button5.grid(row=2,column=3)
-                    
-                    self.button6 = Tkinter.Button(master, text="STOP SF", width=self.sizeButton,command=self.stopScoreFollower, bg='red')
-                    self.button6.grid(row=5,column=4)
-                                        
-                    self.textVarComments = Tkinter.StringVar()
-                    self.textVarComments.set('Comments') 
-                    self.label2 = Tkinter.Label(master, textvariable=self.textVarComments)
-                    self.label2.grid(row=8,column=3,sticky=Tkinter.E)
-                    
-                    self.firstTime = False
-                
-
-            except IOError:
-                print 'no he pogut'
-                print 'nom',self.scoreNameSong
-
-        self.buttonSubmit = Tkinter.Button(master, text="Submit score name", width=2*self.sizeButton, command=callback)
+                            
+        self.buttonSubmit = Tkinter.Button(master, text="Submit score name", 
+                                           width=2*self.sizeButton, command=self.startMainCanvas)
         self.buttonSubmit.grid(row=1,column=3,columnspan=2,padx=0)
-        
-        wrongName = True        
-        
+                
                 
         self.textVar3 = Tkinter.StringVar()
         self.textVar3.set('example: scores/d luca gloria_Page_') 
-        self.label3 = Tkinter.Label(master,width=3*self.sizeButton,textvariable=self.textVar3)
+        self.label3 = Tkinter.Label(master, width=3*self.sizeButton, textvariable=self.textVar3)
         self.label3.grid(row=6,column=3,columnspan=2,rowspan=4)
+    
+    def startMainCanvas(self):
+        self.scoreNameSong = self.box.get()
+        self.initializeScore()
+        try:
+            self.initializeName()                
+        except IOError:
+            print 'no he pogut'
+            print 'nom',self.scoreNameSong
+        self.initializeGraphicInterface()
         print 'Initialized!'
         
+        
+        
     def initializeName(self):   
-        for i in range(self.totalPagesScore):            
-            namePage = '%s%d.%s' % (str(self.scoreNameSong), i + 1,self.format)
+        self.newSize = [self.x, self.y]
+        
+        for i in range(self.totalPagesScore):
+            numberLength = len(str(self.totalPagesScore))
+            namePage = '%s%s.%s' % (str(self.scoreNameSong), str(i + 1).zfill(numberLength), self.format)
+            
             self.listNamePages.append(namePage)
             pilPage = PILImage.open(namePage)
             if pilPage.mode != "RGB":
@@ -233,30 +181,119 @@ class SFApp():
             bottomCut = 0
         if rightCut < 0:
             rightCut = 0
-        print (leftCut, topCut, rightCut, bottomCut)
+        #print (leftCut, topCut, rightCut, bottomCut)
         img = img.crop((leftCut, topCut, resX-rightCut, resY-bottomCut)) 
         return img
         
         
     def initializeScore(self):
-        scNotes = corpus.parse(self.nameRecordedSong).parts[0].flat.notesAndRests
+        try:
+            score = converter.parse(self.nameRecordedSong).parts[0]
+        except converter.ConverterException:
+            score = corpus.parse(self.nameRecordedSong).parts[0]
+        self.scorePart = score
+        self.pageMeasureNumbers = [0] # first measure is 0 in case of pickup
+        for e in score.flat:
+            if 'PageLayout' in e.classes:
+                self.pageMeasureNumbers.append(e.measureNumber)
+        lastMeasure = score.getElementsByClass('Measure')[-1].measureNumber
+        self.pageMeasureNumbers.append(lastMeasure)
+        self.totalPagesScore = len(self.pageMeasureNumbers)-1
+        #print self.pageMeasureNumbers
+
+        scNotes = score.flat.notesAndRests
         noteCounter=1
         pageCounter=0
         middlePagesCounter=0
         self.middlePages=[]
         self.beginningPages=[]
+        doneThisPage = -1
         for i in scNotes:
-            if i.measureNumber == self.pageMeasureNumbers[pageCounter]:
+            imn = i.measureNumber
+            if imn >= self.pageMeasureNumbers[pageCounter]:
                 self.beginningPages.append(noteCounter)
                 pageCounter +=1
-            if middlePagesCounter<self.totalPagesScore and i.measureNumber == math.floor((self.pageMeasureNumbers[middlePagesCounter+1]+self.pageMeasureNumbers[middlePagesCounter])/2):
+                doneThisPage = imn
+                if pageCounter >= self.totalPagesScore:
+                    pageCounter == self.totalPagesScore
+            if middlePagesCounter<self.totalPagesScore and imn == math.floor((self.pageMeasureNumbers[middlePagesCounter+1]+self.pageMeasureNumbers[middlePagesCounter])/2):
                 self.middlePages.append(noteCounter)
                 middlePagesCounter +=1
             noteCounter +=1
         print "beginning of the pages",self.beginningPages
         print 'middles of the pages',self.middlePages
                                                                                   
+    def initializeGraphicInterface(self):
+        master = self.master
+
+        self.separation = math.floor(self.x / 8)
+        self.positionxLeft = math.floor(self.x / 2)
+        self.positionyLeft = math.floor(self.y / 2)
+        self.positionxRight = math.floor(1.5 * self.x + self.separation)
+        self.positionyRight = math.floor(self.y / 2) 
+        self.positionx3rd = math.floor(2.5 * self.x + 2 * self.separation)
+        self.positiony3rd = math.floor(self.y / 2)
+        self.sizeCanvasx = 2 * self.x + self.separation
+        self.sizeCanvasy = self.y
+    
         
+        self.canvas1 = Tkinter.Canvas(master, borderwidth=1, width=self.sizeCanvasx, height=self.sizeCanvasy, bg="black")
+        self.canvas1.create_image(self.positionxLeft, self.positionyLeft, image=self.phimage[0], tag='leftImage')
+        
+        if self.totalPagesScore >= 2:
+            self.canvas1.create_image(self.positionxRight, self.positionyRight, image=self.phimage[1], tag='rightImage')
+        self.canvas1.grid(row=1,column=0,columnspan=3,rowspan=7)
+        #self.canvas1.pack()#(side='left')       
+        self.textVarTitle = Tkinter.StringVar()
+        self.textVarTitle.set('%s' %self.scoreNameSong) 
+        self.labelTitle = Tkinter.Label(master, textvariable=self.textVarTitle)
+        self.labelTitle.grid(row=0,column=1)
+        
+        self.textVar2 = Tkinter.StringVar()
+        self.textVar2.set('Right page: %d/%d' % (self.currentPage + 1, self.totalPagesScore)) 
+        self.label2 = Tkinter.Label(master, textvariable=self.textVar2)
+        self.label2.grid(row=0,column=2,sticky=Tkinter.E)
+        #self.label2.pack(side=Tkinter.RIGHT)
+        
+        self.textVar1 = Tkinter.StringVar()
+        self.textVar1.set('Left page: %d/%d' % (self.currentPage, self.totalPagesScore))            
+        self.label1 = Tkinter.Label(master, textvariable=self.textVar1)
+        self.label1.grid(row=0,column=0,sticky=Tkinter.W)
+        
+        self.textVar3.set('That is a good song! :)')
+        
+        if self.firstTime == True:
+            self.button2 = Tkinter.Button(master, text="Start SF", width=self.sizeButton,command=self.startScoreFollower, bg='green')
+            self.button2.grid(row=5,column=3)
+            
+            self.button3 = Tkinter.Button(master, text="1st page", width=self.sizeButton,command=self.goTo1stPage)
+            self.button3.grid(row=4,column=3)
+            #self.button3.pack()#(side=Tkinter.BOTTOM)
+            
+            self.button3 = Tkinter.Button(master, text="Last page", width=self.sizeButton,command=self.goToLastPage)
+            self.button3.grid(row=4,column=4)
+            
+            self.button4 = Tkinter.Button(master, text="Forward", width=self.sizeButton,command=self.pageForward)
+            self.button4.grid(row=3,column=4)
+            #self.button4.pack()
+            
+            self.button7 = Tkinter.Button(master, text="Backward", width=self.sizeButton,command=self.pageBackward)
+            self.button7.grid(row=3,column=3)
+            #self.button7.pack()
+            
+            self.button5 = Tkinter.Button(master, text="MOVE", width=self.sizeButton,command=self.moving, bg='beige')
+            self.button5.grid(row=2,column=3)
+            
+            self.button6 = Tkinter.Button(master, text="STOP SF", width=self.sizeButton,command=self.stopScoreFollower, bg='red')
+            self.button6.grid(row=5,column=4)
+                                
+            self.textVarComments = Tkinter.StringVar()
+            self.textVarComments.set('Comments') 
+            self.label2 = Tkinter.Label(master, textvariable=self.textVarComments)
+            self.label2.grid(row=8,column=3,sticky=Tkinter.E)
+            
+            self.firstTime = False
+
         
     def moving(self):
         print "moving!"
@@ -355,7 +392,7 @@ class SFApp():
         
         #scoreNotes = ["f'#4", "e'", "d'", "c'#", "b", "a", "b", "c'#", "d'", "c'#", "b", "a", "g", "f#", "g", "e", "d8", "f#", "a", "g", "f#", "d", "f#", "e", "d", "B", "d", "a", "g", "b", "a", "g", "f#", "d", "e", "c'#", "d'", "f'#", "a'", "a", "b", "g", "a", "f#", "d", "d'16", "e'", "d'8", "c'#", "d'16", "c'#", "d'", "d", "c#", "a", "e", "f#", "d", "d'", "c'#", "b", "c'#", "f'#", "a'", "b'", "g'", "f'#", "e'", "g'", "f'#", "e'", "d'", "c'#", "b", "a", "g", "f#", "e", "g", "f#", "e", "d", "e", "f#", "g", "a", "e", "a", "g", "f#", "b", "a", "g", "a", "g", "f#", "e", "d", "B", "b", "c'#", "d'", "c'#", "b", "a", "g", "f#", "e", "b", "a", "b", "a", "g", "f#8", "f'#", "e'4", "d'", "f'#", "b'4", "a'", "b'", "c'#'", "d''8", "d'", "c'#4", "b", "d'"]
         #scNotes = converter.parse(" ".join(scoreNotes), "4/4")
-        scNotes = corpus.parse(self.nameRecordedSong).parts[0].flat.notes
+        scNotes = self.scorePart.flat.notes
         ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         #ScF.runSFGraphic = self.runSFGraphic
         #ScF.runScoreFollower(show=True, plot=False, useMic=True, seconds=10.0)
@@ -457,7 +494,7 @@ class SFApp():
  
     def stopScoreFollower(self):
         self.stop = True
-        print "Stop botton pressed!"  
+        print "Stop button pressed!"  
 
 
 class RecordThread(threading.Thread):

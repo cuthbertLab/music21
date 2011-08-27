@@ -52,7 +52,8 @@ class Spanner(music21.Music21Object):
 
     In the first demo, we create
     a spanner to represent a written-out accelerando, such
-    as Elliott Carter uses in his second string quartet
+    as Elliott Carter uses in his second string quartet (he marks them
+    with an arrow).
 
 
     >>> from music21 import *
@@ -64,6 +65,108 @@ class Spanner(music21.Music21Object):
     >>> sp1 = CarterAccelerandoSign(n1, n2, n3) # or as a list: [n1, n2, n3]
     >>> sp1.getComponents()
     [<music21.note.Note C>, <music21.note.Note D>, <music21.note.Note E>]
+    
+    
+    Now we put the notes and the spanner into a Stream object.  Note that
+    the convention is to put the spanner at the beginning:
+    
+    
+    >>> s = stream.Stream()
+    >>> s.append([n1, n2, n3])
+    >>> s.insert(0, sp1)
+    
+    
+    Now we can get at the spanner in one of three ways.
+    
+    (1) it is just a normal element in the stream:
+    
+    >>> for e in s:
+    ...    print e
+    <music21.note.Note C>
+    <music21.spanner.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
+    <music21.note.Note D>
+    <music21.note.Note E>
+    
+    
+    (2) we can get a stream of spanners (equiv. to getElementsByClass('Spanner'))
+        by calling the .spanner property on the stream.
+    
+    >>> spannerCollection = s.spanners # a stream object
+    >>> for thisSpanner in spannerCollection:
+    ...     print thisSpanner
+    <music21.spanner.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
+
+
+    (3) we can get the spanner by looking at the list getSpannerSites() on any object.
+    
+
+    >>> n2.getSpannerSites()
+    [<music21.spanner.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>]
+    
+    
+    In this example we will slur a few notes and then iterate over the stream to
+    see which are slurred:
+    
+    
+    >>> n1 = note.Note('C4')
+    >>> n2 = note.Note('D4')
+    >>> n3 = note.Note('E4')
+    >>> n4 = note.Note('F4')
+    >>> n5 = note.Note('G4')
+    >>> n6 = note.Note('A4')
+    
+    
+    Create a slur over the second and third notes at instantiation:
+    
+    >>> slur1 = spanner.Slur([n2, n3])
+    
+    Slur the fifth and the sixth notes by adding them to an existing slur:
+    
+    >>> slur2 = spanner.Slur()
+    >>> slur2.addComponents([n5, n6])
+    
+    Now add them all to a stream:
+    
+    >>> part1 = stream.Part()
+    >>> part1.append([n1, n2, n3, n4, n5, n6])
+    >>> part1.insert(0, slur1)
+    >>> part1.insert(0, slur2)
+    
+    Say we wanted to know which notes in a piece started a
+    slur, here's how we could do it:
+    
+    >>> for n in part1.notes:
+    ...    ss = n.getSpannerSites()
+    ...    for thisSpanner in ss:
+    ...       if 'Slur' in thisSpanner.classes:
+    ...            if thisSpanner.isFirst(n):
+    ...                print n.nameWithOctave
+    D4
+    G4
+    
+    Alternatively, you could iterate over the spanners
+    of part1 and get their first elements:
+    
+    >>> for thisSpanner in part1.spanners:
+    ...     firstNote = thisSpanner.getComponents()[0]
+    ...     print firstNote.nameWithOctave
+    D4
+    G4
+    
+    The second method is shorter, but the first is likely to
+    be useful in cases where you are doing other things to
+    each note object along the way.  
+    
+    Oh, and of course, slurs do print properly in musicxml:
+    
+    
+    >>> #_DOCS_SHOW part1.show()
+    
+    .. image:: images/slur1_example.*
+        :width: 400
+    
+    (the Carter example would not print an arrow since that
+    element has no corresponding musicxml representation).
 
     
     
@@ -81,8 +184,10 @@ class Spanner(music21.Music21Object):
         self._cache = common.DefaultHash()    
 
         # store this so subclasses can replace
-        self._reprHead = '<music21.spanner.Spanner '
-
+        if self.__module__ != '__main__':
+            self._reprHead = '<' + self.__module__ + '.' + self.__class__.__name__ + ' '
+        else:
+            self._reprHead = '<music21.spanner.' + self.__class__.__name__ + ' '
         # store a Stream inside of Spanner
         from music21 import stream
 

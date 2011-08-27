@@ -124,6 +124,7 @@ Developer Reference
    :maxdepth: 2
 
    documenting
+   buildingDocumentation
    usingEclipse
 
 

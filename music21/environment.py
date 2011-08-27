@@ -374,7 +374,9 @@ class Environment(object):
     # utility methods for commonly needed OS services
 
     def getDefaultRootTempDir(self):
-        '''Use the Python tempfile.gettempdir() to get the system specified temporary directory, and try to add a new 'music21' directory, and then return this directory.
+        '''Use the Python tempfile.gettempdir() to get the system specified 
+        temporary directory, and try to add a new 'music21' directory, and 
+        then return this directory.
 
         This method is only called if the no scratch directory preference has been set. 
 
@@ -395,7 +397,10 @@ class Environment(object):
             return dstDir
 
     def getRootTempDir(self):
-        '''Return a directory for writing temporary files. This does not create a new directory for each use, but either uses the user-set preference or gets the system-provided directory (with a music21 subdirectory, if possible).
+        '''Return a directory for writing temporary files. This does 
+        not create a new directory for each use, but either uses 
+        the user-set preference or gets the system-provided 
+        directory (with a music21 subdirectory, if possible).
         '''
         if self.ref['directoryScratch'] == None:
             return self.getDefaultRootTempDir()

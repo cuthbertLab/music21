@@ -1538,6 +1538,7 @@ class Documentation(RestructuredWriter):
                              'advancedGraphing', 
                              ]
         self.chaptersDeveloper = ['documenting',
+                                  'buildingDocumentation',
                                   'usingEclipse'
                                   
                              ]

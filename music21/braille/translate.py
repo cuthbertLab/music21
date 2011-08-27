@@ -671,16 +671,16 @@ def showOctaveWithNote(previousNote = note.Note('C3'), currentNote = note.Note('
     
         
     1) If a braille measure goes to a new line, the first note in the measure carries an 
-    octave designation regardless of what the previous note was. 
+       octave designation regardless of what the previous note was. 
     
     
     2) If a braille measure contains a new key or time signature, the first note carries
-    an octave designation regardless of what the previous note was.
+       an octave designation regardless of what the previous note was.
     
     
     3) If a new key or time signature occurs in the middle of a measure, or if a double bar
-    line is encountered, both of which would necessitate a music hyphen, the next note after
-    those cases needs an octave marking. 
+       line is encountered, both of which would necessitate a music hyphen, the next note after
+       those cases needs an octave marking. 
     
     
     If any special case happens, previousNote can be set to None and the method will return
@@ -1203,25 +1203,21 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
     
     
     * showLeadingOctave: True by default. If set to True, the first note of the measure
-    (if there is one) displays an octave mark before it. If set to false, the first note
-    does not display an octave mark, unless preceded by a key or time signature within
-    the measure itself.
-    
+      (if there is one) displays an octave mark before it. If set to false, the first note
+      does not display an octave mark, unless preceded by a key or time signature within
+      the measure itself.
     
     * isFirstOfSegment: False by default. If set to True, a heading (see :meth:`~music21.braille.translate.extractBrailleHeading`)
-    and a measure number precede the rest of the contents of the measure, unless includeMeasureNumberAfterHeading is set to False.
-    
+      and a measure number precede the rest of the contents of the measure, unless includeMeasureNumberAfterHeading is set to False.
     
     * measureNumberWithHeading: True by default. If set to True, a measure number follows a heading whenever isFirstOfSegment is
-    True.
-    
+      True.
     
     * outgoingKeySig: None by default. If provided an old key signature, and the measure contains
-    a new key signature, the outgoing key signature is cancelled before the new one is added.
-    
+      a new key signature, the outgoing key signature is cancelled before the new one is added.
     
     * precedingBrailleText: None by default. If provided a BrailleText object, the
-    measure contents are added to it, otherwise a new BrailleText object is created.
+      measure contents are added to it, otherwise a new BrailleText object is created.
     
     
     >>> from music21.braille import translate
@@ -1349,15 +1345,12 @@ def partToBraille(samplePart = stream.Part(), **keywords):
     
     * segmentStartMeasureNumbers: empty list by default
     
-    
     * cancelOutgoingKeySig: True by default
     
-    
     * measureNumberWithHeading: True by default.
-        
     
     * upperFirstInNoteFingering: True by default. When provided a choice fingering for 
-    a note, if set to True, provides upper fingering followed by lower fingering.
+      a note, if set to True, provides upper fingering followed by lower fingering.
     
     
     A thing to keep in mind: there is a 40 braille character limit per line.
@@ -1567,13 +1560,13 @@ def brailleUnicodeToBrailleAscii(sampleBraille = u'\u2800'):
     
     
     .. note:: The method works by corresponding braille symbols to ASCII symbols.
-    The table which corresponds said values can be found 
-    `here <http://en.wikipedia.org/wiki/Braille_ASCII#Braille_ASCII_values>`_.
-    Because of the way in which the braille symbols translate, the resulting
-    ASCII string will look like gibberish. Also, the eighth-note notes in braille 
-    music are one-off their corresponding letters in both ASCII and written braille.
-    The written D is really a C eighth-note, the written E is really a 
-    D eighth note, etc. 
+        The table which corresponds said values can be found 
+        `here <http://en.wikipedia.org/wiki/Braille_ASCII#Braille_ASCII_values>`_.
+        Because of the way in which the braille symbols translate, the resulting
+        ASCII string will look like gibberish. Also, the eighth-note notes in braille 
+        music are one-off their corresponding letters in both ASCII and written braille.
+        The written D is really a C eighth-note, the written E is really a 
+        D eighth note, etc. 
     
     
     >>> from music21.braille import translate
@@ -1607,13 +1600,13 @@ def brailleAsciiToBrailleUnicode(sampleAscii = ",ANDANTE ,MAESTOSO4"):
     
     
     .. note:: The method works by corresponding ASCII symbols to braille
-    symbols in a very direct fashion. It is not a translator from plain
-    text to braille, because ASCII symbols may not correspond to their
-    equivalents in braille. For example, a literal period is a 4 in 
-    braille ASCII. Also, all letters are translated into their lowercase
-    equivalents, and any capital letters are indicated by preceding them
-    with a comma.
-    
+        symbols in a very direct fashion. It is not a translator from plain
+        text to braille, because ASCII symbols may not correspond to their
+        equivalents in braille. For example, a literal period is a 4 in 
+        braille ASCII. Also, all letters are translated into their lowercase
+        equivalents, and any capital letters are indicated by preceding them
+        with a comma.
+        
     
     >>> from music21.braille import translate
     >>> from music21 import tempo
