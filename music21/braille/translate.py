@@ -37,7 +37,8 @@ from music21 import tempo
 UPPER_FIRST_IN_NOTE_FINGERING = True
 SHOW_CLEF_SIGNS = False
 SLUR_LONG_PHRASE_WITH_BRACKETS = False
-SHOW_SLURS_AND_TIES_TOGETHER = False
+SHOW_SHORT_SLURS_AND_TIES_TOGETHER = False
+SHOW_LONG_SLURS_AND_TIES_TOGETHER = False
 
 c = {'128th':   u'\u2819',
      '64th':    u'\u2839',
@@ -919,6 +920,21 @@ def noteToBraille(sampleNote = note.Note('C4'), showOctave = True):
     beginLongSlur = False
     endLongSlur = False
     shortSlur = False
+    
+    try:
+        beginLongSlur = sampleNote.beginLongSlur
+    except AttributeError:
+        pass
+    try:
+        endLongSlur = sampleNote.endLongSlur
+    except AttributeError:
+        pass
+    try:
+        shortSlur = sampleNote.shortSlur
+    except AttributeError:
+        pass
+
+    '''
     if sampleNote.hasSpannerSite():
         for sp in sampleNote.getSpannerSites():
             if isinstance(sp, spanner.Slur):
@@ -943,12 +959,17 @@ def noteToBraille(sampleNote = note.Note('C4'), showOctave = True):
             endLongSlur = sampleNote.endLongSlur
         except AttributeError:
             pass
+    '''
     
+    # opening double slur (before second note, after first note)
     # opening bracket slur
     # closing bracket slur (if also beginning of next long slur)
     # --------------------
-    if beginLongSlur and SLUR_LONG_PHRASE_WITH_BRACKETS:
-        noteTrans.append(symbols['opening_bracket_slur'])
+    if beginLongSlur:
+        if SLUR_LONG_PHRASE_WITH_BRACKETS:
+            noteTrans.append(symbols['opening_bracket_slur'])
+        else:
+            noteTrans.append(symbols['opening_double_slur'])
     if endLongSlur and beginLongSlur and SLUR_LONG_PHRASE_WITH_BRACKETS:
         noteTrans.append(symbols['closing_bracket_slur'])
         
@@ -983,7 +1004,7 @@ def noteToBraille(sampleNote = note.Note('C4'), showOctave = True):
         except AttributeError:
             pass
         # single slur
-        # closing double slur
+        # closing double slur (after second to last note, before last note)
         # opening double slur
         # closing bracket slur (unless note also has beginning long slur)
         # ----------------------------------
@@ -993,8 +1014,6 @@ def noteToBraille(sampleNote = note.Note('C4'), showOctave = True):
             if not SLUR_LONG_PHRASE_WITH_BRACKETS:
                 if endLongSlur:
                     noteTrans.append(symbols['closing_double_slur'])
-                elif beginLongSlur:
-                    noteTrans.append(symbols['opening_double_slur'])
             elif endLongSlur and SLUR_LONG_PHRASE_WITH_BRACKETS:
                 noteTrans.append(symbols['closing_bracket_slur'])
         # tie
@@ -1361,18 +1380,24 @@ def partToBraille(samplePart = stream.Part(), **keywords):
     global UPPER_FIRST_IN_NOTE_FINGERING
     global SHOW_CLEF_SIGNS
     global SLUR_LONG_PHRASE_WITH_BRACKETS
-    global SHOW_SLURS_AND_TIES_TOGETHER
-
+    global SHOW_SHORT_SLURS_AND_TIES_TOGETHER
+    global SHOW_LONG_SLURS_AND_TIES_TOGETHER
+    
     if 'upperFirstInNoteFingering' in keywords:
         UPPER_FIRST_IN_NOTE_FINGERING = keywords['upperFirstInNoteFingering']
     if 'showClefSigns' in keywords:
         SHOW_CLEF_SIGNS = keywords['showClefSigns']
     if 'slurLongPhraseWithBrackets' in keywords:
         SLUR_LONG_PHRASE_WITH_BRACKETS = keywords['slurLongPhraseWithBrackets']
-    if 'showSlursAndTiesTogether' in keywords:
-        SHOW_SLURS_AND_TIES_TOGETHER = keywords['showSlursAndTiesTogether']
-    
-    prepareNotesWithSlurs(samplePart = samplePart)
+    if 'showShortSlursAndTiesTogether' in keywords:
+        SHOW_SHORT_SLURS_AND_TIES_TOGETHER = keywords['showShortSlursAndTiesTogether']
+    if 'showLongSlursAndTiesTogether' in keywords:
+        SHOW_LONG_SLURS_AND_TIES_TOGETHER = keywords['showLongSlursAndTiesTogether']
+    else:
+        if SLUR_LONG_PHRASE_WITH_BRACKETS:
+            SHOW_LONG_SLURS_AND_TIES_TOGETHER = True
+
+    prepareSlurredNotes(samplePart = samplePart)
     bt = BrailleText()
     partTrans = []
     allMeasures = samplePart.getElementsByClass('Measure')
@@ -1411,31 +1436,50 @@ def partToBraille(samplePart = stream.Part(), **keywords):
     UPPER_FIRST_IN_NOTE_FINGERING = True
     SHOW_CLEF_SIGNS = False
     SLUR_LONG_PHRASE_WITH_BRACKETS = False
-    SHOW_SLURS_AND_TIES_TOGETHER = False
+    SHOW_SHORT_SLURS_AND_TIES_TOGETHER = False
+    SHOW_LONG_SLURS_AND_TIES_TOGETHER = False
     return bt
 
-def prepareNotesWithSlurs(samplePart = stream.Part()):
+def prepareSlurredNotes(samplePart = stream.Part()):
     if not len(samplePart.spannerBundle) > 0:
         return
     allNotes = samplePart.flat.notes
     for slur in samplePart.spannerBundle.getByClass(spanner.Slur):
         slur[0].index = allNotes.index(slur[0])
         slur[1].index = allNotes.index(slur[1])
-        delta = abs(slur[1].index - slur[0].index) + 1
-        if delta == 3:
-            allNotes[slur[0].index + 1].isPartOfShortSlur = True
-        if delta == 4:
-            allNotes[slur[0].index + 1].isPartOfShortSlur = True
-            allNotes[slur[0].index + 2].isPartOfShortSlur = True
-        if delta > 4:
-            if not SLUR_LONG_PHRASE_WITH_BRACKETS:
-                allNotes[slur[1].index - 1].endLongSlur = True
+        beginIndex = slur[0].index
+        endIndex = slur[1].index
+        delta = abs(endIndex - beginIndex) + 1
+        if not SHOW_SHORT_SLURS_AND_TIES_TOGETHER and delta <= 4:
+            if allNotes[beginIndex].tie != None and allNotes[beginIndex].tie.type == 'start':
+                beginIndex += 1
+            if allNotes[endIndex].tie != None and allNotes[endIndex].tie.type == 'stop':
+                endIndex -= 1
+        if not SHOW_LONG_SLURS_AND_TIES_TOGETHER and delta > 4:
+            if allNotes[beginIndex].tie != None and allNotes[beginIndex].tie.type == 'start':
+                beginIndex += 1
+            if allNotes[endIndex].tie != None and allNotes[endIndex].tie.type == 'stop':
+                endIndex -= 1
+        if not(delta > 4):
+            for noteIndex in range(beginIndex, endIndex):
+                allNotes[noteIndex].shortSlur = True
+        else:
+            if SLUR_LONG_PHRASE_WITH_BRACKETS:
+                allNotes[beginIndex].beginLongSlur = True
+                allNotes[endIndex].endLongSlur = True
+            else:
+                allNotes[beginIndex + 1].beginLongSlur = True
+                allNotes[endIndex - 1].endLongSlur = True
 
-def keyboardPartsToBraille(keyboardStyle = stream.Part()):
+def keyboardPartsToBraille(keyboardStyle = stream.Part(), **keywords):
     '''
     Translates a stream Part consisting of two stream Parts, a right hand and left hand,
     into braille music bar over bar format.
     '''
+    recenterHeading = False
+    if 'recenterHeading' in keywords:
+        recenterHeading = keywords['recenterHeading']
+
     rightHand = keyboardStyle[0]
     leftHand = keyboardStyle[1]
 
@@ -1451,7 +1495,10 @@ def keyboardPartsToBraille(keyboardStyle = stream.Part()):
         lh_braille = noteGroupingsToBraille(lhMeasure)[0]
         bt.addElement(pair = (numberToBraille(sampleNumber = rhMeasure.number)[1:], rh_braille, lh_braille))
 
+    if recenterHeading:
+        bt.recenterHeading()
     return bt
+
 
 # A (very) primitive stab at beamed notes
 # ----------------------------------------
