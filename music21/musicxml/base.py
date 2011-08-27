@@ -232,11 +232,18 @@ class TagLib(object):
 ('words', True, Words),  
 ('offset', True),  # no object
 ('print', False, Print),  
+('page-layout', False, PageLayout),  
+('page-margins', False, PageMargins),  
+('page-height', True),  
+('page-width', True),  
 ('system-layout', False, SystemLayout),  
 ('system-margins', False, SystemMargins),  
 ('right-margin', True),  
 ('left-margin', True),  
 ('system-distance', True),  
+
+
+
 
 ('metronome', False, Metronome), # no char data
 ('beat-unit', True, BeatUnit),
@@ -581,14 +588,16 @@ class Score(MusicXMLElementList):
     '''
     def __init__(self, m21Version=None):
         '''
-        >>> a = Score()
+                
+        >>> from music21 import *
+        >>> a = musicxml.Score()
         >>> a.tag
         'score-partwise'
         >>> a.setDefaults()
-        >>> b = Identification()
+        >>> b = musicxml.Identification()
         >>> b.setDefaults()
         >>> a.set('identification', b)
-        >>> c = Score()
+        >>> c = musicxml.Score()
         >>> d = c.merge(a)
         '''
         MusicXMLElementList.__init__(self)
@@ -2287,16 +2296,113 @@ class Tuplet(MusicXMLElement):
 
 
 
-# Layout elements in a print statement only apply to the current page, system, staff, or measure. Music that follows continues to take the default values from the layout included in the defaults element.
+# Layout elements in a print statement only apply to the 
+# current page, system, staff, or measure. Music that follows 
+# continues to take the default values from the layout included in the defaults element.
 
 class Print(MusicXMLElementList):
     def __init__(self):
+        '''from direction.mod:
+
+        <!--
+            The print element contains general printing parameters,
+            including the layout elements defined in the layout.mod
+            file. The part-name-display and part-abbreviation-display
+            elements used in the score.mod file may also be used here
+            to change how a part name or abbreviation is displayed over
+            the course of a piece. They take effect when the current
+            measure or a succeeding measure starts a new system.
+            
+            The new-system and new-page attributes indicate whether
+            to force a system or page break, or to force the current
+            music onto the same system or page as the preceding music.
+            Normally this is the first music data within a measure.
+            If used in multi-part music, they should be placed in the
+            same positions within each part, or the results are
+            undefined. The page-number attribute sets the number of a
+            new page; it is ignored if new-page is not "yes". Version
+            2.0 adds a blank-page attribute. This is a positive integer
+            value that specifies the number of blank pages to insert
+            before the current measure. It is ignored if new-page is
+            not "yes". These blank pages have no music, but may have
+            text or images specified by the credit element. This is
+            used to allow a combination of pages that are all text,
+            or all text and images, together with pages of music.
+        
+            Staff spacing between multiple staves is measured in
+            tenths of staff lines (e.g. 100 = 10 staff lines). This is
+            deprecated as of Version 1.1; the staff-layout element
+            should be used instead. If both are present, the
+            staff-layout values take priority.
+        
+            Layout elements in a print statement only apply to the
+            current page, system, staff, or measure. Music that
+            follows continues to take the default values from the
+            layout included in the defaults element.
+        -->
+        <!ELEMENT print (page-layout?, system-layout?, staff-layout*,
+            measure-layout?, measure-numbering?, part-name-display?,
+            part-abbreviation-display?)>
+        <!ATTLIST print
+            staff-spacing %tenths; #IMPLIED
+            new-system %yes-no; #IMPLIED
+            new-page %yes-no; #IMPLIED
+            blank-page NMTOKEN #IMPLIED
+            page-number CDATA #IMPLIED    
+        >
+
+
+        Supported in music21: page-layout, system-layout
+        new-system
+        new-page
+        page-number
+        '''
         MusicXMLElementList.__init__(self)
         self._tag = 'print'
         # attributes
         self._attr['new-system'] = None # yes /no
+        self._attr['new-page'] = None # yes/no
+        self._attr['page-number'] = None # yes/no
         # elements
-        self.componentList = [] # contains: system-layout, measure-layout, numerous others
+        self.componentList = [] # contains: page-layout, system-layout, measure-layout, numerous others
+
+
+class PageLayout(MusicXMLElementList):
+    def __init__(self):
+        MusicXMLElementList.__init__(self)
+        self._tag = 'page-layout'
+        # elements
+        self.pageHeight = None #
+        self.pageWidth = None #
+        self.componentList = [] # contains: page-margins
+
+    def _getComponents(self):
+        c = [] 
+        c += self.componentList
+        # place after components
+        c.append(('page-height', self.pageHeight))
+        c.append(('page-width', self.pageWidth))
+        return c
+
+class PageMargins(MusicXMLElement):
+    def __init__(self):
+        '''
+        only supports left and right margins for now.
+        
+        and not the type = (odd|even|both) attribute
+        '''
+        MusicXMLElement.__init__(self)
+        self._tag = 'page-margins'
+        # simple elements
+        self.leftMargin = None
+        self.rightMargin = None
+
+    def _getComponents(self):
+        c = []
+        c.append(('left-margin', self.leftMargin))
+        c.append(('right-margin', self.rightMargin))
+        return c
+
 
 class SystemLayout(MusicXMLElementList):
     def __init__(self):
@@ -2438,6 +2544,8 @@ class Handler(xml.sax.ContentHandler):
         self._perMinuteObj = None
 
         self._printObj = None
+        self._pageLayoutObj = None
+        self._pageMarginsObj = None
         self._systemLayoutObj = None
         self._systemMarginsObj = None
 
@@ -2609,6 +2717,16 @@ class Handler(xml.sax.ContentHandler):
             #environLocal.printDebug(['found print tag'])
             self._printObj = Print()
             self._printObj.loadAttrs(attrs)
+
+        elif name == 'page-layout':
+            # has one attr, not yet supported -- margin-type
+            self._pageLayoutObj = PageLayout() 
+
+        elif name == 'page-margins':
+            # has no attrs
+            self._pageMarginsObj = PageMargins() 
+
+
 
         elif name == 'system-layout':
             # has no attrs
@@ -3036,6 +3154,26 @@ class Handler(xml.sax.ContentHandler):
                 self._measureObj.componentList.append(self._printObj)
                 self._printObj = None
 
+        elif name == 'page-layout':
+            # has no attrs
+            if self._printObj != None: # in case found elsewhere
+                self._printObj.componentList.append(self._pageLayoutObj)
+                self._pageLayoutObj = None
+
+        elif name == 'page-margins':
+            if self._pageLayoutObj != None: # in case found elsewhere
+                self._pageLayoutObj.componentList.append(self._pageMarginsObj)
+                self._pageMarginsObj = None
+
+        elif name == 'page-height': # simple element
+            if self._pageLayoutObj != None: # in case found elsewhere
+                self._pageLayoutObj.pageHeight = self._currentTag.charData
+
+        elif name == 'page-width': # simple element
+            if self._pageLayoutObj != None: # in case found elsewhere
+                self._pageLayoutObj.pageWidth = self._currentTag.charData
+
+
         elif name == 'system-layout':
             # has no attrs
             if self._printObj != None: # in case found elsewhere
@@ -3050,10 +3188,15 @@ class Handler(xml.sax.ContentHandler):
         elif name == 'left-margin': # simple element
             if self._systemMarginsObj != None: # in case found elsewhere
                 self._systemMarginsObj.leftMargin = self._currentTag.charData
+            elif self._pageMarginsObj != None: # in case found elsewhere
+                self._pageMarginsObj.leftMargin = self._currentTag.charData
+
 
         elif name == 'right-margin': # simple element
             if self._systemMarginsObj != None: # in case found elsewhere
                 self._systemMarginsObj.rightMargin = self._currentTag.charData
+            elif self._pageMarginsObj != None: # in case found elsewhere
+                self._pageMarginsObj.rightMargin = self._currentTag.charData
 
         elif name == 'system-distance': # simple element
             if self._systemLayoutObj != None: # in case found elsewhere

@@ -95,19 +95,45 @@ class GregorianStream(music21.stream.Stream):
  
  
 class GregorianNote(music21.note.Note):
-    breakNeume = False
+    '''
+    A GregorianNote is a subclass of :class:`~music21.note.Note` that
+    contains extra attributes which represent the interpretation or
+    graphical representation of the note.
+    
+    
+    Most of the attributes default to False.  Exceptions are noted below.
+    
+    
+    Example: a very special note.
+    
+    
+    >>> n = music21.chant.GregorianNote("C4")
+    >>> n.liquescent = True 
+    >>> n.quilisma = True
+    >>> n.basicShape = 'virga'  # default: punctus
+    >>> n.breakNeume = True # don't connect to the next note in a neume.
+    >>> n.stropha = True
+    >>> n.inclinatum = True
+    >>> n.debilis = True  # small note
+    >>> n.episema = True
+    >>> n.punctumMora = True
+    >>> n.fill = 'cavum' # 
+    '''
+    
     liquescent = False
     quilisma = False
     oriscus = False
     basicShape = 'punctus'
+    breakNeume = False
     stropha = False
     inclinatum = False
     debilis = False
     nextNote = None
     episema = False
     punctumMora = False
-    fill = False
-    fillDic = {'cavum': 'r',
+    _fill = 'solid'
+    fillDic = {'solid': '',
+               'cavum': 'r',
                'linea': 'R',
                'linea-cavum': 'r0',
                'accentus': 'r1',
@@ -121,14 +147,14 @@ class GregorianNote(music21.note.Note):
     def __init__(self, *arguments, **keywords):
         music21.note.Note.__init__(self, *arguments, **keywords)
        
-    def toGABC(self, useClef = None):
+    def toGABC(self, useClef = None, nextNote = None):
         letter = self.toBasicGABC(useClef)
         if self.debilis == True:
             letter = "-" + letter
         if self.inclinatum == True:
             letter = letter.upper()
        
-        if self.fill != False:
+        if self.fill != 'solid':
             if self.fill in self.fillDic:
                 letter += self.fillDic[self.fill]
             else:
@@ -225,6 +251,39 @@ class GregorianNote(music21.note.Note):
             return unichr(asciiNote)
 
 
+    def _getFill(self):
+        return self._fill
+    
+    def _setFill(self, value):
+        if value not in self.fillDic:
+            raise ChantException("Cannot set fill to value %s." % value)
+        self._fill = value
+    
+    fill = property(_getFill, _setFill, doc='''Sets the
+    fill for the note, for teaching purposes, representing
+    polyphony, etc.  Acceptable values are:
+    
+        * solid (default)
+        * cavum (void)
+        * linea (lines around it; technically not a fill)
+        * linea-cavum (both of the previous)
+        * accentus
+        * reversed-accentus
+        * circulus
+        * semi-circulus
+        * reversed-semi-circulus
+        
+    See the docs for Gregorio for graphical representations of these figures.
+    
+    >>> from music21 import *
+    >>> n = chant.GregorianNote("D3")
+    >>> n.fill
+    u'solid'
+    >>> n.fill = 'cavum'
+    >>> n.fill
+    u'cavum'
+    
+    ''')
 
 class BaseScoreConverter(object):
     '''
@@ -507,7 +566,7 @@ _DOC_ORDER = []
 
 
 if __name__ == "__main__":
-    music21.mainTest(TestExternal)
+    music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof

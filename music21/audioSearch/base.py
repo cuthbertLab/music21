@@ -62,7 +62,11 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
     
     
     >>> from music21 import *
-    >>> wv = wave.open("test_audio.wav",'r')
+    >>> import wave
+    >>> import os #_DOCS_HIDE
+    >>> readPath = os.path.dirname(__file__) + os.path.sep #_DOCS_HIDE
+    >>> wv = wave.open(readPath + 'test_audio.wav', 'r') #_DOCS_HIDE
+    >>> #_DOCS_SHOW wv = wave.open("test_audio.wav",'r')
     >>> data = wv.readframes(1024)
     >>> samps = numpy.fromstring(data, dtype=numpy.int16)
     >>> finalResult = autocorrelationFunction(samps, 44100)
@@ -223,7 +227,10 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=music21.scale.MajorS
     
     >>> from music21 import *
     >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes        
-    >>> freqFromAQList = getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
+    >>> import os #_DOCS_HIDE
+    >>> readPath = os.path.dirname(__file__) + os.path.sep #_DOCS_HIDE
+    >>> freqFromAQList = getFrequenciesFromAudioFile(waveFilename=readPath + 'test_audio.wav') #_DOCS_HIDE
+    >>> #_DOCS_SHOW freqFromAQList = getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
     >>> detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale=scale.ChromaticScale('C4'))
     >>> detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
     >>> (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))
@@ -290,7 +297,10 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     
     
     >>> from music21 import *
-    >>> freq = getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
+    >>> import os #_DOCS_HIDE
+    >>> readPath = os.path.dirname(__file__) + os.path.sep #_DOCS_HIDE
+    >>> freq = getFrequenciesFromAudioFile(waveFilename=readPath + 'test_audio.wav') #_DOCS_HIDE
+    >>> #_DOCS_SHOW freq = getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
     >>> print freq
     [143.627689055..., 99.083545201..., 211.004784688..., 4700.313479623..., ...]
     '''
@@ -472,6 +482,9 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
 
     >>> from music21 import *
     >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes        
+    >>> import os #_DOCS_HIDE
+    >>> readPath = os.path.dirname(__file__) + os.path.sep #_DOCS_HIDE
+    >>> freqFromAQList = getFrequenciesFromAudioFile(waveFilename=readPath + 'test_audio.wav') #_DOCS_HIDE
     >>> freqFromAQList = getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
     >>> detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale=scale.ChromaticScale('C4'))
     >>> detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
@@ -709,7 +722,10 @@ def decisionProcess(list, notePrediction, beginningData, lastNotePosition, count
     >>> from music21 import *
     >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes    
     >>> scoreStream = scNotes    
-    >>> freqFromAQList = getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
+    >>> import os #_DOCS_HIDE
+    >>> readPath = os.path.dirname(__file__) + os.path.sep #_DOCS_HIDE
+    >>> freqFromAQList = getFrequenciesFromAudioFile(waveFilename=readPath + 'test_audio.wav') #_DOCS_HIDE
+    >>> #_DOCS_SHOW freqFromAQList = getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
     >>> detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale=scale.ChromaticScale('C4'))
     >>> detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
     >>> (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))

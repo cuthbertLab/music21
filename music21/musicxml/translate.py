@@ -1863,10 +1863,21 @@ def measureToMx(m, spannerBundle=None):
 
     # print objects come before attributes
     # note: this class match is a problem in cases where the object is created in the module itself, as in a test. 
+    mxPrint = None
+    found = m.getElementsByClass('PageLayout')
+    if len(found) > 0:
+        sl = found[0] # assume only one per measure
+        mxPrint = sl.mx
+        
     found = m.getElementsByClass('SystemLayout')
     if len(found) > 0:
-        sl = found[0] # assume only one
-        mxPrint = sl.mx
+        sl = found[0] # assume only one per measure
+        if mxPrint is None:
+            mxPrint = sl.mx
+        else:
+            mxPrint.merge(sl.mx)
+    
+    if mxPrint is not None:
         mxMeasure.componentList.append(mxPrint)
 
     # get an empty mxAttributes object
@@ -2202,13 +2213,37 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             offsetMeasureNote += float(mxObj.duration) / float(divisions)
             continue
         elif isinstance(mxObj, musicxmlMod.Print):
-            # mxPrint objects may be found in a Measure's componetns
-            # contain system layout information
+            # mxPrint objects may be found in a Measure's components
+            # contain page or system layout information among others
             mxPrint = mxObj
-            sl = layout.SystemLayout()
-            sl.mx = mxPrint
-            # store at zero position
-            m._insertCore(0, sl)
+            try:
+                newPage = mxPrint.get('new-page')
+            except xmlnode.XMLNodeException:
+                try:
+                    newPage = mxPrint.get('page-number')
+                except xmlnode.XMLNodeException:
+                    newPage = None
+            
+            try:   
+                newSystem = mxPrint.get('new-system')
+            except xmlnode.XMLNodeException:
+                try:
+                    newSystem = mxPrint.get('system-layout')
+                except xmlnode.XMLNodeException:
+                    newSystem = None
+            
+            
+            if newPage is not None:
+                pl = layout.PageLayout()
+                pl.mx = mxPrint
+                # store at zero position
+                m._insertCore(0, pl)
+
+            if newSystem is not None or newPage is None:
+                sl = layout.SystemLayout()
+                sl.mx = mxPrint
+                # store at zero position
+                m._insertCore(0, sl)
 
         # <sound> tags may be found in the Measure, used to define tempo
         elif isinstance(mxObj, musicxmlMod.Sound):
