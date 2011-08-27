@@ -438,7 +438,7 @@ class Test(unittest.TestCase):
     def testGetPageMeasureNumbers(self):
         from music21 import corpus
         c = corpus.parse('luca/gloria').parts[0]
-        c.show('text')
+        #c.show('text')
         retStr = ""
         for x in c.flat:
             if 'PageLayout' in x.classes:
