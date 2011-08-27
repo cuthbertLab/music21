@@ -1811,7 +1811,10 @@ def example12_5():
 def example12_6():
     '''
     >>> from music21.braille import translate
-    >>> print translate.partToBraille(example12_6(), measureNumberWithHeading = False, recenterHeading = True, showSlursAndTiesTogether = True)
+    >>> print translate.partToBraille(example12_6(), measureNumberWithHeading = False, recenterHeading = True, showShortSlursAndTiesTogether = False)
+    ⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀
+    ⠨⠝⠈⠉⠙⠉⠑⠀⠕⠈⠉⠑⠉⠋
+    >>> print translate.partToBraille(example12_6(), measureNumberWithHeading = False, recenterHeading = True, showShortSlursAndTiesTogether = True)
     ⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
     ⠨⠝⠉⠈⠉⠙⠉⠑⠀⠕⠉⠈⠉⠑⠉⠋
     '''
@@ -1822,6 +1825,91 @@ def example12_6():
     bm[1].rightBarline = None
     return bm
   
+def example12_7():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example12_7(), measureNumberWithHeading = False, recenterHeading = True, slurLongPhraseWithBrackets = True)
+    ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀
+    ⠰⠃⠨⠟⠄⠈⠉⠀⠛⠙⠑⠙⠚⠊⠘⠆
+    >>> print translate.partToBraille(example12_7(), measureNumberWithHeading = False, recenterHeading = True, slurLongPhraseWithBrackets = False)
+    ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀
+    ⠨⠟⠄⠈⠉⠀⠛⠉⠉⠙⠑⠙⠚⠉⠊
+    '''
+    bm = tinyNotation.TinyNotationStream("f'2.~ f'8 c' d' c' b- a", "3/4")
+    bm.insert(0, key.KeySignature(-1))
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[-1].append(spanner.Slur(bm[0].notes[0], bm[-1].notes[-1]))
+    bm[-1].rightBarline = None
+    return bm
+
+def example12_8():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example12_8(), measureNumberWithHeading = False, recenterHeading = True, slurLongPhraseWithBrackets = True)
+    ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀
+    ⠨⠟⠄⠈⠉⠀⠰⠃⠛⠙⠑⠙⠚⠊⠘⠆
+    >>> print translate.partToBraille(example12_8(), measureNumberWithHeading = False, recenterHeading = True, slurLongPhraseWithBrackets = False)
+    ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀
+    ⠨⠟⠄⠈⠉⠀⠛⠉⠉⠙⠑⠙⠚⠉⠊
+    '''
+    bm = tinyNotation.TinyNotationStream("f'2.~ f'8 c' d' c' b- a", "3/4")
+    bm.insert(0, key.KeySignature(-1))
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[-1].append(spanner.Slur(bm[-1].notes[0], bm[-1].notes[-1]))
+    bm[-1].rightBarline = None
+    return bm
+
+def example12_9():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example12_9(), measureNumberWithHeading = False, recenterHeading = True, slurLongPhraseWithBrackets = True)
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠰⠃⠨⠋⠛⠓⠛⠋⠑⠀⠝⠄⠈⠉⠀⠹⠘⠆⠧⠧
+    >>> print translate.partToBraille(example12_9(), measureNumberWithHeading = False, recenterHeading = True, slurLongPhraseWithBrackets = False)
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠨⠋⠉⠉⠛⠓⠛⠋⠑⠉⠀⠝⠄⠈⠉⠀⠹⠧⠧
+    '''
+    bm = tinyNotation.TinyNotationStream("e'8 f' g' f' e' d' c'2.~ c'4 r r", "3/4")
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[-1].append(spanner.Slur(bm[0].notes[0], bm[-1].notes[-1]))
+    bm[-1].rightBarline = None
+    return bm
+
+def example12_10():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example12_10(), measureNumberWithHeading = False, recenterHeading = True, slurLongPhraseWithBrackets = True)
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠰⠃⠨⠋⠛⠓⠛⠋⠑⠀⠝⠄⠘⠆⠈⠉⠀⠹⠧⠧
+    >>> print translate.partToBraille(example12_10(), measureNumberWithHeading = False, recenterHeading = True, slurLongPhraseWithBrackets = False)
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠨⠋⠉⠉⠛⠓⠛⠋⠑⠉⠀⠝⠄⠈⠉⠀⠹⠧⠧
+    '''
+    bm = tinyNotation.TinyNotationStream("e'8 f' g' f' e' d' c'2.~ c'4 r r", "3/4")
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[1].append(spanner.Slur(bm[0].notes[0], bm[1].notes[0]))
+    bm[-1].rightBarline = None
+    return bm
+
+def example12_11():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example12_11(), measureNumberWithHeading = False, recenterHeading = True)
+    ⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀
+    ⠐⠹⠇⠉⠹⠃⠉⠹⠁⠉⠹⠇
+    '''
+    bm = tinyNotation.TinyNotationStream("c4 c c c", "4/4")
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[0].append(spanner.Slur(bm[0].notes[0], bm[0].notes[1]))
+    bm[0].append(spanner.Slur(bm[0].notes[1], bm[0].notes[2]))
+    bm[0].append(spanner.Slur(bm[0].notes[2], bm[0].notes[3]))
+    bm[0].notes[0].fingering = '3'
+    bm[0].notes[1].fingering = '2'
+    bm[0].notes[2].fingering = '1'
+    bm[0].notes[3].fingering = '3'
+    bm[-1].rightBarline = None
+    return bm
+
 #-------------------------------------------------------------------------------
 # Chapter 13: Words, Abbreviations, Letters, and Phrases of Expression
 
@@ -1995,13 +2083,13 @@ def example15_8():
     return bm
 
 def example15_9():
+    '''
+    '''
     bm = tinyNotation.TinyNotationStream("r16 d' c' b c' d' e' c' b c' b a g f# g r g' f'# e' d' c' r b a g2", "2/4")
     bm.insert(0, key.KeySignature(1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None
     return bm
-
-
 
 #-------------------------------------------------------------------------------
 # Chapter 16: Irregular Note-Grouping
@@ -2104,12 +2192,23 @@ def example24_2():
     return keyboardPart
 
 def example24_3():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.keyboardPartsToBraille(example24_3(), recenterHeading = True)
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠚⠀⠅⠜⠨⠱⠇⠀⠨⠑⠋⠑⠙⠚⠊⠀⠐⠗⠁⠈⠉⠺⠇
+    ⠀⠀⠇⠜⠸⠚⠊⠀⠸⠓⠭⠚⠭⠑⠭⠀⠸⠓⠊⠚⠙⠱⠀
+    '''
     rightHand = tinyNotation.TinyNotationStream("r2 d'4 d'8 e'-8 d'8 c'8 b-8 a8 g2~ b-4", "3/4")
     leftHand = tinyNotation.TinyNotationStream("r2 B-8 A8 G8 r8 B-8 r8 d8 r8 G8 A8 B-8 c8 d4", "3/4")
     rightHand.insert(0, key.KeySignature(-2))
     leftHand.insert(0, key.KeySignature(-2))
     rightHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     leftHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    rightHand[-1].append(spanner.Slur(rightHand[-1].notes[0], rightHand[-1].notes[1]))
+    rightHand[0].notes[0].fingering = '3'
+    rightHand[-1].notes[0].fingering = '1'
+    rightHand[-1].notes[1].fingering = '3'
     rightHand[0].pop(3)
     rightHand[0].padAsAnacrusis()
     leftHand[0].pop(3)
@@ -2153,7 +2252,6 @@ def example24_4():
     keyboardPart.append(leftHand)
     return keyboardPart
  
-
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
@@ -2161,9 +2259,6 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    #ex = example12_6()
-    #ex.show('text')
-    #print translate.partToBraille(example12_6(), measureNumberWithHeading = False, recenterHeading = True, showSlursAndTiesTogether = False)
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
