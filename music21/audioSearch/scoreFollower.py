@@ -48,6 +48,8 @@ class ScoreFollower(object):
         self.END_OF_SCORE = False
         self.lengthFixed = False
         self.qle = None
+        self.firstNotePage = None
+        self.lastNotePage = None
 
 
     def runScoreFollower(self, show=True, plot=False, useMic=False,
@@ -78,11 +80,12 @@ class ScoreFollower(object):
 
 
     def repeatTranscription(self):  
-        print "WE STAY AT:  *****",
+        print "WE STAY AT:",
         print self.lastNotePosition, len(self.scoreNotesOnly),
         print "en percent %d %%" % (self.lastNotePosition * 100 / len(self.scoreNotesOnly)),
         print " this search begins at: ", self.startSearchAtSlot,
-        print "countdown %d" %self.countdown
+        print "countdown %d" % self.countdown
+        print "Measure last note", self.scoreStream[self.lastNotePosition].measureNumber
 
         if self.useMic == True:
             freqFromAQList = getFrequenciesFromMicrophone(length=self.seconds_recording, storeWaveFilename=None)
@@ -119,8 +122,7 @@ class ScoreFollower(object):
         elif (self.useMic == False and self.currentSample >= self.totalFile):
             print "waveFileEOF"
             exitType = "waveFileEOF"
-        
-        print "El que retorna el repeater",exitType
+
         return exitType
 
     def updatePosition(self, prob, totalLengthPeriod, time_start):
@@ -372,8 +374,8 @@ class ScoreFollower(object):
         if notePrediction > len(scoreStream) - tn_recording - hop - 1:
             notePrediction = len(scoreStream) - tn_recording - hop - 1
             END_OF_SCORE = True
-            environLocal.printDebug("**********++++ LAST PART OF THE SCORE ++++***********")
-        position, self.countdown = decisionProcess(listOfParts, notePrediction, beginningData, lastNotePosition, self.countdown)
+            environLocal.printDebug("LAST PART OF THE SCORE")
+        position, self.countdown = decisionProcess(listOfParts, notePrediction, beginningData, lastNotePosition, self.countdown, self.firstNotePage, self.lastNotePage)
         try:
             print "measure: " + listOfParts[position][0].measureNumber     
         except:

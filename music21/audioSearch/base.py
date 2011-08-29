@@ -82,9 +82,9 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
     lengthCorrelation = len(correlation) / 2
     correlation = correlation[lengthCorrelation:]
     difference = numpy.diff(correlation) #  Calculates the difference between slots
-    positiveDifferences=matplotlib.mlab.find(difference > 0)
-    if len(positiveDifferences)==0:
-        finalResult=10 # Rest
+    positiveDifferences = matplotlib.mlab.find(difference > 0)
+    if len(positiveDifferences) == 0:
+        finalResult = 10 # Rest
     else:
         beginning = positiveDifferences[0]
         peak = numpy.argmax(correlation[beginning:]) + beginning
@@ -701,7 +701,7 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
     else: #case follower
         return sc, lengthFixed, qle
 
-def decisionProcess(list, notePrediction, beginningData, lastNotePosition, countdown):
+def decisionProcess(list, notePrediction, beginningData, lastNotePosition, countdown, firstNotePage=None, lastNotePage=None):
     '''
     It decides which of the given parts of the score has a better matching with 
     the recorded part of the song.
@@ -775,14 +775,17 @@ def decisionProcess(list, notePrediction, beginningData, lastNotePosition, count
                 
     #print "ERRORS", position, len(list), lastNotePosition, list[position].matchProbability , beginningData[int(list[position].id)]
     if position < len(list) and beginningData[int(list[position].id)] <= lastNotePosition:
-        environLocal.printDebug(" error ? ", beginningData[int(list[position].id)], lastNotePosition)
+        environLocal.printDebug(" error ? %d, %d" % (beginningData[int(list[position].id)], lastNotePosition))
     if list[position].matchProbability < 0.6 or len(list) == 1: #the latter for the all-rest case
         environLocal.printDebug("ARE YOU SURE YOU ARE PLAYING THE RIGHT SONG??")
         countdown = countdown + 1
 
-    elif dist > 20 and countdown==0:
-        countdown +=1
+    elif dist > 20 and countdown == 0:
+        countdown += 1
         environLocal.printDebug("Excessive distance....? dist=%d" % dist)
+        
+    elif (firstNotePage != None and lastNotePage != None) and ((beginningData[int(list[position].id)] < firstNotePage or beginningData[int(list[position].id)] > lastNotePage) and countdown < 2):
+        countdown += 1
     else:
         countdown = 0
   
