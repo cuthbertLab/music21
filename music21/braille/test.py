@@ -1932,7 +1932,7 @@ def example13_3():
     return bm
 
 #-------------------------------------------------------------------------------
-# Chapter 14: Smaller Values and Regular Note-Grouping, the Music Comma
+# Chapter 14: Symbols of Expression and Execution
 
 def example14_1():
     '''
@@ -2084,11 +2084,36 @@ def example15_8():
 
 def example15_9():
     '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example15_9(), measureNumberWithHeading = False, recenterHeading = True) 
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠍⠨⠑⠙⠚⠽⠑⠋⠙⠀⠾⠙⠚⠊⠷⠿⠷⠍⠀⠨⠷⠛⠋⠑⠽⠍⠾⠮⠀⠗
     '''
     bm = tinyNotation.TinyNotationStream("r16 d' c' b c' d' e' c' b c' b a g f# g r g' f'# e' d' c' r b a g2", "2/4")
     bm.insert(0, key.KeySignature(1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None
+    return bm
+
+def example15_10():
+    bm = tinyNotation.TinyNotationStream("g16 a g f e8 c d16 e f d e8 c", "4/4")
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[-1].rightBarline = None
+    return bm
+    
+def example15_11():
+    bm = tinyNotation.TinyNotationStream("r1 r4 r8 b-8 e-16 e'- g- g'- b- b'- bn b'n b- b'- bn b'n b- b'- a'- f' d' b- e'-4.", "12/8")
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    #bm[1].timeSignature = meter.TimeSignature("12/8")
+    translate.prepareBeamedNotes(bm[1])
+    bm[1].show('text')
+    print translate.noteGroupingsToBraille(bm[1][0:6])[0]
+    print translate.noteGroupingsToBraille(bm[1][6:12])[0]
+    print translate.noteGroupingsToBraille(bm[1][12:19])[0]
+    #bm[1].show()
+    bm[-1].rightBarline = None
+    for m in bm:
+        m.number -= 1
     return bm
 
 #-------------------------------------------------------------------------------
