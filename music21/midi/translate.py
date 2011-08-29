@@ -1472,6 +1472,14 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
             # multiple references of the same
             eventCopy = copy.deepcopy(e)
             p.insert(e.getOffsetBySite(conductorTrack), eventCopy)
+
+    # if there is a conductor track, add tempo only to the top-most part
+    p = s.getElementsByClass('Stream')[0]
+    for e in conductorTrack.getElementsByClass('MetronomeMark'):
+        # create a deepcopy of the element so a flat does not cause
+        # multiple references of the same
+        eventCopy = copy.deepcopy(e)
+        p.insert(e.getOffsetBySite(conductorTrack), eventCopy)
     return s
 
 
@@ -2026,10 +2034,47 @@ class Test(unittest.TestCase):
                 break
         dirLib = os.path.join(fp, 'testPrimitive')
         # a simple file created in athenacl
-        fp = os.path.join(dirLib, 'test10.mid')
-        
+        fp = os.path.join(dirLib, 'test10.mid')        
         s = converter.parse(fp)
-        self.assertEqual(len(s.flat.getElementsByClass('MetronomeMark')), 4)
+        mmStream = s.flat.getElementsByClass('MetronomeMark')
+        self.assertEqual(len(mmStream), 4)
+        self.assertEqual(mmStream[0].number, 120.0)        
+        self.assertEqual(mmStream[1].number, 110.0)        
+        self.assertEqual(mmStream[2].number, 90.0)        
+        self.assertEqual(mmStream[3].number, 60.0)        
+    
+
+        fp = os.path.join(dirLib, 'test06.mid')        
+        s = converter.parse(fp)
+        mmStream = s.flat.getElementsByClass('MetronomeMark')
+        self.assertEqual(len(mmStream), 1)
+        self.assertEqual(mmStream[0].number, 120.0)        
+
+        fp = os.path.join(dirLib, 'test07.mid')        
+        s = converter.parse(fp)
+        mmStream = s.flat.getElementsByClass('MetronomeMark')
+        self.assertEqual(len(mmStream), 1)
+        self.assertEqual(mmStream[0].number, 180.0)        
+
+
+    def testMidiTempoImportB(self):
+        import os
+        from music21 import converter, common
+
+        dir = common.getPackageDir(relative=False, remapSep=os.sep)
+        for fp in dir:
+            if fp.endswith('midi'):
+                break
+        dirLib = os.path.join(fp, 'testPrimitive')
+        # a file with three tracks and one conductor track
+        fp = os.path.join(dirLib, 'test11.mid')        
+        s = converter.parse(fp)
+        self.assertEqual(len(s.parts), 3)
+        # metronome marks end up only on the top-most staff
+        self.assertEqual(len(s.parts[0].getElementsByClass('MetronomeMark')), 4)
+        self.assertEqual(len(s.parts[1].getElementsByClass('MetronomeMark')), 0)
+        self.assertEqual(len(s.parts[2].getElementsByClass('MetronomeMark')), 0)
+
 
 if __name__ == "__main__":
     music21.mainTest(Test)
