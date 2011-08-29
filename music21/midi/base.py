@@ -3,8 +3,8 @@
 # Name:         midi.base.py
 # Purpose:      music21 classes for dealing with midi data
 #
-# Authors:      Michael Scott Cuthbert
-#               Christopher Ariza
+# Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
 #               (Will Ware -- see docs)
 #
 # Copyright:    (c) 2010-2011 The music21 Project
@@ -270,10 +270,16 @@ class Enumeration(object):
         return Enumeration(lst) 
 
     def hasattr(self, attr): 
-        return self.lookup.has_key(attr) 
+        if attr in self.lookup.keys():
+            return True
+        return False
+        #return self.lookup.has_key(attr) 
 
     def hasValue(self, attr): 
-        return self.reverseLookup.has_key(attr) 
+        if attr in self.reverseLookup.keys():
+            return True
+        return False
+        #return self.reverseLookup.has_key(attr) 
 
     def __getattr__(self, attr): 
         if not self.lookup.has_key(attr): 
@@ -281,7 +287,9 @@ class Enumeration(object):
         return self.lookup[attr] 
 
     def whatis(self, value): 
-        return self.reverseLookup[value] 
+        post = self.reverseLookup[value] 
+        #environLocal.printDebug(['whatis() call: post', post])
+        return post
 
 channelVoiceMessages = Enumeration([("NOTE_OFF", 0x80), 
                                     ("NOTE_ON", 0x90), 
@@ -607,6 +615,8 @@ class MidiEvent(object):
                 self.data = (ord(str[2]) == 0x7F) 
             elif self.type == "MONO_MODE_ON": 
                 self.data = ord(str[2]) 
+            else:
+                environLocal.printDebug(['unhandled message:', str[2]])
             return str[3:]
 
         elif x == 0xF0 or x == 0xF7: 

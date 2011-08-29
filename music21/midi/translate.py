@@ -663,32 +663,55 @@ def keySignatureToMidiEvents(ks, includeDeltaTime=True):
     >>> eventList[1]
     <MidiEvent KEY_SIGNATURE, t=None, track=None, channel=1, data='\\xfb\\x00'>
     '''
-
     mt = None # use a midi track set to None
-
     eventList = []
-
     if includeDeltaTime:
         dt = midiModule.DeltaTime(mt)
         dt.time = 0 # set to zero; will be shifted later as necessary
         # add to track events
         eventList.append(dt)
-
     sharpCount = ks.sharps
     if ks.mode == 'minor':        
         mode = 1
     else: # major or None; must define one
         mode = 0
-
     me = midiModule.MidiEvent(mt)
     me.type = "KEY_SIGNATURE"
     me.channel = 1
     me.time = None # not required
     me.data = midiModule.putNumbersAsList([sharpCount, mode])
     eventList.append(me)
-
     return eventList 
 
+
+def midiEventsToTempo(eventList):
+    '''Convert a single MIDI event into a music21 TimeSignature object.
+
+    >>> from music21 import *
+    '''
+    from music21 import tempo
+
+    if not common.isListLike(eventList):
+        event = eventList
+    else: # get the second event; first is delta time
+        event = eventList[1]
+    # get microseconds per quarter
+    mspq = midiModule.getNumber(event.data, 3)[0] # first data is number
+    bpm = round(60000000.0 / mspq, 2)
+    #post = midiModule.getNumbersAsList(event.data)
+    #environLocal.printDebug(['midiEventsToTempo, got bpm', bpm])
+    mm = tempo.MetronomeMark(number=bpm)
+    return mm
+
+def tempoToMidiEvents(ks, includeDeltaTime=True):
+    '''Convert a single MIDI event into a music21 TimeSignature object.
+
+    >>> from music21 import *
+    '''
+
+    mt = None # use a midi track set to None
+    eventList = []
+    return eventList 
 
 
 
@@ -1057,45 +1080,6 @@ def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None):
     #environLocal.printDebug(['_packetsToEvents', 'total events:', len(events)])
     return events
 
-# DEPRECIATED: use of this function should be removed. instead, use
-# streamsToMidiTracks and get the first element of the list
-# this is necessary for allocating channels independent of track partitions
-# def streamToMidiTrack(inputM21, instObj=None, trackId=1, channels=None):
-#     '''Returns a :class:`music21.midi.base.MidiTrack` object based on the content of this Stream.
-# 
-#     This assumes that this Stream has only one Part. For Streams that contain sub-streams, use streamsToMidiTracks.
-# 
-#     DEPRECIATED: use of this function should be removed. instead, use streamsToMidiTracks and get the first element of the list this is necessary for allocating channels independent of track partitions.
-# 
-#     >>> from music21 import *
-#     >>> s = stream.Stream()
-#     >>> n = note.Note('g#')
-#     >>> n.quarterLength = .5
-#     >>> s.repeatAppend(n, 4)
-#     >>> mt = streamsToMidiTracks(s)[0]
-#     >>> len(mt.events)
-#     22
-#     '''
-#     #environLocal.printDebug(['streamToMidiTrack()'])
-#     s, instObj = _prepareStream(inputM21, instObj)
-#     # assume one track per Stream
-#     mt = midiModule.MidiTrack(trackId)
-# 
-#     # gets track name from instrument object
-#     mt.events += _getStartEvents(mt, channel=1, instrumentObj=instObj) 
-#     # convert stream to packets, attaching track id
-#     packets = _streamToPackets(s, trackId)
-#     # routine that dynamically assigns channels and adds microtones and 
-#     # program changes
-#     packets = _processPackets(packets)
-#     # here events are created
-#     mt.events += _packetsToEvents(mt, packets, trackIdFilter=trackId)
-#     # must update all events with a ref to this MidiTrack
-# 
-#     mt.updateEvents()
-#     mt.events += getEndEvents(mt)
-#     return mt
-
 
 def packetsToMidiTrack(packets, trackId=1, channels=None):
     '''Given packets already allocated with channel and/or instrument assignments, place these in a MidiTrack.
@@ -1233,7 +1217,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
             elif e.type == 'KEY_SIGNATURE':
                 metaEvents.append([t, midiEventsToKeySignature(e)])
             elif e.type == 'SET_TEMPO':
-                pass
+                metaEvents.append([t, midiEventsToTempo(e)])
             elif e.type == 'INSTRUMENT_NAME':
                 # TODO import instrument object
                 pass
@@ -1241,6 +1225,9 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                 pass
             elif e.type == 'MIDI_PORT':
                 pass
+            else:
+                pass
+                #environLocal.printDebug(['unhandled event:', e.type, e.data])
 
     # first create meta events
     for t, obj in metaEvents:
@@ -1473,6 +1460,7 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
         else:
             # note: in some cases a track such as this might have metadata
             # such as the time sig, tempo, or other parameters
+            #environLocal.printDebug(['found midi track without notes:'])
             midiTrackToStream(mt, ticksPerQuarter, quantizePost, 
                               inputM21=conductorTrack)
     #environLocal.printDebug(['show() conductorTrack elements'])
@@ -1530,7 +1518,7 @@ def midiFileToStream(mf, inputM21=None):
     >>> len(s.flat.notesAndRests)
     9
     '''
-    #environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
+    environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
 
     from music21 import stream
     if inputM21 == None:
@@ -2028,6 +2016,20 @@ class Test(unittest.TestCase):
 
 
 
+    def testMidiTempoImportA(self):
+        import os
+        from music21 import converter, common
+
+        dir = common.getPackageDir(relative=False, remapSep=os.sep)
+        for fp in dir:
+            if fp.endswith('midi'):
+                break
+        dirLib = os.path.join(fp, 'testPrimitive')
+        # a simple file created in athenacl
+        fp = os.path.join(dirLib, 'test10.mid')
+        
+        s = converter.parse(fp)
+        self.assertEqual(len(s.flat.getElementsByClass('MetronomeMark')), 4)
 
 if __name__ == "__main__":
     music21.mainTest(Test)
