@@ -185,7 +185,10 @@ class Spanner(music21.Music21Object):
 
         # store this so subclasses can replace
         if self.__module__ != '__main__':
-            self._reprHead = '<' + self.__module__ + '.' + self.__class__.__name__ + ' '
+            if self.__module__.startswith('music21') == False:
+                self._reprHead = '<music21.' + self.__module__ + '.' + self.__class__.__name__ + ' '
+            else:
+                self._reprHead = '<' + self.__module__ + '.' + self.__class__.__name__ + ' '
         else:
             self._reprHead = '<music21.spanner.' + self.__class__.__name__ + ' '
         # store a Stream inside of Spanner

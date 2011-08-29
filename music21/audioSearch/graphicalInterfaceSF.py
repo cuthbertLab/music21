@@ -225,7 +225,7 @@ class SFApp():
         except converter.ConverterException:
             score = corpus.parse(self.nameRecordedSong).parts[0]
         self.scorePart = score
-        self.pageMeasureNumbers = [0] # first measure is 0 in case of pickup
+        self.pageMeasureNumbers = []
         for e in score.flat:
             if 'PageLayout' in e.classes:
                 self.pageMeasureNumbers.append(e.measureNumber)

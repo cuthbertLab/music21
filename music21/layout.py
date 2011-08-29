@@ -525,7 +525,7 @@ class Test(unittest.TestCase):
             if 'PageLayout' in x.classes:
                 retStr += str(x.pageNumber) + ": " + str(x.measureNumber) + ", "
 #        print retStr
-        self.assertEqual(retStr, '2: 23, 3: 50, 4: 80, 5: 103, ')
+        self.assertEqual(retStr, '1: 1, 2: 23, 3: 50, 4: 80, 5: 103, ')
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":

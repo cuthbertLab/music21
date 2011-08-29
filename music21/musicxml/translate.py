@@ -2216,30 +2216,58 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             # mxPrint objects may be found in a Measure's components
             # contain page or system layout information among others
             mxPrint = mxObj
+            addPageLayout = False
+            addSystemLayout = False
             try:
-                newPage = mxPrint.get('new-page')
+                addPageLayout = mxPrint.get('new-page')
+                if addPageLayout is not None: 
+                    addPageLayout = True # false for No??
+                else:
+                    addPageLayout = False
             except xmlnode.XMLNodeException:
+                pass
+            
+            if addPageLayout == False:
                 try:
-                    newPage = mxPrint.get('page-number')
+                    addPageLayout = mxPrint.get('page-number')
+                    if addPageLayout is not None:
+                        addPageLayout = True
+                    else:
+                        addPageLayout = False
                 except xmlnode.XMLNodeException:
-                    newPage = None
+                    addPageLayout = False
+
+            if addPageLayout == False:
+                for layoutType in mxPrint.componentList:
+                    if isinstance(layoutType, musicxmlMod.PageLayout):
+                        addPageLayout = True
+                        break
+
+            
             
             try:   
-                newSystem = mxPrint.get('new-system')
+                addSystemLayout = mxPrint.get('new-system')
+                if addSystemLayout is not None:
+                    addSystemLayout = True # false for No?
+                else:
+                    addSystemLayout = False
             except xmlnode.XMLNodeException:
-                try:
-                    newSystem = mxPrint.get('system-layout')
-                except xmlnode.XMLNodeException:
-                    newSystem = None
+                pass
             
+            if addSystemLayout == False:
+                for layoutType in mxPrint.componentList:
+                    if isinstance(layoutType, musicxmlMod.SystemLayout):
+                        addSystemLayout = True
+                        break
+
             
-            if newPage is not None:
+            if addPageLayout:
                 pl = layout.PageLayout()
                 pl.mx = mxPrint
                 # store at zero position
                 m._insertCore(0, pl)
 
-            if newSystem is not None or newPage is None:
+            if addSystemLayout == True or addPageLayout != True:
                 sl = layout.SystemLayout()
                 sl.mx = mxPrint
                 # store at zero position

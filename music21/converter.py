@@ -1433,6 +1433,10 @@ class Test(unittest.TestCase):
 
         part = a.getElementsByClass(stream.Part)[0]
         systemLayoutList = part.flat.getElementsByClass(layout.SystemLayout)
+        measuresWithSL = []
+        for e in systemLayoutList:
+            measuresWithSL.append(e.measureNumber)
+        self.assertEqual(measuresWithSL, [1, 3, 4, 5, 7, 8])
         self.assertEqual(len(systemLayoutList), 6)
 
 

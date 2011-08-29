@@ -487,9 +487,8 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
     >>> from music21 import *
     >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes        
     >>> import os #_DOCS_HIDE
-    >>> readPath = os.path.dirname(__file__) + os.path.sep #_DOCS_HIDE
+    >>> readPath = os.path.dirname(audioSearch) + os.path.sep #_DOCS_HIDE
     >>> freqFromAQList = getFrequenciesFromAudioFile(waveFilename=readPath + 'test_audio.wav') #_DOCS_HIDE
-    >>> freqFromAQList = getFrequenciesFromAudioFile(waveFilename='test_audio.wav')
     >>> detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale=scale.ChromaticScale('C4'))
     >>> detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
     >>> (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))
