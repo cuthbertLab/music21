@@ -7,7 +7,7 @@ In order to develop music21 and stay current with updates to the latest versions
 to modify code using SVN for Eclipse.
 
 **IMPORTANT: BEFORE BEGINNING, UNINSTALL ALL EXISTING VERSIONS OF MUSIC21. ADDITIONAL VERSIONS OF 
-MUSIC21  INSTALLED IN OTHER LOCATIONS WILL CAUSE FIRE AND BRIMSTONE TO RAIN DOWN FROM THE SKIES.**
+MUSIC21 INSTALLED IN OTHER LOCATIONS CAN CAUSE DIRECTORY ROUTING PROBLEMS.**
 
 
 Installing Eclipse
@@ -70,70 +70,12 @@ After the install is finished, you will be prompted to restart Eclipse, which yo
 
 
 
-Installing Subclipse for Eclipse
-----------------------------------------------
+Installing Subversive
+~~~~~~~~~~~~~~~~~~~~~
 
-Subclipse is an Eclipse Team Provider plug-in providing support 
-for Subversion within the Eclipse IDE. This is the recommended plug-in for Eclipse, but if you 
-continually encounter errors while following these directions, refer to `Dealing with Subversion Native 
-Library Not Available/JavaHL Errors`_ to install Subversive instead. 
+In order for Eclipse to connect to the SVN, you will also have to install Subversive.
 
-Again, you should install Sublcipse from within Eclipse by clicking on "Help" from the Eclipse menu bar and then 
-selecting "Install new software..." Enter the following website into the "Work with:" field of the Install dialog 
-box: http://subclipse.tigris.org/update_1.6.x. When the folders load in the field underneath, select all three and 
-then click on "Next."
-
-Follow the same process as with PyDev, including accepting the terms and continuing despite any security warnings. 
-Again, you will be asked to restart, and you should do so.
-
-.. image:: images/usingEclipse/installingsubclipse.*
-    :width: 650
-
-
-For additional help with installing Subclipse, refer to: https://www.ibm.com/developerworks/opensource/library/os-ecl-subversion
-
-
-Checking Out music21
-----------------------------------------------
-
-Within Eclipse, select "Import" from the "File" menu. Expand the "SVN" option, and then select 
-"Checkout Projects from SVN." and click "Next." 
-
-.. image:: images/usingEclipse/checkingoutfromSVN0.*
-    :width: 650
-
-
-In the "Checkout from SVN" dialog box, select the "Create a new repository location" option.
-
-.. image:: images/usingEclipse/checkingoutfromSVN.*
-    :width: 650
-
-
-Under "New Repository Location url", enter: "http://music21.googlecode.com/svn/trunk"
-
-
-From here on, if you encounter a "Subversion Native Library Not Available" error (especially OSX 
-Lion users), jump to `Dealing with Subversion Native Library Not Available/JavaHL Errors`_.
-
-.. image:: images/usingEclipse/checkingoutfromSVN2.*
-    :width: 650
-    
-    
-The music21 folders should load in the field below. Highlight the "http://music21.googlecode.com/svn/trunk" 
-folder and click "Finish."
-
-.. image:: images/usingEclipse/checkingoutfromSVN3.*
-    :width: 650 
-
-
-
-Dealing with Subversion Native Library Not Available/JavaHL Errors
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you receive an error in a window entitled "Subversion Native Library Not Available,"
-then the easiest solution will be to install a program called Subversive instead.
-
-Click on "Help," then "Install new software..." In the pull-down menu, select "Indigo."  
+To install Subversive, click on "Help," then "Install new software..." In the pull-down menu, select "Indigo."  
 
 .. image:: images/usingEclipse/install_subversive1.*
     :width: 650
@@ -179,14 +121,15 @@ two SVN folders, expand the one that contains "Project from SVN" and select it. 
  
 .. image:: images/usingEclipse/projectfromSVN.*
     :width: 650
+    
+If you have commit access, refer to `Checking Out music21 with Commit Access`_ for more details.
+For standard checkout procedure, continue below.
  
 In the "Checkout from SVN" window, enter http://music21.googlecode.com/svn into the "URL:" field. 
 Select the "Use the repository URL as the label" option, and click on "Next." 
  
 .. image:: images/usingEclipse/checkoutfromSVN.*
     :width: 650
- 
-#TODO: write one for committing users as well using the images that Myke has with the password and what not
  
 Keep the defaults as shown and click "Finish" in the window that follows.
  
@@ -199,6 +142,32 @@ A "Check Out As" window will appear. Keep the defaults as shown and click "Finis
     :width: 650
  
 Continue the process with `Creating a new PyDev Project`_.
+
+
+Checking Out music21 with Commit Access
+----------------------------------------------
+
+In the "Checkout from SVN" window, enter https://music21.googlecode.com/svn into the "URL:" field. 
+Select the "Use the repository URL as the label" option. Under "Authentication," enter the email 
+address of the Google account that you will be using to which commit access has been granted by the 
+developers, and the password that you have been provided. Be sure to check the "Save authentication"
+box if you'd like to avoid being prompted for the same info in the future. Also, make sure the box next to
+"Validate Repository Location on Finish" is selected, and click on "Next."
+
+.. image:: images/usingEclipse/checkingoutwithcommit.*
+    :width: 650
+
+Keep the defaults as shown and click "Finish" in the window that follows.
+ 
+.. image:: images/usingEclipse/selectresource_checkoutfromSVN.*
+    :width: 650
+ 
+A "Check Out As" window will appear. Keep the defaults as shown and click "Finish."  
+ 
+.. image:: images/usingEclipse/checkoutas.*
+    :width: 650
+ 
+Continue the process with `Creating a new PyDev Project`_.    
 
 
 Creating a new PyDev Project
@@ -325,7 +294,7 @@ Next, create an eight-note triplet duration by typing
 ``trip = duration.Duration(0.333333333333333333)``. Music21 recognizes what kind of note typically has 
 that duration, and prints ``'Eight Triplet (0.33QL)'`` when you type ``trip.fullName`` and press Enter.
 
-.. image:: images/usingEclipse/frommusic21import*.*
+.. image:: images/usingEclipse/frommusic21import.*
     :width: 650
     
 To create a user environment settings file, open the music21/configure.py file and run it by pressing 
