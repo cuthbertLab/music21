@@ -906,20 +906,11 @@ def noteToBraille(sampleNote = note.Note('C4'), showOctave = True):
     ⠘⠎⠄
     '''
     noteTrans = []
-    
-    # articulations
-    # -------------
-    if not len(sampleNote.articulations) == 0:    
-        for a in sampleNote.articulations:
-            try:
-                noteTrans.append(beforeNoteExpr[a._mxName])
-            except KeyError:
-                pass
-        
-
     beginLongSlur = False
     endLongSlur = False
     shortSlur = False
+    beamStart = False
+    beamContinue = False
     
     try:
         beginLongSlur = sampleNote.beginLongSlur
@@ -933,34 +924,21 @@ def noteToBraille(sampleNote = note.Note('C4'), showOctave = True):
         shortSlur = sampleNote.shortSlur
     except AttributeError:
         pass
-
-    '''
-    if sampleNote.hasSpannerSite():
-        for sp in sampleNote.getSpannerSites():
-            if isinstance(sp, spanner.Slur):
-                try:
-                    delta = abs(sp[1].index - sp[0].index) + 1
-                    if delta > 4:
-                        if sp.isFirst(sampleNote):
-                            beginLongSlur = True
-                        elif sp.isLast(sampleNote) and SLUR_LONG_PHRASE_WITH_BRACKETS:
-                            endLongSlur = True
-                    else:
-                        if sp.isFirst(sampleNote):
-                            shortSlur = True
-                except AttributeError:
-                    pass
-    else:
-        try:
-            shortSlur = sampleNote.isPartOfShortSlur
-        except AttributeError:
-            pass
-        try:
-            endLongSlur = sampleNote.endLongSlur
-        except AttributeError:
-            pass
-    '''
+    try:
+        beamStart = sampleNote.beamStart
+    except AttributeError:
+        pass
+    try:
+        beamContinue = sampleNote.beamContinue
+    except AttributeError:
+        pass
     
+    if beamStart:
+        allTuplets = sampleNote.duration.tuplets
+        if len(allTuplets) > 0:
+            if allTuplets[0].fullName == 'Triplet':
+                noteTrans.append(symbols['triplet'])
+
     # opening double slur (before second note, after first note)
     # opening bracket slur
     # closing bracket slur (if also beginning of next long slur)
@@ -972,6 +950,16 @@ def noteToBraille(sampleNote = note.Note('C4'), showOctave = True):
             noteTrans.append(symbols['opening_double_slur'])
     if endLongSlur and beginLongSlur and SLUR_LONG_PHRASE_WITH_BRACKETS:
         noteTrans.append(symbols['closing_bracket_slur'])
+
+    # signs of expression or execution that precede a note
+    # articulations
+    # -------------
+    if not len(sampleNote.articulations) == 0:    
+        for a in sampleNote.articulations:
+            try:
+                noteTrans.append(beforeNoteExpr[a._mxName])
+            except KeyError:
+                pass
         
     # accidental
     # ----------
@@ -991,7 +979,10 @@ def noteToBraille(sampleNote = note.Note('C4'), showOctave = True):
     try:
         # note name with duration
         # -----------------------
-        nameWithDuration = notesInStep[sampleNote.duration.type]
+        if beamContinue:
+            nameWithDuration = notesInStep['eighth']
+        else:
+            nameWithDuration = notesInStep[sampleNote.duration.type]
         noteTrans.append(nameWithDuration)
         # dot(s)
         # ------
@@ -1126,16 +1117,6 @@ def noteGroupingsToBraille(sampleMeasure = stream.Measure(), showLeadingOctave =
                 noteGroupingTrans.append(clefSigns['tenor'])
                 previousNote = None
                 showLeadingOctave = True
-        elif isinstance(element, stream.Measure):
-            if previousNote == None:
-                doShowOctave = showLeadingOctave
-            else:
-                doShowOctave = showOctaveWithNote(previousNote, element.notes[0])
-            isPrecededByRest = False
-            if not(previousElement == None) and isinstance(previousElement, note.Rest) and previousElement.duration.type == element.notes[0].duration.type:
-                isPrecededByRest = True
-            noteGroupingTrans.append(beamGroupToBraille(sampleBeamGroup = element, showLeadingOctave = doShowOctave, isPrecededByRest = isPrecededByRest))
-            previousNote = element.notes[-1]
         elif isinstance(element, note.Note):
             if previousNote == None:
                 doShowOctave = showLeadingOctave
@@ -1247,7 +1228,7 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
     except KeyError:
         bt = BrailleText()
     
-    sampleMeasure = makeBeamGroups(sampleMeasure = sampleMeasure)
+    prepareBeamedNotes(sampleMeasure = sampleMeasure)
     keyOrTimeSig = sampleMeasure.getElementsByClass([key.KeySignature, meter.TimeSignature])
     offsets = []
     kts_braille = {}
@@ -1433,6 +1414,37 @@ def partToBraille(samplePart = stream.Part(), **keywords):
     SHOW_LONG_SLURS_AND_TIES_TOGETHER = False
     return bt
 
+def keyboardPartsToBraille(keyboardStyle = stream.Part(), **keywords):
+    '''
+    Translates a stream Part consisting of two stream Parts, a right hand and left hand,
+    into braille music bar over bar format.
+    '''
+    recenterHeading = False
+    if 'recenterHeading' in keywords:
+        recenterHeading = keywords['recenterHeading']
+
+    rightHand = keyboardStyle[0]
+    leftHand = keyboardStyle[1]
+
+    bt = BrailleText()
+    bt.addElement(heading = extractBrailleHeading(rightHand[0]))
+    bt.highestMeasureNumberLength = len(str(rightHand.getElementsByClass(stream.Measure)[-1].number))
+    
+    for rhMeasure in rightHand:
+        lhMeasure = leftHand.measure(rhMeasure.number)
+        prepareBeamedNotes(rhMeasure)
+        prepareBeamedNotes(lhMeasure)
+        rh_braille = noteGroupingsToBraille(rhMeasure)[0]
+        lh_braille = noteGroupingsToBraille(lhMeasure)[0]
+        bt.addElement(pair = (numberToBraille(sampleNumber = rhMeasure.number)[1:], rh_braille, lh_braille))
+
+    if recenterHeading:
+        bt.recenterHeading()
+    return bt
+
+#-------------------------------------------------------------------------------
+# Methods for preparing slurred/beamed notes in streams.
+
 def prepareSlurredNotes(samplePart = stream.Part()):
     if not len(samplePart.spannerBundle) > 0:
         return
@@ -1464,91 +1476,63 @@ def prepareSlurredNotes(samplePart = stream.Part()):
                 allNotes[beginIndex + 1].beginLongSlur = True
                 allNotes[endIndex - 1].endLongSlur = True
 
-def keyboardPartsToBraille(keyboardStyle = stream.Part(), **keywords):
-    '''
-    Translates a stream Part consisting of two stream Parts, a right hand and left hand,
-    into braille music bar over bar format.
-    '''
-    recenterHeading = False
-    if 'recenterHeading' in keywords:
-        recenterHeading = keywords['recenterHeading']
-
-    rightHand = keyboardStyle[0]
-    leftHand = keyboardStyle[1]
-
-    bt = BrailleText()
-    bt.addElement(heading = extractBrailleHeading(rightHand[0]))
-    bt.highestMeasureNumberLength = len(str(rightHand.getElementsByClass(stream.Measure)[-1].number))
+def prepareBeamedNotes(sampleMeasure = stream.Measure()):
+    allNotes = sampleMeasure.notes
+    for sampleNote in allNotes:
+        sampleNote.beamStart = False
+        sampleNote.beamContinue = False
+    allNotesAndRests = sampleMeasure.notesAndRests
+    allNotesWithBeams = allNotes.splitByClass(None, lambda sampleNote: not(sampleNote.beams == None) and len(sampleNote.beams) > 0)[0]
+    allStart = allNotesWithBeams.splitByClass(None, lambda sampleNote: sampleNote.beams.getByNumber(1).type is 'start')[0]
+    allStop  = allNotesWithBeams.splitByClass(None, lambda sampleNote: sampleNote.beams.getByNumber(1).type is 'stop')[0]
     
-    for rhMeasure in rightHand:
-        lhMeasure = leftHand.measure(rhMeasure.number)
-        rhMeasure = makeBeamGroups(rhMeasure)
-        lhMeasure = makeBeamGroups(lhMeasure)
-        rh_braille = noteGroupingsToBraille(rhMeasure)[0]
-        lh_braille = noteGroupingsToBraille(lhMeasure)[0]
-        bt.addElement(pair = (numberToBraille(sampleNumber = rhMeasure.number)[1:], rh_braille, lh_braille))
-
-    if recenterHeading:
-        bt.recenterHeading()
-    return bt
-
-
-# A (very) primitive stab at beamed notes
-# ----------------------------------------
-def makeBeamGroups(sampleMeasure = stream.Measure()):
-    splitA = sampleMeasure.splitByClass(None, lambda element: isinstance(element, note.GeneralNote) and not isinstance(element, note.Rest))
-    allNotes = splitA[0]
-    nonNotes = splitA[1]
-    splitB = allNotes.splitByClass(None, lambda sampleNote: not(sampleNote.beams) == None and len(sampleNote.beams) > 0)
-    allNotesWithBeams = splitB[0]
-    allRemainingNotes = splitB[1]
-    splitC = allNotesWithBeams.splitByClass(None, lambda n: n.beams.getByNumber(1).type is 'start' or n.beams.getByNumber(1).type is 'stop')
-    startOrStopNotes = splitC[0]
-    otherBeamedNotes = splitC[1]
-    for noteStartIndex in range(len(startOrStopNotes) / 2):
-        startOffset = startOrStopNotes[2 * noteStartIndex].offset
-        stopOffset = startOrStopNotes[2 * noteStartIndex + 1].offset
-        beamGroup = allNotes.getElementsByOffset(startOffset, stopOffset)
-        beamGroup.duration = duration.Duration(beamGroup.highestTime - startOffset)
-        beamGroup.label = 'beam_group'
-        nonNotes.insert(startOffset, beamGroup)
-    for element in otherBeamedNotes:
-        if element.beams.getByNumber(1).type == 'partial':
-            nonNotes.insert(element.offset, element)
-    for nonBeamedNote in allRemainingNotes:
-        nonNotes.insert(nonBeamedNote.offset, nonBeamedNote)
-    nonNotes.mergeAttributes(sampleMeasure)   
-    return nonNotes
-
-def beamGroupToBraille(sampleBeamGroup = stream.Measure(), showLeadingOctave = True, isPrecededByRest = False):
-    if len(sampleBeamGroup) < 3:
-        return noteGroupingsToBraille(sampleBeamGroup, showLeadingOctave = showLeadingOctave)[0]
+    if not(len(allStart) == len(allStop)):
+        raise BrailleTranslateException("Incorrect beaming: number of start notes != to number of stop notes.")
     
-    previousNote = sampleBeamGroup[0]
-    for currentNote in sampleBeamGroup[1:]:
-        if not currentNote.duration.type == previousNote.duration.type:
-            return noteGroupingsToBraille(sampleBeamGroup, showLeadingOctave = showLeadingOctave)[0]
+    for beamIndex in range(len(allStart)):
+        startNote = allStart[beamIndex]
+        stopNote = allStop[beamIndex]
+        startIndex = allNotesAndRests.index(startNote)
+        stopIndex = allNotesAndRests.index(stopNote)
+        delta = stopIndex - startIndex + 1
+        if delta < 3: # 2. The group must be composed of at least three notes.
+            continue
+        # 1. All notes in the group must have precisely the same value.
+        # 3. A rest of the same value may take the place of the first note in a group, 
+        # but if the rest is located anywhere else, grouping may not be used.
+        allNotesOfSameValue = True
+        for noteIndex in range(startIndex+1, stopIndex+1):
+            if not(allNotesAndRests[noteIndex].duration.type == startNote.duration.type) or isinstance(allNotesAndRests[noteIndex], note.Rest):
+                allNotesOfSameValue = False
+                break
+        try:
+            afterStopNote = allNotesAndRests[stopIndex+1]
+            if isinstance(afterStopNote, note.Rest) and (int(afterStopNote.beat) == int(stopNote.beat)):
+                allNotesOfSameValue = False
+                continue
+        except IndexError: # stopNote is last note of measure.
+            pass
+        if not allNotesOfSameValue:
+            continue
+        try:
+            # 4. If the notes in the group are followed immediately by a true eighth note or by an eighth rest, 
+            # grouping may not be used, unless the eighth is located in a new measure.
+            if allNotesAndRests[stopIndex+1].quarterLength == 0.5:
+                continue
+        except IndexError: # stopNote is last note of measure.
+            pass
+        startNote.beamStart = True
+        try:
+            beforeStartNote = allNotesAndRests[startIndex - 1]
+            if isinstance(beforeStartNote, note.Rest) and (int(beforeStartNote.beat) == int(startNote.beat)) and \
+                (beforeStartNote.duration.type == startNote.duration.type):
+                startNote.beamContinue = True
+        except IndexError: # startNote is first note of measure.
+            pass
+        for noteIndex in range(startIndex+1, stopIndex+1):
+            allNotesAndRests[noteIndex].beamContinue = True
     
-    trans = []
-    if not isPrecededByRest:
-        previousNote = sampleBeamGroup[0]
-    else:
-        previousNote = note.Note(sampleBeamGroup[0].pitch, quarterLength = 0.5)
-    allTuplets = previousNote.duration.tuplets
-    if len(allTuplets) > 0:
-        if allTuplets[0].fullName == 'Triplet':
-            trans.append(symbols['triplet'])
-    trans.append(noteToBraille(previousNote, showOctave = showLeadingOctave))
-    for currentNote in sampleBeamGroup[1:]:
-        if isinstance(currentNote, note.Note):
-            newNote = copy.deepcopy(currentNote)
-            newNote.quarterLength = 0.5
-            doShowOctave = showOctaveWithNote(previousNote, currentNote)
-            trans.append(noteToBraille(newNote, showOctave = doShowOctave))
-            previousNote = currentNote
-        elif isinstance(currentNote, note.Rest):
-            noteGroupingTrans.append(restToBraille(sampleRest = element))
-    return u"".join(trans)
+    return
 
 #-------------------------------------------------------------------------------
 # Translation between braille unicode and ASCII/other symbols.
