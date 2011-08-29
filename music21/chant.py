@@ -167,12 +167,12 @@ class GregorianNote(music21.note.Note):
         elif self.stropha == True:
             letter += 's'
         if self.liquescent != False:
-            if nextNote is not None:
-                if nextNote.diatonicNoteNum > self.diatonicNoteNum:
-                    letter += '<'
-                else:
-                    letter += '>'
-            elif self.liquescent == 'ascending':
+            #if nextNote is not None:
+            #   if nextNote.diatonicNoteNum > self.diatonicNoteNum:
+            #        letter += '<'
+            #    else:
+            #        letter += '>'
+            if self.liquescent == 'ascending':
                 letter += '<'
             elif self.liquescent == 'descending':
                 letter += '<'
@@ -538,7 +538,12 @@ class TestExternal(unittest.TestCase):
         n2 = GregorianNote("D4")
         s.append(n2)
         n3 = GregorianNote("C4")
+        n3.stropha = True
         s.append(n3)
+        n4 = GregorianNote("B3")
+        n4.stropha = True
+        s.append(n4)
+
         gabcText = s.toGABCText()
         bsc = BaseScoreConverter()
         bsc.score = gabcText
