@@ -35,10 +35,12 @@ from music21.audioSearch import recording
 from music21.audioSearch import scoreFollower
  
 try:
-    import ctypes
+    import AppKit
+    print 'import done! appkit'
 except:
     try:
-        AppKit
+        import ctypes
+        print 'import ctypes'
     except:
         pass
  
@@ -87,12 +89,15 @@ class SFApp():
                 print "screen resolution (MAC or linux)", self.screenResolution[0], self.screenResolution[1]
                 self.resolution = True             
             except:
+                
+                self.screenResolution = [1024,600]
+                print 'screen resolution not detected'
                 self.resolution = False    
                 
-        self.y = int(self.resolution[1] / 1.25)
+        self.y = int(self.screenResolution[1] / 1.25)
         self.x = int(self.y / 1.29)# 1.29 = side relation of letter paper
-        if self.x > 1024 / 2.6:
-            self.x = int(1024 / 2.6)
+        if self.x > self.screenResolution[0] / 2.6: # 2.6 is a factor to scale canvas
+            self.x = int(self.screenResolution[0] / 2.6)
             self.y = int(self.x * 1.29)
             print "resized! too big"
         print "canvas size", self.x, self.y    
