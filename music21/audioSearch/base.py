@@ -338,7 +338,7 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     >>> #_DOCS_SHOW readFile = 'pachelbel.wav' 
     >>> import os #_DOCS_HIDE
     >>> readPath = os.path.dirname(__file__) #_DOCS_HIDE
-    >>> readFile = readPath + os.path.sep + 'pachelbel.wav' #_DOCS_HIDE
+    >>> readFile = readPath + os.path.sep + 'test_audio.wav' #_DOCS_HIDE
     >>> frequencyList, pachelbelFileHandle, currentSample  = getFrequenciesFromPartialAudioFile(readFile, length=1.0)
     >>> for i in range(5):
     ...     print frequencyList[i]
@@ -346,7 +346,7 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     99.0835452019
     211.004784689
     4700.31347962
-    280.166765932
+    767.827403482
     >>> print currentSample  # should be near 44100, but probably not exact
     44032
 
@@ -355,11 +355,11 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     >>> frequencyList, pachelbelFileHandle, currentSample  = getFrequenciesFromPartialAudioFile(pachelbelFileHandle, length=1.0, startSample = currentSample)
     >>> for i in range(5):
     ...     print frequencyList[i]
-    1039.11088678
-    832.502678838
-    739.558476039
-    741.555921421
-    741.920964565
+    187.798213268
+    238.263483185
+    409.700397349
+    149.958733396
+    101.989786226
     >>> print currentSample  # should be exactly double the previous
     88064
 
@@ -788,7 +788,7 @@ def decisionProcess(list, notePrediction, beginningData, lastNotePosition, count
         countdown += 1
     else:
         countdown = 0
-  
+    #print '****????**** DECISION PROCESS: dist from expected: %d, beginning data: %d , lastNotePos: %d' %(dist, beginningData[int(list[i].id)],lastNotePosition)
     return position, countdown
 
     

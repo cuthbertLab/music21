@@ -293,7 +293,8 @@ class ScoreFollower(object):
                 self.begins = False
                 print "GO!"
             if self.countdown >= 5:
-                exitType = "5consecutiveCountdownsBeginning"               
+                exitType = "5consecutiveCountdownsBeginning"     
+                      
         
         return exitType
          
@@ -368,7 +369,7 @@ class ScoreFollower(object):
             scNotes.id = name
             totScores.append(scNotes)  
     
-        listOfParts = search.approximateNoteSearch(transcribedScore.flat.notes, totScores)
+        listOfParts = search.approximateNoteSearch(transcribedScore.flat.notesAndRests, totScores)
             
         #decision process    
         if notePrediction > len(scoreStream) - tn_recording - hop - 1:
@@ -409,7 +410,7 @@ class TestExternal(unittest.TestCase):
         #scoreNotes = ["d8", "b8", "a8", "g8", "d2", "b8", "a8", "g8", "e2", "c'8", "b8", "a8", "f#2", "d8", "e8", "d8", "c8", "a8", "b8", "r4", "d4", "b4", "a4", "g4", "d4", "b4", "a4", "g4", "e4", "c4", "b4", "a4", "d4", "e4", "d4", "c4", "a4", "g4", "b4", "d4", "g4", "a4", "b4", "c4", "b4", "a4", "b4", "a4", "d4", "b4", "d4", "g4", "a4", "b4", "c4", "b4", "d4", "c4", "a4", "g4"]
         #scoreNotes = ["f'#4", "e'", "d'", "c'#", "b", "a", "b", "c'#", "d'", "c'#", "b", "a", "g", "f#", "g", "e", "d8", "f#", "a", "g", "f#", "d", "f#", "e", "d", "B", "d", "a", "g", "b", "a", "g", "f#", "d", "e", "c'#", "d'", "f'#", "a'", "a", "b", "g", "a", "f#", "d", "d'16", "e'", "d'8", "c'#", "d'16", "c'#", "d'", "d", "c#", "a", "e", "f#", "d", "d'", "c'#", "b", "c'#", "f'#", "a'", "b'", "g'", "f'#", "e'", "g'", "f'#", "e'", "d'", "c'#", "b", "a", "g", "f#", "e", "g", "f#", "e", "d", "e", "f#", "g", "a", "e", "a", "g", "f#", "b", "a", "g", "a", "g", "f#", "e", "d", "B", "b", "c'#", "d'", "c'#", "b", "a", "g", "f#", "e", "b", "a", "b", "a", "g", "f#8", "f'#", "e'4", "d'", "f'#", "b'4", "a'", "b'", "c'#'", "d''8", "d'", "c'#4", "b", "d'"]
         #scNotes = converter.parse(" ".join(scoreNotes), "4/4")
-        scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
+        scNotes = corpus.parse('luca/gloria').parts[0].flat.notesAndRests
         ScF = ScoreFollower(scoreStream=scNotes)
         ScF.runScoreFollower(show=True, plot=False, useMic=True, seconds=10.0)
     

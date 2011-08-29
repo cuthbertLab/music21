@@ -334,18 +334,15 @@ class SFApp():
             self.ntimes = 0
             self.newcoords = self.positionxRight, self.positionyLeft
             self.canvas1.create_image(self.positionx3rd, self.positiony3rd, image=self.phimage[self.currentPage + 1], tag='3rdImage')
-            #self.canvas1.pack(side='left')
-            # REMOVE! some part           
-            #self.secondsPerMeasure = 1
+
             self.refreshTime = 40
-            #provisional = 96
             print "BEFORE COMPUTUING SPEED", self.secondsPerMeasure
             if self.secondsPerMeasure != None:                
                 distanceInPixels = self.positionxRight - self.positionxLeft
                 availableTime = self.secondsPerMeasure * (self.pageMeasureNumbers[self.currentPage + 1] - self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber)
                 print "AVAILABLE TIME", availableTime, distanceInPixels
                 totalIterations = (availableTime * 1000) / self.refreshTime
-                print "totaliretations" , totalIterations
+                print "totaliterations" , totalIterations
                 self.speed = 2 * (distanceInPixels / totalIterations) # the "2" is to give more speed
                 print "speed", self.speed
                 if self.speed < 3:
@@ -437,9 +434,9 @@ class SFApp():
        
     def startScoreFollower(self):
         
-        self.button2 = Tkinter.Button(self.master, text="Start SF", width=self.sizeButton, command=self.startScoreFollower, state='disable', bg='green')
+        self.button2 = Tkinter.Button(self.master, text="START SF", width=self.sizeButton, command=self.startScoreFollower, state='disable', bg='green')
         self.button2.grid(row=5, column=3)        
-        scNotes = self.scorePart.flat.notes
+        scNotes = self.scorePart.flat.notesAndRests
         ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         #ScF.runSFGraphic = self.runSFGraphic
         #ScF.runScoreFollower(show=True, plot=False, useMic=True, seconds=10.0)
@@ -477,7 +474,6 @@ class SFApp():
         if self.stop == False and (self.firstTimeSF == True or self.rt.resultInThread == False):
             
             self.lastNoteString = 'Note: %d, Measure: %d, Countdown:%d, Page:%d' % (self.ScF.lastNotePosition, self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber , self.ScF.countdown, self.currentPage) 
-            print "prova notes", self.ScF.scoreStream[0]
             if self.firstTimeSF == False:
                 self.textVarComments.set("1st meas: %d, last meas: %d" % (self.ScF.scoreStream[self.ScF.firstNotePage].measureNumber, self.ScF.scoreStream[self.ScF.lastNotePage].measureNumber))
             self.firstTimeSF = False
@@ -488,19 +484,19 @@ class SFApp():
                 print "3 or more pages remaining", self.firstTimeSF, self.ScF.lastNotePage
             elif self.currentPage < self.totalPagesScore:
                 self.ScF.lastNotePage = self.beginningPages[self.currentPage + 1] - 1
-                print "2 pages remaining", self.firstTimeSF, self.ScF.lastNotePage
+                print "2 pages on the screen", self.firstTimeSF, self.ScF.lastNotePage
             else:
                 self.ScF.lastNotePage = self.beginningPages[self.currentPage] - 1
-                print "last page", self.firstTimeSF, self.ScF.lastNotePage   
+                print "only one page on the screen", self.firstTimeSF, self.ScF.lastNotePage   
             
             self.rt = RecordThread(self.dummyQueue, self.sampleQueue, self.ScF)            
             self.rt.daemon = True
             self.rt.start() # the 2nd thread starts here
             self.dummyQueue.put("Start")            
-            self.master.after(6000, self.analyzeRecording)
+            self.master.after(7000, self.analyzeRecording)
         else:
             self.button2.destroy() 
-            self.button2 = Tkinter.Button(self.master, text="Start SF", width=self.sizeButton, command=self.startScoreFollower, bg='green')
+            self.button2 = Tkinter.Button(self.master, text="START SF", width=self.sizeButton, command=self.startScoreFollower, bg='green')
             self.button2.grid(row=5, column=3)
             self.textVarComments.set('END!! %s' % (self.rt.resultInThread))
 
@@ -509,7 +505,7 @@ class SFApp():
         self.rt.outQueue.get()
         print "positions", self.previousLastNotePosition, self.ScF.lastNotePosition
         if self.previousLastNotePosition != None:
-            print "COMPUTING SECONDS PER MEAS", time.time() - self.timeStart, self.ScF.scoreStream[self.previousLastNotePosition].measureNumber , self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber
+    #        print "COMPUTING SECONDS PER MEAS", time.time() - self.timeStart, self.ScF.scoreStream[self.previousLastNotePosition].measureNumber , self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber
             self.secondsPerMeasure = (time.time() - self.timeStart) / ((self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber - self.ScF.scoreStream[self.previousLastNotePosition].measureNumber) + 1)
             print "seconds per measure", self.secondsPerMeasure
         self.previousLastNotePosition = self.ScF.lastNotePosition
@@ -530,25 +526,25 @@ class SFApp():
                     totalPagesToMove = 0
                 else:       
                     totalPagesToMove = pageNumber - self.currentPage
-                print "TOTAL PAGES TO MOVE", totalPagesToMove, pageNumber, self.currentPage
+  #              print "TOTAL PAGES TO MOVE", totalPagesToMove, pageNumber, self.currentPage
                 if totalPagesToMove > 0:                                  
                     for i in range(totalPagesToMove):
                         self.pageForward()
-                    print "has played a note not shown in the score (forward)"
+ #                   print "has played a note not shown in the score (forward)"
                 elif totalPagesToMove < 0:
                      for i in range(int(math.fabs(totalPagesToMove))):
                         self.pageBackward()                   
-                     print "has played a note not shown in the score (backward)"
+#                     print "has played a note not shown in the score (backward)"
 
             
             elif self.ScF.lastNotePosition >= self.middlePages[self.currentPage] and self.isMoving == False:  #50% case
                 self.isMoving = True
                 self.moving()
-                print "playing a note of the second half part of the right page"
+                #print "playing a note of the second half part of the right page"
                 
             elif self.ScF.lastNotePosition >= self.beginningPages[self.currentPage] and self.ScF.lastNotePosition < self.middlePages[self.currentPage] + self.beginningPages[self.currentPage]: 
                 self.hits += 1
-                print "playing a note of the first half part of the right page: hits=%d" % self.hits
+                #print "playing a note of the first half part of the right page: hits=%d" % self.hits
                 if self.hits == 2:
                     self.hits = 0
                     if self.isMoving == False:
@@ -556,7 +552,7 @@ class SFApp():
                         self.moving()
             else:
                 self.hits = 0
-                print "playing a note of the left page"
+                #print "playing a note of the left page"
        
         
         print '------------------last note position', self.ScF.lastNotePosition
