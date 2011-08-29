@@ -100,8 +100,10 @@ class SFApp():
             self.x = int(self.screenResolution[0] / 2.6)
             self.y = int(self.x * 1.29)
             print "resized! too big"
-        print "canvas size", self.x, self.y    
+        print "one page score size", self.x, self.y    
         self.filenameRequest()
+        
+        
     def filenameRequest(self):
         master = self.master
         self.textVarName = Tkinter.StringVar()
