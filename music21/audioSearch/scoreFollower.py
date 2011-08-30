@@ -368,7 +368,7 @@ class ScoreFollower(object):
             lengthData.append(tn_recording)
             scNotes.id = name
             totScores.append(scNotes)  
-        listOfParts = search.approximateNoteSearch(transcribedScore.flat.notesAndRests, totScores)
+        listOfParts = search.approximateNoteSearchWeighted(transcribedScore.flat.notesAndRests, totScores)
             
         #decision process    
         if notePrediction > len(scoreStream) - tn_recording - hop - 1:
@@ -388,6 +388,15 @@ class ScoreFollower(object):
             probabilityHit = 0
         else:
             probabilityHit = listOfParts[position].matchProbability
+
+        listOfParts2 = search.approximateNoteSearch(transcribedScore.flat.notesAndRests, totScores)
+        listOfParts3 = search.approximateNoteSearchNoRhythm(transcribedScore.flat.notesAndRests, totScores)    
+        listOfParts4 = search.approximateNoteSearchOnlyRhythm(transcribedScore.flat.notesAndRests, totScores)        
+        print "PROBABILITIES:",
+        print "pitches and durations weighted (current)",listOfParts[position].matchProbability,
+        print "pitches and durations without wieghting" , listOfParts2[position].matchProbability,
+        print "pitches", listOfParts3[position].matchProbability,
+        print "durations",listOfParts4[position].matchProbability
             
         for i in range(len(totScores[number])):
             totalLength = totalLength + totScores[number][i].quarterLength
