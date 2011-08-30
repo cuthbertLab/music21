@@ -17,7 +17,7 @@ connect notes in different Measure objects or even between different parts.
 
 This package defines some of the most common spanners.  Other spanners
 can be found in modules such as :ref:`moduleDynamics` (for things such as crescendos)
-or in :ref:`moduleMeter` (a ritardando for instance).
+or in :ref:`moduleMeter` (a ritardando, for instance).
 '''
 
 import unittest
@@ -42,13 +42,12 @@ class SpannerBundleException(Exception):
 #-------------------------------------------------------------------------------
 class Spanner(music21.Music21Object):
     '''
-    Spanner objects live on Streams as other Music21Objects, but 
-    store connections between one or more Music21Objects.
-
-    Most of the time you will want to subclass Spanner
-    for specific purposes.  
+    Spanner objects live on Streams in the same manner as other Music21Objects, but represent and store connections between one or more other Music21Objects.
 
     Commonly used Spanner subclasses include the :class:`~music21.spanner.Slur`, :class:`~music21.spanner.RepeatBracket`, :class:`~music21.spanner.Crescendo`, and :class:`~music21.spanner.Diminuendo`.
+
+    In some cases you will want to subclass Spanner
+    for specific purposes.  
 
     In the first demo, we create
     a spanner to represent a written-out accelerando, such

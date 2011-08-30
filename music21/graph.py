@@ -517,6 +517,10 @@ class GraphNetworxGraph(Graph):
     Requires the optional networkx module.
     
     '''
+    _DOC_ATTR = {
+        'networkxGraph' : '''An instance ofa  networkx graph object. '''
+    }
+
 #     >>> from music21 import *
 #     >>> #_DOCS_SHOW g = graph.GraphNetworxGraph()
 # 
