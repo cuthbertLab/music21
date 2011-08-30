@@ -165,16 +165,18 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     >>> dt2 = midi.DeltaTime(mt)
     >>> dt2.time = 2048
 
-    >>> me1 = midi.MidiEvent(mt)
-    >>> me1.type = "NOTE_ON"
-    >>> me1.pitch = 45
-    >>> me1.velocity = 0
+    >>> me2 = midi.MidiEvent(mt)
+    >>> me2.type = "NOTE_ON"
+    >>> me2.pitch = 45
+    >>> me2.velocity = 0
 
-    >>> n = midiEventsToNote([dt1, me1, dt2, me1])
+    >>> n = midiEventsToNote([dt1, me1, dt2, me2])
     >>> n.pitch
     A2
     >>> n.duration.quarterLength
     1.0
+    >>> n._midiVelocity
+    94
     '''
     if inputM21 == None:
         from music21 import note
@@ -201,6 +203,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
         raise TranslateException('cannot handle MIDI event list in the form: %r', eventList)
 
     n.pitch.midi = eOn.pitch
+    n._midiVelocity = eOn.velocity
     # here we are handling an occasional error that probably should not happen
     # TODO: handle chords
     if (tOff - tOn) != 0:
