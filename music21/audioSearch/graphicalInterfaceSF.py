@@ -45,8 +45,8 @@ except:
         pass
  
  
- # TO DO
- # the same name for the score and the song!!!!
+# TO DO
+# the same name for the score and the song!!!!
  
 class SFApp():
    
@@ -55,7 +55,6 @@ class SFApp():
             raise music21.Music21Exception("Need PIL installed to run Score Follower")
         self.master = master
         self.frame = Tkinter.Frame(master)
-        #self.frame.pack()
         self.master.wm_title("Score follower - music21")
         
         self.scoreNameSong = 'scores/d luca gloria_Page_' #'d:/desktop/Saint-Saens-Clarinet-Sonata/Saint-Saens-Clarinet-Sonata_Page_'  #'scores/test_pages_'         
@@ -88,9 +87,8 @@ class SFApp():
                     self.screenResolution = [int(screen.frame().size.width), int(screen.frame().size.height)]             
                 print "screen resolution (MAC or linux)", self.screenResolution[0], self.screenResolution[1]
                 self.resolution = True             
-            except:
-                
-                self.screenResolution = [1024,600]
+            except:                
+                self.screenResolution = [1024, 600]
                 print 'screen resolution not detected'
                 self.resolution = False    
                 
@@ -110,7 +108,6 @@ class SFApp():
         self.box = Tkinter.Entry(master, width=2 * self.sizeButton, textvariable=self.textVarName)
         self.textVarName.set(self.scoreNameSong)
         self.box.grid(row=0, column=3, columnspan=2)
-        #box.pack()
                             
         self.buttonSubmit = Tkinter.Button(master, text="Submit score name",
                                            width=2 * self.sizeButton, command=self.startMainCanvas)
@@ -131,8 +128,7 @@ class SFApp():
             print 'no he pogut'
             print 'nom', self.scoreNameSong
         self.initializeGraphicInterface()
-        print 'Initialized!'
-        
+        print 'Initialized!'        
         
         
     def initializeName(self):   
@@ -148,7 +144,8 @@ class SFApp():
                 pilPage = pilPage.convert("RGB")
             pilPage = self.cropBorder(pilPage)
             self.pagesScore.append(pilPage.resize(self.newSize, PILImage.ANTIALIAS))
-            self.phimage.append(PILImageTk.PhotoImage(self.pagesScore[i]))                 
+            self.phimage.append(PILImageTk.PhotoImage(self.pagesScore[i]))   
+                          
       
     def cropBorder(self, img, minColor=240, maxColor=256):
         colorRange = range(minColor, maxColor)
@@ -232,7 +229,6 @@ class SFApp():
         lastMeasure = score.getElementsByClass('Measure')[-1].measureNumber
         self.pageMeasureNumbers.append(lastMeasure)
         self.totalPagesScore = len(self.pageMeasureNumbers) - 1
-        #print self.pageMeasureNumbers
 
         scNotes = score.flat.notesAndRests
         noteCounter = 1
@@ -267,8 +263,7 @@ class SFApp():
         self.positionx3rd = math.floor(2.5 * self.x + 2 * self.separation)
         self.positiony3rd = math.floor(self.y / 2)
         self.sizeCanvasx = 2 * self.x + self.separation
-        self.sizeCanvasy = self.y
-    
+        self.sizeCanvasy = self.y    
         
         self.canvas1 = Tkinter.Canvas(master, borderwidth=1, width=self.sizeCanvasx, height=self.sizeCanvasy, bg="black")
         self.canvas1.create_image(self.positionxLeft, self.positionyLeft, image=self.phimage[0], tag='leftImage')
@@ -276,7 +271,7 @@ class SFApp():
         if self.totalPagesScore >= 2:
             self.canvas1.create_image(self.positionxRight, self.positionyRight, image=self.phimage[1], tag='rightImage')
         self.canvas1.grid(row=1, column=0, columnspan=3, rowspan=7)
-        #self.canvas1.pack()#(side='left')       
+
         self.textVarTitle = Tkinter.StringVar()
         self.textVarTitle.set('%s' % self.scoreNameSong) 
         self.labelTitle = Tkinter.Label(master, textvariable=self.textVarTitle)
@@ -286,7 +281,6 @@ class SFApp():
         self.textVar2.set('Right page: %d/%d' % (self.currentPage + 1, self.totalPagesScore)) 
         self.label2 = Tkinter.Label(master, textvariable=self.textVar2)
         self.label2.grid(row=0, column=2, sticky=Tkinter.E)
-        #self.label2.pack(side=Tkinter.RIGHT)
         
         self.textVar1 = Tkinter.StringVar()
         self.textVar1.set('Left page: %d/%d' % (self.currentPage, self.totalPagesScore))            
@@ -301,18 +295,15 @@ class SFApp():
             
             self.button3 = Tkinter.Button(master, text="1st page", width=self.sizeButton, command=self.goTo1stPage)
             self.button3.grid(row=4, column=3)
-            #self.button3.pack()#(side=Tkinter.BOTTOM)
             
             self.button3 = Tkinter.Button(master, text="Last page", width=self.sizeButton, command=self.goToLastPage)
             self.button3.grid(row=4, column=4)
             
             self.button4 = Tkinter.Button(master, text="Forward", width=self.sizeButton, command=self.pageForward)
             self.button4.grid(row=3, column=4)
-            #self.button4.pack()
             
             self.button7 = Tkinter.Button(master, text="Backward", width=self.sizeButton, command=self.pageBackward)
             self.button7.grid(row=3, column=3)
-            #self.button7.pack()
             
             self.button5 = Tkinter.Button(master, text="MOVE", width=self.sizeButton, command=self.moving, bg='beige')
             self.button5.grid(row=2, column=3)
@@ -343,16 +334,20 @@ class SFApp():
                 print "AVAILABLE TIME", availableTime, distanceInPixels
                 totalIterations = (availableTime * 1000) / self.refreshTime
                 print "totaliterations" , totalIterations
-                self.speed = 2 * (distanceInPixels / totalIterations) # the "2" is to give more speed
+                self.speed = 2 * (distanceInPixels / totalIterations) * int(self.screenResolution[0] / 1024.0) # the "2" is to give more speed
                 print "speed", self.speed
-                if self.speed < 3:
-                    print "maybe too slow the sliding.."                    
+                if self.speed < 3.0 * (self.screenResolution[0] / 1024.0):
+                    self.speed = int(3.0 * (self.screenResolution[0] / 1024.0)) 
+                    print "speed recalculated: too slow"
+                elif self.speed > 7.0 * (self.screenResolution[0] / 1024.0):
+                    self.speed = int(7.0 * (self.screenResolution[0] / 1024.0))   
+                    print "speed recalculated: too fast"               
             else:
                 print "default speed"
-                self.speed = 3
+                self.speed = 7.0 * (self.screenResolution[0] / 1024.0)
             self.master.after(500, self.movingRoutine)
         
-        
+            print "SLIDING SPEED: %d", self.speed
     def movingRoutine(self):
         if self.newcoords[0] > self.positionxLeft:
             self.newcoords = self.positionxRight - self.speed * self.ntimes, self.positionyRight
@@ -367,8 +362,7 @@ class SFApp():
             if self.currentPage + 2 <= self.totalPagesScore:
                 self.canvas1.delete('3rdImage')
             self.master.after(0, self.pageForward)
-            self.isMoving = False
-                        
+            self.isMoving = False                        
         
                       
     def pageForward(self):   
@@ -385,8 +379,7 @@ class SFApp():
             else:
                 self.textVar2.set('Right page: --')   
                             
-            self.canvas1.grid(row=1, column=0, columnspan=3, rowspan=7)
-            #self.canvas1.pack(side=Tkinter.LEFT)              
+            self.canvas1.grid(row=1, column=0, columnspan=3, rowspan=7)        
             self.currentPage += 1        
         print "page Forward", self.currentPage, self.totalPagesScore 
         
@@ -399,7 +392,7 @@ class SFApp():
             self.textVar1.set('Left page: %d/%d' % (self.currentPage - 1, self.totalPagesScore))            
             self.canvas1.create_image(self.positionxRight, self.positionyRight, image=self.phimage[self.currentPage - 1], tag='rightImage')
             self.textVar2.set('Right page: %d/%d' % (self.currentPage, self.totalPagesScore))               
-            #self.canvas1.pack(side=Tkinter.LEFT)    
+
             self.canvas1.grid(row=1, column=0, columnspan=3, rowspan=7)         
             self.currentPage -= 1    
         print "page Backward", self.currentPage, self.totalPagesScore    
@@ -415,8 +408,7 @@ class SFApp():
             self.canvas1.create_image(self.positionxRight, self.positionyRight, image=self.phimage[1], tag='rightImage')
             self.textVar2.set('Right page: %d/%d' % (2, self.totalPagesScore)) 
                           
-        self.canvas1.grid(row=1, column=0, columnspan=3, rowspan=7) 
-        #self.canvas1.pack(side=Tkinter.LEFT)            
+        self.canvas1.grid(row=1, column=0, columnspan=3, rowspan=7)      
         
     def goToLastPage(self):
         self.currentPage = self.totalPagesScore
@@ -438,8 +430,6 @@ class SFApp():
         self.button2.grid(row=5, column=3)        
         scNotes = self.scorePart.flat.notesAndRests
         ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
-        #ScF.runSFGraphic = self.runSFGraphic
-        #ScF.runScoreFollower(show=True, plot=False, useMic=True, seconds=10.0)
         ScF.show = False
         ScF.plot = False
         ScF.useMic = True
@@ -450,7 +440,7 @@ class SFApp():
         self.firstTimeSF = True
         self.stop = False
         
-        # decision lastNotePosition taking into account the beginning of the first displayed page 
+        # decision of lastNotePosition taking into account the beginning of the first displayed page 
         ScF.lastNotePosition = self.beginningPages[self.currentPage - 1]
         ScF.startSearchAtSlot = self.beginningPages[self.currentPage - 1]
         ScF.result = False
@@ -463,9 +453,7 @@ class SFApp():
         self.dummyQueue2 = queue.Queue()
         self.sampleQueue2 = queue.Queue()
         self.firstAnalysis = True
-        self.continueScoreFollower()   
-        #self.master.after(1000, self.continueScoreFollower)
-        
+        self.continueScoreFollower()          
 
  
     def continueScoreFollower(self):
@@ -526,11 +514,11 @@ class SFApp():
                     totalPagesToMove = 0
                 else:       
                     totalPagesToMove = pageNumber - self.currentPage
-  #              print "TOTAL PAGES TO MOVE", totalPagesToMove, pageNumber, self.currentPage
+#              print "TOTAL PAGES TO MOVE", totalPagesToMove, pageNumber, self.currentPage
                 if totalPagesToMove > 0:                                  
                     for i in range(totalPagesToMove):
                         self.pageForward()
- #                   print "has played a note not shown in the score (forward)"
+#                    print "has played a note not shown in the score (forward)"
                 elif totalPagesToMove < 0:
                      for i in range(int(math.fabs(totalPagesToMove))):
                         self.pageBackward()                   
