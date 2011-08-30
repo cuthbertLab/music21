@@ -568,9 +568,7 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
     <MidiEvent TIME_SIGNATURE, t=None, track=None, channel=1, data='\\x05\\x02\\x18\\x08'>
     '''
     mt = None # use a midi track set to None
-
     eventList = []
-
     if includeDeltaTime:
         dt = midiModule.DeltaTime(mt)
         dt.time = 0 # set to zero; will be shifted later as necessary
@@ -590,7 +588,6 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
     me.time = None # not required
     me.data = midiModule.putNumbersAsList([n, d, metroClick, subCount])
     eventList.append(me)
-
     return eventList 
 
 
@@ -703,14 +700,35 @@ def midiEventsToTempo(eventList):
     mm = tempo.MetronomeMark(number=bpm)
     return mm
 
-def tempoToMidiEvents(ks, includeDeltaTime=True):
-    '''Convert a single MIDI event into a music21 TimeSignature object.
+def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
+    '''Given any TempoIndication, covert to a MIDI tempo indication. 
 
     >>> from music21 import *
+    >>> mm = tempo.MetronomeMark(number=90)
+    >>> events = midi.translate.tempoToMidiEvents(mm)
+    >>> midi.translate.midiEventsToTempo(events)
+    <music21.tempo.MetronomeMark maestoso Quarter=90.0>
     '''
-
     mt = None # use a midi track set to None
     eventList = []
+    if includeDeltaTime:
+        dt = midiModule.DeltaTime(mt)
+        dt.time = 0 # set to zero; will be shifted later as necessary
+        # add to track events
+        eventList.append(dt)
+
+    me = midiModule.MidiEvent(mt)
+    me.type = "SET_TEMPO"
+    me.channel = 1
+    me.time = None # not required
+
+    # from any tempo indication, get the sounding metronome mark
+    mm = tempoIndication.getSoundingMetronomeMark()
+    bpm = mm.getQuarterBPM()
+    mspq = int(round(60000000.0 / bpm)) # microseconds per quarter note
+
+    me.data = midiModule.putNumber(mspq, 3)
+    eventList.append(me)
     return eventList 
 
 
@@ -721,32 +739,32 @@ def tempoToMidiEvents(ks, includeDeltaTime=True):
 
 
 # TODO: phase out use of this for new multi-part processing
-def _prepareStream(streamObj, instObj=None):
-    '''Prepare a Stream for MIDI processing. This includes removing ties, flattening, and finding a first instrument if necessary. 
-
-    An optional `instObj` parameter can be provided to force an instrument assignment.
-    '''
-    if instObj is None:
-        # see if an instrument is defined in this or a parent stream
-        # used for the first instrument definition
-        instObj = streamObj.getInstrument(returnDefault=False)
-
-    # have to be sorted, have to strip ties
-    # retain containers to get all elements: time signatures, dynamics, etc
-    s = streamObj.stripTies(inPlace=False, matchByPitch=False, 
-        retainContainers=True)
-    s = s.flat.sorted
-
-    # see if there is an instrument in the first position of this Stream, if not
-    # insert found instrument
-    if instObj is not None:
-        iStream = s.getElementsByClass('Instrument')
-        if len(iStream) > 0 and iStream[0].getOffsetBySite(s) == 0:
-            # already have an instrument in the first position
-            pass
-        else:
-            s.insert(0, instObj)
-    return s, instObj
+# def _prepareStream(streamObj, instObj=None):
+#     '''Prepare a Stream for MIDI processing. This includes removing ties, flattening, and finding a first instrument if necessary. 
+# 
+#     An optional `instObj` parameter can be provided to force an instrument assignment.
+#     '''
+#     if instObj is None:
+#         # see if an instrument is defined in this or a parent stream
+#         # used for the first instrument definition
+#         instObj = streamObj.getInstrument(returnDefault=False)
+# 
+#     # have to be sorted, have to strip ties
+#     # retain containers to get all elements: time signatures, dynamics, etc
+#     s = streamObj.stripTies(inPlace=False, matchByPitch=False, 
+#         retainContainers=True)
+#     s = s.flat.sorted
+# 
+#     # see if there is an instrument in the first position of this Stream, if not
+#     # insert found instrument
+#     if instObj is not None:
+#         iStream = s.getElementsByClass('Instrument')
+#         if len(iStream) > 0 and iStream[0].getOffsetBySite(s) == 0:
+#             # already have an instrument in the first position
+#             pass
+#         else:
+#             s.insert(0, instObj)
+#     return s, instObj
 
 
 def _getPacket(trackId, offset, midiEvent, obj, lastInstrument=None):
@@ -808,6 +826,9 @@ def _streamToPackets(s, trackId=1):
             sub = timeSignatureToMidiEvents(obj, includeDeltaTime=False)
         elif 'KeySignature' in classes:
             sub = keySignatureToMidiEvents(obj, includeDeltaTime=False)
+        elif 'TempoIndication' in classes: # any tempo indication will work
+            # note: tempo indications need to be in channel one for most playback
+            sub = tempoToMidiEvents(obj, includeDeltaTime=False)
         # first instrument will have been gathered above with get start elements
         elif 'Instrument' in classes:
             lastInstrument = obj # store last instrument
@@ -845,7 +866,6 @@ def _streamToPackets(s, trackId=1):
         cmp=lambda x,y: cmp(x['offset'], y['offset']) or
                         cmp(x['midiEvent'].sortOrder, y['midiEvent'].sortOrder)
         )
-
     # return packets and stream, as this flat stream should be retained
     return packetsByOffset
 
@@ -857,7 +877,6 @@ def _processPackets(packets, channelForInstrument={}, channelsDyanmic=[],
     The `channels` argument is a list of channels to use.
     '''
     #allChannels = range(1, 10) + range(11, 17) # all but 10
-
     uniqueChannelEvents = {} # dict of (start, stop, usedChannel) : channel
     post = []
     usedTracks = []
@@ -1103,7 +1122,6 @@ def packetsToMidiTrack(packets, trackId=1, channels=None):
 
 
 
-
 def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     inputM21=None):
     '''
@@ -1178,10 +1196,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
             #environLocal.printDebug(['cannot pair to delta time', mt.events[i]])
             i += 1
             continue
-
-
     #environLocal.printDebug(['raw event pairs', events])
-
     # need to pair note-on with note-off
     notes = [] # store pairs of pairs
     metaEvents = [] # store pairs of abs time, m21 object
@@ -1300,13 +1315,34 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     s.makeRests(inPlace=True, fillGaps=True)
     return s
 
+    
+def _prepareStreamForMidi(s):
+    '''Given a score, prepare it for midding processing. In particular, place MetronomeMark objects at Score level, or elsewhere, place it in the the first part.
+    
+    Note: will make a deepcopy()
+    '''
+    s = copy.deepcopy(s)
+    if s.hasPartLikeStreams():
+        # check for tempo indications in the score
+        mmTopLevel = s.getElementsByClass('MetronomeMark')
+        if len(mmTopLevel) > 0: # place in top part
+            target = s.getElementsByClass('Stream')[0]
+            for mm in mmTopLevel:
+                target.insert(mm.getOffsetBySite(mmTopLevel), mm)
+                s.remove(mm) # remove from Score level
+        # TODO: move any MetronomeMarks not in the top Part to the top Part
+        
+    else: # just a single Stream
+        pass
 
+    return s
 
 def streamsToMidiTracks(inputM21):
     '''Given a multipart stream, return a list of MIDI tracks. 
     '''
     from music21 import stream
-    s = inputM21
+    # makes a deepcopy
+    s = _prepareStreamForMidi(inputM21)
 
     # return a list of MidiTrack objects
     midiTracks = []
@@ -1316,7 +1352,6 @@ def streamsToMidiTracks(inputM21):
 
     # temporary channel allocation
     allChannels = range(1, 10) + range(11, 17) # all but 10
-
     # store streams in uniform list
     procList = []
     if s.hasPartLikeStreams():
@@ -1330,8 +1365,8 @@ def streamsToMidiTracks(inputM21):
     allUniqueInstruments = [] # store program numbers
     trackCount = 1
     for s in procList:
-        s = s.stripTies(inPlace=False, matchByPitch=False, 
-            retainContainers=True)
+        s = s.stripTies(inPlace=True, matchByPitch=False, 
+                        retainContainers=True)
         s = s.flat.sorted
 
         # get a first instrument; iterate over rest
@@ -1386,7 +1421,6 @@ def streamsToMidiTracks(inputM21):
         for p in bundle['rawPackets']:
             # get instrument
             instObj = bundle['initInstrument']
-
             if instObj is None:
                 try:
                     initCh = channelForInstrument[None]
@@ -1415,7 +1449,6 @@ def streamsToMidiTracks(inputM21):
     # build each track, sorting out the appropriate packets based on track
     # ids
     for trackId in packetStorage.keys():   
-
         initChannel = packetStorage[trackId]['initChannel']
         instObj = packetStorage[trackId]['initInstrument']
         # TODO: for a given track id, need to find start/end channel
@@ -1526,7 +1559,7 @@ def midiFileToStream(mf, inputM21=None):
     >>> len(s.flat.notesAndRests)
     9
     '''
-    environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
+    #environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
 
     from music21 import stream
     if inputM21 == None:
@@ -2075,6 +2108,47 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[1].getElementsByClass('MetronomeMark')), 0)
         self.assertEqual(len(s.parts[2].getElementsByClass('MetronomeMark')), 0)
 
+
+
+    def testMidiExportConductorA(self):
+        '''Testing exporting conductor data to midi
+        '''
+        from music21 import stream, note, meter, tempo
+
+        p1 = stream.Part()
+        p1.repeatAppend(note.Note('c4'), 12)
+        p1.insert(0, meter.TimeSignature('3/4'))
+        p1.insert(0, tempo.MetronomeMark(number=90))
+        p1.insert(6, tempo.MetronomeMark(number=30))
+
+        p2 = stream.Part()
+        p2.repeatAppend(note.Note('g4'), 12)    
+        p2.insert(6, meter.TimeSignature('6/4'))
+
+        s = stream.Score()
+        s.insert([0, p1, 0, p2])     
+
+        mts = streamsToMidiTracks(s)
+        mtsRepr = repr(mts)
+        self.assertEqual(mtsRepr.find('SET_TEMPO') > 0, True)
+        self.assertEqual(mtsRepr.find('TIME_SIGNATURE') > 0, True)
+
+        #s.show('midi')
+        #s.show('midi', app='Logic Express')
+
+    def testMidiExportConductorB(self):
+        from music21 import tempo, corpus
+        s = corpus.parse('bwv66.6')
+        s.insert(0, tempo.MetronomeMark(number=240))
+        s.insert(4, tempo.MetronomeMark(number=30))
+        s.insert(6, tempo.MetronomeMark(number=120))
+        s.insert(8, tempo.MetronomeMark(number=90))
+        s.insert(12, tempo.MetronomeMark(number=360))
+        #s.show('midi')
+        
+        mts = streamsToMidiTracks(s)
+        mtsRepr = repr(mts)
+        self.assertEqual(mtsRepr.count('SET_TEMPO'), 5)
 
 if __name__ == "__main__":
     music21.mainTest(Test)
