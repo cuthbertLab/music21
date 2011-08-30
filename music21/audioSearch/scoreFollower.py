@@ -368,7 +368,6 @@ class ScoreFollower(object):
             lengthData.append(tn_recording)
             scNotes.id = name
             totScores.append(scNotes)  
-    
         listOfParts = search.approximateNoteSearch(transcribedScore.flat.notesAndRests, totScores)
             
         #decision process    

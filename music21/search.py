@@ -13,6 +13,7 @@ Methods and Classes useful in searching among repertories.
 '''
 
 import difflib
+import math
 import unittest, doctest
 import music21
 import music21.note
@@ -157,6 +158,168 @@ def rhythmicSearch(thisStream, searchStream):
             foundEls.append(start)
     return foundEls
 
+def approximateNoteSearch(thisStream, otherStreams):
+    '''
+    searches the list of otherStreams and returns an ordered list of matches
+    (each stream will have a new property of matchProbability to show how
+    well it matches)
+
+
+    >>> from music21 import *
+    >>> s = converter.parse("c4 d8 e16 FF a'4 b-", "4/4")
+    >>> o1 = converter.parse("c4 d8 e GG a' b-4", "4/4")
+    >>> o1.id = 'o1'
+    >>> o2 = converter.parse("d#2 f A a' G b", "4/4")
+    >>> o2.id = 'o2'
+    >>> o3 = converter.parse("c4 d e GG CCC r", "4/4")
+    >>> o3.id = 'o3'
+    >>> l = approximateNoteSearch(s, [o1, o2, o3])
+    >>> for i in l:
+    ...    print i.id, i.matchProbability
+    o1 0.6666666...
+    o3 0.5
+    o2 0.0833333...
+    '''
+    isJunk = None
+    n = thisStream.flat.notesAndRests
+    thisStreamStr = translateStreamToString(n)
+    sorterList = []
+    for s in otherStreams:
+        sn = s.flat.notesAndRests
+        thatStreamStr = translateStreamToString(sn)
+        ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
+        s.matchProbability = ratio
+        sorterList.append((ratio, s))
+    sortedList = sorted(sorterList, key = lambda x: 1-x[0])
+    sortedStreams = [x[1] for x in sortedList]
+    return sortedStreams
+
+
+def approximateNoteSearchNoRhythm(thisStream, otherStreams):
+    '''
+    searches the list of otherStreams and returns an ordered list of matches
+    (each stream will have a new property of matchProbability to show how
+    well it matches)
+
+
+    >>> from music21 import *
+    >>> s = converter.parse("c4 d8 e16 FF a'4 b-", "4/4")
+    >>> o1 = converter.parse("c4 d8 e GG a' b-4", "4/4")
+    >>> o1.id = 'o1'
+    >>> o2 = converter.parse("d#2 f A a' G b", "4/4")
+    >>> o2.id = 'o2'
+    >>> o3 = converter.parse("c4 d e GG CCC r", "4/4")
+    >>> o3.id = 'o3'
+    >>> l = approximateNoteSearchNoRhythm(s, [o1, o2, o3])
+    >>> for i in l:
+    ...    print i.id, i.matchProbability
+    o1 0.83333333...
+    o3 0.5
+    o2 0.1666666...
+    '''
+    isJunk = None
+    n = thisStream.flat.notesAndRests
+    thisStreamStr = translateStreamToStringNoRhythm(n)
+    sorterList = []
+    for s in otherStreams:
+        sn = s.flat.notesAndRests
+        thatStreamStr = translateStreamToStringNoRhythm(sn)
+        ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
+        s.matchProbability = ratio
+        sorterList.append((ratio, s))
+    sortedList = sorted(sorterList, key = lambda x: 1-x[0])
+    sortedStreams = [x[1] for x in sortedList]
+    return sortedStreams
+
+
+def translateStreamToString(inputStream):
+    '''
+    takes a stream of notes only and returns
+    a string for searching on.
+    
+    >>> from music21 import *
+    >>> s = converter.parse("c4 d8 e16 FF8. a'8 b-2.", "3/4")
+    >>> sn = s.flat.notes
+    >>> streamString = translateStreamToString(sn)
+    >>> print streamString
+    <P>F@<)KQFF_
+    >>> len(streamString)  
+    12
+    '''
+    b = ''
+    for n in inputStream:
+        b += translateNoteWithDurationToBytes(n)
+    return b
+
+
+def translateStreamToStringNoRhythm(inputStream):
+    '''
+    takes a stream of notes only and returns
+    a string for searching on.
+    
+    >>> from music21 import *
+    >>> s = converter.parse("c4 d e FF a' b-", "4/4")
+    >>> sn = s.flat.notes
+    >>> translateStreamToStringNoRhythm(sn)
+    '<>@)QF'
+    '''
+    b = ''
+    for n in inputStream:
+        b += translateNoteToByte(n)
+    return b
+  
+def translateNoteToByte(n):
+    '''
+    takes a note.Note object and translates it to a single byte representation
+
+    currently returns the chr() for the note's midi number. or chr(127) for rests
+    
+
+    >>> from music21 import *
+    >>> n = note.Note("C4")
+    >>> translateNoteToByte(n)
+    '<'
+    >>> ord(translateNoteToByte(n)) == n.midi
+    True
+
+
+    '''
+    if n.isRest:
+        return chr(127)
+    elif n.isChord:
+        if len(n.pitches) > 0:
+            return chr(n.pitches[0].midi)
+        else:
+            return chr(127)
+    else:
+        return chr(n.midi)
+
+def translateNoteWithDurationToBytes(n):
+    '''
+    takes a note.Note object and translates it to a two-byte representation
+
+    currently returns the chr() for the note's midi number. or chr(127) for rests
+    followed by the log of the quarter length (fitted to 1-127, see formula below)
+
+    >>> from music21 import *
+    >>> n = note.Note("C4")
+    >>> n.duration.quarterLength = 3  # dotted half
+    >>> trans = translateNoteWithDurationToBytes(n)
+    >>> trans
+    '<_'
+    >>> (2**(ord(trans[1])/10.0))/256  # approximately 3
+    2.828...
+    
+    '''
+    firstByte = translateNoteToByte(n)
+    duration1to127 = int(math.log(n.duration.quarterLength * 256, 2)*10)
+    if duration1to127 >= 127:
+        duration1to127 = 127
+    elif duration1to127 == 0:
+        duration1to127 = 1
+    secondByte = chr(duration1to127)
+    return firstByte + secondByte
+
 
 class SearchException(music21.Music21Exception):
     pass
@@ -182,79 +345,7 @@ class Test(unittest.TestCase):
                 a = copy.copy(obj)
                 b = copy.deepcopy(obj)
 
-def approximateNoteSearch(thisStream, otherStreams):
-    '''
-    searches the list of otherStreams and returns an ordered list of matches
-    (each stream will have a new property of matchProbability to show how
-    well it matches)
-
-
-    >>> from music21 import *
-    >>> s = converter.parse("c4 d e FF a' b-", "4/4")
-    >>> o1 = converter.parse("c4 d e GG a' b-", "4/4")
-    >>> o1.id = 'o1'
-    >>> o2 = converter.parse("d#2 f A a' G b", "4/4")
-    >>> o2.id = 'o2'
-    >>> o3 = converter.parse("c4 d e GG CCC r", "4/4")
-    >>> o3.id = 'o3'
-    >>> l = approximateNoteSearch(s, [o1, o2, o3])
-    >>> for i in l:
-    ...    print i.id, i.matchProbability
-    o1 0.8333333...
-    o3 0.5
-    o2 0.1666666...
-    '''
-    isJunk = None
-    n = thisStream.flat.notesAndRests
-    thisStreamStr = translateStreamToString(n)
-    sorterList = []
-    for s in otherStreams:
-        sn = s.flat.notesAndRests
-        thatStreamStr = translateStreamToString(sn)
-        ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
-        s.matchProbability = ratio
-        sorterList.append((ratio, s))
-    sortedList = sorted(sorterList, key = lambda x: 1-x[0])
-    sortedStreams = [x[1] for x in sortedList]
-    return sortedStreams
-
-def translateStreamToString(inputStream):
-    '''
-    takes a stream of notes only and returns
-    a string for searching on.
     
-    >>> from music21 import *
-    >>> s = converter.parse("c4 d e FF a' b-", "4/4")
-    >>> sn = s.flat.notes
-    >>> translateStreamToString(sn)
-    '<>@)QF'
-    '''
-    b = ''
-    for n in inputStream:
-        b += translateNoteToByte(n)
-    return b
-  
-def translateNoteToByte(n):
-    '''
-    takes a note.Note object and translates it to a single byte representation
-
-    currently returns the chr() for the note's ps. or chr(200) for rests
-    
-
-    >>> from music21 import *
-    >>> n = note.Note("C4")
-    >>> translateNoteToByte(n)
-    '<'
-    '''
-    if n.isRest:
-        return chr(200)
-    elif n.isChord:
-        if len(n.pitches) > 0:
-            return chr(int(n.pitches[0].ps))
-        else:
-            return chr(200)
-    else:
-        return chr(int(n.ps))
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
