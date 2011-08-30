@@ -529,14 +529,18 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
-    import sys
+#     import sys
+# 
+#     if len(sys.argv) == 1: # normal conditions
+#         music21.mainTest(Test)
+#     elif len(sys.argv) > 1:
+#         a = Test()
+#         a.testBasic()
+# if __name__ == "__main__":
 
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-    elif len(sys.argv) > 1:
-        a = Test()
+    # sys.arg test options will be used in mainTest()
+    music21.mainTest(Test)
 
-        a.testBasic()
 
 
 #------------------------------------------------------------------------------

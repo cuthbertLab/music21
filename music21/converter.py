@@ -521,7 +521,7 @@ class ConverterMusicXML(object):
 
         c = musicxml.Document()
         if format == 'pickle':
-            #environLocal.printDebug(['opening pickled file', fpDst])
+            environLocal.printDebug(['opening pickled file', fpDst])
             try:
                 c.openPickle(fpDst)
             except (ImportError, EOFError):
