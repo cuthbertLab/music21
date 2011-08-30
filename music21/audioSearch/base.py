@@ -637,7 +637,7 @@ def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
 
     
 def notesAndDurationsToStream(notesList, durationList, scNotes=None,
-                              removeRestsAtBeginning=True, lengthFixed=None, qle=None):
+                              removeRestsAtBeginning=True, qle=None):
     '''
     take a list of :class:`~music21.note.Note` objects or rests
     and an equally long list of how long
@@ -673,8 +673,8 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
     
     # If the score is available, the quarter estimation is better:
     # It could take into account the changes of tempo during the song, but it
-    # will take more processing time
-    if scNotes != None and lengthFixed == False:
+    # would take more processing time
+    if scNotes != None:
         fe = features.native.MostCommonNoteQuarterLength(scNotes)
         mostCommon = fe.extract().vector[0]        
         
@@ -698,7 +698,7 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
     if scNotes == None:   # Case transcriber
         return sc, len(p2)
     else: #case follower
-        return sc, lengthFixed, qle
+        return sc,qle
 
 def decisionProcess(list, notePrediction, beginningData, lastNotePosition, countdown, firstNotePage=None, lastNotePage=None):
     '''
@@ -733,7 +733,7 @@ def decisionProcess(list, notePrediction, beginningData, lastNotePosition, count
     >>> detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
     >>> (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))
     >>> (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
-    >>> transcribedScore, lengthFixed, qle = notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, lengthFixed=False, qle=None)
+    >>> transcribedScore, qle = notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, qle=None)
     >>> hop = 6
     >>> tn_recording = 24
     >>> totScores = []

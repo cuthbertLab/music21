@@ -62,7 +62,7 @@ class SFApp():
         self.nameRecordedSong = 'luca/gloria' #'d:/desktop/Saint-Saens-Clarinet-Sonata/saint-saens.xml'#
         self.pageMeasureNumbers = [] # get directly from score - the last one is the last note of the score
         self.totalPagesScore = 1
-        self.currentPage = 1
+        self.currentLeftPage = 1
         self.pagesScore = []     
         self.phimage = []
         self.canvas = [] 
@@ -70,9 +70,7 @@ class SFApp():
         self.hits = 0
         self.isMoving = False
         self.firstTime = True
-        self.secondsPerMeasure = None
-        self.timeStart = None
-        self.previousLastNotePosition = None
+        self.ScF = None
         
         self.sizeButton = 11   
         
@@ -278,12 +276,12 @@ class SFApp():
         self.labelTitle.grid(row=0, column=1)
         
         self.textVar2 = Tkinter.StringVar()
-        self.textVar2.set('Right page: %d/%d' % (self.currentPage + 1, self.totalPagesScore)) 
+        self.textVar2.set('Right page: %d/%d' % (self.currentLeftPage + 1, self.totalPagesScore)) 
         self.label2 = Tkinter.Label(master, textvariable=self.textVar2)
         self.label2.grid(row=0, column=2, sticky=Tkinter.E)
         
         self.textVar1 = Tkinter.StringVar()
-        self.textVar1.set('Left page: %d/%d' % (self.currentPage, self.totalPagesScore))            
+        self.textVar1.set('Left page: %d/%d' % (self.currentLeftPage, self.totalPagesScore))            
         self.label1 = Tkinter.Label(master, textvariable=self.textVar1)
         self.label1.grid(row=0, column=0, sticky=Tkinter.W)
         
@@ -320,46 +318,40 @@ class SFApp():
 
         
     def moving(self):
-        print "moving!"
-        if self.currentPage + 1 < self.totalPagesScore:
+        if self.currentLeftPage + 1 < self.totalPagesScore:
             self.ntimes = 0
             self.newcoords = self.positionxRight, self.positionyLeft
-            self.canvas1.create_image(self.positionx3rd, self.positiony3rd, image=self.phimage[self.currentPage + 1], tag='3rdImage')
+            self.canvas1.create_image(self.positionx3rd, self.positiony3rd, image=self.phimage[self.currentLeftPage + 1], tag='3rdImage')
 
             self.refreshTime = 40
-            print "BEFORE COMPUTUING SPEED", self.secondsPerMeasure
-            if self.secondsPerMeasure != None:                
-                distanceInPixels = self.positionxRight - self.positionxLeft
-                availableTime = self.secondsPerMeasure * (self.pageMeasureNumbers[self.currentPage + 1] - self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber)
-                print "AVAILABLE TIME", availableTime, distanceInPixels
-                totalIterations = (availableTime * 1000) / self.refreshTime
-                print "totaliterations" , totalIterations
-                self.speed = 2 * (distanceInPixels / totalIterations) * int(self.screenResolution[0] / 1024.0) # the "2" is to give more speed
-                print "speed", self.speed
-                if self.speed < 3.0 * (self.screenResolution[0] / 1024.0):
-                    self.speed = int(3.0 * (self.screenResolution[0] / 1024.0)) 
-                    print "speed recalculated: too slow"
-                elif self.speed > 7.0 * (self.screenResolution[0] / 1024.0):
-                    self.speed = int(7.0 * (self.screenResolution[0] / 1024.0))   
-                    print "speed recalculated: too fast"               
+            if self.ScF != None:                
+                if self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber < (self.pageMeasureNumbers[self.currentLeftPage+1]+self.pageMeasureNumbers[self.currentLeftPage])/2.0:
+                    self.speed = self.speed = int(3.0 * (self.screenResolution[0] / 1024.0))
+                    print "moving when last measure was at the first 50%% of the right page"
+                elif self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber < 3*(self.pageMeasureNumbers[self.currentLeftPage+1]+self.pageMeasureNumbers[self.currentLeftPage])/4.0:
+                    self.speed = self.speed = int(4.0 * (self.screenResolution[0] / 1024.0))
+                    print "moving when last measure was between the first 50%% and the 75%% of the right page"
+                else:
+                    self.speed = self.speed = int(5.0 * (self.screenResolution[0] / 1024.0))
+                    print "moving when last measure was after the 75%% of the right page"
+          
             else:
                 print "default speed"
-                self.speed = 7.0 * (self.screenResolution[0] / 1024.0)
+                self.speed = 3.0 * (self.screenResolution[0] / 1024.0)
             self.master.after(500, self.movingRoutine)
-        
-            print "SLIDING SPEED: %d", self.speed
+
     def movingRoutine(self):
         if self.newcoords[0] > self.positionxLeft:
             self.newcoords = self.positionxRight - self.speed * self.ntimes, self.positionyRight
             self.canvas1.coords('rightImage', self.newcoords) 
-            if self.currentPage + 2 <= self.totalPagesScore:
+            if self.currentLeftPage + 2 <= self.totalPagesScore:
                 self.newcoords3rd = self.positionx3rd - self.speed * self.ntimes, self.positiony3rd
                 self.canvas1.coords('3rdImage', self.newcoords3rd) 
             self.ntimes += 1
             self.master.after(self.refreshTime, self.movingRoutine)
             
         else:
-            if self.currentPage + 2 <= self.totalPagesScore:
+            if self.currentLeftPage + 2 <= self.totalPagesScore:
                 self.canvas1.delete('3rdImage')
             self.master.after(0, self.pageForward)
             self.isMoving = False                        
@@ -367,38 +359,38 @@ class SFApp():
                       
     def pageForward(self):   
         
-        if self.currentPage + 1 <= self.totalPagesScore:
+        if self.currentLeftPage + 1 <= self.totalPagesScore:
             self.canvas1.delete('leftImage')
             self.canvas1.delete('rightImage')  
-            self.canvas1.create_image(self.positionxLeft, self.positionyLeft, image=self.phimage[self.currentPage], tag='leftImage')
-            self.textVar1.set('Left page: %d/%d' % (self.currentPage + 1, self.totalPagesScore))
+            self.canvas1.create_image(self.positionxLeft, self.positionyLeft, image=self.phimage[self.currentLeftPage], tag='leftImage')
+            self.textVar1.set('Left page: %d/%d' % (self.currentLeftPage + 1, self.totalPagesScore))
             
-            if self.currentPage + 1 < self.totalPagesScore:
-                self.canvas1.create_image(self.positionxRight, self.positionyRight, image=self.phimage[self.currentPage + 1], tag='rightImage')
-                self.textVar2.set('Right page: %d/%d' % (self.currentPage + 2, self.totalPagesScore))               
+            if self.currentLeftPage + 1 < self.totalPagesScore:
+                self.canvas1.create_image(self.positionxRight, self.positionyRight, image=self.phimage[self.currentLeftPage + 1], tag='rightImage')
+                self.textVar2.set('Right page: %d/%d' % (self.currentLeftPage + 2, self.totalPagesScore))               
             else:
                 self.textVar2.set('Right page: --')   
                             
             self.canvas1.grid(row=1, column=0, columnspan=3, rowspan=7)        
-            self.currentPage += 1        
-        print "page Forward", self.currentPage, self.totalPagesScore 
+            self.currentLeftPage += 1        
+        print "page Forward", self.currentLeftPage, self.totalPagesScore 
         
     def pageBackward(self):           
-        if self.currentPage > 1:
+        if self.currentLeftPage > 1:
             self.canvas1.delete('leftImage')
             self.canvas1.delete('rightImage')  
-            self.canvas1.create_image(self.positionxLeft, self.positionyLeft, image=self.phimage[self.currentPage - 2], tag='leftImage')
+            self.canvas1.create_image(self.positionxLeft, self.positionyLeft, image=self.phimage[self.currentLeftPage - 2], tag='leftImage')
 
-            self.textVar1.set('Left page: %d/%d' % (self.currentPage - 1, self.totalPagesScore))            
-            self.canvas1.create_image(self.positionxRight, self.positionyRight, image=self.phimage[self.currentPage - 1], tag='rightImage')
-            self.textVar2.set('Right page: %d/%d' % (self.currentPage, self.totalPagesScore))               
+            self.textVar1.set('Left page: %d/%d' % (self.currentLeftPage - 1, self.totalPagesScore))            
+            self.canvas1.create_image(self.positionxRight, self.positionyRight, image=self.phimage[self.currentLeftPage - 1], tag='rightImage')
+            self.textVar2.set('Right page: %d/%d' % (self.currentLeftPage, self.totalPagesScore))               
 
             self.canvas1.grid(row=1, column=0, columnspan=3, rowspan=7)         
-            self.currentPage -= 1    
-        print "page Backward", self.currentPage, self.totalPagesScore    
+            self.currentLeftPage -= 1    
+        print "page Backward", self.currentLeftPage, self.totalPagesScore    
             
     def goTo1stPage(self):
-        self.currentPage = 1
+        self.currentLeftPage = 1
         self.canvas1.delete('leftImage')
         self.canvas1.create_image(self.positionxLeft, self.positionyLeft, image=self.phimage[0], tag='leftImage')
         self.textVar1.set('Left page: %d/%d' % (1, self.totalPagesScore))
@@ -411,7 +403,7 @@ class SFApp():
         self.canvas1.grid(row=1, column=0, columnspan=3, rowspan=7)      
         
     def goToLastPage(self):
-        self.currentPage = self.totalPagesScore
+        self.currentLeftPage = self.totalPagesScore
         self.canvas1.delete('leftImage')
         self.canvas1.create_image(self.positionxLeft, self.positionyLeft, image=self.phimage[self.totalPagesScore - 1], tag='leftImage')
         self.textVar1.set('Left page: %d/%d' % (self.totalPagesScore, self.totalPagesScore))
@@ -441,8 +433,8 @@ class SFApp():
         self.stop = False
         
         # decision of lastNotePosition taking into account the beginning of the first displayed page 
-        ScF.lastNotePosition = self.beginningPages[self.currentPage - 1]
-        ScF.startSearchAtSlot = self.beginningPages[self.currentPage - 1]
+        ScF.lastNotePosition = self.beginningPages[self.currentLeftPage - 1]
+        ScF.startSearchAtSlot = self.beginningPages[self.currentLeftPage - 1]
         ScF.result = False
         self.textVar3.set('Start playing!')
        
@@ -461,20 +453,20 @@ class SFApp():
         self.timeStart = time.time()    
         if self.stop == False and (self.firstTimeSF == True or self.rt.resultInThread == False):
             
-            self.lastNoteString = 'Note: %d, Measure: %d, Countdown:%d, Page:%d' % (self.ScF.lastNotePosition, self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber , self.ScF.countdown, self.currentPage) 
+            self.lastNoteString = 'Note: %d, Measure: %d, Countdown:%d, Page:%d' % (self.ScF.lastNotePosition, self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber , self.ScF.countdown, self.currentLeftPage) 
             if self.firstTimeSF == False:
                 self.textVarComments.set("1st meas: %d, last meas: %d" % (self.ScF.scoreStream[self.ScF.firstNotePage].measureNumber, self.ScF.scoreStream[self.ScF.lastNotePage].measureNumber))
             self.firstTimeSF = False
             # first and last note shown in the screeen
-            self.ScF.firstNotePage = self.beginningPages[self.currentPage - 1] - 1
-            if self.currentPage + 1 < self.totalPagesScore:
-                self.ScF.lastNotePage = self.middlePages[self.currentPage + 1] - 1
+            self.ScF.firstNotePage = self.beginningPages[self.currentLeftPage - 1] - 1
+            if self.currentLeftPage + 1 < self.totalPagesScore:
+                self.ScF.lastNotePage = self.middlePages[self.currentLeftPage + 1] - 1
                 print "3 or more pages remaining", self.firstTimeSF, self.ScF.lastNotePage
-            elif self.currentPage < self.totalPagesScore:
-                self.ScF.lastNotePage = self.beginningPages[self.currentPage + 1] - 1
+            elif self.currentLeftPage < self.totalPagesScore:
+                self.ScF.lastNotePage = self.beginningPages[self.currentLeftPage + 1] - 1
                 print "2 pages on the screen", self.firstTimeSF, self.ScF.lastNotePage
             else:
-                self.ScF.lastNotePage = self.beginningPages[self.currentPage] - 1
+                self.ScF.lastNotePage = self.beginningPages[self.currentLeftPage] - 1
                 print "only one page on the screen", self.firstTimeSF, self.ScF.lastNotePage   
             
             self.rt = RecordThread(self.dummyQueue, self.sampleQueue, self.ScF)            
@@ -490,18 +482,11 @@ class SFApp():
 
             
     def analyzeRecording(self):
-        self.rt.outQueue.get()
-        print "positions", self.previousLastNotePosition, self.ScF.lastNotePosition
-        if self.previousLastNotePosition != None:
-    #        print "COMPUTING SECONDS PER MEAS", time.time() - self.timeStart, self.ScF.scoreStream[self.previousLastNotePosition].measureNumber , self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber
-            self.secondsPerMeasure = (time.time() - self.timeStart) / ((self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber - self.ScF.scoreStream[self.previousLastNotePosition].measureNumber) + 1)
-            print "seconds per measure", self.secondsPerMeasure
-        self.previousLastNotePosition = self.ScF.lastNotePosition
-        self.timeStart = time.time()
+        self.rt.outQueue.get()  
         self.textVar3.set(self.lastNoteString)         
-        print "****", self.ScF.lastNotePosition, self.beginningPages[self.currentPage - 1], self.currentPage, self.ScF.lastNotePosition < self.beginningPages[self.currentPage - 1]
-        if self.currentPage <= self.totalPagesScore:            
-            if self.ScF.lastNotePosition < self.beginningPages[self.currentPage - 1] or self.ScF.lastNotePosition >= self.beginningPages[self.currentPage + 1]: # case in which the musician plays a note of a not displayed page
+        print "****", self.ScF.lastNotePosition, self.beginningPages[self.currentLeftPage - 1], self.currentLeftPage, self.ScF.lastNotePosition < self.beginningPages[self.currentLeftPage - 1]
+        if self.currentLeftPage <= self.totalPagesScore:            
+            if self.ScF.lastNotePosition < self.beginningPages[self.currentLeftPage - 1] or self.ScF.lastNotePosition >= self.beginningPages[self.currentLeftPage + 1]: # case in which the musician plays a note of a not displayed page
                 pageNumber = 0
                 final = False
                 while final == False:              
@@ -513,8 +498,8 @@ class SFApp():
                 if self.ScF.lastNotePosition == 0:
                     totalPagesToMove = 0
                 else:       
-                    totalPagesToMove = pageNumber - self.currentPage
-#              print "TOTAL PAGES TO MOVE", totalPagesToMove, pageNumber, self.currentPage
+                    totalPagesToMove = pageNumber - self.currentLeftPage
+#              print "TOTAL PAGES TO MOVE", totalPagesToMove, pageNumber, self.currentLeftPage
                 if totalPagesToMove > 0:                                  
                     for i in range(totalPagesToMove):
                         self.pageForward()
@@ -525,12 +510,12 @@ class SFApp():
 #                     print "has played a note not shown in the score (backward)"
 
             
-            elif self.ScF.lastNotePosition >= self.middlePages[self.currentPage] and self.isMoving == False:  #50% case
+            elif self.ScF.lastNotePosition >= self.middlePages[self.currentLeftPage] and self.isMoving == False:  #50% case
                 self.isMoving = True
                 self.moving()
                 #print "playing a note of the second half part of the right page"
                 
-            elif self.ScF.lastNotePosition >= self.beginningPages[self.currentPage] and self.ScF.lastNotePosition < self.middlePages[self.currentPage] + self.beginningPages[self.currentPage]: 
+            elif self.ScF.lastNotePosition >= self.beginningPages[self.currentLeftPage] and self.ScF.lastNotePosition < self.middlePages[self.currentLeftPage] + self.beginningPages[self.currentLeftPage]: 
                 self.hits += 1
                 #print "playing a note of the first half part of the right page: hits=%d" % self.hits
                 if self.hits == 2:

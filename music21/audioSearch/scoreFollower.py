@@ -46,7 +46,6 @@ class ScoreFollower(object):
         self.predictedNotePosition = 0
         self.countdown = 0
         self.END_OF_SCORE = False
-        self.lengthFixed = False
         self.qle = None
         self.firstNotePage = None
         self.lastNotePage = None
@@ -101,7 +100,7 @@ class ScoreFollower(object):
         (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, self.useScale)
         (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
         scNotes = self.scoreStream[self.lastNotePosition:self.lastNotePosition + len(notesList)]
-        transcribedScore, self.lengthFixed, self.qle = notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, lengthFixed=self.lengthFixed, qle=self.qle) 
+        transcribedScore, self.qle = notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, qle=self.qle) 
         totalLengthPeriod, self.lastNotePosition, prob, END_OF_SCORE = self.matchingNotes(self.scoreStream, transcribedScore, self.startSearchAtSlot, self.lastNotePosition)
 
         if END_OF_SCORE == True:
@@ -278,7 +277,6 @@ class ScoreFollower(object):
                 self.lastNotePosition = firstSlot
                 self.startSearchAtSlot = firstSlot
                 self.predictedNotePosition = firstSlot
-                self.lengthFixed = False
             else: # self.countdown >= 5:
                 #print "Exit due to bad recognition or rests"
                 environLocal.printDebug("COUNTDOWN = 5")
@@ -287,7 +285,6 @@ class ScoreFollower(object):
             if prob < 0.7: #to avoid rests at the beginning
                 self.lastNotePosition = 0
                 self.startSearchAtSlot = 0
-                self.lengthFixed = False
                 environLocal.printDebug("Silence or noise at the beginning")
             else:  # got some good notes at the beginning!
                 self.begins = False
