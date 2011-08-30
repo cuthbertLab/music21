@@ -2150,6 +2150,23 @@ class Test(unittest.TestCase):
         mtsRepr = repr(mts)
         self.assertEqual(mtsRepr.count('SET_TEMPO'), 5)
 
+
+    def testMidiExportConductorC(self):
+        from music21 import tempo, note, stream
+        import math
+        min = 60
+        max = 600
+        period = 50
+        s = stream.Stream()
+        for i in range(100):
+            scalar = (math.sin(i * (math.pi*2) / period) + 1) * .5
+            n = ((max-min) * scalar) + min
+            s.append(tempo.MetronomeMark(number=n))
+            s.append(note.Note('g3'))
+        mts = streamsToMidiTracks(s)
+        mtsRepr = repr(mts)
+        self.assertEqual(mtsRepr.count('SET_TEMPO'), 100)
+
 if __name__ == "__main__":
     music21.mainTest(Test)
 
