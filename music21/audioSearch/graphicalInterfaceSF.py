@@ -123,8 +123,7 @@ class SFApp():
         try:
             self.initializeName()                
         except IOError:
-            print 'no he pogut'
-            print 'nom', self.scoreNameSong
+            pass
         self.initializeGraphicInterface()
         print 'Initialized!'        
         

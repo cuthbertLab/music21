@@ -93,6 +93,7 @@ def runTranscribe(show=True, plot=True, useMic=True,
         
     return myScore
 
+
 class TestExternal(unittest.TestCase):
     pass
 
@@ -107,8 +108,6 @@ class TestExternal(unittest.TestCase):
         saveFile = environLocal.getRootTempDir() + os.path.sep + 'pachelbel.wav'
         myScore = runTranscribe(useMic=False, saveFile=saveFile, plot=False, show=False)
         #myScore.show()
-
-
 
 
 if __name__ == "__main__":

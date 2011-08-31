@@ -78,10 +78,10 @@ class SFApp():
         
         self.var2 = Tkinter.IntVar()
         self.checkButton = Tkinter.Checkbutton(self.master, text="Save the file after recording" ,variable=self.var2)
-        self.var2.set(1)
+        self.var2.set(0)
         self.checkButton.grid(row=4,column=0,columnspan=2)
    
-        self.buttonSubmit = Tkinter.Button(self.master, text="Submit", width=self.sizeButton, command=callback)
+        self.buttonSubmit = Tkinter.Button(self.master, text="Submit", width=self.sizeButton, command=callback,bg='orange')
         self.buttonSubmit.grid(row=2,column=0,columnspan=2)
      
         self.textTitle = Tkinter.StringVar()
