@@ -253,9 +253,9 @@ def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
     >>> l = approximateNoteSearchOnlyRhythm(s, [o1, o2, o3])
     >>> for i in l:
     ...    print i.id, i.matchProbability
-    o1 0.83333333...
-    o3 0.5
-    o2 0.1666666...
+    o1 0.5
+    o3 0.33...
+    o2 0.0
     '''
     isJunk = None
     n = thisStream.flat.notesAndRests
@@ -281,28 +281,35 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
 
     >>> from music21 import *
     >>> s = converter.parse("c4 d8 e16 FF a'4 b-", "4/4")
-    >>> o1 = converter.parse("c4 d8 e GG a' b-4", "4/4")
+    >>> o1 = converter.parse("c4 d8 e GG2 a' b-4", "4/4")
     >>> o1.id = 'o1'
-    >>> o2 = converter.parse("d#2 f A a' G b", "4/4")
+    >>> o2 = converter.parse("AAA4 AAA8 AAA16 AAA16 AAA4 AAA4", "4/4")
     >>> o2.id = 'o2'
     >>> o3 = converter.parse("c8 d16 e32 FF32 a'8 b-8", "4/4")
     >>> o3.id = 'o3'
-    >>> l = approximateNoteSearchWeighted(s, [o1, o2, o3])
+    >>> o4 = converter.parse("c1 d1 e1 FF1 a'1 b-1", "4/4")
+    >>> o4.id = 'o4'
+    >>> l = approximateNoteSearchWeighted(s, [o1, o2, o3, o4])
     >>> for i in l:
     ...    print i.id, i.matchProbability
-    o3 0.833333333333
+    o3 0.83333...
     o1 0.75
-    o2 0.125
+    o4 0.75
+    o2 0.25
     '''
     isJunk = None
     n = thisStream.flat.notesAndRests
     thisStreamStrPitches = translateStreamToStringNoRhythm(n)
-    thisStreamStrDuration = translateStreamToStringOnlyRhythm(n)    
+    thisStreamStrDuration = translateStreamToStringOnlyRhythm(n)   
+#    print "notes",thisStreamStrPitches
+#    print "rhythm",thisStreamStrDuration 
     sorterList = []
     for s in otherStreams:
         sn = s.flat.notesAndRests
         thatStreamStrPitches = translateStreamToStringNoRhythm(sn)
         thatStreamStrDuration = translateStreamToStringOnlyRhythm(sn)
+#        print "notes2",thatStreamStrPitches
+#        print "rhythm2",thatStreamStrDuration 
         ratioPitches = difflib.SequenceMatcher(isJunk, thisStreamStrPitches, thatStreamStrPitches).ratio()
         ratioDuration = difflib.SequenceMatcher(isJunk,thisStreamStrDuration,thatStreamStrDuration).ratio()
         ratio = (3*ratioPitches+ratioDuration)/4.0

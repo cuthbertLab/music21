@@ -482,7 +482,8 @@ class SFApp():
             
     def analyzeRecording(self):
         self.rt.outQueue.get()  
-        self.textVar3.set(self.lastNoteString)         
+        self.textVar3.set(self.lastNoteString)  
+        self.ScF.firstSlot = self.beginningPages[self.currentLeftPage-1]       
         print "****", self.ScF.lastNotePosition, self.beginningPages[self.currentLeftPage - 1], self.currentLeftPage, self.ScF.lastNotePosition < self.beginningPages[self.currentLeftPage - 1]
         if self.currentLeftPage <= self.totalPagesScore:            
             if self.ScF.lastNotePosition < self.beginningPages[self.currentLeftPage - 1] or self.ScF.lastNotePosition >= self.beginningPages[self.currentLeftPage + 1]: # case in which the musician plays a note of a not displayed page
@@ -494,29 +495,29 @@ class SFApp():
                     else:
                         final = True
                 
-                if self.ScF.lastNotePosition == 0:
+                if self.ScF.lastNotePosition == 0 and self.ScF.countdown < 3:
                     totalPagesToMove = 0
                 else:       
                     totalPagesToMove = pageNumber - self.currentLeftPage
-#              print "TOTAL PAGES TO MOVE", totalPagesToMove, pageNumber, self.currentLeftPage
-                if totalPagesToMove > 0:                                  
-                    for i in range(totalPagesToMove):
-                        self.pageForward()
-#                    print "has played a note not shown in the score (forward)"
-                elif totalPagesToMove < 0:
-                     for i in range(int(math.fabs(totalPagesToMove))):
-                        self.pageBackward()                   
-#                     print "has played a note not shown in the score (backward)"
+    #              print "TOTAL PAGES TO MOVE", totalPagesToMove, pageNumber, self.currentLeftPage
+                    if totalPagesToMove > 0:                                  
+                        for i in range(totalPagesToMove):
+                            self.pageForward()
+    #                    print "has played a note not shown in the score (forward)"
+                    elif totalPagesToMove < 0:
+                         for i in range(int(math.fabs(totalPagesToMove))):
+                            self.pageBackward()                   
+    #                     print "has played a note not shown in the score (backward)"
 
             
             elif self.ScF.lastNotePosition >= self.middlePages[self.currentLeftPage] and self.isMoving == False:  #50% case
                 self.isMoving = True
                 self.moving()
-                #print "playing a note of the second half part of the right page"
+                print "playing a note of the second half part of the right page"
                 
             elif self.ScF.lastNotePosition >= self.beginningPages[self.currentLeftPage] and self.ScF.lastNotePosition < self.middlePages[self.currentLeftPage] + self.beginningPages[self.currentLeftPage]: 
                 self.hits += 1
-                #print "playing a note of the first half part of the right page: hits=%d" % self.hits
+                print "playing a note of the first half part of the right page: hits=%d" % self.hits
                 if self.hits == 2:
                     self.hits = 0
                     if self.isMoving == False:
@@ -524,7 +525,7 @@ class SFApp():
                         self.moving()
             else:
                 self.hits = 0
-                #print "playing a note of the left page"
+                print "playing a note of the left page"
        
         
         print '------------------last note position', self.ScF.lastNotePosition

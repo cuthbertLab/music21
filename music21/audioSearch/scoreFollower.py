@@ -49,6 +49,9 @@ class ScoreFollower(object):
         self.qle = None
         self.firstNotePage = None
         self.lastNotePage = None
+        self.firstSlot = 1
+        self.silencePeriodCounter = 0
+        self.notesCounter = 0
 
 
     def runScoreFollower(self, show=True, plot=False, useMic=False,
@@ -99,6 +102,7 @@ class ScoreFollower(object):
         detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
         (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, self.useScale)
         (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
+        self.silencePeriodDetection(notesList)
         scNotes = self.scoreStream[self.lastNotePosition:self.lastNotePosition + len(notesList)]
         transcribedScore, self.qle = notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, qle=self.qle) 
         totalLengthPeriod, self.lastNotePosition, prob, END_OF_SCORE = self.matchingNotes(self.scoreStream, transcribedScore, self.startSearchAtSlot, self.lastNotePosition)
@@ -116,13 +120,60 @@ class ScoreFollower(object):
             freqFromAQList, junk, self.currentSample = getFrequenciesFromPartialAudioFile(self.waveFile, length=self.processing_time, startSample=self.currentSample)
            
         if self.lastNotePosition > len(self.scoreNotesOnly):
-            print "finishedPerforming"
+            #print "finishedPerforming"
             exitType = "finishedPerforming"
         elif (self.useMic == False and self.currentSample >= self.totalFile):
-            print "waveFileEOF"
+            #print "waveFileEOF"
             exitType = "waveFileEOF"
 
         return exitType
+    
+    
+    def silencePeriodDetection(self,notesList):
+        '''
+        Detection of consecutive periods of silence. 
+        Useful if the musician has some consecutive measures of silence.
+        
+        >>> from music21 import *
+        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
+        >>> ScF = ScoreFollower(scoreStream=scNotes)
+        >>> notesList = []
+        >>> notesList.append(note.Rest())
+        >>> ScF.notesCounter = 3
+        >>> ScF.silencePeriodCounter = 0
+        >>> ScF.silencePeriodDetection(notesList)
+        >>> ScF.notesCounter
+        0
+        >>> ScF.silencePeriodCounter
+        1
+        
+
+        >>> ScF = ScoreFollower(scoreStream=scNotes)
+        >>> notesList = []
+        >>> notesList.append(note.Rest())
+        >>> notesList.append(note.Note())
+        >>> ScF.notesCounter = 1
+        >>> ScF.silencePeriodCounter = 3
+        >>> ScF.silencePeriodDetection(notesList)
+        >>> ScF.notesCounter
+        2
+        >>> ScF.silencePeriodCounter
+        0    
+        '''        
+        onlyRests = True
+        for i in notesList:
+            if i.name != 'rest':
+                onlyRests = False
+
+        if onlyRests == True:
+            self.silencePeriod = True
+            self.notesCounter = 0
+            self.silencePeriodCounter +=1
+        else: 
+            self.silencePeriod = False
+            self.notesCounter +=1
+            self.silencePeriodCounter = 0
+
 
     def updatePosition(self, prob, totalLengthPeriod, time_start):
         '''
@@ -271,12 +322,16 @@ class ScoreFollower(object):
                 # another chance to match notes
                 totalSeconds = 3 * (time() - time_start) + self.seconds_recording
                 self.predictedNotePosition = self.predictNextNotePosition(totalLengthPeriod, totalSeconds)               
-            elif self.countdown > 2 and self.countdown < 5:
-                #print "SEARCHING IN ALL THE SCORE; MAYBE THE MUSICIAN HAS STARTED FROM THE BEGINNING"
-                firstSlot = self.getFirstSlotOnScreen()
-                self.lastNotePosition = firstSlot
-                self.startSearchAtSlot = firstSlot
-                self.predictedNotePosition = firstSlot
+            elif self.countdown == 3:
+                # searching at the beginning of the shown pages
+                self.lastNotePosition = self.firstSlot
+                self.startSearchAtSlot = self.firstSlot
+                self.predictedNotePosition = self.firstSlot
+            elif self.countdown == 4:
+                #SEARCHING IN ALL THE SCORE; MAYBE THE MUSICIAN HAS STARTED FROM THE BEGINNING
+                self.lastNotePosition = 0
+                self.startSearchAtSlot = 0
+                self.predictedNotePosition = 0                
             else: # self.countdown >= 5:
                 #print "Exit due to bad recognition or rests"
                 environLocal.printDebug("COUNTDOWN = 5")
@@ -301,7 +356,7 @@ class ScoreFollower(object):
         '''
         returns the index of the first element on the screen right now.
         
-        Doesn't work.
+        Doesn't work. (maybe it's not necessary)
         
         
         '''
@@ -372,14 +427,17 @@ class ScoreFollower(object):
             notePrediction = len(scoreStream) - tn_recording - hop - 1
             END_OF_SCORE = True
             environLocal.printDebug("LAST PART OF THE SCORE")
+            
+        lastCountdown = self.countdown
         position, self.countdown = decisionProcess(listOfParts, notePrediction, beginningData, lastNotePosition, self.countdown, self.firstNotePage, self.lastNotePage)
-        try:
-            print "measure: " + listOfParts[position][0].measureNumber     
-        except:
-            pass
         
         totalLength = 0    
         number = int(listOfParts[position].id)
+        
+        if self.silencePeriod == True and self.silencePeriodCounter < 5:
+            print lastCountdown, self.countdown,lastNotePosition,beginningData[number] , lengthData[number]
+            print "ALL REST CASE!!!!"
+            self.countdown -=1            
         
         if self.countdown != 0:
             probabilityHit = 0
@@ -391,14 +449,14 @@ class ScoreFollower(object):
         listOfParts4 = search.approximateNoteSearchOnlyRhythm(transcribedScore.flat.notesAndRests, totScores)        
         print "PROBABILITIES:",
         print "pitches and durations weighted (current)",listOfParts[position].matchProbability,
-        print "pitches and durations without wieghting" , listOfParts2[position].matchProbability,
+        print "pitches and durations without weighting" , listOfParts2[position].matchProbability,
         print "pitches", listOfParts3[position].matchProbability,
         print "durations",listOfParts4[position].matchProbability
             
         for i in range(len(totScores[number])):
             totalLength = totalLength + totScores[number][i].quarterLength
     
-        if self.countdown == 0:   
+        if self.countdown == 0 and self.silencePeriodCounter == 0:   
             lastNotePosition = beginningData[number] + lengthData[number]
                    
         return totalLength, lastNotePosition, probabilityHit, END_OF_SCORE

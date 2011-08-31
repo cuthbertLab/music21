@@ -776,16 +776,21 @@ def decisionProcess(list, notePrediction, beginningData, lastNotePosition, count
     if list[position].matchProbability < 0.6 or len(list) == 1: #the latter for the all-rest case
         environLocal.printDebug("ARE YOU SURE YOU ARE PLAYING THE RIGHT SONG??")
         countdown = countdown + 1
-
+        environLocal.printDebug('are you playing the right song?')
     elif dist > 20 and countdown == 0:
+        countdown += 1
+        environLocal.printDebug("Excessive distance....? dist=%d" % dist)
+        
+    elif dist > 30 and countdown == 1:
         countdown += 1
         environLocal.printDebug("Excessive distance....? dist=%d" % dist)
         
     elif (firstNotePage != None and lastNotePage != None) and ((beginningData[int(list[position].id)] < firstNotePage or beginningData[int(list[position].id)] > lastNotePage) and countdown < 2):
         countdown += 1
+        environLocal.printDebug('playing in a not shown part')
     else:
         countdown = 0
-    #print '****????**** DECISION PROCESS: dist from expected: %d, beginning data: %d , lastNotePos: %d' %(dist, beginningData[int(list[i].id)],lastNotePosition)
+    environLocal.printDebug('****????**** DECISION PROCESS: dist from expected: %d, beginning data: %d , lastNotePos: %d' %(dist, beginningData[int(list[i].id)],lastNotePosition))
     return position, countdown
 
     
