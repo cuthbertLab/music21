@@ -45,6 +45,7 @@ from music21 import spanner
 from music21 import tie
 from music21 import metadata
 from music21 import repeat
+from music21 import tempo
 
 
 from music21 import environment
@@ -4242,6 +4243,13 @@ class Stream(music21.Music21Object):
 
         The Stream source of elements is self by default, 
         unless a `srcObj` is provided. 
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> s.repeatAppend(note.Note(), 8)
+        >>> s._getOffsetMap()
+        [{'voiceIndex': None, 'element': <music21.note.Note C>, 'endTime': 1.0, 'offset': 0.0}, {'voiceIndex': None, 'element': <music21.note.Note C>, 'endTime': 2.0, 'offset': 1.0}, {'voiceIndex': None, 'element': <music21.note.Note C>, 'endTime': 3.0, 'offset': 2.0}, {'voiceIndex': None, 'element': <music21.note.Note C>, 'endTime': 4.0, 'offset': 3.0}, {'voiceIndex': None, 'element': <music21.note.Note C>, 'endTime': 5.0, 'offset': 4.0}, {'voiceIndex': None, 'element': <music21.note.Note C>, 'endTime': 6.0, 'offset': 5.0}, {'voiceIndex': None, 'element': <music21.note.Note C>, 'endTime': 7.0, 'offset': 6.0}, {'voiceIndex': None, 'element': <music21.note.Note C>, 'endTime': 8.0, 'offset': 7.0}]
+
         '''
         if srcObj == None:
             srcObj = self
@@ -6716,8 +6724,92 @@ class Stream(music21.Music21Object):
         ''')
 
 
+    def _getSecondsMap(self, srcObj=None):
+        '''Return a list of dictionaries for all elements in this Stream, where each dictionary defines the real-time characteristics of the stored events. This will attempt to find all :class:`~music21.tempo.TempoIndication` subclasses and use these values to realize tempi. If not initial tempo is found, a tempo of 120 BPM will be provided. 
+        '''
+        if srcObj is None:
+            srcObj = self
+        # get all tempo indications from the flat Stream; 
+        # using flat here may not always be desirable
+        # may want to do a recursive upward search as well
+        tiStream = srcObj.flat.getElementsByClass('TempoIndication')
+        mmBoundaries = [] # a  list of (start, end, mm)
+        
+        # not sure if this should be taken from the flat representation
+        highestTime = srcObj.highestTime
+        lowestOffset = srcObj.lowestOffset
 
+        # if no tempo
+        if len(tiStream) == 0:
+            mmDefault = tempo.MetronomeMark(number=120) # a default
+            mmBoundaries.append((lowestOffset, highestTime, mmDefault))
+        # if just one tempo
+        elif len(tiStream) == 1:
+            o = tiStream[0].getOffsetBySite(srcObj)
+            mm = tiStream[0].getSoundingMetronomeMark()
+            if o > lowestOffset:
+                mmDefault = tempo.MetronomeMark(number=120) # a default
+                mmBoundaries.append((lowestOffset, o, mmDefault))
+                mmBoundaries.append((o, highestTime, mm))
+            else:
+                mmBoundaries.append((lowestOffset, highestTime, mm))
+        # one or more tempi
+        else:
+            offsetPairs = []
+            for ti in tiStream:
+                o = ti.getOffsetBySite(srcObj)
+                offsetPairs.append([o, ti.getSoundingMetronomeMark()])
+            # fill boundaries
+            # if lowest region not defined, supply as default
+            if offsetPairs[0][0] > lowestOffset:
+                mmDefault = tempo.MetronomeMark(number=120) # a default
+                mmBoundaries.append((lowestOffset, offsetPairs[0][0],
+                                     mmDefault))
+                mmBoundaries.append((offsetPairs[0][0], offsetPairs[1][0],
+                                     offsetPairs[0][1]))
+            else: # just add the first range
+                mmBoundaries.append((offsetPairs[0][0], offsetPairs[1][0],
+                                     offsetPairs[0][1]))
+            # add any remaining ranges, starting from the second; if last, 
+            # use the highest time as the boundary
+            for i, (o, mm) in enumerate(offsetPairs):
+                if i == 0: 
+                    continue # already added first
+                elif i == len(offsetPairs) - 1: # last index
+                    mmBoundaries.append((offsetPairs[i][0], highestTime,
+                                         offsetPairs[i][1]))
+                else: # add with next boundary
+                    mmBoundaries.append((offsetPairs[i][0], offsetPairs[i+1][0],
+                                         offsetPairs[i][1]))
 
+        environLocal.printDebug(['self._getSecondsMap()', 
+            'got mmBoundaries:', mmBoundaries])
+
+        secondsMap = [] # list of start, start+dur, element
+        if srcObj.hasVoices():
+            groups = []
+            for i, v in enumerate(srcObj.voices):
+                groups.append((v.flat, i))
+        else: # create a single collection
+            groups = [(srcObj, None)]
+        for group, voiceIndex in groups:
+            for e in group:
+                if isinstance(e, bar.Barline):
+                    continue
+                if e.duration is not None:
+                    dur = e.duration.quarterLength
+                else:
+                    dur = 0 
+                offset = round(e.getOffsetBySite(group), 8)
+                # all stored values are seconds
+                secondsDict = {}
+                secondsDict['offset'] = offset
+                secondsDict['endTime'] = offset + dur
+                secondsDict['duration'] = dur
+                secondsDict['element'] = e
+                secondsDict['voiceIndex'] = voiceIndex
+                secondsMap.append(secondsDict)
+        return secondsMap
 
 
     #---------------------------------------------------------------------------
@@ -16295,7 +16387,44 @@ class Test(unittest.TestCase):
         mm.number = 30
         self.assertEqual([m.seconds for m in s.getElementsByClass('Measure')], [6.0, 10.0, 4.0])
 
-            
+
+    def testSecondsMapA(self):
+        from music21 import stream, note, tempo
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 8)            
+        s.insert([0, tempo.MetronomeMark(number=90), 
+                  4, tempo.MetronomeMark(number=120),
+                  6, tempo.MetronomeMark(number=240)])
+        s._getSecondsMap()
+
+        # not starting
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 8)            
+        s.insert([4, tempo.MetronomeMark(number=120),
+                  6, tempo.MetronomeMark(number=240)])
+        s._getSecondsMap()
+
+
+        # none
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 8)            
+        s._getSecondsMap()
+
+
+        # ont mid stream
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 8)     
+        s.insert([6, tempo.MetronomeMark(number=240)])      
+        s._getSecondsMap()
+
+        # one start stream
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 8)     
+        s.insert([0, tempo.MetronomeMark(number=240)])      
+        s._getSecondsMap()
+
+
+
 
 class Test2(unittest.TestCase):
     '''

@@ -9,9 +9,10 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+'''The features implemented here are based on those found in jSymbolic and defined in Cory McKay's MA Thesis, "Automatic Genre Classification of MIDI Recordings"
 
-# features here are a based on those found in 
-# jsymbolic (lgpl): http://jmir.sourceforge.net/jSymbolic.html
+The LGPL jSymbolic system can be found here: http://jmir.sourceforge.net/jSymbolic.html
+'''
 
 
 import unittest
