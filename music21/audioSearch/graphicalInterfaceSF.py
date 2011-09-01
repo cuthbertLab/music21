@@ -57,9 +57,9 @@ class SFApp():
         self.frame = Tkinter.Frame(master)
         self.master.wm_title("Score follower - music21")
         
-        self.scoreNameSong = 'scores/d luca gloria_Page_' #'d:/desktop/Saint-Saens-Clarinet-Sonata/Saint-Saens-Clarinet-Sonata_Page_'  #'scores/test_pages_'         
+        self.scoreNameSong = 'scores/d luca gloria_Page_'#'/Users/cuthbert/Desktop/scores/Saint-Saens-Clarinet-Sonata/Saint-Saens-Clarinet-Sonata_Page_'#'scores/d luca gloria_Page_' #  #'scores/test_pages_'         
         self.format = 'tiff'#'jpg'
-        self.nameRecordedSong = 'luca/gloria' #'d:/desktop/Saint-Saens-Clarinet-Sonata/saint-saens.xml'#
+        self.nameRecordedSong = 'luca/gloria' # '/Users/cuthbert/Desktop/scores/Saint-Saens-Clarinet-Sonata/saint-saens.xml'
         self.pageMeasureNumbers = [] # get directly from score - the last one is the last note of the score
         self.totalPagesScore = 1
         self.currentLeftPage = 1
@@ -119,12 +119,18 @@ class SFApp():
     
     def startMainCanvas(self):
         self.scoreNameSong = self.box.get()
+        prevtime = time.time()
         self.initializeScore()
+        print 'initializeScore',time.time()-prevtime,'sec'
+        prevtime = time.time()
         try:
-            self.initializeName()                
+            self.initializeName()     
+            print 'initializeName',time.time()-prevtime,'sec'
+            prevtime = time.time()
         except IOError:
             pass
         self.initializeGraphicInterface()
+        print 'intiGraph',time.time()-prevtime,'sec'
         print 'Initialized!'        
         
         
@@ -226,7 +232,6 @@ class SFApp():
         lastMeasure = score.getElementsByClass('Measure')[-1].measureNumber
         self.pageMeasureNumbers.append(lastMeasure)
         self.totalPagesScore = len(self.pageMeasureNumbers) - 1
-
         scNotes = score.flat.notesAndRests
         noteCounter = 1
         pageCounter = 0
@@ -236,7 +241,7 @@ class SFApp():
         doneThisPage = -1
         for i in scNotes:
             imn = i.measureNumber
-            if imn >= self.pageMeasureNumbers[pageCounter]:
+            if pageCounter <= self.totalPagesScore and imn >= self.pageMeasureNumbers[pageCounter]:
                 self.beginningPages.append(noteCounter)
                 pageCounter += 1
                 doneThisPage = imn
@@ -534,7 +539,51 @@ class SFApp():
     def stopScoreFollower(self):
         self.stop = True
         print "Stop button pressed!"  
-
+        
+        
+        
+#        
+#        
+#class External():        
+#    
+#    def __init__(self,newcoords,positionxLeft,positionxRight,speed,positionyRight,canvas,currentLeftPage,totalPagesScore,newcoords3rd,positionx3rd,positiony3rd,refreshTime):
+#        self.ntimes = 0
+#        self.newcoords = newcoords
+#        self.positionxLeft = positionxLeft
+#        self.positionxRight = positionxRight
+#        self.speed = speed
+#        self.positionyRight = positionyRight
+#        self.canvas1 = canvas
+#        self.currentLeftPage = currentLeftPage
+#        self.totalPagesScore = totalPagesScore
+#        self.newcoords3rd = newcoords3rd
+#        self.positionx3rd = positionx3rd
+#        self.positiony3rd = positiony3rd
+#        self.refreshTime = refreshTime
+#        self.exception = False
+#        self.isMoving = True
+#    
+#    def movingRoutineExt(self):
+#        if self.newcoords[0] > self.positionxLeft:
+#            self.newcoords = self.positionxRight - self.speed * self.ntimes, self.positionyRight
+#            self.canvas1.coords('rightImage', self.newcoords) 
+#            if self.currentLeftPage + 2 <= self.totalPagesScore:
+#                self.newcoords3rd = self.positionx3rd - self.speed * self.ntimes, self.positiony3rd
+#                self.canvas1.coords('3rdImage', self.newcoords3rd) 
+#            self.ntimes += 1
+#            self.master.after(self.refreshTime, self.movingRoutineExt)
+#            
+#        else:
+#            if self.currentLeftPage + 2 <= self.totalPagesScore:
+#                self.canvas1.delete('3rdImage')
+#            self.exception = True
+#            self.master.after(0, self.pageForward)
+#            self.isMoving = False      
+#        
+        
+        
+        
+        
 
 class RecordThread(threading.Thread):
     def __init__(self, inQueue, outQueue, object):
@@ -550,6 +599,7 @@ class RecordThread(threading.Thread):
         self.resultInThread = self.object.repeatTranscription()
         self.outQueue.put(1)
         self.outQueue.task_done()
+            
 
 
                
