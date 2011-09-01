@@ -28,6 +28,21 @@ from music21 import stream
 from music21 import tempo
 from music21 import tinyNotation
 
+def happyBirthday():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(happyBirthday())
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠃⠗⠊⠛⠓⠞⠇⠽⠲⠀⠹⠶⠼⠁⠃⠚⠀⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠐⠑⠄⠵⠫⠱⠀⠳⠟⠀⠑⠄⠵⠫⠱⠀⠪⠗⠀⠑⠄⠵⠨⠱⠺⠀⠓⠄⠷⠻⠫⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠨⠙⠄⠽⠺⠳⠀⠪⠗⠣⠅
+    '''
+    hb = tinyNotation.TinyNotationStream("d8. d16 e4 d g f#2 d8. d16 e4 d a g2 d8. d16 d'4 b g8. g16 f#4 e c'8. c'16 b4 g a g2", "3/4")
+    hb.insert(0, key.KeySignature(1))
+    hb.insert(0, tempo.TempoText("Brightly"))
+    hb.insert(0, tempo.MetronomeMark(number = 120, referent = note.QuarterNote()))
+    hb.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    return hb
+
 # Introduction to Braille Music Transcription, Second Edition
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
@@ -2284,7 +2299,10 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    ex = happyBirthday()
+    #ex.show()
+    print translate.partToBraille(ex)
+    #music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof
