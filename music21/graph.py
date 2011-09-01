@@ -92,7 +92,6 @@ class PlotStreamException(Exception):
 def _substituteAccidentalSymbols(label):
     if not common.isStr(label):
         return label
-
     if '-' in label:
         #label = label.replace('-', '&#x266d;')
         #label = label.replace('-', 'b')
@@ -105,13 +104,14 @@ def _substituteAccidentalSymbols(label):
         label = label.replace('#', r'$\sharp$')
     return label
 
+# define acceptable format and value strings
 FORMATS = ['horizontalbar', 'histogram', 'scatter', 'scatterweighted', 
             '3dbars', 'colorgrid']
 
 def userFormatsToFormat(value):
     '''Replace possible user format strings with defined format names as used herein. Returns string unaltered if no match.
     '''
-    #environLocal.printDebug(['calling user userFormatsToFormat:', value])
+    environLocal.printDebug(['calling user userFormatsToFormat:', value])
     value = value.lower()
     value = value.replace(' ', '')
     if value in ['bar', 'horizontal', 'horizontalbar', 'pianoroll', 'piano']:
@@ -129,6 +129,8 @@ def userFormatsToFormat(value):
     else: # return unaltered if no mathc
         environLocal.printDebug(['userFormatsToFormat(): could not match value', value])
         return value
+
+VALUES = ['pitch', 'pitchspace', 'ps', 'pitchclass', 'pc', 'duration', 'quarterlength', 'offset', 'time', 'dynamic', 'dynamics']
 
 def userValuesToValues(valueList):
     '''Given a value list, replace string with synonymes. Let unmatched values pass.
@@ -518,7 +520,7 @@ class GraphNetworxGraph(Graph):
     
     '''
     _DOC_ATTR = {
-        'networkxGraph' : '''An instance ofa  networkx graph object. '''
+        'networkxGraph' : '''An instance of a networkx graph object.'''
     }
 
 #     >>> from music21 import *
@@ -3366,19 +3368,29 @@ def _getPlotsToMake(*args, **keywords):
         values = keywords['values'] # should be a list
 
     #environLocal.printDebug(['got args pre conversion', args])
-
     # if no args, use pianoroll
+    foundClassName = None
     if len(args) == 0 and format == '' and values == []:
         format = 'horizontalbar'
         values = 'pitch'
     elif len(args) == 1:
         formatCandidate = userFormatsToFormat(args[0])
+        match = False
         if formatCandidate in FORMATS:
             format = formatCandidate
             values = 'pitch'
-        else: # if one arg, assume it is values and use histogram
+            match = True
+         # if one arg, assume it is a histogram value
+        if formatCandidate in VALUES:
             format = 'histogram'
             values = [args[0]]
+            match = True
+        # permit directly matching the class name
+        if not match:
+            for className in plotClasses:
+                if formatCandidate in str(className).lower():
+                    match = True
+                    foundClassName = className
     elif len(args) > 1:
         format = userFormatsToFormat(args[0])
         values = args[1:] # get all remaining
@@ -3399,6 +3411,8 @@ def _getPlotsToMake(*args, **keywords):
     plotMake = []
     if format.lower() == 'all':
         plotMake = plotClasses
+    elif foundClassName is not None:
+        plotMake = [foundClassName] # place in a list
     else:
         plotMakeCanddidates = [] # store pairs of score, class
         for plotClassName in plotClasses:
@@ -3510,9 +3524,7 @@ def plotStream(streamObj, *args, **keywords):
         :width: 600
 
     '''
-
     plotMake = _getPlotsToMake(*args, **keywords)
-
     #environLocal.printDebug(['plotClassName found', plotMake])
     for plotClassName in plotMake:
         obj = plotClassName(streamObj, *args, **keywords)
