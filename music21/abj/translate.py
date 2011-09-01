@@ -16,9 +16,8 @@ Trevor Baca's Abjad framework -- a high-quality, Lilypond-based python
 framework for algorithmic music composition and post-tonal music.
 
 See http://packages.python.org/Abjad/ for more details.  Requires
-abjad 2.0 (not 1.1.1) to work.  Fetchable via SVN as of January 2011.
+abjad 2.0 (not 1.1.1) to work.
 
-automatically imported in music21.abj:
 
 '''
 
@@ -41,6 +40,7 @@ if abjad is not None:
             raise ImportError('This version of abjad is not compatible with music21, please upgrade')
             abjad = None
     except:
+        raise ImportError('This version of abjad is not compatible with music21, please upgrade')
         abjad = None
 
 
@@ -110,10 +110,10 @@ def noteToAbjad(m21Note):
     >>> m21Note3.quarterLength = 2.333333333333333
     >>> abjadNote3 = music21.abj.noteToAbjad(m21Note3)
     Traceback (most recent call last):
-    AbjadTranslateException: cannot translate complex notes directly
+    AbjadTranslateException: cannot translate complex notes directly, split into individual components first
     '''
     if m21Note.duration.type == 'complex':
-        raise AbjadTranslateException("cannot translate complex notes directly")
+        raise AbjadTranslateException("cannot translate complex notes directly, split into individual components first")
     elif len(m21Note.duration.tuplets) > 0:
         raise AbjadTranslateException("cannot translate tuplet notes directly")
     
@@ -180,7 +180,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [noteToAbjad]
+_DOC_ORDER = [noteToAbjad, streamToAbjad]
 
 
 if __name__ == "__main__":
