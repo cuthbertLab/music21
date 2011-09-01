@@ -4,59 +4,191 @@
 Overview: Streams, Scores, Parts, and Measures
 ==============================================
 
-The :class:`~music21.stream.Stream` object and its many subclasses offer the fundamental container of music21 objects. As a container like a Python list (or an array in some languages), a Stream can be used to hold objects. These objects can be ordered in more than one way, or treated as an unordered collection. Objects stored in a Stream can be spaced in time; each stored object can have an offset from the beginning of the Stream. Streams, further, can store and offset other Streams, permitting a wide variety of nested, ordered, and timed structures.
+The :class:`~music21.stream.Stream` object and its subclasses (Score, 
+Part, Measure) are
+the fundamental containers for music21 objects. A container is like a Python list 
+(or an array in some languages).  Thus a Stream can be used to hold and
+manipulate objects. These objects can be ordered by their musical position in
+the score (this is the default), in some other defined way (if the property
+.autoSort is turned off), or treated 
+as an unordered collection. 
 
-Commonly used subclasses of Streams include the :class:`~music21.stream.Score`, :class:`~music21.stream.Part`, and :class:`~music21.stream.Measure`. As should be clear, any time we want to collect and contain a group of music21 objects, we do so in a Stream. Streams can, of course, be used for less conventional organizational structures. We frequently will build and pass around temporary Streams, as doing so gives us access to a wide variety of tools for extracting, processing, and manipulating objects on the Stream. 
+Objects stored in a Stream are generally spaced in time; each stored object has 
+an offset usually representing how many quarter notes it lies from the beginning 
+of the Stream.  For instance in a 4/4 measure of two half notes, the first note
+will be at offset 0.0, and the second at offset 2.0. 
 
-A critical feature of music21's design is that one music21 object can be simultaneously stored (or, more accurately, referenced) in more than one Stream. For examples, we might have numerous :class:`~music21.stream.Measure` Streams contained in a :class:`~music21.stream.Part` Stream. If we extract a region of this Part (using the :meth:`~music21.stream.Stream.measures` method), we get a new Stream containing the specified Measures. We have not actually created new Measures or their components; the output Stream simply has references to the same objects. Changes made to Measures in this output Stream will be simultaneously reflected in Measures in the source Part. 
+Streams, further, can store other Streams, permitting a wide variety of nested, 
+ordered, and timed structures.  These stored streams also have offsets.  So if
+we put two 4/4 Measure objects (subclasses of Stream) into a Part (also a 
+type of Stream), then the first measure will be at offset 0.0 and the second
+measure will be at offset 4.0.  
 
-This overview will illustrate key features of music21's Stream. For complete documentation on Streams, see :ref:`moduleStream`.
+Commonly used subclasses of Streams include the :class:`~music21.stream.Score`, 
+:class:`~music21.stream.Part`, and :class:`~music21.stream.Measure`. It is 
+important to grasp that any time we want to collect and contain a group of 
+music21 objects, we put them into a Stream. Streams can also be used for 
+less conventional organizational structures. We frequently will build and pass 
+around short-lived, temporary Streams, since doing this opens up a wide variety 
+of tools for extracting, processing, and manipulating objects on the Stream. 
+For instance, if you are looking at only notes on beat 2 of any measure, you'll
+probably want to put them into a Stream as well.
+
+A critical feature of music21's design that distinguishes it from other 
+music analysis frameworks is that one music21 object can be 
+simultaneously stored (or, more accurately, referenced) in more than one Stream. 
+For examples, we might have numerous :class:`~music21.stream.Measure` Streams 
+contained in a :class:`~music21.stream.Part` Stream. If we extract a region of 
+this Part (using the :meth:`~music21.stream.Stream.measures` method), we get a 
+new Stream containing the specified Measures and the contained notes. We have 
+not actually created new 
+notes within these extracted measures; the output Stream simply has references 
+to the 
+same objects. Changes made to Notes in this output Stream will be simultaneously 
+reflected in Notes in the source Part.   There is one limitation though:
+the same object should not appear twice in one hierarchical structure of Streams.
+For instance, you should not put a note object in both measure 3 and measure 5
+of the same piece -- it can appear in measure 3 of one piece and measure 5 of
+another piece. (For instance, if you wanted to track a particular note's context
+in an original version of a score and an arrangement). Most users will never
+need to worry about these details: just know that this feature lets music21
+do some things that no other software package can do.
+
+
+Enough about what Streams are.  The rest of this overview will show you what
+you can do with them. (For complete 
+documentation on Streams, see :ref:`moduleStream`.)
 
 
 
 Appending and Inserting Objects into Streams
 ---------------------------------------------
 
-Streams provide a way to structure and position music21 objects both hierarchically (as Streams nested within Streams) and temporally (as objects and Streams placed in time). Objects stored on lists are called elements, and be a :class:`~music21.base.Music21Object` (almost everything in music21 is a Music21Object, such as Note, Chord, TimeSignature, etc.).  If you want to put an object that's not a Music21Object in a Stream, put it in an :class:`~music21.base.ElementWrapper`. Streams store their objects internally on a list called :attr:`~music21.stream.Stream.elements`, though direct manipulation of this list is rarely needed. 
+Streams structure and position music21 objects.  These objects 
+are structured hierarchically (for instance in a Measure in a Part
+in a Score) and temporally (e.g., at offset 4 in a Measure).
 
-The most common application of Streams is as a place to store Notes. For an introduction to Notes, see :ref:`overviewNotes`; for complete documentation on Notes, see :ref:`moduleNote`.
+Objects stored in Streams are called elements and must be some type
+of :class:`~music21.base.Music21Object` (don't worry, almost everything 
+in music21 is a Music21Object, such as Note, Chord, TimeSignature, etc.).  
 
-Notes, like all Muisc21Objects, have a Duration object that describes the time span they occupy. The span of a Duration can be described in many ways, but a convenient measure is quarter lengths (QLs), or the number of whole or fractional quarter note durations. Notes, when placed in a Stream, also have an offset that describes their position. These offset values are also given in QLs. 
+(If you want to put an object that's not a Music21Object in a Stream, 
+put it in an :class:`~music21.base.ElementWrapper`.) 
 
-To begin, lets create an instance of a Stream and an instance of a Note. We can set the :class:`~music21.pitch.Pitch` object to represent an E, and we can set the :class:`~music21.duration.Duration` object to represent a half-note (2 QLs).
+Streams store their objects internally on a list called 
+:attr:`~music21.stream.Stream.elements`, though you'll rarely need to 
+deal with this directly. 
+
+The most common use of Streams is as places to store Notes. For an 
+introduction to what you can do with Notes, see :ref:`overviewNotes`; 
+and for complete documentation on Notes, see :ref:`moduleNote`.
+
+Notes, like all Music21Objects, have a .duration property (which is a 
+:class:`~music21.duration.Duration` object) that describes how long they
+are and what they should look like on page. Though the span of a 
+Duration can mean many things (the number of seconds it lasts; the number
+of inches in a graphic notation score), by default, and by far the most
+common use is as quarter lengths (QLs), that is the number of number of 
+quarter notes they last.  A quarter note has duration 1.0, a whole has 4.0,
+a dotted eighth 0.75, and a triplet-16th 0.166667 (approximately). 
+
+As we mentioned earlier, when placed in a Stream, Notes and other 
+elements also have an **offset** (stored in .offset) 
+that describes their position from the beginning of the stream. 
+These offset values are also given in QLs. 
+
+To begin, lets create a Stream and a Note. We will set the 
+:class:`~music21.pitch.Pitch` object to E above middle C, and set the 
+:class:`~music21.duration.Duration` object to represent a half-note (2 QLs).
 
 >>> from music21 import *
 >>> s = stream.Stream()
 >>> n1 = note.Note()
 >>> n1.pitch.name = 'E4'
 >>> n1.duration.type = 'half'
->>> n1.quarterLength
+>>> n1.duration.quarterLength
 2.0
 
-There is more than one way to place this Note in the Stream. A convenient way is with the Stream method :meth:`~music21.stream.Stream.append`. This is related to, but very different from, the `append()` method of Python lists. After using append, there are a number of ways to confirm that our Note is on the Stream. We can use the Python `len()` function to return the number of elements on the Stream. Alternatively, we can use the :meth:`~music21.stream.Stream.show` method with the 'text' or (assuming correct setup of your environment) the 'musicxml' argument to return explicit notations. (See :ref:`quickStart` for basic configuration information; see :ref:`environment` for complete information on configuring your :class:`~music21.environment.Environment`.)
+Now we'll put the quarter note in the Stream.
+There is more than one way to do this. A convenient way is with the Stream 
+method :meth:`~music21.stream.Stream.append` which puts it at the end of the Stream. 
+This is related to, but more powerful than, the `append()` method of Python lists. 
 
 >>> s.append(n1)
+
+
+After putting the note in the stream, there are a number of ways to confirm that 
+our Note is actually in the Stream. We can use the Python `len()` function to tell us
+the number of elements on the Stream. 
+
+
 >>> len(s)
 1
+
+
+Alternatively, we can use the :meth:`~music21.stream.Stream.show` method 
+called as show('text') to see what is in the Stream and what its offset 
+is (here 0.0, since we put it at the end of an empty stream). 
+
 >>> s.show('text')
 {0.0} <music21.note.Note E>
+
+If you've setup your environment properly, then calling show with the 
+'musicxml' 
+argument should open up Finale Reader, or Sibelius, or 
+MuseScore or some music notation
+software and display the notes below. (See :ref:`quickStart` for basic 
+configuration information; see :ref:`environment` for complete information 
+on configuring your :class:`~music21.environment.Environment`.)
+
 
 >>> s.show('musicxml')
 
 .. image:: images/overviewStreams-01.*
     :width: 600
 
-Every element on a Stream has an offset in that Stream (and possibly other Streams). In the last example, no offset was given with the :meth:`~music21.stream.Stream.append` method. This method automatically gets an offset for newly-appended objects based on the objects that are already on the Stream. Specifically, the object with the highest offset and combined duration. Generally, this is the next available offset after all current elements have sounded. Whenever we append, we are adding to the end. 
+Every element on a Stream has an offset in that Stream (and possibly 
+other Streams). In the last example, no offset was given with the 
+:meth:`~music21.stream.Stream.append` method. This method automatically 
+gets an offset for newly-appended objects based on the objects that 
+are already on the Stream. Specifically, the object with the highest 
+offset and combined duration. Generally, this is the next available 
+offset after all current elements have sounded. Whenever we append, 
+we are adding to the end. 
 
-If we add another Note with :meth:`~music21.stream.Stream.append`, its offset will automatically be set to the end of the previously added Note.
+If we add another Note with :meth:`~music21.stream.Stream.append`, 
+its offset will automatically be set to the end of the previously added Note.
 
->>> n2 = note.Note('f#') # we can supply a note name as an initial argument
->>> n2.quarterLength = .5 # we can access some Duration attributes from Note
+Let's create a second note, called n2.  This time we will set the
+pitch name of the note at the moment of creation as F# above middle C.
+Then we will set its quarter length to 0.5, or an eighth note.  Notice
+also that last time we called n1.duration.quarterLength and this time
+just n2.quarterLength -- they're exactly the same thing.  The latter is
+just a shortcut to the former, since we use quarterLength so often.
+
+
+>>> n2 = note.Note('f#4')
+>>> n2.quarterLength = 0.5
 >>> s.append(n2)
+
+
+Now we see that there are two notes in the Stream
+
 >>> len(s)
 2
->>> n2.offset # we can examine the Note's current offset
+
+We also can see that n2 was placed at offset 2.0, i.e. just
+after the end of n1, which was a half note.
+
+>>> n2.offset
 2.0
+
+
+Now when we view the stream, either with show('text') or show('musicxml')
+we'll see two notes.  (N.B. you can usually call show('musicxml') just as
+show() since musicxml is generally the default).
+
+
 >>> s.show('text')
 {0.0} <music21.note.Note E>
 {2.0} <music21.note.Note F#>
@@ -262,38 +394,94 @@ Streams provide a way to structure and position music21 objects both hierarchica
 
 As shown in :ref:`quickStart`, a common arrangement of nested Streams is a :class:`~music21.stream.Score` Stream containing one or more :class:`~music21.stream.Part` Streams, each Part Stream in turn containing one or more :class:`~music21.stream.Measure` Streams. 
 
-Such an arrangement of Stream objects is the common way musical scores are represented in music21. For example, importing a four-part chorale by J. S. Bach will provide a Score object with four Part Streams, each Part containing multiple Measure objects. Music21 comes with a :ref:`moduleCorpus.base` module that provides access to a large collection of scores, including all the Bach chorales. We can parse the score from the corpus with the :func:`~music21.corpus.base.parseWork` function. 
+Such an arrangement of Stream objects is the common way musical scores are represented in music21. For example, importing a four-part chorale by J. S. Bach will provide a Score object with four Part Streams, each Part containing multiple Measure objects. Music21 comes with a :ref:`moduleCorpus.base` module that provides access to a large collection of scores, including all the Bach chorales. We can parse the score from the corpus with the :func:`~music21.corpus.base.parse` function. 
 
 >>> from music21 import *
->>> sBach = corpus.parseWork('bach/bwv57.8')
+>>> sBach = corpus.parse('bach/bwv57.8')
 
-We can access and examine elements at each level of this Score by using standard Python syntax for lists within lists. Thus, we can see the length of each component: first the Score, then the Part at index zero, and then the object (a Measure) at index two, all from accessing the same name `sBach`.
+We can access and examine elements at each level of this Score by using standard Python syntax 
+for lists within lists. Thus, we can see the length of each component: 
+first the Score which has five elements, a :class:`~music21.metadata.Metadata` object and four parts.
+Then we find the length of first Part at index one which indicates 19 objects (18 of them are measures).  
+Then within that part we find an object (a Measure) at index 1. All of these subprograms can
+be accessed from looking within the same score object `sBach`.
 
 >>> len(sBach)
-4
->>> len(sBach[0])
+5
+>>> len(sBach[1])
 19
->>> len(sBach[0][1])
+>>> len(sBach[1][1])
 6
 
-Note that more than just Measures might be stored in a Part (such as :class:`~music21.instrument.Instrument` objects), and more than just Notes might be stored in a Measure (such as :class:`~music21.meter.TimeSignature` and :class:`~music21.key.KeySignature` objects). We thus frequently need to filter Stream and Stream subclasses by the class we seek. To repeat the count and select specific classes, we can use the :meth:`~music21.stream.Stream.getElementsByClass` method. Notice how the counts deviate from the examples above.
+But how did we know that index [1] would be a Part and index [1][1] would
+be a measure?  As writers of the tutorial, we know this piece well enough
+to know that.  But as we noted above, more than just Measures might be 
+stored in a Part object
+(such as :class:`~music21.instrument.Instrument` objects), 
+and more than just Note and Rest objects might be stored in a Measure 
+(such as :class:`~music21.meter.TimeSignature` 
+and :class:`~music21.key.KeySignature` objects). We it's much safer 
+to filter Stream and Stream subclasses by 
+the class we seek. To repeat the count and select specific classes, 
+we can use the :meth:`~music21.stream.Stream.getElementsByClass` method. 
+
+Notice how the counts deviate from the examples above.
 
 
 >>> from music21 import *
 >>> len(sBach.getElementsByClass(stream.Part))
 4
->>> len(sBach[0].getElementsByClass(stream.Measure))
+>>> len(sBach.getElementsByClass(stream.Part)[0].getElementsByClass(stream.Measure))
 18
->>> len(sBach[0][1].getElementsByClass(note.Note))
+>>> len(sBach.getElementsByClass(stream.Part)[0].getElementsByClass(stream.Measure)[1].getElementsByClass(note.Note))
 3
 
-The index position of a Measure may not be the same as the Measure number. For that reason, gathering Measures is best accomplished with either the :meth:`~music21.stream.Stream.measures` method (returning a Stream of Parts or Measures) or the :meth:`~music21.stream.Stream.measure` method (returning a single Measure). In the following examples a single Measure from each part is appended to a new Stream.
+The :meth:`~music21.stream.Stream.getElementsByClass` method can also take a
+string representation of the last section of the class name, thus we could've rewritten
+the code above as:
+
+
+>>> from music21 import *
+>>> len(sBach.getElementsByClass('Part'))
+4
+>>> len(sBach.getElementsByClass('Part')[0].getElementsByClass('Measure'))
+18
+>>> len(sBach.getElementsByClass('Part')[0].getElementsByClass('Measure')[1].getElementsByClass('Note'))
+3
+
+
+This way of doing things is a bit faster to code, but a little less safe.  Suppose,
+for instance there were objects of type stream.Measure and tape.Measure; the latter
+way of writing the code would get both of them.  (But this ambiguity is rare enough
+that it's safe enough to use the strings in most code.)
+
+
+There are some convenience properties you should know about.  Calling .parts is the
+same as .getElementsByClass(stream.Part) and calling .notes is the same as
+.getElementsByClass([note.Note, note.Chord]).  Notice that the last example also shows
+that you can give more than one class to getElementsByClass by passing in a list of
+classes.   Note also that when using .parts or .notes, you do not write the () after
+the name.  Also be aware that .notes does not include rests.  For that, we have a
+method called .notesAndRests.
+
+
+The index position of a Measure is often not the same as the Measure number.  For instance,
+most pieces that don't have pickup measures begin with measure 1, not zero.  Sometimes there are measure
+discontinuities within a piece (e.g., some people number first and second endings with the same
+measure number).
+For that reason, gathering Measures is best accomplished not with getElementsByClass(stream.Measure)
+but instead with either 
+the :meth:`~music21.stream.Stream.measures` method (returning a Stream of Parts or Measures) 
+or the :meth:`~music21.stream.Stream.measure` method (returning a single Measure).  What is great
+about these methods is that they can work on a whole score and not just a single part.
+
+In the following examples a single Measure from each part is appended to a new Stream.
 
 >>> sNew = stream.Stream()
->>> sNew.append(sBach[0].measure(3))
->>> sNew.append(sBach[1].measure(5))
->>> sNew.append(sBach[2].measure(7))
->>> sNew.append(sBach[3].measure(9))
+>>> sNew.append(sBach.parts[0].measure(3))
+>>> sNew.append(sBach.parts[1].measure(5))
+>>> sNew.append(sBach.parts[2].measure(7))
+>>> sNew.append(sBach.parts[3].measure(9))
 >>> sNew.show()
 
 .. image:: images/overviewStreams-05.*
@@ -321,10 +509,10 @@ Element offsets are always relative to the Stream that contains them. For exampl
 .. NOTE: intentionally skipping a discussion of objects having offsets stored
 .. for multiple sites here; see below
 
->>> m = sBach[0].measure(8)
->>> m.getOffsetBySite(sBach[0])
+>>> m = sBach.parts[0].measure(8)
+>>> m.getOffsetBySite(sBach.parts[0])
 21.0
->>> n = sBach[0].measure(8).notesAndRests[0]
+>>> n = sBach.parts[0].measure(8).notes[0]
 >>> n
 <music21.note.Note B->
 >>> n.getOffsetBySite(m)
@@ -332,10 +520,11 @@ Element offsets are always relative to the Stream that contains them. For exampl
 
 Flattening a structure of nested Streams will set new, shifted offsets for each of the elements on the Stream, reflecting their appropriate position in the context of the Stream from which the `flat` property was accessed. For example, if a flat version of the first part of the Bach chorale is obtained, the note defined above has the appropriate offset of 22 (the Measure offset of 21 plus the Note offset within this Measure of 1). 
 
->>> pFlat = sBach[0].flat
->>> pFlat[pFlat.index(n)]
+>>> pFlat = sBach.parts[0].flat
+>>> indexN = pFlat.index(n)
+>>> pFlat[indexN]
 <music21.note.Note B->
->>> pFlat[pFlat.index(n)].offset
+>>> pFlat[indexN].offset
 22.0
 
 As an aside, it is important to recognize that the offset of the Note has not been edited; instead, a Note, as all Music21Objects, can store multiple pairs of sites and offsets. Music21Objects retain an offset relative to all Stream or Stream subclasses they are contained within, even if just in passing.
@@ -343,14 +532,23 @@ As an aside, it is important to recognize that the offset of the Note has not be
 
 
 
-Accessing Stream Elements by Group and Identifiers
+Accessing Stream Elements by Id and Group
 -----------------------------------------------------------
 
-All :class:`~music21.base.Music21Object` subclasses, such as :class:`~music21.note.Note` and :class:`~music21.stream.Stream`, have attributes for :attr:`~music21.base.Music21Object.id` and :attr:`~music21.base.Music21Object.group`. 
+All :class:`~music21.base.Music21Object` subclasses, such as 
+:class:`~music21.note.Note` and :class:`~music21.stream.Stream`, 
+have attributes for :attr:`~music21.base.Music21Object.id` 
+and :attr:`~music21.base.Music21Object.group`. 
 
-As shown in :ref:`quickStart`, the `id` attribute is commonly used to distinguish Part objects in a Score, but may have other applications. The :meth:`~music21.stream.Stream.getElementById` method can be used to access elements of a Stream by `id`. As an example, after examining all of the `id` attributes of the Score, a new Score can be created, rearranging the order of the Parts by using the :meth:`~music21.stream.Stream.insert` method with an offset of zero.
+As shown in :ref:`quickStart`, the `id` attribute is commonly used to 
+distinguish Part objects in a Score, but may have other applications. 
+The :meth:`~music21.stream.Stream.getElementById` method can be used 
+to access elements of a Stream by `id`. As an example, after examining 
+all of the `id` attributes of the Score, a new Score can be created, 
+rearranging the order of the Parts by using the 
+:meth:`~music21.stream.Stream.insert` method with an offset of zero.
 
->>> [part.id for part in sBach]
+>>> [part.id for part in sBach.parts]
 [u'Soprano', u'Alto', u'Tenor', u'Bass']
 >>> sNew = stream.Score()
 >>> sNew.insert(0, sBach.getElementById('Bass'))
@@ -367,7 +565,16 @@ As shown in :ref:`quickStart`, the `id` attribute is commonly used to distinguis
 Visualizing Streams in Plots
 ---------------------------------------------
 
-While the :meth:`~music21.stream.Stream.show` method provides a valuable view of a Stream, a visual plot a Stream's elements is very useful. Sometimes called a piano roll, we might graph the pitch of a Note over its position in a Measure (or offset if no Measures are defined). The :meth:`~music21.stream.Stream.plot` method permits us to create a plot of any Stream or Stream subclass. There are a large variety of plots: see :ref:`moduleGraph` for a complete list. There are a number of ways to get the desired plot; one, as demonstrated below, is to provide the name of the plot as a string. We can also add a keyword argument for the title of the plot (and configure many other features).
+While the :meth:`~music21.stream.Stream.show` method provides common
+musical views of a Stream, a visual plot a Stream's elements is very 
+useful. Sometimes called a piano roll, we might graph the pitch of a 
+Note over its position in a Measure (or offset if no Measures are 
+defined). The :meth:`~music21.stream.Stream.plot` method permits us to 
+create a plot of any Stream or Stream subclass. There are a large variety 
+of plots: see :ref:`moduleGraph` for a complete list. There are a number 
+of ways to get the desired plot; one, as demonstrated below, is to provide 
+the name of the plot as a string. We can also add a keyword argument for 
+the title of the plot (and configure many other features).
 
 
 >>> sBach.getElementById('Soprano').plot('PlotHorizontalBarPitchSpaceOffset', title='Soprano')
