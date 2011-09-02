@@ -57,9 +57,9 @@ class SFApp():
         self.frame = Tkinter.Frame(master)
         self.master.wm_title("Score follower - music21")
         
-        self.scoreNameSong = 'scores/d luca gloria_Page_'#'/Users/cuthbert/Desktop/scores/Saint-Saens-Clarinet-Sonata/Saint-Saens-Clarinet-Sonata_Page_'#'scores/d luca gloria_Page_' #  #'scores/test_pages_'         
+        self.scoreNameSong = 'C:\Users\Jordi\Desktop\m21\Saint-Saens-Clarinet-Sonata\Saint-Saens-Clarinet-Sonata\Saint-Saens-Clarinet-Sonata_Page_'#'scores/d luca gloria_Page_'#'/Users/cuthbert/Desktop/scores/Saint-Saens-Clarinet-Sonata/Saint-Saens-Clarinet-Sonata_Page_'#'scores/d luca gloria_Page_' #  #       
         self.format = 'tiff'#'jpg'
-        self.nameRecordedSong = 'luca/gloria' # '/Users/cuthbert/Desktop/scores/Saint-Saens-Clarinet-Sonata/saint-saens.xml'
+        self.nameRecordedSong = 'C:\Users\Jordi\Desktop\m21\Saint-Saens-Clarinet-Sonata\Saint-Saens-Clarinet-Sonata\saint-saens.xml'#'luca/gloria'## # '/Users/cuthbert/Desktop/scores/Saint-Saens-Clarinet-Sonata/saint-saens.xml'
         self.pageMeasureNumbers = [] # get directly from score - the last one is the last note of the score
         self.totalPagesScore = 1
         self.currentLeftPage = 1
@@ -121,16 +121,16 @@ class SFApp():
         self.scoreNameSong = self.box.get()
         prevtime = time.time()
         self.initializeScore()
-        print 'initializeScore',time.time()-prevtime,'sec'
+        print 'initializeScore', time.time() - prevtime, 'sec'
         prevtime = time.time()
         try:
             self.initializeName()     
-            print 'initializeName',time.time()-prevtime,'sec'
+            print 'initializeName', time.time() - prevtime, 'sec'
             prevtime = time.time()
         except IOError:
             pass
         self.initializeGraphicInterface()
-        print 'intiGraph',time.time()-prevtime,'sec'
+        print 'intiGraph', time.time() - prevtime, 'sec'
         print 'Initialized!'        
         
         
@@ -152,8 +152,8 @@ class SFApp():
       
     def cropBorder(self, img, minColor=240, maxColor=256):
         colorRange = range(minColor, maxColor)
-        data = img.getdata()
-
+        data = img.getdata()        
+        print 'image', len(data)
         resX = img.size[0]
         resY = img.size[1]
         leftCut = 0
@@ -162,34 +162,50 @@ class SFApp():
         rightCut = 0
 
         #Find top
-        for i in range(0, len(data), 4):
+        for i in range(0, len(data), 4 + int(resX / 25)):
             if data[i][0] not in colorRange and data[i][1] not in colorRange and data[i][2] not in colorRange:
                 topCut = int(i / resX)
-                break     
+                break  
+        
         #Find bottom
-        for i in range(len(data) - 1, 0, -4):
+        for i in range(len(data) - 1, 0, -4 - int(resX / 15)):
             if data[i][0] not in colorRange and data[i][1] not in colorRange and data[i][2] not in colorRange:
                 bottomCut = int((len(data) - i) / resX)
-                break     
+                break    
                   
         #Find left
         stop = False
         for xPos in range(0, resX, 4):  # check every 4th pixel
-            for yPos in range(0, resY, 4): 
+            for yPos in range(xPos, resY, int(resY / 15)): 
                 pixelPosition = yPos * resX + xPos
                 if data[pixelPosition][0] not in colorRange and \
                    data[pixelPosition][1] not in colorRange and \
                    data[pixelPosition][2] not in colorRange:
-                    leftCut = xPos                 
+                    leftCut = xPos                                     
                     stop = True
-                    break                   
+                    break   
             if stop:
                 break
+            
+        comprovation = False
+        while comprovation == False:
+            print 'checking left'
+            bad = False
+            for yPos in range(0, resY, int(resY / 15)):
+                pixelPosition = yPos * resX + leftCut - 4
+                if data[pixelPosition][0] not in colorRange or \
+                       data[pixelPosition][1] not in colorRange or \
+                       data[pixelPosition][2] not in colorRange:
+                    bad = True
+            if bad == False:
+                comprovation = True
+            else:
+                leftCut = leftCut - 4
 
         #Find right
         stop = False
         for xPos in range(resX - 1, 0, -4):  # check every 4th pixel
-            for yPos in range(0, resY, 4): 
+            for yPos in range(resX - xPos, resY, int(resY / 15)): 
                 pixelPosition = yPos * resX + xPos
                 if data[pixelPosition][0] not in colorRange and \
                    data[pixelPosition][1] not in colorRange and \
@@ -199,6 +215,22 @@ class SFApp():
                     break
             if stop:
                 break
+            
+        comprovation = False
+        while comprovation == False:
+            print 'checking right', rightCut
+            bad = False
+            for yPos in range(0, resY, int(resY / 100)):
+                pixelPosition = yPos * resX + resX - (rightCut - 4)
+                if data[pixelPosition][0] not in colorRange or \
+                       data[pixelPosition][1] not in colorRange or \
+                       data[pixelPosition][2] not in colorRange:
+                    bad = True
+            if bad == False:
+                comprovation = True
+            else:
+                rightCut = rightCut - 4
+        print 'end crops!'
 
         margin = int(resX * 0.03) # leave border 3% of the size
 
@@ -329,10 +361,10 @@ class SFApp():
 
             self.refreshTime = 40
             if self.ScF != None:                
-                if self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber < (self.pageMeasureNumbers[self.currentLeftPage+1]+self.pageMeasureNumbers[self.currentLeftPage])/2.0:
+                if self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber < (self.pageMeasureNumbers[self.currentLeftPage + 1] + self.pageMeasureNumbers[self.currentLeftPage]) / 2.0:
                     self.speed = self.speed = int(3.0 * (self.screenResolution[0] / 1024.0))
                     print "moving when last measure was at the first 50%% of the right page"
-                elif self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber < 3*(self.pageMeasureNumbers[self.currentLeftPage+1]+self.pageMeasureNumbers[self.currentLeftPage])/4.0:
+                elif self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber < 3 * (self.pageMeasureNumbers[self.currentLeftPage + 1] + self.pageMeasureNumbers[self.currentLeftPage]) / 4.0:
                     self.speed = self.speed = int(4.0 * (self.screenResolution[0] / 1024.0))
                     print "moving when last measure was between the first 50%% and the 75%% of the right page"
                 else:
@@ -488,7 +520,7 @@ class SFApp():
     def analyzeRecording(self):
         self.rt.outQueue.get()  
         self.textVar3.set(self.lastNoteString)  
-        self.ScF.firstSlot = self.beginningPages[self.currentLeftPage-1]       
+        self.ScF.firstSlot = self.beginningPages[self.currentLeftPage - 1]       
         print "****", self.ScF.lastNotePosition, self.beginningPages[self.currentLeftPage - 1], self.currentLeftPage, self.ScF.lastNotePosition < self.beginningPages[self.currentLeftPage - 1]
         if self.currentLeftPage <= self.totalPagesScore:            
             if self.ScF.lastNotePosition < self.beginningPages[self.currentLeftPage - 1] or self.ScF.lastNotePosition >= self.beginningPages[self.currentLeftPage + 1]: # case in which the musician plays a note of a not displayed page
