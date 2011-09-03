@@ -4288,7 +4288,7 @@ class Stream(music21.Music21Object):
         return offsetMap
 
     offsetMap = property(_getOffsetMap, doc='''
-        returns a list where each element is a dictionary
+        Returns a list where each element is a dictionary
         consisting of the 'offset' of each element in a stream, the
         'endTime' (that is, the offset plus the duration) and the 
         'element' itself.  Also contains a 'voiceIndex' entry which
@@ -6789,10 +6789,33 @@ class Stream(music21.Music21Object):
                     mmBoundaries.append((offsetPairs[i][0], offsetPairs[i+1][0],
                                          offsetPairs[i][1]))
 
-        environLocal.printDebug(['self._getSecondsMap()', 
+        environLocal.printDebug(['self._getMetronomeMarkBoundaries()', 
             'got mmBoundaries:', mmBoundaries])
         return mmBoundaries
 
+    def _accumulatedSeconds(self, mmBoundaries, oStart, oEnd):
+        '''Given MetronomeMark boundaries, for any pair of offsets, determine the realized duration in seconds. 
+        '''
+        # assume tt mmBoundaries are in order
+        sum = 0.0  
+        activeStart = oStart
+        activeEnd = None
+        for s, e, mm in mmBoundaries:
+            if activeStart >= s and activeStart < e:
+                # find time in this region
+                if oEnd < e: # if end within this region
+                    activeEnd = oEnd
+                else: # if end after this region
+                    activeEnd = e
+                #environLocal.printDebug(['activeStart', activeStart, 'activeEnd', activeEnd, 's, e, mm', s, e, mm])
+                sum += mm.durationToSeconds(activeEnd-activeStart)
+            else:
+                continue
+            if activeEnd == oEnd:
+                break
+            else: # continue on
+                activeStart = activeEnd
+        return sum
 
     def _getSecondsMap(self, srcObj=None):
         '''Return a list of dictionaries for all elements in this Stream, where each dictionary defines the real-time characteristics of the stored events. This will attempt to find all :class:`~music21.tempo.TempoIndication` subclasses and use these values to realize tempi. If not initial tempo is found, a tempo of 120 BPM will be provided. 
@@ -6800,6 +6823,10 @@ class Stream(music21.Music21Object):
         if srcObj is None:
             srcObj = self
         mmBoundaries = self._getMetronomeMarkBoundaries(srcObj=srcObj)
+
+        # not sure if this should be taken from the flat representation
+        highestTime = srcObj.highestTime
+        lowestOffset = srcObj.lowestOffset
 
         secondsMap = [] # list of start, start+dur, element
         if srcObj.hasVoices():
@@ -6809,12 +6836,8 @@ class Stream(music21.Music21Object):
         else: # create a single collection
             groups = [(srcObj, None)]
 
-        # get accumulated time over many possible tempo changes for start/end offset
-        def accumulatedTime(mmBoundaries, oStart, oEnd):
-            # assume tt mmBoundaries are in order
-            for s, e, mm in mmBoundaries:
-                pass
-
+        # get accumulated time over many possible tempo changes for 
+        # start/end offset
         for group, voiceIndex in groups:
             for e in group:
                 if isinstance(e, bar.Barline):
@@ -6828,13 +6851,38 @@ class Stream(music21.Music21Object):
 
                 # all stored values are seconds
                 secondsDict = {}
-                secondsDict['offset'] = offset
-                secondsDict['endTime'] = offset + dur
-                secondsDict['duration'] = dur
+                secondsDict['offset'] = srcObj._accumulatedSeconds(
+                                      mmBoundaries, lowestOffset, offset)
+                secondsDict['duration'] = srcObj._accumulatedSeconds(
+                                      mmBoundaries, offset, offset + dur)
+                secondsDict['endTime'] = (secondsDict['offset'] + 
+                                          secondsDict['duration'])
                 secondsDict['element'] = e
                 secondsDict['voiceIndex'] = voiceIndex
                 secondsMap.append(secondsDict)
         return secondsMap
+
+
+    secondsMap = property(_getSecondsMap, doc='''
+        Returns a list where each element is a dictionary consisting of the 'offset' in seconds of each element in a Stream, the 'duration' in seconds, the 'endTime' in seconds (that is, the offset plus the duration), and the 'element' itself. Also contains a 'voiceIndex' entry which contains the voice number of the element, or None if there
+        are no voices.
+        
+        >>> from music21 import *
+        >>> mm1 = tempo.MetronomeMark(number=120)
+        >>> n1 = note.QuarterNote()
+        >>> c1 = clef.AltoClef()
+        >>> n2 = note.HalfNote()
+        >>> s1 = stream.Stream()
+        >>> s1.append([mm1, n1, c1, n2])
+        >>> om = s1.secondsMap
+        >>> om[3]['offset']
+        0.5
+        >>> om[3]['endTime']
+        1.5
+        >>> om[3]['element'] is n2
+        True
+        >>> om[3]['voiceIndex']
+    ''')
 
 
     #---------------------------------------------------------------------------
@@ -16412,6 +16460,41 @@ class Test(unittest.TestCase):
         mm.number = 30
         self.assertEqual([m.seconds for m in s.getElementsByClass('Measure')], [6.0, 10.0, 4.0])
 
+    def testAccumulatedTimeA(self):
+        from music21 import stream, tempo, note
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 8)            
+        s.insert([0, tempo.MetronomeMark(number=60)])
+        mmBoundaries = s._getMetronomeMarkBoundaries()
+        self.assertEqual(s._accumulatedSeconds(mmBoundaries, 0, 1), 1.0)
+        self.assertEqual(s._accumulatedSeconds(mmBoundaries, 0, 2), 2.0)
+        self.assertEqual(s._accumulatedSeconds(mmBoundaries, 0, 8), 8.0)
+
+        # changing in the middle of boundary
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 8)            
+        s.insert([0, tempo.MetronomeMark(number=60),
+                  4, tempo.MetronomeMark(number=120)])
+        mmBoundaries = s._getMetronomeMarkBoundaries()
+        self.assertEqual(s._accumulatedSeconds(mmBoundaries, 0, 4), 4.0)
+        self.assertEqual(s._accumulatedSeconds(mmBoundaries, 4, 8), 2.0)
+        self.assertEqual(s._accumulatedSeconds(mmBoundaries, 0, 8), 6.0)
+
+    def testAccumulatedTimeB(self):
+        from music21 import stream, tempo, note
+
+        # changing in the middle of boundary
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 8)            
+        s.insert([0, tempo.MetronomeMark(number=60),
+                  4, tempo.MetronomeMark(number=120),
+                  6, tempo.MetronomeMark(number=240)])
+        mmBoundaries = s._getMetronomeMarkBoundaries()
+        self.assertEqual(s._accumulatedSeconds(mmBoundaries, 0, 4), 4.0)
+        self.assertEqual(s._accumulatedSeconds(mmBoundaries, 4, 6), 1.0)
+        self.assertEqual(s._accumulatedSeconds(mmBoundaries, 6, 8), 0.5)
+        self.assertEqual(s._accumulatedSeconds(mmBoundaries, 0, 8), 5.5)
+
 
     def testSecondsMapA(self):
         from music21 import stream, note, tempo
@@ -16421,7 +16504,6 @@ class Test(unittest.TestCase):
                   4, tempo.MetronomeMark(number=120),
                   6, tempo.MetronomeMark(number=240)])
         self.assertEqual(str(s._getMetronomeMarkBoundaries()), '[(0.0, 4.0, <music21.tempo.MetronomeMark maestoso Quarter=90>), (4.0, 6.0, <music21.tempo.MetronomeMark animato Quarter=120>), (6.0, 8.0, <music21.tempo.MetronomeMark Quarter=240>)]')
-        s._getSecondsMap()
 
         # not starting
         s = stream.Stream()
@@ -16430,30 +16512,48 @@ class Test(unittest.TestCase):
                   6, tempo.MetronomeMark(number=240)])
         self.assertEqual(str(s._getMetronomeMarkBoundaries()), '[(0.0, 4.0, <music21.tempo.MetronomeMark animato Quarter=120>), (4.0, 6.0, <music21.tempo.MetronomeMark animato Quarter=120>), (6.0, 8.0, <music21.tempo.MetronomeMark Quarter=240>)]')
 
-        s._getSecondsMap()
-
-
         # none
         s = stream.Stream()
         s.repeatAppend(note.Note(), 8)    
         self.assertEqual(str(s._getMetronomeMarkBoundaries()), '[(0.0, 8.0, <music21.tempo.MetronomeMark animato Quarter=120>)]')        
-        s._getSecondsMap()
-
 
         # ont mid stream
         s = stream.Stream()
         s.repeatAppend(note.Note(), 8)     
         s.insert([6, tempo.MetronomeMark(number=240)])   
         self.assertEqual(str(s._getMetronomeMarkBoundaries()), '[(0.0, 6.0, <music21.tempo.MetronomeMark animato Quarter=120>), (6.0, 8.0, <music21.tempo.MetronomeMark Quarter=240>)]')           
-        s._getSecondsMap()
 
         # one start stream
         s = stream.Stream()
         s.repeatAppend(note.Note(), 8)     
         s.insert([0, tempo.MetronomeMark(number=240)])      
         self.assertEqual(str(s._getMetronomeMarkBoundaries()), '[(0.0, 8.0, <music21.tempo.MetronomeMark Quarter=240>)]')           
-        s._getSecondsMap()
 
+    def testSecondsMapB(self):
+        from music21 import stream, note, tempo
+        # one start stream
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 2)     
+        s.insert([0, tempo.MetronomeMark(number=60)])      
+        self.assertEqual(str(s._getSecondsMap()), """[{'duration': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghetto Quarter=60>, 'endTime': 0.0, 'offset': 0.0}, {'duration': 1.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'endTime': 1.0, 'offset': 0.0}, {'duration': 1.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'endTime': 2.0, 'offset': 1.0}]""")        
+
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 2)     
+        s.insert([0, tempo.MetronomeMark(number=15)])      
+        self.assertEqual(str(s._getSecondsMap()), """[{'duration': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghissimo Quarter=15>, 'endTime': 0.0, 'offset': 0.0}, {'duration': 4.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'endTime': 4.0, 'offset': 0.0}, {'duration': 4.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'endTime': 8.0, 'offset': 4.0}]""")        
+
+
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 2)     
+        s.insert([0, tempo.MetronomeMark(number=15), 
+                  1, tempo.MetronomeMark(number=60)])      
+        self.assertEqual(str(s._getSecondsMap()), """[{'duration': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghissimo Quarter=15>, 'endTime': 0.0, 'offset': 0.0}, {'duration': 4.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'endTime': 4.0, 'offset': 0.0}, {'duration': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghetto Quarter=60>, 'endTime': 4.0, 'offset': 4.0}, {'duration': 1.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'endTime': 5.0, 'offset': 4.0}]""")        
+
+        s = stream.Stream()
+        s.repeatAppend(note.Note(quarterLength=2.0), 1)     
+        s.insert([0, tempo.MetronomeMark(number=15), 
+                  1, tempo.MetronomeMark(number=60)])      
+        self.assertEqual(str(s._getSecondsMap()), """[{'duration': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghissimo Quarter=15>, 'endTime': 0.0, 'offset': 0.0}, {'duration': 5.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'endTime': 5.0, 'offset': 0.0}, {'duration': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghetto Quarter=60>, 'endTime': 4.0, 'offset': 4.0}]""")        
 
 
 
