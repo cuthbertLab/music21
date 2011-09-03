@@ -52,42 +52,60 @@ class ScoreFollower(object):
         self.firstSlot = 1
         self.silencePeriodCounter = 0
         self.notesCounter = 0
+        self.begins = True
 
-
-    def runScoreFollower(self, show=True, plot=False, useMic=False,
+    def runScoreFollower(self, plot=False, useMic=False,
                       seconds=15.0, useScale=scale.ChromaticScale('C4')):
         '''
-        I'll think about it.
-        '''          
-          
-        self.begins = True
-        self.seconds_recording = seconds
-        
+        It is the main program. It runs the 'repeatTranscription' until the performance ends.
+        '''                  
+        self.seconds_recording = seconds        
         self.useMic = useMic
         self.useScale = useScale
         
         self.result = False
         while(self.result is False): 
             self.result = self.repeatTranscription()    
-              
-        if show == True:
-            #transcribedScore.show()    
-            pass    
 
         if plot == True:
             matplotlib.pyplot.plot(listplot)
             matplotlib.pyplot.show()
         environLocal.printDebug("* END")
-        return self.result
 
 
     def repeatTranscription(self):  
-        print "WE STAY AT:",
-        print self.lastNotePosition, len(self.scoreNotesOnly),
-        print "en percent %d %%" % (self.lastNotePosition * 100 / len(self.scoreNotesOnly)),
-        print " this search begins at: ", self.startSearchAtSlot,
-        print "countdown %d" % self.countdown
-        print "Measure last note", self.scoreStream[self.lastNotePosition].measureNumber
+        '''
+        First, it records from the microphone (or from a file if is used for test). Later, it processes the signal in 
+        order to detect the pitches. It converts them into music21 objects and compares them with the score.
+        It finds the best matching position of the recorded signal with the score, and decides, depending on matching accuracy, 
+        the last note predicted and some other parameters, in which position the recorded signal is.
+        
+        It returns a value that is False if the song has not finished, or true if there has been a problem like some consecutive
+        bad matchings or the score has finished.
+         
+        
+        >>> from music21 import *
+        >>> scoreNotes = ["c4", "d", "e", "f", "g", "a", "b", "c'", "c", "e", "g", "c'", "a", "f", "d", "c#", "d#", "f#","c", "e", "g", "c'", "a", "f", "d", "c#", "d#", "f#"]
+        >>> scNotes = converter.parse(" ".join(scoreNotes), "4/4")
+        >>> ScF = ScoreFollower(scoreStream=scNotes)
+        >>> ScF.useMic = False
+        >>> ScF.waveFile = 'test_audio.wav'
+        >>> ScF.seconds_recording = 10
+        >>> ScF.useScale = scale.ChromaticScale('C4')
+        >>> ScF.currentSample = 0
+        >>> exitType = ScF.repeatTranscription()
+        >>> print exitType
+        False
+        >>> print ScF.lastNotePosition
+        10
+        '''
+        
+#        print "WE STAY AT:",
+#        print self.lastNotePosition, len(self.scoreNotesOnly),
+#        print "en percent %d %%" % (self.lastNotePosition * 100 / len(self.scoreNotesOnly)),
+#        print " this search begins at: ", self.startSearchAtSlot,
+#        print "countdown %d" % self.countdown
+#        print "Measure last note", self.scoreStream[self.lastNotePosition].measureNumber
 
         if self.useMic == True:
             freqFromAQList = getFrequenciesFromMicrophone(length=self.seconds_recording, storeWaveFilename=None)
@@ -97,7 +115,6 @@ class ScoreFollower(object):
                 self.totalFile = self.waveFile.getnframes()
         
         time_start = time()
-        #print "MOSTRES LLEGIDES:       ----  %d/%d = %d %%" % (self.totsamples, self.totalfile, self.totsamples * 100 / self.totalfile)
         detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, self.useScale)
         detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
         (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, self.useScale)
@@ -106,11 +123,10 @@ class ScoreFollower(object):
         scNotes = self.scoreStream[self.lastNotePosition:self.lastNotePosition + len(notesList)]
         transcribedScore, self.qle = notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, qle=self.qle) 
         totalLengthPeriod, self.lastNotePosition, prob, END_OF_SCORE = self.matchingNotes(self.scoreStream, transcribedScore, self.startSearchAtSlot, self.lastNotePosition)
-
+        self.processing_time = time()-time_start
         if END_OF_SCORE == True:
             exitType = "endOfScore"  #"endOfScore"
             return exitType
-
 
         # estimate position, or exit if we can't at all...
         exitType = self.updatePosition(prob, totalLengthPeriod, time_start)
@@ -343,7 +359,7 @@ class ScoreFollower(object):
                 environLocal.printDebug("Silence or noise at the beginning")
             else:  # got some good notes at the beginning!
                 self.begins = False
-                print "GO!"
+#                print "GO!"
             if self.countdown >= 5:
                 exitType = "5consecutiveCountdownsBeginning"     
                       
@@ -435,8 +451,8 @@ class ScoreFollower(object):
         number = int(listOfParts[position].id)
         
         if self.silencePeriod == True and self.silencePeriodCounter < 5:
-            print lastCountdown, self.countdown,lastNotePosition,beginningData[number] , lengthData[number]
-            print "ALL REST CASE!!!!"
+#            print lastCountdown, self.countdown,lastNotePosition,beginningData[number] , lengthData[number]
+            environLocal.printDebug("All rest period")
             self.countdown -=1            
         
         if self.countdown != 0:
@@ -447,11 +463,11 @@ class ScoreFollower(object):
         listOfParts2 = search.approximateNoteSearch(transcribedScore.flat.notesAndRests, totScores)
         listOfParts3 = search.approximateNoteSearchNoRhythm(transcribedScore.flat.notesAndRests, totScores)    
         listOfParts4 = search.approximateNoteSearchOnlyRhythm(transcribedScore.flat.notesAndRests, totScores)        
-        print "PROBABILITIES:",
-        print "pitches and durations weighted (current)",listOfParts[position].matchProbability,
-        print "pitches and durations without weighting" , listOfParts2[position].matchProbability,
-        print "pitches", listOfParts3[position].matchProbability,
-        print "durations",listOfParts4[position].matchProbability
+#        print "PROBABILITIES:",
+#        print "pitches and durations weighted (current)",listOfParts[position].matchProbability,
+#        print "pitches and durations without weighting" , listOfParts2[position].matchProbability,
+#        print "pitches", listOfParts3[position].matchProbability,
+#        print "durations",listOfParts4[position].matchProbability
             
         for i in range(len(totScores[number])):
             totalLength = totalLength + totScores[number][i].quarterLength
@@ -470,12 +486,9 @@ class TestExternal(unittest.TestCase):
         pass
     
     def xtestRunScoreFollower(self):
-        #scoreNotes = ["d8", "b8", "a8", "g8", "d2", "b8", "a8", "g8", "e2", "c'8", "b8", "a8", "f#2", "d8", "e8", "d8", "c8", "a8", "b8", "r4", "d4", "b4", "a4", "g4", "d4", "b4", "a4", "g4", "e4", "c4", "b4", "a4", "d4", "e4", "d4", "c4", "a4", "g4", "b4", "d4", "g4", "a4", "b4", "c4", "b4", "a4", "b4", "a4", "d4", "b4", "d4", "g4", "a4", "b4", "c4", "b4", "d4", "c4", "a4", "g4"]
-        #scoreNotes = ["f'#4", "e'", "d'", "c'#", "b", "a", "b", "c'#", "d'", "c'#", "b", "a", "g", "f#", "g", "e", "d8", "f#", "a", "g", "f#", "d", "f#", "e", "d", "B", "d", "a", "g", "b", "a", "g", "f#", "d", "e", "c'#", "d'", "f'#", "a'", "a", "b", "g", "a", "f#", "d", "d'16", "e'", "d'8", "c'#", "d'16", "c'#", "d'", "d", "c#", "a", "e", "f#", "d", "d'", "c'#", "b", "c'#", "f'#", "a'", "b'", "g'", "f'#", "e'", "g'", "f'#", "e'", "d'", "c'#", "b", "a", "g", "f#", "e", "g", "f#", "e", "d", "e", "f#", "g", "a", "e", "a", "g", "f#", "b", "a", "g", "a", "g", "f#", "e", "d", "B", "b", "c'#", "d'", "c'#", "b", "a", "g", "f#", "e", "b", "a", "b", "a", "g", "f#8", "f'#", "e'4", "d'", "f'#", "b'4", "a'", "b'", "c'#'", "d''8", "d'", "c'#4", "b", "d'"]
-        #scNotes = converter.parse(" ".join(scoreNotes), "4/4")
         scNotes = corpus.parse('luca/gloria').parts[0].flat.notesAndRests
         ScF = ScoreFollower(scoreStream=scNotes)
-        ScF.runScoreFollower(show=True, plot=False, useMic=True, seconds=10.0)
+        ScF.runScoreFollower(plot=False, useMic=True, seconds=10.0)
     
 
 

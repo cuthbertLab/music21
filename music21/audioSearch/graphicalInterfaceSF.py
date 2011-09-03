@@ -57,9 +57,9 @@ class SFApp():
         self.frame = Tkinter.Frame(master)
         self.master.wm_title("Score follower - music21")
         
-        self.scoreNameSong = 'C:\Users\Jordi\Desktop\m21\Saint-Saens-Clarinet-Sonata\Saint-Saens-Clarinet-Sonata\Saint-Saens-Clarinet-Sonata_Page_'#'scores/d luca gloria_Page_'#'/Users/cuthbert/Desktop/scores/Saint-Saens-Clarinet-Sonata/Saint-Saens-Clarinet-Sonata_Page_'#'scores/d luca gloria_Page_' #  #       
+        self.scoreNameSong = 'scores/d luca gloria_Page_'#'/Users/cuthbert/Desktop/scores/Saint-Saens-Clarinet-Sonata/Saint-Saens-Clarinet-Sonata_Page_'#C:\Users\Jordi\Desktop\m21\Saint-Saens-Clarinet-Sonata\Saint-Saens-Clarinet-Sonata\Saint-Saens-Clarinet-Sonata_Page_'#'scores/d luca gloria_Page_'##'scores/d luca gloria_Page_' #  #       
         self.format = 'tiff'#'jpg'
-        self.nameRecordedSong = 'C:\Users\Jordi\Desktop\m21\Saint-Saens-Clarinet-Sonata\Saint-Saens-Clarinet-Sonata\saint-saens.xml'#'luca/gloria'## # '/Users/cuthbert/Desktop/scores/Saint-Saens-Clarinet-Sonata/saint-saens.xml'
+        self.nameRecordedSong = 'luca/gloria'#'/Users/cuthbert/Desktop/scores/Saint-Saens-Clarinet-Sonata/saint-saens.xml'#'C:\Users\Jordi\Desktop\m21\Saint-Saens-Clarinet-Sonata\Saint-Saens-Clarinet-Sonata\saint-saens.xml'### # 
         self.pageMeasureNumbers = [] # get directly from score - the last one is the last note of the score
         self.totalPagesScore = 1
         self.currentLeftPage = 1
@@ -136,46 +136,44 @@ class SFApp():
         
     def initializeName(self):   
         self.newSize = [self.x, self.y]
-        
         for i in range(self.totalPagesScore):
             numberLength = len(str(self.totalPagesScore))
             namePage = '%s%s.%s' % (str(self.scoreNameSong), str(i + 1).zfill(numberLength), self.format)
-            
             self.listNamePages.append(namePage)
             pilPage = PILImage.open(namePage)
             if pilPage.mode != "RGB":
                 pilPage = pilPage.convert("RGB")
-            pilPage = self.cropBorder(pilPage)
-            self.pagesScore.append(pilPage.resize(self.newSize, PILImage.ANTIALIAS))
+            pilPage = self.cropBorder(pilPage)  
+            self.pagesScore.append(pilPage.resize(self.newSize, PILImage.ANTIALIAS))   
             self.phimage.append(PILImageTk.PhotoImage(self.pagesScore[i]))   
-                          
+                  
       
     def cropBorder(self, img, minColor=240, maxColor=256):
         colorRange = range(minColor, maxColor)
         data = img.getdata()        
-        print 'image', len(data)
         resX = img.size[0]
         resY = img.size[1]
         leftCut = 0
         topCut = 0
         bottomCut = 0
         rightCut = 0
+        numberPixels = int(math.sqrt(len(data)/3000000)*4)  
 
         #Find top
-        for i in range(0, len(data), 4 + int(resX / 25)):
+        for i in range(0, len(data), numberPixels + int(resX / 10)):
             if data[i][0] not in colorRange and data[i][1] not in colorRange and data[i][2] not in colorRange:
                 topCut = int(i / resX)
                 break  
         
         #Find bottom
-        for i in range(len(data) - 1, 0, -4 - int(resX / 15)):
+        for i in range(len(data) - 1, 0, -numberPixels - int(resX / 10)):
             if data[i][0] not in colorRange and data[i][1] not in colorRange and data[i][2] not in colorRange:
                 bottomCut = int((len(data) - i) / resX)
                 break    
                   
         #Find left
         stop = False
-        for xPos in range(0, resX, 4):  # check every 4th pixel
+        for xPos in range(0, resX, numberPixels):  # check every 4th pixel
             for yPos in range(xPos, resY, int(resY / 15)): 
                 pixelPosition = yPos * resX + xPos
                 if data[pixelPosition][0] not in colorRange and \
@@ -189,22 +187,23 @@ class SFApp():
             
         comprovation = False
         while comprovation == False:
-            print 'checking left'
             bad = False
-            for yPos in range(0, resY, int(resY / 15)):
-                pixelPosition = yPos * resX + leftCut - 4
-                if data[pixelPosition][0] not in colorRange or \
+            for yPos in range(0, resY, int(resY / resY)):
+                pixelPosition = yPos * resX + leftCut - numberPixels
+                if pixelPosition >= len(data):
+                    bad = False
+                elif data[pixelPosition][0] not in colorRange or \
                        data[pixelPosition][1] not in colorRange or \
                        data[pixelPosition][2] not in colorRange:
                     bad = True
             if bad == False:
                 comprovation = True
             else:
-                leftCut = leftCut - 4
+                leftCut = leftCut - numberPixels
 
         #Find right
         stop = False
-        for xPos in range(resX - 1, 0, -4):  # check every 4th pixel
+        for xPos in range(resX - 1, 0, -numberPixels):  # check every 4th pixel
             for yPos in range(resX - xPos, resY, int(resY / 15)): 
                 pixelPosition = yPos * resX + xPos
                 if data[pixelPosition][0] not in colorRange and \
@@ -218,19 +217,19 @@ class SFApp():
             
         comprovation = False
         while comprovation == False:
-            print 'checking right', rightCut
             bad = False
-            for yPos in range(0, resY, int(resY / 100)):
-                pixelPosition = yPos * resX + resX - (rightCut - 4)
-                if data[pixelPosition][0] not in colorRange or \
+            for yPos in range(0, resY, int(resY / resY)):
+                pixelPosition = yPos * resX + resX - (rightCut - numberPixels)
+                if pixelPosition >= len(data):
+                    bad = False
+                elif data[pixelPosition][0] not in colorRange or \
                        data[pixelPosition][1] not in colorRange or \
                        data[pixelPosition][2] not in colorRange:
                     bad = True
             if bad == False:
                 comprovation = True
             else:
-                rightCut = rightCut - 4
-        print 'end crops!'
+                rightCut = rightCut - numberPixels
 
         margin = int(resX * 0.03) # leave border 3% of the size
 
@@ -270,15 +269,11 @@ class SFApp():
         middlePagesCounter = 0
         self.middlePages = []
         self.beginningPages = []
-        doneThisPage = -1
         for i in scNotes:
             imn = i.measureNumber
             if pageCounter <= self.totalPagesScore and imn >= self.pageMeasureNumbers[pageCounter]:
                 self.beginningPages.append(noteCounter)
                 pageCounter += 1
-                doneThisPage = imn
-                if pageCounter >= self.totalPagesScore:
-                    pageCounter == self.totalPagesScore
             if middlePagesCounter < self.totalPagesScore and imn == math.floor((self.pageMeasureNumbers[middlePagesCounter + 1] + self.pageMeasureNumbers[middlePagesCounter]) / 2):
                 self.middlePages.append(noteCounter)
                 middlePagesCounter += 1
@@ -549,7 +544,9 @@ class SFApp():
             
             elif self.ScF.lastNotePosition >= self.middlePages[self.currentLeftPage] and self.isMoving == False:  #50% case
                 self.isMoving = True
+                print 'moving for 2n part'
                 self.moving()
+                self.isMoving = False
                 print "playing a note of the second half part of the right page"
                 
             elif self.ScF.lastNotePosition >= self.beginningPages[self.currentLeftPage] and self.ScF.lastNotePosition < self.middlePages[self.currentLeftPage] + self.beginningPages[self.currentLeftPage]: 
@@ -559,7 +556,9 @@ class SFApp():
                     self.hits = 0
                     if self.isMoving == False:
                         self.isMoving = True
+                        print 'moving for hits'
                         self.moving()
+                        self.isMoving = False
             else:
                 self.hits = 0
                 print "playing a note of the left page"

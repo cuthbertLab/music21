@@ -751,7 +751,7 @@ def decisionProcess(list, notePrediction, beginningData, lastNotePosition, count
     >>> positionInList, countdown = decisionProcess(listOfParts, notePrediction, beginningData, lastNotePosition, countdown)
     >>> print positionInList
     0
-    >>> print countdown # the result is 1 because the used song is completely different from the score!!
+    >>> print countdown # the result is 1 because the song used is completely different from the score!!
     1
     '''
     i = 0
