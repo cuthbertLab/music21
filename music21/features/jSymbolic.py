@@ -39,12 +39,6 @@ environLocal = environment.Environment(_MOD)
 # need to classify and add id
 
  
-
-
-
-
-
- 
 class DurationFeature(featuresModule.FeatureExtractor):
     '''A feature extractor that extracts the duration in seconds.
 
@@ -57,12 +51,6 @@ class DurationFeature(featuresModule.FeatureExtractor):
         self.description = 'The total duration in seconds of the music.'
         self.isSequential = False # this is the only jSymbolc non seq feature
         self.dimensions = 1
-
- 
-
-
-
-
 
  
 
@@ -1383,8 +1371,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
             keyFeature = 0
 
         self._feature.vector[0] = keyFeature
-        
-        
+                
 
 class GlissandoPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
@@ -1401,6 +1388,9 @@ class GlissandoPrevalenceFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        raise JSymbolicFeatureException('not yet implemented')
+
 
 class AverageRangeOfGlissandosFeature(featuresModule.FeatureExtractor):
     '''
@@ -1415,6 +1405,9 @@ class AverageRangeOfGlissandosFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        raise JSymbolicFeatureException('not yet implemented')
+
 
 class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
@@ -1428,6 +1421,9 @@ class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
         self.description = 'Number of notes for which Pitch Bend messages change direction at least twice divided by total number of notes that have Pitch Bend messages associated with them.'
         self.isSequential = True
         self.dimensions = 1
+
+    def _process(self):
+        raise JSymbolicFeatureException('not yet implemented')
 
 
 # class PrevalenceOfMicroTonesFeature(featuresModule.FeatureExtractor):
@@ -1463,6 +1459,10 @@ class StrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        raise JSymbolicFeatureException('not yet implemented')
+
+
 class SecondStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
@@ -1475,6 +1475,9 @@ class SecondStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
         self.description = 'Bin label of the beat bin of the peak with the second highest frequency.'
         self.isSequential = True
         self.dimensions = 1
+
+    def _process(self):
+        raise JSymbolicFeatureException('not yet implemented')
 
 
  
@@ -1492,6 +1495,9 @@ class HarmonicityOfTwoStrongestRhythmicPulsesFeature(
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        raise JSymbolicFeatureException('not yet implemented')
+
 
 class StrengthOfStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
@@ -1505,6 +1511,9 @@ class StrengthOfStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
         self.description = 'Frequency of the beat bin with the highest frequency.'
         self.isSequential = True
         self.dimensions = 1
+
+    def _process(self):
+        raise JSymbolicFeatureException('not yet implemented')
 
 
 class StrengthOfSecondStrongestRhythmicPulseFeature(
@@ -1521,6 +1530,8 @@ class StrengthOfSecondStrongestRhythmicPulseFeature(
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        raise JSymbolicFeatureException('not yet implemented')
  
 
 
@@ -1539,6 +1550,10 @@ class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        raise JSymbolicFeatureException('not yet implemented')
+
+
 class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(
     featuresModule.FeatureExtractor):
     '''
@@ -1552,6 +1567,9 @@ class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(
         self.description = 'The sum of the frequencies of the two beat bins of the peaks with the highest frequencies.'
         self.isSequential = True
         self.dimensions = 1
+
+    def _process(self):
+        raise JSymbolicFeatureException('not yet implemented')
 
 
 class NumberOfStrongPulsesFeature(featuresModule.FeatureExtractor):
@@ -1567,6 +1585,9 @@ class NumberOfStrongPulsesFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        raise JSymbolicFeatureException('not yet implemented')
+
  
 class NumberOfModeratePulsesFeature(featuresModule.FeatureExtractor):
     '''
@@ -1580,6 +1601,9 @@ class NumberOfModeratePulsesFeature(featuresModule.FeatureExtractor):
         self.description = 'Number of beat peaks with normalized frequencies over 0.01.'
         self.isSequential = True
         self.dimensions = 1
+
+    def _process(self):
+        raise JSymbolicFeatureException('not yet implemented')
 
 
  
@@ -1610,6 +1634,9 @@ class RhythmicLoosenessFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        raise JSymbolicFeatureException('not yet implemented')
+
  
 class PolyrhythmsFeature(featuresModule.FeatureExtractor):
     '''
@@ -1624,6 +1651,9 @@ class PolyrhythmsFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        raise JSymbolicFeatureException('not yet implemented')
+
  
 class RhythmicVariabilityFeature(featuresModule.FeatureExtractor):
     '''
@@ -1637,6 +1667,9 @@ class RhythmicVariabilityFeature(featuresModule.FeatureExtractor):
         self.description = 'Standard deviation of the bin values (except the first 40 empty ones).'
         self.isSequential = True
         self.dimensions = 1
+
+    def _process(self):
+        raise JSymbolicFeatureException('not yet implemented')
 
 
 class BeatHistogramFeature(featuresModule.FeatureExtractor):
@@ -1655,11 +1688,19 @@ class BeatHistogramFeature(featuresModule.FeatureExtractor):
         self.discrete = False
         self.normalize = True
 
+    def _process(self):
+        raise JSymbolicFeatureException('not yet implemented')
+
   
 
 class NoteDensityFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('bwv66.6')
+    >>> fe = features.jSymbolic.NoteDensityFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [12]
     '''
     id = 'R15'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1669,6 +1710,38 @@ class NoteDensityFeature(featuresModule.FeatureExtractor):
         self.description = 'Average number of notes per second.'
         self.isSequential = True
         self.dimensions = 1
+
+    def _process(self):
+        secondsMap = self.data['secondsMap']
+        # create a dictionary of seconds regions, and count events in each each
+        # just look at start tme
+        regions = {}
+        minKey = None
+        maxKey = 0
+        for bundle in secondsMap:
+            # have already filtered only notes
+            keyStart = int(math.floor(bundle['offset']))
+            keyEnd = int(math.floor(bundle['endTime']))
+
+            if minKey is None or keyStart < minKey:
+                minKey = keyStart
+            if keyEnd > maxKey:
+                maxKey = keyEnd
+
+            # increment all contiguous regions
+            for i in range(keyStart, keyEnd+1):
+                if i in regions.keys():
+                    regions[i] += 1 # increment
+                else:
+                    regions[i] = 1
+        # have counts of all start events for each second; average
+        total = 0
+        for i in range(minKey, maxKey+1):
+            if i in regions.keys(): # there may be gaps
+                total += regions[i]
+        self._feature.vector[0] = total / (maxKey - minKey + 1) # number of slots, inclusive
+
+
 
 class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
@@ -3151,7 +3224,7 @@ def getExtractorByTypeAndNumber(type, number):
     R 12 PolyrhythmsFeature (not implemented)
     R 13 RhythmicVariabilityFeature (not implemented)
     R 14 BeatHistogramFeature (not implemented)
-    R 15 NoteDensityFeature (not implemented)
+    R 15 NoteDensityFeature
     R 17 AverageNoteDurationFeature (not implemented)
     R 18 VariabilityOfNoteDurationFeature (not implemented)
     R 19 MaximumNoteDurationFeature (not implemented)
@@ -3235,6 +3308,9 @@ ElectricInstrumentFractionFeature, #i20
 #t14 not in jSymbolic
 
 #t16-19 not in jSymbolic
+
+
+NoteDensityFeature, # r15
 
 #r26-29 not in jSymbolic
 
@@ -3580,6 +3656,40 @@ class Test(unittest.TestCase):
         f = fe.extract()
         #self.assertAlmostEqual(f.vector[0], 1+2/3.)
 
+
+    def testNoteDensityFeatureA(self):
+        from music21 import stream, note, tempo, features
+        s = stream.Stream()
+        s.insert(0, tempo.MetronomeMark(number=60))
+        s.insert(0, note.Note(quarterLength=8))
+        s.insert(1, note.Note(quarterLength=7))
+        s.insert(2, note.Note(quarterLength=6))
+        s.insert(3, note.Note(quarterLength=5))
+        s.insert(4, note.Note(quarterLength=4))
+        s.insert(5, note.Note(quarterLength=3))
+        s.insert(6, note.Note(quarterLength=2))
+        s.insert(7, note.Note(quarterLength=1))
+        
+        fe = features.jSymbolic.NoteDensityFeature(s)
+        f = fe.extract()
+        self.assertAlmostEqual(f.vector[0], 4)
+        
+        s = stream.Stream()
+        s.insert(0, tempo.MetronomeMark(number=240))
+        s.insert(0, note.Note(quarterLength=8))
+        s.insert(1, note.Note(quarterLength=7))
+        s.insert(2, note.Note(quarterLength=6))
+        s.insert(3, note.Note(quarterLength=5))
+        s.insert(4, note.Note(quarterLength=4))
+        s.insert(5, note.Note(quarterLength=3))
+        s.insert(6, note.Note(quarterLength=2))
+        s.insert(7, note.Note(quarterLength=1))
+        
+        fe = features.jSymbolic.NoteDensityFeature(s)
+        f = fe.extract()
+        self.assertAlmostEqual(f.vector[0], 6)
+
+        
 
     def testFeatureCount(self):
         from music21 import features

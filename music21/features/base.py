@@ -217,7 +217,7 @@ class FeatureExtractor(object):
 
 #-------------------------------------------------------------------------------
 class StreamForms(object):
-    '''A dictionary-like wrapper of a Stream, providing numerous representations cached and on-demand.
+    '''A dictionary-like wrapper of a Stream, providing numerous representations, generated on-demand, and cached.
 
     A single StreamForms object can be created for an entire Score, as well as one for each Part and/or Voice. 
 
@@ -250,7 +250,7 @@ class StreamForms(object):
     def __getitem__(self, key):
         '''Get a form of this Stream, using a cached version if available.
         '''
-        # get cached copy
+        # first, check for cached version
         if key in self._forms.keys():
             return self._forms[key]
 
@@ -446,6 +446,16 @@ class StreamForms(object):
         elif key in ['metadata']:
             self._forms['metadata'] = self._base.metadata
             return self._forms['metadata']
+
+        elif key in ['secondsMap']:
+            secondsMap = self.__getitem__('flat').secondsMap
+            post = []
+            # filter only notes; all elements would otherwise be gathered
+            for bundle in secondsMap:
+                if 'GeneralNote' in bundle['element'].classes:
+                    post.append(bundle)
+            self._forms['secondsMap'] = post
+            return self._forms['secondsMap']
         
         else:
             raise AttributeError('no such attribute: %s' % key)
@@ -1192,6 +1202,19 @@ class Test(unittest.TestCase):
 
         self.assertEqual(di['parts'][1]['midiIntervalHistogram'], [0, 1, 3, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
+
+    def testStreamFormsC(self):
+
+        from music21 import corpus, features, note, stream
+
+        s = stream.Stream()
+        for p in ['c4', 'c4', 'd-4', 'd#4', 'f#4', 'a#4', 'd#5', 'a5']:
+            s.append(note.Note(p))
+        di = features.DataInstance(s)
+
+        self.assertEqual(str(di['secondsMap']), """[{'duration': 0.5, 'voiceIndex': None, 'element': <music21.note.Note C>, 'endTime': 0.5, 'offset': 0.0}, {'duration': 0.5, 'voiceIndex': None, 'element': <music21.note.Note C>, 'endTime': 1.0, 'offset': 0.5}, {'duration': 0.5, 'voiceIndex': None, 'element': <music21.note.Note D->, 'endTime': 1.5, 'offset': 1.0}, {'duration': 0.5, 'voiceIndex': None, 'element': <music21.note.Note D#>, 'endTime': 2.0, 'offset': 1.5}, {'duration': 0.5, 'voiceIndex': None, 'element': <music21.note.Note F#>, 'endTime': 2.5, 'offset': 2.0}, {'duration': 0.5, 'voiceIndex': None, 'element': <music21.note.Note A#>, 'endTime': 3.0, 'offset': 2.5}, {'duration': 0.5, 'voiceIndex': None, 'element': <music21.note.Note D#>, 'endTime': 3.5, 'offset': 3.0}, {'duration': 0.5, 'voiceIndex': None, 'element': <music21.note.Note A>, 'endTime': 4.0, 'offset': 3.5}]""")
+
+
     def testDataSetOutput(self):
         from music21 import features
         # test just a few features
@@ -1363,8 +1386,6 @@ class Test(unittest.TestCase):
         ds.write('/_scratch/chinaMitteleuropaSplit-a.tab')
         ds.write('/_scratch/chinaMitteleuropaSplit-a.csv')
         ds.write('/_scratch/chinaMitteleuropaSplit-a.arff')
-
-
 
         # create second data set from alternate collections
         ds = features.DataSet(classLabel='Region')
