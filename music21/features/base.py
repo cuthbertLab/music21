@@ -720,7 +720,7 @@ class OutputCSV(OutputFormat):
 class OutputARFF(OutputFormat):
     '''An ARFF (Attribute-Relation File Format) file.
 
-    http://weka.wikispaces.com/ARFF+(stable+version)
+    See http://weka.wikispaces.com/ARFF+%28stable+version%29 for more details
 
     >>> from music21 import *
     >>> oa = features.OutputARFF()
