@@ -1817,7 +1817,6 @@ class MaximumNoteDurationFeature(featuresModule.FeatureExtractor):
                 max = bundle['durationSeconds']
         self._feature.vector[0] = max
 
-
  
 class MinimumNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
@@ -1850,6 +1849,11 @@ class MinimumNoteDurationFeature(featuresModule.FeatureExtractor):
 class StaccatoIncidenceFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('bwv66.6')
+    >>> fe = features.jSymbolic.StaccatoIncidenceFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [0.0]
     '''
     id = 'R21'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1860,10 +1864,24 @@ class StaccatoIncidenceFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        secondsMap = self.data['secondsMap']
+        count = 0
+        for bundle in secondsMap:
+            if bundle['durationSeconds'] < .10:
+                count += 1
+        self._feature.vector[0] = count / float(len(secondsMap))
+
+
 
 class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('bwv66.6')
+    >>> fe = features.jSymbolic.AverageTimeBetweenAttacksFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [0.349999...]
     '''
     id = 'R22'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1873,6 +1891,22 @@ class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
         self.description = 'Average time in seconds between Note On events (regardless of channel).'
         self.isSequential = True
         self.dimensions = 1
+
+    def _process(self):
+        secondsMap = self.data['secondsMap']
+        onsets = [bundle['offsetSeconds'] for bundle in secondsMap]
+        onsets.sort() # may already be sorted?
+        differences = []
+        for i, o in enumerate(onsets):
+            if i == len(onsets) - 1: # last
+                break
+            oNext = onsets[i+1]
+            # not including simultaneous attacks
+            dif = oNext-o
+            if not common.almostEquals(dif, 0.0):
+                differences.append(dif)
+        self._feature.vector[0] = sum(differences) / float(len(differences))
+
 
  
 class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
@@ -2247,6 +2281,7 @@ class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    # count Voices, count Parts, sum total 
 
 
 class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
@@ -3275,8 +3310,8 @@ def getExtractorByTypeAndNumber(type, number):
     R 18 VariabilityOfNoteDurationFeature (not implemented)
     R 19 MaximumNoteDurationFeature
     R 20 MinimumNoteDurationFeature
-    R 21 StaccatoIncidenceFeature (not implemented)
-    R 22 AverageTimeBetweenAttacksFeature (not implemented)
+    R 21 StaccatoIncidenceFeature
+    R 22 AverageTimeBetweenAttacksFeature
     R 23 VariabilityOfTimeBetweenAttacksFeature (not implemented)
     R 24 AverageTimeBetweenAttacksForEachVoiceFeature (not implemented)
     R 25 AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature (not implemented)
@@ -3360,7 +3395,8 @@ NoteDensityFeature, # r15
 AverageNoteDurationFeature, # r17
 MaximumNoteDurationFeature, # r19
 MinimumNoteDurationFeature, # r20
-
+StaccatoIncidenceFeature, # r21
+AverageTimeBetweenAttacksFeature, #r22
 #r26-29 not in jSymbolic
 
 
