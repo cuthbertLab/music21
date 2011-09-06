@@ -1720,8 +1720,8 @@ class NoteDensityFeature(featuresModule.FeatureExtractor):
         maxKey = 0
         for bundle in secondsMap:
             # have already filtered only notes
-            keyStart = int(math.floor(bundle['offset']))
-            keyEnd = int(math.floor(bundle['endTime']))
+            keyStart = int(math.floor(bundle['offsetSeconds']))
+            keyEnd = int(math.floor(bundle['endTimeSeconds']))
 
             if minKey is None or keyStart < minKey:
                 minKey = keyStart
