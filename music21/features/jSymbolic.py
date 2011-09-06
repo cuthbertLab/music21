@@ -1746,6 +1746,16 @@ class NoteDensityFeature(featuresModule.FeatureExtractor):
 class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('bwv66.6')
+    >>> fe = features.jSymbolic.AverageNoteDurationFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [0.441717...]
+    >>> s.insert(0, tempo.MetronomeMark(number=240))
+    >>> fe = features.jSymbolic.AverageNoteDurationFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [0.220858...]
     '''
     id = 'R17'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1756,7 +1766,14 @@ class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
- 
+    def _process(self):
+        secondsMap = self.data['secondsMap']
+        total = 0.0
+        for bundle in secondsMap:
+            total += bundle['durationSeconds']
+        self._feature.vector[0] = total / len(secondsMap)
+
+
 class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
@@ -1770,10 +1787,18 @@ class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        pass
+        # if using numpy, can use:>>> numpy.std([1,2,3])
  
 class MaximumNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('bwv66.6')
+    >>> fe = features.jSymbolic.MaximumNoteDurationFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [1.0]
     '''
     id = 'R19'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1784,12 +1809,24 @@ class MaximumNoteDurationFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        secondsMap = self.data['secondsMap']
+        max = 0.0
+        for bundle in secondsMap:
+            if bundle['durationSeconds'] > max:
+                max = bundle['durationSeconds']
+        self._feature.vector[0] = max
 
 
  
 class MinimumNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('bwv66.6')
+    >>> fe = features.jSymbolic.MinimumNoteDurationFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [0.25]
     '''
     id = 'R20'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1800,7 +1837,16 @@ class MinimumNoteDurationFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
- 
+    def _process(self):
+        secondsMap = self.data['secondsMap']
+        # an arbitrary number from the coll
+        min = secondsMap[0]['durationSeconds'] 
+        for bundle in secondsMap:
+            if bundle['durationSeconds'] < min:
+                min = bundle['durationSeconds']
+        self._feature.vector[0] = min 
+
+
 class StaccatoIncidenceFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
@@ -3225,10 +3271,10 @@ def getExtractorByTypeAndNumber(type, number):
     R 13 RhythmicVariabilityFeature (not implemented)
     R 14 BeatHistogramFeature (not implemented)
     R 15 NoteDensityFeature
-    R 17 AverageNoteDurationFeature (not implemented)
+    R 17 AverageNoteDurationFeature
     R 18 VariabilityOfNoteDurationFeature (not implemented)
-    R 19 MaximumNoteDurationFeature (not implemented)
-    R 20 MinimumNoteDurationFeature (not implemented)
+    R 19 MaximumNoteDurationFeature
+    R 20 MinimumNoteDurationFeature
     R 21 StaccatoIncidenceFeature (not implemented)
     R 22 AverageTimeBetweenAttacksFeature (not implemented)
     R 23 VariabilityOfTimeBetweenAttacksFeature (not implemented)
@@ -3311,6 +3357,9 @@ ElectricInstrumentFractionFeature, #i20
 
 
 NoteDensityFeature, # r15
+AverageNoteDurationFeature, # r17
+MaximumNoteDurationFeature, # r19
+MinimumNoteDurationFeature, # r20
 
 #r26-29 not in jSymbolic
 
