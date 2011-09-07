@@ -288,7 +288,7 @@ class TempoText(TempoIndication):
 class MetronomeMarkException(TempoException):
     pass
 
-
+# TODO: define if tempo applies only to part
 #-------------------------------------------------------------------------------
 class MetronomeMark(TempoIndication):
     '''
