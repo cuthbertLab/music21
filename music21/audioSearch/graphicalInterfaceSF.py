@@ -10,7 +10,9 @@
 # Copyright:    (c) 2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+'''
 
+'''
 
 from music21 import corpus
 from music21 import converter

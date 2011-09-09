@@ -53,6 +53,41 @@ if len(_missingImport) > 0:
         #environLocal.warn(common.getMissingImportStr(_missingImport), header='music21:')
 
 
+def histogram(data,bins):
+    '''
+    Histogram
+    
+    
+    >>> from music21 import *
+    >>> data = [1, 1, 4, 5, 6, 0, 8, 8, 8, 8, 8]
+    >>> pdf, bins = audioSearch.histogram(data,8)
+    >>> print pdf
+    [3, 0, 0, 1, 1, 1, 0, 5]
+    >>> print bins
+    [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    
+    '''
+    maxValue = max(data)
+    minValue = min(data)
+    lengthEachBin = (maxValue-minValue)/bins
+    
+    container = []
+    for i in range(int(bins)):
+        container.append(0)
+    for i in data:
+        count = 1
+        while i > minValue + count*lengthEachBin:
+            count += 1
+        container[count - 1] += 1
+        
+    binsLimits = []
+    binsLimits.append(minValue)
+    count = 1
+    for i in range(int(bins)):
+        binsLimits.append(minValue+count*lengthEachBin)
+        count +=1
+    return container,binsLimits
+
 
 def autocorrelationFunction(recordedSignal, recordSampleRate):
     '''  
@@ -579,6 +614,7 @@ def quantizeDuration(length):
     return finalLength / 100
 
 
+
 def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
     '''
     takes a list of lengths of notes (measured in
@@ -612,7 +648,7 @@ def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
     ''' 
     dl = copy.copy(durationList)
     dl.append(0)
-    pdf, bins, patches = matplotlib.pyplot.hist(dl, bins=8)        
+    pdf, bins = histogram(dl,8.0)        
     #environLocal.printDebug("HISTOGRAMA %s %s" % (pdf, bins))
     
     i = len(pdf) - 1 # backwards! it has more sense
@@ -633,6 +669,7 @@ def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
 
 
 
+        
     
 def notesAndDurationsToStream(notesList, durationList, scNotes=None,
                               removeRestsAtBeginning=True, qle=None):
