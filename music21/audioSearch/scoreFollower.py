@@ -107,6 +107,7 @@ class ScoreFollower(object):
 #        print "countdown %d" % self.countdown
 #        print "Measure last note", self.scoreStream[self.lastNotePosition].measureNumber
 
+        print "repeat transcription starting"
         if self.useMic == True:
             freqFromAQList = getFrequenciesFromMicrophone(length=self.seconds_recording, storeWaveFilename=None)
         else:
@@ -114,16 +115,23 @@ class ScoreFollower(object):
             if self.totalFile == 0:
                 self.totalFile = self.waveFile.getnframes()
         
+        print "got Frequencies from Microphone"
+
         time_start = time()
         detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, self.useScale)
         detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
         (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, self.useScale)
         (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
         self.silencePeriodDetection(notesList)
+        print "made it to here..."
         scNotes = self.scoreStream[self.lastNotePosition:self.lastNotePosition + len(notesList)]
+        print "1"
         transcribedScore, self.qle = notesAndDurationsToStream(notesList, durationList, scNotes=scNotes, qle=self.qle) 
+        print "2"
         totalLengthPeriod, self.lastNotePosition, prob, END_OF_SCORE = self.matchingNotes(self.scoreStream, transcribedScore, self.startSearchAtSlot, self.lastNotePosition)
+        print "3"
         self.processing_time = time()-time_start
+        print "and even to here..."
         if END_OF_SCORE == True:
             exitType = "endOfScore"  #"endOfScore"
             return exitType
@@ -142,6 +150,7 @@ class ScoreFollower(object):
             #print "waveFileEOF"
             exitType = "waveFileEOF"
 
+        print "about to return -- exitType: %s " % exitType 
         return exitType
     
     

@@ -53,6 +53,7 @@ except:
 class SFApp():
    
     def __init__(self, master):
+        self.debug = True
         if 'PIL' in _missingImport:
             raise music21.Music21Exception("Need PIL installed to run Score Follower")
         self.master = master
@@ -78,7 +79,8 @@ class SFApp():
         
         try: # for windows
             user32 = ctypes.windll.user32
-            self.screenResolution = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+            self.screenResolution = [1024, 600]
+            #self.screenResolution = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
             print "screen resolution (windows)", self.screenResolution[0], self.screenResolution[1]
             self.resolution = True
         except: # mac and linux
@@ -132,8 +134,9 @@ class SFApp():
         except IOError:
             pass
         self.initializeGraphicInterface()
-        print 'intiGraph', time.time() - prevtime, 'sec'
-        print 'Initialized!'        
+        if self.debug == True:
+            print 'intiGraph', time.time() - prevtime, 'sec'
+            print 'Initialized!'        
         
         
     def initializeName(self):   
@@ -148,6 +151,8 @@ class SFApp():
             pilPage = self.cropBorder(pilPage)  
             self.pagesScore.append(pilPage.resize(self.newSize, PILImage.ANTIALIAS))   
             self.phimage.append(PILImageTk.PhotoImage(self.pagesScore[i]))   
+        if self.debug == True:
+            print "initializeName finished"
                   
       
     def cropBorder(self, img, minColor=240, maxColor=256):
@@ -280,8 +285,11 @@ class SFApp():
                 self.middlePages.append(noteCounter)
                 middlePagesCounter += 1
             noteCounter += 1
-        print "beginning of the pages", self.beginningPages
-        print 'middles of the pages', self.middlePages
+        if self.debug == True:
+            print "beginning of the pages", self.beginningPages
+            print 'middles of the pages', self.middlePages
+            print "initializeScore finished"
+
                                                                                   
     def initializeGraphicInterface(self):
         master = self.master
@@ -348,9 +356,12 @@ class SFApp():
             self.label2.grid(row=7, column=3, sticky=Tkinter.E)
             
             self.firstTime = False
-
+        if self.debug == True:
+            print "initializeGraphicInterface finished"
         
     def moving(self):
+        if self.debug == True:
+            print "moving starting"
         if self.currentLeftPage + 1 < self.totalPagesScore:
             self.ntimes = 0
             self.newcoords = self.positionxRight, self.positionyLeft
@@ -374,6 +385,8 @@ class SFApp():
             self.master.after(500, self.movingRoutine)
 
     def movingRoutine(self):
+        if self.debug == True:
+            print "starting movingRoutine"
         if self.newcoords[0] > self.positionxLeft:
             self.newcoords = self.positionxRight - self.speed * self.ntimes, self.positionyRight
             self.canvas1.coords('rightImage', self.newcoords) 
@@ -384,14 +397,17 @@ class SFApp():
             self.master.after(self.refreshTime, self.movingRoutine)
             
         else:
+            print "finished main moving routine"
             if self.currentLeftPage + 2 <= self.totalPagesScore:
                 self.canvas1.delete('3rdImage')
-            self.master.after(0, self.pageForward)
+            self.pageForward()
             self.isMoving = False                        
         
                       
     def pageForward(self):   
-        
+        '''
+        runs after moving is done
+        '''
         if self.currentLeftPage + 1 <= self.totalPagesScore:
             self.canvas1.delete('leftImage')
             self.canvas1.delete('rightImage')  
@@ -450,7 +466,8 @@ class SFApp():
         
        
     def startScoreFollower(self):
-        
+        if self.debug == True:
+            print "startScoreFollower starting"
         self.button2 = Tkinter.Button(self.master, text="START SF", width=self.sizeButton, command=self.startScoreFollower, state='disable', bg='green')
         self.button2.grid(row=5, column=3)        
         scNotes = self.scorePart.flat.notesAndRests
@@ -482,9 +499,13 @@ class SFApp():
 
  
     def continueScoreFollower(self):
+        if self.debug == True:
+            print "continueScoreFollower starting"
         self.ScF = self.scoreFollower   
         self.timeStart = time.time()    
         if self.stop == False and (self.firstTimeSF == True or self.rt.resultInThread == False):
+            if self.debug == True:
+                print "firstTimeSF == True or resultInThread"
             
             self.lastNoteString = 'Note: %d, Measure: %d, Countdown:%d, Page:%d' % (self.ScF.lastNotePosition, self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber , self.ScF.countdown, self.currentLeftPage) 
             if self.firstTimeSF == False:
@@ -504,10 +525,17 @@ class SFApp():
             
             self.rt = RecordThread(self.dummyQueue, self.sampleQueue, self.ScF)            
             self.rt.daemon = True
+            if self.debug == True:
+                print "2nd thread about to start"
             self.rt.start() # the 2nd thread starts here
             self.dummyQueue.put("Start")            
+            if self.debug == True:
+                print "about to put analyzeRecording into master..."
             self.master.after(7000, self.analyzeRecording)
         else:
+            if self.debug == True:
+                print "stopped..."
+
             self.button2.destroy() 
             self.button2 = Tkinter.Button(self.master, text="START SF", width=self.sizeButton, command=self.startScoreFollower, bg='green')
             self.button2.grid(row=5, column=3)
@@ -546,9 +574,9 @@ class SFApp():
             
             elif self.ScF.lastNotePosition >= self.middlePages[self.currentLeftPage] and self.isMoving == False:  #50% case
                 self.isMoving = True
-                print 'moving for 2n part'
+                print 'moving right page to left'
                 self.moving()
-                self.isMoving = False
+                #self.isMoving = False
                 print "playing a note of the second half part of the right page"
                 
             elif self.ScF.lastNotePosition >= self.beginningPages[self.currentLeftPage] and self.ScF.lastNotePosition < self.middlePages[self.currentLeftPage] + self.beginningPages[self.currentLeftPage]: 
@@ -560,7 +588,7 @@ class SFApp():
                         self.isMoving = True
                         print 'moving for hits'
                         self.moving()
-                        self.isMoving = False
+                        #self.isMoving = False
             else:
                 self.hits = 0
                 print "playing a note of the left page"
@@ -625,14 +653,15 @@ class RecordThread(threading.Thread):
         self.outQueue = outQueue
         self.l = []
         self.object = object
-        print 'valor dins el thread'
     def run(self):
         startCommand = self.inQueue.get()
         print "start command received: recording!"
         self.resultInThread = self.object.repeatTranscription()
+        print "repeatTranscription has been run"
         self.outQueue.put(1)
+        print "put into outQueue"
         self.outQueue.task_done()
-            
+        print "task is done"
 
 
                
