@@ -446,6 +446,20 @@ def nearestMultiple(n, unit):
         return matchHigh, matchHigh - n
        
 
+def standardDeviation(coll):
+    '''Given a collection of values, return the standard deviation.
+
+    >>> from music21 import *
+    >>> common.standardDeviation([2,4,4,4,5,5,7,9])
+    2.0
+
+    '''
+    avg = sum(coll) / float(len(coll))
+    diffColl = [math.pow(val-avg, 2) for val in coll]
+    # some subtract 1 from the count below
+    return math.sqrt(sum(diffColl) / float(len(diffColl)))
+
+
 def isNum(usrData):
     '''check if usrData is a number (float, int, long, Decimal), return boolean
     IMPROVE: when 2.6 is everywhere: add numbers class.
