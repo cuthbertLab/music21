@@ -1912,6 +1912,11 @@ class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
 class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('bwv66.6')
+    >>> fe = features.jSymbolic.VariabilityOfTimeBetweenAttacksFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [0.15000...]
     '''
     id = 'R23'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1921,8 +1926,25 @@ class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
         self.description = 'Standard deviation of the times, in seconds, between Note On events (regardless of channel).'
         self.isSequential = True
         self.dimensions = 1
-
  
+    def _process(self):
+        secondsMap = self.data['secondsMap']
+        onsets = [bundle['offsetSeconds'] for bundle in secondsMap]
+        onsets.sort() # may already be sorted?
+        differences = []
+        for i, o in enumerate(onsets):
+            if i == len(onsets) - 1: # last
+                break
+            oNext = onsets[i+1]
+            # not including simultaneous attacks
+            dif = oNext-o
+            if not common.almostEquals(dif, 0.0):
+                differences.append(dif)
+        self._feature.vector[0] = common.standardDeviation(differences,
+                                  bassel=False)
+
+
+
 class AverageTimeBetweenAttacksForEachVoiceFeature(
     featuresModule.FeatureExtractor):
     '''
@@ -3312,7 +3334,7 @@ def getExtractorByTypeAndNumber(type, number):
     R 20 MinimumNoteDurationFeature
     R 21 StaccatoIncidenceFeature
     R 22 AverageTimeBetweenAttacksFeature
-    R 23 VariabilityOfTimeBetweenAttacksFeature (not implemented)
+    R 23 VariabilityOfTimeBetweenAttacksFeature
     R 24 AverageTimeBetweenAttacksForEachVoiceFeature (not implemented)
     R 25 AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature (not implemented)
     R 30 InitialTempoFeature (not implemented)
@@ -3397,6 +3419,7 @@ MaximumNoteDurationFeature, # r19
 MinimumNoteDurationFeature, # r20
 StaccatoIncidenceFeature, # r21
 AverageTimeBetweenAttacksFeature, #r22
+VariabilityOfTimeBetweenAttacksFeature, #r23
 #r26-29 not in jSymbolic
 
 
