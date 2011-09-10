@@ -446,18 +446,27 @@ def nearestMultiple(n, unit):
         return matchHigh, matchHigh - n
        
 
-def standardDeviation(coll):
+def standardDeviation(coll, bassel=False):
     '''Given a collection of values, return the standard deviation.
 
     >>> from music21 import *
     >>> common.standardDeviation([2,4,4,4,5,5,7,9])
     2.0
+    >>> common.standardDeviation([600, 470, 170, 430, 300])
+    147.3227...
+    >>> common.standardDeviation([4, 2, 5, 8, 6], bassel=True)
+    2.23606...
 
     '''
     avg = sum(coll) / float(len(coll))
     diffColl = [math.pow(val-avg, 2) for val in coll]
-    # some subtract 1 from the count below
-    return math.sqrt(sum(diffColl) / float(len(diffColl)))
+    # with a sample standard deviation (not a whole population)
+    # subtract 1 from the length
+    # this is bassel's correction
+    if bassel:
+        return math.sqrt(sum(diffColl) / float(len(diffColl)-1))
+    else:
+        return math.sqrt(sum(diffColl) / float(len(diffColl)))
 
 
 def isNum(usrData):
