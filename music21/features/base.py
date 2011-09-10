@@ -290,6 +290,10 @@ class StreamForms(object):
             self._forms['flat.getElementsByClass.KeySignature'] = self._base.flat.getElementsByClass('KeySignature')
             return self._forms['flat.getElementsByClass.KeySignature']
 
+        elif key in ['metronomeMarkBoundaries']: # already flat
+            self._forms['metronomeMarkBoundaries'] = self._base.metronomeMarkBoundaries()
+            return self._forms['metronomeMarkBoundaries']
+
         # some methods that return new streams
         elif key in ['chordify']:
             if 'Score' in self._base.classes:

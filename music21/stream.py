@@ -6724,14 +6724,18 @@ class Stream(music21.Music21Object):
         ''')
 
 
-    def _getMetronomeMarkBoundaries(self, srcObj=None):
-        '''Return a list of offset start, offset end, MetronomeMark triples for all tempo indications found in this Stream or a Stream provided by srcObj. If no MetronomeMarks are found, or an initial region does not have a MetronomeMark, a mark of quarter equal to 120 is provided as default. 
+    def metronomeMarkBoundaries(self, srcObj=None):
+        '''Return a list of offset start, offset end, MetronomeMark triples for all TempoIndication objects found in this Stream or a Stream provided by srcObj. 
+
+        If no MetronomeMarks are found, or an initial region does not have a MetronomeMark, a mark of quarter equal to 120 is provided as default. 
+
+        Note that if other TempoIndication objets are defined, they will be converted to MetronomeMarks and returned here
 
         >>> from music21 import *   
         >>> s = stream.Stream()
         >>> s.repeatAppend(note.Note(), 8)     
         >>> s.insert([6, tempo.MetronomeMark(number=240)]) 
-        >>> s._getMetronomeMarkBoundaries()
+        >>> s.metronomeMarkBoundaries()
         [(0.0, 6.0, <music21.tempo.MetronomeMark animato Quarter=120>), (6.0, 8.0, <music21.tempo.MetronomeMark Quarter=240>)]
         '''
         if srcObj is None:
@@ -6739,12 +6743,13 @@ class Stream(music21.Music21Object):
         # get all tempo indications from the flat Stream; 
         # using flat here may not always be desirable
         # may want to do a recursive upward search as well
-        tiStream = srcObj.flat.getElementsByClass('TempoIndication')
+        srcFlat = srcObj.flat
+        tiStream = srcFlat.getElementsByClass('TempoIndication')
         mmBoundaries = [] # a  list of (start, end, mm)
         
         # not sure if this should be taken from the flat representation
-        highestTime = srcObj.highestTime
-        lowestOffset = srcObj.lowestOffset
+        highestTime = srcFlat.highestTime
+        lowestOffset = srcFlat.lowestOffset
 
         # if no tempo
         if len(tiStream) == 0:
@@ -6752,7 +6757,8 @@ class Stream(music21.Music21Object):
             mmBoundaries.append((lowestOffset, highestTime, mmDefault))
         # if just one tempo
         elif len(tiStream) == 1:
-            o = tiStream[0].getOffsetBySite(srcObj)
+            # get offset from flat source
+            o = tiStream[0].getOffsetBySite(srcFlat)
             mm = tiStream[0].getSoundingMetronomeMark()
             if o > lowestOffset:
                 mmDefault = tempo.MetronomeMark(number=120) # a default
@@ -6789,7 +6795,7 @@ class Stream(music21.Music21Object):
                     mmBoundaries.append((offsetPairs[i][0], offsetPairs[i+1][0],
                                          offsetPairs[i][1]))
 
-        #environLocal.printDebug(['self._getMetronomeMarkBoundaries()', 'got mmBoundaries:', mmBoundaries])
+        #environLocal.printDebug(['self.metronomeMarkBoundaries()', 'got mmBoundaries:', mmBoundaries])
         return mmBoundaries
 
     def _accumulatedSeconds(self, mmBoundaries, oStart, oEnd):
@@ -6821,7 +6827,7 @@ class Stream(music21.Music21Object):
         '''
         if srcObj is None:
             srcObj = self
-        mmBoundaries = self._getMetronomeMarkBoundaries(srcObj=srcObj)
+        mmBoundaries = self.metronomeMarkBoundaries(srcObj=srcObj)
 
         # not sure if this should be taken from the flat representation
         highestTime = srcObj.highestTime
@@ -16459,12 +16465,18 @@ class Test(unittest.TestCase):
         mm.number = 30
         self.assertEqual([m.seconds for m in s.getElementsByClass('Measure')], [6.0, 10.0, 4.0])
 
+    def testMetronomeMarkBoundaries(self):
+        from music21 import stream, tempo, note, corpus
+        s = corpus.parse('hwv56/movement2-09.md')
+        mmBoundaries = s.metronomeMarkBoundaries()
+        self.assertEqual(str(mmBoundaries), '[(0.0, 20.0, <music21.tempo.MetronomeMark Largo e piano Quarter=46>)]')
+
     def testAccumulatedTimeA(self):
         from music21 import stream, tempo, note
         s = stream.Stream()
         s.repeatAppend(note.Note(), 8)            
         s.insert([0, tempo.MetronomeMark(number=60)])
-        mmBoundaries = s._getMetronomeMarkBoundaries()
+        mmBoundaries = s.metronomeMarkBoundaries()
         self.assertEqual(s._accumulatedSeconds(mmBoundaries, 0, 1), 1.0)
         self.assertEqual(s._accumulatedSeconds(mmBoundaries, 0, 2), 2.0)
         self.assertEqual(s._accumulatedSeconds(mmBoundaries, 0, 8), 8.0)
@@ -16474,7 +16486,7 @@ class Test(unittest.TestCase):
         s.repeatAppend(note.Note(), 8)            
         s.insert([0, tempo.MetronomeMark(number=60),
                   4, tempo.MetronomeMark(number=120)])
-        mmBoundaries = s._getMetronomeMarkBoundaries()
+        mmBoundaries = s.metronomeMarkBoundaries()
         self.assertEqual(s._accumulatedSeconds(mmBoundaries, 0, 4), 4.0)
         self.assertEqual(s._accumulatedSeconds(mmBoundaries, 4, 8), 2.0)
         self.assertEqual(s._accumulatedSeconds(mmBoundaries, 0, 8), 6.0)
@@ -16488,7 +16500,7 @@ class Test(unittest.TestCase):
         s.insert([0, tempo.MetronomeMark(number=60),
                   4, tempo.MetronomeMark(number=120),
                   6, tempo.MetronomeMark(number=240)])
-        mmBoundaries = s._getMetronomeMarkBoundaries()
+        mmBoundaries = s.metronomeMarkBoundaries()
         self.assertEqual(s._accumulatedSeconds(mmBoundaries, 0, 4), 4.0)
         self.assertEqual(s._accumulatedSeconds(mmBoundaries, 4, 6), 1.0)
         self.assertEqual(s._accumulatedSeconds(mmBoundaries, 6, 8), 0.5)
@@ -16502,31 +16514,31 @@ class Test(unittest.TestCase):
         s.insert([0, tempo.MetronomeMark(number=90), 
                   4, tempo.MetronomeMark(number=120),
                   6, tempo.MetronomeMark(number=240)])
-        self.assertEqual(str(s._getMetronomeMarkBoundaries()), '[(0.0, 4.0, <music21.tempo.MetronomeMark maestoso Quarter=90>), (4.0, 6.0, <music21.tempo.MetronomeMark animato Quarter=120>), (6.0, 8.0, <music21.tempo.MetronomeMark Quarter=240>)]')
+        self.assertEqual(str(s.metronomeMarkBoundaries()), '[(0.0, 4.0, <music21.tempo.MetronomeMark maestoso Quarter=90>), (4.0, 6.0, <music21.tempo.MetronomeMark animato Quarter=120>), (6.0, 8.0, <music21.tempo.MetronomeMark Quarter=240>)]')
 
         # not starting
         s = stream.Stream()
         s.repeatAppend(note.Note(), 8)            
         s.insert([4, tempo.MetronomeMark(number=120),
                   6, tempo.MetronomeMark(number=240)])
-        self.assertEqual(str(s._getMetronomeMarkBoundaries()), '[(0.0, 4.0, <music21.tempo.MetronomeMark animato Quarter=120>), (4.0, 6.0, <music21.tempo.MetronomeMark animato Quarter=120>), (6.0, 8.0, <music21.tempo.MetronomeMark Quarter=240>)]')
+        self.assertEqual(str(s.metronomeMarkBoundaries()), '[(0.0, 4.0, <music21.tempo.MetronomeMark animato Quarter=120>), (4.0, 6.0, <music21.tempo.MetronomeMark animato Quarter=120>), (6.0, 8.0, <music21.tempo.MetronomeMark Quarter=240>)]')
 
         # none
         s = stream.Stream()
         s.repeatAppend(note.Note(), 8)    
-        self.assertEqual(str(s._getMetronomeMarkBoundaries()), '[(0.0, 8.0, <music21.tempo.MetronomeMark animato Quarter=120>)]')        
+        self.assertEqual(str(s.metronomeMarkBoundaries()), '[(0.0, 8.0, <music21.tempo.MetronomeMark animato Quarter=120>)]')        
 
         # ont mid stream
         s = stream.Stream()
         s.repeatAppend(note.Note(), 8)     
         s.insert([6, tempo.MetronomeMark(number=240)])   
-        self.assertEqual(str(s._getMetronomeMarkBoundaries()), '[(0.0, 6.0, <music21.tempo.MetronomeMark animato Quarter=120>), (6.0, 8.0, <music21.tempo.MetronomeMark Quarter=240>)]')           
+        self.assertEqual(str(s.metronomeMarkBoundaries()), '[(0.0, 6.0, <music21.tempo.MetronomeMark animato Quarter=120>), (6.0, 8.0, <music21.tempo.MetronomeMark Quarter=240>)]')           
 
         # one start stream
         s = stream.Stream()
         s.repeatAppend(note.Note(), 8)     
         s.insert([0, tempo.MetronomeMark(number=240)])      
-        self.assertEqual(str(s._getMetronomeMarkBoundaries()), '[(0.0, 8.0, <music21.tempo.MetronomeMark Quarter=240>)]')           
+        self.assertEqual(str(s.metronomeMarkBoundaries()), '[(0.0, 8.0, <music21.tempo.MetronomeMark Quarter=240>)]')           
 
     def testSecondsMapB(self):
         from music21 import stream, note, tempo

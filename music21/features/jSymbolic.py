@@ -1976,6 +1976,7 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
         self.dimensions = 1
 
 
+
 #class IncidenceOfCompleteRestsFeature(featuresModule.FeatureExtractor):
 #    '''
 #    Not implemented in jSymbolic
@@ -2035,6 +2036,18 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 class InitialTempoFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.jSymbolic.InitialTempoFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector # a default
+    [120.0]
+
+    >>> s = corpus.parse('hwv56/movement2-09.md') # has a tempos
+    >>> fe = features.jSymbolic.InitialTempoFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [46.0]
+
     '''
     id = 'R30'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2045,6 +2058,12 @@ class InitialTempoFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        triples = self.data['metronomeMarkBoundaries']
+        # the first is the a default, if necessary; also provides start/end time
+        mm = triples[0][2]
+        # assume we want quarter bpm, not bpm in other division
+        self._feature.vector[0] = mm.getQuarterBPM()
 
  
 class InitialTimeSignatureFeature(featuresModule.FeatureExtractor):
@@ -3337,7 +3356,7 @@ def getExtractorByTypeAndNumber(type, number):
     R 23 VariabilityOfTimeBetweenAttacksFeature
     R 24 AverageTimeBetweenAttacksForEachVoiceFeature (not implemented)
     R 25 AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature (not implemented)
-    R 30 InitialTempoFeature (not implemented)
+    R 30 InitialTempoFeature
     R 31 InitialTimeSignatureFeature
     R 32 CompoundOrSimpleMeterFeature
     R 33 TripleMeterFeature
@@ -3422,7 +3441,7 @@ AverageTimeBetweenAttacksFeature, #r22
 VariabilityOfTimeBetweenAttacksFeature, #r23
 #r26-29 not in jSymbolic
 
-
+InitialTempoFeature, # r30
 InitialTimeSignatureFeature, # r31
 CompoundOrSimpleMeterFeature, # r32
 TripleMeterFeature, # r33
@@ -3460,9 +3479,23 @@ QualityFeature, #p22
 
 
 
-
-
-
+def getCompletionStats():
+    '''
+    >>> from music21 import *
+    >>> features.jSymbolic.getCompletionStats()
+    completion rate: 65/111 (0.5855...)
+    '''
+    countTotal = 0
+    countComplete = 0
+    for k in extractorsById.keys(): # a dictionary of lists
+        group = extractorsById[k]
+        for i in range(len(group)):
+            if group[i] is not None:
+                n = group[i].__name__
+                countTotal += 1
+                if group[i] in featureExtractors:
+                    countComplete += 1
+    print('completion rate: %s/%s (%s)' % (countComplete, countTotal, (float(countComplete)/countTotal)))
 
 
 
