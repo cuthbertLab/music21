@@ -1354,7 +1354,6 @@ class Stream(music21.Music21Object):
             except AttributeError:
                 #environLocal.printDebug(['wrapping item in ElementWrapper:', item])
                 raise StreamException('cannot append a non Music21Object. wrap it in a music21.ElementWrapper(item) first')
-
             self._addElementPreProcess(element)
     
             # add this Stream as a location for the new elements, with the 
@@ -6593,12 +6592,13 @@ class Stream(music21.Music21Object):
         Gets the duration of the whole stream (generally the highestTime, but can be set
         independently).
         '''
-
         if self._unlinkedDuration is not None:
             return self._unlinkedDuration
         elif self._cache["Duration"] is not None:
+            #environLocal.printDebug(['returning cached duration'])
             return self._cache["Duration"]
         else:
+            #environLocal.printDebug(['creating new duration based on highest time'])
             self._cache["Duration"] = duration.Duration()
             self._cache["Duration"].quarterLength = self.highestTime
             return self._cache["Duration"]
@@ -16565,6 +16565,40 @@ class Test(unittest.TestCase):
         s.insert([0, tempo.MetronomeMark(number=15), 
                   1, tempo.MetronomeMark(number=60)])      
         self.assertEqual(str(s._getSecondsMap()), """[{'durationSeconds': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghissimo Quarter=15>, 'offsetSeconds': 0.0, 'endTimeSeconds': 0.0}, {'durationSeconds': 5.0, 'voiceIndex': None, 'element': <music21.note.Note C>, 'offsetSeconds': 0.0, 'endTimeSeconds': 5.0}, {'durationSeconds': 0.0, 'voiceIndex': None, 'element': <music21.tempo.MetronomeMark larghetto Quarter=60>, 'offsetSeconds': 4.0, 'endTimeSeconds': 4.0}]""")        
+
+
+
+    def testPartDurationA(self):
+        from music21 import stream, corpus
+        #s = corpus.parse('bach/bwv7.7')
+        #junk = s.musicxml
+        p1 = stream.Part()
+        p1.append(note.Note(quarterLength=72))
+        p2 = stream.Part()
+        p2.append(note.Note(quarterLength=72))
+
+        sNew = stream.Score()
+        sNew.append(p1)
+        self.assertEqual(str(sNew.duration), '<music21.duration.Duration 72.0>')
+        self.assertEqual(sNew.duration.quarterLength, 72.0)
+        sNew.append(p2)
+        self.assertEqual(sNew.duration.quarterLength, 144.0)
+
+        #junk = sNew.musicxml
+
+        #sPost = sNew.chordify()
+        #sPost.show()
+
+    def testPartDurationB(self):
+        from music21 import stream, corpus
+        s = corpus.parse('bach/bwv66.6')
+        sNew = stream.Score()
+        sNew.append(s.parts[0])
+        self.assertEqual(str(s.parts[0].duration), '<music21.duration.Duration 36.0>')
+        self.assertEqual(str(sNew.duration), '<music21.duration.Duration 36.0>')
+        self.assertEqual(sNew.duration.quarterLength, 36.0)
+        sNew.append(s.parts[1])
+        self.assertEqual(sNew.duration.quarterLength, 72.0)
 
 
 

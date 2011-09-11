@@ -2984,6 +2984,7 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
 
             streamPartStaff.addGroupForElements(partIdStaff) 
             streamPartStaff.groups.append(partIdStaff) 
+            streamPartStaff._elementsChanged()
             s._insertCore(0, streamPartStaff)
     else:
         streamPart.addGroupForElements(partId) # set group for components 
@@ -3003,7 +3004,8 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
         # remove from original spanner bundle
         for sp in rm:
             spannerBundle.remove(sp)
-    
+        # s is the score; adding the aprt to the score
+        streamPart._elementsChanged()
         s._insertCore(0, streamPart)
 
     s._elementsChanged()
