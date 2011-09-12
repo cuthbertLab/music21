@@ -3938,7 +3938,8 @@ class Stream(music21.Music21Object):
             return returnObj # exit
     
         if returnObj.hasPartLikeStreams():
-            for p in returnObj.getElementsByClass('Part'):
+            # must get Streams, not Parts here
+            for p in returnObj.getElementsByClass('Stream'):
                 p.makeChords(minimumWindowSize=minimumWindowSize,
                     includePostWindow=includePostWindow,
                     removeRedundantPitches=removeRedundantPitches,
@@ -8562,7 +8563,6 @@ class Stream(music21.Music21Object):
         for foundOffset in sorted(returnKey):
             if returnKey[foundOffset] >= 2:
                 returnList.append(foundOffset)
-        
         return returnList
 
     def attachIntervalsBetweenStreams(self, cmpStream):
@@ -8665,7 +8665,6 @@ class Stream(music21.Music21Object):
                 
 
         '''
-    
         if elStream is not None: # bit of safety
             elOffset = el.getOffsetBySite(elStream)
         else:
@@ -10035,11 +10034,7 @@ class Score(Stream):
 
             s.insert(0, pActive)
             pActive = None
-            
         return s
-
-
-
 
     def implode(self):
         '''Reduce a polyphonic work into one or more staves.
