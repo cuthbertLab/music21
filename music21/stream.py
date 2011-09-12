@@ -3847,7 +3847,8 @@ class Stream(music21.Music21Object):
 
     def makeChords(self, minimumWindowSize=.125, includePostWindow=True,
             removeRedundantPitches=True,
-            gatherArticulations=True, gatherExpressions=True, inPlace=False):
+            gatherArticulations=True, gatherExpressions=True, inPlace=False,
+            transferGroupsToPitches=False):
         '''
         Gathers simultaneously sounding :class:`~music21.note.Note` objects 
         into :class:`~music21.chord.Chord` objects, each of which
@@ -3906,13 +3907,16 @@ class Stream(music21.Music21Object):
         Chords can gather both articulations and expressions from found Notes 
         using `gatherArticulations` and `gatherExpressions`.
         
-        
+        If `transferGroupsToPitches` is True, and group defined on the source elements Groups object will be transfered to the Pitch objects conatained in the resulting Chord.        
+
         The resulting Stream, if not in-place, can also gather 
         additional objects by placing class names in the `collect` list. 
         By default, TimeSignature and KeySignature objects are collected. 
         
         
         '''
+        #environLocal.printDebug(['makeChords():', 'transferGroupsToPitches', transferGroupsToPitches])
+
         if not inPlace: # make a copy
             # since we do not return Scores, this probably should always be 
             # a Stream
@@ -3948,9 +3952,7 @@ class Stream(music21.Music21Object):
                     inPlace=True)
             return returnObj # exit
 
-
         # TODO: gather lyrics as an option
-
         # define classes that are gathered; assume they have pitches
         # matchClasses = ['Note', 'Chord', 'Rest']
         matchClasses = ['Note', 'Chord']
@@ -3969,7 +3971,6 @@ class Stream(music21.Music21Object):
                     includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)  
             subNotes = sub.getElementsByClass(matchClasses) # get once for speed         
             #environLocal.printDebug(['subNotes', subNotes])
-
             qlMax = None 
             # get the max duration found from within the window
             if len(subNotes) > 0:
@@ -4005,17 +4006,20 @@ class Stream(music21.Music21Object):
             # make subNotes into a chord
             if len(subNotes) > 0:
                 #environLocal.printDebug(['creating chord from subNotes', subNotes, 'inPlace', inPlace])
-
                 c = chord.Chord()
                 c.duration.quarterLength = qlMax
                 # these are references, not copies, for now
                 tempPitches = []
                 for n in subNotes:
                     if n.isChord:
-                        for p in n.pitches:
-                            tempPitches.append(p)
+                        pSub = n.pitches
                     else:
-                        tempPitches.append(n.pitch)
+                        pSub = [n.pitch]
+                    for p in pSub:
+                        if transferGroupsToPitches:
+                            for g in n.groups:
+                                p.groups.append(g)
+                        tempPitches.append(p)
                 c.pitches = tempPitches
                 if gatherArticulations:
                     for n in subNotes:
@@ -4068,19 +4072,28 @@ class Stream(music21.Music21Object):
         return returnObj
 
 
-    def chordify(self, addTies=True, displayTiedAccidentals=False):
+    def chordify(self, addTies=True, displayTiedAccidentals=False, 
+        addPartIdAsGroup=False, removeRedundantPitches=True):
         '''
         Create a chordal reduction of polyphonic music, where each change to a new pitch results in a new chord. If a Score or Part of Measures is provided, a Stream of Measures will be returned. If a flat Stream of notes, or a Score of such Streams is provided, no Measures will be returned. 
 
         This functionlaity works by splitgin all Durations in all parts, if multi-part, by all unique offsets. All simultaneous durations are 
         then gathered into single chords. 
         
+        If `addPartIdAsGroup` is True, all elements found in the Stream will have their source Part id added to the element's Group. 
+
         The `addTies` parameter currently does not work for pitches in Chords.
         
         '''
         # TODO: need to handle flat Streams contained in a Stream   
         # TODO: need to handle voices
         # even if those component Stream do not have Measures
+
+        # for makeChords, below
+        transferGroupsToPitches = False
+        if addPartIdAsGroup:
+            transferGroupsToPitches = True
+
         returnObj = deepcopy(self)
 
         if returnObj.hasPartLikeStreams():
@@ -4118,13 +4131,20 @@ class Stream(music21.Music21Object):
                 # working with a copy, in place can be true
                 m.sliceAtOffsets(offsetList=uniqueOffsets, addTies=addTies, 
                     inPlace=True,
-                    displayTiedAccidentals=displayTiedAccidentals )
+                    displayTiedAccidentals=displayTiedAccidentals)
+                # tag all sliced notes if requested
+                if addPartIdAsGroup:
+                    for e in m: # add to all elements
+                        e.groups.append(p.id)
 
+        # make chords from flat version of sliced parts
         # do in place as already a copy has been made
         post = returnObj.flat.makeChords(includePostWindow=True, 
-            removeRedundantPitches=True,
-            gatherArticulations=True, gatherExpressions=True, inPlace=True)
+            removeRedundantPitches=removeRedundantPitches,
+            gatherArticulations=True, gatherExpressions=True, inPlace=True, 
+            transferGroupsToPitches=transferGroupsToPitches)
 
+        # re-populate a measure stream with the new chords
         # get a measure stream from the top voice
         # assume we can manipulate this these measures as already have deepcopy
         # the Part may not have had any Measures;
@@ -7435,13 +7455,13 @@ class Stream(music21.Music21Object):
             return returnObj # exit
     
         if returnObj.hasPartLikeStreams():
-            for p in returnObj.getElementsByClass('Part'):
+            # part-like requires getting Streams, not Parts
+            for p in returnObj.getElementsByClass('Stream'):
                 offsetListLocal = [o - p.getOffsetBySite(self) for o in offsetList]
                 p.sliceAtOffsets(offsetList=offsetListLocal, 
                     addTies=addTies, inPlace=True, 
                     displayTiedAccidentals=displayTiedAccidentals)
             return returnObj # exit
-
 
         # list of start, start+dur, element, all in abs offset time
         offsetMap = self._getOffsetMap(returnObj)
@@ -10044,7 +10064,6 @@ class Score(Stream):
 
         return self.partsToVoices(voiceAllocation=voiceAllocation,
             permitOneVoicePerPart=permitOneVoicePerPart)
-
 
 
 # this was commented out as it is not immediately needed
@@ -16596,17 +16615,69 @@ class Test(unittest.TestCase):
         self.assertEqual(sNew.duration.quarterLength, 72.0)
 
 
+    def testChordifyTagPartA(self):
+        from music21 import stream, note
+        p1 = stream.Stream()
+        p1.id = 'a'
+        p1.repeatAppend(note.Note('g4', quarterLength=2), 6)
+        p2 = stream.Stream()
+        p2.repeatAppend(note.Note('c4', quarterLength=3), 4)
+        p2.id = 'b'
+        
+        s = stream.Score()
+        s.insert(0, p1)
+        s.insert(0, p2)
+        post = s.chordify(addPartIdAsGroup=True, removeRedundantPitches=False)
+        self.assertEqual(len(post.flat.notes), 8)
+        # test that each note has its original group
+        idA = []
+        idB = []
+        for c in post.flat.getElementsByClass('Chord'):
+            for p in c.pitches:
+                if 'a' in p.groups:
+                    idA.append(p.name)
+                if 'b' in p.groups:
+                    idB.append(p.name)
+        self.assertEqual(idA, ['G', 'G', 'G', 'G', 'G', 'G', 'G', 'G'])
+        self.assertEqual(idB, ['C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'])
 
-class Test2(unittest.TestCase):
-    '''
-    short tests because Test is taking too long but running from command line removes the debugger
-    '''
+    def testChordifyTagPartB(self):
+        from music21 import stream, note, corpus
+        s = corpus.parse('bwv66.6')
+        idSoprano = []
+        idAlto = []
+        idTenor = []
+        idBass = []
 
-    def runTest(self):
-        pass
+        post = s.chordify(addPartIdAsGroup=True, removeRedundantPitches=False)
+        for c in post.flat.getElementsByClass('Chord'):
+            for p in c.pitches:
+                if 'Soprano' in p.groups:
+                    idSoprano.append(p.name)
+                if 'Alto' in p.groups:
+                    idAlto.append(p.name)
+                if 'Tenor' in p.groups:
+                    idTenor.append(p.name)
+                if 'Bass' in p.groups:
+                    idBass.append(p.name)
 
-    def testNothing(self):
-        pass
+        self.assertEqual(idSoprano, [u'C#', u'B', u'A', u'B', u'C#', u'E', u'C#', u'C#', u'B', u'B', u'A', u'C#', u'A', u'B', u'G#', u'G#', u'F#', u'A', u'B', u'B', u'B', u'B', u'F#', u'F#', u'E', u'A', u'A', u'B', u'B', u'C#', u'C#', u'A', u'B', u'C#', u'A', u'G#', u'G#', u'F#', u'F#', u'G#', u'F#', u'F#', u'F#', u'F#', u'F#', u'F#', u'F#', u'F#', u'F#', u'E#', u'F#'])
+
+        self.assertEqual(idAlto, [u'E', u'E', u'F#', u'E', u'E', u'E', u'E', u'A', u'G#', u'G#', u'E', u'G#', u'F#', u'G#', u'E#', u'E#', u'C#', u'F#', u'F#', u'F#', u'E', u'E', u'D#', u'D#', u'C#', u'C#', u'F#', u'E', u'E', u'E', u'A', u'F#', u'F#', u'G#', u'F#', u'F#', u'E#', u'F#', u'F#', u'C#', u'C#', u'D', u'E', u'E', u'D', u'C#', u'B', u'C#', u'D', u'D', u'C#'])
+
+        # length should be the same
+        self.assertEqual(len(idSoprano), len(idAlto))
+
+# class Test2(unittest.TestCase):
+#     '''
+#     short tests because Test is taking too long but running from command line removes the debugger
+#     '''
+# 
+#     def runTest(self):
+#         pass
+# 
+#     def testNothing(self):
+#         pass
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

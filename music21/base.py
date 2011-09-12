@@ -155,7 +155,6 @@ class Groups(list):
         else:
             raise GroupException("Only strings can be used as list names")
             
-
     def __setitem__(self, i, y):
         if isinstance(y, basestring):
             list.__setitem__(self, i, y)
@@ -168,6 +167,8 @@ class Groups(list):
         >>> a = Groups()
         >>> a.append('red')
         >>> a.append('green')
+        >>> a
+        ['red', 'green']
         >>> b = Groups()
         >>> b.append('green')
         >>> b.append('red')
@@ -190,7 +191,6 @@ class Groups(list):
             return False
         else:
             return True
-
 
 
 #-------------------------------------------------------------------------------
@@ -1796,14 +1796,10 @@ class Music21Object(JSONSerializer):
         # accessed with _getDuration(); this is a performance optimization
         if "duration" in keywords:
             self.duration = keywords["duration"]
-#         else:
-#             self.duration = duration.Duration(0)
-
         if "groups" in keywords and keywords["groups"] is not None:
             self.groups = keywords["groups"]
         else:
             self.groups = Groups()
-        
         if "locations" in keywords:
             self._definedContexts = keywords["locations"]
         else:
