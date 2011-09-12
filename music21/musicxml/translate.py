@@ -3017,7 +3017,6 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     else:
         return streamPart
 
-
 def mxToStream(mxScore, spannerBundle=None, inputM21=None):
     '''Translate an mxScore into a music21 Score object.
 

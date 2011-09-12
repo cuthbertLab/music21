@@ -1949,6 +1949,11 @@ class AverageTimeBetweenAttacksForEachVoiceFeature(
     featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('bwv66.6')
+    >>> fe = features.jSymbolic.AverageTimeBetweenAttacksForEachVoiceFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [0.4375]
     '''
     id = 'R24'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1959,12 +1964,44 @@ class AverageTimeBetweenAttacksForEachVoiceFeature(
         self.isSequential = True
         self.dimensions = 1
 
+    def _process(self):
+        onsetsByPart = []
+        avgByPart = []
+        if self.data.partsCount > 0:
+            for i in range(self.data.partsCount):
+                secondsMap = self.data['parts'][i]['secondsMap']
+                onsets = [bundle['offsetSeconds'] for bundle in secondsMap]
+                onsetsByPart.append(onsets)
+        else:
+            secondsMap = self.data['secondsMap']
+            onsets = [bundle['offsetSeconds'] for bundle in secondsMap]
+            onsetsByPart.append(onsets)
 
- 
+        for onserts in onsetsByPart:
+            onsets.sort() # may already be sorted?
+            differences = []
+            for i, o in enumerate(onsets):
+                if i == len(onsets) - 1: # last
+                    break
+                oNext = onsets[i+1]
+                # not including simultaneous attacks
+                dif = oNext-o
+                if not common.almostEquals(dif, 0.0):
+                    differences.append(dif)
+            avgByPart.append(sum(differences) / float(len(differences)))
+    
+        self._feature.vector[0] = sum(avgByPart) / len(avgByPart)
+
+
 class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
     featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('bwv66.6')
+    >>> fe = features.jSymbolic.AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [0.1773926...]
     '''
     id = 'R25'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1974,6 +2011,36 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
         self.description = 'Average standard deviation, in seconds, of time between Note On events on individual channels that contain at least one note.'
         self.isSequential = True
         self.dimensions = 1
+
+    def _process(self):
+        onsetsByPart = []
+        stdDeviationByPart = []
+
+        if self.data.partsCount > 0:
+            for i in range(self.data.partsCount):
+                secondsMap = self.data['parts'][i]['secondsMap']
+                onsets = [bundle['offsetSeconds'] for bundle in secondsMap]
+                onsetsByPart.append(onsets)
+        else:
+            secondsMap = self.data['secondsMap']
+            onsets = [bundle['offsetSeconds'] for bundle in secondsMap]
+            onsetsByPart.append(onsets)
+
+        for onsets in onsetsByPart:
+            onsets.sort() # may already be sorted?
+            differences = []
+            for i, o in enumerate(onsets):
+                if i == len(onsets) - 1: # last
+                    break
+                oNext = onsets[i+1]
+                dif = oNext-o # not including simultaneous attacks
+                if not common.almostEquals(dif, 0.0):
+                    differences.append(dif)
+            stdDeviationByPart.append(common.standardDeviation(differences,
+                                                               bassel=False))
+        self._feature.vector[0] = (sum(stdDeviationByPart) / 
+                                   len(stdDeviationByPart))
+
 
 
 
@@ -3354,8 +3421,8 @@ def getExtractorByTypeAndNumber(type, number):
     R 21 StaccatoIncidenceFeature
     R 22 AverageTimeBetweenAttacksFeature
     R 23 VariabilityOfTimeBetweenAttacksFeature
-    R 24 AverageTimeBetweenAttacksForEachVoiceFeature (not implemented)
-    R 25 AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature (not implemented)
+    R 24 AverageTimeBetweenAttacksForEachVoiceFeature
+    R 25 AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature
     R 30 InitialTempoFeature
     R 31 InitialTimeSignatureFeature
     R 32 CompoundOrSimpleMeterFeature
@@ -3423,12 +3490,8 @@ WoodwindsFractionFeature, #i17
 OrchestralStringsFractionFeature,  #i18
 StringEnsembleFractionFeature,  #i19
 ElectricInstrumentFractionFeature, #i20
-
-
 #t11 not in jSymbolic
-
 #t14 not in jSymbolic
-
 #t16-19 not in jSymbolic
 
 
@@ -3439,6 +3502,8 @@ MinimumNoteDurationFeature, # r20
 StaccatoIncidenceFeature, # r21
 AverageTimeBetweenAttacksFeature, #r22
 VariabilityOfTimeBetweenAttacksFeature, #r23
+AverageTimeBetweenAttacksForEachVoiceFeature, #r24
+AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature, #r25
 #r26-29 not in jSymbolic
 
 InitialTempoFeature, # r30
@@ -3469,9 +3534,7 @@ PitchClassDistributionFeature, #p20
 FifthsPitchHistogramFeature, # p21
 QualityFeature, #p22
 #p26 is not in jSymbolic
-
 #m16 is not in jSymbolic
-
 #m20 is not in jSymbolic
 
 #c types are not in jSymbolic
@@ -3483,7 +3546,7 @@ def getCompletionStats():
     '''
     >>> from music21 import *
     >>> features.jSymbolic.getCompletionStats()
-    completion rate: 65/111 (0.5855...)
+    completion rate: 67/111 (0.60360...)
     '''
     countTotal = 0
     countComplete = 0
