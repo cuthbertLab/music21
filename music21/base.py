@@ -138,20 +138,29 @@ class GroupException(Music21Exception):
 # make subclass of set once that is defined properly
 class Groups(list):   
     '''A list of strings used to identify associations that an element might 
-    have. Enforces that all elements must be strings
+    have. Enforces that all elements must be strings, and that the same element cannot be provided more than once.
     
     >>> g = Groups()
     >>> g.append("hello")
     >>> g[0]
     'hello'
-    
+    >>> g.append("hello") # not added as already present
+    >>> len(g)
+    1
+    >>> g
+    ['hello']
+        
     >>> g.append(5)
     Traceback (most recent call last):
     GroupException: Only strings can be used as list names
     '''
+    # TODO: presently groups can be cased-differentiated; this may 
+    # need to be made case independent
     def append(self, value):
         if isinstance(value, basestring):
-            list.append(self, value)
+            # do not permit the same entry more than once
+            if not list.__contains__(self, value): 
+                list.append(self, value)
         else:
             raise GroupException("Only strings can be used as list names")
             

@@ -2379,37 +2379,90 @@ class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
 class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.jSymbolic.MaximumNumberOfIndependentVoicesFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [2]
+
+    >>> s = corpus.parse('bwv66.6')
+    >>> fe = features.jSymbolic.MaximumNumberOfIndependentVoicesFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [4]
+
     '''
     id = 'T1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'Maximum Number of Independent Voices'
-        self.description = 'Maximum number of different channels in which notes have sounded simultaneously.'
+        self.description = 'Maximum number of different channels in which notes have sounded simultaneously. Here, Parts are treated as channels.'
         self.isSequential = True
         self.dimensions = 1
 
-    # count Voices, count Parts, sum total 
+    def _process(self):
+        # for each chordify, find the largest number different groups
+        found = 0
+        for c in self.data['chordify.getElementsByClass.Chord']:
+            # create a group to aggregate all groups for each pitch in this 
+            # chord
+            g = music21.Groups()
+            for p in c.pitches:
+                for gSub in p.groups:
+                    g.append(gSub) # add to temporary group; will act as a set
+            if len(g) > found:
+                found = len(g)
+        self._feature.vector[0] = found
 
 
 class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.jSymbolic.AverageNumberOfIndependentVoicesFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [1.75]
+
+    >>> s = corpus.parse('bwv66.6')
+    >>> fe = features.jSymbolic.AverageNumberOfIndependentVoicesFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [4.0]
     '''
     id = 'T2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'Average Number of Independent Voices'
-        self.description = 'Average number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation.'
+        self.description = 'Average number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation. Here, Parts are treated as voices'
         self.isSequential = True
         self.dimensions = 1
 
-  
+    def _process(self):
+        # for each chordify, find the largest number different groups
+        found = []
+        for c in self.data['chordify.getElementsByClass.Chord']:
+            # create a group to aggregate all groups for each pitch in this 
+            # chord
+            g = music21.Groups()
+            for p in c.pitches:
+                for gSub in p.groups:
+                    g.append(gSub) # add to temporary group; will act as a set
+            found.append(len(g))
+        self._feature.vector[0] = sum(found) / float(len(found))
+
+
 class VariabilityOfNumberOfIndependentVoicesFeature(
     featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.jSymbolic.VariabilityOfNumberOfIndependentVoicesFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [0.433012...]
     '''
     id = 'T3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2419,6 +2472,19 @@ class VariabilityOfNumberOfIndependentVoicesFeature(
         self.description = 'Standard deviation of number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation.'
         self.isSequential = True
         self.dimensions = 1
+
+    def _process(self):
+        # for each chordify, find the largest number different groups
+        found = []
+        for c in self.data['chordify.getElementsByClass.Chord']:
+            # create a group to aggregate all groups for each pitch in this 
+            # chord
+            g = music21.Groups()
+            for p in c.pitches:
+                for gSub in p.groups:
+                    g.append(gSub) # add to temporary group; will act as a set
+            found.append(len(g))
+        self._feature.vector[0] = common.standardDeviation(found, bassel=False)
 
 
 class VoiceEqualityNumberOfNotesFeature(featuresModule.FeatureExtractor):
@@ -3429,9 +3495,9 @@ def getExtractorByTypeAndNumber(type, number):
     R 33 TripleMeterFeature
     R 34 QuintupleMeterFeature
     R 35 ChangesOfMeterFeature
-    T 1 MaximumNumberOfIndependentVoicesFeature (not implemented)
-    T 2 AverageNumberOfIndependentVoicesFeature (not implemented)
-    T 3 VariabilityOfNumberOfIndependentVoicesFeature (not implemented)
+    T 1 MaximumNumberOfIndependentVoicesFeature
+    T 2 AverageNumberOfIndependentVoicesFeature
+    T 3 VariabilityOfNumberOfIndependentVoicesFeature
     T 4 VoiceEqualityNumberOfNotesFeature (not implemented)
     T 5 VoiceEqualityNoteDurationFeature (not implemented)
     T 6 VoiceEqualityDynamicsFeature (not implemented)
@@ -3505,13 +3571,16 @@ VariabilityOfTimeBetweenAttacksFeature, #r23
 AverageTimeBetweenAttacksForEachVoiceFeature, #r24
 AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature, #r25
 #r26-29 not in jSymbolic
-
 InitialTempoFeature, # r30
 InitialTimeSignatureFeature, # r31
 CompoundOrSimpleMeterFeature, # r32
 TripleMeterFeature, # r33
 QuintupleMeterFeature, # r34
 ChangesOfMeterFeature, # r35
+
+MaximumNumberOfIndependentVoicesFeature, # t1
+AverageNumberOfIndependentVoicesFeature, # t2
+VariabilityOfNumberOfIndependentVoicesFeature, # t3
 
 MostCommonPitchPrevalenceFeature,  # p1
 MostCommonPitchClassPrevalenceFeature,  # p2
@@ -3546,7 +3615,7 @@ def getCompletionStats():
     '''
     >>> from music21 import *
     >>> features.jSymbolic.getCompletionStats()
-    completion rate: 67/111 (0.60360...)
+    completion stats: 70/111 (0.6306...)
     '''
     countTotal = 0
     countComplete = 0
@@ -3558,7 +3627,7 @@ def getCompletionStats():
                 countTotal += 1
                 if group[i] in featureExtractors:
                     countComplete += 1
-    print('completion rate: %s/%s (%s)' % (countComplete, countTotal, (float(countComplete)/countTotal)))
+    print('completion stats: %s/%s (%s)' % (countComplete, countTotal, (float(countComplete)/countTotal)))
 
 
 

@@ -297,7 +297,10 @@ class StreamForms(object):
         # some methods that return new streams
         elif key in ['chordify']:
             if 'Score' in self._base.classes:
-                self._forms['chordify'] = self._base.chordify()
+                # options here permit getting part information out
+                # of chordified representation
+                self._forms['chordify'] = self._base.chordify(
+                    addPartIdAsGroup=True, removeRedundantPitches=False)
             else: # for now, just return a normal Part or Stream
                 self._forms['chordify'] = self._base
             return self._forms['chordify']
