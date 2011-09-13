@@ -35,7 +35,7 @@ from music21 import pitch
 from music21 import beam
 from music21 import meter
 from music21 import tie
-
+from music21 import volume
 
 
 from music21 import environment
@@ -549,6 +549,9 @@ class GeneralNote(music21.Music21Object):
 
 
 
+#-------------------------------------------------------------------------------
+class NotRestException(Exception):
+    pass
 
 #-------------------------------------------------------------------------------
 class NotRest(GeneralNote):
@@ -567,6 +570,7 @@ class NotRest(GeneralNote):
         self._noteheadFill = 'default'
         self._noteheadParen = False
         self._stemDirection = 'unspecified'
+        self._volume = None # created on demand
         
     def _getStemDirection(self):
         '''Returns the stem direction.
@@ -600,7 +604,6 @@ class NotRest(GeneralNote):
         return self._noteheadFill
 
     def _setNoteheadFill(self, value):
-
         self._noteheadFill = value
 
     noteheadFill = property(_getNoteheadFill, _setNoteheadFill)
@@ -611,7 +614,6 @@ class NotRest(GeneralNote):
         return self._noteheadParen
 
     def _setNoteheadParen(self, value):
-
         self._noteheadParen = value
 
     noteheadParen = property(_getNoteheadParen, _setNoteheadParen)
@@ -659,6 +661,30 @@ class NotRest(GeneralNote):
         if not inPlace:
             return returnObj
         # else return None
+
+    #---------------------------------------------------------------------------
+    def _getVolume(self):
+        # lazy volume creation
+        if self._volume is None:
+            # when creating the volume object, set the parent as sellf
+            self._volume = volume.Volume(parent=self)
+        return self._volume
+
+    def _setVolume(self, volumeObj):
+        # test by looking for method
+        if hasattr(volumeObj, "getDynamicContext"):
+            if volumeObj.parent is not None:
+                raise NotRestException('cannot set a volume object that has a defined parent: %s' % volumeObj.parent)
+            volumeObj.parent = self # set to self
+            self._volume = volumeObj
+        else:
+            raise Exception('this must be a Volume object, not %s' % volumeObj)
+
+    volume = property(_getVolume, _setVolume, 
+        doc = '''Get and set the volume of this object as a Volume object.
+        ''')
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -1743,6 +1769,26 @@ class Test(unittest.TestCase):
         # need to test that this gets us a continue tie, but hard to test
         # post musicxml processing
         #s.show()
+
+    def testVolumeA(self):
+        from music21 import note, volume
+        v1 = volume.Volume()
+        v2 = volume.Volume()
+
+        n1 = note.Note()
+        n2 = note.Note()
+        
+        n1.volume = v1 # can set as v1 has no parent
+        self.assertEqual(n1.volume, v1)
+
+        # object is created on demand
+        self.assertEqual(n2.volume is not v1, True)
+        self.assertEqual(n2.volume is not None, True)
+
+        
+
+                
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

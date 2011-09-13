@@ -110,6 +110,23 @@ class Test(unittest.TestCase):
         self.assertEqual(v1.getDynamicContext(), d2)
 
 
+
+    def testGetContextSearchB(self):
+        from music21 import stream, note, volume, dynamics
+        
+        s = stream.Stream()
+        d1 = dynamics.Dynamic('mf')
+        s.insert(0, d1)
+        d2 = dynamics.Dynamic('f')
+        s.insert(2, d2)
+
+        n1 = note.Note('g')
+        s.insert(4, n1)
+
+        # can get dyanmics from volume object
+        self.assertEqual(n1.volume.getDynamicContext(), d2)
+
+
         
         
 
