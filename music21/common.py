@@ -456,7 +456,6 @@ def standardDeviation(coll, bassel=False):
     147.3227...
     >>> common.standardDeviation([4, 2, 5, 8, 6], bassel=True)
     2.23606...
-
     '''
     avg = sum(coll) / float(len(coll))
     diffColl = [math.pow(val-avg, 2) for val in coll]
