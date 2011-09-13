@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''This module defines numerous subclasses of :class:`~music21.clef.Clef`, providing object representations for all commonly used clefs. Clef objects are often found within :class:`~music21.stream.Measure` objects.  

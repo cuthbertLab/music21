@@ -66,7 +66,8 @@ __all__ = ['base',
            'spanner', 'scala', 'scale', 'search',
            'serial', 'sieve', 'stream', 
            'tempo', 'text', 'tie', 'tinyNotation', 
-           'voiceLeading']
+           'voiceLeading', 'volume',
+        ]
 
 
 #print __all__
