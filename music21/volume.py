@@ -116,7 +116,6 @@ class Volume(object):
         1.0
         ''')
 
-
     #---------------------------------------------------------------------------
     # high-level methods
 
@@ -139,6 +138,27 @@ class Volume(object):
         return self.getContextByClass('Dynamic')
 
 
+    def mergeAttributes(self, other):
+        '''Given another Volume object, gather all attributes except parent.
+
+        >>> from music21 import *
+        >>> n1 = note.Note()
+        >>> v1 = volume.Volume()
+        >>> v1.velocity = 111
+        >>> v1.parent = n1
+
+        >>> v2 = volume.Volume()
+        >>> v2.mergeAttributes(v1)
+        >>> v2.parent == None
+        True
+        >>> v2.velocity
+        111
+        '''
+        if other is not None:      
+            self._velocity = other._velocity
+
+        
+        
         
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
