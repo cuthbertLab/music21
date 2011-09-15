@@ -27,8 +27,8 @@ from music21.midi import translate as midiTranslate
 from music21.musicxml import translate as musicxmlTranslate
 from music21 import note
 from music21 import defaults
-
-#from music21.pitch import Pitch
+from music21 import tie
+from music21 import volume
 from music21 import pitch
 from music21 import beam
 from music21 import common
@@ -37,7 +37,6 @@ from music21 import chordTables
 from music21 import environment
 _MOD = "chord.py"
 environLocal = environment.Environment(_MOD)
-from music21 import tie
 
 #-------------------------------------------------------------------------------
 class ChordException(Exception):
@@ -125,10 +124,17 @@ class Chord(note.NotRest):
             if isinstance(n, music21.pitch.Pitch):
                 self._components.append({'pitch':n})
             elif isinstance(n, music21.note.Note):
+                # TODO: need to provide self as argument, but currently
+                # cause problem on copy
+                vNew = volume.Volume() 
+                vNew.mergeAttributes(n.volume)
                 self._components.append({'pitch':n.pitch,
                                       'notehead':n.notehead,
-                                      'stem': n.stemDirection})
+                                      'stem': n.stemDirection,
+                                     'volume': vNew, # volume
+                                    })
             elif isinstance(n, Chord):
+                # TODO: transfer all attributes from _components of other
                 for p in n.pitches:
                     # this might better make a deepcopy of the pitch
                     self._components.append({'pitch':p})
@@ -137,7 +143,6 @@ class Chord(note.NotRest):
                 self._components.append({'pitch':music21.pitch.Pitch(n)})
             else:
                 raise ChordException("Could not process pitch %s" % n)
-
 
         if "duration" in keywords or "type" in keywords or \
             "quarterLength" in keywords: #dots dont cut it
@@ -354,6 +359,7 @@ class Chord(note.NotRest):
             self._chordTablesAddress = self.seekChordTablesAddress()
         self._chordTablesAddressNeedsUpdating = False
 
+    #---------------------------------------------------------------------------
     def _getPitches(self):
         '''
         OMIT_FROM_DOCS
@@ -521,9 +527,7 @@ class Chord(note.NotRest):
         'double'
         >>> c1.getStemDirection(c1.pitches[0]) 
         'unspecified'
-        
         '''
-        
         for d in self._components:
             # this is an object comparison, not equality
             if d['pitch'] is p:
@@ -669,11 +673,58 @@ class Chord(note.NotRest):
                     d['notehead'] = nh
                     match = True
                     break
+        if not match:
+            raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
+
+
+
+
+
+
+    def getVolume(self, p):
+        '''For a given Pitch in this Chord, return the Volume      
+        '''
+        for d in self._components:
+            # this is an object comparison, not equality
+            if d['pitch'] is p or d['pitch'] == p:
+                if 'volume' in d.keys():
+                    return d['volume']
+                else: # create on demand
+                    v = volume.Volume() # add self 
+                    d['volume'] = v
+                    return v
+        raise ChordException('the given pitch is not in the Chord: %s' % 
+                            pitchTarget)
+
+
+    def setVolume(self, vol, pitchTarget=None):
+        '''
+        >>> from music21 import *
+        '''
+        # assign to first pitch by default
+        if pitchTarget is None and len(self._components) > 0: # if no pitches
+            pitchTarget = self._components[0]['pitch']
+        elif common.isStr(pitchTarget):
+            pitchTarget = pitch.Pitch(pitchTarget)    
+            
+        match = False
+        for d in self._components:
+            if d['pitch'] is pitchTarget or d['pitch'] == pitchTarget:
+                # set parent of volume here:
+                # vol.parent = self
+                d['volume'] = vol
+                match = True
+                break
                 
         if not match:
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
 
 
+
+
+
+
+    #---------------------------------------------------------------------------
     def _getPitchNames(self):
         return [d['pitch'].name for d in self._components]
 
