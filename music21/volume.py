@@ -87,6 +87,7 @@ class Volume(object):
 
 
     def _getVelocityScalar(self):
+        # multiplying by 1/127. for performance
         return self._velocity * 0.007874015748031496
         
     def _setVelocityScalar(self, value):
