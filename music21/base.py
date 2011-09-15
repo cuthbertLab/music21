@@ -10,7 +10,6 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-
 # base -- the convention within music21 is that __init__ files contain:
 #    from base import *
 
@@ -81,8 +80,6 @@ try:
     import scipy
 except ImportError:
     _missingImport.append('scipy')
-
-
 
 try:
     import PIL

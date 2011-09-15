@@ -34,7 +34,11 @@ class Volume(object):
 
         # store a reference to the parent, as we use this to do context 
         # will use property; if None will leave as None
-        self.parent = parent
+        self.parent = parent    
+        self._velocity = None
+
+    #---------------------------------------------------------------------------
+    # properties
         
     def _getParent(self):
         if self._parent is None:
@@ -56,6 +60,65 @@ class Volume(object):
         Get or set the parent, which must be a note.NotRest subclass. The parent is wrapped in a weak reference.
         ''')
 
+    def _getVelocity(self):
+        return self._velocity
+        
+    def _setVelocity(self, value):
+        if not common.isNum(value):
+            raise VolumeException('value provided for velocity must be a number, not %s' % value)
+        if value < 0:
+            self._velocity = 0
+        elif value > 127:
+            self._velocity = 127
+        else:
+            self._velocity = value
+
+    velocity = property(_getVelocity, _setVelocity, doc = '''
+        Get or set the velocity value, a numerical value between 0 and 127 and available setting amplitude on each Note or Pitch in chord. 
+
+        >>> from music21 import *
+        >>> n = note.Note()
+        >>> n.volume.velocity = 20
+        >>> n.volume.parent == n
+        True
+        >>> n.volume.velocity 
+        20
+        ''')
+
+
+    def _getVelocityScalar(self):
+        return self._velocity * 0.007874015748031496
+        
+    def _setVelocityScalar(self, value):
+        if not common.isNum(value):
+            raise VolumeException('value provided for velocityScalar must be a number, not %s' % value)
+        if value < 0:
+            scalar = 0
+        elif value > 1:
+            scalar = 1
+        else:
+            scalar = value
+        self._velocity = int(round(scalar * 127))
+
+    velocityScalar = property(_getVelocityScalar, _setVelocityScalar, doc = '''
+        Get or set the velocityScalar value, a numerical value between 0 and 1 and available setting amplitude on each Note or Pitch in chord. This value is mapped to the range 0 to 127 on output.
+
+        Note that this value is derived from the set velocity value. Floating point error seen here will not be fond in the velocity value. 
+
+        >>> from music21 import *
+        >>> n = note.Note()
+        >>> n.volume.velocityScalar = .5
+        >>> n.volume.velocity
+        64
+        >>> n.volume.velocity = 127
+        >>> n.volume.velocityScalar
+        1.0
+        ''')
+
+
+    #---------------------------------------------------------------------------
+    # high-level methods
+
     def getContextByClass(self, className, sortByCreationTime=False,         
             getElementMethod='getElementAtOrBefore'):
         '''Simulate get context by class method as found on parent NotRest object.
@@ -73,6 +136,7 @@ class Volume(object):
         '''
         # TODO: find wedges and crescendi too
         return self.getContextByClass('Dynamic')
+
 
         
 #-------------------------------------------------------------------------------

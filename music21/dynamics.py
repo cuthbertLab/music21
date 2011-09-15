@@ -83,14 +83,14 @@ def dynamicStrFromDecimal(n):
     elif n >= .9:
         return 'fff'
 
-
+#-------------------------------------------------------------------------------
 class DynamicException(Exception):
     pass
 
 class WedgeException(Exception):
     pass
 
-
+#-------------------------------------------------------------------------------
 class Dynamic(music21.Music21Object):
     '''
     Object representation of Dynamics.
@@ -132,7 +132,6 @@ class Dynamic(music21.Music21Object):
 
     
     '''
-    
     classSortOrder = 10
     
     def __init__(self, value=None):
@@ -201,8 +200,6 @@ class Dynamic(music21.Music21Object):
         10.0
         ''')
 
-
-
     def _getMX(self):
         return musicxmlTranslate.dynamicToMx(self)
 
@@ -230,10 +227,7 @@ class Dynamic(music21.Music21Object):
     musicxml = property(_getMusicXML)
 
 
-
-
-
-
+#-------------------------------------------------------------------------------
 class Wedge(music21.Music21Object):
     '''Object model of crescendeo/decrescendo wedges.
     '''
@@ -306,8 +300,6 @@ class Wedge(music21.Music21Object):
     mx = property(_getMX, _setMX)
 
 
-
-
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
     
@@ -331,7 +323,7 @@ class TestExternal(unittest.TestCase):
         a.show()
 
 
-
+#-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     
     def runTest(self):

@@ -1780,6 +1780,7 @@ class Test(unittest.TestCase):
         
         n1.volume = v1 # can set as v1 has no parent
         self.assertEqual(n1.volume, v1)
+        self.assertEqual(n1.volume.parent, n1)
 
         # object is created on demand
         self.assertEqual(n2.volume is not v1, True)
