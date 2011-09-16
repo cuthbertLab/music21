@@ -106,13 +106,8 @@ if len(_missingImport) > 0:
         header='music21:')
 
 
-
-
-
-
 # define whether weakrefs are used for storage of object locations
 WEAKREF_ACTIVE = True
-
 
 #-------------------------------------------------------------------------------
 class Music21Exception(Exception):
@@ -1863,6 +1858,8 @@ class Music21Object(JSONSerializer):
         >>> ("flute" in n.groups, "flute" in b.groups)
         (False, True)
         '''
+        #environLocal.printDebug(['calling Music21Object.__deepcopy__', self])
+
         # call class to get a new, empty instance
         new = self.__class__()
         #environLocal.printDebug(['Music21Object.__deepcopy__', self, id(self)])

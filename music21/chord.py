@@ -42,7 +42,6 @@ environLocal = environment.Environment(_MOD)
 class ChordException(Exception):
     pass
 
-
 class Chord(note.NotRest):
     '''Class for dealing with chords
     
@@ -73,11 +72,8 @@ class Chord(note.NotRest):
     
     Chord has the ability to determine the root of a chord, as well as the bass note of a chord.
     In addition, Chord is capable of determining what type of chord a particular chord is, whether
-    it is a triad or a seventh, major or minor, etc, as well as what inversion the chord is in. 
-    
-    
+    it is a triad or a seventh, major or minor, etc, as well as what inversion the chord is in.     
     '''
-    
     _bass = None
     _root = None
     isChord = True
@@ -191,6 +187,25 @@ class Chord(note.NotRest):
         baseName = baseName.rstrip()
         baseName += ">"
         return baseName
+
+
+    def __deepcopy__(self, memo=None):
+        '''As Chord objects have one or more Volume, objects, and Volume objects store weak refs to the to parent object, need to specialize deep copy handling.
+        '''
+        #environLocal.printDebug(['calling NotRest.__deepcopy__', self])
+        # as this inherits from NotRest, can use that __deepcopy__ as basis
+        # that looks only to _volume to see if it is not None; with a       
+        # Chord, _volume will always be None
+        new = note.NotRest.__deepcopy__(self, memo=memo)
+        # after copying, if a Volume exists, it is linked to the old object
+        # look at _volume so as not to create object if not already there
+        for d in new._components:
+            if 'volume' in d.keys():
+                if d['volume'] is not None:
+                    #environLocal.printDebug(['changing paren to Chord volume in __deepcopy__', 'id(new)', id(new)])
+                    d['volume'].parent = new # update with new instance
+        return new
+
 
     #---------------------------------------------------------------------------
     def __repr__(self):
@@ -677,13 +692,16 @@ class Chord(note.NotRest):
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
 
 
-
-
-
+    #---------------------------------------------------------------------------
+    # volume per pitch 
 
     def getVolume(self, p):
         '''For a given Pitch in this Chord, return the Volume      
         '''
+        # NOTE: pitch matching is potentially problematic if we have more than
+        # one of the same pitch
+        if common.isStr(p):
+            p = pitch.Pitch(p)    
         for d in self._components:
             # this is an object comparison, not equality
             if d['pitch'] is p or d['pitch'] == p:
@@ -691,14 +709,15 @@ class Chord(note.NotRest):
                     return d['volume']
                 else: # create on demand
                     v = volume.Volume() # add self 
+                    v.parent = self
                     d['volume'] = v
                     return v
-        raise ChordException('the given pitch is not in the Chord: %s' % 
-                            pitchTarget)
+        raise ChordException('the given pitch is not in the Chord: %s' % p)
 
 
     def setVolume(self, vol, pitchTarget=None):
-        '''
+        '''Set the volume object of a specific pitch target. If no pitch target is given, the first pitch is used. 
+
         >>> from music21 import *
         '''
         # assign to first pitch by default
@@ -706,20 +725,17 @@ class Chord(note.NotRest):
             pitchTarget = self._components[0]['pitch']
         elif common.isStr(pitchTarget):
             pitchTarget = pitch.Pitch(pitchTarget)    
-            
         match = False
         for d in self._components:
             if d['pitch'] is pitchTarget or d['pitch'] == pitchTarget:
                 # set parent of volume here:
-                # vol.parent = self
+                vol.parent = self
                 d['volume'] = vol
                 match = True
                 break
                 
         if not match:
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
-
-
 
 
 
@@ -3760,12 +3776,47 @@ class Test(unittest.TestCase):
         self.assertEqual(c2._components[1]['tie'].type, 'start')
 
 
-
-
     def testChordQuality(self):
         from music21 import chord
         c1 = chord.Chord(['c','e-'])
         self.assertEqual(c1.quality, 'minor')
+
+
+    def testVolumePerPitchA(self):
+        import copy
+        from music21 import chord, volume
+
+        c = chord.Chord(['c4', 'd-4', 'g4'])
+        v1 = volume.Volume(velocity=111)
+        v2 = volume.Volume(velocity=98)
+        v3 = volume.Volume(velocity=73)
+        c.setVolume(v1, 'c4')
+        c.setVolume(v2, 'd-4')
+        c.setVolume(v3, 'g4')
+
+        self.assertEqual(c.getVolume('c4').velocity, 111) 
+        self.assertEqual(c.getVolume('d-4').velocity, 98) 
+        self.assertEqual(c.getVolume('g4').velocity, 73)
+
+        self.assertEqual(c.getVolume('c4').parent, c) 
+        self.assertEqual(c.getVolume('d-4').parent, c) 
+        self.assertEqual(c.getVolume('g4').parent, c)
+
+        cCopy = copy.deepcopy(c)
+        
+        self.assertEqual(cCopy.getVolume('c4').velocity, 111) 
+        self.assertEqual(cCopy.getVolume('d-4').velocity, 98) 
+        self.assertEqual(cCopy.getVolume('g4').velocity, 73)
+
+#         environLocal.printDebug(['in test', 'id(c)', id(c)])
+#         environLocal.printDebug(['in test', "c.getVolume('g4').parent", id(c.getVolume('g4').parent)])
+# 
+#         environLocal.printDebug(['in test', 'id(cCopy)', id(cCopy)])
+#         environLocal.printDebug(['in test', "cCopy.getVolume('g4').parent", id(cCopy.getVolume('g4').parent)])
+        
+        self.assertEqual(cCopy.getVolume('c4').parent, cCopy) 
+        self.assertEqual(cCopy.getVolume('d-4').parent, cCopy) 
+        self.assertEqual(cCopy.getVolume('g4').parent, cCopy)
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

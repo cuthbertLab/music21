@@ -30,12 +30,24 @@ class Volume(object):
     >>> from music21 import *
     >>> v = volume.Volume()     
     '''
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, velocity=None):
 
         # store a reference to the parent, as we use this to do context 
         # will use property; if None will leave as None
+        self._parent = None
         self.parent = parent    
         self._velocity = None
+        if velocity is not None:
+            self.velocity = velocity
+
+    def __deepcopy__(self, memo=None):
+        '''Need to manage copying of weak ref; when copying, do not copy weak ref, but keep as a reference to the same object. 
+        '''
+        new = self.__class__()
+        new.mergeAttributes(self) # will get all numerical values
+        # keep same weak ref object
+        new._parent = self._parent
+        return new
 
     #---------------------------------------------------------------------------
     # properties
@@ -139,7 +151,7 @@ class Volume(object):
 
 
     def mergeAttributes(self, other):
-        '''Given another Volume object, gather all attributes except parent.
+        '''Given another Volume object, gather all attributes except parent. Values are always copied, not passed by reference. 
 
         >>> from music21 import *
         >>> n1 = note.Note()
@@ -195,7 +207,6 @@ class Test(unittest.TestCase):
         self.assertEqual(v1.getDynamicContext(), d2)
 
 
-
     def testGetContextSearchB(self):
         from music21 import stream, note, volume, dynamics
         
@@ -212,7 +223,21 @@ class Test(unittest.TestCase):
         self.assertEqual(n1.volume.getDynamicContext(), d2)
 
 
+    def testDeepCopyA(self):
+        import copy
+        from music21 import volume, note    
+        n1 = note.Note()
+
+        v1 = volume.Volume()
+        v1.velocity = 111
+        v1.parent = n1
         
+        v1Copy = copy.deepcopy(v1)
+        self.assertEqual(v1.velocity, 111)
+        self.assertEqual(v1Copy.velocity, 111)
+
+        self.assertEqual(v1.parent, n1)
+        self.assertEqual(v1Copy.parent, n1)
         
 
 

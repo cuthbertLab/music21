@@ -571,7 +571,18 @@ class NotRest(GeneralNote):
         self._noteheadParen = False
         self._stemDirection = 'unspecified'
         self._volume = None # created on demand
-        
+
+    def __deepcopy__(self, memo=None):
+        '''As NotRest objects have a Volume, objects, and Volume objects store weak refs to the to parent object, need to specialize deep copy handling
+        '''
+        #environLocal.printDebug(['calling NotRest.__deepcopy__', self])
+        new = GeneralNote.__deepcopy__(self, memo=memo)
+        # after copying, if a Volume exists, it is linked to the old object
+        # look at _volume so as not to create object if not already there
+        if new._volume is not None:
+            new.volume.parent = new # update with new instance
+        return new
+
     def _getStemDirection(self):
         '''Returns the stem direction.
         '''
@@ -1787,8 +1798,20 @@ class Test(unittest.TestCase):
         self.assertEqual(n2.volume is not None, True)
 
         
+    def testVolumeB(self):
+        # manage deepcopying properly
 
-                
+        from music21 import note, volume
+        n1 = note.Note()
+        n2 = note.Note()
+
+        n1.volume.velocity = 100
+        self.assertEqual(n1.volume.velocity, 100)
+        self.assertEqual(n1.volume.parent, n1)
+        
+        n1Copy = copy.deepcopy(n1)
+        self.assertEqual(n1Copy.volume.velocity, 100)
+        self.assertEqual(n1Copy.volume.parent, n1Copy)
 
 
 #-------------------------------------------------------------------------------
