@@ -49,6 +49,10 @@ class Volume(object):
         new._parent = self._parent
         return new
 
+
+    def __repr__(self):
+        return "<music21.voliume.Volume realized=%s>" % round(self.realized, 2)
+
     #---------------------------------------------------------------------------
     # properties
         
@@ -170,7 +174,31 @@ class Volume(object):
             self._velocity = other._velocity
 
         
-        
+
+    def getRealized(self, dynamicContext=True, useVelocity=True, 
+        useArticulations=True, baseLevel=1.0):
+        '''Get a realized unit-interval scalar for this Volume. This scalar is to be applied to the final amplitude scalar, whatever that may be.
+ 
+        This can optionally take into account `dynamicContext`, `useVelocity`, and `useArticulation`.
+        '''
+        val = baseLevel
+        if dynamicContext:
+            pass
+        if useVelocity:
+            if self._velocity is not None:
+                val = val * self.velocityScalar
+        if useArticulations:
+            pass
+        # might to rebalance range after scalings       
+        return val
+
+    realized = property(getRealized, doc='''
+        Return the realized unit-interval scalar for this Volume
+
+        >>> from music21 import *
+        >>> 
+        ''')
+
         
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):

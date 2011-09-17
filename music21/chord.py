@@ -214,6 +214,51 @@ class Chord(note.NotRest):
             allPitches.append(thisPitch.nameWithOctave)
         return "<music21.chord.Chord %s>" % ' '.join(allPitches)
 
+    def __iter__(self):
+        return common.Iterator(self._components)
+
+    def __len__(self):
+        '''Return the length of components in the chord.
+    
+        >>> from music21 import *
+        >>> c = chord.Chord(['c', 'e', 'g'])
+        >>> len(c)
+        3
+        '''
+        return len(self._components)
+
+    def __getitem__(self, key):
+        '''Get item makes access pitch components fo the Chord easier
+        '''
+        
+        if common.isStr(key) and key.count('.') == 1:
+            first, last = key.split('.')
+            try:
+                component = self._components[int(first)]
+            except:
+                raise KeyError('cannot access component with string: %s' % key)
+
+            p = component['pitch']
+            if last == 'pitch':
+                return p
+            elif last == 'volume':
+                # use function; will create if necessary
+                return self.getVolume(p) 
+            elif last == 'tie':
+                return self.getTie(p) 
+        else:
+            try:
+                return self._components[key]
+            except KeyError:
+                raise KeyError('cannot access component with: %s' % key)
+
+
+            
+
+
+
+
+
 
     #---------------------------------------------------------------------------
     # properties
@@ -3817,6 +3862,53 @@ class Test(unittest.TestCase):
         self.assertEqual(cCopy.getVolume('c4').parent, cCopy) 
         self.assertEqual(cCopy.getVolume('d-4').parent, cCopy) 
         self.assertEqual(cCopy.getVolume('g4').parent, cCopy)
+
+
+    def testGetItemA(self):
+        from music21 import chord, stream
+        
+        c = chord.Chord(['c4', 'd-4', 'g4'])
+        self.assertEqual(str(c[0]['pitch']), 'C4')
+        self.assertEqual(str(c[1]['pitch']), 'D-4')
+        self.assertEqual(str(c[2]['pitch']), 'G4')
+
+        self.assertEqual(str(c['0.pitch']), 'C4')
+        self.assertEqual(str(c['1.pitch']), 'D-4')
+        self.assertEqual(str(c['2.pitch']), 'G4')
+
+        # cannot do this, as this provides raw access
+        #self.assertEqual(str(c[0]['volume']), 'C4')
+
+        self.assertEqual(str(c['0.volume']), '<music21.voliume.Volume realized=1.0>')
+        self.assertEqual(str(c['1.volume']), '<music21.voliume.Volume realized=1.0>')
+        self.assertEqual(str(c['1.volume']), '<music21.voliume.Volume realized=1.0>')
+
+        c['0.volume'].velocity = 20
+        c['1.volume'].velocity = 80
+        c['2.volume'].velocity = 120
+
+        self.assertEqual(c['0.volume'].velocity, 20)
+        self.assertEqual(c['1.volume'].velocity, 80)
+        self.assertEqual(c['2.volume'].velocity, 120)
+
+    
+        self.assertEqual([x['volume'].velocity for x in c], [20, 80, 120])
+
+        cCopy = copy.deepcopy(c)
+
+        self.assertEqual([x['volume'].velocity for x in cCopy], [20, 80, 120])
+
+        vals = [11, 22, 33]
+        for i, x in enumerate(cCopy):
+            x['volume'].velocity = vals[i]
+
+        self.assertEqual([x['volume'].velocity for x in cCopy], [11, 22, 33])
+        self.assertEqual([x['volume'].velocity for x in c], [20, 80, 120])
+
+        self.assertEqual([x['volume'].parent for x in cCopy], [cCopy, cCopy, cCopy])
+        self.assertEqual([x['volume'].parent for x in c], [c, c, c])
+    
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
