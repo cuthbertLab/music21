@@ -175,7 +175,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     A2
     >>> n.duration.quarterLength
     1.0
-    >>> n._midiVelocity
+    >>> n.volume.velocity
     94
     '''
     if inputM21 == None:
@@ -203,7 +203,8 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
         raise TranslateException('cannot handle MIDI event list in the form: %r', eventList)
 
     n.pitch.midi = eOn.pitch
-    n._midiVelocity = eOn.velocity
+    n.volume.velocity = eOn.velocity
+    #n._midiVelocity = eOn.velocity
     # here we are handling an occasional error that probably should not happen
     # TODO: handle chords
     if (tOff - tOn) != 0:
@@ -248,7 +249,13 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
     me1.pitch = n.pitch.getMidiPreCentShift() # will shift later, do not round
     if not n.pitch.isTwelveTone():
         me1.centShift = n.pitch.getCentShiftFromMidi()
-    me1.velocity = 90 # default, can change later
+    # get realized value from volume, scale to velocity
+    # or just velocity
+    if n.volume.velocity is not None:
+        me1.velocity = n.volume.velocity
+    else: # set as realized
+        me1.velocity = int(round(n.volume.realized * 127))
+
     eventList.append(me1)
 
     if includeDeltaTime:
@@ -2169,6 +2176,26 @@ class Test(unittest.TestCase):
         mts = streamsToMidiTracks(s)
         mtsRepr = repr(mts)
         self.assertEqual(mtsRepr.count('SET_TEMPO'), 100)
+
+
+
+    def testMidiExportVelocityA(self):
+        from music21 import note, stream
+
+        s = stream.Stream()
+        for i in range(10):
+            #print i
+            n = note.Note('c3')
+            n.volume.velocityScalar = i/10.
+            s.append(n)
+
+        #s.show('midi')        
+        mts = streamsToMidiTracks(s)
+        mtsRepr = repr(mts)
+        self.assertEqual(mtsRepr.count('velocity=114'), 1)
+        self.assertEqual(mtsRepr.count('velocity=13'), 1)
+        
+
 
 if __name__ == "__main__":
     music21.mainTest(Test)
