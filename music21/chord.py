@@ -740,6 +740,39 @@ class Chord(note.NotRest):
     #---------------------------------------------------------------------------
     # volume per pitch 
 
+    def _getVolume(self):
+        post = []
+        for c in self._components:
+            if 'volume' in c.keys() and c['volume'] is not None:
+                v = c['volume']
+            else:
+                v = volume.Volume() # add self 
+                v.parent = self
+                c['volume'] = v
+            post.append(v)
+        return post
+
+    def _setVolume(self, value):
+        if not isinstance(value, volume.Volume):
+            raise ChordException('must set volume property with a Volume')
+        value.parent = self # set once
+        for c in self._components:
+            c['volume'] = value # set the same instance to each?
+        
+    volume = property(_getVolume, _setVolume, doc='''
+        When setting the .volume property, all pitches are set to the same Volume object. 
+
+        >>> from music21 import *
+        >>> c = chord.Chord(['g#', 'd-'])
+        >>> c.volume
+        [<music21.volume.Volume realized=1.0>, <music21.volume.Volume realized=1.0>]
+        >>> c.volume = volume.Volume(velocity=64)
+        >>> c.volume
+        [<music21.volume.Volume realized=0.5>, <music21.volume.Volume realized=0.5>]
+
+        ''')
+
+
     def getVolume(self, p):
         '''For a given Pitch in this Chord, return the Volume      
         '''
@@ -3879,9 +3912,9 @@ class Test(unittest.TestCase):
         # cannot do this, as this provides raw access
         #self.assertEqual(str(c[0]['volume']), 'C4')
 
-        self.assertEqual(str(c['0.volume']), '<music21.voliume.Volume realized=1.0>')
-        self.assertEqual(str(c['1.volume']), '<music21.voliume.Volume realized=1.0>')
-        self.assertEqual(str(c['1.volume']), '<music21.voliume.Volume realized=1.0>')
+        self.assertEqual(str(c['0.volume']), '<music21.volume.Volume realized=1.0>')
+        self.assertEqual(str(c['1.volume']), '<music21.volume.Volume realized=1.0>')
+        self.assertEqual(str(c['1.volume']), '<music21.volume.Volume realized=1.0>')
 
         c['0.volume'].velocity = 20
         c['1.volume'].velocity = 80

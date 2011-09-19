@@ -51,7 +51,7 @@ class Volume(object):
 
 
     def __repr__(self):
-        return "<music21.voliume.Volume realized=%s>" % round(self.realized, 2)
+        return "<music21.volume.Volume realized=%s>" % round(self.realized, 2)
 
     #---------------------------------------------------------------------------
     # properties
