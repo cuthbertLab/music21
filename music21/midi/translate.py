@@ -314,6 +314,7 @@ def noteToMidiFile(inputM21):
 
 #-------------------------------------------------------------------------------
 # Chords
+# TODO: add velocity reading and writing
 
 def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     '''
@@ -370,7 +371,9 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
         ticksPerQuarter = defaults.ticksPerQuarter
 
     from music21 import pitch
+    from music21 import volume
     pitches = []
+    volumes = []
 
     # this is a format provided by the Stream conversion of 
     # midi events; it pre groups events for a chord together in nested pairs
@@ -380,11 +383,10 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
         for onPair, offPair in eventList:
             tOn, eOn = onPair
             tOff, eOff = offPair
-
             p = pitch.Pitch()
             p.midi = eOn.pitch
             pitches.append(p)
-
+            volumes.append(volume.Volume(velocity=eOn.velocity))
     # assume it is  a flat list        
     else:
         onEvents = eventList[:(len(eventList) / 2)]
@@ -392,14 +394,15 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
         # first is always delta time
         tOn = onEvents[0].time
         tOff = offEvents[0].time
-
         # create pitches for the odd on Events:
         for i in range(1, len(onEvents), 2):
             p = pitch.Pitch()
             p.midi = onEvents[i].pitch
             pitches.append(p)
+            volumes.append(volume.Volume(velocity=onEvents[i].velocity))
 
     c.pitches = pitches
+    c.volume = volumes # can set a list to volume property
     # can simply use last-assigned pair of tOff, tOn
     if (tOff - tOn) != 0:
         c.duration.midi = (tOff - tOn), ticksPerQuarter
@@ -419,17 +422,21 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
     [<MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=48, velocity=90>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=68, velocity=90>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=83, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=48, velocity=0>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=68, velocity=0>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=83, velocity=0>]
 
     '''
+    from music21 import volume
     mt = None # midi track 
     eventList = []
     c = inputM21
 
+    defaultVolume = volume.Volume()
+
     # temporary storage for setting correspondance
     noteOn = []
     noteOff = [] 
-
-    for i in range(len(c.pitches)):
-        pitchObj = c.pitches[i]
-
+    for i in range(len(c)):
+    #for i in range(len(c.pitches)):
+        chordComponent = c[i]
+        #pitchObj = c.pitches[i]
+        pitchObj = chordComponent['pitch']
         if includeDeltaTime:
             dt = midiModule.DeltaTime(mt)
             # for a chord, only the first delta time should have the offset
@@ -445,7 +452,15 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
         me.pitch = pitchObj.midi
         if not pitchObj.isTwelveTone():
             me.centShift =  pitchObj.getCentShiftFromMidi()
-        me.velocity = 90 # default, can change later
+        if 'volume' in chordComponent.keys():
+            if chordComponent['volume'] is not None:
+                me.velocity = chordComponent['volume'].velocity
+            else:
+                me.velocity = int(round(
+                                chordComponent['volume'].realized * 127))
+        else: # no volume information, use default
+            me.velocity = int(round(defaultVolume.realized * 127))
+            
         eventList.append(me)
         noteOn.append(me)
 
@@ -2195,7 +2210,47 @@ class Test(unittest.TestCase):
         self.assertEqual(mtsRepr.count('velocity=114'), 1)
         self.assertEqual(mtsRepr.count('velocity=13'), 1)
         
+    def testMidiExportVelocityB(self):
+        import random
+        from music21 import stream, chord, note
+        
+        s1 = stream.Stream()
+        shift = [0, 6, 12]
+        amps = [(x/10. + .4) for x in range(6)]
+        amps = amps + list(reversed(amps))
+        
+        qlList = [1.5] * 6 + [1] * 8 + [2] * 6 + [1.5] * 8 + [1] * 4 
+        for j, ql in enumerate(qlList):
+            if random.random() > .6:
+                c = note.Rest()
+            else:
+                c = chord.Chord(['c3', 'd-4', 'g5'])
+                for i, v in enumerate(c.volume):
+                    v.velocityScalar = amps[(j+shift[i]) % len(amps)]
+            c.duration.quarterLength = ql
+            s1.append(c)
+        
+        s2 = stream.Stream()
+        random.shuffle(qlList)
+        random.shuffle(amps)
+        for j, ql in enumerate(qlList):
+            n = note.Note(random.choice(['f#2', 'f#2', 'e-2']))
+            n.duration.quarterLength = ql
+            n.volume.velocityScalar = amps[j%len(amps)]
+            s2.append(n)
+        
+        s = stream.Score()
+        s.insert(0, s1)
+        s.insert(0, s2)
 
+        mts = streamsToMidiTracks(s)
+        mtsRepr = repr(mts)
+        #print mtsRepr
+        self.assertEqual(mtsRepr.count('velocity=51') > 2, True)
+        self.assertEqual(mtsRepr.count('velocity=102') > 2, True)
+
+
+        #s.show('midi')
 
 if __name__ == "__main__":
     music21.mainTest(Test)

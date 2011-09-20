@@ -176,7 +176,7 @@ class Volume(object):
         
 
     def getRealized(self, dynamicContext=True, useVelocity=True, 
-        useArticulations=True, baseLevel=1.0):
+        useArticulations=True, baseLevel=0.70866):
         '''Get a realized unit-interval scalar for this Volume. This scalar is to be applied to the final amplitude scalar, whatever that may be.
  
         This can optionally take into account `dynamicContext`, `useVelocity`, and `useArticulation`.
@@ -186,7 +186,8 @@ class Volume(object):
             pass
         if useVelocity:
             if self._velocity is not None:
-                val = val * self.velocityScalar
+                # if velocity is already set, it should full determine output
+                val = self.velocityScalar
         if useArticulations:
             pass
         # might to rebalance range after scalings       
