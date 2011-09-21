@@ -120,7 +120,7 @@ class Volume(object):
     velocityScalar = property(_getVelocityScalar, _setVelocityScalar, doc = '''
         Get or set the velocityScalar value, a numerical value between 0 and 1 and available setting amplitude on each Note or Pitch in chord. This value is mapped to the range 0 to 127 on output.
 
-        Note that this value is derived from the set velocity value. Floating point error seen here will not be fond in the velocity value. 
+        Note that this value is derived from the set velocity value. Floating point error seen here will not be found in the velocity value. 
 
         >>> from music21 import *
         >>> n = note.Note()
