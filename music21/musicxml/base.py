@@ -2281,6 +2281,69 @@ class TimeModification(MusicXMLElement):
         return c
 
 
+#-------------------------------------------------------------------------------
+# Harmony and components
+
+class Harmony(MusicXMLElement):
+    '''A harmony tag stores a root, kind 
+    '''
+    def __init__(self):
+        MusicXMLElement.__init__(self)
+        self._tag = 'harmony'
+        self.kindObj = None # object
+        self.rootObj = None # object
+
+        self._crossReference['kindObj'] = ['kind']
+        self._crossReference['rootObj'] = ['root']
+
+    def _getComponents(self):
+        c = []
+        c.append(self.rootObj)
+        c.append(self.kindObj)
+        return c
+
+
+class Root(MusicXMLElement):
+    '''A root defines a pitch, with a step and an alter
+    '''
+    def __init__(self):
+        MusicXMLElement.__init__(self)
+        self._tag = 'root'
+        # simple entities
+        self.rootStep = None 
+        self.rootAlter = None
+
+    def _getComponents(self):
+        c = []
+        # as simple elements, must provide tag name here
+        c.append(('root-step', self.rootStep))
+        c.append(('root-alter', self.rootAlter))
+        return c
+
+class Kind(MusicXMLElement):
+    '''A harmony tag stores a root, kind 
+    '''
+    def __init__(self):
+        MusicXMLElement.__init__(self)
+        self._tag = 'kind'
+
+        # the type of chord, common values are 'dominant', 'major', etc
+        self.charData = None 
+
+        # The text attribute describes how the kind should be spelled if not using symbols
+        self._attr['text'] = None # can be the text as displayed, like 7
+        self._attr['use-symbols'] = None  # use or no
+        self._attr['stack-degrees'] = None # yes or no
+        self._attr['parentheses-degrees'] = None # yes or no
+        self._attr['bracket-degrees'] = None # yes or no
+        # not added: print-style, haligh, and valign attributeGroups
+
+
+
+
+#-------------------------------------------------------------------------------
+
+
 class Tuplet(MusicXMLElement):
     def __init__(self):
         MusicXMLElement.__init__(self)
@@ -4379,6 +4442,35 @@ class Test(unittest.TestCase):
         s = corpus.parse('opus18no1/movement3', extList=['.xml'])
 
 
+    def testHarmonyA(self):
+        k = Kind()
+        k.charData = 'major'
+        k.set('text', ' ') # set as an empty string to hide
+
+        r = Root()
+        r.set('rootStep', 'B')
+        r.set('rootAlter', '-1')
+
+        h = Harmony()       
+        h.set('root', r)
+        h.set('kind', k)
+
+        #print h.xmlStr()
+
+        expected = """<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE score-partwise
+  PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
+  'http://www.musicxml.org/dtds/partwise.dtd'>
+<harmony>
+  <root>
+    <root-step>B</root-step>
+    <root-alter>-1</root-alter>
+  </root>
+  <kind text=" ">major</kind>
+</harmony>
+"""
+        self._compareXml(h, expected)
+
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
@@ -4387,23 +4479,26 @@ if __name__ == "__main__":
     reload(sys)
     sys.setdefaultencoding("utf-8")
 
+    music21.mainTest(Test)
 
-    if len(sys.argv) != 2:
-        music21.mainTest(Test)
-
-
-    elif len(sys.argv) == 2:
-        #te = TestExternal()
-        t = Test()
-        t.testBarlineRepeat()
-
-#         if os.path.isdir(sys.argv[1]): 
-#             pass
-#             #te.testInputDirectory(sys.argv[1])
-#         else: # assume it is a single file
-#             #te.testOpen(sys.argv[1])
-
-
+# 
+# 
+#     if len(sys.argv) != 2:
+#         music21.mainTest(Test)
+# 
+# 
+#     elif len(sys.argv) == 2:
+#         #te = TestExternal()
+#         t = Test()
+#         t.testBarlineRepeat()
+# 
+# #         if os.path.isdir(sys.argv[1]): 
+# #             pass
+# #             #te.testInputDirectory(sys.argv[1])
+# #         else: # assume it is a single file
+# #             #te.testOpen(sys.argv[1])
+# 
+# 
 
 
 #------------------------------------------------------------------------------
