@@ -2284,24 +2284,37 @@ class TimeModification(MusicXMLElement):
 #-------------------------------------------------------------------------------
 # Harmony and components
 
-class Harmony(MusicXMLElement):
+class Harmony(MusicXMLElementList):
     '''A harmony tag stores a root, kind 
     '''
     def __init__(self):
-        MusicXMLElement.__init__(self)
+        MusicXMLElementList.__init__(self)
         self._tag = 'harmony'
-        self.kindObj = None # object
+
         self.rootObj = None # object
+        self.function = None # a string, I, II, iii
+        self.kindObj = None # object
+        self.inversion = None # non negative integer, 0 for root
+        self.bassObj = None # object
+        self.degreeObj = None # object
+    
+        self.componentList = [] # list of HarmonyChord objects?
 
         self._crossReference['kindObj'] = ['kind']
         self._crossReference['rootObj'] = ['root']
+        self._crossReference['bassObj'] = ['bass']
+        self._crossReference['degreeObj'] = ['degree']
 
     def _getComponents(self):
         c = []
+        c = c + self.componentList
         c.append(self.rootObj)
+        c.append(('function', self.function))
         c.append(self.kindObj)
+        c.append(('inversion', self.inversion)) 
+        c.append(self.bassObj)
+        c.append(self.degreeObj)
         return c
-
 
 class Root(MusicXMLElement):
     '''A root defines a pitch, with a step and an alter
@@ -2318,6 +2331,23 @@ class Root(MusicXMLElement):
         # as simple elements, must provide tag name here
         c.append(('root-step', self.rootStep))
         c.append(('root-alter', self.rootAlter))
+        return c
+
+class Bass(MusicXMLElement):
+    '''A root defines a pitch, with a step and an alter
+    '''
+    def __init__(self):
+        MusicXMLElement.__init__(self)
+        self._tag = 'bass'
+        # simple entities
+        self.bassStep = None 
+        self.bassAlter = None
+
+    def _getComponents(self):
+        c = []
+        # as simple elements, must provide tag name here
+        c.append(('bass-step', self.bassStep))
+        c.append(('bass-alter', self.bassAlter))
         return c
 
 class Kind(MusicXMLElement):
@@ -2339,6 +2369,47 @@ class Kind(MusicXMLElement):
         # not added: print-style, haligh, and valign attributeGroups
 
 
+class Degree(MusicXMLElementList):
+    '''The degree type is used to add, alter, or subtract individual notes in the chord.
+    '''
+    def __init__(self):
+        MusicXMLElementList.__init__(self)
+        self._tag = 'degree'
+        self.componentList = [] # triples of degree value, alter, type
+
+    def _getComponents(self):
+        c = []
+        c = c + self.componentList
+        return c
+
+
+class DegreeValue(MusicXMLElement):
+    '''Stores 1 for root, 3 for third, etc
+    '''
+    def __init__(self):
+        MusicXMLElement.__init__(self)
+        self._tag = 'degree-value'
+        self.charData = None # stores 
+
+class DegreeAlter(MusicXMLElement):
+    '''Chromatic alteration of current degree
+    '''
+    def __init__(self):
+        MusicXMLElement.__init__(self)
+        self._tag = 'degree-alter'
+        self.charData = None # stores semitones values, 1, -1, etc
+
+        # if +/- should be used instead of flat/sharp
+        self._attr['plus-minus'] = None 
+
+
+class DegreeType(MusicXMLElement):
+    '''addition, alteration, subtraction relative to the kind of current chord
+    '''
+    def __init__(self):
+        MusicXMLElement.__init__(self)
+        self._tag = 'degree-type'
+        self.charData = None # add, alter, subtract
 
 
 #-------------------------------------------------------------------------------
@@ -3697,19 +3768,6 @@ class Document(object):
         print()
         print(self.score.toxml(None, None, 1))
 
-# no longer needed 
-#     def reprPolyphony(self):
-#         # create an event list by measure
-#         for part in self.score.componentList:
-#             print('+'*20 + ' ' + 'part-id', part.get('id'))
-#             for measure in part.componentList:
-#                 print(' '*10 + '+'*10 + ' ' + 'measure-no', measure.get('number'))
-#                 for note in measure.componentList:
-#                     # skip forward and backward objects
-#                     if note.tag != 'note': continue
-#                     #startStr = str(note.external['start']).ljust(5)
-#                     print(' '*20 + ' ' + 'note', startStr, note)
-
     #---------------------------------------------------------------------------
     def write(self, fp):
         msg = self.score.toxml(None, None, 1)
@@ -4437,8 +4495,6 @@ class Test(unittest.TestCase):
                         self.assertEqual(c.repeatObj.get('direction'), 'backward')
                         self.assertEqual(c.repeatObj.get('times'), None)
                         #print c.repeatObj.direction
-
-
         s = corpus.parse('opus18no1/movement3', extList=['.xml'])
 
 
@@ -4451,9 +4507,29 @@ class Test(unittest.TestCase):
         r.set('rootStep', 'B')
         r.set('rootAlter', '-1')
 
+        b = Bass()
+        b.set('bassStep', 'D')
+        b.set('bassAlter', None)
+
+        d = Degree()
+        dv = DegreeValue()
+        dv.set('charData', 5)
+        da = DegreeAlter()
+        da.set('charData', 1)
+        dt = DegreeType() # add, alter, subtract
+        dt.set('charData', 'alter')
+
+        d.append(dv)
+        d.append(da)
+        d.append(dt)
+
         h = Harmony()       
         h.set('root', r)
         h.set('kind', k)
+        h.set('bass', b)
+        h.set('inversion', 1)
+        h.set('degree', d)
+        h.set('function', 'V')
 
         #print h.xmlStr()
 
@@ -4466,7 +4542,17 @@ class Test(unittest.TestCase):
     <root-step>B</root-step>
     <root-alter>-1</root-alter>
   </root>
+  <function>V</function>
   <kind text=" ">major</kind>
+  <inversion>1</inversion>
+  <bass>
+    <bass-step>D</bass-step>
+  </bass>
+  <degree>
+    <degree-value>5</degree-value>
+    <degree-alter>1</degree-alter>
+    <degree-type>alter</degree-type>
+  </degree>
 </harmony>
 """
         self._compareXml(h, expected)
