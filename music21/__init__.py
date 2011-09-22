@@ -47,7 +47,7 @@ __all__ = ['base',
            'chant',
            'composition', 'configure',
            'counterpoint', 'corpus', 
-           'demos', 'doc', 'figuredBass', 'humdrum', 
+           'demos', 'doc', 'figuredBass', 'humdrum', 'harmony', 
            'lily', 'musicxml', 
            'noteworthy','romanText', 'test', 'trecento', 'midi', 
            
