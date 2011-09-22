@@ -2245,7 +2245,6 @@ class Test(unittest.TestCase):
 
         mts = streamsToMidiTracks(s)
         mtsRepr = repr(mts)
-        #print mtsRepr
         self.assertEqual(mtsRepr.count('velocity=51') > 2, True)
         self.assertEqual(mtsRepr.count('velocity=102') > 2, True)
 

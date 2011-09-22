@@ -3216,7 +3216,6 @@ class Handler(xml.sax.ContentHandler):
             self._notationsObj.componentList.append(self._technicalObj)
             self._technicalObj = None
 
-
         elif name == 'offset':
             if self._directionObj is not None:
                 #environLocal.printDebug(['got an offset tag for a directionObj', self._currentTag.charData])
@@ -3224,7 +3223,6 @@ class Handler(xml.sax.ContentHandler):
             else: # ignoring figured-bass
                 environLocal.printDebug(['got an offset tag but no open directionObj', self._currentTag.charData])
                 pass
-
 
         elif name == 'words':
             if self._directionTypeObj is not None: 
@@ -3435,6 +3433,7 @@ class Handler(xml.sax.ContentHandler):
 
         elif name == 'transpose':
             self._attributesObj.transposeObj = self._transposeObj
+            #environLocal.printDebug(['storing transpose object', self._transposeObj])
             self._transposeObj = None
 
         elif name == 'diatonic':
@@ -3447,7 +3446,7 @@ class Handler(xml.sax.ContentHandler):
             self._transposeObj.octaveChange = self._currentTag.charData
 
         elif name == 'double': 
-            self._transposeObj.double = True
+            self._transposeObj.double = self._currentTag.charData
 
         elif name == 'time':
             self._attributesObj.timeList.append(self._timeObj)

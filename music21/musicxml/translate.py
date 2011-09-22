@@ -1178,6 +1178,10 @@ def instrumentToMx(i):
 
 
 def mxToInstrument(mxScorePart, inputM21=None):
+
+    # TODO: to get and fill transposition, need to get corresponding
+    # part, and look for <transpose> object in Measure attributes, 
+    # presumably in Measure 1
     if inputM21 is None:
         i = instrument.Instrument()
     else:
@@ -2892,6 +2896,8 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     # create a new music21 instrument
     instrumentObj = instrument.Instrument()
     if mxInstrument is not None:
+        # need an mxScorePart here   
+        #mxToInstrument(mxScorePart)
         instrumentObj.mx = mxInstrument
 
     # add part id as group
@@ -3875,6 +3881,14 @@ spirit</words>
         match = '<part-group number="2" type="stop"/>'
         self.assertEqual(raw.find(match) > 0, True)
 
+
+    def testInstrumentTranspositionA(self):
+
+        from music21.musicxml import testPrimitive        
+        from music21 import converter
+
+        s = converter.parse(testPrimitive.transposingInstruments72a)
+        #s.show()
 
 
 if __name__ == "__main__":
