@@ -2375,10 +2375,8 @@ class Kind(MusicXMLElement):
     def __init__(self):
         MusicXMLElement.__init__(self)
         self._tag = 'kind'
-
         # the type of chord, common values are 'dominant', 'major', etc
         self.charData = None 
-
         # The text attribute describes how the kind should be spelled if not using symbols
         self._attr['text'] = None # can be the text as displayed, like 7
         self._attr['use-symbols'] = None  # use or no
@@ -2415,7 +2413,6 @@ class DegreeAlter(MusicXMLElement):
         MusicXMLElement.__init__(self)
         self._tag = 'degree-alter'
         self.charData = None # stores semitones values, 1, -1, etc
-
         # if +/- should be used instead of flat/sharp
         self._attr['plus-minus'] = None 
 

@@ -1118,10 +1118,71 @@ def mxToRepeatExpression(mxDirection):
 # Harmony
 
 def mxToHarmony(mxHarmony):
-    environLocal.printDebug(['mxToHarmony():', mxHarmony])
-
+    #environLocal.printDebug(['mxToHarmony():', mxHarmony])
     from music21 import harmony
+    from music21 import pitch
+
     h = harmony.Harmony()
+
+    mxKind = mxHarmony.get('kind')
+    if mxKind is not None:
+        h.kind = mxKind.charData
+        mxKindText = mxKind.get('text')
+        if mxKindText is not None:
+            h.kindStr = mxKindText
+    
+    mxRoot = mxHarmony.get('root')
+    if mxRoot is not None:
+        r = pitch.Pitch(mxRoot.get('rootStep'))
+        if mxRoot.get('rootAlter') is not None:
+            # can provide integer to create accidental on pitch
+            r.accidental = pitch.Accidental(int(mxRoot.get('rootAlter')))
+        # set Pitch object on Harmony
+        h.root = r
+
+    mxBass = mxHarmony.get('bass')
+    if mxBass is not None:
+        b = pitch.Pitch(mxBass.get('bassStep'))
+        if mxBass.get('bassAlter') is not None:
+            # can provide integer to create accidental on pitch
+            b.accidental = pitch.Accidental(int(mxRoot.get('bassAlter')))
+        # set Pitch object on Harmony
+        h.bass = b
+
+    mxInversion = mxHarmony.get('inversion')
+    if mxInversion is not None:
+        h.inversion = int(mxInversion) # must be an int
+
+    mxFunction = mxHarmony.get('function')
+    if mxFunction is not None:
+        h.romanNumeral = mxFunction # goes to roman property
+
+    mxDegree = mxHarmony.get('degree')
+    if mxDegree is not None: # a list of components
+        harmonyDegrees = []
+        hd = None
+        for mxSub in mxDegree.componentList:
+            # this is the assumed order of triples
+            if isinstance(mxSub, musicxmlMod.DegreeValue):
+                if hd is not None: # already set
+                    harmonyDegrees.append(hd)
+                    hd = None
+                if hd is None:
+                    hd = harmony.HarmonyDegree() 
+                hd.degree = int(mxSub.charData)
+            elif isinstance(mxSub, musicxmlMod.DegreeAlter):
+                hd.interval = int(mxSub.charData)
+            elif isinstance(mxSub, musicxmlMod.DegreeType):
+                hd.type = int(mxSub.charData)
+            else:
+                raise TranslateException('found unexpected object in degree tag: %s' % mxSub)
+        # must get last on loop exit
+        if hd is not None: 
+            harmonyDegrees.append(hd)
+        for hd in harmonyDegrees:
+            h.addHarmonyDegree(hd)
+
+    environLocal.printDebug(['mxToHarmony(): Harmony object', h])
     return h
     
 
@@ -3918,6 +3979,14 @@ spirit</words>
 
         s = corpus.parse('leadSheet/berlinAlexandersRagtime.xml')
         self.assertEqual(len(s.flat.getElementsByClass('Harmony')), 19)
+
+        match = [h.kind for h in s.flat.getElementsByClass('Harmony')]
+        self.assertEqual(match, [u'major', u'dominant', u'major', u'major', u'major', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'major'])
+
+        match = [str(h.root) for h in s.flat.getElementsByClass('Harmony')]
+        self.assertEqual(match, ['F', 'C', 'F', 'B-', 'F', 'C', 'G', 'C', 'C', 'F', 'C', 'F', 'F', 'B-', 'F', 'F', 'C', 'F', 'C'])
+
+        
         #s.show()
 
 
