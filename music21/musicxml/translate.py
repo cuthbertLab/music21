@@ -2084,6 +2084,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     from music21 import stream
     from music21 import chord
     from music21 import dynamics
+    from music21 import harmony
     from music21 import key
     from music21 import note
     from music21 import layout
@@ -2202,6 +2203,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             mxObjNext = mxMeasure[i+1]
         else:
             mxObjNext = None
+        #environLocal.printDebug(['handling', mxObj])
 
         # NOTE: tests have shown that using isinstance() here is much faster
         # than checking the .tag attribute.
@@ -2230,8 +2232,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     addPageLayout = False
             except xmlnode.XMLNodeException:
                 pass
-            
-            if addPageLayout == False:
+            if not addPageLayout:
                 try:
                     addPageLayout = mxPrint.get('page-number')
                     if addPageLayout is not None:
@@ -2240,15 +2241,11 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                         addPageLayout = False
                 except xmlnode.XMLNodeException:
                     addPageLayout = False
-
-            if addPageLayout == False:
+            if not addPageLayout:
                 for layoutType in mxPrint.componentList:
                     if isinstance(layoutType, musicxmlMod.PageLayout):
                         addPageLayout = True
-                        break
-
-            
-            
+                        break            
             try:   
                 addSystemLayout = mxPrint.get('new-system')
                 if addSystemLayout is not None:
@@ -2257,21 +2254,17 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     addSystemLayout = False
             except xmlnode.XMLNodeException:
                 pass
-            
-            if addSystemLayout == False:
+            if not addSystemLayout:
                 for layoutType in mxPrint.componentList:
                     if isinstance(layoutType, musicxmlMod.SystemLayout):
                         addSystemLayout = True
                         break
-
-            
             if addPageLayout:
                 pl = layout.PageLayout()
                 pl.mx = mxPrint
                 # store at zero position
                 m._insertCore(0, pl)
-
-            if addSystemLayout == True or addPageLayout != True:
+            if addSystemLayout or not addPageLayout:
                 sl = layout.SystemLayout()
                 sl.mx = mxPrint
                 # store at zero position
@@ -2483,6 +2476,11 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     else:
                         _addToStaffReference(mxObj, te, staffReference)
                         m._insertCore(offsetMeasureNote + offsetDirection, te)
+
+        elif isinstance(mxObj, musicxmlMod.Harmony):
+            mxHarmony = mxObj
+            environLocal.printDebug(['found harmony:', mxHarmony])
+
 
     #environLocal.printDebug(['staffReference', staffReference])
     # if we have voices and/or if we used backup/forward, we may have
@@ -3888,6 +3886,21 @@ spirit</words>
         from music21 import converter
 
         s = converter.parse(testPrimitive.transposingInstruments72a)
+        #s.show()
+
+
+    def testHarmonyA(self):
+
+        from music21.musicxml import testPrimitive        
+        from music21 import converter, corpus
+
+        # can also test
+        # corpus/monteverdi/madrigal.3.12.xml
+        #s = corpus.parse('coltrane')
+
+        s = corpus.parse('monteverdi/madrigal.3.12.xml')
+
+        #s = corpus.parse('leadSheet/berlinAlexandersRagtime.xml')
         #s.show()
 
 

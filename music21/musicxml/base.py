@@ -41,7 +41,7 @@ environLocal = environment.Environment(_MOD)
 # are >= to this value
 # if changes are made here that are not compatible, the m21 version number
 # needs to be increased and this number needs to be set to that value
-VERSION_MINIMUM = (0, 3, 5) 
+VERSION_MINIMUM = (0, 3, 8) 
 
 
 #-------------------------------------------------------------------------------
@@ -3359,6 +3359,7 @@ class Handler(xml.sax.ContentHandler):
             self._bassObj.bassAlter = self._currentTag.charData
 
         elif name == 'kind':
+            self._kindObj.charData = self._currentTag.charData
             self._harmonyObj.kindObj = self._kindObj
             self._kindObj = None
 
@@ -3366,12 +3367,15 @@ class Handler(xml.sax.ContentHandler):
             self._harmonyObj.degreeObj = self._degreeObj
             self._degreeObj = None
         elif name == 'degree-value':
+            self._degreeValueObj.charData = self._currentTag.charData
             self._degreeObj.componentList.append(self._degreeValueObj)
             self._degreeValueObj = None
         elif name == 'degree-alter':
+            self._degreeAlterObj.charData = self._currentTag.charData
             self._degreeObj.componentList.append(self._degreeAlterObj)
             self._degreeAlterObj = None
         elif name == 'degree-type':
+            self._degreeTypeObj.charData = self._currentTag.charData
             self._degreeObj.componentList.append(self._degreeTypeObj)
             self._degreeTypeObj = None
 
