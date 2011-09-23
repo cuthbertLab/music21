@@ -77,11 +77,14 @@ def expandShortHand(shorthand):
     return ','.join(shGroupOut)
         
 
-
-class RomanNumeralException(Exception):
+#-------------------------------------------------------------------------------
+class RomanException(music21.Music21Exception):
     pass
 
+class RomanNumeralException(music21.Music21Exception):
+    pass
 
+#-------------------------------------------------------------------------------
 class RomanNumeral(chord.Chord):
     '''
     
@@ -668,8 +671,7 @@ def fromChordAndKey(inChord, inKey):
 
 
 
-class RomanException(music21.Music21Exception):
-    pass
+
 
 class Test(unittest.TestCase):
 

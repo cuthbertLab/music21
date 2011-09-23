@@ -504,13 +504,13 @@ def convertHarmonicToCents(value):
 
 
 #-------------------------------------------------------------------------------
-class AccidentalException(Exception):
+class AccidentalException(music21.Music21Exception):
     pass
 
-class PitchException(Exception):
+class PitchException(music21.Music21Exception):
     pass
 
-class MicrotoneException(Exception):
+class MicrotoneException(music21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------

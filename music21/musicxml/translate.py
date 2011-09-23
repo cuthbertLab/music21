@@ -1114,6 +1114,20 @@ def mxToRepeatExpression(mxDirection):
     pass
     # note: this may not be needed, as mx text expressions are converted to repeat objects in measure processing
 
+#-------------------------------------------------------------------------------
+# Harmony
+
+def mxToHarmony(mxHarmony):
+    environLocal.printDebug(['mxToHarmony():', mxHarmony])
+
+    from music21 import harmony
+    h = harmony.Harmony()
+    return h
+    
+
+def harmonyToMx(h):
+    pass
+
 
 #-------------------------------------------------------------------------------
 # Instruments
@@ -2479,7 +2493,9 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
 
         elif isinstance(mxObj, musicxmlMod.Harmony):
             mxHarmony = mxObj
-            environLocal.printDebug(['found harmony:', mxHarmony])
+            h = mxToHarmony(mxHarmony)
+            _addToStaffReference(mxObj, h, staffReference)
+            m._insertCore(offsetMeasureNote, h)
 
 
     #environLocal.printDebug(['staffReference', staffReference])
@@ -3898,9 +3914,10 @@ spirit</words>
         # corpus/monteverdi/madrigal.3.12.xml
         #s = corpus.parse('coltrane')
 
-        s = corpus.parse('monteverdi/madrigal.3.12.xml')
+        #s = corpus.parse('monteverdi/madrigal.3.12.xml')
 
-        #s = corpus.parse('leadSheet/berlinAlexandersRagtime.xml')
+        s = corpus.parse('leadSheet/berlinAlexandersRagtime.xml')
+        self.assertEqual(len(s.flat.getElementsByClass('Harmony')), 19)
         #s.show()
 
 
