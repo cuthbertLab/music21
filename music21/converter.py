@@ -911,7 +911,7 @@ class Converter(object):
         {0.0} <music21.instrument.Instrument P1:...>
         {0.0} <music21.key.KeySignature of no sharps or flats>
         {0.0} <music21.meter.TimeSignature 4/4>
-        {0.0} <music21.harmony.Harmony kind=major () root=F bass=None inversion=None harmonyDegrees=>
+        {0.0} <music21.harmony.Harmony kind=major () root=F bass=None inversion=None>
         {0.0} <music21.note.Note C>
         {3.0} <music21.note.Note A>
         '''
