@@ -3664,7 +3664,7 @@ class Handler(xml.sax.ContentHandler):
 
         elif name == 'transpose':
             self._attributesObj.transposeObj = self._transposeObj
-            #environLocal.printDebug(['storing transpose object', self._transposeObj])
+            #environLocal.printDebug(['setting transpose object', self._transposeObj])
             self._transposeObj = None
 
         elif name == 'diatonic':

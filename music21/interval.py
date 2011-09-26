@@ -829,7 +829,7 @@ class DiatonicInterval(music21.Music21Object):
         # translate strings, if provided, to integers
         # specifier here is the index number in the prefixSpecs list
         self.specifier, specifierStr = convertSpecifier(specifier)
-        if self.specifier != None:
+        if self.specifier is not None:
             self.name = (prefixSpecs[self.specifier] +
                         str(self.generic.undirected))
 

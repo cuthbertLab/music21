@@ -64,6 +64,48 @@ def configureMxPartGroupFromStaffGroup(staffGroup):
     return mxPartGroup
 
 
+def mxTransposeToInterval(mxTranspose):
+    '''Convert a MusicXML Transpose object to a music21 Interval object.
+
+    >>> from music21 import *
+    >>> t = musicxml.Transpose()
+    >>> t.diatonic = -1
+    >>> t.chromatic = -2
+    >>> musicxml.translate.mxTransposeToInterval(t)
+    <music21.interval.Interval M-2>
+
+    >>> t = musicxml.Transpose()
+    >>> t.diatonic = -5
+    >>> t.chromatic = -9
+    >>> musicxml.translate.mxTransposeToInterval(t)
+    <music21.interval.Interval M-6>
+
+    '''
+    from music21 import interval
+
+    if mxTranspose.diatonic is not None:        
+        ds = int(mxTranspose.diatonic)
+        # cannot create a diatonic interval w/o specifier (maj/min)
+        generic = interval.GenericInterval(ds)
+
+    if mxTranspose.chromatic is not None:        
+        cs = int(mxTranspose.chromatic)
+
+    oc = 0
+    if mxTranspose.octaveChange is not None:        
+        oc = int(mxTranspose.octaveChange) * 12
+        
+    # NOTE: presently not dealing with double
+    # doubled one octave down from what is currently written 
+    # (as is the case for mixed cello / bass parts in orchestral literature)
+
+    post = interval.Interval(cs + oc)
+    # TODO: check that diatonic conforms to chromatic; if not
+    # flip spelling to find a match
+    return post
+
+
+
 def mxToTempoIndication(mxMetronome, mxWords=None):
     '''Given an mxMetronome, convert to either a TempoIndication subclass, either a tempo.MetronomeMark or tempo.MetricModulation. 
 
@@ -2303,7 +2345,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             m._insertCore(0, ts)
             #m.timeSignature = meter.TimeSignature()
             #m.timeSignature.mx = mxSub
-    if mxAttributesInternal is True and len(mxAttributes.clefList) != 0:
+    if mxAttributesInternal and len(mxAttributes.clefList) != 0:
         for mxSub in mxAttributes.clefList:
             cl = clef.Clef()
             cl.mx = mxSub
@@ -2311,7 +2353,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             m._insertCore(0, cl)
             #m.clef = clef.Clef()
             #m.clef.mx = mxSub
-    if mxAttributesInternal is True and len(mxAttributes.keyList) != 0:
+    if mxAttributesInternal and len(mxAttributes.keyList) != 0:
         for mxSub in mxAttributes.keyList:
             ks = key.KeySignature()
             ks.mx = mxSub
@@ -2319,6 +2361,13 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             m._insertCore(0, ks)
             #m.keySignature = key.KeySignature()
             #m.keySignature.mx = mxSub
+
+    # transposition may be defined for a Part in the Measure attributes
+    transposition = None
+    if mxAttributesInternal and mxAttributes.transposeObj is not None:
+        # get interval object
+        transposition = mxTransposeToInterval(mxAttributes.transposeObj)
+        environLocal.printDebug(['mxToMeasure: got transposition', transposition])
 
     if mxAttributes.divisions is not None:
         divisions = mxAttributes.divisions
@@ -2642,7 +2691,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             v._elementsChanged()
     m._elementsChanged()
 
-    return m, staffReference
+    return m, staffReference, transposition
 
 def measureToMusicXML(m):
     '''Translate a music21 Measure into a complete MusicXML string representation.
@@ -3047,7 +3096,6 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
         # need an mxScorePart here   
         #mxToInstrument(mxScorePart)
         instrumentObj.mx = mxInstrument
-
     # add part id as group
     instrumentObj.groups.append(partId)
 
@@ -3062,7 +3110,12 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     oMeasure = 0.0
     lastTimeSignature = None
     for mxMeasure in mxPart:
-        m, staffReference = mxToMeasure(mxMeasure, spannerBundle=spannerBundle)
+        # t here is transposition, if defined; otherwise it is None
+        m, staffReference, t = mxToMeasure(mxMeasure, 
+                               spannerBundle=spannerBundle)
+        if t is not None:
+            instrumentObj.transposition = t
+
         # there will be one for each measure
         staffReferenceList.append(staffReference)
 
@@ -4036,6 +4089,13 @@ spirit</words>
         from music21 import converter
 
         s = converter.parse(testPrimitive.transposingInstruments72a)
+        i1 = s.parts[0].flat.getElementsByClass('Instrument')[0]
+        i2 = s.parts[1].flat.getElementsByClass('Instrument')[0]
+        i3 = s.parts[2].flat.getElementsByClass('Instrument')[0]
+
+        self.assertEqual(str(i1.transposition), '<music21.interval.Interval M-2>')
+        self.assertEqual(str(i2.transposition), '<music21.interval.Interval M-6>')
+
         #s.show()
 
 
