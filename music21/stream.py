@@ -199,6 +199,9 @@ class Stream(music21.Music21Object):
         self.autoSort = True
         self.isFlat = True  # does it have no embedded Streams
 
+        # property for transposition status; 
+        self._atSoundingPitch = 'unknown' # True, False, or unknown
+
         # experimental
         self._mutable = True
 
@@ -3298,7 +3301,34 @@ class Stream(music21.Music21Object):
         2
         ''')
 
+    #---------------------------------------------------------------------------
+    # handling transposition values and status
+    def _getAtSoundingPitch(self):
+        return self._atSoundingPitch
 
+    def _setAtSoundingPitch(self, value):
+        if value in [True, False, 'unknown']:
+            self._atSoundingPitch = value
+        else:
+            raise StreamException('not a valid at sounding pitch value: %s' % 
+                                value)
+
+    atSoundingPitch = property(_getAtSoundingPitch, _setAtSoundingPitch, doc='''
+        Get or set the atSoundingPith status. Valid values are True, False, and 'unknown'.
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> s.atSoundingPitch = True
+        >>> s.atSoundingPitch = False
+        >>> s.atSoundingPitch = 'unknown'
+        >>> s.atSoundingPitch
+        'unknown'
+        >>> s.atSoundingPitch = 'junk'
+        Traceback (most recent call last):
+        StreamException: not a valid at sounding pitch value: junk
+        ''')
+
+    #---------------------------------------------------------------------------
     def getTimeSignatures(self, searchContext=True, returnDefault=True,
         sortByCreationTime=True):
         '''
