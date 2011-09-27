@@ -631,7 +631,7 @@ class Oboe(WoodwindInstrument):
 
 class EnglishHorn(WoodwindInstrument):
     def __init__(self):
-        BrassInstrument.__init__(self)
+        WoodwindInstrument.__init__(self)
 
         self.instrumentName = 'English Horn'
         self.instrumentAbbreviation = 'Eng Hn'

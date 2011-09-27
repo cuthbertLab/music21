@@ -3303,6 +3303,7 @@ class Stream(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     # handling transposition values and status
+
     def _getAtSoundingPitch(self):
         return self._atSoundingPitch
 
@@ -3327,6 +3328,60 @@ class Stream(music21.Music21Object):
         Traceback (most recent call last):
         StreamException: not a valid at sounding pitch value: junk
         ''')
+
+
+    def _transposeByInstrument(self, reverse=False, inPlace=True):
+        '''If reverse is False, the transposition will happen in the direction opposite of what is specified by the Instrument
+        '''
+        if not inPlace: # make a copy
+            returnObj = deepcopy(self)
+        else:
+            returnObj = self
+
+        if returnObj.hasPartLikeStreams():
+            for p in returnObj.getElementsByClass('Stream'):
+                # call on each part
+                returnObj.toSoundingPitch(inPlace=True)
+
+        # this will change the working Stream; not sure if a problem
+        returnObj.extendDuration('Instrument', inPlace=True)
+        insts = returnObj.getElementsByClass('Instrument')
+
+        boundaries = {}
+        if len(insts) == 0:
+            raise StreamException('no Instruments defined in this Stream')
+        else:
+            for i in insts:
+                start = i.getOffsetBySite(returnObj)
+                end = start + i.duration.quarterLength
+                boundaries[(start, end)] = i
+
+        for key in boundaries.keys():
+            start, end = key
+            i = boundaries[key]
+            focus = returnObj.getElementsByOffset(start, end,     
+                includeEndBoundary=False, mustFinishInSpan=False, 
+                mustBeginInSpan=True)
+            if i.transposition is not None:
+                trans = i.transposition
+                if reverse:
+                    transInvert = trans.reverse()
+                    focus.transpose(transInvert, inPlace=True)
+                else:
+                    focus.transpose(trans, inPlace=True)
+            #print key, i.transposition
+        return returnObj
+
+    def toSoundingPitch(inPlace=True):
+        '''If not at sounding pitch, transpose all Pitch elements to sounding pitch. The atSoundingPitch property is used to determine if transposition is necessary. 
+        '''
+        pass        
+
+    
+    def toWrittenPitch(inPlace=True):
+        '''If not at written pitch, transpose all Pitch elements to written pitch. The atSoundingPitch property is used to determine if transposition is necessary. 
+        '''
+        pass
 
     #---------------------------------------------------------------------------
     def getTimeSignatures(self, searchContext=True, returnDefault=True,
@@ -7074,8 +7129,6 @@ class Stream(music21.Music21Object):
                 restoreActiveSites=True, 
                 classFilter=classFilterList):
             e.transpose(value, inPlace=True)            
-
-
         if not inPlace:
             return post
         else:       
@@ -16698,16 +16751,31 @@ class Test(unittest.TestCase):
         # length should be the same
         self.assertEqual(len(idSoprano), len(idAlto))
 
-# class Test2(unittest.TestCase):
-#     '''
-#     short tests because Test is taking too long but running from command line removes the debugger
-#     '''
-# 
-#     def runTest(self):
-#         pass
-# 
-#     def testNothing(self):
-#         pass
+
+    def testTransposeByPitch(self):
+        from music21 import stream, instrument, note
+
+        i1 = instrument.EnglishHorn()  # -p5
+        i2 = instrument.Clarinet()  # -M2
+
+        p1 = stream.Part()
+        p1.repeatAppend(note.Note('C'), 20)
+        p1.insert(0, i1)
+        p1.insert(10, i2)
+
+        self.assertEqual([str(p) for p in p1.pitches], ['C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'])
+        test = p1._transposeByInstrument(inPlace=False)
+        self.assertEqual([str(p) for p in test.pitches], ['F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3'])
+
+        test = p1._transposeByInstrument(inPlace=False, reverse=True)
+        self.assertEqual([str(p) for p in test.pitches], ['G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4'])
+        
+
+        p2 = stream.Part()
+        p2.repeatAppend(note.Note('C'), 20)
+        p2.insert(0, i2)
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
