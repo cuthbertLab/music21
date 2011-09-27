@@ -9573,7 +9573,7 @@ class Measure(Stream):
         '''
         # in just getting value for one measure, cannot create multiple parts
         # for multi-staff presentation
-        m, staffReference = musicxmlTranslate.mxToMeasure(mxMeasure,
+        m, staffReference, t = musicxmlTranslate.mxToMeasure(mxMeasure,
                             inputM21=self)
         return m
 
