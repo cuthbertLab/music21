@@ -16788,7 +16788,7 @@ class Test(unittest.TestCase):
 
         i1 = instrument.EnglishHorn()  # -p5
         i2 = instrument.Clarinet()  # -M2
-
+        
         p1 = stream.Part()
         p1.repeatAppend(note.Note('C'), 20)
         p1.insert(0, i1)
@@ -16799,12 +16799,12 @@ class Test(unittest.TestCase):
         s = stream.Score()
         s.insert(0, p1)
         s.insert(0, p2)
-
-
+        
+        
         self.assertEqual([str(p) for p in p1.pitches], ['C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'])
         test = p1._transposeByInstrument(inPlace=False)
         self.assertEqual([str(p) for p in test.pitches], ['F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3'])
-
+        
         test = p1._transposeByInstrument(inPlace=False, reverse=True)
         self.assertEqual([str(p) for p in test.pitches], ['G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4'])
         
@@ -16813,19 +16813,19 @@ class Test(unittest.TestCase):
         test = p1.toSoundingPitch(inPlace=False)
         # all transpositions should be downward
         self.assertEqual([str(p) for p in test.pitches], ['F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3'])
-
+        
         # declare that at written pitch 
         p1.atSoundingPitch = False
         test = p1.toWrittenPitch(inPlace=False)
         # no change; already at written
         self.assertEqual([str(p) for p in test.pitches], ['C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'])
-
+        
         # declare that at sounding pitch 
         p1.atSoundingPitch = True
         # no change happens
         test = p1.toSoundingPitch(inPlace=False)
         self.assertEqual([str(p) for p in test.pitches], ['C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'])
-
+        
         # declare  at sounding pitch 
         p1.atSoundingPitch = True
         # reverse intervals; app pitches should be upward
@@ -16846,6 +16846,31 @@ class Test(unittest.TestCase):
         s.toSoundingPitch(inPlace=True)
         self.assertEqual([str(p) for p in s.parts[0].pitches], ['F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3'])
         self.assertEqual([str(p) for p in test.parts[1].pitches], ['B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3'])
+
+
+    def testTransposeByPitchB(self):
+        from music21 import stream, instrument, note
+
+        from music21.musicxml import testPrimitive        
+        from music21 import converter
+        
+        s = converter.parse(testPrimitive.transposingInstruments72a)
+        self.assertEqual(s.parts[0].atSoundingPitch, False)
+        self.assertEqual(s.parts[1].atSoundingPitch, False)
+
+        self.assertEqual(str(s.parts[0].getElementsByClass(
+            'Instrument')[0].transposition), '<music21.interval.Interval M-2>')
+        self.assertEqual(str(s.parts[1].getElementsByClass(
+            'Instrument')[0].transposition), '<music21.interval.Interval M-6>')
+
+        
+        self.assertEqual([str(p) for p in s.parts[0].pitches], ['D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C#5', 'D5'])
+        self.assertEqual([str(p) for p in s.parts[1].pitches], ['A4', 'B4', 'C#5', 'D5', 'E5', 'F#5', 'G#5', 'A5'])
+        
+        s.toSoundingPitch()
+        
+        self.assertEqual([str(p) for p in s.parts[0].pitches], ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'] )
+        self.assertEqual([str(p) for p in s.parts[1].pitches], ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'] )
 
 
 

@@ -3100,6 +3100,9 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     instrumentObj.groups.append(partId)
 
     streamPart = stream.Part() # create a part instance for each part
+    # always assume at sounding, unless transposition is defined in attributes
+    streamPart.atSoundingPitch = True
+
     # set part id to stream best name
     if instrumentObj.bestName() is not None:
         streamPart.id = instrumentObj.bestName()
@@ -3115,6 +3118,9 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
                                spannerBundle=spannerBundle)
         if t is not None:
             instrumentObj.transposition = t
+            # if a transposition is defined in musicxml, we assume it is
+            # at written pitch
+            streamPart.atSoundingPitch = False
 
         # there will be one for each measure
         staffReferenceList.append(staffReference)
