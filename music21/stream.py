@@ -3338,11 +3338,6 @@ class Stream(music21.Music21Object):
         else:
             returnObj = self
 
-        if returnObj.hasPartLikeStreams():
-            for p in returnObj.getElementsByClass('Stream'):
-                # call on each part
-                returnObj.toSoundingPitch(inPlace=True)
-
         # this will change the working Stream; not sure if a problem
         returnObj.extendDuration('Instrument', inPlace=True)
         insts = returnObj.getElementsByClass('Instrument')
@@ -3372,16 +3367,52 @@ class Stream(music21.Music21Object):
             #print key, i.transposition
         return returnObj
 
-    def toSoundingPitch(inPlace=True):
+    def toSoundingPitch(self, inPlace=True):
         '''If not at sounding pitch, transpose all Pitch elements to sounding pitch. The atSoundingPitch property is used to determine if transposition is necessary. 
         '''
-        pass        
+        if not inPlace: # make a copy
+            returnObj = deepcopy(self)
+        else:
+            returnObj = self
 
-    
-    def toWrittenPitch(inPlace=True):
+        if returnObj.hasPartLikeStreams():
+            for p in returnObj.getElementsByClass('Stream'):
+                # call on each part
+                p.toSoundingPitch(inPlace=True)
+            return returnObj
+
+        if returnObj.atSoundingPitch == 'unknown':
+            raise StreamException('atSoundingPitch is unknown: cannot transpose')
+        elif returnObj.atSoundingPitch == False:
+            # transposition defined on instrument goes from written to sounding
+            returnObj._transposeByInstrument(reverse=False, inPlace=True)
+        elif returnObj.atSoundingPitch == True:
+            pass
+        return returnObj # the Stream or None
+
+    def toWrittenPitch(self, inPlace=True):
         '''If not at written pitch, transpose all Pitch elements to written pitch. The atSoundingPitch property is used to determine if transposition is necessary. 
         '''
-        pass
+        if not inPlace: # make a copy
+            returnObj = deepcopy(self)
+        else:
+            returnObj = self
+
+        if returnObj.hasPartLikeStreams():
+            for p in returnObj.getElementsByClass('Stream'):
+                # call on each part
+                p.toWrittenPitch(inPlace=True)
+            return returnObj
+
+        if self.atSoundingPitch == 'unknown':
+            raise StreamException('atSoundingPitch is unknown: cannot transpose')
+        elif self.atSoundingPitch == False:
+            pass
+        elif self.atSoundingPitch == True:
+            # transposition defined on instrument goes from written to sounding
+            # need to reverse to go to written
+            returnObj._transposeByInstrument(reverse=True, inPlace=True)
+        return returnObj
 
     #---------------------------------------------------------------------------
     def getTimeSignatures(self, searchContext=True, returnDefault=True,
@@ -16752,7 +16783,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(idSoprano), len(idAlto))
 
 
-    def testTransposeByPitch(self):
+    def testTransposeByPitchA(self):
         from music21 import stream, instrument, note
 
         i1 = instrument.EnglishHorn()  # -p5
@@ -16762,6 +16793,13 @@ class Test(unittest.TestCase):
         p1.repeatAppend(note.Note('C'), 20)
         p1.insert(0, i1)
         p1.insert(10, i2)
+        p2 = stream.Part()
+        p2.repeatAppend(note.Note('C'), 20)
+        p2.insert(0, i2)
+        s = stream.Score()
+        s.insert(0, p1)
+        s.insert(0, p2)
+
 
         self.assertEqual([str(p) for p in p1.pitches], ['C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'])
         test = p1._transposeByInstrument(inPlace=False)
@@ -16770,10 +16808,44 @@ class Test(unittest.TestCase):
         test = p1._transposeByInstrument(inPlace=False, reverse=True)
         self.assertEqual([str(p) for p in test.pitches], ['G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4'])
         
+        # declare that at written pitch 
+        p1.atSoundingPitch = False
+        test = p1.toSoundingPitch(inPlace=False)
+        # all transpositions should be downward
+        self.assertEqual([str(p) for p in test.pitches], ['F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3'])
 
-        p2 = stream.Part()
-        p2.repeatAppend(note.Note('C'), 20)
-        p2.insert(0, i2)
+        # declare that at written pitch 
+        p1.atSoundingPitch = False
+        test = p1.toWrittenPitch(inPlace=False)
+        # no change; already at written
+        self.assertEqual([str(p) for p in test.pitches], ['C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'])
+
+        # declare that at sounding pitch 
+        p1.atSoundingPitch = True
+        # no change happens
+        test = p1.toSoundingPitch(inPlace=False)
+        self.assertEqual([str(p) for p in test.pitches], ['C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'])
+
+        # declare  at sounding pitch 
+        p1.atSoundingPitch = True
+        # reverse intervals; app pitches should be upward
+        test = p1.toWrittenPitch(inPlace=False)
+        self.assertEqual([str(p) for p in test.pitches], ['G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4'])
+
+        
+        # test on a complete score
+        s.parts[0].atSoundingPitch = False
+        s.parts[1].atSoundingPitch = False
+        test = s.toSoundingPitch(inPlace=False)
+        self.assertEqual([str(p) for p in test.parts[0].pitches], ['F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3'])
+        self.assertEqual([str(p) for p in test.parts[1].pitches], ['B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3'])
+
+        # test same in place
+        s.parts[0].atSoundingPitch = False
+        s.parts[1].atSoundingPitch = False
+        s.toSoundingPitch(inPlace=True)
+        self.assertEqual([str(p) for p in s.parts[0].pitches], ['F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3'])
+        self.assertEqual([str(p) for p in test.parts[1].pitches], ['B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3'])
 
 
 
