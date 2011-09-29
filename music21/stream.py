@@ -4193,7 +4193,7 @@ class Stream(music21.Music21Object):
         '''
         Create a chordal reduction of polyphonic music, where each change to a new pitch results in a new chord. If a Score or Part of Measures is provided, a Stream of Measures will be returned. If a flat Stream of notes, or a Score of such Streams is provided, no Measures will be returned. 
 
-        This functionlaity works by splitgin all Durations in all parts, if multi-part, by all unique offsets. All simultaneous durations are 
+        This functionlaity works by splittgin all Durations in all parts, if multi-part, by all unique offsets. All simultaneous durations are 
         then gathered into single chords. 
         
         If `addPartIdAsGroup` is True, all elements found in the Stream will have their source Part id added to the element's Group. 
