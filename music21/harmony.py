@@ -219,9 +219,9 @@ class Harmony(music21.Music21Object):
 
     def __repr__(self):
         if len(self._harmonyDegrees) == 0:
-            return '<music21.harmony.Harmony kind=%s (%s) root=%s bass=%s inversion=%s>' % (self.kind, self.kindStr, self.root, self.bass, self.inversion)
+            return '<music21.harmony.%s kind=%s (%s) root=%s bass=%s inversion=%s>' % (self.__class__.__name__, self.kind, self.kindStr, self.root, self.bass, self.inversion)
         else:
-            return '<music21.harmony.Harmony kind=%s (%s) root=%s bass=%s inversion=%s harmonyDegrees=%s>' % (self.kind, self.kindStr, self.root, self.bass, self.inversion, ''.join([str(x) for x in self._harmonyDegrees]))
+            return '<music21.harmony.%s kind=%s (%s) root=%s bass=%s inversion=%s harmonyDegrees=%s>' % (self.__class__.__name__, self.kind, self.kindStr, self.root, self.bass, self.inversion, ''.join([str(x) for x in self._harmonyDegrees]))
 
 
     #---------------------------------------------------------------------------
@@ -366,6 +366,18 @@ class Harmony(music21.Music21Object):
         return self._harmonyDegrees
 
 
+class ChordSymbol(Harmony):
+    '''
+    BETH: Fill in info!  :-)
+    
+    >>> from music21 import *
+    >>> cs = harmony.ChordSymbol()
+    >>> cs
+    <music21.harmony.ChordSymbol kind= () root=None bass=None inversion=None>
+    '''
+    pass
+
+
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
@@ -386,7 +398,7 @@ class Test(unittest.TestCase):
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 
-_DOC_ORDER = [Harmony, HarmonyDegree]
+_DOC_ORDER = [Harmony, HarmonyDegree, ChordSymbol]
 
 
 
