@@ -206,7 +206,7 @@ class Harmony(music21.Music21Object):
 
         self._root = None # a pitch object
         self._bass = None # a pitch object
-        self._roman = None # a romanNumeral numeral object, mxl imports as function str
+        self._roman = None # a romanNumeral numeral object, musicxml stores this within a node called <function> which might conflict with the Harmony...
         self._inversion = None # an integer
 
         # TODO: properties for these need to be implemented
@@ -385,7 +385,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER = [HarmonyDegree, Harmony]
 
 
 if __name__ == "__main__":
