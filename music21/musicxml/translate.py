@@ -1187,7 +1187,7 @@ def mxToHarmony(mxHarmony):
         b = pitch.Pitch(mxBass.get('bassStep'))
         if mxBass.get('bassAlter') is not None:
             # can provide integer to create accidental on pitch
-            b.accidental = pitch.Accidental(int(mxRoot.get('bassAlter')))
+            b.accidental = pitch.Accidental(int(mxBass.get('bassAlter')))
         # set Pitch object on Harmony
         h.bass = b
 
