@@ -385,7 +385,9 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [HarmonyDegree, Harmony]
+
+_DOC_ORDER = [Harmony, HarmonyDegree]
+
 
 
 if __name__ == "__main__":
