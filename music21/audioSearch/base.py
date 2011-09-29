@@ -36,7 +36,6 @@ try:
     import matplotlib.pyplot
 except ImportError:
     _missingImport.append('matplotlib')
-    print "did not get matplotlib"
 
 try:    
     import numpy
@@ -647,7 +646,6 @@ def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
 
 
     ''' 
-    print "1.3.0"
     dl = copy.copy(durationList)
     dl.append(0)
 
@@ -663,11 +661,9 @@ def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
 
     if mostRepeatedQuarterLength == 0:
         mostRepeatedQuarterLength = 1.0
-    print "1.3.4"
 
     binPosition = 0 - math.log(mostRepeatedQuarterLength, 2)
     qle = qle * math.pow(2, binPosition) # it normalizes the length to a quarter note
-    print "1.3.5"
 
     #environLocal.printDebug("QUARTER ESTIMATION")
     #environLocal.printDebug("bins %s " % bins)
@@ -718,16 +714,12 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
     # It could take into account the changes of tempo during the song, but it
     # would take more processing time
     if scNotes != None:
-        print "1.1"
         fe = features.native.MostCommonNoteQuarterLength(scNotes)
-        print "1.2"
         mostCommon = fe.extract().vector[0]        
-        print "1.3"
         qle = quarterLengthEstimation(durationList, mostCommon)
     elif scNotes == None: # this is for the transcriber 
         qle = quarterLengthEstimation(durationList)    
 
-    print "1.4"
     for i in range(len(durationList)): 
         actualDuration = quantizeDuration(durationList[i] / qle)
         notesList[i].quarterLength = actualDuration
@@ -736,13 +728,11 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
         else: 
             p2.append(notesList[i])
             removeRestsAtBeginning = False        
-    print "1.5"
 
     sc = stream.Score()
     sc.metadata = metadata.Metadata()
     sc.metadata.title = 'Automatic Music21 Transcription'
     sc.insert(0, p2)  
-    print "1.6"
     
     if scNotes == None:   # Case transcriber
         return sc, len(p2)
