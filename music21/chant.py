@@ -571,7 +571,7 @@ _DOC_ORDER = []
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    music21.mainTest(TestExternal)
 
 #------------------------------------------------------------------------------
 # eof
