@@ -506,10 +506,13 @@ class GenericInterval(music21.Music21Object):
     Two generic intervals are the equal if their size and direction are the same.
     
     '''
-    
     def __init__(self, value = "unison"):
         '''
         >>> from music21 import *
+        >>> gi = interval.GenericInterval(8)
+        >>> gi
+        <music21.interval.GenericInterval 8>
+
         >>> aInterval = interval.GenericInterval(3)
         >>> aInterval.direction
         1
@@ -519,6 +522,8 @@ class GenericInterval(music21.Music21Object):
         2
 
         >>> aInterval = interval.GenericInterval('Third')
+        >>> aInterval.directed
+        3
         >>> aInterval.staffDistance
         2
 

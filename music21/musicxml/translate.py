@@ -113,11 +113,44 @@ def mxTransposeToInterval(mxTranspose):
             post = interval.intervalFromGenericAndChromatic(ds+1, cs+oc)
     else: # assume we have chromatic; may not be correct spelling
         post = interval.Interval(cs + oc)
-
-    # TODO: check that diatonic conforms to chromatic; if not
-    # flip spelling to find a match
     return post
 
+def mxIntervalToTranspose(int):
+    '''Convert a music21 Interval into a musicxml transposition specification
+    
+    >>> from music21 import *
+    >>> musicxml.translate.mxIntervalToTranspose(interval.Interval('m6'))
+    <transpose diatonic=5 chromatic=8>
+    >>> musicxml.translate.mxIntervalToTranspose(interval.Interval('-M6'))
+    <transpose diatonic=-5 chromatic=-9>
+    '''
+    mxTranspose = musicxmlMod.Transpose()
+
+    rawSemitones = int.chromatic.semitones # will be directed
+    octShift = 0
+    if abs(rawSemitones) > 12:
+        octShift, semitones = divmod(rawSemitones, 12)
+    else:
+        semitones = rawSemitones
+
+    rawGeneric = int.diatonic.generic.directed
+    if octShift != 0:
+        # need to shift 7 for each octave; sign will be correct
+        generic = rawGeneric + (octShift * 7)
+    else:
+        generic = rawGeneric
+
+    # must implement the necessary shifts
+    if int.generic.directed > 0:
+        mxTranspose.diatonic = generic - 1
+    elif int.generic.directed < 0:    
+        mxTranspose.diatonic = generic + 1
+
+    mxTranspose.chromatic = semitones
+
+    if octShift != 0:
+        mxTranspose.octaveChange = octShift
+    return mxTranspose
 
 
 def mxToTempoIndication(mxMetronome, mxWords=None):
