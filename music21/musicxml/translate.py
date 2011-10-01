@@ -80,14 +80,19 @@ def mxTransposeToInterval(mxTranspose):
     >>> musicxml.translate.mxTransposeToInterval(t)
     <music21.interval.Interval M-6>
 
+    >>> t = musicxml.Transpose()
+    >>> t.diatonic = 3 # a type of 4th
+    >>> t.chromatic = 6
+    >>> musicxml.translate.mxTransposeToInterval(t)
+    <music21.interval.Interval A4>
+
     '''
     from music21 import interval
 
+    ds = None
     if mxTranspose.diatonic is not None:        
         ds = int(mxTranspose.diatonic)
-        # cannot create a diatonic interval w/o specifier (maj/min)
-        generic = interval.GenericInterval(ds)
-
+    cs = None
     if mxTranspose.chromatic is not None:        
         cs = int(mxTranspose.chromatic)
 
@@ -99,7 +104,16 @@ def mxTransposeToInterval(mxTranspose):
     # doubled one octave down from what is currently written 
     # (as is the case for mixed cello / bass parts in orchestral literature)
 
-    post = interval.Interval(cs + oc)
+    if ds is not None and cs is not None:
+        # diatonic step can be used as a generic specifier here if 
+        # shifted 1 away from zero
+        if ds < 0:
+            post = interval.intervalFromGenericAndChromatic(ds-1, cs+oc)
+        else:
+            post = interval.intervalFromGenericAndChromatic(ds+1, cs+oc)
+    else: # assume we have chromatic; may not be correct spelling
+        post = interval.Interval(cs + oc)
+
     # TODO: check that diatonic conforms to chromatic; if not
     # flip spelling to find a match
     return post

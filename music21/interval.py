@@ -1125,7 +1125,6 @@ class ChromaticInterval(music21.Music21Object):
         '''Given a Chromatic interval, return a Diatonic interval object of the
         same size. 
         
-        
         While there is more than one Generic Interval for any given chromatic 
         interval, this is needed to to permit easy chromatic specification of 
         Interval objects.  No augmented or diminished intervals are returned
@@ -1295,9 +1294,7 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
     (2, 'M')
     
     
-    
     Absurdly altered interval:
-    
     
     
     >>> cInterval = interval.GenericInterval('second')
@@ -1343,8 +1340,6 @@ def intervalsToDiatonic(gInt, cInt):
     >>> cInterval
     <music21.interval.DiatonicInterval P5>
     '''
-
-    # TODO: rename intervalsToDiatonic
     specifier = _getSpecifierFromGenericChromatic(gInt, cInt)
     return DiatonicInterval(specifier, gInt)
     
@@ -1362,9 +1357,24 @@ def intervalFromGenericAndChromatic(gInt, cInt):
     <music21.interval.Interval A-5>
     >>> cInterval.directedNiceName
     'Descending Augmented Fifth'
-    '''
 
-    # TODO: rename intervalsToDiatonic
+    >>> interval.intervalFromGenericAndChromatic(3, 4)
+    <music21.interval.Interval M3>
+    >>> interval.intervalFromGenericAndChromatic(3, 3)
+    <music21.interval.Interval m3>
+
+    >>> interval.intervalFromGenericAndChromatic(5, 6)
+    <music21.interval.Interval d5>
+    >>> interval.intervalFromGenericAndChromatic(5, 5)
+    <music21.interval.Interval dd5>
+    >>> interval.intervalFromGenericAndChromatic(-2, -2)
+    <music21.interval.Interval M-2>
+    '''
+    if common.isNum(gInt):
+        gInt = GenericInterval(gInt)
+    if common.isNum(cInt):
+        cInt = ChromaticInterval(cInt)
+
     specifier = _getSpecifierFromGenericChromatic(gInt, cInt)
     dInt = DiatonicInterval(specifier, gInt)
     return Interval(diatonic = dInt, chromatic = cInt)
