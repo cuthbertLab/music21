@@ -4125,6 +4125,19 @@ class Test(unittest.TestCase):
         #self.assertEqual([x.volume.parent for x in c], [c, c, c])
     
 
+    def testChordComponentsA(self):
+        from music21 import chord, stream
+
+        c = chord.Chord(['d2', 'e-1', 'b-6'])
+
+        s = stream.Stream()
+        for n in c:
+            s.append(n)
+        self.assertEqual(len(s.notes), 3)
+        self.assertEqual(s.highestOffset, 2.0)
+        self.assertEqual(str(s.pitches), '[D2, E-1, B-6]')
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
