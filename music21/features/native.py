@@ -683,8 +683,8 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
     >>> s.append(metadata.Metadata()) #_DOCS_HIDE
     >>> s.metadata.composer = "W.A. Mozart" #_DOCS_HIDE
     >>> fe = features.native.ComposerPopularity(s)
-    >>> fe.extract().vector 
-    [7...]
+    >>> fe.extract().vector >= 6 
+    True
     '''
     id = 'MD1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):

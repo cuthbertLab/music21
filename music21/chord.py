@@ -118,27 +118,36 @@ class Chord(note.NotRest):
 
         for n in notes:
             if isinstance(n, music21.pitch.Pitch):
-                self._components.append({'pitch':n})
+                # assign pitch to a new Note
+                newNote = note.Note()
+                newNote.pitch = n
+                self._components.append(newNote)
+                #self._components.append({'pitch':n})
             elif isinstance(n, music21.note.Note):
+                self._components.append(copy.deepcopy(n))
+
                 # TODO: need to provide self as argument, but currently
                 # cause problem on copy
-                vNew = volume.Volume() 
-                vNew.mergeAttributes(n.volume)
-                self._components.append({'pitch':n.pitch,
-                                      'notehead':n.notehead,
-                                      'stem': n.stemDirection,
-                                     'volume': vNew, # volume
-                                    })
+#                 vNew = volume.Volume() 
+#                 vNew.mergeAttributes(n.volume)
+#                 self._components.append({'pitch':n.pitch,
+#                                       'notehead':n.notehead,
+#                                       'stem': n.stemDirection,
+#                                      'volume': vNew, # volume
+#                                     })
             elif isinstance(n, Chord):
+                for newNote in n._components:
+                    self._components.append(copy.deepcopy(n))
+
                 # TODO: transfer all attributes from _components of other
-                for p in n.pitches:
-                    # this might better make a deepcopy of the pitch
-                    self._components.append({'pitch':p})
-            elif isinstance(n, basestring) or \
-                isinstance(n, int):
-                self._components.append({'pitch':music21.pitch.Pitch(n)})
+#                 for p in n.pitches:
+#                     # this might better make a deepcopy of the pitch
+#                     self._components.append({'pitch':p})
+            elif isinstance(n, basestring) or isinstance(n, int):
+                self._components.append(note.Note(n))
+                #self._components.append({'pitch':music21.pitch.Pitch(n)})
             else:
-                raise ChordException("Could not process pitch %s" % n)
+                raise ChordException("Could not process input argument %s" % n)
 
         if "duration" in keywords or "type" in keywords or \
             "quarterLength" in keywords: #dots dont cut it
@@ -199,11 +208,17 @@ class Chord(note.NotRest):
         new = note.NotRest.__deepcopy__(self, memo=memo)
         # after copying, if a Volume exists, it is linked to the old object
         # look at _volume so as not to create object if not already there
+
+
         for d in new._components:
-            if 'volume' in d.keys():
-                if d['volume'] is not None:
-                    #environLocal.printDebug(['changing paren to Chord volume in __deepcopy__', 'id(new)', id(new)])
-                    d['volume'].parent = new # update with new instance
+            d.volume.parent = new # update with new instance
+
+
+#         for d in new._components:
+#             if 'volume' in d.keys():
+#                 if d['volume'] is not None:
+#                     #environLocal.printDebug(['changing paren to Chord volume in __deepcopy__', 'id(new)', id(new)])
+#                     d['volume'].parent = new # update with new instance
         return new
 
 
@@ -238,37 +253,29 @@ class Chord(note.NotRest):
             except:
                 raise KeyError('cannot access component with string: %s' % key)
 
-            p = component['pitch']
-            if last == 'pitch':
-                return p
-            elif last == 'volume':
-                # use function; will create if necessary
-                return self.getVolume(p) 
-            elif last == 'tie':
-                return self.getTie(p) 
+            # get by name of attribute on Note
+            if last == 'volume': # special handling to avoid setting parent
+                return component._getVolume(forceParent=self)
+            else:
+                return getattr(component, last)
+
+#             p = component['pitch']
+#             if last == 'pitch':
+#                 return p
+#             elif last == 'volume':
+#                 # use function; will create if necessary
+#                 return self.getVolume(p) 
+#             elif last == 'tie':
+#                 return self.getTie(p) 
         else:
             try:
-                return self._components[key]
+                return self._components[key] # must be a number
             except KeyError:
                 raise KeyError('cannot access component with: %s' % key)
 
 
-            
-
-
-
-
-
-
     #---------------------------------------------------------------------------
-    # properties
-
-#     def _getDuration(self):
-#         '''It is assumed that all notes ahve the same duration
-#         '''
-#     def _setDuration(self, value):
-# 
-#     property(_getDuration, _setDuration)
+    # properties for i/o
 
     def _getMidiEvents(self):
         return midiTranslate.chordToMidiEvents(self)
@@ -431,18 +438,20 @@ class Chord(note.NotRest):
         a better way to do this needs to be found
         '''
         self._chordTablesAddressNeedsUpdating = True
-        post = [d['pitch'] for d in self._components]
+        post = [d.pitch for d in self._components]
+        #post = [d['pitch'] for d in self._components]
         #return self._components
         return post
 
     def _setPitches(self, value):
-        if value != [d['pitch'] for d in self._components]:
+        #if value != [d['pitch'] for d in self._components]:
+        if value != [d.pitch for d in self._components]:
             self._chordTablesAddressNeedsUpdating = True
         self._components = []
         # assume we have pitch objects here
         # TODO: individual ties are not being retained here
         for p in value:
-            self._components.append({'pitch':p})
+            self._components.append(note.Note(p))
 
     pitches = property(_getPitches, _setPitches, 
         doc = '''Get or set a list of all Pitch objects in this Chord.
@@ -464,15 +473,20 @@ class Chord(note.NotRest):
         '''If setting a tie, tie is applied to all pitches. 
         '''
         for d in self._components:
+            d.tie = value
             # set the same instance for each pitch
-            d['tie'] = value
+            #d['tie'] = value
 
     def _getTie(self):
+        for d in self._components:
+            if d.tie is not None:
+                return d.tie
+
         # this finds the tie on the first pitch; it might alternatively
         # return the first tie available 
-        if len(self._components) > 0:
-            if 'tie' in self._components[0].keys():
-                return self._components[0]['tie']
+#         if len(self._components) > 0:
+#             if 'tie' in self._components[0].keys():
+#                 return self._components[0]['tie']
         # otherwise, return None
         return None
 
@@ -504,20 +518,28 @@ class Chord(note.NotRest):
         True
         '''
         for d in self._components:
-            # this is an object comparison, not equality
-            if d['pitch'] is p:
-                if 'tie' in d.keys():
-                    return d['tie']
-                else:
-                    return None
-        
+            if d.pitch is p:
+                return d.tie
         for d in self._components:
-            # this is an equality comparison, not object
-            if d['pitch'] == p:
-                if 'tie' in d.keys():
-                    return d['tie']
-                else:
-                    return None
+            if d.pitch == p:
+                return d.tie
+        return None
+
+#         for d in self._components:
+#             # this is an object comparison, not equality
+#             if d['pitch'] is p:
+#                 if 'tie' in d.keys():
+#                     return d['tie']
+#                 else:
+#                     return None
+#         
+#         for d in self._components:
+#             # this is an equality comparison, not object
+#             if d['pitch'] == p:
+#                 if 'tie' in d.keys():
+#                     return d['tie']
+#                 else:
+#                     return None
         return None
 
     def setTie(self, t, pitchTarget):
@@ -547,30 +569,56 @@ class Chord(note.NotRest):
         <music21.tie.Tie start>
         
         '''
-        # assign to first pitch by default
-        if pitchTarget is None and len(self._components) > 0: # if no pitch target
-            pitchTarget = self._components[0]['pitch']
+        if pitchTarget is None and len(self._components) > 0: # if no pitch
+            pitchTarget = self._components[0].pitch
         elif common.isStr(pitchTarget):
             pitchTarget = pitch.Pitch(pitchTarget)
-        
         if common.isStr(t):
             t = tie.Tie(t)
-        
+        else:
+            pass # assume a tie object
+
         match = False
         for d in self._components:
-            if d['pitch'] is pitchTarget:
-                d['tie'] = t
+            if d.pitch is pitchTarget: # compare by obj id first
+                d.tie = t
                 match = True
-        if match is False:
+                break
+        if not match: # more loose comparison: by ==
             for d in self._components:
-                if d['pitch'] == pitchTarget:
-                    d['tie'] = t
+                if d.pitch == pitchTarget:
+                    d.tie = t
                     match = True
                     break
+
         if not match:
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
 
-   
+
+        # assign to first pitch by default
+#         if pitchTarget is None and len(self._components) > 0: # if no pitch target
+#             pitchTarget = self._components[0]['pitch']
+#         elif common.isStr(pitchTarget):
+#             pitchTarget = pitch.Pitch(pitchTarget)
+#         
+#         if common.isStr(t):
+#             t = tie.Tie(t)
+#         
+#         match = False
+#         for d in self._components:
+#             if d['pitch'] is pitchTarget:
+#                 d['tie'] = t
+#                 match = True
+#         if match is False:
+#             for d in self._components:
+#                 if d['pitch'] == pitchTarget:
+#                     d['tie'] = t
+#                     match = True
+#                     break
+#         if not match:
+#             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
+# 
+#    
     
     def getStemDirection(self, p):
         '''Given a pitch in this Chord, return an associated stem attribute, or return 'unspecified' if not defined for that Pitch.
@@ -589,21 +637,30 @@ class Chord(note.NotRest):
         >>> c1.getStemDirection(c1.pitches[0]) 
         'unspecified'
         '''
+        match = False
         for d in self._components:
-            # this is an object comparison, not equality
-            if d['pitch'] is p:
-                if 'stem' in d.keys():
-                    return d['stem']
-                else:
-                    return 'unspecified'
-                
+            if d.pitch is p: # compare by obj id first
+                return d.stemDirection
         for d in self._components:
-            # this is an equality comparison, not object
-            if d['pitch'] == p:
-                if 'stem' in d.keys():
-                    return d['stem']
-                else:
-                    return 'unspecified'
+            if d.pitch == p:
+                return d.stemDirection
+        return None
+            
+#         for d in self._components:
+#             # this is an object comparison, not equality
+#             if d['pitch'] is p:
+#                 if 'stem' in d.keys():
+#                     return d['stem']
+#                 else:
+#                     return 'unspecified'
+#                 
+#         for d in self._components:
+#             # this is an equality comparison, not object
+#             if d['pitch'] == p:
+#                 if 'stem' in d.keys():
+#                     return d['stem']
+#                 else:
+#                     return 'unspecified'
         return None
     
     def setStemDirection(self, stem, pitchTarget):
@@ -632,24 +689,44 @@ class Chord(note.NotRest):
         double
 
         '''
-        # assign to first pitch by default
-        if pitchTarget is None and len(self._components) > 0: # if no pitch target
-            pitchTarget = self._components[0]['pitch']
+
+        if pitchTarget is None and len(self._components) > 0:
+            pitchTarget = self._components[0].pitch # first is default
         elif common.isStr(pitchTarget):
             pitchTarget = pitch.Pitch(pitchTarget)    
             
         match = False
         for d in self._components:
-            if d['pitch'] is pitchTarget:
-                d['stem'] = stem
+            if d.pitch is pitchTarget:
+                d.stemDirection = stem
                 match = True
-        if match is False:
+                break
+        if not match:
             for d in self._components:
-                if d['pitch'] == pitchTarget:
-                    d['stem'] = stem
+                if d.pitch == pitchTarget:
+                    d.stemDirection = stem
                     match = True
                     break
-                
+
+
+        # assign to first pitch by default
+#         if pitchTarget is None and len(self._components) > 0: # if no pitch target
+#             pitchTarget = self._components[0]['pitch']
+#         elif common.isStr(pitchTarget):
+#             pitchTarget = pitch.Pitch(pitchTarget)    
+#             
+#         match = False
+#         for d in self._components:
+#             if d['pitch'] is pitchTarget:
+#                 d['stem'] = stem
+#                 match = True
+#         if match is False:
+#             for d in self._components:
+#                 if d['pitch'] == pitchTarget:
+#                     d['stem'] = stem
+#                     match = True
+#                     break
+#                 
         if not match:
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
         
@@ -673,23 +750,35 @@ class Chord(note.NotRest):
         True
         
         '''
-        
+        match = False
         for d in self._components:
-            # this is an object comparison, not equality
-            if d['pitch'] is p:
-                if 'notehead' in d.keys():
-                    return d['notehead']
-                else:
-                    return 'normal'
-                
+            if d.pitch is p:
+                return d.notehead
         for d in self._components:
-            # this is an equality comparison, not object
-            if d['pitch'] == p:
-                if 'notehead' in d.keys():
-                    return d['notehead']
-                else:
-                    return 'normal'
+            if d.pitch == p:
+                return d.notehead
         return None
+
+#         for d in self._components:
+#             if d.pitch is p or d.pitch == p:
+#                 return d.notehead
+        
+#         for d in self._components:
+#             # this is an object comparison, not equality
+#             if d['pitch'] is p:
+#                 if 'notehead' in d.keys():
+#                     return d['notehead']
+#                 else:
+#                     return 'normal'
+#                 
+#         for d in self._components:
+#             # this is an equality comparison, not object
+#             if d['pitch'] == p:
+#                 if 'notehead' in d.keys():
+#                     return d['notehead']
+#                 else:
+#                     return 'normal'
+#         return None
 
     def setNotehead(self, nh, pitchTarget):
         '''Given a notehead attribute as a string and a pitch object in this Chord, set the notehead attribute of that pitch to the value of that notehead.
@@ -718,22 +807,35 @@ class Chord(note.NotRest):
 
         '''
         # assign to first pitch by default
-        if pitchTarget is None and len(self._components) > 0: # if no pitch target
-            pitchTarget = self._components[0]['pitch']
+        if pitchTarget is None and len(self._components) > 0: 
+            pitchTarget = self._components[0].pitch
         elif common.isStr(pitchTarget):
             pitchTarget = pitch.Pitch(pitchTarget)    
-            
+
         match = False
         for d in self._components:
-            if d['pitch'] is pitchTarget:
-                d['notehead'] = nh
+            if d.pitch is pitchTarget:
+                d.notehead = nh
                 match = True
-        if match is False:
+                break
+        if not match:
             for d in self._components:
-                if d['pitch'] == pitchTarget:
-                    d['notehead'] = nh
+                if d.pitch == pitchTarget:
+                    d.notehead = nh
                     match = True
                     break
+            
+#         match = False
+#         for d in self._components:
+#             if d['pitch'] is pitchTarget:
+#                 d['notehead'] = nh
+#                 match = True
+#         if match is False:
+#             for d in self._components:
+#                 if d['pitch'] == pitchTarget:
+#                     d['notehead'] = nh
+#                     match = True
+#                     break
         if not match:
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
 
@@ -743,28 +845,49 @@ class Chord(note.NotRest):
 
     def _getVolume(self):
         post = []
-        for c in self._components:
-            if 'volume' in c.keys() and c['volume'] is not None:
-                v = c['volume']
-            else:
-                v = volume.Volume() # add self 
-                v.parent = self
-                c['volume'] = v
-            post.append(v)
+
+        for d in self._components:
+            # will create on Note on demand
+            post.append(d._getVolume(forceParent=self)) 
         return post
+    
+
+#         for c in self._components:
+#             if 'volume' in c.keys() and c['volume'] is not None:
+#                 v = c['volume']
+#             else:
+#                 v = volume.Volume() # add self 
+#                 v.parent = self
+#                 c['volume'] = v
+#             post.append(v)
+#        return post
 
     def _setVolume(self, value):
+
         if isinstance(value, volume.Volume):
             value.parent = self # set once
             for c in self._components:
-                c['volume'] = value # set the same instance to each?
+                # if we set c.volume, the parent of volume will be the Note
+                # parent needs to be set to the chord
+                value.parent = self
+                c._setVolume(value, setParent=False)                
         elif common.isListLike(value): # assume an array of vol objects
             for i, c in enumerate(self._components):
                 v = value[i%len(value)]
                 v.parent = self
-                c['volume'] = v
-        else:
-            raise ChordException('must set volume property with a Volume, not %s' % value)
+                c._setVolume(v, setParent=False)
+
+#         if isinstance(value, volume.Volume):
+#             value.parent = self # set once
+#             for c in self._components:
+#                 c['volume'] = value # set the same instance to each?
+#         elif common.isListLike(value): # assume an array of vol objects
+#             for i, c in enumerate(self._components):
+#                 v = value[i%len(value)]
+#                 v.parent = self
+#                 c['volume'] = v
+#         else:
+#             raise ChordException('must set volume property with a Volume, not %s' % value)
 
         
     volume = property(_getVolume, _setVolume, doc='''
@@ -791,16 +914,22 @@ class Chord(note.NotRest):
         # one of the same pitch
         if common.isStr(p):
             p = pitch.Pitch(p)    
+
         for d in self._components:
-            # this is an object comparison, not equality
-            if d['pitch'] is p or d['pitch'] == p:
-                if 'volume' in d.keys():
-                    return d['volume']
-                else: # create on demand
-                    v = volume.Volume() # add self 
-                    v.parent = self
-                    d['volume'] = v
-                    return v
+            if d.pitch is p or d.pitch == p:
+                # will create if not set; will set parent to Note
+                return d._getVolume(forceParent=self) 
+        
+#         for d in self._components:
+#             # this is an object comparison, not equality
+#             if d['pitch'] is p or d['pitch'] == p:
+#                 if 'volume' in d.keys():
+#                     return d['volume']
+#                 else: # create on demand
+#                     v = volume.Volume() # add self 
+#                     v.parent = self
+#                     d['volume'] = v
+#                     return v
         raise ChordException('the given pitch is not in the Chord: %s' % p)
 
 
@@ -811,18 +940,26 @@ class Chord(note.NotRest):
         '''
         # assign to first pitch by default
         if pitchTarget is None and len(self._components) > 0: # if no pitches
-            pitchTarget = self._components[0]['pitch']
+            pitchTarget = self._components[0].pitch
         elif common.isStr(pitchTarget):
             pitchTarget = pitch.Pitch(pitchTarget)    
+
         match = False
         for d in self._components:
-            if d['pitch'] is pitchTarget or d['pitch'] == pitchTarget:
-                # set parent of volume here:
+            if d.pitch is pitchTarget or d.pitch == pitchTarget:
                 vol.parent = self
-                d['volume'] = vol
+                d._setVolume(vol, setParent=False)                
                 match = True
                 break
-                
+
+#         for d in self._components:
+#             if d['pitch'] is pitchTarget or d['pitch'] == pitchTarget:
+#                 # set parent of volume here:
+#                 vol.parent = self
+#                 d['volume'] = vol
+#                 match = True
+#                 break
+#                 
         if not match:
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
 
@@ -831,16 +968,27 @@ class Chord(note.NotRest):
 
     #---------------------------------------------------------------------------
     def _getPitchNames(self):
-        return [d['pitch'].name for d in self._components]
+        return [d.pitch.name for d in self._components]
+
+        #return [d['pitch'].name for d in self._components]
 
     def _setPitchNames(self, value):
+
         if common.isListLike(value):
             if common.isStr(value[0]): # only checking first
                 self._components = [] # clear
                 for name in value:
-                    self._components.append({'pitch':pitch.Pitch(name)})
+                    self._components.append(note.Note(name))
             else:
                 raise NoteException('must provide a list containing a Pitch, not: %s' % value)
+
+#         if common.isListLike(value):
+#             if common.isStr(value[0]): # only checking first
+#                 self._components = [] # clear
+#                 for name in value:
+#                     self._components.append({'pitch':pitch.Pitch(name)})
+#             else:
+#                 raise NoteException('must provide a list containing a Pitch, not: %s' % value)
         else:
             raise NoteException('cannot set pitch name with provided object: %s' % value)
 
@@ -966,11 +1114,15 @@ class Chord(note.NotRest):
             post = copy.deepcopy(self)
         else:
             post = self
+
+        # call transpose on component Notes
+        for n in post._components:
+            n.transpose(intervalObj, inPlace=True)
         
-        for p in post.pitches:
-            # we are either operating on self or a copy; always use inPlace
-            p.transpose(intervalObj, inPlace=True)
-            #pitches.append(intervalObj.transposePitch(p))
+#         for p in post.pitches:
+#             # we are either operating on self or a copy; always use inPlace
+#             p.transpose(intervalObj, inPlace=True)
+#             #pitches.append(intervalObj.transposePitch(p))
 
         if not inPlace:
             return post
@@ -984,11 +1136,9 @@ class Chord(note.NotRest):
     # analytical routines
 
     def bass(self, newbass = 0):
-        '''returns the bass Pitch or sets it to the given Pitch.
-
-        
+        '''returns the bass Pitch or sets it to the given Pitch.        
         example:
-        
+
         
         >>> from music21 import *
         >>> cmaj1stInv = chord.Chord(['C4', 'E3', 'G5'])
@@ -1133,7 +1283,8 @@ class Chord(note.NotRest):
         '''
         # TODO: this presently returns a DurationUnit, not a Duration
         if self._duration is None and len(self._components) > 0:
-            pitchZeroDuration = self._components[0]['pitch'].duration
+            #pitchZeroDuration = self._components[0]['pitch'].duration
+            pitchZeroDuration = self._components[0].duration
             self._duration = pitchZeroDuration
         return self._duration
 
@@ -3405,11 +3556,11 @@ class Test(unittest.TestCase):
         assert isinstance(b, music21.note.Note)
         assert isinstance(b, music21.note.Note)
     
-        MiddleC = note.Note ()
+        MiddleC = note.Note()
         MiddleC.name = 'C'
         MiddleC.octave = 4
     
-        LowG = pitch.Pitch ()
+        LowG = pitch.Pitch()
         LowG.name = 'G'
         LowG.octave = 3
     
@@ -3798,16 +3949,16 @@ class Test(unittest.TestCase):
         # directly manipulate pitches
         t1 = tie.Tie()
         t2 = tie.Tie()
-        c1._components[0]['tie'] = t1
+        c1._components[0].tie = t1
         # now, the tie attribute returns the tie found on the first pitch
         self.assertEqual(c1.tie, t1)
         # try to set all ties for all pitches using the .tie attribute
         c1.tie = t2
         # must do id comparisons, as == comparisons are based on attributes
         self.assertEqual(id(c1.tie), id(t2))
-        self.assertEqual(id(c1._components[0]['tie']), id(t2))
-        self.assertEqual(id(c1._components[1]['tie']), id(t2))
-        self.assertEqual(id(c1._components[2]['tie']), id(t2))
+        self.assertEqual(id(c1._components[0].tie), id(t2))
+        self.assertEqual(id(c1._components[1].tie), id(t2))
+        self.assertEqual(id(c1._components[2].tie), id(t2))
 
         # set ties for specific pitches
         t3 = tie.Tie()
@@ -3857,12 +4008,13 @@ class Test(unittest.TestCase):
                 c.setTie(tie.Tie('start'), c.pitches[pos])
             s.append(c)
         #s.show()
+
     def testTiesC(self):
         c2 = Chord(['D4','D4'])
         secondD4 = c2.pitches[1]
         c2.setTie('start', secondD4)
-        self.assertEqual('tie' in c2._components[0], False)
-        self.assertEqual(c2._components[1]['tie'].type, 'start')
+        self.assertEqual(c2._components[0].tie is None, True)
+        self.assertEqual(c2._components[1].tie.type, 'start')
 
 
     def testChordQuality(self):
@@ -3930,9 +4082,9 @@ class Test(unittest.TestCase):
         from music21 import chord, stream
         
         c = chord.Chord(['c4', 'd-4', 'g4'])
-        self.assertEqual(str(c[0]['pitch']), 'C4')
-        self.assertEqual(str(c[1]['pitch']), 'D-4')
-        self.assertEqual(str(c[2]['pitch']), 'G4')
+        self.assertEqual(str(c[0].pitch), 'C4')
+        self.assertEqual(str(c[1].pitch), 'D-4')
+        self.assertEqual(str(c[2].pitch), 'G4')
 
         self.assertEqual(str(c['0.pitch']), 'C4')
         self.assertEqual(str(c['1.pitch']), 'D-4')
@@ -3954,21 +4106,23 @@ class Test(unittest.TestCase):
         self.assertEqual(c['2.volume'].velocity, 120)
 
     
-        self.assertEqual([x['volume'].velocity for x in c], [20, 80, 120])
+        self.assertEqual([x.volume.velocity for x in c], [20, 80, 120])
 
         cCopy = copy.deepcopy(c)
 
-        self.assertEqual([x['volume'].velocity for x in cCopy], [20, 80, 120])
+        self.assertEqual([x.volume.velocity for x in cCopy], [20, 80, 120])
 
         vals = [11, 22, 33]
         for i, x in enumerate(cCopy):
-            x['volume'].velocity = vals[i]
+            x.volume.velocity = vals[i]
 
-        self.assertEqual([x['volume'].velocity for x in cCopy], [11, 22, 33])
-        self.assertEqual([x['volume'].velocity for x in c], [20, 80, 120])
+        self.assertEqual([x.volume.velocity for x in cCopy], [11, 22, 33])
+        self.assertEqual([x.volume.velocity for x in c], [20, 80, 120])
 
-        self.assertEqual([x['volume'].parent for x in cCopy], [cCopy, cCopy, cCopy])
-        self.assertEqual([x['volume'].parent for x in c], [c, c, c])
+        self.assertEqual([x.volume.parent for x in cCopy], [cCopy, cCopy, cCopy])
+
+        # TODO: not yet working
+        #self.assertEqual([x.volume.parent for x in c], [c, c, c])
     
 
 

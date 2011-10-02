@@ -427,7 +427,7 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
     eventList = []
     c = inputM21
 
-    defaultVolume = volume.Volume()
+    #defaultVolume = volume.Volume()
 
     # temporary storage for setting correspondance
     noteOn = []
@@ -436,7 +436,7 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
     #for i in range(len(c.pitches)):
         chordComponent = c[i]
         #pitchObj = c.pitches[i]
-        pitchObj = chordComponent['pitch']
+        #noteObj = chordComponent
         if includeDeltaTime:
             dt = midiModule.DeltaTime(mt)
             # for a chord, only the first delta time should have the offset
@@ -449,17 +449,20 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
         me.type = "NOTE_ON"
         me.channel = 1
         me.time = None # not required
-        me.pitch = pitchObj.midi
-        if not pitchObj.isTwelveTone():
-            me.centShift =  pitchObj.getCentShiftFromMidi()
-        if 'volume' in chordComponent.keys():
-            if chordComponent['volume'] is not None:
-                me.velocity = chordComponent['volume'].velocity
-            else:
-                me.velocity = int(round(
-                                chordComponent['volume'].realized * 127))
-        else: # no volume information, use default
-            me.velocity = int(round(defaultVolume.realized * 127))
+        me.pitch = chordComponent.pitch.midi
+        if not chordComponent.pitch.isTwelveTone():
+            me.centShift = chordComponent.pitch.getCentShiftFromMidi()
+        #if 'volume' in chordComponent.keys():
+        
+        # TODO: review now that chord Components are Notes
+        if chordComponent.volume.velocity is not None:
+            me.velocity = chordComponent.volume.velocity
+        else:
+            me.velocity = int(round(
+                            chordComponent.volume.realized * 127))
+
+#         else: # no volume information, use default
+#             me.velocity = int(round(defaultVolume.realized * 127))
             
         eventList.append(me)
         noteOn.append(me)
