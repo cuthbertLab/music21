@@ -1356,7 +1356,7 @@ def instrumentToMx(i):
     '''
     >>> from music21 import *
     >>> i = instrument.Celesta()
-    >>> mxScorePart = i.mx
+    >>> mxScorePart = instrumentToMx(i)
     >>> len(mxScorePart.scoreInstrumentList)
     1
     >>> mxScorePart.scoreInstrumentList[0].instrumentName
@@ -1411,10 +1411,8 @@ def instrumentToMx(i):
 
 
 def mxToInstrument(mxScorePart, inputM21=None):
-
-    # TODO: to get and fill transposition, need to get corresponding
-    # part, and look for <transpose> object in Measure attributes, 
-    # presumably in Measure 1
+    # note: transposition values is not set in this operation, but in 
+    # mxToStreamPart
     if inputM21 is None:
         i = instrument.Instrument()
     else:
@@ -2821,8 +2819,8 @@ def streamPartToMx(part, instObj=None, meterStream=None,
 
     # instrument object returns a configured mxScorePart, that may
     # also include midi or score instrument definitions
-    mxScorePart = instObj.mx
-
+    #mxScorePart = instObj.mx
+    mxScorePart = instrumentToMx(instObj)
     #environLocal.printDebug(['calling Stream._getMXPart', 'mxScorePart', mxScorePart, mxScorePart.get('id')])
 
     mxPart = musicxmlMod.Part()
@@ -3135,14 +3133,14 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
         spannerBundle = spanner.SpannerBundle()
 
     mxPart = mxScore.getPart(partId)
-    mxInstrument = mxScore.getInstrument(partId)
+    mxInstrument = mxScore.getScorePart(partId)
 
     # create a new music21 instrument
     instrumentObj = instrument.Instrument()
-    if mxInstrument is not None:
+    if mxInstrument is not None: # mxInstrument is a ScorePart
         # need an mxScorePart here   
-        #mxToInstrument(mxScorePart)
-        instrumentObj.mx = mxInstrument
+        mxToInstrument(mxInstrument, instrumentObj)
+        #instrumentObj.mx = mxInstrument
     # add part id as group
     instrumentObj.groups.append(partId)
 

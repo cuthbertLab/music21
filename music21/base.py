@@ -39,8 +39,8 @@ under the module "base":
 
 #-------------------------------------------------------------------------------
 # string and tuple must be the same
-VERSION_STR = "0.3.7.a11"
 VERSION = (0, 3, 7)
+VERSION_STR = "%s.%s.%s.a11" % (VERSION[0], VERSION[1], VERSION[2])
 #-------------------------------------------------------------------------------
 
 import codecs

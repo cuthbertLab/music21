@@ -178,19 +178,19 @@ class Instrument(music21.Music21Object):
 
 
     #---------------------------------------------------------------------------
-    def _getMX(self):
-        '''Return a mxScorePart based on this instrument.
-        '''
-        return musicxmlTranslate.instrumentToMx(self)
-
-    def _setMX(self, mxScorePart):
-        '''
-        provide a score part object
-        '''
-        # load an instrument from a ScorePart into self
-        musicxmlTranslate.mxToInstrument(mxScorePart, self)
-
-    mx = property(_getMX, _setMX)
+#     def _getMX(self):
+#         '''Return a mxScorePart based on this instrument.
+#         '''
+#         return musicxmlTranslate.instrumentToMx(self)
+# 
+#     def _setMX(self, mxScorePart):
+#         '''
+#         provide a score part object
+#         '''
+#         # load an instrument from a ScorePart into self
+#         musicxmlTranslate.mxToInstrument(mxScorePart, self)
+# 
+#     mx = property(_getMX, _setMX)
 
 
 

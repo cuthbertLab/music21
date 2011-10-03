@@ -696,17 +696,17 @@ class Score(MusicXMLElementList):
                     c['scorePartIds'].append(p.get('id'))
         return closed
 
-    def getInstrument(self, partId):
-        '''Get an instrument from a part
+    def getScorePart(self, partId):
+        '''Get an instrument, as defined in a ScorePart object, from a Score. 
 
         >>> a = Score()
         >>> a.setDefaults()
-        >>> a.getInstrument('P3') == None
+        >>> a.getScorePart('P3') == None
         True
         >>> from music21.musicxml import testPrimitive
         >>> b = Document()
         >>> b.read(testPrimitive.pitches01a)
-        >>> b.score.getInstrument(b.score.getPartNames().keys()[0])
+        >>> b.score.getScorePart(b.score.getPartNames().keys()[0])
         <score-part id=P1 part-name=MusicXML Part>
         '''
         inst = None
@@ -718,6 +718,7 @@ class Score(MusicXMLElementList):
                     inst = obj 
                     break
         return inst
+
 
     def getPart(self, partId):
         ''' Get a part, given an id.
@@ -914,6 +915,8 @@ class PartGroup(MusicXMLElement):
 
 
 class ScorePart(MusicXMLElement):
+    '''Lives in a PartList
+    '''
     def __init__(self):
         MusicXMLElement.__init__(self)
         self._tag = 'score-part'

@@ -4127,9 +4127,9 @@ class Test(unittest.TestCase):
 
     def testChordComponentsA(self):
         from music21 import chord, stream
-
+        
         c = chord.Chord(['d2', 'e-1', 'b-6'])
-
+        
         s = stream.Stream()
         for n in c:
             s.append(n)
