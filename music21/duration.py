@@ -1186,10 +1186,7 @@ class Tuplet(object):
         mxTimeModification.set('normal-type', self.durationNormal.type)
         if self.durationNormal.dots > 0: # only one dot supported...
             mxTimeModification.set('normal-dot', True)
-            
-
-#         environLocal.printDebug(['_getMX(), found tuplet type:', self.type, 'bracket:', self.bracket, self])
-
+        
         # need to permit a tuplet type that is startStop, that
         # create two mxTuplet objects, one for starting and one
         # for stopping
@@ -2708,52 +2705,52 @@ class Duration(DurationCommon):
         ''')
 
 
-    def _getMX(self):
-        '''
-        Returns a list of one or more musicxml.Note() objects with all rhythms
-        and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc.
-
-        >>> a = Duration()
-        >>> a.quarterLength = 3
-        >>> b = a.mx
-        >>> len(b) == 1
-        True
-        >>> isinstance(b[0], musicxmlMod.Note)
-        True
-
-        >>> a = Duration()
-        >>> a.quarterLength = .33333333
-        >>> b = a.mx
-        >>> len(b) == 1
-        True
-        >>> isinstance(b[0], musicxmlMod.Note)
-        True
-        '''
-        return musicxmlTranslate.durationToMx(self)
-
-    def _setMX(self, mxNote):
-        '''
-        Given a single MusicXML Note object, read in and create a
-        Duration
-
-        mxNote must have a defined _measure attribute that is a reference to the
-        MusicXML Measure that contains it
-
-        >>> from music21 import musicxml
-        >>> a = musicxml.Note()
-        >>> a.setDefaults()
-        >>> m = musicxml.Measure()
-        >>> m.setDefaults()
-        >>> a.external['measure'] = m # assign measure for divisions ref
-        >>> a.external['divisions'] = m.external['divisions']
-        >>> c = Duration()
-        >>> c.mx = a
-        >>> c.quarterLength
-        1.0
-        '''   
-        musicxmlTranslate.mxToDuration(mxNote, self)
-
-    mx = property(_getMX, _setMX)
+#     def _getMX(self):
+#         '''
+#         Returns a list of one or more musicxml.Note() objects with all rhythms
+#         and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc.
+# 
+#         >>> a = Duration()
+#         >>> a.quarterLength = 3
+#         >>> b = a.mx
+#         >>> len(b) == 1
+#         True
+#         >>> isinstance(b[0], musicxmlMod.Note)
+#         True
+# 
+#         >>> a = Duration()
+#         >>> a.quarterLength = .33333333
+#         >>> b = a.mx
+#         >>> len(b) == 1
+#         True
+#         >>> isinstance(b[0], musicxmlMod.Note)
+#         True
+#         '''
+#         return musicxmlTranslate.durationToMx(self)
+# 
+#     def _setMX(self, mxNote):
+#         '''
+#         Given a single MusicXML Note object, read in and create a
+#         Duration
+# 
+#         mxNote must have a defined _measure attribute that is a reference to the
+#         MusicXML Measure that contains it
+# 
+#         >>> from music21 import musicxml
+#         >>> a = musicxml.Note()
+#         >>> a.setDefaults()
+#         >>> m = musicxml.Measure()
+#         >>> m.setDefaults()
+#         >>> a.external['measure'] = m # assign measure for divisions ref
+#         >>> a.external['divisions'] = m.external['divisions']
+#         >>> c = Duration()
+#         >>> c.mx = a
+#         >>> c.quarterLength
+#         1.0
+#         '''   
+#         musicxmlTranslate.mxToDuration(mxNote, self)
+# 
+#     mx = property(_getMX, _setMX)
 
 
     def _getMusicXML(self):
