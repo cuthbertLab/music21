@@ -1880,8 +1880,8 @@ class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.AverageTimeBetweenAttacksFeature(s)
     >>> f = fe.extract()
-    >>> f.vector
-    [0.349999...]
+    >>> round(f.vector[0], 3)
+    0.35
     '''
     id = 'R22'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
