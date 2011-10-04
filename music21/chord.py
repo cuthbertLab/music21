@@ -882,7 +882,7 @@ class Chord(note.NotRest):
                 vels.append(d._volume.velocity) 
             # create new local object
             self._volume = volume.Volume(parent=self)
-            self._volume.velocity = sum(vels) / float(len(vels))
+            self._volume.velocity = int(round(sum(vels) / float(len(vels))))
             return self._volume
         else:
             raise ChordException('unmatched condition')
@@ -4150,10 +4150,39 @@ class Test(unittest.TestCase):
 
 
     def testVolumePerPitchD(self):
-        pass
+        from music21 import chord, volume
+        c = chord.Chord(['f-3', 'g3', 'b-3'])
+        #set a single velocity
+        c.volume.velocity = 121
+        self.assertEqual(c.volume.velocity, 121)
+        self.assertEqual(c.hasComponentVolumes(), False)
 
-        #c = chord.Chord(['f-3', 'g3', 'b-3'])
-        # set a single velocity
+        # set individual velocities     
+        c.volume = [volume.Volume(velocity=x) for x in (30, 60, 90)]
+        # components are set
+        self.assertEqual([x.volume.velocity for x in c], [30, 60, 90])
+        # hasComponentVolumes is True
+        self.assertEqual(c.hasComponentVolumes(), True)
+        # if we get a volume, the average is taken, and we get this velocity
+        self.assertEqual(c.volume.velocity, 60)
+        # still have components
+        self.assertEqual(c.hasComponentVolumes(), True)
+        self.assertEqual([x.volume.velocity for x in c], [30, 60, 90])
+        # if we set the outer velocity of the volume, components are not 
+        # changed; now we have an out-of sync situation
+        c.volume.velocity = 127
+        self.assertEqual(c.volume.velocity, 127)
+        self.assertEqual(c.hasComponentVolumes(), True)
+        self.assertEqual([x.volume.velocity for x in c], [30, 60, 90])
+        # if we set the volume property, then we drop the components
+        c.volume = volume.Volume(velocity=20)
+        self.assertEqual(c.volume.velocity, 20)
+        self.assertEqual(c.hasComponentVolumes(), False)
+        # if we can still set components
+        c.volume = [volume.Volume(velocity=x) for x in (10, 20, 30)]
+        self.assertEqual([x.volume.velocity for x in c], [10, 20, 30])
+        self.assertEqual(c.hasComponentVolumes(), True)
+        self.assertEqual(c._volume, None)
 
 
     def testGetItemA(self):
