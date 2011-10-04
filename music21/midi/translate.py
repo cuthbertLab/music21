@@ -427,11 +427,14 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
     eventList = []
     c = inputM21
 
-    #defaultVolume = volume.Volume()
 
     # temporary storage for setting correspondance
     noteOn = []
     noteOff = [] 
+
+    chordVolume = c.volume # use if component volume are not defined
+    hasComponentVolumes = c.hasComponentVolumes()
+
     for i in range(len(c)):
     #for i in range(len(c.pitches)):
         chordComponent = c[i]
@@ -454,16 +457,10 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
             me.centShift = chordComponent.pitch.getCentShiftFromMidi()
         #if 'volume' in chordComponent.keys():
         
-        # TODO: review now that chord Components are Notes
-        if chordComponent.volume.velocity is not None:
-            me.velocity = chordComponent.volume.velocity
+        if hasComponentVolumes:
+            me.velocity = int(round(chordComponent.volume.realized * 127))
         else:
-            me.velocity = int(round(
-                            chordComponent.volume.realized * 127))
-
-#         else: # no volume information, use default
-#             me.velocity = int(round(defaultVolume.realized * 127))
-            
+            me.velocity = int(round(chordVolume.realized * 127))
         eventList.append(me)
         noteOn.append(me)
 
@@ -2215,7 +2212,7 @@ class Test(unittest.TestCase):
         
     def testMidiExportVelocityB(self):
         import random
-        from music21 import stream, chord, note
+        from music21 import stream, chord, note, volume
         
         s1 = stream.Stream()
         shift = [0, 6, 12]
@@ -2228,8 +2225,12 @@ class Test(unittest.TestCase):
                 c = note.Rest()
             else:
                 c = chord.Chord(['c3', 'd-4', 'g5'])
-                for i, v in enumerate(c.volume):
+                vChord = []
+                for i, cSub in enumerate(c):
+                    v = volume.Volume()
                     v.velocityScalar = amps[(j+shift[i]) % len(amps)]
+                    vChord.append(v)
+                c.volume = vChord # can set to list
             c.duration.quarterLength = ql
             s1.append(c)
         

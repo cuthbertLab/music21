@@ -30,7 +30,7 @@ class Volume(object):
     >>> from music21 import *
     >>> v = volume.Volume()     
     '''
-    def __init__(self, parent=None, velocity=None):
+    def __init__(self, parent=None, velocity=None, velocityScalar=None):
 
         # store a reference to the parent, as we use this to do context 
         # will use property; if None will leave as None
@@ -39,6 +39,8 @@ class Volume(object):
         self._velocity = None
         if velocity is not None:
             self.velocity = velocity
+        elif velocityScalar is not None:
+            self.velocityScalar = velocityScalar
 
     def __deepcopy__(self, memo=None):
         '''Need to manage copying of weak ref; when copying, do not copy weak ref, but keep as a reference to the same object. 
@@ -172,7 +174,6 @@ class Volume(object):
         '''
         if other is not None:      
             self._velocity = other._velocity
-
         
 
     def getRealized(self, dynamicContext=True, useVelocity=True, 

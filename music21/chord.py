@@ -211,7 +211,9 @@ class Chord(note.NotRest):
 
 
         for d in new._components:
-            d.volume.parent = new # update with new instance
+            # if .volume is called, a new Volume obj will be created
+            if d._volume is not None:
+                d.volume.parent = new # update with new instance
 
 
 #         for d in new._components:
@@ -843,39 +845,73 @@ class Chord(note.NotRest):
     #---------------------------------------------------------------------------
     # volume per pitch 
 
+    def hasComponentVolumes(self):
+        '''Utility method to determine if this object has component volumes, or Volume objets assigned to each note-component.
+        '''
+        count = 0
+        for c in self._components:
+            # access private attribute, as property will create otherwise
+            if c._volume is not None: 
+                count += 1
+        if count == len(self._components):
+            #environLocal.printDebug(['hasComponentVolumes:', True])
+            return True
+        else:
+            #environLocal.printDebug(['hasComponentVolumes:', False])
+            return False
+
+
     def _getVolume(self):
-        post = []
 
-        for d in self._components:
-            # will create on Note on demand
-            post.append(d._getVolume(forceParent=self)) 
-        return post
+#         post = []
+#         for d in self._components:
+#             post.append(d._getVolume(forceParent=self)) 
+#         return post
     
-
-#         for c in self._components:
-#             if 'volume' in c.keys() and c['volume'] is not None:
-#                 v = c['volume']
-#             else:
-#                 v = volume.Volume() # add self 
-#                 v.parent = self
-#                 c['volume'] = v
-#             post.append(v)
-#        return post
+        if not self.hasComponentVolumes() and self._volume is None:
+            # create a single new Volume object for the chord
+            return note.NotRest._getVolume(self, forceParent=self)
+        elif self._volume is not None:
+            # if we already have a Volume, use that
+            return self._volume   
+        # if we have components and _volume is None, create a volume from
+        # components
+        elif self.hasComponentVolumes():
+            vels = []
+            for d in self._components:
+                vels.append(d._volume.velocity) 
+            # create new local object
+            self._volume = volume.Volume(parent=self)
+            self._volume.velocity = sum(vels) / float(len(vels))
+            return self._volume
+        else:
+            raise ChordException('unmatched condition')
 
     def _setVolume(self, value):
 
         if isinstance(value, volume.Volume):
-            value.parent = self # set once
+            value.parent = self
+            # remove any component volmes
             for c in self._components:
-                # if we set c.volume, the parent of volume will be the Note
-                # parent needs to be set to the chord
-                value.parent = self
-                c._setVolume(value, setParent=False)                
+                c._volume = None
+            return note.NotRest._setVolume(self, value, setParent=False)
+
+#             value.parent = self # set once
+#             for c in self._components:
+#                 # if we set c.volume, the parent of volume will be the Note
+#                 # parent needs to be set to the chord
+#                 value.parent = self
+#                 c._setVolume(value, setParent=False)                
         elif common.isListLike(value): # assume an array of vol objects
+            # if setting components, remove single velocity 
+            self._volume = None
             for i, c in enumerate(self._components):
                 v = value[i%len(value)]
                 v.parent = self
                 c._setVolume(v, setParent=False)
+        else:
+            raise ChordException('unhandled setting value: %s' % value)
+
 
 #         if isinstance(value, volume.Volume):
 #             value.parent = self # set once
@@ -896,13 +932,13 @@ class Chord(note.NotRest):
         >>> from music21 import *
         >>> c = chord.Chord(['g#', 'd-'])
         >>> c.volume
-        [<music21.volume.Volume realized=0.71>, <music21.volume.Volume realized=0.71>]
+        <music21.volume.Volume realized=0.71>
         >>> c.volume = volume.Volume(velocity=64)
         >>> c.volume
-        [<music21.volume.Volume realized=0.5>, <music21.volume.Volume realized=0.5>]
+        <music21.volume.Volume realized=0.5>
         >>> c.volume = [volume.Volume(velocity=96), volume.Volume(velocity=96)]
-        >>> c.volume
-        [<music21.volume.Volume realized=0.76>, <music21.volume.Volume realized=0.76>]
+        >>> c.volume  # return a new volume that is an average
+        <music21.volume.Volume realized=0.76>
 
         ''')
         
@@ -4067,15 +4103,57 @@ class Test(unittest.TestCase):
         amps = [.1, .5, 1]        
         for j in range(12):
             c = chord.Chord(['c3', 'd-4', 'g5'])
-            for i, v in enumerate(c.volume):
-                v.velocityScalar = amps[i]
+            for i, sub in enumerate(c):
+                sub.volume.velocityScalar = amps[i]
             s.append(c)
         match = []
         for c in s:
-            for v in c.volume:
-                match.append(v.velocity)
+            for sub in c:
+                match.append(sub.volume.velocity)
 
         self.assertEqual(match, [13, 64, 127, 13, 64, 127, 13, 64, 127, 13, 64, 127, 13, 64, 127, 13, 64, 127, 13, 64, 127, 13, 64, 127, 13, 64, 127, 13, 64, 127, 13, 64, 127, 13, 64, 127])
+
+
+    def testVolumePerPitchC(self):
+        import random
+        from music21 import chord, stream, tempo
+        
+        c = chord.Chord(['f-2', 'a-2', 'c-3', 'f-3', 'g3', 'b-3', 'd-4', 'e-4'])
+        c.duration.quarterLength = .5
+        s = stream.Stream()
+        s.insert(tempo.MetronomeMark(referent=2, number=50))
+        
+        amps = [.1, .2, .3, .4, .5, .6, .7, .8]
+        
+        for accent in [.5, .5, .5, .5,   .5, .5, .5, .5,   .5, 1, .5, 1,  
+                       .5, .5, .5, .5,   .5, 1, .5, .5,    1, .5, .5, .5,
+                        1, .5, .5, .5,   .5, 1, .5, .5,
+                        None, None, None, None, 
+                        None, None, None, None, 
+                        None, None, None, None, 
+                        None, None, None, None, 
+                        .5, .5, .5, .5,  .5, 1, .5, 1,   .5, .5, .5, .5, 
+                         .5, 1, .5, .5,  .5, .5, .5, .5,  .5, .5, .5, .5, 
+                        .5, .5, .5, .5,  .5, .5, .5, .5, 
+                        .5, .5, .5, .5,  .5, .5, .5, .5, 
+                        ]:
+            cNew = copy.deepcopy(c)
+            if accent is not None:
+                cNew.volume.velocityScalar = accent
+                self.assertEqual(cNew.hasComponentVolumes(), False)
+            else:
+                random.shuffle(amps)            
+                cNew.volume = [volume.Volume(velocityScalar=x) for x in amps]
+                self.assertEqual(cNew.hasComponentVolumes(), True)
+            s.append(cNew)
+        #s.show('midi')
+
+
+    def testVolumePerPitchD(self):
+        pass
+
+        #c = chord.Chord(['f-3', 'g3', 'b-3'])
+        # set a single velocity
 
 
     def testGetItemA(self):
