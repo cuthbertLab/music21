@@ -16,6 +16,11 @@ import unittest
 
 import music21
 from music21 import common
+from music21 import dynamics
+
+from music21 import environment
+_MOD = "volume.py"  
+environLocal = environment.Environment(_MOD)
 
 
 
@@ -30,7 +35,8 @@ class Volume(object):
     >>> from music21 import *
     >>> v = volume.Volume()     
     '''
-    def __init__(self, parent=None, velocity=None, velocityScalar=None):
+    def __init__(self, parent=None, velocity=None, velocityScalar=None, 
+                velocityIsRelative=True):
 
         # store a reference to the parent, as we use this to do context 
         # will use property; if None will leave as None
@@ -41,6 +47,9 @@ class Volume(object):
             self.velocity = velocity
         elif velocityScalar is not None:
             self.velocityScalar = velocityScalar
+
+        # TODO replace with a property; set from MIDI import to be False
+        self.velocityIsRelative = velocityIsRelative
 
     def __deepcopy__(self, memo=None):
         '''Need to manage copying of weak ref; when copying, do not copy weak ref, but keep as a reference to the same object. 
@@ -155,7 +164,6 @@ class Volume(object):
         # TODO: find wedges and crescendi too
         return self.getContextByClass('Dynamic')
 
-
     def mergeAttributes(self, other):
         '''Given another Volume object, gather all attributes except parent. Values are always copied, not passed by reference. 
 
@@ -174,23 +182,72 @@ class Volume(object):
         '''
         if other is not None:      
             self._velocity = other._velocity
+            self.velocityIsRelative = other.velocityIsRelative
         
 
-    def getRealized(self, dynamicContext=True, useVelocity=True, 
+    def getRealized(self, useDynamicContext=True, useVelocity=True,
         useArticulations=True, baseLevel=0.70866):
-        '''Get a realized unit-interval scalar for this Volume. This scalar is to be applied to the final amplitude scalar, whatever that may be.
+        '''Get a realized unit-interval scalar for this Volume. This scalar is to be applied to the dynamic range of whatever output is available, whatever that may be. 
+
+        The `baseLevel` value is a middle value between 0 and 1 that all scalars modify. This also becomes the default value for unspecified dynamics. When scalars (between 0 and 1) are used, their values are doubled, such that mid-values (around .5, which become 1) make no change. 
  
         This can optionally take into account `dynamicContext`, `useVelocity`, and `useArticulation`.
+
+        The `velocityIsRelative` tag determines if the velocity value includes contextual values, such as dynamics and and accents, or not. 
+
+        >>> from music21 import stream, volume, note
+        >>> s = stream.Stream()
+        >>> s.repeatAppend(note.Note('d3', quarterLength=.5), 8)
+        >>> s.insert([0, dynamics.Dynamic('p'), 1, dynamics.Dynamic('mp'), 2, dynamics.Dynamic('mf'), 3, dynamics.Dynamic('f')])
+
+        >>> s.notes[0].volume.getRealized()
+        0.42519599...
+        >>> s.notes[1].volume.getRealized()
+        0.42519599...
+        >>> s.notes[2].volume.getRealized()
+        0.63779399...
+        >>> s.notes[7].volume.getRealized()
+        0.992123...
+
+        >>> # velocity, if set, will be scaled by dyanmics
+        >>> s.notes[7].volume.velocity = 20
+        >>> s.notes[7].volume.getRealized()
+        0.31247...
+
+        >>> # unless we set the velocity to not be relative
+        >>> s.notes[7].volume.velocityIsRelative = False
+        >>> s.notes[7].volume.getRealized()
+        0.1574803...
         '''
+        #velocityIsRelative might be best set at import. e.g., from MIDI, 
+        # velocityIsRelative is False, but in other applications, it may not 
+        # be
+
+        # TODO: set base level to .5, but provide a default velocity?
+
         val = baseLevel
-        if dynamicContext:
-            pass
+        dm = None  # no dynamic mark
+        if useDynamicContext:
+            dm = self.getDynamicContext() # dm may be None
+ 
         if useVelocity:
             if self._velocity is not None:
-                # if velocity is already set, it should full determine output
-                val = self.velocityScalar
-        if useArticulations:
-            pass
+                if not self.velocityIsRelative:
+                    # if velocity is already set, it should fully determine output
+                    val = self.velocityScalar
+                else:
+                    val = val * (self.velocityScalar * 2.0)
+
+        # only change the val from here if velocity is relative 
+        if self.velocityIsRelative or self._velocity is None:                    
+            if useDynamicContext:
+                if dm is not None:
+                    # double scalare (so range is between 0 and 1) and scale 
+                    # t he current val (around the base)
+                    val = val * (dm.volumeScalar * 2.0)
+            if useArticulations:
+                pass
+
         # might to rebalance range after scalings       
         return val
 

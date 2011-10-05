@@ -204,6 +204,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
 
     n.pitch.midi = eOn.pitch
     n.volume.velocity = eOn.velocity
+    n.volume.velocityIsRelative = False # not relative coming from MIDI
     #n._midiVelocity = eOn.velocity
     # here we are handling an occasional error that probably should not happen
     # TODO: handle chords
@@ -249,12 +250,11 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
     me1.pitch = n.pitch.getMidiPreCentShift() # will shift later, do not round
     if not n.pitch.isTwelveTone():
         me1.centShift = n.pitch.getCentShiftFromMidi()
-    # get realized value from volume, scale to velocity
-    # or just velocity
-    if n.volume.velocity is not None:
-        me1.velocity = n.volume.velocity
-    else: # set as realized
-        me1.velocity = int(round(n.volume.realized * 127))
+
+    # TODO: not yet using dynamics or velocity
+    volScalar = n.volume.getRealized(useDynamicContext=False, 
+            useVelocity=True, useArticulations=False)
+    me1.velocity = int(round(volScalar * 127))
 
     eventList.append(me1)
 
@@ -386,7 +386,9 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
             p = pitch.Pitch()
             p.midi = eOn.pitch
             pitches.append(p)
-            volumes.append(volume.Volume(velocity=eOn.velocity))
+            v = volume.Volume(velocity=eOn.velocity)
+            v.velocityIsRelative = False # velocity is absolute coming from 
+            volumes.append(v)
     # assume it is  a flat list        
     else:
         onEvents = eventList[:(len(eventList) / 2)]
@@ -399,7 +401,9 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
             p = pitch.Pitch()
             p.midi = onEvents[i].pitch
             pitches.append(p)
-            volumes.append(volume.Volume(velocity=onEvents[i].velocity))
+            v = volume.Volume(velocity=onEvents[i].velocity)
+            v.velocityIsRelative = False # velocity is absolute coming from 
+            volumes.append(v)
 
     c.pitches = pitches
     c.volume = volumes # can set a list to volume property
@@ -458,9 +462,15 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
         #if 'volume' in chordComponent.keys():
         
         if hasComponentVolumes:
-            me.velocity = int(round(chordComponent.volume.realized * 127))
+            # TODO: not yet using dynamics or velocity
+            volScalar = chordComponent.volume.getRealized(
+                useDynamicContext=False, 
+                useVelocity=True, useArticulations=False)
         else:
-            me.velocity = int(round(chordVolume.realized * 127))
+            volScalar = chordVolume.getRealized(
+                useDynamicContext=False, 
+                useVelocity=True, useArticulations=False)
+        me.velocity = int(round(volScalar * 127))
         eventList.append(me)
         noteOn.append(me)
 
@@ -1781,7 +1791,6 @@ class Test(unittest.TestCase):
         # its the same as before
         match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=65, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=66, velocity=90>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=61, velocity=90>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=58, velocity=90>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=54, velocity=90>, <MidiEvent DeltaTime, t=1024, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=66, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=61, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=58, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=54, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
 
-
         self.assertEqual(str(mtList[0].events[-20:]), match)
 
 
@@ -2202,11 +2211,13 @@ class Test(unittest.TestCase):
             #print i
             n = note.Note('c3')
             n.volume.velocityScalar = i/10.
+            n.volume.velocityIsRelative = False
             s.append(n)
 
         #s.show('midi')        
         mts = streamsToMidiTracks(s)
         mtsRepr = repr(mts)
+        #print mtsRepr
         self.assertEqual(mtsRepr.count('velocity=114'), 1)
         self.assertEqual(mtsRepr.count('velocity=13'), 1)
         
@@ -2229,6 +2240,7 @@ class Test(unittest.TestCase):
                 for i, cSub in enumerate(c):
                     v = volume.Volume()
                     v.velocityScalar = amps[(j+shift[i]) % len(amps)]
+                    v.velocityIsRelative = False
                     vChord.append(v)
                 c.volume = vChord # can set to list
             c.duration.quarterLength = ql

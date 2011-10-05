@@ -83,6 +83,25 @@ def dynamicStrFromDecimal(n):
     elif n >= .9:
         return 'fff'
 
+# defaults used for volume scalar
+dyanmicStrToScalar = {
+             None: .5, # default value
+              'n': 0,
+              'pppp': 0.05,
+              'ppp': .1,
+              'pp': .15,
+              'p': .3,
+              'mp': .45,
+              'mf': .55,
+              'f': .7,
+              'fp': .75,
+              'sf': .85,
+              'ff': .85,
+              'fff': .9,
+              'ffff': .95,
+        }
+
+
 #-------------------------------------------------------------------------------
 class DynamicException(Exception):
     pass
@@ -143,6 +162,11 @@ class Dynamic(music21.Music21Object):
         else:
             self.value = value # will use property
 
+        # the scalar is used to calculate the final output of a note
+        # under this dynamic. if this property is set, it will override 
+        # use of a default. 
+        self._volumeScalar = None
+
         # for position, as musicxml, all units are in tenths of interline space
         # position is needed as default positions are often incorrect
         self._positionDefaultX = -36
@@ -173,9 +197,34 @@ class Dynamic(music21.Music21Object):
             self.englishName = None
 
     value = property(_getValue, _setValue,
-        doc='''Get or set the value of this dynamic, which sets the long and english names of this Dynamic.
+        doc='''Get or set the value of this dynamic, which sets the long and english names of this Dynamic. The value is a string specification. 
         ''')
 
+    def _getVolumeScalar(self):
+        if self._volumeScalar is not None:
+            return self._volumeScalar
+        # use default
+        if self._value in dyanmicStrToScalar.keys():
+            return dyanmicStrToScalar[self._value]
+        return 
+
+    def _setVolumeScalar(self, value):
+        # we can manually set this to be anything, overriding defaults
+        if common.isNum(value) and 0 >= value <= 1:
+            self._volumeScalar = value
+        else:
+            raise DynamicException('cannot set as volume scalar to: %s', value)
+
+    volumeScalar = property(_getVolumeScalar, _setVolumeScalar, doc='''
+        Get or set the volume scalar for this dynamic. If not explicitly set, a default volume scalar will be provided. Any number between 0 and 1 can be used to set the volume scalar, overriding the expected behavior. 
+
+        As mezzo is at .5, the unit interval range might be doubled for generating final output. The default output is .5.
+
+        >>> from music21 import *
+        >>> d = dynamics.Dynamic('mf')
+        >>> d.volumeScalar
+        0.55...
+        ''')
 
     def _getPositionVertical(self):
         return self._positionDefaultY
