@@ -756,9 +756,6 @@ class Key(KeySignature, scale.DiatonicScale):
     It probably has a scale (or scales) associated with it and a KeySignature,
     but not necessarily.
 
-    EXPERIMENTAL
-
-
     >>> from music21 import *
     >>> cm = key.Key('c')  # cminor.
     >>> cm
@@ -821,6 +818,52 @@ class Key(KeySignature, scale.DiatonicScale):
 
 
 
+    def _tonalCertainityCorrelationCoefficient(self, *args, **keywords):
+        # possible measures:
+        if len(self.alternateInterpretations) == 0:
+            raise KeySignatureException('cannot process amgiguity without alternative Interpretations')
+        focus = []
+        focus.append(self.correlationCoefficient)
+        for subKey in self.alternateInterpretations:
+            cc = subKey.correlationCoefficient
+            if cc > 0:
+                focus.append(cc)
+#         print focus
+#         print
+
+        # take abs magnitude as one factor; assume between 0 and 1
+        # greater certainty often has a larger number
+        absMagnitude = focus[0] 
+
+        # take distance from first to second; greater certainty
+        # seems to have a greater span
+        leaderSpan = focus[0] - focus[1]
+
+        # take average of all non-negative values
+        meanMagnitude = sum(focus) / float(len(focus))
+
+        # standard deviation of all non-neg values
+        standardDeviation = common.standardDeviation(focus, bassel=False)
+
+        environLocal.printDebug(['absMagnitude', absMagnitude, 'leaderSpan', leaderSpan, 'meanMagnitude', meanMagnitude, 'standardDeviation', standardDeviation])
+
+        # combine factors with a weighting for each 
+        # estimate range as 2, normalize between zero and 1
+        return (absMagnitude * 1) + (leaderSpan * 2)
+
+    def tonalCertainty(self, method='correlationCoefficient', *args, 
+        **keywords):
+        '''Provide a measure of tonal ambiguity for Key determined with one of many methods. 
+
+        The `correlationCoefficient` assumes that the alternateInterpretations list has been filled from the use of a KeyWeightKeyAnalysis subclass.
+        '''
+        if method == 'correlationCoefficient':
+            return self._tonalCertainityCorrelationCoefficient(
+                    args, keywords)
+
+
+
+
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
@@ -853,26 +896,61 @@ class Test(unittest.TestCase):
         a = KeySignature()
         self.assertEqual(a.sharps, None)
 
-
-
-
-#     def testJSONStorage(self):
-#         ks = KeySignature(3)
-#         # cannot test to json str as __class__ is different based on context 
-#         #self.assertEqual(ks.json, '{"__attr__": {"sharps": 3}, "__version__": [0, 3, 0], "__class__": "<class \'__main__.KeySignature\'>"}')
+    def testTonalAmbiguityA(self):
+        from music21 import corpus, stream, key, scale
+#         s = corpus.parse('bwv64.2')
+#         k = s.analyze('KrumhanslSchmuckler')
+#         k.tonalCertainty(method='correlationCoefficient')
 # 
-#         jsonStr = ks.json
-#     
-#         ksNew = KeySignature()
-#         ksNew.json = jsonStr
-# 
-#         self.assertEqual(ksNew._strDescription(), '3 sharps')
-#         
+        s = corpus.parse('bwv66.6')
+        k = s.analyze('KrumhanslSchmuckler')
+        ta = k.tonalCertainty(method='correlationCoefficient')
+        self.assertEqual(ta < 2 and ta > 0.1, True)
 
-#         jsString = ts.json
-#         ts = TimeSignature()
-#         ts.json = jsString
-#         self.assertEqual(ts.stringNotation, '3/4')
+        s = corpus.parse('schoenberg/opus19', 6)
+        k = s.analyze('KrumhanslSchmuckler')
+        ta = k.tonalCertainty(method='correlationCoefficient')
+        self.assertEqual(ta < 2 and ta > 0.1, True)
+
+
+
+        sc1 = scale.MajorScale('g')
+        sc2 = scale.MajorScale('d')
+        sc3 = scale.MajorScale('a')
+        sc5 = scale.MajorScale('f#')
+
+        s = stream.Stream()
+        [s.append(note.Note(p)) for p in sc1.pitches]
+        k = s.analyze('KrumhanslSchmuckler')
+        ta = k.tonalCertainty(method='correlationCoefficient')
+        self.assertEqual(ta < 2 and ta > 0.1, True)
+
+        s = stream.Stream()
+        [s.append(note.Note(p)) for p in sc1.pitches + sc2.pitches + sc2.pitches + sc3.pitches]
+        k = s.analyze('KrumhanslSchmuckler')
+        ta = k.tonalCertainty(method='correlationCoefficient')
+        self.assertEqual(ta < 2 and ta > 0.1, True)
+
+        s = stream.Stream()
+        [s.append(note.Note(p)) for p in sc1.pitches + sc5.pitches]
+        k = s.analyze('KrumhanslSchmuckler')
+        ta = k.tonalCertainty(method='correlationCoefficient')
+        self.assertEqual(ta < 2 and ta > 0.1, True)
+
+
+        s = stream.Stream()
+        [s.append(note.Note(p)) for p in ['c', 'g', 'c', 'c', 'e']]
+        k = s.analyze('KrumhanslSchmuckler')
+        ta = k.tonalCertainty(method='correlationCoefficient')
+        self.assertEqual(ta < 2 and ta > 0.1, True)
+
+
+
+#         s = corpus.parse('bwv66.2')
+#         k = s.analyze('KrumhanslSchmuckler')
+#         k.tonalCertainty(method='correlationCoefficient')
+        #s = corpus.parse('bwv48.3')
+
 
 
 

@@ -52,6 +52,9 @@ environLocal = environment.Environment(_MOD)
 # key detection on windowed segments
 # prevalence m/M over 4 bar windwows
 
+# key ambiguity list
+# correlation coefficient
+# harmony realization also adds pitches not available in midi
 
 
 #-------------------------------------------------------------------------------
@@ -138,7 +141,31 @@ class QualityFeature(featuresModule.FeatureExtractor):
 
         self._feature.vector[0] = keyFeature
     
-    
+
+#-------------------------------------------------------------------------------
+class TonalCertainty(featuresModule.FeatureExtractor):
+    '''
+    >>> from music21 import *
+    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> fe = features.native.TonalCertainty(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [1.18093058...]
+
+    '''
+    id = '' # TODO: need id
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Tonal Certainty'
+        self.description = 'A floating point magnitude value that suggest tonal certainty based on automatic key analysis.'
+        self.dimensions = 1
+        self.discrete = False 
+
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        self._feature.vector[0] = self.data['flat.tonalCertainty']
 
 
 #-------------------------------------------------------------------------------

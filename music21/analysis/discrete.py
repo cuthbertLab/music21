@@ -610,7 +610,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         return solution, color        
     
     def _solutionToObject(self, solution):
-        '''Convert a solution into an appropriate object representation
+        '''Convert a solution into an appropriate object representation, returning a Key object.
         '''
         k = key.Key(tonic=solution[0], mode=solution[1])
         k.correlationCoefficient = solution[2]
@@ -618,6 +618,8 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
     def getSolution(self, sStream):
         '''Return a music21 Key object defining the results of the analysis. Do not call process before calling this method, as this method calls process. 
+
+        Note that all alternative solutions are returned as Key objects and stored on a list found at Key.alternateInterpretations.
 
         >>> from music21 import *
         >>> s = corpus.parse('bach/bwv66.6')
@@ -1233,9 +1235,6 @@ def analyzeStream(streamObj, *args, **keywords):
     >>> s.analyze('range')
     <music21.interval.Interval m21>
 
-
-
-
     '''
     analysisClasses = [
         Ambitus,
@@ -1249,10 +1248,8 @@ def analyzeStream(streamObj, *args, **keywords):
 
     if 'method' in keywords:
         method = keywords['method']
-
     if len(args) > 0:
         method = args[0]
-
     match = None
     for analysisClassName in analysisClasses:    
         # this is a very loose matching, as there are few classes now
@@ -1266,16 +1263,13 @@ def analyzeStream(streamObj, *args, **keywords):
                 if method in idStr:
                     match = analysisClassName
                     #environLocal.printDebug(['matched idStr', idStr])
-
                     break
             if match != None:
                 break
-
     if match != None:
         obj = analysisClassName()
         #environLocal.printDebug(['analysis method used:', obj])
         return obj.getSolution(streamObj)
-
 
     # if no match raise error
     raise DiscreteAnalysisException('no such analysis method: %s' % method)
@@ -1440,7 +1434,7 @@ class Test(unittest.TestCase):
         k = s.analyze('KrumhanslSchmuckler')
         self.assertEqual(str(k), 'C major')
         self.assertEqual(str(k.alternateInterpretations), '[<music21.key.Key of C minor>, <music21.key.Key of G major>, <music21.key.Key of A minor>, <music21.key.Key of F major>, <music21.key.Key of G minor>, <music21.key.Key of E minor>, <music21.key.Key of F minor>, <music21.key.Key of E- major>, <music21.key.Key of A- major>, <music21.key.Key of B- major>, <music21.key.Key of D minor>, <music21.key.Key of D major>, <music21.key.Key of A major>, <music21.key.Key of B minor>, <music21.key.Key of B- minor>, <music21.key.Key of C# minor>, <music21.key.Key of F# minor>, <music21.key.Key of C# major>, <music21.key.Key of E major>, <music21.key.Key of G# minor>, <music21.key.Key of F# major>, <music21.key.Key of B major>, <music21.key.Key of E- minor>]')
-        
+
         k = s.analyze('AardenEssen')
         self.assertEqual(str(k), 'F major')
         self.assertEqual(str(k.alternateInterpretations), '[<music21.key.Key of C major>, <music21.key.Key of C minor>, <music21.key.Key of G minor>, <music21.key.Key of F minor>, <music21.key.Key of A minor>, <music21.key.Key of G major>, <music21.key.Key of D minor>, <music21.key.Key of A- major>, <music21.key.Key of B- major>, <music21.key.Key of E- major>, <music21.key.Key of E minor>, <music21.key.Key of B- minor>, <music21.key.Key of D major>, <music21.key.Key of A major>, <music21.key.Key of F# minor>, <music21.key.Key of C# major>, <music21.key.Key of B minor>, <music21.key.Key of E major>, <music21.key.Key of C# minor>, <music21.key.Key of E- minor>, <music21.key.Key of F# major>, <music21.key.Key of B major>, <music21.key.Key of G# minor>]')

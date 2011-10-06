@@ -447,8 +447,16 @@ class StreamForms(object):
 
 
         elif key in ['flat.analyzedKey']:
-            self._forms['analyzedKey'] = self.__getitem__('flat').analyze('key')
+            # this will use default weightings
+            self._forms['analyzedKey'] = self.__getitem__('flat').analyze(
+                                         method='key')
             return self._forms['analyzedKey']
+
+        elif key in ['flat.tonalCertainty']:
+            # this will use default weightings
+            foundKey = self.__getitem__('flat.analyzedKey')
+            self._forms['flat.tonalCertainty'] = foundKey.tonalCertainty()         
+            return self._forms['flat.tonalCertainty']
         
         elif key in ['metadata']:
             self._forms['metadata'] = self._base.metadata
