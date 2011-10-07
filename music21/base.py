@@ -27,7 +27,7 @@ available after importing music21.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'0.3.7.a11'
+'0.6.1.b1'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -39,8 +39,8 @@ under the module "base":
 
 #-------------------------------------------------------------------------------
 # string and tuple must be the same
-VERSION = (0, 3, 7)
-VERSION_STR = "%s.%s.%s.a11" % (VERSION[0], VERSION[1], VERSION[2])
+VERSION = (0, 6, 1)
+VERSION_STR = "%s.%s.%s.b1" % (VERSION[0], VERSION[1], VERSION[2])
 #-------------------------------------------------------------------------------
 
 import codecs

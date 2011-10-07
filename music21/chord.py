@@ -293,6 +293,7 @@ class Chord(note.NotRest):
         >>> from music21 import *
         >>> c = chord.Chord(['c3','g#4', 'b5'])
         >>> c.volume = volume.Volume(velocity=90)
+        >>> c.volume.velocityIsRelative = False
         >>> c.midiEvents
         [<MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=48, velocity=90>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=68, velocity=90>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=83, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=48, velocity=0>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=68, velocity=0>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=83, velocity=0>]
         ''')
@@ -861,13 +862,7 @@ class Chord(note.NotRest):
             return False
 
 
-    def _getVolume(self):
-
-#         post = []
-#         for d in self._components:
-#             post.append(d._getVolume(forceParent=self)) 
-#         return post
-    
+    def _getVolume(self):    
         if not self.hasComponentVolumes() and self._volume is None:
             # create a single new Volume object for the chord
             return note.NotRest._getVolume(self, forceParent=self)
@@ -934,9 +929,17 @@ class Chord(note.NotRest):
         >>> c.volume
         <music21.volume.Volume realized=0.71>
         >>> c.volume = volume.Volume(velocity=64)
+        >>> c.volume.velocityIsRelative = False
         >>> c.volume
         <music21.volume.Volume realized=0.5>
         >>> c.volume = [volume.Volume(velocity=96), volume.Volume(velocity=96)]
+        >>> c.hasComponentVolumes()
+        True
+        >>> c._volume == None
+        True
+        >>> c.volume.velocity
+        96
+        >>> c.volume.velocityIsRelative = False
         >>> c.volume  # return a new volume that is an average
         <music21.volume.Volume realized=0.76>
 

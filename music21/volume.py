@@ -186,7 +186,7 @@ class Volume(object):
         
 
     def getRealized(self, useDynamicContext=True, useVelocity=True,
-        useArticulations=True, baseLevel=0.70866):
+        useArticulations=True, baseLevel=0.70866, clip=True):
         '''Get a realized unit-interval scalar for this Volume. This scalar is to be applied to the dynamic range of whatever output is available, whatever that may be. 
 
         The `baseLevel` value is a middle value between 0 and 1 that all scalars modify. This also becomes the default value for unspecified dynamics. When scalars (between 0 and 1) are used, their values are doubled, such that mid-values (around .5, which become 1) make no change. 
@@ -248,6 +248,11 @@ class Volume(object):
             if useArticulations:
                 pass
 
+        if clip:
+            if val > 1:
+                val = 1.0
+            elif val < 0:
+                val = 0.0
         # might to rebalance range after scalings       
         return val
 
