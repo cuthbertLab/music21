@@ -42,7 +42,7 @@ environLocal = environment.Environment(_MOD)
 # luca gloria:
 # searching for numbers of hits
 # vowel metrical postiion
-# idea of language/text specific
+# idea of language/text specific # DONE
 
 # essen locale and elevation
 
@@ -812,6 +812,43 @@ class LandiniCadence(featuresModule.FeatureExtractor):
 
 
 
+#------------------------------------------------------------------------------
+# text features
+
+class LanguageFeature(featuresModule.FeatureExtractor):
+    '''
+    language of text as a number
+    the number is the index of text.LanguageDetector.languageCodes + 1
+    or 0 if there is no language.
+
+    
+    Detect that the language of "For unto us a child is born" is English.
+
+    >>> from music21 import *
+    >>> s = corpus.parse('handel/hwv56/movement1-13.md') 
+    >>> fe = features.native.LanguageFeature(s)
+    >>> fe.extract().vector
+    [1]
+    '''
+    id = 'TX1'
+
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Language Feature'
+        self.description = 'Languge of the lyrics of the piece given as a numeric value from text.LanguageDetector.mostLikelyLanguageNumeric().'
+        self.dimensions = 1
+        self.discrete = True
+        self.languageDetector = music21.text.LanguageDetector()
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        storedLyrics = self.data['assembledLyrics']
+        self._feature.vector[0] = self.languageDetector.mostLikelyLanguageNumeric(storedLyrics)
+
+
+
+
 #-------------------------------------------------------------------------------
 
 
@@ -840,6 +877,8 @@ IncorrectlySpelledTriadPrevalence, # cs11
 ComposerPopularity, #md1
 
 LandiniCadence, #mc1
+
+LanguageFeature, #tx1
 ]
 
 

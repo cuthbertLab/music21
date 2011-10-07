@@ -82,13 +82,13 @@ class SFApp():
             user32 = ctypes.windll.user32
             self.screenResolution = [1024, 600]
             #self.screenResolution = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
-            environLocal.printDebug("screen resolution (windows)", self.screenResolution[0], self.screenResolution[1])
+            environLocal.printDebug("screen resolution (windows) %d x %d" % (self.screenResolution[0], self.screenResolution[1]))
             self.resolution = True
         except: # mac and linux
             try:   
                 for screen in AppKit.NSScreen.screens():
                     self.screenResolution = [int(screen.frame().size.width), int(screen.frame().size.height)]             
-                environLocal.printDebug("screen resolution (MAC or linux)", self.screenResolution[0], self.screenResolution[1])
+                environLocal.printDebug("screen resolution (MAC or linux) %d x %d" % (self.screenResolution[0], self.screenResolution[1]))
                 self.resolution = True             
             except:                
                 self.screenResolution = [1024, 600]
@@ -101,7 +101,7 @@ class SFApp():
             self.x = int(self.screenResolution[0] / 2.6)
             self.y = int(self.x * 1.29)
             environLocal.printDebug("resized! too big")
-        environLocal.printDebug("one page score size", self.x, self.y)    
+        environLocal.printDebug("one page score size %d x %d" % (self.x, self.y))    
         self.filenameRequest()
         
         
@@ -126,16 +126,16 @@ class SFApp():
         self.scoreNameSong = self.box.get()
         prevtime = time.time()
         self.initializeScore()
-        environLocal.printDebug('initializeScore', time.time() - prevtime, 'sec')
+        environLocal.printDebug('initializeScore' + str(time.time() - prevtime) + 'sec')
         prevtime = time.time()
         try:
             self.initializeName()     
-            environLocal.printDebug('initializeName', time.time() - prevtime, 'sec')
+            environLocal.printDebug('initializeName' + str(time.time() - prevtime) + 'sec')
             prevtime = time.time()
         except IOError:
             pass
         self.initializeGraphicInterface()
-        environLocal.printDebug('intiGraph', time.time() - prevtime, 'sec')
+        environLocal.printDebug('initializeGraphicInterface' + str(time.time() - prevtime) + 'sec')
         environLocal.printDebug('Initialized!')
         
         
@@ -284,8 +284,8 @@ class SFApp():
                 self.middlePages.append(noteCounter)
                 middlePagesCounter += 1
             noteCounter += 1
-        environLocal.printDebug("beginning of the pages", self.beginningPages)
-        environLocal.printDebug('middles of the pages', self.middlePages)
+        environLocal.printDebug("beginning of the pages %s" % str(self.beginningPages))
+        environLocal.printDebug("middles of the pages %s" % str(self.middlePages))
         environLocal.printDebug("initializeScore finished")
 
                                                                                   
@@ -417,7 +417,7 @@ class SFApp():
                             
             self.canvas1.grid(row=1, column=0, columnspan=3, rowspan=7)        
             self.currentLeftPage += 1        
-        environLocal.printDebug("page Forward", self.currentLeftPage, self.totalPagesScore)
+        environLocal.printDebug("page Forward %d, %d" % (self.currentLeftPage, self.totalPagesScore))
         
     def pageBackward(self):           
         if self.currentLeftPage > 1:
@@ -431,7 +431,7 @@ class SFApp():
 
             self.canvas1.grid(row=1, column=0, columnspan=3, rowspan=7)         
             self.currentLeftPage -= 1    
-        environLocal.printDebug("page Backward", self.currentLeftPage, self.totalPagesScore)
+        environLocal.printDebug("page Backward %d %d" % (self.currentLeftPage, self.totalPagesScore))
             
     def goTo1stPage(self):
         self.currentLeftPage = 1
@@ -507,13 +507,13 @@ class SFApp():
             self.ScF.firstNotePage = self.beginningPages[self.currentLeftPage - 1] - 1
             if self.currentLeftPage + 1 < self.totalPagesScore:
                 self.ScF.lastNotePage = self.middlePages[self.currentLeftPage + 1] - 1
-                environLocal.printDebug("3 or more pages remaining", self.firstTimeSF, self.ScF.lastNotePage)
+                environLocal.printDebug("3 or more pages remaining %d %d" % (self.firstTimeSF, self.ScF.lastNotePage))
             elif self.currentLeftPage < self.totalPagesScore:
                 self.ScF.lastNotePage = self.beginningPages[self.currentLeftPage + 1] - 1
-                environLocal.printDebug("2 pages on the screen", self.firstTimeSF, self.ScF.lastNotePage)
+                environLocal.printDebug("2 pages on the screen %d %d" % (self.firstTimeSF, self.ScF.lastNotePage))
             else:
                 self.ScF.lastNotePage = self.beginningPages[self.currentLeftPage] - 1
-                environLocal.printDebug("only one page on the screen", self.firstTimeSF, self.ScF.lastNotePage)
+                environLocal.printDebug("only one page on the screen %d %d" % (self.firstTimeSF, self.ScF.lastNotePage))
             
             self.rt = RecordThread(self.dummyQueue, self.sampleQueue, self.ScF)            
             self.rt.daemon = True
@@ -535,7 +535,7 @@ class SFApp():
         self.rt.outQueue.get()  
         self.textVar3.set(self.lastNoteString)  
         self.ScF.firstSlot = self.beginningPages[self.currentLeftPage - 1]       
-        environLocal.printDebug("****", self.ScF.lastNotePosition, self.beginningPages[self.currentLeftPage - 1], self.currentLeftPage, self.ScF.lastNotePosition < self.beginningPages[self.currentLeftPage - 1])
+        environLocal.printDebug("**** %d %d %d %d" % (self.ScF.lastNotePosition, self.beginningPages[self.currentLeftPage - 1], self.currentLeftPage, self.ScF.lastNotePosition < self.beginningPages[self.currentLeftPage - 1]))
         if self.currentLeftPage <= self.totalPagesScore:            
             if self.ScF.lastNotePosition < self.beginningPages[self.currentLeftPage - 1] or self.ScF.lastNotePosition >= self.beginningPages[self.currentLeftPage + 1]: # case in which the musician plays a note of a not displayed page
                 pageNumber = 0

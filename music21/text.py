@@ -13,9 +13,12 @@
 '''
 
 import doctest, unittest
+import os
+
 import music21 # needed to properly do isinstance checking
 
 from music21 import environment
+
 _MOD = "text.py"  
 environLocal = environment.Environment(_MOD)
 
@@ -74,15 +77,16 @@ def assembleLyrics(streamIn, lineNumber=1):
         #environLocal.printDebug(['lyricObj', 'lyricObj.text', lyricObj.text, 'lyricObj.syllabic', lyricObj.syllabic, 'word', word])
 
         # need to match case of non-defined syllabic attribute
-        if lyricObj.syllabic in ['begin', 'middle']:
-            word.append(lyricObj.text)
-        elif lyricObj.syllabic in ['end', 'single', None]:
-            word.append(lyricObj.text)
-            #environLocal.printDebug(['word pre-join', word])
-            words.append(''.join(word))
-            word = []
-        else:
-            raise Exception('no known Text syllabic setting: %s' % lyricObj.syllabic)
+        if lyricObj.text != '_': # continuation syllable in many pieces
+            if lyricObj.syllabic in ['begin', 'middle']:
+                word.append(lyricObj.text)
+            elif lyricObj.syllabic in ['end', 'single', None]:
+                word.append(lyricObj.text)
+                #environLocal.printDebug(['word pre-join', word])
+                words.append(''.join(word))
+                word = []
+            else:
+                raise Exception('no known Text syllabic setting: %s' % lyricObj.syllabic)
     return ' '.join(words)
         
 
@@ -301,6 +305,215 @@ class TextFormat(object):
 #         return post
 
 
+class LanguageDetector(object):
+    '''
+    attempts to detect language on the basis of trigrams
+    
+    uses code from 
+    http://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
+    unknown author.  No license given.
+    
+    
+    '''
+    languageCodes = ['en', 'fr', 'it', 'de', 'cn']
+    languageLong = {'en': 'English',
+                    'fr': 'French',
+                    'it': 'Italian',
+                    'de': 'German',
+                    'cn': 'Chinese',}
+    
+    def __init__(self, text = None):
+        self.text = text
+        self.trigrams = {}
+        self.readExcerpts()
+    
+    def readExcerpts(self):
+        for languageCode in self.languageCodes:
+            pair = '  '
+            f = open(os.path.dirname(music21.languageExcerpts.__file__) + os.path.sep + languageCode + '.txt')                
+            self.trigrams[languageCode] = Trigram(f.read().split())
+            f.close()
+
+    def mostLikelyLanguage(self, excerpt):
+        '''
+        returns the code of the most likely language for a passage
+
+        >>> from music21 import *
+        >>> ld = text.LanguageDetector()
+        >>> ld.mostLikelyLanguage("Hello there, how are you doing today? I haven't seen you in a while.")
+        'en'
+        '''
+        excTrigram = Trigram(excerpt)
+        maxLang = ""
+        maxDifference = 1.0
+        for lang in self.languageCodes:
+            langDiff = self.trigrams[lang] - excTrigram
+            if langDiff < maxDifference:
+                maxLang = lang
+                maxDifference = langDiff
+        
+        return maxLang
+        
+
+    def mostLikelyLanguageNumeric(self, excerpt = None):
+        '''
+        returns a number representing the most likely language for a passage
+        or 0 if there is no text.
+        
+        Useful for feature extraction.
+        
+        The codes are the index of the language name in LanguageDetector.languageCodes + 1
+        
+        >>> ld = LanguageDetector()
+        >>> for i in range(0, len(ld.languageCodes)):
+        ...    print i+1, ld.languageCodes[i]
+        1 en
+        2 fr
+        3 it
+        4 de
+        5 cn
+        >>> numLang = ld.mostLikelyLanguageNumeric("Hello there, how are you doing today? I haven't seen you in a while.")
+        >>> numLang
+        1
+        >>> ld.languageCodes[numLang - 1]
+        'en'
+        '''
+        if excerpt is None or excerpt == "":
+            return 0
+        else:
+            langCode = self.mostLikelyLanguage(excerpt)
+            for i in range(len(self.languageCodes)):
+                if self.languageCodes[i] == langCode:
+                    return i+1
+            else:
+                raise TextException("got a language that was not in the codes; should not happen")
+
+class Trigram(object):
+    '''the frequency of three character
+    sequences is calculated.  When treated as a vector, this information
+    can be compared to other trigrams, and the difference between them
+    seen as an angle.  The cosine of this angle varies between 1 for
+    complete similarity, and 0 for utter difference.  Since letter
+    combinations are characteristic to a language, this can be used to
+    determine the language of a body of text. For example:
+
+        #>>> reference_en = Trigram('/path/to/reference/text/english')
+        #>>> reference_de = Trigram('/path/to/reference/text/german')
+        #>>> unknown = Trigram('url://pointing/to/unknown/text')
+        #>>> unknown.similarity(reference_de)
+        #0.4
+        #>>> unknown.similarity(reference_en)
+        #0.95
+    
+    would indicate the unknown text is almost cetrtainly English.  As
+    syntax sugar, the minus sign is overloaded to return the difference
+    between texts, so the above objects would give you:
+
+    #>>> unknown - reference_de
+    #0.6
+    #>>> reference_en - unknown    # order doesn't matter.
+    #0.05
+
+    As it stands, the Trigram ignores character set information, which
+    means you can only accurately compare within a single encoding
+    (iso-8859-1 in the examples).  A more complete implementation might
+    convert to unicode first.
+
+    As an extra bonus, there is a method to make up nonsense words in the
+    style of the Trigram's text.
+
+    #>>> reference_en.makeWords(30)
+    My withillonquiver and ald, by now wittlectionsurper, may sequia,
+    tory, I ad my notter. Marriusbabilly She lady for rachalle spen
+    hat knong al elf
+    '''    
+
+    def __init__(self, excerptList = None):
+        self.lut = {}
+        if excerptList is not None:
+            self.parseExcerpt(excerptList)
+
+    
+    def parseExcerpt(self, excerpt):
+        pair = u'  '
+        if isinstance(excerpt, list):
+            for line in excerpt:
+                for letter in line.strip() + u' ':
+                    d = self.lut.setdefault(pair, {})
+                    d[letter] = d.get(letter, 0) + 1
+                    pair = pair[1] + letter
+        else:
+            for letter in excerpt:
+                d = self.lut.setdefault(pair, {})
+                d[letter] = d.get(letter, 0) + 1
+                pair = pair[1] + letter
+        self.measure()
+    
+    def measure(self):
+        """calculates the scalar length of the trigram vector and
+        stores it in self.length."""
+        total = 0
+        for y in self.lut.values():
+            total += sum([ x * x for x in y.values() ])
+        self.length = total ** 0.5
+
+    def similarity(self, other):
+        """
+        returns a number between 0 and 1 indicating similarity between
+        two trigrams.
+        1 means an identical ratio of trigrams;
+        0 means no trigrams in common.
+        """
+        if not isinstance(other, Trigram):
+            raise TypeError("can't compare Trigram with non-Trigram")
+        lut1 = self.lut
+        lut2 = other.lut
+        total = 0
+        for k in lut1:
+            if k in lut2:
+                a = lut1[k]
+                b = lut2[k]
+                for x in a:
+                    if x in b:
+                        total += a[x] * b[x]
+
+        return float(total) / (self.length * other.length)
+
+    def __sub__(self, other):
+        """indicates difference between trigram sets; 1 is entirely
+        different, 0 is entirely the same."""
+        return 1 - self.similarity(other)
+
+    def makeWords(self, count):
+        """returns a string of made-up words based on the known text."""
+        text = []
+        k = '  '
+        while count:
+            n = self.likely(k)
+            text.append(n)
+            k = k[1] + n
+            if n in ' \t':
+                count -= 1
+        return ''.join(text)
+
+
+    def likely(self, k):
+        """Returns a character likely to follow the given string
+        two character string, or a space if nothing is found."""
+        if k not in self.lut:
+            return ' '
+        # if you were using this a lot, caching would a good idea.
+        letters = []
+        for k, v in self.lut[k].items():
+            letters.append(k * v)
+        letters = ''.join(letters)
+        return random.choice(letters)
+
+#---------------------------------------
+class TextException(music21.Music21Exception):
+    pass
+
+
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
@@ -338,6 +551,26 @@ class Test(unittest.TestCase):
         self.assertEqual(post, 'aristocrats are great')
 
 
+    def testLanguageDetector(self):
+        from music21 import corpus
+        ld = LanguageDetector()
+        ld.trigrams
+        #print ld.trigrams['fr'] - ld.trigrams['it'] 
+        #print ld.trigrams['fr'] - ld.trigrams['de'] 
+        #print ld.trigrams['fr'] - ld.trigrams['cn'] 
+        
+        self.assertTrue(0.50 < ld.trigrams['fr'] - ld.trigrams['it'] < 0.55)
+        self.assertTrue(0.67 < ld.trigrams['fr'] - ld.trigrams['de'] < 0.70)
+        self.assertTrue(0.99 < ld.trigrams['fr'] - ld.trigrams['cn'] < 1.0)
+        
+        self.assertEqual('en', ld.mostLikelyLanguage(u"hello friends, this is a test of the ability of language detector to tell what language I am writing in."))
+        self.assertEqual('it', ld.mostLikelyLanguage(u"ciao amici! così trovo in quale lingua ho scritto questo passaggio. Spero che troverò che è stata scritta in italiano"))
+
+        messiahGovernment = corpus.parse('handel/hwv56/movement1-13.md')
+        forUntoUs = assembleLyrics(messiahGovernment)
+        self.assertTrue(forUntoUs.startswith('For unto us a child is born'))
+        forUntoUs = forUntoUs.replace('_', '')
+        self.assertEqual('en', ld.mostLikelyLanguage(forUntoUs))
 
 if __name__ == "__main__":
     music21.mainTest(Test)

@@ -471,6 +471,10 @@ class StreamForms(object):
                     post.append(bundle)
             self._forms['secondsMap'] = post
             return self._forms['secondsMap']
+
+        elif key in ['assembledLyrics']:
+            self._forms['assembledLyrics'] = music21.text.assembleLyrics(self._base)
+            return self._forms['assembledLyrics']
         
         else:
             raise AttributeError('no such attribute: %s' % key)

@@ -48,6 +48,7 @@ __all__ = ['base',
            'composition', 'configure',
            'counterpoint', 'corpus', 
            'demos', 'doc', 'figuredBass', 'humdrum', 'harmony', 
+           'languageExcerpts',
            'lily', 'musicxml', 
            'noteworthy','romanText', 'test', 'trecento', 'midi', 
            
