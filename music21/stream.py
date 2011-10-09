@@ -4189,7 +4189,8 @@ class Stream(music21.Music21Object):
 
 
     def chordify(self, addTies=True, displayTiedAccidentals=False, 
-        addPartIdAsGroup=False, removeRedundantPitches=True):
+        addPartIdAsGroup=False, removeRedundantPitches=True, 
+        toSoundingPitch=True):
         '''
         Create a chordal reduction of polyphonic music, where each change to a new pitch results in a new chord. If a Score or Part of Measures is provided, a Stream of Measures will be returned. If a flat Stream of notes, or a Score of such Streams is provided, no Measures will be returned. 
 
@@ -4199,6 +4200,8 @@ class Stream(music21.Music21Object):
         If `addPartIdAsGroup` is True, all elements found in the Stream will have their source Part id added to the element's Group. 
 
         The `addTies` parameter currently does not work for pitches in Chords.
+
+        If `toSoundingPitch` is True, all parts that define one or more transpositions will be transposed to sounding pitch before chordification. True by default. 
         
         '''
         # TODO: need to handle flat Streams contained in a Stream   
@@ -4211,6 +4214,8 @@ class Stream(music21.Music21Object):
             transferGroupsToPitches = True
 
         returnObj = deepcopy(self)
+        if toSoundingPitch:
+            returnObj.toSoundingPitch(inPlace=True)
 
         if returnObj.hasPartLikeStreams():
             allParts = returnObj.getElementsByClass('Stream')

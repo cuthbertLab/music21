@@ -4227,6 +4227,10 @@ spirit</words>
         self.assertEqual(str([p for p in sSounding.parts[0].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
         self.assertEqual(str([p for p in sSounding.parts[1].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
         self.assertEqual(str([p for p in sSounding.parts[2].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
+
+        # chordification by default places notes at sounding pitch
+        sChords = s.chordify()
+        self.assertEqual(str([p for p in sChords.flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
         
 
     def testHarmonyA(self):
