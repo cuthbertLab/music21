@@ -3153,6 +3153,8 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
         spannerBundle = spanner.SpannerBundle()
 
     mxPart = mxScore.getPart(partId)
+    # in some cases there may be more than one instrument defined
+    # in each score part; this has not been tested
     mxInstrument = mxScore.getScorePart(partId)
 
     # create a new music21 instrument
@@ -3177,15 +3179,27 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     # offset is in quarter note length
     oMeasure = 0.0
     lastTimeSignature = None
-    for mxMeasure in mxPart:
+    lastTransposition = None # may change at measure boundaries
+
+    for i, mxMeasure in enumerate(mxPart):
         # t here is transposition, if defined; otherwise it is None
         m, staffReference, t = mxToMeasure(mxMeasure, 
                                spannerBundle=spannerBundle)
         if t is not None:
-            instrumentObj.transposition = t
+            if lastTransposition is None and i == 0: # if this is the first
+                #environLocal.printDebug(['transposition', t])
+                instrumentObj.transposition = t
+            else: # if not the first measure, need to copy as well
+                # for now, copy Instrument, change transposition, 
+                # could insert in part, or in measure
+                newInst = copy.deepcopy(instrumentObj)
+                newInst.transposition = t
+                streamPart._insertCore(oMeasure, newInst)
             # if a transposition is defined in musicxml, we assume it is
             # at written pitch
             streamPart.atSoundingPitch = False
+            # store last for comparison
+            lastTransposition = t
 
         # there will be one for each measure
         staffReferenceList.append(staffReference)
@@ -4175,6 +4189,45 @@ spirit</words>
         self.assertEqual(raw.find('<diatonic>-1</diatonic>') > 0, True)
         self.assertEqual(raw.find('<chromatic>-2</chromatic>') > 0, True)
 
+
+    def testInstrumentTranspositionB(self):
+
+        from music21.musicxml import testPrimitive        
+        from music21 import converter
+
+        s = converter.parse(testPrimitive.transposing01)
+        # should be 2
+        iStream1 = s.parts[0].flat.getElementsByClass('Instrument')
+        # three instruments; one initial, and then one for each transposition
+        self.assertEqual(len(iStream1), 3)
+        # should be 3
+        iStream2 = s.parts[1].flat.getElementsByClass('Instrument')
+        self.assertEqual(len(iStream2), 3)
+        i2 = iStream2[0]
+
+        iStream3 = s.parts[2].flat.getElementsByClass('Instrument')
+        self.assertEqual(len(iStream3), 1)
+        i3 = iStream3[0]
+
+
+        self.assertEqual(str(iStream1[0].transposition), 'None')
+        self.assertEqual(str(iStream1[1].transposition), '<music21.interval.Interval P-5>')
+        self.assertEqual(str(iStream1[2].transposition), '<music21.interval.Interval P1>')
+
+        self.assertEqual(str(iStream2[0].transposition), '<music21.interval.Interval M-2>')
+        self.assertEqual(str(iStream2[1].transposition), '<music21.interval.Interval m3>')
+
+        self.assertEqual(str(i3.transposition), '<music21.interval.Interval P-5>')
+
+        self.assertEqual(str([p for p in s.parts[0].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, A4, A4, A4, A4]')
+        self.assertEqual(str([p for p in s.parts[1].flat.pitches]), '[B4, B4, B4, B4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, B4, B4, B4, B4, B4, B4]')
+        self.assertEqual(str([p for p in s.parts[2].flat.pitches]), '[E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5]')
+
+        sSounding = s.toSoundingPitch(inPlace=False)
+        self.assertEqual(str([p for p in sSounding.parts[0].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
+        self.assertEqual(str([p for p in sSounding.parts[1].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
+        self.assertEqual(str([p for p in sSounding.parts[2].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
+        
 
     def testHarmonyA(self):
 
