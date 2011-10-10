@@ -3462,7 +3462,9 @@ class Stream(music21.Music21Object):
         return post
         
 
-    def getInstrument(self, searchActiveSite=True, returnDefault=True):
+
+
+    def getInstruments(self, searchActiveSite=True, returnDefault=True):
         '''
         Search this stream or activeSite streams for 
         :class:`~music21.instrument.Instrument` objects, otherwise 
@@ -3502,12 +3504,15 @@ class Stream(music21.Music21Object):
         else:
             if searchActiveSite:
                 #if isinstance(self.activeSite, Stream) and self.activeSite != self:
-                if self.activeSite is not None and self.activeSite.isStream and self.activeSite is not self:
+                if (self.activeSite is not None and self.activeSite.isStream and 
+                    self.activeSite is not self):
                     #environLocal.printDebug(['searching activeSite Stream', 
                     #    self, self.activeSite])
                     instObj = self.activeSite.getInstrument(
                               searchActiveSite=searchActiveSite, 
                               returnDefault=False) 
+                    if instObj is not None:
+                        post.insert(0, instObj)
 
         # if still not defined, get default
         if returnDefault and instObj is None:
@@ -3515,10 +3520,21 @@ class Stream(music21.Music21Object):
             # now set with .mx call
             #instObj.partId = defaults.partId # give a default id
             instObj.partName = defaults.partName # give a default id
+            post.insert(0, instObj)
 
-        # may return None
-        return instObj
+        # returns a Stream
+        return post
 
+
+    def getInstrument(self, searchActiveSite=True, returnDefault=True):
+        '''Return the first Instrument found in this Stream. 
+        '''
+        post = self.getInstruments(searchActiveSite=searchActiveSite,
+                                returnDefault=returnDefault)
+        if len(post) > 0:
+            return post[0]
+        else:
+            return None
 
 
     def bestClef(self, allowTreble8vb = False):
@@ -4214,13 +4230,17 @@ class Stream(music21.Music21Object):
             transferGroupsToPitches = True
 
         returnObj = deepcopy(self)
-        if toSoundingPitch:
-            returnObj.toSoundingPitch(inPlace=True)
 
         if returnObj.hasPartLikeStreams():
             allParts = returnObj.getElementsByClass('Stream')
         else: # simulate a list of Streams
             allParts = [returnObj]
+
+        if toSoundingPitch:
+            environLocal.printDebug(['at sounding pitch',     
+                allParts[0].atSoundingPitch])
+            if allParts[0].atSoundingPitch == False: # if false
+                returnObj.toSoundingPitch(inPlace=True)
 
         mStream = allParts[0].getElementsByClass('Measure')
         mCount = len(mStream)
@@ -7814,7 +7834,7 @@ class Stream(music21.Music21Object):
 
 
     #---------------------------------------------------------------------------
-    def _getMXPart(self, instObj=None, meterStream=None, 
+    def _getMXPart(self, instStream=None, meterStream=None, 
         refStreamOrTimeRange=None):
         '''If there are Measures within this stream, use them to create and
         return an MX Part and ScorePart. 
@@ -7830,7 +7850,7 @@ class Stream(music21.Music21Object):
         # Stream.
 
         # pass self as Stream to use
-        return musicxmlTranslate.streamPartToMx(self, instObj=instObj,
+        return musicxmlTranslate.streamPartToMx(self, instStream=instStream,
             meterStream=meterStream, refStreamOrTimeRange=refStreamOrTimeRange)
 
 

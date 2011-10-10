@@ -2799,7 +2799,7 @@ def measureToMusicXML(m):
 # Streams
 
 
-def streamPartToMx(part, instObj=None, meterStream=None,
+def streamPartToMx(part, instStream=None, meterStream=None,
                    refStreamOrTimeRange=None, spannerBundle=None):
     '''
     If there are Measures within this stream, use them to create and
@@ -2818,21 +2818,23 @@ def streamPartToMx(part, instObj=None, meterStream=None,
     #environLocal.printDebug(['calling Stream._getMXPart'])
     # note: meterStream may have TimeSignature objects from an unrelated
     # Stream.
-    if instObj is None:
+    if instStream is None:
         # see if an instrument is defined in this or a parent stream
         instObj = part.getInstrument()
+    else:
+        instObj = instStream[0]
+
     # must set a unique part id, if not already assigned
     if instObj.partId == None:
         instObj.partIdRandomize()
 
     #environLocal.printDebug(['calling Stream._getMXPart', repr(instObj), instObj.partId])
+    mxTranspose = None   
     if part.atSoundingPitch in [False]:
         # if not at sounding pitch, encode transposition from instrument
-        if instObj.transposition is None:
-            raise TranslateException('cannot get transposition for a part that is not at sounding pitch.')
-        mxTranspose = intervalToMXTranspose(instObj.transposition)
-    else:
-        mxTranspose = None   
+        if instObj.transposition is not None:
+            mxTranspose = intervalToMXTranspose(instObj.transposition)
+            #raise TranslateException('cannot get transposition for a part that is not at sounding pitch.')
     # instrument object returns a configured mxScorePart, that may
     # also include midi or score instrument definitions
     #mxScorePart = instObj.mx
@@ -3001,7 +3003,8 @@ def streamToMx(s, spannerBundle=None):
 
             # only things that can be treated as parts are in finalStream
             # get a default instrument if not assigned
-            inst = obj.getInstrument(returnDefault=True)
+            instStream = obj.getInstruments(returnDefault=True)
+            inst = instStream[0] # store first, as handled differently
             instIdList = [x.partId for x in instList]
 
             if inst.partId in instIdList: # must have unique ids 
@@ -3011,7 +3014,6 @@ def streamToMx(s, spannerBundle=None):
                 inst.midiChannel in midiChannelList):
                 inst.autoAssignMidiChannel(usedChannels=midiChannelList)
             midiChannelList.append(inst.midiChannel)
-
             #environLocal.printDebug(['midiChannel list', midiChannelList])
 
             # add to list for checking on next round
@@ -3020,7 +3022,7 @@ def streamToMx(s, spannerBundle=None):
             # force this instrument into this part
             # meterStream is only used here if there are no measures
             # defined in this part
-            mxScorePart, mxPart = streamPartToMx(obj, instObj=inst, 
+            mxScorePart, mxPart = streamPartToMx(obj, instStream=instStream, 
                         meterStream=meterStream, 
                         refStreamOrTimeRange=refStreamOrTimeRange, 
                         spannerBundle=spannerBundle)
@@ -4231,7 +4233,21 @@ spirit</words>
         # chordification by default places notes at sounding pitch
         sChords = s.chordify()
         self.assertEqual(str([p for p in sChords.flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
+
         
+
+    def testInstrumentTranspositionC(self):
+        # generate all transpositions on output
+        from music21 import converter, stream
+        from music21.musicxml import testPrimitive        
+
+        s = converter.parse(testPrimitive.transposing01)
+
+        self.assertEqual(len(s.flat.getElementsByClass('Instrument')), 7)
+
+        raw = s.musicxml
+
+
 
     def testHarmonyA(self):
 
