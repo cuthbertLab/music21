@@ -3330,7 +3330,8 @@ class Stream(music21.Music21Object):
         ''')
 
 
-    def _transposeByInstrument(self, reverse=False, inPlace=True):
+    def _transposeByInstrument(self, reverse=False, inPlace=True, 
+        transposeKeySignature=True):
         '''If reverse is False, the transposition will happen in the direction opposite of what is specified by the Instrument
         '''
         if not inPlace: # make a copy
@@ -3351,6 +3352,12 @@ class Stream(music21.Music21Object):
                 end = start + i.duration.quarterLength
                 boundaries[(start, end)] = i
 
+        # store class filter list for transposition
+        if transposeKeySignature:
+            classFilterList = ['Note', 'Chord', 'KeySignature']
+        else:
+            classFilterList = ['Note', 'Chord']
+
         for key in boundaries.keys():
             start, end = key
             i = boundaries[key]
@@ -3361,9 +3368,11 @@ class Stream(music21.Music21Object):
                 trans = i.transposition
                 if reverse:
                     transInvert = trans.reverse()
-                    focus.transpose(transInvert, inPlace=True)
+                    focus.transpose(transInvert, inPlace=True, 
+                                    classFilterList=classFilterList)
                 else:
-                    focus.transpose(trans, inPlace=True)
+                    focus.transpose(trans, inPlace=True, 
+                                    classFilterList=classFilterList)
             #print key, i.transposition
         return returnObj
 

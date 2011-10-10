@@ -4198,9 +4198,8 @@ spirit</words>
 
         from music21.musicxml import testPrimitive        
         from music21 import converter
-
+        
         s = converter.parse(testPrimitive.transposing01)
-        # should be 2
         iStream1 = s.parts[0].flat.getElementsByClass('Instrument')
         # three instruments; one initial, and then one for each transposition
         self.assertEqual(len(iStream1), 3)
@@ -4208,34 +4207,34 @@ spirit</words>
         iStream2 = s.parts[1].flat.getElementsByClass('Instrument')
         self.assertEqual(len(iStream2), 3)
         i2 = iStream2[0]
-
+        
         iStream3 = s.parts[2].flat.getElementsByClass('Instrument')
         self.assertEqual(len(iStream3), 1)
         i3 = iStream3[0]
-
-
+        
+        
         self.assertEqual(str(iStream1[0].transposition), 'None')
         self.assertEqual(str(iStream1[1].transposition), '<music21.interval.Interval P-5>')
         self.assertEqual(str(iStream1[2].transposition), '<music21.interval.Interval P1>')
-
+        
         self.assertEqual(str(iStream2[0].transposition), '<music21.interval.Interval M-2>')
         self.assertEqual(str(iStream2[1].transposition), '<music21.interval.Interval m3>')
-
+        
         self.assertEqual(str(i3.transposition), '<music21.interval.Interval P-5>')
-
+        
         self.assertEqual(str([p for p in s.parts[0].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, A4, A4, A4, A4]')
         self.assertEqual(str([p for p in s.parts[1].flat.pitches]), '[B4, B4, B4, B4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, B4, B4, B4, B4, B4, B4]')
         self.assertEqual(str([p for p in s.parts[2].flat.pitches]), '[E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5]')
-
+        
         sSounding = s.toSoundingPitch(inPlace=False)
         self.assertEqual(str([p for p in sSounding.parts[0].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
         self.assertEqual(str([p for p in sSounding.parts[1].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
         self.assertEqual(str([p for p in sSounding.parts[2].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
-
+        
         # chordification by default places notes at sounding pitch
         sChords = s.chordify()
         self.assertEqual(str([p for p in sChords.flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
-
+        #sChords.show()
         
 
     def testInstrumentTranspositionC(self):
