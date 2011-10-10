@@ -2821,23 +2821,14 @@ def streamPartToMx(part, instStream=None, meterStream=None,
     if instStream is None:
         # see if an instrument is defined in this or a parent stream
         instObj = part.getInstrument()
+        instStream = stream.Stream()
+        instStream.insert(0, instObj) # create for storage
     else:
         instObj = instStream[0]
-
     # must set a unique part id, if not already assigned
     if instObj.partId == None:
         instObj.partIdRandomize()
-
-    #environLocal.printDebug(['calling Stream._getMXPart', repr(instObj), instObj.partId])
-    mxTranspose = None   
-    if part.atSoundingPitch in [False]:
-        # if not at sounding pitch, encode transposition from instrument
-        if instObj.transposition is not None:
-            mxTranspose = intervalToMXTranspose(instObj.transposition)
-            #raise TranslateException('cannot get transposition for a part that is not at sounding pitch.')
-    # instrument object returns a configured mxScorePart, that may
-    # also include midi or score instrument definitions
-    #mxScorePart = instObj.mx
+    # returns an mxScorePart
     mxScorePart = instrumentToMx(instObj)
     #environLocal.printDebug(['calling Stream._getMXPart', 'mxScorePart', mxScorePart, mxScorePart.get('id')])
 
@@ -2898,13 +2889,24 @@ def streamPartToMx(part, instStream=None, meterStream=None,
 
 
     # for each measure, call .mx to get the musicxml representation
-    for i, obj in enumerate(measureStream):
-        # note: assuming constant transposition
-        if i == 0: # just keep transpose for first measure
-            mxPart.append(measureToMx(obj, spannerBundle=spannerBundle, 
-                     mxTranspose=mxTranspose))
-        else:
-            mxPart.append(measureToMx(obj, spannerBundle=spannerBundle))
+    for obj in measureStream:
+        # get instrument for every measure position
+        moStart = obj.getOffsetBySite(measureStream)
+        instSubStream = instStream.getElementsByOffset(moStart, 
+                         moStart+obj.duration.quarterLength, 
+                         includeEndBoundary=False)
+        mxTranspose = None   
+        if len(instSubStream) > 0:
+            instSubObj = instSubStream[0]
+            if part.atSoundingPitch in [False]:
+                # if not at sounding pitch, encode transposition from instrument
+                if instSubObj.transposition is not None:
+                    mxTranspose = intervalToMXTranspose(
+                                    instSubObj.transposition)
+                    #raise TranslateException('cannot get transposition for a part that is not at sounding pitch.')
+            
+        mxPart.append(measureToMx(obj, spannerBundle=spannerBundle, 
+                 mxTranspose=mxTranspose))
 
     # might to post processing after adding all measures to the Stream
     # TODO: need to find all MetricModulations and updateByContext
@@ -4244,9 +4246,10 @@ spirit</words>
         s = converter.parse(testPrimitive.transposing01)
 
         self.assertEqual(len(s.flat.getElementsByClass('Instrument')), 7)
+        #s.show()
 
         raw = s.musicxml
-
+        self.assertEqual(raw.count('<transpose>'), 6)
 
 
     def testHarmonyA(self):
