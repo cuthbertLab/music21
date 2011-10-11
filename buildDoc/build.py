@@ -111,6 +111,8 @@ from music21 import spanner
 from music21 import stream
 
 from music21 import tempo
+from music21 import volume
+
 from music21 import tinyNotation
 from music21 import xmlnode
 
@@ -226,6 +228,7 @@ MODULES = [
 
     trecentoPolyphonicSnippet,
 
+    volume,
     xmlnode, 
 
     

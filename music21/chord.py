@@ -847,7 +847,31 @@ class Chord(note.NotRest):
     # volume per pitch 
 
     def hasComponentVolumes(self):
-        '''Utility method to determine if this object has component volumes, or Volume objets assigned to each note-component.
+        '''Utility method to determine if this object has component :class:`~music21.volume.Volume` objects assigned to each note-component.
+
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c4', 'd-1', 'g6'])
+        >>> c1.volume = [60, 20, 120]
+        >>> [n.volume.velocity for n in c1]
+        [60, 20, 120]
+        >>> c1.hasComponentVolumes()
+        True
+        >>> c2 = chord.Chord(['c4', 'd-1', 'g6'])
+        >>> c2.volume.velocity = 23
+        >>> c2.hasComponentVolumes()
+        False
+
+        >>> c3 = chord.Chord(['c4', 'd-1', 'g6'])
+        >>> c3.volume = [.2, .5, .8]
+        >>> [n.volume.velocity for n in c3]
+        [25, 64, 102]
+
+        >>> c4 = chord.Chord(['c4', 'd-1', 'g6'])
+        >>> c4.volume = 89
+        >>> c4.volume.velocity      
+        89
+        >>> c4.hasComponentVolumes()
+        False
         '''
         count = 0
         for c in self._components:
@@ -896,12 +920,24 @@ class Chord(note.NotRest):
 #                 # if we set c.volume, the parent of volume will be the Note
 #                 # parent needs to be set to the chord
 #                 value.parent = self
-#                 c._setVolume(value, setParent=False)                
+#                 c._setVolume(value, setParent=False) 
+        elif common.isNum(value):
+            vol = self._getVolume()
+            if value < 1: # assume a scalar
+                vol.velocityScalar = value                        
+            else: # assume velocity
+                vol.velocity = value
+
         elif common.isListLike(value): # assume an array of vol objects
             # if setting components, remove single velocity 
             self._volume = None
             for i, c in enumerate(self._components):
                 v = value[i%len(value)]
+                if common.isNum(v): # create a new Volume
+                    if v < 1: # assume a scalar
+                        v = volume.Volume(velocityScalar=v)                        
+                    else: # assume velocity
+                        v = volume.Volume(velocity=v)
                 v.parent = self
                 c._setVolume(v, setParent=False)
         else:
@@ -922,7 +958,7 @@ class Chord(note.NotRest):
 
         
     volume = property(_getVolume, _setVolume, doc='''
-        When setting the .volume property, all pitches are set to the same Volume object. 
+        Get or set the :class:`~music21.volume.Volume` object for this Chord. When setting the .volume property, all pitches are treated as having the same Volume object. 
 
         >>> from music21 import *
         >>> c = chord.Chord(['g#', 'd-'])
@@ -947,7 +983,7 @@ class Chord(note.NotRest):
         
 
     def getVolume(self, p):
-        '''For a given Pitch in this Chord, return the Volume      
+        '''For a given Pitch in this Chord, return the :class:`~music21.volume.Volume` object.      
         '''
         # NOTE: pitch matching is potentially problematic if we have more than
         # one of the same pitch
@@ -973,7 +1009,7 @@ class Chord(note.NotRest):
 
 
     def setVolume(self, vol, pitchTarget=None):
-        '''Set the volume object of a specific pitch target. If no pitch target is given, the first pitch is used. 
+        '''Set the :class:`~music21.volume.Volume` object of a specific pitch target. If no pitch target is given, the first pitch is used. 
 
         >>> from music21 import *
         '''

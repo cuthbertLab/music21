@@ -684,20 +684,40 @@ class NotRest(GeneralNote):
                 self._volume = volume.Volume(parent=forceParent)
         return self._volume
 
-    def _setVolume(self, volumeObj, setParent=True):
+    def _setVolume(self, value, setParent=True):
         # setParent is only False when Chords bundling Notes
         # test by looking for method
-        if hasattr(volumeObj, "getDynamicContext"):
+        if hasattr(value, "getDynamicContext"):
             if setParent:
-                if volumeObj.parent is not None:
-                    raise NotRestException('cannot set a volume object that has a defined parent: %s' % volumeObj.parent)
-                volumeObj.parent = self # set to self
-            self._volume = volumeObj
+                if value.parent is not None:
+                    raise NotRestException('cannot set a volume object that has a defined parent: %s' % value.parent)
+                value.parent = self # set to self
+            self._volume = value
+        elif common.isNum(value) and setParent:
+            # if we can define the parent, we can set from numbers
+            # call local getVolume will set parent appropriately
+            vol = self._getVolume()
+            if value < 1: # assume a scalar
+                vol.velocityScalar = value                        
+            else: # assume velocity
+                vol.velocity = value
+            self._volume = vol
+  
         else:
-            raise Exception('this must be a Volume object, not %s' % volumeObj)
+            raise Exception('this must be a Volume object, not %s' % value)
 
     volume = property(_getVolume, _setVolume, 
-        doc = '''Get and set the volume of this object as a Volume object.
+        doc = '''Get and set the :class:`~music21.volume.Volume` object of this object. Volume objects are created on demand.
+
+        >>> from music21 import *
+        >>> n1 = note.Note()
+        >>> n1.volume.velocity = 120
+        >>> n2 = note.Note()
+        >>> n2.volume = 80 # can directly set a velocity value
+        >>> s = stream.Stream()
+        >>> s.append([n1, n2])
+        >>> [n.volume.velocity for n in s.notes]
+        [120, 80]
         ''')
 
 

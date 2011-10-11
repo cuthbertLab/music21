@@ -88,7 +88,7 @@ def writeManifestTemplate(fpPackageDir):
     msg = []
     
     # when changing this list, also need to update common.getPackageData()
-    msg.append('global-include *.py *.txt *.xml *.krn *.mxl *.pdf *.html *.css *.js *.png *.tiff *.jpg *.xls *.mid *.abc *.json *.md *.zip *.rntxt *.command *.scl *.nwctxt \n')
+    msg.append('global-include *.py *.txt *.xml *.krn *.mxl *.pdf *.html *.css *.js *.png *.tiff *.jpg *.xls *.mid *.abc *.json *.md *.zip *.rntxt *.command *.scl *.nwctxt *.wav \n')
     # order matters: remove dist and buildDoc directories after global include
     # adding .py to this list gets the obsolete dir
 

@@ -114,6 +114,7 @@ Module Reference
    moduleTempo
    moduleTinyNotation
    moduleTrecentoPolyphonicSnippet
+   moduleVolume
    moduleXmlnode
 
 
