@@ -701,7 +701,6 @@ class NotRest(GeneralNote):
                 vol.velocityScalar = value                        
             else: # assume velocity
                 vol.velocity = value
-            self._volume = vol
   
         else:
             raise Exception('this must be a Volume object, not %s' % value)

@@ -140,7 +140,7 @@ if __name__ == '__main__':
     import sys
     d = Distributor()
     d.build()
-    #d.upload()
+    d.upload()
 
 
 
