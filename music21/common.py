@@ -1273,16 +1273,14 @@ def getPackageData():
     # include these extensions for all directories, even if they are not normally there.
     # also need to update writeManifestTemplate() in setup.py when adding
     # new file extensions
-    ext = ['txt', 'xml', 'krn', 'mxl', 'html', 'png', 
-           'css', 'js', 'pdf', 'xls', 'mid', 'abc', 'json', 'md', 
-           'zip', 'rntxt', 'command', 'scl', 'nwctxt']
+    ext = ['txt', 'xml', 'krn', 'mxl', 'pdf', 'html', 
+           'css', 'js', 'png', 'tiff', 'jpg', 'xls', 'mid', 'abc', 'json', 'md', 
+           'zip', 'rntxt', 'command', 'scl', 'nwctxt', 'wav']
 
     # need all dirs, not just packages, and relative to music21
     fpList = getPackageDir(fpMusic21=None, relative=True, remapSep=None,
                             packageOnly=False)
-
     stub = 'music21%s' % os.sep
-
     match = []
     for fp in fpList:
         # these are relative to music21 package, so remove music21
@@ -1290,7 +1288,6 @@ def getPackageData():
             continue
         elif fp.startswith(stub):
             fp = fp[fp.find(stub)+len(stub):]
-
         for e in ext:
             target = fp + os.sep + '*.%s' % e
             match.append(target)
