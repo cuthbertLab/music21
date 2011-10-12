@@ -540,7 +540,7 @@ class ConverterMusicXML(object):
                 #environLocal.printDebug(['pickled file version is compatible', c.score.m21Version])
             else:
                 try:
-                    environLocal.printDebug(['pickled file version (%s) is not compatible' % c.score.m21Version])
+                    environLocal.printDebug(['pickled file version is not compatible' , c.score.m21Version])
                 except AttributeError:
                     # some old pickles have no versions
                     pass
