@@ -1090,7 +1090,7 @@ def extractorsById(idOrList, library=['jSymbolic', 'native']):
     
     >>> y = [x.id for x in features.extractorsById('all')]
     >>> y[0:3], y[-3:-1]
-    (['M1', 'M2', 'M3'], ['CS11', 'MD1'])
+    (['M1', 'M2', 'M3'], ['MD1', 'MC1'])
 
     '''
     from music21.features import jSymbolic

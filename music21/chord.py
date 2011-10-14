@@ -1379,9 +1379,21 @@ class Chord(note.NotRest):
         >>> c = chord.Chord(['a', 'c', 'e'])
         >>> c.duration
         <music21.duration.Duration 1.0>
+        
+        
+        Durations can be overridden after the fact:
+        
+        
         >>> d = duration.Duration()
         >>> d.quarterLength = 2
         >>> c.duration = d
+        >>> c.duration
+        <music21.duration.Duration 2.0>
+        >>> c.duration == d
+        True
+        >>> c.duration is d
+        True
+        
         ''')
 
     def _getScaleDegrees(self):
@@ -2897,16 +2909,7 @@ class Chord(note.NotRest):
 
 
     def _getForteClass(self):
-        '''Return a forte class name
-
-        >>> from music21 import *
-        >>> c1 = chord.Chord(['c', 'e-', 'g'])
-        >>> c1.forteClass
-        '3-11A'
-
-        >>> c2 = chord.Chord(['c', 'e', 'g'])
-        >>> c2.forteClass
-        '3-11B'
+        '''Return a forte class name w/ inversions represented distinctly (Tn space)
         '''
         self._updateChordTablesAddress()
         return chordTables.addressToForteName(self._chordTablesAddress, 'tn')
@@ -2914,16 +2917,30 @@ class Chord(note.NotRest):
     forteClass = property(_getForteClass, 
         doc = '''Return the Forte set class name as a string. This assumes a Tn formation, where inversion distinctions are represented. 
 
+        (synonym: forteClassTn)
+
         >>> from music21 import *
+        
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
+        >>> c1.forteClass
+        '3-11A'
+        
         >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.forteClass
         '3-11B'
         ''')    
 
     forteClassTn = property(_getForteClass, 
-        doc = '''Return the Forte Tn set class name, where inversion distinctions are represented.
+        doc = '''
+        A synonym for "forteClass"
+        
+        Return the Forte Tn set class name, where inversion distinctions are represented.
 
         >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
+        >>> c1.forteClass
+        '3-11A'
+
         >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.forteClassTn
         '3-11B'

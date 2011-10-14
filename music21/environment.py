@@ -304,7 +304,11 @@ class Environment(object):
             return os.path.join(dir, 'music21-settings.xml')
         elif platform in ['nix', 'darwin']:
             # alt : os.path.expanduser('~') 
-            dir = os.environ['HOME']
+            if 'HOME' in os.environ.keys(): # might not exist if running as nobody in a webserver...
+                dir = os.environ['HOME']
+            else:
+                dir = '/tmp/'
+            
             return os.path.join(dir, '.music21rc')
 
         # darwin specific option

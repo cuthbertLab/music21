@@ -106,7 +106,7 @@ class IntervalException(Exception):
 def convertStaffDistanceToInterval(staffDist):
     '''
     Returns an integer of the generic interval number 
-    (P5 = 5, M3 = 3) etc. from the given staff distance.
+    (P5 = 5, M3 = 3, minor 3 = 3 also) etc. from the given staff distance.
 
     >>> from music21 import *
     >>> interval.convertStaffDistanceToInterval(3)

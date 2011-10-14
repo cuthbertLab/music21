@@ -3221,7 +3221,7 @@ class Music21Object(JSONSerializer):
         >>> n.quarterLength = 3
         >>> post = n.splitByQuarterLengths([1,1,1])
         >>> [n.quarterLength for n in post]
-        [1, 1, 1]
+        [1.0, 1.0, 1.0]
         '''
         if self.duration == None:
             raise Music21ObjectException('cannot split an element that has a Duration of None')

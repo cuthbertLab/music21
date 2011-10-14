@@ -821,7 +821,9 @@ class DateSelection(DateSingle):
 
 #-------------------------------------------------------------------------------
 class Contributor(music21.JSONSerializer):
-    '''A person that contributed to a work. Can be a composer, lyricist, arranger, or other type of contributor. In MusicXML, these are "creator" elements.  
+    '''A person that contributed to a work. Can be a composer, lyricist, 
+    arranger, or other type of contributor. 
+    In MusicXML, these are "creator" elements.  
     '''
     relevance = 'contributor'
 
@@ -873,7 +875,9 @@ class Contributor(music21.JSONSerializer):
             raise MetadataException('role value is not supported by this object: %s' % value)
 
     role = property(_getRole, _setRole, 
-        doc = '''The role is what part this Contributor plays in the work. Both full roll strings and roll abbreviations may be used.
+        doc = '''
+        The role is what part this Contributor plays in the work. 
+        Both full roll strings and roll abbreviations may be used.
 
         >>> td = Contributor()
         >>> td.role = 'composer'
@@ -1093,11 +1097,15 @@ class Copyright(object):
 #     'opc' : 'localeOfComposition', # origin in abc
 
 class Metadata(music21.Music21Object):
-    '''Metadata represent data for a work or fragment, including title, composer, dates, and other relevant information.
+    '''Metadata represent data for a work or fragment, 
+    including title, composer, dates, and other relevant information.
 
-    Metadata is a :class:`~music21.base.Music21Object` subclass, meaing that it can be positioned on a Stream by offset and have a :class:`~music21.duration.Duration`.
+    Metadata is a :class:`~music21.base.Music21Object` subclass, 
+    meaing that it can be positioned on a Stream by offset and 
+    have a :class:`~music21.duration.Duration`.
 
-    In many cases, each Stream will have a single Metadata object at the zero offset position. 
+    In many cases, each Stream will have a single Metadata 
+    object at the zero offset position. 
     '''
 
     classSortOrder = -10 
@@ -1369,6 +1377,8 @@ class Metadata(music21.Music21Object):
         ''')
 
 
+
+
     #---------------------------------------------------------------------------
     # provide direct access to common Contributor roles
     def getContributorsByRole(self, value):
@@ -1382,7 +1392,23 @@ class Metadata(music21.Music21Object):
         >>> cList = md.getContributorsByRole('composer')
         >>> cList[0].name
         'Beethoven, Ludwig van'
-
+        
+        
+        Some musicxml files have contributors with no role defined.
+        To get these contributors, search for getContributorsByRole(None).
+        N.B. upon output to MusicXML, music21 gives these contributors
+        the generic role of "creator"
+        
+        >>> c2 = Contributor()
+        >>> c2.name = 'Beth Hadley'
+        >>> md.addContributor(c2)
+        >>> noRoleList = md.getContributorsByRole(None)
+        >>> len(noRoleList)
+        1
+        >>> noRoleList[0].role
+        >>> noRoleList[0].name
+        'Beth Hadley'
+        
         '''
         post = [] # there may be more than one per role
         for c in self._contributors:

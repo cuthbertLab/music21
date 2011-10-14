@@ -269,7 +269,9 @@ def convertQuarterLengthToType(qLen):
         return dtype
 
 def dottedMatch(qLen, maxDots=4):
-    '''Given a quarterLength, determine if there is a dotted (or non-dotted) type that exactly matches. Returns a pair of (numDots, type) or (False, False) if no exact matches are found.
+    '''Given a quarterLength, determine if there is a dotted 
+    (or non-dotted) type that exactly matches. Returns a pair of 
+    (numDots, type) or (False, False) if no exact matches are found.
     
     Returns a maximum of four dots by default.
 
@@ -1433,7 +1435,7 @@ class DurationUnit(DurationCommon):
         >>> bDur.unlink()
         >>> bDur.quarterLength = 234
         >>> bDur.quarterLength
-        234
+        234.0
         >>> bDur.type
         '16th'
         >>> bDur.link() # if linking is restored, type is used to get qLen
@@ -1541,11 +1543,14 @@ class DurationUnit(DurationCommon):
         >>> c.type
         Traceback (most recent call last):
             ...
-        DurationException: Cannot return types greater than double duplex-maxima, your length was 129 : remove this when we are sure this works...
+        DurationException: Cannot return types greater than double duplex-maxima, your length was 129.0 : remove this when we are sure this works...
         '''
         if not common.isNum(value):
             raise DurationException(
             "not a valid quarter length (%s)" % value)
+        if isinstance(value, int):
+            value = float(value)
+            
         if self._link:
             self._typeNeedsUpdating = True
         # need to make sure its a float for comparisons
@@ -2234,6 +2239,8 @@ class Duration(DurationCommon):
         '''
         
         if self._qtrLength != value:
+            if isinstance(value, int):
+                value = float(value)
             self._qtrLength = value            
             self._componentsNeedUpdating = True
             self._quarterLengthNeedsUpdating = False
@@ -2265,6 +2272,17 @@ class Duration(DurationCommon):
         ...    print(unitSpec(thisUnit))
         (2.0, 'half', 0, None, None, None)
         (0.5, 'eighth', 0, None, None, None)
+   
+        
+        Note that integer values of quarter lengths get silently converted to floats:
+        
+        >>> b = duration.Duration()
+        >>> b.quarterLength = 5
+        >>> b.quarterLength
+        5.0
+        >>> b.type  # complex because 5qL cannot be expressed as a single note.
+        'complex'
+   
    
     ''')         
     

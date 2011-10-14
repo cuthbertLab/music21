@@ -1206,19 +1206,19 @@ def mxToRepeatExpression(mxDirection):
 #-------------------------------------------------------------------------------
 # Harmony
 
-def mxToHarmony(mxHarmony):
-    #environLocal.printDebug(['mxToHarmony():', mxHarmony])
+def mxToChordSymbol(mxHarmony):
+    #environLocal.printDebug(['mxToChordSymbol():', mxHarmony])
     from music21 import harmony
     from music21 import pitch
 
-    h = harmony.Harmony()
+    cs = harmony.ChordSymbol()
 
     mxKind = mxHarmony.get('kind')
     if mxKind is not None:
-        h.kind = mxKind.charData
+        cs.kind = mxKind.charData
         mxKindText = mxKind.get('text')
         if mxKindText is not None:
-            h.kindStr = mxKindText
+            cs.kindStr = mxKindText
     
     mxRoot = mxHarmony.get('root')
     if mxRoot is not None:
@@ -1227,7 +1227,7 @@ def mxToHarmony(mxHarmony):
             # can provide integer to create accidental on pitch
             r.accidental = pitch.Accidental(int(mxRoot.get('rootAlter')))
         # set Pitch object on Harmony
-        h.root = r
+        cs.root = r
 
     mxBass = mxHarmony.get('bass')
     if mxBass is not None:
@@ -1236,15 +1236,15 @@ def mxToHarmony(mxHarmony):
             # can provide integer to create accidental on pitch
             b.accidental = pitch.Accidental(int(mxBass.get('bassAlter')))
         # set Pitch object on Harmony
-        h.bass = b
+        cs.bass = b
 
     mxInversion = mxHarmony.get('inversion')
     if mxInversion is not None:
-        h.inversion = int(mxInversion) # must be an int
+        cs.inversion = int(mxInversion) # must be an int
 
     mxFunction = mxHarmony.get('function')
     if mxFunction is not None:
-        h.romanNumeral = mxFunction # goes to roman property
+        cs.romanNumeral = mxFunction # goes to roman property
 
     mxDegree = mxHarmony.get('degree')
     if mxDegree is not None: # a list of components
@@ -1269,25 +1269,25 @@ def mxToHarmony(mxHarmony):
         if hd is not None: 
             harmonyDegrees.append(hd)
         for hd in harmonyDegrees:
-            h.addHarmonyDegree(hd)
+            cs.addHarmonyDegree(hd)
 
     #environLocal.printDebug(['mxToHarmony(): Harmony object', h])
-    return h
+    return cs
     
 
-def harmonyToMx(h):
+def chordSymbolToMx(cs):
     '''
     >>> from music21 import *
-    >>> h = harmony.Harmony()
-    >>> h.root = 'E-'
-    >>> h.bass = 'B-'
-    >>> h.inversion = 2
-    >>> h.romanNumeral = 'I64'
-    >>> h.kind = 'major'
-    >>> h.kindStr = 'M'
-    >>> h
-    <music21.harmony.Harmony kind=major (M) root=E- bass=B- inversion=2>
-    >>> mxHarmony = musicxml.translate.harmonyToMx(h)
+    >>> cs = harmony.ChordSymbol()
+    >>> cs.root = 'E-'
+    >>> cs.bass = 'B-'
+    >>> cs.inversion = 2
+    >>> cs.romanNumeral = 'I64'
+    >>> cs.kind = 'major'
+    >>> cs.kindStr = 'M'
+    >>> cs
+    <music21.harmony.ChordSymbol kind=major (M) root=E- bass=B- inversion=2>
+    >>> mxHarmony = musicxml.translate.chordSymbolToMx(cs)
     >>> mxHarmony
     <harmony <root root-step=E root-alter=-1> function=I64 <kind text=M charData=major> inversion=2 <bass bass-step=B bass-alter=-1>>
 
@@ -1295,41 +1295,41 @@ def harmonyToMx(h):
     >>> hd.type = 'alter'
     >>> hd.interval = -1
     >>> hd.degree = 3
-    >>> h.addHarmonyDegree(hd)
+    >>> cs.addHarmonyDegree(hd)
 
-    >>> mxHarmony = musicxml.translate.harmonyToMx(h)
+    >>> mxHarmony = musicxml.translate.chordSymbolToMx(cs)
     >>> mxHarmony
     <harmony <root root-step=E root-alter=-1> function=I64 <kind text=M charData=major> inversion=2 <bass bass-step=B bass-alter=-1> <degree <degree-value charData=3> <degree-alter charData=-1> <degree-type charData=alter>>>        
     '''
     mxHarmony = musicxmlMod.Harmony()
 
     mxKind = musicxmlMod.Kind()
-    mxKind.set('charData', h.kind)
-    mxKind.set('text', h.kindStr)
+    mxKind.set('charData', cs.kind)
+    mxKind.set('text', cs.kindStr)
     mxHarmony.set('kind', mxKind)
 
     # can assign None to these if None
-    mxHarmony.set('inversion', h.inversion)
-    if h.romanNumeral is not None:
-        mxHarmony.set('function', h.romanNumeral.figure)
+    mxHarmony.set('inversion', cs.inversion)
+    if cs.romanNumeral is not None:
+        mxHarmony.set('function', cs.romanNumeral.figure)
 
-    if h.root is not None:        
+    if cs.root is not None:        
         mxRoot = musicxmlMod.Root()
-        mxRoot.set('rootStep', h.root.step)
-        if  h.root.accidental is not None:
-            mxRoot.set('rootAlter', int(h.root.accidental.alter))
+        mxRoot.set('rootStep', cs.root.step)
+        if cs.root.accidental is not None:
+            mxRoot.set('rootAlter', int(cs.root.accidental.alter))
         mxHarmony.set('root', mxRoot)
 
-    if h.bass is not None:        
+    if cs.bass is not None:        
         mxBass = musicxmlMod.Bass()
-        mxBass.set('bassStep', h.bass.step)
-        if  h.bass.accidental is not None:
-            mxBass.set('bassAlter', int(h.bass.accidental.alter))
+        mxBass.set('bassStep', cs.bass.step)
+        if cs.bass.accidental is not None:
+            mxBass.set('bassAlter', int(cs.bass.accidental.alter))
         mxHarmony.set('bass', mxBass)
 
-    if len(h.getHarmonyDegrees()) > 0:
+    if len(cs.getHarmonyDegrees()) > 0:
         mxDegree = musicxmlMod.Degree()
-        for hd in h.getHarmonyDegrees():
+        for hd in cs.getHarmonyDegrees():
             # types should be compatible
             mxDegreeValue = musicxmlMod.DegreeValue()
             mxDegreeValue.set('charData', hd.degree)
@@ -2217,8 +2217,8 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                 mxDirection.offset = mxOffset 
                 mxMeasure.insert(0, mxDirection)
 
-            elif 'Harmony' in classes:
-                mxMeasure.componentList.append(harmonyToMx(obj))
+            elif 'ChordSymbol' in classes:
+                mxMeasure.componentList.append(chordSymbolToMx(obj))
 
             elif 'Segno' in classes:
                 mxOffset = int(defaults.divisionsPerQuarter * 
@@ -2731,7 +2731,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
 
         elif isinstance(mxObj, musicxmlMod.Harmony):
             mxHarmony = mxObj
-            h = mxToHarmony(mxHarmony)
+            h = mxToChordSymbol(mxHarmony)
             _addToStaffReference(mxObj, h, staffReference)
             m._insertCore(offsetMeasureNote, h)
 
@@ -4257,19 +4257,19 @@ spirit</words>
         from music21 import converter, corpus
 
         s = corpus.parse('leadSheet/berlinAlexandersRagtime.xml')
-        self.assertEqual(len(s.flat.getElementsByClass('Harmony')), 19)
+        self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 19)
 
-        match = [h.kind for h in s.flat.getElementsByClass('Harmony')]
+        match = [h.kind for h in s.flat.getElementsByClass('ChordSymbol')]
         self.assertEqual(match, [u'major', u'dominant', u'major', u'major', u'major', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'major'])
 
-        match = [str(h.root) for h in s.flat.getElementsByClass('Harmony')]
+        match = [str(h.root) for h in s.flat.getElementsByClass('ChordSymbol')]
         self.assertEqual(match, ['F', 'C', 'F', 'B-', 'F', 'C', 'G', 'C', 'C', 'F', 'C', 'F', 'F', 'B-', 'F', 'F', 'C', 'F', 'C'])
 
         s = corpus.parse('monteverdi/madrigal.3.12.xml')
-        self.assertEqual(len(s.flat.getElementsByClass('Harmony')), 10)
+        self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 10)
 
         s = corpus.parse('leadSheet/fosterBrownHair.xml')
-        self.assertEqual(len(s.flat.getElementsByClass('Harmony')), 40)
+        self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 40)
 
         #s.show()
     def testHarmonyB(self):
@@ -4277,49 +4277,49 @@ spirit</words>
         s = stream.Stream()
         s.append(key.KeySignature(-2))
         
-        h1 = harmony.Harmony()
+        h1 = harmony.ChordSymbol()
         h1.root = 'c'
         h1.kind = 'minor-seventh'
         h1.kindStr = 'm7'
         h1.duration.quarterLength = 4
         s.append(h1)
         
-        h2 = harmony.Harmony()
+        h2 = harmony.ChordSymbol()
         h2.root = 'f'
         h2.kind = 'dominant'
         h2.kindStr = '7'
         h2.duration.quarterLength = 4
         s.append(h2)
         
-        h3 = harmony.Harmony()
+        h3 = harmony.ChordSymbol()
         h3.root = 'b-'
         h3.kind = 'major-seventh'
         h3.kindStr = 'Maj7'
         h3.duration.quarterLength = 4
         s.append(h3)
         
-        h4 = harmony.Harmony()
+        h4 = harmony.ChordSymbol()
         h4.root = 'e-'
         h4.kind = 'major-seventh'
         h4.kindStr = 'Maj7'
         h4.duration.quarterLength = 4
         s.append(h4)
         
-        h5 = harmony.Harmony()
+        h5 = harmony.ChordSymbol()
         h5.root = 'a'
         h5.kind = 'half-diminished'
         h5.kindStr = 'm7b5'
         h5.duration.quarterLength = 4
         s.append(h5)
         
-        h6 = harmony.Harmony()
+        h6 = harmony.ChordSymbol()
         h6.root = 'd'
         h6.kind = 'dominant'
         h6.kindStr = '7'
         h6.duration.quarterLength = 4
         s.append(h6)
         
-        h7 = harmony.Harmony()
+        h7 = harmony.ChordSymbol()
         h7.root = 'g'
         h7.kind = 'minor-sixth'
         h7.kindStr = 'm6'
@@ -4342,7 +4342,7 @@ spirit</words>
 
         from music21 import harmony, stream
 
-        h = harmony.Harmony()
+        h = harmony.ChordSymbol()
         h.root = 'E-'
         h.bass = 'B-'
         h.inversion = 2

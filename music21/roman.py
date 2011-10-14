@@ -87,10 +87,16 @@ class RomanNumeralException(music21.Music21Exception):
 #-------------------------------------------------------------------------------
 class RomanNumeral(chord.Chord):
     '''
+    A RomanNumeral object is a specialized type of :class:`~music21.chord.Chord` object
+    that stores the function and scale degree of a chord within a 
+    :class:`~music21.key.Key` (if no Key is given then it exists as a theoretical, keyless
+    RomanNumeral; e.g., V in any key. but when realized, keyless RomanNumerals are
+    treated as if they are in C major).
+    
     
     >>> from music21 import *
     >>> V = roman.RomanNumeral('V') # could also use 5
-    >>> V.quality
+    >>> V.quality   # TODO: document better! what is inherited from Chord and what is new here...
     'major'
     >>> V.inversion()
     0

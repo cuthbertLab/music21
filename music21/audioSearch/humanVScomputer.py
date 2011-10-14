@@ -19,6 +19,7 @@ import time
 import random
 
 
+
 def runGame():
     from music21.audioSearch import recording 
     useScale = scale.ChromaticScale('C4')

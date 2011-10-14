@@ -2307,7 +2307,10 @@ class TimeModification(MusicXMLElement):
 # root-step, root-alter, bass-step, bass-alter,
 
 class Harmony(MusicXMLElementList):
-    '''A harmony tag stores a root, kind 
+    '''A harmony tag stores a root, kind -- eventually becomes converted
+    to a music21 ChordSymbol object (not Harmony; though ChordSymbol is a
+    subclass of the music21 object called Harmony, which also deals with
+    Figured bass and Roman Numerals.
     '''
     def __init__(self):
         MusicXMLElementList.__init__(self)

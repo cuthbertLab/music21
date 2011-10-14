@@ -301,12 +301,12 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         >>> s.append(n1)
         >>> s.append(n2)
         >>> a._getPitchClassDistribution(s)
-        [3, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0]
+        [3.0, 0, 0, 0, 0, 0, 2.0, 0, 0, 0, 0, 0]
         >>> c1 = chord.Chord(['d', 'e', 'b-'])
         >>> c1.quarterLength = 1.5
         >>> s.append(c1)
         >>> a._getPitchClassDistribution(s)
-        [3, 0, 1.5, 0, 1.5, 0, 2, 0, 0, 0, 1.5, 0]
+        [3.0, 0, 1.5, 0, 1.5, 0, 2.0, 0, 0, 0, 1.5, 0]
         '''
         # storage for 12 pitch classes
         pcDist = [0]*12

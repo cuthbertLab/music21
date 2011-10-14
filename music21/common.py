@@ -82,18 +82,21 @@ VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
 def getMissingImportStr(modNameList):
     '''
+    Given a list of missing module names, returns a nicely-formatted message to the user
+    that gives instructions on how to expand music21 with optional packages.
+    
     >>> getMissingImportStr(['PIL'])
-    'Missing optional package PIL; see http://mit.edu/music21/installAdditional.html'
+    'Certain music21 functions might need the optional package PIL; if you run into errors, install it by following the instructions at http://mit.edu/music21/doc/html/installAdditional.html'
     >>> getMissingImportStr(['PIL', 'numpy'])
-    'Missing optional packages PIL, numpy; see http://mit.edu/music21/installAdditional.html'
+    'Certain music21 functions might need these optional packages: PIL, numpy; if you run into errors, install it by following the instructions at http://mit.edu/music21/doc/html/installAdditional.html'
 
     '''
     if len(modNameList) == 0:
         return None
     elif len(modNameList) == 1:
-        return 'Missing optional package %s; see http://mit.edu/music21/installAdditional.html' % modNameList[0]
+        return 'Certain music21 functions might need the optional package %s; if you run into errors, install it by following the instructions at http://mit.edu/music21/doc/html/installAdditional.html' % modNameList[0]
     else:
-        return 'Missing optional packages %s; see http://mit.edu/music21/installAdditional.html' % ', '.join(modNameList)
+        return 'Certain music21 functions might need these optional packages: %s; if you run into errors, install it by following the instructions at http://mit.edu/music21/doc/html/installAdditional.html' % ', '.join(modNameList)
 
 #-------------------------------------------------------------------------------
 def findFormat(fmt):
