@@ -562,7 +562,6 @@ class NotRest(GeneralNote):
     
     # unspecified means that there may be a stem, but its orientation
     # has not been declared. 
-    # TODO: import from MusicXML
     
     def __init__(self, *arguments, **keywords):
         GeneralNote.__init__(self, **keywords)
@@ -593,9 +592,11 @@ class NotRest(GeneralNote):
         
         Accepted values are 'up', 'down', 'noStem', 'double', or 'unspecified'.
         '''
+        # TODO: check for acceotable values
         self._stemDirection = direction
         
     stemDirection = property(_getStemDirection, _setStemDirection)
+
 
     def _getNotehead(self):
         '''Return the Notehead type.
@@ -605,9 +606,12 @@ class NotRest(GeneralNote):
     def _setNotehead(self, value):
         '''Sets the notehead to the specified value.
         '''
+        # TODO: this should check for valid note head values
+        # 'slash', 'triangle', 'diamond', 'square', 'cross', 'x' , 'circle-x', 'inverted triangle', 'arrow down', 'arrow up', 'slashed', 'back slashed', 'normal', 'cluster', 'none', 'do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'circle dot', 'left triangle', 'rectangle'
         self._notehead = value
 
     notehead = property(_getNotehead, _setNotehead)
+
     
     def _getNoteheadFill(self):
         '''Return the Notehead fill type.
@@ -615,10 +619,13 @@ class NotRest(GeneralNote):
         return self._noteheadFill
 
     def _setNoteheadFill(self, value):
+        # TODO: check for valid values
+        # 'default' is default
         self._noteheadFill = value
 
     noteheadFill = property(_getNoteheadFill, _setNoteheadFill)
     
+
     def _getNoteheadParen(self):
         '''Return whether or not the notehead has parenthesis around it.
         '''

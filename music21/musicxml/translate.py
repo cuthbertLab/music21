@@ -1707,7 +1707,8 @@ def generalNoteToMusicXML(n):
     # call the musicxml property on Stream
     return out.musicxml
     
-def noteheadToMxNotehead(obj, spannerBundle=None, overRiddenNotehead = None, overRiddenNoteheadFill = None, overRiddenNoteheadParen = None):
+def noteheadToMxNotehead(obj, spannerBundle=None, overRiddenNotehead = None, 
+    overRiddenNoteheadFill = None, overRiddenNoteheadParen = None):
     '''
     Translate a music21 :class:`~music21.note.Note` object or :class:`~music21.pitch.Pitch` object to a
     into a musicxml.Notehead object.
@@ -1912,12 +1913,12 @@ def noteToMxNotes(n, spannerBundle=None):
             mxNoteList[0].notationsObj.componentList.append(mxSlur)
             
     #Adds the notehead type if it is not set to the default 'normal'.
-    if n.notehead != 'normal':
+    if n.notehead != 'normal' or n.noteheadFill != 'default':
        mxNoteList[0].noteheadObj = noteheadToMxNotehead(n)
     
     #If the stem direction is not 'unspecified'    
     if n.stemDirection != 'unspecified':
-        if n.stemDirection == 'noStem':
+        if n.stemDirection in ['noStem', None]:
             mxNoteList[0].stem = 'none'
         else:
             mxNoteList[0].stem = n.stemDirection
