@@ -1752,45 +1752,36 @@ def noteheadToMxNotehead(obj, spannerBundle=None, overRiddenNotehead = None,
     'yes'
     '''
     
+    from music21 import note # needed for note.noteheadTypeNames
+
     mxNotehead = musicxmlMod.Notehead()
 
-	#Ensures that the music21 notehead value is supported by MusicXML, and then sets the MusicXML notehead's 'charaData' to the value of the Music21 notehead.
-    supportedValues = ['slash', 'triangle', 'diamond', 'square', 'cross', 'x' , 'circle-x', 'inverted triangle', 'arrow down', 'arrow up', 'slashed', 'back slashed', 'normal', 'cluster', 'none', 'do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'circle dot', 'left triangle', 'rectangle']
     nh = None
     nhFill = 'default'
     nhParen = False
     
+    nh = 'normal'
     if 'Pitch' in obj.classes:
-        if overRiddenNotehead is None:
-            nh = 'normal'
-        else:
+        if overRiddenNotehead is not None:
             nh = overRiddenNotehead
     elif hasattr(obj, 'notehead'):
         nh = obj.notehead
-    else:
-        nh = 'normal'
         
+    nhFill = 'default'
     if 'Pitch' in obj.classes:
-        if overRiddenNoteheadFill is None:
-            nhFill = 'default'
-        else:
+        if overRiddenNoteheadFill is not None:
             nhFill = overRiddenNoteheadFill
     elif hasattr(obj, 'noteheadFill'):
         nhFill = obj.noteheadFill
-    else:
-        nhFill = 'default'
         
+    nhParen = False
     if 'Pitch' in obj.classes:
-        if overRiddenNoteheadParen is None:
-            nhParen = False
-        else:
+        if overRiddenNoteheadParen is not None:
             nhParen = overRiddenNoteheadParen
     elif hasattr(obj, 'noteheadParen'):
         nhParen = obj.noteheadParen
-    else:
-        nhParen = False
     
-    if nh not in supportedValues:
+    if nh not in note.noteheadTypeNames:
         raise NoteheadException('This notehead type is not supported by MusicXML.')
     else:
         mxNotehead.set('charData', nh)

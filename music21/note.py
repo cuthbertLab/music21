@@ -43,8 +43,9 @@ _MOD = "note.py"
 environLocal = environment.Environment(_MOD)
 
 
+noteheadTypeNames = ['slash', 'triangle', 'diamond', 'square', 'cross', 'x' , 'circle-x', 'inverted triangle', 'arrow down', 'arrow up', 'slashed', 'back slashed', 'normal', 'cluster', 'none', 'do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'circle dot', 'left triangle', 'rectangle']
 
-
+stemDirectionNames = ['up', 'down', 'noStem', 'double', 'unspecified']
 
 #-------------------------------------------------------------------------------
 class LyricException(Exception):
@@ -583,34 +584,57 @@ class NotRest(GeneralNote):
         return new
 
     def _getStemDirection(self):
-        '''Returns the stem direction.
-        '''
         return self._stemDirection
     
     def _setStemDirection(self, direction):
-        '''Sets the stem direction to the specified value.
-        
-        Accepted values are 'up', 'down', 'noStem', 'double', or 'unspecified'.
-        '''
-        # TODO: check for acceotable values
+        if direction is None:
+            pass
+        elif direction not in stemDirectionNames:
+            raise NotRestException('not a valid stem direction name: %s' % direction)
         self._stemDirection = direction
         
-    stemDirection = property(_getStemDirection, _setStemDirection)
+    stemDirection = property(_getStemDirection, _setStemDirection, doc=
+        '''Get or set the stem direction of this NotRest object. Valid stem direction names are found in note.stemDirectionNames (see below)
+
+        >>> from music21 import *
+        >>> note.stemDirectionNames
+        ['up', 'down', 'noStem', 'double', 'unspecified']
+
+        >>> n = note.Note()
+        >>> n.stemDirection = 'noStem'
+        >>> n.stemDirection
+        'noStem'
+        >>> n.stemDirection = 'junk'
+        Traceback (most recent call last):
+        NotRestException: not a valid stem direction name: junk
+        ''')
 
 
     def _getNotehead(self):
-        '''Return the Notehead type.
-        '''
         return self._notehead
 
     def _setNotehead(self, value):
-        '''Sets the notehead to the specified value.
-        '''
-        # TODO: this should check for valid note head values
-        # 'slash', 'triangle', 'diamond', 'square', 'cross', 'x' , 'circle-x', 'inverted triangle', 'arrow down', 'arrow up', 'slashed', 'back slashed', 'normal', 'cluster', 'none', 'do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'circle dot', 'left triangle', 'rectangle'
+        if value is None: 
+            pass # allow setting to None
+        elif value not in noteheadTypeNames:
+            raise NotRestException('not a valid notehead type name: %s' % value)
         self._notehead = value
 
-    notehead = property(_getNotehead, _setNotehead)
+    notehead = property(_getNotehead, _setNotehead, doc=
+        '''Get or set the notehead of this NotRest object. Valid notehead type names are found in note.noteheadTypeNames (see below):
+
+        >>> from music21 import *
+        >>> note.noteheadTypeNames
+        ['slash', 'triangle', 'diamond', 'square', 'cross', 'x', 'circle-x', 'inverted triangle', 'arrow down', 'arrow up', 'slashed', 'back slashed', 'normal', 'cluster', 'none', 'do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'circle dot', 'left triangle', 'rectangle']
+
+        >>> n = note.Note()
+        >>> n.notehead = 'diamond'
+        >>> n.notehead
+        'diamond'
+        >>> n.notehead = 'junk'
+        Traceback (most recent call last):
+        NotRestException: not a valid notehead type name: junk
+        ''')
 
     
     def _getNoteheadFill(self):
@@ -620,22 +644,27 @@ class NotRest(GeneralNote):
 
     def _setNoteheadFill(self, value):
         # TODO: check for valid values
-        # 'default' is default
+        # 'default', 'yes','no'
         self._noteheadFill = value
 
-    noteheadFill = property(_getNoteheadFill, _setNoteheadFill)
+    noteheadFill = property(_getNoteheadFill, _setNoteheadFill, doc='''
+        Get or set the note head fill status of this NotRest. 
+        ''')
     
 
     def _getNoteheadParen(self):
-        '''Return whether or not the notehead has parenthesis around it.
-        '''
         return self._noteheadParen
 
     def _setNoteheadParen(self, value):
+        # TODO: check for valid values
         self._noteheadParen = value
 
-    noteheadParen = property(_getNoteheadParen, _setNoteheadParen)
+    noteheadParen = property(_getNoteheadParen, _setNoteheadParen, doc='''
+        Get or set the note head fill status fo this NotRest.
+        ''')
     
+
+
     def _isGrace(self):
         # duration must not be linked and quarterLength must be zero
         if self.duration.quarterLength == 0 and not self.duration.isLinked:
