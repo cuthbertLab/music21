@@ -200,6 +200,7 @@ class Dynamic(music21.Music21Object):
         doc='''Get or set the value of this dynamic, which sets the long and english names of this Dynamic. The value is a string specification. 
         ''')
 
+
     def _getVolumeScalar(self):
         if self._volumeScalar is not None:
             return self._volumeScalar
@@ -225,6 +226,7 @@ class Dynamic(music21.Music21Object):
         >>> d.volumeScalar
         0.55...
         ''')
+
 
     def _getPositionVertical(self):
         return self._positionDefaultY
@@ -459,6 +461,7 @@ class Test(unittest.TestCase):
                 m.insert(o, d)
 
         #s.show()
+
 
 
 
