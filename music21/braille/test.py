@@ -1603,6 +1603,48 @@ def example10_1():
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)    
     return bm
 
+def example10_2():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example10_2(), recenterHeading = True, insertDummyRest = True, btFirstLineLength = 17)
+    ⠀⠀⠀⠀⠀⠀⠀⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠄⠄⠄⠀⠐⠋⠩⠛⠩⠓⠊⠐⠀⠀
+    ⠀⠀⠐⠚⠡⠓⠋⠙⠀⠛⠊⠓⠙⠐⠎⠣⠅
+    '''
+    bm = tinyNotation.TinyNotationStream("e8 f# g# a b- gn e c f a g c a2", "4/4")
+    bm.insert(0, key.KeySignature(-1))
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[1].notesAndRests[0].accidental.displayStatus = False
+    return bm
+
+def example10_3():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example10_3(), recenterHeading = True, insertDummyRest = True, btFirstLineLength = 14)
+    ⠀⠀⠀⠀⠀⠣⠼⠋⠦⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠄⠄⠄⠀⠐⠋⠩⠛⠩⠓⠐
+    ⠀⠀⠐⠊⠚⠡⠓⠀⠋⠙⠛⠊⠓⠙⠀⠐⠎⠄⠣⠅
+    '''
+    bm = tinyNotation.TinyNotationStream("e8 f# g# a b- g e c f a g c a2.", "6/8")
+    bm.insert(0, key.KeySignature(-1))
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[1].notesAndRests[2].accidental.displayStatus = False
+    return bm
+
+def example10_4():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example10_4(), recenterHeading = True, insertDummyRest = True, btFirstLineLength = 31)
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠄⠄⠄⠀⠐⠏⠄⠈⠉⠋⠩⠛⠩⠓⠊⠚⠡⠓⠀⠙⠑⠋⠻⠄⠈⠉⠛⠐
+    ⠀⠀⠐⠋⠛⠓⠛⠋⠀⠟⠄⠣⠅
+    '''
+    bm = tinyNotation.TinyNotationStream("e2.~ e8 f# g# a b- gn c d e f4.~ f8 e f g f e f2.", "12/8")
+    bm.insert(0, key.KeySignature(-1))
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[1].notesAndRests[3].accidental.displayStatus = False
+    return bm
+    
 def example10_5():
     '''
     >>> from music21.braille import translate
@@ -2119,16 +2161,11 @@ def example15_10():
 def example15_11():
     bm = tinyNotation.TinyNotationStream("r1 r4 r8 b-8 e-16 e'- g- g'- b- b'- bn b'n b- b'- bn b'n b- b'- a'- f' d' b- e'-4.", "12/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    #bm[1].timeSignature = meter.TimeSignature("12/8")
-    translate.prepareBeamedNotes(bm[1])
-    bm[1].show('text')
-    print translate.noteGroupingsToBraille(bm[1][0:6])[0]
-    print translate.noteGroupingsToBraille(bm[1][6:12])[0]
-    print translate.noteGroupingsToBraille(bm[1][12:19])[0]
-    #bm[1].show()
     bm[-1].rightBarline = None
     for m in bm:
         m.number -= 1
+    for i in range(3):
+        bm[0].pop(2)
     return bm
 
 #-------------------------------------------------------------------------------
@@ -2299,10 +2336,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    ex = happyBirthday()
-    #ex.show()
-    print translate.partToBraille(ex)
-    #music21.mainTest(Test)
+    music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof
