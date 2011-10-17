@@ -45,7 +45,7 @@ environLocal = environment.Environment(_MOD)
 
 noteheadTypeNames = ['slash', 'triangle', 'diamond', 'square', 'cross', 'x' , 'circle-x', 'inverted triangle', 'arrow down', 'arrow up', 'slashed', 'back slashed', 'normal', 'cluster', 'none', 'do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'circle dot', 'left triangle', 'rectangle']
 
-stemDirectionNames = ['up', 'down', 'noStem', 'double', 'unspecified']
+stemDirectionNames = ['up', 'down', 'noStem', 'double', 'unspecified', 'none']
 
 #-------------------------------------------------------------------------------
 class LyricException(Exception):
@@ -587,8 +587,8 @@ class NotRest(GeneralNote):
         return self._stemDirection
     
     def _setStemDirection(self, direction):
-        if direction is None:
-            pass
+        if direction == 'none' or direction is None:
+            pass # allow setting to none or None
         elif direction not in stemDirectionNames:
             raise NotRestException('not a valid stem direction name: %s' % direction)
         self._stemDirection = direction
@@ -598,7 +598,7 @@ class NotRest(GeneralNote):
 
         >>> from music21 import *
         >>> note.stemDirectionNames
-        ['up', 'down', 'noStem', 'double', 'unspecified']
+        ['up', 'down', 'noStem', 'double', 'unspecified', 'none']
 
         >>> n = note.Note()
         >>> n.stemDirection = 'noStem'
@@ -614,8 +614,8 @@ class NotRest(GeneralNote):
         return self._notehead
 
     def _setNotehead(self, value):
-        if value is None: 
-            pass # allow setting to None
+        if value == 'none' or value is None: 
+            pass # allow setting to none or None
         elif value not in noteheadTypeNames:
             raise NotRestException('not a valid notehead type name: %s' % value)
         self._notehead = value
