@@ -48,7 +48,9 @@ class Volume(object):
         elif velocityScalar is not None:
             self.velocityScalar = velocityScalar
 
-        # TODO replace with a property; set from MIDI import to be False
+        self._cachedRealized = None
+
+        #  replace with a property
         self.velocityIsRelative = velocityIsRelative
 
     def __deepcopy__(self, memo=None):
@@ -272,6 +274,9 @@ class Volume(object):
             elif val < 0:
                 val = 0.0
         # might to rebalance range after scalings       
+
+        # always update cached result each time this is called
+        self._cachedRealized = val
         return val
 
     def getRealizedStr(self, useDynamicContext=True, useVelocity=True,
@@ -296,14 +301,30 @@ class Volume(object):
         >>> 
         ''')
 
+    
+    def _getCachedRealized(self):
+        if self._cachedRealized is None:
+            self._cachedRealized = self.getRealized()
+        return self._cachedRealized
+
+    cachedRealized = property(_getCachedRealized, doc='''
+        Return the cached realized value of this volume. This will be the last realized value or, if that value has not been set, a newly realized value. If the caller knows that the realized values have all been recently set, using this property will add significant performance boost.
+
+        >>> from music21 import *
+        >>> v = volume.Volume(velocity=128)
+        >>> v.cachedRealized
+        1.0
+        ''')
+
 #-------------------------------------------------------------------------------
 # utility stream processing methods
 
 
 def realizeVolume(self, srcStream):
-    '''Given a Stream, 
+    '''Given a Stream, destructively modify it to set all 
 
     This is always done in place; for the option of non-in place processing, see Stream.realizeVolume().
+
     '''
     pass
 
