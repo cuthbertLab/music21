@@ -3340,17 +3340,20 @@ class Stream(music21.Music21Object):
             returnObj = self
 
         # this will change the working Stream; not sure if a problem
-        returnObj.extendDuration('Instrument', inPlace=True)
-        insts = returnObj.getElementsByClass('Instrument')
+        boundaries = returnObj.extendDurationAndGetBoundaries('Instrument', 
+                        inPlace=True)
 
-        boundaries = {}
-        if len(insts) == 0:
-            raise StreamException('no Instruments defined in this Stream')
-        else:
-            for i in insts:
-                start = i.getOffsetBySite(returnObj)
-                end = start + i.duration.quarterLength
-                boundaries[(start, end)] = i
+#         returnObj.extendDuration('Instrument', inPlace=True)
+#         insts = returnObj.getElementsByClass('Instrument')
+# 
+#         boundaries = {}
+#         if len(insts) == 0:
+#             raise StreamException('no Instruments defined in this Stream')
+#         else:
+#             for i in insts:
+#                 start = i.getOffsetBySite(returnObj)
+#                 end = start + i.duration.quarterLength
+#                 boundaries[(start, end)] = i
 
         # store class filter list for transposition
         if transposeKeySignature:
@@ -5653,6 +5656,35 @@ class Stream(music21.Music21Object):
             #print elements[-1], elements[-1].duration    
         return returnObj
     
+
+    def extendDurationAndGetBoundaries(self, objName, inPlace=True):
+        '''Extend the Duration of elements specified by objName; then, collect a dictionary for every matched element of objName class, where the matched element is the value and the key is the start,end offset value.
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> s.insert(3, dynamics.Dynamic('mf'))
+        >>> s.insert(7, dynamics.Dynamic('f'))
+        >>> s.insert(12, dynamics.Dynamic('ff'))
+        >>> s.extendDurationAndGetBoundaries('Dynamic')
+        {(7.0, 12.0): <music21.dynamics.Dynamic f >, (3.0, 7.0): <music21.dynamics.Dynamic mf >, (12.0, 12.0): <music21.dynamics.Dynamic ff >}
+
+        '''
+        if not inPlace: # make a copy
+            returnObj = deepcopy(self)
+        else:
+            returnObj = self
+
+        returnObj.extendDuration(objName, inPlace=True)
+        elements = returnObj.getElementsByClass(objName)
+        boundaries = {}
+        if len(elements) == 0:
+            raise StreamException('no elements of this class defined in this Stream')
+        else:
+            for e in elements:
+                start = e.getOffsetBySite(returnObj)
+                end = start + e.duration.quarterLength
+                boundaries[(start, end)] = e
+        return boundaries
 
 
     def stripTies(self, inPlace=False, matchByPitch=False,

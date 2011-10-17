@@ -320,14 +320,40 @@ class Volume(object):
 # utility stream processing methods
 
 
-def realizeVolume(self, srcStream):
-    '''Given a Stream, destructively modify it to set all 
+def realizeVolume(self, srcStream, setAbsoluteVelocity=False):
+    '''Given a Stream with one level of dynamics (e.g., a Part, or two Staffs that share Dyanmics), destructively modify it to set all realized volume levels. These values will be stored in the Volume object as `cachedRealized` values. 
 
     This is always done in place; for the option of non-in place processing, see Stream.realizeVolume().
 
-    '''
-    pass
+    If setAbsoluteVelocity is True, the realized values will overwrite all existing velocity values, and the Volume objects velocityIsRelative parameters will be set to False.
 
+    
+    '''
+    # get dynamic map
+    flatSrc = srcStream.flat # assuming sorted
+    # extend durations of all dyanmics
+    # doing this in place as this is a destructive opperation
+    boundaries = flatSrc.extendDuration('Dynamic', inPlace=True)
+    bKeys = boundaries.keys()
+    bKeys.sort() # sort
+
+    # assuming stream is sorted
+    lastRelevantKeyIndex = 0
+    for e in flatStream: # iterate over all elements
+        if hasattr(e, 'volume'):
+            # try to find a dynamic
+            eStart = e.getOffsetBySite(flatSrc)
+
+            # get the most recent dynamic
+            dm = None
+            for k in range(lastRelevantKeyIndex, len(bKeys)):
+                start, end = bKeys[k]
+                if eStart >= start and eStart < end:
+                    # store so as to start in the same position
+                    # for next element
+                    lastRelevantKeyIndex = k
+                    dm = boundaries[bKeys[k]]
+                    break
 
 
         
