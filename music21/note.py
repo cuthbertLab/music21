@@ -588,13 +588,13 @@ class NotRest(GeneralNote):
     
     def _setStemDirection(self, direction):
         if direction == 'none' or direction is None:
-            pass # allow setting to none or None
+            direction = None # allow setting to none or None
         elif direction not in stemDirectionNames:
             raise NotRestException('not a valid stem direction name: %s' % direction)
         self._stemDirection = direction
         
     stemDirection = property(_getStemDirection, _setStemDirection, doc=
-        '''Get or set the stem direction of this NotRest object. Valid stem direction names are found in note.stemDirectionNames (see below)
+        '''Get or set the stem direction of this NotRest object. Valid stem direction names are found in note.stemDirectionNames (see below).
 
         >>> from music21 import *
         >>> note.stemDirectionNames
@@ -615,7 +615,7 @@ class NotRest(GeneralNote):
 
     def _setNotehead(self, value):
         if value == 'none' or value is None: 
-            pass # allow setting to none or None
+            value = None # allow setting to none or None
         elif value not in noteheadTypeNames:
             raise NotRestException('not a valid notehead type name: %s' % value)
         self._notehead = value
@@ -643,12 +643,23 @@ class NotRest(GeneralNote):
         return self._noteheadFill
 
     def _setNoteheadFill(self, value):
-        # TODO: check for valid values
-        # 'default', 'yes','no'
+        if value == 'none' or value is None: 
+            value = None # allow setting to none or None
+        elif value not in ['default', 'yes', 'no']:
+            raise NotRestException('not a valid notehead fill value: %s' % value)
         self._noteheadFill = value
 
     noteheadFill = property(_getNoteheadFill, _setNoteheadFill, doc='''
-        Get or set the note head fill status of this NotRest. 
+        Get or set the note head fill status of this NotRest. Valid note head fill values are yes, no, default, and None.
+
+        >>> from music21 import *
+        >>> n = note.Note()
+        >>> n.noteheadFill = 'no'
+        >>> n.noteheadFill
+        'no'
+        >>> n.noteheadFill = 'junk'
+        Traceback (most recent call last):
+        NotRestException: not a valid notehead fill value: junk
         ''')
     
 
@@ -656,7 +667,7 @@ class NotRest(GeneralNote):
         return self._noteheadParen
 
     def _setNoteheadParen(self, value):
-        # TODO: check for valid values
+        # TODO: check for valid values: yes and no?
         self._noteheadParen = value
 
     noteheadParen = property(_getNoteheadParen, _setNoteheadParen, doc='''

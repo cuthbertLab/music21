@@ -484,13 +484,6 @@ class Chord(note.NotRest):
         for d in self._components:
             if d.tie is not None:
                 return d.tie
-
-        # this finds the tie on the first pitch; it might alternatively
-        # return the first tie available 
-#         if len(self._components) > 0:
-#             if 'tie' in self._components[0].keys():
-#                 return self._components[0]['tie']
-        # otherwise, return None
         return None
 
     tie = property(_getTie, _setTie, 
@@ -526,23 +519,6 @@ class Chord(note.NotRest):
         for d in self._components:
             if d.pitch == p:
                 return d.tie
-        return None
-
-#         for d in self._components:
-#             # this is an object comparison, not equality
-#             if d['pitch'] is p:
-#                 if 'tie' in d.keys():
-#                     return d['tie']
-#                 else:
-#                     return None
-#         
-#         for d in self._components:
-#             # this is an equality comparison, not object
-#             if d['pitch'] == p:
-#                 if 'tie' in d.keys():
-#                     return d['tie']
-#                 else:
-#                     return None
         return None
 
     def setTie(self, t, pitchTarget):
@@ -598,30 +574,7 @@ class Chord(note.NotRest):
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
 
 
-        # assign to first pitch by default
-#         if pitchTarget is None and len(self._components) > 0: # if no pitch target
-#             pitchTarget = self._components[0]['pitch']
-#         elif common.isStr(pitchTarget):
-#             pitchTarget = pitch.Pitch(pitchTarget)
-#         
-#         if common.isStr(t):
-#             t = tie.Tie(t)
-#         
-#         match = False
-#         for d in self._components:
-#             if d['pitch'] is pitchTarget:
-#                 d['tie'] = t
-#                 match = True
-#         if match is False:
-#             for d in self._components:
-#                 if d['pitch'] == pitchTarget:
-#                     d['tie'] = t
-#                     match = True
-#                     break
-#         if not match:
-#             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
-# 
-#    
+
     
     def getStemDirection(self, p):
         '''Given a pitch in this Chord, return an associated stem attribute, or return 'unspecified' if not defined for that Pitch.
@@ -649,27 +602,14 @@ class Chord(note.NotRest):
                 return d.stemDirection
         return None
             
-#         for d in self._components:
-#             # this is an object comparison, not equality
-#             if d['pitch'] is p:
-#                 if 'stem' in d.keys():
-#                     return d['stem']
-#                 else:
-#                     return 'unspecified'
-#                 
-#         for d in self._components:
-#             # this is an equality comparison, not object
-#             if d['pitch'] == p:
-#                 if 'stem' in d.keys():
-#                     return d['stem']
-#                 else:
-#                     return 'unspecified'
-        return None
     
     def setStemDirection(self, stem, pitchTarget):
-        '''Given a stem attribute as a string and a pitch object in this Chord, set the stem attribute of that pitch to the value of that stem.
+        '''Given a stem attribute as a string and a pitch object in this Chord, set the stem attribute of that pitch to the value of that stem. Valid stem directions are found note.stemDirectionNames (see below).
 
         >>> from music21 import *
+        >>> note.stemDirectionNames
+        ['up', 'down', 'noStem', 'double', 'unspecified', 'none']
+
         >>> n1 = note.Note('D4')
         >>> n2 = note.Note('G4')
         >>> c1 = chord.Chord([n1, n2])
@@ -710,32 +650,11 @@ class Chord(note.NotRest):
                     d.stemDirection = stem
                     match = True
                     break
-
-
-        # assign to first pitch by default
-#         if pitchTarget is None and len(self._components) > 0: # if no pitch target
-#             pitchTarget = self._components[0]['pitch']
-#         elif common.isStr(pitchTarget):
-#             pitchTarget = pitch.Pitch(pitchTarget)    
-#             
-#         match = False
-#         for d in self._components:
-#             if d['pitch'] is pitchTarget:
-#                 d['stem'] = stem
-#                 match = True
-#         if match is False:
-#             for d in self._components:
-#                 if d['pitch'] == pitchTarget:
-#                     d['stem'] = stem
-#                     match = True
-#                     break
-#                 
         if not match:
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
         
     def getNotehead(self, p):
-        '''Given a pitch in this Chord, return an associated Notehead attribute, or return 'normal' if not defined for that Pitch.
-
+        '''Given a pitch in this Chord, return an associated notehead attribute, or return 'normal' if not defined for that Pitch.
 
         If the pitch is not found, None will be returned. 
         
@@ -762,31 +681,14 @@ class Chord(note.NotRest):
                 return d.notehead
         return None
 
-#         for d in self._components:
-#             if d.pitch is p or d.pitch == p:
-#                 return d.notehead
-        
-#         for d in self._components:
-#             # this is an object comparison, not equality
-#             if d['pitch'] is p:
-#                 if 'notehead' in d.keys():
-#                     return d['notehead']
-#                 else:
-#                     return 'normal'
-#                 
-#         for d in self._components:
-#             # this is an equality comparison, not object
-#             if d['pitch'] == p:
-#                 if 'notehead' in d.keys():
-#                     return d['notehead']
-#                 else:
-#                     return 'normal'
-#         return None
 
     def setNotehead(self, nh, pitchTarget):
-        '''Given a notehead attribute as a string and a pitch object in this Chord, set the notehead attribute of that pitch to the value of that notehead.
+        '''Given a notehead attribute as a string and a pitch object in this Chord, set the notehead attribute of that pitch to the value of that notehead. Valid notehead type names are found in note.noteheadTypeNames (see below):
 
         >>> from music21 import *
+        >>> note.noteheadTypeNames
+        ['slash', 'triangle', 'diamond', 'square', 'cross', 'x', 'circle-x', 'inverted triangle', 'arrow down', 'arrow up', 'slashed', 'back slashed', 'normal', 'cluster', 'none', 'do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'circle dot', 'left triangle', 'rectangle']
+
         >>> n1 = note.Note('D4')
         >>> n2 = note.Note('G4')
         >>> c1 = chord.Chord([n1, n2])
@@ -826,19 +728,8 @@ class Chord(note.NotRest):
                 if d.pitch == pitchTarget:
                     d.notehead = nh
                     match = True
-                    break
-            
-#         match = False
-#         for d in self._components:
-#             if d['pitch'] is pitchTarget:
-#                 d['notehead'] = nh
-#                 match = True
-#         if match is False:
-#             for d in self._components:
-#                 if d['pitch'] == pitchTarget:
-#                     d['notehead'] = nh
-#                     match = True
-#                     break
+                    break            
+
         if not match:
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
 
