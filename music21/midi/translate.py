@@ -252,9 +252,11 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
         me1.centShift = n.pitch.getCentShiftFromMidi()
 
     # TODO: not yet using dynamics or velocity
-    volScalar = n.volume.getRealized(useDynamicContext=False, 
-            useVelocity=True, useArticulations=False)
-    me1.velocity = int(round(volScalar * 127))
+#     volScalar = n.volume.getRealized(useDynamicContext=False, 
+#             useVelocity=True, useArticulations=False)
+
+    # use cached realized, as realized values should have already been set
+    me1.velocity = int(round(n.volume.cachedRealized * 127))
 
     eventList.append(me1)
 
@@ -462,14 +464,16 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
         #if 'volume' in chordComponent.keys():
         
         if hasComponentVolumes:
-            # TODO: not yet using dynamics or velocity
-            volScalar = chordComponent.volume.getRealized(
-                useDynamicContext=False, 
-                useVelocity=True, useArticulations=False)
+#             volScalar = chordComponent.volume.getRealized(
+#                 useDynamicContext=False, 
+#                 useVelocity=True, useArticulations=False)
+            volScalar = chordComponent.volume.cachedRealized
         else:
-            volScalar = chordVolume.getRealized(
-                useDynamicContext=False, 
-                useVelocity=True, useArticulations=False)
+#             volScalar = chordVolume.getRealized(
+#                 useDynamicContext=False, 
+#                 useVelocity=True, useArticulations=False)
+            volScalar = chordVolume.cachedRealized
+
         me.velocity = int(round(volScalar * 127))
         eventList.append(me)
         noteOn.append(me)
@@ -855,7 +859,7 @@ def _streamToPackets(s, trackId=1):
         elif 'Chord' in classes:
             sub = chordToMidiEvents(obj, includeDeltaTime=False)
         elif 'Dynamic' in classes:
-            pass # configure dynamics
+            continue # dynamics have already been applied to notes 
         elif 'TimeSignature' in classes:
             # return a pair of events
             sub = timeSignatureToMidiEvents(obj, includeDeltaTime=False)
@@ -1356,6 +1360,8 @@ def _prepareStreamForMidi(s):
     
     Note: will make a deepcopy()
     '''
+    from music21 import volume
+
     s = copy.deepcopy(s)
     if s.hasPartLikeStreams():
         # check for tempo indications in the score
@@ -1367,8 +1373,15 @@ def _prepareStreamForMidi(s):
                 s.remove(mm) # remove from Score level
         # TODO: move any MetronomeMarks not in the top Part to the top Part
         
+        # process Volumes one part at a time
+        # this assumes that dynamics in a part/stream apply to all components
+        # of that part stream
+        # this sets the cachedRealized value for each Volume
+        for p in s.getElementsByClass('Stream'):
+            volume.realizeVolume(p)
+
     else: # just a single Stream
-        pass
+        volume.realizeVolume(s)
 
     return s
 
@@ -1511,6 +1524,7 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
         s = stream.Score()
     else:
         s = inputM21
+
     # store common elements such as time sig, key sig from conductor
     conductorTrack = stream.Stream()
     for mt in midiTracks:

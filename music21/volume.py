@@ -136,6 +136,8 @@ class Volume(object):
 
         Note that this value is derived from the set velocity value. Floating point error seen here will not be found in the velocity value. 
 
+        When setting this value, an integer-based velocity value will be derived and stored. 
+
         >>> from music21 import *
         >>> n = note.Note()
         >>> n.volume.velocityScalar = .5
@@ -316,12 +318,27 @@ class Volume(object):
         1.0
         ''')
 
+    def _getCachedRealizedStr(self):
+        return str(round(self._getCachedRealized(), 2))
+
+    cachedRealizedStr = property(_getCachedRealizedStr, doc='''
+        Convenience property for testing.
+
+        >>> from music21 import *
+        >>> v = volume.Volume(velocity=128)
+        >>> v.cachedRealizedStr
+        '1.0'
+        ''')
+
 #-------------------------------------------------------------------------------
 # utility stream processing methods
 
 
-def realizeVolume(self, srcStream, setAbsoluteVelocity=False):
+def realizeVolume(srcStream, setAbsoluteVelocity=False,         
+            useDynamicContext=True, useVelocity=True, useArticulations=True):
     '''Given a Stream with one level of dynamics (e.g., a Part, or two Staffs that share Dyanmics), destructively modify it to set all realized volume levels. These values will be stored in the Volume object as `cachedRealized` values. 
+
+    This is a top-down routine, as opposed to bottom-up values available with context searches on Volume. This thus offers a performance benefit. 
 
     This is always done in place; for the option of non-in place processing, see Stream.realizeVolume().
 
@@ -331,29 +348,52 @@ def realizeVolume(self, srcStream, setAbsoluteVelocity=False):
     '''
     # get dynamic map
     flatSrc = srcStream.flat # assuming sorted
-    # extend durations of all dyanmics
-    # doing this in place as this is a destructive opperation
-    boundaries = flatSrc.extendDuration('Dynamic', inPlace=True)
-    bKeys = boundaries.keys()
-    bKeys.sort() # sort
+
+    # check for any dyanmics
+    dyanmicsAvailable = False
+    if len(flatSrc.getElementsByClass('Dynamic')) > 0:
+        dyanmicsAvailable = True
+    else: # no dynamics available
+        if useDynamicContext is True: # only if True, and non avail, override
+            useDynamicContext = False
+
+    if dyanmicsAvailable:
+        # extend durations of all dyanmics
+        # doing this in place as this is a destructive opperation
+        boundaries = flatSrc.extendDurationAndGetBoundaries('Dynamic', inPlace=True)
+        bKeys = boundaries.keys()
+        bKeys.sort() # sort
 
     # assuming stream is sorted
+    # storing last releven index lets us always start form the last-used
+    # key, avoiding searching through entire list every time
     lastRelevantKeyIndex = 0
-    for e in flatStream: # iterate over all elements
-        if hasattr(e, 'volume'):
+    for e in flatSrc: # iterate over all elements
+        if hasattr(e, 'volume') and 'NotRest' in e.classes:
             # try to find a dynamic
             eStart = e.getOffsetBySite(flatSrc)
-
+    
             # get the most recent dynamic
-            dm = None
-            for k in range(lastRelevantKeyIndex, len(bKeys)):
-                start, end = bKeys[k]
-                if eStart >= start and eStart < end:
-                    # store so as to start in the same position
-                    # for next element
-                    lastRelevantKeyIndex = k
-                    dm = boundaries[bKeys[k]]
-                    break
+            if dyanmicsAvailable and useDynamicContext is True:
+                dm = False # set to not search dynamic context
+                for k in range(lastRelevantKeyIndex, len(bKeys)):
+                    start, end = bKeys[k]
+                    if eStart >= start and eStart < end:
+                        # store so as to start in the same position
+                        # for next element
+                        lastRelevantKeyIndex = k
+                        dm = boundaries[bKeys[k]]
+                        break
+            else: # permit supplying a single dynamic context for all materia
+                dm = useDynamicContext
+            # this returns a value, but all we need to do is to set the 
+            # cached values stored internally
+            val = e.volume.getRealized(useDynamicContext=dm, useVelocity=True, 
+                  useArticulations=True)
+            if setAbsoluteVelocity:
+                e.volume.velocityIsRelative = False
+                # set to velocity scalar
+                e.volume.velocityScalar = val
 
 
         
@@ -454,6 +494,49 @@ class Test(unittest.TestCase):
         d1 = dynamics.Dynamic('p')
         self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.6')
 
+
+    def testRealizeVolumeA(self):
+        from music21 import stream, dynamics, note, volume
+
+        s = stream.Stream()
+        s.repeatAppend(note.Note('g3'), 16)
+
+        # before insertion of dyanmics
+        match = [n.volume.cachedRealizedStr for n in s.notes]
+        self.assertEqual(match, ['0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71'])
+
+        for i, d in enumerate(['pp', 'p', 'mp', 'f', 'mf', 'ff', 'ppp', 'mf']):
+            s.insert(i*2, dynamics.Dynamic(d))
+
+        # cached will be out of date in regard to new dynamics
+        match = [n.volume.cachedRealizedStr for n in s.notes]
+        self.assertEqual(match, ['0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71', '0.71'])
+
+        # calling realize will set all to new cached values
+        volume.realizeVolume(s)
+        match = [n.volume.cachedRealizedStr for n in s.notes]
+        self.assertEqual(match, ['0.21', '0.21', '0.43', '0.43', '0.64', '0.64', '0.99', '0.99', '0.78', '0.78', '1.0', '1.0', '0.14', '0.14', '0.78', '0.78'])
+
+        # we can get the same results without using realizeVolume, though
+        # this uses slower context searches
+        s = stream.Stream()
+        s.repeatAppend(note.Note('g3'), 16)
+
+        for i, d in enumerate(['pp', 'p', 'mp', 'f', 'mf', 'ff', 'ppp', 'mf']):
+            s.insert(i*2, dynamics.Dynamic(d))
+        match = [n.volume.cachedRealizedStr for n in s.notes]
+        self.assertEqual(match, ['0.21', '0.21', '0.43', '0.43', '0.64', '0.64', '0.99', '0.99', '0.78', '0.78', '1.0', '1.0', '0.14', '0.14', '0.78', '0.78'])
+
+        # loooking at raw velocity values
+        match = [n.volume.velocity for n in s.notes]
+        self.assertEqual(match, [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None])
+
+        # can set velocity with realized values
+        volume.realizeVolume(s, setAbsoluteVelocity=True)
+        match = [n.volume.velocity for n in s.notes]
+        self.assertEqual(match, [27, 27, 54, 54, 81, 81, 126, 126, 99, 99, 127, 127, 18, 18, 99, 99])
+
+        #s.show('midi')
 
 
 #-------------------------------------------------------------------------------
