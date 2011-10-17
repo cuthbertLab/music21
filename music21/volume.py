@@ -538,6 +538,37 @@ class Test(unittest.TestCase):
 
         #s.show('midi')
 
+    def testRealizeVolumeB(self):
+        from music21 import corpus, dynamics
+        s = corpus.parse('bwv66.6')
+        
+        durUnit = s.highestTime  // 8 # let floor
+        dyns = ['pp', 'p', 'mp', 'f', 'mf', 'ff', 'f', 'mf']
+        
+        for i, p in enumerate(s.parts):
+            for j, d in enumerate(dyns):
+                oTarget = j*durUnit
+                # placing dynamics in Measure requires extra handling
+                m = p.getElementsByOffset(oTarget, 
+                    mustBeginInSpan=False).getElementsByClass('Measure')[0]
+                oInsert = oTarget - m.getOffsetBySite(p)
+                m.insert(oInsert, dynamics.Dynamic(d))
+            # shift 2 places each time
+            dyns = dyns[2:] + dyns[:2]
+        
+        #s.show()
+        #s.show('midi')
+        match = [n.volume.cachedRealizedStr for n in s.parts[0].flat.notes]
+        self.assertEqual(match, ['0.21', '0.21', '0.21', '0.21', '0.21', '0.43', '0.43', '0.43', '0.43', '0.64', '0.64', '0.64', '0.64', '0.64', '0.99', '0.99', '0.99', '0.99', '0.78', '0.78', '0.78', '0.78', '1.0', '1.0', '1.0', '1.0', '0.99', '0.99', '0.99', '0.99', '0.78', '0.78', '0.78', '0.78', '0.78', '0.78', '0.78'])
+
+        match = [n.volume.cachedRealizedStr for n in s.parts[1].flat.notes]
+        self.assertEqual(match, ['0.64', '0.64', '0.64', '0.64', '0.99', '0.99', '0.99', '0.99', '0.99', '0.78', '0.78', '0.78', '0.78', '0.78', '1.0', '1.0', '1.0', '1.0', '0.99', '0.99', '0.99', '0.99', '0.99', '0.78', '0.78', '0.78', '0.78', '0.21', '0.21', '0.21', '0.21', '0.21', '0.21', '0.43', '0.43', '0.43', '0.43', '0.43', '0.43', '0.43', '0.43', '0.43'])
+
+        match = [n.volume.cachedRealizedStr for n in s.parts[3].flat.notes]
+        self.assertEqual(match, ['0.99', '0.99', '0.99', '0.99', '0.99', '0.78', '0.78', '0.78', '0.78', '0.78', '0.21', '0.21', '0.21', '0.21', '0.21', '0.43', '0.43', '0.43', '0.43', '0.43', '0.43', '0.43', '0.64', '0.64', '0.64', '0.64', '0.99', '0.99', '0.99', '0.99', '0.78', '0.78', '0.78', '0.78', '0.78', '1.0', '1.0', '1.0', '1.0', '1.0', '1.0'])
+
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
