@@ -182,7 +182,8 @@ beatUnits = {2: u'\u2806',
              4: u'\u2832',
              8: u'\u2826'}
 
-rests = {'128th':   u'\u282d',
+rests = {'dummy':   u'\u2804\u2804\u2804',
+         '128th':   u'\u282d',
          '64th':    u'\u2827',
          '32nd':    u'\u2825',
          '16th':    u'\u280d',
@@ -450,14 +451,23 @@ class BrailleText():
             noteGrouping = elementKeywords['noteGrouping']
             showLeadingOctave = elementKeywords['showLeadingOctave']
             withHyphen = elementKeywords['withHyphen']
+            try:
+                forceHyphen = elementKeywords['forceHyphen']
+            except KeyError:
+                forceHyphen = True
             if self.linePos + len(noteGrouping) + 1 + int(withHyphen) > self.maxLineLength:
-                if not(showLeadingOctave == False):
+                if (self.maxLineLength - self.linePos > self.maxLineLength / 4 and len(noteGrouping) >= self.maxLineLength / 4):
+                    raise BrailleTextException("Note grouping needs to be split in two parts.")
+                elif showLeadingOctave == False:
+                    raise BrailleTextException("Note grouping needs to be recalculated with a leading octave.")
+                else:
+                    if withHyphen and forceHyphen:
+                        self.allLines[self.lineNumber] += symbols['music_hyphen']
+                        self.linePos += 1
                     self.allLines[self.lineNumber] += symbols['space'] * (self.maxLineLength - self.linePos)
                     self.lineNumber += 1
                     self.allLines[self.lineNumber] = u"".join([symbols['double_space'], noteGrouping])
                     self.linePos = len(noteGrouping) + 2
-                else:
-                    raise BrailleTextException("Note grouping needs to be recalculated with a leading octave.")
             else:
                 if not len(self.allLines[self.lineNumber]) == 0 and not self.linePos == 0:
                     if withHyphen:
@@ -642,7 +652,6 @@ def keyAndTimeSigToBraille(sampleKeySig = key.KeySignature(0), sampleTimeSig = m
         trans.append(timeSigToBraille(sampleTimeSig))
         
     return u''.join(trans)
-
 
 def showOctaveWithNote(previousNote = note.Note('C3'), currentNote = note.Note('D3')):
     '''
@@ -1291,7 +1300,16 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
         
         if isFirstOfSegment and measureNumberWithHeading:
             bt.addElement(measureNumber = numberToBraille(sampleMeasure.number))
-        
+
+        if isFirstOfSegment and startOffset == 0.0:
+            try:
+                insertDummyRest = measureKeywords['insertDummyRest']
+                if insertDummyRest:
+                    bt.allLines[bt.lineNumber] += symbols['space'] + rests['dummy']
+                bt.linePos += 4
+            except KeyError:
+                pass
+
         offsetGrouping = \
             sampleMeasure.getElementsByOffset(offsetStart = startOffset, offsetEnd = endTime, mustFinishInSpan = True)
         withHyphen = False
@@ -1307,13 +1325,31 @@ def measureToBraille(sampleMeasure = stream.Measure(), **measureKeywords):
             noteGrouping.remove(noteGrouping[0])
         allGroupings = noteGroupingsToBraille(noteGrouping, showLeadingOctave = showLeadingOctave)
         try:
-            bt.addElement(noteGrouping = allGroupings[0], showLeadingOctave = showLeadingOctave, withHyphen = False) 
-        except BrailleTextException:
-            allGroupings = noteGroupingsToBraille(noteGrouping, showLeadingOctave = True)
-            bt.addElement(noteGrouping = allGroupings[0], showLeadingOctave = True, withHyphen = False) 
-        if len(allGroupings) > 1:
+            bt.addElement(noteGrouping = allGroupings[0], showLeadingOctave = showLeadingOctave, withHyphen = False)
             for ng in allGroupings[1:]:
-                bt.addElement(noteGrouping = ng, showLeadingOctave = True, withHyphen = True)     
+                bt.addElement(noteGrouping = ng, showLeadingOctave = True, withHyphen = True, forceHyphen = False)     
+        except BrailleTextException:
+            if not(bt.maxLineLength - bt.linePos > bt.maxLineLength / 4 and len(allGroupings[0]) >= bt.maxLineLength / 4):
+                allGroupings = noteGroupingsToBraille(noteGrouping, showLeadingOctave = True)
+                bt.addElement(noteGrouping = allGroupings[0], showLeadingOctave = True, withHyphen = False)
+                for ng in allGroupings[1:]:
+                    bt.addElement(noteGrouping = ng, showLeadingOctave = True, withHyphen = True, forceHyphen = False)     
+            else:
+                isSolved = False
+                bdo = 0
+                while not isSolved:
+                    ng = splitMeasure(noteGrouping, value = 2, beatDivisionOffset = bdo, useTimeSignature = sampleMeasure.getTimeSignatures()[0])
+                    allGroupingsA = noteGroupingsToBraille(ng[0], showLeadingOctave = showLeadingOctave)
+                    allGroupingsB = noteGroupingsToBraille(ng[1], showLeadingOctave = True)
+                    allGroupings = allGroupingsA + allGroupingsB
+                    if (bt.maxLineLength - bt.linePos) < (len(allGroupings[0]) + 2):
+                        bdo += 1
+                        continue
+                    else:
+                        bt.addElement(noteGrouping = allGroupings[0], showLeadingOctave = showLeadingOctave, withHyphen = False)
+                        isSolved = True
+                        for ng in allGroupings[1:]:
+                            bt.addElement(noteGrouping = ng, showLeadingOctave = True, withHyphen = True, forceHyphen = True)
         isFirstGrouping = False
         
     return bt
@@ -1350,7 +1386,6 @@ def partToBraille(samplePart = stream.Part(), **keywords):
         measureNumberWithHeading = keywords['measureNumberWithHeading']
     if 'recenterHeading' in keywords:
         recenterHeading = keywords['recenterHeading']
-
     global UPPER_FIRST_IN_NOTE_FINGERING
     global SHOW_CLEF_SIGNS
     global SLUR_LONG_PHRASE_WITH_BRACKETS
@@ -1373,9 +1408,29 @@ def partToBraille(samplePart = stream.Part(), **keywords):
 
     prepareSlurredNotes(samplePart = samplePart)
     bt = BrailleText()
+    resetLineLength = False
+    if 'btFirstLineLength' in keywords:
+        bt.maxLineLength = keywords['btFirstLineLength']
+        resetLineLength = True
+    elif 'btMaxLineLength' in keywords:
+        bt.maxLineLength = keywords['btMaxLineLength']
+    else:
+        bt.maxLineLength = 40
     partTrans = []
     allMeasures = samplePart.getElementsByClass('Measure')
-    measureToBraille(allMeasures[0], isFirstOfSegment = True, precedingBrailleText = bt, measureNumberWithHeading = measureNumberWithHeading)
+    if 'insertDummyRest' in keywords:
+        insertDummyRest = keywords['insertDummyRest']
+        measureToBraille(allMeasures[0], isFirstOfSegment = True, precedingBrailleText = bt, measureNumberWithHeading = measureNumberWithHeading, insertDummyRest = insertDummyRest)
+    else:
+        measureToBraille(allMeasures[0], isFirstOfSegment = True, precedingBrailleText = bt, measureNumberWithHeading = measureNumberWithHeading)
+
+    if bt.lineNumber > 2 and resetLineLength:
+        if 'btMaxLineLength' in keywords:
+            bt.maxLineLength = keywords['btMaxLineLength']
+        else:
+            bt.maxLineLength = 40
+        resetLineLength = False
+       
     precedingNote = None
     if cancelOutgoingKeySig:
         outgoingKeySig = allMeasures[0].keySignature
@@ -1397,6 +1452,12 @@ def partToBraille(samplePart = stream.Part(), **keywords):
             measureToBraille(sampleMeasure, showLeadingOctave = showLeadingOctave, outgoingKeySig = outgoingKeySig, precedingBrailleText = bt)
         newLineNumber = bt.lineNumber
         if not(newLineNumber == oldLineNumber):
+            if resetLineLength:
+                if 'btMaxLineLength' in keywords:
+                    bt.maxLineLength = keywords['btMaxLineLength']
+                else:
+                    bt.maxLineLength = 40
+                resetLineLength = False
             precedingNote = None 
         if not(len(sampleMeasure.notes) == 0):
             precedingNote = sampleMeasure.notes[-1]
@@ -1644,6 +1705,95 @@ def brailleUnicodeToSymbols(sampleBraille = u'\u2800', filledSymbol = 'o', empty
 
 #-------------------------------------------------------------------------------
 # Helper Methods
+def splitMeasure(sampleMeasure = stream.Measure(), value = 2, beatDivisionOffset = 0, useTimeSignature = None):
+    '''
+    Takes a measure and splits it in two parts, although not necessarily in half.
+    Value is the number of partitions to split a time signature into.
+    The first part will contain all elements found within the offsets of the first partition..
+    The last part will contain all elements not found within the offsets of the first partition.
+    beatDivisionOffset is meant to adjust the end offset of the first partition by a certain
+    number of beats to the left.
+    '''
+    if not useTimeSignature == None:
+        ts = useTimeSignature
+    else:
+        ts = sampleMeasure.timeSignature
+    
+    offset = 0.0
+    if not(beatDivisionOffset == 0):
+        if abs(beatDivisionOffset) > ts.beatDivisionDurations:
+            raise Exception()
+        i = len(ts.beatDivisionDurations) - abs(beatDivisionOffset)
+        offset += ts.beatDivisionDurations[i].quarterLength
+        
+    bs = copy.deepcopy(ts.beatSequence)    
+    bs.partitionByCount(value)
+    (startOffsetZero, endOffsetZero) = bs.getLevelSpan()[0]
+    endOffsetZero -= offset
+    newMeasures = stream.Part()
+    newMeasures.append(stream.Measure())
+    newMeasures.append(stream.Measure())
+    for x in sampleMeasure:
+        if x.offset >= startOffsetZero and (x.offset < endOffsetZero or (x.offset == endOffsetZero and isinstance(x, bar.Barline))):
+            newMeasures[0].insert(x.offset, x)
+        else:
+            newMeasures[1].insert(x.offset, x)
+    for n in newMeasures[1].notes:
+        if n.tie != None:
+            newMeasures[0].append(n)
+            newMeasures[1].remove(n)
+            endOffsetZero += n.duration.quarterLength
+            continue
+        break
+
+    r0 = note.Rest(quarterLength = sampleMeasure.duration.quarterLength - endOffsetZero)
+    newMeasures[0].insert(endOffsetZero, r0)
+    r1 = note.Rest(quarterLength = endOffsetZero)
+    newMeasures[1].insert(0.0, r1)
+    
+    ts0_delete = False
+    if newMeasures[0].timeSignature == None:
+        ts0_delete = True
+        newMeasures[0].timeSignature = ts
+    newMeasures[1].timeSignature = ts
+    newMeasures[0].mergeAttributes(sampleMeasure)
+    newMeasures[1].mergeAttributes(sampleMeasure)
+    newMeasures[0].makeBeams()
+    newMeasures[1].makeBeams()
+    prepareBeamedNotes(newMeasures[0])
+    prepareBeamedNotes(newMeasures[1])
+    newMeasures[0].remove(r0)
+    newMeasures[1].remove(r1)
+    if ts0_delete == True:
+        newMeasures[0].remove(ts)
+    newMeasures[1].remove(ts)
+    return newMeasures
+
+def splitStreamByClass(sampleMeasure, classFilterList, groupWithPrevious = False):
+    '''
+    '''
+    elementsOfClasses = sampleMeasure.getElementsByClass(classFilterList)
+    if len(elementsOfClasses) == 0:
+        return [sampleMeasure]
+    
+    elementsByOffset = elementsOfClasses.groupElementsByOffset(returnDict = True)
+    if len(elementsByOffset.keys()) == 1 and 0.0 in elementsByOffset:
+        return [sampleMeasure]
+
+    allStreams = []
+    startIndex = 0
+    endIndex = 0
+    for offset in elementsByOffset:
+        if not(offset == 0.0):
+            if not groupWithPrevious:
+                endIndex = sampleMeasure.index(elementsByOffset[offset][0])
+            else:
+                endIndex = sampleMeasure.index(elementsByOffset[offset][-1]) + 1
+            allStreams.append(sampleMeasure[startIndex:endIndex])
+            startIndex = endIndex
+    endIndex = len(sampleMeasure)
+    allStreams.append(sampleMeasure[startIndex:endIndex])
+    return allStreams
 
 def wordToBraille(sampleWord = 'Andante'):
     '''
@@ -1678,33 +1828,6 @@ def numberToBraille(sampleNumber = 12):
         numberTrans.append(numbers[int(digit)])
     
     return u''.join(numberTrans)
-
-def splitStreamByClass(sampleMeasure, classFilterList, groupWithPrevious = False):
-    '''
-    keywords groupWithPrevious, includeF
-    '''
-    elementsOfClasses = sampleMeasure.getElementsByClass(classFilterList)
-    if len(elementsOfClasses) == 0:
-        return [sampleMeasure]
-    
-    elementsByOffset = elementsOfClasses.groupElementsByOffset(returnDict = True)
-    if len(elementsByOffset.keys()) == 1 and 0.0 in elementsByOffset:
-        return [sampleMeasure]
-
-    allStreams = []
-    startIndex = 0
-    endIndex = 0
-    for offset in elementsByOffset:
-        if not(offset == 0.0):
-            if not groupWithPrevious:
-                endIndex = sampleMeasure.index(elementsByOffset[offset][0])
-            else:
-                endIndex = sampleMeasure.index(elementsByOffset[offset][-1]) + 1
-            allStreams.append(sampleMeasure[startIndex:endIndex])
-            startIndex = endIndex
-    endIndex = len(sampleMeasure)
-    allStreams.append(sampleMeasure[startIndex:endIndex])
-    return allStreams
 
 
 class BrailleTranslateException(music21.Music21Exception):
