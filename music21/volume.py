@@ -200,6 +200,8 @@ class Volume(object):
 
         If `useDynamicContext` is True, a context search for a dynamic will be done, else dynamics are ignored. Alternatively, the useDynamicContext may supply a Dyanmic object that will be used instead of a context search.
 
+        If `useArticulations` is True and parent is not None, any articulations found on that parent will be used to adjust the volume. Alternatively, the `useArticulations` parameter may supply a list of articulations that will be used instead of that available on a parent.
+
         The `velocityIsRelative` tag determines if the velocity value includes contextual values, such as dynamics and and accents, or not. 
 
         >>> from music21 import stream, volume, note
@@ -267,8 +269,19 @@ class Volume(object):
                     val = val * (dm.volumeScalar * 2.0)
             # userArticulations can be a list of 1 or more articulation objects
             # as well as True/False
-            if useArticulations is not None:
-                pass
+            if useArticulations is not False:
+                am = None
+                if common.isListLike(useArticulations):
+                    am = useArticulations
+                elif hasattr(useArticulations, 
+                    'classes') and 'Articulation' in useArticulations.classes:
+                    am = [useArticulations] # place in a list
+                elif self.parent is not None:
+                    am = self.parent.articulations
+                if am is not None:
+                    for a in am:
+                        # add in volume shift for all articulations
+                        val += a.volumeShift
             
         if clip: # limit between 0 and 1
             if val > 1:
@@ -495,6 +508,27 @@ class Test(unittest.TestCase):
         self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.6')
 
 
+    def testGetRealizedB(self):
+        
+
+        from music21 import volume, dynamics, articulations
+
+        v1 = volume.Volume(velocity=64)
+        self.assertEqual(v1.getRealizedStr(), '0.5')
+
+        a1 = articulations.StrongAccent()
+        self.assertEqual(v1.getRealizedStr(useArticulations=a1), '0.65')
+
+        a1 = articulations.Accent()
+        self.assertEqual(v1.getRealizedStr(useArticulations=a1), '0.6')
+
+#         d1 = dynamics.Dynamic('ppp')
+#         self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.1')
+
+
+
+
+
     def testRealizeVolumeA(self):
         from music21 import stream, dynamics, note, volume
 
@@ -567,6 +601,22 @@ class Test(unittest.TestCase):
         match = [n.volume.cachedRealizedStr for n in s.parts[3].flat.notes]
         self.assertEqual(match, ['0.99', '0.99', '0.99', '0.99', '0.99', '0.78', '0.78', '0.78', '0.78', '0.78', '0.21', '0.21', '0.21', '0.21', '0.21', '0.43', '0.43', '0.43', '0.43', '0.43', '0.43', '0.43', '0.64', '0.64', '0.64', '0.64', '0.99', '0.99', '0.99', '0.99', '0.78', '0.78', '0.78', '0.78', '0.78', '1.0', '1.0', '1.0', '1.0', '1.0', '1.0'])
 
+
+    def testRealizeVolumeC(self):
+        from music21 import stream, note, dynamics, articulations
+
+        s = stream.Stream()
+        s.repeatAppend(note.Note('g3'), 16)
+
+        for i in range(0, 16, 3):
+            s.notes[i].articulations.append(articulations.Accent())
+        for i in range(0, 16, 4):
+            s.notes[i].articulations.append(articulations.StrongAccent())
+
+        match = [n.volume.cachedRealizedStr for n in s.notes]
+        self.assertEqual(match, ['0.96', '0.71', '0.71', '0.81', '0.86', '0.71', '0.81', '0.71', '0.86', '0.81', '0.71', '0.71', '0.96', '0.71', '0.71', '0.81'])
+        #s.show()
+        #s.show('midi')
 
 
 

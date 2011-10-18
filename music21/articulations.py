@@ -207,8 +207,8 @@ class Articulation(music21.Music21Object):
 
         >>> from music21 import *
         >>> at1 = articulations.StrongAccent()
-        >>> at1.volumeShift
-        0.2000...
+        >>> at1.volumeShift > .1
+        True
         ''')
 
     def _getMX(self):
@@ -319,7 +319,7 @@ class StrongAccent(Accent):
         '''
         Accent.__init__(self)
         self._mxName = 'strong-accent'
-        self._volumeShift = 0.2
+        self._volumeShift = 0.15
 
 class Staccato(LengthArticulation):
     def __init__(self):
