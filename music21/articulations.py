@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -124,6 +124,8 @@ class Articulation(music21.Music21Object):
         music21.Music21Object.__init__(self)
         self._mxName = None # specified in subclasses
         self.placement = 'above'
+        # declare a unit interval shift for the performance of this articulation
+        self._volumeShift = 0.0 
 
     def __repr__(self):
         return '<music21.articulations.%s>' % (self.__class__.__name__)
@@ -142,11 +144,7 @@ class Articulation(music21.Music21Object):
         True
 
 
-
-
         Comparison between classes and with the object itself behaves as expected
-        
-
 
 
         >>> at3 = articulations.Accent()
@@ -155,7 +153,6 @@ class Articulation(music21.Music21Object):
         False
         >>> at4 == at4
         True
-
 
 
         #OMIT_FROM_DOCS
@@ -194,7 +191,25 @@ class Articulation(music21.Music21Object):
         '''
         return not self.__eq__(other)
 
+    def _getVolumeShift(self):
+        return self._volumeShift
 
+    def _setVolumeShift(self, value):
+        # value should be between 0 and 1
+        if value > 1:
+            value = 1
+        elif value < -1:
+            value = -1
+        self._volumeShift = value
+
+    volumeShift = property(_getVolumeShift, _setVolumeShift, doc='''
+        Get or set the volumeShift of this Articulation. This value, between -1 and 1, that is used to shift the final Volume of the object it is attached to.
+
+        >>> from music21 import *
+        >>> at1 = articulations.StrongAccent()
+        >>> at1.volumeShift
+        0.2000...
+        ''')
 
     def _getMX(self):
         '''
@@ -210,10 +225,8 @@ class Articulation(music21.Music21Object):
         <accent placement=above>
 
 
-
         As a setter: Provided an musicxml.ArticulationMark object (not an mxArticulations object)
         configure the music21 object.
-
 
         Create both a musicxml.ArticulationMark object and a conflicting music21 object:
         
@@ -226,10 +239,7 @@ class Articulation(music21.Music21Object):
         >>> a.placement = 'above'
 
 
-
         Now override the music21 object with the mxArticulationMark object's characteristics
-
-
 
 
         >>> a.mx = mxArticulationMark
@@ -242,7 +252,6 @@ class Articulation(music21.Music21Object):
         >>> a.placement
         'below'
         '''
-
         #mxArticulations = musicxml.Articulations()
         mxArticulationMark = musicxml.ArticulationMark(self._mxName)
         mxArticulationMark.set('placement', self.placement)
@@ -299,6 +308,8 @@ class Accent(DynamicArticulation):
         '''
         DynamicArticulation.__init__(self)
         self._mxName = 'accent'
+        self._volumeShift = 0.1
+
 
 class StrongAccent(Accent):
     def __init__(self):
@@ -308,6 +319,7 @@ class StrongAccent(Accent):
         '''
         Accent.__init__(self)
         self._mxName = 'strong-accent'
+        self._volumeShift = 0.2
 
 class Staccato(LengthArticulation):
     def __init__(self):
@@ -317,6 +329,7 @@ class Staccato(LengthArticulation):
         '''
         LengthArticulation.__init__(self)
         self._mxName = 'staccato'
+        self._volumeShift = 0.05
 
 class Staccatissimo(Staccato):
     def __init__(self):
@@ -329,6 +342,7 @@ class Staccatissimo(Staccato):
         '''
         Staccato.__init__(self)
         self._mxName = 'staccatissimo'
+        self._volumeShift = 0.05
 
 class Spiccato(Staccato):
     def __init__(self):
@@ -340,6 +354,7 @@ class Spiccato(Staccato):
         '''
         Staccato.__init__(self)
         self._mxName = 'spiccato'
+        self._volumeShift = 0.05
 
 class Tenuto(LengthArticulation):
     def __init__(self):
@@ -349,6 +364,7 @@ class Tenuto(LengthArticulation):
         '''
         LengthArticulation.__init__(self)
         self._mxName = 'tenuto'
+        self._volumeShift = -0.05
 
 class DetachedLegato(LengthArticulation):
     def __init__(self):
@@ -358,6 +374,7 @@ class DetachedLegato(LengthArticulation):
         '''
         LengthArticulation.__init__(self)
         self._mxName = 'detached-legato'
+        self._volumeShift = 0
 
 
 class IndeterminantSlide(PitchArticulation):    
