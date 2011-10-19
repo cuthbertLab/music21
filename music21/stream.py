@@ -5076,7 +5076,6 @@ class Stream(music21.Music21Object):
             for v in bundle:
                 for e in v:
                     #environLocal.printDebug(['Stream.makeTies() iterating over elements in measure', m, e])
-    
                     #if hasattr(e, 'duration') and e.duration is not None:
                     if e.duration is not None:
                         # check to see if duration is within Measure
@@ -5126,7 +5125,6 @@ class Stream(music21.Music21Object):
                         elif overshot > 0:
                             environLocal.printDebug(['makeTies() found and skipping extremely small overshot into next measure', overshot])
             mCount += 1
-
         # changes elements
         returnObj._elementsChanged()
         return returnObj
@@ -5683,7 +5681,6 @@ class Stream(music21.Music21Object):
             returnObj = deepcopy(self)
         else:
             returnObj = self
-
         returnObj.extendDuration(objName, inPlace=True)
         elements = returnObj.getElementsByClass(objName)
         boundaries = {}
@@ -5885,6 +5882,73 @@ class Stream(music21.Music21Object):
             notes._elementsChanged()
             return notes
 
+
+    def extendTies(self, ignoreRests=False, pitchAttr='nameWithOctave'):
+        '''Connect any adjacent pitch space values that are the same with a Tie. Adjacent pitches can be Chords, Notes, or Voices.
+    
+        If `ignoreRests` is True, rests that occur between events will not be 
+        considered in matching pitches.
+
+        The `pitchAttr` determines the pitch attribute that is used for comparison. Any valid pitch attribute name can be used.
+        '''
+        def _getNextElements(srcStream, currentIndex, targetOffset, 
+                         ignoreRests=ignoreRests):
+            # need to find next event that start at the appropriate offset
+            if currentIndex == len(srcStream.notes) - 1:
+                return [] # nothing left
+            # iterate over all possible elements
+            if ignoreRests:
+                # need to find the offset of the first thing that is not rest
+                for i in range(currentIndex+1, len(srcStream._elements)):    
+                    e = srcStream._elements[i]
+                    if 'NotRest' in e.classes:
+                        # change target offset to this position
+                        targetOffset = srcStream._elements[i].getOffsetBySite(
+                                        srcStream)
+                        break
+            match = srcStream.getElementsByOffset(targetOffset)
+            #filter matched elements
+            post = []
+            for m in match: 
+                if 'NotRest' in m.classes:
+                    post.append(m)
+            return post 
+
+        # take all flat elements; this will remove all voices; just use offset
+        # position
+        # do not need to worry about ._endElements
+        srcFlat = self.flat
+        for i, e in enumerate(srcFlat._elements): 
+            pSrc = []
+            if 'Note' in e.classes:
+                pSrc = [e]
+            elif 'Chord' in e.classes:
+                pSrc = [n for n in e] # get components
+            for p in pSrc: 
+                # for each p, see if there is match in the next position
+                for m in _getNextElements(srcFlat, i, 
+                    e.getOffsetBySite(srcFlat)+e.duration.quarterLength):
+                    # for each element, look for a pitch to match   
+                    mSrc = []    
+                    if 'Note' in m.classes:
+                        mSrc = [m]
+                    elif 'Chord' in m.classes:
+                        mSrc = [n for n in m] # get components
+                    # final note comparison
+                    for q in mSrc:
+                        environLocal.printDebug(['comparing', q, p])
+                        if getattr(q.pitch, pitchAttr) == getattr(q.pitch, pitchAttr):
+                            # create a tie from p to q
+                            if p.tie is None:
+                                p.tie = tie.Tie('start')
+                            elif p.tie.type is 'stop':
+                                p.tie.type = 'continue'
+                            # if dst tie exists, assume it connects
+                            if q.tie is None:
+                                q.tie = tie.Tie('stop')
+                            elif q.tie.type is 'start':
+                                q.tie.type = 'continue'
+                            break # can only have one match from p to q
 
     #---------------------------------------------------------------------------
 
@@ -16948,6 +17012,39 @@ class Test(unittest.TestCase):
         self.assertEqual([str(p) for p in s.parts[0].pitches], ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'] )
         self.assertEqual([str(p) for p in s.parts[1].pitches], ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'] )
 
+
+
+    def testExtendTies(self):
+        from music21 import stream, note, chord
+
+
+        s = stream.Stream()
+        s.append(note.Note('g4'))
+        s.append(chord.Chord(['c3', 'g4', 'a5']))
+        s.append(note.Note('a5'))
+        s.append(chord.Chord(['c4', 'a5']))
+        s.extendTies()
+        #s.show()
+
+        s = stream.Stream()
+        s.append(note.Note('g4'))
+        s.append(note.Rest())
+        s.append(chord.Chord(['c2', 'g4', 'a5']))
+        s.append(note.Rest())
+        s.append(note.Note('a5'))
+        s.extendTies(ignoreRests=True)
+        #s.show()
+        
+        #TODO: test
+
+    def testExtendTies(self):
+        from music21 import corpus
+        s = corpus.parse('bwv66.6')
+        sChords = s.chordify()
+        sChords.extendTies()
+        # TODO: this creating extra ties, likely due to 
+        #sChords.show()
+        
 
 
 #-------------------------------------------------------------------------------

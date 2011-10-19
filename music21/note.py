@@ -187,8 +187,7 @@ class GeneralNote(music21.Music21Object):
         if "lyric" in keywords:
             self.addLyric(keywords['lyric'])
 
-        # note: Chord inherits this object, and thus has one Tie object
-        # chords may need Tie objects for each pitch
+        # note: Chords handle ties differently
         self.tie = None # store a Tie object
 
     def compactNoteInfo(self):
