@@ -153,7 +153,7 @@ class TonalCertainty(featuresModule.FeatureExtractor):
     [1.18093058...]
 
     '''
-    id = '' # TODO: need id
+    id = 'K1' # TODO: need id
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
@@ -689,6 +689,75 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
         self._feature.vector[0] = totalIncorrectlySpelled / float(totalForteTriads)
 
 
+class ChordBassMotionFeature(featuresModule.FeatureExtractor):
+    '''
+    A twelve element feature that reports the fraction
+    of all chord motion of music21.harmony.Harmony objects
+    that move up by i-half-steps. (a half-step motion down would
+    be stored in i = 11).  i = 0 is always 0.0 since consecutive
+    chords on the same pitch are ignored (unless there are 0 or 1 harmonies, in which case it is 1)
+       
+    Sample test on the beatles' "here comes the sun"
+    
+    >>> from music21 import *
+    >>> s = converter.parse('http://wikifonia.org/node/8859') # here comes the sun
+    >>> fe = features.native.ChordBassMotionFeature(s)
+    >>> fe.extract().vector 
+    [0.0, 0.05..., 0.14..., 0.03..., 0.06..., 0.3..., 0.008..., 0.303..., 0.0, 0.0, 0.07..., 0.008...]
+
+    
+    '''
+    id = 'CS12'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+
+        self.name = 'Chord Bass Motion'
+        self.description = '12-element vector showing the fraction of chords that move by x semitones (where x=0 is always 0 unless there are 0 or 1 harmonies, in which case it is 1).'
+        self.dimensions = 12
+        self.discrete = False 
+
+    def _process(self):
+        '''Do processing necessary, storing result in _feature.
+        '''
+        # use for total number of chords
+        harms = self.data['flat.getElementsByClass.Harmony']
+
+        totMotion = [0,0,0,0,0,0,0,0,0,0,0,0]
+        totalHarmonicMotion = 0
+        lastHarm = None
+        
+        for thisHarm in harms:
+            if lastHarm is None:
+                lastHarm = thisHarm
+            else:
+                if lastHarm.bass is not None:
+                    lastBass = lastHarm.bass
+                else:
+                    lastBass = lastHarm.root
+                    
+                if thisHarm.bass is not None:
+                    thisBass = thisHarm.bass
+                else:
+                    thisBass = thisHarm.root
+                    
+                if lastBass.pitchClass == thisBass.pitchClass:
+                    pass
+                else:
+                    halfStepMotion = (lastBass.pitchClass - thisBass.pitchClass) % 12
+                    totMotion[halfStepMotion] += 1
+                    totalHarmonicMotion += 1
+                    lastHarm = thisHarm
+                    
+        if totalHarmonicMotion == 0:
+            vector = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        else:
+            totHarmonicMotionFraction = [0.0, 0,0, 0,0,0, 0,0,0, 0,0,0]
+            for i in range(1, 12):
+                totHarmonicMotionFraction[i] = float(totMotion[i]) / totalHarmonicMotion
+            vector = totHarmonicMotionFraction
+
+
+        self._feature.vector = vector
 
 
 #-------------------------------------------------------------------------------
@@ -857,6 +926,8 @@ class LanguageFeature(featuresModule.FeatureExtractor):
 featureExtractors = [
 QualityFeature, #p22
 
+TonalCertainty, #k1
+
 UniqueNoteQuarterLengths, # ql1
 MostCommonNoteQuarterLength, # ql2
 MostCommonNoteQuarterLengthPrevalence, # ql3
@@ -873,6 +944,7 @@ DiminishedTriadSimultaneityPrevalence, # cs8
 TriadSimultaneityPrevalence, # cs9
 DiminishedSeventhSimultaneityPrevalence, # cs10
 IncorrectlySpelledTriadPrevalence, # cs11
+ChordBassMotionFeature, #cs12
 
 ComposerPopularity, #md1
 

@@ -290,6 +290,11 @@ class StreamForms(object):
             self._forms['flat.getElementsByClass.KeySignature'] = self._base.flat.getElementsByClass('KeySignature')
             return self._forms['flat.getElementsByClass.KeySignature']
 
+        elif key in ['flat.getElementsByClass.Harmony']:
+            self._forms['flat.getElementsByClass.Harmony'] = self._base.flat.getElementsByClass('Harmony')
+            return self._forms['flat.getElementsByClass.Harmony']
+
+
         elif key in ['metronomeMarkBoundaries']: # already flat
             self._forms['metronomeMarkBoundaries'] = self._base.metronomeMarkBoundaries()
             return self._forms['metronomeMarkBoundaries']

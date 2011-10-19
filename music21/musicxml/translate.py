@@ -1262,7 +1262,7 @@ def mxToChordSymbol(mxHarmony):
             elif isinstance(mxSub, musicxmlMod.DegreeAlter):
                 hd.interval = int(mxSub.charData)
             elif isinstance(mxSub, musicxmlMod.DegreeType):
-                hd.type = int(mxSub.charData)
+                hd.type = mxSub.charData
             else:
                 raise TranslateException('found unexpected object in degree tag: %s' % mxSub)
         # must get last on loop exit

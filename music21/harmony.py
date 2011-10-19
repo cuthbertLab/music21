@@ -394,6 +394,49 @@ class Test(unittest.TestCase):
         self.assertEqual(len(h._harmonyDegrees), 1)
 
 
+    def testCountHarmonicMotion(self):
+        from music21 import converter
+        s = converter.parse('http://wikifonia.org/node/8859')
+        harms = s.flat.getElementsByClass('Harmony')
+        
+        totMotion = [0,0,0,0,0,0,0,0,0,0,0,0]
+        totalHarmonicMotion = 0
+        lastHarm = None
+        
+        for thisHarm in harms:
+            if lastHarm is None:
+                lastHarm = thisHarm
+            else:
+                if lastHarm.bass is not None:
+                    lastBass = lastHarm.bass
+                else:
+                    lastBass = lastHarm.root
+                    
+                if thisHarm.bass is not None:
+                    thisBass = thisHarm.bass
+                else:
+                    thisBass = thisHarm.root
+                    
+                if lastBass.pitchClass == thisBass.pitchClass:
+                    pass
+                else:
+                    halfStepMotion = (lastBass.pitchClass - thisBass.pitchClass) % 12
+                    totMotion[halfStepMotion] += 1
+                    totalHarmonicMotion += 1
+                    lastHarm = thisHarm
+                    
+        if totalHarmonicMotion == 0:
+            vector = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        else:
+            totHarmonicMotionFraction = [0.0, 0,0, 0,0,0, 0,0,0, 0,0,0]
+            for i in range(1, 12):
+                totHarmonicMotionFraction[i] = float(totMotion[i]) / totalHarmonicMotion
+            vector = totHarmonicMotionFraction
+
+        print vector
+
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

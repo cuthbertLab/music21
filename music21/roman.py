@@ -238,6 +238,17 @@ class RomanNumeral(chord.Chord):
     >>> r.pitches
     [C#5, F#5, A5]
 
+
+    Dominant 7ths can be specified by putting d7 at end:
+
+    >>> r = roman.RomanNumeral('bVIId7', key.Key('B-'))
+    >>> r.figure
+    'bVIId7'
+    >>> r.pitches
+    [A-5, C6, E-6, G-6]
+
+
+
     >>> r2 = roman.RomanNumeral('V42/V7/vi', key.Key('C'))
     >>> r2.pitches
     [A4, B4, D#5, F#5]
@@ -433,6 +444,10 @@ class RomanNumeral(chord.Chord):
         elif figure.startswith('+'):
             figure = figure[1:]
             shouldBe = 'augmented'
+        elif figure.endswith('d7'):
+            figure = figure[:-2] + '7'
+            shouldBe = 'dominant-seventh'
+        
         elif self.caseMatters and romanNumeralAlone.upper() == romanNumeralAlone:
             shouldBe = 'major'
         elif self.caseMatters and romanNumeralAlone.lower() == romanNumeralAlone:
@@ -553,6 +568,8 @@ class RomanNumeral(chord.Chord):
             correctSemitones = (3, 6, 10)
         elif shouldBe == 'augmented':
             correctSemitones = (4, 8)
+        elif shouldBe == 'dominant-seventh':
+            correctSemitones = (4, 7, 10)
         else:
             return
 

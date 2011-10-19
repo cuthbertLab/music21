@@ -923,7 +923,7 @@ class Converter(object):
 
         # If we give the URL to a Wikifonia main page,
         # redirect to musicxml page:
-        matchedWikifonia = re.search("www.wikifonia.org/node/(\d+)", url)
+        matchedWikifonia = re.search("wikifonia.org/node/(\d+)", url)
         if matchedWikifonia:
             url = 'http://static.wikifonia.org/' + matchedWikifonia.group(1) + '/musicxml.xml'
 

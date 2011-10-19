@@ -127,10 +127,24 @@ def findFormat(fmt):
     ('midi', '.mid')
     >>> findFormat('abc')
     ('abc', '.abc')
-    >>> findFormat('md')
-    ('musedata', '.md')
     >>> findFormat('scl')
     ('scala', '.scl')
+
+
+    Works the same whether you have a leading dot or not:
+    
+
+    >>> findFormat('md')
+    ('musedata', '.md')
+    >>> findFormat('.md')
+    ('musedata', '.md')
+    
+    
+    If you give something we can't deal with, returns a Tuple of None, None:
+    
+    >>> findFormat('wpd')
+    (None, None)
+    
     '''
     # make lower case, as some lilypond processing used upper case
     fmt = fmt.lower().strip()
@@ -985,6 +999,8 @@ def fromRoman(num):
     Traceback (most recent call last):
     Music21CommonException: invalid roman numeral vx
     '''
+    if num == "":
+        raise Music21CommonException("No roman numeral specified.")
     if (num == 'I' or num == 'i'):
         return 1
     elif (num == 'II' or num == 'ii'):

@@ -336,7 +336,8 @@ class LanguageDetector(object):
 
     def mostLikelyLanguage(self, excerpt):
         '''
-        returns the code of the most likely language for a passage
+        returns the code of the most likely language for a passage, works on unicode or ascii.
+        current languages: en, fr, de, it, cn
 
         >>> from music21 import *
         >>> ld = text.LanguageDetector()
