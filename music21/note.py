@@ -645,6 +645,8 @@ class NotRest(GeneralNote):
     def _setNoteheadFill(self, value):
         if value == 'none' or value is None: 
             value = None # allow setting to none or None
+        if value == 'filled':
+            value = 'yes'
         elif value not in ['default', 'yes', 'no']:
             raise NotRestException('not a valid notehead fill value: %s' % value)
         self._noteheadFill = value

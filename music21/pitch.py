@@ -3487,7 +3487,8 @@ class Pitch(music21.Music21Object):
 
 
         If `cautionaryNotImmediateRepeat` is True, cautionary accidentals will be displayed 
-        for an altered pitch even if that pitch had already been displayed as altered. 
+        for an altered pitch even if that pitch had already been displayed as altered (unless
+        it's an immediate repetition).
 
 
         If `lastNoteWasTied` is True then this note will be treated as immediately following a tie.
@@ -3701,6 +3702,19 @@ class Pitch(music21.Music21Object):
                     if self.accidental == None:
                         self.accidental = Accidental('natural')
                     self.accidental.displayStatus = True
+
+                # cautionaryNotImmediateRepeat == False
+                # but the previous note was not in this measure,
+                # so do the previous step anyhow
+                elif (self._stepInKeySignature(alteredPitches) == True
+                      and cautionaryNotImmediateRepeat == False
+                      and pPastInMeasure == False):
+                    if self.accidental == None:
+                        self.accidental = Accidental('natural')
+                    self.accidental.displayStatus = True
+
+                
+                
                 # other cases: already natural in past usage, do not need 
                 # natural again (and not in key sig)
                 else:
@@ -3856,7 +3870,7 @@ class Pitch(music21.Music21Object):
             
         noteOut = note.Note(soundingPitch.nameWithOctave)
         noteOut.noteheadParen = True
-        noteOut.noteheadFill = 'filled'
+        noteOut.noteheadFill = 'yes'
         noteOut.stemDirection = 'noStem'
         
         note1 = note.Note(pitchList[0].nameWithOctave)
