@@ -3096,6 +3096,17 @@ class Stream(music21.Music21Object):
             return None
 
 
+    def measureTemplate(self):
+        '''If this Stream contains measures, return a new Stream with new Measures populated with the same characteristics of those found in this Stream.
+        '''
+        if not self.hasMeasures():
+            raise StreamException('the requested Stream does not have Measures')
+        measureTemplate = copy.deepcopy(self.getElementsByClass('Measure'))
+        for i, m in enumerate(measureTemplate):
+            m.removeByClass(['GeneralNote'])
+            m.removeByClass(['Dyanmic'])
+        return measureTemplate
+
     def measureOffsetMap(self, classFilterList=None):
         '''
         If this Stream contains Measures, provide a dictionary 
@@ -4249,8 +4260,7 @@ class Stream(music21.Music21Object):
             allParts = [returnObj]
 
         if toSoundingPitch:
-            environLocal.printDebug(['at sounding pitch',     
-                allParts[0].atSoundingPitch])
+            #environLocal.printDebug(['at sounding pitch',     allParts[0].atSoundingPitch])
             if allParts[0].atSoundingPitch == False: # if false
                 returnObj.toSoundingPitch(inPlace=True)
 
