@@ -5894,16 +5894,17 @@ class Stream(music21.Music21Object):
         def _getNextElements(srcStream, currentIndex, targetOffset, 
                          ignoreRests=ignoreRests):
             # need to find next event that start at the appropriate offset
-            if currentIndex == len(srcStream.notes) - 1:
+            if currentIndex == len(srcStream) - 1: # assume flat
+                #environLocal.pd(['_getNextElements: nothing to process', currentIndex, len(srcStream.notes) ])
                 return [] # nothing left
             # iterate over all possible elements
             if ignoreRests:
                 # need to find the offset of the first thing that is not rest
-                for i in range(currentIndex+1, len(srcStream._elements)):    
-                    e = srcStream._elements[i]
+                for j in range(currentIndex+1, len(srcStream._elements)):    
+                    e = srcStream._elements[j]
                     if 'NotRest' in e.classes:
                         # change target offset to this position
-                        targetOffset = srcStream._elements[i].getOffsetBySite(
+                        targetOffset = srcStream._elements[j].getOffsetBySite(
                                         srcStream)
                         break
             match = srcStream.getElementsByOffset(targetOffset)
@@ -5917,17 +5918,23 @@ class Stream(music21.Music21Object):
         # take all flat elements; this will remove all voices; just use offset
         # position
         # do not need to worry about ._endElements
-        srcFlat = self.flat
+        srcFlat = self.flat.notes
         for i, e in enumerate(srcFlat._elements): 
             pSrc = []
             if 'Note' in e.classes:
                 pSrc = [e]
             elif 'Chord' in e.classes:
                 pSrc = [n for n in e] # get components
+            else:
+                continue
+            #environLocal.pd(['examining', i, e])
+            connections = _getNextElements(srcFlat, i, 
+                e.getOffsetBySite(srcFlat)+e.duration.quarterLength)
+            #environLocal.pd(['possible conections', connections])
+
             for p in pSrc: 
                 # for each p, see if there is match in the next position
-                for m in _getNextElements(srcFlat, i, 
-                    e.getOffsetBySite(srcFlat)+e.duration.quarterLength):
+                for m in connections:
                     # for each element, look for a pitch to match   
                     mSrc = []    
                     if 'Note' in m.classes:
@@ -5936,18 +5943,15 @@ class Stream(music21.Music21Object):
                         mSrc = [n for n in m] # get components
                     # final note comparison
                     for q in mSrc:
-                        environLocal.printDebug(['comparing', q, p])
-                        if getattr(q.pitch, pitchAttr) == getattr(q.pitch, pitchAttr):
+                        if getattr(q.pitch, pitchAttr) == getattr(p.pitch, 
+                            pitchAttr):
                             # create a tie from p to q
                             if p.tie is None:
                                 p.tie = tie.Tie('start')
                             elif p.tie.type is 'stop':
                                 p.tie.type = 'continue'
                             # if dst tie exists, assume it connects
-                            if q.tie is None:
-                                q.tie = tie.Tie('stop')
-                            elif q.tie.type is 'start':
-                                q.tie.type = 'continue'
+                            q.tie = tie.Tie('stop')
                             break # can only have one match from p to q
 
     #---------------------------------------------------------------------------
@@ -17014,7 +17018,7 @@ class Test(unittest.TestCase):
 
 
 
-    def testExtendTies(self):
+    def testExtendTiesA(self):
         from music21 import stream, note, chord
 
 
@@ -17024,28 +17028,28 @@ class Test(unittest.TestCase):
         s.append(note.Note('a5'))
         s.append(chord.Chord(['c4', 'a5']))
         s.extendTies()
-        #s.show()
+        post = []
+        for n in s.flat.getElementsByClass('GeneralNote'):
+            if 'Chord' in n.classes:
+                post.append([q.tie for q in n])
+            else:
+                post.append(n.tie)
+        self.assertEqual(str(post), '[<music21.tie.Tie start>, [None, <music21.tie.Tie stop>, <music21.tie.Tie start>], <music21.tie.Tie continue>, [None, <music21.tie.Tie stop>]]')
 
-        s = stream.Stream()
-        s.append(note.Note('g4'))
-        s.append(note.Rest())
-        s.append(chord.Chord(['c2', 'g4', 'a5']))
-        s.append(note.Rest())
-        s.append(note.Note('a5'))
-        s.extendTies(ignoreRests=True)
-        #s.show()
-        
-        #TODO: test
 
-    def testExtendTies(self):
+
+    def testExtendTiesB(self):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
-        sChords = s.chordify()
+        sChords = s.measures(9, 9).chordify()
+        #sChords = s.chordify()
         sChords.extendTies()
-        # TODO: this creating extra ties, likely due to 
+        post = []
+        for chord in sChords.flat.getElementsByClass('Chord'):
+            post.append([n.tie for n in chord])
+        self.assertEqual(str(post), '[[<music21.tie.Tie start>, <music21.tie.Tie start>, <music21.tie.Tie start>], [<music21.tie.Tie continue>, None, <music21.tie.Tie continue>, <music21.tie.Tie stop>], [<music21.tie.Tie stop>, <music21.tie.Tie start>, <music21.tie.Tie continue>, <music21.tie.Tie start>], [None, <music21.tie.Tie stop>, <music21.tie.Tie stop>, <music21.tie.Tie stop>], [None, None, None, None]]')
         #sChords.show()
-        
-
+    
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
