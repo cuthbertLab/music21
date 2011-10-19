@@ -447,10 +447,29 @@ class Chord(note.NotRest):
         return post
 
     def _setPitches(self, value):
+        '''
+        test that root and bass get reset after pitches change:
+        
+        >>> from music21 import *
+        >>> c = chord.Chord(['C4', 'A4', 'E5'])
+        >>> c.bass()
+        C4
+        >>> c.root()
+        A4
+        >>> c.pitches = ['C#4', 'A#4', 'E#5']
+        >>> c.bass()
+        C#4
+        >>> c.root()
+        A#4
+        
+        '''
+        
         #if value != [d['pitch'] for d in self._components]:
         if value != [d.pitch for d in self._components]:
             self._chordTablesAddressNeedsUpdating = True
         self._components = []
+        self._root = None
+        self._bass = None
         # assume we have pitch objects here
         # TODO: individual ties are not being retained here
         for p in value:

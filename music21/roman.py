@@ -246,6 +246,12 @@ class RomanNumeral(chord.Chord):
     'bVIId7'
     >>> r.pitches
     [A-5, C6, E-6, G-6]
+    >>> r = roman.RomanNumeral('VId7')
+    >>> r.figure
+    'VId7'
+    >>> r.setKeyOrScale(key.Key('B-'))
+    >>> r.pitches
+    [G5, B5, D6, F6]
 
 
 
@@ -266,6 +272,26 @@ class RomanNumeral(chord.Chord):
     >>> rn3 = roman.RomanNumeral('III', dminor)
     >>> rn3.pitches
     [F4, A4, C5]
+
+
+    Should be the same as above no matter when the key is set:
+    
+    >>> r = roman.RomanNumeral('VId7', key.Key('B-'))
+    >>> r.pitches
+    [G5, B5, D6, F6]
+    >>> r.setKeyOrScale(key.Key('B-'))
+    >>> r.pitches
+    [G5, B5, D6, F6]
+    
+
+    This was getting B-flat.
+
+    >>> r = roman.RomanNumeral('VId7')
+    >>> r.setKeyOrScale(key.Key('B-'))
+    >>> r.pitches
+    [G5, B5, D6, F6]
+
+    
     
     '''
 
@@ -349,6 +375,9 @@ class RomanNumeral(chord.Chord):
     def _parseFigure(self, prelimFigure):
         '''
         '''
+        if prelimFigure == 'VId7':
+            pass
+        
         if not common.isStr(prelimFigure):
             raise RomanException('got a non-string figure: %r', prelimFigure)
 

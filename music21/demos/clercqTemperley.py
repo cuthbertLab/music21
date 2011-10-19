@@ -72,7 +72,6 @@ def convertCTRTstr(fileString):
                 pass # BETH: Meter (and rhythm throughout...)
         elif atom != '|' and atom != ".":
             try:
-                print atom
                 if currentKey is None:
                     rn = music21.roman.RomanNumeral(atom)
                 else:
@@ -88,6 +87,7 @@ def convertCTRTstr(fileString):
             currentKey = el
         elif 'RomanNumeral' in el.classes:
             el.setKeyOrScale(currentKey)
+            el.lyric = el.figure
     
     scoreObj.subsections = allSubsections
     return scoreObj
