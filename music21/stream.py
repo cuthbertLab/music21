@@ -3096,15 +3096,19 @@ class Stream(music21.Music21Object):
             return None
 
 
-    def measureTemplate(self):
+    def measureTemplate(self, fillWithRests=True):
         '''If this Stream contains measures, return a new Stream with new Measures populated with the same characteristics of those found in this Stream.
         '''
         if not self.hasMeasures():
             raise StreamException('the requested Stream does not have Measures')
         measureTemplate = copy.deepcopy(self.getElementsByClass('Measure'))
         for i, m in enumerate(measureTemplate):
-            m.removeByClass(['GeneralNote'])
+            m.removeByClass(['GeneralNote']) # includes rests
             m.removeByClass(['Dyanmic'])
+            if fillWithRests:
+                ql = m.duration.quarterLength
+                # quarterLength duration will be appropriate to pickup
+                m.insert(0, note.Rest(quarterLength=ql))
         return measureTemplate
 
     def measureOffsetMap(self, classFilterList=None):
