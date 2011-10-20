@@ -20,7 +20,7 @@ from music21 import common
 from music21 import pitch
 from music21 import roman
 from music21 import interval
-
+from music21 import duration
 
 from music21 import environment
 _MOD = "harmony.py"
@@ -61,7 +61,21 @@ environLocal = environment.Environment(_MOD)
 # <xs:enumeration value="Tristan"/>
 # <xs:enumeration value="other"/>
 # <xs:enumeration value="none"/>
-
+def getduration(piece):
+    pf = piece.flat
+    onlychords = pf.getElementsByClass(ChordSymbol)
+    first = True
+    for cs in onlychords:
+        if first:
+            lastchord = cs
+            first = False
+            continue
+        else:
+            lastchord.duration.quarterLength = cs.getOffsetBySite(pf) - lastchord.getOffsetBySite(pf)
+            if onlychords.index(cs) == (len(onlychords) - 1):
+                cs.duration.quarterLength = pf.highestOffset - cs.getOffsetBySite(pf)
+            lastchord = cs
+    return pf
 
 #-------------------------------------------------------------------------------
 class HarmonyDegreeException(Exception):
@@ -197,7 +211,7 @@ class Harmony(music21.Music21Object):
     >>> h.inversion = 1
     >>> h.addHarmonyDegree(harmony.HarmonyDegree('add', 4))
     >>> h
-    <music21.harmony.Harmony kind=major (M) root=B- bass=D inversion=1 harmonyDegrees=<music21.harmony.HarmonyDegree type=add degree=4 interval=None>>
+    <music21.harmony.Harmony kind=major (M) root=B- bass=D inversion=1 duration=0.0 harmonyDegrees=<music21.harmony.HarmonyDegree type=add degree=4 interval=None>>
 
     '''
     # TODO: accept some creation args
@@ -219,9 +233,9 @@ class Harmony(music21.Music21Object):
 
     def __repr__(self):
         if len(self._harmonyDegrees) == 0:
-            return '<music21.harmony.%s kind=%s (%s) root=%s bass=%s inversion=%s>' % (self.__class__.__name__, self.kind, self.kindStr, self.root, self.bass, self.inversion)
+            return '<music21.harmony.%s kind=%s (%s) root=%s bass=%s inversion=%s duration=%s>' % (self.__class__.__name__, self.kind, self.kindStr, self.root, self.bass, self.inversion, self.duration.quarterLength)
         else:
-            return '<music21.harmony.%s kind=%s (%s) root=%s bass=%s inversion=%s harmonyDegrees=%s>' % (self.__class__.__name__, self.kind, self.kindStr, self.root, self.bass, self.inversion, ''.join([str(x) for x in self._harmonyDegrees]))
+            return '<music21.harmony.%s kind=%s (%s) root=%s bass=%s inversion=%s duration=%s harmonyDegrees=%s>' % (self.__class__.__name__, self.kind, self.kindStr, self.root, self.bass, self.inversion, self.duration.quarterLength,''.join([str(x) for x in self._harmonyDegrees]))
 
 
     #---------------------------------------------------------------------------
@@ -365,18 +379,16 @@ class Harmony(music21.Music21Object):
         '''
         return self._harmonyDegrees
 
-
 class ChordSymbol(Harmony):
-    '''
-    BETH: Fill in info!  :-)
-    
-    >>> from music21 import *
-    >>> cs = harmony.ChordSymbol()
-    >>> cs
-    <music21.harmony.ChordSymbol kind= () root=None bass=None inversion=None>
-    '''
     pass
 
+'''
+     >>> from music21 import *
+     >>> cs = harmony.ChordSymbol()
+     >>> cs
+     <music21.harmony.ChordSymbol kind= () root=None bass=None inversion=None duration=0.0>
+    
+'''
 
 
 #-------------------------------------------------------------------------------
