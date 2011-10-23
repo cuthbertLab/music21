@@ -273,6 +273,10 @@ class ScoreReduction(object):
         if len(self._reductiveGroups) == 1:
             # if 1, can be None or a group name:
             oneGroup = True
+        oneVoice = False
+        if len(self._reductiveVoices) == 1:
+            # if 1, can be None or a group name:
+            oneVoice = True
 
         # for each defined reductive group
         for gName in self._reductiveGroups:
@@ -286,18 +290,35 @@ class ScoreReduction(object):
                 if oneGroup or rn['group'] == gName:
                     environLocal.pd(['_createReduction(): found reductive note, rn', rn, 'group', gName])
                     gMeasure = gMeasures[rn.measureIndex]
-                    # there will be rests in this Measure on first usage
-                    gMeasure.removeByClass('Rest')
-                    gMeasure.insert(rn.measureOffset, rn.getNote())
+                    if len(gMeasure.voices) == 0: # common setup routines
+                        # if no voices, start by removing rests
+                        gMeasure.removeByClass('Rest')
+                        for vId in self._reductiveVoices:
+                            v = stream.Voice()
+                            v.id = vId
+                            gMeasure.insert(0, v)
+                    if oneVoice:
+                        gMeasure.voices[0].insert(rn.measureOffset, rn.getNote())
+                    else:
+                        v = gMeasure.getElementById(rn['voice'])
+                        if v is None: # just take the first
+                            v = gMeasure.voices[0]
+                        v.insert(rn.measureOffset, rn.getNote())
 
             # after gathering all parts, fill with rests
             for i, m in enumerate(g.getElementsByClass('Measure')):
+
                 # only make rests if there are notes in the measure
-                if len(m.flat.notes) > 0:
-                    m.makeRests(fillGaps=True, inPlace=True) 
-                # hide all rests       
-                for r in m.getElementsByClass('Rest'):
+                for v in m.voices:
+                    if len(v.flat.notes) > 0:
+                        v.makeRests(fillGaps=True, inPlace=True) 
+                m.flattenUnnecessaryVoices(inPlace=True)
+                # hide all rests in all containers
+                for r in m.flat.getElementsByClass('Rest'):
                     r.hideObjectOnPrint = True
+
+                #m.show('t')
+
             # add to score
             s.insert(0, g)
             print g
@@ -333,7 +354,8 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         #s.show()
         s.parts[0].flat.notes[3].addLyric('test')
-        s.parts[0].flat.notes[4].addLyric('::/o:6/tb:here')
+        s.parts[0].flat.notes[4].addLyric('::/o:6/tb:here/v:2')
+        s.parts[3].flat.notes[2].addLyric('::/o:5/tb:fromBass/v:1')
 
         s.parts[1].flat.notes[7].addLyric('::/o:6/nf:no/g:Ursatz')
 
@@ -343,14 +365,13 @@ class Test(unittest.TestCase):
         post = sr.reduce()
         #post.show()
         #post.parts[0].show('t')
-
-        self.assertEqual(len(post.parts[0].flat.notes), 2)
+        self.assertEqual(len(post.parts[0].flat.notes), 3)
 
         match = [(e, e.offset, e.duration.quarterLength) for e in post.parts[0].getElementsByClass('Measure')[0:3].flat.notesAndRests]
-        self.assertEqual(str(match), '[(<music21.note.Rest rest>, 0.0, 1.0), (<music21.note.Rest rest>, 1.0, 2.0), (<music21.note.Note C#>, 3.0, 1.0), (<music21.note.Rest rest>, 5.0, 1.0), (<music21.note.Note G#>, 6.0, 1.0)]')
+        self.assertEqual(str(match), '[(<music21.note.Rest rest>, 0.0, 1.0), (<music21.note.Rest rest>, 1.0, 2.0), (<music21.note.Note F#>, 1.0, 1.0), (<music21.note.Note C#>, 3.0, 1.0), (<music21.note.Rest rest>, 5.0, 1.0), (<music21.note.Note G#>, 6.0, 1.0)]')
 
         # test that lyric is found
-        self.assertEqual(post.parts[0].flat.notes[0].lyric, 'here')
+        self.assertEqual(post.parts[0].flat.notes[0].lyric, 'fromBass')
 
 
 #-------------------------------------------------------------------------------
