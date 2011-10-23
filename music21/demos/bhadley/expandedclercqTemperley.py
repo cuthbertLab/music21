@@ -1,5 +1,5 @@
 '''    Demonstration of how music21 can read in an expanded 
-       LeClerq and Temperley text file and output roman numeral 
+       Clercq and Temperley text file and output roman numeral 
        objects to score. **Note** input text file must be specially 
        expanded using C parser external to music21...I'm working on improving this!
        but this is the most accurate way to do things for now
@@ -9,11 +9,12 @@ import music21
 import shutil
 #CHANGE DIRECTORY BELOW!!!
 #good demo file to try: 23 (Bridge Over Troubled Water)
-dst = 'C:\\expandedclerqtemperley\\23.txt' #location of EXPANDED leclerq and tempereley file
-#format of text file
+#The following numbers of Temperley files won't work: 4,49,50,54,and 180 
+dst = 'C:\\expandedclercqtemperley\\23.txt' #location of EXPANDED clercq and tempereley file
+#format of text file:
 #[start] [end] [Roman numeral] [chromatic root] [diatonic root] [key] [absolute root] [timesig]
 chordlist = []
-#try:
+
 try:
     f = open(dst, 'r')
     i = 0; 
