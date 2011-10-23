@@ -101,7 +101,7 @@ class ReductiveNote(object):
         # start with the defaults
         self._parameters = copy.deepcopy(self._defaultParameters)
         spec = spec.strip()
-        spec = spec.replace(' ', '')
+        #spec = spec.replace(' ', '')
         if not spec.startswith(self._delimitValue+self._delimitValue):
             return # nothing to parse
         args = spec.split(self._delimitArg)
@@ -111,6 +111,7 @@ class ReductiveNote(object):
                 continue
             candidateKey, value = a.split(self._delimitValue)
             candidateKey = candidateKey.strip()
+            value = value.strip()
             if candidateKey.lower() in self._parameterKeys.keys():
                 attr = self._parameterKeys[candidateKey]
                 self._parameters[attr] = value
@@ -149,7 +150,7 @@ class ReductiveNote(object):
         if 'textBelow' in self._parameters.keys():
             n.addLyric(self._parameters['textBelow'])
         if 'textAbove' in self._parameters.keys():
-            te = expressions.TextExpression('testing')
+            te = expressions.TextExpression(self._parameters['textAbove'])
         return n, te
 
 
@@ -302,14 +303,16 @@ class ScoreReduction(object):
                         n, te = rn.getNoteAndTextExpression()
                         gMeasure.voices[0].insert(rn.measureOffset, n)
                         # place the text expression in the Measure, not Voice
+                        if te is not None:
+                            gMeasure.voices[0].insert(rn.measureOffset, te)
                     else:
                         v = gMeasure.getElementById(rn['voice'])
                         if v is None: # just take the first
                             v = gMeasure.voices[0]
                         n, te = rn.getNoteAndTextExpression()
                         v.insert(rn.measureOffset, n)
-                    if te is not None:
-                        gMeasure.insert(rn.measureOffset, te)
+                        if te is not None:
+                            v.insert(rn.measureOffset, te)
 
             # after gathering all parts, fill with rests
             for i, m in enumerate(g.getElementsByClass('Measure')):
@@ -360,10 +363,10 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         #s.show()
         s.parts[0].flat.notes[3].addLyric('test')
-        s.parts[0].flat.notes[4].addLyric('::/o:6/tb:here/v:2')
-        s.parts[3].flat.notes[2].addLyric('::/o:5/tb:fromBass/v:1')
+        s.parts[0].flat.notes[4].addLyric('::/o:6/tb:here')
+        s.parts[3].flat.notes[2].addLyric('::/o:5/tb:fromBass')
 
-        s.parts[1].flat.notes[7].addLyric('::/o:6/nf:no/g:Ursatz/ta:3')
+        s.parts[1].flat.notes[7].addLyric('::/o:4/nf:no/g:Ursatz/ta:3 3 200')
 
         sr = analysis.reduction.ScoreReduction()
         sr.score = s
@@ -373,8 +376,10 @@ class Test(unittest.TestCase):
         #post.parts[0].show('t')
         self.assertEqual(len(post.parts[0].flat.notes), 3)
 
+        #post.parts[0].show('t')
+
         match = [(e, e.offset, e.duration.quarterLength) for e in post.parts[0].getElementsByClass('Measure')[0:3].flat.notesAndRests]
-        self.assertEqual(str(match), '[(<music21.note.Rest rest>, 0.0, 1.0), (<music21.note.Rest rest>, 1.0, 2.0), (<music21.note.Note F#>, 1.0, 1.0), (<music21.note.Note C#>, 3.0, 1.0), (<music21.note.Rest rest>, 5.0, 1.0), (<music21.note.Note G#>, 6.0, 1.0)]')
+        self.assertEqual(str(match), '[(<music21.note.Rest rest>, 0.0, 1.0), (<music21.note.Note F#>, 1.0, 1.0), (<music21.note.Rest rest>, 2.0, 1.0), (<music21.note.Note C#>, 3.0, 1.0), (<music21.note.Rest rest>, 5.0, 1.0), (<music21.note.Note G#>, 6.0, 1.0)]')
 
         # test that lyric is found
         self.assertEqual(post.parts[0].flat.notes[0].lyric, 'fromBass')
