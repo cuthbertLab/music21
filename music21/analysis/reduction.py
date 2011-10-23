@@ -15,7 +15,7 @@ import copy
 
 
 import music21 
-from music21 import stream, note
+from music21 import stream, note, expressions
 
 
 from music21 import environment
@@ -119,7 +119,7 @@ class ReductiveNote(object):
     def isParsed(self):
         return self._isParsed
 
-    def getNote(self):
+    def getNoteAndTextExpression(self):
         '''Produce a new note, a deep copy of the supplied note and with the specified modifications.
         '''
         if self._note.isChord:
@@ -136,6 +136,7 @@ class ReductiveNote(object):
             n = copy.deepcopy(self._note)
         # always clear certain parameters
         n.lyrics = []
+        te = None
 
         if 'octave' in self._parameters.keys():
             if self._parameters['octave'] is not None:
@@ -147,9 +148,9 @@ class ReductiveNote(object):
                 n.noteheadFill = self._parameters['noteheadFill']
         if 'textBelow' in self._parameters.keys():
             n.addLyric(self._parameters['textBelow'])
-
-        return n
-
+        if 'textAbove' in self._parameters.keys():
+            te = expressions.TextExpression('testing')
+        return n, te
 
 
 #-------------------------------------------------------------------------------
@@ -298,12 +299,17 @@ class ScoreReduction(object):
                             v.id = vId
                             gMeasure.insert(0, v)
                     if oneVoice:
-                        gMeasure.voices[0].insert(rn.measureOffset, rn.getNote())
+                        n, te = rn.getNoteAndTextExpression()
+                        gMeasure.voices[0].insert(rn.measureOffset, n)
+                        # place the text expression in the Measure, not Voice
                     else:
                         v = gMeasure.getElementById(rn['voice'])
                         if v is None: # just take the first
                             v = gMeasure.voices[0]
-                        v.insert(rn.measureOffset, rn.getNote())
+                        n, te = rn.getNoteAndTextExpression()
+                        v.insert(rn.measureOffset, n)
+                    if te is not None:
+                        gMeasure.insert(rn.measureOffset, te)
 
             # after gathering all parts, fill with rests
             for i, m in enumerate(g.getElementsByClass('Measure')):
@@ -357,7 +363,7 @@ class Test(unittest.TestCase):
         s.parts[0].flat.notes[4].addLyric('::/o:6/tb:here/v:2')
         s.parts[3].flat.notes[2].addLyric('::/o:5/tb:fromBass/v:1')
 
-        s.parts[1].flat.notes[7].addLyric('::/o:6/nf:no/g:Ursatz')
+        s.parts[1].flat.notes[7].addLyric('::/o:6/nf:no/g:Ursatz/ta:3')
 
         sr = analysis.reduction.ScoreReduction()
         sr.score = s
