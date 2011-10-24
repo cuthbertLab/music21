@@ -4863,10 +4863,10 @@ class Stream(music21.Music21Object):
 
 
     def makeRests(self, refStreamOrTimeRange=None, fillGaps=False,
-        inPlace=True):
+        timeRangeFromBarDuration=False, inPlace=True):
         '''
         Given a Stream with an offset not equal to zero, 
-        fill with one Rest preeceding this offset. 
+        fill with one Rest preeceding this offset. This can be called on any Stream, a Measure alone, or a Measure that contains Voices. 
     
         If `refStreamOrTimeRange` is provided as a Stream, this 
         Stream is used to get min and max offsets. If a list is provided, 
@@ -4874,6 +4874,8 @@ class Stream(music21.Music21Object):
         be added to fill all time defined within refStream.
 
         If `fillGaps` is True, this will create rests in any time regions that have no active elements.
+
+        If `timeRangeFromBarDuration` is True, and the calling Stream is a Measure with a TimeSignature, the time range will be determined based on the .barDuration property.
 
         If `inPlace` is True, this is done in-place; if `inPlace` is False, 
         this returns a modified deepcopy.
@@ -4903,7 +4905,11 @@ class Stream(music21.Music21Object):
         #environLocal.printDebug(['makeRests(): object lowestOffset, highestTime', oLow, oHigh])
         if refStreamOrTimeRange is None: # use local
             oLowTarget = 0
-            oHighTarget = returnObj.highestTime
+            if timeRangeFromBarDuration and returnObj.isMeasure:
+                # NOTE: this will raise an exception if no meter can be found
+                oHighTarget = returnObj.barDuration.quarterLength
+            else:
+                oHighTarget = returnObj.highestTime
         elif isinstance(refStreamOrTimeRange, Stream):
             oLowTarget = refStreamOrTimeRange.lowestOffset
             oHighTarget = refStreamOrTimeRange.highestTime
@@ -4913,7 +4919,6 @@ class Stream(music21.Music21Object):
             oLowTarget = min(refStreamOrTimeRange)
             oHighTarget = max(refStreamOrTimeRange)
             #environLocal.printDebug(['offsets used in makeRests', oLowTarget, oHighTarget, len(refStreamOrTimeRange)])
-
         if returnObj.hasVoices():
             bundle = returnObj.voices
         else:
@@ -4951,15 +4956,21 @@ class Stream(music21.Music21Object):
                         r.duration.quarterLength = e.duration.quarterLength
                         v._insertCore(e.offset, r)
             v._elementsChanged()
-            #v.isSorted = False
             #environLocal.printDebug(['post makeRests show()', v])
+            # NOTE: this sorting has been found to be necessary, as otherwise
+            # the resulting Stream is not sorted and does not get sorted in 
+            # preparing musicxml output
+            if v.autoSort:
+                v.sort()
 
         # with auto sort no longer necessary. 
         
         #returnObj.elements = returnObj.sorted.elements
         #self.isSorted = False
         # changes elements
-        returnObj._elementsChanged()
+#         returnObj._elementsChanged()
+#         if returnObj.autoSort:
+#             returnObj.sort()
 
         return returnObj
 
@@ -5960,7 +5971,7 @@ class Stream(music21.Music21Object):
 
     #---------------------------------------------------------------------------
 
-    def sort(self):
+    def sort(self, force=False):
         '''
         Sort this Stream in place by offset, then priority, then 
         standard class sort order (e.g., Clefs before KeySignatures before
@@ -5969,6 +5980,7 @@ class Stream(music21.Music21Object):
         Note that Streams automatically sort themsevlves unless
         autoSort is set to False (as in the example below)
 
+        If `force` is True, a sort will be attempted regardless of any other parameters.
 
         >>> from music21 import *
         >>> n1 = note.Note('a')
@@ -5985,7 +5997,8 @@ class Stream(music21.Music21Object):
         '''
         # trust if this is sorted: do not sort again
         # experimental
-        if not self.isSorted and self._mutable:
+        if (not self.isSorted and self._mutable) or force:
+            #environLocal.pd(['sorting _elements, _endElements'])
             self._elements.sort(
                 cmp=lambda x, y: cmp(
                     x.getOffsetBySite(self), y.getOffsetBySite(self)
@@ -6001,6 +6014,7 @@ class Stream(music21.Music21Object):
             self._elementsChanged(updateIsFlat=False, clearIsSorted=False)
             self.isSorted = True
 
+            #environLocal.pd(['_elements', self._elements])
 
     def _getSorted(self):
         if self._cache['sorted'] is None:
@@ -9560,7 +9574,7 @@ class Measure(Stream):
         return ts.barDuration
 
     barDuration = property(_getBarDuration, 
-        doc = '''Return the bar duration, or the Duration specified by the TimeSignature. TimeSignature is found first within the Measure, or within a context based search.
+        doc = '''Return the bar duration, or the Duration specified by the TimeSignature, regardless of what elements are found in this Measure or the highest time. TimeSignature is found first within the Measure, or within a context based search.
         ''')
 
     #---------------------------------------------------------------------------
@@ -12319,7 +12333,7 @@ class Test(unittest.TestCase):
 
         #s3.show()
 
-    def testMakeRests(self):
+    def testMakeRestsA(self):
 
         from music21 import note
         a = ['c', 'g#', 'd-', 'f#', 'e', 'f' ] * 4
@@ -12353,6 +12367,44 @@ class Test(unittest.TestCase):
             self.assertEqual(p[1].offset, sub.duration.quarterLength)
 
             partOffset += partOffsetShift
+
+
+    def testMakeRestsB(self):
+        # test makeRests fillGaps
+        from music21 import stream, meter, note
+        s = stream.Stream()
+        m1 = stream.Measure()
+        m1.timeSignature = meter.TimeSignature('4/4')
+        m1.insert(2, note.Note())
+        m2 = stream.Measure()
+        m2.insert(1, note.Note())
+        self.assertEqual(m2.isSorted, True)
+
+        s.insert(0, m1)
+        s.insert(4, m2)
+        # must connect Measures to Streams before filling gaps
+        m1.makeRests(fillGaps=True, timeRangeFromBarDuration=True)
+        m2.makeRests(fillGaps=True, timeRangeFromBarDuration=True)
+        self.assertEqual(m2.isSorted, True)
+        #m2.sort()
+
+        match = str([(n.offset, n, n.duration) for n in m2.flat.notesAndRests])
+        self.assertEqual(match, '[(0.0, <music21.note.Rest rest>, <music21.duration.Duration 1.0>), (1.0, <music21.note.Note C>, <music21.duration.Duration 1.0>), (2.0, <music21.note.Rest rest>, <music21.duration.Duration 2.0>)]')
+
+        match = str([(n.offset, n, n.duration) for n in m2.flat])
+        self.assertEqual(match, '[(0.0, <music21.note.Rest rest>, <music21.duration.Duration 1.0>), (1.0, <music21.note.Note C>, <music21.duration.Duration 1.0>), (2.0, <music21.note.Rest rest>, <music21.duration.Duration 2.0>)]')
+
+        #m2.show()
+
+        match = str([n for n in s.flat.notesAndRests])
+        self.assertEqual(match, '[<music21.note.Rest rest>, <music21.note.Note C>, <music21.note.Rest rest>, <music21.note.Rest rest>, <music21.note.Note C>, <music21.note.Rest rest>]')
+        match = str([(n, n.duration) for n in s.flat.notesAndRests])
+        self.assertEqual(match, '[(<music21.note.Rest rest>, <music21.duration.Duration 2.0>), (<music21.note.Note C>, <music21.duration.Duration 1.0>), (<music21.note.Rest rest>, <music21.duration.Duration 1.0>), (<music21.note.Rest rest>, <music21.duration.Duration 1.0>), (<music21.note.Note C>, <music21.duration.Duration 1.0>), (<music21.note.Rest rest>, <music21.duration.Duration 2.0>)]')
+
+        raw = s.musicxml
+        #s.show('text')
+        s.show()
+
 
     def testMakeMeasuresInPlace(self):
         from music21 import clef, meter, note

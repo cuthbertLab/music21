@@ -1286,7 +1286,7 @@ def chordSymbolToMx(cs):
     >>> cs.kind = 'major'
     >>> cs.kindStr = 'M'
     >>> cs
-    <music21.harmony.ChordSymbol kind=major (M) root=E- bass=B- inversion=2>
+    <music21.harmony.ChordSymbol kind=major (M) root=E- bass=B- inversion=2 duration=0.0>
     >>> mxHarmony = musicxml.translate.chordSymbolToMx(cs)
     >>> mxHarmony
     <harmony <root root-step=E root-alter=-1> function=I64 <kind text=M charData=major> inversion=2 <bass bass-step=B bass-alter=-1>>
@@ -1418,16 +1418,24 @@ def mxToInstrument(mxScorePart, inputM21=None):
     else:
         i = inputM21
 
-    i.partId = mxScorePart.get('id')
-    i.partName = mxScorePart.get('partName')
-    i.partAbbreviation = mxScorePart.get('partAbbreviation')
+    def _cleanStr(str):
+        # need to remove badly-formed strings
+        if str is None: 
+            return None
+        str = str.strip()
+        str = str.replace('\n', ' ')        
+        return str
+
+    i.partId = _cleanStr(mxScorePart.get('id'))
+    i.partName = _cleanStr(mxScorePart.get('partName'))
+    i.partAbbreviation = _cleanStr(mxScorePart.get('partAbbreviation'))
 
     # for now, just get first instrument
     if len(mxScorePart.scoreInstrumentList) > 0:
         mxScoreInstrument = mxScorePart.scoreInstrumentList[0]
-        i.instrumentName = mxScoreInstrument.get('instrumentName')
-        i.instrumentAbbreviation = mxScoreInstrument.get(
-                                        'instrumentAbbreviation')
+        i.instrumentName = _cleanStr(mxScoreInstrument.get('instrumentName'))
+        i.instrumentAbbreviation = _cleanStr(mxScoreInstrument.get(
+                                        'instrumentAbbreviation'))
     if len(mxScorePart.midiInstrumentList) > 0:
         # for now, just get first midi instrument
         mxMIDIInstrument = mxScorePart.midiInstrumentList[0]
@@ -2078,20 +2086,17 @@ def mxToRest(mxNote, inputM21=None):
 def measureToMx(m, spannerBundle=None, mxTranspose=None):
     '''Translate a :class:`~music21.stream.Measure` to a MusicXML :class:`~music21.musicxml.Measure` object.
     '''
-    #environLocal.printDebug(['measureToMx(): got spannerBundle:', spannerBundle])
+    #environLocal.printDebug(['measureToMx(): m.isSorted:', m.isSorted, 'm._mutable', m._mutable])
     if spannerBundle is not None:
         # get all spanners that have this measure as a component    
         rbSpanners = spannerBundle.getByComponentAndClass(
                           m, 'RepeatBracket')
-        #environLocal.printDebug(['measureToMx', 'm', m, 'len(rbSpanners)',
-        #                     len(rbSpanners)])
     else:
         rbSpanners = [] # for size comparison
 
     mxMeasure = musicxmlMod.Measure()
     mxMeasure.set('number', m.number)
-
-    if m.layoutWidth != None:
+    if m.layoutWidth is not None:
         mxMeasure.set('width', m.layoutWidth)
 
     # print objects come before attributes
@@ -2147,14 +2152,12 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
         # setting location outside of object based on that this attribute
         # is the leftBarline
         mxBarline.set('location', 'left')
-    
         # if we have spanners here, we can be sure they are relevant
         if len(rbSpanners) > 0:
             mxEnding = musicxmlMod.Ending()
             mxEnding.set('type', 'start')
             mxEnding.set('number', rbSpanners[0].number)
             mxBarline.set('endingObj', mxEnding)
-
         mxMeasure.componentList.append(mxBarline)
     
     # need to handle objects in order when creating musicxml 
@@ -2194,12 +2197,13 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
     else: # no voices
         mFlat = m.flat
         for obj in mFlat:
+            #environLocal.pd(['iterating flat M components', obj, obj.offset])
             classes = obj.classes # store result of property call once
             if 'Note' in classes:
                 mxMeasure.componentList += noteToMxNotes(obj, 
                     spannerBundle=spannerBundle)
             elif 'GeneralNote' in classes:
-                # .mx here returns a list of notes
+                # .mx here returns a list of notes; this could be a rest
                 mxMeasure.componentList += obj.mx
             elif 'Dynamic' in classes:
                 # returns an mxDirection object
