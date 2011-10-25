@@ -301,6 +301,7 @@ class ScoreReduction(object):
                             gMeasure.insert(0, v)
                     if oneVoice:
                         n, te = rn.getNoteAndTextExpression()
+                        # TODO: insert or make chord
                         gMeasure.voices[0].insert(rn.measureOffset, n)
                         # place the text expression in the Measure, not Voice
                         if te is not None:
@@ -310,6 +311,7 @@ class ScoreReduction(object):
                         if v is None: # just take the first
                             v = gMeasure.voices[0]
                         n, te = rn.getNoteAndTextExpression()
+                        # TODO: insert or make chord
                         v.insert(rn.measureOffset, n)
                         if te is not None:
                             v.insert(rn.measureOffset, te)
@@ -372,7 +374,7 @@ class Test(unittest.TestCase):
         sr.score = s
 
         post = sr.reduce()
-        #post.show()
+        post.show()
         #post.parts[0].show('t')
         self.assertEqual(len(post.parts[0].flat.notes), 3)
 
@@ -383,6 +385,21 @@ class Test(unittest.TestCase):
 
         # test that lyric is found
         self.assertEqual(post.parts[0].flat.notes[0].lyric, 'fromBass')
+
+
+    def testExtractionB(self):
+        from music21 import stream, analysis, note, corpus
+        s = corpus.parse('bwv66.6')
+
+        s.parts[0].flat.notes[4].addLyric('::/o:6/v:1/tb:s')
+        s.parts[3].flat.notes[2].addLyric('::/o:5/v:2/tb:b')
+        s.parts[2].flat.notes[3].addLyric('::/o:4/v:2/tb:t')
+        s.parts[1].flat.notes[2].addLyric('::/o:4/v:2/tb:t')
+
+        sr = analysis.reduction.ScoreReduction()
+        sr.score = s
+        post = sr.reduce()
+        post.show()
 
 
 #-------------------------------------------------------------------------------

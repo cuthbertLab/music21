@@ -1140,7 +1140,6 @@ class Stream(music21.Music21Object):
         '''
         Inserts an item(s) at the given offset(s). 
 
-
         If `ignoreSort` is True then the inserting does not
         change whether the Stream is sorted or not (much faster if you're going to be inserting dozens
         of items that don't change the sort status)
@@ -1280,6 +1279,49 @@ class Stream(music21.Music21Object):
             self._setHighestTime(self.highestTime + 
                 element.duration.quarterLength)
 
+
+    def insertIntoNoteOrChord(self, offset, noteOrChord):
+        '''Insert a Note or Chord into an offset position in this Stream. If there is another Note or Chord in this position, create a new Chord that combines the pitches of the inserted chord. If there is a Rest in this position, the Rest is replaced by the Note or Chord. The duration of the previously-found chord will remain the same in the new Chord.
+        '''
+        # could use duration of Note to get end offset span
+        match = self.getElementsByOffset(offset, 
+                offset+noteOrChord.quarterLength, # set end to dur of supplied
+                includeEndBoundary=False, 
+                mustFinishInSpan=False, mustBeginInSpan=True)
+        targets = match.notesAndRests
+        removeTarget = None
+        #environLocal.pd(['insertIntoNoteOrChord', [e for e in targets]])
+        if len(targets) == 1:
+            target = targets[0] # assume first
+            removeTarget = target
+            if 'Rest' in target.classes:
+                pass # nothing to do, will remove
+            if 'Note' in target.classes:
+                # if a note, make it into a chord   
+                if 'Note' in noteOrChord.classes:
+                    pitches = [target.pitch, noteOrChord.pitch]
+                elif 'Chord' in noteOrChord.classes:
+                    pitches = [target.pitch] + noteOrChord.pitches
+            if 'Chord' in target.classes:
+                # if a chord, make it into a chord   
+                if 'Note' in noteOrChord.classes:
+                    pitches = target.pitches + [noteOrChord.pitch]
+                elif 'Chord' in noteOrChord.classes:
+                    pitches = target.pitches + noteOrChord.pitches
+            finalTarget = chord.Chord(pitches)
+            finalTarget.expressions = target.expressions
+            finalTarget.articulations = target.articulations
+            finalTarget.duration = target.duration
+        elif len(targets) > 1:
+            raise StreamException('more than one element found at the specified offset')
+        else:
+            finalTarget = noteOrChord
+
+        if removeTarget is not None:
+            self.remove(removeTarget)
+        # insert normally, nothing to handle
+        self.insert(offset, finalTarget, ignoreSort=False, setActiveSite=True)
+            
 
     def append(self, others):
         '''
@@ -12500,8 +12542,6 @@ class Test(unittest.TestCase):
 
         from music21 import note
         a = ['c', 'g#', 'd-', 'f#', 'e', 'f' ] * 4
-
-
         partOffsetShift = 1.25
         partOffset = 2  # start at non zero
         for part in range(6):  
@@ -17255,8 +17295,6 @@ class Test(unittest.TestCase):
                 post.append(n.tie)
         self.assertEqual(str(post), '[<music21.tie.Tie start>, [None, <music21.tie.Tie stop>, <music21.tie.Tie start>], <music21.tie.Tie continue>, [None, <music21.tie.Tie stop>]]')
 
-
-
     def testExtendTiesB(self):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
@@ -17268,7 +17306,36 @@ class Test(unittest.TestCase):
             post.append([n.tie for n in chord])
         self.assertEqual(str(post), '[[<music21.tie.Tie continue>, <music21.tie.Tie start>, <music21.tie.Tie start>], [<music21.tie.Tie continue>, None, <music21.tie.Tie continue>, <music21.tie.Tie stop>], [<music21.tie.Tie stop>, <music21.tie.Tie start>, <music21.tie.Tie continue>, <music21.tie.Tie start>], [None, <music21.tie.Tie stop>, <music21.tie.Tie stop>, <music21.tie.Tie stop>], [None, None, None, None]]')
         #sChords.show()
-    
+
+
+    def insertIntoNoteOrChordA(self):
+        from music21 import stream
+        s = stream.Stream()
+        s.repeatAppend(note.Note('d4'), 8)
+        s.insertIntoNoteOrChord(3, note.Note('g4'))
+        self.assertEqual(str([e for e in s]), '[<music21.note.Note D>, <music21.note.Note D>, <music21.note.Note D>, <music21.chord.Chord D4 G4>, <music21.note.Note D>, <music21.note.Note D>, <music21.note.Note D>, <music21.note.Note D>]')
+
+        s.insertIntoNoteOrChord(3, note.Note('b4'))
+        self.assertEqual(str([e for e in s]), '[<music21.note.Note D>, <music21.note.Note D>, <music21.note.Note D>, <music21.chord.Chord D4 G4 B4>, <music21.note.Note D>, <music21.note.Note D>, <music21.note.Note D>, <music21.note.Note D>]')
+
+        s.insertIntoNoteOrChord(5, note.Note('b4'))
+        self.assertEqual(str([e for e in s]), '[<music21.note.Note D>, <music21.note.Note D>, <music21.note.Note D>, <music21.chord.Chord D4 G4 B4>, <music21.note.Note D>, <music21.chord.Chord D4 B4>, <music21.note.Note D>, <music21.note.Note D>]')
+
+        s.insertIntoNoteOrChord(5, chord.Chord(['c5', 'e-5']))
+        self.assertEqual(str([e for e in s]), '[<music21.note.Note D>, <music21.note.Note D>, <music21.note.Note D>, <music21.chord.Chord D4 G4 B4>, <music21.note.Note D>, <music21.chord.Chord D4 B4 C5 E-5>, <music21.note.Note D>, <music21.note.Note D>]')
+
+        #s.show('text')
+
+    def insertIntoNoteOrChordB(self):
+        from music21 import stream
+        s = stream.Stream()
+        s.repeatAppend(chord.Chord(['c4', 'e4', 'g4']), 8)
+
+        s.insertIntoNoteOrChord(5, note.Note('b4'))
+        s.insertIntoNoteOrChord(3, note.Note('b4'))
+        s.insertIntoNoteOrChord(6, chord.Chord(['d5', 'e-5', 'b-5']))
+
+        self.assertEqual(str([e for e in s]), '[<music21.chord.Chord C4 E4 G4>, <music21.chord.Chord C4 E4 G4>, <music21.chord.Chord C4 E4 G4>, <music21.chord.Chord C4 E4 G4 B4>, <music21.chord.Chord C4 E4 G4>, <music21.chord.Chord C4 E4 G4 B4>, <music21.chord.Chord C4 E4 G4 D5 E-5 B-5>, <music21.chord.Chord C4 E4 G4>]')
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
