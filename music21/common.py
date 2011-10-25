@@ -17,6 +17,7 @@ import re
 import copy
 import math, types, sys, os
 import unittest, doctest
+import fractions
 import decimal
 import time
 import weakref
@@ -303,6 +304,24 @@ def basicallyEqual(a, b):
 
 basicallyEquals = basicallyEqual
 
+def cleanupFloat(floatNum, maxDenominator=1000):
+    '''
+    Cleans up a floating point number by converting
+    it to a fractions.Fraction object limited to
+    a denominator of maxDenominator
+    
+    >>> from music21 import *
+    >>> common.cleanupFloat(0.33333327824)
+    0.333333333333...
+    
+    >>> common.cleanupFloat(0.142857)
+    0.1428571428571...
+    
+    '''
+    f = fractions.Fraction(floatNum).limit_denominator(maxDenominator)
+    return float(f)
+
+
 def almostEquals(x, y = 0.0, grain=1e-7):
     '''
     The following four routines work for comparisons between floats that are normally inconsistent.
@@ -355,11 +374,21 @@ def nearestCommonFraction(x, grain=1e-2):
     return x
 
 
-def greaterThan(x, y = 0.0):
+def greaterThan(x, y = 0.0, grain=1e-7):
     '''
     greaterThan returns True if x is greater than and not almostEquals y
+
+    >>> from music21 import *
+    >>> common.greaterThan(5, 4)
+    True
+    >>> common.greaterThan(5.05, 5.02)
+    True
+    >>> common.greaterThan(5.000000000005, 5.000000000006)
+    False
+    >>> common.greaterThan(5.000000000006, 5.000000000005)
+    False
     '''
-    if x < y or almostEquals(x, y): 
+    if x < y or almostEquals(x, y, grain): 
         return False
     else: 
         return True
@@ -374,11 +403,24 @@ def greaterThanOrEqual(x, y=0.0, grain=1e-7):
         return False
 
 
-def lessThan(x, y = 0.0):
+def lessThan(x, y = 0.0, grain=1e-7):
     '''
     lessThan -- returns True if x is less than and not almostEquals y
+
+    >>> from music21 import *
+    >>> common.lessThan(5, 4)
+    False
+    >>> common.lessThan(5.2, 5.5)
+    True
+    >>> common.lessThan(5.2, 5.5, grain=1)
+    False
+    >>> common.lessThan(5.000000000005, 5.000000000006)
+    False
+    >>> common.lessThan(5.000000000006, 5.000000000005)
+    False
+
     '''
-    if x > y or almostEquals(x, y): 
+    if x > y or almostEquals(x, y, grain): 
         return False
     else: 
         return True    
@@ -999,23 +1041,25 @@ def fromRoman(num):
     Traceback (most recent call last):
     Music21CommonException: invalid roman numeral vx
     '''
+    num = num.lower()
+    
     if num == "":
         raise Music21CommonException("No roman numeral specified.")
-    if (num == 'I' or num == 'i'):
+    if (num == 'i'):
         return 1
-    elif (num == 'II' or num == 'ii'):
+    elif (num == 'ii'):
         return 2
-    elif (num == 'III' or num == 'iii'):
+    elif (num == 'iii'):
         return 3
-    elif (num == 'IV' or num == 'iv'):
+    elif (num == 'iv'):
         return 4
-    elif (num == 'V' or num == 'v'):
+    elif (num == 'v'):
         return 5
-    elif (num == 'VI' or num == 'vi'):
+    elif (num == 'vi'):
         return 6
-    elif (num == 'VII' or num == 'vii'):
+    elif (num == 'vii'):
         return 7
-    elif (num == 'VIII' or num == 'viii'):
+    elif (num == 'viii'):
         return 8
     else:
         raise Music21CommonException("invalid roman numeral %s" % (num))

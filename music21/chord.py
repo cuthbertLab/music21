@@ -521,7 +521,10 @@ class Chord(note.NotRest):
         ''')
 
     def getTie(self, p):
-        '''Given a pitch in this Chord, return an associated Tie object, or return None if not defined for that Pitch.
+        '''
+        Given a pitch in this Chord, return an 
+        associated Tie object, or return None 
+        if not defined for that Pitch.
 
         >>> from music21 import *
         >>> c1 = chord.Chord(['d', 'e-', 'b-'])
@@ -541,7 +544,7 @@ class Chord(note.NotRest):
         return None
 
     def setTie(self, t, pitchTarget):
-        '''Given a tie object and a pitch in this Chord,
+        '''Given a tie object (or a tie type string) and a pitch in this Chord,
         set the pitch's tie attribute in this chord to that tie type.
         
         
@@ -3220,23 +3223,24 @@ class Chord(note.NotRest):
         else:
             returnObj = self
 
-        unique = []
-        delete = []
-        for p in returnObj.pitches:
-            if getattr(p, attribute) not in unique:
-                unique.append(getattr(p, attribute)) 
+        uniquePitches = []
+        deleteComponents = []
+        for comp in returnObj._components:
+            if getattr(comp.pitch, attribute) not in uniquePitches:
+                uniquePitches.append(getattr(comp.pitch, attribute)) 
             else:
-                delete.append(p)
+                deleteComponents.append(comp)
 
         #environLocal.printDebug(['unique, delete', self, unique, delete])
-        altered = returnObj.pitches
-        for p in delete:
+        altered = returnObj._components
+        for p in deleteComponents:
             altered.remove(p)
 
-        returnObj.pitches = altered
-        if len(delete) > 0:
+        returnObj._components = altered
+        if len(deleteComponents) > 0:
             returnObj._chordTablesAddressNeedsUpdating = True
-
+            returnObj._bass = None
+            returnObj._root = None
         if not inPlace:
             return returnObj
 

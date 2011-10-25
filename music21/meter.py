@@ -2099,7 +2099,12 @@ class TimeSignature(music21.Music21Object):
     1.0
 
 
-    TimeSignature objects are generally positioned in Streams at offset positions, or assigned to special property in Measure that positions the TimeSignature at the start of a Measure. Once a Note has a local TimeSignature, a Note can get its beat positions and other meter-specific parameters
+    TimeSignature objects are generally positioned in Streams 
+    at specific positions (offsets), or they can be assigned 
+    to a special property in Measure that positions the 
+    TimeSignature at the start of a Measure. Once a Note has 
+    a local TimeSignature, a Note can get its beat positions 
+    and other meter-specific parameters.
 
 
     >>> m = stream.Measure()
@@ -3223,7 +3228,23 @@ class TimeSignature(music21.Music21Object):
                 
 
     def getBeatDuration(self, qLenPos):
-        '''Give a quarter length position into this meter, return a :class:`~music21.duration.Duration` object active for the top-level beat. Unlike the :attr:`music21.meter.TimeSignature.beatDuration` parameter, this will work for asymmetrical meters.
+        '''
+        Returns a :class:`~music21.duration.Duration` 
+        object representing the length of the beat
+        found at qLenPos.  For most standard 
+        meters, you can give qLenPos = 0
+        and get the length of any beat in
+        the TimeSignature; but the simpler
+        :attr:`music21.meter.TimeSignature.beatDuration` parameter, 
+        will do that for you just as well.
+        
+        The advantage of this method is that
+        it will work for asymmetrical meters, as the second
+        example shows.
+
+
+        Ex. 1: beat duration for 3/4 is always 1.0
+        no matter where in the meter you query.
 
         >>> from music21 import *
         >>> ts1 = meter.TimeSignature('3/4')
@@ -3232,9 +3253,19 @@ class TimeSignature(music21.Music21Object):
         >>> ts1.getBeatDuration(2.5)
         <music21.duration.Duration 1.0>
 
+
+        Ex. 2: same for 6/8:
+        
+
         >>> ts2 = meter.TimeSignature('6/8')
         >>> ts2.getBeatDuration(2.5)
         <music21.duration.Duration 1.5>
+
+
+        Ex. 3: but for a compound meter of 3/8 + 2/8,
+        where you ask for the beat duration
+        will determine the length of the beat:
+        
 
         >>> ts3 = meter.TimeSignature(['3/8','2/8']) # will partition as 2 beat
         >>> ts3.getBeatDuration(.5)
@@ -3246,7 +3277,8 @@ class TimeSignature(music21.Music21Object):
 
 
     def getOffsetFromBeat(self, beat):
-        '''Given a beat value, convert into an offset position. 
+        '''
+        Given a beat value, convert into an offset position. 
 
         >>> from music21 import *
         >>> ts1 = meter.TimeSignature('3/4')
@@ -3272,6 +3304,22 @@ class TimeSignature(music21.Music21Object):
         2.25
         >>> ts1.getOffsetFromBeat(2.66)
         2.5
+        
+        
+        Works for asymmetrical meters as well:
+        
+        
+        >>> ts3 = meter.TimeSignature(['3/8','2/8']) # will partition as 2 beat
+        >>> ts3.getOffsetFromBeat(1)
+        0.0
+        >>> ts3.getOffsetFromBeat(2)
+        1.5
+        >>> ts3.getOffsetFromBeat(1.66)
+        1.0
+        >>> ts3.getOffsetFromBeat(2.5)
+        2.0
+        
+        
         '''
         # divide into integer and floating point components
         beatInt, beatFraction = divmod(beat, 1)
@@ -3292,8 +3340,12 @@ class TimeSignature(music21.Music21Object):
 
 
     def getBeatProgress(self, qLenPos):
-        '''Given a quarterLength position, get the beat, where beats count from 1, and return the the amount of qLen into this beat the supplied qLenPos
+        '''
+        Given a quarterLength position, get the beat, 
+        where beats count from 1, and return the the 
+        amount of qLen into this beat the supplied qLenPos
         is. 
+
 
         >>> from music21 import *
         >>> a = meter.TimeSignature('3/4', 3)
@@ -3301,8 +3353,14 @@ class TimeSignature(music21.Music21Object):
         (1, 0)
         >>> a.getBeatProgress(0.75)
         (1, 0.75)
+        >>> a.getBeatProgress(1.0)
+        (2, 0.0)
         >>> a.getBeatProgress(2.5)
         (3, 0.5)
+
+
+        Works for specifically partitioned meters too:
+
         >>> a.beatSequence.partition(['3/8', '3/8'])
         >>> a.getBeatProgress(2.5)
         (2, 1.0)

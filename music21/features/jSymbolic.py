@@ -2418,18 +2418,20 @@ class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
 
 class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
+    Average number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation. Here, Parts are treated as voices
+    
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.AverageNumberOfIndependentVoicesFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [1.75]
+    [1.6]
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.AverageNumberOfIndependentVoicesFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [4.0]
+    [3.96...]
     '''
     id = 'T2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2457,12 +2459,14 @@ class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
 class VariabilityOfNumberOfIndependentVoicesFeature(
     featuresModule.FeatureExtractor):
     '''
+    Standard deviation of number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation.
+    
     >>> from music21 import *
     >>> s = corpus.parse('hwv56/movement3-05.md')
     >>> fe = features.jSymbolic.VariabilityOfNumberOfIndependentVoicesFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [0.433012...]
+    [0.489...]
     '''
     id = 'T3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):

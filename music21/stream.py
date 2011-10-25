@@ -4004,14 +4004,76 @@ class Stream(music21.Music21Object):
     #---------------------------------------------------------------------------
     # transformations of self that return a new Stream
 
+    def _uniqueOffsetsAndEndTimes(self, offsetsOnly = False, endTimesOnly = False):
+        '''
+        get a list of all offsets and endtimes 
+        of notes and rests in this stream.
+        
+        Runs common.cleanupFloat() on them.
+        
+        
+        Helper method for makeChords and Chordify
+        run on .flat.notesAndRests
+
+
+        >>> from music21 import *
+        >>> s = stream.Score()
+        >>> p1 = stream.Part()
+        >>> p1.insert(4, note.Note("C#"))
+        >>> p1.insert(5.3, note.Rest())
+        >>> p2 = stream.Part()
+        >>> p2.insert(2.12, note.HalfNote("D-"))
+        >>> p2.insert(5.5, note.Rest())
+        >>> s.insert(0, p1)
+        >>> s.insert(0, p2)
+        >>> s.flat._uniqueOffsetsAndEndTimes()
+        [2.12, 4.0, 4.12, 5.0, 5.3, 5.5, 6.3, 6.5]
+        
+        
+        Limit what is returned:
+        
+        
+        >>> s.flat._uniqueOffsetsAndEndTimes(offsetsOnly = True)
+        [2.12, 4.0, 5.3, 5.5]
+        >>> s.flat._uniqueOffsetsAndEndTimes(endTimesOnly = True)
+        [4.12, 5.0, 6.3, 6.5]
+
+
+        And this is useless...  :-)
+
+        >>> s.flat._uniqueOffsetsAndEndTimes(offsetsOnly = True, endTimesOnly = True)
+        []
+
+        '''
+        uniqueOffsets = []
+        for e in self:
+             o = e.getOffsetBySite(self)
+             o = common.cleanupFloat(o)
+             if endTimesOnly is not True and o not in uniqueOffsets:
+                 uniqueOffsets.append(o)
+             endTime = o + e.duration.quarterLength
+             endTime = common.cleanupFloat(endTime)
+             if offsetsOnly is not True and endTime not in uniqueOffsets:
+                 uniqueOffsets.append(endTime)
+        uniqueOffsets = sorted(uniqueOffsets)
+        return uniqueOffsets
+
+
+
+
     def makeChords(self, minimumWindowSize=.125, includePostWindow=True,
-            removeRedundantPitches=True,
+            removeRedundantPitches=True, useExactOffsets = False,
             gatherArticulations=True, gatherExpressions=True, inPlace=False,
             transferGroupsToPitches=False):
         '''
         Gathers simultaneously sounding :class:`~music21.note.Note` objects 
         into :class:`~music21.chord.Chord` objects, each of which
         contains all the pitches sounding together.
+        
+        
+        If useExactOffsets is True (default = False), then do an exact
+        makeChords using the offsets in the piece.  
+        If this parameter is set, then minimumWindowSize is ignored.
         
         
         This first example puts a part with three quarter notes (C4, D4, E4) 
@@ -4072,7 +4134,7 @@ class Stream(music21.Music21Object):
         additional objects by placing class names in the `collect` list. 
         By default, TimeSignature and KeySignature objects are collected. 
         
-        
+
         '''
         #environLocal.printDebug(['makeChords():', 'transferGroupsToPitches', transferGroupsToPitches])
 
@@ -4118,109 +4180,170 @@ class Stream(music21.Music21Object):
         o = 0.0 # start at zero
         oTerminate = returnObj.highestOffset
 
-        # get temporar boundaries for making rests
+        # get temporary boundaries for making rests
         preHighestTime = returnObj.highestTime
         preLowestOffset = returnObj.lowestOffset
         #environLocal.printDebug(['got preLowest, preHighest', preLowestOffset, preHighestTime])
-        while True: 
-            # get all notes within the start and the minwindow size
-            oStart = o
-            oEnd = oStart + minimumWindowSize 
-            sub = returnObj.getElementsByOffset(oStart, oEnd,
-                    includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)  
-            subNotes = sub.getElementsByClass(matchClasses) # get once for speed         
-            #environLocal.printDebug(['subNotes', subNotes])
-            qlMax = None 
-            # get the max duration found from within the window
-            if len(subNotes) > 0:
-                # get largest duration, use for duration of Chord, next span
-                qlMax = max([n.quarterLength for n in subNotes])
-
-            # if the max duration found in the window is greater than the min 
-            # window size, it is possible that there are notes that will not
-            # be gathered; those starting at the end of this window but before
-            # the max found duration (as that will become the start of the next
-            # window
-            # so: if ql > min window, gather notes between 
-            # oStart + minimumWindowSize and oStart + qlMax
-            if (includePostWindow and qlMax is not None 
-                and qlMax > minimumWindowSize):
-                subAdd = returnObj.getElementsByOffset(oStart+minimumWindowSize,
-                        oStart+qlMax,
+        if useExactOffsets is False:        
+            while True: 
+                # get all notes within the start and the minwindow size
+                oStart = o
+                oEnd = oStart + minimumWindowSize 
+                sub = returnObj.getElementsByOffset(oStart, oEnd,
                         includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)  
-                # concatenate any additional notes found
-                subNotes += subAdd.getElementsByClass(matchClasses)
-
-#             subRest = []
-#             for e in subNotes:
-#                 environLocal.printDebug(['e in subNotes', e])
-#                 if 'Rest' in e.classes:
-#                     subRest.append(e)
-#             environLocal.printDebug(['got rests', subRest])
-#             if len(subRest) > 0:
-#                 # remove from subNotes
-#                 for e in subRest:
-#                     subNotes.remove(e)
-                
-            # make subNotes into a chord
-            if len(subNotes) > 0:
-                #environLocal.printDebug(['creating chord from subNotes', subNotes, 'inPlace', inPlace])
-                c = chord.Chord()
-                c.duration.quarterLength = qlMax
-                # these are references, not copies, for now
-                tempPitches = []
-                for n in subNotes:
-                    if n.isChord:
-                        pSub = n.pitches
-                    else:
-                        pSub = [n.pitch]
-                    for p in pSub:
-                        if transferGroupsToPitches:
-                            for g in n.groups:
-                                p.groups.append(g)
-                        tempPitches.append(p)
-                c.pitches = tempPitches
-                if gatherArticulations:
+                subNotes = sub.getElementsByClass(matchClasses) # get once for speed         
+                #environLocal.printDebug(['subNotes', subNotes])
+                qlMax = None 
+                # get the max duration found from within the window
+                if len(subNotes) > 0:
+                    # get largest duration, use for duration of Chord, next span
+                    qlMax = max([n.quarterLength for n in subNotes])
+    
+                # if the max duration found in the window is greater than the min 
+                # window size, it is possible that there are notes that will not
+                # be gathered; those starting at the end of this window but before
+                # the max found duration (as that will become the start of the next
+                # window
+                # so: if ql > min window, gather notes between 
+                # oStart + minimumWindowSize and oStart + qlMax
+                if (includePostWindow and qlMax is not None 
+                    and qlMax > minimumWindowSize):
+                    subAdd = returnObj.getElementsByOffset(oStart+minimumWindowSize,
+                            oStart+qlMax,
+                            includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)  
+                    # concatenate any additional notes found
+                    subNotes += subAdd.getElementsByClass(matchClasses)
+    
+    #             subRest = []
+    #             for e in subNotes:
+    #                 environLocal.printDebug(['e in subNotes', e])
+    #                 if 'Rest' in e.classes:
+    #                     subRest.append(e)
+    #             environLocal.printDebug(['got rests', subRest])
+    #             if len(subRest) > 0:
+    #                 # remove from subNotes
+    #                 for e in subRest:
+    #                     subNotes.remove(e)
+                    
+                # make subNotes into a chord
+                if len(subNotes) > 0:
+                    #environLocal.printDebug(['creating chord from subNotes', subNotes, 'inPlace', inPlace])
+                    c = chord.Chord()
+                    c.duration.quarterLength = qlMax
+                    # these are references, not copies, for now
+                    tempPitches = []
                     for n in subNotes:
-                        c.articulations += n.articulations
-                if gatherExpressions:
+                        if n.isChord:
+                            pSub = n.pitches
+                        else:
+                            pSub = [n.pitch]
+                        for p in pSub:
+                            if transferGroupsToPitches:
+                                for g in n.groups:
+                                    p.groups.append(g)
+                            tempPitches.append(p)
+                    c.pitches = tempPitches
+                    if gatherArticulations:
+                        for n in subNotes:
+                            c.articulations += n.articulations
+                    if gatherExpressions:
+                        for n in subNotes:
+                            c.expressions += n.expressions
+                    # always remove all the previous elements      
                     for n in subNotes:
-                        c.expressions += n.expressions
-                # always remove all the previous elements      
-                for n in subNotes:
-                    returnObj.remove(n)
-                # remove all rests found in source
-                for r in returnObj.getElementsByClass('Rest'):
-                    returnObj.remove(r)
+                        returnObj.remove(n)
+                    # remove all rests found in source
+                    for r in returnObj.getElementsByClass('Rest'):
+                        returnObj.remove(r)
+    
+                    if removeRedundantPitches:
+                        c.removeRedundantPitches(inPlace=True)
+                    # insert chord at start location
+                    returnObj._insertCore(o, c)
+    
+                # only add rests if no notes
+    #             elif len(subRest) > 0:
+    #                 r = note.Rest()
+    #                 r.quarterLength = qlMax
+    #                 # remove old rests if in place
+    #                 for rOld in subRest:
+    #                     returnObj.remove(rOld)
+    #                 returnObj._insertCore(o, r)
+    
+                #environLocal.printDebug(['len of returnObj', len(returnObj)])
+    
+                # shift offset to qlMax or minimumWindowSize
+                if qlMax != None and qlMax >= minimumWindowSize:
+                    # update start offset to what was old boundary
+                    # note: this assumes that the start of the longest duration
+                    # was at oStart; it could have been between oStart and oEnd
+                    o += qlMax
+                else:
+                    o += minimumWindowSize
+    
+                # end While loop conditions
+                if o > oTerminate:
+                    break
+        else: # useExactOffsets is True:        
+            onAndOffOffsets = self.flat.notesAndRests._uniqueOffsetsAndEndTimes()
+#            print onAndOffOffsets
+#            for i in returnObj:
+#                print "%1.4f \t %s" % (i.offset, i.fullName)
 
-                if removeRedundantPitches:
-                    c.removeRedundantPitches(inPlace=True)
-                # insert chord at start location
-                returnObj._insertCore(o, c)
-
-            # only add rests if no notes
-#             elif len(subRest) > 0:
-#                 r = note.Rest()
-#                 r.quarterLength = qlMax
-#                 # remove old rests if in place
-#                 for rOld in subRest:
-#                     returnObj.remove(rOld)
-#                 returnObj._insertCore(o, r)
-
-            #environLocal.printDebug(['len of returnObj', len(returnObj)])
-
-            # shift offset to qlMax or minimumWindowSize
-            if qlMax != None and qlMax >= minimumWindowSize:
-                # update start offset to what was old boundary
-                # note: this assumes that the start of the longest duration
-                # was at oStart; it could have been between oStart and oEnd
-                o += qlMax
-            else:
-                o += minimumWindowSize
-
-            # end While loop conditions
-            if o > oTerminate:
-                break
+            for i in range(len(onAndOffOffsets) - 1):
+                # get all notes within the start and the minwindow size
+                oStart = onAndOffOffsets[i]
+                oEnd = onAndOffOffsets[i+1]
+                sub = returnObj.getElementsByOffset(oStart, oEnd,
+                        includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)  
+                subNotes = sub.getElementsByClass(matchClasses) # get once for speed         
+#                print "oStart", str(oStart), "oEnd", str(oEnd)
+#                for i in subNotes:
+#                    print "%1.4f \t %s \t %s" % (i.offset, i.fullName, i.tie)
+#                print "-----"
+                #environLocal.printDebug(['subNotes', subNotes])
+    
+                # make subNotes into a chord
+                if len(subNotes) > 0:
+                    #environLocal.printDebug(['creating chord from subNotes', subNotes, 'inPlace', inPlace])
+                    c = chord.Chord()
+                    c.duration.quarterLength = oEnd - oStart
+                    # these are references, not copies, for now
+                    tempComponents = []
+                    for n in subNotes:
+                        nEnd = n.getOffsetBySite(self)
+                        if n.isChord:
+                            cSub = n._components
+                        else:
+                            cSub = [n]
+                        for comp in cSub:
+                            if transferGroupsToPitches:
+                                for g in comp.groups:
+                                    comp.pitch.groups.append(g)
+                            tempComponents.append(comp)
+                    c.pitches = [comp.pitch for comp in tempComponents]
+                    for comp in tempComponents:
+                        if comp.tie is not None:
+                            c.setTie(comp.tie.type, comp.pitch)
+                    
+                    if gatherArticulations:
+                        for n in subNotes:
+                            c.articulations += n.articulations
+                    if gatherExpressions:
+                        for n in subNotes:
+                            c.expressions += n.expressions
+                    # always remove all the previous elements      
+                    for n in subNotes:
+                        returnObj.remove(n)
+                    # remove all rests found in source
+                    for r in returnObj.getElementsByClass('Rest'):
+                        returnObj.remove(r)
+    
+                    if removeRedundantPitches:
+                        c.removeRedundantPitches(inPlace=True)
+                    # insert chord at start location
+                    returnObj._insertCore(oStart, c)
+    
 
         # makeRests to fill any gaps produced by stripping
         #environLocal.printDebug(['pre makeRests show()'])
@@ -4235,16 +4358,44 @@ class Stream(music21.Music21Object):
         addPartIdAsGroup=False, removeRedundantPitches=True, 
         toSoundingPitch=True):
         '''
-        Create a chordal reduction of polyphonic music, where each change to a new pitch results in a new chord. If a Score or Part of Measures is provided, a Stream of Measures will be returned. If a flat Stream of notes, or a Score of such Streams is provided, no Measures will be returned. 
+        Create a chordal reduction of polyphonic music, where each 
+        change to a new pitch results in a new chord. If a Score or 
+        Part of Measures is provided, a Stream of Measures will be 
+        returned. If a flat Stream of notes, or a Score of such 
+        Streams is provided, no Measures will be returned. 
 
-        This functionlaity works by splittgin all Durations in all parts, if multi-part, by all unique offsets. All simultaneous durations are 
-        then gathered into single chords. 
+        This functionlaity works by splitting all Durations in 
+        all parts, or if multi-part by all unique offsets. All 
+        simultaneous durations are then gathered into single chords. 
         
-        If `addPartIdAsGroup` is True, all elements found in the Stream will have their source Part id added to the element's Group. 
+        If `addPartIdAsGroup` is True, all elements found in the 
+        Stream will have their source Part id added to the 
+        element's Group.  These groups names are useful
+        for partially "de-chordifying" the output.
 
         The `addTies` parameter currently does not work for pitches in Chords.
 
         If `toSoundingPitch` is True, all parts that define one or more transpositions will be transposed to sounding pitch before chordification. True by default. 
+
+
+        >>> from music21 import *
+        >>> s = stream.Score()
+        >>> p1 = stream.Part()
+        >>> p1.insert(4, note.Note("C#"))
+        >>> p1.insert(5.3, note.Rest())
+        >>> p2 = stream.Part()
+        >>> p2.insert(2.12, note.HalfNote("D-"))
+        >>> p2.insert(5.5, note.Rest())
+        >>> s.insert(0, p1)
+        >>> s.insert(0, p2)
+        >>> cc = s.chordify()
+        >>> cc.show('text')
+        {0.0} <music21.note.Rest rest>
+        {2.12} <music21.chord.Chord D->
+        {4.0} <music21.chord.Chord C# D->
+        {4.12} <music21.chord.Chord C#>
+        {5.0} <music21.note.Rest rest>
+
         
         '''
         # TODO: need to handle flat Streams contained in a Stream   
@@ -4281,12 +4432,10 @@ class Stream(music21.Music21Object):
                 else:
                     m = p # treat the entire part as one measure
                 mFlatNotes = m.flat.notesAndRests
-                for e in mFlatNotes:
-                    # offset values here will be relative to the Measure
-                    # must get flat in case we have voices
-                    o = e.getOffsetBySite(mFlatNotes)
-                    if o not in uniqueOffsets:
-                        uniqueOffsets.append(o)
+                theseUniques = mFlatNotes._uniqueOffsetsAndEndTimes()
+                for t in theseUniques:
+                    if t not in uniqueOffsets:
+                        uniqueOffsets.append(t)
             #environLocal.printDebug(['chordify: uniqueOffsets for all parts, m', uniqueOffsets, i])
             uniqueOffsets = sorted(uniqueOffsets)
             for p in allParts:
@@ -4307,6 +4456,7 @@ class Stream(music21.Music21Object):
         # make chords from flat version of sliced parts
         # do in place as already a copy has been made
         post = returnObj.flat.makeChords(includePostWindow=True, 
+            useExactOffsets = True,
             removeRedundantPitches=removeRedundantPitches,
             gatherArticulations=True, gatherExpressions=True, inPlace=True, 
             transferGroupsToPitches=transferGroupsToPitches)
@@ -4460,12 +4610,12 @@ class Stream(music21.Music21Object):
                 else:
                     dur = 0 
                 # NOTE: rounding here may cause secondary problems
-                offset = round(e.getOffsetBySite(group), 8)
+                offset = common.cleanupFloat(e.getOffsetBySite(group)) #round(e.getOffsetBySite(group), 8)
                 # NOTE: used to make a copy.copy of elements here; 
                 # this is not necssary b/c making deepcopy of entire Stream
                 offsetDict = {}
                 offsetDict['offset'] = offset
-                offsetDict['endTime'] = offset + dur
+                offsetDict['endTime'] = common.cleanupFloat(offset + dur)
                 offsetDict['element'] = e
                 offsetDict['voiceIndex'] = voiceIndex
                 #environLocal.printDebug(['_getOffsetMap: offsetDict', offsetDict])
@@ -7742,9 +7892,12 @@ class Stream(music21.Music21Object):
         # list of start, start+dur, element, all in abs offset time
         offsetMap = self._getOffsetMap(returnObj)
         
+        offsetList = [common.cleanupFloat(o) for o in offsetList]
+        
         for ob in offsetMap:
             # if target is defined, only modify that object
             oStart, oEnd, e, voiceCount = ob['offset'], ob['endTime'], ob['element'], ob['voiceIndex']
+            
             if target != None and id(e) != id(target):
                 continue
 
@@ -7760,6 +7913,10 @@ class Stream(music21.Music21Object):
                 oStartNext = oStart
                 for o in cutPoints:
                     oCut = o - oStartNext
+                    #no longer needed with cleanup floats
+                    #if common.almostEquals(oCut, 0, grain=1e-5):
+                    #    oStartNext = o
+                    #    continue
                     # set the second part of the remainder to e, so that it
                     # will be processed with next cut point
                     eComplete, eNext = eNext.splitAtQuarterLength(oCut,
@@ -8726,11 +8883,17 @@ class Stream(music21.Music21Object):
         '''
         Find any elements that overlap. Overlaping might include elements
         that have no duration but that are simultaneous. 
-        Whether elements with None durations are included is determined by includeDurationless.
+        Whether elements with None durations are included is determined by 
+        includeDurationless.
                 
-        This method returns a dictionary, where keys are the start time of the first overlap and value are a list of all objects included in that overlap group. 
+        This method returns a dictionary, where keys 
+        are the start time of the first overlap and 
+        value are a list of all objects included in 
+        that overlap group. 
 
-        This example demonstrates end-joing overlaps: there are four quarter notes each following each other. Whether or not these count as overlaps
+        This example demonstrates end-joing overlaps: there are four 
+        quarter notes each following each other. Whether or not 
+        these count as overlaps
         is determined by the includeEndBoundary parameter. 
 
         >>> from music21 import *
@@ -12403,7 +12566,7 @@ class Test(unittest.TestCase):
 
         raw = s.musicxml
         #s.show('text')
-        s.show()
+        #s.show()
 
 
     def testMakeMeasuresInPlace(self):
@@ -12842,7 +13005,7 @@ class Test(unittest.TestCase):
         p.repeatAppend(tuplet1, 10)
         p.repeatAppend(tuplet2, 7)
         ex = p.makeNotation()
-        #ex.show()
+        #ex.show('text')
         
         display = [n.pitch.accidental.displayStatus for n in ex.flat.notes]
         self.assertEqual(display, [1,0,0, 0,0,0,   1,0,0, 0, 1,  1, 0, 0,  1, 0, 0])         
@@ -15306,8 +15469,8 @@ class Test(unittest.TestCase):
         for m in post.getElementsByClass('Measure'):
             self.assertEqual(m.hasVoices(), False)
             match.append(len(m.pitches))
-        self.assertEqual(match, [3, 9, 9, 25, 25, 21, 12, 7, 24, 26])
-        self.assertEqual(len(post.flat.getElementsByClass('Rest')), 5)
+        self.assertEqual(match, [3, 9, 9, 25, 25, 21, 12, 6, 21, 29])
+        self.assertEqual(len(post.flat.getElementsByClass('Rest')), 4)
 
 
     def testChordifyD(self):
@@ -15340,7 +15503,7 @@ class Test(unittest.TestCase):
         #s1.show()
         post = s1.chordify()
         #post.show()
-        self.assertEqual(len(post.flat.getElementsByClass('Chord')), 7)
+        self.assertEqual(len(post.flat.getElementsByClass('Chord')), 8)
 
 
     def testOpusSearch(self):
@@ -17103,7 +17266,7 @@ class Test(unittest.TestCase):
         post = []
         for chord in sChords.flat.getElementsByClass('Chord'):
             post.append([n.tie for n in chord])
-        self.assertEqual(str(post), '[[<music21.tie.Tie start>, <music21.tie.Tie start>, <music21.tie.Tie start>], [<music21.tie.Tie continue>, None, <music21.tie.Tie continue>, <music21.tie.Tie stop>], [<music21.tie.Tie stop>, <music21.tie.Tie start>, <music21.tie.Tie continue>, <music21.tie.Tie start>], [None, <music21.tie.Tie stop>, <music21.tie.Tie stop>, <music21.tie.Tie stop>], [None, None, None, None]]')
+        self.assertEqual(str(post), '[[<music21.tie.Tie continue>, <music21.tie.Tie start>, <music21.tie.Tie start>], [<music21.tie.Tie continue>, None, <music21.tie.Tie continue>, <music21.tie.Tie stop>], [<music21.tie.Tie stop>, <music21.tie.Tie start>, <music21.tie.Tie continue>, <music21.tie.Tie start>], [None, <music21.tie.Tie stop>, <music21.tie.Tie stop>, <music21.tie.Tie stop>], [None, None, None, None]]')
         #sChords.show()
     
 

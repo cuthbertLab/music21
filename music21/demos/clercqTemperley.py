@@ -21,7 +21,7 @@ import music21
 
 def convertCTRTstr(fileString):
     '''
-    converts a string containing the de Clercq Temperley popular music flavor of RomanText
+    converts a string containing the de Clercq/Temperley popular music flavor of RomanText
     to a :class:~`music21.stream.Score` object.  Subsections of the piece are stored in
     a property called `subsections` containing a dictionary of subsections whose
     keys are the subsection name ('Vr' for verse, for instance) and whose value is 

@@ -1180,7 +1180,7 @@ class Test(unittest.TestCase):
 
         #di['chordify'].show('t')
         self.assertEqual(len(di['chordify']), 6)
-        self.assertEqual(len(di['chordify.getElementsByClass.Chord']), 24)
+        self.assertEqual(len(di['chordify.getElementsByClass.Chord']), 30)
 
 
         self.assertEqual(di['chordifySetClassHistogram'], {'2-2': 3, '2-3': 4, '3-9': 1, '2-4': 4, '2-5': 4, '1-1': 7, '4-13': 1})

@@ -3081,7 +3081,7 @@ class Music21Object(JSONSerializer):
 
 
     def splitAtQuarterLength(self, quarterLength, retainOrigin=True, 
-        addTies=True, displayTiedAccidentals=False):
+        addTies=True, displayTiedAccidentals=False, delta=1e-06):
         '''
         Split an Element into two Elements at a provided 
         QuarterLength into the Element.
@@ -3123,7 +3123,7 @@ class Music21Object(JSONSerializer):
         if self.duration == None:
             raise Exception('cannot split an element that has a Duration of None')
 
-        if quarterLength > self.duration.quarterLength:
+        if quarterLength - delta > self.duration.quarterLength:
             raise duration.DurationException(
             "cannot split a duration (%s) at this quarterLength (%s)" % (
             self.duration.quarterLength, quarterLength))
@@ -3157,6 +3157,10 @@ class Music21Object(JSONSerializer):
                     e.expressions.append(thisExpression)
                     eRemain.expressions.append(thisExpression)
 
+        if quarterLength < delta:
+            quarterLength == 0
+        elif abs(quarterLength - self.duration.quarterLength) < delta:
+            quarterLength = self.duration.quarterLength
 
         lenEnd = self.duration.quarterLength - quarterLength
         lenStart = self.duration.quarterLength - lenEnd
@@ -3173,7 +3177,6 @@ class Music21Object(JSONSerializer):
         # some higher-level classes need this functionality
         # set ties
         if addTies and ('Note' in e.classes or 
-            'Chord' in e.classes or 
             'Unpitched' in e.classes):
 
             forceEndTieType = 'stop'
@@ -3192,9 +3195,34 @@ class Music21Object(JSONSerializer):
                     forceEndTieType = 'continue'
                     # keep continue if already set
             else:
-                e.tie = tie.Tie('start') # need a tie objects
+                e.tie = tie.Tie('start') # need a tie object
 
             eRemain.tie = tie.Tie(forceEndTieType)
+
+        elif addTies and 'Chord' in e.classes:
+            for i in range(len(e._components)):
+                component = e._components[i]
+                remainComponent = eRemain._components[i]
+                forceEndTieType = 'stop'
+                if component.tie != None:
+                    # the last tie of what was formally a start should
+                    # continue
+                    if component.tie.type == 'start':
+                        # keep start  if already set
+                        forceEndTieType = 'continue'
+                    # a stop was ending a previous tie; we know that
+                    # the first is now a continue
+                    elif component.tie.type == 'stop':
+                        forceEndTieType = 'stop'
+                        component.tie.type = 'continue' 
+                    elif component.tie.type == 'continue':
+                        forceEndTieType = 'continue'
+                        # keep continue if already set
+                else:
+                    component.tie = tie.Tie('start') # need a tie object
+    
+                remainComponent.tie = tie.Tie(forceEndTieType)
+            
     
         # hide accidentals on tied notes where previous note
         # had an accidental that was shown
