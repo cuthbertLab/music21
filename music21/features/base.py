@@ -1183,9 +1183,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(di['chordify.getElementsByClass.Chord']), 30)
 
 
-        self.assertEqual(di['chordifySetClassHistogram'], {'2-2': 3, '2-3': 4, '3-9': 1, '2-4': 4, '2-5': 4, '1-1': 7, '4-13': 1})
+        self.assertEqual(di['chordifySetClassHistogram'], {'2-2': 3, '2-3': 4, '2-4': 4, '2-5': 6, '1-1': 13})
 
-        self.assertEqual(di['chordifyPitchClassSetHistogram'], {'<A>': 4, '<2A>': 2, '<09>': 1, '<03>': 1, '<3>': 1, '<37>': 1, '<79>': 3, '<58>': 1, '<7A>': 1, '<0>': 1, '<59>': 1, '<2358>': 1, '<35A>': 1, '<5A>': 4, '<5>': 1})
+        self.assertEqual(di['chordifyPitchClassSetHistogram'], {'<8>': 2, '<3A>': 2, '<A>': 4, '<2A>': 2, '<09>': 1, '<03>': 1, '<3>': 2, '<37>': 1, '<79>': 3, '<58>': 1, '<7A>': 1, '<0>': 1, '<59>': 1, '<2>': 1, '<5A>': 4, '<5>': 3})
 
         self.assertEqual(di['chordifyTypesHistogram'], {'isMinorTriad': 0, 'isAugmentedTriad': 0, 'isTriad': 0, 'isSeventh': 0, 'isDiminishedTriad': 0, 'isDiminishedSeventh': 0, 'isIncompleteMajorTriad': 4, 'isHalfDiminishedSeventh': 0, 'isMajorTriad': 0, 'isDominantSeventh': 0, 'isIncompleteMinorTriad': 4})
 
