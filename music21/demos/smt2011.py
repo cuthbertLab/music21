@@ -95,7 +95,7 @@ def exShenker():
     import copy
     from music21 import corpus, stream, scale, bar, layout
     # wtc no 1
-    src = corpus.parse('bwv846');
+    src = corpus.parse('bwv846')
     #src.show()
 
     melodicSrc = src.parts[0]

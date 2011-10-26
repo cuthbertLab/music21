@@ -86,13 +86,13 @@ try:
 except ImportError:
     _missingImport.append('PIL')
 
-try:
-    import pyaudio
-except ImportError:
-    _missingImport.append('pyaudio')
-except SystemExit:
-    _missingImport.append('pyaudio')
-    sys.stderr.write('pyaudio is installed but PortAudio is not -- re-download pyaudio at http://people.csail.mit.edu/hubert/pyaudio/')
+# as this is only needed for one module, and error messages print
+# to standard io, this has been removed
+# try:
+#     import pyaudio
+# except (ImportError, SystemExit):
+#     _missingImport.append('pyaudio')
+    #sys.stderr.write('pyaudio is installed but PortAudio is not -- re-download pyaudio at http://people.csail.mit.edu/hubert/pyaudio/')
 
 # try:
 #     import abjad

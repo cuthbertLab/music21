@@ -12,7 +12,7 @@
 '''Utility constants, dictionaries, functions, and objects used throughout music21.
 '''
 
-# should NOT import music21 or anything like that except in doctests.
+# should NOT import music21 or anything like that, except in doctests.
 import re
 import copy
 import math, types, sys, os
@@ -316,11 +316,18 @@ def cleanupFloat(floatNum, maxDenominator=1000):
     
     >>> common.cleanupFloat(0.142857)
     0.1428571428571...
+
+    >>> common.cleanupFloat(1.5)
+    1.5
     
     '''
-    f = fractions.Fraction(floatNum).limit_denominator(maxDenominator)
-    return float(f)
+    # this form only works w/ python2.7
+    #f = fractions.Fraction(floatNum).limit_denominator(maxDenominator)
 
+    # this works w/ python2.6, 2.7
+    f = fractions.Fraction.from_float(
+        floatNum).limit_denominator(maxDenominator)
+    return float(f)
 
 def almostEquals(x, y = 0.0, grain=1e-7):
     '''

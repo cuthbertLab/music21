@@ -44,6 +44,7 @@ __all__ = ['base',
 
            # sub folders
            'abc', 'abj', 'analysis', 'audioSearch',
+
            'chant',
            'composition', 'configure',
            'counterpoint', 'corpus', 

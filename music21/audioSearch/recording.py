@@ -38,33 +38,19 @@ from music21 import environment
 _MOD = "chant.py"
 environLocal = environment.Environment(_MOD)
 
-_missingImport = []
 
 ###
 # to download pyaudio for windows 64-bit go to http://www.lfd.uci.edu/~gohlke/pythonlibs/
 # users of 64-bit windows but 32-bit python should download the win32 port
 # users of 64-bit windows and 64-bit python should download the amd64 port
 # requires portaudio to be installed http://www.portaudio.com/download.html
-try:
-    import pyaudio
-    recordFormat = pyaudio.paInt16
-except ImportError:
-    pyaudio = None
-    recordFormat = 8 # pyaudio.paInt16
-
-    _missingImport.append('pyaudio')
-except SystemExit:
-    pyaudio = None
-    recordFormat = 8 # pyaudio.paInt16
-
-    _missingImport.append('pyaudio')
 
 recordChannels = 1
 recordSampleRate = 44100
 recordChunkLength = 1024
 
 def samplesFromRecording(seconds=10.0, storeFile=True,
-                recordFormat=recordFormat,
+                recordFormat=None,
                 recordChannels=recordChannels,
                 recordSampleRate=recordSampleRate,
                 recordChunkLength=1024):
@@ -75,6 +61,17 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
     
     Returns a list of samples.
     '''
+    
+    try:
+        import pyaudio
+        recordFormatDefault = pyaudio.paInt16
+    except (ImportError, SystemExit):
+        pyaudio = None
+        recordFormatDefault = 8 # pyaudio.paInt16    
+
+    if recordFormat is None:
+        recordFormat = recordFormatDefault
+
     if recordFormat == pyaudio.paInt8:
         raise AudioSearchException("cannot perform freq_from_autocorr on 8-bit samples")
     

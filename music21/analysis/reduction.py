@@ -198,7 +198,7 @@ class ScoreReduction(object):
     def _setChordReduction(self, value):
         if 'Stream' not in value.classes:
             raise ScoreReductionException('cannot set a non Stream')
-        if value.hasPartLikeStreams:
+        if value.hasPartLikeStreams():
             # make a local copy
             self._chordReduction = copy.deepcopy(value)
         else: # assume a single stream, place in a Score
@@ -336,18 +336,22 @@ class ScoreReduction(object):
             s.insert(0, g)
             #g.show('t')
 
+        if self._chordReduction is not None:
+            for p in self._chordReduction.parts:
+                s.insert(0, p)
+
         srcParts = [] # for bracket
-        for p in self._score.parts:
-            s.insert(0, p)
-            srcParts.append(p) # store to brace
+        if self._score is not None:
+            for p in self._score.parts:
+                s.insert(0, p)
+                srcParts.append(p) # store to brace
         return s
 
-    def reduce(self, score=None):
+    def reduce(self):
         '''Given a score, populate this Score reduction 
         '''
-        if score is not None:
-            self.score = score
-        if self.score is None: # if not set here or before
+        # if not set here or before
+        if self.score is None and self.chordReduction is None: 
             raise ScoreReductionException('no score defined to reduce')
 
         return self._createReduction()
@@ -406,6 +410,20 @@ class Test(unittest.TestCase):
 
         
         #post.show()
+
+    def testExtractionC(self):
+        from music21 import stream, analysis, note, corpus
+        # http://solomonsmusic.net/schenker.htm
+
+        src = corpus.parse('bwv846')
+        chords = src.makeChords(minimumWindowSize=4)
+
+        #s.parts[0].flat.notes[4].addLyric('::/o:6/v:1/tb:s/g:Ursatz')
+
+        sr = analysis.reduction.ScoreReduction()
+        sr.chordReduction = chords
+        post = sr.reduce()
+        post.show()        
 
 
 #-------------------------------------------------------------------------------
