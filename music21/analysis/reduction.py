@@ -16,7 +16,7 @@ import copy
 
 import music21 
 from music21 import stream, note, expressions
-
+from music21 import instrument
 
 from music21 import environment
 _MOD = "analysis/reduction.py"
@@ -286,8 +286,12 @@ class ScoreReduction(object):
             # need to break by necessary parts, voices; for now, assume one
             g = self._score.parts[0].measureTemplate()
             g.id = gName
+            inst = instrument.Instrument()
+            inst.partName = gName
+            g.insert(0, inst)
             gMeasures = g.getElementsByClass('Measure')
     
+            # TODO: insert into note or chord
             for key, rn in self._reductiveNotes.items():
                 if oneGroup or rn['group'] == gName:
                     environLocal.pd(['_createReduction(): found reductive note, rn', rn, 'group', gName])
@@ -301,8 +305,8 @@ class ScoreReduction(object):
                             gMeasure.insert(0, v)
                     if oneVoice:
                         n, te = rn.getNoteAndTextExpression()
-                        # TODO: insert or make chord
-                        gMeasure.voices[0].insert(rn.measureOffset, n)
+                        gMeasure.voices[0].insertIntoNoteOrChord(
+                            rn.measureOffset, n)
                         # place the text expression in the Measure, not Voice
                         if te is not None:
                             gMeasure.voices[0].insert(rn.measureOffset, te)
@@ -311,8 +315,7 @@ class ScoreReduction(object):
                         if v is None: # just take the first
                             v = gMeasure.voices[0]
                         n, te = rn.getNoteAndTextExpression()
-                        # TODO: insert or make chord
-                        v.insert(rn.measureOffset, n)
+                        v.insertIntoNoteOrChord(rn.measureOffset, n)
                         if te is not None:
                             v.insert(rn.measureOffset, te)
 
@@ -327,12 +330,12 @@ class ScoreReduction(object):
                 # hide all rests in all containers
                 for r in m.flat.getElementsByClass('Rest'):
                     r.hideObjectOnPrint = True
-
                 #m.show('t')
 
             # add to score
             s.insert(0, g)
-            print g
+            #g.show('t')
+
         srcParts = [] # for bracket
         for p in self._score.parts:
             s.insert(0, p)
@@ -374,10 +377,9 @@ class Test(unittest.TestCase):
         sr.score = s
 
         post = sr.reduce()
-        post.show()
+        #post.show()
         #post.parts[0].show('t')
         self.assertEqual(len(post.parts[0].flat.notes), 3)
-
         #post.parts[0].show('t')
 
         match = [(e, e.offset, e.duration.quarterLength) for e in post.parts[0].getElementsByClass('Measure')[0:3].flat.notesAndRests]
@@ -391,15 +393,19 @@ class Test(unittest.TestCase):
         from music21 import stream, analysis, note, corpus
         s = corpus.parse('bwv66.6')
 
-        s.parts[0].flat.notes[4].addLyric('::/o:6/v:1/tb:s')
+        s.parts[0].flat.notes[4].addLyric('::/o:6/v:1/tb:s/g:Ursatz')
         s.parts[3].flat.notes[2].addLyric('::/o:5/v:2/tb:b')
         s.parts[2].flat.notes[3].addLyric('::/o:4/v:2/tb:t')
-        s.parts[1].flat.notes[2].addLyric('::/o:4/v:2/tb:t')
+        s.parts[1].flat.notes[2].addLyric('::/o:4/v:2/tb:a')
 
         sr = analysis.reduction.ScoreReduction()
-        sr.score = s
+        sr.score = s.measures(0, 10)
         post = sr.reduce()
-        post.show()
+        match = [n for n in post.parts[0].flat.notes]
+        self.assertEqual(str(match), '[<music21.note.Note F#>, <music21.chord.Chord E4 B4>, <music21.note.Note C#>]')
+
+        
+        #post.show()
 
 
 #-------------------------------------------------------------------------------

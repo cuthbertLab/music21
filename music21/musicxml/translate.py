@@ -1376,15 +1376,15 @@ def instrumentToMx(i):
     # note: this is id, not partId!
     mxScorePart.set('id', i.partId)
 
-    if i.partName != None:
+    if i.partName is not None:
         mxScorePart.partName = i.partName
-    elif i.partName == None: # get default, as required
+    elif i.partName is None: # get default, as required
         mxScorePart.partName = defaults.partName
 
-    if i.partAbbreviation != None:
+    if i.partAbbreviation is not None:
         mxScorePart.partAbbreviation = i.partAbbreviation
 
-    if i.instrumentName != None or i.instrumentAbbreviation != None:
+    if i.instrumentName is not None or i.instrumentAbbreviation is not None:
         mxScoreInstrument = musicxmlMod.ScoreInstrument()
         # set id to same as part for now
         mxScoreInstrument.set('id', i.instrumentId)
@@ -1394,7 +1394,7 @@ def instrumentToMx(i):
         # add to mxScorePart
         mxScorePart.scoreInstrumentList.append(mxScoreInstrument)
 
-    if i.midiProgram != None:
+    if i.midiProgram is not None:
         mxMIDIInstrument = musicxmlMod.MIDIInstrument()
         mxMIDIInstrument.set('id', i.instrumentId)
         # shift to start from 1
@@ -1513,11 +1513,13 @@ def chordToMx(c):
             nh = c.getNotehead(pitchObj)
             mxNote.noteheadObj = noteheadToMxNotehead(pitchObj, overRiddenNotehead = nh)
             
-            #get the stem direction
-            stemDir = c.getStemDirection(pitchObj)
-            mxNote.stem = stemDir
+            #get the stem direction from the chord, not the pitch
+            if c.stemDirection != 'unspecified':
+                if c.stemDirection in ['noStem', None]:
+                    mxNote.stem = 'none'
+                else:
+                    mxNote.stem = n.stemDirection
             
-
             # only add beam to first note in group
             if c.beams != None and chordPos == 0:
                 mxNote.beamList = c.beams.mx

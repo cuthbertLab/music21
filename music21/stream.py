@@ -1312,6 +1312,10 @@ class Stream(music21.Music21Object):
             finalTarget.expressions = target.expressions
             finalTarget.articulations = target.articulations
             finalTarget.duration = target.duration
+            finalTarget.lyrics = target.lyrics
+            finalTarget.stemDirection = target.stemDirection
+            finalTarget.noteheadFill = target.noteheadFill
+
         elif len(targets) > 1:
             raise StreamException('more than one element found at the specified offset')
         else:
