@@ -4254,7 +4254,8 @@ class Stream(music21.Music21Object):
                 # oStart + minimumWindowSize and oStart + qlMax
                 if (includePostWindow and qlMax is not None 
                     and qlMax > minimumWindowSize):
-                    subAdd = returnObj.getElementsByOffset(oStart+minimumWindowSize,
+                    subAdd = returnObj.getElementsByOffset(
+                            oStart+minimumWindowSize,
                             oStart+qlMax,
                             includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)  
                     # concatenate any additional notes found
@@ -10376,31 +10377,10 @@ class Score(Stream):
                             map[key].append(m)
             return map
 
-# functionality moved to Stream.stripTies()
-#     def stripTies(self, inPlace=False, matchByPitch=False):
-#         '''Apply strip ties to each class:`~music21.part.Part` contained within this Score. 
-# 
-#         This method will retain class:`~music21.part.Measure` objects and Parts.
-#         '''
-# 
-#         if not inPlace: # make a copy
-#             returnObj = deepcopy(self)
-#         else:
-#             returnObj = self
-# 
-#         for p in returnObj.getElementsByClass(Part):
-#             # strip ties will use the appropriate flat presentation
-#             # in place: already have a copy if nec
-#             p.stripTies(inPlace=True, matchByPitch=matchByPitch,
-#                          retainContainers=True) 
-#         return returnObj
-        
-
     def sliceByGreatestDivisor(self, inPlace=True, addTies=True):
         '''
         Slice all duration of all part by the minimum duration 
         that can be summed to each concurrent duration. 
-
 
         Overrides method defined on Stream.
         '''
@@ -10549,6 +10529,24 @@ class Score(Stream):
 
         return self.partsToVoices(voiceAllocation=voiceAllocation,
             permitOneVoicePerPart=permitOneVoicePerPart)
+
+
+
+    def flattenParts(self):
+        '''Join all Parts into a single Part with all elements found in each Measure. 
+        '''
+        parts = self.parts
+        post = copy.deepcopy(parts[0])
+        if len(parts) == 1:
+            return post
+
+        remainderParts = parts[1:]
+        for i, m in enumerate(post.getElementsByClass('Measure')):
+            for p in remainderParts:
+                mNew = copy.deepcopy(p.getElementsByClass('Measure')[i])
+                for e in mNew:
+                    m.insert(e.getOffsetBySite(mNew), e)
+        return post
 
 
 # this was commented out as it is not immediately needed

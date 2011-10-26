@@ -17,6 +17,7 @@ import copy
 import music21 
 from music21 import stream, note, expressions
 from music21 import instrument
+from music21 import pitch
 
 from music21 import environment
 _MOD = "analysis/reduction.py"
@@ -126,6 +127,7 @@ class ReductiveNote(object):
         if self._note.isChord:
             # need to permit specification by pitch
             if 'pitch' in self._parameters.keys():
+                p = pitch.Pitch(self._parameters['pitch'])
                 for sub in self._note: # iterate over compoinents
                     if p.name == sub.pitch.name:
                         # copy the component
@@ -234,8 +236,9 @@ class ScoreReduction(object):
                                                 n.getOffsetBySite(m))
                             if rn.isParsed():
                                 environLocal.pd(['parsing reductive note', rn])
-                                # use id as hash key
-                                self._reductiveNotes[id(n)] = rn
+                                # use id, lyric text as hash
+                                key = str(id(n)) + l.text
+                                self._reductiveNotes[key] = rn
                                 removalIndices.append(k)
                         if removeAfterParsing:
                             for q in removalIndices:
@@ -257,7 +260,6 @@ class ScoreReduction(object):
                 self._reductiveGroups):
                 self._reductiveGroups.remove(None)
             # for now, sort all 
-            self._reductiveGroups.sort()
             environLocal.pd(['self._reductiveGroups', self._reductiveGroups])
 
             if (len(self._reductiveVoices) == 2 and None in 
@@ -280,11 +282,16 @@ class ScoreReduction(object):
             # if 1, can be None or a group name:
             oneVoice = True
 
+        if self._score is not None:
+            mTemplate = self._score.parts[0].measureTemplate()
+        else:
+            mTemplate = self._chordReduction.parts[0].measureTemplate()
+
         # for each defined reductive group
         for gName in self._reductiveGroups:
             # create reductive parts
             # need to break by necessary parts, voices; for now, assume one
-            g = self._score.parts[0].measureTemplate()
+            g = copy.deepcopy(mTemplate)
             g.id = gName
             inst = instrument.Instrument()
             inst.partName = gName
@@ -406,7 +413,7 @@ class Test(unittest.TestCase):
         sr.score = s.measures(0, 10)
         post = sr.reduce()
         match = [n for n in post.parts[0].flat.notes]
-        self.assertEqual(str(match), '[<music21.note.Note F#>, <music21.chord.Chord E4 B4>, <music21.note.Note C#>]')
+        self.assertEqual(str(match), '[<music21.note.Note F#>, <music21.chord.Chord B4 E4>, <music21.note.Note C#>]')
 
         
         #post.show()
@@ -416,14 +423,23 @@ class Test(unittest.TestCase):
         # http://solomonsmusic.net/schenker.htm
 
         src = corpus.parse('bwv846')
-        chords = src.makeChords(minimumWindowSize=4)
+        chords = src.flattenParts().makeChords(minimumWindowSize=2)
 
-        #s.parts[0].flat.notes[4].addLyric('::/o:6/v:1/tb:s/g:Ursatz')
+        chords.measure(1).notes[0].addLyric('::/p:e/o:5/ta:3/g:Ursatz')
+        chords.measure(1).notes[0].addLyric('::/p:c/o:4/tb:I/g:Ursatz')
+
+        chords.measure(1).notes[0].addLyric('::/p:e/o:5/ta:3/nf:no/g:Other')
+
+
+        chords.measure(24).notes[0].addLyric('::/p:d/o:5/ta:2/g:Ursatz')
+
+        chords.measure(35).notes[0].addLyric('::/p:c/o:5/ta:1/g:Ursatz')
+
 
         sr = analysis.reduction.ScoreReduction()
         sr.chordReduction = chords
         post = sr.reduce()
-        post.show()        
+        #post.show()        
 
 
 #-------------------------------------------------------------------------------
