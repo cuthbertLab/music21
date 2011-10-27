@@ -3245,7 +3245,6 @@ class Chord(note.NotRest):
             return returnObj
 
 
-
     def removeRedundantPitches(self, inPlace=True):
         '''Remove all but one instance of a pitch with more than one instance. 
         

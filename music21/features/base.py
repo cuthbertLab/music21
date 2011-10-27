@@ -198,7 +198,6 @@ class FeatureExtractor(object):
             self._feature.normalize()
         return self._feature    
 
-
     def getBlankFeature(self):
         '''Return a properly configured plain feature as a place holder
 
@@ -211,8 +210,6 @@ class FeatureExtractor(object):
         self._fillFeatureAttributes(f) 
         f.prepareVectors() # will vector with necessary zeros
         return f
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -533,7 +530,6 @@ class DataInstance(object):
         if hasattr(self.stream, 'voices'):
             for v in self.stream.voices:
                 self._formsByPart.append(StreamForms(v))
-
 
     def setClassLabel(self, classLabel, classValue=None):
         '''Set the class label, as well as the class value if known. The class label is the attribute name used to define the class of this data instance.
@@ -914,7 +910,6 @@ class DataSet(object):
             post.append(True)
         return post
 
-
     def getClassPositionLabels(self, includeId=True):
         '''Return column labels for the presence of a class definition
 
@@ -934,7 +929,6 @@ class DataSet(object):
         if self._classLabel is not None:
             post.append(True)
         return post
-
 
     def addData(self, dataOrStreamOrPath, classValue=None, id=None):
         '''Add a Stream, DataInstance, or path to a corpus or local file to this data set.
@@ -965,7 +959,6 @@ class DataSet(object):
         self.dataInstances.append(di)
         self.streams.append(s)
 
-
     def process(self):
         '''Process all Data with all FeatureExtractors. Processed data is stored internally as numerous Feature objects. 
         '''
@@ -986,7 +979,6 @@ class DataSet(object):
                 row.append(fReturned) # get feature and store
             # rows will align with data the order of DataInstances
             self._features.append(row)
-
 
     def getFeaturesAsList(self, includeClassLabel=True, includeId=True):
         '''Get processed data as a list of lists, merging any sub-lists in multi-dimensional features. 
@@ -1069,14 +1061,7 @@ class DataSet(object):
         
 
 
-
-
-
-
-
-
 #-------------------------------------------------------------------------------
-
 def extractorsById(idOrList, library=['jSymbolic', 'native']):
     '''Given one or more :class:`~music21.features.FeatureExtractor` ids, return the appropriate  subclass. An optional `library` argument can be added to define which module is used. Current options are jSymbolic and native.
 
@@ -1371,9 +1356,9 @@ class Test(unittest.TestCase):
 
         # process with all feature extractors, store all features
         ds.process()
-        ds.write(format='tab')
-        ds.write(format='csv')
-        ds.write(format='arff')
+        ds.getString(format='tab')
+        ds.getString(format='csv')
+        ds.getString(format='arff')
 
 
 

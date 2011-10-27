@@ -9,15 +9,19 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+'''Tools for generation reduction displays, showing a score and or a chord reduction, and one or more reductive representation lines.
+
+'''
+
+
 import doctest, unittest
 import copy
-
-
 
 import music21 
 from music21 import stream, note, expressions
 from music21 import instrument
 from music21 import pitch
+from music21 import clef
 
 from music21 import environment
 _MOD = "analysis/reduction.py"
@@ -260,7 +264,7 @@ class ScoreReduction(object):
                 self._reductiveGroups):
                 self._reductiveGroups.remove(None)
             # for now, sort all 
-            environLocal.pd(['self._reductiveGroups', self._reductiveGroups])
+            # environLocal.pd(['self._reductiveGroups', self._reductiveGroups])
 
             if (len(self._reductiveVoices) == 2 and None in 
                 self._reductiveVoices):
@@ -269,10 +273,8 @@ class ScoreReduction(object):
 
     def _createReduction(self):
         self._parseReductiveNotes()
-
         s = stream.Score() 
         # need to scan all tags 
-
         oneGroup = False
         if len(self._reductiveGroups) == 1:
             # if 1, can be None or a group name:
@@ -297,11 +299,12 @@ class ScoreReduction(object):
             inst.partName = gName
             g.insert(0, inst)
             gMeasures = g.getElementsByClass('Measure')
-    
+            for m in gMeasures:
+                m.clef = clef.TrebleClef()
             # TODO: insert into note or chord
             for key, rn in self._reductiveNotes.items():
                 if oneGroup or rn['group'] == gName:
-                    environLocal.pd(['_createReduction(): found reductive note, rn', rn, 'group', gName])
+                    #environLocal.pd(['_createReduction(): found reductive note, rn', rn, 'group', gName])
                     gMeasure = gMeasures[rn.measureIndex]
                     if len(gMeasure.voices) == 0: # common setup routines
                         # if no voices, start by removing rests
@@ -316,7 +319,7 @@ class ScoreReduction(object):
                             rn.measureOffset, n)
                         # place the text expression in the Measure, not Voice
                         if te is not None:
-                            gMeasure.voices[0].insert(rn.measureOffset, te)
+                            gMeasure.insert(rn.measureOffset, te)
                     else:
                         v = gMeasure.getElementById(rn['voice'])
                         if v is None: # just take the first
@@ -324,11 +327,10 @@ class ScoreReduction(object):
                         n, te = rn.getNoteAndTextExpression()
                         v.insertIntoNoteOrChord(rn.measureOffset, n)
                         if te is not None:
-                            v.insert(rn.measureOffset, te)
+                            gMeasure.insert(rn.measureOffset, te)
 
             # after gathering all parts, fill with rests
             for i, m in enumerate(g.getElementsByClass('Measure')):
-
                 # only make rests if there are notes in the measure
                 for v in m.voices:
                     if len(v.flat.notes) > 0:
@@ -338,7 +340,6 @@ class ScoreReduction(object):
                 for r in m.flat.getElementsByClass('Rest'):
                     r.hideObjectOnPrint = True
                 #m.show('t')
-
             # add to score
             s.insert(0, g)
             #g.show('t')
@@ -423,21 +424,30 @@ class Test(unittest.TestCase):
         # http://solomonsmusic.net/schenker.htm
 
         src = corpus.parse('bwv846')
-        chords = src.flattenParts().makeChords(minimumWindowSize=2)
+        chords = src.flattenParts().makeChords(minimumWindowSize=4, 
+                                    makeRests=False)
+        for c in chords.flat.notes:
+            c.quarterLength = 4
+            #c.closedPosition(forceOctave=4, inPlace=True)
+            c.removeRedundantPitches(inPlace=True)
+        for m in chords.getElementsByClass('Measure'):
+            m.clef = m.bestClef()
 
         chords.measure(1).notes[0].addLyric('::/p:e/o:5/ta:3/g:Ursatz')
-        chords.measure(1).notes[0].addLyric('::/p:c/o:4/tb:I/g:Ursatz')
+        chords.measure(1).notes[0].addLyric('::/p:c/o:4/tb:I')
 
-        chords.measure(1).notes[0].addLyric('::/p:e/o:5/ta:3/nf:no/g:Other')
+        chords.measure(24).notes[0].addLyric('::/p:d/o:5/ta:2')
+        chords.measure(24).notes[0].addLyric('::/p:g/o:3/tb:V')
 
+        chords.measure(31).notes[0].addLyric('::/p:f/o:4/tb:7')
 
-        chords.measure(24).notes[0].addLyric('::/p:d/o:5/ta:2/g:Ursatz')
-
-        chords.measure(35).notes[0].addLyric('::/p:c/o:5/ta:1/g:Ursatz')
-
+        chords.measure(35).notes[0].addLyric('::/p:c/o:5/v:1/ta:1')
+        chords.measure(35).notes[0].addLyric('::/p:g/o:4/v:2')
+        chords.measure(35).notes[0].addLyric('::/p:c/o:4/v:1/tb:I')
 
         sr = analysis.reduction.ScoreReduction()
         sr.chordReduction = chords
+        #sr.score = src
         post = sr.reduce()
         #post.show()        
 

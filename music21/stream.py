@@ -1312,7 +1312,11 @@ class Stream(music21.Music21Object):
             finalTarget.expressions = target.expressions
             finalTarget.articulations = target.articulations
             finalTarget.duration = target.duration
-            finalTarget.lyrics = target.lyrics
+            # append lyrics list
+            for l in target.lyrics:
+                if l.text not in ['', None]:
+                    finalTarget.addLyric(l.text)
+            #finalTarget.lyrics = target.lyrics
             finalTarget.stemDirection = target.stemDirection
             finalTarget.noteheadFill = target.noteheadFill
 
@@ -4110,7 +4114,7 @@ class Stream(music21.Music21Object):
     def makeChords(self, minimumWindowSize=.125, includePostWindow=True,
             removeRedundantPitches=True, useExactOffsets = False,
             gatherArticulations=True, gatherExpressions=True, inPlace=False,
-            transferGroupsToPitches=False):
+            transferGroupsToPitches=False, makeRests=True):
         '''
         Gathers simultaneously sounding :class:`~music21.note.Note` objects 
         into :class:`~music21.chord.Chord` objects, each of which
@@ -4205,7 +4209,7 @@ class Stream(music21.Music21Object):
                     removeRedundantPitches=removeRedundantPitches,
                     gatherArticulations=gatherArticulations,
                     gatherExpressions=gatherExpressions,
-                    inPlace=True)
+                    inPlace=True, makeRests=makeRests)
             return returnObj # exit
     
         if returnObj.hasPartLikeStreams():
@@ -4216,7 +4220,7 @@ class Stream(music21.Music21Object):
                     removeRedundantPitches=removeRedundantPitches,
                     gatherArticulations=gatherArticulations,
                     gatherExpressions=gatherExpressions,
-                    inPlace=True)
+                    inPlace=True, makeRests=makeRests)
             return returnObj # exit
 
         # TODO: gather lyrics as an option
@@ -4394,9 +4398,10 @@ class Stream(music21.Music21Object):
 
         # makeRests to fill any gaps produced by stripping
         #environLocal.printDebug(['pre makeRests show()'])
-        returnObj.makeRests(
-            refStreamOrTimeRange=(preLowestOffset, preHighestTime), 
-                        fillGaps=True, inPlace=True)
+        if makeRests:
+            returnObj.makeRests(
+                refStreamOrTimeRange=(preLowestOffset, preHighestTime), 
+                fillGaps=True, inPlace=True)
         returnObj._elementsChanged()
         return returnObj
 
@@ -10532,20 +10537,21 @@ class Score(Stream):
 
 
 
-    def flattenParts(self):
+    def flattenParts(self, classFilterList=['Note', 'Chord']):
         '''Join all Parts into a single Part with all elements found in each Measure. 
         '''
-        parts = self.parts
-        post = copy.deepcopy(parts[0])
-        if len(parts) == 1:
-            return post
-
-        remainderParts = parts[1:]
+        post = self.parts[0].measureTemplate(fillWithRests=False)
         for i, m in enumerate(post.getElementsByClass('Measure')):
-            for p in remainderParts:
+            for p in self.parts:
                 mNew = copy.deepcopy(p.getElementsByClass('Measure')[i])
                 for e in mNew:
-                    m.insert(e.getOffsetBySite(mNew), e)
+                    match = False
+                    for cf in classFilterList:
+                        if cf in e.classes:
+                            match = True
+                            break
+                    if match:
+                        m.insert(e.getOffsetBySite(mNew), e)
         return post
 
 

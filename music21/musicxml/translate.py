@@ -1794,7 +1794,8 @@ def noteheadToMxNotehead(obj, spannerBundle=None, overRiddenNotehead = None,
     if nh not in note.noteheadTypeNames:
         raise NoteheadException('This notehead type is not supported by MusicXML.')
     else:
-        mxNotehead.set('charData', nh)
+        if nh not in ['normal']:
+            mxNotehead.set('charData', nh)
         
     if nhFill != 'default':
         mxNotehead._attr['filled'] = nhFill
@@ -2165,7 +2166,9 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
     # need to handle objects in order when creating musicxml 
     # we thus assume that objects are sorted here
     
+    nonVoiceMeasureItems = None
     if m.hasVoices():
+        nonVoiceMeasureItems = m.getElementsNotOfClass('Stream')
         # store divisions for use in calculating backup of voices 
         divisions = mxAttributes.divisions
         for v in m.voices:
@@ -2196,8 +2199,11 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
             mxBackup.duration = int(divisions * offsetMeasureNote)
             mxMeasure.componentList.append(mxBackup)
 
-    else: # no voices
-        mFlat = m.flat
+    if not m.hasVoices() or nonVoiceMeasureItems is not None: # no voices
+        if nonVoiceMeasureItems is not None:
+            mFlat = nonVoiceMeasureItems # this is a Stream
+        else:
+            mFlat = m.flat
         for obj in mFlat:
             #environLocal.pd(['iterating flat M components', obj, obj.offset])
             classes = obj.classes # store result of property call once
@@ -2214,10 +2220,8 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                 mxDirection = dynamicToMx(obj)
                 mxDirection.offset = mxOffset 
                 mxMeasure.insert(0, mxDirection)
-
             elif 'ChordSymbol' in classes:
                 mxMeasure.componentList.append(chordSymbolToMx(obj))
-
             elif 'Segno' in classes:
                 mxOffset = int(defaults.divisionsPerQuarter * 
                            obj.getOffsetBySite(mFlat))
@@ -2230,7 +2234,6 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                 mxDirection = codaToMx(obj)
                 mxDirection.offset = mxOffset 
                 mxMeasure.insert(0, mxDirection)
-
             elif 'MetronomeMark' in classes or 'MetricModulation' in classes:
                 #environLocal.printDebug(['measureToMx: found:', obj])
                 # convert m21 offset to mxl divisions
@@ -2243,16 +2246,16 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                     # uses internal offset positioning, can insert at zero
                     mxMeasure.insert(0, mxDirection)
                     #mxMeasure.componentList.append(mxObj)
-
             elif 'TextExpression' in classes:
                 # convert m21 offset to mxl divisions
+                environLocal.printDebug(['found TextExpression', obj])
+
                 mxOffset = int(defaults.divisionsPerQuarter * 
                            obj.getOffsetBySite(mFlat))
                 mxDirection = textExpressionToMx(obj)
                 mxDirection.offset = mxOffset 
                 # place at zero position, as offset value determines horizontal position, not location amongst notes
                 mxMeasure.insert(0, mxDirection)
-
             elif 'RepeatExpression' in classes:
                 # subclass of RepeatMark and Expression
                 mxOffset = int(defaults.divisionsPerQuarter * 
@@ -2262,7 +2265,6 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                 mxDirection.offset = mxOffset 
                 # place at zero position, as offset value determines horizontal position, not location amongst notes
                 mxMeasure.insert(0, mxDirection)
-
             else: # other objects may have already been added
                 pass
                 #environLocal.printDebug(['_getMX of Measure is not processing', obj])
