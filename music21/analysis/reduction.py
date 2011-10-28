@@ -143,6 +143,12 @@ class ReductiveNote(object):
             n = copy.deepcopy(self._note)
         # always clear certain parameters
         n.lyrics = []
+        n.tie = None
+        n.expressions = []
+        n.articulations = []
+        n.duration.dots = 0 # set to zero
+        if n.pitch.accidental is not None:
+            n.pitch.accidental.displayStatus = True
         te = None
 
         if 'octave' in self._parameters.keys():
@@ -153,6 +159,7 @@ class ReductiveNote(object):
         if 'noteheadFill' in self._parameters.keys():
             if self._parameters['noteheadFill'] is not None:
                 n.noteheadFill = self._parameters['noteheadFill']
+                environLocal.pd(['set nothead fill:', n.noteheadFill])
         if 'textBelow' in self._parameters.keys():
             n.addLyric(self._parameters['textBelow'])
         if 'textAbove' in self._parameters.keys():
@@ -236,8 +243,13 @@ class ScoreReduction(object):
                         # a list of Lyric objects
                         for k, l in enumerate(n.lyrics): 
                             # store measure index
-                            rn = ReductiveNote(l.text, n, i, 
-                                                n.getOffsetBySite(m))
+                            if m.hasElement(n):
+                                offset = n.getOffsetBySite(m)
+                            else: # its in a Voice
+                                for v in m.voices:
+                                    if v.hasElement(n):
+                                        offset = n.getOffsetBySite(v)
+                            rn = ReductiveNote(l.text, n, i, offset)
                             if rn.isParsed():
                                 environLocal.pd(['parsing reductive note', rn])
                                 # use id, lyric text as hash
@@ -422,34 +434,108 @@ class Test(unittest.TestCase):
     def testExtractionC(self):
         from music21 import stream, analysis, note, corpus
         # http://solomonsmusic.net/schenker.htm
+        # shows extracting an Ursatz line
+        
+        # BACH pre;ide !, WTC
 
         src = corpus.parse('bwv846')
         chords = src.flattenParts().makeChords(minimumWindowSize=4, 
                                     makeRests=False)
         for c in chords.flat.notes:
             c.quarterLength = 4
-            #c.closedPosition(forceOctave=4, inPlace=True)
-            c.removeRedundantPitches(inPlace=True)
         for m in chords.getElementsByClass('Measure'):
             m.clef = m.bestClef()
-
-        chords.measure(1).notes[0].addLyric('::/p:e/o:5/ta:3/g:Ursatz')
-        chords.measure(1).notes[0].addLyric('::/p:c/o:4/tb:I')
-
-        chords.measure(24).notes[0].addLyric('::/p:d/o:5/ta:2')
-        chords.measure(24).notes[0].addLyric('::/p:g/o:3/tb:V')
-
+        
+        chords.measure(1).notes[0].addLyric('::/p:e/o:5/nf:no/ta:3/g:Ursatz')
+        chords.measure(1).notes[0].addLyric('::/p:c/o:4/nf:no/tb:I')
+        
+        chords.measure(24).notes[0].addLyric('::/p:d/o:5/nf:no/ta:2')
+        chords.measure(24).notes[0].addLyric('::/p:g/o:3/nf:no/tb:V')
+        
         chords.measure(31).notes[0].addLyric('::/p:f/o:4/tb:7')
-
-        chords.measure(35).notes[0].addLyric('::/p:c/o:5/v:1/ta:1')
-        chords.measure(35).notes[0].addLyric('::/p:g/o:4/v:2')
-        chords.measure(35).notes[0].addLyric('::/p:c/o:4/v:1/tb:I')
-
+        
+        chords.measure(35).notes[0].addLyric('::/p:c/o:5/nf:no/v:1/ta:1')
+        chords.measure(35).notes[0].addLyric('::/p:g/o:4/nf:no/v:2')
+        chords.measure(35).notes[0].addLyric('::/p:c/o:4/nf:no/v:1/tb:I')
+        
         sr = analysis.reduction.ScoreReduction()
         sr.chordReduction = chords
         #sr.score = src
         post = sr.reduce()
         #post.show()        
+
+
+    def testExtractionD(self):
+        # this shows a score, extracting a single pitch
+        from music21 import stream, analysis, note, corpus
+
+        src = corpus.parse('schoenberg/opus19', 6)
+        for n in src.flat.notes:
+            if 'Note' in n.classes:
+                if n.pitch.name == 'F#':
+                    n.addLyric('::/p:f#/o:4')
+        #                 if n.pitch.name == 'C':
+        #                     n.addLyric('::/p:c/o:4/g:C')
+            elif 'Chord' in n.classes:
+                if 'F#' in [p.name for p in n.pitches]:
+                    n.addLyric('::/p:f#/o:4')
+        #                 if 'C' in [p.name for p in n.pitches]:
+        #                     n.addLyric('::/p:c/o:4/g:C')
+                    
+        sr = analysis.reduction.ScoreReduction()
+        sr.score = src
+        post = sr.reduce()
+        #post.show()        
+    
+
+    def testExtractionD2(self):
+        # this shows a score, extracting a single pitch
+        from music21 import stream, analysis, note, corpus
+
+        src = corpus.parse('schoenberg/opus19', 6)
+        for n in src.flat.notes:
+            if 'Note' in n.classes:
+                if n.pitch.name == 'F#':
+                    n.addLyric('::/p:f#/o:4/g:F#')
+                if n.pitch.name == 'C':
+                    n.addLyric('::/p:c/o:4/g:C')
+            elif 'Chord' in n.classes:
+                if 'F#' in [p.name for p in n.pitches]:
+                    n.addLyric('::/p:f#/o:4/g:F#')
+                if 'C' in [p.name for p in n.pitches]:
+                    n.addLyric('::/p:c/o:4/g:C')
+                    
+        sr = analysis.reduction.ScoreReduction()
+        sr.score = src
+        post = sr.reduce()
+        post.show()        
+
+
+
+    def testExtractionE(self):
+        from music21 import stream, analysis, note, corpus
+
+        #src = corpus.parse('opus18no1/movement3.xml').measures(0, 10)
+        #src = corpus.parse('hwv56/movement3-02.md').measures(7,10)
+        src = corpus.parse('opus48no2.xml')
+
+        #chords = src.chordify()
+
+        sr = analysis.reduction.ScoreReduction()
+        #sr.chordReduction = chords
+        sr.score = src
+        post = sr.reduce()
+        #post.show()        
+
+    def testExtractionF(self):
+        from music21 import stream, analysis, note, converter
+
+        src = converter.parse('/_scratch/reduction.xml')
+        sr = analysis.reduction.ScoreReduction()
+        sr.score = src
+        post = sr.reduce()
+        #post.show()        
+        
 
 
 #-------------------------------------------------------------------------------

@@ -586,8 +586,10 @@ class NotRest(GeneralNote):
         return self._stemDirection
     
     def _setStemDirection(self, direction):
-        if direction == 'none' or direction is None:
+        if direction is None:
             direction = None # allow setting to none or None
+        elif direction == 'none':
+            direction = 'noStem' # allow setting to none or None
         elif direction not in stemDirectionNames:
             raise NotRestException('not a valid stem direction name: %s' % direction)
         self._stemDirection = direction
@@ -613,10 +615,10 @@ class NotRest(GeneralNote):
         return self._notehead
 
     def _setNotehead(self, value):
-        if value == 'none' or value is None: 
+        if value in ['none', None, '']: 
             value = None # allow setting to none or None
         elif value not in noteheadTypeNames:
-            raise NotRestException('not a valid notehead type name: %s' % value)
+            raise NotRestException('not a valid notehead type name: %s' % repr(value))
         self._notehead = value
 
     notehead = property(_getNotehead, _setNotehead, doc=

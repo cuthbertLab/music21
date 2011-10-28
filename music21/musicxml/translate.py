@@ -1501,25 +1501,40 @@ def chordToMx(c):
         # merge method returns a new object
         chordPos = 0
         mxNoteChordGroup = []
-        for pitchObj in c.pitches:
+        for n in c: # iterate component notes
+        #for pitchObj in c.pitches:
             # copy here, before merge
             mxNote = copy.deepcopy(mxNoteBase)
-            mxNote = mxNote.merge(pitchObj.mx, returnDeepcopy=False)
+            mxNote = mxNote.merge(n.pitch.mx, returnDeepcopy=False)
             if chordPos > 0:
                 mxNote.set('chord', True)
             # get color from within .editorial using attribute
             mxNote.set('color', c.color)
             # get notehead object
-            nh = c.getNotehead(pitchObj)
-            mxNote.noteheadObj = noteheadToMxNotehead(pitchObj, overRiddenNotehead = nh)
-            
+            #nh = c.getNotehead(n.pitch)
+            nh = n.notehead
+
+            mxNote.noteheadObj = noteheadToMxNotehead(n)
+#             environLocal.printDebug(['parsed mx notehead', mxNote.noteheadObj])
+#             environLocal.printDebug(['n.stemDirection', n.stemDirection])
+#             environLocal.printDebug(['c.stemDirection', c.stemDirection])
+
             #get the stem direction from the chord, not the pitch
             if c.stemDirection != 'unspecified':
                 if c.stemDirection in ['noStem', None]:
                     mxNote.stem = 'none'
                 else:
-                    mxNote.stem = n.stemDirection
-            
+                    mxNote.stem = c.stemDirection
+            # if not specified, try to get from note
+            elif c.stemDirection == 'unspecified':
+                if n.stemDirection != 'unspecified':
+                    #environLocal.printDebug(['found specified component stemdirection', n.stemDirection])
+                    if n.stemDirection in ['noStem', None]:
+                        mxNote.stem = 'none'
+                    else:
+                        mxNote.stem = n.stemDirection            
+
+            #environLocal.pd(['final note stem', mxNote.stem])
             # only add beam to first note in group
             if c.beams != None and chordPos == 0:
                 mxNote.beamList = c.beams.mx
@@ -1529,7 +1544,8 @@ def chordToMx(c):
 
             # get mxl objs from tie obj
             #mxTieList, mxTiedList = c.tie.mx 
-            tieObj = c.getTie(pitchObj) # get for each pitch
+            #tieObj = c.getTie(n.pitch) # get for each pitch
+            tieObj = n.tie
             if tieObj is not None:
                 #environLocal.printDebug(['chordToMx: found tie for pitch', pitchObj])
 
@@ -1578,6 +1594,8 @@ def chordToMx(c):
         obj = c.expressions[i]
         if hasattr(obj, 'mx'): 
             mxNoteList[0].notationsObj.componentList.append(obj.mx)
+
+    #environLocal.pd(['final note list', mxNoteList])
 
     return mxNoteList
 
@@ -1650,7 +1668,7 @@ def mxToChord(mxNoteList, inputM21=None):
         #extract notehead objects
         nh = mxNote.get('noteheadObj')
         noteheads.append(nh)
-        
+
         #extract stem directions
         stemDir = mxNote.get('stem')
         stemDirs.append(stemDir)
@@ -1668,7 +1686,6 @@ def mxToChord(mxNoteList, inputM21=None):
     # set beams from first note of chord
     c.beams.mx = mxNoteList[0].beamList
 
-
     # set ties based on pitches
     for i, t in enumerate(ties):
         if t is not None:
@@ -1678,7 +1695,7 @@ def mxToChord(mxNoteList, inputM21=None):
     #set notehead based on pitches
     index = 0
     for obj in noteheads:
-        if obj !=None:
+        if obj is not None:
             c.setNotehead(obj.charData, c.pitches[index])
         index+=1
         
@@ -1717,8 +1734,7 @@ def generalNoteToMusicXML(n):
     # call the musicxml property on Stream
     return out.musicxml
     
-def noteheadToMxNotehead(obj, spannerBundle=None, overRiddenNotehead = None, 
-    overRiddenNoteheadFill = None, overRiddenNoteheadParen = None):
+def noteheadToMxNotehead(obj):
     '''
     Translate a music21 :class:`~music21.note.Note` object or :class:`~music21.pitch.Pitch` object to a
     into a musicxml.Notehead object.
@@ -1736,20 +1752,6 @@ def noteheadToMxNotehead(obj, spannerBundle=None, overRiddenNotehead = None,
     >>> mxN = musicxml.translate.noteheadToMxNotehead(n)
     >>> mxN.get('charData')
     'diamond'
-
-
-    >>> p = pitch.Pitch('E--5')
-    >>> mxN2 = musicxml.translate.noteheadToMxNotehead(p, overRiddenNotehead = 'slash')
-    >>> mxN2.get('charData')
-    'slash'
-    
-    
-    >>> p2 = pitch.Pitch('C3')
-    >>> mxN3 = musicxml.translate.noteheadToMxNotehead(p2, overRiddenNotehead = 'diamond', overRiddenNoteheadFill = 'no', overRiddenNoteheadParen = 'yes')
-    >>> mxN3._attr['filled']
-    'no'
-    >>> mxN3._attr['parentheses']
-    'yes'
     
     >>> n1 = note.Note('c3')
     >>> n1.notehead = 'diamond'
@@ -1771,31 +1773,33 @@ def noteheadToMxNotehead(obj, spannerBundle=None, overRiddenNotehead = None,
     nhParen = False
     
     nh = 'normal'
-    if 'Pitch' in obj.classes:
-        if overRiddenNotehead is not None:
-            nh = overRiddenNotehead
-    elif hasattr(obj, 'notehead'):
+#     if 'Pitch' in obj.classes:
+#         if overRiddenNotehead is not None:
+#             nh = overRiddenNotehead
+    if hasattr(obj, 'notehead'):
         nh = obj.notehead
         
     nhFill = 'default'
-    if 'Pitch' in obj.classes:
-        if overRiddenNoteheadFill is not None:
-            nhFill = overRiddenNoteheadFill
-    elif hasattr(obj, 'noteheadFill'):
+#     if 'Pitch' in obj.classes:
+#         if overRiddenNoteheadFill is not None:
+#             nhFill = overRiddenNoteheadFill
+    if hasattr(obj, 'noteheadFill'):
         nhFill = obj.noteheadFill
-        
+    #environLocal.pd(['nhFill', nhFill])        
+
     nhParen = False
-    if 'Pitch' in obj.classes:
-        if overRiddenNoteheadParen is not None:
-            nhParen = overRiddenNoteheadParen
-    elif hasattr(obj, 'noteheadParen'):
+#     if 'Pitch' in obj.classes:
+#         if overRiddenNoteheadParen is not None:
+#             nhParen = overRiddenNoteheadParen
+    if hasattr(obj, 'noteheadParen'):
         nhParen = obj.noteheadParen
     
     if nh not in note.noteheadTypeNames:
         raise NoteheadException('This notehead type is not supported by MusicXML.')
     else:
-        if nh not in ['normal']:
-            mxNotehead.set('charData', nh)
+        # should only set if needed, otherwise creates extra mxl data
+        #if nh not in ['normal']: 
+        mxNotehead.set('charData', nh)
         
     if nhFill != 'default':
         mxNotehead._attr['filled'] = nhFill
@@ -1920,7 +1924,7 @@ def noteToMxNotes(n, spannerBundle=None):
     
     #If the stem direction is not 'unspecified'    
     if n.stemDirection != 'unspecified':
-        if n.stemDirection in ['noStem', None]:
+        if n.stemDirection in ['noStem']:
             mxNoteList[0].stem = 'none'
         else:
             mxNoteList[0].stem = n.stemDirection
@@ -2248,7 +2252,7 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                     #mxMeasure.componentList.append(mxObj)
             elif 'TextExpression' in classes:
                 # convert m21 offset to mxl divisions
-                environLocal.printDebug(['found TextExpression', obj])
+                #environLocal.printDebug(['found TextExpression', obj])
 
                 mxOffset = int(defaults.divisionsPerQuarter * 
                            obj.getOffsetBySite(mFlat))
@@ -4113,8 +4117,12 @@ spirit</words>
         c = chord.Chord([n1, n2])
         c.quarterLength = 2
         xml = c.musicxml
+        #c.show()
         input = converter.parse(xml)
         chordResult = input.flat.notes[0]
+        for n in chordResult:
+            print n.stemDirection       
+
         self.assertEqual(chordResult.getStemDirection(chordResult.pitches[0]), 'down')
         self.assertEqual(chordResult.getStemDirection(chordResult.pitches[1]), 'noStem')
         
@@ -4364,6 +4372,16 @@ spirit</words>
         self.assertEqual(raw.find('<degree-value>3</degree-value>') > 0, True)
         self.assertEqual(raw.find('<degree-type>alter</degree-type>') > 0, True)
 
+
+    def testChordNoteheadFillA(self):
+        from music21 import chord
+        c = chord.Chord(['c4', 'g4'])
+        c[0].noteheadFill = 'no'
+        raw = c.musicxml
+        self.assertEqual(raw.count('<notehead filled="no">normal</notehead>'), 1)
+        c[1].noteheadFill = 'no'
+        raw = c.musicxml
+        self.assertEqual(raw.count('<notehead filled="no">normal</notehead>'), 2)
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

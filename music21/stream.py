@@ -1300,14 +1300,19 @@ class Stream(music21.Music21Object):
                 # if a note, make it into a chord   
                 if 'Note' in noteOrChord.classes:
                     pitches = [target.pitch, noteOrChord.pitch]
+                    components = [target, noteOrChord]
                 elif 'Chord' in noteOrChord.classes:
                     pitches = [target.pitch] + noteOrChord.pitches
+                    components = [target] + [c for c in noteOrChord]
             if 'Chord' in target.classes:
                 # if a chord, make it into a chord   
                 if 'Note' in noteOrChord.classes:
                     pitches = target.pitches + [noteOrChord.pitch]
+                    components = [c for c in target] + [noteOrChord]
                 elif 'Chord' in noteOrChord.classes:
                     pitches = target.pitches + noteOrChord.pitches
+                    components = [c for c in target] + [c for c in noteOrChord]
+
             finalTarget = chord.Chord(pitches)
             finalTarget.expressions = target.expressions
             finalTarget.articulations = target.articulations
@@ -1319,6 +1324,11 @@ class Stream(music21.Music21Object):
             #finalTarget.lyrics = target.lyrics
             finalTarget.stemDirection = target.stemDirection
             finalTarget.noteheadFill = target.noteheadFill
+
+            # fill component details
+            for i, n in enumerate(finalTarget):
+                nPrevious = components[i]
+                n.noteheadFill = nPrevious.noteheadFill
 
         elif len(targets) > 1:
             raise StreamException('more than one element found at the specified offset')
@@ -3155,6 +3165,10 @@ class Stream(music21.Music21Object):
         for i, m in enumerate(measureTemplate):
             m.removeByClass(['GeneralNote']) # includes rests
             m.removeByClass(['Dyanmic'])
+            m.removeByClass(['Stream']) # get voices or sub-streams
+            m.removeByClass(['Dynamic']) 
+            m.removeByClass(['Expression']) 
+
             if fillWithRests:
                 ql = m.duration.quarterLength
                 # quarterLength duration will be appropriate to pickup
