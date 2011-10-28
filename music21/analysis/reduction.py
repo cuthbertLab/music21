@@ -426,7 +426,7 @@ class Test(unittest.TestCase):
         sr.score = s.measures(0, 10)
         post = sr.reduce()
         match = [n for n in post.parts[0].flat.notes]
-        self.assertEqual(str(match), '[<music21.note.Note F#>, <music21.chord.Chord B4 E4>, <music21.note.Note C#>]')
+        self.assertEqual(str(match), '[<music21.note.Note F#>, <music21.chord.Chord E4 B4>, <music21.note.Note C#>]')
 
         
         #post.show()
@@ -508,7 +508,7 @@ class Test(unittest.TestCase):
         sr = analysis.reduction.ScoreReduction()
         sr.score = src
         post = sr.reduce()
-        post.show()        
+        #post.show()        
 
 
 
