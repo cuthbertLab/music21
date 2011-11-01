@@ -462,8 +462,8 @@ class MuseDataMeasure(object):
 
         # see if there is a measure number
         mNumber = ''
-        if len(data) > 11 and data[8:12].strip() != '':
-            mNumber = data[8:12].strip()
+        if len(data) >= 9 and data[8:].strip() != '':
+            mNumber, junk = common.getNumFromStr(data)
 
         m = stream.Measure()
         # assume that this definition refers to this bar; this is not 
@@ -473,7 +473,6 @@ class MuseDataMeasure(object):
 
         if mNumber != '':
             m.number = mNumber
-
         return m
 
     def hasNotes(self):
@@ -1726,6 +1725,16 @@ class Test(unittest.TestCase):
 
 
 
+    def testMeasureNumberImport(self):
+        from music21 import corpus
+        s = corpus.parse('symphony94/02')
+        for p in s.parts:
+            match = []
+            for m in p.getElementsByClass('Measure'):
+                match.append(m.number)
+            self.assertEqual(len(match), 156)
+            # make sure there areno empty string
+            self.assertEqual(match.count(''), 0)
 
 if __name__ == "__main__":
     import sys

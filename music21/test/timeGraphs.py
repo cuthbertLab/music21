@@ -353,8 +353,6 @@ class TestBigMusicXML(CallTest):
         post = self.s.musicxml
 
 
-
-#-------------------------------------------------------------------------------
 class TestGetElementsByClass(CallTest):
 
     def __init__(self):
@@ -365,6 +363,14 @@ class TestGetElementsByClass(CallTest):
         found = self.s.flat.notes
 
 
+class TestMeasuresA(CallTest):
+
+    def __init__(self):
+        from music21 import corpus
+        self.s = corpus.parse('symphony94/02')
+
+    def testFocus(self):
+        found = self.s.measures(3, 10)
 
 
 #-------------------------------------------------------------------------------
@@ -393,10 +399,11 @@ class CallGraph:
         #self.callTest = TestMakeMeasures
         #self.callTest = TestGetElementsByClass
 
-        self.callTest = TestMusicXMLMultiPartOutput
+        #self.callTest = TestMusicXMLMultiPartOutput
         #self.callTest = TestCommonContextSearches
         #self.callTest = TestBigMusicXML
 
+        self.callTest = TestMeasuresA
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 

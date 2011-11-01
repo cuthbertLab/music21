@@ -111,6 +111,9 @@ from music21.corpus.haydn import opus76no6
 from music21.corpus.haydn import opus77no1
 from music21.corpus.haydn import opus77no2 
 
+from music21.corpus.haydn import symphony94
+
+
 from music21.corpus import leadSheet
 from music21.corpus import miscFolk
 
@@ -285,6 +288,7 @@ MODULES = [
             opus76no6,
             opus77no1,
             opus77no2,
+            symphony94,
 
             leadSheet,
             miscFolk,

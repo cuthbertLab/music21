@@ -3017,11 +3017,13 @@ class Stream(music21.Music21Object):
             # there may be multiple None and/or 0 measure numbers
             mapRaw[mId].append(m)
 
-        #environLocal.printDebug(['len(mapRaw)', len(mapRaw)])
+        environLocal.printDebug(['len(mapRaw)', len(mapRaw)])
+        environLocal.printDebug(['mNumbersUnique', mNumbersUnique])
 
         # if measure numbers are not defined, we should just count them 
         # in order, starting from 1
         if len(mNumbersUnique) == 1:
+            environLocal.printDebug(['measures()', 'attempting to assign measures order numbers'])
             mapCooked = {}  
             # only one key but we do not know what it is
             i = 1
@@ -3033,7 +3035,7 @@ class Stream(music21.Music21Object):
         else:
             mapCooked = mapRaw
         #environLocal.printDebug(['mapCooked', mapCooked])
-        #environLocal.printDebug(['len(mapCooked)', len(mapCooked)])
+        environLocal.printDebug(['len(mapCooked)', len(mapCooked)])
 
         startOffset = None # set with the first measure
         startMeasure = None # store for adding other objects
