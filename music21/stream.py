@@ -4090,17 +4090,17 @@ class Stream(music21.Music21Object):
         >>> p2.insert(5.5, note.Rest())
         >>> s.insert(0, p1)
         >>> s.insert(0, p2)
-        >>> s.flat._uniqueOffsetsAndEndTimes()
-        [2.12, 4.0, 4.12, 5.0, 5.3, 5.5, 6.3, 6.5]
+        >>> [str(o) for o in s.flat._uniqueOffsetsAndEndTimes()]
+        ['2.12', '4.0', '4.12', '5.0', '5.3', '5.5', '6.3', '6.5']
         
         
         Limit what is returned:
         
         
-        >>> s.flat._uniqueOffsetsAndEndTimes(offsetsOnly = True)
-        [2.12, 4.0, 5.3, 5.5]
-        >>> s.flat._uniqueOffsetsAndEndTimes(endTimesOnly = True)
-        [4.12, 5.0, 6.3, 6.5]
+        >>> [str(o) for o in s.flat._uniqueOffsetsAndEndTimes(offsetsOnly = True)]
+        ['2.12', '4.0', '5.3', '5.5']
+        >>> [str(o) for o in s.flat._uniqueOffsetsAndEndTimes(endTimesOnly = True)]
+        ['4.12', '5.0', '6.3', '6.5']
 
 
         And this is useless...  :-)

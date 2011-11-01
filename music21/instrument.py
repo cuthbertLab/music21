@@ -173,7 +173,8 @@ class Instrument(music21.Music21Object):
                 else:
                     self.midiChannel = ch
                     return ch
-            raise InstrumentException("we are out of midi channels and this was not already detected PROGRAM BUG!")
+            return 0
+            #raise InstrumentException("we are out of midi channels and this was not already detected PROGRAM BUG!")
             
 
 
