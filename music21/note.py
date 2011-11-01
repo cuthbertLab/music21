@@ -634,7 +634,7 @@ class NotRest(GeneralNote):
         'diamond'
         >>> n.notehead = 'junk'
         Traceback (most recent call last):
-        NotRestException: not a valid notehead type name: junk
+        NotRestException: not a valid notehead type name: 'junk'
         ''')
 
     

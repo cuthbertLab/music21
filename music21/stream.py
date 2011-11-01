@@ -2615,8 +2615,13 @@ class Stream(music21.Music21Object):
         for e in self.elements:
             match = False
             offset = e.getOffsetBySite(self)
-            dur = e.duration
 
+            # if sorted, optimize by breaking after exceeding offsetEnd
+            if self.isSorted:
+                if offset > offsetEnd:
+                    break
+
+            dur = e.duration
             if dur is None or mustFinishInSpan is False:
                 eEnd = offset
             else:
@@ -2627,6 +2632,7 @@ class Stream(music21.Music21Object):
             else:
                 eStart = offset
 
+            match = False
             if includeEndBoundary is True and mustBeginInSpan is True and \
                 eStart >= offsetStart and eEnd <= offsetEnd:
                     match = True
@@ -2639,8 +2645,7 @@ class Stream(music21.Music21Object):
             elif includeEndBoundary is False and mustBeginInSpan is False and \
                 eStart > offsetStart and eEnd < offsetEnd:
                     match = True
-            else: # 
-                match = False
+
             if match:
                 found._insertCore(offset, e)
 

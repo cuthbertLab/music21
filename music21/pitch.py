@@ -4274,6 +4274,7 @@ class Test(unittest.TestCase):
         assert(bm.flat.notes[4].accidental.displayStatus == True)
         assert(bm.flat.notes[5].accidental.name == 'natural')     # En4 
         assert(bm.flat.notes[5].accidental.displayStatus == True)
+
         assert(bm.flat.notes[6].accidental != None)               # En5
         assert(bm.flat.notes[6].accidental.name == 'natural')
         assert(bm.flat.notes[6].accidental.displayStatus == True)

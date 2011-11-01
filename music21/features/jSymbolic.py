@@ -2425,7 +2425,7 @@ class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     >>> fe = features.jSymbolic.AverageNumberOfIndependentVoicesFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [1.6]
+    [1.6...]
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.AverageNumberOfIndependentVoicesFeature(s)
