@@ -667,7 +667,7 @@ def getNumFromStr(usrStr, numbers='0123456789'):
             found.append(char)
         else:
             remain.append(char)
-    # returns numbers, and then characeters
+    # returns numbers, and then characters
     return ''.join(found), ''.join(remain)
 
 

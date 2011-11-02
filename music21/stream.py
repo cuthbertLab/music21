@@ -23,6 +23,7 @@ import music21 # needed to do fully-qualified isinstance name checking
 
 from music21 import bar
 from music21 import common
+from music21 import classCache
 from music21 import clef
 from music21 import chord
 from music21 import defaults
@@ -2102,9 +2103,6 @@ class Stream(music21.Music21Object):
         '''
         # TODO: could add `domain` parameter to allow searching only _elements, 
         # or _endElements, or both; possible performance hit
-
-        # TODO: attempted caching of all getelements by class searches, but without a significant performance boost. see below.
-
         # NOTE: this is a performance critical operation 
         if returnStreamSubClass:
             try:
@@ -2123,40 +2121,21 @@ class Stream(music21.Music21Object):
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
 
+#         if self._cache['classCache'] is None:
+#             self._cache['classCache'] = classCache.ClassCache()
+#             self._cache['classCache'].load(self)
+#       return self._cache['classCache'].getElementsByClass(found,
+#                                         classFilterList)
+
+        #found.show('t')
         # need both _elements and _endElements
         for e in self._elements:
             #eClasses = e.classes # store once, as this is property call
             if e.isClassOrSubclass(classFilterList):
                 found._insertCore(e.getOffsetBySite(self), e, ignoreSort=True)                
-
-#             for className in classFilterList:
-#                 # new method uses string matching of .classes attribute
-#                 # temporarily check to see if this is a string
-#                 #if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
-#                 if className in eClasses:
-#                     found._insertCore(e.getOffsetBySite(self), e,
-#                         ignoreSort=True)
-#                     break # match first class and break to next e
-#                 try:
-#                     if isinstance(e, className):
-#                         found._insertCore(e.getOffsetBySite(self), e,
-#                             ignoreSort=True)
-#                         break
-#                 # catch TypeError: isinstance() arg 2 must be a class, type, or tuple of classes and types
-#                 except TypeError:
-#                     continue
-
-
         for e in self._endElements:
             if e.isClassOrSubclass(classFilterList):
                 found._storeAtEndCore(e)
-
-#             for className in classFilterList:
-#                 if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
-#                     #found.storeAtEnd(e, ignoreSort=True)
-#                     found._storeAtEndCore(e)
-#                     break # match first class and break to next e
-
         found._elementsChanged()
         # if this stream was sorted, the resultant stream is sorted
         found.isSorted = self.isSorted
@@ -2164,45 +2143,7 @@ class Stream(music21.Music21Object):
         found.autoSort = self.autoSort
         return found
 
-# experimental: caching all returns
-#         cacheKey = 'getElementsByClass-%s-%s' % (classFilterList, returnStreamSubClass)
-# 
-#         if self._cache[cacheKey] is None:
-#             if returnStreamSubClass:
-#                 found = self.__class__()
-#             else:
-#                 found = Stream()
-#             found.setDerivation(self)
-#             found.derivationMethod = 'getElementsByClass'
-#     
-#             # much faster in the most common case than calling common.isListLike
-#             if not isinstance(classFilterList, (list, tuple)):
-#                 classFilterList = tuple([classFilterList])
-#     
-#             if not self.isSorted and self.autoSort:
-#                 self.sort() # will set isSorted to True
-#     
-#             # need both _elements and _endElements
-#             for e in self._elements:
-#                 eClasses = e.classes # store once, as this is property call
-#                 for className in classFilterList:
-#                     # new method uses string matching of .classes attribute
-#                     # temporarily check to see if this is a string
-#                     if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
-#                         found.insert(e.getOffsetBySite(self), e, ignoreSort=True)
-#                         break # match first class and break to next e
-#             for e in self._endElements:
-#                 eClasses = e.classes # store once, as this is property call
-#                 for className in classFilterList:
-#                     if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
-#                         found.storeAtEnd(e, ignoreSort=True)
-#                         break # match first class and break to next e
-#             # if this stream was sorted, the resultant stream is sorted
-#             found.isSorted = self.isSorted
-#             # passing on auto sort status may or may not be what is needed here
-#             found.autoSort = self.autoSort
-#             self._cache[cacheKey] = found # store in cache
-#         return self._cache[cacheKey]
+
 
     def getElementsNotOfClass(self, classFilterList):
         '''Return a list of all Elements that do not match the one or more classes in the `classFilterList`. A single class can be provided to the `classFilterList` parameter.
@@ -3007,7 +2948,11 @@ class Stream(music21.Music21Object):
         for m in mStream.elements:
             #environLocal.printDebug(['m', m])
             # mId is a tuple of measure nmber and any suffix
-            mId = (m.number, m.numberSuffix)
+            try:
+                mNumber = int(m.number)
+            except ValueError:
+                raise StreamException('found problematic measure number: %s' % mNumber)
+            mId = (mNumber, m.numberSuffix)
             # store unique measure numbers for reference
             if m.number not in mNumbersUnique:
                 mNumbersUnique.append(m.number)
@@ -3017,13 +2962,13 @@ class Stream(music21.Music21Object):
             # there may be multiple None and/or 0 measure numbers
             mapRaw[mId].append(m)
 
-        environLocal.printDebug(['len(mapRaw)', len(mapRaw)])
-        environLocal.printDebug(['mNumbersUnique', mNumbersUnique])
+        #environLocal.printDebug(['len(mapRaw)', len(mapRaw)])
+        #environLocal.printDebug(['mNumbersUnique', mNumbersUnique])
 
         # if measure numbers are not defined, we should just count them 
         # in order, starting from 1
         if len(mNumbersUnique) == 1:
-            environLocal.printDebug(['measures()', 'attempting to assign measures order numbers'])
+            #environLocal.printDebug(['measures()', 'attempting to assign measures order numbers'])
             mapCooked = {}  
             # only one key but we do not know what it is
             i = 1
@@ -3035,7 +2980,7 @@ class Stream(music21.Music21Object):
         else:
             mapCooked = mapRaw
         #environLocal.printDebug(['mapCooked', mapCooked])
-        environLocal.printDebug(['len(mapCooked)', len(mapCooked)])
+        #environLocal.printDebug(['len(mapCooked)', len(mapCooked)])
 
         startOffset = None # set with the first measure
         startMeasure = None # store for adding other objects
@@ -3046,20 +2991,24 @@ class Stream(music21.Music21Object):
         if numberEnd == None:
             numberEnd = max([x for x,y in mapCooked])
 
+        #environLocal.pd(['numberStart', numberStart, 'numberEnd', numberEnd])
+
         for i in range(numberStart, numberEnd+1):
             match = None
             for number, suffix in mapCooked.keys():
                 # this will match regardless of suffix
+                # numbers may be strings still
                 if number == i:
                     match = mapCooked[(number, suffix)]
                     break
-            if match == None: # None found in this range
+            if match is None: # None found in this range
                 continue 
             # need to make offsets relative to this new Stream
             for m in match:
+                #environLocal.pd(['startMeasure', startMeasure, 'm', m])
                 # this assumes measure are in offset order
                 # this may not always be the case
-                if startOffset == None: # only set on first
+                if startOffset is None: # only set on first
                     startOffset = m.getOffsetBySite(srcObj)
                     # store reference for collecting objects in src
                     startMeasure = m
@@ -8285,7 +8234,7 @@ class Stream(music21.Music21Object):
             else:
                 returnStreamSubClass = True
             self._cache['notesAndRests'] = self.getElementsByClass(
-                                          ['GeneralNote', 'Chord'], 
+                                          ['GeneralNote'], 
                             returnStreamSubClass=returnStreamSubClass)
         return self._cache['notesAndRests']
 
@@ -9311,7 +9260,7 @@ class Stream(music21.Music21Object):
     # voice processing routines
 
     def internalize(self, container=None, 
-                    classFilterList=['GeneralNote', 'Rest', 'Chord']):
+                    classFilterList=['GeneralNote']):
         '''
         Gather all notes and related classes of this Stream 
         and place inside a new container (like a Voice) in this Stream.
@@ -12797,7 +12746,7 @@ class Test(unittest.TestCase):
         sBach = corpus.parse('bach/bwv324.xml')
         partSoprano = sBach.parts[0]
 
-        c1 = partSoprano.flat.getElementsByClass(clef.Clef)[0]
+        c1 = partSoprano.flat.getElementsByClass('Clef')[0]
         self.assertEqual(isinstance(c1, clef.TrebleClef), True)
 
         # now, replace with a different clef
@@ -12805,7 +12754,7 @@ class Test(unittest.TestCase):
         partSoprano.flat.replace(c1, c2)
 
         # all views of the Stream have been updated
-        cTest = sBach.parts[0].flat.getElementsByClass(clef.Clef)[0]
+        cTest = sBach.parts[0].flat.getElementsByClass('Clef')[0]
         self.assertEqual(isinstance(cTest, clef.AltoClef), True)
 
         s1 = Stream()

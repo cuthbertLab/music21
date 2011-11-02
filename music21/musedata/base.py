@@ -461,7 +461,7 @@ class MuseDataMeasure(object):
             data = 'measure'
 
         # see if there is a measure number
-        mNumber = ''
+        mNumber = '1'
         if len(data) >= 9 and data[8:].strip() != '':
             mNumber, junk = common.getNumFromStr(data)
 
@@ -1735,6 +1735,8 @@ class Test(unittest.TestCase):
             self.assertEqual(len(match), 156)
             # make sure there areno empty string
             self.assertEqual(match.count(''), 0)
+            
+        self.assertEqual(len(s.parts[-1].flat.notes), 287)
 
 if __name__ == "__main__":
     import sys
