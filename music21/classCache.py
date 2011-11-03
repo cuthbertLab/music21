@@ -27,6 +27,8 @@ class Repository(object):
         self._elements = []
         self._endElements = []
 
+    def __len__(self):
+        return len(self._elements) + len(self._endElements)
 
     def addElement(self, e):
         '''Add an element to the repository
@@ -57,6 +59,7 @@ class Repository(object):
         ['Note', 'NotRest', 'GeneralNote', 'Music21Object', 'JSONSerializer',     'object']
 
         '''
+        # check elements first for first match
         if len(self._elements) == 0 and len(self._endElements) == 0:
             # set class name and key
             self.classObj = e.__class__
@@ -96,9 +99,12 @@ class Repository(object):
 #-------------------------------------------------------------------------------
 class ClassCache(object):
 
-    def __init__(self):
+    def __init__(self, srcStream=None):
         self.repositories = {}
         self.parent = None
+
+        if srcStream is not None:
+            self.load(srcStream)
 
     def load(self, srcStream):
         '''
@@ -109,26 +115,42 @@ class ClassCache(object):
         >>> cc = classCache.ClassCache()
         >>> cc.load(s1)
         >>> cc.repositories.keys()
-        ['Note', 'Rest']
+        ['Note', 'Rest', 'NotRest', 'GeneralNote']
         '''
         self.parent = srcStream # store this to get offsets later
+
+        #environLocal.printDebug(['loading parent:', srcStream])
+
+        # elements must already be sorted
         for e in srcStream._elements:
-            try:
-                dst = self.repositories[e.classes[0]]
-            except KeyError:
-                # store a repository for each entry
-                self.repositories[e.classes[0]] = Repository()
-                dst = self.repositories[e.classes[0]]
-            dst.addElement(e)                
+            #environLocal.printDebug(['loading', e, e.classes])
+
+            for className in e.classes:
+                if className == 'Music21Object': 
+                    break
+                try:
+                    dst = self.repositories[className]
+                except KeyError:
+                    # store a repository for each entry
+                    self.repositories[className] = Repository()
+                    dst = self.repositories[className]
+                dst.addElement(e)                
 
         for e in srcStream._endElements:
-            try:
-                dst = self.repositories[e.classes[0]]
-            except KeyError:
-                # store a repository for each entry
-                self.repositories[e.classes[0]] = Repository()
-                dst = self.repositories[e.classes[0]]
-            dst.addEndElement(e)                
+            for className in e.classes:
+                if className == 'Music21Object':
+                    break
+                try:
+                    dst = self.repositories[className]
+                except KeyError:
+                    # store a repository for each entry
+                    self.repositories[className] = Repository()
+                    dst = self.repositories[className]
+                dst.addEndElement(e)                
+
+#         environLocal.printDebug(['loaded parent:', srcStream, 'got repository keys', self.repositories.keys()])
+#         for r in self.repositories.keys():
+#             environLocal.printDebug([r, len(self.repositories[r])])
 
 
     def getElementsByClass(self, targetStream, classFilterList):
@@ -157,55 +179,54 @@ class ClassCache(object):
         {6.0} <music21.note.Rest rest>
         {7.0} <music21.note.Rest rest>
 
-        >>> # can use class names as well
+        >>> # cannot match more than one class
         >>> s4 = stream.Stream()
-        >>> cc.getElementsByClass(s4, [note.Note, note.Rest]).show('t')
-        {0.0} <music21.note.Note C>
-        {1.0} <music21.note.Note C>
-        {2.0} <music21.note.Note C>
-        {3.0} <music21.note.Note C>
-        {4.0} <music21.note.Rest rest>
-        {5.0} <music21.note.Rest rest>
-        {6.0} <music21.note.Rest rest>
-        {7.0} <music21.note.Rest rest>
+        >>> len(cc.getElementsByClass(s4, [note.Note, note.Rest]))
+        0
         '''
         matchKeys = []
         #environLocal.pd(['getElementsByClass', 'classFilterList', classFilterList])
 
-        # if the ancestry of one classFilterList is entirely within
-        # another, duplicate items will be placed in the stream
-
+        # for now, can only match a single class, as this will be in the 
+        # correct order
         if len(classFilterList) == 1:
+            classNameOrStr = classFilterList[0]
+            r = None
             try: # for performance, try a direct match first
-                self.repositories[classFilterList[0]]
-                matchKeys.append(classFilterList[0])
-            except KeyError:    
+                r = self.repositories[classNameOrStr]
+            except KeyError: # string match not possible
                 pass
-        if matchKeys == []:
-            for classNameOrStr in classFilterList:
-                #environLocal.pd(['classNameOrStr', classNameOrStr])
-                if isinstance(classNameOrStr, str):
-                    for r in self.repositories.values(): 
-                        if classNameOrStr in r.classes:
-                            # they key is always the first class
-                            matchKeys.append(r.classes[0])
-                else:
-                    for r in self.repositories.values():
-                        # see if the requested class is or is subclass      
-                        # of the stored class
-                        if issubclass(classNameOrStr, r.classObj):
-                            # they key is always the first class
-                            matchKeys.append(r.classes[0])
+            if r is not None:
+                r.insertIntoStream(targetStream=targetStream, 
+                        offsetSite=self.parent)
+        # found may be unaltered; check length
+        return targetStream 
+
+#         if matchKeys == []:
+#             for classNameOrStr in classFilterList:
+#                 #environLocal.pd(['classNameOrStr', classNameOrStr])
+#                 if isinstance(classNameOrStr, str):
+#                     for r in self.repositories.values(): 
+#                         if classNameOrStr in r.classes:
+#                             # they key is always the first class
+#                             matchKeys.append(r.classes[0])
+#                 else:
+#                     for r in self.repositories.values():
+#                         # see if the requested class is or is subclass      
+#                         # of the stored class
+#                         if issubclass(classNameOrStr, r.classObj):
+#                             # they key is always the first class
+#                             matchKeys.append(r.classes[0])
         #environLocal.pd(['matchKeys', matchKeys, 'self.repositories.keys()', self.repositories.keys()])
 
-        for key in matchKeys:
-            # rather than directly assign, can build list of offset/value?
-            self.repositories[key].insertIntoStream(targetStream=targetStream, 
-                                    offsetSite=self.parent)
-        # must sort, as ordering is sequential
-        # if sort, remove all performance boost
-        #targetStream.sort()
-        return targetStream
+#         for key in matchKeys:
+#             # rather than directly assign, can build list of offset/value?
+#             self.repositories[key].insertIntoStream(targetStream=targetStream, 
+#                                     offsetSite=self.parent)
+#         # must sort, as ordering is sequential
+#         # if sort, remove all performance boost
+#         #targetStream.sort()
+#         return targetStream
 
 
 class Test(unittest.TestCase):
@@ -228,11 +249,11 @@ class Test(unittest.TestCase):
         for i in range(50):
             s1.getElementsByClass('Rest')
             s1.getElementsByClass('Note')
-            s1.getElementsByClass('GeneralNote')
-            s1.getElementsByClass('Clef')
+            s1.getElementsByClass('GemeralNote')
+            s1.getElementsByClass('BassClef')
             s1.getElementsByClass('TimeSignature')
         environLocal.printDebug(['Stream.getOffsetBySite()', t1])
-        #classCache.py: Stream.getOffsetBySite() 0.988
+        #classCache.py: Stream.getOffsetBySite() 0.747
 
         s2 = stream.Stream()
         s2.repeatAppend(note.Note(), 300)
@@ -253,11 +274,87 @@ class Test(unittest.TestCase):
             s = stream.Stream()
             cc.getElementsByClass(s, ['GeneralNote'])
             s = stream.Stream()
-            cc.getElementsByClass(s, ['Clef'])
+            cc.getElementsByClass(s, ['BassClef'])
             s = stream.Stream()
             cc.getElementsByClass(s, ['TimeSignature'])
         environLocal.printDebug(['Stream.getOffsetBySite()', t1])
-        #Stream.getOffsetBySite() 0.557
+        #classCache.py: Stream.getOffsetBySite() 0.261
+
+
+    def testSubclassMatchingA(self):
+        from music21 import stream, note, clef, meter, classCache, common, chord
+        s2 = stream.Stream()
+        s2.repeatAppend(note.Note(), 300)
+        s2.repeatAppend(note.Rest(), 300)
+        s2.repeatAppend(chord.Chord(), 300)
+
+        s2.repeatInsert(meter.TimeSignature(), [0, 50, 100, 150])
+        s2.repeatInsert(clef.BassClef(), [0, 50, 100, 150])
+
+        t1 = common.Timer()
+        t1.start()
+        cc = classCache.ClassCache()
+        # simulate what would happen in getElementsByClass
+        cc.load(s2) 
+        s = stream.Stream()
+        cc.getElementsByClass(s, ['Rest'])
+        self.assertEqual(len(s), 300)
+        s = stream.Stream()
+        cc.getElementsByClass(s, ['Note'])
+        self.assertEqual(len(s), 300)
+        s = stream.Stream()
+        cc.getElementsByClass(s, ['GeneralNote'])
+        self.assertEqual(len(s), 900)
+
+        s = stream.Stream()
+        cc.getElementsByClass(s, ['NotRest'])
+        self.assertEqual(len(s), 600)
+
+        s = stream.Stream()
+        cc.getElementsByClass(s, ['BassClef'])
+        self.assertEqual(len(s), 4)
+
+        s = stream.Stream()
+        cc.getElementsByClass(s, ['Clef'])
+        self.assertEqual(len(s), 4)
+
+        s = stream.Stream()
+        cc.getElementsByClass(s, ['TimeSignature'])
+        self.assertEqual(len(s), 4)
+
+
+    def testBasicA(self):
+        from music21 import corpus, stream, classCache
+        s = corpus.parse('schoenberg/opus19/movement6')
+
+        cc = classCache.ClassCache(s.parts[0])
+        sOut = stream.Stream()
+        cc.getElementsByClass(sOut, ['Measure'])
+        self.assertEqual(len(sOut), 10)
+
+        cc = classCache.ClassCache(s.parts[1])
+        sOut = stream.Stream()
+        cc.getElementsByClass(sOut, ['Measure'])
+        self.assertEqual(len(sOut), 10)
+
+
+#         s = corpus.parse('schoenberg/opus19/movement6')
+#         m1 = s.parts[0].getElementsByClass('Measure', useClassCache=True)[0]
+        
+
+
+    def testBasicB(self):
+        from music21.musicxml import testPrimitive
+        from music21 import converter, clef
+
+        mxString = testPrimitive.clefs12a
+        a = converter.parse(mxString)
+        part = a.parts[0]
+
+        clefs = part.flat.getElementsByClass('Clef')
+        self.assertEqual(len(clefs), 18)
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

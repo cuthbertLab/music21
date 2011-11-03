@@ -303,7 +303,10 @@ class Stream(music21.Music21Object):
         if common.isNum(key):
             # TODO: using self._elements here will retain activeSite, as opposed   
             # to using .elements
-            e = self.elements[key]
+            try:
+                e = self.elements[key]
+            except IndexError:
+                raise StreamException('attempting to access index %s while elements is of size %s' % (key, len(self.elements)))
             e.activeSite = self
             return e
     
@@ -2121,11 +2124,18 @@ class Stream(music21.Music21Object):
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
 
-#         if self._cache['classCache'] is None:
-#             self._cache['classCache'] = classCache.ClassCache()
-#             self._cache['classCache'].load(self)
-#       return self._cache['classCache'].getElementsByClass(found,
-#                                         classFilterList)
+        # to use class cache, class must be provided as a string, 
+        # and there must be only one class
+#         if (len(classFilterList) == 1 and 
+#             isinstance(classFilterList[0], str)):
+#             if self._cache['classCache'] is None:
+#                 self._cache['classCache'] = classCache.ClassCache()
+#                 self._cache['classCache'].load(self)
+#             found = self._cache['classCache'].getElementsByClass(found,
+#                                               classFilterList)
+#             found.isSorted = self.isSorted
+#             found.autoSort = self.autoSort
+#             return found
 
         #found.show('t')
         # need both _elements and _endElements
@@ -3302,7 +3312,7 @@ class Stream(music21.Music21Object):
     def _getVoices(self):
         '''        
         '''
-        return self.getElementsByClass(Voice)
+        return self.getElementsByClass('Voice')
 
     voices = property(_getVoices, 
         doc='''Return all :class:`~music21.stream.Voices` objects in a :class:`~music21.stream.Stream` or Stream subclass.
@@ -3318,7 +3328,7 @@ class Stream(music21.Music21Object):
     def _getSpanners(self):
         '''        
         '''
-        return self.getElementsByClass(spanner.Spanner)
+        return self.getElementsByClass('Spanner')
 
     spanners = property(_getSpanners, 
         doc='''
@@ -3677,12 +3687,12 @@ class Stream(music21.Music21Object):
         '''
         # TODO: activeSite searching is not yet implemented
         # this may not be useful unless a stream is flat
-        post = self.getElementsByClass(clef.Clef)
+        post = self.getElementsByClass('Clef')
 
         #environLocal.printDebug(['getClefs(); count of local', len(post), post])       
         if len(post) == 0 and searchActiveSite and self.activeSite != None:
             #environLocal.printDebug(['getClefs(): search activeSite'])       
-            post = self.activeSite.getElementsByClass(clef.Clef)
+            post = self.activeSite.getElementsByClass('Clef')
 
         if len(post) == 0 and searchContext:
             # returns a single element match
@@ -3715,7 +3725,7 @@ class Stream(music21.Music21Object):
         '''
         # TODO: activeSite searching is not yet implemented
         # this may not be useful unless a stream is flat
-        post = self.getElementsByClass(key.KeySignature)
+        post = self.getElementsByClass('KeySignature')
         if len(post) == 0 and searchContext:
             # returns a single value
             post = self.__class__()
@@ -5209,7 +5219,7 @@ class Stream(music21.Music21Object):
         while True:
             # update measureStream on each iteration, 
             # as new measure may have been added to the returnObj stream 
-            measureStream = returnObj.getElementsByClass(Measure)
+            measureStream = returnObj.getElementsByClass('Measure')
             if mCount >= len(measureStream):
                 break # reached the end of all measures available or added
             # get the current measure to look for notes that need ties
@@ -6050,7 +6060,7 @@ class Stream(music21.Music21Object):
                 # go through each container and find the note to delete
                 # note: this assumes the container is Measure
                 # TODO: this is where we need a recursive container Generator out
-                for sub in reversed(returnObj.getElementsByClass(Measure)):
+                for sub in reversed(returnObj.getElementsByClass('Measure')):
                     try:
                         i = sub.index(nTarget)
                     except ValueError:
@@ -7371,7 +7381,7 @@ class Stream(music21.Music21Object):
         >>> a = stream.Stream()
         >>> a.metadata = metadata.Metadata()
         '''
-        mdList = self.getElementsByClass(metadata.Metadata)
+        mdList = self.getElementsByClass('Metadata')
         # only return metadata that has an offset = 0.0 
         mdList = mdList.getElementsByOffset(0)
         if len(mdList) == 0:
@@ -8234,7 +8244,7 @@ class Stream(music21.Music21Object):
             else:
                 returnStreamSubClass = True
             self._cache['notesAndRests'] = self.getElementsByClass(
-                                          ['GeneralNote'], 
+                                          'GeneralNote', 
                             returnStreamSubClass=returnStreamSubClass)
         return self._cache['notesAndRests']
 
@@ -8282,7 +8292,7 @@ class Stream(music21.Music21Object):
         see property `notes`, below
         '''
         if self._cache['notes'] is None:
-           self._cache['notes'] = self.getElementsByClass(['NotRest'], 
+           self._cache['notes'] = self.getElementsByClass('NotRest', 
                                   returnStreamSubClass=False)
         return self._cache['notes']
 
@@ -9776,7 +9786,7 @@ class Measure(Stream):
         'G'
         '''
         # TODO: perhaps sort by priority?
-        clefList = self.getElementsByClass(clef.Clef)
+        clefList = self.getElementsByClass('Clef')
         # only return clefs that have offset = 0.0 
         clefList = clefList.getElementsByOffset(0)
         if len(clefList) == 0:
@@ -9853,7 +9863,7 @@ class Measure(Stream):
         >>> a.keySignature.sharps 
         0
         '''
-        keyList = self.getElementsByClass(key.KeySignature)
+        keyList = self.getElementsByClass('KeySignature')
         # only return keySignatures with offset = 0.0
         keyList = keyList.getElementsByOffset(0)
         if len(keyList) == 0:
@@ -10218,7 +10228,7 @@ class Score(Stream):
     def _getParts(self):
         '''        
         '''
-        return self.getElementsByClass(Part)
+        return self.getElementsByClass('Part')
 
     parts = property(_getParts, 
         doc='''Return all :class:`~music21.stream.Part` objects in a :class:`~music21.stream.Score`.
@@ -10337,7 +10347,7 @@ class Score(Stream):
         have measures with identical offsets.
         '''
         map = {}
-        parts = self.getElementsByClass(Part)
+        parts = self.getElementsByClass('Part')
         if len(parts) == 0:
             return Stream.measureOffsetMap(self, classFilterList)
         else:
@@ -11518,7 +11528,7 @@ class Test(unittest.TestCase):
         a = converter.parse(corpus.getWork('opus74no1', 3))
         b = a.parts[1] 
         c = b.flat
-        for thisNote in c.getElementsByClass(note.Note):
+        for thisNote in c.getElementsByClass('Note'):
             thisNote.lyric = thisNote.name
         textStr = text.assembleLyrics(b)
         self.assertEqual(textStr.startswith('C D E A F E'), 
@@ -11665,7 +11675,7 @@ class Test(unittest.TestCase):
 
         a = Stream()
 
-        for obj in src.getElementsByClass(Stream):
+        for obj in src.getElementsByClass('Stream'):
             a.insert(obj)
 
         environLocal.printDebug(['expected length', len(a)])
@@ -12595,7 +12605,7 @@ class Test(unittest.TestCase):
         sScr.append(note.Note('C4', quarterLength = 3.0))
         sScr.append(note.Note('D4', quarterLength = 3.0))
         sScr.makeMeasures(inPlace = True)
-        self.assertEqual(len(sScr.getElementsByClass(Measure)), 2)
+        self.assertEqual(len(sScr.getElementsByClass('Measure')), 2)
         self.assertEqual(sScr.measure(1).notes[0].name, 'C')
         self.assertEqual(sScr.measure(2).notes[0].name, 'D')
        
