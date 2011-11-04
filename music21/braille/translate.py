@@ -41,8 +41,6 @@ def partToBraille(music21Part, **partKeywords):
     allTrans = []
     for brailleElementSegment in allSegments:
         segmentTranscription = segment.transcribeSegment(brailleElementSegment, **partKeywords)
-        if 'recenterHeading' in partKeywords:
-            segmentTranscription.recenterHeading()
         allTrans.append(str(segmentTranscription))
     return u"\n".join(allTrans)
 
@@ -51,14 +49,11 @@ def keyboardPartsToBraille(music21PartUpper, music21PartLower, **keywords):
     Translates a stream Part consisting of two stream Parts, a right hand and left hand,
     into braille music bar over bar format.
     '''
-    recenterHeading = False
     maxLineLength = 40
-    if 'recenterHeading' in keywords:
-        recenterHeading = keywords['recenterHeading']
     if 'maxLineLength' in keywords:
         maxLineLength = keywords['maxLineLength']
 
-    bt = text.BrailleText(maxLineLength)
+    bt = text.BrailleKeyboard(maxLineLength)
     rhSegment = segment.findSegments(music21PartUpper)[0]
     lhSegment = segment.findSegments(music21PartLower)[0]
     
@@ -87,8 +82,6 @@ def keyboardPartsToBraille(music21PartUpper, music21PartLower, **keywords):
         except:
             break
 
-    if recenterHeading:
-        bt.recenterHeading()
     return bt
 
 #-------------------------------------------------------------------------------
