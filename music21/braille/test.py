@@ -2593,12 +2593,6 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    #ex = example26_1a()
-    #ex.show()
-    #ex.flat.sorted.show('text')
-    #print translate.keyboardPartsToBraille(ex)
-    #print translate.partToBraille(ex, slurLongPhraseWithBrackets = True, showFirstMeasureNumber = True)
-    #print translate.noteGroupingsToBraille(sampleMeasure = ex[-1])[0]
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
