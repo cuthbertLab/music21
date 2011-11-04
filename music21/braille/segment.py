@@ -14,6 +14,7 @@ import unittest
 import copy
 
 from music21 import bar
+from music21 import chord
 from music21 import clef
 from music21 import dynamics
 from music21 import expressions
@@ -116,6 +117,10 @@ def setBrailleElementProperties(music21Object):
         music21Object.classSortOrder = 20
     elif isinstance(music21Object, note.Rest):
         music21Object.type = "Rest"
+        music21Object.affinityCode = 9
+        music21Object.classSortOrder = 20
+    elif isinstance(music21Object, chord.Chord):
+        music21Object.type = "Chord"
         music21Object.affinityCode = 9
         music21Object.classSortOrder = 20
     elif isinstance(music21Object, dynamics.Dynamic):
@@ -267,6 +272,7 @@ def transcribeSegment(brailleSegment, **segmentKeywords):
     maxLineLength = 40
     showClefSigns = False
     showFirstMeasureNumber = True
+    showHand = None
     showHeading = True
     showLeadingOctave = True
     upperFirstInNoteFingering = True
@@ -281,6 +287,8 @@ def transcribeSegment(brailleSegment, **segmentKeywords):
         showClefSigns = segmentKeywords['showClefSigns']
     if 'showFirstMeasureNumber' in segmentKeywords:
         showFirstMeasureNumber = segmentKeywords['showFirstMeasureNumber']
+    if 'showHand' in segmentKeywords:
+        showHand = segmentKeywords['showHand']
     if 'showHeading' in segmentKeywords:
         showHeading = segmentKeywords['showHeading']
     if 'showLeadingOctave' in segmentKeywords:
@@ -288,7 +296,7 @@ def transcribeSegment(brailleSegment, **segmentKeywords):
     if 'upperFirstInNoteFingering' in segmentKeywords:
         upperFirstInNoteFingering = segmentKeywords['upperFirstInNoteFingering']
 
-    bt = text.BrailleText(maxLineLength)
+    bt = text.BrailleText(maxLineLength, showHand = showHand)
     try:
         if showHeading is True:
             brailleHeading = extractHeading(brailleSegment, maxLineLength)
@@ -400,6 +408,9 @@ def transcribeNoteGrouping(brailleElements, showLeadingOctave = True, showClefSi
         elif brailleElement.type == 'Rest':
             currentRest = brailleElement
             trans.append(basic.restToBraille(currentRest))
+        elif brailleElement.type == "Chord":
+            currentChord = brailleElement
+            trans.append(basic.chordToBraille(currentChord))
         elif brailleElement.type == 'Dynamic':
             currentDynamic = brailleElement
             trans.append(basic.dynamicToBraille(currentDynamic))
