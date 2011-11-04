@@ -9,8 +9,9 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-import music21
 import collections
+import music21
+import unittest
 
 from music21.braille import lookup
 
@@ -21,180 +22,297 @@ class BrailleText():
     '''
     Object that handles all the formatting associated with braille music notation.
     '''
-    def __init__(self, maxLineLength):
-        self.lineNumber = 1
-        self.linePos = 0
-        self.allLines = collections.defaultdict(str)
-        self.maxLineLength = maxLineLength
-        
+    def __init__(self, lineLength = 40, showHand = None):
+        self.lineLength = lineLength
+        self.allLines = []
+        self.makeNewLine()
+        self.rightHandSymbol = False
+        self.leftHandSymbol = False
+        if showHand == 'right':
+            self.rightHandSymbol = True
+        elif showHand == 'left':
+            self.leftHandSymbol = True
+        elif not showHand == None:
+            raise BrailleTextException("Illegal hand sign request.")
+        self.allHeadings = []
+
     def addElement(self, **elementKeywords):
+        withHyphen = False
+        if 'withHyphen' in elementKeywords:
+            withHyphen = elementKeywords['withHyphen']
         if 'heading' in elementKeywords:
-            if not (self.lineNumber == 1 or self.linePos == 0):
-                self.lineNumber += 1
-                self.linePos = 0
-            for headingLine in elementKeywords['heading'].splitlines():
-                self.allLines[self.lineNumber] = headingLine
-                self.lineNumber += 1
-            return
-        if 'measureNumber' in elementKeywords:
-            withHyphen = False
-            if 'withHyphen' in elementKeywords:
-                withHyphen = elementKeywords['withHyphen']
-            if not(len(self.allLines[self.lineNumber]) == 0):
-                if withHyphen:
-                    self.allLines[self.lineNumber] += symbols['music_hyphen']
-                self.lineNumber += 1
-                self.linePos = 0
-            self.allLines[self.lineNumber] = elementKeywords['measureNumber']
-            self.linePos += len(elementKeywords['measureNumber'])
-            return
-        if 'longExpression' in elementKeywords:
-            longExpression = elementKeywords['longExpression']
-            withHyphen = elementKeywords['withHyphen']
-            if withHyphen == True:
-                if self.linePos == 40:
-                    raise BrailleTranslateException("Crazy error I can't deal with right now.")
-                self.allLines[self.lineNumber] += symbols['music_hyphen']
-                self.linePos += 1
-                
-            for brailleExpr in longExpression.split(u"\u2800"):
-                if self.linePos + len(brailleExpr) + 1 > self.maxLineLength:
-                    self.allLines[self.lineNumber] += symbols['space'] * (self.maxLineLength - self.linePos)
-                    self.lineNumber += 1
-                    self.allLines[self.lineNumber] = u"".join([symbols['double_space'], brailleExpr])
-                    self.linePos = len(brailleExpr) + 2
-                else:
-                    self.allLines[self.lineNumber] += u"".join([symbols['space'], brailleExpr])
-                    self.linePos += len(brailleExpr) + 1
-            return
-        if 'keyOrTimeSig' in elementKeywords:
-            keyOrTimeSig = elementKeywords['keyOrTimeSig']
-            withHyphen = elementKeywords['withHyphen']
-            if self.linePos + len(keyOrTimeSig) + 1 + int(withHyphen) > self.maxLineLength:
-                self.allLines[self.lineNumber] += symbols['space'] * (self.maxLineLength - self.linePos)
-                self.lineNumber += 1
-                self.allLines[self.lineNumber] = u"".join([symbols['double_space'], keyOrTimeSig])
-                self.linePos = len(keyOrTimeSig) + 2
-            else:
-                if not len(self.allLines[self.lineNumber]) == 0:
-                    if withHyphen:
-                        self.allLines[self.lineNumber] += symbols['music_hyphen']
-                        self.linePos += 1
-                    self.allLines[self.lineNumber] += symbols['space']
-                    self.linePos += 1
-                self.allLines[self.lineNumber] += keyOrTimeSig
-                self.linePos += len(keyOrTimeSig)
-            return
-        if 'noteGrouping' in elementKeywords:
+            self.addHeading(elementKeywords['heading'])
+        elif 'measureNumber' in elementKeywords:
+            self.addMeasureNumber(elementKeywords['measureNumber'], withHyphen)
+        elif 'keyOrTimeSig' in elementKeywords:
+            self.addSignatures(elementKeywords['keyOrTimeSig'], withHyphen)
+        elif 'noteGrouping' in elementKeywords:
             noteGrouping = elementKeywords['noteGrouping']
             showLeadingOctave = elementKeywords['showLeadingOctave']
-            withHyphen = elementKeywords['withHyphen']
-            try:
+            forceHyphen = True
+            if 'forceHyphen' in elementKeywords:
                 forceHyphen = elementKeywords['forceHyphen']
-            except KeyError:
-                forceHyphen = True
-            if self.linePos + len(noteGrouping) + 1 + int(withHyphen) > self.maxLineLength:
-                if (self.maxLineLength - self.linePos > self.maxLineLength / 4 and len(noteGrouping) >= self.maxLineLength / 4):
-                    #"Note grouping needs to be split in two parts."
-                    raise BrailleTextException("Split Note Grouping")
-                elif showLeadingOctave == False:
-                    #"Note grouping needs to be recalculated with a leading octave."
-                    raise BrailleTextException("Recalculate Note Grouping With Leading Octave")
-                else:
-                    if withHyphen and forceHyphen:
-                        self.allLines[self.lineNumber] += symbols['music_hyphen']
-                        self.linePos += 1
-                    self.allLines[self.lineNumber] += symbols['space'] * (self.maxLineLength - self.linePos)
-                    self.lineNumber += 1
-                    self.allLines[self.lineNumber] = u"".join([symbols['double_space'], noteGrouping])
-                    self.linePos = len(noteGrouping) + 2
-            else:
-                if not len(self.allLines[self.lineNumber]) == 0 and not self.linePos == 0:
-                    if withHyphen:
-                        self.allLines[self.lineNumber] += symbols['music_hyphen']
-                        self.linePos += 1
-                    self.allLines[self.lineNumber] += symbols['space']
-                    self.linePos += 1
-                self.allLines[self.lineNumber] += noteGrouping
-                self.linePos += len(noteGrouping)
-            return
-        if 'pair' in elementKeywords:
-            (measureNumber, rh_braille, lh_braille) = elementKeywords['pair']
-            isFirstOfLine = False
-            rh_all = []
-            lh_all = []
-            if len(self.allLines[self.lineNumber]) == 0:
-                rh_all.append((self.highestMeasureNumberLength - len(measureNumber)) * symbols['space'])
-                rh_all.append(measureNumber)
-                lh_all.append(symbols['space'] * self.highestMeasureNumberLength)
-                self.linePos = self.highestMeasureNumberLength
-                isFirstOfLine = True
-            if self.linePos + len(rh_braille) + 1 > self.maxLineLength or self.linePos + len(lh_braille) + 1 > self.maxLineLength:
-                rh_all.append((self.highestMeasureNumberLength - len(measureNumber)) * symbols['space'])
-                self.fillLine(self.lineNumber)
-                self.fillLine(self.lineNumber + 1)
-                self.lineNumber += 2
-                rh_all.append(measureNumber)
-                lh_all.append(symbols['space'] * self.highestMeasureNumberLength)
-                self.linePos = self.highestMeasureNumberLength
-                isFirstOfLine = True
-            rh_all.append(symbols['space'])
-            lh_all.append(symbols['space'])
-            rh_length = len(rh_braille)
-            lh_length = len(lh_braille)
-            if isFirstOfLine:
-                rh_all.append(symbols['rh_keyboard'])
-                lh_all.append(symbols['lh_keyboard'])
-                rh_length += 2
-                lh_length += 2
-                for dots in binary_dots[rh_braille[0]]:
-                    if (dots == '10' or dots == '11'):
-                        rh_all.append(symbols['dot'])
-                        rh_length += 1
-                for dots in binary_dots[lh_braille[0]]:
-                    if (dots == '10' or dots == '11'):
-                        lh_all.append(symbols['dot'])
-                        lh_length += 1
-            if rh_length > lh_length:
-                rh_all.append(rh_braille)
-                lh_all.append(lh_braille)
-                #if not(rh_length - lh_length > 6):
-                lh_all.append(symbols['space'] * (rh_length - lh_length))
-                #else:
-                #    lh_all.append(symbols['space'])
-                #    lh_all.append(symbols['dot'] * (rh_length - lh_length - 1)) # tracker dots
-                self.linePos += rh_length + 1
-            else:
-                lh_all.append(lh_braille)
-                rh_all.append(rh_braille)
-                #if not(lh_length - rh_length > 6):
-                rh_all.append(symbols['space'] * (lh_length - rh_length))
-                #else:
-                #    rh_all.append(symbols['space'])
-                #    rh_all.append(symbols['dot'] * (lh_length - rh_length - 1)) # tracker dots
-                self.linePos += lh_length + 1
-            self.allLines[self.lineNumber] += u"".join(rh_all)
-            self.allLines[self.lineNumber + 1] += u"".join(lh_all)
-            return
-        raise BrailleTextException("Invalid Keyword.")
+            self.addNoteGrouping(noteGrouping, showLeadingOctave, withHyphen, forceHyphen)
+        elif 'longExpression' in elementKeywords:
+            longExpression = elementKeywords['longExpression']
+            self.addLongExpression(longExpression, withHyphen)
+        else:
+            raise BrailleTextException("Invalid Keyword.")
+ 
+    def addHeading(self, heading):
+        if not self.currentLine.textLocation == 0:
+            self.makeNewLine()
+        indexStart = len(self.allLines) - 1
+        indexFinal = indexStart
+        for line in heading.splitlines():
+            self.currentLine.isHeading = True
+            self.currentLine.append(line, addSpace = False)
+            self.makeNewLine()
+            indexFinal += 1
+        self.allHeadings.append((indexStart, indexFinal))
+
+    def addLongExpression(self, longExpr, withHyphen = False):
+        if withHyphen:
+            self.currentLine.append(symbols['music_hyphen'], addSpace = False)
+        for brailleExpr in longExpr.split(symbols['space']):
+            try:
+                self.currentLine.append(brailleExpr, addSpace = True)
+            except BrailleTextException as bte:
+                self.makeNewLine()
+                self.currentLine.insert(2, brailleExpr)
+        return
     
-    def recenterHeading(self):
-        '''
-        Temporary method which manually recenters the heading if the melody is too short for a complete line.
-        '''
-        lineToCenter = self.allLines[1]
-        lineToCenter = lineToCenter.strip(symbols['space'])
-        nextLine = self.allLines[2]
-        self.allLines[2] = nextLine.strip(symbols['space'])
-        nextLineLength = len(self.allLines[2])
-        self.allLines[1] = lineToCenter.center(nextLineLength, symbols['space'])
+    def addMeasureNumber(self, measureNumber, withHyphen = False):
+        if withHyphen:
+            self.currentLine.append(symbols['music_hyphen'], addSpace = False)
+            self.makeNewLine()
+        elif not self.currentLine.textLocation == 0:
+            self.makeNewLine()
+        self.currentLine.append(measureNumber, addSpace = False)
 
-    def fillLine(self, lineNumberToFill):
-        self.allLines[lineNumberToFill] += u"".join(symbols['space'] * (self.maxLineLength - self.linePos))
+    def addNoteGrouping(self, noteGrouping, showLeadingOctave = False, withHyphen = False, forceHyphen = False):
+        addSpace = True
+        if not self.currentLine.containsNoteGrouping:
+            if self.rightHandSymbol or self.leftHandSymbol:
+                if self.currentLine.textLocation == 0:
+                    addSpace = False
+                if self.rightHandSymbol:
+                    self.currentLine.append(symbols['rh_keyboard'], addSpace = addSpace)
+                elif self.leftHandSymbol:
+                    self.currentLine.append(symbols['lh_keyboard'], addSpace = addSpace)
+                for dots in binary_dots[noteGrouping[0]]:
+                    if (dots == '10' or dots == '11'):
+                        self.currentLine.append(symbols['dot'], addSpace = False)
+                addSpace = False
+        try:
+            if withHyphen:
+                oldLocation = self.currentLine.textLocation
+                self.currentLine.insert(oldLocation + 2, noteGrouping)
+                self.currentLine.insert(oldLocation, symbols['music_hyphen'])
+            else:
+                if self.currentLine.textLocation == 0:
+                    addSpace = False
+                self.currentLine.append(noteGrouping, addSpace = addSpace)
+        except BrailleTextException as bte:
+            if self.lineLength - self.currentLine.textLocation > self.lineLength / 4 and \
+                len(noteGrouping) >= self.lineLength / 4:
+                raise BrailleTextException("Split Note Grouping")
+            elif showLeadingOctave == False:
+                raise BrailleTextException("Recalculate Note Grouping With Leading Octave")
+            else:
+                if withHyphen and forceHyphen:
+                    self.currentLine.append(symbols['music_hyphen'], addSpace = False)
+                self.makeNewLine()
+                if self.rightHandSymbol or self.leftHandSymbol:
+                    if self.rightHandSymbol:
+                        self.currentLine.insert(2, symbols['rh_keyboard'])
+                    elif self.leftHandSymbol:
+                        self.currentLine.insert(2, symbols['lh_keyboard'])
+                    for dots in binary_dots[noteGrouping[0]]:
+                        if (dots == '10' or dots == '11'):
+                            self.currentLine.append(symbols['dot'], addSpace = False)
+                    self.currentLine.append(noteGrouping, addSpace = False)
+                else:
+                    self.currentLine.insert(2, noteGrouping)
+        self.currentLine.containsNoteGrouping = True
 
+    def addSignatures(self, signatures, withHyphen = False):
+        if withHyphen:
+            self.currentLine.append(symbols['music_hyphen'], addSpace = False)
+        try:
+            addSpace = True
+            if self.currentLine.textLocation == 0:
+                addSpace = False
+            self.currentLine.append(signatures, addSpace = addSpace)
+        except BrailleTextException as bte:
+            self.makeNewLine()
+            self.currentLine.insert(2, signatures)
+
+    def makeNewLine(self):
+        self.currentLine = BrailleTextLine(self.lineLength)
+        self.allLines.append(self.currentLine)
+        self.currentLine.isHeading = False
+        self.currentLine.containsNoteGrouping = False
+            
+    def recenterHeadings(self):
+        for (indexStart, indexFinal) in self.allHeadings:
+            maxLineLength = 0
+            for i in range(indexFinal, len(self.allLines)):
+                if self.allLines[i].isHeading:
+                    break
+                lineLength = self.allLines[i].textLocation
+                if lineLength > maxLineLength:
+                    maxLineLength = lineLength
+            if self.lineLength == maxLineLength:
+                continue
+            for j in range(indexStart, indexFinal):
+                lineToCenter = str(self.allLines[j])
+                lineToCenter = lineToCenter.strip(symbols['space'])
+                lineToCenter = lineToCenter.center(maxLineLength, symbols['space'])
+                self.allLines[j].insert(0, lineToCenter)
+                self.allLines[j].textLocation = maxLineLength
+    
     def __str__(self):
-        return u"\n".join([j for (i, j) in sorted(self.allLines.items())])
+        self.recenterHeadings()
+        return u"\n".join([str(l) for l in self.allLines])
+
+class BrailleKeyboard(BrailleText):
+    def __init__(self, lineLength = 40):
+        self.lineLength = lineLength
+        self.allLines = []
+        self.makeNewLine()
+        self.allHeadings = []
+        self.rightHand = None
+        self.leftHand = None
+
+    def addElement(self, **elementKeywords):
+        if 'heading' in elementKeywords:
+            self.addHeading(elementKeywords['heading'])
+        elif 'pair' in elementKeywords:
+            (measureNumber, noteGroupingR, noteGroupingL) = elementKeywords['pair']
+            self.addNoteGroupings(measureNumber, noteGroupingL, noteGroupingR)
+        else:
+            raise BrailleTextException("Invalid Keyword.")
+
+    def makeNewLines(self):
+        if self.currentLine.textLocation == 0:
+            self.rightHand = self.currentLine
+        else:
+            self.rightHand = BrailleTextLine(self.lineLength)
+            self.allLines.append(self.rightHand)
+        self.rightHand.isHeading = False
+        self.rightHand.containsNoteGrouping = False
+
+        self.leftHand = BrailleTextLine(self.lineLength)
+        self.leftHand.isHeading = False
+        self.leftHand.containsNoteGrouping = False
+        self.allLines.append(self.leftHand)
+
+    def addNoteGroupings(self, measureNumber, noteGroupingL, noteGroupingR):
+        if self.rightHand is None and self.leftHand is None:
+            self.makeNewLines()
+        if self.rightHand.textLocation == 0:
+            self.rightHand.insert(self.highestMeasureNumberLength - len(measureNumber), measureNumber)
+            self.leftHand.textLocation = self.rightHand.textLocation
+        addSpace = True
+        if not self.rightHand.containsNoteGrouping:
+            addSpace = False
+            self.rightHand.append(symbols['rh_keyboard'], addSpace = True)
+            self.leftHand.append(symbols['lh_keyboard'], addSpace = True)
+            for dots in binary_dots[noteGroupingR[0]]:
+                if (dots == '10' or dots == '11'):
+                    self.rightHand.append(symbols['dot'], addSpace = False)
+            for dots in binary_dots[noteGroupingL[0]]:
+                if (dots == '10' or dots == '11'):
+                    self.leftHand.append(symbols['dot'], addSpace = False)
+        if self.rightHand.canAppend(noteGroupingR, addSpace = addSpace) and \
+             self.leftHand.canAppend(noteGroupingL, addSpace = addSpace):
+            self.leftHand.append(noteGroupingL, addSpace = addSpace)
+            self.rightHand.append(noteGroupingR, addSpace = addSpace)
+            if self.rightHand.textLocation > self.leftHand.textLocation:
+                self.leftHand.textLocation = self.rightHand.textLocation
+            else:
+                self.rightHand.textLocation = self.leftHand.textLocation
+        else:
+            self.makeNewLines()
+            self.rightHand.insert(self.highestMeasureNumberLength - len(measureNumber), measureNumber)
+            self.leftHand.textLocation = self.rightHand.textLocation
+            self.rightHand.append(symbols['rh_keyboard'], addSpace = True)
+            self.leftHand.append(symbols['lh_keyboard'], addSpace = True)
+            for dots in binary_dots[noteGroupingR[0]]:
+                if (dots == '10' or dots == '11'):
+                    self.rightHand.append(symbols['dot'], addSpace = False)
+            for dots in binary_dots[noteGroupingL[0]]:
+                if (dots == '10' or dots == '11'):
+                    self.leftHand.append(symbols['dot'], addSpace = False)
+            self.leftHand.append(noteGroupingL, addSpace = False)
+            self.rightHand.append(noteGroupingR, addSpace = False)
+        self.rightHand.containsNoteGrouping = True
+        self.leftHand.containsNoteGrouping = True
+    
+class BrailleTextLine():
+    def __init__(self, lineLength):
+        self.lineLength = lineLength
+        self.allChars = self.lineLength * [symbols['space']]
+        self.textLocation = 0
+        self.endOfLine = 0
         
+    def append(self, text, addSpace = True):
+        if not self.canAppend(text, addSpace):
+            raise BrailleTextException("Text does not fit at end of braille text line.")
+        if addSpace:
+            self.textLocation += 1
+        for char in list(text):
+            self.allChars[self.textLocation] = char
+            self.textLocation += 1
+        self.endOfLine = self.textLocation
+        return True
+    
+    def insert(self, textLocation, text):
+        if not self.canInsert(textLocation, text):
+            raise BrailleTextException("Text cannot be inserted at specified location.")
+        self.textLocation = textLocation
+        for char in list(text):
+            self.allChars[self.textLocation] = char
+            self.textLocation += 1
+        if self.textLocation > self.endOfLine:
+            self.endOfLine = self.textLocation
+        return True
+
+    def canAppend(self, text, addSpace = True):
+        if self.endOfLine > self.textLocation:
+            self.textLocation = self.endOfLine
+        if self.textLocation + len(text) + int(addSpace) > self.lineLength:
+            return False
+        else:
+            return True
+    
+    def canInsert(self, textLocation, text):
+        if textLocation + len(text) > self.lineLength:
+            return False
+        else:
+            return True
+    
+    def __str__(self):
+        return u"".join(self.allChars[0:self.textLocation])
+    
+#-------------------------------------------------------------------------------        
 
 class BrailleTextException(music21.Music21Exception):
     pass
+    
+#-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+
+if __name__ == "__main__":
+    import sys
+    reload(sys)
+    sys.setdefaultencoding("UTF-8")
+    music21.mainTest(Test)
+
+#------------------------------------------------------------------------------
+# eof
