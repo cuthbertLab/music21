@@ -10,6 +10,7 @@
 #-------------------------------------------------------------------------------
 
 import unittest
+import collections
 
 import music21
 
@@ -21,11 +22,14 @@ environLocal = environment.Environment(_MOD)
 
 
 class Repository(object):
+    # perhaps use 
+    # from collections import deque
+    # for elements
     def __init__(self):
         self.classObj = None
         self.classes = []
-        self._elements = []
-        self._endElements = []
+        self._elements = collections.deque()
+        self._endElements = collections.deque()
 
     def __len__(self):
         return len(self._elements) + len(self._endElements)
@@ -47,7 +51,6 @@ class Repository(object):
             self.classes = e.classes
         self._elements.append(e)
             
-
     def addEndElement(self, e):
         '''Add an element to the repository
 
@@ -118,13 +121,11 @@ class ClassCache(object):
         ['Note', 'Rest', 'NotRest', 'GeneralNote']
         '''
         self.parent = srcStream # store this to get offsets later
-
         #environLocal.printDebug(['loading parent:', srcStream])
 
         # elements must already be sorted
         for e in srcStream._elements:
             #environLocal.printDebug(['loading', e, e.classes])
-
             for className in e.classes:
                 if className == 'Music21Object': 
                     break
@@ -287,7 +288,6 @@ class Test(unittest.TestCase):
         s2.repeatAppend(note.Note(), 300)
         s2.repeatAppend(note.Rest(), 300)
         s2.repeatAppend(chord.Chord(), 300)
-
         s2.repeatInsert(meter.TimeSignature(), [0, 50, 100, 150])
         s2.repeatInsert(clef.BassClef(), [0, 50, 100, 150])
 

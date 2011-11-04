@@ -457,23 +457,23 @@ class DefinedContexts(object):
         # do not need to set this as is default
         if idKey is None and obj is not None:
             idKey = id(obj)
+
+        updateNotAdd = False
+        if idKey in self._definedContexts.keys():
+            updateNotAdd = True 
+
         if offset is not None: # a location, not a context
-            if idKey not in self._locationKeys: 
+            if idKey not in self._locationKeys:                 
                 self._locationKeys.append(idKey)
         #environLocal.printDebug(['adding obj', obj, idKey])
         # weak refs were being passed in __deepcopy__ calling this method
         # __deepcopy__ no longer call this method, so we can assume that
         # we will not get weakrefs
 
-        if obj is None:
-            objRef = None
-        else:
+        objRef = None
+        if obj is not None:
             classString = obj.classes[0] # get last class
             objRef = self._prepareObject(obj)
-
-        updateNotAdd = False
-        if idKey in self._definedContexts.keys():
-            updateNotAdd = True
 
         if updateNotAdd:
             dict = self._definedContexts[idKey]
@@ -1167,9 +1167,6 @@ class DefinedContexts(object):
         121.5
         '''
         post = self._getOffsetBySiteId(siteId) 
-        #post = self._definedContexts[siteId]['offset']
-#         if post is None: # 
-#             raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % siteId)
         return post
 
 
@@ -2548,6 +2545,7 @@ class Music21Object(JSONSerializer):
     
     def _setActiveSite(self, site):
         #environLocal.printDebug(['_setActiveSite() called:', 'self', self, 'site', site])
+
         # NOTE: this is a performance intensive call
         if site is not None: 
             siteId = id(site)

@@ -353,7 +353,7 @@ class TestBigMusicXML(CallTest):
         post = self.s.musicxml
 
 
-class TestGetElementsByClass(CallTest):
+class TestGetElementsByClassA(CallTest):
 
     def __init__(self):
         from music21 import corpus
@@ -372,13 +372,35 @@ class TestMeasuresA(CallTest):
     def testFocus(self):
         found = self.s.measures(3, 10)
 
+class TestGetElementsByClassB(CallTest):
+
+    def __init__(self):
+        from music21 import stream, note, clef, meter, classCache, common, chord
+        self.s = stream.Stream()
+        self.s.repeatAppend(note.Note(), 300)
+        self.s.repeatAppend(note.Rest(), 300)
+        self.s.repeatAppend(chord.Chord(), 300)
+        self.s.repeatInsert(meter.TimeSignature(), [0, 50, 100, 150])
+        self.s.repeatInsert(clef.BassClef(), [0, 50, 100, 150])
+
+    def testFocus(self):
+        for x in range(20): 
+            self.s.getElementsByClass(['Rest'])
+            self.s.getElementsByClass(['Note'])
+            self.s.getElementsByClass(['GeneralNote'])
+            self.s.getElementsByClass(['NotRest'])
+            self.s.getElementsByClass(['BassClef'])
+            self.s.getElementsByClass(['Clef'])
+            self.s.getElementsByClass(['TimeSignature'])
+
 
 #-------------------------------------------------------------------------------
 # handler
 class CallGraph:
 
     def __init__(self):
-        self.excludeList = ['pycallgraph.*','re.*','sre_*', 'copy*', '*xlrd*']
+        #self.excludeList = ['pycallgraph.*','re.*','sre_*', 'copy*', '*xlrd*']
+        self.excludeList = ['pycallgraph.*','re.*','sre_*', '*xlrd*']
         # these have been shown to be very fast
         self.excludeList += ['*xmlnode*', 'xml.dom.*', 'codecs.*']
         #self.excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
@@ -403,7 +425,7 @@ class CallGraph:
         #self.callTest = TestCommonContextSearches
         #self.callTest = TestBigMusicXML
 
-        self.callTest = TestMeasuresA
+        self.callTest = TestGetElementsByClassB
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
