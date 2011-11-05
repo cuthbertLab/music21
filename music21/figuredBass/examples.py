@@ -175,7 +175,7 @@ def exampleB():
     >>> fbRules.forbidIncompletePossibilities = False
     >>> fbRealization2 = fbLine.realize(fbRules)
     >>> fbRealization2.getNumSolutions()
-    205054
+    188974
     >>> #_DOCS_SHOW fbRealization2.generateRandomRealization().show()
 
     .. image:: images/figuredBass/fbExamples_sol2B.*
@@ -467,7 +467,6 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    exampleA().realize().generateRandomRealization().show()
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
