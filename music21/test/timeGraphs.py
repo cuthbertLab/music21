@@ -425,7 +425,7 @@ class CallGraph:
         #self.callTest = TestCommonContextSearches
         #self.callTest = TestBigMusicXML
 
-        self.callTest = TestGetElementsByClassB
+        self.callTest = TestMeasuresA
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 

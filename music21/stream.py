@@ -799,7 +799,8 @@ class Stream(music21.Music21Object):
 
         This is not the same as getElementById, which refers to the id attribute which may be manually set and not unique. 
         '''
-        # TODO: refactor to handle possibility of multiple values
+        # NOTE: this may be slightly faster than other approaches 
+        # as it does not sort. 
         for e in self._elements:
             if id(e) == objId: 
                 return e
@@ -809,16 +810,68 @@ class Stream(music21.Music21Object):
         return None
 
 
-    def indexList(self, obj, firstMatchOnly=False):
-        '''Return a list of one or more index values where the supplied object is found on this Stream's `elements` list. 
+#     def indexList(self, obj, firstMatchOnly=False):
+#         '''Return a list of one or more index values where the supplied object is found on this Stream's `elements` list. 
+# 
+#         To just return the first matched index, set `firstMatchOnly` to True.
+# 
+#         The `obj` parameter may be an object or an id of an object. 
+# 
+#         No matches are found, an empty list is returned.
+# 
+#         Matching is based exclusively on id() of objects.
+# 
+#         >>> from music21 import *
+#         >>> s = stream.Stream()
+#         >>> n1 = note.Note('g')
+#         >>> n2 = note.Note('g#')
+# 
+#         >>> s.insert(0, n1)
+#         >>> s.insert(5, n2)
+#         >>> len(s)
+#         2
+#         >>> s.indexList(n1)
+#         [0]
+#         >>> s.indexList(n2)
+#         [1]
+#         '''
+#         # NOTE: this supports multiple instances of the same object in one 
+#         # stream. to be developed.
+#         if not self.isSorted and self.autoSort:
+#             self.sort() # will set isSorted to True
+#         if common.isNum(obj):
+#             objId = obj
+#         else:
+#             objId = id(obj)
+# 
+#         iMatch = []
+# #        elements = self.elements # store once as concatenating
+# #         for i in range(len(elements)):
+# #             if id(elements[i]) == objId:
+# #                 iMatch.append(i)
+# #             if firstMatchOnly and len(iMatch) > 0:
+# #                 break
+#         end = False
+#         count = 0
+#         for e in self._elements:
+#             if id(e) == objId:
+#                 iMatch.append(count) # store index
+#                 if firstMatchOnly:
+#                     end = True
+#                     break
+#             count += 1
+#         if not end:
+#             for e in self._endElements:
+#                 if id(e) == objId:
+#                     iMatch.append(count)
+#                     if firstMatchOnly:
+#                         break
+#                 count += 1 # cumulative indices
+#         return iMatch
 
-        To just return the first matched index, set `firstMatchOnly` to True.
 
-        The `obj` parameter may be an object or an id of an object. 
-
-        No matches are found, an empty list is returned.
-
-        Matching is based exclusively on id() of objects.
+    def indexOfObject(self, obj):
+        '''Return the index for an object or an object id.
 
         >>> from music21 import *
         >>> s = stream.Stream()
@@ -829,28 +882,32 @@ class Stream(music21.Music21Object):
         >>> s.insert(5, n2)
         >>> len(s)
         2
-        >>> s.indexList(n1)
-        [0]
-        >>> s.indexList(n2)
-        [1]
+        >>> s.indexOfObject(n1)
+        0
+        >>> s.indexOfObject(n2)
+        1
         '''
-        # NOTE: this supports multiple instances of the same object in one 
-        # stream. to be developed.
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
+            # TODO: possibly replace by binary search
+
         if common.isNum(obj):
             objId = obj
         else:
             objId = id(obj)
 
-        iMatch = []
-        elements = self.elements # store once as concatenating
-        for i in range(len(elements)):
-            if id(elements[i]) == objId:
-                iMatch.append(i)
-            if firstMatchOnly and len(iMatch) > 0:
-                break
-        return iMatch
+        count = 0
+        for e in self._elements:
+            if id(e) == objId:
+                return count
+            count += 1
+        for e in self._endElements:
+            if id(e) == objId:
+                return count # this is the index
+            count += 1 # cumulative indices
+        raise StreamException('cannot find object (%s) in Stream' % obj)
+
+
 
     def index(self, obj):
         '''Return the first matched index for the specified object.
@@ -863,11 +920,13 @@ class Stream(music21.Music21Object):
         >>> a.index(fSharp)
         10
         '''
-        iMatch = self.indexList(obj, firstMatchOnly=True)
-        if len(iMatch) == 0:
-            raise ValueError("Could not find object in index")
-        else:
-            return iMatch[0] # only need first returned index
+#         iMatch = self.indexList(obj, firstMatchOnly=True)
+#         if len(iMatch) == 0:
+#             raise ValueError("Could not find object in index")
+#         else:
+#             return iMatch[0] # only need first returned index
+
+        return self.indexOfObject(obj) # will raise exception on first)
 
     def remove(self, target, firstMatchOnly=True):
         '''
@@ -901,25 +960,42 @@ class Stream(music21.Music21Object):
         >>> s.remove(n3)
         
         '''
-        iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
-        match = []
-        baseElementCount = len(self._elements)
-        for i in iMatch:
-            # remove from stream with pop with index
-            if i < baseElementCount:
-                match.append(self._elements.pop(i))
-            else: # its in end elements
-                match.append(self._endElements.pop(i-baseElementCount))
+#         iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
+#         match = []
+#         baseElementCount = len(self._elements)
+#         for i in iMatch:
+#             # remove from stream with pop with index
+#             if i < baseElementCount:
+#                 match.append(self._elements.pop(i))
+#             else: # its in end elements
+#                 match.append(self._endElements.pop(i-baseElementCount))
 
-        if len(iMatch) > 0:
+        try:
+            i = self.indexOfObject(target)
+        except StreamException:
+            return # if not found, no error is raised
+
+        match = None
+        baseElementCount = len(self._elements)
+        if i < baseElementCount:
+            match = self._elements.pop(i)
+        else: # its in end elements
+            match = self._endElements.pop(i-baseElementCount) 
+
+#         if len(iMatch) > 0:
+#             # removing an object will never change the sort status
+#             self._elementsChanged(clearIsSorted=False)
+
+        if match is not None:
             # removing an object will never change the sort status
             self._elementsChanged(clearIsSorted=False)
+            match.removeLocationBySite(self)
 
         # after removing, need to remove self from locations reference 
         # and from activeSite reference, if set; this is taken care of with the 
         # Music21Object method
-        for obj in match:
-            obj.removeLocationBySite(self)
+#         for obj in match:
+#             obj.removeLocationBySite(self)
 
     def pop(self, index):
         '''Return and remove the object found at the user-specified index value. Index values are those found in `elements` and are not necessary offset order. 
@@ -964,18 +1040,24 @@ class Stream(music21.Music21Object):
             classFilterList = [classFilterList]
         # process main elements
         indexList = []
-        for i, e in enumerate(self._elements):
+        count = 0
+        #for i, e in enumerate(self._elements):
+        for e in self._elements:
             if e.isClassOrSubclass(classFilterList):
-                indexList.append(i)                        
+                indexList.append(count)
+            count += 1                        
         for i in reversed(indexList):
             post = self._elements.pop(i)
             post.removeLocationBySite(self)
 
         # process end elements
         indexList = []
-        for i, e in enumerate(self._endElements):
+        count = 0
+        #for i, e in enumerate(self._endElements):
+        for e in self._endElements:
             if e.isClassOrSubclass(classFilterList):
-                indexList.append(i)                        
+                indexList.append(count)
+            count += 1                        
         for i in reversed(indexList):
             post = self._endElements.pop(i)
             post.removeLocationBySite(self)
@@ -1718,52 +1800,74 @@ class Stream(music21.Music21Object):
         '''Given a `target` object, replace all references of that object with 
         references to the supplied `replacement` object.
 
-
         If `allTargetSites` is True (as it is by default), all sites that 
         have a reference for the replacement will be similarly changed. 
         This is useful for altering both a flat and nested representation.         
         '''
-        # get all indices in this Stream that match
-        if common.isNum(target): # matching object id number
-            iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
-        elif target is None:
+        if target is None:
             raise StreamException('received a target of None as a candidate for replacement.')
-        else: # matching object directly
-            iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
+
+        # get all indices in this Stream that match
+#         if common.isNum(target): # matching object id number
+#             iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
+#         elif target is None:
+#             raise StreamException('received a target of None as a candidate for replacement.')
+#         else: # matching object directly
+#             iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
+
+        try:
+            i = self.indexOfObject(target)
+        except StreamException:
+            return  # do nothing if no match
 
         #environLocal.printDebug(['Stream.replace()', 'target', target, id(target), 'replacement', replacement, id(replacement), 'iMatch', iMatch])
 
         # target can be given as an obj id number
-        if common.isNum(target):
-            # replace target id with target
-            target = self.getElementByObjectId(target) 
+#         if common.isNum(target):
+#             # replace target id with target
+#             target = self.getElementByObjectId(target) 
 
         eLen = len(self._elements)
-        for i in iMatch:
-            # replace all index target with the replacement
-            if i < eLen:
-                self._elements[i] = replacement
-                # place the replacement at the old objects offset for this site
-                replacement.addLocation(self, target.getOffsetBySite(self))
-            else:
-                self._endElements[i - eLen] = replacement
-                replacement.addLocation(self, 'highestTime')
+        if i < eLen:
+            target = self._elements[i] # target may have been obj id; reassing
+            self._elements[i] = replacement
+            # place the replacement at the old objects offset for this site
+            replacement.addLocation(self, target.getOffsetBySite(self))
+        else:
+            # target may have been obj id; reassin
+            target = self._endElements[i - eLen] 
+            self._endElements[i - eLen] = replacement
+            replacement.addLocation(self, 'highestTime')
 
-            # NOTE: an alternative way to do this would be to look at all the 
-            # sites defined by the target and add them to the replacement
-            # this would not put them in those locations elements, however
+        target.removeLocationBySite(self)
 
-            # remove this location from old; this will also adjust the 
-            # activeSite assignment if necessary
-            target.removeLocationBySite(self)
 
-        # elements have changed
+# 
+#         for i in iMatch:
+#             # replace all index target with the replacement
+#             if i < eLen:
+#                 self._elements[i] = replacement
+#                 # place the replacement at the old objects offset for this site
+#                 replacement.addLocation(self, target.getOffsetBySite(self))
+#             else:
+#                 self._endElements[i - eLen] = replacement
+#                 replacement.addLocation(self, 'highestTime')
+# 
+#             # NOTE: an alternative way to do this would be to look at all the 
+#             # sites defined by the target and add them to the replacement
+#             # this would not put them in those locations elements, however
+# 
+#             # remove this location from old; this will also adjust the 
+#             # activeSite assignment if necessary
+#             target.removeLocationBySite(self)
+
+        # elements have changed: sort order may change b/c have diff classes
         self._elementsChanged()
 
         if allTargetSites:
             for site in target.getSites():
                 # each site must be a Stream
-                if site == None or site == self:
+                if site is None or site is self:
                     continue
                 site.replace(target, replacement, firstMatchOnly=firstMatchOnly)
 
@@ -6063,8 +6167,8 @@ class Stream(music21.Music21Object):
                 for sub in reversed(returnObj.getElementsByClass('Measure')):
                     try:
                         i = sub.index(nTarget)
-                    except ValueError:
-                        continue
+                    except StreamException:
+                        continue # pass if not in Stream
                     junk = sub.pop(i)
                     # get a new note
                     # we should not continue searching Measures
