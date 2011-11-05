@@ -308,12 +308,14 @@ def parallelFifths(possibA, possibB):
             pitchQuartet = (lowerPitchA, lowerPitchB, higherPitchA, higherPitchB)
             if parallelFifthsTable.has_key(pitchQuartet):
                 hasParallelFifths = parallelFifthsTable[pitchQuartet]
-                return hasParallelFifths
+                if hasParallelFifths:
+                    return hasParallelFifths
             vlq = voiceLeading.VoiceLeadingQuartet(*pitchQuartet)
             if vlq.parallelFifth():
                 hasParallelFifths = True
-            parallelFifthsTable[pitchQuartet] = hasParallelFifths    
-            return hasParallelFifths
+            parallelFifthsTable[pitchQuartet] = hasParallelFifths
+            if hasParallelFifths: 
+                return hasParallelFifths
     
     return hasParallelFifths
     
@@ -387,12 +389,14 @@ def parallelOctaves(possibA, possibB):
             pitchQuartet = (lowerPitchA, lowerPitchB, higherPitchA, higherPitchB)
             if parallelOctavesTable.has_key(pitchQuartet):
                 hasParallelOctaves = parallelOctavesTable[pitchQuartet]
-                return hasParallelOctaves
+                if hasParallelOctaves:
+                    return hasParallelOctaves
             vlq = voiceLeading.VoiceLeadingQuartet(*pitchQuartet)
             if vlq.parallelOctave():
                 hasParallelOctaves = True
             parallelOctavesTable[pitchQuartet] = hasParallelOctaves
-            return hasParallelOctaves
+            if hasParallelOctaves:
+                return hasParallelOctaves
     
     return hasParallelOctaves
 
