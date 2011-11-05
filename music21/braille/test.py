@@ -2585,7 +2585,6 @@ def example26_1b():
     m1.append(c1)
     return m1
 
- 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
