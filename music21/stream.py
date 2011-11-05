@@ -870,6 +870,8 @@ class Stream(music21.Music21Object):
 #         return iMatch
 
 
+
+
     def indexOfObject(self, obj):
         '''Return the index for an object or an object id.
 
@@ -2167,12 +2169,21 @@ class Stream(music21.Music21Object):
         'B-'
 
         '''
-        # TODO: update class filter to accept lists
-        for e in self.elements:
+        if classFilter is not None:
+            if not common.isListLike(classFilter):  
+                classFilter = [classFilter]
+
+        for e in self._elements:
             if classFilter is None:
                 e.groups.append(group)
             else:
-                if isinstance(e, classFilter):
+                if e.isClassOrSubclass(classFilter):
+                    e.groups.append(group)
+        for e in self._endElements:
+            if classFilter is None:
+                e.groups.append(group)
+            else:
+                if e.isClassOrSubclass(classFilter):
                     e.groups.append(group)
 
 
@@ -2408,8 +2419,13 @@ class Stream(music21.Music21Object):
 
         post = {}
         # need both _elements and _endElements
-        for element in self.elements:
-            for groupName in element.groups:
+        for e in self._elements:
+            for groupName in e.groups:
+                if groupName not in post.keys():
+                    post[groupName] = 0
+                post[groupName] += 1
+        for e in self._endElements:
+            for groupName in e.groups:
                 if groupName not in post.keys():
                     post[groupName] = 0
                 post[groupName] += 1
@@ -2419,6 +2435,8 @@ class Stream(music21.Music21Object):
     def getOffsetByElement(self, obj):
         '''Given an object, return the offset of that object in the context of
         this Stream. This method can be called on a flat representation to return the ultimate position of a nested structure. 
+
+        If the object is not found in the Stream, None is returned.
 
         >>> from music21 import *
 
@@ -2441,22 +2459,18 @@ class Stream(music21.Music21Object):
         >>> s2.flat.getOffsetByElement(n2)
         110.0
         '''
-        post = None
-
+        try:
+            return obj.getOffsetBySite(self)
+        except music21.DefinedContextsException:
+            return None 
+            
+#         post = None
         # the offset of end element is always highest time
-        for e in self.elements:
-            # must compare id(), not elements directly
-            # NOTE: we need to compare the wrapper, not the stored object
-            # in order to do context searches. 
-            compareObj = e
-            if id(compareObj) == id(obj):
-                post = obj.getOffsetBySite(self)
-                break
-#         if post is not None:
-#             for e in self._endElements:
-#                 if id(e) == id(obj):
-#                     return self.highestTime
-        return post
+#         for e in self.elements:
+#             if id(e) == id(obj):
+#                 post = obj.getOffsetBySite(self)
+#                 break
+#         return post
 
     def getElementById(self, id, classFilter=None):
         '''Returns the first encountered element for a given id. Return None
@@ -2491,28 +2505,36 @@ class Stream(music21.Music21Object):
         >>> ew.activeSite is a
         True
         '''
-        # accessing .elements assures an autoSort check
-        for element in self.elements:
-            # case insensitive; this could be based on an option 
+        for e in self._elements:
             match = False
             try:
-                if element.id.lower() == id.lower():
+                if e.id.lower() == id.lower():
                     match = True
             except AttributeError: # not a string
-                if element.id == id:
+                if e.id == id:
                     match = True
             if match:
+                e.activeSite = self
                 if classFilter is not None:
-                    eClasses = e.classes # store once, as this is property call
-                    #if element.isClass(classFilter):
-                    if classFilter in eClasses or isinstance(e, classFilter):
-                        element.activeSite = self
-                        return element
-                    else:
-                        continue # id may match but not proper class
-                else:
-                    element.activeSite = self
-                    return element
+                    if e.isClassOrSubclass(classFilter):
+                        return e
+                else:                    
+                    return e
+        for e in self._endElements:
+            match = False
+            try:
+                if e.id.lower() == id.lower():
+                    match = True
+            except AttributeError: # not a string
+                if e.id == id:
+                    match = True
+            if match:
+                e.activeSite = self
+                if classFilter is not None:
+                    if e.isClassOrSubclass(classFilter):
+                        return e
+                else:                    
+                    return e
         return None
 
 
@@ -2675,14 +2697,18 @@ class Stream(music21.Music21Object):
             if self.isSorted:
                 if offset > offsetEnd:
                     break
+                # if offset of this element is lt, the target - the dur of e        
+                # it is not  a match
+                if offset < (offsetStart - e.duration.quarterLength):
+                    continue
 
             dur = e.duration
-            if dur is None or mustFinishInSpan is False:
+            if not mustFinishInSpan:
                 eEnd = offset
             else:
                 eEnd = offset + dur.quarterLength
 
-            if mustBeginInSpan is False and dur is not None:
+            if not mustBeginInSpan:
                 eStart = offset + dur.quarterLength
             else:
                 eStart = offset
@@ -8437,21 +8463,17 @@ class Stream(music21.Music21Object):
         ''')
 
     def _getPitches(self):
-        '''
-        documented as part of property `pitches`, below.
-        '''  
         post = []
         for e in self.elements:
-            # case of a Note or note-like object
             if hasattr(e, "pitch"):
                 post.append(e.pitch)
             # both Chords and Stream have a pitches properties; this just
-            # causes a recursive pitch gatherns            
+            # causes a recursive pitch gathering          
             elif hasattr(e, "pitches"):
-                for thisPitch in e.pitches:
-                    post.append(thisPitch)
+                for p in e.pitches:
+                    post.append(p)
             # do an ininstance comparison
-            elif isinstance(e, music21.pitch.Pitch):
+            elif 'Pitch' in e.classes:
                 post.append(e)
         return post
     
