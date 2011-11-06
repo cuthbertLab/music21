@@ -56,6 +56,7 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color = "#FF00
         previousKey = currentKey
 
     allParts = [p.flat.notesAndRests for p in music21Stream.getElementsByClass('Part')]
+    measureNumbers = []
     for k in sorted(violations.keys()):
         (startTimeA, startTimeB) = k
         for partTuple in violations[k]:
@@ -64,13 +65,14 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color = "#FF00
                 noteA2 = allParts[partNumber-1].getElementsByOffset(startTimeB, startTimeB, mustBeginInSpan = False)[0]
                 noteA1.color = color
                 noteA2.color = color
-            #print str(noteA1.measureNumber)
+            if not noteA1.measureNumber in measureNumbers:
+                measureNumbers.append(noteA1.measureNumber)
 
-    return True
+    return measureNumbers
 
 # Creates a complete offset mapping of a Stream Part
 def extractHarmonies(music21Stream):
-    allParts = music21Stream.getElementsByClass('Part')
+    allParts = music21Stream.getElementsByClass(['Part','TinyNotationStream'])
     if len(allParts) < 2:
         raise Exception()
     currentMapping = createOffsetMapping(allParts[0])
@@ -268,15 +270,15 @@ def playWithHarmonies():
     #music21Stream = hallelujah
     #from music21 import converter
     #smusic21Stream = converter.parse('/Users/Jose/Downloads/Selective Defrostingv2.xml')
-    music21Stream = corpus.parseWork('mozart/k421/movement1')
-    #music21Stream = corpus.parseWork('bach/bwv144.3.xml')
+    #music21Stream = corpus.parseWork('mozart/k421/movement1')
+    music21Stream = corpus.parseWork('bach/bwv144.3.xml')
     #checkSinglePossibilities(music21Stream, voiceCrossing, color = "#0000FF")
-    checkConsecutivePossibilities(music21Stream, parallelOctaves, debug = True)
+    print checkConsecutivePossibilities(music21Stream, parallelFifths, debug = True)
     music21Stream.show()
 
 if __name__ == "__main__":
     pass
-    #playWithHarmonies()
+    playWithHarmonies()
 
 #------------------------------------------------------------------------------
 # eof
