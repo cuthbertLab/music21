@@ -15,6 +15,8 @@ import music21
 from music21 import corpus
 from music21 import voiceLeading
 
+from music21.figuredBass import possibility
+
 # Takes in a Stream, highlights notes which violate single harmony rules
 def checkSinglePossibilities(music21Stream, functionToApply, color = "#FF0000", debug = False):
     currentMapping = extractHarmonies(music21Stream)
@@ -184,9 +186,9 @@ def parallelOctaves(possibA, possibB):
         for pair2Index in range(pair1Index +  1, len(pairsList)):
             (lowerPitchA, lowerPitchB) = pairsList[pair2Index]
             try:
-                if not abs(higherPitchA.ps - lowerPitchA.ps) % 12 == 12:
+                if not abs(higherPitchA.ps - lowerPitchA.ps) % 12 == 0:
                     continue
-                if not abs(higherPitchB.ps - lowerPitchB.ps) % 12 == 12:
+                if not abs(higherPitchB.ps - lowerPitchB.ps) % 12 == 0:
                     continue
             except AttributeError:
                 continue
@@ -213,7 +215,7 @@ def hiddenOctave(possibA, possibB):
     (lowestPitchA, lowestPitchB) = pairsList[-1]
 
     try:
-        if abs(highestPitchB.ps - lowestPitchB.ps) % 12 == 12:
+        if abs(highestPitchB.ps - lowestPitchB.ps) % 12 == 0:
             #Very high probability of hidden fifth, but still not certain.
             pitchQuartet = (lowestPitchA, lowestPitchB, highestPitchA, highestPitchB)
             if hiddenOctavesTable.has_key(pitchQuartet):
@@ -266,11 +268,11 @@ def playWithHarmonies():
     #music21Stream = hallelujah
     #from music21 import converter
     #smusic21Stream = converter.parse('/Users/Jose/Downloads/Selective Defrostingv2.xml')
-    #music21Stream = corpus.parseWork('mozart/k421/movement1')
-    music21Stream = corpus.parseWork('bach/bwv144.3.xml')
+    music21Stream = corpus.parseWork('mozart/k421/movement1')
+    #music21Stream = corpus.parseWork('bach/bwv144.3.xml')
     #checkSinglePossibilities(music21Stream, voiceCrossing, color = "#0000FF")
-    checkConsecutivePossibilities(music21Stream, parallelFifths, debug = True)
-    #music21Stream.show('text')
+    checkConsecutivePossibilities(music21Stream, parallelOctaves, debug = True)
+    music21Stream.show()
 
 if __name__ == "__main__":
     pass
