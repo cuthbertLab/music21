@@ -30,12 +30,15 @@ def checkSinglePossibilities(music21Stream, functionToApply, color = "#FF0000", 
             violations[startTimeA].append(partViolation)
 
     allParts = [p.flat.notesAndRests for p in music21Stream.getElementsByClass('Part')]
+    measureNumbers = []
     for startTime in sorted(violations.keys()):
         for partTuple in violations[startTime]:
             for partNumber in partTuple:
                 allParts[partNumber-1].getElementsByOffset(startTime, startTime, mustBeginInSpan = False)[0].color = color
-
-    return True
+            if not allParts[partNumber-1].measureNumber in measureNumbers:
+                measureNumbers.append(allParts[partNumber-1].measureNumber)
+    
+    return measureNumbers
   
 # Takes in a Stream, highlights notes which violate consecutive harmony rules  
 def checkConsecutivePossibilities(music21Stream, functionToApply, color = "#FF0000", debug = False):
@@ -270,10 +273,10 @@ def playWithHarmonies():
     #music21Stream = hallelujah
     #from music21 import converter
     #smusic21Stream = converter.parse('/Users/Jose/Downloads/Selective Defrostingv2.xml')
-    #music21Stream = corpus.parseWork('mozart/k421/movement1')
-    music21Stream = corpus.parseWork('bach/bwv144.3.xml')
-    #checkSinglePossibilities(music21Stream, voiceCrossing, color = "#0000FF")
-    print checkConsecutivePossibilities(music21Stream, parallelFifths, debug = True)
+    music21Stream = corpus.parseWork('mozart/k421/movement1')
+    #music21Stream = corpus.parseWork('bach/bwv144.3.xml')
+    print checkSinglePossibilities(music21Stream, voiceCrossing, color = "#0000FF")
+    #print checkConsecutivePossibilities(music21Stream, parallelFifths, debug = True)
     music21Stream.show()
 
 if __name__ == "__main__":
