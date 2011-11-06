@@ -1509,7 +1509,7 @@ def chordToMx(c):
             if chordPos > 0:
                 mxNote.set('chord', True)
             # get color from within .editorial using attribute
-            mxNote.set('color', c.color)
+            # mxNote.set('color', c.color) -- Music Hack Day - Color is set in notheadToMxNotehead
             # get notehead object
             #nh = c.getNotehead(n.pitch)
             nh = n.notehead
@@ -1806,6 +1806,10 @@ def noteheadToMxNotehead(obj):
     
     if nhParen != False:
         mxNotehead._attr['parentheses'] = nhParen
+
+    # -- Music Hack Day - color is now set in nothead object
+    if obj.color:
+        mxNotehead._attr['color'] = obj.color
         
     return mxNotehead
 
@@ -1843,7 +1847,8 @@ def noteToMxNotes(n, spannerBundle=None):
         mxNote = mxNote.merge(pitchMx, returnDeepcopy=False)
         # get color from within .editorial using attribute
         if noteColor != "":
-            mxNote.set('color', noteColor)
+            pass
+            #mxNote.set('color', noteColor)  -- Music Hack Day - Color is set in notheadToMxNotehead
         if n.hideObjectOnPrint == True:
             mxNote.set('printObject', "no")
             mxNote.set('printSpacing', "yes")
@@ -1919,7 +1924,8 @@ def noteToMxNotes(n, spannerBundle=None):
             mxNoteList[0].notationsObj.componentList.append(mxSlur)
             
     #Adds the notehead type if it is not set to the default 'normal'.
-    if n.notehead != 'normal' or n.noteheadFill != 'default':
+    # -- Music Hack Day - Color is set in notheadToMxNotehead
+    if n.notehead != 'normal' or n.noteheadFill != 'default' or n.color:
        mxNoteList[0].noteheadObj = noteheadToMxNotehead(n)
     
     #If the stem direction is not 'unspecified'    
