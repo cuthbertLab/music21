@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
-# Name:         segment.py
+# Name:         checker.py
 # Purpose:      music21 class which can parse a stream of parts and check your homework
 # Authors:      Jose Cabal-Ugaz
 #
