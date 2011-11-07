@@ -889,6 +889,7 @@ def timeSignatureToMx(ts):
     >>> a = meter.TimeSignature('3/4+2/4')
     >>> b = timeSignatureToMx(a)
     '''
+    from music21 import meter
     #mxTimeList = []
     mxTime = musicxmlMod.Time()
     # always get a flat version to display any subivisions created
@@ -896,7 +897,7 @@ def timeSignatureToMx(ts):
     if ts.summedNumerator:
         # this will try to reduce any common denominators into 
         # a common group
-        fList = fractionToSlashMixed(fList)
+        fList = meter.fractionToSlashMixed(fList)
 
     for n,d in fList:
         mxBeats = musicxmlMod.Beats(n)
@@ -4388,6 +4389,27 @@ spirit</words>
         c[1].noteheadFill = 'no'
         raw = c.musicxml
         self.assertEqual(raw.count('<notehead filled="no">normal</notehead>'), 2)
+
+    def testSummedNumerators(self):
+        from music21 import meter, stream, note
+
+        # this forces a call to summed numerator translation
+        ts1 = meter.TimeSignature('5/8') # assumes two partitions
+        ts1.displaySequence.partition(['3/16','1/8','5/16'])
+        
+        ts2 = meter.TimeSignature('5/8') # assumes two partitions
+        ts2.displaySequence.partition(['2/8', '3/8'])
+        ts2.summedNumerator = True
+        
+        s = stream.Stream()
+        for ts in [ts1, ts2]:            
+            m = stream.Measure()
+            m.timeSignature = ts
+            n = note.Note('b')
+            n.quarterLength = 0.5
+            m.repeatAppend(n, 5)
+            s.append(m)
+        raw = s.musicxml
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
