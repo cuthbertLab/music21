@@ -4434,14 +4434,18 @@ spirit</words>
         #s.insert(4, expressions.Trill())
         s.notes[3].expressions.append(expressions.Trill())
         s.notes[2].expressions.append(expressions.Mordent())
+        s.notes[1].expressions.append(expressions.InvertedMordent())
 
         s.notes[6].expressions.append(expressions.Trill())
         s.notes[7].expressions.append(expressions.Mordent())
+        s.notes[5].expressions.append(expressions.InvertedMordent())
         
         raw = s.musicxml
         #s.show()
 
-        self.assertEqual(raw.count('<ornaments>'), 4)
+        self.assertEqual(raw.count('<ornaments>'), 6)
+        self.assertEqual(raw.count('<inverted-mordent/>'), 2)
+        self.assertEqual(raw.count('<mordent/>'), 2)
 
 
 

@@ -222,6 +222,7 @@ class TagLib(object):
 ('text', True),
 ('trill-mark', False, TrillMark), 
 ('mordent', False, Mordent), 
+('inverted-mordent', False, InvertedMordent), 
 ('attributes', False, Attributes), 
 ('divisions', True), 
 ('forward', False, Forward), 
@@ -2137,6 +2138,11 @@ class Mordent(MusicXMLElement):
         self._tag = 'mordent'
         self._attr['long'] = None # yes/no
 
+class InvertedMordent(MusicXMLElement):
+    def __init__(self, type=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'inverted-mordent'
+
 
 
 class Notehead(MusicXMLElement):
@@ -2673,6 +2679,7 @@ class Handler(xml.sax.ContentHandler):
         self._ornamentsObj = None
         self._trillMarkObj = None
         self._mordentObj = None
+        self._invertedMordentObj = None
 
         self._timeObj = None
         # store last encountered
@@ -2881,6 +2888,9 @@ class Handler(xml.sax.ContentHandler):
             self._mordentObj = Mordent()
             self._mordentObj.loadAttrs(attrs)
 
+        elif name == 'inverted-mordent': 
+            self._invertedMordentObj = InvertedMordent()
+            self._invertedMordentObj.loadAttrs(attrs)
 
         elif name == 'grace':
             #environLocal.printDebug('creating mxGrace object')
@@ -3253,6 +3263,10 @@ class Handler(xml.sax.ContentHandler):
         elif name == 'mordent': 
             self._ornamentsObj.append(self._mordentObj)
             self._mordentObj = None
+
+        elif name == 'inverted-mordent': 
+            self._ornamentsObj.append(self._invertedMordentObj)
+            self._invertedMordentObj = None
 
 
         elif name == 'sound':

@@ -396,6 +396,15 @@ class InvertedMordent(GeneralMordent):
     def __init__(self):
         GeneralMordent.__init__(self)
 
+    def _getMX(self):
+        mxInvertedMordent = musicxml.InvertedMordent()
+        return mxInvertedMordent
+
+    def _setMX(self, mxInvertedMordent):
+        pass
+
+    mx = property(_getMX, _setMX)
+
 class HalfStepInvertedMordent(InvertedMordent):
     def __init__(self):
         InvertedMordent.__init__(self)
