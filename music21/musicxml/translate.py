@@ -1593,8 +1593,14 @@ def chordToMx(c):
     # notations and articulations are mixed in musicxml
     for i in range(len(c.expressions)):
         obj = c.expressions[i]
-        if hasattr(obj, 'mx'): 
-            mxNoteList[0].notationsObj.componentList.append(obj.mx)
+        if hasattr(obj, 'mx'):
+            # some expressions must be wrapped in a musicxml ornament
+            if 'Ornament' in obj.classes:
+                ornamentsObj = musicxmlMod.Ornaments()
+                ornamentsObj.append(obj.mx)
+                mxNoteList[0].notationsObj.componentList.append(ornamentsObj)
+            else: 
+                mxNoteList[0].notationsObj.componentList.append(obj.mx)
 
     #environLocal.pd(['final note list', mxNoteList])
 
@@ -1900,7 +1906,13 @@ def noteToMxNotes(n, spannerBundle=None):
     # notations and articulations are mixed in musicxml
     for expObj in n.expressions:
         if hasattr(expObj, 'mx'):
-            mxNoteList[0].notationsObj.componentList.append(expObj.mx)
+            # some expressions must be wrapped in a musicxml ornament
+            if 'Ornament' in expObj.classes:
+                ornamentsObj = musicxmlMod.Ornaments()
+                ornamentsObj.append(expObj.mx)
+                mxNoteList[0].notationsObj.componentList.append(ornamentsObj)
+            else:
+                mxNoteList[0].notationsObj.componentList.append(expObj.mx)
 
     
 
@@ -3519,7 +3531,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.flat.spanners) >= 2, True)
 
 
-        environLocal.printDebug(['pre s.measures(2,3)', 's', s])
+        #environLocal.printDebug(['pre s.measures(2,3)', 's', s])
         ex = s.measures(2, 3) # this needs to get all spanners too
 
         # all spanners are referenced over; even ones that may not be relevant
@@ -4127,8 +4139,8 @@ spirit</words>
         #c.show()
         input = converter.parse(xml)
         chordResult = input.flat.notes[0]
-        for n in chordResult:
-            print n.stemDirection       
+#         for n in chordResult:
+#             print n.stemDirection       
 
         self.assertEqual(chordResult.getStemDirection(chordResult.pitches[0]), 'down')
         self.assertEqual(chordResult.getStemDirection(chordResult.pitches[1]), 'noStem')
@@ -4410,6 +4422,24 @@ spirit</words>
             m.repeatAppend(n, 5)
             s.append(m)
         raw = s.musicxml
+
+
+    def testOrnamentA(self):
+        from music21 import stream, note, expressions, chord
+
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 4)
+        s.repeatAppend(chord.Chord(['c4','g5']), 4)
+
+        #s.insert(4, expressions.Trill())
+        s.notes[3].expressions.append(expressions.Trill())
+        s.notes[6].expressions.append(expressions.Trill())
+        
+        raw = s.musicxml
+        self.assertEqual(raw.count('<ornaments>'), 2)
+
+        #s.show()
+
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

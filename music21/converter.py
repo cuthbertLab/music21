@@ -496,7 +496,7 @@ class ConverterMusicXML(object):
         c.read(xmlString)
         self._mxScore = c.score #  the mxScore object from the musicxml Document
         if len(self._mxScore) == 0:
-            print xmlString
+            #print xmlString
             raise ConverterException('score from xmlString (%s...) has no parts defined' % xmlString[:30])
         self.load()
 
@@ -560,10 +560,10 @@ class ConverterMusicXML(object):
 
         # get mxScore object from .score attribute
         self._mxScore = c.score
-
+        #print self._mxScore
         # check that we have parts
         if len(self._mxScore) == 0:
-            raise ConverterException('score from file path (...%s) no parts defined' % fp)
+            raise ConverterException('score from file path (%s) no parts defined' % fp)
 
         # movement titles can be stored in more than one place in musicxml
         # manually insert file name as a title if no titles are defined

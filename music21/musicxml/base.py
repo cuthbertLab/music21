@@ -2111,6 +2111,8 @@ class Wedge(MusicXMLElement):
 
 
 class Ornaments(MusicXMLElementList):
+    '''The Ornaments tag wraps the following muscixml entities: trill-mark, turn, delayed-turn, inverted-turn, shake, wavy-line, mordent, inverted mordent, schleifer, termolo, other-ornament. 
+    '''
     def __init__(self, type=None):
         MusicXMLElementList.__init__(self)
         self._tag = 'ornaments'
@@ -3100,8 +3102,8 @@ class Handler(xml.sax.ContentHandler):
 
     #---------------------------------------------------------------------------
     def endElement(self, name):
-        environLocal.printDebug([self._debugTagStr('end', name)],  
-                common.DEBUG_ALL)
+#         environLocal.printDebug([self._debugTagStr('end', name)],  
+#                 common.DEBUG_ALL)
 
         # not in use yet
 #         if name in self.t.tagsAll:
