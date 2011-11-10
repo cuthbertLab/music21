@@ -221,6 +221,7 @@ class TagLib(object):
 ('syllabic', True), 
 ('text', True),
 ('trill-mark', False, TrillMark), 
+('mordent', False, Mordent), 
 ('attributes', False, Attributes), 
 ('divisions', True), 
 ('forward', False, Forward), 
@@ -2130,6 +2131,11 @@ class TrillMark(MusicXMLElement):
         self._attr['placement'] = None # above/below
 
 
+class Mordent(MusicXMLElement):
+    def __init__(self, type=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'mordent'
+        self._attr['long'] = None # yes/no
 
 
 
@@ -2666,6 +2672,7 @@ class Handler(xml.sax.ContentHandler):
 
         self._ornamentsObj = None
         self._trillMarkObj = None
+        self._mordentObj = None
 
         self._timeObj = None
         # store last encountered
@@ -2869,6 +2876,10 @@ class Handler(xml.sax.ContentHandler):
         elif name == 'trill-mark': 
             self._trillMarkObj = TrillMark()
             self._trillMarkObj.loadAttrs(attrs)
+
+        elif name == 'mordent': 
+            self._mordentObj = Mordent()
+            self._mordentObj.loadAttrs(attrs)
 
 
         elif name == 'grace':
@@ -3238,6 +3249,10 @@ class Handler(xml.sax.ContentHandler):
         elif name == 'trill-mark': 
             self._ornamentsObj.append(self._trillMarkObj)
             self._trillMarkObj = None
+
+        elif name == 'mordent': 
+            self._ornamentsObj.append(self._mordentObj)
+            self._mordentObj = None
 
 
         elif name == 'sound':

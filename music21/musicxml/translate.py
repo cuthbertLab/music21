@@ -4433,12 +4433,16 @@ spirit</words>
 
         #s.insert(4, expressions.Trill())
         s.notes[3].expressions.append(expressions.Trill())
+        s.notes[2].expressions.append(expressions.Mordent())
+
         s.notes[6].expressions.append(expressions.Trill())
+        s.notes[7].expressions.append(expressions.Mordent())
         
         raw = s.musicxml
-        self.assertEqual(raw.count('<ornaments>'), 2)
-
         #s.show()
+
+        self.assertEqual(raw.count('<ornaments>'), 4)
+
 
 
 if __name__ == "__main__":

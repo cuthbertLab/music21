@@ -369,6 +369,16 @@ class Mordent(GeneralMordent):
     def __init__(self):
         GeneralMordent.__init__(self)
 
+    def _getMX(self):
+        mxMordent = musicxml.Mordent()
+        return mxMordent
+
+    def _setMX(self, mxMordent):
+        pass
+
+    mx = property(_getMX, _setMX)
+
+
 class HalfStepMordent(Mordent):
     def __init__(self):
         Mordent.__init__(self)
@@ -378,6 +388,8 @@ class WholeStepMordent(Mordent):
     def __init__(self):
         Mordent.__init__(self)
         self.size = music21.interval.Interval("M2")
+
+
 
 class InvertedMordent(GeneralMordent):
     direction = "up"
@@ -393,6 +405,9 @@ class WholeStepInvertedMordent(InvertedMordent):
     def __init__(self):
         InvertedMordent.__init__(self)
         self.size = music21.interval.Interval("M2")
+
+
+
 
 class Trill(Ornament):
     placement = 'above'
