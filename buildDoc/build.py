@@ -1685,7 +1685,8 @@ class Documentation(RestructuredWriter):
                 import sphinx
             except ImportError:
                 raise BuildException("Building documentation requires the Sphinx toolkit. Download it by typing 'easy_install -U Sphinx' at the command line or at http://sphinx.pocoo.org/")
-            sphinxList = ['sphinx', '-E', '-b', format, '-d', self.dirBuildDoctrees,
+            sphinxList = ['sphinx', '-E', '-b', format, 
+                         '-d', self.dirBuildDoctrees,
                          self.dirRst, dirOut] 
             statusCode = sphinx.main(sphinxList)
 

@@ -1296,6 +1296,15 @@ def getBuildDocFilePath():
     raise Exception('no such path exists: %s' % post)
 
 
+def getTestDocsFilePath():
+    '''Return the directory that contains the documentation RST files.
+    '''
+    post = os.path.join(getSourceFilePath(), 'test', 'testDocs')
+    if os.path.exists(post):
+        return post
+    raise Exception('no such path exists: %s' % post)
+
+
 def getMetadataCacheFilePath():
     '''Get the stored music21 directory that contains the corpus metadata cache. 
 
