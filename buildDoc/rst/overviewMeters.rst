@@ -471,10 +471,9 @@ In the following example, all leading tones, or C#s, are collected into a new St
     
     found = stream.Stream()
     offsetQL = 0
-    for part in score:
+    for part in score.parts:
         found.insert(offsetQL, 
-            part.flat.getElementsByClass(
-            music21.clef.Clef)[0])
+            part.flat.getElementsByClass('Clef')[0])
         for i in range(len(part.getElementsByClass('Measure'))):
             m = part.getElementsByClass('Measure')[i]
             for n in m.notesAndRests:

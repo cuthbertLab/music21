@@ -333,9 +333,7 @@ class PartitionedModule(PartitionedName):
     '''
     def __init__(self, srcNameEval):
         PartitionedName.__init__(self, srcNameEval)
-
         self.srcNameStr = self.srcNameEval.__name__
-
         self.namesOrdered = [] # any defined order for names
         if hasattr(self.srcNameEval, '_DOC_ORDER'):
             # these are evaluated class names, not strings
@@ -450,7 +448,6 @@ class PartitionedModule(PartitionedName):
         >>> a.getNames('functions')    
         ['convertCentsToAlterAndCents', 'convertFqToPs', 'convertHarmonicToCents', 'convertNameToPitchClass', 'convertNameToPs', 'convertPitchClassToNumber', 'convertPitchClassToStr', 'convertPsToFq', 'convertPsToOct', 'convertPsToStep', 'convertStepToPs']
         '''
-
         post = []
         if nameKind.lower() in ['classes', 'class']:
             nameKind = 'class'
@@ -467,7 +464,6 @@ class PartitionedModule(PartitionedName):
                 # this is really defining module
                 if element.defining_class != self.srcNameEval:
                     continue
-
             if public:
                 if name.startswith('__'): # ignore private variables
                     continue
@@ -477,13 +473,10 @@ class PartitionedModule(PartitionedName):
                     continue
                 elif 'Exception' in name: # ignore exceptions
                     continue
-
             if not element.kind == nameKind:
                 continue
-
             post.append(name)
         return post
-
 
     def getDoc(self, partName):
         element = self.getElement(partName)
@@ -1145,7 +1138,6 @@ class RestructuredWriter(object):
                     stripL = l.lstrip()
                     lengthStrip = len(l) - len(stripL)
                     break
-
         returnLine = u''
         for i in range(lengthStrip):
             returnLine += u' '
@@ -1167,7 +1159,6 @@ class CorpusDoc(RestructuredWriter):
         msg.append('.. _%s:\n\n' % self.fileRef)
         msg += self._heading('List of Works Found in the music21 Corpus' , '=')
         msg.append(WARN_EDIT)
-
 
         msg += self._para('''The following list shows all files available in the music21 corpus and available through the virtual corpus. To load a work from the corpus, provide the file path stub provided. For example::
 
@@ -1216,10 +1207,7 @@ class CorpusDoc(RestructuredWriter):
 
                 msg += self._list(fileList)
                 #msg += self._list(fileList, INDENT*2)
-
-
             msg.append('\n'*2)
-
         msg.append('\n'*1)
         return ''.join(msg) # return as tring not a list
 
@@ -1560,7 +1548,7 @@ class Documentation(RestructuredWriter):
     def updateDirs(self):
         '''Update file paths.
         '''
-        self.dir = os.getcwd()
+        self.dir = common.getBuildDocFilePath()
         self.parentDir = os.path.dirname(self.dir)
         parentContents = os.listdir(self.parentDir)
         # make sure we are in the the proper directory

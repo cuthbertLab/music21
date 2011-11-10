@@ -1277,6 +1277,25 @@ def getSourceFilePath():
     return fpMusic21
 
 
+def getBuildDocRstFilePath():
+    '''Return the directory that contains the documentation RST files.
+    '''
+    outer = os.path.dirname(getSourceFilePath())
+    post = os.path.join(outer, 'buildDoc', 'rst')
+    if os.path.exists(post):
+        return post
+    raise Exception('no such path exists: %s' % post)
+
+def getBuildDocFilePath():
+    '''Return the directory that contains the documentation RST files.
+    '''
+    outer = os.path.dirname(getSourceFilePath())
+    post = os.path.join(outer, 'buildDoc')
+    if os.path.exists(post):
+        return post
+    raise Exception('no such path exists: %s' % post)
+
+
 def getMetadataCacheFilePath():
     '''Get the stored music21 directory that contains the corpus metadata cache. 
 

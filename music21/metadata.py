@@ -1177,7 +1177,7 @@ class Metadata(music21.Music21Object):
             elif name == abbr:
                 match = id 
                 break
-        if match == None:
+        if match is None:
             raise AttributeError('object has no attribute: %s' % name)
         post = self._workIds[match]
         # always return string representation for now
