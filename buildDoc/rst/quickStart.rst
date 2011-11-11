@@ -45,7 +45,7 @@ from music21, enter the following command.
 
 Assuming this works, your music21 installation is complete and you can move on. However, you may get the following error:
 
->>> from music21 import corpus
+>>> from music21 import corpus   # doctest: +SKIP  
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
 ImportError: No module named music21
@@ -90,7 +90,7 @@ http://www.finalemusic.com/Reader
 
 After installing an appropriate MusicXML reader, the generated file can be examined and opened. For music21 to automatically open MusicXML files, you may need to set a music21 `musicxmlPath` preference in Environment (see :ref:`environment`). Once the MusicXML file has been opened, the following output (excerpted) will be displayed. 
 
->>> sBach.show()
+>>> sBach.show()   # doctest: +SKIP
 
 .. image:: images/quickStart-01.*
     :width: 600
@@ -99,7 +99,7 @@ If we do not have a MusicXML reader handy, we can always show
 the components of a Stream in a text format, with the optional 
 'text' argument passed to the show method. Here is an excerpt of the output. 
 
->>> sBach.show('text')
+>>> sBach.show('text')      # doctest: +SKIP
 {0.0} <music21.stream.Part object at 0x2a85d70>
     {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
     {0.0} <music21.stream.Measure 0 offset=0.0>
@@ -119,7 +119,7 @@ The components of a Stream can be accessed as a list of elements accessed by ind
 >>> len(sBach)
 6
 >>> sBach[0]
-<music21.metadata.Metadata object at 0x5aefcb0>
+<music21.metadata.Metadata object at ...>
 >>> sBach[1]
 <music21.stream.Part Soprano>
 
@@ -130,7 +130,7 @@ Components of a Stream subclass, filtered by class type, are made available thro
 
 We can view one of these Parts by accessing the appropriate component and calling the show() method.
 
->>> sBach.parts[0].show()
+>>> sBach.parts[0].show()  # doctest: +SKIP
 
 .. image:: images/quickStart-02.*
     :width: 600
@@ -138,7 +138,7 @@ We can view one of these Parts by accessing the appropriate component and callin
 
 Again, we can view the components of the Part with the 'text' option for the show() method:
 
->>> sBach[0].show('text')
+>>> sBach[0].show('text')  # doctest: +SKIP
 {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
 {0.0} <music21.stream.Measure 0 offset=0.0>
     {0.0} <music21.meter.TimeSignature 4/4>
@@ -152,7 +152,7 @@ Again, we can view the components of the Part with the 'text' option for the sho
 Parts contain numerous components, including :class:`~music21.instrument.Instrument` objects. We can access the components of a Part by index, or directly access Measures from within a Part by using the :meth:`~music21.stream.Stream.measures` method. In the following example, measures 2 through 4 are extracted from the Part as a new Stream (called select) and displayed with the show() method. 
 
 >>> select = sBach.parts[0].measures(2,4)
->>> select.show()
+>>> select.show()  # doctest: +SKIP
 
 .. image:: images/quickStart-03.*
     :width: 600
@@ -167,7 +167,7 @@ Streams, the components can be accessed by index values starting from zero.
 To view the first note of the second measure (stored in the Stream select), 
 we can do the following. 
 
->>> select[0].notes[0].show()
+>>> select[0].notes[0].show()  # doctest: +SKIP
 
 .. image:: images/quickStart-04.*
     :width: 600
@@ -183,7 +183,7 @@ Alternatively, we can access components of a Stream by `id`, or string identifie
 >>> [part.id for part in sBach.parts]
 [u'Soprano', u'Alto', u'Tenor', u'Bass']
 >>> sBach.getElementById('Soprano')
-<music21.stream.Part object at 0x1b67cb0>
+<music21.stream.Part Soprano>
 
 
 
@@ -207,7 +207,7 @@ If we wanted to re-create a few measures form a popular counterpoint text, we ca
 >>> partLower = stream.Part()
 >>> partLower.append(m1)
 >>> partLower.append(m2)
->>> partLower.show()
+>>> partLower.show()  # doctest: +SKIP
 
 .. image:: images/quickStart-05.*
     :width: 600
@@ -226,7 +226,7 @@ We might automate this procedure by using Python's loop control structure and ne
 ...         m.append(n)
 ...     partUpper.append(m)
 ... 
->>> partUpper.show()
+>>> partUpper.show()  # doctest: +SKIP
 
 .. image:: images/quickStart-06.*
     :width: 600
@@ -236,7 +236,7 @@ Finally, we can add both Part objects to a Score object. To display both parts s
 >>> sCadence = stream.Score()
 >>> sCadence.insert(0, partUpper)
 >>> sCadence.insert(0, partLower)
->>> sCadence.show()
+>>> sCadence.show()  # doctest: +SKIP
 
 .. image:: images/quickStart-07.*
     :width: 600

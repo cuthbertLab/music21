@@ -128,7 +128,7 @@ class TwelveToneRow(ToneRow):
             matrixObj.insert(0, rowObject)
         
 
-        environLocal.printDebug(['calling matrix start: len row:', self.row, 'len self', len(self)])
+        #environLocal.printDebug(['calling matrix start: len row:', self.row, 'len self', len(self)])
 
         return matrixObj
         

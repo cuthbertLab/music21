@@ -54,7 +54,7 @@ C##4
 
 As with nearly all music21 objects, we can call the :class:`~music21.base.Music21Object.show` method to display this Pitch in notation.
 
->>> p1.show()
+>>> p1.show()  # doctest: +SKIP
 
 .. image:: images/overviewNotes-01.*
     :width: 600
@@ -93,7 +93,7 @@ Some of the Duration parameters are settable. In the following example the :attr
 
 The :class:`~music21.base.Music21Object.show` method can be used to display the Duration with a default pitch value. 
 
->>> d1.show()
+>>> d1.show()    # doctest: +SKIP
 
 .. image:: images/overviewNotes-02.*
     :width: 600
@@ -130,7 +130,7 @@ Notes can store numerous lines of text as lyrics or other notations on the :attr
 
 As should be clear, we can always check our work with the :class:`~music21.base.Music21Object.show` method.
 
->>> n1.show()
+>>> n1.show()    # doctest: +SKIP
 
 .. image:: images/overviewNotes-03.*
     :width: 600
@@ -141,7 +141,7 @@ Note's Duration. Notice that because we already set the lyric to have the
 previous QL of 1.0, it does not get changed in the following example.
 
 >>> n1.quarterLength = 6.25
->>> n1.show()
+>>> n1.show()   # doctest: +SKIP
 
 .. image:: images/overviewNotes-04.*
     :width: 600
@@ -167,7 +167,7 @@ A Chord can be created with a list of Pitch objects or strings identical to thos
 Like with a Note, Duration object properties can be configured from properties on Chord. For example, the Quarter Length of the Chord can be accessed from the :attr:`~music21.chord.Chord.quarterLength` property. (Note that, to get expected results in Python 2.x, one of the values in division must be a floating point value.) The :meth:`~music21.base.Music21Object.show` method can be used to display the results.
 
 >>> c1.quarterLength = 1 + 1/3.0
->>> c1.show()
+>>> c1.show()   # doctest: +SKIP
 
 .. image:: images/overviewNotes-05.*
     :width: 600
@@ -176,7 +176,7 @@ Like with a Note, Duration object properties can be configured from properties o
 A Chord, like a Note and Pitch, can be transposed by an interval specified in any format permitted by the :class:`~music21.interval.Interval` object. The :meth:`~music21.chord.Chord.transpose` method returns a new Chord instance. 
 
 >>> c2 = c1.transpose('m2')
->>> c2.show()
+>>> c2.show()   # doctest: +SKIP
 
 .. image:: images/overviewNotes-06.*
     :width: 600
@@ -186,7 +186,7 @@ Finally, a Chord, like a Note, can have one or more lyrics. The :meth:`~music21.
 
 
 >>> c2.addLyric(c2.forteClass)
->>> c2.show()
+>>> c2.show()     # doctest: +SKIP
  
 .. image:: images/overviewNotes-07.*
     :width: 600

@@ -18,14 +18,14 @@ In the following example, the :func:`~music21.corpus.base.parseWork` function is
 
 >>> from music21 import corpus
 >>> aScore = corpus.parseWork('beethoven/opus59no2', 3)
->>> [e.id for e in aScore]
+>>> [e.id for e in aScore.parts]
 [u'Violin I.', u'Violin II.', u'Viola.', u'Violoncello.']
 
 We can view the fourth and fifth measures of the violin Part by obtaining the Part from the Stream with :meth:`~music21.stream.Stream.getElementById` method. Next, we can extract the desired measures with the :meth:`~music21.stream.Stream.measures` method. Calling the :meth:`~music21.stream.Stream.show` method will, assuming correct setup of your environment, open a display of the extracted measures. (See :ref:`quickStart` for basic configuration information; see :ref:`environment` for complete information on configuring your :class:`~music21.environment.Environment`.)
 
 >>> vlnPart = aScore.getElementById('Violin I.')
 >>> mRange = vlnPart.measures(4,7)
->>> mRange.show()
+>>> mRange.show()     # doctest: +SKIP
 
 .. image:: images/overviewPostTonal-01.*
     :width: 600
@@ -42,7 +42,7 @@ If we want to label the notes in our measure range with the Note's pitch class r
 >>> for n in mRange.flat.notesAndRests:
 ...     if not n.isRest:
 ...             n.lyric = n.pitchClassString
->>> mRange.show()
+>>> mRange.show()    # doctest: +SKIP
 
 .. image:: images/overviewPostTonal-02.*
     :width: 600
@@ -55,17 +55,16 @@ Chords as Forte Set Classes
 
 Any music21 Chord can be interpreted as a Forte set class. Additional, a wide variety of analytical features, derived from the Forte set class, are available as methods of the chord. 
 
-For an example, lets create a sequence of randomly generated aggregate-completing trichords stored on a Stream. That is, we will randomly construct chords with pitch classes, drawing them from a list of all pitch classes. These pitches will be supplied to a Chord object and stored on a Stream.
+For an example, lets create a sequence of generated aggregate-completing trichords stored on a Stream. That is, we will construct chords with pitch classes, drawing them from a list of all pitch classes. These pitches will be supplied to a Chord object and stored on a Stream.
 
->>> import random
 >>> from music21 import stream, chord
 >>> aStream = stream.Stream()
 >>> src = range(12) # cheate a list of integers 0 through 11
->>> random.shuffle(src) # randomize the order of the integers
+>>> src = src[2:4] + src[0:2] + src[8:9] + src[4:8] + src[9:12] # recombine
 >>> for i in range(0,12,3):
 ...     aStream.append(chord.Chord(src[i:i+3]))
 ... 
->>> aStream.show()
+>>> aStream.show()    # doctest: +SKIP
 
 .. image:: images/overviewPostTonal-03.*
     :width: 600
@@ -75,40 +74,40 @@ These Chords, like all Chords in music21, can be interpreted as Forte set classe
 
 >>> for c in aStream: print(c.orderedPitchClassesString)
 ... 
-<259>
-<16B>
-<038>
-<47A>
+<023>
+<148>
+<567>
+<9AB>
 >>> for c in aStream: print(c.forteClass)
 ... 
+3-2B
 3-11A
-3-9
-3-11B
-3-10
+3-1
+3-1
 >>> for c in aStream: print(c.forteClassTnI)
 ... 
+3-2
 3-11
-3-9
-3-11
-3-10
+3-1
+3-1
 >>> for c in aStream: print(c.normalForm)
 ... 
+[0, 2, 3]
 [0, 3, 7]
-[0, 2, 7]
-[0, 4, 7]
-[0, 3, 6]
+[0, 1, 2]
+[0, 1, 2]
 >>> for c in aStream: print(c.primeFormString)
 ... 
+<013>
 <037>
-<027>
-<037>
-<036>
+<012>
+<012>
 >>> for c in aStream: print(c.intervalVector)
 ... 
+[1, 1, 1, 0, 0, 0]
 [0, 0, 1, 1, 1, 0]
-[0, 1, 0, 0, 2, 0]
-[0, 0, 1, 1, 1, 0]
-[0, 0, 2, 0, 0, 1]
+[2, 1, 0, 0, 0, 0]
+[2, 1, 0, 0, 0, 0]
 
 
 To annotate the Chords stored on the Stream with their Forte name, we can iterate over the Stream and assign the Forte name to each Chord's `lyric` attribute.
@@ -116,7 +115,7 @@ To annotate the Chords stored on the Stream with their Forte name, we can iterat
 >>> for c in aStream:
 ...     c.lyric = c.forteClass
 ... 
->>> aStream.show()
+>>> aStream.show()    # doctest: +SKIP
 
 
 .. image:: images/overviewPostTonal-04.*
@@ -132,10 +131,10 @@ The music21 :ref:`moduleSerial` module provides a Stream-based representation of
 For example, we can create an instance of the row from Alban Berg's *Violin Concerto*, use the show() method to display its contents as text, and then create and print a :class:`~music21.serial.TwelveToneMatrix` object. 
 
 >>> from music21 import serial
->>> aRow = serial.RowBergConcertoForViolinAndOrchestra()
->>> aRow.show('text')
+>>> aRow = serial.RowBergViolinConcerto()
+>>> aRow.show('text')    
 {0.0} G
-{0.0} A#
+{0.0} B-
 {0.0} D
 {0.0} F#
 {0.0} A
@@ -144,7 +143,7 @@ For example, we can create an instance of the row from Alban Berg's *Violin Conc
 {0.0} G#
 {0.0} B
 {0.0} C#
-{0.0} D#
+{0.0} E-
 {0.0} F
 >>> aMatrix = aRow.matrix()
 >>> print(aMatrix)
@@ -160,6 +159,7 @@ For example, we can create an instance of the row from Alban Berg's *Violin Conc
   6  9  1  5  8  B  3  7  A  0  2  4
   4  7  B  3  6  9  1  5  8  A  0  2
   2  5  9  1  4  7  B  3  6  8  A  0
+<BLANKLINE>
 
 We might divide this row into trichords, present each of those trichords as Chords, and label the resulting pitch classes and Forte set class. As shown above, we can set the `lyric` attribute to assign a single line of text. If we need to assign multiple lines of text, the Note and Chord method :meth:`~music21.note.GeneralNote.addLyric` can be used to add successive lines.
 
@@ -170,7 +170,7 @@ We might divide this row into trichords, present each of those trichords as Chor
 ...     c.addLyric(c.primeFormString)
 ...     c.addLyric(c.forteClass)
 ...     bStream.append(c)
->>> bStream.show()
+>>> bStream.show()    # doctest: +SKIP
 
 
 .. image:: images/overviewPostTonal-05.*

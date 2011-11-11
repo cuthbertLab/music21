@@ -970,6 +970,11 @@ class RestructuredWriter(object):
         u' there\nuser!\n\n'
 
         '''
+
+        # TODO: need to remove lines as follow:
+        # # doctest: +SKIP
+        # <BLANKLINE>
+
         if doc == None:
             return ''
         else:

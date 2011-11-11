@@ -142,7 +142,7 @@ configuration information; see :ref:`environment` for complete information
 on configuring your :class:`~music21.environment.Environment`.)
 
 
->>> s.show('musicxml')
+>>> s.show('musicxml')    # doctest: +SKIP
 
 .. image:: images/overviewStreams-01.*
     :width: 600
@@ -193,7 +193,7 @@ show() since musicxml is generally the default).
 {0.0} <music21.note.Note E>
 {2.0} <music21.note.Note F#>
 
->>> s.show('musicxml')
+>>> s.show('musicxml')   # doctest: +SKIP
 
 .. image:: images/overviewStreams-02.*
     :width: 600
@@ -229,7 +229,7 @@ We can add a number of independent, unique copies of the same Note with the Stre
 {3.5} <music21.note.Note D#>
 {3.75} <music21.note.Note D#>
 
->>> s.show('musicxml')
+>>> s.show('musicxml')   # doctest: +SKIP
 
 .. image:: images/overviewStreams-03.*
     :width: 600
@@ -255,7 +255,7 @@ As shown above, :meth:`~music21.stream.Stream.append` and :meth:`~music21.stream
 {4.0} <music21.note.Rest rest>
 {4.5} <music21.note.Note B>
 
->>> s.show('musicxml')
+>>> s.show('musicxml')    # doctest: +SKIP
 
 .. image:: images/overviewStreams-04.*
     :width: 600
@@ -290,7 +290,7 @@ The syntax for accessing elements by index is the same as accessing items by ind
 >>> s[3]
 <music21.note.Note D#>
 >>> s[3:6]
-<music21.stream.Stream object at 0x18fdef0>
+<music21.stream.Stream ...>
 >>> s[3:6].show('text')
 {2.75} <music21.note.Note D#>
 {3.0} <music21.note.Note D#>
@@ -298,18 +298,16 @@ The syntax for accessing elements by index is the same as accessing items by ind
 >>> s[-1]
 <music21.note.Note B>
 
-While full list-like functionality of the Stream is not yet provided, some additional methods familiar to users of Python lists are also available. The Stream :meth:`~music21.stream.Stream.index` method can be used to get the first-encountered index of a supplied object. Given an index, an element from the Stream can be removed with the :meth:`~music21.stream.Stream.pop` method. 
+While full list-like functionality of the Stream is not provided, some additional methods familiar to users of Python lists are also available. The Stream :meth:`~music21.stream.Stream.index` method can be used to get the first-encountered index of a supplied object. Given an index, an element from the Stream can be removed with the :meth:`~music21.stream.Stream.pop` method. 
 
 >>> s.index(n2)
 1
 >>> s.index(r1)
 8
->>> s.index(n3)
+>>> s.index(n3) 
 Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-  File "/Users/ariza/_x/src/music21/music21/stream.py", line 362, in index
-    match = i
-ValueError: Could not find object in index
+...
+StreamException: cannot find object (<music21.note.Note D#>) in Stream
 
 
 The index for `n3` cannot be obtained because the :meth:`~music21.stream.Stream.repeatAppend` method makes independent copies (deep copies) of the object provided as an argument. Thus, only copies of `n3`, not references to `n3`, are stored on the Stream. There are, of course, other ways to find these Notes. 
@@ -351,7 +349,7 @@ Similarly, the :attr:`~music21.stream.Stream.pitches` property returns all Pitch
 >>> len(listOut)
 9
 >>> listOut
-[E4, F#, D#5, D#5, D#5, D#5, D#5, D#5, B5]
+[E4, F#4, D#5, D#5, D#5, D#5, D#5, D#5, B5]
 
 Gathering elements from a Stream based a single offset or an offset range permits treating the elements as part of timed sequence of events that can be be cut and sliced. 
 
@@ -407,7 +405,7 @@ Then within that part we find an object (a Measure) at index 1. All of these sub
 be accessed from looking within the same score object `sBach`.
 
 >>> len(sBach)
-5
+6
 >>> len(sBach[1])
 19
 >>> len(sBach[1][1])
@@ -482,7 +480,7 @@ In the following examples a single Measure from each part is appended to a new S
 >>> sNew.append(sBach.parts[1].measure(5))
 >>> sNew.append(sBach.parts[2].measure(7))
 >>> sNew.append(sBach.parts[3].measure(9))
->>> sNew.show()
+>>> sNew.show()    # doctest: +SKIP
 
 .. image:: images/overviewStreams-05.*
     :width: 600
@@ -504,15 +502,15 @@ While nested Streams offer expressive flexibility, it is often useful to be able
 >>> len(sBach.flat.getElementsByClass(note.Note))
 213
 
-Element offsets are always relative to the Stream that contains them. For example, a Measure, when placed in a Stream, might have an offset of 16. This offset describes the position of the Measure in the Stream. Components of this Measure, such as Notes, have offset values relative only to their container, the Measure. The first Note of this Measure, then, has an offset of 0. In the following example we find the offset of the measure eight (using the :meth:`~music21.base.Music21Object.getOffsetBySite` method) is 21; the offset of the second Note in this Measure (index 1), however, is 1.
+Element offsets are always relative to the Stream that contains them. For example, a Measure, when placed in a Stream, might have an offset of 16. This offset describes the position of the Measure in the Stream. Components of this Measure, such as Notes, have offset values relative only to their container, the Measure. The first Note of this Measure, then, has an offset of 0. In the following example we find that the offset of measure eight (using the :meth:`~music21.base.Music21Object.getOffsetBySite` method) is 21; the offset of the second Note in this Measure (index 1), however, is 1.
 
 .. NOTE: intentionally skipping a discussion of objects having offsets stored
 .. for multiple sites here; see below
 
->>> m = sBach.parts[0].measure(8)
+>>> m = sBach.parts[0].getElementsByClass('Measure')[7]
 >>> m.getOffsetBySite(sBach.parts[0])
 21.0
->>> n = sBach.parts[0].measure(8).notes[0]
+>>> n = sBach.parts[0].measure(8).notes[1]
 >>> n
 <music21.note.Note B->
 >>> n.getOffsetBySite(m)
@@ -555,7 +553,7 @@ rearranging the order of the Parts by using the
 >>> sNew.insert(0, sBach.getElementById('Tenor'))
 >>> sNew.insert(0, sBach.getElementById('Alto'))
 >>> sNew.insert(0, sBach.getElementById('Soprano'))
->>> sNew.show()
+>>> sNew.show()   # doctest: +SKIP
 
 .. image:: images/overviewStreams-06.*
     :width: 600
@@ -577,7 +575,7 @@ the name of the plot as a string. We can also add a keyword argument for
 the title of the plot (and configure many other features).
 
 
->>> sBach.getElementById('Soprano').plot('PlotHorizontalBarPitchSpaceOffset', title='Soprano')
+>>> sBach.getElementById('Soprano').plot('PlotHorizontalBarPitchSpaceOffset', title='Soprano')   # doctest: +SKIP
 
 .. image:: images/overviewStreams-07.*
     :width: 600
