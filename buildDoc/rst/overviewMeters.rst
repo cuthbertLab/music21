@@ -35,7 +35,7 @@ In the following example, a score is parsed from the :ref:`moduleCorpus.base` mo
 .. bwv127.5.xml : good eight note runs
 
 >>> from music21 import *
->>> sSrc = corpus.parseWork('bach/bwv57.8.xml')
+>>> sSrc = corpus.parse('bach/bwv57.8.xml')
 >>> sPart = sSrc.getElementById('Alto')
 >>> sPart.show()  # doctest: +SKIP
 

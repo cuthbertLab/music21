@@ -1323,18 +1323,6 @@ class Stream(music21.Music21Object):
         # checks of element is self; possibly performs additional checks
         self._addElementPreProcess(element)
 
-#         element.addLocation(self, offset)
-#         # need to explicitly set the activeSite of the element
-#         if setActiveSite:
-#             element.activeSite = self 
-#         if ignoreSort is False:
-#             if self.isSorted is True and self.highestTime <= offset:
-#                 storeSorted = True
-#             else:
-#                 storeSorted = False
-#         # could also do self.elements = self.elements + [element]
-#         self._elements.append(element)  
-
         storeSorted = self._insertCore(offset, element, 
                      ignoreSort=ignoreSort, setActiveSite=setActiveSite)
 
@@ -5454,8 +5442,11 @@ class Stream(music21.Music21Object):
             mCount += 1
         # changes elements
         returnObj._elementsChanged()
-        return returnObj
-    
+        if not inPlace:
+            return returnObj
+        else:
+            return None
+
 
     def makeBeams(self, inPlace=True):
         '''Return a new measure with beams applied to all notes. 
@@ -6059,7 +6050,7 @@ class Stream(music21.Music21Object):
         >>> n.quarterLength = 6
         >>> a.append(n)
         >>> m = a.makeMeasures()
-        >>> m = m.makeTies()
+        >>> m.makeTies()
         >>> len(m.flat.notes)
         2
         >>> m = m.stripTies()
@@ -11980,7 +11971,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s1.notes), 1)
 
         s1 = s1.makeMeasures()
-        s1 = s1.makeTies() # makes ties but no end tie positions!
+        s1.makeTies() # makes ties but no end tie positions!
         # flat version has 2 notes
         self.assertEqual(len(s1.flat.notes), 2)
 
@@ -12002,7 +11993,7 @@ class Test(unittest.TestCase):
         a.insert(40, meter.TimeSignature("10/4") )
 
         b = a.makeMeasures()
-        b = b.makeTies()
+        b.makeTies()
         
         # we now have 65 notes, as ties have been created
         self.assertEqual(len(b.flat.notes), 65)
@@ -12745,35 +12736,40 @@ class Test(unittest.TestCase):
         meterStream = Stream()
         meterStream.insert(0, meter.TimeSignature('2/4'))
         # need to call make ties to allocate notes
-        sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies()
+        sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies(
+            inPlace=False)
         self.assertEqual(len(sPartitioned), 21)
 
 
         meterStream = Stream()
         meterStream.insert(0, meter.TimeSignature('1/4'))
         # need to call make ties to allocate notes
-        sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies()
+        sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies(
+            inPlace=False)
         self.assertEqual(len(sPartitioned), 42)
 
 
         meterStream = Stream()
         meterStream.insert(0, meter.TimeSignature('3/4'))
         # need to call make ties to allocate notes
-        sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies()
+        sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies(
+            inPlace=False)
         self.assertEqual(len(sPartitioned), 14)
 
 
         meterStream = Stream()
         meterStream.insert(0, meter.TimeSignature('12/4'))
         # need to call make ties to allocate notes
-        sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies()
+        sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies(
+            inPlace=False)
         self.assertEqual(len(sPartitioned), 4)
 
 
         meterStream = Stream()
         meterStream.insert(0, meter.TimeSignature('48/4'))
         # need to call make ties to allocate notes
-        sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies()
+        sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies(
+            inPlace=False)
         self.assertEqual(len(sPartitioned), 1)
 
     def testMakeMeasuresWithBarlines(self):
