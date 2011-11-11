@@ -35,13 +35,11 @@ class DocTester(object):
 
 
     def _getRSTFileNames(self):
-        fileNames = [
-        #'quickStart.rst', 'overviewStreams.rst', 'overviewPostTonal.rst', 'overviewNotes.rst', 
-        #'overviewMeters.rst',
-        #'overviewFormats.rst',
-        #'environment.rst',
-        'examples.rst',
-        ]
+        fileNames = []
+        for fn in os.listdir(self.srcDirRst):
+            if fn.endswith('rst') and not fn.startswith('module'):
+                fileNames.append(fn)
+        #print fileNames
         return fileNames
 
     def _transferDocFiles(self):

@@ -51,7 +51,7 @@ The Installation Destination
 After downloading the music21 toolkit, the package is installed like any other Python extension library. Python stores extension libraries in a directory called 'site-packages'. The site-packages directory is located in different places depending on your system. To find where your site-packages directory is located, you can enter the following command in the Python interpreter:
 
     >>> import distutils.sysconfig
-    >>> print(distutils.sysconfig.get_python_lib())
+    >>> print(distutils.sysconfig.get_python_lib())  # doctest: +SKIP
 
 
 
@@ -80,7 +80,7 @@ Start Python, and add this file path to Python's list of directories
 searched for modules:
 
     >>> import sys
-    >>> sys.path.append('/Users/ariza/Desktop/music21')
+    >>> sys.path.append('/Users/ariza/Desktop/music21')  # doctest: +SKIP
     >>>
 
 This can be done permanently by adding the music21 directory to the 

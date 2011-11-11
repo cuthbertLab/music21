@@ -22,11 +22,10 @@ for music21 and change the musicxml reader path.
 
 >>> from music21 import *
 >>> us = environment.UserSettings()
->>> us.create()
->>> us['musicxmlPath']
+>>> us.create()  # doctest: +SKIP
+>>> us['musicxmlPath']  # doctest: +SKIP
 '/Applications/Finale Reader.app'
->>> us['musicxmlPath'] = '/Applications/Finale 2009/Finale 2009.app'
->>> quit()
+>>> us['musicxmlPath'] = '/Applications/Finale 2009/Finale 2009.app' # doctest: +SKIP
 
 
 if you discover that you made a mistake in the filename, 

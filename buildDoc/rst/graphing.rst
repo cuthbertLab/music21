@@ -54,8 +54,8 @@ The graph.py module offers the :func:`~music21.graph.plotStream` function for ea
 Calling :func:`~music21.graph.plotStream` with no arguments creates a default graph, using :class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`, of a flat version of the Stream:
 
     >>> from music21 import corpus, graph
-    >>> aStream = corpus.parseWork('bach/bwv57.8')
-    >>> graph.plotStream(aStream)
+    >>> aStream = corpus.parse('bach/bwv57.8')
+    >>> graph.plotStream(aStream)    # doctest: +SKIP
 
 
     .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
@@ -65,7 +65,7 @@ Calling :func:`~music21.graph.plotStream` with no arguments creates a default gr
 Calling :func:`~music21.graph.plotStream` with a Stream and the name of plot class will use that class to create a and display a graph. 
 
 
-    >>> graph.plotStream(aStream, 'PlotHistogramPitchClass')
+    >>> graph.plotStream(aStream, 'PlotHistogramPitchClass')  # doctest: +SKIP
 
     .. image:: images/PlotHistogramPitchClass.*
         :width: 600
@@ -73,12 +73,12 @@ Calling :func:`~music21.graph.plotStream` with a Stream and the name of plot cla
 Alternatively, the type of desired graph can be given as the `format` keyword argument, and list of values desired can be given with the `values` keyword argument. If one or more plots are available that match the requested values, these will be displayed
 
 
-    >>> graph.plotStream(aStream, format='scatterweighted')
+    >>> graph.plotStream(aStream, format='scatterweighted') # doctest: +SKIP
 
     .. image:: images/PlotScatterWeightedPitchSpaceQuarterLength.*
         :width: 600
 
-    >>> graph.plotStream(aStream, format='scatter', values=['pitch'])
+    >>> graph.plotStream(aStream, format='scatter', values=['pitch'])  # doctest: +SKIP
 
     .. image:: images/PlotScatterPitchSpaceQuarterLength.*
         :width: 600
@@ -86,7 +86,7 @@ Alternatively, the type of desired graph can be given as the `format` keyword ar
 Note that the exact same functionality of :func:`~music21.graph.plotStream` is available as the Stream :meth:`~music21.stream.Stream.plot` method.
 
 
-    >>> aStream.plot(format='scatterweighted', values='pitchclass')
+    >>> aStream.plot(format='scatterweighted', values='pitchclass') # doctest: +SKIP
 
     .. image:: images/PlotScatterWeightedPitchClassQuarterLength.*
         :width: 600
@@ -99,9 +99,9 @@ Creating and Calling Plot Objects
 Graphs can be created and/or written to a file by creating an instance of a plot class with the Stream as an argument. Once created, the object's :meth:`~music21.graph.Graph.process` method is called to obtain a result. The result is determined by the `doneAction` keyword argument.
 
     >>> from music21 import corpus, graph
-    >>> aStream = corpus.parseWork('bach/bwv57.8')
+    >>> aStream = corpus.parse('bach/bwv57.8')
     >>> aPlot = graph.PlotHistogramPitchClass(aStream)
-    >>> aPlot.process()
+    >>> aPlot.process()  # doctest: +SKIP
 
     .. image:: images/PlotHistogramPitchClass.*
         :width: 600
@@ -144,7 +144,7 @@ The ActivityMatch object provides a way to examine, for a given parameter, what 
 Elementary Graphing Classes
 -------------------------------
 
-Music21 provides low-level access to basic graphing routines through classes for each graphing archetype
+Music21 provides low-level access to basic graphing routines through classes for each graphing archetype.
 
 Complete documentation for these graphing objects can be found with the following classes: :class:`~music21.graph.GraphHorizontalBar`, :class:`~music21.graph.GraphScatterWeighted`, :class:`~music21.graph.GraphScatter`, :class:`~music21.graph.GraphHistogram`, :class:`~music21.graph.Graph3DPolygonBars`.
 
@@ -162,7 +162,7 @@ A basic example follows::
     >>> a = graph.GraphScatter(doneAction='show')
     >>> data = [(x, x*x) for x in range(50)]
     >>> a.setData(data)
-    >>> a.process()
+    >>> a.process()  # doctest: +SKIP
 
 .. image:: images/graphing-01.*
     :width: 600
@@ -181,7 +181,7 @@ This example provides basic customization to a scatter graph::
     >>> a = graph.GraphScatter(title='Exponential Graph', alpha=1, doneAction='show')
     >>> data = [(x, x*x) for x in range(50)]
     >>> a.setData(data)
-    >>> a.process()
+    >>> a.process()  # doctest: +SKIP
 
 .. image:: images/graphing-02.*
     :width: 600
@@ -200,7 +200,7 @@ A basic example follows::
     >>> a = graph.GraphHistogram(doneAction='show')
     >>> data = [(x, random.choice(range(30))) for x in range(50)]
     >>> a.setData(data)
-    >>> a.process()
+    >>> a.process()  # doctest: +SKIP
 
 .. image:: images/graphing-03.*
     :width: 600
@@ -226,7 +226,7 @@ A basic example follows::
     ...    q = [(x, random.choice(range(10*(i+1)))) for x in range(20)]
     ...    data[data.keys()[i]] = q
     >>> a.setData(data) 
-    >>> a.process()
+    >>> a.process()  # doctest: +SKIP
 
 .. image:: images/graphing-04.*
     :width: 600
@@ -237,7 +237,7 @@ The following example demonstrates basic customization with keyword arguments us
     >>> b = graph.Graph3DPolygonBars(title='Random Data', alpha=.8,\
         barWidth=.2, doneAction='show', colors=['b','r','g']) 
     >>> b.setData(data)
-    >>> b.process()
+    >>> b.process()   # doctest: +SKIP
 
 .. image:: images/graphing-05.*
     :width: 600

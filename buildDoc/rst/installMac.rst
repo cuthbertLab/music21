@@ -58,7 +58,7 @@ The Installation Destination
 After downloading the music21 toolkit, the package is installed like any other Python extension library. Python stores extension libraries in a directory called 'site-packages'. The site-packages directory is located in different places depending on your platform. To find where your site-packages directory is located, you can enter the following command in the Python interpreter:
 
     >>> import distutils.sysconfig
-    >>> print(distutils.sysconfig.get_python_lib())
+    >>> print(distutils.sysconfig.get_python_lib())  # doctest: +SKIP
 
 In Terminal, this looks like this:
 
@@ -132,7 +132,7 @@ After the Configuration Assistant is complete, you can open a fresh Terminal win
 
     >>> from music21 import *
     >>> s = corpus.parse('bach/bwv65.2.xml')
-    >>> s.show()
+    >>> s.show()  # doctest: +SKIP
 
 
 Assuming your installation and configuration went as expected, the MusicXML reader should launch and display the work, as shown below:

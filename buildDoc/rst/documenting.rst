@@ -66,19 +66,21 @@ test to make sure that flats and sharps both were equally eliminated.  We could
 write documentation/test-code like this::
  
    '''
-   >>> c1 = music21.Note('C#')
+   >>> from music21 import *
+   >>> c1 = note.Note('C#')
    >>> c1.step
    'C'
    
    OMIT_FROM_DOCS
-   >>> c2 = music21.Note('C-')
+   >>> c2 = note.Note('C-')
    >>> c2.step
    'C'
    '''
    
 and what you'll get in your documentation is:
- 
-   >>> c1 = music21.Note('C#')
+
+   >>> from music21 import * 
+   >>> c1 = note.Note('C#')
    >>> c1.step
    'C'
  
@@ -88,7 +90,7 @@ Lines can be omitted on an individual basis by adding the expression
 documentation.  So you could use some of the same lines to test 
 code and also to give an example like so::
 
-   >>> d1 = music21.Note("D-")
+   >>> d1 = note.Note("D-")
    >>> assert(d1.name == 'D-')  #_DOCS_HIDE
    >>> #_DOCS_SHOW d1.show('lily')
    
