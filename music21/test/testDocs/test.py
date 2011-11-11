@@ -35,7 +35,9 @@ class DocTester(object):
 
 
     def _getRSTFileNames(self):
-        fileNames = ['quickStart.rst', 'overviewStreams.rst', 'overviewPostTonal.rst', 'overviewNotes.rst', 'overviewMeters.rst']
+        fileNames = [
+        #'quickStart.rst', 'overviewStreams.rst', 'overviewPostTonal.rst', 'overviewNotes.rst', 
+        'overviewMeters.rst']
         return fileNames
 
     def _transferDocFiles(self):

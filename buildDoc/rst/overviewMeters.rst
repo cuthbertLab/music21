@@ -29,7 +29,7 @@ In general, :class:`~music21.meter.TimeSignature` objects are found within :clas
 
 TimeSignature objects, as a subclass of the :class:`~music21.base.Music21Object`, have an offset and can be positioned anywhere on a Stream. When placed in a Measure, TimeSignature objects are often placed at the start, or zero offset position. The Measure property :attr:`~music21.stream.Measure.timeSignature` can be used to set or get a TimeSignature at the zero offset position. If a Measure does not have a TimeSignature, the :attr:`~music21.stream.Measure.timeSignature` property returns None.
 
-In the following example, a score is parsed from the :ref:`moduleCorpus.base` module :func:`~music21.corpus.base.parseWork` function. The alto :class:`~music21.stream.Part` Stream is accessed by its identification string, 'Alto,' using the :meth:`~music21.stream.Stream.getElementById` method. We can produce notation output of this Part by calling the :meth:`~music21.base.Music21Object.show` method.
+In the following example, a score is parsed from the :ref:`moduleCorpus.base` module :func:`~music21.corpus.base.parse` function. The alto :class:`~music21.stream.Part` Stream is accessed by its identification string, 'Alto,' using the :meth:`~music21.stream.Stream.getElementById` method. We can produce notation output of this Part by calling the :meth:`~music21.base.Music21Object.show` method.
 
 .. bwv57.8.xml 3/4
 .. bwv127.5.xml : good eight note runs
@@ -143,7 +143,7 @@ If a Note is in a Measure, and that Measure or a preceding Measure has a TimeSig
 
 The Note :attr:`~music21.note.GeneralNote.beat` property will return, if available, a numerical representation of the beat, with a floating point value corresponding to the proportional position through the beat. The Note :attr:`~music21.note.GeneralNote.beatStr` property returns a string representation, replacing floating point values with fractions when available. 
 
->>> sSrc = corpus.parseWork('bach/bwv57.8.xml')
+>>> sSrc = corpus.parse('bach/bwv57.8.xml')
 >>> sPart = sSrc.getElementById('Soprano')
 >>> sPart.flat.notesAndRests[0]
 <music21.note.Note B->
@@ -327,25 +327,24 @@ The TimeSignature :attr:`~music21.meter.TimeSignature.displaySequence` MeterSequ
 
 Note that a new MeterSequence instance can be assigned to the :attr:`~music21.meter.TimeSignature.displaySequence` attribute with a duration and/or partitioning completely independent from the :attr:`~music21.meter.TimeSignature.beatSequence`, :attr:`~music21.meter.TimeSignature.beamSequence`, and :attr:`~music21.meter.TimeSignature.accentSequence` MeterSequences.
 
-The following example demonstrates setting the display MeterSequence for a TimeSignature::
+The following example demonstrates setting the display MeterSequence for a TimeSignature.
 
 
-    ts1 = meter.TimeSignature('5/8') # assumes two partitions
-    ts1.displaySequence.partition(['3/16','1/8','5/16'])
-    
-    ts2 = meter.TimeSignature('5/8') # assumes two partitions
-    ts2.displaySequence.partition(['2/8', '3/8'])
-    ts2.summedNumerator = True
-        
-    s = stream.Stream()
-    for ts in [ts1, ts2]:
-        m = stream.Measure()
-        m.timeSignature = ts
-        n = note.Note('b')
-        n.quarterLength = 0.5
-        m.repeatAppend(n, 5)
-        s.append(m)
-    s.show('musicxml')  # doctest: +SKIP
+>>> ts1 = meter.TimeSignature('5/8') # assumes two partitions
+>>> ts1.displaySequence.partition(['3/16','1/8','5/16'])
+>>> ts2 = meter.TimeSignature('5/8') # assumes two partitions
+>>> ts2.displaySequence.partition(['2/8', '3/8'])
+>>> ts2.summedNumerator = True
+>>> s = stream.Stream()
+>>> for ts in [ts1, ts2]:
+...     m = stream.Measure()
+...     m.timeSignature = ts
+...     n = note.Note('b')
+...     n.quarterLength = 0.5
+...     m.repeatAppend(n, 5)
+...     s.append(m)
+...
+>>> s.show()   # doctest: +SKIP
 
 
 .. image:: images/overviewMeters-08.*
@@ -363,37 +362,37 @@ The :attr:`~music21.meter.TimeSignature.beamSequence` MeterSequence is generally
 
 Many users may find the Stream :meth:`~music21.stream.Stream.makeBeams` method the most convenient way to apply beams to a Measure or Stream of Note objects. This method returns a new Stream with created and configured Beams. 
 
-The following example beams a bar of 3/4 in four different ways. The diversity and complexity of beaming is offered here to illustrate the flexibility of this model::
+The following example beams a bar of 3/4 in four different ways. The diversity and complexity of beaming is offered here to illustrate the flexibility of this model.
 
 
-    ts1 = meter.TimeSignature('3/4') 
-    ts1.beamSequence.partition(1)
-    ts1.beamSequence[0] = ts1.beamSequence[0].subdivide(['3/8', '5/32', '4/32', '3/32'])
-    
-    ts2 = meter.TimeSignature('3/4') 
-    ts2.beamSequence.partition(3)
-    
-    ts3 = meter.TimeSignature('3/4') 
-    ts3.beamSequence.partition(3)
-    for i in range(len(ts3.beamSequence)):
-        ts3.beamSequence[i] = ts3.beamSequence[i].subdivide(2)
-    
-    ts4 = meter.TimeSignature('3/4') 
-    ts4.beamSequence.partition(['3/8', '3/8'])
-    for i in range(len(ts4.beamSequence)):
-        ts4.beamSequence[i] = ts4.beamSequence[i].subdivide(['6/32', '6/32'])
-        for j in range(len(ts4.beamSequence[i])):
-            ts4.beamSequence[i][j] = ts4.beamSequence[i][j].subdivide(2)
-    
-    s = stream.Stream()
-    for ts in [ts1, ts2, ts3, ts4]:
-        m = stream.Measure()
-        m.timeSignature = ts
-        n = note.Note('b')
-        n.quarterLength = 0.125
-        m.repeatAppend(n, 24)
-        s.append(m.makeBeams())
-    s.show()   # doctest: +SKIP
+>>> ts1 = meter.TimeSignature('3/4') 
+>>> ts1.beamSequence.partition(1)
+>>> ts1.beamSequence[0] = ts1.beamSequence[0].subdivide(['3/8', '5/32', '4/32', '3/32'])
+>>> ts2 = meter.TimeSignature('3/4') 
+>>> ts2.beamSequence.partition(3)
+>>> ts3 = meter.TimeSignature('3/4') 
+>>> ts3.beamSequence.partition(3)
+>>>
+>>> for i in range(len(ts3.beamSequence)):
+...     ts3.beamSequence[i] = ts3.beamSequence[i].subdivide(2)
+... 
+>>> ts4 = meter.TimeSignature('3/4') 
+>>> ts4.beamSequence.partition(['3/8', '3/8'])
+>>> for i in range(len(ts4.beamSequence)):
+...     ts4.beamSequence[i] = ts4.beamSequence[i].subdivide(['6/32', '6/32'])
+...     for j in range(len(ts4.beamSequence[i])):
+...         ts4.beamSequence[i][j] = ts4.beamSequence[i][j].subdivide(2)
+... 
+>>> s = stream.Stream()
+>>> for ts in [ts1, ts2, ts3, ts4]:
+...     m = stream.Measure()
+...     m.timeSignature = ts
+...     n = note.Note('b')
+...     n.quarterLength = 0.125
+...     m.repeatAppend(n, 24)
+...     s.append(m.makeBeams())
+... 
+>>> s.show()   # doctest: +SKIP
 
 
 .. image:: images/overviewMeters-04.*
@@ -458,35 +457,29 @@ Annotating Found Notes with Beat Count
 
 The :meth:`~music21.meter.TimeSignature.getBeat` method returns the currently active beat given a quarter length position into the TimeSignature.
 
-In the following example, all leading tones, or C#s, are collected into a new Stream and displayed with annotations for part, measure, and beat::
+In the following example, all leading tones, or C#s, are collected into a new Stream and displayed with annotations for part, measure, and beat.
 
 
-    import music21
-    from music21 import corpus, meter, stream
+>>> from music21 import corpus, meter, stream
     
-    score = corpus.parseWork('bach/bwv366.xml') 
-    ts = score.flat.getElementsByClass(
-        meter.TimeSignature)[0]
-    ts.beatSequence.partition(3)
-    
-    found = stream.Stream()
-    offsetQL = 0
-    for part in score.parts:
-        found.insert(offsetQL, 
-            part.flat.getElementsByClass('Clef')[0])
-        for i in range(len(part.getElementsByClass('Measure'))):
-            m = part.getElementsByClass('Measure')[i]
-            for n in m.notesAndRests:
-                if n.name == 'C#': 
-                    n.addLyric('%s, m. %s' %
-                        (part.id[0], 
-                        m.number))
-                    n.addLyric('beat %s' % 
-                        ts.getBeat(n.offset))
-                    found.insert(offsetQL, n)
-                    offsetQL += 4
-    
-    found.show('musicxml')   # doctest: +SKIP
+>>> score = corpus.parse('bach/bwv366.xml') 
+>>> ts = score.flat.getElementsByClass('TimeSignature')[0]
+>>> ts.beatSequence.partition(3)
+>>> 
+>>> found = stream.Stream()
+>>> offsetQL = 0
+>>> for part in score.parts:
+...     found.insert(offsetQL, part.flat.getElementsByClass('Clef')[0])
+...     for i in range(len(part.getElementsByClass('Measure'))):
+...         m = part.getElementsByClass('Measure')[i]
+...         for n in m.notesAndRests:
+...             if n.name == 'C#': 
+...                 n.addLyric('%s, m. %s' % (part.id[0], m.number))
+...                 n.addLyric('beat %s' % ts.getBeat(n.offset))
+...                 found.insert(offsetQL, n)
+...                 offsetQL += 4
+... 
+>>> found.show('musicxml')   # doctest: +SKIP
 
 .. image:: images/overviewMeters-06.*
     :width: 400
@@ -503,36 +496,32 @@ The :meth:`~music21.meter.TimeSignature.getBeatDepth` method, when set with the 
 
 In the following example, :attr:`~music21.meter.TimeSignature.beatSequence` MeterSequence is partitioned first into one subdivision, and then each subsequent subdivision into two, down to four layers of partitioning. 
 
-The number of hierarchical levels, found with the :meth:`~music21.meter.TimeSignature.getBeatDepth` method, is appended to each note with the :meth:`~music21.note.Note.addLyric` method::
+The number of hierarchical levels, found with the :meth:`~music21.meter.TimeSignature.getBeatDepth` method, is appended to each note with the :meth:`~music21.note.Note.addLyric` method.
 
-    import music21
-    from music21 import corpus, meter
-    
-    score = corpus.parseWork('bach/bwv281.xml') 
-    partBass = score.getElementById('Bass')
-    ts = partBass.flat.getElementsByClass(
-         meter.TimeSignature)[0]
-    
-    ts.beatSequence.partition(1)
-    for h in range(len(ts.beatSequence)):
-        ts.beatSequence[h] = ts.beatSequence[h].subdivide(2)
-        for i in range(len(ts.beatSequence[h])):
-            ts.beatSequence[h][i] = \
-                ts.beatSequence[h][i].subdivide(2)
-            for j in range(len(ts.beatSequence[h][i])):
-                ts.beatSequence[h][i][j] = \
-                    ts.beatSequence[h][i][j].subdivide(2)
-    
-    for m in partBass.getElementsByClass('Measure'):
-        for n in m.notesAndRests:
-            for i in range(ts.getBeatDepth(n.offset)):
-                n.addLyric('*')
-    
-    partBass.getElementsByClass('Measure')[0:7].show('musicxml')  # doctest: +SKIP
+
+>>> from music21 import corpus, meter 
+>>> score = corpus.parse('bach/bwv281.xml') 
+>>> partBass = score.getElementById('Bass')
+>>> ts = partBass.flat.getElementsByClass('TimeSignature')[0]
+>>> ts.beatSequence.partition(1)
+>>> for h in range(len(ts.beatSequence)):
+...     ts.beatSequence[h] = ts.beatSequence[h].subdivide(2)
+...     for i in range(len(ts.beatSequence[h])):
+...         ts.beatSequence[h][i] = ts.beatSequence[h][i].subdivide(2)
+...         for j in range(len(ts.beatSequence[h][i])):
+...             ts.beatSequence[h][i][j] = ts.beatSequence[h][i][j].subdivide(2)
+... 
+>>> for m in partBass.getElementsByClass('Measure'):
+...     for n in m.notesAndRests:
+...         for i in range(ts.getBeatDepth(n.offset)):
+...             n.addLyric('*')
+... 
+>>> partBass.getElementsByClass('Measure')[0:7].show()  # doctest: +SKIP
 
 
 .. image:: images/overviewMeters-07.*
     :width: 400
+
 
 Alternatively, this type of annotation can be applied to a Stream using the :func:`~music21.analysis.metrical.labelBeatDepth` function.
 
@@ -554,35 +543,32 @@ Applying Articulations Based on Accent
 
 The :meth:`~music21.meter.TimeSignature.getAccentWeight` method returns the currently active accent weight given a quarter length position into the TimeSignature. Combined with the :meth:`~music21.meter.TimeSignature.getBeatProgress` method, Notes that start on particular beat can be isolated and examined. 
 
-The following example extracts the Bass line of a Bach chorale in 3/4 and, after repartitioning the beat and accent attributes, applies accents to reflect a meter of 6/8::
+The following example extracts the Bass line of a Bach chorale in 3/4 and, after repartitioning the beat and accent attributes, applies accents to reflect a meter of 6/8.
 
 
-    from music21 import corpus, meter, articulations
-    
-    score = corpus.parseWork('bach/bwv366.xml')
-    partBass = score.getElementById('Bass')
-    
-    ts = partBass.flat.getElementsByClass(meter.TimeSignature)[0]
-    ts.beatSequence.partition(['3/8', '3/8'])
-    ts.accentSequence.partition(['3/8', '3/8'])
-    ts.setAccentWeight([1, .5])
-    
-    for m in partBass.getElementsByClass('Measure'):
-        lastBeat = None
-        for n in m.notesAndRests:
-            beat, progress = ts.getBeatProgress(n.offset)
-            if beat != lastBeat and progress == 0:
-                if n.tie != None and n.tie.type == 'stop':
-                    continue
-                if ts.getAccentWeight(n.offset) == 1:
-                    mark = articulations.StrongAccent()
-                elif ts.getAccentWeight(n.offset) == .5:
-                    mark = articulations.Accent()
-                n.articulations.append(mark)
-                lastBeat = beat
-            m = m.sorted
-    
-    partBass.getElementsByClass('Measure')[0:8].show('musicxml') # doctest: +SKIP
+>>> from music21 import corpus, meter, articulations 
+>>> score = corpus.parse('bach/bwv366.xml')
+>>> partBass = score.getElementById('Bass')
+>>> ts = partBass.flat.getElementsByClass(meter.TimeSignature)[0]
+>>> ts.beatSequence.partition(['3/8', '3/8'])
+>>> ts.accentSequence.partition(['3/8', '3/8'])
+>>> ts.setAccentWeight([1, .5])
+>>> for m in partBass.getElementsByClass('Measure'):
+...     lastBeat = None
+...     for n in m.notesAndRests:
+...         beat, progress = ts.getBeatProgress(n.offset)
+...         if beat != lastBeat and progress == 0:
+...             if n.tie != None and n.tie.type == 'stop':
+...                 continue
+...             if ts.getAccentWeight(n.offset) == 1:
+...                 mark = articulations.StrongAccent()
+...             elif ts.getAccentWeight(n.offset) == .5:
+...                 mark = articulations.Accent()
+...             n.articulations.append(mark)
+...             lastBeat = beat
+...         m = m.sorted
+... 
+>>> partBass.getElementsByClass('Measure')[0:8].show() # doctest: +SKIP
 
 
 .. image:: images/overviewMeters-05.*
