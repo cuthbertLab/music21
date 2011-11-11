@@ -21,25 +21,26 @@ Creating and Configuring the UserSettings Object
 
 Environment configuration files are not created by default. To create an environment configuration file, import environment form Music21 and create an :class:`~music21.environment.UserSettings` object. Then, call the  :meth:`~music21.environment.UserSettings.create` method to create an XML environment file.
 
-    >>> from music21 import *
-    >>> us = environment.UserSettings()
-    >>> us.create()
+>>> from music21 import *
+>>> us = environment.UserSettings()
+>>> us.create()   # doctest: +SKIP
 
 After creating an environment file, the resulting XML preference file can be edited directly by the user. To find where the XML file is written, the :meth:`~music21.environment.UserSettings.getSettingsPath` method can be called. This path will be different depending on your platform and/or user name. 
 
-    >>> us.getSettingsPath()
-    '/Users/ariza/.music21rc'
+>>> us.getSettingsPath()
+'/Users/ariza/.music21rc'
 
 Settings can be edited directly in the XML file or through the UserSettings object interface. The UserSettings object acts as a Python dictionary. To view the names of user-configurable parameters, call the keys() method.
 
-    >>> us.keys()
-    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'showFormat', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
+>>> us.keys()
+['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
+
 
 To set and write a preference, a key and value pair must be provided using Python dictionary-like syntax. For example, to set the Music21 scratch directory, the 'directoryScratch' key can be set to a file path of the user's choice. Changes are made immediately to the environment configuration file. To see the current setting, the value can be accesed by key.
 
-    >>> us['directoryScratch'] = '/_scratch'
-    >>> us['directoryScratch']
-    '/_scratch'
+>>> us['directoryScratch'] = '/_scratch'  # doctest: +SKIP
+>>> us['directoryScratch']  # doctest: +SKIP
+'/_scratch'
 
 Note that Music21 objects may need to be reloaded, and/or the Python session restarted, to have changes made to the UserSettings object take effect.
 
@@ -56,16 +57,16 @@ On Windows computers the configuration file is generally located in the Applicat
 
 The path to the environment settings file can always be found with the :meth:`~music21.environment.UserSettings.getSettingsPath` method.
 
-    >>> from music21 import *
-    >>> us = environment.UserSettings()
-    >>> us.getSettingsPath()
-    '/Users/ariza/.music21rc'
+>>> from music21 import *
+>>> us = environment.UserSettings()
+>>> us.getSettingsPath()   # doctest: +SKIP
+'/Users/ariza/.music21rc'
 
 To permanently delete the environment configuration file, call the :meth:`~music21.environment.UserSettings.delete` method.
 
-    >>> from music21 import *
-    >>> us = environment.UserSettings()
-    >>> us.delete()
+
+>>> us = environment.UserSettings()
+>>> us.delete()    # doctest: +SKIP
 
 
 

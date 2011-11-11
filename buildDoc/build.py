@@ -131,6 +131,8 @@ INDENT = ' '*4
 OMIT_STR = 'OMIT_FROM_DOCS'
 HIDE_LINE_STR = '#_DOCS_HIDE'
 SHOW_LINE_STR = '#_DOCS_SHOW'
+# used in rst doc-tests to avoid calling .show(), etc; remove comment
+DOC_TEST_SKIP = '# doctest: +SKIP'
 
 FORMATS = ['html', 'latex', 'pdf']
 
@@ -1007,6 +1009,8 @@ class RestructuredWriter(object):
                     line = line.replace(SHOW_LINE_STR, ' ')
                 else:
                     line = lineNew
+            elif DOC_TEST_SKIP in line: # do not show in docs
+                line = line.replace(DOC_TEST_SKIP, ' ')
 
             match = False
             for stub in rstExclude:

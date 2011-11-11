@@ -12,7 +12,17 @@ Papers, Presentations, and Publications
 
 The following papers and publications make extensive use of Music21. When links become available for download, they will be added.
 
-Ariza, C. and M. S. Cuthbert. 2010. "Modeling Beats, Accents, Beams, and Time Signatures Hierarchically with music21 Meter Objects." In *Proceedings of the International Computer Music Conference*. San Francisco: International Computer Music Association. 216-223. Internet:
+Ariza, C. and M. S. Cuthbert. 2011. "The music21 Stream: A New Object
+Model for Representing, Filtering, and Transforming Symbolic Musical
+Structures." In *Proceedings of the International Computer Music Conference*. San Francisco: International Computer Music Association, pp. 61-68. Available online at http://www.flexatone.org/static/docs/music21Stream.pdf
+
+Ariza, C. and M. S. Cuthbert. 2011. "Analytical and Compositional
+Applications of a Network-Based Scale Model in music21." In *Proceedings of the
+International Computer Music Conference*. San Francisco: International Computer
+Music Association, pp. 701-708. Available online at
+http://www.flexatone.org/static/docs/scaleNetwork.pdf
+
+Ariza, C. and M. S. Cuthbert. 2010. "Modeling Beats, Accents, Beams, and Time Signatures Hierarchically with music21 Meter Objects." In *Proceedings of the International Computer Music Conference*. San Francisco: International Computer Music Association. 216-223. Available online at
 http://mit.edu/music21/papers/2010MeterObjects.pdf
 
 Cuthbert, M. S. and C. Ariza. 2010. "music21: A Toolkit for Computer-Aided Musicology and Symbolic Music Data." In *Proceedings of the International Society for Music Information Retrieval*. 
