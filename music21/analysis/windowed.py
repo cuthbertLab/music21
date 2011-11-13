@@ -81,7 +81,9 @@ class WindowedAnalysis(object):
         # makeTies() splits the durations into proper measure boundaries for 
         # analysis; this means that a duration that spans multiple 1/4 measures
         # will be represented in each of those measures
-        return self._srcStream.makeMeasures(meterStream).makeTies(inPlace=True)
+        measured = self._srcStream.makeMeasures(meterStream)
+        measured.makeTies(inPlace=True)
+        return measured
 
 
     def _analyze(self, windowSize, windowType='overlap'):
@@ -232,7 +234,6 @@ class WindowedAnalysis(object):
             windowType = 'noOverlap'
         elif windowType.lower() in ['adjacentaverage']:
             windowType = 'adjacentAverage'
-
 
         # need to create storage for the output of each row, or the processing
         # of all windows of a single size across the entire Stream

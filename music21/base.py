@@ -683,7 +683,7 @@ class DefinedContexts(object):
         post = [] 
         #purgeKeys = []
         
-        # get partitioned lost of all, w/ locations last if necessary
+        # get partitioned list of all, w/ locations last if necessary
         if locationsTrail:
             keys = []
             keysLocations = [] # but possibly sorted
@@ -1029,7 +1029,6 @@ class DefinedContexts(object):
         # NOTE: this is a core method called very frequently
         if idKey == self._lastID:
             return self._lastOffset
-
         try:
             value = self._definedContexts[idKey]['offset']
         except KeyError:
@@ -1138,16 +1137,11 @@ class DefinedContexts(object):
             siteId = id(site)
         try:
             # will raise a key error if not found
-            post = self._getOffsetBySiteId(siteId) 
+            return self._getOffsetBySiteId(siteId) 
             #post = self._definedContexts[siteId]['offset']
         except DefinedContextsException: # the site id is not valid
             #environLocal.printDebug(['getOffsetBySite: trying to get an offset by a site failed; self:', self, 'site:', site, 'defined contexts:', self._definedContexts])
             raise # re-raise Exception
-
-#         if post is None:
-#             raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % siteId)
-        #self._definedContexts[siteId]['offset']
-        return post
 
 
     def getOffsetBySiteId(self, siteId):
@@ -1166,8 +1160,7 @@ class DefinedContexts(object):
         >>> aLocations.getOffsetBySiteId(id(bSite))
         121.5
         '''
-        post = self._getOffsetBySiteId(siteId) 
-        return post
+        return self._getOffsetBySiteId(siteId) 
 
 
     def setOffsetBySite(self, site, value):
@@ -1309,61 +1302,59 @@ class DefinedContexts(object):
         post = None
 
         count = 0
+
         # search any defined contexts first
         # need to sort: look at most-recently added objs are first
-
-        # TODO: can optimize search of defined contexts if we store in advance
-        # all class names; then weakrefs will not have to be used
-        # presently storing top-most class, but checking this will not permit
-        # matching sub-classes
-        objs = self.get(locationsTrail=True,  
+        objs = self.get(locationsTrail=False,  
                         sortByCreationTime=sortByCreationTime,
                         priorityTarget=priorityTarget)
+
+        classNameIsStr = common.isStr(className)
         for obj in objs:
             #environLocal.printDebug(['memo', memo])
             if obj is None: 
                 continue # a None context, or a dead reference
-            if common.isStr(className):
-                #if type(obj).__name__.lower() == className.lower():
+            if classNameIsStr:
                 if className in obj.classes:
                     post = obj       
                     break
             elif isinstance(obj, className):
-                    post = obj       
+                    post = obj
                     break
-        if post != None:
+        if post is not None:
             return post
 
+        memoKeys = memo.keys()
         # all objs here are containers, as they are all locations
         for obj in objs:
             if obj is None: 
                 continue # in case the reference is dead
             # if after trying to match name, look in the defined contexts' 
             # defined contexts [sic!]
-            if post is None: # no match yet
-                # access public method to recurse
-                if id(obj) not in memo.keys():
-                    # if the object is a Musci21Object
-                    #if hasattr(obj, 'getContextByClass'):
-                    # store this object as having been searched
-                    memo[id(obj)] = obj
-                    post = obj.getContextByClass(className,
-                           serialReverseSearch=serialReverseSearch,
-                           callerFirst=callerFirst, 
-                           sortByCreationTime=sortByCreationTime, 
-                           prioritizeActiveSite=prioritizeActiveSite,
-                           getElementMethod=getElementMethod,
-                           memo=memo)
-                    if post != None:
-                        break
-                    else: # this is not a music21 object
-                        pass
-                        #environLocal.printDebug['cannot call getContextByClass on obj stored in DefinedContext:', obj]
-                else: # objec has already been searched
-                    pass
-                    #environLocal.printDebug['skipping searching of object already searched:', obj]
-            else: # post is not None
-                break
+            #if post is None: # no match yet
+            # access public method to recurse
+            if id(obj) not in memoKeys:
+                # if the object is a Musci21Object
+                #if hasattr(obj, 'getContextByClass'):
+                # store this object as having been searched
+                memo[id(obj)] = obj
+                post = obj.getContextByClass(className,
+                       serialReverseSearch=serialReverseSearch,
+                       callerFirst=callerFirst, 
+                       sortByCreationTime=sortByCreationTime, 
+                       prioritizeActiveSite=prioritizeActiveSite,
+                       getElementMethod=getElementMethod,
+                       memo=memo)
+                if post is not None:
+                    break
+#                 else: # this is not a music21 object
+#                     pass
+                    #environLocal.printDebug['cannot call getContextByClass on obj stored in DefinedContext:', obj]
+#             else: # objec has already been searched
+#                 pass
+                #environLocal.printDebug['skipping searching of object already searched:', obj]
+#             else: # post is not None
+#                 break
         return post
 
 
@@ -1757,11 +1748,9 @@ class Music21Object(JSONSerializer):
         >>> ks.classSortOrder
         1
         
-        
-        
-        New classes can define their own default classSortOrder
-        
-        
+
+        New classes can define their own default classSortOrder        
+å
         
         >>> class ExampleClass(base.Music21Object):
         ...     classSortOrderDefault = 5
@@ -2373,13 +2362,14 @@ class Music21Object(JSONSerializer):
 
         if memo is None:
             memo = {} # intialize
+            # only add self on first call, as already added when called 
+            # from getByClass()
             memo[id(self)] = self
 
         post = None
         # first, if this obj is a Stream, we see if the class exists at or
         # before where the offsetOfCaller
         if serialReverseSearch:
-
             # if this is a Stream and we have a caller, see if we 
             # can get the offset from within this Stream of the caller 
             # first, see if this element is even in this Stream     
@@ -2439,6 +2429,10 @@ class Music21Object(JSONSerializer):
 
                 #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from a semi-flat representation', 'self', self, self.id, 'callerFirst', callerFirst, callerFirst.id])
                 offsetOfCaller = semiFlat.getOffsetByElement(callerFirst)
+#                 try:
+#                     offsetOfCaller = callerFirst.getOffsetBySite(semiFlat)
+#                 except DefinedContextsException:
+#                     offsetOfCaller = None
 
                 # our caller might have been flattened after contexts were set
                 # thus, this object may be in the caller's defined contexts, 

@@ -6468,6 +6468,7 @@ class Stream(music21.Music21Object):
                 #environLocal.printDebug(['_getFlatOrSemiFlat', '!!! processing substream:', e])
 
                 recurseStreamOffset = e.getOffsetBySite(self)
+
                 if retainContainers is True: # semiFlat
                     #environLocal.printDebug(['_getFlatOrSemiFlat(), retaining containers, storing element:', e])
 
@@ -6493,7 +6494,6 @@ class Stream(music21.Music21Object):
                     #    recurseStreamOffset, eSub)
                     sNew._insertCore(eSub.getOffsetBySite(recurseStream) + 
                         recurseStreamOffset, eSub)
-
             # if element not a Stream
             else:
                 # insert into new stream at offset in old stream
@@ -6544,67 +6544,6 @@ class Stream(music21.Music21Object):
         # here, we store the source stream from which this stream was derived
         sNew.flattenedRepresentationOf = sf.flattenedRepresentationOf
         return sNew
-
-#     def _getFlatAndSemiFlat(self):
-#         '''The `retainContainers` option, if True, returns a semiFlat version: containers are not discarded in flattening.
-#         '''
-#         # this copy will have a shared locations object
-#         # note that copy.copy() in some cases seems to not cause secondary
-#         # problems that self.__class__() does
-#         sNew = copy.copy(self)
-#         sNew._derivation = derivation.Derivation(sNew)
-#         sNew.setDerivation(self)
-# 
-#         sNewSemi = copy.copy(self)
-#         sNewSemi._derivation = derivation.Derivation(sNewSemi)
-#         sNewSemi.setDerivation(self)            
-# 
-#         sNew.derivationMethod = 'flat'
-#         sNewSemi.derivationMethod = 'semiFlat'
-# 
-#         # storing .elements in here necessitates
-#         # create a new, independent cache instance in the flat representation
-#         sNew._cache = common.DefaultHash()
-#         sNew._elements = []
-#         sNew._endElements = []
-#         sNew._elementsChanged()
-# 
-#         sNewSemi._cache = common.DefaultHash()
-#         sNewSemi._elements = []
-#         sNewSemi._endElements = []
-#         sNewSemi._elementsChanged()
-# 
-#         for e in self._elements:
-#             # if this element is a Stream, recurse
-#             if hasattr(e, "elements"): 
-#                 recurseStreamOffset = e.getOffsetBySite(self)
-#                 # add Stream to semiFlat
-#                 sNewSemi.insert(recurseStreamOffset, e, setActiveSite=False)
-#                 recurseStream = e.semiFlat                
-#                 for eSub in recurseStream:
-#                     oldOffset = eSub.getOffsetBySite(recurseStream)
-#                     # do not copy Stream in semiFlat to elements; 
-#                     # this simulates subflat
-#                     if not hasattr(eSub, "elements"):
-#                         sNew.insert(oldOffset + recurseStreamOffset, eSub)
-#                         sNewSemi.insert(oldOffset + recurseStreamOffset, eSub)
-#                     else: # add Streams too to semi
-#                         sNewSemi.insert(oldOffset + recurseStreamOffset, eSub)
-#             else: # if element not a Stream
-#                 # insert into new stream at offset in old stream
-#                 sNew.insert(e.getOffsetBySite(self), e)
-#                 sNewSemi.insert(e.getOffsetBySite(self), e)
-#         # endElements should never be Streams
-#         for e in self._endElements:
-#             sNew.storeAtEnd(e)
-#             sNewSemi.storeAtEnd(e)
-#         sNew.isFlat = True
-#         # should this be marked as flat? it has Streams!
-#         sNewSemi.isFlat = False
-#         # here, we store the source stream from which this stream was derived
-#         sNew.flattenedRepresentationOf = self #common.wrapWeakref(self)
-#         sNewSemi.flattenedRepresentationOf = self #common.wrapWeakref(self)
-#         return sNew, sNewSemi
 
 
     def _getFlat(self):
@@ -6763,11 +6702,9 @@ class Stream(music21.Music21Object):
 
 
     def _getSemiFlat(self):
-        # TODO: this does not work yet, as some Streams try to 
-        # place elements in Streams that already have elements
-        # see test/testDocumentation.py testOverviewMeterB
         if self._cache['semiFlat'] is None:
-           self._cache['semiFlat'] = self._getFlatOrSemiFlat(
+            #environLocal.pd(['using cached semiFlat', self])
+            self._cache['semiFlat'] = self._getFlatOrSemiFlat(
                                     retainContainers=True)
         return self._cache['semiFlat']
 
