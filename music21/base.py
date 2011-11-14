@@ -109,6 +109,8 @@ if len(_missingImport) > 0:
 # define whether weakrefs are used for storage of object locations
 WEAKREF_ACTIVE = True
 
+DEBUG_CONTEXT = False
+
 #-------------------------------------------------------------------------------
 class Music21Exception(Exception):
     pass
@@ -645,7 +647,7 @@ class DefinedContexts(object):
 
 
     def get(self, locationsTrail=False, sortByCreationTime=False,
-            priorityTarget=None):
+            priorityTarget=None, excludeNone=False):
         '''Get references; unwrap from weakrefs; order, based on dictionary keys, is from most recently added to least recently added.
 
         The `locationsTrail` option forces locations to come after all other defined contexts.
@@ -701,7 +703,8 @@ class DefinedContexts(object):
             dict = self._definedContexts[key]
             # check for None object; default location, not a weakref, keep
             if dict['obj'] is None:
-                post.append(dict['obj'])
+                if not excludeNone:
+                    post.append(dict['obj'])
             elif WEAKREF_ACTIVE:
                 obj = common.unwrapWeakref(dict['obj'])
                 if obj is None: # dead ref
@@ -1290,6 +1293,7 @@ class DefinedContexts(object):
         OMIT_FROM_DOCS
         TODO: not sure if memo is properly working: need a test case
         '''
+        if DEBUG_CONTEXT: print 'Y: first call'
         # in general, this should not be the first caller, as this method
         # is called from a Music21Object, not directly on the DefinedContexts
         # isntance. Nontheless, if this is the first caller, it is the first
@@ -1300,20 +1304,20 @@ class DefinedContexts(object):
             memo = {} # intialize
 
         post = None
-
         count = 0
 
         # search any defined contexts first
         # need to sort: look at most-recently added objs are first
         objs = self.get(locationsTrail=False,  
                         sortByCreationTime=sortByCreationTime,
-                        priorityTarget=priorityTarget)
+                        priorityTarget=priorityTarget, 
+                        excludeNone=True)
+
+        #printMemo(memo, 'getByClass() called: looking at %s sites' % len(objs))
 
         classNameIsStr = common.isStr(className)
         for obj in objs:
             #environLocal.printDebug(['memo', memo])
-            if obj is None: 
-                continue # a None context, or a dead reference
             if classNameIsStr:
                 if className in obj.classes:
                     post = obj       
@@ -1324,16 +1328,14 @@ class DefinedContexts(object):
         if post is not None:
             return post
 
-        memoKeys = memo.keys()
         # all objs here are containers, as they are all locations
         for obj in objs:
-            if obj is None: 
-                continue # in case the reference is dead
+            if DEBUG_CONTEXT: print '\tY: getByClass: iterating objs:', id(obj), obj
             # if after trying to match name, look in the defined contexts' 
             # defined contexts [sic!]
             #if post is None: # no match yet
             # access public method to recurse
-            if id(obj) not in memoKeys:
+            if id(obj) not in memo.keys():
                 # if the object is a Musci21Object
                 #if hasattr(obj, 'getContextByClass'):
                 # store this object as having been searched
@@ -2342,6 +2344,7 @@ class Music21Object(JSONSerializer):
         get elements for searching. The strings 'getElementAtOrBefore' and 'getElementBeforeOffset' are currently accepted. 
 
         '''
+        if DEBUG_CONTEXT: print 'X: first call; looking for:', className        
         from music21 import stream # needed for exception matching
 
         #environLocal.printDebug(['call getContextByClass from:', self, 'activeSite:', self.activeSite, 'callerFirst:', callerFirst, 'prioritizeActiveSite', prioritizeActiveSite])
@@ -2365,10 +2368,15 @@ class Music21Object(JSONSerializer):
             # only add self on first call, as already added when called 
             # from getByClass()
             memo[id(self)] = self
+            if DEBUG_CONTEXT: print 'X: creating new memo'        
+        #printMemo(memo, 'getContextByClass called by: %s %s' % (id(self), self))
+        if DEBUG_CONTEXT: print 'X: memo:', [(key, memo[key]) for key in memo.keys()]
 
         post = None
         # first, if this obj is a Stream, we see if the class exists at or
         # before where the offsetOfCaller
+
+        if DEBUG_CONTEXT: print '\tX: entering if serialReverseSearch'
         if serialReverseSearch:
             # if this is a Stream and we have a caller, see if we 
             # can get the offset from within this Stream of the caller 
@@ -2399,17 +2407,9 @@ class Music21Object(JSONSerializer):
                 # stores a Stream that has already been examined
                 # for now, cannot use cached semiFlat: leads to infinite loops
                 # TODO: get cached semiFlat to work if possible
+                if DEBUG_CONTEXT: print '\tX: getting semiFlat because self is Stream'
                 #semiFlat = self.semiFlat
                 semiFlat = self._getFlatOrSemiFlat(retainContainers=True)
-
-                # when using old insert method, got an error that we were
-                # trying to add an object that already existed in a Stream
-#                 try:
-#                     semiFlat = self.semiFlat
-#                 except stream.StreamException:
-#                     # in some testing environments this semiFlat or flat
-#                     # will try to place the same object in the same stream; cannot yet localize the problem; skipping is ok
-#                     skipGetOffsetOfCaller = True                    
 
                 # see if this element is in this Stream; 
                 if not skipGetOffsetOfCaller:
@@ -2426,13 +2426,16 @@ class Music21Object(JSONSerializer):
             if getOffsetOfCaller:
                 # in some cases we may need to try to get the offset of a semiFlat representation. this is necessary when a Measure
                 # is the caller. 
+                if DEBUG_CONTEXT: print '\tX: getting offset of caller'
 
                 #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from a semi-flat representation', 'self', self, self.id, 'callerFirst', callerFirst, callerFirst.id])
-                offsetOfCaller = semiFlat.getOffsetByElement(callerFirst)
-#                 try:
-#                     offsetOfCaller = callerFirst.getOffsetBySite(semiFlat)
-#                 except DefinedContextsException:
-#                     offsetOfCaller = None
+
+                #offsetOfCaller = semiFlat.getOffsetByElement(callerFirst)
+                # TODO: use this, as should be faster
+                try:
+                    offsetOfCaller = callerFirst.getOffsetBySite(semiFlat)
+                except DefinedContextsException:
+                    offsetOfCaller = None
 
                 # our caller might have been flattened after contexts were set
                 # thus, this object may be in the caller's defined contexts, 
@@ -2465,7 +2468,7 @@ class Music21Object(JSONSerializer):
                     else:
                         raise Music21ObjectException('cannot get element with requested method: %s' % getElementMethod)
                 #environLocal.printDebug([self, 'results of serialReverseSearch:', post, '; searching for:', className, '; starting from offset', offsetOfCaller])
-
+        if DEBUG_CONTEXT: print '\tX: about to call getByClass'
         if post is None: # still no match
             # this will call this method on all defined contexts, including
             # locations (one of which must be the activeSite)
@@ -4875,6 +4878,61 @@ class Test(unittest.TestCase):
 #         self.assertEqual(n.quarterLength, 1.5)
 # 
 #         self.assertEqual(n, unwrapped)
+
+
+    def testGetContextByClassB(self):
+        from music21 import stream, note, meter
+
+        s = stream.Score()
+
+        p1 = stream.Part()
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note(), 3)
+        m1.timeSignature = meter.TimeSignature('3/4')
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note(), 3)
+        p1.append(m1)
+        p1.append(m2)
+
+        p2 = stream.Part()
+        m3 = stream.Measure()
+        m3.timeSignature = meter.TimeSignature('3/4')
+        m3.repeatAppend(note.Note(), 3)
+        m4 = stream.Measure()
+        m4.repeatAppend(note.Note(), 3)
+        p2.append(m3)
+        p2.append(m4)
+
+        s.insert(0, p1)
+        s.insert(0, p2)
+
+        p3 = stream.Part()
+        m5 = stream.Measure()
+        m5.timeSignature = meter.TimeSignature('3/4')
+        m5.repeatAppend(note.Note(), 3)
+        m6 = stream.Measure()
+        m6.repeatAppend(note.Note(), 3)
+        p3.append(m5)
+        p3.append(m6)
+
+        p4 = stream.Part()
+        m7 = stream.Measure()
+        m7.timeSignature = meter.TimeSignature('3/4')
+        m7.repeatAppend(note.Note(), 3)
+        m8 = stream.Measure()
+        m8.repeatAppend(note.Note(), 3)
+        p4.append(m7)
+        p4.append(m8)
+
+        s.insert(0, p3)
+        s.insert(0, p4)
+
+        #self.targetMeasures = m4
+        n = m4[-1] # last element is a note
+
+        self.assertEqual(str(n.getContextByClass('TimeSignature')), '3/4') 
+
+
 
 
 #-------------------------------------------------------------------------------

@@ -398,57 +398,57 @@ class TestGetContextByClassB(CallTest):
     def __init__(self):
         from music21 import stream, note, meter, converter
 
-#         self.s = stream.Score()
-# 
-#         p1 = stream.Part()
-#         m1 = stream.Measure()
-#         m1.repeatAppend(note.Note(), 3)
-#         m1.timeSignature = meter.TimeSignature('3/4')
-#         m2 = stream.Measure()
-#         m2.repeatAppend(note.Note(), 3)
-#         p1.append(m1)
-#         p1.append(m2)
-# 
-#         p2 = stream.Part()
-#         m3 = stream.Measure()
-#         m3.timeSignature = meter.TimeSignature('3/4')
-#         m3.repeatAppend(note.Note(), 3)
-#         m4 = stream.Measure()
-#         m4.repeatAppend(note.Note(), 3)
-#         p2.append(m3)
-#         p2.append(m4)
-# 
-#         self.s.insert(0, p1)
-#         self.s.insert(0, p2)
-# 
-#         p3 = stream.Part()
-#         m5 = stream.Measure()
-#         m5.timeSignature = meter.TimeSignature('3/4')
-#         m5.repeatAppend(note.Note(), 3)
-#         m6 = stream.Measure()
-#         m6.repeatAppend(note.Note(), 3)
-#         p3.append(m5)
-#         p3.append(m6)
-# 
-#         p4 = stream.Part()
-#         m7 = stream.Measure()
-#         m7.timeSignature = meter.TimeSignature('3/4')
-#         m7.repeatAppend(note.Note(), 3)
-#         m8 = stream.Measure()
-#         m8.repeatAppend(note.Note(), 3)
-#         p4.append(m7)
-#         p4.append(m8)
-# 
-#         self.s.insert(0, p3)
-#         self.s.insert(0, p4)
-# 
-#         #self.targetMeasures = m4
-#         self.targetNote = m4[-1] # last element is a note
+        self.s = stream.Score()
+
+        p1 = stream.Part()
+        m1 = stream.Measure()
+        m1.repeatAppend(note.Note(), 3)
+        m1.timeSignature = meter.TimeSignature('3/4')
+        m2 = stream.Measure()
+        m2.repeatAppend(note.Note(), 3)
+        p1.append(m1)
+        p1.append(m2)
+
+        p2 = stream.Part()
+        m3 = stream.Measure()
+        m3.timeSignature = meter.TimeSignature('3/4')
+        m3.repeatAppend(note.Note(), 3)
+        m4 = stream.Measure()
+        m4.repeatAppend(note.Note(), 3)
+        p2.append(m3)
+        p2.append(m4)
+
+        self.s.insert(0, p1)
+        self.s.insert(0, p2)
+
+        p3 = stream.Part()
+        m5 = stream.Measure()
+        m5.timeSignature = meter.TimeSignature('3/4')
+        m5.repeatAppend(note.Note(), 3)
+        m6 = stream.Measure()
+        m6.repeatAppend(note.Note(), 3)
+        p3.append(m5)
+        p3.append(m6)
+
+        p4 = stream.Part()
+        m7 = stream.Measure()
+        m7.timeSignature = meter.TimeSignature('3/4')
+        m7.repeatAppend(note.Note(), 3)
+        m8 = stream.Measure()
+        m8.repeatAppend(note.Note(), 3)
+        p4.append(m7)
+        p4.append(m8)
+
+        self.s.insert(0, p3)
+        self.s.insert(0, p4)
+
+        #self.targetMeasures = m4
+        self.targetNote = m4[-1] # last element is a note
         #self.s.show()
-        self.s = converter.parse('/_scratch/test.xml')
-        t = self.s.parts[1].flat.notes
-        self.targetNote = t[-1]
-        del t
+#         self.s = converter.parse('/_scratch/test.xml')
+#         t = self.s.parts[1].flat.notes
+#         self.targetNote = t[-1]
+#         del t
 
     def testFocus(self):
         post = self.targetNote.getContextByClass('TimeSignature')

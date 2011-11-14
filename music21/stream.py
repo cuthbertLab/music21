@@ -17355,7 +17355,7 @@ class Test(unittest.TestCase):
         #sChords.show()
 
 
-    def insertIntoNoteOrChordA(self):
+    def testInsertIntoNoteOrChordA(self):
         from music21 import stream
         s = stream.Stream()
         s.repeatAppend(note.Note('d4'), 8)
@@ -17373,7 +17373,7 @@ class Test(unittest.TestCase):
 
         #s.show('text')
 
-    def insertIntoNoteOrChordB(self):
+    def testInsertIntoNoteOrChordB(self):
         from music21 import stream
         s = stream.Stream()
         s.repeatAppend(chord.Chord(['c4', 'e4', 'g4']), 8)
@@ -17383,6 +17383,20 @@ class Test(unittest.TestCase):
         s.insertIntoNoteOrChord(6, chord.Chord(['d5', 'e-5', 'b-5']))
 
         self.assertEqual(str([e for e in s]), '[<music21.chord.Chord C4 E4 G4>, <music21.chord.Chord C4 E4 G4>, <music21.chord.Chord C4 E4 G4>, <music21.chord.Chord C4 E4 G4 B4>, <music21.chord.Chord C4 E4 G4>, <music21.chord.Chord C4 E4 G4 B4>, <music21.chord.Chord C4 E4 G4 D5 E-5 B-5>, <music21.chord.Chord C4 E4 G4>]')
+
+
+
+#     def testInvertDiatonicA(self):
+#         from music21 import corpus, stream, key
+# 
+#         qj = corpus.parse('ciconia/quod_jactatur').parts[0]
+# 
+#         k1 = qj.flat.getElementsByClass(key.KeySignature)[0]
+#         qj.flat.replace(k1, key.KeySignature(-3))
+#         qj.getElementsByClass(stream.Measure)[1].insert(0, key.KeySignature(5))
+#         qj2 = qj.invertDiatonic(note.Note('F4'), inPlace = False)
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
