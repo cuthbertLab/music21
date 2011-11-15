@@ -144,8 +144,8 @@ def partPari(show = True):
     middle.insertAndShift(0, r2)    
     middle.getElementsByClass(key.Key)[0].setOffsetBySite(middle, 0)
 
-    ttied = top.makeMeasures().makeTies()
-    mtied = middle.makeMeasures().makeTies()
+    ttied = top.makeMeasures().makeTies(inPlace=False)
+    mtied = middle.makeMeasures().makeTies(inPlace=False)
     bass.makeMeasures(inPlace = True)
     main.makeMeasures(inPlace = True)
     
@@ -257,7 +257,7 @@ class TestExternal(unittest.TestCase):
         # run a reduced version
         pitchedPhase(cycles=cycles, show=show)
 
-    def testArvoPart(self, show=True):
+    def testArvoPart(self, show=False):
         partPari(show)
 
     def xtestPendulumMusic(self, show=True):  

@@ -1306,7 +1306,9 @@ class Stream(music21.Music21Object):
         # assume first arg is item, and that offset is local offset of object
         else:
             item = offsetOrItemOrList
-            offset = item.offset # should this be getOffsetBySite(None)?
+            #offset = item.offset       
+            # this is equivalent to:
+            offset = item.getOffsetBySite(item.activeSite)
 
         #if not common.isNum(offset):
         try: # using float conversion instead of isNum for performance
