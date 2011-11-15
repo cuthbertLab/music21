@@ -2578,12 +2578,141 @@ def example26_1a():
 def example26_1b():
     '''
     >>> from music21.braille import translate
-    >>> #print translate.measureToBraille(example26_1b(), showHand = 'left')
+    >>> print translate.measureToBraille(example26_1b(), showHand = 'left')
+    ⠇⠜⠘⠷⠬⠔⠤
     '''    
     c1 = chord.Chord(['G2','B2','D3','G3'], quarterLength = 4.0)
     m1 = stream.Measure()
     m1.append(c1)
     return m1
+
+def example26_2():
+    '''
+    >>> from music21.braille import translate
+    >>> rightHand = example26_2()[0]
+    >>> leftHand = example26_2()[1]
+    >>> print translate.keyboardPartsToBraille(rightHand, leftHand) 
+    ⠀⠀⠀⠨⠉⠀⠀⠀
+    ⠁⠀⠅⠜⠨⠷⠴⠼
+    ⠀⠀⠇⠜⠘⠷⠔⠬
+    '''
+    chord_right = chord.Chord(['D4','B4','G5'], quarterLength = 4.0)
+    chord_left = chord.Chord(['G2','D3','B3'], quarterLength = 4.0)
+    part_right = stream.Part()
+    part_right.append(meter.TimeSignature('c'))
+    part_right.append(chord_right)
+    part_left = stream.Part()
+    part_left.append(meter.TimeSignature('c'))
+    part_left.append(chord_left)
+    part_right.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    part_left.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    part_right[-1].rightBarline = None
+    part_left[-1].rightBarline = None
+    keyboardPart = stream.Part()
+    keyboardPart.append(part_right)
+    keyboardPart.append(part_left)
+    return keyboardPart
+
+def example26_3():
+    '''
+    >>> from music21.braille import translate
+    >>> rightHand = example26_3()[0]
+    >>> leftHand = example26_3()[1]
+    >>> print translate.keyboardPartsToBraille(rightHand, leftHand) 
+    ⠀⠀⠀⠨⠉⠀⠀⠀
+    ⠁⠀⠅⠜⠨⠯⠐⠬
+    ⠀⠀⠇⠜⠘⠽⠸⠬
+    '''
+    chord_right = chord.Chord(['C4','E5'], quarterLength = 4.0)
+    chord_left = chord.Chord(['C2','E3'], quarterLength = 4.0)
+    part_right = stream.Part()
+    part_right.append(meter.TimeSignature('c'))
+    part_right.append(chord_right)
+    part_left = stream.Part()
+    part_left.append(meter.TimeSignature('c'))
+    part_left.append(chord_left)
+    part_right.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    part_left.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    part_right[-1].rightBarline = None
+    part_left[-1].rightBarline = None
+    keyboardPart = stream.Part()
+    keyboardPart.append(part_right)
+    keyboardPart.append(part_left)
+    return keyboardPart
+
+def example26_4():
+    '''
+    >>> from music21.braille import translate
+    >>> rightHand = example26_4()[0]
+    >>> leftHand = example26_4()[1]
+    >>> print translate.keyboardPartsToBraille(rightHand, leftHand) 
+    ⠀⠀⠀⠀⠨⠉⠀⠀⠀
+    ⠁⠀⠅⠜⠰⠽⠴⠌⠀
+    ⠀⠀⠇⠜⠘⠷⠴⠐⠴
+    '''
+    chord_right = chord.Chord(['B4','E5','C6'], quarterLength = 4.0)
+    chord_left = chord.Chord(['G2','E3','E4'], quarterLength = 4.0)
+    part_right = stream.Part()
+    part_right.append(meter.TimeSignature('c'))
+    part_right.append(chord_right)
+    part_left = stream.Part()
+    part_left.append(meter.TimeSignature('c'))
+    part_left.append(chord_left)
+    part_right.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    part_left.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    part_right[-1].rightBarline = None
+    part_left[-1].rightBarline = None
+    keyboardPart = stream.Part()
+    keyboardPart.append(part_right)
+    keyboardPart.append(part_left)
+    return keyboardPart
+
+def example26_5():
+    '''
+    >>> from music21.braille import translate
+    >>> rightHand = example26_5()[0]
+    >>> leftHand = example26_5()[1]
+    >>> print translate.keyboardPartsToBraille(rightHand, leftHand) 
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠁⠀⠅⠜⠐⠚⠬⠙⠑⠬⠐⠓⠨⠋⠬⠛⠓⠴⠐⠓⠀⠀
+    ⠀⠀⠇⠜⠘⠓⠔⠸⠋⠘⠓⠔⠸⠚⠸⠙⠔⠊⠓⠔⠸⠚
+    '''
+    all_right = []
+    all_right.append(chord.Chord(['G4','B4'], quarterLength = 0.5))
+    all_right.append(note.Note('C5', quarterLength = 0.5))
+    all_right.append(chord.Chord(['B4','D5'], quarterLength = 0.5))
+    all_right.append(note.Note('G4', quarterLength = 0.5))
+    all_right.append(chord.Chord(['C5','E5'], quarterLength = 0.5))
+    all_right.append(note.Note('F#5', quarterLength = 0.5))
+    all_right.append(chord.Chord(['B4','G5'], quarterLength = 0.5))
+    all_right.append(note.Note('G4', quarterLength = 0.5))
+    part_right = stream.Part()
+    part_right.append(key.KeySignature(1))
+    part_right.append(meter.TimeSignature('4/4'))
+    part_right.append(all_right)
+
+    all_left = []
+    all_left.append(chord.Chord(['G2','D3'], quarterLength = 0.5))
+    all_left.append(note.Note('E3', quarterLength = 0.5))
+    all_left.append(chord.Chord(['G2','D3'], quarterLength = 0.5))
+    all_left.append(note.Note('B3', quarterLength = 0.5))
+    all_left.append(chord.Chord(['C3','G3'], quarterLength = 0.5))
+    all_left.append(note.Note('A2', quarterLength = 0.5))
+    all_left.append(chord.Chord(['G2','D3'], quarterLength = 0.5))
+    all_left.append(note.Note('B3', quarterLength = 0.5))
+    part_left = stream.Part()
+    part_left.append(key.KeySignature(1))
+    part_left.append(meter.TimeSignature('4/4'))
+    part_left.append(all_left)
+    
+    part_right.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    part_left.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    part_right[-1].rightBarline = None
+    part_left[-1].rightBarline = None
+    keyboardPart = stream.Part()
+    keyboardPart.append(part_right)
+    keyboardPart.append(part_left)
+    return keyboardPart
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
