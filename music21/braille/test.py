@@ -2039,6 +2039,11 @@ def example13_3():
     bm = tinyNotation.TinyNotationStream("a1 a1 a1 a1", "c")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None
+    e0 = expressions.TextExpression('cresc.')
+    e1 = expressions.TextExpression('decresc.')
+    bm[0].insert(0.0, e0)
+    bm[1].insert(0.0, e1)
+    w1 = dynamics.Wedge(type = 'crescendo')
     return bm
 
 def example13_9():
@@ -2153,13 +2158,36 @@ def example13_18():
     return bm
 
 def example13_19():
-    '''
-    '''
     bm = tinyNotation.TinyNotationStream("c'8 d' c' b- a g a2.", "3/4")
     bm.insert(0.0, key.KeySignature(-1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].insert(0.0, dynamics.Dynamic("pp"))
     bm[0].insert(0.0, expressions.TextExpression("very sweetly"))
+    bm[-1].rightBarline = None
+    return bm
+
+def example13_26():
+    '''
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(example13_26(), slurLongPhraseWithBrackets = True)
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠙⠑⠀⠰⠃⠐⠏⠻⠳⠀⠎⠜⠗⠁⠇⠇⠄⠐⠺⠪⠀⠗⠻⠫⠀⠕⠄⠘⠆⠧⠣⠅⠄⠀⠡⠡⠣⠣
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠏⠗⠑⠎⠞⠕⠲⠀⠣⠣⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠙⠊⠀⠜⠋⠋⠐⠺⠑⠛⠺⠛⠑⠀⠺⠨⠋⠓⠺⠓⠋⠀⠐⠺⠨⠋⠛⠪⠛⠋⠀⠐⠺⠑⠛⠺⠧
+    '''
+    bm = tinyNotation.TinyNotationStream("e2 f#4 g a2 b4 a g2 f#4 e d2. r4\
+    b-4 d'8 f' b'-4 f'8 d'8\
+    b-4 e'-8 g' b'-4 g'8 e'-8 b-4 e'-8 f' a'4 f'8 e'- b-4 d'8 f' b'-4 r", "4/4")
+    bm.insert(0.0, key.KeySignature(2))
+    bm.insert(16.0, key.KeySignature(-2))
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[4].append(spanner.Slur(bm[0].notes[0], bm[3].notes[0]))
+    for m in bm:
+        m.number += 44
+    bm[1].insert(2.0, expressions.TextExpression("rall."))
+    bm[3].append(bar.Barline("double"))
+    bm[4].insert(0.0, expressions.TextExpression("ff"))
+    bm[4].insert(0.0, tempo.TempoText("Presto"))
     bm[-1].rightBarline = None
     return bm
 
