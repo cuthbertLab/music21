@@ -43,6 +43,7 @@ def findSegments(music21Part, **partKeywords):
     showShortSlursAndTiesTogether = False
     showLongSlursAndTiesTogether = False
     segmentBreaks = None
+    descendingChords = True
 
     if 'slurLongPhraseWithBrackets' in partKeywords:
         slurLongPhraseWithBrackets = partKeywords['slurLongPhraseWithBrackets']
@@ -55,6 +56,9 @@ def findSegments(music21Part, **partKeywords):
             showLongSlursAndTiesTogether = True
     if 'segmentBreaks' in partKeywords:
         segmentBreaks = partKeywords['segmentBreaks']
+    if 'showHand' in partKeywords:
+        if partKeywords['showHand'] == 'left':
+            descendingChords = False
 
     prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets, showShortSlursAndTiesTogether, showLongSlursAndTiesTogether)
     allSegments = []
@@ -64,9 +68,12 @@ def findSegments(music21Part, **partKeywords):
     if not segmentBreaks == None:
         firstSegmentBreak = segmentBreaks.pop()
         (measureNumberStart, offsetStart) = firstSegmentBreak
-    currentKeySig = None
-    currentTimeSig = None
-
+    currentKeySig = key.KeySignature(0)
+    try:
+        currentTimeSig = music21Part.getElementsByClass('Measure')[0].bestTimeSignature()
+    except stream.StreamException:
+        currentTimeSig = meter.TimeSignature('4/4')
+        
     for music21Measure in music21Part.getElementsByClass('Measure'):
         prepareBeamedNotes(music21Measure)
         brailleElements = []
@@ -103,8 +110,15 @@ def findSegments(music21Part, **partKeywords):
                 offsetFactor += 1
             bucketNumber = music21Measure.number * 100 +  offsetFactor * 10 + int(brailleElement.affinityCode)
             currentSegment[bucketNumber].append(brailleElement)
-            currentSegment[bucketNumber].keySignature = currentKeySig
-            currentSegment[bucketNumber].timeSignature = currentTimeSig
+            if brailleElement.affinityCode == 9:
+                try:
+                    currentSegment[bucketNumber].keySignature
+                    currentSegment[bucketNumber].timeSignature
+                    currentSegment[bucketNumber].descendingChords
+                except AttributeError:
+                    currentSegment[bucketNumber].keySignature = currentKeySig
+                    currentSegment[bucketNumber].timeSignature = currentTimeSig
+                    currentSegment[bucketNumber].descendingChords = descendingChords
             previousCode = brailleElement.affinityCode
 
     allSegments.append(currentSegment)
@@ -389,9 +403,6 @@ def transcribeSegment(brailleSegment, **segmentKeywords):
     
     return bt
 
-def transcribeSegments(brailleSegmentUpper, brailleSegmentLower, **segmentKeywords):
-    pass
-
 def transcribeNoteGrouping(brailleElements, showLeadingOctave = True, showClefSigns = False, upperFirstInNoteFingering = True):
     trans = []
     previousNote = None
@@ -410,7 +421,21 @@ def transcribeNoteGrouping(brailleElements, showLeadingOctave = True, showClefSi
             trans.append(basic.restToBraille(currentRest))
         elif brailleElement.type == "Chord":
             currentChord = brailleElement
-            trans.append(basic.chordToBraille(currentChord))
+            try:
+                allNotes = sorted(currentChord._components, key=lambda n: n.pitch)
+            except AttributeError as e:
+                raise BrailleSegmentException("If you're getting this exception, the '_components' attribute for a music21 Chord probably\
+                became 'notes'. If that's the case, change it and life will be great.")
+            if brailleElements.descendingChords:
+                currentNote = allNotes[-1]
+            else:
+                currentNote = allNotes[0]
+            if previousNote == None:
+                doShowOctave = showLeadingOctave
+            else:
+                doShowOctave = basic.showOctaveWithNote(previousNote, currentNote)
+            trans.append(basic.chordToBraille(currentChord, descending = brailleElements.descendingChords, showOctave = doShowOctave))
+            previousNote = currentNote
         elif brailleElement.type == 'Dynamic':
             currentDynamic = brailleElement
             trans.append(basic.dynamicToBraille(currentDynamic))
