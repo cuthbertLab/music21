@@ -1329,6 +1329,8 @@ class DefinedContexts(object):
             return post
 
         # all objs here are containers, as they are all locations
+        # if we could be sure that these objs do not have their own locations
+        # and do not have the target class, we can skip
         for obj in objs:
             if DEBUG_CONTEXT: print '\tY: getByClass: iterating objs:', id(obj), obj
             # if after trying to match name, look in the defined contexts' 
@@ -2999,6 +3001,9 @@ class Music21Object(JSONSerializer):
         This might need to return the file path.
         '''
 
+        # note that all formats here must be defined in 
+        # common.VALID_SHOW_FORMATS
+
         if fmt == None: # get setting in environment
             fmt = environLocal['showFormat']
         if common.isStr(fmt) != True:
@@ -3017,7 +3022,7 @@ class Music21Object(JSONSerializer):
             return self._reprTextLine()
 
         # TODO: these need to be updated to write files
-
+        # TODO: the lilypondFormat is not yet consulted
         elif fmt == 'lily.pdf':
             #return self.lily.showPDF()
             environLocal.launch('pdf', self.lily.createPDF(), app=app)
@@ -3422,7 +3427,7 @@ class Music21Object(JSONSerializer):
         '''
 
         if self.activeSite != None and self.activeSite.isMeasure:
-            environLocal.printDebug(['found activeSite as Measure, using for offset'])
+            #environLocal.printDebug(['found activeSite as Measure, using for offset'])
             offsetLocal = self.getOffsetBySite(self.activeSite)
         else:
             #environLocal.printDebug(['did not find activeSite as Measure, doing context search', 'self.activeSite', self.activeSite])

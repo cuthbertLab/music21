@@ -73,7 +73,7 @@ DEBUG_DEVEL = 63
 DEBUG_ALL = 255
 
 # used for checking preferences, and for setting environment variables
-VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi']
+VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'lily.pdf', 'lily.png']
 VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi']
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 

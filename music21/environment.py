@@ -406,7 +406,7 @@ class Environment(object):
         the user-set preference or gets the system-provided 
         directory (with a music21 subdirectory, if possible).
         '''
-        if self.ref['directoryScratch'] == None:
+        if self.ref['directoryScratch'] is None:
             return self.getDefaultRootTempDir()
         # check that the user-specified directory exists
         elif not os.path.exists(self.ref['directoryScratch']):    
