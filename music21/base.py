@@ -812,28 +812,28 @@ class DefinedContexts(object):
                     obj = common.unwrapWeakref(objRef)
                 found.append(obj)
         return found
-            
-#         found = []
-#         for idKey in self._locationKeys:
-#             objRef = self._definedContexts[idKey]['obj']
-#             if objRef is None:
-#                 continue
-#             if not WEAKREF_ACTIVE: # leave None alone
-#                 obj = objRef
-#             else:
-#                 obj = common.unwrapWeakref(objRef)
-#             match = False
-#             if common.isStr(className):
-#                 if hasattr(obj, 'classes'):
-#                     if className in obj.classes:
-#                         match = True
-#                 elif type(obj).__name__.lower() == className.lower():
-#                     match = True
-#             elif isinstance(obj, className):
-#                 match = True
-#             if match:
-#                 found.append(obj)
-#         return found
+#             
+        found = []
+        for idKey in self._locationKeys:
+            objRef = self._definedContexts[idKey]['obj']
+            if objRef is None:
+                continue
+            if not WEAKREF_ACTIVE: # leave None alone
+                obj = objRef
+            else:
+                obj = common.unwrapWeakref(objRef)
+            match = False
+            if common.isStr(className):
+                if hasattr(obj, 'classes'):
+                    if className in obj.classes:
+                        match = True
+                elif type(obj).__name__.lower() == className.lower():
+                    match = True
+            elif isinstance(obj, className):
+                match = True
+            if match:
+                found.append(obj)
+        return found
 
 
     def hasSpannerSite(self):
@@ -843,12 +843,13 @@ class DefinedContexts(object):
         a SpannerStorage Stream class as a Site.
         '''
         for idKey in self._locationKeys:
+            if self._definedContexts[idKey]['isDead']:
+                continue 
             if self._definedContexts[idKey]['class'] == 'SpannerStorage':
                 return True
         return False
 
-# the long way to do this
-#         from music21 import stream
+        # the long way to do this
 #         for idKey in self._locationKeys:
 #             objRef = self._definedContexts[idKey]['obj']
 #             if objRef is None:
@@ -859,10 +860,7 @@ class DefinedContexts(object):
 #                 obj = common.unwrapWeakref(objRef)
 #             if obj is None:
 #                 continue
-#             if hasattr(obj, 'classes'):
-#                 if 'SpannerStorage' in obj.classes:
-#                     return True
-#             elif isinstance(obj, stream.SpannerStorage):
+#             if 'SpannerStorage' in obj.classes:
 #                 return True
 #         return False
 
@@ -1899,7 +1897,6 @@ class Music21Object(JSONSerializer):
 #                 return True
 #         except TypeError:
 #             pass
-
         eClasses = self.classes # get cached from property
         for className in classFilterList:
             # new method uses string matching of .classes attribute
@@ -1917,7 +1914,9 @@ class Music21Object(JSONSerializer):
 
 
     def _getClasses(self):
+        #environLocal.pd(['calling _getClasses'])
         if self._classes is None:
+            #environLocal.pd(['setting self._classes', id(self), self])
             self._classes = [x.__name__ for x in self.__class__.mro()] 
         return self._classes    
 
@@ -2261,11 +2260,24 @@ class Music21Object(JSONSerializer):
         '''
         found = self._definedContexts.getSitesByClass('SpannerStorage')
         post = []
-        # get reference to actual spanner stored in each SpannerStorage obj
-        # these are the Spanners
         for obj in found:
             post.append(obj.spannerParent)
         return post
+
+        # get reference to actual spanner stored in each SpannerStorage obj
+        # these are the Spanners
+
+#         found = []
+#         for site in self._definedContexts.getSites():
+#             if site is None:
+#                 continue
+#             if 'SpannerStorage' in site.classes:
+#                 found.append(site)
+#         post = []
+# 
+#         for obj in found:
+#             post.append(obj.spannerParent)
+#         return post
 
     def removeLocationBySite(self, site):
         '''Remove a location in the :class:`~music21.base.DefinedContexts` object.
@@ -2410,6 +2422,10 @@ class Music21Object(JSONSerializer):
                 # for now, cannot use cached semiFlat: leads to infinite loops
                 # TODO: get cached semiFlat to work if possible
                 if DEBUG_CONTEXT: print '\tX: getting semiFlat because self is Stream'
+
+                # using the cached semiFlat here can lead to an infinite
+                # loop in context searches: lower level containers each
+                # gain a new site (self here)  
                 #semiFlat = self.semiFlat
                 semiFlat = self._getFlatOrSemiFlat(retainContainers=True)
 
@@ -2470,6 +2486,12 @@ class Music21Object(JSONSerializer):
                     else:
                         raise Music21ObjectException('cannot get element with requested method: %s' % getElementMethod)
                 #environLocal.printDebug([self, 'results of serialReverseSearch:', post, '; searching for:', className, '; starting from offset', offsetOfCaller])
+
+                # NOTE: deleting this semiFlat is critical, is it prohibits 
+                # lower level components retaining this stream as a new site
+                # on successive calls
+                del semiFlat
+
         if DEBUG_CONTEXT: print '\tX: about to call getByClass'
         if post is None: # still no match
             # this will call this method on all defined contexts, including
@@ -2483,7 +2505,6 @@ class Music21Object(JSONSerializer):
                    # this object first
                    prioritizeActiveSite=prioritizeActiveSite, 
                    priorityTarget=priorityTarget,  getElementMethod=getElementMethod, memo=memo)
-
         return post
 
 
