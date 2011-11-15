@@ -54,8 +54,8 @@ def keyboardPartsToBraille(music21PartUpper, music21PartLower, **keywords):
         maxLineLength = keywords['maxLineLength']
 
     bt = text.BrailleKeyboard(maxLineLength)
-    rhSegment = segment.findSegments(music21PartUpper)[0]
-    lhSegment = segment.findSegments(music21PartLower)[0]
+    rhSegment = segment.findSegments(music21PartUpper, showHand = 'right')[0]
+    lhSegment = segment.findSegments(music21PartLower, showHand = 'left')[0]
     
     try:
         brailleHeadingR = segment.extractHeading(rhSegment, maxLineLength)
