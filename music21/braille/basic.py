@@ -57,43 +57,43 @@ def barlineToBraille(music21Barline):
     except KeyError:
         return BrailleBasicException("Barline type cannot be shown in braille.")
 
-def chordToBraille(music21Chord, highestToLowest = True):
+def chordToBraille(music21Chord, descending = True, showOctave = True):
     '''
     >>> from music21.braille import basic
     >>> from music21 import chord
     >>> gMajorTriadA = chord.Chord(['G4','B4','D5','G5'], quarterLength = 4.0)
-    >>> print basic.chordToBraille(gMajorTriadA, highestToLowest = True)
+    >>> print basic.chordToBraille(gMajorTriadA, descending = True)
     ⠨⠷⠼⠴⠤
     >>> gMajorTriadB = chord.Chord(['G2','B2','D3','G3'], quarterLength = 4.0)
-    >>> print basic.chordToBraille(gMajorTriadB, highestToLowest = False)
+    >>> print basic.chordToBraille(gMajorTriadB, descending = False)
     ⠘⠷⠬⠔⠤
     >>> gMajorTriadRightHand = chord.Chord(['D4','B4','G5'], quarterLength = 4.0)  
-    >>> print basic.chordToBraille(gMajorTriadRightHand, highestToLowest = True)
+    >>> print basic.chordToBraille(gMajorTriadRightHand, descending = True)
     ⠨⠷⠴⠼
     >>> gMajorTriadLeftHand = chord.Chord(['G2','D3','B3'], quarterLength = 4.0)
-    >>> print basic.chordToBraille(gMajorTriadLeftHand, highestToLowest = False)
+    >>> print basic.chordToBraille(gMajorTriadLeftHand, descending = False)
     ⠘⠷⠔⠬
     >>> cMajorTriadRightHand = chord.Chord(['C4','E5'], quarterLength = 4.0)
-    >>> print basic.chordToBraille(cMajorTriadRightHand, highestToLowest = True)
+    >>> print basic.chordToBraille(cMajorTriadRightHand, descending = True)
     ⠨⠯⠐⠬
     >>> cMajorTriadLeftHand = chord.Chord(['C2','E3'], quarterLength = 4.0)
-    >>> print basic.chordToBraille(cMajorTriadLeftHand, highestToLowest = False)
+    >>> print basic.chordToBraille(cMajorTriadLeftHand, descending = False)
     ⠘⠽⠸⠬
     >>> cMajorSeventhRightHand = chord.Chord(['C6','E5','B4'], quarterLength = 4.0)
-    >>> print basic.chordToBraille(cMajorSeventhRightHand, highestToLowest = True)
+    >>> print basic.chordToBraille(cMajorSeventhRightHand, descending = True)
     ⠰⠽⠴⠌
     >>> cMajorSeventhLeftHand = chord.Chord(['G2','E3','E4'], quarterLength = 4.0)
-    >>> print basic.chordToBraille(cMajorSeventhLeftHand, highestToLowest = False)
+    >>> print basic.chordToBraille(cMajorSeventhLeftHand, descending = False)
     ⠘⠷⠴⠐⠴
     '''
     allPitches = sorted(music21Chord.pitches)
-    if highestToLowest:
+    if descending:
         allPitches.reverse()
     
     chordTrans = []
     basePitch = allPitches[0]
     initNote = note.Note(basePitch, quarterLength = music21Chord.quarterLength)
-    chordTrans.append(noteToBraille(music21Note=initNote))
+    chordTrans.append(noteToBraille(music21Note=initNote,showOctave=showOctave))
     
     for currentPitchIndex in range(1, len(allPitches)):
         currentPitch = allPitches[currentPitchIndex]        
