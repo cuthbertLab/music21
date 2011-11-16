@@ -311,7 +311,7 @@ class ScoreReduction(object):
             inst.partName = gName
             g.insert(0, inst)
             gMeasures = g.getElementsByClass('Measure')
-            for m in gMeasures:
+            for m in gMeasures._elements:
                 m.clef = clef.TrebleClef()
             # TODO: insert into note or chord
             for key, rn in self._reductiveNotes.items():

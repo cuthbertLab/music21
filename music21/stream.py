@@ -1216,18 +1216,22 @@ class Stream(music21.Music21Object):
         
         '''
         #environLocal.printDebug(['_insertCore', 'self', self, 'offset', offset, 'element', element])
-        #self._addElementPreProcess(element)
+
+        # need to compare highest time before inserting the element in 
+        # the elements list
+        storeSorted = False 
+        if not ignoreSort:
+            # if sorted and our insertion is > the highest time, then
+            # are still inserted
+            if self.isSorted is True and self.highestTime <= offset:
+                storeSorted = True
 
         element.addLocation(self, float(offset))
         # need to explicitly set the activeSite of the element
         if setActiveSite:
             element.activeSite = self
 
-        storeSorted = False 
-        if ignoreSort is False:
-            if self.isSorted is True and self.highestTime <= offset:
-                storeSorted = True
-        # will be sorted later
+        # will be sorted later if necessary
         self._elements.append(element)  
         return storeSorted
 
@@ -3208,6 +3212,8 @@ class Stream(music21.Music21Object):
             found = srcObj.flat.getElementAtOrBefore(startOffset, [className])
             if found is not None:
                 startMeasureNew._insertCore(0, found)
+        # as we have inserted elements, need to call
+        startMeasureNew._elementsChanged()
 
         if gatherSpanners:
             for sp in spannerBundle:
@@ -7021,29 +7027,16 @@ class Stream(music21.Music21Object):
             self._cache["HighestTime"] = 0.0
             return 0.0
 #        #take the case where a whole note appears a 0.0, but a textExpression (ql=0) at 0.25 -- isSorted would be true, but highestTime should be 4.0 not 0.25
-#        elif self.isSorted is True:
-#            eLast = self._elements[-1]
-#            #if hasattr(eLast, "duration") and hasattr(eLast.duration,
-#            #        "quarterLength"):
-#            if eLast.duration is not None:
-#                self._cache["HighestTime"] = (eLast.getOffsetBySite(self) + 
-#                    eLast.duration.quarterLength)
-#            else:
-#                self._cache["HighestTime"] = eLast.getOffsetBySite(self)
         else:
-            max = None
+            max = 0
+            # TODO: this may not be the fastest way to do this
             for e in self._elements:
-                if e.duration is not None:
-                #if hasattr(e, "duration") and hasattr(e.duration, 
-                #        "quarterLength"):
-                    candidateOffset = (e.getOffsetBySite(self) + 
-                                 e.duration.quarterLength)
-                else:
-                    candidateOffset = e.getOffsetBySite(self)
-                if max is None or candidateOffset > max :
+                #print self, e, id(e), e.offset, e.getSites()
+                candidateOffset = (e.getOffsetBySite(self) + 
+                                   e.duration.quarterLength)
+                if candidateOffset > max:
                     max = candidateOffset
             self._cache["HighestTime"] = max
-
         return self._cache["HighestTime"]
 
     
