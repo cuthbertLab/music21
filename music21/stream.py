@@ -3036,8 +3036,7 @@ class Stream(music21.Music21Object):
     # _getNotes and _getPitches are found with the interval routines
 
     def measures(self, numberStart, numberEnd, 
-        collect=[clef.Clef, meter.TimeSignature, 
-        instrument.Instrument, key.KeySignature], gatherSpanners=True):
+        collect=['Clef', 'TimeSignature', 'Instrument', 'KeySignature'], gatherSpanners=True):
         '''Get a region of Measures based on a start and end Measure number, were the boundary numbers are both included. That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
 
         Additionally, any number of associated classes can be gathered as well. Associated classes are the last found class relevant to this Stream or Part.  
@@ -3051,7 +3050,6 @@ class Stream(music21.Music21Object):
         3
 
         '''
-        
         # create a dictionary of measure number, list of Meaures
         # there may be more than one Measure with the same Measure number
         mapRaw = {}
@@ -3081,17 +3079,16 @@ class Stream(music21.Music21Object):
             # TODO: make sure that makeNotation copies spanners
             #mStreamSpanners = mStream.spanners
             spannerBundle = srcObj.spannerBundle
-
+    
         # spanners may be store at the container/Part level, not w/n a measure
         # if they are within the Measure, or a voice, they will be transfered
         # below
         #mStreamSpanners = self.spanners
         if gatherSpanners:
-            # this probably need to be copied?
-            #spannerBundle = copy.deepcopy(srcObj.spannerBundle)
             spannerBundle = srcObj.spannerBundle
 
-        for m in mStream.elements:
+        # can use _elements here, as we do not need _endElements
+        for m in mStream._elements:
             #environLocal.printDebug(['m', m])
             # mId is a tuple of measure nmber and any suffix
             try:
@@ -3127,7 +3124,6 @@ class Stream(music21.Music21Object):
             mapCooked = mapRaw
         #environLocal.printDebug(['mapCooked', mapCooked])
         #environLocal.printDebug(['len(mapCooked)', len(mapCooked)])
-
         startOffset = None # set with the first measure
         startMeasure = None # store for adding other objects
         # get requested range
@@ -3136,7 +3132,6 @@ class Stream(music21.Music21Object):
         # if end not specified, get last
         if numberEnd == None:
             numberEnd = max([x for x,y in mapCooked])
-
         #environLocal.pd(['numberStart', numberStart, 'numberEnd', numberEnd])
 
         for i in range(numberStart, numberEnd+1):
@@ -3158,24 +3153,18 @@ class Stream(music21.Music21Object):
                     startOffset = m.getOffsetBySite(srcObj)
                     # store reference for collecting objects in src
                     startMeasure = m
-
                 #environLocal.printDebug(['startOffset', startOffset, 'startMeasure', startMeasure])
-
                 # get offset before doing spanner updates; not sure why yet
                 oldOffset = m.getOffsetBySite(srcObj)
-
                 # create a new Measure container, but populate it 
                 # with the same elements
                 mNew = Measure()
                 mNew.mergeAttributes(m)
-
                 # replace any spanner associations with this measure
                 if len(spannerBundle) > 0:
                     spannerBundle.replaceComponent(m, mNew)
-
                 # active sites get mangled somewhere
                 m.restoreActiveSites()
-
                 # will only set on first time through
                 if startMeasureNew is None:
                     startMeasureNew = mNew
@@ -3199,19 +3188,26 @@ class Stream(music21.Music21Object):
         for className in collect:
             # first, see if it is in this Measure
             # startMeasure here is the original measure
-            found = startMeasure.getElementsByClass(className)
-            if len(found) > 0:
-                continue # already have one on this measure
+#             found = startMeasure.getElementsByClass(className)
+#             if len(found) > 0:
+#                 continue # already have one on this measure
+
+            if startMeasure.hasElementOfClass(className):
+                continue
+
             # do a context search for the class, searching all stored
             # locations
-            found = startMeasure.getContextByClass(className)
-            if found != None:
-                # only insert into measure new
-                # TODO: may want to deepcopy inserted object here
+#             found = startMeasure.getContextByClass(className)
+#             if found is not None:
+#                 # only insert into measure new
+#                 # TODO: may want to deepcopy inserted object here
+#                 startMeasureNew._insertCore(0, found)
+
+            # search the flat caller stream, which is usually a Part
+            # need to search self, as we ne need to get the instrument
+            found = srcObj.flat.getElementAtOrBefore(startOffset, [className])
+            if found is not None:
                 startMeasureNew._insertCore(0, found)
-            else:
-                pass
-                #environLocal.printDebug(['measures(): cannot find requested class in stream:', className])
 
         if gatherSpanners:
             for sp in spannerBundle:
@@ -9575,12 +9571,10 @@ class Measure(Stream):
         else:
             self.number = 0 # 0 means undefined or pickup
         self.numberSuffix = None # for measure 14a would be "a"
-    
         # we can request layout width, using the same units used
         # in layout.py for systems; most musicxml readers do not support this
         # on input
         self.layoutWidth = None
-
 
     def addRepeat(self):
         # TODO: write
@@ -9590,7 +9584,6 @@ class Measure(Stream):
         # TODO: write
         pass
 
-    
     def measureNumberWithSuffix(self):
         if self.numberSuffix:
             return str(self.number) + self.numberSuffix
@@ -9639,9 +9632,7 @@ class Measure(Stream):
         >>> m.notes[1].pitch.accidental
         <accidental natural>
         '''
-
         #environLocal.printDebug(['Measure.makeNotation'])
-
         # TODO: this probably needs to look to see what processes need to be done; for example, existing beaming may be destroyed. 
 
         # assuming we are not trying to get context of previous measure
@@ -9764,9 +9755,7 @@ class Measure(Stream):
         Note: this does not yet accommodate triplets. 
         '''
         #TODO: set limit at 11/4?
-
         minDurQL = 4 # smallest denominator; start with a whole note
-
         # find sum of all durations in quarter length
         # find if there are any dotted durations
         minDurDotted = False        
@@ -17473,6 +17462,8 @@ class Test(unittest.TestCase):
         qj2 = qj.invertDiatonic(note.Note('F4'), inPlace = False)
 
 
+    def testMeasuresA(self):
+        pass
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

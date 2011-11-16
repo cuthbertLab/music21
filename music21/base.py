@@ -903,7 +903,6 @@ class DefinedContexts(object):
         DefinedContexts object already has 
         this site id defined as a location
 
-
         >>> import music21
         >>> class Mock(music21.Music21Object): 
         ...     pass
@@ -2607,7 +2606,6 @@ class Music21Object(JSONSerializer):
             # this avoids making another weakref
             if self._activeSiteId == siteId:
                 return
-
             if not self._definedContexts.hasSiteId(siteId):
                 self._definedContexts.add(site, self.offset, idKey=siteId) 
         else:

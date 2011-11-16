@@ -363,14 +363,6 @@ class TestGetElementsByClassA(CallTest):
         found = self.s.flat.notes
 
 
-class TestMeasuresA(CallTest):
-
-    def __init__(self):
-        from music21 import corpus
-        self.s = corpus.parse('symphony94/02')
-
-    def testFocus(self):
-        found = self.s.measures(3, 10)
 
 class TestGetElementsByClassB(CallTest):
 
@@ -455,6 +447,15 @@ class TestGetContextByClassB(CallTest):
     def testFocus(self):
         post = self.targetNoteA.getContextByClass('TimeSignature')
 
+class TestMeasuresA(CallTest):
+
+    def __init__(self):
+        from music21 import corpus
+        self.s = corpus.parse('symphony94/02')
+
+    def testFocus(self):
+        found = self.s.measures(3, 10)
+
 
 class TestMeasuresB(CallTest):
     def __init__(self):
@@ -508,9 +509,9 @@ class CallGraph:
         #self.callTest = TestCommonContextSearches
         #self.callTest = TestBigMusicXML
 
-        #self.callTest = TestMeasuresA
+        self.callTest = TestMeasuresA
         #self.callTest = TestGetContextByClassB
-        self.callTest = TestMeasuresB
+        #self.callTest = TestMeasuresB
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
