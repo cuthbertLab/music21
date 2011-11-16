@@ -39,7 +39,7 @@ _MOD = "chord.py"
 environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------
-class ChordException(Exception):
+class ChordException(music21.Music21Exception):
     pass
 
 class Chord(note.NotRest):

@@ -717,6 +717,15 @@ class Stream(music21.Music21Object):
                 return True
         return False
 
+    def hasElementOfClass(self, className, forceFlat=False):
+        '''Given a single class name as string, return True or False if an element with the specified class is found. The Stream must be flat, and only a single class name can be given.
+        '''
+        if forceFlat and not self.isFlat:
+            raise StreamException('cannot use hasElementOfClass on a non-flat Stream')
+        if self._cache['classCache'] is None:
+            self._cache['classCache'] = classCache.ClassCache()
+            self._cache['classCache'].load(self)
+        return self._cache['classCache'].hasElementOfClass(className)
 
     def hasElementByObjectId(self, objId):
         '''Return True if an element object id, provided as an argument, is contained in this Stream.
@@ -2221,26 +2230,38 @@ class Stream(music21.Music21Object):
             found = Stream()
         found.setDerivation(self)
         found.derivationMethod = 'getElementsByClass'
+        # passing on auto sort status may or may not be what is needed here
+        found.autoSort = self.autoSort
 
         # much faster in the most common case than calling common.isListLike
         if not isinstance(classFilterList, (list, tuple)):
             classFilterList = tuple([classFilterList])
 
+        # if we are sure that this Stream does not have a class
+        canUseClassCache = False
+        if (len(classFilterList) == 1 and 
+            isinstance(classFilterList[0], str)):
+            canUseClassCache = True
+
+        if canUseClassCache:
+            if not self.hasElementOfClass(classFilterList[0]):
+                found.isSorted = self.isSorted
+                return found
+
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
+        # if this stream was sorted, the resultant stream is sorted
+        found.isSorted = self.isSorted
 
         # to use class cache, class must be provided as a string, 
         # and there must be only one class
-#         if (len(classFilterList) == 1 and 
-#             isinstance(classFilterList[0], str)):
-#             if self._cache['classCache'] is None:
-#                 self._cache['classCache'] = classCache.ClassCache()
-#                 self._cache['classCache'].load(self)
-#             found = self._cache['classCache'].getElementsByClass(found,
-#                                               classFilterList)
-#             found.isSorted = self.isSorted
-#             found.autoSort = self.autoSort
-#             return found
+        if canUseClassCache:
+            if self._cache['classCache'] is None:
+                self._cache['classCache'] = classCache.ClassCache()
+                self._cache['classCache'].load(self)
+            found = self._cache['classCache'].getElementsByClass(found,
+                                              classFilterList)
+            return found
 
         #found.show('t')
         # need both _elements and _endElements
@@ -2252,10 +2273,6 @@ class Stream(music21.Music21Object):
             if e.isClassOrSubclass(classFilterList):
                 found._storeAtEndCore(e)
         found._elementsChanged()
-        # if this stream was sorted, the resultant stream is sorted
-        found.isSorted = self.isSorted
-        # passing on auto sort status may or may not be what is needed here
-        found.autoSort = self.autoSort
         return found
 
 
@@ -2821,7 +2838,6 @@ class Stream(music21.Music21Object):
             if classList is not None:
                 if not e.isClassOrSubclass(classList):
                     continue
-
             span = offset - e.getOffsetBySite(self)
             #environLocal.printDebug(['e span check', span, 'offset', offset, 'e.offset', e.offset, 'e.getOffsetBySite(self)', e.getOffsetBySite(self), 'e', e])
             if span < 0: # the e is after this offset
@@ -3176,7 +3192,6 @@ class Stream(music21.Music21Object):
                 # this will be zero in the first usage
                 newOffset = oldOffset - startOffset
                 returnObj._insertCore(newOffset, mNew)
-
                 mNew._elementsChanged()
                 #environLocal.printDebug(['old/new offset', oldOffset, newOffset])
 
@@ -3817,7 +3832,7 @@ class Stream(music21.Music21Object):
         if len(post) == 0 and searchContext:
             # returns a single element match
             #post = self.__class__()
-            obj = self.getContextByClass(clef.Clef)
+            obj = self.getContextByClass('Clef')
             if obj is not None:
                 post.append(obj)
 
@@ -5445,6 +5460,7 @@ class Stream(music21.Music21Object):
                         elif overshot > 0:
                             environLocal.printDebug(['makeTies() found and skipping extremely small overshot into next measure', overshot])
             mCount += 1
+        del measureStream # clean up unused streams
         # changes elements
         returnObj._elementsChanged()
         if not inPlace:
@@ -5540,6 +5556,7 @@ class Stream(music21.Music21Object):
                 # in dur lost
                 duration.updateTupletType(durList)
 
+        del mColl # remove Stream no longer needed
         return returnObj
 
     def haveBeamsBeenMade(self):
@@ -6906,7 +6923,7 @@ class Stream(music21.Music21Object):
     def makeImmutable(self):
         '''Clean this Stream: for self and all elements, purge all dead locations and remove all non-contained sites. Further, restore all active sites
         '''
-        # TODO: experimental
+        self.sort() # must sort before making immutable
         self._mutable = False
         for e in self._yieldElementsDownward(streamsOnly=False,     
             restoreActiveSites=True):
@@ -6914,6 +6931,7 @@ class Stream(music21.Music21Object):
             e.removeNonContainedLocations()
             #if isinstance(e, Stream):
             if e.isStream:
+                e.sort() # sort before making immutable
                 e._mutable = False
 
     def makeMutable(self, recurse=True):
@@ -8279,12 +8297,8 @@ class Stream(music21.Music21Object):
         # this should only be done once
         post = copy.deepcopy(self)
         post.makeImmutable()
-        
-# experimental tests
-#         for obj in post.recurse(streamsOnly=True):
-#             obj._mutable = False
-
         mxScore = post._getMX()
+        del post
         return mxScore.xmlStr()
 
     musicxml = property(_getMusicXML,
@@ -10408,7 +10422,7 @@ class Score(Stream):
         have measures with identical offsets.
         '''
         map = {}
-        parts = self.getElementsByClass('Part')
+        parts = self.parts
         if len(parts) == 0:
             return Stream.measureOffsetMap(self, classFilterList)
         else:
@@ -10468,7 +10482,7 @@ class Score(Stream):
                     m = p # treat the entire part as one measure
                 m.sliceByQuarterLengths(quarterLengthList=[divisor],
                     target=None, addTies=addTies, inPlace=True)
-        
+        del mStream # cleanup Streams
         returnObj._elementsChanged()
         return returnObj
 
@@ -17392,16 +17406,71 @@ class Test(unittest.TestCase):
         self.assertEqual(str([e for e in s]), '[<music21.chord.Chord C4 E4 G4>, <music21.chord.Chord C4 E4 G4>, <music21.chord.Chord C4 E4 G4>, <music21.chord.Chord C4 E4 G4 B4>, <music21.chord.Chord C4 E4 G4>, <music21.chord.Chord C4 E4 G4 B4>, <music21.chord.Chord C4 E4 G4 D5 E-5 B-5>, <music21.chord.Chord C4 E4 G4>]')
 
 
+    def testSortingAfterInsertA(self):
+        from music21 import corpus
+        import math
 
-#     def testInvertDiatonicA(self):
-#         from music21 import corpus, stream, key
-# 
-#         qj = corpus.parse('ciconia/quod_jactatur').parts[0]
-# 
-#         k1 = qj.flat.getElementsByClass(key.KeySignature)[0]
-#         qj.flat.replace(k1, key.KeySignature(-3))
-#         qj.getElementsByClass(stream.Measure)[1].insert(0, key.KeySignature(5))
-#         qj2 = qj.invertDiatonic(note.Note('F4'), inPlace = False)
+        s = corpus.parse('bwv66.6')
+        p = s.parts[0]
+        for m in p.getElementsByClass('Measure'):
+            for n in m.notes:
+                targetOffset = n.getOffsetBySite(m)
+                if targetOffset != math.floor(targetOffset):
+                    r = note.Rest(quarterLength=n.quarterLength)
+                    m.remove(n)
+                    m.insert(targetOffset, r)
+        # if we iterate, we get a sorted version
+        #self.assertEqual([str(n) for n in p.flat.notesAndRests], [])
+
+        # when we just call show(), we were not geting a sorted version;
+        # this was due to making the stream immutable before sorting
+        # this is now fixed
+        match = """      <note>
+        <pitch>
+          <step>A</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>5040</duration>
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam>begin</beam>
+        <notations/>
+      </note>
+      <note>
+        <rest/>
+        <duration>5040</duration>
+        <type>eighth</type>
+        <notations/>
+      </note>
+      <note>
+        <pitch>
+          <step>G</step>
+          <alter>1</alter>
+          <octave>4</octave>
+        </pitch>
+        <duration>10080</duration>
+        <type>quarter</type>
+        <stem>up</stem>
+        <notations/>
+      </note>
+      <note>"""
+        raw = p.musicxml
+        match = match.replace(' ', '')
+        match = match.replace('\n', '')
+        raw = raw.replace(' ', '')
+        raw = raw.replace('\n', '')
+        self.assertEqual(raw.find(match) > 0, True)
+
+
+    def testInvertDiatonicA(self):
+        from music21 import corpus, stream, key
+
+        qj = corpus.parse('ciconia/quod_jactatur').parts[0]
+
+        k1 = qj.flat.getElementsByClass(key.KeySignature)[0]
+        qj.flat.replace(k1, key.KeySignature(-3))
+        qj.getElementsByClass(stream.Measure)[1].insert(0, key.KeySignature(5))
+        qj2 = qj.invertDiatonic(note.Note('F4'), inPlace = False)
 
 
 

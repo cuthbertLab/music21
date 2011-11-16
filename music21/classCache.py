@@ -19,6 +19,8 @@ from music21 import environment
 _MOD = "classCache.py"  
 environLocal = environment.Environment(_MOD)
 
+class ClassCacheException(Exception):
+    pass
 
 
 class Repository(object):
@@ -154,6 +156,16 @@ class ClassCache(object):
 #             environLocal.printDebug([r, len(self.repositories[r])])
 
 
+    def hasElementOfClass(self, className):
+        '''Return True/False if this class is found. 
+        '''
+        try: # for performance, try a direct match first
+            r = self.repositories[className]
+            return True
+        except KeyError: # string match not possible
+            return False
+
+
     def getElementsByClass(self, targetStream, classFilterList):
         '''
         `classFilterList` must be a list.
@@ -183,7 +195,8 @@ class ClassCache(object):
         >>> # cannot match more than one class
         >>> s4 = stream.Stream()
         >>> len(cc.getElementsByClass(s4, [note.Note, note.Rest]))
-        0
+        Traceback (most recent call last):
+        ClassCacheException: can only process single class names given as a string
         '''
         matchKeys = []
         #environLocal.pd(['getElementsByClass', 'classFilterList', classFilterList])
@@ -200,6 +213,9 @@ class ClassCache(object):
             if r is not None:
                 r.insertIntoStream(targetStream=targetStream, 
                         offsetSite=self.parent)
+        else:
+            raise ClassCacheException('can only process single class names given as a string')
+
         # found may be unaltered; check length
         return targetStream 
 

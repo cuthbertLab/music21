@@ -59,6 +59,7 @@ from music21 import environment
 # needed for temporal manipulations; not music21 objects
 from music21 import tie
 from music21 import duration
+#from music21 import contextCache
 
 _MOD = 'music21.base.py'
 environLocal = environment.Environment(_MOD)
@@ -864,6 +865,15 @@ class DefinedContexts(object):
 #                 return True
 #         return False
 
+    def getSiteCount(self):
+        '''Return the number of non-dead sites, including None. This does not unwrap weakrefs for performance. 
+        '''
+        count = 0
+        for idKey in self._locationKeys:
+            if self._definedContexts[idKey]['isDead']:
+                continue 
+            count += 1
+        return count
 
     def isSite(self, obj):
         '''
@@ -1331,6 +1341,14 @@ class DefinedContexts(object):
         # and do not have the target class, we can skip
         for obj in objs:
             if DEBUG_CONTEXT: print '\tY: getByClass: iterating objs:', id(obj), obj
+
+            if (classNameIsStr and obj.isFlat and 
+                obj._definedContexts.getSiteCount() == 1):
+                if DEBUG_CONTEXT: print '\tY: skipping flat stream that does not contain object:', id(obj), obj
+                #environLocal.pd(['\tY: skipping flat stream that does not contain object:'])
+                if not obj.hasElementOfClass(className, forceFlat=True):
+                    continue # skip, not in this stream
+
             # if after trying to match name, look in the defined contexts' 
             # defined contexts [sic!]
             #if post is None: # no match yet
@@ -2358,8 +2376,17 @@ class Music21Object(JSONSerializer):
         get elements for searching. The strings 'getElementAtOrBefore' and 'getElementBeforeOffset' are currently accepted. 
 
         '''
-        if DEBUG_CONTEXT: print 'X: first call; looking for:', className        
+        if DEBUG_CONTEXT: print 'X: first call; looking for:', className, id(self), self
         from music21 import stream # needed for exception matching
+
+#         if self.isStream and isinstance(className, str):
+#             if self._cache['contextCache'] is not None:
+#                 post = self._cache['contextCache'].get(className, callerFirst, 
+#                                             getElementMethod)
+#                 if post is not None:
+#                     environLocal.pd(['using context cache'])
+#                     return post
+
 
         #environLocal.printDebug(['call getContextByClass from:', self, 'activeSite:', self.activeSite, 'callerFirst:', callerFirst, 'prioritizeActiveSite', prioritizeActiveSite])
     
@@ -2379,9 +2406,6 @@ class Music21Object(JSONSerializer):
 
         if memo is None:
             memo = {} # intialize
-            # only add self on first call, as already added when called 
-            # from getByClass()
-            memo[id(self)] = self
             if DEBUG_CONTEXT: print 'X: creating new memo'        
         #printMemo(memo, 'getContextByClass called by: %s %s' % (id(self), self))
         if DEBUG_CONTEXT: print 'X: memo:', [(key, memo[key]) for key in memo.keys()]
@@ -2423,9 +2447,12 @@ class Music21Object(JSONSerializer):
                 # TODO: get cached semiFlat to work if possible
                 if DEBUG_CONTEXT: print '\tX: getting semiFlat because self is Stream'
 
-                # using the cached semiFlat here can lead to an infinite
-                # loop in context searches: lower level containers each
-                # gain a new site (self here)  
+                # using the cached semiFlat here can lead to an ever-
+                # increasing number of sites in the outermost semiflat
+                # lower level containers each gain a new site (self here)  
+                # for example, each Measure in a Part that caches a semiflat
+                # each Measure will have a new site for every call; thus
+                # we delete the semiflat here used after every call
                 #semiFlat = self.semiFlat
                 semiFlat = self._getFlatOrSemiFlat(retainContainers=True)
 
@@ -2505,6 +2532,14 @@ class Music21Object(JSONSerializer):
                    # this object first
                    prioritizeActiveSite=prioritizeActiveSite, 
                    priorityTarget=priorityTarget,  getElementMethod=getElementMethod, memo=memo)
+    
+        # if we have a Stream, store the results
+#         if self.isStream and isinstance(className, str):
+#             if self._cache['contextCache'] is None:
+#                 self._cache['contextCache'] = contextCache.ContextCache()
+#             self._cache['contextCache'].add(className, callerFirst, 
+#                                             getElementMethod, post)
+
         return post
 
 
@@ -2544,7 +2579,6 @@ class Music21Object(JSONSerializer):
         # next, search all defined contexts
         self._definedContexts.getAllByClass(className, found=found,
                                          idFound=idFound, memo=memo)
-
         return found
 
 
@@ -4954,9 +4988,13 @@ class Test(unittest.TestCase):
         s.insert(0, p4)
 
         #self.targetMeasures = m4
-        n = m4[-1] # last element is a note
+        n1 = m2[-1] # last element is a note
+        n2 = m4[-1] # last element is a note
 
-        self.assertEqual(str(n.getContextByClass('TimeSignature')), '3/4') 
+        #environLocal.pd(['getContexByClass()'])
+        #self.assertEqual(str(n1.getContextByClass('TimeSignature')), '3/4') 
+        environLocal.pd(['getContexByClass()'])
+        self.assertEqual(str(n2.getContextByClass('TimeSignature')), '3/4') 
 
 
 

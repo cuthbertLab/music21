@@ -443,7 +443,9 @@ class TestGetContextByClassB(CallTest):
         self.s.insert(0, p4)
 
         #self.targetMeasures = m4
-        self.targetNote = m4[-1] # last element is a note
+        self.targetNoteA = m4[-1] # last element is a note
+        self.targetNoteB = m1[-1] # last element is a note
+
         #self.s.show()
 #         self.s = converter.parse('/_scratch/test.xml')
 #         t = self.s.parts[1].flat.notes
@@ -451,8 +453,28 @@ class TestGetContextByClassB(CallTest):
 #         del t
 
     def testFocus(self):
-        post = self.targetNote.getContextByClass('TimeSignature')
+        post = self.targetNoteA.getContextByClass('TimeSignature')
 
+
+class TestMeasuresB(CallTest):
+    def __init__(self):
+        from music21 import stream, note, meter, converter
+
+        self.s = stream.Score()
+        for pn in [1]:
+            p = stream.Part()
+            for mn in range(10):
+                m = stream.Measure()
+                if mn == 0:
+                    m.timeSignature = meter.TimeSignature('3/4')
+                for nn in range(3):
+                    m.append(note.Note())
+                p.append(m)
+            self.s.insert(0, p)
+        #self.s.show()
+
+    def testFocus(self):
+        post = self.s.measures(3, 6)
 
 
 #-------------------------------------------------------------------------------
@@ -487,7 +509,8 @@ class CallGraph:
         #self.callTest = TestBigMusicXML
 
         #self.callTest = TestMeasuresA
-        self.callTest = TestGetContextByClassB
+        #self.callTest = TestGetContextByClassB
+        self.callTest = TestMeasuresB
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
