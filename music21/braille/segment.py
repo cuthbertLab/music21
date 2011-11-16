@@ -39,7 +39,7 @@ class BrailleElementGrouping(list):
     pass
 
 def findSegments(music21Part, **partKeywords):
-    slurLongPhraseWithBrackets = False
+    slurLongPhraseWithBrackets = True
     showShortSlursAndTiesTogether = False
     showLongSlursAndTiesTogether = False
     segmentBreaks = None
@@ -74,6 +74,9 @@ def findSegments(music21Part, **partKeywords):
     except stream.StreamException:
         currentTimeSig = meter.TimeSignature('4/4')
         
+    greaterOffsetFactor = 0
+    greaterPreviousCode = -1
+    biggerPicture = collections.defaultdict(BrailleElementGrouping)
     for music21Measure in music21Part.getElementsByClass('Measure'):
         prepareBeamedNotes(music21Measure)
         brailleElements = []
@@ -87,8 +90,8 @@ def findSegments(music21Part, **partKeywords):
         if len(brailleElements) > 0 and brailleElements[-1].type == 'Dynamic':
             brailleElements[-1].classSortOrder = -6
             brailleElements.sort(cmp = lambda x, y: cmp(x.offset, y.offset) or cmp(x.classSortOrder, y.classSortOrder))
-        offsetFactor = 0
-        previousCode = 0
+        lesserOffsetFactor = 0
+        lesserPreviousCode = -1
         for brailleElement in brailleElements:
             if music21Measure.number > measureNumberStart or\
                 music21Measure.number == measureNumberStart and brailleElement.offset >= offsetStart:
@@ -99,6 +102,7 @@ def findSegments(music21Part, **partKeywords):
                     (measureNumberStart, offsetStart) = nextSegmentBreak
                 except IndexError:
                     (measureNumberStart, offsetStart) = (10E5, 0.0)
+                greaterOffsetFactor += 1
             if brailleElement.type == 'Key Signature':
                 brailleElement.outgoingKeySig = currentKeySig
                 currentKeySig = brailleElement
@@ -106,21 +110,49 @@ def findSegments(music21Part, **partKeywords):
                 currentTimeSig = brailleElement
             elif brailleElement.type == 'Rest' and brailleElement.duration == music21Measure.duration:
                 brailleElement.quarterLength = 4.0
-            if brailleElement.affinityCode < previousCode:
-                offsetFactor += 1
-            bucketNumber = music21Measure.number * 100 +  offsetFactor * 10 + int(brailleElement.affinityCode)
-            currentSegment[bucketNumber].append(brailleElement)
+            if brailleElement.affinityCode < lesserPreviousCode:
+                lesserOffsetFactor += 1
+            if brailleElement.affinityCode < greaterPreviousCode:
+                greaterOffsetFactor += 1
+            lesserBucketNumber = music21Measure.number * 100 +  lesserOffsetFactor * 10 + int(brailleElement.affinityCode)
+            greaterBucketNumber = 10*greaterOffsetFactor + int(brailleElement.affinityCode)
+            currentSegment[lesserBucketNumber].append(brailleElement)
+            biggerPicture[greaterBucketNumber].append(brailleElement)
             if brailleElement.affinityCode == 9:
                 try:
-                    currentSegment[bucketNumber].keySignature
-                    currentSegment[bucketNumber].timeSignature
-                    currentSegment[bucketNumber].descendingChords
+                    currentSegment[lesserBucketNumber].keySignature
+                    currentSegment[lesserBucketNumber].timeSignature
+                    currentSegment[lesserBucketNumber].descendingChords
                 except AttributeError:
-                    currentSegment[bucketNumber].keySignature = currentKeySig
-                    currentSegment[bucketNumber].timeSignature = currentTimeSig
-                    currentSegment[bucketNumber].descendingChords = descendingChords
-            previousCode = brailleElement.affinityCode
+                    currentSegment[lesserBucketNumber].keySignature = currentKeySig
+                    currentSegment[lesserBucketNumber].timeSignature = currentTimeSig
+                    currentSegment[lesserBucketNumber].descendingChords = descendingChords
+            lesserPreviousCode = brailleElement.affinityCode
+            greaterPreviousCode = lesserPreviousCode
 
+    # check each consolidated note grouping for articulation doublings
+    for bucketNumber in sorted([n for n in biggerPicture if n%10==9]):
+        allNotes = [n for n in biggerPicture[bucketNumber] if n.type == "Note"]
+        for noteIndexStart in range(len(allNotes)):
+            music21NoteStart = allNotes[noteIndexStart]
+            for artcIndex in range(len(music21NoteStart.articulations)):
+                artc = music21NoteStart.articulations[artcIndex]
+                # if artc is swell, then continue
+                # 11/16/11: music21 does not yet have support for swells.
+                numSequential=0
+                for noteIndexContinue in range(noteIndexStart+1, len(allNotes)):
+                    music21NoteContinue = allNotes[noteIndexContinue]
+                    if artc in music21NoteContinue.articulations:
+                        numSequential+=1
+                        continue
+                    break
+                if numSequential >= 3:
+                    music21NoteStart.articulations.append(artc)
+                    for noteIndexContinue in range(noteIndexStart+1, noteIndexStart+numSequential):
+                        music21NoteContinue = allNotes[noteIndexContinue]
+                        music21NoteContinue.articulations.remove(artc)
+            music21NoteStart.articulations.sort()
+            
     allSegments.append(currentSegment)
     return allSegments
 
@@ -553,7 +585,7 @@ def prepareBeamedNotes(music21Measure):
     return True
 
 # Prepares notes for braille slurring in a part
-def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = False, showShortSlursAndTiesTogether = True, showLongSlursAndTiesTogether = True):
+def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = True, showShortSlursAndTiesTogether = True, showLongSlursAndTiesTogether = True):
     if not len(music21Part.spannerBundle) > 0:
         return True
     allNotes = music21Part.flat.notes
