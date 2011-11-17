@@ -3040,7 +3040,7 @@ class Stream(music21.Music21Object):
     # _getNotes and _getPitches are found with the interval routines
 
     def measures(self, numberStart, numberEnd, 
-        collect=['Clef', 'TimeSignature', 'Instrument', 'KeySignature'], gatherSpanners=True):
+        collect=['Clef', 'TimeSignature', 'Instrument', 'KeySignature'], gatherSpanners=True, searchContext=False):
         '''Get a region of Measures based on a start and end Measure number, were the boundary numbers are both included. That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
 
         Additionally, any number of associated classes can be gathered as well. Associated classes are the last found class relevant to this Stream or Part.  
@@ -3191,30 +3191,24 @@ class Stream(music21.Music21Object):
         # manipulate startMeasure to add desired context objects
         for className in collect:
             # first, see if it is in this Measure
-            # startMeasure here is the original measure
-#             found = startMeasure.getElementsByClass(className)
-#             if len(found) > 0:
-#                 continue # already have one on this measure
-
             if startMeasure.hasElementOfClass(className):
                 continue
-
-            # do a context search for the class, searching all stored
-            # locations
-#             found = startMeasure.getContextByClass(className)
-#             if found is not None:
-#                 # only insert into measure new
-#                 # TODO: may want to deepcopy inserted object here
-#                 startMeasureNew._insertCore(0, found)
-
             # search the flat caller stream, which is usually a Part
             # need to search self, as we ne need to get the instrument
             found = srcObj.flat.getElementAtOrBefore(startOffset, [className])
             if found is not None:
                 startMeasureNew._insertCore(0, found)
+
+            # if still not found
+            # do a context search for the class, searching all stored
+            # locations: this is very time consuming on large scores
+            if found is not None and searchContext:
+                found = startMeasure.getContextByClass(className)
+                startMeasureNew._insertCore(0, found)
+  
         # as we have inserted elements, need to call
         startMeasureNew._elementsChanged()
-
+        
         if gatherSpanners:
             for sp in spannerBundle:
                 # can use old offsets of spanners, even though components
@@ -7031,9 +7025,12 @@ class Stream(music21.Music21Object):
             max = 0
             # TODO: this may not be the fastest way to do this
             for e in self._elements:
-                #print self, e, id(e), e.offset, e.getSites()
-                candidateOffset = (e.getOffsetBySite(self) + 
+                try:
+                    candidateOffset = (e.getOffsetBySite(self) + 
                                    e.duration.quarterLength)
+                except:
+                    print self, e, id(e), e.offset, e.getSites()
+                    raise
                 if candidateOffset > max:
                     max = candidateOffset
             self._cache["HighestTime"] = max

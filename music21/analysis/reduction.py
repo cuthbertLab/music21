@@ -159,7 +159,7 @@ class ReductiveNote(object):
         if 'noteheadFill' in self._parameters.keys():
             if self._parameters['noteheadFill'] is not None:
                 n.noteheadFill = self._parameters['noteheadFill']
-                environLocal.pd(['set nothead fill:', n.noteheadFill])
+                #environLocal.pd(['set nothead fill:', n.noteheadFill])
         if 'textBelow' in self._parameters.keys():
             n.addLyric(self._parameters['textBelow'])
         if 'textAbove' in self._parameters.keys():
@@ -251,7 +251,7 @@ class ScoreReduction(object):
                                         offset = n.getOffsetBySite(v)
                             rn = ReductiveNote(l.text, n, i, offset)
                             if rn.isParsed():
-                                environLocal.pd(['parsing reductive note', rn])
+                                #environLocal.pd(['parsing reductive note', rn])
                                 # use id, lyric text as hash
                                 key = str(id(n)) + l.text
                                 self._reductiveNotes[key] = rn
@@ -311,8 +311,9 @@ class ScoreReduction(object):
             inst.partName = gName
             g.insert(0, inst)
             gMeasures = g.getElementsByClass('Measure')
-            for m in gMeasures._elements:
-                m.clef = clef.TrebleClef()
+#             for m in gMeasures._elements:
+#                 print gName, m
+#                 m.clef = clef.TrebleClef()
             # TODO: insert into note or chord
             for key, rn in self._reductiveNotes.items():
                 if oneGroup or rn['group'] == gName:
@@ -423,10 +424,15 @@ class Test(unittest.TestCase):
         s.parts[1].flat.notes[2].addLyric('::/o:4/v:2/tb:a')
 
         sr = analysis.reduction.ScoreReduction()
-        sr.score = s.measures(0, 10)
+        extract = s.measures(0, 10)
+        #extract.show()
+        sr.score = extract
+        #sr.score = s
         post = sr.reduce()
+        #post.show()
+        self.assertEqual(len(post.parts), 5)
         match = [n for n in post.parts[0].flat.notes]
-        self.assertEqual(str(match), '[<music21.note.Note F#>, <music21.chord.Chord E4 B4>, <music21.note.Note C#>]')
+        self.assertEqual(len(match), 3)
 
         
         #post.show()

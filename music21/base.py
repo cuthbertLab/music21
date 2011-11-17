@@ -110,7 +110,7 @@ if len(_missingImport) > 0:
 # define whether weakrefs are used for storage of object locations
 WEAKREF_ACTIVE = True
 
-DEBUG_CONTEXT = False
+#DEBUG_CONTEXT = False
 
 #-------------------------------------------------------------------------------
 class Music21Exception(Exception):
@@ -1300,7 +1300,7 @@ class DefinedContexts(object):
         OMIT_FROM_DOCS
         TODO: not sure if memo is properly working: need a test case
         '''
-        if DEBUG_CONTEXT: print 'Y: first call'
+        #if DEBUG_CONTEXT: print 'Y: first call'
         # in general, this should not be the first caller, as this method
         # is called from a Music21Object, not directly on the DefinedContexts
         # isntance. Nontheless, if this is the first caller, it is the first
@@ -1339,11 +1339,11 @@ class DefinedContexts(object):
         # if we could be sure that these objs do not have their own locations
         # and do not have the target class, we can skip
         for obj in objs:
-            if DEBUG_CONTEXT: print '\tY: getByClass: iterating objs:', id(obj), obj
+            #if DEBUG_CONTEXT: print '\tY: getByClass: iterating objs:', id(obj), obj
 
             if (classNameIsStr and obj.isFlat and 
                 obj._definedContexts.getSiteCount() == 1):
-                if DEBUG_CONTEXT: print '\tY: skipping flat stream that does not contain object:', id(obj), obj
+                #if DEBUG_CONTEXT: print '\tY: skipping flat stream that does not contain object:', id(obj), obj
                 #environLocal.pd(['\tY: skipping flat stream that does not contain object:'])
                 if not obj.hasElementOfClass(className, forceFlat=True):
                     continue # skip, not in this stream
@@ -2375,7 +2375,7 @@ class Music21Object(JSONSerializer):
         get elements for searching. The strings 'getElementAtOrBefore' and 'getElementBeforeOffset' are currently accepted. 
 
         '''
-        if DEBUG_CONTEXT: print 'X: first call; looking for:', className, id(self), self
+        #if DEBUG_CONTEXT: print 'X: first call; looking for:', className, id(self), self
         from music21 import stream # needed for exception matching
 
 #         if self.isStream and isinstance(className, str):
@@ -2405,15 +2405,15 @@ class Music21Object(JSONSerializer):
 
         if memo is None:
             memo = {} # intialize
-            if DEBUG_CONTEXT: print 'X: creating new memo'        
+            #if DEBUG_CONTEXT: print 'X: creating new memo'        
         #printMemo(memo, 'getContextByClass called by: %s %s' % (id(self), self))
-        if DEBUG_CONTEXT: print 'X: memo:', [(key, memo[key]) for key in memo.keys()]
+        #if DEBUG_CONTEXT: print 'X: memo:', [(key, memo[key]) for key in memo.keys()]
 
         post = None
         # first, if this obj is a Stream, we see if the class exists at or
         # before where the offsetOfCaller
 
-        if DEBUG_CONTEXT: print '\tX: entering if serialReverseSearch'
+        #if DEBUG_CONTEXT: print '\tX: entering if serialReverseSearch'
         if serialReverseSearch:
             # if this is a Stream and we have a caller, see if we 
             # can get the offset from within this Stream of the caller 
@@ -2440,11 +2440,7 @@ class Music21Object(JSONSerializer):
 
                 #environLocal.printDebug(['getContextByClass, serialReverseSearch', 'requesting semi flat from self:', self, id(self)])
 
-                # need to look for problematic cases where a semiFlat
-                # stores a Stream that has already been examined
-                # for now, cannot use cached semiFlat: leads to infinite loops
-                # TODO: get cached semiFlat to work if possible
-                if DEBUG_CONTEXT: print '\tX: getting semiFlat because self is Stream'
+                #if DEBUG_CONTEXT: print '\tX: getting semiFlat because self is Stream'
 
                 # using the cached semiFlat here can lead to an ever-
                 # increasing number of sites in the outermost semiflat
@@ -2470,7 +2466,7 @@ class Music21Object(JSONSerializer):
             if getOffsetOfCaller:
                 # in some cases we may need to try to get the offset of a semiFlat representation. this is necessary when a Measure
                 # is the caller. 
-                if DEBUG_CONTEXT: print '\tX: getting offset of caller'
+                #if DEBUG_CONTEXT: print '\tX: getting offset of caller'
 
                 #environLocal.printDebug(['getContextByClass(): trying to get offset of caller from a semi-flat representation', 'self', self, self.id, 'callerFirst', callerFirst, callerFirst.id])
 
@@ -2518,7 +2514,7 @@ class Music21Object(JSONSerializer):
                 # on successive calls
                 del semiFlat
 
-        if DEBUG_CONTEXT: print '\tX: about to call getByClass'
+        #if DEBUG_CONTEXT: print '\tX: about to call getByClass'
         if post is None: # still no match
             # this will call this method on all defined contexts, including
             # locations (one of which must be the activeSite)
