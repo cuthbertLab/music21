@@ -3050,29 +3050,21 @@ class Stream(music21.Music21Object):
         >>> from music21 import *
         >>> a = corpus.parse('bach/bwv324.xml')
         >>> b = a.parts[0].measures(4,6)
-        >>> len(b)
+        >>> len(b.getElementsByClass('Measure'))
         3
 
         '''
-        # create a dictionary of measure number, list of Meaures
-        # there may be more than one Measure with the same Measure number
-        mapRaw = {}
-        mNumbersUnique = [] # store just the numbers
-        mStream = self.getElementsByClass('Measure')
-
-        # TODO: calling .flat here causes unidentified problems in further
-        # processing of the returnObj; need to investigate further
-        #tempFlat = self.flat
-        #environLocal.printDebug(['measures(): post flat call', self, 'len(self.flat)', len(self.flat)])
-
         returnObj = self.__class__()
         returnObj.setDerivation(self)
         returnObj.derivationMethod = 'measures'
         returnObj.mergeAttributes(self) # get id and groups
         srcObj = self
 
-        # create empty bundle in case not created by other means
-        spannerBundle = spanner.SpannerBundle()
+        # create a dictionary of measure number: list of Meaures
+        # there may be more than one Measure with the same Measure number
+        mapRaw = {}
+        mNumbersUnique = [] # store just the numbers
+        mStream = self.getElementsByClass('Measure')
         # if we have no Measures defined, call makeNotation
         # this will  return a deepcopy of all objects
         if len(mStream) == 0:
@@ -3087,7 +3079,8 @@ class Stream(music21.Music21Object):
         # spanners may be store at the container/Part level, not w/n a measure
         # if they are within the Measure, or a voice, they will be transfered
         # below
-        #mStreamSpanners = self.spanners
+        # create empty bundle in case not created by other means
+        spannerBundle = spanner.SpannerBundle()
         if gatherSpanners:
             spannerBundle = srcObj.spannerBundle
 
@@ -3099,6 +3092,7 @@ class Stream(music21.Music21Object):
                 mNumber = int(m.number)
             except ValueError:
                 raise StreamException('found problematic measure number: %s' % mNumber)
+            # id combines suffice w/ number 
             mId = (mNumber, m.numberSuffix)
             # store unique measure numbers for reference
             if m.number not in mNumbersUnique:
@@ -3126,26 +3120,28 @@ class Stream(music21.Music21Object):
                     i += 1
         else:
             mapCooked = mapRaw
+
         #environLocal.printDebug(['mapCooked', mapCooked])
         #environLocal.printDebug(['len(mapCooked)', len(mapCooked)])
         startOffset = None # set with the first measure
         startMeasure = None # store for adding other objects
         # get requested range
         startMeasureNew = None
-
         # if end not specified, get last
-        if numberEnd == None:
+        if numberEnd is None:
             numberEnd = max([x for x,y in mapCooked])
         #environLocal.pd(['numberStart', numberStart, 'numberEnd', numberEnd])
 
         for i in range(numberStart, numberEnd+1):
             match = None
+            # do not know if we have suffixes for the number
             for number, suffix in mapCooked.keys():
                 # this will match regardless of suffix
                 # numbers may be strings still
                 if number == i:
                     match = mapCooked[(number, suffix)]
                     break
+            # numbers may not be contiguous
             if match is None: # None found in this range
                 continue 
             # need to make offsets relative to this new Stream
@@ -3162,52 +3158,64 @@ class Stream(music21.Music21Object):
                 oldOffset = m.getOffsetBySite(srcObj)
                 # create a new Measure container, but populate it 
                 # with the same elements
-                mNew = Measure()
-                mNew.mergeAttributes(m)
-                # replace any spanner associations with this measure
-                if len(spannerBundle) > 0:
-                    spannerBundle.replaceComponent(m, mNew)
-                # active sites get mangled somewhere
-                m.restoreActiveSites()
-                # will only set on first time through
-                if startMeasureNew is None:
-                    startMeasureNew = mNew
 
-                # transfer elements to the new measure; these are not copies
-                # this might contain voices and/or spanners
-                for e in m._elements:
-                    mNew.insert(e) # NOTE: cannot use _insertCore here
-                for e in m._endElements:
-                    #mNew.storeAtEnd(e)
-                    mNew._storeAtEndCore(e)
-
-                # subtract the offset of the first measure
-                # this will be zero in the first usage
+                # using the same measure in the return obj
                 newOffset = oldOffset - startOffset
-                returnObj._insertCore(newOffset, mNew)
-                mNew._elementsChanged()
-                #environLocal.printDebug(['old/new offset', oldOffset, newOffset])
+                returnObj._insertCore(newOffset, m)
+            
+
+#                 mNew = Measure()
+#                 mNew.mergeAttributes(m)
+#                 # replace any spanner associations with this measure
+#                 if len(spannerBundle) > 0:
+#                     spannerBundle.replaceComponent(m, mNew)
+#                 # active sites get mangled somewhere
+#                 m.restoreActiveSites()
+#                 # will only set on first time through
+#                 if startMeasureNew is None:
+#                     startMeasureNew = mNew
+# 
+#                 # transfer elements to the new measure; these are not copies
+#                 # this might contain voices and/or spanners
+#                 for e in m._elements:
+#                     mNew.insert(e) # NOTE: cannot use _insertCore here
+#                 for e in m._endElements:
+#                     #mNew.storeAtEnd(e)
+#                     mNew._storeAtEndCore(e)
+# 
+#                 # subtract the offset of the first measure
+#                 # this will be zero in the first usage
+#                 newOffset = oldOffset - startOffset
+#                 returnObj._insertCore(newOffset, mNew)
+#                 mNew._elementsChanged()
+#                 #environLocal.printDebug(['old/new offset', oldOffset, newOffset])
 
         # manipulate startMeasure to add desired context objects
         for className in collect:
             # first, see if it is in this Measure
             if startMeasure.hasElementOfClass(className):
                 continue
-            # search the flat caller stream, which is usually a Part
-            # need to search self, as we ne need to get the instrument
+
+            # placing missing objects in outer container, not Measure
             found = srcObj.flat.getElementAtOrBefore(startOffset, [className])
             if found is not None:
-                startMeasureNew._insertCore(0, found)
+                returnObj._insertCore(0, found)
 
-            # if still not found
-            # do a context search for the class, searching all stored
-            # locations: this is very time consuming on large scores
-            if found is not None and searchContext:
-                found = startMeasure.getContextByClass(className)
-                startMeasureNew._insertCore(0, found)
-  
-        # as we have inserted elements, need to call
-        startMeasureNew._elementsChanged()
+            # search the flat caller stream, which is usually a Part
+            # need to search self, as we ne need to get the instrument
+#             found = srcObj.flat.getElementAtOrBefore(startOffset, [className])
+#             if found is not None:
+#                 startMeasureNew._insertCore(0, found)
+# 
+#             # if still not found
+#             # do a context search for the class, searching all stored
+#             # locations: this is very time consuming on large scores
+#             if found is not None and searchContext:
+#                 found = startMeasure.getContextByClass(className)
+#                 startMeasureNew._insertCore(0, found)
+#   
+#         # as we have inserted elements, need to call
+#         startMeasureNew._elementsChanged()
         
         if gatherSpanners:
             for sp in spannerBundle:
@@ -3225,8 +3233,8 @@ class Stream(music21.Music21Object):
 
 
     def measure(self, measureNumber, 
-        collect=[clef.Clef, meter.TimeSignature, 
-        instrument.Instrument, key.KeySignature]):
+        collect=['Clef', 'TimeSignature', 'Instrument', 'KeySignature'], 
+        searchContext=False):
         '''Given a measure number, return a single :class:`~music21.stream.Measure` object if the Measure number exists, otherwise return None.
 
         This method is distinguished from :meth:`~music21.stream.Stream.measures` in that this method returns a single Measure object, not a Stream containing one or more Measure objects.
@@ -3240,7 +3248,8 @@ class Stream(music21.Music21Object):
         # representation (e.g., this is a Stream or Part, not a Score)
         if len(self.getElementsByClass('Measure')) >= 1:
             #environLocal.printDebug(['got measures from getElementsByClass'])
-            s = self.measures(measureNumber, measureNumber, collect=collect)
+            s = self.measures(measureNumber, measureNumber, collect=collect, 
+                              searchContext=searchContext)
             if len(s) == 0:
                 return None
             else:
@@ -3886,9 +3895,9 @@ class Stream(music21.Music21Object):
         >>> from music21 import *
         >>> qj = corpus.parse('ciconia/quod_jactatur').parts[0]
         >>> qj.measures(1,2).show('text')
+        {0.0} <music21.instrument.Instrument P1: MusicXML Part: Grand Piano>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.Treble8vbClef>
-            {0.0} <music21.instrument.Instrument P1: MusicXML Part: Grand Piano>
             {0.0} <music21.key.KeySignature of 1 flat>
             {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.layout.SystemLayout>
@@ -3904,9 +3913,9 @@ class Stream(music21.Music21Object):
         >>> qj.getElementsByClass(stream.Measure)[1].insert(0, key.KeySignature(5))
         >>> qj2 = qj.invertDiatonic(note.Note('F4'), inPlace = False)
         >>> qj2.measures(1,2).show('text')
+        {0.0} <music21.instrument.Instrument P1: MusicXML Part: Grand Piano>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.Treble8vbClef>
-            {0.0} <music21.instrument.Instrument P1: MusicXML Part: Grand Piano>
             {0.0} <music21.key.KeySignature of 3 flats>
             {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.layout.SystemLayout>
@@ -10331,7 +10340,8 @@ class Score(Stream):
 
         >>> from music21 import corpus
         >>> a = corpus.parse('bach/bwv324.xml')
-        >>> len(a.measure(3)[0]) # contains 1 measure
+        >>> # contains 1 measure
+        >>> len(a.measure(3).parts[0].getElementsByClass('Measure')) 
         1
         '''
 
@@ -12079,15 +12089,19 @@ class Test(unittest.TestCase):
     def testMeasureRange(self):
         from music21 import corpus
         a = corpus.parse('bach/bwv324.xml')
-        b = a[3].measures(4,6)
-        self.assertEqual(len(b), 3) 
+        b = a.parts[3].measures(4,6)
+        self.assertEqual(len(b.getElementsByClass('Measure')), 3) 
         #b.show('t')
         # first measure now has keu sig
-        self.assertEqual(len(b[0].getElementsByClass(key.KeySignature)), 1) 
+        bMeasureFirst = b.getElementsByClass('Measure')[0]
+        
+        self.assertEqual(len(b.flat.getElementsByClass(
+            key.KeySignature)), 1) 
         # first measure now has meter
-        self.assertEqual(len(b[0].getElementsByClass(meter.TimeSignature)), 1) 
+        self.assertEqual(len(b.flat.getElementsByClass(
+            meter.TimeSignature)), 1) 
         # first measure now has clef
-        self.assertEqual(len(b[0].getElementsByClass(clef.Clef)), 1) 
+        self.assertEqual(len(b.flat.getElementsByClass(clef.Clef)), 1) 
 
         #b.show()       
         # get first part
@@ -12100,7 +12114,7 @@ class Test(unittest.TestCase):
         # get measure by using method; this will add elements
         mEx = p1.measure(6)
         self.assertEqual(str([n for n in mEx.notes]), '[<music21.note.Note B>, <music21.note.Note D>]')
-        self.assertEqual(len(mEx.flat), 7)
+        self.assertEqual(len(mEx.flat), 3)
         
         # make sure source has not chnaged
         mExRaw = p1.getElementsByClass('Measure')[5]
@@ -15838,8 +15852,10 @@ class Test(unittest.TestCase):
         self.assertEqual(len(m2Raw.flat), 9)
 
         # get a measure from this part
-        m1 = p1.measure(2)
-        self.assertEqual(len(m1.flat.getElementsByClass('Clef')), 1)
+        # NOTE: we no longer get Clef here, as we return clefs in the 
+        # Part outside of a Measure when using measures()
+        #m1 = p1.measure(2)
+        #self.assertEqual(len(m1.flat.getElementsByClass('Clef')), 1)
 
         # look at individual measure; check counts; these should not
         # change after measure extraction
@@ -15854,7 +15870,7 @@ class Test(unittest.TestCase):
 
         #m2Raw.show('t')
 
-        self.assertEqual(len(m1.flat.getElementsByClass('Clef')), 1)
+        #self.assertEqual(len(m1.flat.getElementsByClass('Clef')), 1)
         ex1 = p1.measures(1,3)
         self.assertEqual(len(ex1.flat.getElementsByClass('Clef')), 1)
 
@@ -15864,7 +15880,8 @@ class Test(unittest.TestCase):
             # need to look in measures to get at voices
             self.assertEqual(len(p.getElementsByClass('Measure')[0].voices), 2)
             self.assertEqual(len(p.measure(2).voices), 2)
-            self.assertEqual(len(p.measures(1,3)[2].voices), 2)
+            self.assertEqual(len(p.measures(
+                1,3).getElementsByClass('Measure')[2].voices), 2)
 
         #s1.show()
         #p1.show()
@@ -17453,7 +17470,20 @@ class Test(unittest.TestCase):
 
 
     def testMeasuresA(self):
-        pass
+        from music21 import corpus
+        s = corpus.parse('bwv66.6')
+        ex = s.parts[0].measures(3,6)
+        self.assertEqual(str(ex.flat.getElementsByClass('Clef')[0]), '<music21.clef.TrebleClef>')
+        self.assertEqual(str(ex.flat.getElementsByClass('Instrument')[0]), 'P1: Soprano: Instrument 1')
+        
+        # check that we have the exact same Measure instance
+        mTarget = s.parts[0].getElementsByClass('Measure')[3]
+        self.assertEqual(id(ex.getElementsByClass('Measure')[0]), id(mTarget))
+
+
+        
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

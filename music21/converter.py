@@ -905,13 +905,7 @@ class Converter(object):
         >>> c = converter.Converter()
         >>> c.parseURL(jeanieLightBrownURL)
         >>> jeanieStream = c.stream
-        >>> jeanieStream.parts[0].measure(2).show('text')
-        {0.0} <music21.bar.Repeat direction=start>
-        {0.0} <music21.clef.TrebleClef>
-        {0.0} <music21.instrument.Instrument P1: : >
-        {0.0} <music21.key.KeySignature of no sharps or flats>
-        {0.0} <music21.meter.TimeSignature 4/4>
-        {0.0} <music21.harmony.ChordSymbol kind=major () root=F bass=None inversion=None duration=0.0>
+        >>> jeanieStream.parts[0].measure(2).notes.show('text')
         {0.0} <music21.note.Note C>
         {3.0} <music21.note.Note A>
         '''
