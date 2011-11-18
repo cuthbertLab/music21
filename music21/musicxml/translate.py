@@ -1514,12 +1514,7 @@ def chordToMx(c):
             # get notehead object
             #nh = c.getNotehead(n.pitch)
             nh = n.notehead
-
             mxNote.noteheadObj = noteheadToMxNotehead(n)
-#             environLocal.printDebug(['parsed mx notehead', mxNote.noteheadObj])
-#             environLocal.printDebug(['n.stemDirection', n.stemDirection])
-#             environLocal.printDebug(['c.stemDirection', c.stemDirection])
-
             #get the stem direction from the chord, not the pitch
             if c.stemDirection != 'unspecified':
                 if c.stemDirection in ['noStem', None]:
@@ -1770,34 +1765,21 @@ def noteheadToMxNotehead(obj):
     >>> mxN4._attr['parentheses']
     'yes'
     '''
-    
     from music21 import note # needed for note.noteheadTypeNames
-
     mxNotehead = musicxmlMod.Notehead()
-
     nh = None
     nhFill = 'default'
     nhParen = False
     
     nh = 'normal'
-#     if 'Pitch' in obj.classes:
-#         if overRiddenNotehead is not None:
-#             nh = overRiddenNotehead
     if hasattr(obj, 'notehead'):
         nh = obj.notehead
         
     nhFill = 'default'
-#     if 'Pitch' in obj.classes:
-#         if overRiddenNoteheadFill is not None:
-#             nhFill = overRiddenNoteheadFill
     if hasattr(obj, 'noteheadFill'):
         nhFill = obj.noteheadFill
-    #environLocal.pd(['nhFill', nhFill])        
 
     nhParen = False
-#     if 'Pitch' in obj.classes:
-#         if overRiddenNoteheadParen is not None:
-#             nhParen = overRiddenNoteheadParen
     if hasattr(obj, 'noteheadParen'):
         nhParen = obj.noteheadParen
     
@@ -1807,17 +1789,12 @@ def noteheadToMxNotehead(obj):
         # should only set if needed, otherwise creates extra mxl data
         #if nh not in ['normal']: 
         mxNotehead.set('charData', nh)
-        
     if nhFill != 'default':
-        mxNotehead._attr['filled'] = nhFill
-    
-    if nhParen != False:
-        mxNotehead._attr['parentheses'] = nhParen
-
-    # -- Music Hack Day - color is now set in nothead object
-    if obj.color:
-        mxNotehead._attr['color'] = obj.color
-        
+        mxNotehead.set('filled', nhFill)
+    if nhParen is not False:
+        mxNotehead.set('parentheses', nhParen)
+    if obj.color is not None:
+        mxNotehead.set('color', obj.color)
     return mxNotehead
 
 def noteToMxNotes(n, spannerBundle=None):
@@ -1852,14 +1829,13 @@ def noteToMxNotes(n, spannerBundle=None):
     #for mxNote in n.duration.mx: # returns a list of mxNote objs
         # merge method returns a new object; but can use existing here
         mxNote = mxNote.merge(pitchMx, returnDeepcopy=False)
-        # get color from within .editorial using attribute
-        if noteColor != "":
-            pass
-            #mxNote.set('color', noteColor)  -- Music Hack Day - Color is set in notheadToMxNotehead
+        # get color from within .editorial using property
+        # only set note-level color for rests, otherwise set notehead
+        if noteColor is not None and n.isRest:
+            mxNote.set('color', noteColor)
         if n.hideObjectOnPrint == True:
             mxNote.set('printObject', "no")
             mxNote.set('printSpacing', "yes")
-
         mxNoteList.append(mxNote)
 
     # note: lyric only applied to first note
@@ -1883,7 +1859,6 @@ def noteToMxNotes(n, spannerBundle=None):
 
     # need to apply beams to notes, but application needs to be
     # reconfigured based on what is gotten from n.duration.mx
-
     # likely, this means that many continue beams will need to be added
 
     # this is setting the same beams for each part of this 
@@ -1914,8 +1889,6 @@ def noteToMxNotes(n, spannerBundle=None):
             else:
                 mxNoteList[0].notationsObj.componentList.append(expObj.mx)
 
-    
-
     if spannerBundle is not None:
         # already filtered for just the spanner that have this note as
         # a component
@@ -1937,9 +1910,9 @@ def noteToMxNotes(n, spannerBundle=None):
             mxNoteList[0].notationsObj.componentList.append(mxSlur)
             
     #Adds the notehead type if it is not set to the default 'normal'.
-    # -- Music Hack Day - Color is set in notheadToMxNotehead
-    if n.notehead != 'normal' or n.noteheadFill != 'default' or n.color:
-       mxNoteList[0].noteheadObj = noteheadToMxNotehead(n)
+    if (n.notehead != 'normal' or n.noteheadFill != 'default' or 
+        n.color is not None):
+        mxNoteList[0].noteheadObj = noteheadToMxNotehead(n)
     
     #If the stem direction is not 'unspecified'    
     if n.stemDirection != 'unspecified':
@@ -2781,8 +2754,6 @@ def measureToMusicXML(m):
     >>> m = stream.Measure()
     >>> m.repeatAppend(note.Note('g3'), 4)
     >>> post = musicxml.translate.measureToMusicXML(m)
-    >>> post[-100:].replace('\\n', '')
-    ' <type>quarter</type>        <notations/>      </note>    </measure>  </part></score-partwise>'
     '''
     from music21 import stream, duration
     # search for time signatures, either defined locally or in context
@@ -4449,6 +4420,26 @@ spirit</words>
         self.assertEqual(raw.count('<mordent/>'), 2)
 
 
+    def testNoteColorA(self):
+        from music21 import note, stream
+        n1 = note.Note()
+        n2 = note.Note()
+        n2.color = '#ff1111'
+        n3 = note.Note()
+        n3.color = '#1111ff'
+        r1 = note.Rest()
+        r1.color = '#11ff11'
+        s = stream.Stream()
+        s.append([n1, n2, n3, r1])
+        #s.show()
+
+        raw = s.musicxml
+        # three color indications
+        self.assertEqual(raw.count("color="), 3)
+        # color set at note level only for rest, so only 1
+        self.assertEqual(raw.count('note color="#11ff11"'), 1)
+    
+        
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
