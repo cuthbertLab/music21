@@ -10304,8 +10304,7 @@ class Score(Stream):
         ''')
 
     def measures(self, numberStart, numberEnd, 
-        collect=[clef.Clef, meter.TimeSignature, 
-        instrument.Instrument, key.KeySignature], gatherSpanners=True):
+        collect=['Clef', 'TimeSignature', 'Instrument', 'KeySignature'], gatherSpanners=True, searchContext=False):
         '''This method override the :meth:`~music21.stream.Stream.measures` method on Stream. This creates a new Score stream that has the same measure range for all Parts.
         '''
         post = Score()
@@ -17473,6 +17472,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
         ex = s.parts[0].measures(3,6)
+
         self.assertEqual(str(ex.flat.getElementsByClass('Clef')[0]), '<music21.clef.TrebleClef>')
         self.assertEqual(str(ex.flat.getElementsByClass('Instrument')[0]), 'P1: Soprano: Instrument 1')
         
@@ -17481,7 +17481,14 @@ class Test(unittest.TestCase):
         self.assertEqual(id(ex.getElementsByClass('Measure')[0]), id(mTarget))
 
 
-        
+        for m in ex.getElementsByClass('Measure'):
+            for n in m.notes:
+                if n.name == 'B':
+                    o = n.getOffsetBySite(m)
+                    m.remove(n)
+                    r = note.Rest(quarterLength=n.quarterLength)
+                    m.insert(o, r)
+        #s.parts[0].show()
 
 
 
