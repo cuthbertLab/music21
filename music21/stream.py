@@ -17492,6 +17492,28 @@ class Test(unittest.TestCase):
         #s.parts[0].show()
 
 
+    def testMeasuresB(self):
+        from music21 import corpus
+        s = corpus.parse('luca/gloria')
+        y = s.measures(50,90)
+
+        self.assertEqual(len(
+            y.parts[0].flat.getElementsByClass('TimeSignature')), 2)
+        # make sure that ts is being found in musicxml score generation
+        # as it is in the Part, and not the Measure, this req an extra check
+        raw = y.parts[0].musicxml
+        match = """        <time>
+          <beats>2</beats>
+          <beat-type>4</beat-type>
+        </time>
+        """        
+        raw = raw.replace(' ', '')
+        raw = raw.replace('\n', '')
+        match = match.replace(' ', '')
+        match = match.replace('\n', '')
+
+        self.assertEqual(raw.find(match)>0, True)
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

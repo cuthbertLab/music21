@@ -1510,9 +1510,6 @@ def chordToMx(c):
             if chordPos > 0:
                 mxNote.set('chord', True)
             # get color from within .editorial using attribute
-            # mxNote.set('color', c.color) -- Music Hack Day - Color is set in notheadToMxNotehead
-            # get notehead object
-            #nh = c.getNotehead(n.pitch)
             nh = n.notehead
             mxNote.noteheadObj = noteheadToMxNotehead(n)
             #get the stem direction from the chord, not the pitch
@@ -2821,9 +2818,7 @@ def streamPartToMx(part, instStream=None, meterStream=None,
     # may need to be semi flat?
     measureStream = part.getElementsByClass('Measure')
     if len(measureStream) == 0:
-
         part.makeMutable() # must mutate
-
         # try to add measures if none defined
         # returns a new stream w/ new Measures but the same objects
         measureStream = part.makeNotation(meterStream=meterStream,
@@ -2844,16 +2839,22 @@ def streamPartToMx(part, instStream=None, meterStream=None,
         # check that first measure has any atributes in outer Stream
         # this is for non-standard Stream formations (some kern imports)
         # that place key/clef information in the containing stream
-        if measureStream[0].clef == None:
+
+        if measureStream[0].clef is None:
             measureStream[0].makeMutable() # must mutate
             outerClefs = part.getElementsByClass('Clef')
             if len(outerClefs) > 0:
                 measureStream[0].clef = outerClefs[0]
-        if measureStream[0].keySignature == None:
+        if measureStream[0].keySignature is None:
             measureStream[0].makeMutable() # must mutate
             outerKeySignatures = part.getElementsByClass('KeySignature')
             if len(outerKeySignatures) > 0:
                 measureStream[0].keySignature = outerKeySignatures[0]
+        if measureStream[0].timeSignature is None:
+            measureStream[0].makeMutable() # must mutate
+            outerTimeSignatures = part.getElementsByClass('TimeSignature')
+            if len(outerTimeSignatures) > 0:
+                measureStream[0].timeSignature = outerTimeSignatures[0]
 
         # see if accidentals/beams can be processed
         if not measureStream.haveAccidentalsBeenMade():
