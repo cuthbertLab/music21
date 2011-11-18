@@ -17490,6 +17490,7 @@ class Test(unittest.TestCase):
                     r = note.Rest(quarterLength=n.quarterLength)
                     m.insert(o, r)
         #s.parts[0].show()
+        self.assertEqual(len(ex.flat.getElementsByClass('Rest')), 5)
 
 
     def testMeasuresB(self):
@@ -17513,6 +17514,22 @@ class Test(unittest.TestCase):
         match = match.replace('\n', '')
 
         self.assertEqual(raw.find(match)>0, True)
+
+
+    def testMeasuresC(self):
+        from music21 import corpus
+        s = corpus.parse('bwv66.6')
+        ex = s.parts[0].measures(3,6)
+        for n in ex.recurse(classFilter=['Note']):
+            if n.name == 'B':
+                o = n.offset
+                site = n.activeSite
+                n.activeSite.remove(n)
+                r = note.Rest(quarterLength=n.quarterLength)
+                site.insert(o, r)
+        self.assertEqual(len(ex.flat.getElementsByClass('Rest')), 5)
+        #ex.show()
+
 
 
 #-------------------------------------------------------------------------------
