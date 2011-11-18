@@ -17406,6 +17406,7 @@ class Test(unittest.TestCase):
         import math
 
         s = corpus.parse('bwv66.6')
+        #s.show()
         p = s.parts[0]
         for m in p.getElementsByClass('Measure'):
             for n in m.notes:
@@ -17416,7 +17417,7 @@ class Test(unittest.TestCase):
                     m.insert(targetOffset, r)
         # if we iterate, we get a sorted version
         #self.assertEqual([str(n) for n in p.flat.notesAndRests], [])
-
+        
         # when we just call show(), we were not geting a sorted version;
         # this was due to making the stream immutable before sorting
         # this is now fixed

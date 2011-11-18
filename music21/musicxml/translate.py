@@ -1793,7 +1793,7 @@ def noteheadToMxNotehead(obj):
         mxNotehead.set('filled', nhFill)
     if nhParen is not False:
         mxNotehead.set('parentheses', nhParen)
-    if obj.color is not None:
+    if obj.color not in [None, '']:
         mxNotehead.set('color', obj.color)
     return mxNotehead
 
@@ -1911,7 +1911,7 @@ def noteToMxNotes(n, spannerBundle=None):
             
     #Adds the notehead type if it is not set to the default 'normal'.
     if (n.notehead != 'normal' or n.noteheadFill != 'default' or 
-        n.color is not None):
+        n.color not in [None, '']):
         mxNoteList[0].noteheadObj = noteheadToMxNotehead(n)
     
     #If the stem direction is not 'unspecified'    
@@ -1920,7 +1920,6 @@ def noteToMxNotes(n, spannerBundle=None):
             mxNoteList[0].stem = 'none'
         else:
             mxNoteList[0].stem = n.stemDirection
-        
 
     return mxNoteList
 
@@ -1941,10 +1940,9 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
         n = note.Note()
     else:
         n = inputM21
- 
     # doing this will create an instance, but will not be passed
     # out of this method, and thus is only for testing
-    if spannerBundle == None:
+    if spannerBundle is None:
         #environLocal.printDebug(['mxToNote()', 'creating SpannerBundle'])
         spannerBundle = spanner.SpannerBundle()
 
@@ -1965,8 +1963,12 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
     n.beams.mx = mxNote.beamList
     
     mxStem = mxNote.get('stem')
-    if mxStem != None:
+    if mxStem is not None:
         n.stemDirection = mxStem
+
+    # get color from Note forst; if not, try to get from notehead
+    if mxNote.get('color') is not None:
+        n.color = mxNote.get('color')
 
     # can use mxNote.tieList instead
     mxTieList = mxNote.get('tieList')
@@ -1977,10 +1979,9 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
         n.tie = tieObj
 
     # things found in notations object:
-    # articulations
-    # slurs
+    # articulations, slurs
     mxNotations = mxNote.get('notationsObj')
-    if mxNotations != None:
+    if mxNotations is not None:
         # get a list of mxArticulationMarks, not mxArticulations
         mxArticulationMarkList = mxNotations.getArticulations()
         for mxObj in mxArticulationMarkList:
@@ -1994,7 +1995,6 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
             fermataObj = expressions.Fermata()
             fermataObj.mx = mxObj
             n.expressions.append(fermataObj)
-
             #environLocal.printDebug(['_setMX(), n.mxFermataList', mxFermataList])
 
         # get slurs; requires a spanner bundle
@@ -2024,14 +2024,15 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
             if mxObj.get('type') == 'stop':
                 su.completeStatus = True
                 # only add after complete
-                
 
             #environLocal.printDebug(['got slur:', su, mxObj.get('placement'), mxObj.get('number')])
     
     # gets the notehead object from the mxNote and sets value of the music21 note to the value of the notehead object        
     mxNotehead = mxNote.get('noteheadObj')
-    if mxNotehead != None:
+    if mxNotehead is not None:
         n.notehead = mxNotehead.charData
+        if mxNotehead.get('color') is not None:
+            n.color = mxNotehead.get('color')
 
     return n
 
@@ -2074,6 +2075,10 @@ def mxToRest(mxNote, inputM21=None):
     except duration.DurationException:
         environLocal.printDebug(['failed extaction of duration from musicxml', 'mxNote:', mxNote, r])
         raise
+
+    if mxNote.get('color') is not None:
+        r.color = mxNote.get('color')
+
     return r
 
 
@@ -2757,30 +2762,10 @@ def measureToMusicXML(m):
     '''
     from music21 import stream, duration
     # search for time signatures, either defined locally or in context
-
     #environLocal.printDebug(['measureToMusicXML', m]) 
-
     # we already have a deep copy passed in, which happens in 
     # stream.Measure._getMusicXML()
     m.makeNotation(inPlace=True)
-
-# this is now in Measure.makeNotation
-#     found = m.getTimeSignatures(returnDefault=False)
-#     if len(found) == 0:
-#         try:
-#             ts = m.bestTimeSignature()
-#         # may raise an exception if cannot find a rational match
-#         except stream.StreamException:
-#             ts = None # get the default
-#     else:
-#         ts = found[0]
-
-    # might similarly look for key signature, instrument, and clef
-    # must copy here b/c do not want to alter original, and need to set
-    # new objects in some cases (time signature, etc)
-#     mCopy = copy.deepcopy(m)    
-#     if ts != None:
-#         mCopy.timeSignature = ts
 
     out = stream.Part()
     out.append(m)
@@ -4242,7 +4227,6 @@ spirit</words>
         from music21.musicxml import testPrimitive        
 
         s = converter.parse(testPrimitive.transposing01)
-
         self.assertEqual(len(s.flat.getElementsByClass('Instrument')), 7)
         #s.show()
 
@@ -4251,7 +4235,6 @@ spirit</words>
 
 
     def testHarmonyA(self):
-
         from music21.musicxml import testPrimitive        
         from music21 import converter, corpus
 
@@ -4398,7 +4381,6 @@ spirit</words>
 
     def testOrnamentA(self):
         from music21 import stream, note, expressions, chord
-
         s = stream.Stream()
         s.repeatAppend(note.Note(), 4)
         s.repeatAppend(chord.Chord(['c4','g5']), 4)
@@ -4439,7 +4421,17 @@ spirit</words>
         # color set at note level only for rest, so only 1
         self.assertEqual(raw.count('note color="#11ff11"'), 1)
     
-        
+
+    def testNoteColorB(self):
+        from music21 import converter, stream
+        from music21.musicxml import testPrimitive        
+
+        s = converter.parse(testPrimitive.colors01)
+        #s.show()
+        raw = s.musicxml
+        self.assertEqual(raw.count("color="), 3)
+        # color set at note level only for rest, so only 1
+        self.assertEqual(raw.count('note color="#11ff11"'), 1)
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
