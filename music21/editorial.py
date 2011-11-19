@@ -74,7 +74,7 @@ class NoteEditorial(object):
     
     def __init__(self):
         self.ficta = None  # Accidental object -- N.B. for PRINTING only not for determining intervals
-        self.color = ""
+        self.color = None
         self.misc  = {}
         self.harmonicInterval = None
         self.harmonicIntervals = []

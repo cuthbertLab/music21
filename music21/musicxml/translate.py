@@ -1494,13 +1494,11 @@ def chordToMx(c):
     >>> listOfMxNotes[1].noteheadObj.get('charData')
     'diamond'
     
-    
     '''
     #environLocal.printDebug(['chordToMx', c])
     mxNoteList = []
     durPos = 0 # may have more than one dur
     mxDurationNotes = durationToMx(c.duration)
-    #durPosLast = len(c.duration.mx) - 1
     durPosLast = len(mxDurationNotes) - 1
     for mxNoteBase in mxDurationNotes: # returns a list of mxNote objs
         # merge method returns a new object
@@ -1513,12 +1511,14 @@ def chordToMx(c):
             mxNote = mxNote.merge(n.pitch.mx, returnDeepcopy=False)
             if chordPos > 0:
                 mxNote.set('chord', True)
-            # get color from within .editorial using attribute
-            nh = n.notehead
+            # if we do not have a component color, set color from the chord
+            # working with a deepcopy, so this change is ok
+            if n.color is None:
+                n.color = c.color
             mxNote.noteheadObj = noteheadToMxNotehead(n)
             #get the stem direction from the chord, not the pitch
             if c.stemDirection != 'unspecified':
-                if c.stemDirection in ['noStem', None]:
+                if c.stemDirection in ['noStem']:
                     mxNote.stem = 'none'
                 else:
                     mxNote.stem = c.stemDirection
@@ -1526,26 +1526,22 @@ def chordToMx(c):
             elif c.stemDirection == 'unspecified':
                 if n.stemDirection != 'unspecified':
                     #environLocal.printDebug(['found specified component stemdirection', n.stemDirection])
-                    if n.stemDirection in ['noStem', None]:
+                    if n.stemDirection in ['noStem']:
                         mxNote.stem = 'none'
                     else:
                         mxNote.stem = n.stemDirection            
 
             #environLocal.pd(['final note stem', mxNote.stem])
             # only add beam to first note in group
-            if c.beams != None and chordPos == 0:
+            if c.beams is not None and chordPos == 0:
                 mxNote.beamList = c.beams.mx
 
             # if this note, not a component duration,
             # need to add this to the last-encountered mxNote
-
             # get mxl objs from tie obj
-            #mxTieList, mxTiedList = c.tie.mx 
-            #tieObj = c.getTie(n.pitch) # get for each pitch
             tieObj = n.tie
             if tieObj is not None:
                 #environLocal.printDebug(['chordToMx: found tie for pitch', pitchObj])
-
                 mxTieList, mxTiedList = tieObj.mx 
                 # if starting a tie, add to all mxNotes in the chord
                 # but only add to the last duration in the dur group
@@ -1559,7 +1555,6 @@ def chordToMx(c):
                     mxNote.notationsObj.componentList += mxTiedList
                 else:
                     pass
-                    #environLocal.printDebug(['rejecting tie creation', 'tieObj.type', tieObj.type, 'durPos', durPos])
             chordPos += 1
             mxNoteChordGroup.append(mxNote)
         
@@ -1577,10 +1572,6 @@ def chordToMx(c):
     for i in range(len(c.articulations)):
         obj = c.articulations[i]
         if hasattr(obj, 'mx'):
-#             if i == 0: # assign first
-#                 mxArticulations = obj.mx # mxArt... stores more than one artic
-#             else: # concatenate any remaining
-#                 mxArticulations += obj.mx
             mxArticulations.append(obj.mx)
     #if mxArticulations != None:
     if len(mxArticulations) > 0:
@@ -1597,9 +1588,6 @@ def chordToMx(c):
                 mxNoteList[0].notationsObj.componentList.append(ornamentsObj)
             else: 
                 mxNoteList[0].notationsObj.componentList.append(obj.mx)
-
-    #environLocal.pd(['final note list', mxNoteList])
-
     return mxNoteList
 
 def mxToChord(mxNoteList, inputM21=None):
@@ -1667,11 +1655,9 @@ def mxToChord(mxNoteList, inputM21=None):
         p = pitch.Pitch()
         p.mx = mxNote # will extract pitch info from mxNote
         pitches.append(p)
-        
-        #extract notehead objects
+        #extract notehead objects; may be None
         nh = mxNote.get('noteheadObj')
         noteheads.append(nh)
-
         #extract stem directions
         stemDir = mxNote.get('stem')
         stemDirs.append(stemDir)
@@ -1685,7 +1671,6 @@ def mxToChord(mxNoteList, inputM21=None):
             ties.append(None)
     # set all at once
     c.pitches = pitches
-
     # set beams from first note of chord
     c.beams.mx = mxNoteList[0].beamList
 
@@ -1693,15 +1678,13 @@ def mxToChord(mxNoteList, inputM21=None):
     for i, t in enumerate(ties):
         if t is not None:
             # provide pitch to assign tie to based on index number
-            c.setTie(t, pitches[i])
-            
+            c.setTie(t, pitches[i]) 
     #set notehead based on pitches
-    index = 0
-    for obj in noteheads:
+    for index, obj in enumerate(noteheads):
         if obj is not None:
             c.setNotehead(obj.charData, c.pitches[index])
-        index+=1
-        
+            # set color per pitch
+            c.setColor(obj.get('color'), c.pitches[index])
     #set stem direction based upon pitches
     index2 = 0
     for obj2 in stemDirs:
@@ -1737,17 +1720,10 @@ def generalNoteToMusicXML(n):
     # call the musicxml property on Stream
     return out.musicxml
     
-def noteheadToMxNotehead(obj):
+def noteheadToMxNotehead(obj, defaultColor=None):
     '''
     Translate a music21 :class:`~music21.note.Note` object or :class:`~music21.pitch.Pitch` object to a
     into a musicxml.Notehead object.
-    
-    
-    If a pitch object is given then (since it doesn't store its own notehead)
-    the notehead must be given as a string via overRiddenNotehead. Similarly, because a pitch
-    can't store information about any other attributes (such as fill status or whether or not
-    it's on parentheses), that information is passed in from overRiddenNoteheadAttr.
-
 
     >>> from music21 import *
     >>> n = note.Note('C#4')
@@ -1772,20 +1748,16 @@ def noteheadToMxNotehead(obj):
     nhFill = 'default'
     nhParen = False
     
+    # default noteheard, regardless of if set as attr
     nh = 'normal'
     if hasattr(obj, 'notehead'):
         nh = obj.notehead
-        if nh == "" or nh is None: 
-            nh = 'normal'
-        
     nhFill = 'default'
     if hasattr(obj, 'noteheadFill'):
         nhFill = obj.noteheadFill
-
     nhParen = False
     if hasattr(obj, 'noteheadParen'):
-        nhParen = obj.noteheadParen
-    
+        nhParen = obj.noteheadParen    
     
     if nh not in note.noteheadTypeNames:
         raise NoteheadException('This notehead type is not supported by MusicXML: "%s"' % nh)
@@ -2034,7 +2006,8 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
     # gets the notehead object from the mxNote and sets value of the music21 note to the value of the notehead object        
     mxNotehead = mxNote.get('noteheadObj')
     if mxNotehead is not None:
-        n.notehead = mxNotehead.charData
+        if mxNotehead.charData not in ['', None]:
+            n.notehead = mxNotehead.charData
         if mxNotehead.get('color') is not None:
             n.color = mxNotehead.get('color')
 
@@ -4411,7 +4384,7 @@ spirit</words>
 
 
     def testNoteColorA(self):
-        from music21 import note, stream
+        from music21 import note, stream, chord
         n1 = note.Note()
         n2 = note.Note()
         n2.color = '#ff1111'
@@ -4419,13 +4392,16 @@ spirit</words>
         n3.color = '#1111ff'
         r1 = note.Rest()
         r1.color = '#11ff11'
+
+        c1 = chord.Chord(['c2', 'd3', 'e4'])
+        c1.color = '#ff0000'
         s = stream.Stream()
-        s.append([n1, n2, n3, r1])
+        s.append([n1, n2, n3, r1, c1])
         #s.show()
 
         raw = s.musicxml
         # three color indications
-        self.assertEqual(raw.count("color="), 3)
+        self.assertEqual(raw.count("color="), 6)
         # color set at note level only for rest, so only 1
         self.assertEqual(raw.count('note color="#11ff11"'), 1)
     
@@ -4437,7 +4413,7 @@ spirit</words>
         s = converter.parse(testPrimitive.colors01)
         #s.show()
         raw = s.musicxml
-        self.assertEqual(raw.count("color="), 3)
+        self.assertEqual(raw.count("color="), 6)
         # color set at note level only for rest, so only 1
         self.assertEqual(raw.count('note color="#11ff11"'), 1)
 

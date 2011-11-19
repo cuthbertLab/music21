@@ -208,19 +208,10 @@ class Chord(note.NotRest):
         new = note.NotRest.__deepcopy__(self, memo=memo)
         # after copying, if a Volume exists, it is linked to the old object
         # look at _volume so as not to create object if not already there
-
-
         for d in new._components:
             # if .volume is called, a new Volume obj will be created
             if d._volume is not None:
                 d.volume.parent = new # update with new instance
-
-
-#         for d in new._components:
-#             if 'volume' in d.keys():
-#                 if d['volume'] is not None:
-#                     #environLocal.printDebug(['changing paren to Chord volume in __deepcopy__', 'id(new)', id(new)])
-#                     d['volume'].parent = new # update with new instance
         return new
 
 
@@ -260,15 +251,6 @@ class Chord(note.NotRest):
                 return component._getVolume(forceParent=self)
             else:
                 return getattr(component, last)
-
-#             p = component['pitch']
-#             if last == 'pitch':
-#                 return p
-#             elif last == 'volume':
-#                 # use function; will create if necessary
-#                 return self.getVolume(p) 
-#             elif last == 'tie':
-#                 return self.getTie(p) 
         else:
             try:
                 return self._components[key] # must be a number
@@ -694,7 +676,6 @@ class Chord(note.NotRest):
         True
         
         '''
-        match = False
         for d in self._components:
             if d.pitch is p:
                 return d.notehead
@@ -702,7 +683,6 @@ class Chord(note.NotRest):
             if d.pitch == p:
                 return d.notehead
         return None
-
 
     def setNotehead(self, nh, pitchTarget):
         '''Given a notehead attribute as a string and a pitch object in this Chord, set the notehead attribute of that pitch to the value of that notehead. Valid notehead type names are found in note.noteheadTypeNames (see below):
@@ -751,9 +731,79 @@ class Chord(note.NotRest):
                     d.notehead = nh
                     match = True
                     break            
-
         if not match:
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
+
+
+    #---------------------------------------------------------------------------
+    # color for Notes is stored on notes.editorial; 
+    def _getColor(self):
+        '''Return the Note color. 
+        '''
+        return self.editorial.color
+
+    def _setColor(self, value): 
+        '''
+        >>> from music21 import *
+        >>> a = chord.Chord(['c4', 'e4', 'g4'])
+        >>> a.duration.type = 'whole'
+        >>> a.color = '#235409'
+        >>> a.color
+        '#235409'
+        >>> a.editorial.color
+        '#235409'
+        >>> a.setColor('#ff0000', 'e4')
+        >>> a.getColor('c4')
+        '#235409'
+        >>> for p in a.pitches: print a.getColor(p)
+        #235409
+        #ff0000
+        #235409
+        '''
+        self.editorial.color = value
+
+    color = property(_getColor, _setColor)
+
+    def setColor(self, value, pitchTarget=None):
+        '''Set color for specific pitch
+        '''
+        # assign to base
+        if pitchTarget is None and len(self._components) > 0: 
+            self.color = value
+            return
+        elif common.isStr(pitchTarget):
+            pitchTarget = pitch.Pitch(pitchTarget)    
+
+        match = False
+        for d in self._components:
+            if d.pitch is pitchTarget:
+                d.color = value
+                match = True
+                break
+        if not match: # look at equality of value
+            for d in self._components:
+                if d.pitch == pitchTarget:
+                    d.color = value
+                    match = True
+                    break
+        if not match:
+            raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
+
+    def getColor(self, pitchTarget):
+        '''For a pitch in this Chord, return the color stored in self.editorial, or, if set for each component, return the color assigned to this component.
+        '''
+        if common.isStr(pitchTarget):
+            pitchTarget = pitch.Pitch(pitchTarget)    
+
+        for d in self._components:
+            if d.pitch is pitchTarget:
+                if d.color is not None:
+                    return d.color
+        for d in self._components:
+            if d.pitch == pitchTarget:
+                if d.color is not None:
+                    return d.color
+        return self.color # may be None
 
 
     #---------------------------------------------------------------------------
@@ -819,8 +869,8 @@ class Chord(note.NotRest):
         else:
             raise ChordException('unmatched condition')
 
-    def _setVolume(self, value):
 
+    def _setVolume(self, value):
         if isinstance(value, volume.Volume):
             value.parent = self
             # remove any component volmes
@@ -828,12 +878,6 @@ class Chord(note.NotRest):
                 c._volume = None
             return note.NotRest._setVolume(self, value, setParent=False)
 
-#             value.parent = self # set once
-#             for c in self._components:
-#                 # if we set c.volume, the parent of volume will be the Note
-#                 # parent needs to be set to the chord
-#                 value.parent = self
-#                 c._setVolume(value, setParent=False) 
         elif common.isNum(value):
             vol = self._getVolume()
             if value < 1: # assume a scalar
@@ -856,18 +900,6 @@ class Chord(note.NotRest):
         else:
             raise ChordException('unhandled setting value: %s' % value)
 
-
-#         if isinstance(value, volume.Volume):
-#             value.parent = self # set once
-#             for c in self._components:
-#                 c['volume'] = value # set the same instance to each?
-#         elif common.isListLike(value): # assume an array of vol objects
-#             for i, c in enumerate(self._components):
-#                 v = value[i%len(value)]
-#                 v.parent = self
-#                 c['volume'] = v
-#         else:
-#             raise ChordException('must set volume property with a Volume, not %s' % value)
 
         
     volume = property(_getVolume, _setVolume, doc='''
@@ -906,18 +938,7 @@ class Chord(note.NotRest):
         for d in self._components:
             if d.pitch is p or d.pitch == p:
                 # will create if not set; will set parent to Note
-                return d._getVolume(forceParent=self) 
-        
-#         for d in self._components:
-#             # this is an object comparison, not equality
-#             if d['pitch'] is p or d['pitch'] == p:
-#                 if 'volume' in d.keys():
-#                     return d['volume']
-#                 else: # create on demand
-#                     v = volume.Volume() # add self 
-#                     v.parent = self
-#                     d['volume'] = v
-#                     return v
+                return d._getVolume(forceParent=self)         
         raise ChordException('the given pitch is not in the Chord: %s' % p)
 
 
@@ -939,15 +960,7 @@ class Chord(note.NotRest):
                 d._setVolume(vol, setParent=False)                
                 match = True
                 break
-
-#         for d in self._components:
-#             if d['pitch'] is pitchTarget or d['pitch'] == pitchTarget:
-#                 # set parent of volume here:
-#                 vol.parent = self
-#                 d['volume'] = vol
-#                 match = True
-#                 break
-#                 
+                 
         if not match:
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
 
@@ -969,14 +982,6 @@ class Chord(note.NotRest):
                     self._components.append(note.Note(name))
             else:
                 raise NoteException('must provide a list containing a Pitch, not: %s' % value)
-
-#         if common.isListLike(value):
-#             if common.isStr(value[0]): # only checking first
-#                 self._components = [] # clear
-#                 for name in value:
-#                     self._components.append({'pitch':pitch.Pitch(name)})
-#             else:
-#                 raise NoteException('must provide a list containing a Pitch, not: %s' % value)
         else:
             raise NoteException('cannot set pitch name with provided object: %s' % value)
 

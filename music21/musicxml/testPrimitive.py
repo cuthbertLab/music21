@@ -16466,7 +16466,7 @@ colors01 = """<?xml version="1.0" encoding="utf-8"?>
       <attributes>
         <divisions>10080</divisions>
         <time>
-          <beats>4</beats>
+          <beats>5</beats>
           <beat-type>4</beat-type>
         </time>
         <clef>
@@ -16501,7 +16501,7 @@ colors01 = """<?xml version="1.0" encoding="utf-8"?>
         </pitch>
         <duration>10080</duration>
         <type>quarter</type>
-        <notehead color="#1111ff">normal</notehead>
+        <notehead color="#1111ff"></notehead>
         <notations/>
       </note>
       <note color="#11ff11">
@@ -16510,6 +16510,40 @@ colors01 = """<?xml version="1.0" encoding="utf-8"?>
         <type>quarter</type>
         <notations/>
       </note>
+
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>2</octave>
+        </pitch>
+        <duration>10080</duration>
+        <type>quarter</type>
+        <notehead color="#ff1111">normal</notehead>
+        <notations/>
+      </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>D</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>10080</duration>
+        <type>quarter</type>
+        <notehead color="#11ff11">normal</notehead>
+        <notations/>
+      </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>E</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>10080</duration>
+        <type>quarter</type>
+        <notehead color="#1111ff">normal</notehead>
+        <notations/>
+      </note>
+
       <barline location="right">
         <bar-style>light-heavy</bar-style>
       </barline>

@@ -2153,7 +2153,7 @@ class Notehead(MusicXMLElement):
         self._attr['filled'] = None
         self._attr['parentheses'] = None
         self._attr['color'] = None
-        # character data 
+        # character data: this is the notehead type/shape
         self.charData = None
 
 # valid notehead values
