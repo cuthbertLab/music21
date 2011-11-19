@@ -430,18 +430,16 @@ def chordifyAnalysisBrief():
     # 128, 134
     #o = corpus.parseWork('josquin/milleRegrets')
     # remove number
-    o = corpus.parseWork('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
-    sExcerpt = o.mergeScores().measures(128, 134)
+    o = corpus.parse('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
+    excerpt = o.mergeScores().measures(126, 134)
 
-    display = stream.Score()
-    for p in sExcerpt.parts: display.insert(0, p)
-    reduction = sExcerpt.chordify()
+    reduction = excerpt.chordify()
     for c in reduction.flat.getElementsByClass('Chord'):
         c.closedPosition(forceOctave=4, inPlace=True)
         c.removeRedundantPitches(inPlace=True)
         c.annotateIntervals()
-    display.insert(0, reduction)
-    display.show()
+    excerpt.insert(0, reduction)
+    excerpt.show()
 
 
 #-------------------------------------------------------------------------------
@@ -470,6 +468,7 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) == 1: # normal conditions
+        chordifyAnalysisBrief()
         music21.mainTest(Test)
 
     elif len(sys.argv) > 1:

@@ -101,8 +101,6 @@ ordinalTypeFromNum = ["duplex-maxima", "maxima", "longa", "breve", "whole",
 
 defaultTupletNumerators = [3, 5, 7, 11, 13]
 
-def roundDuration(qLen):
-    return round(qLen, 5)
 
 def unitSpec(durationObjectOrObjects):
     '''
@@ -308,9 +306,13 @@ def dottedMatch(qLen, maxDots=4):
 
 def quarterLengthToTuplet(qLen, maxToReturn=4):
     '''    
-    Returns a list of possible Tuplet objects for a given `qLen` (quarterLength). As there may be more than one possible solution, the `maxToReturn` integer specifies the maximum number of values returned.
+    Returns a list of possible Tuplet objects for a 
+    given `qLen` (quarterLength). As there may be more than one 
+    possible solution, the `maxToReturn` integer specifies the 
+    maximum number of values returned.
 
-    Searches for numerators specified in duration.defaultTupletNumerators (3, 5, 7, 11, 13). Does not return dotted tuplets, nor nested tuplets.
+    Searches for numerators specified in duration.defaultTupletNumerators 
+    (3, 5, 7, 11, 13). Does not return dotted tuplets, nor nested tuplets.
 
     Note that 4:3 tuplets won't be found, but will be found as dotted notes
     by dottedMatch.
@@ -363,11 +365,15 @@ def quarterLengthToDurations(qLen, link=True):
     '''
     Returns a List of new Duration Units given a quarter length.
 
-    For many simple quarterLengths, the list will have only a single element.  However, for more complex durations, the list could contain several durations (presumably to be tied to each other).
+    For many simple quarterLengths, the list will have only a 
+    single element.  However, for more complex durations, the list 
+    could contain several durations (presumably to be tied to each other).
 
-    (All quarterLengths can, technically, be notated as a single unit given a complex enough tuplet, but we don't like doing that).
+    (All quarterLengths can, technically, be notated as a single unit 
+    given a complex enough tuplet, but we don't like doing that).
     
-    This is mainly a utility function. Much faster for many purposes is something like::
+    This is mainly a utility function. Much faster for many purposes 
+    is something like::
     
        d = Duration()
        d.quarterLength = 251.231312

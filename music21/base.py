@@ -53,6 +53,26 @@ import types
 import unittest, doctest
 import uuid
 
+#-------------------------------------------------------------------------------
+class Music21Exception(Exception):
+    pass
+
+# should be renamed:
+class DefinedContextsException(Music21Exception):
+    pass
+
+class Music21ObjectException(Music21Exception):
+    pass
+
+class ElementException(Music21Exception):
+    pass
+
+class GroupException(Music21Exception):
+    pass
+
+
+
+
 from music21 import common
 from music21 import environment
 
@@ -112,22 +132,7 @@ WEAKREF_ACTIVE = True
 
 #DEBUG_CONTEXT = False
 
-#-------------------------------------------------------------------------------
-class Music21Exception(Exception):
-    pass
 
-# should be renamed:
-class DefinedContextsException(Music21Exception):
-    pass
-
-class Music21ObjectException(Music21Exception):
-    pass
-
-class ElementException(Music21Exception):
-    pass
-
-class GroupException(Music21Exception):
-    pass
 
 #-------------------------------------------------------------------------------
 # make subclass of set once that is defined properly

@@ -37,20 +37,28 @@ class SerialException(Exception):
 
 #-------------------------------------------------------------------------------
 class TwelveToneMatrix(stream.Stream):
-    '''An object representation of a 2-dimensional array of 12 pitches. Internal representation is as a :class:`~music21.stream.Stream`, which stores 12 Streams, each Stream a horizontal row of pitches in the matrix. 
+    '''
+    An object representation of a 2-dimensional array of 12 pitches. 
+    Internal representation is as a :class:`~music21.stream.Stream`, 
+    which stores 12 Streams, each Stream a horizontal row of pitches 
+    in the matrix. 
 
-    This object is commonly used by calling the :meth:`~music21.stream.TwelveToneRow.matrix` method of :meth:`~music21.stream.TwelveToneRow` (or a subclass).
+    This object is commonly used by calling the 
+    :meth:`~music21.stream.TwelveToneRow.matrix` method of 
+    :meth:`~music21.stream.TwelveToneRow` (or a subclass).
 
+    __OMIT_FROM_DOCS__
+
+    >>> from music21 import *
+    >>> aMatrix = serial.rowToMatrix([0,2,11,7,8,3,9,1,4,10,6,5])
     '''
     
     def __init__(self, *arguments, **keywords):
-        '''
-        >>> aMatrix = TwelveToneMatrix()
-        '''
         stream.Stream.__init__(self, *arguments, **keywords)
     
     def __str__(self):
-        '''Return a string representation of the matrix.
+        '''
+        Return a string representation of the matrix.
         '''
         ret = ""
         for rowForm in self.elements:
@@ -60,6 +68,14 @@ class TwelveToneMatrix(stream.Stream):
             ret += ''.join(msg) + "\n"
         return ret
 
+    def __repr__(self):
+        if len(self.elements) > 0:
+            if isinstance(ToneRow, self.elements[0]):
+                return '<music21.serial.TwelveToneMatrix for [%s]>' % self.elements[0]
+            else:
+                return Music21Object.__repr__(self)
+        else:
+            return Music21Object.__repr__(self)
 
 #-------------------------------------------------------------------------------
 class ToneRow(stream.Stream):
@@ -97,15 +113,16 @@ class TwelveToneRow(ToneRow):
         >>> len(src)
         12
         >>> s37 = RowSchoenbergOp37().matrix()
-        >>> [e for e in s37[0]]
-        [C, B, G, G#, E-, C#, D, B-, F#, F, E, A]
-
         >>> print s37
           0  B  7  8  3  1  2  A  6  5  4  9
           1  0  8  9  4  2  3  B  7  6  5  A
           5  4  0  1  8  6  7  3  B  A  9  2
           4  3  B  0  7  5  6  2  A  9  8  1
         ...
+        >>> [e for e in s37[0]]
+        [C, B, G, G#, E-, C#, D, B-, F#, F, E, A]
+
+        
         '''        
         # note: do not want to return a TwelveToneRow() type, as this will
         # add again the same pitches to the elements list twice. 
@@ -546,6 +563,10 @@ def pcToToneRow(pcSet):
         raise SerialException("pcToToneRow requires a 12-tone-row")
     
 def rowToMatrix(p):
+    '''
+    takes a row of numbers of converts it to a 12-tone 
+    '''
+    
     i = [(12-x) % 12 for x in p]
     matrix = [[(x+t) % 12 for x in p] for t in i]
 

@@ -253,14 +253,14 @@ class TestExternal(unittest.TestCase):
         pass
    
 
-    def xtestBasic(self, cycles=8, show=True):
+    def testBasic(self, cycles=8, show=True):
         # run a reduced version
         pitchedPhase(cycles=cycles, show=show)
 
-    def testArvoPart(self, show=False):
+    def xtestArvoPart(self, show=True):
         partPari(show)
 
-    def xtestPendulumMusic(self, show=True):  
+    def testPendulumMusic(self, show=True):  
         pendulumMusic(show)
 #        pendulumMusic(show = True, 
 #                  loopLength = 210.0, 

@@ -341,10 +341,23 @@ class RomanNumeral(chord.Chord):
 
     def __repr__(self):
         if hasattr(self.scale, 'tonic'):
-            return '<music21.roman.RomanNumeral %s in %s %s>' % (self.figure, self.scale.tonic, self.scale.mode)
+            return '<music21.roman.RomanNumeral %s>' % (self.figureAndKey)
         else:
             return '<music21.roman.RomanNumeral %s>' % (self.figure)
 
+    def _getFigureAndKey(self):
+        '''
+        returns the figure and the key and mode as a string
+        
+        >>> from music21 import *
+        >>> rn = roman.RomanNumeral('V65/V', 'e')
+        >>> rn.figureAndKey
+        'V65/V in e minor'
+        
+        '''
+        return '%s in %s %s' % (self.figure, self.scale.tonic, self.scale.mode)
+
+    figureAndKey = property(_getFigureAndKey)
 
     def setKeyOrScale(self, keyOrScale):
         '''Provide a new key or scale, and re-configure the RN with the existing figure. 

@@ -947,7 +947,7 @@ def parse(workName, movementNumber=None, number=None,
     if len(post) == 1:
         fp = post[0]
     elif len(post) == 0:
-        raise CorpusException("Could not find a work that met this criteria")
+        raise CorpusException("Could not find a work that met this criteria %s" % workName)
     else: # greater than zero:
         fp = post[0] # get first
       

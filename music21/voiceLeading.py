@@ -45,7 +45,8 @@ class VoiceLeadingQuartet(music21.Music21Object):
         self.v2n2 = v2n2    
         self.vIntervals = []
         self.hIntervals = []
-        self._findIntervals()
+        if v1n1 is not None and v1n2 is not None and v2n1 is not None and v2n2 is not None:
+            self._findIntervals()
     
     def _findIntervals(self):
         self.vIntervals.append(interval.notesToInterval(self.v1n1, self.v2n1))
@@ -440,6 +441,11 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
  
+    def testInstantiateEmptyObject(self):
+        '''
+        test instantiating an empty VoiceLeadingQuartet
+        '''
+        vlq = VoiceLeadingQuartet()
 
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module

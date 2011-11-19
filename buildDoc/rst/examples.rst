@@ -5,7 +5,8 @@ Examples and Demonstrations
 =============================
 
 
-The following examples provide a few samples of some of the possibilities available when working with music21.
+The following examples provide a few samples of 
+some of the possibilities available when working with music21.
 
 
 
@@ -18,7 +19,7 @@ This example, after parsing a polyphonic work stored as an Opus and creating a S
 >>> # Parse an Opus, a collection of Scores
 >>> o = corpus.parse('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
 >>> # Create a Score from a Measure range
->>> sExcerpt = o.mergeScores().measures(127, 134)
+>>> sExcerpt = o.mergeScores().measures(126, 134)
 >>> # Create a reduction of Chords
 >>> reduction = sExcerpt.chordify()
 >>> # Iterate over the Chords and prepare presentation
@@ -30,6 +31,7 @@ This example, after parsing a polyphonic work stored as an Opus and creating a S
 >>> # Add the reduction and display the results
 >>> sExcerpt.insert(0, reduction)
 >>> sExcerpt.show()   # doctest: +SKIP
+
 
 .. image:: images/examples-04.*
     :width: 600

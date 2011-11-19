@@ -37,6 +37,10 @@ environLocal = environment.Environment(_MOD)
 class TranslateException(Exception):
     pass
 
+class NoteheadException(TranslateException):
+    pass
+
+
 
 def configureStaffGroupFromMxPartGroup(staffGroup, mxPartGroup):
     '''Given an already instantiated spanner.StaffGroup, configure it with parameters from an mxPartGroup.
@@ -1771,6 +1775,7 @@ def noteheadToMxNotehead(obj):
     nh = 'normal'
     if hasattr(obj, 'notehead'):
         nh = obj.notehead
+        if nh == "": nh = 'normal'
         
     nhFill = 'default'
     if hasattr(obj, 'noteheadFill'):
@@ -1779,6 +1784,7 @@ def noteheadToMxNotehead(obj):
     nhParen = False
     if hasattr(obj, 'noteheadParen'):
         nhParen = obj.noteheadParen
+    
     
     if nh not in note.noteheadTypeNames:
         raise NoteheadException('This notehead type is not supported by MusicXML.')
@@ -1963,7 +1969,7 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
     if mxStem is not None:
         n.stemDirection = mxStem
 
-    # get color from Note forst; if not, try to get from notehead
+    # get color from Note first; if not, try to get from notehead
     if mxNote.get('color') is not None:
         n.color = mxNote.get('color')
 
