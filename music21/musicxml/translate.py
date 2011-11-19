@@ -1775,7 +1775,8 @@ def noteheadToMxNotehead(obj):
     nh = 'normal'
     if hasattr(obj, 'notehead'):
         nh = obj.notehead
-        if nh == "": nh = 'normal'
+        if nh == "" or nh is None: 
+            nh = 'normal'
         
     nhFill = 'default'
     if hasattr(obj, 'noteheadFill'):
@@ -1787,7 +1788,7 @@ def noteheadToMxNotehead(obj):
     
     
     if nh not in note.noteheadTypeNames:
-        raise NoteheadException('This notehead type is not supported by MusicXML.')
+        raise NoteheadException('This notehead type is not supported by MusicXML: "%s"' % nh)
     else:
         # should only set if needed, otherwise creates extra mxl data
         #if nh not in ['normal']: 
