@@ -301,14 +301,20 @@ class Stream(music21.Music21Object):
             self.sort() # will set isSorted to True
 
         if common.isNum(key):
-            # TODO: using self._elements here will retain activeSite, as opposed   
-            # to using .elements
-            try:
-                e = self.elements[key]
-            except IndexError:
-                raise StreamException('attempting to access index %s while elements is of size %s' % (key, len(self.elements)))
-            e.activeSite = self
-            return e
+            match = None
+            # handle easy and most common case first
+            if key >= 0 and key < len(self._elements):
+                match = self._elements[key]
+            # if using negative indices, or trying to access end elements, 
+            # then need to use .elements property
+            else:
+                try:
+                    match = self.elements[key]
+                except IndexError:
+                    raise StreamException('attempting to access index %s while elements is of size %s' % (key, len(self.elements)))
+            # setting active site as cautionary measure
+            match.activeSite = self
+            return match
     
         elif isinstance(key, slice): # get a slice of index values
             # manually inserting elements is critical to setting the element

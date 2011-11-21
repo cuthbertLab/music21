@@ -2585,8 +2585,22 @@ class Music21Object(JSONSerializer):
         '''Get the next element if this element is in a Stream. If this element is in multiple Streams, the next element found in all the same sites will be returned if possible.
         '''
         sites = self._definedContexts.getSites(excludeNone=True)
+        match = None
         if len(sites == 1): # if 1 non-None site, 
-            pass
+            site = sites[0]
+            currentIndex = site.index(self) + 1 # start with next
+            siteLength = len(site)
+            while (current < siteLength):
+                next = site[currentIndex]
+                if classFilterList is not None:     
+                    if next.isClassOrSubclass(classFilterList):
+                        return next
+                else:
+                    return next
+                currentIndex += 1
+            # if we have not returned, we have run out of elements in this 
+            # site
+                
 
 
 
