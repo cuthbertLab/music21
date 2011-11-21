@@ -360,10 +360,12 @@ class Stream(music21.Music21Object):
     # most will set isSorted to False
 
     def _elementsChanged(self, updateIsFlat=True, clearIsSorted=True, 
-        memo=None):
+        memo=None, keepIndex=False):
         '''
         Call any time _elements is changed. Called by methods that add or change
         elements.
+    
+        If `appendOnly` is True, it will be assumed that the only change has been appending an element.
 
         >>> from music21 import *
         >>> a = stream.Stream()
@@ -384,7 +386,7 @@ class Stream(music21.Music21Object):
         # if this Stream is a flat representation of something, and its 
         # elements have changed, than we must clear the cache of that 
         # ancestor; we can do that by calling _elementsChanged on
-        # flattened representation of
+        # flattenedRepresentationOf
         if self.flattenedRepresentationOf is not None:
             self.flattenedRepresentationOf._elementsChanged(memo=memo)
 
@@ -392,17 +394,6 @@ class Stream(music21.Music21Object):
         # be a good idea; may need to intead clear all sites            
         if self.activeSite is not None:
             self.activeSite._elementsChanged()
-
-#         for site in self.getSites(idExclude=memo):
-#             # if this Stream is a location in a Site, those sites are not flat
-#             # assume that sorting does not need to be changed
-#             if site is not None:
-#                 # some sites may have been added to memo in this loop
-#                 if id(site) in memo:
-#                     #environLocal.printDebug(['found site even after passing memo', 'memo', memo, 'id(site)', id(site)])
-#                     continue
-#                 site._elementsChanged(updateIsFlat=False, clearIsSorted=False, 
-#                     memo=memo)
 
         # clear these attributes for setting later
         if clearIsSorted:
@@ -422,8 +413,11 @@ class Stream(music21.Music21Object):
         # resetting the cache removes lowest and highest time storage
         # a slight performance optimization: not creating unless needed
         if len(self._cache) > 0:
+            if keepIndex:
+                indexCache = self._cache['index']
             self._cache = common.DefaultHash()
-
+            if keepIndex:
+                self._cache['index'] = indexCache
 
     def _getElements(self):
         # this method is now important, in that it combines self._elements
@@ -841,15 +835,18 @@ class Stream(music21.Music21Object):
         0
         >>> s.index(n2)
         1        '''
-        # TODO: could cache results
-#         iMatch = self.indexList(obj, firstMatchOnly=True)
-#         if len(iMatch) == 0:
-#             raise ValueError("Could not find object in index")
-#         else:
-#             return iMatch[0] # only need first returned index
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
-            # TODO: possibly replace by binary search
+
+        if self._cache['index'] is not None:
+            try:
+                return self._cache['index'][id(obj)]
+            except KeyError:
+                pass # not in cache
+        else:
+            self._cache['index'] = {}     
+
+        # TODO: possibly replace by binary search
         if common.isNum(obj):
             objId = obj
         else:
@@ -858,10 +855,12 @@ class Stream(music21.Music21Object):
         count = 0
         for e in self._elements:
             if id(e) == objId:
+                self._cache['index'][objId] = count
                 return count
             count += 1
         for e in self._endElements:
             if id(e) == objId:
+                self._cache['index'][objId] = count
                 return count # this is the index
             count += 1 # cumulative indices
         raise StreamException('cannot find object (%s) in Stream' % obj)
@@ -1144,7 +1143,6 @@ class Stream(music21.Music21Object):
         
         '''
         #environLocal.printDebug(['_insertCore', 'self', self, 'offset', offset, 'element', element])
-
         # need to compare highest time before inserting the element in 
         # the elements list
         storeSorted = False 
@@ -1153,12 +1151,10 @@ class Stream(music21.Music21Object):
             # are still inserted
             if self.isSorted is True and self.highestTime <= offset:
                 storeSorted = True
-
         element.addLocation(self, float(offset))
         # need to explicitly set the activeSite of the element
         if setActiveSite:
             element.activeSite = self
-
         # will be sorted later if necessary
         self._elements.append(element)  
         return storeSorted
@@ -1230,7 +1226,6 @@ class Stream(music21.Music21Object):
         #environLocal.printDebug(['self', self, 'offsetOrItemOrList', 
         #            offsetOrItemOrList, 'itemOrNone', itemOrNone, 
         #             'ignoreSort', ignoreSort, 'setActiveSite', setActiveSite])
-
         # normal approach: provide offset and item
         if itemOrNone != None:
             offset = offsetOrItemOrList
@@ -1241,7 +1236,7 @@ class Stream(music21.Music21Object):
                 offset = offsetOrItemOrList[i]
                 item = offsetOrItemOrList[i+1]
                 # recursively calling insert() here
-                self.insert(offset, item, ignoreSort = ignoreSort)
+                self.insert(offset, item, ignoreSort=ignoreSort)
                 i += 2
             return
         # assume first arg is item, and that offset is local offset of object
@@ -1265,12 +1260,13 @@ class Stream(music21.Music21Object):
 
         # checks of element is self; possibly performs additional checks
         self._addElementPreProcess(element)
-
+        # main insert procedure here
         storeSorted = self._insertCore(offset, element, 
                      ignoreSort=ignoreSort, setActiveSite=setActiveSite)
-
-        self._elementsChanged() 
-
+        updateIsFlat = False
+        if element.isStream:
+            updateIsFlat = True
+        self._elementsChanged(updateIsFlat=updateIsFlat) 
         if ignoreSort is False:
             self.isSorted = storeSorted
 
@@ -1428,14 +1424,17 @@ class Stream(music21.Music21Object):
             # back into a list for list processing if single
             others = [others]
 
-        for item in others:    
-            try:
-                item.isStream # will raise attribute error if not m21 obj
-                element = item
-            #if not isinstance(item, music21.Music21Object): 
-            except AttributeError:
-                #environLocal.printDebug(['wrapping item in ElementWrapper:', item])
-                raise StreamException('cannot append a non Music21Object. wrap it in a music21.ElementWrapper(item) first')
+        updateIsFlat = False
+        for element in others:    
+            if element.isStream: # any on that is a Stream req update
+                updateIsFlat = True
+#             try:
+#                 item.isStream # will raise attribute error if not m21 obj
+#                 element = item
+#             #if not isinstance(item, music21.Music21Object): 
+#             except AttributeError:
+#                 #environLocal.printDebug(['wrapping item in ElementWrapper:', item])
+#                 raise StreamException('cannot append a non Music21Object. wrap it in a music21.ElementWrapper(item) first')
             self._addElementPreProcess(element)
     
             # add this Stream as a location for the new elements, with the 
@@ -1465,7 +1464,8 @@ class Stream(music21.Music21Object):
 
         # does not change sorted state
         storeSorted = self.isSorted    
-        self._elementsChanged()         
+        # we cannot keep the index cache here b/c we might 
+        self._elementsChanged(updateIsFlat=updateIsFlat)         
         self.isSorted = storeSorted
         self._setHighestTime(highestTime) # call after to store in cache
 
@@ -1505,7 +1505,6 @@ class Stream(music21.Music21Object):
             return
         else:
             item = itemOrList
-
         try:
             item.isStream # will raise attribute error
             element = item
@@ -1739,26 +1738,10 @@ class Stream(music21.Music21Object):
         '''
         if target is None:
             raise StreamException('received a target of None as a candidate for replacement.')
-
-        # get all indices in this Stream that match
-#         if common.isNum(target): # matching object id number
-#             iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
-#         elif target is None:
-#             raise StreamException('received a target of None as a candidate for replacement.')
-#         else: # matching object directly
-#             iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
-
         try:
             i = self.index(target)
         except StreamException:
             return  # do nothing if no match
-
-        #environLocal.printDebug(['Stream.replace()', 'target', target, id(target), 'replacement', replacement, id(replacement), 'iMatch', iMatch])
-
-        # target can be given as an obj id number
-#         if common.isNum(target):
-#             # replace target id with target
-#             target = self.getElementByObjectId(target) 
 
         eLen = len(self._elements)
         if i < eLen:
@@ -1767,35 +1750,18 @@ class Stream(music21.Music21Object):
             # place the replacement at the old objects offset for this site
             replacement.addLocation(self, target.getOffsetBySite(self))
         else:
-            # target may have been obj id; reassin
+            # target may have been obj id; reassign
             target = self._endElements[i - eLen] 
             self._endElements[i - eLen] = replacement
             replacement.addLocation(self, 'highestTime')
 
         target.removeLocationBySite(self)
 
-
-# 
-#         for i in iMatch:
-#             # replace all index target with the replacement
-#             if i < eLen:
-#                 self._elements[i] = replacement
-#                 # place the replacement at the old objects offset for this site
-#                 replacement.addLocation(self, target.getOffsetBySite(self))
-#             else:
-#                 self._endElements[i - eLen] = replacement
-#                 replacement.addLocation(self, 'highestTime')
-# 
-#             # NOTE: an alternative way to do this would be to look at all the 
-#             # sites defined by the target and add them to the replacement
-#             # this would not put them in those locations elements, however
-# 
-#             # remove this location from old; this will also adjust the 
-#             # activeSite assignment if necessary
-#             target.removeLocationBySite(self)
-
+        updateIsFlat = False
+        if replacement.isStream:
+            updateIsFlat = True
         # elements have changed: sort order may change b/c have diff classes
-        self._elementsChanged()
+        self._elementsChanged(updateIsFlat=updateIsFlat)
 
         if allTargetSites:
             for site in target.getSites():
@@ -6272,7 +6238,6 @@ class Stream(music21.Music21Object):
             # need to clear cache, but flat status is the same
             self._elementsChanged(updateIsFlat=False, clearIsSorted=False)
             self.isSorted = True
-
             #environLocal.pd(['_elements', self._elements])
 
     def _getSorted(self):
@@ -14857,12 +14822,9 @@ class Test(unittest.TestCase):
 
         n1 = note.Note()
         n1.quarterLength = 30
-
         n2 = note.Note()
         n2.quarterLength = 20
-
         b1 = bar.Barline()
-
         s = Stream()
         s.append(n1)
         self.assertEqual(s.highestTime, 30)
