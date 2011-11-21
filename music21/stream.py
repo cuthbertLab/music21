@@ -4623,7 +4623,8 @@ class Stream(music21.Music21Object):
                 # tag all sliced notes if requested
                 if addPartIdAsGroup:
                     for e in m: # add to all elements
-                        e.groups.append(p.id)
+                        # some ids may not be strings; must convert
+                        e.groups.append(str(p.id))
 
         # make chords from flat version of sliced parts
         # do in place as already a copy has been made
