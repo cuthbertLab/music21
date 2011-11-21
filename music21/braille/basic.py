@@ -11,6 +11,7 @@
 import music21
 import unittest
 
+from music21 import articulations
 from music21 import clef
 from music21 import interval
 from music21 import note
@@ -144,13 +145,13 @@ def dynamicToBraille(music21Dynamic, precedeByWordSign = True):
     >>> from music21.braille import basic
     >>> from music21 import dynamics
     >>> print basic.dynamicToBraille(dynamics.Dynamic('f'))
-    ⠋
+    ⠜⠋
     >>> print basic.dynamicToBraille(dynamics.Dynamic('pp'))
-    ⠏⠏
+    ⠜⠏⠏
     '''
     try:
         dynamicTrans = []
-        if precedeByWordSign == True:
+        if precedeByWordSign:
             dynamicTrans.append(symbols['word'])
         dynamicTrans.append(wordToBraille(music21Dynamic.value, isTextExpression = True))
         return u"".join(dynamicTrans)
@@ -327,7 +328,36 @@ def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
     # signs of expression or execution that precede a note
     # articulations
     # -------------
-    if not len(music21Note.articulations) == 0:    
+    if not len(music21Note.articulations) == 0:
+        # "When a staccato or staccatissimo is shown with any of the other [before note expressions]
+        # it is brailled first.
+        # This is buggy, but since I can't handle after note expressions, let's fly with this for now.
+        if articulations.Staccato() in music21Note.articulations:
+            music21Note.articulations.remove(articulations.Staccato())
+            noteTrans.append(beforeNoteExpr['staccato'])
+            try:
+                music21Note.articulations.remove(articulations.Staccato())
+                noteTrans.append(beforeNoteExpr['staccato'])
+            except ValueError:
+                pass
+        if articulations.Staccatissimo() in music21Note.articulations:
+            music21Note.articulations.remove(articulations.Staccatissimo())
+            noteTrans.append(beforeNoteExpr['staccatissimo'])
+            try:
+                music21Note.articulations.remove(articulations.Staccatissimo())
+                noteTrans.append(beforeNoteExpr['staccatissimo'])
+            except ValueError:
+                pass
+        music21Note.articulations.sort()
+        # "When an accent is shown with a tenuto, the accent is brailled first."
+        if articulations.Accent() in music21Note.articulations and articulations.Tenuto() in music21Note.articulations:
+            music21Note.articulations.remove(articulations.Accent())
+            noteTrans.append(beforeNoteExpr['accent'])
+            try:
+                music21Note.articulations.remove(articulations.Accent())
+                noteTrans.append(beforeNoteExpr['accent'])
+            except ValueError:
+                pass
         for a in music21Note.articulations:
             try:
                 noteTrans.append(beforeNoteExpr[a._mxName])
