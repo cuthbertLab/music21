@@ -819,70 +819,8 @@ class Stream(music21.Music21Object):
         return None
 
 
-#     def indexList(self, obj, firstMatchOnly=False):
-#         '''Return a list of one or more index values where the supplied object is found on this Stream's `elements` list. 
-# 
-#         To just return the first matched index, set `firstMatchOnly` to True.
-# 
-#         The `obj` parameter may be an object or an id of an object. 
-# 
-#         No matches are found, an empty list is returned.
-# 
-#         Matching is based exclusively on id() of objects.
-# 
-#         >>> from music21 import *
-#         >>> s = stream.Stream()
-#         >>> n1 = note.Note('g')
-#         >>> n2 = note.Note('g#')
-# 
-#         >>> s.insert(0, n1)
-#         >>> s.insert(5, n2)
-#         >>> len(s)
-#         2
-#         >>> s.indexList(n1)
-#         [0]
-#         >>> s.indexList(n2)
-#         [1]
-#         '''
-#         # NOTE: this supports multiple instances of the same object in one 
-#         # stream. to be developed.
-#         if not self.isSorted and self.autoSort:
-#             self.sort() # will set isSorted to True
-#         if common.isNum(obj):
-#             objId = obj
-#         else:
-#             objId = id(obj)
-# 
-#         iMatch = []
-# #        elements = self.elements # store once as concatenating
-# #         for i in range(len(elements)):
-# #             if id(elements[i]) == objId:
-# #                 iMatch.append(i)
-# #             if firstMatchOnly and len(iMatch) > 0:
-# #                 break
-#         end = False
-#         count = 0
-#         for e in self._elements:
-#             if id(e) == objId:
-#                 iMatch.append(count) # store index
-#                 if firstMatchOnly:
-#                     end = True
-#                     break
-#             count += 1
-#         if not end:
-#             for e in self._endElements:
-#                 if id(e) == objId:
-#                     iMatch.append(count)
-#                     if firstMatchOnly:
-#                         break
-#                 count += 1 # cumulative indices
-#         return iMatch
-
-
-
-
-    def indexOfObject(self, obj):
-        '''Return the index for an object or an object id.
+    def index(self, obj):
+        '''Return the first matched index for the specified object.
 
         >>> from music21 import *
         >>> s = stream.Stream()
@@ -893,15 +831,19 @@ class Stream(music21.Music21Object):
         >>> s.insert(5, n2)
         >>> len(s)
         2
-        >>> s.indexOfObject(n1)
+        >>> s.index(n1)
         0
-        >>> s.indexOfObject(n2)
-        1
-        '''
+        >>> s.index(n2)
+        1        '''
+        # TODO: could cache results
+#         iMatch = self.indexList(obj, firstMatchOnly=True)
+#         if len(iMatch) == 0:
+#             raise ValueError("Could not find object in index")
+#         else:
+#             return iMatch[0] # only need first returned index
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
             # TODO: possibly replace by binary search
-
         if common.isNum(obj):
             objId = obj
         else:
@@ -918,26 +860,6 @@ class Stream(music21.Music21Object):
             count += 1 # cumulative indices
         raise StreamException('cannot find object (%s) in Stream' % obj)
 
-
-
-    def index(self, obj):
-        '''Return the first matched index for the specified object.
-
-        >>> from music21 import *
-        >>> a = stream.Stream()
-        >>> fSharp = note.Note("F#")
-        >>> a.repeatInsert(note.Note("A#"), range(10))
-        >>> a.append(fSharp)
-        >>> a.index(fSharp)
-        10
-        '''
-#         iMatch = self.indexList(obj, firstMatchOnly=True)
-#         if len(iMatch) == 0:
-#             raise ValueError("Could not find object in index")
-#         else:
-#             return iMatch[0] # only need first returned index
-
-        return self.indexOfObject(obj) # will raise exception on first)
 
     def remove(self, target, firstMatchOnly=True):
         '''
@@ -982,7 +904,7 @@ class Stream(music21.Music21Object):
 #                 match.append(self._endElements.pop(i-baseElementCount))
 
         try:
-            i = self.indexOfObject(target)
+            i = self.index(target)
         except StreamException:
             return # if not found, no error is raised
 
@@ -1821,7 +1743,7 @@ class Stream(music21.Music21Object):
 #             iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
 
         try:
-            i = self.indexOfObject(target)
+            i = self.index(target)
         except StreamException:
             return  # do nothing if no match
 

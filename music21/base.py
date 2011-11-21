@@ -734,7 +734,7 @@ class DefinedContexts(object):
 
     #---------------------------------------------------------------------------
     # for dealing with locations
-    def getSites(self, idExclude=None):
+    def getSites(self, idExclude=None, excludeNone=False):
         '''Get all defined contexts that are locations; unwrap from weakrefs
 
         >>> import music21
@@ -750,26 +750,24 @@ class DefinedContexts(object):
         >>> len(aContexts.getSites()) == 2
         True
         '''
-        if idExclude is None:
-            idExclude = [] # else, assume a list
+#         if idExclude is None:
+#             idExclude = [] # else, assume a list
         # use pre-collected keys
         post = []
         for idKey in self._locationKeys:
-            if idKey in idExclude:
-                continue
-
+            if idExclude is not None:
+                if idKey in idExclude:
+                    continue
             try:
                 objRef = self._definedContexts[idKey]['obj']
             except KeyError:
                 raise DefinedContextsException('no such site: %s' % idKey)
-
             # skip dead references
             if self._definedContexts[idKey]['isDead']:
                 continue
-
-            #if s1 is None: # hwt keep none?
             if idKey is None:
-                post.append(None) # keep None as site
+                if not excludeNone: 
+                    post.append(None) # keep None as site
             elif not WEAKREF_ACTIVE: # leave None alone
                 post.append(objRef)
             else:
@@ -2580,6 +2578,16 @@ class Music21Object(JSONSerializer):
         self._definedContexts.getAllByClass(className, found=found,
                                          idFound=idFound, memo=memo)
         return found
+
+
+
+    def next(self, site=None, classFilterList=None):
+        '''Get the next element if this element is in a Stream. If this element is in multiple Streams, the next element found in all the same sites will be returned if possible.
+        '''
+        sites = self._definedContexts.getSites(excludeNone=True)
+        if len(sites == 1): # if 1 non-None site, 
+            pass
+
 
 
 
