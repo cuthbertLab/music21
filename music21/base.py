@@ -2580,17 +2580,26 @@ class Music21Object(JSONSerializer):
         return found
 
 
+    #---------------------------------------------------------------------------
+    def _adjacentObject(self, site, classFilterList=None, ascend=True):
+        '''Core method for finding adjacent objects given a single site. 
+            
+        The `site` argument is a Stream that contains this element. The index of this element if sound in this site, and either the next or previous element, if found, is returned.
 
-    def next(self, site=None, classFilterList=None):
-        '''Get the next element if this element is in a Stream. If this element is in multiple Streams, the next element found in all the same sites will be returned if possible.
+        If `ascend` is True index values are increment; if False, index values are decremented.
+    
+        The `classFilterList` may specify one or more classes as targets.
         '''
-        sites = self._definedContexts.getSites(excludeNone=True)
-        match = None
-        if len(sites == 1): # if 1 non-None site, 
-            site = sites[0]
+        siteLength = len(site)
+        # special optimization for class selection when a single str class
+        # is given
+        if (classFilterList is not None and len(classFilterList) == 1 and 
+            isinstance(classFilterList[0], str)):
+            if not site.hasElementOfClass(classFilterList[0]):
+                return None
+        if ascend:
             currentIndex = site.index(self) + 1 # start with next
-            siteLength = len(site)
-            while (current < siteLength):
+            while (currentIndex < siteLength):
                 next = site[currentIndex]
                 if classFilterList is not None:     
                     if next.isClassOrSubclass(classFilterList):
@@ -2598,11 +2607,81 @@ class Music21Object(JSONSerializer):
                 else:
                     return next
                 currentIndex += 1
-            # if we have not returned, we have run out of elements in this 
-            # site
-                
+        else:
+            currentIndex = site.index(self) - 1 # start with next
+            while (currentIndex >= 0):
+                next = site[currentIndex]
+                if classFilterList is not None:     
+                    if next.isClassOrSubclass(classFilterList):
+                        return next
+                else:
+                    return next
+                currentIndex -= 1
+        # if nothing found, return None
+        return None
 
+    def _adjacencySearch(self, classFilterList=None, ascend=True):
+        '''Get the next or previous element if this element is in a Stream. 
 
+        If this element is in multiple Streams, the first next element found in any site will be returned. If not found no next element is found in any site, the flat representation of all sites of each immediate site are searched. 
+        '''
+        if classFilterList is not None:
+            if not common.isListLike(classFilterList):
+                classFilterList = [classFilterList]
+        sites = self._definedContexts.getSites(excludeNone=True)
+        match = None
+        # if there is more than one site that this object is in
+        # just take the first that has an object?
+        # this might use get(sortByCreationTime)
+        #environLocal.printDebug(['sites:', sites])
+
+        siteSites = []
+        for s in sites:
+            #environLocal.printDebug(['looking at sites:', s, id(s)])
+            match = self._adjacentObject(s, 
+                classFilterList=classFilterList, ascend=ascend)
+            if match is not None:
+                return match
+            siteSites += s._definedContexts.getSites(excludeNone=True)
+        # if still have not found, need to look in flat of each object site
+        # and find next
+        # note that it might still be necessary to ascend to higher level, 
+        # e.g., like when coming from a Voice in a Measure
+        memo = {}
+        for s in siteSites:
+            #environLocal.printDebug(['looking at siteSites:', s])
+            # check for duplicated sites; may be possible
+            try:
+                memo[id(s)]
+                continue # if in dict, do not continue
+            except KeyError: # if not in dict
+                memo[id(s)] = None # add to dict
+            sFlat = s.semiFlat # calling will create a new site for self
+            match = self._adjacentObject(sFlat, 
+                    classFilterList=classFilterList, ascend=ascend)
+            if match is not None:
+                return match
+        # if cannot be found, return None
+        return None            
+        
+
+    def next(self, classFilterList=None):
+        '''Get the next element found in a site of this element. 
+
+        >>> from music21 import *
+        >>> s = corpus.parse('bwv66.6')
+        >>> m = s.parts[0][5]
+        >>> m.next() == s.parts[0][6]
+        True
+        '''
+        return self._adjacencySearch(classFilterList=classFilterList, 
+                                    ascend=True)
+                        
+    def previous(self, classFilterList=None):
+        '''Get the previous element found in a site of this element. 
+        '''
+        return self._adjacencySearch(classFilterList=classFilterList, 
+                                    ascend=False)
 
 
     #---------------------------------------------------------------------------
@@ -5017,6 +5096,50 @@ class Test(unittest.TestCase):
         environLocal.pd(['getContexByClass()'])
         self.assertEqual(str(n2.getContextByClass('TimeSignature')), '3/4') 
 
+
+    def testNextA(self):
+        from music21 import stream, scale, note
+        s = stream.Stream()
+        sc = scale.MajorScale()
+        notes = []
+        for p in sc.pitches:
+            n = note.Note()
+            s.append(n)
+            notes.append(n) # keep for reference and testing
+        
+        self.assertEqual(notes[0], s[0])
+        self.assertEqual(notes[1], s[0].next())
+        self.assertEqual(notes[0], s[1].previous())
+
+        self.assertEqual(id(notes[5]), id(s[4].next()))
+        self.assertEqual(id(notes[3]), id(s[4].previous()))
+
+        # if a note has more than one site, what happens
+        self.assertEqual(notes[6], s.notes[5].next())
+        self.assertEqual(notes[7], s.notes[6].next())
+        
+
+    def testNextB(self):
+        from music21 import stream, note
+
+        m1 = stream.Measure()
+        m1.number = 1
+        n1 = note.Note()
+        m1.append(n1)
+
+        m2 = stream.Measure()
+        m2.number = 2
+        n2 = note.Note()    
+        m2.append(n2)
+
+        # n1 cannot be connected to n2 as no common site
+        self.assertEqual(n1.next(), None)
+
+        p1 = stream.Part()
+        p1.append(m1)
+        p1.append(m2)
+        self.assertEqual(n1.next(), m2)
+        self.assertEqual(n1.next('Note'), n2)
 
 
 

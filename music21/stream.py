@@ -6363,8 +6363,7 @@ class Stream(music21.Music21Object):
         # this copy will have a shared locations object
         # note that copy.copy() in some cases seems to not cause secondary
         # problems that self.__class__() does
-        sNew = copy.copy(self)
-            
+        sNew = copy.copy(self)            
         sNew._derivation = derivation.Derivation(sNew)
         sNew.setDerivation(self)
         if retainContainers:
