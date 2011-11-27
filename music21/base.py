@@ -2630,12 +2630,14 @@ class Music21Object(JSONSerializer):
                 classFilterList = [classFilterList]
         sites = self._definedContexts.getSites(excludeNone=True)
         match = None
-        # if there is more than one site that this object is in
-        # just take the first that has an object?
+
         # this might use get(sortByCreationTime)
         #environLocal.printDebug(['sites:', sites])
-
         siteSites = []
+
+        # first, look in sites that are do not req flat presentation
+        # these do not need to be flattened b/c we know the self is in these
+        # streams
         for s in sites:
             #environLocal.printDebug(['looking at sites:', s, id(s)])
             match = self._adjacentObject(s, 
@@ -2643,24 +2645,27 @@ class Music21Object(JSONSerializer):
             if match is not None:
                 return match
             siteSites += s._definedContexts.getSites(excludeNone=True)
+
         # if still have not found, need to look in flat of each object site
         # and find next
-        # note that it might still be necessary to ascend to higher level, 
-        # e.g., like when coming from a Voice in a Measure
+        # this does not use recursion, but instead uses a queue
         memo = {}
-        for s in siteSites:
+        while len(siteSites) > 0:
             #environLocal.printDebug(['looking at siteSites:', s])
             # check for duplicated sites; may be possible
+            s = siteSites.pop(0) # take the first off of 
             try:
                 memo[id(s)]
                 continue # if in dict, do not continue
             except KeyError: # if not in dict
                 memo[id(s)] = None # add to dict
-            sFlat = s.semiFlat # calling will create a new site for self
-            match = self._adjacentObject(sFlat, 
+            # use semiflat of site
+            match = self._adjacentObject(s.semiFlat, 
                     classFilterList=classFilterList, ascend=ascend)
             if match is not None:
                 return match
+            # append new sites to end of queue
+            siteSites += s._definedContexts.getSites(excludeNone=True)
         # if cannot be found, return None
         return None            
         
@@ -5141,6 +5146,15 @@ class Test(unittest.TestCase):
         self.assertEqual(n1.next(), m2)
         self.assertEqual(n1.next('Note'), n2)
 
+
+    def testNextC(self):
+        from music21 import corpus
+        s = corpus.parse('bwv66.6')
+        p1 = s.parts[0]
+        nLast = p1.flat.notes[-1]
+        self.assertEqual(str(nLast.previous('TimeSignature')), '4/4')
+        self.assertEqual(str(nLast.previous('KeySignature')), 
+            'sharps 3, mode minor')
 
 
 #-------------------------------------------------------------------------------
