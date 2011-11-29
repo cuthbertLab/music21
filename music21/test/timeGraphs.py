@@ -6,7 +6,7 @@
 # Authors:       Michael Scott Cuthbert
 #                Christopher Ariza
 #
-# Copyright:     (c) 2009-2010 The music21 Project
+# Copyright:     (c) 2009-2011 The music21 Project
 # License:       GPL
 #-------------------------------------------------------------------------------
 
@@ -438,14 +438,11 @@ class TestGetContextByClassB(CallTest):
         self.targetNoteA = m4[-1] # last element is a note
         self.targetNoteB = m1[-1] # last element is a note
 
-        #self.s.show()
-#         self.s = converter.parse('/_scratch/test.xml')
-#         t = self.s.parts[1].flat.notes
-#         self.targetNote = t[-1]
-#         del t
-
     def testFocus(self):
         post = self.targetNoteA.getContextByClass('TimeSignature')
+        #post = self.targetNoteA.previous('TimeSignature')
+
+
 
 class TestMeasuresA(CallTest):
 
@@ -509,8 +506,8 @@ class CallGraph:
         #self.callTest = TestCommonContextSearches
         #self.callTest = TestBigMusicXML
 
-        self.callTest = TestMeasuresA
-        #self.callTest = TestGetContextByClassB
+        #self.callTest = TestMeasuresA
+        self.callTest = TestGetContextByClassB
         #self.callTest = TestMeasuresB
 
     def run(self):

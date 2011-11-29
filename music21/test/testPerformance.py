@@ -215,6 +215,30 @@ class Test(unittest.TestCase):
                     assert post != None
             
 
+    def runGetElementsByPrevious(self):
+        '''Test getting elements by using the previous method
+        '''
+        from music21 import corpus, clef, meter, key
+        s = corpus.parse('bwv66.6')
+        for p in s.parts:
+            for m in p.getElementsByClass('Measure'):
+                post = m.previous('Clef')
+                assert post != None
+                post = m.previous('TimeSignature')
+                assert post != None
+                post = m.previous('KeySignature')
+                assert post != None
+
+                for n in m.notesAndRests:
+                    post = n.getContextByClass('Clef')
+                    assert post != None
+                    post = n.getContextByClass('TimeSignature')
+                    assert post != None
+                    post = n.getContextByClass('KeySignature')
+                    assert post != None
+            
+
+
 
     def runParseMonteverdiRNText(self):
         '''Loading file: beethoven/opus59no2/movement3
@@ -234,11 +258,18 @@ class Test(unittest.TestCase):
         # provide work and expected min/max in seconds
         for testMethod, best in [
 
-#             (self.runGetElementsByContext, 
-#                 {
-#                  '2010.11.10': 7.3888170, 
-#                  '2010.11.11': 3.96121883392, 
-#                 }),
+            (self.runGetElementsByPrevious, 
+                {
+                 '2011.11.29': 4.69, 
+                }),
+
+            (self.runGetElementsByContext, 
+                {
+                 '2010.11.10': 7.3888170, 
+                 '2010.11.11': 3.96121883392, 
+                }),
+
+
 # 
 # 
 # 
@@ -292,10 +323,10 @@ class Test(unittest.TestCase):
 #                 {'2010.09.20': 7.706, 
 #                 }),
 # 
-            (self.runMusicxmlOutScoreBeethoven, 
-                {'2010.09.20': 33.273, 
-                 '2010.10.07': 11.9290, 
-                }),
+#             (self.runMusicxmlOutScoreBeethoven, 
+#                 {'2010.09.20': 33.273, 
+#                  '2010.10.07': 11.9290, 
+#                 }),
 
 
 # 

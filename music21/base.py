@@ -2653,7 +2653,7 @@ class Music21Object(JSONSerializer):
         while len(siteSites) > 0:
             #environLocal.printDebug(['looking at siteSites:', s])
             # check for duplicated sites; may be possible
-            s = siteSites.pop(0) # take the first off of 
+            s = siteSites.pop(0) # take the first off of sites
             try:
                 memo[id(s)]
                 continue # if in dict, do not continue

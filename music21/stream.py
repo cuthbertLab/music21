@@ -720,12 +720,37 @@ class Stream(music21.Music21Object):
     def hasElementOfClass(self, className, forceFlat=False):
         '''Given a single class name as string, return True or False if an element with the specified class is found. The Stream must be flat, and only a single class name can be given.
         '''
-        if forceFlat and not self.isFlat:
-            raise StreamException('cannot use hasElementOfClass on a non-flat Stream')
-        if self._cache['classCache'] is None:
-            self._cache['classCache'] = classCache.ClassCache()
-            self._cache['classCache'].load(self)
-        return self._cache['classCache'].hasElementOfClass(className)
+        for e in self._elements:
+            if e.isClassOrSubclass([className]): 
+                return True
+        for e in self._endElements:
+            if e.isClassOrSubclass([className]): 
+                return True
+        return False
+
+#         cacheKey = 'hasElementOfClass-%s' % str(className)
+#         try:
+#             return self._cache[cacheKey]
+#         except:
+#             pass
+# 
+#         for e in self._elements:
+#             if e.isClassOrSubclass([className]): 
+#                 self._cache[cacheKey] = True
+#                 return True
+#         for e in self._endElements:
+#             if e.isClassOrSubclass([className]): 
+#                 self._cache[cacheKey] = True
+#                 return True
+#         self._cache[cacheKey] = False
+#         return False
+
+#         if forceFlat and not self.isFlat:
+#             raise StreamException('cannot use hasElementOfClass on a non-flat Stream')
+#         if self._cache['classCache'] is None:
+#             self._cache['classCache'] = classCache.ClassCache()
+#             self._cache['classCache'].load(self)
+#         return self._cache['classCache'].hasElementOfClass(className)
 
     def hasElementByObjectId(self, objId):
         '''Return True if an element object id, provided as an argument, is contained in this Stream.
@@ -2136,12 +2161,11 @@ class Stream(music21.Music21Object):
             classFilterList = tuple([classFilterList])
 
         # if we are sure that this Stream does not have a class
-        canUseClassCache = False
+        singleClassString = False
         if (len(classFilterList) == 1 and 
             isinstance(classFilterList[0], str)):
-            canUseClassCache = True
-
-        if canUseClassCache:
+            singleClassString = True
+        if singleClassString:
             if not self.hasElementOfClass(classFilterList[0]):
                 found.isSorted = self.isSorted
                 return found
@@ -2153,13 +2177,13 @@ class Stream(music21.Music21Object):
 
         # to use class cache, class must be provided as a string, 
         # and there must be only one class
-        if canUseClassCache:
-            if self._cache['classCache'] is None:
-                self._cache['classCache'] = classCache.ClassCache()
-                self._cache['classCache'].load(self)
-            found = self._cache['classCache'].getElementsByClass(found,
-                                              classFilterList)
-            return found
+#         if canUseClassCache:
+#             if self._cache['classCache'] is None:
+#                 self._cache['classCache'] = classCache.ClassCache()
+#                 self._cache['classCache'].load(self)
+#             found = self._cache['classCache'].getElementsByClass(found,
+#                                               classFilterList)
+#             return found
 
         #found.show('t')
         # need both _elements and _endElements
