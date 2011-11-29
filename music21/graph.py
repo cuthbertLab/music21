@@ -853,6 +853,7 @@ class GraphHorizontalBar(Graph):
 
         keys = []
         i = 0
+        # TODO: check data orientation; flips in some cases
         for key, points in self.data:
             keys.append(key)
             # provide a list of start, end points;
@@ -894,6 +895,105 @@ class GraphHorizontalBar(Graph):
         self._adjustAxisSpines(ax)
         self._applyFormatting(ax)
         self.done()
+
+
+
+
+class GraphHorizontalBarDynamic(Graph):
+    def __init__(self, *args, **keywords):
+        '''Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap and can have different heights.
+        '''
+        Graph.__init__(self, *args, **keywords)
+        self.axisKeys = ['x', 'y']
+        self._axisInit()
+
+        self._barSpace = 8
+        self._margin = 2
+        # this is a maximum value
+        self._barHeight = self._barSpace - (self._margin * 2)
+
+        # if figure size has not been defined, configure
+        if 'figureSize' not in keywords:
+            self.setFigureSize([10,4])
+        if 'alpha' not in keywords:
+            self.alpha = .6
+
+    def process(self):
+        # figure size can be set w/ figsize=(5,10)
+        self.fig = plt.figure()
+        self.fig.subplots_adjust(left=0.15)   
+        ax = self.fig.add_subplot(1, 1, 1)
+
+        yPos = 0
+        xPoints = [] # store all to find min/max
+        yTicks = [] # a list of label, value pairs
+        xTicks = []
+
+        keys = []
+        i = 0
+
+        # TODO: reverse data to draw top / bottom
+        for key, points in self.data:
+            keys.append(key)
+            xRanges = []
+            yRanges = []
+            for heightScalar, x, span in points:
+                xRanges.append((x, span))
+            # TODO: add high/low shift to position w/n range
+            # provide a list of start, end points;
+            # then start y position, bar height
+                h = self._barHeight*heightScalar
+                if heightScalar < 1:
+                    yAdjust = (self._barHeight-h) * .5
+                else:
+                    yAdjust = 0
+                yRanges.append((yPos+self._margin+yAdjust, h))
+
+#             ax.broken_barh(xRanges, yRanges[0],
+#                         facecolors=self.colors[i%len(self.colors)], alpha=self.alpha)
+
+            for i, xRange in enumerate(xRanges):
+                ax.broken_barh([xRange], yRanges[i],
+                        facecolors=self.colors[i%len(self.colors)], alpha=self.alpha)
+
+            for heightScalar, xStart, xLen in points:
+                xEnd = xStart + xLen
+                for x in [xStart, xEnd]:
+                    if x not in xPoints:
+                        xPoints.append(x)
+            # ticks are value, label
+            yTicks.append([yPos + self._barSpace * .5, key])
+            #yTicks.append([key, yPos + self._barSpace * .5])
+            yPos += self._barSpace
+            i += 1
+
+        xMin = min(xPoints)
+        xMax = max(xPoints) 
+        xRange = xMax - xMin
+        #environLocal.printDebug(['got xMin, xMax for points', xMin, xMax, ])
+
+        self.setAxisRange('y', (0, len(keys) * self._barSpace))
+        self.setAxisRange('x', (xMin, xMax), pad=True)
+        self.setTicks('y', yTicks)  
+
+        # first, see if ticks have been set externally
+        if 'ticks' in self.axis['x'].keys() and len(self.axis['x']['ticks']) == 0:
+            rangeStep = int(xMin+int(round(xRange/10)))
+            if rangeStep == 0:
+                rangeStep = 1
+            for x in range(int(math.floor(xMin)), 
+                           int(round(math.ceil(xMax))), 
+                           rangeStep):
+                xTicks.append([x, '%s' % x])
+            self.setTicks('x', xTicks)  
+
+        #environLocal.printDebug([yTicks])
+        self._adjustAxisSpines(ax)
+        self._applyFormatting(ax)
+        self.done()
+
+
+
 
 
 
@@ -2724,20 +2824,6 @@ class PlotHorizontalBar(PlotStream):
                 xValues.append(end)
                 dataUnique[numericValue].append((start, end))
 
-#         for noteObj in sSrc.getElementsByClass(note.Note):
-#             # numeric value here becomes y axis
-#             numericValue = int(round(self.fy(noteObj)))
-#             if numericValue not in dataUnique.keys():
-#                 dataUnique[numericValue] = []
-#             # all work with offset
-#             start = noteObj.offset
-#             # this is not the end, but instead the length
-#             end = noteObj.quarterLength
-#             xValues.append(start)
-#             xValues.append(end)
-#             dataUnique[numericValue].append((start, end))
-            
-
         # create final data list
         # get labels from ticks
         data = []
@@ -2846,6 +2932,100 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
 
         if 'title' not in keywords:
             self.graph.setTitle('Note Quarter Length by Pitch')
+
+
+
+
+#-------------------------------------------------------------------------------
+class PlotHorizontalBarDynamic(PlotStream):
+    '''
+    '''
+    format = 'horizontalbardynamic'
+    def __init__(self, streamObj, *args, **keywords):
+        PlotStream.__init__(self, streamObj, *args, **keywords)
+
+        self.fy = lambda n:n.ps
+        self.fyTicks = self.ticksPitchSpaceChromatic
+        self.fxTicks = self.ticksOffset
+
+    def _extractData(self):
+        dataUnique = {}
+        xValues = []
+        # collect data
+        # create final data list
+        # get labels from ticks
+        
+        # data is value, (weight, start, duration)
+        # note that order here is reverse
+        # change: start, dur, weight, color, alpha
+        data =  [
+        ('Violins', [(1, 3, 5), (.2, 1, 12)]), 
+        ('Celli', [(.2, 2, 7), (.6, 10, 3)]), 
+        ('clarinet', [(.5, 5, 1)]),
+        ('Flute', [(.1, 5, 1), (.3, 7, 20)]),
+                ]
+
+        uniqueOffsets = []
+        for key, value in data:
+            for weight, start, dur in value:
+                if start not in uniqueOffsets:
+                    uniqueOffsets.append(start)
+                if start+dur not in uniqueOffsets:
+                    uniqueOffsets.append(start+dur)
+
+        # y ticks are auto-generated in lower-level routines
+        # this is used just for creating labels
+#         yTicks = self.fyTicks(min(dataUnique.keys()),
+#                                        max(dataUnique.keys()))
+# 
+#         for numericValue, label in yTicks:
+#             if numericValue in dataUnique.keys():
+#                 data.append([label, dataUnique[numericValue]])
+#             else:
+#                 data.append([label, []])
+
+        yTicks = []
+        # use default args for now
+        xTicks = self.fxTicks(min(uniqueOffsets), max(uniqueOffsets))
+        # yTicks are returned, even though they are not used after this method
+        return data, xTicks, yTicks
+
+
+
+class PlotHorizontalBarInstrumentation(PlotHorizontalBarDynamic):
+    '''A graph of instrument activity. 
+
+    >>> from music21 import *
+    '''
+    values = ['instrument', 'pianoroll']
+    def __init__(self, streamObj, *args, **keywords):
+        PlotHorizontalBarDynamic.__init__(self, streamObj, *args, **keywords)
+
+        #self.fy = lambda n:n.pitchClass
+        self.fyTicks = self.ticksPitchClassUsage
+        self.fxTicks = self.ticksOffset # this a method
+
+        self.data, xTicks, yTicks = self._extractData()
+
+        #environLocal.printDebug(['PlotHorizontalBarPitchClassOffset', 'post processing xTicks', xTicks])
+
+        self.graph = GraphHorizontalBarDynamic(*args, **keywords)
+        self.graph.setData(self.data)
+
+        # only need to add x ticks; y ticks added from data labels
+        #environLocal.printDebug(['PlotHorizontalBarPitchClassOffset:', 'xTicks before setting to self.graph', xTicks])
+        self.graph.setTicks('x', xTicks)  
+
+        self.graph.setAxisLabel('x', self._axisLabelMeasureOrOffset())
+        self.graph.setAxisLabel('y', 'Instrument')
+
+        # need more space for pitch axis labels
+        if 'figureSize' not in keywords:
+            self.graph.setFigureSize([10,4])
+
+        if 'title' not in keywords:
+            self.graph.setTitle('Instrumentation')
+
 
 
 
@@ -4352,6 +4532,13 @@ class Test(unittest.TestCase):
         p = PlotFeatures(streamList, feList)
         p.process()
 
+
+    def testHorizontalInstrumentationA(self):
+        from music21 import graph, stream
+        s = stream.Stream()
+        g = graph.PlotHorizontalBarInstrumentation(s)
+        #g.process()
+        #g.show()
 
 
 #-------------------------------------------------------------------------------

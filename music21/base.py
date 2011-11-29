@@ -2581,7 +2581,8 @@ class Music21Object(JSONSerializer):
 
 
     #---------------------------------------------------------------------------
-    def _adjacentObject(self, site, classFilterList=None, ascend=True):
+    def _adjacentObject(self, site, classFilterList=None, ascend=True, 
+                        beginNearest=True):
         '''Core method for finding adjacent objects given a single site. 
             
         The `site` argument is a Stream that contains this element. The index of this element if sound in this site, and either the next or previous element, if found, is returned.
@@ -2591,39 +2592,72 @@ class Music21Object(JSONSerializer):
         The `classFilterList` may specify one or more classes as targets.
         '''
         siteLength = len(site)
+        # get another list to avoid function calls
+        siteElements = site.elements
         # special optimization for class selection when a single str class
         # is given
         if (classFilterList is not None and len(classFilterList) == 1 and 
             isinstance(classFilterList[0], str)):
             if not site.hasElementOfClass(classFilterList[0]):
                 return None
-        if ascend:
+        # go to right, start at nearest
+        if ascend and beginNearest:
             currentIndex = site.index(self) + 1 # start with next
             while (currentIndex < siteLength):
-                next = site[currentIndex]
-                if classFilterList is not None:     
+                next = siteElements[currentIndex]
+                if classFilterList is not None: 
+                    if next.isClassOrSubclass(classFilterList):
+                        return next
+                else:
+                    return next
+                currentIndex += 1
+        # go to right, start at righmost
+        elif ascend and not beginNearest:
+            lastIndex = site.index(self) + 1 # end with next
+            currentIndex = siteLength
+            while (currentIndex >= lastIndex):
+                next = siteElements[currentIndex]
+                if classFilterList is not None:
+                    if next.isClassOrSubclass(classFilterList):
+                        return next
+                else:
+                    return next
+                currentIndex -= 1
+        # go to left, start at nearest
+        elif not ascend and beginNearest:
+            currentIndex = site.index(self) - 1 # start with next
+            while (currentIndex >= 0):
+                next = siteElements[currentIndex]
+                if classFilterList is not None: 
+                    if next.isClassOrSubclass(classFilterList):
+                        return next
+                else:
+                    return next
+                currentIndex -= 1
+        # go to left, start at leftmost
+        elif not ascend and not beginNearest:
+            lastIndex = site.index(self) - 1 # start with next
+            currentIndex = 0
+            while (currentIndex <= lastIndex):
+                next = siteElements[currentIndex]
+                if classFilterList is not None:
                     if next.isClassOrSubclass(classFilterList):
                         return next
                 else:
                     return next
                 currentIndex += 1
         else:
-            currentIndex = site.index(self) - 1 # start with next
-            while (currentIndex >= 0):
-                next = site[currentIndex]
-                if classFilterList is not None:     
-                    if next.isClassOrSubclass(classFilterList):
-                        return next
-                else:
-                    return next
-                currentIndex -= 1
+            raise Music21ObjectException('bad organization of ascend and beginNearest parameters')
         # if nothing found, return None
         return None
 
-    def _adjacencySearch(self, classFilterList=None, ascend=True):
+    def _adjacencySearch(self, classFilterList=None, ascend=True, 
+        beginNearest=True, flattenFirstSites=False):
         '''Get the next or previous element if this element is in a Stream. 
 
         If this element is in multiple Streams, the first next element found in any site will be returned. If not found no next element is found in any site, the flat representation of all sites of each immediate site are searched. 
+
+        If `beginNearest` is True, sites will be searched from the element nearest to the caller and then outward. 
         '''
         if classFilterList is not None:
             if not common.isListLike(classFilterList):
@@ -2631,46 +2665,51 @@ class Music21Object(JSONSerializer):
         sites = self._definedContexts.getSites(excludeNone=True)
         match = None
 
+        # store ids of of first sites; might need to take flattened version
+        firstSites = []
+        for s in sites:
+            firstSites.append(id(s))
         # this might use get(sortByCreationTime)
         #environLocal.printDebug(['sites:', sites])
-        siteSites = []
+        #siteSites = []
 
         # first, look in sites that are do not req flat presentation
         # these do not need to be flattened b/c we know the self is in these
         # streams
-        for s in sites:
-            #environLocal.printDebug(['looking at sites:', s, id(s)])
-            match = self._adjacentObject(s, 
-                classFilterList=classFilterList, ascend=ascend)
-            if match is not None:
-                return match
-            siteSites += s._definedContexts.getSites(excludeNone=True)
-
-        # if still have not found, need to look in flat of each object site
-        # and find next
-        # this does not use recursion, but instead uses a queue
         memo = {}
-        while len(siteSites) > 0:
+        while len(sites) > 0:
             #environLocal.printDebug(['looking at siteSites:', s])
             # check for duplicated sites; may be possible
-            s = siteSites.pop(0) # take the first off of sites
+            s = sites.pop(0) # take the first off of sites
             try:
                 memo[id(s)]
                 continue # if in dict, do not continue
             except KeyError: # if not in dict
-                memo[id(s)] = None # add to dict
+                memo[id(s)] = None # add to dict, value does not matter
+
+            if id(s) in firstSites:
+                if flattenFirstSites:
+                    target = s.semiFlat
+                else: # do not flatten first sites
+                    target = s
+                    # add semi flat to sites, as we have not searched it yet
+                    sites.append(s.semiFlat)
+                firstSites.pop(firstSites.index(id(s))) # remove for efficiency
+            else: # normal site
+                target = s.semiFlat
             # use semiflat of site
-            match = self._adjacentObject(s.semiFlat, 
-                    classFilterList=classFilterList, ascend=ascend)
+            match = self._adjacentObject(target, 
+                    classFilterList=classFilterList, ascend=ascend, 
+                    beginNearest=beginNearest)
             if match is not None:
                 return match
             # append new sites to end of queue
-            siteSites += s._definedContexts.getSites(excludeNone=True)
+            sites += s._definedContexts.getSites(excludeNone=True)
         # if cannot be found, return None
         return None            
         
 
-    def next(self, classFilterList=None):
+    def next(self, classFilterList=None, beginNearest=True):
         '''Get the next element found in a site of this element. 
 
         >>> from music21 import *
@@ -2680,13 +2719,13 @@ class Music21Object(JSONSerializer):
         True
         '''
         return self._adjacencySearch(classFilterList=classFilterList, 
-                                    ascend=True)
+                                    ascend=True, beginNearest=beginNearest)
                         
-    def previous(self, classFilterList=None):
+    def previous(self, classFilterList=None, beginNearest=True):
         '''Get the previous element found in a site of this element. 
         '''
         return self._adjacencySearch(classFilterList=classFilterList, 
-                                    ascend=False)
+                                    ascend=False, beginNearest=beginNearest)
 
 
     #---------------------------------------------------------------------------

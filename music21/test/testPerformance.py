@@ -197,21 +197,25 @@ class Test(unittest.TestCase):
         from music21 import corpus, clef, meter, key
 
         s = corpus.parse('bwv66.6')
+        # create a few secondary streams to add more sites
+        flat = s.flat
+        notes = s.flat.notes
+
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
-                post = m.getContextByClass(clef.Clef)
+                post = m.getContextByClass('Clef')
                 assert post != None
-                post = m.getContextByClass(meter.TimeSignature)
+                post = m.getContextByClass('TimeSignature')
                 assert post != None
-                post = m.getContextByClass(key.KeySignature)
+                post = m.getContextByClass('KeySignature')
                 assert post != None
 
                 for n in m.notesAndRests:
-                    post = n.getContextByClass(clef.Clef)
+                    post = n.getContextByClass('Clef')
                     assert post != None
-                    post = n.getContextByClass(meter.TimeSignature)
+                    post = n.getContextByClass('TimeSignature')
                     assert post != None
-                    post = n.getContextByClass(key.KeySignature)
+                    post = n.getContextByClass('KeySignature')
                     assert post != None
             
 
@@ -220,6 +224,10 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus, clef, meter, key
         s = corpus.parse('bwv66.6')
+        # create a few secondary streams to add more sites
+        flat = s.flat
+        notes = s.flat.notes
+
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
                 post = m.previous('Clef')

@@ -439,8 +439,8 @@ class TestGetContextByClassB(CallTest):
         self.targetNoteB = m1[-1] # last element is a note
 
     def testFocus(self):
-        post = self.targetNoteA.getContextByClass('TimeSignature')
-        #post = self.targetNoteA.previous('TimeSignature')
+        #post = self.targetNoteA.getContextByClass('TimeSignature')
+        post = self.targetNoteA.previous('TimeSignature')
 
 
 

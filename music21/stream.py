@@ -23,7 +23,7 @@ import music21 # needed to do fully-qualified isinstance name checking
 
 from music21 import bar
 from music21 import common
-from music21 import classCache
+#from music21 import classCache
 from music21 import clef
 from music21 import chord
 from music21 import defaults
@@ -3561,8 +3561,8 @@ class Stream(music21.Music21Object):
             post.derivationMethod = 'getTimeSignatures'
 
             # sort by time to search the most recent objects
-            obj = self.getContextByClass('TimeSignature', 
-                  sortByCreationTime=sortByCreationTime)
+            obj = self.getContextByClass('TimeSignature', sortByCreationTime=sortByCreationTime)
+            #obj = self.previous('TimeSignature')
             #environLocal.printDebug(['getTimeSignatures(): searching contexts: results', obj])
             if obj != None:
                 post.append(obj)
