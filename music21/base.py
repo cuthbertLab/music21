@@ -5217,7 +5217,7 @@ class Test(unittest.TestCase):
     def testNextC(self):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
-
+        
         # getting time signature and key sig
         p1 = s.parts[0]
         nLast = p1.flat.notes[-1]
@@ -5228,19 +5228,20 @@ class Test(unittest.TestCase):
         # iterating at the Measure level, showing usage of flattenLocalSites
         measures = s.parts[0].getElementsByClass('Measure')
         self.assertEqual(measures[3].previous(), measures[2])
-
+        
         self.assertEqual(measures[3].previous(), measures[2])
         self.assertEqual(measures[3].previous(flattenLocalSites=True), measures[2].notes[-1])
-
+        
         self.assertEqual(measures[3].next(), measures[4])
         self.assertEqual(measures[3].next('Note', flattenLocalSites=True), measures[3].notes[0])
-
+        
         self.assertEqual(measures[3].previous().previous(), measures[1])
         self.assertEqual(measures[3].previous().previous().previous(), measures[0])
         self.assertEqual(
             str(measures[3].previous().previous().previous().previous()), 
             'P1: Soprano: Instrument 1')
 
+        self.assertEqual(str(measures[0].previous()), 'P1: Soprano: Instrument 1') 
 
 
 #-------------------------------------------------------------------------------
