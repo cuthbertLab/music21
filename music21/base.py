@@ -2589,6 +2589,8 @@ class Music21Object(JSONSerializer):
 
         If `ascend` is True index values are increment; if False, index values are decremented.
     
+        If `beginNearest` is True, index values are searched based on those closest to the caller; if False, the search is done in reverse, from the most remote index toward the caller. This may be useful as an optimization when looking for elements that are far from the caller. 
+
         The `classFilterList` may specify one or more classes as targets.
         '''
         siteLength = len(site)
@@ -2652,7 +2654,7 @@ class Music21Object(JSONSerializer):
         return None
 
     def _adjacencySearch(self, classFilterList=None, ascend=True, 
-        beginNearest=True, flattenFirstSites=False):
+        beginNearest=True, flattenLocalSites=False):
         '''Get the next or previous element if this element is in a Stream. 
 
         If this element is in multiple Streams, the first next element found in any site will be returned. If not found no next element is found in any site, the flat representation of all sites of each immediate site are searched. 
@@ -2688,13 +2690,20 @@ class Music21Object(JSONSerializer):
                 memo[id(s)] = None # add to dict, value does not matter
 
             if id(s) in firstSites:
-                if flattenFirstSites:
-                    target = s.semiFlat
+                if flattenLocalSites:
+                    if s.isFlat:
+                        target = s
+                    else:
+                        target = s.semiFlat
                 else: # do not flatten first sites
                     target = s
                     # add semi flat to sites, as we have not searched it yet
                     sites.append(s.semiFlat)
                 firstSites.pop(firstSites.index(id(s))) # remove for efficiency
+            # if flat, do not get semiFlat
+            # note that semiFlat streams are marked as isFlat=True
+            elif s.isFlat:
+                target = s
             else: # normal site
                 target = s.semiFlat
             # use semiflat of site
@@ -2704,28 +2713,47 @@ class Music21Object(JSONSerializer):
             if match is not None:
                 return match
             # append new sites to end of queue
+            # these are the sites of s, not target
             sites += s._definedContexts.getSites(excludeNone=True)
         # if cannot be found, return None
         return None            
         
 
-    def next(self, classFilterList=None, beginNearest=True):
-        '''Get the next element found in a site of this element. 
+    def next(self, classFilterList=None, flattenLocalSites=False, 
+        beginNearest=True):
+        '''Get the next element found in a site of this Music21Object. 
+
+        The `classFilterList` can be used to specify one or more classes to match.
+
+        The `flattenLocalSites` parameter determines if the sites of this element (e.g., a Measure's Part) are flattened on first search. When True, elements contained in adjacent containers may be selected first. 
 
         >>> from music21 import *
         >>> s = corpus.parse('bwv66.6')
-        >>> m = s.parts[0][5]
-        >>> m.next() == s.parts[0][6]
+        >>> s.parts[0].measure(3).next() == s.parts[0].measure(4)
+        True
+        >>> s.parts[0].measure(3).next('Note', flattenLocalSites=True) == s.parts[0].measure(3).notes[0]
         True
         '''
         return self._adjacencySearch(classFilterList=classFilterList, 
-                                    ascend=True, beginNearest=beginNearest)
+                                    ascend=True, beginNearest=beginNearest, flattenLocalSites=flattenLocalSites)
                         
-    def previous(self, classFilterList=None, beginNearest=True):
-        '''Get the previous element found in a site of this element. 
+    def previous(self, classFilterList=None, flattenLocalSites=False,
+        beginNearest=True):
+        '''Get the previous element found in a site of this Music21Object. 
+
+        The `classFilterList` can be used to specify one or more classes to match.
+
+        The `flattenLocalSites` parameter determines if the sites of this element (e.g., a Measure's Part) are flattened on first search. When True, elements contained in adjacent containers may be selected first. 
+
+        >>> from music21 import *
+        >>> s = corpus.parse('bwv66.6')
+        >>> s.parts[0].measure(3).previous() == s.parts[0].measure(2)
+        True
+        >>> s.parts[0].measure(3).previous('Note', flattenLocalSites=True) == s.parts[0].measure(2).notes[-1]
+        True
         '''
         return self._adjacencySearch(classFilterList=classFilterList, 
-                                    ascend=False, beginNearest=beginNearest)
+                                    ascend=False, beginNearest=beginNearest, flattenLocalSites=flattenLocalSites)
 
 
     #---------------------------------------------------------------------------
@@ -5189,11 +5217,30 @@ class Test(unittest.TestCase):
     def testNextC(self):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
+
+        # getting time signature and key sig
         p1 = s.parts[0]
         nLast = p1.flat.notes[-1]
         self.assertEqual(str(nLast.previous('TimeSignature')), '4/4')
         self.assertEqual(str(nLast.previous('KeySignature')), 
             'sharps 3, mode minor')
+        
+        # iterating at the Measure level, showing usage of flattenLocalSites
+        measures = s.parts[0].getElementsByClass('Measure')
+        self.assertEqual(measures[3].previous(), measures[2])
+
+        self.assertEqual(measures[3].previous(), measures[2])
+        self.assertEqual(measures[3].previous(flattenLocalSites=True), measures[2].notes[-1])
+
+        self.assertEqual(measures[3].next(), measures[4])
+        self.assertEqual(measures[3].next('Note', flattenLocalSites=True), measures[3].notes[0])
+
+        self.assertEqual(measures[3].previous().previous(), measures[1])
+        self.assertEqual(measures[3].previous().previous().previous(), measures[0])
+        self.assertEqual(
+            str(measures[3].previous().previous().previous().previous()), 
+            'P1: Soprano: Instrument 1')
+
 
 
 #-------------------------------------------------------------------------------
