@@ -17450,6 +17450,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive  
         from music21 import converter, stream
 
+        # TODO: there are still errors in this chordify output
         s = converter.parse(testPrimitive.triplets01)
         #s.parts[0].show()
         #s.show() 

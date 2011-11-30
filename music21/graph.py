@@ -901,7 +901,7 @@ class GraphHorizontalBar(Graph):
 
 class GraphHorizontalBarDynamic(Graph):
     def __init__(self, *args, **keywords):
-        '''Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap and can have different heights.
+        '''Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap, and can have different heights within their respective channel.
         '''
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']
@@ -915,6 +915,7 @@ class GraphHorizontalBarDynamic(Graph):
         # if figure size has not been defined, configure
         if 'figureSize' not in keywords:
             self.setFigureSize([10,4])
+        # this default alpha is used if not specified per bar
         if 'alpha' not in keywords:
             self.alpha = .6
 
@@ -932,35 +933,47 @@ class GraphHorizontalBarDynamic(Graph):
         keys = []
         i = 0
 
-        # TODO: reverse data to draw top / bottom
+        # reversing data to present in order
+        print self.data
+        self.data = list(self.data)
+        self.data.reverse()
         for key, points in self.data:
             keys.append(key)
             xRanges = []
             yRanges = []
-            for heightScalar, x, span in points:
+            alphas = []
+            colors = []
+            for i, data in enumerate(points):
+                if len(data) == 3:
+                    x, span, heightScalar = data
+                    color = self.colors[i%len(self.colors)]
+                    alpha = self.alpha
+                elif len(data) == 4:
+                    x, span, heightScalar, color = data
+                    alpha = self.alpha
+                elif len(data) == 5:
+                    x, span, heightScalar, color, alpha = data
+                # add to x ranges
                 xRanges.append((x, span))
-            # TODO: add high/low shift to position w/n range
-            # provide a list of start, end points;
-            # then start y position, bar height
-                h = self._barHeight*heightScalar
-                if heightScalar < 1:
-                    yAdjust = (self._barHeight-h) * .5
-                else:
-                    yAdjust = 0
-                yRanges.append((yPos+self._margin+yAdjust, h))
+                colors.append(color)
+                alphas.append(alpha)
+                # x points used to get x ticks
+                if x not in xPoints:
+                    xPoints.append(x)
+                if x+span not in xPoints:
+                    xPoints.append(x+span)
 
-#             ax.broken_barh(xRanges, yRanges[0],
-#                         facecolors=self.colors[i%len(self.colors)], alpha=self.alpha)
+                # TODO: add high/low shift to position w/n range
+                # provide a list of start, end points;
+                # then start y position, bar height
+                h = self._barHeight*heightScalar
+                yAdjust = (self._barHeight-h) * .5
+                yRanges.append((yPos+self._margin+yAdjust, h))
 
             for i, xRange in enumerate(xRanges):
                 ax.broken_barh([xRange], yRanges[i],
-                        facecolors=self.colors[i%len(self.colors)], alpha=self.alpha)
+                        facecolors=colors[i], alpha=alphas[i])
 
-            for heightScalar, xStart, xLen in points:
-                xEnd = xStart + xLen
-                for x in [xStart, xEnd]:
-                    if x not in xPoints:
-                        xPoints.append(x)
             # ticks are value, label
             yTicks.append([yPos + self._barSpace * .5, key])
             #yTicks.append([key, yPos + self._barSpace * .5])
@@ -2943,9 +2956,6 @@ class PlotHorizontalBarDynamic(PlotStream):
     format = 'horizontalbardynamic'
     def __init__(self, streamObj, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
-
-        self.fy = lambda n:n.ps
-        self.fyTicks = self.ticksPitchSpaceChromatic
         self.fxTicks = self.ticksOffset
 
     def _extractData(self):
@@ -2955,35 +2965,22 @@ class PlotHorizontalBarDynamic(PlotStream):
         # create final data list
         # get labels from ticks
         
-        # data is value, (weight, start, duration)
-        # note that order here is reverse
-        # change: start, dur, weight, color, alpha
+        # change: start, dur, heightWeight, color, alpha
         data =  [
-        ('Violins', [(1, 3, 5), (.2, 1, 12)]), 
-        ('Celli', [(.2, 2, 7), (.6, 10, 3)]), 
-        ('clarinet', [(.5, 5, 1)]),
-        ('Flute', [(.1, 5, 1), (.3, 7, 20)]),
+        ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, .2, '#3ff203')]  ), 
+        ('Celli',    [(2, 7, .2, '#0ff302'), (10, 3, .6, '#ff0000', 1)]  ), 
+        ('Clarinet', [(5, 1, .5, '#3ff203')]  ),
+        ('Flute',    [(5, 1, .1, '#00ff00'), (7, 20, .3, '#00ff88')]  ),
                 ]
-
         uniqueOffsets = []
         for key, value in data:
-            for weight, start, dur in value:
+            for x in value:
+                start = x[0]
+                dur = x[1]
                 if start not in uniqueOffsets:
                     uniqueOffsets.append(start)
                 if start+dur not in uniqueOffsets:
                     uniqueOffsets.append(start+dur)
-
-        # y ticks are auto-generated in lower-level routines
-        # this is used just for creating labels
-#         yTicks = self.fyTicks(min(dataUnique.keys()),
-#                                        max(dataUnique.keys()))
-# 
-#         for numericValue, label in yTicks:
-#             if numericValue in dataUnique.keys():
-#                 data.append([label, dataUnique[numericValue]])
-#             else:
-#                 data.append([label, []])
-
         yTicks = []
         # use default args for now
         xTicks = self.fxTicks(min(uniqueOffsets), max(uniqueOffsets))
@@ -3015,14 +3012,12 @@ class PlotHorizontalBarInstrumentation(PlotHorizontalBarDynamic):
         # only need to add x ticks; y ticks added from data labels
         #environLocal.printDebug(['PlotHorizontalBarPitchClassOffset:', 'xTicks before setting to self.graph', xTicks])
         self.graph.setTicks('x', xTicks)  
-
         self.graph.setAxisLabel('x', self._axisLabelMeasureOrOffset())
         self.graph.setAxisLabel('y', 'Instrument')
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
             self.graph.setFigureSize([10,4])
-
         if 'title' not in keywords:
             self.graph.setTitle('Instrumentation')
 
