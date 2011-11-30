@@ -5454,7 +5454,6 @@ class Stream(music21.Music21Object):
                 durList = []
                 for n in noteStream:
                     durList.append(n.duration)
-    
                 #environLocal.printDebug(['beaming with ts', lastTimeSignature, 'measure', m, durList, noteStream[0], noteStream[1]])
     
                 # error check; call before sending to time signature, as, if this
@@ -5477,7 +5476,7 @@ class Stream(music21.Music21Object):
                     # this may try to assign a beam to a Rest
                     noteStream[i].beams = beamsList[i]
                 # apply tuple types in place; this modifies the durations 
-                # in dur lost
+                # in dur list
                 duration.updateTupletType(durList)
 
         del mColl # remove Stream no longer needed
@@ -17444,6 +17443,30 @@ class Test(unittest.TestCase):
         self.assertEqual(len(ex.flat.getElementsByClass('Rest')), 5)
         #ex.show()
 
+
+
+    def testChordifyF(self):
+        # testing chordify handling of triplets
+        from music21.musicxml import testPrimitive  
+        from music21 import converter, stream
+
+        s = converter.parse(testPrimitive.triplets01)
+        #s.parts[0].show()
+        #s.show() 
+        chords = s.chordify()
+        m1 = chords.getElementsByClass('Measure')
+        match = [(n.pitches, n.offset, n.quarterLength) for n in m1[0].notes]
+        self.assertEqual(str(match), '[([B-4, B-2], 0.0, 0.66666666666666663), ([C5, B-2], 0.66666666666666663, 0.66666666666666663), ([B-4, B-2], 1.3333333333333333, 0.66666666666666674), ([A4, B-2], 2.0, 2.0)]')
+        #x.show()
+        #m1[0].show()
+        raw = m1[0].musicxml
+        # there should only be 2 tuplet indications in the produced chords
+        self.assertEqual(raw.count('<tuplet'), 2)
+#         for n in m1[0].notes:
+#             print n.duration
+#             print n.duration.tuplets
+#             for t in n.duration.tuplets:            
+#                 print t, t.type
 
 
 #-------------------------------------------------------------------------------

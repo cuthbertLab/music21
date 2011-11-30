@@ -2450,6 +2450,8 @@ class DegreeType(MusicXMLElement):
 
 
 class Tuplet(MusicXMLElement):
+    '''Stored in notations object and governs presentation and bracket.
+    '''
     def __init__(self):
         MusicXMLElement.__init__(self)
         self._tag = 'tuplet'

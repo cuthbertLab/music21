@@ -655,7 +655,7 @@ def mxToDuration(mxNote, inputM21=None):
         mxNotations = mxNote.get('notationsObj')
         mxTimeModification = mxNote.get('timeModificationObj')
 
-        if mxTimeModification != None:
+        if mxTimeModification is not None:
             tup = duration.Tuplet()
             tup.mx = mxNote # get all necessary config from mxNote
 
@@ -853,9 +853,6 @@ def durationToMusicXML(d):
 
     # make a copy, as we this process will change tuple types
     dCopy = copy.deepcopy(d)
-    # this update is done in note output
-    #updateTupletType(dCopy.components) # modifies in place
-
     n = note.Note()
     n.duration = dCopy
     # call the musicxml property on Stream
@@ -1502,9 +1499,8 @@ def chordToMx(c):
     durPosLast = len(mxDurationNotes) - 1
     for mxNoteBase in mxDurationNotes: # returns a list of mxNote objs
         # merge method returns a new object
-        chordPos = 0
         mxNoteChordGroup = []
-        for n in c: # iterate component notes
+        for chordPos, n in enumerate(c): # iterate component notes
         #for pitchObj in c.pitches:
             # copy here, before merge
             mxNote = copy.deepcopy(mxNoteBase)
@@ -1536,6 +1532,19 @@ def chordToMx(c):
             if c.beams is not None and chordPos == 0:
                 mxNote.beamList = c.beams.mx
 
+            # if the durations included tuplets, there will be a tuplet
+            # notations indication in each of the components of the chord; thus
+            # all those other than first must be removed
+            if chordPos != 0 and mxNote.notationsObj is not None:
+                rmTargets = []
+                for i, sub in enumerate(mxNote.notationsObj.componentList):
+                    if sub.tag == 'tuplet':
+                        rmTargets.append(i)
+                # remove in reverse order
+                rmTargets.reverse()
+                for i in rmTargets:
+                    mxNote.notationsObj.componentList.pop(i)
+
             # if this note, not a component duration,
             # need to add this to the last-encountered mxNote
             # get mxl objs from tie obj
@@ -1555,7 +1564,6 @@ def chordToMx(c):
                     mxNote.notationsObj.componentList += mxTiedList
                 else:
                     pass
-            chordPos += 1
             mxNoteChordGroup.append(mxNote)
         
         # add chord group to note list
@@ -2067,6 +2075,7 @@ def mxToRest(mxNote, inputM21=None):
 def measureToMx(m, spannerBundle=None, mxTranspose=None):
     '''Translate a :class:`~music21.stream.Measure` to a MusicXML :class:`~music21.musicxml.Measure` object.
     '''
+    from music21 import duration
 
     #environLocal.printDebug(['measureToMx(): m.isSorted:', m.isSorted, 'm._mutable', m._mutable])
     if spannerBundle is not None:
@@ -2088,7 +2097,6 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
     if len(found) > 0:
         sl = found[0] # assume only one per measure
         mxPrint = sl.mx
-        
     found = m.getElementsByClass('SystemLayout')
     if len(found) > 0:
         sl = found[0] # assume only one per measure
@@ -2183,13 +2191,23 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
             mFlat = nonVoiceMeasureItems # this is a Stream
         else:
             mFlat = m.flat
+        # update al tuplet types; this is done for beamed notes but not 
+        # unbeamed tuplets?
+#         durs = []
+#         for n in mFlat.notesAndRests:
+#             durs.append(n.duration)
+#         #duration.updateTupletType(durs)
+#         for d in durs:
+#             for t in d.tuplets:
+#                 print t.type
+
         for obj in mFlat:
             #environLocal.pd(['iterating flat M components', obj, obj.offset])
             classes = obj.classes # store result of property call once
             if 'Note' in classes:
                 mxMeasure.componentList += noteToMxNotes(obj, 
                     spannerBundle=spannerBundle)
-            elif 'GeneralNote' in classes:
+            elif 'GeneralNote' in classes: # this includes chords
                 # .mx here returns a list of notes; this could be a rest
                 mxMeasure.componentList += obj.mx
             elif 'Dynamic' in classes:

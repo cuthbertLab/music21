@@ -681,7 +681,7 @@ def convertTypeToNumber(dType):
 
 
 def updateTupletType(durationList):
-    '''Given a list of Durations or DurationUnits (not yet working properly), 
+    '''Given a list of Durations or DurationUnits, 
     examine each Duration, and each component, and set Tuplet type to 
     start or stop, as necessary.
 
@@ -752,8 +752,8 @@ def updateTupletType(durationList):
             tupletNext, durNext = None, None
             nextNormalType = None
 
-        #environLocal.printDebug(['updateTupletType previous, this, next:', 
-        #                         tupletPrevious, tuplet, tupletNext])
+#         environLocal.printDebug(['updateTupletType previous, this, next:', 
+#                                  tupletPrevious, tuplet, tupletNext])
 
         if tuplet != None:
             thisNormalType = tuplet.durationNormal.type
