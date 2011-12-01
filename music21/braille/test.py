@@ -9,7 +9,6 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-import codecs
 import music21
 import unittest
 
@@ -2274,7 +2273,7 @@ def example13_19():
 
 def example13_26():
     '''
-    >>> from music21.braille import test     
+    >>> from music21.braille import test
     >>> from music21.braille import translate 
     >>> print translate.partToBraille(test.example13_26())
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -2342,6 +2341,30 @@ def example14_2():
     bm[-1].rightBarline = None
     return bm
 
+def example14_3():
+    '''
+    >>> from music21.braille import test     
+    >>> from music21.braille import translate 
+    >>> print translate.partToBraille(test.example14_3())
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠰⠃⠨⠦⠨⠑⠋⠙⠑⠚⠊⠓⠛⠘⠆⠀⠦⠳⠦⠫⠸⠦⠏⠀⠫⠉⠦⠋⠭⠳⠉⠦⠓⠭
+    ⠀⠀⠸⠦⠐⠻⠉⠸⠦⠻⠫⠈⠉⠋⠭
+    '''
+    bm = tinyNotation.TinyNotationStream("d'8 e'- c' d' b- a- g f g4 e- e-2 e-4~ e-8 r g4~ g8 r f4~ f e-~ e-8 r", "4/4")
+    bm.insert(0, key.KeySignature(-3))
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[0].append(spanner.Slur(bm[0].notes[0], bm[0].notes[-1]))
+    bm[0].notes[0].articulations.append(articulations.Accent())
+    bm[1].notes[0].articulations.append(articulations.Staccato())
+    bm[1].notes[1].articulations.append(articulations.Staccato())
+    bm[1].notes[2].articulations.append(articulations.Tenuto())
+    bm[2].notes[1].articulations.append(articulations.Staccato())
+    bm[2].notes[3].articulations.append(articulations.Staccato())
+    bm[3].notes[0].articulations.append(articulations.Tenuto())
+    bm[3].notes[1].articulations.append(articulations.Tenuto())
+    bm[-1].rightBarline = None
+    return bm
+
 def example14_5():
     '''
     >>> from music21.braille import test     
@@ -2359,6 +2382,56 @@ def example14_5():
     bm[0].notes[3].articulations.append(articulations.Staccato())
     bm[1].notes[0].articulations.append(articulations.Accent())
     bm[-1].rightBarline = None
+    return bm
+
+def example14_6():
+    '''
+    >>> from music21.braille import test     
+    >>> from music21.braille import translate 
+    >>> print translate.partToBraille(test.example14_6(), showFirstMeasureNumber = False)
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠸⠻⠦⠦⠑⠛⠙⠋⠀⠨⠦⠨⠦⠘⠚⠊⠚⠙⠨⠦⠱⠀⠑⠦⠋⠸⠦⠻⠧
+    '''
+    bm = tinyNotation.TinyNotationStream("F4 D8 F C E BB AA BB C D4 D8 E F4 r", "3/4")
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    for n in bm.flat.notes[1:-1]:
+        n.articulations.append(articulations.Staccato())
+    for n in bm[1].notes:
+        n.articulations.append(articulations.Accent())
+    bm[2].notes[-1].articulations.append(articulations.Tenuto())
+    bm[-1].rightBarline = None
+    return bm
+
+def example14_7():
+    '''
+    >>> from music21.braille import test     
+    >>> from music21.braille import translate 
+    >>> print translate.partToBraille(test.example14_7(), showFirstMeasureNumber = False)
+    ⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀
+    ⠦⠨⠦⠸⠹⠦⠨⠦⠫⠦⠨⠦⠻
+    '''
+    bm = tinyNotation.TinyNotationStream("C4 E F","3/4")
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    for n in bm[0].notes:
+        n.articulations.append(articulations.Accent())
+        n.articulations.append(articulations.Staccato())
+    bm[0].rightBarline = None
+    return bm
+
+def example14_8():
+    '''
+    >>> from music21.braille import test     
+    >>> from music21.braille import translate 
+    >>> print translate.partToBraille(test.example14_8(), showFirstMeasureNumber = False)
+    ⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
+    ⠨⠦⠸⠦⠸⠳⠨⠦⠸⠦⠺⠨⠦⠸⠦⠹
+    '''
+    bm = tinyNotation.TinyNotationStream("G4 B c","3/4")
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    for n in bm[0].notes:
+        n.articulations.append(articulations.Tenuto())
+        n.articulations.append(articulations.Accent())
+    bm[0].rightBarline = None
     return bm
 
 #-------------------------------------------------------------------------------
