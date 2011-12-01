@@ -911,7 +911,7 @@ class GraphHorizontalBar(Graph):
 
 
 
-class GraphHorizontalBarDynamic(Graph):
+class GraphHorizontalBarWeighted(Graph):
     def __init__(self, *args, **keywords):
         '''Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap, and can have different heights and colors within their respective channel.
         '''
@@ -3117,7 +3117,7 @@ class PlotDolan(PlotHorizontalBarWeighted):
         self.fxTicks = self.ticksOffset # this is a method
         self.data, xTicks, yTicks = self._extractData()
 
-        self.graph = GraphHorizontalBarDynamic(*args, **keywords)
+        self.graph = GraphHorizontalBarWeighted(*args, **keywords)
         self.graph.setData(self.data)
 
         # only need to add x ticks; y ticks added from data labels
