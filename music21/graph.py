@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -326,15 +326,14 @@ class Graph(object):
         if pad != False:
             range = valueRange[1] - valueRange[0]
             if pad == True: # use a default
-                shift = range * .1 # add 10 percent of ragne
+                shift = range * .1 # add 10 percent of range
             else:
-                shift = pad # provide a value directly
+                shift = pad # alternatively, provide a value directly
         else:
             shift = 0
         # set range with shift
         self.axis[axisKey]['range'] = (valueRange[0]-shift,
                                        valueRange[1]+shift)
-
 
     def setAxisLabel(self, axisKey, label):
         if axisKey not in self.axisKeys:
@@ -900,7 +899,7 @@ class GraphHorizontalBar(Graph):
 
 class GraphHorizontalBarDynamic(Graph):
     def __init__(self, *args, **keywords):
-        '''Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap, and can have different heights within their respective channel.
+        '''Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap, and can have different heights and colors within their respective channel.
         '''
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']
@@ -929,6 +928,7 @@ class GraphHorizontalBarDynamic(Graph):
     def process(self):
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
+        # might need more space here for larger y-axis labels
         self.fig.subplots_adjust(left=0.15)   
         ax = self.fig.add_subplot(1, 1, 1)
 
@@ -1168,19 +1168,16 @@ class GraphScatter(Graph):
         yValues = []
         i = 0
         for x, y in self.data:
-            if x not in xValues:
-                xValues.append(x)
-            if y not in yValues:
-                yValues.append(y)
+            xValues.append(x)
+            yValues.append(y)
         xValues.sort()
         yValues.sort()
-
         for x, y in self.data:
             ax.plot(x, y, 'o', color=self.colors[i%len(self.colors)], alpha=self.alpha)
             i += 1
-
-        self.setAxisRange('y', (min(yValues), max(yValues)), pad=True)
-        self.setAxisRange('x', (min(xValues), max(xValues)), pad=True)
+        # values are sorted, so no need to use max/min
+        self.setAxisRange('y', (yValues[0], yValues[-1]), pad=True)
+        self.setAxisRange('x', (xValues[0], xValues[-1]), pad=True)
 
         self._adjustAxisSpines(ax)
         self._applyFormatting(ax)
