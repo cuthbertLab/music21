@@ -268,7 +268,6 @@ class Graph(object):
         self.hideXGrid = False
         if 'hideXGrid' in keywords:
             self.hideXGrid = keywords['hideXGrid']
-
         self.hideYGrid = False
         if 'hideYGrid' in keywords:
             self.hideYGrid = keywords['hideYGrid']
@@ -2975,8 +2974,8 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
 
 
 #-------------------------------------------------------------------------------
-class PlotHorizontalBarDynamic(PlotStream):
-    '''
+class PlotHorizontalBarWeighted(PlotStream):
+    '''A base class for plots of Scores with weighted (by height) horizontal bars
     '''
     format = 'horizontalbardynamic'
     def __init__(self, streamObj, *args, **keywords):
@@ -2984,55 +2983,114 @@ class PlotHorizontalBarDynamic(PlotStream):
         # will get Measure numbers if appropraite
         self.fxTicks = self.ticksOffset
 
-    def _extractData(self):
-        from music21 import stream
+        self.fillByMeasure = True
+        if 'fillByMeasure' in keywords:
+            self.fillByMeasure = keywords['fillByMeasure']
+        self.partGroups = None
+        if 'partGroups' in keywords:
+            self.partGroups = keywords['partGroups']
 
+
+    def _extractData(self):
+        '''Extract the data from the Stream.
+        '''
+        # parameters: x, span, heightScalar, color, alpha, yShift
+#         data =  [
+#         ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, .2, '#3ff203',.1, 1)]  ), 
+#         ('Celli',    [(2, 7, .2, '#0ff302'), (10, 3, .6, '#ff0000', 1)]  ), ]
+        from music21 import stream
         if 'Score' not in self.streamObj.classes:
             raise GraphException('provided Stream must be Score')
 
         # need to partition Stream into groups      
         partGroups = []
-        for p in self.streamObj.parts:
-            # store one or more Parts associated with an id
-            partGroups.append([p.id, [p]])
-
+        if self.partGroups is not None:
+            for d in self.partGroups: # a list of dictionaries
+                name, pColor, matches = d['name'], d['color'], d['match']
+                sub = []
+                for p in self.streamObj.parts:
+                    # if matches is None, use group name
+                    if matches is None:
+                        matches = [name]
+                    for m in matches: # strings or instruments
+                        if common.isStr(m):
+                            if p.id.lower().find(m.lower()) >= 0:
+                                sub.append(p)
+                                break
+                partGroups.append([name, pColor, sub])
+        else: # manually creates    
+            for p in self.streamObj.parts:
+                # store one or more Parts associated with an id
+                partGroups.append([p.id, '#666666', [p]])
         data = []
-        for pId, parts in partGroups:
+        for pId, pColor, parts in partGroups:
             dataKey = pId
             dataEvents = []
             # combine multiple streams into a single
-            s = stream.Stream()
-            for p in parts:
-                s.insert(0, p)
             eStart = None
             eEnd = None
             eLast = None
-            eSrc = s.flat
-            # a li=st, not a stream
-            noteSrc = eSrc.findConsecutiveNotes()
-            for i, e in enumerate(noteSrc): 
-                if e is None or i >= len(noteSrc) - 1:
-                    if eStart is not None:
-                        eEnd = eLast.getOffsetBySite(eSrc) + eLast.quarterLength
-                        dataEvents.append((eStart, eEnd-eStart, 1, '#666666'))
+
+            # marking events only if a measure is filled
+            if self.fillByMeasure:    
+                partMeasures = []
+                for p in parts:
+                    partMeasures.append(p.getElementsByClass('Measure'))
+                # assuming that all parts have same number of measures
+                # iterate over each measures
+                iLast = len(partMeasures[0]) - 1
+                for i in range(len(partMeasures[0])):
+                    active = False
+                    # check for activity in any part in the part group
+                    for p in partMeasures:
+                        #print i, p[i], len(p[i].flat.notes)
+                        if len(p[i].flat.notes) > 0:
+                            active = True
+                            break
+                    if eStart is None and active:
+                        eStart = partMeasures[0][i].getOffsetBySite(
+                                 partMeasures[0])
+                    elif (eStart is not None and not active) or i >= iLast:
+                        if eStart is None: # nothing to do; just the last
+                            continue
+                        # if this is the last measure and it is active
+                        if (i >= iLast and active):
+                            eLast = partMeasures[0][i]                            
+                        # use duration, not barDuration.quarterLength
+                        # as want filled duration?
+                        eEnd = (eLast.getOffsetBySite(
+                                partMeasures[0]) + 
+                                eLast.barDuration.quarterLength)
+                        dataEvents.append((eStart, eEnd-eStart, 1, pColor))
                         eStart = None
-                else:
-                    if eStart is None:
-                        eStart = e.getOffsetBySite(eSrc)
-                    eLast = e
+                    eLast = partMeasures[0][i]
+            # fill by alternative approach, based on activity of notes        
+            else:
+                s = stream.Stream()
+                for p in parts:
+                    s.insert(0, p)
+                # this takes a flat presentation of all parts, and then
+                # finds any gaps in consecutive notes
+                eSrc = s.flat
+                # a li=st, not a stream
+                noteSrc = eSrc.findConsecutiveNotes()
+                for i, e in enumerate(noteSrc): 
+                    if e is None or i >= len(noteSrc) - 1:
+                        if eStart is not None:
+                            eEnd = eLast.getOffsetBySite(eSrc) + eLast.quarterLength
+                            dataEvents.append((eStart, eEnd-eStart, 1, pColor))
+                            eStart = None
+                    else:
+                        if eStart is None:
+                            eStart = e.getOffsetBySite(eSrc)
+                        eLast = e
+            #print dataEvents
             data.append([dataKey, dataEvents])
-        # parameters: x, span, heightScalar, color, alpha, yShift
-#         data =  [
-#         ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, .2, '#3ff203',.1, 1)]  ), 
-#         ('Celli',    [(2, 7, .2, '#0ff302'), (10, 3, .6, '#ff0000', 1)]  ), 
-#         ('Clarinet', [(5, 1, .5, '#3ff203')]  ),
-#         ('Flute',    [(5, 1, .1, '#00ff00', 1, -1), (7, 20, .3, '#00ff88')]  ),
-#                 ]
         uniqueOffsets = []
         for key, value in data:
-            for x in value:
-                start = x[0]
-                dur = x[1]
+            for dataList in value:
+                start = dataList[0]
+                dur = dataList[1]
                 if start not in uniqueOffsets:
                     uniqueOffsets.append(start)
                 if start+dur not in uniqueOffsets:
@@ -3045,14 +3103,14 @@ class PlotHorizontalBarDynamic(PlotStream):
 
 
 
-class PlotHorizontalBarInstrumentation(PlotHorizontalBarDynamic):
+class PlotDolan(PlotHorizontalBarWeighted):
     '''A graph of instrument activity. 
 
     >>> from music21 import *
     '''
     values = ['instrument', ]
     def __init__(self, streamObj, *args, **keywords):
-        PlotHorizontalBarDynamic.__init__(self, streamObj, *args, **keywords)
+        PlotHorizontalBarWeighted.__init__(self, streamObj, *args, **keywords)
 
         #self.fy = lambda n:n.pitchClass
         #self.fyTicks = self.ticksPitchClassUsage
@@ -3073,8 +3131,8 @@ class PlotHorizontalBarInstrumentation(PlotHorizontalBarDynamic):
             self.graph.setFigureSize([10,4])
         if 'title' not in keywords:
             self.graph.setTitle('Instrumentation')
-
-
+        if 'hideYGrid' not in keywords:
+            self.graph.hideYGrid = True
 
 
 #-------------------------------------------------------------------------------
@@ -4581,14 +4639,39 @@ class Test(unittest.TestCase):
         p.process()
 
 
-    def testHorizontalInstrumentationA(self):
+    def xtestHorizontalInstrumentationA(self):
         from music21 import graph, stream
         #s = stream.Stream()
         s = corpus.parse('bwv66.6')
-        #s = corpus.parse('symphony94/02')
-        g = graph.PlotHorizontalBarInstrumentation(s, 
+
+        partGroups = [
+            {'name':'High Voices', 'color':'#ff0088', 
+                'match':['soprano', 'alto']}, 
+            {'name':'Low Voices', 'color':'#8800ff', 
+                'match':['tenor', 'bass']}
+                    ]
+
+        partGroups = [
+            {'name':'Brass', 'color':'#ff9900', 
+                'match':['corno', 'tromba']},
+            {'name':'Winds', 'color':'#3333cc', 
+                'match':['flauto', 'oboe', 'fagotto']}, 
+            {'name':'Timpani', 'color':'#330000', 'match':None},
+            {'name':'Violino I', 'color':'#669933', 'match':None},
+            {'name':'Violino II', 'color':'#339933', 'match':None},
+            {'name':'Low Strings', 'color':'#336633', 
+                'match':['viola', 'violincello', 'contrabasso']},
+                    ]
+        
+        #partGroups = None
+        #s.show()
+        s = corpus.parse('symphony94/02')
+        g = graph.PlotDolan(s, fillByMeasure=True, partGroups=partGroups,
             figureSize=[16,6], dpi=150)
-        #g.process()
+        g.process()
+        g = graph.PlotDolan(s, fillByMeasure=False, partGroups=partGroups, 
+            hideYGrid=False, figureSize=[16,6], dpi=150)
+        g.process()
         #g.show()
 
 
