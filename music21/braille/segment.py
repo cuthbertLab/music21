@@ -13,6 +13,7 @@ import collections
 import unittest
 import copy
 
+from music21 import articulations
 from music21 import bar
 from music21 import chord
 from music21 import clef
@@ -59,6 +60,8 @@ def findSegments(music21Part, **partKeywords):
     if 'showHand' in partKeywords:
         if partKeywords['showHand'] == 'left':
             descendingChords = False
+        elif partKeywords['showHand'] == 'right':
+            descendingChords = True
 
     prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets, showShortSlursAndTiesTogether, showLongSlursAndTiesTogether)
     allSegments = []
@@ -73,7 +76,10 @@ def findSegments(music21Part, **partKeywords):
         currentTimeSig = music21Part.getElementsByClass('Measure')[0].bestTimeSignature()
     except stream.StreamException:
         currentTimeSig = meter.TimeSignature('4/4')
-        
+    if descendingChords is None:
+        # run get clefs on first measure of music21Part. 
+        pass    
+    
     greaterOffsetFactor = 0
     greaterPreviousCode = -1
     biggerPicture = collections.defaultdict(BrailleElementGrouping)
@@ -137,8 +143,18 @@ def findSegments(music21Part, **partKeywords):
             music21NoteStart = allNotes[noteIndexStart]
             for artcIndex in range(len(music21NoteStart.articulations)):
                 artc = music21NoteStart.articulations[artcIndex]
-                # if artc is swell, then continue
-                # 11/16/11: music21 does not yet have support for swells.
+                # "If two repeated notes appear to be tied, but either is marked staccato or tenuto,
+                # they are treated as slurred instead of tied"
+                if isinstance(artc, articulations.Staccato) or isinstance(artc, articulations.Tenuto):
+                    if not music21NoteStart.tie == None:
+                        if music21NoteStart.tie.type == 'stop':
+                            music21NoteStart.tie = None
+                            allNotes[noteIndexStart-1].tie = None
+                            allNotes[noteIndexStart-1].shortSlur = True
+                        else:
+                            music21NoteStart.tie = None
+                            music21NoteStart.shortSlur = True
+                            allNotes[noteIndexStart+1].tie = None
                 numSequential=0
                 for noteIndexContinue in range(noteIndexStart+1, len(allNotes)):
                     music21NoteContinue = allNotes[noteIndexContinue]
@@ -150,8 +166,7 @@ def findSegments(music21Part, **partKeywords):
                     music21NoteStart.articulations.append(artc)
                     for noteIndexContinue in range(noteIndexStart+1, noteIndexStart+numSequential):
                         music21NoteContinue = allNotes[noteIndexContinue]
-                        music21NoteContinue.articulations.remove(artc)
-            music21NoteStart.articulations.sort()
+                        music21NoteContinue.articulations.remove(artc)            
             
     allSegments.append(currentSegment)
     return allSegments
