@@ -8477,7 +8477,6 @@ class Stream(music21.Music21Object):
         lastPitch = None
         if skipOctaves is True:
             skipUnisons = True  # implied
-            
 
         # need to look for voices in self and deal with each one at a time
         if self.hasVoices:

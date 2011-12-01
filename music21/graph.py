@@ -898,7 +898,6 @@ class GraphHorizontalBar(Graph):
 
 
 
-
 class GraphHorizontalBarDynamic(Graph):
     def __init__(self, *args, **keywords):
         '''Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap, and can have different heights within their respective channel.
@@ -919,6 +918,14 @@ class GraphHorizontalBarDynamic(Graph):
         if 'alpha' not in keywords:
             self.alpha = .6
 
+# example data
+#         data =  [
+#         ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, .2, '#3ff203')]  ), 
+#         ('Celli',    [(2, 7, .2, '#0ff302'), (10, 3, .6, '#ff0000', 1)]  ), 
+#         ('Clarinet', [(5, 1, .5, '#3ff203')]  ),
+#         ('Flute',    [(5, 1, .1, '#00ff00'), (7, 20, .3, '#00ff88')]  ),
+#                 ]
+
     def process(self):
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
@@ -934,7 +941,6 @@ class GraphHorizontalBarDynamic(Graph):
         i = 0
 
         # reversing data to present in order
-        print self.data
         self.data = list(self.data)
         self.data.reverse()
         for key, points in self.data:
@@ -948,11 +954,16 @@ class GraphHorizontalBarDynamic(Graph):
                     x, span, heightScalar = data
                     color = self.colors[i%len(self.colors)]
                     alpha = self.alpha
+                    yShift = 0 # between -1 and 1
                 elif len(data) == 4:
                     x, span, heightScalar, color = data
                     alpha = self.alpha
+                    yShift = 0 # between -1 and 1
                 elif len(data) == 5:
                     x, span, heightScalar, color, alpha = data
+                    yShift = 0 # between -1 and 1
+                elif len(data) == 6:
+                    x, span, heightScalar, color, alpha, yShift = data
                 # add to x ranges
                 xRanges.append((x, span))
                 colors.append(color)
@@ -968,7 +979,9 @@ class GraphHorizontalBarDynamic(Graph):
                 # then start y position, bar height
                 h = self._barHeight*heightScalar
                 yAdjust = (self._barHeight-h) * .5
-                yRanges.append((yPos+self._margin+yAdjust, h))
+                yShiftUnit = self._barHeight * (1-heightScalar) * .5
+                yRanges.append((yPos + 
+                    self._margin + yAdjust + (yShiftUnit*yShift), h))
 
             for i, xRange in enumerate(xRanges):
                 ax.broken_barh([xRange], yRanges[i],
@@ -2956,22 +2969,53 @@ class PlotHorizontalBarDynamic(PlotStream):
     format = 'horizontalbardynamic'
     def __init__(self, streamObj, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
+        # will get Measure numbers if appropraite
         self.fxTicks = self.ticksOffset
 
     def _extractData(self):
-        dataUnique = {}
-        xValues = []
-        # collect data
-        # create final data list
-        # get labels from ticks
-        
-        # change: start, dur, heightWeight, color, alpha
-        data =  [
-        ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, .2, '#3ff203')]  ), 
-        ('Celli',    [(2, 7, .2, '#0ff302'), (10, 3, .6, '#ff0000', 1)]  ), 
-        ('Clarinet', [(5, 1, .5, '#3ff203')]  ),
-        ('Flute',    [(5, 1, .1, '#00ff00'), (7, 20, .3, '#00ff88')]  ),
-                ]
+        from music21 import stream
+
+        if 'Score' not in self.streamObj.classes:
+            raise GraphException('provided Stream must be Score')
+
+        # need to partition Stream into groups      
+        partGroups = []
+        for p in self.streamObj.parts:
+            # store one or more Parts associated with an id
+            partGroups.append([p.id, [p]])
+
+        data = []
+        for pId, parts in partGroups:
+            dataKey = pId
+            dataEvents = []
+            # combine multiple streams into a single
+            s = stream.Stream()
+            for p in parts:
+                s.insert(0, p)
+            eStart = None
+            eEnd = None
+            eLast = None
+            eSrc = s.flat
+            # a li=st, not a stream
+            noteSrc = eSrc.findConsecutiveNotes()
+            for i, e in enumerate(noteSrc): 
+                if e is None or i >= len(noteSrc) - 1:
+                    if eStart is not None:
+                        eEnd = eLast.getOffsetBySite(eSrc) + eLast.quarterLength
+                        dataEvents.append((eStart, eEnd-eStart, 1, '#666666'))
+                        eStart = None
+                else:
+                    if eStart is None:
+                        eStart = e.getOffsetBySite(eSrc)
+                    eLast = e
+            data.append([dataKey, dataEvents])
+        # parameters: x, span, heightScalar, color, alpha, yShift
+#         data =  [
+#         ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, .2, '#3ff203',.1, 1)]  ), 
+#         ('Celli',    [(2, 7, .2, '#0ff302'), (10, 3, .6, '#ff0000', 1)]  ), 
+#         ('Clarinet', [(5, 1, .5, '#3ff203')]  ),
+#         ('Flute',    [(5, 1, .1, '#00ff00', 1, -1), (7, 20, .3, '#00ff88')]  ),
+#                 ]
         uniqueOffsets = []
         for key, value in data:
             for x in value:
@@ -2994,17 +3038,14 @@ class PlotHorizontalBarInstrumentation(PlotHorizontalBarDynamic):
 
     >>> from music21 import *
     '''
-    values = ['instrument', 'pianoroll']
+    values = ['instrument', ]
     def __init__(self, streamObj, *args, **keywords):
         PlotHorizontalBarDynamic.__init__(self, streamObj, *args, **keywords)
 
         #self.fy = lambda n:n.pitchClass
-        self.fyTicks = self.ticksPitchClassUsage
-        self.fxTicks = self.ticksOffset # this a method
-
+        #self.fyTicks = self.ticksPitchClassUsage
+        self.fxTicks = self.ticksOffset # this is a method
         self.data, xTicks, yTicks = self._extractData()
-
-        #environLocal.printDebug(['PlotHorizontalBarPitchClassOffset', 'post processing xTicks', xTicks])
 
         self.graph = GraphHorizontalBarDynamic(*args, **keywords)
         self.graph.setData(self.data)
@@ -4530,8 +4571,10 @@ class Test(unittest.TestCase):
 
     def testHorizontalInstrumentationA(self):
         from music21 import graph, stream
-        s = stream.Stream()
-        g = graph.PlotHorizontalBarInstrumentation(s)
+        #s = stream.Stream()
+        #s = corpus.parse('bwv66.6')
+        s = corpus.parse('symphony94/02')
+        g = graph.PlotHorizontalBarInstrumentation(s, figureSize=[16,6], dpi=300)
         #g.process()
         #g.show()
 
