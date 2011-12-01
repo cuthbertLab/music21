@@ -156,10 +156,9 @@ def userValuesToValues(valueList):
 #-------------------------------------------------------------------------------
 class Graph(object):
     '''
-    A music21.graph.Graph is an abstract object that represents a graph or 
+    A music21.graph.Graph is an object that represents a visual graph or 
     plot, automating the creation and configuration of this graph in matplotlib.
-    It is a low-level object that most music21 users do not need to call directly
-    but because it most graphs will take keyword arguments that specify the
+    It is a low-level object that most music21 users do not need to call directly; yet, as most graphs will take keyword arguments that specify the
     look of graphs, they are important to know about.
 
     The keyword arguments can be provided for configuration are: 
@@ -170,10 +169,10 @@ class Graph(object):
     fontFamily.
 
     Graph objects do not manipulate Streams or other music21 data; they only 
-    manipulate raw data formatted for each Graph subclass, hence why it is
-    unlikely that people will call this class directly.
+    manipulate raw data formatted for each Graph subclass, hence it is
+    unlikely that users will call this class directly.
 
-    The doneAction argument determines what happens after the graph 
+    The `doneAction` argument determines what happens after the graph 
     has been processed. Currently there are three options, 'write' creates
     a file on disk (this is the default), while 'show' opens an 
     interactive GUI browser.  The
@@ -266,9 +265,20 @@ class Graph(object):
         else:
             self.fontFamily = 'serif'
 
+        self.hideXGrid = False
+        if 'hideXGrid' in keywords:
+            self.hideXGrid = keywords['hideXGrid']
+
+        self.hideYGrid = False
+        if 'hideYGrid' in keywords:
+            self.hideYGrid = keywords['hideYGrid']
+
         self.xTickLabelRotation = 0
         self.xTickLabelHorizontalAlignment = 'center'
         self.xTickLabelVerticalAlignment = 'center'
+
+        #self.hideYTick = True
+        #self.hideXTick = True
 
     def _axisInit(self):
         for ax in self.axisKeys:
@@ -448,13 +458,18 @@ class Graph(object):
                 ax.set_yticklabels(ax.get_yticks(),
                     fontsize=self.tickFontSize, family=self.fontFamily) 
 
+
         if self.title:
             ax.set_title(self.title, fontsize=self.titleFontSize, family=self.fontFamily)
 
         if self.grid:
             if self.colorGrid is not None: # None is another way to hide grid
-                ax.grid(True, color=self.colorGrid)
-
+                ax.grid(True, which='major', color=self.colorGrid)
+        # provide control for each grid line
+        if self.hideYGrid:
+            ax.yaxis.grid(False)
+        if self.hideXGrid:
+            ax.xaxis.grid(False)
 
         # right and top must be larger
         # this does not work right yet
@@ -4569,9 +4584,10 @@ class Test(unittest.TestCase):
     def testHorizontalInstrumentationA(self):
         from music21 import graph, stream
         #s = stream.Stream()
-        #s = corpus.parse('bwv66.6')
-        s = corpus.parse('symphony94/02')
-        g = graph.PlotHorizontalBarInstrumentation(s, figureSize=[16,6], dpi=300)
+        s = corpus.parse('bwv66.6')
+        #s = corpus.parse('symphony94/02')
+        g = graph.PlotHorizontalBarInstrumentation(s, 
+            figureSize=[16,6], dpi=150)
         #g.process()
         #g.show()
 
