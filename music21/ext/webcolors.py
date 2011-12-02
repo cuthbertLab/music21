@@ -1,4 +1,10 @@
 """
+webcolors.py by James Bennett.  
+http://pypi.python.org/pypi/webcolors/ 
+License :: OSI Approved :: BSD License
+
+
+
 Utility functions for working with the color names and color value
 formats defined by the HTML and CSS specifications for use in
 documents on the Web.
