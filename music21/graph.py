@@ -39,7 +39,7 @@ from music21.analysis import discrete
 from music21.analysis import correlate
 
 from music21 import features
-
+from music21.ext import webcolors
 
 from music21 import environment
 _MOD = 'graph.py'
@@ -111,7 +111,7 @@ FORMATS = ['horizontalbar', 'histogram', 'scatter', 'scatterweighted',
 def userFormatsToFormat(value):
     '''Replace possible user format strings with defined format names as used herein. Returns string unaltered if no match.
     '''
-    environLocal.printDebug(['calling user userFormatsToFormat:', value])
+    #environLocal.printDebug(['calling user userFormatsToFormat:', value])
     value = value.lower()
     value = value.replace(' ', '')
     if value in ['bar', 'horizontal', 'horizontalbar', 'pianoroll', 'piano']:
@@ -152,6 +152,54 @@ def userValuesToValues(valueList):
         else:
             post.append(value)
     return post
+
+
+def getColor(color):
+    '''Convert any specification of a color to a hexadecimal color used by matplotlib. 
+
+    >>> from music21 import *
+    >>> graph.getColor('red')
+    '#ff0000'
+    >>> graph.getColor('Steel Blue')
+    '#4682b4'
+    >>> graph.getColor('#f50')
+    '#ff5500'
+    >>> graph.getColor([.5, .5, .5])
+    '#808080'
+    >>> graph.getColor(.8)
+    '#cccccc'
+    >>> graph.getColor([255, 255, 255])
+    '#ffffff'
+    '''
+    # expand a single value to three
+    if common.isNum(color):
+        color = [color, color, color]
+    if common.isStr(color):
+        if color[0] == '#': # assume is hex
+            # this will expand three-value codes, and check for badly
+            # formed codes
+            return webcolors.normalize_hex(color)
+        color = color.lower().replace(' ', '')
+        try:
+            return webcolors.css3_names_to_hex[color]
+        except KeyError: # no color match
+            raise GraphException('invalid color name: %s' % color)
+    elif common.isListLike(color):
+        percent = False
+        for sub in color:
+            if sub < 1:
+                percent = True  
+                break
+        if percent:
+            if len(color) == 1:
+                color = [color, color, color]
+            # convert to 0 100% values as strings with % symbol
+            color = ['%s' % str(x*100) for x in color]
+            color = [x + '%' for x in color]
+            return webcolors.rgb_percent_to_hex(color)
+        else: # assume integers
+            return webcolors.rgb_to_hex(tuple(color))
+    raise GraphException('invalid color specificiation: %s' % color)
 
 #-------------------------------------------------------------------------------
 class Graph(object):
@@ -4605,9 +4653,6 @@ class Test(unittest.TestCase):
         self.assertEqual(post, [PlotScatterPitchClassOffset])
 
 
-
-        
-
     def testGraphVerticalBar(self):
         from music21 import graph
         
@@ -4621,6 +4666,13 @@ class Test(unittest.TestCase):
         p = PlotFeatures(streamList, featureExtractors=feList, doneAction=None)
         p.process()
 
+
+    def testColors(self):
+        from music21 import graph
+        self.assertEqual(graph.getColor([.5, .5, .5]), '#808080')
+        self.assertEqual(graph.getColor(.5), '#808080')
+        self.assertEqual(graph.getColor(255), '#ffffff')
+        self.assertEqual(graph.getColor('Steel Blue'), '#4682b4')
 
 #     def testMeasureNumbersA(self):
 #         from music21 import corpus, graph

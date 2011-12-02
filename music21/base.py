@@ -5301,7 +5301,8 @@ def mainTest(*testClasses):
             runThisTest = sys.argv[1]    
 
     # -f, --failfast
-
+    if 'onlyDocTest' in sys.argv:
+        testClasses = [] # remove cases
     for t in testClasses:
         if not isinstance(t, str):
             if displayNames:
