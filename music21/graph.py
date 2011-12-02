@@ -180,6 +180,16 @@ def getColor(color):
             # formed codes
             return webcolors.normalize_hex(color)
         color = color.lower().replace(' ', '')
+        # check for one character matplotlib colors
+        if len(color) == 1:
+            if color == 'b': color = 'blue'
+            elif color == 'g': color = 'green'
+            elif color == 'r': color = 'red'
+            elif color == 'c': color = 'cyan'
+            elif color == 'm': color = 'magenta'
+            elif color == 'y': color = 'yellow'
+            elif color == 'k': color = 'black'
+            elif color == 'w': color = 'white'
         try:
             return webcolors.css3_names_to_hex[color]
         except KeyError: # no color match
@@ -426,7 +436,7 @@ class Graph(object):
 
         rect = ax.axesPatch
         # this sets the color of the main data presentation window
-        rect.set_facecolor(self.colorBackgroundData)
+        rect.set_facecolor(getColor(self.colorBackgroundData))
         # this does not do anything yet
         # rect.set_edgecolor('red')
 
@@ -511,7 +521,7 @@ class Graph(object):
 
         if self.grid:
             if self.colorGrid is not None: # None is another way to hide grid
-                ax.grid(True, which='major', color=self.colorGrid)
+                ax.grid(True, which='major', color=getColor(self.colorGrid))
         # provide control for each grid line
         if self.hideYGrid:
             ax.yaxis.grid(False)
@@ -562,12 +572,12 @@ class Graph(object):
             fp = environLocal.getTempFile('.png')
         #print _MOD, fp
         if self.dpi != None:
-            self.fig.savefig(fp, facecolor=self.colorBackgroundFigure,      
-                             edgecolor=self.colorBackgroundFigure,
+            self.fig.savefig(fp, facecolor=getColor(self.colorBackgroundFigure),      
+                             edgecolor=getColor(self.colorBackgroundFigure),
                               dpi=self.dpi)
         else:
-            self.fig.savefig(fp, facecolor=self.colorBackgroundFigure,      
-                             edgecolor=self.colorBackgroundFigure)
+            self.fig.savefig(fp, facecolor=getColor(self.colorBackgroundFigure),      
+                             edgecolor=getColor(self.colorBackgroundFigure))
 
         environLocal.launch('png', fp)
 
@@ -920,7 +930,7 @@ class GraphHorizontalBar(Graph):
             # provide a list of start, end points;
             # then start y position, bar height
             ax.broken_barh(points, (yPos+self._margin, self._barHeight),
-                            facecolors=self.colors[i%len(self.colors)], alpha=self.alpha)
+                        facecolors=getColor(self.colors[i%len(self.colors)]), alpha=self.alpha)
             for xStart, xLen in points:
                 xEnd = xStart + xLen
                 for x in [xStart, xEnd]:
@@ -1026,6 +1036,8 @@ class GraphHorizontalBarWeighted(Graph):
                     yShift = 0 # between -1 and 1
                 elif len(data) == 6:
                     x, span, heightScalar, color, alpha, yShift = data
+                # filter color value
+                color = getColor(color)
                 # add to x ranges
                 xRanges.append((x, span))
                 colors.append(color)
@@ -1178,7 +1190,8 @@ class GraphScatterWeighted(Graph):
             e.set_clip_box(ax.bbox)
             #e.set_alpha(self.alpha*zScalar)
             e.set_alpha(self.alpha)
-            e.set_facecolor(self.colors[i%len(self.colors)]) # can do this here
+            e.set_facecolor(getColor(self.colors[i%len(self.colors)])) 
+            # can do this here
             #environLocal.printDebug([e])
 
             # only show label if min if greater than zNorm min
@@ -1235,7 +1248,7 @@ class GraphScatter(Graph):
         xValues.sort()
         yValues.sort()
         for x, y in self.data:
-            ax.plot(x, y, 'o', color=self.colors[i%len(self.colors)], alpha=self.alpha)
+            ax.plot(x, y, 'o', color=getColor(self.colors[i%len(self.colors)]), alpha=self.alpha)
             i += 1
         # values are sorted, so no need to use max/min
         self.setAxisRange('y', (yValues[0], yValues[-1]), pad=True)
@@ -1282,7 +1295,7 @@ class GraphHistogram(Graph):
         for a, b in self.data:
             x.append(a)
             y.append(b)
-        ax.bar(x, y, alpha=.8, color=self.colors[0])
+        ax.bar(x, y, alpha=.8, color=getColor(self.colors[0]))
 
         self._adjustAxisSpines(ax)
         self._applyFormatting(ax)
@@ -1356,7 +1369,7 @@ class GraphGroupedVerticalBar(Graph):
                 xValsShifted.append(x + (widthShift * i))
 
             rect = ax.bar(xValsShifted, yVals, width=widthShift, alpha=.8, 
-                    color=self.colors[i % len(self.colors)])
+                    color=getColor(self.colors[i % len(self.colors)]))
             rects.append(rect)
 
         colors = []
@@ -1472,7 +1485,7 @@ class Graph3DPolygonBars(Graph):
             self.barWidth = .1
 
     def process(self):
-        cc = lambda arg: matplotlib.colors.colorConverter.to_rgba(arg,
+        cc = lambda arg: matplotlib.colors.colorConverter.to_rgba(getColor(arg),
                                 alpha=self.alpha)
         self.fig = plt.figure()
         ax = Axes3D(self.fig)
@@ -4704,14 +4717,14 @@ class Test(unittest.TestCase):
                     ]
 
         partGroups = [
-            {'name':'Brass', 'color':'#ff9900', 
+            {'name':'Brass', 'color':'orange', 
                 'match':['corno', 'tromba']},
-            {'name':'Winds', 'color':'#3333cc', 
+            {'name':'Winds', 'color':'dark blue', 
                 'match':['flauto', 'oboe', 'fagotto']}, 
-            {'name':'Timpani', 'color':'#330000', 'match':None},
-            {'name':'Violino I', 'color':'#669933', 'match':None},
-            {'name':'Violino II', 'color':'#339933', 'match':None},
-            {'name':'Low Strings', 'color':'#336633', 
+            {'name':'Timpani', 'color':'purple', 'match':None},
+            {'name':'Violino I', 'color':'dark green', 'match':None},
+            {'name':'Violino II', 'color':'green', 'match':None},
+            {'name':'Low Strings', 'color':'pale green', 
                 'match':['viola', 'violincello', 'contrabasso']},
                     ]
         
