@@ -2692,6 +2692,24 @@ class Chord(note.NotRest):
     # annotations
 
     def annotateIntervals(self, stripSpecifiers=True, sortPitches=False):
+        '''Create multiple lyrics for the Chord specifying the interval between the bass and the pitches above the bass. 
+
+        The `stripSpecifiers` parameter can be used to show only the intervals size (3, 5, etc) or the complete interval specification (m3, P5, etc.)
+
+        
+        >>> from music21 import *
+        >>> c = chord.Chord(['c4', 'd-4', 'g4'])
+        >>> c.annotateIntervals()
+        >>> [l.text for l in c.lyrics]
+        ['5', '2']
+        
+        >>> # with stripSpecifiers=False:
+        >>> c = chord.Chord(['c4', 'd-4', 'g4'])
+        >>> c.annotateIntervals(stripSpecifiers=False)
+        >>> [l.text for l in c.lyrics]
+        ['P5', 'm2']
+
+        '''
         # make a copy of self for reducing pitches, but attach to self
         c = copy.deepcopy(self)
 
