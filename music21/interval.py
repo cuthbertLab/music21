@@ -1051,7 +1051,7 @@ class ChromaticInterval(music21.Music21Object):
             value = int(value)
 
         self.semitones = value
-        self.cents = round(value * 100.0, 1)
+        self.cents = round(value * 100.0, 5)
         self.directed = value
         self.undirected = abs(value)
 
