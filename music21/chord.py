@@ -2691,23 +2691,68 @@ class Chord(note.NotRest):
     #---------------------------------------------------------------------------
     # annotations
 
-    def annotateIntervals(self, stripSpecifiers=True, sortPitches=False):
-        '''Create multiple lyrics for the Chord specifying the interval between the bass and the pitches above the bass. 
-
-        The `stripSpecifiers` parameter can be used to show only the intervals size (3, 5, etc) or the complete interval specification (m3, P5, etc.)
-
+    def annotateIntervals(self, inPlace = True, stripSpecifiers=True, sortPitches=True):
+        '''
+        Add lyrics to the chord that show the distance of each note from
+        the bass.  By default we show only the generic interval:
+        
         
         >>> from music21 import *
+        >>> c1 = chord.Chord(['C2','E2','G2','C3'])
+        >>> c2 = c1.annotateIntervals(inPlace = False)
+        >>> c2.lyrics
+        [<music21.note.Lyric number=1 syllabic=single text="8">, <music21.note.Lyric number=2 syllabic=single text="5">, <music21.note.Lyric number=3 syllabic=single text="3">]
+        >>> [l.text for l in c2.lyrics]
+        ['8', '5', '3']
+
+        
+        The `stripSpecifiers` parameter can be used to show only the intervals size (3, 5, etc) 
+        or the complete interval specification (m3, P5, etc.)
+        
+        
+        >>> c3 = c1.annotateIntervals(inPlace = False, stripSpecifiers = False)
+        >>> c3.lyrics
+        [<music21.note.Lyric number=1 syllabic=single text="P8">, <music21.note.Lyric number=2 syllabic=single text="P5">, <music21.note.Lyric number=3 syllabic=single text="M3">]
+        >>> [l.text for l in c3.lyrics]
+        ['P8', 'P5', 'M3']
+        
+        
+        This chord was giving us problems:
+        
+        >>> c4 = chord.Chord(['G4', 'E4', 'B3', 'E3'])
+        >>> c4.annotateIntervals(stripSpecifiers = False)
+        >>> [l.text for l in c4.lyrics]
+        ['m3', 'P8', 'P5']
+        
+
+        If sortPitches is false it still gives problems...
+
+        
+        >>> c4 = chord.Chord(['G4', 'E4', 'B3', 'E3'])
+        >>> c4.annotateIntervals(stripSpecifiers = False, sortPitches = False)
+        >>> [l.text for l in c4.lyrics]
+        ['m3', 'm6', 'm3']
+        
+        
+        
+
+        
         >>> c = chord.Chord(['c4', 'd-4', 'g4'])
         >>> c.annotateIntervals()
         >>> [l.text for l in c.lyrics]
         ['5', '2']
         
-        >>> # with stripSpecifiers=False:
         >>> c = chord.Chord(['c4', 'd-4', 'g4'])
         >>> c.annotateIntervals(stripSpecifiers=False)
         >>> [l.text for l in c.lyrics]
         ['P5', 'm2']
+
+        >>> c = chord.Chord(['c4', 'd---4', 'g4'])
+        >>> c.annotateIntervals(stripSpecifiers=False)
+        >>> [l.text for l in c.lyrics]
+        ['P5', 'dd2']
+
+
 
         '''
         # make a copy of self for reducing pitches, but attach to self
@@ -2716,22 +2761,23 @@ class Chord(note.NotRest):
         # this could be an option
         c.removeRedundantPitches(inPlace=True)
         if sortPitches:
-            c.sortAscending()
+            c = c.sortAscending()
         #environLocal.printDebug(['annotateIntervals()', c.pitches])
         for j in range(len(c.pitches)-1, 0, -1): # only go to zero 
             if j == 0: 
                 continue # first is lowest
             p = c.pitches[j]
             i = interval.Interval(c.pitches[0], p)
-            notation = i.semiSimpleName
-            # remove perfect
-            if stripSpecifiers:
-                notation = notation.lower().replace('p', '')
-                notation = notation.replace('m', '')
-                notation = notation.replace('d', '')
-                notation = notation.replace('a', '')
-            self.addLyric(notation)
-
+            if stripSpecifiers is False:            
+                notation = i.semiSimpleName
+            else:
+                notation = str(i.diatonic.generic.semiSimpleUndirected)
+            if inPlace is True:
+                self.addLyric(notation)
+            else:
+                c.addLyric(notation)
+        if inPlace is False:
+            return c
 
     #---------------------------------------------------------------------------
     # new methods for forte/pitch class data
@@ -3269,7 +3315,10 @@ class Chord(note.NotRest):
 
 
     def removeRedundantPitches(self, inPlace=True):
-        '''Remove all but one instance of a pitch with more than one instance. 
+        '''
+        Remove all but one instance of a pitch that appears twice.
+        It removes based on the name of the note and the octave, so the same note name in two different
+        octaves is retained. 
         
         If `inPlace` is True, a copy is not made and None is returned; otherwise a copy is made and that copy is returned.
 
@@ -3285,8 +3334,30 @@ class Chord(note.NotRest):
         >>> c2.removeRedundantPitches()
         >>> c2.pitches
         [C2, E3, G4, C5]
-        >>> c1.forteClass
-        '3-11B'
+
+
+        It is a known bug that because pitch.nameWithOctave gives
+        the same value for B-flat in octave 1 as B-natural in octave
+        negative 1, negative octaves can screw up this method.
+        With all the things left to do for music21, it doesn't seem
+        a bug worth squashing at this moment, but FYI:
+        
+        >>> p1 = pitch.Pitch('B-')
+        >>> p1.octave = 1
+        >>> p2 = pitch.Pitch('B')
+        >>> p2.octave = -1
+        >>> c3 = chord.Chord([p1, p2])
+        >>> c3.removeRedundantPitches()
+        >>> c3.pitches
+        [B-1]
+        
+        
+        The first pitch survives:
+        
+        >>> c3.pitches[0] is p1
+        True
+        >>> c3.pitches[0] is p2
+        False
 
         '''
         return self._removePitchByRedundantAttribute('nameWithOctave',
