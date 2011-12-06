@@ -22,6 +22,7 @@ from music21 import stream, note, expressions
 from music21 import instrument
 from music21 import pitch
 from music21 import clef
+from music21 import common
 
 from music21 import environment
 _MOD = "analysis/reduction.py"
@@ -379,6 +380,65 @@ class ScoreReduction(object):
 
 
 
+#-------------------------------------------------------------------------------
+class PartReductionException(Exception):
+    pass
+
+#-------------------------------------------------------------------------------
+class PartReduction(object):
+    '''A part reduction reduces a Score into on or more parts. Parts are combined based on a part group dictionary. Each resulting part is then segmented by a parameter. 
+
+    This reduction is designed to work with the GraphHorizontalBarWeighted and related Plot subclasses.
+    '''
+
+    # basic strategy:
+    # combine parts as dictated
+    # segment into bins based on time relation
+    # for each bin, determine parameter; may need to divide into smaller bins
+
+    def __init__(self, srcScore=None, partGroups=[]):
+
+        if 'Score' not in srcScore.classes:
+            raise PartReductionException('provided Stream must be Score')
+
+        self._score = srcScore
+
+        # define how parts are grouped
+        # a list of dictionaries, with keys for name, color, and a match list
+        self._partGroups = partGroups
+        # an ordered list of part id, part color, and a list of Part objs
+        self._partBundles = []
+        # a dictionary of part id to a list of events
+        self._eventSpans = {}
+
+
+    def _createPartBundles(self):
+        '''Fill the _partBundles list with dictionaries, each dictionary defining a name (part id or supplied), a color, and list of Parts that match.
+        '''
+        self._partBundles = []
+
+        if self._partGroups is not None:
+            for d in self._partGroups: # a list of dictionaries
+                name, pColor, matches = d['name'], d['color'], d['match']
+                sub = []
+                for p in self._score.parts:
+                    # if matches is None, use group name
+                    if matches is None:
+                        matches = [name]
+                    for m in matches: # strings or instruments
+                        if common.isStr(m):
+                            if p.id.lower().find(m.lower()) >= 0:
+                                sub.append(p)
+                                break
+                self._partBundles.append([name, pColor, sub])
+        else: # manually creates    
+            for p in self._score.parts:
+                # store one or more Parts associated with an id
+                self._partBundles.append([p.id, '#666666', [p]])
+
+
+    def proces(self):
+        self._createPartGroups()
 
 
 #-------------------------------------------------------------------------------    
@@ -542,6 +602,26 @@ class Test(unittest.TestCase):
         post = sr.reduce()
         #post.show()        
         
+
+
+    def testPartReductionA(self):
+
+        from music21 import stream, analysis, corpus
+
+        s = corpus.parse('bwv66.6')
+
+        partGroups = [
+            {'name':'High Voices', 'color':'#ff0088', 
+                'match':['soprano', 'alto']}, 
+            {'name':'Low Voices', 'color':'#8800ff', 
+                'match':['tenor', 'bass']}
+                    ]
+
+        pr = analysis.reduction.PartReduction(s, partGroups)
+        pr._createPartBundles()
+        for sub in pr._partGroups:
+            self.assertEqual(len(sub['match']), 2)
+
 
 
 #-------------------------------------------------------------------------------
