@@ -396,20 +396,27 @@ class PartReduction(object):
     # segment into bins based on time relation
     # for each bin, determine parameter; may need to divide into smaller bins
 
-    def __init__(self, srcScore=None, partGroups=[]):
+    def __init__(self, srcScore=None, *args, **keywords):
 
         if 'Score' not in srcScore.classes:
             raise PartReductionException('provided Stream must be Score')
 
         self._score = srcScore
 
-        # define how parts are grouped
-        # a list of dictionaries, with keys for name, color, and a match list
-        self._partGroups = partGroups
         # an ordered list of part id, part color, and a list of Part objs
         self._partBundles = []
         # a dictionary of part id to a list of events
         self._eventSpans = {}
+
+        # define how parts are grouped
+        # a list of dictionaries, with keys for name, color, and a match list
+        self._partGroups = None
+        if 'partGroups' in keywords:
+            self._partGroups = keywords['partGroups']
+
+        self._fillByMeasure = True
+        if 'fillByMeasure' in keywords:
+            self._fillByMeasure = keywords['fillByMeasure']
 
 
     def _createPartBundles(self):
@@ -437,9 +444,93 @@ class PartReduction(object):
                 self._partBundles.append([p.id, '#666666', [p]])
 
 
-    def proces(self):
-        self._createPartGroups()
+    def _createEventSpans(self):
+        # for each part group id key, store a list of events
+        self._eventSpans = {}
 
+        for pGroupId, pColor, parts in self._partBundles:
+            #print pGroupId
+            dataEvents = []
+            # combine multiple streams into a single
+            eStart = None
+            eEnd = None
+            eLast = None
+
+            # marking events only if a measure is filled
+            if self._fillByMeasure:    
+                partMeasures = []
+                for p in parts:
+                    partMeasures.append(p.getElementsByClass('Measure'))
+                # assuming that all parts have same number of measures
+                # iterate over each measures
+                iLast = len(partMeasures[0]) - 1
+                for i in range(len(partMeasures[0])):
+                    active = False
+                    # check for activity in any part in the part group
+                    for p in partMeasures:
+                        #print i, p[i], len(p[i].flat.notes)
+                        if len(p[i].flat.notes) > 0:
+                            active = True
+                            break
+                    if eStart is None and active:
+                        eStart = partMeasures[0][i].getOffsetBySite(
+                                 partMeasures[0])
+                    elif (eStart is not None and not active) or i >= iLast:
+                        if eStart is None: # nothing to do; just the last
+                            continue
+                        # if this is the last measure and it is active
+                        if (i >= iLast and active):
+                            eLast = partMeasures[0][i]                            
+                        # use duration, not barDuration.quarterLength
+                        # as want filled duration?
+                        eEnd = (eLast.getOffsetBySite(
+                                partMeasures[0]) + 
+                                eLast.barDuration.quarterLength)
+                        dataEvents.append((eStart, eEnd-eStart, 1, pColor))
+                        eStart = None
+                    eLast = partMeasures[0][i]
+            # fill by alternative approach, based on activity of notes        
+            else:
+                s = stream.Stream()
+                for p in parts:
+                    s.insert(0, p)
+                # this takes a flat presentation of all parts, and then
+                # finds any gaps in consecutive notes
+                eSrc = s.flat
+                # a li=st, not a stream
+                noteSrc = eSrc.findConsecutiveNotes()
+                for i, e in enumerate(noteSrc): 
+                    if e is None or i >= len(noteSrc) - 1:
+                        if eStart is not None:
+                            eEnd = eLast.getOffsetBySite(eSrc) + eLast.quarterLength
+                            dataEvents.append((eStart, eEnd-eStart, 1, pColor))
+                            eStart = None
+                    else:
+                        if eStart is None:
+                            eStart = e.getOffsetBySite(eSrc)
+                        eLast = e
+            #print dataEvents
+            self._eventSpans[pGroupId] = dataEvents
+
+
+    def process(self):
+        '''Core processing routines.
+        '''
+        self._createPartBundles()
+        self._createEventSpans()
+
+    def getGraphHorizontalBarWeightedData(self):
+        '''Get all data organized into bar span specifications. 
+        '''
+#         data =  [
+#         ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, .2, '#3ff203',.1, 1)]  ), 
+#         ('Celli',    [(2, 7, .2, '#0ff302'), (10, 3, .6, '#ff0000', 1)]  ), ]
+        data = []
+        # iterate over part bundles to get order
+        for pGroupId, pColor, parts in self._partBundles:
+            # event spans stores data events
+            data.append((pGroupId, self._eventSpans[pGroupId]))
+        return data
 
 #-------------------------------------------------------------------------------    
 class Test(unittest.TestCase):
@@ -617,11 +708,11 @@ class Test(unittest.TestCase):
                 'match':['tenor', 'bass']}
                     ]
 
-        pr = analysis.reduction.PartReduction(s, partGroups)
-        pr._createPartBundles()
+        pr = analysis.reduction.PartReduction(s, partGroups=partGroups)
+        pr.process()
         for sub in pr._partGroups:
             self.assertEqual(len(sub['match']), 2)
-
+        print pr.getGraphHorizontalBarWeightedData()
 
 
 #-------------------------------------------------------------------------------

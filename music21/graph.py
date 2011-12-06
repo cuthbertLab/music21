@@ -37,6 +37,7 @@ from music21 import converter
 from music21.analysis import windowed
 from music21.analysis import discrete
 from music21.analysis import correlate
+from music21.analysis import reduction
 
 from music21 import features
 from music21.ext import webcolors
@@ -3055,98 +3056,19 @@ class PlotHorizontalBarWeighted(PlotStream):
     def _extractData(self):
         '''Extract the data from the Stream.
         '''
-        # parameters: x, span, heightScalar, color, alpha, yShift
-#         data =  [
-#         ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, .2, '#3ff203',.1, 1)]  ), 
-#         ('Celli',    [(2, 7, .2, '#0ff302'), (10, 3, .6, '#ff0000', 1)]  ), ]
         from music21 import stream
         if 'Score' not in self.streamObj.classes:
             raise GraphException('provided Stream must be Score')
 
-        # need to partition Stream into groups      
-        partGroups = []
-        if self.partGroups is not None:
-            for d in self.partGroups: # a list of dictionaries
-                name, pColor, matches = d['name'], d['color'], d['match']
-                sub = []
-                for p in self.streamObj.parts:
-                    # if matches is None, use group name
-                    if matches is None:
-                        matches = [name]
-                    for m in matches: # strings or instruments
-                        if common.isStr(m):
-                            if p.id.lower().find(m.lower()) >= 0:
-                                sub.append(p)
-                                break
-                partGroups.append([name, pColor, sub])
-        else: # manually creates    
-            for p in self.streamObj.parts:
-                # store one or more Parts associated with an id
-                partGroups.append([p.id, '#666666', [p]])
-        data = []
-        for pId, pColor, parts in partGroups:
-            dataKey = pId
-            dataEvents = []
-            # combine multiple streams into a single
-            eStart = None
-            eEnd = None
-            eLast = None
+        # parameters: x, span, heightScalar, color, alpha, yShift
+#         data =  [
+#         ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, .2, '#3ff203',.1, 1)]  ), 
+#         ('Celli',    [(2, 7, .2, '#0ff302'), (10, 3, .6, '#ff0000', 1)]  ), ]
+        pr = reduction.PartReduction(self.streamObj, partGroups=self.partGroups, 
+                fillByMeasure=self.fillByMeasure)
+        pr.process()
+        data = pr.getGraphHorizontalBarWeightedData()
 
-            # marking events only if a measure is filled
-            if self.fillByMeasure:    
-                partMeasures = []
-                for p in parts:
-                    partMeasures.append(p.getElementsByClass('Measure'))
-                # assuming that all parts have same number of measures
-                # iterate over each measures
-                iLast = len(partMeasures[0]) - 1
-                for i in range(len(partMeasures[0])):
-                    active = False
-                    # check for activity in any part in the part group
-                    for p in partMeasures:
-                        #print i, p[i], len(p[i].flat.notes)
-                        if len(p[i].flat.notes) > 0:
-                            active = True
-                            break
-                    if eStart is None and active:
-                        eStart = partMeasures[0][i].getOffsetBySite(
-                                 partMeasures[0])
-                    elif (eStart is not None and not active) or i >= iLast:
-                        if eStart is None: # nothing to do; just the last
-                            continue
-                        # if this is the last measure and it is active
-                        if (i >= iLast and active):
-                            eLast = partMeasures[0][i]                            
-                        # use duration, not barDuration.quarterLength
-                        # as want filled duration?
-                        eEnd = (eLast.getOffsetBySite(
-                                partMeasures[0]) + 
-                                eLast.barDuration.quarterLength)
-                        dataEvents.append((eStart, eEnd-eStart, 1, pColor))
-                        eStart = None
-                    eLast = partMeasures[0][i]
-            # fill by alternative approach, based on activity of notes        
-            else:
-                s = stream.Stream()
-                for p in parts:
-                    s.insert(0, p)
-                # this takes a flat presentation of all parts, and then
-                # finds any gaps in consecutive notes
-                eSrc = s.flat
-                # a li=st, not a stream
-                noteSrc = eSrc.findConsecutiveNotes()
-                for i, e in enumerate(noteSrc): 
-                    if e is None or i >= len(noteSrc) - 1:
-                        if eStart is not None:
-                            eEnd = eLast.getOffsetBySite(eSrc) + eLast.quarterLength
-                            dataEvents.append((eStart, eEnd-eStart, 1, pColor))
-                            eStart = None
-                    else:
-                        if eStart is None:
-                            eStart = e.getOffsetBySite(eSrc)
-                        eLast = e
-            #print dataEvents
-            data.append([dataKey, dataEvents])
         uniqueOffsets = []
         for key, value in data:
             for dataList in value:
