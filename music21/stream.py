@@ -4486,6 +4486,20 @@ class Stream(music21.Music21Object):
         {4.12} <music21.chord.Chord C#>
         {5.0} <music21.note.Rest rest>
 
+
+        OMIT_FROM_DOCS
+        
+        Test that chordifying 
+        
+        >>> f2 = stream.Score()
+        >>> f2.insert(0, metadata.Metadata())
+        >>> f2.append(note.Note('C4'))
+        >>> f2.insert(0, note.Note('D#4'))
+        >>> c = f2.chordify()
+        >>> cn = c.notes
+        >>> cn[0].pitches
+        [C4, D#4]
+
         
         '''
         # TODO: need to handle flat Streams contained in a Stream   
@@ -4586,7 +4600,7 @@ class Stream(music21.Music21Object):
         else: # place in a single flat Stream
             post._elementsChanged()
 
-        if hasattr(returnObj, 'metadata') and returnObj.metadata is not None:
+        if hasattr(returnObj, 'metadata') and returnObj.metadata is not None and returnObj.hasPartLikeStreams() is True:
             post.insert(0, returnObj.metadata)
         return post
 
@@ -17455,8 +17469,8 @@ class Test(unittest.TestCase):
         #s.show() 
         chords = s.chordify()
         m1 = chords.getElementsByClass('Measure')
-        match = [(n.pitches, n.offset, n.quarterLength) for n in m1[0].notes]
-        self.assertEqual(str(match), '[([B-4, B-2], 0.0, 0.66666666666666663), ([C5, B-2], 0.66666666666666663, 0.66666666666666663), ([B-4, B-2], 1.3333333333333333, 0.66666666666666674), ([A4, B-2], 2.0, 2.0)]')
+        match = [(n.pitches, round(n.offset, 3), round(n.quarterLength, 3)) for n in m1[0].notes]
+        self.assertEqual(str(match), '[([B-4, B-2], 0.0, 0.667), ([C5, B-2], 0.667, 0.667), ([B-4, B-2], 1.333, 0.667), ([A4, B-2], 2.0, 2.0)]')
         #x.show()
         #m1[0].show()
         raw = m1[0].musicxml
