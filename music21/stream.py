@@ -2645,6 +2645,10 @@ class Stream(music21.Music21Object):
 
             match = False
 
+            # alternate version that uses common based comparison
+            # not yet seen as necessary (but incurring a performance hit so
+            # not yet used
+
 #             if (includeEndBoundary is True and mustBeginInSpan is True and 
 #                 common.greaterThanOrEqual(eStart, offsetStart) and common.lessThanOrEqual(eEnd, offsetEnd)):
 #                     match = True
@@ -17480,6 +17484,32 @@ class Test(unittest.TestCase):
         #s.chordify().show('t')
         for c in chords.getElementsByClass('Chord'):
             self.assertEqual(len(c), 2)
+
+        # try with small divisions
+        s = stream.Stream()
+        s.repeatAppend(note.Note('G4', quarterLength=1/6.), 12)
+        s.insert(0, note.Note('C4', quarterLength=2))
+        chords = s.chordify()
+        #s.chordify().show('t')
+        for c in chords.getElementsByClass('Chord'):
+            self.assertEqual(len(c), 2)
+
+        s = stream.Stream()
+        s.repeatAppend(note.Note('G4', quarterLength=1/12.), 24)
+        s.insert(0, note.Note('C4', quarterLength=2))
+        chords = s.chordify()
+        #s.chordify().show('t')
+        for c in chords.getElementsByClass('Chord'):
+            self.assertEqual(len(c), 2)
+
+        s = stream.Stream()
+        s.repeatAppend(note.Note('G4', quarterLength=1/24.), 48)
+        s.insert(0, note.Note('C4', quarterLength=2))
+        chords = s.chordify()
+        #s.chordify().show('t')
+        for c in chords.getElementsByClass('Chord'):
+            self.assertEqual(len(c), 2)
+
 
 
 #-------------------------------------------------------------------------------
