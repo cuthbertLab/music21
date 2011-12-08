@@ -17466,12 +17466,14 @@ class Test(unittest.TestCase):
         # TODO: there are still errors in this chordify output
         s = converter.parse(testPrimitive.triplets01)
         #s.parts[0].show()
-        #s.show() 
+        s.show() 
         chords = s.chordify()
         m1 = chords.getElementsByClass('Measure')
-        match = [(n.pitches, round(n.offset, 3), round(n.quarterLength, 3)) for n in m1[0].notes]
-        self.assertEqual(str(match), '[([B-4, B-2], 0.0, 0.667), ([C5, B-2], 0.667, 0.667), ([B-4, B-2], 1.333, 0.667), ([A4, B-2], 2.0, 2.0)]')
-        #x.show()
+        match = [(n.pitches, str(round(n.offset, 2)), str(round(n.quarterLength, 3))) for n in m1[0].notes]
+        self.assertEqual(str(match), "[([B-4, B-2], '0.0', '0.667'), ([C5, B-2], '0.67', '0.667'), ([B-4, B-2], '1.33', '0.667'), ([A4, B-2], '2.0', '2.0')]")
+
+        #chords.show()
+
         #m1[0].show()
         raw = m1[0].musicxml
         # there should only be 2 tuplet indications in the produced chords

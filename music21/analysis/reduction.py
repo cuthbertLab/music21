@@ -403,7 +403,8 @@ class PartReduction(object):
 
         self._score = srcScore
 
-        # an ordered list of part id, part color, and a list of Part objs
+        # an ordered list of dictionaries for 
+        # part id, part color, and a list of Part objs
         self._partBundles = []
         # a dictionary of part id to a list of events
         self._eventSpans = {}
@@ -437,18 +438,35 @@ class PartReduction(object):
                             if p.id.lower().find(m.lower()) >= 0:
                                 sub.append(p)
                                 break
-                self._partBundles.append([name, pColor, sub])
+                data = {'pGroupId':name, 'color':pColor, 'parts':sub}
+                self._partBundles.append(data)
         else: # manually creates    
             for p in self._score.parts:
                 # store one or more Parts associated with an id
-                self._partBundles.append([p.id, '#666666', [p]])
+                data = {'pGroupId':p.id, 'color':'#666666', 'parts':[p]}
+                self._partBundles.append(data)
+
+        # create flat representation of all parts in a bundle
+        for partBundle in self._partBundles:
+            if len(partBundle['parts']) == 1:
+                partBundle['parts.flat'] = partBundle['parts'][0].flat
+            else:
+                # align all parts and flatten
+                # this takes a flat presentation of all parts
+                s = stream.Stream()
+                for p in partBundle['parts']:
+                    s.insert(0, p)
+                partBundle['parts.flat'] = s.flat
 
 
     def _createEventSpans(self):
         # for each part group id key, store a list of events
         self._eventSpans = {}
 
-        for pGroupId, pColor, parts in self._partBundles:
+        for partBundle in self._partBundles:
+            pGroupId = partBundle['pGroupId']
+            pColor = partBundle['color']
+            parts = partBundle['parts']
             #print pGroupId
             dataEvents = []
             # combine multiple streams into a single
@@ -486,24 +504,27 @@ class PartReduction(object):
                         eEnd = (eLast.getOffsetBySite(
                                 partMeasures[0]) + 
                                 eLast.barDuration.quarterLength)
-                        dataEvents.append((eStart, eEnd-eStart, 1, pColor))
+                        ds = {'eStart':eStart, 'span':eEnd-eStart, 'weight':1, 
+                                'color':pColor}
+                        dataEvents.append(ds)
                         eStart = None
                     eLast = partMeasures[0][i]
             # fill by alternative approach, based on activity of notes        
             else:
-                s = stream.Stream()
-                for p in parts:
-                    s.insert(0, p)
+#                 s = stream.Stream()
+#                 for p in parts:
+#                     s.insert(0, p)
                 # this takes a flat presentation of all parts, and then
                 # finds any gaps in consecutive notes
-                eSrc = s.flat
+                eSrc = partBundle['parts.flat']
                 # a li=st, not a stream
                 noteSrc = eSrc.findConsecutiveNotes()
                 for i, e in enumerate(noteSrc): 
                     if e is None or i >= len(noteSrc) - 1:
                         if eStart is not None:
                             eEnd = eLast.getOffsetBySite(eSrc) + eLast.quarterLength
-                            dataEvents.append((eStart, eEnd-eStart, 1, pColor))
+                            ds = {'eStart':eStart, 'span':eEnd-eStart, 'weight':1, 'color':pColor}
+                            dataEvents.append(ds)
                             eStart = None
                     else:
                         if eStart is None:
@@ -513,11 +534,17 @@ class PartReduction(object):
             self._eventSpans[pGroupId] = dataEvents
 
 
+    def _getValueForSpan():
+        '''For each span, determine the measured parameter value.
+        ''' 
+        pass
+
     def process(self):
         '''Core processing routines.
         '''
         self._createPartBundles()
         self._createEventSpans()
+        self._getValueForSpan()
 
     def getGraphHorizontalBarWeightedData(self):
         '''Get all data organized into bar span specifications. 
@@ -527,9 +554,15 @@ class PartReduction(object):
 #         ('Celli',    [(2, 7, .2, '#0ff302'), (10, 3, .6, '#ff0000', 1)]  ), ]
         data = []
         # iterate over part bundles to get order
-        for pGroupId, pColor, parts in self._partBundles:
+        for partBundle in self._partBundles:
+            print partBundle
             # event spans stores data events
-            data.append((pGroupId, self._eventSpans[pGroupId]))
+#                             ds = {'eStart':eStart, 'span':eEnd-eStart, 'weight':1, 'color':pColor}
+            dataList = []
+            for ds in self._eventSpans[partBundle['pGroupId']]:
+                data.append(ds['eStart'], ds['span'], ds['weight'], ds['color'])
+
+            data.append((partBundle['pGroupId'], dataList))
         return data
 
 #-------------------------------------------------------------------------------    
