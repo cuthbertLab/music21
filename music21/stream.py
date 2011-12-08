@@ -2630,19 +2630,34 @@ class Stream(music21.Music21Object):
                 # it is not  a match
                 if offset < (offsetStart - e.duration.quarterLength):
                     continue
-
             dur = e.duration
             if not mustFinishInSpan:
                 eEnd = offset
             else:
                 eEnd = offset + dur.quarterLength
-
+            eEnd = common.cleanupFloat(eEnd)
+    
             if not mustBeginInSpan:
                 eStart = offset + dur.quarterLength
             else:
                 eStart = offset
+            eStart = common.cleanupFloat(eStart)
 
             match = False
+
+#             if (includeEndBoundary is True and mustBeginInSpan is True and 
+#                 common.greaterThanOrEqual(eStart, offsetStart) and common.lessThanOrEqual(eEnd, offsetEnd)):
+#                     match = True
+#             elif (includeEndBoundary is True and mustBeginInSpan is False and
+#                 eStart > offsetStart and common.lessThanOrEqual(eEnd, offsetEnd)):
+#                     match = True
+#             elif (includeEndBoundary is False and mustBeginInSpan is True and 
+#                 common.greaterThanOrEqual(eStart, offsetStart) and eEnd < offsetEnd):
+#                     match = True
+#             elif (includeEndBoundary is False and mustBeginInSpan is False and
+#                 eStart > offsetStart and eEnd < offsetEnd):
+#                     match = True
+
             if includeEndBoundary is True and mustBeginInSpan is True and \
                 eStart >= offsetStart and eEnd <= offsetEnd:
                     match = True
@@ -4092,9 +4107,10 @@ class Stream(music21.Music21Object):
     #---------------------------------------------------------------------------
     # transformations of self that return a new Stream
 
-    def _uniqueOffsetsAndEndTimes(self, offsetsOnly = False, endTimesOnly = False):
+    def _uniqueOffsetsAndEndTimes(self, offsetsOnly = False, 
+        endTimesOnly = False):
         '''
-        get a list of all offsets and endtimes 
+        Get a list of all offsets and endtimes 
         of notes and rests in this stream.
         
         Runs common.cleanupFloat() on them.
@@ -4134,7 +4150,7 @@ class Stream(music21.Music21Object):
 
         '''
         uniqueOffsets = []
-        for e in self:
+        for e in self.elements:
              o = e.getOffsetBySite(self)
              o = common.cleanupFloat(o)
              if endTimesOnly is not True and o not in uniqueOffsets:
@@ -4143,7 +4159,9 @@ class Stream(music21.Music21Object):
              endTime = common.cleanupFloat(endTime)
              if offsetsOnly is not True and endTime not in uniqueOffsets:
                  uniqueOffsets.append(endTime)
-        uniqueOffsets = sorted(uniqueOffsets)
+        #uniqueOffsets = sorted(uniqueOffsets)
+        # must sort do to potential overlaps
+        uniqueOffsets.sort() # might be faster in-place
         return uniqueOffsets
 
 
@@ -4303,17 +4321,6 @@ class Stream(music21.Music21Object):
                     # concatenate any additional notes found
                     subNotes += subAdd.getElementsByClass(matchClasses)
     
-    #             subRest = []
-    #             for e in subNotes:
-    #                 environLocal.printDebug(['e in subNotes', e])
-    #                 if 'Rest' in e.classes:
-    #                     subRest.append(e)
-    #             environLocal.printDebug(['got rests', subRest])
-    #             if len(subRest) > 0:
-    #                 # remove from subNotes
-    #                 for e in subRest:
-    #                     subNotes.remove(e)
-                    
                 # make subNotes into a chord
                 if len(subNotes) > 0:
                     #environLocal.printDebug(['creating chord from subNotes', subNotes, 'inPlace', inPlace])
@@ -4344,23 +4351,11 @@ class Stream(music21.Music21Object):
                     # remove all rests found in source
                     for r in returnObj.getElementsByClass('Rest'):
                         returnObj.remove(r)
-    
                     if removeRedundantPitches:
                         c.removeRedundantPitches(inPlace=True)
                     # insert chord at start location
                     returnObj._insertCore(o, c)
-    
-                # only add rests if no notes
-    #             elif len(subRest) > 0:
-    #                 r = note.Rest()
-    #                 r.quarterLength = qlMax
-    #                 # remove old rests if in place
-    #                 for rOld in subRest:
-    #                     returnObj.remove(rOld)
-    #                 returnObj._insertCore(o, r)
-    
                 #environLocal.printDebug(['len of returnObj', len(returnObj)])
-    
                 # shift offset to qlMax or minimumWindowSize
                 if qlMax != None and qlMax >= minimumWindowSize:
                     # update start offset to what was old boundary
@@ -4369,15 +4364,12 @@ class Stream(music21.Music21Object):
                     o += qlMax
                 else:
                     o += minimumWindowSize
-    
                 # end While loop conditions
                 if o > oTerminate:
                     break
         else: # useExactOffsets is True:        
             onAndOffOffsets = self.flat.notesAndRests._uniqueOffsetsAndEndTimes()
-#            print onAndOffOffsets
-#            for i in returnObj:
-#                print "%1.4f \t %s" % (i.offset, i.fullName)
+            #environLocal.pd(['makeChords: useExactOffsets=True; onAndOffOffsets:', onAndOffOffsets])
 
             for i in range(len(onAndOffOffsets) - 1):
                 # get all notes within the start and the minwindow size
@@ -4385,13 +4377,11 @@ class Stream(music21.Music21Object):
                 oEnd = onAndOffOffsets[i+1]
                 sub = returnObj.getElementsByOffset(oStart, oEnd,
                         includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)  
-                subNotes = sub.getElementsByClass(matchClasses) # get once for speed         
-#                print "oStart", str(oStart), "oEnd", str(oEnd)
-#                for i in subNotes:
-#                    print "%1.4f \t %s \t %s" % (i.offset, i.fullName, i.tie)
-#                print "-----"
+                # get once for speed         
+                subNotes = sub.getElementsByClass(matchClasses) 
                 #environLocal.printDebug(['subNotes', subNotes])
-    
+                #subNotes.show('t')
+
                 # make subNotes into a chord
                 if len(subNotes) > 0:
                     #environLocal.printDebug(['creating chord from subNotes', subNotes, 'inPlace', inPlace])
@@ -4512,7 +4502,6 @@ class Stream(music21.Music21Object):
             transferGroupsToPitches = True
 
         returnObj = deepcopy(self)
-
         if returnObj.hasPartLikeStreams():
             allParts = returnObj.getElementsByClass('Stream')
         else: # simulate a list of Streams
@@ -17466,23 +17455,31 @@ class Test(unittest.TestCase):
         # TODO: there are still errors in this chordify output
         s = converter.parse(testPrimitive.triplets01)
         #s.parts[0].show()
-        s.show() 
+        #s.show() 
         chords = s.chordify()
         m1 = chords.getElementsByClass('Measure')
         match = [(n.pitches, str(round(n.offset, 2)), str(round(n.quarterLength, 3))) for n in m1[0].notes]
         self.assertEqual(str(match), "[([B-4, B-2], '0.0', '0.667'), ([C5, B-2], '0.67', '0.667'), ([B-4, B-2], '1.33', '0.667'), ([A4, B-2], '2.0', '2.0')]")
 
         #chords.show()
-
-        #m1[0].show()
         raw = m1[0].musicxml
         # there should only be 2 tuplet indications in the produced chords
         self.assertEqual(raw.count('<tuplet'), 2)
-#         for n in m1[0].notes:
-#             print n.duration
-#             print n.duration.tuplets
-#             for t in n.duration.tuplets:            
-#                 print t, t.type
+        # pitch grouping in measure index 1 was not allocated properly
+        for c in chords.getElementsByClass('Chord'):
+            self.assertEqual(len(c), 2)
+
+
+    def testChordifyG(self):
+        from music21 import stream
+        # testing a problem in triplets in makeChords
+        s = stream.Stream()
+        s.repeatAppend(note.Note('G4', quarterLength=1/3.), 6)
+        s.insert(0, note.Note('C4', quarterLength=2))
+        chords = s.chordify()
+        #s.chordify().show('t')
+        for c in chords.getElementsByClass('Chord'):
+            self.assertEqual(len(c), 2)
 
 
 #-------------------------------------------------------------------------------

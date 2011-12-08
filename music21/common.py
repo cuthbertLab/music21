@@ -397,8 +397,7 @@ def greaterThan(x, y = 0.0, grain=1e-7):
     '''
     if x < y or almostEquals(x, y, grain): 
         return False
-    else: 
-        return True
+    return True
 
 def greaterThanOrEqual(x, y=0.0, grain=1e-7):
     '''
@@ -406,8 +405,7 @@ def greaterThanOrEqual(x, y=0.0, grain=1e-7):
     '''
     if x > y or almostEquals(x, y, grain): 
         return True
-    else: 
-        return False
+    return False
 
 
 def lessThan(x, y = 0.0, grain=1e-7):
@@ -429,8 +427,27 @@ def lessThan(x, y = 0.0, grain=1e-7):
     '''
     if x > y or almostEquals(x, y, grain): 
         return False
-    else: 
-        return True    
+    return True    
+
+
+def lessThanOrEqual(x, y = 0.0, grain=1e-7):
+    '''
+    lessThan -- returns True if x is less than and not almostEquals y
+
+    >>> from music21 import *
+    >>> common.lessThanOrEqual(4, 4)
+    True
+    >>> common.lessThanOrEqual(5.2, 5.5)
+    True
+    >>> common.lessThanOrEqual(5.2, 5.5)
+    True
+    >>> common.lessThanOrEqual(5.000000000005, 5.000000000006)
+    True
+
+    '''
+    if x < y or almostEquals(x, y, grain): 
+        return True
+    return False    
 
     
 def isPowerOfTwo(n):
