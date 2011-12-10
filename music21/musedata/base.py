@@ -358,6 +358,9 @@ class MuseDataRecord(object):
             # on trim trailing white space, not leading
             return data.rstrip()
             
+
+    # TODO: need to get slurs from this indication: 
+    # (), {}, []
     def _getAdditionalNotations(self):        
         '''Return an articulation object or None
 
@@ -373,8 +376,6 @@ class MuseDataRecord(object):
         >>> mdr = music21.musedata.MuseDataRecord('G4    24        q     u        (')
         >>> mdr._getAdditionalNotations()
         '('
-
-
         '''
         if len(self.src) < 31:
             return None 
@@ -430,6 +431,104 @@ class MuseDataRecord(object):
                 post.append(articulations.BreathMark())
         return post
 
+
+    def getExpressionObjects(self):        
+        '''Return a list of 0 or more music21 Articulation objects
+
+        >>> from music21 import *
+        >>> mdr = music21.musedata.MuseDataRecord('C4    12        e     u  [      t')
+        >>> mdr.getExpressionObjects()
+        [<music21.expressions.Trill>]
+
+        >>> mdr = music21.musedata.MuseDataRecord('C4    12        e     u  [      .p>F')
+        >>> mdr.getExpressionObjects()
+        [<music21.expressions.Fermata>]
+
+        '''
+        from music21 import expressions
+        post = []
+        data = self._getAdditionalNotations()
+        if data is None:
+            return post
+
+        for char in data:
+            if 'F' == char:
+                # upright fermata
+                post.append(expressions.Fermata())
+            elif 'E' == char:
+                # inverted Fermata
+                post.append(expressions.Fermata())
+            elif 't' == char: # trill
+                post.append(expressions.Trill())
+            elif 'r' == char:
+                post.append(expressions.Turn())
+            elif 'M' == char: 
+                post.append(expressions.Mordent())
+
+        return post
+
+
+    def getDynamicObjects(self):        
+        '''Return a list of 0 or more music21 Dyanmic objects
+
+        >>> from music21 import *
+        >>> mdr = music21.musedata.MuseDataRecord('C5    12        e     u         ff')
+        >>> mdr.getDynamicObjects()
+        [<music21.dynamics.Dynamic ff >]
+
+        >>> mdr = music21.musedata.MuseDataRecord('E4    48        h     u        (pp')
+        >>> mdr.getDynamicObjects()
+        [<music21.dynamics.Dynamic pp >]
+
+        '''
+        from music21 import dynamics
+        post = []
+        data = self._getAdditionalNotations()
+        if data is None:
+            return post
+        # find targets from largest to smallest
+        targets = ['ppp', 'fff',
+                    'pp', 'ff', 'fp', 'mp', 'mf', 
+                    'p', 'f', 'm', 'Z', 'Zp', 'R']
+        for t in targets:
+            pos = data.find(t)
+            if pos < 0:
+                continue
+            # remove from data to avoid double hits
+            data = data[:pos] + data[pos + len(t):]
+            # those that can be directedly created
+            if t in ['ppp', 'fff', 'pp', 'ff', 'p', 'f', 'mp', 'mf', 'fp']:
+                post.append(dynamics.Dynamic(t))
+            elif t == 'm':
+                post.append(dynamics.Dynamic('mp'))
+            elif t == 'Z': # sfz
+                post.append(dynamics.Dynamic('sf'))
+            elif t == 'Zp': # sfp 
+                post.append(dynamics.Dynamic('sf'))
+            elif t == 'R': # rfz
+                post.append(dynamics.Dynamic('sf'))
+        return post
+
+
+    def hasCautionaryAccidental(self):        
+        '''Return a boolean if this note has a cautionary accidental.
+
+        >>> from music21 import *
+        >>> mdr = music21.musedata.MuseDataRecord('F5     3        t n   d  ==[   (+')
+        >>> mdr.hasCautionaryAccidental()
+        True
+
+        >>> mdr = music21.musedata.MuseDataRecord('C4    12        e     u  [')
+        >>> mdr.hasCautionaryAccidental()
+        False
+
+        '''
+        data = self._getAdditionalNotations()
+        if data is None:
+            return False
+        if '+' in data:
+            return True
+        return False
 
 #-------------------------------------------------------------------------------
 class MuseDataRecordIterator(object):
