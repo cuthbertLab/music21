@@ -107,8 +107,8 @@ def mxTransposeToInterval(mxTranspose):
     # NOTE: presently not dealing with double
     # doubled one octave down from what is currently written 
     # (as is the case for mixed cello / bass parts in orchestral literature)
-
-    if ds is not None and cs is not None:
+    #environLocal.pd(['ds', ds, 'cs', cs, 'oc', oc])
+    if ds is not None and ds != 0 and cs is not None and cs != 0:
         # diatonic step can be used as a generic specifier here if 
         # shifted 1 away from zero
         if ds < 0:

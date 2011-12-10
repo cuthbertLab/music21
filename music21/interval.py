@@ -1301,7 +1301,6 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
     
     Absurdly altered interval:
     
-    
     >>> cInterval = interval.GenericInterval('second')
     >>> dInterval = interval.ChromaticInterval(10)  # 8x augmented second
     >>> _getSpecifierFromGenericChromatic(cInterval, dInterval)
@@ -1309,7 +1308,6 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
     IntervalException: cannot get a specifier for a note with this many semitones off of Major: 8
     '''
     noteVals = [None, 0, 2, 4, 5, 7, 9, 11]
-    
     normalSemis = noteVals[gInt.simpleUndirected] + 12 * gInt.undirectedOctaves
 
     if (gInt.direction != cInt.direction and 
