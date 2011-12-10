@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2010 The music21 Project
+# Copyright:    (c) 2010-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
@@ -287,7 +287,6 @@ class MuseDataRecord(object):
             dpq = divisionsPerQuarterNote
         else:
             raise MuseDataException('cannot access parent container of this record to obtain divisions per quarter')
-
         return divisions / float(dpq)
 
 
@@ -359,7 +358,78 @@ class MuseDataRecord(object):
             # on trim trailing white space, not leading
             return data.rstrip()
             
-        
+    def _getAdditionalNotations(self):        
+        '''Return an articulation object or None
+
+        >>> from music21 import *
+        >>> mdr = music21.musedata.MuseDataRecord('C4    12        e     u  [      .p')
+        >>> mdr._getAdditionalNotations()
+        '.p'
+
+        >>> mdr = music21.musedata.MuseDataRecord('C4    12        e     u  =      .')
+        >>> mdr._getAdditionalNotations()
+        '.'
+
+        >>> mdr = music21.musedata.MuseDataRecord('G4    24        q     u        (')
+        >>> mdr._getAdditionalNotations()
+        '('
+
+
+        '''
+        if len(self.src) < 31:
+            return None 
+        else:
+            # accumulate chars 32-43, index 31, 42
+            data = []
+            i = 31
+            while (i <= 42 and i < len(self.src)):            
+                data.append(self.src[i])
+                i += 1
+            data = ''.join(data).strip()
+        return data
+
+
+    def getArticulationObjects(self):        
+        '''Return a list of 0 or more music21 Articulation objects
+
+        >>> from music21 import *
+        >>> mdr = music21.musedata.MuseDataRecord('C4    12        e     u  [      .p')
+        >>> mdr.getArticulationObjects()
+        [<music21.articulations.Staccato>]
+
+        >>> mdr = music21.musedata.MuseDataRecord('C4    12        e     u  [      .p>')
+        >>> mdr.getArticulationObjects()
+        [<music21.articulations.Staccato>, <music21.articulations.Accent>]
+
+        '''
+        from music21 import articulations
+        post = []
+        data = self._getAdditionalNotations()
+        if data is None:
+            return post
+
+        for char in data:
+            if 'A' == char:
+                # vertical accent up
+                post.append(articulations.StrongAccent())
+            elif 'V' == char:
+                # vertical accent down
+                post.append(articulations.StrongAccent())
+            elif '>' == char:
+                # horizontal accents; normal
+                post.append(articulations.Accent())
+            elif '.' == char:
+                post.append(articulations.Staccato())
+            elif '_' == char:
+                post.append(articulations.Tenuto())
+            elif '=' == char:
+                post.append(articulations.DetachedLegato())
+            elif 'i' == char:
+                post.append(articulations.Spiccato())
+            elif ',' == char:
+                post.append(articulations.BreathMark())
+        return post
+
 
 #-------------------------------------------------------------------------------
 class MuseDataRecordIterator(object):
