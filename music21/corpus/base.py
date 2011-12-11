@@ -212,6 +212,7 @@ from music21.corpus.bach import bwv891
 from music21.corpus.bach import bwv892
 from music21.corpus.bach import bwv893
 
+from music21.corpus import theoryExercises
 
 MODULES = [
             airdsAirs,
@@ -389,6 +390,7 @@ MODULES = [
 
             cpebach,
 
+            theoryExercises,
     ]
 
 
