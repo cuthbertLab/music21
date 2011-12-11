@@ -38,15 +38,16 @@ def checkTriadExercise(stream, studentAnswers):
         else:
             outputCheck.append((answerTuple[0] == 'X', answerTuple[0] == 'X'))
             
-    print outputCheck
+    return outputCheck
 
 if __name__ == "__main__":
-    studentAnswers = [('E-', 'm'), ('D', 'M'), ('X', ''), ('X', ''), ('B', 'd'), 
-                      ('G', 'M'), ('F#','M'),('C','m'),('X', ''),('D-', 'M'), ('G#', 'm'),
-                      ('X', 'X'), ('E', 'd'), ('E', 'M'), ('X',''), ('B','m'), ('A', 'M'), 
-                      ('X',''), ('X',''), ('B-', 'd'), ('G')]
     
-    checkTriadExercise(music21.converter.parse('C:/Users/bhadley/Documents/ex1.xml'), studentAnswers)
+    #studentAnswers = [('E-', 'm'), ('D', 'M'), ('X', ''), ('X', ''), ('B', 'd'), 
+    #                  ('G', 'M'), ('F#','M'),('C','m'),('X', ''),('D-', 'M'), ('G#', 'm'),
+    #                  ('X', 'X'), ('E', 'd'), ('E', 'M'), ('X',''), ('B','m'), ('A', 'M'), 
+    #                  ('X',''), ('X',''), ('B-', 'd'), ('G')]
+    
+    #checkTriadExercise(music21.converter.parse('C:/Users/bhadley/Documents/ex1.xml'), studentAnswers)
     
 
     
