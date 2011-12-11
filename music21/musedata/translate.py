@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2010 The music21 Project
+# Copyright:    (c) 2010-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
@@ -112,6 +112,18 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
     if beamsChars is not None:
         post.beams = _musedataBeamToBeams(beamsChars)
  
+    # get accents and expressions; assumes all on first
+    # returns an empty list of None
+    dynamicObjs = [] # stored in stream, not Note
+
+    for a in records[0].getArticulationObjects():
+        post.articulations.append(a)
+    for e in records[0].getExpressionObjects():
+        post.expressions.append(e)
+
+    for d in records[0].getDynamicObjects():
+        dynamicObjs.append(d)
+
     # presently this sets a single tie for a chord; may be different cases
     if records[0].isTied():
         post.tie = tie.Tie('start') # can be start or continue;
@@ -124,16 +136,21 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
         if previousElement != None and previousElement.tie != None:
             if previousElement.tie.type in ['start', 'continue']:
                 post.tie = tie.Tie('stop') # can be start, end, continue
-    return post
+    return post, dynamicObjs
 
 
 
 def _processPending(hasVoices, pendingRecords, eLast, m, vActive):
-    e = _musedataRecordListToNoteOrChord(pendingRecords, eLast)
+    e, dynamicObjs = _musedataRecordListToNoteOrChord(pendingRecords, eLast)
+    # place dyanmics at same position as element
     if hasVoices:
         vActive._appendCore(e)
+        for d in dynamicObjs:
+            vActive._insertCore(e.getOffsetBySite(vActive), d)
     else:
         m._appendCore(e)
+        for d in dynamicObjs:
+            m._insertCore(e.getOffsetBySite(m), d)
     return e
 
 def musedataPartToStreamPart(museDataPart, inputM21=None):
@@ -233,13 +250,6 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
                 # check for pending records first
                 if pendingRecords != []:
                     eLast = _processPending(hasVoices, pendingRecords, eLast, m, vActive)
-#                     e = _musedataRecordListToNoteOrChord(pendingRecords,
-#                         eLast)
-#                     if hasVoices:
-#                         vActive.append(e)
-#                     else:
-#                         m.append(e)
-#                     eLast = e
                     pendingRecords = []
                 # create rest after clearing pending records
                 r = note.Rest()
@@ -263,24 +273,12 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
                 if pendingRecords != []:
                     # this could be a Chord or Note
                     eLast = _processPending(hasVoices, pendingRecords, eLast, m, vActive)
-#                     e = _musedataRecordListToNoteOrChord(pendingRecords, eLast)
-#                     if hasVoices:
-#                         vActive.append(e)
-#                     else:
-#                         m.append(e)
-#                     eLast = e
                     pendingRecords = []
                 # need to append this record for the current note
                 pendingRecords.append(mdr)
 
         # check for any remaining single notes (if last) or chords
         if pendingRecords != []:
-#             e = _musedataRecordListToNoteOrChord(pendingRecords, eLast)
-#             if hasVoices:
-#                 vActive.append(e)
-#             else:
-#                 m.append(e)
-#             eLast = e
             eLast = _processPending(hasVoices, pendingRecords, eLast, m, vActive)
 
         # may be bending elements in a voice to append to a measure
@@ -587,6 +585,17 @@ class Test(unittest.TestCase):
         self.assertEqual(str(
             s.flat.getElementsByClass('TempoIndication')[0]), 
             '<music21.tempo.MetronomeMark Largo Quarter=46>')
+
+    def testMuseDataImportDyanmicsA(self):
+        # note: this is importing a large work, but this seems to presently
+        # be the only one with dynamics
+        from music21 import corpus
+        s = corpus.parse('symphony94', 3)
+        sFlat = s.flat
+        #s.show()
+        self.assertEqual(len(sFlat.getElementsByClass('Dynamic')), 79)
+
+
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

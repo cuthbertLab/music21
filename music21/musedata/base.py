@@ -63,6 +63,8 @@ class MuseDataRecord(object):
             self.stage = self.parent.parent.stage
         else:
             self.stage = None
+        # store frequently used values
+        self._cache = {}
 
     def isRest(self):
         '''Return a boolean if this record is a rest. 
@@ -257,6 +259,11 @@ class MuseDataRecord(object):
                 p.accidental.displayStatus = False
             if acc is not None:
                 p._accidental = self._getAccidentalObject()
+
+            if p.accidental is not None and self.hasCautionaryAccidental():
+                p.accidental.displayStatus = True
+
+            #environLocal.printDebug(['p', p])
             return p
 
 
@@ -377,8 +384,14 @@ class MuseDataRecord(object):
         >>> mdr._getAdditionalNotations()
         '('
         '''
+        # these are cached b/c they are requested for many operations
+        try:
+            return self._cache['_getAdditionalNotations']
+        except KeyError:
+            pass
+
         if len(self.src) < 31:
-            return None 
+            data = None 
         else:
             # accumulate chars 32-43, index 31, 42
             data = []
@@ -387,6 +400,7 @@ class MuseDataRecord(object):
                 data.append(self.src[i])
                 i += 1
             data = ''.join(data).strip()
+        self._cache['_getAdditionalNotations'] = data
         return data
 
 
@@ -408,7 +422,6 @@ class MuseDataRecord(object):
         data = self._getAdditionalNotations()
         if data is None:
             return post
-
         for char in data:
             if 'A' == char:
                 # vertical accent up
@@ -464,9 +477,7 @@ class MuseDataRecord(object):
                 post.append(expressions.Turn())
             elif 'M' == char: 
                 post.append(expressions.Mordent())
-
         return post
-
 
     def getDynamicObjects(self):        
         '''Return a list of 0 or more music21 Dyanmic objects
@@ -507,6 +518,7 @@ class MuseDataRecord(object):
                 post.append(dynamics.Dynamic('sf'))
             elif t == 'R': # rfz
                 post.append(dynamics.Dynamic('sf'))
+        #environLocal.pd(['got dynamics', post])
         return post
 
 
