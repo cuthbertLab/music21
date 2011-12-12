@@ -9,16 +9,26 @@
     This is Lars's Update - Lars
 '''
 
-
 import music21
+import unittest
 
-class CheckerException(Exception):
-    pass
+from music21 import corpus
 
+'''
+Triad Exercise Assignment:
+http://ocw.mit.edu/courses/music-and-theater-arts/21m-301-harmony-and-counterpoint-i-spring-2005/assignments/asgnmnt3_triads.pdf
 
-def checkTriadExercise(stream, studentAnswers):
-    c = stream.chordify()
-    c = c.flat.getElementsByClass(music21.chord.Chord)
+Instructions:
+Determine whether each collection of notes is a triad.
+If it is a triad, identify the root and quality (d, m, M) of the triad.
+If it's not a triad, simply write "X" below that collection of notes.
+'''
+
+#-------------------------------------------------------------------------------
+
+# Don't call an attribute "stream", because there is a very important module named "stream"
+def checkTriadExercise(music21Stream, studentAnswers):
+    c = music21Stream.chordify().getElementsByClass('Chord')
     outputCheck = []
     cnt = 0
     for x, answerTuple in zip(c, studentAnswers):
@@ -33,6 +43,7 @@ def checkTriadExercise(stream, studentAnswers):
             elif x.isDiminishedTriad():
                 boolType =  'd' == answerTuple[1]
             else:
+                # Avoid extraneous print statements...use warnings or throw an exception.
                 print "NOT IDENTIFIED BY MUSIC21 - FAIL"
             outputCheck.append((x.root().name == answerTuple[0], boolType))
         else:
@@ -40,15 +51,24 @@ def checkTriadExercise(stream, studentAnswers):
             
     return outputCheck
 
-if __name__ == "__main__":
+# music21 has its own Exception class, which every Exception in music21 should extend.
+class CheckerException(music21.Music21Exception):
+    pass
     
-    #studentAnswers = [('E-', 'm'), ('D', 'M'), ('X', ''), ('X', ''), ('B', 'd'), 
-    #                  ('G', 'M'), ('F#','M'),('C','m'),('X', ''),('D-', 'M'), ('G#', 'm'),
-    #                  ('X', 'X'), ('E', 'd'), ('E', 'M'), ('X',''), ('B','m'), ('A', 'M'), 
-    #                  ('X',''), ('X',''), ('B-', 'd'), ('G')]
+#-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
     
-    #checkTriadExercise(music21.converter.parse('C:/Users/bhadley/Documents/ex1.xml'), studentAnswers)
-    
+    def runTest(self):
+        pass
 
-    
-    
+if __name__ == "__main__":
+    #music21.mainTest(Test)
+    studentAnswers = [('E-', 'm'), ('D', 'M'), ('X', ''), ('X', ''), ('B', 'd'), 
+                      ('G', 'M'), ('F#','M'),('C','m'),('X', ''),('D-', 'M'), ('G#', 'm'),
+                      ('X', 'X'), ('E', 'd'), ('E', 'M'), ('X',''), ('B','m'), ('A', 'M'), 
+                      ('X',''), ('X',''), ('B-', 'd'), ('G')]
+    checkTriadExercise(corpus.parse('theoryExercises/triadExercise.xml'), studentAnswers)
+    #checkTriadExercise(music21.converter.parse('C:/Users/bhadley/Documents/ex1.xml'), studentAnswers)
+
+#------------------------------------------------------------------------------
+# eof
