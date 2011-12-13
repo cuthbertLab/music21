@@ -534,10 +534,13 @@ class PartReduction(object):
             self._eventSpans[pGroupId] = dataEvents
 
 
-    def _getValueForSpan():
-        '''For each span, determine the measured parameter value.
+    def _getValueForSpan(self):
+        '''For each span, determine the measured parameter value. This is translated as the height of the bar graph.
         ''' 
-        pass
+        for partBundle in self._partBundles:
+            for ds in self._eventSpans[partBundle['pGroupId']]:
+                pass
+
 
     def process(self):
         '''Core processing routines.
@@ -555,13 +558,11 @@ class PartReduction(object):
         data = []
         # iterate over part bundles to get order
         for partBundle in self._partBundles:
-            print partBundle
-            # event spans stores data events
-#                             ds = {'eStart':eStart, 'span':eEnd-eStart, 'weight':1, 'color':pColor}
+            #print partBundle
             dataList = []
             for ds in self._eventSpans[partBundle['pGroupId']]:
-                data.append(ds['eStart'], ds['span'], ds['weight'], ds['color'])
-
+                # data format here is set by the graphing routine
+                dataList.append([ds['eStart'], ds['span'], ds['weight'], ds['color']])
             data.append((partBundle['pGroupId'], dataList))
         return data
 
