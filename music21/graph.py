@@ -4639,15 +4639,20 @@ class Test(unittest.TestCase):
                     ]
 
         partGroups = [
-            {'name':'Brass', 'color':'orange', 
-                'match':['corno', 'tromba']},
-            {'name':'Winds', 'color':'dark blue', 
-                'match':['flauto', 'oboe', 'fagotto']}, 
             {'name':'Timpani', 'color':'purple', 'match':None},
-            {'name':'Violino I', 'color':'dark green', 'match':None},
+            {'name':'Trumpet', 'color':'orange', 'match':['tromba']},
+            {'name':'Horns', 'color':'yellow', 'match':['corno']},
+
+            {'name':'Flute', 'color':'mediumblue', 'match':['flauto']}, 
+            {'name':'Oboe', 'color':'lightsteelblue', 'match':['oboe']}, 
+            {'name':'Basoon', 'color':'dark blue', 'match':['fagotto']}, 
+
+            {'name':'Violino I', 'color':'lightgreen', 'match':None},
             {'name':'Violino II', 'color':'green', 'match':None},
-            {'name':'Low Strings', 'color':'pale green', 
-                'match':['viola', 'violincello', 'contrabasso']},
+            {'name':'Viola', 'color':'forestgreen', 'match':None},
+            {'name':'Violoncello', 'color':'dark green', 
+                'match':['violoncello']}, 
+            {'name':'CB', 'color':'darkolivegreen', 'match':['contrabasso']},
                     ]
         
         #partGroups = None

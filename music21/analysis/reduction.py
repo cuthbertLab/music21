@@ -430,6 +430,7 @@ class PartReduction(object):
                 name, pColor, matches = d['name'], d['color'], d['match']
                 sub = []
                 for p in self._score.parts:
+                    #environLocal.pd(['_createPartBundles: part.id', p.id])
                     # if matches is None, use group name
                     if matches is None:
                         matches = [name]
@@ -438,6 +439,8 @@ class PartReduction(object):
                             if p.id.lower().find(m.lower()) >= 0:
                                 sub.append(p)
                                 break
+                        # TODO: match if m is Instrument class
+
                 data = {'pGroupId':name, 'color':pColor, 'parts':sub}
                 self._partBundles.append(data)
         else: # manually creates    
@@ -534,12 +537,43 @@ class PartReduction(object):
             self._eventSpans[pGroupId] = dataEvents
 
 
-    def _getValueForSpan(self):
+    def _getValueForSpan(self, target='Dynamic', splitSpans=False):
         '''For each span, determine the measured parameter value. This is translated as the height of the bar graph.
+
+        If `splitSpans` is True, a span will be split of the target changes over the span. Otherwise, Spans will be averaged. 
         ''' 
+        # TODO: need a lambda to convert from target to unit interval
+        # this temporary function only works with dynamics
+        def _targetToWeight(targets):
+            sum = 0
+            for e in targets: # a Stream
+                sum += e.volumeScalar
+            raw = sum / len(target)
+            environLocal.pd(['raw average', raw])
+            # shift into three bins: .333, .666, .777
+            if raw <= .1: # p and below
+                return 1/3.
+            elif raw < .3: # p less than f
+                return 3/6.
+            elif raw < .6: # p less than f
+                return 4/6.
+            else:
+                return 1.
+
+        import random
         for partBundle in self._partBundles:
+            flatRef = partBundle['parts.flat']
             for ds in self._eventSpans[partBundle['pGroupId']]:
-                pass
+                # for each event span, find the targeted object
+                if not splitSpans:          
+                    offsetStart = ds['eStart']
+                    offsetEnd = offsetStart + ds['span']
+                    match = flatRef.getElementsByOffset(offsetStart, offsetEnd,
+                        includeEndBoundary=False, mustFinishInSpan=False, 
+                        mustBeginInSpan=True).getElementsByClass(target)
+                    w = _targetToWeight(match)
+                    #environLocal.pd(['segment weight', w])
+                    ds['weight'] = w
 
 
     def process(self):

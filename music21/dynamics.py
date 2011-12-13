@@ -219,7 +219,7 @@ class Dynamic(music21.Music21Object):
     volumeScalar = property(_getVolumeScalar, _setVolumeScalar, doc='''
         Get or set the volume scalar for this dynamic. If not explicitly set, a default volume scalar will be provided. Any number between 0 and 1 can be used to set the volume scalar, overriding the expected behavior. 
 
-        As mezzo is at .5, the unit interval range might be doubled for generating final output. The default output is .5.
+        As mezzo is at .5, the unit interval range is doubled for generating final output. The default output is .5.
 
         >>> from music21 import *
         >>> d = dynamics.Dynamic('mf')
