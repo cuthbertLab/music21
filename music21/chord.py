@@ -2545,35 +2545,68 @@ class Chord(note.NotRest):
             return False
 
     def inversion(self):
-        ''' returns an integer representing which standard inversion the chord is in. Chord
+        ''' returns an integer representing which inversion (if any) the chord is in. Chord
         does not have to be complete, but determines the inversion by looking at the relationship
-        of the bass note to the root.
+        of the bass note to the root. Returns max value of 5 for inversion of a thirteenth chord.
+        Returns 0 if bass to root interval is 1 or if interval is not a common inversion (1st-5th).
+        Octave of bass and root are irrelevant to this calculation of inversion.
+        
+        Method doesn't check to see if inversion is reasonable according to the chord provided
+        (if only two pitches given, an inversion is still returned)
+        see harmony.inversionIsvalid(inversion) for checker method on ChordSymbolObjects.
 
         >>> from music21 import *
         >>> a = chord.Chord(['g', 'b', 'd', 'f'])
         >>> a.inversion()
         2
+        >>> CTriad1stInversion = chord.Chord(['E1', 'G1', 'C2'])
+        >>> CTriad1stInversion.inversion()
+        1
+        >>> CTriad2ndInversion = chord.Chord(['G1', 'E2', 'C2'])
+        >>> CTriad2ndInversion.inversion()
+        2
+        >>> DSeventh3rdInversion = chord.Chord(['C', 'B'])
+        >>> DSeventh3rdInversion.bass(pitch.Pitch('B4'))
+        >>> DSeventh3rdInversion.inversion()
+        3
+        >>> GNinth4thInversion = chord.Chord(['G', 'B', 'D', 'F', 'A'])
+        >>> GNinth4thInversion.bass(pitch.Pitch('A4'))
+        >>> GNinth4thInversion.inversion()
+        4
+        >>> BbEleventh5thInversion = chord.Chord(['B-','D','F','A','C','E-'])
+        >>> BbEleventh5thInversion.bass(pitch.Pitch('E-4'))
+        >>> BbEleventh5thInversion.inversion()
+        5
         '''
         try:
             self.root()
         except ChordException:
             raise ChordException("Not a normal inversion")
-
         
         bassNote = self.bass()
+        #do all interval calculations with bassNote being one octave below root note
+        tempBassPitch = copy.deepcopy(self.bass())
+        tempBassPitch.octave = 1
+        tempRootPitch = copy.deepcopy(self.root())
+        tempRootPitch.octave = 2
         
-        bassToRoot = interval.notesToInterval(bassNote, self.root()).generic.simpleDirected
-        
+        bassToRoot = interval.notesToInterval(tempBassPitch, tempRootPitch).generic.simpleDirected
+        #print 'bassToRoot', bassToRoot
         if (bassToRoot == 1):
             return 0
-        elif (bassToRoot == 6):
+        elif (bassToRoot == 6): #triads
             return 1
-        elif (bassToRoot == 4):
+        elif (bassToRoot == 4): #triads
             return 2
-        elif (bassToRoot == 2):
+        elif (bassToRoot == 2): #sevenths
             return 3
+        elif (bassToRoot == 7): #ninths
+            return 4
+        elif (bassToRoot == 5): #eleventh
+            return 5
         else:
-            raise ChordException("Not a normal inversion")
+            return 0 #no longer raise an exception if not normal inversion
+
 
     def inversionName(self):
         ''' 
