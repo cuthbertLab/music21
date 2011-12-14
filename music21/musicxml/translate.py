@@ -1250,16 +1250,16 @@ def mxToChordSymbol(mxHarmony):
 
     mxDegree = mxHarmony.get('degree')
     if mxDegree is not None: # a list of components
-        harmonyDegrees = []
+        ChordStepModifications = []
         hd = None
         for mxSub in mxDegree.componentList:
             # this is the assumed order of triples
             if isinstance(mxSub, musicxmlMod.DegreeValue):
                 if hd is not None: # already set
-                    harmonyDegrees.append(hd)
+                    ChordStepModifications.append(hd)
                     hd = None
                 if hd is None:
-                    hd = harmony.HarmonyDegree() 
+                    hd = harmony.ChordStepModification() 
                 hd.degree = int(mxSub.charData)
             elif isinstance(mxSub, musicxmlMod.DegreeAlter):
                 hd.interval = int(mxSub.charData)
@@ -1269,9 +1269,9 @@ def mxToChordSymbol(mxHarmony):
                 raise TranslateException('found unexpected object in degree tag: %s' % mxSub)
         # must get last on loop exit
         if hd is not None: 
-            harmonyDegrees.append(hd)
-        for hd in harmonyDegrees:
-            cs.addHarmonyDegree(hd)
+            ChordStepModifications.append(hd)
+        for hd in ChordStepModifications:
+            cs.addChordStepModification(hd)
 
     #environLocal.printDebug(['mxToHarmony(): Harmony object', h])
     return cs
@@ -1293,11 +1293,11 @@ def chordSymbolToMx(cs):
     >>> mxHarmony
     <harmony <root root-step=E root-alter=-1> function=I64 <kind text=M charData=major> inversion=2 <bass bass-step=B bass-alter=-1>>
 
-    >>> hd = harmony.HarmonyDegree()
+    >>> hd = harmony.ChordStepModification()
     >>> hd.type = 'alter'
     >>> hd.interval = -1
     >>> hd.degree = 3
-    >>> cs.addHarmonyDegree(hd)
+    >>> cs.addChordStepModification(hd)
 
     >>> mxHarmony = musicxml.translate.chordSymbolToMx(cs)
     >>> mxHarmony
@@ -1329,9 +1329,9 @@ def chordSymbolToMx(cs):
             mxBass.set('bassAlter', int(cs.bass.accidental.alter))
         mxHarmony.set('bass', mxBass)
 
-    if len(cs.getHarmonyDegrees()) > 0:
+    if len(cs.getChordStepModifications()) > 0:
         mxDegree = musicxmlMod.Degree()
-        for hd in cs.getHarmonyDegrees():
+        for hd in cs.getChordStepModifications():
             # types should be compatible
             mxDegreeValue = musicxmlMod.DegreeValue()
             mxDegreeValue.set('charData', hd.degree)
@@ -4331,11 +4331,11 @@ spirit</words>
         h.kind = 'major'
         h.kindStr = 'M'
         
-        hd = harmony.HarmonyDegree()
+        hd = harmony.ChordStepModification()
         hd.type = 'alter'
         hd.interval = -1
         hd.degree = 3
-        h.addHarmonyDegree(hd)
+        h.addChordStepModification(hd)
         
         s = stream.Stream()
         s.append(h)
