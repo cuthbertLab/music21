@@ -549,6 +549,7 @@ class PartReduction(object):
             for e in targets: # a Stream
                 sum += e.volumeScalar
             raw = sum / len(target)
+            return raw
             environLocal.pd(['raw average', raw])
             # shift into three bins: .333, .666, .777
             if raw <= .1: # p and below

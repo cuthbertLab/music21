@@ -4645,7 +4645,7 @@ class Test(unittest.TestCase):
 
             {'name':'Flute', 'color':'mediumblue', 'match':['flauto']}, 
             {'name':'Oboe', 'color':'lightsteelblue', 'match':['oboe']}, 
-            {'name':'Basoon', 'color':'dark blue', 'match':['fagotto']}, 
+            {'name':'Bassoon', 'color':'dark blue', 'match':['fagotto']}, 
 
             {'name':'Violino I', 'color':'lightgreen', 'match':None},
             {'name':'Violino II', 'color':'green', 'match':None},

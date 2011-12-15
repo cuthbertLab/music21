@@ -716,13 +716,23 @@ def fromChordAndKey(inChord, inKey):
     scaleDeg = inKey.getScaleDegreeFromPitch(chordRoot)
     if scaleDeg is None:
         tempChordRoot = copy.deepcopy(chordRoot)
-        tempChordRoot.accidental = pitch.Accidental(tempChordRoot.accidental.alter + 1)
-        scaleDeg = inKey.getScaleDegreeFromPitch(tempChordRoot, comparisonAttribute='name')
+        if tempChordRoot.accidental is not None:
+            tempChordRoot.accidental = pitch.Accidental(
+                tempChordRoot.accidental.alter + 1)
+        else: # create a new Accidental object
+            tempChordRoot.accidental = pitch.Accidental(1)
+
+        scaleDeg = inKey.getScaleDegreeFromPitch(tempChordRoot, 
+                        comparisonAttribute='name')
         if scaleDeg is not None:
             frontPrefix = 'b'
         else:        
             tempChordRoot = copy.deepcopy(chordRoot)
-            tempChordRoot.accidental = pitch.Accidental(tempChordRoot.accidental.alter - 1)
+            if tempChordRoot.accidental is not None:
+                tempChordRoot.accidental = pitch.Accidental(
+                    tempChordRoot.accidental.alter - 1)
+            else: # create a new Accidental object
+                tempChordRoot.accidental = pitch.Accidental(-1)
             scaleDeg = inKey.getScaleDegreeFromPitch(tempChordRoot, comparisonAttribute='name')
             if scaleDeg is not None:
                 frontPrefix = '#'
@@ -932,6 +942,19 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 0)
 
+
+
+    def testFromChordAndKey(self):
+        from music21 import key, chord, roman        
+        k = key.Key('E')
+        c = chord.Chord(['C','E','G'])
+        r = roman.fromChordAndKey(c, k)
+        self.assertEqual(str(r), 'bVI')
+        
+        # a simple test of the routine necessary for the above test to pass
+        p = pitch.Pitch('c4')
+        p.accidental = pitch.Accidental(-1)
+        self.assertEqual(str(p), 'C-4')
 
 
 _DOC_ORDER = [RomanNumeral, fromChordAndKey]
