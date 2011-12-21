@@ -680,6 +680,15 @@ class Test(unittest.TestCase):
 
 
 
+    def testTranslateA(self):  
+        # this tests a few files in this collection, some of which are hard to parse
+        import os
+        from music21 import corpus
+        for fn in ['ToCashellImGoingJig.abc', 'SundayIsMyWeddingDayJig.abc', 'SinkHimDoddieHighlandFling.abc', 'RandyWifeOfGreenlawReel.abc', 'PassionFlowerHornpipe.abc', 'NightingaleClog.abc', 'MountainRangerHornpipe.abc', 'LadiesPandelettsReel.abc', 'JauntingCarHornpipe.abc', 'GoodMorrowToYourNightCapJig.abc', 'ChandlersHornpipe.abc', 'AlistairMaclalastairStrathspey.abc']:
+            #print fn
+            s = corpus.parse(fn)
+            #s.show()
+
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
