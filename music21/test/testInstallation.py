@@ -15,10 +15,11 @@ import sys, os
 import tarfile
 import distutils.sysconfig
 
-# define on or more directories to try to use as a scratch directory for download; the first valid match will be used.
+# define one or more directories to try to use as a scratch directory for download; the first valid match will be used.
 SCRATCH = ['~/_download', '/_scratch']
 
 # set a download path if downloading source
+# this is only used if not passing a path to locally built src installer
 M21_SOURCE = 'http://music21.googlecode.com/files/music21-0.2.5a4.tar.gz'
 # if true, a new installer will always be downloaded. otherwise, if an appropriately named path exists on the local machine, downloading will be skipped
 FORCE_DOWNLOAD = False
