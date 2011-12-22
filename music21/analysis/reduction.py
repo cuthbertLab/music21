@@ -752,15 +752,6 @@ class Test(unittest.TestCase):
         sr.score = src
         post = sr.reduce()
         #post.show()        
-
-    def testExtractionF(self):
-        from music21 import stream, analysis, note, converter
-
-        src = converter.parse('/_scratch/reduction.xml')
-        sr = analysis.reduction.ScoreReduction()
-        sr.score = src
-        post = sr.reduce()
-        #post.show()        
         
 
 
