@@ -1771,8 +1771,7 @@ class Music21Object(JSONSerializer):
         1
         
 
-        New classes can define their own default classSortOrder        
-å
+        New classes can define their own default classSortOrder 
         
         >>> class ExampleClass(base.Music21Object):
         ...     classSortOrderDefault = 5

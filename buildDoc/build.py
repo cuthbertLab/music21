@@ -750,7 +750,6 @@ class PartitionedClass(PartitionedName):
         # the object object returns by default 
         # x.__init__(...) initializes x; see x.__class__.__doc__ for signature
         # this should be returned as Documentation
-
         if match == None or match.startswith('x.__init__(...) initializes x'):
             return NO_DOC
         # default for a dictionary
