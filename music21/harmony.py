@@ -1379,18 +1379,6 @@ class Test(unittest.TestCase):
         #    s.append(x.chord)
         #s.show()
     
-      
-    def testReadInXML(self):  
-        from music21 import harmony, corpus
-        testFile = music21.corpus.parse('leadSheet/fosterBrownHair.xml')
-        testFile = harmony.realizeChordSymbolDurations(testFile)
-       
-        chordSymbols = testFile.flat.getElementsByClass(ChordSymbol)
-        s = music21.stream.Stream()
-        for cS in chordSymbols:
-            s.append(cS.chord)
-        s.show()
-      
     def testCountHarmonicMotion(self):
         from music21 import converter
         s = converter.parse('http://wikifonia.org/node/8859')
@@ -1433,6 +1421,26 @@ class Test(unittest.TestCase):
         #print vector
 
 
+class TestExternal(unittest.TestCase):
+    pass
+
+    def runTest(self):
+        pass
+    
+      
+    def testReadInXML(self):  
+        from music21 import harmony, corpus
+        testFile = music21.corpus.parse('leadSheet/fosterBrownHair.xml')
+        testFile = harmony.realizeChordSymbolDurations(testFile)
+       
+        chordSymbols = testFile.flat.getElementsByClass(ChordSymbol)
+        s = music21.stream.Stream()
+        for cS in chordSymbols:
+            s.append(cS.chord)
+        s.show()
+      
+
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -1442,7 +1450,7 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    music21.mainTest(Test, TestExternal)
     
     #import doctest
     #doctest.testmod()
