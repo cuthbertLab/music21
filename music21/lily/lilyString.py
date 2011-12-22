@@ -253,12 +253,8 @@ scoreTitleMarkup=##f
             else:
                 command = ''
             os.system(command)
-        
-    def showPNG(self):
-        '''Take the LilyString, run it through LilyPond, and then show it as a PNG file.
-        On Windows, the PNG file will not be deleted, so you  will need to clean out
-        TEMP every once in a while
-        '''        
+    
+    def createPNG(self):
         self.format = 'png'
         self.backend = 'eps'
         self.writeTemp() # do not need extension here
@@ -286,15 +282,20 @@ scoreTitleMarkup=##f
                     file = lilyImage2.convert(base)._dump(format=format)
                 else:
                     file = lilyImage2._dump(format=format)
-                environLocal.launch(format, file)
-                #self.showImageDirect(file)
+                return file
             except:
                 raise
-                # this will never execute after an extension
-                #self.showImageDirect(lilyFile)
-        else:
-            environLocal.launch(self.format, lilyFile)
-            #self.showImageDirect(lilyFile)
+                
+        return lilyFile
+        
+    def showPNG(self):
+        '''Take the LilyString, run it through LilyPond, and then show it as a PNG file.
+        On Windows, the PNG file will not be deleted, so you  will need to clean out
+        TEMP every once in a while
+        '''
+        lilyFile = self.createPNG()
+        environLocal.launch(self.format, lilyFile)
+        #self.showImageDirect(lilyFile)
         
         return lilyFile
         

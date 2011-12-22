@@ -39,12 +39,12 @@ fileExtensions = {
      # note: this is setting .zip as default mapping to musedata
     'musedata' : {'input': ['md', 'musedata', 'zip'], 'output': 'md'},
     'noteworthytext': {'input': ['nwctxt'], 'output': 'nwctxt'},
-    'lilypond' : {'input': ['ly', 'lily', 'lily.png', 'lily.pdf', 'lilypond.png', 'lilypong.pdf'], 'output': 'ly'},
+    'lilypond' : {'input': ['ly', 'lily'], 'output': 'ly'},
     'finale' : {'input': ['mus'], 'output': 'mus'},
     'humdrum' : {'input': ['krn'], 'output': 'krn'},
     'jpeg' : {'input': ['jpg', 'jpeg'], 'output': 'jpg'},
-    'png'  : {'input': ['png'], 'output': 'png'},
-    'pdf'  : {'input': ['pdf'], 'output': 'pdf'},
+    'png'  : {'input': ['png', 'lily.png', 'lilypond.png'], 'output': 'png'},
+    'pdf'  : {'input': ['pdf', 'lily.pdf', 'lilypond.pdf'], 'output': 'pdf'},
     'pickle' : {'input': ['p', 'pickle'], 'output': 'p'},
     'romantext' : {'input': ['rntxt', 'rntext', 'romantext', 'rtxt'], 'output': 'rntxt'},
     'scala' : {'input': ['scl'], 'output': 'scl'},
@@ -74,7 +74,7 @@ DEBUG_ALL = 255
 
 # used for checking preferences, and for setting environment variables
 VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'lily.pdf', 'lily.png']
-VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi']
+VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf']
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
 

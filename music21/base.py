@@ -3184,12 +3184,12 @@ class Music21Object(JSONSerializer):
             mf.close()
             return fp
 
-#         elif fmt == 'lily.pdf':
-#             return self.lily.showPDF()
-#         elif fmt == 'lily.png':
-#             return self.lily.showPNG()
-#         elif fmt == 'lily':
-#             return self.lily.showPNG()
+        elif fmt == 'lily.pdf':
+            return self.lily.createPDF()
+        elif fmt == 'lily.png':
+            return self.lily.createPNG()
+        elif fmt == 'lily':
+            return self.lily.createPNG()
 
         else:
             raise Music21ObjectException('cannot support writing in this format, %s yet' % format)

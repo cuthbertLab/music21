@@ -61,8 +61,8 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> from music21 import *
         >>> n1 = note.Note('G4')
         >>> n2 = note.Note('G4')
-        >>> m1 = note.Note('G4')
-        >>> m2 = note.Note('G4')
+        >>> m1 = note.Note('D4')
+        >>> m2 = note.Note('D4')
         >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.noMotion()
         True
@@ -86,8 +86,8 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> from music21 import *
         >>> n1 = note.Note('G4')
         >>> n2 = note.Note('G4')
-        >>> m1 = note.Note('G4')
-        >>> m2 = note.Note('G4')
+        >>> m1 = note.Note('D4')
+        >>> m2 = note.Note('D4')
         >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.obliqueMotion()
         False
@@ -301,7 +301,7 @@ class VoiceLeadingQuartet(music21.Music21Object):
  
     def parallelInterval(self, thisInterval):
         '''
-        Returns true if there is a parallel or antiParallel interval of
+        Returns true if there is a parallel motion or antiParallel motion of
         this type (thisInterval should be an Interval object)
         
         >>> n11 = Note("C4")
