@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ PY_BIN = ['python']
 # first build a source distribution
 # python setup.py sdist
 # then pass path to source distribution to test routine (update the version)
-# python music21/test/testInstallation.py ~/music21/dist/music21-0.3.4a8.tar.gz
+# python music21/test/testInstallation.py ~/music21/dist/music21-0.6.2b2.tar.gz
 
 
 #-------------------------------------------------------------------------------
