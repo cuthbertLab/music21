@@ -13,7 +13,7 @@
 An object representation of harmony, as encountered as chord symbols or other chord representations with a defined root.
 '''
 
-import unittest, doctest
+import unittest
 
 import music21
 from music21 import common
@@ -21,14 +21,14 @@ from music21 import pitch
 from music21 import roman
 from music21 import interval
 from music21 import chord
-from music21 import duration
+
 
 import re
 import copy
 
 from music21 import environment
 from music21.figuredBass import realizerScale
-from music21 import scale
+
 
 _MOD = "harmony.py"
 environLocal = environment.Environment(_MOD)
@@ -251,50 +251,50 @@ class ChordStepModification(object):
     >>> from music21 import harmony
     >>> hd = harmony.ChordStepModification('add', 4)
     >>> hd
-    <music21.harmony.ChordStepModification type=add degree=4 interval=None>
+    <music21.harmony.ChordStepModification modType=add degree=4 interval=None>
     >>> hd = harmony.ChordStepModification('alter', 3, 1)
     >>> hd
-    <music21.harmony.ChordStepModification type=alter degree=3 interval=<music21.interval.Interval A1>>
+    <music21.harmony.ChordStepModification modType=alter degree=3 interval=<music21.interval.Interval A1>>
 
     '''
-    def __init__(self, type=None, degree=None, interval=None):
-        self._type = None # add, alter, subtract
+    def __init__(self, modType=None, degree=None, interval=None):
+        self._modType = None # add, alter, subtract
         self._interval = None # alteration of degree, alter ints in mxl
         self._degree = None # the degree number, where 3 is the third
 
         # use properties if defined
-        if type is not None:    
-            self.type = type
+        if modType is not None:    
+            self.modType = modType
         if degree is not None:
             self.degree = degree
         if interval is not None:
             self.interval = interval
     
     def __repr__(self):
-        return '<music21.harmony.ChordStepModification type=%s degree=%s interval=%s>' % (self.type, self.degree, self.interval)
+        return '<music21.harmony.ChordStepModification modType=%s degree=%s interval=%s>' % (self.modType, self.degree, self.interval)
         
     #---------------------------------------------------------------------------
-    def _setType(self, value):
+    def _setModType(self, value):
         if value is not None and common.isStr(value):
             if value.lower() in ['add', 'subtract', 'alter']:
-                self._type = value.lower()
+                self._modType = value.lower()
                 return            
-        raise ChordStepModificationException('not a valid degree type: %s' % value)
+        raise ChordStepModificationException('not a valid degree modification type: %s' % value)
 
-    def _getType(self):
-        return self._type
+    def _getModType(self):
+        return self._modType
 
-    type = property(_getType, _setType, doc= '''
-        Get or set the ChordStepModification type, where permitted types are the strings add, subtract, or alter.
+    modType = property(_getModType, _setModType, doc= '''
+        Get or set the ChordStepModification modification type, where permitted types are the strings add, subtract, or alter.
 
         >>> from music21 import *
         >>> hd = harmony.ChordStepModification()
-        >>> hd.type = 'add'
-        >>> hd.type
+        >>> hd.modType = 'add'
+        >>> hd.modType
         'add'
-        >>> hd.type = 'juicy'
+        >>> hd.modType = 'juicy'
         Traceback (most recent call last):
-        ChordStepModificationException: not a valid degree type: juicy
+        ChordStepModificationException: not a valid degree modification type: juicy
         ''')
 
     #---------------------------------------------------------------------------
@@ -367,7 +367,7 @@ class Harmony(music21.Music21Object):
     >>> h.inversion = 1
     >>> h.addChordStepModification(harmony.ChordStepModification('add', 4))
     >>> h
-    <music21.harmony.Harmony root=B- bass=D inversion=1 duration=0.0 ChordStepModifications=<music21.harmony.ChordStepModification type=add degree=4 interval=None>>
+    <music21.harmony.Harmony root=B- bass=D inversion=1 duration=0.0 ChordStepModifications=<music21.harmony.ChordStepModification modType=add degree=4 interval=None>>
 
     >>> p = harmony.Harmony(root='C', bass='E', inversion=1, duration=4.0)
     >>> p
@@ -882,17 +882,14 @@ class ChordSymbol(Harmony):
         st = self._getKindFromShortHand(remaining)
     
         if 'add' in remaining:
-            justType = remaining[0:remaining.index('add')]
             degree = remaining[remaining.index('add') + 3: ]
             self.addChordStepModification(music21.harmony.ChordStepModification('add', int(degree) ) )
             return
         if 'alter' in remaining:
-            justType = remaining[0:remaining.index('alter')]
             degree = remaining[remaining.index('alter') + 5: ]
             self.addChordStepModification(music21.harmony.ChordStepModification('alter', int(degree) ) )
             return
         if 'omit' in remaining or 'subtract' in remaining:
-            justType = remaining[0:remaining.index('omit')]
             degree = remaining[remaining.index('omit') + 4: ]
             self.addChordStepModification(music21.harmony.ChordStepModification('subtract', int(degree) ) )
             return       
@@ -1099,7 +1096,7 @@ class ChordSymbol(Harmony):
         returns true if the provided inversion is exists for the given pitches of the chord. If not, it returns
         false and the getPitches method then appends the bass pitch to the chord.
         '''
-        triads = ['major', 'minor', 'augmented', 'diminished', 'suspended-second','suspended-fourth' ]
+
         sevenths = ['dominant', 'major-seventh', 'minor-seventh', \
                     'diminished-seventh', 'augmented-seventh', 'half-diminished', 'major-minor', \
                     'Neapolitan', 'Italian', 'French', 'German', 'Tristan']
@@ -1163,7 +1160,7 @@ class ChordSymbol(Harmony):
             for hD in ChordStepModifications:
                 
                 sc = music21.scale.MajorScale(self._chord.root())
-                if hD.type == 'add':
+                if hD.modType == 'add':
                     if self._chord.bass() != None:
                         p = sc.pitchFromDegree(hD.degree, self._chord.bass())
                     else:
@@ -1184,7 +1181,7 @@ class ChordSymbol(Harmony):
                         p = p.transpose(hD.interval)
                     pitches.append(p)
                     self._pitchesAndDegrees.append([p, degreeForList] )
-                elif hD.type == 'subtract':
+                elif hD.modType == 'subtract':
                     pitchFound = False
                     degrees = self._degreesList
                     if degrees != None:
@@ -1208,7 +1205,7 @@ class ChordSymbol(Harmony):
                                 #will be more lenient....
                         if pitchFound == False:
                             raise ChordStepModificationException('Degree not in specified chord: %s' % hD.degree)     
-                elif hD.type == 'alter':
+                elif hD.modType == 'alter':
                     pitchFound = False
                     degrees = self._degreesList
                     
@@ -1276,10 +1273,9 @@ class ChordSymbol(Harmony):
         '''returns NotationString of ChordSymbolObject which dictates which scale
         degrees and how those scale degrees are altered in this chord'''
         notationString = ""
-        pitches = []
+
         kind = self.kind
-        root = self.root
-        bass = self.bass            
+          
         if kind == 'major':
             notationString =  '1,3,5'
         elif kind == 'minor':
@@ -1404,16 +1400,16 @@ class Test(unittest.TestCase):
                 totHarmonicMotionFraction[i] = float(totMotion[i]) / totalHarmonicMotion
             vector = totHarmonicMotionFraction
 
-        #print vector
-
+        self.assertEqual( len(vector), 12)
 
 class TestExternal(unittest.TestCase):
     def runTest(self):
         pass
     
     def testReadInXML(self):  
-        from music21 import harmony, corpus
-        testFile = music21.corpus.parse('leadSheet/fosterBrownHair.xml')
+        from music21 import harmony
+        from music21 import corpus
+        testFile = corpus.parse('leadSheet/fosterBrownHair.xml')
         testFile = harmony.realizeChordSymbolDurations(testFile)
        
         chordSymbols = testFile.flat.getElementsByClass(harmony.ChordSymbol)
@@ -1430,30 +1426,27 @@ class TestExternal(unittest.TestCase):
         #I have a test file in music xml that renders pitches of a systematic representation of
         #muxic xml chords....where should I store this test file in the workspace?
         #right now of course its not in the workspace so you can't run this test
-     #   testFile = music21.converter.parse('C:/Users/bhadley/Dropbox/UROP/code/lead sheet chord symbols/ChordSymbolTestFile.xml')
-     #   testFile = harmony.realizeChordSymbolDurations(testFile)
-     #   chords = testFile.flat.getElementsByClass(harmony.ChordSymbol)
+#        testFile = music21.converter.parse('C:/Users/bhadley/Dropbox/UROP/code/lead sheet chord symbols/ChordSymbolTestFile.xml')
+#        testFile = harmony.realizeChordSymbolDurations(testFile)
+#        chords = testFile.flat.getElementsByClass(harmony.ChordSymbol)
         
-     #   s = music21.stream.Stream()
-     #   for x in chords:
-     #       s.append(x.chord)
-            
-     #   csChords = s.flat.getElementsByClass(chord.Chord)
-     #   self.assertEqual(len(csChords), 57)
+#        s = music21.stream.Stream()
+#        for x in chords:
+#            s.append(x.chord)
+#            
+#        csChords = s.flat.getElementsByClass(chord.Chord)
+#        self.assertEqual(len(csChords), 57)
 
     def realizeCSwithFB(self):
         '''just an exploration of using figured bass methods to realize chord symbols
         ...in the process of development...'''
         #from music21 import *
-        from music21 import stream
         from music21 import harmony, corpus
         from music21.figuredBass import realizer
-        from music21 import note
+
         s = music21.stream.Score()
-        voicePart = stream.Part()
-        pianoTreble = stream.PartStaff()
-        pianoBass = stream.PartStaff
-        testFile = music21.corpus.parse('leadSheet/fosterBrownHair.xml')
+
+        testFile = corpus.parse('leadSheet/fosterBrownHair.xml')
         #testFile = music21.converter.parse('C:/wikifonia/wikifonia-4643.mxl')
         
         voicePart = testFile.parts[0]
@@ -1462,8 +1455,8 @@ class TestExternal(unittest.TestCase):
         fillerCS = harmony.ChordSymbol(root='C', kind = 'major', duration = 4.0)
         chordSymbols = []
         chordSymbols.append(fillerCS)
-        list = testFile.flat.getElementsByClass(ChordSymbol)
-        for x in list:
+        cslist = testFile.flat.getElementsByClass(ChordSymbol)
+        for x in cslist:
             chordSymbols.append(x)
         
         fbLine = realizer.FiguredBassLine()
