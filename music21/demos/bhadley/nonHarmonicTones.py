@@ -153,6 +153,32 @@ def _isPassingTone(noteToAnalyze, leftNote, rightNote):
     False
     >>> _isPassingTone(music21.pitch.Pitch('C3'), music21.pitch.Pitch('A3'), music21.pitch.Pitch('D3'))
     False
+    
+    
+    Directionality must be maintained:
+    
+    
+    >>> _isPassingTone(music21.pitch.Pitch('C4'), music21.pitch.Pitch('B##3'), music21.pitch.Pitch('D--4'))
+    False
+   
+    
+    If no octave is given then ._defaultOctave is used.  This is generally octave 4:
+    
+    
+    >>> _isPassingTone(music21.pitch.Pitch('D'), music21.pitch.Pitch('C'), music21.pitch.Pitch('E'))
+    True
+    >>> _isPassingTone(music21.pitch.Pitch('D'), music21.pitch.Pitch('C4'), music21.pitch.Pitch('E'))
+    True
+    >>> _isPassingTone(music21.pitch.Pitch('D'), music21.pitch.Pitch('C5'), music21.pitch.Pitch('E'))
+    False
+
+
+    N.B. this should return False, but it is currently returning True:
+    
+    >>> _isPassingTone(music21.pitch.Pitch('C4'), music21.pitch.Pitch('B3'), music21.pitch.Pitch('B##3'))
+    True
+
+
     '''
     iLeft = music21.interval.Interval(leftNote, noteToAnalyze)
     iRight = music21.interval.Interval(noteToAnalyze, rightNote)
@@ -186,8 +212,7 @@ def _beatIsUnaccented(note):
         return False
     
 if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+    music21.mainTest()
     
     #s = music21.converter.parse('''\
 #C:/Users/bhadley/Dropbox/Music21Theory/WWNortonWorksheets/WWNortonXMLFiles/\
