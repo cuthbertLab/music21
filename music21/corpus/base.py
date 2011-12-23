@@ -36,16 +36,73 @@ environLocal = environment.Environment(_MOD)
 # import corpus packages as python modules
 from music21.corpus import airdsAirs
 
+from music21.corpus import bach
+from music21.corpus.bach import bwv1080
+from music21.corpus.bach import bwv846
+
+from music21.corpus.bach import bwv847
+from music21.corpus.bach import bwv848
+from music21.corpus.bach import bwv849
+from music21.corpus.bach import bwv850
+from music21.corpus.bach import bwv851
+from music21.corpus.bach import bwv852
+from music21.corpus.bach import bwv853
+from music21.corpus.bach import bwv854
+from music21.corpus.bach import bwv855
+from music21.corpus.bach import bwv856
+from music21.corpus.bach import bwv857
+from music21.corpus.bach import bwv858
+from music21.corpus.bach import bwv859
+from music21.corpus.bach import bwv860
+from music21.corpus.bach import bwv861
+from music21.corpus.bach import bwv862
+from music21.corpus.bach import bwv863
+from music21.corpus.bach import bwv864
+from music21.corpus.bach import bwv865
+from music21.corpus.bach import bwv866
+from music21.corpus.bach import bwv867
+from music21.corpus.bach import bwv868
+from music21.corpus.bach import bwv869
+from music21.corpus.bach import bwv870
+from music21.corpus.bach import bwv871
+from music21.corpus.bach import bwv872
+from music21.corpus.bach import bwv873
+from music21.corpus.bach import bwv874
+from music21.corpus.bach import bwv875
+from music21.corpus.bach import bwv876
+from music21.corpus.bach import bwv877
+from music21.corpus.bach import bwv878
+from music21.corpus.bach import bwv879
+from music21.corpus.bach import bwv880
+from music21.corpus.bach import bwv881
+from music21.corpus.bach import bwv882
+from music21.corpus.bach import bwv883
+from music21.corpus.bach import bwv884
+from music21.corpus.bach import bwv885
+from music21.corpus.bach import bwv886
+from music21.corpus.bach import bwv887
+from music21.corpus.bach import bwv888
+from music21.corpus.bach import bwv889
+from music21.corpus.bach import bwv890
+from music21.corpus.bach import bwv891
+from music21.corpus.bach import bwv892
+from music21.corpus.bach import bwv893
+
+
 from music21.corpus import beethoven
 from music21.corpus.beethoven import opus18no1
 from music21.corpus.beethoven import opus59no1
 from music21.corpus.beethoven import opus59no2
 from music21.corpus.beethoven import opus59no3
 
+from music21.corpus import ciconia
+
 from music21.corpus import cpebach
 
+from music21.corpus import demos
+
 from music21.corpus import essenFolksong
-from music21.corpus import ciconia
+
 from music21.corpus import josquin
 
 from music21.corpus import handel
@@ -113,8 +170,10 @@ from music21.corpus.haydn import opus77no2
 
 from music21.corpus.haydn import symphony94
 
-
 from music21.corpus import leadSheet
+
+from music21.corpus import luca
+
 from music21.corpus import miscFolk
 
 from music21.corpus import monteverdi
@@ -158,65 +217,62 @@ from music21.corpus.schoenberg import opus19
 from music21.corpus import schumann
 from music21.corpus.schumann import opus41no1
 
-from music21.corpus import luca
-
-from music21.corpus import bach
-from music21.corpus.bach import bwv1080
-from music21.corpus.bach import bwv846
-
-from music21.corpus.bach import bwv847
-from music21.corpus.bach import bwv848
-from music21.corpus.bach import bwv849
-from music21.corpus.bach import bwv850
-from music21.corpus.bach import bwv851
-from music21.corpus.bach import bwv852
-from music21.corpus.bach import bwv853
-from music21.corpus.bach import bwv854
-from music21.corpus.bach import bwv855
-from music21.corpus.bach import bwv856
-from music21.corpus.bach import bwv857
-from music21.corpus.bach import bwv858
-from music21.corpus.bach import bwv859
-from music21.corpus.bach import bwv860
-from music21.corpus.bach import bwv861
-from music21.corpus.bach import bwv862
-from music21.corpus.bach import bwv863
-from music21.corpus.bach import bwv864
-from music21.corpus.bach import bwv865
-from music21.corpus.bach import bwv866
-from music21.corpus.bach import bwv867
-from music21.corpus.bach import bwv868
-from music21.corpus.bach import bwv869
-from music21.corpus.bach import bwv870
-from music21.corpus.bach import bwv871
-from music21.corpus.bach import bwv872
-from music21.corpus.bach import bwv873
-from music21.corpus.bach import bwv874
-from music21.corpus.bach import bwv875
-from music21.corpus.bach import bwv876
-from music21.corpus.bach import bwv877
-from music21.corpus.bach import bwv878
-from music21.corpus.bach import bwv879
-from music21.corpus.bach import bwv880
-from music21.corpus.bach import bwv881
-from music21.corpus.bach import bwv882
-from music21.corpus.bach import bwv883
-from music21.corpus.bach import bwv884
-from music21.corpus.bach import bwv885
-from music21.corpus.bach import bwv886
-from music21.corpus.bach import bwv887
-from music21.corpus.bach import bwv888
-from music21.corpus.bach import bwv889
-from music21.corpus.bach import bwv890
-from music21.corpus.bach import bwv891
-from music21.corpus.bach import bwv892
-from music21.corpus.bach import bwv893
-
 from music21.corpus import theoryExercises
 
 MODULES = [
             airdsAirs,
-            
+
+            bach,
+            bwv1080,
+            bwv846,
+            bwv847,
+            bwv848,
+            bwv849,
+            bwv850,
+            bwv851,
+            bwv852,
+            bwv853,
+            bwv854,
+            bwv855,
+            bwv856,
+            bwv857,
+            bwv858,
+            bwv859,
+            bwv860,
+            bwv861,
+            bwv862,
+            bwv863,
+            bwv864,
+            bwv865,
+            bwv866,
+            bwv867,
+            bwv868,
+            bwv869,
+            bwv870,
+            bwv871,
+            bwv872,
+            bwv873,
+            bwv874,
+            bwv875,
+            bwv876,
+            bwv877,
+            bwv878,
+            bwv879,
+            bwv880,
+            bwv881,
+            bwv882,
+            bwv883,
+            bwv884,
+            bwv885,
+            bwv886,
+            bwv887,
+            bwv888,
+            bwv889,
+            bwv890,
+            bwv891,
+            bwv892,
+            bwv893,
+
             beethoven, 
             opus18no1,
             opus59no1,
@@ -224,7 +280,11 @@ MODULES = [
             opus59no3,
 
             ciconia,
-            josquin,
+
+            cpebach,
+
+            demos,
+
             essenFolksong,
 
             handel,
@@ -291,7 +351,12 @@ MODULES = [
             opus77no2,
             symphony94,
 
+            josquin,
+
             leadSheet,
+
+            luca,
+
             miscFolk,
             
             monteverdi,
@@ -334,61 +399,6 @@ MODULES = [
 
             schumann,
             opus41no1,
-
-            luca,
-
-            bach,
-            bwv1080,
-            bwv846,
-            bwv847,
-            bwv848,
-            bwv849,
-            bwv850,
-            bwv851,
-            bwv852,
-            bwv853,
-            bwv854,
-            bwv855,
-            bwv856,
-            bwv857,
-            bwv858,
-            bwv859,
-            bwv860,
-            bwv861,
-            bwv862,
-            bwv863,
-            bwv864,
-            bwv865,
-            bwv866,
-            bwv867,
-            bwv868,
-            bwv869,
-            bwv870,
-            bwv871,
-            bwv872,
-            bwv873,
-            bwv874,
-            bwv875,
-            bwv876,
-            bwv877,
-            bwv878,
-            bwv879,
-            bwv880,
-            bwv881,
-            bwv882,
-            bwv883,
-            bwv884,
-            bwv885,
-            bwv886,
-            bwv887,
-            bwv888,
-            bwv889,
-            bwv890,
-            bwv891,
-            bwv892,
-            bwv893,
-
-            cpebach,
 
             theoryExercises,
     ]
