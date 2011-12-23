@@ -1,3 +1,15 @@
+# -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
+# Name:         nonHarmonicTones.py
+# Purpose:      locater routines to label (with colors) non-harmonic tones
+#               for use in music21 theory checker routines
+#
+# Authors:      Beth Hadley
+#
+# Copyright:    (c) 2011 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
+
 import music21
 
 class NonHarmonicException(music21.Music21Exception):
@@ -27,7 +39,7 @@ def labelPassingTones(music21Stream, checkForDissonance=True, checkSimultaneous=
     for part in music21Stream.parts:
         notes = part.flat.getElementsByClass(music21.note.Note)
         index = 0
-        for note in notes[1:len(notes) - 2]:
+        for note in notes[1:len(notes) - 1]:
             index = index + 1
             if _isPassingTone(note, notes[index - 1], notes[index + 1]):
                 listOfTruths = []
@@ -68,7 +80,7 @@ def labelNeighborTones(music21Stream, checkForDissonance=True, checkSimultaneous
     for part in music21Stream.parts:
         notes = part.flat.getElementsByClass(music21.note.Note)
         index = 0
-        for note in notes[1:len(notes) - 2]:
+        for note in notes[1:len(notes) - 1]:
             index = index + 1
             if _isNeighborTone(note, notes[index - 1], notes[index + 1]):
                 listOfTruths = []
@@ -129,7 +141,7 @@ def _isPassingTone(noteToAnalyze, leftNote, rightNote):
     '''checks if the two intervals are steps and if these steps
     are moving in the same direction. Does NOT check if tone is non harmonic
     
-    Accepts pitch or note objects; method is dependant on octave information
+    Accepts pitch or note objects; method is dependent on octave information
     
     >>> _isPassingTone(music21.pitch.Pitch('D3'), music21.pitch.Pitch('C3'), music21.pitch.Pitch('E3'))
     True
@@ -150,7 +162,7 @@ def _isNeighborTone(noteToAnalyze, leftNote, rightNote):
     '''checks if the two intervals are steps and if these steps
     are moving in the opposite direction. Does NOT check if tone is non harmonic
     
-    Accepts pitch or note objects; method is dependant on octave information
+    Accepts pitch or note objects; method is dependent on octave information
     
     >>> _isNeighborTone(music21.pitch.Pitch('F3'), music21.pitch.Pitch('E3'), music21.pitch.Pitch('E3'))
     True
@@ -174,12 +186,12 @@ def _beatIsUnaccented(note):
         return False
     
 if __name__ == "__main__":
-    #import doctest
-    #doctest.testmod()
+    import doctest
+    doctest.testmod()
     
-    s = music21.converter.parse('''\
-C:/Users/bhadley/Dropbox/Music21Theory/WWNortonWorksheets/WWNortonXMLFiles/\
-XML11_worksheets/S11_4_I.xml''')
+    #s = music21.converter.parse('''\
+#C:/Users/bhadley/Dropbox/Music21Theory/WWNortonWorksheets/WWNortonXMLFiles/\
+#XML11_worksheets/S11_6_IB.xml''')
 
-    s = labelPassingTones(s)
-    labelNeighborTones(s).show()
+    #s = labelPassingTones(s)
+    #labelNeighborTones(s).show()
