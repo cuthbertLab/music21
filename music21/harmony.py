@@ -1352,6 +1352,7 @@ class ChordSymbol(Harmony):
         return notationString
 
 #-------------------------------------------------------------------------------
+
 class Test(unittest.TestCase):
     
     def runTest(self):
@@ -1363,21 +1364,6 @@ class Test(unittest.TestCase):
         hd = harmony.ChordStepModification('add', 4)
         h.addChordStepModification(hd)
         self.assertEqual(len(h.chordStepModifications), 1)
-
-    #def testChordRealization(self):
-    #    from music21 import harmony
-        #I have a test file in music xml that renders pitches of a systematic representation of
-        #muxic xml chords....where should I store this test file in the workspace?
-        
-        #right now of course its not in the workspace so you can't run this test
-        #testFile = music21.converter.parse('C:/ChordSymbolTestFile.xml')
-        #testFile = harmony.realizeChordSymbolDurations(testFile)
-        #chords = testFile.flat.getElementsByClass(harmony.ChordSymbol)
-        
-        #s = music21.stream.Stream()
-        #for x in chords:
-        #    s.append(x.chord)
-        #s.show()
     
     def testCountHarmonicMotion(self):
         from music21 import converter
@@ -1422,26 +1408,84 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):
-    pass
-
     def runTest(self):
         pass
     
-      
     def testReadInXML(self):  
         from music21 import harmony, corpus
         testFile = music21.corpus.parse('leadSheet/fosterBrownHair.xml')
         testFile = harmony.realizeChordSymbolDurations(testFile)
        
-        chordSymbols = testFile.flat.getElementsByClass(ChordSymbol)
+        chordSymbols = testFile.flat.getElementsByClass(harmony.ChordSymbol)
         s = music21.stream.Stream()
+
         for cS in chordSymbols:
             s.append(cS.chord)
-        s.show()
+            
+        csChords = s.flat.getElementsByClass(chord.Chord)
+        self.assertEqual(len(csChords), 40)
+
+    #def testChordRealization(self):
+    #    from music21 import harmony
+        #I have a test file in music xml that renders pitches of a systematic representation of
+        #muxic xml chords....where should I store this test file in the workspace?
+        #right now of course its not in the workspace so you can't run this test
+     #   testFile = music21.converter.parse('C:/Users/bhadley/Dropbox/UROP/code/lead sheet chord symbols/ChordSymbolTestFile.xml')
+     #   testFile = harmony.realizeChordSymbolDurations(testFile)
+     #   chords = testFile.flat.getElementsByClass(harmony.ChordSymbol)
+        
+     #   s = music21.stream.Stream()
+     #   for x in chords:
+     #       s.append(x.chord)
+            
+     #   csChords = s.flat.getElementsByClass(chord.Chord)
+     #   self.assertEqual(len(csChords), 57)
+
+    def realizeCSwithFB(self):
+        '''just an exploration of using figured bass methods to realize chord symbols
+        ...in the process of development...'''
+        #from music21 import *
+        from music21 import stream
+        from music21 import harmony, corpus
+        from music21.figuredBass import realizer
+        from music21 import note
+        s = music21.stream.Score()
+        voicePart = stream.Part()
+        pianoTreble = stream.PartStaff()
+        pianoBass = stream.PartStaff
+        testFile = music21.corpus.parse('leadSheet/fosterBrownHair.xml')
+        #testFile = music21.converter.parse('C:/wikifonia/wikifonia-4643.mxl')
+        
+        voicePart = testFile.parts[0]
+
+        testFile = harmony.realizeChordSymbolDurations(testFile)
+        fillerCS = harmony.ChordSymbol(root='C', kind = 'major', duration = 4.0)
+        chordSymbols = []
+        chordSymbols.append(fillerCS)
+        list = testFile.flat.getElementsByClass(ChordSymbol)
+        for x in list:
+            chordSymbols.append(x)
+        
+        fbLine = realizer.FiguredBassLine()
+       
+        for cS in chordSymbols:
+            fb = cS._notationString().replace('1,', '')
+          
+            print fb
+            n = music21.note.Note(cS.root.name, quarterLength = cS.duration.quarterLength)
+            n.octave = 3
+            fbLine.addElement(n)
+        
+        allSols = fbLine.realize()
+        gen = allSols.generateRandomRealizations(1)
       
-
-
-
+        pianoTreble = gen.parts[0]
+        pianoBass = gen.parts[1]
+        s.insert(0, voicePart)
+        s.insert(0, pianoTreble)
+        s.insert(0, pianoBass)
+        #s.show()
+        
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 
@@ -1451,21 +1495,20 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == "__main__":
     music21.mainTest(Test, TestExternal)
-    
+
     #import doctest
     #doctest.testmod()
     
-    #test = music21.harmony.Test()
+    #test = music21.harmony.TestExternal()
     #test.testReadInXML()
-     
-    #test = music21.harmony.Test()
+    
+    #test = music21.harmony.TestExternal()
     #test.testChordRealization()
     
+    #test = music21.harmony.Test()
+    #test.realizeCSwithFB()
 #------------------------------------------------------------------------------
 # eof
-
-
-
 
 
 
