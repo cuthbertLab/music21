@@ -1421,21 +1421,24 @@ class TestExternal(unittest.TestCase):
         csChords = s.flat.getElementsByClass(chord.Chord)
         self.assertEqual(len(csChords), 40)
 
-    #def testChordRealization(self):
-    #    from music21 import harmony
-        #I have a test file in music xml that renders pitches of a systematic representation of
-        #muxic xml chords....where should I store this test file in the workspace?
-        #right now of course its not in the workspace so you can't run this test
-#        testFile = music21.converter.parse('C:/Users/bhadley/Dropbox/UROP/code/lead sheet chord symbols/ChordSymbolTestFile.xml')
-#        testFile = harmony.realizeChordSymbolDurations(testFile)
-#        chords = testFile.flat.getElementsByClass(harmony.ChordSymbol)
+    def testChordRealization(self):
+        from music21 import harmony, corpus
+        #There is a test file under demos called ComprehensiveChordSymbolsTestFile.xml
+        #that should contain a copmlete iteration of tests of chord symbol objects
+        #this test makes sure that no error exists, and checks that 57 chords were
+        #created out of that file....feel free to add to file if you find missing
+        #tests, and adjust 57 accordingly
+        testFile = corpus.parse('demos/ComprehensiveChordSymbolsTestFile.xml')
+    
+        testFile = harmony.realizeChordSymbolDurations(testFile)
+        chords = testFile.flat.getElementsByClass(harmony.ChordSymbol)
         
-#        s = music21.stream.Stream()
-#        for x in chords:
-#            s.append(x.chord)
-#            
-#        csChords = s.flat.getElementsByClass(chord.Chord)
-#        self.assertEqual(len(csChords), 57)
+        s = music21.stream.Stream()
+        for x in chords:
+            s.append(x.chord)
+            
+        csChords = s.flat.getElementsByClass(chord.Chord)
+        self.assertEqual(len(csChords), 57)
 
     def realizeCSwithFB(self):
         '''just an exploration of using figured bass methods to realize chord symbols
@@ -1477,7 +1480,7 @@ class TestExternal(unittest.TestCase):
         s.insert(0, voicePart)
         s.insert(0, pianoTreble)
         s.insert(0, pianoBass)
-        #s.show()
+        s.show()
         
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -1498,7 +1501,7 @@ if __name__ == "__main__":
     #test = music21.harmony.TestExternal()
     #test.testChordRealization()
     
-    #test = music21.harmony.Test()
+    #test = music21.harmony.TestExternal()
     #test.realizeCSwithFB()
 #------------------------------------------------------------------------------
 # eof
