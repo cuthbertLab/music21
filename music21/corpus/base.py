@@ -13,7 +13,7 @@
 '''
 The music21 corpus provides a collection of freely distributable music in MusicXML, Humdrum, and other representations. The corpus package provides an interface to this data.
 
-To see complete listing of works in the music21 corpus, visit  :ref:`referenceCorpus`.
+To see a complete listing of the works in the music21 corpus, visit  :ref:`referenceCorpus`.
 '''
 
 
@@ -482,34 +482,31 @@ def getPaths(extList=None, expandExtensions=True):
         for e in extList:
             extMod += common.findInputExtension(e)
         extList = extMod
-        
+    
+    #escape extension dots (if there) for regex
+    extList = ["\\%s" % ex for ex in extList if ex.startswith('.')]
+    extRe = re.compile('.*(%s)' % '|'.join(extList))
     #environLocal.printDebug(['getting paths with extensions:', extList])
-    paths = []    
-    for moduleName in MODULES:
-        if not hasattr(moduleName, '__path__'):
-            # when importing a package name (a directory) the moduleName        
-            # may be a list of all paths contained within the package
-            # this seems to be dependent on the context of the call:
-            # from the command line is different than from the interpreter
-            dirListing = moduleName
-        else:
-            # returns a list with one or more paths
-            # the first is the path to the directory that contains xml files
-            dir = moduleName.__path__[0] 
-            dirListing = [os.path.join(dir, x) for x in os.listdir(dir)]
+    
+    def findPaths():
+        for moduleName in MODULES:
+            if not hasattr(moduleName, '__path__'):
+                # when importing a package name (a directory) the moduleName        
+                # may be a list of all paths contained within the package
+                # this seems to be dependent on the context of the call:
+                # from the command line is different than from the interpreter
+                dirListing = moduleName
+            else:
+                # returns a list with one or more paths
+                # the first is the path to the directory that contains xml files
+                dir = moduleName.__path__[0] 
+                dirListing = [os.path.join(dir, x) for x in os.listdir(dir)]
 
-        for fp in dirListing:
-            if fp in paths:
-                continue
-            match = False
-            for ext in extList:
-                if fp.endswith(ext):
-                    match = True
-                    break 
-            if match:
-                if fp not in paths:
-                    paths.append(fp)    
-    return paths
+            for fp in dirListing:
+                if extRe.match(fp):
+                    yield fp
+    # set() is to uniquify the list.
+    return sorted(list(set(findPaths())))
 
 def getVirtualPaths(extList=None):
     '''Get all paths in the virtual corpus that match a known extension. An extension of None will return all known extensions.
@@ -670,12 +667,12 @@ def getWorkList(workName, movementNumber=None, extList=None):
     1
     >>> len(getWorkList('beethoven/opus18no1', 0, '.xml'))
     0
-    >>> len(getWorkList('handel/hwv56', '1-01', '.md'))
+    >>> len(getWorkList('handel/hwv56', '1-02', '.md'))
     1
-    >>> len(getWorkList('handel/hwv56', (1,1), '.md'))
+    >>> len(getWorkList('handel/hwv56', (2,1), '.md'))
     1
 
-    >>> len(getWorkList('bach/bwv1080', 1, '.md'))
+    >>> len(getWorkList('bach/bwv1080', 2, '.md'))
     1
 
     '''

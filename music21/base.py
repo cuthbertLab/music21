@@ -3160,14 +3160,14 @@ class Music21Object(JSONSerializer):
         if fp is None:
             fp = environLocal.getTempFile(ext)
 
-        if format in ['text', 'textline', 'musicxml', 'lilypond']:        
+        if format in ['text', 'textline', 'musicxml', 'lilypond', 'lily']:        
             if format == 'text':
                 dataStr = self._reprText()
             elif format == 'textline':
                 dataStr = self._reprTextLine()
             elif format == 'musicxml':
                 dataStr = self.musicxml
-            elif format == 'lilypond':
+            elif format in ['lilypond', 'lily']:
                 dataStr = self.lily.renderTemplate()
 
             f = open(fp, 'w')
@@ -3183,13 +3183,10 @@ class Music21Object(JSONSerializer):
             mf.close()
             return fp
 
-        elif fmt == 'lily.pdf':
+        elif fmt in ['pdf', 'lily.pdf']:
             return self.lily.createPDF()
-        elif fmt == 'lily.png':
+        elif fmt in ['png', 'lily.png']:
             return self.lily.createPNG()
-        elif fmt == 'lily':
-            return self.lily.createPNG()
-
         else:
             raise Music21ObjectException('cannot support writing in this format, %s yet' % format)
 
@@ -3220,8 +3217,14 @@ class Music21Object(JSONSerializer):
             xml (musicxml)
             text
             midi
+            lily (or lilypond)
             lily.png
             lily.pdf
+
+
+        N.B. score.write('lily') returns a bare lilypond file,
+        score.show('lily') gives a png of a rendered lilypond file.
+
 
         OMIT_FROM_DOCS        
         This might need to return the file path.
@@ -3249,10 +3252,10 @@ class Music21Object(JSONSerializer):
 
         # TODO: these need to be updated to write files
         # TODO: the lilypondFormat is not yet consulted
-        elif fmt == 'lily.pdf':
+        elif fmt in ['lily.pdf', 'pdf']:
             #return self.lily.showPDF()
             environLocal.launch('pdf', self.lily.createPDF(), app=app)
-        elif fmt == 'lily.png':
+        elif fmt in ['lily.png', 'png']:
             # TODO check that these use environLocal 
             return self.lily.showPNG()
         elif fmt in ['lily', 'lilypond']:
