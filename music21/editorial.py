@@ -23,6 +23,52 @@ class EditorialException(Exception):
 class CommentException(Exception):
     pass
 
+def getObjectsWithEditorial(listToSearch, editorialStringToFind, listOfValues = None):
+    '''
+    provided a list of objects (typically note objects) to search through, this method returns
+    only those objects that have the editorial attribute defined by the editorialStringToFind.
+    An optional parameter, listOfValues, is a list of all the possible values the given
+    object's editorialString can have.
+    
+    the editorialStringToFind can be any of the pre-defined editorial attributes (such as "ficta" or "harmonicIntervals")
+    but it may also be the dictionary key of editorial notes stored in the miscellaneous (misc) dictionary.
+    For example, "isPassingTone" or "isNeighborTone"
+    
+    >>> from music21 import *
+    >>> n1 = note.Note()
+    >>> n1.editorial.misc['isPassingTone'] = True
+    >>> n2 = note.Note()
+    >>> n2.editorial.comment = 'consider revising'
+    >>> s = stream.Stream()
+    >>> s.repeatAppend(n1, 5)
+    >>> s.repeatAppend(note.Note(), 2)
+    >>> s.repeatAppend(n2, 3)
+    >>> listofNotes = s.getElementsByClass(note.Note)
+    >>> listOfValues = ['consider revising', 'remove']
+    >>> listofNotesWithEditorialisPassingTone = editorial.getObjectsWithEditorial(listofNotes, "isPassingTone")
+    >>> listofNotesWithEditorialComment = editorial.getObjectsWithEditorial(listofNotes, "comment", listOfValues)
+    >>> print len(listofNotesWithEditorialisPassingTone)
+    5
+    >>> print len(listofNotesWithEditorialComment)
+    3
+    '''
+    listofOBJToReturn = []
+    for obj in listToSearch:
+        try:
+            try:
+                editorialContents = getattr(obj.editorial, editorialStringToFind)
+            except:
+                editorialContents = obj.editorial.misc[editorialStringToFind]
+            
+            if listOfValues != None:
+                if editorialContents in listOfValues:
+                    listofOBJToReturn.append(obj)
+            else:
+                listofOBJToReturn.append(obj)
+        except:
+            pass
+    return listofOBJToReturn
+    
 class NoteEditorial(object):
     '''Editorial comments and special effects that can be applied to notes
     Standard ones are stored as attributes.  Non-standard/one-off effects are
@@ -214,6 +260,8 @@ _DOC_ORDER = [NoteEditorial]
 
 
 if __name__ == "__main__":
+    #import doctest
+    #doctest.testmod()
     music21.mainTest(Test)
 
 
