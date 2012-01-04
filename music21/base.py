@@ -40,7 +40,7 @@ under the module "base":
 #-------------------------------------------------------------------------------
 # string and tuple must be the same
 VERSION = (0, 6, 2)
-VERSION_STR = "%s.%s.%sb2" % (VERSION[0], VERSION[1], VERSION[2])
+VERSION_STR = "%s.%s.%s.b2" % (VERSION[0], VERSION[1], VERSION[2])
 #-------------------------------------------------------------------------------
 
 import codecs

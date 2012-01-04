@@ -2277,9 +2277,23 @@ class Test(unittest.TestCase):
         mtsRepr = repr(mts)
         self.assertEqual(mtsRepr.count('velocity=51') > 2, True)
         self.assertEqual(mtsRepr.count('velocity=102') > 2, True)
-
-
         #s.show('midi')
+
+
+    def testImportTruncationProblemA(self):
+        import os
+        from music21 import converter
+
+        # specialized problem of not importing last notes
+        dir = common.getPackageDir(relative=False, remapSep=os.sep)
+        for fp in dir:
+            if fp.endswith('midi'):
+                break
+        dirLib = os.path.join(fp, 'testPrimitive')
+        # a simple file created in athenacl
+        fp = os.path.join(dirLib, 'test12.mid')
+        s = converter.parse(fp)
+        s.show('t')
 
 if __name__ == "__main__":
     music21.mainTest(Test)
