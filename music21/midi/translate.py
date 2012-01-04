@@ -1179,7 +1179,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     >>> mt = mf.tracks[0] 
     >>> s = midiTrackToStream(mt)
     >>> len(s.notesAndRests)
-    9
+    11
     '''
     #environLocal.printDebug(['midiTrackToStream(): got midi track: events', len(mt.events), 'ticksPerQuarter', ticksPerQuarter])
 
@@ -1188,7 +1188,6 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
         s = stream.Stream()
     else:
         s = inputM21
-
     if ticksPerQuarter == None:
         ticksPerQuarter = defaults.ticksPerQuarter
 
@@ -1242,7 +1241,6 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     memo = [] # store already matched note off
     for i in range(len(events)):
         #environLocal.printDebug(['midiTrackToStream(): paired events', events[i][0], events[i][1]])
-
         if i in memo:
             continue
         t, e = events[i]
@@ -1250,6 +1248,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
         # events
         if e.isNoteOn():
             match = None
+            #environLocal.pd(['midiTrackToStream(): isNoteOn', e])
             for j in range(i+1, len(events)):
                 if j in memo: 
                     continue
@@ -1296,13 +1295,17 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     chordSub = None
     i = 0
     if len(notes) > 1:
+        #environLocal.pd(['\nmidiTrackToStream(): notes', notes])
         while i < len(notes):
             # look at each note; get on time and event
             on, off = notes[i]
             t, e = on
             #environLocal.printDebug(['on, off', on, off, 'i', i, 'len(notes)', len(notes)])
+
             # go through all following notes; if there is only 1 note, this will 
-            # not exectue
+            # not execute;
+            # looking for other events that start within a certain small time 
+            # window to make into a chod
             for j in range(i+1, len(notes)):
                 # look at each on time event
                 onSub, offSub = notes[j]
@@ -1310,31 +1313,36 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                 # can set a tolerance for chordSubing; here at 1/16th
                 # of a quarter
                 if tSub - t <= ticksPerQuarter / 16:
-                    if chordSub == None: # start a new one
+                    if chordSub is None: # start a new one
                         chordSub = [notes[i]]
                     chordSub.append(notes[j])
-                    continue # keep looping
+                    continue # keep looping through events to see 
+                    # if we can add more elements to this chord group
                 else: # no more matches; assuming chordSub tones are contiguous
-                    if chordSub != None:
-                        #composite.append(chordSub)
-                        # create a chord here
-                        c = chord.Chord()
-                        c._setMidiEvents(chordSub, ticksPerQuarter)
-                        o = notes[i][0][0] / float(ticksPerQuarter)
-                        s._insertCore(o, c)
-                        iSkip = len(chordSub)
-                        chordSub = None
-                    else: # just append the note
-                        #composite.append(notes[i])
-                        # create a note here
-                        n = note.Note()
-                        n._setMidiEvents(notes[i], ticksPerQuarter)
-                        # the time is the first value in the first pair
-                        # need to round, as floating point error is likely
-                        o = notes[i][0][0] / float(ticksPerQuarter)
-                        s._insertCore(o, n)
-                        iSkip = 1
-                    break # exit secondary loop
+                    break
+            # this comparison must be outside of j loop, as the case where we
+            # have the last note in a list of notes and the j loop does not 
+            # execute; chordSub will be None
+            if chordSub is not None:
+                #composite.append(chordSub)
+                # create a chord here
+                c = chord.Chord()
+                c._setMidiEvents(chordSub, ticksPerQuarter)
+                o = notes[i][0][0] / float(ticksPerQuarter)
+                s._insertCore(o, c)
+                iSkip = len(chordSub)
+                chordSub = None
+            else: # just append the note, chordSub is None
+                #composite.append(notes[i])
+                # create a note here
+                n = note.Note()
+                n._setMidiEvents(notes[i], ticksPerQuarter)
+                # the time is the first value in the first pair
+                # need to round, as floating point error is likely
+                o = notes[i][0][0] / float(ticksPerQuarter)
+                s._insertCore(o, n)
+                iSkip = 1
+            #break # exit secondary loop
             i += iSkip
     elif len(notes) == 1: # rare case of just one note
         n = note.Note()
@@ -1606,7 +1614,7 @@ def midiFileToStream(mf, inputM21=None):
     1
     >>> s = midiFileToStream(mf)
     >>> len(s.flat.notesAndRests)
-    9
+    11
     '''
     #environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
 
@@ -2293,7 +2301,14 @@ class Test(unittest.TestCase):
         # a simple file created in athenacl
         fp = os.path.join(dirLib, 'test12.mid')
         s = converter.parse(fp)
-        s.show('t')
+        
+        self.assertEqual(len(s.parts[0].flat.notes), 3)
+        self.assertEqual(len(s.parts[1].flat.notes), 3)
+        self.assertEqual(len(s.parts[2].flat.notes), 3)        
+        self.assertEqual(len(s.parts[3].flat.notes), 3)
+
+        #s.show('t')
+        #s.show('midi')
 
 if __name__ == "__main__":
     music21.mainTest(Test)

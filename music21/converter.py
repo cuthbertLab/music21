@@ -1513,7 +1513,7 @@ class Test(unittest.TestCase):
         #for fn in ['test01.mid', 'test02.mid', 'test03.mid', 'test04.mid']:
         s = parseFile(fp)
         #s.show()
-        self.assertEqual(len(s.flat.getElementsByClass(note.Note)), 17)
+        self.assertEqual(len(s.flat.getElementsByClass(note.Note)), 18)
 
 
         # has chords and notes
@@ -1523,7 +1523,7 @@ class Test(unittest.TestCase):
         #environLocal.printDebug(['\nopening fp', fp])
 
         self.assertEqual(len(s.flat.getElementsByClass(note.Note)), 2)
-        self.assertEqual(len(s.flat.getElementsByClass(chord.Chord)), 3)
+        self.assertEqual(len(s.flat.getElementsByClass(chord.Chord)), 4)
 
         self.assertEqual(len(s.flat.getElementsByClass(meter.TimeSignature)), 0)
         self.assertEqual(len(s.flat.getElementsByClass(key.KeySignature)), 0)

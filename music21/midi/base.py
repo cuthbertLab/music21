@@ -1375,8 +1375,8 @@ class Test(unittest.TestCase):
         # dealing with midi files that use running status compression
         s = converter.parse(fp)
         self.assertEqual(len(s.parts), 2)
-        self.assertEqual(len(s.parts[0].notes), 711)
-        self.assertEqual(len(s.parts[1].notes), 855)
+        self.assertEqual(len(s.parts[0].notes), 712)
+        self.assertEqual(len(s.parts[1].notes), 856)
 
         #for n in s.parts[0].notes:
         #    print n, n.quarterLength
