@@ -409,9 +409,7 @@ class GeneralNote(music21.Music21Object):
     def insertLyric(self, text, index = 0, applyRaw = False):
         '''Inserts a lyric into the Note, Chord, or Rest's lyric list in front of 
         the index specified (0 by default), using index + 1 as the inserted lyric's
-        line number. shifts line numbers of all following lyrics in list
-        
-        If `lyricNumber` is not None, a specific line of lyric text can be set. 
+        line number. shifts line numbers of all following lyrics in list 
 
         >>> from music21 import *
         >>> n1 = note.Note()
