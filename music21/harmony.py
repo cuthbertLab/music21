@@ -191,7 +191,7 @@ def realizeChordSymbolDurations(piece):
             else:
                 lastchord.duration.quarterLength = cs.getOffsetBySite(pf) - lastchord.getOffsetBySite(pf)
                 if onlyChords.index(cs) == (len(onlyChords) - 1):
-                    cs.duration.quarterLength = pf.highestOffset - cs.getOffsetBySite(pf)
+                    cs.duration.quarterLength = pf.highestTime - cs.getOffsetBySite(pf)
                 lastchord = cs
         return pf
     elif len(onlyChords) == 1:
@@ -1091,6 +1091,7 @@ class ChordSymbol(Harmony):
 
         return self._chord.pitches
         
+        
     def inversionIsValid(self, inversion):
         '''
         returns true if the provided inversion is exists for the given pitches of the chord. If not, it returns
@@ -1424,7 +1425,7 @@ class TestExternal(unittest.TestCase):
     def testChordRealization(self):
         from music21 import harmony, corpus
         #There is a test file under demos called ComprehensiveChordSymbolsTestFile.xml
-        #that should contain a copmlete iteration of tests of chord symbol objects
+        #that should contain a complete iteration of tests of chord symbol objects
         #this test makes sure that no error exists, and checks that 57 chords were
         #created out of that file....feel free to add to file if you find missing
         #tests, and adjust 57 accordingly
@@ -1440,47 +1441,8 @@ class TestExternal(unittest.TestCase):
         csChords = s.flat.getElementsByClass(chord.Chord)
         self.assertEqual(len(csChords), 57)
 
-    def realizeCSwithFB(self):
-        '''just an exploration of using figured bass methods to realize chord symbols
-        ...in the process of development...'''
-        #from music21 import *
-        from music21 import harmony, corpus
-        from music21.figuredBass import realizer
-
-        s = music21.stream.Score()
-
-        testFile = corpus.parse('leadSheet/fosterBrownHair.xml')
-        #testFile = music21.converter.parse('C:/wikifonia/wikifonia-4643.mxl')
-        
-        voicePart = testFile.parts[0]
-
-        testFile = harmony.realizeChordSymbolDurations(testFile)
-        fillerCS = harmony.ChordSymbol(root='C', kind = 'major', duration = 4.0)
-        chordSymbols = []
-        chordSymbols.append(fillerCS)
-        cslist = testFile.flat.getElementsByClass(ChordSymbol)
-        for x in cslist:
-            chordSymbols.append(x)
-        
-        fbLine = realizer.FiguredBassLine()
-       
-        for cS in chordSymbols:
-            fb = cS._notationString().replace('1,', '')
-          
-            print fb
-            n = music21.note.Note(cS.root.name, quarterLength = cS.duration.quarterLength)
-            n.octave = 3
-            fbLine.addElement(n)
-        
-        allSols = fbLine.realize()
-        gen = allSols.generateRandomRealizations(1)
-      
-        pianoTreble = gen.parts[0]
-        pianoBass = gen.parts[1]
-        s.insert(0, voicePart)
-        s.insert(0, pianoTreble)
-        s.insert(0, pianoBass)
-        s.show()
+    #def realizeCSwithFB(self):
+    #see demos.bhadley.HarmonyRealizer
         
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -1501,8 +1463,6 @@ if __name__ == "__main__":
     #test = music21.harmony.TestExternal()
     #test.testChordRealization()
     
-    #test = music21.harmony.TestExternal()
-    #test.realizeCSwithFB()
 #------------------------------------------------------------------------------
 # eof
 
