@@ -1305,7 +1305,9 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
             # go through all following notes; if there is only 1 note, this will 
             # not execute;
             # looking for other events that start within a certain small time 
-            # window to make into a chod
+            # window to make into a chord
+            # if we find a note with a different end time but same start
+            # time, through into a different voice
             for j in range(i+1, len(notes)):
                 # look at each on time event
                 onSub, offSub = notes[j]
@@ -1313,6 +1315,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                 # can set a tolerance for chordSubing; here at 1/16th
                 # of a quarter
                 if tSub - t <= ticksPerQuarter / 16:
+
                     if chordSub is None: # start a new one
                         chordSub = [notes[i]]
                     chordSub.append(notes[j])
@@ -1330,7 +1333,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                 c._setMidiEvents(chordSub, ticksPerQuarter)
                 o = notes[i][0][0] / float(ticksPerQuarter)
                 s._insertCore(o, c)
-                iSkip = len(chordSub)
+                iSkip = len(chordSub) # amount of accumulated chords
                 chordSub = None
             else: # just append the note, chordSub is None
                 #composite.append(notes[i])
