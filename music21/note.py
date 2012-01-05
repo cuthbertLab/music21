@@ -406,7 +406,33 @@ class GeneralNote(music21.Music21Object):
             if foundLyric is False:
                 self.lyrics.append(Lyric(text, lyricNumber, applyRaw = applyRaw))
 
+    def insertLyric(self, text, index = 0, applyRaw = False):
+        '''Inserts a lyric into the Note, Chord, or Rest's lyric list in front of 
+        the index specified (0 by default), using index + 1 as the inserted lyric's
+        line number. shifts line numbers of all following lyrics in list
+        
+        If `lyricNumber` is not None, a specific line of lyric text can be set. 
 
+        >>> from music21 import *
+        >>> n1 = note.Note()
+        >>> n1.addLyric("second")
+        >>> n1.lyrics
+        [<music21.note.Lyric number=1 syllabic=single text="second">]
+        >>> n1.insertLyric("first", 0)
+        >>> n1.lyrics
+        [<music21.note.Lyric number=1 syllabic=single text="first">, <music21.note.Lyric number=2 syllabic=single text="second">]
+        
+        OMIT_FROM_DOCS
+        >>> n1.insertLyric("newSecond", 1)
+        >>> n1.lyrics
+        [<music21.note.Lyric number=1 syllabic=single text="first">, <music21.note.Lyric number=2 syllabic=single text="newSecond">, <music21.note.Lyric number=3 syllabic=single text="second">]
+        '''
+        if not common.isStr(text):
+            text = str(text)
+        for lyric in self.lyrics[index:]:
+            lyric.number += 1
+        self.lyrics.insert(index, Lyric(text, (index+ 1), applyRaw ))
+        
     def hasLyrics(self):
         '''Return True if this object has any lyrics defined
         '''
