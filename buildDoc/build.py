@@ -91,6 +91,7 @@ from music21.musicxml import base as musicxml
 from music21.musicxml import translate as musicxmlTranslate
 from music21.romanText import base as romanText
 from music21.romanText import translate as romanTextTranslate
+from music21.romanText import clercqTemperley
 
 from music21 import note
 
@@ -216,6 +217,7 @@ MODULES = [
     roman, 
     romanText,
     romanTextTranslate,
+    clercqTemperley,
     repeat,
 
     scala,
