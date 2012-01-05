@@ -875,7 +875,7 @@ class MidiTrack(object):
                 trackStrCandidate = e.read(timeCandidate, trackStrCandidate) 
             except MidiException:
                 # assume that trackStr, after delta extraction, is still correct
-                environLocal.printDebug(['forced to skip event; delta_t:', delta_t])
+                #environLocal.printDebug(['forced to skip event; delta_t:', delta_t])
                 # set to result after taking delta time
                 trackStr = trackStrCandidate
                 continue
@@ -1375,8 +1375,8 @@ class Test(unittest.TestCase):
         # dealing with midi files that use running status compression
         s = converter.parse(fp)
         self.assertEqual(len(s.parts), 2)
-        self.assertEqual(len(s.parts[0].notes), 712)
-        self.assertEqual(len(s.parts[1].notes), 856)
+        self.assertEqual(len(s.parts[0].notes), 746)
+        self.assertEqual(len(s.parts[1].notes), 857)
 
         #for n in s.parts[0].notes:
         #    print n, n.quarterLength

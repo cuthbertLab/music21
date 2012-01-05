@@ -1294,12 +1294,17 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     #composite = []
     chordSub = None
     i = 0
+    iGathered = [] # store a lost of indexes of gathered values put into chords
     if len(notes) > 1:
         #environLocal.pd(['\nmidiTrackToStream(): notes', notes])
         while i < len(notes):
+            if i in iGathered:
+                i += 1
+                continue
             # look at each note; get on time and event
             on, off = notes[i]
             t, e = on
+            tOff, eOff = off
             #environLocal.printDebug(['on, off', on, off, 'i', i, 'len(notes)', len(notes)])
 
             # go through all following notes; if there is only 1 note, this will 
@@ -1312,13 +1317,22 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                 # look at each on time event
                 onSub, offSub = notes[j]
                 tSub, eSub = onSub
+                tOffSub, eOffSub = offSub
+ 
                 # can set a tolerance for chordSubing; here at 1/16th
                 # of a quarter
-                if tSub - t <= ticksPerQuarter / 16:
-
+                chunkTolerance = ticksPerQuarter / 16
+                if abs(tSub - t) <= chunkTolerance:
+                    # isolate case where end time is not w/n tolerance
+                    if abs(tOffSub - tOff) > chunkTolerance:
+                        # need to store this as requiring movement to a diff
+                        # voice
+                        continue
                     if chordSub is None: # start a new one
                         chordSub = [notes[i]]
+                        iGathered.append(i)
                     chordSub.append(notes[j])
+                    iGathered.append(j)
                     continue # keep looping through events to see 
                     # if we can add more elements to this chord group
                 else: # no more matches; assuming chordSub tones are contiguous
@@ -1333,7 +1347,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                 c._setMidiEvents(chordSub, ticksPerQuarter)
                 o = notes[i][0][0] / float(ticksPerQuarter)
                 s._insertCore(o, c)
-                iSkip = len(chordSub) # amount of accumulated chords
+                #iSkip = len(chordSub) # amount of accumulated chords
                 chordSub = None
             else: # just append the note, chordSub is None
                 #composite.append(notes[i])
@@ -1344,9 +1358,9 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                 # need to round, as floating point error is likely
                 o = notes[i][0][0] / float(ticksPerQuarter)
                 s._insertCore(o, n)
-                iSkip = 1
+                #iSkip = 1
             #break # exit secondary loop
-            i += iSkip
+            i += 1
     elif len(notes) == 1: # rare case of just one note
         n = note.Note()
         n._setMidiEvents(notes[0], ticksPerQuarter)
@@ -2311,6 +2325,24 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[3].flat.notes), 3)
 
         #s.show('t')
+        #s.show('midi')
+
+
+    def testImportChordVoiceA(self):
+        # looking at cases where notes appear to be chord but 
+        # are better seen as voices
+
+        import os
+        from music21 import converter
+        # specialized problem of not importing last notes
+        dir = common.getPackageDir(relative=False, remapSep=os.sep)
+        for fp in dir:
+            if fp.endswith('midi'):
+                break
+        fp = os.path.join(fp, 'testPrimitive', 'test13.mid')
+        s = converter.parse(fp)
+        #s.show('t')
+        self.assertEqual(len(s.flat.notes), 7)
         #s.show('midi')
 
 if __name__ == "__main__":
