@@ -11,7 +11,7 @@
 
 from music21.romanText.base import *
 from music21.romanText import base
-
+from music21.romanText import clercqTemperley
 __doc__ = base.__doc__
 
 
