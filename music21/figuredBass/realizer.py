@@ -47,6 +47,7 @@ import music21
 import random
 import unittest
 
+
 from music21 import chord
 from music21 import clef
 from music21 import environment
@@ -59,6 +60,7 @@ from music21.figuredBass import notation
 from music21.figuredBass import realizerScale
 from music21.figuredBass import rules
 from music21.figuredBass import segment
+from music21 import harmony, roman
 
 _MOD = 'realizer.py'
 
@@ -194,7 +196,7 @@ class FiguredBassLine(object):
         self._fbScale = realizerScale.FiguredBassScale(inKey.pitchFromDegree(1), inKey.mode)
         self._fbList = []
     
-    def addElement(self, bassNote, notationString = None):
+    def addElement(self, bassObject, notationString = None):
         '''
         Use this method to add (bassNote, notationString) pairs to the bass line. Elements
         are realized in the order they are added.
@@ -212,10 +214,26 @@ class FiguredBassLine(object):
         
         .. image:: images/figuredBass/fbRealizer_bassLine.*
             :width: 200
+            
+        OMIT_FROM_DOCS    
+        >>> fbLine = realizer.FiguredBassLine(key.Key('C'), meter.TimeSignature('4/4'))
+        >>> fbLine.addElement(harmony.ChordSymbol('C'))
+        >>> fbLine.addElement(harmony.ChordSymbol('G'))
+        
+        >>> fbLine = realizer.FiguredBassLine(key.Key('C'), meter.TimeSignature('4/4'))
+        >>> fbLine.addElement(roman.RomanNumeral('I'))
+        >>> fbLine.addElement(roman.RomanNumeral('V'))
         '''
-        self._fbList.append((bassNote, notationString))
-        addLyricsToBassNote(bassNote, notationString)
-    
+        if isinstance(bassObject, note.Note):
+            self._fbList.append((bassObject, notationString)) #a bass note, and a notationString
+            addLyricsToBassNote(bassObject, notationString) 
+        #!---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects --------!     
+        elif isinstance(bassObject, harmony.ChordSymbol):
+            self._fbList.append(bassObject) #a harmony object
+        elif isinstance(bassObject, roman.RomanNumeral):
+            self._fbList.append(bassObject) #a roman Numeral object
+        else:
+            raise FiguredBassLineException("Not a valid bassObject (only note.Note, harmony.ChordSymbol, and roman.RomanNumeral supported)")
     def generateBassLine(self):
         '''
         Generates the bass line as a :class:`~music21.stream.Score`.
@@ -275,11 +293,74 @@ class FiguredBassLine(object):
         >>> r2 = fbLine.realize(fbRules)
         >>> r2.getNumSolutions()
         7908
+        
+        OMIT_FROM_DOCS
+        >>> fbLine2 = realizer.FiguredBassLine(key.Key('C'), meter.TimeSignature('2/4'))
+        >>> fbLine2.addElement(harmony.ChordSymbol('C'))
+        >>> fbLine2.addElement(harmony.ChordSymbol('F'))
+        >>> r2 = fbLine2.realize()
+        >>> r2.getNumSolutions()
+        13
+        >>> fbLine3 = realizer.FiguredBassLine(key.Key('C'), meter.TimeSignature('2/4'))
+        >>> fbLine3.addElement(roman.RomanNumeral('I'))
+        >>> fbLine3.addElement(roman.RomanNumeral('IV'))
+        >>> r2 = fbLine3.realize()
+        >>> r2.getNumSolutions()
+        13
         '''
+        
+        #!---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects --------!
         segmentList = []
-        for (bassNote, notationString) in self._fbList:
-            correspondingSegment = segment.Segment(bassNote, notationString, self._fbScale, fbRules, numParts, maxPitch)
-            segmentList.append(correspondingSegment)
+        listOfChordSymbols = False
+        listOfRomanNumerals = False
+        for item in self._fbList:
+            if isinstance(item, note.Note):
+                break
+            if isinstance(item, harmony.ChordSymbol):
+                listOfChordSymbols = True
+                break
+            if isinstance(item, roman.RomanNumeral):
+                listOfRomanNumerals = True
+                break
+            
+        if listOfChordSymbols:
+            for chordSymbolObject in self._fbList:
+                #print chordSymbolObject.bass.name
+                listofpitchesjustnames = []
+                for pitch in chordSymbolObject.chord.pitches:
+                    listofpitchesjustnames.append(pitch.name)
+                #remove duplicates just in case...
+                d = {}
+                for x in listofpitchesjustnames: 
+                    d[x]=x
+                outputList = d.values()    
+                passedNote = note.Note(chordSymbolObject.bass.nameWithOctave, quarterLength = chordSymbolObject.duration.quarterLength)
+                
+                correspondingSegment = segment.Segment(bassNote=passedNote, \
+                fbScale=self._fbScale, fbRules=fbRules, numParts=numParts, maxPitch=maxPitch, listOfPitches=outputList) 
+                segmentList.append(correspondingSegment)
+        elif listOfRomanNumerals:
+            for romanNumeralObject in self._fbList:
+                listofpitchesjustnames = []
+                for pitch in romanNumeralObject.pitches:
+                    listofpitchesjustnames.append(pitch.name)
+                #remove duplicates just in case...
+                d = {}
+                for x in listofpitchesjustnames: 
+                    d[x]=x
+                outputList = d.values()    
+        
+                passedNote = note.Note(romanNumeralObject.bass().nameWithOctave, quarterLength = romanNumeralObject.duration.quarterLength)
+                
+                correspondingSegment = segment.Segment(bassNote=passedNote, \
+                fbScale=self._fbScale, fbRules=fbRules, numParts=numParts, maxPitch=maxPitch, listOfPitches=outputList) 
+                segmentList.append(correspondingSegment)                
+        #!---------- Original code - Accommodates a tuple (figured bass)  --------!
+        else:
+            for (bassNote, notationString) in self._fbList:
+                correspondingSegment = segment.Segment(bassNote, notationString, self._fbScale, fbRules, numParts, maxPitch)
+                segmentList.append(correspondingSegment)
+        
 
         if len(segmentList) >= 2:
             for segmentIndex in range(len(segmentList) - 1):
