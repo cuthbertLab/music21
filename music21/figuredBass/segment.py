@@ -45,8 +45,8 @@ class Segment(object):
                  'fbRules': 'A deepcopy of the :class:`~music21.figuredBass.rules.Rules` object provided.',
                  }
 
-    def __init__(self, bassNote = note.Note('C3'), notationString = None, fbScale = realizerScale.FiguredBassScale(), fbRules = rules.Rules(), numParts = 4, maxPitch = pitch.Pitch('B5')):
-        '''
+    def __init__(self, bassNote = note.Note('C3'), notationString = None, fbScale = realizerScale.FiguredBassScale(), fbRules = rules.Rules(), numParts = 4, maxPitch = pitch.Pitch('B5'), listOfPitches = None):
+        ''' 
         A Segment corresponds to a 1:1 realization of a bassNote and notationString of a :class:`~music21.figuredBass.realizer.FiguredBassLine`.
         It is created by passing six arguments: a :class:`~music21.figuredBass.realizerScale.FiguredBassScale`, a bassNote, a notationString,
         a :class:`~music21.figuredBass.rules.Rules` object, a number of parts and a maximum pitch. Realizations of a Segment are represented 
@@ -77,7 +77,12 @@ class Segment(object):
         self.fbRules = copy.deepcopy(fbRules)
         self.numParts = numParts
         self._maxPitch = maxPitch
-        self.pitchNamesInChord = fbScale.getPitchNames(self.bassNote.pitch, notationString)
+        if notationString == None and listOfPitches != None: #must be a chord symbol or roman numeral....
+            self.pitchNamesInChord = listOfPitches
+        #!---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects --------!
+        else:
+            self.pitchNamesInChord = fbScale.getPitchNames(self.bassNote.pitch, notationString)
+        
         self.allPitchesAboveBass = getPitches(self.pitchNamesInChord, self.bassNote.pitch, self._maxPitch)
         self.segmentChord = chord.Chord(self.allPitchesAboveBass, quarterLength = bassNote.quarterLength)
         self._environRules = environment.Environment(_MOD)
