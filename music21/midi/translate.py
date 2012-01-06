@@ -1295,6 +1295,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     chordSub = None
     i = 0
     iGathered = [] # store a lost of indexes of gathered values put into chords
+    voicesRequired = False
     if len(notes) > 1:
         #environLocal.pd(['\nmidiTrackToStream(): notes', notes])
         while i < len(notes):
@@ -1327,6 +1328,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                     if abs(tOffSub - tOff) > chunkTolerance:
                         # need to store this as requiring movement to a diff
                         # voice
+                        voicesRequired = True
                         continue
                     if chordSub is None: # start a new one
                         chordSub = [notes[i]]
@@ -1370,13 +1372,17 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
         s._insertCore(o, n)
                     
     s._elementsChanged()
-
     # quantize to nearest 16th
     if quantizePost:    
         s.quantize([8, 3], processOffsets=True, processDurations=True)
 
-    # always need to fill gaps, as rests are not found in any other way
-    s.makeRests(inPlace=True, fillGaps=True)
+    if voicesRequired:
+        pass
+        # this procedure will make the appropriate rests
+        s.makeVoices(inPlace=True, fillGaps=True)
+    else:
+        # always need to fill gaps, as rests are not found in any other way
+        s.makeRests(inPlace=True, fillGaps=True)
     return s
 
     
@@ -1549,14 +1555,13 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
         s = stream.Score()
     else:
         s = inputM21
-
     # store common elements such as time sig, key sig from conductor
     conductorTrack = stream.Stream()
+    #environLocal.printDebug(['midi track count', len(midiTracks)])
     for mt in midiTracks:
         # not all tracks have notes defined; only creates parts for those
         # that do
         #environLocal.printDebug(['raw midi trakcs', mt])
-
         if mt.hasNotes(): 
             streamPart = stream.Part() # create a part instance for each part
             midiTrackToStream(mt, ticksPerQuarter, quantizePost, 
@@ -2339,11 +2344,19 @@ class Test(unittest.TestCase):
         for fp in dir:
             if fp.endswith('midi'):
                 break
-        fp = os.path.join(fp, 'testPrimitive', 'test13.mid')
+        fpMidi = fp
+        fp = os.path.join(fpMidi, 'testPrimitive', 'test13.mid')
         s = converter.parse(fp)
         #s.show('t')
         self.assertEqual(len(s.flat.notes), 7)
         #s.show('midi')
+
+        fp = os.path.join(fpMidi, 'testPrimitive', 'test14.mid')
+        s = converter.parse(fp)
+        # three chords will be created, as well as two voices
+        self.assertEqual(len(s.flat.getElementsByClass('Chord')), 3)
+        self.assertEqual(len(s.parts[0].voices), 2)
+
 
 if __name__ == "__main__":
     music21.mainTest(Test)

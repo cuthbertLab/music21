@@ -8958,7 +8958,6 @@ class Stream(music21.Music21Object):
         >>> len(d[0])
         7
 
-
         '''
         checkSimultaneity = False
         checkOverlap = True
@@ -9258,6 +9257,65 @@ class Stream(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     # voice processing routines
+    def makeVoices(self, inPlace=True, fillGaps=True):
+        '''If this Stream has overlapping Notes or Chords, this method will isolate all overlaps in unique Voices, and place those Voices in the Stream.
+
+        '''
+        # TODO: this method needs more testing, and may not always 
+        # produce the optimal voice assignment based on context (register
+        # chord formation, etc
+        if not inPlace: # make a copy
+            returnObj = deepcopy(self)
+        else:
+            returnObj = self
+
+        # must be sorted
+        if not returnObj.isSorted:
+            returnObj.sort() 
+        
+        olDict = returnObj.notes.getOverlaps(
+                 includeDurationless=False, includeEndBoundary=False)
+        #environLocal.pd(['makeVoices(): olDict', olDict])
+        # find the max necessary voices by finding the max number 
+        # of elements in each group; these may not all be necessary
+        maxVoiceCount = 1
+        for group in olDict.values():
+            if len(group) > maxVoiceCount:
+                maxVoiceCount = len(group)
+        if maxVoiceCount == 1: # nothing to do here
+            return returnObj
+
+        # store all voices in a list
+        voices = []
+        for i in range(0, maxVoiceCount):
+            voices.append(Voice()) # add voice classes
+
+        # iterate through all elements; if not in an overlap, place in 
+        # voice 1, otherwise, distribute
+        for e in returnObj.notes:
+            o = e.getOffsetBySite(returnObj)
+            if o not in olDict.keys(): # place in a first voices
+                voices[0].insert(o, e)
+            # find a voice to place in
+            # as elements are sorted, can use the highest time
+            else: 
+                for v in voices:
+                    if v.highestTime <= o:  
+                        v.insert(o, e)
+                        break
+            # remove from source
+            returnObj.remove(e)
+        # remove any unused voices (possible if overlap group has sus)
+        for v in voices:
+            if len(v) > 0:
+                if fillGaps:
+                    returnObj.makeRests(fillGaps=True, inPlace=True)
+                returnObj.insert(0, v)
+        # remove rests in returnObj
+        returnObj.removeByClass('Rest')
+        # elements changed will already have been called
+        return returnObj
+
 
     def internalize(self, container=None, 
                     classFilterList=['GeneralNote']):
