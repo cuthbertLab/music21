@@ -84,23 +84,24 @@ class CTSongException(Exception):
     pass
 
 class CTSong(object):
-    '''
+    """
     This parser is an object-oriented approach to parsing clercqTemperley text files into music.
     
     Create a CTSong object one of two ways:
-    1) by passing in the string, with newline characters (\n) at the end of each line
+    1) by passing in the string, with newline characters (\\n) at the end of each line
     2) by passing in the text file as a string, and have python open the file and read the text
-    ::
-        exampleClercqTemperley = 
-        % Brown-Eyed Girl
-        VP: I | IV | I | V |
-        In: $VP*2
-        Vr: $VP*4 IV | V | I | vi | IV | V | I | V |       % Second part of verse could be called chorus
-        Ch: V | | $VP*2 I |*4 
-        Ch2: V | | $VP*3     % Fadeout
-        S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2
+    #_DOCS_HIDE Please note: the backslashes included in the file below are for sphinx documentation
+    #_DOCS_HIDE purposes only. They are not permitted in the clercq-temperley file format   
 
-    
+        | exampleClercqTemperley = '''
+        | % Brown-Eyed Girl
+        | VP: I \| IV \| I \| V \|
+        | In: $VP\*2
+        | Vr: $VP\*4 IV \| V \| I \| vi \| IV \| V \| I \| V \|       % Second part of verse could be called chorus
+        | Ch: V \| \| $VP\*2 I \|\*4 
+        | Ch2: V \| \| $VP\*3     % Fadeout
+        | S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2'''
+        
     >>> from music21 import *
     >>> s = romanText.clercqTemperley.CTSong(exampleClercqTemperley)
     >>> #_DOCS_SHOW s = romanText.clercqTemperley.CTSong('C:/Brown-Eyed_Girl.txt')
@@ -173,17 +174,18 @@ class CTSong(object):
     into popular music beyond our current understanding.
     
     Examples used throughout this class utilize the following Clercq-Temperley text file
-    ::
-        BlitzkriegBopCT = 
-        % Blitzkrieg Bop
-        BP: I | IV V | %THIS IS A COMMENT
-        In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4
-        Vr: $BP*3 I IV | I |
-        Br: IV | | I | IV I | IV | | ii | IV V |
-        Co: R |*4 I |*4
-        S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co
     
-        
+    #_DOCS_HIDE Please note: the backslashes included in the file below are for sphinx documentation
+    #_DOCS_HIDE purposes only. They are not permitted in the clercq-temperley file format   
+        | BlitzkriegBopCT = '''
+        | % Blitzkrieg Bop
+        | BP: I \| IV V \| %THIS IS A COMMENT
+        | In: $BP\*3 I IV \| I \| $BP\*3 I IV \| I \| R \|\*4 I \|\*4
+        | Vr: $BP\*3 I IV \| I \|
+        | Br: IV \| \| I \| IV I \| IV \| \| ii \| IV V \|
+        | Co: R \|\*4 I \|\*4
+        | S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co'''
+    
     OMIT_FROM_DOCS
     
     Another example using a different clercq temperley file
@@ -238,7 +240,7 @@ class CTSong(object):
     >>> ex3 = romanText.clercqTemperley.CTSong(RingFireCT)
     >>> ex3.toScore().highestOffset
     265.0
-    '''
+    """
     _DOC_ORDER = ['text', 'toScore', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'appendComment', 'rules']
     _DOC_ATTR = {'year': 'the year of the CTSong; not formally defined by the Clercq-Temperley format'}
                  
@@ -344,15 +346,17 @@ class CTSong(object):
             return self._comments
     
     def appendComment(self, value):
-        '''
+        """
         append a comment to self.text at the end of the text file. Only strings or lists of strings are
         acceptible to append to the text file. this list of comments (self.comments) is also appended
-        ::
-            textString =
-            %Simple Gifts
-            % A wonderful shaker melody
-            Vr: I | I | %incomplete verse
-            S: [A] $Vr % Not quite finished!
+        #_DOCS_HIDE Please note: the backslashes included in the file below are for sphinx documentation
+        #_DOCS_HIDE purposes only. They are not permitted in the clercq-temperley file format   
+            
+            | textString = '''
+            | %Simple Gifts
+            | % A wonderful shaker melody
+            | Vr: I \| I \| %incomplete verse
+            | S: [A] $Vr % Not quite finished!'''
 
         >>> from music21 import *
         >>> s = romanText.clercqTemperley.CTSong(textString)
@@ -361,7 +365,7 @@ class CTSong(object):
         >>> s.appendComment('please append this comment to list')
         >>> s.comments
         [['A wonderful shaker melody'], ['Vr:', 'incomplete verse'], ['S:', 'Not quite finished!'], 'please append this comment to list']
-        '''
+        """
         try:
             self._comments.append(value)
             if isinstance(value, str) and value != '':
@@ -372,7 +376,7 @@ class CTSong(object):
         except:
             raise CTSongException('not a valid comment to append (must be a string or list): %s' % value)
         
-    comments = property(_getComments, _setComments, doc= '''
+    comments = property(_getComments, _setComments, doc= """
         Get or set the comments list of a CTRule object. setting comments does not alter self.text
     
         comments are stored as a list of comments, each comment on a line as a list. If the
@@ -380,13 +384,14 @@ class CTSong(object):
         if the comment is on a line of its own, only the comment is appended as a list of length one.
         
         The title is not a comment. The title is stored under self.title
-        ::
-            textString =
-            %Simple Gifts
-            % A wonderful shaker melody
-            Vr: I | I | %incomplete verse
-            S: [A] $Vr % Not quite finished!
+        #_DOCS_HIDE Please note: the backslashes included in the file below are for sphinx documentation
+        #_DOCS_HIDE purposes only. They are not permitted in the clercq-temperley file format   
 
+            | textString = '''
+            | %Simple Gifts
+            | % A wonderful shaker melody
+            | Vr: I \| I \| %incomplete verse
+            | S: [A] $Vr % Not quite finished!'''
         >>> from music21 import *
         >>> s = romanText.clercqTemperley.CTSong(textString)
         >>> s.comments
@@ -399,7 +404,7 @@ class CTSong(object):
         >>> s.comments
         ['a new list of comments', 'please append this comment to list']
 
-        ''')
+        """)
 
 
     def _setRules(self, value):
@@ -535,7 +540,8 @@ class CTSong(object):
             return False
 
     def _getDuration(self, containsIndex, entireSplitString, timeSig):
-        '''returns duration (in quarterLength) of any single character passed to it 
+        '''
+        returns duration (in quarterLength) of any single character passed to it 
         (whose index in entireSplitString is specified by containsIndex) 
         entireSplitString is the entire textfile split by spaces. timeSig is the time
         signature the character being analyzed is in
@@ -625,12 +631,12 @@ class CTSong(object):
 
     def _getStreamWithBarsandDots(self, indexofatom, expressionString, splitFile, atom, currentKey, timeSig):
         '''
-            a very ugly method, and all the methods it calls is also very ugly. A messy solution to 
-            dealing roman numerals with bars and dots after it, but this method is necessary to deal
-            with possible changes in key or time signature found embedded within the string.
-            
-            If there's a parsing error related to missing key signatures or time signatures, 
-            it's probably here or in the methods this method depends on.
+        a very ugly method, and all the methods it calls are also very ugly. A messy solution to 
+        dealing roman numerals with bars and dots after it, but this method is necessary to deal
+        with possible changes in key or time signature found embedded within the string.
+        
+        If there's a parsing error related to missing key signatures or time signatures, 
+        it's probably here or in the methods this method depends on.
         '''
         outputStream = music21.stream.Stream()
         index = -1
@@ -779,7 +785,8 @@ class CTSong(object):
         return scoreObj
             
     def toScore(self ,labelRomanNumerals=True, labelSubsectionsOnScore = True):
-        '''creates Score object out of a from CTSong...also creates CTRule objects in the process,
+        '''
+        creates Score object out of a from CTSong...also creates CTRule objects in the process,
         filling their .streamFromCTSong attribute with the corresponding smaller inner stream. 
         Individual attributes of a rule are defined by the entire CTSong, such as 
         meter and time signature, so creation of CTRule objects typically occurs
