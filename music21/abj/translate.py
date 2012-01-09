@@ -28,6 +28,8 @@ import music21.common
 
 import re
 
+abjadVersion = 2.0
+
 try:
     import abjad
 except ImportError:
@@ -40,8 +42,15 @@ if abjad is not None:
             raise ImportError('This version of abjad is not compatible with music21, please upgrade')
             abjad = None
     except:
-        raise ImportError('This version of abjad is not compatible with music21, please upgrade')
-        abjad = None
+#        try:
+            # abjad 2.5...
+            from abjad.tools import configurationtools
+            xstr = configurationtools.get_abjad_version_string()
+            abjadVersion = float(xstr)
+            # this version is good enough no matter what, so it's fine...
+#        except:
+#            raise ImportError('This version of abjad is not compatible with music21, please upgrade')
+#            abjad = None
 
 
 
@@ -131,8 +140,11 @@ def pitchToAbjad(m21Pitch):
     >>> music21.abj.pitchToAbjad(m21p)
     NamedChromaticPitch('dff,')
     '''    
-    music21name = m21Pitch.name
+    music21name = m21Pitch.name.lower()
     abjadPitchName = music21name.replace('-','f').replace('#','s')
+#    if abjadVersion >= 2.1:
+#        abjadPitch = abjad.pitchtools.NamedChromaticPitch((abjadPitchName, m21Pitch.octave),)
+#    else:
     abjadPitch = abjad.pitchtools.NamedChromaticPitch(abjadPitchName, m21Pitch.octave)
     return abjadPitch
 
