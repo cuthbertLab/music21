@@ -69,6 +69,9 @@ from music21.figuredBass import rules as fbRules
 from music21.figuredBass import segment as fbSegment
 
 from music21 import graph
+
+from music21 import harmony
+
 from music21.humdrum import spineParser as humdrumSpineParser
 
 from music21 import instrument
@@ -91,7 +94,7 @@ from music21.musicxml import base as musicxml
 from music21.musicxml import translate as musicxmlTranslate
 from music21.romanText import base as romanText
 from music21.romanText import translate as romanTextTranslate
-from music21.romanText import clercqTemperley
+from music21.romanText import clercqTemperley as romanTextClercqTemperley
 
 from music21 import note
 
@@ -158,20 +161,22 @@ MODULES = [
     analysisWindowed,
     
     articulations,
+
     base,
     beam,
     brailleTranslate,
+
     clef, 
     common, 
-
     #composition
     compositionPhasing,
-    
     converter,
     corpus, 
     chord, 
+
     duration, 
     dynamics,
+
     editorial,
     environment, 
     expressions,
@@ -191,34 +196,36 @@ MODULES = [
     fbSegment,
     
     graph,
+    
+    harmony,
     humdrumSpineParser,
+    
     instrument,
     interval, 
     intervalNetwork,
+    
     key,
 
     medren,
     meter, 
     metadata,
-
     midi,
     midiTranslate,
-
     musedata,
     musedataTranslate,
     musedataBase40,
-
     musicxmlTranslate,
 
     note, 
     noteworthyTranslate,
 
     pitch,
+
+    repeat,
     roman, 
     romanText,
     romanTextTranslate,
-    clercqTemperley,
-    repeat,
+    romanTextClercqTemperley,
 
     scala,
     scale,     
@@ -230,16 +237,15 @@ MODULES = [
   
     tempo,     
     tinyNotation,
-
+    # trecento
+    #    trecentoCadencebook
     trecentoPolyphonicSnippet,
 
     voiceLeading,
     volume,
-    xmlnode, 
 
+    xmlnode, 
     
-# trecento
-#    trecentoCadencebook
 ]
 
 

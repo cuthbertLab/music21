@@ -83,6 +83,7 @@ Module Reference
    moduleFiguredBassRules
    moduleFiguredBassSegment
    moduleGraph
+   moduleHarmony
    moduleHumdrumSpineParser
    moduleInstrument
    moduleInterval
@@ -100,10 +101,11 @@ Module Reference
    moduleNote
    moduleNoteworthyTranslate
    modulePitch
+   moduleRepeat
    moduleRoman
    moduleRomanTextBase
    moduleRomanTextTranslate
-   moduleRepeat
+   moduleRomanTextClercqTemperley
    moduleScalaBase
    moduleScale
    moduleSearch
