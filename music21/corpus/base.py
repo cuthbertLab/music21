@@ -460,15 +460,17 @@ def getPaths(extList=None, expandExtensions=True):
 
     If `expandExtensions` is True, a format for an extension, and related extensions, will replaced by all known input extensions. This is convenient when an input format might match for multiple extensions.
 
-    >>> a = getPaths()
+    >>> from music21 import *
+    
+    >>> a = corpus.getPaths()
     >>> len(a) > 30
     True
 
-    >>> a = getPaths('krn')
+    >>> a = corpus.getPaths('krn')
     >>> len(a) >= 4
     True
 
-    >>> a = getPaths('abc')
+    >>> a = corpus.getPaths('abc')
     >>> len(a) >= 10
     True
 
@@ -511,7 +513,8 @@ def getPaths(extList=None, expandExtensions=True):
 def getVirtualPaths(extList=None):
     '''Get all paths in the virtual corpus that match a known extension. An extension of None will return all known extensions.
    
-    >>> len(getVirtualPaths()) > 6
+    >>> from music21 import *
+    >>> len(corpus.getVirtualPaths()) > 6
     True
     '''
     if not common.isListLike(extList):
@@ -574,16 +577,17 @@ def search(query, field=None, domain=['core', 'virtual'], extList=None):
 def getComposer(composerName, extList=None):
     '''Return all components of the corpus that match a composer's or a collection's name. An `extList`, if provided, defines which extensions are returned. An `extList` of None returns all extensions. 
 
-    >>> a = getComposer('beethoven')
+    >>> from music21 import *
+    >>> a = corpus.getComposer('beethoven')
     >>> len(a) > 10
     True
-    >>> a = getComposer('mozart')
+    >>> a = corpus.getComposer('mozart')
     >>> len(a) > 10
     True
-    >>> a = getComposer('bach', 'krn')
+    >>> a = corpus.getComposer('bach', 'krn')
     >>> len(a) < 10
     True
-    >>> a = getComposer('bach', 'xml')
+    >>> a = corpus.getComposer('bach', 'xml')
     >>> len(a) > 10
     True
     '''
@@ -610,17 +614,18 @@ def getComposerDir(composerName):
     '''Given the name of a composer, get the path to the top-level directory
     of that composer 
 
+    >>> from music21 import *
     >>> import os
-    >>> a = getComposerDir('beethoven')
+    >>> a = corpus.getComposerDir('beethoven')
     >>> a.endswith(os.path.join('corpus', os.sep, 'beethoven'))
     True
-    >>> a = getComposerDir('bach')
+    >>> a = corpus.getComposerDir('bach')
     >>> a.endswith(os.path.join('corpus', os.sep, 'bach'))
     True
-    >>> a = getComposerDir('mozart')
+    >>> a = corpus.getComposerDir('mozart')
     >>> a.endswith(os.path.join('corpus', os.sep, 'mozart'))
     True
-    >>> a = getComposerDir('luca')
+    >>> a = corpus.getComposerDir('luca')
     >>> a.endswith(os.path.join('corpus', os.sep, 'luca'))
     True
     '''
@@ -657,22 +662,23 @@ def getComposerDir(composerName):
 def getWorkList(workName, movementNumber=None, extList=None):
     '''Search the corpus and return a list of works, always in a list. If no matches are found, an empty list is returned.
 
-    >>> len(getWorkList('beethoven/opus18no1'))
+    >>> from music21 import *
+    >>> len(corpus.getWorkList('beethoven/opus18no1'))
     8
-    >>> len(getWorkList('beethoven/opus18no1', 1))
+    >>> len(corpus.getWorkList('beethoven/opus18no1', 1))
     2 
-    >>> len(getWorkList('beethoven/opus18no1', 1, '.krn'))
+    >>> len(corpus.getWorkList('beethoven/opus18no1', 1, '.krn'))
     1
-    >>> len(getWorkList('beethoven/opus18no1', 1, '.xml'))
+    >>> len(corpus.getWorkList('beethoven/opus18no1', 1, '.xml'))
     1
-    >>> len(getWorkList('beethoven/opus18no1', 0, '.xml'))
+    >>> len(corpus.getWorkList('beethoven/opus18no1', 0, '.xml'))
     0
-    >>> len(getWorkList('handel/hwv56', '1-02', '.md'))
+    >>> len(corpus.getWorkList('handel/hwv56', '1-02', '.md'))
     1
-    >>> len(getWorkList('handel/hwv56', (2,1), '.md'))
+    >>> len(corpus.getWorkList('handel/hwv56', (2,1), '.md'))
     1
 
-    >>> len(getWorkList('bach/bwv1080', 2, '.md'))
+    >>> len(corpus.getWorkList('bach/bwv1080', 2, '.md'))
     1
 
     '''
@@ -764,10 +770,11 @@ def getWorkList(workName, movementNumber=None, extList=None):
 def getVirtualWorkList(workName, movementNumber=None, extList=None):
     '''Given a work name, search all virtual works and return a list of URLs for any matches.
 
-    >>> getVirtualWorkList('bach/bwv1007/prelude')
+    >>> from music21 import *
+    >>> corpus.getVirtualWorkList('bach/bwv1007/prelude')
     ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
 
-    >>> getVirtualWorkList('junk')
+    >>> corpus.getVirtualWorkList('junk')
     []
     '''
     if not common.isListLike(extList):
@@ -786,7 +793,8 @@ def getVirtualWorkList(workName, movementNumber=None, extList=None):
 def getWorkReferences(sort=True):
     '''Return a data dictionary for all works in the corpus and (optionally) the virtual corpus. Returns a list of reference dictionaries, each each dictionary for a each composer. A 'works' dictionary for each composer provides references to dictionaries for all associated works. 
 
-    >>> post = getWorkReferences()
+    >>> from music21 import *
+    >>> post = corpus.getWorkReferences()
     '''
     # from music21 import corpus; corpus.getWorkReferences()
     # TODO: update this to use metadata
@@ -907,12 +915,13 @@ def getWorkReferences(sort=True):
 def getWork(workName, movementNumber=None, extList=None):
     '''Search the corpus, then the virtual corpus, for a work, and return a file path or URL. This method will return either a list of file paths or, if there is a single match, a single file path. If no matches are found an Exception is raised. 
 
+    >>> from music21 import *
     >>> import os
-    >>> a = getWork('opus74no2', 4)
+    >>> a = corpus.getWork('opus74no2', 4)
     >>> a.endswith(os.path.sep.join(['haydn', 'opus74no2', 'movement4.xml']))
     True
 
-    >>> a = getWork(['haydn', 'opus74no2', 'movement4.xml'])
+    >>> a = corpus.getWork(['haydn', 'opus74no2', 'movement4.xml'])
     >>> a.endswith(os.path.sep.join(['haydn', 'opus74no2', 'movement4.xml']))
     True
 
@@ -935,15 +944,30 @@ def getWork(workName, movementNumber=None, extList=None):
 
 def parse(workName, movementNumber=None, number=None, 
     extList=None, forceSource=False):
-    '''Search the corpus, then the virtual corpus, for a work, and return a parsed :class:`music21.stream.Stream`.
+    '''
+    The most important method call for corpus.
+    
+    Similar to converer.parse(), the method searches the corpus (including the virtual corpus)
+    for a work fitting the workName description and returns a :class:`music21.stream.Stream`.
 
     If `movementNumber` is defined, and a movement is included in the corpus, that movement will be returned. 
 
-    If `number` is defined, and the work is a collection with multiple components, that work number will be returned. 
+    If `number` is defined, and the work is a collection with multiple components, that work number will be returned.
+    For instance, some of our ABC documents contain dozens of folk songs within a single file.
 
-    If `forceSource` is True, the original file will always be loaded and pickled files, if available, will be ignored.
+    Advanced: if `forceSource` is True, the original file will always be loaded freshly and pickled (e.g., pre-parsed) files
+    will be ignored.  This should not be needed if the file has been changed, since the filetime of the file and
+    the filetime of the pickled version are compared.  But it might be needed if the music21 parsing routine has changed.
+    
 
-    >>> aStream = parse('opus74no1/movement3')
+    Example, get a chorale by Bach.  Note that the source type does not need to be
+    specified, nor does the name Bach even (since it's the only piece with the title BWV 66.6)
+
+    >>> from music21 import *
+    >>> bachChorale = corpus.parse('bwv66.6')
+    >>> len(bachChorale.parts)
+    4
+    
     '''
     if not common.isListLike(extList):
         extList = [extList]
@@ -997,13 +1021,14 @@ def getBachChorales(extList='xml'):
     By default, only Bach Chorales in xml format are returned, because the quality of 
     the encoding and our parsing of those is superior.
 
-    >>> a = getBachChorales()
+    >>> from music21 import *
+    >>> a = corpus.getBachChorales()
     >>> len(a) > 400
     True
-    >>> a = getBachChorales('krn')
+    >>> a = corpus.getBachChorales('krn')
     >>> len(a) > 10
     False
-    >>> a = getBachChorales('xml')
+    >>> a = corpus.getBachChorales('xml')
     >>> len(a) > 400
     True
     '''
@@ -1476,7 +1501,7 @@ def getHandelMessiah(extList='md'):
     '''Return the file name of all of handel's messiah.
 
     >>> from music21 import *
-    >>> a = getHandelMessiah()
+    >>> a = corpus.getHandelMessiah()
     >>> len(a)
     43
     '''
@@ -1522,7 +1547,7 @@ def getMonteverdiMadrigals(extList='xml'):
     '''Return the file name of all Monteverdi madrigals.
 
     >>> from music21 import *
-    >>> a = getMonteverdiMadrigals()
+    >>> a = corpus.getMonteverdiMadrigals()
     >>> len(a) > 40
     True
     '''
@@ -1551,13 +1576,14 @@ monteverdiMadrigals = getMonteverdiMadrigals('xml')
 def getBeethovenStringQuartets(extList=None):
     '''Return all Beethoven String Quartets.
 
-    >>> a = getBeethovenStringQuartets()
+    >>> from music21 import *
+    >>> a = corpus.getBeethovenStringQuartets()
     >>> len(a) > 10
     True
-    >>> a = getBeethovenStringQuartets('krn')
+    >>> a = corpus.getBeethovenStringQuartets('krn')
     >>> len(a) < 10 and len(a) > 0
     True
-    >>> a = getBeethovenStringQuartets('xml')
+    >>> a = corpus.getBeethovenStringQuartets('xml')
     >>> len(a) > 400
     False
     '''

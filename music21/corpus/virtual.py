@@ -1,12 +1,12 @@
 ﻿# -*- coding: UTF-8 -*-
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
-# Name:         corpus/base.py
-# Purpose:      Access to the corpus collection
+# Name:         corpus/virtual.py
+# Purpose:      Access to the Virtual corpus collection
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2010 The music21 Project
+# Copyright:    (c) 2010, 2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
