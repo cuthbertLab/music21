@@ -110,22 +110,23 @@ def unitSpec(durationObjectOrObjects):
     
     This function does not deal with nested tuplets, etc.
 
-    >>> aDur = Duration()
+    >>> from music21 import *
+    >>> aDur = duration.Duration()
     >>> aDur.quarterLength = 3
-    >>> unitSpec(aDur)
+    >>> duration.unitSpec(aDur)
     (3.0, 'half', 1, None, None, None)
 
-    >>> bDur = Duration()
+    >>> bDur = duration.Duration()
     >>> bDur.quarterLength = 1.125
-    >>> unitSpec(bDur)
+    >>> duration.unitSpec(bDur)
     (1.125, 'complex', None, None, None, None)
 
-    >>> cDur = Duration()
+    >>> cDur = duration.Duration()
     >>> cDur.quarterLength = 0.3333333
-    >>> unitSpec(cDur)
+    >>> duration.unitSpec(cDur)
     (0.33333..., 'eighth', 0, 3, 2, 'eighth')
 
-    >>> unitSpec([aDur, bDur, cDur])
+    >>> duration.unitSpec([aDur, bDur, cDur])
     [(3.0, 'half', 1, None, None, None), (1.125, 'complex', None, None, None, None), (0.333333..., 'eighth', 0, 3, 2, 'eighth')]
     '''
     if common.isListLike(durationObjectOrObjects):
@@ -194,11 +195,12 @@ def quarterLengthToClosestType(qLen):
 
     2. Boolean, True or False, whether the conversion was exact.
 
-    >>> quarterLengthToClosestType(.5)
+    >>> from music21 import *
+    >>> duration.quarterLengthToClosestType(.5)
     ('eighth', True)
-    >>> quarterLengthToClosestType(.75)
+    >>> duration.quarterLengthToClosestType(.75)
     ('eighth', False)
-    >>> quarterLengthToClosestType(1.8)
+    >>> duration.quarterLengthToClosestType(1.8)
     ('quarter', False)
     '''
     if (4.0 / qLen) in typeFromNumDict:
@@ -217,11 +219,12 @@ def quarterLengthToClosestType(qLen):
 def musicXMLTypeToType(value):
     '''Convert a MusicXML type to an music21 type.
 
-    >>> musicXMLTypeToType('long')
+    >>> from music21 import *
+    >>> duration.musicXMLTypeToType('long')
     'longa'
-    >>> musicXMLTypeToType('quarter')
+    >>> duration.musicXMLTypeToType('quarter')
     'quarter'
-    >>> musicXMLTypeToType(None)
+    >>> duration.musicXMLTypeToType(None)
     Traceback (most recent call last):
     DurationException...
     '''
@@ -237,9 +240,10 @@ def musicXMLTypeToType(value):
 def typeToMusicXMLType(value):
     '''Convert a music21 type to a MusicXML type.
 
-    >>> typeToMusicXMLType('longa')
+    >>> from music21 import *
+    >>> duration.typeToMusicXMLType('longa')
     'long'
-    >>> typeToMusicXMLType('quarter')
+    >>> duration.typeToMusicXMLType('quarter')
     'quarter'
     '''
     # MusicXML uses long instead of longa
@@ -252,11 +256,12 @@ def typeToMusicXMLType(value):
 def convertQuarterLengthToType(qLen):
     '''Return a type if there exists a type that is exactly equal to the duration of the provided quarterLength. Similar to quarterLengthToClosestType() but this function only returns exact matches.
     
-    >>> convertQuarterLengthToType(2)
+    >>> from music21 import *
+    >>> duration.convertQuarterLengthToType(2)
     'half'
-    >>> convertQuarterLengthToType(0.125)
+    >>> duration.convertQuarterLengthToType(0.125)
     '32nd'   
-    >>> convertQuarterLengthToType(0.33333)
+    >>> duration.convertQuarterLengthToType(0.33333)
     Traceback (most recent call last):
     DurationException: cannot convert quarterLength 0.33333 exactly to type
     '''
@@ -273,22 +278,23 @@ def dottedMatch(qLen, maxDots=4):
     
     Returns a maximum of four dots by default.
 
-    >>> dottedMatch(3.0)
+    >>> from music21 import *
+    >>> duration.dottedMatch(3.0)
     (1, 'half')
-    >>> dottedMatch(1.75)
+    >>> duration.dottedMatch(1.75)
     (2, 'quarter')
 
     This value is not equal to any dotted note length
-    >>> dottedMatch(1.6)
+    >>> duration.dottedMatch(1.6)
     (False, False)
     
     maxDots can be lowered for certain searches
-    >>> dottedMatch(1.875)
+    >>> duration.dottedMatch(1.875)
     (3, 'quarter')
-    >>> dottedMatch(1.875, 2)
+    >>> duration.dottedMatch(1.875, 2)
     (False, False)
 
-    >>> dottedMatch(0.00001, 2)
+    >>> duration.dottedMatch(0.00001, 2)
     (False, False)
 
     '''
@@ -317,18 +323,19 @@ def quarterLengthToTuplet(qLen, maxToReturn=4):
     Note that 4:3 tuplets won't be found, but will be found as dotted notes
     by dottedMatch.
 
-    >>> quarterLengthToTuplet(.33333333)
+    >>> from music21 import *
+    >>> duration.quarterLengthToTuplet(.33333333)
     [<music21.duration.Tuplet 3/2/eighth>, <music21.duration.Tuplet 3/1/quarter>]
 
     By specifying only 1 `maxToReturn`, the a single-length list containing the Tuplet with the smallest type will be returned.    
 
-    >>> quarterLengthToTuplet(.3333333, 1)
+    >>> duration.quarterLengthToTuplet(.3333333, 1)
     [<music21.duration.Tuplet 3/2/eighth>]
 
-    >>> quarterLengthToTuplet(.20)
+    >>> duration.quarterLengthToTuplet(.20)
     [<music21.duration.Tuplet 5/4/16th>, <music21.duration.Tuplet 5/2/eighth>, <music21.duration.Tuplet 5/1/quarter>]
 
-    >>> c = quarterLengthToTuplet(.3333333, 1)[0]
+    >>> c = duration.quarterLengthToTuplet(.3333333, 1)[0]
     >>> c.tupletMultiplier()
     0.6666...
     '''
@@ -375,42 +382,43 @@ def quarterLengthToDurations(qLen, link=True):
     This is mainly a utility function. Much faster for many purposes 
     is something like::
     
-       d = Duration()
+       d = duration.Duration()
        d.quarterLength = 251.231312
     
     and then let Duration automatically create Duration Components as necessary.
 
     These examples use unitSpec() to get a concise summary of the contents
 
-    >>> unitSpec(quarterLengthToDurations(2))
+    >>> from music21 import *
+    >>> duration.unitSpec(duration.quarterLengthToDurations(2))
     [(2.0, 'half', 0, None, None, None)]
  
     Dots are supported
 
-    >>> unitSpec(quarterLengthToDurations(3))
+    >>> duration.unitSpec(duration.quarterLengthToDurations(3))
     [(3.0, 'half', 1, None, None, None)]
-    >>> unitSpec(quarterLengthToDurations(6.0))
+    >>> duration.unitSpec(duration.quarterLengthToDurations(6.0))
     [(6.0, 'whole', 1, None, None, None)]
 
     Double and triple dotted half note.
 
-    >>> unitSpec(quarterLengthToDurations(3.5))
+    >>> duration.unitSpec(duration.quarterLengthToDurations(3.5))
     [(3.5, 'half', 2, None, None, None)]
-    >>> unitSpec(quarterLengthToDurations(3.75))
+    >>> duration.unitSpec(duration.quarterLengthToDurations(3.75))
     [(3.75, 'half', 3, None, None, None)]
 
     A triplet quarter note, lasting .6666 qLen
     Or, a quarter that is 1/3 of a half.
     Or, a quarter that is 2/3 of a quarter.
 
-    >>> unitSpec(quarterLengthToDurations(2.0/3.0))
+    >>> duration.unitSpec(duration.quarterLengthToDurations(2.0/3.0))
     [(0.666..., 'quarter', 0, 3, 2, 'quarter')]
 
     A triplet eighth note, where 3 eights are in the place of 2. 
     Or, an eighth that is 1/3 of a quarter
     Or, an eighth that is 2/3 of eighth
 
-    >>> post = unitSpec(quarterLengthToDurations(.3333333))
+    >>> post = duration.unitSpec(duration.quarterLengthToDurations(.3333333))
     >>> common.almostEquals(post[0][0], .3333333)
     True
     >>> post[0][1:]
@@ -419,45 +427,45 @@ def quarterLengthToDurations(qLen, link=True):
     A half that is 1/3 of a whole, or a triplet half note.
     Or, a half that is 2/3 of a half
 
-    >>> unitSpec(quarterLengthToDurations(4.0/3.0))
+    >>> duration.unitSpec(duration.quarterLengthToDurations(4.0/3.0))
     [(1.33..., 'half', 0, 3, 2, 'half')]
 
     A sixteenth that is 1/5 of a quarter
     Or, a sixteenth that is 4/5ths of a 16th
 
-    >>> unitSpec(quarterLengthToDurations(1.0/5.0))
+    >>> duration.unitSpec(duration.quarterLengthToDurations(1.0/5.0))
     [(0.2..., '16th', 0, 5, 4, '16th')]
 
     A 16th that is  1/7th of a quarter
     Or, a 16th that is 4/7 of a 16th
 
-    >>> unitSpec(quarterLengthToDurations(1.0/7.0))
+    >>> duration.unitSpec(duration.quarterLengthToDurations(1.0/7.0))
     [(0.142857..., '16th', 0, 7, 4, '16th')]
 
     A 4/7ths of a whole note, or 
     A quarter that is 4/7th of of a quarter
 
-    >>> unitSpec(quarterLengthToDurations(4.0/7.0))
+    >>> duration.unitSpec(duration.quarterLengthToDurations(4.0/7.0))
     [(0.571428..., 'quarter', 0, 7, 4, 'quarter')]
 
     If a duration is not containable in a single unit, this method
     will break off the largest type that fits within this type
     and recurse, adding as my units as necessary.
 
-    >>> unitSpec(quarterLengthToDurations(2.5))
+    >>> duration.unitSpec(duration.quarterLengthToDurations(2.5))
     [(2.0, 'half', 0, None, None, None), (0.5, 'eighth', 0, None, None, None)]
 
-    >>> unitSpec(quarterLengthToDurations(2.3333333))
+    >>> duration.unitSpec(duration.quarterLengthToDurations(2.3333333))
     [(2.0, 'half', 0, None, None, None), (0.333..., 'eighth', 0, 3, 2, 'eighth')]
 
-    >>> unitSpec(quarterLengthToDurations(1.0/6.0))
+    >>> duration.unitSpec(duration.quarterLengthToDurations(1.0/6.0))
     [(0.1666..., '16th', 0, 3, 2, '16th')]
 
-    >>> quarterLengthToDurations(.18333333333333)
+    >>> duration.quarterLengthToDurations(.18333333333333)
     [<music21.duration.DurationUnit 0.125>, <music21.duration.DurationUnit 0.03125>, <music21.duration.DurationUnit 0.015625>, <music21.duration.DurationUnit 0.0078125>]
 
 
-    >>> quarterLengthToDurations(0.0)
+    >>> duration.quarterLengthToDurations(0.0)
     [<music21.duration.ZeroDuration>]
 
     '''
@@ -537,13 +545,15 @@ def partitionQuarterLength(qLen, qLenDiv=4):
     This is a useful tool for partitioning a duration by Measures (i.e., take a long Duration and
     make it fit within several measures) or by beat groups.
 
-    >>> # Here is a Little demonstration function that will show how we can use partitionQuarterLength: 
+    Here is a Little demonstration function that will show how we can use partitionQuarterLength: 
+    >>> from music21 import *
     >>> def pql(qLen, qLenDiv):
-    ...    partitionList = partitionQuarterLength(qLen, qLenDiv)
+    ...    partitionList = duration.partitionQuarterLength(qLen, qLenDiv)
     ...    for dur in partitionList: 
-    ...        print(unitSpec(dur))
+    ...        print(duration.unitSpec(dur))
     
-    >>> #Divide 2.5 quarters worth of time into eighth notes.
+    
+    Divide 2.5 quarters worth of time into eighth notes.
     >>> pql(2.5,.5)
     (0.5, 'eighth', 0, None, None, None)
     (0.5, 'eighth', 0, None, None, None)
@@ -551,27 +561,30 @@ def partitionQuarterLength(qLen, qLenDiv=4):
     (0.5, 'eighth', 0, None, None, None)
     (0.5, 'eighth', 0, None, None, None)
 
-    >>> #Dividing 5 qLen into 2.5 qLen bundles (i.e., 5/8 time)
+
+    Divide 5 qLen into 2.5 qLen bundles (i.e., 5/8 time)
     >>> pql(5, 2.5)
     (2.0, 'half', 0, None, None, None)
     (0.5, 'eighth', 0, None, None, None)
     (2.0, 'half', 0, None, None, None)
     (0.5, 'eighth', 0, None, None, None)
 
-    >>> #Dividing 5.25 qLen into dotted halves
+
+    Divide 5.25 qLen into dotted halves
     >>> pql(5.25,3)
     (3.0, 'half', 1, None, None, None)
     (2.0, 'half', 0, None, None, None)
     (0.25, '16th', 0, None, None, None)
 
-    >>> #Dividing 1.33333 qLen into triplet eighths:
+
+    Divide 1.33333 qLen into triplet eighths:
     >>> pql(4.0/3.0, 1.0/3.0)
     (0.333..., 'eighth', 0, 3, 2, 'eighth')
     (0.333..., 'eighth', 0, 3, 2, 'eighth')
     (0.333..., 'eighth', 0, 3, 2, 'eighth')
     (0.333..., 'eighth', 0, 3, 2, 'eighth')
     
-    >>> #Dividing 1.5 into triplet eighths
+    Divide 1.5 into triplet eighths
     >>> pql(1.5,.33333333333333)
     (0.333..., 'eighth', 0, 3, 2, 'eighth')
     (0.333..., 'eighth', 0, 3, 2, 'eighth')
@@ -579,7 +592,7 @@ def partitionQuarterLength(qLen, qLenDiv=4):
     (0.333..., 'eighth', 0, 3, 2, 'eighth')
     (0.1666..., '16th', 0, 3, 2, '16th')
 
-    >>> #There is no problem if the division unit is larger then the source duration, it
+    There is no problem if the division unit is larger then the source duration, it
     just will not be totally filled.
     >>> pql(1.5, 4)
     (1.5, 'quarter', 1, None, None, None)
@@ -605,22 +618,22 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=[], dotGroups=[]):
     Tuplet objects (`tuplets`), and a (very) optional list of 
     Medieval dot groups (`dotGroups`), return the equivalent quarter length.
 
-    
-    >>> convertTypeToQuarterLength('whole')
+    >>> from music21 import *
+    >>> duration.convertTypeToQuarterLength('whole')
     4.0
-    >>> convertTypeToQuarterLength('16th')
+    >>> duration.convertTypeToQuarterLength('16th')
     0.25
-    >>> convertTypeToQuarterLength('quarter', 2)
+    >>> duration.convertTypeToQuarterLength('quarter', 2)
     1.75
 
     
-    >>> tup = Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
-    >>> convertTypeToQuarterLength('quarter', 0, [tup])
+    >>> tup = duration.Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
+    >>> duration.convertTypeToQuarterLength('quarter', 0, [tup])
     0.8...
 
 
-    >>> tup = Tuplet(numberNotesActual = 3, numberNotesNormal = 4)
-    >>> convertTypeToQuarterLength('quarter', 0, [tup])
+    >>> tup = duration.Tuplet(numberNotesActual = 3, numberNotesNormal = 4)
+    >>> duration.convertTypeToQuarterLength('quarter', 0, [tup])
     1.333333...
 
 
@@ -629,7 +642,7 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=[], dotGroups=[]):
     Conceptually, these are dotted-(dotted-half) notes.  See 
     trecento.trecentoCadence for more information
     ).
-    >>> convertTypeToQuarterLength('half', dots = 1, dotGroups = [1,1])
+    >>> duration.convertTypeToQuarterLength('half', dots = 1, dotGroups = [1,1])
     4.5
     '''
     
@@ -658,13 +671,14 @@ def convertTypeToNumber(dType):
     '''Convert a duration type string (`dType`) to a numerical scalar representation that shows
     how many of that duration type fits within a whole note.
 
-    >>> convertTypeToNumber('quarter')
+    >>> from music21 import *
+    >>> duration.convertTypeToNumber('quarter')
     4
-    >>> convertTypeToNumber('half')
+    >>> duration.convertTypeToNumber('half')
     2
-    >>> convertTypeToNumber('1024th')
+    >>> duration.convertTypeToNumber('1024th')
     1024
-    >>> convertTypeToNumber('maxima')
+    >>> duration.convertTypeToNumber('maxima')
     0.125
     '''
     dTypeFound = None
@@ -685,17 +699,18 @@ def updateTupletType(durationList):
     examine each Duration, and each component, and set Tuplet type to 
     start or stop, as necessary.
 
-    >>> a = Duration(); a.quarterLength = .33333
-    >>> b = Duration(); b.quarterLength = .33333
-    >>> c = DurationUnit(); c.quarterLength = .33333
-    >>> d = Duration(); d.quarterLength = 2
-    >>> e = Duration(); e.quarterLength = .33333
-    >>> f = DurationUnit(); f.quarterLength = .33333
-    >>> g = Duration(); g.quarterLength = .33333
+    >>> from music21 import *
+    >>> a = duration.Duration(); a.quarterLength = .33333
+    >>> b = duration.Duration(); b.quarterLength = .33333
+    >>> c = duration.DurationUnit(); c.quarterLength = .33333
+    >>> d = duration.Duration(); d.quarterLength = 2
+    >>> e = duration.Duration(); e.quarterLength = .33333
+    >>> f = duration.DurationUnit(); f.quarterLength = .33333
+    >>> g = duration.Duration(); g.quarterLength = .33333
 
     >>> a.tuplets[0].type == None
     True
-    >>> updateTupletType([a, b, c, d, e, f, g])
+    >>> duration.updateTupletType([a, b, c, d, e, f, g])
     >>> a.tuplets[0].type == 'start'
     True
     >>> b.tuplets[0].type == None
@@ -838,7 +853,7 @@ class Tuplet(object):
 
 
 
-    >>> from music21 import duration
+    >>> from music21 import *
     >>> myTup = duration.Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
     >>> print(myTup.tupletMultiplier())
     0.8
@@ -986,7 +1001,7 @@ class Tuplet(object):
         '''Get a floating point value by which to scale the duration that 
         this Tuplet is associated with.
 
-        >>> from music21 import duration
+        >>> from music21 import *
         >>> myTuplet = duration.Tuplet()
         >>> print(round(myTuplet.tupletMultiplier(), 3))
         0.667
@@ -1011,7 +1026,7 @@ class Tuplet(object):
         5 half notes in the place of a 2 dotted half notes = 6.0
         (In the end it's only the denominator that matters) 
 
-        >>> from music21 import duration
+        >>> from music21 import *
         >>> a = duration.Tuplet()
         >>> a.totalTupletLength()
         1.0
@@ -1035,7 +1050,7 @@ class Tuplet(object):
         '''Set the ratio of actual divisions to represented in normal divisions.
         A triplet is 3 actual in the time of 2 normal.
 
-        >>> from music21 import duration
+        >>> from music21 import *
         >>> a = duration.Tuplet()
         >>> a.tupletMultiplier()
         0.666...
@@ -1064,7 +1079,7 @@ class Tuplet(object):
 
         A type string or quarter length can be given.
 
-        >>> from music21 import duration
+        >>> from music21 import *
         >>> a = duration.Tuplet()
         >>> a.tupletMultiplier()
         0.666...
@@ -1111,7 +1126,7 @@ class Tuplet(object):
         usage.
 
 
-        >>> from music21 import duration
+        >>> from music21 import *
         >>> a = duration.Tuplet()
         >>> a.setRatio(6,2)
         >>> a.tupletMultiplier()
@@ -1183,7 +1198,7 @@ class Tuplet(object):
         '''From this object return both an mxTimeModification object and an mxTuplet object configured for this Triplet.
         mxTuplet needs to be on the Notes mxNotations field
 
-        >>> from music21 import duration
+        >>> from music21 import *
         >>> a = duration.Tuplet()
         >>> a.bracket = True
         >>> b, c = a.mx
@@ -1294,7 +1309,7 @@ class DurationCommon(object):
 
         This tuple is needed for MusicXML time-modification among other places
 
-        >>> from music21 import duration
+        >>> from music21 import *
         >>> complexDur = duration.Duration('eighth')
         >>> complexDur.appendTuplet(duration.Tuplet())
         >>> complexDur.aggregateTupletRatio()
@@ -1367,7 +1382,8 @@ class DurationUnit(DurationCommon):
     def __repr__(self):
         '''Return a string representation.
 
-        >>> aDur = DurationUnit('quarter')
+        >>> from music21 import *
+        >>> aDur = duration.DurationUnit('quarter')
         >>> repr(aDur)
         '<music21.duration.DurationUnit 1.0>'
         '''
@@ -1377,9 +1393,10 @@ class DurationUnit(DurationCommon):
         '''Test equality. Note: this may not work with Tuplets until we 
         define equality tests for tuplets.
 
-        >>> aDur = DurationUnit('quarter')
-        >>> bDur = DurationUnit('16th') 
-        >>> cDur = DurationUnit('16th') 
+        >>> from music21 import *
+        >>> aDur = duration.DurationUnit('quarter')
+        >>> bDur = duration.DurationUnit('16th') 
+        >>> cDur = duration.DurationUnit('16th') 
         >>> aDur == bDur
         False
         >>> cDur == bDur        
@@ -1397,9 +1414,10 @@ class DurationUnit(DurationCommon):
     def __ne__(self, other):
         '''Test not equality.
 
-        >>> aDur = DurationUnit('quarter')
-        >>> bDur = DurationUnit('16th') 
-        >>> cDur = DurationUnit('16th') 
+        >>> from music21 import *
+        >>> aDur = duration.DurationUnit('quarter')
+        >>> bDur = duration.DurationUnit('16th') 
+        >>> cDur = duration.DurationUnit('16th') 
         >>> aDur != bDur
         True
         >>> cDur != bDur        
@@ -1435,7 +1453,8 @@ class DurationUnit(DurationCommon):
         
         To set quarterLength, use self.quarterLength.
 
-        >>> bDur = DurationUnit('16th') 
+        >>> from music21 import *
+        >>> bDur = duration.DurationUnit('16th') 
         >>> bDur.quarterLength
         0.25
         >>> bDur.unlink()
@@ -1470,8 +1489,8 @@ class DurationUnit(DurationCommon):
         This is done purposely to reflect the most common
         usage.
         
-        
-        >>> bDur = DurationUnit('16th') 
+        >>> from music21 import *
+        >>> bDur = duration.DurationUnit('16th') 
         >>> bDur.augmentOrDiminish(2)
         >>> bDur.quarterLength
         0.5
@@ -1523,9 +1542,10 @@ class DurationUnit(DurationCommon):
     def _setQuarterLength(self, value):
         '''Set the quarter note length to the specified value. 
         
-        (We no longer unlink if quarterLength is greater than a long)
+        (We no longer unlink if quarterLength is greater than a longa)
 
-        >>> a = DurationUnit()
+        >>> from music21 import *
+        >>> a = duration.DurationUnit()
         >>> a.quarterLength = 3
         >>> a.type
         'half'
@@ -1539,12 +1559,12 @@ class DurationUnit(DurationCommon):
         'eighth'
         >>> a.dots
         1
-        >>> b = DurationUnit()
+        >>> b = duration.DurationUnit()
         >>> b.quarterLength = 16
         >>> b.type
         'longa'
 
-        >>> c = DurationUnit()
+        >>> c = duration.DurationUnit()
         >>> c.quarterLength = 129
         >>> c.type
         Traceback (most recent call last):
@@ -1565,8 +1585,11 @@ class DurationUnit(DurationCommon):
     quarterLength = property(_getQuarterLength, _setQuarterLength,
         doc='''Property for getting or setting the quarterLength of a DurationUnit. 
     
-        >>> a = DurationUnit()
+        >>> from music21 import *
+        >>> a = duration.DurationUnit()
         >>> a.quarterLength = 3
+        >>> a.quarterLength
+        3.0
         >>> a.type
         'half'
         >>> a.dots
@@ -1579,7 +1602,7 @@ class DurationUnit(DurationCommon):
         'eighth'
         >>> a.dots
         1
-        >>> b = DurationUnit()
+        >>> b = duration.DurationUnit()
         >>> b.quarterLength = 16
         >>> b.type
         'longa'
@@ -1610,7 +1633,8 @@ class DurationUnit(DurationCommon):
     def _setType(self, value):
         '''Set the type length to the specified value. Check for bad types.
 
-        >>> a = Duration()
+        >>> from music21 import *
+        >>> a = duration.Duration()
         >>> a.type = '128th'
         >>> a.quarterLength
         0.03125
@@ -1629,7 +1653,8 @@ class DurationUnit(DurationCommon):
     type = property(_getType, _setType,
         doc='''Property for getting or setting the type of a DurationUnit. 
     
-        >>> a = DurationUnit()
+        >>> from music21 import *
+        >>> a = duration.DurationUnit()
         >>> a.quarterLength = 3
         >>> a.type
         'half'
@@ -1655,13 +1680,14 @@ class DurationUnit(DurationCommon):
         Converts type to an ordinal number where maxima = 1 and 1024th = 14;  whole = 4 and quarter = 6. 
         Based on duration.ordinalTypeFromNum
     
-        >>> a = DurationUnit('whole')
+        >>> from music21 import *
+        >>> a = duration.DurationUnit('whole')
         >>> a.ordinal
         4
-        >>> b = DurationUnit('maxima')
+        >>> b = duration.DurationUnit('maxima')
         >>> b.ordinal
         1
-        >>> c = DurationUnit('1024th')
+        >>> c = duration.DurationUnit('1024th')
         >>> c.ordinal
         14
         '''
@@ -1697,7 +1723,8 @@ class DurationUnit(DurationCommon):
 
         Having this as a method permits error checking.
 
-        >>> a = DurationUnit()
+        >>> from music21 import *
+        >>> a = duration.DurationUnit()
         >>> a.dots # dots is zero before assignment
         0
         >>> a.type = 'quarter'

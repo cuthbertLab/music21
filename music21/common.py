@@ -86,9 +86,10 @@ def getMissingImportStr(modNameList):
     Given a list of missing module names, returns a nicely-formatted message to the user
     that gives instructions on how to expand music21 with optional packages.
     
-    >>> getMissingImportStr(['PIL'])
+    >>> from music21 import *
+    >>> common.getMissingImportStr(['PIL'])
     'Certain music21 functions might need the optional package PIL; if you run into errors, install it by following the instructions at http://mit.edu/music21/doc/html/installAdditional.html'
-    >>> getMissingImportStr(['PIL', 'numpy'])
+    >>> common.getMissingImportStr(['PIL', 'numpy'])
     'Certain music21 functions might need these optional packages: PIL, numpy; if you run into errors, install it by following the instructions at http://mit.edu/music21/doc/html/installAdditional.html'
 
     '''
@@ -106,44 +107,45 @@ def findFormat(fmt):
 
     Note that .mxl and .mx are only considered MusicXML input formats. 
 
-    >>> findFormat('mx')
+    >>> from music21 import *
+    >>> common.findFormat('mx')
     ('musicxml', '.xml')
-    >>> findFormat('.mxl')
+    >>> common.findFormat('.mxl')
     ('musicxml', '.xml')
-    >>> findFormat('musicxml')
+    >>> common.findFormat('musicxml')
     ('musicxml', '.xml')
-    >>> findFormat('jpeg')
+    >>> common.findFormat('jpeg')
     ('jpeg', '.jpg')
-    >>> findFormat('lily')
+    >>> common.findFormat('lily')
     ('lilypond', '.ly')
-    >>> findFormat('jpeg')
+    >>> common.findFormat('jpeg')
     ('jpeg', '.jpg')
-    >>> findFormat('humdrum')
+    >>> common.findFormat('humdrum')
     ('humdrum', '.krn')
-    >>> findFormat('txt')
+    >>> common.findFormat('txt')
     ('text', '.txt')
-    >>> findFormat('textline')
+    >>> common.findFormat('textline')
     ('textline', '.txt')
-    >>> findFormat('midi')
+    >>> common.findFormat('midi')
     ('midi', '.mid')
-    >>> findFormat('abc')
+    >>> common.findFormat('abc')
     ('abc', '.abc')
-    >>> findFormat('scl')
+    >>> common.findFormat('scl')
     ('scala', '.scl')
 
 
     Works the same whether you have a leading dot or not:
     
 
-    >>> findFormat('md')
+    >>> common.findFormat('md')
     ('musedata', '.md')
-    >>> findFormat('.md')
+    >>> common.findFormat('.md')
     ('musedata', '.md')
     
     
     If you give something we can't deal with, returns a Tuple of None, None:
     
-    >>> findFormat('wpd')
+    >>> common.findFormat('wpd')
     (None, None)
     
     '''
@@ -161,16 +163,17 @@ def findFormat(fmt):
 def findInputExtension(fmt):
     '''Given an input format, find and return all possible input extensions.
 
-    >>> a = findInputExtension('musicxml')
+    >>> from music21 import *
+    >>> a = common.findInputExtension('musicxml')
     >>> a
     ['.xml', '.mxl', '.mx']
-    >>> a = findInputExtension('mx')
+    >>> a = common.findInputExtension('mx')
     >>> a
     ['.xml', '.mxl', '.mx']
-    >>> a = findInputExtension('humdrum')
+    >>> a = common.findInputExtension('humdrum')
     >>> a
     ['.krn']
-    >>> findInputExtension('musedata')
+    >>> common.findInputExtension('musedata')
     ['.md', '.musedata', '.zip']
     '''
     fmt = findFormat(fmt)[0]
@@ -186,19 +189,20 @@ def findInputExtension(fmt):
 def findFormatFile(fp):
     '''Given a file path (relative or absolute) return the format
 
-    >>> findFormatFile('test.xml')
+    >>> from music21 import *
+    >>> common.findFormatFile('test.xml')
     'musicxml'
-    >>> findFormatFile('long/file/path/test-2009.03.02.xml')
+    >>> common.findFormatFile('long/file/path/test-2009.03.02.xml')
     'musicxml'
-    >>> findFormatFile('long/file/path.intermediate.png/test-2009.03.xml')
+    >>> common.findFormatFile('long/file/path.intermediate.png/test-2009.03.xml')
     'musicxml'
     
     Windows drive + pickle
-    >>> findFormatFile('d:/long/file/path/test.p')
+    >>> common.findFormatFile('d:/long/file/path/test.p')
     'pickle'
     
     On a windows networked filesystem
-    >>> findFormatFile('\\\\long\\file\\path\\test.krn')
+    >>> common.findFormatFile('\\\\long\\file\\path\\test.krn')
     'humdrum'
     '''
     fmt, ext = findFormat(fp.split('.')[-1])
@@ -208,25 +212,26 @@ def findFormatFile(fp):
 def findFormatExtFile(fp):
     '''Given a file path (relative or absolute) find format and extension used (not the output extension)
 
-    >>> findFormatExtFile('test.mx')
+    >>> from music21 import *
+    >>> common.findFormatExtFile('test.mx')
     ('musicxml', '.mx')
-    >>> findFormatExtFile('long/file/path/test-2009.03.02.xml')
+    >>> common.findFormatExtFile('long/file/path/test-2009.03.02.xml')
     ('musicxml', '.xml')
-    >>> findFormatExtFile('long/file/path.intermediate.png/test-2009.03.xml')
+    >>> common.findFormatExtFile('long/file/path.intermediate.png/test-2009.03.xml')
     ('musicxml', '.xml')
 
-    >>> findFormatExtFile('test.mus')
+    >>> common.findFormatExtFile('test.mus')
     ('finale', '.mus')
 
-    >>> findFormatExtFile('test')
+    >>> common.findFormatExtFile('test')
     (None, None)
     
     Windows drive + pickle
-    >>> findFormatExtFile('d:/long/file/path/test.p')
+    >>> common.findFormatExtFile('d:/long/file/path/test.p')
     ('pickle', '.p')
     
     On a windows networked filesystem
-    >>> findFormatExtFile('\\\\long\\file\\path\\test.krn')
+    >>> common.findFormatExtFile('\\\\long\\file\\path\\test.krn')
     ('humdrum', '.krn')
     '''
     format, extOut = findFormat(fp.split('.')[-1])
@@ -239,6 +244,7 @@ def findFormatExtFile(fp):
 def findFormatExtURL(url):
     '''Given a URL, attempt to find the extension. This may scrub arguments in a URL, or simply look at the last characters.
 
+    >>> from music21 import *
     >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml'
     >>> urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=kern'
     >>> urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'
@@ -246,17 +252,17 @@ def findFormatExtURL(url):
     >>> urlE = 'http://static.wikifonia.org/4306/musicxml.mxl'
     >>> urlF = 'http://junk'
 
-    >>> findFormatExtURL(urlA)
+    >>> common.findFormatExtURL(urlA)
     ('musicxml', '.xml')
-    >>> findFormatExtURL(urlB)
+    >>> common.findFormatExtURL(urlB)
     ('humdrum', '.krn')
-    >>> findFormatExtURL(urlC)
+    >>> common.findFormatExtURL(urlC)
     ('musicxml', '.xml')
-    >>> findFormatExtURL(urlD)
+    >>> common.findFormatExtURL(urlD)
     ('musicxml', '.mxl')
-    >>> findFormatExtURL(urlE)
+    >>> common.findFormatExtURL(urlE)
     ('musicxml', '.mxl')
-    >>> findFormatExtURL(urlF)
+    >>> common.findFormatExtURL(urlF)
     (None, None)
     '''
     ext = None
@@ -286,12 +292,13 @@ def basicallyEqual(a, b):
     '''
     returns true if a and b are equal except for whitespace differences
 
+    >>> from music21 import *
     >>> a = " hello there "
     >>> b = "hello there"
     >>> c = " bye there "
-    >>> basicallyEqual(a,b)
+    >>> common.basicallyEqual(a,b)
     True
-    >>> basicallyEqual(a,c)
+    >>> common.basicallyEqual(a,c)
     False
     '''
     a = WHITESPACE.sub('', a)
@@ -456,19 +463,20 @@ def isPowerOfTwo(n):
     of a power of 2. Uses almostEquals so that a float whose reminder after
     taking a log is nearly zero is still True
 
-    >>> isPowerOfTwo(3)
+    >>> from music21 import *
+    >>> common.isPowerOfTwo(3)
     False
-    >>> isPowerOfTwo(18)
+    >>> common.isPowerOfTwo(18)
     False
-    >>> isPowerOfTwo(1024)
+    >>> common.isPowerOfTwo(1024)
     True
-    >>> isPowerOfTwo(1024.01)
+    >>> common.isPowerOfTwo(1024.01)
     False
-    >>> isPowerOfTwo(1024.00001)
+    >>> common.isPowerOfTwo(1024.00001)
     True
 
     OMIT_FROM_DOCS
-    >>> isPowerOfTwo(10)
+    >>> common.isPowerOfTwo(10)
     False
     '''
 
@@ -483,28 +491,37 @@ def isPowerOfTwo(n):
 
 
 def nearestMultiple(n, unit):
-    '''Given a positive value `n`, return the nearest multiple of the supplied `unit` as well as the difference (error).
+    '''Given a positive value `n`, return the nearest multiple of the supplied `unit` as well as the difference (error) to 
+    seven significant digits.
 
-    >>> nearestMultiple(.25, .25)[0]
-    0.25
-    >>> nearestMultiple(.35, .25)[0]
-    0.25
-    >>> nearestMultiple(.4, .25)[0]
+    >>> from music21 import *
+    >>> print common.nearestMultiple(.25, .25)
+    (0.25, 0.0)
+    >>> print common.nearestMultiple(.35, .25)
+    (0.25, 0.1)
+    
+    Note that this one also has an error of .1 but it's a positive error off of 0.5
+    >>> print common.nearestMultiple(.4, .25)
+    (0.5, 0.1)
+
+
+
+    >>> common.nearestMultiple(.4, .25)[0]
     0.5
-    >>> nearestMultiple(23404.001, .125)[0]
+    >>> common.nearestMultiple(23404.001, .125)[0]
     23404.0
-    >>> nearestMultiple(23404.134, .125)[0]
+    >>> common.nearestMultiple(23404.134, .125)[0]
     23404.125
-    >>> nearestMultiple(.001, .125)[0]
+    >>> common.nearestMultiple(.001, .125)[0]
     0.0
 
-    >>> almostEquals(nearestMultiple(.25, (1/3.))[0], .33333333)
+    >>> common.almostEquals(common.nearestMultiple(.25, (1/3.))[0], .33333333)
     True
-    >>> almostEquals(nearestMultiple(.55, (1/3.))[0], .66666666)
+    >>> common.almostEquals(common.nearestMultiple(.55, (1/3.))[0], .66666666)
     True
-    >>> almostEquals(nearestMultiple(234.69, (1/3.))[0], 234.6666666)
+    >>> common.almostEquals(common.nearestMultiple(234.69, (1/3.))[0], 234.6666666)
     True
-    >>> almostEquals(nearestMultiple(18.123, (1/6.))[0], 18.16666666)
+    >>> common.almostEquals(common.nearestMultiple(18.123, (1/6.))[0], 18.16666666)
     True
 
 
@@ -524,9 +541,9 @@ def nearestMultiple(n, unit):
         raise Exception('cannot place n between multiples: %s, %s', matchLow, matchHigh)
 
     if n >= matchLow and n < (matchLow + halfUnit):
-        return matchLow, n - matchLow
+        return matchLow, round(n - matchLow, 7)
     elif n >= (matchHigh - halfUnit) and n <= matchHigh:
-        return matchHigh, matchHigh - n
+        return matchHigh, round(matchHigh - n, 7)
        
 
 def standardDeviation(coll, bassel=False):
@@ -555,11 +572,12 @@ def isNum(usrData):
     '''check if usrData is a number (float, int, long, Decimal), return boolean
     IMPROVE: when 2.6 is everywhere: add numbers class.
 
-    >>> isNum(3.0)
+    >>> from music21 import *
+    >>> common.isNum(3.0)
     True
-    >>> isNum(3)
+    >>> common.isNum(3)
     True
-    >>> isNum('three')
+    >>> common.isNum('three')
     False
     '''
     try:
@@ -581,11 +599,12 @@ def isNum(usrData):
 def isStr(usrData):
     """Check of usrData is some form of string, including unicode.
 
-    >>> isStr(3)
+    >>> from music21 import *
+    >>> common.isStr(3)
     False
-    >>> isStr('sharp')
+    >>> common.isStr('sharp')
     True
-    >>> isStr(u'flat')
+    >>> common.isStr(u'flat')
     True
     """
     if isinstance(usrData, basestring):
@@ -600,14 +619,14 @@ def isListLike(usrData):
     """
     Returns True if is a List or a Set or a Tuple
 
-    >>> isListLike([])
+    >>> from music21 import *
+    >>> common.isListLike([])
     True
-    >>> isListLike('sharp')
+    >>> common.isListLike('sharp')
     False
-    >>> isListLike((None, None))
+    >>> common.isListLike((None, None))
     True
-    >>> import music21.stream
-    >>> isListLike(music21.stream.Stream())
+    >>> common.isListLike(stream.Stream())
     False
     """
     #TODO: add immutable sets and pre 2.6 set support
@@ -622,14 +641,14 @@ def isIterable(usrData):
     """
     Returns True if is the object can be iter'd over
 
-    >>> isIterable([])
+    >>> from music21 import *
+    >>> common.isIterable([5, 10])
     True
-    >>> isIterable('sharp')
+    >>> common.isIterable('sharp')
     False
-    >>> isIterable((None, None))
+    >>> common.isIterable((None, None))
     True
-    >>> import music21.stream
-    >>> isIterable(music21.stream.Stream())
+    >>> common.isIterable(stream.Stream())
     True
     """
     if hasattr(usrData, "__iter__"):
@@ -642,9 +661,9 @@ def toUnicode(usrStr):
     '''Convert this tring to a uncode string; if already a unicode string, do nothing.
         
     >>> from music21 import *
-    >>> toUnicode('test')
+    >>> common.toUnicode('test')
     u'test'
-    >>> toUnicode(u'test')
+    >>> common.toUnicode(u'test')
     u'test'
     '''
     try:
@@ -659,9 +678,9 @@ def classToClassStr(classObj):
     '''Convert a class object to a class string.
 
     >>> from music21 import *
-    >>> classToClassStr(note.Note)
+    >>> common.classToClassStr(note.Note)
     'Note'
-    >>> classToClassStr(chord.Chord)
+    >>> common.classToClassStr(chord.Chord)
     'Chord'
     '''
     # remove closing quotes
@@ -670,11 +689,12 @@ def classToClassStr(classObj):
 def getNumFromStr(usrStr, numbers='0123456789'):
     '''Given a string, extract any numbers. Return two strings, the numbers (as strings) and the remaining characters.
 
-    >>> getNumFromStr('23a')
+    >>> from music21 import *
+    >>> common.getNumFromStr('23a')
     ('23', 'a')
-    >>> getNumFromStr('23a954sdfwer')
+    >>> common.getNumFromStr('23a954sdfwer')
     ('23954', 'asdfwer')
-    >>> getNumFromStr('')
+    >>> common.getNumFromStr('')
     ('', '')
     '''
     found = []
@@ -691,13 +711,14 @@ def getNumFromStr(usrStr, numbers='0123456789'):
 def numToIntOrFloat(value):
     '''Given a number, return an integer if it is very close to an integer, otherwise, return a float.
 
-    >>> numToIntOrFloat(1.0)
+    >>> from music21 import *
+    >>> common.numToIntOrFloat(1.0)
     1
-    >>> numToIntOrFloat(1.00003)
+    >>> common.numToIntOrFloat(1.00003)
     1.00003
-    >>> numToIntOrFloat(1.5)
+    >>> common.numToIntOrFloat(1.5)
     1.5
-    >>> numToIntOrFloat(1.0000000005)
+    >>> common.numToIntOrFloat(1.0000000005)
     1
     '''
     intVal = int(round(value))
@@ -710,18 +731,26 @@ def numToIntOrFloat(value):
 def spaceCamelCase(usrStr, replaceUnderscore=True):
     '''Given a camel-cased string, or a mixture of numbers and characters, create a space separated string.
 
-    >>> spaceCamelCase('thisIsATest')
+    If replaceUnderscore is True (default) then underscores also become spaces (but without the _)
+
+    >>> from music21 import *
+    >>> common.spaceCamelCase('thisIsATest')
     'this Is A Test'
-    >>> spaceCamelCase('ThisIsATest')
+    >>> common.spaceCamelCase('ThisIsATest')
     'This Is A Test'
-    >>> spaceCamelCase('movement3')
+    >>> common.spaceCamelCase('movement3')
     'movement 3'
-    >>> spaceCamelCase('opus41no1')
+    >>> common.spaceCamelCase('opus41no1')
     'opus 41 no 1'
-    >>> spaceCamelCase('opus23402no219235')
+    >>> common.spaceCamelCase('opus23402no219235')
     'opus 23402 no 219235'
-    >>> spaceCamelCase('opus23402no219235').title()
+    >>> common.spaceCamelCase('opus23402no219235').title()
     'Opus 23402 No 219235'
+
+    >>> common.spaceCamelCase('hello_myke')
+    'hello myke'
+    >>> common.spaceCamelCase('hello_myke', replaceUnderscore = False)
+    'hello_myke'
 
     '''
     numbers = '0123456789.'
@@ -767,7 +796,9 @@ def spaceCamelCase(usrStr, replaceUnderscore=True):
 
 
 def getPlatform():
-    '''Return the name of the platform, where platforms are divided between 'win' (for Windows), 'darwin' (for MacOS X), and 'nix' for (GNU/Linux and other variants).
+    '''
+    Return the name of the platform, where platforms are divided 
+    between 'win' (for Windows), 'darwin' (for MacOS X), and 'nix' for (GNU/Linux and other variants).
     '''
     # possible os.name values: 'posix', 'nt', 'mac', 'os2', 'ce', 
     # 'java', 'riscos'.
@@ -783,11 +814,12 @@ def dotMultiplier(dots):
     '''
     dotMultiplier(dots) returns how long to multiply the note length of a note in order to get the note length with n dots
     
-    >>> dotMultiplier(1)
+    >>> from music21 import *
+    >>> common.dotMultiplier(1)
     1.5
-    >>> dotMultiplier(2)
+    >>> common.dotMultiplier(2)
     1.75
-    >>> dotMultiplier(3)
+    >>> common.dotMultiplier(3)
     1.875
     '''
     x = (((2**(dots+1.0))-1.0)/(2**dots))
@@ -805,9 +837,10 @@ def decimalToTuplet(decNum):
 
     returns (numerator, denominator)
 
-    >>> decimalToTuplet(1.5)
+    >>> from music21 import *
+    >>> common.decimalToTuplet(1.5)
     (3, 2)
-    >>> decimalToTuplet(1.25)
+    >>> common.decimalToTuplet(1.25)
     (5, 4)
     '''
 
@@ -887,8 +920,9 @@ def unitBoundaryProportion(series):
 def weightedSelection(values, weights, randomGenerator=None):
     '''Given a list of values and an equal-sized list of weights, return a randomly selected value using the weight.
 
+    Example: sum -1 and 1 for 100 values; should be around 0 or at least between -30 and 30
+
     >>> from music21 import *
-    >>> # summing -1 and 1 for 100 values; should be around 0
     >>> -30 < sum([common.weightedSelection([-1, 1], [1,1]) for x in range(100)]) < 30
     True
     '''
@@ -907,9 +941,11 @@ def weightedSelection(values, weights, randomGenerator=None):
 
 def euclidGCD(a, b):
     '''use Euclid\'s algorithm to find the GCD of a and b
-    >>> euclidGCD(2,4)
+
+    >>> from music21 import *
+    >>> common.euclidGCD(2,4)
     2
-    >>> euclidGCD(20,8)
+    >>> common.euclidGCD(20,8)
     4
     '''
     if b == 0:
@@ -994,13 +1030,16 @@ def _lcm(a, b):
 
 def lcm(filter):
     '''
-    >>> lcm([3,4,5])
+    Find the least common multiple of a list of values
+    
+    >>> from music21 import *
+    >>> common.lcm([3,4,5])
     60
-    >>> lcm([3,4])
+    >>> common.lcm([3,4])
     12
-    >>> lcm([1,2])
+    >>> common.lcm([1,2])
     2
-    >>> lcm([3,6])
+    >>> common.lcm([3,6])
     6
     '''
     # derived from 
@@ -1014,19 +1053,20 @@ def lcm(filter):
 def groupContiguousIntegers(src):
     '''Given a list of integers, group contiguous values into sub lists
 
-    >>> groupContiguousIntegers([3, 5, 6])
+    >>> from music21 import *
+    >>> common.groupContiguousIntegers([3, 5, 6])
     [[3], [5, 6]]
-    >>> groupContiguousIntegers([3, 4, 6])
+    >>> common.groupContiguousIntegers([3, 4, 6])
     [[3, 4], [6]]
-    >>> groupContiguousIntegers([3, 4, 6, 7])
+    >>> common.groupContiguousIntegers([3, 4, 6, 7])
     [[3, 4], [6, 7]]
-    >>> groupContiguousIntegers([3, 4, 6, 7, 20])
+    >>> common.groupContiguousIntegers([3, 4, 6, 7, 20])
     [[3, 4], [6, 7], [20]]
-    >>> groupContiguousIntegers([3, 4, 5, 6, 7])
+    >>> common.groupContiguousIntegers([3, 4, 5, 6, 7])
     [[3, 4, 5, 6, 7]]
-    >>> groupContiguousIntegers([3])
+    >>> common.groupContiguousIntegers([3])
     [[3]]
-    >>> groupContiguousIntegers([3, 200])
+    >>> common.groupContiguousIntegers([3, 200])
     [[3], [200]]
     '''
     if len(src) <= 1:
@@ -1057,65 +1097,93 @@ def groupContiguousIntegers(src):
 
 def fromRoman(num):
     '''
-    >>> fromRoman('ii')
-    2
-    >>> fromRoman('vii')
-    7
-    >>> fromRoman('vx')
-    Traceback (most recent call last):
-    Music21CommonException: invalid roman numeral vx
-    '''
-    num = num.lower()
     
-    if num == "":
-        raise Music21CommonException("No roman numeral specified.")
-    if (num == 'i'):
-        return 1
-    elif (num == 'ii'):
-        return 2
-    elif (num == 'iii'):
-        return 3
-    elif (num == 'iv'):
-        return 4
-    elif (num == 'v'):
-        return 5
-    elif (num == 'vi'):
-        return 6
-    elif (num == 'vii'):
-        return 7
-    elif (num == 'viii'):
-        return 8
-    else:
-        raise Music21CommonException("invalid roman numeral %s" % (num))
+    Convert a Roman numeral (upper or lower) to an int
 
+    http://code.activestate.com/recipes/81611-roman-numerals/
+    
+    >>> from music21 import *
+    >>> common.fromRoman('ii')
+    2
+    >>> common.fromRoman('vii')
+    7
+    
+    Works with both IIII and IV forms:
+    >>> common.fromRoman('MCCCCLXXXIX')
+    1489
+    >>> common.fromRoman('MCDLXXXIX')
+    1489
+
+
+    some people consider this an error, but you see it in medieval documents:
+    >>> common.fromRoman('ic')
+    99
+
+    but things like this are never seen and cause an error:
+    >>> common.fromRoman('vx')
+    Traceback (most recent call last):
+    Music21CommonException: input contains an invalid subtraction element: vx
+
+    '''
+    input = num.upper()
+    nums = ['M', 'D', 'C', 'L', 'X', 'V', 'I']
+    ints = [1000, 500, 100, 50,  10,  5,   1]
+    places = []
+    for c in input:
+       if not c in nums:
+          raise Music21CommonException("input is not a valid roman numeral: %s" % input)
+    for i in range(len(input)):
+       c = input[i]
+       value = ints[nums.index(c)]
+       # If the next place holds a larger number, this value is negative.
+       try:
+           nextvalue = ints[nums.index(input[i +1])]
+           if nextvalue > value and value in [1, 10, 100]:
+               value *= -1
+           elif nextvalue > value:
+               raise Music21CommonException("input contains an invalid subtraction element: %s" % num)
+       except IndexError:
+          # there is no next place.
+          pass
+       places.append(value)
+    sum = 0
+    for n in places: sum += n
+    return sum
+    # Easiest test for validity...
+    #if int_to_roman(sum) == input:
+    #   return sum
+    #else:
+    #   raise ValueError, 'input is not a valid roman numeral: %s' % input
+    
 def toRoman(num):
     '''
-    >>> toRoman(2)
+    
+    Convert a number from 1 to 3999 to a roman numeral
+    
+    >>> from music21 import *
+    >>> common.toRoman(2)
     'II'
-    >>> toRoman(7)
+    >>> common.toRoman(7)
     'VII'
-    >>> toRoman("hi")
+    >>> common.toRoman(1999)
+    'MCMXCIX'
+
+    >>> common.toRoman("hi")
     Traceback (most recent call last):
-    Music21CommonException: invalid input hi: must be integer 1-8
+    TypeError: expected integer, got <type 'str'>
     '''
-    if (num == 1):
-        return 'I'
-    elif (num == 2):
-        return 'II'
-    elif (num == 3):
-        return 'III'
-    elif (num == 4):
-        return 'IV'
-    elif (num == 5):
-        return 'V'
-    elif (num == 6):
-        return 'VI'
-    elif (num == 7):
-        return 'VII'
-    elif (num == 8): # TODO: add comment explaining if this is correct!
-        return 'VIII'
-    else:
-        raise Music21CommonException("invalid input %s: must be integer 1-8" % (str(num)))
+    if type(num) != type(1):
+       raise TypeError("expected integer, got %s" % type(num))
+    if not 0 < num < 4000:
+       raise ValueError, "Argument must be between 1 and 3999"   
+    ints = (1000, 900,  500, 400, 100,  90, 50,  40, 10,  9,   5,  4,   1)
+    nums = ('M',  'CM', 'D', 'CD','C', 'XC','L','XL','X','IX','V','IV','I')
+    result = ""
+    for i in range(len(ints)):
+        count = int(num/ ints[i])
+        result += nums[i] * count
+        num -= ints[i] * count
+    return result
 
 
 def ordinalAbbreviation(value, plural=False):
@@ -1163,12 +1231,13 @@ def stripAddresses(textString, replacement = "ADDRESS"):
     that a function gives an expected result even if the result
     contains references to memory locations.  So for instance:
 
-    >>> stripAddresses("{0.0} <music21.clef.TrebleClef object at 0x02A87AD0>")
+    >>> from music21 import *
+    >>> common.stripAddresses("{0.0} <music21.clef.TrebleClef object at 0x02A87AD0>")
     '{0.0} <music21.clef.TrebleClef object at ADDRESS>'
     
     while this is left alone:
 
-    >>> stripAddresses("{0.0} <music21.humdrum.MiscTandam *>I humdrum control>")
+    >>> common.stripAddresses("{0.0} <music21.humdrum.MiscTandam *>I humdrum control>")
     '{0.0} <music21.humdrum.MiscTandam *>I humdrum control>'
     '''
     ADDRESS = re.compile('0x[0-9A-F]+')
@@ -1195,8 +1264,10 @@ def sortFilesRecent(fileList):
     '''Given two files, sort by most recent. Return only the file
     paths.
 
+    >>> from music21 import *
+    >>> import os
     >>> a = os.listdir(os.curdir)
-    >>> b = sortFilesRecent(a)
+    >>> b = common.sortFilesRecent(a)
     '''
     sort = []
     for fp in fileList:
@@ -1210,7 +1281,9 @@ def sortFilesRecent(fileList):
 
 def getMd5(value=None):
     '''Return a string from an md5 haslib
-    >>> getMd5('test')
+    
+    >>> from music21 import *
+    >>> common.getMd5('test')
     '098f6bcd4621d373cade4e832627b4f6'
     '''
     if value == None:
@@ -1224,7 +1297,8 @@ def formatStr(msg, *arguments, **keywords):
     '''Format one or more data elements into string suitable for printing
     straight to stderr or other outputs
 
-    >>> a = formatStr('test', '1', 2, 3)
+    >>> from music21 import *
+    >>> a = common.formatStr('test', '1', 2, 3)
     >>> print a
     test 1 2 3
     <BLANKLINE>
@@ -1244,7 +1318,7 @@ def formatStr(msg, *arguments, **keywords):
 
 
 def dirPartitioned(obj, skipLeading=['__']):
-    '''Given an objet, return three lists of names: methods, attributes, and properties.
+    '''Given an object, return three lists of names: methods, attributes, and properties.
 
     Note that if a name/attribute is dynamically created by a property it 
     cannot be found until that attribute is created.
@@ -1431,7 +1505,7 @@ class DefaultHash(dict):
     
     If you want a factory that makes hashes with a particular different default, use:
     
-        falsehash = lambda h = None: DefaultHash(h, default = False)
+        falsehash = lambda h = None: common.DefaultHash(h, default = False)
         a = falsehash({"A": falsehash(), "B": falsehash()})
         print(a["A"]["hi"]) # returns False
     
@@ -1440,7 +1514,7 @@ class DefaultHash(dict):
 
     if callDefault is True then the default is called:
     
-        DefaultHash(default = list, callDefault = True)
+        common.DefaultHash(default = list, callDefault = True)
         
     will create a new List for each element
     '''
@@ -1681,18 +1755,21 @@ def wrapWeakref(referent):
 def unwrapWeakref(referent):
     '''
     Utility function that gets an object that might be an object itself
-    or a weak reference to an object.
+    or a weak reference to an object.  It returns obj() if it's a weakref 
+    and obj if it's not.
     
-    >>> class Mock(object): pass
+    >>> from music21 import *
+    >>> class Mock(object): 
+    ...     pass
     >>> a1 = Mock()
     >>> a2 = Mock()
     >>> a2.strong = a1
-    >>> a2.weak = wrapWeakref(a1)
-    >>> unwrapWeakref(a2.strong) is a1
+    >>> a2.weak = common.wrapWeakref(a1)
+    >>> common.unwrapWeakref(a2.strong) is a1
     True
-    >>> unwrapWeakref(a2.weak) is a1
+    >>> common.unwrapWeakref(a2.weak) is a1
     True
-    >>> unwrapWeakref(a2.strong) is unwrapWeakref(a2.weak)
+    >>> common.unwrapWeakref(a2.strong) is common.unwrapWeakref(a2.weak)
     True
     '''
     if type(referent) is weakref.ref:
@@ -1704,20 +1781,40 @@ def unwrapWeakref(referent):
 def isWeakref(referent):
     '''Test if an object is a weakref
 
-    >>> class Mock(object): pass
+    >>> from music21 import *
+    >>> class Mock(object): 
+    ...     pass
     >>> a1 = Mock()
     >>> a2 = Mock()
-    >>> isWeakref(a1)
+    >>> common.isWeakref(a1)
     False
-    >>> isWeakref(3)
+    >>> common.isWeakref(3)
     False
-    >>> isWeakref(wrapWeakref(a1))
+    >>> common.isWeakref(common.wrapWeakref(a1))
     True
     '''
     if type(referent) is weakref.ref:
         return True
     else:
         return False
+
+
+def findWeakRef(target):
+    '''Given an object or composition of objects, find an attribute that is a weakref. This is a diagnostic tool.
+    '''
+    for attrName in dir(target):
+        try:
+            attr = getattr(target, attrName)
+        except:
+            print 'exception on attribute access: %s' % attrName
+        if isWeakref(attr):
+            print 'found weakref', attr, attrName, 'of target:', target
+        if isinstance(attr, (list, tuple)):
+            for x in attr:
+                findWeakRef(x)
+#         elif isinstance(attr, dict):
+#             for x in attr.keys():
+#                 findWeakRef(attr[x])
 
 xlateAccents={0xc0:'A', 0xc1:'A', 0xc2:'A', 0xc3:'A', 0xc4:'A', 0xc5:'A',
     0xc6:'Ae', 0xc7:'C',
@@ -1746,28 +1843,11 @@ xlateAccents={0xc0:'A', 0xc1:'A', 0xc2:'A', 0xc3:'A', 0xc4:'A', 0xc5:'A',
     0xd7:'*', 0xf7:'/'
     }
 
-def findWeakRef(target):
-    '''Given an object or composition of objects, find an attribute that is a weakref. This is a diagnostic tool.
-    '''
-    for attrName in dir(target):
-        try:
-            attr = getattr(target, attrName)
-        except:
-            print 'exception on attribute access: %s' % attrName
-        if isWeakref(attr):
-            print 'found weakref', attr, attrName, 'of target:', target
-        if isinstance(attr, (list, tuple)):
-            for x in attr:
-                findWeakRef(x)
-#         elif isinstance(attr, dict):
-#             for x in attr.keys():
-#                 findWeakRef(attr[x])
-
 def stripAccents(inputString):
     '''
     removes accents from unicode strings.
     
-    >>> from music21 import common
+    >>> from music21 import *
     >>> s = u'tr\u00e8s vite'
     >>> u'\u00e8' in s
     True

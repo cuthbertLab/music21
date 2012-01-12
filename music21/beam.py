@@ -40,16 +40,16 @@ class Beam(object):
     
     Here are two ways to define the start of a beam
     >>> from music21 import *
-    >>> b1 = music21.beam.Beam(type = 'start')
-    >>> b2 = music21.beam.Beam('start')
+    >>> b1 = beam.Beam(type = 'start')
+    >>> b2 = beam.Beam('start')
     
     Here is a partial beam (that is, one that does not
     connect to any other note, such as the second beam of
     a dotted eighth, sixteenth group)
     
     Two ways of doing the same thing
-    >>> b3 = music21.beam.Beam(type = 'partial', direction = 'left')
-    >>> b4 = music21.beam.Beam('partial', 'left')
+    >>> b3 = beam.Beam(type = 'partial', direction = 'left')
+    >>> b4 = beam.Beam('partial', 'left')
     
     '''
 
@@ -72,7 +72,7 @@ class Beam(object):
         '''
 
         >>> from music21 import *
-        >>> a = Beam()
+        >>> a = beam.Beam()
         >>> a.type = 'start'
         >>> a.number = 1
         >>> b = a.mx
@@ -114,7 +114,7 @@ class Beam(object):
         >>> from music21 import *
         >>> mxBeam = musicxmlMod.Beam()
         >>> mxBeam.set('charData', 'begin')
-        >>> a = Beam()
+        >>> a = beam.Beam()
         >>> a.mx = mxBeam
         >>> a.type
         'start'
@@ -182,7 +182,7 @@ class Beams(object):
         512th notes) raises an error.
 
         >>> from music21 import *
-        >>> a = music21.beam.Beams()
+        >>> a = beam.Beams()
         >>> a.fill('16th')
         >>> len(a)
         2
@@ -240,7 +240,7 @@ class Beams(object):
         Beam() above.
 
         >>> from music21 import *
-        >>> a = music21.beam.Beams()
+        >>> a = beam.Beams()
         >>> a.fill('16th')
         >>> a.setAll('start')
         >>> a.getTypes()
@@ -257,7 +257,7 @@ class Beams(object):
         '''Set an internal beam object by number, or rhythmic symbol level
 
         >>> from music21 import *
-        >>> a = Beams()
+        >>> a = beam.Beams()
         >>> a.fill('16th')
         >>> a.setAll('start')
         >>> a.setByNumber(1, 'continue')
@@ -292,7 +292,7 @@ class Beams(object):
         '''Gets an internal beam object by number...
 
         >>> from music21 import *
-        >>> a = Beams()
+        >>> a = beam.Beams()
         >>> a.fill('16th')
         >>> a.setAll('start')
         >>> a.getByNumber(2).type
@@ -309,7 +309,7 @@ class Beams(object):
         '''Get beam type, with direction, by number
 
         >>> from music21 import *
-        >>> a = Beams()
+        >>> a = beam.Beams()
         >>> a.fill('16th')
         >>> a.setAll('start')
         >>> a.setByNumber(2, 'partial-right')
@@ -329,7 +329,7 @@ class Beams(object):
         '''Returns a list of all beam types defined for the current beams
 
         >>> from music21 import *
-        >>> a = Beams()
+        >>> a = beam.Beams()
         >>> a.fill('16th')
         >>> a.setAll('start')
         >>> a.getTypes()
@@ -342,7 +342,7 @@ class Beams(object):
         a set of consecutive integers, but it might not be.
 
         >>> from music21 import *
-        >>> a = Beams()
+        >>> a = beam.Beams()
         >>> a.fill('32nd')
         >>> a.getNumbers()
         [1, 2, 3]
@@ -365,7 +365,7 @@ class Beams(object):
 
         >>> from music21 import *
         >>> mxBeamList = []
-        >>> a = Beams()
+        >>> a = beam.Beams()
         >>> a.mx = mxBeamList
         '''
         for mxBeam in mxBeamList:

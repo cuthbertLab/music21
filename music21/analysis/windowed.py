@@ -61,7 +61,7 @@ class WindowedAnalysis(object):
         >>> s = corpus.parse('bach/bwv324')
         >>> p = analysis.discrete.Ambitus()
         >>> # placing one part into analysis
-        >>> wa = WindowedAnalysis(s.parts[0], p)
+        >>> wa = analysis.windowed.WindowedAnalysis(s.parts[0], p)
 
         >>> post = wa._getMinimumWindowStream()
         >>> len(post.getElementsByClass('Measure'))
@@ -99,7 +99,7 @@ class WindowedAnalysis(object):
         >>> from music21 import *
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
-        >>> wa = WindowedAnalysis(s, p)
+        >>> wa = analysis.windowed.WindowedAnalysis(s, p)
         >>> len(wa._windowedStream)
         36
         >>> a, b = wa._analyze(1)
@@ -197,7 +197,7 @@ class WindowedAnalysis(object):
         >>> s = corpus.parse('bach/bwv324')
         >>> p = analysis.discrete.KrumhanslSchmuckler()
         >>> # placing one part into analysis
-        >>> wa = WindowedAnalysis(s.parts[0], p)
+        >>> wa = analysis.windowed.WindowedAnalysis(s.parts[0], p)
         >>> x, y, z = wa.process(1, 1, includeTotalWindow=False)
         >>> len(x) # we only have one series of windows
         1
