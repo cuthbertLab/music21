@@ -199,7 +199,116 @@ def askForScaleDegrees(sc, partNumList):
         newStream.append(sc.parts[i])
     
     return newStream
+
+
+
+def createEditorialMelodicIntervals(music21Stream):
+    '''Generates intervalList and intervalORList.'''
+
+    for part in music21Stream.parts:
+        notes = part.flat.notes
+        currentObject = notes[1]
+        while currentObject != None and not isinstance(currentObject, music21.bar.Barline):
+            previousObject = currentObject.previous()
+            if isinstance(currentObject, note.Note) and isinstance(previousObject, note.Note):
+                currentObject.editorial.melodicInterval = interval.notesToInterval(previousObject, currentObject)
+            currentObject = currentObject.next()
         
+    for x in music21Stream.flat.notes:
+        print x, x.editorial.melodicInterval 
+
+def labelEditorialMotion(music21Stream):
+    '''Generates intervalList and intervalORList.'''
+
+    for part in music21Stream.parts:
+        notes = part.flat.notes
+        currentObject = notes[1]
+        notes[0].editorial.misc['motion'] = None
+        while currentObject != None and not isinstance(currentObject, music21.bar.Barline):
+            previousObject = currentObject.previous()
+            if isinstance(currentObject, music21.note.Note) and isinstance(previousObject, music21.note.Note):
+                thisInterval = interval.Interval(previousObject, currentObject)
+                if thisInterval.generic.isDiatonicStep:
+                    currentObject.editorial.misc['motion'] = 'step'
+                elif thisInterval.generic.isSkip:
+                    currentObject.editorial.misc['motion'] = 'skip'
+                else:
+                    currentObject.editorial.misc['motion'] = 'unison'
+                currentObject.lyric = currentObject.editorial.misc['motion']
+            else:
+                currentObject.editorial.misc['motion'] = None
+            currentObject = currentObject.next()
+        
+
+    for noteObj in music21Stream.flat.getElementsByClass('Note'):
+        print noteObj
+        try:
+            noteObj.editorial.misc['motion']
+        except:
+            noteObj.editorial.misc['motion'] = ''
+        
+    return music21Stream 
+
+
+#Leap or skip (difference?) is not set with a step in the other part
+def locateAbundantLeaps(music21Stream):
+
+    #find skips in part1, verify steps are in part 2
+
+    listOfNotes1 = music21Stream.parts[0].flat.getElementsByClass(music21.note.Note)
+    for note in editorial.getObjectsWithEditorial(listOfNotes1, 'motion', 'skip'):
+        noteInOtherPart = music21Stream.parts[1].flat.getElementAtOrBefore(note.offset, classList=['Note'])
+        if noteInOtherPart.editorial.misc['motion'] != 'step' and noteInOtherPart.editorial.misc['motion'] != 'unison':
+            note.color = 'red'
+            noteInOtherPart.color = 'red'
+            note.previous().color = 'red'
+            noteInOtherPart.previous().color = 'red'
+    listOfNotes2 = music21Stream.parts[1].flat.getElementsByClass(music21.note.Note)
+    for note in editorial.getObjectsWithEditorial(listOfNotes2, 'motion', 'skip'):
+        noteInOtherPart = music21Stream.parts[0].flat.getElementAtOrBefore(note.offset, classList=['Note'])
+        if noteInOtherPart.editorial.misc['motion'] != 'step' and noteInOtherPart.editorial.misc['motion'] != 'unison':
+            note.color = 'red'
+            note.previous().color = 'red'
+            noteInOtherPart.color = 'red'
+            noteInOtherPart.previous().color = 'red'
+            
+    music21Stream.show()
+    
+    
+'''
+    iL = []
+    iORL = []
+    for i in range(0, self.totalNotes - 1):
+        n1 = self.notesAndRests[i]
+        n2 = self.notesAndRests[i+1]
+        if n1 is None or n2 is None:
+            raise StreamException("Some reason a NoneType is Here...")
+        if n1.isRest == True or n2.isRest == True:
+            iL.append(None)
+            if n1.isRest == False:
+                n3 = self.noteFollowingNote(n2, allowRests = False)
+                if n3 is not None:
+                    int1 = interval.notesToInterval(n1, n3)
+                    n1.editorial.melodicIntervalOverRests = int1
+                    iORL.append(int1)
+        else:
+            try:
+                int1 = interval.notesToInterval(n1, n2)
+            except:
+                int1 = interval.notesToInterval(n1, n2)
+            iL.append(int1)
+            iORL.append(int1)
+            n1.editorial.melodicInterval = int1
+            n1.editorial.melodicIntervalOverRests = int1
+    self.__intervalList = iL
+    self.__intervalORList = iORL
+'''
+
+
+
+
+
+
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
@@ -207,8 +316,21 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+class TextExternal(unittest.TestCase):
+    
+    def runTest(self):
+        pass
+
+
+
+
 if __name__ == "__main__":
     music21.mainTest(Test)
+    
+    #studentExcercise = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/CounterpointExamplesCh9/9.4.C.xml')
+    #studentExcercise2 = labelEditorialMotion(studentExcercise)
+    #locateAbundantLeaps(studentExcercise2)
+
 #    studentExercise = corpus.parse('theoryExercises/triadExercise.xml')
 #    studentAnswers = [('E-', 'm'), ('D', 'M'), ('X', ''), ('X', ''), ('B', 'd'), 
 #                      ('G', 'M'), ('F#','M'),('C','m'),('X', ''),('D-', 'M'), ('G#', 'm'),
