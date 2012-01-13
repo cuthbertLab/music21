@@ -54,7 +54,7 @@ __all__ = ['base',
            'noteworthy','romanText', 'test', 'trecento', 'midi', 
            
            # individual modules
-           'articulations', 'bar',
+           'articulations', 'bar', 'beam',
            'chord', 'chordTables', 'clef','common', 'converter',
            'defaults', 'derivation', 'duration', 'dynamics',
            'editorial', 'environment', 
@@ -69,6 +69,7 @@ __all__ = ['base',
            'serial', 'sieve', 'stream', 
            'tempo', 'text', 'tie', 'tinyNotation', 
            'voiceLeading', 'volume',
+           'xmlnode',
         ]
 
 

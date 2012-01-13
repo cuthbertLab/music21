@@ -24,9 +24,9 @@ To create a :class:`~music21.scale.ScalaScale` instance, simply provide a root p
 ['mbira_banda.scl', 'mbira_banda2.scl', 'mbira_gondo.scl', 'mbira_kunaka.scl', 'mbira_kunaka2.scl', 'mbira_mude.scl', 'mbira_mujuru.scl', 'mbira_zimb.scl']
 
 
-Most people
+For most people you'll want to do something like this:
 
->>> sc = scale.ScalaScale('a4', mbiraScales[0])
+>>> sc = scale.ScalaScale('a4', 'mbira_banda.scl')
 >>> sc.pitches
 [A4, B4(-15c), C#5(-11c), D#5(-7c), E~5(+6c), F#5(+14c), G~5(+1c), B-5(+2c)]
 
@@ -109,11 +109,11 @@ class ScalaPitch(object):
     '''Representation of a scala pitch notation
 
     >>> from music21 import *
-    >>> sp = ScalaPitch(' 1066.667 cents')
+    >>> sp = scala.ScalaPitch(' 1066.667 cents')
     >>> print sp.parse()
     1066.667
 
-    >>> sp = ScalaPitch(' 2/1')
+    >>> sp = scala.ScalaPitch(' 2/1')
     >>> sp.parse()
     1200.0
     >>> sp.parse('100.0 C#')
@@ -295,7 +295,7 @@ class ScalaFile(object):
     Interface for reading and writing scala files. On reading, returns a :class:`~music21.scala.ScalaStorage` object.
 
     >>> from music21 import *
-    >>> sf = ScalaFile() 
+    >>> sf = scala.ScalaFile() 
     '''
     
     def __init__(self, data=None): 
@@ -312,8 +312,6 @@ class ScalaFile(object):
 
     def openFileLike(self, fileLike):
         '''Assign a file-like object, such as those provided by StringIO, as an open file object.
-
-        >>> fileLikeOpen = StringIO.StringIO()
         '''
         self.file = fileLike # already 'open'
     

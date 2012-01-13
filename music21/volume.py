@@ -204,7 +204,7 @@ class Volume(object):
 
         The `velocityIsRelative` tag determines if the velocity value includes contextual values, such as dynamics and and accents, or not. 
 
-        >>> from music21 import stream, volume, note
+        >>> from music21 import *
         >>> s = stream.Stream()
         >>> s.repeatAppend(note.Note('d3', quarterLength=.5), 8)
         >>> s.insert([0, dynamics.Dynamic('p'), 1, dynamics.Dynamic('mp'), 2, dynamics.Dynamic('mf'), 3, dynamics.Dynamic('f')])
@@ -311,9 +311,6 @@ class Volume(object):
 
     realized = property(getRealized, doc='''
         Return the realized unit-interval scalar for this Volume
-
-        >>> from music21 import *
-        >>> 
         ''')
 
     

@@ -240,7 +240,8 @@ class Graph(object):
 
     def __init__(self, *args, **keywords):
         '''
-        >>> a = Graph(title='a graph of some data to be given soon', tickFontSize = 9)
+        >>> from music21 import *
+        >>> a = graph.Graph(title='a graph of some data to be given soon', tickFontSize = 9)
         >>> a.setData(['some', 'arbitrary', 'data', 14, 9.04, None])
         '''
         try:
@@ -972,7 +973,11 @@ class GraphHorizontalBar(Graph):
 
 class GraphHorizontalBarWeighted(Graph):
     def __init__(self, *args, **keywords):
-        '''Numerous horizontal bars in discrete channels, where bars can be incomplete and/or overlap, and can have different heights and colors within their respective channel.
+        '''
+        Numerous horizontal bars in discrete channels, 
+        where bars can be incomplete and/or overlap, and 
+        can have different heights and colors within their 
+        respective channel.
         '''
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']

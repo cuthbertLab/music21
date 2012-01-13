@@ -114,6 +114,7 @@ def realizeChordSymbolDurations(piece):
     '''Returns Music21 score object with duration attribute of chord symbols correctly set. 
     Duration of chord symbols is based on the surrounding chord symbols; The chord symbol
     continues duration until another chord symbol is located or the piece ends.
+
     >>> from music21 import *
     >>> s = stream.Score()
     >>> s.append(harmony.ChordSymbol())
@@ -121,6 +122,7 @@ def realizeChordSymbolDurations(piece):
     >>> s.append(harmony.ChordSymbol())
     >>> s.repeatAppend(note.Note('C'), 4)
     >>> s = s.makeMeasures()
+
     >>> harmony.realizeChordSymbolDurations(s).show('text')
     {0.0} <music21.clef.TrebleClef>
     {0.0} <music21.meter.TimeSignature 4/4>
@@ -136,7 +138,8 @@ def realizeChordSymbolDurations(piece):
     {7.0} <music21.note.Note C>
     {8.0} <music21.bar.Barline style=final>
     
-    If only one chord symbol object present:
+
+    If only one chord symbol object is present:
 
     >>> s = stream.Score()
     >>> s.append(harmony.ChordSymbol())
@@ -151,10 +154,12 @@ def realizeChordSymbolDurations(piece):
     {2.0} <music21.note.Note C>
     {3.0} <music21.note.Note C>
     {4.0} <music21.bar.Barline style=final>
+
        
-    If chord symbol object exists followed by many notes, duration represents all those notes
+    If a ChordSymbol object exists followed by many notes, duration represents all those notes
     (how else can the computer know to end the chord? if there's not chord following it other than
     end the chord at the end of the piece?)
+
     >>> s = stream.Score()
     >>> s.repeatAppend(note.Note('C'), 4)
     >>> s.append(harmony.ChordSymbol())
@@ -248,7 +253,7 @@ class ChordStepModification(object):
         using a series of degree elements together with a root.
         -->
         
-    >>> from music21 import harmony
+    >>> from music21 import *
     >>> hd = harmony.ChordStepModification('add', 4)
     >>> hd
     <music21.harmony.ChordStepModification modType=add degree=4 interval=None>
@@ -444,15 +449,16 @@ class Harmony(music21.Music21Object):
         for altered. It is a list of lists of two units, the pitch and the degree. The list is 
         not ordered.
         
-        >>> h = music21.harmony.ChordSymbol('CMaj7')
+        >>> from music21 import *
+        >>> h = harmony.ChordSymbol('CMaj7')
         >>> h.getPitchesAndDegrees()
         [[C3, '1'], [E3, '3'], [G3, '5'], [B3, '7']]
         
-        >>> h = music21.harmony.ChordSymbol('Dm7/Fomit5')
+        >>> h = harmony.ChordSymbol('Dm7/Fomit5')
         >>> h.getPitchesAndDegrees()
         [[D4, '1'], [F3, '-3'], [C4, '-7']]
         
-        >>> h = music21.harmony.ChordSymbol('Dm7/F')
+        >>> h = harmony.ChordSymbol('Dm7/F')
         >>> h.getPitchesAndDegrees()
         [[D4, '1'], [F3, '-3'], [A3, '5'], [C4, '-7']]
         '''
@@ -465,7 +471,9 @@ class Harmony(music21.Music21Object):
     
     def getDegrees(self):
         '''Return list of all the degrees associated with the pitches of the Harmony Chord
-        >>> h = music21.harmony.ChordSymbol('Dm7/F')
+        
+        >>> from music21 import *
+        >>> h = harmony.ChordSymbol('Dm7/F')
         >>> h.getDegrees()
         ['1', '-3', '5', '-7']
         '''
@@ -615,113 +623,114 @@ class ChordSymbol(Harmony):
     for both Chord Symbol objects instantiated from music xml and directly with music21.
     
     The music xml-based approach to instantiating Chord Symbol objects:
-     >>> from music21 import *
-     >>> cs = harmony.ChordSymbol(kind='minor',kindStr = 'm', root='C', bass = 'E')
-     >>> cs
-     <music21.harmony.ChordSymbol kind=minor (m) root=C bass=E inversion=None duration=0.0>
-     >>> cs.kind
-     'minor'
-     >>> cs.root
-     C
-     >>> cs.bass
-     E
+     
+    >>> from music21 import *
+    >>> cs = harmony.ChordSymbol(kind='minor',kindStr = 'm', root='C', bass = 'E')
+    >>> cs
+    <music21.harmony.ChordSymbol kind=minor (m) root=C bass=E inversion=None duration=0.0>
+    >>> cs.kind
+    'minor'
+    >>> cs.root
+    C
+    >>> cs.bass
+    E
     
-     The second approach to creating a Chord Symbol object, by passing a regular expression:
-     >>> harmony.ChordSymbol('C').chord.pitches
-     [C3, E3, G3]
-     >>> harmony.ChordSymbol('Cm').chord.pitches
-     [C3, E-3, G3]
-     >>> harmony.ChordSymbol('C+').chord.pitches
-     [C3, E3, G#3]
-     >>> harmony.ChordSymbol('Cdim').chord.pitches
-     [C3, E-3, G-3]
-     >>> harmony.ChordSymbol('C7').chord.pitches
-     [C3, E3, G3, B-3]
-     >>> harmony.ChordSymbol('CM7').chord.pitches
-     [C3, E3, G3, B3]
-     >>> harmony.ChordSymbol('Cm7').chord.pitches
-     [C3, E-3, G3, B-3]
-     >>> harmony.ChordSymbol('Cdim7').chord.pitches
-     [C3, E-3, G-3, B--3]
-     >>> harmony.ChordSymbol('C7+').chord.pitches
-     [C3, E3, G#3, B-3]
-     >>> harmony.ChordSymbol('Cm7b5').chord.pitches #half-diminished
-     [C3, E3, G-3, B-3]
-     >>> harmony.ChordSymbol('CmMaj7').chord.pitches
-     [C3, E-3, G3, B3]
-     >>> harmony.ChordSymbol('C6').chord.pitches
-     [C3, E3, G3, A3]
-     >>> harmony.ChordSymbol('Cm6').chord.pitches
-     [C3, E-3, G3, A3]
-     >>> harmony.ChordSymbol('C9').chord.pitches
-     [C3, E3, G3, B-3, D4]
-     >>> harmony.ChordSymbol('CMaj9').chord.pitches
-     [C3, E3, G3, B3, D4]
-     >>> harmony.ChordSymbol('Cm9').chord.pitches
-     [C3, E-3, G3, B-3, D4]
-     >>> harmony.ChordSymbol('C11').chord.pitches
-     [C2, E2, G2, B-2, D3, F3]
-     >>> harmony.ChordSymbol('CMaj11').chord.pitches
-     [C2, E2, G2, B2, D3, F3]
-     >>> harmony.ChordSymbol('Cm11').chord.pitches
-     [C2, E-2, G2, B-2, D3, F3]
-     >>> harmony.ChordSymbol('C13').chord.pitches
-     [C2, E2, G2, B-2, D3, F3, A3]
-     >>> harmony.ChordSymbol('CMaj13').chord.pitches
-     [C2, E2, G2, B2, D3, F3, A3]
-     >>> harmony.ChordSymbol('Cm13').chord.pitches
-     [C2, E-2, G2, B-2, D3, F3, A3]
-     >>> harmony.ChordSymbol('Csus2').chord.pitches     
-     [C3, D3, G3]
-     >>> harmony.ChordSymbol('Csus4').chord.pitches 
-     [C3, F3, G3]
-     >>> harmony.ChordSymbol('CN6').chord.pitches
-     [C3, D-3, E3, G-3]
-     >>> harmony.ChordSymbol('CIt+6').chord.pitches     
-     [C3, F#3, A-3]
-     >>> harmony.ChordSymbol('CFr+6').chord.pitches 
-     [C3, D3, F#3, A-3]
-     >>> harmony.ChordSymbol('CGr+6').chord.pitches
-     [C3, E-3, F#3, A-3]
-     >>> harmony.ChordSymbol('Cpedal').chord.pitches     
-     [C3]
-     >>> harmony.ChordSymbol('Cpower').chord.pitches   
-     [C3, G3]
-     >>> harmony.ChordSymbol('Ftristan').chord.pitches 
-     [F3, G#3, B3, D#4]
-     >>> harmony.ChordSymbol('C/E').chord.pitches
-     [E3, G3, C4]
-     >>> harmony.ChordSymbol('Dm7/F').chord.pitches
-     [F3, A3, C4, D4]
-     
-     >>> harmony.ChordSymbol('Cadd2').chord.pitches
-     [C3, D3, E3, G3]
-     >>> harmony.ChordSymbol('C7omit3').chord.pitches
-     [C3, G3, B-3]
     
-     You can also create a Chord Symbol by writing out each degree, and any alterations to that degree:
-     You must explicitly indicate EACH degree (a triad is NOT necessarily implied)
+    The second approach to creating a Chord Symbol object, by passing a regular expression:
+    
+    >>> harmony.ChordSymbol('C').chord.pitches
+    [C3, E3, G3]
+    >>> harmony.ChordSymbol('Cm').chord.pitches
+    [C3, E-3, G3]
+    >>> harmony.ChordSymbol('C+').chord.pitches
+    [C3, E3, G#3]
+    >>> harmony.ChordSymbol('Cdim').chord.pitches
+    [C3, E-3, G-3]
+    >>> harmony.ChordSymbol('C7').chord.pitches
+    [C3, E3, G3, B-3]
+    >>> harmony.ChordSymbol('CM7').chord.pitches
+    [C3, E3, G3, B3]
+    >>> harmony.ChordSymbol('Cm7').chord.pitches
+    [C3, E-3, G3, B-3]
+    >>> harmony.ChordSymbol('Cdim7').chord.pitches
+    [C3, E-3, G-3, B--3]
+    >>> harmony.ChordSymbol('C7+').chord.pitches
+    [C3, E3, G#3, B-3]
+    >>> harmony.ChordSymbol('Cm7b5').chord.pitches #half-diminished
+    [C3, E3, G-3, B-3]
+    >>> harmony.ChordSymbol('CmMaj7').chord.pitches
+    [C3, E-3, G3, B3]
+    >>> harmony.ChordSymbol('C6').chord.pitches
+    [C3, E3, G3, A3]
+    >>> harmony.ChordSymbol('Cm6').chord.pitches
+    [C3, E-3, G3, A3]
+    >>> harmony.ChordSymbol('C9').chord.pitches
+    [C3, E3, G3, B-3, D4]
+    >>> harmony.ChordSymbol('CMaj9').chord.pitches
+    [C3, E3, G3, B3, D4]
+    >>> harmony.ChordSymbol('Cm9').chord.pitches
+    [C3, E-3, G3, B-3, D4]
+    >>> harmony.ChordSymbol('C11').chord.pitches
+    [C2, E2, G2, B-2, D3, F3]
+    >>> harmony.ChordSymbol('CMaj11').chord.pitches
+    [C2, E2, G2, B2, D3, F3]
+    >>> harmony.ChordSymbol('Cm11').chord.pitches
+    [C2, E-2, G2, B-2, D3, F3]
+    >>> harmony.ChordSymbol('C13').chord.pitches
+    [C2, E2, G2, B-2, D3, F3, A3]
+    >>> harmony.ChordSymbol('CMaj13').chord.pitches
+    [C2, E2, G2, B2, D3, F3, A3]
+    >>> harmony.ChordSymbol('Cm13').chord.pitches
+    [C2, E-2, G2, B-2, D3, F3, A3]
+    >>> harmony.ChordSymbol('Csus2').chord.pitches     
+    [C3, D3, G3]
+    >>> harmony.ChordSymbol('Csus4').chord.pitches 
+    [C3, F3, G3]
+    >>> harmony.ChordSymbol('CN6').chord.pitches
+    [C3, D-3, E3, G-3]
+    >>> harmony.ChordSymbol('CIt+6').chord.pitches     
+    [C3, F#3, A-3]
+    >>> harmony.ChordSymbol('CFr+6').chord.pitches 
+    [C3, D3, F#3, A-3]
+    >>> harmony.ChordSymbol('CGr+6').chord.pitches
+    [C3, E-3, F#3, A-3]
+    >>> harmony.ChordSymbol('Cpedal').chord.pitches     
+    [C3]
+    >>> harmony.ChordSymbol('Cpower').chord.pitches   
+    [C3, G3]
+    >>> harmony.ChordSymbol('Ftristan').chord.pitches 
+    [F3, G#3, B3, D#4]
+    >>> harmony.ChordSymbol('C/E').chord.pitches
+    [E3, G3, C4]
+    >>> harmony.ChordSymbol('Dm7/F').chord.pitches
+    [F3, A3, C4, D4]
+    >>> harmony.ChordSymbol('Cadd2').chord.pitches
+    [C3, D3, E3, G3]
+    >>> harmony.ChordSymbol('C7omit3').chord.pitches
+    [C3, G3, B-3]
+    
+    You can also create a Chord Symbol by writing out each degree, and any alterations to that degree:
+    You must explicitly indicate EACH degree (a triad is NOT necessarily implied)
 
-     >>> h = harmony.ChordSymbol('C35b7b9#11b13')
-     >>> h.chord.pitches
-     [C3, D-3, E3, F#3, G3, A-3, B-3]
+    >>> h = harmony.ChordSymbol('C35b7b9#11b13')
+    >>> h.chord.pitches
+    [C3, D-3, E3, F#3, G3, A-3, B-3]
+    
+    >>> harmony.ChordSymbol('C35911').chord.pitches
+    [C3, D3, E3, F3, G3]
+    
+    Ambiguity in notation: if the expression is ambiguous, for example 'Db35' (is this
+    the key of Db with a third and a fifth, or is this key of D with a flat 3 and 
+    normal fifth?) To prevent ambiguity, insert a comma after the root.
      
-     >>> harmony.ChordSymbol('C35911').chord.pitches
-     [C3, D3, E3, F3, G3]
-     
-     Ambiguity in notation: if the expression is ambiguous, for example 'Db35' (is this
-     the key of Db with a third and a fifth, or is this key of D with a flat 3 and 
-     normal fifth?) To prevent ambiguity, insert a comma after the root.
-     
-     >>> harmony.ChordSymbol('Db,35').chord.pitches
-     [D-3, F3, A-3]
-     >>> harmony.ChordSymbol('D,b35').chord.pitches
-     [D3, F3, A3]
-     >>> harmony.ChordSymbol('D,35b7b9#11b13').chord.pitches
-     [D3, E-3, F#3, G#3, A3, B-3, C4]
+    >>> harmony.ChordSymbol('Db,35').chord.pitches
+    [D-3, F3, A-3]
+    >>> harmony.ChordSymbol('D,b35').chord.pitches
+    [D3, F3, A3]
+    >>> harmony.ChordSymbol('D,35b7b9#11b13').chord.pitches
+    [D3, E-3, F#3, G#3, A3, B-3, C4]
 
-
-     '''
+    '''
     def __init__(self, figure = None, **keywords):
         Harmony.__init__(self, **keywords)
 
@@ -794,6 +803,7 @@ class ChordSymbol(Harmony):
             minor (minor third, perfect fifth)                           Cm        C-    Cmin
             augmented (major third, augmented fifth)                     C+        C#5
             diminished (minor third, diminished fifth)                   Cdim      Co
+
         Sevenths:
             dominant (major triad, minor seventh)                        C7        
             major-seventh (major triad, major seventh)                   CMaj7    CM7
@@ -802,29 +812,36 @@ class ChordSymbol(Harmony):
             augmented-seventh (augmented triad, minor seventh)           C7+      C7#5
             half-diminished (diminished triad, minor seventh)            Cm7b5    
             major-minor (minor triad, major seventh)                     CmMaj7
+
         Sixths:
             major-sixth (major triad, added sixth)                       C6
             minor-sixth (minor triad, added sixth)                       Cm6      Cmin6
+
         Ninths:
             dominant-ninth (dominant-seventh, major ninth)               C9        
             major-ninth (major-seventh, major ninth)                     CMaj9    CM9
             minor-ninth (minor-seventh, major ninth)                     Cm9      Cmin9
+
         11ths (usually as the basis for alteration):
             dominant-11th (dominant-ninth, perfect 11th)                 C11
             major-11th (major-ninth, perfect 11th)                       CMaj11   CM11
             minor-11th (minor-ninth, perfect 11th)                       Cm11     Cmin11
+
         13ths (usually as the basis for alteration):
             dominant-13th (dominant-11th, major 13th)                    C13
             major-13th (major-11th, major 13th)                          CMaj13
             minor-13th (minor-11th, major 13th)                          Cm13     Cmin13
+
         Suspended:
             suspended-second (major second, perfect fifth)               Csus2
             suspended-fourth (perfect fourth, perfect fifth)             Csus    Csus4
+
         Functional sixths:
             Neapolitan                                                   CN6
             Italian                                                      CIt+6
             French                                                       CFr+6
             German                                                       CGr+6
+
         Other:
             pedal (pedal-point bass)                                     Cpedal
             power (perfect fifth)                                        Cpower
@@ -836,8 +853,8 @@ class ChordSymbol(Harmony):
         
         Harmony Degree (Additions, Subtractions, Alterations)
         Add:
-        Cadd3 ('regular figure expression' 'add' 'scale degree')
-        Comit5 ('regular figure expression' 'omit' or 'subtract' scale degree')
+           Cadd3 ('regular figure expression' 'add' 'scale degree')
+           Comit5 ('regular figure expression' 'omit' or 'subtract' scale degree')
         
         Or just spell out the harmonies by degrees
     
@@ -1002,7 +1019,8 @@ class ChordSymbol(Harmony):
     def realizePitches(self):
         '''returns pitches in chordSymbol, also updates the chord with the correct
         bass, root, and inversion
-        >>> from music21 import harmony
+
+        >>> from music21 import *
         >>> harmony.ChordSymbol(root='C', bass='E', kind='major').chord.pitches
         [E3, G3, C4]
         >>> harmony.ChordSymbol(root='C', bass='G', kind='major').chord.pitches

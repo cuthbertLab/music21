@@ -110,7 +110,8 @@ def eratosthenes(firstCandidate = 2):
     to use this generator, create an instance and then call the .next() method
     on the instance
 
-    >>> a = eratosthenes()
+    >>> from music21 import *
+    >>> a = sieve.eratosthenes()
     >>> a.next()
     2
     >>> a.next()
@@ -121,7 +122,7 @@ def eratosthenes(firstCandidate = 2):
     initial primes smaller than this number:
 
 
-    >>> a = eratosthenes(95)
+    >>> a = sieve.eratosthenes(95)
     >>> a.next()
     97
     >>> a.next()
@@ -161,13 +162,14 @@ def rabinMiller(n):
 
     See also here: http://www.4dsolutions.net/ocn/numeracy2.html
 
-    >>> rabinMiller(234)
+    >>> from music21 import *
+    >>> sieve.rabinMiller(234)
     False
-    >>> rabinMiller(5)
+    >>> sieve.rabinMiller(5)
     True
-    >>> rabinMiller(4)
+    >>> sieve.rabinMiller(4)
     False
-    >>> rabinMiller(123986234193)
+    >>> sieve.rabinMiller(123986234193)
     False
 
     """
@@ -219,10 +221,11 @@ def discreteBinaryPad(series, fixRange=None):
     the first entry (signifying 3), 0s for the next six entries (signifying 
     4-9), a 1 (for 10), a 0 (for 11), and a 1 (for 12).  
 
-    >>> discreteBinaryPad([3,10,12])
+    >>> from music21 import *
+    >>> sieve.discreteBinaryPad([3,10,12])
     [1, 0, 0, 0, 0, 0, 0, 1, 0, 1]
 
-    >>> discreteBinaryPad([3,4,5])
+    >>> sieve.discreteBinaryPad([3,4,5])
     [1, 1, 1]
 
     """
@@ -256,7 +259,8 @@ def unitNormRange(series, fixRange=None):
     according to their distance between these two units.  For instance, for 0, 3, 4
     the middle entry will be 0.75 since 3 is 3/4 of the distance between 0 and 4:
 
-    >>> unitNormRange([0,3,4])
+    >>> from music21 import *
+    >>> sieve.unitNormRange([0,3,4])
     [0.0, 0.75, 1.0]
     
     
@@ -264,7 +268,7 @@ def unitNormRange(series, fixRange=None):
     1 and 4
 
 
-    >>> unitNormRange([1,3,4])
+    >>> sieve.unitNormRange([1,3,4])
     [0.0, 0.666..., 1.0]
 
     
@@ -296,13 +300,14 @@ def unitNormEqual(parts):
     """Given a certain number of parts, return a list unit-interval values 
     between 0 and 1, with as many divisions as parts; 0 and 1 are always inclusive.
 
-    >>> unitNormEqual(3)
+    >>> from music21 import *
+    >>> sieve.unitNormEqual(3)
     [0.0, 0.5, 1]
     
     
     If parts is 0 or 1, then a single entry of [0] is given:
     
-    >>> unitNormEqual(1)
+    >>> sieve.unitNormEqual(1)
     [0]
     
     """
@@ -323,19 +328,20 @@ def unitNormStep(step, a=0, b=1, normalized=True):
 
     Note that returned values are by default normalized within the unit interval.
 
-    >>> unitNormStep(.5, 0, 1)
+    >>> from music21 import *
+    >>> sieve.unitNormStep(.5, 0, 1)
     [0.0, 0.5, 1]
 
-    >>> unitNormStep(.5, -1, 1)
+    >>> sieve.unitNormStep(.5, -1, 1)
     [0.0, 0.25, 0.5, 0.75, 1]
 
-    >>> unitNormStep(.5, -1, 1, normalized=False)
+    >>> sieve.unitNormStep(.5, -1, 1, normalized=False)
     [-1, -0.5, 0.0, 0.5, 1.0]
 
-    >>> post = unitNormStep(.25, 0, 20)
+    >>> post = sieve.unitNormStep(.25, 0, 20)
     >>> len(post)
     81
-    >>> post = unitNormStep(.25, 0, 20, normalized=False)
+    >>> post = sieve.unitNormStep(.25, 0, 20, normalized=False)
     >>> len(post)
     81
 
@@ -372,7 +378,8 @@ def _gcd(a, b):
     i.e., greatest number that is a factor of both numbers
     euclides algorithm
 
-    >>> _gcd(20, 30)
+    >>> from music21 import *
+    >>> sieve._gcd(20, 30)
     10
     """
     # alt implementation
@@ -393,10 +400,11 @@ def _gcd(a, b):
 def _lcm(a, b):
     """find lowest common multiple of a,b
 
-    >>> _lcm(30,20)
+    >>> from music21 import *
+    >>> sieve._lcm(30,20)
     60
     """
-    # // forcers integer style division (no remainder)
+    # // forces integer style division (no remainder)
     return abs(a*b) / _gcd(a,b) 
 
 def _lcmRecurse(filter):
@@ -449,8 +457,9 @@ class PrimeSegment(object):
     def __init__(self, start, length):
         """A generator of prime number segments, given a start value and desired length of primes. 
 
-        >>> a = PrimeSegment(3, 20)
-        >>> a()
+        >>> from music21 import *
+        >>> ps = sieve.PrimeSegment(3, 20)
+        >>> ps()
         [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73]
         """
         self.seg = []
@@ -540,7 +549,8 @@ class Residual(object):
     """
     def __init__(self, m, shift=0, neg=0, z=None):
         """
-        >>> a = Residual(3, 2)
+        >>> from music21 import *
+        >>> resid = sieve.Residual(3, 2)
         """
         # get a default range, can be changed later
         # is an actual range and not start/end points b/c when producing a not (-)
@@ -585,8 +595,8 @@ class Residual(object):
         within the integer range provided by z
         format can be 'int' or 'bin', for integer or binary
 
-
-        >>> a = Residual(3, 2)
+        >>> from music21 import *
+        >>> a = sieve.Residual(3, 2)
         >>> a.segment(3)
         [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44, 47, 50, 53, 56, 59, 62, 65, 68, 71, 74, 77, 80, 83, 86, 89, 92, 95, 98]
         >>> a.segment(3, range(3,15))
@@ -629,7 +639,8 @@ class Residual(object):
     def period(self):
         """period is M; obvious, but nice for completeness
 
-        >>> a = Residual(3, 2)
+        >>> from music21 import *
+        >>> a = sieve.Residual(3, 2)
         >>> a.period()
         3
         """
@@ -647,7 +658,8 @@ class Residual(object):
     def __call__(self, n=0, z=None, format=None):
         """calls self.segment(); uses _segmentFormat
 
-        >>> a = Residual(3, 2)
+        >>> from music21 import *
+        >>> a = sieve.Residual(3, 2)
         >>> a()
         [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44, 47, 50, 53, 56, 59, 62, 65, 68, 71, 74, 77, 80, 83, 86, 89, 92, 95, 98]
         """ # if z is None, uses self._z
@@ -671,7 +683,8 @@ class Residual(object):
     def __str__(self):
         """str representation using M(n+shift) style notation
 
-        >>> a = Residual(3, 2)
+        >>> from music21 import *
+        >>> a = sieve.Residual(3, 2)
         >>> str(a)
         '3@2'
         """
@@ -728,8 +741,9 @@ class Residual(object):
         returns a new Residual class
         cannot be done if R under complementation
 
-        >>> a = Residual(3, 2)
-        >>> b = Residual(5, 1)
+        >>> from music21 import *
+        >>> a = sieve.Residual(3, 2)
+        >>> b = sieve.Residual(5, 1)
         >>> c = a & b
         >>> str(c)
         '15@11'
@@ -799,15 +813,16 @@ class CompressionSegment(object):
 
     def __init__(self, src, z=None):
         """
-        >>> a = CompressionSegment([3,4,5,6,7,8,13,19])
+        >>> from music21 import *
+        >>> a = sieve.CompressionSegment([3,4,5,6,7,8,13,19])
         >>> str(a)
         '6@1|7@6|8@5|9@4|10@3|11@8'
 
-        >>> b = CompressionSegment([0, 2, 4, 6, 8])
+        >>> b = sieve.CompressionSegment([0, 2, 4, 6, 8])
         >>> str(b)
         '2@0'
 
-        >>> c = CompressionSegment([0, 2, 4, 5, 7, 9, 11, 12])
+        >>> c = sieve.CompressionSegment([0, 2, 4, 5, 7, 9, 11, 12])
         >>> str(c)
         '5@2|5@4|6@5|7@0'
         """
@@ -847,7 +862,8 @@ class CompressionSegment(object):
     #---------------------------------------------------------------------------
     def __call__(self):
         """
-        >>> a = CompressionSegment([3,4,5,6,7,8])
+        >>> from music21 import *
+        >>> a = sieve.CompressionSegment([3,4,5,6,7,8])
         >>> b = a()
         >>> str(b[0])
         '1@0'
@@ -961,9 +977,10 @@ class Sieve(object):
     """
     def __init__(self, usrStr, z=None):
         """
-        >>> a = Sieve('3@11')
-        >>> b = Sieve('2&4&8|5')
-        >>> c = Sieve('(5|2)&4&8')
+        >>> from music21 import *
+        >>> a = sieve.Sieve('3@11')
+        >>> b = sieve.Sieve('2&4&8|5')
+        >>> c = sieve.Sieve('(5|2)&4&8')
         """
         # note: this z should only be used if usrStr is a str, and not a list
         if z is None and common.isStr(usrStr):
@@ -1108,9 +1125,10 @@ class Sieve(object):
     def __and__(self, other):
         """&, produces an intersection of two
 
-        >>> a = Sieve('3@11')
-        >>> b = Sieve('2&4&8|5')
-        >>> c = Sieve('(5|2)&4&8')
+        >>> from music21 import *
+        >>> a = sieve.Sieve('3@11')
+        >>> b = sieve.Sieve('2&4&8|5')
+        >>> c = sieve.Sieve('(5|2)&4&8')
         >>> d = a & b
         >>> str(d)
         '{2@0&4@0&8@0|5@0}&{3@2}'
@@ -1127,9 +1145,9 @@ class Sieve(object):
     def __or__(self, other):
         """|, produces a union 
 
-        >>> a = Sieve('3@11')
-        >>> b = Sieve('2&4&8|5')
-        >>> c = Sieve('(5|2)&4&8')
+        >>> from music21 import *
+        >>> a = sieve.Sieve('3@11')
+        >>> b = sieve.Sieve('2&4&8|5')
         >>> d = a | b
         >>> str(d)
         '{2@0&4@0&8@0|5@0}|{3@2}'
@@ -1501,11 +1519,12 @@ class Sieve(object):
     def segment(self, state=None, n=0, z=None, format=None):
         """Return a sieve segment in various formats.
 
-        >>> a = Sieve('3@11')
-        >>> b = Sieve('2&4&8|5')
-        >>> c = Sieve('(5|2)&4&8')
+        >>> from music21 import *
+        >>> a = sieve.Sieve('3@11')
         >>> a.segment('exp')
         [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44, 47, 50, 53, 56, 59, 62, 65, 68, 71, 74, 77, 80, 83, 86, 89, 92, 95, 98]
+
+        >>> c = sieve.Sieve('(5|2)&4&8')
         >>> c.segment('cmp', format='wid')
         [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]
         """
@@ -1565,13 +1584,14 @@ class Sieve(object):
     def period(self, state=None):
         """Return the period of the sieve.
 
-        >>> a = Sieve('3@11')
+        >>> from music21 import *
+        >>> a = sieve.Sieve('3@11')
         >>> a.period()
         3
-        >>> b = Sieve('2&4&8|5')
+        >>> b = sieve.Sieve('2&4&8|5')
         >>> b.period()
         40
-        >>> c = Sieve('(5|2)&4&8')
+        >>> c = sieve.Sieve('(5|2)&4&8')
         >>> c.period()
         40
         """
@@ -1599,7 +1619,8 @@ class Sieve(object):
     def collect(self, n, zMinimum, length, format, zStep=100):
         """Collect sieve segment points for the provided length and format. 
 
-        >>> a = Sieve('3@11')
+        >>> from music21 import *
+        >>> a = sieve.Sieve('3@11')
         >>> a.collect(10, 100, 10, 'int')
         [102, 105, 108, 111, 114, 117, 120, 123, 126, 129]
         """
@@ -1683,7 +1704,8 @@ class PitchSieve(object):
     def __init__(self, sieveString, pitchLower=None, 
                 pitchUpper=None, pitchOrigin=None, eld=1):
         """
-        >>> a = PitchSieve('4@7')
+        >>> from music21 import *
+        >>> a = sieve.PitchSieve('4@7')
         >>> a()
         [E-3, G3, B3, E-4, G4, B4]
         """
@@ -1719,15 +1741,16 @@ class PitchSieve(object):
     def __call__(self):
         """Return a sieve segment as a list of :class:`music21.pitch.Pitch` objects, mapped to the range between pitchLower and pitchUpper.
 
-        >>> a = PitchSieve('4@7&5@4')
+        >>> from music21 import *
+        >>> a = sieve.PitchSieve('4@7&5@4')
         >>> a()
         [G4]
 
-        >>> a = PitchSieve('13@3|13@6|13@9', 'c1', 'c10')
+        >>> a = sieve.PitchSieve('13@3|13@6|13@9', 'c1', 'c10')
         >>> a()
         [E-1, F#1, A1, E2, G2, B-2, F3, G#3, B3, F#4, A4, C5, G5, B-5, C#6, G#6, B6, D7, A7, C8, E-8, B-8, C#9, E9, B9]
 
-        >>> a = PitchSieve('3@0', 'c4', 'c5', 'c4', .5)
+        >>> a = sieve.PitchSieve('3@0', 'c4', 'c5', 'c4', .5)
         >>> a.eld
         0.5
 
@@ -1737,7 +1760,7 @@ class PitchSieve(object):
         >>> a()
         [C4, C#~4, E-4, E~4, F#4, G~4, A4, B`4, C5]
 
-        >>> a = PitchSieve('3@0', 'c4', 'c5', 'c#4', .5)
+        >>> a = sieve.PitchSieve('3@0', 'c4', 'c5', 'c#4', .5)
         >>> a()
         [C~4, D4, E`4, F4, F#~4, G#4, A~4, B4]
         >>> # [0.5, 2.0, 3.5, 5.0, 6.5, 8.0, 9.5, 11.0]
@@ -1776,11 +1799,12 @@ class PitchSieve(object):
     def getIntervalSequence(self):
         '''Return a list of Interval objects that defines the complete structure of this :class:`music21.sieve.Sieve`.  
 
-        >>> a = PitchSieve('3@0')
+        >>> from music21 import *
+        >>> a = sieve.PitchSieve('3@0')
         >>> a.getIntervalSequence()
         [<music21.interval.Interval m3>]
 
-        >>> a = PitchSieve('3@0|7@0')
+        >>> a = sieve.PitchSieve('3@0|7@0')
         >>> a.sieveObject.segment()
         [0, 3, 6, 7, 9, 12, 14, 15, 18, 21, 24, 27, 28, 30, 33, 35, 36, 39, 42, 45, 48, 49, 51, 54, 56, 57, 60, 63, 66, 69, 70, 72, 75, 77, 78, 81, 84, 87, 90, 91, 93, 96, 98, 99]
         >>> a.sieveObject.period()
@@ -1788,7 +1812,7 @@ class PitchSieve(object):
         >>> a.getIntervalSequence()
         [<music21.interval.Interval m3>, <music21.interval.Interval m3>, <music21.interval.Interval m2>, <music21.interval.Interval M2>, <music21.interval.Interval m3>, <music21.interval.Interval M2>, <music21.interval.Interval m2>, <music21.interval.Interval m3>, <music21.interval.Interval m3>]
 
-        >>> b = PitchSieve('(-3@2 & 4) | (-3@1 & 4@1) | (3@2 & 4@2) | (-3 & 4@3)') # major scale
+        >>> b = sieve.PitchSieve('(-3@2 & 4) | (-3@1 & 4@1) | (3@2 & 4@2) | (-3 & 4@3)') # major scale
         >>> b.getIntervalSequence()
         [<music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval m2>, <music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval m2>]
         '''

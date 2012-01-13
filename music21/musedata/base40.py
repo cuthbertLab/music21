@@ -155,19 +155,19 @@ def base40DeltaToInterval(delta):
     a quadruple augmented unison) just would not occur.
 
     >>> from music21 import *
-    >>> base40DeltaToInterval(4)
+    >>> musedata.base40.base40DeltaToInterval(4)
     <music21.interval.Interval d2>
-    >>> base40DeltaToInterval(11)
+    >>> musedata.base40.base40DeltaToInterval(11)
     <music21.interval.Interval m3>
-    >>> base40DeltaToInterval(23)
+    >>> musedata.base40.base40DeltaToInterval(23)
     <music21.interval.Interval P5>
-    >>> base40DeltaToInterval(-23)
+    >>> musedata.base40.base40DeltaToInterval(-23)
     <music21.interval.Interval P-5>
-    >>> base40DeltaToInterval(52)
+    >>> musedata.base40.base40DeltaToInterval(52)
     <music21.interval.Interval M10>
-    >>> base40DeltaToInterval(-52)
+    >>> musedata.base40.base40DeltaToInterval(-52)
     <music21.interval.Interval M-10>    
-    >>> base40DeltaToInterval(77)
+    >>> musedata.base40.base40DeltaToInterval(77)
     Traceback (most recent call last):
     Base40Exception: Interval not handled by Base40 37
     '''
@@ -204,14 +204,14 @@ def base40ToPitch(base40Num):
     each time the interval between two letters is a whole step.
     
     >>> from music21 import *
-    >>> base40ToPitch(1)
+    >>> musedata.base40.base40ToPitch(1)
     C--1
-    >>> base40ToPitch(40)
+    >>> musedata.base40.base40ToPitch(40)
     B##1
-    >>> base40ToPitch(23)
+    >>> musedata.base40.base40ToPitch(23)
     Traceback (most recent call last):
     Base40Exception: Pitch name not assigned to this Base40 number 23
-    >>> base40ToPitch(186)
+    >>> musedata.base40.base40ToPitch(186)
     G5
     '''
     p = pitch.Pitch()
@@ -236,11 +236,11 @@ def pitchToBase40(pitchToConvert):
     and half sharps or triple flats and triple sharps.
 
     >>> from music21 import *
-    >>> pitchToBase40(pitch.Pitch('C--5'))
+    >>> musedata.base40.pitchToBase40(pitch.Pitch('C--5'))
     161
-    >>> pitchToBase40('F##4')
+    >>> musedata.base40.pitchToBase40('F##4')
     142
-    >>> pitchToBase40('F###4')
+    >>> musedata.base40.pitchToBase40('F###4')
     Traceback (most recent call last):
     Base40Exception: Base40 cannot handle this pitch F###4
     '''
@@ -267,16 +267,16 @@ def base40Interval(base40NumA, base40NumB):
     number doesn't correspond to a pitch name.
 
     >>> from music21 import *
-    >>> base40Interval(163,191)
+    >>> musedata.base40.base40Interval(163,191)
     <music21.interval.Interval m6>
-    >>> base40Interval(186,174)      #Descending M3
+    >>> musedata.base40.base40Interval(186,174)      #Descending M3
     <music21.interval.Interval M-3> 
-    >>> base40Interval(1,5)          #INCORRECT!
+    >>> musedata.base40.base40Interval(1,5)          #INCORRECT!
     <music21.interval.Interval d2> 
-    >>> base40Interval(1,3)
+    >>> musedata.base40.base40Interval(1,3)
     Traceback (most recent call last):
     Base40Exception: Interval not handled by Base40 2
-    >>> base40Interval(2,6)
+    >>> musedata.base40.base40Interval(2,6)
     Traceback (most recent call last):
     Base40Exception: Pitch name not assigned to this Base40 number 6 Interval does not exist
     '''
@@ -309,20 +309,20 @@ def base40ActualInterval(base40NumA, base40NumB):
     by music21.
 
     >>> from music21 import *
-    >>> base40ActualInterval(163,191)
+    >>> musedata.base40.base40ActualInterval(163,191)
     <music21.interval.Interval m6>
-    >>> base40ActualInterval(186,174) #Descending M3
+    >>> musedata.base40.base40ActualInterval(186,174) #Descending M3
     <music21.interval.Interval M-3> 
-    >>> base40ActualInterval(1,5)
+    >>> musedata.base40.base40ActualInterval(1,5)
     <music21.interval.Interval AAAA1>
-    >>> base40ActualInterval(1,3)
+    >>> musedata.base40.base40ActualInterval(1,3)
     <music21.interval.Interval AA1>
-    >>> base40ActualInterval(2,6)
+    >>> musedata.base40.base40ActualInterval(2,6)
     Traceback (most recent call last):
     Base40Exception: Pitch name not assigned to this Base40 number 6
 
     OMIT_FROM_DOCS
-    >>> base40ActualInterval(12,6)
+    >>> musedata.base40.base40ActualInterval(12,6)
     Traceback (most recent call last):
     Base40Exception: Pitch name not assigned to this Base40 number 12
     '''

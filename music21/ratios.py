@@ -25,7 +25,8 @@ class IntervalRatio(object):
     
     def __init__(self, numerator = 1, denominator = 1):
         '''
-        >>> a = IntervalRatio(4,3)
+        >>> from music21 import *
+        >>> a = ratios.IntervalRatio(4,3)
         '''
         self.unreduced_num = Decimal(numerator)
         self.unreduced_den = Decimal(denominator)

@@ -42,7 +42,8 @@ class PageLayout(music21.Music21Object):
 
     PageLayout objects may be found on Measure or Part Streams.    
 
-    >>> pl = PageLayout(pageNumber = 4, leftMargin=234, rightMargin=124, pageHeight=4000, pageWidth=3000, isNew=True)
+    >>> from music21 import *
+    >>> pl = layout.PageLayout(pageNumber = 4, leftMargin=234, rightMargin=124, pageHeight=4000, pageWidth=3000, isNew=True)
     >>> pl.pageNumber
     4
     >>> pl.rightMargin
@@ -86,9 +87,12 @@ class PageLayout(music21.Music21Object):
         '''Used for musicxml conversion: Return a mxPrint object for a PageLayout object.
         General users should not need to call this method.
 
-        >>> pl = PageLayout(pageNumber = 5, leftMargin=234, rightMargin=124, pageHeight=4000, pageWidth=3000, isNew=True)
+        >>> from music21 import *
+        >>> pl = layout.PageLayout(pageNumber = 5, leftMargin=234, rightMargin=124, pageHeight=4000, pageWidth=3000, isNew=True)
         >>> mxPrint = pl.mx
-        >>> plAlt = PageLayout()
+
+
+        >>> plAlt = layout.PageLayout()
         >>> plAlt.mx = mxPrint # transfer
         >>> plAlt.pageNumber
         5
@@ -147,7 +151,7 @@ class PageLayout(music21.Music21Object):
     def _setMX(self, mxPrint):
         '''Given an mxPrint object, set object data for the print section of a page layout object
 
-        >>> from music21 import musicxml
+        >>> from music21 import *
         >>> mxPrint = musicxml.Print()
         >>> mxPrint.set('new-page', 'yes')
         >>> mxPrint.set('page-number', 5)
@@ -159,7 +163,7 @@ class PageLayout(music21.Music21Object):
         >>> mxPageLayout.append(mxPageMargins) 
         >>> mxPrint.append(mxPageLayout)
 
-        >>> pl = PageLayout()
+        >>> pl = layout.PageLayout()
         >>> pl.mx = mxPrint
         >>> pl.isNew
         True
@@ -225,7 +229,8 @@ class SystemLayout(music21.Music21Object):
 
     SystemLayout objects may be found on Measure or Part Streams.    
 
-    >>> sl = SystemLayout(leftMargin=234, rightMargin=124, distance=3, isNew=True)
+    >>> from music21 import *
+    >>> sl = layout.SystemLayout(leftMargin=234, rightMargin=124, distance=3, isNew=True)
     >>> sl.distance
     3
     >>> sl.rightMargin
@@ -266,9 +271,11 @@ class SystemLayout(music21.Music21Object):
     def _getMX(self):
         '''Return a mxPrint object
 
-        >>> sl = SystemLayout(leftmargin=234, rightmargin=124, distance=3, isNew=True)
+        >>> from music21 import *
+        >>> sl = layout.SystemLayout(leftmargin=234, rightmargin=124, distance=3, isNew=True)
         >>> mxPrint = sl.mx
-        >>> slAlt = SystemLayout()
+        
+        >>> slAlt = layout.SystemLayout()
         >>> slAlt.mx = mxPrint # transfer
         >>> slAlt.leftMargin
         234.0
@@ -319,7 +326,7 @@ class SystemLayout(music21.Music21Object):
     def _setMX(self, mxPrint):
         '''Given an mxPrint object, set object data
 
-        >>> from music21 import musicxml
+        >>> from music21 import *
         >>> mxPrint = musicxml.Print()
         >>> mxPrint.set('new-system', 'yes')
         >>> mxSystemLayout = musicxml.SystemLayout()
@@ -330,7 +337,7 @@ class SystemLayout(music21.Music21Object):
         >>> mxSystemLayout.append(mxSystemMargins) 
         >>> mxPrint.append(mxSystemLayout)
 
-        >>> sl = SystemLayout()
+        >>> sl = layout.SystemLayout()
         >>> sl.mx = mxPrint
         >>> sl.isNew
         True
@@ -381,7 +388,9 @@ class StaffGroupException(spanner.SpannerException):
 
 #-------------------------------------------------------------------------------
 class StaffGroup(spanner.Spanner):
-    '''A StaffGroup defines a collection of one or more Parts, specifying that they should be shown together with a bracket, brace, or other symbol, and may have a common name.
+    '''A StaffGroup defines a collection of one or more Parts, 
+    specifying that they should be shown together with a bracket, 
+    brace, or other symbol, and may have a common name.
     '''
     def __init__(self, *arguments, **keywords):
         spanner.Spanner.__init__(self, *arguments, **keywords)

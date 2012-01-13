@@ -120,7 +120,9 @@ class Tag(object):
     '''
     def __init__(self, tag, cdFlag=False, className=None):
         '''
-        >>> t = Tag('note')
+        >>> from music21 import *
+
+        >>> t = musicxml.Tag('note')
         >>> t.start()
         >>> t.start() # catch double starts
         Traceback (most recent call last):
@@ -175,7 +177,8 @@ class TagLib(object):
     '''
     def __init__(self):
         '''
-        >>> tl = TagLib()
+        >>> from music21 import *
+        >>> tl = musicxml.TagLib()
         >>> tl['voice'].tag
         'voice'
         >>> tl['voice'].status # open or closed
@@ -491,7 +494,9 @@ class MusicXMLElement(xmlnode.XMLNode):
         '''
         These tests are module specific and should be loaded as unittests, below
 
-        >>> a = MusicXMLElement()
+        >>> from music21 import *
+
+        >>> a = musicxml.MusicXMLElement()
         >>> a._convertNameToXml('groupAbbreviation')
         'group-abbreviation'
         >>> a._convertNameToXml('midiUnpitched')
@@ -501,7 +506,7 @@ class MusicXMLElement(xmlnode.XMLNode):
         >>> a._convertNameToXml('group-name-display')
         'group-name-display'
 
-        >>> a = MusicXMLElement()
+        >>> a = musicxml.MusicXMLElement()
         >>> a._convertNameFromXml('group-abbreviation')
         'groupAbbreviation'
         >>> a._convertNameFromXml('midi-unpitched')
@@ -513,7 +518,7 @@ class MusicXMLElement(xmlnode.XMLNode):
         >>> a._convertNameFromXml('group-name-display')
         'groupNameDisplay'
 
-        >>> a = MusicXMLElement()
+        >>> a = musicxml.MusicXMLElement()
         >>> len(a._publicAttributes())
         3
         >>> print(a._publicAttributes())
@@ -578,9 +583,10 @@ class MusicXMLElementList(MusicXMLElement):
         '''Used to combine component lists of objects. There may be other object
         attributes not on component list that are not 'added' with this method.
 
-        >>> a = MusicXMLElementList()
+        >>> from music21 import *
+        >>> a = musicxml.MusicXMLElementList()
         >>> a.componentList.append(1)
-        >>> b = MusicXMLElementList()
+        >>> b = musicxml.MusicXMLElementList()
         >>> b.componentList.append(2)
         >>> c = a + b
         >>> c.componentList
@@ -701,12 +707,13 @@ class Score(MusicXMLElementList):
     def getScorePart(self, partId):
         '''Get an instrument, as defined in a ScorePart object, from a Score. 
 
-        >>> a = Score()
+        >>> from music21 import *
+        >>> a = musicxml.Score()
         >>> a.setDefaults()
         >>> a.getScorePart('P3') == None
         True
         >>> from music21.musicxml import testPrimitive
-        >>> b = Document()
+        >>> b = musicxml.Document()
         >>> b.read(testPrimitive.pitches01a)
         >>> b.score.getScorePart(b.score.getPartNames().keys()[0])
         <score-part id=P1 part-name=MusicXML Part>
@@ -725,12 +732,17 @@ class Score(MusicXMLElementList):
     def getPart(self, partId):
         ''' Get a part, given an id.
 
+        >>> from music21 import *
         >>> from music21.musicxml import testPrimitive
-        >>> b = Document()
+        >>> b = musicxml.Document()
         >>> b.read(testPrimitive.ALL[0])
         >>> c = b.score.getPart(b.score.getPartNames().keys()[0])
-        >>> isinstance(c, Part)
+        >>> c
+        <part id=P1 <measure width=983 number=1 <print <system-layout...
+        >>> isinstance(c, musicxml.Part)
         True
+        >>> isinstance(c, stream.Part)
+        False
         '''
         idFound = None
         partNames = self.getPartNames()    
@@ -764,7 +776,8 @@ class Score(MusicXMLElementList):
 class Work(MusicXMLElement):
     def __init__(self):
         '''
-        >>> a = Work()
+        >>> from music21 import *
+        >>> a = musicxml.Work()
         >>> a.tag
         'work'
         '''
@@ -789,7 +802,8 @@ class Work(MusicXMLElement):
 class Identification(MusicXMLElement):
     def __init__(self):
         '''
-        >>> a = Identification()
+        >>> from music21 import *
+        >>> a = musicxml.Identification()
         >>> a.tag
         'identification'
         '''
@@ -821,7 +835,8 @@ class Creator(MusicXMLElement):
     # types: composer, lyricist, and arranger
     def __init__(self):
         '''
-        >>> a = Creator()
+        >>> from music21 import *
+        >>> a = musicxml.Creator()
         >>> a.tag
         'creator'
         '''
@@ -1378,10 +1393,11 @@ class Direction(MusicXMLElementList):
     def getDynamicMark(self):
         '''Search this direction and determine if it contains a dynamic mark, return, otherwise, return None
 
-        >>> a = Direction()
-        >>> b = DirectionType()
-        >>> c = Dynamics()
-        >>> d = DynamicMark('f')
+        >>> from music21 import *
+        >>> a = musicxml.Direction()
+        >>> b = musicxml.DirectionType()
+        >>> c = musicxml.Dynamics()
+        >>> d = musicxml.DynamicMark('f')
         >>> c.append(d)
         >>> b.append(c)
         >>> a.append(b)
@@ -1415,9 +1431,10 @@ class Direction(MusicXMLElementList):
     def getMetronome(self):
         '''Search this direction and determine if it contains a dynamic mark.
 
-        >>> a = Direction()
-        >>> b = DirectionType()
-        >>> c = Metronome()
+        >>> from music21 import *
+        >>> a = musicxml.Direction()
+        >>> b = musicxml.DirectionType()
+        >>> c = musicxml.Metronome()
         >>> b.append(c)
         >>> a.append(b)
         >>> a.getMetronome() != None
@@ -1432,9 +1449,10 @@ class Direction(MusicXMLElementList):
     def getWedge(self):
         '''Search this direction and determine if it contains a dynamic mark.
 
-        >>> a = Direction()
-        >>> b = DirectionType()
-        >>> c = Wedge('crescendo')
+        >>> from music21 import *
+        >>> a = musicxml.Direction()
+        >>> b = musicxml.DirectionType()
+        >>> c = musicxml.Wedge('crescendo')
         >>> b.append(c)
         >>> a.append(b)
         >>> a.getWedge() != None
@@ -1457,9 +1475,10 @@ class Direction(MusicXMLElementList):
     def getWords(self):
         '''Search this direction and determine if it contains a Words entity.
 
-        >>> a = Direction()
-        >>> b = DirectionType()
-        >>> c = Words('crescendo')
+        >>> from music21 import *
+        >>> a = musicxml.Direction()
+        >>> b = musicxml.DirectionType()
+        >>> c = musicxml.Words('crescendo')
         >>> b.append(c)
         >>> a.append(b)
         >>> a.getWords() == [c]
@@ -1488,9 +1507,10 @@ class Direction(MusicXMLElementList):
     def getCoda(self):
         '''Search this direction and determine if it contains a coda mark.
 
-        >>> a = Direction()
-        >>> b = DirectionType()
-        >>> c = Coda()
+        >>> from music21 import *
+        >>> a = musicxml.Direction()
+        >>> b = musicxml.DirectionType()
+        >>> c = musicxml.Coda()
         >>> b.append(c)
         >>> a.append(b)
         >>> a.getCoda() != None
@@ -1513,9 +1533,10 @@ class Direction(MusicXMLElementList):
     def getSegno(self):
         '''Search this direction and determine if it contains a segno mark.
 
-        >>> a = Direction()
-        >>> b = DirectionType()
-        >>> c = Segno()
+        >>> from music21 import *
+        >>> a = musicxml.Direction()
+        >>> b = musicxml.DirectionType()
+        >>> c = musicxml.Segno()
         >>> b.append(c)
         >>> a.append(b)
         >>> a.getSegno() != None
@@ -1554,7 +1575,7 @@ class DirectionType(MusicXMLElementList):
 
 
 class Words(MusicXMLElement):
-    '''A direction tupe that can be used for arbitrary text expressions, and font formatting 
+    '''A direction type that can be used for arbitrary text expressions, and font formatting 
     '''
     def __init__(self, charData=None):
         MusicXMLElement.__init__(self)

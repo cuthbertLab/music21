@@ -15,6 +15,9 @@
 This module provides object representations of expressions, that is
 notational symbols such as Fermatas, Mordents, Trills, Turns, etc.
 which are stored under a Music21Object's .expressions attribute 
+
+It also includes representations of things such as TextExpressions which
+are better attached to the Stream itself.
 '''
 import copy
 import doctest, unittest

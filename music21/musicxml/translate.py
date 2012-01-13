@@ -983,7 +983,7 @@ def dynamicToMx(d):
     >>> from music21 import *
     >>> a = dynamics.Dynamic('ppp')
     >>> a._positionRelativeY = -10
-    >>> b = dynamicToMx(a)
+    >>> b = musicxml.translate.dynamicToMx(a)
     >>> b[0][0][0].get('tag')
     'ppp'
     '''
@@ -1017,6 +1017,7 @@ def mxToDynamicList(mxDirection):
     >>> mxDynamics.append(mxDynamicMark)
     >>> mxDirectionType.append(mxDynamics)
     >>> mxDirection.append(mxDirectionType)
+
     >>> a = dynamics.Dynamic()
     >>> a = musicxml.translate.mxToDynamicList(mxDirection)[0]
     >>> a.value
@@ -1358,7 +1359,7 @@ def instrumentToMx(i):
     '''
     >>> from music21 import *
     >>> i = instrument.Celesta()
-    >>> mxScorePart = instrumentToMx(i)
+    >>> mxScorePart = musicxml.translate.instrumentToMx(i)
     >>> len(mxScorePart.scoreInstrumentList)
     1
     >>> mxScorePart.scoreInstrumentList[0].instrumentName
@@ -1469,7 +1470,7 @@ def chordToMx(c):
     >>> e = a.pitches = [b, c, d]
     >>> len(e)
     3
-    >>> mxNoteList = chordToMx(a)
+    >>> mxNoteList = musicxml.translate.chordToMx(a)
     >>> len(mxNoteList) # get three mxNotes
     3
     >>> mxNoteList[0].get('chord')
@@ -1485,7 +1486,7 @@ def chordToMx(c):
     >>> h = pitch.Pitch('g3')
     >>> i = chord.Chord([h, g])
     >>> i.quarterLength = 2
-    >>> listOfMxNotes = chordToMx(i)
+    >>> listOfMxNotes = musicxml.translate.chordToMx(i)
     >>> listOfMxNotes[0].get('chord')
     False
     >>> listOfMxNotes[1].noteheadObj.get('charData')

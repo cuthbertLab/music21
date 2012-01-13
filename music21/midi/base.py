@@ -58,7 +58,8 @@ class MidiException(Exception):
 
 def charToBinary(char):
     '''Convert a char into its binary representation. Useful for debugging. 
-    >>> charToBinary('a')
+    >>> from music21 import *
+    >>> midi.charToBinary('a')
     '01100001'
     '''
     ascii = ord(char)
@@ -102,11 +103,12 @@ def getNumber(str, length):
 
     This will sum a length greater than 1 if desired.
 
-    >>> getNumber('test', 0)
+    >>> from music21 import *
+    >>> midi.getNumber('test', 0)
     (0, 'test')
-    >>> getNumber('test', 2)
+    >>> midi.getNumber('test', 2)
     (29797, 'st')
-    >>> getNumber('test', 4)
+    >>> midi.getNumber('test', 4)
     (1952805748, '')
     '''
     # MIDI uses big-endian for everything 
@@ -121,25 +123,26 @@ def getVariableLengthNumber(str):
 
     This necessary as Delta times are given with variable size, and thus may be if different numbers of characters.
 
-    >>> getVariableLengthNumber('A-u')
+    >>> from music21 import *
+    >>> midi.getVariableLengthNumber('A-u')
     (65, '-u')
-    >>> getVariableLengthNumber('-u')
+    >>> midi.getVariableLengthNumber('-u')
     (45, 'u')
-    >>> getVariableLengthNumber('u')
+    >>> midi.getVariableLengthNumber('u')
     (117, '')
 
-    >>> getVariableLengthNumber('test')
+    >>> midi.getVariableLengthNumber('test')
     (116, 'est')
-    >>> getVariableLengthNumber('E@-E')
+    >>> midi.getVariableLengthNumber('E@-E')
     (69, '@-E')
-    >>> getVariableLengthNumber('@-E')
+    >>> midi.getVariableLengthNumber('@-E')
     (64, '-E')
-    >>> getVariableLengthNumber('-E')
+    >>> midi.getVariableLengthNumber('-E')
     (45, 'E')
-    >>> getVariableLengthNumber('E')
+    >>> midi.getVariableLengthNumber('E')
     (69, '')
 
-    >>> getVariableLengthNumber('\\xff\\x7f')
+    >>> midi.getVariableLengthNumber('\\xff\\x7f')
     (16383, '')
     '''
     # from http://faydoc.tripod.com/formats/mid.htm
@@ -160,7 +163,8 @@ def getVariableLengthNumber(str):
 def getNumbersAsList(str):
     '''Translate each char into a number, return in a list. Used for reading data messages where each byte encodes a different discrete value. 
 
-    >>> getNumbersAsList('\\x00\\x00\\x00\\x03')
+    >>> from music21 import *
+    >>> midi.getNumbersAsList('\\x00\\x00\\x00\\x03')
     [0, 0, 0, 3]
     '''
     post = []
@@ -170,9 +174,10 @@ def getNumbersAsList(str):
 
 def putNumber(num, length): 
     '''
-    >>> putNumber(3, 4)
+    >>> from music21 import *
+    >>> midi.putNumber(3, 4)
     '\\x00\\x00\\x00\\x03'
-    >>> putNumber(0, 1)
+    >>> midi.putNumber(0, 1)
     '\\x00'
     '''
     lst = [] 
@@ -183,20 +188,21 @@ def putNumber(num, length):
 
 def putVariableLengthNumber(x): 
     '''
-    >>> putVariableLengthNumber(4)
+    >>> from music21 import *
+    >>> midi.putVariableLengthNumber(4)
     '\\x04'
-    >>> putVariableLengthNumber(127)
+    >>> midi.putVariableLengthNumber(127)
     '\\x7f'
-    >>> putVariableLengthNumber(0)
+    >>> midi.putVariableLengthNumber(0)
     '\\x00'
-    >>> putVariableLengthNumber(1024)
+    >>> midi.putVariableLengthNumber(1024)
     '\\x88\\x00'
-    >>> putVariableLengthNumber(8192)
+    >>> midi.putVariableLengthNumber(8192)
     '\\xc0\\x00'
-    >>> putVariableLengthNumber(16383)
+    >>> midi.putVariableLengthNumber(16383)
     '\\xff\\x7f'
 
-    >>> putVariableLengthNumber(-1)
+    >>> midi.putVariableLengthNumber(-1)
     Traceback (most recent call last):
     MidiException: cannot putVariableLengthNumber() when number is negative: -1
     '''
@@ -217,11 +223,12 @@ def putVariableLengthNumber(x):
 def putNumbersAsList(numList):
     '''Translate a list of numbers into a character byte strings. Used for encoding data messages where each byte encodes a different discrete value. 
 
-    >>> putNumbersAsList([0, 0, 0, 3])
+    >>> from music21 import *
+    >>> midi.putNumbersAsList([0, 0, 0, 3])
     '\\x00\\x00\\x00\\x03'
-    >>> putNumbersAsList([0, 0, 0, -3])
+    >>> midi.putNumbersAsList([0, 0, 0, -3])
     '\\x00\\x00\\x00\\xfd'
-    >>> putNumbersAsList([0, 0, 0, -1])
+    >>> midi.putNumbersAsList([0, 0, 0, -1])
     '\\x00\\x00\\x00\\xff'
     '''
     post = []
@@ -345,8 +352,9 @@ class MidiEvent(object):
 
     The `data` attribute is used for storing other messages, such as SEQUENCE_TRACK_NAME string values. 
 
-    >>> mt = MidiTrack(1)
-    >>> me1 = MidiEvent(mt)
+    >>> from music21 import *
+    >>> mt = midi.MidiTrack(1)
+    >>> me1 = midi.MidiEvent(mt)
     >>> me1.type = "NOTE_ON"
     >>> me1.channel = 1
     >>> me1.time = 200
@@ -355,7 +363,7 @@ class MidiEvent(object):
     >>> me1
     <MidiEvent NOTE_ON, t=200, track=1, channel=1, pitch=60, velocity=120>
 
-    >>> me2 = MidiEvent(mt)
+    >>> me2 = midi.MidiEvent(mt)
     >>> me2.type = "SEQUENCE_TRACK_NAME"
     >>> me2.time = 0
     >>> me2.data = 'guitar'
@@ -458,8 +466,9 @@ class MidiEvent(object):
     
         The `bendRange` parameter gives the number of half steps in the bend range.
 
-        >>> mt = MidiTrack(1)
-        >>> me1 = MidiEvent(mt)
+        >>> from music21 import *
+        >>> mt = midi.MidiTrack(1)
+        >>> me1 = midi.MidiEvent(mt)
         >>> me1.setPitchBend(50)
         >>> me1._parameter1, me1._parameter2
         (0, 80)
@@ -696,8 +705,9 @@ class MidiEvent(object):
     def isNoteOn(self):
         '''Return a boolean if this is a note-on message and velocity is not zero.
 
-        >>> mt = MidiTrack(1)
-        >>> me1 = MidiEvent(mt)
+        >>> from music21 import *
+        >>> mt = midi.MidiTrack(1)
+        >>> me1 = midi.MidiEvent(mt)
         >>> me1.type = "NOTE_ON"
         >>> me1.velocity = 120
         >>> me1.isNoteOn()
@@ -712,15 +722,16 @@ class MidiEvent(object):
     def isNoteOff(self):
         '''Return a boolean if this is a note-off message, either as a note-off or as a note-on with zero velocity.
 
-        >>> mt = MidiTrack(1)
-        >>> me1 = MidiEvent(mt)
+        >>> from music21 import *
+        >>> mt = midi.MidiTrack(1)
+        >>> me1 = midi.MidiEvent(mt)
         >>> me1.type = "NOTE_OFF"
         >>> me1.isNoteOn()
         False
         >>> me1.isNoteOff()
         True
 
-        >>> me2 = MidiEvent(mt)
+        >>> me2 = midi.MidiEvent(mt)
         >>> me2.type = "NOTE_ON"
         >>> me2.velocity = 0
         >>> me2.isNoteOn()
@@ -737,8 +748,9 @@ class MidiEvent(object):
     def isDeltaTime(self):
         '''Return a boolean if this is a note-on message and velocity is not zero.
 
-        >>> mt = MidiTrack(1)
-        >>> dt = DeltaTime(mt)
+        >>> from music21 import *
+        >>> mt = midi.MidiTrack(1)
+        >>> dt = midi.DeltaTime(mt)
         >>> dt.isDeltaTime()
         True
         '''
@@ -749,13 +761,14 @@ class MidiEvent(object):
     def matchedNoteOff(self, other):
         '''If this is a note-on, given another MIDI event, is this a matching note-off for this event, return True. Checks both pitch and channel.
 
-        >>> mt = MidiTrack(1)
-        >>> me1 = MidiEvent(mt)
+        >>> from music21 import *
+        >>> mt = midi.MidiTrack(1)
+        >>> me1 = midi.MidiEvent(mt)
         >>> me1.type = "NOTE_ON"
         >>> me1.velocity = 120
         >>> me1.pitch = 60
 
-        >>> me2 = MidiEvent(mt)
+        >>> me2 = midi.MidiEvent(mt)
         >>> me2.type = "NOTE_ON"
         >>> me2.velocity = 0
         >>> me2.pitch = 60
@@ -795,8 +808,9 @@ class DeltaTime(MidiEvent):
 
     The `channel` attribute, inherited from MidiEvent is not used.
 
-    >>> mt = MidiTrack(1)
-    >>> dt = DeltaTime(mt)
+    >>> from music21 import *
+    >>> mt = midi.MidiTrack(1)
+    >>> dt = midi.DeltaTime(mt)
     >>> dt.time = 380
     >>> dt
     <MidiEvent DeltaTime, t=380, track=1, channel=None>
@@ -825,7 +839,8 @@ class MidiTrack(object):
 
     An `index` is an integer identifier for this object.
 
-    >>> mt = MidiTrack(0)
+    >>> from music21 import *
+    >>> mt = midi.MidiTrack(0)
     
     '''
     def __init__(self, index): 
@@ -977,8 +992,10 @@ class MidiFile(object):
     def openFileLike(self, fileLike):
         '''Assign a file-like object, such as those provided by StringIO, as an open file object.
 
+        >>> import StringIO
+        >>> from music21 import *
         >>> fileLikeOpen = StringIO.StringIO()
-        >>> mf = MidiFile()
+        >>> mf = midi.MidiFile()
         >>> mf.openFileLike(fileLikeOpen)
         >>> mf.close()
         '''

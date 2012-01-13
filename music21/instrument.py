@@ -135,7 +135,7 @@ class Instrument(music21.Music21Object):
 
         Currently only 16 channels are used.
 
-        >>> from music21 import instrument
+        >>> from music21 import *
         >>> used = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11]
         >>> i = instrument.Violin()
         >>> i.autoAssignMidiChannel(used)
@@ -203,8 +203,8 @@ class KeyboardInstrument(Instrument):
 
 class Piano(KeyboardInstrument):   
     '''
-    >>> import music21
-    >>> p = music21.instrument.Piano()
+    >>> from music21 import *
+    >>> p = instrument.Piano()
     >>> p.instrumentName
     'Piano'
     >>> p.midiProgram
@@ -345,8 +345,8 @@ class StringInstrument(Instrument):
             highest.[*]
 
             
-            
-            >>> vln1 = Violin()
+            >>> from music21 import *
+            >>> vln1 = instrument.Violin()
             >>> vln1.stringPitches
             [G3, D4, A4, E5]
             

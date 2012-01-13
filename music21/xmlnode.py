@@ -77,7 +77,8 @@ class XMLNodeException(Exception):
 class XMLNode(object):
     def __init__(self):
         '''
-        >>> a = XMLNode()
+        >>> from music21 import *
+        >>> a = xmlnode.XMLNode()
         >>> a.set('charData', 'test')
         '''
         self._attr = {} # store attributes in dictionary
@@ -96,7 +97,8 @@ class XMLNode(object):
 
     def _getAttributes(self):
         '''Return a list of attribute names / value pairs
-        >>> a = XMLNode()
+        >>> from music21 import *
+        >>> a = xmlnode.XMLNode()
         >>> a._getAttributes()
         []
         '''
@@ -142,8 +144,8 @@ class XMLNode(object):
 
         All options need to be lower case.
 
-
-        >>> a = XMLNode()
+        >>> from music21 import *
+        >>> a = xmlnode.XMLNode()
         >>> a._convertNameCrossReference('characterData')
         'charData'
         '''
@@ -156,7 +158,8 @@ class XMLNode(object):
     def _convertNameFromXml(self, nameSrc):
         '''Given an xml attribute/entity name, try to convert it to a Python attribute name. If the python name is given, without and - dividers, the the proper name should be returned
 
-        >>> a = XMLNode()
+        >>> from music21 import *
+        >>> a = xmlnode.XMLNode()
         >>> a._convertNameFromXml('char-data')
         'charData'
         '''
@@ -178,7 +181,8 @@ class XMLNode(object):
         '''Given an a Python attribute name, try to convert it to a XML name.
         If already an XML name, leave alone.
 
-        >>> a = XMLNode()
+        >>> from music21 import *
+        >>> a = xmlnode.XMLNode()
         >>> a._convertNameToXml('charData')
         'char-data'
         '''
@@ -212,7 +216,8 @@ class XMLNode(object):
         '''Get all public names from this object.
         Used in merging. 
 
-        >>> a = XMLNode()
+        >>> from music21 import *
+        >>> a = xmlnode.XMLNode()
         >>> len(a._publicAttributes())
         2
         >>> print(a._publicAttributes())
@@ -245,9 +250,11 @@ class XMLNode(object):
         '''Given another similar or commonly used XMLNode object, combine
         all attributes and return a new object.
 
-        >>> a = XMLNode()
+        >>> from music21 import *
+        >>> a = xmlnode.XMLNode()
         >>> a.set('charData', 'green')
-        >>> b = XMLNode()
+
+        >>> b = xmlnode.XMLNode()
         >>> c = b.merge(a)
         >>> c.get('charData')
         'green'
@@ -589,7 +596,7 @@ class Test(unittest.TestCase):
         pass
 
     def testCopyAndDeepcopy(self):
-        '''Test copyinng all objects defined in this module
+        '''Test copying all objects defined in this module
         '''
         import sys, types, copy
         for part in sys.modules[self.__module__].__dict__.keys():

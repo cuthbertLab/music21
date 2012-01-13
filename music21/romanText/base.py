@@ -253,7 +253,7 @@ class RTMeasure(RTToken):
     def __init__(self, src =u''):
         '''
         >>> from music21 import *
-        >>> rtm = RTMeasure('m15 V6 b1.5 V6/5 b2 I b3 viio6')
+        >>> rtm = romanText.RTMeasure('m15 V6 b1.5 V6/5 b2 I b3 viio6')
         >>> rtm.data
         'V6 b1.5 V6/5 b2 I b3 viio6'
         >>> rtm.number

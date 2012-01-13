@@ -92,8 +92,8 @@ class TinyNotationStream(stream.Stream):
     
     Example in 3/4:
     
-    
-    >>> stream1 = TinyNotationStream("E4 r f# g=lastG trip{b-8 a g} c4~ c", "3/4")
+    >>> from music21 import *
+    >>> stream1 = tinyNotation.TinyNotationStream("E4 r f# g=lastG trip{b-8 a g} c4~ c", "3/4")
     >>> stream1.show('text')
     {0.0} <music21.meter.TimeSignature 3/4>
     {0.0} <music21.note.Note E>
@@ -468,12 +468,13 @@ class HarmonyStream(TinyNotationStream):
     example of subclassing :class:`~music21.tinyNotation.TinyNotationStream`
     to include harmonies and lyrics encoded in a simple format.
     
+    >>> from music21 import *
 
     >>> michelle = "c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle "
     >>> michelle += "G4*E-*_these c_are A-_words G_that "
     >>> michelle += "F*Ddim*_go A-_to- Bn_geth- A-_er"
     
-    >>> hns = HarmonyStream(michelle, "4/4")
+    >>> hns = tinyNotation.HarmonyStream(michelle, "4/4")
     >>> ns = hns.notesAndRests
     >>> ns[0].step
     'C'

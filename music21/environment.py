@@ -60,10 +60,14 @@ class Settings(xmlnode.XMLNodeList):
 
 class Preference(xmlnode.XMLNode):
     '''
+    An xmlnode.XMLNode subclass representing a single environment preference
+
+    TODO: Make private class because there's no docs and no public interface.
     '''
     def __init__(self):
         '''
-        >>> a = Preference()
+        >>> from music21 import *
+        >>> a = environment.Preference()
         '''
         xmlnode.XMLNode.__init__(self)
         self._tag = 'preference' # assumed for now
@@ -76,7 +80,12 @@ class Preference(xmlnode.XMLNode):
 #-------------------------------------------------------------------------------
 class SettingsHandler(xml.sax.ContentHandler):
     '''
-    >>> a = SettingsHandler()
+    An xml.sax.ContentHandler subclass holding settings
+
+    TODO: Make private class because there's no docs and no public interface.
+
+    >>> from music21 import *
+    >>> a = environment.SettingsHandler()
     '''
     def __init__(self, tagLib=None):
         self.storage = Settings()        
@@ -93,11 +102,17 @@ class SettingsHandler(xml.sax.ContentHandler):
 
 #-------------------------------------------------------------------------------
 class Environment(object):
-    '''The Environment object stores user preferences as dictionary-like object. Additionally, the Environment object provides convenience methods to music21 modules for getting temporary files, launching files with external applications, and printing debug and warning messages.
+    '''
+    The environment.Environment object stores user preferences as a dictionary-like object. 
+    Additionally, the Environment object provides convenience methods to music21 modules 
+    for getting temporary files, launching files with external applications, and 
+    printing debug and warning messages.
 
-    Generally, each module creates a single, module-level instance of Environment, passing the module's name during creation. 
+    Generally, each module creates a single, module-level instance of Environment, 
+    passing the module's name during creation. 
 
-    For more a user-level interface for creating and editing settings, see the  :class:`~music21.environment.UserSettings` object. 
+    For more a user-friendly interface for creating and editing settings, see 
+    the :class:`~music21.environment.UserSettings` object. 
     '''
 
     # define order to present names in documentation; use strings
@@ -109,10 +124,16 @@ class Environment(object):
     }
 
     def __init__(self, modName=None):
-        '''Create an instance of this object. A modName argument can be provided for use in printDebug() calls. 
+        '''
+        Create an instance of this object, reading settings from disk. 
+        A modName argument can be provided for use in printDebug() calls. ## HOW??
 
-        >>> a = Environment()
-        >>> post = a['writeFormat']
+        >>> from music21 import *
+        >>> myEnv = environment.Environment()
+        >>> post = myEnv['writeFormat']
+        >>> #_DOCS_SHOW post
+        >>> print "\'musicxml\'" #_DOCS_HIDE
+        'musicxml'
         '''
         self.ref = {}
 
@@ -178,7 +199,7 @@ class Environment(object):
         '''Restore only defaults for all parameters. Useful for testing. 
 
         >>> from music21 import *
-        >>> a = music21.environment.Environment()
+        >>> a = environment.Environment()
         >>> a['debug'] = 1
         >>> a.restoreDefaults()
         >>> a['debug']
@@ -225,7 +246,7 @@ class Environment(object):
         Must call write() to make permanent
 
         >>> from music21 import *
-        >>> a = music21.environment.Environment()
+        >>> a = environment.Environment()
         >>> a['debug'] = 1
         >>> a['graphicsPath'] = '/test&Encode'
         >>> a['graphicsPath']
@@ -318,7 +339,11 @@ class Environment(object):
 
     #---------------------------------------------------------------------------
     def read(self, fp=None):
-        '''Load an XML preference file if and only if the file is available and has been written in the past. This means that no preference file will ever be written unless manually done so. If no preference file exists, the method returns None.
+        '''
+        Load an XML preference file if and only if the file is available 
+        and has been written in the past. This means that no preference file 
+        will ever be written unless manually done so. If no preference file 
+        exists, the method returns None.
         '''
         if fp == None:
             fp = self.getSettingsPath()
@@ -350,7 +375,10 @@ class Environment(object):
                 self.ref[name] = value
 
     def write(self, fp=None):
-        '''Write an XML preference file. This must be manually called to store any changes made to the object and access preferences later. If `fp` is None, the default storage location will be used.
+        '''
+        Write an XML preference file. This must be manually called to store 
+        any changes made to the object and access preferences later. 
+        If `fp` is None, the default storage location will be used.
         '''
         if fp == None:
             fp = self.getSettingsPath()
