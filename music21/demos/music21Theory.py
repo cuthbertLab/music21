@@ -8,13 +8,13 @@
     This is an update - Beth
     This is Lars's Update - Lars
 '''
-
 import music21
+from music21 import *
+
 import itertools
 import unittest
 
-from music21 import corpus
-
+import copy
 '''
 Triad Exercise Assignment:
 http://ocw.mit.edu/courses/music-and-theater-arts/21m-301-harmony-and-counterpoint-i-spring-2005/assignments/asgnmnt3_triads.pdf
@@ -96,6 +96,111 @@ def solveExercise(music21Stream):
 def solveChord(music21Chord):
     return (music21Chord.isTriad(), music21Chord.root().name, music21Chord.quality)
 
+def checkScaleDegrees(sc,scorePart,markerPart):
+    exerciseScale = sc.parts[scorePart].flat.getElementsByClass('KeySignature')[0].getScale()
+
+    # Check whether lyrics of marker part match scale degrees of score part at that offset
+    for nMarker in sc.parts[markerPart].flat.getElementsByClass('Note'):
+        n = sc.parts[scorePart].flat.getElementAtOrBefore(nMarker.offset,classList={'Note'})
+      
+
+        if nMarker.lyric != str(exerciseScale.getScaleDegreeFromPitch(n.pitch)):
+            nMarker.color = 'red'
+            nMarker.lyric += "->"+str(exerciseScale.getScaleDegreeFromPitch(n.pitch))
+        else:
+            nMarker.color='black'
+
+def checkIntervalDegrees(sc,upperPart, lowerPart, markerPart):
+    # Checks whether lyrics of marker part matches interval between lower part and upper part 
+    for nMarker in sc.chordify().getElementsByClass('Chord'):
+        nLower = sc.parts[lowerPart].flat.getElementAtOrBefore(nMarker.offset,classList={'Note'})
+        nUpper = sc.parts[upperPart].flat.getElementAtOrBefore(nMarker.offset,classList={'Note'})
+        intv = interval.notesToInterval(nLower,nUpper).generic.undirected
+        while intv >= 9:
+            intv -= 7
+        if nMarker.lyric != str(intv):
+            nMarker.lyric += "->"+str(intv)
+            nMarker.color = 'red'
+        else:
+            nMarker.color ='black'
+            
+def checkMovement(sc,upperPart, lowerPart, markerPart):
+    # Checks whether lyrics of marker part matches motion before that offset in marker part
+    prevMarker = note.Note()
+    prevMarker.offset = 0
+    for nMarker in sc.parts[markerPart].flat.getElementsByClass('Note'):
+        offsetDiff = nMarker.offset - prevMarker.offset
+        n2Upper = sc.parts[upperPart].flat.getElementAtOrBefore(nMarker.offset,classList={'Note'})
+        n1Upper = sc.parts[upperPart].flat.getElementAtOrBefore(nMarker.offset - offsetDiff,classList={'Note'})
+
+        n2Lower = sc.parts[lowerPart].flat.getElementAtOrBefore(nMarker.offset,classList={'Note'})
+        n1Lower = sc.parts[lowerPart].flat.getElementAtOrBefore(nMarker.offset - offsetDiff,classList={'Note'})
+
+        vlq = voiceLeading.VoiceLeadingQuartet(n1Upper,n2Upper,n1Lower,n2Lower)
+       
+        if vlq.contraryMotion():
+            if nMarker.lyric == "C":
+                nMarker.color = 'black'
+            else:
+                nMarker.color = 'red'
+                nMarker.lyric += "->C"
+        elif vlq.obliqueMotion():
+            if nMarker.lyric == "O":
+                nMarker.color = 'black'
+            else:
+                nMarker.color = 'red'
+                nMarker.lyric += "->O"
+        elif vlq.parallelMotion():
+            if nMarker.lyric == "P":
+                nMarker.color = 'black'
+            else:
+                nMarker.color = 'red'
+                nMarker.lyric += "->P"
+        elif vlq.similarMotion():
+            if nMarker.lyric == "S":
+                nMarker.color = 'black'
+            else:
+                nMarker.color = 'red'
+                nMarker.lyric += "->S"
+        else:
+            nMarker.color = 'green' # For testing
+        prevMarker = nMarker
+
+def ex_11_1_A(sc):
+    checkScaleDegrees(sc,1,0)
+    checkIntervalDegrees(sc,1, 2, 3)
+    checkMovement(sc,1,2,4)
+
+def ex_11_1_B(sc):
+    checkIntervalDegrees(sc,0, 1, 2)
+    checkMovement(sc,0,1,3)
+
+def ex_11_1_C(sc):
+    checkIntervalDegrees(sc,0, 1, 2)
+    checkMovement(sc,0,1,3)
+
+def ex_11_1_D(sc):
+    checkIntervalDegrees(sc,0, 1, 2)
+    checkMovement(sc,0,1,3)
+
+    
+def askForScaleDegrees(sc, partNumList):
+    newStream = stream.Stream()
+        
+    for i in range(len(sc.parts)):
+        if i in partNumList:
+            newPart = copy.deepcopy(sc.parts[i])
+            newPart[0] = instrument.Woodblock()
+            
+            for n in newPart.flat.getElementsByClass('Note'):
+                n.notehead = 'x'
+                n.pitch = pitch.Pitch('b-4')     
+            newStream.append(newPart)   
+        newStream.append(sc.parts[i])
+    
+    return newStream
+        
+
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     
@@ -103,14 +208,14 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    #music21.mainTest(Test)
-    studentExercise = corpus.parse('theoryExercises/triadExercise.xml')
-    studentAnswers = [('E-', 'm'), ('D', 'M'), ('X', ''), ('X', ''), ('B', 'd'), 
-                      ('G', 'M'), ('F#','M'),('C','m'),('X', ''),('D-', 'M'), ('G#', 'm'),
-                      ('X', 'X'), ('E', 'd'), ('E', 'M'), ('X',''), ('B','m'), ('A', 'M'), 
-                      ('X',''), ('X',''), ('B-', 'd'), ('G', 'm')]
-    print checkTriadExercise(studentExercise, studentAnswers)
-    print list(checkExercise(studentExercise, studentAnswers))
+    music21.mainTest(Test)
+#    studentExercise = corpus.parse('theoryExercises/triadExercise.xml')
+#    studentAnswers = [('E-', 'm'), ('D', 'M'), ('X', ''), ('X', ''), ('B', 'd'), 
+#                      ('G', 'M'), ('F#','M'),('C','m'),('X', ''),('D-', 'M'), ('G#', 'm'),
+#                      ('X', 'X'), ('E', 'd'), ('E', 'M'), ('X',''), ('B','m'), ('A', 'M'), 
+#                      ('X',''), ('X',''), ('B-', 'd'), ('G', 'm')]
+#    print checkTriadExercise(studentExercise, studentAnswers)
+#    print list(checkExercise(studentExercise, studentAnswers))
     #checkTriadExercise(music21.converter.parse('C:/Users/bhadley/Documents/ex1.xml'), studentAnswers)
 
 #------------------------------------------------------------------------------
