@@ -8702,10 +8702,12 @@ class Stream(music21.Music21Object):
 
         if includeEndBoundary:
             # if the start of b is before the end of a
-            if durSpans[1][0] <= durSpans[0][1]:   
+            #if durSpans[1][0] <= durSpans[0][1]:   
+            if common.lessThanOrEqual(durSpans[1][0], durSpans[0][1]):   
                 found = True
         else: # do not include coincident boundaries
-            if durSpans[1][0] < durSpans[0][1]:   
+            #if durSpans[1][0] < durSpans[0][1]:   
+            if common.lessThan(durSpans[1][0], durSpans[0][1]):   
                 found = True
         return found
 
@@ -8746,12 +8748,12 @@ class Stream(music21.Music21Object):
                 dst = durSpanSorted[j]
                 # print src, dst, self._durSpanOverlap(src, dst, includeEndBoundary)
         
-                if src[0] == dst[0]: # if start times are the same
+                # if start times are the same
+                if common.almostEquals(src[0], dst[0]):
                     simultaneityMap[i].append(j)
-        
+                # this function uses common.py comparions methods
                 if self._durSpanOverlap(src, dst, includeEndBoundary):
                     overlapMap[i].append(j)
-        
         return simultaneityMap, overlapMap
 
 
@@ -8779,7 +8781,6 @@ class Stream(music21.Music21Object):
                 # check indices
                 for j in indices: # indices of other elements tt overlap
                     elementObj = flatStream[j]
-
                     # check if this object has been stored anywhere yet
                     # if so, use the offset of where it was stored to 
                     # to store the src element below
@@ -8815,7 +8816,7 @@ class Stream(music21.Music21Object):
                         post[dstOffset] = [] # create dictionary entry
                     # print 'storing offset', dstOffset
                     post[dstOffset].append(srcElementObj)
-                    # print post
+        #print post
         return post
 
 
@@ -9261,18 +9262,16 @@ class Stream(music21.Music21Object):
         '''If this Stream has overlapping Notes or Chords, this method will isolate all overlaps in unique Voices, and place those Voices in the Stream.
 
         '''
-        # TODO: this method needs more testing, and may not always 
+        # this method may not always 
         # produce the optimal voice assignment based on context (register
         # chord formation, etc
         if not inPlace: # make a copy
             returnObj = deepcopy(self)
         else:
             returnObj = self
-
         # must be sorted
         if not returnObj.isSorted:
             returnObj.sort() 
-        
         olDict = returnObj.notes.getOverlaps(
                  includeDurationless=False, includeEndBoundary=False)
         #environLocal.pd(['makeVoices(): olDict', olDict])
@@ -9294,15 +9293,17 @@ class Stream(music21.Music21Object):
         # voice 1, otherwise, distribute
         for e in returnObj.notes:
             o = e.getOffsetBySite(returnObj)
-            if o not in olDict.keys(): # place in a first voices
-                voices[0].insert(o, e)
+            # cannot match here by offset, as olDict keys are representative
+            # of the first overlapped offset, not all contained offsets
+            #if o not in olDict.keys(): # place in a first voices
+            #    voices[0].insert(o, e)
             # find a voice to place in
             # as elements are sorted, can use the highest time
-            else: 
-                for v in voices:
-                    if v.highestTime <= o:  
-                        v.insert(o, e)
-                        break
+            #else: 
+            for v in voices:
+                if v.highestTime <= o:  
+                    v.insert(o, e)
+                    break
             # remove from source
             returnObj.remove(e)
         # remove any unused voices (possible if overlap group has sus)
@@ -17568,6 +17569,31 @@ class Test(unittest.TestCase):
         for c in chords.getElementsByClass('Chord'):
             self.assertEqual(len(c), 2)
 
+
+    def testMakeVoicesA(self):
+        from music21 import stream, note
+        s = stream.Stream()
+        s.repeatAppend(note.Note('d-4', quarterLength=1), 8)
+        s.insert(0, note.Note('C4', quarterLength=8))
+        s.makeVoices(inPlace=True)
+        self.assertEqual(len(s.voices), 2)
+        self.assertEqual(len(s.voices[0]), 8)
+        self.assertEqual(len(s.voices[1]), 1)
+
+        #s.show()
+
+    def testMakeVoicesB(self):
+        from music21 import corpus
+        s = corpus.parse('bwv66.6') 
+        #s.measures(6,7).show()
+        sMeasures = s.measures(6,7)
+        sFlatVoiced = sMeasures.flat.makeVoices()
+        #sFlatVoiced.show('t')
+        #sFlatVoiced.show()
+        self.assertEqual(len(sMeasures.flat.notes), len(sFlatVoiced.flat.notes))
+        self.assertEqual(sMeasures.flat.highestTime, 
+            sFlatVoiced.flat.notes.highestTime)
+        self.assertEqual(len(sFlatVoiced.voices), 4)
 
 
 #-------------------------------------------------------------------------------

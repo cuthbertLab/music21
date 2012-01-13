@@ -352,11 +352,9 @@ def almostEquals(x, y = 0.0, grain=1e-7):
     True
     
     '''
-    
     if abs(x - y) < grain: 
         return True
-    else: 
-        return False
+    return False
 
 almostEqual = almostEquals
 
