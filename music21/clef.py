@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2011 The music21 Project
+# Copyright:    (c) 2009-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''This module defines numerous subclasses of :class:`~music21.clef.Clef`, providing object representations for all commonly used clefs. Clef objects are often found within :class:`~music21.stream.Measure` objects.  
@@ -51,7 +51,7 @@ class Clef(music21.Music21Object):
     
     
     Most clefs also have a "lowest note" function which represents the
-    :ref:`~music21.pitch.Pitch.diatonicNoteNum` of the note. (Where C4,C#4,C##4,C-4
+    :attr:`~music21.pitch.Pitch.diatonicNoteNum` of the note. (Where C4,C#4,C##4,C-4
     etc. = 29, all types of D4 = 30, etc.)
     
     >>> tc.lowestLine

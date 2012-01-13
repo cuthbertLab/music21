@@ -790,38 +790,40 @@ class ThreeNoteLinearSegment(music21.Music21Object):
             self.iLeft.isChromaticStep and self.iRight.isChromaticStep and \
             (self.iLeft.direction * self.iRight.direction == -1)
 
-def labelPassingTones(music21Stream, checkForDissonance=True, checkSimultaneous=True, checkForAccent=True, markWithColor=False, color='#FF0000'):
-    '''searches through all voices of all parts in a given music21 stream and
+def labelPassingTones(music21Stream, checkForDissonance=True,     
+    checkSimultaneous=True, checkForAccent=True, markWithColor=False, 
+    color='#FF0000'):
+
+    '''Searches through all voices of all parts in a given music21 stream and
     identifies passing tones, then assigns a True/False value to the 
     note's :class:`~music21.editorial.NoteEditorial` object. The information is 
     stored as a miscellaneous attribute in the note editorial object, called 'isPassingTone'. 
     Access this data from any note object in the stream after running this method by typing
-
+    
     for note in labeledStream.flat.getElementsByClass(music21.note.Note):
         print note.editorial.misc['isPassingTone']
     
     Selectivity in labeling is provided by the following optional arguments:
-    checkForDissonance (default = True) --> checks if the chord formed is dissonant, and only
+    checkForDissonance (default = True): checks if the chord formed is dissonant, and only
     labels tone as a passing tone if the chord is dissonant.
     
-    checkSimultaneous (default = True) --> iterates through every instance where simultaneous notes
+    checkSimultaneous (default = True): iterates through every instance where simultaneous notes
     are labeled (with color) and if their durations are different, labels only the tone that has a shorter duration
     
-    checkForAccent (default = True) --> only labels passing tones on unaccented beats of the measure
+    checkForAccent (default = True): only labels passing tones on unaccented beats of the measure
     
-    markWithColor (default = False) --> optionally label the identified passing tones with a color; default
+    markWithColor (default = False): optionally label the identified passing tones with a color; default
     color is red. Change labeling color with color modifier/
     
-    color (default = '#00FF00') --> color to label notes if markWithColor is True. Colors must be specified
-    in a string HEX. For example, 
-     color = '#FF0000' (red)
-     color = '#00FF00' (green)
-     color = '#0000FF' (blue)
-     color = '#FFFF00' (yellow)
-     color = '#00FFFF' (turquoise)
-     color = '#FF00FF' (magenta)
-     color = '#C0C0C0' (grey)
-     color = '#FFFFFF' (white)
+    color (default = '#00FF00'): color to label notes if markWithColor is True. Colors must be specified in a string HEX. For example, 
+    color = '#FF0000' (red)
+    color = '#00FF00' (green)
+    color = '#0000FF' (blue)
+    color = '#FFFF00' (yellow)
+    color = '#00FFFF' (turquoise)
+    color = '#FF00FF' (magenta)
+    color = '#C0C0C0' (grey)
+    color = '#FFFFFF' (white)
     
     '''
 
@@ -852,7 +854,8 @@ def labelPassingTones(music21Stream, checkForDissonance=True, checkSimultaneous=
         music21Stream = _checkForSimultaneousLabels(music21Stream, markWithColor)
     return music21Stream
     
-def labelNeighborTones(music21Stream, checkForDissonance=True, checkSimultaneous=True, checkForAccent=True, markWithColor=False, color='#00FF00'):
+def labelNeighborTones(music21Stream, checkForDissonance=True, 
+    checkSimultaneous=True, checkForAccent=True, markWithColor=False, color='#00FF00'):
     '''searches through all voices of all parts in a given music21 stream and
     identifies neighbor tones, then assigns a True/False value to the 
     note's :class:`~music21.editorial.NoteEditorial` object. The information is 
@@ -863,27 +866,27 @@ def labelNeighborTones(music21Stream, checkForDissonance=True, checkSimultaneous
         print note.editorial.misc['isNeighborTone']
     
     Selectivity in labeling is provided by the following optional arguments:
-    checkForDissonance (default = True) --> checks if the chord formed is dissonant, and only
+    checkForDissonance (default = True): checks if the chord formed is dissonant, and only
     labels tone as a passing tone if the chord is dissonant.
     
-    checkSimultaneous (default = True) --> iterates through every instance where simultaneous notes
+    checkSimultaneous (default = True): iterates through every instance where simultaneous notes
     are labeled (with color) and if their durations are different, labels only the tone that has a shorter duration
     
-    checkForAccent (default = True) --> only labels passing tones on unacented beats of the measure
+    checkForAccent (default = True): only labels passing tones on unacented beats of the measure
     
-    markWithColor (default = False) --> optionally label the identified neighbor tones with a color; default
+    markWithColor (default = False): optionally label the identified neighbor tones with a color; default
     color is green. Change labeling color with color modifier/
     
-    color (default = '#00FF00') --> color to label notes if markWithColor is True. Colors must be specified
+    color (default = '#00FF00'): color to label notes if markWithColor is True. Colors must be specified
     in a string HEX. For example, 
-     color = '#FF0000' (red)
-     color = '#00FF00' (green)
-     color = '#0000FF' (blue)
-     color = '#FFFF00' (yellow)
-     color = '#00FFFF' (turquoise)
-     color = '#FF00FF' (magenta)
-     color = '#C0C0C0' (grey)
-     color = '#FFFFFF' (white)
+    color = '#FF0000' (red)
+    color = '#00FF00' (green)
+    color = '#0000FF' (blue)
+    color = '#FFFF00' (yellow)
+    color = '#00FFFF' (turquoise)
+    color = '#FF00FF' (magenta)
+    color = '#C0C0C0' (grey)
+    color = '#FFFFFF' (white)
     
     '''
     for part in music21Stream.parts:
@@ -911,7 +914,8 @@ def labelNeighborTones(music21Stream, checkForDissonance=True, checkSimultaneous
         music21Stream = _checkForSimultaneousLabels(music21Stream, markWithColor)
     return music21Stream
     
-def _checkForSimultaneousLabels(preLabeledMusic21Stream, checkPT=True, checkNT=True, markWithColor=False, color='#000000'):
+def _checkForSimultaneousLabels(preLabeledMusic21Stream, checkPT=True, 
+    checkNT=True, markWithColor=False, color='#000000'):
     '''
     If after running a non-harmonic labeling method (such as labelPassingTones or labelNeighborTones)
     you find that there are simultaneous pitches labeled when at least one of those pitches must

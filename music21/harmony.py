@@ -221,10 +221,10 @@ class ChordStepModification(object):
         degree-value element: indicates degree in chord, positive integers only
         degree-alter: indicates semitone alteration of degree, positive and negative integers only
         degree-type: add, alter, or subtract
-            if add: 
-                degree-alter is relative to a dominant chord (major and perfect intervals except for a minor seventh)
-            if alter or subtract:
-                degree-alter is relative to degree already in the chord based on its kind element
+
+        if add:  degree-alter is relative to a dominant chord (major and perfect intervals except for a minor seventh)
+
+        if alter or subtract: degree-alter is relative to degree already in the chord based on its kind element
         
         <!-- FROM XML DOCUMENTATION
         http://www.google.com/codesearch#AHKd_kdk32Q/trunk/musicXML/dtd/direction.mod&q=Chord%20Symbols%20package:http://bmml%5C.googlecode%5C.com&l=530
@@ -386,6 +386,7 @@ class Harmony(music21.Music21Object):
         
         self._root = None # a pitch object
         self._bass = None # a pitch object
+
         self._inversion = None # an integer
         self._chord = music21.chord.Chord()
         #TODO: deal with the roman numeral property of harmonies...music xml documentation is ambiguous: 
@@ -1421,6 +1422,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual( len(vector), 12)
 
+
 class TestExternal(unittest.TestCase):
     def runTest(self):
         pass
@@ -1465,7 +1467,9 @@ class TestExternal(unittest.TestCase):
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 
+
 #_DOC_ORDER = [Harmony, ChordStepModification, ChordSymbol]
+
 
 
 

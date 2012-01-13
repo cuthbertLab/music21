@@ -206,7 +206,7 @@ Basic Counting of and Searching for Musical Elements
 28
 
 
-2. This example searches a Part for a particular chord formation, a dominant seventh, expressed melodically::
+2. This example searches a Part for a particular chord formation, a dominant seventh, expressed melodically.
 
 >>> from music21 import *
 >>> # First, we parse the score and get just the Violin part
