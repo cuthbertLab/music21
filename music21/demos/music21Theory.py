@@ -213,7 +213,6 @@ def createEditorialMelodicIntervals(music21Stream):
             if isinstance(currentObject, note.Note) and isinstance(previousObject, note.Note):
                 currentObject.editorial.melodicInterval = interval.notesToInterval(previousObject, currentObject)
             currentObject = currentObject.next()
-        
     for x in music21Stream.flat.notes:
         print x, x.editorial.melodicInterval 
 
@@ -310,6 +309,42 @@ def locateAbundantLeaps(music21Stream):
 
 
 
+MELODIC_INTERVALS = ["P1","m3","M3","P5","m6","M6","P8","m10","M10","P12","m13","M13","P15"]
+
+def labelHarmonicIntervals(topPart, bottomPart):
+    s = stream.Stream()
+    s.append(topPart)
+    s.append(bottomPart)
+    for c in s.chordify().flat.getElementsByClass('Chord'):
+        topNote = topPart.flat.getElementAtOrBefore(c.offset,classList={'Note'})
+        bottomNote = bottomPart.flat.getElementAtOrBefore(c.offset,classList={'Note'})
+        intv = interval.notesToInterval(bottomNote,topNote)
+        if(topNote.offset == c.offset):
+            topNote.editorial.harmonicInterval = copy.deepcopy(intv)
+        if(bottomNote.offset == c.offset):
+            bottomNote.editorial.harmonicInterval = copy.deepcopy(intv)
+            
+def labelBasedOnHarmonicIntervalsEditorial(sc):
+    for n in sc.flat.getElementsByClass('Note'):
+        n.lyric = n.editorial.harmonicInterval.name
+        print n.editorial.harmonicInterval  
+           
+def checkForDissonance(topPart, bottomPart):
+    ''' Given two streams, highlight all dissonant intervals
+    '''
+    for topNote in bottomPart.flat.getElementsByClass('Note'):
+        bottomNote = topPart.flat.getElementAtOrBefore(topNote.offset,classList={'Note'})
+        intv = interval.notesToInterval(bottomNote, topNote)
+        print intv.name
+        if intv.name not in MELODIC_INTERVALS:
+            topNote.color = 'red'
+            bottomNote.color = 'red'
+
+def highlightDissonances(sc):
+    for n in sc.flat.getElementsByClass('Note'):
+        if n.editorial.harmonicInterval.name not in MELODIC_INTERVALS:
+            n.color = 'red'
+
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     
@@ -325,7 +360,11 @@ class TextExternal(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    sc = converter.parse('/Users/larsj/Dropbox/Music21Theory/CounterpointExamplesCh9/9.4.A.xml')
+    labelHarmonicIntervals(sc.parts[0],sc.parts[1])
+    labelBasedOnHarmonicIntervalsEditorial(sc)
+    highlightDissonances(sc)
+    sc.show()
     
     #studentExcercise = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/CounterpointExamplesCh9/9.4.C.xml')
     #studentExcercise2 = labelEditorialMotion(studentExcercise)
