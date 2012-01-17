@@ -145,7 +145,8 @@ def isIncomplete(possibA, pitchNamesToContain):
         if pitchName not in pitchNamesContained:
             isIncomplete = True
     if not isIncomplete and (len(pitchNamesContained) > len(pitchNamesToContain)):
-        raise PossibilityException(str(possibA) + " contains pitch names not found in pitchNamesToContain.")
+        isIncomplete = False
+        #raise PossibilityException(str(possibA) + " contains pitch names not found in pitchNamesToContain.")
 
     return isIncomplete
 
@@ -228,6 +229,33 @@ def pitchesWithinLimit(possibA, maxPitch = pitch.Pitch('B5')):
         if givenPitch > maxPitch:
             return False
         
+    return True
+
+def limitPartToPitch(possibA, partPitchLimits = {}):
+    '''
+    Takes in partPitchLimits containing (partNumber, partPitch) pairs, each
+    of which limits a part in possibA to a certain :class:`~music21.pitch.Pitch`.
+    Returns True if all limits are followed in possibA, False otherwise.
+    
+    >>> from music21.figuredBass import possibility
+    >>> from music21 import pitch
+    >>> C4 = pitch.Pitch('C4')
+    >>> E4 = pitch.Pitch('E4')
+    >>> G4 = pitch.Pitch('G4')
+    >>> C5 = pitch.Pitch('C5')
+    >>> G5 = pitch.Pitch('G5')
+    >>> sopranoPitch = pitch.Pitch('G5')
+    >>> possibA1 = (C5, G4, E4, C4)
+    >>> possibility.limitPartToPitch(possibA1, {1: sopranoPitch})
+    False
+    >>> possibA2 = (G5, G4, E4, C4)
+    >>> possibility.limitPartToPitch(possibA2, {1: sopranoPitch})
+    True
+    '''
+    for (partNumber, partPitch) in partPitchLimits.items():
+        if not (possibA[partNumber - 1] == partPitch):
+            return False
+
     return True
 
 
@@ -609,7 +637,7 @@ def voiceOverlap(possibA, possibB):
             if lowerPitchB > higherPitchA or higherPitchB < lowerPitchA:
                 hasVoiceOverlap = True
                 return hasVoiceOverlap
-            
+        
     return hasVoiceOverlap
 
 def partMovementsWithinLimits(possibA, possibB, partMovementLimits = []):
@@ -689,6 +717,35 @@ def upperPartsSame(possibA, possibB):
         if not (pitchA == pitchB):
             return False
         
+    return True
+
+def partsSame(possibA, possibB, partsToCheck = None):
+    '''
+    Takes in partsToCheck, a list of part numbers. Checks if pitches at those part numbers of
+    possibA and possibB are equal, determined by pitch space.
+    
+    >>> from music21 import pitch
+    >>> from music21.figuredBass import possibility
+    >>> C4 = pitch.Pitch('C4')
+    >>> E4 = pitch.Pitch('E4')
+    >>> G4 = pitch.Pitch('G4')
+    >>> B4 = pitch.Pitch('B4')
+    >>> C5 = pitch.Pitch('C5')
+    >>> possibA1 = (C5, G4, E4, C4)
+    >>> possibB1 = (B4, G4, E4, C4)
+    >>> possibility.partsSame(possibA1, possibB1, [2,3,4])
+    True
+    '''
+    if partsToCheck == None:
+        return True
+    
+    pairsList = partPairs(possibA, possibB)
+    
+    for partIndex in partsToCheck:
+        (pitchA, pitchB) = pairsList[partIndex - 1]
+        if not (pitchA == pitchB):
+            return False
+    
     return True
 
 def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo = None, restrictDoublings = True):
@@ -879,6 +936,14 @@ def partPairs(possibA, possibB):
     [(C5, B4), (G4, F4), (E4, D4), (C4, D4)]
     '''
     return list(itertools.izip(possibA, possibB))
+
+# apply a function to one pitch of possibA at a time
+# apply a function to two pitches of possibA at a time
+# apply a function to one partPair of possibA, possibB at a time
+# apply a function to two partPairs of possibA, possibB at a time
+# use an iterator that fails when the first false is returned
+
+
 
 
 singlePossibilityMethods = [voiceCrossing, isIncomplete, upperPartsWithinLimit, pitchesWithinLimit]
