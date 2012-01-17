@@ -18,15 +18,16 @@ import unittest
 from music21 import stream
 
 from music21.braille import basic
-from music21.braille import lookup
 from music21.braille import text
 from music21.braille import segment
 
-symbols = lookup.symbols
 #-------------------------------------------------------------------------------
 # music21 streams to BrailleText objects.
 
 def measureToBraille(music21Measure, **measureKeywords):
+    '''
+    
+    '''
     if not 'showHeading' in measureKeywords:
         measureKeywords['showHeading'] = False
     if not 'showFirstMeasureNumber' in measureKeywords:
