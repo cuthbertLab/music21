@@ -39,10 +39,38 @@ binary_dots = lookup.binary_dots
 class BrailleElementGrouping(list):
     pass
 
+class BrailleSegment(collections.defaultdict):
+    pass
+
+
+
+'''
+Part keywords:
+- slurLongPhraseWithBrackets
+- showShortSlursAndTiesTogether
+- showLongSlursAndTiesTogether
+- segmentBreaks
+- showHand
+
+'''
 def findSegments(music21Part, **partKeywords):
+    '''
+    How do you explain all this?
+    
+    Fudge.
+    
+    Blast.
+    
+    Takes in a :class:`~music21.stream.Part`
+    
+    Organizes the elements of the stream Part into segments
+    
+    
+    
+    
+    '''
     slurLongPhraseWithBrackets = True
-    showShortSlursAndTiesTogether = False
-    showLongSlursAndTiesTogether = False
+    showShortSlursAndTiesTogether, showLongSlursAndTiesTogether = False, False
     segmentBreaks = None
     descendingChords = True
 
@@ -65,7 +93,7 @@ def findSegments(music21Part, **partKeywords):
 
     prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets, showShortSlursAndTiesTogether, showLongSlursAndTiesTogether)
     allSegments = []
-    currentSegment = collections.defaultdict(BrailleElementGrouping)
+    currentSegment = BrailleSegment(BrailleElementGrouping)
     measureNumberStart = 10E5
     offsetStart = 0.0
     if not segmentBreaks == None:
@@ -82,7 +110,7 @@ def findSegments(music21Part, **partKeywords):
     
     greaterOffsetFactor = 0
     greaterPreviousCode = -1
-    biggerPicture = collections.defaultdict(BrailleElementGrouping)
+    biggerPicture = BrailleSegment(BrailleElementGrouping)
     for music21Measure in music21Part.getElementsByClass('Measure'):
         prepareBeamedNotes(music21Measure)
         brailleElements = []
@@ -102,7 +130,7 @@ def findSegments(music21Part, **partKeywords):
             if music21Measure.number > measureNumberStart or\
                 music21Measure.number == measureNumberStart and brailleElement.offset >= offsetStart:
                 allSegments.append(currentSegment)
-                currentSegment = collections.defaultdict(BrailleElementGrouping)
+                currentSegment = BrailleSegment(BrailleElementGrouping)
                 try:
                     nextSegmentBreak = segmentBreaks.pop()
                     (measureNumberStart, offsetStart) = nextSegmentBreak
@@ -171,6 +199,17 @@ def findSegments(music21Part, **partKeywords):
     allSegments.append(currentSegment)
     return allSegments
 
+brailleElements = collections.OrderedDict({'Note':    (9, 20),
+                                           'Rest':    (9, 20),
+                                           'Chord':   (9, 20),
+                                           'Dynamic': (9, 19),
+                                           'Clef':    (9, 15),
+                                           'KeySignature':  (3, 2),
+                                           'TimeSignature': (3, 3),
+                                           'Barline': (9.5, -5),
+                                           'TempoText': (4, 5),
+                                           'MetronomeMark': (5, 6)})
+
 def setBrailleElementProperties(music21Object):
     if isinstance(music21Object, note.Note):
         music21Object.type = "Note"
@@ -188,13 +227,6 @@ def setBrailleElementProperties(music21Object):
         music21Object.type = "Dynamic"
         music21Object.affinityCode = 9
         music21Object.classSortOrder = 19
-    elif isinstance(music21Object, expressions.TextExpression):
-        music21Object.type = "Text Expression"
-        if len(music21Object.content.split()) > 1:
-            music21Object.affinityCode = 8
-        else:
-            music21Object.affinityCode = 9
-        music21Object.classSortOrder = 18
     elif isinstance(music21Object, key.KeySignature):
         music21Object.type = "Key Signature"
         music21Object.affinityCode = 3
@@ -217,6 +249,13 @@ def setBrailleElementProperties(music21Object):
         music21Object.type = "Metronome Mark"
         music21Object.affinityCode = 5
         music21Object.classSortOrder = 6
+    elif isinstance(music21Object, expressions.TextExpression):
+        music21Object.type = "Text Expression"
+        if len(music21Object.content.split()) > 1:
+            music21Object.affinityCode = 8
+        else:
+            music21Object.affinityCode = 9
+        music21Object.classSortOrder = 18
     else:
         raise BrailleSegmentException()
     
@@ -327,6 +366,18 @@ def extractSignatures(brailleSegment, cancelOutgoingKeySig):
 #-------------------------------------------------------------------------------
 # Segment Transcription Methods
 
+'''
+Segment keywords:
+- cancelOutgoingKeySig
+- dummyRestLength
+- maxLineLength
+- showClefSigns
+- showFirstMeasureNumber
+- showHand
+- showHeading
+- showLeadingOctave
+- upperFirstInNoteFingering
+'''
 def transcribeSegment(brailleSegment, **segmentKeywords):
     cancelOutgoingKeySig = True
     dummyRestLength = None
