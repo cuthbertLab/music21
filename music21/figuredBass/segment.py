@@ -157,6 +157,7 @@ class Segment(object):
         >>> allConsecRules = segmentA.consecutivePossibilityRules()
         >>> segment.printRules(allConsecRules)
         Will run:  Method:                       Keep solutions which return:  Arguments:
+        True       partsSame                     True                          []
         False      upperPartsSame                True                          None
         True       voiceOverlap                  False                         None
         True       partMovementsWithinLimits     True                          []
@@ -179,6 +180,7 @@ class Segment(object):
         >>> allConsecRules = segmentA.consecutivePossibilityRules(fbRules)
         >>> segment.printRules(allConsecRules)
         Will run:  Method:                       Keep solutions which return:  Arguments:
+        True       partsSame                     True                          []
         False      upperPartsSame                True                          None
         False      voiceOverlap                  False                         None
         True       partMovementsWithinLimits     True                          [(1, 2)]
