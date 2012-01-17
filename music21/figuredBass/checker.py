@@ -8,10 +8,11 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+import itertools
 import collections
 import copy
 import music21
-
+    
 from music21 import corpus
 from music21 import voiceLeading
 
@@ -34,9 +35,10 @@ def checkSinglePossibilities(music21Stream, functionToApply, color = "#FF0000", 
     for startTime in sorted(violations.keys()):
         for partTuple in violations[startTime]:
             for partNumber in partTuple:
-                allParts[partNumber-1].getElementsByOffset(startTime, startTime, mustBeginInSpan = False)[0].color = color
-            if not allParts[partNumber-1].measureNumber in measureNumbers:
-                measureNumbers.append(allParts[partNumber-1].measureNumber)
+                noteA1 = allParts[partNumber-1].getElementsByOffset(startTime, startTime, mustBeginInSpan = False)[0]
+                noteA1.color = color
+            if not noteA1.measureNumber in measureNumbers:
+                measureNumbers.append(noteA1.measureNumber)
     
     return measureNumbers
   
@@ -92,7 +94,6 @@ def createOffsetMapping(music21Part):
         startTime = music21Object.offset
         endTime = startTime + music21Object.quarterLength
         currentMapping[(startTime, endTime)] = [music21Object]
-        
     return currentMapping
 
 # Appends another Stream Part to an existing offset mapping
@@ -114,7 +115,6 @@ def correlateHarmonies(currentMapping, music21Part):
                 allNotesCopy = copy.copy(allNotesSoFar)
                 allNotesCopy.append(music21Note)
                 currentMapping[(startTime, endTime)] = allNotesCopy      
-    return True
 
 parallelFifthsTable = {}
 hiddenFifthsTable = {}
@@ -183,6 +183,10 @@ def hiddenFifth(possibA, possibB):
 # Takes in two possibilities, returns (partNumberA, partNumberB) which represent
 # voices between the two possibilities which form parallel octaves
 def parallelOctaves(possibA, possibB):
+    iter1 = itertools.combinations([1,2,3,4], 2)
+    partViolations = []
+    
+    
     pairsList = possibility.partPairs(possibA, possibB)
     partViolations = []
     
@@ -268,20 +272,63 @@ def noteOrRestToPitch(music21NoteOrRest):
 
 #------------------------------------------------------------------------------
 
+def playWithIterators():
+    from music21 import pitch
+    C4 = pitch.Pitch('C4')
+    D4 = pitch.Pitch('D4')
+    E4 = pitch.Pitch('E4')
+    F4 = pitch.Pitch('F4')
+    G4 = pitch.Pitch('G4')
+    B4 = pitch.Pitch('B4')
+    C5 = pitch.Pitch('C5')
+    possibA1 = (C5, G4, E4, C4)
+    possibB1 = (B4, F4, D4, D4)
+    iter1 = itertools.izip(possibA1, possibB1)
+    print list(itertools.combinations([1,2,3,4], 1)) # one voice
+    print list(itertools.combinations([1,2,3,4], 2)) # two voices
+    print list(itertools.combinations([1,2,3,4], 3)) # three voices
+
+
+    print list(itertools.combinations(iter1, 2))
+    print possibility.partPairs(possibA1, possibB1)
+
 def playWithHarmonies():
+    from music21.figuredBass import examples
+    from music21.figuredBass import rules
+    from music21 import converter
+    fbLine = examples.exampleD()
+    fbRules = rules.Rules()
+    fbRules.forbidParallelFifths = False
+    fbRules.forbidParallelOctaves = False
+    #fbRules.upperPartsMaxSemitoneSeparation = None
+    fbRules.partMovementLimits.append((1,4))
+    r1 = fbLine.realize(fbRules)
+    r1.keyboardStyleOutput = False
+    #music21Stream = converter.parse('/Users/Jose/Documents/demo.xml')
+    music21Stream = corpus.parseWork('bach/bwv56.5.xml')
+    music21Stream.show()
+    #music21Stream.show('text')
+    for music21Part in music21Stream.getElementsByClass('Part'):
+        music21Part.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    #music21Stream.show('text')
+    print checkConsecutivePossibilities(music21Stream, parallelFifths)
+    print checkConsecutivePossibilities(music21Stream, parallelOctaves, color = "#0000FF")
+    music21Stream.show()
+    return
     #hallelujah = corpus.parseWork('handel/hwv56/movement2-21.md').getElementsByClass('Part')
     #music21Stream = hallelujah
-    #from music21 import converter
     #smusic21Stream = converter.parse('/Users/Jose/Downloads/Selective Defrostingv2.xml')
-    music21Stream = corpus.parseWork('mozart/k421/movement1')
+    music21Stream = converter.parse("corelli/op3no1/1grave")
+    #music21Stream = corpus.parseWork('mozart/k421/movement1')
     #music21Stream = corpus.parseWork('bach/bwv144.3.xml')
-    print checkSinglePossibilities(music21Stream, voiceCrossing, color = "#0000FF")
-    #print checkConsecutivePossibilities(music21Stream, parallelFifths, debug = True)
+    #print checkSinglePossibilities(music21Stream, voiceCrossing, color = "#0000FF")
+    print checkConsecutivePossibilities(music21Stream, hiddenOctave, debug = True)
     music21Stream.show()
 
 if __name__ == "__main__":
     pass
-    playWithHarmonies()
+    playWithIterators()
+    #playWithHarmonies()
 
 #------------------------------------------------------------------------------
 # eof
