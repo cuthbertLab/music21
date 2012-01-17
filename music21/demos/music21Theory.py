@@ -139,7 +139,7 @@ def checkScaleDegrees(sc,scorePart,markerPart):
 
 def checkIntervalDegrees(sc,upperPart, lowerPart, markerPart):
     # Checks whether lyrics of marker part matches interval between lower part and upper part 
-    for nMarker in sc.chordify().getElementsByClass('Chord'):
+    for nMarker in sc.parts[markerPart].flat.getElementsByClass('Note'):
         nLower = sc.parts[lowerPart].flat.getElementAtOrBefore(nMarker.offset,classList={'Note'})
         nUpper = sc.parts[upperPart].flat.getElementAtOrBefore(nMarker.offset,classList={'Note'})
         intv = interval.notesToInterval(nLower,nUpper).generic.undirected
@@ -346,6 +346,7 @@ def locateAbundantLeaps(music21Stream):
 
 # Harmonic Intervals are consonant (Letter J)
 
+# Ex: addHarmonicIntervalEditorials(sc.parts[0],sc.parts[1])
 
 CONSONANT_INTERVALS = ["P1","m3","M3","P5","m6","M6"]
 
