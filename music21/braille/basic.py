@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: UTF-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         basic.py
 # Purpose:      music21 class which allows transcription of music21Object instances to braille.
@@ -44,6 +44,12 @@ textExpressions = lookup.textExpressions
 
 def barlineToBraille(music21Barline):
     '''
+    Takes in a :class:`~music21.bar.Barline` and returns its representation
+    as a braille string in UTF-8 unicode.
+    
+    
+    .. note:: Only double barlines and final barlines can be transcribed.
+        
     >>> from music21.braille import basic
     >>> from music21 import bar
     >>> doubleBarline = bar.Barline('double')
@@ -60,6 +66,22 @@ def barlineToBraille(music21Barline):
 
 def chordToBraille(music21Chord, descending = True, showOctave = True):
     '''
+    Takes in a :class:`~music21.chord.Chord` and returns its representation
+    as a braille string in UTF-8 unicode.
+
+    
+    In braille, only one pitch of a chord is brailled, with the rest represented
+    as numeric intervals from that one pitch. If descending is True, the highest
+    (sounding) pitch is brailled, and intervals are labeled in descending order;
+    if descending is False, the lowest (sounding) pitch is brailled, and the
+    intervals are labeled in ascending order. Convention dictates that chords
+    found in the treble clef are brailled descending, and those found in the bass 
+    clef are brailled ascending.
+    
+
+    If showOctave is True, the octave of the brailled pitch is shown. Other
+    octave marks are shown in context relative to the brailled pitch.
+    
     >>> from music21.braille import basic
     >>> from music21 import chord
     >>> gMajorTriadA = chord.Chord(['G4','B4','D5','G5'], quarterLength = 4.0)
@@ -114,6 +136,13 @@ def chordToBraille(music21Chord, descending = True, showOctave = True):
 
 def clefToBraille(music21Clef):
     '''
+    Takes in a :class:`~music21.clef.Clef` and returns its representation
+    as a braille string in UTF-8 unicode.
+    
+    
+    .. note:: Only :class:`~music21.clef.TrebleClef`, :class:`~music21.clef.BassClef`,
+    :class:`~music21.clef.AltoClef`, and :class:`~music21.clef.TenorClef` can be transcribed.
+    
     >>> from music21.braille import basic
     >>> from music21 import clef
     >>> trebleClef = clef.TrebleClef()
@@ -142,6 +171,15 @@ def clefToBraille(music21Clef):
 
 def dynamicToBraille(music21Dynamic, precedeByWordSign = True):
     '''
+    Takes in a :class:`~music21.dynamics.Dynamic` and returns its 
+    :attr:`~music21.dynamics.Dynamic.value` as a braille string in
+    UTF-8 unicode.
+
+    
+    If precedeByWordSign is True, the value is preceded by a word
+    sign (⠜).
+    
+    
     >>> from music21.braille import basic
     >>> from music21 import dynamics
     >>> print basic.dynamicToBraille(dynamics.Dynamic('f'))
@@ -161,7 +199,7 @@ def dynamicToBraille(music21Dynamic, precedeByWordSign = True):
 def instrumentToBraille(music21Instrument):
     '''
     Takes in a :class:`~music21.instrument.Instrument` and returns its "best name"
-    as a braille string in utf-8 unicode.
+    as a braille string in UTF-8 unicode.
     
     
     >>> from music21.braille import basic
@@ -181,7 +219,7 @@ def instrumentToBraille(music21Instrument):
 def keySigToBraille(music21KeySignature, outgoingKeySig = None):
     '''
     Takes in a :class:`~music21.key.KeySignature` and returns its representation 
-    in braille as a string in utf-8 unicode.
+    in braille as a string in UTF-8 unicode.
     
     >>> from music21.braille import basic
     >>> from music21 import key
@@ -214,7 +252,7 @@ def keySigToBraille(music21KeySignature, outgoingKeySig = None):
 
 def metronomeMarkToBraille(music21MetronomeMark):
     '''
-    Takes in a :class:`~music21.tempo.MetronomeMark` and returns it as a braille string in utf-8 unicode.
+    Takes in a :class:`~music21.tempo.MetronomeMark` and returns it as a braille string in UTF-8 unicode.
     The format is (note C with duration of metronome's referent)(metronome symbol)(number/bpm).
     
     >>> from music21.braille import basic
@@ -236,7 +274,7 @@ def metronomeMarkToBraille(music21MetronomeMark):
 def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
     '''
     Given a :class:`~music21.note.Note`, returns the appropriate braille 
-    characters as a string in utf-8 unicode.
+    characters as a string in UTF-8 unicode.
     
     
     The format for note display in braille is the accidental (if necessary)
@@ -420,7 +458,7 @@ def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
 def restToBraille(music21Rest):
     '''
     Given a :class:`~music21.note.Rest`, returns the appropriate braille 
-    characters as a string in utf-8 unicode.
+    characters as a string in UTF-8 unicode.
     
     
     Currently, only supports single rests with or without dots.
@@ -452,7 +490,7 @@ def restToBraille(music21Rest):
 def tempoTextToBraille(music21TempoText):
     '''
     Takes in a :class:`~music21.tempo.TempoText` and returns its representation in braille 
-    as a string in utf-8 unicode. The tempo text is returned uncentered, and is split around
+    as a string in UTF-8 unicode. The tempo text is returned uncentered, and is split around
     the comma, each split returned on a separate line. The literary period required at the end
     of every tempo text expression in braille is also included.
     
@@ -496,6 +534,8 @@ def tempoTextToBraille(music21TempoText):
 
 def textExpressionToBraille(music21TextExpression, precedeByWordSign = True):    
     '''
+    
+    
     music21TextExpression = expressions.TextExpression('dim. e rall.')
     '''
     try:
@@ -518,7 +558,7 @@ def textExpressionToBraille(music21TextExpression, precedeByWordSign = True):
 def timeSigToBraille(music21TimeSignature):
     '''
     Takes in a :class:`~music21.meter.TimeSignature` and returns its
-    representation in braille as a string in utf-8 unicode.
+    representation in braille as a string in UTF-8 unicode.
     
 
     >>> from music21.braille import basic
@@ -617,7 +657,7 @@ def showOctaveWithNote(previousNote, currentNote):
 def transcribeHeading(music21KeySignature = None, music21TimeSignature = None, music21TempoText = None, music21MetronomeMark = None, maxLineLength = 40):
     '''
     Takes in a :class:`~music21.key.KeySignature`, :class:`~music21.meter.TimeSignature`, :class:`~music21.tempo.TempoText`, and
-    :class:`~music21.tempo.MetronomeMark` and returns its representation in braille as a string in utf-8 unicode. The contents
+    :class:`~music21.tempo.MetronomeMark` and returns its representation in braille as a string in UTF-8 unicode. The contents
     are always centerd on a line, whose width is 40 by default.
     
     
@@ -739,7 +779,7 @@ def transcribeNoteFingering(sampleNoteFingering = '1', upperFirstInFingering = T
 def transcribeSignatures(music21KeySignature, music21TimeSignature, outgoingKeySig = None):
     '''
     Takes in a :class:`~music21.key.KeySignature` and :class:`~music21.meter.TimeSignature` and returns its representation 
-    in braille as a string in utf-8 unicode. If given an old key signature, then its cancellation will be applied before
+    in braille as a string in UTF-8 unicode. If given an old key signature, then its cancellation will be applied before
     and in relation to the new key signature.
     
     
@@ -770,7 +810,7 @@ def transcribeSignatures(music21KeySignature, music21TimeSignature, outgoingKeyS
 
 def brailleUnicodeToBrailleAscii(brailleUnicode):
     '''
-    translates a braille utf-8 unicode string into braille ASCII,
+    translates a braille UTF-8 unicode string into braille ASCII,
     which is the format compatible with most braille embossers.
     
     
@@ -810,7 +850,7 @@ def brailleUnicodeToBrailleAscii(brailleUnicode):
 
 def brailleAsciiToBrailleUnicode(brailleAscii):
     '''
-    translates a braille ASCII string to braille utf-8 unicode, which
+    translates a braille ASCII string to braille UTF-8 unicode, which
     can then be displayed on-screen in braille on compatible systems.
     
     
@@ -847,7 +887,7 @@ def brailleAsciiToBrailleUnicode(brailleAscii):
 
 def brailleUnicodeToSymbols(brailleUnicode, filledSymbol = 'o', emptySymbol = u'\u00B7'):
     '''
-    translates a braille unicode string into symbols (ASCII or utf-8).
+    translates a braille unicode string into symbols (ASCII or UTF-8).
     '''
     symbolTrans = {'00': '{symbol1}{symbol2}'.format(symbol1 = emptySymbol, symbol2 = emptySymbol),
                    '01': '{symbol1}{symbol2}'.format(symbol1 = emptySymbol, symbol2 = filledSymbol),
