@@ -27,6 +27,8 @@ If it's not a triad, simply write "X" below that collection of notes.
 
 #-------------------------------------------------------------------------------
 
+# Beth's Triad Checker - Method to solve a single excercise Developed before break.
+
 # Don't call an attribute "stream", because there is a very important module named "stream"
 def checkTriadExercise(music21Stream, studentAnswers):
     c = music21Stream.chordify().flat.getElementsByClass('Chord')
@@ -52,17 +54,27 @@ def checkTriadExercise(music21Stream, studentAnswers):
             
     return outputCheck
 
-# music21 has its own Exception class, which every Exception in music21 should extend.
-class CheckerException(music21.Music21Exception):
-    pass
+#    studentAnswers = [('E-', 'm'), ('D', 'M'), ('X', ''), ('X', ''), ('B', 'd'), 
+#                      ('G', 'M'), ('F#','M'),('C','m'),('X', ''),('D-', 'M'), ('G#', 'm'),
+#                      ('X', 'X'), ('E', 'd'), ('E', 'M'), ('X',''), ('B','m'), ('A', 'M'), 
+#                      ('X',''), ('X',''), ('B-', 'd'), ('G', 'm')]
+
+
+
 
 #-------------------------------------------------------------------------------
+
+# Jose's Triad Checker 
 
 # information about individual exercises should be correlated with student, computer answers to make showing errors easier.
 # include chord itself and bar number, for instance.
 
 # A different plan of attack for checker software.
 # Beth, Lars: E-mail me if you have any questions. Feel free to play around with it.
+
+# music21 has its own Exception class, which every Exception in music21 should extend.
+class CheckerException(music21.Music21Exception):
+    pass
 
 quality = {'diminished': ['diminished','d'],
            'major': ['major','M'],
@@ -96,6 +108,21 @@ def solveExercise(music21Stream):
 def solveChord(music21Chord):
     return (music21Chord.isTriad(), music21Chord.root().name, music21Chord.quality)
 
+#-------------------------------------------------------------------------------
+
+# Example of solving specific assignment from book 11.1.* (Lars)
+
+# The exercise asks students to identify the scale degrees, the interval between parts, and 
+# the harmonic motion.
+
+# To facilitate labeling, the xml of the exercise includes "marker" parts with dummy ("x notehead") notes 
+# to indicate where the student should respond rather than having many question marks or underscores
+# Students' responses are lyrics on those parts
+
+# Each method is passed the complete stream sc, and the indexes of various parts (markerPart, topPart, etc...)
+# allowing the methods to check slight variations on the same assignment (A vs. B-D)
+# Incorrect responses are marked in red, although other output formats would be straightforward to implement
+
 def checkScaleDegrees(sc,scorePart,markerPart):
     exerciseScale = sc.parts[scorePart].flat.getElementsByClass('KeySignature')[0].getScale()
 
@@ -125,10 +152,12 @@ def checkIntervalDegrees(sc,upperPart, lowerPart, markerPart):
             nMarker.color ='black'
             
 def checkMovement(sc,upperPart, lowerPart, markerPart):
-    # Checks whether lyrics of marker part matches motion before that offset in marker part
+    # Checks whether lyrics of marker part matches motion in upper and lower parts before that marker
     prevMarker = note.Note()
     prevMarker.offset = 0
     for nMarker in sc.parts[markerPart].flat.getElementsByClass('Note'):
+        # Use uses the offset of the previous marker to determine which notes to compare
+        # could be set to different value if desired
         offsetDiff = nMarker.offset - prevMarker.offset
         n2Upper = sc.parts[upperPart].flat.getElementAtOrBefore(nMarker.offset,classList={'Note'})
         n1Upper = sc.parts[upperPart].flat.getElementAtOrBefore(nMarker.offset - offsetDiff,classList={'Note'})
@@ -163,8 +192,11 @@ def checkMovement(sc,upperPart, lowerPart, markerPart):
                 nMarker.color = 'red'
                 nMarker.lyric += "->S"
         else:
-            nMarker.color = 'green' # For testing
+            #nMarker.color = 'green' # For testing
+            pass
         prevMarker = nMarker
+
+# Each Exercise from the book
 
 def ex_11_1_A(sc):
     checkScaleDegrees(sc,1,0)
@@ -183,7 +215,7 @@ def ex_11_1_D(sc):
     checkIntervalDegrees(sc,0, 1, 2)
     checkMovement(sc,0,1,3)
 
-    
+# Starting method to automatically add the marker parts -- Not functional
 def askForScaleDegrees(sc, partNumList):
     newStream = stream.Stream()
         
@@ -201,6 +233,11 @@ def askForScaleDegrees(sc, partNumList):
     return newStream
 
 
+#-------------------------------------------------------------------------------
+
+# Examples of checking for Counterpoint Errors as shown in the checklist from chapter 9
+
+# Melodic Intervals - leap/skip is not et with a step in the other part (Letter L)
 
 def createEditorialMelodicIntervals(music21Stream):
     '''Generates intervalList and intervalORList.'''
@@ -305,13 +342,19 @@ def locateAbundantLeaps(music21Stream):
 
 
 
+# ---------
+
+# Harmonic Intervals are consonant (Letter J)
 
 
+CONSONANT_INTERVALS = ["P1","m3","M3","P5","m6","M6"]
 
-
-MELODIC_INTERVALS = ["P1","m3","M3","P5","m6","M6","P8","m10","M10","P12","m13","M13","P15"]
-
-def labelHarmonicIntervals(topPart, bottomPart):
+def addHarmonicIntervalEditorials(topPart, bottomPart):
+    '''Assigns the .editorial.harmonicInterval attribute of each note to an interval object
+    representing the interval between the bottom part and the top part'''
+    # Note: Uses chordify to accommodate different rhythms
+    # The harmonicInterval assigned to each note is the interval
+    # occurring when the note sounds
     s = stream.Stream()
     s.append(topPart)
     s.append(bottomPart)
@@ -324,25 +367,18 @@ def labelHarmonicIntervals(topPart, bottomPart):
         if(bottomNote.offset == c.offset):
             bottomNote.editorial.harmonicInterval = copy.deepcopy(intv)
             
+# Samples of what to do with these harmonic interval editorials:
+
+# Assign as lyrics / print
 def labelBasedOnHarmonicIntervalsEditorial(sc):
     for n in sc.flat.getElementsByClass('Note'):
         n.lyric = n.editorial.harmonicInterval.name
         print n.editorial.harmonicInterval  
-           
-def checkForDissonance(topPart, bottomPart):
-    ''' Given two streams, highlight all dissonant intervals
-    '''
-    for topNote in bottomPart.flat.getElementsByClass('Note'):
-        bottomNote = topPart.flat.getElementAtOrBefore(topNote.offset,classList={'Note'})
-        intv = interval.notesToInterval(bottomNote, topNote)
-        print intv.name
-        if intv.name not in MELODIC_INTERVALS:
-            topNote.color = 'red'
-            bottomNote.color = 'red'
 
+# Check for dissonances and highlight red
 def highlightDissonances(sc):
     for n in sc.flat.getElementsByClass('Note'):
-        if n.editorial.harmonicInterval.name not in MELODIC_INTERVALS:
+        if n.editorial.harmonicInterval.simpleName not in CONSONANT_INTERVALS:
             n.color = 'red'
 
 #-------------------------------------------------------------------------------
@@ -360,24 +396,7 @@ class TextExternal(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    sc = converter.parse('/Users/larsj/Dropbox/Music21Theory/CounterpointExamplesCh9/9.4.A.xml')
-    labelHarmonicIntervals(sc.parts[0],sc.parts[1])
-    labelBasedOnHarmonicIntervalsEditorial(sc)
-    highlightDissonances(sc)
-    sc.show()
-    
-    #studentExcercise = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/CounterpointExamplesCh9/9.4.C.xml')
-    #studentExcercise2 = labelEditorialMotion(studentExcercise)
-    #locateAbundantLeaps(studentExcercise2)
-
-#    studentExercise = corpus.parse('theoryExercises/triadExercise.xml')
-#    studentAnswers = [('E-', 'm'), ('D', 'M'), ('X', ''), ('X', ''), ('B', 'd'), 
-#                      ('G', 'M'), ('F#','M'),('C','m'),('X', ''),('D-', 'M'), ('G#', 'm'),
-#                      ('X', 'X'), ('E', 'd'), ('E', 'M'), ('X',''), ('B','m'), ('A', 'M'), 
-#                      ('X',''), ('X',''), ('B-', 'd'), ('G', 'm')]
-#    print checkTriadExercise(studentExercise, studentAnswers)
-#    print list(checkExercise(studentExercise, studentAnswers))
-    #checkTriadExercise(music21.converter.parse('C:/Users/bhadley/Documents/ex1.xml'), studentAnswers)
+    music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof
