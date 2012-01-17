@@ -114,6 +114,8 @@ class Rules(object):
         self.restrictDoublingsInItalianA6Resolution = True
         
         self._upperPartsRemainSame = False
+        self._partPitchLimits = []
+        self._partsToCheck = []
     
     def __repr__(self):
         return "<music21.figuredBass.rules Rules>" 
