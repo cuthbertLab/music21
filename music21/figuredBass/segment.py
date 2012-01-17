@@ -191,7 +191,8 @@ class Segment(object):
         isItalianAugmentedSixth = self.segmentChord.isItalianAugmentedSixth()
             
         consecPossibRules = \
-        [(fbRules._upperPartsRemainSame, possibility.upperPartsSame, True),
+        [(True, possibility.partsSame, True, [fbRules._partsToCheck]),
+         (fbRules._upperPartsRemainSame, possibility.upperPartsSame, True),
          (fbRules.forbidVoiceOverlap, possibility.voiceOverlap, False),
          (True, possibility.partMovementsWithinLimits, True, [fbRules.partMovementLimits]),
          (fbRules.forbidParallelFifths, possibility.parallelFifths, False),
@@ -690,6 +691,18 @@ class NonChordSegment(Segment):
         self.pitchNamesInChord = pitchNamesAboveBass + [self.bassNote.pitch.name]
         self.compileAllRules(fbRules)
 '''
+
+class OverlayedSegment(Segment):
+    '''
+    Class to allow Segments to be overlayed with non-chord notes.
+    '''
+    def allSinglePossibilities(self):
+        iterables = [self.allPitchesAboveBass] * (self.numParts - 1) # Parts 1 -> n-1
+        iterables.append([fbPitch.HashablePitch(self.bassNote.pitch.nameWithOctave)]) # Part n
+        for (partNumber, partPitch) in self.fbRules._partPitchLimits:
+            iterables[partNumber - 1] = [fbPitch.HashablePitch(partPitch.nameWithOctave)]
+        return itertools.product(*iterables)
+
     
 # HELPER METHODS
 # --------------
