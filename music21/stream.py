@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2011 The music21 Project
+# Copyright:    (c) 2009-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''The :class:`~music21.stream.Stream` and its subclasses, a subclass of the :class:`~music21.base.Music21Object`, is the fundamental container of offset-positioned notation and musical elements in music21. Common Stream subclasses, such as the :class:`~music21.stream.Measure` and :class:`~music21.stream.Score` objects, are defined in this module. 
@@ -5732,6 +5732,7 @@ class Stream(music21.Music21Object):
         # only use inPlace arg on first usage
         if not self.hasMeasures():
             # only try to make voices if no Measures are defined
+            measureStream.makeVoices(inPlace=True, fillGaps=True)
 
             # if this is not inPlace, it will return a newStream; if  
             # inPlace, this returns None
@@ -9333,7 +9334,9 @@ class Stream(music21.Music21Object):
             if len(group) > maxVoiceCount:
                 maxVoiceCount = len(group)
         if maxVoiceCount == 1: # nothing to do here
-            return returnObj
+            if not inPlace: 
+                return returnObj
+            return None
 
         # store all voices in a list
         voices = []
@@ -14533,7 +14536,7 @@ class Test(unittest.TestCase):
 
 
 
-    def testMakeNotation(self):
+    def testMakeNotationA(self):
         '''This is a test of many make procedures
         '''
         def collectTupletType(s):
@@ -14577,6 +14580,44 @@ class Test(unittest.TestCase):
         #s.show()
 
 
+    def testMakeNotationB(self):
+        '''Testing voices making routines within make notation
+        '''
+        from music21 import stream, note
+        s = stream.Stream()
+        s.insert(0, note.Note('C4', quarterLength=8))
+        s.repeatInsert(note.Note('b-4', quarterLength=.5), [x*.5 for x in range(0,16)])
+        s.repeatInsert(note.Note('f#5', quarterLength=2), [0, 2, 4, 6])
+        
+        sPost = s.makeNotation()
+        #sPost.show()
+        # make sure original is not changed
+        self.assertEqual(len(s.voices), 0)
+        self.assertEqual(len(s.notes), 21)
+        # we have generated measures, beams, and voices
+        self.assertEqual(len(sPost.getElementsByClass('Measure')), 2)
+        self.assertEqual(len(sPost.getElementsByClass('Measure')[0].voices), 3)
+        self.assertEqual(len(sPost.getElementsByClass('Measure')[1].voices), 3)        
+        # check beaming
+        for m in sPost.getElementsByClass('Measure'):
+            for n in m.voices[1].notes: # middle voice has beams
+                self.assertEqual(len(n.beams) > 0, True)
+
+    def testMakeNotationC(self):
+        '''Test creating diverse, overlapping durations and notes
+        '''    
+        from music21 import stream, note
+        s = stream.Stream()
+        for duration in [.5, 1.5, 3]:
+            for offset in [0, 1.5, 4, 6]:
+                # create a midi pitch value from duration
+                s.insert(offset, note.Note(50+(duration*2)+(offset*2), 
+                            quarterLength=duration))
+        #s.show()
+        sPost = s.makeNotation()
+        self.assertEqual(len(sPost.getElementsByClass('Measure')), 3)
+        self.assertEqual(len(sPost.getElementsByClass('Measure')[0].voices), 4)
+        self.assertEqual(len(sPost.getElementsByClass('Measure')[1].voices), 4)        
 
     def testMakeTies(self):
 
