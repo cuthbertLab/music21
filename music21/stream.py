@@ -9056,7 +9056,7 @@ class Stream(music21.Music21Object):
         you'll need to flatten each stream as follows:
 
         
-        >>> #_DOCS_SHOW stream1.flat.attachIntervvalsBetweenStreams(stream2.flat)
+        >>> #_DOCS_SHOW stream1.flat.attachIntervalsBetweenStreams(stream2.flat)
         
             
         Example usage:
@@ -9084,6 +9084,48 @@ class Stream(music21.Music21Object):
                     interval1 = interval.notesToInterval(thisNote, simultNote)
                     thisNote.editorial.harmonicInterval = interval1
                     break
+
+    def attachMelodicIntervals(self):
+        '''For each element in self, creates an interval.Interval object in the element's
+        editorial that is the interval between it and the previous element in the stream. Thus,
+        the first element will have a value of None.
+        >>> from music21 import *
+        >>> s1 = converter.parse('C4 d8 e f# g A2 d2', '7/4')
+        >>> s1.attachMelodicIntervals()
+        >>> for n in s1.notes:
+        ...     if n.editorial.melodicInterval is None: print None
+        ...     else: print n.editorial.melodicInterval.directedName
+        None
+        M9
+        M2
+        M2
+        m2
+        m-7
+        P4
+        
+        OMIT_FROM_DOCS
+        >>> s = stream.Stream()
+        >>> s.append(note.Note('C'))
+        >>> s.append(note.Note('D'))
+        >>> s.append(note.Rest(quarterLength = 4.0))
+        >>> s.append(note.Note('D'))
+        >>> s.attachMelodicIntervals()
+        >>> for n in s.notes:
+        ...     if n.editorial.melodicInterval is None: print None # if other voice had a rest...
+        ...     else: print n.editorial.melodicInterval.directedName
+        None
+        M2
+        None
+        '''
+        
+        notes = self.notes
+        currentObject = notes[1]
+        while currentObject != None and not isinstance(currentObject, music21.bar.Barline):
+            previousObject = currentObject.previous()
+            if isinstance(currentObject, note.Note) and isinstance(previousObject, note.Note):
+                currentObject.editorial.melodicInterval = interval.notesToInterval(previousObject, currentObject)
+            currentObject = currentObject.next()
+
 
     def playingWhenAttacked(self, el, elStream = None):
         '''
