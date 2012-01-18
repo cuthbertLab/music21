@@ -1312,7 +1312,6 @@ class DefinedContexts(object):
             callerFirst = self # set DefinedContexts as caller first
         if memo is None:
             memo = {} # intialize
-
         post = None
         count = 0
 
@@ -1322,9 +1321,7 @@ class DefinedContexts(object):
                         sortByCreationTime=sortByCreationTime,
                         priorityTarget=priorityTarget, 
                         excludeNone=True)
-
         #printMemo(memo, 'getByClass() called: looking at %s sites' % len(objs))
-
         classNameIsStr = common.isStr(className)
         for obj in objs:
             #environLocal.printDebug(['memo', memo])
@@ -1343,7 +1340,6 @@ class DefinedContexts(object):
         # and do not have the target class, we can skip
         for obj in objs:
             #if DEBUG_CONTEXT: print '\tY: getByClass: iterating objs:', id(obj), obj
-
             if (classNameIsStr and obj.isFlat and 
                 obj._definedContexts.getSiteCount() == 1):
                 #if DEBUG_CONTEXT: print '\tY: skipping flat stream that does not contain object:', id(obj), obj

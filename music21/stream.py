@@ -5401,7 +5401,7 @@ class Stream(music21.Music21Object):
 
 
     def makeBeams(self, inPlace=True):
-        '''Return a new measure with beams applied to all notes. 
+        '''Return a new Measure, or Stream of Measures, with beams applied to all notes. Measures with Voices will process voices independently. 
 
         In the process of making Beams, this method also updates tuplet types. This is destructive and thus changes an attribute of Durations in Notes.
 
@@ -5451,13 +5451,11 @@ class Stream(music21.Music21Object):
                     noteGroups.append(v.notesAndRests)
             else:
                 noteGroups.append(m.notesAndRests)
-
             #environLocal.printDebug(['noteGroups', noteGroups, 'len(noteGroups[0])',  len(noteGroups[0])])
 
             for noteStream in noteGroups:
                 if len(noteStream) <= 1: 
                     continue # nothing to beam
-    
                 durList = []
                 for n in noteStream:
                     durList.append(n.duration)
@@ -5466,14 +5464,12 @@ class Stream(music21.Music21Object):
                 # error check; call before sending to time signature, as, if this
                 # fails, it represents a problem that happens before time signature
                 # processing
-    
                 durSum = sum([d.quarterLength for d in durList])
                 barQL = lastTimeSignature.barDuration.quarterLength
     
                 if not common.almostEquals(durSum, barQL) and durSum > barQL:
                     #environLocal.printDebug(['attempting makeBeams with a bar that contains durations that sum greater than bar duration (%s > %s)' % (durSum, barQL)])
                     continue
-            
                 # getBeams can take a list of Durations; however, this cannot
                 # distinguish a Note from a Rest; thus, we can submit a flat 
                 # stream of note or note-like entities; will return
@@ -5702,7 +5698,7 @@ class Stream(music21.Music21Object):
     def makeNotation(self, meterStream=None, refStreamOrTimeRange=None,
                         inPlace=False, **subroutineKeywords):
         '''
-        This method calls a sequence of Stream methods on this Stream to prepare notation, including creating Measures if necessary, creating ties, beams, and accidentals.
+        This method calls a sequence of Stream methods on this Stream to prepare notation, including creating voices for overlapped regions, Measures if necessary, creating ties, beams, and accidentals.
 
 
         If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
@@ -5735,6 +5731,8 @@ class Stream(music21.Music21Object):
         
         # only use inPlace arg on first usage
         if not self.hasMeasures():
+            # only try to make voices if no Measures are defined
+
             # if this is not inPlace, it will return a newStream; if  
             # inPlace, this returns None
             # use inPlace=True, as already established above
@@ -9303,6 +9301,17 @@ class Stream(music21.Music21Object):
     def makeVoices(self, inPlace=True, fillGaps=True):
         '''If this Stream has overlapping Notes or Chords, this method will isolate all overlaps in unique Voices, and place those Voices in the Stream.
 
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> s.insert(0, note.Note('C4', quarterLength=4))
+        >>> s.repeatInsert(note.Note('b-4', quarterLength=.5), [x*.5 for x in range(0,8)])
+        >>> s.makeVoices(inPlace=True)
+        >>> len(s.voices)
+        2
+        >>> [n.pitch for n in s.voices[0].notes]
+        [C4]
+        >>> [n.pitch for n in s.voices[1].notes]
+        [B-4, B-4, B-4, B-4, B-4, B-4, B-4, B-4]
         '''
         # this method may not always 
         # produce the optimal voice assignment based on context (register
@@ -9357,7 +9366,9 @@ class Stream(music21.Music21Object):
         # remove rests in returnObj
         returnObj.removeByClass('Rest')
         # elements changed will already have been called
-        return returnObj
+        if not inPlace: 
+            return returnObj
+        return None
 
 
     def internalize(self, container=None, 
@@ -17629,13 +17640,16 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6') 
         #s.measures(6,7).show()
         sMeasures = s.measures(6,7)
-        sFlatVoiced = sMeasures.flat.makeVoices()
+        sFlatVoiced = sMeasures.flat.makeVoices(inPlace=False)
         #sFlatVoiced.show('t')
         #sFlatVoiced.show()
         self.assertEqual(len(sMeasures.flat.notes), len(sFlatVoiced.flat.notes))
         self.assertEqual(sMeasures.flat.highestTime, 
             sFlatVoiced.flat.notes.highestTime)
         self.assertEqual(len(sFlatVoiced.voices), 4)
+
+
+
 
 
 #-------------------------------------------------------------------------------
