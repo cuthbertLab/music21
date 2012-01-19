@@ -2245,25 +2245,9 @@ class Stream(music21.Music21Object):
         for e in self._elements:
             if not e.isClassOrSubclass(classFilterList):
                 found._insertCore(e.getOffsetBySite(self), e, ignoreSort=True)
-
-#             eClasses = e.classes # store once, as this is property call
-#             for className in classFilterList:
-#                 if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
-#                     break # if a match to any of the classes, break
-#                 # only insert after all no match to all classes   
-#                 found._insertCore(e.getOffsetBySite(self), e, ignoreSort=True)
-
         for e in self._endElements:
             if not e.isClassOrSubclass(classFilterList):
                 found._storeAtEndCore(e)
-
-#             eClasses = e.classes # store once, as this is property call
-#             for className in classFilterList:
-#                 if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
-#                     break # if a match to any of the classes, break
-#                 # only insert after all no match to all classes   
-#                 #found.storeAtEnd(e, ignoreSort=True)
-#                 found._storeAtEndCore(e)
 
         # if this stream was sorted, the resultant stream is sorted
         found._elementsChanged(clearIsSorted=False)
@@ -5428,6 +5412,7 @@ class Stream(music21.Music21Object):
 
         #if self.isClass(Measure):
         if 'Measure' in self.classes:
+        #if self.isClassOrSubclass('Measure'):
             mColl = [] # store a list of measures for processing
             mColl.append(returnObj)
         elif len(self.getElementsByClass('Measure')) > 0:
@@ -6078,8 +6063,8 @@ class Stream(music21.Music21Object):
                         and nLast.pitch == n.pitch):
                         endMatch = True
                     # looking for two chords of equal size
-                    elif (nLast is not None and 'Note' not in nLast.classes and 
-                        iLast in posConnected
+                    elif (nLast is not None and not 
+                        self.isClassOrSubclass('Note') and iLast in posConnected
                         and hasattr(nLast, "pitches") and hasattr(n, "pitches")
                         and len(nLast.pitches) == len(n.pitches)):
                         allPitchesMatched = True
@@ -14606,6 +14591,7 @@ class Test(unittest.TestCase):
     def testMakeNotationC(self):
         '''Test creating diverse, overlapping durations and notes
         '''    
+        # TODO: the output of this is missing a tie to the last dotted half
         from music21 import stream, note
         s = stream.Stream()
         for duration in [.5, 1.5, 3]:

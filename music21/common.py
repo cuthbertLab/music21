@@ -786,7 +786,6 @@ def spaceCamelCase(usrStr, replaceUnderscore=True):
             lastIsNum = True
         else:
             lastIsNum = False
-
     postStr = ''.join(post)
     if replaceUnderscore:
         postStr = postStr.replace('_', ' ')
