@@ -58,6 +58,7 @@ from music21.features import base as features
 from music21.features import jSymbolic as featuresJSymbolic
 from music21.features import native as featuresNative
 
+from music21.figuredBass import checker as fbChecker
 from music21.figuredBass import examples as fbExamples
 from music21.figuredBass import fbPitch
 from music21.figuredBass import notation as fbNotation
@@ -185,6 +186,7 @@ MODULES = [
     featuresJSymbolic,
     featuresNative,
     
+    fbChecker,
     fbExamples,
     fbPitch,
     fbNotation,

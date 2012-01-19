@@ -650,6 +650,8 @@ class ThreeNoteLinearSegment(music21.Music21Object):
         pentatonic or scales beyond twelve-notes). Does NOT check if tone is non harmonic
         
         Accepts pitch or note objects; method is dependent on octave information
+
+
         >>> from music21 import *
         >>> voiceLeading.ThreeNoteLinearSegment('C#4','D4','E-4').couldBePassingTone()
         True
@@ -663,10 +665,12 @@ class ThreeNoteLinearSegment(music21.Music21Object):
         False
         
         Directionality must be maintained:
+
         >>> voiceLeading.ThreeNoteLinearSegment('B##3','C4','D--4').couldBePassingTone()
         False
        
         If no octave is given then ._defaultOctave is used.  This is generally octave 4:
+
         >>> voiceLeading.ThreeNoteLinearSegment('C','D','E').couldBePassingTone()
         True
         >>> voiceLeading.ThreeNoteLinearSegment('C4','D','E').couldBePassingTone()
@@ -676,6 +680,7 @@ class ThreeNoteLinearSegment(music21.Music21Object):
         
         Method returns true if either a chromatic passing tone or a diatonic passing
         tone is identified. Spelling of the pitch does matter!
+
         >>> voiceLeading.ThreeNoteLinearSegment('B3','C4','B##3').couldBePassingTone()
         False
         >>> voiceLeading.ThreeNoteLinearSegment('A##3','C4','E---4').couldBePassingTone()
@@ -762,6 +767,7 @@ class ThreeNoteLinearSegment(music21.Music21Object):
 
     def couldBeDiatonicNeighborTone(self):
         '''returns true if and only if noteToAnalyze could be a diatonic neighbor tone
+
         >>> from music21 import *
         >>> voiceLeading.ThreeNoteLinearSegment('C3','D3','C3').couldBeDiatonicNeighborTone()
         True
@@ -1008,7 +1014,7 @@ def _noteContextIsConsonant(note, music21Stream):
     What will happen if there’s a rest in another part at 
     the same moment as the note? will the previous note get added to the chord 
     even though it’s no longer sounding?  
-    Fix: getElementAtorBefore now grabs the rest object, but doesn't add
+    Fix: getElementAtOrBefore now grabs the rest object, but doesn't add
     it to the pitches list. 
     '''
     pitches = []
@@ -1025,7 +1031,7 @@ def _noteContextIsConsonant(note, music21Stream):
     return cWithPitch.isConsonant()
 
 def _beatIsUnaccented(note):
-    #only unnacented passing tones are labeled
+    #only unaccented passing tones are labeled
     try:
         return note.beatStrength < 0.5
     except:

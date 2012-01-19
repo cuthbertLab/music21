@@ -285,10 +285,12 @@ def dottedMatch(qLen, maxDots=4):
     (2, 'quarter')
 
     This value is not equal to any dotted note length
+
     >>> duration.dottedMatch(1.6)
     (False, False)
     
     maxDots can be lowered for certain searches
+
     >>> duration.dottedMatch(1.875)
     (3, 'quarter')
     >>> duration.dottedMatch(1.875, 2)
@@ -457,13 +459,12 @@ def quarterLengthToDurations(qLen, link=True):
 
     >>> duration.unitSpec(duration.quarterLengthToDurations(2.3333333))
     [(2.0, 'half', 0, None, None, None), (0.333..., 'eighth', 0, 3, 2, 'eighth')]
-
+    
     >>> duration.unitSpec(duration.quarterLengthToDurations(1.0/6.0))
     [(0.1666..., '16th', 0, 3, 2, '16th')]
 
     >>> duration.quarterLengthToDurations(.18333333333333)
     [<music21.duration.DurationUnit 0.125>, <music21.duration.DurationUnit 0.03125>, <music21.duration.DurationUnit 0.015625>, <music21.duration.DurationUnit 0.0078125>]
-
 
     >>> duration.quarterLengthToDurations(0.0)
     [<music21.duration.ZeroDuration>]

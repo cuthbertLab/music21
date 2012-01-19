@@ -73,6 +73,7 @@ Module Reference
    moduleFeaturesBase
    moduleFeaturesJSymbolic
    moduleFeaturesNative
+   moduleFiguredBassChecker
    moduleFiguredBassExamples
    moduleFiguredBassFbPitch
    moduleFiguredBassNotation
