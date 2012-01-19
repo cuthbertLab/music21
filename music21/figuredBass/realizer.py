@@ -261,10 +261,13 @@ class FiguredBassLine(object):
         bassLine.append(clef.BassClef())
         for (bassNote, notationString) in self._fbList:
             bassLine.append(bassNote)
-            
+
         return bassLine
     
     def retrieveSegments(self, fbRules = rules.Rules(), numParts = 4, maxPitch = pitch.Pitch('B5')):
+        '''
+        generates the segmentList from an fbList, including any overlayed Segments
+        '''
         segmentList = []
         bassLine = self.generateBassLine()
         if len(self._overlayedParts) >= 1:
@@ -338,27 +341,23 @@ class FiguredBassLine(object):
         7908
         
         OMIT_FROM_DOCS
-        >>> fbLine2 = realizer.FiguredBassLine(key.Key('C'), meter.TimeSignature('2/4'))
-        >>> fbLine2.addElement(harmony.ChordSymbol('C'))
-        >>> fbLine2.addElement(harmony.ChordSymbol('F'))
-        >>> r2 = fbLine2.realize()
-        >>> r2.getNumSolutions()
-        13
         >>> fbLine3 = realizer.FiguredBassLine(key.Key('C'), meter.TimeSignature('2/4'))
-        >>> fbLine3.addElement(roman.RomanNumeral('I'))
-        >>> fbLine3.addElement(roman.RomanNumeral('IV'))
-        >>> r2 = fbLine3.realize()
-        >>> r2.getNumSolutions()
+        >>> fbLine3.addElement(harmony.ChordSymbol('C'))
+        >>> fbLine3.addElement(harmony.ChordSymbol('F'))
+        >>> r3 = fbLine3.realize()
+        >>> r3.getNumSolutions()
+        13
+        >>> fbLine4 = realizer.FiguredBassLine(key.Key('C'), meter.TimeSignature('2/4'))
+        >>> fbLine4.addElement(roman.RomanNumeral('I'))
+        >>> fbLine4.addElement(roman.RomanNumeral('IV'))
+        >>> r4 = fbLine4.realize()
+        >>> r4.getNumSolutions()
         13
         '''
-        segmentList = self.retrieveSegments(fbRules, numParts, maxPitch)
-        #segmentList = []
-        #for (bassNote, notationString) in self._fbList:
-        #    correspondingSegment = segment.Segment(bassNote, notationString, self._fbScale, fbRules, numParts, maxPitch)
-        #    segmentList.append(correspondingSegment)
         
         #!---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects --------!
         segmentList = []
+
         listOfChordSymbols = False
         listOfRomanNumerals = False
         for item in self._fbList:
@@ -373,7 +372,6 @@ class FiguredBassLine(object):
             
         if listOfChordSymbols:
             for chordSymbolObject in self._fbList:
-                #print chordSymbolObject.bass.name
                 listofpitchesjustnames = []
                 for pitch in chordSymbolObject.chord.pitches:
                     listofpitchesjustnames.append(pitch.name)
@@ -386,6 +384,7 @@ class FiguredBassLine(object):
                 
                 correspondingSegment = segment.Segment(bassNote=passedNote, \
                 fbScale=self._fbScale, fbRules=fbRules, numParts=numParts, maxPitch=maxPitch, listOfPitches=outputList) 
+                correspondingSegment.quarterLength = chordSymbolObject.duration.quarterLength
                 segmentList.append(correspondingSegment)
         elif listOfRomanNumerals:
             for romanNumeralObject in self._fbList:
@@ -401,14 +400,12 @@ class FiguredBassLine(object):
                 passedNote = note.Note(romanNumeralObject.bass().nameWithOctave, quarterLength = romanNumeralObject.duration.quarterLength)
                 
                 correspondingSegment = segment.Segment(bassNote=passedNote, \
-                fbScale=self._fbScale, fbRules=fbRules, numParts=numParts, maxPitch=maxPitch, listOfPitches=outputList) 
+                fbScale=self._fbScale, fbRules=fbRules, numParts=numParts, maxPitch=maxPitch, listOfPitches=outputList)
+                correspondingSegment.quarterLength = romanNumeralObject.duration.quarterLength 
                 segmentList.append(correspondingSegment)                
         #!---------- Original code - Accommodates a tuple (figured bass)  --------!
         else:
-            for (bassNote, notationString) in self._fbList:
-                correspondingSegment = segment.Segment(bassNote, notationString, self._fbScale, fbRules, numParts, maxPitch)
-                segmentList.append(correspondingSegment)
-        
+            segmentList = self.retrieveSegments(fbRules, numParts, maxPitch)      
 
         if len(segmentList) >= 2:
             for segmentIndex in range(len(segmentList) - 1):
@@ -543,7 +540,7 @@ class Realization(object):
             self._inTime = fbLineOutputs['inTime']
         if 'overlayedParts' in fbLineOutputs:
             self._overlayedParts = fbLineOutputs['overlayedParts']
-        self.keyboardStyleOutput = False #Only for MMM presentation, change back to True afterward
+        self.keyboardStyleOutput = True 
 
     def getNumSolutions(self):
         '''
@@ -721,7 +718,7 @@ class Realization(object):
                     possibA = possibilityProgression[segmentIndex]
                     bassNote = self._segmentList[segmentIndex].bassNote
                     bassLine.append(copy.deepcopy(bassNote))  
-                    rhPitches = possibA[len(self._overlayedParts):-1]                           
+                    rhPitches = possibA[len(self._overlayedParts):-1]                         
                     rhChord = chord.Chord(rhPitches)
                     rhChord.quarterLength = self._segmentList[segmentIndex].quarterLength
                     rightHand.append(rhChord)
@@ -778,7 +775,7 @@ class Realization(object):
             return self.generateAllRealizations()
         allSols = stream.Score()
         bassLine = stream.Part()
-        
+
         if self.keyboardStyleOutput:
             rightHand = stream.Part()
             for music21Part in self._overlayedParts:
