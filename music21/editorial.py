@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -23,7 +23,8 @@ class EditorialException(Exception):
 class CommentException(Exception):
     pass
 
-def getObjectsWithEditorial(listToSearch, editorialStringToFind, listOfValues = None):
+def getObjectsWithEditorial(listToSearch, editorialStringToFind, 
+    listOfValues=None):
     '''
     provided a list of objects (typically note objects) to search through, this method returns
     only those objects that have the editorial attribute defined by the editorialStringToFind.

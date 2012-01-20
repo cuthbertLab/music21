@@ -2613,7 +2613,8 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [notesToChromatic, intervalsToDiatonic, intervalFromGenericAndChromatic, 
+_DOC_ORDER = [notesToChromatic, intervalsToDiatonic, 
+        intervalFromGenericAndChromatic, 
               Interval]
 
 

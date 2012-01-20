@@ -213,6 +213,7 @@ class Stream(music21.Music21Object):
         self._cache = common.DefaultHash()
 
         if givenElements is not None:
+            # TODO: perhaps convert a single element into a list?
             for e in givenElements:
                 self.insert(e)
 
@@ -1077,7 +1078,7 @@ class Stream(music21.Music21Object):
                 # elements; their components, however, are not copied, and 
                 # must be replaced
                 for e in self._elements: 
-                    #environLocal.printDebug(['deepcopy()', e, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e), 'e.activeSite', e.activeSite, 'e.getSites()', e.getSites(), 'e.getSiteIds()', e.getSiteIds()], format='block')
+                    #environLocal.pd(['deepcopy()', e, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e), 'e.activeSite', e.activeSite, 'e.getSites()', e.getSites(), 'e.getSiteIds()', e.getSiteIds()], format='block')
                     # this will work for all with __deepcopy___
                     # get the old offset from the activeSite Stream     
                     # user here to provide new offset
@@ -6840,8 +6841,10 @@ class Stream(music21.Music21Object):
         for e in self._yieldElementsDownward(streamsOnly=False,     
             restoreActiveSites=True):
             #e.purgeLocations(rescanIsDead=True)
-            e.removeNonContainedLocations()
-            #if isinstance(e, Stream):
+            # NOTE: calling this method was having the side effect of removing
+            # sites from locations when a Note was both in a Stream and in 
+            # an Interval
+            #e.removeNonContainedLocations()
             if e.isStream:
                 e.sort() # sort before making immutable
                 e._mutable = False
@@ -9061,12 +9064,14 @@ class Stream(music21.Music21Object):
         P8
         None
         '''
-        for thisNote in self.notes:
-            simultEls = cmpStream.getElementsByOffset(thisNote.offset, mustBeginInSpan = False, mustFinishInSpan = False)
+        for n in self.notes:
+            # get simultaneous elements form other stream
+            simultEls = cmpStream.getElementsByOffset(n.getOffsetBySite(self), 
+                mustBeginInSpan=False, mustFinishInSpan=False)
             if len(simultEls) > 0:
                 for simultNote in simultEls.notes:
-                    interval1 = interval.notesToInterval(thisNote, simultNote)
-                    thisNote.editorial.harmonicInterval = interval1
+                    interval1 = interval.notesToInterval(n, simultNote)
+                    n.editorial.harmonicInterval = interval1
                     break
 
     def attachMelodicIntervals(self):

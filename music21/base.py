@@ -270,7 +270,6 @@ class DefinedContexts(object):
 
         new = self.__class__()
         locations = [] #self._locationKeys[:]
-
         for idKey in self._definedContexts.keys():
             dict = self._definedContexts[idKey]
             if dict['isDead']:
@@ -997,7 +996,11 @@ class DefinedContexts(object):
 
 
     def removeNonContainedLocations(self):
-        '''Remove all locations in which the object that contains this DefinedContexts object is not actually stored within 
+        '''Remove all locations in which the object that contains this DefinedContexts object is not actually stored within.
+
+        Said another way: this looks at all defined sites (Streams), if that
+        Stream does not actually have this element, was removing the site 
+        from the elements sites. 
         '''
         remove = []
         for idKey in self._locationKeys:
@@ -1865,7 +1868,7 @@ class Music21Object(JSONSerializer):
 
         # call class to get a new, empty instance
         new = self.__class__()
-        #environLocal.printDebug(['Music21Object.__deepcopy__', self, id(self)])
+        #environLocal.pd(['Music21Object.__deepcopy__', self, id(self)])
         #for name in dir(self):
         for name in self.__dict__.keys():
             if name.startswith('__'):
@@ -1880,15 +1883,9 @@ class Music21Object(JSONSerializer):
             # use _definedContexts own __deepcopy__, but set contained by id
             elif name == '_definedContexts':
                 newValue = copy.deepcopy(part, memo)
+                #environLocal.pd(['copied definedContexts:', newValue._locationKeys])
                 newValue.containedById = id(new)
                 setattr(new, name, newValue)
-            # this is an error check, particularly for object that inherit
-            # this object and place a Stream as an attribute
-#             elif name == '_elements':
-#             #elif hasattr(part, '_elements'):
-#                 environLocal.printDebug(['found stream in dict keys', self,
-#                     part, name])
-#                 raise Music21Exception('streams as attributes requires special handling when deepcopying')
             else: # use copy.deepcopy, will call __deepcopy__ if available
                 newValue = copy.deepcopy(part, memo)
                 #setattr() will call the set method of a named property.
