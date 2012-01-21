@@ -21,13 +21,15 @@ from music21 import common
 from music21 import pitch
 from music21.note import Note
 from music21.interval import Interval
+from music21 import key
 
 #TODO: rename VoiceLeadingQuartet -> Pairwise
 #TODO: add chordwise -- add parsimonious (all move by step or not at all)
 
 #-------------------------------------------------------------------------------
 class VoiceLeadingQuartet(music21.Music21Object):
-    '''An object consisting of four pitches: v1n1, v1n2, v2n1, v2n2
+    '''
+    An object consisting of four pitches: v1n1, v1n2, v2n1, v2n2
     where v1n1 moves to v1n2 at the same time as 
     v2n1 moves to v2n2.  
     
@@ -44,8 +46,8 @@ class VoiceLeadingQuartet(music21.Music21Object):
         self.v1n2 = v1n2
         self.v2n1 = v2n1
         self.v2n2 = v2n2    
-        self.vIntervals = []
-        self.hIntervals = []
+        self.vIntervals = [] #vertical intervals (harmonic)
+        self.hIntervals = [] #horizontal intervals (melodic)
         if v1n1 is not None and v1n2 is not None and v2n1 is not None and v2n2 is not None:
             self._findIntervals()
     
@@ -56,7 +58,8 @@ class VoiceLeadingQuartet(music21.Music21Object):
         self.hIntervals.append(interval.notesToInterval(self.v2n1, self.v2n2))
     
     def noMotion(self):
-        '''Returns true if no voice moves at this "voice-leading" moment
+        '''
+        Returns true if no voice moves at this "voice-leading" moment
 
 
         >>> from music21 import *
@@ -64,13 +67,11 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> n2 = note.Note('G4')
         >>> m1 = note.Note('D4')
         >>> m2 = note.Note('D4')
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.noMotion()
         True
         >>> n2.octave = 5
-        
-        
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.noMotion()
         False
 
@@ -91,15 +92,15 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> n2 = note.Note('G4')
         >>> m1 = note.Note('D4')
         >>> m2 = note.Note('D4')
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.obliqueMotion()
         False
         >>> n2.octave = 5
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.obliqueMotion()
         True
         >>> m2.octave = 5
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.obliqueMotion()
         False
         
@@ -126,19 +127,19 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> n2 = note.Note('G4')
         >>> m1 = note.Note('G4')
         >>> m2 = note.Note('G4')
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.similarMotion()
         False
         >>> n2.octave = 5
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.similarMotion()
         False
         >>> m2.octave = 5
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.similarMotion()
         True
         >>> m2 = note.Note('A5')
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.similarMotion()
         True
         
@@ -153,7 +154,8 @@ class VoiceLeadingQuartet(music21.Music21Object):
                 return False
  
     def parallelMotion(self, requiredInterval = None):
-        '''returns True if both voices move with the same interval or an
+        '''
+        returns True if both voices move with the same interval or an
         octave duplicate of the interval.  if requiredInterval is given
         then returns True only if the parallel interval is that simple interval.
         
@@ -163,15 +165,15 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> n2 = note.Note('G4')
         >>> m1 = note.Note('G4')
         >>> m2 = note.Note('G4')
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.parallelMotion() #no motion, so oblique motion will give False
         False
         >>> n2.octave = 5
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.parallelMotion()
         False
         >>> m2.octave = 5
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.parallelMotion()
         True
         >>> vl.parallelMotion('P8')
@@ -180,7 +182,7 @@ class VoiceLeadingQuartet(music21.Music21Object):
         False
         
         >>> m2 = note.Note('A5')
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.parallelMotion()
         False
 
@@ -205,29 +207,28 @@ class VoiceLeadingQuartet(music21.Music21Object):
         '''
         returns True if both voices move in opposite directions
 
-
         >>> from music21 import *
         >>> n1 = note.Note('G4')
         >>> n2 = note.Note('G4')
         >>> m1 = note.Note('G4')
         >>> m2 = note.Note('G4')
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.contraryMotion() #no motion, so oblique motion will give False
         False
         >>> n2.octave = 5
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.contraryMotion()
         False
         >>> m2.octave = 5
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.contraryMotion()
         False
         >>> m2 = note.Note('A5')
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.contraryMotion()
         False
         >>> m2 = note.Note('C4')
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.contraryMotion()
         True
         
@@ -242,6 +243,40 @@ class VoiceLeadingQuartet(music21.Music21Object):
                 return False
             else:
                 return True
+ 
+    def outwardContraryMotion(self):
+        '''
+        Returns true if both voices move outward by contrary motion
+        
+        >>> from music21 import *
+        >>> n1 = note.Note('D5')
+        >>> n2 = note.Note('E5')
+        >>> m1 = note.Note('G4')
+        >>> m2 = note.Note('F4')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.outwardContraryMotion()
+        True
+        >>> vl.inwardContraryMotion()
+        False
+        '''
+        return self.contraryMotion() and self.hIntervals[0].direction == 1
+ 
+    def inwardContraryMotion(self):
+        '''
+        Returns true if both voices move inward by contrary motion
+        
+        >>> from music21 import *
+        >>> n1 = note.Note('C5')
+        >>> n2 = note.Note('B4')
+        >>> m1 = note.Note('G4')
+        >>> m2 = note.Note('A4')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.inwardContraryMotion()
+        True
+        >>> vl.outwardContraryMotion()
+        False
+        '''
+        return self.contraryMotion() and self.hIntervals[0].direction == -1
  
     def antiParallelMotion(self, simpleName = None):
         '''
@@ -277,7 +312,7 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> n2 = note.Note('G4')
         >>> m1 = note.Note('G4')
         >>> m2 = note.Note('G3')
-        >>> vl2 = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl2 = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl2.antiParallelMotion()
         False
         '''
@@ -307,28 +342,27 @@ class VoiceLeadingQuartet(music21.Music21Object):
         Returns true if there is a parallel motion or antiParallel motion of
         this type (thisInterval should be an Interval object)
         
-        >>> from music21 import *
-        >>> n11 = note.Note("C4")
-        >>> n12a = note.Note("D4") # ascending 2nd
-        >>> n12b = note.Note("D3") # descending 7th
+        >>> n11 = Note("C4")
+        >>> n12a = Note("D4") # ascending 2nd
+        >>> n12b = Note("D3") # descending 7th
 
-        >>> n21 = note.Note("G4")
-        >>> n22a = note.Note("A4") # ascending 2nd
-        >>> n22b = note.Note("B4") # ascending 3rd
-        >>> vlq1 = voiceLeading.VoiceLeadingQuartet(n11, n12a, n21, n22a)
-        >>> vlq1.parallelInterval(interval.Interval("P5"))
+        >>> n21 = Note("G4")
+        >>> n22a = Note("A4") # ascending 2nd
+        >>> n22b = Note("B4") # ascending 3rd
+        >>> vlq1 = VoiceLeadingQuartet(n11, n12a, n21, n22a)
+        >>> vlq1.parallelInterval(Interval("P5"))
         True
-        >>> vlq1.parallelInterval(interval.Interval("P8"))
+        >>> vlq1.parallelInterval(Interval("P8"))
         False
         
         Antiparallel fifths also are true
-        >>> vlq2 = voiceLeading.VoiceLeadingQuartet(n11, n12b, n21, n22a)
-        >>> vlq2.parallelInterval(interval.Interval("P5"))
+        >>> vlq2 = VoiceLeadingQuartet(n11, n12b, n21, n22a)
+        >>> vlq2.parallelInterval(Interval("P5"))
         True
         
         Non-parallel intervals are, of course, False
-        >>> vlq3 = voiceLeading.VoiceLeadingQuartet(n11, n12a, n21, n22b)
-        >>> vlq3.parallelInterval(interval.Interval("P5"))
+        >>> vlq3 = VoiceLeadingQuartet(n11, n12a, n21, n22b)
+        >>> vlq3.parallelInterval(Interval("P5"))
         False
         '''
         
@@ -343,13 +377,11 @@ class VoiceLeadingQuartet(music21.Music21Object):
     def parallelFifth(self):
         '''
         Returns true if the motion is a parallel Perfect Fifth (or antiparallel) or Octave duplication
-
-        >>> from music21 import *
-        >>> voiceLeading.VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("G4"), Note("A4")).parallelFifth()
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("G4"), Note("A4")).parallelFifth()
         True
-        >>> voiceLeading.VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("G5"), Note("A5")).parallelFifth()
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("G5"), Note("A5")).parallelFifth()
         True
-        >>> voiceLeading.VoiceLeadingQuartet(Note("C4"), Note("D#4"), Note("G4"), Note("A4")).parallelFifth()
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D#4"), Note("G4"), Note("A4")).parallelFifth()
         False
         '''
         return self.parallelInterval(self.fifth)
@@ -360,13 +392,11 @@ class VoiceLeadingQuartet(music21.Music21Object):
         
         [ a concept so abhorrent we shudder to illustrate it with an example, but alas, we must ]
 
-        >>> from music21 import *
-        >>> from music21.note import Note
-        >>> voiceLeading.VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C5"), Note("D5")).parallelOctave()
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C5"), Note("D5")).parallelOctave()
         True
-        >>> voiceLeading.VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C6"), Note("D6")).parallelOctave()
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C6"), Note("D6")).parallelOctave()
         True
-        >>> voiceLeading.VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C4"), Note("D4")).parallelOctave()
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C4"), Note("D4")).parallelOctave()
         False
         '''
         return self.parallelInterval(self.octave)
@@ -375,22 +405,18 @@ class VoiceLeadingQuartet(music21.Music21Object):
         '''
         Returns true if the motion is a parallel Perfect Unison (and not Perfect Octave, etc.)
 
-        >>> from music21 import *
-        >>> from music21.note import Note
-        >>> voiceLeading.VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C4"), Note("D4")).parallelUnison()
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C4"), Note("D4")).parallelUnison()
         True
-        >>> voiceLeading.VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C5"), Note("D5")).parallelUnison()
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C5"), Note("D5")).parallelUnison()
         False
         '''
         return self.parallelInterval(self.unison)
 
     def parallelUnisonOrOctave(self):
         '''
-        >>> from music21 import *
-        >>> from music21.note import Note
-        >>> voiceLeading.VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C3"), Note("D3")).parallelUnisonOrOctave()
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C3"), Note("D3")).parallelUnisonOrOctave()
         True
-        >>> voiceLeading.VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C4"), Note("D4")).parallelUnisonOrOctave()
+        >>> VoiceLeadingQuartet(Note("C4"), Note("D4"), Note("C4"), Note("D4")).parallelUnisonOrOctave()
         True
         '''
     
@@ -410,18 +436,16 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> n2 = note.Note('G4')
         >>> m1 = note.Note('B4')
         >>> m2 = note.Note('D5')
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
-        >>> vl.hiddenInterval(interval.Interval('P5'))
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.hiddenInterval(Interval('P5'))
         True
-
         >>> n1 = note.Note('E4')
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
-        >>> vl.hiddenInterval(interval.Interval('P5'))
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.hiddenInterval(Interval('P5'))
         False
-
         >>> m2.octave = 6
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
-        >>> vl.hiddenInterval(interval.Interval('P5'))
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.hiddenInterval(Interval('P5'))
         False
         
         '''
@@ -442,6 +466,72 @@ class VoiceLeadingQuartet(music21.Music21Object):
     def hiddenOctave(self):
         return self.hiddenInterval(self.octave)
     
+    def resolvesCorrectly(self, music21KeyObj=key.KeySignature('C')):
+        '''
+        checks whether the voice-leading quartet resolves correctly according to standard
+        counterpoint rules. If the first harmony is dissonant (d5, A4, or m7) it checks
+        that these are correctly resolved. If the first harmony is consonant, True is returned.
+        
+        The key parameter should be specified to check for motion in the bass from specific
+        note degrees. Default key is C Major.
+        
+        Diminished Fifth: in by contrary motion to a third, with 7 resolving up to 1 in the bass
+        Augmented Fourth: out by contrary motion to a sixth, with chordal seventh resolving 
+        down to a third in the bass.
+        Minor Seventh: In to a third with a leap form 5 to 1 in the bass
+        
+        >>> from music21 import *
+        >>> n1 = note.Note('B-4')
+        >>> n2 = note.Note('A4')
+        >>> m1 = note.Note('E4')
+        >>> m2 = note.Note('F4')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.resolvesCorrectly(key.Key('F')) #d5
+        True
+        
+        >>> n1 = note.Note('E5')
+        >>> n2 = note.Note('F5')
+        >>> m1 = note.Note('B-4')
+        >>> m2 = note.Note('A4')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.resolvesCorrectly(key.Key('F')) #A4
+        True
+        
+        >>> n1 = note.Note('B-4')
+        >>> n2 = note.Note('A4')
+        >>> m1 = note.Note('C4')
+        >>> m2 = note.Note('F4')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.resolvesCorrectly(key.Key('F')) #m7
+        True        
+        
+        >>> n1 = note.Note('C4')
+        >>> n2 = note.Note('D4')
+        >>> m1 = note.Note('F4')
+        >>> m2 = note.Note('G4')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.resolvesCorrectly(key.Key('C')) #not dissonant, true returned
+        True 
+        '''
+        scale = music21KeyObj.getScale()
+         
+        if self.vIntervals[0].simpleName == 'd5':
+            return scale.getScaleDegreeFromPitch(self.v2n1) == 7 and \
+            scale.getScaleDegreeFromPitch(self.v2n2) == 1 and \
+            self.inwardContraryMotion() and self.vIntervals[1].generic.undirected == 3
+
+        elif self.vIntervals[0].simpleName == 'A4':
+            return scale.getScaleDegreeFromPitch(self.v2n1) == 4 and \
+            scale.getScaleDegreeFromPitch(self.v2n2) == 3 and \
+            self.outwardContraryMotion() and self.vIntervals[1].generic.undirected == 6
+            
+        elif self.vIntervals[0].simpleName == 'm7':
+            return scale.getScaleDegreeFromPitch(self.v2n1) == 5 and \
+            scale.getScaleDegreeFromPitch(self.v2n2) == 1 and \
+            self.inwardContraryMotion() and self.vIntervals[1].generic.undirected == 3
+        else:
+            return True
+           
 class VoiceLeadingException(Exception):
     pass
 
@@ -470,6 +560,29 @@ class ThreeNoteLinearSegment(music21.Music21Object):
     >>> ex.rightPitch
     E-4
     
+    >>> ex = voiceLeading.ThreeNoteLinearSegment(pitch.Pitch('A4'),note.Note('D4'),'F5')
+    >>> ex.leftPitch
+    A4
+    >>> ex.pitchToAnalyze
+    D4
+    >>> ex.rightPitch
+    F5
+    
+    if no octave specified, default octave of 4 is assumed
+    
+    >>> ex = voiceLeading.ThreeNoteLinearSegment('a','b','c')
+    >>> ex.leftPitch
+    A
+    >>> ex.leftPitch.defaultOctave
+    4
+    
+    OMIT_FROM_DOCS
+    
+    >>> ex.pitchToAnalyze.defaultOctave
+    4
+    >>> ex.rightPitch.defaultOctave
+    4
+
     >>> ex = voiceLeading.ThreeNoteLinearSegment(note.Note('D4'),note.Note('E4'),note.Note('F4'))
     >>> ex.leftPitch
     D4
@@ -486,24 +599,6 @@ class ThreeNoteLinearSegment(music21.Music21Object):
     >>> ex.rightPitch
     C5
     
-    >>> ex = voiceLeading.ThreeNoteLinearSegment(pitch.Pitch('A4'),note.Note('D4'),'F5')
-    >>> ex.leftPitch
-    A4
-    >>> ex.pitchToAnalyze
-    D4
-    >>> ex.rightPitch
-    F5
-    
-    if no octave specified, default octave of 4 is assumed
-    >>> ex = voiceLeading.ThreeNoteLinearSegment('a','b','c')
-    >>> ex.leftPitch
-    A
-    >>> ex.leftPitch.defaultOctave
-    4
-    >>> ex.pitchToAnalyze.defaultOctave
-    4
-    >>> ex.rightPitch.defaultOctave
-    4
     '''
 
     def __init__(self, leftPitch=None, pitchToAnalyze=None, rightPitch=None):
@@ -526,7 +621,7 @@ class ThreeNoteLinearSegment(music21.Music21Object):
             self.rightPitch = rightPitch
 
     def _calcIntervals(self):
-        '''updated every time the leftPitch, pitchToAnalyze, or rightPitch is set (or reset)'''
+        #updated every time the leftPitch, pitchToAnalyze, or rightPitch is set (or reset)
         if self.leftPitch != None and self.rightPitch != None:
             self.iLeftToRight = music21.interval.Interval(self.leftPitch, self.rightPitch)
         if self.leftPitch != None and self.pitchToAnalyze != None:
@@ -567,7 +662,7 @@ class ThreeNoteLinearSegment(music21.Music21Object):
         >>> h.leftPitch
         A
     
-    ''')
+        ''')
     
     
     def _setpitchToAnalyze(self, value):
@@ -603,7 +698,7 @@ class ThreeNoteLinearSegment(music21.Music21Object):
         >>> h.pitchToAnalyze
         B
     
-    ''')
+        ''')
     
     def _setrightPitch(self, value):
         if hasattr(value, 'classes') and 'Pitch' in value.classes:
@@ -640,18 +735,18 @@ class ThreeNoteLinearSegment(music21.Music21Object):
         >>> h.rightPitch.defaultOctave
         4
     
-    ''')
+        ''')
     
     def couldBePassingTone(self):
-        '''checks if the two intervals are steps and if these steps
+        '''
+        checks if the two intervals are steps and if these steps
         are moving in the same direction. Returns true if the tone is
         identified as either a chromatic passing tone or a diatonic passing
         tone. Only major and minor diatonic passing tones are recognized (not 
         pentatonic or scales beyond twelve-notes). Does NOT check if tone is non harmonic
         
         Accepts pitch or note objects; method is dependent on octave information
-
-
+        
         >>> from music21 import *
         >>> voiceLeading.ThreeNoteLinearSegment('C#4','D4','E-4').couldBePassingTone()
         True
@@ -664,13 +759,13 @@ class ThreeNoteLinearSegment(music21.Music21Object):
         >>> voiceLeading.ThreeNoteLinearSegment('A3','C3','D3').couldBePassingTone()
         False
         
-        Directionality must be maintained:
-
+        Directionality must be maintained
+        
         >>> voiceLeading.ThreeNoteLinearSegment('B##3','C4','D--4').couldBePassingTone()
         False
        
-        If no octave is given then ._defaultOctave is used.  This is generally octave 4:
-
+        If no octave is given then ._defaultOctave is used.  This is generally octave 4
+        
         >>> voiceLeading.ThreeNoteLinearSegment('C','D','E').couldBePassingTone()
         True
         >>> voiceLeading.ThreeNoteLinearSegment('C4','D','E').couldBePassingTone()
@@ -680,7 +775,7 @@ class ThreeNoteLinearSegment(music21.Music21Object):
         
         Method returns true if either a chromatic passing tone or a diatonic passing
         tone is identified. Spelling of the pitch does matter!
-
+        
         >>> voiceLeading.ThreeNoteLinearSegment('B3','C4','B##3').couldBePassingTone()
         False
         >>> voiceLeading.ThreeNoteLinearSegment('A##3','C4','E---4').couldBePassingTone()
@@ -694,10 +789,12 @@ class ThreeNoteLinearSegment(music21.Music21Object):
         return self.couldBeDiatonicPassingTone() or self.couldBeChromaticPassingTone()
     
     def couldBeDiatonicPassingTone(self):
-        '''(MSC) A note could be a diatonic passing tone (and therefore a passing tone in general) 
+        '''
+        A note could be a diatonic passing tone (and therefore a passing tone in general) 
         if the generic interval between the previous and the current is 2 or -2; 
         same for the next; and both move in the same direction 
         (that is, the two intervals multiplied by each other are 4, not -4).
+        
         >>> from music21 import *
         >>> voiceLeading.ThreeNoteLinearSegment('B3','C4','C#4').couldBeDiatonicPassingTone()
         False
@@ -711,7 +808,8 @@ class ThreeNoteLinearSegment(music21.Music21Object):
         
         
     def couldBeChromaticPassingTone(self):
-        '''(MSC) A note could a chromatic passing tone (and therefore a passing tone in general) 
+        '''
+        A note could a chromatic passing tone (and therefore a passing tone in general) 
         if the generic interval between the previous and the current is -2, 1, or 2; 
         the generic interval between the current and next is -2, 1, 2; the two generic 
         intervals multiply to -2 or 2 (if 4 then it's a diatonic interval; if 1 then 
@@ -743,7 +841,8 @@ class ThreeNoteLinearSegment(music21.Music21Object):
             self.iLeft.direction * self.iRight.direction == 1
     
     def couldBeNeighborTone(self):
-        '''checks if noteToAnalyze could be a neighbor tone, either a diatonic neighbor tone
+        '''
+        checks if noteToAnalyze could be a neighbor tone, either a diatonic neighbor tone
         or a chromatic neighbor tone. Does NOT check if tone is non harmonic
         
         >>> from music21 import *
@@ -760,14 +859,16 @@ class ThreeNoteLinearSegment(music21.Music21Object):
         >>> voiceLeading.ThreeNoteLinearSegment('C3','D3','E3').couldBeNeighborTone()
         False
         >>> voiceLeading.ThreeNoteLinearSegment('A3','C3','D3').couldBeNeighborTone()
-        False'''
+        False
+        '''
         
         return self.couldBeDiatonicNeighborTone() or self.couldBeChromaticNeighborTone()
         
 
     def couldBeDiatonicNeighborTone(self):
-        '''returns true if and only if noteToAnalyze could be a diatonic neighbor tone
-
+        '''
+        returns true if and only if noteToAnalyze could be a diatonic neighbor tone
+        
         >>> from music21 import *
         >>> voiceLeading.ThreeNoteLinearSegment('C3','D3','C3').couldBeDiatonicNeighborTone()
         True
@@ -781,7 +882,9 @@ class ThreeNoteLinearSegment(music21.Music21Object):
             (self.iLeft.direction * self.iRight.direction == -1)
         
     def couldBeChromaticNeighborTone(self):
-        '''returns true if and only if noteToAnalyze could be a chromatic neighbor tone
+        '''
+        returns true if and only if noteToAnalyze could be a chromatic neighbor tone
+        
         >>> from music21 import *
         >>> voiceLeading.ThreeNoteLinearSegment('C3','D3','C3').couldBeChromaticNeighborTone()
         False
@@ -796,32 +899,31 @@ class ThreeNoteLinearSegment(music21.Music21Object):
             self.iLeft.isChromaticStep and self.iRight.isChromaticStep and \
             (self.iLeft.direction * self.iRight.direction == -1)
 
-def labelPassingTones(music21Stream, checkForDissonance=True,     
-    checkSimultaneous=True, checkForAccent=True, markWithColor=False, 
-    color='#FF0000'):
-
-    '''Searches through all voices of all parts in a given music21 stream and
+def labelPassingTones(music21Stream, checkForDissonance=True, checkSimultaneous=True, checkForAccent=True, markWithColor=False, color='#FF0000'):
+    '''
+    searches through all voices of all parts in a given music21 stream and
     identifies passing tones, then assigns a True/False value to the 
     note's :class:`~music21.editorial.NoteEditorial` object. The information is 
     stored as a miscellaneous attribute in the note editorial object, called 'isPassingTone'. 
     Access this data from any note object in the stream after running this method by typing
-    
+
     for note in labeledStream.flat.getElementsByClass(music21.note.Note):
-        print note.editorial.misc['isPassingTone']
+    print note.editorial.misc['isPassingTone']
     
     Selectivity in labeling is provided by the following optional arguments:
-    checkForDissonance (default = True): checks if the chord formed is dissonant, and only
+    checkForDissonance (default = True) --> checks if the chord formed is dissonant, and only
     labels tone as a passing tone if the chord is dissonant.
     
-    checkSimultaneous (default = True): iterates through every instance where simultaneous notes
+    checkSimultaneous (default = True) --> iterates through every instance where simultaneous notes
     are labeled (with color) and if their durations are different, labels only the tone that has a shorter duration
     
-    checkForAccent (default = True): only labels passing tones on unaccented beats of the measure
+    checkForAccent (default = True) --> only labels passing tones on unaccented beats of the measure
     
-    markWithColor (default = False): optionally label the identified passing tones with a color; default
+    markWithColor (default = False) --> optionally label the identified passing tones with a color; default
     color is red. Change labeling color with color modifier/
     
-    color (default = '#00FF00'): color to label notes if markWithColor is True. Colors must be specified in a string HEX. For example, 
+    color (default = '#00FF00') --> color to label notes if markWithColor is True. Colors must be specified
+    in a string HEX. For example, 
     color = '#FF0000' (red)
     color = '#00FF00' (green)
     color = '#0000FF' (blue)
@@ -860,31 +962,32 @@ def labelPassingTones(music21Stream, checkForDissonance=True,
         music21Stream = _checkForSimultaneousLabels(music21Stream, markWithColor)
     return music21Stream
     
-def labelNeighborTones(music21Stream, checkForDissonance=True, 
-    checkSimultaneous=True, checkForAccent=True, markWithColor=False, color='#00FF00'):
-    '''searches through all voices of all parts in a given music21 stream and
+def labelNeighborTones(music21Stream, checkForDissonance=True, checkSimultaneous=True, checkForAccent=True, markWithColor=False, color='#00FF00'):
+    '''
+    searches through all voices of all parts in a given music21 stream and
     identifies neighbor tones, then assigns a True/False value to the 
     note's :class:`~music21.editorial.NoteEditorial` object. The information is 
     stored as a miscellaneous attribute in the note editorial object, called 'isPassingTone'. 
     Access this data from any note object in the stream after running this method by typing
 
     for note in labeledStream.flat.getElementsByClass(music21.note.Note):
-        print note.editorial.misc['isNeighborTone']
+    print note.editorial.misc['isNeighborTone']
     
     Selectivity in labeling is provided by the following optional arguments:
-    checkForDissonance (default = True): checks if the chord formed is dissonant, and only
+    checkForDissonance (default = True) --> checks if the chord formed is dissonant, and only
     labels tone as a passing tone if the chord is dissonant.
     
-    checkSimultaneous (default = True): iterates through every instance where simultaneous notes
+    checkSimultaneous (default = True) --> iterates through every instance where simultaneous notes
     are labeled (with color) and if their durations are different, labels only the tone that has a shorter duration
     
-    checkForAccent (default = True): only labels passing tones on unacented beats of the measure
+    checkForAccent (default = True) --> only labels passing tones on unacented beats of the measure
     
-    markWithColor (default = False): optionally label the identified neighbor tones with a color; default
+    markWithColor (default = False) --> optionally label the identified neighbor tones with a color; default
     color is green. Change labeling color with color modifier/
     
-    color (default = '#00FF00'): color to label notes if markWithColor is True. Colors must be specified
-    in a string HEX. For example, 
+    color (default = '#00FF00') --> color to label notes if markWithColor is True. Colors must be specified
+    in a string HEX. 
+    For example, 
     color = '#FF0000' (red)
     color = '#00FF00' (green)
     color = '#0000FF' (blue)
@@ -920,8 +1023,7 @@ def labelNeighborTones(music21Stream, checkForDissonance=True,
         music21Stream = _checkForSimultaneousLabels(music21Stream, markWithColor)
     return music21Stream
     
-def _checkForSimultaneousLabels(preLabeledMusic21Stream, checkPT=True, 
-    checkNT=True, markWithColor=False, color='#000000'):
+def _checkForSimultaneousLabels(preLabeledMusic21Stream, checkPT=True, checkNT=True, markWithColor=False, color='#000000'):
     '''
     If after running a non-harmonic labeling method (such as labelPassingTones or labelNeighborTones)
     you find that there are simultaneous pitches labeled when at least one of those pitches must
@@ -984,8 +1086,19 @@ def _checkForSimultaneousLabels(preLabeledMusic21Stream, checkPT=True,
                                 #and which is the chordal tone???
     
     return preLabeledMusic21Stream
-    
+
+#METHOD UNDER REVISION...
+#getVerticalSlice() should be able to operate directly on a stream...    
 def _noteContextIsConsonant(note, music21Stream):
+    #WRITE TESTS
+    
+    #music21Score
+    #isClass or subclass
+    #harmonicContext
+    #be able to pass in any object with an offset in a stream
+    #could be a spanner
+    #contextSearch (getContextByClass)
+    
     '''
     determines if the given note is a non-harmonic tone due to the context around the note,
     specifically the pitches sounding simultaneously in all voices while the note sounds.
@@ -995,43 +1108,25 @@ def _noteContextIsConsonant(note, music21Stream):
     Consonance is determined by making a chord of the simultaneous pitches, 
     then calling chord's isConsonant() on that chord.
     
-    TODO:
-    This is a very tricky method – will it work with measures?
-    ???What does this mean...'work with measures', no, you can't pass
-    a measure in instead of a note object. Would you want to test to see if an entire
-    measure is consonant? If so...that would be an entirely seperate method I think
-    
-    DONE:
-    Is there a way to do it so as not to require the user to give the offset or partNoteIsIn?  
-    (there should be, but it’ll require knowing a bit 
-    more about how streams and .sites work (.sites are lists of places where an 
-    object could appear).  
-    Fix: yes. I was not thinking when I required the user to pass in those two parameters
-    I wrote the code to extract the necessary information solely given the note object and 
-    the music21 stream. the code relies on the method getOffsetBySite()
-    
-    DONE:
-    What will happen if there’s a rest in another part at 
-    the same moment as the note? will the previous note get added to the chord 
-    even though it’s no longer sounding?  
-    Fix: getElementAtOrBefore now grabs the rest object, but doesn't add
-    it to the pitches list. 
+
     '''
     pitches = []
     #hypothetically (and in actuality if used correctly), note.offset should be equal to offsetOfPitchToIdentify
     offsetOfPitchToIdentify =  note.getOffsetBySite(music21Stream.flat)
-
-    for part in music21Stream.parts:
+#getContextByClass 
+    for part in music21Stream.parts: #'Rest'
         value = part.flat.getElementAtOrBefore(offsetOfPitchToIdentify, classList=['Pitch', 'Note', 'Chord', music21.note.Rest])
-        if hasattr(value, 'classes') and ('Chord' in value.classes):
+        if 'Chord' in value.classes:
             value = value.pitches
-        if not (hasattr(value, 'classes') and ('Rest' in value.classes)):
+        if 'Rest' in value.classes:
             pitches.append(value)
     cWithPitch = music21.chord.Chord(pitches)
     return cWithPitch.isConsonant()
 
+#contextSearch in stream
+
 def _beatIsUnaccented(note):
-    #only unaccented passing tones are labeled
+    #only unnacented passing tones are labeled
     try:
         return note.beatStrength < 0.5
     except:
@@ -1050,8 +1145,8 @@ class Test(unittest.TestCase):
         vlq = VoiceLeadingQuartet()
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
-        '''
+        #Test copying all objects defined in this module
+        
         import sys, types, copy
         for part in sys.modules[self.__module__].__dict__.keys():
             match = False
@@ -1071,7 +1166,7 @@ class Test(unittest.TestCase):
         D4 = Note(); D4.name = "D"
         E4 = Note(); E4.name = "E"
         F4 = Note(); F4.name = "F"
-        G4 = Note(); G4.name = "G"
+        G4 = Note(); G4.name = "G"  
         A4 = Note(); A4.name = "A"
         B4 = Note(); B4.name = "B"
         C5 = Note(); C5.name = "C"; C5.octave = 5
@@ -1111,26 +1206,23 @@ class TestExternal(unittest.TestCase):
         from music21 import corpus
         from music21 import voiceLeading
         from music21 import editorial
-        s = corpus.parse('bach/bwv103.6.xml')
+        s = corpus.parse('bach/bwv66.6.xml')
         
         s = voiceLeading.labelPassingTones(s, markWithColor=True)
         s = voiceLeading.labelNeighborTones(s, markWithColor=True)
         #s.show()
         #MOST rigorous test below...probably not necessary so commented out for now
-        listOfPassingToneNotes = editorial.getObjectsWithEditorial(s.flat.getElementsByClass(music21.note.Note), "isPassingTone", listOfValues = [True])
-        listOfNeighborToneNotes = editorial.getObjectsWithEditorial(s.flat.getElementsByClass(music21.note.Note), "isNeighborTone", listOfValues = [True])
-        assert len(listOfNeighborToneNotes) == 15
-        assert len(listOfPassingToneNotes) == 45
+        #listOfPassingToneNotes = editorial.getObjectsWithEditorial(s.flat.getElementsByClass(music21.note.Note), "isPassingTone", listOfValues = [True])
+        #listOfNeighborToneNotes = editorial.getObjectsWithEditorial(s.flat.getElementsByClass(music21.note.Note), "isNeighborTone", listOfValues = [True])
+        #assert len(listOfNeighborToneNotes) == 15
+        #assert len(listOfPassingToneNotes) == 45
 
-
+_DOC_ORDER = [VoiceLeadingQuartet, ThreeNoteLinearSegment, labelPassingTones, labelNeighborTones]
 
 if __name__ == "__main__":
     music21.mainTest(Test)
-    #test = music21.voiceLeading.TestExternal()
-    #test.testThreeNoteLinearSegment()
     
-    #import doctest
-    #doctest.testmod()
+
 
 #------------------------------------------------------------------------------
 # eof
