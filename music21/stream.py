@@ -1946,6 +1946,8 @@ class Stream(music21.Music21Object):
         :class:`~music21.graph.PlotWindowedTemperleyKostkaPayne`
         :class:`~music21.graph.PlotWindowedAmbitus`
 
+        :class:`~music21.graph.PlotDolan`
+
         >>> from music21 import *
         >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
         >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE

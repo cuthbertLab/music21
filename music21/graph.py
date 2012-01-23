@@ -107,12 +107,12 @@ def _substituteAccidentalSymbols(label):
 
 # define acceptable format and value strings
 FORMATS = ['horizontalbar', 'histogram', 'scatter', 'scatterweighted', 
-            '3dbars', 'colorgrid']
+            '3dbars', 'colorgrid', 'horizontalbarweighted']
 
 def userFormatsToFormat(value):
     '''Replace possible user format strings with defined format names as used herein. Returns string unaltered if no match.
     '''
-    #environLocal.printDebug(['calling user userFormatsToFormat:', value])
+    #environLocal.pd(['calling user userFormatsToFormat:', value])
     value = value.lower()
     value = value.replace(' ', '')
     if value in ['bar', 'horizontal', 'horizontalbar', 'pianoroll', 'piano']:
@@ -126,12 +126,14 @@ def userFormatsToFormat(value):
     elif value in ['3dbars', '3d']:
         return '3dbars'
     elif value in ['colorgrid', 'grid', 'window', 'windowed']:
-        return 'colorGrid'
-    else: # return unaltered if no mathc
-        environLocal.printDebug(['userFormatsToFormat(): could not match value', value])
+        return 'colorgrid'
+    elif value in ['horizontalbarweighted', 'barweighted', 'weightedbar']:
+        return 'horizontalbarweighted'
+    else: # return unaltered if no match
+        #environLocal.printDebug(['userFormatsToFormat(): could not match value', value])
         return value
 
-VALUES = ['pitch', 'pitchspace', 'ps', 'pitchclass', 'pc', 'duration', 'quarterlength', 'offset', 'time', 'dynamic', 'dynamics']
+VALUES = ['pitch', 'pitchspace', 'ps', 'pitchclass', 'pc', 'duration', 'quarterlength', 'offset', 'time', 'dynamic', 'dynamics', 'instrument']
 
 def userValuesToValues(valueList):
     '''Given a value list, replace string with synonymes. Let unmatched values pass.
@@ -150,6 +152,8 @@ def userValuesToValues(valueList):
             post.append('offset')
         elif value in ['dynamic', 'dynamics']:
             post.append('dynamics')
+        elif value in ['instrument', 'instruments', 'instrumentation']:
+            post.append('instrument')
         else:
             post.append(value)
     return post
@@ -642,7 +646,7 @@ class GraphNetworxGraph(Graph):
             # shift labels off center of nodes
             posNodeLabels[nId] = (nData['pos'][0]+.125, nData['pos'][1])
 
-        environLocal.printDebug(['get position', posNodes])
+        #environLocal.printDebug(['get position', posNodes])
         #posNodes = networkx.spring_layout(self.networkxGraph, weighted=True) 
         # draw nodes
         networkx.draw_networkx_nodes(self.networkxGraph, posNodes, 
@@ -3044,7 +3048,7 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
 class PlotHorizontalBarWeighted(PlotStream):
     '''A base class for plots of Scores with weighted (by height) horizontal bars
     '''
-    format = 'horizontalbardynamic'
+    format = 'horizontalbarweighted'
     def __init__(self, streamObj, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
         # will get Measure numbers if appropraite
@@ -3096,7 +3100,7 @@ class PlotDolan(PlotHorizontalBarWeighted):
 
     >>> from music21 import *
     '''
-    values = ['instrument', ]
+    values = ['instrument']
     def __init__(self, streamObj, *args, **keywords):
         PlotHorizontalBarWeighted.__init__(self, streamObj, *args, **keywords)
 
@@ -3628,8 +3632,9 @@ def _getPlotsToMake(*args, **keywords):
         PlotWindowedSimpleWeights,
         PlotWindowedBellmanBudge,
         PlotWindowedTemperleyKostkaPayne,
-
         PlotWindowedAmbitus,
+        # instrumentation and part graphs
+        PlotDolan,
     ]
 
     format = ''
@@ -3649,6 +3654,7 @@ def _getPlotsToMake(*args, **keywords):
         values = 'pitch'
     elif len(args) == 1:
         formatCandidate = userFormatsToFormat(args[0])
+        #environLocal.printDebug(['formatCandidate', formatCandidate])
         match = False
         if formatCandidate in FORMATS:
             format = formatCandidate
@@ -3665,16 +3671,16 @@ def _getPlotsToMake(*args, **keywords):
                 if formatCandidate in str(className).lower():
                     match = True
                     foundClassName = className
+                    break
     elif len(args) > 1:
         format = userFormatsToFormat(args[0])
         values = args[1:] # get all remaining
-
     if not common.isListLike(values):
         values = [values]
     # make sure we have a list
     values = list(values)
 
-    #environLocal.printDebug(['got args post conversion', 'format', format, 'values', values])
+    #environLocal.printDebug(['got args post conversion', 'format', format, 'values', values, 'foundClassName', foundClassName])
 
     # clean data and process synonyms
     # will return unaltered if no change
@@ -3688,7 +3694,7 @@ def _getPlotsToMake(*args, **keywords):
     elif foundClassName is not None:
         plotMake = [foundClassName] # place in a list
     else:
-        plotMakeCanddidates = [] # store pairs of score, class
+        plotMakeCandidates = [] # store pairs of score, class
         for plotClassName in plotClasses:
             # try to match by complete class name
             if plotClassName.__name__.lower() == format.lower():
@@ -3704,7 +3710,7 @@ def _getPlotsToMake(*args, **keywords):
                 # normally plots need to match all values 
                 match = []
                 for requestedValue in values:
-                    if requestedValue == None: continue
+                    if requestedValue is None: continue
                     if (requestedValue.lower() in plotClassNameValues):
                         # do not allow the same value to be requested
                         if requestedValue not in match:
@@ -3712,14 +3718,14 @@ def _getPlotsToMake(*args, **keywords):
                 if len(match) == len(values):
                     plotMake.append(plotClassName)
                 else:
-                    plotMakeCanddidates.append([len(match), plotClassName])
+                    plotMakeCandidates.append([len(match), plotClassName])
 
         # if no matches, try something more drastic:
         if len(plotMake) == 0:
-            if len(plotMakeCanddidates) > 0:
-                plotMakeCanddidates.sort()
+            if len(plotMakeCandidates) > 0:
+                plotMakeCandidates.sort()
                 # last in list has highest score; second item is class
-                plotMake.append(plotMakeCanddidates[-1][1])
+                plotMake.append(plotMakeCandidates[-1][1])
             else:
                 for plotClassName in plotClasses:
                     # create a list of all possible identifiers
@@ -3733,6 +3739,7 @@ def _getPlotsToMake(*args, **keywords):
                             break
                     if len(plotMake) > 0: # found a match
                         break
+    #environLocal.pd(['plotMake', plotMake])
     return plotMake
 
 def plotStream(streamObj, *args, **keywords):
@@ -3777,6 +3784,7 @@ def plotStream(streamObj, *args, **keywords):
     * :class:`~music21.graph.PlotWindowedBellmanBudge`
     * :class:`~music21.graph.PlotWindowedTemperleyKostkaPayne`
     * :class:`~music21.graph.PlotWindowedAmbitus`
+    * :class:`~music21.graph.PlotDolan`
 
 
     >>> from music21 import *
@@ -4549,9 +4557,7 @@ class Test(unittest.TestCase):
             s.plot(*args, doneAction=None)
         
 
-    def testGetPlotsToMake(self):
-
-        
+    def testGetPlotsToMakeA(self):
         post = _getPlotsToMake(format='grid', values='krumhansl-schmuckler')
         self.assertEqual(post, [PlotWindowedKrumhanslSchmuckler])
         post = _getPlotsToMake(format='grid', values='aarden')
@@ -4593,6 +4599,16 @@ class Test(unittest.TestCase):
         self.assertEqual(post, [PlotScatterPitchClassOffset])
 
 
+    def testGetPlotsToMakeB(self):
+        post = _getPlotsToMake('dolan')
+        self.assertEqual(post, [PlotDolan])
+        post = _getPlotsToMake(values='instrument')
+        self.assertEqual(post, [PlotDolan])
+        post = _getPlotsToMake(format='horizontalbarweighted')
+        self.assertEqual(post, [PlotDolan])
+
+
+
     def testGraphVerticalBar(self):
         from music21 import graph
         
@@ -4619,6 +4635,14 @@ class Test(unittest.TestCase):
 #         s = corpus.parse('bwv66.6')
 #         p = graph.PlotHorizontalBarPitchClassOffset(s)
 #         #p.process()
+
+
+    def testPlotDolanA(self):
+        from music21 import corpus      
+        a = corpus.parse('bach/bwv57.8')
+        b = PlotDolan(a, title='Bach', doneAction=None)
+        b.process()
+        #b.show()
 
 
     def xtestGraphVerticalBar(self):
