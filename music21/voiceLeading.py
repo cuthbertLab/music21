@@ -41,13 +41,15 @@ class VoiceLeadingQuartet(music21.Music21Object):
     fifth  = interval.Interval("P5")
     octave = interval.Interval("P8")
         
-    def __init__(self, v1n1 = None, v1n2 = None, v2n1 = None, v2n2 = None):
+    def __init__(self, v1n1 = None, v1n2 = None, v2n1 = None, v2n2 = None, key=key.KeySignature(0)):
         self.v1n1 = v1n1
         self.v1n2 = v1n2
         self.v2n1 = v2n1
         self.v2n2 = v2n2    
         self.vIntervals = [] #vertical intervals (harmonic)
         self.hIntervals = [] #horizontal intervals (melodic)
+        
+        self.key = key
         if v1n1 is not None and v1n2 is not None and v2n1 is not None and v2n2 is not None:
             self._findIntervals()
     
@@ -187,6 +189,7 @@ class VoiceLeadingQuartet(music21.Music21Object):
         False
 
         '''
+        
         if not self.similarMotion():
             return False
         elif self.vIntervals[0].directedSimpleName != self.vIntervals[1].directedSimpleName:
@@ -466,7 +469,7 @@ class VoiceLeadingQuartet(music21.Music21Object):
     def hiddenOctave(self):
         return self.hiddenInterval(self.octave)
     
-    def resolvesCorrectly(self, music21KeyObj=key.KeySignature('C')):
+    def improperResolution(self):
         '''
         checks whether the voice-leading quartet resolves correctly according to standard
         counterpoint rules. If the first harmony is dissonant (d5, A4, or m7) it checks
@@ -486,7 +489,7 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> m1 = note.Note('E4')
         >>> m2 = note.Note('F4')
         >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
-        >>> vl.resolvesCorrectly(key.Key('F')) #d5
+        >>> vl.improperResolution() #d5
         True
         
         >>> n1 = note.Note('E5')
@@ -494,7 +497,7 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> m1 = note.Note('B-4')
         >>> m2 = note.Note('A4')
         >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
-        >>> vl.resolvesCorrectly(key.Key('F')) #A4
+        >>> vl.improperResolution() #A4
         True
         
         >>> n1 = note.Note('B-4')
@@ -502,7 +505,7 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> m1 = note.Note('C4')
         >>> m2 = note.Note('F4')
         >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
-        >>> vl.resolvesCorrectly(key.Key('F')) #m7
+        >>> vl.improperResolution() #m7
         True        
         
         >>> n1 = note.Note('C4')
@@ -510,30 +513,56 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> m1 = note.Note('F4')
         >>> m2 = note.Note('G4')
         >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
-        >>> vl.resolvesCorrectly(key.Key('C')) #not dissonant, true returned
-        True 
+        >>> vl.improperResolution() #not dissonant, true returned
+        False 
         '''
-        scale = music21KeyObj.getScale()
+        scale = self.key.getScale()
          
         if self.vIntervals[0].simpleName == 'd5':
-            return scale.getScaleDegreeFromPitch(self.v2n1) == 7 and \
+            return not (scale.getScaleDegreeFromPitch(self.v2n1) == 7 and \
             scale.getScaleDegreeFromPitch(self.v2n2) == 1 and \
-            self.inwardContraryMotion() and self.vIntervals[1].generic.undirected == 3
+            self.inwardContraryMotion() and self.vIntervals[1].generic.undirected == 3)
 
         elif self.vIntervals[0].simpleName == 'A4':
-            return scale.getScaleDegreeFromPitch(self.v2n1) == 4 and \
+            return not (scale.getScaleDegreeFromPitch(self.v2n1) == 4 and \
             scale.getScaleDegreeFromPitch(self.v2n2) == 3 and \
-            self.outwardContraryMotion() and self.vIntervals[1].generic.undirected == 6
+            self.outwardContraryMotion() and self.vIntervals[1].generic.undirected == 6)
             
         elif self.vIntervals[0].simpleName == 'm7':
-            return scale.getScaleDegreeFromPitch(self.v2n1) == 5 and \
+            return not (scale.getScaleDegreeFromPitch(self.v2n1) == 5 and \
             scale.getScaleDegreeFromPitch(self.v2n2) == 1 and \
-            self.inwardContraryMotion() and self.vIntervals[1].generic.undirected == 3
+            self.inwardContraryMotion() and self.vIntervals[1].generic.undirected == 3)
         else:
-            return True
+            return False
+           
+    def leapNotSetWithStep(self):
+        '''
+        returns true if there is a leap or skip in once voice then the other voice must be a step or unison.
+        if neither part skips then False is returned
+        
+        >>> from music21 import *
+        >>> n1 = note.Note('G4')
+        >>> n2 = note.Note('C5')
+        >>> m1 = note.Note('B3')
+        >>> m2 = note.Note('A3')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.leapNotSetWithStep()
+        True
+        '''
+        
+        if self.hIntervals[0].generic.isSkip:
+            return self.hIntervals[1].generic.isDiatonicStep or self.hIntervals[1].generic.isUnison
+        elif self.hIntervals[1].generic.isSkip:
+            return self.hIntervals[0].generic.isDiatonicStep or self.hIntervals[0].generic.isUnison
+        else:
+            return False
+
+
+  
            
 class VoiceLeadingException(Exception):
     pass
+    
 
 class ThreeNoteLinearSegmentException(music21.Music21Exception):
     pass
