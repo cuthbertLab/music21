@@ -594,6 +594,11 @@ class GenericInterval(music21.Music21Object):
         
         self.isStep = self.isDiatonicStep
         
+        if self.undirected == 1:
+            self.isUnison = True
+        else:
+            self.isUnison = False
+        
         # unisons (even augmented) are neither steps nor skips.
         steps, octaves = math.modf(self.undirected/7.0)
         steps = int(steps*7 + .001)
@@ -1637,6 +1642,27 @@ class Interval(music21.Music21Object):
         else:
             return "<music21.interval.Interval %s>" % self.directedName
 
+    def isConsonant(self):
+        '''
+        returns True if the pitches are a major or minor third or sixth or perfect fifth or unison.
+
+        These rules define all common-practice consonances (and earlier back to about 1300 all imperfect consonances)
+
+
+        >>> from music21 import *
+        >>> i1 = notesToInterval(note.Note('C'), note.Note('E'))
+        >>> i1.isConsonant()
+        True
+        >>> i1 = notesToInterval(note.Note('B-'), note.Note('C'))
+        >>> i1.isConsonant()
+        False
+        ''' 
+        if self.simpleName == 'P5' or self.simpleName == 'm3' or self.simpleName == 'M3' or \
+        self.simpleName == 'm6' or self.simpleName == 'M6' or self.simpleName == 'P1':
+            return True
+        else:
+            return False
+        
     def __eq__(self, other):
         '''
         >>> a = Interval('a4')
