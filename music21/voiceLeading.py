@@ -547,13 +547,21 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> m2 = note.Note('A3')
         >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.leapNotSetWithStep()
+        False
+        
+        >>> n1 = note.Note('G4')
+        >>> n2 = note.Note('C5')
+        >>> m1 = note.Note('B3')
+        >>> m2 = note.Note('F3')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.leapNotSetWithStep()
         True
         '''
         
         if self.hIntervals[0].generic.isSkip:
-            return self.hIntervals[1].generic.isDiatonicStep or self.hIntervals[1].generic.isUnison
+            return not (self.hIntervals[1].generic.isDiatonicStep or self.hIntervals[1].generic.isUnison)
         elif self.hIntervals[1].generic.isSkip:
-            return self.hIntervals[0].generic.isDiatonicStep or self.hIntervals[0].generic.isUnison
+            return not (self.hIntervals[0].generic.isDiatonicStep or self.hIntervals[0].generic.isUnison)
         else:
             return False
 
