@@ -516,6 +516,9 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> vl.improperResolution() #not dissonant, true returned
         False 
         '''
+        if self.noMotion():
+            return False
+        
         scale = self.key.getScale()
          
         if self.vIntervals[0].simpleName == 'd5':
@@ -557,6 +560,8 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> vl.leapNotSetWithStep()
         True
         '''
+        if self.noMotion():
+            return False
         
         if self.hIntervals[0].generic.isSkip:
             return not (self.hIntervals[1].generic.isDiatonicStep or self.hIntervals[1].generic.isUnison)
