@@ -2370,9 +2370,10 @@ class Chord(note.NotRest):
     def isConsonant(self):
         '''
         returns True if the chord is
-             one PC
-             two PCs is a major or minor third or sixth or perfect fifth.
-             three PCs and is a major or minor triad not in second inversion.
+             one pitch
+             two pitches: uses :meth:`~music21.interval.Interval.isConsonant()` , which
+             checks if interval is a major or minor third or sixth or perfect fifth.
+             three pitches: if chord is a major or minor triad not in second inversion.
 
         These rules define all common-practice consonances (and earlier back to about 1300 all imperfect consonances)
 
@@ -2427,12 +2428,8 @@ class Chord(note.NotRest):
         elif len(c2.pitches) == 2:
             c3 = self.closedPosition()
             c4 = c3.removeRedundantPitches(inPlace = False) # to get from lowest to highest for P4 protection
-            
             i = interval.notesToInterval(c4.pitches[0], c4.pitches[1])
-            if i.simpleName == 'P5' or i.simpleName == 'm3' or i.simpleName == 'M3' or i.simpleName == 'm6' or i.simpleName == 'M6':
-                return True
-            else:
-                return False
+            return i.isConsonant()
         elif len(c2.pitches) == 3:
             if (self.isMajorTriad() is True or self.isMinorTriad() is True) and (self.inversion() != 2):
                 return True
@@ -2553,8 +2550,8 @@ class Chord(note.NotRest):
         
         Method doesn't check to see if inversion is reasonable according to the chord provided
         (if only two pitches given, an inversion is still returned)
-        see harmony.inversionIsvalid(inversion) for checker method on ChordSymbolObjects.
-
+        see :meth:`~music21.harmony.ChordSymbol.inversionIsValid` for checker method on ChordSymbolObjects.
+        
         >>> from music21 import *
         >>> a = chord.Chord(['g', 'b', 'd', 'f'])
         >>> a.inversion()
