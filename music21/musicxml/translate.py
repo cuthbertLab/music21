@@ -489,7 +489,10 @@ def mxToPitch(mxNote, inputM21=None):
         else:
             # here we generate an accidental object from the alter value
             # but in the source, there was not a defined accidental
-            p.accidental = pitch.Accidental(float(acc))
+            try:
+                p.accidental = pitch.Accidental(float(acc))
+            except music21.pitch.AccidentalException:
+                raise TranslateException('incorrect accidental %s for pitch %s' % (str(acc), p))
             p.accidental.displayStatus = False
     p.octave = int(mxPitch.get('octave'))
     p._pitchSpaceNeedsUpdating = True
@@ -2613,7 +2616,11 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 else:
                     #n = note.Note()
                     #n.mx = mxNote
-                    n = mxToNote(mxNote, spannerBundle=spannerBundle)
+                    try:
+                        n = mxToNote(mxNote, spannerBundle=spannerBundle)
+                    except TranslateException as strerror:
+                        raise TranslateException('cannot translate note in measure %s: %s' % (mNumRaw, strerror))
+                    
                     _addToStaffReference(mxNote, n, staffReference)
                     if useVoices:
                         m.voices[mxNote.voice]._insertCore(offsetMeasureNote, n)
@@ -3320,8 +3327,11 @@ def mxToStream(mxScore, spannerBundle=None, inputM21=None):
     for partId in partNameIds: # part names are part ids
         # NOTE: setting partId not partId: might change
         # return the part; however, it is still already attached to the Score
-        part = mxToStreamPart(mxScore, partId=partId, 
-            spannerBundle=spannerBundle, inputM21=s)
+        try:
+            part = mxToStreamPart(mxScore, partId=partId, 
+                                  spannerBundle=spannerBundle, inputM21=s)
+        except TranslateException as strerror:
+            raise TranslateException('cannot translate part %s: %s' % (partId, strerror))
         # update dictionary to store music21 part
         partIdDictionary[partId] = part
 

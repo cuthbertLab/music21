@@ -3526,7 +3526,6 @@ class Pitch(music21.Music21Object):
 
         pitchPastAll = pitchPastMeasure + pitchPast
 
-
         if overrideStatus == False: # go with what we have defined
             if self.accidental is None:
                 pass # no accidental defined; we may need to add one
@@ -3545,6 +3544,7 @@ class Pitch(music21.Music21Object):
             else:
                 return # exit: nothing more to do
 
+        ### no pitches in past...
         if len(pitchPastAll) == 0:
             # if we have no past, we always need to show the accidental, 
             # unless this accidental is in the alteredPitches list
@@ -3569,6 +3569,22 @@ class Pitch(music21.Music21Object):
                     self.accidental = Accidental('natural')
                 self.accidental.displayStatus = True
             return # do not search past
+
+        #### pitches in past... first search if last pitch in measure
+        #### at this octave contradicts this pitch.  if so then no matter what
+        #### we need an accidental.
+        for i in reversed(range(len(pitchPast))):
+            thisPPast = pitchPast[i]
+            if thisPPast.step == self.step and thisPPast.octave == self.octave:
+                if thisPPast.name != self.name: # conflicting alters, need accidental and return
+                    if self.accidental is None:
+                        self.accidental = Accidental('natural')
+                    self.accidental.displayStatus = True
+                    return
+                else: #names are the same, skip this line of questioning
+                    break
+        # nope, no previous pitches in this octave and register, now more complex things...
+
 
         # here tied and always are treated the same; we assume that
         # making ties sets the displayStatus, and thus we would not be 
@@ -4011,7 +4027,7 @@ class Test(unittest.TestCase):
                 targetDisplayStatus = result[i][1]
 
                 #environLocal.printDebug(['accidental test:', p, pName, pDisplayStatus, 'target:', targetName, targetDisplayStatus]) # test
-                self.assertEqual(pName, targetName)
+                self.assertEqual(pName, targetName, "name error for %d: %s instead of desired %s" % (i, pName, targetName))
                 self.assertEqual(pDisplayStatus, targetDisplayStatus, "%d: %s display: %s, target %s" % (i, p, pDisplayStatus, targetDisplayStatus))
 
         # alternating, in a sequence, same pitch space
@@ -4042,7 +4058,7 @@ class Test(unittest.TestCase):
         pList = [Pitch('a-2'), Pitch('a-2'), Pitch('a-5'), 
                  Pitch('a#5'), Pitch('a#3'), Pitch('a3'), Pitch('a2')]
         result = [('flat', True), ('flat', False), ('flat', True), 
-                  ('sharp', True), ('sharp', True), ('natural', True), (None, None)]
+                  ('sharp', True), ('sharp', True), ('natural', True), ('natural', True)]
         proc(pList, [])        
         compare(pList, result)
 
@@ -4469,7 +4485,8 @@ _DOC_ORDER = [Pitch, Accidental]
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     music21.mainTest(Test)
-
+    #t = Test()
+    #t.testAccidentalsCautionary()
 
 #------------------------------------------------------------------------------
 # eof

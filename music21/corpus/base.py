@@ -202,6 +202,7 @@ from music21.corpus.mozart import k458
 from music21.corpus.mozart import k464
 from music21.corpus.mozart import k465
 from music21.corpus.mozart import k499
+from music21.corpus.mozart import k545
 from music21.corpus.mozart import k546
 from music21.corpus.mozart import k575
 from music21.corpus.mozart import k589
@@ -385,6 +386,7 @@ MODULES = [
             k464,
             k465,
             k499,
+            k545,
             k546,
             k575,
             k589,

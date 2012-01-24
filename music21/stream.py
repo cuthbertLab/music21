@@ -5575,24 +5575,41 @@ class Stream(music21.Music21Object):
         '''
         A method to set and provide accidentals given various conditions and contexts.
 
-        If `useKeySignature` is True, a :class:`~music21.key.KeySignature` will be searched for in this Stream or this Stream's defined contexts. An alternative KeySignature can be supplied with this object and used for temporary pitch processing. 
+        `pitchPast` is a list of pitches preceeding this pitch in this measure.
+        
+        `pitchPastMeasure` is a list of pitches preceeding this pitch but in a previous measure.
 
-        If `alteredPitches` is a list of modified pitches (Pitches with Accidentals) that can be directly supplied to Accidental processing. These are the same values obtained from a :class:`music21.key.KeySignature` object using the :attr:`~music21.key.KeySignature.alteredPitches` property. 
 
-        If `cautionaryPitchClass` is True, comparisons to past accidentals are made regardless of register. That is, if a past sharp is found two octaves above a present natural, a natural sign is still displayed. 
+        If `useKeySignature` is True, a :class:`~music21.key.KeySignature` will be searched 
+        for in this Stream or this Stream's defined contexts. An alternative KeySignature 
+        can be supplied with this object and used for temporary pitch processing. 
+
+        If `alteredPitches` is a list of modified pitches (Pitches with Accidentals) that 
+        can be directly supplied to Accidental processing. These are the same values obtained 
+        from a :class:`music21.key.KeySignature` object using the 
+        :attr:`~music21.key.KeySignature.alteredPitches` property. 
+
+        If `cautionaryPitchClass` is True, comparisons to past accidentals are made regardless 
+        of register. That is, if a past sharp is found two octaves above a present natural, 
+        a natural sign is still displayed. 
 
         If `cautionaryAll` is True, all accidentals are shown.
 
-        If `overrideStatus` is True, this method will ignore any current `displayStatus` stetting found on the Accidental. By default this does not happen. If `displayStatus` is set to None, the Accidental's `displayStatus` is set. 
+        If `overrideStatus` is True, this method will ignore any current `displayStatus` stetting 
+        found on the Accidental. By default this does not happen. If `displayStatus` is set to 
+        None, the Accidental's `displayStatus` is set. 
 
-        If `cautionaryNotImmediateRepeat` is True, cautionary accidentals will be displayed for an altered pitch even if that pitch had already been displayed as altered. 
+        If `cautionaryNotImmediateRepeat` is True, cautionary accidentals will be displayed for 
+        an altered pitch even if that pitch had already been displayed as altered. 
 
         If `lastNoteWasTied` is True, assume that the first note of the stream was tied
         to the previous note.  TODO: make more robust for tied chords with only some pitches tied...
 
-        The :meth:`~music21.pitch.Pitch.updateAccidentalDisplay` method is used to determine if an accidental is necessary.
+        The :meth:`~music21.pitch.Pitch.updateAccidentalDisplay` method is used to determine if 
+        an accidental is necessary.
 
-        This will assume that the complete Stream is the context of evaluation. For smaller context ranges, call this on Measure objects. 
+        This will assume that the complete Stream is the context of evaluation. For smaller context 
+        ranges, call this on Measure objects. 
 
         If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
 
@@ -9072,9 +9089,14 @@ class Stream(music21.Music21Object):
                 mustBeginInSpan=False, mustFinishInSpan=False)
             if len(simultEls) > 0:
                 for simultNote in simultEls.notes:
-                    interval1 = interval.notesToInterval(n, simultNote)
-                    n.editorial.harmonicInterval = interval1
-                    break
+                    interval1 = None
+                    try:
+                        interval1 = interval.notesToInterval(n, simultNote)
+                        n.editorial.harmonicInterval = interval1
+                    except:
+                        pass
+                    if interval1 is not None:
+                        break
 
     def attachMelodicIntervals(self):
         '''For each element in self, creates an interval.Interval object in the element's

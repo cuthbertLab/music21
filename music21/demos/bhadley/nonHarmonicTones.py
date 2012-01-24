@@ -255,7 +255,11 @@ def _noteContextIsConsonant(note, music21Stream):
     return c.isConsonant()
 
 def couldBePassingTone(noteToAnalyze, leftNote, rightNote):
-    '''checks if the two intervals are steps and if these steps
+    '''
+    checks to see if noteToAnalyze([0]) could be a passing tone between leftNote([1])
+    and rightNote([2])
+    
+    checks if the two intervals are steps and if these steps
     are moving in the same direction. Does NOT check if tone is non harmonic
     
     Accepts pitch or note objects; method is dependent on octave information
