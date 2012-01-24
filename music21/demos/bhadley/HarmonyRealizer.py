@@ -28,7 +28,7 @@ import music21
 from music21 import *
 from music21 import corpus
 from music21.figuredBass import realizer, rules
-from music21.demos import clercqTemperley
+from music21.romanText import clercqTemperley
 import copy
 import unittest
 
@@ -171,7 +171,9 @@ def generatePopSongRules():
     fbRules.restrictDoublingsInItalianA6Resolution = True #True
     
     fbRules._upperPartsRemainSame = False        #False
-
+    
+    fbRules.partMovementLimits.append((1,3))
+    
     return fbRules
 
 def mergeLeadSheetAndBassLine(leadsheet, bassLine):
@@ -251,11 +253,12 @@ class TestExternal(unittest.TestCase):
 if __name__ == "__main__":
     music21.mainTest(Test)
     
-    from music21 import corpus
-    from music21.demos.bhadley import HarmonyRealizer
-    test = HarmonyRealizer.TestExternal()
+    #from music21 import corpus
+    #from music21.demos.bhadley import HarmonyRealizer
+    #test = HarmonyRealizer.TestExternal()
 
     #test.leadsheetEx1()
+    #sc = converter.parse('C:/wikifonia/wikifonia-4750.mxl') #hey Jude
     
     #sc = corpus.parse('demos/BlowinInTheWind.mxl')
     #test.realizeLeadsheet(sc)
@@ -280,7 +283,7 @@ Brk: I |*4 $A
 
 S: [G] $In $Vr*2 $Ext $Ch $Brk $Vr $Ext $Ch $A
 '''
-    test.realizeclercqTemperleyEx(testfile2)
+    #test.realizeclercqTemperleyEx(testfile2)
     
 
 
