@@ -940,7 +940,7 @@ class CTSong(object):
                     mList = myScoreTemp.getElementsByClass('Measure')
                     for i in range(repetitions - 1):
                         for x in mList[len(mList) - 1].notesAndRests:
-                            if isinstance(x, music21.roman.RomanNumeral):
+                            if x.isClassOrSubclass([music21.roman.RomanNumeral]):
                                 try:
                                     del x.lyrics
                                 except:
