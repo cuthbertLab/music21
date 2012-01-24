@@ -1,10 +1,14 @@
+# -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
+# Name:         Theory Analyzer.py
+# Purpose:      Framework for analyzing music theory aspects of a score
 #
-# Theory Analyzer
+# Authors:      Lars Johnson
+#               Beth Hadley
 #
-# framework for analyzing theory in scores (parallel fifths, harmonic intervals, etc.)
-#
-# Beth Hadley and Lars Johnson
-# January 22, 2012
+# Copyright:    (c) 2009-2012 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
 
 import music21
 
@@ -15,14 +19,20 @@ from music21 import voiceLeading
 
 import unittest
 
-class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
+class TheoryAnalyzer(object):
     '''
-    A Theory Analyzer is an object used for analyzing scores. It can identify, store, label 
-    and output various counterpoint-related features in a score (parallel fifths, harmonic intervals,
-    melodic intervals, etc.)
+    A Theory Analyzer is an object used for analyzing musical theory elements in scores. 
+    It can identify, store, label and output various counterpoint-related features 
+    in a score (parallel fifths, harmonic intervals, melodic intervals, etc.)
     
     A Theory Analyzer must be passed a score containing parts with single voices 
-    (no harmonies/chords within a part...).  
+    (no harmonies/chords within a part...).
+    
+    >>> from music21 import *
+    >>> p = corpus.parse('bwv66.6')
+    >>> ta = TheoryAnalyzer(p)
+    >>> ta.key
+    <music21.key.Key of F# minor>
     '''
     
     def __init__(self, theoryScore):
@@ -39,6 +49,7 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
         '''
         Gets a list of the vertical slices of the Theory Analyzer's score. Note that it uses the
         combined rhythm of the parts to determine what vertical slices to take.
+        
         >>> from music21 import *
         >>> from music21.demos import theoryAnalyzer
         >>> n1 = note.Note('c5')
@@ -81,6 +92,7 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
     def getHarmonicIntervals(self, partNum1, partNum2):
         '''
         Gets a list of all the harmonic intervals occurring between the two specified parts.
+        
         >>> from music21 import *
         >>> from music21.demos import theoryAnalyzer
         >>> sc = stream.Score()
@@ -118,6 +130,7 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
     def getMelodicIntervals(self, partNum):
         '''
         Gets a list of all the melodic intervals in the specified part.
+        
         >>> from music21 import *
         >>> from music21.demos import theoryAnalyzer
         >>> sc = stream.Score()
@@ -148,11 +161,12 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
                     
         return mInvList
     
-    # VLQs
+    # VLQs are Voice Leading Quartets as found in voiceLeading.py
     
     def getVLQs(self, partNum1, partNum2):
         '''
         Gets a list of all the melodic intervals in the specified part.
+        
         >>> from music21 import *
         >>> from music21.demos import theoryAnalyzer
         >>> sc = stream.Score()
@@ -199,6 +213,7 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
         '''
         Gets a list of all possible pairs of partNumbers:
         tuples (partNum1, partNum2) where 0 <= partNum1 < partnum2 < numParts
+        
         >>> from music21 import *
         >>> from music21.demos import theoryAnalyzer
         >>> sc = stream.Score()
@@ -254,10 +269,11 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
     
     def identifyParallelFifths(self, partNum1 = None, partNum2 = None, color = None):
         '''
-        Identifies parallel fifths between two parts (if specified) or between all possible pairs
-        of parts (if not specified) and stores the resulting list of VLQTheoryResult objects in
-        self.resultDict['parallelFifths']. Optionally, a color attribute may be specified to color
-        all corresponding notes in the score.
+        Identifies parallel fifths (calls :meth:`~music21.voiceLeading.parallelFifth`) between 
+        two parts (if specified) or between all possible pairs of parts (if not specified) 
+        and stores the resulting list of VLQTheoryResult objects in self.resultDict['parallelFifths']. 
+        Optionally, a color attribute may be specified to color all corresponding notes in the score.
+        
         >>> from music21 import *
         >>> from music21.demos import theoryAnalyzer
         >>> sc = stream.Score()
@@ -292,6 +308,12 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey,testFunction,textFunction)
         
     def identifyParallelOctaves(self, partNum1 = None, partNum2 = None, color = None):
+        '''
+        Identifies parallel octaves (calls :meth:`~music21.voiceLeading.parallelOctave`) between 
+        two parts (if specified) or between all possible pairs of parts (if not specified) 
+        and stores the resulting list of VLQTheoryResult objects in self.resultDict['parallelOctaves']. 
+        Optionally, a color attribute may be specified to color all corresponding notes in the score.
+        '''
         dictKey = 'parallelOctaves'
         testFunction = lambda vlq: vlq.parallelOctave()
         textFunction = lambda vlq, pn1, pn2: "Parallel octave at measure " + str(vlq.v1n1.measureNumber) +": "\
@@ -300,6 +322,12 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
         
     def identifyParallelUnisons(self, partNum1 = None, partNum2 = None, color = None):
+        '''
+        Identifies parallel unisons (calls :meth:`~music21.voiceLeading.parallelUnison`) between 
+        two parts (if specified) or between all possible pairs of parts (if not specified) 
+        and stores the resulting list of VLQTheoryResult objects in self.resultDict['parallelUnisons']. 
+        Optionally, a color attribute may be specified to color all corresponding notes in the score.
+        '''
         dictKey = 'parallelUnisons'
         testFunction = lambda vlq: vlq.parallelUnison()
         textFunction = lambda vlq, pn1, pn2: "Parallel unison at measure " + str(vlq.v1n1.measureNumber) +": "\
@@ -308,6 +336,12 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
         
     def identifyHiddenFifths(self, partNum1 = None, partNum2 = None, color = None):
+        '''
+        Identifies hidden fifths (calls :meth:`~music21.voiceLeading.hiddenFifth`) between 
+        two parts (if specified) or between all possible pairs of parts (if not specified) 
+        and stores the resulting list of VLQTheoryResult objects in self.resultDict['hiddenFifths']. 
+        Optionally, a color attribute may be specified to color all corresponding notes in the score.
+        '''
         dictKey = 'hiddenFifths'
         testFunction = lambda vlq: vlq.hiddenFifth()
         textFunction = lambda vlq, pn1, pn2: "Hidden fifth at measure " + str(vlq.v1n1.measureNumber) +": "\
@@ -316,6 +350,12 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
         
     def identifyHiddenOctaves(self, partNum1 = None, partNum2 = None, color = None):
+        '''
+        Identifies hidden octaves (calls :meth:`~music21.voiceLeading.hiddenOctave`) between 
+        two parts (if specified) or between all possible pairs of parts (if not specified) 
+        and stores the resulting list of VLQTheoryResult objects in self.resultDict['hiddenOctaves']. 
+        Optionally, a color attribute may be specified to color all corresponding notes in the score.
+        '''
         dictKey = 'hiddenOctaves'
         testFunction = lambda vlq: vlq.hiddenOctave()
         textFunction = lambda vlq, pn1, pn2: "Hidden octave at measure " + str(vlq.v1n1.measureNumber) +": "\
@@ -324,6 +364,12 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
         
     def identifyImproperResolutions(self, partNum1 = None, partNum2 = None, color = None):
+        '''
+        Identifies improper resolutions of dissonant intervals (calls :meth:`~music21.voiceLeading.improperResolution`) 
+        between two parts (if specified) or between all possible pairs of parts (if not specified) 
+        and stores the resulting list of VLQTheoryResult objects in self.resultDict['improperResolution']. 
+        Optionally, a color attribute may be specified to color all corresponding notes in the score.
+        '''
         dictKey = 'improperResolution'
         testFunction = lambda vlq: vlq.improperResolution()
         textFunction = lambda vlq, pn1, pn2: "Improper resolution of " + vlq.vIntervals[0].niceName +" at measure " + str(vlq.v1n1.measureNumber) +": "\
@@ -332,7 +378,14 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
         
     def identifyLeapNotSetWithStep(self, partNum1 = None, partNum2 = None, color = None):
-        dictKey = 'identifyLeapNotSetWithStep'
+        '''
+        Identifies a leap/skip in one voice not set with a step in the other voice 
+        (calls :meth:`~music21.voiceLeading.leapNotSetWithStep`) 
+        between two parts (if specified) or between all possible pairs of parts (if not specified) 
+        and stores the resulting list of VLQTheoryResult objects in self.resultDict['leapNotSetWithStep']. 
+        Optionally, a color attribute may be specified to color all corresponding notes in the score.
+        '''
+        dictKey = 'LeapNotSetWithStep'
         testFunction = lambda vlq: vlq.leapNotSetWithStep()
         textFunction = lambda vlq, pn1, pn2: "Leap not set with step at measure " + str(vlq.v1n1.measureNumber) +": "\
                  + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
@@ -342,6 +395,12 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
     # Theory Errors not using VLQ (therefore, not using template)      
                     
     def identifyDissonantHarmonicIntervals(self, partNum1 = None, partNum2 = None, color = None):
+        '''
+        Identifies dissonant harmonic intervals (calls :meth:`~music21.interval.isConsonant`) 
+        between the two parts (if specified) or between all possible pairs of parts (if not specified) 
+        and stores the resulting list of IntervalTheoryResultObject objects in self.resultDict['dissonantHarmonicIntervals']. 
+        Optionally, a color attribute may be specified to color all corresponding notes in the score.
+        '''
         if 'dissonantHarmonicIntervals' not in self.resultDict.keys():
             self.resultDict['dissonantHarmonicIntervals'] = []
         
@@ -353,7 +412,7 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
             
             for hIntv in hIntvList:
                 if hIntv is not None and not hIntv.isConsonant():
-                    tr = IntervalTheoryResultObject(hIntv)
+                    tr = IntervalTheoryResult(hIntv)
                     tr.text = "Dissonant harmonic interval in measure " + str(hIntv.noteStart.measureNumber) +": " \
                      + str(hIntv.niceName) + " from " + str(hIntv.noteStart.name) + " to " + str(hIntv.noteEnd.name) \
                      + " between part " + str(partNum1 + 1) + " and part " + str(partNum2 + 1)
@@ -362,6 +421,12 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
                     self.resultDict['dissonantHarmonicIntervals'].append(tr)
                 
     def identifyDissonantMelodicIntervals(self, partNum = None, color = None):
+        '''
+        Identifies dissonant melodic intervals (A2, A4, d5, m7, M7) in the part (if specified) 
+        or for all parts (if not specified) and stores the resulting list of 
+        IntervalTheoryResultObject objects in self.resultDict['dissonantMelodicIntervals']. 
+        Optionally, a color attribute may be specified to color all corresponding notes in the score.
+        '''
         if 'dissonantMelodicIntervals' not in self.resultDict.keys():
             self.resultDict['dissonantMelodicIntervals'] = []
         
@@ -373,7 +438,7 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
             
             for mIntv in mIntvList:
                 if mIntv is not None and mIntv.simpleName in ["A2","A4","d5","m7","M7"]:
-                    tr = IntervalTheoryResultObject(mIntv)
+                    tr = IntervalTheoryResult(mIntv)
                     tr.text = "Dissonant melodic interval in part " + str(partNum + 1) + " measure " + str(mIntv.noteStart.measureNumber) +": "\
                      + str(mIntv.niceName) + " from " + str(mIntv.noteStart.name) + " to " + str(mIntv.noteEnd.name)
                     if color is not None:
@@ -453,7 +518,15 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
                     
     # Combo Methods
     
-    def identifyAll(self):
+    def identifyCommonPracticeErrors(self):
+        '''
+        wrapper class that calls all identify methods for common-practice counterpoint errors, 
+        assigning a color identifier to each
+        
+        ParallelFifths = red, ParallelOctaves = orange, HiddenFifths = yellow, HiddenOctaves = green, 
+        ParallelUnisons = blue, ImproperResolutions = purple, LeapNotSetWithStep = white, 
+        DissonantHarmonicIntervals = magenta, DissonantMelodicIntervals = cyan
+        '''
         self.identifyParallelFifths(color='red')
         self.identifyParallelOctaves(color='orange')
         self.identifyHiddenFifths(color='yellow')
@@ -467,6 +540,10 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
     # Output Methods
 
     def printResults(self, typeList=None):
+        '''
+        method should be deleted....just print getResultsString()
+        
+        '''
         for resultType in self.resultDict.keys():
             print resultType+":"
             if typeList is None or type in typeList:
@@ -475,6 +552,9 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
                 print ""
                 
     def getResultsString(self, typeList=None):
+        '''
+        returns string of all results found by calling all identify methods on the TheoryAnalyzer score
+        '''
         resultStr = ""
         for resultType in self.resultDict.keys():
             if typeList is None or type in typeList:
@@ -485,19 +565,27 @@ class TheoryAnalyzer(object): # Should this be a music21 object? We think no.
         return resultStr
             
     def colorResults(self, color='red', typeList=None):
+        '''
+        colors the notes of all results found by calling all identify methods on Theory Analyzer.
+        Optionally specify a color.
+        '''
         for resultType in self.resultDict.keys():
             if typeList is None or type in typeList:
                 for result in self.resultDict[resultType]:
                     result.color(color)
             
     def show(self):
+        '''
+        show the score, usually after running some identify and color routines
+        '''
         self._theoryScore.show()
                 
 # Vertical Slice Object
 
 class VerticalSliceOfNotes(object):
     ''' A vertical slice of notes represents a list of notes that occur
-    simultaneously in a score'''
+    simultaneously in a score
+    '''
     
     def __init__(self,noteList):
         self._noteList = noteList
@@ -515,7 +603,7 @@ class TheoryResult(object):
     '''
     A TheoryResult object is used to store information about the results
     of the theory analysis. Includes references to the original elements
-    of the score and a textual description of the error. Uses subclasses
+    in the score and a textual description of the error. Uses subclasses
     corresponding to the different types of objects determining the result
     '''
     
@@ -540,7 +628,7 @@ class VLQTheoryResult(TheoryResult):
 
 # Interval Theory Result Object
                   
-class IntervalTheoryResultObject(TheoryResult):
+class IntervalTheoryResult(TheoryResult):
     def __init__(self, intv):
         TheoryResult.__init__(self)
         self.intv = intv
@@ -564,7 +652,7 @@ class TestExternal(unittest.TestCase):
     
     def demo(self):
         s = converter.parse('/Users/larsj/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
-#        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
+#       s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
         
         ta = TheoryAnalyzer(s)
 
