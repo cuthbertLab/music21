@@ -16,6 +16,8 @@ from music21 import converter
 from music21 import corpus
 from music21 import interval
 from music21 import voiceLeading
+from music21 import roman
+from music21 import chord
 
 import unittest
 
@@ -85,7 +87,7 @@ class TheoryAnalyzer(object):
             vs = VerticalSlice(nList)
             
             vsList.append(vs)
-                
+               
         return vsList
     
     #  Intervals
@@ -175,6 +177,7 @@ class TheoryAnalyzer(object):
             noteList.append(n)
                     
         return noteList
+
     
     # VLQs are Voice Leading Quartets as found in voiceLeading.py
     
@@ -341,6 +344,20 @@ class TheoryAnalyzer(object):
                         tr.color(color)
                     self.resultDict[dictKey].append(tr)
                        
+                       
+    def _identifyBasedOnVerticalSlice(self, color, dictKey, testFunction, textFunction):
+        if dictKey not in self.resultDict.keys():
+            self.resultDict[dictKey] = []             
+
+        for vs in self.verticalSlices:
+            if testFunction(vs) is not False:
+                tr = VerticalSliceTheoryResult(vs)
+                tr.value = testFunction(vs)
+                tr.text = textFunction(vs)
+                if color is not None: 
+                    tr.color(color)
+                self.resultDict[dictKey].append(tr)
+                
     # Theory Errors using VLQ template
     
     def identifyParallelFifths(self, partNum1 = None, partNum2 = None, color = None, dictKey = 'parallelFifths'):
@@ -494,6 +511,22 @@ class TheoryAnalyzer(object):
                      + str(mIntv.niceName) + " from " + str(mIntv.noteStart.name) + " to " + str(mIntv.noteEnd.name)
         self._identifyBasedOnMelodicInterval(partNum, color, dictKey, testFunction, textFunction)                
     
+    
+    def identifyRomanNumerals(self, color = None, dictKey = 'romanNumerals'):
+        def testFunction(vs):
+            noteList = vs.getNoteList()
+            if not None in noteList:
+                c = chord.Chord(noteList)
+                rn = roman.fromChordAndKey(c, self.key)
+                print self.key
+                print noteList
+            else:
+                rn = False
+            return rn
+        textFunction = lambda vs: "Roman Numeral at " + str(vs.getNoteList()[0].measureNumber)
+        self._identifyBasedOnVerticalSlice(color, dictKey, testFunction, textFunction)                
+    
+    
     # Other Theory Properties to Identify:
     
     # Theory Properties using VLQ template
@@ -573,7 +606,7 @@ class TheoryAnalyzer(object):
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name)  if vlq.motionType() != "No Motion" else 'No motion'
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
         
-                    
+                
     # Combo Methods
     
     def identifyCommonPracticeErrors(self, partNum1,partNum2,dictKey='commonPracticeErrors'):
@@ -640,6 +673,12 @@ class VerticalSlice(object):
     def getNote(self,partNum):
         return self._noteList[partNum]
     
+    def getNoteList(self):
+        '''
+        returns the entire note list of a vertical slice
+        '''
+        return self._noteList
+        
     def __repr__(self):
         for (i,n) in enumerate(self._noteList):
             print str(i) + ": " + str(n)
@@ -707,7 +746,14 @@ class NoteTheoryResult(TheoryResult):
     def color(self, color='red'):
         self.n.color = color
             
-            
+class VerticalSliceTheoryResult(TheoryResult):            
+    def __init__(self, vs): 
+        TheoryResult.__init__(self)
+        self.vs = vs
+        
+    def color(self, color ='red'):
+        for n in self.vs.getNoteList():
+            n.color = color
 # ------------------------------------------------------------
 
 class Test(unittest.TestCase):
@@ -722,7 +768,7 @@ class TestExternal(unittest.TestCase):
     
     def demo(self):
 
-        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/Exercises/S11_1_IA_scratch.xml')
+        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/Exercises/11_I_A_1.xml')
 
         #s = converter.parse('/Users/larsj/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
 #        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
@@ -739,9 +785,11 @@ class TestExternal(unittest.TestCase):
         #ta.identifyLeapNotSetWithStep(color='white')
         #ta.identifyDissonantHarmonicIntervals(color='magenta')
         #ta.identifyDissonantMelodicIntervals(color='cyan')
-        ta.identifyMotionType()
+        #ta.identifyMotionType()
         #ta.identifyScaleDegrees()
         #ta.identifyHarmonicIntervals()
+        
+        print ta.identifyRomanNumerals()
         
 #        ta.identifyObliqueMotion()
 #        ta.identifySimilarMotion()
@@ -756,7 +804,7 @@ class TestExternal(unittest.TestCase):
 #                nResult.n.lyric = str(nResult.value)
 
         print ta.getResultsString()
-        ta.show()
+        #ta.show()
         
     
 if __name__ == "__main__":
