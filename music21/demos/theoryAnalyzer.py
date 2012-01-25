@@ -263,7 +263,6 @@ class TheoryAnalyzer(object):
     # Template for analysis based on VLQs
     
     def _identifyBasedOnVLQ(self, partNum1, partNum2, color, dictKey, testFunction, textFunction, valueFunction = None):
-        
         if dictKey not in self.resultDict.keys():
             self.resultDict[dictKey] = []
         
@@ -344,7 +343,7 @@ class TheoryAnalyzer(object):
                        
     # Theory Errors using VLQ template
     
-    def identifyParallelFifths(self, partNum1 = None, partNum2 = None, color = None):
+    def identifyParallelFifths(self, partNum1 = None, partNum2 = None, color = None, dictKey = 'parallelFifths'):
         '''
         Identifies parallel fifths (calls :meth:`~music21.voiceLeading.parallelFifth`) between 
         two parts (if specified) or between all possible pairs of parts (if not specified) 
@@ -377,84 +376,83 @@ class TheoryAnalyzer(object):
         >>> ta.resultDict['parallelFifths'][0].text
         'Parallel fifth at measure 1: Part 1 moves from D to E while part 2 moves from G to A'
         '''
-        dictKey = 'parallelFifths'
         testFunction = lambda vlq: vlq.parallelFifth()
         textFunction = lambda vlq, pn1, pn2: "Parallel fifth at measure " + str(vlq.v1n1.measureNumber) +": "\
                      + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey,testFunction,textFunction)
         
-    def identifyParallelOctaves(self, partNum1 = None, partNum2 = None, color = None):
+    def identifyParallelOctaves(self, partNum1 = None, partNum2 = None, color = None, dictKey = 'parallelOctaves'):
         '''
         Identifies parallel octaves (calls :meth:`~music21.voiceLeading.parallelOctave`) between 
         two parts (if specified) or between all possible pairs of parts (if not specified) 
         and stores the resulting list of VLQTheoryResult objects in self.resultDict['parallelOctaves']. 
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
         '''
-        dictKey = 'parallelOctaves'
+        
         testFunction = lambda vlq: vlq.parallelOctave()
         textFunction = lambda vlq, pn1, pn2: "Parallel octave at measure " + str(vlq.v1n1.measureNumber) +": "\
                      + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
         
-    def identifyParallelUnisons(self, partNum1 = None, partNum2 = None, color = None):
+    def identifyParallelUnisons(self, partNum1 = None, partNum2 = None, color = None,dictKey = 'parallelUnisons'):
         '''
         Identifies parallel unisons (calls :meth:`~music21.voiceLeading.parallelUnison`) between 
         two parts (if specified) or between all possible pairs of parts (if not specified) 
         and stores the resulting list of VLQTheoryResult objects in self.resultDict['parallelUnisons']. 
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
         '''
-        dictKey = 'parallelUnisons'
+        
         testFunction = lambda vlq: vlq.parallelUnison()
         textFunction = lambda vlq, pn1, pn2: "Parallel unison at measure " + str(vlq.v1n1.measureNumber) +": "\
                      + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
         
-    def identifyHiddenFifths(self, partNum1 = None, partNum2 = None, color = None):
+    def identifyHiddenFifths(self, partNum1 = None, partNum2 = None, color = None,dictKey = 'hiddenFifths'):
         '''
         Identifies hidden fifths (calls :meth:`~music21.voiceLeading.hiddenFifth`) between 
         two parts (if specified) or between all possible pairs of parts (if not specified) 
         and stores the resulting list of VLQTheoryResult objects in self.resultDict['hiddenFifths']. 
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
         '''
-        dictKey = 'hiddenFifths'
+        
         testFunction = lambda vlq: vlq.hiddenFifth()
         textFunction = lambda vlq, pn1, pn2: "Hidden fifth at measure " + str(vlq.v1n1.measureNumber) +": "\
                      + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
         
-    def identifyHiddenOctaves(self, partNum1 = None, partNum2 = None, color = None):
+    def identifyHiddenOctaves(self, partNum1 = None, partNum2 = None, color = None,dictKey = 'hiddenOctaves'):
         '''
         Identifies hidden octaves (calls :meth:`~music21.voiceLeading.hiddenOctave`) between 
         two parts (if specified) or between all possible pairs of parts (if not specified) 
         and stores the resulting list of VLQTheoryResult objects in self.resultDict['hiddenOctaves']. 
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
         '''
-        dictKey = 'hiddenOctaves'
+        
         testFunction = lambda vlq: vlq.hiddenOctave()
         textFunction = lambda vlq, pn1, pn2: "Hidden octave at measure " + str(vlq.v1n1.measureNumber) +": "\
                      + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
         
-    def identifyImproperResolutions(self, partNum1 = None, partNum2 = None, color = None):
+    def identifyImproperResolutions(self, partNum1 = None, partNum2 = None, color = None,dictKey = 'improperResolution'):
         '''
         Identifies improper resolutions of dissonant intervals (calls :meth:`~music21.voiceLeading.improperResolution`) 
         between two parts (if specified) or between all possible pairs of parts (if not specified) 
         and stores the resulting list of VLQTheoryResult objects in self.resultDict['improperResolution']. 
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
         '''
-        dictKey = 'improperResolution'
+        
         testFunction = lambda vlq: vlq.improperResolution()
         textFunction = lambda vlq, pn1, pn2: "Improper resolution of " + vlq.vIntervals[0].niceName +" at measure " + str(vlq.v1n1.measureNumber) +": "\
                  + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                  + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name + " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
         
-    def identifyLeapNotSetWithStep(self, partNum1 = None, partNum2 = None, color = None):
+    def identifyLeapNotSetWithStep(self, partNum1 = None, partNum2 = None, color = None,dictKey = 'LeapNotSetWithStep'):
         '''
         Identifies a leap/skip in one voice not set with a step in the other voice 
         (calls :meth:`~music21.voiceLeading.leapNotSetWithStep`) 
@@ -462,7 +460,7 @@ class TheoryAnalyzer(object):
         and stores the resulting list of VLQTheoryResult objects in self.resultDict['leapNotSetWithStep']. 
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
         '''
-        dictKey = 'LeapNotSetWithStep'
+        
         testFunction = lambda vlq: vlq.leapNotSetWithStep()
         textFunction = lambda vlq, pn1, pn2: "Leap not set with step at measure " + str(vlq.v1n1.measureNumber) +": "\
                  + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
@@ -484,7 +482,7 @@ class TheoryAnalyzer(object):
                      + " between part " + str(pn1 + 1) + " and part " + str(pn2 + 1)
         self._identifyBasedOnHarmonicInterval(partNum1, partNum2, color, dictKey, testFunction, textFunction)
 
-    def identifyDissonantMelodicIntervals(self, partNum = None, color = None, dictKey = 'dissonantHarmonicIntervals'):
+    def identifyDissonantMelodicIntervals(self, partNum = None, color = None, dictKey = 'dissonantMelodicIntervals'):
         '''
         Identifies dissonant melodic intervals (A2, A4, d5, m7, M7) in the part (if specified) 
         or for all parts (if not specified) and stores the resulting list of 
@@ -578,7 +576,7 @@ class TheoryAnalyzer(object):
                     
     # Combo Methods
     
-    def identifyCommonPracticeErrors(self):
+    def identifyCommonPracticeErrors(self, partNum1,partNum2,dictKey='commonPracticeErrors'):
         '''
         wrapper class that calls all identify methods for common-practice counterpoint errors, 
         assigning a color identifier to each
@@ -587,15 +585,15 @@ class TheoryAnalyzer(object):
         ParallelUnisons = blue, ImproperResolutions = purple, LeapNotSetWithStep = white, 
         DissonantHarmonicIntervals = magenta, DissonantMelodicIntervals = cyan
         '''
-        self.identifyParallelFifths(color='red')
-        self.identifyParallelOctaves(color='orange')
-        self.identifyHiddenFifths(color='yellow')
-        self.identifyHiddenOctaves(color='green')
-        self.identifyParallelUnisons(color='blue')
-        self.identifyImproperResolutions(color='purple')
-        self.identifyLeapNotSetWithStep(color='white')
-        self.identifyDissonantHarmonicIntervals(color='magenta')
-        self.identifyDissonantMelodicIntervals(color='cyan')                
+        self.identifyParallelFifths(partNum1, partNum2, dictKey = dictKey, color='red')
+        self.identifyParallelOctaves(partNum1, partNum2, dictKey = dictKey, color='orange')
+        self.identifyHiddenFifths(partNum1, partNum2, dictKey = dictKey, color='yellow')
+        self.identifyHiddenOctaves(partNum1, partNum2, dictKey = dictKey, color='green')
+        self.identifyParallelUnisons(partNum1, partNum2, dictKey = dictKey, color='blue')
+        self.identifyImproperResolutions(partNum1, partNum2, dictKey = dictKey, color='purple')
+        self.identifyLeapNotSetWithStep(partNum1, partNum2, dictKey = dictKey, color='white')
+        self.identifyDissonantHarmonicIntervals(partNum1, partNum2, dictKey = dictKey, color='magenta')
+        self.identifyDissonantMelodicIntervals(dictKey = dictKey, color='cyan')                
     
     # Output Methods
                 
@@ -605,9 +603,8 @@ class TheoryAnalyzer(object):
         '''
         resultStr = ""
         for resultType in self.resultDict.keys():
-            resultStr+=resultType+": \n"
-            if typeList is None or type in typeList:
-                
+            if typeList is None or resultType in typeList:
+                resultStr+=resultType+": \n"
                 for result in self.resultDict[resultType]:
                     resultStr += result.text +": "+str(result.value)+ "\n"
                 resultStr += "\n"
@@ -620,7 +617,7 @@ class TheoryAnalyzer(object):
         Optionally specify a color.
         '''
         for resultType in self.resultDict.keys():
-            if typeList is None or type in typeList:
+            if typeList is None or resultType in typeList:
                 for result in self.resultDict[resultType]:
                     result.color(color)
             
@@ -676,6 +673,12 @@ class VLQTheoryResult(TheoryResult):
         self.vlq.v1n2.color = color
         self.vlq.v2n1.color = color
         self.vlq.v2n2.color = color
+        
+    def offset(self):
+        offset = self.vlq.v1n2.offset
+        if self.vlq.v2n2.offset > offset:
+            offset = self.vlq.v2n2.offset
+        return offset
 
 # Interval Theory Result Object
                   
@@ -687,6 +690,12 @@ class IntervalTheoryResult(TheoryResult):
     def color(self, color='red'):
         self.intv.noteStart.color = color
         self.intv.noteEnd.color = color
+        
+    def offset(self):
+        offset = self.intv.noteStart.offset
+        if self.intv.noteEnd.offset > offset:
+            offset = self.intv.noteEnd.offset
+        return offset
         
 # Note Theory Result Object
                   
