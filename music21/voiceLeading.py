@@ -36,7 +36,6 @@ class VoiceLeadingQuartet(music21.Music21Object):
     Necessary for classifying types of voice-leading motion
     '''
     
-    motionType = None
     unison = interval.Interval("P1")
     fifth  = interval.Interval("P5")
     octave = interval.Interval("P8")
@@ -57,8 +56,42 @@ class VoiceLeadingQuartet(music21.Music21Object):
         self.vIntervals.append(interval.notesToInterval(self.v1n1, self.v2n1))
         self.vIntervals.append(interval.notesToInterval(self.v1n2, self.v2n2))
         self.hIntervals.append(interval.notesToInterval(self.v1n1, self.v1n2))
-        self.hIntervals.append(interval.notesToInterval(self.v2n1, self.v2n2))
+        self.hIntervals.append(interval.notesToInterval(self.v2n1, self.v2n2))    
     
+    def motionType(self):
+        '''
+        >>> from music21 import *
+        >>> n1 = note.Note('D4')
+        >>> n2 = note.Note('E4')
+        >>> m1 = note.Note('F4')
+        >>> m2 = note.Note('B4')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.motionType()
+        'Similar'
+        
+        >>> n1 = note.Note('A4')
+        >>> n2 = note.Note('C5')
+        >>> m1 = note.Note('D4')
+        >>> m2 = note.Note('F4')
+        >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.motionType()
+        'Parallel'
+        '''
+        motionType = ''
+        if self.obliqueMotion():
+            motionType = 'Oblique'
+        elif self.parallelMotion():
+            motionType = 'Parallel'
+        elif self.similarMotion():
+            motionType = 'Similar'
+        elif self.contraryMotion():
+            motionType = 'Contrary'
+        elif self.antiParallelMotion():
+            motionType = 'Anti-Parallel'
+        elif self.noMotion():
+            motionType = 'No Motion'
+        return motionType
+            
     def noMotion(self):
         '''
         Returns true if no voice moves at this "voice-leading" moment
@@ -280,6 +313,7 @@ class VoiceLeadingQuartet(music21.Music21Object):
         False
         '''
         return self.contraryMotion() and self.hIntervals[0].direction == -1
+ 
  
     def antiParallelMotion(self, simpleName = None):
         '''
