@@ -262,7 +262,8 @@ class TheoryAnalyzer(object):
     
     # Template for analysis based on VLQs
     
-    def _identifyBasedOnVLQ(self, partNum1, partNum2, color, dictKey, testFunction, textFunction    , valueFunction = None):
+    def _identifyBasedOnVLQ(self, partNum1, partNum2, color, dictKey, testFunction, textFunction, valueFunction = None):
+        
         if dictKey not in self.resultDict.keys():
             self.resultDict[dictKey] = []
         
@@ -275,8 +276,11 @@ class TheoryAnalyzer(object):
             for vlq in vlqList:
                 if testFunction(vlq) is not False: # True or value
                     tr = VLQTheoryResult(vlq)
+      
                     tr.value = testFunction(vlq)
                     tr.text = textFunction(vlq, partNum1, partNum2)
+                    tr.value = textFunction(vlq, partNum1, partNum2)
+
                     if color is not None:
                         tr.color(color)
                     self.resultDict[dictKey].append(tr)
@@ -327,7 +331,7 @@ class TheoryAnalyzer(object):
             for partNum in range(0, len(self._theoryScore.parts)):
                 self._identifyBasedOnNote(partNum, color, dictKey, testFunction, textFunction)
         else:
-            nList = self.getNotesList(partNum)
+            nList = self.getNotes(partNum)
             
             for n in nList:
                 if testFunction(n) is not False: # True or value
@@ -555,15 +559,23 @@ class TheoryAnalyzer(object):
     # More Properties
 
     def identifyHarmonicIntervals(self, partNum1 = None, partNum2 = None, color = None, dictKey = 'harmonicIntervals'):
-        testFunction = lambda hIntv: hIntv.generic.undirected
+        testFunction = lambda hIntv: hIntv.generic.undirected if hIntv is not None else False
         textFunction = lambda hIntv, pn1, pn2: "harmonic interval"
         self._identifyBasedOnHarmonicInterval(partNum1, partNum2, color, dictKey, testFunction, textFunction)
         
     def identifyScaleDegrees(self, partNum = None, color = None, dictKey = 'scaleDegrees'):
-        testFunction = lambda n: str(self.key.getScale().getScaleDegreeFromPitch(n.pitch))
+        testFunction = lambda n:  (str(self.key.getScale().getScaleDegreeFromPitch(n.pitch)) ) if n is not None else False
         textFunction = lambda n, pn: "scale degree"
         self._identifyBasedOnNote(partNum, color, dictKey, testFunction, textFunction)
             
+    def identifyMotionType(self, partNum1 = None, partNum2 = None, color = None, dictKey = 'motionType'):
+        testFunction = lambda vlq: vlq.motionType()
+        textFunction = lambda vlq, pn1, pn2: (vlq.motionType() + ' Motion at '+ str(vlq.v1n1.measureNumber) +": " \
+                     + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
+                     + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name)  if vlq.motionType() != "No Motion" else 'No motion'
+        self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
+        
+                    
     # Combo Methods
     
     def identifyCommonPracticeErrors(self):
@@ -593,10 +605,11 @@ class TheoryAnalyzer(object):
         '''
         resultStr = ""
         for resultType in self.resultDict.keys():
-            print resultType+":"
+            resultStr+=resultType+": \n"
             if typeList is None or type in typeList:
+                
                 for result in self.resultDict[resultType]:
-                    resultStr += result.text + "\n"
+                    resultStr += result.text +": "+str(result.value)+ "\n"
                 resultStr += "\n"
                 
         return resultStr
@@ -699,21 +712,27 @@ class TestExternal(unittest.TestCase):
         pass 
     
     def demo(self):
-        s = converter.parse('/Users/larsj/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
+
+        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/Exercises/S11_1_IA_scratch.xml')
+
+        #s = converter.parse('/Users/larsj/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
 #        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
 #        s = corpus.parse('bwv7.7')
         
         ta = TheoryAnalyzer(s)
 
-        ta.identifyParallelFifths(color='red')
-        ta.identifyParallelOctaves(color='orange')
-        ta.identifyHiddenFifths(color='yellow')
-        ta.identifyHiddenOctaves(color='green')
-        ta.identifyParallelUnisons(color='blue')
-        ta.identifyImproperResolutions(color='purple')
-        ta.identifyLeapNotSetWithStep(color='white')
-        ta.identifyDissonantHarmonicIntervals(color='magenta')
-        ta.identifyDissonantMelodicIntervals(color='cyan')
+        #ta.identifyParallelFifths(color='red')
+        #ta.identifyParallelOctaves(color='orange')
+        #ta.identifyHiddenFifths(color='yellow')
+        #ta.identifyHiddenOctaves(color='green')
+        #ta.identifyParallelUnisons(color='blue')
+        #ta.identifyImproperResolutions(color='purple')
+        #ta.identifyLeapNotSetWithStep(color='white')
+        #ta.identifyDissonantHarmonicIntervals(color='magenta')
+        #ta.identifyDissonantMelodicIntervals(color='cyan')
+        ta.identifyMotionType()
+        #ta.identifyScaleDegrees()
+        #ta.identifyHarmonicIntervals()
         
 #        ta.identifyObliqueMotion()
 #        ta.identifySimilarMotion()
@@ -723,13 +742,18 @@ class TestExternal(unittest.TestCase):
 #        ta.identifyInwardContraryMotion()
 #        ta.identifyAntiParallelMotion()
 
+#        for nResult in ta.resultDict['scaleDegrees']:
+#            if nResult.n is not None:
+#                nResult.n.lyric = str(nResult.value)
+
         print ta.getResultsString()
         ta.show()
         
     
 if __name__ == "__main__":
-#    music21.mainTest(Test)
+
+    music21.mainTest(Test)
     
-    te = TestExternal()
-    te.demo()
+    #te = TestExternal()
+    #te.demo()
     
