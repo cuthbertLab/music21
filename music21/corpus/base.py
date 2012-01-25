@@ -97,6 +97,9 @@ from music21.corpus.beethoven import opus59no3
 
 from music21.corpus import ciconia
 
+from music21.corpus import corelli
+from music21.corpus.corelli import op3no1
+
 from music21.corpus import cpebach
 
 from music21.corpus import demos
@@ -282,6 +285,9 @@ MODULES = [
 
             ciconia,
 
+            corelli,
+            op3no1,
+            
             cpebach,
 
             demos,
