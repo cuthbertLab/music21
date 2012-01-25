@@ -72,6 +72,7 @@ class TheoryAnalyzer(object):
         '''
         vsList = []
         
+        # If speed is an issue, could try using offset maps...
         chordifiedSc = self._theoryScore.chordify()
         for c in chordifiedSc.flat.getElementsByClass('Chord'):
             nList = []
@@ -81,7 +82,7 @@ class TheoryAnalyzer(object):
                     nList.append(el)                    
                 else:
                     nList.append(None)
-            vs = VerticalSliceOfNotes(nList)
+            vs = VerticalSlice(nList)
             
             vsList.append(vs)
                 
@@ -126,7 +127,8 @@ class TheoryAnalyzer(object):
             hInvList.append(hIntv)
                     
         return hInvList
-        
+    
+    
     def getMelodicIntervals(self, partNum):
         '''
         Gets a list of all the melodic intervals in the specified part.
@@ -160,6 +162,19 @@ class TheoryAnalyzer(object):
             mInvList.append(mIntv)
                     
         return mInvList
+    
+    def getNotes(self, partNum):
+        noteList = []
+        noteOrRestList = self._theoryScore.parts[partNum].flat.getElementsByClass(['Note','Rest'])
+        for nr in noteOrRestList:
+            if nr.isClassOrSubclass(['Note']):
+                n = nr
+            else:
+                n = None
+            
+            noteList.append(n)
+                    
+        return noteList
     
     # VLQs are Voice Leading Quartets as found in voiceLeading.py
     
@@ -247,7 +262,7 @@ class TheoryAnalyzer(object):
     
     # Template for analysis based on VLQs
     
-    def _identifyBasedOnVLQ(self, partNum1, partNum2, color, dictKey, testFunction, textFunction):
+    def _identifyBasedOnVLQ(self, partNum1, partNum2, color, dictKey, testFunction, textFunction    , valueFunction = None):
         if dictKey not in self.resultDict.keys():
             self.resultDict[dictKey] = []
         
@@ -258,13 +273,71 @@ class TheoryAnalyzer(object):
             vlqList = self.getVLQs(partNum1, partNum2)
             
             for vlq in vlqList:
-                if testFunction(vlq):
+                if testFunction(vlq) is not False: # True or value
                     tr = VLQTheoryResult(vlq)
+                    tr.value = testFunction(vlq)
                     tr.text = textFunction(vlq, partNum1, partNum2)
                     if color is not None:
                         tr.color(color)
                     self.resultDict[dictKey].append(tr)
                     
+    def _identifyBasedOnHarmonicInterval(self, partNum1, partNum2, color, dictKey, testFunction, textFunction):
+        if dictKey not in self.resultDict.keys():
+            self.resultDict[dictKey] = []
+        
+        if partNum1 == None or partNum2 == None:
+            for (partNum1,partNum2) in self.getAllPartNumPairs():
+                self._identifyBasedOnHarmonicInterval(partNum1, partNum2, color, dictKey, testFunction, textFunction)
+        else:
+            hIntvList = self.getHarmonicIntervals(partNum1, partNum2)
+            
+            for hIntv in hIntvList:
+                if testFunction(hIntv) is not False: # True or value
+                    tr = IntervalTheoryResult(hIntv)
+                    tr.value = testFunction(hIntv)
+                    tr.text = textFunction(hIntv, partNum1, partNum2)
+                    if color is not None:
+                        tr.color(color)
+                    self.resultDict[dictKey].append(tr)
+                    
+    def _identifyBasedOnMelodicInterval(self, partNum, color, dictKey, testFunction, textFunction):
+        if dictKey not in self.resultDict.keys():
+            self.resultDict[dictKey] = []
+        
+        if partNum == None:
+            for partNum in range(0, len(self._theoryScore.parts)):
+                self._identifyBasedOnMelodicInterval(partNum, color, dictKey, testFunction, textFunction)
+        else:
+            mIntvList = self.getMelodicIntervals(partNum)
+            
+            for mIntv in mIntvList:
+                if testFunction(mIntv) is not False: # True or value
+                    tr = IntervalTheoryResult(mIntv)
+                    tr.value = testFunction(mIntv)
+                    tr.text = textFunction(mIntv, partNum)
+                    if color is not None:
+                        tr.color(color)
+                    self.resultDict[dictKey].append(tr)
+                    
+    def _identifyBasedOnNote(self, partNum, color, dictKey, testFunction, textFunction):
+        if dictKey not in self.resultDict.keys():
+            self.resultDict[dictKey] = []
+        
+        if partNum == None:
+            for partNum in range(0, len(self._theoryScore.parts)):
+                self._identifyBasedOnNote(partNum, color, dictKey, testFunction, textFunction)
+        else:
+            nList = self.getNotesList(partNum)
+            
+            for n in nList:
+                if testFunction(n) is not False: # True or value
+                    tr = NoteTheoryResult(n)
+                    tr.value = testFunction(n)
+                    tr.text = textFunction(n, partNum)
+                    if color is not None:
+                        tr.color(color)
+                    self.resultDict[dictKey].append(tr)
+                       
     # Theory Errors using VLQ template
     
     def identifyParallelFifths(self, partNum1 = None, partNum2 = None, color = None):
@@ -393,72 +466,35 @@ class TheoryAnalyzer(object):
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
     
     # Theory Errors not using VLQ (therefore, not using template)      
-                    
-    def identifyDissonantHarmonicIntervals(self, partNum1 = None, partNum2 = None, color = None):
+
+    def identifyDissonantHarmonicIntervals(self, partNum1 = None, partNum2 = None, color = None, dictKey = 'dissonantHarmonicIntervals'):
         '''
         Identifies dissonant harmonic intervals (calls :meth:`~music21.interval.isConsonant`) 
         between the two parts (if specified) or between all possible pairs of parts (if not specified) 
         and stores the resulting list of IntervalTheoryResultObject objects in self.resultDict['dissonantHarmonicIntervals']. 
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
         '''
-        if 'dissonantHarmonicIntervals' not in self.resultDict.keys():
-            self.resultDict['dissonantHarmonicIntervals'] = []
-        
-        if partNum1 == None or partNum2 == None:
-            for (partNum1,partNum2) in self.getAllPartNumPairs():
-                self.identifyDissonantHarmonicIntervals(partNum1, partNum2, color = color)
-        else:
-            hIntvList = self.getHarmonicIntervals(partNum1, partNum2)
-            
-            for hIntv in hIntvList:
-                if hIntv is not None and not hIntv.isConsonant():
-                    tr = IntervalTheoryResult(hIntv)
-                    tr.text = "Dissonant harmonic interval in measure " + str(hIntv.noteStart.measureNumber) +": " \
+        testFunction = lambda hIntv: hIntv is not None and not hIntv.isConsonant()
+        textFunction = lambda hIntv, pn1, pn2: "Dissonant harmonic interval in measure " + str(hIntv.noteStart.measureNumber) +": " \
                      + str(hIntv.niceName) + " from " + str(hIntv.noteStart.name) + " to " + str(hIntv.noteEnd.name) \
-                     + " between part " + str(partNum1 + 1) + " and part " + str(partNum2 + 1)
-                    if color is not None:
-                        tr.color(color)
-                    self.resultDict['dissonantHarmonicIntervals'].append(tr)
-                
-    def identifyDissonantMelodicIntervals(self, partNum = None, color = None):
+                     + " between part " + str(pn1 + 1) + " and part " + str(pn2 + 1)
+        self._identifyBasedOnHarmonicInterval(partNum1, partNum2, color, dictKey, testFunction, textFunction)
+
+    def identifyDissonantMelodicIntervals(self, partNum = None, color = None, dictKey = 'dissonantHarmonicIntervals'):
         '''
         Identifies dissonant melodic intervals (A2, A4, d5, m7, M7) in the part (if specified) 
         or for all parts (if not specified) and stores the resulting list of 
         IntervalTheoryResultObject objects in self.resultDict['dissonantMelodicIntervals']. 
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
         '''
-        if 'dissonantMelodicIntervals' not in self.resultDict.keys():
-            self.resultDict['dissonantMelodicIntervals'] = []
-        
-        if partNum == None:
-            for partNum in range(0, len(self._theoryScore.parts)):
-                self.identifyDissonantMelodicIntervals(partNum,color = color)
-        else:
-            mIntvList = self.getMelodicIntervals(partNum)
-            
-            for mIntv in mIntvList:
-                if mIntv is not None and mIntv.simpleName in ["A2","A4","d5","m7","M7"]:
-                    tr = IntervalTheoryResult(mIntv)
-                    tr.text = "Dissonant melodic interval in part " + str(partNum + 1) + " measure " + str(mIntv.noteStart.measureNumber) +": "\
+        testFunction = lambda mIntv: mIntv is not None and mIntv.simpleName in ["A2","A4","d5","m7","M7"]
+        textFunction = lambda mIntv, pn: "Dissonant melodic interval in part " + str(pn + 1) + " measure " + str(mIntv.noteStart.measureNumber) +": "\
                      + str(mIntv.niceName) + " from " + str(mIntv.noteStart.name) + " to " + str(mIntv.noteEnd.name)
-                    if color is not None:
-                        tr.color(color)
-                    self.resultDict['dissonantMelodicIntervals'].append(tr)
-                
+        self._identifyBasedOnMelodicInterval(partNum, color, dictKey, testFunction, textFunction)                
     
     # Other Theory Properties to Identify:
     
     # Theory Properties using VLQ template
-        
-    def identifyNoMotion(self, partNum1 = None, partNum2 = None, color = None):
-        dictKey = 'noMotion'
-        testFunction = lambda vlq: vlq.noMotion()
-        textFunction = lambda vlq, pn1, pn2: "No motion found"
-# Donesn't work if v1n1 is none:
-#         at measure " + str(vlq.v1n1.measureNumber) +": "\
-#                     + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
-#                     + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
-        self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
         
     def identifyObliqueMotion(self, partNum1 = None, partNum2 = None, color = None):
         dictKey = 'obliqueMotion'
@@ -515,7 +551,19 @@ class TheoryAnalyzer(object):
                      + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
-                    
+
+    # More Properties
+
+    def identifyHarmonicIntervals(self, partNum1 = None, partNum2 = None, color = None, dictKey = 'harmonicIntervals'):
+        testFunction = lambda hIntv: hIntv.generic.undirected
+        textFunction = lambda hIntv, pn1, pn2: "harmonic interval"
+        self._identifyBasedOnHarmonicInterval(partNum1, partNum2, color, dictKey, testFunction, textFunction)
+        
+    def identifyScaleDegrees(self, partNum = None, color = None, dictKey = 'scaleDegrees'):
+        testFunction = lambda n: str(self.key.getScale().getScaleDegreeFromPitch(n.pitch))
+        textFunction = lambda n, pn: "scale degree"
+        self._identifyBasedOnNote(partNum, color, dictKey, testFunction, textFunction)
+            
     # Combo Methods
     
     def identifyCommonPracticeErrors(self):
@@ -538,18 +586,6 @@ class TheoryAnalyzer(object):
         self.identifyDissonantMelodicIntervals(color='cyan')                
     
     # Output Methods
-
-    def printResults(self, typeList=None):
-        '''
-        method should be deleted....just print getResultsString()
-        
-        '''
-        for resultType in self.resultDict.keys():
-            print resultType+":"
-            if typeList is None or type in typeList:
-                for result in self.resultDict[resultType]:
-                    print result.text
-                print ""
                 
     def getResultsString(self, typeList=None):
         '''
@@ -557,6 +593,7 @@ class TheoryAnalyzer(object):
         '''
         resultStr = ""
         for resultType in self.resultDict.keys():
+            print resultType+":"
             if typeList is None or type in typeList:
                 for result in self.resultDict[resultType]:
                     resultStr += result.text + "\n"
@@ -582,7 +619,7 @@ class TheoryAnalyzer(object):
                 
 # Vertical Slice Object
 
-class VerticalSliceOfNotes(object):
+class VerticalSlice(object):
     ''' A vertical slice of notes represents a list of notes that occur
     simultaneously in a score
     '''
@@ -609,6 +646,7 @@ class TheoryResult(object):
     
     def __init__(self):
         self.text = ""
+        self.value = ""
         
     def color(self,color):
         pass
@@ -636,6 +674,16 @@ class IntervalTheoryResult(TheoryResult):
     def color(self, color='red'):
         self.intv.noteStart.color = color
         self.intv.noteEnd.color = color
+        
+# Note Theory Result Object
+                  
+class NoteTheoryResult(TheoryResult):
+    def __init__(self, n):
+        TheoryResult.__init__(self)
+        self.n = n
+        
+    def color(self, color='red'):
+        self.n.color = color
             
             
 # ------------------------------------------------------------
@@ -652,7 +700,8 @@ class TestExternal(unittest.TestCase):
     
     def demo(self):
         s = converter.parse('/Users/larsj/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
-#       s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
+#        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
+#        s = corpus.parse('bwv7.7')
         
         ta = TheoryAnalyzer(s)
 
@@ -674,13 +723,13 @@ class TestExternal(unittest.TestCase):
 #        ta.identifyInwardContraryMotion()
 #        ta.identifyAntiParallelMotion()
 
-        ta.printResults()
+        print ta.getResultsString()
         ta.show()
         
     
 if __name__ == "__main__":
-    music21.mainTest(Test)
+#    music21.mainTest(Test)
     
-#    te = TestExternal()
-#    te.demo()
+    te = TestExternal()
+    te.demo()
     
