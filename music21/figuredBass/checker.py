@@ -4,7 +4,7 @@
 # Purpose:      music21 class which can parse a stream of parts and check your homework
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    (c) 2011 The music21 Project    
+# Copyright:    (c) 2012 The music21 Project    
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
