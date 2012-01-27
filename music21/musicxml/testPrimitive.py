@@ -16988,6 +16988,71 @@ triplets01 = """<?xml version="1.0" encoding="UTF-8"?>
 </score-partwise>
 """
 
+textBoxes01 = """<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="2.0">
+  <credit page="1">
+    <credit-words default-x="427" default-y="999" font-size="24" halign="center" valign="top">This is a text box!</credit-words>
+  </credit>
+
+    <!-- this will not create additional pages if page number is not needed -->
+  <credit page="1">
+    <credit-words default-x="200" default-y="300" font-size="12" halign="center" valign="top">pos 200/300 (lower left)</credit-words>
+  </credit>
+  <credit page="1">
+    <credit-words default-x="1000" default-y="300" font-size="12" halign="center" valign="top" enclosure="oval">pos 1000/300 (lower right)</credit-words>
+  </credit>
+  <credit page="1">
+    <credit-words default-x="200" default-y="1500" font-size="12" halign="center" valign="top">pos 200/1500 (upper left)</credit-words>
+  </credit>
+  <credit page="1">
+    <credit-words default-x="1000" default-y="1500" font-size="12" halign="center" valign="top">pos 1000/1500 (upper right)</credit-words>
+  </credit>
+
+  <part-list>
+    <score-part id="P1">
+      <part-name print-object="no">MusicXML Part</part-name>
+    </score-part>
+  </part-list>
+  <!--=========================================================-->
+  <part id="P1">
+    <measure number="1" width="351">
+      <attributes>
+        <divisions>2</divisions>
+        <key>
+          <fifths>0</fifths>
+          <mode>major</mode>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <note>
+        <rest/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="2" width="281">
+      <note>
+        <rest/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+
+  </part>
+  <!--=========================================================-->
+</score-partwise>
+"""
+
 
 
 ALL = [articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a, restsDurations02a, rhythmDurations03a, chordsThreeNotesDuration21c,
@@ -17007,7 +17072,7 @@ graceNotes24a, transposingInstruments72a, transposing01,
 
 mixedVoices1a, mixedVoices1b, mixedVoices2, 
 
-colors01, triplets01, 
+colors01, triplets01, textBoxes01, 
 ]
 
 
