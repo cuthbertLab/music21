@@ -45,6 +45,8 @@ class TheoryAnalyzer(object):
         
         self.verticalSlices = self.getVerticalSlices()
         
+        self.threeNoteLinearSegments = {}
+        
     # Vertical Slices
     
     def getVerticalSlices(self):
@@ -183,7 +185,7 @@ class TheoryAnalyzer(object):
     
     def getVLQs(self, partNum1, partNum2):
         '''
-        Gets a list of all the melodic intervals in the specified part.
+        Gets a list of the Voice Leading Quartets present between partNum1 and partNum2
         
         >>> from music21 import *
         >>> from music21.demos import theoryAnalyzer
@@ -193,13 +195,14 @@ class TheoryAnalyzer(object):
         >>> part0.append(note.Note('g4'))
         >>> part0.append(note.Note('c5'))
         >>> sc.insert(part0)
+        >>> part1 = stream.Part()
+        >>> part1.append(note.Note('d4'))
+        >>> part1.append(note.Note('e4'))
+        >>> part1.append(note.Note('f5'))
+        >>> sc.insert(part1)
         >>> ta = TheoryAnalyzer(sc)
-        >>> len(ta.getMelodicIntervals(0))
+        >>> len(ta.getVLQs(0,1))
         2
-        >>> ta.getMelodicIntervals(0)[0].name
-        'P5'
-        >>> ta.getMelodicIntervals(0)[1].name
-        'P4'
         '''
         # Caches the list of VLQs once they have been computed
         # for a specified set of partNums
@@ -224,6 +227,48 @@ class TheoryAnalyzer(object):
             self._vlqCache[vlqCacheKey] = vlqList
         
         return vlqList
+
+    def getLinearSegments(self, partNum, lengthLinearSegment):
+        '''
+        Gets a list of all the linear segments in the piece, the length of which specified by lengthLinearSegment
+        Currenlty Supported: ThreeNoteLinearSegment
+        
+        >>> from music21 import *
+        >>> from music21.demos import theoryAnalyzer
+        >>> sc = stream.Score()
+        >>> part0 = stream.Part()
+        >>> part0.append(note.Note('c4'))
+        >>> part0.append(note.Note('g4'))
+        >>> part0.append(note.Note('c5'))
+        >>> part0.append(note.Note('c6'))
+        >>> sc.insert(part0)
+        >>> ta = TheoryAnalyzer(sc)
+        >>> len(ta.getLinearSegments(0,3))
+        2
+        '''
+        # Caches the list of VLQs once they have been computed
+        # for a specified set of partNums
+        
+        #lsCacheKey = str(partNum1) + "," + str(partNum2)
+        
+        #if vlqCacheKey in self._vlqCache.keys():
+        #    return self._vlqCache[vlqCacheKey]
+        
+        linearSegments = []
+        for i in range(0, len(self.verticalSlices)-lengthLinearSegment+1):
+            notes = []
+            for n in range(0,lengthLinearSegment):
+                notes.append(self.verticalSlices[i+n].getNote(partNum))           
+            
+            if lengthLinearSegment == 3:
+                tnls = voiceLeading.ThreeNoteLinearSegment()
+                tnls.p1 = notes[0]
+                tnls.p2 = notes[1]
+                tnls.p3 = notes[2]
+                linearSegments.append(tnls)
+        
+        return linearSegments
+
 
     # Helper for identifying across all parts - used for recursion in identify functions
 
@@ -678,6 +723,9 @@ class VerticalSlice(object):
         returns the entire note list of a vertical slice
         '''
         return self._noteList
+        
+        
+        
         
     def __repr__(self):
         for (i,n) in enumerate(self._noteList):
