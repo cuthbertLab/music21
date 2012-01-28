@@ -325,6 +325,9 @@ class TextBox(base.Music21Object, TextFormat):
     >>> tb.positionHorizontal = 300
     >>> tb.positionVertical, tb.positionHorizontal
     (300, 300)
+    >>> tb.justify = 'center'
+    >>> tb.justify
+    'center'
     '''
     classSortOrder = -11 # text expressions are -10
 
