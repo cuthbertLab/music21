@@ -22,13 +22,21 @@ class wwnortonExercise(object):
     def __init__(self):
         self.xmlFileDirectory = "/xmlfiles/"
         self.xmlFilename = ""
+        self.title = ""
+        self.instructions = ""
+        self.additionalQuestionInstructions = ""
+        self.additionalQuestion = ""
+        
+        self.studentExerciseErrorDict = {}
+
+        
         self.originalExercise = stream.Stream()
         self.modifiedExercise = stream.Stream()
         self.studentExercise = stream.Stream()
         self.textResultString = ""
         self.pn = {}
         
-    def checkExercise(self):
+    def checkExercise(self, questionAnswer = ""):
         pass
     
     def addAuxillaryParts(self):
@@ -142,20 +150,51 @@ class wwnortonExercise(object):
         self._partOffsetsToZero()
         return newPart
     
-    def compareMarkerLyricAnswer(self,ta,taKey,markerPartName,offsetFunc,lyricFunc):
+    def compareMarkerLyricAnswer(self,ta,taKey,markerPartName,offsetFunc,lyricFunc,errorKey=None):
         markerPart = self.studentExercise.parts[self.pn[markerPartName]]
+        
+        totalNumber = 0
+        numberCorrect = 0
+        
         for resultObj in ta.resultDict[taKey]:
             offset = offsetFunc(resultObj)
             correctLyric = lyricFunc(resultObj)
-            print correctLyric
-            print offset
             markerNote = markerPart.flat.getElementAtOrBefore(offset,classList={'Note'})
             if markerNote is None or markerNote.offset != offset:
                 print "No Marker"
                 continue
-            if markerNote.lyric != str(correctLyric):
+            
+            totalNumber += 1
+            if markerNote.lyric == str(correctLyric):
+                numberCorrect += 1
+            else:
+                # RECORD ERROR
                 #markerNote.lyric = markerNote.lyric + "->" + str(correctLyric)
                 markerNote.color = 'red'
+        if errorKey is not None:
+            self.studentExerciseErrorDict[errorKey] = (numberCorrect, totalNumber)
+            
+    def getErrorDictPercentagesResultString(self):
+        resultStr = ""
+        overallCorrect = 0
+        overallTotal = 0
+        for dictKey in self.studentExerciseErrorDict.keys():
+            (numCorrect,numTotal) = self.studentExerciseErrorDict[dictKey]
+            overallCorrect += numCorrect
+            overallTotal += numTotal
+            if numTotal == 0:
+                percent = "NA"
+            else:
+                percent = int( numCorrect * 100.0 / numTotal)
+            resultStr += dictKey+": "+ str(numCorrect)+"/"+str(numTotal) + " ("+str(percent)+"%)\n"
+            
+        if overallTotal == 0:
+            overallPercent = "NA"
+        else:
+            overallPercent = int( overallCorrect * 100.0 / overallTotal)
+        resultStr += "\nOverall: "+ str(overallCorrect)+"/"+str(overallTotal) + " ("+str(overallPercent)+"%)"
+        return resultStr
+                
                 
     def showStudentExercise(self):
         self.studentExercise.show()
@@ -166,9 +205,15 @@ class wwnortonExercise(object):
 
 # EX 11.1.I (A->D)
 class ex11_1_I(wwnortonExercise):
-    def __init__(self):
+    def __init__(self, letter="A"):
         wwnortonExercise.__init__(self)
-        self.xmlFilename = 'S11_1_I_A.xml'
+        self.xmlFilename = '11_1_I_'+str(letter)+'.xml'
+        self.title = "Excercise 11.1.I."+str(letter)+" Chorale Melody Settings"
+        self.instructions = "Here are the soprano and bass parts for a setting by J. S. Bach of the first phrase of an anonymous \
+chorale melody (composed in (1539). Write the scale degrees for the melody above the first staff. Then, \
+sing or play each of these. Label the harmonic intervals between the staves, and examine the counterpoint. In the blanks above the staff, \
+mark the type of motion from beat to beat: contrary (C), oblique (O), similar (S), or parallel (P). Circle and label any dissonant passing \
+or neighbor tones."
         self.pn['part1'] = 0
         self.pn['part2'] = 1
         self.loadOriginalExercise()
@@ -178,7 +223,7 @@ class ex11_1_I(wwnortonExercise):
         self.addMarkerPartFromExisting('part1', newPartName='motionType',newPartTitle="2. Motion Type", rhythmType="quarterNotes", direction = "above")
         self.addMarkerPartFromExisting('part1', newPartName='harmIntervals',newPartTitle="3. Harmonic Intervals", rhythmType='chordify', direction = "below")
         
-    def checkExercise(self):
+    def checkExercise(self, questionAnswer = ""):
         ta = theoryAnalyzer.TheoryAnalyzer(self.studentExercise)
         ta.identifyMotionType(self.pn['part1'],self.pn['part2'],dictKey='motionType')
         ta.identifyScaleDegrees(self.pn['part1'],dictKey='p1ScaleDegrees')
@@ -191,7 +236,8 @@ class ex11_1_I(wwnortonExercise):
         self.compareMarkerLyricAnswer(ta,taKey='p1ScaleDegrees',\
                                 markerPartName='p1ScaleDegrees',\
                                 offsetFunc = scaleDegreeOffsetFunc,\
-                                lyricFunc = scaleDegreeLyricTextFunc)
+                                lyricFunc = scaleDegreeLyricTextFunc,
+                                errorKey = "Scale Degrees")
         
         motionTypeOffsetFunc = lambda resultObj: resultObj.offset()
         motionTypeLyricTextFunc = lambda resultObj: resultObj.value[0]
@@ -199,7 +245,8 @@ class ex11_1_I(wwnortonExercise):
         self.compareMarkerLyricAnswer(ta,taKey='motionType',\
                                 markerPartName='motionType',\
                                 offsetFunc = motionTypeOffsetFunc,\
-                                lyricFunc = motionTypeLyricTextFunc)
+                                lyricFunc = motionTypeLyricTextFunc,
+                                errorKey = "Motion Type")
         
         harmonicIntervalOffsetFunc = lambda resultObj: resultObj.offset()
         
@@ -212,13 +259,25 @@ class ex11_1_I(wwnortonExercise):
         self.compareMarkerLyricAnswer(ta,taKey='harmIntervals',\
                                 markerPartName='harmIntervals',\
                                 offsetFunc = harmonicIntervalOffsetFunc,\
-                                lyricFunc = harmonicIntervalLyricTextFunc)
+                                lyricFunc = harmonicIntervalLyricTextFunc,
+                                errorKey = "Harmonic Intervals")
+
+        self.textResultString = self.getErrorDictPercentagesResultString()
+
     
-# EX 11.1.I (A->D)
+# EX 11.3.A.* (1-3)
 class ex11_3_A(wwnortonExercise):
-    def __init__(self):
+    def __init__(self,number=1):
         wwnortonExercise.__init__(self)
-        self.xmlFilename = '11_3_A_1.xml'
+        self.xmlFilename = '11_3_A_'+str(number)+'.xml'
+        self.title = "Excercise 11.3.A."+str(number)+" Writing note-to-note Counterpoint above a given bass line"
+        self.instructions = "Examine the bass line to identify the key and mode, then determine which chords \
+(V, V7, I, or i, and their inversions) are implied at the beginning and end, and write those Roman numerals in the blanks. \
+Write the opening and closing counterpoint, then provide one soprano note for each of the other bass notes. You may use \
+chordal dissonances (d5, A4, m7) if they can be resolved correctly; appoach these intervals by common tone or step. Label the harmonic \
+intervals between the parts."
+        self.additionalQuestionInstructions = "Please enter the key of the piece:"
+        self.additionalQuestion = "Key of piece:"
         self.pn['part1'] = 0
         self.pn['part2'] = 1
         self.loadOriginalExercise()
@@ -226,12 +285,20 @@ class ex11_3_A(wwnortonExercise):
     def addAuxillaryParts(self):
         self.addMarkerPartFromExisting('part2', newPartName='harmIntervals',newPartTitle="1. Harmonic Intervals", direction = "below")
         
-    def checkExercise(self):
+    def checkExercise(self,additionalAnswer = ""):
         ta = theoryAnalyzer.TheoryAnalyzer(self.studentExercise)
         ta.identifyHarmonicIntervals(self.pn['part1'],self.pn['part2'],dictKey='harmIntervals')
-        ta.identifyCommonPracticeErrors(self.pn['part1'],self.pn['part2'],dictKey='counterpointErrors')
-                
-        self.textResultString = ta.getResultsString(['counterpointErrors'])
+        ta.identifyCommonPracticeErrors(self.pn['part1'],self.pn['part2'],dictKey='Counterpoint Issues')
+          
+        # KEY IS NOT WORKING!!!!
+        if additionalAnswer != str(theoryAnalyzer.TheoryAnalyzer(self.originalExercise).key.pitchAndMode[0]):
+            self.studentExerciseErrorDict['Key Identification'] = (0, 1) 
+            self.textResultString += "Sorry, This exercise is not in the key of "+additionalAnswer+"->"+str(ta.key.pitchAndMode[0])+"\n\n"
+        else:
+            self.textResultString += "Good job. This exercise is in the key of "+additionalAnswer+"\n\n"
+            self.studentExerciseErrorDict['Key Identification'] = (1, 1)   
+              
+        self.textResultString += ta.getResultsString(['Counterpoint Issues'])
         
         harmonicIntervalOffsetFunc = lambda resultObj: resultObj.offset()
         
@@ -244,7 +311,12 @@ class ex11_3_A(wwnortonExercise):
         self.compareMarkerLyricAnswer(ta,taKey='harmIntervals',\
                                 markerPartName='harmIntervals',\
                                 offsetFunc = harmonicIntervalOffsetFunc,\
-                                lyricFunc = harmonicIntervalLyricTextFunc)
+                                lyricFunc = harmonicIntervalLyricTextFunc,
+                                errorKey = "Harmonic Intervals")
+        
+        
+
+        self.textResultString += self.getErrorDictPercentagesResultString()
         
 
 # ------------------------------------------------------------
