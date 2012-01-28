@@ -17,7 +17,9 @@ import os
 
 import music21 # needed to properly do isinstance checking
 
+from music21 import base
 from music21 import environment
+from music21 import common
 
 _MOD = "text.py"  
 environLocal = environment.Environment(_MOD)
@@ -162,6 +164,9 @@ def postpendArticle(src, language=None):
         return src
 
 
+#-------------------------------------------------------------------------------
+class TextException(music21.Music21Exception):
+    pass
 
 
 #-------------------------------------------------------------------------------
@@ -305,6 +310,93 @@ class TextFormat(object):
 #         return post
 
 
+
+#-------------------------------------------------------------------------------
+class TextBox(base.Music21Object, TextFormat):
+    '''A TextBox is arbitrary text that might be positioned anywhere on a page, independent of notes or staffs. 
+
+    This object is similar to the TextExpression object, but does not as many position parameters, enclosure attributes, and the ability to convert to RepeatExpressions and TempoTexts. 
+
+    >>> from music21 import text
+    >>> tb = text.TextBox('testing')
+    >>> tb.content
+    'testing'
+    >>> tb.positionVertical = 300
+    >>> tb.positionHorizontal = 300
+    >>> tb.positionVertical, tb.positionHorizontal
+    (300, 300)
+    '''
+    classSortOrder = -11 # text expressions are -10
+
+    def __init__(self, content=None):
+        base.Music21Object.__init__(self)
+        # numerous properties are inherited from TextFormat
+        TextFormat.__init__(self)
+
+        # the text string to be displayed; not that line breaks
+        # are given in the xml with this non-printing character: (#)
+        if not common.isStr(content):
+            self._content = str(content)
+        else:
+            self._content = content    
+
+        self._positionDefaultX = None
+        self._positionDefaultY = None
+
+
+    def __repr__(self):
+        if self._content is not None and len(self._content) > 10:
+            return '<music21.text.%s "%s...">' % (self.__class__.__name__, self._content[:10])
+        elif self._content is not None:
+            return '<music21.text.%s "%s">' % (self.__class__.__name__, self._content)
+        else:
+            return '<music21.text.%s>' % (self.__class__.__name__)
+
+
+    def _getContent(self):
+        return self._content
+    
+    def _setContent(self, value):
+        self._content = str(value)
+    
+    content = property(_getContent, _setContent, 
+        doc = '''Get or set the the content.
+
+        >>> from music21 import *
+        >>> te = expressions.TextExpression('testing')
+        >>> te.content
+        'testing'
+        ''')
+
+
+    def _getPositionVertical(self):
+        return self._positionDefaultY
+    
+    def _setPositionVertical(self, value):
+        if value is not None:
+            self._positionDefaultY = value
+    
+    positionVertical = property(_getPositionVertical, _setPositionVertical, 
+        doc = '''
+        ''')
+
+
+    def _getPositionHorizontal(self):
+        return self._positionDefaultX
+    
+    def _setPositionHorizontal(self, value):
+        if value is not None:
+            self._positionDefaultX = value
+    
+    positionHorizontal = property(_getPositionHorizontal,     
+        _setPositionHorizontal, 
+        doc = '''
+        ''')
+
+
+
+
+#-------------------------------------------------------------------------------
 class LanguageDetector(object):
     '''
     attempts to detect language on the basis of trigrams
@@ -389,6 +481,7 @@ class LanguageDetector(object):
             else:
                 raise TextException("got a language that was not in the codes; should not happen")
 
+#-------------------------------------------------------------------------------
 class Trigram(object):
     '''the frequency of three character
     sequences is calculated.  When treated as a vector, this information
@@ -514,9 +607,6 @@ class Trigram(object):
         letters = ''.join(letters)
         return random.choice(letters)
 
-#---------------------------------------
-class TextException(music21.Music21Exception):
-    pass
 
 
 #-------------------------------------------------------------------------------

@@ -140,7 +140,6 @@ class TextExpression(Expression, text.TextFormat):
         self._enclosure = None
 
         # numerous parameters are inherited from text.TextFormat
-
         self._positionDefaultX = None
         self._positionDefaultY = 20 # two staff lines above
         # these values provided for musicxml compatibility
