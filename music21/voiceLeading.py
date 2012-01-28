@@ -676,7 +676,8 @@ class VoiceLeadingQuartet(music21.Music21Object):
     def leapNotSetWithStep(self):
         '''
         returns true if there is a leap or skip in once voice then the other voice must be a step or unison.
-        if neither part skips then False is returned
+        if neither part skips then False is returned. Returns False if the two voices skip thirds in contrary 
+        motion.
         
         >>> from music21 import *
         >>> n1 = note.Note('G4')
@@ -694,8 +695,15 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.leapNotSetWithStep()
         True
+        
+        >>> vl = VoiceLeadingQuartet('E', 'G', 'G', 'E')
+        >>> vl.leapNotSetWithStep()
+        False
         '''
         if self.noMotion():
+            return False
+    
+        if self.hIntervals[0].generic.undirected == 3 and self.hIntervals[1].generic.undirected == 3 and self.contraryMotion():
             return False
         
         if self.hIntervals[0].generic.isSkip:
@@ -705,22 +713,25 @@ class VoiceLeadingQuartet(music21.Music21Object):
         else:
             return False
         
-    def opensCorrectly(self):
+    def opensIncorrectly(self):
         '''
         returns true if the opening or second harmonic interval is PU, P8, or P5, to accomodate an anacrusis
         
         
         >>> from music21 import *
         >>> vl = VoiceLeadingQuartet('D','D','D','F#')
-        >>> vl.opensCorrectly()
-        True
+        >>> vl.opensIncorrectly()
+        False
         >>> vl = VoiceLeadingQuartet('B','A','G#','A')
-        >>> vl.opensCorrectly()
-        True
+        >>> vl.opensIncorrectly()
+        False
         >>> vl = VoiceLeadingQuartet('A', 'A', 'F#', 'D')
-        >>> vl.opensCorrectly()
-        True
+        >>> vl.opensIncorrectly()
+        False
         
+        >>> vl = VoiceLeadingQuartet('C#', 'C#', 'D', 'E')
+        >>> vl.opensIncorrectly()
+        True
         
         OMIT_FROM_DOCS
         
@@ -728,10 +739,10 @@ class VoiceLeadingQuartet(music21.Music21Object):
         music21 key analysis (k =  music21Score.analyze('key') ) on the score representation
         of this quartet object and see if it matches the designated key
         '''
-        return (self.vIntervals[0].name == 'P1' or self.vIntervals[0].name == 'P8' or self.vIntervals[0].simpleName == 'P5') or \
-            self.vIntervals[1].name == 'P1' or self.vIntervals[1].name == 'P8' or self.vIntervals[1].simpleName == 'P5'   
+        return not ( (self.vIntervals[0].name == 'P1' or self.vIntervals[0].name == 'P8' or self.vIntervals[0].simpleName == 'P5') or \
+            (self.vIntervals[1].name == 'P1' or self.vIntervals[1].name == 'P8' or self.vIntervals[1].simpleName == 'P5') )
 
-    def closesCorrectly(self):
+    def closesIncorrectly(self):
         '''
         returns true if closing harmonic interval is a P8 or PU and the interval approaching the close is
         6 - 8, 10 - 8, or 3 - U. and if in minor key, the leading tone resolves to the tonic.
@@ -739,18 +750,18 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> from music21 import *
         >>> vl = VoiceLeadingQuartet('C#', 'D', 'E', 'D')
         >>> vl.key = key.Key('d')
-        >>> vl.closesCorrectly()
-        True
+        >>> vl.closesIncorrectly()
+        False
         
         >>> vl = VoiceLeadingQuartet('B', 'C', 'G', 'C')
         >>> vl.key = key.Key('C')
-        >>> vl.closesCorrectly()
-        True       
+        >>> vl.closesIncorrectly()
+        False       
         
         >>> vl = VoiceLeadingQuartet('F', 'G', 'D', 'G')
         >>> vl.key = key.Key('g')
-        >>> vl.closesCorrectly()
-        False
+        >>> vl.closesIncorrectly()
+        True
         
         OMIT_FROM_DOCS
         TODO: when we write 2 by 3 matrix, check to see if 6 is raised for minor keys 
@@ -766,11 +777,11 @@ class VoiceLeadingQuartet(music21.Music21Object):
             raisedMinorCorrectly = True  
                   
         if self.vIntervals[0].generic.undirected == 6:
-            return self.vIntervals[1].generic.undirected == 8 and raisedMinorCorrectly
+            return not (self.vIntervals[1].generic.undirected == 8 and raisedMinorCorrectly)
         elif self.vIntervals[0].generic.undirected == 10:
-            return self.vIntervals[1].generic.undirected == 8 and raisedMinorCorrectly
+            return not (self.vIntervals[1].generic.undirected == 8 and raisedMinorCorrectly)
         elif self.vIntervals[0].generic.undirected == 3:
-            return self.vIntervals[1].generic.undirected == 1 and raisedMinorCorrectly
+            return  not (self.vIntervals[1].generic.undirected == 1 and raisedMinorCorrectly)
 
   
            
