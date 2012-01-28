@@ -22,6 +22,7 @@ from music21 import pitch
 from music21.note import Note
 from music21.interval import Interval
 from music21 import key
+from music21 import note
 
 #TODO: rename VoiceLeadingQuartet -> Pairwise
 #TODO: add chordwise -- add parsimonious (all move by step or not at all)
@@ -41,16 +42,116 @@ class VoiceLeadingQuartet(music21.Music21Object):
     octave = interval.Interval("P8")
         
     def __init__(self, v1n1 = None, v1n2 = None, v2n1 = None, v2n2 = None, key=key.KeySignature(0)):
+        self._v1n1 = None
+        self._v1n2 = None
+        self._v2n1 = None
+        self._v2n2 = None
+
         self.v1n1 = v1n1
         self.v1n2 = v1n2
         self.v2n1 = v2n1
-        self.v2n2 = v2n2    
+        self.v2n2 = v2n2
+          
         self.vIntervals = [] #vertical intervals (harmonic)
         self.hIntervals = [] #horizontal intervals (melodic)
         
         self.key = key
         if v1n1 is not None and v1n2 is not None and v2n1 is not None and v2n2 is not None:
             self._findIntervals()
+    
+    
+    def _getv1n1(self):
+        return self._v1n1
+
+    def _setv1n1(self, value):
+        if value == None:
+            self._v1n1 = None
+        elif common.isStr(value):
+            self._v1n1 = note.Note(value)
+        else:
+            try:
+                if value.isClassOrSubclass([note.Note, pitch.Pitch]):
+                    self._v1n1 = value
+            except:
+                raise VoiceLeadingQuartetException('not a valid note specification: %s' % value)
+
+    v1n1 = property(_getv1n1, _setv1n1, doc = '''
+        >>> from music21 import *
+        >>> vl = VoiceLeadingQuartet('C', 'D', 'E', 'F')
+        >>> vl.v1n1    
+        <music21.note.Note C>
+        ''')
+    
+    def _getv1n2(self):
+        return self._v1n2
+
+    def _setv1n2(self, value):
+        if value == None:
+            self._v1n2 = None
+        elif common.isStr(value):
+            self._v1n2 = note.Note(value)
+        else:
+            try:
+                if value.isClassOrSubclass([note.Note, pitch.Pitch]):
+                    self._v1n2 = value
+            except:
+                raise VoiceLeadingQuartetException('not a valid note specification: %s' % value)
+
+    v1n2 = property(_getv1n2, _setv1n2, doc = '''
+        >>> from music21 import *
+        >>> vl = VoiceLeadingQuartet('C', 'D', 'E', 'F')
+        >>> vl.v1n2
+        <music21.note.Note D>
+    
+        ''')
+    
+    
+    def _getv2n1(self):
+        return self._v2n1
+
+    def _setv2n1(self, value):
+        if value == None:
+            self._v2n1 = None
+        elif common.isStr(value):
+            self._v2n1 = note.Note(value)
+        else:
+            try:
+                if value.isClassOrSubclass([note.Note, pitch.Pitch]):
+                    self._v2n1 = value
+            except:
+                raise VoiceLeadingQuartetException('not a valid note specification: %s' % value)
+
+    v2n1 = property(_getv2n1, _setv2n1, doc = '''
+        >>> from music21 import *
+        >>> vl = VoiceLeadingQuartet('C', 'D', 'E', 'F')
+        >>> vl.v2n1
+        <music21.note.Note E>
+        ''')
+    
+    def _getv2n2(self):
+        return self._v2n2
+
+    def _setv2n2(self, value):
+        if value == None:
+            self._v2n2 = None
+        elif common.isStr(value):
+            self._v2n2 = note.Note(value)
+        else:
+            try:
+                if value.isClassOrSubclass([note.Note, pitch.Pitch]):
+                    self._v2n2 = value
+            except:
+                raise VoiceLeadingQuartetException('not a valid note specification: %s' % value)
+
+    v2n2 = property(_getv2n2, _setv2n2, doc = '''
+        >>> from music21 import *
+        >>> vl = VoiceLeadingQuartet('C', 'D', 'E', 'F')
+        >>> vl.v2n2
+        <music21.note.Note F>
+        ''')    
+    
+    
+    
     
     def _findIntervals(self):
         self.vIntervals.append(interval.notesToInterval(self.v1n1, self.v2n1))
@@ -603,11 +704,77 @@ class VoiceLeadingQuartet(music21.Music21Object):
             return not (self.hIntervals[0].generic.isDiatonicStep or self.hIntervals[0].generic.isUnison)
         else:
             return False
+        
+    def opensCorrectly(self):
+        '''
+        returns true if the opening or second harmonic interval is PU, P8, or P5, to accomodate an anacrusis
+        
+        
+        >>> from music21 import *
+        >>> vl = VoiceLeadingQuartet('D','D','D','F#')
+        >>> vl.opensCorrectly()
+        True
+        >>> vl = VoiceLeadingQuartet('B','A','G#','A')
+        >>> vl.opensCorrectly()
+        True
+        >>> vl = VoiceLeadingQuartet('A', 'A', 'F#', 'D')
+        >>> vl.opensCorrectly()
+        True
+        
+        
+        OMIT_FROM_DOCS
+        
+        does not check to see if opening establishes the tonic harmony...possibly run
+        music21 key analysis (k =  music21Score.analyze('key') ) on the score representation
+        of this quartet object and see if it matches the designated key
+        '''
+        return (self.vIntervals[0].name == 'P1' or self.vIntervals[0].name == 'P8' or self.vIntervals[0].simpleName == 'P5') or \
+            self.vIntervals[1].name == 'P1' or self.vIntervals[1].name == 'P8' or self.vIntervals[1].simpleName == 'P5'   
 
+    def closesCorrectly(self):
+        '''
+        returns true if closing harmonic interval is a P8 or PU and the interval approaching the close is
+        6 - 8, 10 - 8, or 3 - U. and if in minor key, the leading tone resolves to the tonic.
+        
+        >>> from music21 import *
+        >>> vl = VoiceLeadingQuartet('C#', 'D', 'E', 'D')
+        >>> vl.key = key.Key('d')
+        >>> vl.closesCorrectly()
+        True
+        
+        >>> vl = VoiceLeadingQuartet('B', 'C', 'G', 'C')
+        >>> vl.key = key.Key('C')
+        >>> vl.closesCorrectly()
+        True       
+        
+        >>> vl = VoiceLeadingQuartet('F', 'G', 'D', 'G')
+        >>> vl.key = key.Key('g')
+        >>> vl.closesCorrectly()
+        False
+        
+        OMIT_FROM_DOCS
+        TODO: when we write 2 by 3 matrix, check to see if 6 is raised for minor keys 
+        '''
+        
+        raisedMinorCorrectly = False
+        if self.key.mode == 'minor':
+            if self.key.pitchFromDegree(7).transpose("A1").name == self.v1n1.name:
+                raisedMinorCorrectly = self.key.getScaleDegreeFromPitch(self.v1n2) == 1
+            elif self.key.pitchFromDegree(7).transpose("A1").name == self.v2n1.name:
+                raisedMinorCorrectly = self.key.getScaleDegreeFromPitch(self.v1n2) == 1
+        else:
+            raisedMinorCorrectly = True  
+                  
+        if self.vIntervals[0].generic.undirected == 6:
+            return self.vIntervals[1].generic.undirected == 8 and raisedMinorCorrectly
+        elif self.vIntervals[0].generic.undirected == 10:
+            return self.vIntervals[1].generic.undirected == 8 and raisedMinorCorrectly
+        elif self.vIntervals[0].generic.undirected == 3:
+            return self.vIntervals[1].generic.undirected == 1 and raisedMinorCorrectly
 
   
            
-class VoiceLeadingException(Exception):
+class VoiceLeadingQuartetException(Exception):
     pass
     
 
@@ -617,7 +784,7 @@ class ThreeNoteLinearSegmentException(music21.Music21Exception):
 class ThreeNoteLinearSegment(music21.Music21Object):
     '''
     An object consisting of three sequential pitches,
-    leftPitch --> pitchToAnalyze --> rightPitch
+    p1 --> p2 --> p3
     
     The middle tone in a ThreeNoteLinearSegment can
     be classified using methods enclosed in this class
@@ -629,186 +796,186 @@ class ThreeNoteLinearSegment(music21.Music21Object):
     
     >>> from music21 import *
     >>> ex = voiceLeading.ThreeNoteLinearSegment('C#4','D4','E-4')
-    >>> ex.leftPitch
+    >>> ex.p1
     C#4
-    >>> ex.pitchToAnalyze
+    >>> ex.p2
     D4
-    >>> ex.rightPitch
+    >>> ex.p3
     E-4
     
     >>> ex = voiceLeading.ThreeNoteLinearSegment(pitch.Pitch('A4'),note.Note('D4'),'F5')
-    >>> ex.leftPitch
+    >>> ex.p1
     A4
-    >>> ex.pitchToAnalyze
+    >>> ex.p2
     D4
-    >>> ex.rightPitch
+    >>> ex.p3
     F5
     
     if no octave specified, default octave of 4 is assumed
     
     >>> ex = voiceLeading.ThreeNoteLinearSegment('a','b','c')
-    >>> ex.leftPitch
+    >>> ex.p1
     A
-    >>> ex.leftPitch.defaultOctave
+    >>> ex.p1.defaultOctave
     4
     
     OMIT_FROM_DOCS
     
-    >>> ex.pitchToAnalyze.defaultOctave
+    >>> ex.p2.defaultOctave
     4
-    >>> ex.rightPitch.defaultOctave
+    >>> ex.p3.defaultOctave
     4
 
     >>> ex = voiceLeading.ThreeNoteLinearSegment(note.Note('D4'),note.Note('E4'),note.Note('F4'))
-    >>> ex.leftPitch
+    >>> ex.p1
     D4
-    >>> ex.pitchToAnalyze
+    >>> ex.p2
     E4
-    >>> ex.rightPitch
+    >>> ex.p3
     F4
     
     >>> ex = voiceLeading.ThreeNoteLinearSegment(pitch.Pitch('A4'),pitch.Pitch('B4'),pitch.Pitch('C5'))
-    >>> ex.leftPitch
+    >>> ex.p1
     A4
-    >>> ex.pitchToAnalyze
+    >>> ex.p2
     B4
-    >>> ex.rightPitch
+    >>> ex.p3
     C5
     
     '''
 
-    def __init__(self, leftPitch=None, pitchToAnalyze=None, rightPitch=None):
-        self._leftPitch = None
-        self._pitchToAnalyze = None
-        self._rightPitch = None
+    def __init__(self, p1=None, p2=None, p3=None):
+        self._p1 = None
+        self._p2 = None
+        self._p3 = None
         
         #storage location for the intervals between the pitches
         self.iLeftToRight = None #interval between the left pitch and right pitch
-        self.iLeft = None #interval between the left pitch and the pitchToAnalyze
+        self.iLeft = None #interval between the left pitch and the p2
         self.iRight = None #interval between the pitch to Analyze and the right pitch
         
-        if leftPitch != None:
-            self.leftPitch = leftPitch
+        if p1 != None:
+            self.p1 = p1
 
-        if pitchToAnalyze != None:
-            self.pitchToAnalyze = pitchToAnalyze
+        if p2 != None:
+            self.p2 = p2
 
-        if rightPitch != None:
-            self.rightPitch = rightPitch
+        if p3 != None:
+            self.p3 = p3
 
     def _calcIntervals(self):
-        #updated every time the leftPitch, pitchToAnalyze, or rightPitch is set (or reset)
-        if self.leftPitch != None and self.rightPitch != None:
-            self.iLeftToRight = music21.interval.Interval(self.leftPitch, self.rightPitch)
-        if self.leftPitch != None and self.pitchToAnalyze != None:
-            self.iLeft = music21.interval.Interval(self.leftPitch, self.pitchToAnalyze)
-        if self.pitchToAnalyze != None and self.rightPitch != None:
-            self.iRight = music21.interval.Interval(self.pitchToAnalyze, self.rightPitch)
+        #updated every time the p1, p2, or p3 is set (or reset)
+        if self.p1 != None and self.p3 != None:
+            self.iLeftToRight = music21.interval.Interval(self.p1, self.p3)
+        if self.p1 != None and self.p2 != None:
+            self.iLeft = music21.interval.Interval(self.p1, self.p2)
+        if self.p2 != None and self.p3 != None:
+            self.iRight = music21.interval.Interval(self.p2, self.p3)
     
-    def _setleftPitch(self, value):
+    def _setp1(self, value):
         if hasattr(value, 'classes') and 'Pitch' in value.classes:
-            self._leftPitch = value
+            self._p1 = value
             self._calcIntervals()
             return
         elif hasattr(value, 'classes') and 'Note' in value.classes:
-            self._leftPitch = value.pitch
+            self._p1 = value.pitch
             self._calcIntervals()
             return
         try: # try to create a Pitch object
-            self._leftPitch = pitch.Pitch(value)
+            self._p1 = pitch.Pitch(value)
             self._calcIntervals()
             return
         except music21.Music21Exception: 
             pass
         raise ThreeNoteLinearSegmentException('not a valid pitch specification: %s' % value)
 
-    def _getleftPitch(self):
-        return self._leftPitch
+    def _getp1(self):
+        return self._p1
 
-    leftPitch = property(_getleftPitch, _setleftPitch, doc = '''
+    p1 = property(_getp1, _setp1, doc = '''
         >>> from music21 import *
         >>> h = voiceLeading.ThreeNoteLinearSegment()
-        >>> h.leftPitch = 'a3'
-        >>> h.leftPitch
+        >>> h.p1 = 'a3'
+        >>> h.p1
         A3
-        >>> h.leftPitch = note.Note('A3')
-        >>> h.leftPitch
+        >>> h.p1 = note.Note('A3')
+        >>> h.p1
         A3
-        >>> h.leftPitch = pitch.Pitch('A')
-        >>> h.leftPitch
+        >>> h.p1 = pitch.Pitch('A')
+        >>> h.p1
         A
     
         ''')
     
     
-    def _setpitchToAnalyze(self, value):
+    def _setp2(self, value):
         if hasattr(value, 'classes') and 'Pitch' in value.classes:
-            self._pitchToAnalyze = value
+            self._p2 = value
             self._calcIntervals()
             return
         elif hasattr(value, 'classes') and 'Note' in value.classes:
-            self._pitchToAnalyze = value.pitch
+            self._p2 = value.pitch
             self._calcIntervals()
             return
         try: # try to create a Pitch object
-            self._pitchToAnalyze = pitch.Pitch(value)
+            self._p2 = pitch.Pitch(value)
             self._calcIntervals()
             return
         except music21.Music21Exception: 
             pass
         raise ThreeNoteLinearSegmentException('not a valid pitch specification: %s' % value)
 
-    def _getpitchToAnalyze(self):
-        return self._pitchToAnalyze
+    def _getp2(self):
+        return self._p2
 
-    pitchToAnalyze = property(_getpitchToAnalyze, _setpitchToAnalyze, doc = '''
+    p2 = property(_getp2, _setp2, doc = '''
         >>> from music21 import *
         >>> h = voiceLeading.ThreeNoteLinearSegment()
-        >>> h.pitchToAnalyze = 'b3'
-        >>> h.pitchToAnalyze
+        >>> h.p2 = 'b3'
+        >>> h.p2
         B3
-        >>> h.pitchToAnalyze = note.Note('b3')
-        >>> h.pitchToAnalyze
+        >>> h.p2 = note.Note('b3')
+        >>> h.p2
         B3
-        >>> h.pitchToAnalyze = pitch.Pitch('b')
-        >>> h.pitchToAnalyze
+        >>> h.p2 = pitch.Pitch('b')
+        >>> h.p2
         B
     
         ''')
     
-    def _setrightPitch(self, value):
+    def _setp3(self, value):
         if hasattr(value, 'classes') and 'Pitch' in value.classes:
-            self._rightPitch = value
+            self._p3 = value
             self._calcIntervals()
             return
         elif hasattr(value, 'classes') and 'Note' in value.classes:
-            self._rightPitch = value.pitch
+            self._p3 = value.pitch
             self._calcIntervals()
             return
         try: # try to create a Pitch object
-            self._rightPitch = pitch.Pitch(value)
+            self._p3 = pitch.Pitch(value)
             self._calcIntervals()
             return
         except music21.Music21Exception: 
             pass
         raise ThreeNoteLinearSegmentException('not a valid pitch specification: %s' % value)
 
-    def _getrightPitch(self):
-        return self._rightPitch
+    def _getp3(self):
+        return self._p3
 
-    rightPitch = property(_getrightPitch, _setrightPitch, doc = '''
+    p3 = property(_getp3, _setp3, doc = '''
         >>> from music21 import *
         >>> h = voiceLeading.ThreeNoteLinearSegment()
-        >>> h.rightPitch = 'C4'
-        >>> h.rightPitch
+        >>> h.p3 = 'C4'
+        >>> h.p3
         C4
-        >>> h.rightPitch = note.Note('c4')
-        >>> h.rightPitch
+        >>> h.p3 = note.Note('c4')
+        >>> h.p3
         C4
-        >>> h.rightPitch = pitch.Pitch('C')
-        >>> h.rightPitch
+        >>> h.p3 = pitch.Pitch('C')
+        >>> h.p3
         C
-        >>> h.rightPitch.defaultOctave
+        >>> h.p3.defaultOctave
         4
     
         ''')
@@ -953,7 +1120,7 @@ class ThreeNoteLinearSegment(music21.Music21Object):
         >>> voiceLeading.ThreeNoteLinearSegment('C3','D-3','C3').couldBeDiatonicNeighborTone()
         False
         '''
-        return self.leftPitch.nameWithOctave == self.rightPitch.nameWithOctave and \
+        return self.p1.nameWithOctave == self.p3.nameWithOctave and \
             self.iLeft.chromatic.undirected == 2 and self.iRight.chromatic.undirected == 2 and \
             (self.iLeft.direction * self.iRight.direction == -1)
         
@@ -971,7 +1138,7 @@ class ThreeNoteLinearSegment(music21.Music21Object):
         >>> voiceLeading.ThreeNoteLinearSegment('C#3','D3','D-3').couldBeChromaticNeighborTone()
         False
         '''
-        return self.leftPitch.nameWithOctave == self.rightPitch.nameWithOctave and \
+        return self.p1.nameWithOctave == self.p3.nameWithOctave and \
             self.iLeft.isChromaticStep and self.iRight.isChromaticStep and \
             (self.iLeft.direction * self.iRight.direction == -1)
 
