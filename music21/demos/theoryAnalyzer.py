@@ -310,20 +310,25 @@ class TheoryAnalyzer(object):
     
     # Template for analysis based on VLQs
     
-    def _identifyBasedOnVLQ(self, partNum1, partNum2, color, dictKey, testFunction, textFunction, valueFunction = None):
+    def _identifyBasedOnVLQ(self, partNum1, partNum2, color, dictKey, testFunction, textFunction, startIndex=0, endIndex = None):
+        '''
+        startIndex is the first VLQ in the list to start with (0 is default). endIndex is the first VLQ in list not to search 
+        (length of VLQ list is default), meaning default values are to search the entire vlqList
+        '''
         if dictKey not in self.resultDict.keys():
             self.resultDict[dictKey] = []
         
         if partNum1 == None or partNum2 == None:
             for (partNum1,partNum2) in self.getAllPartNumPairs():
-                self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
+                self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction, startIndex, endIndex)
         else:
             vlqList = self.getVLQs(partNum1, partNum2)
             
-            for vlq in vlqList:
+            if endIndex == None and startIndex >=0:
+                endIndex = len(vlqList)
+            for vlq in vlqList[startIndex:endIndex]:
                 if testFunction(vlq) is not False: # True or value
                     tr = VLQTheoryResult(vlq)
-      
                     tr.value = testFunction(vlq)
                     tr.text = textFunction(vlq, partNum1, partNum2)
                     tr.value = textFunction(vlq, partNum1, partNum2)
@@ -529,6 +534,33 @@ class TheoryAnalyzer(object):
                  + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name + " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
     
+    def identifyOpensIncorrectly(self, partNum1 = None, partNum2 = None, color = None,dictKey = 'opensIncorrectly'):
+        '''
+        Identifies if the piece opens correctly 
+        (calls :meth:`~music21.voiceLeading.opensIncorrectly`) 
+        
+        '''
+        
+        testFunction = lambda vlq: vlq.opensIncorrectly()
+        textFunction = lambda vlq, pn1, pn2: "The opening harmonic interval is not correct " + \
+                 "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " " \
+                 + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name + " to " + vlq.v2n2.name
+        self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction, startIndex = 0, endIndex = 1)
+        
+
+    def identifyClosesIncorrectly(self, partNum1 = None, partNum2 = None, color = None,dictKey = 'closesIncorrectly'):
+        '''
+        Identifies if the piece closes correctly (calls :meth:`~music21.voiceLeading.closesIncorrectly`) 
+        
+        '''
+        
+        testFunction = lambda vlq: vlq.closesIncorrectly() 
+        textFunction = lambda vlq, pn1, pn2: "The closing motion and intervals are not correct " + \
+                 "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
+                 + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name + " to " + vlq.v2n2.name
+        self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction, startIndex=-1)
+    
+    
     # Theory Errors not using VLQ (therefore, not using template)      
 
     def identifyDissonantHarmonicIntervals(self, partNum1 = None, partNum2 = None, color = None, dictKey = 'dissonantHarmonicIntervals'):
@@ -684,7 +716,7 @@ class TheoryAnalyzer(object):
             if typeList is None or resultType in typeList:
                 resultStr+=resultType+": \n"
                 for result in self.resultDict[resultType]:
-                    resultStr += result.text +": "+str(result.value)+ "\n"
+                    resultStr += result.text
                 resultStr += "\n"
                 
         return resultStr
@@ -816,7 +848,8 @@ class TestExternal(unittest.TestCase):
     
     def demo(self):
 
-        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/Exercises/11_I_A_1.xml')
+        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/FromServer/11_3_A_2_completed.xml')
+  
 
         #s = converter.parse('/Users/larsj/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
 #        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
@@ -836,8 +869,10 @@ class TestExternal(unittest.TestCase):
         #ta.identifyMotionType()
         #ta.identifyScaleDegrees()
         #ta.identifyHarmonicIntervals()
+        ta.identifyOpensIncorrectly()
+        ta.identifyClosesIncorrectly()
         
-        print ta.identifyRomanNumerals()
+        #print ta.identifyRomanNumerals()
         
 #        ta.identifyObliqueMotion()
 #        ta.identifySimilarMotion()
