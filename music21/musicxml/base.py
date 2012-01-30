@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2009-2011 The music21 Project
+# Copyright:    (c) 2009-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''This module defines an object representation of MusicXML, used for converting to and from MusicXML and music21.
@@ -41,7 +41,7 @@ environLocal = environment.Environment(_MOD)
 # are >= to this value
 # if changes are made here that are not compatible, the m21 version number
 # needs to be increased and this number needs to be set to that value
-VERSION_MINIMUM = (0, 3, 8) 
+VERSION_MINIMUM = (0, 6, 2) 
 
 
 #-------------------------------------------------------------------------------
@@ -314,6 +314,8 @@ class TagLib(object):
 ('identification', False, Identification),  
 ('rights', True), 
 ('creator', True, Creator), 
+('credit', False, Credit), 
+('credit-words', True, CreditWords), 
 ('encoding', False, Encoding), 
 ('software', True, Software), 
 ('encoding-date', True), 
@@ -633,6 +635,8 @@ class Score(MusicXMLElementList):
         self.identificationObj = None
         self.encodingObj = None 
         self.partListObj = None
+        
+        self.creditList = [] # store a list of credit objects
         self.componentList = [] # list of Part objects
 
         self._crossReference['partListObj'] = ['partlist', 'part-list']
@@ -645,6 +649,7 @@ class Score(MusicXMLElementList):
 
     def _getComponents(self):
         c = []
+        c = c + self.creditList
         c.append(self.workObj)
         c.append(('movement-number', self.movementNumber))
         c.append(('movement-title', self.movementTitle))
@@ -851,7 +856,10 @@ class Creator(MusicXMLElement):
         self.set('type', 'composer')
         self.set('charData', defaults.author)
 
-class Credit(MusicXMLElement):
+class Credit(MusicXMLElementList):
+    '''The credit tag stores on or more credit-words tags, defining text positioned on a page. 
+    '''
+    #series of credit-words elements within a single credit element
     def __init__(self):
         '''
         >>> from music21 import *
@@ -860,25 +868,21 @@ class Credit(MusicXMLElement):
         'credit'
         >>> a.setDefaults()
         >>> b = musicxml.CreditWords('testing')
-        >>> a.set('creditwords', b)
+        >>> a.append(b)
         >>> print a
         <credit page=1 <credit-words charData=testing>>
         '''
-        MusicXMLElement.__init__(self)
+        MusicXMLElementList.__init__(self)
         self._tag = 'credit'
         # attributes
         self._attr['page'] = None
         # character data
         self.charData = None
         # elements
-        self.creditWordsObj = None
+        self.componentList = [] # a list of partGroups and scoreParts
     
-        self._crossReference['creditWordsObj'] = ['creditwords']
-
     def _getComponents(self):
-        c = []
-        c.append(self.creditWordsObj)
-        return c
+        return self.componentList
 
     def setDefaults(self):
         self.set('page', 1)
@@ -2711,6 +2715,8 @@ class Handler(xml.sax.ContentHandler):
         # in a dictionary, where _activeTags['tagName'] = None
 
         self._creatorObj = None
+        self._creditObj = None
+        self._creditWordsObj = None
         self._workObj = None
         self._identificationObj = None
         self._encodingObj = None
@@ -3115,6 +3121,14 @@ class Handler(xml.sax.ContentHandler):
         elif name == 'creator':
             self._creatorObj = Creator()
             self._creatorObj.loadAttrs(attrs)
+
+        elif name == 'credit':
+            self._creditObj = Credit()
+            self._creditObj.loadAttrs(attrs)
+
+        elif name == 'credit-words':
+            self._creditWordsObj = CreditWords()
+            self._creditWordsObj.loadAttrs(attrs)
 
         elif name == 'encoding':
             self._encodingObj = Encoding()
@@ -3683,6 +3697,15 @@ class Handler(xml.sax.ContentHandler):
             self._creatorObj.charData = self._currentTag.charData
             self._identificationObj.creatorList.append(self._creatorObj)
             self._creatorObj = None
+
+        elif name == 'credit':
+            self._scoreObj.creditList.append(self._creditObj)
+            self._creditObj = None
+
+        elif name == 'credit-words':
+            self._creditWordsObj.charData = self._currentTag.charData
+            self._creditObj.append(self._creditWordsObj)
+            self._creditWordsObj = None
 
         elif name == 'encoding':
             self._identificationObj.encodingObj = self._encodingObj

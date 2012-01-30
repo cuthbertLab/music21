@@ -3311,6 +3311,7 @@ def mxToStream(mxScore, spannerBundle=None, inputM21=None):
     from music21 import metadata
     from music21 import spanner
     from music21 import layout
+    from music21 import text
 
     if inputM21 == None:
         from music21 import stream
@@ -3352,8 +3353,13 @@ def mxToStream(mxScore, spannerBundle=None, inputM21=None):
     # add metadata object; this is placed after all other parts now
     # these means that both Parts and other objects live on Stream.
     md = metadata.Metadata()
-    md.mx = mxScore
+    md.mx = mxScore # TODO: this needs to be updated to normal translation
     s._insertCore(0, md)
+
+    # store credits on Score stream
+    for creditObj in mxScore.creditList:
+        co = text.TextBox() # need to import data 
+        s._insertCore(0, co)
 
     # only insert complete spanners; at each level possible, complete spanners
     # are inserted into either the Score or the Part
@@ -4445,6 +4451,18 @@ spirit</words>
         self.assertEqual(raw.count("color="), 6)
         # color set at note level only for rest, so only 1
         self.assertEqual(raw.count('note color="#11ff11"'), 1)
+
+
+    def testTextBoxA(self):
+
+        from music21 import converter, stream
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.textBoxes01)
+        self.assertEqual(len(s.flat.getElementsByClass('TextBox')), 5)
+        
+
+
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
