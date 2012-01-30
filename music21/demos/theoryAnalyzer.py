@@ -24,11 +24,11 @@ import unittest
 class TheoryAnalyzer(object):
     '''
     A Theory Analyzer is an object used for analyzing musical theory elements in scores. 
-    It can identify, store, label and output various counterpoint-related features 
+    It can identify, store, label, and output various counterpoint-related features 
     in a score (parallel fifths, harmonic intervals, melodic intervals, etc.)
     
     A Theory Analyzer must be passed a score containing parts with single voices 
-    (no harmonies/chords within a part...).
+    (no harmonies/chords within a part (yet!)).
     
     >>> from music21 import *
     >>> p = corpus.parse('bwv66.6')
@@ -39,20 +39,24 @@ class TheoryAnalyzer(object):
     
     def __init__(self, theoryScore):
         self._theoryScore = theoryScore
-        self._vlqCache = {}
-        self.resultDict = {}
+        self._vlqCache = {} #Voice Leading Quartet
+        self._tnlsCache = {} #Three Note Linear Segment
+        self._tbtlsCache = {} #Two By Three Linear Segment Cache
+        
         self.key = self._theoryScore.analyze('key')
         
         self.verticalSlices = self.getVerticalSlices()
-        
-        self.threeNoteLinearSegments = {}
-        
+        self.verticalSliceTriplets = self.getVerticalSliceTriplets()
+
+        self.resultDict = {} #dictionary storing the results of any identification method queries
+       
     # Vertical Slices
     
     def getVerticalSlices(self):
         '''
-        Gets a list of the vertical slices of the Theory Analyzer's score. Note that it uses the
-        combined rhythm of the parts to determine what vertical slices to take.
+        returns a list of a list of the :class:`~music21.voiceLeading.VerticalSlice` objects in)
+        the Theory Analyzer's score. Note that it uses the combined rhythm of the parts 
+        to determine what vertical slices to take.
         
         >>> from music21 import *
         >>> from music21.demos import theoryAnalyzer
@@ -79,15 +83,18 @@ class TheoryAnalyzer(object):
         # If speed is an issue, could try using offset maps...
         chordifiedSc = self._theoryScore.chordify()
         for c in chordifiedSc.flat.getElementsByClass('Chord'):
-            nList = []
+            contentDict = {}
+            partNum= 0
             for part in self._theoryScore.parts:
-                el = part.flat.getElementAtOrBefore(c.offset,classList=['Note','Rest'])
-                if el.isClassOrSubclass(['Note']):
-                    nList.append(el)                    
+                
+                el = part.flat.getElementAtOrBefore(c.offset,classList=['Note','Rest', 'Chord', 'Harmony'])
+                if el.isClassOrSubclass(['Note', 'Chord', 'Harmony']):
+                    contentDict[partNum] = el                    
                 else:
-                    nList.append(None)
-            vs = VerticalSlice(nList)
-            
+                    #TODO: currently rests are stored as None...change to store them as music21 Rests soon
+                    contentDict[partNum] = None # rests are stored as None...change to store them as Rests soon
+                partNum+=1
+            vs = voiceLeading.VerticalSlice(contentDict)
             vsList.append(vs)
                
         return vsList
@@ -96,7 +103,7 @@ class TheoryAnalyzer(object):
     
     def getHarmonicIntervals(self, partNum1, partNum2):
         '''
-        Gets a list of all the harmonic intervals occurring between the two specified parts.
+        returns a list of all the harmonic intervals occurring between the two specified parts.
         
         >>> from music21 import *
         >>> from music21.demos import theoryAnalyzer
@@ -135,7 +142,7 @@ class TheoryAnalyzer(object):
     
     def getMelodicIntervals(self, partNum):
         '''
-        Gets a list of all the melodic intervals in the specified part.
+        returns a list of all the melodic intervals in the specified part.
         
         >>> from music21 import *
         >>> from music21.demos import theoryAnalyzer
@@ -168,6 +175,9 @@ class TheoryAnalyzer(object):
         return mInvList
     
     def getNotes(self, partNum):
+        '''
+        returns a list of notes present in the score. If Rests are present, appends None to the list
+        '''
         noteList = []
         noteOrRestList = self._theoryScore.parts[partNum].flat.getElementsByClass(['Note','Rest'])
         for nr in noteOrRestList:
@@ -181,11 +191,10 @@ class TheoryAnalyzer(object):
         return noteList
 
     
-    # VLQs are Voice Leading Quartets as found in voiceLeading.py
-    
     def getVLQs(self, partNum1, partNum2):
         '''
-        Gets a list of the Voice Leading Quartets present between partNum1 and partNum2
+        extracts and returns a list of the :class:`~music21.voiceLeading.VoiceLeadingQuartet` 
+        objects present between partNum1 and partNum2 in the score
         
         >>> from music21 import *
         >>> from music21.demos import theoryAnalyzer
@@ -228,10 +237,44 @@ class TheoryAnalyzer(object):
         
         return vlqList
 
+    def getThreeNoteLinearSegments(self, partNum):
+        '''
+        extracts and returns a list of the :class:`~music21.voiceLeading.ThreeNoteLinearSegment` 
+        objects present in partNum in the score
+        
+        >>> from music21 import *
+        >>> from music21.demos import theoryAnalyzer
+        >>> sc = stream.Score()
+        >>> part0 = stream.Part()
+        >>> part0.append(note.Note('c4'))
+        >>> part0.append(note.Note('g4'))
+        >>> part0.append(note.Note('c5'))
+        >>> part0.append(note.Note('c6'))
+        >>> sc.insert(part0)
+        >>> ta = TheoryAnalyzer(sc)
+        >>> len(ta.getThreeNoteLinearSegments(0))
+        2
+        >>> ta.getThreeNoteLinearSegments(0)[1]
+        <music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note G> n2=<music21.note.Note C> n3=<music21.note.Note C> 
+
+        '''
+        # Caches the list of TNLS once they have been computed
+        # for a specified partNum
+        
+        tnlsCacheKey = str(partNum)
+        
+        if tnlsCacheKey in self._tnlsCache.keys():
+            return self._tnlsCache[tnlsCacheKey]
+        else:
+            self._tnlsCache[tnlsCacheKey] = self.getLinearSegments(partNum, 3)
+        
+        return self._tnlsCache[tnlsCacheKey]
+
     def getLinearSegments(self, partNum, lengthLinearSegment):
         '''
-        Gets a list of all the linear segments in the piece, the length of which specified by lengthLinearSegment
-        Currenlty Supported: ThreeNoteLinearSegment
+        extracts and returns a list of all the linear segments in the piece at 
+        the partNum specified, the length of which specified by lengthLinearSegment: 
+        Currently Supported: :class:`~music21.voiceLeading.ThreeNoteLinearSegment` 
         
         >>> from music21 import *
         >>> from music21.demos import theoryAnalyzer
@@ -246,14 +289,6 @@ class TheoryAnalyzer(object):
         >>> len(ta.getLinearSegments(0,3))
         2
         '''
-        # Caches the list of VLQs once they have been computed
-        # for a specified set of partNums
-        
-        #lsCacheKey = str(partNum1) + "," + str(partNum2)
-        
-        #if vlqCacheKey in self._vlqCache.keys():
-        #    return self._vlqCache[vlqCacheKey]
-        
         linearSegments = []
         for i in range(0, len(self.verticalSlices)-lengthLinearSegment+1):
             notes = []
@@ -262,14 +297,71 @@ class TheoryAnalyzer(object):
             
             if lengthLinearSegment == 3:
                 tnls = voiceLeading.ThreeNoteLinearSegment()
-                tnls.p1 = notes[0]
-                tnls.p2 = notes[1]
-                tnls.p3 = notes[2]
+                tnls.n1 = notes[0]
+                tnls.n2 = notes[1]
+                
+                tnls.n3 = notes[2]
                 linearSegments.append(tnls)
-        
+
         return linearSegments
 
 
+    def getVerticalSliceTriplets(self):
+        '''
+        extracts and returns a list of the :class:`~music21.voiceLeading.VerticalSliceTriplet` 
+        objects present in the score
+        
+        >>> from music21 import *
+        >>> from music21.demos import theoryAnalyzer
+        >>> sc = stream.Score()
+        >>> part0 = stream.Part()
+        >>> part1 = stream.Part()
+        >>> part0.append(note.Note('c4'))
+        >>> part0.append(note.Note('g4'))
+        >>> part0.append(note.Note('c5'))
+        >>> part1.append(note.Note('e4'))
+        >>> part1.append(note.Note('f4'))
+        >>> part1.append(note.Note('a5'))
+        >>> sc.insert(part0)
+        >>> sc.insert(part1)
+        >>> ta = TheoryAnalyzer(sc)
+        >>> len(ta.getVerticalSliceTriplets())
+        1
+        >>> ta.getVerticalSliceTriplets()[0]
+        <music21.voiceLeading.VerticalSliceTriplet vs1=<music21.voiceLeading.VerticalSlice contentDict={0: <music21.note.Note C>, 1: <music21.note.Note E>}   vs2=<music21.voiceLeading.VerticalSlice contentDict={0: <music21.note.Note G>, 1: <music21.note.Note F>}   vs3=<music21.voiceLeading.VerticalSlice contentDict={0: <music21.note.Note C>, 1: <music21.note.Note A>}   
+
+        
+        '''
+
+        verticalSliceTriplets = []
+        for i in range(0, len(self.verticalSlices)-2):
+            currentVerticalSlice = self.verticalSlices[i]
+            nextVerticalSlice = self.verticalSlices[i+1]
+            nextNextVerticalSlice = self.verticalSlices[i+2]
+            vst = voiceLeading.VerticalSliceTriplet(currentVerticalSlice, nextVerticalSlice, nextNextVerticalSlice)
+            verticalSliceTriplets.append(vst)
+        return verticalSliceTriplets
+
+
+#    def getTwoByThreeLinearSegments(self, partNum1, partNum2):
+#        tbtlsCacheKey = str(partNum1) + "," + str(partNum2)
+#        if tbtlsCacheKey in self._tbtlsCache.keys():
+#            return self._tbtlsCache[tbtlsCacheKey]
+#        else:      
+#            matrixList = []
+#
+#            ls1List = self.getThreeNoteLinearSegments(partNum1)
+#            ls2List = self.getThreeNoteLinearSegments(partNum2)
+#            
+#            for ls1, ls2 in zip(ls1List, ls2List):
+#                m = voiceLeading.TwoByThreeMatrix(ls1, ls2)
+#              
+#                matrixList.append(m)
+#                
+#            self._tbtlsCache[tbtlsCacheKey] = matrixList
+#            return matrixList
+        
+    
     # Helper for identifying across all parts - used for recursion in identify functions
 
     def getAllPartNumPairs(self):
@@ -394,7 +486,6 @@ class TheoryAnalyzer(object):
                         tr.color(color)
                     self.resultDict[dictKey].append(tr)
                        
-                       
     def _identifyBasedOnVerticalSlice(self, color, dictKey, testFunction, textFunction):
         if dictKey not in self.resultDict.keys():
             self.resultDict[dictKey] = []             
@@ -407,7 +498,62 @@ class TheoryAnalyzer(object):
                 if color is not None: 
                     tr.color(color)
                 self.resultDict[dictKey].append(tr)
-                
+    
+    def _identifyBasedOnVerticalSliceTriplet(self, partNumToIdentify, color, dictKey, testFunction, textFunction):
+        if dictKey not in self.resultDict.keys():
+            self.resultDict[dictKey] = []             
+
+        if partNumToIdentify == None:
+            for partNum in range(0,len(self._theoryScore.parts)):
+                self._identifyBasedOnVerticalSliceTriplet(partNum, color, dictKey, testFunction, textFunction)
+        else:
+            for vs in self.verticalSliceTriplets:
+                if testFunction(vs, partNumToIdentify) is not False:
+                    tr = VerticalSliceTripletTheoryResult(vs, partNumToIdentify)
+                    tr.text = textFunction(vs, partNumToIdentify)
+                    if color is not None: 
+                        tr.color(color)
+                    self.resultDict[dictKey].append(tr)
+    
+    def _identifyBasedOnThreeNoteLinearSegment(self, partNum, color, dictKey, testFunction, textFunction):
+        if dictKey not in self.resultDict.keys():
+            self.resultDict[dictKey] = []             
+
+        if partNum == None:
+            for partNum in range(0,len(self._theoryScore.parts)):
+                self._identifyBasedOnThreeNoteLinearSegment(partNum, color, dictKey, testFunction, textFunction)
+        else:
+            tnlsList = self.getThreeNoteLinearSegments(partNum)
+
+            for tnls in tnlsList:
+                if testFunction(tnls) is not False:
+                    tr = ThreeNoteLinearSegmentTheoryResult(tnls)
+                    tr.value = testFunction(tnls)
+                    tr.text = textFunction(tnls, partNum)
+                    if color is not None: 
+                        tr.color(color)
+                    self.resultDict[dictKey].append(tr)
+  
+#    def _identifyBasedOnTwoByThreeLinearSegment(self, partNum1, partNum2, partNumToIdentify, color, dictKey, testFunction, textFunction):
+#        if dictKey not in self.resultDict.keys():
+#            self.resultDict[dictKey] = []             
+#
+#        if partNum1 == None or partNum2 == None:
+#            for partNum in range(0,len(self._theoryScore.parts)):
+#                self._identifyBasedOnTwoByThreeLinearSegment(partNum1, partNum2, partNumToIdentify, color, dictKey, testFunction, textFunction)
+#        else:
+#            tbtlsList = self.getTwoByThreeLinearSegments(partNum1, partNum2)
+#
+#            for tbtls in tbtlsList:
+#                if testFunction(tbtls, partNumToIdentify) is not False:
+#                    tr = TwoByThreeLinearSegmentTheoryResult(tbtls, partNumToIdentify)
+#                    #tr.value = testFunction(tbtls, partNum)
+#                    tr.text = textFunction(tbtls, partNumToIdentify)
+#                    if color is not None: 
+#                        tr.color(color)
+#                    self.resultDict[dictKey].append(tr)
+
+               
     # Theory Errors using VLQ template
     
     def identifyParallelFifths(self, partNum1 = None, partNum2 = None, color = None, dictKey = 'parallelFifths'):
@@ -536,8 +682,7 @@ class TheoryAnalyzer(object):
     
     def identifyOpensIncorrectly(self, partNum1 = None, partNum2 = None, color = None,dictKey = 'opensIncorrectly'):
         '''
-        Identifies if the piece opens correctly 
-        (calls :meth:`~music21.voiceLeading.opensIncorrectly`) 
+        Identifies if the piece opens correctly; calls :meth:`~music21.voiceLeading.opensIncorrectly`
         
         '''
         
@@ -547,21 +692,33 @@ class TheoryAnalyzer(object):
                  + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name + " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction, startIndex = 0, endIndex = 1)
         
-
     def identifyClosesIncorrectly(self, partNum1 = None, partNum2 = None, color = None,dictKey = 'closesIncorrectly'):
         '''
-        Identifies if the piece closes correctly (calls :meth:`~music21.voiceLeading.closesIncorrectly`) 
-        
+        Identifies if the piece closes correctly; calls :meth:`~music21.voiceLeading.closesIncorrectly`
         '''
-        
         testFunction = lambda vlq: vlq.closesIncorrectly() 
         textFunction = lambda vlq, pn1, pn2: "The closing motion and intervals are not correct " + \
                  "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                  + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name + " to " + vlq.v2n2.name
-        self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction, startIndex=-1)
-    
-    
-    # Theory Errors not using VLQ (therefore, not using template)      
+        self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction, startIndex=-1)    
+
+    # Using the Three Note Linear Segment Template
+    def identifyCouldBePassingTone(self, partNum = None, color = None, dictKey = 'possiblePassingTone'):
+        testFunction = lambda tnls: tnls.couldBePassingTone()
+        textFunction = lambda tnls, pn: tnls.n2.name + ' in part ' + str(pn+1) + ' identified as a possible passing tone '
+        self._identifyBasedOnThreeNoteLinearSegment(partNum, color, dictKey, testFunction, textFunction)
+
+    # Using the Vertical Slice Triplet Template
+    def identifyUnaccentedPassingTones(self, partNumToIdentify = None, color = None, dictKey = 'unaccentedPassingTone'):
+        testFunction = lambda vst, pn: vst.hasUnaccentedPassingTone(pn)
+        textFunction = lambda vst, pn: 'PRINT IDENTIFIED PASSING TONE' + ' in part ' + str(pn+1) + ' identified as an unaccented passing tone '
+        self._identifyBasedOnVerticalSliceTriplet(partNumToIdentify, color, dictKey, testFunction, textFunction)
+
+    def identifyUnaccentedNeighborTones(self, partNumToIdentify = None, color = None, dictKey = 'unaccentedNeighborTone'):
+        testFunction = lambda vst, pn: vst.hasUnaccentedNeighborTone(pn)
+        textFunction = lambda vst, pn: 'PRINT IDENTIFIED NEIGHBOR TONE' + ' in part ' + str(pn+1) + ' identified as an unaccented passing tone '
+        self._identifyBasedOnVerticalSliceTriplet(partNumToIdentify, color, dictKey, testFunction, textFunction)
+
 
     def identifyDissonantHarmonicIntervals(self, partNum1 = None, partNum2 = None, color = None, dictKey = 'dissonantHarmonicIntervals'):
         '''
@@ -571,10 +728,24 @@ class TheoryAnalyzer(object):
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
         '''
         testFunction = lambda hIntv: hIntv is not None and not hIntv.isConsonant()
+        
         textFunction = lambda hIntv, pn1, pn2: "Dissonant harmonic interval in measure " + str(hIntv.noteStart.measureNumber) +": " \
                      + str(hIntv.niceName) + " from " + str(hIntv.noteStart.name) + " to " + str(hIntv.noteEnd.name) \
                      + " between part " + str(pn1 + 1) + " and part " + str(pn2 + 1)
         self._identifyBasedOnHarmonicInterval(partNum1, partNum2, color, dictKey, testFunction, textFunction)
+
+#
+#    def identifyNotInStyleDissonantIntervals(self, partNum1 = None, partNum2 = None, color = None, dictKey = 'dissonantHarmonicIntervals'):
+#        '''
+#        Identifies dissonant harmonic intervals that are not passing tones or neighbor tones
+#        
+#        '''
+#        testFunction = lambda hIntv: hIntv is not None and not hIntv.isConsonant()
+#        
+#        textFunction = lambda hIntv, pn1, pn2: "Dissonant harmonic interval in measure " + str(hIntv.noteStart.measureNumber) +": " \
+#                     + str(hIntv.niceName) + " from " + str(hIntv.noteStart.name) + " to " + str(hIntv.noteEnd.name) \
+#                     + " between part " + str(pn1 + 1) + " and part " + str(pn2 + 1)
+#        self._identifyBasedOnHarmonicInterval(partNum1, partNum2, color, dictKey, testFunction, textFunction)
 
     def identifyDissonantMelodicIntervals(self, partNum = None, color = None, dictKey = 'dissonantMelodicIntervals'):
         '''
@@ -588,21 +759,17 @@ class TheoryAnalyzer(object):
                      + str(mIntv.niceName) + " from " + str(mIntv.noteStart.name) + " to " + str(mIntv.noteEnd.name)
         self._identifyBasedOnMelodicInterval(partNum, color, dictKey, testFunction, textFunction)                
     
-    
     def identifyRomanNumerals(self, color = None, dictKey = 'romanNumerals'):
         def testFunction(vs):
             noteList = vs.getNoteList()
             if not None in noteList:
                 c = chord.Chord(noteList)
                 rn = roman.fromChordAndKey(c, self.key)
-                print self.key
-                print noteList
             else:
                 rn = False
             return rn
         textFunction = lambda vs: "Roman Numeral at " + str(vs.getNoteList()[0].measureNumber)
         self._identifyBasedOnVerticalSlice(color, dictKey, testFunction, textFunction)                
-    
     
     # Other Theory Properties to Identify:
     
@@ -683,6 +850,8 @@ class TheoryAnalyzer(object):
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name)  if vlq.motionType() != "No Motion" else 'No motion'
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
         
+
+
                 
     # Combo Methods
     
@@ -717,7 +886,7 @@ class TheoryAnalyzer(object):
                 resultStr+=resultType+": \n"
                 for result in self.resultDict[resultType]:
                     resultStr += result.text
-                resultStr += "\n"
+                    resultStr += "\n"
                 
         return resultStr
             
@@ -737,31 +906,6 @@ class TheoryAnalyzer(object):
         '''
         self._theoryScore.show()
                 
-# Vertical Slice Object
-
-class VerticalSlice(object):
-    ''' A vertical slice of notes represents a list of notes that occur
-    simultaneously in a score
-    '''
-    
-    def __init__(self,noteList):
-        self._noteList = noteList
-        
-    def getNote(self,partNum):
-        return self._noteList[partNum]
-    
-    def getNoteList(self):
-        '''
-        returns the entire note list of a vertical slice
-        '''
-        return self._noteList
-        
-        
-        
-        
-    def __repr__(self):
-        for (i,n) in enumerate(self._noteList):
-            print str(i) + ": " + str(n)
     
 # Theory Result Object
 
@@ -834,6 +978,38 @@ class VerticalSliceTheoryResult(TheoryResult):
     def color(self, color ='red'):
         for n in self.vs.getNoteList():
             n.color = color
+            
+class ThreeNoteLinearSegmentTheoryResult(TheoryResult):            
+    def __init__(self, tnls): 
+        TheoryResult.__init__(self)
+        self.tnls = tnls
+        
+    def color(self, color ='red'):
+        #self.tnls.n1.color = color
+        self.tnls.n2.color = color
+        #self.tnls.n3.color = color
+            
+#class TwoByThreeLinearSegmentTheoryResult(TheoryResult):            
+#    def __init__(self, tbtls, partNumToColor = None): 
+#        TheoryResult.__init__(self)
+#        self.tbtls = tbtls
+#        self.partNumToColor = partNumToColor
+#        
+#    def color(self, color ='red'):
+#        if self.partNumToColor == 0:
+#            self.tbtls.tnls1.n2.color = color
+#        elif self.partNumToColor == 1:
+#            self.tbtls.tnls1.n2.color = color
+  
+class VerticalSliceTripletTheoryResult(TheoryResult):
+    def __init__(self, vst, partNumToColor = None): 
+        TheoryResult.__init__(self)
+        self.vst = vst
+        self.partNumToColor = partNumToColor
+
+    def color(self, color ='red'):
+        if self.partNumToColor != None:
+            self.vst.tnlsList[self.partNumToColor].n2.color = color 
 # ------------------------------------------------------------
 
 class Test(unittest.TestCase):
@@ -848,15 +1024,15 @@ class TestExternal(unittest.TestCase):
     
     def demo(self):
 
-        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/FromServer/11_3_A_2_completed.xml')
-  
+        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/WWNortonWorksheets/WWNortonXMLFiles/XML11_worksheets/S11_4_I.xml')
 
         #s = converter.parse('/Users/larsj/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
 #        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
-#        s = corpus.parse('bwv7.7')
+        #s = corpus.parse('bwv7.7')
         
         ta = TheoryAnalyzer(s)
-
+        #ta.key = music21.key.Key('D')
+        #ta.getTwoByThreeLinearSegments(0,1)
         #ta.identifyParallelFifths(color='red')
         #ta.identifyParallelOctaves(color='orange')
         #ta.identifyHiddenFifths(color='yellow')
@@ -869,10 +1045,12 @@ class TestExternal(unittest.TestCase):
         #ta.identifyMotionType()
         #ta.identifyScaleDegrees()
         #ta.identifyHarmonicIntervals()
-        ta.identifyOpensIncorrectly()
-        ta.identifyClosesIncorrectly()
-        
-        #print ta.identifyRomanNumerals()
+        #ta.identifyOpensIncorrectly()
+
+        #ta.identifyClosesIncorrectly()
+        ta.identifyUnaccentedPassingTones(color = 'red')
+        ta.identifyUnaccentedNeighborTones(color = 'yellow')
+        #ta.identifyRomanNumerals()
         
 #        ta.identifyObliqueMotion()
 #        ta.identifySimilarMotion()
@@ -887,8 +1065,10 @@ class TestExternal(unittest.TestCase):
 #                nResult.n.lyric = str(nResult.value)
 
         print ta.getResultsString()
-        #ta.show()
-        
+        print ta.show()
+        #for n in ta._theoryScore.flat.notes:
+        #    print 'h', n.color
+
     
 if __name__ == "__main__":
 
