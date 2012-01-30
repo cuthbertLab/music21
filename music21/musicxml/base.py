@@ -851,6 +851,66 @@ class Creator(MusicXMLElement):
         self.set('type', 'composer')
         self.set('charData', defaults.author)
 
+class Credit(MusicXMLElement):
+    def __init__(self):
+        '''
+        >>> from music21 import *
+        >>> a = musicxml.Credit()
+        >>> a.tag
+        'credit'
+        >>> a.setDefaults()
+        >>> b = musicxml.CreditWords('testing')
+        >>> a.set('creditwords', b)
+        >>> print a
+        <credit page=1 <credit-words charData=testing>>
+        '''
+        MusicXMLElement.__init__(self)
+        self._tag = 'credit'
+        # attributes
+        self._attr['page'] = None
+        # character data
+        self.charData = None
+        # elements
+        self.creditWordsObj = None
+    
+        self._crossReference['creditWordsObj'] = ['creditwords']
+
+    def _getComponents(self):
+        c = []
+        c.append(self.creditWordsObj)
+        return c
+
+    def setDefaults(self):
+        self.set('page', 1)
+
+
+class CreditWords(MusicXMLElement):
+    def __init__(self, charData=None):
+        '''
+        >>> from music21 import *
+        >>> a = musicxml.CreditWords()
+        >>> a.tag
+        'credit-words'
+        '''
+        MusicXMLElement.__init__(self)
+        self._tag = 'credit-words'
+        # attributes
+        self._attr['default-x'] = None
+        self._attr['default-y'] = None
+        self._attr['font-size'] = None
+        self._attr['justify'] = None
+        self._attr['halign'] = None
+        self._attr['valign'] = None
+        # character data
+        self.charData = charData # main content
+    
+    def setDefaults(self):
+#         self.set('default-x', 500)
+#         self.set('default-y', 500)
+        self.set('font-size', 12)
+        self.set('justify', 'center')
+        self.set('haligh', 'center')
+        self.set('valign', 'center')
 
 class Encoding(MusicXMLElement):
     def __init__(self):
