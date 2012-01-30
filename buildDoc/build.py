@@ -35,6 +35,8 @@ from music21.analysis import windowed as analysisWindowed
 from music21 import articulations
 from music21 import base
 from music21 import beam
+
+from music21.braille import basic as brailleBasic
 from music21.braille import translate as brailleTranslate
 
 from music21 import clef
@@ -165,6 +167,8 @@ MODULES = [
 
     base,
     beam,
+    
+    brailleBasic,
     brailleTranslate,
 
     clef, 
