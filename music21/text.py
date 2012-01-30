@@ -313,7 +313,7 @@ class TextFormat(object):
 
 #-------------------------------------------------------------------------------
 class TextBox(base.Music21Object, TextFormat):
-    '''A TextBox is arbitrary text that might be positioned anywhere on a page, independent of notes or staffs. 
+    '''A TextBox is arbitrary text that might be positioned anywhere on a page, independent of notes or staffs. A page attribute specifies what page this text is found on; positionVertical and positionHorizontal position the text from the bottom left corner.
 
     This object is similar to the TextExpression object, but does not as many position parameters, enclosure attributes, and the ability to convert to RepeatExpressions and TempoTexts. 
 
@@ -343,8 +343,9 @@ class TextBox(base.Music21Object, TextFormat):
         else:
             self._content = content    
 
-        self._positionDefaultX = None
-        self._positionDefaultY = None
+        self._page = 1; # page one is deafault
+        self._positionDefaultX = 500    
+        self._positionDefaultY = 500
 
 
     def __repr__(self):
@@ -366,10 +367,28 @@ class TextBox(base.Music21Object, TextFormat):
         doc = '''Get or set the the content.
 
         >>> from music21 import *
-        >>> te = expressions.TextExpression('testing')
+        >>> te = text.TextBox('testing')
         >>> te.content
         'testing'
         ''')
+
+    def _getPage(self):
+        return self._page
+    
+    def _setPage(self, value):
+        self._page = int(value) # must be an integer
+    
+    page = property(_getPage, _setPage, 
+        doc = '''Get or set the the page number. The first page (page 1) is the default. 
+
+        >>> from music21 import *
+        >>> te = text.TextBox('testing')
+        >>> te.content
+        'testing'
+        >>> te.page
+        1
+        ''')
+
 
 
     def _getPositionVertical(self):
@@ -381,6 +400,13 @@ class TextBox(base.Music21Object, TextFormat):
     
     positionVertical = property(_getPositionVertical, _setPositionVertical, 
         doc = '''
+        Get or set the vertical position.
+
+        >>> from music21 import *
+        >>> te = text.TextBox('testing')
+        >>> te.positionVertical = 1000
+        >>> te.positionVertical
+        1000
         ''')
 
 
@@ -394,6 +420,14 @@ class TextBox(base.Music21Object, TextFormat):
     positionHorizontal = property(_getPositionHorizontal,     
         _setPositionHorizontal, 
         doc = '''
+        Get or set the vertical position.
+
+        >>> from music21 import *
+        >>> te = text.TextBox('testing')
+        >>> te.positionHorizontal = 200
+        >>> te.positionHorizontal
+        200
+
         ''')
 
 
