@@ -23,8 +23,8 @@ from music21.note import Note
 from music21.interval import Interval
 from music21 import key
 from music21 import note
+from music21 import chord
 
-#TODO: rename VoiceLeadingQuartet -> Pairwise
 #TODO: add chordwise -- add parsimonious (all move by step or not at all)
 
 #-------------------------------------------------------------------------------
@@ -149,9 +149,6 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> vl.v2n2
         <music21.note.Note F>
         ''')    
-    
-    
-    
     
     def _findIntervals(self):
         self.vIntervals.append(interval.notesToInterval(self.v1n1, self.v2n1))
@@ -798,8 +795,7 @@ class ThreeNoteLinearSegmentException(music21.Music21Exception):
 
 class ThreeNoteLinearSegment(music21.Music21Object):
     '''
-    An object consisting of three sequential pitches,
-    n1 --> n2 --> n3
+    An object consisting of three sequential notes
     
     The middle tone in a ThreeNoteLinearSegment can
     be classified using methods enclosed in this class
@@ -883,7 +879,15 @@ class ThreeNoteLinearSegment(music21.Music21Object):
                 raise ThreeNoteLinearSegmentException('not a valid note specification: %s' % value)
         self._calcIntervals()
         
-    n1 = property(_getn1, _setn1)
+    n1 = property(_getn1, _setn1, doc = '''
+        >>> from music21 import *
+        >>> ex = voiceLeading.ThreeNoteLinearSegment('C', 'D', 'E')
+        >>> ex.n3
+        <music21.note.Note E>
+        >>> ex.n3 = note.Note('F')
+        >>> ex.n3
+        <music21.note.Note F>   
+        ''')
     
     
     def _getn2(self):
@@ -905,7 +909,16 @@ class ThreeNoteLinearSegment(music21.Music21Object):
                 raise ThreeNoteLinearSegmentException('not a valid note specification: %s' % value)
         self._calcIntervals()
         
-    n2 = property(_getn2, _setn2)
+    n2 = property(_getn2, _setn2, doc = '''
+        >>> from music21 import *
+        >>> ex = voiceLeading.ThreeNoteLinearSegment('C', 'D', 'E')
+        >>> ex.n3
+        <music21.note.Note E>
+        >>> ex.n3 = note.Note('F')
+        >>> ex.n3
+        <music21.note.Note F>   
+    
+        ''')
     
     def _getn3(self):
         return self._n3
@@ -926,7 +939,20 @@ class ThreeNoteLinearSegment(music21.Music21Object):
                 raise ThreeNoteLinearSegmentException('not a valid note specification: %s' % value)
         self._calcIntervals()
         
-    n3 = property(_getn3, _setn3)
+    n3 = property(_getn3, _setn3, doc = '''
+    
+        Get or set the right-most note in the three note linear segment. All intervals are
+        updated accordingly.
+        
+        >>> from music21 import *
+        >>> ex = voiceLeading.ThreeNoteLinearSegment('C', 'D', 'E')
+        >>> ex.n3
+        <music21.note.Note E>
+        >>> ex.n3 = note.Note('F')
+        >>> ex.n3
+        <music21.note.Note F>    
+    
+        ''')
     
     def couldBePassingTone(self):
         '''
@@ -1061,11 +1087,11 @@ class ThreeNoteLinearSegment(music21.Music21Object):
         returns true if and only if noteToAnalyze could be a diatonic neighbor tone
         
         >>> from music21 import *
-        >>> voiceLeading.ThreeNoteLinearSegment('C3','D3','C3').couldBeDiatonicNeighborTone()
+        >>> ThreeNoteLinearSegment('C3','D3','C3').couldBeDiatonicNeighborTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('C3','C#3','C3').couldBeDiatonicNeighborTone()
+        >>> ThreeNoteLinearSegment('C3','C#3','C3').couldBeDiatonicNeighborTone()
         False
-        >>> voiceLeading.ThreeNoteLinearSegment('C3','D-3','C3').couldBeDiatonicNeighborTone()
+        >>> ThreeNoteLinearSegment('C3','D-3','C3').couldBeDiatonicNeighborTone()
         False
         '''
         return self.n1.nameWithOctave == self.n3.nameWithOctave and \
@@ -1077,304 +1103,425 @@ class ThreeNoteLinearSegment(music21.Music21Object):
         returns true if and only if noteToAnalyze could be a chromatic neighbor tone
         
         >>> from music21 import *
-        >>> voiceLeading.ThreeNoteLinearSegment('C3','D3','C3').couldBeChromaticNeighborTone()
+        >>> ThreeNoteLinearSegment('C3','D3','C3').couldBeChromaticNeighborTone()
         False
-        >>> voiceLeading.ThreeNoteLinearSegment('C3','D-3','C3').couldBeChromaticNeighborTone()
+        >>> ThreeNoteLinearSegment('C3','D-3','C3').couldBeChromaticNeighborTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('C#3','D3','C#3').couldBeChromaticNeighborTone()
+        >>> ThreeNoteLinearSegment('C#3','D3','C#3').couldBeChromaticNeighborTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('C#3','D3','D-3').couldBeChromaticNeighborTone()
+        >>> ThreeNoteLinearSegment('C#3','D3','D-3').couldBeChromaticNeighborTone()
         False
         '''
         return self.n1.nameWithOctave == self.n3.nameWithOctave and \
             self.iLeft.isChromaticStep and self.iRight.isChromaticStep and \
             (self.iLeft.direction * self.iRight.direction == -1)
 
-
-
-class TwoByThreeMatrix(music21.Music21Object):
+class VerticalSlice(object):
+    ''' A vertical slice of notes represents a list of notes that occur
+    simultaneously in a score
+    
+    instantiate by passing in a dictionary of the form {partNumber : music21NoteObject }
+    {'1': 'note 1', '2' : 'note', '3' : 'note'}
+    
+    >>> from music21 import *
+    >>> vs1 = VerticalSlice({0:note.Note('A4'), 1: note.Note('F2')})
+    >>> vs1.noteList
+    [<music21.note.Note A>, <music21.note.Note F>]
+    >>> vs1.getNote(0)
+    <music21.note.Note A>
     '''
-    An object consisting of two ThreeNoteLinearSegments (for now)....later on maybe more than just two
-    '''
-
-    def __init__(self, tnls1, tnls2):
-        self.tnls1 = tnls1
-        self.tnls2 = tnls2
+    
+    def __init__(self,contentDict):
+        self.contentDict = contentDict
+        self.noteList = self.getNoteList()
         
-        self.vIntervals = [] #vertical intervals (harmonic)
-        self.hIntervals = [] #horizontal intervals (melodic)
-        
-        if tnls1 is not None and tnls2 is not None:
-            self._findIntervals()        
-        
-        
-    def _findIntervals(self):
-        self.vIntervals.append(interval.notesToInterval(self.tnls1.n1, self.tnls2.n1))
-        self.vIntervals.append(interval.notesToInterval(self.tnls1.n2, self.tnls2.n2))
-        self.vIntervals.append(interval.notesToInterval(self.tnls1.n3, self.tnls2.n3))
-        
-        #self.hIntervals.append(interval.notesToInterval(self.tnls1.p1, self.tnls2.p1))
-        #self.hIntervals.append(interval.notesToInterval(self.tnls.p2, self.tnls2.p2))    
-        #self.hIntervals.append(interval.notesToInterval(self.tnls1.p3, self.tnls2.p3))  
+    def getNote(self,partNum):
+        return self.contentDict[partNum]
+    
+    def getNoteList(self):
+        '''
+        returns the entire note list of a vertical slice
+        '''
+        noteList = []
+        for part, m21object in self.contentDict.items():
+            if m21object == None:
+                continue
+            else:
+                noteList.append(m21object)
+        return noteList
         
     def __repr__(self):
-        return '<music21.voiceLeading.%s tnls1=%s tnls2=%s ' % (self.__class__.__name__, self.tnls1, self.tnls2)
+        return '<music21.voiceLeading.%s contentDict=%s  ' % (self.__class__.__name__, self.contentDict)
        
-    def isPassingTone(self, partNum):  
+
+class VerticalSliceTriplet(music21.Music21Object):
+    '''a collection of three vertical slices'''
+    def __init__(self,vs1, vs2, vs3):
+        self.vs1 = vs1
+        self.vs2 = vs2
+        self.vs3 = vs3
+        self.chordList = []
+        self.tnlsList = [] #Three Note Linear Segments
+        if vs1 is not None and vs2 is not None and vs3 is not None:
+            self._calcChords()
+            self._calcTNLS()
+        
+    def _calcChords(self):
+        self.chordList.append(chord.Chord(self.vs1.noteList))
+        self.chordList.append(chord.Chord(self.vs2.noteList))
+        self.chordList.append(chord.Chord(self.vs3.noteList))
+    
+    def _calcTNLS(self):
+        for partNum in range(0,min(len(self.vs1.noteList), len(self.vs2.noteList), len(self.vs3.noteList))):
+            self.tnlsList.append(ThreeNoteLinearSegment(self.vs1.getNote(partNum), self.vs2.getNote(partNum), self.vs3.getNote(partNum)) )
+        
+    def __repr__(self):
+        return '<music21.voiceLeading.%s vs1=%s vs2=%s vs3=%s ' % (self.__class__.__name__, self.vs1, self.vs2, self.vs3)
+       
+    def hasUnaccentedPassingTone(self, partNumToIdentify):  
         '''
-        partNum is the part (0 or 1) to identify the passing tone
+        partNum is the part (starting with 0) to identify the passing tone
         
         >>> from music21 import *
-        >>> vl1 = ThreeNoteLinearSegment('A', 'B', 'C')
-        
+        >>> vs1 = VerticalSlice({0:note.Note('A4'), 1: note.Note('F2')})
+        >>> vs2 = VerticalSlice({0:note.Note('B-4'), 1: note.Note('F2')})
+        >>> vs3 = VerticalSlice({0:note.Note('C5'), 1: note.Note('E2')})
+        >>> tbtm = VerticalSliceTriplet(vs1, vs2, vs3)
+        >>> tbtm.hasUnaccentedPassingTone(0)
+        True
         '''  
-        ret = False
-        if partNum == 0:
-            ret = self.tnls1.couldBePassingTone()
-        elif partNum == 1:
-            ret = self.tnls2.couldBePassingTone()
-        #try:
-        #    print note.beatStrength
-        #    print note.quarterLength
-        #return ret and self.vIntervals[1].isConsonant()
+
+        ret = self.tnlsList[partNumToIdentify].couldBePassingTone()
+
+        try:
+            ret = ret and (self.tnls1.n2.beatStrength < 0.5)
+        except:
+            pass
+        #print self.tnls1.n2.quarterLength
+        return ret and not self.chordList[1].isConsonant()
         
         
-        #check that the vertical slice containing the passing tone is dissonant
+        #check that the vertical slice containing the passing tone is dissonant        
+
+    def hasUnaccentedNeighborTone(self, partNumToIdentify):  
+        '''
+        partNum is the part (starting with 0) to identify the passing tone
         
+        >>> from music21 import *
+        >>> vs1 = VerticalSlice({0:note.Note('E-4'), 1: note.Note('C3')})
+        >>> vs2 = VerticalSlice({0:note.Note('E-4'), 1: note.Note('B2')})
+        >>> vs3 = VerticalSlice({0:note.Note('C5'), 1: note.Note('C3')})
+        >>> tbtm = VerticalSliceTriplet(vs1, vs2, vs3)
+        >>> tbtm.hasUnaccentedNeighborTone(1)
+        True
+        '''  
+        ret = self.tnlsList[partNumToIdentify].couldBeNeighborTone()
+        try:
+            ret = ret and (self.tnls1.n2.beatStrength < 0.5)
+        except:
+            pass
 
-
-def labelPassingTones(music21Stream, checkForDissonance=True, checkSimultaneous=True, checkForAccent=True, markWithColor=False, color='#FF0000'):
-    '''
-    searches through all voices of all parts in a given music21 stream and
-    identifies passing tones, then assigns a True/False value to the 
-    note's :class:`~music21.editorial.NoteEditorial` object. The information is 
-    stored as a miscellaneous attribute in the note editorial object, called 'isPassingTone'. 
-    Access this data from any note object in the stream after running this method by typing
-
-    for note in labeledStream.flat.getElementsByClass(music21.note.Note):
-    print note.editorial.misc['isPassingTone']
-    
-    Selectivity in labeling is provided by the following optional arguments:
-    checkForDissonance (default = True) --> checks if the chord formed is dissonant, and only
-    labels tone as a passing tone if the chord is dissonant.
-    
-    checkSimultaneous (default = True) --> iterates through every instance where simultaneous notes
-    are labeled (with color) and if their durations are different, labels only the tone that has a shorter duration
-    
-    checkForAccent (default = True) --> only labels passing tones on unaccented beats of the measure
-    
-    markWithColor (default = False) --> optionally label the identified passing tones with a color; default
-    color is red. Change labeling color with color modifier/
-    
-    color (default = '#00FF00') --> color to label notes if markWithColor is True. Colors must be specified
-    in a string HEX. For example, 
-    color = '#FF0000' (red)
-    color = '#00FF00' (green)
-    color = '#0000FF' (blue)
-    color = '#FFFF00' (yellow)
-    color = '#00FFFF' (turquoise)
-    color = '#FF00FF' (magenta)
-    color = '#C0C0C0' (grey)
-    color = '#FFFFFF' (white)
-    
-    '''
-
-    for part in music21Stream.parts:
-        notes = part.flat.getElementsByClass(music21.note.Note)
-        index = 0
-        for note in notes[1:len(notes) - 1]:
-            index = index + 1
-            if ThreeNoteLinearSegment(notes[index - 1], note, notes[index + 1]).couldBePassingTone():
-                listOfTruths = []
-                if checkForDissonance:
-                    listOfTruths.append(not _noteContextIsConsonant(note, music21Stream))
-                if checkForAccent:
-                    listOfTruths.append(_beatIsUnaccented(note))
-                if not (False in listOfTruths):
-                    note.editorial.misc['isPassingTone'] = True
-                    if markWithColor:
-                        note.color = color
-                else:
-                    note.editorial.misc['isPassingTone'] = False
-            else:
-                note.editorial.misc['isPassingTone'] = False
-                    
-        notes[0].editorial.misc['isPassingTone'] = False
-        notes[len(notes)-1].editorial.misc['isPassingTone'] = False
+        return ret and not self.chordList[1].isConsonant()
         
-    if checkSimultaneous:
-        music21Stream = _checkForSimultaneousLabels(music21Stream, markWithColor)
-    return music21Stream
-    
-def labelNeighborTones(music21Stream, checkForDissonance=True, checkSimultaneous=True, checkForAccent=True, markWithColor=False, color='#00FF00'):
-    '''
-    searches through all voices of all parts in a given music21 stream and
-    identifies neighbor tones, then assigns a True/False value to the 
-    note's :class:`~music21.editorial.NoteEditorial` object. The information is 
-    stored as a miscellaneous attribute in the note editorial object, called 'isPassingTone'. 
-    Access this data from any note object in the stream after running this method by typing
-
-    for note in labeledStream.flat.getElementsByClass(music21.note.Note):
-    print note.editorial.misc['isNeighborTone']
-    
-    Selectivity in labeling is provided by the following optional arguments:
-    checkForDissonance (default = True) --> checks if the chord formed is dissonant, and only
-    labels tone as a passing tone if the chord is dissonant.
-    
-    checkSimultaneous (default = True) --> iterates through every instance where simultaneous notes
-    are labeled (with color) and if their durations are different, labels only the tone that has a shorter duration
-    
-    checkForAccent (default = True) --> only labels passing tones on unacented beats of the measure
-    
-    markWithColor (default = False) --> optionally label the identified neighbor tones with a color; default
-    color is green. Change labeling color with color modifier/
-    
-    color (default = '#00FF00') --> color to label notes if markWithColor is True. Colors must be specified
-    in a string HEX. 
-    For example, 
-    color = '#FF0000' (red)
-    color = '#00FF00' (green)
-    color = '#0000FF' (blue)
-    color = '#FFFF00' (yellow)
-    color = '#00FFFF' (turquoise)
-    color = '#FF00FF' (magenta)
-    color = '#C0C0C0' (grey)
-    color = '#FFFFFF' (white)
-    
-    '''
-    for part in music21Stream.parts:
-        notes = part.flat.getElementsByClass(music21.note.Note)
-        index = 0
-        for note in notes[1:len(notes) - 1]:
-            index = index + 1
-            if ThreeNoteLinearSegment(notes[index - 1], note, notes[index + 1]).couldBeNeighborTone():
-                listOfTruths = []
-                if checkForDissonance:
-                    listOfTruths.append(not _noteContextIsConsonant(note, music21Stream))
-                if checkForAccent:
-                    listOfTruths.append(_beatIsUnaccented(note))
-                if not (False in listOfTruths):
-                    note.editorial.misc['isNeighborTone'] = True
-                    if markWithColor:
-                        note.color = color
-                else:
-                    note.editorial.misc['isNeighborTone'] = False
-            else:
-                note.editorial.misc['isNeighborTone'] = False         
-        notes[0].editorial.misc['isNeighborTone'] = False
-        notes[len(notes)-1].editorial.misc['isNeighborTone'] = False
-    if checkSimultaneous:
-        music21Stream = _checkForSimultaneousLabels(music21Stream, markWithColor)
-    return music21Stream
-    
-def _checkForSimultaneousLabels(preLabeledMusic21Stream, checkPT=True, checkNT=True, markWithColor=False, color='#000000'):
-    '''
-    If after running a non-harmonic labeling method (such as labelPassingTones or labelNeighborTones)
-    you find that there are simultaneous pitches labeled when at least one of those pitches must
-    not be labeled, run this method to sort out which has the shorter duration, and this one remains
-    labeled while the other one becomes unlabeled. Optionally label with colors (as in with label passing tones)
-    
-    This method is run after every label non-harmonic tone method (labelPassingTones and labelNeighborTones)
-    
-    if markWithColor = True, then the identified non-harmonic tones that are returned to normal status are 
-    set back to the default color of black.
-    
-    Method steps through each part, and checks that part against each of the other parts. This method
-    should unlabel all simultaneous sounding like-type non-harmonic tones that have the same duration if a shorter
-    duraiton like-type non-harmonic tone is sounding simultaneously. For example, in four voices (SATB)
-    if the soprano and alto both have a passing tone labeled but each is a quarter note, and the tenor 
-    has a neighbor tone labeled but it is an eighth note, the soprano and alto labels are removed 
-    (editorial.misc['isPassingTone'] set to False and their color optionally returned to black. If the bass
-    is labeled as a neighbor tone and is simultaneous, there is no consequence because it is not of the same
-    'type' of non-harmonic tone.
-    
-    '''
-    partNumberBeingSearched = -1
-    while partNumberBeingSearched < len(preLabeledMusic21Stream.parts) - 1:
-        partNumberBeingSearched += 1
-        for note in preLabeledMusic21Stream.parts[partNumberBeingSearched].flat.getElementsByClass(music21.note.Note):
-            try:
-                note.editorial.misc['isPassingTone']
-            except:
-                note.editorial.misc['isPassingTone'] = False
-            try:
-                note.editorial.misc['isNeighborTone']
-            except:
-                note.editorial.misc['isNeighborTone'] = False
-                  
-            if checkPT and note.editorial.misc['isPassingTone'] == True:
-                for part in preLabeledMusic21Stream.parts[partNumberBeingSearched:]:
-                    for simultaneousNote in part.flat.getElementsByOffset(note.offset).flat.getElementsByClass(music21.note.Note):
-                        if simultaneousNote.editorial.misc['isPassingTone'] == True:
-                            if simultaneousNote.duration.quarterLength > note.duration.quarterLength:
-                                simultaneousNote.editorial.misc['isPassingTone'] = False
-                                simultaneousNote.color = color
-                            elif simultaneousNote.duration.quarterLength < note.duration.quarterLength:
-                                note.color = color
-                                note.editorial.misc['isPassingTone'] = False
-                            else:
-                                pass
-            if checkPT and note.editorial.misc['isNeighborTone'] == True:
-                for part in preLabeledMusic21Stream.parts[partNumberBeingSearched:]:
-                    for simultaneousNote in part.flat.getElementsByOffset(note.offset).flat.getElementsByClass(music21.note.Note):
-                        if simultaneousNote.editorial.misc['isNeighborTone'] == True:
-                            if simultaneousNote.duration.quarterLength > note.duration.quarterLength:
-                                simultaneousNote.editorial.misc['isNeighborTone'] = False
-                                simultaneousNote.color = color
-                            elif simultaneousNote.duration.quarterLength < note.duration.quarterLength:
-                                note.color = color
-                                note.editorial.misc['isNeighborTone'] = False
-                            else:
-                                pass
-                                #if the two durations are equal, then how do we know which is the passing tone
-                                #and which is the chordal tone???
-    
-    return preLabeledMusic21Stream
-
-#METHOD UNDER REVISION...
-#getVerticalSlice() should be able to operate directly on a stream...    
-def _noteContextIsConsonant(note, music21Stream):
-    #WRITE TESTS
-    
-    #music21Score
-    #isClass or subclass
-    #harmonicContext
-    #be able to pass in any object with an offset in a stream
-    #could be a spanner
-    #contextSearch (getContextByClass)
-    
-    '''
-    determines if the given note is a non-harmonic tone due to the context around the note,
-    specifically the pitches sounding simultaneously in all voices while the note sounds.
-    If the chord formed by these simultaneous pitches in consonant, False is returned. 
-    If the chord formed is consonant, true is returned
-    
-    Consonance is determined by making a chord of the simultaneous pitches, 
-    then calling chord's isConsonant() on that chord.
-    
-
-    '''
-    pitches = []
-    #hypothetically (and in actuality if used correctly), note.offset should be equal to offsetOfPitchToIdentify
-    offsetOfPitchToIdentify =  note.getOffsetBySite(music21Stream.flat)
-#getContextByClass 
-    for part in music21Stream.parts: #'Rest'
-        value = part.flat.getElementAtOrBefore(offsetOfPitchToIdentify, classList=['Pitch', 'Note', 'Chord', music21.note.Rest])
-        if 'Chord' in value.classes:
-            value = value.pitches
-        if 'Rest' in value.classes:
-            pitches.append(value)
-    cWithPitch = music21.chord.Chord(pitches)
-    return cWithPitch.isConsonant()
-
-#contextSearch in stream
-
-def _beatIsUnaccented(note):
-    #only unnacented passing tones are labeled
-    try:
-        return note.beatStrength < 0.5
-    except:
-        return False        
+        
+        #check that the vertical slice containing the passing tone is dissonant        
+                
+        
+#class TwoByThreeLinearSegment(music21.Music21Object):
+#    '''
+#    An object consisting of two ThreeNoteLinearSegments (for now)....later on maybe more than just two
+#    '''
+#
+#    def __init__(self, tnls1, tnls2):
+#        self.tnls1 = tnls1
+#        self.tnls2 = tnls2
+#        
+#        self.vIntervals = [] #vertical intervals (harmonic)
+#        self.hIntervals = [] #horizontal intervals (melodic)
+#        
+#        if tnls1 is not None and tnls2 is not None:
+#            self._findIntervals()        
+#        
+#        
+#    def _findIntervals(self):
+#        self.vIntervals.append(interval.notesToInterval(self.tnls1.n1, self.tnls2.n1))
+#        self.vIntervals.append(interval.notesToInterval(self.tnls1.n2, self.tnls2.n2))
+#        self.vIntervals.append(interval.notesToInterval(self.tnls1.n3, self.tnls2.n3))
+#        
+#        #self.hIntervals.append(interval.notesToInterval(self.tnls1.p1, self.tnls2.p1))
+#        #self.hIntervals.append(interval.notesToInterval(self.tnls.p2, self.tnls2.p2))    
+#        #self.hIntervals.append(interval.notesToInterval(self.tnls1.p3, self.tnls2.p3))  
+#        
+#    def __repr__(self):
+#        return '<music21.voiceLeading.%s tnls1=%s tnls2=%s ' % (self.__class__.__name__, self.tnls1, self.tnls2)
+#       
+#    def hasUnaccentedPassingTone(self, partNum):  
+#        '''
+#        partNum is the part (0 or 1) to identify the passing tone
+#        
+#        >>> from music21 import *
+#        >>> n1 = note.Note('A4', quarterLength = 0.5)
+#        >>> n2 = note.Note('B-4', quarterLength = 0.5)
+#        >>> n3 = note.Note('C5', quarterLength = 1.0)
+#        >>> n4 = note.Note('F3', quarterLength = 1.0)
+#        >>> n5 = note.Note('E3', quarterLength = 1.0)
+#        >>> vl1 = ThreeNoteLinearSegment(n1, n2, n3)
+#        >>> vl2 = ThreeNoteLinearSegment(n4, n4, n5)
+#        >>> tbtm = TwoByThreeLinearSegment(vl1, vl2)
+#        >>> tbtm.hasUnaccentedPassingTone(0)
+#        True
+#        '''  
+#        
+#        ret = False
+#        if partNum == 0:
+#            ret = self.tnls1.couldBePassingTone()
+#        elif partNum == 1:
+#            ret = self.tnls2.couldBePassingTone()
+#        try:
+#            ret = ret and (self.tnls1.n2.beatStrength < 0.5)
+#        except:
+#            pass
+#        #print self.tnls1.n2.quarterLength
+#        return ret and not self.vIntervals[1].isConsonant()
+#        
+#        
+#        #check that the vertical slice containing the passing tone is dissonant
+#   
+#        
+#
+#
+#def labelPassingTones(music21Stream, checkForDissonance=True, checkSimultaneous=True, checkForAccent=True, markWithColor=False, color='#FF0000'):
+#    '''
+#    searches through all voices of all parts in a given music21 stream and
+#    identifies passing tones, then assigns a True/False value to the 
+#    note's :class:`~music21.editorial.NoteEditorial` object. The information is 
+#    stored as a miscellaneous attribute in the note editorial object, called 'isPassingTone'. 
+#    Access this data from any note object in the stream after running this method by typing
+#
+#    for note in labeledStream.flat.getElementsByClass(music21.note.Note):
+#    print note.editorial.misc['isPassingTone']
+#    
+#    Selectivity in labeling is provided by the following optional arguments:
+#    checkForDissonance (default = True) --> checks if the chord formed is dissonant, and only
+#    labels tone as a passing tone if the chord is dissonant.
+#    
+#    checkSimultaneous (default = True) --> iterates through every instance where simultaneous notes
+#    are labeled (with color) and if their durations are different, labels only the tone that has a shorter duration
+#    
+#    checkForAccent (default = True) --> only labels passing tones on unaccented beats of the measure
+#    
+#    markWithColor (default = False) --> optionally label the identified passing tones with a color; default
+#    color is red. Change labeling color with color modifier/
+#    
+#    color (default = '#00FF00') --> color to label notes if markWithColor is True. Colors must be specified
+#    in a string HEX. For example, 
+#    color = '#FF0000' (red)
+#    color = '#00FF00' (green)
+#    color = '#0000FF' (blue)
+#    color = '#FFFF00' (yellow)
+#    color = '#00FFFF' (turquoise)
+#    color = '#FF00FF' (magenta)
+#    color = '#C0C0C0' (grey)
+#    color = '#FFFFFF' (white)
+#    
+#    '''
+#
+#    for part in music21Stream.parts:
+#        notes = part.flat.getElementsByClass(music21.note.Note)
+#        index = 0
+#        for note in notes[1:len(notes) - 1]:
+#            index = index + 1
+#            if ThreeNoteLinearSegment(notes[index - 1], note, notes[index + 1]).couldBePassingTone():
+#                listOfTruths = []
+#                if checkForDissonance:
+#                    listOfTruths.append(not _noteContextIsConsonant(note, music21Stream))
+#                if checkForAccent:
+#                    listOfTruths.append(_beatIsUnaccented(note))
+#                if not (False in listOfTruths):
+#                    note.editorial.misc['isPassingTone'] = True
+#                    if markWithColor:
+#                        note.color = color
+#                else:
+#                    note.editorial.misc['isPassingTone'] = False
+#            else:
+#                note.editorial.misc['isPassingTone'] = False
+#                    
+#        notes[0].editorial.misc['isPassingTone'] = False
+#        notes[len(notes)-1].editorial.misc['isPassingTone'] = False
+#        
+#    if checkSimultaneous:
+#        music21Stream = _checkForSimultaneousLabels(music21Stream, markWithColor)
+#    return music21Stream
+#    
+#def labelNeighborTones(music21Stream, checkForDissonance=True, checkSimultaneous=True, checkForAccent=True, markWithColor=False, color='#00FF00'):
+#    '''
+#    searches through all voices of all parts in a given music21 stream and
+#    identifies neighbor tones, then assigns a True/False value to the 
+#    note's :class:`~music21.editorial.NoteEditorial` object. The information is 
+#    stored as a miscellaneous attribute in the note editorial object, called 'isPassingTone'. 
+#    Access this data from any note object in the stream after running this method by typing
+#
+#    for note in labeledStream.flat.getElementsByClass(music21.note.Note):
+#    print note.editorial.misc['isNeighborTone']
+#    
+#    Selectivity in labeling is provided by the following optional arguments:
+#    checkForDissonance (default = True) --> checks if the chord formed is dissonant, and only
+#    labels tone as a passing tone if the chord is dissonant.
+#    
+#    checkSimultaneous (default = True) --> iterates through every instance where simultaneous notes
+#    are labeled (with color) and if their durations are different, labels only the tone that has a shorter duration
+#    
+#    checkForAccent (default = True) --> only labels passing tones on unacented beats of the measure
+#    
+#    markWithColor (default = False) --> optionally label the identified neighbor tones with a color; default
+#    color is green. Change labeling color with color modifier/
+#    
+#    color (default = '#00FF00') --> color to label notes if markWithColor is True. Colors must be specified
+#    in a string HEX. 
+#    For example, 
+#    color = '#FF0000' (red)
+#    color = '#00FF00' (green)
+#    color = '#0000FF' (blue)
+#    color = '#FFFF00' (yellow)
+#    color = '#00FFFF' (turquoise)
+#    color = '#FF00FF' (magenta)
+#    color = '#C0C0C0' (grey)
+#    color = '#FFFFFF' (white)
+#    
+#    '''
+#    for part in music21Stream.parts:
+#        notes = part.flat.getElementsByClass(music21.note.Note)
+#        index = 0
+#        for note in notes[1:len(notes) - 1]:
+#            index = index + 1
+#            if ThreeNoteLinearSegment(notes[index - 1], note, notes[index + 1]).couldBeNeighborTone():
+#                listOfTruths = []
+#                if checkForDissonance:
+#                    listOfTruths.append(not _noteContextIsConsonant(note, music21Stream))
+#                if checkForAccent:
+#                    listOfTruths.append(_beatIsUnaccented(note))
+#                if not (False in listOfTruths):
+#                    note.editorial.misc['isNeighborTone'] = True
+#                    if markWithColor:
+#                        note.color = color
+#                else:
+#                    note.editorial.misc['isNeighborTone'] = False
+#            else:
+#                note.editorial.misc['isNeighborTone'] = False         
+#        notes[0].editorial.misc['isNeighborTone'] = False
+#        notes[len(notes)-1].editorial.misc['isNeighborTone'] = False
+#    if checkSimultaneous:
+#        music21Stream = _checkForSimultaneousLabels(music21Stream, markWithColor)
+#    return music21Stream
+#    
+#def _checkForSimultaneousLabels(preLabeledMusic21Stream, checkPT=True, checkNT=True, markWithColor=False, color='#000000'):
+#    '''
+#    If after running a non-harmonic labeling method (such as labelPassingTones or labelNeighborTones)
+#    you find that there are simultaneous pitches labeled when at least one of those pitches must
+#    not be labeled, run this method to sort out which has the shorter duration, and this one remains
+#    labeled while the other one becomes unlabeled. Optionally label with colors (as in with label passing tones)
+#    
+#    This method is run after every label non-harmonic tone method (labelPassingTones and labelNeighborTones)
+#    
+#    if markWithColor = True, then the identified non-harmonic tones that are returned to normal status are 
+#    set back to the default color of black.
+#    
+#    Method steps through each part, and checks that part against each of the other parts. This method
+#    should unlabel all simultaneous sounding like-type non-harmonic tones that have the same duration if a shorter
+#    duraiton like-type non-harmonic tone is sounding simultaneously. For example, in four voices (SATB)
+#    if the soprano and alto both have a passing tone labeled but each is a quarter note, and the tenor 
+#    has a neighbor tone labeled but it is an eighth note, the soprano and alto labels are removed 
+#    (editorial.misc['isPassingTone'] set to False and their color optionally returned to black. If the bass
+#    is labeled as a neighbor tone and is simultaneous, there is no consequence because it is not of the same
+#    'type' of non-harmonic tone.
+#    
+#    '''
+#    partNumberBeingSearched = -1
+#    while partNumberBeingSearched < len(preLabeledMusic21Stream.parts) - 1:
+#        partNumberBeingSearched += 1
+#        for note in preLabeledMusic21Stream.parts[partNumberBeingSearched].flat.getElementsByClass(music21.note.Note):
+#            try:
+#                note.editorial.misc['isPassingTone']
+#            except:
+#                note.editorial.misc['isPassingTone'] = False
+#            try:
+#                note.editorial.misc['isNeighborTone']
+#            except:
+#                note.editorial.misc['isNeighborTone'] = False
+#                  
+#            if checkPT and note.editorial.misc['isPassingTone'] == True:
+#                for part in preLabeledMusic21Stream.parts[partNumberBeingSearched:]:
+#                    for simultaneousNote in part.flat.getElementsByOffset(note.offset).flat.getElementsByClass(music21.note.Note):
+#                        if simultaneousNote.editorial.misc['isPassingTone'] == True:
+#                            if simultaneousNote.duration.quarterLength > note.duration.quarterLength:
+#                                simultaneousNote.editorial.misc['isPassingTone'] = False
+#                                simultaneousNote.color = color
+#                            elif simultaneousNote.duration.quarterLength < note.duration.quarterLength:
+#                                note.color = color
+#                                note.editorial.misc['isPassingTone'] = False
+#                            else:
+#                                pass
+#            if checkPT and note.editorial.misc['isNeighborTone'] == True:
+#                for part in preLabeledMusic21Stream.parts[partNumberBeingSearched:]:
+#                    for simultaneousNote in part.flat.getElementsByOffset(note.offset).flat.getElementsByClass(music21.note.Note):
+#                        if simultaneousNote.editorial.misc['isNeighborTone'] == True:
+#                            if simultaneousNote.duration.quarterLength > note.duration.quarterLength:
+#                                simultaneousNote.editorial.misc['isNeighborTone'] = False
+#                                simultaneousNote.color = color
+#                            elif simultaneousNote.duration.quarterLength < note.duration.quarterLength:
+#                                note.color = color
+#                                note.editorial.misc['isNeighborTone'] = False
+#                            else:
+#                                pass
+#                                #if the two durations are equal, then how do we know which is the passing tone
+#                                #and which is the chordal tone???
+#    
+#    return preLabeledMusic21Stream
+#
+##METHOD UNDER REVISION...
+##getVerticalSlice() should be able to operate directly on a stream...    
+#def _noteContextIsConsonant(note, music21Stream):
+#    #WRITE TESTS
+#    
+#    #music21Score
+#    #isClass or subclass
+#    #harmonicContext
+#    #be able to pass in any object with an offset in a stream
+#    #could be a spanner
+#    #contextSearch (getContextByClass)
+#    
+#    '''
+#    determines if the given note is a non-harmonic tone due to the context around the note,
+#    specifically the pitches sounding simultaneously in all voices while the note sounds.
+#    If the chord formed by these simultaneous pitches in consonant, False is returned. 
+#    If the chord formed is consonant, true is returned
+#    
+#    Consonance is determined by making a chord of the simultaneous pitches, 
+#    then calling chord's isConsonant() on that chord.
+#    
+#
+#    '''
+#    pitches = []
+#    #hypothetically (and in actuality if used correctly), note.offset should be equal to offsetOfPitchToIdentify
+#    offsetOfPitchToIdentify =  note.getOffsetBySite(music21Stream.flat)
+##getContextByClass 
+#    for part in music21Stream.parts: #'Rest'
+#        value = part.flat.getElementAtOrBefore(offsetOfPitchToIdentify, classList=['Pitch', 'Note', 'Chord', music21.note.Rest])
+#        if 'Chord' in value.classes:
+#            value = value.pitches
+#        if 'Rest' in value.classes:
+#            pitches.append(value)
+#    cWithPitch = music21.chord.Chord(pitches)
+#    return cWithPitch.isConsonant()
+#
+##contextSearch in stream
+#
+#def _beatIsUnaccented(note):
+#    #only unnacented passing tones are labeled
+#    try:
+#        return note.beatStrength < 0.5
+#    except:
+#        return False        
     
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
@@ -1443,25 +1590,8 @@ class TestExternal(unittest.TestCase):
     def runTest(self):
         pass
     
-    def testThreeNoteLinearSegment(self):
-        #s = music21.converter.parse('''\
-#C:/Users/bhadley/Dropbox/Music21Theory/WWNortonWorksheets/WWNortonXMLFiles/\
-#XML11_worksheets/S11_6_IB.xml''')
-        from music21 import corpus
-        from music21 import voiceLeading
-        from music21 import editorial
-        s = corpus.parse('bach/bwv66.6.xml')
-        
-        s = voiceLeading.labelPassingTones(s, markWithColor=True)
-        s = voiceLeading.labelNeighborTones(s, markWithColor=True)
-        #s.show()
-        #MOST rigorous test below...probably not necessary so commented out for now
-        #listOfPassingToneNotes = editorial.getObjectsWithEditorial(s.flat.getElementsByClass(music21.note.Note), "isPassingTone", listOfValues = [True])
-        #listOfNeighborToneNotes = editorial.getObjectsWithEditorial(s.flat.getElementsByClass(music21.note.Note), "isNeighborTone", listOfValues = [True])
-        #assert len(listOfNeighborToneNotes) == 15
-        #assert len(listOfPassingToneNotes) == 45
 
-_DOC_ORDER = [VoiceLeadingQuartet]
+_DOC_ORDER = [VoiceLeadingQuartet, ThreeNoteLinearSegment, VerticalSlice, VerticalSliceTriplet]
 
 if __name__ == "__main__":
     music21.mainTest(Test)
