@@ -13,6 +13,7 @@ import unittest
 
 from music21 import articulations
 from music21 import clef
+from music21 import environment
 from music21 import interval
 from music21 import note
 
@@ -39,9 +40,17 @@ rests = lookup.rests
 symbols = lookup.symbols
 textExpressions = lookup.textExpressions
 
+environRules = environment.Environment('basic.py')
 #-------------------------------------------------------------------------------
 # music21Object to braille unicode methods
 
+'''
+Any :class:`~music21.base.Music21Object` which cannot be transcribed in
+:mod:`~music21.braille.basic` returns a braille literary question mark
+and outputs a warning to the console, rather than raising an exception.
+This is so that a transcription of a :class:`~music21.stream.Stream` in
+:class:`~music21.braille.translate` is completed as thoroughly as possible.
+'''
 def barlineToBraille(music21Barline):
     '''
     Takes in a :class:`~music21.bar.Barline` and returns its representation
@@ -58,11 +67,15 @@ def barlineToBraille(music21Barline):
     >>> finalBarline = bar.Barline('final')
     >>> print basic.barlineToBraille(finalBarline)
     ⠣⠅
+    >>> heavyBarline = bar.Barline('heavy')
+    >>> print basic.barlineToBraille(heavyBarline)
+    ⠜⠦
     '''
     try:
         return barlines[music21Barline.style]
     except KeyError:
-        return BrailleBasicException("Barline type cannot be shown in braille.")
+        environRules.warn("Barline {0} cannot be transcribed to braille.".format(music21Barline))
+        return symbols['basic_exception']
 
 def chordToBraille(music21Chord, descending = True, showOctave = True):
     '''
@@ -109,31 +122,35 @@ def chordToBraille(music21Chord, descending = True, showOctave = True):
     >>> print basic.chordToBraille(cMajorSeventhLeftHand, descending = False)
     ⠘⠷⠴⠐⠴
     '''
-    allPitches = sorted(music21Chord.pitches)
-    if descending:
-        allPitches.reverse()
-    
-    chordTrans = []
-    basePitch = allPitches[0]
-    initNote = note.Note(basePitch, quarterLength = music21Chord.quarterLength)
-    chordTrans.append(noteToBraille(music21Note=initNote,showOctave=showOctave))
-    
-    for currentPitchIndex in range(1, len(allPitches)):
-        currentPitch = allPitches[currentPitchIndex]        
-        intervalDistance = interval.notesToInterval(basePitch, currentPitch).generic.undirected
-        if intervalDistance > 8:
-            intervalDistance = intervalDistance % 8 + 1
-            if currentPitchIndex == 1:
-                chordTrans.append(octaves[currentPitch.octave])
-            else:
-                previousPitch = allPitches[currentPitchIndex - 1]
-                relativeIntervalDist = interval.notesToInterval(previousPitch, currentPitch).generic.undirected
-                if relativeIntervalDist >= 8:
+    try:
+        allPitches = sorted(music21Chord.pitches)
+        if descending:
+            allPitches.reverse()
+        
+        chordTrans = []
+        basePitch = allPitches[0]
+        initNote = note.Note(basePitch, quarterLength = music21Chord.quarterLength)
+        chordTrans.append(noteToBraille(music21Note=initNote,showOctave=showOctave))
+        
+        for currentPitchIndex in range(1, len(allPitches)):
+            currentPitch = allPitches[currentPitchIndex]        
+            intervalDistance = interval.notesToInterval(basePitch, currentPitch).generic.undirected
+            if intervalDistance > 8:
+                intervalDistance = intervalDistance % 8 + 1
+                if currentPitchIndex == 1:
                     chordTrans.append(octaves[currentPitch.octave])
-        chordTrans.append(intervals[intervalDistance])
-            
-    return u''.join(chordTrans)
-
+                else:
+                    previousPitch = allPitches[currentPitchIndex - 1]
+                    relativeIntervalDist = interval.notesToInterval(previousPitch, currentPitch).generic.undirected
+                    if relativeIntervalDist >= 8:
+                        chordTrans.append(octaves[currentPitch.octave])
+            chordTrans.append(intervals[intervalDistance])
+                
+        return u"".join(chordTrans)
+    except:
+        environRules.warn("Chord {0} cannot be transcribed to braille.".format(music21Chord))
+        return symbols['basic_exception']
+  
 def clefToBraille(music21Clef):
     '''
     Takes in a :class:`~music21.clef.Clef` and returns its representation
@@ -157,6 +174,9 @@ def clefToBraille(music21Clef):
     >>> tenorClef = clef.TenorClef()
     >>> print basic.clefToBraille(tenorClef)
     ⠜⠬⠐⠇
+    >>> sopranoClef = clef.SopranoClef()
+    >>> print basic.clefToBraille(sopranoClef)
+    ⠜⠦
     '''
     if isinstance(music21Clef, clef.TrebleClef):
         return clefSigns['treble']
@@ -167,7 +187,8 @@ def clefToBraille(music21Clef):
     elif isinstance(music21Clef, clef.TenorClef):
         return clefSigns['tenor']
     else:
-        raise BrailleBasicException("Clef type cannot be shown in braille.")
+        environRules.warn("Clef {0} cannot be transcribed to braille.".format(music21Clef))
+        return symbols['basic_exception']
 
 def dynamicToBraille(music21Dynamic, precedeByWordSign = True):
     '''
@@ -193,8 +214,9 @@ def dynamicToBraille(music21Dynamic, precedeByWordSign = True):
             dynamicTrans.append(symbols['word'])
         dynamicTrans.append(wordToBraille(music21Dynamic.value, isTextExpression = True))
         return u"".join(dynamicTrans)
-    except KeyError:
-        raise BrailleBasicException("Dynamic type cannot be shown in braille.")
+    except BrailleBasicException as wordException:
+        environRules.warn("Dynamic {0}: {1}".format(music21Dynamic, wordException))
+        return symbols['basic_exception']
 
 def instrumentToBraille(music21Instrument):
     '''
@@ -209,12 +231,14 @@ def instrumentToBraille(music21Instrument):
     >>> print basic.instrumentToBraille(instrument.BassClarinet())
     ⠠⠃⠁⠎⠎⠀⠉⠇⠁⠗⠊⠝⠑⠞
     '''
-    allWords = music21Instrument.bestName().split()
-    trans = []
-    for word in allWords:
-        trans.append(wordToBraille(sampleWord = word))
-        trans.append(symbols['space'])
-    return u''.join(trans[0:-1])
+    try:
+        trans = []
+        allWords = music21Instrument.bestName().split()
+        trans = [wordToBraille(word) for word in allWords]
+        return symbols['space'].join(trans)
+    except BrailleBasicException as wordException:
+        environRules.warn("Instrument {0}: {1}".format(music21Instrument, wordException))
+        return symbols['basic_exception']
 
 def keySigToBraille(music21KeySignature, outgoingKeySig = None):
     '''
@@ -234,22 +258,29 @@ def keySigToBraille(music21KeySignature, outgoingKeySig = None):
     >>> print basic.keySigToBraille(key.KeySignature(0), outgoingKeySig = key.KeySignature(-3))
     ⠡⠡⠡
     '''
-    if music21KeySignature == None:
-        raise BrailleBasicException("No key signature provided!")
-    ks_braille = keySignatures[music21KeySignature.sharps]
-    if outgoingKeySig == None:
+    try:
+        incomingSharps = music21KeySignature.sharps
+        ks_braille = keySignatures[incomingSharps]
+        if outgoingKeySig is None:
+            return ks_braille
+    except KeyError:
+        environRules.warn("Incoming Key Signature {0} cannot be transcribed to braille.".format(music21KeySignature))
+        return symbols['basic_exception']
+
+    try:
+        outgoingSharps = outgoingKeySig.sharps
+        trans = []
+        if incomingSharps == 0 or outgoingSharps == 0 or \
+            not outgoingSharps / abs(outgoingSharps) == incomingSharps / abs(incomingSharps):
+            trans.append(naturals[abs(outgoingSharps)])
+        elif not (abs(outgoingSharps) < abs(incomingSharps)):
+            trans.append(naturals[abs(outgoingSharps - incomingSharps)])
+        trans.append(ks_braille)
+        return u"".join(trans)
+    except KeyError:
+        environRules.warn("Outgoing Key Signature {0} cannot be transcribed to braille.".format(outgoingKeySig))
         return ks_braille
-
-    trans = []
-    if music21KeySignature.sharps == 0 or outgoingKeySig.sharps == 0 or \
-        not (outgoingKeySig.sharps / abs(outgoingKeySig.sharps) == music21KeySignature.sharps / abs(music21KeySignature.sharps)):
-        trans.append(naturals[abs(outgoingKeySig.sharps)])
-    elif not (abs(outgoingKeySig.sharps) < abs(music21KeySignature.sharps)):
-        trans.append(naturals[abs(outgoingKeySig.sharps - music21KeySignature.sharps)])
-
-    trans.append(ks_braille)
-    return u''.join(trans)
-
+    
 def metronomeMarkToBraille(music21MetronomeMark):
     '''
     Takes in a :class:`~music21.tempo.MetronomeMark` and returns it as a braille string in UTF-8 unicode.
@@ -262,14 +293,15 @@ def metronomeMarkToBraille(music21MetronomeMark):
     >>> print basic.metronomeMarkToBraille(tempo.MetronomeMark(number = 135, referent = note.Note(quarterLength = 0.5)))
     ⠙⠶⠼⠁⠉⠑
     '''
-    if music21MetronomeMark == None:
-        raise BrailleBasicException("No metronome mark provided!")
-    metroTrans = []
-    metroTrans.append(noteToBraille(note.Note('C4', quarterLength = music21MetronomeMark.referent.quarterLength), showOctave = False))
-    metroTrans.append(symbols['metronome'])
-    metroTrans.append(numberToBraille(music21MetronomeMark.number))
-    
-    return ''.join(metroTrans)
+    try:
+        metroTrans = []
+        metroTrans.append(noteToBraille(note.Note('C4', quarterLength = music21MetronomeMark.referent.quarterLength), showOctave = False))
+        metroTrans.append(symbols['metronome'])
+        metroTrans.append(numberToBraille(music21MetronomeMark.number))
+        return u"".join(metroTrans)
+    except BrailleBasicException as numberException:
+        environRules.warn("Metronome Mark {0}: {1}".format(music21MetronomeMark, numberException))  
+        return symbols['basic_exception']
 
 def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
     '''
@@ -307,45 +339,15 @@ def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
     >>> print basic.noteToBraille(A2)
     ⠘⠎⠄
     '''
+    falseKeywords = ['beginLongBracketSlur', 'endLongBracketSlur', 'beginLongDoubleSlur', 
+                     'endLongDoubleSlur', 'shortSlur', 'beamStart', 'beamContinue']
+    for keyword in falseKeywords:
+        try:
+            globals()[keyword] = getattr(music21Note, keyword)
+        except AttributeError:
+            globals()[keyword] = False
+    
     noteTrans = []
-    beginLongBracketSlur = False
-    endLongBracketSlur = False
-    beginLongDoubleSlur = False
-    endLongDoubleSlur = False
-    shortSlur = False
-    beamStart = False
-    beamContinue = False
-    
-    try:
-        beginLongBracketSlur = music21Note.beginLongBracketSlur
-    except AttributeError:
-        pass
-    try:
-        endLongBracketSlur = music21Note.endLongBracketSlur
-    except AttributeError:
-        pass
-    try:
-        beginLongDoubleSlur = music21Note.beginLongDoubleSlur
-    except AttributeError:
-        pass
-    try:
-        endLongDoubleSlur = music21Note.endLongDoubleSlur
-    except AttributeError:
-        pass
-
-    try:
-        shortSlur = music21Note.shortSlur
-    except AttributeError:
-        pass
-    try:
-        beamStart = music21Note.beamStart
-    except AttributeError:
-        pass
-    try:
-        beamContinue = music21Note.beamContinue
-    except AttributeError:
-        pass
-    
     # opening double slur (before second note, after first note)
     # opening bracket slur
     # closing bracket slur (if also beginning of next long slur)
@@ -357,6 +359,8 @@ def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
     if endLongBracketSlur and beginLongBracketSlur:
         noteTrans.append(symbols['closing_bracket_slur'])
 
+    # Triplet
+    # -------
     if beamStart:
         allTuplets = music21Note.duration.tuplets
         if len(allTuplets) > 0:
@@ -368,92 +372,86 @@ def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
     # -------------
     if not len(music21Note.articulations) == 0:
         # "When a staccato or staccatissimo is shown with any of the other [before note expressions]
-        # it is brailled first.
-        # This is buggy, but since I can't handle after note expressions, let's fly with this for now.
-        if articulations.Staccato() in music21Note.articulations:
-            music21Note.articulations.remove(articulations.Staccato())
-            noteTrans.append(beforeNoteExpr['staccato'])
-            try:
-                music21Note.articulations.remove(articulations.Staccato())
-                noteTrans.append(beforeNoteExpr['staccato'])
-            except ValueError:
-                pass
-        if articulations.Staccatissimo() in music21Note.articulations:
-            music21Note.articulations.remove(articulations.Staccatissimo())
-            noteTrans.append(beforeNoteExpr['staccatissimo'])
-            try:
-                music21Note.articulations.remove(articulations.Staccatissimo())
-                noteTrans.append(beforeNoteExpr['staccatissimo'])
-            except ValueError:
-                pass
+        # it is brailled first."
+        for artc in [articulations.Staccato(), articulations.Staccatissimo()]:                
+            for i in range(music21Note.articulations.count(artc)):
+                noteTrans.append(beforeNoteExpr[artc._mxName])                 
         music21Note.articulations.sort()
-        # "When an accent is shown with a tenuto, the accent is brailled first."
-        if articulations.Accent() in music21Note.articulations and articulations.Tenuto() in music21Note.articulations:
-            music21Note.articulations.remove(articulations.Accent())
-            noteTrans.append(beforeNoteExpr['accent'])
+        for artc in music21Note.articulations:
             try:
-                music21Note.articulations.remove(articulations.Accent())
-                noteTrans.append(beforeNoteExpr['accent'])
-            except ValueError:
-                pass
-        for a in music21Note.articulations:
-            try:
-                noteTrans.append(beforeNoteExpr[a._mxName])
-            except KeyError:
-                pass
-        
+                name = artc._mxName
+                if not name == "staccato" or name == "staccatissimo":
+                    noteTrans.append(beforeNoteExpr[name])
+            except (AttributeError, KeyError):
+                environRules.warn("Articulation {0} of note {1} cannot be transcribed to braille.".format(artc, music21Note))
+
     # accidental
     # ----------
-    if not(music21Note.accidental == None):
-        if not(music21Note.accidental.displayStatus == False):
-            try:
+    try:
+        if music21Note.accidental is not None:
+            if music21Note.accidental.displayStatus is not False:
                 noteTrans.append(accidentals[music21Note.accidental.name])
-            except KeyError:
-                raise BrailleBasicException("Accidental type cannot be translated to braille.")  
-    
+    except KeyError:
+        environRules.warn("Accidental {0} of note {1} cannot be transcribed to braille.".format(music21Note.accidental, music21Note))
+                    
     # octave mark
     # -----------
-    if showOctave:
-        noteTrans.append(octaves[music21Note.octave])
-
-    notesInStep = pitchNameToNotes[music21Note.step]  
     try:
-        # note name with duration
-        # -----------------------
+        if showOctave:
+            noteTrans.append(octaves[music21Note.octave])
+    except KeyError:
+        environRules.warn("Octave {0} of note {1} cannot be transcribed to braille.".format(music21Note.octave, music21Note))
+
+    # note name
+    # ---------
+    try:
+        notesInStep = pitchNameToNotes[music21Note.step]
+    except KeyError:
+        environRules.warn("Name '{0}' of note {1} cannot be transcribed to braille.".format(music21Note.step, music21Note)) 
+        return symbols['basic_exception']
+    
+    # note duration
+    # -------------
+    try:
         if beamContinue:
             nameWithDuration = notesInStep['eighth']
         else:
             nameWithDuration = notesInStep[music21Note.duration.type]
         noteTrans.append(nameWithDuration)
-        # dot(s)
-        # ------
         for dot in range(music21Note.duration.dots):
             noteTrans.append(symbols['dot'])
-        # finger mark
-        # -----------
-        try:
-            noteTrans.append(transcribeNoteFingering(music21Note.fingering, upperFirstInFingering = upperFirstInFingering))
-        except AttributeError:
-            pass
-        # single slur
-        # closing double slur (after second to last note, before last note)
-        # opening double slur
-        # closing bracket slur (unless note also has beginning long slur)
-        # ----------------------------------
-        if shortSlur:
-            noteTrans.append(symbols['opening_single_slur'])
-        if not(endLongBracketSlur and beginLongBracketSlur):
-            if endLongDoubleSlur:
-                noteTrans.append(symbols['closing_double_slur'])
-            elif endLongBracketSlur:
-                noteTrans.append(symbols['closing_bracket_slur'])
-        # tie
-        # ---
-        if not music21Note.tie == None and not music21Note.tie.type == 'stop':
-            noteTrans.append(symbols['tie'])
-        return ''.join(noteTrans)
     except KeyError:
-        raise BrailleBasicException("Note duration '" + music21Note.duration.type + "' cannot be translated to braille.")
+        environRules.warn("Duration {0} of note {1} cannot be transcribed to braille.".format(music21Note.duration, music21Note)) 
+        return symbols['basic_exception']
+
+    # finger mark
+    # -----------
+    try:
+        noteTrans.append(transcribeNoteFingering(music21Note.fingering, upperFirstInFingering))
+    except AttributeError:
+        pass
+    except BrailleBasicException:
+        environRules.warn("Fingering {0} of note {1} cannot be transcribed to braille.".format(music21Note.fingering, music21Note))
+
+    # single slur
+    # closing double slur (after second to last note, before last note)
+    # opening double slur
+    # closing bracket slur (unless note also has beginning long slur)
+    # ----------------------------------
+    if shortSlur:
+        noteTrans.append(symbols['opening_single_slur'])
+    if not(endLongBracketSlur and beginLongBracketSlur):
+        if endLongDoubleSlur:
+            noteTrans.append(symbols['closing_double_slur'])
+        elif endLongBracketSlur:
+            noteTrans.append(symbols['closing_bracket_slur'])
+
+    # tie
+    # ---
+    if not music21Note.tie == None and not music21Note.tie.type == 'stop':
+        noteTrans.append(symbols['tie'])
+
+    return u"".join(noteTrans)
 
 def restToBraille(music21Rest):
     '''
@@ -474,8 +472,7 @@ def restToBraille(music21Rest):
     ⠍
     >>> quarterPlusSixteenth = note.Rest(quarterLength = 1.25)
     >>> print basic.restToBraille(quarterPlusSixteenth)
-    Traceback (most recent call last):
-    BrailleBasicException: Rest duration cannot be translated to braille.
+    ⠜⠦
     '''
     try:
         restTrans = []
@@ -483,11 +480,12 @@ def restToBraille(music21Rest):
         restTrans.append(simpleRest)
         for dot in range(music21Rest.duration.dots):
             restTrans.append(symbols['dot'])
-        return ''.join(restTrans)
+        return u"".join(restTrans)
     except KeyError:
-        raise BrailleBasicException("Rest duration cannot be translated to braille.")
+        environRules.warn("Rest of duration {0} cannot be transcribed to braille.".format(music21Rest.duration)) 
+        return symbols['basic_exception']
 
-def tempoTextToBraille(music21TempoText):
+def tempoTextToBraille(music21TempoText, maxLineLength = 40):
     '''
     Takes in a :class:`~music21.tempo.TempoText` and returns its representation in braille 
     as a string in UTF-8 unicode. The tempo text is returned uncentered, and is split around
@@ -503,44 +501,54 @@ def tempoTextToBraille(music21TempoText):
     >>> print basic.tempoTextToBraille(tempo.TempoText("Andante molto grazioso"))
     ⠠⠁⠝⠙⠁⠝⠞⠑⠀⠍⠕⠇⠞⠕⠀⠛⠗⠁⠵⠊⠕⠎⠕⠲
     '''
-    if music21TempoText == None:
-        raise BrailleBasicException("No tempo text provided!")
+    try:
+        allPhrases = music21TempoText.text.split(",")
+        braillePhrases = []
+        for samplePhrase in allPhrases:
+            allWords = samplePhrase.split()
+            phraseTrans = []
+            for sampleWord in allWords:
+                brailleWord = wordToBraille(sampleWord)
+                if not (len(phraseTrans) + len(brailleWord) + 1 > (maxLineLength - 6)):
+                    phraseTrans.append(brailleWord)
+                    phraseTrans.append(symbols['space'])
+                else:
+                    phraseTrans.append(u"\n")
+                    phraseTrans.append(brailleWord)
+                    phraseTrans.append(symbols['space'])
+            braillePhrases.append(u"".join(phraseTrans[0:-1]))
         
-    allPhrases = music21TempoText.text.split(",")
-    braillePhrases = []
-    for samplePhrase in allPhrases:
-        allWords = samplePhrase.split()
-        phraseTrans = []
-        for sampleWord in allWords:
-            brailleWord = wordToBraille(sampleWord)
-            if not (len(phraseTrans) + len(brailleWord) + 1 > 34):
-                phraseTrans.append(brailleWord)
-                phraseTrans.append(symbols['space'])
-            else:
-                phraseTrans.append(u"\n")
-                phraseTrans.append(brailleWord)
-                phraseTrans.append(symbols['space'])
-        braillePhrases.append(u"".join(phraseTrans[0:-1]))
-    
-    brailleText = []
-    for braillePhrase in braillePhrases:
-        brailleText.append(braillePhrase)
-        brailleText.append(alphabet[","])
-        brailleText.append(u"\n")
-        
-    brailleText = brailleText[0:-2]
-    brailleText.append(alphabet["."]) # literary period
-    return u"".join(brailleText)
+        brailleText = []
+        for braillePhrase in braillePhrases:
+            brailleText.append(braillePhrase)
+            brailleText.append(alphabet[","])
+            brailleText.append(u"\n")
+            
+        brailleText = brailleText[0:-2]
+        brailleText.append(alphabet["."]) # literary period
+        return u"".join(brailleText)
+    except BrailleBasicException as wordException:
+        environRules.warn("Tempo Text {0}: {1}".format(music21TempoText, wordException))
+        return symbols['basic_exception']
 
 def textExpressionToBraille(music21TextExpression, precedeByWordSign = True):    
     '''
-    
-    
-    music21TextExpression = expressions.TextExpression('dim. e rall.')
+    Takes in a :class:`~music21.expressions.TextExpression` and returns its 
+    representation in UTF-8 unicode.
+        
+    >>> from music21.braille import basic
+    >>> from music21 import expressions
+    >>> print basic.textExpressionToBraille(expressions.TextExpression('dim. e rall.'))
+    ⠜⠙⠊⠍⠄⠀⠑⠀⠗⠁⠇⠇⠄⠜
+    >>> print basic.textExpressionToBraille(expressions.TextExpression('dolce'))
+    ⠜⠙⠕⠇⠉⠑
     '''
     try:
         return textExpressions[music21TextExpression.content]
     except KeyError:
+        pass
+    
+    try:
         allExpr = music21TextExpression.content.split()
         textExpressionTrans = []
         if precedeByWordSign:
@@ -553,13 +561,15 @@ def textExpressionToBraille(music21TextExpression, precedeByWordSign = True):
                 textExpressionTrans.append(symbols['space'])
             textExpressionTrans.append(wordToBraille(allExpr[-1], isTextExpression = True))
             textExpressionTrans.append(symbols['word'])
-        return u''.join(textExpressionTrans)
+        return u"".join(textExpressionTrans)
+    except BrailleBasicException as wordException:
+        environRules.warn("Text Expression {0}: {1}".format(music21TextExpression, wordException))
+        return symbols['basic_exception']
 
 def timeSigToBraille(music21TimeSignature):
     '''
     Takes in a :class:`~music21.meter.TimeSignature` and returns its
     representation in braille as a string in UTF-8 unicode.
-    
 
     >>> from music21.braille import basic
     >>> from music21 import meter
@@ -572,18 +582,19 @@ def timeSigToBraille(music21TimeSignature):
     >>> print basic.timeSigToBraille(meter.TimeSignature('c'))
     ⠨⠉
     '''
-    if music21TimeSignature == None:
-        raise BrailleBasicException("No time signature provided!")
-    if len(music21TimeSignature.symbol) != 0:
-        try:
-            return symbols[music21TimeSignature.symbol]
-        except KeyError:
-            pass
-
-    timeSigTrans = []
-    timeSigTrans.append(numberToBraille(music21TimeSignature.numerator))    
-    timeSigTrans.append(beatUnits[music21TimeSignature.denominator])
-    return u''.join(timeSigTrans)
+    try:
+        return symbols[music21TimeSignature.symbol]
+    except (AttributeError, KeyError):
+        pass
+    
+    try:
+        timeSigTrans = []
+        timeSigTrans.append(numberToBraille(music21TimeSignature.numerator))    
+        timeSigTrans.append(beatUnits[music21TimeSignature.denominator])
+        return u"".join(timeSigTrans)
+    except (BrailleBasicException, KeyError):
+        environRules.warn("Time Signature {0} cannot be transcribed to braille.".format(music21TimeSignature)) 
+        return symbols['basic_exception']
 
 #-------------------------------------------------------------------------------
 # Helper methods
@@ -642,7 +653,7 @@ def showOctaveWithNote(previousNote, currentNote):
     >>> basic.showOctaveWithNote(note.Note('C4'), note.Note('A4'))
     True
     '''
-    if previousNote == None:
+    if previousNote is None:
         return True
     i = interval.notesToInterval(previousNote, currentNote)
     isSixthOrGreater = i.generic.undirected >= 6
@@ -735,6 +746,50 @@ def transcribeHeading(music21KeySignature = None, music21TimeSignature = None, m
             return u"\n".join(headingTrans)
 
 def transcribeNoteFingering(sampleNoteFingering = '1', upperFirstInFingering = True):
+    '''
+    Takes in a note fingering, an attribute :attr:`~music21.note.Note.fingering`, and
+    returns its correct transcription to braille. Fingering is not officially supported
+    by music21, but it is described in Chapter 9 of the "Introduction to Braille Music
+    Transcription" manual.
+    
+    >>> from music21.braille import basic
+    >>> print basic.transcribeNoteFingering('4')
+    ⠂
+    
+    A change of fingering:
+    
+    
+    >>> print basic.transcribeNoteFingering('2-1')
+    ⠃⠉⠁
+    
+    A choice of fingering, both on either the top or bottom of the staff:
+    
+    
+    >>> print basic.transcribeNoteFingering('5|4', upperFirstInFingering=True)
+    ⠅⠂
+    >>> print basic.transcribeNoteFingering('5|4', upperFirstInFingering=False)
+    ⠂⠅
+    
+    A choice of fingering, one on top and one below the staff:
+
+    
+    >>> print basic.transcribeNoteFingering('2,1', upperFirstInFingering=True)
+    ⠃⠁
+    >>> print basic.transcribeNoteFingering('2,1', upperFirstInFingering=False)
+    ⠁⠃
+    
+    A choice of fingering, first set missing fingermark:
+    
+    
+    >>> print basic.transcribeNoteFingering('2,x')
+    ⠃⠄
+    
+    A choice of fingering, second set missing fingermark:
+    
+    
+    >>> print basic.transcribeNoteFingering('x,2')
+    ⠠⠃
+    '''
     if len(sampleNoteFingering) == 1:
         return fingerMarks[sampleNoteFingering]
     trans = []
@@ -914,10 +969,12 @@ def brailleUnicodeToSymbols(brailleUnicode, filledSymbol = 'o', emptySymbol = u'
     return u'\n'.join(binaryLines[0:-1])
 
 #-------------------------------------------------------------------------------
-# Translation of words and numbers.
+# Transcription of words and numbers.
 
 def wordToBraille(sampleWord, isTextExpression = False):
     '''
+    Transcribes a word to UTF-8 braille.
+    
     >>> from music21.braille import basic
     >>> print basic.wordToBraille('Andante')
     ⠠⠁⠝⠙⠁⠝⠞⠑
@@ -926,25 +983,34 @@ def wordToBraille(sampleWord, isTextExpression = False):
     '''
     wordTrans = []
     
-    if not isTextExpression:
-        for letter in sampleWord:
-            if letter.isupper():
-                wordTrans.append(symbols['uppercase'] + alphabet[letter.lower()])
-            else:
-                wordTrans.append(alphabet[letter])
-    else:
+    if isTextExpression:
         for letter in sampleWord:
             if letter.isupper():
                 wordTrans.append(alphabet[letter.lower()])
             elif letter == '.':
                 wordTrans.append(symbols['dot'])
             else:
+                try:
+                    wordTrans.append(alphabet[letter])
+                except KeyError:
+                    raise BrailleBasicException("Character '{0}' in Text Expression '{1}' cannot be transcribed to braille.".format(letter, sampleWord))
+        return u"".join(wordTrans)
+    
+    for letter in sampleWord:
+        try:
+            if letter.isupper():
+                wordTrans.append(symbols['uppercase'] + alphabet[letter.lower()])
+            else:
                 wordTrans.append(alphabet[letter])
-        
-    return u''.join(wordTrans)
+        except KeyError:
+            raise BrailleBasicException("Character '{0}' in word '{1}' cannot be transcribed to braille.".format(letter, sampleWord))
+            
+    return u"".join(wordTrans)
 
 def numberToBraille(sampleNumber):
     '''
+    Transcribes a number to UTF-8 braille.
+    
     >>> from music21.braille import basic
     >>> print basic.numberToBraille(12)
     ⠼⠁⠃
@@ -956,10 +1022,11 @@ def numberToBraille(sampleNumber):
     numberTrans = []
     numberTrans.append(symbols['number'])
     for digit in str(sampleNumber):
-        numberTrans.append(numbers[int(digit)])
-    
-    return u''.join(numberTrans)
-
+        try:
+            numberTrans.append(numbers[int(digit)])
+        except ValueError:
+            raise BrailleBasicException("Digit '{0}' in number '{1}' cannot be transcribed to braille.".format(digit, sampleNumber))
+    return u"".join(numberTrans)
 
 #-------------------------------------------------------------------------------
 
