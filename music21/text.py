@@ -346,6 +346,8 @@ class TextBox(base.Music21Object, TextFormat):
         self._page = 1; # page one is deafault
         self._positionDefaultX = 500    
         self._positionDefaultY = 500
+        self._alignVertical = 'center'
+        self._alignHorizontal = 'center'
 
 
     def __repr__(self):
@@ -389,8 +391,6 @@ class TextBox(base.Music21Object, TextFormat):
         1
         ''')
 
-
-
     def _getPositionVertical(self):
         return self._positionDefaultY
     
@@ -408,7 +408,6 @@ class TextBox(base.Music21Object, TextFormat):
         >>> te.positionVertical
         1000
         ''')
-
 
     def _getPositionHorizontal(self):
         return self._positionDefaultX
@@ -429,6 +428,50 @@ class TextBox(base.Music21Object, TextFormat):
         200
 
         ''')
+
+
+    # note: this properties might be moved into the TextFormat object?
+
+    def _getAlignVertical(self):
+        return self._alignVertical
+    
+    def _setAlignVertical(self, value):
+        if value in [None, 'top', 'middle', 'bottom', 'baseline']:
+            self._alignVertical = value
+    
+    alignVertical = property(_getAlignVertical, _setAlignVertical, 
+        doc = '''
+        Get or set the vertical align.
+
+        >>> from music21 import *
+        >>> te = text.TextBox('testing')
+        >>> te.alignVertical = 'top'
+        >>> te.alignVertical
+        'top'
+        ''')
+
+    def _getAlignHorizontal(self):
+        return self._alignHorizontal
+    
+    def _setAlignHorizontal(self, value):
+        if value in [None, 'left', 'right', 'center']:
+            self._alignHorizontal = value
+    
+    alignHorizontal = property(_getAlignHorizontal,     
+        _setAlignHorizontal, 
+        doc = '''
+        Get or set the vertical align.
+
+        >>> from music21 import *
+        >>> te = text.TextBox('testing')
+        >>> te.alignHorizontal = 'right'
+        >>> te.alignHorizontal
+        'right'
+
+        ''')
+
+
+
 
 
 

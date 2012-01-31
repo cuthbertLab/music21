@@ -68,6 +68,31 @@ def configureMxPartGroupFromStaffGroup(staffGroup):
     return mxPartGroup
 
 
+def mxCreditToTextBox(mxCredit):
+    '''Convert a MusicXML credit to a music21 TextBox
+    '''
+    from music21 import text
+    tb = text.TextBox()
+
+    tb.page = mxCredit.get('page')
+
+    content = []
+    for mxCreditWords in mxCredit: # can iterate
+        content.append(mxCreditWords)
+    if len(content) == 0: # no text defined
+        raise TranslateException('no credit words defined for a credit tag')
+    tb.content = '\n'.join(content) # join with \n
+    # take formatting from the first, no matter if multiple are defined
+    tb.positionVertical = mxCredit.componentList[0].get('default-x')
+    tb.positionHorizontal = mxCredit.componentList[0].get('default-y')
+    tb.justify = mxCredit.componentList[0].get('justify')
+    tb.style = mxCredit.componentList[0].get('style')
+    tb.size = mxCredit.componentList[0].get('font-size')
+    tb.alignVertical = mxCredit.componentList[0].get('halign')
+    tb.alignHorizontal = mxCredit.componentList[0].get('valign')
+
+    return tb
+
 def mxTransposeToInterval(mxTranspose):
     '''Convert a MusicXML Transpose object to a music21 Interval object.
 

@@ -903,6 +903,7 @@ class CreditWords(MusicXMLElement):
         self._attr['default-y'] = None
         self._attr['font-size'] = None
         self._attr['justify'] = None
+        self._attr['style'] = None
         self._attr['halign'] = None
         self._attr['valign'] = None
         # character data
