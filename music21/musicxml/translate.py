@@ -70,6 +70,16 @@ def configureMxPartGroupFromStaffGroup(staffGroup):
 
 def mxCreditToTextBox(mxCredit):
     '''Convert a MusicXML credit to a music21 TextBox
+
+    >>> from music21 import *
+    >>> c = musicxml.Credit()
+    >>> c.append(musicxml.CreditWords('testing'))
+    >>> c.set('page', 2)
+    >>> tb = musicxml.translate.mxCreditToTextBox(c)
+    >>> tb.page
+    2
+    >>> tb.content
+    'testing'
     '''
     from music21 import text
     tb = text.TextBox()
