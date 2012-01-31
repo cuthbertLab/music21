@@ -73,12 +73,10 @@ def mxCreditToTextBox(mxCredit):
     '''
     from music21 import text
     tb = text.TextBox()
-
     tb.page = mxCredit.get('page')
-
     content = []
     for mxCreditWords in mxCredit: # can iterate
-        content.append(mxCreditWords)
+        content.append(mxCreditWords.charData)
     if len(content) == 0: # no text defined
         raise TranslateException('no credit words defined for a credit tag')
     tb.content = '\n'.join(content) # join with \n
@@ -88,10 +86,11 @@ def mxCreditToTextBox(mxCredit):
     tb.justify = mxCredit.componentList[0].get('justify')
     tb.style = mxCredit.componentList[0].get('style')
     tb.size = mxCredit.componentList[0].get('font-size')
-    tb.alignVertical = mxCredit.componentList[0].get('halign')
-    tb.alignHorizontal = mxCredit.componentList[0].get('valign')
-
+    tb.alignVertical = mxCredit.componentList[0].get('valign')
+    tb.alignHorizontal = mxCredit.componentList[0].get('halign')
     return tb
+
+
 
 def mxTransposeToInterval(mxTranspose):
     '''Convert a MusicXML Transpose object to a music21 Interval object.
@@ -3382,9 +3381,9 @@ def mxToStream(mxScore, spannerBundle=None, inputM21=None):
     s._insertCore(0, md)
 
     # store credits on Score stream
-    for creditObj in mxScore.creditList:
-        co = text.TextBox() # need to import data 
-        s._insertCore(0, co)
+    for mxCredit in mxScore.creditList:
+        co = mxCreditToTextBox(mxCredit)
+        s._insertCore(0, co) # insert position does not matter
 
     # only insert complete spanners; at each level possible, complete spanners
     # are inserted into either the Score or the Part
@@ -3720,7 +3719,6 @@ spirit</words>
         
         from music21.musicxml import testPrimitive
         from music21 import converter
-        
         # this 2 part segments was importing multiple voices within
         # a measure, even though there was no data in the second voice
         s = converter.parse(testPrimitive.mixedVoices1a)
@@ -3731,8 +3729,6 @@ spirit</words>
         
         #s.parts[0].show('t')
         #self.assertEqual(len(s.parts[0].voices), 2)
-        
-        
         s = converter.parse(testPrimitive.mixedVoices1b)
         self.assertEqual(len(s.parts), 2)
         self.assertEqual(len(s.parts[0].getElementsByClass(
@@ -4484,7 +4480,13 @@ spirit</words>
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.textBoxes01)
-        self.assertEqual(len(s.flat.getElementsByClass('TextBox')), 5)
+        tbs = s.flat.getElementsByClass('TextBox')
+        self.assertEqual(len(tbs), 5)
+
+        msg = []
+        for tb in tbs:
+            msg.append(tb.content)
+        self.assertEqual(msg, [u'This is a text box!', u'pos 200/300 (lower left)', u'pos 1000/300 (lower right)', u'pos 200/1500 (upper left)', u'pos 1000/1500 (upper right)'])
         
 
 

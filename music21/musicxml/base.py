@@ -41,7 +41,7 @@ environLocal = environment.Environment(_MOD)
 # are >= to this value
 # if changes are made here that are not compatible, the m21 version number
 # needs to be increased and this number needs to be set to that value
-VERSION_MINIMUM = (0, 6, 2) 
+VERSION_MINIMUM = (0, 6, 3) 
 
 
 #-------------------------------------------------------------------------------
@@ -904,8 +904,8 @@ class CreditWords(MusicXMLElement):
         self._attr['font-size'] = None
         self._attr['justify'] = None
         self._attr['style'] = None
-        self._attr['halign'] = None
         self._attr['valign'] = None
+        self._attr['halign'] = None
         # character data
         self.charData = charData # main content
     
@@ -913,9 +913,9 @@ class CreditWords(MusicXMLElement):
 #         self.set('default-x', 500)
 #         self.set('default-y', 500)
         self.set('font-size', 12)
-        self.set('justify', 'center')
-        self.set('haligh', 'center')
-        self.set('valign', 'center')
+#         self.set('justify', 'center')
+#         self.set('halign', 'center')
+#         self.set('valign', 'top')
 
 class Encoding(MusicXMLElement):
     def __init__(self):

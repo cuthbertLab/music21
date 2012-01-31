@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''Utility routines for processing text in scores and other musical objects. 
@@ -309,7 +309,9 @@ class TextFormat(object):
 #         # font family not yet being specified
 #         return post
 
-
+#-------------------------------------------------------------------------------
+class TextBoxException(music21.Music21Exception):
+    pass
 
 #-------------------------------------------------------------------------------
 class TextBox(base.Music21Object, TextFormat):
@@ -338,15 +340,12 @@ class TextBox(base.Music21Object, TextFormat):
 
         # the text string to be displayed; not that line breaks
         # are given in the xml with this non-printing character: (#)
-        if not common.isStr(content):
-            self._content = str(content)
-        else:
-            self._content = content    
+        self.content = content   # use property
 
         self._page = 1; # page one is deafault
         self._positionDefaultX = 500    
         self._positionDefaultY = 500
-        self._alignVertical = 'center'
+        self._alignVertical = 'top'
         self._alignHorizontal = 'center'
 
 
@@ -363,7 +362,10 @@ class TextBox(base.Music21Object, TextFormat):
         return self._content
     
     def _setContent(self, value):
-        self._content = str(value)
+        if not common.isStr(value):
+            self._content = str(value)
+        else:
+            self._content = value    
     
     content = property(_getContent, _setContent, 
         doc = '''Get or set the the content.
@@ -378,7 +380,9 @@ class TextBox(base.Music21Object, TextFormat):
         return self._page
     
     def _setPage(self, value):
-        self._page = int(value) # must be an integer
+        if value != None:
+            self._page = int(value) # must be an integer
+        # do not set otherwise
     
     page = property(_getPage, _setPage, 
         doc = '''Get or set the the page number. The first page (page 1) is the default. 
@@ -437,7 +441,9 @@ class TextBox(base.Music21Object, TextFormat):
     
     def _setAlignVertical(self, value):
         if value in [None, 'top', 'middle', 'bottom', 'baseline']:
-            self._alignVertical = value
+            self._alignVertical = value 
+        else:
+            raise TextBoxException('invalid vertical align: %s' % value)
     
     alignVertical = property(_getAlignVertical, _setAlignVertical, 
         doc = '''
@@ -456,6 +462,8 @@ class TextBox(base.Music21Object, TextFormat):
     def _setAlignHorizontal(self, value):
         if value in [None, 'left', 'right', 'center']:
             self._alignHorizontal = value
+        else:
+            raise TextBoxException('invalid horizontal align: %s' % value)
     
     alignHorizontal = property(_getAlignHorizontal,     
         _setAlignHorizontal, 

@@ -1332,11 +1332,11 @@ class Test(unittest.TestCase):
         self.assertEqual(type(clefs[0]).__name__, 'Treble8vbClef')
 
         # third part
-        clefs = a[2].flat.getElementsByClass(clef.Clef)
+        clefs = a.parts[2].flat.getElementsByClass(clef.Clef)
         self.assertEqual(len(clefs), 1)
 
         # check time signature count
-        ts = a[1].flat.getElementsByClass(meter.TimeSignature)
+        ts = a.parts[1].flat.getElementsByClass(meter.TimeSignature)
         self.assertEqual(len(ts), 4)
 
         from music21 import corpus
