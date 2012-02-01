@@ -90,10 +90,11 @@ def textBoxToMxCredit(textBox):
     for l in textBox.content.split('\n'):
         cw = musicxmlMod.CreditWords(l)
         if count == 0: # on first, configure properties         
-            cw.set('default-x', textBox.positionVertical)
-            cw.set('default-y', textBox.positionHorizontal)
+            cw.set('default-x', textBox.positionHorizontal)
+            cw.set('default-y', textBox.positionVertical)
             cw.set('justify', textBox.justify)
-            cw.set('style', textBox.style)
+            cw.set('font-style', textBox.style)
+            cw.set('font-weight', textBox.weight)
             cw.set('font-size', textBox.size)
             cw.set('valign', textBox.alignVertical)
             cw.set('halign', textBox.alignHorizontal)
@@ -127,7 +128,8 @@ def mxCreditToTextBox(mxCredit):
     tb.positionVertical = mxCredit.componentList[0].get('default-x')
     tb.positionHorizontal = mxCredit.componentList[0].get('default-y')
     tb.justify = mxCredit.componentList[0].get('justify')
-    tb.style = mxCredit.componentList[0].get('style')
+    tb.style = mxCredit.componentList[0].get('font-style')
+    tb.weight = mxCredit.componentList[0].get('font-weight')
     tb.size = mxCredit.componentList[0].get('font-size')
     tb.alignVertical = mxCredit.componentList[0].get('valign')
     tb.alignHorizontal = mxCredit.componentList[0].get('halign')
@@ -3022,6 +3024,9 @@ def streamToMx(s, spannerBundle=None):
         meterStream = s.flat.getTimeSignatures(searchContext=False,
                     sortByCreationTime=True, returnDefault=True) 
 
+    # get all text boxes
+    textBoxes = s.flat.getElementsByClass('TextBox') 
+
     # we need independent sub-stream elements to shift in presentation
     highestTime = 0
 
@@ -3106,6 +3111,10 @@ def streamToMx(s, spannerBundle=None):
         mxScore = s.metadata.mx # returns an mx score
     else:
         mxScore = musicxmlMod.Score()
+
+    # add text boxes
+    for tb in textBoxes: # a stream of text boxes
+        mxScore.creditList.append(textBoxToMxCredit(tb))
 
     mxScoreDefault = musicxmlMod.Score()
     mxScoreDefault.setDefaults()
@@ -4518,7 +4527,6 @@ spirit</words>
 
 
     def testTextBoxA(self):
-
         from music21 import converter, stream
         from music21.musicxml import testPrimitive
 
@@ -4531,7 +4539,43 @@ spirit</words>
             msg.append(tb.content)
         self.assertEqual(msg, [u'This is a text box!', u'pos 200/300 (lower left)', u'pos 1000/300 (lower right)', u'pos 200/1500 (upper left)', u'pos 1000/1500 (upper right)'])
         
-
+    def testTextBoxB(self):
+        from music21 import converter, stream, text
+        y = 1000
+        s = stream.Stream()
+        
+        tb3 = text.TextBox('c', 200, y)
+        tb3.size = 40
+        tb3.alignVertical = 'bottom'
+        s.append(tb3)
+        
+        tb2 = text.TextBox('B', 300, y)
+        tb2.size = 60
+        tb2.alignVertical = 'bottom'
+        s.append(tb2)
+        
+        tb2 = text.TextBox('!*&', 500, y)
+        tb2.size = 100
+        tb2.alignVertical = 'bottom'
+        s.append(tb2)
+        
+        tb1 = text.TextBox('slowly', 700, y)
+        tb1.alignVertical = 'bottom'
+        tb1.size = 20
+        tb1.style = 'italic'
+        s.append(tb1)
+        
+        
+        tb1 = text.TextBox('A', 850, y)
+        tb1.alignVertical = 'bottom'
+        tb1.size = 80
+        tb1.weight = 'bold'
+        tb1.style = 'italic'
+        s.append(tb1)
+        
+        raw = s.musicxml
+        self.assertEqual(raw.count('</credit>'), 5)
+        self.assertEqual(raw.count('font-size'), 5)
 
 
 if __name__ == "__main__":

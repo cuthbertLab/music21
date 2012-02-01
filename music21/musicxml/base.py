@@ -649,11 +649,11 @@ class Score(MusicXMLElementList):
 
     def _getComponents(self):
         c = []
-        c = c + self.creditList
         c.append(self.workObj)
         c.append(('movement-number', self.movementNumber))
         c.append(('movement-title', self.movementTitle))
         c.append(self.identificationObj)
+        c = c + self.creditList
         c.append(self.partListObj)
         c = c + self.componentList
         return c
@@ -902,8 +902,9 @@ class CreditWords(MusicXMLElement):
         self._attr['default-x'] = None
         self._attr['default-y'] = None
         self._attr['font-size'] = None
+        self._attr['font-weight'] = None
         self._attr['justify'] = None
-        self._attr['style'] = None
+        self._attr['font-style'] = None
         self._attr['valign'] = None
         self._attr['halign'] = None
         # character data

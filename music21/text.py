@@ -182,6 +182,7 @@ class TextFormat(object):
         # these could all be in a text s
         self._justify = None
         self._style = None
+        self._weight = None
         self._size = None
         self._letterSpacing = None
 
@@ -227,6 +228,27 @@ class TextFormat(object):
         >>> tf = TextFormat()
         >>> tf.style = 'bold'
         >>> tf.style
+        'bold'
+        ''')
+
+    def _getWeight(self):
+        return self._weight    
+    
+    def _setWeight(self, value):
+        if value is None:
+            self._weight = None
+        else:
+            if value.lower() not in ['normal', 'bold']:
+                raise TextFormatException('Not a supported justification: %s' % value)
+            self._weight = value.lower()
+
+    weight = property(_getWeight, _setWeight, 
+        doc = '''Get or set the weight, as normal, or bold.
+
+        >>> from music21 import *
+        >>> tf = TextFormat()
+        >>> tf.weight = 'bold'
+        >>> tf.weight
         'bold'
         ''')
 
@@ -333,7 +355,7 @@ class TextBox(base.Music21Object, TextFormat):
     '''
     classSortOrder = -11 # text expressions are -10
 
-    def __init__(self, content=None):
+    def __init__(self, content=None, x=500, y=500):
         base.Music21Object.__init__(self)
         # numerous properties are inherited from TextFormat
         TextFormat.__init__(self)
@@ -343,8 +365,8 @@ class TextBox(base.Music21Object, TextFormat):
         self.content = content   # use property
 
         self._page = 1; # page one is deafault
-        self._positionDefaultX = 500    
-        self._positionDefaultY = 500
+        self._positionDefaultX = x    
+        self._positionDefaultY = y
         self._alignVertical = 'top'
         self._alignHorizontal = 'center'
 
@@ -447,7 +469,7 @@ class TextBox(base.Music21Object, TextFormat):
     
     alignVertical = property(_getAlignVertical, _setAlignVertical, 
         doc = '''
-        Get or set the vertical align.
+        Get or set the vertical align. Valid values are top, middle, bottom, and baseline
 
         >>> from music21 import *
         >>> te = text.TextBox('testing')
@@ -468,7 +490,7 @@ class TextBox(base.Music21Object, TextFormat):
     alignHorizontal = property(_getAlignHorizontal,     
         _setAlignHorizontal, 
         doc = '''
-        Get or set the vertical align.
+        Get or set the horicontal align.
 
         >>> from music21 import *
         >>> te = text.TextBox('testing')
