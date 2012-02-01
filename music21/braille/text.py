@@ -233,7 +233,7 @@ class BrailleKeyboard(BrailleText):
                 self.leftHand.textLocation = self.rightHand.textLocation
             else:
                 self.rightHand.textLocation = self.leftHand.textLocation
-        else:
+        else:   
             self.makeNewLines()
             self.rightHand.insert(self.highestMeasureNumberLength - len(measureNumber), measureNumber)
             self.leftHand.textLocation = self.rightHand.textLocation
@@ -247,6 +247,10 @@ class BrailleKeyboard(BrailleText):
                     self.leftHand.append(symbols['dot'], addSpace = False)
             self.leftHand.append(noteGroupingL, addSpace = False)
             self.rightHand.append(noteGroupingR, addSpace = False)
+            if self.rightHand.textLocation > self.leftHand.textLocation:
+                self.leftHand.textLocation = self.rightHand.textLocation
+            else:
+                self.rightHand.textLocation = self.leftHand.textLocation
         self.rightHand.containsNoteGrouping = True
         self.leftHand.containsNoteGrouping = True
     
