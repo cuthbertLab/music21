@@ -68,6 +68,39 @@ def configureMxPartGroupFromStaffGroup(staffGroup):
     return mxPartGroup
 
 
+def textBoxToMxCredit(textBox):
+    '''Convert a music21 TextBox to a MusicXML Credit. 
+
+    >>> from music21 import *
+    >>> tb = text.TextBox('testing')
+    >>> tb.positionVertical = 500
+    >>> tb.positionHorizontal = 500
+    >>> tb.page = 3
+    >>> mxCredit = musicxml.translate.textBoxToMxCredit(tb)
+    >>> print mxCredit
+    <credit page=3 <credit-words halign=center default-y=500 default-x=500 valign=top charData=testing>>
+
+    '''
+    # use line carriages to separate messages
+    mxCredit = musicxmlMod.Credit()
+    # add all credit words to components
+    count = 0
+
+    mxCredit.set('page', textBox.page)
+    for l in textBox.content.split('\n'):
+        cw = musicxmlMod.CreditWords(l)
+        if count == 0: # on first, configure properties         
+            cw.set('default-x', textBox.positionVertical)
+            cw.set('default-y', textBox.positionHorizontal)
+            cw.set('justify', textBox.justify)
+            cw.set('style', textBox.style)
+            cw.set('font-size', textBox.size)
+            cw.set('valign', textBox.alignVertical)
+            cw.set('halign', textBox.alignHorizontal)
+        mxCredit.append(cw)
+        count += 1
+    return mxCredit
+
 def mxCreditToTextBox(mxCredit):
     '''Convert a MusicXML credit to a music21 TextBox
 
