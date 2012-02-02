@@ -4578,6 +4578,7 @@ spirit</words>
         self.assertEqual(raw.count('font-size'), 5)
 
 
+
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     music21.mainTest(Test)

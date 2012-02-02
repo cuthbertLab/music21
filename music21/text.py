@@ -337,21 +337,47 @@ class TextBoxException(music21.Music21Exception):
 
 #-------------------------------------------------------------------------------
 class TextBox(base.Music21Object, TextFormat):
-    '''A TextBox is arbitrary text that might be positioned anywhere on a page, independent of notes or staffs. A page attribute specifies what page this text is found on; positionVertical and positionHorizontal position the text from the bottom left corner.
+    '''A TextBox is arbitrary text that might be positioned anywhere on a page, independent of notes or staffs. A page attribute specifies what page this text is found on; positionVertical and positionHorizontal position the text from the bottom left corner in units of tenths.
 
-    This object is similar to the TextExpression object, but does not as many position parameters, enclosure attributes, and the ability to convert to RepeatExpressions and TempoTexts. 
+    This object is similar to the TextExpression object, but does not have as many position parameters, enclosure attributes, and the ability to convert to RepeatExpressions and TempoTexts. 
 
-    >>> from music21 import text
-    >>> tb = text.TextBox('testing')
-    >>> tb.content
-    'testing'
-    >>> tb.positionVertical = 300
-    >>> tb.positionHorizontal = 300
-    >>> tb.positionVertical, tb.positionHorizontal
-    (300, 300)
-    >>> tb.justify = 'center'
-    >>> tb.justify
-    'center'
+    >>> from music21 import text, stream
+    >>> y = 1000 # set a fixed vertical distance
+    >>> s = stream.Stream()
+        
+    >>> # specify character, x position, y position
+    >>> tb = text.TextBox('m', 250, y)
+    >>> tb.size = 40
+    >>> tb.alignVertical = 'bottom'
+    >>> s.append(tb)
+        
+    >>> tb = text.TextBox('u', 300, y)
+    >>> tb.size = 60
+    >>> tb.alignVertical = 'bottom'
+    >>> s.append(tb)
+        
+    >>> tb = text.TextBox('s', 550, y)
+    >>> tb.size = 120
+    >>> tb.alignVertical = 'bottom'
+    >>> s.append(tb)
+        
+    >>> tb = text.TextBox('ic', 700, y)
+    >>> tb.alignVertical = 'bottom'
+    >>> tb.size = 20
+    >>> tb.style = 'italic'
+    >>> s.append(tb)
+        
+    >>> tb = text.TextBox('21', 850, y)
+    >>> tb.alignVertical = 'bottom'
+    >>> tb.size = 80
+    >>> tb.weight = 'bold'
+    >>> tb.style = 'italic'
+    >>> s.append(tb)
+    >>> #_DOCS_SHOW s.show()
+
+    .. image:: images/textBoxes-01.*
+        :width: 600
+
     '''
     classSortOrder = -11 # text expressions are -10
 
@@ -396,6 +422,10 @@ class TextBox(base.Music21Object, TextFormat):
         >>> te = text.TextBox('testing')
         >>> te.content
         'testing'
+        >>> te.justify = 'center'
+        >>> te.justify
+        'center'
+
         ''')
 
     def _getPage(self):
