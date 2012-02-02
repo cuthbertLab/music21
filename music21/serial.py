@@ -626,20 +626,41 @@ class Test(unittest.TestCase):
         s37 = RowSchoenbergOp37().matrix()
         self.assertEqual([e.name for e in s37[0]], ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-', 'F#', 'F', 'E', 'A'])
 
+
+    def testLabelingA(self):
+
+        from music21 import corpus, stream, pitch
+        series = {'a':1, 'g-':2, 'g':3, 'a-':4, 
+                  'f':5, 'e-':6, 'e':7, 'd':8, 
+                  'c':9, 'c#':10, 'b-':11, 'b':12}
+        s = corpus.parse('bwv66.6')
+        for n in s.flat.notes:
+            for key in series.keys():
+                if n.pitch.pitchClass == pitch.Pitch(key).pitchClass:
+                    n.addLyric(series[key])
+        match = []
+        for n in s.parts[0].flat.notes:
+            match.append(n.lyric)
+        self.assertEqual(match, ['10', '12', '1', '12', '10', '7', '10', '12', '1', '10', '1', '12', '4', '2', '1', '12', '12', '2', '7', '1', '12', '10', '10', '1', '12', '10', '1', '4', '2', '4', '2', '2', '2', '2', '2', '5', '2'])
+        #s.show()
+
+                
         
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [ToneRow, TwelveToneRow, TwelveToneMatrix]
 
 if __name__ == "__main__":
-    import sys
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
+    music21.mainTest(Test)
 
-    elif len(sys.argv) > 1:
-        t = Test()
-
-        t.testMatrix()
+#     import sys
+#     if len(sys.argv) == 1: # normal conditions
+#         music21.mainTest(Test)
+# 
+#     elif len(sys.argv) > 1:
+#         t = Test()
+# 
+#         t.testMatrix()
 
 #------------------------------------------------------------------------------
 # eof
