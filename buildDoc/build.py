@@ -118,6 +118,7 @@ from music21 import spanner
 from music21 import stream
 
 from music21 import tempo
+from music21 import text
 from music21 import tinyNotation
 
 from music21 import voiceLeading
@@ -242,6 +243,7 @@ MODULES = [
     stream,     
   
     tempo,     
+    text,
     tinyNotation,
     # trecento
     #    trecentoCadencebook
@@ -764,7 +766,15 @@ class PartitionedClass(PartitionedName):
         # the object object returns by default 
         # x.__init__(...) initializes x; see x.__class__.__doc__ for signature
         # this should be returned as Documentation
-        if match == None or match.startswith('x.__init__(...) initializes x'):
+        ifInitializes = False
+        if not match is None:
+            try:
+                ifInitializes = match.startswith('x.__init__(...) initializes x')
+            except UnicodeDecodeError: # this happens with some docs
+                environLocal.pd(['cannot decode doc string, getting UnicodeDecodeError', partName])
+                return NO_DOC
+
+        if match is None or ifInitializes:
             return NO_DOC
         # default for a dictionary
         elif match.startswith('dict() -> new empty dictionary'):

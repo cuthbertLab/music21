@@ -58,6 +58,7 @@ Module Reference
    moduleArticulations
    moduleBase
    moduleBeam
+   moduleBrailleBasic
    moduleBrailleTranslate
    moduleClef
    moduleCommon
@@ -115,6 +116,7 @@ Module Reference
    moduleSpanner
    moduleStream
    moduleTempo
+   moduleText
    moduleTinyNotation
    moduleTrecentoPolyphonicSnippet
    moduleVoiceLeading

@@ -75,9 +75,7 @@ def figuredBassFromStream(streamPart):
     a realized version of the same line.
     
     
-    .. note:: This example corresponds to example 1b in "fbREALIZER: AUTOMATIC FIGURED BASS REALIZATION FOR 
-         MUSIC INFORMATION RETRIEVAL IN music21," which was submitted for consideration for the 12th International 
-         Society for Music Information Retrieval Conference (`ISMIR 2011 <http://ismir2011.ismir.net/>`_).
+    .. note:: This example corresponds to example 1b in "fbREALIZER: AUTOMATIC FIGURED BASS REALIZATION FOR MUSIC INFORMATION RETRIEVAL IN music21," which was submitted for consideration for the 12th International Society for Music Information Retrieval Conference (`ISMIR 2011 <http://ismir2011.ismir.net/>`_).
         
     >>> from music21 import tinyNotation
     >>> from music21.figuredBass import realizer

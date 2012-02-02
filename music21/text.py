@@ -344,29 +344,24 @@ class TextBox(base.Music21Object, TextFormat):
     >>> from music21 import text, stream
     >>> y = 1000 # set a fixed vertical distance
     >>> s = stream.Stream()
-        
     >>> # specify character, x position, y position
     >>> tb = text.TextBox('m', 250, y)
     >>> tb.size = 40
     >>> tb.alignVertical = 'bottom'
     >>> s.append(tb)
-        
     >>> tb = text.TextBox('u', 300, y)
     >>> tb.size = 60
     >>> tb.alignVertical = 'bottom'
     >>> s.append(tb)
-        
     >>> tb = text.TextBox('s', 550, y)
     >>> tb.size = 120
     >>> tb.alignVertical = 'bottom'
-    >>> s.append(tb)
-        
+    >>> s.append(tb)        
     >>> tb = text.TextBox('ic', 700, y)
     >>> tb.alignVertical = 'bottom'
     >>> tb.size = 20
     >>> tb.style = 'italic'
     >>> s.append(tb)
-        
     >>> tb = text.TextBox('21', 850, y)
     >>> tb.alignVertical = 'bottom'
     >>> tb.size = 80
