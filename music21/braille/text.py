@@ -49,10 +49,13 @@ class BrailleText():
         elif 'noteGrouping' in elementKeywords:
             noteGrouping = elementKeywords['noteGrouping']
             showLeadingOctave = elementKeywords['showLeadingOctave']
-            forceHyphen = True
+            forceHyphen = False
             if 'forceHyphen' in elementKeywords:
                 forceHyphen = elementKeywords['forceHyphen']
             self.addNoteGrouping(noteGrouping, showLeadingOctave, withHyphen, forceHyphen)
+        elif 'inaccord' in elementKeywords:
+            inaccord = elementKeywords['inaccord']
+            self.addInaccord(inaccord)
         elif 'longExpression' in elementKeywords:
             longExpression = elementKeywords['longExpression']
             self.addLongExpression(longExpression, withHyphen)
@@ -81,6 +84,39 @@ class BrailleText():
                 self.makeNewLine()
                 self.currentLine.insert(2, brailleExpr)
         return
+    
+    def addInaccord(self, inaccord):
+        addSpace = True
+        if not self.currentLine.containsNoteGrouping:
+            if self.rightHandSymbol or self.leftHandSymbol:
+                if self.currentLine.textLocation == 0:
+                    addSpace = False
+                if self.rightHandSymbol:
+                    self.currentLine.append(symbols['rh_keyboard'], addSpace = addSpace)
+                elif self.leftHandSymbol:
+                    self.currentLine.append(symbols['lh_keyboard'], addSpace = addSpace)
+                for dots in binary_dots[inaccord[0]]:
+                    if (dots == '10' or dots == '11'):
+                        self.currentLine.append(symbols['dot'], addSpace = False)
+                addSpace = False
+        try:
+            if self.currentLine.textLocation == 0:
+                addSpace = False
+            self.currentLine.append(inaccord, addSpace = addSpace)
+        except BrailleTextException as bte:
+            self.makeNewLine()
+            if self.rightHandSymbol or self.leftHandSymbol:
+                if self.rightHandSymbol:
+                    self.currentLine.insert(2, symbols['rh_keyboard'])
+                elif self.leftHandSymbol:
+                    self.currentLine.insert(2, symbols['lh_keyboard'])
+                for dots in binary_dots[inaccord[0]]:
+                    if (dots == '10' or dots == '11'):
+                        self.currentLine.append(symbols['dot'], addSpace = False)
+                self.currentLine.append(inaccord, addSpace = False)
+            else:
+                self.currentLine.insert(2, inaccord)
+        self.currentLine.containsNoteGrouping = True
     
     def addMeasureNumber(self, measureNumber, withHyphen = False):
         if withHyphen:
@@ -168,9 +204,10 @@ class BrailleText():
             for j in range(indexStart, indexFinal):
                 lineToCenter = str(self.allLines[j])
                 lineToCenter = lineToCenter.strip(symbols['space'])
-                lineToCenter = lineToCenter.center(maxLineLength, symbols['space'])
-                self.allLines[j].insert(0, lineToCenter)
-                self.allLines[j].textLocation = maxLineLength
+                if maxLineLength > len(lineToCenter):
+                    lineToCenter = lineToCenter.center(maxLineLength, symbols['space'])
+                    self.allLines[j].insert(0, lineToCenter)
+                    self.allLines[j].textLocation = maxLineLength
     
     def __str__(self):
         self.recenterHeadings()
