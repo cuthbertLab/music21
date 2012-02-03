@@ -12,14 +12,16 @@
 
 import music21
 
+from music21 import common
 from music21 import converter
 from music21 import corpus
 from music21 import interval
 from music21 import voiceLeading
 from music21 import roman
 from music21 import chord
-
+from music21 import key
 import unittest
+
 
 class TheoryAnalyzer(object):
     '''
@@ -33,25 +35,105 @@ class TheoryAnalyzer(object):
     >>> from music21 import *
     >>> p = corpus.parse('bwv66.6')
     >>> ta = TheoryAnalyzer(p)
-    >>> ta.key
-    <music21.key.Key of F# minor>
     '''
     
-    def __init__(self, theoryScore):
+    def __init__(self, theoryScore, keyMeasureMap={}):
         self._theoryScore = theoryScore
         self._vlqCache = {} #Voice Leading Quartet
         self._tnlsCache = {} #Three Note Linear Segment
         self._tbtlsCache = {} #Two By Three Linear Segment Cache
-        
-        self.key = self._theoryScore.analyze('key')
         
         self.verticalSlices = self.getVerticalSlices()
         self.verticalSliceTriplets = self.getVerticalSliceTriplets()
 
         self.resultDict = {} #dictionary storing the results of any identification method queries
        
-    # Vertical Slices
+        self.keyMeasureMap = keyMeasureMap
+        
+    def _getkeyMeasureMap(self):
+        return self._keyMeasureMap
+
+    def _setkeyMeasureMap(self, keyMeasureMap):
+        if isinstance(keyMeasureMap, dict):
+            for measureNumber in keyMeasureMap.iterkeys():
+                if not common.isNum(measureNumber):
+                    raise TheoryAnalyzerException('got a measure number that is not an integer: %s', measureNumber)
+            for keyValue in keyMeasureMap.itervalues():
+                if common.isStr(keyValue):
+                    try:
+                        key.Key(key.convertKeyStringToMusic21KeyString(keyValue))
+                    except: 
+                        raise TheoryAnalyzerException('got a key signature string that is not supported: %s', keyValue)                               
+                else:
+                    try:
+                        keyValue.isClassOrSubclass('Key')
+                    except:   
+                        raise TheoryAnalyzerException('got a key signature that is not a string or music21 key signature object: %s', keyValue)
+            self._keyMeasureMap = keyMeasureMap
+        else:
+            raise TheoryAnalyzerException('keyMeasureMap must be a dictionary, not : %s', keyMeasureMap)
+        
+
+    keyMeasureMap = property(_getkeyMeasureMap, _setkeyMeasureMap, doc = '''
+        specify the key of the theoryScore by measure in a dictionary correlating measure number to key, such as
+        {1:'C', 2:'D', 3:'B-',5:'g'}. optionally pass in the music21 key object or the key string. 
+        Check the music xml to verify measure numbers; pickup measures are usually 0.
     
+        >>> from music21 import *
+        >>> from music21.demos import theoryAnalyzer
+        >>> s = stream.Score()
+        >>> ta = TheoryAnalyzer(s)
+
+        >>> ta.keyMeasureMap = {'1':'C'}
+        Traceback (most recent call last):
+        TheoryAnalyzerException: ('got a measure number that is not an integer: %s', '1')
+        >>> ta.keyMeasureMap = {1:'a key'}
+        Traceback (most recent call last):
+        TheoryAnalyzerException: ('got a key signature string that is not supported: %s', 'a key')
+        >>> ta.keyMeasureMap = {1:'C'}
+
+        ''')     
+        
+    def keyAtMeasure(self, measureNumber):
+        '''
+        uses keyMeasureMap to return music21 key object. If keyMeasureMap not specified,
+        returns key analysis of theory score as a whole. 
+        
+        >>> from music21 import *
+        >>> from music21.demos import theoryAnalyzer
+        >>> s = stream.Score()
+        >>> ta = TheoryAnalyzer(s)
+        >>> ta.keyMeasureMap = {1:'C', 2:'G', 4:'a', 7:'C'}
+        >>> ta.keyAtMeasure(3)
+        <music21.key.Key of G major>
+        >>> ta.keyAtMeasure(7)
+        <music21.key.Key of C major>
+        
+        OMIT_FROM_DOCS
+        
+        >>> ta.keyMeasureMap = {1:'G', 7:'D', 9:'F'}
+        >>> ta.keyAtMeasure(8)
+        <music21.key.Key of D major>
+        >>> ta.keyAtMeasure(10)
+        <music21.key.Key of F major>
+        
+        '''
+        
+        if self.keyMeasureMap:
+            for dictKey in sorted(self.keyMeasureMap.iterkeys(), reverse=True):
+                if measureNumber >= dictKey:                             
+                    if common.isStr(self.keyMeasureMap[dictKey]):
+                        return key.Key(key.convertKeyStringToMusic21KeyString(self.keyMeasureMap[dictKey]))
+                    else:
+                        return self.keyMeasureMap[dictKey]
+            if measureNumber == 0: #just in case of a pickup measure
+                if 1 in self.keyMeasureMap.keys():
+                    return key.Key(key.convertKeyStringToMusic21KeyString(self.keyMeasureMap[1]))
+            else:
+                return self._theoryScore.analyze('key')
+        else:
+            return self._theoryScore.analyze('key')
+        
     def getVerticalSlices(self):
         '''
         returns a list of a list of the :class:`~music21.voiceLeading.VerticalSlice` objects in)
@@ -127,8 +209,8 @@ class TheoryAnalyzer(object):
         hInvList = []
         for verticalSlice in self.verticalSlices:
             
-            nUpper = verticalSlice.getNote(partNum1)
-            nLower = verticalSlice.getNote(partNum2)
+            nUpper = verticalSlice.noteFromPart(partNum1)
+            nLower = verticalSlice.noteFromPart(partNum2)
             
             if nLower is None or nUpper is None:
                 hIntv = None
@@ -224,13 +306,13 @@ class TheoryAnalyzer(object):
         for (i, verticalSlice) in enumerate(self.verticalSlices[:-1]):
             nextVerticalSlice = self.verticalSlices[i + 1]
             
-            v1n1 = verticalSlice.getNote(partNum1)
-            v1n2 = nextVerticalSlice.getNote(partNum1)
+            v1n1 = verticalSlice.noteFromPart(partNum1)
+            v1n2 = nextVerticalSlice.noteFromPart(partNum1)
             
-            v2n1 = verticalSlice.getNote(partNum2)
-            v2n2 = nextVerticalSlice.getNote(partNum2)
+            v2n1 = verticalSlice.noteFromPart(partNum2)
+            v2n2 = nextVerticalSlice.noteFromPart(partNum2)
             
-            vlq = voiceLeading.VoiceLeadingQuartet(v1n1,v1n2,v2n1,v2n2, key=self.key)
+            vlq = voiceLeading.VoiceLeadingQuartet(v1n1,v1n2,v2n1,v2n2, key=self.keyAtMeasure(v1n1.measureNumber))
             vlqList.append(vlq)
             
             self._vlqCache[vlqCacheKey] = vlqList
@@ -293,7 +375,7 @@ class TheoryAnalyzer(object):
         for i in range(0, len(self.verticalSlices)-lengthLinearSegment+1):
             notes = []
             for n in range(0,lengthLinearSegment):
-                notes.append(self.verticalSlices[i+n].getNote(partNum))           
+                notes.append(self.verticalSlices[i+n].noteFromPart(partNum))           
             
             if lengthLinearSegment == 3:
                 tnls = voiceLeading.ThreeNoteLinearSegment()
@@ -429,7 +511,9 @@ class TheoryAnalyzer(object):
                         tr.color(color)
                     self.resultDict[dictKey].append(tr)
                     
-    def _identifyBasedOnHarmonicInterval(self, partNum1, partNum2, color, dictKey, testFunction, textFunction):
+    def _identifyBasedOnHarmonicInterval(self, partNum1, partNum2, color, dictKey, testFunction, textFunction, valueFunction=None):
+        if valueFunction == None:
+            valueFunction = testFunction
         if dictKey not in self.resultDict.keys():
             self.resultDict[dictKey] = []
         
@@ -442,7 +526,7 @@ class TheoryAnalyzer(object):
             for hIntv in hIntvList:
                 if testFunction(hIntv) is not False: # True or value
                     tr = IntervalTheoryResult(hIntv)
-                    tr.value = testFunction(hIntv)
+                    tr.value = valueFunction(hIntv)
                     tr.text = textFunction(hIntv, partNum1, partNum2)
                     if color is not None:
                         tr.color(color)
@@ -486,15 +570,16 @@ class TheoryAnalyzer(object):
                         tr.color(color)
                     self.resultDict[dictKey].append(tr)
                        
-    def _identifyBasedOnVerticalSlice(self, color, dictKey, testFunction, textFunction):
+    def _identifyBasedOnVerticalSlice(self, color, dictKey, testFunction, textFunction, responseOffsetMap=[]):
         if dictKey not in self.resultDict.keys():
             self.resultDict[dictKey] = []             
-
         for vs in self.verticalSlices:
+            if responseOffsetMap and vs.offset(leftAlign=True) not in responseOffsetMap:
+                continue
             if testFunction(vs) is not False:
                 tr = VerticalSliceTheoryResult(vs)
                 tr.value = testFunction(vs)
-                tr.text = textFunction(vs)
+                tr.text = textFunction(vs, testFunction(vs))
                 if color is not None: 
                     tr.color(color)
                 self.resultDict[dictKey].append(tr)
@@ -728,7 +813,6 @@ class TheoryAnalyzer(object):
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
         '''
         testFunction = lambda hIntv: hIntv is not None and not hIntv.isConsonant()
-        
         textFunction = lambda hIntv, pn1, pn2: "Dissonant harmonic interval in measure " + str(hIntv.noteStart.measureNumber) +": " \
                      + str(hIntv.niceName) + " from " + str(hIntv.noteStart.name) + " to " + str(hIntv.noteEnd.name) \
                      + " between part " + str(pn1 + 1) + " and part " + str(pn2 + 1)
@@ -759,17 +843,112 @@ class TheoryAnalyzer(object):
                      + str(mIntv.niceName) + " from " + str(mIntv.noteStart.name) + " to " + str(mIntv.noteEnd.name)
         self._identifyBasedOnMelodicInterval(partNum, color, dictKey, testFunction, textFunction)                
     
-    def identifyRomanNumerals(self, color = None, dictKey = 'romanNumerals'):
+    def identifyTonicAndDominantRomanNumerals(self, color = None, dictKey = 'romanNumerals', responseOffsetMap = []):
+        '''
+        Identifies the roman numerals in the piece by iterating throgh the vertical slices and figuring
+        out which roman numeral best corresponds to that vertical slice. Optionally specify the responseOffsetMap
+        which limits the resultObjects returned to only those with verticalSlice's.offset(leftAlign=True) included
+        in the list. For example, if only roman numerals were to be written for the vertical slice at offset 0, 6, and 7
+        in the piece, pass responseOffsetMap = [0,6,7]
+        '''
         def testFunction(vs):
-            noteList = vs.getNoteList()
+            noteList = vs.noteList
             if not None in noteList:
-                c = chord.Chord(noteList)
-                rn = roman.fromChordAndKey(c, self.key)
+                inChord = chord.Chord(noteList)
+                pitchNameList = []
+                for x in noteList:
+                    pitchNameList.append(x.pitch.name)
+                inKey = self.keyAtMeasure(noteList[0].measureNumber)
+                chordBass = noteList[-1]
+                inChord.bass(chordBass.pitch)
+                oneRoot =  inKey.pitchFromDegree(1)
+                fiveRoot = inKey.pitchFromDegree(5)
+                oneChordIdentified = False
+                fiveChordIdentified = False
+                if oneRoot.name in pitchNameList:
+                    oneChordIdentified = True
+                elif fiveRoot.name in pitchNameList:
+                    fiveChordIdentified = True
+                else:
+                    oneRomanChord = roman.RomanNumeral('I7', inKey).pitches
+                    fiveRomanChord = roman.RomanNumeral('V7', inKey).pitches
+                    
+                    onePitchNameList = []
+                    for x in oneRomanChord:
+                        onePitchNameList.append(x.name)
+                    
+                    fivePitchNameList = []
+                    for x in fiveRomanChord:
+                        fivePitchNameList.append(x.name)                    
+                    
+                    oneMatches = len(set(onePitchNameList) & set(pitchNameList))
+                    fiveMatches = len(set(fivePitchNameList) & set(pitchNameList))
+                    if  oneMatches > fiveMatches and oneMatches > 0:
+                        oneChordIdentified = True
+                    elif oneMatches < fiveMatches and fiveMatches > 0:
+                        fiveChordIdentified = True
+                    else:
+                        return False
+                    
+                if oneChordIdentified:
+                    rootScaleDeg = common.toRoman(1)
+                    if inKey.mode == 'minor':
+                        rootScaleDeg = rootScaleDeg.lower()
+                    else:
+                        rootScaleDeg = rootScaleDeg.upper()
+                    inChord.root(oneRoot)
+                elif fiveChordIdentified:
+                    rootScaleDeg = common.toRoman(5)
+                    inChord.root(fiveRoot)
+                else:
+                    return False
+                try:
+                    if inChord.inversionName() != 53:
+                        rn = rootScaleDeg + str(inChord.inversionName())
+                    else:
+                        rn = rootScaleDeg
+                except:
+                    rn = rootScaleDeg
+                return rn
             else:
-                rn = False
-            return rn
-        textFunction = lambda vs: "Roman Numeral at " + str(vs.getNoteList()[0].measureNumber)
-        self._identifyBasedOnVerticalSlice(color, dictKey, testFunction, textFunction)                
+                return False
+           
+        def textFunction(vs, rn):
+            notes = ''
+            for n in vs.noteList:
+                notes+= n.name + ','
+            notes = notes[:-1]
+            return "Roman Numeral of " + notes + ' is ' + rn
+        self._identifyBasedOnVerticalSlice(color, dictKey, testFunction, textFunction, responseOffsetMap=responseOffsetMap)                
+    
+    def identifyRomanNumerals(self, color = None, dictKey = 'romanNumerals', responseOffsetMap = []):
+        '''
+        Identifies the roman numerals in the piece by iterating throgh the vertical slices and figuring
+        out which roman numeral best corresponds to that vertical slice. (calls :meth:`~music21.roman.fromChordAndKey`)
+        
+        Optionally specify the responseOffsetMap which limits the resultObjects returned to only those with 
+        verticalSlice's.offset(leftAlign=True) included in the list. For example, if only roman numerals
+        were to be written for the vertical slice at offset 0, 6, and 7 in the piece, pass responseOffsetMap = [0,6,7]
+        '''
+        def testFunction(vs, responseOffsetMap=[]):
+            noteList = vs.noteList
+
+            if not None in noteList:
+                inChord = chord.Chord(noteList)
+                inChord.bass(noteList[-1])
+                inKey = self.keyAtMeasure(noteList[0].measureNumber)
+                rn = roman.fromChordAndKey(inChord, inKey)
+                return rn
+            else:
+                return False
+           
+        def textFunction(vs, rn):
+            notes = ''
+            for n in vs.noteList:
+                notes+= n.name + ','
+            notes = notes[:-1]
+            return "Roman Numeral of " + notes + ' is ' + rn
+        self._identifyBasedOnVerticalSlice(color, dictKey, testFunction, textFunction, responseOffsetMap=responseOffsetMap)                
     
     # Other Theory Properties to Identify:
     
@@ -835,11 +1014,21 @@ class TheoryAnalyzer(object):
 
     def identifyHarmonicIntervals(self, partNum1 = None, partNum2 = None, color = None, dictKey = 'harmonicIntervals'):
         testFunction = lambda hIntv: hIntv.generic.undirected if hIntv is not None else False
-        textFunction = lambda hIntv, pn1, pn2: "harmonic interval"
-        self._identifyBasedOnHarmonicInterval(partNum1, partNum2, color, dictKey, testFunction, textFunction)
+        textFunction = lambda hIntv, pn1, pn2: "harmonic interval between" + hIntv.noteStart.name + ' and ' + hIntv.noteEnd.name + \
+                     ' between parts ' + str(pn1 + 1) + ' and ' + str(pn2) + ' is ' + str(hIntv.niceName)
+        def valueFunction(self, hIntv):
+            augordimIntervals = ['A4','d5']
+            if hIntv.simpleName in augordimIntervals:
+                return hIntv.simpleName
+            else:
+                value = hIntv.generic.undirected
+                while value > 9:
+                    value -= 7
+                return value
+        self._identifyBasedOnHarmonicInterval(partNum1, partNum2, color, dictKey, testFunction, textFunction, valueFunction)
         
     def identifyScaleDegrees(self, partNum = None, color = None, dictKey = 'scaleDegrees'):
-        testFunction = lambda n:  (str(self.key.getScale().getScaleDegreeFromPitch(n.pitch)) ) if n is not None else False
+        testFunction = lambda n:  (str(self.keyAtMeasure(n.measureNumber).getScale().getScaleDegreeFromPitch(n.pitch)) ) if n is not None else False
         textFunction = lambda n, pn: "scale degree"
         self._identifyBasedOnNote(partNum, color, dictKey, testFunction, textFunction)
             
@@ -850,9 +1039,6 @@ class TheoryAnalyzer(object):
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name)  if vlq.motionType() != "No Motion" else 'No motion'
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
         
-
-
-                
     # Combo Methods
     
     def identifyCommonPracticeErrors(self, partNum1,partNum2,dictKey='commonPracticeErrors'):
@@ -906,7 +1092,10 @@ class TheoryAnalyzer(object):
         '''
         self._theoryScore.show()
                 
-    
+
+class TheoryAnalyzerException(music21.Music21Exception):
+    pass
+
 # Theory Result Object
 
 class TheoryResult(object):
@@ -976,7 +1165,7 @@ class VerticalSliceTheoryResult(TheoryResult):
         self.vs = vs
         
     def color(self, color ='red'):
-        for n in self.vs.getNoteList():
+        for n in self.vs.noteList:
             n.color = color
             
 class ThreeNoteLinearSegmentTheoryResult(TheoryResult):            
@@ -1024,13 +1213,17 @@ class TestExternal(unittest.TestCase):
     
     def demo(self):
 
-        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/WWNortonWorksheets/WWNortonXMLFiles/XML11_worksheets/S11_4_I.xml')
-
+        #s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/WWNortonWorksheets/WWNortonXMLFiles/XML11_worksheets/S11_1_II_cleaned.xml')
+        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/WWNortonWorksheets/WWNortonXMLFiles/XML11_worksheets/S11_3_A.xml')
+        #s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/FromServer/11_3_A_1.xml')
         #s = converter.parse('/Users/larsj/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
 #        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
         #s = corpus.parse('bwv7.7')
         
         ta = TheoryAnalyzer(s)
+        #ta.keyMeasureMap = {1:'C', 2:'D', 3:'Bb', 4:'c', 5:'g',6:'e',7:'G'}
+        ta.keyMeasureMap = {1:'C',3:'d',4:'F',5:'G',6:'e',7:'g',8:'B-',9:'A-',10:'E',11:'f',12:'c#'}
+
         #ta.key = music21.key.Key('D')
         #ta.getTwoByThreeLinearSegments(0,1)
         #ta.identifyParallelFifths(color='red')
@@ -1044,12 +1237,15 @@ class TestExternal(unittest.TestCase):
         #ta.identifyDissonantMelodicIntervals(color='cyan')
         #ta.identifyMotionType()
         #ta.identifyScaleDegrees()
-        #ta.identifyHarmonicIntervals()
+        ta.identifyHarmonicIntervals()
         #ta.identifyOpensIncorrectly()
 
+        #rom = [0,6,7,8]
+        #ta.identifyTonicAndDominantRomanNumerals(responseOffsetMap=rom)
+
         #ta.identifyClosesIncorrectly()
-        ta.identifyUnaccentedPassingTones(color = 'red')
-        ta.identifyUnaccentedNeighborTones(color = 'yellow')
+        #ta.identifyUnaccentedPassingTones(color = 'red')
+        #ta.identifyUnaccentedNeighborTones(color = 'yellow')
         #ta.identifyRomanNumerals()
         
 #        ta.identifyObliqueMotion()
@@ -1060,11 +1256,10 @@ class TestExternal(unittest.TestCase):
 #        ta.identifyInwardContraryMotion()
 #        ta.identifyAntiParallelMotion()
 
-#        for nResult in ta.resultDict['scaleDegrees']:
-#            if nResult.n is not None:
-#                nResult.n.lyric = str(nResult.value)
+        for vsResult in ta.resultDict['harmonicIntervals']:
+            vsResult.vs.lyric = str(vsResult.value)
 
-        print ta.getResultsString()
+        #print ta.getResultsString()
         print ta.show()
         #for n in ta._theoryScore.flat.notes:
         #    print 'h', n.color
