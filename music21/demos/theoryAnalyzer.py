@@ -20,6 +20,8 @@ from music21 import voiceLeading
 from music21 import roman
 from music21 import chord
 from music21 import key
+import string
+
 import unittest
 
 
@@ -672,10 +674,10 @@ class TheoryAnalyzer(object):
         >>> len(ta.resultDict['parallelFifths'])
         2
         >>> ta.resultDict['parallelFifths'][0].text
-        'Parallel fifth at measure 1: Part 1 moves from D to E while part 2 moves from G to A'
+        'Parallel fifth in measure 1: Part 1 moves from D to E while part 2 moves from G to A'
         '''
         testFunction = lambda vlq: vlq.parallelFifth()
-        textFunction = lambda vlq, pn1, pn2: "Parallel fifth at measure " + str(vlq.v1n1.measureNumber) +": "\
+        textFunction = lambda vlq, pn1, pn2: "Parallel fifth in measure " + str(vlq.v1n1.measureNumber) +": "\
                      + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey,testFunction,textFunction)
@@ -689,7 +691,7 @@ class TheoryAnalyzer(object):
         '''
         
         testFunction = lambda vlq: vlq.parallelOctave()
-        textFunction = lambda vlq, pn1, pn2: "Parallel octave at measure " + str(vlq.v1n1.measureNumber) +": "\
+        textFunction = lambda vlq, pn1, pn2: "Parallel octave in measure " + str(vlq.v1n1.measureNumber) +": "\
                      + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
@@ -703,7 +705,7 @@ class TheoryAnalyzer(object):
         '''
         
         testFunction = lambda vlq: vlq.parallelUnison()
-        textFunction = lambda vlq, pn1, pn2: "Parallel unison at measure " + str(vlq.v1n1.measureNumber) +": "\
+        textFunction = lambda vlq, pn1, pn2: "Parallel unison in measure " + str(vlq.v1n1.measureNumber) +": "\
                      + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
@@ -717,7 +719,7 @@ class TheoryAnalyzer(object):
         '''
         
         testFunction = lambda vlq: vlq.hiddenFifth()
-        textFunction = lambda vlq, pn1, pn2: "Hidden fifth at measure " + str(vlq.v1n1.measureNumber) +": "\
+        textFunction = lambda vlq, pn1, pn2: "Hidden fifth in measure " + str(vlq.v1n1.measureNumber) +": "\
                      + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
@@ -731,7 +733,7 @@ class TheoryAnalyzer(object):
         '''
         
         testFunction = lambda vlq: vlq.hiddenOctave()
-        textFunction = lambda vlq, pn1, pn2: "Hidden octave at measure " + str(vlq.v1n1.measureNumber) +": "\
+        textFunction = lambda vlq, pn1, pn2: "Hidden octave in measure " + str(vlq.v1n1.measureNumber) +": "\
                      + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
@@ -745,7 +747,7 @@ class TheoryAnalyzer(object):
         '''
         
         testFunction = lambda vlq: vlq.improperResolution()
-        textFunction = lambda vlq, pn1, pn2: "Improper resolution of " + vlq.vIntervals[0].niceName +" at measure " + str(vlq.v1n1.measureNumber) +": "\
+        textFunction = lambda vlq, pn1, pn2: "Improper resolution of " + vlq.vIntervals[0].simpleNiceName +" in measure " + str(vlq.v1n1.measureNumber) +": "\
                  + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                  + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name + " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
@@ -760,7 +762,7 @@ class TheoryAnalyzer(object):
         '''
         
         testFunction = lambda vlq: vlq.leapNotSetWithStep()
-        textFunction = lambda vlq, pn1, pn2: "Leap not set with step at measure " + str(vlq.v1n1.measureNumber) +": "\
+        textFunction = lambda vlq, pn1, pn2: "Leap not set with step in measure " + str(vlq.v1n1.measureNumber) +": "\
                  + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                  + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name + " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
@@ -772,9 +774,7 @@ class TheoryAnalyzer(object):
         '''
         
         testFunction = lambda vlq: vlq.opensIncorrectly()
-        textFunction = lambda vlq, pn1, pn2: "The opening harmonic interval is not correct " + \
-                 "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " " \
-                 + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name + " to " + vlq.v2n2.name
+        textFunction = lambda vlq, pn1, pn2: "Opening harmony is not in style"
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction, startIndex = 0, endIndex = 1)
         
     def identifyClosesIncorrectly(self, partNum1 = None, partNum2 = None, color = None,dictKey = 'closesIncorrectly'):
@@ -782,9 +782,7 @@ class TheoryAnalyzer(object):
         Identifies if the piece closes correctly; calls :meth:`~music21.voiceLeading.closesIncorrectly`
         '''
         testFunction = lambda vlq: vlq.closesIncorrectly() 
-        textFunction = lambda vlq, pn1, pn2: "The closing motion and intervals are not correct " + \
-                 "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
-                 + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name + " to " + vlq.v2n2.name
+        textFunction = lambda vlq, pn1, pn2: "Closing harmony is not in style"
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction, startIndex=-1)    
 
     # Using the Three Note Linear Segment Template
@@ -814,7 +812,7 @@ class TheoryAnalyzer(object):
         '''
         testFunction = lambda hIntv: hIntv is not None and not hIntv.isConsonant()
         textFunction = lambda hIntv, pn1, pn2: "Dissonant harmonic interval in measure " + str(hIntv.noteStart.measureNumber) +": " \
-                     + str(hIntv.niceName) + " from " + str(hIntv.noteStart.name) + " to " + str(hIntv.noteEnd.name) \
+                     + str(hIntv.simpleNiceName) + " from " + str(hIntv.noteStart.name) + " to " + str(hIntv.noteEnd.name) \
                      + " between part " + str(pn1 + 1) + " and part " + str(pn2 + 1)
         self._identifyBasedOnHarmonicInterval(partNum1, partNum2, color, dictKey, testFunction, textFunction)
 
@@ -840,7 +838,7 @@ class TheoryAnalyzer(object):
         '''
         testFunction = lambda mIntv: mIntv is not None and mIntv.simpleName in ["A2","A4","d5","m7","M7"]
         textFunction = lambda mIntv, pn: "Dissonant melodic interval in part " + str(pn + 1) + " measure " + str(mIntv.noteStart.measureNumber) +": "\
-                     + str(mIntv.niceName) + " from " + str(mIntv.noteStart.name) + " to " + str(mIntv.noteEnd.name)
+                     + str(mIntv.simpleNiceName) + " from " + str(mIntv.noteStart.name) + " to " + str(mIntv.noteEnd.name)
         self._identifyBasedOnMelodicInterval(partNum, color, dictKey, testFunction, textFunction)                
     
     def identifyTonicAndDominantRomanNumerals(self, color = None, dictKey = 'romanNumerals', responseOffsetMap = []):
@@ -957,7 +955,7 @@ class TheoryAnalyzer(object):
     def identifyObliqueMotion(self, partNum1 = None, partNum2 = None, color = None):
         dictKey = 'obliqueMotion'
         testFunction = lambda vlq: vlq.obliqueMotion()
-        textFunction = lambda vlq, pn1, pn2: "Oblique motion at measure " + str(vlq.v1n1.measureNumber) +": "\
+        textFunction = lambda vlq, pn1, pn2: "Oblique motion in measure " + str(vlq.v1n1.measureNumber) +": "\
                      + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
@@ -965,7 +963,7 @@ class TheoryAnalyzer(object):
     def identifySimilarMotion(self, partNum1 = None, partNum2 = None, color = None):
         dictKey = 'similarMotion'
         testFunction = lambda vlq: vlq.similarMotion()
-        textFunction = lambda vlq, pn1, pn2: "Similar motion at measure " + str(vlq.v1n1.measureNumber) +": "\
+        textFunction = lambda vlq, pn1, pn2: "Similar motion in measure " + str(vlq.v1n1.measureNumber) +": "\
                      + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
@@ -973,7 +971,7 @@ class TheoryAnalyzer(object):
     def identifyParallelMotion(self, partNum1 = None, partNum2 = None, color = None):
         dictKey = 'parallelMotion'
         testFunction = lambda vlq: vlq.parallelMotion()
-        textFunction = lambda vlq, pn1, pn2: "Parallel motion at measure " + str(vlq.v1n1.measureNumber) +": "\
+        textFunction = lambda vlq, pn1, pn2: "Parallel motion in measure " + str(vlq.v1n1.measureNumber) +": "\
                      + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
@@ -981,7 +979,7 @@ class TheoryAnalyzer(object):
     def identifyContraryMotion(self, partNum1 = None, partNum2 = None, color = None):
         dictKey = 'contraryMotion'
         testFunction = lambda vlq: vlq.contraryMotion()
-        textFunction = lambda vlq, pn1, pn2: "Contrary motion at measure " + str(vlq.v1n1.measureNumber) +": "\
+        textFunction = lambda vlq, pn1, pn2: "Contrary motion in measure " + str(vlq.v1n1.measureNumber) +": "\
                      + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
@@ -989,7 +987,7 @@ class TheoryAnalyzer(object):
     def identifyOutwardContraryMotion(self, partNum1 = None, partNum2 = None, color = None):
         dictKey = 'outwardContraryMotion'
         testFunction = lambda vlq: vlq.outwardContraryMotion()
-        textFunction = lambda vlq, pn1, pn2: "Outward contrary motion at measure " + str(vlq.v1n1.measureNumber) +": "\
+        textFunction = lambda vlq, pn1, pn2: "Outward contrary motion in measure " + str(vlq.v1n1.measureNumber) +": "\
                      + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
@@ -997,7 +995,7 @@ class TheoryAnalyzer(object):
     def identifyInwardContraryMotion(self, partNum1 = None, partNum2 = None, color = None):
         dictKey = 'inwardContraryMotion'
         testFunction = lambda vlq: vlq.inwardContraryMotion()
-        textFunction = lambda vlq, pn1, pn2: "Inward contrary motion at measure " + str(vlq.v1n1.measureNumber) +": "\
+        textFunction = lambda vlq, pn1, pn2: "Inward contrary motion in measure " + str(vlq.v1n1.measureNumber) +": "\
                      + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
@@ -1005,7 +1003,7 @@ class TheoryAnalyzer(object):
     def identifyAntiParallelMotion(self, partNum1 = None, partNum2 = None, color = None):
         dictKey = 'antiParallelMotion'
         testFunction = lambda vlq: vlq.antiParallelMotion()
-        textFunction = lambda vlq, pn1, pn2: "Anti-parallel motion at measure " + str(vlq.v1n1.measureNumber) +": "\
+        textFunction = lambda vlq, pn1, pn2: "Anti-parallel motion in measure " + str(vlq.v1n1.measureNumber) +": "\
                      + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
                      + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
         self._identifyBasedOnVLQ(partNum1, partNum2, color, dictKey, testFunction, textFunction)
@@ -1051,14 +1049,16 @@ class TheoryAnalyzer(object):
         DissonantHarmonicIntervals = magenta, DissonantMelodicIntervals = cyan
         '''
         self.identifyParallelFifths(partNum1, partNum2, dictKey = dictKey, color='red')
-        self.identifyParallelOctaves(partNum1, partNum2, dictKey = dictKey, color='orange')
-        self.identifyHiddenFifths(partNum1, partNum2, dictKey = dictKey, color='yellow')
+        self.identifyParallelOctaves(partNum1, partNum2, dictKey = dictKey, color='yellow')
+        self.identifyHiddenFifths(partNum1, partNum2, dictKey = dictKey, color='orange')
         self.identifyHiddenOctaves(partNum1, partNum2, dictKey = dictKey, color='green')
         self.identifyParallelUnisons(partNum1, partNum2, dictKey = dictKey, color='blue')
         self.identifyImproperResolutions(partNum1, partNum2, dictKey = dictKey, color='purple')
-        self.identifyLeapNotSetWithStep(partNum1, partNum2, dictKey = dictKey, color='white')
-        self.identifyDissonantHarmonicIntervals(partNum1, partNum2, dictKey = dictKey, color='magenta')
-        self.identifyDissonantMelodicIntervals(dictKey = dictKey, color='cyan')                
+        #self.identifyLeapNotSetWithStep(partNum1, partNum2, dictKey = dictKey, color='white')
+        #self.identifyDissonantHarmonicIntervals(partNum1, partNum2, dictKey = dictKey, color='magenta')
+        self.identifyDissonantMelodicIntervals(partNum1,dictKey = dictKey, color='cyan')  
+        self.identifyOpensIncorrectly(partNum1, partNum2,dictKey = dictKey, color='brown')
+        #self.identifyClosesIncorrectly(partNum1, partNum2,dictKey = dictKey, color='gray')              
     
     # Output Methods
                 
@@ -1075,6 +1075,21 @@ class TheoryAnalyzer(object):
                     resultStr += "\n"
                 
         return resultStr
+    
+    def getHTMLResultsString(self, typeList=None):
+        '''
+        returns string of all results found by calling all identify methods on the TheoryAnalyzer score
+        '''
+        resultStr = ""
+        for resultType in self.resultDict.keys():
+            if typeList is None or resultType in typeList:
+                resultStr+="<b>"+resultType+"</B>: <br /><ul>"
+                for result in self.resultDict[resultType]:
+                    resultStr += "<li style='color:"+result.currentColor+"'><b>"+string.replace(result.text,':',"</b>:<span style='color:black'>")+"</span></li>"
+                resultStr += "</ul><br />"
+                
+        return resultStr
+            
             
     def colorResults(self, color='red', typeList=None):
         '''
@@ -1109,9 +1124,10 @@ class TheoryResult(object):
     def __init__(self):
         self.text = ""
         self.value = ""
+        self.currentColor = ""
         
     def color(self,color):
-        pass
+        self.color = color
 
 # VLQ Theory Result Object
 
@@ -1121,6 +1137,7 @@ class VLQTheoryResult(TheoryResult):
         self.vlq = vlq
         
     def color(self, color='red'):
+        self.currentColor = color
         self.vlq.v1n1.color = color
         self.vlq.v1n2.color = color
         self.vlq.v2n1.color = color
@@ -1140,6 +1157,7 @@ class IntervalTheoryResult(TheoryResult):
         self.intv = intv
         
     def color(self, color='red'):
+        self.currentColor = color
         self.intv.noteStart.color = color
         self.intv.noteEnd.color = color
         
@@ -1157,6 +1175,7 @@ class NoteTheoryResult(TheoryResult):
         self.n = n
         
     def color(self, color='red'):
+        self.currentColor  = color
         self.n.color = color
             
 class VerticalSliceTheoryResult(TheoryResult):            
@@ -1214,7 +1233,8 @@ class TestExternal(unittest.TestCase):
     def demo(self):
 
         #s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/WWNortonWorksheets/WWNortonXMLFiles/XML11_worksheets/S11_1_II_cleaned.xml')
-        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/WWNortonWorksheets/WWNortonXMLFiles/XML11_worksheets/S11_3_A.xml')
+        s = converter.parse('/Users/larsj/Dropbox/Music21Theory/WWNortonWorksheets/WWNortonXMLFiles/XML11_worksheets/S11_1_II_cleaned.xml')
+#        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/WWNortonWorksheets/WWNortonXMLFiles/XML11_worksheets/S11_3_A.xml')
         #s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/FromServer/11_3_A_1.xml')
         #s = converter.parse('/Users/larsj/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
 #        s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
@@ -1237,16 +1257,16 @@ class TestExternal(unittest.TestCase):
         #ta.identifyDissonantMelodicIntervals(color='cyan')
         #ta.identifyMotionType()
         #ta.identifyScaleDegrees()
-        ta.identifyHarmonicIntervals()
+#        ta.identifyHarmonicIntervals()
         #ta.identifyOpensIncorrectly()
 
-        #rom = [0,6,7,8]
-        #ta.identifyTonicAndDominantRomanNumerals(responseOffsetMap=rom)
+        rom = [0,6,7,8]
+        ta.identifyTonicAndDominantRomanNumerals()
 
         #ta.identifyClosesIncorrectly()
         #ta.identifyUnaccentedPassingTones(color = 'red')
         #ta.identifyUnaccentedNeighborTones(color = 'yellow')
-        #ta.identifyRomanNumerals()
+#        ta.identifyRomanNumerals()
         
 #        ta.identifyObliqueMotion()
 #        ta.identifySimilarMotion()
@@ -1256,11 +1276,11 @@ class TestExternal(unittest.TestCase):
 #        ta.identifyInwardContraryMotion()
 #        ta.identifyAntiParallelMotion()
 
-        for vsResult in ta.resultDict['harmonicIntervals']:
+        for vsResult in ta.resultDict['romanNumerals']:
             vsResult.vs.lyric = str(vsResult.value)
 
-        #print ta.getResultsString()
-        print ta.show()
+        print ta.getResultsString()
+        ta.show()
         #for n in ta._theoryScore.flat.notes:
         #    print 'h', n.color
 
@@ -1269,6 +1289,6 @@ if __name__ == "__main__":
 
     music21.mainTest(Test)
     
-    #te = TestExternal()
-    #te.demo()
+#    te = TestExternal()
+#    te.demo()
     
