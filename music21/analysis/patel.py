@@ -113,6 +113,11 @@ class Test(unittest.TestCase):
         pass
 
 
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+_DOC_ORDER = [melodicIntervalVariability]
+
 if __name__ == "__main__":
     music21.mainTest(Test)
 

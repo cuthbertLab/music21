@@ -1919,9 +1919,12 @@ class Test(unittest.TestCase):
             
         self.assertEqual(len(s.parts[-1].flat.notes), 287)
 
-if __name__ == "__main__":
-    import sys
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+_DOC_ORDER = [MuseDataWork]
 
+
+if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     music21.mainTest(Test)
 

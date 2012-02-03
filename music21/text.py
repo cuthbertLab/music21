@@ -534,7 +534,7 @@ class TextBox(base.Music21Object, TextFormat):
 #-------------------------------------------------------------------------------
 class LanguageDetector(object):
     '''
-    attempts to detect language on the basis of trigrams
+    Attempts to detect language on the basis of trigrams
     
     uses code from 
     http://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
@@ -626,22 +626,22 @@ class Trigram(object):
     combinations are characteristic to a language, this can be used to
     determine the language of a body of text. For example:
 
-        #>>> reference_en = Trigram('/path/to/reference/text/english')
-        #>>> reference_de = Trigram('/path/to/reference/text/german')
-        #>>> unknown = Trigram('url://pointing/to/unknown/text')
-        #>>> unknown.similarity(reference_de)
-        #0.4
-        #>>> unknown.similarity(reference_en)
-        #0.95
+    >>> #_DOCS_SHOW reference_en = Trigram('/path/to/reference/text/english')
+    >>> #_DOCS_SHOW reference_de = Trigram('/path/to/reference/text/german')
+    >>> #_DOCS_SHOW unknown = Trigram('url://pointing/to/unknown/text')
+    >>> #_DOCS_SHOW unknown.similarity(reference_de)
+    #_DOCS_SHOW 0.4
+    >>> #_DOCS_SHOW unknown.similarity(reference_en)
+    #_DOCS_SHOW 0.95
     
     would indicate the unknown text is almost cetrtainly English.  As
     syntax sugar, the minus sign is overloaded to return the difference
     between texts, so the above objects would give you:
 
-    #>>> unknown - reference_de
-    #0.6
-    #>>> reference_en - unknown    # order doesn't matter.
-    #0.05
+    #_DOCS_SHOW >>> unknown - reference_de
+    #_DOCS_SHOW 0.6
+    #_DOCS_SHOW >>> reference_en - unknown    # order doesn't matter.
+    #_DOCS_SHOW 0.05
 
     As it stands, the Trigram ignores character set information, which
     means you can only accurately compare within a single encoding
@@ -651,9 +651,8 @@ class Trigram(object):
     As an extra bonus, there is a method to make up nonsense words in the
     style of the Trigram's text.
 
-    #>>> reference_en.makeWords(30)
-    My withillonquiver and ald, by now wittlectionsurper, may sequia,
-    tory, I ad my notter. Marriusbabilly She lady for rachalle spen
+    #_DOCS_SHOW >>> reference_en.makeWords(30)
+    #_DOCS_SHOW My withillonquiver and ald, by now wittlectionsurper, may sequia, tory, I ad my notter. Marriusbabilly She lady for rachalle spen
     hat knong al elf
     '''    
 
@@ -802,7 +801,14 @@ class Test(unittest.TestCase):
         forUntoUs = forUntoUs.replace('_', '')
         self.assertEqual('en', ld.mostLikelyLanguage(forUntoUs))
 
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+_DOC_ORDER = [TextBox, TextFormat]
+
+
 if __name__ == "__main__":
+
     music21.mainTest(Test)
 
 

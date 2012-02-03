@@ -137,7 +137,6 @@ class RepeatExpression(RepeatMark, expressions.Expression):
             s = s.replace('.', '')
             s = s.lower()
             return s
-
         for candidate in self._textAlternatives:
             candidate = stripText(candidate)
             value = stripText(value)
@@ -3019,6 +3018,9 @@ class Test(unittest.TestCase):
 #         s.show()
 #         post = s.expandRepeats()    
 
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+_DOC_ORDER = [RepeatExpression, RepeatExpressionMarker, Coda, Segno, Fine, RepeatExpressionCommand, DaCapo, DaCapoAlFine, DaCapoAlCoda, AlSegno, DalSegno, DalSegnoAlFine, DalSegnoAlCoda]
         
 
 if __name__ == "__main__":

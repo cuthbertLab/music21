@@ -918,6 +918,10 @@ class Test(unittest.TestCase):
         cpe2 = cpe.realizeOrnaments()
         #cpe2.show()
 
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+_DOC_ORDER = [TextExpression]
+
 if __name__ == "__main__":
     music21.mainTest(Test)
 

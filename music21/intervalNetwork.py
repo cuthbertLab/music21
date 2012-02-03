@@ -3042,33 +3042,14 @@ class Test(unittest.TestCase):
 
 
 
+
 #-------------------------------------------------------------------------------
+# define presented order in documentation
+_DOC_ORDER = [BoundIntervalNetwork]
+
 if __name__ == "__main__":
-    import sys
+    music21.mainTest(Test)
 
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-    elif len(sys.argv) > 1:
-        t = Test()
-        #t.testGraphedOutput()
-        #t.testBasicA()
-        #t.testScaleModel()
-        #t.testHarmonyModel()
-        #t.testDirectedA()
-        #t.testScaleArbitrary()
-        #t.testRealizeDescending()
-
-        #t.testBasicB()
-
-
-        #t.testGetPitchFromNodeStep()
-
-        t.testNextPitch()
-
-
-# melodic/harmonic minor
-# abstracted in scale class
-# non uni-directional scale
 
 #------------------------------------------------------------------------------
 # eof

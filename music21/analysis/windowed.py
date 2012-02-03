@@ -389,7 +389,9 @@ class Test(unittest.TestCase):
         plot.process()
         #plot.write()
 
-#------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+_DOC_ORDER = [WindowedAnalysis]
 
 if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions

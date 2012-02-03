@@ -4578,6 +4578,9 @@ spirit</words>
         self.assertEqual(raw.count('font-size'), 5)
 
 
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+_DOC_ORDER = [mxToStream, streamToMx]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

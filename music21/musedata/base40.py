@@ -348,6 +348,11 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+
+#-------------------------------------------------------------------------------
+_DOC_ORDER = [base40ActualInterval]
+
+
 if __name__ == "__main__":
     music21.mainTest(Test)
 

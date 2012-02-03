@@ -384,6 +384,9 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+_DOC_ORDER = [Beams, Beam]
 
 
 if __name__ == "__main__":

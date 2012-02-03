@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''Various tools and utilities for doing metrical or rhythmic analysis. 
@@ -109,6 +109,10 @@ class Test(unittest.TestCase):
     def setUp(self):
         pass
 
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+_DOC_ORDER = [labelBeatDepth]
 
 
 if __name__ == "__main__":

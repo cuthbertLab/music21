@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2010-11 The music21 Project
+# Copyright:    (c) 2010-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -281,6 +281,11 @@ class TestExternal(unittest.TestCase):
 #                  startingPitch = 'C2',
 #                  )
 #        
+
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+_DOC_ORDER = [pitchedPhase]
+
 if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions
         music21.mainTest(TestExternal)

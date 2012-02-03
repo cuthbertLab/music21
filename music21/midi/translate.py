@@ -2358,6 +2358,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].voices), 2)
 
 
+#-------------------------------------------------------------------------------
+_DOC_ORDER = [streamToMidiFile, midiFileToStream]
+
 if __name__ == "__main__":
     music21.mainTest(Test)
 

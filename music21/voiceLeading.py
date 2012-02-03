@@ -711,9 +711,7 @@ class VoiceLeadingQuartet(music21.Music21Object):
             return False
         
     def opensIncorrectly(self):
-        '''
-        returns true if the opening or second harmonic interval is PU, P8, or P5, to accomodate an anacrusis
-        
+        '''Returns true if the opening or second harmonic interval is PU, P8, or P5, to accomodate an anacrusis.
         
         >>> from music21 import *
         >>> vl = VoiceLeadingQuartet('D','D','D','F#')
@@ -733,7 +731,7 @@ class VoiceLeadingQuartet(music21.Music21Object):
         OMIT_FROM_DOCS
         
         does not check to see if opening establishes the tonic harmony...possibly run
-        music21 key analysis (k =  music21Score.analyze('key') ) on the score representation
+        music21 key analysis (k = music21Score.analyze('key') ) on the score representation
         of this quartet object and see if it matches the designated key
         '''
         return not ( (self.vIntervals[0].name == 'P1' or self.vIntervals[0].name == 'P8' or self.vIntervals[0].simpleName == 'P5') or \

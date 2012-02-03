@@ -2627,6 +2627,9 @@ class Test(unittest.TestCase):
         af.close()
         self.assertEqual(len(ah), 101)
 
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+_DOC_ORDER = [ABCFile, ABCHandler, ABCHandlerBar]
 
 
 if __name__ == "__main__":
