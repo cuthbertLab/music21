@@ -107,9 +107,9 @@ def laDonnaEMobile():
     ⠀⠀⠀⠇⠜⠸⠾⠬⠍⠘⠚⠬⠔⠭⠣⠅⠀⠀⠀
     <BLANKLINE>
     '''
-    mob = converter.parse("http://static.musescore.com/29836/5862119bda/score.mxl")
-    upperPart = mob[1].makeNotation(cautionaryNotImmediateRepeat=False)
-    lowerPart = mob[2].makeNotation(cautionaryNotImmediateRepeat=False)
+    mob = converter.parse("http://static.musescore.com/29836/5862119bda/score.mxl").getElementsByClass('Part')
+    upperPart = mob[0].makeNotation(cautionaryNotImmediateRepeat=False)
+    lowerPart = mob[1].makeNotation(cautionaryNotImmediateRepeat=False)
     segmentBreaks = [(6,0.0),(10,0.0),(14,0.0),(18,0.0),(22,0.0),(25,1.0),(29,1.0),(33,0.5)]
     print translate.keyboardPartsToBraille(upperPart, lowerPart, segmentBreaks=segmentBreaks)
 
