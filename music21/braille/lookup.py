@@ -247,7 +247,8 @@ symbols = {'space': u'\u2800',
            'closing_double_slur': u'\u2809',
            'opening_bracket_slur': u'\u2830\u2803',
            'closing_bracket_slur': u'\u2818\u2806',
-           'basic_exception': u'\u281c\u2826'}
+           'basic_exception': u'\u281c\u2826',
+           'full_inaccord': u'\u2823\u281c'}
 
 ascii_chars = {u'\u2800': ' ',
                u'\u2801': 'A',
