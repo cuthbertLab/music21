@@ -1120,23 +1120,22 @@ class VerticalSlice(object):
     
     instantiate by passing in a dictionary of the form {partNumber : music21NoteObject }
     {'1': 'note 1', '2' : 'note', '3' : 'note'}
-    
+
     >>> from music21 import *
     >>> vs1 = VerticalSlice({0:note.Note('A4'), 1: note.Note('F2')})
     >>> vs1.noteList
     [<music21.note.Note A>, <music21.note.Note F>]
-    >>> vs1.getNote(0)
+    >>> vs1.noteFromPart(0)
     <music21.note.Note A>
     '''
-    
+    #TODO: allow VerticalSlice to be composed of not just note objects....
     def __init__(self,contentDict):
         self.contentDict = contentDict
-        self.noteList = self.getNoteList()
         
-    def getNote(self,partNum):
+    def noteFromPart(self,partNum):
         return self.contentDict[partNum]
-    
-    def getNoteList(self):
+        
+    def _getNoteList(self):
         '''
         returns the entire note list of a vertical slice
         '''
@@ -1146,8 +1145,54 @@ class VerticalSlice(object):
                 continue
             else:
                 noteList.append(m21object)
-        return noteList
+        return noteList 
         
+    noteList = property(_getNoteList)    
+    
+    def offset(self,leftAlign=True):
+        '''
+        returns the overall offset of the vertical slice. Typically, this would just be the
+        offset of each object in the vertical slice, and each object would have the same offset.
+        However, if the duration of one object in the slice is different than the duration of another,
+        and that other starts after the first, but the first is still sounding, then the offsets would be
+        different. In this case, specify leftAlign=True to return the lowest valued-offset of all the objects
+        in the vertical slice. If you prefer the offset of the right-most starting object, then specify leftAlign=False
+        
+        >>> from music21 import *
+        >>> s = stream.Score()
+        >>> n1 = note.Note('A4', quarterLength=1.0)
+        >>> s.append(n1)
+        >>> n1.offset
+        0.0
+        >>> n2 = note.Note('F2', quarterLength =0.5)
+        >>> s.append(n2)
+        >>> n2.offset
+        1.0
+        >>> vs = VerticalSlice({0:n1, 1: n2})
+        >>> vs.noteList
+        [<music21.note.Note A>, <music21.note.Note F>]
+
+        >>> vs.offset(leftAlign=True)
+        0.0
+        >>> vs.offset(leftAlign=False)
+        1.0
+        '''
+        if leftAlign:
+            return sorted(self.noteList, key=lambda m21Obj: m21Obj.offset)[0].offset
+        else:
+            return sorted(self.noteList, key=lambda m21Obj: m21Obj.offset)[-1].offset
+    
+        
+    def _setLyric(self, value):
+        newList = sorted(self.noteList, key=lambda x: x.offset, reverse=True)
+        newList[0].lyric = value
+        
+    def _getLyric(self):
+        newList = sorted(self.noteList, key=lambda x: x.offset, reverse=True)
+        return newList[0].lyric
+        
+    lyric = property(_getLyric, _setLyric)
+    
     def __repr__(self):
         return '<music21.voiceLeading.%s contentDict=%s  ' % (self.__class__.__name__, self.contentDict)
        
@@ -1171,7 +1216,7 @@ class VerticalSliceTriplet(music21.Music21Object):
     
     def _calcTNLS(self):
         for partNum in range(0,min(len(self.vs1.noteList), len(self.vs2.noteList), len(self.vs3.noteList))):
-            self.tnlsList.append(ThreeNoteLinearSegment(self.vs1.getNote(partNum), self.vs2.getNote(partNum), self.vs3.getNote(partNum)) )
+            self.tnlsList.append(ThreeNoteLinearSegment(self.vs1.noteFromPart(partNum), self.vs2.noteFromPart(partNum), self.vs3.noteFromPart(partNum)) )
         
     def __repr__(self):
         return '<music21.voiceLeading.%s vs1=%s vs2=%s vs3=%s ' % (self.__class__.__name__, self.vs1, self.vs2, self.vs3)
