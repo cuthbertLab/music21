@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         testDocs.py
-# Purpose:      tests from or derived from the Documentation
+# Purpose:      Tests the documentation.
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2011 The music21 Project
+# Copyright:    (c) 2011-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-
+'''
+To use this module, cd into the test/testDocs directory. Then, run test.py from the command line. Note that running this file requires moving and re-processing the documentation files. 
+'''
 
 import copy, types, random
 import doctest, unittest
@@ -30,9 +32,7 @@ class DocTester(object):
     def __init__(self):
         self.srcDirRst = os.path.join(common.getBuildDocFilePath(), 'rst')
         self.dstDirRst = os.path.join(common.getTestDocsFilePath(), 'testRst')
-
         self.testConfigDir = os.path.join(common.getTestDocsFilePath())
-
 
     def _getRSTFileNames(self):
         fileNames = []
@@ -51,7 +51,6 @@ class DocTester(object):
             src = os.path.join(self.srcDirRst, fn)
             dst = os.path.join(self.dstDirRst, fn)
             shutil.copy2(src, dst)
- 
 
     def _cleanUp(self):
         '''Remove the copied .rst files so as not to keep duplicates.
@@ -62,10 +61,8 @@ class DocTester(object):
             except OSError:
                 environLocal.pd(['cannot remove temporary file:', fn])
 
-
     def run(self):
         self._transferDocFiles()
-
         try:
             import sphinx
         except ImportError:
@@ -78,7 +75,6 @@ class DocTester(object):
                      self.dstDirRst, self.dstDirRst] 
         # run
         statusCode = sphinx.main(sphinxList)
-
         self._cleanUp()
 
 
