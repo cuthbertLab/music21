@@ -16,6 +16,7 @@ from music21 import articulations
 from music21 import bar
 from music21 import clef
 from music21 import chord
+from music21 import converter
 from music21 import dynamics
 from music21 import expressions
 from music21 import key
@@ -26,6 +27,8 @@ from music21 import spanner
 from music21 import stream
 from music21 import tempo
 from music21 import tinyNotation
+
+from music21.braille import translate
 
 def happyBirthday():
     '''
@@ -45,6 +48,70 @@ def happyBirthday():
     hb.insert(0, tempo.MetronomeMark(number = 120, referent = note.QuarterNote()))
     hb.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     return hb
+
+def laDonnaEMobile():
+    '''
+    A piano reduction of Giuseppi Verdi's famous aria from Rigoletto,
+    "La Donna É Mobile," transcribed into braille music.
+     
+    >>> from music21.braille import test  
+    >>> test.laDonnaEMobile()
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠁⠀⠅⠜⠄⠜⠁⠇⠇⠑⠛⠗⠑⠞⠞⠕⠜⠋⠄⠍⠀⠦⠨⠑⠦⠑⠦⠑⠀⠀
+    ⠀⠀⠇⠜⠘⠚⠸⠛⠼⠴⠛⠼⠴⠀⠀⠀⠀⠀⠀⠀⠀⠘⠚⠸⠛⠼⠴⠛⠼⠴
+    ⠉⠀⠅⠜⠨⠦⠨⠿⠄⠏⠹⠀⠀⠀⠀⠀⠀⠀⠀⠀⠨⠙⠙⠙⠀⠀⠀⠀⠀
+    ⠀⠀⠇⠜⠄⠄⠭⠸⠛⠬⠒⠛⠬⠒⠣⠜⠘⠻⠄⠀⠘⠛⠸⠛⠬⠒⠛⠬⠒
+    ⠑⠀⠅⠜⠨⠦⠨⠯⠄⠕⠺⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠇⠜⠄⠄⠭⠸⠛⠼⠴⠛⠼⠴⠣⠜⠘⠻⠄
+    <BLANKLINE>
+    ⠋⠀⠅⠜⠄⠄⠦⠨⠑⠦⠙⠦⠚⠀⠐⠾⠄⠎⠪⠀⠀⠀⠀⠀⠀⠀⠀⠀⠨⠙⠚⠓⠀⠀⠀⠀⠀
+    ⠀⠀⠇⠜⠘⠛⠸⠛⠼⠴⠛⠼⠴⠀⠭⠐⠋⠬⠒⠋⠬⠒⠣⠜⠘⠻⠄⠀⠘⠛⠸⠛⠔⠒⠛⠔⠒
+    ⠊⠀⠅⠜⠐⠷⠄⠟⠻⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠇⠜⠄⠄⠭⠸⠛⠼⠴⠛⠼⠴⠣⠜⠘⠺⠄
+    <BLANKLINE>
+    ⠁⠚⠀⠅⠜⠄⠜⠋⠋⠄⠦⠨⠑⠦⠑⠦⠑⠀⠨⠦⠨⠿⠄⠏⠹⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠀⠇⠜⠘⠾⠸⠛⠾⠬⠛⠾⠬⠛⠀⠀⠀⠍⠸⠛⠮⠔⠛⠮⠔⠛⠣⠜⠘⠻⠄
+    ⠁⠃⠀⠅⠜⠨⠙⠙⠙⠀⠀⠀⠀⠀⠀⠀⠨⠦⠨⠯⠄⠕⠺⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠀⠇⠜⠘⠿⠸⠛⠮⠔⠛⠮⠔⠛⠀⠍⠸⠛⠾⠬⠛⠾⠬⠛⠣⠜⠘⠺⠄
+    <BLANKLINE>
+    ⠁⠙⠀⠅⠜⠄⠄⠦⠨⠑⠦⠙⠦⠚⠀⠀⠐⠾⠄⠎⠪⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠀⠇⠜⠘⠾⠸⠛⠾⠬⠛⠾⠬⠛⠀⠍⠸⠛⠮⠔⠛⠮⠔⠛⠣⠜⠘⠻⠄
+    ⠁⠋⠀⠅⠜⠨⠙⠚⠓⠀⠀⠀⠀⠀⠀⠀⠐⠷⠄⠟⠻⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠀⠇⠜⠘⠿⠸⠛⠮⠔⠛⠮⠔⠛⠀⠍⠸⠛⠾⠬⠛⠾⠬⠛⠣⠜⠘⠺⠄
+    <BLANKLINE>
+    ⠁⠓⠀⠅⠜⠨⠽⠄⠕⠙⠙⠀⠀⠀⠀⠀⠀⠀⠨⠿⠴⠍⠹⠬⠔⠀⠀⠀⠀⠀⠨⠵⠄⠏⠑⠑⠀⠀⠀
+    ⠀⠀⠀⠇⠜⠄⠜⠍⠋⠸⠋⠓⠬⠼⠓⠬⠼⠀⠭⠸⠊⠬⠊⠬⠣⠜⠸⠻⠄⠀⠣⠸⠓⠊⠬⠼⠊⠬⠼
+    ⠃⠁⠀⠅⠜⠄⠡⠨⠷⠴⠍⠱⠬⠔⠀⠀⠀⠀
+    ⠀⠀⠀⠇⠜⠄⠄⠭⠐⠑⠬⠑⠬⠣⠜⠸⠳⠄
+    <BLANKLINE>
+    ⠃⠃⠀⠅⠜⠨⠿⠄⠗⠛⠛⠀⠀⠀⠜⠋⠋⠨⠳⠴⠛⠀⠦⠨⠯⠦⠿⠦⠯⠵⠍⠽⠍⠀⠀
+    ⠀⠀⠀⠇⠜⠸⠊⠙⠬⠼⠙⠬⠼⠀⠸⠺⠄⠬⠀⠀⠀⠀⠸⠯⠬⠴⠍⠿⠼⠴⠍⠿⠬⠒⠍
+    ⠃⠑⠀⠅⠜⠐⠺⠀⠀⠀
+    ⠀⠀⠀⠇⠜⠸⠚⠬⠚⠬
+    <BLANKLINE>
+    ⠃⠑⠀⠅⠜⠄⠜⠍⠋⠨⠿⠄⠰⠟⠀⠰⠻⠨⠿⠄⠰⠟⠣⠜⠍⠀⠀⠀⠀⠰⠻⠨⠿⠄⠰⠟⠀⠀⠀⠀
+    ⠀⠀⠀⠇⠜⠄⠄⠭⠀⠀⠀⠀⠀⠀⠀⠭⠸⠛⠬⠔⠭⠣⠜⠸⠻⠄⠬⠔⠀⠭⠐⠑⠬⠭⠣⠜⠐⠱⠄⠬
+    ⠃⠓⠀⠅⠜⠰⠯⠿⠯⠦⠵⠍⠦⠽⠍⠀⠀⠀⠀⠨⠺⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠀⠇⠜⠸⠯⠬⠴⠍⠿⠼⠴⠍⠿⠬⠒⠍⠀⠘⠾⠸⠿⠼⠴⠛⠼⠴
+    <BLANKLINE>
+    ⠃⠊⠀⠅⠜⠄⠜⠋⠨⠿⠄⠰⠟⠀⠰⠯⠨⠮⠰⠿⠋⠨⠿⠄⠰⠟⠣⠜⠍
+    ⠀⠀⠀⠇⠜⠸⠛⠼⠴⠀⠀⠀⠀⠀⠭⠸⠛⠬⠒⠛⠬⠒⠣⠜⠘⠻⠄⠀⠀
+    ⠉⠁⠀⠅⠜⠰⠵⠨⠿⠰⠿⠑⠨⠿⠄⠰⠟⠀⠀⠀⠀⠆⠰⠯⠨⠊⠰⠛⠋⠨⠊⠰⠛⠋⠨⠊⠰⠛
+    ⠀⠀⠀⠇⠜⠄⠄⠭⠸⠛⠼⠴⠛⠼⠴⠣⠜⠘⠻⠄⠀⠘⠛⠸⠛⠔⠒⠛⠔⠒⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠉⠉⠀⠅⠜⠨⠚⠀
+    ⠀⠀⠀⠇⠜⠸⠚⠬
+    <BLANKLINE>
+    ⠉⠉⠀⠅⠜⠄⠄⠭⠩⠨⠛⠀⠜⠋⠋⠨⠦⠨⠮⠄⠗⠿⠄⠏⠵⠄⠝
+    ⠀⠀⠀⠇⠜⠄⠄⠄⠧⠀⠀⠀⠧⠸⠛⠬⠒⠣⠜⠸⠫⠄⠬⠴⠀⠀⠀
+    ⠉⠑⠀⠅⠜⠐⠾⠍⠜⠋⠋⠋⠨⠚⠼⠴⠭⠣⠅
+    ⠀⠀⠀⠇⠜⠸⠾⠬⠍⠘⠚⠬⠔⠭⠣⠅⠀⠀⠀
+    <BLANKLINE>
+    '''
+    mob = converter.parse("http://static.musescore.com/29836/5862119bda/score.mxl")
+    upperPart = mob[1].makeNotation(cautionaryNotImmediateRepeat=False)
+    lowerPart = mob[2].makeNotation(cautionaryNotImmediateRepeat=False)
+    segmentBreaks = [(6,0.0),(10,0.0),(14,0.0),(18,0.0),(22,0.0),(25,1.0),(29,1.0),(33,0.5)]
+    print translate.keyboardPartsToBraille(upperPart, lowerPart, segmentBreaks=segmentBreaks)
 
 # Introduction to Braille Music Transcription, Second Edition
 #-------------------------------------------------------------------------------
