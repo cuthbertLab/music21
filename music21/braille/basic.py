@@ -1007,7 +1007,7 @@ def wordToBraille(sampleWord, isTextExpression = False):
             
     return u"".join(wordTrans)
 
-def numberToBraille(sampleNumber):
+def numberToBraille(sampleNumber, withNumberSign = True):
     '''
     Transcribes a number to UTF-8 braille.
     
@@ -1020,7 +1020,8 @@ def numberToBraille(sampleNumber):
     ⠼⠉⠛
     '''
     numberTrans = []
-    numberTrans.append(symbols['number'])
+    if withNumberSign:
+        numberTrans.append(symbols['number'])
     for digit in str(sampleNumber):
         try:
             numberTrans.append(numbers[int(digit)])
