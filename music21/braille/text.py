@@ -263,7 +263,7 @@ class BrailleKeyboard():
         self.leftHand.containsNoteGrouping = False
         self.allLines.append(self.leftHand)
 
-    def addNoteGroupings(self, measureNumber, noteGroupingL, noteGroupingR):
+    def addNoteGroupings(self, measureNumber, noteGroupingR, noteGroupingL):
         if self.rightHand is None and self.leftHand is None:
             self.makeNewLines()
         if self.rightHand.textLocation == 0:
