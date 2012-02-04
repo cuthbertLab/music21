@@ -950,20 +950,6 @@ def transcribeSignatures(music21KeySignature, music21TimeSignature, outgoingKeyS
         
     return u"".join(trans)
 
-def transcribeVoice(music21Voice):
-    music21Part = stream.Part()
-    music21Measure = stream.Measure()
-    for brailleElement in music21Voice:
-        music21Measure.append(brailleElement)
-    music21Part.append(music21Measure)
-    music21Measure.number = music21Voice.measureNumber
-    allSegments = findSegments(music21Part, showHeading=False, showFirstMeasureNumber=False)
-    allTrans = []
-    for brailleElementSegment in allSegments:
-        segmentTranscription = brailleElementSegment.transcribe()
-        allTrans.append(str(segmentTranscription))
-    return u"\n".join(allTrans)
-
 #-------------------------------------------------------------------------------
 # Translation between braille unicode and ASCII/other symbols.
 
