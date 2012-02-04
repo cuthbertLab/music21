@@ -61,7 +61,7 @@ class BrailleText():
             self.addLongExpression(longExpression, withHyphen)
         else:
             raise BrailleTextException("Invalid Keyword.")
- 
+    
     def addHeading(self, heading):
         if not self.currentLine.textLocation == 0:
             self.makeNewLine()
@@ -73,7 +73,7 @@ class BrailleText():
             self.makeNewLine()
             indexFinal += 1
         self.allHeadings.append((indexStart, indexFinal))
-
+        
     def addLongExpression(self, longExpr, withHyphen = False):
         if withHyphen:
             self.currentLine.append(symbols['music_hyphen'], addSpace = False)
@@ -213,7 +213,7 @@ class BrailleText():
         self.recenterHeadings()
         return u"\n".join([str(l) for l in self.allLines])
 
-class BrailleKeyboard(BrailleText):
+class BrailleKeyboard():
     def __init__(self, lineLength = 40):
         self.lineLength = lineLength
         self.allLines = []
@@ -230,6 +230,24 @@ class BrailleKeyboard(BrailleText):
             self.addNoteGroupings(measureNumber, noteGroupingL, noteGroupingR)
         else:
             raise BrailleTextException("Invalid Keyword.")
+    
+    def addHeading(self, heading):
+        if not self.currentLine.textLocation == 0:
+            self.makeNewLine()
+        indexStart = len(self.allLines) - 1
+        indexFinal = indexStart
+        for line in heading.splitlines():
+            self.currentLine.isHeading = True
+            self.currentLine.append(line, addSpace = False)
+            self.makeNewLine()
+            indexFinal += 1
+        self.allHeadings.append((indexStart, indexFinal))
+
+    def makeNewLine(self):
+        self.currentLine = BrailleTextLine(self.lineLength)
+        self.allLines.append(self.currentLine)
+        self.currentLine.isHeading = False
+        self.currentLine.containsNoteGrouping = False
 
     def makeNewLines(self):
         if self.currentLine.textLocation == 0:
@@ -290,6 +308,29 @@ class BrailleKeyboard(BrailleText):
                 self.rightHand.textLocation = self.leftHand.textLocation
         self.rightHand.containsNoteGrouping = True
         self.leftHand.containsNoteGrouping = True
+
+    def recenterHeadings(self):
+        for (indexStart, indexFinal) in self.allHeadings:
+            maxLineLength = 0
+            for i in range(indexFinal, len(self.allLines)):
+                if self.allLines[i].isHeading:
+                    break
+                lineLength = self.allLines[i].textLocation
+                if lineLength > maxLineLength:
+                    maxLineLength = lineLength
+            if self.lineLength == maxLineLength:
+                continue
+            for j in range(indexStart, indexFinal):
+                lineToCenter = str(self.allLines[j])
+                lineToCenter = lineToCenter.strip(symbols['space'])
+                if maxLineLength > len(lineToCenter):
+                    lineToCenter = lineToCenter.center(maxLineLength, symbols['space'])
+                    self.allLines[j].insert(0, lineToCenter)
+                    self.allLines[j].textLocation = maxLineLength
+                    
+    def __str__(self):
+        self.recenterHeadings()
+        return u"\n".join([str(l) for l in self.allLines])
     
 class BrailleTextLine():
     def __init__(self, lineLength):
