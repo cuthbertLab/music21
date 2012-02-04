@@ -266,7 +266,14 @@ class TagLib(object):
 ('tuplet', False, Tuplet), 
 ('notehead', True, Notehead), 
 ('technical', False, Technical), 
+
 ('wedge', False, Wedge), 
+('octave-shift', False, OctaveShift), 
+('bracket', False, Bracket), 
+('wavy-line', False, WavyLine), 
+('glissando', False, Glissando), 
+('dashes', False, Dashes), 
+
 ('ornaments', False, Ornaments), 
 ('part', False, Part), 
 ('key', False, Key), 
@@ -2909,7 +2916,14 @@ class Handler(xml.sax.ContentHandler):
         self._directionObj = None
         self._directionTypeObj = None
         self._graceObj = None
+
         self._wedgeObj = None
+        self._octaveShiftObj = None
+        self._bracketObj = None
+        self._wavyLineObj = None
+        self._glissandoObj = None
+        self._dashesObj = None
+
         self._wordsObj = None
         self._soundObj = None
 
@@ -3140,9 +3154,33 @@ class Handler(xml.sax.ContentHandler):
             self._wordsObj = Words()
             self._wordsObj.loadAttrs(attrs)
 
+
+
         elif name == 'wedge': 
             self._wedgeObj = Wedge()
             self._wedgeObj.loadAttrs(attrs)
+
+        elif name == 'octave-shift': 
+            self._octaveShiftObj = OctaveShift()
+            self._octaveShiftObj.loadAttrs(attrs)
+
+        elif name == 'bracket': 
+            self._bracketObj = Bracket()
+            self._bracketObj.loadAttrs(attrs)
+
+        elif name == 'wavy-line': 
+            self._wavyLineObj = WavyLine()
+            self._wavyLineObj.loadAttrs(attrs)
+
+        elif name == 'glissando': 
+            self._glissandoObj = Glissando()
+            self._glissandoObj.loadAttrs(attrs)
+
+        elif name == 'dashes': 
+            self._dashesObj = Dashes()
+            self._dashesObj.loadAttrs(attrs)
+
+
 
         elif name == 'ornaments': 
             self._ornamentsObj = Ornaments()
@@ -3721,6 +3759,30 @@ class Handler(xml.sax.ContentHandler):
             else:
                 raise MusicXMLException('do not know where this wedge goes: %s' % self._wedgeObj)
             self._wedgeObj = None
+
+
+
+        elif name == 'octave-shift': 
+            #TODO: import
+            self._octaveShiftObj = None
+
+        elif name == 'bracket': 
+            #TODO: import
+            self._bracketObj = None
+
+        elif name == 'wavy-line': 
+            #TODO: import
+            self._wavyLineObj = None
+
+        elif name == 'glissado': 
+            #TODO: import
+            self._glissandoObj = None
+
+        elif name == 'dashes': 
+            #TODO: import
+            self._dashesObj = None
+
+
 
         elif name == 'segno':
             if self._directionTypeObj != None: 
