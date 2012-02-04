@@ -2691,8 +2691,8 @@ def example24_2():
     '''
     >>> from music21.braille import test     
     >>> from music21.braille import translate 
-    >>> rightHand = example24_2()[0]
-    >>> leftHand = example24_2()[1]
+    >>> rightHand = test.example24_2()[0]
+    >>> leftHand = test.example24_2()[1]
     >>> print translate.keyboardPartsToBraille(rightHand, leftHand)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠁⠀⠅⠜⠨⠙⠐⠓⠋⠓⠀⠐⠛⠓⠋⠊⠀⠐⠓⠛⠋⠑⠀⠐⠋⠋⠑⠭⠀⠐⠋⠑⠋⠓⠀⠐⠛⠓⠊⠛
@@ -2713,8 +2713,8 @@ def example24_3():
     '''
     >>> from music21.braille import test     
     >>> from music21.braille import translate 
-    >>> rightHand = example24_3()[0]
-    >>> leftHand = example24_3()[1]
+    >>> rightHand = test.example24_3()[0]
+    >>> leftHand = test.example24_3()[1]
     >>> print translate.keyboardPartsToBraille(rightHand, leftHand)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠚⠀⠅⠜⠨⠱⠇⠀⠨⠑⠋⠑⠙⠚⠊⠀⠐⠗⠁⠉⠺⠇
@@ -2749,8 +2749,8 @@ def example24_4():
     '''
     >>> from music21.braille import test     
     >>> from music21.braille import translate 
-    >>> rightHand = example24_4()[0]
-    >>> leftHand = example24_4()[1]
+    >>> rightHand = test.example24_4()[0]
+    >>> leftHand = test.example24_4()[1]
     >>> print translate.keyboardPartsToBraille(rightHand, leftHand)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠀⠊⠀⠅⠜⠰⠵⠚⠊⠛⠫⠈⠉⠯⠑⠐⠊⠨⠑⠫⠀⠨⠽⠚⠙⠑⠯⠓⠛⠋⠿⠋⠛⠓⠮⠚⠙⠑
@@ -2784,9 +2784,9 @@ def example24_5():
     rightHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     leftHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     for m in rightHand:
-        m.number += 10
+        m.number += 9
     for m in leftHand:
-        m.number += 10
+        m.number += 9
     rightHand[0].notes[0].fingering = '4'
     rightHand[0].notes[1].fingering = '3'
     rightHand[0].notes[2].fingering = '2'
