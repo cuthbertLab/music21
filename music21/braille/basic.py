@@ -12,10 +12,15 @@ import music21
 import unittest
 
 from music21 import articulations
+from music21 import bar
+from music21 import chord
 from music21 import clef
+from music21 import dynamics
 from music21 import environment
+from music21 import expressions
 from music21 import interval
 from music21 import note
+from music21 import stream
 
 from music21.braille import lookup
 
@@ -40,7 +45,9 @@ rests = lookup.rests
 symbols = lookup.symbols
 textExpressions = lookup.textExpressions
 
+binary_dots = lookup.binary_dots
 environRules = environment.Environment('basic.py')
+
 #-------------------------------------------------------------------------------
 # music21Object to braille unicode methods
 
@@ -831,6 +838,89 @@ def transcribeNoteFingering(sampleNoteFingering = '1', upperFirstInFingering = T
 
     return u"".join(trans)
 
+def transcribeNoteGrouping(brailleElementGrouping, showLeadingOctave = True):
+    try:
+        trans = []
+        previousNote = None
+        previousElement = None
+        for brailleElement in brailleElementGrouping:
+            if isinstance(brailleElement, note.Note):
+                currentNote = brailleElement
+                if previousNote == None:
+                    doShowOctave = showLeadingOctave
+                else:
+                    doShowOctave = showOctaveWithNote(previousNote, currentNote)
+                trans.append(noteToBraille(currentNote, showOctave = doShowOctave,\
+                                 upperFirstInFingering = brailleElementGrouping.upperFirstInNoteFingering))
+                previousNote = currentNote
+            elif isinstance(brailleElement, note.Rest):
+                currentRest = brailleElement
+                trans.append(restToBraille(currentRest))
+            elif isinstance(brailleElement, chord.Chord):
+                currentChord = brailleElement
+                try:
+                    allNotes = sorted(currentChord._components, key=lambda n: n.pitch)
+                except AttributeError as e:
+                    raise BrailleSegmentException("If you're getting this exception,\
+                    the '_components' attribute for a music21 Chord probably\
+                    became 'notes'. If that's the case, change it and life will be great.")
+                if brailleElementGrouping.descendingChords:
+                    currentNote = allNotes[-1]
+                else:
+                    currentNote = allNotes[0]
+                if previousNote == None:
+                    doShowOctave = showLeadingOctave
+                else:
+                    doShowOctave = showOctaveWithNote(previousNote, currentNote)
+                trans.append(chordToBraille(currentChord,\
+                                    descending = brailleElementGrouping.descendingChords, showOctave = doShowOctave))
+                previousNote = currentNote
+            elif isinstance(brailleElement, dynamics.Dynamic):
+                currentDynamic = brailleElement
+                trans.append(dynamicToBraille(currentDynamic))
+                previousNote = None
+                showLeadingOctave = True
+            elif isinstance(brailleElement, expressions.TextExpression):
+                currentExpression = brailleElement
+                trans.append(textExpressionToBraille(currentExpression))
+                previousNote = None
+                showLeadingOctave = True
+            elif isinstance(brailleElement, bar.Barline):
+                currentBarline = brailleElement
+                trans.append(barlineToBraille(currentBarline))
+            elif isinstance(brailleElement, clef.Clef):
+                if brailleElementGrouping.showClefSigns:
+                    currentClef = brailleElement
+                    trans.append(clefToBraille(currentClef))
+                    previousNote = None
+                    showLeadingOctave = True
+            else:
+                environRules.warn("{0} not transcribed to braille.".format(brailleElement))
+            if not previousElement == None:
+                if brailleElementGrouping.showClefSigns and isinstance(previousElement, clef.Clef) or\
+                   isinstance(previousElement, dynamics.Dynamic)\
+                    and not isinstance(brailleElement, dynamics.Dynamic)\
+                     and not isinstance(brailleElement, expressions.TextExpression):
+                    for dots in binary_dots[trans[-1][0]]:
+                        if (dots == '10' or dots == '11'):
+                            trans.insert(-1, symbols['dot'])
+                            break
+                elif isinstance(previousElement, expressions.TextExpression)\
+                 and not isinstance(brailleElement, dynamics.Dynamic)\
+                  and not isinstance(brailleElement, expressions.TextExpression):
+                    if not previousElement.content[-1] == '.': # abbreviation, no extra dot 3 necessary
+                        for dots in binary_dots[trans[-1][0]]:
+                            if (dots == '10' or dots == '11'):
+                                trans.insert(-1, symbols['dot'])
+                                break
+            previousElement = brailleElement
+        return u"".join(trans)
+    except AttributeError:
+        brailleElementGrouping.descendingChords = True
+        brailleElementGrouping.showClefSigns = False
+        brailleElementGrouping.upperFirstInNoteFingering = True
+        return transcribeNoteGrouping(brailleElementGrouping, showLeadingOctave)
+
 def transcribeSignatures(music21KeySignature, music21TimeSignature, outgoingKeySig = None):
     '''
     Takes in a :class:`~music21.key.KeySignature` and :class:`~music21.meter.TimeSignature` and returns its representation 
@@ -859,6 +949,20 @@ def transcribeSignatures(music21KeySignature, music21TimeSignature, outgoingKeyS
         trans.append(timeSigToBraille(music21TimeSignature))
         
     return u"".join(trans)
+
+def transcribeVoice(music21Voice):
+    music21Part = stream.Part()
+    music21Measure = stream.Measure()
+    for brailleElement in music21Voice:
+        music21Measure.append(brailleElement)
+    music21Part.append(music21Measure)
+    music21Measure.number = music21Voice.measureNumber
+    allSegments = findSegments(music21Part, showHeading=False, showFirstMeasureNumber=False)
+    allTrans = []
+    for brailleElementSegment in allSegments:
+        segmentTranscription = brailleElementSegment.transcribe()
+        allTrans.append(str(segmentTranscription))
+    return u"\n".join(allTrans)
 
 #-------------------------------------------------------------------------------
 # Translation between braille unicode and ASCII/other symbols.
