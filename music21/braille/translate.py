@@ -17,85 +17,59 @@ import music21
 import unittest
 
 from music21 import stream
+from music21 import tinyNotation
 
-from music21.braille import basic
 from music21.braille import segment
-from music21.braille import text
 
 #-------------------------------------------------------------------------------
 # music21 streams to BrailleText objects.
 
-def measureToBraille(music21Measure, **measureKeywords):
-    if not 'showHeading' in measureKeywords:
-        measureKeywords['showHeading'] = False
-    if not 'showFirstMeasureNumber' in measureKeywords:
-        measureKeywords['showFirstMeasureNumber'] = False
-        
+def streamToBraille(music21Stream, debug=False, **keywords):
+    if isinstance(music21Stream, stream.Part) or isinstance(music21Stream, tinyNotation.TinyNotationStream):
+        music21Part = music21Stream.makeNotation(cautionaryNotImmediateRepeat=False)
+        return partToBraille(music21Part, debug=debug, **keywords)
+    if isinstance(music21Stream, stream.Measure):
+        music21Measure = music21Stream.makeNotation(cautionaryNotImmediateRepeat=False)
+        return measureToBraille(music21Measure, debug=debug, **keywords)
+    keyboardParts = music21Stream.getElementsByClass(stream.PartStaff)
+    if len(keyboardParts) == 2:
+        rightHand = keyboardParts[0].makeNotation(cautionaryNotImmediateRepeat=False)
+        leftHand = keyboardParts[1].makeNotation(cautionaryNotImmediateRepeat=False)
+        return keyboardPartsToBraille(rightHand, leftHand, debug=debug, **keywords)
+    raise BrailleTranslateException("Cannot transcribe stream to braille")
+    
+def measureToBraille(music21Measure, debug=False, **keywords):
+    if not 'showHeading' in keywords:
+        keywords['showHeading'] = False
+    if not 'showFirstMeasureNumber' in keywords:
+        keywords['showFirstMeasureNumber'] = False
     music21Part = stream.Part()
     music21Part.append(music21Measure)
-    return partToBraille(music21Part, **measureKeywords)
+    return partToBraille(music21Part, debug = debug, **keywords)
 
-def partToBraille(music21Part, **partKeywords):
-    allSegments = segment.findSegments(music21Part, **partKeywords)
-    allTrans = []
-    for brailleElementSegment in allSegments:
-        segmentTranscription = brailleElementSegment.transcribe()
-        allTrans.append(str(segmentTranscription))
-    return u"\n".join(allTrans)
-
-def keyboardPartsToBraille(music21PartUpper, music21PartLower, **keywords):
+def partToBraille(music21Part, debug = False, **keywords):
+    allSegments = segment.findSegments(music21Part, **keywords)
+    allBrailleText = []
+    for brailleSegment in allSegments:
+        if debug:
+            print brailleSegment
+        allBrailleText.append(brailleSegment.transcribe())
+    return u"\n".join([str(bt) for bt in allBrailleText])
+    
+def keyboardPartsToBraille(music21PartStaffUpper, music21PartStaffLower, debug=False, **keywords):
     '''
     Translates a stream Part consisting of two stream Parts, a right hand and left hand,
     into braille music bar over bar format.
     '''
-    maxLineLength = 40
-    segmentBreaks = None
-    if 'maxLineLength' in keywords:
-        maxLineLength = keywords['maxLineLength']
-    if 'segmentBreaks' in keywords:
-        segmentBreaks = keywords['segmentBreaks']
-
-    rhSegments = segment.findSegments(music21PartUpper, showHand = 'right',\
-                                      maxLineLength = maxLineLength, segmentBreaks = segmentBreaks)
-    lhSegments = segment.findSegments(music21PartLower, showHand = 'left',\
-                                      maxLineLength = maxLineLength, segmentBreaks = segmentBreaks)
+    rhSegments = segment.findSegments(music21PartStaffUpper, **keywords)
+    lhSegments = segment.findSegments(music21PartStaffLower, **keywords)
     allBrailleText = []
     for (rhSegment, lhSegment) in itertools.izip(rhSegments, lhSegments):
-        bt = text.BrailleKeyboard(maxLineLength)
-        try:
-            brailleHeadingR = rhSegment.extractHeading(bt)
-            brailleHeadingL = lhSegment.extractHeading(text.BrailleKeyboard(maxLineLength)) # placeholder
-            allGroupingKeysR = rhSegment.allGroupingKeys
-            allGroupingKeysL = lhSegment.allGroupingKeys
-        except basic.BrailleBasicException as bbe:
-            if not bbe.args[0] == "No heading can be made.":
-                raise bbe
-            allGroupingKeysR = sorted(rhSegment.keys())
-            allGroupingKeysL = sorted(lhSegment.keys())
-
-        bt.highestMeasureNumberLength = len(str(allGroupingKeysR[-1] / 100))
-        
-        for (gkR, gkL) in itertools.izip(allGroupingKeysR, allGroupingKeysL):
-            if gkR / 100 != gkL / 100 or gkR % 10 < 8 or gkL % 10 < 8:
-                print "Cannot continue keyboard transcription: "
-                print (gkR, gkL)
-                return bt 
-            currentMeasureNumber = basic.numberToBraille(gkR / 100, withNumberSign=False)
-            if gkR % 10 == 8:
-                inaccords = rhSegment[gkR]
-                rh_braille = basic.symbols['full_inaccord'].join([segment.transcribeVoice(vc) for vc in inaccords])
-            else:
-                rh_braille = basic.transcribeNoteGrouping(rhSegment[gkR])
-            if gkL % 10 == 8:
-                inaccords = lhSegment[gkL]
-                lh_braille = basic.symbols['full_inaccord'].join([segment.transcribeVoice(vc) for vc in inaccords])
-            else:
-                lh_braille = basic.transcribeNoteGrouping(lhSegment[gkL])
-            bt.addNoteGroupings(currentMeasureNumber, lh_braille, rh_braille)
-        bt.makeNewLine()
-        allBrailleText.append(bt)
-        
-    return u"\n".join([str(bt) for bt in allBrailleText])
+        if debug:
+            print bg
+        bg = segment.BrailleGrandSegment(rhSegment, lhSegment)
+        allBrailleText.append(bg.transcribe())
+    return u"\n\n".join([str(bt) for bt in allBrailleText])
 
 #-------------------------------------------------------------------------------
 
@@ -107,7 +81,6 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
-
 
 if __name__ == "__main__":
     import sys
