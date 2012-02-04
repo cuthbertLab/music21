@@ -44,6 +44,12 @@ environLocal = environment.Environment(_MOD)
 VERSION_MINIMUM = (0, 6, 3) 
 
 
+# new objects to add: octave-shift, in direction-type
+# bracket, in direction-type
+# Notations -> ornaments, trill-mark/wavy-line
+# notations -> glissando
+# dashes, in direction-type
+
 #-------------------------------------------------------------------------------
 # notes
 
@@ -2187,16 +2193,122 @@ class Grace(MusicXMLElement):
 
 
 class Wedge(MusicXMLElement):
+    '''
+    >>> from music21 import *
+    >>> w = musicxml.Wedge()
+    >>> w.tag
+    'wedge'
+    '''
     def __init__(self, type=None):
         MusicXMLElement.__init__(self)
         self._tag = 'wedge'
         # attributes
         self._attr['type'] = None # crescendo, stop, or diminuendo
-        self._attr['spread'] = None
-        self._attr['relative-y'] = None
+        self._attr['number'] = None # used for id
+        self._attr['spread'] = None # in tenths
+
+        self._attr['default-x'] = None 
+        self._attr['default-y'] = None 
         self._attr['relative-x'] = None
+        self._attr['relative-y'] = None
 
 
+class OctaveShift(MusicXMLElement):
+    '''
+    >>> from music21 import *
+    >>> os = musicxml.OctaveShift()
+    >>> os.tag
+    'octave-shift'
+    '''
+    def __init__(self, type=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'octave-shift'
+
+        # attributes
+        self._attr['type'] = None # up-down-stop
+        self._attr['number'] = None # used for id
+        self._attr['size'] = None # integer, 8 is default, 15 is two octaves
+
+
+class Bracket(MusicXMLElement):
+    '''
+    >>> from music21 import *
+    >>> b = musicxml.Bracket()
+    >>> b.tag
+    'bracket'
+    '''
+    def __init__(self, type=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'bracket'
+
+        # attributes
+        self._attr['type'] = None # start/stop
+        self._attr['number'] = None # used for id
+        self._attr['line-end'] = None 
+        self._attr['end-length'] = None 
+        self._attr['line-type'] = None 
+
+        self._attr['default-x'] = None 
+        self._attr['default-y'] = None 
+        self._attr['relative-x'] = None 
+        self._attr['relative-y'] = None 
+
+
+class WavyLine(MusicXMLElement):
+    '''A wavy line that extends across many notes or measures.
+
+    >>> from music21 import *
+    >>> wl = musicxml.WavyLine()
+    >>> wl.tag
+    'wavy-line'
+    '''
+    def __init__(self, type=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'wavy-line'
+
+        # attributes
+        self._attr['type'] = None # start/stop/continue
+        self._attr['number'] = None # used for id
+        self._attr['default-x'] = None 
+        self._attr['default-y'] = None 
+        self._attr['relative-x'] = None 
+        self._attr['relative-y'] = None 
+        self._attr['placement'] = None # above or below
+
+class Glissando(MusicXMLElement):
+    '''
+    >>> from music21 import *
+    >>> g = musicxml.Glissando()
+    >>> g.tag
+    'glissando'
+    '''
+    def __init__(self, type=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'glissando'
+
+        # attributes
+        self._attr['type'] = None # start/stop
+        self._attr['number'] = None # used for id
+        self._attr['line-type'] = None # solid, dashed, dotted, wavy
+
+class Dashes(MusicXMLElement):
+    '''
+    >>> from music21 import *
+    >>> d = musicxml.Dashes()
+    >>> d.tag
+    'dashes'
+    '''
+    def __init__(self, type=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'dashes'
+
+        # attributes
+        self._attr['type'] = None # start/stop
+        self._attr['number'] = None # used for id
+        self._attr['default-x'] = None 
+        self._attr['default-y'] = None 
+        self._attr['relative-x'] = None 
+        self._attr['relative-y'] = None 
 
 
 class Ornaments(MusicXMLElementList):

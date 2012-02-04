@@ -1028,6 +1028,8 @@ class RepeatBracket(Spanner):
 
 #-------------------------------------------------------------------------------
 class DynamicWedge(Spanner):
+    '''Common base-class for Crescendo and Diminuendo. 
+    '''
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
 
