@@ -19,8 +19,8 @@ import unittest
 from music21 import stream
 
 from music21.braille import basic
-from music21.braille import text
 from music21.braille import segment
+from music21.braille import text
 
 #-------------------------------------------------------------------------------
 # music21 streams to BrailleText objects.
@@ -63,9 +63,8 @@ def keyboardPartsToBraille(music21PartUpper, music21PartLower, **keywords):
     for (rhSegment, lhSegment) in itertools.izip(rhSegments, lhSegments):
         bt = text.BrailleKeyboard(maxLineLength)
         try:
-            brailleHeadingR = rhSegment.extractHeading()
-            brailleHeadingL = lhSegment.extractHeading()
-            bt.addElement(heading = brailleHeadingR)
+            brailleHeadingR = rhSegment.extractHeading(bt)
+            brailleHeadingL = lhSegment.extractHeading(text.BrailleKeyboard(maxLineLength)) # placeholder
             allGroupingKeysR = rhSegment.allGroupingKeys
             allGroupingKeysL = lhSegment.allGroupingKeys
         except basic.BrailleBasicException as bbe:
@@ -86,12 +85,12 @@ def keyboardPartsToBraille(music21PartUpper, music21PartLower, **keywords):
                 inaccords = rhSegment[gkR]
                 rh_braille = basic.symbols['full_inaccord'].join([segment.transcribeVoice(vc) for vc in inaccords])
             else:
-                rh_braille = segment.transcribeNoteGrouping(rhSegment[gkR])
+                rh_braille = basic.transcribeNoteGrouping(rhSegment[gkR])
             if gkL % 10 == 8:
                 inaccords = lhSegment[gkL]
                 lh_braille = basic.symbols['full_inaccord'].join([segment.transcribeVoice(vc) for vc in inaccords])
             else:
-                lh_braille = segment.transcribeNoteGrouping(lhSegment[gkL])
+                lh_braille = basic.transcribeNoteGrouping(lhSegment[gkL])
             bt.addNoteGroupings(currentMeasureNumber, lh_braille, rh_braille)
         bt.makeNewLine()
         allBrailleText.append(bt)
