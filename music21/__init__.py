@@ -46,7 +46,7 @@ __all__ = ['base',
            'abc', 'abj', 'analysis', 'audioSearch',
 
            'chant', 'classCache', 
-           'composition', 'configure', 'contextCache',
+           'composition', 'configure', 
            'counterpoint', 'corpus', 
            'demos', 'doc', 'figuredBass', 'humdrum', 'harmony', 
            'languageExcerpts',

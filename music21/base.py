@@ -79,7 +79,6 @@ from music21 import environment
 # needed for temporal manipulations; not music21 objects
 from music21 import tie
 from music21 import duration
-#from music21 import contextCache
 
 _MOD = 'music21.base.py'
 environLocal = environment.Environment(_MOD)
@@ -2372,15 +2371,6 @@ class Music21Object(JSONSerializer):
         '''
         #if DEBUG_CONTEXT: print 'X: first call; looking for:', className, id(self), self
         from music21 import stream # needed for exception matching
-
-#         if self.isStream and isinstance(className, str):
-#             if self._cache['contextCache'] is not None:
-#                 post = self._cache['contextCache'].get(className, callerFirst, 
-#                                             getElementMethod)
-#                 if post is not None:
-#                     environLocal.pd(['using context cache'])
-#                     return post
-
 
         #environLocal.printDebug(['call getContextByClass from:', self, 'activeSite:', self.activeSite, 'callerFirst:', callerFirst, 'prioritizeActiveSite', prioritizeActiveSite])
     
