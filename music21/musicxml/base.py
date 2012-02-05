@@ -3754,32 +3754,44 @@ class Handler(xml.sax.ContentHandler):
 
 
         elif name == 'wedge': 
-            if self._directionTypeObj != None: 
+            if self._directionTypeObj is not None: 
                 self._directionTypeObj.componentList.append(self._wedgeObj)
             else:
-                raise MusicXMLException('do not know where this wedge goes: %s' % self._wedgeObj)
+                raise MusicXMLException('missing direction type container: %s' % self._wedgeObj)
             self._wedgeObj = None
 
 
-
         elif name == 'octave-shift': 
-            #TODO: import
+            if self._directionTypeObj is not None: 
+                self._directionTypeObj.componentList.append(
+                    self._octaveShiftObj)
+            else:
+                raise MusicXMLException('missing direction type container: %s' % self._octaveShiftObj)
             self._octaveShiftObj = None
 
         elif name == 'bracket': 
-            #TODO: import
+            if self._directionTypeObj is not None: 
+                self._directionTypeObj.componentList.append(
+                    self._bracketObj)
+            else:
+                raise MusicXMLException('missing direction type container: %s' % self._bracketObj)
             self._bracketObj = None
 
         elif name == 'wavy-line': 
-            #TODO: import
+            # goes in ornaments, which is in notations
+            self._ornamentsObj.append(self._wavyLineObj)
             self._wavyLineObj = None
 
-        elif name == 'glissado': 
-            #TODO: import
+        elif name == 'glissando': 
+            # goes in notations
+            self._notationsObj.append(self._glissandoObj)
             self._glissandoObj = None
 
         elif name == 'dashes': 
-            #TODO: import
+            if self._directionTypeObj is not None: 
+                self._directionTypeObj.componentList.append(self._dashesObj)
+            else:
+                raise MusicXMLException('missing direction type container: %s' % self._dashesObj)
             self._dashesObj = None
 
 
@@ -4974,6 +4986,58 @@ class Test(unittest.TestCase):
 """
         self._compareXml(h, expected)
 
+
+
+    def testDirectionsA(self):
+        from music21.musicxml import testPrimitive
+
+        wedgeCount = 0
+        octaveShiftCount = 0
+        dashesCount = 0
+        bracketCount = 0
+
+        d = Document()
+        d.read(testPrimitive.directions31a)
+        for m in d.score[0]: # get each raw measure
+            for sub in m:
+                if isinstance(sub, Direction):
+                    for dType in sub:
+                        for d in dType:
+                            if isinstance(d, Dashes):
+                                dashesCount += 1
+                            if isinstance(d, OctaveShift):
+                                octaveShiftCount += 1
+                            if isinstance(d, Wedge):
+                                wedgeCount += 1
+                            if isinstance(d, Bracket):
+                                bracketCount += 1
+        self.assertEqual(dashesCount, 2)
+        self.assertEqual(octaveShiftCount, 2)
+        self.assertEqual(bracketCount, 2)
+        self.assertEqual(wedgeCount, 4)
+                        
+
+    def testSpannersA(self):
+        from music21.musicxml import testPrimitive
+
+        glissCount = 0
+        wavyCount = 0
+
+        d = Document()
+        d.read(testPrimitive.spanners33a)
+        for m in d.score[0]: # get each raw measure
+            for sub in m:
+                if isinstance(sub, Note):
+                    if sub.notationsObj is not None:
+                        for n in sub.notationsObj:
+                            if isinstance(n, Glissando):
+                                glissCount += 1
+                            if isinstance(n, Ornaments):
+                                for o in n:
+                                    if isinstance(o, WavyLine):
+                                        wavyCount += 1;
+        self.assertEqual(glissCount, 2)
+        self.assertEqual(wavyCount, 4)
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
