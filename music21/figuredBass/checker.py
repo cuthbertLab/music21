@@ -42,7 +42,7 @@ def getVoiceLeadingMoments(music21Stream):
             :width: 700
     '''
     allHarmonies = extractHarmonies(music21Stream)
-    allParts = music21Stream.getElementsByClass(['Part','TinyNotationStream'])
+    allParts = music21Stream.getElementsByClass(['Part', 'TinyNotationStream'])
     newParts = [allParts[i].flat.getElementsNotOfClass('GeneralNote') for i in range(len(allParts))]
     paddingLeft = allParts[0].getElementsByClass('Measure')[0].paddingLeft
     for (offsets, notes) in sorted(allHarmonies.items()):
@@ -52,7 +52,7 @@ def getVoiceLeadingMoments(music21Stream):
             newGeneralNote = copy.deepcopy(music21GeneralNote)
             newGeneralNote.quarterLength = endTime - initOffset
             newGeneralNote.tie = None
-            newParts[genNoteIndex].insert(initOffset+paddingLeft, newGeneralNote)
+            newParts[genNoteIndex].insert(initOffset + paddingLeft, newGeneralNote)
     for givenPart in newParts:
         givenPart.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         if paddingLeft != 0.0:
@@ -101,7 +101,7 @@ def extractHarmonies(music21Stream):
     (11.0, 11.5)   [<music21.note.Note A>  <music21.note.Note F>  <music21.note.Note D> ]
     (11.5, 12.0)   [<music21.note.Note A>  <music21.note.Note F>  <music21.note.Note A> ]
     '''
-    allParts = music21Stream.getElementsByClass(['Part','TinyNotationStream'])
+    allParts = music21Stream.getElementsByClass(['Part', 'TinyNotationStream'])
     if len(allParts) < 2:
         raise Exception()
     allHarmonies = createOffsetMapping(allParts[0])
@@ -174,8 +174,8 @@ def correlateHarmonies(currentMapping, music21Part):
     
     for offsets in sorted(currentMapping.keys()):
         (initOffset, endTime) = offsets
-        notesInRange = music21Part.flat.getElementsByClass('GeneralNote').getElementsByOffset(initOffset, offsetEnd = endTime,\
-                        includeEndBoundary = False, mustFinishInSpan = False, mustBeginInSpan = False)
+        notesInRange = music21Part.flat.getElementsByClass('GeneralNote').getElementsByOffset(initOffset, offsetEnd=endTime, \
+                        includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=False)
         allNotesSoFar = currentMapping[offsets]
         for music21GeneralNote in notesInRange:
             newInitOffset = initOffset
@@ -193,7 +193,7 @@ def correlateHarmonies(currentMapping, music21Part):
 #-------------------------------------------------------------------------------
 # Generic methods for checking for composition rule violations in streams
 
-def checkSinglePossibilities(music21Stream, functionToApply, color = "#FF0000", debug = False):
+def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", debug=False):
     '''    
     Takes in a :class:`~music21.stream.Score` and a functionToApply which takes in a possibility
     instance, a tuple with pitches or rests comprising a vertical sonority. Changes the color of
@@ -231,10 +231,10 @@ def checkSinglePossibilities(music21Stream, functionToApply, color = "#FF0000", 
     if debug is True:
         debugInfo = []
         debugInfo.append("Function To Apply: " + functionToApply.__name__)
-        debugInfo.append("{0:25}{1}".format("(Offset, End Time):","Part Numbers:"))
+        debugInfo.append("{0:25}{1}".format("(Offset, End Time):", "Part Numbers:"))
     
     allHarmonies = sorted(extractHarmonies(music21Stream).items())
-    allParts = [p.flat for p in music21Stream.getElementsByClass(['Part','TinyNotationStream'])]
+    allParts = [p.flat for p in music21Stream.getElementsByClass(['Part', 'TinyNotationStream'])]
     for (offsets, notes) in allHarmonies:
         vlm = [generalNoteToPitch(n) for n in notes]
         vlm_violations = functionToApply(vlm)
@@ -242,7 +242,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color = "#FF0000", 
         for partNumberTuple in vlm_violations:
             for partNumber in partNumberTuple:
                 if color is not None:
-                    noteA = allParts[partNumber-1].getElementsByOffset(initOffset, initOffset, mustBeginInSpan = False)[0]
+                    noteA = allParts[partNumber - 1].getElementsByOffset(initOffset, initOffset, mustBeginInSpan=False)[0]
                     noteA.color = color
             if debug is True:
                 debugInfo.append("{0:25}{1}".format(offsets, partNumberTuple))
@@ -253,7 +253,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color = "#FF0000", 
         for lineInfo in debugInfo:
             print lineInfo
 
-def checkConsecutivePossibilities(music21Stream, functionToApply, color = "#FF0000", debug = False):
+def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000", debug=False):
     '''
     Takes in a :class:`~music21.stream.Score` and a functionToApply which takes in two consecutive 
     possibility instances, each a tuple with pitches or rests comprising a vertical sonority. 
@@ -293,10 +293,10 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color = "#FF00
     if debug is True:
         debugInfo = []
         debugInfo.append("Function To Apply: " + functionToApply.__name__)
-        debugInfo.append("{0:25}{1:25}{2}".format("(Offset A, End Time A):","(Offset B, End Time B):","Part Numbers:"))
+        debugInfo.append("{0:25}{1:25}{2}".format("(Offset A, End Time A):", "(Offset B, End Time B):", "Part Numbers:"))
 
     allHarmonies = sorted(extractHarmonies(music21Stream).items())
-    allParts = [p.flat for p in music21Stream.getElementsByClass(['Part','TinyNotationStream'])]    
+    allParts = [p.flat for p in music21Stream.getElementsByClass(['Part', 'TinyNotationStream'])]    
     (previousOffsets, previousNotes) = allHarmonies[0]
     vlmA = [generalNoteToPitch(n) for n in previousNotes]
     initOffsetA = previousOffsets[0]
@@ -308,8 +308,8 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color = "#FF00
         for partNumberTuple in vlm_violations:
             for partNumber in partNumberTuple:
                 if color is not None:
-                    noteA = allParts[partNumber-1].getElementsByOffset(initOffsetA, initOffsetA, mustBeginInSpan = False)[0]
-                    noteB = allParts[partNumber-1].getElementsByOffset(initOffsetB, initOffsetB, mustBeginInSpan = False)[0]
+                    noteA = allParts[partNumber - 1].getElementsByOffset(initOffsetA, initOffsetA, mustBeginInSpan=False)[0]
+                    noteB = allParts[partNumber - 1].getElementsByOffset(initOffsetB, initOffsetB, mustBeginInSpan=False)[0]
                     noteA.color = color
                     noteB.color = color
             if debug is True:
@@ -366,7 +366,7 @@ def voiceCrossing(possibA):
             except AttributeError:
                 continue
             if higherPitch < lowerPitch:
-                partViolations.append((part1Index+1, part2Index+1))
+                partViolations.append((part1Index + 1, part2Index + 1))
     return partViolations
 
 #-------------------------------------------------------------------------------
@@ -431,7 +431,7 @@ def parallelFifths(possibA, possibB):
     
     for pair1Index in range(len(pairsList)):
         (higherPitchA, higherPitchB) = pairsList[pair1Index]
-        for pair2Index in range(pair1Index +  1, len(pairsList)):
+        for pair2Index in range(pair1Index + 1, len(pairsList)):
             (lowerPitchA, lowerPitchB) = pairsList[pair2Index]
             try:
                 if not abs(higherPitchA.ps - lowerPitchA.ps) % 12 == 7:
@@ -445,10 +445,10 @@ def parallelFifths(possibA, possibB):
             if parallelFifthsTable.has_key(pitchQuartet):
                 hasParallelFifths = parallelFifthsTable[pitchQuartet]
                 if hasParallelFifths: 
-                    partViolations.append((pair1Index+1, pair2Index+1))
+                    partViolations.append((pair1Index + 1, pair2Index + 1))
             vlq = voiceLeading.VoiceLeadingQuartet(*pitchQuartet)
             if vlq.parallelFifth():
-                partViolations.append((pair1Index+1, pair2Index+1))
+                partViolations.append((pair1Index + 1, pair2Index + 1))
                 parallelFifthsTable[pitchQuartet] = True
             parallelFifthsTable[pitchQuartet] = False
 
@@ -522,11 +522,11 @@ def hiddenFifth(possibA, possibB):
             if hiddenFifthsTable.has_key(pitchQuartet):
                 hasHiddenFifth = hiddenFifthsTable[pitchQuartet]
                 if hasHiddenFifth:
-                    partViolations.append((1,len(possibB)))
+                    partViolations.append((1, len(possibB)))
                 return partViolations
             vlq = voiceLeading.VoiceLeadingQuartet(*pitchQuartet)
             if vlq.hiddenFifth():
-                partViolations.append((1,len(possibB)))
+                partViolations.append((1, len(possibB)))
                 hiddenFifthsTable[pitchQuartet] = True
             hiddenFifthsTable[pitchQuartet] = False
             return partViolations
@@ -589,7 +589,7 @@ def parallelOctaves(possibA, possibB):
     
     for pair1Index in range(len(pairsList)):
         (higherPitchA, higherPitchB) = pairsList[pair1Index]
-        for pair2Index in range(pair1Index +  1, len(pairsList)):
+        for pair2Index in range(pair1Index + 1, len(pairsList)):
             (lowerPitchA, lowerPitchB) = pairsList[pair2Index]
             try:
                 if not abs(higherPitchA.ps - lowerPitchA.ps) % 12 == 0:
@@ -603,10 +603,10 @@ def parallelOctaves(possibA, possibB):
             if parallelOctavesTable.has_key(pitchQuartet):
                 hasParallelOctaves = parallelOctavesTable[pitchQuartet]
                 if hasParallelOctaves: 
-                    partViolations.append((pair1Index+1, pair2Index+1))
+                    partViolations.append((pair1Index + 1, pair2Index + 1))
             vlq = voiceLeading.VoiceLeadingQuartet(*pitchQuartet)
             if vlq.parallelOctave():
-                partViolations.append((pair1Index+1, pair2Index+1))
+                partViolations.append((pair1Index + 1, pair2Index + 1))
                 parallelOctavesTable[pitchQuartet] = True
             parallelOctavesTable[pitchQuartet] = False
 
@@ -668,11 +668,11 @@ def hiddenOctave(possibA, possibB):
             if hiddenOctavesTable.has_key(pitchQuartet):
                 hasHiddenOctave = hiddenOctavesTable[pitchQuartet]
                 if hasHiddenOctave:
-                    partViolations.append((1,len(possibB)))
+                    partViolations.append((1, len(possibB)))
                 return partViolations
             vlq = voiceLeading.VoiceLeadingQuartet(*pitchQuartet)
             if vlq.hiddenOctave():
-                partViolations.append((1,len(possibB)))
+                partViolations.append((1, len(possibB)))
                 hiddenOctavesTable[pitchQuartet] = True
             hiddenOctavesTable[pitchQuartet] = False
             return partViolations
