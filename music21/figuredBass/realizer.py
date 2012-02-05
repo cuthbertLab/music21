@@ -235,6 +235,7 @@ class FiguredBassLine(object):
             self._fbList.append(bassObject) #a roman Numeral object
         else:
             raise FiguredBassLineException("Not a valid bassObject (only note.Note, harmony.ChordSymbol, and roman.RomanNumeral supported)")
+    
     def generateBassLine(self):
         '''
         Generates the bass line as a :class:`~music21.stream.Score`.
