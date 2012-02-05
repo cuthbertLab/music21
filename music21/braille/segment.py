@@ -266,7 +266,10 @@ class BrailleSegment(collections.defaultdict):
         
         outgoingKeySig = None
         if self.cancelOutgoingKeySig and not keySignature is None:
-            outgoingKeySig = keySignature.outgoingKeySig
+            try:
+                outgoingKeySig = keySignature.outgoingKeySig
+            except AttributeError:
+                pass
 
         withHyphen = False
         if self.previousGroupingKey is not None and (self.currentGroupingKey - self.previousGroupingKey) == 4:
@@ -284,7 +287,7 @@ class BrailleSegment(collections.defaultdict):
         if self.previousGroupingKey % 10 == 3:
             self.allGroupingKeys.insert(0, self.previousGroupingKey)
         self.extractHeading(brailleText)
-        brailleText.addElement(measureNumber = self.getMeasureNumber())
+        self.addMeasureNumber(brailleText)
         return None
 
     def getMeasureNumber(self):
