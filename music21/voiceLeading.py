@@ -24,8 +24,9 @@ from music21.interval import Interval
 from music21 import key
 from music21 import note
 from music21 import chord
+#from music21 import roman Can't import roman because of circular 
+#importing issue with counterpoint.py and figuredbass
 
-#TODO: add chordwise -- add parsimonious (all move by step or not at all)
 
 #-------------------------------------------------------------------------------
 class VoiceLeadingQuartet(music21.Music21Object):
@@ -41,7 +42,7 @@ class VoiceLeadingQuartet(music21.Music21Object):
     fifth  = interval.Interval("P5")
     octave = interval.Interval("P8")
         
-    def __init__(self, v1n1 = None, v1n2 = None, v2n1 = None, v2n2 = None, key=key.KeySignature(0)):
+    def __init__(self, v1n1 = None, v1n2 = None, v2n1 = None, v2n2 = None, key=key.Key('C')):
         self._v1n1 = None
         self._v1n2 = None
         self._v2n1 = None
@@ -55,9 +56,32 @@ class VoiceLeadingQuartet(music21.Music21Object):
         self.vIntervals = [] #vertical intervals (harmonic)
         self.hIntervals = [] #horizontal intervals (melodic)
         
-        self.key = key
+        self._key = key
+        if key is not None:
+            self.key = key
         if v1n1 is not None and v1n2 is not None and v2n1 is not None and v2n2 is not None:
             self._findIntervals()
+    
+    
+    def _getKey(self):
+        return self._key
+        
+        
+    def _setKey(self, keyValue):
+        if common.isStr(keyValue):
+            try:
+                keyValue = key.Key(key.convertKeyStringToMusic21KeyString(keyValue))
+            except: 
+                raise VoiceLeadingQuartetException('got a key signature string that is not supported: %s', keyValue)                               
+        else:
+            try:
+                keyValue.isClassOrSubclass('Key')
+            except:   
+                raise VoiceLeadingQuartetException('got a key signature that is not a string or music21 key signature object: %s', keyValue)
+        self._key = keyValue
+        
+    key = property(_getKey, _setKey)
+    
     
     
     def _getv1n1(self):
@@ -647,26 +671,32 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> vl = VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.improperResolution() #not dissonant, true returned
         False 
+        
+        >>> vl = VoiceLeadingQuartet('B-4', 'A4', 'C2', 'F2')
+        >>> vl.key = key.Key('F')
+        >>> vl.improperResolution() #not dissonant, true returned
+        False 
+        
         '''
         if self.noMotion():
             return False
-        
+
         scale = self.key.getScale()
-         
+    
         if self.vIntervals[0].simpleName == 'd5':
             return not (scale.getScaleDegreeFromPitch(self.v2n1) == 7 and \
             scale.getScaleDegreeFromPitch(self.v2n2) == 1 and \
-            self.inwardContraryMotion() and self.vIntervals[1].generic.undirected == 3)
+            self.inwardContraryMotion() and self.vIntervals[1].generic.simpleUndirected == 3)
 
         elif self.vIntervals[0].simpleName == 'A4':
             return not (scale.getScaleDegreeFromPitch(self.v2n1) == 4 and \
             scale.getScaleDegreeFromPitch(self.v2n2) == 3 and \
-            self.outwardContraryMotion() and self.vIntervals[1].generic.undirected == 6)
+            self.outwardContraryMotion() and self.vIntervals[1].generic.simpleUndirected == 6)
             
         elif self.vIntervals[0].simpleName == 'm7':
             return not (scale.getScaleDegreeFromPitch(self.v2n1) == 5 and \
             scale.getScaleDegreeFromPitch(self.v2n2) == 1 and \
-            self.inwardContraryMotion() and self.vIntervals[1].generic.undirected == 3)
+            self.inwardContraryMotion() and self.vIntervals[1].generic.simpleUndirected == 3)
         else:
             return False
            
@@ -711,36 +741,46 @@ class VoiceLeadingQuartet(music21.Music21Object):
             return False
         
     def opensIncorrectly(self):
-        '''Returns true if the opening or second harmonic interval is PU, P8, or P5, to accomodate an anacrusis.
+        '''Returns true if the opening or second harmonic interval is PU, P8, or P5, to accommodate an anacrusis.
+        also checks to see if opening establishes tonic or dominant harmony (uses 
+        :meth:`~music21.roman.identifyAsTonicOrDominant`
         
         >>> from music21 import *
         >>> vl = VoiceLeadingQuartet('D','D','D','F#')
+        >>> vl.key = 'D'
         >>> vl.opensIncorrectly()
         False
         >>> vl = VoiceLeadingQuartet('B','A','G#','A')
+        >>> vl.key = 'A'
         >>> vl.opensIncorrectly()
         False
         >>> vl = VoiceLeadingQuartet('A', 'A', 'F#', 'D')
+        >>> vl.key = 'A'
         >>> vl.opensIncorrectly()
         False
         
         >>> vl = VoiceLeadingQuartet('C#', 'C#', 'D', 'E')
+        >>> vl.key = 'A'
         >>> vl.opensIncorrectly()
         True
         
-        OMIT_FROM_DOCS
-        
-        does not check to see if opening establishes the tonic harmony...possibly run
-        music21 key analysis (k = music21Score.analyze('key') ) on the score representation
-        of this quartet object and see if it matches the designated key
+        >>> vl = VoiceLeadingQuartet('B', 'B', 'A', 'A')
+        >>> vl.key = 'C'
+        >>> vl.opensIncorrectly()
+        True
         '''
-        return not ( (self.vIntervals[0].name == 'P1' or self.vIntervals[0].name == 'P8' or self.vIntervals[0].simpleName == 'P5') or \
-            (self.vIntervals[1].name == 'P1' or self.vIntervals[1].name == 'P8' or self.vIntervals[1].simpleName == 'P5') )
+
+        c1 = chord.Chord([self.vIntervals[0].noteStart, self.vIntervals[0].noteEnd])
+        c2 = chord.Chord([self.vIntervals[1].noteStart, self.vIntervals[1].noteEnd])
+        openings = ['P1','P5', 'I', 'V']
+        return not ( ( self.vIntervals[0].simpleName in openings or self.vIntervals[1].simpleName in openings)  and
+                     ( music21.roman.identifyAsTonicOrDominant(c1, self.key)[0].upper() in openings or 
+                     music21.roman.identifyAsTonicOrDominant(c2, self.key)[0].upper() in openings )   )
 
     def closesIncorrectly(self):
         '''
         returns true if closing harmonic interval is a P8 or PU and the interval approaching the close is
-        6 - 8, 10 - 8, or 3 - U. and if in minor key, the leading tone resolves to the tonic.
+        6 - 8, 10 - 8, or 3 - U. Must be in contrary motion, and if in minor key, the leading tone resolves to the tonic.
         
         >>> from music21 import *
         >>> vl = VoiceLeadingQuartet('C#', 'D', 'E', 'D')
@@ -748,7 +788,7 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> vl.closesIncorrectly()
         False
         
-        >>> vl = VoiceLeadingQuartet('B', 'C', 'G', 'C')
+        >>> vl = VoiceLeadingQuartet('B3', 'C4', 'G3', 'C2')
         >>> vl.key = key.Key('C')
         >>> vl.closesIncorrectly()
         False       
@@ -758,15 +798,16 @@ class VoiceLeadingQuartet(music21.Music21Object):
         >>> vl.closesIncorrectly()
         True
         
-        >>> vl = VoiceLeadingQuartet('C#4', 'D4', 'A2', 'D3')
+        >>> vl = VoiceLeadingQuartet('C#4', 'D4', 'A2', 'D3', key='D')
         >>> vl.closesIncorrectly()
-        False
+        True
         
         
         OMIT_FROM_DOCS
-        TODO: when we write 2 by 3 matrix, check to see if 6 is raised for minor keys 
+        TODO: when we write 2 by 3 matrix, check to see if 6 is raised for minor keys
+        TODO: check to make sure closing ends with tonic
+         
         '''
-        
         raisedMinorCorrectly = False
         if self.key.mode == 'minor':
             if self.key.pitchFromDegree(7).transpose("A1").name == self.v1n1.name:
@@ -774,15 +815,14 @@ class VoiceLeadingQuartet(music21.Music21Object):
             elif self.key.pitchFromDegree(7).transpose("A1").name == self.v2n1.name:
                 raisedMinorCorrectly = self.key.getScaleDegreeFromPitch(self.v1n2) == 1
         else:
-            raisedMinorCorrectly = True  
-       
-        if self.vIntervals[0].generic.simpleUndirected == 6:
-            return not (self.vIntervals[1].generic.simpleUndirected == 1 and raisedMinorCorrectly)
-        elif self.vIntervals[0].generic.simpleUndirected == 3:
-            return  not (self.vIntervals[1].generic.simpleUndirected == 1 and raisedMinorCorrectly)
-        else:
-            return False
-  
+            raisedMinorCorrectly = True
+        preclosings = [6,3]
+        closingPitches = [self.v1n2.pitch.name, self.v2n2.name]  
+        return not ( self.vIntervals[0].generic.simpleUndirected in preclosings and 
+            self.vIntervals[1].generic.simpleUndirected == 1 and raisedMinorCorrectly and
+             self.key.pitchFromDegree(1).name in closingPitches and
+             self.contraryMotion()
+                )
            
 class VoiceLeadingQuartetException(Exception):
     pass
@@ -1197,73 +1237,82 @@ class VerticalSlice(object):
         return '<music21.voiceLeading.%s contentDict=%s  ' % (self.__class__.__name__, self.contentDict)
        
 
-class VerticalSliceTriplet(music21.Music21Object):
-    '''a collection of three vertical slices'''
-    def __init__(self,vs1, vs2, vs3):
-        self.vs1 = vs1
-        self.vs2 = vs2
-        self.vs3 = vs3
+class VerticalSliceNTuplet(music21.Music21Object):
+    '''a collection of n number of vertical slices'''
+    def __init__(self, listofVerticalSlices):       
+        self.verticalSlices = listofVerticalSlices
+        
+        self.nTupletNum = len(listofVerticalSlices)
+        
         self.chordList = []
-        self.tnlsList = [] #Three Note Linear Segments
-        if vs1 is not None and vs2 is not None and vs3 is not None:
+        self.tnlsDict = {} #Three Note Linear Segments
+        
+        if listofVerticalSlices:
             self._calcChords()
+        if self.nTupletNum == 3:
             self._calcTNLS()
         
     def _calcChords(self):
-        self.chordList.append(chord.Chord(self.vs1.noteList))
-        self.chordList.append(chord.Chord(self.vs2.noteList))
-        self.chordList.append(chord.Chord(self.vs3.noteList))
+        for vs in self.verticalSlices:
+            self.chordList.append(chord.Chord(vs.noteList))
     
     def _calcTNLS(self):
-        for partNum in range(0,min(len(self.vs1.noteList), len(self.vs2.noteList), len(self.vs3.noteList))):
-            self.tnlsList.append(ThreeNoteLinearSegment(self.vs1.noteFromPart(partNum), self.vs2.noteFromPart(partNum), self.vs3.noteFromPart(partNum)) )
+        '''
+        calculates the three note linear segments if only three vertical slices provided
+        '''
+        for partNum in range(0,min(len(self.verticalSlices[0].noteList), len(self.verticalSlices[1].noteList), len(self.verticalSlices[2].noteList))):
+            self.tnlsDict[partNum] = ThreeNoteLinearSegment(self.verticalSlices[0].noteFromPart(partNum), self.verticalSlices[1].noteFromPart(partNum), self.verticalSlices[2].noteFromPart(partNum))
         
     def __repr__(self):
-        return '<music21.voiceLeading.%s vs1=%s vs2=%s vs3=%s ' % (self.__class__.__name__, self.vs1, self.vs2, self.vs3)
+        return '<music21.voiceLeading.%s listofVerticalSlices=%s ' % (self.__class__.__name__, self.verticalSlices)
        
-    def hasUnaccentedPassingTone(self, partNumToIdentify):  
+    def hasPassingTone(self, partNumToIdentify, unaccentedOnly=False):  
         '''
         partNum is the part (starting with 0) to identify the passing tone
+        for use on 3 vertical slices (3Tuplet)
+        
         
         >>> from music21 import *
         >>> vs1 = VerticalSlice({0:note.Note('A4'), 1: note.Note('F2')})
         >>> vs2 = VerticalSlice({0:note.Note('B-4'), 1: note.Note('F2')})
         >>> vs3 = VerticalSlice({0:note.Note('C5'), 1: note.Note('E2')})
-        >>> tbtm = VerticalSliceTriplet(vs1, vs2, vs3)
-        >>> tbtm.hasUnaccentedPassingTone(0)
+        >>> tbtm = VerticalSliceNTuplet([vs1, vs2, vs3])
+        >>> tbtm.hasPassingTone(0)
         True
         '''  
-
-        ret = self.tnlsList[partNumToIdentify].couldBePassingTone()
-
-        try:
-            ret = ret and (self.tnls1.n2.beatStrength < 0.5)
-        except:
-            pass
+        #TODO: check to make sure it's a 3Tuple
+        ret = self.tnlsDict[partNumToIdentify].couldBePassingTone()
+        if unaccentedOnly:
+            try:
+                ret = ret and (self.tnlsDict[partNumToIdentify].n2.beatStrength < 0.5)
+            except:
+                pass
         #print self.tnls1.n2.quarterLength
         return ret and not self.chordList[1].isConsonant()
         
-        
         #check that the vertical slice containing the passing tone is dissonant        
 
-    def hasUnaccentedNeighborTone(self, partNumToIdentify):  
+    def hasNeighborTone(self, partNumToIdentify, unaccentedOnly=False):  
         '''
         partNum is the part (starting with 0) to identify the passing tone
+        for use on 3 vertical slices (3tuplet)
         
         >>> from music21 import *
         >>> vs1 = VerticalSlice({0:note.Note('E-4'), 1: note.Note('C3')})
         >>> vs2 = VerticalSlice({0:note.Note('E-4'), 1: note.Note('B2')})
         >>> vs3 = VerticalSlice({0:note.Note('C5'), 1: note.Note('C3')})
-        >>> tbtm = VerticalSliceTriplet(vs1, vs2, vs3)
-        >>> tbtm.hasUnaccentedNeighborTone(1)
+        >>> tbtm = VerticalSliceNTuplet([vs1, vs2, vs3])
+        >>> tbtm.hasNeighborTone(1)
         True
-        '''  
-        ret = self.tnlsList[partNumToIdentify].couldBeNeighborTone()
-        try:
-            ret = ret and (self.tnls1.n2.beatStrength < 0.5)
-        except:
-            pass
-
+        '''
+        #TODO: check to make sure this is an 3tuplet
+        
+        ret = self.tnlsDict[partNumToIdentify].couldBeNeighborTone()
+        if unaccentedOnly:
+            try:
+                ret = ret and (self.tnlsDict[partNumToIdentify].n2.beatStrength < 0.5)
+            except:
+                pass
         return ret and not self.chordList[1].isConsonant()
         
         
@@ -1634,7 +1683,7 @@ class TestExternal(unittest.TestCase):
         pass
     
 
-_DOC_ORDER = [VoiceLeadingQuartet, ThreeNoteLinearSegment, VerticalSlice, VerticalSliceTriplet]
+_DOC_ORDER = [VoiceLeadingQuartet, ThreeNoteLinearSegment, VerticalSlice, VerticalSliceNTuplet]
 
 if __name__ == "__main__":
     music21.mainTest(Test)
