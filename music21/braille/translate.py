@@ -61,13 +61,13 @@ def keyboardPartsToBraille(music21PartStaffUpper, music21PartStaffLower, debug=F
     Translates a stream Part consisting of two stream Parts, a right hand and left hand,
     into braille music bar over bar format.
     '''
-    rhSegments = segment.findSegments(music21PartStaffUpper, **keywords)
-    lhSegments = segment.findSegments(music21PartStaffLower, **keywords)
+    rhSegments = segment.findSegments(music21PartStaffUpper, descendingChords=True, **keywords)
+    lhSegments = segment.findSegments(music21PartStaffLower, descendingChords=False,**keywords)
     allBrailleText = []
     for (rhSegment, lhSegment) in itertools.izip(rhSegments, lhSegments):
+        bg = segment.BrailleGrandSegment(rhSegment, lhSegment)
         if debug:
             print bg
-        bg = segment.BrailleGrandSegment(rhSegment, lhSegment)
         allBrailleText.append(bg.transcribe())
     return u"\n\n".join([str(bt) for bt in allBrailleText])
 
