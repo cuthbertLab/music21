@@ -747,6 +747,9 @@ class MuseDataPart(object):
     def _scrubStage1(self, src):
         '''Some stage1 files start with a leading line of space. This needs to be removed, as each line matters. Provide a list of character lines.
         '''
+        if len(src) <= 1:
+            raise MuseDataException('cannot scrub empty source')
+
         check = True
         post = []
         # remove all spaces found in leading lines
@@ -1502,6 +1505,7 @@ class MuseDataFile(object):
     def readstr(self, str): 
         '''Read a string, dividing it into individual parts.
         '''
+        #environLocal.pd(['readstr()', 'len(str)', len(str)])
         # need to split the string into individual parts, as more than 
         # one part might be defined
         commentToggle = False
@@ -1528,7 +1532,10 @@ class MuseDataFile(object):
             # stage 1 files use END, stage 2 uses /END
             elif line.startswith('/END') or line.startswith('END'):
                 #environLocal.printDebug(['found last line', i, repr(line), 'length of lines', len(lines)])
-                
+                # anticipate malformed files that have more than one END at END
+                if len(lines) <= 1:
+                    lines = [] # clear storage
+                    continue
                 mdp = MuseDataPart(lines)
                 # update sets measure boundaries, divisions
                 mdp.update()
@@ -1576,6 +1583,9 @@ class MuseDataWork(object):
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
 
         '''
+        #environLocal.pd(['addString str', str])
+#         if str.strip() == '':
+#             raise MuseDataException('passed in empty string to add string')
         if not common.isListLike(str):
             strList = [str]
         else:

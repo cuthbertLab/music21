@@ -3046,7 +3046,7 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
 
 #-------------------------------------------------------------------------------
 class PlotHorizontalBarWeighted(PlotStream):
-    '''A base class for plots of Scores with weighted (by height) horizontal bars
+    '''A base class for plots of Scores with weighted (by height) horizontal bars.
     '''
     format = 'horizontalbarweighted'
     def __init__(self, streamObj, *args, **keywords):
@@ -3070,9 +3070,6 @@ class PlotHorizontalBarWeighted(PlotStream):
             raise GraphException('provided Stream must be Score')
 
         # parameters: x, span, heightScalar, color, alpha, yShift
-#         data =  [
-#         ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, .2, '#3ff203',.1, 1)]  ), 
-#         ('Celli',    [(2, 7, .2, '#0ff302'), (10, 3, .6, '#ff0000', 1)]  ), ]
         pr = reduction.PartReduction(self.streamObj, partGroups=self.partGroups, 
                 fillByMeasure=self.fillByMeasure)
         pr.process()

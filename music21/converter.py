@@ -179,7 +179,9 @@ class ArchiveManager(object):
                 post = []
                 for subFp in mdd.getPaths():
                     component = f.open(subFp, 'rU')
-                    post.append(''.join(component.readlines()))    
+                    lines = component.readlines()
+                    #environLocal.pd(['subFp', subFp, len(lines)]) 
+                    post.append(''.join(lines))    
                     
                     # note: the following methods do not properly employ
                     # universal new lines; this is a python problem:
@@ -749,7 +751,7 @@ class ConverterMuseData(object):
             #environLocal.printDebug(['ConverterMuseData: found archive', fp])
             # get data will return all data from the zip as a single string
             for partStr in af.getData(format='musedata'):
-                #environLocal.printDebug(['partStr', partStr])
+                #environLocal.printDebug(['partStr', len(partStr)])
                 mdw.addString(partStr)            
         else:
             if os.path.isdir(fp):

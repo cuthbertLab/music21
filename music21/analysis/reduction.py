@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2011 The music21 Project
+# Copyright:    (c) 2011-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -773,6 +773,27 @@ class Test(unittest.TestCase):
         for sub in pr._partGroups:
             self.assertEqual(len(sub['match']), 2)
         print pr.getGraphHorizontalBarWeightedData()
+
+
+    def testPartReductionC(self):
+        '''Artificially create test cases.
+        '''
+        from music21 import stream, note, dynamics
+
+        durDynPairsA = [(1, 'mf'), (3, 'f'), (2, 'p'), (4, 'ff'), (2, 'mf')]
+        durDynPairsB = [(1, 'mf'), (3, 'f'), (2, 'p'), (4, 'ff'), (2, 'mf')]
+
+        s = stream.Score()
+        for pairs in [durDynPairsA, durDynPairsB]:
+            p = stream.Part()
+            pos = 0;
+            for ql, dyn in pairs:
+                n = note.Note(quarterLength=ql)
+                p.insert(ql, n)
+                p.insert(ql, dynamics.Dynamic(dyn))
+                pos += ql;
+            s.insert(0, p)
+        s.show()
 
 
 #-------------------------------------------------------------------------------

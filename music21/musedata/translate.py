@@ -597,7 +597,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sFlat.getElementsByClass('Dynamic')), 79)
 
 
-    def testMuseDataImportBeams(self):
+    def testMuseDataImportErrorA(self):
         from music21 import corpus
         # this files was crashing in the handling of an error in beam notation
         s = corpus.parse('haydn/opus55no1/movement2.md')
@@ -605,6 +605,11 @@ class Test(unittest.TestCase):
 
         #s.show('t')
 
+    def testMuseDataImportErrorB(self):
+        # this file has a malformed END repeated twice
+        from music21 import corpus
+        s = corpus.parse('haydn/opus71no1/movement1.zip')
+        self.assertEqual(len(s.flat.getElementsByClass('Note')), 2792)
 
 
 #-------------------------------------------------------------------------------
