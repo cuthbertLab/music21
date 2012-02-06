@@ -772,10 +772,11 @@ class VoiceLeadingQuartet(music21.Music21Object):
 
         c1 = chord.Chord([self.vIntervals[0].noteStart, self.vIntervals[0].noteEnd])
         c2 = chord.Chord([self.vIntervals[1].noteStart, self.vIntervals[1].noteEnd])
+        r1 = music21.roman.identifyAsTonicOrDominant(c1, self.key)
+        r2 = music21.roman.identifyAsTonicOrDominant(c2, self.key)
         openings = ['P1','P5', 'I', 'V']
         return not ( ( self.vIntervals[0].simpleName in openings or self.vIntervals[1].simpleName in openings)  and
-                     ( music21.roman.identifyAsTonicOrDominant(c1, self.key)[0].upper() in openings or 
-                     music21.roman.identifyAsTonicOrDominant(c2, self.key)[0].upper() in openings )   )
+                       (r1[0].upper() in openings if r1 is not False else False or r2[0].upper() in openings if r2 is not False else False  ) )
 
     def closesIncorrectly(self):
         '''

@@ -1,10 +1,13 @@
-####
-# methods for checking wwnorton theory assignments
-# 
-# Beth Hadley and Lars Johnson
-# January 24, 2012
+# -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
+# Name:         wwnortonMGTA.py
+# Purpose:      interface for using theoryAnalyzer on W.W.Norton exercises
 #
-# WORK IN PROGRESS
+# Authors:      Lars Johnson and Beth Hadley
+#
+# Copyright:    (c) 2009-2012 The music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
 
 import music21
 
@@ -12,15 +15,20 @@ from music21 import converter
 from music21 import stream
 from music21 import instrument
 from music21 import note
-from music21.demos import theoryAnalyzer
+from music21.demos.theoryAnalysis import theoryAnalyzer
 
 import unittest
 import copy
 
 class wwnortonExercise(object):
-    ''' wwnortonExercise is a base class for all wwwnorton exercises '''
+    ''' wwnortonExercise is a base class for all wwwnorton exercises 
+    
+    Textbook: The Musician's Guide to Theory and Analysis (MGTA), Second Edition: Clendinning and Marvin
+    Workbook: The Musician's Guide Workbook, Second Edition: Clendinning and Marvin (Teacher's Edition)
+    
+    '''
     def __init__(self):
-        self.xmlFileDirectory = "/xmlfiles/"
+        self.xmlFileDirectory = "C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/Exercises/" #/xmlfiles/"
         self.xmlFilename = ""
         self.originalExercise = stream.Stream()
         self.modifiedExercise = stream.Stream()
@@ -49,7 +57,6 @@ class wwnortonExercise(object):
             n.color = 'black'
         self.studentExercise = sc
         
-    
     def getBlankExercise(self):
         return self.blankExercise
     
@@ -92,7 +99,7 @@ class wwnortonExercise(object):
             measureDuration = m.duration.quarterLength
             
             m.removeByClass(['GeneralNote']) # includes rests
-            m.removeByClass(['Dyanmic'])
+            m.removeByClass(['Dynamic'])
             m.removeByClass(['Stream']) # get voices or sub-streams
             m.removeByClass(['Dynamic']) 
             m.removeByClass(['Expression']) 
@@ -146,9 +153,7 @@ class wwnortonExercise(object):
         markerPart = self.studentExercise.parts[self.pn[markerPartName]]
         for resultObj in ta.resultDict[taKey]:
             offset = offsetFunc(resultObj)
-            correctLyric = resultObj.value
-            print correctLyric
-            print offset
+            correctLyric = lyricFunc(resultObj)
             markerNote = markerPart.flat.getElementAtOrBefore(offset,classList={'Note'})
             if markerNote is None or markerNote.offset != offset:
                 print "No Marker"
@@ -163,9 +168,13 @@ class wwnortonExercise(object):
     def show(self):
         self.modifiedExercise.show()
                
+#-------------------------------------------------------------------------------
+# Workbook Assignments
 
-# EX 11.1.I (A->D)
 class ex11_1_I(wwnortonExercise):
+    '''
+    Assignment 11.1 I. Chorale melody settings (A, B, C, and D)
+    '''
     def __init__(self):
         wwnortonExercise.__init__(self)
         self.xmlFilename = 'S11_1_I_A.xml'
@@ -180,10 +189,10 @@ class ex11_1_I(wwnortonExercise):
         
     def checkExercise(self):
         ta = theoryAnalyzer.TheoryAnalyzer(self.studentExercise)
+        ta.keyMeasureMap = {0:'F'}
         ta.identifyMotionType(self.pn['part1'],self.pn['part2'],dictKey='motionType')
         ta.identifyScaleDegrees(self.pn['part1'],dictKey='p1ScaleDegrees')
         ta.identifyHarmonicIntervals(self.pn['part1'],self.pn['part2'],dictKey='harmIntervals')
-        
         
         scaleDegreeOffsetFunc = lambda resultObj: resultObj.n.offset
         scaleDegreeLyricTextFunc = lambda resultObj: resultObj.value
@@ -203,19 +212,17 @@ class ex11_1_I(wwnortonExercise):
         
         harmonicIntervalOffsetFunc = lambda resultObj: resultObj.offset()
         
-        def harmonicIntervalLyricTextFunc(resultObj): 
-            value = resultObj.value
-            while value > 9:
-                value -= 7
-            return value
+        harmonicIntervalTextFunc = lambda resultObj: resultObj.value 
         
         self.compareMarkerLyricAnswer(ta,taKey='harmIntervals',\
                                 markerPartName='harmIntervals',\
                                 offsetFunc = harmonicIntervalOffsetFunc,\
-                                lyricFunc = harmonicIntervalLyricTextFunc)
+                                lyricFunc = harmonicIntervalTextFunc)
     
-# EX 11.1.I (A->D)
 class ex11_3_A(wwnortonExercise):
+    '''
+    Assignment 11.3 A. Writing a note-to-note counterpoint in eighteenth-century style
+    '''
     def __init__(self):
         wwnortonExercise.__init__(self)
         self.xmlFilename = '11_3_A_1.xml'
@@ -228,6 +235,7 @@ class ex11_3_A(wwnortonExercise):
         
     def checkExercise(self):
         ta = theoryAnalyzer.TheoryAnalyzer(self.studentExercise)
+        ta.keyMeasureMap = {0:'G',5:'D',8:'F'}
         ta.identifyHarmonicIntervals(self.pn['part1'],self.pn['part2'],dictKey='harmIntervals')
         ta.identifyCommonPracticeErrors(self.pn['part1'],self.pn['part2'],dictKey='counterpointErrors')
                 
@@ -235,15 +243,11 @@ class ex11_3_A(wwnortonExercise):
         
         harmonicIntervalOffsetFunc = lambda resultObj: resultObj.offset()
         
-#        def harmonicIntervalLyricTextFunc(resultObj): 
-#            value = resultObj.value
-#            while value > 9:
-#                value -= 7
-#            return value
-#        
+        harmonicIntervalTextFunc = lambda resultObj: resultObj.value 
         self.compareMarkerLyricAnswer(ta,taKey='harmIntervals',\
                                 markerPartName='harmIntervals',\
-                                offsetFunc = harmonicIntervalOffsetFunc)
+                                offsetFunc = harmonicIntervalOffsetFunc, \
+                                lyricFunc = harmonicIntervalTextFunc)
         
 
 # ------------------------------------------------------------
@@ -260,9 +264,8 @@ class TestExternal(unittest.TestCase):
     
     def demo(self):
         ex = ex11_3_A()
-#        ex.show()
-        sc = converter.parse('/Users/larsj/Dropbox/Music21Theory/TestFiles/Exercises/11_3_A_1_completed.xml')
-        ex.show()
+        #ex.show()
+        sc = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/Exercises/11_3_A_1_completed2.xml')
         ex.loadStudentExercise(sc)
         ex.checkExercise()
         ex.showStudentExercise()
@@ -271,6 +274,6 @@ class TestExternal(unittest.TestCase):
 if __name__ == "__main__":
     music21.mainTest(Test)
     
-#    te = TestExternal()
-#    te.demo()
+    #te = TestExternal()
+    #te.demo()
     

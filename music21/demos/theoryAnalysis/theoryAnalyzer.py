@@ -118,7 +118,6 @@ class TheoryAnalyzer(object):
         Check the music xml to verify measure numbers; pickup measures are usually 0.
     
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
         >>> s = stream.Score()
         >>> ta = TheoryAnalyzer(s)
 
@@ -138,7 +137,6 @@ class TheoryAnalyzer(object):
         returns key analysis of theory score as a whole. 
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
         >>> s = stream.Score()
         >>> ta = TheoryAnalyzer(s)
         >>> ta.keyMeasureMap = {1:'C', 2:'G', 4:'a', 7:'C'}
@@ -184,7 +182,7 @@ class TheoryAnalyzer(object):
         to determine what vertical slices to take.
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> n1 = note.Note('c5')
         >>> n1.quarterLength = 4
         >>> n2 = note.Note('f4')
@@ -230,7 +228,7 @@ class TheoryAnalyzer(object):
         objects present between partNum1 and partNum2 in the score
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> part0.append(note.Note('c4'))
@@ -275,7 +273,7 @@ class TheoryAnalyzer(object):
         objects present in partNum in the score
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> part0.append(note.Note('c4'))
@@ -309,7 +307,7 @@ class TheoryAnalyzer(object):
         Currently Supported: :class:`~music21.voiceLeading.ThreeNoteLinearSegment` 
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> part0.append(note.Note('c4'))
@@ -344,7 +342,7 @@ class TheoryAnalyzer(object):
         objects present in the score
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> part1 = stream.Part()
@@ -386,7 +384,7 @@ class TheoryAnalyzer(object):
         occurring between the two specified parts.
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> part0.append(note.Note('e4'))
@@ -425,7 +423,7 @@ class TheoryAnalyzer(object):
         returns a list of all the melodic intervals (:class:`~music21.interval.Interval`) in the specified part.
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> part0.append(note.Note('c4'))
@@ -490,7 +488,7 @@ class TheoryAnalyzer(object):
         tuples (partNum1, partNum2) where 0 <= partNum1 < partnum2 < numParts
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> part0.append(note.Note('c5'))
@@ -691,7 +689,7 @@ class TheoryAnalyzer(object):
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> p0measure1 = stream.Measure(number=1)
@@ -730,7 +728,7 @@ class TheoryAnalyzer(object):
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> p0measure1 = stream.Measure(number=1)
@@ -766,7 +764,7 @@ class TheoryAnalyzer(object):
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> p0measure1 = stream.Measure(number=1)
@@ -807,7 +805,7 @@ class TheoryAnalyzer(object):
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> p0measure1 = stream.Measure(number=1)
@@ -843,7 +841,7 @@ class TheoryAnalyzer(object):
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> p0measure1 = stream.Measure(number=1)
@@ -879,7 +877,7 @@ class TheoryAnalyzer(object):
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> p0measure1 = stream.Measure(number=1)
@@ -917,7 +915,7 @@ class TheoryAnalyzer(object):
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> p0measure1 = stream.Measure(number=1)
@@ -950,7 +948,7 @@ class TheoryAnalyzer(object):
         Identifies if the piece opens correctly; calls :meth:`~music21.voiceLeading.opensIncorrectly`
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> p0measure1 = stream.Measure(number=1)
@@ -982,7 +980,7 @@ class TheoryAnalyzer(object):
         Identifies if the piece closes correctly; calls :meth:`~music21.voiceLeading.closesIncorrectly`
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> p0measure1 = stream.Measure(number=1)
@@ -1030,7 +1028,7 @@ class TheoryAnalyzer(object):
         editorialValue at note.editorial.misc[editorialDictKey]
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> sc.insert(0, meter.TimeSignature('2/4'))
         >>> part0 = stream.Part()
@@ -1070,7 +1068,7 @@ class TheoryAnalyzer(object):
         by default set to True
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> sc.insert(0, meter.TimeSignature('2/4'))
         >>> part0 = stream.Part()
@@ -1110,7 +1108,7 @@ class TheoryAnalyzer(object):
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
                 
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> p0measure1 = stream.Measure(number=1)
@@ -1148,7 +1146,6 @@ class TheoryAnalyzer(object):
         Identifies dissonant harmonic intervals that are not passing tones or neighbor tones or don't resolve correctly
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> p0measure1 = stream.Measure(number=1)
@@ -1216,7 +1213,6 @@ class TheoryAnalyzer(object):
         Optionally, a color attribute may be specified to color all corresponding notes in the score.
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> p0measure1 = stream.Measure(number=1)
@@ -1317,7 +1313,7 @@ class TheoryAnalyzer(object):
         in the piece, pass responseOffsetMap = [0,6,7]
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        >>> from music21.demos.theoryAnalysis import theoryAnalyzer
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> p0measure1 = stream.Measure(number=1)
@@ -1402,7 +1398,7 @@ class TheoryAnalyzer(object):
         used to identify the interval (0 through 9, with A4 and d5)
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        >>> from music21.demos.theoryAnalysis import theoryAnalyzer
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> p0measure1 = stream.Measure(number=1)
@@ -1449,7 +1445,7 @@ class TheoryAnalyzer(object):
         identify all the scale degrees in the score in partNum, or if not specified ALL partNums
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        >>> from music21.demos.theoryAnalysis import theoryAnalyzer
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> p0measure1 = stream.Measure(number=1)
@@ -1490,7 +1486,7 @@ class TheoryAnalyzer(object):
         Possible values for VLQTheoryResult are 'Oblique', 'Parallel', 'Similar', 'Contrary', 'Anti-Parallel', 'No Motion'
         
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        >>> from music21.demos.theoryAnalysis import theoryAnalyzer
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> p0measure1 = stream.Measure(number=1)
@@ -1557,7 +1553,7 @@ class TheoryAnalyzer(object):
         returns string of all results found by calling all identify methods on the TheoryAnalyzer score
 
         >>> from music21 import *
-        >>> from music21.demos import theoryAnalyzer
+        >>> from music21.demos.theoryAnalysis import theoryAnalyzer
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
         >>> p0measure1 = stream.Measure(number=1)

@@ -739,18 +739,18 @@ def fromChordAndKey(inChord, inKey):
 def identifyAsTonicOrDominant(inChord, inKey):
     '''
     returns the roman numeral string expression (either tonic or dominant) that best matches the inChord.
-    Usefull when you know inChord is either tonic or dominant, but only two pitches are provided in the chord.
+    Useful when you know inChord is either tonic or dominant, but only two pitches are provided in the chord.
+    If neither tonic nor dominant is possibly correct, False is returned
     
     >>> from music21 import *
     >>> roman.identifyAsTonicOrDominant(['B2','F5'], key.Key('C'))
     'V65'
-    
     >>> roman.identifyAsTonicOrDominant(['B3','G4'], key.Key('g'))
     'i6'
-    
     >>> roman.identifyAsTonicOrDominant(['C3', 'B4'], key.Key('f'))
     'V7'
-    
+    >>> roman.identifyAsTonicOrDominant(['D3'], key.Key('f'))
+    False
     '''
     if isinstance(inChord, list):
         inChord = chord.Chord(inChord)
