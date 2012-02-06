@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 __all__ = ['basic',
+           'examples',
            'lookup',
            'segment',
            'test',
@@ -8,6 +9,7 @@ __all__ = ['basic',
            'translate']
            
 import basic
+import examples
 import lookup
 import segment
 import test
