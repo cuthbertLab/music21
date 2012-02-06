@@ -690,23 +690,18 @@ class RomanNumeral(chord.Chord):
 
 def fromChordAndKey(inChord, inKey):
     '''
-    return a RomanNumeral object from the given chord in the given key.
+    return the roman numeral string from the given chord in the given key.
+    *Method is not well developed and may not return correct results for complicated chords*
     
     >>> from music21 import *
     >>> dim7chord = chord.Chord(["E2", "C#3", "B-3", "G4"])
-    >>> viio65 = roman.fromChordAndKey(dim7chord, key.Key('D'))
-    >>> viio65
-    'VII'
+    >>> roman.fromChordAndKey(dim7chord, key.Key('D'))
+    'VII65'
     >>> roman.fromChordAndKey(["E-3","G4","B-5"], key.Key('D'))
     'bII'
     >>> roman.fromChordAndKey(["G#3","B#4","D#5"], key.Key('D'))
     '#IV'
 
-    
-    #>>> viio65.pitches   # retains octave
-    #['E2', 'C#3', 'B-3', 'G4']
-    #>>> viio65.figure
-    #'viio65'
     '''
     if isinstance(inChord, list):
         inChord = chord.Chord(inChord)
@@ -739,12 +734,101 @@ def fromChordAndKey(inChord, inKey):
             else:
                 raise RomanException('could not find this note as a scale degree in the given key (double-sharps and flats, such as bbVII are not currently searched)')
     rootScaleDeg = frontPrefix + common.toRoman(int(scaleDeg))
-    return rootScaleDeg
+    return rootScaleDeg + str(_romanInversionName(inChord))
 
+def identifyAsTonicOrDominant(inChord, inKey):
+    '''
+    returns the roman numeral string expression (either tonic or dominant) that best matches the inChord.
+    Usefull when you know inChord is either tonic or dominant, but only two pitches are provided in the chord.
+    
+    >>> from music21 import *
+    >>> roman.identifyAsTonicOrDominant(['B2','F5'], key.Key('C'))
+    'V65'
+    
+    >>> roman.identifyAsTonicOrDominant(['B3','G4'], key.Key('g'))
+    'i6'
+    
+    >>> roman.identifyAsTonicOrDominant(['C3', 'B4'], key.Key('f'))
+    'V7'
+    
+    '''
+    if isinstance(inChord, list):
+        inChord = chord.Chord(inChord)
+    pitchNameList = []
+    for x in inChord.pitches:
+        pitchNameList.append(x.name)
+    oneRoot =  inKey.pitchFromDegree(1)
+    fiveRoot = inKey.pitchFromDegree(5)
+    oneChordIdentified = False
+    fiveChordIdentified = False
+    if oneRoot.name in pitchNameList:
+        oneChordIdentified = True
+    elif fiveRoot.name in pitchNameList:
+        fiveChordIdentified = True
+    else:
+        oneRomanChord = RomanNumeral('I7', inKey).pitches
+        fiveRomanChord = RomanNumeral('V7', inKey).pitches
+        
+        onePitchNameList = []
+        for x in oneRomanChord:
+            onePitchNameList.append(x.name)
+        
+        fivePitchNameList = []
+        for x in fiveRomanChord:
+            fivePitchNameList.append(x.name)                    
+        
+        oneMatches = len(set(onePitchNameList) & set(pitchNameList))
+        fiveMatches = len(set(fivePitchNameList) & set(pitchNameList))
+        if  oneMatches > fiveMatches and oneMatches > 0:
+            oneChordIdentified = True
+        elif oneMatches < fiveMatches and fiveMatches > 0:
+            fiveChordIdentified = True
+        else:
+            return False
+        
+    if oneChordIdentified:
+        rootScaleDeg = common.toRoman(1)
+        if inKey.mode == 'minor':
+            rootScaleDeg = rootScaleDeg.lower()
+        else:
+            rootScaleDeg = rootScaleDeg.upper()
+        inChord.root(oneRoot)
+    elif fiveChordIdentified:
+        rootScaleDeg = common.toRoman(5)
+        inChord.root(fiveRoot)
+    else:
+        return False
 
-
-
-
+    return rootScaleDeg + _romanInversionName(inChord)
+    
+def _romanInversionName(inChord):
+    '''
+    method is extremely similar to Chord's inversionName() method, but returns string values
+    and allows incomplete triads
+    '''
+    inv = inChord.inversion()
+    if inChord.isSeventh() or inChord.seventh is not None:
+        if inv == 0:
+            return '7'
+        elif inv == 1:
+            return '65'
+        elif inv == 2:
+            return '43'
+        elif inv == 3:
+            return '42'
+        else:
+            return ''
+    elif inChord.isTriad() or inChord.isIncompleteMajorTriad() or inChord.isIncompleteMinorTriad():
+        if inv == 0:
+            return '' #not 53
+        elif inv == 1:
+            return '6'
+        elif inv == 2:
+            return '64'
+        else:
+            return ''
+    else:
+        return ''
 
 
 
