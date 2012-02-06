@@ -73,8 +73,18 @@ class BrailleSegment(collections.defaultdict):
     def __str__(self):
         name = "<music21.braille.segment BrailleSegment {0}>".format(id(self))
         hyphenation = "isHyphenated = {0}".format(self.isHyphenated)
-        allGroupings = u"\n".join(["{0}: {1}".format(item[0],item[1]) for item in sorted(self.items())])
-        return u"\n".join(["---begin segment---", name, hyphenation, allGroupings, "---end segment---"])
+        allItems = sorted(self.items())
+        allKeys = []
+        allGroupings = []
+        for (key, grouping) in allItems:
+            allKeys.append("{0}: ".format(key))
+            if key % 10 == 8:
+                
+                allGroupings.append("{0}".format(u"".join(["{0}: {1} ".format(v, list(v)) for v in grouping])))
+            else:
+                allGroupings.append("{0}".format(grouping))
+        allElementGroupings = u"\n".join([u"".join([k, g]) for (k,g) in list(itertools.izip(allKeys, allGroupings))])
+        return u"\n".join(["---begin segment---", name, hyphenation, allElementGroupings, "---end segment---"])
     
     def __repr__(self):
         return str(self)
@@ -185,8 +195,15 @@ class BrailleSegment(collections.defaultdict):
             
     def extractInaccordGrouping(self, brailleText):
         inaccords = self.get(self.currentGroupingKey)
-        brailleInaccord = symbols['full_inaccord'].join([basic.transcribeVoice(vc) for vc in inaccords])
-        brailleText.addElement(inaccord=self.brailleInaccord)
+        voice_trans = []
+        for music21Voice in inaccords:
+            noteGrouping = extractBrailleElements(music21Voice)
+            noteGrouping.descendingChords = inaccords.descendingChords
+            noteGrouping.showClefSigns = inaccords.showClefSigns
+            noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
+            voice_trans.append(basic.transcribeNoteGrouping(noteGrouping))
+        brailleInaccord = symbols['full_inaccord'].join(voice_trans)
+        brailleText.addElement(inaccord=brailleInaccord)
         return None
 
     def extractLongExpressionGrouping(self, brailleText):
@@ -308,9 +325,15 @@ class BrailleGrandSegment():
         allPairs = []
         for (rightKey, leftKey) in self.allKeyPairs:
             a = "{0}: ".format(rightKey)
-            b = "{0}".format(self.rightSegment[rightKey])
+            if rightKey % 10 == 8:
+                b = "{0}".format(u"".join(["{0}: {1} ".format(v, list(v)) for v in self.rightSegment[rightKey]]))
+            else:
+                b = "{0}".format(self.rightSegment[rightKey])
             c = "{0}: ".format(leftKey)
-            d = "{0}".format(self.leftSegment[leftKey])
+            if leftKey % 10 == 8:
+                d = "{0}".format(u"".join(["{0}: {1} ".format(v, list(v)) for v in self.leftSegment[leftKey]]))
+            else:
+                d = "{0}".format(self.leftSegment[leftKey])
             ab = u"".join([a,b]) 
             cd = u"".join([c,d])
             allPairs.append(u"\n".join([ab, cd, "====\n"]))
@@ -426,12 +449,26 @@ class BrailleGrandSegment():
         currentMeasureNumber = basic.numberToBraille(rightKey / 100, withNumberSign=False)
         if rightKey % 10 == 8:
             inaccords = self.rightSegment[rightKey]
-            rh_braille = basic.symbols['full_inaccord'].join([transcribeVoice(vc) for vc in inaccords])
+            voice_trans = []
+            for music21Voice in inaccords:
+                noteGrouping = extractBrailleElements(music21Voice)
+                noteGrouping.descendingChords = inaccords.descendingChords
+                noteGrouping.showClefSigns = inaccords.showClefSigns
+                noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
+                voice_trans.append(basic.transcribeNoteGrouping(noteGrouping))
+            rh_braille = symbols['full_inaccord'].join(voice_trans)
         else:
             rh_braille = basic.transcribeNoteGrouping(self.rightSegment[rightKey])
         if leftKey % 10 == 8:
             inaccords = self.leftSegment[leftKey]
-            lh_braille = basic.symbols['full_inaccord'].join([transcribeVoice(vc) for vc in inaccords])
+            voice_trans = []
+            for music21Voice in inaccords:
+                noteGrouping = extractBrailleElements(music21Voice)
+                noteGrouping.descendingChords = inaccords.descendingChords
+                noteGrouping.showClefSigns = inaccords.showClefSigns
+                noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
+                voice_trans.append(basic.transcribeNoteGrouping(noteGrouping))
+            lh_braille = symbols['full_inaccord'].join(voice_trans)
         else:
             lh_braille = basic.transcribeNoteGrouping(self.leftSegment[leftKey])
         brailleKeyboard.addNoteGroupings(currentMeasureNumber, rh_braille, lh_braille)
@@ -464,19 +501,6 @@ def splitNoteGrouping(noteGrouping, value = 2, beatDivisionOffset = 0):
 
     return (leftBrailleElements, rightBrailleElements)
 
-def transcribeVoice(music21Voice):
-    music21Part = stream.Part()
-    music21Measure = stream.Measure()
-    for brailleElement in music21Voice:
-        music21Measure.append(brailleElement)
-    music21Part.append(music21Measure)
-    music21Measure.number = music21Voice.measureNumber
-    allSegments = findSegments(music21Part, showHeading=False, showFirstMeasureNumber=False)
-    allTrans = []
-    for brailleElementSegment in allSegments:
-        segmentTranscription = brailleElementSegment.transcribe()
-        allTrans.append(str(segmentTranscription))
-    return u"\n".join(allTrans)
 #-------------------------------------------------------------------------------
 # Grouping + Segment creation from music21.stream Part
 
@@ -561,7 +585,7 @@ def getRawSegments(music21Part, segmentBreaks=None):
         segmentIndex = 0
         (mnStart, offsetStart) = segmentBreaks[segmentIndex]
     currentSegment = BrailleSegment()
-    for music21Measure in music21Part.getElementsByClass(['Measure', 'Voice']):
+    for music21Measure in music21Part.getElementsByClass(stream.Measure, stream.Voice):
         prepareBeamedNotes(music21Measure)
         brailleElements = extractBrailleElements(music21Measure)
         offsetFactor = 0
@@ -698,7 +722,11 @@ excludeClasses = [spanner.Slur, layout.SystemLayout, layout.PageLayout]
 def addGroupingAttributes(allSegments, music21Part, **partKeywords):
     currentKeySig = key.KeySignature(0)
     try:
-        currentTimeSig = music21Part.getElementsByClass(['Measure','Voice'])[0].bestTimeSignature()
+        allMeasures = music21Part.getElementsByClass(stream.Measure)
+        if allMeasures[0].paddingLeft == 0.0:
+            currentTimeSig = allMeasures[0].bestTimeSignature()
+        else:
+            currentTimeSig = allMeasures[1].bestTimeSignature()
     except stream.StreamException:
         currentTimeSig = meter.TimeSignature('4/4')
 
