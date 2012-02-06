@@ -803,7 +803,9 @@ class ABCTuplet(ABCToken):
             normalSwitch = 2
 
         data = self.src.strip()
-        if data == '(2':
+        if data == '(1': # not sure if valid, but found
+            a, n = 1, 1 
+        elif data == '(2':
             a, n = 2, 3 # actual, normal
         elif data == '(3':
             a, n = 3, 2 # actual, normal
@@ -1536,7 +1538,7 @@ class ABCHandler(object):
                         continue                    
                     # only allow one pitch alpha to be a continue condition
                     elif (foundPitchAlpha == False and strSrc[j].isalpha() 
-                        and strSrc[j] not in 'uvHLTS'):
+                        and strSrc[j] not in 'wuvhHLTSN'):
                         foundPitchAlpha = True
                         j += 1
                         continue                    
@@ -1563,16 +1565,20 @@ class ABCHandler(object):
                 # v is up bow; might be: "^Segno"v which also should be dropped
                 # H is fermata
                 # . dot may be staccato, but should be attached to pitch
-                if collect in ['u', 'v', 'v.', 'H', 'vk', 'k', 'uk', 'U', 
-                    '.', '=', 'V', 'v.', 'S', 's', 'i', 'I', 'ui', 'u.', 'K', 'Q', 'Hy', 'r', 'm', 'M', 'n', 'o', 'L',
+                if collect in ['w', 'u', 'v', 'v.', 'h', 'H', 'vk', 'k', 
+                    'uk', 'U', 
+                    '.', '=', 'V', 'v.', 'S', 's', 'i', 'I', 'ui', 'u.', 'K', 'Q', 'Hy', 'r', 'm', 'M', 'n', 'N', 'o', 'l', 'L',
                     'y', 'T', 't', 'x']:
                     pass
                 elif collect.startswith('"') and (collect[-1] in 
-                    ['u', 'v', 'k', 'K', 'Q', '.', 'y', 'T'] or collect.endswith('v.')):
+                    ['u', 'v', 'k', 'K', 'Q', '.', 'y', 'T', 'w', 'h'] or collect.endswith('v.')):
+                    pass
+                elif collect.startswith('x'):
                     pass
                 # not sure what =20 refers to
                 elif len(collect) > 1 and collect.startswith("=") and collect[1].isdigit():
-                    pass
+                    pass    
+                # only let valid collect strings be parsed
                 else:    
                     self._tokens.append(ABCNote(collect))
                 i = j

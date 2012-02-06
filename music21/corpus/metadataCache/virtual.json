@@ -87,6 +87,57 @@
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
       }, 
+      "http:__kern_ccarh_org_cgi-bin_ksdata?l=users_craig_classical_schubert_piano_d0576&file=d0576-02_krn&f=xml": {
+        "__attr__": {
+          "_contributors": [], 
+          "_urls": [], 
+          "_workIds": {
+            "movementName": {
+              "__attr__": {
+                "_data": "m21-7a4081e06d963e526a925e5671704e90.xml"
+              }, 
+              "__class__": "<class 'music21.metadata.Text'>"
+            }
+          }, 
+          "keySignatureFirst": "sharps 0, mode None", 
+          "timeSignatureFirst": "2/4"
+        }, 
+        "__class__": "<class 'music21.metadata.RichMetadata'>"
+      }, 
+      "http:__kern_ccarh_org_cgi-bin_ksdata?l=users_craig_classical_schubert_piano_d0576&file=d0576-03_krn&f=xml": {
+        "__attr__": {
+          "_contributors": [], 
+          "_urls": [], 
+          "_workIds": {
+            "movementName": {
+              "__attr__": {
+                "_data": "m21-a5574e2fdd8974f6eac9998f724bccfe.xml"
+              }, 
+              "__class__": "<class 'music21.metadata.Text'>"
+            }
+          }, 
+          "keySignatureFirst": "sharps 0, mode None", 
+          "timeSignatureFirst": "2/4"
+        }, 
+        "__class__": "<class 'music21.metadata.RichMetadata'>"
+      }, 
+      "http:__kern_ccarh_org_cgi-bin_ksdata?l=users_craig_classical_schubert_piano_d0576&file=d0576-04_krn&f=xml": {
+        "__attr__": {
+          "_contributors": [], 
+          "_urls": [], 
+          "_workIds": {
+            "movementName": {
+              "__attr__": {
+                "_data": "m21-09037b882cbace8c89188abc2de880b1.xml"
+              }, 
+              "__class__": "<class 'music21.metadata.Text'>"
+            }
+          }, 
+          "keySignatureFirst": "sharps 0, mode None", 
+          "timeSignatureFirst": "2/4"
+        }, 
+        "__class__": "<class 'music21.metadata.RichMetadata'>"
+      }, 
       "http:__static_wikifonia_org_1164_musicxml_mxl": {
         "__attr__": {
           "_contributors": [
@@ -163,64 +214,13 @@
           "timeSignatureFirst": "4/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
-      }, 
-      "http:__web_mit_edu_sadoian_Public_corpus_schubert576-6_xml": {
-        "__attr__": {
-          "_contributors": [], 
-          "_urls": [], 
-          "_workIds": {
-            "movementName": {
-              "__attr__": {
-                "_data": "m21-416a563fb85e0f39605959a901af8503.xml"
-              }, 
-              "__class__": "<class 'music21.metadata.Text'>"
-            }
-          }, 
-          "keySignatureFirst": "sharps 3, mode major", 
-          "timeSignatureFirst": "2/4"
-        }, 
-        "__class__": "<class 'music21.metadata.RichMetadata'>"
-      }, 
-      "http:__web_mit_edu_sadoian_Public_corpus_schubert576-6a_xml": {
-        "__attr__": {
-          "_contributors": [], 
-          "_urls": [], 
-          "_workIds": {
-            "movementName": {
-              "__attr__": {
-                "_data": "m21-48f24e5f0ad04454b4b8876a208c307a.xml"
-              }, 
-              "__class__": "<class 'music21.metadata.Text'>"
-            }
-          }, 
-          "keySignatureFirst": "sharps 3, mode major", 
-          "timeSignatureFirst": "2/4"
-        }, 
-        "__class__": "<class 'music21.metadata.RichMetadata'>"
-      }, 
-      "http:__web_mit_edu_sadoian_Public_corpus_schubert576-6b_xml": {
-        "__attr__": {
-          "_contributors": [], 
-          "_urls": [], 
-          "_workIds": {
-            "movementName": {
-              "__attr__": {
-                "_data": "m21-80b35bd98e567cd528f82c4a03dbbe7d.xml"
-              }, 
-              "__class__": "<class 'music21.metadata.Text'>"
-            }
-          }, 
-          "keySignatureFirst": "sharps 3, mode major", 
-          "timeSignatureFirst": "2/4"
-        }, 
-        "__class__": "<class 'music21.metadata.RichMetadata'>"
       }
     }
   }, 
   "__class__": "<class 'music21.metadata.MetadataBundle'>", 
   "__version__": [
     0, 
-    3, 
-    5
+    6, 
+    2
   ]
 }

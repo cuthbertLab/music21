@@ -9,6 +9,9 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
+'''
+Run this module to process all files in the corpus. 
+'''
 
 from music21 import corpus, metadata, common
 

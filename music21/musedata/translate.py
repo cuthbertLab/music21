@@ -68,8 +68,9 @@ def _musedataBeamToBeams(beamSymbol):
             type='partial'
             direction='left'
         else:
-            raise MuseDataTranslateException('cannot interpreter beams char:' % char)
-
+            #MuseDataTranslateException('cannot interprete beams char: %s' % char)
+            environLocal.pd(['cannot interprete beams char:',  char])
+            continue
         # will automatically increment number        
         # note that this does not permit defining 16th and not defining 8th
         beamsObj.append(type, direction)
@@ -594,6 +595,15 @@ class Test(unittest.TestCase):
         sFlat = s.flat
         #s.show()
         self.assertEqual(len(sFlat.getElementsByClass('Dynamic')), 79)
+
+
+    def testMuseDataImportBeams(self):
+        from music21 import corpus
+        # this files was crashing in the handling of an error in beam notation
+        s = corpus.parse('haydn/opus55no1/movement2.md')
+        self.assertEqual(len(s.flat.getElementsByClass('Note')), 1735)
+
+        #s.show('t')
 
 
 

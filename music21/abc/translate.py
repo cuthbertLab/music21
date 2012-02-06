@@ -689,6 +689,14 @@ class Test(unittest.TestCase):
             s = corpus.parse(fn)
             #s.show()
 
+    def testTranslateB(self):
+
+        from music21 import corpus
+        for fn in ['airdsAirs/book4.abc']:
+            s = corpus.parse(fn)
+
+            #s.show()
+
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
