@@ -2358,6 +2358,22 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].voices), 2)
 
 
+    def testImportChordsA(self):
+        import os
+        from music21 import converter, common
+
+        dir = common.getPackageDir(relative=False, remapSep=os.sep)
+        for fp in dir:
+            if fp.endswith('midi'):
+                break
+        dirLib = os.path.join(fp, 'testPrimitive')
+        # a simple file created in athenacl
+        fp = os.path.join(dirLib, 'test05.mid')        
+        s = converter.parse(fp)
+        #s.show('t')
+        self.assertEqual(len(s.flat.getElementsByClass('Chord')), 4)
+        
+
 #-------------------------------------------------------------------------------
 _DOC_ORDER = [streamToMidiFile, midiFileToStream]
 
