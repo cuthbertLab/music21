@@ -397,12 +397,9 @@ class PartReduction(object):
     # for each bin, determine parameter; may need to divide into smaller bins
 
     def __init__(self, srcScore=None, *args, **keywords):
-
         if 'Score' not in srcScore.classes:
             raise PartReductionException('provided Stream must be Score')
-
         self._score = srcScore
-
         # an ordered list of dictionaries for 
         # part id, part color, and a list of Part objs
         self._partBundles = []
@@ -418,13 +415,17 @@ class PartReduction(object):
         self._fillByMeasure = True
         if 'fillByMeasure' in keywords:
             self._fillByMeasure = keywords['fillByMeasure']
-
+        # check that there are measures
+        for p in self._score.parts:
+            if not p.hasMeasures():
+                self._fillByMeasure = False         
+                environLocal.pd(['overrdding fillByMeasure as no measures are defined'])
+                break
 
     def _createPartBundles(self):
         '''Fill the _partBundles list with dictionaries, each dictionary defining a name (part id or supplied), a color, and list of Parts that match.
         '''
         self._partBundles = []
-
         if self._partGroups is not None:
             for d in self._partGroups: # a list of dictionaries
                 name, pColor, matches = d['name'], d['color'], d['match']
@@ -512,32 +513,45 @@ class PartReduction(object):
                         dataEvents.append(ds)
                         eStart = None
                     eLast = partMeasures[0][i]
-            # fill by alternative approach, based on activity of notes        
+
+            # fill by alternative approach, based on activity of notes  
+            # creates region for each contiguous span of notes
+            # this is useful as it will handle overlaps and similar arrangments
+
+            # TODO: this needs further testing
             else:
-#                 s = stream.Stream()
-#                 for p in parts:
-#                     s.insert(0, p)
                 # this takes a flat presentation of all parts, and then
                 # finds any gaps in consecutive notes
                 eSrc = partBundle['parts.flat']
                 # a li=st, not a stream
+                # a None in the resulting list designates a rest
                 noteSrc = eSrc.findConsecutiveNotes()
                 for i, e in enumerate(noteSrc): 
-                    if e is None or i >= len(noteSrc) - 1:
-                        if eStart is not None:
-                            eEnd = eLast.getOffsetBySite(eSrc) + eLast.quarterLength
-                            ds = {'eStart':eStart, 'span':eEnd-eStart, 'weight':1, 'color':pColor}
-                            dataEvents.append(ds)
-                            eStart = None
+                    environLocal.pd(['i, e', i, e])
+                    # if this event is a rest, or the last event
+                    if e is None:
+                        if eStart is None:
+                            raise Exception('eStart is None')
+                        eEnd = eLast.getOffsetBySite(eSrc) + eLast.quarterLength
+                        # create a temporary weight
+                        ds = {'eStart':eStart, 'span':eEnd-eStart, 'weight':1, 'color':pColor}
+                        dataEvents.append(ds)
+                        eStart = None
+                    elif i >= len(noteSrc) - 1: # this is the last
+                        eEnd = e.getOffsetBySite(eSrc) + e.quarterLength
+                        # create a temporary weight
+                        ds = {'eStart':eStart, 'span':eEnd-eStart, 'weight':1, 'color':pColor}
+                        dataEvents.append(ds)
+                        eStart = None
                     else:
                         if eStart is None:
                             eStart = e.getOffsetBySite(eSrc)
                         eLast = e
-            #print dataEvents
+            environLocal.pd(['dataEvents', dataEvents])
             self._eventSpans[pGroupId] = dataEvents
 
 
-    def _getValueForSpan(self, target='Dynamic', splitSpans=False):
+    def _getValueForSpan(self, target='Dynamic', splitSpans=True):
         '''For each span, determine the measured parameter value. This is translated as the height of the bar graph.
 
         If `splitSpans` is True, a span will be split of the target changes over the span. Otherwise, Spans will be averaged. 
@@ -561,12 +575,11 @@ class PartReduction(object):
             else:
                 return 1.
 
-        import random
-        for partBundle in self._partBundles:
-            flatRef = partBundle['parts.flat']
-            for ds in self._eventSpans[partBundle['pGroupId']]:
-                # for each event span, find the targeted object
-                if not splitSpans:          
+        if not splitSpans:          
+            for partBundle in self._partBundles:
+                flatRef = partBundle['parts.flat']
+                for ds in self._eventSpans[partBundle['pGroupId']]:
+                    # for each event span, find the targeted object
                     offsetStart = ds['eStart']
                     offsetEnd = offsetStart + ds['span']
                     match = flatRef.getElementsByOffset(offsetStart, offsetEnd,
@@ -575,7 +588,69 @@ class PartReduction(object):
                     w = _targetToWeight(match)
                     #environLocal.pd(['segment weight', w])
                     ds['weight'] = w
+        else:
+            for partBundle in self._partBundles:
+                finalBundle = []
+                flatRef = partBundle['parts.flat']
+                # get each span
+                for ds in self._eventSpans[partBundle['pGroupId']]:
+                    offsetStart = ds['eStart']
+                    offsetEnd = offsetStart + ds['span']
+                    # get all targets within the contiguous region
+                    # e.g., Dynamics objects
+                    match = flatRef.getElementsByOffset(offsetStart, offsetEnd,
+                        includeEndBoundary=True, mustFinishInSpan=False, 
+                        mustBeginInSpan=True).getElementsByClass(target)
+                    # extend duration of all found dynamics
+                    match.extendDuration(target, inPlace=True)
+                    #match.show('t')
+                    dsFirst = copy.deepcopy(ds)
+                    if len(match) == 0:
+                        # weight is not known
+                        finalBundle.append(dsFirst)
+                        continue
+                    # create new spans for each target
+                    for i, t in enumerate(match):
+                        targetStart = t.getOffsetBySite(flatRef)
+                        # can use extended duration
+                        targetSpan = t.duration.quarterLength
+                        # if dur of target is greater tn this span
+                        # end at this span
+                        if targetStart + targetSpan > offsetEnd:
+                            targetSpan = offsetEnd - targetStart
+                        # if we have the last matched target, it will 
+                        # have zero duration, as there is no following
+                        # thus, span needs to be distance to end of regions
+                        if targetSpan <= 0.001: 
+                            targetSpan = offsetEnd - targetStart
+                        environLocal.pd([t, 'targetSpan', targetSpan, 'offsetEnd', offsetEnd, "ds['span']", ds['span']])
 
+                        if i==0 and ds['eStart'] == targetStart:
+                            # the target start at the same position
+                            # as the start of this existing span
+                            #dsFirst['eStart'] = targetStart
+                            dsFirst['span'] = targetSpan
+                            dsFirst['weight'] = t.volumeScalar
+                            finalBundle.append(dsFirst)
+                        elif t==0 and ds['eStart'] != targetStart: 
+                            # add two, on for the empty region, one for target
+                            # adjust span of first; weight is not knonw
+                            # (hangs over from last)
+                            dsFirst['span'] = targetStart - offsetStart                            
+                            finalBundle.append(dsFirst)
+                            dsNext = copy.deepcopy(ds)
+                            dsNext['eStart'] = targetStart
+                            dsNext['span'] = targetSpan
+                            dsNext['weight'] = t.volumeScalar
+                            finalBundle.append(dsNext)
+                        else: # for all other cases, create segment for each 
+                            dsNext = copy.deepcopy(ds)
+                            dsNext['eStart'] = targetStart
+                            dsNext['span'] = targetSpan
+                            dsNext['weight'] = t.volumeScalar
+                            finalBundle.append(dsNext)
+                # after iterating all ds spans, reassign 
+                self._eventSpans[partBundle['pGroupId']] = finalBundle
 
     def process(self):
         '''Core processing routines.
@@ -778,23 +853,32 @@ class Test(unittest.TestCase):
     def testPartReductionC(self):
         '''Artificially create test cases.
         '''
-        from music21 import stream, note, dynamics
+        from music21 import stream, note, dynamics, graph, analysis
 
         durDynPairsA = [(1, 'mf'), (3, 'f'), (2, 'p'), (4, 'ff'), (2, 'mf')]
         durDynPairsB = [(1, 'mf'), (3, 'f'), (2, 'p'), (4, 'ff'), (2, 'mf')]
 
         s = stream.Score()
+        pCount = 0
         for pairs in [durDynPairsA, durDynPairsB]:
             p = stream.Part()
-            pos = 0;
+            p.id = pCount
+            pos = 0
             for ql, dyn in pairs:
-                n = note.Note(quarterLength=ql)
-                p.insert(ql, n)
-                p.insert(ql, dynamics.Dynamic(dyn))
-                pos += ql;
+                p.insert(pos, note.Note(quarterLength=ql))
+                p.insert(pos, dynamics.Dynamic(dyn))
+                pos += ql
+            #p.makeMeasures(inPlace=True)
             s.insert(0, p)
-        s.show()
+            pCount += 1
+        #s.show()
 
+        pr = analysis.reduction.PartReduction(s)
+        pr.process()
+        print pr.getGraphHorizontalBarWeightedData()
+
+        p = graph.PlotDolan(s, title='Dynamics')
+        #p.process()
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

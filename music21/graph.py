@@ -3075,6 +3075,7 @@ class PlotHorizontalBarWeighted(PlotStream):
         pr.process()
         data = pr.getGraphHorizontalBarWeightedData()
 
+        environLocal.pd(['data', data])
         uniqueOffsets = []
         for key, value in data:
             for dataList in value:

@@ -576,7 +576,7 @@ class RomanNumeral(chord.Chord):
             for thisCS in omit:
                 # getChordStep may return False
                 p = self.getChordStep(thisCS)
-                if p is not False:
+                if p not in [False, None]:
                     omittedPitches.append(p.name)
             newPitches = []
             for thisPitch in pitches:
