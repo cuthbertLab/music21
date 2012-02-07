@@ -3248,6 +3248,10 @@ class Music21Object(JSONSerializer):
             returnedFilePath = self.write(format)
             environLocal.launch(format, returnedFilePath, app=app)
 
+        elif fmt == 'braille':
+            import music21.braille
+            print music21.braille.translate.objectToBraille(self)
+
         else:
             raise Music21ObjectException('no such show format is supported:', fmt)
 

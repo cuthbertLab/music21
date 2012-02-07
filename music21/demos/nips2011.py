@@ -6,15 +6,20 @@ Methods used to create the data in the NIPS2011 paper.
 import json
 import orange, orngTree
 
+try:
+    from BeautifulSoup import *
+except:
+    pass
+
 from music21 import *
 
-def nipsBuild():
+def nipsBuild(useOurExtractors = True, buildSet = 1, evaluationMethod = 'coarse'):
     '''
     Runs a collection of Feature Extractors, especially those related to Harmony (ChordSymbol) bass motion
     in order to classify pop songs from wikifonia as either early (pre-1960) or recent (post-1980)
     '''
         
-    dir = 'd:/docs/research/music21/nips-2011/wikifonia/wikifonia-'
+    wikifoniaDir = 'd:/docs/research/music21/nips-2011/wikifonia/wikifonia-'
     
     
     # here are all the pieces by id and their year and billboard chart number (not used)
@@ -29,36 +34,54 @@ def nipsBuild():
     
     ourExtractors = ['cs12', 'p22', 'k1', 'ql1', 'ql2', 'ql3', 'ql4', 'md1', ]
     jSymbolicExtrators = ['m1','m2','m3','m4','m5','m6','m7','m9','m10','m11','m12','m13','m14','m15','m17','m18','m19','r23','r32','r33','r35','p3','p4','p5','p6','p7','p10','p12','p15']
-    
-    FEs = features.extractorsById(ourExtractors)
+
+    if useOurExtractors is True:
+        FEs = features.extractorsById(ourExtractors)
+    else:
+        FEs = features.extractorsById(jSymbolicExtrators)
     
     ds = features.DataSet(classLabel='year')
     ds.addFeatureExtractors(FEs)
     
     
-    for wf in entryDict.keys()[0:198]:  # taking half the data here.... to get the other set do [198:]
+    if buildSet == 1:
+        halfOfData = entryDict.keys()[0:198]
+    else:
+        halfOfData = entryDict.keys()[198:]
+    
+    for wf in halfOfData:  # taking half the data here.... to get the other set do [198:]
         year = entryDict[wf][0]
+        
+        ## ignore 1960s and 1970s pieces...
         if year < 1961 or year >= 1981: 
-            fn = dir + str(wf) + '.mxl'
+            fn = wikifoniaDir + str(wf) + '.mxl'
             print fn, year, entryDict[wf][1]
             s = converter.parse(fn)
             id = s.metadata.title
             #cv = year  # if not using coarse but instead using the exact year as the class value
             
-            if year < 1961: cv = "old" # if using coarse evaluation (only "old" or "new")
-            else: cv = "new"
+            if evaluationMethod == 'coarse':            
+                #coarse evaluation (only "old" or "new")
+                if year < 1961: 
+                    cv = "old" 
+                else: 
+                    cv = "new"
+            else: 
+                # fine grained evaluations
+                cv = year  # if not using coarse but instead using the exact year as the class value
+
             ds.addData(s, classValue=cv, id=id)
     
     ds.process()
     ds.write('d:/desktop/year7-ourextractors-only.tab')
     
-def nipsEval():
+def nipsEvalFine():
     '''
     takes the data from nipsBuild() and runs it through a set of classifiers
     in order to see how well the FEs can classify a piece by year, giving
     an error value to misjudged years.
     
-    THIS METHOD DIDN'T WORK WELL, so see nipsEvalCoarse below
+    Coarse evaluations worked much better
     '''
     data1 = orange.ExampleTable('d:/desktop/year1.tab')
     data2 = orange.ExampleTable('d:/desktop/year2.tab')
@@ -91,8 +114,12 @@ def nipsEvalCoarse():
     
     Worked rather well...
     '''
-    data1 = orange.ExampleTable('d:/docs/research/music21/nips-2011/year7-midi-only.tab')
-    data2 = orange.ExampleTable('d:/docs/research/music21/nips-2011/year8-midi-only.tab')
+    data1 = orange.ExampleTable('d:/docs/research/music21/nips-2011/year5-ourExtractors-1.tab')
+    data2 = orange.ExampleTable('d:/docs/research/music21/nips-2011/year6-ourExtractors-2.tab')
+
+    #data1 = orange.ExampleTable('d:/docs/research/music21/nips-2011/year7-midi-only-1.tab')
+    #data2 = orange.ExampleTable('d:/docs/research/music21/nips-2011/year8-midi-only-2.tab')
+
     
     learners = {}
     learners['maj'] = orange.MajorityLearner
@@ -114,9 +141,6 @@ def nipsEvalCoarse():
                 if c != matchData[i].getclass():
                     mismatch += 1
             print('%s %s: misclassified %s/%s of %s' % (cStr, cName, mismatch, len(matchData), matchStr))
-
-
-from BeautifulSoup import *
 
 def getWikifoniaDatesFromBillboard():    
     '''
@@ -384,6 +408,5 @@ def probabilityOfChance():
     
     print 'The probability that the computer would guess correctly 69% or more of the time', prob
 
-nipsBuild()
-#nipsEval()
-#nipsEvalCoarse()
+#nipsBuild()
+nipsEvalCoarse()

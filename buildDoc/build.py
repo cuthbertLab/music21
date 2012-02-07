@@ -33,6 +33,8 @@ from music21.analysis import windowed as analysisWindowed
 
 
 from music21 import articulations
+
+from music21 import bar
 from music21 import base
 from music21 import beam
 
@@ -166,6 +168,7 @@ MODULES = [
     
     articulations,
 
+    bar,
     base,
     beam,
     

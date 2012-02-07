@@ -24,6 +24,38 @@ from music21.braille import segment
 #-------------------------------------------------------------------------------
 # music21 streams to BrailleText objects.
 
+def objectToBraille(music21Obj, debug=False, **keywords):
+    '''
+    >>> from music21 import *
+
+    #>>> n = note.Note()
+    #>>> braille.translate.objectToBraille(n)
+    #>>> n.show('braille') # calls objectToBraille(n)
+
+    >>> tns = tinyNotation.TinyNotationStream('C4 D16 E F G# r4 e2.', '3/4')
+    >>> tns.show('braille')
+            ⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠸⠹⠵⠋⠛⠩⠓⠧⠀⠐⠏⠄⠣⠅
+    
+    Same as:
+    
+    >>> x = objectToBraille(tns)
+    >>> print x
+            ⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠸⠹⠵⠋⠛⠩⠓⠧⠀⠐⠏⠄⠣⠅
+    
+    
+    '''
+    
+    
+    if 'Stream' in music21Obj.classes:
+        return streamToBraille(music21Obj, debug, **keywords)
+    else:
+        m = stream.Measure()
+        m.insert(0, music21Obj)
+        return measureToBraille(music21Obj, debug, **keywords)
+
+
 def streamToBraille(music21Stream, debug=False, **keywords):
     if isinstance(music21Stream, stream.Part) or isinstance(music21Stream, tinyNotation.TinyNotationStream):
         music21Part = music21Stream.makeNotation(cautionaryNotImmediateRepeat=False)

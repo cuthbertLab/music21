@@ -48,6 +48,7 @@ fileExtensions = {
     'pickle' : {'input': ['p', 'pickle'], 'output': 'p'},
     'romantext' : {'input': ['rntxt', 'rntext', 'romantext', 'rtxt'], 'output': 'rntxt'},
     'scala' : {'input': ['scl'], 'output': 'scl'},
+    'braille' : {'input' : ['brailleTextDoesNotWork'], 'output' : 'txt'},
 }
 
 
@@ -73,7 +74,7 @@ DEBUG_DEVEL = 63
 DEBUG_ALL = 255
 
 # used for checking preferences, and for setting environment variables
-VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'lily.pdf', 'lily.png', ]
+VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'lily.pdf', 'lily.png', 'braille']
 VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'lily.pdf', 'lily.png', ]
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 

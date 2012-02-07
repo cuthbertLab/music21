@@ -201,8 +201,8 @@ class Repeat(repeat.RepeatMark, Barline):
     The `direction` parameter can be one of 'start' or 'end.'
 
     >>> from music21 import *
-    >>> bl = bar.Repeat(direction='end', times=3)
-    >>> bl
+    >>> rep = bar.Repeat(direction='end', times=3)
+    >>> rep
     <music21.bar.Repeat direction=end times=3>
 
     '''
