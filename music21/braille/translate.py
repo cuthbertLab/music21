@@ -26,21 +26,21 @@ from music21.braille import segment
 
 def objectToBraille(music21Obj, debug=False, **keywords):
     '''
+    Translates an arbitrary object to Braille.  Doesn't yet work on notes:
+    
     >>> from music21 import *
 
-    #>>> n = note.Note()
-    #>>> braille.translate.objectToBraille(n)
-    #>>> n.show('braille') # calls objectToBraille(n)
-
-    >>> tns = tinyNotation.TinyNotationStream('C4 D16 E F G# r4 e2.', '3/4')
-    >>> tns.show('braille')
+    >>> tns = tinyNotation.TinyNotationStream('C4 D16 E F G# r4 e2.', '3/4')    
+    >>> x = braille.translate.objectToBraille(tns)
+    >>> print x
             ⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠸⠹⠵⠋⠛⠩⠓⠧⠀⠐⠏⠄⠣⠅
+
+    For normal users, you'll just call this, which starts a text editor:
+
+
+    >>> #_DOCS_SHOW tns.show('braille')
     
-    Same as:
-    
-    >>> x = objectToBraille(tns)
-    >>> print x
             ⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠸⠹⠵⠋⠛⠩⠓⠧⠀⠐⠏⠄⠣⠅
     
@@ -86,7 +86,7 @@ def partToBraille(music21Part, debug = False, **keywords):
         if debug:
             print brailleSegment
         allBrailleText.append(brailleSegment.transcribe())
-    return u"\n".join([str(bt) for bt in allBrailleText])
+    return u"\n".join([unicode(bt) for bt in allBrailleText])
     
 def keyboardPartsToBraille(music21PartStaffUpper, music21PartStaffLower, debug=False, **keywords):
     '''
@@ -101,7 +101,7 @@ def keyboardPartsToBraille(music21PartStaffUpper, music21PartStaffLower, debug=F
         if debug:
             print bg
         allBrailleText.append(bg.transcribe())
-    return u"\n\n".join([str(bt) for bt in allBrailleText])
+    return u"\n\n".join([unicode(bt) for bt in allBrailleText])
 
 #-------------------------------------------------------------------------------
 

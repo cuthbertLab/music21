@@ -3158,6 +3158,16 @@ class Music21Object(JSONSerializer):
             f.close()
             return fp
 
+        elif format == 'braille':
+            import music21.braille
+            dataStr = music21.braille.translate.objectToBraille(self)
+            f = codecs.open(fp, mode='w', encoding='utf-8')
+            f.write(dataStr)
+            f.close()
+            return fp
+
+
+
         elif format == 'midi':
             # returns a midi file object
             mf = self.midiFile
@@ -3203,7 +3213,7 @@ class Music21Object(JSONSerializer):
             lily (or lilypond)
             lily.png
             lily.pdf
-
+            braille
 
         N.B. score.write('lily') returns a bare lilypond file,
         score.show('lily') gives a png of a rendered lilypond file.
@@ -3249,8 +3259,8 @@ class Music21Object(JSONSerializer):
             environLocal.launch(format, returnedFilePath, app=app)
 
         elif fmt == 'braille':
-            import music21.braille
-            print music21.braille.translate.objectToBraille(self)
+            returnedFilePath = self.write(format)
+            environLocal.launch(format, returnedFilePath, app=app)
 
         else:
             raise Music21ObjectException('no such show format is supported:', fmt)

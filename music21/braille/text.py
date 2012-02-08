@@ -330,7 +330,8 @@ class BrailleKeyboard():
                     
     def __str__(self):
         self.recenterHeadings()
-        return u"\n".join([str(l) for l in self.allLines])
+        return u"\n".join([unicode(l) for l in self.allLines])
+            
     
 class BrailleTextLine():
     def __init__(self, lineLength):
