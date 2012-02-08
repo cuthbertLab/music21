@@ -2807,7 +2807,7 @@ def example26_1a():
     '''
     >>> from music21.braille import test
     >>> from music21.braille import translate
-    >>> print translate.measureToBraille(test.example26_1a(), showHand = 'right')
+    >>> print translate.measureToBraille(test.example26_1a(), showHand = 'right', descendingChords = True)
     ⠅⠜⠨⠷⠼⠴⠤
     '''
     c1 = chord.Chord(['G4','B4','D5','G5'], quarterLength = 4.0)
@@ -2819,7 +2819,7 @@ def example26_1b():
     '''
     >>> from music21.braille import test     
     >>> from music21.braille import translate 
-    >>> print translate.measureToBraille(test.example26_1b(), showHand = 'left')
+    >>> print translate.measureToBraille(test.example26_1b(), showHand = 'left', descendingChords = False)
     ⠇⠜⠘⠷⠬⠔⠤
     '''    
     c1 = chord.Chord(['G2','B2','D3','G3'], quarterLength = 4.0)
