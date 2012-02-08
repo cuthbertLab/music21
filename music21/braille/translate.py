@@ -33,28 +33,23 @@ def objectToBraille(music21Obj, debug=False, **keywords):
     >>> tns = tinyNotation.TinyNotationStream('C4 D16 E F G# r4 e2.', '3/4')    
     >>> x = braille.translate.objectToBraille(tns)
     >>> print x
-            ⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
-        ⠼⠁⠀⠸⠹⠵⠋⠛⠩⠓⠧⠀⠐⠏⠄⠣⠅
+    ⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠸⠹⠵⠋⠛⠩⠓⠧⠀⠐⠏⠄⠣⠅
 
     For normal users, you'll just call this, which starts a text editor:
 
 
     >>> #_DOCS_SHOW tns.show('braille')
     
-            ⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
-        ⠼⠁⠀⠸⠹⠵⠋⠛⠩⠓⠧⠀⠐⠏⠄⠣⠅
-    
-    
+    ⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠁⠀⠸⠹⠵⠋⠛⠩⠓⠧⠀⠐⠏⠄⠣⠅
     '''
-    
-    
-    if 'Stream' in music21Obj.classes:
+    if isinstance(music21Obj, stream.Stream):
         return streamToBraille(music21Obj, debug, **keywords)
     else:
         m = stream.Measure()
         m.insert(0, music21Obj)
         return measureToBraille(music21Obj, debug, **keywords)
-
 
 def streamToBraille(music21Stream, debug=False, **keywords):
     if isinstance(music21Stream, stream.Part) or isinstance(music21Stream, tinyNotation.TinyNotationStream):
@@ -100,7 +95,7 @@ def keyboardPartsToBraille(music21PartStaffUpper, music21PartStaffLower, debug=F
         bg = segment.BrailleGrandSegment(rhSegment, lhSegment)
         if debug:
             print bg
-        allBrailleText.append(bg.transcribe())
+        allBrailleText.append(bg.transcription)
     return u"\n\n".join([unicode(bt) for bt in allBrailleText])
 
 #-------------------------------------------------------------------------------
