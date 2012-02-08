@@ -415,6 +415,12 @@ class PartReduction(object):
         self._fillByMeasure = True
         if 'fillByMeasure' in keywords:
             self._fillByMeasure = keywords['fillByMeasure']
+
+        # if we re-partition if spans change
+        self._segmentByTarget = True
+        if 'segmentByTarget' in keywords:
+            self._segmentByTarget = keywords['segmentByTarget']
+
         # check that there are measures
         for p in self._score.parts:
             if not p.hasMeasures():
@@ -527,17 +533,21 @@ class PartReduction(object):
                 # a None in the resulting list designates a rest
                 noteSrc = eSrc.findConsecutiveNotes()
                 for i, e in enumerate(noteSrc): 
-                    environLocal.pd(['i, e', i, e])
-                    # if this event is a rest, or the last event
+                    #environLocal.pd(['i, e', i, e])
+                    # if this event is a rest, e is None
                     if e is None:
-                        if eStart is None:
-                            raise Exception('eStart is None')
-                        eEnd = eLast.getOffsetBySite(eSrc) + eLast.quarterLength
+                        if eStart is None: # the first event is a rest
+                            continue
+                        else:
+                            eEnd = eLast.getOffsetBySite(eSrc) + eLast.quarterLength
                         # create a temporary weight
                         ds = {'eStart':eStart, 'span':eEnd-eStart, 'weight':1, 'color':pColor}
                         dataEvents.append(ds)
                         eStart = None
                     elif i >= len(noteSrc) - 1: # this is the last
+                        if eStart is None: # the last event was was a rest
+                            # this the start is the start of this event
+                            eStart = e.getOffsetBySite(eSrc)
                         eEnd = e.getOffsetBySite(eSrc) + e.quarterLength
                         # create a temporary weight
                         ds = {'eStart':eStart, 'span':eEnd-eStart, 'weight':1, 'color':pColor}
@@ -657,7 +667,7 @@ class PartReduction(object):
         '''
         self._createPartBundles()
         self._createEventSpans()
-        self._getValueForSpan()
+        self._getValueForSpan(splitSpans=self._segmentByTarget)
 
     def getGraphHorizontalBarWeightedData(self):
         '''Get all data organized into bar span specifications. 
@@ -850,11 +860,26 @@ class Test(unittest.TestCase):
         print pr.getGraphHorizontalBarWeightedData()
 
 
-    def testPartReductionC(self):
+    def _matchWeightedData(self, match, target):
+        '''Utility function to compare known data but not compare floating point weights. 
+        '''
+        for partId in range(len(target)):
+            a = match[partId]
+            b = target[partId]
+            self.assertEqual(a[0], b[0])
+            for i, dataMatch in enumerate(a[1]): # second item has data
+                dataTarget = b[1][i]
+                # start
+                self.assertTrue(common.almostEquals(dataMatch[0], dataTarget[0]))
+                # span
+                self.assertTrue(common.almostEquals(dataMatch[1], dataTarget[1]))
+                # weight
+                self.assertTrue(common.almostEquals(dataMatch[2], dataTarget[2]))
+
+    def testPartReductionB(self):
         '''Artificially create test cases.
         '''
         from music21 import stream, note, dynamics, graph, analysis
-
         durDynPairsA = [(1, 'mf'), (3, 'f'), (2, 'p'), (4, 'ff'), (2, 'mf')]
         durDynPairsB = [(1, 'mf'), (3, 'f'), (2, 'p'), (4, 'ff'), (2, 'mf')]
 
@@ -875,10 +900,155 @@ class Test(unittest.TestCase):
 
         pr = analysis.reduction.PartReduction(s)
         pr.process()
-        print pr.getGraphHorizontalBarWeightedData()
-
-        p = graph.PlotDolan(s, title='Dynamics')
+        match = pr.getGraphHorizontalBarWeightedData()
+        target = [(0, [[0.0, 1.0, 0.55000000000000004, '#666666'], 
+                        [1.0, 3.0, 0.69999999999999996, '#666666'], 
+                        [4.0, 2.0, 0.29999999999999999, '#666666'], 
+                        [6.0, 4.0, 0.84999999999999998, '#666666'], 
+                        [10.0, 2.0, 0.55000000000000004, '#666666']
+                        ]), 
+                  (1, [[0.0, 1.0, 0.55000000000000004, '#666666'], 
+                       [1.0, 3.0, 0.69999999999999996, '#666666'], 
+                       [4.0, 2.0, 0.29999999999999999, '#666666'], 
+                       [6.0, 4.0, 0.84999999999999998, '#666666'], 
+                       [10.0, 2.0, 0.55000000000000004, '#666666']
+                        ])
+                ]
+        self._matchWeightedData(match, target)
+        #p = graph.PlotDolan(s, title='Dynamics')
         #p.process()
+
+
+    def testPartReductionC(self):
+        '''Artificially create test cases.
+        '''
+        from music21 import stream, note, dynamics, graph, analysis
+
+        s = stream.Score()
+        p1 = stream.Part()
+        p1.id = 0
+        p2 = stream.Part()
+        p2.id = 1
+        for ql in [1, 2, 1, 4]:
+            p1.append(note.Note(quarterLength=ql))
+            p2.append(note.Note(quarterLength=ql))
+        for pos, dyn in [(0, 'p'), (2, 'fff'), (6, 'ppp')]:
+            p1.insert(pos, dynamics.Dynamic(dyn))
+        for pos, dyn in [(0, 'p'), (1, 'fff'), (2, 'ppp')]:
+            p2.insert(pos, dynamics.Dynamic(dyn))
+        s.insert(0, p1)
+        s.insert(0, p2)
+        #s.show()
+
+
+        pr = analysis.reduction.PartReduction(s)
+        pr.process()
+        match = pr.getGraphHorizontalBarWeightedData()
+
+        #p = graph.PlotDolan(s, title='Dynamics')
+        #p.process()
+
+        #print match
+        target = [(0, [[0.0, 2.0, 0.29999999999999999, '#666666'], 
+                       [2.0, 4.0, 0.90000000000000002, '#666666'], 
+                       [6.0, 2.0, 0.10000000000000001, '#666666']]), 
+                (1, [[0.0, 1.0, 0.29999999999999999, '#666666'], 
+                     [1.0, 1.0, 0.90000000000000002, '#666666'], 
+                      [2.0, 6.0, 0.10000000000000001, '#666666']])]
+
+        self._matchWeightedData(match, target)
+
+
+
+    def testPartReductionD(self):
+        '''Artificially create test cases. Here, uses rests.
+        '''
+        from music21 import stream, note, dynamics, graph, analysis
+
+        s = stream.Score()
+        p1 = stream.Part()
+        p1.id = 0
+        p2 = stream.Part()
+        p2.id = 1
+        for ql in [None, 2, False, 2, False, 2]:
+            if ql:
+                p1.append(note.Note(quarterLength=ql))
+                p2.append(note.Note(quarterLength=ql))
+            else:
+                p1.append(note.Rest(quarterLength=2))
+                p2.append(note.Rest(quarterLength=2))
+        for pos, dyn in [(0, 'p'), (2, 'fff'), (6, 'ppp')]:
+            p1.insert(pos, dynamics.Dynamic(dyn))
+        for pos, dyn in [(0, 'mf'), (2, 'f'), (6, 'mf')]:
+            p2.insert(pos, dynamics.Dynamic(dyn))
+        s.insert(0, p1)
+        s.insert(0, p2)
+        #s.show()
+
+        pr = analysis.reduction.PartReduction(s)
+        pr.process()
+        match = pr.getGraphHorizontalBarWeightedData()
+        target = [(0, [[2.0, 2.0, 0.90000000000000002, '#666666'], 
+                       [6.0, 2.0, 0.10000000000000001, '#666666'], 
+                       [10.0, 2.0, 1, '#666666']]), 
+                (1, [[2.0, 2.0, 0.69999999999999996, '#666666'], 
+                    [6.0, 2.0, 0.55000000000000004, '#666666'], 
+                    [10.0, 2.0, 1, '#666666']])]
+        self._matchWeightedData(match, target)
+
+
+#         p = graph.PlotDolan(s, title='Dynamics')
+#         p.process()
+
+
+    def testPartReductionE(self):
+        '''Artificially create test cases.
+        '''
+        from music21 import stream, note, dynamics, graph, analysis
+        s = stream.Score()
+        p1 = stream.Part()
+        p1.id = 0
+        p2 = stream.Part()
+        p2.id = 1
+        for ql in [2, 2, False, 2, False, 2]:
+            if ql:
+                p1.append(note.Note(quarterLength=ql))
+                p2.append(note.Note(quarterLength=ql))
+            else:
+                p1.append(note.Rest(quarterLength=2))
+                p2.append(note.Rest(quarterLength=2))
+        for pos, dyn in [(0, 'p'), (2, 'fff'), (6, 'ppp')]:
+            p1.insert(pos, dynamics.Dynamic(dyn))
+        for pos, dyn in [(0, 'mf'), (2, 'f'), (6, 'mf')]:
+            p2.insert(pos, dynamics.Dynamic(dyn))
+        p1.makeMeasures(inPlace=True)
+        p2.makeMeasures(inPlace=True)
+        s.insert(0, p1)
+        s.insert(0, p2)
+        #s.show()
+
+        pr = analysis.reduction.PartReduction(s, fillByMeasure=True,
+                    segmentByTarget=False)
+        pr.process()
+        match = pr.getGraphHorizontalBarWeightedData()
+#         target = [(0, [[0.0, 1.0, 0.55000000000000004, '#666666'], 
+#                         [1.0, 3.0, 0.69999999999999996, '#666666'], 
+#                         [4.0, 2.0, 0.29999999999999999, '#666666'], 
+#                         [6.0, 4.0, 0.84999999999999998, '#666666'], 
+#                         [10.0, 2.0, 0.55000000000000004, '#666666']
+#                         ]), 
+#                   (1, [[0.0, 1.0, 0.55000000000000004, '#666666'], 
+#                        [1.0, 3.0, 0.69999999999999996, '#666666'], 
+#                        [4.0, 2.0, 0.29999999999999999, '#666666'], 
+#                        [6.0, 4.0, 0.84999999999999998, '#666666'], 
+#                        [10.0, 2.0, 0.55000000000000004, '#666666']
+#                         ])
+#                 ]
+        #self._matchWeightedData(match, target)
+        p = graph.PlotDolan(s, title='Dynamics', fillByMeasure=False,
+                            segmentByTarget=True)
+        p.process()
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

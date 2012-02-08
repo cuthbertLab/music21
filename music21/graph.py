@@ -997,7 +997,7 @@ class GraphHorizontalBarWeighted(Graph):
             self.setFigureSize([10,4])
         # this default alpha is used if not specified per bar
         if 'alpha' not in keywords:
-            self.alpha = .6
+            self.alpha = .9
 
 # example data
 #         data =  [
@@ -1021,7 +1021,6 @@ class GraphHorizontalBarWeighted(Graph):
 
         keys = []
         i = 0
-
         # reversing data to present in order
         self.data = list(self.data)
         self.data.reverse()
@@ -1068,8 +1067,11 @@ class GraphHorizontalBarWeighted(Graph):
                     self._margin + yAdjust + (yShiftUnit*yShift), h))
 
             for i, xRange in enumerate(xRanges):
+                # note: can get ride of bounding lines by providing
+                # linewidth=0, however, this may leave gaps in adjacent regions
                 ax.broken_barh([xRange], yRanges[i],
-                        facecolors=colors[i], alpha=alphas[i])
+                        facecolors=colors[i], alpha=alphas[i], 
+                        edgecolor=colors[i])
 
             # ticks are value, label
             yTicks.append([yPos + self._barSpace * .5, key])
@@ -3057,6 +3059,11 @@ class PlotHorizontalBarWeighted(PlotStream):
         self.fillByMeasure = True
         if 'fillByMeasure' in keywords:
             self.fillByMeasure = keywords['fillByMeasure']
+
+        self.segmentByTarget = False
+        if 'segmentByTarget' in keywords:
+            self.segmentByTarget = keywords['segmentByTarget']
+
         self.partGroups = None
         if 'partGroups' in keywords:
             self.partGroups = keywords['partGroups']
@@ -3071,11 +3078,12 @@ class PlotHorizontalBarWeighted(PlotStream):
 
         # parameters: x, span, heightScalar, color, alpha, yShift
         pr = reduction.PartReduction(self.streamObj, partGroups=self.partGroups, 
-                fillByMeasure=self.fillByMeasure)
+                fillByMeasure=self.fillByMeasure, 
+                segmentByTarget=self.segmentByTarget)
         pr.process()
         data = pr.getGraphHorizontalBarWeightedData()
 
-        environLocal.pd(['data', data])
+        #environLocal.pd(['data', data])
         uniqueOffsets = []
         for key, value in data:
             for dataList in value:
@@ -3123,6 +3131,7 @@ class PlotDolan(PlotHorizontalBarWeighted):
             self.graph.setTitle('Instrumentation')
         if 'hideYGrid' not in keywords:
             self.graph.hideYGrid = True
+
 
 
 #-------------------------------------------------------------------------------
@@ -4656,14 +4665,14 @@ class Test(unittest.TestCase):
     def xtestHorizontalInstrumentationA(self):
         from music21 import graph, stream
         #s = stream.Stream()
-        s = corpus.parse('bwv66.6')
-
-        partGroups = [
-            {'name':'High Voices', 'color':'#ff0088', 
-                'match':['soprano', 'alto']}, 
-            {'name':'Low Voices', 'color':'#8800ff', 
-                'match':['tenor', 'bass']}
-                    ]
+#         s = corpus.parse('bwv66.6')
+# 
+#         partGroups = [
+#             {'name':'High Voices', 'color':'#ff0088', 
+#                 'match':['soprano', 'alto']}, 
+#             {'name':'Low Voices', 'color':'#8800ff', 
+#                 'match':['tenor', 'bass']}
+#                     ]
 
         partGroups = [
             {'name':'Timpani', 'color':'purple', 'match':None},
@@ -4685,10 +4694,10 @@ class Test(unittest.TestCase):
         #partGroups = None
         #s.show()
         s = corpus.parse('symphony94/02')
-        g = graph.PlotDolan(s, fillByMeasure=True, partGroups=partGroups,
-            figureSize=[16,6], dpi=150)
-        g.process()
-        g = graph.PlotDolan(s, fillByMeasure=False, partGroups=partGroups, 
+#         g = graph.PlotDolan(s, fillByMeasure=True, partGroups=partGroups,
+#             figureSize=[16,6], dpi=150)
+#         g.process()
+        g = graph.PlotDolan(s, fillByMeasure=False, segmentByTarget=True, partGroups=partGroups, 
             hideYGrid=False, figureSize=[16,6], dpi=150)
         g.process()
         #g.show()

@@ -418,7 +418,7 @@ class Spanner(music21.Music21Object):
         return False
 
     def replaceComponent(self, old, new):
-        '''When copying a Spanner, we need to update the spanner with new references for copied components. Given the old component, this method will replace the old with the new.
+        '''When copying a Spanner, we need to update the spanner with new references for copied components (if the Notes of a Slur have beenc copied, that Slur's Note references need references to the new Notes). Given the old component, this method will replace the old with the new.
 
         The `old` parameter can be either an object or object id. 
 

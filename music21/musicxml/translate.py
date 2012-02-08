@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2010-11 The music21 Project
+# Copyright:    (c) 2010-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -1870,9 +1870,10 @@ def noteToMxNotes(n, spannerBundle=None):
 
         # get a new spanner bundle that only has components relevant to this 
         # note.
-        spannerBundle = spannerBundle.getByComponent(n)
+        #environLocal.printDebug(['noteToMxNotes(): spannerBundle[0].getComponentIds()', spannerBundle[0].getComponentIds()])
 
-        #environLocal.printDebug(['noteToMxNotes(): spannerBundle post-filter by component:', spannerBundle])
+        spannerBundle = spannerBundle.getByComponent(n)
+        #environLocal.printDebug(['noteToMxNotes(): spannerBundle post-filter by component:', spannerBundle, n, id(n)])
 
     mxNoteList = []
     pitchMx = n.pitch.mx
@@ -1946,9 +1947,11 @@ def noteToMxNotes(n, spannerBundle=None):
             else:
                 mxNoteList[0].notationsObj.componentList.append(expObj.mx)
 
-    if spannerBundle is not None:
+    if spannerBundle is not None and len(spannerBundle) > 0:
         # already filtered for just the spanner that have this note as
         # a component
+        #environLocal.pd(['noteToMxNotes()', 'len(spannerBundle)', len(spannerBundle) ])
+
         for su in spannerBundle.getByClass('Slur'):     
             mxSlur = musicxmlMod.Slur()
             mxSlur.set('number', su.idLocal)
@@ -2078,10 +2081,10 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
 
             # add a reference of this note to this spanner
             su.addComponents(n)
+            #environLocal.pd(['adding n', n, id(n), 'su.getComponents', su.getComponents(), su.getComponentIds()])
             if mxObj.get('type') == 'stop':
                 su.completeStatus = True
                 # only add after complete
-
             #environLocal.printDebug(['got slur:', su, mxObj.get('placement'), mxObj.get('number')])
     
     # gets the notehead object from the mxNote and sets value of the music21 note to the value of the notehead object        
@@ -2150,11 +2153,10 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
     '''
     from music21 import duration
 
-    #environLocal.printDebug(['measureToMx(): m.isSorted:', m.isSorted, 'm._mutable', m._mutable])
+    #environLocal.printDebug(['measureToMx(): m.isSorted:', m.isSorted, 'm._mutable', m._mutable, 'len(spannerBundle)', len(spannerBundle)])
     if spannerBundle is not None:
         # get all spanners that have this measure as a component    
-        rbSpanners = spannerBundle.getByComponentAndClass(
-                          m, 'RepeatBracket')
+        rbSpanners = spannerBundle.getByComponentAndClass(m, 'RepeatBracket')
     else:
         rbSpanners = [] # for size comparison
 
@@ -2264,15 +2266,6 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
             mFlat = nonVoiceMeasureItems # this is a Stream
         else:
             mFlat = m.flat
-        # update al tuplet types; this is done for beamed notes but not 
-        # unbeamed tuplets?
-#         durs = []
-#         for n in mFlat.notesAndRests:
-#             durs.append(n.duration)
-#         #duration.updateTupletType(durs)
-#         for d in durs:
-#             for t in d.tuplets:
-#                 print t.type
 
         for obj in mFlat:
             #environLocal.pd(['iterating flat M components', obj, obj.offset])
@@ -2867,7 +2860,7 @@ def streamPartToMx(part, instStream=None, meterStream=None,
     from music21 import spanner
     from music21 import stream
 
-    #environLocal.printDebug(['calling Stream._getMXPart'])
+    #environLocal.printDebug(['calling Stream._getMXPart', 'len(spannerBundle)', len(spannerBundle)])
     # note: meterStream may have TimeSignature objects from an unrelated
     # Stream.
     if instStream is None:
@@ -3032,7 +3025,6 @@ def streamToMx(s, spannerBundle=None):
 
     if s.hasPartLikeStreams():
         #environLocal.printDebug('Stream._getMX: interpreting multipart')
-
         # must set spanner after copying
         if spannerBundle is None: 
             # no spanner bundle provided, get one from the flat stream
@@ -3049,7 +3041,6 @@ def streamToMx(s, spannerBundle=None):
                 highestTime = ht
 
         refStreamOrTimeRange = [0, highestTime]
-
         # would like to do something like this but cannot
         # replace object inside of the stream
         for obj in streamOfStreams:
@@ -3309,13 +3300,27 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     # note: this presently has to look at _idLastDeepCopyOf to get matches
     # to find removed elements after copying; this is probably not the
     # best way to do this. 
+
+    # for this part, if any elements are components in the spannerBundle,
+    # then then we need to update the spannerBundle after the part is copied
+
     streamPartStaff = None
     if mxPart.getStavesCount() > 1:
+        # transfer all spanners to the streamPart such that they get
+        # updated in copying, then remove them
+        rm = []
+        for sp in spannerBundle.getByCompleteStatus(True):
+            streamPart._insertCore(0, sp)
+            rm.append(sp)
+        # remove from original spanner bundle
+        for sp in rm:
+            spannerBundle.remove(sp)
+
         # get staves will return a number, between 1 and count
         #for staffCount in range(mxPart.getStavesCount()):
         for staffCount in _getUniqueStaffKeys(staffReferenceList):
             partIdStaff = '%s-Staff%s' % (partId, staffCount)
-            #environLocal.printDebug(['partIdStaff', partIdStaff])
+            #environLocal.printDebug(['partIdStaff', partIdStaff, 'copying streamPart'])
             # this deepcopy is necessary, as we will remove components
             # in each staff that do not belong
             streamPartStaff = copy.deepcopy(streamPart)
@@ -3335,12 +3340,14 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
                         for eVoice in v.elements:
                             if eVoice._idLastDeepCopyOf == id(eRemove):
                                 v.remove(eVoice)
-                # after adjusting voices see of voices can be reduced or
+                # after adjusting voices see if voices can be reduced or
                 # removed
                 #environLocal.printDebug(['calling flattenUnnecessaryVoices: voices before:', len(m.voices)])
                 m.flattenUnnecessaryVoices(force=False, inPlace=True)
                 #environLocal.printDebug(['calling flattenUnnecessaryVoices: voices after:', len(m.voices)])
-
+            # TODO: copying spanners may have created orphaned
+            # spanners that no longer have valid connections
+            # in this part; should be deleted
             streamPartStaff.addGroupForElements(partIdStaff) 
             streamPartStaff.groups.append(partIdStaff) 
             streamPartStaff._elementsChanged()
@@ -3354,8 +3361,6 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
 
         # copy spanners that are complete into the part, as this is the 
         # highest level container that needs them
-        # note that this may cause problems when creating staff copies, 
-        # as is down below
         rm = []
         for sp in spannerBundle.getByCompleteStatus(True):
             streamPart._insertCore(0, sp)
@@ -4576,6 +4581,28 @@ spirit</words>
         raw = s.musicxml
         self.assertEqual(raw.count('</credit>'), 5)
         self.assertEqual(raw.count('font-size'), 5)
+
+
+    def testImportSlursA(self):
+        from music21 import corpus, spanner
+        # this is a good test as this encoding uses staffs, not parts
+        # to encode both parts; this requires special spanner handling
+        s = corpus.parse('k545')
+        slurs = s.flat.getElementsByClass(spanner.Slur)
+        # TODO: this value should be 2, but due to staff encoding we 
+        # have orphaned spanners that are not cleaned up
+        self.assertEqual(len(slurs), 4)
+
+        n1, n2 = s.parts[0].flat.notes[3], s.parts[0].flat.notes[5]
+        #environLocal.pd(['n1', n1, 'id(n1)', id(n1), slurs[0].getComponentIds(), slurs[0].getComponents()])
+        self.assertEqual(id(n1) == slurs[0].getComponentIds()[0], True)
+        self.assertEqual(id(n2) == slurs[0].getComponentIds()[1], True)
+
+        #environLocal.pd(['n2', n2, 'id(n2)', id(n2), slurs[0].getComponentIds()])
+        raw = s.musicxml
+        self.assertEqual(raw.count('<slur'), 4) # 2 pairs of start/stop
+        #s.show()
+
 
 
 #-------------------------------------------------------------------------------

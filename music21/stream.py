@@ -6705,7 +6705,7 @@ class Stream(music21.Music21Object):
         return self._cache['spannerBundle']
 
     spannerBundle = property(_getSpannerBundle, 
-        doc = '''A high-level object or Spanner management.
+        doc = '''A high-level object for Spanner management. This is only a gettable property. 
         ''')
 
 

@@ -4136,7 +4136,8 @@ class Document(object):
 
         if not file:
             fileLikeOpen = StringIO.StringIO(fileLike)
-        else:
+        else:   
+            # TODO: should this be codecs.open()?
             fileLikeOpen = open(fileLike)
 
         # the file always needs to be closed, otherwise
