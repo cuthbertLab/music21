@@ -47,9 +47,9 @@ def objectToBraille(music21Obj, debug=False, **keywords):
     if isinstance(music21Obj, stream.Stream):
         return streamToBraille(music21Obj, debug, **keywords)
     else:
-        m = stream.Measure()
-        m.insert(0, music21Obj)
-        return measureToBraille(music21Obj, debug, **keywords)
+        music21Measure = stream.Measure()
+        music21Measure.append(music21Obj)
+        return measureToBraille(music21Measure, debug, **keywords)
 
 def streamToBraille(music21Stream, debug=False, **keywords):
     if isinstance(music21Stream, stream.Part) or isinstance(music21Stream, tinyNotation.TinyNotationStream):
