@@ -2622,6 +2622,30 @@ def example16_6():
     return bm
 
 #-------------------------------------------------------------------------------
+# Chapter 17: Measure Repeats, Full-Measure In-Accords
+
+def example17_1():
+    '''
+    >>> from music21.braille import test     
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(test.example17_1(), showFirstMeasureNumber=False)
+    ⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀
+    ⠐⠹⠫⠪⠳⠀⠶⠀⠸⠺⠱⠪⠳⠀⠷
+    '''
+    bm = tinyNotation.TinyNotationStream("c4 e a g c e a g B d a g g1", "4/4")
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[-1].rightBarline = None
+    return bm
+
+def example17_2():
+    '''
+    >>> from music21.braille import test     
+    >>> from music21.braille import translate
+    >>> #print translate.partToBraille(test.example17_2(), showFirstMeasureNumber=False)
+    '''
+    bm = tinyNotation.TinyNotationStream("", "4/4")
+    return bm
+#-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # PART TWO
 # Transcribing Two- and Three-Staff Music
