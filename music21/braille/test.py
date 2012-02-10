@@ -2641,10 +2641,47 @@ def example17_2():
     '''
     >>> from music21.braille import test     
     >>> from music21.braille import translate
-    >>> #print translate.partToBraille(test.example17_2(), showFirstMeasureNumber=False)
+    >>> print translate.partToBraille(test.example17_2(), showFirstMeasureNumber=False)
+    ⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
+    ⠦⠐⠳⠦⠩⠻⠨⠦⠡⠟⠀⠶⠀⠏⠗⠀⠯
     '''
-    bm = tinyNotation.TinyNotationStream("", "4/4")
+    bm = tinyNotation.TinyNotationStream("g4 f# fn2 g4 f# fn2 e2 g2 e1", "4/4")
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[-1].rightBarline = None
+    bm[0].notes[0].articulations.append(articulations.Staccato())
+    bm[0].notes[1].articulations.append(articulations.Staccato())
+    bm[0].notes[2].articulations.append(articulations.Accent())
+    bm[1].notes[0].articulations.append(articulations.Staccato())
+    bm[1].notes[1].articulations.append(articulations.Staccato())
+    bm[1].notes[2].articulations.append(articulations.Accent())
     return bm
+
+def example17_3():
+    '''
+    >>> from music21.braille import test     
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(test.example17_3(), showFirstMeasureNumber=False)
+    ⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀
+    ⠐⠹⠫⠳⠀⠶⠀⠶⠀⠨⠝⠄
+    '''
+    bm = tinyNotation.TinyNotationStream("c4 e g c e g c e g c'2.", "3/4")
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[-1].rightBarline = None
+    return bm
+
+def example17_4():
+    '''
+    >>> from music21.braille import test     
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(test.example17_4(), showFirstMeasureNumber=False)
+    ⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀
+    ⠐⠹⠫⠳⠀⠶⠀⠶⠀⠎⠄
+    '''
+    bm = tinyNotation.TinyNotationStream("c4 e g c e g c e g a2.", "3/4")
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm[-1].rightBarline = None
+    return bm
+
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # PART TWO
