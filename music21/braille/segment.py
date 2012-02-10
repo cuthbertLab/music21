@@ -59,6 +59,7 @@ class BrailleElementGrouping(list):
         self.showClefSigns = False
         self.upperFirstInNoteFingering = True
         self.withHyphen = False
+        self.numRepeats = 0
         
 class BrailleSegment(collections.defaultdict):
     def __init__(self):
@@ -73,7 +74,6 @@ class BrailleSegment(collections.defaultdict):
         # -------------------
         self.cancelOutgoingKeySig = True
         self.dummyRestLength = None
-        self.isHyphenated = False
         self.maxLineLength = 40
         self.showFirstMeasureNumber = True
         self.showHand = None
@@ -84,7 +84,6 @@ class BrailleSegment(collections.defaultdict):
         
     def __str__(self):
         name = "<music21.braille.segment BrailleSegment {0}>".format(id(self))
-        hyphenation = "isHyphenated = {0}\n===".format(self.isHyphenated)
         allItems = sorted(self.items())
         allKeys = []
         allGroupings = []
@@ -108,7 +107,7 @@ class BrailleSegment(collections.defaultdict):
                                     (u"\n".join([u"\n".join(x._brailleEnglish) for x in grouping if len(x._brailleEnglish) > 0])))
             prevKey = key
         allElementGroupings = u"\n".join([u"".join([k, g, "\n==="]) for (k,g) in list(itertools.izip(allKeys, allGroupings))])
-        return u"\n".join(["---begin segment---", name, hyphenation, allElementGroupings, "---end segment---"])
+        return u"\n".join(["---begin segment---", name, allElementGroupings, "---end segment---"])
     
     def __repr__(self):
         return str(self)
@@ -293,6 +292,9 @@ class BrailleSegment(collections.defaultdict):
                     self[self.currentGroupingKey-0.5] = sngA
                     self[self.currentGroupingKey+0.5] = sngB
                     
+        if noteGrouping.numRepeats > 0:
+            for n in range(noteGrouping.numRepeats):
+                brailleText.addElement(keyOrTimeSig = symbols['repeat'])
         return None
 
     def extractSignatureGrouping(self, brailleText):
@@ -793,6 +795,18 @@ def addGroupingAttributes(allSegments, music21Part, **partKeywords):
         allGroupings = sorted(brailleSegment.items())
         (previousKey, previousList) = None, None
         for (groupingKey, groupingList) in allGroupings:
+            if previousKey is not None:
+                if groupingKey % 100 >= 10:
+                    previousList.withHyphen = True
+                if previousKey % 100 == 9 and groupingKey % 100 == 9:
+                    if isinstance(previousList[0], clef.Clef):
+                        measureRepeats = compareNoteGroupings(previousList[1:], groupingList)
+                    else:
+                        measureRepeats = compareNoteGroupings(previousList, groupingList)
+                    if measureRepeats:
+                        previousList.numRepeats += 1
+                        del brailleSegment[groupingKey]
+                        continue
             if groupingKey % 10 == 3:
                 for brailleElement in groupingList:
                     if isinstance(brailleElement, meter.TimeSignature):
@@ -815,13 +829,20 @@ def addGroupingAttributes(allSegments, music21Part, **partKeywords):
             groupingList.descendingChords = descendingChords
             groupingList.showClefSigns = showClefSigns
             groupingList.upperFirstInNoteFingering = upperFirstInNoteFingering
-            if previousKey is not None and groupingKey % 100 >= 10:
-                previousList.withHyphen = True                
             (previousKey, previousList) = (groupingKey, groupingList)
         if brailleSegment.endHyphen:
             previousList.withHyphen = True
             
     return None
+
+def compareNoteGroupings(noteGroupingA, noteGroupingB):
+    if len(noteGroupingA) == len(noteGroupingB):
+        for (elementA, elementB) in itertools.izip(noteGroupingA, noteGroupingB):
+            if elementA != elementB:
+                return False
+        return True
+    else:
+        return False
 
 # Segment Attributes
 # ------------------
@@ -992,4 +1013,4 @@ if __name__ == "__main__":
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
-# eof
+# eof   
