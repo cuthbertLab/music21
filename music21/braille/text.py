@@ -141,13 +141,11 @@ class BrailleText():
                         self.currentLine.append(symbols['dot'], addSpace = False)
                 addSpace = False
         try:
+            if self.currentLine.textLocation == 0:
+                addSpace = False
             if withHyphen:
-                oldLocation = self.currentLine.textLocation
-                self.currentLine.insert(oldLocation + 2, noteGrouping)
-                self.currentLine.insert(oldLocation, symbols['music_hyphen'])
+                self.currentLine.append(u"".join([noteGrouping, symbols['music_hyphen']]), addSpace = addSpace)
             else:
-                if self.currentLine.textLocation == 0:
-                    addSpace = False
                 self.currentLine.append(noteGrouping, addSpace = addSpace)
         except BrailleTextException as bte:
             if self.lineLength - self.currentLine.textLocation > self.lineLength / 4 and \
@@ -156,8 +154,11 @@ class BrailleText():
             elif showLeadingOctave == False:
                 raise BrailleTextException("Recalculate Note Grouping With Leading Octave")
             else:
-                if withHyphen and forceHyphen:
-                    self.currentLine.append(symbols['music_hyphen'], addSpace = False)
+                if not forceHyphen:
+                    prevChar = self.currentLine.allChars[self.currentLine.textLocation - 1]
+                    if prevChar == symbols['music_hyphen']:
+                        self.currentLine.allChars[self.currentLine.textLocation - 1] = symbols['space']
+                        self.currentLine.textLocation -= 1
                 self.makeNewLine()
                 if self.rightHandSymbol or self.leftHandSymbol:
                     if self.rightHandSymbol:
@@ -170,6 +171,8 @@ class BrailleText():
                     self.currentLine.append(noteGrouping, addSpace = False)
                 else:
                     self.currentLine.insert(2, noteGrouping)
+                if withHyphen:
+                    self.currentLine.append(symbols['music_hyphen'], addSpace = False)
         self.currentLine.containsNoteGrouping = True
 
     def addSignatures(self, signatures, withHyphen = False):
