@@ -1808,6 +1808,16 @@ def example11_1():
     return bm
 
 def example11_2():
+    '''
+    >>> from music21.braille import test     
+    >>> from music21.braille import translate 
+    >>> print translate.partToBraille(test.example11_2(), segmentBreaks = [(8, 3.0)])
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠚⠀⠐⠺⠀⠳⠫⠱⠫⠀⠗⠻⠫⠀⠪⠳⠨⠹⠄⠙⠀⠞⠄⠺⠀⠨⠫⠐⠺⠪⠄⠓⠀⠗⠻⠨⠹
+    ⠀⠀⠨⠹⠐⠻⠪⠄⠑⠀⠏⠄⠐
+    ⠼⠓⠄⠀⠐⠳⠀⠳⠄⠛⠻⠻⠀⠎⠳⠺⠀⠺⠡⠪⠪⠹⠀⠞⠄⠺⠀⠨⠫⠐⠺⠪⠳⠀⠗⠻⠨⠹
+    ⠀⠀⠨⠹⠧⠐⠻⠧⠀⠎⠄⠱⠀⠏⠄⠣⠅
+    '''
     bm = tinyNotation.TinyNotationStream("r2. b-4 g e- d e- g2 f4 e- a- g c'4. c'8 b-2. b-4 e'-4 b- a-4. g8\
     g2 f4 c' c' f a-4. d8 e-2. g4 g4. f8 f4 f a-2 g4 b- b- an an c'\
     b-2. b-4 e'- b- a- g g2 f4 c' c' r f r a-2. d4 e-2.", "4/4")
