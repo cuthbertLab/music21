@@ -1018,9 +1018,6 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    import sys
-    reload(sys)
-    sys.setdefaultencoding("UTF-8")
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
