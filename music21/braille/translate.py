@@ -8,14 +8,15 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-'''
+"""
 Objects for exporting music21 data as braille.
-'''
+"""
 
 import itertools
 import music21
 import unittest
 
+from music21 import metadata
 from music21 import stream
 from music21 import tinyNotation
 
@@ -25,12 +26,12 @@ from music21.braille import segment
 # music21 streams to BrailleText objects.
 
 def objectToBraille(music21Obj, debug=False, **keywords):
-    '''
+    """
     Translates an arbitrary object to Braille.  Doesn't yet work on notes:
-    
+
     >>> from music21 import *
 
-    >>> tns = tinyNotation.TinyNotationStream('C4 D16 E F G# r4 e2.', '3/4')    
+    >>> tns = tinyNotation.TinyNotationStream('C4 D16 E F G# r4 e2.', '3/4')
     >>> x = braille.translate.objectToBraille(tns)
     >>> print x
     ⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
@@ -40,10 +41,10 @@ def objectToBraille(music21Obj, debug=False, **keywords):
 
 
     >>> #_DOCS_SHOW tns.show('braille')
-    
+
     ⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠸⠹⠵⠋⠛⠩⠓⠧⠀⠐⠏⠄⠣⠅
-    '''
+    """
     if isinstance(music21Obj, stream.Stream):
         return streamToBraille(music21Obj, debug, **keywords)
     else:
@@ -63,6 +64,27 @@ def streamToBraille(music21Stream, debug=False, **keywords):
         rightHand = keyboardParts[0].makeNotation(cautionaryNotImmediateRepeat=False)
         leftHand = keyboardParts[1].makeNotation(cautionaryNotImmediateRepeat=False)
         return keyboardPartsToBraille(rightHand, leftHand, debug=debug, **keywords)
+    if isinstance(music21Stream, stream.Score):
+        allBrailleLines = []
+        for music21Metadata in music21Stream.getElementsByClass(metadata.Metadata):
+            if music21Metadata.title is not None:
+                allBrailleLines.append(unicode(music21Metadata.title))
+            if music21Metadata.composer is not None:
+                allBrailleLines.append(unicode(music21Metadata.composer))
+        for p in music21Stream.getElementsByClass(stream.Part):
+            try:
+                music21Part = p.makeNotation(cautionaryNotImmediateRepeat=False)
+            except Exception as e:
+                allBrailleLines.append("Make Notation bug / {0}".format(e))
+                continue
+            try:
+                braillePart = partToBraille(music21Part, debug, **keywords)
+                allBrailleLines.append(braillePart)
+            except Exception as e:
+                allBrailleLines.append("Transcription bug / {0}".format(e))
+        return u"\n".join(allBrailleLines)
+    if isinstance(music21Stream, stream.Opus):
+        pass
     raise BrailleTranslateException("Cannot transcribe stream to braille")
     
 def measureToBraille(music21Measure, debug=False, **keywords):
@@ -84,10 +106,10 @@ def partToBraille(music21Part, debug = False, **keywords):
     return u"\n".join([unicode(bt) for bt in allBrailleText])
     
 def keyboardPartsToBraille(music21PartStaffUpper, music21PartStaffLower, debug=False, **keywords):
-    '''
+    """
     Translates a stream Part consisting of two stream Parts, a right hand and left hand,
     into braille music bar over bar format.
-    '''
+    """
     rhSegments = segment.findSegments(music21PartStaffUpper, **keywords)
     lhSegments = segment.findSegments(music21PartStaffLower, **keywords)
     allBrailleText = []
@@ -96,7 +118,7 @@ def keyboardPartsToBraille(music21PartStaffUpper, music21PartStaffLower, debug=F
         if debug:
             print bg
         allBrailleText.append(bg.transcription)
-    return u"\n\n".join([unicode(bt) for bt in allBrailleText])
+    return u"\n".join([unicode(bt) for bt in allBrailleText])
 
 #-------------------------------------------------------------------------------
 

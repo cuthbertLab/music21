@@ -40,13 +40,13 @@ from music21.braille import translate
 # Chapter 2: Eighth Notes, the Eighth Rest, and Other Basic Signs
 
 def example2_1():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example2_1(), suppressOctaveMarks = True)
     ⠼⠁⠀⠓⠭⠋⠀⠛⠭⠊⠀⠓⠭⠛⠀⠋⠭⠭⠀⠋⠭⠙⠀⠑⠭⠛⠀⠋⠭⠑⠀⠙⠭⠭⠀⠑⠭⠛
     ⠀⠀⠋⠭⠓⠀⠛⠓⠊⠀⠓⠭⠭⠀⠊⠭⠛⠀⠓⠭⠋⠀⠛⠋⠑⠀⠙⠭⠭⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("g8 r8 e8 f8 r8 a8 g8 r8 f8 e8 r8 r8 e8 r8 c8 d8 r8 f8 e8 r8 d8 c8 r8 r8 \
     d8 r8 f8 e8 r8 g8 f8 g8 a8 g8 r8 r8 a8 r8 f8 g8 r8 e8 f8 e8 d8 c8 r8 r8", "3/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -54,13 +54,13 @@ def example2_1():
     return bm
 
 def example2_2():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example2_2(), suppressOctaveMarks = True)
     ⠼⠚⠀⠑⠀⠑⠙⠚⠑⠀⠙⠚⠊⠙⠀⠚⠊⠓⠚⠀⠊⠊⠑⠭⠀⠋⠋⠓⠋⠀⠑⠋⠓⠚⠀⠑⠙⠚⠊
     ⠀⠀⠓⠓⠓⠭⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("r8 r8 r8 d8 d8 c8 B8 d8 c8 B8 A8 c8 B8 A8 G8 B8 A8 A8 D8 r8 E8 E8 G8 E8 \
     D8 E8 G8 B8 d8 c8 B8 A8 G8 G8 G8 r8", "4/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -73,13 +73,13 @@ def example2_2():
     return bm
 
 def example2_3():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example2_3(), suppressOctaveMarks = True)
     ⠼⠁⠀⠋⠋⠀⠓⠊⠀⠓⠛⠀⠋⠓⠀⠛⠋⠀⠑⠛⠀⠋⠙⠀⠑⠭⠀⠋⠋⠀⠛⠛⠀⠓⠊⠀⠚⠙
     ⠀⠀⠊⠛⠀⠋⠑⠀⠙⠚⠀⠙⠭⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("e8 e8 g8 a8 g8 f8 e8 g8 f8 e8 d8 f8 e8 c8 d8 r8 e8 e8 f8 f8 g8 a8 b8 c'8 \
     a8 f8 e8 d8 c8 B8 c8 r8", "2/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -87,13 +87,13 @@ def example2_3():
     return bm
 
 def example2_4():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example2_4(), suppressOctaveMarks = True)
     ⠼⠁⠀⠊⠙⠋⠀⠑⠙⠚⠀⠙⠭⠚⠀⠊⠭⠭⠀⠚⠚⠙⠀⠑⠙⠚⠀⠊⠭⠊⠀⠚⠭⠭⠣⠅⠄
     ⠀⠀⠊⠋⠊⠀⠙⠚⠊⠀⠊⠚⠙⠀⠑⠭⠭⠀⠋⠑⠙⠀⠚⠋⠚⠀⠊⠭⠊⠀⠊⠭⠭⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("A8 c8 e8 d8 c8 B8 c8 r8 B8 A8 r8 r8 B8 B8 c8 d8 c8 B8 A8 r8 A8 B8 r8 r8 \
     A8 E8 A8 c8 B8 A8 A8 B8 c8 d8 r8 r8 e8 d8 c8 B8 E8 B8 A8 r8 A8 A8 r8 r8", "3/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -102,13 +102,13 @@ def example2_4():
     return bm
 
 def example2_5():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example2_5(), suppressOctaveMarks = True)
     ⠼⠚⠀⠑⠋⠀⠛⠙⠊⠙⠀⠑⠙⠊⠙⠀⠊⠙⠊⠓⠀⠋⠓⠛⠭⠀⠑⠋⠛⠑⠀⠙⠑⠋⠛⠀⠓⠋⠙⠋
     ⠀⠀⠛⠭⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("r8 r8 d'8 e'8 f'8 c'8 a8 c'8 d'8 c'8 a8 c'8 a8 c'8 a8 g8 e8 g8 f8 r8 \
     d8 e8 f8 d8 c8 d8 e8 f8 g8 e8 c8 e8 f8 r8", "4/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -121,13 +121,13 @@ def example2_5():
     return bm
 
 def example2_6():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example2_6(), suppressOctaveMarks = True)
     ⠼⠁⠀⠓⠓⠓⠓⠋⠛⠀⠊⠓⠓⠓⠭⠓⠀⠊⠊⠊⠙⠚⠊⠀⠊⠓⠓⠓⠭⠭⠀⠓⠛⠛⠛⠭⠭
     ⠀⠀⠛⠋⠋⠋⠭⠭⠀⠑⠋⠑⠓⠛⠑⠀⠙⠋⠑⠙⠭⠭⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("G8 G8 G8 G8 E8 F8 A8 G8 G8 G8 r8 G8 A8 A8 A8 c8 B8 A8 A8 G8 G8 G8 r8 r8 \
     G8 F8 F8 F8 r8 r8 F8 E8 E8 E8 r8 r8 D8 E8 D8 G8 F8 D8 C8 E8 D8 C8 r8 r8", "6/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -135,13 +135,13 @@ def example2_6():
     return bm
 
 def example2_7():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example2_7(), suppressOctaveMarks = True)
     ⠼⠁⠀⠋⠭⠋⠛⠭⠛⠀⠑⠭⠑⠋⠭⠋⠀⠙⠑⠋⠓⠛⠋⠀⠋⠑⠑⠑⠭⠭⠀⠙⠭⠙⠋⠭⠋
     ⠀⠀⠛⠭⠛⠊⠭⠊⠀⠓⠭⠓⠓⠊⠚⠀⠑⠙⠙⠙⠭⠭⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("e8 r8 e8 f8 r8 f8 d8 r8 d8 e8 r8 e8 c8 d8 e8 g8 f8 e8 e8 d8 d8 d8 r8 r8 \
     c8 r8 c8 e8 r8 e8 f8 r8 f8 a8 r8 a8 g8 r8 g8 g8 a8 b8 d'8 c'8 c'8 c'8 r8 r8", "6/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -152,13 +152,13 @@ def example2_7():
 # Chapter 3: Quarter Notes, the Quarter Rest, and the Dot
 
 def example3_1():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example3_1(), suppressOctaveMarks = True)
     ⠼⠁⠀⠱⠺⠳⠺⠀⠹⠺⠪⠧⠀⠺⠳⠫⠳⠀⠱⠺⠱⠧⠀⠫⠳⠪⠳⠀⠱⠳⠺⠱⠀⠫⠱⠹⠪
     ⠀⠀⠳⠱⠳⠧⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("d'4 b4 g4 b4 c'4 b4 a4 r4 b4 g4 e4 g4 d4 B4 d4 r4 e4 g4 a4 g4 d4 g4 b4 \
     d'4 e'4 d'4 c'4 a4 g4 d4 g4 r4", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -166,13 +166,13 @@ def example3_1():
     return bm
 
 def example3_2():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example3_2(), suppressOctaveMarks = True)
     ⠼⠁⠀⠪⠻⠹⠻⠀⠳⠫⠹⠫⠀⠻⠳⠪⠻⠀⠱⠫⠻⠧⠀⠳⠪⠳⠹⠀⠻⠪⠹⠱⠀⠹⠪⠳⠹
     ⠀⠀⠱⠫⠻⠧⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("A4 F4 C4 F4 G4 E4 C4 E4 F4 G4 A4 F4 D4 E4 F4 r4 G4 A4 G4 C4 F4 A4 c4 d4 \
     c4 A4 G4 C4 D4 E4 F4 r4", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -180,13 +180,13 @@ def example3_2():
     return bm
 
 def example3_3():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example3_3(), suppressOctaveMarks = True)
     ⠼⠁⠀⠳⠫⠀⠪⠳⠀⠻⠧⠀⠱⠧⠀⠹⠄⠙⠀⠱⠄⠑⠀⠫⠧⠀⠹⠧⠀⠳⠳⠀⠪⠺⠀⠹⠧⠀⠪⠧
     ⠀⠀⠳⠄⠓⠀⠻⠱⠀⠹⠫⠀⠹⠧⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("g4 e4 a4 g4 f4 r4 d4 r4 c4. c8 d4. d8 e4 r4 c4 r4 g4 g4 a4 b4 c'4 r4 a4 r4 \
     g4. g8 f4 d4 c4 e4 c4 r4", "2/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -194,13 +194,13 @@ def example3_3():
     return bm
 
 def example3_4():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example3_4(), suppressOctaveMarks = True)
     ⠼⠁⠀⠫⠙⠑⠫⠧⠀⠻⠊⠛⠫⠧⠀⠱⠋⠛⠓⠋⠹⠀⠱⠱⠳⠧⠀⠻⠋⠑⠫⠧⠀⠳⠛⠋⠻⠧
     ⠀⠀⠪⠓⠛⠋⠛⠳⠀⠻⠱⠹⠧⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("E4 C8 D8 E4 r4 F4 A8 F8 E4 r4 D4 E8 F8 G8 E8 C4 D4 D4 G4 r4 \
     F4 E8 D8 E4 r4 G4 F8 E8 F4 r4 A4 G8 F8 E8 F8 G4 F4 D4 C4 r4", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -208,13 +208,13 @@ def example3_4():
     return bm
 
 def example3_5():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example3_5(), suppressOctaveMarks = True)
     ⠼⠁⠀⠻⠄⠙⠱⠫⠀⠻⠄⠓⠪⠻⠀⠪⠹⠱⠹⠀⠪⠻⠳⠧⠣⠅⠄⠀⠳⠄⠋⠹⠫⠀⠻⠄⠙⠻⠪
     ⠀⠀⠳⠳⠻⠫⠀⠻⠪⠻⠧⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("f4. c8 d4 e4 f4. g8 a4 f4 a4 c'4 d'4 c'4 a4 f4 g4 r4 \
     g4. e8 c4 e4 f4. c8 f4 a4 g4 g4 f4 e4 f4 a4 f4 r4", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -223,13 +223,13 @@ def example3_5():
     return bm
 
 def example3_6():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example3_6(), suppressOctaveMarks = True)
     ⠼⠁⠀⠳⠓⠱⠑⠀⠳⠚⠑⠚⠓⠀⠪⠊⠊⠚⠙⠀⠺⠚⠳⠭⠀⠪⠊⠱⠑⠀⠳⠚⠪⠙⠀⠚⠙⠑⠹⠊
     ⠀⠀⠳⠓⠳⠭⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("g4 g8 d4 d8 g4 b8 d'8 b8 g8 a4 a8 a8 b8 c'8 b4 b8 g4 r8 a4 a8 d4 d8 g4 b8 a4 c'8\
     b8 c'8 d'8 c'4 a8 g4 g8 g4 r8", "3/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -240,37 +240,37 @@ def example3_6():
 # Chapter 4: Half Notes, the Half Rest, and the Tie
 
 def example4_1():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example4_1(), suppressOctaveMarks = True)
     ⠼⠁⠀⠝⠏⠀⠕⠟⠀⠏⠗⠀⠟⠎⠀⠗⠞⠀⠎⠝⠀⠞⠕⠀⠝⠥⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c2 e2 d2 f2 e2 g2 f2 a2 g2 b2 a2 c'2 b2 d'2 c'2 r2", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(0)
     return bm
 
 def example4_2():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example4_2(), suppressOctaveMarks = True)
     ⠼⠁⠀⠟⠎⠀⠗⠝⠀⠱⠹⠱⠫⠀⠟⠥⠀⠕⠟⠀⠝⠟⠀⠫⠻⠳⠪⠀⠟⠥⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("F2 A2 G2 C2 D4 C4 D4 E4 F2 r2 D2 F2 C2 F2 E4 F4 G4 A4 F2 r2", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(0)
     return bm    
 
 def example4_3():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example4_3(), suppressOctaveMarks = True)
     ⠼⠁⠀⠝⠹⠀⠑⠙⠚⠙⠱⠀⠏⠫⠀⠛⠋⠑⠋⠻⠀⠗⠳⠀⠊⠓⠛⠓⠪⠀⠚⠊⠓⠊⠚⠑⠀⠹⠥
     ⠀⠀⠏⠫⠀⠑⠙⠚⠙⠱⠀⠝⠹⠀⠚⠊⠓⠊⠺⠀⠎⠪⠀⠓⠛⠋⠛⠳⠀⠛⠋⠑⠋⠛⠑⠀⠹⠥⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c2 c4 d8 c8 B8 c8 d4 e2 e4 f8 e8 d8 e8 f4 g2 g4 a8 g8 f8 g8 a4 \
     b8 a8 g8 a8 b8 d'8 c'4 r2 e'2 e'4 d'8 c'8 b8 c'8 d'4 c'2 c'4 b8 a8 g8 a8 b4 a2 a4 g8 f8 e8 f8 g4 \
     f8 e8 d8 e8 f8 d8 c4 r2", "3/4")
@@ -279,13 +279,13 @@ def example4_3():
     return bm
 
 def example4_4():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> measure1 = example4_4()[0]
     >>> print translate.measureToBraille(measure1, suppressOctaveMarks = True)
     ⠟⠈⠉⠻⠄⠛
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("f2~ f4. f8", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(1)
@@ -293,13 +293,13 @@ def example4_4():
     return bm
 
 def example4_5():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> measure1 = example4_5()[0]
     >>> print translate.measureToBraille(measure1, suppressOctaveMarks = True)
     ⠳⠄⠈⠉⠓⠊⠓
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("g4.~ g8 a8 g8", "3/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(1)
@@ -307,9 +307,9 @@ def example4_5():
     return bm
 
 def example4_6():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> bm = example4_6()
     >>> measure1 = bm[0]
     >>> measure2 = bm[1]
@@ -317,7 +317,7 @@ def example4_6():
     ⠗⠳⠈⠉
     >>> print translate.measureToBraille(measure2, suppressOctaveMarks = True)
     ⠗⠧
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("g2 g4~ g2 r4", "3/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(0)
@@ -325,13 +325,13 @@ def example4_6():
     return bm
 
 def example4_7():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example4_7(), suppressOctaveMarks = True)
     ⠼⠁⠀⠗⠄⠀⠏⠄⠀⠝⠄⠀⠏⠄⠀⠹⠱⠫⠀⠳⠻⠫⠀⠕⠄⠈⠉⠀⠕⠄⠀⠏⠫⠀⠫⠻⠳⠀⠎⠪
     ⠀⠀⠪⠳⠻⠀⠏⠻⠀⠕⠫⠀⠝⠄⠈⠉⠀⠝⠄⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("g2. e2. c2. e2. c4 d4 e4 g4 f4 e4 d2.~ d2.\
     e2 e4 e4 f4 g4 a2 a4 a4 g4 f4 e2 f4 d2 e4 c2.~ c2.", "3/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -343,50 +343,50 @@ def example4_7():
 # Transcriber-Added Signs
 
 def example5_1():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example5_1(), suppressOctaveMarks = True)
     ⠼⠁⠀⠽⠀⠮⠀⠿⠀⠮⠀⠽⠀⠵⠀⠽⠈⠉⠀⠽⠀⠵⠀⠯⠀⠿⠀⠵⠀⠽⠀⠷⠀⠿⠈⠉⠀⠿⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c'1 a1 f1 a1 c'1 d'1 c'1~ c'1 d'1 e'1 f'1 d'1 c'1 g'1 f'1~ f'1", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(0)
     return bm
 
 def example5_2():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example5_2(), suppressOctaveMarks = True)
     ⠼⠁⠀⠽⠀⠯⠀⠷⠀⠮⠀⠾⠀⠮⠀⠷⠈⠉⠀⠷⠀⠮⠀⠽⠀⠮⠀⠿⠀⠷⠀⠾⠀⠷⠀⠯⠀⠿⠀⠮
     ⠀⠀⠿⠀⠵⠀⠾⠀⠵⠀⠽⠈⠉⠀⠽⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("C1 E1 G1 A1 B1 A1 G1~ G1 A1 c1 A1 F1 G1 B1 G1 E1 F1 A1 F1 D1 BB1 D1 C1~ C1", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(0)
     return bm
 
 def example5_3():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example5_3(), suppressOctaveMarks = True)
     ⠼⠁⠀⠍⠗⠀⠗⠗⠗⠀⠳⠳⠍⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("r1 g2 g2 g2 g2 g4 g4 r1", "3/2")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(0)
     return bm
 
 def example5_4():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example5_4(), suppressOctaveMarks = True)
     ⠼⠁⠀⠏⠟⠀⠷⠀⠏⠕⠀⠽⠀⠕⠏⠀⠟⠏⠀⠵⠀⠍⠀⠝⠕⠀⠯⠀⠟⠗⠀⠮⠀⠗⠟⠀⠏⠕⠀⠽
     ⠀⠀⠍⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("E2 F2 G1 E2 D2 C1 D2 E2 F2 E2 D1 r1 \
     C2 D2 E1 F2 G2 A1 G2 F2 E2 D2 C1 r1", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -394,13 +394,13 @@ def example5_4():
     return bm
 
 def example5_5():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example5_5(), suppressOctaveMarks = True)
     ⠼⠁⠀⠟⠄⠀⠍⠀⠎⠄⠀⠍⠀⠻⠳⠪⠀⠹⠪⠻⠀⠳⠥⠀⠍⠀⠏⠄⠀⠍⠀⠗⠄⠀⠍⠀⠹⠱⠫
     ⠀⠀⠳⠫⠹⠀⠻⠥⠀⠍⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("F2. r2. A2. r2. F4 G4 A4 c4 A4 F4 G4 r2 r2. \
     E2. r2. G2. r2. C4 D4 E4 G4 E4 C4 F4 r2 r2.", "3/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -408,14 +408,14 @@ def example5_5():
     return bm
 
 def example5_6():
-    '''
+    ur"""
     NOTE: Breve note and breve rest are transcribed using method (b) on page 24.
-    
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example5_6(), suppressOctaveMarks = True)
     ⠼⠁⠀⠮⠽⠾⠀⠝⠞⠮⠞⠝⠀⠾⠍⠘⠉⠍⠀⠷⠾⠎⠗⠀⠮⠘⠉⠮⠍⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("a1 c'1 b1 c'2 b2 a1 b2 c'2 b1")
     bm.append(note.Rest(quarterLength=8.0))
     bm2 = tinyNotation.TinyNotationStream("g1 b1 a2 g2")
@@ -451,7 +451,7 @@ def example5_7c():
 # Chapter 6: Accidentals
 
 def example6_1():
-    '''
+    ur"""
     >>> from music21.braille import basic
     >>> from music21 import note
     >>> print basic.noteToBraille(note.Note('C#4', quarterLength = 2.0), showOctave = False)
@@ -460,16 +460,16 @@ def example6_1():
     ⠡⠗
     >>> print basic.noteToBraille(note.Note('E-4', quarterLength = 2.0), showOctave = False)
     ⠣⠏
-    '''
+    """
     pass
 
 def example6_2():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example6_2()[0], suppressOctaveMarks = True)
     ⠩⠳⠩⠩⠻⠗
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("g#4 f##4 g#2")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(1)
@@ -477,14 +477,14 @@ def example6_2():
     return bm
 
 def example6_3():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example6_3()[0], suppressOctaveMarks = True)
     ⠝⠣⠞⠈⠉
     >>> print translate.measureToBraille(test.example6_3()[1], suppressOctaveMarks = True)
     ⠺⠹⠪⠻
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c'2 b-2~ b-4 c'4 a4 f4", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(0)
@@ -492,14 +492,14 @@ def example6_3():
     return bm
 
 def example6_4():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example6_4()[0], suppressOctaveMarks = True)
     ⠡⠫⠋⠊⠙⠡⠋
     >>> print translate.measureToBraille(test.example6_4()[1], suppressOctaveMarks = True)
     ⠟⠄
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("en4 en8 a8 c'8 e'n8 f'2.", "3/4")
     bm.notes[0].accidental = pitch.Accidental()
     bm.notes[4].accidental = pitch.Accidental()
@@ -509,14 +509,14 @@ def example6_4():
     return bm
 
 def example6_5():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example6_5()[0], suppressOctaveMarks = True)
     ⠙⠣⠚⠊⠓⠻
     >>> print translate.measureToBraille(test.example6_5()[1], suppressOctaveMarks = True)
     ⠓⠡⠚⠹⠱
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c'8 b-8 a8 g8 f4 g8 bn8 c'4 d'4", "3/4")
     bm.notes[-3].accidental = pitch.Accidental()
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -525,13 +525,13 @@ def example6_5():
     return bm
 
 def example6_6():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example6_6(), suppressOctaveMarks = True)
     ⠼⠁⠀⠹⠩⠹⠱⠩⠱⠀⠫⠻⠩⠻⠳⠀⠩⠳⠪⠣⠺⠡⠺⠀⠝⠥⠀⠏⠣⠫⠱⠀⠹⠱⠡⠫⠹
     ⠀⠀⠺⠣⠺⠪⠡⠺⠀⠝⠥⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c4 c#4 d4 d#4 e4 f4 f#4 g4 g#4 a4 b-4 bn4 c'2 r2\
     e'2 e'-4 d'4 c'4 d'4 e'4 c'4 b4 b-4 a4 bn4 c'2 r2")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -539,13 +539,13 @@ def example6_6():
     return bm
 
 def example6_7():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example6_7(), suppressOctaveMarks = True)
     ⠼⠁⠀⠳⠩⠻⠡⠻⠫⠀⠣⠫⠱⠣⠱⠹⠀⠺⠣⠺⠪⠣⠪⠀⠳⠩⠻⠡⠻⠫⠀⠣⠫⠱⠣⠱⠹
     ⠀⠀⠺⠹⠱⠫⠀⠝⠥⠀⠽⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("g'4 f'#4 f'n4 e'n4 e'-4 d'4 d'-4 c'4 b4 b-4 a4 a-4 g4 f#4 fn4 e4\
     e-4 d4 d-4 c4 B4 c4 d4 e4 c2 r2 c1")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -555,12 +555,12 @@ def example6_7():
     return bm
 
 def example6_8():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example6_8(), suppressOctaveMarks = True)
     ⠼⠁⠀⠹⠙⠣⠚⠣⠊⠙⠛⠣⠊⠈⠉⠀⠊⠓⠛⠓⠝⠀⠣⠱⠛⠑⠙⠙⠣⠊⠛⠀⠓⠓⠙⠙⠟⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c'4 c'8 b-8 a-8 c'8 f'8 a'-8~ a'-8 g'8 f'8 g'8 c'2\
     d'-4 f'8 d'-8 c'8 c'8 a-8 f8 g8 g8 c8 c8 f2", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -568,13 +568,13 @@ def example6_8():
     return bm
 
 def example6_9():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example6_9(), suppressOctaveMarks = True)
     ⠼⠁⠀⠫⠗⠫⠀⠩⠻⠎⠻⠀⠓⠊⠺⠳⠫⠀⠩⠑⠋⠩⠻⠱⠳⠀⠹⠏⠩⠻⠀⠳⠞⠹
     ⠀⠀⠚⠊⠓⠚⠊⠓⠩⠛⠩⠑⠀⠯⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("E4 G2 E4 F#4 A2 F#4 G8 A8 B4 G4 E4 D#8 E8 F#4 D#4 G4\
     C4 E2 F#4 G4 B2 c4 B8 A8 G8 B8 A8 G8 F#8 D#8 E1")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -582,13 +582,13 @@ def example6_9():
     return bm
 
 def example6_10():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example6_10(), suppressOctaveMarks = True)
     ⠼⠁⠀⠪⠎⠪⠈⠉⠀⠪⠧⠣⠞⠀⠹⠹⠧⠹⠈⠉⠀⠹⠧⠕⠀⠋⠫⠋⠻⠧⠀⠋⠫⠋⠱⠧
     ⠀⠀⠙⠹⠙⠣⠚⠺⠚⠀⠎⠄⠧⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("a4 a2 a4~ a4 r4 b-2 c'4 c'4 r4 c'4~ c'4 r4 d'2\
     e'8 e'4 e'8 f'4 r4 e'8 e'4 e'8 d'4 r4 c'8 c'4 c'8 b-8 b-4 b-8 a2. r4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -596,13 +596,13 @@ def example6_10():
     return bm
 
 def example6_11():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example6_11(), suppressOctaveMarks = True)
     ⠼⠁⠀⠪⠄⠚⠹⠺⠀⠊⠙⠋⠙⠊⠙⠫⠀⠱⠄⠛⠪⠻⠀⠑⠛⠊⠛⠑⠛⠪⠀⠩⠳⠄⠋⠎
     ⠀⠀⠺⠄⠚⠝⠀⠑⠙⠚⠊⠩⠓⠋⠩⠛⠓⠀⠎⠈⠉⠊⠩⠓⠪⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("A4. B8 c4 B4 A8 c8 e8 c8 A8 c8 e4 d4. f8 a4 f4 d8 f8 a8 f8 d8 f8 a4\
     g#4. e8 a2 b4. b8 c'2 d'8 c'8 b8 a8 g#8 e8 f#8 g#8 a2~ a8 g#8 a4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -610,13 +610,13 @@ def example6_11():
     return bm
 
 def example6_12():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example6_12(), suppressOctaveMarks = True)
     ⠼⠁⠀⠋⠣⠋⠑⠣⠑⠙⠊⠣⠊⠓⠀⠣⠣⠚⠣⠊⠓⠣⠓⠛⠋⠑⠙⠀⠑⠚⠣⠚⠡⠚⠙⠑⠋⠛
     ⠀⠀⠓⠩⠓⠊⠚⠹⠧⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("e'8 e'-8 d'8 d'-8 c'8 a8 a-8 g8 b--8 a-8 g8 g-8 f8 e8 d8 c8 d8 B8 B-8 Bn8 c8 d8 e8 f8 g8 g#8 a8 b8 c'4 r4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm.measure(2).notes[5].accidental.displayStatus = False
@@ -629,12 +629,12 @@ def example6_12():
 # Chapter 7: Octave Marks
 
 def example7_1():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example7_1())
     ⠼⠁⠀⠈⠽⠀⠘⠽⠀⠸⠽⠀⠐⠽⠀⠨⠽⠀⠰⠽⠀⠠⠽
-    '''
+    """
     bm = stream.Part()
     bm.append(note.Note('C1', quarterLength=4.0))
     bm.append(note.Note('C2', quarterLength=4.0))
@@ -649,12 +649,12 @@ def example7_1():
     return bm
 
 def example7_2():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example7_2())
     ⠼⠁⠀⠈⠈⠮⠾⠀⠠⠠⠽
-    '''
+    """
     bm = stream.Part()
     bm.append(note.Note('A0', quarterLength=4.0))
     bm.append(note.Note('B0', quarterLength=4.0))
@@ -666,12 +666,12 @@ def example7_2():
     return bm
     
 def example7_3a():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example7_3a()[0])
     ⠐⠹⠫
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c4 e4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(1)
@@ -679,12 +679,12 @@ def example7_3a():
     return bm
 
 def example7_3b():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example7_3b()[0])
     ⠨⠝⠄⠪
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c'2. a4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(1)
@@ -692,12 +692,12 @@ def example7_3b():
     return bm
 
 def example7_4a():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example7_4a()[0])
     ⠐⠝⠐⠎
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c2 a2", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(1)
@@ -705,12 +705,12 @@ def example7_4a():
     return bm
 
 def example7_4b():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example7_4b()[0])
     ⠨⠝⠐⠏
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c'2 e2", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(1)
@@ -718,12 +718,12 @@ def example7_4b():
     return bm
 
 def example7_5a():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example7_5a()[0])
     ⠸⠝⠟
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("C2 F2")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(1)
@@ -731,12 +731,12 @@ def example7_5a():
     return bm
 
 def example7_5b():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example7_5b()[0])
     ⠐⠟⠨⠝
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("f2 c'2")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(1)
@@ -744,9 +744,9 @@ def example7_5b():
     return bm
 
 def example7_6():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> inPart = example7_6()
     >>> print translate.partToBraille(inPart)
     ⠼⠁⠀⠣⠨⠋⠋⠋⠋⠀⠑⠑⠣⠺⠀⠙⠙⠙⠙⠀⠣⠐⠋⠨⠙⠣⠺⠀⠛⠛⠨⠹⠀⠣⠚⠚⠨⠻
@@ -755,7 +755,7 @@ def example7_6():
     <accidental flat>
     >>> inPart.measure(7).notes[3].accidental.displayStatus == True
     True
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("e'-8 e'-8 e'-8 e'-8 d'8 d'8 b-4 c'8 c'8 c'8 c'8 e-8 c'8 b-4\
     f8 f8 c'4 b-8 b-8 f'4 e'-8 d'8 c'8 b-8 e'-4 e-4", "4/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -763,16 +763,16 @@ def example7_6():
     return bm
 
 def example7_7():
-    '''
-    "Whenever the marking “8va” occurs in print over or under certain notes, 
-    these notes should be transcribed according to the octaves in which they 
+    ur"""
+    "Whenever the marking “8va” occurs in print over or under certain notes,
+    these notes should be transcribed according to the octaves in which they
     are actually to be played." page 42, Braille Transcription Manual
-    
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example7_7())
     ⠼⠁⠀⠐⠊⠙⠛⠙⠀⠨⠊⠙⠛⠙⠀⠰⠊⠛⠙⠑⠀⠨⠊⠛⠋⠙⠀⠟⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("a8 c'8 f'8 c'8 a8 c'8 f'8 c'8 a'8 f'8 c'8 d'8 a'8 f'8 e'8 c'8 f'2", "4/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(0)
@@ -781,13 +781,13 @@ def example7_7():
     return bm
 
 def example7_8():
-    '''
-    >>> from music21.braille import test     
+    ur"""
+    >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example7_8())
     ⠼⠁⠀⠸⠝⠘⠳⠸⠫⠀⠱⠄⠙⠹⠹⠀⠸⠎⠳⠫⠀⠱⠗⠳⠀⠐⠹⠄⠚⠪⠳⠀⠪⠻⠹⠪
     ⠀⠀⠘⠳⠳⠸⠱⠳⠀⠫⠝⠄⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("C2 GG4 E4 D4. C8 C4 C4 A2 G4 E4 D4 G2 G4\
     c4. B8 A4 G4 A4 F4 C4 AA4 GG4 GG4 D4 G4 E4 C2.")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -795,13 +795,13 @@ def example7_8():
     return bm
 
 def example7_9():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example7_9())
     ⠼⠁⠀⠐⠫⠄⠊⠙⠋⠀⠱⠑⠙⠺⠀⠫⠄⠩⠓⠚⠨⠋⠀⠹⠙⠚⠪⠀⠊⠩⠙⠋⠊⠨⠙⠓
     ⠀⠀⠨⠛⠑⠐⠊⠨⠋⠑⠐⠛⠀⠨⠙⠚⠐⠑⠊⠩⠓⠋⠀⠎⠄⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("e4. a8 c'8 e'8 d'4 d'8 c'8 b4 e4. g#8 b8 e'8 c'4 c'8 b8 a4\
     a8 c'#8 e'8 a'8 c'#8 g'8 f'8 d'8 a8 e'8 d'8 f8 c'8 b8 d8 a8 g#8 e8 a2.", "3/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -809,9 +809,9 @@ def example7_9():
     return bm
     
 def example7_10():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> inPart = example7_10()
     >>> inPart.measure(2).notes[0].accidental.displayStatus == True
     True
@@ -837,13 +837,13 @@ def example7_10():
     True
     >>> inPart.measure(7).notes[6].accidental.displayStatus == False
     True
-    
-        
+
+
     >>> print translate.partToBraille(inPart)
     ⠼⠁⠀⠐⠪⠨⠫⠪⠫⠀⠩⠙⠩⠛⠋⠐⠊⠺⠨⠫⠀⠑⠐⠊⠩⠛⠨⠑⠩⠙⠊⠋⠨⠙
     ⠀⠀⠐⠚⠩⠛⠩⠓⠊⠺⠫⠀⠪⠪⠩⠨⠻⠫⠀⠱⠱⠨⠺⠪⠀⠊⠩⠨⠙⠩⠓⠩⠛⠋⠐⠋⠨⠙⠚
     ⠀⠀⠐⠎⠥⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("a4 e'4 a'4 e'4 c'#8 f'#8 e'8 a8 b4 e'4 d'8 a8 f#8 d'8 c'#8 a8 e8 c'#8 b8 f#8 g#8 a8 b4 e4\
     a4 a4 f'#4 e'4 d'4 d'4 b'4 a'4 a'8 c'#8 g'#8 f'#8 e'8 e8 c'#8 b8 a2 r2", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -851,9 +851,9 @@ def example7_10():
     return bm
 
 def example7_11():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate  
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> inPart = example7_11()
     >>> inPart.measure(4).notes[0].accidental.displayStatus == True # A-3
     True
@@ -867,11 +867,11 @@ def example7_11():
     True
     >>> inPart.measure(6).notes[5].accidental.displayStatus == True # E-2
     True
-    
+
     >>> print translate.partToBraille(inPart)
     ⠼⠚⠀⠘⠓⠀⠸⠹⠘⠓⠸⠹⠣⠋⠀⠱⠘⠓⠸⠱⠓⠀⠹⠓⠐⠹⠣⠚⠀⠣⠪⠛⠹⠸⠊
     ⠀⠀⠸⠓⠣⠋⠣⠊⠓⠙⠛⠀⠣⠋⠘⠓⠸⠑⠙⠘⠓⠣⠋⠀⠛⠸⠑⠙⠡⠚⠓⠓⠀⠹⠄⠧⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("r2 r8 GG8 C4 GG8 C4 E-8 D4 GG8 D4 G8 C4 G8 c4 B-8 A-4 F8 C4 A-8\
     G8 E-8 A-8 G8 C8 F8 E-8 GG8 D8 C8 GG8 EE-8 FF8 D8 C8 BBn8 GG8 GG8 CC4. r4", "6/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -888,9 +888,9 @@ def example7_11():
 # Chapter 8: The Music Heading: Signatures, Tempo, and Mood
 
 def example8_1a():
-    '''
+    ur"""
     Flats.
-    
+
     >>> from music21.braille import basic
     >>> from music21 import key
     >>> print basic.keySigToBraille(key.KeySignature(-1))
@@ -907,13 +907,13 @@ def example8_1a():
     ⠼⠋⠣
     >>> print basic.keySigToBraille(key.KeySignature(-7))
     ⠼⠛⠣
-    '''
+    """
     pass
     
 def example8_1b():
-    '''
+    ur"""
     Sharps.
-    
+
     >>> from music21.braille import basic
     >>> from music21 import key
     >>> print basic.keySigToBraille(key.KeySignature(1))
@@ -930,13 +930,13 @@ def example8_1b():
     ⠼⠋⠩
     >>> print basic.keySigToBraille(key.KeySignature(7))
     ⠼⠛⠩
-    '''
+    """
     pass
     
 def example8_2():
-    '''
+    ur"""
     Time signatures with two numbers.
-    
+
     >>> from music21.braille import basic
     >>> from music21 import meter
     >>> print basic.timeSigToBraille(meter.TimeSignature('6/8'))
@@ -947,38 +947,38 @@ def example8_2():
     ⠼⠁⠃⠦
     >>> print basic.timeSigToBraille(meter.TimeSignature('2/2'))
     ⠼⠃⠆
-    '''
+    """
     pass
 
 def example8_3():
-    '''
+    ur"""
     Time signatures with one number. Not currently supported.
-    '''
+    """
     pass
 
 def example8_4():
-    '''
+    ur"""
     Combined time signatures. Not currently supported.
-    '''
+    """
     pass
 
 def example8_5():
-    '''
+    ur"""
     Common/cut time signatures.
-    
+
     >>> from music21.braille import basic
     >>> from music21 import meter
     >>> print basic.timeSigToBraille(meter.TimeSignature('common'))
     ⠨⠉
     >>> print basic.timeSigToBraille(meter.TimeSignature('cut'))
     ⠸⠉
-    '''
+    """
     pass
 
 def example8_6():
-    '''
+    ur"""
     Combined key and time signatures.
-    
+
     >>> from music21.braille import basic
     >>> from music21 import key
     >>> from music21 import meter
@@ -990,26 +990,26 @@ def example8_6():
     ⠼⠙⠩⠼⠉⠦
     >>> print basic.transcribeSignatures(key.KeySignature(3), meter.TimeSignature('3/8'))
     ⠩⠩⠩⠼⠉⠦
-    
-    
+
+
     The following two cases are identical, having no key signature is equivalent to having a key signature with no sharps or flats.
-    
-    
+
+
     >>> print basic.transcribeSignatures(None, meter.TimeSignature('4/4'))
     ⠼⠙⠲
     >>> print basic.transcribeSignatures(key.KeySignature(0), meter.TimeSignature('4/4'))
     ⠼⠙⠲
-    
-    
+
+
     >>> print basic.transcribeSignatures(key.KeySignature(-1), meter.TimeSignature('3/4'))
     ⠣⠼⠉⠲
     >>> print basic.transcribeSignatures(key.KeySignature(0), meter.TimeSignature('6/8'))
     ⠼⠋⠦
-    '''
+    """
     pass
 
 def example8_7a():
-    '''
+    ur"""
     >>> from music21.braille import basic
     >>> from music21 import key
     >>> from music21 import meter
@@ -1022,56 +1022,56 @@ def example8_7a():
     ⠀⠀⠀⠀⠀⠀⠀⠀⠠⠁⠝⠙⠁⠝⠞⠑⠀⠉⠁⠝⠞⠁⠃⠊⠇⠑⠲⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
     >>> print basic.transcribeHeading(key.KeySignature(2), meter.TimeSignature("7/8"), tempo.TempoText("Very brightly"), None)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠧⠑⠗⠽⠀⠃⠗⠊⠛⠓⠞⠇⠽⠲⠀⠩⠩⠼⠛⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    '''
+    """
     pass
     
 def example8_8():
-    '''
+    ur"""
     Metronome Markings
-    
+
     >>> from music21.braille import basic
     >>> from music21 import tempo
     >>> print basic.metronomeMarkToBraille(tempo.MetronomeMark(number = 80, referent = note.HalfNote()))
     ⠝⠶⠼⠓⠚
-    '''
+    """
     pass
 
 def example8_9():
-    '''
+    ur"""
     >>> from music21.braille import basic
     >>> from music21 import key
     >>> from music21 import meter
     >>> from music21 import tempo
-    >>> print basic.transcribeHeading(key.KeySignature(-3), meter.TimeSignature("12/8"), tempo.TempoText("Andante"),\
-    tempo.MetronomeMark(number = 132, referent = note.EighthNote()))
+    >>> print basic.transcribeHeading(key.KeySignature(-3), meter.TimeSignature("12/8"), tempo.TempoText("Andante"),
+    ... tempo.MetronomeMark(number = 132, referent = note.EighthNote()))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠠⠁⠝⠙⠁⠝⠞⠑⠲⠀⠙⠶⠼⠁⠉⠃⠀⠣⠣⠣⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀⠀⠀
-    '''
+    """
     pass
     
-def example8_10():    
-    '''
+def example8_10():
+    ur"""
     >>> from music21.braille import basic
     >>> from music21 import key
     >>> from music21 import meter
     >>> from music21 import tempo
-    >>> print basic.transcribeHeading(key.KeySignature(-5), meter.TimeSignature("6/8"),\
-    tempo.TempoText("Lento assai, cantante e tranquillo"),\
-    tempo.MetronomeMark(number = 52, referent = note.Note(quarterLength = 1.5)))
+    >>> print basic.transcribeHeading(key.KeySignature(-5), meter.TimeSignature("6/8"),
+    ... tempo.TempoText("Lento assai, cantante e tranquillo"),
+    ... tempo.MetronomeMark(number = 52, referent = note.Note(quarterLength = 1.5)))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠇⠑⠝⠞⠕⠀⠁⠎⠎⠁⠊⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠁⠝⠞⠁⠝⠞⠑⠀⠑⠀⠞⠗⠁⠝⠟⠥⠊⠇⠇⠕⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⠄⠶⠼⠑⠃⠀⠼⠑⠣⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    '''
+    """
     pass
 
 def drill8_1():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill8_1())
     ⠀⠀⠀⠀⠀⠠⠁⠝⠙⠁⠝⠞⠑⠀⠍⠁⠑⠎⠞⠕⠎⠕⠲⠀⠹⠶⠼⠊⠃⠀⠨⠉⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠐⠎⠓⠛⠫⠀⠱⠫⠛⠓⠪⠀⠳⠨⠙⠚⠪⠳⠀⠻⠄⠋⠕⠀⠹⠫⠪⠨⠫⠀⠫⠱⠙⠚⠪
     ⠀⠀⠨⠪⠓⠛⠫⠱⠀⠹⠊⠚⠝⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("a2 g8 f8 e4 d4 e4 f8 g8 a4 g4 c'8 b8 a4 g4 f4. e8 d2\
     c4 e4 a4 e'4 e'4 d'4 c'8 b8 a4 a'4 g'8 f'8 e'4 d'4 c'4 a8 b8 c'2", "c")
     bm.insert(0, tempo.TempoText("Andante maestoso"))
@@ -1080,15 +1080,15 @@ def drill8_1():
     return bm
 
 def drill8_2():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill8_2())
     ⠀⠀⠀⠀⠀⠀⠀⠀⠠⠊⠝⠀⠎⠞⠗⠊⠉⠞⠀⠞⠊⠍⠑⠲⠀⠣⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠸⠋⠭⠘⠚⠭⠸⠋⠭⠀⠡⠫⠻⠩⠻⠀⠓⠭⠑⠭⠓⠭⠀⠪⠳⠻⠀⠋⠭⠙⠭⠊⠭
     ⠀⠀⠡⠘⠪⠺⠡⠺⠀⠙⠑⠭⠋⠭⠘⠚⠀⠸⠋⠡⠋⠭⠛⠭⠩⠛⠀⠓⠑⠭⠓⠭⠊⠀⠊⠓⠭⠛⠭⠋
     ⠀⠀⠸⠑⠙⠺⠈⠺⠀⠘⠏⠄⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("E-8 r8 BB-8 r8 E-8 r8 En4 F4 F#4 G8 r8 D8 r8 G8 r8 A-4 G4 F4\
     E-8 r8 C8 r8 AA-8 r8 AAn4 BB-4 BBn4 C8 D8 r8 E-8 r8 BB-8 E-8 En8 r8 F8 r8 F#8\
     G8 D8 r8 G8 r8 A-8 A-8 G8 r8 F8 r8 E-8 D8 C8 BB-4 BB-4 EE-2.", "3/4")
@@ -1101,15 +1101,15 @@ def drill8_2():
     return bm
 
 def drill8_3():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill8_3())
     ⠀⠀⠀⠀⠀⠀⠀⠠⠉⠕⠝⠀⠙⠑⠇⠊⠉⠁⠞⠑⠵⠵⠁⠲⠀⠼⠑⠩⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀
     ⠼⠚⠀⠨⠑⠙⠀⠺⠄⠈⠉⠚⠑⠓⠀⠳⠄⠻⠭⠀⠫⠄⠈⠉⠋⠑⠐⠓⠀⠨⠱⠙⠱⠭
     ⠀⠀⠐⠊⠓⠊⠚⠊⠚⠀⠙⠑⠋⠛⠓⠊⠀⠚⠛⠑⠓⠋⠐⠚⠀⠨⠻⠑⠋⠑⠙⠀⠚⠛⠨⠑⠺⠛
     ⠀⠀⠐⠑⠛⠚⠹⠊⠀⠞⠄⠈⠉⠀⠺⠄⠭⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("r2 d'#8 c'#8 b4.~ b8 d'#8 g'#8 g'#4. f'#4 r8 e'4.~ e'8 d'#8 g#8 d'#4 c'#8 d'#4 r8 a#8 g#8 a#8 b8 a#8 b8\
     c'#8 d'#8 e'8 f'#8 g'#8 a'#8 b'8 f'#8 d'#8 g'#8 e'8 b8 f'#4 d'#8 e'8 d'#8 c'#8 b8 f#8 d'#8 b4 f#8 d#8 f#8 b8 c'#4 a#8 b2.~ b4. r8", "6/8")
     bm.insert(0, key.KeySignature(5))
@@ -1122,14 +1122,14 @@ def drill8_3():
     return bm
 
 def drill8_4():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill8_4())
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠛⠗⠁⠵⠊⠕⠎⠕⠲⠀⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠸⠎⠄⠄⠓⠀⠟⠫⠱⠀⠫⠄⠛⠳⠫⠀⠩⠝⠱⠧⠀⠘⠎⠄⠄⠡⠚⠀⠩⠹⠄⠑⠫⠳
     ⠀⠀⠸⠻⠳⠪⠻⠀⠕⠄⠄⠭⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("A2.. G8 F2 E4 D4 E4. F8 G4 E4 C#2 D4 r4 AA2.. BBn8 C#4. D8 E4 G4 F4 G4 A4 F4 D2.. r8", "4/4")
     bm.insert(0, key.KeySignature(-1))
     bm.insert(0, tempo.TempoText("Grazioso"))
@@ -1137,15 +1137,15 @@ def drill8_4():
     return bm
 
 def drill8_5():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill8_5())
     ⠀⠀⠀⠀⠀⠀⠀⠠⠃⠑⠝⠀⠍⠁⠗⠉⠁⠞⠕⠲⠀⠝⠶⠼⠁⠁⠃⠀⠣⠣⠸⠉⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠚⠀⠨⠻⠫⠀⠕⠺⠳⠀⠨⠏⠹⠐⠻⠀⠨⠟⠫⠱⠀⠝⠐⠻⠻⠀⠗⠻⠳⠀⠎⠨⠱⠹⠀⠺⠪⠺⠹
     ⠀⠀⠨⠕⠫⠻⠀⠗⠫⠹⠀⠟⠱⠺⠀⠨⠏⠹⠐⠻⠀⠨⠕⠺⠺⠀⠝⠺⠹⠀⠱⠺⠹⠱⠀⠺⠹⠺⠪
     ⠀⠀⠐⠞⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("r2 f'4 e'-4 d'2 b-4 g4 e'-2 c'4 f4 f'2 e'-4 d'4 c'2 f4 f4 g2 f4 g4\
     a2 d'4 c'4 b-4 a4 b-4 c'4 d'2 e'-4 f'4 g'2 e'-4 c'4 f'2 d'4 b-4\
     e'-2 c'4 f4 d'2 b-4 b-4 c'2 b-4 c'4 d'4 b-4 c'4 d'4 b-4 c'4 b-4 a4 b-2", "cut")
@@ -1163,13 +1163,13 @@ def drill8_5():
 # Chapter 9: Fingering
 
 def example9_1():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example9_1(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠣⠼⠃⠲⠀⠀⠀
     ⠐⠪⠂⠳⠇⠀⠻⠄⠃⠙⠁
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("a4 g f. c8", "2/4")
     bm.insert(0, key.KeySignature(-1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1181,13 +1181,13 @@ def example9_1():
     return bm
 
 def example9_2():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example9_2(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
     ⠨⠻⠂⠋⠇⠑⠃⠙⠁⠚⠃⠈⠉⠀⠺⠭⠊⠙⠚
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("f'4 e'-8 d' c' b-~ b-4 r8 a c' b-", "3/4")
     bm.insert(0, key.KeySignature(-2))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1200,13 +1200,13 @@ def example9_2():
     return bm
     
 def example9_3():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example9_3(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠼⠋⠦⠀⠀⠀⠀⠀
     ⠐⠝⠄⠁⠈⠉⠀⠹⠄⠻⠃⠓
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c2.~ c4. f4 g8", "6/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None 
@@ -1215,13 +1215,13 @@ def example9_3():
     return bm
 
 def example9_4a():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example9_4a(), showFirstMeasureNumber = False)
     ⠀⠩⠩⠼⠉⠲⠀
     ⠐⠕⠃⠉⠁⠸⠻
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("d2 F#4", "3/4")
     bm.insert(0, key.KeySignature(2))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1230,13 +1230,13 @@ def example9_4a():
     return bm
 
 def example9_4b():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example9_4b(), showFirstMeasureNumber = False)
-    ⠀⠼⠉⠲⠀⠀  
+    ⠀⠼⠉⠲⠀⠀
     ⠐⠝⠇⠉⠁⠳
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c2 g4", "3/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None 
@@ -1244,13 +1244,13 @@ def example9_4b():
     return bm
 
 def example9_5a():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example9_5a(), showFirstMeasureNumber = False)
     ⠀⠀⠼⠃⠲⠀⠀⠀
     ⠐⠙⠋⠓⠨⠙⠅⠂
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c8 e g c'", "2/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None 
@@ -1258,13 +1258,13 @@ def example9_5a():
     return bm
 
 def example9_5b():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example9_5b(), showFirstMeasureNumber = False, upperFirstInNoteFingering = False)
     ⠀⠀⠀⠀⠀⠼⠋⠦⠀⠀⠀⠀⠀⠀
     ⠐⠑⠃⠇⠙⠁⠃⠑⠃⠇⠫⠄⠇⠂
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("d8 c d e4.", "6/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None 
@@ -1275,16 +1275,16 @@ def example9_5b():
     return bm
   
 def example9_6():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
-    >>> print translate.partToBraille(test.example9_6(), showFirstMeasureNumber = False, upperFirstInNoteFingering = True) 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(test.example9_6(), showFirstMeasureNumber = False, upperFirstInNoteFingering = True)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠐⠻⠃⠁⠪⠁⠃⠀⠨⠱⠠⠂⠻⠂⠅⠀⠻⠂⠇⠫⠇⠃
     >>> print translate.partToBraille(test.example9_6(), showFirstMeasureNumber = False, upperFirstInNoteFingering = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠐⠻⠁⠃⠪⠃⠁⠀⠨⠱⠂⠠⠻⠅⠂⠀⠻⠇⠂⠫⠃⠇
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("f#4 a d' f'# f'# e'", "2/4")
     bm.insert(0, key.KeySignature(2))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1298,15 +1298,15 @@ def example9_6():
     return bm
 
 def drill9_1():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill9_1())
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠁⠇⠇⠑⠛⠗⠑⠞⠞⠕⠲⠀⠣⠣⠣⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠚⠀⠐⠓⠃⠊⠀⠺⠄⠈⠉⠚⠓⠁⠚⠀⠱⠄⠅⠈⠉⠑⠙⠚⠀⠪⠓⠫⠃⠛⠁⠀⠳⠄⠃⠭⠊⠚
     ⠀⠀⠨⠹⠄⠈⠉⠙⠊⠁⠙⠃⠀⠫⠄⠇⠈⠉⠋⠑⠃⠛⠂⠀⠋⠑⠙⠚⠂⠊⠛⠃⠁
     ⠀⠀⠐⠫⠄⠁⠃⠈⠉⠋⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("r2 g8 a- b-4.~ b-8 g b- d'4.~ d'8 c' b- a-4 g8 e-4 f8 g4. r8 a- b-\
     c'4.~ c'8 a- c' e'-4.~ e'-8 d' f' e'- d' c' b- a- f e-4.~ e-8", "6/8")
     bm.insert(0, tempo.TempoText("Allegretto"))
@@ -1333,16 +1333,16 @@ def drill9_1():
     return bm
 
 def drill9_2():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill9_2())
     ⠀⠀⠀⠀⠀⠀⠠⠁⠙⠁⠛⠊⠕⠀⠑⠀⠍⠕⠇⠞⠕⠀⠇⠑⠛⠁⠞⠕⠲⠀⠨⠉⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠐⠎⠃⠈⠉⠊⠓⠊⠨⠑⠅⠂⠀⠙⠂⠇⠚⠇⠁⠨⠋⠅⠂⠑⠂⠇⠙⠇⠃⠛⠅⠫⠂⠈⠉
     ⠀⠀⠨⠋⠛⠋⠐⠚⠁⠙⠃⠑⠇⠐⠊⠁⠚⠀⠙⠐⠓⠁⠎⠃⠉⠇⠈⠉⠊⠛⠁
     ⠀⠀⠐⠓⠨⠙⠂⠚⠇⠊⠃⠨⠑⠂⠙⠇⠚⠃⠨⠋⠂⠀⠕⠇⠈⠉⠑⠓⠅⠛⠙
     ⠀⠀⠨⠑⠋⠐⠚⠁⠙⠃⠱⠇⠐⠊⠁⠓⠃⠀⠎⠄⠁⠈⠉⠊⠭⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("a2~ a8 g a d' c' b e' d' c' f' e'4~ e'8 f' e' b c' d' a b c' g a2~ a8 f\
     g c' b a d' c' b e' d'2~ d'8 g' f' c' d' e' b c' d'4 a8 g a2.~ a8 r", "c")
     bm.insert(0, tempo.TempoText("Adagio e molto legato"))
@@ -1381,15 +1381,15 @@ def drill9_2():
     return bm
 
 def drill9_3():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill9_3())
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠍⠕⠙⠑⠗⠁⠞⠕⠲⠀⠩⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠘⠺⠇⠂⠙⠃⠇⠑⠁⠃⠀⠋⠂⠁⠛⠠⠇⠓⠠⠁⠊⠁⠃⠀⠺⠇⠁⠙⠠⠇⠑⠁⠃
     ⠀⠀⠐⠋⠇⠁⠛⠠⠃⠓⠁⠁⠛⠃⠃⠀⠫⠇⠁⠑⠁⠃⠙⠠⠇⠀⠚⠠⠁⠊⠁⠃⠓⠠⠇⠛⠠⠂
     ⠀⠀⠸⠫⠂⠁⠑⠁⠄⠙⠃⠄⠀⠑⠁⠁⠙⠃⠃⠚⠁⠇⠩⠊⠃⠂⠀⠞⠁⠇⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("BB4 C#8 D E F# G A B4 c#8 d e f# g f# e4 d8 c#\
     B A G F# E4 D8 C# D C# BB AA# BB2", "2/4")
     bm.insert(0, key.KeySignature(2))
@@ -1438,15 +1438,15 @@ def drill9_3():
     return bm
     
 def drill9_4():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill9_4())
     ⠀⠀⠀⠀⠀⠀⠀⠠⠝⠕⠞⠀⠞⠕⠕⠀⠋⠁⠎⠞⠲⠀⠹⠶⠼⠁⠚⠚⠀⠩⠼⠑⠦⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠸⠋⠩⠑⠃⠋⠛⠃⠑⠀⠺⠸⠫⠇⠓⠀⠓⠃⠛⠇⠓⠊⠚⠃⠀⠺⠁⠘⠺⠅⠚⠁
     ⠀⠀⠘⠑⠓⠚⠁⠓⠅⠚⠂⠀⠸⠫⠃⠳⠁⠛⠀⠋⠘⠚⠸⠓⠋⠘⠚⠀⠸⠫⠁⠘⠫⠅⠋⠂
     ⠀⠀⠘⠫⠇⠭⠋⠃⠋⠁⠀⠑⠇⠋⠃⠋⠇⠋⠃⠋⠁⠀⠋⠇⠋⠃⠫⠇⠋⠃⠀⠫⠁⠈⠉⠋⠭⠭⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("E8 D# E F# D# BB4 E G8 G F# G A B B4 BB BB8 DD GG BB GG BB E4 G F#8\
     E BB G E BB E4 EE EE8 EE4 r8 EE8 EE DD EE EE EE EE EE EE EE4 EE8 EE4~ EE8 r8 r", "5/8")
     bm.insert(0, key.KeySignature(1))
@@ -1497,16 +1497,16 @@ def drill9_4():
     return bm
 
 def drill9_5():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill9_5())
     ⠀⠠⠇⠊⠛⠓⠞⠇⠽⠂⠀⠁⠇⠍⠕⠎⠞⠀⠊⠝⠀⠕⠝⠑⠲⠀⠣⠼⠉⠲⠀
     ⠼⠁⠀⠐⠛⠅⠸⠊⠁⠩⠓⠃⠊⠁⠙⠊⠀⠐⠓⠸⠚⠃⠊⠁⠚⠃⠑⠇⠚⠃
     ⠀⠀⠐⠓⠙⠡⠚⠙⠐⠊⠐⠙⠁⠀⠣⠐⠚⠐⠙⠁⠡⠚⠃⠙⠇⠣⠚⠃⠙⠇
     ⠀⠀⠸⠊⠁⠙⠃⠐⠊⠅⠐⠙⠁⠡⠚⠃⠑⠇⠀⠙⠁⠐⠊⠂⠩⠓⠇⠊⠂⠙⠊
     ⠀⠀⠐⠙⠐⠚⠂⠊⠇⠚⠙⠚⠀⠊⠨⠑⠅⠙⠂⠊⠇⠓⠃⠙⠁⠀⠟⠄⠃⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("f8 A G# A c A g B- A B- d B- g c Bn c a c b- c Bn c B- c\
     A c a c Bn d c a g# a c' a c b- a b- c' b- a d' c' a g c f2.", "3/4")
     bm.insert(0, key.KeySignature(-1))
@@ -1562,14 +1562,14 @@ def drill9_5():
 # Parenthesis; Clef Signs
 
 def example10_1():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example10_1())
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠣⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠐⠻⠨⠙⠑⠙⠚⠀⠼⠃⠲⠀⠐⠪⠳⠣⠅⠄⠀⠡⠣⠣⠣⠼⠋⠦⠀⠐⠋⠨⠋⠑⠫⠐⠓
     ⠀⠀⠼⠉⠲⠀⠐⠪⠳⠻⠣⠅⠄⠀⠡⠡⠡⠀⠐⠓⠛⠋⠑⠙⠚⠀⠝⠄⠣⠅
-    '''
+    """
     bm = stream.Part()
     
     m1 = stream.Measure(number=1)
@@ -1627,14 +1627,14 @@ def example10_1():
     return bm
 
 def example10_2():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example10_2(), dummyRestLength = 5, maxLineLength = 20)
     ⠀⠀⠀⠀⠀⠀⠀⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠄⠄⠄⠄⠄⠀⠐⠋⠩⠛⠩⠓⠊⠐
     ⠀⠀⠐⠚⠡⠓⠋⠙⠀⠛⠊⠓⠙⠐⠎⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("e8 f# g# a b- gn e c f a g c a2", "4/4")
     bm.insert(0, key.KeySignature(-1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1642,14 +1642,14 @@ def example10_2():
     return bm
 
 def example10_3():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example10_3(), dummyRestLength = 10, maxLineLength = 21)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠀⠐⠋⠩⠛⠩⠓⠐
     ⠀⠀⠐⠊⠚⠡⠓⠀⠋⠙⠛⠊⠓⠙⠀⠐⠎⠄⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("e8 f# g# a b- g e c f a g c a2.", "6/8")
     bm.insert(0, key.KeySignature(-1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1657,14 +1657,14 @@ def example10_3():
     return bm
 
 def example10_4():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example10_4(), dummyRestLength = 10)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠀⠐⠏⠄⠈⠉⠋⠩⠛⠩⠓⠊⠚⠡⠓⠀⠙⠑⠋⠻⠄⠈⠉⠛⠐
     ⠀⠀⠐⠋⠛⠓⠛⠋⠀⠟⠄⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("e2.~ e8 f# g# a b- gn c d e f4.~ f8 e f g f e f2.", "12/8")
     bm.insert(0, key.KeySignature(-1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1672,14 +1672,14 @@ def example10_4():
     return bm
     
 def example10_5():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example10_5())
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠐⠳⠄⠛⠫⠀⠸⠺⠐⠺⠳⠀⠟⠣⠅⠄⠐⠀⠐⠳⠀⠨⠫⠄⠑⠹⠀⠱⠐⠳⠡⠺
     ⠀⠀⠨⠱⠹⠣⠅⠄⠐⠀⠼⠙⠣⠀⠨⠹⠀⠪⠄⠓⠻⠀⠹⠨⠹⠡⠐⠫⠀⠟⠄⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("g4. f8 e-4 B-4 b-4 g4 f2 g4 e'-4. d'8 c'4 d'4 g4 bn4\
     d'4 c'4 c'4 a-4. g8 f4 c4 c'4 en4 f2.", "3/4")
     bm.insert(0, key.KeySignature(-3))
@@ -1690,14 +1690,14 @@ def example10_5():
     return bm
 
 def example10_6():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example10_6())
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠐⠪⠨⠪⠈⠉⠊⠓⠛⠋⠀⠻⠫⠈⠉⠋⠑⠙⠚⠀⠱⠹⠈⠉⠙⠚⠊⠚⠀⠝⠣⠅⠄
     ⠀⠀⠭⠨⠊⠓⠛⠀⠋⠑⠙⠚⠊⠚⠙⠚⠀⠎⠄⠧⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("a4 a'~ a'8 g'# f'# e' f'#4 e'~ e'8 d' c'# b d'4 c'#~ c'#8 b a b\
     c'#2 r8 a'8 g'# f'# e' d' c'# b a b c'# b a2. r4", "4/4")
     bm.insert(0, key.KeySignature(3))
@@ -1706,16 +1706,16 @@ def example10_6():
     return bm
 
 def example10_9():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example10_9(), showClefSigns = False)
     ⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠘⠺⠸⠻⠺⠐⠻⠀⠺⠱⠹⠪⠀⠾⠣⠅
     >>> print translate.partToBraille(test.example10_9(), showClefSigns = True)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠜⠼⠇⠘⠺⠸⠻⠺⠜⠌⠇⠐⠻⠀⠺⠱⠹⠪⠀⠾⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("BB-4 F B- f b- d' c' a b-1", "4/4")
     bm.insert(0, key.KeySignature(-2))
     bm.insert(0, clef.BassClef())
@@ -1724,16 +1724,16 @@ def example10_9():
     return bm
 
 def example10_10():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example10_10(), showClefSigns = False)
     ⠀⠀⠀⠀⠀⠀⠩⠩⠩⠼⠋⠦⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠐⠊⠋⠊⠚⠙⠑⠀⠋⠛⠓⠪⠄⠣⠅
     >>> print translate.partToBraille(test.example10_10(), showClefSigns = True)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠩⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠜⠬⠇⠐⠊⠋⠊⠚⠙⠑⠀⠜⠌⠇⠨⠋⠛⠓⠪⠄⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("a8 e a b c'# d' e' f'# g'# a'4.", "6/8")
     bm.insert(0, key.KeySignature(3))
     bm.insert(0, clef.AltoClef())
@@ -1742,15 +1742,15 @@ def example10_10():
     return bm
 
 def drill10_2():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.drill10_2(), cancelOutgoingKeySig = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠐⠱⠻⠪⠻⠀⠑⠋⠛⠓⠎⠣⠅⠄⠀⠣⠣⠣⠀⠐⠫⠳⠺⠳⠀⠋⠛⠓⠊⠞⠣⠅⠄⠀⠼⠙⠩
     ⠀⠀⠐⠫⠳⠺⠳⠀⠋⠛⠓⠊⠞⠣⠅⠄⠀⠣⠀⠐⠻⠪⠹⠪⠀⠛⠓⠊⠚⠝⠣⠅⠄⠀⠼⠋⠣
     ⠀⠀⠐⠳⠺⠱⠺⠀⠓⠊⠚⠙⠕⠣⠅⠄⠀⠨⠱⠺⠳⠺⠀⠑⠙⠚⠊⠗⠣⠅⠄
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("d4 f# a f# d8 e f# g a2 e-4 g b- g e-8 f g a- b-2\
     e4 g# b g# e8 f# g# a b2 f4 a c' a f8 g a b- c'2\
     g-4 b- d'- b- g-8 a- b- c'- d'-2 d'4 b g b d'8 c' b a g2", "4/4")
@@ -1790,16 +1790,16 @@ def drill10_4():
 # Beginning of a Composition or Movement
 
 def example11_1():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example11_1(), segmentBreaks = [(9, 0.0)])
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠸⠱⠋⠛⠓⠊⠀⠺⠪⠓⠛⠀⠋⠑⠙⠑⠋⠛⠀⠳⠪⠧⠀⠺⠙⠑⠋⠛⠀⠫⠱⠙⠚
     ⠀⠀⠐⠙⠋⠑⠙⠚⠩⠊⠀⠞⠧
     ⠼⠊⠀⠐⠻⠑⠙⠺⠀⠐⠫⠙⠚⠩⠪⠀⠐⠱⠚⠡⠊⠩⠳⠀⠎⠧⠀⠪⠓⠛⠋⠑⠀⠹⠱⠋⠛
     ⠀⠀⠸⠓⠊⠚⠊⠓⠛⠀⠫⠱⠧⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("D4 E8 F#8 G8 A8 B4 A4 G8 F#8 E8 D8 C#8 D8 E8 F#8 G4 A4 r4 B4 c#8 d8 e8 f#8 e4 d4 c#8 B8\
     c#8 e8 d8 c#8 B8 A#8 B2 r4 f#4 d8 c#8 B4 e4 c#8 B8 A#4 d4 B8 An8 G#4 A2 r4\
     A4 G8 F#8 E8 D8 C#4 D4 E8 F#8 G8 A8 B8 A8 G8 F#8 E4 D4 r4", "3/4")
@@ -1808,16 +1808,16 @@ def example11_1():
     return bm
 
 def example11_2():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example11_2(), segmentBreaks = [(8, 3.0)])
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠚⠀⠐⠺⠀⠳⠫⠱⠫⠀⠗⠻⠫⠀⠪⠳⠨⠹⠄⠙⠀⠞⠄⠺⠀⠨⠫⠐⠺⠪⠄⠓⠀⠗⠻⠨⠹
     ⠀⠀⠨⠹⠐⠻⠪⠄⠑⠀⠏⠄⠐
     ⠼⠓⠄⠀⠐⠳⠀⠳⠄⠛⠻⠻⠀⠎⠳⠺⠀⠺⠡⠪⠪⠹⠀⠞⠄⠺⠀⠨⠫⠐⠺⠪⠳⠀⠗⠻⠨⠹
     ⠀⠀⠨⠹⠧⠐⠻⠧⠀⠎⠄⠱⠀⠏⠄⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("r2. b-4 g e- d e- g2 f4 e- a- g c'4. c'8 b-2. b-4 e'-4 b- a-4. g8\
     g2 f4 c' c' f a-4. d8 e-2. g4 g4. f8 f4 f a-2 g4 b- b- an an c'\
     b-2. b-4 e'- b- a- g g2 f4 c' c' r f r a-2. d4 e-2.", "4/4")
@@ -1833,13 +1833,13 @@ def example11_2():
 # Chapter 12: Slurs (Phrasing)
 
 def example12_1():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_1(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠐⠳⠄⠅⠉⠛⠫⠉⠱⠀⠳⠉⠻⠉⠫⠧⠀⠻⠃⠉⠳⠁⠉⠪⠉⠺⠀⠹⠉⠱⠉⠹⠧
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("g4. f8 e4 d4 g4 f4 e4 r4 f4 g4 a4 b4 c'4 d'4 c'4 r4", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].notes[0].fingering = '5'
@@ -1854,13 +1854,13 @@ def example12_1():
     return bm
 
 def example12_2():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_2(), showFirstMeasureNumber = False, slurLongPhraseWithBrackets = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠐⠳⠄⠅⠉⠉⠛⠫⠱⠀⠳⠻⠉⠫⠧⠀⠻⠁⠉⠉⠳⠪⠺⠀⠹⠁⠱⠉⠹⠧
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("g4. f8 e4 d g f e r f g a b c' d' c' r", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[1].append(spanner.Slur(bm[0].notes[0], bm[1].notes[2]))
@@ -1872,13 +1872,13 @@ def example12_2():
     return bm
   
 def example12_3():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_3(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠰⠃⠣⠐⠫⠄⠁⠛⠳⠫⠀⠻⠳⠣⠪⠘⠆⠧⠀⠰⠃⠳⠁⠳⠣⠨⠫⠂⠱⠀⠝⠄⠘⠆⠧
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("e-4. f8 g4 e- f g a- r g g e'- d' c'2. r4", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[1].append(spanner.Slur(bm[0].notes[0], bm[1].notes[2]))
@@ -1890,13 +1890,13 @@ def example12_3():
     return bm
 
 def example12_4():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_4(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀
     ⠰⠃⠨⠫⠄⠉⠹⠉⠓⠳⠄⠉⠻⠉⠋⠘⠆
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("e'4. c'4 g'8 g'4. f'4 e'8", "12/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].append(spanner.Slur(bm[0].notes[0], bm[0].notes[2]))
@@ -1906,16 +1906,16 @@ def example12_4():
     return bm
 
 def example12_5():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_5(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠰⠃⠐⠎⠺⠀⠊⠨⠛⠋⠑⠙⠚⠀⠰⠃⠘⠆⠪⠚⠙⠑⠋⠀⠟⠄⠘⠆
     >>> print translate.partToBraille(test.example12_5(), showFirstMeasureNumber = False, slurLongPhraseWithBrackets = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠐⠎⠉⠉⠺⠀⠊⠨⠛⠋⠑⠙⠚⠉⠀⠪⠉⠉⠚⠙⠑⠋⠉⠀⠟⠄
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("a2 b4 a8 f'# e' d' c'# b a4 b8 c'# d' e' f'#2.", "3/4")
     bm.insert(0, key.KeySignature(2))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1925,16 +1925,16 @@ def example12_5():
     return bm
 
 def example12_6():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_6(), showFirstMeasureNumber = False, showShortSlursAndTiesTogether = False)
     ⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀
     ⠨⠝⠈⠉⠙⠉⠑⠀⠕⠈⠉⠑⠉⠋
     >>> print translate.partToBraille(test.example12_6(), showFirstMeasureNumber = False, showShortSlursAndTiesTogether = True)
     ⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
     ⠨⠝⠉⠈⠉⠙⠉⠑⠀⠕⠉⠈⠉⠑⠉⠋
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c'2~ c'8 d' d'2~ d'8 e'", "3/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].append(spanner.Slur(bm[0].notes[0], bm[0].notes[2]))
@@ -1943,16 +1943,16 @@ def example12_6():
     return bm
   
 def example12_7():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_7(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀
     ⠰⠃⠨⠟⠄⠈⠉⠀⠛⠙⠑⠙⠚⠊⠘⠆
     >>> print translate.partToBraille(test.example12_7(), showFirstMeasureNumber = False, slurLongPhraseWithBrackets = False)
     ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀
     ⠨⠟⠄⠈⠉⠀⠛⠉⠉⠙⠑⠙⠚⠉⠊
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("f'2.~ f'8 c' d' c' b- a", "3/4")
     bm.insert(0, key.KeySignature(-1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1961,16 +1961,16 @@ def example12_7():
     return bm
 
 def example12_8():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_8(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀
     ⠨⠟⠄⠈⠉⠀⠰⠃⠛⠙⠑⠙⠚⠊⠘⠆
     >>> print translate.partToBraille(test.example12_8(), showFirstMeasureNumber = False, slurLongPhraseWithBrackets = False)
     ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀
     ⠨⠟⠄⠈⠉⠀⠛⠉⠉⠙⠑⠙⠚⠉⠊
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("f'2.~ f'8 c' d' c' b- a", "3/4")
     bm.insert(0, key.KeySignature(-1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1979,16 +1979,16 @@ def example12_8():
     return bm
 
 def example12_9():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_9(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠰⠃⠨⠋⠛⠓⠛⠋⠑⠀⠝⠄⠈⠉⠀⠹⠘⠆⠧⠧
     >>> print translate.partToBraille(test.example12_9(), showFirstMeasureNumber = False, slurLongPhraseWithBrackets = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀
     ⠨⠋⠉⠉⠛⠓⠛⠋⠑⠉⠀⠝⠄⠈⠉⠀⠹⠧⠧
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("e'8 f' g' f' e' d' c'2.~ c'4 r r", "3/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].append(spanner.Slur(bm[0].notes[0], bm[-1].notes[-1]))
@@ -1996,16 +1996,16 @@ def example12_9():
     return bm
 
 def example12_10():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_10(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠰⠃⠨⠋⠛⠓⠛⠋⠑⠀⠝⠄⠘⠆⠈⠉⠀⠹⠧⠧
     >>> print translate.partToBraille(test.example12_10(), showFirstMeasureNumber = False, slurLongPhraseWithBrackets = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀
     ⠨⠋⠉⠉⠛⠓⠛⠋⠑⠉⠀⠝⠄⠈⠉⠀⠹⠧⠧
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("e'8 f' g' f' e' d' c'2.~ c'4 r r", "3/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[1].append(spanner.Slur(bm[0].notes[0], bm[1].notes[0]))
@@ -2013,13 +2013,13 @@ def example12_10():
     return bm
 
 def example12_11():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example12_11(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀
     ⠐⠹⠇⠉⠹⠃⠉⠹⠁⠉⠹⠇
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c4 c c c", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].append(spanner.Slur(bm[0].notes[0], bm[0].notes[1]))
@@ -2036,14 +2036,14 @@ def example12_11():
 # Chapter 13: Words, Abbreviations, Letters, and Phrases of Expression
 
 def example13_1():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_1())
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠜⠙⠕⠇⠉⠑⠐⠟⠫⠀⠫⠱⠜⠏⠐⠹⠀⠐⠪⠄⠚⠪⠀⠳⠜⠍⠋⠐⠙⠑⠋⠛
     ⠀⠀⠐⠳⠜⠗⠊⠞⠄⠐⠻⠫⠀⠟⠄⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("f2 e4 e4 d4 c4 a4. b-8 a4 g4 c8 d8 e8 f8 g4 f4 e4 f2.", "3/4")
     bm.insert(0, key.KeySignature(-1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2054,14 +2054,14 @@ def example13_1():
     return bm
 
 def example13_2():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_2())
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠜⠋⠄⠩⠨⠱⠉⠋⠭⠜⠏⠰⠃⠐⠺⠳⠀⠪⠻⠳⠘⠆⠜⠗⠊⠞⠄⠡⠐⠛⠉⠋
     ⠀⠀⠐⠑⠉⠋⠉⠡⠛⠉⠋⠜⠍⠕⠗⠑⠝⠙⠕⠄⠩⠐⠛⠉⠓⠛⠉⠩⠓⠀⠩⠮⠜⠏⠏⠏⠄⠣⠅
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("d'#4 e'8 r b4 g a f# g fn8 e d e fn e f# g f# g# a#1", "4/4")
     bm.insert(0, key.KeySignature(1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2087,17 +2087,17 @@ def example13_3():
     e1 = expressions.TextExpression('decresc.')
     bm[0].insert(0.0, e0)
     bm[1].insert(0.0, e1)
-    w1 = dynamics.Wedge(type = 'crescendo')
+    #w1 = dynamics.Wedge(type = 'crescendo')
     return bm
 
 def example13_9():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_9(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
     ⠜⠗⠥⠎⠓⠖⠜⠋⠐⠓⠊⠚⠙⠑⠋⠛⠓
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("g8 a b c' d' e' f' g'", "4/4")
     bm.insert(0.0, dynamics.Dynamic('f'))
     bm.insert(0.0, expressions.TextExpression('rush!'))
@@ -2106,13 +2106,13 @@ def example13_9():
     return bm
 
 def example13_10():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_10(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀
     ⠜⠶⠍⠁⠗⠉⠄⠶⠜⠋⠐⠹⠹⠫⠹
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c4 c e c", "4/4")
     bm.insert(0.0, dynamics.Dynamic('f'))
     bm.insert(0.0, expressions.TextExpression('(marc.)'))
@@ -2132,13 +2132,13 @@ def example13_11():
     return bm
 
 def example13_14():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_14(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠨⠫⠫⠻⠀⠗⠄⠀⠜⠙⠊⠍⠄⠀⠑⠀⠗⠁⠇⠇⠄⠜⠀⠨⠛⠑⠐⠊⠨⠑⠋⠙⠀⠕⠄
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("e'4 e' f'# g'2. f'#8 d' a d' e' c'# d'2.", "3/4")
     bm.insert(0.0, key.KeySignature(2))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2147,13 +2147,13 @@ def example13_14():
     return bm
 
 def example13_15():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_15(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠨⠑⠙⠚⠊⠀⠗⠀⠜⠉⠁⠇⠍⠂⠀⠎⠑⠗⠑⠝⠑⠜⠀⠐⠺⠄⠊⠀⠳⠄⠚⠀⠪⠄⠓⠀⠟
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("d'8 c' b- a g2 b-4. a8 g4. b-8 a4. g8 f2", "2/4")
     bm.insert(0.0, key.KeySignature(-2))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2162,13 +2162,13 @@ def example13_15():
     return bm
 
 def example13_16():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_16(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠨⠑⠙⠚⠊⠀⠗⠀⠜⠎⠑⠓⠗⠀⠗⠥⠓⠊⠛⠜⠀⠐⠺⠄⠊⠀⠳⠄⠚⠀⠪⠄⠓⠀⠟
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("d'8 c' b- a g2 b-4. a8 g4. b-8 a4. g8 f2", "2/4")
     bm.insert(0.0, key.KeySignature(-2))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2177,13 +2177,13 @@ def example13_16():
     return bm
 
 def example13_17():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_17(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠐⠳⠧⠐⠀⠜⠗⠊⠞⠄⠀⠑⠀⠙⠊⠍⠄⠜⠀⠰⠃⠨⠳⠀⠳⠫⠹⠀⠻⠱⠺⠀⠝⠄⠘⠆
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("g4 r g' g' e' c' f' d' b c'2.", "3/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].insert(2.0, expressions.TextExpression('rit. e dim.'))
@@ -2192,14 +2192,14 @@ def example13_17():
     return bm
 
 def example13_18():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_18())
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠘⠻⠐⠀⠜⠎⠏⠑⠑⠙⠊⠝⠛⠀⠥⠏⠜⠀⠘⠓⠊⠚⠙⠀⠱⠚⠙⠐
     ⠀⠀⠜⠎⠇⠕⠺⠊⠝⠛⠸⠑⠋⠀⠻⠋⠑⠹
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("FF4 GG8 AA BB- C D4 BB-8 C D E F4 E8 D C4", "3/4")
     bm.insert(0.0, key.KeySignature(-1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2218,15 +2218,15 @@ def example13_19():
     return bm
 
 def example13_26():
-    '''
+    ur"""
     >>> from music21.braille import test
-    >>> from music21.braille import translate 
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example13_26())
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠙⠑⠀⠰⠃⠐⠏⠻⠳⠀⠎⠜⠗⠁⠇⠇⠄⠐⠺⠪⠀⠗⠻⠫⠀⠕⠄⠘⠆⠧⠣⠅⠄⠀⠡⠡⠣⠣
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠏⠗⠑⠎⠞⠕⠲⠀⠣⠣⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠙⠊⠀⠜⠋⠋⠐⠺⠑⠛⠺⠛⠑⠀⠺⠨⠋⠓⠺⠓⠋⠀⠐⠺⠨⠋⠛⠪⠛⠋⠀⠐⠺⠑⠛⠺⠧
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("e2 f#4 g a2 b4 a g2 f#4 e d2. r4\
     b-4 d'8 f' b'-4 f'8 d'8\
     b-4 e'-8 g' b'-4 g'8 e'-8 b-4 e'-8 f' a'4 f'8 e'- b-4 d'8 f' b'-4 r", "4/4")
@@ -2247,13 +2247,13 @@ def example13_26():
 # Chapter 14: Symbols of Expression and Execution
 
 def example14_1():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example14_1(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
     ⠨⠦⠐⠛⠊⠨⠦⠙⠊⠨⠦⠓⠨⠙⠨⠦⠐⠋⠓
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("f8 a c' a g c' e g", "4/4")
     bm.notes[0].articulations.append(articulations.Accent())
     bm.notes[2].articulations.append(articulations.Accent())
@@ -2265,16 +2265,16 @@ def example14_1():
     return bm
 
 def example14_2():
-    '''
+    ur"""
     Doubling of Tenuto marking is demonstrated. Accent is used in place of Reversed Accent because music21
     doesn't support the latter.
-    
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example14_2(), showFirstMeasureNumber = False, slurLongPhraseWithBrackets=True)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠰⠃⠨⠏⠄⠀⠱⠻⠐⠺⠀⠹⠘⠆⠸⠦⠸⠦⠐⠫⠳⠀⠨⠹⠱⠸⠦⠩⠱⠀⠨⠦⠏⠄
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("e'2. d'4 f' b c' e g c' d' d'# e'2.", "3/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[2].append(spanner.Slur(bm[0].notes[0], bm[2].notes[0]))
@@ -2288,14 +2288,14 @@ def example14_2():
     return bm
 
 def example14_3():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example14_3())
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠰⠃⠨⠦⠨⠑⠋⠙⠑⠚⠊⠓⠛⠘⠆⠀⠦⠳⠦⠫⠸⠦⠏⠀⠫⠉⠦⠋⠭⠳⠉⠦⠓⠭
     ⠀⠀⠸⠦⠐⠻⠉⠸⠦⠻⠫⠈⠉⠋⠭
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("d'8 e'- c' d' b- a- g f g4 e- e-2 e-4~ e-8 r g4~ g8 r f4~ f e-~ e-8 r", "4/4")
     bm.insert(0, key.KeySignature(-3))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2312,13 +2312,13 @@ def example14_3():
     return bm
 
 def example14_5():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example14_5(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠣⠸⠉⠀⠀⠀⠀⠀⠀⠀⠀
     ⠦⠦⠸⠑⠭⠛⠭⠊⠭⠦⠐⠑⠭⠀⠨⠦⠞⠪⠧
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("D8 r F r A r d r B-2 A4 r", "cut")
     bm.insert(0, key.KeySignature(-1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2331,13 +2331,13 @@ def example14_5():
     return bm
 
 def example14_6():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example14_6(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠸⠻⠦⠦⠑⠛⠙⠋⠀⠨⠦⠨⠦⠘⠚⠊⠚⠙⠨⠦⠱⠀⠑⠦⠋⠸⠦⠻⠧
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("F4 D8 F C E BB AA BB C D4 D8 E F4 r", "3/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     for n in bm.flat.notes[1:-1]:
@@ -2349,13 +2349,13 @@ def example14_6():
     return bm
 
 def example14_7():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example14_7(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀
     ⠦⠨⠦⠸⠹⠦⠨⠦⠫⠦⠨⠦⠻
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("C4 E F","3/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     for n in bm[0].notes:
@@ -2365,13 +2365,13 @@ def example14_7():
     return bm
 
 def example14_8():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example14_8(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
     ⠨⠦⠸⠦⠸⠳⠨⠦⠸⠦⠺⠨⠦⠸⠦⠹
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("G4 B c","3/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     for n in bm[0].notes:
@@ -2384,14 +2384,14 @@ def example14_8():
 # Chapter 15: Smaller Values and Regular Note-Grouping, the Music Comma
 
 def example15_1():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_1())
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠚⠀⠐⠑⠀⠓⠄⠿⠓⠚⠀⠊⠄⠷⠊⠚⠀⠓⠄⠷⠚⠑⠀⠫⠄⠋⠀⠑⠄⠾⠚⠓⠀⠊⠄⠷⠊⠚
     ⠀⠀⠐⠓⠄⠯⠋⠑⠀⠳⠄
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("r4. d8 g8. f#16 g8 b8 a8. g16 a8 b8 g8. g16 b8 d'8 e'4. e'8\
     d'8. b16 b8 g8 a8. g16 a8 b8 g8. e16 e8 d8 g4.", "2/4")
     bm.insert(0, key.KeySignature(1))
@@ -2404,13 +2404,13 @@ def example15_1():
     return bm
  
 def example15_2():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_2(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠨⠑⠍⠯⠑⠍⠩⠽⠀⠱⠚⠭⠀⠚⠍⠽⠚⠍⠩⠮⠀⠺⠓⠭
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("d'8 r16 e'16 d'8 r16 c'#16 d'4 b8 r8 b8 r16 c'16 b8 r16 a#16 b4 g8 r8", "2/4")
     bm.insert(0, key.KeySignature(1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2418,14 +2418,14 @@ def example15_2():
     return bm
 
 def example15_3():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_3())
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠐⠋⠄⠿⠋⠳⠓⠀⠑⠄⠯⠑⠻⠛⠀⠹⠑⠫⠛⠀⠫⠑⠱⠋⠀⠫⠛⠳⠮⠞⠝
     ⠀⠀⠐⠹⠯⠵⠹⠍
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("e8. f16 e8 g4 g8 d8. e16 d8 f4 f8 c4 d8 e4 f8\
     e4 d8 d4 e8 e4 f8 g4 a16 b32 c'32 c4 e16 d16 c4 r16", "6/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2433,27 +2433,27 @@ def example15_3():
     return bm
 
 def example15_4():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_4(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠨⠫⠈⠉⠋⠄⠿⠑⠄⠯⠀⠹⠰⠹⠹⠀⠩⠨⠷⠮⠭⠯⠿⠭⠵⠾⠭⠀⠹⠧⠧
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("e'4~ e'8. f'16 d'8. e'16 c'4 c''4 c''4 g'#16 a'16 r8 e'16 f'16 r8 d'16 b16 r8 c'4 r4 r4", "3/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None
     return bm
 
 def example15_5():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_5())
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠩⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠚⠀⠐⠯⠄⠞⠀⠚⠊⠚⠀⠩⠚⠽⠍⠐⠯⠄⠨⠝⠀⠙⠚⠙⠀⠙⠵⠍⠑⠀⠱⠯⠿⠀⠿⠐⠚⠄⠙
     ⠀⠀⠨⠋⠄⠵⠽⠾⠀⠪⠣⠅⠄
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("r4 e16. b32 b8 a8 b8 b#8 c'#16 r16 e16. c'#32 c'#8 b8 c'#8 c'#8 d'16 r16 d'8\
     d'4 e'16 f'#16 f'#16 b8. c'#8 e'8. d'16 c'#16 b16 a4", "3/8")
     bm.insert(0, key.KeySignature(3))
@@ -2466,27 +2466,29 @@ def example15_5():
     bm[-1].rightBarline = bar.Barline('double')
     return bm
 
-def example15_6a(): # beamed 16th notes
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+def example15_6a():
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_6a(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
     ⠐⠽⠚⠙⠑⠯⠑⠋⠛⠷⠓⠊⠚⠽⠑⠋⠋
-    '''
+    """
+    # beamed 16th notes
     bm = tinyNotation.TinyNotationStream("c16 B c d e d e f g g a b c' d' e' e'", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None
     return bm
 
-def example15_6b(): # unbeamed 16th notes
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+def example15_6b():
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_6b(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
     ⠐⠽⠾⠽⠵⠯⠵⠯⠿⠷⠷⠮⠾⠽⠵⠯⠯
-    '''
+    """
+    # unbeamed 16th notes
     bm = tinyNotation.TinyNotationStream("c16 B c d e d e f g g a b c' d' e' e'", "4/4")
     # not calling makeNotation because it calls makeBeams
     bm.makeMeasures(inPlace=True)
@@ -2495,39 +2497,39 @@ def example15_6b(): # unbeamed 16th notes
     return bm
 
 def example15_7():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
-    >>> print translate.partToBraille(test.example15_7(), showFirstMeasureNumber = False) 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(test.example15_7(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠼⠃⠲⠀⠀⠀⠀⠀⠀
     ⠐⠷⠨⠑⠙⠚⠹⠀⠐⠷⠄⠟⠯⠵⠫
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("g16 d' c' b c'4 g16. f32 e16 d e4", "2/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None
     return bm
 
 def example15_8():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
-    >>> print translate.partToBraille(test.example15_8(), showFirstMeasureNumber = False) 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(test.example15_8(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀
     ⠸⠷⠋⠛⠋⠷⠿⠭⠀⠿⠑⠋⠑⠿⠯⠍
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("G16 E F E G F r8 F16 D E D F E r", "2/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None
     return bm
 
 def example15_9():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
-    >>> print translate.partToBraille(test.example15_9(), showFirstMeasureNumber = False) 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(test.example15_9(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠍⠨⠑⠙⠚⠽⠑⠋⠙⠀⠾⠙⠚⠊⠷⠿⠷⠍⠀⠨⠷⠛⠋⠑⠽⠍⠾⠮⠀⠗
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("r16 d' c' b c' d' e' c' b c' b a g f# g r g' f'# e' d' c' r b a g2", "2/4")
     bm.insert(0, key.KeySignature(1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2544,14 +2546,14 @@ def example15_10():
     return bm
     
 def example15_11():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example15_11())
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠚⠀⠣⠐⠚⠀⠣⠯⠣⠨⠋⠣⠐⠓⠣⠨⠓⠣⠐⠚⠣⠨⠚⠡⠐⠾⠡⠨⠾⠣⠐⠾⠣⠨⠾⠐
     ⠀⠀⠡⠐⠾⠡⠨⠾⠣⠐⠾⠣⠨⠚⠣⠊⠛⠑⠚⠨⠫⠄
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("r1 r4 r8 b-8 e-16 e'- g- g'- b- b'- bn b'n b- b'- bn b'n b- b'- a'- f' d' b- e'-4.", "12/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None
@@ -2569,13 +2571,13 @@ def example15_11():
 # Triplets
 # --------
 def example16_1():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
-    >>> print translate.partToBraille(test.example16_1(), showFirstMeasureNumber = False) 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(test.example16_1(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀
     ⠆⠨⠦⠐⠙⠋⠊⠳⠀⠆⠨⠦⠸⠚⠑⠊⠳
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("trip{c8 e a} g4 trip{B8 d a} g4", "2/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None
@@ -2584,13 +2586,13 @@ def example16_1():
     return bm
 
 def example16_2():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
-    >>> print translate.partToBraille(test.example16_2(), showFirstMeasureNumber = False) 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
+    >>> print translate.partToBraille(test.example16_2(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠐⠺⠈⠉⠆⠚⠙⠐⠛⠆⠚⠑⠐⠛⠀⠺⠈⠉⠆⠚⠙⠑⠆⠑⠙⠚
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("b-4~ trip{b-8 c' f} trip{b- d' f} b-4~ trip{b-8 c' d'} trip{d' c' b-}", "3/4")
     bm.insert(0, key.KeySignature(-2))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2598,13 +2600,13 @@ def example16_2():
     return bm
 
 def example16_4():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example16_4(), showFirstMeasureNumber = False)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠜⠇⠑⠛⠁⠞⠕⠜⠏⠰⠃⠆⠨⠙⠚⠊⠆⠊⠚⠙⠆⠚⠙⠚⠫⠘⠆
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("trip{c'8 b- a-} trip{a- b- c'} trip{b- c' b-} e-4", "4/4")
     bm.insert(0, key.KeySignature(-4))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2625,26 +2627,26 @@ def example16_6():
 # Chapter 17: Measure Repeats, Full-Measure In-Accords
 
 def example17_1():
-    '''
-    >>> from music21.braille import test     
+    ur"""
+    >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example17_1(), showFirstMeasureNumber=False)
     ⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀
     ⠐⠹⠫⠪⠳⠀⠶⠀⠸⠺⠱⠪⠳⠀⠷
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c4 e a g c e a g B d a g g1", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None
     return bm
 
 def example17_2():
-    '''
-    >>> from music21.braille import test     
+    ur"""
+    >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example17_2(), showFirstMeasureNumber=False)
     ⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
     ⠦⠐⠳⠦⠩⠻⠨⠦⠡⠟⠀⠶⠀⠏⠗⠀⠯
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("g4 f# fn2 g4 f# fn2 e2 g2 e1", "4/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None
@@ -2657,26 +2659,26 @@ def example17_2():
     return bm
 
 def example17_3():
-    '''
-    >>> from music21.braille import test     
+    ur"""
+    >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example17_3(), showFirstMeasureNumber=False)
     ⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀
     ⠐⠹⠫⠳⠀⠶⠀⠶⠀⠨⠝⠄
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c4 e g c e g c e g c'2.", "3/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None
     return bm
 
 def example17_4():
-    '''
-    >>> from music21.braille import test     
+    ur"""
+    >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.partToBraille(test.example17_4(), showFirstMeasureNumber=False)
     ⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀
     ⠐⠹⠫⠳⠀⠶⠀⠶⠀⠎⠄
-    '''
+    """
     bm = tinyNotation.TinyNotationStream("c4 e g c e g c e g a2.", "3/4")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None
@@ -2691,13 +2693,13 @@ def example17_4():
 # Chapter 24: Bar-over-Bar Format
 
 def example24_1a():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example24_1a(), showHand = 'right', showHeading = True)
     ⠀⠀⠼⠙⠲⠀⠀⠀
     ⠅⠜⠄⠜⠋⠐⠝⠏
-    '''
+    """
     rightHand = tinyNotation.TinyNotationStream("c2 e2", "4/4")
     rightHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     rightHand[0].rightBarline = None
@@ -2705,22 +2707,22 @@ def example24_1a():
     return rightHand[0]
 
 def example24_1b():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example24_1b(), showHand = 'left', showHeading = True)
     ⠀⠀⠼⠃⠲⠀⠀
     ⠇⠜⠸⠙⠭⠋⠭
-    '''
+    """
     leftHand = tinyNotation.TinyNotationStream("C8 r8 E8 r8", "2/4")
     leftHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     leftHand[0].rightBarline = None
     return leftHand[0]
 
 def example24_2():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> rightHand = test.example24_2()[0]
     >>> leftHand = test.example24_2()[1]
     >>> print translate.keyboardPartsToBraille(rightHand, leftHand)
@@ -2729,7 +2731,7 @@ def example24_2():
     ⠀⠀⠇⠜⠸⠙⠓⠐⠙⠚⠀⠸⠊⠚⠙⠙⠀⠸⠚⠊⠓⠚⠀⠐⠙⠙⠚⠓⠀⠐⠙⠭⠣⠺⠀⠸⠊⠭⠙⠭
     ⠛⠀⠅⠜⠐⠋⠓⠓⠛⠀⠐⠏⠣⠅
     ⠀⠀⠇⠜⠐⠙⠭⠚⠓⠀⠐⠝⠣⠅
-    '''
+    """
     rightHand = tinyNotation.TinyNotationStream("c'8 g8 e8 g8 f8 g8 e8 a8 g8 f8 e8 d8 e8 e8 d8 r8 e8 d8 e8 g8 f8 g8 a8 f8 e8 g8 g8 f8 e2", "2/4")
     leftHand = tinyNotation.TinyNotationStream("C8 G8 c8 B8 A8 B8 c8 c8 B8 A8 G8 B8 c8 c8 B8 G8 c8 r8 B-4 A8 r8 c8 r8 c8 r8 B8 G8 c2", "2/4")
     rightHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2740,16 +2742,16 @@ def example24_2():
     return keyboardPart
 
 def example24_3():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> rightHand = test.example24_3()[0]
     >>> leftHand = test.example24_3()[1]
     >>> print translate.keyboardPartsToBraille(rightHand, leftHand)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠚⠀⠅⠜⠨⠱⠇⠀⠨⠑⠋⠑⠙⠚⠊⠀⠐⠗⠁⠉⠺⠇
     ⠀⠀⠇⠜⠸⠚⠊⠀⠸⠓⠭⠚⠭⠑⠭⠀⠸⠓⠊⠚⠙⠱
-    '''
+    """
     rightHand = tinyNotation.TinyNotationStream("r2 d'4 d'8 e'-8 d'8 c'8 b-8 a8 g2 b-4", "3/4")
     leftHand = tinyNotation.TinyNotationStream("r2 B-8 A8 G8 r8 B-8 r8 d8 r8 G8 A8 B-8 c8 d4", "3/4")
     rightHand.insert(0, key.KeySignature(-2))
@@ -2776,9 +2778,9 @@ def example24_3():
     return keyboardPart
 
 def example24_4():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> rightHand = test.example24_4()[0]
     >>> leftHand = test.example24_4()[1]
     >>> print translate.keyboardPartsToBraille(rightHand, leftHand)
@@ -2787,7 +2789,7 @@ def example24_4():
     ⠀⠀⠀⠇⠜⠨⠱⠈⠉⠵⠙⠚⠓⠻⠈⠉⠿⠓⠚⠓⠀⠐⠪⠹⠑⠵⠯⠿⠓⠋⠛⠀⠀⠀⠀⠀⠀⠀
     ⠁⠁⠀⠅⠜⠰⠯⠑⠙⠚⠮⠓⠛⠋⠕⠣⠅
     ⠀⠀⠀⠇⠜⠨⠳⠹⠍⠊⠛⠋⠱⠣⠅⠀⠀
-    '''
+    """
     rightHand = tinyNotation.TinyNotationStream("d'16 b16 a16 f#16 e4~ e16 d16 A16 d16 e4 c#16 B16 c#16 d16 e16 g16 f#16 e16 f#16 e16 f#16 g16 a16 b16 c'#16 d'16\
     e'16 d'16 c'#16 b16 a16 g16 f#16 e16 d2", "4/4")
     leftHand = tinyNotation.TinyNotationStream("d'4~ d'16 c'#16 b16 g16 f#4~ f#16 g16 b16 g16 a4 c'#4 d'8 d'16 e'16 f'#16 g'16 e'16 f'#16\
@@ -2834,40 +2836,40 @@ def example24_5():
 # Chapter 26: Interval Signs and Chords
 
 def example26_1a():
-    '''
+    ur"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example26_1a(), showHand = 'right', descendingChords = True)
     ⠅⠜⠨⠷⠼⠴⠤
-    '''
+    """
     c1 = chord.Chord(['G4','B4','D5','G5'], quarterLength = 4.0)
     m1 = stream.Measure()
     m1.append(c1)
     return m1
 
 def example26_1b():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> print translate.measureToBraille(test.example26_1b(), showHand = 'left', descendingChords = False)
     ⠇⠜⠘⠷⠬⠔⠤
-    '''    
+    """
     c1 = chord.Chord(['G2','B2','D3','G3'], quarterLength = 4.0)
     m1 = stream.Measure()
     m1.append(c1)
     return m1
 
 def example26_2():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> rightHand = example26_2()[0]
     >>> leftHand = example26_2()[1]
-    >>> print translate.keyboardPartsToBraille(rightHand, leftHand) 
+    >>> print translate.keyboardPartsToBraille(rightHand, leftHand)
     ⠀⠀⠀⠨⠉⠀⠀⠀
     ⠁⠀⠅⠜⠨⠷⠴⠼
     ⠀⠀⠇⠜⠘⠷⠔⠬
-    '''
+    """
     chord_right = chord.Chord(['D4','B4','G5'], quarterLength = 4.0)
     chord_left = chord.Chord(['G2','D3','B3'], quarterLength = 4.0)
     part_right = stream.Part()
@@ -2886,16 +2888,16 @@ def example26_2():
     return keyboardPart
 
 def example26_3():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> rightHand = example26_3()[0]
     >>> leftHand = example26_3()[1]
-    >>> print translate.keyboardPartsToBraille(rightHand, leftHand) 
+    >>> print translate.keyboardPartsToBraille(rightHand, leftHand)
     ⠀⠀⠀⠨⠉⠀⠀⠀
     ⠁⠀⠅⠜⠨⠯⠐⠬
     ⠀⠀⠇⠜⠘⠽⠸⠬
-    '''
+    """
     chord_right = chord.Chord(['C4','E5'], quarterLength = 4.0)
     chord_left = chord.Chord(['C2','E3'], quarterLength = 4.0)
     part_right = stream.Part()
@@ -2914,16 +2916,16 @@ def example26_3():
     return keyboardPart
 
 def example26_4():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> rightHand = example26_4()[0]
     >>> leftHand = example26_4()[1]
-    >>> print translate.keyboardPartsToBraille(rightHand, leftHand) 
+    >>> print translate.keyboardPartsToBraille(rightHand, leftHand)
     ⠀⠀⠀⠀⠨⠉⠀⠀⠀
     ⠁⠀⠅⠜⠰⠽⠴⠌⠀
     ⠀⠀⠇⠜⠘⠷⠴⠐⠴
-    '''
+    """
     chord_right = chord.Chord(['B4','E5','C6'], quarterLength = 4.0)
     chord_left = chord.Chord(['G2','E3','E4'], quarterLength = 4.0)
     part_right = stream.Part()
@@ -2942,39 +2944,29 @@ def example26_4():
     return keyboardPart
 
 def example26_5():
-    '''
-    >>> from music21.braille import test     
-    >>> from music21.braille import translate 
+    ur"""
+    >>> from music21.braille import test
+    >>> from music21.braille import translate
     >>> rightHand = example26_5()[0]
     >>> leftHand = example26_5()[1]
-    >>> print translate.keyboardPartsToBraille(rightHand, leftHand) 
+    >>> print translate.keyboardPartsToBraille(rightHand, leftHand)
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠁⠀⠅⠜⠐⠚⠬⠙⠑⠬⠐⠓⠨⠋⠬⠛⠓⠴⠐⠓⠀⠀
     ⠀⠀⠇⠜⠘⠓⠔⠸⠋⠘⠓⠔⠸⠚⠸⠙⠔⠊⠓⠔⠸⠚
-    '''
-    all_right = []
-    all_right.append(chord.Chord(['G4','B4'], quarterLength = 0.5))
-    all_right.append(note.Note('C5', quarterLength = 0.5))
-    all_right.append(chord.Chord(['B4','D5'], quarterLength = 0.5))
-    all_right.append(note.Note('G4', quarterLength = 0.5))
-    all_right.append(chord.Chord(['C5','E5'], quarterLength = 0.5))
-    all_right.append(note.Note('F#5', quarterLength = 0.5))
-    all_right.append(chord.Chord(['B4','G5'], quarterLength = 0.5))
-    all_right.append(note.Note('G4', quarterLength = 0.5))
+    """
+    all_right = [chord.Chord(['G4', 'B4'], quarterLength=0.5), note.Note('C5', quarterLength=0.5),
+                 chord.Chord(['B4', 'D5'], quarterLength=0.5), note.Note('G4', quarterLength=0.5),
+                 chord.Chord(['C5', 'E5'], quarterLength=0.5), note.Note('F#5', quarterLength=0.5),
+                 chord.Chord(['B4', 'G5'], quarterLength=0.5), note.Note('G4', quarterLength=0.5)]
     part_right = stream.Part()
     part_right.append(key.KeySignature(1))
     part_right.append(meter.TimeSignature('4/4'))
     part_right.append(all_right)
 
-    all_left = []
-    all_left.append(chord.Chord(['G2','D3'], quarterLength = 0.5))
-    all_left.append(note.Note('E3', quarterLength = 0.5))
-    all_left.append(chord.Chord(['G2','D3'], quarterLength = 0.5))
-    all_left.append(note.Note('B3', quarterLength = 0.5))
-    all_left.append(chord.Chord(['C3','G3'], quarterLength = 0.5))
-    all_left.append(note.Note('A2', quarterLength = 0.5))
-    all_left.append(chord.Chord(['G2','D3'], quarterLength = 0.5))
-    all_left.append(note.Note('B3', quarterLength = 0.5))
+    all_left = [chord.Chord(['G2', 'D3'], quarterLength=0.5), note.Note('E3', quarterLength=0.5),
+                chord.Chord(['G2', 'D3'], quarterLength=0.5), note.Note('B3', quarterLength=0.5),
+                chord.Chord(['C3', 'G3'], quarterLength=0.5), note.Note('A2', quarterLength=0.5),
+                chord.Chord(['G2', 'D3'], quarterLength=0.5), note.Note('B3', quarterLength=0.5)]
     part_left = stream.Part()
     part_left.append(key.KeySignature(1))
     part_left.append(meter.TimeSignature('4/4'))

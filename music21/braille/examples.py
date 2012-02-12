@@ -21,17 +21,18 @@ from music21 import tinyNotation
 from music21.braille import translate
 
 def happyBirthday():
-    '''
+    """
     If you would like to wish a visually-impaired friend happy birthday,
     this would be the way to go :-D
-    
-    >>> from music21.braille import examples     
+
+    >>> from music21.braille import examples
     >>> print examples.happyBirthday()
     ⠀⠀⠀⠀⠀⠀⠠⠃⠗⠊⠛⠓⠞⠇⠽⠲⠀⠹⠶⠼⠁⠃⠚⠀⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠐⠑⠄⠵⠫⠱⠀⠳⠟⠀⠑⠄⠵⠫⠱⠀⠪⠗⠀⠑⠄⠵⠨⠱⠺⠀⠓⠄⠷⠻⠫
     ⠀⠀⠨⠙⠄⠽⠺⠳⠀⠪⠗⠣⠅
-    '''
-    hb = tinyNotation.TinyNotationStream("d8. d16 e4 d g f#2 d8. d16 e4 d a g2 d8. d16 d'4 b g8. g16 f#4 e c'8. c'16 b4 g a g2", "3/4")
+    """
+    hb = tinyNotation.TinyNotationStream\
+        ("d8. d16 e4 d g f#2 d8. d16 e4 d a g2 d8. d16 d'4 b g8. g16 f#4 e c'8. c'16 b4 g a g2", "3/4")
     hb.insert(0, key.KeySignature(1))
     hb.insert(0, tempo.TempoText("Brightly"))
     hb.insert(0, tempo.MetronomeMark(number = 120, referent = note.QuarterNote()))
@@ -39,11 +40,11 @@ def happyBirthday():
     return translate.partToBraille(hb)
 
 def laDonnaEMobile():
-    '''
+    """
     A piano reduction of Giuseppi Verdi's famous aria from Rigoletto,
     "La Donna É Mobile," transcribed into braille music.
-     
-    >>> from music21.braille import examples  
+
+    >>> from music21.braille import examples
     >>> print examples.laDonnaEMobile()
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠀⠁⠀⠅⠜⠄⠜⠁⠇⠇⠑⠛⠗⠑⠞⠞⠕⠜⠋⠄⠍⠀⠦⠨⠑⠦⠑⠦⠑⠀⠀
@@ -80,7 +81,7 @@ def laDonnaEMobile():
     ⠀⠀⠀⠇⠜⠸⠚⠬⠧⠀⠀⠧⠸⠛⠬⠒⠣⠜⠸⠫⠄⠬⠴⠀⠀⠀
     ⠉⠑⠀⠅⠜⠐⠾⠍⠜⠋⠋⠋⠨⠚⠼⠴⠭⠣⠅
     ⠀⠀⠀⠇⠜⠸⠾⠬⠍⠘⠚⠬⠔⠭⠣⠅⠀⠀⠀
-    '''
+    """
     mob = converter.parse("http://static.musescore.com/29836/5862119bda/score.mxl").getElementsByClass('Part')
     #segmentBreaks = [(6,0.0),(10,0.0),(14,0.0),(18,0.0),(22,0.0),(25,1.0),(29,1.0),(33,0.5)]
     return translate.streamToBraille(mob)
