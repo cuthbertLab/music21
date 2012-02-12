@@ -26,7 +26,7 @@ from music21.braille import segment
 # music21 streams to BrailleText objects.
 
 def objectToBraille(music21Obj, debug=False, **keywords):
-    """
+    ur"""
     Translates an arbitrary object to Braille.  Doesn't yet work on notes:
 
     >>> from music21 import *
@@ -132,9 +132,6 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    import sys
-    reload(sys)
-    sys.setdefaultencoding("UTF-8")
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
