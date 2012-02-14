@@ -281,6 +281,8 @@ class Dynamic(music21.Music21Object):
 #-------------------------------------------------------------------------------
 class Wedge(music21.Music21Object):
     '''Object model of crescendeo/decrescendo wedges.
+
+    NOTE: this object is will soon be replaced by Crescend and Diminendo objects.
     '''
     
     def __init__(self, type=None):

@@ -1057,7 +1057,7 @@ class DynamicWedge(Spanner):
 
         self.type = None # crescendo or diminuendo
         self.placement = 'below' # can above or below, after musicxml
-        self.spread = 15
+        self.spread = 15 # this unit is probably in tenth
 
     def __repr__(self):
         msg = Spanner.__repr__(self)
@@ -1151,6 +1151,8 @@ class OctaveShift(Spanner):
             self.type = keywords['type'] # use property
         else: # use 8 as a defualt
             self.type = '8va'
+
+        self.placement = 'above' # can above or below, after musicxml
 
     def __repr__(self):
         msg = Spanner.__repr__(self)
@@ -1251,6 +1253,8 @@ class BracketLine(Spanner):
     '''
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
+
+        #self._lineEnd 
 
     def __repr__(self):
         msg = Spanner.__repr__(self)
@@ -1824,7 +1828,28 @@ class Test(unittest.TestCase):
         self.assertEqual(raw.count('octave-shift'), 2)
 
 
+    def testCrescendoA(self):
+        from music21 import stream, note, spanner, chord, dynamics
+        s = stream.Stream()
+        #s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
+        s.repeatAppend(note.Note(), 12)
+        n1 = s.notes[0]
+        #s.insert(n1.offset, dynamics.Dynamic('fff'))
+        n2 = s.notes[len(s.notes) / 2]
+        #s.insert(n2.offset, dynamics.Dynamic('ppp'))
+        n3 = s.notes[-1]
+        #s.insert(n3.offset, dynamics.Dynamic('ff'))
+        s.show('t')
+        sp1 = spanner.Diminuendo(n1, n2)
+        sp2 = spanner.Crescendo(n2, n3)
+        s.append(sp1)
+        s.append(sp2)
+        #s.show()
+        raw = s.musicxml
+        self.assertEqual(raw.count('<wedge'), 4)
 
+        #self.assertEqual(raw.count('octave-shift'), 2)
+        
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

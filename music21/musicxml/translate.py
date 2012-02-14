@@ -1530,7 +1530,8 @@ def mxToInstrument(mxScorePart, inputM21=None):
 def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost, 
     spannerBundle):
     '''
-    This may edit the mxNoteList and other lists in place, and thus returns None.
+    The `target` parameter here may be music21 Note or Chord. 
+    This may edit the mxNoteList and direction lists in place, and thus returns None.
     '''
     if spannerBundle is None or len(spannerBundle) == 0:
         return
@@ -1550,7 +1551,7 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
             mxSlur.set('type', 'stop')
         else:
             # this may not always be an error
-            environLocal.printDebug(['have a slur that has this note as a component but that note is neither a start nor an end.', su, target])
+            environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, target])
             continue
         mxNoteList[0].notationsObj.componentList.append(mxSlur)
 
@@ -1565,7 +1566,7 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
             mxWavyLine.set('type', 'stop')
         else:
             # this may not always be an error
-            environLocal.printDebug(['have a wave line has this note as a component but that note is neither a start nor an end.', su, target])
+            environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, target])
         mxOrnamentsList = mxNoteList[0].notationsObj.getOrnaments()
         if mxOrnamentsList == []: # need to create ornaments obj
             mxOrnaments = musicxmlMod.Ornaments()
@@ -1588,8 +1589,9 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
             mxOctaveShift.set('size', pmtrs['size'])
         else:
             # this may not always be an error
-            environLocal.printDebug(['have a wave line has this note as a component but that note is neither a start nor an end.', su, target])
+            environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, target])
         mxDirection = musicxmlMod.Direction()
+        mxDirection.set('placement', su.placement) # placement goes here
         mxDirectionType = musicxmlMod.DirectionType()
         mxDirectionType.append(mxOctaveShift)
         mxDirection.append(mxDirectionType)
@@ -1598,6 +1600,37 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
             mxDirectionPre.append(mxDirection)
         else:
             mxDirectionPost.append(mxDirection)
+
+    # get common base class of cresc and decresc
+    for su in spannerBundle.getByClass('DynamicWedge'):     
+        mxWedge = musicxmlMod.Wedge()
+        mxWedge.set('number', su.idLocal)
+        # is this note first in this spanner?
+        if su.isFirst(target):
+            pmtrs = su.getStartParameters()
+            mxWedge.set('type', pmtrs['type'])
+            mxWedge.set('spread', pmtrs['spread'])
+        elif su.isLast(target):
+            pmtrs = su.getEndParameters()
+            mxWedge.set('type', pmtrs['type'])
+            mxWedge.set('spread', pmtrs['spread'])
+        else:
+            # this may not always be an error
+            environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, target])
+        mxDirection = musicxmlMod.Direction()
+        mxDirection.set('placement', su.placement) # placement goes here
+        mxDirectionType = musicxmlMod.DirectionType()
+        mxDirectionType.append(mxWedge)
+        mxDirection.append(mxDirectionType)
+        environLocal.pd(['os', 'mxDirection', mxDirection ])
+
+        mxDirectionPre.append(mxDirection)
+
+#         if su.isFirst(target): # if first, goes after note
+#             mxDirectionPost.append(mxDirection)
+#         else:
+#             mxDirectionPre.append(mxDirection)
+
 
 def articulationsAndExpressionsToMx(target, mxNoteList):
     '''The `target` parameter is the music21 object. 
@@ -2394,6 +2427,7 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                            obj.getOffsetBySite(mFlat))
                 mxDirection = dynamicToMx(obj)
                 mxDirection.offset = mxOffset 
+                # positioning dynamics by offset, not position in measure
                 mxMeasure.insert(0, mxDirection)
             elif 'ChordSymbol' in classes:
                 mxMeasure.componentList.append(chordSymbolToMx(obj))
@@ -3021,7 +3055,6 @@ def streamPartToMx(part, instStream=None, meterStream=None,
         # check that first measure has any atributes in outer Stream
         # this is for non-standard Stream formations (some kern imports)
         # that place key/clef information in the containing stream
-
         if measureStream[0].clef is None:
             measureStream[0].makeMutable() # must mutate
             outerClefs = part.getElementsByClass('Clef')
@@ -3037,7 +3070,6 @@ def streamPartToMx(part, instStream=None, meterStream=None,
             outerTimeSignatures = part.getElementsByClass('TimeSignature')
             if len(outerTimeSignatures) > 0:
                 measureStream[0].timeSignature = outerTimeSignatures[0]
-
         # see if accidentals/beams can be processed
         if not measureStream.haveAccidentalsBeenMade():
             measureStream.makeAccidentals(inPlace=True)
@@ -3049,7 +3081,6 @@ def streamPartToMx(part, instStream=None, meterStream=None,
                 pass
         if spannerBundle is None:
             spannerBundle = spanner.SpannerBundle(measureStream.flat)
-
 
     # for each measure, call .mx to get the musicxml representation
     for obj in measureStream:
@@ -3067,13 +3098,10 @@ def streamPartToMx(part, instStream=None, meterStream=None,
                     mxTranspose = intervalToMXTranspose(
                                     instSubObj.transposition)
                     #raise TranslateException('cannot get transposition for a part that is not at sounding pitch.')
-            
         mxPart.append(measureToMx(obj, spannerBundle=spannerBundle, 
                  mxTranspose=mxTranspose))
-
     # might to post processing after adding all measures to the Stream
     # TODO: need to find all MetricModulations and updateByContext
-
     # mxScorePart contains mxInstrument
     return mxScorePart, mxPart
 
