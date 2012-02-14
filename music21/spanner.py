@@ -1131,15 +1131,119 @@ class Diminuendo(DynamicWedge):
 class OctaveShift(Spanner):
     '''An octave shift line
 
+    >>> from music21 import *
+    >>> os = spanner.OctaveShift(type='8va')
+    >>> os.type
+    '8va'
+    >>> os.type = 15
+    >>> os.type
+    '15ma'
+    >>> os.type = 8, 'down'
+    >>> os.type
+    '8vb'
+    >>> print os
+    <music21.spanner.OctaveShift 8vb >
     '''
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
+        self._type = None # can be 8va, 8vb, 15ma, 15mb
+        if 'type' in keywords.keys():
+            self.type = keywords['type'] # use property
+        else: # use 8 as a defualt
+            self.type = '8va'
 
     def __repr__(self):
         msg = Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.spanner.OctaveShift ')
+        msg = msg.replace(self._reprHead, '<music21.spanner.OctaveShift %s ' % 
+            self.type)
         return msg
     
+    def _getType(self):
+        return self._type
+
+    def _setType(self, type):
+        if common.isNum(type) and type in [8, 15]: 
+            if type == 8:
+                self._type = '8va'
+            else:
+                self._type = '15ma'
+        # try to parse as list of size, dir
+        elif common.isListLike(type) and len(type) >= 1: 
+            stub = []
+            if type[0] in [8, '8']:
+                stub.append(str(type[0]))
+                stub.append('v')
+            elif type[0] in [15, '15']:
+                stub.append(str(type[0]))
+                stub.append('m')
+            if len(type) >= 2 and type[1] in ['down']:
+                stub.append('b')
+            else: # default if not provided
+                stub.append('a')        
+            self._type = ''.join(stub)    
+        else:
+            if not common.isStr(type) or type.lower() not in [
+                '8va', '8vb', '15ma', '15mb']:
+                raise SpannerException(
+                    'cannot create OctaveShift of type: %s' % type)
+            self._type = type.lower()
+    
+    type = property(_getType, _setType, doc='''
+        Get or set OctaveShift type. This can be set by as complete string (such as 8va or 15mb) or with a pair specifying size and direction.
+
+        >>> from music21 import *
+        >>> os = spanner.OctaveShift()
+        >>> os.type = 15, 'down'
+        >>> os.type
+        '15mb'
+        >>> os.type = '8vb'
+        >>> os.type
+        '8vb'
+        ''')
+
+    def _getShiftMagnitude(self):
+        '''Get basic parameters of shift.
+        '''
+        if self._type.startswith('8'): return 8
+        if self._type.startswith('15'): return 15
+
+    def _getShiftDirection(self):
+        '''Get basic parameters of shift.
+        '''
+        if self._type.endswith('a'): return 'up'
+        if self._type.endswith('b'): return 'down'
+
+    def getStartParameters(self):
+        '''Return the parameters for the start of this spanners required by MusicXML output. 
+
+        >>> from music21 import *
+        >>> os = spanner.OctaveShift(type='15mb')
+        >>> os.getStartParameters()
+        {'type': 'down', 'size': 15}
+        >>> os.getEndParameters()
+        {'type': 'stop', 'size': 15}
+        ''' 
+        post = {}
+        post['size'] = self._getShiftMagnitude()
+        post['type'] = self._getShiftDirection() # up or down
+        return post
+
+    def getEndParameters(self):
+        '''Return the parameters for the start of this spanner required by MusicXML output. 
+
+        >>> from music21 import *
+        >>> os = spanner.OctaveShift(type=8)
+        >>> os.getStartParameters()
+        {'type': 'up', 'size': 8}
+        >>> os.getEndParameters()
+        {'type': 'stop', 'size': 8}
+        ''' 
+        post = {}
+        post['size'] = self._getShiftMagnitude()
+        post['type'] = 'stop' # always stop
+        return post
+
+
 
 class BracketLine(Spanner):
     '''A bracket represented as a spanner between two Notes. 
@@ -1672,7 +1776,7 @@ class Test(unittest.TestCase):
         '''Test basic wave line creation and output, as well as passing
         objects through make measure calls. 
         '''
-        from music21 import stream, note, spanner
+        from music21 import stream, note, spanner, chord
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
         n1 = s.notes[0]
@@ -1681,6 +1785,44 @@ class Test(unittest.TestCase):
         s.append(sp1)
         raw = s.musicxml
         self.assertEqual(raw.count('wavy-line'), 2)
+
+        s = stream.Stream()
+        s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
+        n1 = s.notes[0]
+        n2 = s.notes[-1]
+        sp1 = spanner.WavyLine(n1, n2)
+        s.append(sp1)
+        raw = s.musicxml
+        #s.show()
+        self.assertEqual(raw.count('wavy-line'), 2)
+
+
+    def testOctaveShiftA(self):
+        '''Test basic octave shift creation and output, as well as passing
+        objects through make measure calls. 
+        '''
+        from music21 import stream, note, spanner, chord
+        s = stream.Stream()
+        s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
+        #s.repeatAppend(note.Note(), 12)
+        n1 = s.notes[0]
+        n2 = s.notes[-1]
+        sp1 = spanner.OctaveShift(n1, n2)
+        s.append(sp1)
+        #s.show()
+        raw = s.musicxml
+        self.assertEqual(raw.count('octave-shift'), 2)
+
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 12)
+        n1 = s.notes[0]
+        n2 = s.notes[-1]
+        sp1 = spanner.OctaveShift(n1, n2)
+        s.append(sp1)
+        #s.show()
+        raw = s.musicxml
+        self.assertEqual(raw.count('octave-shift'), 2)
+
 
 
 
