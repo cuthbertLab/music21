@@ -2043,6 +2043,9 @@ class DisplayOctave(MusicXMLElement):
 
 
 class Notations(MusicXMLElementList):
+    '''
+    Notations contains many elements, including Ornaments.
+    '''
     def __init__(self, type=None):
         MusicXMLElementList.__init__(self)
         self._tag = 'notations'
@@ -2100,6 +2103,14 @@ class Notations(MusicXMLElementList):
                 post.append(part)
         return post
 
+    def getOrnaments(self):
+        '''Get a the ornaments object stored on a components. There can be more than one.
+        '''
+        post = []        
+        for part in self.componentList:
+            if isinstance(part, Ornaments):
+                post.append(part)
+        return post
 
 
 
@@ -2320,6 +2331,8 @@ class Dashes(MusicXMLElement):
 
 class Ornaments(MusicXMLElementList):
     '''The Ornaments tag wraps the following muscixml entities: trill-mark, turn, delayed-turn, inverted-turn, shake, wavy-line, mordent, inverted mordent, schleifer, termolo, other-ornament. 
+
+    Ornaments are stored on the notations object. 
     '''
     def __init__(self, type=None):
         MusicXMLElementList.__init__(self)

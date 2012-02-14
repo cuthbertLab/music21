@@ -1966,9 +1966,28 @@ def noteToMxNotes(n, spannerBundle=None):
                 environLocal.printDebug(['have a slur that has this note as a component but that note is neither a start nor an end.', su, n])
                 #raise TranslateException('have a slur that has this note as a component but that note is neither a start nor an end.')
                 continue
-
             mxNoteList[0].notationsObj.componentList.append(mxSlur)
-            
+
+        for su in spannerBundle.getByClass('WavyLine'):     
+            mxWavyLine = musicxmlMod.WavyLine()
+            mxWavyLine.set('number', su.idLocal)
+            mxWavyLine.set('placement', su.placement)
+            # is this note first in this spanner?
+            if su.isFirst(n):
+                mxWavyLine.set('type', 'start')
+            elif su.isLast(n):
+                mxWavyLine.set('type', 'stop')
+            else:
+                # this may not always be an error
+                environLocal.printDebug(['have a wave line has this note as a component but that note is neither a start nor an end.', su, n])
+            mxOrnamentsList = mxNoteList[0].notationsObj.getOrnaments()
+            if mxOrnamentsList == []: # need to create ornaments obj
+                mxOrnaments = musicxmlMod.Ornaments()
+                mxNoteList[0].notationsObj.componentList.append(mxOrnaments)
+                mxOrnamentsList = [mxOrnaments] # emulate returned obj
+            mxOrnamentsList[0].append(mxWavyLine) # add to first
+            environLocal.pd(['wl', 'mxOrnamentsList', mxOrnamentsList ])
+    
     #Adds the notehead type if it is not set to the default 'normal'.
     if (n.notehead != 'normal' or n.noteheadFill != 'default' or 
         n.color not in [None, '']):
@@ -2889,9 +2908,11 @@ def streamPartToMx(part, instStream=None, meterStream=None,
         part.makeMutable() # must mutate
         # try to add measures if none defined
         # returns a new stream w/ new Measures but the same objects
-        measureStream = part.makeNotation(meterStream=meterStream,
-                        refStreamOrTimeRange=refStreamOrTimeRange)
+        part.makeNotation(meterStream=meterStream,
+                        refStreamOrTimeRange=refStreamOrTimeRange, 
+                        inPlace=True)
         #environLocal.printDebug(['Stream._getMXPart: post makeNotation, length', len(measureStream)])
+        measureStream = part.getElementsByClass('Measure')
 
         # after calling measuresStream, need to update Spanners, as a deepcopy
         # has been made
@@ -2901,7 +2922,7 @@ def streamPartToMx(part, instStream=None, meterStream=None,
         #                measureStream.flat.getAllContextsByClass('Spanner'))
         # only getting spanners at this level
         #spannerBundle = spanner.SpannerBundle(measureStream.flat)
-        spannerBundle = measureStream.spannerBundle
+        spannerBundle = part.spannerBundle
     # if this is a Measure, see if it needs makeNotation
     else: # there are measures
         # check that first measure has any atributes in outer Stream

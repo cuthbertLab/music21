@@ -4934,6 +4934,10 @@ class Stream(music21.Music21Object):
 
         #environLocal.printDebug(['makeMeasures(): meterStream', 'meterStream[0]', meterStream[0], 'meterStream[0].offset',  meterStream[0].offset, 'meterStream.elements[0].activeSite', meterStream.elements[0].activeSite])
 
+        # need a SpannerBundle to store any found spanners and place
+        # at the part level
+        spannerBundleAccum = spanner.SpannerBundle()
+
         # get a clef for the entire stream; this will use bestClef
         # presently, this only gets the first clef
         # may need to store a clefStream and access changes in clefs
@@ -5026,8 +5030,15 @@ class Stream(music21.Music21Object):
         for ob in offsetMap:
             start, end, e, voiceIndex = ob['offset'], ob['endTime'], ob['element'], ob['voiceIndex']
             
+            #environLocal.pd(['makeMeasures()', start, end, e, voiceIndex])
             # iterate through all measures, finding a measure that 
             # can contain this element
+
+            # collect all spanners and move to outer Stream
+            if e.isSpanner:
+                spannerBundleAccum.append(e)
+                continue
+
             match = False
             lastTimeSignature = None
             for i in range(len(post)):
@@ -5073,6 +5084,10 @@ class Stream(music21.Music21Object):
             else: # insert into voice specified by the voice index
                 m.voices[voiceIndex].insert(oNew, e)
 
+        # add found spanners to higher-level; could insert at zero
+        for sp in spannerBundleAccum:
+            post.append(sp)
+
         post._elementsChanged()
 
         # clean up temporary streams to avoid extra site accumulation
@@ -5097,6 +5112,7 @@ class Stream(music21.Music21Object):
             self._endElements = []
             self._elementsChanged()
             for e in post.sorted:
+                # may need to handle spanners; already have self as site
                 self.insert(e.getOffsetBySite(post), e)
 
 
@@ -5725,9 +5741,9 @@ class Stream(music21.Music21Object):
         '''
         # determine what is the object to work on first
         if inPlace:
-            measureStream = self
+            returnStream = self
         else:
-            measureStream = copy.deepcopy(self)
+            returnStream = copy.deepcopy(self)
 
 #         if 'finalBarline' in subroutineKeywords:
 #             lastBarlineType = subroutineKeywords['finalBarline']
@@ -5737,16 +5753,17 @@ class Stream(music21.Music21Object):
         # only use inPlace arg on first usage
         if not self.hasMeasures():
             # only try to make voices if no Measures are defined
-            measureStream.makeVoices(inPlace=True, fillGaps=True)
+            returnStream.makeVoices(inPlace=True, fillGaps=True)
 
             # if this is not inPlace, it will return a newStream; if  
             # inPlace, this returns None
             # use inPlace=True, as already established above
-            measureStream.makeMeasures(meterStream=meterStream,
+            returnStream.makeMeasures(meterStream=meterStream,
                 refStreamOrTimeRange=refStreamOrTimeRange, 
-                inPlace=True)#, finalBarline = lastBarlineType)
-          
-        #environLocal.printDebug(['Stream.makeNotation(): post makeMeasures, length', len(measureStream)])
+                inPlace=True)#, finalBarline = lastBarlineType)          
+
+        measureStream = returnStream.getElementsByClass('Measure')
+        #environLocal.printDebug(['Stream.makeNotation(): post makeMeasures, length', len(returnStream)])
 
         # for now, calling makeAccidentals once per measures       
         # pitches from last measure are passed
@@ -5776,7 +5793,6 @@ class Stream(music21.Music21Object):
 
         #environLocal.printDebug(['makeNotation(): meterStream:', meterStream, meterStream[0]])
         measureStream.makeTies(meterStream, inPlace=True)
-
         #measureStream.makeBeams(inPlace=True)
         try:
             measureStream.makeBeams(inPlace=True)
@@ -5790,14 +5806,14 @@ class Stream(music21.Music21Object):
         # makeBeams was causing the duration's tuplet to loose its type setting
         # check for tuplet brackets one measure at a time       
         # this means that they will never extend beyond one measure
-        for m in measureStream.getElementsByClass('Measure'):
+        for m in measureStream:
             m.makeTupletBrackets(inPlace=True)
 
         if len(measureStream) == 0:            
             raise StreamException('no measures found in stream with %s elements' % (self.__len__()))
         #environLocal.printDebug(['Stream.makeNotation(): created measures:', len(measureStream)])
 
-        return measureStream
+        return returnStream
 
 
 
@@ -12739,7 +12755,7 @@ class Test(unittest.TestCase):
         # need to call make ties to allocate notes
         sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies(
             inPlace=False)
-        self.assertEqual(len(sPartitioned), 21)
+        self.assertEqual(len(sPartitioned.getElementsByClass('Measure')), 21)
 
 
         meterStream = Stream()
@@ -12747,7 +12763,7 @@ class Test(unittest.TestCase):
         # need to call make ties to allocate notes
         sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies(
             inPlace=False)
-        self.assertEqual(len(sPartitioned), 42)
+        self.assertEqual(len(sPartitioned.getElementsByClass('Measure')), 42)
 
 
         meterStream = Stream()
@@ -12755,7 +12771,7 @@ class Test(unittest.TestCase):
         # need to call make ties to allocate notes
         sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies(
             inPlace=False)
-        self.assertEqual(len(sPartitioned), 14)
+        self.assertEqual(len(sPartitioned.getElementsByClass('Measure')), 14)
 
 
         meterStream = Stream()
@@ -12763,7 +12779,7 @@ class Test(unittest.TestCase):
         # need to call make ties to allocate notes
         sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies(
             inPlace=False)
-        self.assertEqual(len(sPartitioned), 4)
+        self.assertEqual(len(sPartitioned.getElementsByClass('Measure')), 4)
 
 
         meterStream = Stream()
@@ -12771,7 +12787,7 @@ class Test(unittest.TestCase):
         # need to call make ties to allocate notes
         sPartitioned = sBach.flat.makeMeasures(meterStream).makeTies(
             inPlace=False)
-        self.assertEqual(len(sPartitioned), 1)
+        self.assertEqual(len(sPartitioned.getElementsByClass('Measure')), 1)
 
     def testMakeMeasuresWithBarlines(self):
         '''Test makeMeasures with optional barline parameters.
