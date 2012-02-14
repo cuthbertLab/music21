@@ -1672,6 +1672,31 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
         else:
             mxDirectionPost.append(mxDirection)
 
+
+    for su in spannerBundle.getByClass('DashedLine'):     
+        mxDashes = musicxmlMod.Dashes()
+        mxDashes.set('number', su.idLocal)
+        # is this note first in this spanner?
+        if su.isFirst(target):
+            mxDashes.set('type', 'start')
+        elif su.isLast(target):
+            mxDashes.set('type', 'stop')
+        else: # this may not always be an error
+            environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, target])
+        mxDirection = musicxmlMod.Direction()
+        mxDirection.set('placement', su.placement) # placement goes here
+        mxDirectionType = musicxmlMod.DirectionType()
+        mxDirectionType.append(mxDashes)
+        mxDirection.append(mxDirectionType)
+        environLocal.pd(['os', 'mxDirection', mxDirection ])
+
+        if su.isFirst(target):
+            mxDirectionPre.append(mxDirection)
+        else:
+            mxDirectionPost.append(mxDirection)
+
+
+
 def articulationsAndExpressionsToMx(target, mxNoteList):
     '''The `target` parameter is the music21 object. 
     '''
