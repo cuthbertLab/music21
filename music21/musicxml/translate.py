@@ -1626,11 +1626,36 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
 
         mxDirectionPre.append(mxDirection)
 
-#         if su.isFirst(target): # if first, goes after note
-#             mxDirectionPost.append(mxDirection)
-#         else:
-#             mxDirectionPre.append(mxDirection)
+    for su in spannerBundle.getByClass('BracketLine'):     
+        mxBracket = musicxmlMod.Bracket()
+        mxBracket.set('number', su.idLocal)
+        mxBracket.set('line-type', su.lineType)
+        # TODO: may be able to set independent for each side
+        mxBracket.set('line-end', su.lineEnd)
+        mxBracket.set('end-length', su.endLength)
+        # is this note first in this spanner?
+        if su.isFirst(target):
+            pmtrs = su.getStartParameters()
+            mxBracket.set('type', pmtrs['type'])
+        elif su.isLast(target):
+            pmtrs = su.getEndParameters()
+            mxBracket.set('type', pmtrs['type'])
+        else:
+            # this may not always be an error
+            environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, target])
+        mxDirection = musicxmlMod.Direction()
+        mxDirection.set('placement', su.placement) # placement goes here
+        mxDirectionType = musicxmlMod.DirectionType()
+        mxDirectionType.append(mxBracket)
+        mxDirection.append(mxDirectionType)
+        environLocal.pd(['os', 'mxDirection', mxDirection ])
 
+        #mxDirectionPre.append(mxDirection)
+
+        if su.isFirst(target):
+            mxDirectionPre.append(mxDirection)
+        else:
+            mxDirectionPost.append(mxDirection)
 
 def articulationsAndExpressionsToMx(target, mxNoteList):
     '''The `target` parameter is the music21 object. 
@@ -2996,10 +3021,8 @@ def streamPartToMx(part, instStream=None, meterStream=None,
     If there are Measures within this stream, use them to create and
     return an MX Part and ScorePart. 
 
-
     An `instObj` may be assigned from caller; this Instrument is pre-collected 
     from this Stream in order to configure id and midi-channel values. 
-
 
     The `meterStream`, if given, provides a template of meters. 
     '''
@@ -3081,6 +3104,9 @@ def streamPartToMx(part, instStream=None, meterStream=None,
                 pass
         if spannerBundle is None:
             spannerBundle = spanner.SpannerBundle(measureStream.flat)
+
+    # make sure that all instances of the same class have unique ids
+    spannerBundle.setIdLocals()
 
     # for each measure, call .mx to get the musicxml representation
     for obj in measureStream:

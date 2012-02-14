@@ -870,6 +870,31 @@ class SpannerBundle(object):
             sp.idLocal = i+1
                 
 
+    def setIdLocals(self):
+        '''Set all id locals for all classes in this SpannerBundle. This will assure that each class has a unique id local number. This is destructive: existing id local values will be lost.
+
+        >>> from music21 import *
+        >>> su1 = spanner.Slur()
+        >>> su2 = layout.StaffGroup()
+        >>> su3 = spanner.Slur()
+        >>> sb = spanner.SpannerBundle()
+        >>> sb.append(su1)
+        >>> sb.append(su2)
+        >>> sb.append(su3)
+        >>> [sp.idLocal for sp in sb.getByClass('Slur')]
+        [None, None]
+        >>> sb.setIdLocals()
+        >>> [(sp, sp.idLocal) for sp in sb]
+        [(<music21.spanner.Slur >, 1), (<music21.layout.StaffGroup >, 1), (<music21.spanner.Slur >, 2)]
+        '''
+        classes = []
+        for sp in self._storage:
+            if sp.classes[0] not in classes:
+                classes.append(sp.classes[0])
+        for className in classes:
+            self.setIdLocalByClass(className)
+    
+
     def getByComponentAndClass(self, component, className):
         '''Get all Spanners that both contain the component and match the provided class. 
         '''
@@ -1250,16 +1275,92 @@ class OctaveShift(Spanner):
 class BracketLine(Spanner):
     '''A bracket represented as a spanner between two Notes. 
 
+    Brackets can take many line types. 
+
+    >>> from music21 import *
+    >>> b = spanner.BracketLine()
+    >>> b.lineType = 'dotted'
+    >>> b.lineType
+    'dotted'
+    >>> b = spanner.BracketLine(endLength=20)
+    >>> b.endLength 
+    20
+
     '''
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
 
-        #self._lineEnd 
+        self._lineEnd = None # can ne up/down/arrow/both/None
+        self._endLength = None # for up/down, specified in tenths
+        self._lineType = 'solid' # can be solid, dashed, dotter, wavy
+
+        self.placement = 'above' # can above or below, after musicxml
+        
+        if 'lineType' in keywords.keys():
+            self.lineType = keywords['lineType'] # use property
+        if 'lineEnd' in keywords.keys():
+            self.lineEnd = keywords['lineEnd'] # use property
+        if 'endLength' in keywords.keys():
+            self.endLength = keywords['endLength'] # use property
 
     def __repr__(self):
         msg = Spanner.__repr__(self)
         msg = msg.replace(self._reprHead, '<music21.spanner.BracketLine ')
         return msg
+
+
+    def _getLineEnd(self):
+        return self._lineEnd
+
+    def _setLineEnd(self, value):
+        if value.lower() not in ['up', 'down', 'arrow', 'both']:
+            raise SpannerException('not a valid value: %s' % value)
+        self._lineEnd = value.lower()
+
+    lineEnd = property(_getLineEnd, _setLineEnd, doc='''
+        Get or set the lineEnd property.
+        ''')
+
+
+    def _getLineType(self):
+        return self._lineType
+
+    def _setLineType(self, value):
+        if value.lower() not in ['solid', 'dashed', 'dotted', 'wavy']:
+            raise SpannerException('not a valid value: %s' % value)
+        self._lineType = value.lower()
+
+    lineType = property(_getLineType, _setLineType, doc='''
+        Get or set the lineType property.
+        ''')
+
+
+    def _getEndLength(self):
+        return self._endLength
+
+    def _setEndLength(self, value):
+        if not common.isNum(value) and value >= 0:
+            raise SpannerException('not a valid value: %s' % value)
+        self._endLength = value
+
+    endLength = property(_getEndLength, _setEndLength, doc='''
+        Get or set the endLength property.
+        ''')
+
+
+    def getStartParameters(self):
+        '''Return the parameters for the start of this spanners required by MusicXML output. 
+        ''' 
+        post = {}
+        post['type'] = 'start'
+        return post
+
+    def getEndParameters(self):
+        '''Return the parameters for the start of this spanner required by MusicXML output. 
+        ''' 
+        post = {}
+        post['type'] = 'stop' # always stop
+        return post
 
 
 class WavyLine(Spanner):
@@ -1839,7 +1940,6 @@ class Test(unittest.TestCase):
         #s.insert(n2.offset, dynamics.Dynamic('ppp'))
         n3 = s.notes[-1]
         #s.insert(n3.offset, dynamics.Dynamic('ff'))
-        s.show('t')
         sp1 = spanner.Diminuendo(n1, n2)
         sp2 = spanner.Crescendo(n2, n3)
         s.append(sp1)
@@ -1850,6 +1950,24 @@ class Test(unittest.TestCase):
 
         #self.assertEqual(raw.count('octave-shift'), 2)
         
+
+    def testBracketA(self):
+        from music21 import stream, note, spanner, chord, dynamics
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 12)
+        n1 = s.notes[0]
+        n2 = s.notes[len(s.notes) / 2]
+        n3 = s.notes[-1]
+        sp1 = spanner.BracketLine(n1, n2, lineEnd='up', lineType='dotted')
+        sp2 = spanner.BracketLine(n2, n3, lineEnd='down', lineType='dashed',
+                                    endLength=40)
+        s.append(sp1)
+        s.append(sp2)
+        #s.show()
+        raw = s.musicxml
+        self.assertEqual(raw.count('<bracket'), 4)
+        
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
