@@ -709,7 +709,6 @@ class SpannerBundle(object):
         return self._cache[cacheKey]
 
 
-
     def getByCompleteStatus(self, completeStatus):
         '''Get spanners by matching status of `completeStatus` to the same attribute
 
@@ -847,6 +846,30 @@ class SpannerBundle(object):
         return self._cache[cacheKey]
 
 
+    def setIdLocalByClass(self, className):
+        '''Automatically set id local values for all members of the provided class. This is necessary in cases where spanners are newly created in potentially overlapping boundaries and need to be tagged for MusicXML or other output. Note that, if some Spanners already have ids, they will be overwritten.
+
+        >>> from music21 import *
+        >>> su1 = spanner.Slur()
+        >>> su2 = layout.StaffGroup()
+        >>> su3 = spanner.Slur()
+        >>> sb = spanner.SpannerBundle()
+        >>> sb.append(su1)
+        >>> sb.append(su2)
+        >>> sb.append(su3)
+        >>> [sp.idLocal for sp in sb.getByClass('Slur')]
+        [None, None]
+        >>> sb.setIdLocalByClass('Slur')
+        >>> [sp.idLocal for sp in sb.getByClass('Slur')]
+        [1, 2]
+
+        '''
+        found = []
+        # note that this over rides previous values
+        for i, sp in enumerate(self.getByClass(className)):
+            sp.idLocal = i+1
+                
+
     def getByComponentAndClass(self, component, className):
         '''Get all Spanners that both contain the component and match the provided class. 
         '''
@@ -912,9 +935,6 @@ class Slur(Spanner):
         msg = msg.replace(self._reprHead, '<music21.spanner.Slur ')
         return msg
     
-
-
-
 #-------------------------------------------------------------------------------
 # first/second repeat bracket
 class RepeatBracket(Spanner):
@@ -1103,6 +1123,72 @@ class Diminuendo(DynamicWedge):
         return post
 
 
+#-------------------------------------------------------------------------------
+# line-based spanners
+
+class OctaveShift(Spanner):
+    '''An octave shift line
+
+    '''
+    def __init__(self, *arguments, **keywords):
+        Spanner.__init__(self, *arguments, **keywords)
+
+    def __repr__(self):
+        msg = Spanner.__repr__(self)
+        msg = msg.replace(self._reprHead, '<music21.spanner.OctaveShift ')
+        return msg
+    
+
+class BracketLine(Spanner):
+    '''A bracket represented as a spanner between two Notes. 
+
+    '''
+    def __init__(self, *arguments, **keywords):
+        Spanner.__init__(self, *arguments, **keywords)
+
+    def __repr__(self):
+        msg = Spanner.__repr__(self)
+        msg = msg.replace(self._reprHead, '<music21.spanner.BracketLine ')
+        return msg
+
+
+class WavyLine(Spanner):
+    '''A wavy represented as a spanner between two Notes. 
+
+    The `idLocal` attribute, defined in the Spanner base class, is used to mark start and end tags of potentially overlapping indicators.
+    '''
+    def __init__(self, *arguments, **keywords):
+        Spanner.__init__(self, *arguments, **keywords)
+
+    def __repr__(self):
+        msg = Spanner.__repr__(self)
+        msg = msg.replace(self._reprHead, '<music21.spanner.WavyLine ')
+        return msg
+
+
+class GlissandoLine(Spanner):
+    '''A wavy represented as a spanner between two Notes. 
+    '''
+    def __init__(self, *arguments, **keywords):
+        Spanner.__init__(self, *arguments, **keywords)
+
+    def __repr__(self):
+        msg = Spanner.__repr__(self)
+        msg = msg.replace(self._reprHead, '<music21.spanner.BracketLine ')
+        return msg
+
+class DashedLine(Spanner):
+    '''A dashed line represented as a spanner between two Notes. 
+    '''
+    def __init__(self, *arguments, **keywords):
+        Spanner.__init__(self, *arguments, **keywords)
+
+    def __repr__(self):
+        msg = Spanner.__repr__(self)
+        msg = msg.replace(self._reprHead, '<music21.spanner.DashedLine ')
+        return msg
+
+
 
 #-------------------------------------------------------------------------------
 # other ideas for spanners
@@ -1114,7 +1200,6 @@ class Diminuendo(DynamicWedge):
 # use a stored time signature to apply beaming values 
 # class BeamingGroup(Spanner):
 #     pass
-
 
 # optionally define one or more Streams as a staff
 # provide settings for staff presentation such as number lines
@@ -1574,6 +1659,17 @@ class Test(unittest.TestCase):
         sp3 = p3.spanners[2]
         self.assertEqual(sp3.hasComponent(m5), True)
 
+
+
+    def testWavyLineA(self):
+        from music21 import stream, note, spanner
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 8)
+        n1 = s.notes[0]
+        n2 = s.notes[-1]
+        sp1 = spanner.WavyLine(n1, n2)
+        print sp1
+        #s.show()
 
 
 
