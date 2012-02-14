@@ -1369,7 +1369,7 @@ class WavyLine(Spanner):
     The `idLocal` attribute, defined in the Spanner base class, is used to mark start and end tags of potentially overlapping indicators.
     '''
     # musicxml defines a start, stop, and a continue; will try to avoid continue
-
+    # note that this always includes a trill symbol
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
         self.placement = None # can above or below, after musicxml
@@ -1388,10 +1388,28 @@ class GlissandoLine(Spanner):
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
 
+        self.lineType = 'solid'
+        if 'lineType' in keywords.keys():
+            self.lineType = keywords['lineType'] # use property
+
     def __repr__(self):
         msg = Spanner.__repr__(self)
         msg = msg.replace(self._reprHead, '<music21.spanner.BracketLine ')
         return msg
+
+    def _getLineType(self):
+        return self._lineType
+
+    def _setLineType(self, value):
+        if value.lower() not in ['solid', 'dashed', 'dotted', 'wavy']:
+            raise SpannerException('not a valid value: %s' % value)
+        self._lineType = value.lower()
+
+    lineType = property(_getLineType, _setLineType, doc='''
+        Get or set the lineType property.
+        ''')
+
+
 
 class DashedLine(Spanner):
     '''A dashed line represented as a spanner between two Notes. 
@@ -1966,6 +1984,26 @@ class Test(unittest.TestCase):
         #s.show()
         raw = s.musicxml
         self.assertEqual(raw.count('<bracket'), 4)
+
+
+    def testGlissandoA(self):
+        from music21 import stream, note, spanner, chord, dynamics
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 12)
+        for i, n in enumerate(s.notes):
+            n.transpose(i + (i%2*12), inPlace=True)
+
+        # note: this does not suppor glissandi between non-adjacent notes
+        n1 = s.notes[0]
+        n2 = s.notes[len(s.notes) / 2]
+        n3 = s.notes[-1]
+        sp1 = spanner.GlissandoLine(n1, n2)
+        sp2 = spanner.GlissandoLine(n2, n3)
+        s.append(sp1)
+        s.append(sp2)
+        #s.show()
+        raw = s.musicxml
+        self.assertEqual(raw.count('<glissando'), 4)
         
 
 
