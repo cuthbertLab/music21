@@ -1632,7 +1632,6 @@ class JSONSerializer(object):
             elif attr == '__attr__':
                 for key in d[attr].keys():
                     attrValue = d[attr][key]
-
                     if attrValue == None or isinstance(attrValue, 
                         (int, float)):
                         setattr(self, key, attrValue)
@@ -1682,14 +1681,12 @@ class JSONSerializer(object):
 
     json = property(_getJSON, _setJSON, 
         doc = '''Get or set string JSON data for this object. This method is only available if a JSONSerializer subclass object has been customized and configured by overriding the following methods: :meth:`~music21.base.JSONSerializer.jsonAttributes`, :meth:`~music21.base.JSONSerializer.jsonComponentFactory`.
-
         ''')    
 
 
     def jsonPrint(self):
         print(json.dumps(self._getJSONDict(includeVersion=True), 
             sort_keys=True, indent=2))
-
 
     def jsonWrite(self, fp, format=True):
         '''Given a file path, write JSON to a file for this object. Default file extension should be .json. File is opened and closed within this method call. 

@@ -1555,7 +1555,7 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
             continue
         mxNoteList[0].notationsObj.componentList.append(mxSlur)
 
-    for su in spannerBundle.getByClass('WavyLine'):     
+    for su in spannerBundle.getByClass('TrillExtension'):     
         mxWavyLine = musicxmlMod.WavyLine()
         mxWavyLine.set('number', su.idLocal)
         mxWavyLine.set('placement', su.placement)

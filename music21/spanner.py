@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2010-2011 The music21 Project
+# Copyright:    (c) 2010-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
@@ -1313,7 +1313,8 @@ class BracketLine(Spanner):
         return self._lineEnd
 
     def _setLineEnd(self, value):
-        if value.lower() not in ['up', 'down', 'arrow', 'both']:
+        # need to test None
+        if value.lower() not in ['up', 'down', 'arrow', 'both', 'none']:
             raise SpannerException('not a valid value: %s' % value)
         self._lineEnd = value.lower()
 
@@ -1363,32 +1364,13 @@ class BracketLine(Spanner):
         return post
 
 
-class WavyLine(Spanner):
-    '''A wavy represented as a spanner between two Notes. 
-
-    The `idLocal` attribute, defined in the Spanner base class, is used to mark start and end tags of potentially overlapping indicators.
-    '''
-    # musicxml defines a start, stop, and a continue; will try to avoid continue
-    # note that this always includes a trill symbol
-    def __init__(self, *arguments, **keywords):
-        Spanner.__init__(self, *arguments, **keywords)
-        self.placement = None # can above or below, after musicxml
-    
-    # TODO: add property for placement
-
-    def __repr__(self):
-        msg = Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.spanner.WavyLine ')
-        return msg
-
-
 class GlissandoLine(Spanner):
     '''A wavy represented as a spanner between two Notes. 
     '''
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
 
-        self.lineType = 'solid'
+        self.lineType = 'wavy' # shold be default
         if 'lineType' in keywords.keys():
             self.lineType = keywords['lineType'] # use property
 
@@ -1898,29 +1880,6 @@ class Test(unittest.TestCase):
 
 
 
-    def testWavyLineA(self):
-        '''Test basic wave line creation and output, as well as passing
-        objects through make measure calls. 
-        '''
-        from music21 import stream, note, spanner, chord
-        s = stream.Stream()
-        s.repeatAppend(note.Note(), 12)
-        n1 = s.notes[0]
-        n2 = s.notes[-1]
-        sp1 = spanner.WavyLine(n1, n2)
-        s.append(sp1)
-        raw = s.musicxml
-        self.assertEqual(raw.count('wavy-line'), 2)
-
-        s = stream.Stream()
-        s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
-        n1 = s.notes[0]
-        n2 = s.notes[-1]
-        sp1 = spanner.WavyLine(n1, n2)
-        s.append(sp1)
-        raw = s.musicxml
-        #s.show()
-        self.assertEqual(raw.count('wavy-line'), 2)
 
 
     def testOctaveShiftA(self):
@@ -1943,7 +1902,7 @@ class Test(unittest.TestCase):
         s.repeatAppend(note.Note(), 12)
         n1 = s.notes[0]
         n2 = s.notes[-1]
-        sp1 = spanner.OctaveShift(n1, n2)
+        sp1 = spanner.OctaveShift(n1, n2, type='15mb')
         s.append(sp1)
         #s.show()
         raw = s.musicxml
@@ -1956,11 +1915,11 @@ class Test(unittest.TestCase):
         #s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
         s.repeatAppend(note.Note(), 12)
         n1 = s.notes[0]
-        #s.insert(n1.offset, dynamics.Dynamic('fff'))
+        s.insert(n1.offset, dynamics.Dynamic('fff'))
         n2 = s.notes[len(s.notes) / 2]
-        #s.insert(n2.offset, dynamics.Dynamic('ppp'))
+        s.insert(n2.offset, dynamics.Dynamic('ppp'))
         n3 = s.notes[-1]
-        #s.insert(n3.offset, dynamics.Dynamic('ff'))
+        s.insert(n3.offset, dynamics.Dynamic('ff'))
         sp1 = spanner.Diminuendo(n1, n2)
         sp2 = spanner.Crescendo(n2, n3)
         s.append(sp1)
@@ -1979,7 +1938,7 @@ class Test(unittest.TestCase):
         n1 = s.notes[0]
         n2 = s.notes[len(s.notes) / 2]
         n3 = s.notes[-1]
-        sp1 = spanner.BracketLine(n1, n2, lineEnd='up', lineType='dotted')
+        sp1 = spanner.BracketLine(n1, n2, lineEnd='both', lineType='wavy')
         sp2 = spanner.BracketLine(n2, n3, lineEnd='down', lineType='dashed',
                                     endLength=40)
         s.append(sp1)
