@@ -820,22 +820,52 @@ class Fermata(Expression):
 #-------------------------------------------------------------------------------
 # spanner expressions
 
+class TrillExtensionException(music21.Music21Exception):
+    pass
 
 class TrillExtension(spanner.Spanner):
     '''A wavy line trill extension, placed between two notes. Note that some MusicXML readers include a trill symbol with the wavy line.
 
+    >>> from music21 import *
+    >>> s = stream.Stream()
+    >>> s.repeatAppend(note.Note(), 8)
+    >>> # create between notes 2 and 3
+    >>> te = expressions.TrillExtension(s.notes[1], s.notes[2])
+    >>> s.append(te) # can go anywhere in the Stream
+    >>> te.getDurationBySite(s).quarterLength
+    2.0
+    >>> print te
+    <music21.spanner.TrillExtension <music21.note.Note C><music21.note.Note C>>
     '''
     # musicxml defines a start, stop, and a continue; will try to avoid continue
     # note that this always includes a trill symbol
     def __init__(self, *arguments, **keywords):
         spanner.Spanner.__init__(self, *arguments, **keywords)
-        self.placement = None # can above or below, after musicxml
+        self._placement = 'below' # can above or below, after musicxml
     
-    # TODO: add property for placement
+    def _getPlacement(self):
+        return self._placement
+
+    def _setPlacement(self, value):
+        if value.lower() not in ['above', 'below']:
+            raise TrillExtensionException('incorrect placement value: %s' % value)
+        self._placement = value.lower()
+        
+    placement = property(_getPlacement, _setPlacement, doc='''
+        Get or set the placement as either above or below.
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> s.repeatAppend(note.Note(), 8)
+        >>> te = expressions.TrillExtension(s.notes[1], s.notes[2])
+        >>> te.placement = 'above'
+        >>> te.placement
+        'above'
+        ''')
 
     def __repr__(self):
         msg = spanner.Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.spanner.WavyLine ')
+        msg = msg.replace(self._reprHead, '<music21.spanner.TrillExtension ')
         return msg
 
 

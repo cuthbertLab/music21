@@ -1641,20 +1641,20 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
 
         mxDirectionPre.append(mxDirection)
 
-    for su in spannerBundle.getByClass('BracketLine'):     
+    for su in spannerBundle.getByClass('Line'):     
         mxBracket = musicxmlMod.Bracket()
         mxBracket.set('number', su.idLocal)
         mxBracket.set('line-type', su.lineType)
-        # TODO: may be able to set independent for each side
-        mxBracket.set('line-end', su.lineEnd)
-        mxBracket.set('end-length', su.endLength)
-        # is this note first in this spanner?
         if su.isFirst(target):
             pmtrs = su.getStartParameters()
             mxBracket.set('type', pmtrs['type'])
+            mxBracket.set('line-end', pmtrs['line-end'])
+            mxBracket.set('end-length', pmtrs['end-length'])
         elif su.isLast(target):
             pmtrs = su.getEndParameters()
             mxBracket.set('type', pmtrs['type'])
+            mxBracket.set('line-end', pmtrs['line-end'])
+            mxBracket.set('end-length', pmtrs['end-length'])
         else:
             # this may not always be an error
             environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, target])
