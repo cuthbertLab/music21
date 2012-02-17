@@ -75,6 +75,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     # each unit in merged handlers defines possible a Measure (w/ or w/o metadata), trailing meta data, or a single collection of metadata and note data
 
     barCount = 0
+    measureNumber = 1
     # merged handler are ABCHandlerBar objects, defining attributes for barlines
     for mh in mergedHandlers:
         # if use measures and the handler has notes; otherwise add to part
@@ -219,7 +220,17 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                 # can only do this b/c ts is defined
                 if dst.barDurationProportion() < 1.0:
                     dst.padAsAnacrusis()
+                    dst.number = 0
                     #environLocal.printDebug(['incompletely filled Measure found on abc import; interpreting as a anacrusis:', 'padingLeft:', dst.paddingLeft])
+            else:
+                # TODO USE "SPLITATQUARTERLENGTH" WHEN IT WORKS ON STREAMS
+                '''
+                bdp = dst.barDurationProportion()
+                if bdp > 1.0 and int(bdp) == bdp:
+                    pass
+                '''
+                dst.number = measureNumber
+                measureNumber += 1
             p._appendCore(dst)
 
 
