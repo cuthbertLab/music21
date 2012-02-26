@@ -82,11 +82,6 @@ def bachParallels():
         print fn
         c = corpus.parseWork(fn)
         displayMe = False
-#        sc = stream.Score()
-#        p1 = stream.Part()
-#        p1.append(meter.TimeSignature('8/4'))
-#        p2 = stream.Part()
-#        p2.append(meter.TimeSignature('8/4'))
         for i in range(len(c.parts) - 1):
             iName = c.parts[i].id
             if iName.lower() not in ['soprano', 'alto', 'tenor', 'bass']:
@@ -97,7 +92,6 @@ def bachParallels():
                 jName = c.parts[j].id
                 if jName.lower() not in ['soprano', 'alto', 'tenor', 'bass']:
                     continue
-
 
                 jfn = c.parts[j].flat.notesAndRests
                 for k in range(len(omi) - 1):

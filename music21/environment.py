@@ -143,6 +143,7 @@ class Environment(object):
         self._keysToPaths.append('lilypondPath')
         self._keysToPaths.append('musicxmlPath')
         self._keysToPaths.append('graphicsPath')
+        self._keysToPaths.append('vectorPath')
         self._keysToPaths.append('pdfPath')
         self._keysToPaths.append('midiPath')
 
@@ -165,6 +166,7 @@ class Environment(object):
         self.ref['musicxmlPath'] = None 
         self.ref['midiPath'] = None # path to a midi reader
         self.ref['graphicsPath'] = None # path to a graphics viewer
+        self.ref['vectorPath'] = None # path to a vector graphics viewer
         self.ref['pdfPath'] = None # path to a pdf viewer
         self.ref['showFormat'] = 'musicxml' 
         self.ref['writeFormat'] = 'musicxml' 
@@ -189,6 +191,7 @@ class Environment(object):
             # with 2011 version forward default finale reader location is now:
             ('musicxmlPath', '/Applications/Finale Reader.app'),
             ('graphicsPath', '/Applications/Preview.app'),
+            ('vectorPath', '/Applications/Preview.app'),
             ('pdfPath', '/Applications/Preview.app'),
             ('midiPath', '/Applications/QuickTime Player.app'),
 
@@ -487,6 +490,8 @@ class Environment(object):
             environmentKey = 'lilypondPath'
         elif format in ['png', 'jpeg']:
             environmentKey = 'graphicsPath'
+        elif format in ['svg']:
+            environmentKey = 'vectorPath'
         elif format in ['pdf']:
             environmentKey = 'pdfPath'
         elif format == 'musicxml':
@@ -573,7 +578,7 @@ class UserSettings(object):
 
 
     >>> us.keys()
-    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
+    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
 
 
     Third, after finding the desired setting, supply the new value as a Python dictionary key value pair. Setting this value updates the user's settings file. For example, to set the file path to the Application that will be used to open MusicXML files, use the 'musicxmlPath' key. 
@@ -696,7 +701,7 @@ def set(key, value):
 
     >>> from music21 import *
     >>> environment.keys()
-    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
+    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
     >>> environment.set('wer', 'asdf')
     Traceback (most recent call last):
     EnvironmentException: no preference: wer
@@ -714,7 +719,7 @@ def get(key):
 
     >>> from music21 import *
     >>> environment.keys()
-    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
+    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
     >>> #_DOCS_SHOW environment.get('musicxmlPath')
     '/Applications/Finale Reader.app'
     '''

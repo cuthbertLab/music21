@@ -215,7 +215,7 @@ scoreTitleMarkup=##f
         filename = self.tempName
         format   = self.format
         backend  = self.backend
-        lilyCommand = '"' + self.LILYEXEC + '"' + " --" + format + " " + \
+        lilyCommand = '"' + self.LILYEXEC + '"' + " -f " + format + " " + \
                     self.backendString + backend + " -o " + filename + " " + filename
         
         try:
@@ -297,6 +297,18 @@ scoreTitleMarkup=##f
         environLocal.launch(self.format, lilyFile)
         #self.showImageDirect(lilyFile)
         
+        return lilyFile
+        
+    def createSVG(self):
+        self.format = 'svg'
+        self.backend = 'svg'
+        self.writeTemp()
+        lilyFile = self.runThroughLily()
+        return lilyFile
+
+    def showSVG(self):
+        lilyFile = self.createSVG()
+        environLocal.launch(self.format, lilyFile)
         return lilyFile
         
     def showPNGandPlayMIDI(self):

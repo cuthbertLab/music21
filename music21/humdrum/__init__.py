@@ -41,13 +41,13 @@ fields          None                Not needed.
 fin2hum         music21.musicxml.parseFile(filename) (Outputting to Kern is not a priority of the music21 team for now; We do not read Finale files in Enigma, only those in musicXML.  An Enigma to music21 converter is a low priority.  Software to do this is available from recordare
 freq            note.Note.freq440
 hint            twoStreams.TwoStreamComparer.intervalToOtherStreamWhenAttacked()   or other similar functions
-hum2fin         m21xml.write()      Writes to musicXML.  A music21 to enigma converter is an extremely low priority since musicXML has made writing new Enigma files essentially obsolete.
+hum2fin         myScore.write('musicxml')      Writes to musicXML.  A music21 to enigma converter is an extremely low priority since musicXML has made writing new Enigma files essentially obsolete.
 humdrum         None                Not needed.
 humsed          None                Not needed.
 humver          None                Not needed.
 infot           None                Use general purpose python information theory models
 iv              Chord.intervalVector  chord.intervalVector
-kern            kern.write()        Outputting to kern not planned at this time.
+kern            myScore.write('kern')        Outputting to kern not planned at this time.
 key             Key.keyFromStream() NOT YET WRITTEN (2008-10-18) (v0.6b)
 melac           analysis.thomassen.MelodicAccent    NOT YET WRITTEN -- lower priority (v2.0 or later)
 metpos          meter.addAccentToStream()   NOT YET WRITTEN -- high priority (v0.3a)

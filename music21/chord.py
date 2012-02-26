@@ -183,11 +183,12 @@ class Chord(note.NotRest):
             elif (self.editorial.ficta is not None):
                 baseName += self.editorial.ficta.lily
             octaveModChars = ""
-            if (thisPitch.octave < 3):
-                correctedOctave = 3 - thisPitch.octave
+            
+            if (thisPitch.implicitOctave < 3):
+                correctedOctave = 3 - thisPitch.implicitOctave 
                 octaveModChars = ',' * correctedOctave #  C3 = c ; C2 = c, ; C1 = c,,
             else:
-                correctedOctave = thisPitch.octave - 3
+                correctedOctave = thisPitch.implicitOctave - 3
                 octaveModChars  = '\'' * correctedOctave # C4 = c' ; C5 = c''  etc.
             baseName += octaveModChars
             if (self.editorial.ficta is not None):

@@ -1779,9 +1779,15 @@ class Test(unittest.TestCase):
         sineNominePath = parserPath + os.path.sep + 'Missa_Sine_nomine-Kyrie.krn'
         myScore = converter.parse(sineNominePath)
         #myScore.show()
-        
+    
+    def testSplitSpines(self):
+        hf1 = HumdrumDataCollection(testFiles.splitSpines)
+        masterStream = hf1.stream
+        masterStream.show('text')
+    
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    Test().testSplitSpines()
+    #music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof

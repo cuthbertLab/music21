@@ -56,6 +56,7 @@ Module Reference
    moduleAnalysisPatel
    moduleAnalysisWindowed
    moduleArticulations
+   moduleBar
    moduleBase
    moduleBeam
    moduleBrailleBasic

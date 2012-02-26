@@ -408,5 +408,6 @@ def probabilityOfChance():
     
     print 'The probability that the computer would guess correctly 69% or more of the time', prob
 
-#nipsBuild()
-nipsEvalCoarse()
+if __name__ == '__main__':
+    #nipsBuild()
+    nipsEvalCoarse()

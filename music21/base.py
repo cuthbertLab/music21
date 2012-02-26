@@ -3173,10 +3173,12 @@ class Music21Object(JSONSerializer):
             mf.close()
             return fp
 
-        elif fmt in ['pdf', 'lily.pdf']:
+        elif fmt in ['pdf', 'lily.pdf',]:
             return self.lily.createPDF()
         elif fmt in ['png', 'lily.png']:
             return self.lily.createPNG()
+        elif fmt in ['svg', 'lily.svg']:
+            return self.lily.createSVG()
         else:
             raise Music21ObjectException('cannot support writing in this format, %s yet' % format)
 
@@ -3210,6 +3212,7 @@ class Music21Object(JSONSerializer):
             lily (or lilypond)
             lily.png
             lily.pdf
+            lily.svg
             braille
 
         N.B. score.write('lily') returns a bare lilypond file,
@@ -3248,6 +3251,9 @@ class Music21Object(JSONSerializer):
         elif fmt in ['lily.png', 'png']:
             # TODO check that these use environLocal 
             return self.lily.showPNG()
+        elif fmt in ['lily.svg', 'svg']:
+            # TODO check that these use environLocal 
+            return self.lily.showSVG()
         elif fmt in ['lily', 'lilypond']:
             return self.lily.showPNG()
 

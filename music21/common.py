@@ -45,6 +45,7 @@ fileExtensions = {
     'jpeg' : {'input': ['jpg', 'jpeg'], 'output': 'jpg'},
     'png'  : {'input': ['png', 'lily.png', 'lilypond.png'], 'output': 'png'},
     'pdf'  : {'input': ['pdf', 'lily.pdf', 'lilypond.pdf'], 'output': 'pdf'},
+    'svg'  : {'input': ['svg', 'lily.svg', 'lilypond.svg'], 'output': 'svg'},
     'pickle' : {'input': ['p', 'pickle'], 'output': 'p'},
     'romantext' : {'input': ['rntxt', 'rntext', 'romantext', 'rtxt'], 'output': 'rntxt'},
     'scala' : {'input': ['scl'], 'output': 'scl'},
@@ -74,8 +75,8 @@ DEBUG_DEVEL = 63
 DEBUG_ALL = 255
 
 # used for checking preferences, and for setting environment variables
-VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'lily.pdf', 'lily.png', 'braille']
-VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'lily.pdf', 'lily.png', 'braille']
+VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'svg', 'lily.pdf', 'lily.png', 'lily.svg', 'braille']
+VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'svg', 'lily.pdf', 'lily.png', 'lily.svg', 'braille']
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
 

@@ -565,11 +565,15 @@ def _updateMetadataBundle():
 
 
 def search(query, field=None, domain=['core', 'virtual'], extList=None):
-    '''Search all stored metadata and return a list of file paths; to return a list of parsed Streams, use searchParse(). 
+    '''Search all stored metadata and return a list of file paths; to 
+    return a list of parsed Streams, use searchParse(). 
 
-    The `domain` parameter can be used to specify one of three corpora: core (included with music21), virtual (defined in music21 but hosted online), and local (hosted on the user's system). 
+    The `domain` parameter can be used to specify one of three corpora: 
+    core (included with music21), virtual (defined in music21 but hosted 
+    online), and local (hosted on the user's system (not yet implemented)). 
 
-    This method uses stored metadata and thus, on first usage, will incur a performance penalty during metadata loading.
+    This method uses stored metadata and thus, on first usage, will 
+    incur a performance penalty during metadata loading.
     '''
     post = []
     _updateMetadataBundle()

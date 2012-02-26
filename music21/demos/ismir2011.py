@@ -339,16 +339,18 @@ def fbFeatureExtraction():
     #[0.0, 0.5, 1.0, 0.0, 0.6000000000000001, 0.0, 0.4, 0.2, 0.0, 0.7000000000000001, 0.0, 0.1]
     # exampleFBOut.show()
 
-#testTrecentoSimpler()
-#prepareTrecentoCadences()
-#figuredBassScale()
-#fbFeatureExtraction()
-#testChinaEuropeSimpler()
-
-#prepareChinaEurope2()
-#testDataSet()
-#testFictaFeature()
-#example2()
+if __name__ == '__main__':
+    pass
+    #testTrecentoSimpler()
+    #prepareTrecentoCadences()
+    #figuredBassScale()
+    #fbFeatureExtraction()
+    #testChinaEuropeSimpler()
+    
+    #prepareChinaEurope2()
+    #testDataSet()
+    #testFictaFeature()
+    #example2()
 
 
 #------------------------------------------------------------------------------
