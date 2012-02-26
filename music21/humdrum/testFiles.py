@@ -73,6 +73,34 @@ splitSpines =  re.sub("\s\s\s\s+", "\t", \
 '''
 )
 
+splitSpines2 =  re.sub("\s\s\s\s+", "\t", \
+'''
+**kern
+*staff1
+*clefG2
+*M2/4
+=1
+4d
+4d
+=2
+2d
+=3
+*^
+4c    4a
+4c    4a
+=4    =4
+2c    2a
+=5    =5
+*v    *v
+4d
+4d
+=6
+2d
+==
+*-
+'''
+)
+
 
   
 schubert = re.sub("\s\s\s\s", "\t", \

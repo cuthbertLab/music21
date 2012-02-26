@@ -8379,10 +8379,10 @@ class Stream(music21.Music21Object):
 
         >>> from music21 import corpus
         >>> a = corpus.parse('bach/bwv324.xml')
-        >>> voiceOnePitches = a.parts[0].pitches
-        >>> len(voiceOnePitches)
+        >>> partOnePitches = a.parts[0].pitches
+        >>> len(partOnePitches)
         25
-        >>> voiceOnePitches[0:10]
+        >>> partOnePitches[0:10]
         [B4, D5, B4, B4, B4, B4, C5, B4, A4, A4]
 
         
@@ -8390,7 +8390,7 @@ class Stream(music21.Music21Object):
         objects, not text:
 
         
-        >>> voiceOnePitches[0].octave
+        >>> partOnePitches[0].octave
         4
         
 
