@@ -21,6 +21,25 @@ simply want to call:
 
 The methods in here are documented for developers wishing to expand
 music21's ability to parse humdrum.
+
+SpineParsing consists of several steps.
+
+* The data file is read in and all events are sliced horizontally (EventCollections) and vertically (Protospines)
+* Protospines are parsed into HumdrumSpines by following Spine Path Indicators (*^ and *v especially)
+    Protospines that separate become new Protospines with their parentSpine indicated.  Protospines
+    that merge again then followed by the same Protospine as before.  This will cause problems if
+    a voice remerges with another staff, but in practice I have not seen a .krn file that does this and
+    should be avoided in any case.
+* HumdrumSpines are reclassed according to their exclusive definition.  **kern becomes KernSpines, etc.
+* All reclassed HumdrumSpines are filled with music21 objects in their .stream property.  
+    Measures are put into the spine but are empty containers.  The resulting HumdrumSpine.stream objects
+    look like Stream.semiFlat versions in many ways.
+* For HumdrumSpines with parent spines their .stream contents are then inserted into their parent spines with
+    voice tagged as a music21 Group property.
+* Lyrics and Dynamics [NOT DONE] are placed into their corresponding HumdrumSpine.stream objects
+* Stream elements are moved into their measures within a Stream
+* Measures are searched for elements with voice groups and Voice objects are created
+
 '''
 
 import copy
@@ -495,7 +514,7 @@ class HumdrumDataCollection(object):
             for thisSpine in self.spineCollection:
                 thisSpine.stream.id = "spine_" + str(thisSpine.id)
             for thisSpine in self.spineCollection:
-                if thisSpine.parentSpine is None:
+                if thisSpine.parentSpine is None and thisSpine.spineType == 'kern':
                     masterStream.insert(thisSpine.stream)
             return masterStream
 
@@ -948,12 +967,26 @@ class HumdrumSpine(object):
         as ElementWrappers.  Should be overridden in
         specific Spine subclasses.
         '''
+        lastContainer = hdStringToMeasure('=0')
+
         for event in self.eventList:
             eventC = str(event.contents)
+            thisObject = None
             if eventC == ".":
                 pass
+            elif eventC.startswith('*'):
+                ## control processing
+                if eventC not in spinePathIndicators:
+                    thisObject = MiscTandam(eventC)
+            elif eventC.startswith('='):
+                lastContainer  = hdStringToMeasure(eventC, lastContainer)
+                thisObject = lastContainer
             else:
-                self.stream.append(music21.base.ElementWrapper(event))
+                thisObject = music21.base.ElementWrapper(event)
+                thisObject.humdrumPosition = event.position
+            
+            if thisObject is not None:
+                self.stream.append(thisObject)
 
 class KernSpine(HumdrumSpine):
     '''
@@ -1039,6 +1072,7 @@ class KernSpine(HumdrumSpine):
             if thisObject is not None:
                 thisObject.humdrumPosition = event.position
                 thisObject.humdrumSpineId  = event.spineId                
+                thisObject.priority = event.position
                 self.stream.append(thisObject)
                 
         #if len(thisContainer.getElementsNotOfClass(bar.Barline)) > 0:
@@ -1250,6 +1284,32 @@ class SpineCollection(object):
                 return thisSpine
         raise HumdrumException("Could not find a Spine with that ID")
 
+    def removeSpineById(self, id):
+        '''
+        deletes a spine from the SpineCollection (after inserting, integrating, etc.)
+
+        >>> hsc = music21.humdrum.spineParser.SpineCollection()
+        >>> newSpine = hsc.addSpine()
+        >>> newSpine.id
+        0
+        >>> newSpine2 = hsc.addSpine()
+        >>> newSpine2.id
+        1
+        >>> hsc.spines
+        [Spine: 0, Spine: 1]
+        >>> hsc.removeSpineById(newSpine.id)
+        >>> hsc.spines
+        [Spine: 1]
+
+        raises a HumdrumException if the spine with a given id is not found
+        '''
+        for s in self.spines:
+            if s.id == id:
+                self.spines.remove(s)
+                return None
+        raise HumdrumException("Could not find a Spine with that ID %d" % id)
+
+
 
     def createMusic21Streams(self):
         
@@ -1257,6 +1317,7 @@ class SpineCollection(object):
         self.parseMusic21()
         self.performInsertions()
         self.moveObjectsToMeasures()
+        self.moveDynamicsAndLyricsToStreams()
         self.makeVoices()
 
     def performInsertions(self):
@@ -1265,6 +1326,7 @@ class SpineCollection(object):
         subspines and put them in their proper location
         '''
         for s in self.spines:
+            removeSpines = []
             if s.parentSpine is None:
                 if s.childSpines != []:
                     newStream = s.stream.__class__()
@@ -1277,18 +1339,23 @@ class SpineCollection(object):
                                 if lastHumdrumPosition < i and humdrumPosition > i:
                                     startPoint = newStream.highestTime
                                     childrenToInsert = s.childSpineInsertPoints[i]
+                                    insertPoints.remove(i)
                                     voiceNumber = 0
                                     for insertSpine in childrenToInsert:
+                                        removeSpines.append(insertSpine.id)
                                         voiceNumber += 1
                                         for insertEl in insertSpine.stream:
                                             if 'Measure' in insertEl.classes and insertSpine.isFirstVoice is False:
-                                                pass
+                                                pass # only insert one measure object per spine
                                             else:
                                                 insertEl.groups.append('voice' + str(voiceNumber))
                                                 newStream.insert(startPoint + insertEl.offset, insertEl)
                             lastHumdrumPosition = humdrumPosition
                         newStream.append(el) 
                     s.stream = newStream
+            #for removeMe in removeSpines:
+            #    #needed for some tests
+            #    self.removeSpineById(removeMe)
                     
     def reclassSpines(self):
         '''
@@ -1322,6 +1389,56 @@ class SpineCollection(object):
                 thisSpine.stream = thisSpine.moveElementsIntoMeasures(thisSpine.stream)
                 thisSpine.measuresMoved = True
 
+    def moveDynamicsAndLyricsToStreams(self):
+        '''
+        move **dynam and **lyrics/**text information to the appropriate staff.
+
+        Assumes that *staff is consistent through the spine.
+        '''
+        kernStreams = {}
+        for thisSpine in self.spines:
+            if thisSpine.parentSpine == None:
+                if thisSpine.spineType == 'kern':    
+                    for tandam in thisSpine.stream.getElementsByClass('MiscTandam'):
+                        if tandam.tandam.startswith('*staff'):
+                            staffInfo = int(tandam.tandam[6:]) # single staff
+                            kernStreams[staffInfo] = thisSpine.stream
+                            break
+        for thisSpine in self.spines:
+            if thisSpine.parentSpine == None:
+                if thisSpine.spineType != 'kern':    
+                    stavesAppliedTo = []
+                    prioritiesToSearch = {}
+                    for tandam in thisSpine.stream.flat.getElementsByClass('MiscTandam'):
+                        if tandam.tandam.startswith('*staff'):
+                            staffInfo = tandam.tandam[6:] # could be multiple staves
+                            stavesAppliedTo = [int(x) for x in staffInfo.split('/')]
+                            break
+                    if thisSpine.spineType == 'dynam':
+                        for dynamic in thisSpine.stream.flat:
+                            if 'Dynamic' in dynamic.classes:
+                                prioritiesToSearch[dynamic.humdrumPosition] = dynamic
+                        for applyStaff in stavesAppliedTo:
+                            applyStream = kernStreams[applyStaff]
+                            for el in applyStream.recurse():
+                                if el.priority in prioritiesToSearch:
+                                    try:
+                                        el.activeSite.insert(el.offset, prioritiesToSearch[el.priority])
+                                    except music21.stream.StreamException: # may appear twice because of voices...
+                                        pass
+                                        #el.activeSite.insert(el.offset, copy.deepcopy(prioritiesToSearch[el.priority]))
+                    elif thisSpine.spineType == 'lyrics' or thisSpine.spineType == 'text':
+                        for text in thisSpine.stream.flat:
+                            if 'ElementWrapper' in text.classes:
+                                prioritiesToSearch[text.humdrumPosition] = text.obj
+                        for applyStaff in stavesAppliedTo:
+                            applyStream = kernStreams[applyStaff]
+                            for el in applyStream.recurse():
+                                if el.priority in prioritiesToSearch:
+                                    lyric = prioritiesToSearch[el.priority].contents
+                                    el.lyric = lyric
+                        
+        
     def makeVoices(self):
         '''
         make voices for each kernSpine -- why not just run
@@ -1970,9 +2087,14 @@ class Test(unittest.TestCase):
         masterStream = hf1.stream
         #masterStream.show('text')
         
+    def testMoveDynamics(self):
+        hf1 = HumdrumDataCollection(testFiles.fakeTest)
+        #hf1.parseLines()
+        #hf1.spineCollection.moveDynamicsAndLyricsToStreams()        
+        s = hf1.stream #.show()
     
 if __name__ == "__main__":
-    #Test().testSplitSpines()
+    #Test().testMoveDynamics()
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
