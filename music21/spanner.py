@@ -1272,17 +1272,17 @@ class OctaveShift(Spanner):
 
 
 
-class BracketLine(Spanner):
-    '''A bracket represented as a spanner between two Notes. 
+class Line(Spanner):
+    '''A line or bracket represented as a spanner above two Notes. 
 
     Brackets can take many line types. 
 
     >>> from music21 import *
-    >>> b = spanner.BracketLine()
+    >>> b = spanner.Line()
     >>> b.lineType = 'dotted'
     >>> b.lineType
     'dotted'
-    >>> b = spanner.BracketLine(endLength=20)
+    >>> b = spanner.Line(endLength=20)
     >>> b.endLength 
     20
 
@@ -1305,9 +1305,8 @@ class BracketLine(Spanner):
 
     def __repr__(self):
         msg = Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.spanner.BracketLine ')
+        msg = msg.replace(self._reprHead, '<music21.spanner.Line ')
         return msg
-
 
     def _getLineEnd(self):
         return self._lineEnd
@@ -1334,7 +1333,6 @@ class BracketLine(Spanner):
         Get or set the lineType property.
         ''')
 
-
     def _getEndLength(self):
         return self._endLength
 
@@ -1353,6 +1351,8 @@ class BracketLine(Spanner):
         ''' 
         post = {}
         post['type'] = 'start'
+        post['line-end'] = self._getLineEnd()
+        post['end-length'] = self._getEndLength()
         return post
 
     def getEndParameters(self):
@@ -1360,26 +1360,9 @@ class BracketLine(Spanner):
         ''' 
         post = {}
         post['type'] = 'stop' # always stop
+        post['line-end'] = self._getLineEnd()
+        post['end-length'] = self._getEndLength()
         return post
-
-
-class WavyLine(Spanner):
-    '''A wavy represented as a spanner between two Notes. 
-
-    The `idLocal` attribute, defined in the Spanner base class, is used to mark start and end tags of potentially overlapping indicators.
-    '''
-    # musicxml defines a start, stop, and a continue; will try to avoid continue
-    # note that this always includes a trill symbol
-    def __init__(self, *arguments, **keywords):
-        Spanner.__init__(self, *arguments, **keywords)
-        self.placement = None # can above or below, after musicxml
-    
-    # TODO: add property for placement
-
-    def __repr__(self):
-        msg = Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.spanner.WavyLine ')
-        return msg
 
 
 class GlissandoLine(Spanner):
@@ -1898,31 +1881,6 @@ class Test(unittest.TestCase):
 
 
 
-    def testWavyLineA(self):
-        '''Test basic wave line creation and output, as well as passing
-        objects through make measure calls. 
-        '''
-        from music21 import stream, note, spanner, chord
-        s = stream.Stream()
-        s.repeatAppend(note.Note(), 12)
-        n1 = s.notes[0]
-        n2 = s.notes[-1]
-        sp1 = spanner.WavyLine(n1, n2)
-        s.append(sp1)
-        raw = s.musicxml
-        self.assertEqual(raw.count('wavy-line'), 2)
-
-        s = stream.Stream()
-        s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
-        n1 = s.notes[0]
-        n2 = s.notes[-1]
-        sp1 = spanner.WavyLine(n1, n2)
-        s.append(sp1)
-        raw = s.musicxml
-        #s.show()
-        self.assertEqual(raw.count('wavy-line'), 2)
-
-
     def testOctaveShiftA(self):
         '''Test basic octave shift creation and output, as well as passing
         objects through make measure calls. 
@@ -1979,8 +1937,8 @@ class Test(unittest.TestCase):
         n1 = s.notes[0]
         n2 = s.notes[len(s.notes) / 2]
         n3 = s.notes[-1]
-        sp1 = spanner.BracketLine(n1, n2, lineEnd='up', lineType='dotted')
-        sp2 = spanner.BracketLine(n2, n3, lineEnd='down', lineType='dashed',
+        sp1 = spanner.Line(n1, n2, lineEnd='up', lineType='dotted')
+        sp2 = spanner.Line(n2, n3, lineEnd='down', lineType='dashed',
                                     endLength=40)
         s.append(sp1)
         s.append(sp2)
