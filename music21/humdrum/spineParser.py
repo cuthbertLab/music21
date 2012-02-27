@@ -965,6 +965,7 @@ class KernSpine(HumdrumSpine):
         lastContainer = hdStringToMeasure('=0')
         inTuplet = False
         lastNote = None
+        currentBeamNumbers = 0
         
         for event in self.eventList:
             eventC = str(event.contents)  # is str already; just for Eclipse completion
@@ -988,9 +989,23 @@ class KernSpine(HumdrumSpine):
                 notesToProcess = eventC.split()
                 chordNotes = []
                 for noteToProcess in notesToProcess:
-                    chordNotes.append(hdStringToNote(noteToProcess))
+                    thisNote = hdStringToNote(noteToProcess)
+                    chordNotes.append(thisNote)
                 thisObject = music21.chord.Chord(chordNotes)
                 thisObject.duration = chordNotes[0].duration
+                thisObject.beams = chordNotes[-1].beams
+
+                if hasattr(thisObject, 'beams'):
+                    if currentBeamNumbers != 0 and len(thisObject.beams.beamsList) == 0:
+                        for i in range(currentBeamNumbers):
+                            thisObject.beams.append('continue')
+                    elif len(thisObject.beams.beamsList) > 0:
+                        if thisObject.beams.beamsList[0].type == 'stop':
+                            currentBeamNumbers = 0
+                        else:
+                            for i in range(len(thisObject.beams.beamsList)):
+                                if thisObject.beams.beamsList[i].type != 'stop':
+                                    currentBeamNumbers += 1
 
                 if inTuplet is False and len(thisObject.duration.tuplets) > 0:
                     inTuplet = True
@@ -1002,6 +1017,17 @@ class KernSpine(HumdrumSpine):
 
             else:
                 thisObject = hdStringToNote(eventC)
+                if hasattr(thisObject, 'beams'):
+                    if currentBeamNumbers != 0 and len(thisObject.beams.beamsList) == 0:
+                        for i in range(currentBeamNumbers):
+                            thisObject.beams.append('continue')
+                    elif len(thisObject.beams.beamsList) > 0:
+                        if thisObject.beams.beamsList[0].type == 'stop':
+                            currentBeamNumbers = 0
+                        else:
+                            for i in range(len(thisObject.beams.beamsList)):
+                                if thisObject.beams.beamsList[i].type != 'stop':
+                                    currentBeamNumbers += 1
                 if inTuplet is False and len(thisObject.duration.tuplets) > 0:
                     inTuplet = True
                     thisObject.duration.tuplets[0].type = 'start'
