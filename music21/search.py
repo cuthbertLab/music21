@@ -12,6 +12,7 @@
 Methods and Classes useful in searching among repertories.
 '''
 
+import copy
 import difflib
 import math
 import unittest, doctest
@@ -455,6 +456,78 @@ def translateDurationToBytes(n):
     secondByte = chr(duration1to127)
     return secondByte
 
+def mostCommonMeasureRythms(streamIn, transposeDiatonic = False):
+    '''
+    returns a sorted list of dictionaries 
+    of the most common rhythms in a stream where
+    each dictionary contains:
+    
+    number: the number of times a rhythm appears
+    rhythm: the rhythm found (with the pitches of the first instance of the rhythm transposed to C5)
+    measures: a list of measures containing the rhythm
+    rhythmString: a string representation of the rhythm (see translateStreamToStringOnlyRhythm)
+
+    >>> from music21 import *
+    >>> bach = corpus.parse('bwv1.6')
+    >>> sortedRhythms = search.mostCommonMeasureRythms(bach)
+    >>> for dict in sortedRhythms[0:3]:
+    ...     print 'no:', dict['number'], 'rhythmString:', dict['rhythmString']
+    ...     print '  bars:', [(m.number, str(m.getContextByClass('Part').id)) for m in dict['measures']]
+    ...     dict['rhythm'].show('text')
+    ...     print '-----'
+    no: 34 rhythmString: PPPP
+      bars: [(1, 'Soprano'), (1, 'Alto'), (1, 'Tenor'), (1, 'Bass'), (2, 'Soprano'), ..., (19, 'Soprano')]
+    {0.0} <music21.note.Note C>
+    {1.0} <music21.note.Note A>
+    {2.0} <music21.note.Note F>
+    {3.0} <music21.note.Note C>
+    -----
+    no: 7 rhythmString: ZZ
+      bars: [(13, 'Soprano'), (13, 'Alto'), ..., (14, 'Bass')]
+    {0.0} <music21.note.Note C>
+    {2.0} <music21.note.Note A>
+    -----
+    no: 6 rhythmString: ZPP
+      bars: [(6, 'Soprano'), (6, 'Bass'), ..., (18, 'Tenor')]
+    {0.0} <music21.note.Note C>
+    {2.0} <music21.note.Note B->
+    {3.0} <music21.note.Note B->
+    -----
+    '''
+    returnDicts = []
+    for thisMeasure in streamIn.semiFlat.getElementsByClass('Measure'):
+        rhythmString = translateStreamToStringOnlyRhythm(thisMeasure.notesAndRests)
+        rhythmFound = False
+        for entry in returnDicts:
+            if entry['rhythmString'] == rhythmString:
+                rhythmFound = True
+                entry['number'] += 1
+                entry['measures'].append(thisMeasure)
+                break
+        if rhythmFound == False:
+            newDict = {}
+            newDict['number'] = 1
+            newDict['rhythmString'] = rhythmString
+            measureNotes = thisMeasure.notes
+            foundNote = False
+            for i in range(len(measureNotes)):
+                if 'Note' in measureNotes[i].classes:
+                    distanceToTranspose = 72 - measureNotes[0].ps
+                    foundNote = True
+                    break
+            if foundNote == True:
+                thisMeasureCopy = copy.deepcopy(thisMeasure)
+                for n in thisMeasureCopy.notes:
+                    # TODO: Transpose Diatonic
+                    n.transpose(distanceToTranspose, inPlace=True)
+                newDict['rhythm'] = thisMeasureCopy
+            else:
+                newDict['rhythm'] = thisMeasure
+            newDict['measures'] = [thisMeasure]
+            returnDicts.append(newDict)
+    
+    sortedDicts = sorted(returnDicts, key=lambda k: k['number'], reverse=True)
+    return sortedDicts
 
 class SearchException(music21.Music21Exception):
     pass
