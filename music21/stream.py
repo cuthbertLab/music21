@@ -17772,7 +17772,29 @@ class Test(unittest.TestCase):
         sPost.append(r)
 
 
+    def testSplitAtQuarterLengthB(self):
+        '''Test if recursive calls work over voices in a Measure
+        '''
+        from music21 import stream, note
+        m1 = stream.Measure()
+        v1 = stream.Voice()
+        v1.repeatAppend(note.Note('g4', quarterLength=2), 3)
+        v2 = stream.Voice()
+        v2.repeatAppend(note.Note(quarterLength=6), 1)
+        m1.insert(0, v1)
+        m1.insert(0, v2)
 
+        #m1.show()
+        mLeft, mRight = m1.splitAtQuarterLength(3)
+        self.assertEqual(len(mLeft.flat.notes), 3)
+        self.assertEqual(len(mLeft.voices), 2)
+        self.assertEqual(len(mRight.flat.notes), 3)
+        self.assertEqual(len(mRight.voices), 2)
+
+        sPost = stream.Stream()
+        sPost.append(mLeft)
+        sPost.append(mRight)
+        #sPost.show()
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
