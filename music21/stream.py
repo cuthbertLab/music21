@@ -1726,28 +1726,6 @@ class Stream(music21.Music21Object):
 
         
 
-#     def isClass(self, className):
-#         '''Returns true if the Stream or Stream Subclass is a particular class or subclasses that class.
-# 
-#         Used by getElementsByClass in Stream
-# 
-#         >>> from music21 import *
-#         >>> a = stream.Stream()
-#         >>> a.isClass(note.Note)
-#         False
-#         >>> a.isClass(stream.Stream)
-#         True
-#         >>> b = stream.Measure()
-#         >>> b.isClass(stream.Measure)
-#         True
-#         >>> b.isClass(stream.Stream)
-#         True
-#         '''
-#         ## same as Music21Object.isClass, not ElementWrapper.isClass
-#         if isinstance(self, className):
-#             return True
-#         else:
-#             return False
 
 
     #---------------------------------------------------------------------------
@@ -1797,6 +1775,59 @@ class Stream(music21.Music21Object):
                 site.replace(target, replacement, firstMatchOnly=firstMatchOnly)
 
 
+
+
+    def splitAtQuarterLength(self, quarterLength, retainOrigin=True, 
+        addTies=True, displayTiedAccidentals=False, delta=1e-06):
+        '''This method overrides the method on Music21Object to provide similar functionality for Streams. Most arguments are passed to Music21Object.splitAtQuarterLength.
+        '''
+        if retainOrigin == True:
+            sLeft = self
+        else:
+            sLeft = copy.deepcopy(self)
+        # create empty container for right-hand side
+        sRight = self.__class__()
+
+        if (quarterLength > sLeft.highestTime): # nothing to doc    
+            return sLeft, sRight
+
+        # use quarterLength as start time
+        targets = sLeft.getElementsByOffset(quarterLength, sLeft.highestTime,     
+            includeEndBoundary=True, mustFinishInSpan=False, 
+            mustBeginInSpan=False)
+    
+        targetSplit = []
+        targetMove = []
+        # find all those that need to split v. those that need to be movewd
+        for t in targets:
+            # if target starts before the boundary, it needs to be split
+            if common.lessThan(t.getOffsetBySite(sLeft), quarterLength, 
+                grain=delta):
+                targetSplit.append(t)
+            else:
+                targetMove.append(t)
+
+        environLocal.pd(['split', targetSplit, 'move', targetMove])
+
+        for t in targetSplit:
+            # must retain origina, as a deepcopy, if necessary, has
+            # already been made
+            
+            # the split point needs to be relative to this element's start
+            qlSplit = quarterLength - t.getOffsetBySite(sLeft)
+            eLeft, eRight = t.splitAtQuarterLength(qlSplit,     
+                retainOrigin=True, addTies=addTies, 
+                displayTiedAccidentals=displayTiedAccidentals, delta=delta)
+            # do not need to insert eLeft, as already positioned and
+            # altered in-place above
+            # it is assumed that anything cut will start at zero
+            sRight.insert(0, eRight)
+
+        for t in targetMove:
+            sRight.insert(t.getOffsetBySite(sLeft) - quarterLength, t)
+            sLeft.remove(t)
+
+        return sLeft, sRight
 
     #---------------------------------------------------------------------------
     def _recurseRepr(self, thisStream, prefixSpaces=0, 
@@ -17720,6 +17751,25 @@ class Test(unittest.TestCase):
             sFlatVoiced.flat.notes.highestTime)
         self.assertEqual(len(sFlatVoiced.voices), 4)
 
+
+    def testSplitAtQuarterLengthA(self):
+        from music21 import stream
+        s = stream.Measure()
+        s.append(note.Note('a', quarterLength=1))
+        s.append(note.Note('b', quarterLength=2))
+        s.append(note.Note('c', quarterLength=1))
+
+        l, r = s.splitAtQuarterLength(2, retainOrigin=True)
+        # if retain origin is true, l is the original
+        self.assertEqual(l, s)
+        self.assertEqual(l.highestTime, 2)
+        self.assertEqual(len(l.notes), 2)
+        self.assertEqual(r.highestTime, 2)
+        self.assertEqual(len(r.notes), 2)
+        
+        sPost = stream.Stream()
+        sPost.append(l)
+        sPost.append(r)
 
 
 

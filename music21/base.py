@@ -3449,10 +3449,8 @@ class Music21Object(JSONSerializer):
                         # keep continue if already set
                 else:
                     component.tie = tie.Tie('start') # need a tie object
-    
                 remainComponent.tie = tie.Tie(forceEndTieType)
             
-    
         # hide accidentals on tied notes where previous note
         # had an accidental that was shown
         if hasattr(e, 'accidental') and e.accidental != None:

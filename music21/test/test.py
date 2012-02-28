@@ -92,9 +92,7 @@ class ModuleGather(object):
                     break
             if skip:
                 continue
-
             name = self._getName(fp)
-
             try:
                 #environLocal.printDebug(['import:', fp]) 
                 mod = imp.load_source(name, fp)
@@ -102,7 +100,6 @@ class ModuleGather(object):
                 environLocal.printDebug(['failed import:', fp, '\n', 
                     '\tEXCEPTION:', str(excp).strip()])
                 continue
-
             if restoreEnvironmentDefaults:
                 if hasattr(mod, 'environLocal'):
                     mod.environLocal.restoreDefaults()
