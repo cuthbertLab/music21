@@ -1282,42 +1282,63 @@ class Line(Spanner):
     >>> b.lineType = 'dotted'
     >>> b.lineType
     'dotted'
-    >>> b = spanner.Line(endLength=20)
-    >>> b.endLength 
+    >>> b = spanner.Line(endHeight=20)
+    >>> b.endHeight 
     20
 
     '''
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
 
-        self._lineEnd = None # can ne up/down/arrow/both/None
-        self._endLength = None # for up/down, specified in tenths
-        self._lineType = 'solid' # can be solid, dashed, dotter, wavy
+        self._endTick = 'down' # can ne up/down/arrow/both/None
+        self._startTick = 'down' # can ne up/down/arrow/both/None
 
+        self._endHeight = None # for up/down, specified in tenths
+        self._startHeight = None # for up/down, specified in tenths
+
+        self._lineType = 'solid' # can be solid, dashed, dotter, wavy
         self.placement = 'above' # can above or below, after musicxml
         
         if 'lineType' in keywords.keys():
             self.lineType = keywords['lineType'] # use property
-        if 'lineEnd' in keywords.keys():
-            self.lineEnd = keywords['lineEnd'] # use property
-        if 'endLength' in keywords.keys():
-            self.endLength = keywords['endLength'] # use property
+
+        if 'startTick' in keywords.keys():
+            self.startTick = keywords['startTick'] # use property
+        if 'endTick' in keywords.keys():
+            self.endTick = keywords['endTick'] # use property
+
+        if 'endHeight' in keywords.keys():
+            self.endHeight = keywords['endHeight'] # use property
+        if 'startHeight' in keywords.keys():
+            self.startHeight = keywords['startHeight'] # use property
 
     def __repr__(self):
         msg = Spanner.__repr__(self)
         msg = msg.replace(self._reprHead, '<music21.spanner.Line ')
         return msg
 
-    def _getLineEnd(self):
-        return self._lineEnd
+    def _getEndTick(self):
+        return self._endTick
 
-    def _setLineEnd(self, value):
-        if value.lower() not in ['up', 'down', 'arrow', 'both']:
+    def _setEndTick(self, value):
+        if value.lower() not in ['up', 'down', 'arrow', 'both', 'none']:
             raise SpannerException('not a valid value: %s' % value)
-        self._lineEnd = value.lower()
+        self._endTick = value.lower()
 
-    lineEnd = property(_getLineEnd, _setLineEnd, doc='''
-        Get or set the lineEnd property.
+    endTick = property(_getEndTick, _setEndTick, doc='''
+        Get or set the endTick property.
+        ''')
+
+    def _getStartTick(self):
+        return self._startTick
+
+    def _setStartTick(self, value):
+        if value.lower() not in ['up', 'down', 'arrow', 'both', 'none']:
+            raise SpannerException('not a valid value: %s' % value)
+        self._startTick = value.lower()
+
+    startTick = property(_getStartTick, _setStartTick, doc='''
+        Get or set the startTick property.
         ''')
 
 
@@ -1333,16 +1354,29 @@ class Line(Spanner):
         Get or set the lineType property.
         ''')
 
-    def _getEndLength(self):
-        return self._endLength
+    def _getEndHeight(self):
+        return self._endHeight
 
-    def _setEndLength(self, value):
+    def _setEndHeight(self, value):
         if not common.isNum(value) and value >= 0:
             raise SpannerException('not a valid value: %s' % value)
-        self._endLength = value
+        self._endHeight = value
 
-    endLength = property(_getEndLength, _setEndLength, doc='''
-        Get or set the endLength property.
+    endHeight = property(_getEndHeight, _setEndHeight, doc='''
+        Get or set the endHeight property.
+        ''')
+
+
+    def _getStartHeight(self):
+        return self._startHeight
+
+    def _setStartHeight(self, value):
+        if not common.isNum(value) and value >= 0:
+            raise SpannerException('not a valid value: %s' % value)
+        self._startHeight = value
+
+    startHeight = property(_getStartHeight, _setStartHeight, doc='''
+        Get or set the startHeight property.
         ''')
 
 
@@ -1351,8 +1385,8 @@ class Line(Spanner):
         ''' 
         post = {}
         post['type'] = 'start'
-        post['line-end'] = self._getLineEnd()
-        post['end-length'] = self._getEndLength()
+        post['line-end'] = self._getStartTick()
+        post['end-length'] = self._getStartHeight()
         return post
 
     def getEndParameters(self):
@@ -1360,8 +1394,8 @@ class Line(Spanner):
         ''' 
         post = {}
         post['type'] = 'stop' # always stop
-        post['line-end'] = self._getLineEnd()
-        post['end-length'] = self._getEndLength()
+        post['line-end'] = self._getEndTick()
+        post['end-length'] = self._getEndHeight()
         return post
 
 
@@ -1930,21 +1964,46 @@ class Test(unittest.TestCase):
         #self.assertEqual(raw.count('octave-shift'), 2)
         
 
-    def testBracketA(self):
+    def testLineA(self):
         from music21 import stream, note, spanner, chord, dynamics
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
         n1 = s.notes[0]
         n2 = s.notes[len(s.notes) / 2]
         n3 = s.notes[-1]
-        sp1 = spanner.Line(n1, n2, lineEnd='up', lineType='dotted')
-        sp2 = spanner.Line(n2, n3, lineEnd='down', lineType='dashed',
-                                    endLength=40)
+        sp1 = spanner.Line(n1, n2, startTick='up', lineType='dotted')
+        sp2 = spanner.Line(n2, n3, startTick='down', lineType='dashed',
+                                    endHeight=40)
         s.append(sp1)
         s.append(sp2)
         #s.show()
         raw = s.musicxml
         self.assertEqual(raw.count('<bracket'), 4)
+
+
+    def testLineB(self):
+        from music21 import stream, note, spanner, chord, dynamics
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 12)
+        n1 = s.notes[4]
+        n2 = s.notes[-1]
+
+        n3 = s.notes[0]
+        n4 = s.notes[2]
+
+        sp1 = spanner.Line(n1, n2, startTick='up', endTick='down', lineType='solid')
+        sp2 = spanner.Line(n3, n4, startTick='arrow', endTick='none', lineType='solid')
+
+        s.append(sp1)
+        s.append(sp2)
+
+        #s.show()
+        raw = s.musicxml
+        self.assertEqual(raw.count('<bracket'), 4)
+        self.assertEqual(raw.count('line-end="arrow"'), 1)
+        self.assertEqual(raw.count('line-end="none"'), 1)
+        self.assertEqual(raw.count('line-end="up"'), 1)
+        self.assertEqual(raw.count('line-end="down"'), 1)
 
 
     def testGlissandoA(self):
