@@ -1306,6 +1306,8 @@ class Line(Spanner):
             self.startTick = keywords['startTick'] # use property
         if 'endTick' in keywords.keys():
             self.endTick = keywords['endTick'] # use property
+        if 'tick' in keywords.keys():
+            self.tick = keywords['tick'] # use property
 
         if 'endHeight' in keywords.keys():
             self.endHeight = keywords['endHeight'] # use property
@@ -1339,6 +1341,28 @@ class Line(Spanner):
 
     startTick = property(_getStartTick, _setStartTick, doc='''
         Get or set the startTick property.
+        ''')
+
+
+    def _getTick(self):
+        return self._startTick # just returning start
+
+    def _setTick(self, value):
+        if value.lower() not in ['up', 'down', 'arrow', 'both', 'none']:
+            raise SpannerException('not a valid value: %s' % value)
+        self._startTick = value.lower()
+        self._endTick = value.lower()
+
+    tick = property(_getTick, _setTick, doc='''
+        Set the start and end tick to the same value
+
+        >>> from music21 import *
+        >>> b = spanner.Line()
+        >>> b.tick = 'arrow'
+        >>> b.startTick
+        'arrow'
+        >>> b.endTick
+        'arrow'
         ''')
 
 
