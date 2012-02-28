@@ -1423,15 +1423,20 @@ class Line(Spanner):
         return post
 
 
-class GlissandoLine(Spanner):
-    '''A wavy represented as a spanner between two Notes. 
+class Glissando(Spanner):
+    '''A between two Notes specifying a glissando or similar alteration. Different line types can be specified. 
+
     '''
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
 
-        self.lineType = 'solid'
+        self._lineType = 'wavy'
+        self._label = None
+
         if 'lineType' in keywords.keys():
             self.lineType = keywords['lineType'] # use property
+        if 'label' in keywords.keys(): 
+            self.label = keywords['label'] # use property
 
     def __repr__(self):
         msg = Spanner.__repr__(self)
@@ -1450,6 +1455,16 @@ class GlissandoLine(Spanner):
         Get or set the lineType property.
         ''')
 
+
+    def _getLabel(self):
+        return self._label
+
+    def _setLabel(self, value):
+        self._label = value
+
+    label = property(_getLabel, _setLabel, doc='''
+        Get or set the label property.
+        ''')
 
 
 class DashedLine(Spanner):
@@ -2042,14 +2057,38 @@ class Test(unittest.TestCase):
         n1 = s.notes[0]
         n2 = s.notes[len(s.notes) / 2]
         n3 = s.notes[-1]
-        sp1 = spanner.GlissandoLine(n1, n2)
-        sp2 = spanner.GlissandoLine(n2, n3)
+        sp1 = spanner.Glissando(n1, n2)
+        sp2 = spanner.Glissando(n2, n3)
+        sp2.lineType = 'dashed'
         s.append(sp1)
         s.append(sp2)
         #s.show()
         raw = s.musicxml
         self.assertEqual(raw.count('<glissando'), 4)
-        
+        self.assertEqual(raw.count('line-type="dashed"'), 2)        
+
+
+    def testGlissandoB(self):
+        from music21 import stream, note, spanner, chord, dynamics
+        s = stream.Stream()
+        s.repeatAppend(note.Note(), 12)
+        for i, n in enumerate(s.notes):
+            n.transpose(i + (i%2*12), inPlace=True)
+
+        # note: this does not suppor glissandi between non-adjacent notes
+        n1 = s.notes[0]
+        n2 = s.notes[1]
+        sp1 = spanner.Glissando(n1, n2)
+        sp1.lineType = 'solid'
+        sp1.label = 'gliss.'
+        s.append(sp1)
+
+        #s.show()
+        raw = s.musicxml
+        self.assertEqual(raw.count('<glissando'), 2)
+        self.assertEqual(raw.count('line-type="solid"'), 2)        
+        self.assertEqual(raw.count('>gliss.<'), 1)        
+
 
     def testDashedLineA(self):
         from music21 import stream, note, spanner, chord, dynamics

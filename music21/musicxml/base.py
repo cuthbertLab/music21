@@ -271,7 +271,7 @@ class TagLib(object):
 ('octave-shift', False, OctaveShift), 
 ('bracket', False, Bracket), 
 ('wavy-line', False, WavyLine), 
-('glissando', False, Glissando), 
+('glissando', True, Glissando), 
 ('dashes', False, Dashes), 
 
 ('ornaments', False, Ornaments), 
@@ -2308,6 +2308,9 @@ class Glissando(MusicXMLElement):
         self._attr['type'] = None # start/stop
         self._attr['number'] = None # used for id
         self._attr['line-type'] = None # solid, dashed, dotted, wavy
+        # character data: this is the glissando label, if present
+        self.charData = None
+
 
 class Dashes(MusicXMLElement):
     '''
@@ -3797,6 +3800,7 @@ class Handler(xml.sax.ContentHandler):
 
         elif name == 'glissando': 
             # goes in notations
+            self._glissandoObj.charData = self._currentTag.charData            
             self._notationsObj.append(self._glissandoObj)
             self._glissandoObj = None
 

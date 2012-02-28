@@ -1575,12 +1575,13 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
         mxOrnamentsList[0].append(mxWavyLine) # add to first
         environLocal.pd(['wl', 'mxOrnamentsList', mxOrnamentsList ])
 
-    for su in spannerBundle.getByClass('GlissandoLine'):     
+    for su in spannerBundle.getByClass('Glissando'):     
         mxGlissando = musicxmlMod.Glissando()
         mxGlissando.set('number', su.idLocal)
         mxGlissando.set('line-type', su.lineType)
         # is this note first in this spanner?
         if su.isFirst(target):
+            mxGlissando.set('charData', su.label)
             mxGlissando.set('type', 'start')
         elif su.isLast(target):
             mxGlissando.set('type', 'stop')
@@ -1588,7 +1589,7 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
             # this may not always be an error
             environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, target])
         mxNoteList[0].notationsObj.append(mxGlissando) # add to first
-        environLocal.pd(['gliss', 'notationsObj', mxNoteList[0].notationsObj])
+        #environLocal.pd(['gliss', 'notationsObj', mxNoteList[0].notationsObj])
 
     for su in spannerBundle.getByClass('Ottava'):     
         mxOctaveShift = musicxmlMod.OctaveShift()
