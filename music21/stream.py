@@ -1778,7 +1778,8 @@ class Stream(music21.Music21Object):
 
 
     def splitAtQuarterLength(self, quarterLength, retainOrigin=True, 
-        addTies=True, displayTiedAccidentals=False, delta=1e-06):
+        addTies=True, displayTiedAccidentals=False, searchContext=True, 
+        delta=1e-06):
         '''This method overrides the method on Music21Object to provide similar functionality for Streams. Most arguments are passed to Music21Object.splitAtQuarterLength.
         '''
         if retainOrigin == True:
@@ -1788,7 +1789,20 @@ class Stream(music21.Music21Object):
         # create empty container for right-hand side
         sRight = self.__class__()
 
-        if (quarterLength > sLeft.highestTime): # nothing to doc    
+        # if this is a Measure or Part, transfer clefs, ts, and key
+        if sLeft.isMeasure:
+            timeSignatures = sLeft.getTimeSignatures(
+                            searchContext=searchContext)
+            if len(timeSignatures) > 0:
+                sRight.keySignature = copy.deepcopy(timeSignatures[0])
+            keySignatures = sLeft.getKeySignatures(searchContext=searchContext)
+            if len(keySignatures) > 0:
+                sRight.keySignature = copy.deepcopy(keySignatures[0])
+            clefs = sLeft.getClefs(searchContext=searchContext)
+            if len(clefs) > 0:
+                sRight.clef = copy.deepcopy(clefs[0])
+
+        if (quarterLength > sLeft.highestTime): # nothing to do
             return sLeft, sRight
 
         # use quarterLength as start time
@@ -17795,6 +17809,49 @@ class Test(unittest.TestCase):
         sPost.append(mLeft)
         sPost.append(mRight)
         #sPost.show()
+
+    def testSplitAtQuarterLengthC(self):
+
+        from music21 import corpus, stream
+        irl = corpus.parse('irl')[1]
+        #irl.show()
+        #irl[1].makeNotation(cautionaryNotRepeatAccidental=False)
+        p = irl.parts[0]
+        self.assertEqual(len(p.getElementsByClass('Measure')), 29)
+        pNew = stream.Part()
+        for m in p.getElementsByClass('Measure'):
+            if m.highestTime > 2:
+                mLeft, mRight = m.splitAtQuarterLength(2)
+                pNew.append(mLeft)
+                pNew.append(mRight)
+            else:
+                pNew.append(m)
+        self.assertEqual(len(pNew.getElementsByClass('Measure')), 32)
+        #pNew.show()
+
+    def testSplitAtQuarterLengthD(self):
+        '''Test splitting a Score
+        '''
+        from music21 import corpus
+        s = corpus.parse('bwv66.6')
+        sLeft, sRight = s.splitAtQuarterLength(6)
+        
+        self.assertEqual(len(sLeft.parts), 4)
+        self.assertEqual(len(sRight.parts), 4)
+        for i in range(4):
+            self.assertEqual(
+            str(sLeft.parts[i].getElementsByClass('Measure')[0].timeSignature), str(sRight.parts[i].getElementsByClass('Measure')[0].timeSignature))
+        for i in range(4):
+            self.assertEqual(
+            str(sLeft.parts[i].getElementsByClass('Measure')[0].clef), str(sRight.parts[i].getElementsByClass('Measure')[0].clef))
+        for i in range(4):
+            self.assertEqual(
+            str(sLeft.parts[i].getElementsByClass('Measure')[0].keySignature), str(sRight.parts[i].getElementsByClass('Measure')[0].keySignature))
+
+
+        #sLeft.show()
+        #sRight.show()
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
