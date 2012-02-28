@@ -500,11 +500,11 @@ def nearestMultiple(n, unit):
     >>> print common.nearestMultiple(.25, .25)
     (0.25, 0.0)
     >>> print common.nearestMultiple(.35, .25)
-    (0.25, 0.1)
+    (0.25, 0.1...)
     
     Note that this one also has an error of .1 but it's a positive error off of 0.5
     >>> print common.nearestMultiple(.4, .25)
-    (0.5, 0.1)
+    (0.5, 0.1...)
 
 
 
@@ -1396,7 +1396,6 @@ def getTestDocsFilePath():
         return post
     raise Exception('no such path exists: %s' % post)
 
-
 def getMetadataCacheFilePath():
     '''Get the stored music21 directory that contains the corpus metadata cache. 
 
@@ -1406,6 +1405,16 @@ def getMetadataCacheFilePath():
     True
     '''
     return os.path.join(getSourceFilePath(), 'corpus', 'metadataCache')
+
+def getCorpusFilePath():
+    '''Get the stored music21 directory that contains the corpus metadata cache. 
+
+    >>> from music21 import *
+    >>> fp = common.getCorpusFilePath()
+    >>> fp.endswith('music21/corpus') or fp.endswith(r'music21\corpus')
+    True
+    '''
+    return os.path.join(getSourceFilePath(), 'corpus')
 
 
 def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
@@ -1425,10 +1434,8 @@ def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
     # a test if this is the correct directory
     if 'corpus' not in os.listdir(fpMusic21):
         raise Exception('cannot find corpus within %s' % fpMusic21)
-
     #fpCorpus = os.path.join(fpMusic21, 'corpus')
     fpParent = os.path.dirname(fpMusic21)
-
     match = []
     for dirpath, dirnames, filenames in os.walk(fpMusic21):
         # remove hidden directories
@@ -1436,7 +1443,6 @@ def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
             continue
         elif '.svn' in dirpath:
             continue
-
         if packageOnly:
             if '__init__.py' not in filenames: # must be to be a package
                 continue
@@ -1447,13 +1453,10 @@ def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
                 fp = fp[fp.find(os.sep)+len(os.sep):]
         else:
             fp = dirpath
-
         # replace os.sep
         if remapSep != None:
             fp = fp.replace(os.sep, remapSep)
-
         match.append(fp)
-
     return match
 
 

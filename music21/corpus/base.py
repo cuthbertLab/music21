@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009-2011 The music21 Project
+# Copyright:    (c) 2009-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -34,382 +34,382 @@ environLocal = environment.Environment(_MOD)
 
 
 # import corpus packages as python modules
-from music21.corpus import airdsAirs
+# from music21.corpus import airdsAirs
+# 
+# from music21.corpus import bach
+# from music21.corpus.bach import bwv1080
+# from music21.corpus.bach import bwv846
+# 
+# from music21.corpus.bach import bwv847
+# from music21.corpus.bach import bwv848
+# from music21.corpus.bach import bwv849
+# from music21.corpus.bach import bwv850
+# from music21.corpus.bach import bwv851
+# from music21.corpus.bach import bwv852
+# from music21.corpus.bach import bwv853
+# from music21.corpus.bach import bwv854
+# from music21.corpus.bach import bwv855
+# from music21.corpus.bach import bwv856
+# from music21.corpus.bach import bwv857
+# from music21.corpus.bach import bwv858
+# from music21.corpus.bach import bwv859
+# from music21.corpus.bach import bwv860
+# from music21.corpus.bach import bwv861
+# from music21.corpus.bach import bwv862
+# from music21.corpus.bach import bwv863
+# from music21.corpus.bach import bwv864
+# from music21.corpus.bach import bwv865
+# from music21.corpus.bach import bwv866
+# from music21.corpus.bach import bwv867
+# from music21.corpus.bach import bwv868
+# from music21.corpus.bach import bwv869
+# from music21.corpus.bach import bwv870
+# from music21.corpus.bach import bwv871
+# from music21.corpus.bach import bwv872
+# from music21.corpus.bach import bwv873
+# from music21.corpus.bach import bwv874
+# from music21.corpus.bach import bwv875
+# from music21.corpus.bach import bwv876
+# from music21.corpus.bach import bwv877
+# from music21.corpus.bach import bwv878
+# from music21.corpus.bach import bwv879
+# from music21.corpus.bach import bwv880
+# from music21.corpus.bach import bwv881
+# from music21.corpus.bach import bwv882
+# from music21.corpus.bach import bwv883
+# from music21.corpus.bach import bwv884
+# from music21.corpus.bach import bwv885
+# from music21.corpus.bach import bwv886
+# from music21.corpus.bach import bwv887
+# from music21.corpus.bach import bwv888
+# from music21.corpus.bach import bwv889
+# from music21.corpus.bach import bwv890
+# from music21.corpus.bach import bwv891
+# from music21.corpus.bach import bwv892
+# from music21.corpus.bach import bwv893
+# 
+# 
+# from music21.corpus import beethoven
+# from music21.corpus.beethoven import opus18no1
+# from music21.corpus.beethoven import opus59no1
+# from music21.corpus.beethoven import opus59no2
+# from music21.corpus.beethoven import opus59no3
+# 
+# from music21.corpus import ciconia
+# 
+# from music21.corpus import corelli
+# from music21.corpus.corelli import op3no1
+# 
+# from music21.corpus import cpebach
+# 
+# from music21.corpus import demos
+# 
+# from music21.corpus import essenFolksong
+# 
+# from music21.corpus import josquin
+# 
+# from music21.corpus import handel
+# from music21.corpus.handel import hwv56  
+# 
+# from music21.corpus import haydn
+# from music21.corpus.haydn import opus1no0
+# from music21.corpus.haydn import opus1no1
+# from music21.corpus.haydn import opus1no2
+# from music21.corpus.haydn import opus1no3
+# from music21.corpus.haydn import opus1no4
+# from music21.corpus.haydn import opus1no6
+# from music21.corpus.haydn import opus9no2
+# from music21.corpus.haydn import opus9no3
+# from music21.corpus.haydn import opus17no1
+# from music21.corpus.haydn import opus17no2
+# from music21.corpus.haydn import opus17no3
+# from music21.corpus.haydn import opus17no5
+# from music21.corpus.haydn import opus17no6
+# from music21.corpus.haydn import opus20no1
+# from music21.corpus.haydn import opus20no2
+# from music21.corpus.haydn import opus20no3
+# from music21.corpus.haydn import opus20no4
+# from music21.corpus.haydn import opus20no5
+# from music21.corpus.haydn import opus20no6
+# from music21.corpus.haydn import opus33no1
+# from music21.corpus.haydn import opus33no2
+# from music21.corpus.haydn import opus33no3
+# from music21.corpus.haydn import opus33no4
+# from music21.corpus.haydn import opus33no5
+# from music21.corpus.haydn import opus33no6
+# from music21.corpus.haydn import opus42
+# from music21.corpus.haydn import opus50no1
+# from music21.corpus.haydn import opus50no2
+# from music21.corpus.haydn import opus50no3
+# from music21.corpus.haydn import opus50no4
+# from music21.corpus.haydn import opus50no5
+# from music21.corpus.haydn import opus50no6
+# from music21.corpus.haydn import opus54no1
+# from music21.corpus.haydn import opus54no2
+# from music21.corpus.haydn import opus54no3
+# from music21.corpus.haydn import opus55no1
+# from music21.corpus.haydn import opus55no2
+# from music21.corpus.haydn import opus55no3
+# from music21.corpus.haydn import opus64no1
+# from music21.corpus.haydn import opus64no2
+# from music21.corpus.haydn import opus64no3
+# from music21.corpus.haydn import opus64no4
+# from music21.corpus.haydn import opus64no5
+# from music21.corpus.haydn import opus64no6
+# from music21.corpus.haydn import opus71no1
+# from music21.corpus.haydn import opus71no2
+# from music21.corpus.haydn import opus71no3
+# from music21.corpus.haydn import opus74no1  
+# from music21.corpus.haydn import opus74no2 
+# from music21.corpus.haydn import opus74no3
+# from music21.corpus.haydn import opus76no1
+# from music21.corpus.haydn import opus76no2
+# from music21.corpus.haydn import opus76no3
+# from music21.corpus.haydn import opus76no4
+# from music21.corpus.haydn import opus76no5
+# from music21.corpus.haydn import opus76no6
+# from music21.corpus.haydn import opus77no1
+# from music21.corpus.haydn import opus77no2 
+# 
+# from music21.corpus.haydn import symphony94
+# 
+# from music21.corpus import leadSheet
+# 
+# from music21.corpus import luca
+# 
+# from music21.corpus import miscFolk
+# 
+# from music21.corpus import monteverdi
+# 
+# from music21.corpus import mozart
+# from music21.corpus.mozart import k80
+# from music21.corpus.mozart import k155
+# from music21.corpus.mozart import k156
+# from music21.corpus.mozart import k157
+# from music21.corpus.mozart import k158
+# from music21.corpus.mozart import k159
+# from music21.corpus.mozart import k160
+# from music21.corpus.mozart import k168
+# from music21.corpus.mozart import k169
+# from music21.corpus.mozart import k170
+# from music21.corpus.mozart import k171
+# from music21.corpus.mozart import k172
+# from music21.corpus.mozart import k173
+# from music21.corpus.mozart import k285
+# from music21.corpus.mozart import k298
+# from music21.corpus.mozart import k370
+# from music21.corpus.mozart import k387
+# from music21.corpus.mozart import k421
+# from music21.corpus.mozart import k428
+# from music21.corpus.mozart import k458
+# from music21.corpus.mozart import k464
+# from music21.corpus.mozart import k465
+# from music21.corpus.mozart import k499
+# from music21.corpus.mozart import k545
+# from music21.corpus.mozart import k546
+# from music21.corpus.mozart import k575
+# from music21.corpus.mozart import k589
+# from music21.corpus.mozart import k590
+# 
+# from music21.corpus import oneills1850
+# 
+# from music21.corpus import ryansMammoth
+# 
+# from music21.corpus import schoenberg
+# from music21.corpus.schoenberg import opus19
+# 
+# from music21.corpus import schumann
+# from music21.corpus.schumann import opus41no1
+# 
+# from music21.corpus import theoryExercises
 
-from music21.corpus import bach
-from music21.corpus.bach import bwv1080
-from music21.corpus.bach import bwv846
-
-from music21.corpus.bach import bwv847
-from music21.corpus.bach import bwv848
-from music21.corpus.bach import bwv849
-from music21.corpus.bach import bwv850
-from music21.corpus.bach import bwv851
-from music21.corpus.bach import bwv852
-from music21.corpus.bach import bwv853
-from music21.corpus.bach import bwv854
-from music21.corpus.bach import bwv855
-from music21.corpus.bach import bwv856
-from music21.corpus.bach import bwv857
-from music21.corpus.bach import bwv858
-from music21.corpus.bach import bwv859
-from music21.corpus.bach import bwv860
-from music21.corpus.bach import bwv861
-from music21.corpus.bach import bwv862
-from music21.corpus.bach import bwv863
-from music21.corpus.bach import bwv864
-from music21.corpus.bach import bwv865
-from music21.corpus.bach import bwv866
-from music21.corpus.bach import bwv867
-from music21.corpus.bach import bwv868
-from music21.corpus.bach import bwv869
-from music21.corpus.bach import bwv870
-from music21.corpus.bach import bwv871
-from music21.corpus.bach import bwv872
-from music21.corpus.bach import bwv873
-from music21.corpus.bach import bwv874
-from music21.corpus.bach import bwv875
-from music21.corpus.bach import bwv876
-from music21.corpus.bach import bwv877
-from music21.corpus.bach import bwv878
-from music21.corpus.bach import bwv879
-from music21.corpus.bach import bwv880
-from music21.corpus.bach import bwv881
-from music21.corpus.bach import bwv882
-from music21.corpus.bach import bwv883
-from music21.corpus.bach import bwv884
-from music21.corpus.bach import bwv885
-from music21.corpus.bach import bwv886
-from music21.corpus.bach import bwv887
-from music21.corpus.bach import bwv888
-from music21.corpus.bach import bwv889
-from music21.corpus.bach import bwv890
-from music21.corpus.bach import bwv891
-from music21.corpus.bach import bwv892
-from music21.corpus.bach import bwv893
-
-
-from music21.corpus import beethoven
-from music21.corpus.beethoven import opus18no1
-from music21.corpus.beethoven import opus59no1
-from music21.corpus.beethoven import opus59no2
-from music21.corpus.beethoven import opus59no3
-
-from music21.corpus import ciconia
-
-from music21.corpus import corelli
-from music21.corpus.corelli import op3no1
-
-from music21.corpus import cpebach
-
-from music21.corpus import demos
-
-from music21.corpus import essenFolksong
-
-from music21.corpus import josquin
-
-from music21.corpus import handel
-from music21.corpus.handel import hwv56  
-
-from music21.corpus import haydn
-from music21.corpus.haydn import opus1no0
-from music21.corpus.haydn import opus1no1
-from music21.corpus.haydn import opus1no2
-from music21.corpus.haydn import opus1no3
-from music21.corpus.haydn import opus1no4
-from music21.corpus.haydn import opus1no6
-from music21.corpus.haydn import opus9no2
-from music21.corpus.haydn import opus9no3
-from music21.corpus.haydn import opus17no1
-from music21.corpus.haydn import opus17no2
-from music21.corpus.haydn import opus17no3
-from music21.corpus.haydn import opus17no5
-from music21.corpus.haydn import opus17no6
-from music21.corpus.haydn import opus20no1
-from music21.corpus.haydn import opus20no2
-from music21.corpus.haydn import opus20no3
-from music21.corpus.haydn import opus20no4
-from music21.corpus.haydn import opus20no5
-from music21.corpus.haydn import opus20no6
-from music21.corpus.haydn import opus33no1
-from music21.corpus.haydn import opus33no2
-from music21.corpus.haydn import opus33no3
-from music21.corpus.haydn import opus33no4
-from music21.corpus.haydn import opus33no5
-from music21.corpus.haydn import opus33no6
-from music21.corpus.haydn import opus42
-from music21.corpus.haydn import opus50no1
-from music21.corpus.haydn import opus50no2
-from music21.corpus.haydn import opus50no3
-from music21.corpus.haydn import opus50no4
-from music21.corpus.haydn import opus50no5
-from music21.corpus.haydn import opus50no6
-from music21.corpus.haydn import opus54no1
-from music21.corpus.haydn import opus54no2
-from music21.corpus.haydn import opus54no3
-from music21.corpus.haydn import opus55no1
-from music21.corpus.haydn import opus55no2
-from music21.corpus.haydn import opus55no3
-from music21.corpus.haydn import opus64no1
-from music21.corpus.haydn import opus64no2
-from music21.corpus.haydn import opus64no3
-from music21.corpus.haydn import opus64no4
-from music21.corpus.haydn import opus64no5
-from music21.corpus.haydn import opus64no6
-from music21.corpus.haydn import opus71no1
-from music21.corpus.haydn import opus71no2
-from music21.corpus.haydn import opus71no3
-from music21.corpus.haydn import opus74no1  
-from music21.corpus.haydn import opus74no2 
-from music21.corpus.haydn import opus74no3
-from music21.corpus.haydn import opus76no1
-from music21.corpus.haydn import opus76no2
-from music21.corpus.haydn import opus76no3
-from music21.corpus.haydn import opus76no4
-from music21.corpus.haydn import opus76no5
-from music21.corpus.haydn import opus76no6
-from music21.corpus.haydn import opus77no1
-from music21.corpus.haydn import opus77no2 
-
-from music21.corpus.haydn import symphony94
-
-from music21.corpus import leadSheet
-
-from music21.corpus import luca
-
-from music21.corpus import miscFolk
-
-from music21.corpus import monteverdi
-
-from music21.corpus import mozart
-from music21.corpus.mozart import k80
-from music21.corpus.mozart import k155
-from music21.corpus.mozart import k156
-from music21.corpus.mozart import k157
-from music21.corpus.mozart import k158
-from music21.corpus.mozart import k159
-from music21.corpus.mozart import k160
-from music21.corpus.mozart import k168
-from music21.corpus.mozart import k169
-from music21.corpus.mozart import k170
-from music21.corpus.mozart import k171
-from music21.corpus.mozart import k172
-from music21.corpus.mozart import k173
-from music21.corpus.mozart import k285
-from music21.corpus.mozart import k298
-from music21.corpus.mozart import k370
-from music21.corpus.mozart import k387
-from music21.corpus.mozart import k421
-from music21.corpus.mozart import k428
-from music21.corpus.mozart import k458
-from music21.corpus.mozart import k464
-from music21.corpus.mozart import k465
-from music21.corpus.mozart import k499
-from music21.corpus.mozart import k545
-from music21.corpus.mozart import k546
-from music21.corpus.mozart import k575
-from music21.corpus.mozart import k589
-from music21.corpus.mozart import k590
-
-from music21.corpus import oneills1850
-
-from music21.corpus import ryansMammoth
-
-from music21.corpus import schoenberg
-from music21.corpus.schoenberg import opus19
-
-from music21.corpus import schumann
-from music21.corpus.schumann import opus41no1
-
-from music21.corpus import theoryExercises
-
-MODULES = [
-            airdsAirs,
-
-            bach,
-            bwv1080,
-            bwv846,
-            bwv847,
-            bwv848,
-            bwv849,
-            bwv850,
-            bwv851,
-            bwv852,
-            bwv853,
-            bwv854,
-            bwv855,
-            bwv856,
-            bwv857,
-            bwv858,
-            bwv859,
-            bwv860,
-            bwv861,
-            bwv862,
-            bwv863,
-            bwv864,
-            bwv865,
-            bwv866,
-            bwv867,
-            bwv868,
-            bwv869,
-            bwv870,
-            bwv871,
-            bwv872,
-            bwv873,
-            bwv874,
-            bwv875,
-            bwv876,
-            bwv877,
-            bwv878,
-            bwv879,
-            bwv880,
-            bwv881,
-            bwv882,
-            bwv883,
-            bwv884,
-            bwv885,
-            bwv886,
-            bwv887,
-            bwv888,
-            bwv889,
-            bwv890,
-            bwv891,
-            bwv892,
-            bwv893,
-
-            beethoven, 
-            opus18no1,
-            opus59no1,
-            opus59no2,
-            opus59no3,
-
-            ciconia,
-
-            corelli,
-            op3no1,
-            
-            cpebach,
-
-            demos,
-
-            essenFolksong,
-
-            handel,
-            hwv56,
-
-            haydn,
-            opus1no0,
-            opus1no1,
-            opus1no2,
-            opus1no3,
-            opus1no4,
-            opus1no6,
-            opus9no2,
-            opus9no3,
-            opus17no1,
-            opus17no2,
-            opus17no3,
-            opus17no5,
-            opus17no6,
-            opus20no1,
-            opus20no2,
-            opus20no3,
-            opus20no4,
-            opus20no5,
-            opus20no6,
-            opus33no1,
-            opus33no2,
-            opus33no3,
-            opus33no4,
-            opus33no5,
-            opus33no6,
-            opus42,
-            opus50no1,
-            opus50no2,
-            opus50no3,
-            opus50no4,
-            opus50no5,
-            opus50no6,
-            opus54no1,
-            opus54no2,
-            opus54no2,
-            opus55no1,
-            opus55no2,
-            opus55no3,
-            opus64no1,
-            opus64no2,
-            opus64no3,
-            opus64no4,
-            opus64no5,
-            opus64no6,
-            opus71no1,
-            opus71no2,
-            opus71no3,
-            opus74no1,
-            opus74no2,
-            opus74no3,
-            opus76no1,
-            opus76no2,
-            opus76no3,
-            opus76no4,
-            opus76no5,
-            opus76no6,
-            opus77no1,
-            opus77no2,
-            symphony94,
-
-            josquin,
-
-            leadSheet,
-
-            luca,
-
-            miscFolk,
-            
-            monteverdi,
-
-            mozart,
-            k80,
-            k155,
-            k156,
-            k157,
-            k158,
-            k159,
-            k160,
-            k168,
-            k169,
-            k170,
-            k171,
-            k172,
-            k173,
-            k285,
-            k298,
-            k370,
-            k387,
-            k421,
-            k428,
-            k458,
-            k464,
-            k465,
-            k499,
-            k545,
-            k546,
-            k575,
-            k589,
-            k590,
-            
-            oneills1850,
-            
-            ryansMammoth,
-            
-            schoenberg,
-            opus19,
-
-            schumann,
-            opus41no1,
-
-            theoryExercises,
-    ]
+# MODULES = [
+#             airdsAirs,
+# 
+#             bach,
+#             bwv1080,
+#             bwv846,
+#             bwv847,
+#             bwv848,
+#             bwv849,
+#             bwv850,
+#             bwv851,
+#             bwv852,
+#             bwv853,
+#             bwv854,
+#             bwv855,
+#             bwv856,
+#             bwv857,
+#             bwv858,
+#             bwv859,
+#             bwv860,
+#             bwv861,
+#             bwv862,
+#             bwv863,
+#             bwv864,
+#             bwv865,
+#             bwv866,
+#             bwv867,
+#             bwv868,
+#             bwv869,
+#             bwv870,
+#             bwv871,
+#             bwv872,
+#             bwv873,
+#             bwv874,
+#             bwv875,
+#             bwv876,
+#             bwv877,
+#             bwv878,
+#             bwv879,
+#             bwv880,
+#             bwv881,
+#             bwv882,
+#             bwv883,
+#             bwv884,
+#             bwv885,
+#             bwv886,
+#             bwv887,
+#             bwv888,
+#             bwv889,
+#             bwv890,
+#             bwv891,
+#             bwv892,
+#             bwv893,
+# 
+#             beethoven, 
+#             opus18no1,
+#             opus59no1,
+#             opus59no2,
+#             opus59no3,
+# 
+#             ciconia,
+# 
+#             corelli,
+#             op3no1,
+#             
+#             cpebach,
+# 
+#             demos,
+# 
+#             essenFolksong,
+# 
+#             handel,
+#             hwv56,
+# 
+#             haydn,
+#             opus1no0,
+#             opus1no1,
+#             opus1no2,
+#             opus1no3,
+#             opus1no4,
+#             opus1no6,
+#             opus9no2,
+#             opus9no3,
+#             opus17no1,
+#             opus17no2,
+#             opus17no3,
+#             opus17no5,
+#             opus17no6,
+#             opus20no1,
+#             opus20no2,
+#             opus20no3,
+#             opus20no4,
+#             opus20no5,
+#             opus20no6,
+#             opus33no1,
+#             opus33no2,
+#             opus33no3,
+#             opus33no4,
+#             opus33no5,
+#             opus33no6,
+#             opus42,
+#             opus50no1,
+#             opus50no2,
+#             opus50no3,
+#             opus50no4,
+#             opus50no5,
+#             opus50no6,
+#             opus54no1,
+#             opus54no2,
+#             opus54no2,
+#             opus55no1,
+#             opus55no2,
+#             opus55no3,
+#             opus64no1,
+#             opus64no2,
+#             opus64no3,
+#             opus64no4,
+#             opus64no5,
+#             opus64no6,
+#             opus71no1,
+#             opus71no2,
+#             opus71no3,
+#             opus74no1,
+#             opus74no2,
+#             opus74no3,
+#             opus76no1,
+#             opus76no2,
+#             opus76no3,
+#             opus76no4,
+#             opus76no5,
+#             opus76no6,
+#             opus77no1,
+#             opus77no2,
+#             symphony94,
+# 
+#             josquin,
+# 
+#             leadSheet,
+# 
+#             luca,
+# 
+#             miscFolk,
+#             
+#             monteverdi,
+# 
+#             mozart,
+#             k80,
+#             k155,
+#             k156,
+#             k157,
+#             k158,
+#             k159,
+#             k160,
+#             k168,
+#             k169,
+#             k170,
+#             k171,
+#             k172,
+#             k173,
+#             k285,
+#             k298,
+#             k370,
+#             k387,
+#             k421,
+#             k428,
+#             k458,
+#             k464,
+#             k465,
+#             k499,
+#             k545,
+#             k546,
+#             k575,
+#             k589,
+#             k590,
+#             
+#             oneills1850,
+#             
+#             ryansMammoth,
+#             
+#             schoenberg,
+#             opus19,
+# 
+#             schumann,
+#             opus41no1,
+# 
+#             theoryExercises,
+#     ]
 
 
 # a list of metadataCache's can reside in this module-level storage; this 
@@ -462,6 +462,8 @@ class CorpusException(Exception):
 
 
 #-------------------------------------------------------------------------------
+_pathsCache = {}
+
 def getPaths(extList=None, expandExtensions=True):    
     '''Get all paths in the corpus that match a known extension, or an extenion
     provided by an argument.
@@ -483,6 +485,15 @@ def getPaths(extList=None, expandExtensions=True):
     True
 
     '''
+    if extList is not None:
+        # must convert to tuple for use as a key
+        cacheKey = (tuple(extList), expandExtensions)
+    else:
+        cacheKey = (extList, expandExtensions)
+    if cacheKey in _pathsCache.keys():
+        return _pathsCache[cacheKey]
+
+
     if not common.isListLike(extList):
         extList = [extList]
     if extList == [None]:
@@ -499,24 +510,43 @@ def getPaths(extList=None, expandExtensions=True):
     #environLocal.printDebug(['getting paths with extensions:', extList])
     
     def findPaths():
-        for moduleName in MODULES:
-            if not hasattr(moduleName, '__path__'):
-                # when importing a package name (a directory) the moduleName        
-                # may be a list of all paths contained within the package
-                # this seems to be dependent on the context of the call:
-                # from the command line is different than from the interpreter
-                dirListing = moduleName
-            else:
-                # returns a list with one or more paths
-                # the first is the path to the directory that contains xml files
-                dir = moduleName.__path__[0] 
-                dirListing = [os.path.join(dir, x) for x in os.listdir(dir)]
+        #for moduleName in MODULES:
+        for moduleName in os.listdir(common.getCorpusFilePath()):
+#             if not hasattr(moduleName, '__path__'):
+#                 # when importing a package name (a directory) the moduleName        
+#                 # may be a list of all paths contained within the package
+#                 # this seems to be dependent on the context of the call:
+#                 # from the command line is different than from the interpreter
+#                 dirListing = moduleName
+#             else:
+#                 # returns a list with one or more paths
+#                 # the first is the path to the directory that contains xml files
+#                 dir = moduleName.__path__[0] 
+#                 dirListing = [os.path.join(dir, x) for x in os.listdir(dir)]
 
+            if moduleName.startswith('.'):
+                continue
+            dir = os.path.join(common.getCorpusFilePath(), moduleName)
+            if not os.path.isdir(dir):
+                continue
+
+            # walk each top-level fp
+            dirListing = []
+            for dirpath, dirnames, filenames in os.walk(dir):
+                if '.svn' in dirnames:
+                    dirnames.remove('.svn')
+                for fn in filenames:
+                    dirListing.append(os.path.join(dirpath, fn))
+            #dirListing = [os.path.join(dir, x) for x in os.listdir(dir)]
+            if len(dirListing) == 0: 
+                continue
             for fp in dirListing:
                 if extRe.match(fp):
                     yield fp
     # set() is to uniquify the list.
-    return sorted(list(set(findPaths())))
+    _pathsCache[cacheKey] = sorted(list(set(findPaths())))
+    return _pathsCache[cacheKey]
+
 
 def getVirtualPaths(extList=None):
     '''Get all paths in the virtual corpus that match a known extension. An extension of None will return all known extensions.
@@ -642,28 +672,34 @@ def getComposerDir(composerName):
     True
     '''
     match = None
-    for moduleName in MODULES:          
-        if common.isListLike(moduleName):
-            candidate = moduleName[0]         
-        else:
-            candidate = str(moduleName)
+    #for moduleName in MODULES:          
+    for moduleName in os.listdir(common.getCorpusFilePath()):
+
+#         if common.isListLike(moduleName):
+#             candidate = moduleName[0]         
+#         else:
+#             candidate = str(moduleName)
+
+        candidate = moduleName
+
         if composerName.lower() not in candidate.lower():
             continue
-        # might also slook at .__file__
-        if not hasattr(moduleName, '__path__'): # its a list of files
-            dirCandidate = moduleName[0]
-            while True:
-                dir = os.path.dirname(dirCandidate)
-                if dir.lower().endswith(composerName.lower()):
-                    break
-                else:
-                    dirCandidate = dir
-                if dirCandidate.count(os.sep) < 2: # done enough checks
-                    break
-        else:
-            dir = moduleName.__path__[0] 
+        # might also look at .__file__
+#         if not hasattr(moduleName, '__path__'): # its a list of files
+#             dirCandidate = moduleName[0]
+#             while True:
+#                 dir = os.path.dirname(dirCandidate)
+#                 if dir.lower().endswith(composerName.lower()):
+#                     break
+#                 else:
+#                     dirCandidate = dir
+#                 if dirCandidate.count(os.sep) < 2: # done enough checks
+#                     break
+#         else:
+#             dir = moduleName.__path__[0] 
 
         # last check
+        dir = os.path.join(common.getCorpusFilePath(), moduleName)
         if dir.lower().endswith(composerName.lower()):
             match = dir     
             break
