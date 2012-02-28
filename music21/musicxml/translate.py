@@ -1590,7 +1590,7 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
         mxNoteList[0].notationsObj.append(mxGlissando) # add to first
         environLocal.pd(['gliss', 'notationsObj', mxNoteList[0].notationsObj])
 
-    for su in spannerBundle.getByClass('OctaveShift'):     
+    for su in spannerBundle.getByClass('Ottava'):     
         mxOctaveShift = musicxmlMod.OctaveShift()
         mxOctaveShift.set('number', su.idLocal)
         # is this note first in this spanner?
