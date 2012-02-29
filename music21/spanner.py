@@ -1966,7 +1966,7 @@ class Test(unittest.TestCase):
         n2 = s.notes[-1]
         sp1 = spanner.Ottava(n1, n2)
         s.append(sp1)
-        #s.show()
+        s.show()
         raw = s.musicxml
         self.assertEqual(raw.count('octave-shift'), 2)
 
@@ -1980,6 +1980,23 @@ class Test(unittest.TestCase):
         raw = s.musicxml
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="down"'), 1)
+
+
+    def testOttavaShiftB(self):
+        '''Test basic octave shift creation and output, as well as passing
+        objects through make measure calls. 
+        '''
+        from music21 import stream, note, spanner, chord
+        s = stream.Stream()
+        s.append(note.Note())
+        s.append(note.Note())
+        n1 = s.notes[0]
+        n2 = s.notes[1]
+        sp1 = spanner.Ottava(n1, n2)
+        s.append(sp1)
+        s.show()
+        #raw = s.musicxml
+        #self.assertEqual(raw.count('octave-shift'), 2)
 
 
     def testCrescendoA(self):

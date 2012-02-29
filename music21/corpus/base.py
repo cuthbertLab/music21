@@ -418,10 +418,13 @@ _METADATA_BUNDLES = {'core':None, 'virtual':None, 'local':None}
 
 _ALL_EXTENSIONS = (common.findInputExtension('abc') +
                    common.findInputExtension('lily') +
+                   common.findInputExtension('midi') +
                    common.findInputExtension('musicxml') +
                    common.findInputExtension('musedata') +
                    common.findInputExtension('humdrum') +
-                   common.findInputExtension('romantext'))
+                   common.findInputExtension('romantext') +
+                   common.findInputExtension('noteworthytext') 
+                )
 
 # store all composers in the corpus (not virtual) 
 # as two element tuples of path name, full name
@@ -493,9 +496,9 @@ def getPaths(extList=None, expandExtensions=True):
     if cacheKey in _pathsCache.keys():
         return _pathsCache[cacheKey]
 
-
     if not common.isListLike(extList):
         extList = [extList]
+
     if extList == [None]:
         extList = _ALL_EXTENSIONS
     elif expandExtensions:
@@ -505,13 +508,14 @@ def getPaths(extList=None, expandExtensions=True):
         extList = extMod
     
     #escape extension dots (if there) for regex
-    extList = ["\\%s" % ex for ex in extList if ex.startswith('.')]
-    extRe = re.compile('.*(%s)' % '|'.join(extList))
+    #extList = ["\\%s" % ex for ex in extList if ex.startswith('.')]
+    #extRe = re.compile('.*(%s)' % '|'.join(extList))
+    #extList = [ex for ex in extList]
     #environLocal.printDebug(['getting paths with extensions:', extList])
     
-    def findPaths():
-        #for moduleName in MODULES:
-        for moduleName in os.listdir(common.getCorpusFilePath()):
+    matched = []
+    #for moduleName in MODULES:
+    for moduleName in os.listdir(common.getCorpusFilePath()):
 #             if not hasattr(moduleName, '__path__'):
 #                 # when importing a package name (a directory) the moduleName        
 #                 # may be a list of all paths contained within the package
@@ -524,27 +528,30 @@ def getPaths(extList=None, expandExtensions=True):
 #                 dir = moduleName.__path__[0] 
 #                 dirListing = [os.path.join(dir, x) for x in os.listdir(dir)]
 
-            if moduleName.startswith('.'):
-                continue
-            dir = os.path.join(common.getCorpusFilePath(), moduleName)
-            if not os.path.isdir(dir):
-                continue
-
-            # walk each top-level fp
-            dirListing = []
-            for dirpath, dirnames, filenames in os.walk(dir):
-                if '.svn' in dirnames:
-                    dirnames.remove('.svn')
-                for fn in filenames:
-                    dirListing.append(os.path.join(dirpath, fn))
-            #dirListing = [os.path.join(dir, x) for x in os.listdir(dir)]
-            if len(dirListing) == 0: 
-                continue
-            for fp in dirListing:
-                if extRe.match(fp):
-                    yield fp
+        if moduleName.startswith('.'):
+            continue
+        dir = os.path.join(common.getCorpusFilePath(), moduleName)
+        if not os.path.isdir(dir):
+            continue
+        # walk each top-level dir
+        dirListing = []
+        for dirpath, dirnames, filenames in os.walk(dir):
+            if '.svn' in dirnames:
+                dirnames.remove('.svn')
+            for fn in filenames:
+                dirListing.append(os.path.join(dirpath, fn))
+        #dirListing = [os.path.join(dir, x) for x in os.listdir(dir)]
+        if len(dirListing) == 0: 
+            continue
+        #environLocal.pd(['got dir listing size:', len(dirListing)])
+        for fp in dirListing:
+            for ext in extList:
+                if fp.endswith(ext):
+                    #environLocal.pd(['re did match:', fp])
+                    matched.append(fp)
+                    break
     # set() is to uniquify the list.
-    _pathsCache[cacheKey] = sorted(list(set(findPaths())))
+    _pathsCache[cacheKey] = sorted(matched)
     return _pathsCache[cacheKey]
 
 
@@ -739,9 +746,10 @@ def getWorkList(workName, movementNumber=None, extList=None):
     # permit workName to be a list of paths/branches
     if common.isListLike(workName):
         workName = os.path.sep.join(workName)
-
     # replace with os-dependent separators 
     workSlashes = workName.replace('/', os.path.sep)
+
+    #environLocal.printDebug(['getWorkList(): searching for workName or workSlashses', workName, workSlashes])
 
     # find all matches for the work name
     # TODO: this should match by path component, not just
@@ -751,7 +759,6 @@ def getWorkList(workName, movementNumber=None, extList=None):
             post.append(path)
         elif workSlashes.lower() in path.lower():
             post.append(path)
-
     #environLocal.printDebug(['getWorkList(): post', post])
 
     postMvt = []
@@ -976,11 +983,9 @@ def getWork(workName, movementNumber=None, extList=None):
     '''
     if not common.isListLike(extList):
         extList = [extList]
-
     post = getWorkList(workName, movementNumber, extList)
     if len(post) == 0:
         post = getVirtualWorkList(workName, movementNumber, extList)
-
     if len(post) == 1:
         return post[0]
     elif len(post) == 0:
