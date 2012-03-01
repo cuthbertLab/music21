@@ -130,14 +130,15 @@ class SettingsHandler(xml.sax.ContentHandler):
 
     def __init__(self, tagLib=None):
         self.localCorpusSettings = LocalCorpusSettings()
-        self.storage = Settings()   
+        # create directly, not in sax parsing; this is just a shortcut
+        self._settings = Settings() 
         self._charData = ''     
 
     def startElement(self, name, attrs):
         if name == 'preference':        
             slot = Preference()
             slot.loadAttrs(attrs)
-            self.storage.append(slot)
+            self._settings.append(slot)
 
     def characters(self, charData):
         self._charData += charData
@@ -146,13 +147,13 @@ class SettingsHandler(xml.sax.ContentHandler):
         if name == 'localCorpusPath':     
             lcp = LocalCorpusPath()   
             lcp.charData = self._charData
-            self._charData = '' # must clear
+            self._charData = '' # must clear after reading in 
             self.localCorpusSettings.append(lcp)
             
     def getSettings(self):
         # only called after processing; can add local corpus settings
-        self.storage.append(self.localCorpusSettings)
-        return self.storage
+        self._settings.append(self.localCorpusSettings)
+        return self._settings
 
 
 #-------------------------------------------------------------------------------
@@ -456,28 +457,13 @@ class Environment(object):
         f.close()    
 
         # load from XML into dictionary
-        storage = h.getSettings()
-        self._fromSettings(storage, self.ref)
-#         for slot in storage:
-#             if isinstance(slot, LocalCorpusSettings):
-#                 self.ref['localCorpusSettings'] = []
-#                 for lcp in slot:
-#                     slot.append(lcp.charData)
-#                 continue
-#             name = slot.get('name')
-#             value = slot.get('value')
-#             if name not in self.ref.keys():
-#                 self.printDebug(['a preference is defined that is longer used: %s' % name])
-#                 continue
-#                 # do not set, ignore for now
-#                 #raise EnvironmentException('no such defined preference: %s' % name)
-#             else: # load up stored values, overwriting defaults
-#                 self.ref[name] = value
+        # updates self.ref in place
+        self._fromSettings(h.getSettings(), self.ref)
 
     def _toSettings(self, ref):
         '''Convert a ref dictionary to a Settings object
         '''
-        storage = Settings()
+        settings = Settings()
         for key, item in ref.items():
             if key == 'localCorpusSettings':
                 lcs = LocalCorpusSettings()
@@ -485,13 +471,13 @@ class Environment(object):
                     lcp = LocalCorpusPath()
                     lcp.charData = fp
                     lcs.append(lcp)
-                storage.append(lcs)
+                settings.append(lcs)
             else:
                 slot = Preference()
                 slot.set('name', key)
                 slot.set('value', item)
-                storage.append(slot)
-        return storage
+                settings.append(slot)
+        return settings
 
 
     def write(self, fp=None):
@@ -511,10 +497,10 @@ class Environment(object):
         if fp == None or not os.path.exists(dir):
             raise EnvironmentException('bad file path: %s' % fp)
 
-        storage = self._toSettings(self.ref)
+        settings = self._toSettings(self.ref)
 
         f = open(fp, 'w')
-        f.write(storage.xmlStr())
+        f.write(settings.xmlStr())
         f.close()
 
     #---------------------------------------------------------------------------
