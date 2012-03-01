@@ -4153,8 +4153,7 @@ class Document(object):
 
         if not file:
             fileLikeOpen = StringIO.StringIO(fileLike)
-        else:   
-            # TODO: should this be codecs.open()?
+        else: # TODO: should this be codecs.open()?
             fileLikeOpen = open(fileLike)
 
         # the file always needs to be closed, otherwise
@@ -4167,7 +4166,6 @@ class Document(object):
 
         #t.stop()
         #environLocal.printDebug(['parsing time:', t])
-
         if audit:
             ok, msg = self.tagLib.audit() # audit tags
             if not ok:
