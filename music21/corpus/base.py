@@ -33,398 +33,9 @@ _MOD = "corpus.base.py"
 environLocal = environment.Environment(_MOD)
 
 
-# import corpus packages as python modules
-# from music21.corpus import airdsAirs
-# 
-# from music21.corpus import bach
-# from music21.corpus.bach import bwv1080
-# from music21.corpus.bach import bwv846
-# 
-# from music21.corpus.bach import bwv847
-# from music21.corpus.bach import bwv848
-# from music21.corpus.bach import bwv849
-# from music21.corpus.bach import bwv850
-# from music21.corpus.bach import bwv851
-# from music21.corpus.bach import bwv852
-# from music21.corpus.bach import bwv853
-# from music21.corpus.bach import bwv854
-# from music21.corpus.bach import bwv855
-# from music21.corpus.bach import bwv856
-# from music21.corpus.bach import bwv857
-# from music21.corpus.bach import bwv858
-# from music21.corpus.bach import bwv859
-# from music21.corpus.bach import bwv860
-# from music21.corpus.bach import bwv861
-# from music21.corpus.bach import bwv862
-# from music21.corpus.bach import bwv863
-# from music21.corpus.bach import bwv864
-# from music21.corpus.bach import bwv865
-# from music21.corpus.bach import bwv866
-# from music21.corpus.bach import bwv867
-# from music21.corpus.bach import bwv868
-# from music21.corpus.bach import bwv869
-# from music21.corpus.bach import bwv870
-# from music21.corpus.bach import bwv871
-# from music21.corpus.bach import bwv872
-# from music21.corpus.bach import bwv873
-# from music21.corpus.bach import bwv874
-# from music21.corpus.bach import bwv875
-# from music21.corpus.bach import bwv876
-# from music21.corpus.bach import bwv877
-# from music21.corpus.bach import bwv878
-# from music21.corpus.bach import bwv879
-# from music21.corpus.bach import bwv880
-# from music21.corpus.bach import bwv881
-# from music21.corpus.bach import bwv882
-# from music21.corpus.bach import bwv883
-# from music21.corpus.bach import bwv884
-# from music21.corpus.bach import bwv885
-# from music21.corpus.bach import bwv886
-# from music21.corpus.bach import bwv887
-# from music21.corpus.bach import bwv888
-# from music21.corpus.bach import bwv889
-# from music21.corpus.bach import bwv890
-# from music21.corpus.bach import bwv891
-# from music21.corpus.bach import bwv892
-# from music21.corpus.bach import bwv893
-# 
-# 
-# from music21.corpus import beethoven
-# from music21.corpus.beethoven import opus18no1
-# from music21.corpus.beethoven import opus59no1
-# from music21.corpus.beethoven import opus59no2
-# from music21.corpus.beethoven import opus59no3
-# 
-# from music21.corpus import ciconia
-# 
-# from music21.corpus import corelli
-# from music21.corpus.corelli import op3no1
-# 
-# from music21.corpus import cpebach
-# 
-# from music21.corpus import demos
-# 
-# from music21.corpus import essenFolksong
-# 
-# from music21.corpus import josquin
-# 
-# from music21.corpus import handel
-# from music21.corpus.handel import hwv56  
-# 
-# from music21.corpus import haydn
-# from music21.corpus.haydn import opus1no0
-# from music21.corpus.haydn import opus1no1
-# from music21.corpus.haydn import opus1no2
-# from music21.corpus.haydn import opus1no3
-# from music21.corpus.haydn import opus1no4
-# from music21.corpus.haydn import opus1no6
-# from music21.corpus.haydn import opus9no2
-# from music21.corpus.haydn import opus9no3
-# from music21.corpus.haydn import opus17no1
-# from music21.corpus.haydn import opus17no2
-# from music21.corpus.haydn import opus17no3
-# from music21.corpus.haydn import opus17no5
-# from music21.corpus.haydn import opus17no6
-# from music21.corpus.haydn import opus20no1
-# from music21.corpus.haydn import opus20no2
-# from music21.corpus.haydn import opus20no3
-# from music21.corpus.haydn import opus20no4
-# from music21.corpus.haydn import opus20no5
-# from music21.corpus.haydn import opus20no6
-# from music21.corpus.haydn import opus33no1
-# from music21.corpus.haydn import opus33no2
-# from music21.corpus.haydn import opus33no3
-# from music21.corpus.haydn import opus33no4
-# from music21.corpus.haydn import opus33no5
-# from music21.corpus.haydn import opus33no6
-# from music21.corpus.haydn import opus42
-# from music21.corpus.haydn import opus50no1
-# from music21.corpus.haydn import opus50no2
-# from music21.corpus.haydn import opus50no3
-# from music21.corpus.haydn import opus50no4
-# from music21.corpus.haydn import opus50no5
-# from music21.corpus.haydn import opus50no6
-# from music21.corpus.haydn import opus54no1
-# from music21.corpus.haydn import opus54no2
-# from music21.corpus.haydn import opus54no3
-# from music21.corpus.haydn import opus55no1
-# from music21.corpus.haydn import opus55no2
-# from music21.corpus.haydn import opus55no3
-# from music21.corpus.haydn import opus64no1
-# from music21.corpus.haydn import opus64no2
-# from music21.corpus.haydn import opus64no3
-# from music21.corpus.haydn import opus64no4
-# from music21.corpus.haydn import opus64no5
-# from music21.corpus.haydn import opus64no6
-# from music21.corpus.haydn import opus71no1
-# from music21.corpus.haydn import opus71no2
-# from music21.corpus.haydn import opus71no3
-# from music21.corpus.haydn import opus74no1  
-# from music21.corpus.haydn import opus74no2 
-# from music21.corpus.haydn import opus74no3
-# from music21.corpus.haydn import opus76no1
-# from music21.corpus.haydn import opus76no2
-# from music21.corpus.haydn import opus76no3
-# from music21.corpus.haydn import opus76no4
-# from music21.corpus.haydn import opus76no5
-# from music21.corpus.haydn import opus76no6
-# from music21.corpus.haydn import opus77no1
-# from music21.corpus.haydn import opus77no2 
-# 
-# from music21.corpus.haydn import symphony94
-# 
-# from music21.corpus import leadSheet
-# 
-# from music21.corpus import luca
-# 
-# from music21.corpus import miscFolk
-# 
-# from music21.corpus import monteverdi
-# 
-# from music21.corpus import mozart
-# from music21.corpus.mozart import k80
-# from music21.corpus.mozart import k155
-# from music21.corpus.mozart import k156
-# from music21.corpus.mozart import k157
-# from music21.corpus.mozart import k158
-# from music21.corpus.mozart import k159
-# from music21.corpus.mozart import k160
-# from music21.corpus.mozart import k168
-# from music21.corpus.mozart import k169
-# from music21.corpus.mozart import k170
-# from music21.corpus.mozart import k171
-# from music21.corpus.mozart import k172
-# from music21.corpus.mozart import k173
-# from music21.corpus.mozart import k285
-# from music21.corpus.mozart import k298
-# from music21.corpus.mozart import k370
-# from music21.corpus.mozart import k387
-# from music21.corpus.mozart import k421
-# from music21.corpus.mozart import k428
-# from music21.corpus.mozart import k458
-# from music21.corpus.mozart import k464
-# from music21.corpus.mozart import k465
-# from music21.corpus.mozart import k499
-# from music21.corpus.mozart import k545
-# from music21.corpus.mozart import k546
-# from music21.corpus.mozart import k575
-# from music21.corpus.mozart import k589
-# from music21.corpus.mozart import k590
-# 
-# from music21.corpus import oneills1850
-# 
-# from music21.corpus import ryansMammoth
-# 
-# from music21.corpus import schoenberg
-# from music21.corpus.schoenberg import opus19
-# 
-# from music21.corpus import schumann
-# from music21.corpus.schumann import opus41no1
-# 
-# from music21.corpus import theoryExercises
-
-# MODULES = [
-#             airdsAirs,
-# 
-#             bach,
-#             bwv1080,
-#             bwv846,
-#             bwv847,
-#             bwv848,
-#             bwv849,
-#             bwv850,
-#             bwv851,
-#             bwv852,
-#             bwv853,
-#             bwv854,
-#             bwv855,
-#             bwv856,
-#             bwv857,
-#             bwv858,
-#             bwv859,
-#             bwv860,
-#             bwv861,
-#             bwv862,
-#             bwv863,
-#             bwv864,
-#             bwv865,
-#             bwv866,
-#             bwv867,
-#             bwv868,
-#             bwv869,
-#             bwv870,
-#             bwv871,
-#             bwv872,
-#             bwv873,
-#             bwv874,
-#             bwv875,
-#             bwv876,
-#             bwv877,
-#             bwv878,
-#             bwv879,
-#             bwv880,
-#             bwv881,
-#             bwv882,
-#             bwv883,
-#             bwv884,
-#             bwv885,
-#             bwv886,
-#             bwv887,
-#             bwv888,
-#             bwv889,
-#             bwv890,
-#             bwv891,
-#             bwv892,
-#             bwv893,
-# 
-#             beethoven, 
-#             opus18no1,
-#             opus59no1,
-#             opus59no2,
-#             opus59no3,
-# 
-#             ciconia,
-# 
-#             corelli,
-#             op3no1,
-#             
-#             cpebach,
-# 
-#             demos,
-# 
-#             essenFolksong,
-# 
-#             handel,
-#             hwv56,
-# 
-#             haydn,
-#             opus1no0,
-#             opus1no1,
-#             opus1no2,
-#             opus1no3,
-#             opus1no4,
-#             opus1no6,
-#             opus9no2,
-#             opus9no3,
-#             opus17no1,
-#             opus17no2,
-#             opus17no3,
-#             opus17no5,
-#             opus17no6,
-#             opus20no1,
-#             opus20no2,
-#             opus20no3,
-#             opus20no4,
-#             opus20no5,
-#             opus20no6,
-#             opus33no1,
-#             opus33no2,
-#             opus33no3,
-#             opus33no4,
-#             opus33no5,
-#             opus33no6,
-#             opus42,
-#             opus50no1,
-#             opus50no2,
-#             opus50no3,
-#             opus50no4,
-#             opus50no5,
-#             opus50no6,
-#             opus54no1,
-#             opus54no2,
-#             opus54no2,
-#             opus55no1,
-#             opus55no2,
-#             opus55no3,
-#             opus64no1,
-#             opus64no2,
-#             opus64no3,
-#             opus64no4,
-#             opus64no5,
-#             opus64no6,
-#             opus71no1,
-#             opus71no2,
-#             opus71no3,
-#             opus74no1,
-#             opus74no2,
-#             opus74no3,
-#             opus76no1,
-#             opus76no2,
-#             opus76no3,
-#             opus76no4,
-#             opus76no5,
-#             opus76no6,
-#             opus77no1,
-#             opus77no2,
-#             symphony94,
-# 
-#             josquin,
-# 
-#             leadSheet,
-# 
-#             luca,
-# 
-#             miscFolk,
-#             
-#             monteverdi,
-# 
-#             mozart,
-#             k80,
-#             k155,
-#             k156,
-#             k157,
-#             k158,
-#             k159,
-#             k160,
-#             k168,
-#             k169,
-#             k170,
-#             k171,
-#             k172,
-#             k173,
-#             k285,
-#             k298,
-#             k370,
-#             k387,
-#             k421,
-#             k428,
-#             k458,
-#             k464,
-#             k465,
-#             k499,
-#             k545,
-#             k546,
-#             k575,
-#             k589,
-#             k590,
-#             
-#             oneills1850,
-#             
-#             ryansMammoth,
-#             
-#             schoenberg,
-#             opus19,
-# 
-#             schumann,
-#             opus41no1,
-# 
-#             theoryExercises,
-#     ]
-
-
 # a list of metadataCache's can reside in this module-level storage; this 
 # data is loaded on demand. 
 _METADATA_BUNDLES = {'core':None, 'virtual':None, 'local':None}
-
-_ALL_EXTENSIONS = (common.findInputExtension('abc') +
-                   common.findInputExtension('lily') +
-                   common.findInputExtension('midi') +
-                   common.findInputExtension('musicxml') +
-                   common.findInputExtension('musedata') +
-                   common.findInputExtension('humdrum') +
-                   common.findInputExtension('romantext') +
-                   common.findInputExtension('noteworthytext') 
-                )
 
 # store all composers in the corpus (not virtual) 
 # as two element tuples of path name, full name
@@ -465,9 +76,76 @@ class CorpusException(Exception):
 
 
 #-------------------------------------------------------------------------------
+def _findPaths(fpRoot, extList):
+    '''Given a root fp file path, recursively search all contained paths for 
+    
+    The `extList` is a list of file extensions. 
+    '''
+    # can replace extension matching with a regex    
+    #escape extension dots (if there) for regex
+    #extList = ["\\%s" % ex for ex in extList if ex.startswith('.')]
+    #extRe = re.compile('.*(%s)' % '|'.join(extList))
+
+    matched = []
+    # walk each top-level dir
+    for dirpath, dirnames, filenames in os.walk(fpRoot):
+        if '.svn' in dirnames:
+            # removing in place will stop recursion into these dirs
+            dirnames.remove('.svn')
+        for fn in filenames:
+            if fn.startswith('.'): 
+                continue
+            for ext in extList:
+                if fn.endswith(ext):
+                    matched.append(os.path.join(dirpath, fn))
+                    break # just break out of outer loop
+    return matched
+
+
+# cached once; default extensions for all corpus entires;
+# returned by _translateExtensions() function below
+_ALL_EXTENSIONS = (common.findInputExtension('abc') +
+                   common.findInputExtension('lily') +
+                   common.findInputExtension('midi') +
+                   common.findInputExtension('musicxml') +
+                   common.findInputExtension('musedata') +
+                   common.findInputExtension('humdrum') +
+                   common.findInputExtension('romantext') +
+                   common.findInputExtension('noteworthytext') 
+                )
+
+def _translateExtensions(extList=None, expandExtensions=True):
+    '''Utility to get default extensions, or, optionally, expand extensions to all known formats. 
+
+    >>> from music21 import *
+    >>> corpus.base._translateExtensions()
+    ['.abc', '.ly', '.lily', '.mid', '.midi', '.xml', '.mxl', '.mx', '.md', '.musedata', '.zip', '.krn', '.rntxt', '.rntext', '.romantext', '.rtxt', '.nwctxt', '.nwc']
+
+    >>> corpus.base._translateExtensions('.mid', False)
+    ['.mid']
+    >>> corpus.base._translateExtensions('.mid', True)
+    ['.mid', '.midi']
+    '''
+    if not common.isListLike(extList):
+        extList = [extList]
+
+    if extList == [None]:
+        extList = _ALL_EXTENSIONS # already expended
+    elif expandExtensions:
+        extMod = []
+        for e in extList:
+            extMod += common.findInputExtension(e)
+        extList = extMod
+    return extList
+
+
+#-------------------------------------------------------------------------------
+# core routines for getting file paths
+
+# module-level cache; only higher-level functions cache results
 _pathsCache = {}
 
-def getPaths(extList=None, expandExtensions=True):    
+def getCorePaths(extList=None, expandExtensions=True):    
     '''Get all paths in the corpus that match a known extension, or an extenion
     provided by an argument.
 
@@ -475,98 +153,37 @@ def getPaths(extList=None, expandExtensions=True):
 
     >>> from music21 import *
     
-    >>> a = corpus.getPaths()
-    >>> len(a) > 30
-    True
+    >>> a = corpus.getCorePaths()
+    >>> len(a) # the current number of paths; update when adding to corpus
+    2196
 
-    >>> a = corpus.getPaths('krn')
+    >>> a = corpus.getCorePaths('krn')
     >>> len(a) >= 4
     True
 
-    >>> a = corpus.getPaths('abc')
+    >>> a = corpus.getCorePaths('abc')
     >>> len(a) >= 10
     True
 
     '''
-    if extList is not None:
-        # must convert to tuple for use as a key
-        cacheKey = (tuple(extList), expandExtensions)
-    else:
-        cacheKey = (extList, expandExtensions)
-    if cacheKey in _pathsCache.keys():
-        return _pathsCache[cacheKey]
-
-    if not common.isListLike(extList):
-        extList = [extList]
-
-    if extList == [None]:
-        extList = _ALL_EXTENSIONS
-    elif expandExtensions:
-        extMod = []
-        for e in extList:
-            extMod += common.findInputExtension(e)
-        extList = extMod
-    
-    #escape extension dots (if there) for regex
-    #extList = ["\\%s" % ex for ex in extList if ex.startswith('.')]
-    #extRe = re.compile('.*(%s)' % '|'.join(extList))
-    #extList = [ex for ex in extList]
-    #environLocal.printDebug(['getting paths with extensions:', extList])
-    
-    matched = []
-    #for moduleName in MODULES:
-    for moduleName in os.listdir(common.getCorpusFilePath()):
-#             if not hasattr(moduleName, '__path__'):
-#                 # when importing a package name (a directory) the moduleName        
-#                 # may be a list of all paths contained within the package
-#                 # this seems to be dependent on the context of the call:
-#                 # from the command line is different than from the interpreter
-#                 dirListing = moduleName
-#             else:
-#                 # returns a list with one or more paths
-#                 # the first is the path to the directory that contains xml files
-#                 dir = moduleName.__path__[0] 
-#                 dirListing = [os.path.join(dir, x) for x in os.listdir(dir)]
-
-        if moduleName.startswith('.'):
-            continue
-        dir = os.path.join(common.getCorpusFilePath(), moduleName)
-        if not os.path.isdir(dir):
-            continue
-        # walk each top-level dir
-        dirListing = []
-        for dirpath, dirnames, filenames in os.walk(dir):
-            if '.svn' in dirnames:
-                dirnames.remove('.svn')
-            for fn in filenames:
-                dirListing.append(os.path.join(dirpath, fn))
-        #dirListing = [os.path.join(dir, x) for x in os.listdir(dir)]
-        if len(dirListing) == 0: 
-            continue
-        #environLocal.pd(['got dir listing size:', len(dirListing)])
-        for fp in dirListing:
-            for ext in extList:
-                if fp.endswith(ext):
-                    #environLocal.pd(['re did match:', fp])
-                    matched.append(fp)
-                    break
-    # set() is to uniquify the list.
-    _pathsCache[cacheKey] = sorted(matched)
+    extList = _translateExtensions(extList=extList,
+                expandExtensions=expandExtensions)
+    cacheKey = ('core', tuple(extList))
+    # not cached, fetch and reset 
+    if cacheKey not in _pathsCache.keys():
+        _pathsCache[cacheKey] = _findPaths(common.getCorpusFilePath(), extList)
     return _pathsCache[cacheKey]
 
 
-def getVirtualPaths(extList=None):
+def getVirtualPaths(extList=None, expandExtensions=True):
     '''Get all paths in the virtual corpus that match a known extension. An extension of None will return all known extensions.
    
     >>> from music21 import *
     >>> len(corpus.getVirtualPaths()) > 6
     True
     '''
-    if not common.isListLike(extList):
-        extList = [extList]
-
-    if extList == [None]:
-        extList = _ALL_EXTENSIONS
+    extList = _translateExtensions(extList=extList,
+                expandExtensions=expandExtensions)
     paths = []
     for obj in VIRTUAL:
         if obj.corpusPath != None:
@@ -579,15 +196,55 @@ def getVirtualPaths(extList=None):
     return paths
 
 
-def getLocalPaths(extList=None):
+def getLocalPaths(extList=None, expandExtensions=True):
     '''
     Access files in additional directories supplied by the user and defined in environement settings. 
     '''
-    return []
+    extList = _translateExtensions(extList=extList,
+                expandExtensions=expandExtensions)
+    cacheKey = ('local', tuple(extList))
+    # not cached, fetch and reset 
+    if cacheKey not in _pathsCache.keys():
+        # check paths before trying to search
+        candidatePaths = environLocal['localCorpusSettings']
+        validPaths = []
+        for fp in candidatePaths:
+            if not os.path.isdir(fp):
+                environLocal.warn(
+                'invalid path set as localCorpusSetting: %s' % fp)
+            else:
+                validPaths.append(fp)
+        # append successive matches into one list
+        matched = []
+        for fp in validPaths:
+            #environLocal.pd(['finding paths in:', fp])
+            matched += _findPaths(fp, extList)
+        _pathsCache[cacheKey] = matched
+    return _pathsCache[cacheKey]
+
+
+
+def getPaths(extList=None, expandExtensions=True, 
+    domain=['core', 'virtual', 'local']):
+    '''Get paths from core, virtual, and/or local domains.
+    '''
+    post = []
+    if 'core' in domain:
+        post += getCorePaths(extList=extList,
+                expandExtensions=expandExtensions)
+    if 'virtual' in domain:
+        post += getVirtualPaths(extList=extList,
+                expandExtensions=expandExtensions)
+    if 'local' in domain:
+        post += getLocalPaths(extList=extList,
+                expandExtensions=expandExtensions)
+    return post
 
 
 
 #-------------------------------------------------------------------------------
+# metadata routines
+
 def _updateMetadataBundle():
 
     for d, f in (('core', getPaths), ('virtual', getVirtualPaths)):
@@ -845,125 +502,128 @@ def getVirtualWorkList(workName, movementNumber=None, extList=None):
 # high level utilities that mix corpus and virtual corpus
 # this will need to be re-worked after metadata caching is stored
 
-def getWorkReferences(sort=True):
-    '''Return a data dictionary for all works in the corpus and (optionally) the virtual corpus. Returns a list of reference dictionaries, each each dictionary for a each composer. A 'works' dictionary for each composer provides references to dictionaries for all associated works. 
-
-    >>> from music21 import *
-    >>> post = corpus.getWorkReferences()
-    '''
-    # from music21 import corpus; corpus.getWorkReferences()
-    # TODO: update this to use metadata
-
-    post = []
-    for dirComposer, composer in COMPOSERS:
-        ref = {}
-        ref['composer'] = composer
-        ref['composerDir'] = dirComposer
-        ref['works'] = {} # store by keys of name/dirname
-
-        works = getComposer(dirComposer)
-        for path in works:
-            # split by the composer dir to get relative path
-            #environLocal.printDebug(['dir composer', dirComposer, path])
-            junk, fileStub = path.split(dirComposer)
-            if fileStub.startswith(os.sep):
-                fileStub = fileStub[len(os.sep):]
-            # break into file components
-            fileComponents = fileStub.split(os.sep)
-            # the first is either a directory for containing components
-            # or a top-level name
-            format, ext = common.findFormatExtFile(fileComponents[0])
-            # if not a file w/ ext, we will get None for format
-            if format == None:
-                workStub = fileComponents[0]
-            else: # remove the extension
-                workStub = fileComponents[0].replace(ext, '')
-            # create list location if not already added
-            if workStub not in ref['works'].keys():
-                ref['works'][workStub] = {}
-                ref['works'][workStub]['files'] = []
-                title = common.spaceCamelCase(workStub).title()
-                ref['works'][workStub]['title'] = title
-                ref['works'][workStub]['virtual'] = False
-
-            # last component is name
-            format, ext = common.findFormatExtFile(fileComponents[-1])
-            fileDict = {}
-            fileDict['format'] = format
-            fileDict['ext'] = ext
-            # all path parts after corpus
-            fileDict['corpusPath'] = os.path.join(dirComposer, fileStub)
-            fileDict['fileName'] = fileComponents[-1] # all after 
-
-            title = None
-            # this works but takes a long time!
-#             if format == 'musicxml':
-#                 mxDocument = musicxml.Document()
-#                 mxDocument.open(path)
-#                 title = mxDocument.getBestTitle()
-            if title == None:
-                title = common.spaceCamelCase(
-                    fileComponents[-1].replace(ext, ''))
-                title = title.title()
-            fileDict['title'] = title
-
-            ref['works'][workStub]['files'].append(fileDict)
-
-            # add this path
-        post.append(ref)
-
-    # get each VirtualWork object
-    for vw in VIRTUAL:
-        composerDir = vw.corpusPath.split('/')[0]
-        match = False
-        for ref in post:
-            # check composer reference or first part of corpusPath
-            if (ref['composer'] == vw.composer or 
-                composerDir == ref['composerDir']):
-                match = True
-                break # use this ref
-
-        if not match: # new composers, create a new ref
-            ref = {}
-            ref['composer'] = vw.composer
-            ref['composerDir'] = composerDir
-            ref['works'] = {} # store by keys of name/dirname
-
-        # work stub should be everything other than top-level
-        workStub = vw.corpusPath.replace(composerDir+'/', '')
-        ref['works'][workStub] = {}
-        ref['works'][workStub]['virtual'] = True
-        ref['works'][workStub]['files'] = []
-        ref['works'][workStub]['title'] = vw.title
-
-        for url in vw.urlList:
-            format, ext = common.findFormatExtURL(url)
-            fileDict = {}
-            fileDict['format'] = format
-            fileDict['ext'] = ext
-            # all path parts after corpus
-            fileDict['corpusPath'] = vw.corpusPath
-            fileDict['title'] = vw.title
-            fileDict['url'] = url
-            ref['works'][workStub]['files'].append(fileDict)
-
-        if not match: # not found already, need to add
-            post.append(ref)
-
-    if sort:
-        sortGroup = []
-        for ref in post:
-            sortGroupSub = []
-            for workStub in ref['works'].keys():
-                # add title first for sorting
-                sortGroupSub.append([ref['works'][workStub]['title'], workStub])
-            sortGroupSub.sort()
-            ref['sortedWorkKeys'] = [y for x, y in sortGroupSub]
-            # prepare this sort group
-            sortGroup.append([ref['composerDir'], ref])
-        sortGroup.sort()
-        post = [ref for junk, ref in sortGroup]
-    return post
+# def getWorkReferences(sort=True):
+#     '''Return a data dictionary for all works in the corpus and (optionally) the virtual corpus. Returns a list of reference dictionaries, each each dictionary for a each composer. A 'works' dictionary for each composer provides references to dictionaries for all associated works. 
+# 
+#     >>> from music21 import *
+#     >>> post = corpus.getWorkReferences()
+#     '''
+#     # from music21 import corpus; corpus.getWorkReferences()
+#     # TODO: update this to use metadata
+# 
+#     post = []
+#     for dirComposer, composer in COMPOSERS:
+#         ref = {}
+#         ref['composer'] = composer
+#         ref['composerDir'] = dirComposer
+#         ref['works'] = {} # store by keys of name/dirname
+# 
+#         works = getComposer(dirComposer)
+#         for path in works:
+#             # split by the composer dir to get relative path
+#             #environLocal.printDebug(['dir composer', dirComposer, path])
+#             junk, fileStub = path.split(dirComposer)
+#             if fileStub.startswith(os.sep):
+#                 fileStub = fileStub[len(os.sep):]
+#             # break into file components
+#             fileComponents = fileStub.split(os.sep)
+#             # the first is either a directory for containing components
+#             # or a top-level name
+#             format, ext = common.findFormatExtFile(fileComponents[-1])
+#             if ext is None:
+#                 #environLocal.printDebug(['file that does not seem to have an extension', ext, path])
+#                 continue
+#             # if not a file w/ ext, we will get None for format
+#             if format == None:
+#                 workStub = fileComponents[0]
+#             else: # remove the extension
+#                 workStub = fileComponents[0].replace(ext, '')
+#             # create list location if not already added
+#             if workStub not in ref['works'].keys():
+#                 ref['works'][workStub] = {}
+#                 ref['works'][workStub]['files'] = []
+#                 title = common.spaceCamelCase(workStub).title()
+#                 ref['works'][workStub]['title'] = title
+#                 ref['works'][workStub]['virtual'] = False
+# 
+#             # last component is name
+#             format, ext = common.findFormatExtFile(fileComponents[-1])
+#             fileDict = {}
+#             fileDict['format'] = format
+#             fileDict['ext'] = ext
+#             # all path parts after corpus
+#             fileDict['corpusPath'] = os.path.join(dirComposer, fileStub)
+#             fileDict['fileName'] = fileComponents[-1] # all after 
+# 
+#             title = None
+#             # this works but takes a long time!
+# #             if format == 'musicxml':
+# #                 mxDocument = musicxml.Document()
+# #                 mxDocument.open(path)
+# #                 title = mxDocument.getBestTitle()
+#             if title is None:
+#                 title = common.spaceCamelCase(
+#                     fileComponents[-1].replace(ext, ''))
+#                 title = title.title()
+#             fileDict['title'] = title
+# 
+#             ref['works'][workStub]['files'].append(fileDict)
+# 
+#             # add this path
+#         post.append(ref)
+# 
+#     # get each VirtualWork object
+#     for vw in VIRTUAL:
+#         composerDir = vw.corpusPath.split('/')[0]
+#         match = False
+#         for ref in post:
+#             # check composer reference or first part of corpusPath
+#             if (ref['composer'] == vw.composer or 
+#                 composerDir == ref['composerDir']):
+#                 match = True
+#                 break # use this ref
+# 
+#         if not match: # new composers, create a new ref
+#             ref = {}
+#             ref['composer'] = vw.composer
+#             ref['composerDir'] = composerDir
+#             ref['works'] = {} # store by keys of name/dirname
+# 
+#         # work stub should be everything other than top-level
+#         workStub = vw.corpusPath.replace(composerDir+'/', '')
+#         ref['works'][workStub] = {}
+#         ref['works'][workStub]['virtual'] = True
+#         ref['works'][workStub]['files'] = []
+#         ref['works'][workStub]['title'] = vw.title
+# 
+#         for url in vw.urlList:
+#             format, ext = common.findFormatExtURL(url)
+#             fileDict = {}
+#             fileDict['format'] = format
+#             fileDict['ext'] = ext
+#             # all path parts after corpus
+#             fileDict['corpusPath'] = vw.corpusPath
+#             fileDict['title'] = vw.title
+#             fileDict['url'] = url
+#             ref['works'][workStub]['files'].append(fileDict)
+# 
+#         if not match: # not found already, need to add
+#             post.append(ref)
+# 
+#     if sort:
+#         sortGroup = []
+#         for ref in post:
+#             sortGroupSub = []
+#             for workStub in ref['works'].keys():
+#                 # add title first for sorting
+#                 sortGroupSub.append([ref['works'][workStub]['title'], workStub])
+#             sortGroupSub.sort()
+#             ref['sortedWorkKeys'] = [y for x, y in sortGroupSub]
+#             # prepare this sort group
+#             sortGroup.append([ref['composerDir'], ref])
+#         sortGroup.sort()
+#         post = [ref for junk, ref in sortGroup]
+#     return post
 
 
 #-------------------------------------------------------------------------------
@@ -1101,6 +761,9 @@ def getBachChorales(extList='xml'):
     return post
 
 bachChorales = getBachChorales('xml')
+
+
+
 
 class BachChoraleList(object):
     '''
@@ -1836,13 +1499,13 @@ class Test(unittest.TestCase):
         #s.show()
 
 
-    def testWorkReferences(self):
-        from music21 import corpus
-        s = corpus.getWorkReferences()
-        
-        # presenly 19 top level lists
-        self.assertEqual(len(s)>=19, True)
-        self.assertEqual(len(s[0].keys()), 4)
+#     def testWorkReferences(self):
+#         from music21 import corpus
+#         s = corpus.getWorkReferences()
+#         
+#         # presenly 19 top level lists
+#         self.assertEqual(len(s)>=19, True)
+#         self.assertEqual(len(s[0].keys()), 4)
 
 
 #-------------------------------------------------------------------------------

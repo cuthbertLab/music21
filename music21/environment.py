@@ -77,7 +77,6 @@ class Preference(xmlnode.XMLNode):
 class LocalCorpusSettings(xmlnode.XMLNodeList):
     '''
     An xmlnode.XMLNode subclass representing a a list of environment preference
-
     '''
     def __init__(self):
         '''
@@ -124,7 +123,7 @@ class SettingsHandler(xml.sax.ContentHandler):
     An xml.sax.ContentHandler subclass holding settings
 
     >>> from music21 import *
-    >>> a = environment.SettingsHandler()
+    >>> sh = environment.SettingsHandler()
     '''
     #TODO: Make private class because there's no docs and no public interface.
 
@@ -169,6 +168,12 @@ class Environment(object):
 
     For more a user-friendly interface for creating and editing settings, see 
     the :class:`~music21.environment.UserSettings` object. 
+
+    >>> env = Environment(forcePlatform='darwin')
+    >>> env['musicxmlPath'] = '/Applications/Finale Reader.app'
+    >>> env['musicxmlPath']
+    '/Applications/Finale Reader.app'
+
     '''
 
     # define order to present names in documentation; use strings
@@ -205,6 +210,7 @@ class Environment(object):
         self._keysToPaths.append('vectorPath')
         self._keysToPaths.append('pdfPath')
         self._keysToPaths.append('midiPath')
+        self._keysToPaths.append('localCorpusPath')
 
         # defines all valid keys in ref
         self.loadDefaults(forcePlatform=forcePlatform) 
@@ -286,6 +292,9 @@ class Environment(object):
         # could store last update tim and look of file is more recent
         # how, only doing read once is a bit more conservative
         #self.read()
+
+        # note: this will not get 'localCorpusPath' as there may be more tn 
+        # one value
         if key not in self.ref.keys():
             raise EnvironmentException('no preference: %s' % key)
         value = self.ref[key]
@@ -327,13 +336,16 @@ class Environment(object):
         Traceback (most recent call last):
         EnvironmentException: adsf is not an acceptable value for preference: showFormat
         >>> a['showFormat'] = 'musicxml'
+        >>> a['localCorpusPath'] = '/path/to/local'
+
         '''
         #saxutils.escape # used for escaping strings going to xml
         # with unicode encoding
         # http://www.xml.com/pub/a/2002/11/13/py-xml.html?page=2
         # saxutils.escape(msg).encode('UTF-8')
 
-        if key not in self.ref.keys():
+        # add local corpus path as a key
+        if key not in self.ref.keys() + ['localCorpusPath']:
             raise EnvironmentException('no preference: %s' % key)
         if value == '':
             value = None # always replace '' with None
@@ -364,10 +376,13 @@ class Environment(object):
         # need to escape problematic characters for xml storage
         if common.isStr(value):
             value = xml.sax.saxutils.escape(value).encode('UTF-8')
-
         # set value
-        self.ref[key] = value
-
+        if key == 'localCorpusPath':
+            # only add if unique
+            if value not in self.ref['localCorpusSettings']:
+                self.ref['localCorpusSettings'].append(value)
+        else:
+            self.ref[key] = value
 
     def __repr__(self):
         return '<Environment>'
@@ -376,7 +391,7 @@ class Environment(object):
         return repr(self.ref)
 
     def keys(self):
-        return self.ref.keys()
+        return self.ref.keys() + ['localCorpusPath']
 
     #---------------------------------------------------------------------------
     def getSettingsPath(self):
@@ -676,7 +691,7 @@ class UserSettings(object):
 
 
     >>> us.keys()
-    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
+    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath', 'localCorpusPath']
 
 
     Third, after finding the desired setting, supply the new value as a Python dictionary key value pair. Setting this value updates the user's settings file. For example, to set the file path to the Application that will be used to open MusicXML files, use the 'musicxmlPath' key. 
@@ -728,12 +743,23 @@ class UserSettings(object):
         >>> us['musicxmlPath'] = 'asdfwerasdffasdfwer'
         Traceback (most recent call last):
         UserSettingsException: attempting to set a path that does not exist: asdfwerasdffasdfwer
+
+        >>> us['localCorpusPath'] = '/path/to/local'
+        Traceback (most recent call last):
+        UserSettingsException: attempting to set a path that does not exist: /path/to/local
         '''
+        # NOTE: testing setting of any UserSettings key will result
+        # in a change in your local preferences files
+
         # before setting value, see if this is a path and test existence
+        # this will accept localCorpusPath
         if key in self._environment._keysToPaths:
             if not os.path.exists(value):
                 raise UserSettingsException('attempting to set a path that does not exist: %s' % value)
-
+        # when setting a local corpus setting, if not a list, append
+        elif key in ['localCorpusSettings']:
+            if not common.isListLike(value):
+                raise UserSettingsException('localCorpusSettings must be provided as a list.')
         # location specific, cannot test further
         self._environment.__setitem__(key, value)
         self._environment.write()
@@ -760,7 +786,7 @@ class UserSettings(object):
     def keys(self):
         '''Return the keys found in the user's :class:`~music21.environment.Environment` object. 
         '''
-        return self._environment.ref.keys()
+        return self._environment.ref.keys() + ['localCorpusPath']
 
     def getSettingsPath(self):
         '''Return the path to the platform specific settings file.
@@ -799,7 +825,7 @@ def set(key, value):
 
     >>> from music21 import *
     >>> environment.keys()
-    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
+    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath', 'localCorpusPath']
     >>> environment.set('wer', 'asdf')
     Traceback (most recent call last):
     EnvironmentException: no preference: wer
@@ -817,7 +843,7 @@ def get(key):
 
     >>> from music21 import *
     >>> environment.keys()
-    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
+    ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath', 'localCorpusPath']
     >>> #_DOCS_SHOW environment.get('musicxmlPath')
     '/Applications/Finale Reader.app'
     '''
@@ -956,6 +982,18 @@ class Test(unittest.TestCase):
   <preference name="midiPath" value="w"/>
 </settings>
 """,  match)
+
+
+    def testEnvironmentA(self):
+        env = Environment(forcePlatform='darwin')
+
+        # setting the local corpus path pref is like adding a path
+        env['localCorpusPath'] = 'a'
+        self.assertEqual(env['localCorpusSettings'], ['a'])
+
+        env['localCorpusPath'] = 'b'
+        self.assertEqual(env['localCorpusSettings'], ['a', 'b'])
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
