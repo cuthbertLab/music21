@@ -144,6 +144,9 @@ def _translateExtensions(extList=None, expandExtensions=True):
 
 # module-level cache; only higher-level functions cache results
 _pathsCache = {}
+# store temporary local paths added by a user in a session and not stored in 
+# Environment
+_pathsLocalTemp = [] 
 
 def getCorePaths(extList=None, expandExtensions=True):    
     '''Get all paths in the corpus that match a known extension, or an extenion
@@ -208,7 +211,7 @@ def getLocalPaths(extList=None, expandExtensions=True):
         # check paths before trying to search
         candidatePaths = environLocal['localCorpusSettings']
         validPaths = []
-        for fp in candidatePaths:
+        for fp in candidatePaths + _pathsLocalTemp:
             if not os.path.isdir(fp):
                 environLocal.warn(
                 'invalid path set as localCorpusSetting: %s' % fp)
@@ -223,10 +226,34 @@ def getLocalPaths(extList=None, expandExtensions=True):
     return _pathsCache[cacheKey]
 
 
+def addPath(fp):
+    '''Add a directory path to the local corpus on a temporary basis, i.e., just for the current Python session. All directories contained within the provided directory will be searched for files with file extensions matching the currently readable file types. Any number of file paths can be added one at a time. 
+
+    An error will be raised if the file path does not exist, is already defined as a temporary, or is already being searched by being defined with the :class:`~music21.environment.Environment` 'localCorpusSettings' setting.
+
+    To permanently add a path to the list of stored local corpus paths, set the 'localCorpusPath' or 'localCorpusSettings' setting of the :class:`~music21.environment.UserSettings` object. 
+
+    >>> from music21 import *
+    >>> #_DOCS_SHOW coprus.addPath('~/Documents')
+
+    '''
+    if fp is None or not os.path.exists(fp):
+        raise CorpusException("an invalid file path has been provided: %s" % fp)
+    if fp in _pathsLocalTemp:
+        raise CorpusException("the provided path has already been added: %s" % fp)
+    if fp in environLocal['localCorpusSettings']:
+        raise CorpusException("the provided path is already incldued in the Environment localCorpusSettings: %s" % fp)
+
+    _pathsLocalTemp.append(fp)
+    # delete all local keys in the cache
+    for key in _pathsCache.keys():
+        if key[0] == 'local':
+            del _pathsCache[key]
+
 
 def getPaths(extList=None, expandExtensions=True, 
     domain=['core', 'virtual', 'local']):
-    '''Get paths from core, virtual, and/or local domains.
+    '''Get paths from core, virtual, and/or local domains. This is the public interface for getting all corpus paths with one function. 
     '''
     post = []
     if 'core' in domain:

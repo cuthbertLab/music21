@@ -423,8 +423,6 @@ class Environment(object):
         # darwin specific option
         # os.path.join(os.environ['HOME'], 'Library',)
 
-     
-
     #---------------------------------------------------------------------------
     def _fromSettings(self, settings, ref={}):
         '''Load a ref dictionary from the Settings object. Change the passed-in ref dictionary in place.
@@ -686,9 +684,7 @@ class UserSettings(object):
     >>> from music21 import *
     >>> us = environment.UserSettings()
 
-
     Second, view the available settings keys.
-
 
     >>> us.keys()
     ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath', 'localCorpusPath']
@@ -701,6 +697,12 @@ class UserSettings(object):
     >>> #_DOCS_SHOW us['musicxmlPath']
     u'/Applications/Finale Reader.app'
 
+
+    Note that the 'localCorpusPath' setting operates in a slightly different manner than other settings. Each time the 'localCorpusPath' setting is set, an additional local corpus file path is added to the list of local corpus paths (unless that path is already defined in the list of local corpus paths). To view all local corpus paths, access the 'localCorpusSettings' settings. This setting can also be used to set a complete list of file paths. 
+
+    >>> #_DOCS_SHOW us['localCorpusPath'] = '~/Documents'
+    >>> #_DOCS_SHOW us['localCorpusSettings']
+    ['~/Documents']
 
     Alternatively, the environment.py module provides convenience functions for setting these settings: :func:`~music21.environment.keys`, :func:`~music21.environment.get`, and :func:`~music21.environment.set`.
     '''
@@ -754,6 +756,8 @@ class UserSettings(object):
         # before setting value, see if this is a path and test existence
         # this will accept localCorpusPath
         if key in self._environment._keysToPaths:
+            # try to expand user if found; otherwise return unaltered
+            value = os.path.expanduser(value)
             if not os.path.exists(value):
                 raise UserSettingsException('attempting to set a path that does not exist: %s' % value)
         # when setting a local corpus setting, if not a list, append
