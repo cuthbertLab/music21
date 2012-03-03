@@ -2528,7 +2528,7 @@ class Stream(music21.Music21Object):
 
     def getElementsByOffset(self, offsetStart, offsetEnd=None,
                     includeEndBoundary=True, mustFinishInSpan=False, 
-                    mustBeginInSpan=True):
+                    mustBeginInSpan=True, classList=None ):
         '''
         Returns a Stream containing all Music21Objects that 
         are found at a certain offset or within a certain 
@@ -2651,6 +2651,11 @@ class Stream(music21.Music21Object):
 
         # need both _elements and _endElements
         for e in self.elements:
+            
+            if classList is not None:
+                if not e.isClassOrSubclass(classList):
+                    continue
+            
             match = False
             offset = e.getOffsetBySite(self)
 
