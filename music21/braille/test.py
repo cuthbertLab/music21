@@ -2,7 +2,7 @@
 #!/usr/bin/python
 #-------------------------------------------------------------------------------
 # Name:         test.py
-# Purpose:      music21 class which allows for test cases of music21 to braille translation.
+# Purpose:      Examples from "Introduction to Braille Music Transcription"
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    (c) 2012 The music21 Project
