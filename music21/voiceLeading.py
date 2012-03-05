@@ -822,17 +822,397 @@ class VoiceLeadingQuartet(music21.Music21Object):
         return not ( self.vIntervals[0].generic.simpleUndirected in preclosings and 
             self.vIntervals[1].generic.simpleUndirected == 1 and raisedMinorCorrectly and
              self.key.pitchFromDegree(1).name in closingPitches and
-             self.contraryMotion()
-                )
+             self.contraryMotion())
            
 class VoiceLeadingQuartetException(Exception):
     pass
+
+
+def getVerticalSliceFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None):
+    #scoreObjectIsFrom = music21Obj.getAllContextsByClass(stream.Score) #EXTREMELY UNRELIABLE AND VERY PRONE TO ERROR>>>>GRRRRR
+    
+    offsetOfObject =  music21Obj.getOffsetBySite(scoreObjectIsFrom.flat)
+
+    contentDict = {}
+    for partObj, partNum in enumerate(scoreObjectIsFrom.parts):
+        elementStream = partObj.flat.getElementsByOffset(offsetOfObject, mustBeginInSpan=False, classFilterList=classFilterList)
+        for el in elementStream.elements:
+            contentDict[partNum].append(el)                 
+    return VerticalSlice(contentDict)
+
+
+class VerticalSlice(music21.Music21Object):
+    ''' A vertical slice of music21 objects that occur simultaneously in a score. The vertical slice 
+    is instantiated by passing in a dictionary of the form {partNumber : [ music21Objects ] } 
+    Typically vertical slices are created by :meth:`~music21.theoryAnalzyer.getVerticalSlices`
     
 
-class ThreeNoteLinearSegmentException(music21.Music21Exception):
+    >>> from music21 import *
+    >>> vs1 = VerticalSlice({0:[note.Note('A4'), harmony.ChordSymbol('Cm')], 1: [note.Note('F2')]})
+    >>> vs1.getObjectsByClass(note.Note)
+    [<music21.note.Note A>, <music21.note.Note F>]
+    >>> vs1.getObjectsByPart(0, note.Note)
+    <music21.note.Note A>
+    '''
+
+    def __init__(self,contentDict):
+        music21.Music21Object.__init__(self)
+        for partNum, element in contentDict.items():
+            if not isinstance(element, list):
+                contentDict[partNum] = [element]
+        
+        self.contentDict = contentDict
+        
+        _DOC_ATTR = {
+    'contentDict': 'Dictionary representing contents of vertical slices. the keys of the dictionary \
+    are the part numbers and the element at each key is a list of music21 objects (allows for multiple voices \
+    in a single part'
+    }
+    #method should be depricated...and will be as soon as we fix the other code that uses this    
+#    def noteFromPart(self,partNum):
+#        partNoteList = self.getObjectsByPart(partNum, classFilterList=['Note'])
+#        if partNoteList:
+#            return [0]
+    
+    def getObjectsByPart(self, partNum, classFilterList=None ):
+        '''
+        return the list of music21 objects associated with that part number (if more than one). returns
+        the single object if only one. Optionally specify which
+        type of objects to return with classFilterList
+        
+        >>> from music21 import *
+        >>> vs1 = VerticalSlice({0:[note.Note('A4'), harmony.ChordSymbol('C')], 1: [note.Note('C')]})
+        >>> vs1.getObjectsByPart(0, classFilterList=['Harmony'])
+        <music21.harmony.ChordSymbol C>
+
+        '''
+        if not common.isIterable( classFilterList):
+            classFilterList = [classFilterList]
+        retList = []
+        for el in self.contentDict[partNum]:
+    
+            if classFilterList is not None:
+                if not el.isClassOrSubclass(classFilterList):
+                    continue
+            retList.append(el)
+        if len(retList) > 1:
+            return retList
+        else:
+            return retList[0]
+        
+#    def _getNoteList(self):
+#
+#        noteList = []
+#        for part, m21object in self.contentDict.items():
+#            if m21object == None:
+#                continue
+#            else:
+#                noteList.extend(m21object)
+#        return noteList 
+#    
+#    noteList = property(_getNoteList, doc = '''
+#        the a list of only the note objects in the vertical slice 
+#    
+#    
+#    ''')    
+    
+    def getObjectsByClass(self, classFilterList, partNums=None):
+        '''
+        >>> from music21 import *
+        >>> vs1 = VerticalSlice({0:[note.Note('A4'), harmony.ChordSymbol('C')], 1: [note.Note('C')], 2: [note.Note('B'), note.Note('F#')]})
+        >>> vs1.getObjectsByClass('Note')
+        [<music21.note.Note A>, <music21.note.Note C>, <music21.note.Note B>, <music21.note.Note F#>]
+        >>>
+        >>> vs1.getObjectsByClass('Note', [1,2])
+        [<music21.note.Note C>, <music21.note.Note B>, <music21.note.Note F#>]
+
+        '''
+        if not common.isIterable( classFilterList):
+            classFilterList = [classFilterList]
+        retList = []
+        for part, objList in self.contentDict.items():
+            for m21object in objList:
+                
+                if  m21object == None or not m21object.isClassOrSubclass(classFilterList):
+                    continue
+                else:
+                    if partNums and not part in partNums:
+                            continue
+                    retList.append(m21object)
+        return retList 
+    
+    def _getObjects(self):
+        retList = []
+        for part, objList in self.contentDict.items():
+            for m21object in objList:
+                
+                if  m21object == None:
+                    continue
+                else:
+                    retList.append(m21object)
+        return retList 
+    
+    objects = property(_getObjects, doc = '''
+        return a list of all the music21 objects in the vertical slice
+        
+        >>> from music21 import *
+        >>> vs1 = VerticalSlice({0:[ harmony.ChordSymbol('C'), note.Note('A4'),], 1: [note.Note('C')]})
+        >>> vs1.objects
+        [<music21.harmony.ChordSymbol C>, <music21.note.Note A>, <music21.note.Note C>]
+
+        
+        ''')
+    
+    def getStream(self, streamVSCameFrom = None):
+        '''
+        returns the stream representation of this vertical slice. Optionally pass in
+        the full stream that this VS was extracted from, and correct key, meter, and time
+        signatures will be included
+        
+        >>> from music21 import *
+        >>> vs1 = VerticalSlice({0:[ harmony.ChordSymbol('C'), note.Note('A4'),], 1: [note.Note('C')]})
+        >>> len(vs1.getStream().flat.getElementsByClass(note.Note))
+        2
+        >>> len(vs1.getStream().flat.getElementsByClass('Harmony'))
+        1
+        '''
+        #scoreFromNote1 = music21Obj.getAllContextsByClass(stream.Score) #EXTREMELY UNRELIABLE AND VERY PRONE TO ERROR>>>>GRRRRR
+        retStream = music21.stream.Score()
+        for partNum, elementList in self.contentDict.items():
+            p = music21.stream.Part()
+            if streamVSCameFrom:
+                foundObj = elementList[0]
+                
+                ks = foundObj.getContextByClass(key.KeySignature)
+                ts = foundObj.getContextByClass(music21.meter.TimeSignature)
+                cl = foundObj.getContextByClass(music21.clef.Clef)
+               
+                if cl:
+                    p.append(cl)
+                if ks:
+                    p.append(ks)
+                if ts:
+                    p.append(ts)
+                p.append(foundObj)
+            if len(elementList) > 1:
+                for el in elementList:
+                    p.insert(music21.stream.Voice([el])) #probably wrong! Need to fix!!!
+            else:
+                p.insert(elementList[0])
+            retStream.insert(p)
+        return retStream
+
+        
+    def offset(self,leftAlign=True):
+        '''
+        returns the overall offset of the vertical slice. Typically, this would just be the
+        offset of each object in the vertical slice, and each object would have the same offset.
+        However, if the duration of one object in the slice is different than the duration of another,
+        and that other starts after the first, but the first is still sounding, then the offsets would be
+        different. In this case, specify leftAlign=True to return the lowest valued-offset of all the objects
+        in the vertical slice. If you prefer the offset of the right-most starting object, then specify leftAlign=False
+        
+        >>> from music21 import *
+        >>> s = stream.Score()
+        >>> n1 = note.Note('A4', quarterLength=1.0)
+        >>> s.append(n1)
+        >>> n1.offset
+        0.0
+        >>> n2 = note.Note('F2', quarterLength =0.5)
+        >>> s.append(n2)
+        >>> n2.offset
+        1.0
+        >>> vs = VerticalSlice({0:n1, 1: n2})
+        >>> vs.getObjectsByClass(note.Note)
+        [<music21.note.Note A>, <music21.note.Note F>]
+
+        >>> vs.offset(leftAlign=True)
+        0.0
+        >>> vs.offset(leftAlign=False)
+        1.0
+        '''
+        if leftAlign:
+            return sorted(self.objects, key=lambda m21Obj: m21Obj.offset)[0].offset
+        else:
+            return sorted(self.objects, key=lambda m21Obj: m21Obj.offset)[-1].offset
+    
+        
+    def _setLyric(self, value):
+        newList = sorted(self.objects, key=lambda x: x.offset, reverse=True)
+        newList[0].lyric = value
+        
+    def _getLyric(self):
+        newList = sorted(self.objects, key=lambda x: x.offset, reverse=True)
+        return newList[0].lyric
+        
+    lyric = property(_getLyric, _setLyric, doc = '''
+        sets each element on the vertical slice to have the passed in lyric
+        
+        >>> from music21 import *
+        >>> h = voiceLeading.VerticalSlice({1:note.Note('C'), 2:harmony.ChordSymbol('C')})
+        >>> h.lyric = 'vertical slice 1'
+        >>> h.getStream().flat.getElementsByClass(note.Note)[0].lyric
+        'vertical slice 1'
+        ''')
+    
+    def __repr__(self):
+        return '<music21.voiceLeading.%s contentDict=%s  ' % (self.__class__.__name__, self.contentDict)
+                                                              
+class VerticalSliceNTuplet(music21.Music21Object):
+    '''a collection of n number of vertical slices'''
+    def __init__(self, listofVerticalSlices): 
+        music21.Music21Object.__init__(self)
+              
+        self.verticalSlices = listofVerticalSlices
+        self.nTupletNum = len(listofVerticalSlices)
+        
+        self.chordList = []
+        if listofVerticalSlices:
+            self._calcChords()
+        
+    def _calcChords(self):
+        for vs in self.verticalSlices:
+            self.chordList.append(chord.Chord(vs.getObjectsByClass(note.Note)))
+    
+    def __repr__(self):
+        return '<music21.voiceLeading.%s listofVerticalSlices=%s ' % (self.__class__.__name__, self.verticalSlices)
+       
+class VerticalSliceTriplet(VerticalSliceNTuplet):
+    '''a collection of three vertical slices'''
+    def __init__(self, listofVerticalSlices):
+        VerticalSliceNTuplet.__init__(self, listofVerticalSlices)
+        self.tnlsDict = {} #Three Note Linear Segments
+        self._calcTNLS()
+        
+    def _calcTNLS(self):
+        '''
+        calculates the three note linear segments if only three vertical slices provided
+        '''
+        for partNum in range(0,min(len(self.verticalSlices[0].getObjectsByClass(note.Note)), \
+                                   len(self.verticalSlices[1].getObjectsByClass(note.Note)),\
+                                    len(self.verticalSlices[2].getObjectsByClass(note.Note)))):
+            self.tnlsDict[partNum] = ThreeNoteLinearSegment([self.verticalSlices[0].getObjectsByPart(partNum, note.Note),\
+                                                              self.verticalSlices[1].getObjectsByPart(partNum, note.Note), \
+                                                              self.verticalSlices[2].getObjectsByPart(partNum, note.Note)])
+
+       
+    def hasPassingTone(self, partNumToIdentify, unaccentedOnly=False):  
+        '''
+        partNum is the part (starting with 0) to identify the passing tone
+        for use on 3 vertical slices (3Tuplet)
+        
+        
+        >>> from music21 import *
+        >>> vs1 = VerticalSlice({0:note.Note('A4'), 1: note.Note('F2')})
+        >>> vs2 = VerticalSlice({0:note.Note('B-4'), 1: note.Note('F2')})
+        >>> vs3 = VerticalSlice({0:note.Note('C5'), 1: note.Note('E2')})
+        >>> tbtm = VerticalSliceTriplet([vs1, vs2, vs3])
+        >>> tbtm.hasPassingTone(0)
+        True
+        '''  
+
+        ret = self.tnlsDict[partNumToIdentify].couldBePassingTone()
+        if unaccentedOnly:
+            try:
+                ret = ret and (self.tnlsDict[partNumToIdentify].n2.beatStrength < 0.5)
+            except:
+                pass
+        #print self.tnls1.n2.quarterLength
+        return ret and not self.chordList[1].isConsonant()
+        
+        #check that the vertical slice containing the passing tone is dissonant        
+
+    def hasNeighborTone(self, partNumToIdentify, unaccentedOnly=False):  
+        '''
+        partNum is the part (starting with 0) to identify the passing tone
+        for use on 3 vertical slices (3tuplet)
+        
+        >>> from music21 import *
+        >>> vs1 = VerticalSlice({0:note.Note('E-4'), 1: note.Note('C3')})
+        >>> vs2 = VerticalSlice({0:note.Note('E-4'), 1: note.Note('B2')})
+        >>> vs3 = VerticalSlice({0:note.Note('C5'), 1: note.Note('C3')})
+        >>> tbtm = VerticalSliceTriplet([vs1, vs2, vs3])
+        >>> tbtm.hasNeighborTone(1)
+        True
+        '''
+
+        
+        ret = self.tnlsDict[partNumToIdentify].couldBeNeighborTone()
+        if unaccentedOnly:
+            try:
+                ret = ret and (self.tnlsDict[partNumToIdentify].n2.beatStrength < 0.5)
+            except:
+                pass
+        return ret and not self.chordList[1].isConsonant()
+
+class NNoteLinearSegment(music21.Music21Object):
+    '''a list of n notes strung together in a sequence
+    noteList = [note1, note2, note3, ..., note-n ] Once this
+    object is created with a noteList, the noteList may not
+    be changed
+    
+    >>> from music21 import *
+    >>> n = NNoteLinearSegment(['A', 'C', 'D'])
+    >>> n.noteList
+    [<music21.note.Note A>, <music21.note.Note C>, <music21.note.Note D>]
+
+    '''
+    def __init__(self, noteList):
+        self._noteList = []
+        for value in noteList:
+            if value == None:
+                self._noteList.append(None)
+            elif common.isStr(value):
+                self._noteList.append(note.Note(value))
+            else:
+                try:
+                    if value.isClassOrSubclass([note.Note, pitch.Pitch]):
+                        self._noteList.append(value)
+                except:
+                    raise NNoteLinearSegmentException('not a valid note specification: %s' % value)
+                
+    def _getNoteList(self):
+        return self._noteList
+
+    noteList = property(_getNoteList, doc = '''
+    
+        >>> from music21 import *
+        >>> n = NNoteLinearSegment(['A', 'B5', 'C', 'F#'])
+        >>> n.noteList
+        [<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>, <music21.note.Note F#>]
+        
+    
+        ''')
+    
+    def _getMelodicIntervals(self):
+
+        tempListOne = self.noteList[:-1]
+        tempListTwo = self.noteList[1:]
+        melodicIntervalList = []
+        for n1, n2 in zip (tempListOne, tempListTwo):
+            melodicIntervalList.append(music21.interval.Interval(n1, n2))
+        
+        return melodicIntervalList
+        
+    melodicIntervals = property(_getMelodicIntervals, doc = '''
+        calculates the melodic intervals and returns them as a list,
+        with the interval at 0 being the interval between the first and second note.
+        
+        >>> from music21 import *
+        >>> n = NNoteLinearSegment([note.Note('A'), note.Note('B'), note.Note('C'), note.Note('D')])
+        >>> n.melodicIntervals
+        [<music21.interval.Interval M2>, <music21.interval.Interval M-7>, <music21.interval.Interval M2>]
+
+        '''
+        )
+
+class NNoteLinearSegmentException(Exception):
+    pass
+    
+class ThreeNoteLinearSegmentException(Exception):
     pass
 
-class ThreeNoteLinearSegment(music21.Music21Object):
+class ThreeNoteLinearSegment(NNoteLinearSegment):
     '''
     An object consisting of three sequential notes
     
@@ -860,6 +1240,13 @@ class ThreeNoteLinearSegment(music21.Music21Object):
     <music21.note.Note D>
     >>> ex.n3
     <music21.note.Note F>
+    >>> ex.iLeftToRight
+    <music21.interval.Interval m6>
+    
+    >>> ex.iLeft
+    <music21.interval.Interval P-5>
+    >>> ex.iRight
+    <music21.interval.Interval m10>
     
     if no octave specified, default octave of 4 is assumed
     
@@ -871,127 +1258,61 @@ class ThreeNoteLinearSegment(music21.Music21Object):
     
     '''
 
-    def __init__(self, n1=None, n2=None, n3=None):
-        self._n1 = None
-        self._n2 = None
-        self._n3 = None
+    def __init__(self, noteListorn1=None, n2 = None, n3 = None):
+        if common.isIterable(noteListorn1):
+            NNoteLinearSegment.__init__(self, noteListorn1)
+        else:
+            NNoteLinearSegment.__init__(self, [noteListorn1,n2,n3])
+            
+    def _getN1(self):
+        return self.noteList[0]
+    
+    def _setN1(self, value):
+        self.noteList[0] = self._correctNoteInput(value)
         
-        #storage location for the intervals between the pitches
-        self.iLeftToRight = None #interval between the left pitch and right pitch
-        self.iLeft = None #interval between the left pitch and the n2
-        self.iRight = None #interval between the pitch to Analyze and the right pitch
+    def _getN2(self):
+        return self.noteList[1]
+    
+    def _setN2(self, value):
+        self.noteList[1] = self._correctNoteInput(value)
+ 
+    def _getN3(self):
+        return self.noteList[2]
+    
+    def _setN3(self, value):
+        self.noteList[2] = self._correctNoteInput(value)
+                
+    def _correctNoteInput(self, value):
+        if value == None:
+            return None
+        elif common.isStr(value):
+            return note.Note(value)
+        else:
+            try:
+                if value.isClassOrSubclass([note.Note, pitch.Pitch]):
+                    return value
+            except:
+                raise ThreeNoteLinearSegmentException('not a valid note specification: %s' % value)
         
-        if n1 != None:
-            self.n1 = n1
-
-        if n2 != None:
-            self.n2 = n2
-
-        if n3 != None:
-            self.n3 = n3
-
-    def _calcIntervals(self):
-        #updated every time the n1, n2, or n3 is set (or reset)
-        if self.n1 != None and self.n3 != None:
-            self.iLeftToRight = music21.interval.Interval(self.n1, self.n3)
-        if self.n1 != None and self.n2 != None:
-            self.iLeft = music21.interval.Interval(self.n1, self.n2)
-        if self.n2 != None and self.n3 != None:
-            self.iRight = music21.interval.Interval(self.n2, self.n3)
+    n1 = property(_getN1, _setN1)
+    n2 = property(_getN2, _setN2)
+    n3 = property(_getN3, _setN3)
+    
+    def _getiLeftToRight(self):
+        return music21.interval.Interval(self.n1, self.n3)
+    
+    def _getiLeft(self):
+        return self.melodicIntervals[0]
+    
+    def _getiRight(self):
+        return self.melodicIntervals[1]
+    
+    iLeftToRight = property(_getiLeftToRight)
+    iLeft = property(_getiLeft)
+    iRight = property(_getiRight)
     
     def __repr__(self):
         return '<music21.voiceLeading.%s n1=%s n2=%s n3=%s ' % (self.__class__.__name__, self.n1, self.n2, self.n3)
-   
-    def _getn1(self):
-        return self._n1
-
-    def _setn1(self, value):
-        if value == None:
-            self._n1 = None
-        elif common.isStr(value):
-            self._n1 = note.Note(value)
-        else:
-            try:
-                if value.isClassOrSubclass([note.Note, pitch.Pitch]):
-                    self._n1 = value
-            except:
-                raise ThreeNoteLinearSegmentException('not a valid note specification: %s' % value)
-        self._calcIntervals()
-        
-    n1 = property(_getn1, _setn1, doc = '''
-        >>> from music21 import *
-        >>> ex = voiceLeading.ThreeNoteLinearSegment('C', 'D', 'E')
-        >>> ex.n3
-        <music21.note.Note E>
-        >>> ex.n3 = note.Note('F')
-        >>> ex.n3
-        <music21.note.Note F>   
-        ''')
-    
-    
-    def _getn2(self):
-        return self._n2
-
-    def _setn2(self, value):
-        if value == None:
-            self._n2 = None
-
-        elif common.isStr(value):
-            self._n2 = note.Note(value)
-
-        else:
-            try:
-                if value.isClassOrSubclass([note.Note, pitch.Pitch]):
-                    self._n2 = value
-
-            except:
-                raise ThreeNoteLinearSegmentException('not a valid note specification: %s' % value)
-        self._calcIntervals()
-        
-    n2 = property(_getn2, _setn2, doc = '''
-        >>> from music21 import *
-        >>> ex = voiceLeading.ThreeNoteLinearSegment('C', 'D', 'E')
-        >>> ex.n3
-        <music21.note.Note E>
-        >>> ex.n3 = note.Note('F')
-        >>> ex.n3
-        <music21.note.Note F>   
-    
-        ''')
-    
-    def _getn3(self):
-        return self._n3
-
-    def _setn3(self, value):
-        if value == None:
-            self._n3 = None
-
-        elif common.isStr(value):
-            self._n3 = note.Note(value)
-
-        else:
-            try:
-                if value.isClassOrSubclass([note.Note, pitch.Pitch]):
-                    self._n3 = value
-
-            except:
-                raise ThreeNoteLinearSegmentException('not a valid note specification: %s' % value)
-        self._calcIntervals()
-        
-    n3 = property(_getn3, _setn3, doc = '''
-    
-        Get or set the right-most note in the three note linear segment. All intervals are
-        updated accordingly.
-        
-        >>> from music21 import *
-        >>> ex = voiceLeading.ThreeNoteLinearSegment('C', 'D', 'E')
-        >>> ex.n3
-        <music21.note.Note E>
-        >>> ex.n3 = note.Note('F')
-        >>> ex.n3
-        <music21.note.Note F>    
-    
-        ''')
     
     def couldBePassingTone(self):
         '''
@@ -1133,9 +1454,11 @@ class ThreeNoteLinearSegment(music21.Music21Object):
         >>> ThreeNoteLinearSegment('C3','D-3','C3').couldBeDiatonicNeighborTone()
         False
         '''
+
         return self.n1.nameWithOctave == self.n3.nameWithOctave and \
             self.iLeft.chromatic.undirected == 2 and self.iRight.chromatic.undirected == 2 and \
             (self.iLeft.direction * self.iRight.direction == -1)
+
         
     def couldBeChromaticNeighborTone(self):
         '''
@@ -1153,173 +1476,8 @@ class ThreeNoteLinearSegment(music21.Music21Object):
         '''
         return self.n1.nameWithOctave == self.n3.nameWithOctave and \
             self.iLeft.isChromaticStep and self.iRight.isChromaticStep and \
-            (self.iLeft.direction * self.iRight.direction == -1)
+            (self.iLeft.direction * self.iRight.direction ==  -1)       
 
-class VerticalSlice(object):
-    ''' A vertical slice of notes represents a list of notes that occur
-    simultaneously in a score
-    
-    instantiate by passing in a dictionary of the form {partNumber : music21NoteObject }
-    {'1': 'note 1', '2' : 'note', '3' : 'note'}
-
-    >>> from music21 import *
-    >>> vs1 = VerticalSlice({0:note.Note('A4'), 1: note.Note('F2')})
-    >>> vs1.noteList
-    [<music21.note.Note A>, <music21.note.Note F>]
-    >>> vs1.noteFromPart(0)
-    <music21.note.Note A>
-    '''
-    #TODO: allow VerticalSlice to be composed of not just note objects....
-    def __init__(self,contentDict):
-        self.contentDict = contentDict
-        
-    def noteFromPart(self,partNum):
-        return self.contentDict[partNum]
-        
-    def _getNoteList(self):
-        '''
-        returns the entire note list of a vertical slice
-        '''
-        noteList = []
-        for part, m21object in self.contentDict.items():
-            if m21object == None:
-                continue
-            else:
-                noteList.append(m21object)
-        return noteList 
-        
-    noteList = property(_getNoteList)    
-    
-    def offset(self,leftAlign=True):
-        '''
-        returns the overall offset of the vertical slice. Typically, this would just be the
-        offset of each object in the vertical slice, and each object would have the same offset.
-        However, if the duration of one object in the slice is different than the duration of another,
-        and that other starts after the first, but the first is still sounding, then the offsets would be
-        different. In this case, specify leftAlign=True to return the lowest valued-offset of all the objects
-        in the vertical slice. If you prefer the offset of the right-most starting object, then specify leftAlign=False
-        
-        >>> from music21 import *
-        >>> s = stream.Score()
-        >>> n1 = note.Note('A4', quarterLength=1.0)
-        >>> s.append(n1)
-        >>> n1.offset
-        0.0
-        >>> n2 = note.Note('F2', quarterLength =0.5)
-        >>> s.append(n2)
-        >>> n2.offset
-        1.0
-        >>> vs = VerticalSlice({0:n1, 1: n2})
-        >>> vs.noteList
-        [<music21.note.Note A>, <music21.note.Note F>]
-
-        >>> vs.offset(leftAlign=True)
-        0.0
-        >>> vs.offset(leftAlign=False)
-        1.0
-        '''
-        if leftAlign:
-            return sorted(self.noteList, key=lambda m21Obj: m21Obj.offset)[0].offset
-        else:
-            return sorted(self.noteList, key=lambda m21Obj: m21Obj.offset)[-1].offset
-    
-        
-    def _setLyric(self, value):
-        newList = sorted(self.noteList, key=lambda x: x.offset, reverse=True)
-        newList[0].lyric = value
-        
-    def _getLyric(self):
-        newList = sorted(self.noteList, key=lambda x: x.offset, reverse=True)
-        return newList[0].lyric
-        
-    lyric = property(_getLyric, _setLyric)
-    
-    def __repr__(self):
-        return '<music21.voiceLeading.%s contentDict=%s  ' % (self.__class__.__name__, self.contentDict)
-       
-
-class VerticalSliceNTuplet(music21.Music21Object):
-    '''a collection of n number of vertical slices'''
-    def __init__(self, listofVerticalSlices):       
-        self.verticalSlices = listofVerticalSlices
-        
-        self.nTupletNum = len(listofVerticalSlices)
-        
-        self.chordList = []
-        self.tnlsDict = {} #Three Note Linear Segments
-        
-        if listofVerticalSlices:
-            self._calcChords()
-        if self.nTupletNum == 3:
-            self._calcTNLS()
-        
-    def _calcChords(self):
-        for vs in self.verticalSlices:
-            self.chordList.append(chord.Chord(vs.noteList))
-    
-    def _calcTNLS(self):
-        '''
-        calculates the three note linear segments if only three vertical slices provided
-        '''
-        for partNum in range(0,min(len(self.verticalSlices[0].noteList), len(self.verticalSlices[1].noteList), len(self.verticalSlices[2].noteList))):
-            self.tnlsDict[partNum] = ThreeNoteLinearSegment(self.verticalSlices[0].noteFromPart(partNum), self.verticalSlices[1].noteFromPart(partNum), self.verticalSlices[2].noteFromPart(partNum))
-        
-    def __repr__(self):
-        return '<music21.voiceLeading.%s listofVerticalSlices=%s ' % (self.__class__.__name__, self.verticalSlices)
-       
-    def hasPassingTone(self, partNumToIdentify, unaccentedOnly=False):  
-        '''
-        partNum is the part (starting with 0) to identify the passing tone
-        for use on 3 vertical slices (3Tuplet)
-        
-        
-        >>> from music21 import *
-        >>> vs1 = VerticalSlice({0:note.Note('A4'), 1: note.Note('F2')})
-        >>> vs2 = VerticalSlice({0:note.Note('B-4'), 1: note.Note('F2')})
-        >>> vs3 = VerticalSlice({0:note.Note('C5'), 1: note.Note('E2')})
-        >>> tbtm = VerticalSliceNTuplet([vs1, vs2, vs3])
-        >>> tbtm.hasPassingTone(0)
-        True
-        '''  
-        #TODO: check to make sure it's a 3Tuple
-        ret = self.tnlsDict[partNumToIdentify].couldBePassingTone()
-        if unaccentedOnly:
-            try:
-                ret = ret and (self.tnlsDict[partNumToIdentify].n2.beatStrength < 0.5)
-            except:
-                pass
-        #print self.tnls1.n2.quarterLength
-        return ret and not self.chordList[1].isConsonant()
-        
-        #check that the vertical slice containing the passing tone is dissonant        
-
-    def hasNeighborTone(self, partNumToIdentify, unaccentedOnly=False):  
-        '''
-        partNum is the part (starting with 0) to identify the passing tone
-        for use on 3 vertical slices (3tuplet)
-        
-        >>> from music21 import *
-        >>> vs1 = VerticalSlice({0:note.Note('E-4'), 1: note.Note('C3')})
-        >>> vs2 = VerticalSlice({0:note.Note('E-4'), 1: note.Note('B2')})
-        >>> vs3 = VerticalSlice({0:note.Note('C5'), 1: note.Note('C3')})
-        >>> tbtm = VerticalSliceNTuplet([vs1, vs2, vs3])
-        >>> tbtm.hasNeighborTone(1)
-        True
-        '''
-        #TODO: check to make sure this is an 3tuplet
-        
-        ret = self.tnlsDict[partNumToIdentify].couldBeNeighborTone()
-        if unaccentedOnly:
-            try:
-                ret = ret and (self.tnlsDict[partNumToIdentify].n2.beatStrength < 0.5)
-            except:
-                pass
-        return ret and not self.chordList[1].isConsonant()
-        
-        
-        #check that the vertical slice containing the passing tone is dissonant        
-                
-        
 #class TwoByThreeLinearSegment(music21.Music21Object):
 #    '''
 #    An object consisting of two ThreeNoteLinearSegments (for now)....later on maybe more than just two
@@ -1617,6 +1775,7 @@ class VerticalSliceNTuplet(music21.Music21Object):
 #        return False        
     
 #-------------------------------------------------------------------------------
+
 class Test(unittest.TestCase):
 
     def runTest(self):
