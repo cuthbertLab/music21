@@ -1290,10 +1290,10 @@ def mxToChordSymbol(mxHarmony):
 
     mxKind = mxHarmony.get('kind')
     if mxKind is not None:
-        cs.kind = mxKind.charData
+        cs.XMLkind = mxKind.charData
         mxKindText = mxKind.get('text')
         if mxKindText is not None:
-            cs.kindStr = mxKindText
+            cs.XMLkindStr = mxKindText
     
     mxRoot = mxHarmony.get('root')
     if mxRoot is not None:
@@ -1302,7 +1302,7 @@ def mxToChordSymbol(mxHarmony):
             # can provide integer to create accidental on pitch
             r.accidental = pitch.Accidental(int(mxRoot.get('rootAlter')))
         # set Pitch object on Harmony
-        cs.root = r
+        cs.XMLroot = r
 
     mxBass = mxHarmony.get('bass')
     if mxBass is not None:
@@ -1311,11 +1311,11 @@ def mxToChordSymbol(mxHarmony):
             # can provide integer to create accidental on pitch
             b.accidental = pitch.Accidental(int(mxBass.get('bassAlter')))
         # set Pitch object on Harmony
-        cs.bass = b
+        cs.XMLbass = b
 
     mxInversion = mxHarmony.get('inversion')
     if mxInversion is not None:
-        cs.inversion = int(mxInversion) # must be an int
+        cs.XMLinversion = int(mxInversion) # must be an int
 
     mxFunction = mxHarmony.get('function')
     if mxFunction is not None:
@@ -1354,14 +1354,14 @@ def chordSymbolToMx(cs):
     '''
     >>> from music21 import *
     >>> cs = harmony.ChordSymbol()
-    >>> cs.root = 'E-'
-    >>> cs.bass = 'B-'
-    >>> cs.inversion = 2
+    >>> cs.XMLroot = 'E-'
+    >>> cs.XMLbass = 'B-'
+    >>> cs.XMLinversion = 2
     >>> cs.romanNumeral = 'I64'
-    >>> cs.kind = 'major'
-    >>> cs.kindStr = 'M'
+    >>> cs.XMLkind = 'major'
+    >>> cs.XMLkindStr = 'M'
     >>> cs
-    <music21.harmony.ChordSymbol kind=major (M) root=E- bass=B- inversion=2 duration=0.0>
+    <music21.harmony.ChordSymbol E-/B->
     >>> mxHarmony = musicxml.translate.chordSymbolToMx(cs)
     >>> mxHarmony
     <harmony <root root-step=E root-alter=-1> function=I64 <kind text=M charData=major> inversion=2 <bass bass-step=B bass-alter=-1>>
@@ -1379,27 +1379,27 @@ def chordSymbolToMx(cs):
     mxHarmony = musicxmlMod.Harmony()
 
     mxKind = musicxmlMod.Kind()
-    mxKind.set('charData', cs.kind)
-    mxKind.set('text', cs.kindStr)
+    mxKind.set('charData', cs.XMLkind)
+    mxKind.set('text', cs.XMLkindStr)
     mxHarmony.set('kind', mxKind)
 
     # can assign None to these if None
-    mxHarmony.set('inversion', cs.inversion)
+    mxHarmony.set('inversion', cs.XMLinversion)
     if cs.romanNumeral is not None:
         mxHarmony.set('function', cs.romanNumeral.figure)
 
-    if cs.root is not None:        
+    if cs.XMLroot is not None:        
         mxRoot = musicxmlMod.Root()
-        mxRoot.set('rootStep', cs.root.step)
-        if cs.root.accidental is not None:
-            mxRoot.set('rootAlter', int(cs.root.accidental.alter))
+        mxRoot.set('rootStep', cs.XMLroot.step)
+        if cs.XMLroot.accidental is not None:
+            mxRoot.set('rootAlter', int(cs.XMLroot.accidental.alter))
         mxHarmony.set('root', mxRoot)
 
-    if cs.bass is not None:        
+    if cs.XMLbass != cs.XMLroot and cs.XMLbass is not None:        
         mxBass = musicxmlMod.Bass()
-        mxBass.set('bassStep', cs.bass.step)
-        if cs.bass.accidental is not None:
-            mxBass.set('bassAlter', int(cs.bass.accidental.alter))
+        mxBass.set('bassStep', cs.XMLbass.step)
+        if cs.XMLbass.accidental is not None:
+            mxBass.set('bassAlter', int(cs.XMLbass.accidental.alter))
         mxHarmony.set('bass', mxBass)
 
     if len(cs.getChordStepModifications()) > 0:
@@ -4544,10 +4544,10 @@ spirit</words>
         s = corpus.parse('leadSheet/berlinAlexandersRagtime.xml')
         self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 19)
 
-        match = [h.kind for h in s.flat.getElementsByClass('ChordSymbol')]
+        match = [h.XMLkind for h in s.flat.getElementsByClass('ChordSymbol')]
         self.assertEqual(match, [u'major', u'dominant', u'major', u'major', u'major', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'major'])
 
-        match = [str(h.root) for h in s.flat.getElementsByClass('ChordSymbol')]
+        match = [str(h.XMLroot) for h in s.flat.getElementsByClass('ChordSymbol')]
         self.assertEqual(match, ['F', 'C', 'F', 'B-', 'F', 'C', 'G', 'C', 'C', 'F', 'C', 'F', 'F', 'B-', 'F', 'F', 'C', 'F', 'C'])
 
         s = corpus.parse('monteverdi/madrigal.3.12.xml')
@@ -4563,51 +4563,51 @@ spirit</words>
         s.append(key.KeySignature(-2))
         
         h1 = harmony.ChordSymbol()
-        h1.root = 'c'
-        h1.kind = 'minor-seventh'
-        h1.kindStr = 'm7'
+        h1.XMLroot = 'c'
+        h1.XMLkind = 'minor-seventh'
+        h1.XMLkindStr = 'm7'
         h1.duration.quarterLength = 4
         s.append(h1)
         
         h2 = harmony.ChordSymbol()
-        h2.root = 'f'
-        h2.kind = 'dominant'
-        h2.kindStr = '7'
+        h2.XMLroot = 'f'
+        h2.XMLkind = 'dominant'
+        h2.XMLkindStr = '7'
         h2.duration.quarterLength = 4
         s.append(h2)
         
         h3 = harmony.ChordSymbol()
-        h3.root = 'b-'
-        h3.kind = 'major-seventh'
-        h3.kindStr = 'Maj7'
+        h3.XMLroot = 'b-'
+        h3.XMLkind = 'major-seventh'
+        h3.XMLkindStr = 'Maj7'
         h3.duration.quarterLength = 4
         s.append(h3)
         
         h4 = harmony.ChordSymbol()
-        h4.root = 'e-'
-        h4.kind = 'major-seventh'
-        h4.kindStr = 'Maj7'
+        h4.XMLroot = 'e-'
+        h4.XMLkind = 'major-seventh'
+        h4.XMLkindStr = 'Maj7'
         h4.duration.quarterLength = 4
         s.append(h4)
         
         h5 = harmony.ChordSymbol()
-        h5.root = 'a'
-        h5.kind = 'half-diminished'
-        h5.kindStr = 'm7b5'
+        h5.XMLroot = 'a'
+        h5.XMLkind = 'half-diminished'
+        h5.XMLkindStr = 'm7b5'
         h5.duration.quarterLength = 4
         s.append(h5)
         
         h6 = harmony.ChordSymbol()
-        h6.root = 'd'
-        h6.kind = 'dominant'
-        h6.kindStr = '7'
+        h6.XMLroot = 'd'
+        h6.XMLkind = 'dominant'
+        h6.XMLkindStr = '7'
         h6.duration.quarterLength = 4
         s.append(h6)
         
         h7 = harmony.ChordSymbol()
-        h7.root = 'g'
-        h7.kind = 'minor-sixth'
-        h7.kindStr = 'm6'
+        h7.XMLroot = 'g'
+        h7.XMLkind = 'minor-sixth'
+        h7.XMLkindStr = 'm6'
         h7.duration.quarterLength = 4
         s.append(h7)
         
@@ -4628,12 +4628,12 @@ spirit</words>
         from music21 import harmony, stream
 
         h = harmony.ChordSymbol()
-        h.root = 'E-'
-        h.bass = 'B-'
-        h.inversion = 2
+        h.XMLroot = 'E-'
+        h.XMLbass = 'B-'
+        h.XMLinversion = 2
         #h.romanNumeral = 'I64'
-        h.kind = 'major'
-        h.kindStr = 'M'
+        h.XMLkind = 'major'
+        h.XMLkindStr = 'M'
         
         hd = harmony.ChordStepModification()
         hd.type = 'alter'
