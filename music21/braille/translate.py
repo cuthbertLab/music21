@@ -27,6 +27,7 @@ from music21.braille import segment
 
 def objectToBraille(music21Obj, debug=False, **keywords):
     ur"""
+
     Translates an arbitrary object to Braille.  Doesn't yet work on notes:
 
     >>> from music21 import *
@@ -41,7 +42,6 @@ def objectToBraille(music21Obj, debug=False, **keywords):
 
 
     >>> #_DOCS_SHOW tns.show('braille')
-
     ⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠸⠹⠵⠋⠛⠩⠓⠧⠀⠐⠏⠄⠣⠅
     """
@@ -68,9 +68,9 @@ def streamToBraille(music21Stream, debug=False, **keywords):
         allBrailleLines = []
         for music21Metadata in music21Stream.getElementsByClass(metadata.Metadata):
             if music21Metadata.title is not None:
-                allBrailleLines.append(unicode(music21Metadata.title))
+                allBrailleLines.append(music21Metadata.title)
             if music21Metadata.composer is not None:
-                allBrailleLines.append(unicode(music21Metadata.composer))
+                allBrailleLines.append(music21Metadata.composer)
         for p in music21Stream.getElementsByClass(stream.Part):
             try:
                 music21Part = p.makeNotation(cautionaryNotImmediateRepeat=False)
