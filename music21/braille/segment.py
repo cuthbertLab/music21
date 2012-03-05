@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         segment.py
-# Purpose:      music21 class which allows division of streams into braille segments.
+# Purpose:      Division of stream.Part into segments for individual handling
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    (c) 2012 The music21 Project
@@ -50,7 +50,7 @@ affinityNames = {3: "Signature Grouping",
 
 class BrailleElementGrouping(list):
     def __init__(self):
-        list.__init__(self)
+        super(list, self).__init__()
         # External attributes
         # -------------------
         self.keySignature = key.KeySignature(0)
@@ -95,18 +95,22 @@ class BrailleSegment(collections.defaultdict):
                     continue
             except TypeError:
                 pass
-            allKeys.append("Measure {0}, {1} {2}:\n".format(int(key/100), affinityNames[key%10], int(key%100)/10 + 1))
+            allKeys.append("Measure {0}, {1} {2}:\n".format(int(key/100),
+                affinityNames[key%10], int(key%100)/10 + 1))
             if key % 10 == 8:
                 allVoices = []
                 for v in grouping:
                     allVoices.append("{0}".format\
-                                     (u"\n".join([u"\n".join(x._brailleEnglish) for x in v if len(x._brailleEnglish) > 0])))
+                                     (u"\n".join([u"\n".join(x._brailleEnglish)
+                                                  for x in v if len(x._brailleEnglish) > 0])))
                 allGroupings.append(u"\n".join(allVoices))
             else:
                 allGroupings.append("{0}".format\
-                                    (u"\n".join([u"\n".join(x._brailleEnglish) for x in grouping if len(x._brailleEnglish) > 0])))
+                                    (u"\n".join([u"\n".join(x._brailleEnglish)
+                                                 for x in grouping if len(x._brailleEnglish) > 0])))
             prevKey = key
-        allElementGroupings = u"\n".join([u"".join([k, g, "\n==="]) for (k,g) in list(itertools.izip(allKeys, allGroupings))])
+        allElementGroupings = u"\n".join([u"".join([k, g, "\n==="])
+                                          for (k,g) in list(itertools.izip(allKeys, allGroupings))])
         return u"\n".join(["---begin segment---", name, allElementGroupings, "---end segment---"])
     
     def __repr__(self):
@@ -199,7 +203,8 @@ class BrailleSegment(collections.defaultdict):
             self.currentGroupingKey = self.allGroupingKeys.pop(0)
             if self.currentGroupingKey % 10 == 3:
                 try:
-                    keySignature, timeSignature = self.get(self.currentGroupingKey)[0], self.get(self.currentGroupingKey)[1]
+                    keySignature, timeSignature = self.get(
+                        self.currentGroupingKey)[0], self.get(self.currentGroupingKey)[1]
                 except IndexError:
                     keyOrTimeSig = self.get(self.currentGroupingKey)[0]
                     if isinstance(keyOrTimeSig, key.KeySignature):
@@ -212,7 +217,8 @@ class BrailleSegment(collections.defaultdict):
                 metronomeMark = self.get(self.currentGroupingKey)[0]
 
         try:
-            brailleHeading = basic.transcribeHeading(keySignature, timeSignature, tempoText, metronomeMark, self.maxLineLength)
+            brailleHeading = basic.transcribeHeading(keySignature, timeSignature,
+                tempoText, metronomeMark, self.maxLineLength)
             brailleText.addElement(heading = brailleHeading)
         except basic.BrailleBasicException as bbe:
             if not bbe.args[0] == "No heading can be made.":
@@ -301,7 +307,8 @@ class BrailleSegment(collections.defaultdict):
         keySignature = None
         timeSignature = None
         try:
-            keySignature, timeSignature = self.get(self.currentGroupingKey)[0], self.get(self.currentGroupingKey)[1]
+            keySignature, timeSignature = self.get(self.currentGroupingKey)[0], \
+                                          self.get(self.currentGroupingKey)[1]
         except IndexError:
             keyOrTimeSig = self.get(self.currentGroupingKey)[0]
             if isinstance(keyOrTimeSig, key.KeySignature):
@@ -354,23 +361,29 @@ class BrailleGrandSegment():
         allPairs = []
         allKeyPairs = self.combineGroupingKeys(self.rightSegment, self.leftSegment)
         for (rightKey, leftKey) in allKeyPairs:
-            a = "Measure {0} Right, {1} {2}:\n".format(int(rightKey/100), affinityNames[rightKey%10], int(rightKey%100)/10 + 1)
+            a = "Measure {0} Right, {1} {2}:\n".format(
+                int(rightKey/100), affinityNames[rightKey%10], int(rightKey%100)/10 + 1)
             if rightKey % 10 == 8:
                 allVoices = []
                 for v in self.rightSegment[rightKey]:
-                    allVoices.append("{0}".format(u"\n".join([u"\n".join(x._brailleEnglish) for x in v if len(x._brailleEnglish) > 0])))
+                    allVoices.append("{0}".format(
+                        u"\n".join([u"\n".join(x._brailleEnglish) for x in v if len(x._brailleEnglish) > 0])))
                 b = u"\n".join(allVoices)
             else:
-                b = "{0}".format(u"\n".join([u"\n".join(x._brailleEnglish) for x in self.rightSegment[rightKey] if len(x._brailleEnglish) > 0]))
-            c = "\nMeasure {0} Left, {1} {2}:\n".format(int(leftKey/100), affinityNames[leftKey%10], int(leftKey%100)/10 + 1)
+                b = "{0}".format(u"\n".join([u"\n".join(x._brailleEnglish)
+                                             for x in self.rightSegment[rightKey] if len(x._brailleEnglish) > 0]))
+            c = "\nMeasure {0} Left, {1} {2}:\n".format(int(leftKey/100),
+                affinityNames[leftKey%10], int(leftKey%100)/10 + 1)
             if leftKey % 10 == 8:
                 allVoices = []
                 for v in self.leftSegment[leftKey]:
                     allVoices.append("{0}:".format(v))
-                    allVoices.append("{0}".format(u"\n".join([u"\n".join(x._brailleEnglish) for x in v if len(x._brailleEnglish) > 0])))
+                    allVoices.append("{0}".format(u"\n".join([u"\n".join(x._brailleEnglish)
+                                                              for x in v if len(x._brailleEnglish) > 0])))
                 d = u"\n".join(allVoices)
             else:
-                d = "{0}".format(u"\n".join([u"\n".join(x._brailleEnglish) for x in self.leftSegment[leftKey] if len(x._brailleEnglish) > 0]))
+                d = "{0}".format(u"\n".join([u"\n".join(x._brailleEnglish)
+                                             for x in self.leftSegment[leftKey] if len(x._brailleEnglish) > 0]))
             ab = u"".join([a,b]) 
             cd = u"".join([c,d])
             allPairs.append(u"\n".join([ab, cd, "====\n"]))
@@ -478,7 +491,8 @@ class BrailleGrandSegment():
                 metronomeMark = useElement[0]
 
         try:
-            brailleHeading = basic.transcribeHeading(keySignature, timeSignature, tempoText, metronomeMark, self.maxLineLength)
+            brailleHeading = basic.transcribeHeading(keySignature, timeSignature,
+                tempoText, metronomeMark, self.maxLineLength)
             brailleKeyboard.addElement(heading = brailleHeading)
         except basic.BrailleBasicException as bbe:
             if not bbe.args[0] == "No heading can be made.":
@@ -564,7 +578,8 @@ def findSegments(music21Part, **partKeywords):
         if slurLongPhraseWithBrackets:
             showLongSlursAndTiesTogether = True
             
-    prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets, showShortSlursAndTiesTogether, showLongSlursAndTiesTogether)
+    prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets,
+        showShortSlursAndTiesTogether, showLongSlursAndTiesTogether)
 
     # Raw Segments
     # ------------
@@ -632,11 +647,7 @@ def getRawSegments(music21Part, segmentBreaks=None):
     if not segmentBreaks is None:
         (mnStart, offsetStart) = segmentBreaks[segmentIndex]
     currentSegment = BrailleSegment()
-    previousMeasureNumber = -1
     for music21Measure in music21Part.getElementsByClass(stream.Measure, stream.Voice):
-        if music21Measure.number == previousMeasureNumber:
-            raise BrailleSegmentException("Improperly formatted part: multiple measures with same measure number")
-        previousMeasureNumber = music21Measure.number
         prepareBeamedNotes(music21Measure)
         if music21Measure.number >= mnStart:
             music21Measure.sliceAtOffsets(offsetList=[offsetStart], inPlace=True)
@@ -691,9 +702,12 @@ def prepareBeamedNotes(music21Measure):
         sampleNote.beamStart = False
         sampleNote.beamContinue = False
     allNotesAndRests = music21Measure.notesAndRests
-    allNotesWithBeams = allNotes.splitByClass(None, lambda sampleNote: not(sampleNote.beams is None) and len(sampleNote.beams) > 0)[0]
-    allStart = allNotesWithBeams.splitByClass(None, lambda sampleNote: sampleNote.beams.getByNumber(1).type is 'start')[0]
-    allStop  = allNotesWithBeams.splitByClass(None, lambda sampleNote: sampleNote.beams.getByNumber(1).type is 'stop')[0]
+    allNotesWithBeams = allNotes.splitByClass(
+        None, lambda sampleNote: not(sampleNote.beams is None) and len(sampleNote.beams) > 0)[0]
+    allStart = allNotesWithBeams.splitByClass(
+        None, lambda sampleNote: sampleNote.beams.getByNumber(1).type is 'start')[0]
+    allStop  = allNotesWithBeams.splitByClass(
+        None, lambda sampleNote: sampleNote.beams.getByNumber(1).type is 'stop')[0]
     if not(len(allStart) == len(allStop)):
         environRules.warn("Incorrect beaming: number of start notes != to number of stop notes.")
         return
@@ -947,7 +961,8 @@ def splitMeasure(music21Measure, value = 2, beatDivisionOffset = 0, useTimeSigna
     newMeasures.append(stream.Measure())
     newMeasures.append(stream.Measure())
     for x in music21Measure:
-        if x.offset >= startOffsetZero and (x.offset < endOffsetZero or (x.offset == endOffsetZero and isinstance(x, bar.Barline))):
+        if x.offset >= startOffsetZero and\
+           (x.offset < endOffsetZero or (x.offset == endOffsetZero and isinstance(x, bar.Barline))):
             newMeasures[0].insert(x.offset, x)
         else:
             newMeasures[1].insert(x.offset, x)
