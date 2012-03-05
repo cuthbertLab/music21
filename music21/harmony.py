@@ -3,8 +3,8 @@
 # Name:         harmony.py
 # Purpose:      music21 classes for representing harmonies and chord symbols
 #
-# Authors:      Christopher Ariza
-#               Beth Hadley
+# Authors:      Beth Hadley
+#               Christopher Ariza
 #
 # Copyright:    (c) 2011 The music21 Project
 # License:      LGPL
@@ -68,6 +68,40 @@ environLocal = environment.Environment(_MOD)
 # <xs:enumeration value="Tristan"/>
 # <xs:enumeration value="other"/>
 # <xs:enumeration value="none"/>
+CHORD_TYPES = {
+             'major': ['', 'Maj'] , 
+             'minor': ['m', '-', 'min'] ,
+             'augmented' : ['+', '#5'] , 
+             'diminished' : ['dim', 'o'] ,
+             'dominant' : ['7'],
+             'major-seventh' : [ 'M7', 'Maj7'],
+             'minor-seventh' : ['m7' , 'min7'] ,
+             'diminished-seventh' : ['dim7' , 'o7'] ,
+             'augmented-seventh' : ['7+', '7#5'] ,
+             'half-diminished' : ['m7b5'] ,
+             'major-minor' : ['mMaj7'] , 
+             'major-sixth' : ['6'] ,
+             'minor-sixth' : ['m6', 'min6'] ,
+             'dominant-ninth' : ['9'] ,
+             'major-ninth' : ['M9' , 'Maj9'] ,
+             'minor-ninth' : ['m9', 'min9'] ,
+             'dominant-11th' : ['11'] ,
+             'major-11th' : ['M11' , 'Maj11'] ,
+             'minor-11th' : ['m11' , 'min11'] ,
+             'dominant-13th' : ['13'] ,
+             'major-13th' : ['M13', 'Maj13'] ,
+             'minor-13th' : ['m13' , 'min13'] ,
+             'suspended-second' : ['sus2'] ,
+             'suspended-fourth' : ['sus' , 'sus4'] ,
+             'Neapolitan' : ['N6'] ,
+             'Italian' : ['It+6'] ,
+             'French' : ['Fr+6'] ,
+             'German' : ['Gr+6'] ,
+             'pedal' : ['pedal'] ,
+             'power' : ['power'] ,
+             'Tristan' : ['tristan']
+             }
+
 '''XML DESCRIPTION OF ABOVE TYPES OF CHORDS:
 Triads:
     major (major third, perfect fifth) [C]
@@ -117,21 +151,21 @@ def realizeChordSymbolDurations(piece):
 
     >>> from music21 import *
     >>> s = stream.Score()
-    >>> s.append(harmony.ChordSymbol())
+    >>> s.append(harmony.ChordSymbol('C'))
     >>> s.repeatAppend(note.Note('C'), 4)
-    >>> s.append(harmony.ChordSymbol())
+    >>> s.append(harmony.ChordSymbol('C'))
     >>> s.repeatAppend(note.Note('C'), 4)
     >>> s = s.makeMeasures()
 
     >>> harmony.realizeChordSymbolDurations(s).show('text')
     {0.0} <music21.clef.TrebleClef>
     {0.0} <music21.meter.TimeSignature 4/4>
-    {0.0} <music21.harmony.ChordSymbol kind= () root=None bass=None inversion=None duration=4.0>
+    {0.0} <music21.harmony.ChordSymbol C>
     {0.0} <music21.note.Note C>
     {1.0} <music21.note.Note C>
     {2.0} <music21.note.Note C>
     {3.0} <music21.note.Note C>
-    {4.0} <music21.harmony.ChordSymbol kind= () root=None bass=None inversion=None duration=4.0>
+    {4.0} <music21.harmony.ChordSymbol C>
     {4.0} <music21.note.Note C>
     {5.0} <music21.note.Note C>
     {6.0} <music21.note.Note C>
@@ -142,13 +176,13 @@ def realizeChordSymbolDurations(piece):
     If only one chord symbol object is present:
 
     >>> s = stream.Score()
-    >>> s.append(harmony.ChordSymbol())
+    >>> s.append(harmony.ChordSymbol('C'))
     >>> s.repeatAppend(note.Note('C'), 4)
     >>> s = s.makeMeasures()
     >>> harmony.realizeChordSymbolDurations(s).show('text') 
     {0.0} <music21.clef.TrebleClef>
     {0.0} <music21.meter.TimeSignature 4/4>
-    {0.0} <music21.harmony.ChordSymbol kind= () root=None bass=None inversion=None duration=4.0>
+    {0.0} <music21.harmony.ChordSymbol C>
     {0.0} <music21.note.Note C>
     {1.0} <music21.note.Note C>
     {2.0} <music21.note.Note C>
@@ -162,7 +196,7 @@ def realizeChordSymbolDurations(piece):
 
     >>> s = stream.Score()
     >>> s.repeatAppend(note.Note('C'), 4)
-    >>> s.append(harmony.ChordSymbol())
+    >>> s.append(harmony.ChordSymbol('C'))
     >>> s.repeatAppend(note.Note('C'), 8)  
     >>> s = s.makeMeasures()
     >>> harmony.realizeChordSymbolDurations(s).show('text')        
@@ -172,7 +206,7 @@ def realizeChordSymbolDurations(piece):
     {1.0} <music21.note.Note C>
     {2.0} <music21.note.Note C>
     {3.0} <music21.note.Note C>
-    {4.0} <music21.harmony.ChordSymbol kind= () root=None bass=None inversion=None duration=8.0>
+    {4.0} <music21.harmony.ChordSymbol C>
     {4.0} <music21.note.Note C>
     {5.0} <music21.note.Note C>
     {6.0} <music21.note.Note C>
@@ -200,7 +234,7 @@ def realizeChordSymbolDurations(piece):
                 lastchord = cs
         return pf
     elif len(onlyChords) == 1:
-        onlyChords[0].duration.quarterLength = pf.highestOffset - onlyChords[0].getOffsetBySite(pf)
+        onlyChords[0].duration.quarterLength = pf.highestOffset - onlyChords[0].getOffsetBySite(pf) 
         return pf
     else:
         return piece
@@ -276,7 +310,8 @@ class ChordStepModification(object):
             self.interval = interval
     
     def __repr__(self):
-        return '<music21.harmony.ChordStepModification modType=%s degree=%s interval=%s>' % (self.modType, self.degree, self.interval)
+        return '<music21.harmony.ChordStepModification modType=%s degree=%s interval=%s>' %\
+             (self.modType, self.degree, self.interval)
         
     #---------------------------------------------------------------------------
     def _setModType(self, value):
@@ -366,29 +401,52 @@ class ChordStepModification(object):
 class Harmony(music21.Music21Object):
     '''
     >>> from music21 import *
-    >>> h = harmony.Harmony() 
-    >>> h.root = 'b-'
-    >>> h.bass = 'd'
-    >>> h.inversion = 1
+    >>> h = harmony.ChordSymbol() 
+    >>> h.XMLroot = 'b-'
+    >>> h.XMLbass = 'd'
+    >>> h.XMLinversion = 1
     >>> h.addChordStepModification(harmony.ChordStepModification('add', 4))
     >>> h
-    <music21.harmony.Harmony root=B- bass=D inversion=1 duration=0.0 ChordStepModifications=<music21.harmony.ChordStepModification modType=add degree=4 interval=None>>
-
-    >>> p = harmony.Harmony(root='C', bass='E', inversion=1, duration=4.0)
+    <music21.harmony.ChordSymbol B-/D add 4>
+    >>> p = harmony.ChordSymbol(root='C', bass='E', inversion=1, duration=4.0)
     >>> p
-    <music21.harmony.Harmony root=C bass=E inversion=1 duration=4.0>
+    <music21.harmony.ChordSymbol C/E>
 
-    '''
+    Harmony objects in music21 are special types of chords. Although on a page of music they exist as symbols
+    rather than notes, musicians consider them to be chords. Thus, harmony objects in music21 are not a subclass
+    of Chord, although they do contain a chord object within them and all of the methods of class chord can
+    be used to operate directly on the harmony object. NB - h.root() is analogous to calling h.chord.root()
     
-    def __init__(self,  **keywords):
+    For example,
+    
+    >>> from music21 import *
+    >>> h = harmony.ChordSymbol('C7/E')
+    >>> h.root()
+    C4
+    >>> h.bass()
+    E3
+    >>> h.inversion()
+    1
+    >>> h.isSeventh()
+    True
+    >>> h.pitches
+    [E3, G3, B-3, C4]
+    ''' 
+    
+    def __init__(self, figure = None, **keywords):
         
         music21.Music21Object.__init__(self)
         
-        self._root = None # a pitch object
-        self._bass = None # a pitch object
+        self._XMLroot = None # a pitch object
+        self._XMLbass = None # a pitch object
 
-        self._inversion = None # an integer
+        self._XMLinversion = None # an integer
         self._chord = music21.chord.Chord()
+        
+        
+        #for a harmony object's duration is 0. Users can run realizeChordSymbolDuraitons method to
+        #assign the correct duration to each harmony object given a score
+        
         #TODO: deal with the roman numeral property of harmonies...music xml documentation is ambiguous: 
         #A root is a pitch name like C, D, E, where a function is an 
         #indication like I, II, III. It is an either/or choice to avoid data inconsistency.    
@@ -398,34 +456,122 @@ class Harmony(music21.Music21Object):
         self.chordStepModifications = []
         self._degreesList = []
         self._pitchesAndDegrees = []
-            
+           
+        self.duration = music21.duration.Duration(0)
+        
         for kw in keywords:
             if kw == 'root':
-                self._root = music21.pitch.Pitch(keywords[kw])
+                self._XMLroot = music21.pitch.Pitch(keywords[kw])
             elif kw == 'bass':
-                self._bass = music21.pitch.Pitch(keywords[kw])
+                self._XMLbass= music21.pitch.Pitch(keywords[kw])
             elif kw == 'inversion':
-                self._inversion = int(keywords[kw])
-            elif kw == "duration" or kw == "quarterLength":
+                self._XMLinversion = int(keywords[kw])
+            elif kw == 'duration' or kw == 'quarterLength':
                 self.duration = music21.duration.Duration(keywords[kw])
             else:
                 pass
-            
+        
+        #figure is the string representation of a Harmony object
+        #for example, for Chord Symbols the figure might be 'Cm7'
+        #for roman numerals, the figure might be 'I7'
+        self._figure = figure
+        if self._figure is not None:
+            self._parseFigure(self._figure)
 
-    def __repr__(self):
-        if len(self.chordStepModifications) == 0:
-            return '<music21.harmony.%s root=%s bass=%s inversion=%s duration=%s>' % (self.__class__.__name__, self.root, self.bass, self.inversion, self.duration.quarterLength)
+    def _getFigure(self):
+        if self._figure == None:
+            return self.findFigure()
         else:
-            return '<music21.harmony.%s root=%s bass=%s inversion=%s duration=%s ChordStepModifications=%s>' % (self.__class__.__name__, self.root, self.bass, self.inversion, self.duration.quarterLength, ''.join([str(x) for x in self.chordStepModifications]))
+            return self._figure
+        
+    def _setFigure(self, value):
+        self._figure = value
+        if self._figure is not None:
+            self._parseFigure(self._figure)
+            
+    figure = property(_getFigure, _setFigure, doc = '''
+        Get or set the figure of the harmony object. The figure is the character (string)
+        representation of the object. For example, 'I', 'CM', '3#'
+        
+        when you instantiate a harmony object, if you pass in a figure it is stored internally
+        and returned when you access the figure property. if you don't instantiate the object
+        with a figure, this property calls :meth:`music21.harmony.findFigure` method which
+        deduces the figure provided other information about the object, especially the chord
+        
+        if the pitches of the harmony object have been modified after being instantiated,
+        call :meth:`music21.harmony.findFigure` to deduce the new figure
+        
+        >>> from music21 import *
+        >>> h = harmony.ChordSymbol('CM')
+        >>> h.figure
+        'CM'
+        >>> harmony.ChordSymbol(root = 'C', bass = 'A', kind = 'minor').figure
+        'Cm/A'
+        >>> h.bass(note.Note('E'))
+        >>> h.figure
+        'CM'
+        ''')
     
+    def findFigure(self):
+        return None
+    
+    def __repr__(self):
+        return '<music21.harmony.%s %s >' % (self.__class__.__name__, self.figure)
+#        if len(self.chordStepModifications) == 0:         
+#                (self.__class__.__name__, self.XMLroot, self.XMLbass, \
+#                    self.XMLinversion, self.duration.quarterLength)
+#            return '<music21.harmony.%s root=%s bass=%s inversion=%s duration=%s>' % \
+#                (self.__class__.__name__, self.XMLroot, self.XMLbass, \
+#                    self.XMLinversion, self.duration.quarterLength)
+#        else:
+#            return '<music21.harmony.%s root=%s bass=%s inversion=%s duration=%s ChordStepModifications=%s>' % \
+#                (self.__class__.__name__, self.XMLroot, self.XMLbass, self.XMLinversion, self.duration.quarterLength, \
+#                                    ''.join([str(x) for x in self.chordStepModifications]))
+
     #---------------------------------------------------------------------------
+    def _realizePitches(self):
+        '''method must be overridden in each subclass of Harmony because each harmony object uses
+        a different method to extract pitches form the harmony symbol'''
+        pass
+    
+    def _parseFigure(self):
+        '''method must be overriden in each subclass of Harmony because each harmony object 
+        uses a different method to parse the figure'''
+        pass
+    
+    def _setChord(self, value):
+        if hasattr(value, 'classes') and 'Chord' in value.classes:
+            self._chord = value
+            return
+        try: # try to create 
+            self._chord = chord.Chord(value)
+            return
+        except music21.Music21Exception: 
+            pass
+        raise HarmonyException('not a valid music21 chord specification: %s' % value)
+
+
+    def _getChord(self):
+        if self._chord.pitches == [] and self.XMLroot:
+            self._realizePitches()   
+        return self._chord
+
+    chord = property(_getChord, _setChord, doc = '''
+        Get or set the chord object of this harmony object. The chord object will
+        be returned with the realized pitches as an attribute. The user could 
+        override these pitches by manually setting the chord.pitches.
+
+
+        ''')
+    
+      
     
     def addChordStepModification(self, degree):
         '''Add a harmony degree specification to this Harmony as a :class:`~music21.harmony.ChordStepModification` object.
 
         >>> from music21 import *
         >>> hd = harmony.ChordStepModification('add', 4)
-        >>> h = harmony.Harmony()
+        >>> h = harmony.ChordSymbol()
         >>> h.addChordStepModification(hd)
         >>> h.addChordStepModification('juicy')
         Traceback (most recent call last):
@@ -465,7 +611,7 @@ class Harmony(music21.Music21Object):
         '''
         #just update octaves here
         
-        for pitch, pitchAndDegree in zip(self.chord.pitches, self._pitchesAndDegrees):
+        for pitch, pitchAndDegree in zip(self.pitches, self._pitchesAndDegrees):
             if pitch.name == pitchAndDegree[0]:
                 pitchAndDegree[0] = pitch
         return self._pitchesAndDegrees
@@ -478,36 +624,40 @@ class Harmony(music21.Music21Object):
         >>> h.getDegrees()
         ['1', '-3', '5', '-7']
         '''
-        if self._chord.pitches == []:
-            self.realizePitches()
+        if self.pitches == []:
+            self._realizePitches()
         return self._degreesList
 
     def _setRoot(self, value):
         if hasattr(value, 'classes') and 'Pitch' in value.classes:
-            self._root = value
+            self._XMLroot = value
+            self._chord.root(self._XMLroot )
             return
         try: # try to create a Pitch object
-            self._root = pitch.Pitch(value)
+            self._XMLroot = pitch.Pitch(value)
+            self._chord.root(self._XMLroot )
             return
         except music21.Music21Exception: 
             pass
         raise HarmonyException('not a valid pitch specification: %s' % value)
 
     def _getRoot(self):
-        return self._root
+        return self._XMLroot
 
-    root = property(_getRoot, _setRoot, doc= '''
-        Get or set the root of the Harmony as a :class:`~music21.pitch.Pitch` object. String representations accepted by Pitch are also accepted.
+    XMLroot = property(_getRoot, _setRoot, doc= '''
+        Get or set the XMLroot attribute of the Harmony as a :class:`~music21.pitch.Pitch` object. 
+        String representations accepted by Pitch are also accepted. Also updates the associated 
+        chord object's root
 
         >>> from music21 import *
-        >>> h = harmony.Harmony()
-        >>> h.root = 'a#'
-        >>> h.root
+        >>> h = harmony.ChordSymbol()
+        >>> h.XMLroot= 'a#'
+        >>> h.XMLroot
         A#
-        >>> h.root = pitch.Pitch('c#')
-        >>> h.root
+        >>> h.XMLroot= pitch.Pitch('c#')
+        >>> h.XMLroot
         C#
-        >>> h.root = 'juicy'
+        >>> h.XMLroot= 'juicy'
         Traceback (most recent call last):
         HarmonyException: not a valid pitch specification: juicy
         ''')
@@ -516,35 +666,38 @@ class Harmony(music21.Music21Object):
     #---------------------------------------------------------------------------
     def _setBass(self, value):
         if hasattr(value, 'classes') and 'Pitch' in value.classes:
-            self._bass = value
+            self._XMLbass = value
+            self._chord.bass(self._XMLbass )
             return
         try: # try to create a Pitch object
-            self._bass = pitch.Pitch(value)
+            self._XMLbass = pitch.Pitch(value)
+            self._chord.bass(self._XMLbass )
             return
         except music21.Music21Exception: 
             pass
         raise HarmonyException('not a valid pitch specification: %s' % value)
 
     def _getBass(self):
-        if self._bass:
-            return self._bass
+        if self._XMLbass:
+            return self._XMLbass
         else:
-            return self._root
+            return self._XMLroot
 
-    bass = property(_getBass, _setBass, doc= '''
-        Get or set the bass of the Harmony as a :class:`~music21.pitch.Pitch` object. String representations accepted by Pitch are also accepted.
-        If the bass is 'None' (commonly read in from music xml) then it returns
+    XMLbass = property(_getBass, _setBass, doc= '''
+        Get or set the XMLbass of the Harmony as a :class:`~music21.pitch.Pitch` object. 
+        String representations accepted by Pitch are also accepted. Also updates the associated 
+        chord object's bass. If the bass is 'None' (commonly read in from music xml) then it returns
         the root pitch.
         
         >>> from music21 import *
-        >>> h = harmony.Harmony()
-        >>> h.bass = 'a#'
-        >>> h.bass
+        >>> h = harmony.ChordSymbol()
+        >>> h.XMLbass = 'a#'
+        >>> h.XMLbass
         A#
-        >>> h.bass = pitch.Pitch('d-')
-        >>> h.bass
+        >>> h.XMLbass = pitch.Pitch('d-')
+        >>> h.XMLbass
         D-
-        >>> h.bass = 'juicy'
+        >>> h.XMLbass = 'juicy'
         Traceback (most recent call last):
         HarmonyException: not a valid pitch specification: juicy
         ''')
@@ -552,26 +705,28 @@ class Harmony(music21.Music21Object):
     #---------------------------------------------------------------------------
     def _setInversion(self, value):
         if common.isNum(value):
-            self._inversion = int(value)
+            self._XMLinversion = int(value)
+            #self.inversion(self._XMLinversion)
             return
         elif value == None:
-            self._inversion = value
+            self._XMLinversion = value
+            #self.inversion(self._XMLinversion)
             return
         raise HarmonyException('not a valid inversion specification: %s' % value)
 
     def _getInversion(self):
-        return self._inversion
+        return self._XMLinversion
 
-    inversion = property(_getInversion, _setInversion, doc= '''
-        Get or set the inversion of this Harmony as an a positive integer.
+    XMLinversion = property(_getInversion, _setInversion, doc= '''
+        Get or set the inversion of this Harmony as a positive integer. Also updates the associated 
+        chord object's bass. 
 
         >>> from music21 import *
-        >>> h = harmony.Harmony()
-        >>> h.inversion = 2
-        >>> h.inversion
+        >>> h = harmony.ChordSymbol()
+        >>> h.XMLinversion = 2
+        >>> h.XMLinversion
         2
         ''')
-
 
     #---------------------------------------------------------------------------
     #TODO: move this attribute to roman class which inherets from harmony.Harmony objects
@@ -593,7 +748,7 @@ class Harmony(music21.Music21Object):
         Get or set the romanNumeral numeral function of the Harmony as a :class:`~music21.romanNumeral.RomanNumeral` object. String representations accepted by RomanNumeral are also accepted.
 
         >>> from music21 import *
-        >>> h = harmony.Harmony()
+        >>> h = harmony.ChordSymbol()
         >>> h.romanNumeral = 'III'
         >>> h.romanNumeral
         <music21.roman.RomanNumeral III>
@@ -603,8 +758,551 @@ class Harmony(music21.Music21Object):
 
         ''')
     
+    #--------------------------------------------------------------
+    #----------------------- CHORD METHODS ------------------------
+    # These methods use the harmony object's chord object to access
+    # chord methods directly. If a method is added to chord, it must
+    # manually be added here. script to run through chord.py and 
+    # generate this is below.
+    '''
+    f = open('C:/Users/bhadley/chord.txt', 'r')
+    import re
+    
+       
+    getThese = False
+    methodDict = {}
+    propertyDict = {}
+    for line in f:
+        if line.startswith('class Chord'):
+            getThese = True
+        elif line.startswith('class'):
+            getThese = False
+        if getThese:
+            if line.startswith('    def ') and True not in [c in line for c in [ '__init__','__repr__', '__deepcopy__']]:
+                methodName = line.split()[1][0:line.split()[1].find('(')]
+                a = re.sub(r'\s', '', line)
+                remList = [('def',''),('self,',''), ('self','')]
+                for i, j in remList:
+                    a = a.replace(i, j)
+                skip = False
+                ret = ''
+                for x in a:
+                    if x == '=': skip = True
+                    elif skip and x ==',' or x == ')':
+                        ret +=x
+                        skip = False
+                    elif skip == False and x not in ':': ret +=x
+                if 'def _' not in line:
+                    code = line + '        \'\'\'directly calls :meth:`~music21.chord.Chord.' + methodName + '`\'\'\'\n' + \
+                           '        return self.chord.' + ret + '\n'
+                else:
+                    code = line + '        return self.chord.' + ret + '\n'
+                methodDict[methodName] = code 
+                
+            if '= property' in line:
+                propertyName = line[0:line.find('=')].strip()
+                line = line.replace('doc=\'\'\'', '')
+                if line.strip().endswith(',') or line.strip().endswith(')'):
+                    line = line.strip()[:-1]
+                code = '    ' + line.strip() + ', \n        doc = \'\'\'directly references :attr:`music21.chord.Chord.' + propertyName + '`\'\'\') \n'
+                #code = '    ' + propertyName + ' = property(self.chord.'+ propertyName + ', self.chord.' + \
+                #       propertyName + ', \n        doc = \'\'\'directly references :attr:`music21.chord.Chord.' + propertyName + '\'\'\' ) \n'
+    
+                propertyDict[propertyName] = code
+    
+    
+    for i,j in methodDict.items():
+        print j
+    
+    for i,j in propertyDict.items():
+        print j
+            
+    '''     
+     
+ 
+    def seekChordTablesAddress(self):
+        '''directly calls :meth:`~music21.chord.Chord.seekChordTablesAddress`'''
+        return self.chord.seekChordTablesAddress()
 
+    def getVolume(self, p):
+        '''directly calls :meth:`~music21.chord.Chord.getVolume`'''
+        return self.chord.getVolume(p)
 
+    #def _getMX(self):
+    #    return self.chord._getMX()
+
+    def getZRelation(self):
+        '''directly calls :meth:`~music21.chord.Chord.getZRelation`'''
+        return self.chord.getZRelation()
+
+    def _removePitchByRedundantAttribute(self, attribute, inPlace):
+        return self.chord._removePitchByRedundantAttribute(attribute,inPlace)
+
+    def isDominantSeventh(self):
+        '''directly calls :meth:`~music21.chord.Chord.isDominantSeventh`'''
+        return self.chord.isDominantSeventh()
+
+    def _getSeventh(self):
+        return self.chord._getSeventh()
+
+    def _getPitches(self):
+        return self.chord._getPitches()
+
+    def _getForteClass(self):
+        return self.chord._getForteClass()
+
+    def isItalianAugmentedSixth(self, restrictDoublings = False):
+        '''directly calls :meth:`~music21.chord.Chord.isItalianAugmentedSixth`'''
+        return self.chord.isItalianAugmentedSixth(restrictDoublings)
+
+    def closedPosition(self, forceOctave=None, inPlace=False):
+        '''directly calls :meth:`~music21.chord.Chord.closedPosition`'''
+        return self.chord.closedPosition(forceOctave,inPlace)
+
+    def hasComponentVolumes(self):
+        '''directly calls :meth:`~music21.chord.Chord.hasComponentVolumes`'''
+        return self.chord.hasComponentVolumes()
+
+    def sortFrequencyAscending(self):
+        '''directly calls :meth:`~music21.chord.Chord.sortFrequencyAscending`'''
+        return self.chord.sortFrequencyAscending()
+
+    def findRoot(self):
+        '''directly calls :meth:`~music21.chord.Chord.findRoot`'''
+        return self.chord.findRoot()
+
+    def isHalfDiminishedSeventh(self):
+        '''directly calls :meth:`~music21.chord.Chord.isHalfDiminishedSeventh`'''
+        return self.chord.isHalfDiminishedSeventh()
+
+    def getTie(self, p):
+        '''directly calls :meth:`~music21.chord.Chord.getTie`'''
+        return self.chord.getTie(p)
+
+    def _getScaleDegrees(self):
+        return self.chord._getScaleDegrees()
+
+    def __getitem__(self, key):
+        return self.chord.__getitem__(key)
+
+    def removeRedundantPitchNames(self, inPlace=True):
+        '''directly calls :meth:`~music21.chord.Chord.removeRedundantPitchNames`'''
+        return self.chord.removeRedundantPitchNames(inPlace)
+
+    def getColor(self, pitchTarget):
+        '''directly calls :meth:`~music21.chord.Chord.getColor`'''
+        return self.chord.getColor(pitchTarget)
+
+    def _findBass(self):
+        return self.chord._findBass()
+
+    def _getMidiFile(self):
+        return self.chord._getMidiFile()
+
+    def isConsonant(self):
+        '''directly calls :meth:`~music21.chord.Chord.isConsonant`'''
+        return self.chord.isConsonant()
+
+    def setNotehead(self, nh, pitchTarget):
+        '''directly calls :meth:`~music21.chord.Chord.setNotehead`'''
+        return self.chord.setNotehead(nh,pitchTarget)
+
+    def _getFifth(self):
+        return self.chord._getFifth()
+
+    def getChordStep(self, chordStep, testRoot = None):
+        '''directly calls :meth:`~music21.chord.Chord.getChordStep`'''
+        return self.chord.getChordStep(chordStep,testRoot)
+
+    def inversion(self):
+        '''directly calls :meth:`~music21.chord.Chord.inversion`'''
+        return self.chord.inversion()
+
+    def hasAnyRepeatedDiatonicNote(self, testRoot = None):
+        '''directly calls :meth:`~music21.chord.Chord.hasAnyRepeatedDiatonicNote`'''
+        return self.chord.hasAnyRepeatedDiatonicNote(testRoot)
+
+    #def _setMX(self, mxNoteList):
+    #    return self.chord._setMX(mxNoteList)
+
+    def getStemDirection(self, p):
+        '''directly calls :meth:`~music21.chord.Chord.getStemDirection`'''
+        return self.chord.getStemDirection(p)
+
+    def isGermanAugmentedSixth(self):
+        '''directly calls :meth:`~music21.chord.Chord.isGermanAugmentedSixth`'''
+        return self.chord.isGermanAugmentedSixth()
+
+    def _getPrimeFormString(self):        
+        return self.chord._getPrimeFormString()
+
+    def semitonesFromChordStep(self, chordStep, testRoot = None):
+        '''directly calls :meth:`~music21.chord.Chord.semitonesFromChordStep`'''
+        return self.chord.semitonesFromChordStep(chordStep,testRoot)
+
+    def _semiClosedPosition(self):
+        return self.chord._semiClosedPosition()
+
+    def sortDiatonicAscending(self, inPlace=False):
+        '''directly calls :meth:`~music21.chord.Chord.sortDiatonicAscending`'''
+        return self.chord.sortDiatonicAscending(inPlace)
+
+    def _getVolume(self):    
+        return self.chord._getVolume()
+
+    def _getDuration(self):
+        return self.chord._getDuration()
+
+    def isFalseDiminishedSeventh(self):
+        '''directly calls :meth:`~music21.chord.Chord.isFalseDiminishedSeventh`'''
+        return self.chord.isFalseDiminishedSeventh()
+
+    def _updateChordTablesAddress(self):
+        return self.chord._updateChordTablesAddress()
+
+    def _getCommonName(self):
+        return self.chord._getCommonName()
+
+    def isMinorTriad(self):
+        '''directly calls :meth:`~music21.chord.Chord.isMinorTriad`'''
+        return self.chord.isMinorTriad()
+
+    def bass(self, newbass = 0):
+        '''directly calls :meth:`~music21.chord.Chord.bass`'''
+        return self.chord.bass(newbass)
+
+    def transpose(self, value, inPlace=False):
+        '''directly calls :meth:`~music21.chord.Chord.transpose`'''
+        return self.chord.transpose(value,inPlace)
+
+    def hasRepeatedChordStep(self, chordStep, testRoot = None):
+        '''directly calls :meth:`~music21.chord.Chord.hasRepeatedChordStep`'''
+        return self.chord.hasRepeatedChordStep(chordStep,testRoot)
+
+    def _getMidiEvents(self):
+        return self.chord._getMidiEvents()
+
+    def containsTriad(self):
+        '''directly calls :meth:`~music21.chord.Chord.containsTriad`'''
+        return self.chord.containsTriad()
+
+    def _getQuality(self):
+        return self.chord._getQuality()
+
+    def _getTie(self):
+        return self.chord._getTie()
+
+    def _getPitchClasses(self):
+        return self.chord._getPitchClasses()
+
+    def _setPitches(self, value):
+        return self.chord._setPitches(value)
+
+    def isIncompleteMajorTriad(self):
+        '''directly calls :meth:`~music21.chord.Chord.isIncompleteMajorTriad`'''
+        return self.chord.isIncompleteMajorTriad()
+
+    def setColor(self, value, pitchTarget=None):
+        '''directly calls :meth:`~music21.chord.Chord.setColor`'''
+        return self.chord.setColor(value,pitchTarget)
+
+    def isFrenchAugmentedSixth(self):        
+        '''directly calls :meth:`~music21.chord.Chord.isFrenchAugmentedSixth`'''
+        return self.chord.isFrenchAugmentedSixth()
+
+    def _getMultisetCardinality(self):
+        return self.chord._getMultisetCardinality()
+
+    def _preDurationLily(self):
+        return self.chord._preDurationLily()
+
+    def _setPitchNames(self, value):
+        return self.chord._setPitchNames(value)
+
+    def isMajorTriad(self):
+        '''directly calls :meth:`~music21.chord.Chord.isMajorTriad`'''
+        return self.chord.isMajorTriad()
+
+    def _getNormalFormString(self):        
+        return self.chord._getNormalFormString()
+
+    def _setColor(self, value): 
+        return self.chord._setColor(value)
+
+    def isTriad(self):
+        '''directly calls :meth:`~music21.chord.Chord.isTriad`'''
+        return self.chord.isTriad()
+
+    def _setDuration(self, durationObj):
+        return self.chord._setDuration(durationObj)
+
+    def setTie(self, t, pitchTarget):
+        '''directly calls :meth:`~music21.chord.Chord.setTie`'''
+        return self.chord.setTie(t,pitchTarget)
+
+    def _setTie(self, value):
+        return self.chord._setTie(value)
+
+    def removeRedundantPitches(self, inPlace=True):
+        '''directly calls :meth:`~music21.chord.Chord.removeRedundantPitches`'''
+        return self.chord.removeRedundantPitches(inPlace)
+
+    def _setMidiEvents(self, eventList, ticksPerQuarter):
+        return self.chord._setMidiEvents(eventList,ticksPerQuarter)
+
+    def isDiminishedSeventh(self):
+        '''directly calls :meth:`~music21.chord.Chord.isDiminishedSeventh`'''
+        return self.chord.isDiminishedSeventh()
+
+    def isAugmentedSixth(self):
+        '''directly calls :meth:`~music21.chord.Chord.isAugmentedSixth`'''
+        return self.chord.isAugmentedSixth()
+
+    def inversionName(self):
+        '''directly calls :meth:`~music21.chord.Chord.inversionName`'''
+        return self.chord.inversionName()
+
+    def _getChordTablesAddress(self):
+        return self.chord._getChordTablesAddress()
+
+    def _isPrimeFormInversion(self):
+        return self.chord._isPrimeFormInversion()
+
+    def __len__(self):
+        return self.chord.__len__()
+
+    def setVolume(self, vol, pitchTarget=None):
+        '''directly calls :meth:`~music21.chord.Chord.setVolume`'''
+        return self.chord.setVolume(vol,pitchTarget)
+
+    def _getIntervalVectorString(self):        
+        return self.chord._getIntervalVectorString()
+
+    def isAugmentedTriad(self):
+        '''directly calls :meth:`~music21.chord.Chord.isAugmentedTriad`'''
+        return self.chord.isAugmentedTriad()
+
+    def _hasZRelation(self):
+        return self.chord._hasZRelation()
+
+    def isSwissAugmentedSixth(self):
+        '''directly calls :meth:`~music21.chord.Chord.isSwissAugmentedSixth`'''
+        return self.chord.isSwissAugmentedSixth()
+
+    def __iter__(self):
+        return self.chord.__iter__()
+
+    def _getPitchClassCardinality(self):
+        return self.chord._getPitchClassCardinality()
+
+    def getNotehead(self, p):
+        '''directly calls :meth:`~music21.chord.Chord.getNotehead`'''
+        return self.chord.getNotehead(p)
+
+    def canBeTonic(self):
+        '''directly calls :meth:`~music21.chord.Chord.canBeTonic`'''
+        return self.chord.canBeTonic()
+
+    def _getForteClassTnI(self):
+        return self.chord._getForteClassTnI()
+
+    def intervalFromChordStep(self, chordStep, testRoot = None):
+        '''directly calls :meth:`~music21.chord.Chord.intervalFromChordStep`'''
+        return self.chord.intervalFromChordStep(chordStep,testRoot)
+
+    def _getPrimeForm(self):
+        return self.chord._getPrimeForm()
+
+    def _getColor(self):
+        return self.chord._getColor()
+
+    def _getNormalForm(self):
+        return self.chord._getNormalForm()
+
+    def _formatVectorString(self, vectorList):
+        return self.chord._formatVectorString(vectorList)
+
+    def root(self, newroot=False):
+        '''directly calls :meth:`~music21.chord.Chord.root`'''
+        return self.chord.root(newroot)
+
+    def annotateIntervals(self, inPlace = True, stripSpecifiers=True, sortPitches=True):
+        '''directly calls :meth:`~music21.chord.Chord.annotateIntervals`'''
+        return self.chord.annotateIntervals(inPlace,stripSpecifiers,sortPitches)
+
+    def removeRedundantPitchClasses(self, inPlace=True):
+        '''directly calls :meth:`~music21.chord.Chord.removeRedundantPitchClasses`'''
+        return self.chord.removeRedundantPitchClasses(inPlace)
+
+    def canBeDominantV(self):
+        '''directly calls :meth:`~music21.chord.Chord.canBeDominantV`'''
+        return self.chord.canBeDominantV()
+
+    def _getIntervalVector(self):
+        return self.chord._getIntervalVector()
+
+    def _setVolume(self, value):
+        return self.chord._setVolume(value)
+
+    def isIncompleteMinorTriad(self):
+        '''directly calls :meth:`~music21.chord.Chord.isIncompleteMinorTriad`'''
+        return self.chord.isIncompleteMinorTriad()
+
+    def _getThird(self):
+        return self.chord._getThird()
+
+    def areZRelations(self, other):
+        '''directly calls :meth:`~music21.chord.Chord.areZRelations`'''
+        return self.chord.areZRelations(other)
+
+    def isDiminishedTriad(self):
+        '''directly calls :meth:`~music21.chord.Chord.isDiminishedTriad`'''
+        return self.chord.isDiminishedTriad()
+
+    def _getForteClassNumber(self):
+        return self.chord._getForteClassNumber()
+
+    def isSeventh(self):
+        '''directly calls :meth:`~music21.chord.Chord.isSeventh`'''
+        return self.chord.isSeventh()
+
+    def _getPitchedCommonName(self):
+        return self.chord._getPitchedCommonName()
+
+    def _getPitchNames(self):
+        return self.chord._getPitchNames()
+
+    def _getFullName(self):
+        return self.chord._getFullName()
+
+    def containsSeventh(self):
+        '''directly calls :meth:`~music21.chord.Chord.containsSeventh`'''
+        return self.chord.containsSeventh()
+
+    def sortAscending(self, inPlace=False):
+        '''directly calls :meth:`~music21.chord.Chord.sortAscending`'''
+        return self.chord.sortAscending(inPlace)
+
+    def setStemDirection(self, stem, pitchTarget):
+        '''directly calls :meth:`~music21.chord.Chord.setStemDirection`'''
+        return self.chord.setStemDirection(stem,pitchTarget)
+
+    def _getOrderedPitchClassesString(self):        
+        return self.chord._getOrderedPitchClassesString()
+
+    def sortChromaticAscending(self):
+        '''directly calls :meth:`~music21.chord.Chord.sortChromaticAscending`'''
+        return self.chord.sortChromaticAscending()
+
+    def _getOrderedPitchClasses(self):
+        return self.chord._getOrderedPitchClasses()
+
+    color = property(_getColor, _setColor, 
+        doc = '''directly references :attr:`music21.chord.Chord.color`''') 
+
+    intervalVector = property(_getIntervalVector, 
+        doc = '''directly references :attr:`music21.chord.Chord.intervalVector`''') 
+
+    midiEvents = property(_getMidiEvents, _setMidiEvents, 
+        doc = '''directly references :attr:`music21.chord.Chord.midiEvents`''') 
+
+    forteClassTnI = property(_getForteClassTnI, 
+        doc = '''directly references :attr:`music21.chord.Chord.forteClassTnI`''') 
+
+    normalForm = property(_getNormalForm, 
+        doc = '''directly references :attr:`music21.chord.Chord.normalForm`''') 
+
+    multisetCardinality = property(_getMultisetCardinality, 
+        doc = '''directly references :attr:`music21.chord.Chord.multisetCardinality`''') 
+
+    forteClass = property(_getForteClass, 
+        doc = '''directly references :attr:`music21.chord.Chord.forteClass`''') 
+
+    primeFormString = property(_getPrimeFormString, 
+        doc = '''directly references :attr:`music21.chord.Chord.primeFormString`''') 
+
+    duration = property(_getDuration, _setDuration, 
+        doc = '''directly references :attr:`music21.chord.Chord.duration`''') 
+
+    isPrimeFormInversion = property(_isPrimeFormInversion, 
+        doc = '''directly references :attr:`music21.chord.Chord.isPrimeFormInversion`''') 
+
+    quality = property(_getQuality, 
+        doc = '''directly references :attr:`music21.chord.Chord.quality`''') 
+
+    chordTablesAddress = property(_getChordTablesAddress, 
+        doc = '''directly references :attr:`music21.chord.Chord.chordTablesAddress`''') 
+
+    fifth = property(_getFifth, 
+        doc = '''directly references :attr:`music21.chord.Chord.fifth`''') 
+
+    pitchClassCardinality = property(_getPitchClassCardinality, 
+        doc = '''directly references :attr:`music21.chord.Chord.pitchClassCardinality`''') 
+
+    commonName = property(_getCommonName, 
+        doc = '''directly references :attr:`music21.chord.Chord.commonName`''') 
+
+    orderedPitchClasses = property(_getOrderedPitchClasses, 
+        doc = '''directly references :attr:`music21.chord.Chord.orderedPitchClasses`''') 
+
+    tie = property(_getTie, _setTie, 
+        doc = '''directly references :attr:`music21.chord.Chord.tie`''') 
+
+    pitchedCommonName = property(_getPitchedCommonName, 
+        doc = '''directly references :attr:`music21.chord.Chord.pitchedCommonName`''') 
+
+    scaleDegrees = property(_getScaleDegrees, 
+        doc = '''directly references :attr:`music21.chord.Chord.scaleDegrees`''') 
+
+    hasZRelation = property(_hasZRelation, 
+        doc = '''directly references :attr:`music21.chord.Chord.hasZRelation`''') 
+
+    intervalVectorString = property(_getIntervalVectorString, 
+        doc = '''directly references :attr:`music21.chord.Chord.intervalVectorString`''') 
+
+    seventh = property(_getSeventh, 
+        doc = '''directly references :attr:`music21.chord.Chord.seventh`''') 
+
+    pitches = property(_getPitches, _setPitches, 
+        doc = '''directly references :attr:`music21.chord.Chord.pitches`''') 
+
+    primeForm = property(_getPrimeForm, 
+        doc = '''directly references :attr:`music21.chord.Chord.primeForm`''') 
+
+    orderedPitchClassesString = property(_getOrderedPitchClassesString, 
+        doc = '''directly references :attr:`music21.chord.Chord.orderedPitchClassesString`''') 
+
+    volume = property(_getVolume, _setVolume, 
+        doc = '''directly references :attr:`music21.chord.Chord.volume`''') 
+
+    fullName = property(_getFullName, 
+        doc = '''directly references :attr:`music21.chord.Chord.fullName`''') 
+
+    forteClassTn = property(_getForteClass, 
+        doc = '''directly references :attr:`music21.chord.Chord.forteClassTn`''') 
+
+    third = property(_getThird, 
+        doc = '''directly references :attr:`music21.chord.Chord.third`''') 
+
+    pitchNames = property(_getPitchNames, _setPitchNames, 
+        doc = '''directly references :attr:`music21.chord.Chord.pitchNames`''') 
+
+    midiFile = property(_getMidiFile, 
+        doc = '''directly references :attr:`music21.chord.Chord.midiFile`''') 
+
+    pitchClasses = property(_getPitchClasses, 
+        doc = '''directly references :attr:`music21.chord.Chord.pitchClasses`''') 
+
+    forteClassNumber = property(_getForteClassNumber, 
+        doc = '''directly references :attr:`music21.chord.Chord.forteClassNumber`''') 
+
+    normalFormString = property(_getNormalFormString, 
+        doc = '''directly references :attr:`music21.chord.Chord.normalFormString`''') 
+
+    #mx = property(_getMX, _setMX, 
+    #    doc = '''directly references :attr:`music21.chord.Chord.mx`''')  
+    
+    
 class ChordSymbol(Harmony): 
     '''
     Class representing the Chord Symbols commonly found on lead sheets. Chord Symbol objects
@@ -626,170 +1324,137 @@ class ChordSymbol(Harmony):
     The music xml-based approach to instantiating Chord Symbol objects:
      
     >>> from music21 import *
-    >>> cs = harmony.ChordSymbol(kind='minor',kindStr = 'm', root='C', bass = 'E')
+    >>> cs = harmony.ChordSymbol(kind='minor',kindStr = 'm', root='C', bass = 'E-')
     >>> cs
-    <music21.harmony.ChordSymbol kind=minor (m) root=C bass=E inversion=None duration=0.0>
-    >>> cs.kind
+    <music21.harmony.ChordSymbol Cm/E->
+    >>> cs.XMLkind
     'minor'
-    >>> cs.root
+    >>> cs.XMLroot
     C
-    >>> cs.bass
-    E
-    
+    >>> cs.XMLbass
+    E-
     
     The second approach to creating a Chord Symbol object, by passing a regular expression:
     
-    >>> harmony.ChordSymbol('C').chord.pitches
+    >>> harmony.ChordSymbol('C').pitches
     [C3, E3, G3]
-    >>> harmony.ChordSymbol('Cm').chord.pitches
+    >>> harmony.ChordSymbol('Cm').pitches
     [C3, E-3, G3]
-    >>> harmony.ChordSymbol('C+').chord.pitches
+    >>> harmony.ChordSymbol('C+').pitches
     [C3, E3, G#3]
-    >>> harmony.ChordSymbol('Cdim').chord.pitches
+    >>> harmony.ChordSymbol('Cdim').pitches
     [C3, E-3, G-3]
-    >>> harmony.ChordSymbol('C7').chord.pitches
+    >>> harmony.ChordSymbol('C7').pitches
     [C3, E3, G3, B-3]
-    >>> harmony.ChordSymbol('CM7').chord.pitches
+    >>> harmony.ChordSymbol('CM7').pitches
     [C3, E3, G3, B3]
-    >>> harmony.ChordSymbol('Cm7').chord.pitches
+    >>> harmony.ChordSymbol('Cm7').pitches
     [C3, E-3, G3, B-3]
-    >>> harmony.ChordSymbol('Cdim7').chord.pitches
+    >>> harmony.ChordSymbol('Cdim7').pitches
     [C3, E-3, G-3, B--3]
-    >>> harmony.ChordSymbol('C7+').chord.pitches
+    >>> harmony.ChordSymbol('C7+').pitches
     [C3, E3, G#3, B-3]
-    >>> harmony.ChordSymbol('Cm7b5').chord.pitches #half-diminished
+    >>> harmony.ChordSymbol('Cm7b5').pitches #half-diminished
     [C3, E3, G-3, B-3]
-    >>> harmony.ChordSymbol('CmMaj7').chord.pitches
+    >>> harmony.ChordSymbol('CmMaj7').pitches
     [C3, E-3, G3, B3]
-    >>> harmony.ChordSymbol('C6').chord.pitches
+    >>> harmony.ChordSymbol('C6').pitches
     [C3, E3, G3, A3]
-    >>> harmony.ChordSymbol('Cm6').chord.pitches
+    >>> harmony.ChordSymbol('Cm6').pitches
     [C3, E-3, G3, A3]
-    >>> harmony.ChordSymbol('C9').chord.pitches
+    >>> harmony.ChordSymbol('C9').pitches
     [C3, E3, G3, B-3, D4]
-    >>> harmony.ChordSymbol('CMaj9').chord.pitches
+    >>> harmony.ChordSymbol('CMaj9').pitches
     [C3, E3, G3, B3, D4]
-    >>> harmony.ChordSymbol('Cm9').chord.pitches
+    >>> harmony.ChordSymbol('Cm9').pitches
     [C3, E-3, G3, B-3, D4]
-    >>> harmony.ChordSymbol('C11').chord.pitches
+    >>> harmony.ChordSymbol('C11').pitches
     [C2, E2, G2, B-2, D3, F3]
-    >>> harmony.ChordSymbol('CMaj11').chord.pitches
+    >>> harmony.ChordSymbol('CMaj11').pitches
     [C2, E2, G2, B2, D3, F3]
-    >>> harmony.ChordSymbol('Cm11').chord.pitches
+    >>> harmony.ChordSymbol('Cm11').pitches
     [C2, E-2, G2, B-2, D3, F3]
-    >>> harmony.ChordSymbol('C13').chord.pitches
+    >>> harmony.ChordSymbol('C13').pitches
     [C2, E2, G2, B-2, D3, F3, A3]
-    >>> harmony.ChordSymbol('CMaj13').chord.pitches
+    >>> harmony.ChordSymbol('CMaj13').pitches
     [C2, E2, G2, B2, D3, F3, A3]
-    >>> harmony.ChordSymbol('Cm13').chord.pitches
+    >>> harmony.ChordSymbol('Cm13').pitches
     [C2, E-2, G2, B-2, D3, F3, A3]
-    >>> harmony.ChordSymbol('Csus2').chord.pitches     
+    >>> harmony.ChordSymbol('Csus2').pitches     
     [C3, D3, G3]
-    >>> harmony.ChordSymbol('Csus4').chord.pitches 
+    >>> harmony.ChordSymbol('Csus4').pitches 
     [C3, F3, G3]
-    >>> harmony.ChordSymbol('CN6').chord.pitches
+    >>> harmony.ChordSymbol('CN6').pitches
     [C3, D-3, E3, G-3]
-    >>> harmony.ChordSymbol('CIt+6').chord.pitches     
+    >>> harmony.ChordSymbol('CIt+6').pitches     
     [C3, F#3, A-3]
-    >>> harmony.ChordSymbol('CFr+6').chord.pitches 
+    >>> harmony.ChordSymbol('CFr+6').pitches 
     [C3, D3, F#3, A-3]
-    >>> harmony.ChordSymbol('CGr+6').chord.pitches
+    >>> harmony.ChordSymbol('CGr+6').pitches
     [C3, E-3, F#3, A-3]
-    >>> harmony.ChordSymbol('Cpedal').chord.pitches     
+    >>> harmony.ChordSymbol('Cpedal').pitches     
     [C3]
-    >>> harmony.ChordSymbol('Cpower').chord.pitches   
+    >>> harmony.ChordSymbol('Cpower').pitches   
     [C3, G3]
-    >>> harmony.ChordSymbol('Ftristan').chord.pitches 
+    >>> harmony.ChordSymbol('Ftristan').pitches 
     [F3, G#3, B3, D#4]
-    >>> harmony.ChordSymbol('C/E').chord.pitches
+    >>> harmony.ChordSymbol('C/E').pitches
     [E3, G3, C4]
-    >>> harmony.ChordSymbol('Dm7/F').chord.pitches
+    >>> harmony.ChordSymbol('Dm7/F').pitches
     [F3, A3, C4, D4]
-    >>> harmony.ChordSymbol('Cadd2').chord.pitches
+    >>> harmony.ChordSymbol('Cadd2').pitches
     [C3, D3, E3, G3]
-    >>> harmony.ChordSymbol('C7omit3').chord.pitches
+    >>> harmony.ChordSymbol('C7omit3').pitches
     [C3, G3, B-3]
     
     You can also create a Chord Symbol by writing out each degree, and any alterations to that degree:
     You must explicitly indicate EACH degree (a triad is NOT necessarily implied)
 
-    >>> h = harmony.ChordSymbol('C35b7b9#11b13')
-    >>> h.chord.pitches
+    >>> harmony.ChordSymbol('C35b7b9#11b13').pitches
     [C3, D-3, E3, F#3, G3, A-3, B-3]
     
-    >>> harmony.ChordSymbol('C35911').chord.pitches
+    >>> harmony.ChordSymbol('C35911').pitches
     [C3, D3, E3, F3, G3]
     
     Ambiguity in notation: if the expression is ambiguous, for example 'Db35' (is this
     the key of Db with a third and a fifth, or is this key of D with a flat 3 and 
     normal fifth?) To prevent ambiguity, insert a comma after the root.
      
-    >>> harmony.ChordSymbol('Db,35').chord.pitches
+    >>> harmony.ChordSymbol('Db,35').pitches
     [D-3, F3, A-3]
-    >>> harmony.ChordSymbol('D,b35').chord.pitches
+    >>> harmony.ChordSymbol('D,b35').pitches
     [D3, F3, A3]
-    >>> harmony.ChordSymbol('D,35b7b9#11b13').chord.pitches
+    >>> harmony.ChordSymbol('D,35b7b9#11b13').pitches
     [D3, E-3, F#3, G#3, A3, B-3, C4]
 
     '''
+        
+            
     def __init__(self, figure = None, **keywords):
-        Harmony.__init__(self, **keywords)
-
-        self.kind = '' # a string from defined list of chord symbol harmonies
-        self.kindStr = '' # the presentation of the kind or label of symbol
+        self.XMLkind = '' # a string from defined list of chord symbol harmonies
+        self.XMLkindStr = '' # the presentation of the kind or label of symbol
         
         for kw in keywords:
             if kw == 'kind':
-                self.kind = keywords[kw]
+                self.XMLkind = keywords[kw]
             if kw == 'kindStr':
-                self.kindStr = keywords[kw]
-        
-        #figure is the string representation of a Harmony object
-        #all Harmony objects have a figure
-        self.figure = figure
-        if self.figure is not None:
-            self._parseFigure(self.figure)
+                self.XMLkindStr = keywords[kw]
+                
+        Harmony.__init__(self, figure, **keywords)
     
     def __repr__(self):
-        if len(self.chordStepModifications) == 0:
-            return '<music21.harmony.%s kind=%s (%s) root=%s bass=%s inversion=%s duration=%s>' % (self.__class__.__name__, self.kind, self.kindStr, self.root, self.bass, self.inversion, self.duration.quarterLength)
-        else:
-            return '<music21.harmony.%s kind=%s (%s) root=%s bass=%s inversion=%s duration=%s ChordStepModifications=%s>' % (self.__class__.__name__, self.kind, self.kindStr, self.root, self.bass, self.inversion, self.duration.quarterLength,''.join([str(x) for x in self.chordStepModifications]))
+        return '<music21.harmony.%s %s>' % (self.__class__.__name__, self.figure)
+#        if len(self.chordStepModifications) == 0:
+#            return '<music21.harmony.%s kind=%s (%s) root=%s bass=%s inversion=%s duration=%s>' % \
+#                (self.__class__.__name__, self.XMLkind, self.XMLkindStr, self.XMLroot, self.XMLbass, \
+#                 self.XMLinversion, self.duration.quarterLength)
+#        else:
+#            return '<music21.harmony.%s kind=%s (%s) root=%s bass=%s inversion=%s duration=%s ChordStepModifications=%s>' %\
+#                 (self.__class__.__name__, self.XMLkind, self.XMLkindStr, self.XMLroot, self.XMLbass, self.XMLinversion, \
+#                  self.duration.quarterLength,''.join([str(x) for x in self.chordStepModifications]))
 #---------------------------------------------------------------------------
 
-    def _setChord(self, value):
-        if hasattr(value, 'classes') and 'Chord' in value.classes:
-            self._chord = value
-            return
-        try: # try to create 
-            self._chord = chord.Chord(value)
-            return
-        except music21.Music21Exception: 
-            pass
-        raise HarmonyException('not a valid music21 chord specification: %s' % value)
-
-
-    def _getChord(self):
-        if self._chord.pitches == []:
-            self.realizePitches()
-        self._chord.duration.quarterLength = self.duration.quarterLength
-        return self._chord
-
-    chord = property(_getChord, _setChord, doc= '''
-        Get or set the chord object of this Chord Symbol. The chord object will
-        be returned with the realized pitches as an attribute. The user could 
-        override these pitches by manually setting the chord.pitches.
-
-        >>> from music21 import *
-        >>> h = harmony.ChordSymbol('Cm7')
-        >>> h.chord
-        <music21.chord.Chord C3 E-3 G3 B-3>
-        >>> h.chord.pitches
-        [C3, E-3, G3, B-3]
-        >>> h.chord.pitches = [pitch.Pitch('C'), pitch.Pitch('D')]
-        >>> h.chord.pitches
-        [C, D]
-        ''')
+    
 
     def _parseFigure(self, prelimFigure):
         '''
@@ -880,7 +1545,7 @@ class ChordSymbol(Harmony):
             if 'b' in root:
                 root = root.replace('b', '-')
             self._chord.root( pitch.Pitch(root) )
-            self.root = root
+            self.XMLroot = pitch.Pitch(root)
 
         #Get optional Bass:
         m2 = re.search(r"/[A-Ga-g][b#]?", prelimFigure) #match not case sensitive
@@ -893,7 +1558,7 @@ class ChordSymbol(Harmony):
    
             bass = bass.replace('/', '')
             self._chord.bass ( pitch.Pitch(bass) ) 
-            self.bass = bass     
+            self.XMLbass = pitch.Pitch(bass)     
             remaining = st.replace(m2.group(), '')   #remove the root and bass from the string and any additions/omitions/alterations/
         
      
@@ -966,87 +1631,79 @@ class ChordSymbol(Harmony):
        
         for degree, alterBy in degrees:
             self.addChordStepModification(music21.harmony.ChordStepModification('add', degree, alterBy))
-
-        
-    def _getKindFromShortHand(self, sH):
-        chordTypes = {
-         'major': ['', 'Maj'] , 
-         'minor': ['m', '-', 'min'] ,
-         'augmented' : ['+', '#5'] , 
-         'diminished' : ['dim', 'o'] ,
-         'dominant' : ['7'],
-         'major-seventh' : ['Maj7', 'M7'],
-         'minor-seventh' : ['m7' , 'min7'] ,
-         'diminished-seventh' : ['dim7' , 'o7'] ,
-         'augmented-seventh' : ['7+', '7#5'] ,
-         'half-diminished' : ['m7b5'] ,
-         'major-minor' : ['mMaj7'] , 
-         'major-sixth' : ['6'] ,
-         'minor-sixth' : ['m6', 'min6'] ,
-         'dominant-ninth' : ['9'] ,
-         'major-ninth' : ['Maj9' , 'M9'] ,
-         'minor-ninth' : ['m9', 'min9'] ,
-         'dominant-11th' : ['11'] ,
-         'major-11th' : ['Maj11' , 'M11'] ,
-         'minor-11th' : ['m11' , 'min11'] ,
-         'dominant-13th' : ['13'] ,
-         'major-13th' : ['Maj13', 'M13'] ,
-         'minor-13th' : ['m13' , 'min13'] ,
-         'suspended-second' : ['sus2'] ,
-         'suspended-fourth' : ['sus' , 'sus4'] ,
-         'Neapolitan' : ['N6'] ,
-         'Italian' : ['It+6'] ,
-         'French' : ['Fr+6'] ,
-         'German' : ['Gr+6'] ,
-         'pedal' : ['pedal'] ,
-         'power' : ['power'] ,
-         'Tristan' : ['tristan']
-         }
     
+    def findFigure(self):
+        '''
+        return the chord symbol figure associated with this chord. the XMLroot, XMLbass and XMLkind
+        attributes must be specified
+        
+        Needs development - TODO: chord step modifications need actually pitches rather than numeric degrees
+        
+        >>> from music21 import *
+        >>> h = harmony.ChordSymbol(root = 'F', bass = 'D-', kind = 'Neapolitan')
+        >>> h.figure
+        'FN6/D-'
+        '''
+        figure = self.XMLroot.name
+        if self.XMLkind in CHORD_TYPES.keys():
+            figure += CHORD_TYPES[self.XMLkind][0]
+        if self.XMLroot.name != self.XMLbass.name:
+            figure+='/' + self.XMLbass.name
+        
+        for csmod in self.chordStepModifications:
+            if csmod.modType != 'alter':
+                figure += ' ' + csmod.modType + ' ' + str(csmod.degree)
+            else:
+                figure += ' ' + csmod.modType + ' ' + csmod.interval.simpleName
+        
+        return figure
+    
+    def _getKindFromShortHand(self, sH):
+        
         if 'add' in sH:
             sH = sH[0:sH.index('add')]
         elif 'omit' in sH:
             sH = sH[0:sH.index('omit')]
     
-        for chordType in chordTypes:
-            for charString in chordTypes[chordType]:
+        for chordType in CHORD_TYPES:
+            for charString in CHORD_TYPES[chordType]:
                 if sH == charString:
-                    self.kind = chordType
+                    self.XMLkind = chordType
                     return sH.replace(charString,'')
         return sH
 
     
     
-    def realizePitches(self):
-        '''returns pitches in chordSymbol, also updates the chord with the correct
-        bass, root, and inversion
+    def _realizePitches(self):
+        '''calculate the pitches in the chord symbol and update all associated
+        variables, including bass, root, inversion and chord
 
         >>> from music21 import *
-        >>> harmony.ChordSymbol(root='C', bass='E', kind='major').chord.pitches
+        >>> harmony.ChordSymbol(root='C', bass='E', kind='major').pitches
         [E3, G3, C4]
-        >>> harmony.ChordSymbol(root='C', bass='G', kind='major').chord.pitches
+        >>> harmony.ChordSymbol(root='C', bass='G', kind='major').pitches
         [G2, C3, E3]
-        >>> harmony.ChordSymbol(root='C', kind='minor').chord.pitches
+        >>> harmony.ChordSymbol(root='C', kind='minor').pitches
         [C3, E-3, G3]
         
-        >>> harmony.ChordSymbol(root='C', bass='B', kind='major-ninth').chord.pitches
+        >>> harmony.ChordSymbol(root='C', bass='B', kind='major-ninth').pitches
         [B1, D2, C3, E3, G3]
         
-        >>> harmony.ChordSymbol(root='D', bass='F', kind='minor-seventh').chord.pitches
+        >>> harmony.ChordSymbol(root='D', bass='F', kind='minor-seventh').pitches
         [F3, A3, C4, D4]
         '''
         nineElevenThirteen = ['dominant-ninth', 'major-ninth', 'minor-ninth','dominant-11th', 'major-11th', 'minor-11th','dominant-13th', 'major-13th', 'minor-13th']
 
 
-        fbScale = realizerScale.FiguredBassScale(self.root, 'major' ) #create figured bass scale with root as scale
-        self._chord.root(copy.deepcopy(self.root))
+        fbScale = realizerScale.FiguredBassScale(self.XMLroot, 'major' ) #create figured bass scale with root as scale
+        self._chord.root(copy.deepcopy(self.XMLroot))
         self._chord.root().octave = 3 #render in the 3rd octave by default
     
         if self._notationString():
             pitches = fbScale.getSamplePitches(self._chord.root(), self._notationString())
             pitches.pop(0) #remove duplicated bass note due to figured bass method.
         else:
-            tempRoot = self.root
+            tempRoot = self.XMLroot
             tempRoot.octave = 3
             pitches = []
             pitches.append(tempRoot)
@@ -1054,8 +1711,8 @@ class ChordSymbol(Harmony):
         pitches = self._adjustOctaves(pitches)
         
         inversionNum = 0
-        if self.bass != self.root: 
-            self._chord.bass(copy.deepcopy(self.bass))
+        if self.XMLbass != self.XMLroot: 
+            self._chord.bass(copy.deepcopy(self.XMLbass))
             inversionNum = self._chord.inversion()
             if not self.inversionIsValid(inversionNum):
                 #there is a bass, yet no normal inversion was found....must be added note 
@@ -1063,14 +1720,14 @@ class ChordSymbol(Harmony):
                 inversionNum = 0
                 self._chord.bass().octave = 2 #arbitrary octave, must be below root, which was arbitrarily chosen as 3 above
                 pitches.append(self._chord.bass())
-        elif self.inversion:
-            inversionNum = self.inversion
+        elif self.XMLinversion:
+            inversionNum = self.XMLinversion
 
         if inversionNum != 0:
             index = -1
             for p in pitches[0:inversionNum]:
                 index = index + 1
-                if self.kind in nineElevenThirteen:
+                if self.XMLkind in nineElevenThirteen:
                     p.octave = p.octave + 2 #bump octave up by two for nineths,elevenths, and thirteenths
                     #this creates more spacing....
                 else:
@@ -1097,7 +1754,7 @@ class ChordSymbol(Harmony):
                 pitches[i] = music21.pitch.Pitch(temp)
         
         #but if this has created pitches below lowest note (the A 3 octaves below middle C)
-        #on a standard piano, we're going to have to bump all the octaves back up and call it quites
+        #on a standard piano, we're going to have to bump all the octaves back up
         while self._hasPitchBelowA1(pitches) :
             i = -1
             for pitch in pitches:
@@ -1107,8 +1764,6 @@ class ChordSymbol(Harmony):
         
         self._chord.pitches = pitches
         self._chord = self._chord.sortDiatonicAscending()
-
-        return self._chord.pitches
         
         
     def inversionIsValid(self, inversion):
@@ -1124,13 +1779,13 @@ class ChordSymbol(Harmony):
         elevenths = ['dominant-11th', 'major-11th', 'minor-11th']
         thirteenths = ['dominant-13th', 'major-13th', 'minor-13th']
 
-        if inversion == 5 and (self.kind in thirteenths or self.kind in elevenths):
+        if inversion == 5 and (self.XMLkind in thirteenths or self.XMLkind in elevenths):
             return True
-        elif inversion == 4 and (self.kind in elevenths or self.kind in thirteenths or self.kind in ninths):
+        elif inversion == 4 and (self.XMLkind in elevenths or self.XMLkind in thirteenths or self.XMLkind in ninths):
             return True
-        elif inversion == 3 and (self.kind in sevenths or self.kind in ninths or self.kind in elevenths or self.kind in thirteenths):
+        elif inversion == 3 and (self.XMLkind in sevenths or self.XMLkind in ninths or self.XMLkind in elevenths or self.XMLkind in thirteenths):
             return True
-        elif (inversion == 2 or inversion == 1) and not self.kind == 'pedal':
+        elif (inversion == 2 or inversion == 1) and not self.XMLkind == 'pedal':
             return True
         else:
             return False
@@ -1185,7 +1840,7 @@ class ChordSymbol(Harmony):
                         p = sc.pitchFromDegree(hD.degree, self._chord.bass())
                     else:
                         p = sc.pitchFromDegree(hD.degree, self._chord.root())
-                    if hD.degree == 7 and self.kind != None and self.kind!= '':
+                    if hD.degree == 7 and self.XMLkind != None and self.XMLkind!= '':
                         #don't know why anyone would want
                         #to add a seventh to a dominant chord already...but according to documentation
                         #added degrees are relative to dominant chords, which have all major degrees
@@ -1272,13 +1927,13 @@ class ChordSymbol(Harmony):
         elevenths = ['dominant-11th', 'major-11th', 'minor-11th']
         thirteenths = ['dominant-13th', 'major-13th', 'minor-13th']
   
-        if self.kind in ninths:
+        if self.XMLkind in ninths:
             pitches[1] = pitch.Pitch(pitches[1].name + str(pitches[1].octave + 1))
-        elif self.kind in elevenths:
+        elif self.XMLkind in elevenths:
             pitches[1] = pitch.Pitch(pitches[1].name + str(pitches[1].octave + 1))
             pitches[3] = pitch.Pitch(pitches[3].name + str(pitches[3].octave + 1))
             
-        elif self.kind in thirteenths:
+        elif self.XMLkind in thirteenths:
             pitches[1] = pitch.Pitch(pitches[1].name + str(pitches[1].octave + 1))
             pitches[3] = pitch.Pitch(pitches[3].name + str(pitches[3].octave + 1))
             pitches[5] = pitch.Pitch(pitches[5].name + str(pitches[5].octave + 1))
@@ -1294,8 +1949,8 @@ class ChordSymbol(Harmony):
         degrees and how those scale degrees are altered in this chord'''
         notationString = ""
 
-        kind = self.kind
-          
+        kind = self.XMLkind
+
         if kind == 'major':
             notationString =  '1,3,5'
         elif kind == 'minor':
@@ -1353,11 +2008,9 @@ class ChordSymbol(Harmony):
         elif kind == 'German':
             notationString = '1,-3,#4,-6'
         elif kind == 'pedal':
-            notationString = '1' #returns two identical pitches...weird. let's fix this 
-            #when I rewrite the method
+            notationString = '1' #returns two identical pitches...weird. 
         elif kind == 'power':
-            notationString = '1,5' #also returns two identical bass pitches...weird. will
-            #up inversion....I should fix this
+            notationString = '1,5' #also returns two identical bass pitches...weird. 
         elif kind == 'Tristan' or kind == 'tristan':
             notationString =  '1,#4,#6,#9'
         else:
@@ -1394,15 +2047,15 @@ class Test(unittest.TestCase):
             if lastHarm is None:
                 lastHarm = thisHarm
             else:
-                if lastHarm.bass is not None:
-                    lastBass = lastHarm.bass
+                if lastHarm.XMLbass is not None:
+                    lastBass = lastHarm.XMLbass
                 else:
-                    lastBass = lastHarm.root
+                    lastBass = lastHarm.XMLroot
                     
-                if thisHarm.bass is not None:
-                    thisBass = thisHarm.bass
+                if thisHarm.XMLbass is not None:
+                    thisBass = thisHarm.XMLbass
                 else:
-                    thisBass = thisHarm.root
+                    thisBass = thisHarm.XMLroot
                     
                 if lastBass.pitchClass == thisBass.pitchClass:
                     pass
@@ -1464,34 +2117,21 @@ class TestExternal(unittest.TestCase):
     #def realizeCSwithFB(self):
     #see demos.bhadley.HarmonyRealizer
         
-#-------------------------------------------------------------------------------
-# define presented order in documentation
-
-
-#_DOC_ORDER = [Harmony, ChordStepModification, ChordSymbol]
-
-
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Harmony, ChordSymbol]
+_DOC_ORDER = [Harmony, ChordStepModification, ChordSymbol]
 
 
 if __name__ == "__main__":
     music21.mainTest(Test, TestExternal)
-
-    #import doctest
-    #doctest.testmod()
     
-    #test = music21.harmony.TestExternal()
-    #test.testReadInXML()
+    #test = music21.harmony.Test()
+    #test.testCountHarmonicMotion()
     
     #test = music21.harmony.TestExternal()
     #test.testChordRealization()
     
 #------------------------------------------------------------------------------
 # eof
-
-
-
 
