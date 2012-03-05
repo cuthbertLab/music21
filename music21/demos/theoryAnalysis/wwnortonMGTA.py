@@ -219,6 +219,48 @@ class ex11_1_I(wwnortonExercise):
                                 offsetFunc = harmonicIntervalOffsetFunc,\
                                 lyricFunc = harmonicIntervalTextFunc)
     
+class ex11_1_II(wwnortonExercise):
+    '''
+    Assignment 11.1 II. Resolving chordal dissonances
+    '''
+    def __init__(self):
+        wwnortonExercise.__init__(self)
+        self.xmlFilename = '11_1_II.xml'
+        self.pn['part1'] = 0
+        self.pn['part2'] = 1
+        self.loadOriginalExercise()
+        
+    def addAuxillaryParts(self):
+        self.addMarkerPartFromExisting('part1', newPartName='p1ScaleDegrees',newPartTitle="1. Scale Degrees", direction = "above")
+        self.addMarkerPartFromExisting('part2', newPartName='p2ScaleDegrees',newPartTitle="2. Scale Degrees", direction = "below")
+        self.addMarkerPartFromExisting('part1', newPartName='harmIntervals',newPartTitle="3. Harmonic Intervals", rhythmType='chordify', direction = "below")
+        
+    def checkExercise(self):
+        ta = theoryAnalyzer.TheoryAnalyzer(self.studentExercise)
+        ta.keyMeasureMap = {1:'C',2:'C',3:'d',4:'F',5:'G',6:'e',7:'g',8:'B-',9:'A-',10:'E',11:'f',12:'c#'}
+        
+        ta.identifyScaleDegrees(self.pn['part1'],dictKey='p1ScaleDegrees')
+        ta.identifyScaleDegrees(self.pn['part2'],dictKey='p2ScaleDegrees')
+        ta.identifyHarmonicIntervals(self.pn['part1'],self.pn['part2'],dictKey='harmIntervals')
+        
+        scaleDegreeLyricTextFunc = lambda resultObj: resultObj.value
+        self.compareMarkerLyricAnswer(ta,taKey='p1ScaleDegrees',\
+                                markerPartName='p1ScaleDegrees',\
+                                lyricFunc = scaleDegreeLyricTextFunc)
+        
+        self.compareMarkerLyricAnswer(ta,taKey='p2ScaleDegrees',\
+                                markerPartName='p2ScaleDegrees',\
+                                lyricFunc = scaleDegreeLyricTextFunc)
+        
+        harmonicIntervalOffsetFunc = lambda resultObj: resultObj.offset()
+        harmonicIntervalTextFunc = lambda resultObj: resultObj.value 
+        
+        self.compareMarkerLyricAnswer(ta,taKey='harmIntervals',\
+                                markerPartName='harmIntervals',\
+                                offsetFunc = harmonicIntervalOffsetFunc,\
+                                lyricFunc = harmonicIntervalTextFunc)    
+    
+    
 class ex11_3_A(wwnortonExercise):
     '''
     Assignment 11.3 A. Writing a note-to-note counterpoint in eighteenth-century style
@@ -250,6 +292,8 @@ class ex11_3_A(wwnortonExercise):
                                 lyricFunc = harmonicIntervalTextFunc)
         
 
+
+
 # ------------------------------------------------------------
 
 class Test(unittest.TestCase):
@@ -265,7 +309,8 @@ class TestExternal(unittest.TestCase):
     def demo(self):
         ex = ex11_3_A()
         #ex.show()
-        sc = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/Exercises/11_3_A_1_completed2.xml')
+        #sc = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/Exercises/11_3_A_1_completed2.xml')
+        sc = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/Exercises/11_3_A_1_completed.xml')
         ex.loadStudentExercise(sc)
         ex.checkExercise()
         ex.showStudentExercise()
