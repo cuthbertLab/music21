@@ -38,6 +38,11 @@ class TheoryAnalyzer(object):
     >>> from music21 import *
     >>> p = corpus.parse('bwv66.6')
     >>> ta = TheoryAnalyzer(p)
+    
+    demonstrate features of entire class
+    
+    
+    
     '''
     
     
@@ -203,6 +208,8 @@ class TheoryAnalyzer(object):
         '''
         vsList = []
         
+        # if elements exist at same offset, return both 
+        
         # If speed is an issue, could try using offset maps...
         chordifiedSc = self._theoryScore.chordify()
         for c in chordifiedSc.flat.getElementsByClass('Chord'):
@@ -210,12 +217,16 @@ class TheoryAnalyzer(object):
             partNum= 0
             for part in self._theoryScore.parts:
                 
-                el = part.flat.getElementAtOrBefore(c.offset,classList=['Note','Rest', 'Chord', 'Harmony'])
-                if el.isClassOrSubclass(['Note', 'Chord', 'Harmony']):
-                    contentDict[partNum] = el                    
-                else:
-                    #TODO: currently rests are stored as None...change to store them as music21 Rests soon
-                    contentDict[partNum] = None # rests are stored as None...change to store them as Rests soon
+                elementStream = part.flat.getElementsByOffset(c.offset,mustBeginInSpan=False, classList=['Note','Rest', 'Chord', 'Harmony'])
+                #el = part.flat.getElementAtOrBefore(c.offset,classList=['Note','Rest', 'Chord', 'Harmony'])
+                
+                for el in elementStream.elements:
+                    contentDict[partNum] = []
+                    if el.isClassOrSubclass(['Note', 'Chord', 'Harmony']):
+                        contentDict[partNum].append(el)                 
+                    else:
+                        #TODO: currently rests are stored as None...change to store them as music21 Rests soon
+                        contentDict[partNum].append(None) # rests are stored as None...change to store them as Rests soon
                 partNum+=1
             vs = voiceLeading.VerticalSlice(contentDict)
             vsList.append(vs)
@@ -255,11 +266,11 @@ class TheoryAnalyzer(object):
         for (i, verticalSlice) in enumerate(self._verticalSlices[:-1]):
             nextVerticalSlice = self._verticalSlices[i + 1]
             
-            v1n1 = verticalSlice.noteFromPart(partNum1)
-            v1n2 = nextVerticalSlice.noteFromPart(partNum1)
+            v1n1 = verticalSlice.getObjectsByPart(partNum1, classFilterList=['Note'])
+            v1n2 = nextVerticalSlice.getObjectsByPart(partNum1, classFilterList=['Note'])
             
-            v2n1 = verticalSlice.noteFromPart(partNum2)
-            v2n2 = nextVerticalSlice.noteFromPart(partNum2)
+            v2n1 = verticalSlice.getObjectsByPart(partNum2, classFilterList=['Note'])
+            v2n2 = nextVerticalSlice.getObjectsByPart(partNum2, classFilterList=['Note'])
             vlq = voiceLeading.VoiceLeadingQuartet(v1n1,v1n2,v2n1,v2n2, key=self.keyAtMeasure(v1n1.measureNumber))
             vlqList.append(vlq)
             
@@ -323,7 +334,7 @@ class TheoryAnalyzer(object):
         for i in range(0, len(self._verticalSlices)-lengthLinearSegment+1):
             notes = []
             for n in range(0,lengthLinearSegment):
-                notes.append(self._verticalSlices[i+n].noteFromPart(partNum))           
+                notes.append(self._verticalSlices[i+n].getObjectsByPart(partNum, classFilterList=['Note']))           
             
             if lengthLinearSegment == 3:
                 tnls = voiceLeading.ThreeNoteLinearSegment()
@@ -338,8 +349,8 @@ class TheoryAnalyzer(object):
 
     def getVerticalSliceNTuplets(self, ntupletNum):
         '''
-        extracts and returns a list of the :class:`~music21.voiceLeading.VerticalSliceTriplet` 
-        objects present in the score
+        extracts and returns a list of the :class:`~music21.voiceLeading.VerticalSliceNTuplets` or the 
+        corresponding subclass (currenlty only supports triplets) 
         
         >>> from music21 import *
         
@@ -358,7 +369,7 @@ class TheoryAnalyzer(object):
         >>> len(ta.getVerticalSliceNTuplets(3))
         1
         >>> ta.getVerticalSliceNTuplets(3)[0]
-        <music21.voiceLeading.VerticalSliceNTuplet listofVerticalSlices=[<music21.voiceLeading.VerticalSlice contentDict={0: <music21.note.Note C>, 1: <music21.note.Note E>}  , <music21.voiceLeading.VerticalSlice contentDict={0: <music21.note.Note G>, 1: <music21.note.Note F>}  , <music21.voiceLeading.VerticalSlice contentDict={0: <music21.note.Note C>, 1: <music21.note.Note A>}  ] 
+        <music21.voiceLeading.VerticalSliceTriplet listofVerticalSlices=[<music21.voiceLeading.VerticalSlice contentDict={0: [<music21.note.Note C>], 1: [<music21.note.Note E>]}  , <music21.voiceLeading.VerticalSlice contentDict={0: [<music21.note.Note G>], 1: [<music21.note.Note F>]}  , <music21.voiceLeading.VerticalSlice contentDict={0: [<music21.note.Note C>], 1: [<music21.note.Note A>]}  ] 
 
         '''
 
@@ -367,7 +378,10 @@ class TheoryAnalyzer(object):
             verticalSliceList = []
             for countNum in range(i,i+ntupletNum):
                 verticalSliceList.append(self._verticalSlices[countNum])
-            vsnt = voiceLeading.VerticalSliceNTuplet(verticalSliceList)
+            if ntupletNum == 3:
+                vsnt = voiceLeading.VerticalSliceTriplet(verticalSliceList)
+            else: 
+                vsnt = voiceLeading.VerticalSliceNTuplet(verticalSliceList)
             verticalSliceNTuplets.append(vsnt)
         return verticalSliceNTuplets
     
@@ -405,8 +419,8 @@ class TheoryAnalyzer(object):
         hInvList = []
         for verticalSlice in self._verticalSlices:
             
-            nUpper = verticalSlice.noteFromPart(partNum1)
-            nLower = verticalSlice.noteFromPart(partNum2)
+            nUpper = verticalSlice.getObjectsByPart(partNum1, classFilterList=['Note'])
+            nLower = verticalSlice.getObjectsByPart(partNum2, classFilterList=['Note'])
             
             if nLower is None or nUpper is None:
                 hIntv = None
@@ -1339,7 +1353,7 @@ class TheoryAnalyzer(object):
         
         '''
         def testFunction(vs):
-            noteList = vs.noteList
+            noteList = vs.getObjectsByClass('Note')
             if not None in noteList:
                 inChord = chord.Chord(noteList)
                 inKey = self.keyAtMeasure(noteList[0].measureNumber)
@@ -1351,7 +1365,7 @@ class TheoryAnalyzer(object):
            
         def textFunction(vs, rn):
             notes = ''
-            for n in vs.noteList:
+            for n in vs.getObjectsByClass('Note'):
                 notes+= n.name + ','
             notes = notes[:-1]
             return "Roman Numeral of " + notes + ' is ' + rn
