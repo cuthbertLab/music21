@@ -1594,6 +1594,40 @@ class Direction(MusicXMLElementList):
             return found[0] 
         return None
 
+    def getBracket(self):
+        '''Search this direction and determine if it contains a segno mark.
+
+        >>> from music21 import *
+        >>> a = musicxml.Direction()
+        >>> b = musicxml.DirectionType()
+        >>> c = musicxml.Bracket()
+        >>> b.append(c)
+        >>> a.append(b)
+        >>> a.getBracket() != None
+        True
+        '''
+        found = self._getObjectsContainedInDirectionType(Bracket)
+        if len(found) > 0:
+            return found[0] 
+        return None
+
+    def getDashes(self):
+        '''Search this direction and determine if it contains a segno mark.
+
+        >>> from music21 import *
+        >>> a = musicxml.Direction()
+        >>> b = musicxml.DirectionType()
+        >>> c = musicxml.Dashes()
+        >>> b.append(c)
+        >>> a.append(b)
+        >>> a.getDashes() != None
+        True
+        '''
+        found = self._getObjectsContainedInDirectionType(Dashes)
+        if len(found) > 0:
+            return found[0] 
+        return None
+
 
 class DirectionType(MusicXMLElementList):
     '''DirectionType stores objects like Pedal, dynamics, wedge, and words

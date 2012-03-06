@@ -1319,9 +1319,12 @@ class Line(Spanner):
         return self._lineType
 
     def _setLineType(self, value):
-        if value.lower() not in ['solid', 'dashed', 'dotted', 'wavy']:
+        if value is not None and value.lower() not in [
+            'solid', 'dashed', 'dotted', 'wavy']:
             raise SpannerException('not a valid value: %s' % value)
-        self._lineType = value.lower()
+        # not sure if we should permit setting as None
+        if value is not None:
+            self._lineType = value.lower()
 
     lineType = property(_getLineType, _setLineType, doc='''
         Get or set the lineType property.
