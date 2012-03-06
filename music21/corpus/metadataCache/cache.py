@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2010 The music21 Project
+# Copyright:    (c) 2010-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ def cacheCore():
     # the core cache is based on local files stored in music21
     # virtual is on-line
     for name, getPaths in [('virtual', corpus.getVirtualPaths), 
-                          ('core', corpus.getPaths), 
+                          ('core', corpus.getCorePaths), 
                       ]:
 
         mdb = metadata.MetadataBundle(name)
