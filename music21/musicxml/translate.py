@@ -1729,6 +1729,7 @@ def mxNotationsToSpanners(target, mxNotations, spannerBundle):
     The `target` object is a reference to the relevant music21 object this spanner is associated with.
     '''
     from music21 import spanner
+    from music21 import expressions
 
     mxSlurList = mxNotations.getSlurs()
     for mxObj in mxSlurList:
@@ -1748,15 +1749,31 @@ def mxNotationsToSpanners(target, mxNotations, spannerBundle):
             su.idLocal = idFound
             su.placement = mxObj.get('placement')
             spannerBundle.append(su)
-
         # add a reference of this note to this spanner
         su.addComponents(target)
         #environLocal.pd(['adding n', n, id(n), 'su.getComponents', su.getComponents(), su.getComponentIds()])
         if mxObj.get('type') == 'stop':
             su.completeStatus = True
             # only add after complete
-        #environLocal.printDebug(['got slur:', su, mxObj.get('placement'), mxObj.get('number')])
 
+    mxWavyLineList = mxNotations.getWavyLines()
+    for mxObj in mxWavyLineList:
+        #environLocal.pd(['waveyLines', mxObj])
+        idFound = mxObj.get('number')
+        sb = spannerBundle.getByClassIdLocalComplete('TrillExtension', 
+            idFound, False)
+        if len(sb) > 0: # if we already have 
+            su = sb[0] # get the first
+        else: # create a new slur
+            su = expressions.TrillExtension()
+            su.idLocal = idFound
+            su.placement = mxObj.get('placement')
+            spannerBundle.append(su)
+        # add a reference of this note to this spanner
+        su.addComponents(target)
+        if mxObj.get('type') == 'stop':
+            su.completeStatus = True
+            # only add after complete
 
 def mxDirectionToSpanners(targetLast, mxDirection, spannerBundle):
     '''Some spanners, such as MusicXML octave-shift, are encoded as MusicXML directions.
@@ -5008,6 +5025,15 @@ spirit</words>
         raw = s.musicxml # test roundtrip output
         self.assertEqual(raw.count('<bracket'), 10)
 
+
+    def testTrillExtensionImportA(self):
+        from music21 import converter, stream
+        from music21.musicxml import testPrimitive        
+        s = converter.parse(testPrimitive.notations32a)
+        #s.show()
+        self.assertEqual(len(s.flat.getElementsByClass('TrillExtension')), 2)
+        raw = s.musicxml # test roundtrip output
+        self.assertEqual(raw.count('<wavy-line'), 4)
 
 
 #-------------------------------------------------------------------------------

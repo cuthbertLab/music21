@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2010-2011 The music21 Project
+# Copyright:    (c) 2010-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
@@ -581,19 +581,19 @@ class Test(unittest.TestCase):
         # each score in the opus is a Stream that contains a Part and metadata
         p1 = o.getScoreByNumber(1).parts[0] 
         self.assertEqual(p1.offset, 0.0)
-        self.assertEqual(len(p1.flat.notesAndRests), 89)
+        self.assertEqual(len(p1.flat.notesAndRests), 88)
 
         p2 = o.getScoreByNumber(2).parts[0] 
         self.assertEqual(p2.offset, 0.0)
-        self.assertEqual(len(p2.flat.notesAndRests), 81)
+        self.assertEqual(len(p2.flat.notesAndRests), 80)
 
         p3 = o.getScoreByNumber(3).parts[0] 
         self.assertEqual(p3.offset, 0.0)
-        self.assertEqual(len(p3.flat.notesAndRests), 83)
+        self.assertEqual(len(p3.flat.notesAndRests), 82)
 
         p4 = o.getScoreByNumber(4).parts[0] 
         self.assertEqual(p4.offset, 0.0)
-        self.assertEqual(len(p4.flat.notesAndRests), 79)
+        self.assertEqual(len(p4.flat.notesAndRests), 78)
 
 
         sMerged = o.mergeScores()

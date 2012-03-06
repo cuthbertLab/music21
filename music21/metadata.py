@@ -1957,6 +1957,13 @@ class MetadataBundle(music21.JSONSerializer):
             environLocal.printDebug(['updateMetadataCache: examining:', fp])
             cp = self.corpusPathToKey(fp)
             post = converter.parse(fp, forceSource=True)
+
+#             try:
+#                 post = converter.parse(fp, forceSource=True)
+#             except:
+#                 environLocal.warn('parse failed: %s' % fp)
+#                 continue
+
             if 'Opus' in post.classes:
                 # need to get scores from each opus?
                 # problem here is that each sub-work has metadata, but there

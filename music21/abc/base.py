@@ -570,7 +570,8 @@ class ABCMetadata(ABCToken):
         0.5
 
         '''
-        if self.isDefaultNoteLength():
+        #environLocal.pd(['getDefaultQuarterLength', self.data])
+        if self.isDefaultNoteLength() and '/' in self.data:
             # should be in L:1/4 form
             n, d = self.data.split('/')
             n = int(n.strip())
@@ -595,7 +596,7 @@ class ABCMetadata(ABCToken):
                 return .5 # otherwiseit is an eighth note
 
         else:       
-            raise ABCTokenException('no quarter length associated with this meta-data')
+            raise ABCTokenException('no quarter length associated with this meta-data: %s' % self.data)
 
 
 
@@ -1191,9 +1192,11 @@ class ABCNote(ABCToken):
 
     def parse(self, forceDefaultQuarterLength=None, 
                     forceKeySignature=None):
+        #environLocal.pd(['parse', self.src])
         self.chordSymbols, nonChordSymStr = self._splitChordSymbols(self.src)        
         # get pitch name form remaining string
         # rests will have a pitch name of None
+
         a, b = self._getPitchName(nonChordSymStr,
                forceKeySignature=forceKeySignature)
         self.pitchName, self.accidentalDisplayStatus = a, b
@@ -1538,7 +1541,7 @@ class ABCHandler(object):
                         continue                    
                     # only allow one pitch alpha to be a continue condition
                     elif (foundPitchAlpha == False and strSrc[j].isalpha() 
-                        and strSrc[j] not in 'wuvhHLTSN'):
+                        and strSrc[j] not in '~wuvhHLTSN'):
                         foundPitchAlpha = True
                         j += 1
                         continue                    
@@ -1566,14 +1569,18 @@ class ABCHandler(object):
                 # H is fermata
                 # . dot may be staccato, but should be attached to pitch
                 if collect in ['w', 'u', 'v', 'v.', 'h', 'H', 'vk', 'k', 
-                    'uk', 'U', 
-                    '.', '=', 'V', 'v.', 'S', 's', 'i', 'I', 'ui', 'u.', 'K', 'Q', 'Hy', 'r', 'm', 'M', 'n', 'N', 'o', 'l', 'L',
-                    'y', 'T', 't', 'x']:
+                    'uk', 'U', '~',
+                    '.', '=', 'V', 'v.', 'S', 's', 'i', 'I', 'ui', 'u.', 'K', 'Q', 'Hy', 'Hx', 
+                    'r', 'm', 'M', 'n', 'N', 'o', 
+                    'l', 'L', 'R',
+                    'y', 'T', 't', 'x', 'Z']:
                     pass
+                # these are bad chords, or other problematic notations like
+                # "D.C."x
                 elif collect.startswith('"') and (collect[-1] in 
-                    ['u', 'v', 'k', 'K', 'Q', '.', 'y', 'T', 'w', 'h'] or collect.endswith('v.')):
+                    ['u', 'v', 'k', 'K', 'Q', '.',    'y', 'T', 'w', 'h', 'x'] or collect.endswith('v.')):
                     pass
-                elif collect.startswith('x'):
+                elif collect.startswith('x') or collect.startswith('H') or collect.startswith('Z'):
                     pass
                 # not sure what =20 refers to
                 elif len(collect) > 1 and collect.startswith("=") and collect[1].isdigit():
@@ -1632,7 +1639,7 @@ class ABCHandler(object):
                     tPrev.brokenRhythmMarker = (t.data, 'left')
                     tNext.brokenRhythmMarker = (t.data, 'right')
                 else:
-                    raise ABCHandlerException('broken rhythm marker (%s) not positioned between two notes or chords' % t.src)
+                    environLocal.pd(['broken rhythm marker (%s) not positioned between two notes or chords' % t.src])
 
             # need to update tuplets with currently active meter
             if isinstance(t, ABCTuplet):
@@ -1675,8 +1682,8 @@ class ABCHandler(object):
     # access tokens
 
     def _getTokens(self):
-        if self._tokens == []:
-            raise ABCHandlerException('must process tokens before calling split')
+#         if self._tokens == []:
+#             raise ABCHandlerException('must process tokens before calling split')
         return self._tokens
 
     def _setTokens(self, tokens):

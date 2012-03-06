@@ -2097,7 +2097,7 @@ class Notations(MusicXMLElementList):
         return post
 
     def getOrnaments(self):
-        '''Get a the ornaments object stored on a components. There can be more than one.
+        '''Get all ornament objects stored on a components. There can be more than one.
         '''
         post = []        
         for part in self.componentList:
@@ -2105,6 +2105,25 @@ class Notations(MusicXMLElementList):
                 post.append(part)
         return post
 
+    def getWavyLines(self):
+        '''Get one or more wavy line objects Stored in Ornaments
+
+        >>> from music21 import *
+        >>> wl = musicxml.WavyLine()
+        >>> o = musicxml.Ornaments()
+        >>> n = musicxml.Notations()
+        >>> o.append(wl)
+        >>> n.append(o)
+        >>> n.getWavyLines()
+        [<ornaments <wavy-line >>]
+        '''
+        post = []        
+        for part in self.componentList:
+            if isinstance(part, Ornaments):
+                for sub in part:
+                    if isinstance(sub, WavyLine):
+                        post.append(sub)
+        return post
 
 
 
@@ -2276,7 +2295,6 @@ class WavyLine(MusicXMLElement):
     def __init__(self, type=None):
         MusicXMLElement.__init__(self)
         self._tag = 'wavy-line'
-
         # attributes
         self._attr['type'] = None # start/stop/continue
         self._attr['number'] = None # used for id
