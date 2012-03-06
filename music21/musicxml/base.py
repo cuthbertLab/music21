@@ -1522,8 +1522,7 @@ class Direction(MusicXMLElementList):
         found = self._getObjectsContainedInDirectionType(Metronome)
         if len(found) > 0:
             return found[0] # only return one fo rnow
-        else:
-            return None
+        return None
 
     def getWedge(self):
         '''Search this direction and determine if it contains a dynamic mark.
@@ -1540,15 +1539,6 @@ class Direction(MusicXMLElementList):
         found = self._getObjectsContainedInDirectionType(Wedge)
         if len(found) > 0:
             return found[0]
-        else:
-            return None
-
-#         for directionType in self.componentList:
-#             if isinstance(directionType, Sound):
-#                 continue 
-#             for obj in directionType:
-#                 if isinstance(obj, Wedge):
-#                     return obj
         return None
 
     def getWords(self):
@@ -1568,20 +1558,7 @@ class Direction(MusicXMLElementList):
         found = self._getObjectsContainedInDirectionType(Words)
         if len(found) > 0:
             return found # return the lost
-        else:
-            return None
-
-#         post = [] # return a lost
-#         for directionType in self.componentList:
-#             if isinstance(directionType, Sound):
-#                 continue 
-#             for obj in directionType:
-#                 if isinstance(obj, Words):
-#                     post.append(obj)
-#         if len(post) > 0:
-#             return post
-#         else:
-#             return None
+        return None
 
     def getCoda(self):
         '''Search this direction and determine if it contains a coda mark.
@@ -1598,16 +1575,7 @@ class Direction(MusicXMLElementList):
         found = self._getObjectsContainedInDirectionType(Coda)
         if len(found) > 0:
             return found[0] 
-        else:
-            return None
-
-#         for directionType in self.componentList:
-#             if isinstance(directionType, Sound):
-#                 continue 
-#             for obj in directionType:
-#                 if isinstance(obj, Coda):
-#                     return obj
-#         return None
+        return None
 
     def getSegno(self):
         '''Search this direction and determine if it contains a segno mark.
@@ -1624,16 +1592,7 @@ class Direction(MusicXMLElementList):
         found = self._getObjectsContainedInDirectionType(Segno)
         if len(found) > 0:
             return found[0] 
-        else:
-            return None
-
-#         for directionType in self.componentList:
-#             if isinstance(directionType, Sound):
-#                 continue 
-#             for obj in directionType:
-#                 if isinstance(obj, Segno):
-#                     return obj
-#         return None
+        return None
 
 
 class DirectionType(MusicXMLElementList):

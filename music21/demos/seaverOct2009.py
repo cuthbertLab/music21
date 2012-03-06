@@ -152,7 +152,7 @@ def simple4b(show=True):
     countDiminuendo = 0
     for part in s.getElementsByClass(stream.Part):
         map = [] # create a l
-        wedgeStream = part.flat.getElementsByClass(dynamics.Wedge)
+        wedgeStream = part.flat.getElementsByClass(dynamics.DynamicWedge)
         for wedge in wedgeStream:
             if wedge.type == 'crescendo':
                 countCrescendo += 1

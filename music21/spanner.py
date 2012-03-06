@@ -403,7 +403,7 @@ class Spanner(music21.Music21Object):
             else:
                 pass
                 # it makes sense to not have multiple copies
-                #environLocal.printDebug(['attempting to add an object (%s) that is already found in the SpannerStorage stream of spaner %s; this may not be an erorr.' % (c, self)])
+                #environLocal.printDebug(['attempting to add an object (%s) that is already found in the SpannerStorage stream of spaner %s; this may not be an error.' % (c, self)])
 
         self._components._elementsChanged()
         # always clear cache
@@ -625,6 +625,12 @@ class SpannerBundle(object):
             elif 'Spanner' in arg.classes:
                 self._storage.append(arg)
     
+        # a special spanners, stored in storage, can be identified in the 
+        # SpannerBundle as missing a component; the next obj that meets
+        # the class expectation will then be assigned and the component 
+        # cleared
+        self._pendingComponentAssignment = []
+
     def append(self, other):
         self._storage.append(other)
         if self._cache > 0:
@@ -940,6 +946,24 @@ class SpannerBundle(object):
         return self.getByClass(className).getByCompleteStatus(completeStatus)
 
 
+    def setPendingComponentAssignment(self, sp, className):
+        ref = {'spanner':sp, 'className':className}
+        self._pendingComponentAssignment.append(ref)
+
+    def freePendingComponentAssignment(self, componentCandidate):
+        if len(self._pendingComponentAssignment) == 0:
+            return
+
+        remove = None
+        for i, ref in enumerate(self._pendingComponentAssignment):
+            environLocal.pd(['calling freePendingComponentAssignment()', self._pendingComponentAssignment])
+            if componentCandidate.isClassOrSubclass([ref['className']]):
+                ref['spanner'].addComponents(componentCandidate)
+                remove = i      
+                environLocal.pd(['freePendingComponentAssignment()', 'added component', ref['spanner']])
+                break
+        if remove is not None:
+            self._pendingComponentAssignment.pop(remove)
 
 #-------------------------------------------------------------------------------
 # connect two or more notes anywhere in the score
@@ -1071,83 +1095,6 @@ class RepeatBracket(Spanner):
         return msg
 
 
-
-
-#-------------------------------------------------------------------------------
-class DynamicWedge(Spanner):
-    '''Common base-class for Crescendo and Diminuendo. 
-    '''
-    def __init__(self, *arguments, **keywords):
-        Spanner.__init__(self, *arguments, **keywords)
-
-        self.type = None # crescendo or diminuendo
-        self.placement = 'below' # can above or below, after musicxml
-        self.spread = 15 # this unit is probably in tenth
-
-    def __repr__(self):
-        msg = Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.spanner.DynamicWedge ')
-        return msg
-
-class Crescendo(DynamicWedge):
-    '''A spanner crescendo wedge.
-
-    >>> from music21 import spanner
-    >>> d = spanner.Crescendo()
-    >>> d.getStartParameters()
-    {'spread': 0, 'type': 'crescendo'}
-    >>> d.getEndParameters()
-    {'spread': 15, 'type': 'stop'}
-    '''
-    def __init__(self, *arguments, **keywords):
-        DynamicWedge.__init__(self, *arguments, **keywords)
-        self.type = 'crescendo'
-
-    def getStartParameters(self):
-        '''Return the parameters for the start of this spanner
-        ''' 
-        post = {}
-        post['type'] = self.type # cresc 
-        post['spread'] = 0 # start at zero
-        return post
-
-    def getEndParameters(self):
-        '''Return the parameters for the start of this spanner
-        ''' 
-        post = {}
-        post['type'] = 'stop'  # end is always stop
-        post['spread'] = self.spread # end with spread
-        return post
-
-class Diminuendo(DynamicWedge):
-    '''A spanner diminuendo wedge.
-
-    >>> from music21 import spanner
-    >>> d = spanner.Diminuendo()
-    >>> d.getStartParameters()
-    {'spread': 15, 'type': 'diminuendo'}
-    >>> d.getEndParameters()
-    {'spread': 0, 'type': 'stop'}
-    '''
-    def __init__(self, *arguments, **keywords):
-        DynamicWedge.__init__(self, *arguments, **keywords)
-        self.type = 'diminuendo'
-
-    def getStartParameters(self):
-        '''Return the parameters for the start of this spanner
-        ''' 
-        post = {}
-        post['type'] = self.type # dim
-        post['spread'] = self.spread # start with spread
-        return post
-
-    def getEndParameters(self):
-        '''Return the parameters for the start of this spanner
-        ''' 
-        post = {}
-        post['type'] = 'stop'  # end is always stop
-        post['spread'] = 0
-        return post
 
 
 #-------------------------------------------------------------------------------
@@ -2018,8 +1965,8 @@ class Test(unittest.TestCase):
         #s.insert(n2.offset, dynamics.Dynamic('ppp'))
         n3 = s.notes[-1]
         #s.insert(n3.offset, dynamics.Dynamic('ff'))
-        sp1 = spanner.Diminuendo(n1, n2)
-        sp2 = spanner.Crescendo(n2, n3)
+        sp1 = dynamics.Diminuendo(n1, n2)
+        sp2 = dynamics.Crescendo(n2, n3)
         s.append(sp1)
         s.append(sp2)
         #s.show()
@@ -2135,6 +2082,16 @@ class Test(unittest.TestCase):
         self.assertEqual(raw.count('<dashes'), 4)
         
 
+    def testOneElementSpanners(self):
+        from music21 import note, spanner
+
+        n1 = note.Note()
+        sp = spanner.Spanner()
+        sp.addComponents(n1)
+        sp.completeStatus = True
+        self.assertEqual(sp.completeStatus, True)
+        self.assertEqual(sp.isFirst(n1), True)
+        self.assertEqual(sp.isLast(n1), True)
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

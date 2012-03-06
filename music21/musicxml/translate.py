@@ -1529,7 +1529,8 @@ def mxToInstrument(mxScorePart, inputM21=None):
 
 def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost, 
     spannerBundle):
-    '''
+    '''Convenience routine to create and add MusicXML objects from music21 objects provided as a target and as a SpannerBundle. 
+
     The `target` parameter here may be music21 Note or Chord. 
     This may edit the mxNoteList and direction lists in place, and thus returns None.
     '''
@@ -1618,29 +1619,40 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
             mxDirectionPost.append(mxDirection)
 
     # get common base class of cresc and decresc
+    # may have the same note as a start and end
     for su in spannerBundle.getByClass('DynamicWedge'):     
-        mxWedge = musicxmlMod.Wedge()
-        mxWedge.set('number', su.idLocal)
-        # is this note first in this spanner?
-        if su.isFirst(target):
-            pmtrs = su.getStartParameters()
-            mxWedge.set('type', pmtrs['type'])
-            mxWedge.set('spread', pmtrs['spread'])
-        elif su.isLast(target):
-            pmtrs = su.getEndParameters()
-            mxWedge.set('type', pmtrs['type'])
-            mxWedge.set('spread', pmtrs['spread'])
+        if len(su) == 1: # have a one element wedge
+            proc = [(su, 'first'), (su, 'last')]
         else:
-            # this may not always be an error
-            environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, target])
-        mxDirection = musicxmlMod.Direction()
-        mxDirection.set('placement', su.placement) # placement goes here
-        mxDirectionType = musicxmlMod.DirectionType()
-        mxDirectionType.append(mxWedge)
-        mxDirection.append(mxDirectionType)
-        environLocal.pd(['os', 'mxDirection', mxDirection ])
+            if su.isFirst(target):
+                proc = [(su, 'first')]
+            else:
+                proc = [(su, 'last')]
 
-        mxDirectionPre.append(mxDirection)
+        for suSub, posSub in proc:
+            mxWedge = musicxmlMod.Wedge()
+            mxWedge.set('number', su.idLocal)
+            # is this note first in this spanner?
+            if posSub == 'first':
+                pmtrs = su.getStartParameters()
+                mxWedge.set('type', pmtrs['type'])
+                mxWedge.set('spread', pmtrs['spread'])
+            elif posSub == 'last':
+                pmtrs = su.getEndParameters()
+                mxWedge.set('type', pmtrs['type'])
+                mxWedge.set('spread', pmtrs['spread'])
+
+            mxDirection = musicxmlMod.Direction()
+            mxDirection.set('placement', su.placement) # placement goes here
+            mxDirectionType = musicxmlMod.DirectionType()
+            mxDirectionType.append(mxWedge)
+            mxDirection.append(mxDirectionType)
+            #environLocal.pd(['os', 'mxDirection', mxDirection ])
+            if posSub == 'first':
+                mxDirectionPre.append(mxDirection)
+            else:
+                mxDirectionPost.append(mxDirection)
+
 
     for su in spannerBundle.getByClass('Line'):     
         mxBracket = musicxmlMod.Bracket()
@@ -1664,15 +1676,12 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
         mxDirectionType = musicxmlMod.DirectionType()
         mxDirectionType.append(mxBracket)
         mxDirection.append(mxDirectionType)
-        environLocal.pd(['os', 'mxDirection', mxDirection ])
-
-        #mxDirectionPre.append(mxDirection)
+        #environLocal.pd(['os', 'mxDirection', mxDirection ])
 
         if su.isFirst(target):
             mxDirectionPre.append(mxDirection)
         else:
             mxDirectionPost.append(mxDirection)
-
 
     for su in spannerBundle.getByClass('DashedLine'):     
         mxDashes = musicxmlMod.Dashes()
@@ -1696,6 +1705,82 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
         else:
             mxDirectionPost.append(mxDirection)
 
+
+def mxNotationsToSpanners(target, mxNotations, spannerBundle):
+    '''General routines for gathering spanners from notes via mxNotations objects and placing them in a spanner bundle. 
+
+    Spanners may be found in musicXML notations and directions objects. 
+
+    The passed-in spannerBundle will be edited in-place; existing spanners may be completed, or new spanners may be added. 
+
+    The `target` object is a reference to the relevant music21 object this spanner is associated with.
+    '''
+    from music21 import spanner
+
+    mxSlurList = mxNotations.getSlurs()
+    for mxObj in mxSlurList:
+        # look at all spanners and see if we have an open, matching
+        # slur to place this in
+        idFound = mxObj.get('number')
+        # returns a new spanner bundle with just the result of the search
+        #environLocal.printDebug(['spanner bundle: getByCompleteStatus(False)', spannerBundle.getByCompleteStatus(False)])
+
+        #sb = spannerBundle.getByIdLocal(idFound).getByCompleteStatus(False)
+        sb = spannerBundle.getByClassIdLocalComplete('Slur', idFound, False)
+        if len(sb) > 0: # if we already have a slur
+            #environLocal.printDebug(['found a match in SpannerBundle'])
+            su = sb[0] # get the first
+        else: # create a new slur
+            su = spanner.Slur()
+            su.idLocal = idFound
+            su.placement = mxObj.get('placement')
+            spannerBundle.append(su)
+
+        # add a reference of this note to this spanner
+        su.addComponents(target)
+        #environLocal.pd(['adding n', n, id(n), 'su.getComponents', su.getComponents(), su.getComponentIds()])
+        if mxObj.get('type') == 'stop':
+            su.completeStatus = True
+            # only add after complete
+        #environLocal.printDebug(['got slur:', su, mxObj.get('placement'), mxObj.get('number')])
+
+
+def mxDirectionToSpanners(targetLast, mxDirection, spannerBundle):
+    '''Some spanners, such as MusicXML octave-shift, are encoded as MusicXML directions.
+    '''
+    from music21 import spanner
+    from music21 import dynamics
+
+    mxWedge = mxDirection.getWedge() 
+    if mxWedge is not None:
+        mxType = mxWedge.get('type')
+        idFound = mxWedge.get('number')
+        environLocal.pd(['mxDirectionToSpanners', 'found mxWedge', mxType, idFound])
+        if mxType == 'crescendo':
+            sp = dynamics.Crescendo()
+            sp.idLocal = idFound
+            spannerBundle.append(sp)
+            # define this spanner as needing component assignment from
+            # the next general note
+            spannerBundle.setPendingComponentAssignment(sp, 'GeneralNote')
+        elif mxType == 'diminuendo':
+            sp = dynamics.Diminuendo()
+            sp.idLocal = idFound
+            spannerBundle.append(sp)
+            spannerBundle.setPendingComponentAssignment(sp, 'GeneralNote')
+        elif mxType == 'stop':
+            # need to retrieve an existing spanner
+            # try to get base class of both Crescendo and Decrescendo
+            sp = spannerBundle.getByClassIdLocalComplete('DynamicWedge', 
+                    idFound, False)[0] # get first
+            sp.completeStatus = True
+            # will only have a target if this follows the note
+            if targetLast is not None:
+                sp.addComponents(targetLast)
+            else:
+                environLocal.pd(['mxDirectionToSpanners', 'cannot add a compolent for the end of a Wedge', 'targetLast', targetLast])
+        else:
+            raise TranslateException('unidentified mxType of mxWedge:', mxType)
 
 
 def articulationsAndExpressionsToMx(target, mxNoteList):
@@ -1891,7 +1976,7 @@ def chordToMx(c, spannerBundle=None):
 
 
 
-def mxToChord(mxNoteList, inputM21=None):
+def mxToChord(mxNoteList, inputM21=None, spannerBundle=None):
     '''
     Given an a list of mxNotes, fill the necessary parameters
 
@@ -1936,11 +2021,19 @@ def mxToChord(mxNoteList, inputM21=None):
     from music21 import chord
     from music21 import pitch
     from music21 import tie
+    from music21 import spanner
 
     if inputM21 == None:
         c = chord.Chord()
     else:
         c = inputM21
+
+    if spannerBundle is None:
+        #environLocal.printDebug(['mxToNote()', 'creating SpannerBundle'])
+        spannerBundle = spanner.SpannerBundle()
+    else: # if we are passed in as spanner bundle, look for any pending
+        # component assignments
+        spannerBundle.freePendingComponentAssignment(c)
 
     # assume that first chord is the same duration for all parts
     #c.duration.mx = mxNoteList[0]
@@ -1993,7 +2086,6 @@ def mxToChord(mxNoteList, inputM21=None):
             c.setStemDirection(obj2, c.pitches[index2])
         index2+=1
             
-        
     return c
 
 
@@ -2199,7 +2291,7 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
     from music21 import tie
     from music21 import spanner
 
-    if inputM21 == None:
+    if inputM21 is None:
         n = note.Note()
     else:
         n = inputM21
@@ -2208,6 +2300,10 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
     if spannerBundle is None:
         #environLocal.printDebug(['mxToNote()', 'creating SpannerBundle'])
         spannerBundle = spanner.SpannerBundle()
+    else: # if we are passed in as spanner bundle, look for any pending
+        # component assignments
+        spannerBundle.freePendingComponentAssignment(n)
+
 
     # print object == 'no' and grace notes may have a type but not
     # a duration. they may be filtered out at the level of Stream 
@@ -2259,36 +2355,39 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
             fermataObj.mx = mxObj
             n.expressions.append(fermataObj)
             #environLocal.printDebug(['_setMX(), n.mxFermataList', mxFermataList])
+        
+        # create spanners:
+        mxNotationsToSpanners(n, mxNotations, spannerBundle)
 
         # get slurs; requires a spanner bundle
-        mxSlurList = mxNotations.getSlurs()
-        for mxObj in mxSlurList:
-            # look at all spanners and see if we have an open, matching
-            # slur to place this in
-            idFound = mxObj.get('number')
-            # returns a new spanner bundle with just the result of the search
-            #environLocal.printDebug(['spanner bundle: getByCompleteStatus(False)', spannerBundle.getByCompleteStatus(False)])
-
-            #sb = spannerBundle.getByIdLocal(idFound).getByCompleteStatus(False)
-            sb = spannerBundle.getByClassIdLocalComplete('Slur', idFound, False)
-            if len(sb) > 0:
-                #environLocal.printDebug(['found a match in SpannerBundle'])
-                su = sb[0] # get the first
-            else:    
-                # create a new slur
-                su = spanner.Slur()
-                su.idLocal = idFound
-                su.placement = mxObj.get('placement')
-                # type attribute, defined as start or stop, 
-                spannerBundle.append(su)
-
-            # add a reference of this note to this spanner
-            su.addComponents(n)
-            #environLocal.pd(['adding n', n, id(n), 'su.getComponents', su.getComponents(), su.getComponentIds()])
-            if mxObj.get('type') == 'stop':
-                su.completeStatus = True
-                # only add after complete
-            #environLocal.printDebug(['got slur:', su, mxObj.get('placement'), mxObj.get('number')])
+#         mxSlurList = mxNotations.getSlurs()
+#         for mxObj in mxSlurList:
+#             # look at all spanners and see if we have an open, matching
+#             # slur to place this in
+#             idFound = mxObj.get('number')
+#             # returns a new spanner bundle with just the result of the search
+#             #environLocal.printDebug(['spanner bundle: getByCompleteStatus(False)', spannerBundle.getByCompleteStatus(False)])
+# 
+#             #sb = spannerBundle.getByIdLocal(idFound).getByCompleteStatus(False)
+#             sb = spannerBundle.getByClassIdLocalComplete('Slur', idFound, False)
+#             if len(sb) > 0: # if we already have a slur
+#                 #environLocal.printDebug(['found a match in SpannerBundle'])
+#                 su = sb[0] # get the first
+#             else:    
+#                 # create a new slur
+#                 su = spanner.Slur()
+#                 su.idLocal = idFound
+#                 su.placement = mxObj.get('placement')
+#                 # type attribute, defined as start or stop, 
+#                 spannerBundle.append(su)
+# 
+#             # add a reference of this note to this spanner
+#             su.addComponents(n)
+#             #environLocal.pd(['adding n', n, id(n), 'su.getComponents', su.getComponents(), su.getComponentIds()])
+#             if mxObj.get('type') == 'stop':
+#                 su.completeStatus = True
+#                 # only add after complete
+#             #environLocal.printDebug(['got slur:', su, mxObj.get('placement'), mxObj.get('number')])
     
     # gets the notehead object from the mxNote and sets value of the music21 note to the value of the notehead object        
     mxNotehead = mxNote.get('noteheadObj')
@@ -2722,8 +2821,9 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     offsetMeasureNote = 0 # offset of note w/n measure        
     mxNoteList = [] # for accumulating notes in chords
     mxLyricList = [] # for accumulating lyrics assigned to chords
-    for i in range(len(mxMeasure)):
+    nLast = None # store the last-create music21 note for Spanners
 
+    for i in range(len(mxMeasure)):
         # try to get the next object for chord comparisons
         mxObj = mxMeasure[i]
         if i < len(mxMeasure)-1:
@@ -2799,7 +2899,6 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
 
         # <sound> tags may be found in the Measure, used to define tempo
         elif isinstance(mxObj, musicxmlMod.Sound):
-            #environLocal.printDebug(['found musicxmlMod.Sound object in mxMeasure'])
             pass
 
         elif isinstance(mxObj, musicxmlMod.Barline):
@@ -2888,8 +2987,6 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     for mxLyric in mxNote.lyricList:
                         mxLyricList.append(mxLyric)
                 else:
-                    #n = note.Note()
-                    #n.mx = mxNote
                     try:
                         n = mxToNote(mxNote, spannerBundle=spannerBundle)
                     except TranslateException as strerror:
@@ -2906,6 +3003,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                         lyricObj = note.Lyric()
                         lyricObj.mx = mxLyric
                         n.lyrics.append(lyricObj)
+                    nLast = n # update
 
                 if mxNote.get('notationsObj') is not None:
                     for mxObjSub in mxNote.get('notationsObj'):
@@ -2921,15 +3019,16 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 else:
                     m._insertCore(offsetMeasureNote, n)
                 offsetIncrement = n.quarterLength
+                nLast = n # update
 
             # if we we have notes in the note list and the next
             # note either does not exist or is not a chord, we 
             # have a complete chord
             if len(mxNoteList) > 0 and (mxNoteNext is None 
                 or mxNoteNext.get('chord') is False):
-                c = chord.Chord()
-                # TODO: use chord conversion
-                c.mx = mxNoteList
+                #c = chord.Chord()
+                #c.mx = mxNoteList
+                c = mxToChord(mxNoteList, spannerBundle=spannerBundle)
                 # add any accumulated lyrics
                 for mxLyric in mxLyricList:
                     lyricObj = note.Lyric()
@@ -2945,14 +3044,13 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 mxLyricList = []
 
                 offsetIncrement = c.quarterLength
+                nLast = c # update
+
             # only increment Chords after completion
             offsetMeasureNote += offsetIncrement
 
         # mxDirections can be dynamics, repeat expressions, text expressions
         elif isinstance(mxObj, musicxmlMod.Direction):
-#                 mxDynamicsFound, mxWedgeFound = m._getMxDynamics(mxObj)
-#                 for mxDirection in mxDynamicsFound:
-            # will return 0 if not defined
             offsetDirection = mxToOffset(mxObj, divisions)
             if mxObj.getDynamicMark() is not None:
                 #d = dynamics.Dynamic()
@@ -2963,11 +3061,14 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     _addToStaffReference(mxObj, d, staffReference)
                     #m.insert(offsetMeasureNote, d)
                     m._insertCore(offsetMeasureNote + offsetDirection, d)
-            if mxObj.getWedge() is not None:
-                w = dynamics.Wedge()
-                w.mx = mxObj     
-                _addToStaffReference(mxObj, w, staffReference)
-                m._insertCore(offsetMeasureNote, w)
+
+            mxDirectionToSpanners(nLast, mxObj, spannerBundle)
+            # TODO: a spanner
+#             if mxObj.getWedge() is not None:
+#                 w = dynamics.Wedge()
+#                 w.mx = mxObj     
+#                 _addToStaffReference(mxObj, w, staffReference)
+#                 m._insertCore(offsetMeasureNote, w)
 
             if mxObj.getSegno() is not None:
                 rm = mxToSegno(mxObj.getSegno())
@@ -2988,10 +3089,8 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
 
             if mxObj.getWords() is not None:
                 # TODO: need to look for tempo words if we have a metro
-
                 #environLocal.printDebug(['found mxWords object', mxObj])
                 # convert into a list of TextExpression objects
-
                 # this may be a TextExpression, or a RepeatExpression
                 for te in mxToTextExpression(mxObj):
                     #environLocal.printDebug(['got TextExpression object', repr(te)])
@@ -3798,7 +3897,7 @@ class Test(unittest.TestCase):
         ex = s.measures(2, 3) # this needs to get all spanners too
 
         # all spanners are referenced over; even ones that may not be relevant
-        self.assertEqual(len(ex.flat.spanners), 2)
+        self.assertEqual(len(ex.flat.spanners), 4)
         #ex.show()
         
         # slurs are on measures 2, 3
@@ -4812,6 +4911,34 @@ spirit</words>
         self.assertEqual(raw.count('<slur'), 4) # 2 pairs of start/stop
         #s.show()
 
+
+    def testImportWedgeA(self):
+
+        from music21 import converter, stream
+        from music21.musicxml import testPrimitive        
+
+        s = converter.parse(testPrimitive.spanners33a)
+        self.assertEqual(len(s.flat.getElementsByClass('Crescendo')), 1)
+        self.assertEqual(len(s.flat.getElementsByClass('Diminuendo')), 1)
+
+        raw = s.musicxml # test roundtrip output
+        self.assertEqual(raw.count('type="crescendo"'), 1)
+        self.assertEqual(raw.count('type="diminuendo"'), 1)
+        #s.show('t')
+        #s.show()
+
+
+    def testImportWedgeB(self):
+        from music21 import converter, stream
+        from music21.musicxml import testPrimitive        
+
+        # this produces a single component cresc
+        s = converter.parse(testPrimitive.directions31a)
+        self.assertEqual(len(s.flat.getElementsByClass('Crescendo')), 2)
+        raw = s.musicxml # test roundtrip output
+        self.assertEqual(raw.count('type="crescendo"'), 2)
+
+        #s.show()
 
 
 #-------------------------------------------------------------------------------

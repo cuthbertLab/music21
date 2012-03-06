@@ -22,6 +22,8 @@ import music21
 from music21 import musicxml as musicxmlMod 
 from music21.musicxml import translate as musicxmlTranslate
 from music21 import common
+from music21 import spanner
+
 from music21 import environment
 _MOD = 'dynamics.py'
 environLocal = environment.Environment(_MOD)
@@ -279,78 +281,169 @@ class Dynamic(music21.Music21Object):
 
 
 #-------------------------------------------------------------------------------
-class Wedge(music21.Music21Object):
-    '''Object model of crescendeo/decrescendo wedges.
+# class Wedge(music21.Music21Object):
+#     '''Object model of crescendeo/decrescendo wedges.
+# 
+#     NOTE: this object is will soon be replaced by Crescend and Diminendo objects.
+#     '''
+#     
+#     def __init__(self, type=None):
+#         music21.Music21Object.__init__(self)
+#         # use inherited duration to show length n time
+#         # these correspond to start and stop
+#         self.type = type # crescendo, stop, or diminuendo
+#         self.spread = None
+# 
+#         # all musicxml-related positioning
+#         self._positionDefaultX = None
+#         self._positionDefaultY = None
+#         self._positionRelativeX = None
+#         self._positionRelativeY = None
+#         self._positionPlacement = 'below' # defined in mxDirection
+# 
+#     def _getMX(self):
+#         '''
+#         returns a musicxml.Direction object
+# 
+#         >>> from music21 import *
+#         >>> a = dynamics.Wedge()
+#         >>> a.type = 'crescendo'
+#         >>> mxDirection = a.mx
+#         >>> mxWedge = mxDirection.getWedge()
+#         >>> mxWedge.get('type')
+#         'crescendo'
+#         '''
+#         mxWedge = musicxmlMod.Wedge()
+#         mxWedge.set('type', self.type)
+#         mxWedge.set('spread', self.spread)
+# 
+#         mxDirectionType = musicxmlMod.DirectionType()
+#         mxDirectionType.append(mxWedge)
+#         mxDirection = musicxmlMod.Direction()
+#         mxDirection.append(mxDirectionType)
+#         mxDirection.set('placement', self._positionPlacement)
+#         return mxDirection
+# 
+# 
+#     def _setMX(self, mxDirection):
+#         '''
+#         given an mxDirection, load instance
+# 
+#         >>> from music21 import *
+#         >>> mxDirection = musicxml.Direction()
+#         >>> mxDirectionType = musicxml.DirectionType()
+#         >>> mxWedge = musicxml.Wedge()
+#         >>> mxWedge.set('type', 'crescendo')
+#         >>> mxDirectionType.append(mxWedge)
+#         >>> mxDirection.append(mxDirectionType)
+#         >>>
+#         >>> a = dynamics.Wedge()
+#         >>> a.mx = mxDirection
+#         >>> a.type
+#         'crescendo'
+#         '''
+#         if mxDirection.get('placement') != None:
+#             self._positionPlacement = mxDirection.get('placement') 
+# 
+#         mxWedge = mxDirection.getWedge()
+#         if mxWedge == None:
+#             raise WedgeException('no wedge found in MusicXML direction object')
+# 
+#         self.type = mxWedge.get('type')
+#         self.spread = mxWedge.get('spread')
+# 
+#     mx = property(_getMX, _setMX)
 
-    NOTE: this object is will soon be replaced by Crescend and Diminendo objects.
+
+
+
+#-------------------------------------------------------------------------------
+class DynamicWedge(spanner.Spanner):
+    '''Common base-class for Crescendo and Diminuendo. 
     '''
-    
-    def __init__(self, type=None):
-        music21.Music21Object.__init__(self)
-        # use inherited duration to show length n time
-        # these correspond to start and stop
-        self.type = type # crescendo, stop, or diminuendo
-        self.spread = None
+    def __init__(self, *arguments, **keywords):
+        spanner.Spanner.__init__(self, *arguments, **keywords)
 
-        # all musicxml-related positioning
-        self._positionDefaultX = None
-        self._positionDefaultY = None
-        self._positionRelativeX = None
-        self._positionRelativeY = None
-        self._positionPlacement = 'below' # defined in mxDirection
+        self.type = None # crescendo or diminuendo
+        self.placement = 'below' # can above or below, after musicxml
+        self.spread = 15 # this unit is probably in tenth
 
-    def _getMX(self):
-        '''
-        returns a musicxml.Direction object
+    def __repr__(self):
+        msg = spanner.Spanner.__repr__(self)
+        msg = msg.replace(self._reprHead, '<music21.spanner.DynamicWedge ')
+        return msg
 
-        >>> from music21 import *
-        >>> a = dynamics.Wedge()
-        >>> a.type = 'crescendo'
-        >>> mxDirection = a.mx
-        >>> mxWedge = mxDirection.getWedge()
-        >>> mxWedge.get('type')
-        'crescendo'
-        '''
-        mxWedge = musicxmlMod.Wedge()
-        mxWedge.set('type', self.type)
-        mxWedge.set('spread', self.spread)
+class Crescendo(DynamicWedge):
+    '''A spanner crescendo wedge.
 
-        mxDirectionType = musicxmlMod.DirectionType()
-        mxDirectionType.append(mxWedge)
-        mxDirection = musicxmlMod.Direction()
-        mxDirection.append(mxDirectionType)
-        mxDirection.set('placement', self._positionPlacement)
-        return mxDirection
+    >>> from music21 import dynamics
+    >>> d = dynamics.Crescendo()
+    >>> d.getStartParameters()
+    {'spread': 0, 'type': 'crescendo'}
+    >>> d.getEndParameters()
+    {'spread': 15, 'type': 'stop'}
+    '''
+    def __init__(self, *arguments, **keywords):
+        DynamicWedge.__init__(self, *arguments, **keywords)
+        self.type = 'crescendo'
+
+    def __repr__(self):
+        msg = spanner.Spanner.__repr__(self)
+        msg = msg.replace(self._reprHead, '<music21.spanner.Crescendo ')
+        return msg
+
+    def getStartParameters(self):
+        '''Return the parameters for the start of this spanner
+        ''' 
+        post = {}
+        post['type'] = self.type # cresc 
+        post['spread'] = 0 # start at zero
+        return post
+
+    def getEndParameters(self):
+        '''Return the parameters for the start of this spanner
+        ''' 
+        post = {}
+        post['type'] = 'stop'  # end is always stop
+        post['spread'] = self.spread # end with spread
+        return post
+
+class Diminuendo(DynamicWedge):
+    '''A spanner diminuendo wedge.
+
+    >>> from music21 import dynamics
+    >>> d = dynamics.Diminuendo()
+    >>> d.getStartParameters()
+    {'spread': 15, 'type': 'diminuendo'}
+    >>> d.getEndParameters()
+    {'spread': 0, 'type': 'stop'}
+    '''
+    def __init__(self, *arguments, **keywords):
+        DynamicWedge.__init__(self, *arguments, **keywords)
+        self.type = 'diminuendo'
+
+    def __repr__(self):
+        msg = spanner.Spanner.__repr__(self)
+        msg = msg.replace(self._reprHead, '<music21.spanner.Diminuendo ')
+        return msg
+
+    def getStartParameters(self):
+        '''Return the parameters for the start of this spanner
+        ''' 
+        post = {}
+        post['type'] = self.type # dim
+        post['spread'] = self.spread # start with spread
+        return post
+
+    def getEndParameters(self):
+        '''Return the parameters for the start of this spanner
+        ''' 
+        post = {}
+        post['type'] = 'stop'  # end is always stop
+        post['spread'] = 0
+        return post
 
 
-    def _setMX(self, mxDirection):
-        '''
-        given an mxDirection, load instance
-
-        >>> from music21 import *
-        >>> mxDirection = musicxml.Direction()
-        >>> mxDirectionType = musicxml.DirectionType()
-        >>> mxWedge = musicxml.Wedge()
-        >>> mxWedge.set('type', 'crescendo')
-        >>> mxDirectionType.append(mxWedge)
-        >>> mxDirection.append(mxDirectionType)
-        >>>
-        >>> a = dynamics.Wedge()
-        >>> a.mx = mxDirection
-        >>> a.type
-        'crescendo'
-        '''
-        if mxDirection.get('placement') != None:
-            self._positionPlacement = mxDirection.get('placement') 
-
-        mxWedge = mxDirection.getWedge()
-        if mxWedge == None:
-            raise WedgeException('no wedge found in MusicXML direction object')
-
-        self.type = mxWedge.get('type')
-        self.spread = mxWedge.get('spread')
-
-    mx = property(_getMX, _setMX)
 
 
 #-------------------------------------------------------------------------------
@@ -420,8 +513,8 @@ class Test(unittest.TestCase):
         b = a.parts[0].flat.getElementsByClass(music21.dynamics.Dynamic)
         self.assertEquals(len(b), 35)
 
-        b = a.parts[0].flat.getElementsByClass(music21.dynamics.Wedge)
-        self.assertEquals(len(b), 4)
+        b = a.parts[0].flat.getElementsByClass(music21.dynamics.DynamicWedge)
+        self.assertEquals(len(b), 2)
 
 
     def testMusicxmlOutput(self):
@@ -469,7 +562,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Dynamic, Wedge, dynamicStrFromDecimal]
+_DOC_ORDER = [Dynamic, dynamicStrFromDecimal]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

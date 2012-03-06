@@ -66,7 +66,8 @@ import music21.stream
 from music21 import common
 from music21.base import Music21Exception
 from music21.humdrum import testFiles, canonicalOutput
-from music21.dynamics import Dynamic, Wedge
+from music21 import dynamics 
+from music21.dynamics import Dynamic
 
 import os
 
@@ -1104,11 +1105,9 @@ class DynamSpine(HumdrumSpine):
                 ## TODO: process comments
                 pass
             elif eventC.startswith('<'):
-                thisObject = Wedge()
-                thisObject.type = 'diminuendo'
+                thisObject = dynamics.Diminuendo()
             elif eventC.startswith('>'):
-                thisObject = Wedge()
-                thisObject.type = 'crescendo'
+                thisObject = dynamics.Crescendo()
             else:
                 thisObject = Dynamic(eventC)
             
