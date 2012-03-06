@@ -1593,30 +1593,35 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
         #environLocal.pd(['gliss', 'notationsObj', mxNoteList[0].notationsObj])
 
     for su in spannerBundle.getByClass('Ottava'):     
-        mxOctaveShift = musicxmlMod.OctaveShift()
-        mxOctaveShift.set('number', su.idLocal)
-        # is this note first in this spanner?
-        if su.isFirst(target):
-            pmtrs = su.getStartParameters()
-            mxOctaveShift.set('type', pmtrs['type'])
-            mxOctaveShift.set('size', pmtrs['size'])
-        elif su.isLast(target):
-            pmtrs = su.getEndParameters()
-            mxOctaveShift.set('type', pmtrs['type'])
-            mxOctaveShift.set('size', pmtrs['size'])
+        if len(su) == 1: # have a one element wedge
+            proc = ['first', 'last']
         else:
-            # this may not always be an error
-            environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, target])
-        mxDirection = musicxmlMod.Direction()
-        mxDirection.set('placement', su.placement) # placement goes here
-        mxDirectionType = musicxmlMod.DirectionType()
-        mxDirectionType.append(mxOctaveShift)
-        mxDirection.append(mxDirectionType)
-        environLocal.pd(['os', 'mxDirection', mxDirection ])
-        if su.isFirst(target):
-            mxDirectionPre.append(mxDirection)
-        else:
-            mxDirectionPost.append(mxDirection)
+            if su.isFirst(target):
+                proc = ['first']
+            else:
+                proc = ['last']
+        for posSub in proc:
+            mxOctaveShift = musicxmlMod.OctaveShift()
+            mxOctaveShift.set('number', su.idLocal)
+            # is this note first in this spanner?
+            if posSub == 'first':
+                pmtrs = su.getStartParameters()
+                mxOctaveShift.set('type', pmtrs['type'])
+                mxOctaveShift.set('size', pmtrs['size'])
+            elif posSub == 'last':
+                pmtrs = su.getEndParameters()
+                mxOctaveShift.set('type', pmtrs['type'])
+                mxOctaveShift.set('size', pmtrs['size'])
+            mxDirection = musicxmlMod.Direction()
+            mxDirection.set('placement', su.placement) # placement goes here
+            mxDirectionType = musicxmlMod.DirectionType()
+            mxDirectionType.append(mxOctaveShift)
+            mxDirection.append(mxDirectionType)
+            environLocal.pd(['os', 'mxDirection', mxDirection ])
+            if posSub == 'first':
+                mxDirectionPre.append(mxDirection)
+            else:
+                mxDirectionPost.append(mxDirection)
 
     # get common base class of cresc and decresc
     # may have the same note as a start and end
@@ -3952,10 +3957,8 @@ class Test(unittest.TestCase):
         from music21 import converter, stream, expressions
         from music21.musicxml import testPrimitive
     
-        
         s = converter.parse(testPrimitive.textExpressions)
-        #s.show()
-        
+        #s.show() 
         self.assertEqual(len(s.flat.getElementsByClass('TextExpression')), 3)
 
         p1 = s.parts[0]

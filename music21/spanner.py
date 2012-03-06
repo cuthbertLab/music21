@@ -1957,6 +1957,24 @@ class Test(unittest.TestCase):
         self.assertEqual(raw.count('type="up"'), 1)
 
 
+
+    def testOttavaShiftB(self):
+        '''Test a single note octave
+        '''
+        from music21 import stream, note, spanner
+        s = stream.Stream()
+        n = note.Note('c4')
+        sp = spanner.Ottava(n)
+        s.append(n)
+        s.append(sp)
+        #s.show()
+        raw = s.musicxml
+        self.assertEqual(raw.count('octave-shift'), 2)
+        self.assertEqual(raw.count('type="down"'), 1)
+
+        
+
+
     def testCrescendoA(self):
         from music21 import stream, note, spanner, chord, dynamics
         s = stream.Stream()
