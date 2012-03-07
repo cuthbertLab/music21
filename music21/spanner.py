@@ -1377,7 +1377,6 @@ class Line(Spanner):
 
 class Glissando(Spanner):
     '''A between two Notes specifying a glissando or similar alteration. Different line types can be specified. 
-
     '''
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)

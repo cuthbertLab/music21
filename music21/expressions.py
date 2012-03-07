@@ -847,9 +847,10 @@ class TrillExtension(spanner.Spanner):
         return self._placement
 
     def _setPlacement(self, value):
-        if value.lower() not in ['above', 'below']:
+        if value is not None and value.lower() not in ['above', 'below']:
             raise TrillExtensionException('incorrect placement value: %s' % value)
-        self._placement = value.lower()
+        if value is not None:
+            self._placement = value.lower()
         
     placement = property(_getPlacement, _setPlacement, doc='''
         Get or set the placement as either above or below.

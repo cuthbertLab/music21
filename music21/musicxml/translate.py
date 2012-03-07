@@ -1764,7 +1764,7 @@ def mxNotationsToSpanners(target, mxNotations, spannerBundle):
             idFound, False)
         if len(sb) > 0: # if we already have 
             su = sb[0] # get the first
-        else: # create a new slur
+        else: # create a new spanner
             su = expressions.TrillExtension()
             su.idLocal = idFound
             su.placement = mxObj.get('placement')
@@ -1774,6 +1774,25 @@ def mxNotationsToSpanners(target, mxNotations, spannerBundle):
         if mxObj.get('type') == 'stop':
             su.completeStatus = True
             # only add after complete
+
+    mxGlissandoList = mxNotations.getGlissandi()
+    for mxObj in mxGlissandoList:
+        idFound = mxObj.get('number')
+        sb = spannerBundle.getByClassIdLocalComplete('Glissando', 
+            idFound, False)
+        if len(sb) > 0: # if we already have 
+            su = sb[0] # get the first
+        else: # create a new spanner
+            su = spanner.Glissando()
+            su.idLocal = idFound
+            su.lineType = mxObj.get('line-type')
+            spannerBundle.append(su)
+        # add a reference of this note to this spanner
+        su.addComponents(target)
+        if mxObj.get('type') == 'stop':
+            su.completeStatus = True
+            # only add after complete
+
 
 def mxDirectionToSpanners(targetLast, mxDirection, spannerBundle):
     '''Some spanners, such as MusicXML octave-shift, are encoded as MusicXML directions.
@@ -5034,6 +5053,16 @@ spirit</words>
         self.assertEqual(len(s.flat.getElementsByClass('TrillExtension')), 2)
         raw = s.musicxml # test roundtrip output
         self.assertEqual(raw.count('<wavy-line'), 4)
+
+
+    def testGlissandoImportA(self):
+        from music21 import converter, stream
+        from music21.musicxml import testPrimitive        
+        s = converter.parse(testPrimitive.spanners33a)
+        #s.show()
+        self.assertEqual(len(s.flat.getElementsByClass('Glissando')), 1)
+        raw = s.musicxml # test roundtrip output
+        self.assertEqual(raw.count('<glissando'), 2)
 
 
 #-------------------------------------------------------------------------------

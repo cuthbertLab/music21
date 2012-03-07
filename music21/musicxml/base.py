@@ -2105,6 +2105,22 @@ class Notations(MusicXMLElementList):
                 post.append(part)
         return post
 
+    def getGlissandi(self):
+        '''Get all glissandi objects stored on components. There can be more than one.
+
+        >>> from music21 import *
+        >>> g = musicxml.Glissando()
+        >>> n = musicxml.Notations()
+        >>> n.append(g)
+        >>> n.getGlissandi()
+        [<glissando >]
+        '''
+        post = []        
+        for part in self.componentList:
+            if isinstance(part, Glissando):
+                post.append(part)
+        return post
+
     def getWavyLines(self):
         '''Get one or more wavy line objects Stored in Ornaments
 
@@ -2115,7 +2131,7 @@ class Notations(MusicXMLElementList):
         >>> o.append(wl)
         >>> n.append(o)
         >>> n.getWavyLines()
-        [<ornaments <wavy-line >>]
+        [<wavy-line >]
         '''
         post = []        
         for part in self.componentList:
@@ -2314,7 +2330,6 @@ class Glissando(MusicXMLElement):
     def __init__(self, type=None):
         MusicXMLElement.__init__(self)
         self._tag = 'glissando'
-
         # attributes
         self._attr['type'] = None # start/stop
         self._attr['number'] = None # used for id
