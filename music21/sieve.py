@@ -6,7 +6,7 @@
 # Authors:       Christopher Ariza
 #
 # Copyright:     (c) 2003-2010 Christopher Ariza
-#                (c) 2010-2011 The music21 Project
+#                (c) 2010-2012 The music21 Project
 # License:       LGPL
 #-------------------------------------------------------------------------------
 '''A comprehensive, object model of the Xenakis Sieve. :class:`music21.sieve.Sieve` objects can be created from high-level string notations, and used to generate line segments in various representation. Additional functionality is available through associated objects. 
@@ -1817,7 +1817,11 @@ class PitchSieve(object):
         [<music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval m2>, <music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval m2>]
         '''
         # get a z for the complete period
-        z = range(self.sieveObject.period()+1)
+#         try:
+#             z = range(self.sieveObject.period()+1)
+#         except (OverflowError, MemoryError):
+#             environLocal.pd('failed to generates a z with period:', self.sieveObject.period())
+        z = None
         integerSteps = self.sieveObject(0, z, format='int')
 
         post = []

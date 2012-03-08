@@ -2482,7 +2482,7 @@ class SieveScale(ConcreteScale):
         ConcreteScale.__init__(self, tonic=tonic)
 
         self._pitchSieve = sieve.PitchSieve(sieveString)
-        environLocal.printDebug([self._pitchSieve.sieveObject.represent(), self._pitchSieve.getIntervalSequence()])
+        #environLocal.printDebug([self._pitchSieve.sieveObject.represent(), self._pitchSieve.getIntervalSequence()])
         # mode here is a list of intervals
         self._abstract = AbstractCyclicalScale(
                          mode=self._pitchSieve.getIntervalSequence())
