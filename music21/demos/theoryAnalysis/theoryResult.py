@@ -219,17 +219,19 @@ class VerticalSliceNTupletTheoryResult(TheoryResult):
         TheoryResult.__init__(self)
         self.vsnt = vsnt #vertical slice ntuplet
         self.partNumIdentified = partNumIdentified
-    def color(self, partNum=None, color ='red', noteList=[]):
+    def color(self,  color ='red', partNum=None, noteList=[]):
         '''
         color the notes in partNum as specified by noteList (1,2,3, etc.)
         '''
+       
         if partNum != None:
-            if self.vsnt.nTupletNum == 3:
-                self.vsnt.tnlsDict[partNum].color(color, noteList) 
+            print 'color...', partNum, self.partNumIdentified, self.vsnt.nTupletNum, self.vsnt.tnlsDict.keys()
+            if self.vsnt.nTupletNum == 3:                    
+                self.vsnt.tnlsDict[partNum].color(color) 
         elif self.partNumIdentified !=None:
             if self.vsnt.nTupletNum == 3:
-                self.vsnt.tnlsDict[self.partNumIdentified].color(color, noteList) 
-                
+                self.vsnt.tnlsDict[self.partNumIdentified].color(color, [2] ) 
+
     def markNoteEditorial(self, editorialDictKey, editorialValue, editorialMarkDict={2:[1]}):        
         '''
         editorialMarkDict is a dictionary denoting which object in the verticalSlice Triplet to 
