@@ -24,6 +24,8 @@ from music21.interval import Interval
 from music21 import key
 from music21 import note
 from music21 import chord
+from collections import defaultdict
+#from music21 import harmony can't do this either
 #from music21 import roman Can't import roman because of circular 
 #importing issue with counterpoint.py and figuredbass
 
@@ -829,15 +831,29 @@ class VoiceLeadingQuartetException(Exception):
 
 
 def getVerticalSliceFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None):
-    #scoreObjectIsFrom = music21Obj.getAllContextsByClass(stream.Score) #EXTREMELY UNRELIABLE AND VERY PRONE TO ERROR>>>>GRRRRR
-    
+    '''
+    >>> from music21 import *
+    >>> c = corpus.parse('bach')
+    >>> n1 = c.flat.getElementsByClass(note.Note)[0]
+    >>> voiceLeading.getVerticalSliceFromObject(n1, c)
+    <music21.voiceLeading.VerticalSlice contentDict={0: [<music21.note.Note F>], 1: [<music21.note.Note F>], 2: [<music21.note.Note C>], 3: [<music21.note.Note A>], 4: [<music21.note.Note F>]}  
+
+    '''
+    #if scoreObjectIsFrom == None:
+    #    scoreObjectIsFrom = music21Obj.getAllContextsByClass(music21.stream.Score) #EXTREMELY UNRELIABLE AND VERY PRONE TO ERROR>>>>GRRRRR
+
     offsetOfObject =  music21Obj.getOffsetBySite(scoreObjectIsFrom.flat)
+    
 
     contentDict = {}
-    for partObj, partNum in enumerate(scoreObjectIsFrom.parts):
-        elementStream = partObj.flat.getElementsByOffset(offsetOfObject, mustBeginInSpan=False, classFilterList=classFilterList)
+    for partNum, partObj in enumerate(scoreObjectIsFrom.parts):
+        elementStream = partObj.flat.getElementsByOffset(offsetOfObject, mustBeginInSpan=False, classList=classFilterList)
+        #USE special python dictionary here!!! (defaultDict)
         for el in elementStream.elements:
-            contentDict[partNum].append(el)                 
+            if partNum in contentDict.keys():
+                contentDict[partNum].append(el)
+            else:
+                contentDict[partNum] = el
     return VerticalSlice(contentDict)
 
 
@@ -897,9 +913,10 @@ class VerticalSlice(music21.Music21Object):
             retList.append(el)
         if len(retList) > 1:
             return retList
-        else:
+        elif len(retList) == 1:
             return retList[0]
-        
+        else:
+            return None
 #    def _getNoteList(self):
 #
 #        noteList = []
@@ -1081,7 +1098,8 @@ class VerticalSliceTriplet(VerticalSliceNTuplet):
     '''a collection of three vertical slices'''
     def __init__(self, listofVerticalSlices):
         VerticalSliceNTuplet.__init__(self, listofVerticalSlices)
-        self.tnlsDict = {} #Three Note Linear Segments
+        
+        self.tnlsDict = {} #defaultdict(int) #Three Note Linear Segments
         self._calcTNLS()
         
     def _calcTNLS(self):
@@ -1117,8 +1135,7 @@ class VerticalSliceTriplet(VerticalSliceNTuplet):
                 ret = ret and (self.tnlsDict[partNumToIdentify].n2.beatStrength < 0.5)
             except:
                 pass
-        #print self.tnls1.n2.quarterLength
-        return ret and not self.chordList[1].isConsonant()
+        return ret and self.chordList[0].isConsonant() and not self.chordList[1].isConsonant() and self.chordList[2].isConsonant()
         
         #check that the vertical slice containing the passing tone is dissonant        
 
@@ -1145,6 +1162,76 @@ class VerticalSliceTriplet(VerticalSliceNTuplet):
                 pass
         return ret and not self.chordList[1].isConsonant()
 
+
+class NChordLinearSegmentException(Exception):
+    pass
+class NObjectLinearSegment(music21.Music21Object):
+    def __init__(self, objectList):
+        self.objectList = objectList
+    
+    def __repr__(self):
+        return '<music21.voiceLeading.%s objectList=%s  ' % (self.__class__.__name__, self.objectList)
+     
+    
+class NChordLinearSegment(NObjectLinearSegment):
+    def __init__(self, chordList):
+        NObjectLinearSegment.__init__(self, chordList)
+        self._chordList = []
+        for value in chordList:
+            if value == None:
+                self._chordList.append(None)
+            else:
+                try:
+                    if value.isClassOrSubclass([chord.Chord, music21.harmony.Harmony]):
+                        self._chordList.append(value)
+                    #else:
+                        #raise NChordLinearSegmentException('not a valid chord specification: %s' % value)
+                except:
+                    raise NChordLinearSegmentException('not a valid chord specification: %s' % value)
+                
+    def _getChordList(self):
+        return self._chordList
+
+    chordList = property(_getChordList, doc = '''
+    
+        >>> from music21 import *
+        >>> n = NChordLinearSegment([harmony.ChordSymbol('Am'), harmony.ChordSymbol('F7'), harmony.ChordSymbol('G9')])
+        >>> n.chordList
+        [<music21.harmony.ChordSymbol Am>, <music21.harmony.ChordSymbol F7>, <music21.harmony.ChordSymbol G9>]
+
+    
+        ''')
+    def __repr__(self):
+        return '<music21.voiceLeading.%s objectList=%s  ' % (self.__class__.__name__, self.chordList
+                                                             )
+class TwoChordLinearSegment(NChordLinearSegment):  
+    def __init__(self, chordList, chord2=None):
+        if isinstance(chordList, (list, tuple)):
+            NChordLinearSegment.__init__(self, chordList)
+        else:
+            NChordLinearSegment.__init__(self, [chordList,chord2])
+            
+    def rootInterval(self, type='chromatic'):
+        '''
+        >>> from music21 import *
+        >>> h = voiceLeading.TwoChordLinearSegment([harmony.ChordSymbol('C'), harmony.ChordSymbol('G')])
+        >>> h.rootInterval()
+        <music21.interval.ChromaticInterval 7>
+        '''
+        if type == 'chromatic':
+            return interval.notesToChromatic(self.chordList[0].root(), self.chordList[1].root())
+    
+    def bassInterval(self, type='chromatic'):
+        '''
+        >>> from music21 import *
+        >>> h = voiceLeading.TwoChordLinearSegment(harmony.ChordSymbol('C/E'), harmony.ChordSymbol('G'))
+        >>> h.bassInterval()
+        <music21.interval.ChromaticInterval 3>
+        '''
+        if type == 'chromatic':
+            return interval.notesToChromatic(self.chordList[0].bass(), self.chordList[1].bass())
+    
+    
 class NNoteLinearSegment(music21.Music21Object):
     '''a list of n notes strung together in a sequence
     noteList = [note1, note2, note3, ..., note-n ] Once this
@@ -1259,7 +1346,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     '''
 
     def __init__(self, noteListorn1=None, n2 = None, n3 = None):
-        if common.isIterable(noteListorn1):
+        if isinstance(noteListorn1, (list, tuple)):
             NNoteLinearSegment.__init__(self, noteListorn1)
         else:
             NNoteLinearSegment.__init__(self, [noteListorn1,n2,n3])
@@ -1314,6 +1401,17 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     def __repr__(self):
         return '<music21.voiceLeading.%s n1=%s n2=%s n3=%s ' % (self.__class__.__name__, self.n1, self.n2, self.n3)
     
+    def color(self, color='red', noteList = [2]):
+        '''
+        color all the notes in noteList (1,2,3). Default is to color only the second note red
+        '''
+        if 1 in noteList:
+            self.n1.color = color
+        if 2 in noteList:
+            self.n2.color = color
+        if 3 in noteList:
+            self.n3.color = color
+        
     def couldBePassingTone(self):
         '''
         checks if the two intervals are steps and if these steps
@@ -1847,7 +1945,7 @@ _DOC_ORDER = [VoiceLeadingQuartet, ThreeNoteLinearSegment, VerticalSlice, Vertic
 
 if __name__ == "__main__":
     music21.mainTest(Test)
-    
+    music21.mainTest
 
 
 #------------------------------------------------------------------------------
