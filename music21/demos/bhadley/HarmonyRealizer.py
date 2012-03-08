@@ -53,7 +53,7 @@ def generateContrapuntalBassLine(harmonyObject, fbRules):
     #print allSols.getNumSolutions()
     return allSols.generateRandomRealizations(1)
 
-def generateSmoothBassLineCS(chordSymbols):
+def generateSmoothBassLine(harmonyObjects):
     '''
     accepts a list of harmony.chordSymbol objects and returns that same list
     with a computer generated octave assigned to each bass note.
@@ -75,16 +75,16 @@ def generateSmoothBassLineCS(chordSymbols):
     '''
     s = stream.Score()
     s.append(clef.BassClef())
-    chordSymbols[0].bass.octave = 2
-    lastBass = chordSymbols[0].bass
+    harmonyObjects[0].bass().octave = 2
+    lastBass = harmonyObjects[0].bass()
     s.append(note.Note(lastBass))
-    for cs in chordSymbols[1:]:
-        cs.bass.octave = lastBass.octave
-        sameOctave = interval.Interval(lastBass, copy.deepcopy(cs.bass))
-        cs.bass.octave += 1
-        octavePlus = interval.Interval(lastBass, copy.deepcopy(cs.bass))
-        cs.bass.octave = cs.bass.octave - 2
-        octaveMinus = interval.Interval(lastBass, copy.deepcopy(cs.bass))
+    for cs in harmonyObjects[1:]:
+        cs.bass().octave = lastBass.octave
+        sameOctave = interval.Interval(lastBass, copy.deepcopy(cs.bass()))
+        cs.bass().octave += 1
+        octavePlus = interval.Interval(lastBass, copy.deepcopy(cs.bass()))
+        cs.bass().octave = cs.bass().octave - 2
+        octaveMinus = interval.Interval(lastBass, copy.deepcopy(cs.bass()))
         l = [sameOctave, octavePlus, octaveMinus]
         minimum = sameOctave.generic.undirected
         ret = sameOctave
@@ -95,46 +95,10 @@ def generateSmoothBassLineCS(chordSymbols):
         
         if ret.noteEnd.octave > 3 or ret.noteEnd.octave < 1:
             ret.noteEnd.octave = lastBass.octave
-        cs.bass.octave = ret.noteEnd.octave
-        lastBass = cs.bass
-        s.append(note.Note(cs.bass))
-    return chordSymbols
-
-def generateSmoothBassLineRN(romanNumerals):
-    '''this algorithm is identical to the above, but designed to interface with a list of
-    romanNumerals. romanNumerals are of class roman.RomanNumeral which inherits directly
-    from chord, so to access the bass note of the chord you must call the chord's .bass() 
-    method (different from harmony.chordSymbol, where the bass is an attribute (.bass)
-    '''
-    #TODO: standardize music21's treatment of harmony objects (especially roman numerals
-    #and chord symbols so that access to the same features is the same)
-    
-    s = stream.Score()
-    s.append(clef.BassClef())
-    romanNumerals[0].bass().octave = 2
-    lastBass = romanNumerals[0].bass()
-    s.append(note.Note(lastBass))
-    for rn in romanNumerals[1:]:
-        rn.bass().octave = lastBass.octave
-        sameOctave = interval.Interval(lastBass, copy.deepcopy(rn.bass()))
-        rn.bass().octave += 1
-        octavePlus = interval.Interval(lastBass, copy.deepcopy(rn.bass()))
-        rn.bass().octave = rn.bass().octave - 2
-        octaveMinus = interval.Interval(lastBass, copy.deepcopy(rn.bass()))
-        l = [sameOctave, octavePlus, octaveMinus]
-        minimum = sameOctave.generic.undirected
-        ret = sameOctave
-        for i in l:
-            if i.generic.undirected < minimum:
-                minimum = i.generic.undirected
-                ret = i
-        
-        if ret.noteEnd.octave > 3 or ret.noteEnd.octave < 1:
-            ret.noteEnd.octave = lastBass.octave
-        rn.bass().octave = ret.noteEnd.octave
-        lastBass = rn.bass()
-        s.append(note.Note(rn.bass()))
-    return romanNumerals
+        cs.bass().octave = ret.noteEnd.octave
+        lastBass = cs.bass()
+        s.append(note.Note(cs.bass()))
+    return harmonyObjects
 
 def generateBaroqueRules():
     fbRules = rules.Rules()
@@ -172,7 +136,7 @@ def generatePopSongRules():
     
     fbRules._upperPartsRemainSame = False        #False
     
-    fbRules.partMovementLimits.append((1,3))
+    fbRules.partMovementLimits.append((1,5))
     
     return fbRules
 
@@ -217,7 +181,7 @@ class TestExternal(unittest.TestCase):
     
         testFile1 = s.toScore()
         testFile = harmony.realizeChordSymbolDurations(testFile1)
-        smoothBassRN = generateSmoothBassLineRN(testFile.flat.getElementsByClass(roman.RomanNumeral))
+        smoothBassRN = generateSmoothBassLine(testFile.flat.getElementsByClass(roman.RomanNumeral))
     
         output = generateContrapuntalBassLine(smoothBassRN, generateBaroqueRules())
         output.insert(metadata.Metadata()) 
@@ -233,7 +197,7 @@ class TestExternal(unittest.TestCase):
         testFile1.insert(metadata.Metadata()) 
         testFile1.metadata.title = 'Jeanie With The Light Brown Hair'
         testFile = harmony.realizeChordSymbolDurations(testFile1)
-        smoothBassCS = generateSmoothBassLineCS(testFile.flat.getElementsByClass(harmony.ChordSymbol))
+        smoothBassCS = generateSmoothBassLine(testFile.flat.getElementsByClass(harmony.ChordSymbol))
     
         output = generateContrapuntalBassLine(smoothBassCS, generatePopSongRules())
         mergeLeadSheetAndBassLine(testFile1, output).show()
@@ -245,7 +209,7 @@ class TestExternal(unittest.TestCase):
         
         '''
         testFile = harmony.realizeChordSymbolDurations(music21Stream)
-        smoothBassCS = generateSmoothBassLineCS(testFile.flat.getElementsByClass(harmony.ChordSymbol))
+        smoothBassCS = generateSmoothBassLine(testFile.flat.getElementsByClass(harmony.ChordSymbol))
         output = generateContrapuntalBassLine(smoothBassCS, generatePopSongRules())
         mergeLeadSheetAndBassLine(music21Stream, output).show()
     
