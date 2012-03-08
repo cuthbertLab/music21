@@ -963,6 +963,7 @@ class CTSong(object):
                     r1 = music21.note.Rest(quarterLength=qlenrest)
                     currentSubsectionContents.append(r1) 
                 elif atom[0].upper() in starters2 and not atom.endswith(':'):
+                    originalAtom = atom
                     if 'x' in atom:
                         atom = atom.replace('x', 'o')
                     if 'h' in atom:
@@ -974,7 +975,7 @@ class CTSong(object):
         
                     if len(expressionString) > 0:
                         streamToAppend = self._getStreamWithBarsandDots(indexofatom, expressionString, splitFile, atom, currentKey, currentTimeSig)
-                        jumpForwardIndexValue = len(expressionString.split()) - expressionString.split().index(atom) + indexofatom
+                        jumpForwardIndexValue = len(expressionString.split()) - expressionString.split().index(originalAtom) + indexofatom
                         currentSubsectionContents.append(streamToAppend.flat.elements) 
                     else:
                         duration = self._getDuration(indexofatom, splitFile, currentTimeSig)
@@ -1285,6 +1286,18 @@ class TestExternal(unittest.TestCase):
         pass
     def testA(self):
         from music21.romanText import clercqTemperley
+        import os
+        dt = 'C:/clercqTemperley/dt'
+        tdc = 'C:/clercqTemperley/tdc'
+    
+        for x in os.listdir(dt):
+            print x
+            f = open(os.path.join(dt, x), 'r')
+            txt = f.read()
+
+            s = clercqTemperley.CTSong(txt)
+            print s.toScore().highestOffset
+        
         '''
         for num in range(1, 200):
             try:
@@ -1294,11 +1307,11 @@ class TestExternal(unittest.TestCase):
             except:
                 print "ERROR", num
         '''
-        s = clercqTemperley.CTSong(exampleClercqTemperley)
+        #s = clercqTemperley.CTSong(exampleClercqTemperley)
         
-        sc = s.toScore()
-        print sc.highestOffset
-        sc.show()
+        #sc = s.toScore()
+        #print sc.highestOffset
+        #sc.show()
 #---------------------------------------------------------------------------
 
 # define presented class order in documentation
