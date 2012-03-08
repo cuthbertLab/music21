@@ -758,6 +758,17 @@ class Accidental(music21.Music21Object):
         else: 
             return False
 
+    def __ge__(self, other):
+        '''Greater than or equal.  Based on the accidentals' alter function.
+
+        >>> from music21 import *
+        >>> a = pitch.Accidental('sharp')
+        >>> b = pitch.Accidental('flat')
+        >>> a >= b
+        True
+        '''
+        return self.__gt__(other) or self.__eq__(other)
+
     def __lt__(self, other):
         '''Less than
 
@@ -775,6 +786,21 @@ class Accidental(music21.Music21Object):
             return True
         else: 
             return False
+
+    def __le__(self, other):
+        '''Less than or equal.  Based on the accidentals' alter function.
+
+        >>> from music21 import *
+        >>> a = pitch.Accidental('sharp')
+        >>> b = pitch.Accidental('flat')
+        >>> c = pitch.Accidental('sharp')
+        >>> a <= b
+        False
+        >>> a <= c
+        True
+        '''
+        return self.__lt__(other) or self.__eq__(other)
+
 
     def set(self, name):
         '''
@@ -1299,6 +1325,20 @@ class Pitch(music21.Music21Object):
         else:
             return False
 
+    def __le__(self, other):
+        '''Less than or equal.  Based on the accidentals' alter function.
+
+        >>> from music21 import *
+        >>> a = pitch.Pitch('d4')
+        >>> b = pitch.Pitch('d8')
+        >>> c = pitch.Pitch('d4')
+        >>> a >= b
+        False
+        >>> a >= c
+        True
+        '''
+        return self.__lt__(other) or self.__eq__(other)
+
     def __gt__(self, other):
         '''Do not accept enharmonic equivialance. Based entirely on pitch space 
         representation.
@@ -1313,6 +1353,20 @@ class Pitch(music21.Music21Object):
             return True
         else:
             return False
+
+    def __ge__(self, other):
+        '''Greater than or equal.  Based on the accidentals' alter function.
+
+        >>> from music21 import *
+        >>> a = pitch.Pitch('d4')
+        >>> b = pitch.Pitch('d8')
+        >>> c = pitch.Pitch('d4')
+        >>> a >= b
+        False
+        >>> a >= c
+        True
+        '''
+        return self.__gt__(other) or self.__eq__(other)
 
     #---------------------------------------------------------------------------
     def _getAccidental(self):

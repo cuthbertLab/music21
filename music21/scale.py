@@ -803,7 +803,6 @@ class AbstractCyclicalScale(AbstractScale):
         self.type = 'Abstract Cyclical'
         self.octaveDuplicating = False
         self._buildNetwork(mode=mode)
-
         # cannot assume that abstract cyclical scales are octave duplicating
         # until we have the intervals in use
 
@@ -813,11 +812,9 @@ class AbstractCyclicalScale(AbstractScale):
         '''
         if not common.isListLike(mode):
             mode = [mode] # place in list
-
         self.tonicDegree = 1
         self._net = intervalNetwork.BoundIntervalNetwork(mode, 
                         octaveDuplicating=self.octaveDuplicating)
-
 
 
 
@@ -1447,7 +1444,6 @@ class ConcreteScale(Scale):
 
             if direction is None:
                 direction = DIRECTION_ASCENDING
-
 
             # this creates new pitches on each call
             return self._abstract.getRealization(pitchObj, 
@@ -2486,7 +2482,7 @@ class SieveScale(ConcreteScale):
         ConcreteScale.__init__(self, tonic=tonic)
 
         self._pitchSieve = sieve.PitchSieve(sieveString)
-        #environLocal.printDebug([self._pitchSieve.sieveObject.represent(), self._pitchSieve.getIntervalSequence()])
+        environLocal.printDebug([self._pitchSieve.sieveObject.represent(), self._pitchSieve.getIntervalSequence()])
         # mode here is a list of intervals
         self._abstract = AbstractCyclicalScale(
                          mode=self._pitchSieve.getIntervalSequence())
