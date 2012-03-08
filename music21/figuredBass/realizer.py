@@ -341,8 +341,12 @@ class FiguredBassLine(object):
         
         OMIT_FROM_DOCS
         >>> fbLine3 = realizer.FiguredBassLine(key.Key('C'), meter.TimeSignature('2/4'))
-        >>> fbLine3.addElement(harmony.ChordSymbol('C'))
-        >>> fbLine3.addElement(harmony.ChordSymbol('F'))
+        >>> h1 = harmony.ChordSymbol('C')
+        >>> h1.bass().octave = 4
+        >>> fbLine3.addElement(h1)
+        >>> h2 = harmony.ChordSymbol('G')
+        >>> h2.bass().octave = 4
+        >>> fbLine3.addElement(h2)
         >>> r3 = fbLine3.realize()
         >>> r3.getNumSolutions()
         13
@@ -352,55 +356,36 @@ class FiguredBassLine(object):
         >>> r4 = fbLine4.realize()
         >>> r4.getNumSolutions()
         13
+
         '''
         
         #!---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects --------!
         segmentList = []
 
-        listOfChordSymbols = False
-        listOfRomanNumerals = False
+        listOfHarmonyObjects = False
         for item in self._fbList:
             if isinstance(item, note.Note):
                 break
-            if isinstance(item, harmony.ChordSymbol):
-                listOfChordSymbols = True
-                break
-            if isinstance(item, roman.RomanNumeral):
-                listOfRomanNumerals = True
+            if isinstance(item, roman.RomanNumeral) or isinstance(item, harmony.ChordSymbol): #and item.isClassOrSubclass(harmony.Harmony):
+                listOfHarmonyObjects = True
                 break
             
-        if listOfChordSymbols:
-            for chordSymbolObject in self._fbList:
+        if listOfHarmonyObjects:
+            for harmonyObject in self._fbList:
+                
                 listofpitchesjustnames = []
-                for pitch in chordSymbolObject.chord.pitches:
+                for pitch in harmonyObject.pitches:
                     listofpitchesjustnames.append(pitch.name)
                 #remove duplicates just in case...
                 d = {}
                 for x in listofpitchesjustnames: 
                     d[x]=x
                 outputList = d.values()    
-                passedNote = note.Note(chordSymbolObject.bass.nameWithOctave, quarterLength = chordSymbolObject.duration.quarterLength)
-                
-                correspondingSegment = segment.Segment(bassNote=passedNote, \
-                fbScale=self._fbScale, fbRules=fbRules, numParts=numParts, maxPitch=maxPitch, listOfPitches=outputList) 
-                correspondingSegment.quarterLength = chordSymbolObject.duration.quarterLength
-                segmentList.append(correspondingSegment)
-        elif listOfRomanNumerals:
-            for romanNumeralObject in self._fbList:
-                listofpitchesjustnames = []
-                for pitch in romanNumeralObject.pitches:
-                    listofpitchesjustnames.append(pitch.name)
-                #remove duplicates just in case...
-                d = {}
-                for x in listofpitchesjustnames: 
-                    d[x]=x
-                outputList = d.values()    
-        
-                passedNote = note.Note(romanNumeralObject.bass().nameWithOctave, quarterLength = romanNumeralObject.duration.quarterLength)
-                
+                g = lambda x: x if x != 0.0 else 1.0
+                passedNote = note.Note(harmonyObject.bass().nameWithOctave , quarterLength = g(harmonyObject.duration.quarterLength) )
                 correspondingSegment = segment.Segment(bassNote=passedNote, \
                 fbScale=self._fbScale, fbRules=fbRules, numParts=numParts, maxPitch=maxPitch, listOfPitches=outputList)
-                correspondingSegment.quarterLength = romanNumeralObject.duration.quarterLength 
+                correspondingSegment.quarterLength = g(harmonyObject.duration.quarterLength)
                 segmentList.append(correspondingSegment)                
         #!---------- Original code - Accommodates a tuple (figured bass)  --------!
         else:
