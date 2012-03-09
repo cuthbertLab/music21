@@ -3325,9 +3325,11 @@ class Stream(music21.Music21Object):
         
         
         >>> choraleSemiFlat = chorale.semiFlat
-        >>> choraleMeasures = chorale.measureOffsetMap()
+        >>> choraleMeasures = choraleSemiFlat.measureOffsetMap()
         >>> choraleMeasures[4.0]
         [<music21.stream.Measure 2 offset=4.0>, <music21.stream.Measure 2 offset=4.0>, <music21.stream.Measure 2 offset=4.0>, <music21.stream.Measure 2 offset=4.0>]
+        
+        
 
 
 

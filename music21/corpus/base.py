@@ -160,7 +160,7 @@ def getCorePaths(extList=None, expandExtensions=True):
     
     >>> a = corpus.getCorePaths()
     >>> len(a) # the current number of paths; update when adding to corpus
-    2196
+    2208
 
     >>> a = corpus.getCorePaths('krn')
     >>> len(a) >= 4
@@ -764,14 +764,14 @@ def parseWork(*arguments, **keywords):
 #-------------------------------------------------------------------------------
 # compression
 
-def compress():
+def compressAllXMLFiles(deleteOriginal = False):
     '''
     Takes all filenames in corpus.paths and runs :meth:`music21.corpus.base.compressXML` on each.
     If the musicXML files are compressed, the originals are deleted from the system.
     '''
     environLocal.warn("Compressing musicXML files...")
     for filename in music21.corpus.paths:
-        compressXML(filename, deleteOriginal=True)
+        compressXML(filename, deleteOriginal=deleteOriginal)
     environLocal.warn("Compression complete. Run the main test suite, fix bugs if necessary,\n\
 and then commit modified directories in corpus.")
 
@@ -1514,7 +1514,7 @@ class Test(unittest.TestCase):
         post = corpus.search('Taiwan', 'locale')
         self.assertEqual(len(post), 27)
         self.assertEqual(post[0][0][-8:], 'han2.abc') # file
-        self.assertEqual(post[0][1], '209') # work number
+        self.assertEqual(post[0][1], 209) # work number
         
         post = corpus.search('Sichuan|Taiwan', 'locale')
         self.assertEqual(len(post), 74)

@@ -220,6 +220,9 @@ class Piano(KeyboardInstrument):
         self.lowestNote = pitch.Pitch('A0')
         self.highestNote = pitch.Pitch('C8')
 
+        self.names = {'de': ['Klavier', 'Pianoforte'],
+                      'en': ["Piano", "Pianoforte"]}
+
 class Harpsichord(KeyboardInstrument):   
     def __init__(self):
         KeyboardInstrument.__init__(self)

@@ -2110,7 +2110,11 @@ class MetadataBundle(music21.JSONSerializer):
             match, fieldPost = md.search(query, field)
             if match:
                 # returns a pair of file path, work number
-                result = (self._accessPaths[key], md.number)
+                if md.number != "" and md.number is not None:
+                    number = int(md.number)
+                else:
+                    number = md.number
+                result = (self._accessPaths[key], number)
                 include = False
                 if extList != None:
                     for ext in extList:

@@ -1651,7 +1651,7 @@ class Chord(note.NotRest):
         example:
         
         >>> from music21 import *
-        >>> cchord = chord.Chord(['C', 'E', 'G'])
+        >>> cchord = chord.Chord(['C4', 'E4', 'A4'])
         >>> other = chord.Chord(['C', 'D', 'E', 'F', 'G'])
         >>> cchord.isTriad() # returns True   
         True

@@ -36,6 +36,7 @@ fileExtensions = {
     'textline' : {'input': ['tl', 'textline'], 'output': 'txt'},
     'musicxml' : {'input': ['xml', 'mxl', 'mx'], 'output': 'xml'},
     'midi' : {'input': ['mid', 'midi'], 'output': 'mid'},
+    'tinynotation' : {'input': ['tntxt', 'tinynotation'], 'output': 'tntxt'},
      # note: this is setting .zip as default mapping to musedata
     'musedata' : {'input': ['md', 'musedata', 'zip'], 'output': 'md'},
     'noteworthytext': {'input': ['nwctxt', 'nwc'], 'output': 'nwctxt'},

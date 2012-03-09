@@ -730,15 +730,15 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
             if lastHarm is None:
                 lastHarm = thisHarm
             else:
-                if lastHarm.bass is not None:
-                    lastBass = lastHarm.bass
+                if lastHarm.bass() is not None:
+                    lastBass = lastHarm.bass()
                 else:
-                    lastBass = lastHarm.root
+                    lastBass = lastHarm.root()
                     
-                if thisHarm.bass is not None:
-                    thisBass = thisHarm.bass
+                if thisHarm.bass() is not None:
+                    thisBass = thisHarm.bass()
                 else:
-                    thisBass = thisHarm.root
+                    thisBass = thisHarm.root()
                     
                 if lastBass.pitchClass == thisBass.pitchClass:
                     pass

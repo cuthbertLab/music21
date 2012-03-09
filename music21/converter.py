@@ -440,7 +440,7 @@ class ConverterNoteworthy(object):
                 {0.0} <music21.clef.TrebleClef>
                 {0.0} <music21.note.Note C>
         '''
-        self.stream = noteworthyTranslate.parseString(nwcData)
+        self.stream = noteworthyTranslate.NoteworthyTranslator().parseString(nwcData)
 
 
     def parseFile(self, fp, number=None):
@@ -458,7 +458,7 @@ class ConverterNoteworthy(object):
         >>> c.parseFile(filePath)
         >>> #_DOCS_SHOW c.stream.show()        
         '''
-        self.stream = noteworthyTranslate.parseFile(fp)
+        self.stream = noteworthyTranslate.NoteworthyTranslator().parseFile(fp)
 
 
 #-------------------------------------------------------------------------------
@@ -797,6 +797,9 @@ class Converter(object):
     def _setConverter(self, format, forceSource=False):
         # assume for now tt pickled files are alwasy musicxml
         # this may change in the future
+        if format is None:
+            raise ConverterException('Did not find a format from the source file')
+        
         if format in ['musicxml', 'pickle']: 
             self._converter = ConverterMusicXML(forceSource=forceSource)
         elif format == 'midi':
@@ -845,7 +848,9 @@ class Converter(object):
             if os.path.isdir(fp):
                 format = 'musedata'
             else:
-                format = common.findFormatFile(fp) 
+                format = common.findFormatFile(fp)
+                if format is None:
+                     raise ConverterFileException('cannot find a format extensions for: %s' % fp)
         self._setConverter(format, forceSource=forceSource)
         self._converter.parseFile(fp, number=number)
 
@@ -1060,8 +1065,13 @@ def parse(value, *args, **keywords):
     else:   
         format = None
 
-    if common.isListLike(value) or len(args) > 0: # tiny notation list
-        if len(args) > 0: # add additional args to a lost
+    if common.isListLike(value) and len(value) == 2 and value[1] == None and os.path.exists(value[0]):
+        ## comes from corpus.search
+        return parseFile(value[0], format=format)
+    elif common.isListLike(value) and len(value) == 2 and isinstance(value[1], int) and os.path.exists(value[0]):
+        return parseFile(value[0], format=format).getScoreByNumber(value[1])
+    elif common.isListLike(value) or len(args) > 0: # tiny notation list
+        if len(args) > 0: # add additional args to a list
             value = [value] + list(args)
         return parseData(value, number=number)
      # a midi string, must come before os.path.exists test
@@ -1197,8 +1207,10 @@ class Test(unittest.TestCase):
         self.assertEqual(len(b), 27)
         c = a.getElementsByClass(note.Note)
         self.assertEqual(len(c), 53)
-        d = a.getElementsByClass(dynamics.Wedge)
-        self.assertEqual(len(d), 4)
+        
+        # two starts and two stops == 2!
+        d = a.getElementsByClass(dynamics.DynamicWedge)
+        self.assertEqual(len(d), 2)
 
 
         # test lyrics
@@ -1420,7 +1432,7 @@ class Test(unittest.TestCase):
         barlineList = part.flat.getElementsByClass(bar.Barline)
         self.assertEqual(len(barlineList), 11)
 
-    def testConversionMXLayout(self):
+    def testConversionXMLayout(self):
         
         from music21.musicxml import testPrimitive
         from music21 import stream, layout

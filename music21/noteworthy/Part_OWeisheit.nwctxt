@@ -138,7 +138,7 @@
 |StaffProperties|Muted:N|Volume:127|StereoPan:64|Device:0|Channel:2
 |StaffInstrument|Trans:0|DynVel:10,30,45,60,75,92,108,127
 |Lyrics|Placement:Bottom|Align:Standard Rules|Offset:0
-|Lyric1|Text:"O Weis-heit her- ge-gan-gen aus dem Mun-de des H�ch-sten die welt um-spannst du von ei-nem En-de zum an-dern, in Kraft und Mil-de ord-nest du al-les: O komm und of-fen-ba-re uns den Weg der Weis-heit und der Ein-sicht. O Weis-heit\r\n"
+|Lyric1|Text:"O Weis-heit her- ge-gan-gen aus dem Mun-de des Höch-sten die welt um-spannst du von ei-nem En-de zum an-dern, in Kraft und Mil-de ord-nest du al-les: O komm und of-fen-ba-re uns den Weg der Weis-heit und der Ein-sicht. O Weis-heit\r\n"
 |Clef|Type:Treble
 |Key|Signature:F#,C#,G#
 |Dynamic|Style:p|Pos:8
@@ -254,7 +254,7 @@
 |StaffProperties|Muted:N|Volume:127|StereoPan:64|Device:0|Channel:3
 |StaffInstrument|Trans:0|DynVel:10,30,45,60,75,92,108,127
 |Lyrics|Placement:Bottom|Align:Standard Rules|Offset:0
-|Lyric1|Text:"O Weis-heit her-vor-ge-gan-gen aus dem Mun-de des H�ch-sten die welt um-spannst du von ei-nem En-de zum an-dern, in Kraft und Mil-de ord-nest du al-les: O komm und of-fen-ba-re uns den Weg der Weis-heit und der Ein-sicht. O Weis-heit\r\n"
+|Lyric1|Text:"O Weis-heit her-vor-ge-gan-gen aus dem Mun-de des Höch-sten die welt um-spannst du von ei-nem En-de zum an-dern, in Kraft und Mil-de ord-nest du al-les: O komm und of-fen-ba-re uns den Weg der Weis-heit und der Ein-sicht. O Weis-heit\r\n"
 |Clef|Type:Treble|OctaveShift:Octave Down
 |Key|Signature:F#,C#,G#
 |Dynamic|Style:p|Pos:8
@@ -370,7 +370,7 @@
 |StaffProperties|Muted:N|Volume:127|StereoPan:64|Device:0|Channel:4
 |StaffInstrument|Trans:0|DynVel:10,30,45,60,75,92,108,127
 |Lyrics|Placement:Bottom|Align:Standard Rules|Offset:0
-|Lyric1|Text:"Weis-heit aus Mun-de H�ch-sten Welt du ei-nem zum in und ord-nest al-les komm of-fen-ba-re den der und Ein-sicht Weis-heit\r\n"
+|Lyric1|Text:"Weis-heit aus Mun-de Höch-sten Welt du ei-nem zum in und ord-nest al-les komm of-fen-ba-re den der und Ein-sicht Weis-heit\r\n"
 |Clef|Type:Bass
 |Key|Signature:F#,C#,G#
 |Rest|Dur:Half

@@ -507,7 +507,8 @@ class CallGraph:
         #self.callTest = TestBigMusicXML
 
         #self.callTest = TestMeasuresA
-        self.callTest = TestGetContextByClassB
+        self.callTest = TestTimeIsmir
+        #self.callTest = TestGetContextByClassB
         #self.callTest = TestMeasuresB
 
     def run(self):

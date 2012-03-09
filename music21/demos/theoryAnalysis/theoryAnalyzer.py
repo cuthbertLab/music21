@@ -1712,11 +1712,10 @@ class TestExternal(unittest.TestCase):
         #s = converter.parse('/Users/larsj/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
         #s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/S11_6_IA_student.xml')
         s = corpus.parse('bwv7.7')
-        
         ta = TheoryAnalyzer(s)
         #ta.keyMeasureMap = {1:'C', 2:'D', 3:'Bb', 4:'c', 5:'g',6:'e',7:'G'}
         #ta.keyMeasureMap = {1:'C',3:'d',4:'F',5:'G',6:'e',7:'g',8:'B-',9:'A-',10:'E',11:'f',12:'c#'}
-        ta.keyMeasureMap = {0:'G',5:'D',8:'F'}
+        #ta.keyMeasureMap = {0:'G',5:'D',8:'F'}
 
         #ta.key = music21.key.Key('D')
         #ta.getTwoByThreeLinearSegments(0,1)
@@ -1744,7 +1743,7 @@ class TestExternal(unittest.TestCase):
         ta.identifyNeighborTones(color = 'yellow')
        
         #ta.identifyImproperDissonantIntervals(color='blue', partNum1=0, partNum2=1)
-        
+        print "identifying..."
 #        ta.identifyRomanNumerals()
 #        ta.identifyObliqueMotion()
 #        ta.identifySimilarMotion()
@@ -1764,9 +1763,7 @@ class TestExternal(unittest.TestCase):
 
     
 if __name__ == "__main__":
-
-   music21.mainTest(Test)
-    
+    music21.mainTest(Test)
     #te = TestExternal()
     #te.demo()
     

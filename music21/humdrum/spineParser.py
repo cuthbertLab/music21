@@ -36,7 +36,7 @@ SpineParsing consists of several steps.
     look like Stream.semiFlat versions in many ways.
 * For HumdrumSpines with parent spines their .stream contents are then inserted into their parent spines with
     voice tagged as a music21 Group property.
-* Lyrics and Dynamics [NOT DONE] are placed into their corresponding HumdrumSpine.stream objects
+* Lyrics and Dynamics are placed into their corresponding HumdrumSpine.stream objects
 * Stream elements are moved into their measures within a Stream
 * Measures are searched for elements with voice groups and Voice objects are created
 

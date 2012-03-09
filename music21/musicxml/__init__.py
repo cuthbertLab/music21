@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         mxl/__init__.py
+# Name:         musicxml/__init__.py
 # Purpose:      Access to musicxml library
 #
 # Authors:      Christopher Ariza

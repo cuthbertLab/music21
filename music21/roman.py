@@ -388,9 +388,6 @@ class RomanNumeral(chord.Chord):
     def _parseFigure(self, prelimFigure):
         '''
         '''
-        if prelimFigure == 'VId7':
-            pass
-        
         if not common.isStr(prelimFigure):
             raise RomanException('got a non-string figure: %r', prelimFigure)
 

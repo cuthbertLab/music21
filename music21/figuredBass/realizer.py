@@ -371,8 +371,7 @@ class FiguredBassLine(object):
                 break
             
         if listOfHarmonyObjects:
-            for harmonyObject in self._fbList:
-                
+            for harmonyObject in self._fbList:                
                 listofpitchesjustnames = []
                 for pitch in harmonyObject.pitches:
                     listofpitchesjustnames.append(pitch.name)
