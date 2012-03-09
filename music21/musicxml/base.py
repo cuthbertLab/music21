@@ -4951,9 +4951,15 @@ class Test(unittest.TestCase):
         from music21 import corpus
         fp = corpus.getWork('opus18no1/movement3', extList=['.xml'])
         d = Document()
-        d.open(fp)
+        
+        # Compressed MXL file instead of regular XML file. Extract XML file.
+        import zipfile
+        mxl = zipfile.ZipFile(fp, 'r')
+        d.open(mxl.extract('movement3.xml'))
+        mxl.close()
+        
         self.assertEqual(d.score != None, True)
-
+        
         mxScore = d.score
         mxParts = mxScore.componentList
         p1 = mxParts[0]      
