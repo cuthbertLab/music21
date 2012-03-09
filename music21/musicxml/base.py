@@ -4973,7 +4973,7 @@ class Test(unittest.TestCase):
                         self.assertEqual(c.repeatObj.get('times'), None)
                         #print c.repeatObj.direction
         s = corpus.parse('opus18no1/movement3', extList=['.xml'])
-
+        os.remove('movement3.xml')
 
     def testHarmonyA(self):
         k = Kind()
