@@ -2101,7 +2101,7 @@ class MetadataBundle(music21.JSONSerializer):
         >>> len(post) # no files in this format
         0
         >>> post = mb.search('cicon', 'composer', extList=['.xml'])
-        >>> len(post) # no files in this format
+        >>> len(post)
         1
         '''
         post = []
@@ -2114,7 +2114,8 @@ class MetadataBundle(music21.JSONSerializer):
                 include = False
                 if extList != None:
                     for ext in extList:
-                        if result[0].endswith(ext):
+                        if result[0].endswith(ext) or\
+                            (ext.endswith('xml') and (result[0].endswith('mxl') or result[0].endswith('mx'))):
                             include = True
                             break
                 else:
