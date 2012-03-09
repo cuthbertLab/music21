@@ -1261,6 +1261,8 @@ class Pitch(music21.Music21Object):
                 self._setPitchClass(keywords['pitchClass'])
             if 'fundamental' in keywords:
                 self.fundamental = keywords['fundamental']
+            if 'midi' in keywords:
+                self.midi = keywords['midi']
 
     def __repr__(self):
         name = self.nameWithOctave
