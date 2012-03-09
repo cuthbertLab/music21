@@ -1942,27 +1942,31 @@ class MetadataBundle(music21.JSONSerializer):
     
 
     def addFromPaths(self, pathList):
-        '''Parse and store metadata from numerous files
+        '''Parse and store metadata from numerous files.
+
+        If any files cannot be loaded, they file paths will be collected in a list. 
 
         >>> from music21 import *
         >>> mb = metadata.MetadataBundle()
         >>> mb.addFromPaths(corpus.getWorkList('bwv66.6'))
+        []
         >>> len(mb._storage)
         1
         '''
         import gc # get a garbage collector
+        fpError = [] # store errors
+
         # converter imports modules that import metadata
         from music21 import converter
         for fp in pathList:
             environLocal.printDebug(['updateMetadataCache: examining:', fp])
             cp = self.corpusPathToKey(fp)
-            post = converter.parse(fp, forceSource=True)
-
-#             try:
-#                 post = converter.parse(fp, forceSource=True)
-#             except:
-#                 environLocal.warn('parse failed: %s' % fp)
-#                 continue
+            try:
+                post = converter.parse(fp, forceSource=True)
+            except:
+                environLocal.warn('parse failed: %s' % fp)
+                fpError.append(fp)
+                continue
 
             if 'Opus' in post.classes:
                 # need to get scores from each opus?
@@ -1996,14 +2000,26 @@ class MetadataBundle(music21.JSONSerializer):
             del post
             gc.collect()
 
-    def addFromVirtualWorks(self, pathList):
-        pass
+        return fpError
+
+    def _getFilePath(self):
+        if self._name in ['virtual', 'core']:
+            fp = os.path.join(common.getMetadataCacheFilePath(), 
+                self._name + '.json')
+        elif self._name == 'local':
+            # write in temporary dir
+            fp = os.path.join(environLocal.getRootTempDir(), 
+                self._name + '.json')
+        else:
+            raise MetadataException('unknown metadata name passed: %s' % 
+                self._name)
+        return fp
 
 
     def write(self):
         '''Write the JSON storage of all Metadata or RichMetadata contained in this object. 
         '''
-        fp = os.path.join(common.getMetadataCacheFilePath(), self._name + '.json')
+        fp = self._getFilePath()
         environLocal.printDebug(['MetadataBundle: writing:', fp])
         self.jsonWrite(fp)
 
@@ -2011,13 +2027,14 @@ class MetadataBundle(music21.JSONSerializer):
     def read(self, fp=None):
         '''Load self from the file path suggested by the _name of this MetadataBundle
         '''
-
         t = common.Timer()
         t.start()
-        if fp == None:
-            fp = os.path.join(common.getMetadataCacheFilePath(), self._name + '.json')
+        if fp is None:
+            fp = self._getFilePath()
+        if not os.path.exists(fp):
+            environLocal.warn('no metadata found for: %s; try building cache with corpus.cacheMetadata("%s")' % (self._name, self._name))
+            return
         self.jsonRead(fp)
-
         environLocal.printDebug(['MetadataBundle: loading time:', self._name, t, 'md items:', len(self._storage)])
 
 
@@ -2029,6 +2046,7 @@ class MetadataBundle(music21.JSONSerializer):
         >>> from music21 import *
         >>> mb = metadata.MetadataBundle()
         >>> mb.addFromPaths(corpus.getWorkList('bwv66.6'))
+        []
         >>> len(mb._accessPaths)
         0
         >>> mb.updateAccessPaths(corpus.getWorkList('bwv66.6'))
@@ -2074,6 +2092,7 @@ class MetadataBundle(music21.JSONSerializer):
         >>> from music21 import *
         >>> mb = metadata.MetadataBundle()
         >>> mb.addFromPaths(corpus.getWorkList('ciconia'))
+        []
         >>> mb.updateAccessPaths(corpus.getWorkList('ciconia'))
         >>> post = mb.search('cicon', 'composer')
         >>> len(post[0])
@@ -2093,7 +2112,6 @@ class MetadataBundle(music21.JSONSerializer):
                 # returns a pair of file path, work number
                 result = (self._accessPaths[key], md.number)
                 include = False
-
                 if extList != None:
                     for ext in extList:
                         if result[0].endswith(ext):
@@ -2101,7 +2119,6 @@ class MetadataBundle(music21.JSONSerializer):
                             break
                 else:
                     include = True
-
                 if include and result not in post:
                     post.append(result)  
         return post

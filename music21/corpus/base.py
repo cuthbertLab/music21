@@ -27,6 +27,7 @@ from music21 import converter
 from music21 import metadata
 from music21 import musicxml
 from music21.corpus import virtual
+from music21.corpus.metadataCache import metadataCache
 
 from music21 import environment
 _MOD = "corpus.base.py"
@@ -201,7 +202,7 @@ def getVirtualPaths(extList=None, expandExtensions=True):
 
 def getLocalPaths(extList=None, expandExtensions=True):
     '''
-    Access files in additional directories supplied by the user and defined in environement settings. 
+    Access files in additional directories supplied by the user and defined in environement settings. If addtional paths are added on a per-session basis witht the :func:`~music21.corpus.addPath` function, these paths are also retuned with this method. 
     '''
     extList = _translateExtensions(extList=extList,
                 expandExtensions=expandExtensions)
@@ -273,19 +274,28 @@ def getPaths(extList=None, expandExtensions=True,
 # metadata routines
 
 def _updateMetadataBundle():
-
-    for d, f in (('core', getPaths), ('virtual', getVirtualPaths)):
-        if _METADATA_BUNDLES[d] == None:
+    '''
+    Update cached metdata bundles.
+    '''
+    for d, f in (('core', getCorePaths), ('virtual', getVirtualPaths),
+                 ('local', getLocalPaths)):
+        if _METADATA_BUNDLES[d] is None:
+            fpList = f()
             _METADATA_BUNDLES[d] = metadata.MetadataBundle(d)
             _METADATA_BUNDLES[d].read()
             # must update access paths for the files found on this system
-            _METADATA_BUNDLES[d].updateAccessPaths(f())
+            _METADATA_BUNDLES[d].updateAccessPaths(fpList)
 
-#     if 'local' in domain:
-#         pass
+def cacheMetadata(domainList=['local']):
+    if not common.isListLike(domainList):
+        domainList = [domainList]
+    for domain in domainList:
+        # remove any cached values
+        _METADATA_BUNDLES[domain] = None
+    metadataCache.cacheMetadata(domainList)        
 
-
-def search(query, field=None, domain=['core', 'virtual'], extList=None):
+def search(query, field=None, domain=['core', 'virtual', 'local'],     
+    extList=None):
     '''Search all stored metadata and return a list of file paths; to 
     return a list of parsed Streams, use searchParse(). 
 
@@ -302,6 +312,9 @@ def search(query, field=None, domain=['core', 'virtual'], extList=None):
         post += _METADATA_BUNDLES['core'].search(query, field, extList)
     if 'virtual' in domain:
         post += _METADATA_BUNDLES['virtual'].search(query, field, extList)
+    if 'local' in domain:
+        post += _METADATA_BUNDLES['local'].search(query, field, extList)
+
     return post
 
 
