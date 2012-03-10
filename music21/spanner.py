@@ -567,6 +567,12 @@ class Spanner(music21.Music21Object):
         # these are in order
         post = []
         idSite = id(site)
+
+        # special handling for case of a single component spanner
+        if len(self._components) == 1:
+            o = self._components[0].getOffsetBySite(site)
+            return o, o + self._components[0].duration.quarterLength
+
         offsetComponent = [] # store pairs
         for c in self._components._elements:
         #for c in self.getComponents():

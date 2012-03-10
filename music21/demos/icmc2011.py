@@ -282,7 +282,7 @@ class Test(unittest.TestCase):
         from music21 import corpus, spanner
         nStart = None; nEnd = None
         
-        ex = corpus.parseWork('luca/gloria').parts['cantus'].measures(1,11)        
+        ex = corpus.parse('luca/gloria').parts['cantus'].measures(1,11)        
         exFlatNotes = ex.flat.notesAndRests
         nLast = exFlatNotes[-1]
         
@@ -303,10 +303,11 @@ class Test(unittest.TestCase):
                 ex.insert(spanner.Slur(nStart, nEnd))
                 nStart = None; nEnd = None
         
-        for sp in ex.spanners:  
+        for sp in ex.spanners.getElementsByClass('Slur'):  
+            #environLocal.pd(['sp', n.nameWithOctave, sp])
             dur = sp.getDurationBySite(exFlatNotes)
             n = sp.getFirst()
-            #print(n.nameWithOctave, dur.quarterLength)
+            
         
         #ex.show()
 
@@ -528,7 +529,7 @@ class Test(unittest.TestCase):
 
         scGMajor = scale.MajorScale('g4')
         scDMajor = scale.MajorScale('d4')
-        s = corpus.parseWork('mozart/k80/movement1').measures(21,25)
+        s = corpus.parse('mozart/k80/movement1').measures(21,25)
         s.remove(s['cello'])
         s.remove(s['viola'])
         for part in s.parts: 
@@ -551,7 +552,7 @@ class Test(unittest.TestCase):
 
         scDMelodicMinor = scale.MelodicMinorScale('d4')
         scGMelodicMinor = scale.MelodicMinorScale('g4')
-        part = corpus.parseWork('bwv1080/03').parts[0].measures(46,53)
+        part = corpus.parse('bwv1080/03').parts[0].measures(46,53)
         
         for sc in [scDMelodicMinor, scGMelodicMinor]:
             groups = analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=4, comparisonAttribute='name')
@@ -651,7 +652,7 @@ class Test(unittest.TestCase):
     def testEx02(self): 
         # Labeling a vocal part based on scale degrees derived from key signature and from a specified target key.
 
-        s = corpus.parseWork('hwv56/movement3-03.md')#.measures(1,7)
+        s = corpus.parse('hwv56/movement3-03.md')#.measures(1,7)
         basso = s.parts['basso']
         s.remove(basso)
         
@@ -684,7 +685,7 @@ class Test(unittest.TestCase):
 
         results = {}
         for fn in corpus.bachChorales[:2]:
-            s = corpus.parseWork(fn)
+            s = corpus.parse(fn)
             ksScale = s.flat.getElementsByClass('KeySignature')[0].getScale()
             for p in s.parts:
                 if p.id.lower() == 'soprano':
