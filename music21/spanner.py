@@ -956,11 +956,11 @@ class SpannerBundle(object):
 
         remove = None
         for i, ref in enumerate(self._pendingComponentAssignment):
-            environLocal.pd(['calling freePendingComponentAssignment()', self._pendingComponentAssignment])
+            #environLocal.pd(['calling freePendingComponentAssignment()', self._pendingComponentAssignment])
             if componentCandidate.isClassOrSubclass([ref['className']]):
                 ref['spanner'].addComponents(componentCandidate)
                 remove = i      
-                environLocal.pd(['freePendingComponentAssignment()', 'added component', ref['spanner']])
+                #environLocal.pd(['freePendingComponentAssignment()', 'added component', ref['spanner']])
                 break
         if remove is not None:
             self._pendingComponentAssignment.pop(remove)

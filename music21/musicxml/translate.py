@@ -1834,7 +1834,7 @@ def mxDirectionToSpanners(targetLast, mxDirection, spannerBundle):
     if mxBracket is not None:
         mxType = mxBracket.get('type')
         idFound = mxBracket.get('number')
-        environLocal.pd(['mxDirectionToSpanners', 'found mxBracket', mxType, idFound])
+        #environLocal.pd(['mxDirectionToSpanners', 'found mxBracket', mxType, idFound])
         if mxType == 'start':
             sp = spanner.Line()
             sp.idLocal = idFound
@@ -3981,7 +3981,7 @@ class Test(unittest.TestCase):
         ex = s.measures(2, 3) # this needs to get all spanners too
 
         # all spanners are referenced over; even ones that may not be relevant
-        self.assertEqual(len(ex.flat.spanners), 9)
+        self.assertEqual(len(ex.flat.spanners), 12)
         #ex.show()
         
         # slurs are on measures 2, 3
