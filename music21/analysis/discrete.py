@@ -590,6 +590,9 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if likelyKeysMinor is not None:
             sortList += [(coefficient, p, 'minor') for 
                          (p, coefficient) in likelyKeysMinor]
+        if len(sortList) == 0:
+            raise DiscreteAnalysisException('failed to get likely keys for Stream component')
+
         sortList.sort()
         sortList.reverse()
         #environLocal.printDebug(['sortList', sortList])

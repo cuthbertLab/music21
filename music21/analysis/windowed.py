@@ -82,6 +82,9 @@ class WindowedAnalysis(object):
         # analysis; this means that a duration that spans multiple 1/4 measures
         # will be represented in each of those measures
         measured = self._srcStream.makeMeasures(meterStream)
+        # need to make sure we only have Measures here, as layout.StaffGroup
+        # or similar objs may be reatined
+        measured.removeByNotOfClass('Measure')
         measured.makeTies(inPlace=True)
         return measured
 
@@ -132,6 +135,7 @@ class WindowedAnalysis(object):
             for i in windowCountIndices:
                 current = stream.Stream()
                 for j in range(i, i+windowSize):
+                    #environLocal.pd(['self._windowedStream[j]', self._windowedStream[j]])
                     current.append(self._windowedStream[j])
                 data[i], color[i] = self.processor.process(current)
 

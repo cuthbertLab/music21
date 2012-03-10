@@ -924,21 +924,10 @@ class Stream(music21.Music21Object):
         >>> s.remove(n3)
         
         '''
-#         iMatch = self.indexList(target, firstMatchOnly=firstMatchOnly)
-#         match = []
-#         baseElementCount = len(self._elements)
-#         for i in iMatch:
-#             # remove from stream with pop with index
-#             if i < baseElementCount:
-#                 match.append(self._elements.pop(i))
-#             else: # its in end elements
-#                 match.append(self._endElements.pop(i-baseElementCount))
-
         try:
             i = self.index(target)
         except StreamException:
             return # if not found, no error is raised
-
         match = None
         baseElementCount = len(self._elements)
         if i < baseElementCount:
@@ -946,20 +935,11 @@ class Stream(music21.Music21Object):
         else: # its in end elements
             match = self._endElements.pop(i-baseElementCount) 
 
-#         if len(iMatch) > 0:
-#             # removing an object will never change the sort status
-#             self._elementsChanged(clearIsSorted=False)
-
         if match is not None:
             # removing an object will never change the sort status
             self._elementsChanged(clearIsSorted=False)
             match.removeLocationBySite(self)
 
-        # after removing, need to remove self from locations reference 
-        # and from activeSite reference, if set; this is taken care of with the 
-        # Music21Object method
-#         for obj in match:
-#             obj.removeLocationBySite(self)
 
     def pop(self, index):
         '''Return and remove the object found at the user-specified index value. Index values are those found in `elements` and are not necessary offset order. 
@@ -1020,6 +1000,39 @@ class Stream(music21.Music21Object):
         #for i, e in enumerate(self._endElements):
         for e in self._endElements:
             if e.isClassOrSubclass(classFilterList):
+                indexList.append(count)
+            count += 1                        
+        for i in reversed(indexList):
+            post = self._endElements.pop(i)
+            post.removeLocationBySite(self)
+
+        # call elements changed once; sorted arrangement has not changed
+        self._elementsChanged(clearIsSorted=False)
+
+
+    def removeByNotOfClass(self, classFilterList):
+        '''Remove all elements not of the specified class or subclass in the Steam in place. 
+        '''
+        if not common.isListLike(classFilterList):
+            classFilterList = [classFilterList]
+        # process main elements
+        indexList = []
+        count = 0
+        #for i, e in enumerate(self._elements):
+        for e in self._elements:
+            if not e.isClassOrSubclass(classFilterList):
+                indexList.append(count)
+            count += 1                        
+        for i in reversed(indexList):
+            post = self._elements.pop(i)
+            post.removeLocationBySite(self)
+
+        # process end elements
+        indexList = []
+        count = 0
+        #for i, e in enumerate(self._endElements):
+        for e in self._endElements:
+            if not e.isClassOrSubclass(classFilterList):
                 indexList.append(count)
             count += 1                        
         for i in reversed(indexList):

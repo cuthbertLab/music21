@@ -1804,7 +1804,7 @@ def mxDirectionToSpanners(targetLast, mxDirection, spannerBundle):
     if mxWedge is not None:
         mxType = mxWedge.get('type')
         idFound = mxWedge.get('number')
-        environLocal.pd(['mxDirectionToSpanners', 'found mxWedge', mxType, idFound])
+        #environLocal.pd(['mxDirectionToSpanners', 'found mxWedge', mxType, idFound])
         if mxType == 'crescendo':
             sp = dynamics.Crescendo()
             sp.idLocal = idFound
