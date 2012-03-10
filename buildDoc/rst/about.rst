@@ -9,11 +9,12 @@ Music21 is an open-source toolkit for Computer-aided musicology.  It is licensed
 About the Authors
 -----------------------
 
-**Michael Cuthbert**, the creator of music21,  is Assistant Professor of Music at M.I.T.  
+**Michael Cuthbert**, the creator of music21,  is Homer A. Burnell Associate Professor of Music at M.I.T.  
 He received his A.B. *summa cum laude*, A.M. and Ph.D. degrees from Harvard University.   
-Cuthbert spent 2004-05 at the American Academy as a Rome Prize winner in Medieval Studies 
-and 2009-10 as Fellow at Harvard's Villa I Tatti Center for Italian Renaissance Studies 
-in Florence.  Prior to joining the M.I.T. faculty, Cuthbert was on the faculties of Smith 
+Cuthbert spent 2004-05 at the American Academy as a Rome Prize winner in Medieval Studies,
+2009-10 as Fellow at Harvard's Villa I Tatti Center for Italian Renaissance Studies 
+in Florence, and 2012-13 at the Radcliffe Institute.  
+Prior to joining the M.I.T. faculty, Cuthbert was on the faculties of Smith 
 and Mount Holyoke Colleges.  He has worked extensively on computer-aided musical analysis,
 fourteenth-century music, and the music of the past forty years.  He has published
 on computer-aided treatment of fragments and palimpsests of the late Middle Ages and 

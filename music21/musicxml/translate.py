@@ -41,6 +41,38 @@ class NoteheadException(TranslateException):
     pass
 
 
+def mod6IdLocal(spannerObj):
+    '''
+    returns the spanner idLocal as a number from 1-6 since
+    only 6 spanners of each type can be active at a time in musicxml
+
+    >>> from music21 import *
+    >>> s = stream.Score()
+    >>> for i in range(10):
+    ...    sp = spanner.Glissando()
+    ...    sp.idLocal = i + 1
+    ...    s.insert(0, sp)
+    >>> for sp in s.getElementsByClass('Spanner'):
+    ...    print sp.idLocal, musicxml.translate.mod6IdLocal(sp)
+    1 1
+    2 2
+    3 3
+    4 4
+    5 5
+    6 6
+    7 1
+    8 2
+    9 3
+    10 4
+    '''
+    spanId = spannerObj.idLocal 
+    if spanId is None:
+        return 1
+    mod6Id = spanId % 6
+    if mod6Id == 0:
+        mod6Id = 6
+    return mod6Id
+
 
 def configureStaffGroupFromMxPartGroup(staffGroup, mxPartGroup):
     '''Given an already instantiated spanner.StaffGroup, configure it with parameters from an mxPartGroup.
@@ -1543,7 +1575,7 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
 
     for su in spannerBundle.getByClass('Slur'):     
         mxSlur = musicxmlMod.Slur()
-        mxSlur.set('number', su.idLocal)
+        mxSlur.set('number', mod6IdLocal(su))
         mxSlur.set('placement', su.placement)
         # is this note first in this spanner?
         if su.isFirst(target):
@@ -1558,7 +1590,7 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
 
     for su in spannerBundle.getByClass('TrillExtension'):     
         mxWavyLine = musicxmlMod.WavyLine()
-        mxWavyLine.set('number', su.idLocal)
+        mxWavyLine.set('number', mod6IdLocal(su))
         mxWavyLine.set('placement', su.placement)
         # is this note first in this spanner?
         if su.isFirst(target):
@@ -1578,7 +1610,7 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
 
     for su in spannerBundle.getByClass('Glissando'):     
         mxGlissando = musicxmlMod.Glissando()
-        mxGlissando.set('number', su.idLocal)
+        mxGlissando.set('number', mod6IdLocal(su))
         mxGlissando.set('line-type', su.lineType)
         # is this note first in this spanner?
         if su.isFirst(target):
@@ -1602,7 +1634,7 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
                 proc = ['last']
         for posSub in proc:
             mxOctaveShift = musicxmlMod.OctaveShift()
-            mxOctaveShift.set('number', su.idLocal)
+            mxOctaveShift.set('number', mod6IdLocal(su))
             # is this note first in this spanner?
             if posSub == 'first':
                 pmtrs = su.getStartParameters()
@@ -1636,7 +1668,7 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
 
         for posSub in proc:
             mxWedge = musicxmlMod.Wedge()
-            mxWedge.set('number', su.idLocal)
+            mxWedge.set('number', mod6IdLocal(su))
             # is this note first in this spanner?
             if posSub == 'first':
                 pmtrs = su.getStartParameters()
@@ -1669,7 +1701,7 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
                 proc = ['last']
         for posSub in proc:
             mxBracket = musicxmlMod.Bracket()
-            mxBracket.set('number', su.idLocal)
+            mxBracket.set('number', mod6IdLocal(su))
             mxBracket.set('line-type', su.lineType)
             if posSub == 'first':
                 pmtrs = su.getStartParameters()
@@ -1698,7 +1730,7 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
 
     for su in spannerBundle.getByClass('DashedLine'):     
         mxDashes = musicxmlMod.Dashes()
-        mxDashes.set('number', su.idLocal)
+        mxDashes.set('number', mod6IdLocal(su))
         # is this note first in this spanner?
         if su.isFirst(target):
             mxDashes.set('type', 'start')
@@ -3986,6 +4018,9 @@ class Test(unittest.TestCase):
         
         # slurs are on measures 2, 3
         # crescendos are on measures 4, 5
+        # wavy lines on measures 6, 7
+        # brackets etc. on measures 10-14
+        # glissando on measure 16
 
 
     def testTextExpressionsA(self):
