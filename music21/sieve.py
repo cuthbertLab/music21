@@ -1821,7 +1821,11 @@ class PitchSieve(object):
 #             z = range(self.sieveObject.period()+1)
 #         except (OverflowError, MemoryError):
 #             environLocal.pd('failed to generates a z with period:', self.sieveObject.period())
-        z = None
+        p = self.sieveObject.period()
+        if p < 999999999:
+            z = range(p+1)
+        else: # to big to get z as list of values
+            z = None
         integerSteps = self.sieveObject(0, z, format='int')
 
         post = []
