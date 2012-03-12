@@ -1,8 +1,12 @@
+# -*- coding: utf-8 -*-
+
+import collections
 import pprint
 import re
 
 from lxml import etree #need to install lxml
 from music21 import instrument
+from music21.braille.translation import tables
 from music21.braille.translation import lookup
 
 #-------------------------------------------------------------------------------
@@ -107,10 +111,10 @@ def dolmetsch():
             if len(dict[key]) == 0:
                 del dict[key]
 
-    merge(lookup.englishFrench, englishFrench)
-    merge(lookup.englishGerman, englishGerman)
-    merge(lookup.englishItalian, englishItalian)
-    merge(lookup.englishSpanish, englishSpanish)
+    merge(tables.englishFrench, englishFrench)
+    merge(tables.englishGerman, englishGerman)
+    merge(tables.englishItalian, englishItalian)
+    merge(tables.englishSpanish, englishSpanish)
     
     print "englishFrench = ", 
     pprint.pprint(englishFrench)
@@ -167,7 +171,7 @@ def dolmetsch2():
             if len(dict[key]) == 0:
                 del dict[key]
 
-    merge(lookup.englishAbbreviations, englishAbbreviations)
+    merge(tables.englishAbbreviations, englishAbbreviations)
     print "englishAbbreviations = ", 
     pprint.pprint(englishAbbreviations)
 
@@ -223,11 +227,11 @@ def yale():
             if len(dict[key]) == 0:
                 del dict[key]
 
-    merge(lookup.englishFrench, englishFrench)
-    merge(lookup.englishGerman, englishGerman)
-    merge(lookup.englishItalian, englishItalian)
-    merge(lookup.englishSpanish, englishSpanish)
-    merge(lookup.englishRussian, englishRussian)
+    merge(tables.englishFrench, englishFrench)
+    merge(tables.englishGerman, englishGerman)
+    merge(tables.englishItalian, englishItalian)
+    merge(tables.englishSpanish, englishSpanish)
+    merge(tables.englishRussian, englishRussian)
     
     print "englishFrench = ", 
     pprint.pprint(englishFrench)
@@ -292,8 +296,8 @@ def ukItalian():
             if len(dict[key]) == 0:
                 del dict[key]
 
-    merge(lookup.englishItalian, englishItalian)
-    merge(lookup.englishAbbreviations, englishAbbreviations)
+    merge(tables.englishItalian, englishItalian)
+    merge(tables.englishAbbreviations, englishAbbreviations)
 
     print "englishItalian = ", 
     pprint.pprint(englishItalian)
@@ -352,8 +356,8 @@ def ukGerman():
             if len(dict[key]) == 0:
                 del dict[key]
 
-    merge(lookup.englishGerman, englishGerman)
-    merge(lookup.englishAbbreviations, englishAbbreviations)
+    merge(tables.englishGerman, englishGerman)
+    merge(tables.englishAbbreviations, englishAbbreviations)
 
     print "englishGerman = ", 
     pprint.pprint(englishGerman)
@@ -412,7 +416,7 @@ def ukFrench():
             if len(dict[key]) == 0:
                 del dict[key]
 
-    merge(lookup.englishFrench, englishFrench)
+    merge(tables.englishFrench, englishFrench)
 
     print "englishFrench = ", 
     pprint.pprint(englishFrench)
@@ -433,15 +437,118 @@ def merge(source, target):
 
 #-------------------------------------------------------------------------------
 
-def allToEnglish():
-    allDicts = [lookup.englishFrench,lookup.englishGerman,lookup.englishAbbreviations,
-                lookup.englishItalian,lookup.englishSpanish, lookup.englishRussian]
+def rewriteLookup():
+    fn = "lookup.py"
+    f = open(fn, "w")
+    f.write("# -*- coding: utf-8 -*-\n")
+    f.write("#-------------------------------------------------------------------------------\n")
+    f.write("# Name:         {0}\n".format(fn))
+    f.write("# Purpose:      Bidirectional musical translation\n")
+    f.write("# Authors:      Jose Cabal-Ugaz\n")
+    f.write("#\n")
+    f.write("# Copyright:    (c) 2012 The music21 Project\n")
+    f.write("# License:      LGPL\n")
+    f.write("#-------------------------------------------------------------------------------\n")
+    f.write("# WARNING: Do not update file. Generated automatically.\n# Add or subtract elements from tables.py instead.\n\n")
+    f.write("englishToAll = \\\n")
+    f.write(englishToAll())
+    f.write("\n\nallToEnglish = \\\n")
+    f.write(allToEnglish())
+    f.close()
+    
+def englishToAll():
+    allDicts = [tables.englishFrench,tables.englishGerman,tables.englishAbbreviations,
+                tables.englishItalian,tables.englishSpanish, tables.englishRussian]
     masterDict = {}
-    pass
+    
+    for (key, value) in sorted(tables.englishFrench.items()):
+        if key not in masterDict:
+            masterDict[key] = {}
+        masterDict[key]["french"] = value
+    for (key, value) in sorted(tables.englishGerman.items()):
+        if key not in masterDict:
+            masterDict[key] = {}
+        masterDict[key]["german"] = value
+    for (key, value) in sorted(tables.englishItalian.items()):
+        if key not in masterDict:
+            masterDict[key] = {}
+        masterDict[key]["italian"] = value
+    for (key, value) in sorted(tables.englishSpanish.items()):
+        if key not in masterDict:
+            masterDict[key] = {}
+        masterDict[key]["spanish"] = value
+    for (key, value) in sorted(tables.englishRussian.items()):
+        if key not in masterDict:
+            masterDict[key] = {}
+        masterDict[key]["russian"] = value
+    for (key, value) in sorted(tables.englishAbbreviations.items()):
+        if key not in masterDict:
+            masterDict[key] = {}
+        masterDict[key]["abbreviation"] = value
+        
+    return pprint.pformat(masterDict)
+
+def allToEnglish():
+    allDicts = [tables.englishFrench,tables.englishGerman,tables.englishAbbreviations,
+                tables.englishItalian,tables.englishSpanish, tables.englishRussian]
+    masterDict = {}
+    
+    for (key, value) in sorted(tables.englishFrench.items()):
+        for trans in value:
+            masterDict[trans] = key
+    for (key, value) in sorted(tables.englishGerman.items()):
+        for trans in value:
+            masterDict[trans] = key
+    for (key, value) in sorted(tables.englishItalian.items()):
+        for trans in value:
+            masterDict[trans] = key
+    for (key, value) in sorted(tables.englishSpanish.items()):
+        for trans in value:
+            masterDict[trans] = key
+    for (key, value) in sorted(tables.englishRussian.items()):
+        for trans in value:
+            masterDict[trans] = key
+    for (key, value) in sorted(tables.englishAbbreviations.items()):
+        for trans in value:
+            masterDict[trans] = key
+        
+    return pprint.pformat(masterDict)
+
+#------------------------------------------------------------------------------
+
+def translate(term, language="French"):
+    try:
+        return fromEnglish(term, language)
+    except Exception:
+        pass
+
+    eng = toEnglish(term)
+    try:
+        return fromEnglish(eng, language)
+    except Exception:
+        raise Exception("{0} could not be translated to {1}.".format(term, language))
+
+def fromEnglish(term, language="French"):
+    try:
+        info = lookup.englishToAll[unicode(term)]
+    except KeyError:
+        raise Exception("{0} not found in dictionary.".format(term))
+    try:
+        return u" OR ".join(info[language.lower()])
+    except KeyError:
+        raise Exception("{0} could not be translated to {1}.".format(term, language))
+        
+def toEnglish(term):
+    try:
+        return lookup.allToEnglish[unicode(term)]
+    except KeyError:
+        raise Exception("{0} not found in dictionary.".format(term))
+
+#------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    #allToEnglish()
-    #print lookup.englishFrench["a double sharp"]
+    #rewriteLookup()
+    print translate("crash cymbals", "French")
 
 #------------------------------------------------------------------------------
 # eof
