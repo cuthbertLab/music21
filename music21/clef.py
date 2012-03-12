@@ -463,6 +463,7 @@ def standardClefFromXN(xnStr):
     '''
     Returns a Clef object given a string like "G2" or "F4" etc.
     '''
+    xnStr = xnStr.strip()
     if len(xnStr) > 1:
         (thisType, lineNum) = (xnStr[0], xnStr[1])
     elif len(xnStr) == 1: # some Humdrum files have just ClefG, eg. Haydn op. 9 no 3, mvmt 1
@@ -472,7 +473,7 @@ def standardClefFromXN(xnStr):
         elif thisType == "F":
             lineNum = 4
         elif thisType == "C":
-            lineNume = 3
+            lineNum = 3
     else:
         raise ClefException("file has clef info but no clef specified")
     if thisType is False or lineNum is False:

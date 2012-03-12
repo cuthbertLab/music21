@@ -933,8 +933,8 @@ class HumdrumSpine(object):
         >>> hds = humdrum.spineParser.HumdrumSpine()        
         >>> s2 = hds.moveElementsIntoMeasures(s1)
         >>> s2.show('text')
-        {0.0} <music21.meter.TimeSignature 2/4>
         {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.note.Note C>
         {2.0} <music21.stream.Measure 2 offset=2.0>
             {0.0} <music21.note.Note D>        
@@ -944,6 +944,7 @@ class HumdrumSpine(object):
         currentMeasure.number = 0
         currentMeasureNumber = 0
         currentMeasureOffset = 0
+        hasMeasureOne = False
         for el in streamIn:
             if 'Stream' in el.classes:
                 if currentMeasureNumber != 0 or len(currentMeasure) > 0:
@@ -951,6 +952,8 @@ class HumdrumSpine(object):
                 currentMeasure = el
                 currentMeasureNumber = el.number
                 currentMeasureOffset = el.offset
+                if currentMeasureNumber == 1:
+                    hasMeasureOne = True
             else:
                 if currentMeasureNumber != 0 or el.duration.quarterLength != 0:
                     currentMeasure.insert(el.offset - currentMeasureOffset, el)
@@ -959,6 +962,22 @@ class HumdrumSpine(object):
         
         if len(currentMeasure) > 0:
             streamOut.append(currentMeasure)
+        
+        # move beginning stuff (Clefs, KeySig, etc.) to first measure...
+        measureElements = streamOut.getElementsByClass('Measure')
+        if len(measureElements) > 0:
+            m1 = measureElements[0]
+            if hasMeasureOne == False: # pickup measure is not measure1
+                m1.number = 1
+            beginningStuff = streamOut.getElementsByOffset(0)
+            for el in beginningStuff:
+                if 'Stream' in el.classes:
+                    pass
+                elif 'MiscTandam' in el.classes:
+                    pass
+                else:
+                    m1.insert(0, el)
+                    streamOut.remove(el)
             
         return streamOut
     
@@ -1606,6 +1625,19 @@ def hdStringToNote(contents):
     'Imperfect Maxima'
     
 
+    Note that this is one note in the time of a double-dotted quarter, 
+    not a double-dotted quarter-note triplet (incorrectly used in
+    http://kern.ccarh.org/cgi-bin/ksdata?l=musedata/mozart/quartet&file=k421-01.krn&f=kern
+    but contradicts the specification in
+    http://www.lib.virginia.edu/artsandmedia/dmmc/Music/Humdrum/kern_hlp.html#tuplets    
+
+    >>> n = hdStringToNote("6..fff")
+    >>> n.duration.quarterLength
+    1.166666...
+    >>> n.duration.dots
+    0
+    >>> n.duration.tuplets[0].durationNormal.dots
+    2
     '''
     
     # http://www.lib.virginia.edu/artsandmedia/dmmc/Music/Humdrum/kern_hlp.html#kern
@@ -1907,9 +1939,15 @@ def kernTandamToObject(tandam):
             return music21.clef.PercussionClef()
         elif clefType == "Gv2": # undocumented in Humdrum, but appears in Huron's Chorales
             return music21.clef.Treble8vbClef()
+        elif clefType == "Gv": # unknown if ever used but better safe...
+            return music21.clef.Treble8vbClef()
         elif clefType == "G^2": # unknown if ever used but better safe...
             return music21.clef.Treble8vaClef()
+        elif clefType == "G^": # unknown if ever used but better safe...
+            return music21.clef.Treble8vaClef()
         elif clefType == "Fv4": # unknown if ever used but better safe...
+            return music21.clef.Bass8vbClef()
+        elif clefType == "Fv": # unknown if ever used but better safe...
             return music21.clef.Bass8vbClef()
         else:
             try:

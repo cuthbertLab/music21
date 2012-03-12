@@ -139,6 +139,23 @@ class TrecentoSheet(object):
         >>> farina = ballataSheet.workByTitle('farina')
         >>> print(farina.title)
         De mia farina
+        >>> farina.incipit.parts[0].show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.meter.TimeSignature 3/4>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.note.Rest rest>
+            {1.0} <music21.note.Rest rest>
+            {2.0} <music21.note.Note C>
+            {2.5} <music21.note.Note D>
+        {3.0} <music21.stream.Measure 2 offset=3.0>
+            {0.0} <music21.note.Note E>
+            {1.0} <music21.note.Note G>
+            {2.0} <music21.note.Note G>
+        {6.0} <music21.stream.Measure 3 offset=6.0>
+            {0.0} <music21.note.Note G>
+            {1.0} <music21.note.Note E>
+            {2.0} <music21.note.Note D>
+            {3.0} <music21.bar.Barline style=final>
         '''
         title = title.lower()
         for i in range(self.totalRows):

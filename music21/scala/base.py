@@ -13,6 +13,7 @@ This module defines classes for representing Scala scale data, including Scala p
 
 The Scala format is defined at the following URL:
 http://www.huygens-fokker.org/scala/scl_format.html
+We thank Manuel Op de Coul for allowing us to include the repository (as of May 11, 2011) with music21
 
 Utility functions are also provided to search and find scales in the Scala scale archive. File names can be found with the :func:`~music21.scala.search` function.
 
