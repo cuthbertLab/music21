@@ -79,7 +79,6 @@ from music21 import environment
 
 # needed for temporal manipulations; not music21 objects
 from music21 import tie
-from music21 import duration
 
 _MOD = 'music21.base.py'
 environLocal = environment.Environment(_MOD)
@@ -1485,7 +1484,7 @@ class JSONSerializer(object):
                     if name not in classNames:
                         # store the name, not the attr
                         post.append(name)
-        #environLocal.pd(['auto-derived jsonAttributes', post])
+        environLocal.pd(['auto-derived jsonAttributes', post])
         return post
 
     def jsonAttributes(self):
@@ -1507,6 +1506,10 @@ class JSONSerializer(object):
             return pitch.Accidental()
         elif '.Pitch' in idStr:
             return pitch.Pitch()
+        elif '.DurationUnit' in idStr:
+            return pitch.DurationUnit()
+        elif '.Duration' in idStr:
+            return pitch.Duration()
 
         else:
             raise JSONSerializerException('cannot instantiate an object from id string: %s' % idStr)
@@ -2926,6 +2929,7 @@ class Music21Object(JSONSerializer):
         Gets the DurationObject of the object or None
 
         '''
+        from music21 import duration
         # lazy duration creation
         if self._duration is None:
             self._duration = duration.Duration(0)
@@ -3147,8 +3151,6 @@ class Music21Object(JSONSerializer):
             f.close()
             return fp
 
-
-
         elif format == 'midi':
             # returns a midi file object
             mf = self.midiFile
@@ -3332,6 +3334,7 @@ class Music21Object(JSONSerializer):
 
         '''
         # was note.splitNoteAtPoint
+        from music21 import duration
 
         if self.duration == None:
             raise Exception('cannot split an element that has a Duration of None')

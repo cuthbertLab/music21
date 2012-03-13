@@ -4589,7 +4589,6 @@ class Test(unittest.TestCase):
         aAlt.json = a.json
         self.assertEqual(str(aAlt), '<accidental double-sharp>')
 
-
         p = pitch.Pitch(ps=61.2)
         self.assertEqual(str(p), 'C#4(+20c)')
         pAlt = pitch.Pitch()

@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2011 The music21 Project
+# Copyright:    (c) 2009-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''The duration module contains  
@@ -50,9 +50,7 @@ Example usage:
 import unittest, doctest
 import copy
 
-# NOT import music21
-# duration.py is imported by base.py, and is thus a lower level object
-# than most other objects. 
+import music21
 
 from music21 import defaults
 from music21 import common
@@ -1285,7 +1283,7 @@ class Tuplet(object):
 
 
 #-------------------------------------------------------------------------------
-class DurationCommon(object):
+class DurationCommon(music21.JSONSerializer):
     '''A base class for both Duration and DurationUnit objects.
     '''
     #def __init__(self):
@@ -3495,8 +3493,6 @@ class Test(unittest.TestCase):
         self.assertEqual(du.type, 'quarter')
         #print du.type, du.quarterLength
 
-
-
         d = duration.Duration()
         self.assertEqual(d.isLinked, True) # note set
         d.setTypeUnlinked('quarter')
@@ -3531,6 +3527,25 @@ class Test(unittest.TestCase):
 #         self.assertEqual(d.isLinked, False) # note set
 
 
+
+    def testSerializationA(self):
+        from music21 import duration
+        d = duration.DurationUnit(1.5)
+        self.assertEqual(str(d), '<music21.duration.DurationUnit 1.5>')
+
+        dAlt = duration.DurationUnit()
+        dAlt.json = d.json
+        self.assertEqual(str(dAlt), '<music21.duration.DurationUnit 1.5>')
+ 
+        d = duration.Duration(2.25)
+        self.assertEqual(str(d), '<music21.duration.Duration 2.25>')
+        dAlt = duration.Duration()
+        dAlt.json = d.json
+        self.assertEqual(str(dAlt), '<music21.duration.Duration 2.25>')
+
+
+
+        
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
