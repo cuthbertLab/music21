@@ -238,6 +238,14 @@ class GeneralNote(music21.Music21Object):
         # note: Chords handle ties differently
         self.tie = None # store a Tie object
 
+
+    def jsonAttributes(self):
+        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
+        '''
+        # will already get _duration
+        return self._autoGatherAttributes() + ['lyrics', 'expressions', 'articulations', 'editorial', 'tie']
+
+
     def compactNoteInfo(self):
         '''A debugging info tool, returning information about a note
         E- E 4 flat 16th 0.166666666667 & is a tuplet (in fact STOPS the tuplet)
@@ -643,6 +651,13 @@ class NotRest(GeneralNote):
         self._stemDirection = 'unspecified'
         self._volume = None # created on demand
 
+    def jsonAttributes(self):
+        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
+        '''
+        # add to base class
+        return GeneralNote.jsonAttributes(self) + ['_notehead', '_noteheadFill', '_noteheadParen', '_stemDirection', '_volume']
+
+
     def __deepcopy__(self, memo=None):
         '''As NotRest objects have a Volume, objects, and Volume objects store weak refs to the to parent object, need to specialize deep copy handling
         '''
@@ -911,6 +926,13 @@ class Note(NotRest):
             self.beams = keywords["beams"]
         else:
             self.beams = beam.Beams()
+
+    def jsonAttributes(self):
+        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation.
+        '''
+        # add to base class
+        return NotRest.jsonAttributes(self) + ['pitch', 'beams']
+
 
     #---------------------------------------------------------------------------
     # operators, representations, and transformatioins
@@ -1954,6 +1976,18 @@ class Test(unittest.TestCase):
         self.assertEqual(n1Copy.volume.velocity, 100)
         self.assertEqual(n1Copy.volume.parent, n1Copy)
 
+
+    def testSerializationA(self):
+        from music21 import note
+
+        gn = note.GeneralNote()
+        print gn.json
+
+        nr = note.NotRest()
+        print nr.json
+
+        n = note.Note()
+        print n.json
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

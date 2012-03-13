@@ -29,7 +29,7 @@ musicxmlMod = musicxml # alias
 class BeamException(Exception):
     pass
 
-class Beam(object):
+class Beam(music21.JSONSerializer):
     '''
     A Beam is an object representation of one single beam, that is, one horizontal
     line connecting two notes together (or less commonly a note to a rest).  Thus it
@@ -60,6 +60,12 @@ class Beam(object):
         # represents which beam line referred to
         # 8th, 16th, etc represented as 1, 2, ...
         self.number = None 
+
+    def jsonAttributes(self):
+        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation.
+        '''
+        # add to base class
+        return ['type', 'direction', 'independentAngle', 'number']
 
     def __str__(self):
         if self.direction == None:
@@ -140,7 +146,7 @@ class Beam(object):
 
 
 #-------------------------------------------------------------------------------
-class Beams(object):
+class Beams(music21.JSONSerializer):
     '''
     The Beams object stores in it attribute beamsList (a list) all
     the Beam objects defined above.  Thus len(beam.Beams) tells you how many
@@ -150,6 +156,13 @@ class Beams(object):
     def __init__(self):
         self.beamsList = []
         self.feathered = False
+
+    def jsonAttributes(self):
+        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation.
+        '''
+        # add to base class
+        return ['beamsList', 'feathered']
+
         
     def __len__(self):
         return len(self.beamsList)

@@ -70,7 +70,7 @@ def getObjectsWithEditorial(listToSearch, editorialStringToFind,
             pass
     return listofOBJToReturn
     
-class NoteEditorial(object):
+class NoteEditorial(music21.JSONSerializer):
     '''Editorial comments and special effects that can be applied to notes
     Standard ones are stored as attributes.  Non-standard/one-off effects are
     stored in the dict called "misc":
@@ -132,6 +132,12 @@ class NoteEditorial(object):
         self.melodicIntervalsOverRests = []
         self.comment = Comment()
 
+    def jsonAttributes(self):
+        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation.
+        '''
+        # add to base class
+        return ['color', 'misc', 'comment']
+
     def lilyStart(self):
         r'''
         A method that returns a string (not LilyString) containing the 
@@ -190,7 +196,7 @@ class NoteEditorial(object):
         return baseRet
 
         
-class Comment(object):
+class Comment(music21.JSONSerializer):
     '''
     an object that adds text above or below a note:
     
@@ -202,8 +208,9 @@ class Comment(object):
     '^"hello"'
     
     '''
-    position = "below"
-    text = None
+    def __init__(self):
+        self.position = "below"
+        self.text = None
     
     def _getLily(self):
         if self.text is None:
