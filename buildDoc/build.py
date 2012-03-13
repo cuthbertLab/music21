@@ -373,7 +373,6 @@ class PartitionedModule(PartitionedName):
         else:
             environLocal.printDebug('module %s missing _DOC_ORDER' % 
                                     self.srcNameStr)
-
         self.names = dir(self.srcNameEval)
         self._data = self._fillData()
         self._sort()

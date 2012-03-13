@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2011 The music21 Project
+# Copyright:    (c) 2009-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
@@ -514,7 +514,7 @@ class MicrotoneException(music21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
-class Microtone(object):
+class Microtone(music21.JSONSerializer):
     '''
     The Microtone object defines a pitch transformation above or below a standard Pitch and its Accidental.
 
@@ -546,6 +546,7 @@ class Microtone(object):
     _validHarmonics = range(1, 32)
 
     def __init__(self, centsOrString=0):
+        music21.JSONSerializer.__init__(self)
 
         self._centShift = 0
         self._harmonicShift = 1 # the first harmonic is the start
@@ -554,7 +555,6 @@ class Microtone(object):
             self._centShift = centsOrString # specify harmonic in cents
         else:
             self._parseString(centsOrString)
-
         # need to additional store a reference to a position in a 
         # another pitches overtone series? 
         # such as: A4(+69c [7thH/C3])?
@@ -667,16 +667,6 @@ class Accidental(music21.Music21Object):
     ('sharp', 1.0, '#')
 
     '''
-    # managed by properties
-    _displayType = "normal" # always, never, unless-repeated, even-tied
-    _displayStatus = None # None, True, False
-
-    # not yet managed by properties: TODO
-    displayStyle = "normal" # "parentheses", "bracket", "both"
-    displaySize  = "full"   # "cue", "large", or a percentage
-    displayLocation = "normal" # "normal", "above" = ficta, "below"
-    # above and below could also be useful for gruppetti, etc.
-
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['name', 'modifier', 'alter', 'set']
     # documentation for all attributes (not properties or methods)
@@ -694,9 +684,20 @@ class Accidental(music21.Music21Object):
     }
 
     def __init__(self, specifier='natural'):
-        self.name = None
-        self.modifier = ''
-        self.alter = 0.0     # semitones to alter step
+
+        # managed by properties
+        self._displayType = "normal" # always, never, unless-repeated, even-tied
+        self._displayStatus = None # None, True, False
+    
+        # not yet managed by properties: TODO
+        self.displayStyle = "normal" # "parentheses", "bracket", "both"
+        self.displaySize  = "full"   # "cue", "large", or a percentage
+        self.displayLocation = "normal" # "normal", "above" = ficta, "below"
+        # above and below could also be useful for gruppetti, etc.
+
+        self._name = None
+        self._modifier = ''
+        self._alter = 0.0     # semitones to alter step
         #alterFrac = [0,0]   # fractional alteration 
         # (e.g., 1/6); fraction class in 2.6
         #alterExp  = [0,0,0] # exponental alteration 
@@ -830,63 +831,63 @@ class Accidental(music21.Music21Object):
         if common.isStr(name):
             name = name.lower() # sometimes args get capitalized
         if name in ['natural', "n", 0]: 
-            self.name = 'natural'
-            self.alter = 0.0
+            self._name = 'natural'
+            self._alter = 0.0
         elif name in ['sharp', accidentalNameToModifier['sharp'], "is", 1, 1.0]:
-            self.name = 'sharp'
-            self.alter = 1.0
+            self._name = 'sharp'
+            self._alter = 1.0
         elif name in ['double-sharp', accidentalNameToModifier['double-sharp'], 
             "isis", 2]:
-            self.name = 'double-sharp'
-            self.alter = 2.0
+            self._name = 'double-sharp'
+            self._alter = 2.0
         elif name in ['flat', accidentalNameToModifier['flat'], "es", -1]:
-            self.name = 'flat'
-            self.alter = -1.0
+            self._name = 'flat'
+            self._alter = -1.0
         elif name in ['double-flat', accidentalNameToModifier['double-flat'], 
             "eses", -2]:
-            self.name = 'double-flat'
-            self.alter = -2.0
+            self._name = 'double-flat'
+            self._alter = -2.0
         
         elif name in ['half-sharp', accidentalNameToModifier['half-sharp'], 
             'quarter-sharp', 'ih', 'semisharp', .5]:
-            self.name = 'half-sharp'
-            self.alter = 0.5
+            self._name = 'half-sharp'
+            self._alter = 0.5
         elif name in ['one-and-a-half-sharp', 
             accidentalNameToModifier['one-and-a-half-sharp'],
             'three-quarter-sharp', 'three-quarters-sharp', 'isih', 
             'sesquisharp', 1.5]:
-            self.name = 'one-and-a-half-sharp'
-            self.alter = 1.5  
+            self._name = 'one-and-a-half-sharp'
+            self._alter = 1.5  
         elif name in ['half-flat', accidentalNameToModifier['half-flat'], 
             'quarter-flat', 'eh', 'semiflat', -.5]:
-            self.name = 'half-flat'
-            self.alter = -0.5
+            self._name = 'half-flat'
+            self._alter = -0.5
         elif name in ['one-and-a-half-flat', 
             accidentalNameToModifier['one-and-a-half-flat'],
             'three-quarter-flat', 'three-quarters-flat', 'eseh', 
             'sesquiflat', -1.5]:
-            self.name = 'one-and-a-half-flat'
-            self.alter = -1.5
+            self._name = 'one-and-a-half-flat'
+            self._alter = -1.5
         elif name in ['triple-sharp', accidentalNameToModifier['triple-sharp'], 
             'isisis', 3]:
-            self.name = 'triple-sharp'
-            self.alter = 3.0
+            self._name = 'triple-sharp'
+            self._alter = 3.0
         elif name in ['quadruple-sharp', 
             accidentalNameToModifier['quadruple-sharp'], 'isisisis', 4]:
-            self.name = 'quadruple-sharp'
-            self.alter = 4.0
+            self._name = 'quadruple-sharp'
+            self._alter = 4.0
         elif name in ['triple-flat', accidentalNameToModifier['triple-flat'],
             'eseses', -3]:
-            self.name = 'triple-flat'
-            self.alter = -3.0
+            self._name = 'triple-flat'
+            self._alter = -3.0
         elif name in ['quadruple-flat', 
             accidentalNameToModifier['quadruple-flat'], 'eseseses', -4]:
-            self.name = 'quadruple-flat'
-            self.alter = -4.0
+            self._name = 'quadruple-flat'
+            self._alter = -4.0
         else:
             raise AccidentalException('%s is not a supported accidental type' % name)
 
-        self.modifier = accidentalNameToModifier[self.name]
+        self._modifier = accidentalNameToModifier[self._name]
 
 
     def isTwelveTone(self):
@@ -910,6 +911,40 @@ class Accidental(music21.Music21Object):
 
     #---------------------------------------------------------------------------
     # main properties
+    def _getName(self):
+        return self._name
+
+    def _setName(self, value):
+        # can alternatively call set()
+        self._name = value
+    
+    name = property(_getName, _setName, 
+        doc = '''Get or set the name of the Accidental, like 'sharp' or 'double-flat'
+        ''')
+
+    def _getAlter(self):
+        return self._alter
+
+    def _setAlter(self, value):
+        # can alternatively call set()
+        self._alter = value
+    
+    alter = property(_getAlter, _setAlter, 
+        doc = '''Get or set the alter of the Accidental, or the semitone shift caused by the Accidental.'
+        ''')
+
+
+    def _getModifier(self):
+        return self._modifier
+
+    def _setModifier(self, value):
+        # can alternatively call set()
+        self._modifier = value
+    
+    modifier = property(_getModifier, _setModifier, 
+        doc = '''Get or set the alter of the modifier, or the string representation.'
+        ''')
+
 
     def _getDisplayType(self):
         return self._displayType
@@ -1167,6 +1202,10 @@ class Pitch(music21.Music21Object):
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
     }
+
+    # constants shared by all classes
+    _twelfth_root_of_two = TWELFTH_ROOT_OF_TWO
+
     def __init__(self, name=None, **keywords):
         '''Create a Pitch.
 
@@ -1212,7 +1251,6 @@ class Pitch(music21.Music21Object):
         # keep an accidental object based on self._alter
         
         self._overridden_freq440 = None
-        self._twelfth_root_of_two = TWELFTH_ROOT_OF_TWO
 
         # store an Accidental and Microtone objects
         # note that creating an Accidental objects is much more time consuming
@@ -4533,6 +4571,31 @@ class Test(unittest.TestCase):
             p.frequency = fq
             pList.append(p)
         self.assertEqual(str(pList), '[A4, A~4(+21c), B`4(-11c), B4(+4c), B~4(+17c), C~5(-22c), C#5(-14c), C#~5(-7c), C##5(-2c), D~5(+1c), E-5(+3c), E`5(+3c), E5(+2c), E~5(-1c), F5(-4c), F~5(-9c), F#5(-16c), F#~5(-23c), F#~5(+19c), G5(+10c), G~5(-1c), G#5(-12c), G#~5(-24c), G#~5(+14c)]')
+
+
+    def testJsonSerializationA(self):
+        from music21 import pitch
+        
+        m = pitch.Microtone(40)
+        self.assertEqual(str(m), '(+40c)')
+
+        mAlt = pitch.Microtone()
+        mAlt.json = m.json
+        self.assertEqual(str(mAlt), '(+40c)')
+    
+        a = pitch.Accidental('##')
+        self.assertEqual(str(a), '<accidental double-sharp>')
+        aAlt = pitch.Accidental()
+        aAlt.json = a.json
+        self.assertEqual(str(aAlt), '<accidental double-sharp>')
+
+
+        p = pitch.Pitch(ps=61.2)
+        self.assertEqual(str(p), 'C#4(+20c)')
+        pAlt = pitch.Pitch()
+        pAlt.json = p.json
+        self.assertEqual(str(pAlt), 'C#4(+20c)')
+
         
         
 #-------------------------------------------------------------------------------

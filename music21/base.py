@@ -52,6 +52,7 @@ import sys
 import types
 import unittest, doctest
 import uuid
+import inspect
 
 #-------------------------------------------------------------------------------
 class Music21Exception(Exception):
@@ -500,57 +501,6 @@ class DefinedContexts(object):
             self._definedContexts[idKey] = dict
 
 
-# old method: about the same performance; may weakref a weakref
-#         isLocation = False # 'contexts'
-#         if offset is not None: 
-#             isLocation = True # 'locations'
-# 
-#         # note: if we want both context and locations to exists
-#         # for the same object, may need to append character code to id
-# 
-#         if idKey is None and obj is not None:
-#             idKey = id(obj)
-#         # a None object will have a key of None
-#         # do not need to set this as is default
-# 
-#         # get class before getting weak ref
-#         if classString is None:
-#             if obj is not None:
-#                 #if hasattr(obj, 'classes'):
-#                 classString = obj.classes[0] # get last class
-# 
-#         #environLocal.printDebug(['adding obj', obj, idKey])
-#         objRef = self._prepareObject(obj, isLocation)
-# 
-#         updateNotAdd = False
-#         if idKey in self._definedContexts.keys():
-#             updateNotAdd = True
-# 
-#         if isLocation: # the dictionary may already be a context
-#             if not updateNotAdd: # already know that it is new (not an update)
-#                 self._locationKeys.append(idKey)
-#             # this may be a context that is now a location
-#             elif idKey not in self._locationKeys: 
-#                 self._locationKeys.append(idKey)
-#             # otherwise, this is attempting to define a new offset for 
-#             # a known location
-#         dict = {}
-#         dict['obj'] = objRef # a weak ref
-#         dict['offset'] = offset # offset can be None for contexts
-#         dict['class'] = classString 
-#         dict['isDead'] = False # store to access w/o unwrapping
-# 
-#         # time is a numeric count, not a real time measure
-#         if timeValue is None:
-#             dict['time'] = self._timeIndex
-#             self._timeIndex += 1 # increment for next usage
-#         else:
-#             dict['time'] = timeValue
-# 
-#         if updateNotAdd: # add new/missing information to dictionary
-#             self._definedContexts[idKey].update(dict)
-#         else: # add:
-#             self._definedContexts[idKey] = dict
 
 
 
@@ -1513,17 +1463,54 @@ class JSONSerializer(object):
     #---------------------------------------------------------------------------
     # override these methods for json functionality
 
+    def _autoGatherAttributes(self):
+        '''Gather just the instance data members that are proceeded by an underscore. 
+        '''
+        post = []
+        # get class names that exclude instance names
+        classNames = []
+        for bundle in inspect.classify_class_attrs(self.__class__):
+            if (bundle.name.startswith('_') and not 
+                bundle.name.startswith('__')):
+                classNames.append(bundle.name)
+        #environLocal.pd(['classNames', classNames])
+        for name in dir(self):
+            if name.startswith('_') and not name.startswith('__'):
+                attr = getattr(self, name)
+                #environLocal.pd(['inspect.isroutine()', attr, inspect.isroutine(attr)])
+                if (not inspect.ismethod(attr) and not 
+                    inspect.isfunction(attr) and not inspect.isroutine(attr)): 
+                    # class names stored are class attrs, not needed for 
+                    # reinstantiation
+                    if name not in classNames:
+                        # store the name, not the attr
+                        post.append(name)
+        #environLocal.pd(['auto-derived jsonAttributes', post])
+        return post
+
     def jsonAttributes(self):
         '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
         '''
-        return []
+        #return []
+        return self._autoGatherAttributes()
+
 
     def jsonComponentFactory(self, idStr):
         '''Given a stored string during JSON serialization, return an object'
 
         The subclass that overrides this method will have access to all modules necessary to create whatever objects necessary. 
         '''
-        return None
+        from music21 import pitch
+        if '.Microtone' in idStr:
+            return pitch.Microtone()
+        elif '.Accidental' in idStr:
+            return pitch.Accidental()
+        elif '.Pitch' in idStr:
+            return pitch.Pitch()
+
+        else:
+            raise JSONSerializerException('cannot instantiate an object from id string: %s' % idStr)
+
 
     #---------------------------------------------------------------------------
     # core methods for getting and setting
@@ -1552,6 +1539,7 @@ class JSONSerializer(object):
 
             # if, stored on this object, is an object w/ a json method
             if hasattr(attrValue, 'json'):
+                #environLocal.pd(['attrValue', attrValue])
                 flatData[attr] = attrValue._getJSONDict()
 
             # handle lists; look for objects that have json attributes
@@ -1635,7 +1623,6 @@ class JSONSerializer(object):
                     if attrValue == None or isinstance(attrValue, 
                         (int, float)):
                         setattr(self, key, attrValue)
-
                     # handle a list or tuple, looking for dicts that define objs
                     elif isinstance(attrValue, (list, tuple)):
                         subList = []
@@ -1646,7 +1633,6 @@ class JSONSerializer(object):
                             else:
                                 subList.append(attrValueSub)
                         setattr(self, key, subList)
-
                     # handle a dictionary, looking for dicts that define objs
                     elif isinstance(attrValue, dict):
                         # could be a data dict or a dict of objects; 
@@ -1675,14 +1661,12 @@ class JSONSerializer(object):
                             dst.update(subDict) 
                     else: # assume a string
                         setattr(self, key, attrValue)
-
             else:
                 raise JSONSerializerException('cannot handle json attr: %s'% attr)
 
     json = property(_getJSON, _setJSON, 
         doc = '''Get or set string JSON data for this object. This method is only available if a JSONSerializer subclass object has been customized and configured by overriding the following methods: :meth:`~music21.base.JSONSerializer.jsonAttributes`, :meth:`~music21.base.JSONSerializer.jsonComponentFactory`.
         ''')    
-
 
     def jsonPrint(self):
         print(json.dumps(self._getJSONDict(includeVersion=True), 
