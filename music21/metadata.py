@@ -1723,7 +1723,6 @@ class RichMetadata(Metadata):
     it is attached to. TimeSignature, KeySignature and related analytical is stored. 
     RichMetadata are generally only created in the process of creating stored JSON metadata. 
     '''
-
     def __init__(self, *args, **keywords):
         '''
         >>> from music21 import *
@@ -1747,8 +1746,11 @@ class RichMetadata(Metadata):
         self.pitchHighest = None
         self.pitchLowest = None
 
+        self.noteCount = None
+        self.quarterLength = None
+
         # append to existing search attributes from Metdata
-        self._searchAttributes += ['keySignatureFirst', 'timeSignatureFirst', 'pitchHighest', 'pitchLowest'] 
+        self._searchAttributes += ['keySignatureFirst', 'timeSignatureFirst', 'pitchHighest', 'pitchLowest', 'noteCount', 'quarterLength'] 
 
 
 
@@ -1759,7 +1761,7 @@ class RichMetadata(Metadata):
         '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
         '''
         # add new names to base-class names
-        return ['keySignatureFirst', 'timeSignatureFirst', 'pitchHighest', 'pitchLowest'] + Metadata.jsonAttributes(self)
+        return ['keySignatureFirst', 'timeSignatureFirst', 'pitchHighest', 'pitchLowest', 'noteCount', 'quarterLength'] + Metadata.jsonAttributes(self)
 
     def jsonComponentFactory(self, idStr):
         from music21 import meter
@@ -1827,13 +1829,16 @@ class RichMetadata(Metadata):
         self.tempoFirst = None
         #self.tempos = []
 
+        self.noteCount = None
+        self.quarterLength = None
+
         self.ambitus = None
         self.pitchHighest = None
         self.pitchLowest = None
 
-
         # get flat sorted stream
         flat = streamObj.flat.sorted
+
 
         tsStream = flat.getElementsByClass('TimeSignature')
         if len(tsStream) > 0:
@@ -1854,6 +1859,8 @@ class RichMetadata(Metadata):
 #             if ks not in self.keySignatures:
 #                 self.keySignatures.append(ts)
 
+        self.noteCount = len(flat.notesAndRests)
+        self.quarterLength = flat.highestTime
 
 # commenting out temporarily due to memory error     
 # with corpus/beethoven/opus132.xml
@@ -2397,26 +2404,28 @@ class Test(unittest.TestCase):
         self.assertEqual(s.metadata.search(re.compile('(.*)canon(.*)')), (True, 'title'))
 
 
+    def testRichMetadataA(self):
+        from music21 import corpus, metadata
+
+        s = corpus.parse('bwv66.6')
+        rmd = metadata.RichMetadata()
+        rmd.merge(s.metadata)
+        rmd.update(s)
+
+        self.assertEqual(rmd.noteCount, 165)
+        self.assertEqual(rmd.quarterLength, 36.0)
+
+        self.assertEqual(rmd.json, '{"__attr__": {"_urls": [], "quarterLength": 36.0, "noteCount": 165, "_contributors": [], "timeSignatureFirst": "4/4", "keySignatureFirst": "sharps 3, mode minor", "_workIds": {"movementName": {"__attr__": {"_data": "bwv66.6.mxl"}, "__class__": "<class \'music21.metadata.Text\'>"}}}, "__version__": [0, 6, 2], "__class__": "<class \'music21.metadata.RichMetadata\'>"}')
+
+
 #-------------------------------------------------------------------------------
 _DOC_ORDER = [Text, Date, 
             DateSingle, DateRelative, DateBetween, DateSelection, 
             Contributor, Metadata]
 
-
 if __name__ == "__main__":
-    import sys
-    import music21
-    
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-    elif len(sys.argv) > 1:
-        t = Test()
-        #t.testAugmentOrDiminish()
-        #t.testJSONSerialization()
-        #t.testJSONSerializationMetadata()
+    music21.mainTest(Test)
 
-
-        t.testMetadataSearch()
 
 #------------------------------------------------------------------------------
 # eof
