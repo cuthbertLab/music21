@@ -177,9 +177,8 @@ def clefToBraille(music21Clef):
     Takes in a :class:`~music21.clef.Clef` and returns its representation
     as a braille string in UTF-8 unicode.
 
+    Only :class:`~music21.clef.TrebleClef`, :class:`~music21.clef.BassClef`, :class:`~music21.clef.AltoClef`, and :class:`~music21.clef.TenorClef` can be transcribed.
 
-    .. note:: Only :class:`~music21.clef.TrebleClef`, :class:`~music21.clef.BassClef`,
-    :class:`~music21.clef.AltoClef`, and :class:`~music21.clef.TenorClef` can be transcribed.
 
     >>> from music21.braille import basic
     >>> from music21 import clef

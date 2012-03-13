@@ -13,52 +13,51 @@
 '''
 Module to translate Noteworthy Composer's NWCTXT format to music21.
 
-to do:
-|SongInfo|Title:"<FileTitle>"|Author:"<Author>"|Lyricist:"<Lyricist>"|Copyright1:"<Copyright1>"|Copyright2:"<Copyright2>"|Comments:"<Comments>"
-|StaffProperties|Muted:N|Volume:127|StereoPan:64|Device:0|Channel:2
-|StaffInstrument|Name:"Lead 6 (voice)"|Patch:85|Trans:0|DynVel:10,30,45,60,75,92,108,127
-
-UnderscoreAsSpace? N or Y
-|Lyrics|Placement:Bottom|Align:Standard Rules|Offset:0|UnderscoreAsSpace:N
-
-strip \\r and \\n
-|Lyric1|Text:"Aaaaaaaah________\\r\\n"
-
-support lyric 2
-|Lyric2|Text:"2_1 2_2 2_3 2_4\r\n2_5 2_6 2_7 2_8\r\n"
-
-|Ending|Endings:1
-|Ending|Endings:2,D
-
-...as expression
-|TempoVariance|Style:Fermata|Pause:3|Pos:-4
-
-...as spanner
-|TempoVariance|Style:Accelerando|Pos:-6
-
-
-...beams:
-|Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam=First
-|Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam
-|Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam
-|Dynamic|Style:ppp|Pos:-8
-|Rest|Dur:8th
-|Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam
-|Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam
-|Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam
-|Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam=End
-
-performance style
-|PerformanceStyle|Style:Animato|Pos:-7
-
-low priority:
-|MPC|Controller:vol|Style:Linear Sweep|TimeRes:Whole|SweepRes:1|Pt1:0,127|Pt2:8,30|Pos:8|Wide:Y|Placement:BestFitForward
-
-Pos2? Dur2?
-|Chord|Dur:8th|Pos:-4,n-3,b-2,#-1,x0,v1,2x|Opts:Stem=Down,Crescendo|Dur2:8th,DblDotted|Pos2:3x
-
-
 '''
+
+# to do:
+# |SongInfo|Title:"<FileTitle>"|Author:"<Author>"|Lyricist:"<Lyricist>"|Copyright1:"<Copyright1>"|Copyright2:"<Copyright2>"|Comments:"<Comments>"
+# |StaffProperties|Muted:N|Volume:127|StereoPan:64|Device:0|Channel:2
+# |StaffInstrument|Name:"Lead 6 (voice)"|Patch:85|Trans:0|DynVel:10,30,45,60,75,92,108,127
+# 
+# UnderscoreAsSpace? N or Y
+# |Lyrics|Placement:Bottom|Align:Standard Rules|Offset:0|UnderscoreAsSpace:N
+# 
+# strip \\r and \\n
+# |Lyric1|Text:"Aaaaaaaah________\\r\\n"
+# 
+# support lyric 2
+# |Lyric2|Text:"2_1 2_2 2_3 2_4\r\n2_5 2_6 2_7 2_8\r\n"
+# 
+# |Ending|Endings:1
+# |Ending|Endings:2,D
+# 
+# ...as expression
+# |TempoVariance|Style:Fermata|Pause:3|Pos:-4
+# 
+# ...as spanner
+# |TempoVariance|Style:Accelerando|Pos:-6
+# 
+# 
+# ...beams:
+# |Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam=First
+# |Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam
+# |Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam
+# |Dynamic|Style:ppp|Pos:-8
+# |Rest|Dur:8th
+# |Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam
+# |Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam
+# |Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam
+# |Note|Dur:8th|Pos:0|Opts:Stem=Down,Beam=End
+# 
+# performance style
+# |PerformanceStyle|Style:Animato|Pos:-7
+# 
+# low priority:
+# |MPC|Controller:vol|Style:Linear Sweep|TimeRes:Whole|SweepRes:1|Pt1:0,127|Pt2:8,30|Pos:8|Wide:Y|Placement:BestFitForward
+# 
+# Pos2? Dur2?
+# |Chord|Dur:8th|Pos:-4,n-3,b-2,#-1,x0,v1,2x|Opts:Stem=Down,Crescendo|Dur2:8th,DblDotted|Pos2:3x
 
 
 from music21.base import Music21Exception
