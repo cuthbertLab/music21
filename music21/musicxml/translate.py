@@ -1727,27 +1727,27 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
             else:
                 mxDirectionPost.append(mxDirection)
 
-    for su in spannerBundle.getByClass('DashedLine'):     
-        mxDashes = musicxmlMod.Dashes()
-        mxDashes.set('number', su.idLocal)
-        # is this note first in this spanner?
-        if su.isFirst(target):
-            mxDashes.set('type', 'start')
-        elif su.isLast(target):
-            mxDashes.set('type', 'stop')
-        else: # this may not always be an error
-            environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, target])
-        mxDirection = musicxmlMod.Direction()
-        mxDirection.set('placement', su.placement) # placement goes here
-        mxDirectionType = musicxmlMod.DirectionType()
-        mxDirectionType.append(mxDashes)
-        mxDirection.append(mxDirectionType)
-        environLocal.pd(['os', 'mxDirection', mxDirection ])
-
-        if su.isFirst(target):
-            mxDirectionPre.append(mxDirection)
-        else:
-            mxDirectionPost.append(mxDirection)
+#     for su in spannerBundle.getByClass('DashedLine'):     
+#         mxDashes = musicxmlMod.Dashes()
+#         mxDashes.set('number', su.idLocal)
+#         # is this note first in this spanner?
+#         if su.isFirst(target):
+#             mxDashes.set('type', 'start')
+#         elif su.isLast(target):
+#             mxDashes.set('type', 'stop')
+#         else: # this may not always be an error
+#             environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, target])
+#         mxDirection = musicxmlMod.Direction()
+#         mxDirection.set('placement', su.placement) # placement goes here
+#         mxDirectionType = musicxmlMod.DirectionType()
+#         mxDirectionType.append(mxDashes)
+#         mxDirection.append(mxDirectionType)
+#         environLocal.pd(['os', 'mxDirection', mxDirection ])
+# 
+#         if su.isFirst(target):
+#             mxDirectionPre.append(mxDirection)
+#         else:
+#             mxDirectionPost.append(mxDirection)
 
 
 def mxNotationsToSpanners(target, mxNotations, spannerBundle):
@@ -1894,6 +1894,33 @@ def mxDirectionToSpanners(targetLast, mxDirection, spannerBundle):
         else:
             raise TranslateException('unidentified mxType of mxBracket:', mxType)
 
+    mxDashes = mxDirection.getDashes() 
+    # import mxDashes as m21 Line objects
+    if mxDashes is not None:
+        mxType = mxDashes.get('type')
+        idFound = mxDashes.get('number')
+        #environLocal.pd(['mxDirectionToSpanners', 'found mxDashes', mxType, idFound])
+        if mxType == 'start':
+            sp = spanner.Line()
+            sp.idLocal = idFound
+            sp.startTick = 'none'
+            sp.lineType = 'dashed'
+            spannerBundle.append(sp)
+            # define this spanner as needing component assignment from
+            # the next general note
+            spannerBundle.setPendingComponentAssignment(sp, 'GeneralNote')
+        elif mxType == 'stop':
+            # need to retrieve an existing spanner
+            # try to get base class of both Crescendo and Decrescendo
+            sp = spannerBundle.getByClassIdLocalComplete('Line', 
+                    idFound, False)[0] # get first
+            sp.completeStatus = True
+            sp.endTick = 'none'
+            # will only have a target if this follows the note
+            if targetLast is not None:
+                sp.addComponents(targetLast)
+        else:
+            raise TranslateException('unidentified mxType of mxBracket:', mxType)
 
 
 
@@ -4012,7 +4039,7 @@ class Test(unittest.TestCase):
         ex = s.measures(2, 3) # this needs to get all spanners too
 
         # all spanners are referenced over; even ones that may not be relevant
-        self.assertEqual(len(ex.flat.spanners), 12)
+        self.assertEqual(len(ex.flat.spanners), 13)
         #ex.show()
         
         # slurs are on measures 2, 3
@@ -5063,9 +5090,9 @@ spirit</words>
 
         s = converter.parse(testPrimitive.directions31a)
         #s.show()
-        self.assertEqual(len(s.flat.getElementsByClass('Line')), 1)
+        self.assertEqual(len(s.flat.getElementsByClass('Line')), 2)
         raw = s.musicxml # test roundtrip output
-        self.assertEqual(raw.count('<bracket'), 2)
+        self.assertEqual(raw.count('<bracket'), 4)
 
 
     def testBracketImportB(self):
@@ -5074,9 +5101,9 @@ spirit</words>
 
         s = converter.parse(testPrimitive.spanners33a)
         #s.show()
-        self.assertEqual(len(s.flat.getElementsByClass('Line')), 5)
+        self.assertEqual(len(s.flat.getElementsByClass('Line')), 6)
         raw = s.musicxml # test roundtrip output
-        self.assertEqual(raw.count('<bracket'), 10)
+        self.assertEqual(raw.count('<bracket'), 12)
 
 
     def testTrillExtensionImportA(self):
@@ -5097,6 +5124,21 @@ spirit</words>
         self.assertEqual(len(s.flat.getElementsByClass('Glissando')), 1)
         raw = s.musicxml # test roundtrip output
         self.assertEqual(raw.count('<glissando'), 2)
+
+
+    def testImportDashes(self):
+        # dashes are imported as Lines (as are brackets)
+        from music21 import converter, stream
+        from music21.musicxml import testPrimitive        
+
+        s = converter.parse(testPrimitive.spanners33a)
+        self.assertEqual(len(s.flat.getElementsByClass('Line')), 6)
+
+        #s.show()
+
+        raw = s.musicxml # test roundtrip output
+        self.assertEqual(raw.count('<bracket'), 12)
+
 
 
 #-------------------------------------------------------------------------------

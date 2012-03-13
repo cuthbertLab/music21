@@ -1254,7 +1254,7 @@ class Line(Spanner):
         self._endHeight = None # for up/down, specified in tenths
         self._startHeight = None # for up/down, specified in tenths
 
-        self._lineType = 'solid' # can be solid, dashed, dotter, wavy
+        self._lineType = 'solid' # can be solid, dashed, dotted, wavy
         self.placement = 'above' # can above or below, after musicxml
         
         if 'lineType' in keywords.keys():
@@ -1336,7 +1336,14 @@ class Line(Spanner):
             self._lineType = value.lower()
 
     lineType = property(_getLineType, _setLineType, doc='''
-        Get or set the lineType property.
+        Get or set the lineType property. Valid line types are "solid", "dashed", "dotted", or "wavy".
+
+        >>> from music21 import *
+        >>> b = spanner.Line()
+        >>> b.lineType = 'dotted'
+        >>> b.lineType = 'junk'
+        Traceback (most recent call last):
+        SpannerException: not a valid value: junk
         ''')
 
     def _getEndHeight(self):
@@ -1427,21 +1434,21 @@ class Glissando(Spanner):
         ''')
 
 
-class DashedLine(Spanner):
-    '''A dashed line represented as a spanner between two Notes. 
-    '''
-    # this is the musicxml dashes entity
-    def __init__(self, *arguments, **keywords):
-        Spanner.__init__(self, *arguments, **keywords)
-        # note: musicxml provides a color attribute 
-        self.placement = 'above' # can above or below, after musicxml
-
-    def __repr__(self):
-        msg = Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.spanner.DashedLine ')
-        return msg
-
-
+# class DashedLine(Spanner):
+#     '''A dashed line represented as a spanner between two Notes. 
+#     '''
+#     # this is the musicxml dashes entity
+#     def __init__(self, *arguments, **keywords):
+#         Spanner.__init__(self, *arguments, **keywords)
+#         # note: musicxml provides a color attribute 
+#         self.placement = 'above' # can above or below, after musicxml
+# 
+#     def __repr__(self):
+#         msg = Spanner.__repr__(self)
+#         msg = msg.replace(self._reprHead, '<music21.spanner.DashedLine ')
+#         return msg
+# 
+# 
 
 #-------------------------------------------------------------------------------
 # other ideas for spanners
@@ -2091,24 +2098,24 @@ class Test(unittest.TestCase):
         self.assertEqual(raw.count('>gliss.<'), 1)        
 
 
-    def testDashedLineA(self):
-        from music21 import stream, note, spanner, chord, dynamics
-        s = stream.Stream()
-        s.repeatAppend(note.Note(), 12)
-        for i, n in enumerate(s.notes):
-            n.transpose(i + (i%2*12), inPlace=True)
-
-        # note: musedata presently does not support these
-        n1 = s.notes[0]
-        n2 = s.notes[len(s.notes) / 2]
-        n3 = s.notes[-1]
-        sp1 = spanner.DashedLine(n1, n2)
-        sp2 = spanner.DashedLine(n2, n3)
-        s.append(sp1)
-        s.append(sp2)
-        #s.show()
-        raw = s.musicxml
-        self.assertEqual(raw.count('<dashes'), 4)
+#     def testDashedLineA(self):
+#         from music21 import stream, note, spanner, chord, dynamics
+#         s = stream.Stream()
+#         s.repeatAppend(note.Note(), 12)
+#         for i, n in enumerate(s.notes):
+#             n.transpose(i + (i%2*12), inPlace=True)
+# 
+#         # note: musedata presently does not support these
+#         n1 = s.notes[0]
+#         n2 = s.notes[len(s.notes) / 2]
+#         n3 = s.notes[-1]
+#         sp1 = spanner.DashedLine(n1, n2)
+#         sp2 = spanner.DashedLine(n2, n3)
+#         s.append(sp1)
+#         s.append(sp2)
+#         #s.show()
+#         raw = s.musicxml
+#         self.assertEqual(raw.count('<dashes'), 4)
         
 
     def testOneElementSpanners(self):
