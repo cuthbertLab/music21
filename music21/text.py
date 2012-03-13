@@ -652,8 +652,9 @@ class Trigram(object):
     style of the Trigram's text.
 
     #_DOCS_SHOW >>> reference_en.makeWords(30)
-    #_DOCS_SHOW My withillonquiver and ald, by now wittlectionsurper, may sequia, tory, I ad my notter. Marriusbabilly She lady for rachalle spen
-    hat knong al elf
+    #_DOCS_SHOW My withillonquiver and ald, by now wittlectionsurper, may sequia, tory, I ad my notter. Marriusbabilly She lady for rachalle spen hat knong al elf
+
+
     '''    
 
     def __init__(self, excerptList = None):
