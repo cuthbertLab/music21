@@ -858,8 +858,10 @@ class SpannerBundle(object):
         return self._cache[cacheKey]
 
 
-    def setIdLocalByClass(self, className):
+    def setIdLocalByClass(self, className, maxId=6):
         '''Automatically set id local values for all members of the provided class. This is necessary in cases where spanners are newly created in potentially overlapping boundaries and need to be tagged for MusicXML or other output. Note that, if some Spanners already have ids, they will be overwritten.
+
+        The `maxId` parameter sets the largest number used in id ass
 
         >>> from music21 import *
         >>> su1 = spanner.Slur()
@@ -879,7 +881,8 @@ class SpannerBundle(object):
         found = []
         # note that this over rides previous values
         for i, sp in enumerate(self.getByClass(className)):
-            sp.idLocal = i+1
+            # 6 seems to be limit in musicxml processing
+            sp.idLocal = (i % maxId) + 1
                 
 
     def setIdLocals(self):
