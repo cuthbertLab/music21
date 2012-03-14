@@ -20,7 +20,7 @@ def music():
     englishGerman = {}
     englishItalian = {}
     englishSpanish = {}
-    englishAbbreviations = {}
+    englishAbbreviation = {}
     
     table = html.iter("tr")
     for row in table:
@@ -38,9 +38,9 @@ def music():
             englishGerman[cell] = [u" ".join(s.split()) for s in allSols[2]]
             englishItalian[cell] = [u" ".join(s.split()) for s in allSols[3]]
             englishSpanish[cell] = [u" ".join(s.split()) for s in allSols[4]]
-            englishAbbreviations[cell] = [u" ".join(s.split()) for s in allSols[5]]
+            englishAbbreviation[cell] = [u" ".join(s.split()) for s in allSols[5]]
 
-    allDicts = [englishFrench, englishGerman, englishItalian, englishSpanish, englishAbbreviations]
+    allDicts = [englishFrench, englishGerman, englishItalian, englishSpanish, englishAbbreviation]
     for dict in allDicts:
         del dict[u'']
         for key in dict:
@@ -62,7 +62,7 @@ def music():
     print "\nenglishSpanish = ", 
     pprint.pprint(englishSpanish)
     print "\nenglishAbbreviations = ", 
-    pprint.pprint(englishAbbreviations)
+    pprint.pprint(englishAbbreviation)
 
 #-------------------------------------------------------------------------------
 
@@ -132,7 +132,7 @@ def dolmetsch2():
     f = open('websites/dolmetsch2.html')
     html = etree.HTML(f.read())
     
-    englishAbbreviations = {}
+    englishAbbreviation = {}
     
     table = html.iter("tr")
     for row in table:
@@ -146,9 +146,9 @@ def dolmetsch2():
             items = []
             for a in allSols[1]:
                 items.extend([x.strip() for x in a.split("(")[0].split(",")])
-            englishAbbreviations[cell] = items
+            englishAbbreviation[cell] = items
     
-    allDicts = [englishAbbreviations]
+    allDicts = [englishAbbreviation]
     for dict in allDicts:
         try:
             del dict[u'']
@@ -169,9 +169,9 @@ def dolmetsch2():
             if len(dict[key]) == 0:
                 del dict[key]
 
-    merge(tlnTables.englishAbbreviations, englishAbbreviations)
-    print "englishAbbreviations = ", 
-    pprint.pprint(englishAbbreviations)
+    merge(tlnTables.englishAbbreviation, englishAbbreviation)
+    print "englishAbbreviation = ", 
+    pprint.pprint(englishAbbreviation)
 
 #-------------------------------------------------------------------------------
 
@@ -252,7 +252,7 @@ def ukItalian():
     html = etree.HTML(f.read())
     
     englishItalian = {}
-    englishAbbreviations = {}
+    englishAbbreviation = {}
 
     table = html.iter("tr")
     for row in table:
@@ -275,10 +275,10 @@ def ukItalian():
 
         for cell in allSols[0]:
             cell = u" ".join(cell.split("(")[0].split())
-            englishAbbreviations[cell] = [u" ".join(s.split("(")[0].split()) for s in allSols[1]]
+            englishAbbreviation[cell] = [u" ".join(s.split("(")[0].split()) for s in allSols[1]]
             englishItalian[cell] = [u" ".join(s.split("(")[0].split()) for s in allSols[2]]
 
-    allDicts = [englishItalian, englishAbbreviations]
+    allDicts = [englishItalian, englishAbbreviation]
     for dict in allDicts:
         try:
             del dict[u'']
@@ -295,12 +295,12 @@ def ukItalian():
                 del dict[key]
 
     merge(tlnTables.englishItalian, englishItalian)
-    merge(tlnTables.englishAbbreviations, englishAbbreviations)
+    merge(tlnTables.englishAbbreviation, englishAbbreviation)
 
     print "englishItalian = ", 
     pprint.pprint(englishItalian)
     print "\nenglishAbbreviations = ", 
-    pprint.pprint(englishAbbreviations)
+    pprint.pprint(englishAbbreviation)
 
 #-------------------------------------------------------------------------------
 
@@ -312,7 +312,7 @@ def ukGerman():
     html = etree.HTML(f.read())
     
     englishGerman = {}
-    englishAbbreviations = {}
+    englishAbbreviation = {}
 
     table = html.iter("tr")
     for row in table:
@@ -335,10 +335,10 @@ def ukGerman():
 
         for cell in allSols[0]:
             cell = u" ".join(cell.split("(")[0].split())
-            englishAbbreviations[cell] = [u" ".join(s.split("(")[0].split()) for s in allSols[1]]
+            englishAbbreviation[cell] = [u" ".join(s.split("(")[0].split()) for s in allSols[1]]
             englishGerman[cell] = [u" ".join(s.split("(")[0].split()) for s in allSols[2]]
 
-    allDicts = [englishGerman, englishAbbreviations]
+    allDicts = [englishGerman, englishAbbreviation]
     for dict in allDicts:
         try:
             del dict[u'']
@@ -355,12 +355,12 @@ def ukGerman():
                 del dict[key]
 
     merge(tlnTables.englishGerman, englishGerman)
-    merge(tlnTables.englishAbbreviations, englishAbbreviations)
+    merge(tlnTables.englishAbbreviation, englishAbbreviation)
 
     print "englishGerman = ", 
     pprint.pprint(englishGerman)
     print "\nenglishAbbreviations = ", 
-    pprint.pprint(englishAbbreviations)
+    pprint.pprint(englishAbbreviation)
 
 #-------------------------------------------------------------------------------
 
@@ -372,7 +372,7 @@ def ukFrench():
     html = etree.HTML(f.read())
     
     englishFrench = {}
-    englishAbbreviations = {}
+    englishAbbreviation = {}
 
     table = html.iter("tr")
     for row in table:
@@ -395,10 +395,10 @@ def ukFrench():
 
         for cell in allSols[0]:
             cell = u" ".join(cell.split("(")[0].split())
-            englishAbbreviations[cell] = [u" ".join(s.split("(")[0].split()) for s in allSols[1]]
+            englishAbbreviation[cell] = [u" ".join(s.split("(")[0].split()) for s in allSols[1]]
             englishFrench[cell] = [u" ".join(s.split("(")[0].split()) for s in allSols[2]]
 
-    allDicts = [englishFrench, englishAbbreviations]
+    allDicts = [englishFrench, englishAbbreviation]
     for dict in allDicts:
         try:
             del dict[u'']
@@ -436,7 +436,9 @@ def merge(source, target):
 #-------------------------------------------------------------------------------
 
 def rewriteLookup():
-    fn = "tlnLookup.py"
+    from music21.braille import translation
+    import os
+    fn = translation.__path__[0] + os.path.sep + "tlnLookup.py"
     f = open(fn, "w")
     f.write("# -*- coding: utf-8 -*-\n")
     f.write("#-------------------------------------------------------------------------------\n")
@@ -448,6 +450,13 @@ def rewriteLookup():
     f.write("# License:      LGPL\n")
     f.write("#-------------------------------------------------------------------------------\n")
     f.write("# WARNING: Do not update file. Generated automatically.\n# Add or subtract elements from tlnTables.py instead.\n\n")
+    f.write("from music21.braille.translation import tlnTables\n\n")
+    f.write("englishFrench = tlnTables.englishFrench\n")
+    f.write("englishGerman = tlnTables.englishGerman\n")
+    f.write("englishItalian = tlnTables.englishItalian\n")
+    f.write("englishSpanish = tlnTables.englishSpanish\n")
+    f.write("englishRussian = tlnTables.englishRussian\n")
+    f.write("englishAbbreviation = tlnTables.englishAbbreviation\n\n")
     f.write("englishToAll = \\\n")
     f.write(englishToAll())
     f.write("\n\nallToEnglish = \\\n")
@@ -455,7 +464,7 @@ def rewriteLookup():
     f.close()
     
 def englishToAll():
-    allDicts = [tlnTables.englishFrench,tlnTables.englishGerman,tlnTables.englishAbbreviations,
+    allDicts = [tlnTables.englishFrench,tlnTables.englishGerman,tlnTables.englishAbbreviation,
                 tlnTables.englishItalian,tlnTables.englishSpanish, tlnTables.englishRussian]
     masterDict = {}
     
@@ -479,7 +488,7 @@ def englishToAll():
         if key not in masterDict:
             masterDict[key] = {}
         masterDict[key]["russian"] = value
-    for (key, value) in sorted(tlnTables.englishAbbreviations.items()):
+    for (key, value) in sorted(tlnTables.englishAbbreviation.items()):
         if key not in masterDict:
             masterDict[key] = {}
         masterDict[key]["abbreviation"] = value
@@ -487,7 +496,7 @@ def englishToAll():
     return pprint.pformat(masterDict)
 
 def allToEnglish():
-    allDicts = [tlnTables.englishFrench,tlnTables.englishGerman,tlnTables.englishAbbreviations,
+    allDicts = [tlnTables.englishFrench,tlnTables.englishGerman,tlnTables.englishAbbreviation,
                 tlnTables.englishItalian,tlnTables.englishSpanish, tlnTables.englishRussian]
     masterDict = {}
     
@@ -506,7 +515,7 @@ def allToEnglish():
     for (key, value) in sorted(tlnTables.englishRussian.items()):
         for trans in value:
             masterDict[trans] = key
-    for (key, value) in sorted(tlnTables.englishAbbreviations.items()):
+    for (key, value) in sorted(tlnTables.englishAbbreviation.items()):
         for trans in value:
             masterDict[trans] = key
         

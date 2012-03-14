@@ -2685,7 +2685,7 @@ englishRussian = {u'alto': [u"al't", u"kontral'to"],
  u'woodwind instrument': [u'dereviannyi dukhvoi instrument'],
  u'xylophone': [u'ksilofon']}
 
-englishAbbreviations = {u'accented': [u'sf', u'sfz'],
+englishAbbreviation = {u'accented': [u'sf', u'sfz'],
  u'accordion': [u'accdn', u'acc.'],
  u'alto': [u'a.'],
  u'alto clarinet': [u'a.cl.', u'a.kl.', u'alto cl.'],

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         lookup.py
+# Name:         /Users/Jose/Documents/music21/music21/trunk/music21/braille/translation/tlnLookup.py
 # Purpose:      Bidirectional musical translation
 # Authors:      Jose Cabal-Ugaz
 #
@@ -8,7 +8,16 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 # WARNING: Do not update file. Generated automatically.
-# Add or subtract elements from tables.py instead.
+# Add or subtract elements from tlnTables.py instead.
+
+from music21.braille.translation import tlnTables
+
+englishFrench = tlnTables.englishFrench
+englishGerman = tlnTables.englishGerman
+englishItalian = tlnTables.englishItalian
+englishSpanish = tlnTables.englishSpanish
+englishRussian = tlnTables.englishRussian
+englishAbbreviation = tlnTables.englishAbbreviation
 
 englishToAll = \
 {u'a': {'french': [u'la'],
@@ -393,7 +402,7 @@ englishToAll = \
                'spanish': [u'berimbao']},
  u'bird whistle': {'french': [u'appeau', u"sifflet d'oiseau"],
                    'german': [u'vogelpfeife'],
-                   'italian': [u'richiamo per uccelli', u'gli uccelli'],
+                   'italian': [u'richiamo per uccelli', u'gliuccelli'],
                    'spanish': [u'silbato de aves']},
  u"bird's eye": {'french': [u'pauses', u"point d'orgue"],
                  'german': [u'fermate'],
@@ -646,15 +655,15 @@ englishToAll = \
                'italian': [u'basso continuo'],
                'russian': [u'basso kontinuo', u'general-bas'],
                'spanish': [u'bajo continuo']},
+ u'contra': {'french': [u'clarinette contrebasse'],
+             'german': [u'kontrabassklarinette'],
+             'spanish': [u'clarinete contrabajo']},
  u'contra bassoon': {'abbreviation': [u'c.bn.',
                                       u'c.fag.',
                                       u'c.bssn.',
                                       u'con.bn.',
                                       u'c.bon.']},
- u'contra or double bass clarinet': {'french': [u'clarinette contrebasse'],
-                                     'german': [u'kontrabassklarinette'],
-                                     'italian': [u'clarinetto contrabbasso'],
-                                     'spanish': [u'clarinete contrabajo']},
+ u'contra or double bass clarinet': {'italian': [u'clarinetto contrabbasso']},
  u'contrabass': {'abbreviation': [u'cb.']},
  u'contrabass clarinet': {'abbreviation': [u'cb.cl', u'cb.kl.']},
  u'contrabass saxophone': {'french': [u'saxophone contrebasse'],
@@ -866,6 +875,9 @@ englishToAll = \
                   'italian': [u'contrabasso'],
                   'russian': [u'kontrabas'],
                   'spanish': [u'contrabajo', u'violon']},
+ u'double bass clarinet': {'french': [u'clarinette contrebasse'],
+                           'german': [u'kontrabassklarinette'],
+                           'spanish': [u'clarinete contrabajo']},
  u'double bass trombone': {'french': [u'trombone contrabasse'],
                            'german': [u'kontrabassposaune'],
                            'italian': [u'trombone contrabbasso'],
@@ -3324,12 +3336,12 @@ allToEnglish = \
  u'clarinete': u'clarinet',
  u'clarinete alto': u'alto clarinet',
  u'clarinete bajo': u'bass clarinet',
- u'clarinete contrabajo': u'contra or double bass clarinet',
+ u'clarinete contrabajo': u'double bass clarinet',
  u'clarinete soprano': u'soprano clarinet',
  u'clarinette': u'clarinet',
  u'clarinette alto': u'alto clarinet',
  u'clarinette basse': u'bass clarinet',
- u'clarinette contrebasse': u'contra or double bass clarinet',
+ u'clarinette contrebasse': u'double bass clarinet',
  u'clarinetto': u'clarinet',
  u'clarinetto basso': u'bass clarinet',
  u'clarinetto contrabbasso': u'contra or double bass clarinet',
@@ -3871,10 +3883,10 @@ allToEnglish = \
  u'glasharmonika': u'musical glasses',
  u'glassarmonica': u'musical glasses',
  u'glck.': u'glockenspiel',
- u'gli uccelli': u'bird whistle',
  u'gliss': u'glissando',
  u'glissando': u'glissando',
  u'glissement': u'glissando',
+ u'gliuccelli': u'bird whistle',
  u'glock.': u'glockenspiel',
  u'glocken': u'tubular bells',
  u'glockenspiel': u'orchestra bells',
@@ -4068,7 +4080,7 @@ allToEnglish = \
  u'komische oper': u'comic opera',
  u'kontrabas': u'string bass',
  u'kontrabass': u'string bass',
- u'kontrabassklarinette': u'contra or double bass clarinet',
+ u'kontrabassklarinette': u'double bass clarinet',
  u'kontrabassposaune': u'double bass trombone',
  u'kontrabasssaxophon': u'contrabass saxophone',
  u'kontrafagott': u'contrabassoon',
