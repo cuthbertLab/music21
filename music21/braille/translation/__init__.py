@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/python
 
-__all__ = ['lookup',
-           'parse']
+__all__ = ['tlnLookup',
+           'tlnParse',
+           'tlnTables']
            
-import lookup
-import parse
+import tlnLookup
+import tlnParse
+import tlnTables
 
 #------------------------------------------------------------------------------
 # eof
