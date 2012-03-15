@@ -408,6 +408,16 @@ def _lcm(a, b):
     return abs(a*b) / _gcd(a,b) 
 
 def _lcmRecurse(filter):
+    '''Given a list of values, find the LCM of all the values by iteratively looking doing an LCM comparison to the values in the list.
+
+    >>> from music21 import sieve
+    >>> sieve._lcmRecurse([2, 3])
+    6
+    >>> sieve._lcmRecurse([2, 3, 12])
+    12
+    >>> sieve._lcmRecurse([8, 10, 3])
+    120
+    '''
     # from
     # http://www.oreillynet.com/cs/user/view/cs_msg/41022
     lcmVal = 1
@@ -1049,8 +1059,14 @@ class Sieve(object):
 
 
     def _initPeriod(self):
+        '''
+        Lazy period initialization, called only when needed from public period() method.
+
+        
+        '''
         mListExp = self._resPeriodList('exp')
         mListCmp = self._resPeriodList('cmp')
+        # get lcm of expanded sieves
         lcmExp = _lcmRecurse(mListExp)
         if mListExp == mListCmp:
             self._expPeriod = lcmExp
@@ -1295,8 +1311,7 @@ class Sieve(object):
             return libKeys
 
     def _resPeriodList(self, state):
-        """the period of residual class is m; can be accessed 
-        via period() method"""
+        """For all residual classes, get the period, or the value of M, adn return these in a list. Remove any redundant values and sort. """
         mList = []
         for key in self._resKeys(state):
             p = self._resLib[key].period()
@@ -1604,13 +1619,10 @@ class Sieve(object):
         # check and see if exp has been set yet
         if self._expPeriod is None:
             self._initPeriod()
-
         if state == 'exp': 
             return self._expPeriod
-
         elif state == 'cmp': 
             return self._cmpPeriod
-
 
     def __call__(self, n=0, z=None, format=None):
         return self.segment(self._state, n, z, format)
