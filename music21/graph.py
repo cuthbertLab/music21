@@ -268,7 +268,6 @@ class Graph(object):
         else:
             self.dpi = None # do not set
 
-
         # set the color of the background data region
         if 'colorBackgroundData' in keywords:
             self.colorBackgroundData = keywords['colorBackgroundData']

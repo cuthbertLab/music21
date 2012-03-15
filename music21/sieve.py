@@ -1747,7 +1747,8 @@ class PitchSieve(object):
         if eld is not None:
             self.eld = float(eld)
         else: 
-            self.eld = 1 # default
+            self.eld = eld
+        #environLocal.pd(['PitchSieve', eld])
 
 
     def __call__(self):
@@ -1838,22 +1839,40 @@ class PitchSieve(object):
             z = range(p+1)
         else: # to big to get z as list of values
             z = None
-        integerSteps = self.sieveObject(0, z, format='int')
+
+        # get widths, then scale by eld
+        # note that the shift here might not always be zero
+        widthSegments = self.sieveObject(0, z, format='wid')
 
         post = []
-        for i, step in enumerate(integerSteps):
-            stepStart = step
-            if i < len(integerSteps)-1:
-                stepEnd = integerSteps[i+1]
-            else:
-                break
+        value = 0
+        for i, width in enumerate(widthSegments):
             #environLocal.printDebug(['stepStart', stepStart, 'stepEnd', stepEnd])
-            intervalObj = interval.Interval(stepEnd-stepStart)
+            intervalObj = interval.Interval(width*self.eld)
             post.append(intervalObj)
 
         if len(post) == 0:
             raise PitchSieveException('interval segment has no values')
         return post
+
+
+        # integer steps have no eld
+#         integerSteps = self.sieveObject(0, z, format='int')
+# 
+#         post = []
+#         for i, step in enumerate(integerSteps):
+#             stepStart = step
+#             if i < len(integerSteps)-1:
+#                 stepEnd = integerSteps[i+1]
+#             else:
+#                 break
+#             #environLocal.printDebug(['stepStart', stepStart, 'stepEnd', stepEnd])
+#             intervalObj = interval.Interval(stepEnd-stepStart)
+#             post.append(intervalObj)
+# 
+#         if len(post) == 0:
+#             raise PitchSieveException('interval segment has no values')
+#         return post
 
 
 
@@ -1945,6 +1964,28 @@ class Test(unittest.TestCase):
         self.assertEqual(str(a), '{-{13@3|13@5|13@7|13@9}&11@2}|{-{11@4|11@8}&13@9}|{13@0|13@1|13@6}')
 
 
+    def testPitchSieveA(self):
+        from music21 import sieve
+
+        s1 = sieve.PitchSieve('3@0|7@0', 'c2', 'c6')
+        self.assertEqual(str(s1()), '[C2, E-2, F#2, G2, A2, C3, D3, E-3, F#3, A3, C4, E-4, E4, F#4, A4, B4, C5, E-5, F#5, A5, C6]')
+
+        s1 = sieve.PitchSieve('3@0|7@0', 'c2', 'c6', eld=2)
+        self.assertEqual(str(s1()), '[C2, D2, F#2, C3, E3, F#3, C4, F#4, C5, F#5, G#5, C6]')
+
+    def testPitchSieveB(self):
+        from music21 import sieve
+
+        # mirotonal elds
+        s1 = sieve.PitchSieve('1@0', 'c2', 'c6', eld=.5)
+        self.assertEqual(str(s1()), '[C2, C~2, C#2, C#~2, D2, D~2, E-2, E`2, E2, E~2, F2, F~2, F#2, F#~2, G2, G~2, G#2, G#~2, A2, A~2, B-2, B`2, B2, B~2, C3, C~3, C#3, C#~3, D3, D~3, E-3, E`3, E3, E~3, F3, F~3, F#3, F#~3, G3, G~3, G#3, G#~3, A3, A~3, B-3, B`3, B3, B~3, C4, C~4, C#4, C#~4, D4, D~4, E-4, E`4, E4, E~4, F4, F~4, F#4, F#~4, G4, G~4, G#4, G#~4, A4, A~4, B-4, B`4, B4, B~4, C5, C~5, C#5, C#~5, D5, D~5, E-5, E`5, E5, E~5, F5, F~5, F#5, F#~5, G5, G~5, G#5, G#~5, A5, A~5, B-5, B`5, B5, B~5, C6]')
+
+
+        s1 = sieve.PitchSieve('3@0', 'c2', 'c6', eld=.5)
+        self.assertEqual(str(s1()), '[C2, C#~2, E-2, E~2, F#2, G~2, A2, B`2, C3, C#~3, E-3, E~3, F#3, G~3, A3, B`3, C4, C#~4, E-4, E~4, F#4, G~4, A4, B`4, C5, C#~5, E-5, E~5, F#5, G~5, A5, B`5, C6]')
+
+
+        
 
 # sieve that break LCM
 # >>> t = sieve.Sieve((3,99,123123,2433,2050))
@@ -1958,12 +1999,9 @@ _DOC_ORDER = []
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
-    import sys
+    # sys.arg test options will be used in mainTest()
+    music21.mainTest(Test)
 
-    if len(sys.argv) == 1: # normal conditions
-        music21.mainTest(Test)
-    elif len(sys.argv) > 1:
-        t = Test()
 
 
 
