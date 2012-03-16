@@ -2477,14 +2477,24 @@ class SieveScale(ConcreteScale):
     >>> sc.pitches
     [C2, D2, E2, F2, G2, A2, B2, C3]
 
+
+    OMIT_FROM_DOCS
+    
+    Test that an empty SieveScale can be created...
+    
+    >>> sc = scale.SieveScale()
     '''
     def __init__(self, tonic=None, sieveString='2@0', eld=1):
         ConcreteScale.__init__(self, tonic=tonic)
 
         # self._tonic is a Pitch
+        if self._tonic is not None:
+            tonic = self._tonic
+        else:
+            tonic = pitch.Pitch('C4')
         self._pitchSieve = sieve.PitchSieve(sieveString, 
-            pitchLower=str(self._tonic), 
-            pitchUpper=str(self._tonic.transpose(48)), eld=eld) 
+            pitchLower=str(tonic), 
+            pitchUpper=str(tonic.transpose(48)), eld=eld) 
             # four octave default
 
         #environLocal.printDebug([self._pitchSieve.sieveObject.represent(), self._pitchSieve.getIntervalSequence()])

@@ -378,7 +378,7 @@ def getComposerDir(composerName):
     '''
     match = None
     #for moduleName in MODULES:          
-    for moduleName in os.listdir(common.getCorpusFilePath()):
+    for moduleName in sorted(os.listdir(common.getCorpusFilePath())):
 
 #         if common.isListLike(moduleName):
 #             candidate = moduleName[0]         

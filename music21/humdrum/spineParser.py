@@ -25,14 +25,15 @@ music21's ability to parse humdrum.
 SpineParsing consists of several steps.
 
 * The data file is read in and all events are sliced horizontally (EventCollections) and vertically (Protospines)
-* Protospines are parsed into HumdrumSpines by following Spine Path Indicators (*^ and *v especially)
+* Protospines are parsed into HumdrumSpines by following Spine Path Indicators (:samp:`*^` and :samp:`*v` especially)
     Protospines that separate become new Protospines with their parentSpine indicated.  Protospines
     that merge again then followed by the same Protospine as before.  This will cause problems if
     a voice remerges with another staff, but in practice I have not seen a .krn file that does this and
     should be avoided in any case.
-* HumdrumSpines are reclassed according to their exclusive definition.  **kern becomes KernSpines, etc.
+* HumdrumSpines are reclassed according to their exclusive definition.  :samp:`**kern` becomes KernSpines, etc.
 * All reclassed HumdrumSpines are filled with music21 objects in their .stream property.  
-    Measures are put into the spine but are empty containers.  The resulting HumdrumSpine.stream objects
+    Measures are put into the spine but are empty containers.  The resulting 
+    HumdrumSpine.stream objects
     look like Stream.semiFlat versions in many ways.
 * For HumdrumSpines with parent spines their .stream contents are then inserted into their parent spines with
     voice tagged as a music21 Group property.
@@ -1409,9 +1410,9 @@ class SpineCollection(object):
 
     def moveDynamicsAndLyricsToStreams(self):
         '''
-        move **dynam and **lyrics/**text information to the appropriate staff.
+        move :samp:`**dynam` and :samp:`**lyrics/**text` information to the appropriate staff.
 
-        Assumes that *staff is consistent through the spine.
+        Assumes that :samp:`*staff` is consistent through the spine.
         '''
         kernStreams = {}
         for thisSpine in self.spines:
@@ -1598,7 +1599,7 @@ def hdStringToNote(contents):
     '''
     returns a music21.note.Note (or Rest or Unpitched, etc.) 
     matching the current SpineEvent.
-    Does not check to see that it is sane or part of a \*\*kern spine, etc.
+    Does not check to see that it is sane or part of a :samp:`**kern` spine, etc.
 
 
     New rhythmic extensions defined in
@@ -1912,7 +1913,7 @@ def hdStringToMeasure(contents, previousMeasure = None):
 
 def kernTandamToObject(tandam):
     '''
-    Kern uses symbols such as `\*M5/4` and `\*clefG2`, etc., to control processing
+    Kern uses symbols such as :samp:`*M5/4` and :samp:`*clefG2`, etc., to control processing
     
     This method converts them to music21 objects.
     

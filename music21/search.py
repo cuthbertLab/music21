@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         search.py
-# Purpose:      music21 classes for searching
+# Purpose:      music21 classes for searching within files
 #
 # Authors:      Michael Scott Cuthbert
 #
@@ -9,7 +9,11 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
-Methods and Classes useful in searching among repertories.
+Methods and Classes useful in searching within scores.
+
+For searching a group of scores see the search functions within
+:ref:~`moduleCorpusBase`.
+
 '''
 
 import copy
