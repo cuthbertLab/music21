@@ -341,6 +341,31 @@ def cleanupFloat(floatNum, maxDenominator=1000):
         floatNum).limit_denominator(maxDenominator)
     return float(f)
 
+
+def roundToHalfInteger(num):
+    '''Given a floating-point number, round to the nearest half-integer.  
+
+    >>> from music21 import *
+    >>> common.roundToHalfInteger(1.2)
+    1
+    >>> common.roundToHalfInteger(1.35)
+    1.5
+    >>> common.roundToHalfInteger(1.8)
+    2
+    >>> common.roundToHalfInteger(1.6234)
+    1.5
+    '''
+    intVal, floatVal = divmod(num, 1.0)
+    intVal = int(intVal)
+    if floatVal < .25:
+        floatVal = 0
+    elif floatVal >= .25 and floatVal < .75 :
+        floatVal = .5
+    else:
+        floatVal = 1
+    return intVal + floatVal
+
+
 def almostEquals(x, y = 0.0, grain=1e-7):
     '''
     The following four routines work for comparisons between floats that are normally inconsistent.

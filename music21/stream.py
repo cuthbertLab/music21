@@ -8144,6 +8144,16 @@ class Stream(music21.Music21Object):
             self._cache['hasPartLikeStreams'] = multiPart
         return self._cache['hasPartLikeStreams']
 
+
+    def isTwelveTone(self):
+        '''Return true if this Stream only employs twelve-tone equal-tempered pitch values. 
+        '''
+        for p in self.pitches:
+            if not p.isTwelveTone():
+                return False
+        return True
+
+
     #---------------------------------------------------------------------------
     def _getLily(self):
         '''Returns the stream translated into Lilypond format.'''
@@ -8491,8 +8501,6 @@ class Stream(music21.Music21Object):
         >>> m.append(c)
         >>> m.pitches
         [F#4, C4, E4, G4]
-        
-        
         
         ''')
 

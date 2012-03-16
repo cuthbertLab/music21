@@ -1875,6 +1875,25 @@ class PlotStream(object):
         ticks = self._filterPitchLabel(ticks)
         return ticks
 
+    def ticksPitchSpaceQuartertone(self, pitchMin=36, pitchMax=100):
+        '''Utility method to get ticks in pitch space values.
+        '''
+        ticks = []
+        cVals = []
+        for i in range(pitchMin, pitchMax+1):
+            cVals.append(i)
+            if i != pitchMax: # if not last
+                cVals.append(i+.5)        
+        for i in cVals:
+            name, acc, micro, octShift = pitch.convertPsToStep(i)
+            # might check for quarter tones and remove
+            oct = pitch.convertPsToOct(i)
+            # should be able to just use nameWithOctave
+            ticks.append([i, '%s%s%s' % (name, acc.modifier, oct)])
+        ticks = self._filterPitchLabel(ticks)
+        environLocal.pd(['ticksPitchSpaceQuartertone', ticks])
+        return ticks
+
     def ticksPitchSpaceUsage(self, pcMin=36, pcMax=72,
             showEnharmonic=False, blankLabelUnused=True, hideUnused=False):
         '''Get ticks and labels for pitch space based on usage. That is, show the most commonly used enharmonic first.
@@ -1901,7 +1920,7 @@ class PlotStream(object):
         nameWithOctaveCount = self.streamObj.pitchAttributeCount(
                              'nameWithOctave')
         ticks = []
-        for i in range(int(pcMin), int(pcMax+1)):
+        for i in range(int(math.floor(pcMin)), int(math.ceil(pcMax+1))):
             p = pitch.Pitch()
             p.ps = i # set pitch space value
             weights = [] # a list of pairs of count/label
@@ -1917,7 +1936,6 @@ class PlotStream(object):
                     label.append(p.nameWithOctave)
                 else: # provide an empty label
                     label.append('')
-
             elif not showEnharmonic: # get just the first weighted
                 label.append(weights[0][1]) # second value is label
             else:      
@@ -1928,6 +1946,51 @@ class PlotStream(object):
             ticks.append([i, ''.join(label)])
         ticks = self._filterPitchLabel(ticks)
         return ticks
+
+
+    def ticksPitchSpaceQuartertoneUsage(self, pcMin=36, pcMax=72,
+            showEnharmonic=False, blankLabelUnused=True, hideUnused=False):
+        '''Get ticks and labels for pitch space based on usage. That is, show the most commonly used enharmonic first.
+        '''
+        # keys are integers
+        pcCount = self.streamObj.pitchAttributeCount('pitchClass')
+        # name strings are keys, and enharmonic are thus different
+        nameWithOctaveCount = self.streamObj.pitchAttributeCount(
+                             'nameWithOctave')
+        vals = []
+        for i in range(int(math.floor(pcMin)), int(math.ceil(pcMax+1))):
+            vals.append(i)
+            vals.append(i+.5)
+        vals = vals[:-1]
+
+        ticks = []
+        for i in vals:
+            p = pitch.Pitch()
+            p.ps = i # set pitch space value
+            weights = [] # a list of pairs of count/label
+            for key in nameWithOctaveCount.keys():
+                if pitch.convertNameToPs(key) == i:
+                    weights.append((nameWithOctaveCount[key], key))
+            weights.sort()
+            label = []
+            if len(weights) == 0: # get a default
+                if hideUnused:
+                    continue
+                if not blankLabelUnused:
+                    label.append(p.nameWithOctave)
+                else: # provide an empty label
+                    label.append('')
+            elif not showEnharmonic: # get just the first weighted
+                label.append(weights[0][1]) # second value is label
+            else:      
+                sub = []
+                for w, name in weights:
+                    sub.append(name)
+                label.append('/'.join(sub))
+            ticks.append([i, ''.join(label)])
+        ticks = self._filterPitchLabel(ticks)
+        return ticks
+
 
 
 
@@ -2893,7 +2956,6 @@ class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
 
 class PlotHorizontalBar(PlotStream):
     '''A graph of events, sorted by pitch, over time
-
     '''
     format = 'horizontalbar'
     def __init__(self, streamObj, *args, **keywords):
@@ -2907,12 +2969,10 @@ class PlotHorizontalBar(PlotStream):
         dataUnique = {}
         xValues = []
         # collect data
-
         if self.flatten:
             sSrc = self.streamObj.flat
         else:
             sSrc = self.streamObj
-
         for obj in sSrc.getElementsByClass((note.Note, chord.Chord)):
             classes = obj.classes       
             if 'Chord' in classes:
@@ -2920,9 +2980,10 @@ class PlotHorizontalBar(PlotStream):
                 valueObjPairs = [(v, obj) for v in values]
             else: # its a Note
                 valueObjPairs = [(self.fy(obj), obj)]
-
             for v, objSub in valueObjPairs:
-                numericValue = int(v)
+                # rounding to nearest quarter tone
+                numericValue = common.roundToHalfInteger(v) #int(v)
+
                 if numericValue not in dataUnique.keys():
                     dataUnique[numericValue] = []
                 # all work with offset
@@ -2932,22 +2993,18 @@ class PlotHorizontalBar(PlotStream):
                 xValues.append(start)
                 xValues.append(end)
                 dataUnique[numericValue].append((start, end))
-
         # create final data list
         # get labels from ticks
         data = []
-
         # y ticks are auto-generated in lower-level routines
         # this is used just for creating labels
         yTicks = self.fyTicks(min(dataUnique.keys()),
                                        max(dataUnique.keys()))
-
         for numericValue, label in yTicks:
             if numericValue in dataUnique.keys():
                 data.append([label, dataUnique[numericValue]])
             else:
                 data.append([label, []])
-
         # use default args for now
         xTicks = self.fxTicks()
         # yTicks are returned, even though they are not used after this method
@@ -2993,10 +3050,8 @@ class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
             self.graph.setFigureSize([10,4])
-
         if 'title' not in keywords:
             self.graph.setTitle('Note Quarter Length and Offset by Pitch Class')
-
 
 
 class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
@@ -3018,8 +3073,12 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
         PlotHorizontalBar.__init__(self, streamObj, *args, **keywords)
        
         self.fy = lambda n:n.ps
-        self.fyTicks = self.ticksPitchSpaceUsage
         self.fxTicks = self.ticksOffset
+
+        if self.streamObj.isTwelveTone():
+            self.fyTicks = self.ticksPitchSpaceUsage
+        else:
+            self.fyTicks = self.ticksPitchSpaceQuartertoneUsage
 
         self.data, xTicks, yTicks = self._extractData()
 
@@ -3038,7 +3097,6 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
             self.graph.setFigureSize([10,6])
-
         if 'title' not in keywords:
             self.graph.setTitle('Note Quarter Length by Pitch')
 
