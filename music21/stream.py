@@ -4799,7 +4799,7 @@ class Stream(music21.Music21Object):
     ''')
 
     def makeMeasures(self, meterStream=None, refStreamOrTimeRange=None,
-        searchContext=False, innerBarline=None, finalBarline='final', inPlace=False):
+        searchContext=False, innerBarline=None, finalBarline='final', bestClef=False, inPlace=False):
         '''
         Takes a stream and places all of its elements into 
         measures (:class:`~music21.stream.Measure` objects) 
@@ -5168,6 +5168,8 @@ class Stream(music21.Music21Object):
             else:
                 if finalBarline not in ['regular', None]:
                     m.rightBarline = finalBarline
+            if bestClef:
+                m.clef = m.bestClef() # may need flat for voices
 
         if not inPlace:
             return post # returns a new stream populated w/ new measure streams
@@ -5782,7 +5784,7 @@ class Stream(music21.Music21Object):
         return False
 
     def makeNotation(self, meterStream=None, refStreamOrTimeRange=None,
-                        inPlace=False, **subroutineKeywords):
+                        inPlace=False, bestClef=False, **subroutineKeywords):
         '''
         This method calls a sequence of Stream methods on this Stream to prepare notation, including creating voices for overlapped regions, Measures if necessary, creating ties, beams, and accidentals.
 
@@ -5825,7 +5827,7 @@ class Stream(music21.Music21Object):
             # use inPlace=True, as already established above
             returnStream.makeMeasures(meterStream=meterStream,
                 refStreamOrTimeRange=refStreamOrTimeRange, 
-                inPlace=True)#, finalBarline = lastBarlineType)          
+                inPlace=True, bestClef=bestClef)
 
         measureStream = returnStream.getElementsByClass('Measure')
         #environLocal.printDebug(['Stream.makeNotation(): post makeMeasures, length', len(returnStream)])

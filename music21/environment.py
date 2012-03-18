@@ -380,6 +380,7 @@ class Environment(object):
         if key == 'localCorpusPath':
             # only add if unique
             if value not in self.ref['localCorpusSettings']:
+                # check for malicious values here
                 self.ref['localCorpusSettings'].append(value)
         else:
             self.ref[key] = value
