@@ -3105,7 +3105,9 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
 
 #-------------------------------------------------------------------------------
 class PlotHorizontalBarWeighted(PlotStream):
-    '''A base class for plots of Scores with weighted (by height) horizontal bars.
+    '''A base class for plots of Scores with weighted (by height) horizontal bars. Many different weighted segments can provide a representation of a dynamic parameter of a Part.
+
+
     '''
     format = 'horizontalbarweighted'
     def __init__(self, streamObj, *args, **keywords):
@@ -3116,10 +3118,12 @@ class PlotHorizontalBarWeighted(PlotStream):
         self.fillByMeasure = True
         if 'fillByMeasure' in keywords:
             self.fillByMeasure = keywords['fillByMeasure']
-
         self.segmentByTarget = False
         if 'segmentByTarget' in keywords:
             self.segmentByTarget = keywords['segmentByTarget']
+        self.normalizeByPart = False
+        if 'normalizeByPart' in keywords:
+            self.normalizeByPart = keywords['normalizeByPart']
 
         self.partGroups = None
         if 'partGroups' in keywords:
@@ -3136,7 +3140,8 @@ class PlotHorizontalBarWeighted(PlotStream):
         # parameters: x, span, heightScalar, color, alpha, yShift
         pr = reduction.PartReduction(self.streamObj, partGroups=self.partGroups, 
                 fillByMeasure=self.fillByMeasure, 
-                segmentByTarget=self.segmentByTarget)
+                segmentByTarget=self.segmentByTarget, 
+                normalizeByPart=self.normalizeByPart)
         pr.process()
         data = pr.getGraphHorizontalBarWeightedData()
 
