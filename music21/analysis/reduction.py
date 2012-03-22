@@ -396,6 +396,8 @@ class PartReduction(object):
 
     If the `normalizeByPart` parameter is True, each part will be normalized within the range only of that part. If False, all parts will be normalized by the max of all parts. The default is True. 
 
+    If the `normalize` parameter is False, no normalization will take place. The default is True. 
+
     '''
     def __init__(self, srcScore=None, *args, **keywords):
         if 'Score' not in srcScore.classes:
@@ -426,11 +428,15 @@ class PartReduction(object):
         if 'normalizeByPart' in keywords:
             self._normalizeByPart = keywords['normalizeByPart']
 
+        self._normalizeToggle = True
+        if 'normalize' in keywords:
+            self._normalizeToggle = keywords['normalize']
+
         # check that there are measures
         for p in self._score.parts:
             if not p.hasMeasures():
                 self._fillByMeasure = False         
-                environLocal.pd(['overrdding fillByMeasure as no measures are defined'])
+                #environLocal.pd(['overrdding fillByMeasure as no measures are defined'])
                 break
 
     def _createPartBundles(self):
@@ -490,7 +496,8 @@ class PartReduction(object):
             eEnd = None
             eLast = None
 
-            # marking events only if a measure is filled
+            # segmenting by measure if that measure contains notes
+            # note that measures are not elided of activity is contiguous
             if self._fillByMeasure:    
                 partMeasures = []
                 for p in parts:
@@ -502,30 +509,43 @@ class PartReduction(object):
                 for i in range(len(partMeasures[0])):
                     active = False
                     # check for activity in any part in the part group
-                    for p in partMeasures:
-                        #print i, p[i], len(p[i].flat.notes)
+                    for p in partMeasures: # iter of parts containing measures
+                        #print p, i, p[i], len(p[i].flat.notes)
                         if len(p[i].flat.notes) > 0:
                             active = True
                             break
-                    if eStart is None and active:
-                        eStart = partMeasures[0][i].getOffsetBySite(
-                                 partMeasures[0])
-                    elif (eStart is not None and not active) or i >= iLast:
-                        if eStart is None: # nothing to do; just the last
-                            continue
-                        # if this is the last measure and it is active
-                        if (i >= iLast and active):
-                            eLast = partMeasures[0][i]                            
-                        # use duration, not barDuration.quarterLength
-                        # as want filled duration?
-                        eEnd = (eLast.getOffsetBySite(
-                                partMeasures[0]) + 
-                                eLast.barDuration.quarterLength)
-                        ds = {'eStart':eStart, 'span':eEnd-eStart, 
-                              'weight':None, 'color':pColor}
-                        dataEvents.append(ds)
-                        eStart = None
-                    eLast = partMeasures[0][i]
+                    #environLocal.pd([i, 'active', active])
+                    if not active:
+                        continue    
+                    # get offset, or start, of this measure
+                    e = partMeasures[0][i]                            
+                    eStart = e.getOffsetBySite(partMeasures[0])
+                    # use duration, not barDuration.quarterLength
+                    # as want filled duration?        
+                    eEnd = (eStart + e.barDuration.quarterLength)
+                    ds = {'eStart':eStart, 'span':eEnd-eStart, 
+                          'weight':None, 'color':pColor}
+                    dataEvents.append(ds)
+
+#                     if eStart is None and active:
+#                         eStart = partMeasures[0][i].getOffsetBySite(
+#                                  partMeasures[0])
+#                     elif (eStart is not None and not active) or i >= iLast:
+#                         if eStart is None: # nothing to do; just the last
+#                             continue
+#                         # if this is the last measure and it is active
+#                         if (i >= iLast and active):
+#                             eLast = partMeasures[0][i]                            
+#                         # use duration, not barDuration.quarterLength
+#                         # as want filled duration?
+#                         eEnd = (eLast.getOffsetBySite(
+#                                 partMeasures[0]) + 
+#                                 eLast.barDuration.quarterLength)
+#                         ds = {'eStart':eStart, 'span':eEnd-eStart, 
+#                               'weight':None, 'color':pColor}
+#                         dataEvents.append(ds)
+#                         eStart = None
+#                    eLast = partMeasures[0][i]
 
             # fill by alternative approach, based on activity of notes  
             # creates region for each contiguous span of notes
@@ -575,7 +595,7 @@ class PartReduction(object):
 
         If `splitSpans` is True, a span will be split of the target changes over the span. Otherwise, Spans will be averaged. This is the `segmentByTarget` parameter. 
 
-        The `targetToWeight` parameter is a function that takes a list or Stream of objects and returns a single floating-point value.
+        The `targetToWeight` parameter is a function that takes a list or Stream of objects (of the class specified by `target`) and returns a single floating-point value.
         ''' 
         # this temporary function only works with dynamics
         def _dynamicToWeight(targets):
@@ -593,7 +613,7 @@ class PartReduction(object):
         if targetToWeight is None:
             targetToWeight = _dynamicToWeight
 
-        if not splitSpans:          
+        if not splitSpans: # this is segmentByTarget
             for partBundle in self._partBundles:
                 flatRef = partBundle['parts.flat']
                 for ds in self._eventSpans[partBundle['pGroupId']]:
@@ -603,7 +623,10 @@ class PartReduction(object):
                     match = flatRef.getElementsByOffset(offsetStart, offsetEnd,
                         includeEndBoundary=False, mustFinishInSpan=False, 
                         mustBeginInSpan=True).getElementsByClass(target)
-                    w = targetToWeight(match)
+                    if len(match) == 0:
+                        w = None
+                    else:
+                        w = targetToWeight(match)
                     #environLocal.pd(['segment weight', w])
                     ds['weight'] = w
         else:
@@ -619,6 +642,7 @@ class PartReduction(object):
                     match = flatRef.getElementsByOffset(offsetStart, offsetEnd,
                         includeEndBoundary=True, mustFinishInSpan=False, 
                         mustBeginInSpan=True).getElementsByClass(target)
+                    #environLocal.pd(['matched elements', target, match])
                     # extend duration of all found dynamics
                     match.extendDuration(target, inPlace=True)
                     #match.show('t')
@@ -673,6 +697,7 @@ class PartReduction(object):
     def _extendSpans(self):
         '''Extend a the value of a target parameter to the next boundary. An undefined boundary will wave as its weight None. 
         ''' 
+#         environLocal.pd(['_extendSpans: pre'])    
 #         for partBundle in self._partBundles:
 #             for i, ds in enumerate(self._eventSpans[partBundle['pGroupId']]):
 #                 print ds
@@ -696,7 +721,7 @@ class PartReduction(object):
                     elif ds['weight'] is None and lastWeight is None: 
                         ds['weight'] = minValue
                         #environLocal.pd(['cannnot extend a weight: no previous weight defined'])
-    
+#         environLocal.pd(['_extendSpans: post'])    
 #         for partBundle in self._partBundles:
 #             for i, ds in enumerate(self._eventSpans[partBundle['pGroupId']]):
 #                 print ds
@@ -733,7 +758,8 @@ class PartReduction(object):
         self._createEventSpans()
         self._getValueForSpan(splitSpans=self._segmentByTarget)
         self._extendSpans()
-        self._normalize(byPart=self._normalizeByPart)
+        if self._normalizeToggle:
+            self._normalize(byPart=self._normalizeByPart)
 
 
 
@@ -920,7 +946,6 @@ class Test(unittest.TestCase):
             {'name':'Low Voices', 'color':'#8800ff', 
                 'match':['tenor', 'bass']}
                     ]
-
         pr = analysis.reduction.PartReduction(s, partGroups=partGroups)
         pr.process()
         for sub in pr._partGroups:
@@ -965,11 +990,10 @@ class Test(unittest.TestCase):
             pCount += 1
         #s.show()
 
-        pr = analysis.reduction.PartReduction(s)
+        pr = analysis.reduction.PartReduction(s, normalize=False)
         pr.process()
         match = pr.getGraphHorizontalBarWeightedData()
-        #print match
-        target = [(0, [[0.0, 1.0, 0.6470588235294119, '#666666'], [1.0, 3.0, 0.8235294117647058, '#666666'], [4.0, 2.0, 0.35294117647058826, '#666666'], [6.0, 4.0, 1.0, '#666666'], [10.0, 2.0, 0.6470588235294119, '#666666']]), (1, [[0.0, 1.0, 0.6470588235294119, '#666666'], [1.0, 3.0, 0.8235294117647058, '#666666'], [4.0, 2.0, 0.35294117647058826, '#666666'], [6.0, 4.0, 1.0, '#666666'], [10.0, 2.0, 0.6470588235294119, '#666666']])]
+        target = [(0, [[0.0, 1.0, 0.07857142857142858, '#666666'], [1.0, 3.0, 0.09999999999999999, '#666666'], [4.0, 2.0, 0.04285714285714286, '#666666'], [6.0, 4.0, 0.12142857142857143, '#666666'], [10.0, 2.0, 0.07857142857142858, '#666666']]), (1, [[0.0, 1.0, 0.07857142857142858, '#666666'], [1.0, 3.0, 0.09999999999999999, '#666666'], [4.0, 2.0, 0.04285714285714286, '#666666'], [6.0, 4.0, 0.12142857142857143, '#666666'], [10.0, 2.0, 0.07857142857142858, '#666666']])]
 
         self._matchWeightedData(match, target)
         #p = graph.PlotDolan(s, title='Dynamics')
@@ -996,18 +1020,13 @@ class Test(unittest.TestCase):
         s.insert(0, p1)
         s.insert(0, p2)
         #s.show()
-        pr = analysis.reduction.PartReduction(s)
+        pr = analysis.reduction.PartReduction(s, normalize=False)
         pr.process()
         match = pr.getGraphHorizontalBarWeightedData()
 
-        #p = graph.PlotDolan(s, title='Dynamics')
-        #p.process()
-
-        #print match
-        target = [(0, [[0.0, 2.0, 0.3333333333333333, '#666666'], [2.0, 4.0, 1.0, '#666666'], [6.0, 2.0, 0.1111111111111111, '#666666']]), (1, [[0.0, 1.0, 0.3333333333333333, '#666666'], [1.0, 1.0, 1.0, '#666666'], [2.0, 6.0, 0.1111111111111111, '#666666']])]
+        target = [(0, [[0.0, 2.0, 0.04285714285714286, '#666666'], [2.0, 4.0, 0.1285714285714286, '#666666'], [6.0, 2.0, 0.014285714285714287, '#666666']]), (1, [[0.0, 1.0, 0.04285714285714286, '#666666'], [1.0, 1.0, 0.1285714285714286, '#666666'], [2.0, 6.0, 0.014285714285714287, '#666666']])]
 
         self._matchWeightedData(match, target)
-
 
 
     def testPartReductionD(self):
@@ -1074,10 +1093,19 @@ class Test(unittest.TestCase):
         #s.show()
 
         pr = analysis.reduction.PartReduction(s, fillByMeasure=True,
-                    segmentByTarget=False)
+                    segmentByTarget=False, normalize=False)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
-        match = [(0, [[0.0, 12.0, 0.7222222222222222, '#666666']]), (1, [[0.0, 12.0, 1.0, '#666666']])]
+        match = [(0, [[0.0, 4.0, 0.17142857142857143, '#666666'], [4.0, 4.0, 0.014285714285714287, '#666666'], [8.0, 4.0, 0.014285714285714287, '#666666']]), (1, [[0.0, 4.0, 0.17857142857142858, '#666666'], [4.0, 4.0, 0.07857142857142858, '#666666'], [8.0, 4.0, 0.07857142857142858, '#666666']])]
+
+        self._matchWeightedData(match, target)
+
+        pr = analysis.reduction.PartReduction(s, fillByMeasure=False,
+                    segmentByTarget=True, normalize=False)
+        pr.process()
+        target = pr.getGraphHorizontalBarWeightedData()
+        #print target
+        match = [(0, [[0.0, 2.0, 0.04285714285714286, '#666666'], [2.0, 2.0, 0.1285714285714286, '#666666'], [6.0, 2.0, 0.014285714285714287, '#666666'], [10.0, 2.0, 0.014285714285714287, '#666666']]), (1, [[0.0, 2.0, 0.07857142857142858, '#666666'], [2.0, 2.0, 0.09999999999999999, '#666666'], [6.0, 2.0, 0.07857142857142858, '#666666'], [10.0, 2.0, 0.07857142857142858, '#666666']])]
         self._matchWeightedData(match, target)
 
 
@@ -1085,13 +1113,22 @@ class Test(unittest.TestCase):
                     segmentByTarget=False)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
-        match = [(0, [[0.0, 4.0, 0.96, '#666666'], [6.0, 2.0, 0.08, '#666666'], [10.0, 2.0, 0.0, '#666666']]), (1, [[0.0, 4.0, 1.0, '#666666'], [6.0, 2.0, 0.44000000000000006, '#666666'], [10.0, 2.0, 0.0, '#666666']])]
+        #print target
+        match = [(0, [[0.0, 4.0, 0.96, '#666666'], [6.0, 2.0, 0.08, '#666666'], [10.0, 2.0, 0.08, '#666666']]), (1, [[0.0, 4.0, 1.0, '#666666'], [6.0, 2.0, 0.44000000000000006, '#666666'], [10.0, 2.0, 0.44000000000000006, '#666666']])]
         self._matchWeightedData(match, target)
 
 
-        #p = graph.PlotDolan(s, title='Dynamics', fillByMeasure=False,
-        #                    segmentByTarget=False, normalizeByPart=False)
-        #p.process()
+        pr = analysis.reduction.PartReduction(s, fillByMeasure=True,
+                    segmentByTarget=True)
+        pr.process()
+        target = pr.getGraphHorizontalBarWeightedData()
+        match = [(0, [[0.0, 2.0, 0.3333333333333333, '#666666'], [2.0, 2.0, 1.0, '#666666'], [6.0, 2.0, 0.1111111111111111, '#666666'], [8.0, 4.0, 0.1111111111111111, '#666666']]), (1, [[0.0, 2.0, 0.6111111111111112, '#666666'], [2.0, 2.0, 0.7777777777777776, '#666666'], [6.0, 2.0, 0.6111111111111112, '#666666'], [8.0, 4.0, 0.6111111111111112, '#666666']])]
+        self._matchWeightedData(match, target)
+
+
+#         p = graph.PlotDolan(s, title='Dynamics', fillByMeasure=False,
+#                             segmentByTarget=True, normalizeByPart=False)
+#         p.process()
 
 
 #-------------------------------------------------------------------------------
