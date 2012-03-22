@@ -1296,7 +1296,7 @@ class Metadata(music21.Music21Object):
         self._workIds['title'] = Text(value)
 
     title = property(_getTitle, _setTitle, 
-        doc = '''Get the title of the work, or the next matched title string available from related parameter fields. 
+        doc = '''Get the title of the work, or the next-matched title string available from a related parameter fields. 
 
         >>> from music21 import *
         >>> md = metadata.Metadata(title='Third Symphony')

@@ -397,12 +397,6 @@ class PartReduction(object):
     If the `normalizeByPart` parameter is True, each part will be normalized within the range only of that part. If False, all parts will be normalized by the max of all parts. The default is True. 
 
     '''
-
-    # basic strategy:
-    # combine parts as dictated
-    # segment into bins based on time relation
-    # for each bin, determine parameter; may need to divide into smaller bins
-
     def __init__(self, srcScore=None, *args, **keywords):
         if 'Score' not in srcScore.classes:
             raise PartReductionException('provided Stream must be Score')
@@ -454,11 +448,12 @@ class PartReduction(object):
                         matches = [name]
                     for m in matches: # strings or instruments
                         if common.isStr(m):
-                            if p.id.lower().find(m.lower()) >= 0:
+                            if str(p.id).lower().find(m.lower()) >= 0:
                                 sub.append(p)
                                 break
                         # TODO: match if m is Instrument class
-
+                if sub == []:
+                    continue
                 data = {'pGroupId':name, 'color':pColor, 'parts':sub}
                 self._partBundles.append(data)
         else: # manually creates    
@@ -500,6 +495,7 @@ class PartReduction(object):
                 partMeasures = []
                 for p in parts:
                     partMeasures.append(p.getElementsByClass('Measure'))
+                #environLocal.pd(['partMeasures', partMeasures])
                 # assuming that all parts have same number of measures
                 # iterate over each measures
                 iLast = len(partMeasures[0]) - 1
@@ -688,7 +684,7 @@ class PartReduction(object):
                 if i == 0: # cannot extend first
                     if ds['weight'] is None: # this is an error in the rep
                         ds['weight'] = minValue
-                        environLocal.pd(['cannnot extend a weight: no previous weight defined'])
+                        #environLocal.pd(['cannnot extend a weight: no previous weight defined'])
                     else:
                         lastWeight = ds['weight']
                 else: # not first
@@ -699,7 +695,7 @@ class PartReduction(object):
                     # do not have a list; mist set to min
                     elif ds['weight'] is None and lastWeight is None: 
                         ds['weight'] = minValue
-                        environLocal.pd(['cannnot extend a weight: no previous weight defined'])
+                        #environLocal.pd(['cannnot extend a weight: no previous weight defined'])
     
 #         for partBundle in self._partBundles:
 #             for i, ds in enumerate(self._eventSpans[partBundle['pGroupId']]):
@@ -1093,8 +1089,8 @@ class Test(unittest.TestCase):
         self._matchWeightedData(match, target)
 
 
-        p = graph.PlotDolan(s, title='Dynamics', fillByMeasure=True,
-                            segmentByTarget=True)
+        #p = graph.PlotDolan(s, title='Dynamics', fillByMeasure=False,
+        #                    segmentByTarget=False, normalizeByPart=False)
         #p.process()
 
 

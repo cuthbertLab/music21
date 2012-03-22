@@ -391,14 +391,14 @@ class Graph(object):
             #environLocal.printDebug(['got labels', labels])
             self.axis[axisKey]['ticks'] = positions, labels
 
-    def setAxisRange(self, axisKey, valueRange, pad=False):
+    def setAxisRange(self, axisKey, valueRange, pad=.1):
         if axisKey not in self.axisKeys:
             raise GraphException('No such axis exists: %s' % axisKey)
         # find a shift
         if pad != False:
             range = valueRange[1] - valueRange[0]
-            if pad == True: # use a default
-                shift = range * .1 # add 10 percent of range
+            if pad is not False: # use a default
+                shift = range * pad # add 10 percent of range
             else:
                 shift = pad # alternatively, provide a value directly
         else:
@@ -986,8 +986,8 @@ class GraphHorizontalBarWeighted(Graph):
         self.axisKeys = ['x', 'y']
         self._axisInit()
 
-        self._barSpace = 8
-        self._margin = 2
+        self._barSpace = 8 
+        self._margin = .25 # was 8; determines space between channels
         # this is a maximum value
         self._barHeight = self._barSpace - (self._margin * 2)
 
@@ -996,7 +996,7 @@ class GraphHorizontalBarWeighted(Graph):
             self.setFigureSize([10,4])
         # this default alpha is used if not specified per bar
         if 'alpha' not in keywords:
-            self.alpha = .9
+            self.alpha = 1
 
 # example data
 #         data =  [
@@ -1083,28 +1083,27 @@ class GraphHorizontalBarWeighted(Graph):
         xRange = xMax - xMin
         #environLocal.printDebug(['got xMin, xMax for points', xMin, xMax, ])
 
-        self.setAxisRange('y', (0, len(keys) * self._barSpace))
-        self.setAxisRange('x', (xMin, xMax), pad=True)
+        # NOTE: these pad values determine extra space inside the graph that
+        # is not filled with data, a sort of inner margin
+        self.setAxisRange('y', (0, len(keys) * self._barSpace), pad=.05)
+        self.setAxisRange('x', (xMin, xMax), pad=.01)
         self.setTicks('y', yTicks)  
 
         # first, see if ticks have been set externally
-        if 'ticks' in self.axis['x'].keys() and len(self.axis['x']['ticks']) == 0:
-            rangeStep = int(xMin+int(round(xRange/10)))
-            if rangeStep == 0:
-                rangeStep = 1
-            for x in range(int(math.floor(xMin)), 
-                           int(round(math.ceil(xMax))), 
-                           rangeStep):
-                xTicks.append([x, '%s' % x])
-            self.setTicks('x', xTicks)  
+#         if 'ticks' in self.axis['x'].keys() and len(self.axis['x']['ticks']) == 0:
+#             rangeStep = int(xMin+int(round(xRange/10)))
+#             if rangeStep == 0:
+#                 rangeStep = 1
+#             for x in range(int(math.floor(xMin)), 
+#                            int(round(math.ceil(xMax))), 
+#                            rangeStep):
+#                 xTicks.append([x, '%s' % x])
+#                 self.setTicks('x', xTicks)  
+#         environLocal.pd(['xTicks', xTicks])
 
-        #environLocal.printDebug([yTicks])
         self._adjustAxisSpines(ax)
         self._applyFormatting(ax)
         self.done()
-
-
-
 
 
 
@@ -2005,11 +2004,11 @@ class PlotStream(object):
         >>> s = corpus.parse('bach/bwv281.xml')
         >>> a = PlotStream(s)
         >>> a.ticksOffset() # on whole score, showing anacrusis spacing
-        [[1.0, '1'], [5.0, '2'], [9.0, '3'], [13.0, '4'], [17.0, '5'], [21.0, '6'], [25.0, '7'], [29.0, '8']]
+        [[0.0, '0'], [1.0, '1'], [5.0, '2'], [9.0, '3'], [13.0, '4'], [17.0, '5'], [21.0, '6'], [25.0, '7'], [29.0, '8']]
 
         >>> a = PlotStream(s.parts[0].flat) # on a Part
         >>> a.ticksOffset() # on whole score, showing anacrusis spacing
-        [[1.0, '1'], [5.0, '2'], [9.0, '3'], [13.0, '4'], [17.0, '5'], [21.0, '6'], [25.0, '7'], [29.0, '8']]
+        [[0.0, '0'], [1.0, '1'], [5.0, '2'], [9.0, '3'], [13.0, '4'], [17.0, '5'], [21.0, '6'], [25.0, '7'], [29.0, '8']]
         >>> a.ticksOffset(8, 12, 2)
         [[9.0, '3']]
 
@@ -2054,12 +2053,10 @@ class PlotStream(object):
             offsetMap = self.streamObj.measureOffsetMap([stream.Measure])
         else:
             offsetMap = self.streamObj.measureOffsetMap([note.Note])
-
         if len(offsetMap.keys()) > 0:
             self._axisLabelUsesMeasures = True
         else:
             self._axisLabelUsesMeasures = False
-
         #environLocal.printDebug(['ticksOffset: got offset map keys', offsetMap.keys(), self._axisLabelUsesMeasures])
 
         ticks = [] # a list of graphed value, string label pairs
@@ -2070,8 +2067,8 @@ class PlotStream(object):
             sortedKeys = sorted(offsetMap.keys())
             for key in sortedKeys:
                 if key >= offsetMin and key <= offsetMax:
-                    if key == 0.0 and not displayMeasureNumberZero:
-                        continue # skip
+#                     if key == 0.0 and not displayMeasureNumberZero:
+#                         continue # skip
                     #if key == sorted(offsetMap.keys())[-1]:
                     #    continue # skip last
                     # assume we can get the first Measure in the lost if
@@ -2085,18 +2082,19 @@ class PlotStream(object):
                     offset = mNoToUse[i]
                     mNumber = offsetMap[offset][0].number
                     ticks.append([offset, '%s' % mNumber])
-
             else: # get all of them
                 if len(mNoToUse) > 20:
                     # get about 10 ticks
                     mNoStepSize = int(len(mNoToUse) / 10.)
                 else:
                     mNoStepSize = 1    
-                for i in range(0, len(mNoToUse), mNoStepSize):
+                #for i in range(0, len(mNoToUse), mNoStepSize):
+                i = 0 # always start with first
+                while i < len(mNoToUse):
                     offset = mNoToUse[i]
                     mNumber = offsetMap[offset][0].number
                     ticks.append([offset, '%s' % mNumber])
-
+                    i += mNoStepSize
         else: # generate numeric ticks
             if offsetStepSize == None:
                 offsetStepSize = 10
@@ -2107,7 +2105,7 @@ class PlotStream(object):
             for i in range(oMin, oMax+1, offsetStepSize):
                 ticks.append([i, '%s' % i])
 
-        #environLocal.printDebug(['ticksOffset():', 'final ticks', ticks])
+        environLocal.printDebug(['ticksOffset():', 'final ticks', ticks])
         return ticks
 
     def remapQuarterLength(self, x):
@@ -2131,32 +2129,17 @@ class PlotStream(object):
             sSrc = self.streamObj.flat
         else:
             sSrc = self.streamObj
-
         # get all quarter lengths
         map = sSrc.attributeCount([note.Note, chord.Chord], 'quarterLength')
 
         ticks = []
-
         for ql in sorted(map.keys()):
-#        for i in range(len(qlList)):
-            #qLen = qlList[i]
-            # dtype, match = duration.
-            # ticks.append([qLen, dc.convertQuarterLengthToType(qLen)])
-
             if remap:
                 x = self.remapQuarterLength(ql)
             else:
                 x = ql
             ticks.append([x, '%s' % round(ql, 2)])
 
-#             if labelStyle == 'type':
-#                 ticks.append([qLen, duration.Duration(qLen).type])
-#             elif labelStyle == 'quarterLength':
-#                 ticks.append([i, '%s' % qLen])
-#             elif labelStyle == 'index':
-#                 ticks.append([i, '%s' % i])
-#             else:
-#                 raise PlotStreamException('bad label style: %s' % labelStyle)
         return ticks
 
    
@@ -3115,16 +3098,15 @@ class PlotHorizontalBarWeighted(PlotStream):
         # will get Measure numbers if appropraite
         self.fxTicks = self.ticksOffset
 
-        self.fillByMeasure = True
+        self.fillByMeasure = False
         if 'fillByMeasure' in keywords:
             self.fillByMeasure = keywords['fillByMeasure']
-        self.segmentByTarget = False
+        self.segmentByTarget = True
         if 'segmentByTarget' in keywords:
             self.segmentByTarget = keywords['segmentByTarget']
         self.normalizeByPart = False
         if 'normalizeByPart' in keywords:
             self.normalizeByPart = keywords['normalizeByPart']
-
         self.partGroups = None
         if 'partGroups' in keywords:
             self.partGroups = keywords['partGroups']
@@ -3136,7 +3118,6 @@ class PlotHorizontalBarWeighted(PlotStream):
         from music21 import stream
         if 'Score' not in self.streamObj.classes:
             raise GraphException('provided Stream must be Score')
-
         # parameters: x, span, heightScalar, color, alpha, yShift
         pr = reduction.PartReduction(self.streamObj, partGroups=self.partGroups, 
                 fillByMeasure=self.fillByMeasure, 
@@ -3144,7 +3125,6 @@ class PlotHorizontalBarWeighted(PlotStream):
                 normalizeByPart=self.normalizeByPart)
         pr.process()
         data = pr.getGraphHorizontalBarWeightedData()
-
         #environLocal.pd(['data', data])
         uniqueOffsets = []
         for key, value in data:
@@ -3162,11 +3142,33 @@ class PlotHorizontalBarWeighted(PlotStream):
         return data, xTicks, yTicks
 
 
-
 class PlotDolan(PlotHorizontalBarWeighted):
-    '''A graph of instrument activity. 
+    '''A graph of the activity of a parameter of a part (or a group of parts) over time. The default parameter graphed is Dynamics. Dynamics are assumed to extend activity to the next change in dynamics.
+
+    Numerous parameters can be configured based on functionality encoded in the :class:`~music21.analysis.reduction.PartReduction` object.
+
+
+    If the `fillByMeasure` parameter is True, and if measures are available, each part will segment by Measure divisions, and look for the target activity only once per Measure. If more than one target is found in the Measure, values will be averaged. If `fillByMeasure` is False, the part will be segmented by each Note. 
+
+    The `segmentByTarget` parameter is True, segments, which may be Notes or Measures, will be divided if necessary to show changes that occur over the duration of the segment by a target object. 
+
+    If the `normalizeByPart` parameter is True, each part will be normalized within the range only of that part. If False, all parts will be normalized by the max of all parts. The default is True. 
+
 
     >>> from music21 import *
+    >>> s = corpus.parse('bwv66.6')
+    >>> dyn = ['p', 'mf', 'f', 'ff', 'mp', 'fff', 'ppp']
+    >>> i = 0
+    ... for p in s.parts:
+    ...     for m in p.getElementsByClass('Measure'):
+    ...         m.insert(0, dynamics.Dynamic(dyn[i % len(dyn)]))
+    ...         i += 1
+    ...
+    >>> #_DOCS_SHOW s.plot('dolan', fillByMeasure=True, segmentByTarget=True)
+
+    .. image:: images/PlotDolan.*
+        :width: 600
+
     '''
     values = ['instrument']
     def __init__(self, streamObj, *args, **keywords):
@@ -3175,6 +3177,9 @@ class PlotDolan(PlotHorizontalBarWeighted):
         #self.fy = lambda n:n.pitchClass
         #self.fyTicks = self.ticksPitchClassUsage
         self.fxTicks = self.ticksOffset # this is a method
+
+        # must set part groups if not defined here
+        self._getPartGroups()
         self.data, xTicks, yTicks = self._extractData()
 
         self.graph = GraphHorizontalBarWeighted(*args, **keywords)
@@ -3184,15 +3189,58 @@ class PlotDolan(PlotHorizontalBarWeighted):
         #environLocal.printDebug(['PlotHorizontalBarPitchClassOffset:', 'xTicks before setting to self.graph', xTicks])
         self.graph.setTicks('x', xTicks)  
         self.graph.setAxisLabel('x', self._axisLabelMeasureOrOffset())
-        self.graph.setAxisLabel('y', 'Instrument')
+        #self.graph.setAxisLabel('y', '')
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
             self.graph.setFigureSize([10,4])
         if 'title' not in keywords:
             self.graph.setTitle('Instrumentation')
+            if self.streamObj.metadata is not None:
+                if self.streamObj.metadata.title is not None:
+                    self.graph.setTitle(self.streamObj.metadata.title)
         if 'hideYGrid' not in keywords:
             self.graph.hideYGrid = True
+
+
+    def _getPartGroups(self):
+        '''Examine the instruments in the Score and determine if there is a good match for a default configuration of parts. 
+        '''
+        if self.partGroups is not None:
+            return # keep what the user set
+
+        instStream = self.streamObj.flat.getElementsByClass('Instrument')
+        if len(instStream) == 0:
+            return # do not set anything
+        
+        if len(instStream) == 4:
+            pgOrc = [
+                {'name':'Soprano', 'color':'purple', 'match':['soprano', '0']},
+                {'name':'Alto', 'color':'orange', 'match':['alto', '1']},
+                {'name':'Tenor', 'color':'lightgreen', 'match':['tenor']},
+                {'name':'Bass', 'color':'mediumblue', 'match':['bass']}, 
+            ]
+            self.partGroups = pgOrc
+
+        elif len(instStream) > 10:
+            pgOrc = [
+            {'name':'Timpani', 'color':'#5C3317', 'match':None},
+            {'name':'Trumpet', 'color':'red', 'match':['tromba']},
+            {'name':'Horns', 'color':'orange', 'match':['corno']},
+
+            {'name':'Flute', 'color':'#C154C1', 'match':['flauto']}, 
+            {'name':'Oboe', 'color':'blue', 'match':['oboe']}, 
+            {'name':'Clarinet', 'color':'mediumblue', 'match':['clarinetto']}, 
+            {'name':'Bassoon', 'color':'purple', 'match':['fagotto']}, 
+
+            {'name':'Violin I', 'color':'lightgreen', 'match':['violino i']},
+            {'name':'Violin II', 'color':'green', 'match':['violino ii']},
+            {'name':'Viola', 'color':'forestgreen', 'match':None},
+            {'name':'Violoncello & CB', 'color':'dark green', 
+                'match':['violoncello', 'contrabasso']}, 
+#            {'name':'CB', 'color':'#003000', 'match':['contrabasso']},
+                    ]
+            self.partGroups = pgOrc
 
 
 
@@ -4724,45 +4772,27 @@ class Test(unittest.TestCase):
         p.process()
 
 
-    def xtestHorizontalInstrumentationA(self):
+    def testHorizontalInstrumentationA(self):
         from music21 import graph, stream
-        #s = stream.Stream()
-#         s = corpus.parse('bwv66.6')
-# 
-#         partGroups = [
-#             {'name':'High Voices', 'color':'#ff0088', 
-#                 'match':['soprano', 'alto']}, 
-#             {'name':'Low Voices', 'color':'#8800ff', 
-#                 'match':['tenor', 'bass']}
-#                     ]
-
-        partGroups = [
-            {'name':'Timpani', 'color':'purple', 'match':None},
-            {'name':'Trumpet', 'color':'orange', 'match':['tromba']},
-            {'name':'Horns', 'color':'yellow', 'match':['corno']},
-
-            {'name':'Flute', 'color':'mediumblue', 'match':['flauto']}, 
-            {'name':'Oboe', 'color':'lightsteelblue', 'match':['oboe']}, 
-            {'name':'Bassoon', 'color':'dark blue', 'match':['fagotto']}, 
-
-            {'name':'Violino I', 'color':'lightgreen', 'match':None},
-            {'name':'Violino II', 'color':'green', 'match':None},
-            {'name':'Viola', 'color':'forestgreen', 'match':None},
-            {'name':'Violoncello', 'color':'dark green', 
-                'match':['violoncello']}, 
-            {'name':'CB', 'color':'darkolivegreen', 'match':['contrabasso']},
-                    ]
-        
-        #partGroups = None
-        #s.show()
         s = corpus.parse('symphony94/02')
-#         g = graph.PlotDolan(s, fillByMeasure=True, partGroups=partGroups,
-#             figureSize=[16,6], dpi=150)
-#         g.process()
-        g = graph.PlotDolan(s, fillByMeasure=False, segmentByTarget=True, partGroups=partGroups, 
-            hideYGrid=False, figureSize=[16,6], dpi=150)
-        g.process()
-        #g.show()
+        g = graph.PlotDolan(s, fillByMeasure=False, segmentByTarget=True, 
+            normalizeByPart = False, title='Haydn, Symphony No. 94 in G major, Movement II',
+            hideYGrid=True, hideXGrid=True, alpha=1, figureSize=[60,4], dpi=300, )
+
+
+    def testHorizontalInstrumentationB(self):
+        from music21 import graph, stream, dynamics, corpus
+        s = corpus.parse('bwv66.6')
+        dyn = ['p', 'mf', 'f', 'ff', 'mp', 'fff', 'ppp']
+        i = 0
+        for p in s.parts:
+            for m in p.getElementsByClass('Measure'):
+                m.insert(0, dynamics.Dynamic(dyn[i % len(dyn)]))
+                i += 1
+        s.plot('dolan', fillByMeasure = True, segmentByTarget=True, doneAction=None)
+
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -4776,6 +4806,7 @@ _DOC_ORDER = [
         PlotScatterPitchSpaceDynamicSymbol,
         # offset based horizontal
         PlotHorizontalBarPitchSpaceOffset, PlotHorizontalBarPitchClassOffset,
+        PlotDolan,
         # weighted scatter
         PlotScatterWeightedPitchSpaceQuarterLength, PlotScatterWeightedPitchClassQuarterLength,
         PlotScatterWeightedPitchSpaceDynamicSymbol,
