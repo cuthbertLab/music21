@@ -1319,6 +1319,103 @@ def partitionByInstrument(streamObj):
 
 
 
+def _combinations(instrumentString):
+    sampleList = instrumentString.split()
+    allComb = []
+    for size in range(1,len(sampleList)+1):
+        for i in range(len(sampleList)-size+1):
+            allComb.append(u" ".join(sampleList[i:i+size]))
+    return allComb
+
+def fromString(instrumentString):
+    """
+    Given a string with instrument content (from an orchestral score
+    for example), attempts to return an appropriate
+    :class:`~music21.instrument.Instrument`.
+    
+    >>> from music21 import instrument
+    >>> t1 = instrument.fromString("Clarinet 2 in A")
+    >>> t1
+    <music21.instrument.Instrument Clarinet>
+    >>> t1.transposition
+    <music21.interval.Interval m-3>
+    
+    >>> t2 = instrument.fromString("Clarinetto 3")
+    >>> t2
+    <music21.instrument.Instrument Clarinet>
+    
+    >>> t3 = instrument.fromString("Flauto 2")
+    >>> t3
+    <music21.instrument.Instrument Flute>
+    
+    
+    Excess information is ignored, and the useful information can be extracted
+    correctly as long as it's sequential.
+    
+    >>> t4 = instrument.fromString("I <3 music saxofono tenor go beavers")
+    >>> t4
+    <music21.instrument.Instrument Tenor Saxophone>
+    
+    #_OMIT_FROM_DOCS
+    
+    >>> t5 = instrument.fromString("Bb Clarinet")
+    >>> t5
+    <music21.instrument.Instrument Clarinet>
+    >>> t5.transposition
+    <music21.interval.Interval M-2>
+
+    >>> t6 = instrument.fromString("Clarinet in B-flat")
+    >>> t5.bestName() == t6.bestName() and t5.transposition == t6.transposition
+    True
+
+    >>> t7 = instrument.fromString("B-flat Clarinet")
+    >>> t5.bestName() == t7.bestName() and t5.transposition == t7.transposition
+    True
+    
+    >>> t8 = instrument.fromString("Eb Clarinet")
+    >>> t5.bestName() == t8.bestName()
+    True
+    >>> t8.transposition
+    <music21.interval.Interval m3>
+    """
+    from music21.languageExcerpts import instrumentLookup
+    allCombinations = _combinations(instrumentString)
+    # First task: Find the best instrument.
+    bestInstClass = None
+    bestInstrument = None
+    bestName = None
+    for substring in allCombinations:
+        try:
+            englishName = instrumentLookup.allToEnglish[unicode(substring.lower())]
+            className = instrumentLookup.bestNameToInstrumentClass[englishName]
+            thisInstClass = eval("{0}".format(className))
+            thisInstrument = thisInstClass()
+            thisBestName = thisInstrument.bestName().lower()
+            if bestInstClass is None or len(thisBestName.split())\
+             >= len(bestName.split()) and not issubclass(bestInstClass, thisInstClass):
+                 # priority is also given to same length instruments which fall later
+                 # on in the string (i.e. Bb Piccolo Trumpet)
+                 bestInstClass = thisInstClass
+                 bestInstrument = thisInstrument
+                 bestName = thisBestName
+        except KeyError:
+            pass
+    if bestInstClass is None:
+        raise InstrumentException("Could not match string with instrument: {0}".format(instrumentString))
+    if bestName not in instrumentLookup.transposition:
+        return bestInstrument
+
+    # A transposition table is defined for the instrument.
+    # Second task: Determine appropriate transposition (if any)
+    for substring in allCombinations:
+        try:
+            bestPitch = instrumentLookup.pitchFullNameToName[unicode(substring.lower())]
+            bestInterval = instrumentLookup.transposition[bestName][bestPitch]
+            bestInstrument.transposition = interval.Interval(bestInterval)
+            break
+        except KeyError:
+            pass
+    return bestInstrument
 
 
 
