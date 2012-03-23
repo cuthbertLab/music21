@@ -39,6 +39,7 @@ from music21 import base
 from music21 import beam
 
 from music21.braille import basic as brailleBasic
+from music21.braille import examples as brailleExamples
 from music21.braille import translate as brailleTranslate
 
 from music21 import clef
@@ -173,10 +174,11 @@ MODULES = [
     beam,
     
     brailleBasic,
+    brailleExamples,
     brailleTranslate,
 
     clef, 
-    common, 
+    common,
     #composition
     compositionPhasing,
     converter,
