@@ -1389,7 +1389,7 @@ def fromString(instrumentString):
     bestName = None
     for substring in allCombinations:
         try:
-            englishName = instrumentLookup.allToEnglish[unicode(substring.lower())]
+            englishName = instrumentLookup.allToBestName[unicode(substring.lower())]
             className = instrumentLookup.bestNameToInstrumentClass[englishName]
             thisInstClass = eval("{0}".format(className))
             thisInstrument = thisInstClass()
