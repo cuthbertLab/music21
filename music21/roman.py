@@ -40,6 +40,70 @@ ENDWITHFLAT_RE = re.compile('[b\-]$')
 # permits using internally scored pitch segments
 _scaleCache = {}
 
+def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = False):
+    '''
+    takes a chord object and returns an appropriate chord name.  If keyObj is omitted,
+    the root of the chord is considered the key (if the chord has a major third, it's major;
+    otherwise it's minor).
+    
+    >>> from music21 import *
+    >>> rn = roman.romanNumeralFromChord(chord.Chord(['E-3','C4','G-4']), key.Key('g#'))
+    >>> rn
+    <music21.roman.RomanNumeral bivo6 in g# minor>
+    '''
+    root = chordObj.root()
+    thirdType = chordObj.semitonesFromChordStep(3)
+    if thirdType == 4:
+        isMajorThird = True
+    else:
+        isMajorThird = False
+    
+    if keyObj is None:
+        if isMajorThird is True:
+            keyObj = key.Key(root.name, mode='major')
+        else:
+            keyObj = key.Key(root.name.lower(), mode='minor')
+
+    fifthType = chordObj.semitonesFromChordStep(5)
+    if fifthType == 6:
+        fifthName = 'o'
+    elif fifthType == 8:
+        fifthName = '+'
+    else:
+        fifthName = ""
+    
+    stepNumber = keyObj.getScaleDegreeFromPitch(root)    
+    rootAlterationString = ""
+    if stepNumber is None:
+        rootChangable = copy.deepcopy(root)
+        if rootChangable.accidental is None:
+            rootChangable.accidental = pitch.Accidental(0)
+        startAlter = rootChangable.accidental.alter
+        for i in range(1,3):
+            rootChangable.accidental = pitch.Accidental(startAlter + i)
+            stepNumber = keyObj.getScaleDegreeFromPitch(rootChangable) 
+            if stepNumber is not None:
+                rootAlterationString = "b" * i
+                break
+        if stepNumber is None:
+            for i in range(1,3):
+                rootChangable.accidental = pitch.Accidental(startAlter - i)
+                stepNumber = keyObj.getScaleDegreeFromPitch(rootChangable) 
+                if stepNumber is not None:
+                    rootAlterationString = "#" * i
+                    break   
+    if stepNumber is None:
+        raise RomanNumeralException('Could not get a step name from %s' % root)
+    stepRoman = common.toRoman(stepNumber)
+    if isMajorThird is True:
+        pass
+    elif isMajorThird is False:
+        stepRoman = stepRoman.lower()
+    inversionString = str(chordObj.inversionName())
+    rn = RomanNumeral(rootAlterationString + stepRoman + fifthName + inversionString, keyObj)
+    return rn
+
+
 def expandShortHand(shorthand):
     '''
     expands shorthand notation into comma notation
@@ -355,7 +419,10 @@ class RomanNumeral(chord.Chord):
         'V65/V in e minor'
         
         '''
-        return '%s in %s %s' % (self.figure, self.scale.tonic, self.scale.mode)
+        tonic = self.scale.tonic
+        if hasattr(tonic, 'name'):
+            tonic = tonic.name
+        return '%s in %s %s' % (self.figure, tonic, self.scale.mode)
 
     figureAndKey = property(_getFigureAndKey)
 
