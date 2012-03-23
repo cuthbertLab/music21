@@ -1352,11 +1352,14 @@ def fromString(instrumentString):
     Excess information is ignored, and the useful information can be extracted
     correctly as long as it's sequential.
     
+    
     >>> t4 = instrument.fromString("I <3 music saxofono tenor go beavers")
     >>> t4
     <music21.instrument.Instrument Tenor Saxophone>
     
+    
     #_OMIT_FROM_DOCS
+    
     
     >>> t5 = instrument.fromString("Bb Clarinet")
     >>> t5
