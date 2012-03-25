@@ -2105,7 +2105,7 @@ class PlotStream(object):
             for i in range(oMin, oMax+1, offsetStepSize):
                 ticks.append([i, '%s' % i])
 
-        environLocal.printDebug(['ticksOffset():', 'final ticks', ticks])
+        #environLocal.printDebug(['ticksOffset():', 'final ticks', ticks])
         return ticks
 
     def remapQuarterLength(self, x):

@@ -135,8 +135,8 @@ def testChinaEuropeFull():
     for cName in learners.keys():
         cType = learners[cName]
         for cData, cStr, matchData, matchStr in [
-                                                 (data1, 'file1', data2, 'file2'),
-                                                 (data2, 'file2', data1, 'file1'),
+                  (data1, 'file1', data2, 'file2'),
+                  (data2, 'file2', data1, 'file1'),
                                                  ]:
             # train with data1
             classifier = cType(cData)

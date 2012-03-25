@@ -22,7 +22,7 @@ Build and upload music21 in three formats: egg, exe, and tar.
 Simply call from the command line.
 '''
 
-PY = 'python2.6'
+PY = 'python2.7'
 
 class Distributor(object):
     def __init__(self):
@@ -140,7 +140,7 @@ if __name__ == '__main__':
     import sys
     d = Distributor()
     d.build()
-    d.upload()
+    #d.upload()
 
 
 
