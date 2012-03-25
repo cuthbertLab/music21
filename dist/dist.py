@@ -62,7 +62,7 @@ class Distributor(object):
             if self.version in fn and fn.endswith('.egg'):
                 self.fpEgg = fp
             elif self.version in fn and fn.endswith('.exe'):
-                fpNew = fp.replace('.macosx-10.3-fat.exe', '.exe')
+                fpNew = fp.replace('.macosx-10.6-intel', '.exe')
                 os.rename(fp, fpNew)
                 self.fpWin = fpNew
             elif self.version in fn and fn.endswith('.tar.gz'):

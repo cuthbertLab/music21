@@ -61,7 +61,7 @@ def _getPackageData():
 def _getClassifiers():
     # http://pypi.python.org/pypi?:action=list_classifiers
     classifiers = [
-            'Development Status :: 3 - Alpha',
+            'Development Status :: 4 - Beta',
             'Environment :: Console',
              'Intended Audience :: End Users/Desktop',
              'Intended Audience :: Developers',
@@ -76,6 +76,7 @@ def _getClassifiers():
              'Programming Language :: Python',
              'Topic :: Multimedia :: Sound/Audio',
              'Topic :: Artistic Software',
+             'Topic :: Software Development :: Libraries :: Python Modules',
              ]
     return classifiers
      
@@ -95,7 +96,6 @@ def writeManifestTemplate(fpPackageDir):
     msg.append('prune dist\n')
     msg.append('prune buildDoc\n')
     msg.append('prune obsolete\n')
-
 
     f = open(dst, 'w')
     f.writelines(msg)
