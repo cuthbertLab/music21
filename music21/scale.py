@@ -91,6 +91,7 @@ class Scale(music21.Music21Object):
     Generic base class for all scales, both abstract and concrete.
     '''
     def __init__(self):
+        music21.Music21Object.__init__(self)
         self.type = 'Scale' # could be mode, could be other indicator
 
 
@@ -1152,13 +1153,13 @@ class ConcreteScale(Scale):
         # found on
         # no default tonic is defined; as such, it is mostly an abstract scale
         if tonic is None:
-            self._tonic = None #pitch.Pitch()
+            self.tonic = None #pitch.Pitch()
         elif common.isStr(tonic):
-            self._tonic = pitch.Pitch(tonic)
+            self.tonic = pitch.Pitch(tonic)
         elif hasattr(tonic, 'classes') and 'GeneralNote' in tonic.classes:
-            self._tonic = tonic.pitch
+            self.tonic = tonic.pitch
         else: # assume this is a pitch object
-            self._tonic = tonic
+            self.tonic = tonic
 
         if pitches is not None and common.isListLike(pitches) and len(pitches) > 0:
             self._abstract = AbstractScale()
@@ -1172,7 +1173,7 @@ class ConcreteScale(Scale):
         To be concrete, a Scale must have a 
         defined tonic. An abstract Scale is not Concrete
         '''
-        if self._tonic is None:
+        if self.tonic is None:
             return False
         else:
             return True
@@ -1233,7 +1234,7 @@ class ConcreteScale(Scale):
                 isinstance(self, other.__class__) and 
                 self._abstract == other._abstract and
                 self.boundRange == other.boundRange and
-                self._tonic == other._tonic 
+                self.tonic == other.tonic 
                 ):
                 return True     
             else:
@@ -1246,10 +1247,10 @@ class ConcreteScale(Scale):
         '''
         Return or construct the name of this scale
         '''
-        if self._tonic is None:
+        if self.tonic is None:
             return " ".join(['Abstract', self.type]) 
         else:
-            return " ".join([self._tonic.name, self.type]) 
+            return " ".join([self.tonic.name, self.type]) 
 
     name = property(_getName, 
         doc = '''Return or construct the name of this scale.
@@ -1261,7 +1262,7 @@ class ConcreteScale(Scale):
         ''')
 
     def __repr__(self):
-        return '<music21.scale.%s %s %s>' % (self.__class__.__name__, self._tonic.name, self.type)
+        return '<music21.scale.%s %s %s>' % (self.__class__.__name__, self.tonic.name, self.type)
 
 
     #---------------------------------------------------------------------------
@@ -1273,7 +1274,7 @@ class ConcreteScale(Scale):
         >>> sc.getTonic()
         E-4
         '''
-        return self._tonic
+        return self.tonic
 
     def _getAbstract(self):
         '''Return the underlying abstract scale
@@ -1318,12 +1319,12 @@ class ConcreteScale(Scale):
             post = self
         else:
             post = copy.deepcopy(self)
-        if self._tonic is None:
+        if self.tonic is None:
             # could raise an error; just assume a 'c'
-            post._tonic = pitch.Pitch('C4')
-            post._tonic.transpose(value, inPlace=True)        
+            post.tonic = pitch.Pitch('C4')
+            post.tonic.transpose(value, inPlace=True)        
         else:
-            post._tonic.transpose(value, inPlace=True)        
+            post.tonic.transpose(value, inPlace=True)        
         # may need to clear cache here
         return post
 
@@ -1402,7 +1403,7 @@ class ConcreteScale(Scale):
         >>> h5.root()
         E-5
         >>> h5
-        <music21.roman.RomanNumeral V>
+        <music21.roman.RomanNumeral V in A- major>
         '''
         from music21 import roman
         return roman.RomanNumeral(degree, self)
@@ -1421,12 +1422,12 @@ class ConcreteScale(Scale):
         if self._abstract is not None:
             # TODO: get and store in cache; return a copy
             # or generate from network stored in abstract
-            if self._tonic is None:
+            if self.tonic is None:
                 # note: could raise an error here, but instead will
                 # use a pseudo-tonic
                 pitchObj = pitch.Pitch('C4')
             else:
-                pitchObj = self._tonic
+                pitchObj = self.tonic
             stepOfPitch = self._abstract.tonicDegree
 
             if common.isStr(minPitch):
@@ -1503,7 +1504,7 @@ class ConcreteScale(Scale):
         
         '''
         post = self._abstract.getPitchFromNodeDegree(
-            pitchReference=self._tonic, # pitch defined here
+            pitchReference=self.tonic, # pitch defined here
             nodeName=self._abstract.tonicDegree, # defined in abstract class
             nodeDegreeTarget=degree, # target looking for
             direction=direction, 
@@ -1538,7 +1539,7 @@ class ConcreteScale(Scale):
         '''
         # TODO: rely here on intervalNetwork for caching
         post = self._abstract.realizePitchByDegree(
-            pitchReference=self._tonic, # pitch defined here
+            pitchReference=self.tonic, # pitch defined here
             nodeId=self._abstract.tonicDegree, # defined in abstract class
             nodeDegreeTargets=degreeTargets, # target looking for
             direction=direction, 
@@ -1604,7 +1605,7 @@ class ConcreteScale(Scale):
         '''
 
         post = self._abstract.getRelativeNodeDegree(
-            pitchReference=self._tonic, 
+            pitchReference=self.tonic, 
             nodeName=self._abstract.tonicDegree, 
             pitchTarget=pitchTarget,      
             comparisonAttribute=comparisonAttribute, 
@@ -1668,7 +1669,7 @@ class ConcreteScale(Scale):
         G4
         '''
         if pitchOrigin is None:
-            return self._tonic
+            return self.tonic
 
         # allow numerical directions
         if common.isNum(direction):
@@ -1693,7 +1694,7 @@ class ConcreteScale(Scale):
                 getNeighbor = DIRECTION_ASCENDING
 
         post = self._abstract.nextPitch(
-            pitchReference=self._tonic, 
+            pitchReference=self.tonic, 
             nodeName=self._abstract.tonicDegree, 
             pitchOrigin=pitchOrigin,      
             direction=direction,
@@ -1758,7 +1759,7 @@ class ConcreteScale(Scale):
 
         # need to deal with direction here? or get an aggregate scale
         matched, notMatched = self._abstract._net.match(
-            pitchReference=self._tonic, 
+            pitchReference=self.tonic, 
             nodeId=self._abstract.tonicDegree, 
             pitchTarget=otherPitches, # can supply a list here
             comparisonAttribute=comparisonAttribute)
@@ -1784,7 +1785,7 @@ class ConcreteScale(Scale):
         otherPitches = self._extractPitchList(other,
                         comparisonAttribute=comparisonAttribute)
         post = self._abstract._net.findMissing(
-            pitchReference=self._tonic, 
+            pitchReference=self.tonic, 
             nodeId=self._abstract.tonicDegree, 
             pitchTarget=otherPitches, # can supply a list here
             comparisonAttribute=comparisonAttribute,
@@ -1986,7 +1987,7 @@ class DiatonicScale(ConcreteScale):
 
         '''
         # NOTE: must be adjust for modes that do not have a proper leading tone
-        interval1to7 = interval.notesToInterval(self._tonic, 
+        interval1to7 = interval.notesToInterval(self.tonic, 
                         self.pitchFromDegree(7))
         if interval1to7.name != 'M7':
             # if not a major seventh from the tonic, get a pitch a M7 above
@@ -2006,7 +2007,7 @@ class DiatonicScale(ConcreteScale):
         >>> sc2.pitches
         [A4, B4, C5, D5, E5, F5, G5, A5]
         '''
-        return MinorScale(self._tonic)
+        return MinorScale(self.tonic)
 
 
     def getParallelMajor(self):
@@ -2020,7 +2021,7 @@ class DiatonicScale(ConcreteScale):
         >>> sc2.pitches
         [G4, A4, B4, C5, D5, E5, F#5, G5]
         '''
-        return MajorScale(self._tonic)
+        return MajorScale(self.tonic)
 
 
 
@@ -2487,9 +2488,9 @@ class SieveScale(ConcreteScale):
     def __init__(self, tonic=None, sieveString='2@0', eld=1):
         ConcreteScale.__init__(self, tonic=tonic)
 
-        # self._tonic is a Pitch
-        if self._tonic is not None:
-            tonic = self._tonic
+        # self.tonic is a Pitch
+        if self.tonic is not None:
+            tonic = self.tonic
         else:
             tonic = pitch.Pitch('C4')
         self._pitchSieve = sieve.PitchSieve(sieveString, 

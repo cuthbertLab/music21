@@ -1418,7 +1418,7 @@ class Chord(note.NotRest):
 
         Currently there is a bug that in the case of a triply diminished
         third (e.g., "c" => "e----"), this function will incorrectly claim
-        no third exists.  Perhaps this be construed as a feature.
+        no third exists.  Perhaps this should be construed as a feature.
 
         In the case of chords such as C, E-, E, semitonesFromChordStep(3)
         will return the number for the first third, in this case 3.  It

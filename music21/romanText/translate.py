@@ -112,8 +112,10 @@ def _getKeyAndPrefix(rtKeyOrString):
         k = key.Key(rtKeyOrString)
     else:
         k = rtKeyOrString.getKey()
-
-    prefix = k.tonic + ": "
+    tonicName = k.tonic.name
+    if k.mode == 'minor':
+        tonicName = tonicName.lower()
+    prefix = tonicName + ": "
     return k, prefix
 
 def romanTextToStreamScore(rtHandler, inputM21=None):

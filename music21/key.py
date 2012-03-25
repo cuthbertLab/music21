@@ -119,7 +119,17 @@ def sharpsToPitch(sharpCount):
 
 
 # store a cache of already-found values
-_pitchToSharpsCache = {}
+#_pitchToSharpsCache = {}
+
+fifthsOrder = ['F','C','G','D','A','E','B']
+modeSharpsAlter = {'major':0,
+                   'minor':-3,
+                   'dorian':-2,
+                   'phrygian': -4,
+                   'lydian': 1,
+                   'mixolydian':-1,
+                   'locrian':-5,}
+
 
 def pitchToSharps(value, mode=None):
     '''Given a pitch or :class:`music21.pitch.Pitch` object, 
@@ -127,9 +137,9 @@ def pitchToSharps(value, mode=None):
 
     The `mode` parameter can be 'major', 'minor', or most
     of the common church/jazz modes ('dorian', 'mixolydian', etc.)
-    but not Locrian yet.
+    including Locrian.
     
-    If `mode` is omitted, the default mode is major.
+    If `mode` is omitted or not found, the default mode is major.
 
     (extra points to anyone who can find the earliest reference to
     the Locrian mode in print.  David Cohen and I (MSC) have been
@@ -173,77 +183,106 @@ def pitchToSharps(value, mode=None):
     -1
     >>> key.pitchToSharps('e', 'phrygian')
     0
-
+    >>> key.pitchToSharps('f#')
+    6
+    >>> key.pitchToSharps('f-')
+    -8
+    >>> key.pitchToSharps('f--')
+    -15
+    >>> key.pitchToSharps('f--', 'locrian')
+    -20
     '''
-
-    if common.isStr(value):
-        p = pitch.Pitch(value)
+    if common.isStr(value): 
+        value = pitch.Pitch(value)
+    elif 'Pitch' in value.classes:
+        value = value
+    elif 'Note' in value.classes:
+        value = value.pitch
     else:
-        p = value
-
-    if (p.name, mode) in _pitchToSharpsCache.keys():            
-        return _pitchToSharpsCache[(p.name, mode)]
-
-
-    # start at C and continue in both directions
-    sharpSource = [0]
-    for i in range(1,13):
-        sharpSource.append(i)
-        sharpSource.append(-i)
-
-    minorShift = interval.Interval('-m3')
-    # these modal values were introduced to translate from ABC key values that
-    # include mode specification
-    # this value/mapping may need to be dynamically allocated based on other
-    # contexts (historical meaning of dorian, for example) in the future
-    dorianShift = interval.Interval('M2')
-    phrygianShift = interval.Interval('M3')
-    lydianShift = interval.Interval('P4')
-    mixolydianShift = interval.Interval('P5')
-
-    # note: this may not be the fastest approach
-    match = None
-    for i in sharpSource:
-        pCandidate = sharpsToPitch(i)
-        # create relative transpositions based on this pitch for major
-        pMinor = pCandidate.transpose(minorShift)
-
-        pDorian = pCandidate.transpose(dorianShift)
-        pPhrygian = pCandidate.transpose(phrygianShift)
-        pLydian = pCandidate.transpose(lydianShift)
-        pMixolydian = pCandidate.transpose(mixolydianShift)
-
-        if mode in [None, 'major']:
-            if pCandidate.name == p.name:
-                match = i
-                break
-        elif mode in ['dorian']:
-            if pDorian.name == p.name:
-                match = i
-                break
-        elif mode in ['phrygian']:
-            if pPhrygian.name == p.name:
-                match = i
-                break
-        elif mode in ['lydian']:
-            if pLydian.name == p.name:
-                match = i
-                break
-        elif mode in ['mixolydian']:
-            if pMixolydian.name == p.name:
-                match = i
-                break
-        elif mode in ['minor', 'aeolian']:
-        #else: # match minor pitch
-            if pMinor.name == p.name:
-                match = i
-                break
-
-    _pitchToSharpsCache[(p.name, mode)] = match
-    return match
+        raise KeyException('Cannot get a sharp number from value')
+    
+    sharps = fifthsOrder.index(value.step) - 1
+    if value.accidental is not None:
+        vaa = value.accidental.alter 
+        if vaa != int(vaa):
+            raise KeyException('Cannot determine sharps for quarter-tone keys! silly!')
+        vaa = int(vaa)
+        sharps = sharps + 7*vaa
+    
+    if mode is not None and mode in modeSharpsAlter:
+        sharps += modeSharpsAlter[mode]
+    
+    return sharps
+#    if common.isStr(value):
+#        p = pitch.Pitch(value)
+#    else:
+#        p = value
+#
+#    if (p.name, mode) in _pitchToSharpsCache.keys():            
+#        return _pitchToSharpsCache[(p.name, mode)]
+#
+#
+#    # start at C and continue in both directions
+#    sharpSource = [0]
+#    for i in range(1,13):
+#        sharpSource.append(i)
+#        sharpSource.append(-i)
+#
+#    minorShift = interval.Interval('-m3')
+#    # these modal values were introduced to translate from ABC key values that
+#    # include mode specification
+#    # this value/mapping may need to be dynamically allocated based on other
+#    # contexts (historical meaning of dorian, for example) in the future
+#    dorianShift = interval.Interval('M2')
+#    phrygianShift = interval.Interval('M3')
+#    lydianShift = interval.Interval('P4')
+#    mixolydianShift = interval.Interval('P5')
+#
+#    # note: this may not be the fastest approach
+#    match = None
+#    for i in sharpSource:
+#        pCandidate = sharpsToPitch(i)
+#        # create relative transpositions based on this pitch for major
+#        pMinor = pCandidate.transpose(minorShift)
+#
+#        pDorian = pCandidate.transpose(dorianShift)
+#        pPhrygian = pCandidate.transpose(phrygianShift)
+#        pLydian = pCandidate.transpose(lydianShift)
+#        pMixolydian = pCandidate.transpose(mixolydianShift)
+#
+#        if mode in [None, 'major']:
+#            if pCandidate.name == p.name:
+#                match = i
+#                break
+#        elif mode in ['dorian']:
+#            if pDorian.name == p.name:
+#                match = i
+#                break
+#        elif mode in ['phrygian']:
+#            if pPhrygian.name == p.name:
+#                match = i
+#                break
+#        elif mode in ['lydian']:
+#            if pLydian.name == p.name:
+#                match = i
+#                break
+#        elif mode in ['mixolydian']:
+#            if pMixolydian.name == p.name:
+#                match = i
+#                break
+#        elif mode in ['minor', 'aeolian']:
+#        #else: # match minor pitch
+#            if pMinor.name == p.name:
+#                match = i
+#                break
+#
+#    _pitchToSharpsCache[(p.name, mode)] = match
+#    return match
 
 
 class KeySignatureException(Exception):
+    pass
+class KeyException(Exception):
     pass
 
 #-------------------------------------------------------------------------------
@@ -251,12 +290,12 @@ class KeySignatureException(Exception):
 
 
 
-def keyFromString(strKey):
-    '''Given a string representing a key, return the appropriate Key object. 
-    '''
-    #TODO: Write keyFromString
-    return None
-    #raise KeyException("keyFromString not yet written")
+#def keyFromString(strKey):
+#    '''Given a string representing a key, return the appropriate Key object. 
+#    '''
+#    #TODO: Write keyFromString
+#    #    return None
+#    #raise KeyException("keyFromString not yet written")
 
 
 
@@ -770,7 +809,16 @@ class Key(KeySignature, scale.DiatonicScale):
     >>> Csharpmaj = key.Key('C#')
     >>> Csharpmaj
     <music21.key.Key of C# major>
+    >>> Csharpmaj.sharps
+    7
 
+    >>> Fflatmaj = key.Key('F-')
+    >>> Fflatmaj
+    <music21.key.Key of F- major>
+    >>> Fflatmaj.sharps
+    -8
+    >>> Fflatmaj.accidentalByStep('B')
+    <accidental double-flat>
     '''
     _sharps = 0
     _mode = None
@@ -794,7 +842,10 @@ class Key(KeySignature, scale.DiatonicScale):
 
         scale.DiatonicScale.__init__(self, tonic=tonic)
 
-        self.tonic = tonic
+        if hasattr(tonic, 'classes') and 'Pitch' in tonic.classes:
+            self.tonic = tonic
+        else:
+            self.tonic = pitch.Pitch(tonic)
         self.type = mode
         self.mode = mode
 
@@ -814,7 +865,12 @@ class Key(KeySignature, scale.DiatonicScale):
     def __str__(self):
         # string representation needs to be complete, as is used
         # for metadata comparisons
-        return "%s %s" % (self.tonic, self.mode)
+        tonic = self.tonic
+        if self.mode == 'major':
+            tonic = tonic.name.upper()
+        elif self.mode == 'minor':
+            tonic = tonic.name.lower()
+        return "%s %s" % (tonic, self.mode)
 
 
 

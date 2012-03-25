@@ -374,6 +374,12 @@ specialModifiers = {'+' : '#',
                     '/' : '-',
                     '\\' : '#',
                     'b' : '-',
+                    'bb' : '--',
+                    'bbb' : '---',
+                    'bbbb' : '-----',
+                    '++': '##',
+                    '+++' : '###',
+                    '++++' : '####',
                     }
 
 class Modifier(object):
@@ -456,9 +462,9 @@ class Modifier(object):
         except pitch.AccidentalException:
             try:
                 newModifierString = specialModifiers[self.modifierString]
-                a.set(newModifierString)
             except KeyError:
-                raise ModifierException("Figure modifier unsupported in music21.")
+                raise ModifierException("Figure modifier unsupported in music21: %s." % self.modifierString)
+            a.set(newModifierString)
         
         return a
     
