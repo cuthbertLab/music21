@@ -6,7 +6,7 @@
 # Authors:       Christopher Ariza
 #                Michael Scott Cuthbert
 #
-# Copyright:     (c) 2009-2011 The music21 Project
+# Copyright:     (c) 2009-2012 The music21 Project
 # License:       LGPL
 #-------------------------------------------------------------------------------
 
@@ -27,10 +27,6 @@ def _getPackagesList():
     #     pkg = (  'music21', 
     #              'music21.analysis', 
     #              'music21.composition', 
-    #              'music21.corpus', 
-    #              'music21.corpus.bach', 
-    #              'music21.corpus.beethoven', 
-    #              'music21.corpus.beethoven.opus18no1', 
 
     pkg = common.getPackageDir()
     for dir in pkg:

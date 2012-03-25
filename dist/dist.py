@@ -8,7 +8,8 @@
 # License:       GPL
 #-------------------------------------------------------------------------------
 
-import os, sys
+import os, sys, tarfile
+
 from music21 import base
 
 from music21 import environment
@@ -62,7 +63,7 @@ class Distributor(object):
             if self.version in fn and fn.endswith('.egg'):
                 self.fpEgg = fp
             elif self.version in fn and fn.endswith('.exe'):
-                fpNew = fp.replace('.macosx-10.6-intel', '.exe')
+                fpNew = fp.replace('.macosx-10.6-intel.exe', '.exe')
                 os.rename(fp, fpNew)
                 self.fpWin = fpNew
             elif self.version in fn and fn.endswith('.tar.gz'):
@@ -135,12 +136,69 @@ class Distributor(object):
 
 
 
+
+def removeCorpusTar(fp=None):
+    '''Remove the corpus from the tar.gz file.
+    '''
+    if fp is None:
+        fp = '/Volumes/xdisc/_sync/_x/src/music21/dist/music21-0.6.3.b3.tar.gz'
+
+    fpDir, fn = os.path.split(fp)
+
+    # this has .tar.gz extension
+    fnDst = fn.replace('music21', 'music21-noCorpus')
+    fpDst = os.path.join(fpDir, fnDst)
+    # remove file extnesions
+    fnDstDir = fnDst.replace('.tar.gz', '')
+    fpDstDir = os.path.join(fpDir, fnDstDir)
+    
+    # get the name of the dir after decompression
+    fpSrcDir = os.path.join(fpDir, fn.replace('.tar.gz', ''))
+        
+    tf = tarfile.open(fp, "r:gz")
+    # the path here is the dir into which to expand, not the name of that dir
+    tf.extractall(path=fpDir)
+
+    # remove old dir if ti exists
+    if os.path.exists(fpDst):
+        # can use shutil.rmtree
+        os.system('rm -r %s' % fpDst)
+    if os.path.exists(fpDstDir):
+        # can use shutil.rmtree
+        os.system('rm -r %s' % fpDstDir)
+
+
+    os.system('mv %s %s' % (fpSrcDir, fpDstDir))
+    # remove files, updates manifest
+    # TODO:
+
+    # compress dst dir to dst file path name
+    # need the -C flag to set relative dir
+    cmd = 'tar -C %s -czf %s %s/' % (fpDir, fpDst, fnDstDir) # just name of dir
+    print(cmd)
+    os.system(cmd)
+
+
+    # remove directory that was compressed
+    if os.path.exists(fpDstDir):
+        # can use shutil.rmtree
+        os.system('rm -r %s' % fpDstDir)
+
+
+    
+
+
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':
     import sys
-    d = Distributor()
-    d.build()
+    #d = Distributor()
+    #d.build()
     #d.upload()
+
+
+    #removeCorpusTar()
+    
+
 
 
 
