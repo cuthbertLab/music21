@@ -1442,6 +1442,24 @@ def getCorpusFilePath():
     '''
     return os.path.join(getSourceFilePath(), 'corpus')
 
+def getCorpusContentDirs():
+    '''Get all dirs that are found in the corpus that contain content; that is, exclude dirst that have code or other resoures.
+
+    >>> from music21 import *
+    >>> fp = common.getCorpusContentDirs()
+    >>> fp # this test will be fragile, depending on composition of dirs
+    ['airdsAirs', 'bach', 'beethoven', 'ciconia', 'corelli', 'cpebach', 'demos', 'essenFolksong', 'handel', 'haydn', 'josquin', 'leadSheet', 'license.txt', 'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'ryansMammoth', 'schoenberg', 'schumann', 'theoryExercises', 'trecento']
+    '''
+    dir = getCorpusFilePath()
+    post = []
+    # dirs to exclude; all files will be retained
+    exclude = ['__init__.py', 'base.py', 'metadataCache', 'virtual.py'] 
+    for fn in os.listdir(dir):
+        if fn not in exclude:
+            if not fn.endswith('.pyc') and not fn.startswith('.'):
+                post.append(fn)
+    return post
+
 
 def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
      packageOnly=True):
