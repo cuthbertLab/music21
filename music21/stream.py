@@ -2045,7 +2045,7 @@ class Stream(music21.Music21Object):
         >>> s.analyze('ambitus')
         <music21.interval.Interval m21>
         >>> s.analyze('key')
-        <music21.key.Key of F# minor>
+        <music21.key.Key of f# minor>
         
         
         Example: music21 allows you to automatically run an 
@@ -2081,7 +2081,7 @@ class Stream(music21.Music21Object):
         
         
         >>> analyzedKey.alternateInterpretations
-        [<music21.key.Key of D minor>, <music21.key.Key of C major>, <music21.key.Key of G minor>,...]
+        [<music21.key.Key of d minor>, <music21.key.Key of C major>, <music21.key.Key of g minor>,...]
         
         
         Each of these can be examined in turn to see its correlation coefficient:

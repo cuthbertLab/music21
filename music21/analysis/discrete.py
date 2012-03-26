@@ -632,7 +632,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.KrumhanslSchmuckler()
         >>> p.getSolution(s) # this seems correct
-        <music21.key.Key of F# minor>
+        <music21.key.Key of f# minor>
 
         >>> s = corpus.parse('bach/bwv57.8')
         >>> p = analysis.discrete.KrumhanslSchmuckler(s)
@@ -1226,19 +1226,19 @@ def analyzeStream(streamObj, *args, **keywords):
     >>> from music21 import *
     >>> s = corpus.parse('bach/bwv66.6')
     >>> analysis.discrete.analyzeStream(s, 'Krumhansl')
-    <music21.key.Key of F# minor>
+    <music21.key.Key of f# minor>
     >>> analysis.discrete.analyzeStream(s, 'ambitus')
     <music21.interval.Interval m21>
 
     >>> analysis.discrete.analyzeStream(s, 'key')
-    <music21.key.Key of F# minor>
+    <music21.key.Key of f# minor>
     >>> analysis.discrete.analyzeStream(s, 'range')
     <music21.interval.Interval m21>
 
 
     Note that the same results can be obtained by calling "analyze" directly on the stream object:
     >>> s.analyze('key')
-    <music21.key.Key of F# minor>
+    <music21.key.Key of f# minor>
     >>> s.analyze('range')
     <music21.interval.Interval m21>
 
@@ -1440,11 +1440,11 @@ class Test(unittest.TestCase):
         
         k = s.analyze('KrumhanslSchmuckler')
         self.assertEqual(str(k), 'C major')
-        self.assertEqual(str(k.alternateInterpretations), '[<music21.key.Key of C minor>, <music21.key.Key of G major>, <music21.key.Key of A minor>, <music21.key.Key of F major>, <music21.key.Key of G minor>, <music21.key.Key of E minor>, <music21.key.Key of F minor>, <music21.key.Key of E- major>, <music21.key.Key of A- major>, <music21.key.Key of B- major>, <music21.key.Key of D minor>, <music21.key.Key of D major>, <music21.key.Key of A major>, <music21.key.Key of B minor>, <music21.key.Key of B- minor>, <music21.key.Key of C# minor>, <music21.key.Key of F# minor>, <music21.key.Key of C# major>, <music21.key.Key of E major>, <music21.key.Key of G# minor>, <music21.key.Key of F# major>, <music21.key.Key of B major>, <music21.key.Key of E- minor>]')
+        self.assertEqual(str(k.alternateInterpretations), '[<music21.key.Key of c minor>, <music21.key.Key of G major>, <music21.key.Key of a minor>, <music21.key.Key of F major>, <music21.key.Key of g minor>, <music21.key.Key of e minor>, <music21.key.Key of f minor>, <music21.key.Key of E- major>, <music21.key.Key of A- major>, <music21.key.Key of B- major>, <music21.key.Key of d minor>, <music21.key.Key of D major>, <music21.key.Key of A major>, <music21.key.Key of b minor>, <music21.key.Key of b- minor>, <music21.key.Key of c# minor>, <music21.key.Key of f# minor>, <music21.key.Key of C# major>, <music21.key.Key of E major>, <music21.key.Key of g# minor>, <music21.key.Key of F# major>, <music21.key.Key of B major>, <music21.key.Key of e- minor>]')
 
         k = s.analyze('AardenEssen')
         self.assertEqual(str(k), 'F major')
-        self.assertEqual(str(k.alternateInterpretations), '[<music21.key.Key of C major>, <music21.key.Key of C minor>, <music21.key.Key of G minor>, <music21.key.Key of F minor>, <music21.key.Key of A minor>, <music21.key.Key of G major>, <music21.key.Key of D minor>, <music21.key.Key of A- major>, <music21.key.Key of B- major>, <music21.key.Key of E- major>, <music21.key.Key of E minor>, <music21.key.Key of B- minor>, <music21.key.Key of D major>, <music21.key.Key of A major>, <music21.key.Key of F# minor>, <music21.key.Key of C# major>, <music21.key.Key of B minor>, <music21.key.Key of E major>, <music21.key.Key of C# minor>, <music21.key.Key of E- minor>, <music21.key.Key of F# major>, <music21.key.Key of B major>, <music21.key.Key of G# minor>]')
+        self.assertEqual(str(k.alternateInterpretations), '[<music21.key.Key of C major>, <music21.key.Key of c minor>, <music21.key.Key of g minor>, <music21.key.Key of f minor>, <music21.key.Key of a minor>, <music21.key.Key of G major>, <music21.key.Key of d minor>, <music21.key.Key of A- major>, <music21.key.Key of B- major>, <music21.key.Key of E- major>, <music21.key.Key of e minor>, <music21.key.Key of b- minor>, <music21.key.Key of D major>, <music21.key.Key of A major>, <music21.key.Key of f# minor>, <music21.key.Key of C# major>, <music21.key.Key of b minor>, <music21.key.Key of E major>, <music21.key.Key of c# minor>, <music21.key.Key of e- minor>, <music21.key.Key of F# major>, <music21.key.Key of B major>, <music21.key.Key of g# minor>]')
         
         #s.plot('grid', 'KrumhanslSchmuckler')
         #s.plot('windowed', 'aarden')

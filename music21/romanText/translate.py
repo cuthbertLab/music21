@@ -31,7 +31,11 @@ class TranslateRomanTextException(Exception):
 
 
 def _copySingleMeasure(t, p, kCurrent):
-    '''Given a RomanText token, a Part used as the current container, and the current Key, return a Measure copied from the past of the Part. 
+    '''Given a RomanText token, a Part used as the current container, 
+    and the current Key, return a Measure copied from the past of the Part. 
+    
+    This is used in cases of definitions such as:
+    m23=m21
     '''
     # copy from a past location; need to change key
     #environLocal.printDebug(['calling _copySingleMeasure()'])
@@ -42,18 +46,28 @@ def _copySingleMeasure(t, p, kCurrent):
     target = targetNumber[0]
     for mPast in p.getElementsByClass('Measure'):
         if mPast.number == target:
-            m = copy.deepcopy(mPast)
+            try:
+                m = copy.deepcopy(mPast)
+            except TypeError:
+                raise TranslateRomanTextException('Failed to copy measure %d: did you perhaps parse an RTOpus object with romanTextToStreamScore instead of romanTextToStreamOpus?' % 
+                                                  (mPast.number))
             m.number = t.number[0]
             # update all keys
             for rnPast in m.getElementsByClass('RomanNumeral'):
                 if kCurrent is None: # should not happen
                     raise TranslateRomanTextException('attempting to copy a measure but no past key definitions are found')
-                rnPast.setKeyOrScale(kCurrent)
+                rnPast.key = kCurrent
             break
     return m
 
 def _copyMultipleMeasures(t, p, kCurrent):
-    '''Given a RomanText token for a RTMeasure, a Part used as the current container, and the current Key, return a Measure range copied from the past of the Part.
+    '''
+    Given a RomanText token for a RTMeasure, a 
+    Part used as the current container, and the current Key, 
+    return a Measure range copied from the past of the Part.
+    
+    This is used for cases such as:
+    m23-25 = m20-22
     '''
     from music21 import stream
     # the key provided needs to be the current key
@@ -74,14 +88,19 @@ def _copyMultipleMeasures(t, p, kCurrent):
     measures = []
     for mPast in p.getElementsByClass('Measure'):
         if mPast.number in range(targetStart, targetEnd +1):
-            m = copy.deepcopy(mPast)
+            try:
+                m = copy.deepcopy(mPast)
+            except TypeError:
+                raise TranslateRomanTextException('Failed to copy measure %d to measure range %d-%d: did you perhaps parse an RTOpus object with romanTextToStreamScore instead of romanTextToStreamOpus?' % 
+                                                  (mPast.number, targetStart, targetEnd))
+            
             m.number = t.number[0] + mPast.number - targetStart
             measures.append(m)
             # update all keys
             for rnPast in m.getElementsByClass('RomanNumeral'):
                 if kCurrent is None: # should not happen
                     raise TranslateRomanTextException('attempting to copy a measure but no past key definitions are found')
-                rnPast.setKeyOrScale(kCurrent)
+                rnPast.key = kCurrent
         if mPast.number == targetEnd:
             break
     return measures
@@ -406,7 +425,7 @@ class Test(unittest.TestCase):
         for tf in testFiles.ALL:
             rtf = romanText.RTFile()
             rth = rtf.readstr(tf) # return handler, processes tokens
-            s = romanTextToStreamScore(rth)
+            s = romanTextToStreamOpus(rth) # will run romanTextToStreamScore on all but k273
             #s.show()
 
         
@@ -553,10 +572,10 @@ m6-7 = m4-5
         m25 = s.measure(25)
         rn = m25.flat.getElementsByClass('RomanNumeral')
         self.assertEqual(rn[1].figure, 'III')
-        self.assertEqual(str(rn[1].scale), 'd minor')
+        self.assertEqual(str(rn[1].key), 'd minor')
 
         # TODO: this is getting the F#m even though the key and figure are 
-        # correect
+        # correct
         #self.assertEqual(str(rn[1].pitches), '[F4, A4, C5]')
 
         #s.show()

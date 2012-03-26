@@ -1735,8 +1735,9 @@ def hdStringToNote(contents):
     if contents.count('"'):
         thisObject.articulations.append(music21.articulations.Pizzicato())
     if contents.count('`'):
-        ### HMMMMM? WHAT DOES THIS MEAN?  Can't find it anywhere.
-        raise HumdrumException("Attacca mark found -- what is that?  I cannot find any references to attacca marks anywhere on the web or reference books!")
+        # called 'attacca' mark but means staccatissimo:
+        # http://www.music-cog.ohio-state.edu/Humdrum/representations/kern.rep.html
+        thisObject.articulations.append(music21.articulations.Staccatissimo())
     if contents.count('~'):
         thisObject.articulations.append(music21.articulations.Tenuto())
     if contents.count('^'):
@@ -1990,8 +1991,7 @@ def kernTandamToObject(tandam):
         return music21.key.KeySignature(numSharps)
     elif tandam.endswith(":"):
         thisKey = tandam[1:-1]
-        # does not work yet
-        return music21.key.keyFromString(thisKey)
+        return music21.key.Key(thisKey)
     else:
         return MiscTandam(tandam)
 

@@ -1424,6 +1424,14 @@ class Test(unittest.TestCase):
         p.accidental = pitch.Accidental(-1)
         self.assertEqual(str(p), 'C-4')
 
+
+
+class TestExternal(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+
     def testFromChordify(self):
         from music21 import corpus
         b = corpus.parse('bwv10.7')
