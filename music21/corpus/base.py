@@ -848,6 +848,9 @@ def getBachChorales(extList='xml'):
 
     baseDir = getComposerDir('bach')
     post = []
+    if baseDir is None: # case where we have no corpus
+        return post
+
     paths = getPaths(extList)
     for fn in names:
         candidate = os.path.join(baseDir, fn)
@@ -1343,6 +1346,8 @@ def getHandelMessiah(extList='md'):
 
     baseDir = getComposerDir('handel')
     post = []
+    if baseDir is None:
+        return post
     paths = getPaths(extList)
     for fn in names:
         candidate = os.path.join(baseDir, 'hwv56', fn)
@@ -1375,6 +1380,8 @@ def getMonteverdiMadrigals(extList='xml'):
 
     baseDir = getComposerDir('monteverdi')
     post = []
+    if baseDir is None:
+        return post
     paths = getPaths(extList)
     for fn in names:
         candidate = os.path.join(baseDir, fn)

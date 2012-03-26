@@ -11,6 +11,7 @@
 import os, sys, tarfile
 
 from music21 import base
+from music21 import common
 
 from music21 import environment
 _MOD = 'dist.py'
@@ -139,9 +140,22 @@ class Distributor(object):
 
 def removeCorpusTar(fp=None):
     '''Remove the corpus from the tar.gz file.
+
+    NOTE: this function works only with Posix systems. 
     '''
     if fp is None:
         fp = '/Volumes/xdisc/_sync/_x/src/music21/dist/music21-0.6.3.b3.tar.gz'
+
+    TAR = 'TAR'
+    EGG = 'EGG'
+    if fp.endswith('.tar.gz'):
+        mode = TAR
+        modeExt = '.tar.gz'
+    elif fp.endswith('.egg'):
+        mode = EGG
+        modeExt = '.egg'
+    else:
+        raise Exception('incorrect source file path')
 
     fpDir, fn = os.path.split(fp)
 
@@ -149,15 +163,19 @@ def removeCorpusTar(fp=None):
     fnDst = fn.replace('music21', 'music21-noCorpus')
     fpDst = os.path.join(fpDir, fnDst)
     # remove file extnesions
-    fnDstDir = fnDst.replace('.tar.gz', '')
+    fnDstDir = fnDst.replace(modeExt, '')
     fpDstDir = os.path.join(fpDir, fnDstDir)
     
     # get the name of the dir after decompression
-    fpSrcDir = os.path.join(fpDir, fn.replace('.tar.gz', ''))
+    fpSrcDir = os.path.join(fpDir, fn.replace(modeExt, ''))
         
-    tf = tarfile.open(fp, "r:gz")
-    # the path here is the dir into which to expand, not the name of that dir
-    tf.extractall(path=fpDir)
+    if mode == TAR:
+        tf = tarfile.open(fp, "r:gz")
+        # the path here is the dir into which to expand, 
+        # not the name of that dir
+        tf.extractall(path=fpDir)
+    elif mode == EGG:
+        pass
 
     # remove old dir if ti exists
     if os.path.exists(fpDst):
@@ -170,14 +188,41 @@ def removeCorpusTar(fp=None):
 
     os.system('mv %s %s' % (fpSrcDir, fpDstDir))
     # remove files, updates manifest
-    # TODO:
+    for fn in common.getCorpusContentDirs():
+        fp = os.path.join(fpDstDir, 'music21', 'corpus', fn)
+        os.system('rm -r %s' % fp)
+    # adjust the sources Txt file
+    sourcesTxt = os.path.join(fpDstDir, 'music21.egg-info', 'SOURCES.txt')
+    # files will look like 'music21/corpus/haydn' in SOURCES.txt
+    post = []
+    f = open(sourcesTxt, 'r')
+    corpusContentDirs = common.getCorpusContentDirs()
+    for l in f:
+        match = False
+        if 'corpus' in l:
+            for fn in corpusContentDirs:
+                # these are relative paths
+                fp = os.path.join('music21', 'corpus', fn)
+                if l.startswith(fp):
+                    match = True
+                    break
+        if not match: 
+            post.append(l)
+    f.close()
+    f = open(sourcesTxt, 'w')
+    f.writelines(post)
+    f.close()
 
-    # compress dst dir to dst file path name
-    # need the -C flag to set relative dir
-    cmd = 'tar -C %s -czf %s %s/' % (fpDir, fpDst, fnDstDir) # just name of dir
-    print(cmd)
-    os.system(cmd)
 
+    if mode == TAR:
+        # compress dst dir to dst file path name
+        # need the -C flag to set relative dir
+        # just name of dir
+        cmd = 'tar -C %s -czf %s %s/' % (fpDir, fpDst, fnDstDir) 
+        os.system(cmd)
+    elif mode == EGG:
+        # zip and name with egg
+        pass
 
     # remove directory that was compressed
     if os.path.exists(fpDstDir):
