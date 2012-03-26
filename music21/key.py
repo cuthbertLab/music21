@@ -191,6 +191,13 @@ def pitchToSharps(value, mode=None):
     -15
     >>> key.pitchToSharps('f--', 'locrian')
     -20
+    
+    But quarter tones don't work:
+    
+    >>> key.pitchToSharps('C~')
+    Traceback (most recent call last):
+    KeyException: Cannot determine sharps for quarter-tone keys! silly!
+    
     '''
     if common.isStr(value): 
         value = pitch.Pitch(value)
@@ -203,10 +210,9 @@ def pitchToSharps(value, mode=None):
     
     sharps = fifthsOrder.index(value.step) - 1
     if value.accidental is not None:
-        vaa = value.accidental.alter 
-        if vaa != int(vaa):
+        if value.accidental.isTwelveTone() is False:
             raise KeyException('Cannot determine sharps for quarter-tone keys! silly!')
-        vaa = int(vaa)
+        vaa = int(value.accidental.alter) 
         sharps = sharps + 7*vaa
     
     if mode is not None and mode in modeSharpsAlter:

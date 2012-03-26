@@ -412,93 +412,29 @@ def convertHarmonicToCents(value):
     >>> [convertHarmonicToCents(x) for x in [16, 17, 18, 19]]
     [4800, 4905, 5004, 5098]
 
-    >>> [convertHarmonicToCents(x) for x in range(1, 32)]
-    [0, 1200, 1902, 2400, 2786, 3102, 3369, 3600, 3804, 3986, 4151, 4302, 4441, 4569, 4688, 4800, 4905, 5004, 5098, 5186, 5271, 5351, 5428, 5502, 5573, 5641, 5706, 5769, 5830, 5888, 5945]
+    >>> [convertHarmonicToCents(x) for x in range(1, 33)]
+    [0, 1200, 1902, 2400, 2786, 3102, 3369, 3600, 3804, 3986, 4151, 4302, 4441, 4569, 4688, 4800, 4905, 5004, 5098, 5186, 5271, 5351, 5428, 5502, 5573, 5641, 5706, 5769, 5830, 5888, 5945, 6000]
+
+
+    Works with subHarmonics as well by specifying them as either 1/x or negative numbers.
+    note that -2 is the first subharmonic, since -1 == 1:
+    
+    >>> [convertHarmonicToCents(1.0/x) for x in [1, 2, 3, 4]]
+    [0, -1200, -1902, -2400]
+    >>> [convertHarmonicToCents(x) for x in [-1, -2, -3, -4]]
+    [0, -1200, -1902, -2400]
+    
+    So the fifth subharmonic of the 7th harmonic (remember floating point division for Python 2.x!),
+    which is C2->C3->G3->C4->E4->G4->B`4 --> B`3->E`3->B`2->G-`2
+    
+    >>> convertHarmonicToCents(7.0/5.0)
+    583
+    >>> convertHarmonicToCents(7.0) - convertHarmonicToCents(5.0)
+    583
     '''
-    # table employed: http://en.wikipedia.org/wiki/Harmonic_series_(music)
-    hs = 100 # halfstep is 100 cents
-
-    # octaves
-    if value == 1:
-        return 0
-    elif value == 2:
-        return (1200 * 1)
-    elif value == 4:
-        return (1200 * 2)
-    elif value == 8:
-        return (1200 * 3)
-    elif value == 16:
-        return (1200 * 4)
-
-    elif value == 17:
-        return ((100 * 1)+(1200 * 4)) + 5
-
-    elif value == 9:
-        return ((100 * 2)+(1200 * 3)) + 4
-    elif value == 18:
-        return ((100 * 2)+(1200 * 4)) + 4
-
-    elif value == 19:
-        return ((100 * 3)+(1200 * 4)) - 2
-
-    elif value == 5:
-        return ((100 * 4)+(1200 * 2)) - 14
-    elif value == 10:
-        return ((100 * 4)+(1200 * 3)) - 14
-    elif value == 20:
-        return ((100 * 4)+(1200 * 4)) - 14
-
-    elif value == 21:
-        return ((100 * 5)+(1200 * 4)) - 29
-
-    elif value == 11:
-        return ((100 * 6)+(1200 * 3)) - 49
-    elif value == 22:
-        return ((100 * 6)+(1200 * 4)) - 49
-
-    elif value == 23:
-        return ((100 * 6)+(1200 * 4)) + 28
-
-    elif value == 3:
-        return ((100 * 7)+(1200 * 1)) + 2
-    elif value == 6:
-        return ((100 * 7)+(1200 * 2)) + 2
-    elif value == 12:
-        return ((100 * 7)+(1200 * 3)) + 2
-    elif value == 24:
-        return ((100 * 7)+(1200 * 4)) + 2
-
-    elif value == 25:
-        return ((100 * 8)+(1200 * 4)) - 27
-
-    elif value == 13:
-        return ((100 * 8)+(1200 * 3)) + 41
-    elif value == 26:
-        return ((100 * 8)+(1200 * 4)) + 41
-
-    elif value == 27:
-        return ((100 * 9)+(1200 * 4)) + 6
-
-    elif value == 7:
-        return ((100 * 10)+(1200 * 2)) - 31
-    elif value == 14:
-        return ((100 * 10)+(1200 * 3)) - 31
-    elif value == 28:
-        return ((100 * 10)+(1200 * 4)) - 31
-
-    elif value == 29:
-        return ((100 * 10)+(1200 * 4)) + 30
-
-    elif value == 15:
-        return ((100 * 11)+(1200 * 3)) - 12
-    elif value == 30:
-        return ((100 * 11)+(1200 * 4)) - 12
-
-    elif value == 31:
-        return ((100 * 11)+(1200 * 4)) + 45
-
-    else:
-        raise Exception('no such harmonic defined: %s' % value)
+    if value < 0: #subharmonics
+        value = 1.0/(abs(value))
+    return int(round(1200*math.log(value, 2), 0))
 
 
 
@@ -516,7 +452,8 @@ class MicrotoneException(music21.Music21Exception):
 #-------------------------------------------------------------------------------
 class Microtone(music21.JSONSerializer):
     '''
-    The Microtone object defines a pitch transformation above or below a standard Pitch and its Accidental.
+    The Microtone object defines a pitch transformation above 
+    or below a standard Pitch and its Accidental.
 
     >>> from music21 import *
     >>> m = pitch.Microtone(20)
@@ -526,6 +463,11 @@ class Microtone(music21.JSONSerializer):
     0.2...
     >>> m
     (+20c)
+
+
+    Microtones can be shifted according to the harmonic. Here we take the 3rd
+    harmonic of the previous microtone
+
     >>> m.harmonicShift = 3
     >>> m
     (+20c+3rdH)
@@ -534,17 +476,28 @@ class Microtone(music21.JSONSerializer):
     >>> m.alter
     19.2...
 
+
+    Microtonal changes can be positive or negative.
+    Both Positive and negative numbers can optionally be placed in parentheses
+    Negative numbers in parentheses still need the minus sign.
+    
+
     >>> m = pitch.Microtone('(-33.333333)')
     >>> m
     (-33c)
     >>> m = pitch.Microtone('33.333333')
     >>> m
     (+33c)
+    
+    
+    Note that we round the display of microtones to the nearest cent,
+    but we keep the exact alteration in both .cents and .alter:
+
+    >>> m.cents
+    33.333...
     >>> m.alter
     0.3333...
     '''
-    _validHarmonics = range(1, 32)
-
     def __init__(self, centsOrString=0):
         music21.JSONSerializer.__init__(self)
 
@@ -623,12 +576,10 @@ class Microtone(music21.JSONSerializer):
         return self._harmonicShift
 
     def _setHarmonicShift(self, value):
-        if value not in self._validHarmonics:
-            raise MicrotoneException('not a valud harmonic: %s' % value)
         self._harmonicShift = value
 
     harmonicShift = property(_getHarmonicShift, _setHarmonicShift, 
-        doc = '''Set or get the harmonic shift.
+        doc = '''Set or get the harmonic shift, altering the microtone
         ''')
 
 
@@ -638,7 +589,9 @@ class Microtone(music21.JSONSerializer):
         return convertHarmonicToCents(self._harmonicShift) + self._centShift
 
     cents = property(_getCents, 
-        doc = '''Return the microtone value in cents. This is not a settable property. To set the value in cents, simply use that value as a creation argument. 
+        doc = '''Return the microtone value in cents. 
+        This is not a settable property. To set the value in cents, 
+        simply use that value as a creation argument. 
         ''')
 
     def _getAlter(self):
@@ -659,7 +612,14 @@ class Accidental(music21.Music21Object):
     
     Two accidentals are considered equal if their names are equal.
 
-    Accidentals have three defining attributes: a name, a modifier, and an alter. For microtonal specifications, the name and modifier are the same'
+    Accidentals have three defining attributes: a name, a modifier, and an alter. 
+    For microtonal specifications, the name and modifier are the same except in
+    the case of half-sharp, half-flat, one-and-a-half-flat, and one-and-a-half-sharp.
+    
+    Accidentals up to quadruple-sharp and quadruple-flat are allowed.
+
+    Natural-sharp etc. (for canceling a previous flat) are not yet supported.
+
 
     >>> from music21 import pitch
     >>> a = pitch.Accidental('sharp')
@@ -956,7 +916,13 @@ class Accidental(music21.Music21Object):
         self._displayType = value
     
     displayType = property(_getDisplayType, _setDisplayType, 
-        doc = '''Display if first in measure; other valid terms:
+        doc = '''
+        Returns or sets the display type of the accidental
+        
+        "normal" (default) displays it if it is the first in measure,
+        or is needed to contradict a previous accidental, etc.
+        
+        other valid terms:
         "always", "never", "unless-repeated" (show always unless
         the immediately preceding note is the same), "even-tied"
         (stronger than always: shows even if it is tied to the
@@ -973,12 +939,15 @@ class Accidental(music21.Music21Object):
         self._displayStatus = value
     
     displayStatus = property(_getDisplayStatus, _setDisplayStatus, 
-        doc = '''Given the displayType, should this accidental be displayed?
+        doc = '''
+        Given the displayType, should this accidental be displayed?
 
-        In general, a display status of None is assumed to mean that no high-level processing of accidentals has happened. 
+        In general, a display status of None is assumed to mean that no high-level 
+        processing of accidentals has happened. 
 
         Can be True, False, or None if not defined. For contexts where
-        the next program down the line cannot evaluate displayType.
+        the next program down the line cannot evaluate displayType.  See
+        stream.makeAccidentals() for more information.
         ''')
 
 
@@ -1019,7 +988,9 @@ class Accidental(music21.Music21Object):
             return self.modifier
 
     unicode = property(_getUnicode, 
-        doc = '''Return a unicode representation of this accidental. 
+        doc = '''
+        Return a unicode representation of this accidental or the best ascii representation
+        if that is not possible.
         ''')
 
 
@@ -1035,6 +1006,13 @@ class Accidental(music21.Music21Object):
         >>> a = pitch.Accidental('double-flat')
         >>> a.fullName
         'double-flat'
+
+        Note that non-standard microtones are converted to standard ones
+        
+        >>> a = pitch.Accidental('quarter-flat')
+        >>> a.fullName
+        'half-flat'
+
         ''')
 
 
@@ -1430,7 +1408,9 @@ class Pitch(music21.Music21Object):
     accidental = property(_getAccidental, _setAccidental,
         doc='''
         Stores an optional accidental object contained within the
-        Pitch object.  This might return None.
+        Pitch object.  This might return None, which is different
+        than a natural accidental:
+        
 
         >>> from music21 import *
         >>> a = pitch.Pitch('E-')
@@ -2340,8 +2320,9 @@ class Pitch(music21.Music21Object):
         Read-only attribute. Returns the name 
         of a Pitch in the German system 
         (where B-flat = B, B = H, etc.)
-        (Microtones raise an error).  Note that 
+        (Microtones and Quartertones raise an error).  Note that 
         Ases is used instead of the also acceptable Asas.
+        
         
         >>> from music21 import *
         >>> print pitch.Pitch('B-').german
