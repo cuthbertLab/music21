@@ -41,7 +41,7 @@ if len(_missingImport) > 0:
 
                                        
 def runTranscribe(show=True, plot=True, useMic=True,
-                  seconds=20.0, useScale=scale.ChromaticScale('C4'), saveFile=True):
+                  seconds=20.0, useScale=None, saveFile=True):
     '''
     runs all the methods to record from audio for `seconds` length (default 10.0)
     and transcribe the resulting melody.
@@ -61,6 +61,8 @@ def runTranscribe(show=True, plot=True, useMic=True,
     Microtonal scales are totally accepted, as are retuned scales where A != 440hz.
 
     '''
+    if useScale is None:
+        useScale = scale.ChromaticScale('C4')
     #beginning - recording or not
     if saveFile != False:
         if saveFile == True:

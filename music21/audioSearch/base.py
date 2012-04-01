@@ -127,7 +127,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
         finalResult = recordSampleRate / vertex
     return finalResult
 
-def prepareThresholds(useScale=music21.scale.ChromaticScale('C4')):
+def prepareThresholds(useScale=None):
     '''
     returns two elements.  The first is a list of threshold values
     for one octave of a given scale, `useScale`, 
@@ -161,6 +161,9 @@ def prepareThresholds(useScale=music21.scale.ChromaticScale('C4')):
     F#4 < 0.61 < G#4
     G#4 < 1.24 < A4
     '''
+    if useScale is None:
+        useScale = music21.scale.ChromaticScale('C4')
+    
     scPitches = useScale.pitches
     scPitchesRemainder = []
    
@@ -251,7 +254,7 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
     name_note = music21.pitch.Pitch(str(pitches[-1]))
     return name_note.frequency, returnPitch      
 
-def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=music21.scale.MajorScale('C4')):
+def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=None):
     '''
     Takes in a list of detected pitch frequencies and returns a tuple where the first element
     is a list of :class:~`music21.pitch.Pitch` objects that best match these frequencies 
@@ -273,7 +276,9 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=music21.scale.MajorS
     >>> print detectedPitchObjects
     [A5, A5, A5, D5, D4, B4, A4, F4, E-4, C#3, B3, B3, B3, A3, G3, F3, F3, E3, F#3, F#3,...]   
     '''
-    
+    if useScale is None:
+        useScale = music21.scale.MajorScale('C4')
+
     detectedPitchObjects = []
     (thresholds, pitches) = prepareThresholds(useScale)
 

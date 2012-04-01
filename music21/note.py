@@ -592,7 +592,7 @@ class GeneralNote(music21.Music21Object):
         if (self.expressions):
             for thisExpression in self.expressions:
                 if dir(thisExpression).count('lily') > 0:
-                    allNames += " " + thisNotation.lily
+                    allNames += " " + thisExpression.lily
 
         allNames += self.editorial.lilyEnd()
         

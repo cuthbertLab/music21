@@ -379,7 +379,7 @@ class BoundIntervalNetwork(IntervalNetwork):
     '''
 
     def __init__(self, edgeList=None, octaveDuplicating=False, 
-            deterministic=True, pitchSimplification='maxAccidental'):
+                 deterministic=True, pitchSimplification='maxAccidental'):
         IntervalNetwork.__init__(self)
 
         # store each edge with and index that is incremented when added
