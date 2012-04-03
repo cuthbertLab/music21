@@ -1377,7 +1377,6 @@ class Chord(note.NotRest):
         '''
         from music21 import scale
         # roman numerals have this built in as the key attribute
-        #print "hasattr(self, 'scale')", hasattr(self, 'scale')
         if hasattr(self, 'key') and self.key is not None: 
             # Key is a subclass of scale.DiatonicScale
             sc = self.key

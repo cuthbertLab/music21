@@ -1437,14 +1437,6 @@ class Test(unittest.TestCase):
         self.assertEqual(str(rn.pitches), '[C#5, E#5, G#5]')
         self.assertEqual(str(rn.scaleDegrees), '[(5, None), (7, <accidental sharp>), (2, None)]')
                 
-#         >>> rn.scaleDegrees
-#         [(5, None), (7, <accidental sharp>), (2, None)] 
-#         >>> rn2 = roman.RomanNumeral('N6', k)
-#         >>> rn2.pitches
-#         [B4, D5, G5]
-#         >>> rn2.scaleDegrees # N.B. -- natural form used for minor!
-#         [(4, None), (6, None), (2, <accidental flat>)]
-
 
 
 class TestExternal(unittest.TestCase):

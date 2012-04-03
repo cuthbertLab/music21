@@ -60,6 +60,7 @@ Module Reference
    moduleBase
    moduleBeam
    moduleBrailleBasic
+   moduleBrailleExamples
    moduleBrailleTranslate
    moduleClef
    moduleCommon

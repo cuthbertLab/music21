@@ -31,6 +31,10 @@ class Distributor(object):
         self.fpEgg = None
         self.fpWin = None
         self.fpTar = None
+
+        self.fpEggNoCorpus = None
+        self.fpTarNoCorpus = None
+
         self.version = base.VERSION_STR
 
         self._initPaths()
@@ -80,6 +84,8 @@ class Distributor(object):
 
     def removeCorpus(self, fp):
         '''Remove the corpus from a compressed file (.tar.gz or .egg) and create a new music21-noCorpus version.
+
+        Return the completed file path of the newly created edition.
     
         NOTE: this function works only with Posix systems. 
         '''
@@ -96,7 +102,7 @@ class Distributor(object):
     
         fpDir, fn = os.path.split(fp)
     
-        # this has .tar.gz extension
+        # this has .tar.gz extension; this is the final completed package
         fnDst = fn.replace('music21', 'music21-noCorpus')
         fpDst = os.path.join(fpDir, fnDst)
         # remove file extnesions
@@ -160,7 +166,6 @@ class Distributor(object):
         f.writelines(post)
         f.close()
     
-    
         if mode == TAR:
             # compress dst dir to dst file path name
             # need the -C flag to set relative dir
@@ -176,8 +181,8 @@ class Distributor(object):
         if os.path.exists(fpDstDir):
             # can use shutil.rmtree
             os.system('rm -r %s' % fpDstDir)
-    
-    
+
+        return fpDst # full path with extension
     
 
 
@@ -201,8 +206,8 @@ class Distributor(object):
         os.system('rm -r %s' % self.fpBuildDir)
 
         # create no corpus versions
-        self.removeCorpus(fp=self.fpTar)
-        self.removeCorpus(fp=self.fpEgg)
+        self.fpTarNoCorpus = self.removeCorpus(fp=self.fpTar)
+        self.fpEggNoCorpus = self.removeCorpus(fp=self.fpEgg)
 
 
     def _uploadPyPi(self):
@@ -237,9 +242,11 @@ class Distributor(object):
     def upload(self):
         '''Perform all uploads.
         '''
-        self._uploadPyPi()
-        for fp in [self.fpTar, self.fpEgg, self.fpWin]:
-            self._uploadGoogleCode(fp)
+        #self._uploadPyPi()
+        for fp in [self.fpTar, self.fpEgg, self.fpWin, 
+            self.fpTarNoCorpus, self.fpEggNoCorpus]:
+            print fp
+            #self._uploadGoogleCode(fp)
 
 
 
@@ -253,7 +260,7 @@ if __name__ == '__main__':
     import sys
     d = Distributor()
     d.build()
-    #d.upload()
+    d.upload()
     
 
 
