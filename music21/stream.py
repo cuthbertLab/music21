@@ -1319,8 +1319,6 @@ class Stream(music21.Music21Object):
         When using this method, the caller is responsible for calling 
         Stream._elementsChanged after all operations are completed.
 
-
-        This method does not adjust priority values for grace notes.
         '''
         # NOTE: this is not called by append, as that is optimized 
         # for looping multiple elements
@@ -1483,22 +1481,25 @@ class Stream(music21.Music21Object):
             element.activeSite = self 
             self._elements.append(element)  
 
-            if element.duration.quarterLength == 0: 
-                # it might be a grace note
-                if 'NotRest' in element.classes and element.isGrace:
-                    # no change to highestTime is needed
-                    graces = self._getGracesAtOffset(highestTime)
-                    #hp = self._highestPriorityAtOffset(highestTime, 
-                    #                    gracesOnly=True)
-                    #environLocal.printDebug(['got highest priority: hp'])
-                    if len(graces) > 1:
-                        hp = max([g.priority for g in graces])
-                        # if highest priority found is greater than known
-                        # must change what we have
-                        if hp >= element.priority:
-                            element.priority = hp + 1 # increment
-            else:
-                # increment highestTime by quarterlength
+#             if element.duration.quarterLength == 0: 
+#                 # it might be a grace note
+#                 if 'NotRest' in element.classes and element.isGrace:
+#                     # no change to highestTime is needed
+#                     graces = self._getGracesAtOffset(highestTime)
+#                     #hp = self._highestPriorityAtOffset(highestTime, 
+#                     #                    gracesOnly=True)
+#                     #environLocal.printDebug(['got highest priority: hp'])
+#                     if len(graces) > 1:
+#                         hp = max([g.priority for g in graces])
+#                         # if highest priority found is greater than known
+#                         # must change what we have
+#                         if hp >= element.priority:
+#                             element.priority = hp + 1 # increment
+#             else:
+#                 # increment highestTime by quarterlength
+#                 highestTime += element.duration.quarterLength
+
+            if element.duration.quarterLength != 0: 
                 highestTime += element.duration.quarterLength
 
         # does not change sorted state
@@ -2512,30 +2513,30 @@ class Stream(music21.Music21Object):
         return None
 
 
-    def _getGracesAtOffset(self, offset):
-        '''Get all grace Notes or Chords that reside at a single offset and return these in a list. This is a utility method that may be made public if useful. This has less features than getElementsByOffset(), and must be as fast as possible, as will be called often in appending and inserting elements.
-        '''
-        post = []
-        # we assume for now that grace notes are not found as endElements 
-        for e in self._elements:
-            o = e.getOffsetBySite(self)
-            if common.almostEquals(o, offset):
-                # must be subclass of NotRest
-                if 'NotRest' in e.classes:
-                    if e.isGrace:
-                        post.append(e)
-        return post
+#     def _getGracesAtOffset(self, offset):
+#         '''Get all grace Notes or Chords that reside at a single offset and return these in a list. This is a utility method that may be made public if useful. This has less features than getElementsByOffset(), and must be as fast as possible, as will be called often in appending and inserting elements.
+#         '''
+#         post = []
+#         # we assume for now that grace notes are not found as endElements 
+#         for e in self._elements:
+#             o = e.getOffsetBySite(self)
+#             if common.almostEquals(o, offset):
+#                 # must be subclass of NotRest
+#                 if 'NotRest' in e.classes:
+#                     if e.isGrace:
+#                         post.append(e)
+#         return post
 
-    def _highestPriorityAtOffset(self, offset, gracesOnly=False):
-        '''Return the highes priority for all graces found at a specific offset.
+    def _highestPriorityAtOffset(self, offset):
+        '''Return the highes priority for all elements found at a specific offset.
         This may be a public method if useful.
         '''
-        if gracesOnly:
-            found = self._getGracesAtOffset(offset)
-            if found == []:
-                return None
-        else:
-            raise StreamException('not implemented')
+#         if gracesOnly:
+#             found = self._getGracesAtOffset(offset)
+#             if found == []:
+#                 return None
+#         else:
+#             raise StreamException('not implemented')
         return max([g.priority for g in found])
 
 
@@ -17022,73 +17023,73 @@ class Test(unittest.TestCase):
         self.assertEqual(str(s.finalBarline), '[<music21.bar.Barline style=final>, <music21.bar.Barline style=none>, <music21.bar.Barline style=final>, <music21.bar.Barline style=none>]')
 
 
-    def testGraceNoteSortingA(self):
-        from music21 import note, stream
+#     def testGraceNoteSortingA(self):
+#         from music21 import note, stream
+# 
+#         n1 = note.Note('C', type='16th')
+#         n2 = note.Note('D', type='16th')
+#         n3 = note.Note('E', type='16th')
+#         n4 = note.Note('F', type='16th')
+#         n5 = note.Note('G', type='16th')
+# 
+#         s = stream.Stream()
+#   
+#         n1.makeGrace()
+#         s.append(n1)
+#         n2.makeGrace()
+#         s.append(n2)
+# 
+#         s.append(n3)
+# 
+#         n4.makeGrace()
+#         s.append(n4)
+#         s.append(n5)
+# 
+#         self.assertEqual(s._getGracesAtOffset(0), [n1, n2])
+#         self.assertEqual(s._getGracesAtOffset(.25), [n4])
+# 
+#         match = [(n.name, n.offset, n.quarterLength, n.priority) for n in s]
+#         self.assertEqual(match, 
+#        [('C', 0.0, 0.0, -100), 
+#         ('D', 0.0, 0.0, -99), 
+#         ('E', 0.0, 0.25, 0), 
+#         ('F', 0.25, 0.0, -100), 
+#         ('G', 0.25, 0.25, 0)])
 
-        n1 = note.Note('C', type='16th')
-        n2 = note.Note('D', type='16th')
-        n3 = note.Note('E', type='16th')
-        n4 = note.Note('F', type='16th')
-        n5 = note.Note('G', type='16th')
 
-        s = stream.Stream()
-  
-        n1.makeGrace()
-        s.append(n1)
-        n2.makeGrace()
-        s.append(n2)
-
-        s.append(n3)
-
-        n4.makeGrace()
-        s.append(n4)
-        s.append(n5)
-
-        self.assertEqual(s._getGracesAtOffset(0), [n1, n2])
-        self.assertEqual(s._getGracesAtOffset(.25), [n4])
-
-        match = [(n.name, n.offset, n.quarterLength, n.priority) for n in s]
-        self.assertEqual(match, 
-       [('C', 0.0, 0.0, -100), 
-        ('D', 0.0, 0.0, -99), 
-        ('E', 0.0, 0.25, 0), 
-        ('F', 0.25, 0.0, -100), 
-        ('G', 0.25, 0.25, 0)])
-
-
-    def testGraceNoteSortingB(self):
-        from music21 import note, stream
-
-        n1 = note.Note('C', type='16th')
-        n2 = note.Note('D', type='16th')
-        n3 = note.Note('E', type='16th')
-        n4 = note.Note('F', type='16th')
-        n5 = note.Note('G', type='16th')
-        s = stream.Stream()
-  
-        n1.makeGrace()
-        s.append(n1)
-        n2.makeGrace()
-        s.append(n2)
-        n3.makeGrace()
-        s.append(n3)
-
-        s.append(n4)
-        n5.makeGrace() # grace at end
-        s.append(n5)
-
-        #s.show('t')
-
-        self.assertEqual(s._getGracesAtOffset(0), [n1, n2, n3])
-        self.assertEqual(s._getGracesAtOffset(.25), [n5])
-
-        match = [(n.name, n.offset, n.quarterLength, n.priority) for n in s]
-        self.assertEqual(match, 
-       [('C', 0.0, 0.0, -100), 
-        ('D', 0.0, 0.0, -99), 
-        ('E', 0.0, 0.0, -98), 
-        ('F', 0.0, 0.25, 0), 
-        ('G', 0.25, 0.0, -100)])
+#     def testGraceNoteSortingB(self):
+#         from music21 import note, stream
+# 
+#         n1 = note.Note('C', type='16th')
+#         n2 = note.Note('D', type='16th')
+#         n3 = note.Note('E', type='16th')
+#         n4 = note.Note('F', type='16th')
+#         n5 = note.Note('G', type='16th')
+#         s = stream.Stream()
+#   
+#         n1.makeGrace()
+#         s.append(n1)
+#         n2.makeGrace()
+#         s.append(n2)
+#         n3.makeGrace()
+#         s.append(n3)
+# 
+#         s.append(n4)
+#         n5.makeGrace() # grace at end
+#         s.append(n5)
+# 
+#         #s.show('t')
+# 
+#         self.assertEqual(s._getGracesAtOffset(0), [n1, n2, n3])
+#         self.assertEqual(s._getGracesAtOffset(.25), [n5])
+# 
+#         match = [(n.name, n.offset, n.quarterLength, n.priority) for n in s]
+#         self.assertEqual(match, 
+#        [('C', 0.0, 0.0, -100), 
+#         ('D', 0.0, 0.0, -99), 
+#         ('E', 0.0, 0.0, -98), 
+#         ('F', 0.0, 0.25, 0), 
+#         ('G', 0.25, 0.0, -100)])
 
         # add a clef; test sorting
         # problem: this sorts priority before class

@@ -1484,7 +1484,7 @@ class JSONSerializer(object):
                     if name not in classNames:
                         # store the name, not the attr
                         post.append(name)
-        environLocal.pd(['auto-derived jsonAttributes', post])
+        #environLocal.pd(['auto-derived jsonAttributes', post])
         return post
 
     def jsonAttributes(self):
@@ -4987,13 +4987,10 @@ class Test(unittest.TestCase):
             #print el
             self.assertEqual(el.obj, soundFile)
             s.insert(i, el)
-#            s.insert(i, note.Note())    
 
         for ew in storage:
             self.assertEqual(s.hasElement(ew), True)
-            #print 'get offset by element', s.getOffsetByElement(ew)
 
-#        print 'outer container', s
         matchOffset = []
         matchBeatStrength = []
         matchAudioChannels = []

@@ -3199,6 +3199,7 @@ class Duration(DurationCommon):
             self.addDurationUnit(Duration(x))
 
 
+# TODO: remove when graces are implemented
 class GraceDuration(Duration):
     def __init__(self):
         Duration.__init__(self)

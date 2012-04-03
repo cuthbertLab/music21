@@ -242,11 +242,10 @@ class Distributor(object):
     def upload(self):
         '''Perform all uploads.
         '''
-        #self._uploadPyPi()
+        self._uploadPyPi()
         for fp in [self.fpTar, self.fpEgg, self.fpWin, 
             self.fpTarNoCorpus, self.fpEggNoCorpus]:
-            print fp
-            #self._uploadGoogleCode(fp)
+            self._uploadGoogleCode(fp)
 
 
 
