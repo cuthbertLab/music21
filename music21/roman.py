@@ -580,6 +580,7 @@ class RomanNumeral(chord.Chord):
         if isinstance(figure, int):
             self.caseMatters = False
             figure = common.toRoman(figure)
+
          # store raw figure before calling setKeyOrScale
         self._figure = figure            
         self._scale = None # this is set when _setKeyOrScale() is called
@@ -589,10 +590,13 @@ class RomanNumeral(chord.Chord):
         self._parsingComplete = False
         
         # actions
-        self.key = keyOrScale
+        #self.key = keyOrScale
+        self._setKeyOrScale(keyOrScale)
         if self._figure is not None:
             self._parseFigure()
             self._updatePitches()
+
+
         self._parsingComplete = True
         
     def __repr__(self):
@@ -615,7 +619,8 @@ class RomanNumeral(chord.Chord):
         #self.scaleCardinality = len(useScale.pitches) - 1 # should be 7 but hey, octatonic scales, etc.
         self.scaleCardinality = useScale.getDegreeMaxUnique()
 
-        bassScaleDegree = self.bassScaleDegreeFromNotation(self.figuresNotationObj)
+        bassScaleDegree = self.bassScaleDegreeFromNotation( 
+                            self.figuresNotationObj)
         bassPitch = useScale.pitchFromDegree(bassScaleDegree, 
                     direction = scale.DIRECTION_ASCENDING)
         pitches = [bassPitch]
@@ -957,7 +962,6 @@ class RomanNumeral(chord.Chord):
             pass
             # cache object if passed directly
 
-        
         self._scale = keyOrScale
         if keyOrScale is None or (hasattr(keyOrScale, "isConcrete") and 
             keyOrScale.isConcrete == False):
@@ -1423,6 +1427,23 @@ class Test(unittest.TestCase):
         p = pitch.Pitch('c4')
         p.accidental = pitch.Accidental(-1)
         self.assertEqual(str(p), 'C-4')
+
+
+    def testScaleDegreesA(self):
+        from music21 import key, roman
+        k = key.Key('f#')  # 3-sharps minor
+        rn = roman.RomanNumeral('V', k)
+        self.assertEqual(str(rn.key), 'f# minor')
+        self.assertEqual(str(rn.pitches), '[C#5, E#5, G#5]')
+        self.assertEqual(str(rn.scaleDegrees), '[(5, None), (7, <accidental sharp>), (2, None)]')
+                
+#         >>> rn.scaleDegrees
+#         [(5, None), (7, <accidental sharp>), (2, None)] 
+#         >>> rn2 = roman.RomanNumeral('N6', k)
+#         >>> rn2.pitches
+#         [B4, D5, G5]
+#         >>> rn2.scaleDegrees # N.B. -- natural form used for minor!
+#         [(4, None), (6, None), (2, <accidental flat>)]
 
 
 

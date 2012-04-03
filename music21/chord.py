@@ -1332,8 +1332,9 @@ class Chord(note.NotRest):
         
         >>> from music21 import *
         >>> k = key.Key('f#')  # 3-sharps minor
-
         >>> rn = roman.RomanNumeral('V', k)
+        >>> rn.key
+        <music21.key.Key of f# minor>
         >>> rn.pitches
         [C#5, E#5, G#5]
         >>> rn.scaleDegrees
@@ -1375,10 +1376,12 @@ class Chord(note.NotRest):
                 
         '''
         from music21 import scale
-        if hasattr(self, 'scale') and self.scale != None: # roman numerals have this built in
-            sc = self.scale
+        # roman numerals have this built in as the key attribute
+        #print "hasattr(self, 'scale')", hasattr(self, 'scale')
+        if hasattr(self, 'key') and self.key is not None: 
+            # Key is a subclass of scale.DiatonicScale
+            sc = self.key
         else:
-
             sc = self.getContextByClass(scale.Scale, 
                 prioritizeActiveSite=True, sortByCreationTime=True)
             if sc is None:
@@ -4338,6 +4341,8 @@ class Test(unittest.TestCase):
         self.assertEqual(s.highestOffset, 2.0)
         self.assertEqual(str(s.pitches), '[D2, E-1, B-6]')
 
+
+    
 
 
 #-------------------------------------------------------------------------------
