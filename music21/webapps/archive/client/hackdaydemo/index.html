@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<!-- saved from url=(0027)http://web.mit.edu/music21/ -->
+<html class="dj_webkit dj_chrome dj_contentbox"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>music21: a Toolkit for Computer-Aided Musicology</title>
+
+<script type="text/javascript">
+        var djConfig = {
+            parseOnLoad: true,
+            isDebug: false
+        };
+</script>
+
+<link rel="stylesheet" type="text/css" href="index_files/tundra.css">
+<link rel="stylesheet" type="text/css" href="index_files/Lightbox.css">
+
+<script type="text/javascript" src="index_files/dojo.xd.js"></script>
+
+<script>
+dojo.require('dojox.image.Lightbox')
+
+function fixBot() {
+  wS = dojo.byId("whiteSection")
+  h1 = wS.offsetTop + wS.offsetHeight
+  rS = dojo.byId("rightSection")
+  h2 = rS.offsetTop + rS.offsetHeight
+
+  botSec = dojo.byId("botSection")
+  if (h1 > h2) { botSec.style.top = h1 + 10 + "px" }
+  else         { botSec.style.top = h2 + 10 + "px" }
+}
+
+function cuthPubLBsetup() {
+   lb1 = new dojox.image.Lightbox( { title:"music21 module code", group: "cuth", href:"top_right_expanded.jpg" });
+   lb2 = new dojox.image.Lightbox( { title:"<span class='blueExample'>tinyNotation</span>.TinyNotationStream<br>&nbsp;&nbsp;('<span class='greenExample'>c4 d8 f g16 a g f#</span>', '<span class='greenExample'>3/4</span>').show()", group: "cuth", href:"tinyNotation1.jpg" });
+   lb3 = new dojox.image.Lightbox( { title:"Schoenberg twelve-tone row as a matrix", group: "cuth", href:"serial_row.jpg" });
+   lb4 = new dojox.image.Lightbox( { title:"Websearches triggered by texts", group: "cuth", href:"magnificat_search.jpg" });
+   lb5 = new dojox.image.Lightbox( { title:"Automatic anotation of German note names", group: "cuth", href:"auto_bach_german.jpg" });
+   lb6 = new dojox.image.Lightbox( { title:"Chopin Pitch/Note-Length Distributions", group: "cuth", href:"chopin_mazurka_distribution.jpg" });
+   lb7 = new dojox.image.Lightbox( { title:"Rhythms used in a Mazurka", group: "cuth", href:"most_common_chopin.jpg" });
+
+   lb1.startup()
+   lb2.startup()
+   lb3.startup()
+   lb4.startup()
+   lb5.startup()
+   lb6.startup()
+   lb7.startup()
+}
+
+function cuthPubLBrun() {
+   lb1.show()
+
+}
+
+dojo.addOnLoad( fixBot )
+dojo.addOnLoad( cuthPubLBsetup )
+</script><script type="text/javascript" charset="utf-8" src="index_files/Lightbox.xd.js"></script>
+<style>
+
+BODY {
+   background: white url(index_files/bg_top_mid.gif) repeat-x;
+   font-family: Georgia, palatino, "Times New Roman", serif;
+   font-size: 13px;
+   line-height: 18px;
+}
+
+H1 {
+   font-size: 22px;
+   color: #301540;
+}
+
+A {
+   color: #8025a0;
+   text-decoration: none;
+   border-bottom: 1px dotted #aa30ff;
+}
+
+A.visited {
+   color: #a025e0;
+   text-decoration: none;
+   border-bottom: 1px dotted #aa30ff;
+}
+
+H2 A {
+   border-bottom: none;
+}
+
+IMG { border-width: 0px 0px 0px 0px;
+    }
+
+B {
+   color: #301540;
+}
+SMALL { font-size: 10px; line-height: 12px; }
+
+.dateline {
+   color: #666677;
+   font-size: 11px;
+   margin-top: 10px;
+   margin-bottom: -12px;
+}
+
+
+#mainContainer {
+   position: absolute;
+   top: 0px;
+   left: 0px;
+   height: 100%;
+   width: 100%;
+}
+
+#topLeft {
+	background: url(index_files/bg_top_left.jpg) no-repeat;
+	width: 631px;
+	height: 70px;
+	position: absolute;
+	top: 0px;
+	left: 200px;
+	cursor: pointer;
+}
+
+#topRight {
+	background: url(index_files/bg_top_right.jpg) no-repeat;
+	width: 355px;
+	height: 392px;
+	position: absolute;
+	top: 0px;
+	left: 831px;
+	z-index: 50;
+	margin-bottom: 0px;
+}
+
+
+
+#firstTextSection {
+   position: relative;
+   top: 80px;
+}
+
+#whiteSection {
+	position: absolute;
+	top: -3px;
+	left: 75px;
+	width: 725px;
+	height: 1606px;
+}
+
+#rightSection {
+	position: absolute;
+	top: 311px;
+	left: 834px;
+	width: 350px;
+	text-align: justify;
+}
+
+#botSection {
+   background: url(index_files/bot_bg.jpg);
+   position: relative;
+   top: 1000px;
+}
+
+#midWhite {
+   background: url(index_files/mid_whiteblack.jpg) repeat-x;
+   width: 100%;
+   height: 36px;
+}
+
+#botTop {
+   display: none;
+/*   background: url(index_files/bot_titles.jpg) no-repeat;
+   width: 1016px;
+   height: 108px;
+   position: relative;
+   top: 20px;
+   left: 20px;
+*/}
+
+#botMid {
+   display: none;
+/*   background: url(index_files/bot_mid.jpg) repeat-y;
+   width: 1016px;
+   position: relative;
+   top: 0px;
+   left: 20px;
+*/
+}
+
+#botBot {
+   display: none;
+/*
+   background: url(index_files/bot_bot.jpg) no-repeat;
+   width: 1016px;
+   height: 52px;
+   position: relative;
+   top: 0px;
+   left: 20px;
+*/
+}
+
+#publications {
+   color: #eeeeee;
+}
+
+#otherLinks {
+   color: #f5f5f5;
+}
+
+#botTable H2 {
+   color: #ffaa66;
+   font-size: 1.3em;
+   margin-bottom: 6px;
+}
+
+#publications A {
+   color: #f0f5d0;
+   border-bottom: 1px dotted #666655;
+}
+
+#otherLinks A {
+   color: #f0f5d0;
+   border-bottom: 1px dotted #777766;
+}
+
+
+#botTable .gray {
+   color: #c0c0c0;
+}
+
+.m21 {
+   font-family: "Courier New", "courier", monospaced;
+   font-size: 90%;
+}
+
+.shadeddotted {
+  background-color: #fafaf0;
+  border: 1px black dotted;
+  padding: 5px 5px 5px 5px
+}
+
+.indentExample {
+   font-family: "Courier New", "courier", monospaced;
+   font-size: 90%;
+   margin-left: 20px;
+}
+
+.greenExample {
+   color: #00a000;
+}
+
+.blueExample {
+   color: #0000e0;
+}
+</style>
+
+
+<script type="text/javascript" charset="utf-8" src="index_files/Dialog.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/_base.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/move.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/TimedMoveable.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/fx.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/_Widget.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/_Templated.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/_FormMixin.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/_DialogMixin.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/DialogUnderlay.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/ContentPane.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/common.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/TooltipDialog.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/Mover.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/Moveable.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/Toggler.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/_base.xd(1).js"></script><script type="text/javascript" charset="utf-8" src="index_files/string.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/parser.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/cache.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/_Contained.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/_LayoutWidget.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/html.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/loading.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/common.xd(1).js"></script><script type="text/javascript" charset="utf-8" src="index_files/autoscroll.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/focus.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/manager.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/place.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/popup.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/scroll.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/sniff.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/typematic.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/wai.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/window.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/stamp.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/_Container.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/AdapterRegistry.xd.js"></script>
+
+<script lang='javascript'>
+
+// Get Movie - provides access to Object - accounts for browser differences
+function getMovie(movieName) {
+    if (navigator.appName.indexOf("Microsoft") != -1) {
+        return document.getElementById(movieName);
+    }
+    else {
+        return document[movieName]
+    }
+}
+
+function sendToNoteflight() {
+	getMovie('score1').loadMusicXML(document.getElementById('resultxmltextarea').value);		
+}
+
+/* 
+ * createObject()
+ * 
+ * creates an AJAX HTTP Request object - accounts for browser differences
+ */
+
+function createObject() {
+	var request_type;
+	var browser = navigator.appName;
+	if(browser == "Microsoft Internet Explorer"){
+		request_type = new ActiveXObject("Microsoft.XMLHTTP");
+	}else{
+		request_type = new XMLHttpRequest();
+	}
+		return request_type;
+}
+
+
+/* 
+ * queryMusic21(cmd)
+ * 
+ * Takes the given command cmd in the form "cmd:args;cmd:args" and queries music21
+ * Once the server loads, it will call music21Reply() 
+ */
+// track the object between query and reply
+var http = createObject();
+
+function queryMusic21(cmd) {
+	musicxml = getMovie('score1').getMusicXML();
+//	document.getElementById('requestxmltextarea').value = musicxml;		
+	
+	var parameters="xmltext="+musicxml+"&cmd="+cmd+"&appname=noteflight"
+
+	// Set te random number to add to URL request
+	nocache = Math.random();
+	http.open('POST', '/music21interface/process',true);
+	http.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+	http.send(parameters)
+
+	http.onreadystatechange = reply;
+}
+
+/* 
+ * reply()
+ * 
+ * Displays the result of the request in the textarea and updates the Noteflight Display
+ */
+function reply() {
+	if(http.readyState == 4){
+		var response = http.responseText;
+		//document.getElementById('resultxmltextarea').value = response;
+		//return;
+		var responsearr = response.split("---");
+		document.getElementById('message').innerHTML = responsearr[1];
+		
+		document.getElementById('responsetextarea').value = responsearr[0];
+		
+		getMovie('score1').loadMusicXML(responsearr[0]);		
+	}
+}
+
+</script>
+</head>
+<body class="tundra">
+<div id="mainContainer">
+  <div id="topLeft" onClick="window.location = &#39;http://web.mit.edu/music21/&#39;"></div>
+  <div id="topRight"><img src="index_files/blank.gif" alt="pubPhotos" width="350" height="380" border="0" usemap="#Map">
+    <map name="Map">
+      <area shape="rect" coords="43,61,262,263" href="http://web.mit.edu/music21">
+    </map>
+  </div>
+  <div id="firstTextSection">
+    <div id="whiteSection">
+      <object id="score1" width="750" height="500">
+      <param name="movie" value="http://music21dev.scc.noteflight.com/scores/embed"></param>
+      <param name="FlashVars" value="id=b322a0c4be0eff7ba444514bacee89d18a2c9c6c&scale=1.25&role=template"></param>
+      <param name="allowScriptAccess" value="always"/>
+      <embed name="score1" src="http://music21dev.scc.noteflight.com/scores/embed" type="application/x-shockwave-flash"
+        FlashVars="id=b322a0c4be0eff7ba444514bacee89d18a2c9c6c&scale=1.25&role=template"
+        width="750" height="500"
+        allowScriptAccess="always">
+      </embed>
+    </object>
+
+    
+
+	</div>
+    <div id="rightSection">
+    <p id='message'></p>
+    <form>
+	<textarea id='command' style="width:100%;display" rows="5"></textarea><br />
+	<input type='button' style="display" onClick="queryMusic21(document.getElementById('command').value)" Value='Query Music 21' /><br />
+	<input type='button' onClick="queryMusic21('canon')" Value='Generate Canon' />
+	<input type='button' onClick="queryMusic21('reduction')" Value='Reduction' />
+	<input type='button' onClick="queryMusic21('idparallelfifths')" Value='Highlight Parallel Fifths' />
+	<input type='button' onClick="queryMusic21('idparalleloctaves')" Value='Highlight Parallel Octaves' />
+	<input type='button' onClick="queryMusic21('idhiddenfifths')" Value='Highlight Hidden Fifths' />
+	<input type='button' onClick="queryMusic21('idhiddenoctaves')" Value='Highlight Hidden Octaves' />
+    <br />
+	<input type='button' onClick="queryMusic21('checkleadsheetpitches')" Value='Check Lead Sheet Chord Pitches' />
+    <br />
+    <select name="corpusfile" id="corpusfile">
+<option value = 'bach/bwv1.6.xml'>bach/bwv1.6.xml</option>
+<option value = 'bach/bwv10.7.xml'>bach/bwv10.7.xml</option>
+<option value = 'bach/bwv101.7.xml'>bach/bwv101.7.xml</option>
+<option value = 'bach/bwv102.7.xml'>bach/bwv102.7.xml</option>
+<option value = 'bach/bwv103.6.xml'>bach/bwv103.6.xml</option>
+<option value = 'bach/bwv104.6.xml'>bach/bwv104.6.xml</option>
+<option value = 'bach/bwv108.6.xml'>bach/bwv108.6.xml</option>
+<option value = 'bach/bwv11.6.xml'>bach/bwv11.6.xml</option>
+<option value = 'bach/bwv110.7.xml'>bach/bwv110.7.xml</option>
+<option value = 'bach/bwv111.6.xml'>bach/bwv111.6.xml</option>
+<option value = 'bach/bwv112.5-sc.xml'>bach/bwv112.5-sc.xml</option>
+<option value = 'bach/bwv112.5.xml'>bach/bwv112.5.xml</option>
+<option value = 'bach/bwv113.8.xml'>bach/bwv113.8.xml</option>
+<option value = 'bach/bwv114.7.xml'>bach/bwv114.7.xml</option>
+<option value = 'bach/bwv115.6.xml'>bach/bwv115.6.xml</option>
+<option value = 'bach/bwv116.6.xml'>bach/bwv116.6.xml</option>
+<option value = 'bach/bwv117.4.xml'>bach/bwv117.4.xml</option>
+<option value = 'bach/bwv119.9.xml'>bach/bwv119.9.xml</option>
+<option value = 'bach/bwv12.7.xml'>bach/bwv12.7.xml</option>
+<option value = 'bach/bwv120.6.xml'>bach/bwv120.6.xml</option>
+<option value = 'bach/bwv120.8-a.xml'>bach/bwv120.8-a.xml</option>
+<option value = 'bach/bwv121.6.xml'>bach/bwv121.6.xml</option>
+<option value = 'bach/bwv122.6.xml'>bach/bwv122.6.xml</option>
+<option value = 'bach/bwv123.6.xml'>bach/bwv123.6.xml</option>
+<option value = 'bach/bwv124.6.xml'>bach/bwv124.6.xml</option>
+<option value = 'bach/bwv125.6.xml'>bach/bwv125.6.xml</option>
+<option value = 'bach/bwv126.6.xml'>bach/bwv126.6.xml</option>
+<option value = 'bach/bwv127.5.xml'>bach/bwv127.5.xml</option>
+<option value = 'bach/bwv128.5.xml'>bach/bwv128.5.xml</option>
+<option value = 'bach/bwv13.6.xml'>bach/bwv13.6.xml</option>
+<option value = 'bach/bwv130.6.xml'>bach/bwv130.6.xml</option>
+<option value = 'bach/bwv133.6.xml'>bach/bwv133.6.xml</option>
+<option value = 'bach/bwv135.6.xml'>bach/bwv135.6.xml</option>
+<option value = 'bach/bwv136.6.xml'>bach/bwv136.6.xml</option>
+<option value = 'bach/bwv137.5.xml'>bach/bwv137.5.xml</option>
+<option value = 'bach/bwv139.6.xml'>bach/bwv139.6.xml</option>
+<option value = 'bach/bwv14.5.xml'>bach/bwv14.5.xml</option>
+<option value = 'bach/bwv140.7.xml'>bach/bwv140.7.xml</option>
+<option value = 'bach/bwv144.3.xml'>bach/bwv144.3.xml</option>
+<option value = 'bach/bwv144.6.xml'>bach/bwv144.6.xml</option>
+<option value = 'bach/bwv145-a.xml'>bach/bwv145-a.xml</option>
+<option value = 'bach/bwv145.5.xml'>bach/bwv145.5.xml</option>
+<option value = 'bach/bwv146.8.xml'>bach/bwv146.8.xml</option>
+<option value = 'bach/bwv148.6.xml'>bach/bwv148.6.xml</option>
+<option value = 'bach/bwv149.7.xml'>bach/bwv149.7.xml</option>
+<option value = 'bach/bwv151.5.xml'>bach/bwv151.5.xml</option>
+<option value = 'bach/bwv153.1.xml'>bach/bwv153.1.xml</option>
+<option value = 'bach/bwv153.5.xml'>bach/bwv153.5.xml</option>
+<option value = 'bach/bwv153.9.xml'>bach/bwv153.9.xml</option>
+<option value = 'bach/bwv154.3.xml'>bach/bwv154.3.xml</option>
+<option value = 'bach/bwv154.8.xml'>bach/bwv154.8.xml</option>
+<option value = 'bach/bwv155.5.xml'>bach/bwv155.5.xml</option>
+<option value = 'bach/bwv156.6.xml'>bach/bwv156.6.xml</option>
+<option value = 'bach/bwv157.5.xml'>bach/bwv157.5.xml</option>
+<option value = 'bach/bwv158.4.xml'>bach/bwv158.4.xml</option>
+<option value = 'bach/bwv159.5.xml'>bach/bwv159.5.xml</option>
+<option value = 'bach/bwv16.6.xml'>bach/bwv16.6.xml</option>
+<option value = 'bach/bwv161.6.xml'>bach/bwv161.6.xml</option>
+<option value = 'bach/bwv162.6-lpz.xml'>bach/bwv162.6-lpz.xml</option>
+<option value = 'bach/bwv164.6.xml'>bach/bwv164.6.xml</option>
+<option value = 'bach/bwv165.6.xml'>bach/bwv165.6.xml</option>
+<option value = 'bach/bwv166.6.xml'>bach/bwv166.6.xml</option>
+<option value = 'bach/bwv168.6.xml'>bach/bwv168.6.xml</option>
+<option value = 'bach/bwv169.7.xml'>bach/bwv169.7.xml</option>
+<option value = 'bach/bwv17.7.xml'>bach/bwv17.7.xml</option>
+<option value = 'bach/bwv171.6.xml'>bach/bwv171.6.xml</option>
+<option value = 'bach/bwv172.6.xml'>bach/bwv172.6.xml</option>
+<option value = 'bach/bwv174.5.xml'>bach/bwv174.5.xml</option>
+<option value = 'bach/bwv175.7.xml'>bach/bwv175.7.xml</option>
+<option value = 'bach/bwv176.6.xml'>bach/bwv176.6.xml</option>
+<option value = 'bach/bwv177.5.xml'>bach/bwv177.5.xml</option>
+<option value = 'bach/bwv178.7.xml'>bach/bwv178.7.xml</option>
+<option value = 'bach/bwv179.6.xml'>bach/bwv179.6.xml</option>
+<option value = 'bach/bwv18.5-lz.xml'>bach/bwv18.5-lz.xml</option>
+<option value = 'bach/bwv18.5-w.xml'>bach/bwv18.5-w.xml</option>
+<option value = 'bach/bwv180.7.xml'>bach/bwv180.7.xml</option>
+<option value = 'bach/bwv183.5.xml'>bach/bwv183.5.xml</option>
+<option value = 'bach/bwv184.5.xml'>bach/bwv184.5.xml</option>
+<option value = 'bach/bwv185.6.xml'>bach/bwv185.6.xml</option>
+<option value = 'bach/bwv187.7.xml'>bach/bwv187.7.xml</option>
+<option value = 'bach/bwv188.6.xml'>bach/bwv188.6.xml</option>
+<option value = 'bach/bwv19.7.xml'>bach/bwv19.7.xml</option>
+<option value = 'bach/bwv190.7-inst.xml'>bach/bwv190.7-inst.xml</option>
+<option value = 'bach/bwv190.7.xml'>bach/bwv190.7.xml</option>
+<option value = 'bach/bwv194.12.xml'>bach/bwv194.12.xml</option>
+<option value = 'bach/bwv194.6.xml'>bach/bwv194.6.xml</option>
+<option value = 'bach/bwv195.6.xml'>bach/bwv195.6.xml</option>
+<option value = 'bach/bwv197.10.xml'>bach/bwv197.10.xml</option>
+<option value = 'bach/bwv197.5.xml'>bach/bwv197.5.xml</option>
+<option value = 'bach/bwv197.7-a.xml'>bach/bwv197.7-a.xml</option>
+<option value = 'bach/bwv2.6.xml'>bach/bwv2.6.xml</option>
+<option value = 'bach/bwv20.11.xml'>bach/bwv20.11.xml</option>
+<option value = 'bach/bwv20.7.xml'>bach/bwv20.7.xml</option>
+<option value = 'bach/bwv226.2.xml'>bach/bwv226.2.xml</option>
+<option value = 'bach/bwv227.1.xml'>bach/bwv227.1.xml</option>
+<option value = 'bach/bwv227.11.xml'>bach/bwv227.11.xml</option>
+<option value = 'bach/bwv227.3.xml'>bach/bwv227.3.xml</option>
+<option value = 'bach/bwv227.7.xml'>bach/bwv227.7.xml</option>
+<option value = 'bach/bwv229.2.xml'>bach/bwv229.2.xml</option>
+<option value = 'bach/bwv244.10.xml'>bach/bwv244.10.xml</option>
+<option value = 'bach/bwv244.15.xml'>bach/bwv244.15.xml</option>
+<option value = 'bach/bwv244.17.xml'>bach/bwv244.17.xml</option>
+<option value = 'bach/bwv244.25.xml'>bach/bwv244.25.xml</option>
+<option value = 'bach/bwv244.29-a.xml'>bach/bwv244.29-a.xml</option>
+<option value = 'bach/bwv244.3.xml'>bach/bwv244.3.xml</option>
+<option value = 'bach/bwv244.32.xml'>bach/bwv244.32.xml</option>
+<option value = 'bach/bwv244.37.xml'>bach/bwv244.37.xml</option>
+<option value = 'bach/bwv244.40.xml'>bach/bwv244.40.xml</option>
+<option value = 'bach/bwv244.44.xml'>bach/bwv244.44.xml</option>
+<option value = 'bach/bwv244.46.xml'>bach/bwv244.46.xml</option>
+<option value = 'bach/bwv244.54.xml'>bach/bwv244.54.xml</option>
+<option value = 'bach/bwv244.62.xml'>bach/bwv244.62.xml</option>
+<option value = 'bach/bwv245.11.xml'>bach/bwv245.11.xml</option>
+<option value = 'bach/bwv245.14.xml'>bach/bwv245.14.xml</option>
+<option value = 'bach/bwv245.15.xml'>bach/bwv245.15.xml</option>
+<option value = 'bach/bwv245.17.xml'>bach/bwv245.17.xml</option>
+<option value = 'bach/bwv245.22.xml'>bach/bwv245.22.xml</option>
+<option value = 'bach/bwv245.26.xml'>bach/bwv245.26.xml</option>
+<option value = 'bach/bwv245.28.xml'>bach/bwv245.28.xml</option>
+<option value = 'bach/bwv245.3.xml'>bach/bwv245.3.xml</option>
+<option value = 'bach/bwv245.37.xml'>bach/bwv245.37.xml</option>
+<option value = 'bach/bwv245.40.xml'>bach/bwv245.40.xml</option>
+<option value = 'bach/bwv245.5.xml'>bach/bwv245.5.xml</option>
+<option value = 'bach/bwv248.12-2.xml'>bach/bwv248.12-2.xml</option>
+<option value = 'bach/bwv248.17.xml'>bach/bwv248.17.xml</option>
+<option value = 'bach/bwv248.23-2.xml'>bach/bwv248.23-2.xml</option>
+<option value = 'bach/bwv248.23-s.xml'>bach/bwv248.23-s.xml</option>
+<option value = 'bach/bwv248.28.xml'>bach/bwv248.28.xml</option>
+<option value = 'bach/bwv248.33-3.xml'>bach/bwv248.33-3.xml</option>
+<option value = 'bach/bwv248.35-3.xml'>bach/bwv248.35-3.xml</option>
+<option value = 'bach/bwv248.35-3c.xml'>bach/bwv248.35-3c.xml</option>
+<option value = 'bach/bwv248.42-4.xml'>bach/bwv248.42-4.xml</option>
+<option value = 'bach/bwv248.42-s.xml'>bach/bwv248.42-s.xml</option>
+<option value = 'bach/bwv248.46-5.xml'>bach/bwv248.46-5.xml</option>
+<option value = 'bach/bwv248.5.xml'>bach/bwv248.5.xml</option>
+<option value = 'bach/bwv248.53-5.xml'>bach/bwv248.53-5.xml</option>
+<option value = 'bach/bwv248.59-6.xml'>bach/bwv248.59-6.xml</option>
+<option value = 'bach/bwv248.64-6.xml'>bach/bwv248.64-6.xml</option>
+<option value = 'bach/bwv248.64-s.xml'>bach/bwv248.64-s.xml</option>
+<option value = 'bach/bwv248.9-1.xml'>bach/bwv248.9-1.xml</option>
+<option value = 'bach/bwv248.9-s.xml'>bach/bwv248.9-s.xml</option>
+<option value = 'bach/bwv25.6.xml'>bach/bwv25.6.xml</option>
+<option value = 'bach/bwv250.xml'>bach/bwv250.xml</option>
+<option value = 'bach/bwv251.xml'>bach/bwv251.xml</option>
+<option value = 'bach/bwv252.xml'>bach/bwv252.xml</option>
+<option value = 'bach/bwv253.xml'>bach/bwv253.xml</option>
+<option value = 'bach/bwv254.xml'>bach/bwv254.xml</option>
+<option value = 'bach/bwv255.xml'>bach/bwv255.xml</option>
+<option value = 'bach/bwv256.xml'>bach/bwv256.xml</option>
+<option value = 'bach/bwv257.xml'>bach/bwv257.xml</option>
+<option value = 'bach/bwv258.xml'>bach/bwv258.xml</option>
+<option value = 'bach/bwv259.xml'>bach/bwv259.xml</option>
+<option value = 'bach/bwv26.6.xml'>bach/bwv26.6.xml</option>
+<option value = 'bach/bwv260.xml'>bach/bwv260.xml</option>
+<option value = 'bach/bwv261.xml'>bach/bwv261.xml</option>
+<option value = 'bach/bwv262.xml'>bach/bwv262.xml</option>
+<option value = 'bach/bwv263.xml'>bach/bwv263.xml</option>
+<option value = 'bach/bwv264.xml'>bach/bwv264.xml</option>
+<option value = 'bach/bwv265.xml'>bach/bwv265.xml</option>
+<option value = 'bach/bwv266.xml'>bach/bwv266.xml</option>
+<option value = 'bach/bwv267.xml'>bach/bwv267.xml</option>
+<option value = 'bach/bwv268.xml'>bach/bwv268.xml</option>
+<option value = 'bach/bwv269.xml'>bach/bwv269.xml</option>
+<option value = 'bach/bwv27.6.xml'>bach/bwv27.6.xml</option>
+<option value = 'bach/bwv270.xml'>bach/bwv270.xml</option>
+<option value = 'bach/bwv271.xml'>bach/bwv271.xml</option>
+<option value = 'bach/bwv272.xml'>bach/bwv272.xml</option>
+<option value = 'bach/bwv273.xml'>bach/bwv273.xml</option>
+<option value = 'bach/bwv276.xml'>bach/bwv276.xml</option>
+<option value = 'bach/bwv277.xml'>bach/bwv277.xml</option>
+<option value = 'bach/bwv278.xml'>bach/bwv278.xml</option>
+<option value = 'bach/bwv279.xml'>bach/bwv279.xml</option>
+<option value = 'bach/bwv28.6.xml'>bach/bwv28.6.xml</option>
+<option value = 'bach/bwv280.xml'>bach/bwv280.xml</option>
+<option value = 'bach/bwv281.xml'>bach/bwv281.xml</option>
+<option value = 'bach/bwv282.xml'>bach/bwv282.xml</option>
+<option value = 'bach/bwv283.xml'>bach/bwv283.xml</option>
+<option value = 'bach/bwv284.xml'>bach/bwv284.xml</option>
+<option value = 'bach/bwv285.xml'>bach/bwv285.xml</option>
+<option value = 'bach/bwv286.xml'>bach/bwv286.xml</option>
+<option value = 'bach/bwv287.xml'>bach/bwv287.xml</option>
+<option value = 'bach/bwv288.xml'>bach/bwv288.xml</option>
+<option value = 'bach/bwv289.xml'>bach/bwv289.xml</option>
+<option value = 'bach/bwv29.8.xml'>bach/bwv29.8.xml</option>
+<option value = 'bach/bwv290.xml'>bach/bwv290.xml</option>
+<option value = 'bach/bwv291.xml'>bach/bwv291.xml</option>
+<option value = 'bach/bwv292.xml'>bach/bwv292.xml</option>
+<option value = 'bach/bwv293.xml'>bach/bwv293.xml</option>
+<option value = 'bach/bwv294.xml'>bach/bwv294.xml</option>
+<option value = 'bach/bwv295.xml'>bach/bwv295.xml</option>
+<option value = 'bach/bwv296.xml'>bach/bwv296.xml</option>
+<option value = 'bach/bwv297.xml'>bach/bwv297.xml</option>
+<option value = 'bach/bwv298.xml'>bach/bwv298.xml</option>
+<option value = 'bach/bwv299.xml'>bach/bwv299.xml</option>
+<option value = 'bach/bwv3.6.xml'>bach/bwv3.6.xml</option>
+<option value = 'bach/bwv30.6.xml'>bach/bwv30.6.xml</option>
+<option value = 'bach/bwv300.xml'>bach/bwv300.xml</option>
+<option value = 'bach/bwv301.xml'>bach/bwv301.xml</option>
+<option value = 'bach/bwv302.xml'>bach/bwv302.xml</option>
+<option value = 'bach/bwv303.xml'>bach/bwv303.xml</option>
+<option value = 'bach/bwv304.xml'>bach/bwv304.xml</option>
+<option value = 'bach/bwv305.xml'>bach/bwv305.xml</option>
+<option value = 'bach/bwv306.xml'>bach/bwv306.xml</option>
+<option value = 'bach/bwv307.xml'>bach/bwv307.xml</option>
+<option value = 'bach/bwv308.xml'>bach/bwv308.xml</option>
+<option value = 'bach/bwv309.xml'>bach/bwv309.xml</option>
+<option value = 'bach/bwv31.9.xml'>bach/bwv31.9.xml</option>
+<option value = 'bach/bwv310.xml'>bach/bwv310.xml</option>
+<option value = 'bach/bwv311.xml'>bach/bwv311.xml</option>
+<option value = 'bach/bwv312.xml'>bach/bwv312.xml</option>
+<option value = 'bach/bwv313.xml'>bach/bwv313.xml</option>
+<option value = 'bach/bwv314.xml'>bach/bwv314.xml</option>
+<option value = 'bach/bwv315.xml'>bach/bwv315.xml</option>
+<option value = 'bach/bwv316.xml'>bach/bwv316.xml</option>
+<option value = 'bach/bwv317.xml'>bach/bwv317.xml</option>
+<option value = 'bach/bwv318.xml'>bach/bwv318.xml</option>
+<option value = 'bach/bwv319.xml'>bach/bwv319.xml</option>
+<option value = 'bach/bwv32.6.xml'>bach/bwv32.6.xml</option>
+<option value = 'bach/bwv320.xml'>bach/bwv320.xml</option>
+<option value = 'bach/bwv321.xml'>bach/bwv321.xml</option>
+<option value = 'bach/bwv322.xml'>bach/bwv322.xml</option>
+<option value = 'bach/bwv323.xml'>bach/bwv323.xml</option>
+<option value = 'bach/bwv324.xml'>bach/bwv324.xml</option>
+<option value = 'bach/bwv325.xml'>bach/bwv325.xml</option>
+<option value = 'bach/bwv326.xml'>bach/bwv326.xml</option>
+<option value = 'bach/bwv327.xml'>bach/bwv327.xml</option>
+<option value = 'bach/bwv328.xml'>bach/bwv328.xml</option>
+<option value = 'bach/bwv329.xml'>bach/bwv329.xml</option>
+<option value = 'bach/bwv33.6.xml'>bach/bwv33.6.xml</option>
+<option value = 'bach/bwv330.xml'>bach/bwv330.xml</option>
+<option value = 'bach/bwv331.xml'>bach/bwv331.xml</option>
+<option value = 'bach/bwv332.xml'>bach/bwv332.xml</option>
+<option value = 'bach/bwv333.xml'>bach/bwv333.xml</option>
+<option value = 'bach/bwv334.xml'>bach/bwv334.xml</option>
+<option value = 'bach/bwv335.xml'>bach/bwv335.xml</option>
+<option value = 'bach/bwv336.xml'>bach/bwv336.xml</option>
+<option value = 'bach/bwv337.xml'>bach/bwv337.xml</option>
+<option value = 'bach/bwv338.xml'>bach/bwv338.xml</option>
+<option value = 'bach/bwv339.xml'>bach/bwv339.xml</option>
+<option value = 'bach/bwv340.xml'>bach/bwv340.xml</option>
+<option value = 'bach/bwv341.xml'>bach/bwv341.xml</option>
+<option value = 'bach/bwv342.xml'>bach/bwv342.xml</option>
+<option value = 'bach/bwv343.xml'>bach/bwv343.xml</option>
+<option value = 'bach/bwv344.xml'>bach/bwv344.xml</option>
+<option value = 'bach/bwv345.xml'>bach/bwv345.xml</option>
+<option value = 'bach/bwv346.xml'>bach/bwv346.xml</option>
+<option value = 'bach/bwv347.xml'>bach/bwv347.xml</option>
+<option value = 'bach/bwv348.xml'>bach/bwv348.xml</option>
+<option value = 'bach/bwv349.xml'>bach/bwv349.xml</option>
+<option value = 'bach/bwv350.xml'>bach/bwv350.xml</option>
+<option value = 'bach/bwv351.xml'>bach/bwv351.xml</option>
+<option value = 'bach/bwv352.xml'>bach/bwv352.xml</option>
+<option value = 'bach/bwv353.xml'>bach/bwv353.xml</option>
+<option value = 'bach/bwv354.xml'>bach/bwv354.xml</option>
+<option value = 'bach/bwv355.xml'>bach/bwv355.xml</option>
+<option value = 'bach/bwv356.xml'>bach/bwv356.xml</option>
+<option value = 'bach/bwv357.xml'>bach/bwv357.xml</option>
+<option value = 'bach/bwv358.xml'>bach/bwv358.xml</option>
+<option value = 'bach/bwv359.xml'>bach/bwv359.xml</option>
+<option value = 'bach/bwv36.4-2.xml'>bach/bwv36.4-2.xml</option>
+<option value = 'bach/bwv36.8-2.xml'>bach/bwv36.8-2.xml</option>
+<option value = 'bach/bwv360.xml'>bach/bwv360.xml</option>
+<option value = 'bach/bwv361.xml'>bach/bwv361.xml</option>
+<option value = 'bach/bwv362.xml'>bach/bwv362.xml</option>
+<option value = 'bach/bwv363.xml'>bach/bwv363.xml</option>
+<option value = 'bach/bwv364.xml'>bach/bwv364.xml</option>
+<option value = 'bach/bwv365.xml'>bach/bwv365.xml</option>
+<option value = 'bach/bwv366.xml'>bach/bwv366.xml</option>
+<option value = 'bach/bwv367.xml'>bach/bwv367.xml</option>
+<option value = 'bach/bwv368.xml'>bach/bwv368.xml</option>
+<option value = 'bach/bwv369.xml'>bach/bwv369.xml</option>
+<option value = 'bach/bwv37.6.xml'>bach/bwv37.6.xml</option>
+<option value = 'bach/bwv370.xml'>bach/bwv370.xml</option>
+<option value = 'bach/bwv371.xml'>bach/bwv371.xml</option>
+<option value = 'bach/bwv372.xml'>bach/bwv372.xml</option>
+<option value = 'bach/bwv373.xml'>bach/bwv373.xml</option>
+<option value = 'bach/bwv374.xml'>bach/bwv374.xml</option>
+<option value = 'bach/bwv375.xml'>bach/bwv375.xml</option>
+<option value = 'bach/bwv376.xml'>bach/bwv376.xml</option>
+<option value = 'bach/bwv377.xml'>bach/bwv377.xml</option>
+<option value = 'bach/bwv378.xml'>bach/bwv378.xml</option>
+<option value = 'bach/bwv379.xml'>bach/bwv379.xml</option>
+<option value = 'bach/bwv38.6.xml'>bach/bwv38.6.xml</option>
+<option value = 'bach/bwv380.xml'>bach/bwv380.xml</option>
+<option value = 'bach/bwv381.xml'>bach/bwv381.xml</option>
+<option value = 'bach/bwv382.xml'>bach/bwv382.xml</option>
+<option value = 'bach/bwv383.xml'>bach/bwv383.xml</option>
+<option value = 'bach/bwv384.xml'>bach/bwv384.xml</option>
+<option value = 'bach/bwv385.xml'>bach/bwv385.xml</option>
+<option value = 'bach/bwv386.xml'>bach/bwv386.xml</option>
+<option value = 'bach/bwv387.xml'>bach/bwv387.xml</option>
+<option value = 'bach/bwv388.xml'>bach/bwv388.xml</option>
+<option value = 'bach/bwv389.xml'>bach/bwv389.xml</option>
+<option value = 'bach/bwv39.7.xml'>bach/bwv39.7.xml</option>
+<option value = 'bach/bwv390.xml'>bach/bwv390.xml</option>
+<option value = 'bach/bwv391.xml'>bach/bwv391.xml</option>
+<option value = 'bach/bwv392.xml'>bach/bwv392.xml</option>
+<option value = 'bach/bwv393.xml'>bach/bwv393.xml</option>
+<option value = 'bach/bwv394.xml'>bach/bwv394.xml</option>
+<option value = 'bach/bwv395.xml'>bach/bwv395.xml</option>
+<option value = 'bach/bwv396.xml'>bach/bwv396.xml</option>
+<option value = 'bach/bwv397.xml'>bach/bwv397.xml</option>
+<option value = 'bach/bwv398.xml'>bach/bwv398.xml</option>
+<option value = 'bach/bwv399.xml'>bach/bwv399.xml</option>
+<option value = 'bach/bwv4.8.xml'>bach/bwv4.8.xml</option>
+<option value = 'bach/bwv40.3.xml'>bach/bwv40.3.xml</option>
+<option value = 'bach/bwv40.6.xml'>bach/bwv40.6.xml</option>
+<option value = 'bach/bwv40.8.xml'>bach/bwv40.8.xml</option>
+<option value = 'bach/bwv400.xml'>bach/bwv400.xml</option>
+<option value = 'bach/bwv401.xml'>bach/bwv401.xml</option>
+<option value = 'bach/bwv402.xml'>bach/bwv402.xml</option>
+<option value = 'bach/bwv403.xml'>bach/bwv403.xml</option>
+<option value = 'bach/bwv404.xml'>bach/bwv404.xml</option>
+<option value = 'bach/bwv405.xml'>bach/bwv405.xml</option>
+<option value = 'bach/bwv406.xml'>bach/bwv406.xml</option>
+<option value = 'bach/bwv407.xml'>bach/bwv407.xml</option>
+<option value = 'bach/bwv408.xml'>bach/bwv408.xml</option>
+<option value = 'bach/bwv41.6.xml'>bach/bwv41.6.xml</option>
+<option value = 'bach/bwv410.xml'>bach/bwv410.xml</option>
+<option value = 'bach/bwv411.xml'>bach/bwv411.xml</option>
+<option value = 'bach/bwv412.xml'>bach/bwv412.xml</option>
+<option value = 'bach/bwv413.xml'>bach/bwv413.xml</option>
+<option value = 'bach/bwv414.xml'>bach/bwv414.xml</option>
+<option value = 'bach/bwv415.xml'>bach/bwv415.xml</option>
+<option value = 'bach/bwv416.xml'>bach/bwv416.xml</option>
+<option value = 'bach/bwv417.xml'>bach/bwv417.xml</option>
+<option value = 'bach/bwv418.xml'>bach/bwv418.xml</option>
+<option value = 'bach/bwv419.xml'>bach/bwv419.xml</option>
+<option value = 'bach/bwv42.7.xml'>bach/bwv42.7.xml</option>
+<option value = 'bach/bwv420.xml'>bach/bwv420.xml</option>
+<option value = 'bach/bwv421.xml'>bach/bwv421.xml</option>
+<option value = 'bach/bwv422.xml'>bach/bwv422.xml</option>
+<option value = 'bach/bwv423.xml'>bach/bwv423.xml</option>
+<option value = 'bach/bwv424.xml'>bach/bwv424.xml</option>
+<option value = 'bach/bwv425.xml'>bach/bwv425.xml</option>
+<option value = 'bach/bwv426.xml'>bach/bwv426.xml</option>
+<option value = 'bach/bwv427.xml'>bach/bwv427.xml</option>
+<option value = 'bach/bwv428.xml'>bach/bwv428.xml</option>
+<option value = 'bach/bwv429.xml'>bach/bwv429.xml</option>
+<option value = 'bach/bwv43.11.xml'>bach/bwv43.11.xml</option>
+<option value = 'bach/bwv430.xml'>bach/bwv430.xml</option>
+<option value = 'bach/bwv431.xml'>bach/bwv431.xml</option>
+<option value = 'bach/bwv432.xml'>bach/bwv432.xml</option>
+<option value = 'bach/bwv433.xml'>bach/bwv433.xml</option>
+<option value = 'bach/bwv434.xml'>bach/bwv434.xml</option>
+<option value = 'bach/bwv435.xml'>bach/bwv435.xml</option>
+<option value = 'bach/bwv436.xml'>bach/bwv436.xml</option>
+<option value = 'bach/bwv437.xml'>bach/bwv437.xml</option>
+<option value = 'bach/bwv438.xml'>bach/bwv438.xml</option>
+<option value = 'bach/bwv44.7.xml'>bach/bwv44.7.xml</option>
+<option value = 'bach/bwv45.7.xml'>bach/bwv45.7.xml</option>
+<option value = 'bach/bwv47.5.xml'>bach/bwv47.5.xml</option>
+<option value = 'bach/bwv48.3.xml'>bach/bwv48.3.xml</option>
+<option value = 'bach/bwv48.7.xml'>bach/bwv48.7.xml</option>
+<option value = 'bach/bwv5.7.xml'>bach/bwv5.7.xml</option>
+<option value = 'bach/bwv52.6.xml'>bach/bwv52.6.xml</option>
+<option value = 'bach/bwv55.5.xml'>bach/bwv55.5.xml</option>
+<option value = 'bach/bwv56.5.xml'>bach/bwv56.5.xml</option>
+<option value = 'bach/bwv57.8.xml'>bach/bwv57.8.xml</option>
+<option value = 'bach/bwv59.3.xml'>bach/bwv59.3.xml</option>
+<option value = 'bach/bwv6.6.xml'>bach/bwv6.6.xml</option>
+<option value = 'bach/bwv60.5.xml'>bach/bwv60.5.xml</option>
+<option value = 'bach/bwv64.2.xml'>bach/bwv64.2.xml</option>
+<option value = 'bach/bwv64.4.xml'>bach/bwv64.4.xml</option>
+<option value = 'bach/bwv64.8.xml'>bach/bwv64.8.xml</option>
+<option value = 'bach/bwv65.2.xml'>bach/bwv65.2.xml</option>
+<option value = 'bach/bwv65.7.xml'>bach/bwv65.7.xml</option>
+<option value = 'bach/bwv66.6.xml'>bach/bwv66.6.xml</option>
+<option value = 'bach/bwv67.4.xml'>bach/bwv67.4.xml</option>
+<option value = 'bach/bwv67.7.xml'>bach/bwv67.7.xml</option>
+<option value = 'bach/bwv69.6-a.xml'>bach/bwv69.6-a.xml</option>
+<option value = 'bach/bwv69.6.xml'>bach/bwv69.6.xml</option>
+<option value = 'bach/bwv7.7.xml'>bach/bwv7.7.xml</option>
+<option value = 'bach/bwv70.11.xml'>bach/bwv70.11.xml</option>
+<option value = 'bach/bwv70.7.xml'>bach/bwv70.7.xml</option>
+<option value = 'bach/bwv72.6.xml'>bach/bwv72.6.xml</option>
+<option value = 'bach/bwv73.5.xml'>bach/bwv73.5.xml</option>
+<option value = 'bach/bwv74.8.xml'>bach/bwv74.8.xml</option>
+<option value = 'bach/bwv77.6.xml'>bach/bwv77.6.xml</option>
+<option value = 'bach/bwv78.7.xml'>bach/bwv78.7.xml</option>
+<option value = 'bach/bwv79.3.xml'>bach/bwv79.3.xml</option>
+<option value = 'bach/bwv79.6.xml'>bach/bwv79.6.xml</option>
+<option value = 'bach/bwv8.6.xml'>bach/bwv8.6.xml</option>
+<option value = 'bach/bwv80.8.xml'>bach/bwv80.8.xml</option>
+<option value = 'bach/bwv81.7.xml'>bach/bwv81.7.xml</option>
+<option value = 'bach/bwv83.5.xml'>bach/bwv83.5.xml</option>
+<option value = 'bach/bwv84.5.xml'>bach/bwv84.5.xml</option>
+<option value = 'bach/bwv85.6.xml'>bach/bwv85.6.xml</option>
+<option value = 'bach/bwv86.6.xml'>bach/bwv86.6.xml</option>
+<option value = 'bach/bwv87.7.xml'>bach/bwv87.7.xml</option>
+<option value = 'bach/bwv88.7.xml'>bach/bwv88.7.xml</option>
+<option value = 'bach/bwv89.6.xml'>bach/bwv89.6.xml</option>
+<option value = 'bach/bwv9.7.xml'>bach/bwv9.7.xml</option>
+<option value = 'bach/bwv90.5.xml'>bach/bwv90.5.xml</option>
+<option value = 'bach/bwv91.6.xml'>bach/bwv91.6.xml</option>
+<option value = 'bach/bwv92.9.xml'>bach/bwv92.9.xml</option>
+<option value = 'bach/bwv93.7.xml'>bach/bwv93.7.xml</option>
+<option value = 'bach/bwv94.8.xml'>bach/bwv94.8.xml</option>
+<option value = 'bach/bwv95.7.xml'>bach/bwv95.7.xml</option>
+<option value = 'bach/bwv96.6.xml'>bach/bwv96.6.xml</option>
+<option value = 'bach/bwv97.9.xml'>bach/bwv97.9.xml</option>
+<option value = 'bach/bwv99.6.xml'>bach/bwv99.6.xml</option>
+<option value = 'beethoven/opus132.xml'>beethoven/opus132.xml</option>
+<option value = 'beethoven/opus133.xml'>beethoven/opus133.xml</option>
+<option value = 'beethoven/opus18no1/movement1.xml'>beethoven/opus18no1/movement1.xml</option>
+<option value = 'beethoven/opus18no1/movement2.xml'>beethoven/opus18no1/movement2.xml</option>
+<option value = 'beethoven/opus18no1/movement3.xml'>beethoven/opus18no1/movement3.xml</option>
+<option value = 'beethoven/opus18no1/movement4.xml'>beethoven/opus18no1/movement4.xml</option>
+<option value = 'beethoven/opus18no3.xml'>beethoven/opus18no3.xml</option>
+<option value = 'beethoven/opus18no4.xml'>beethoven/opus18no4.xml</option>
+<option value = 'beethoven/opus18no5.xml'>beethoven/opus18no5.xml</option>
+<option value = 'beethoven/opus59no1/movement1.xml'>beethoven/opus59no1/movement1.xml</option>
+<option value = 'beethoven/opus59no1/movement2.xml'>beethoven/opus59no1/movement2.xml</option>
+<option value = 'beethoven/opus59no1/movement3.xml'>beethoven/opus59no1/movement3.xml</option>
+<option value = 'beethoven/opus59no1/movement4.xml'>beethoven/opus59no1/movement4.xml</option>
+<option value = 'beethoven/opus59no2/movement1.xml'>beethoven/opus59no2/movement1.xml</option>
+<option value = 'beethoven/opus59no2/movement2.xml'>beethoven/opus59no2/movement2.xml</option>
+<option value = 'beethoven/opus59no2/movement3.xml'>beethoven/opus59no2/movement3.xml</option>
+<option value = 'beethoven/opus59no2/movement4.xml'>beethoven/opus59no2/movement4.xml</option>
+<option value = 'beethoven/opus59no3/movement1.xml'>beethoven/opus59no3/movement1.xml</option>
+<option value = 'beethoven/opus59no3/movement2.xml'>beethoven/opus59no3/movement2.xml</option>
+<option value = 'beethoven/opus59no3/movement3.xml'>beethoven/opus59no3/movement3.xml</option>
+<option value = 'beethoven/opus59no3/movement4.xml'>beethoven/opus59no3/movement4.xml</option>
+<option value = 'beethoven/opus74.xml'>beethoven/opus74.xml</option>
+<option value = 'ciconia/quod_jactatur.xml'>ciconia/quod_jactatur.xml</option>
+<option value = 'cpebach/h186.xml'>cpebach/h186.xml</option>
+<option value = 'haydn/opus74no1/movement1.xml'>haydn/opus74no1/movement1.xml</option>
+<option value = 'haydn/opus74no1/movement2.xml'>haydn/opus74no1/movement2.xml</option>
+<option value = 'haydn/opus74no1/movement3.xml'>haydn/opus74no1/movement3.xml</option>
+<option value = 'haydn/opus74no1/movement4.xml'>haydn/opus74no1/movement4.xml</option>
+<option value = 'haydn/opus74no2/movement1.xml'>haydn/opus74no2/movement1.xml</option>
+<option value = 'haydn/opus74no2/movement2.xml'>haydn/opus74no2/movement2.xml</option>
+<option value = 'haydn/opus74no2/movement3.xml'>haydn/opus74no2/movement3.xml</option>
+<option value = 'haydn/opus74no2/movement4.xml'>haydn/opus74no2/movement4.xml</option>
+<option value = 'haydn/opus74no2/movement5.xml'>haydn/opus74no2/movement5.xml</option>
+<option value = 'leadSheet/berlinAlexandersRagtime.xml'>leadSheet/berlinAlexandersRagtime.xml</option>
+<option value = 'leadSheet/fosterBrownHair.xml'>leadSheet/fosterBrownHair.xml</option>
+<option value = 'luca/gloria.mxl'>luca/gloria.mxl</option>
+<option value = 'monteverdi/madrigal.3.1.xml'>monteverdi/madrigal.3.1.xml</option>
+<option value = 'monteverdi/madrigal.3.10.xml'>monteverdi/madrigal.3.10.xml</option>
+<option value = 'monteverdi/madrigal.3.11.xml'>monteverdi/madrigal.3.11.xml</option>
+<option value = 'monteverdi/madrigal.3.12.xml'>monteverdi/madrigal.3.12.xml</option>
+<option value = 'monteverdi/madrigal.3.13.xml'>monteverdi/madrigal.3.13.xml</option>
+<option value = 'monteverdi/madrigal.3.14.xml'>monteverdi/madrigal.3.14.xml</option>
+<option value = 'monteverdi/madrigal.3.15.xml'>monteverdi/madrigal.3.15.xml</option>
+<option value = 'monteverdi/madrigal.3.16.xml'>monteverdi/madrigal.3.16.xml</option>
+<option value = 'monteverdi/madrigal.3.17.xml'>monteverdi/madrigal.3.17.xml</option>
+<option value = 'monteverdi/madrigal.3.18.xml'>monteverdi/madrigal.3.18.xml</option>
+<option value = 'monteverdi/madrigal.3.19.xml'>monteverdi/madrigal.3.19.xml</option>
+<option value = 'monteverdi/madrigal.3.1_old.xml'>monteverdi/madrigal.3.1_old.xml</option>
+<option value = 'monteverdi/madrigal.3.2.xml'>monteverdi/madrigal.3.2.xml</option>
+<option value = 'monteverdi/madrigal.3.20.xml'>monteverdi/madrigal.3.20.xml</option>
+<option value = 'monteverdi/madrigal.3.3.xml'>monteverdi/madrigal.3.3.xml</option>
+<option value = 'monteverdi/madrigal.3.4.xml'>monteverdi/madrigal.3.4.xml</option>
+<option value = 'monteverdi/madrigal.3.5.xml'>monteverdi/madrigal.3.5.xml</option>
+<option value = 'monteverdi/madrigal.3.6.xml'>monteverdi/madrigal.3.6.xml</option>
+<option value = 'monteverdi/madrigal.3.7.xml'>monteverdi/madrigal.3.7.xml</option>
+<option value = 'monteverdi/madrigal.3.8.xml'>monteverdi/madrigal.3.8.xml</option>
+<option value = 'monteverdi/madrigal.3.9.xml'>monteverdi/madrigal.3.9.xml</option>
+<option value = 'monteverdi/madrigal.4.1.xml'>monteverdi/madrigal.4.1.xml</option>
+<option value = 'monteverdi/madrigal.4.10.xml'>monteverdi/madrigal.4.10.xml</option>
+<option value = 'monteverdi/madrigal.4.11.xml'>monteverdi/madrigal.4.11.xml</option>
+<option value = 'monteverdi/madrigal.4.12.xml'>monteverdi/madrigal.4.12.xml</option>
+<option value = 'monteverdi/madrigal.4.13.xml'>monteverdi/madrigal.4.13.xml</option>
+<option value = 'monteverdi/madrigal.4.14.xml'>monteverdi/madrigal.4.14.xml</option>
+<option value = 'monteverdi/madrigal.4.15.xml'>monteverdi/madrigal.4.15.xml</option>
+<option value = 'monteverdi/madrigal.4.16.xml'>monteverdi/madrigal.4.16.xml</option>
+<option value = 'monteverdi/madrigal.4.17.xml'>monteverdi/madrigal.4.17.xml</option>
+<option value = 'monteverdi/madrigal.4.18.xml'>monteverdi/madrigal.4.18.xml</option>
+<option value = 'monteverdi/madrigal.4.19.xml'>monteverdi/madrigal.4.19.xml</option>
+<option value = 'monteverdi/madrigal.4.2.xml'>monteverdi/madrigal.4.2.xml</option>
+<option value = 'monteverdi/madrigal.4.20.xml'>monteverdi/madrigal.4.20.xml</option>
+<option value = 'monteverdi/madrigal.4.3.xml'>monteverdi/madrigal.4.3.xml</option>
+<option value = 'monteverdi/madrigal.4.4.xml'>monteverdi/madrigal.4.4.xml</option>
+<option value = 'monteverdi/madrigal.4.5.xml'>monteverdi/madrigal.4.5.xml</option>
+<option value = 'monteverdi/madrigal.4.6.xml'>monteverdi/madrigal.4.6.xml</option>
+<option value = 'monteverdi/madrigal.4.7.xml'>monteverdi/madrigal.4.7.xml</option>
+<option value = 'monteverdi/madrigal.4.8.xml'>monteverdi/madrigal.4.8.xml</option>
+<option value = 'monteverdi/madrigal.4.9.xml'>monteverdi/madrigal.4.9.xml</option>
+<option value = 'monteverdi/madrigal.5.1.xml'>monteverdi/madrigal.5.1.xml</option>
+<option value = 'monteverdi/madrigal.5.2.xml'>monteverdi/madrigal.5.2.xml</option>
+<option value = 'monteverdi/madrigal.5.3.xml'>monteverdi/madrigal.5.3.xml</option>
+<option value = 'monteverdi/madrigal.5.4.xml'>monteverdi/madrigal.5.4.xml</option>
+<option value = 'monteverdi/madrigal.5.5.xml'>monteverdi/madrigal.5.5.xml</option>
+<option value = 'monteverdi/madrigal.5.6.xml'>monteverdi/madrigal.5.6.xml</option>
+<option value = 'monteverdi/madrigal.5.7.xml'>monteverdi/madrigal.5.7.xml</option>
+<option value = 'monteverdi/madrigal.5.8.xml'>monteverdi/madrigal.5.8.xml</option>
+<option value = 'mozart/k155/movement1.xml'>mozart/k155/movement1.xml</option>
+<option value = 'mozart/k155/movement2.xml'>mozart/k155/movement2.xml</option>
+<option value = 'mozart/k155/movement3.xml'>mozart/k155/movement3.xml</option>
+<option value = 'mozart/k156/movement1.xml'>mozart/k156/movement1.xml</option>
+<option value = 'mozart/k156/movement2.xml'>mozart/k156/movement2.xml</option>
+<option value = 'mozart/k156/movement3.xml'>mozart/k156/movement3.xml</option>
+<option value = 'mozart/k156/movement4.xml'>mozart/k156/movement4.xml</option>
+<option value = 'mozart/k458/movement1.xml'>mozart/k458/movement1.xml</option>
+<option value = 'mozart/k458/movement2.xml'>mozart/k458/movement2.xml</option>
+<option value = 'mozart/k458/movement3.xml'>mozart/k458/movement3.xml</option>
+<option value = 'mozart/k458/movement4.xml'>mozart/k458/movement4.xml</option>
+<option value = 'mozart/k80/movement1.xml'>mozart/k80/movement1.xml</option>
+<option value = 'mozart/k80/movement2.xml'>mozart/k80/movement2.xml</option>
+<option value = 'mozart/k80/movement3.xml'>mozart/k80/movement3.xml</option>
+<option value = 'mozart/k80/movement4.xml'>mozart/k80/movement4.xml</option>
+<option value = 'schoenberg/opus19/movement2.xml'>schoenberg/opus19/movement2.xml</option>
+<option value = 'schoenberg/opus19/movement6.xml'>schoenberg/opus19/movement6.xml</option>
+<option value = 'schumann/opus41no1/movement1.xml'>schumann/opus41no1/movement1.xml</option>
+<option value = 'schumann/opus41no1/movement2.xml'>schumann/opus41no1/movement2.xml</option>
+<option value = 'schumann/opus41no1/movement3.xml'>schumann/opus41no1/movement3.xml</option>
+<option value = 'schumann/opus41no1/movement4.xml'>schumann/opus41no1/movement4.xml</option>
+<option value = 'schumann/opus41no1/movement5.xml'>schumann/opus41no1/movement5.xml</option>
+<option value = 'schumann/opus48no2.xml'>schumann/opus48no2.xml</option></select>
+	<input type='button' onClick="queryMusic21('showcorpus:' + document.getElementById('corpusfile').value)" Value='Display ' />
+	<textarea id='responsetextarea' style="width:100%;display:none" rows="50"></textarea><br />
+    </form>
+
+    </div>
+  <div id="botSection" style="top: 1823px; ">
+    <div id="midWhite"></div>
+    <div id="botTop"></div>
+    <div id="botMid">
+    </div>
+    <div id="botBot"></div>
+  </div>
+</div>
+</div>
+
+<div class="dojoxLightbox dijitContentPane" dojoattachpoint="containerNode" id="dojoxLightboxDialog" widgetid="dojoxLightboxDialog" style="display: none; position: absolute; " title="" role="group">
+	<div style="position:relative">
+		<div dojoattachpoint="imageContainer" class="dojoxLightboxContainer" dojoattachevent="onclick: _onImageClick">
+			<img dojoattachpoint="imgNode" src="index_files/blank(1).gif" class="dojoxLightboxImage" alt="">
+			<div class="dojoxLightboxFooter" dojoattachpoint="titleNode">
+				<div class="dijitInline LightboxClose" dojoattachpoint="closeNode"></div>
+				<div class="dijitInline LightboxNext" dojoattachpoint="nextNode"></div>	
+				<div class="dijitInline LightboxPrev" dojoattachpoint="prevNode"></div>
+				<div class="dojoxLightboxText" dojoattachpoint="titleTextNode"><span dojoattachpoint="textNode"></span><span dojoattachpoint="groupCount" class="dojoxLightboxGroupText"></span></div>
+			</div>
+		</div>
+	</div>
+</div></body></html>

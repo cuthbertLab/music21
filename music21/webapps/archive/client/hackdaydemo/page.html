@@ -1,0 +1,176 @@
+<html>
+<head>
+<script language="javascript" src="lib/json2.js"></script>
+<script lang='javascript'>
+
+// Get Movie - provides access to Object - accounts for browser differences
+function getMovie(movieName) {
+    if (navigator.appName.indexOf("Microsoft") != -1) {
+        return document.getElementById(movieName);
+    }
+    else {
+        return document[movieName]
+    }
+}
+
+/* 
+ * createObject()
+ * 
+ * creates an AJAX HTTP Request object - accounts for browser differences
+ */
+
+function createAJAXObject() {
+	var request_type;
+	var browser = navigator.appName;
+	if(browser == "Microsoft Internet Explorer"){
+		request_type = new ActiveXObject("Microsoft.XMLHTTP");
+	}else{
+		request_type = new XMLHttpRequest();
+	}
+		return request_type;
+}
+
+
+/* 
+ * queryMusic21(cmd)
+ * 
+ * Takes the given command cmd in the form "cmd:args;cmd:args" and queries music21
+ * Once the server loads, it will call music21Reply() 
+ */
+// track the object between query and reply
+var http = createAJAXObject();
+
+function queryMusic21(cmd) {
+	musicxml = getMovie('score1').getMusicXML();
+		
+	var obj = { 
+		 "type"       :   "simpleCommand", 
+		 "cmd"       :   cmd, 
+		 "xml"    :   musicxml, 
+	};
+	
+	var jsontext = JSON.stringify(obj);
+	document.getElementById('requestxmltextarea').value = jsontext;		
+
+	// Set te random number to add to URL request
+	nocache = Math.random();
+	http.open('POST', '/music21interface',true);
+	http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	http.send(jsontext);
+
+	http.onreadystatechange = reply;
+}
+
+function queryMusic21Given() {
+	
+	var jsontext = document.getElementById('requestxmltextarea').value;
+
+	// Set te random number to add to URL request
+	nocache = Math.random();
+	http.open('POST', '/music21interface',true);
+	http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	http.send(jsontext);
+
+	http.onreadystatechange = reply;
+}
+
+/* 
+ * reply()
+ * 
+ * Displays the result of the request in the textarea and updates the Noteflight Display
+ */
+ 
+function reply() {
+	if(http.readyState == 4){
+		var json_response = http.responseText;
+		document.getElementById('realresponse').value = json_response;
+		//return;
+		
+		json_response_obj = JSON.parse(json_response);
+		document.getElementById('message').innerHTML = json_response_obj['message'];
+		
+		document.getElementById('resultxmltextarea').value = json_response_obj['xml'];
+		
+		sendToNoteflight() ;
+	}
+}
+
+function sendToNoteflight() {
+	getMovie('score1').loadMusicXML(document.getElementById('resultxmltextarea').value);		
+}
+
+
+var c=0;
+var t;
+var timer_is_on=0;
+
+function timedCount()
+{
+queryMusic21('idparallelfifths');
+t=setTimeout("timedCount()",1000);
+}
+
+function doTimer()
+{
+if (!timer_is_on)
+  {
+  timer_is_on=1;
+  timedCount();
+  }
+}
+
+</script>
+</head>
+<body>
+
+<object id="score1" width="1000" height="253">
+  <param name="movie" value="http://music21dev.scc.noteflight.com/scores/embed"></param>
+  <param name="FlashVars" id="flashvars" value="id=03d208391883105b1c9816925c104fd1ba35932c&scale=1.5&role=template&displayMode=paginated"></param>
+  <param name="allowScriptAccess" value="always"/>
+  <embed name="score1" src="http://music21dev.scc.noteflight.com/scores/embed" type="application/x-shockwave-flash"
+    FlashVars="id=03d208391883105b1c9816925c104fd1ba35932c&scale=1.5&role=template&displayMode=paginated"
+    width="1000" height="500"
+    allowScriptAccess="always">
+  </embed>
+</object>
+<br />
+<p id='message'></p>
+<form name='form1' id='form1' >
+<b>Command:</b>
+<input id='command' size="50"/>
+<input type='button' onClick="queryMusic21(document.getElementById('command').value)" value='Query Music 21' />
+<input type='button' onClick="queryMusic21Given()" Value='Query Music 21 XML with Requst field ' />
+<input type='button' onClick="sendToNoteflight()" Value='Response to Noteflight' />
+<br />
+<b>For Beth: </b>
+<input type='button' onClick="queryMusic21('checkleadsheetpitches:checked')" value='Show Corrected' />
+<input type='button' onClick="queryMusic21('checkleadsheetpitches:answerkey')" value='Show Answer Key' />
+<input type='button' onClick="queryMusic21('showcorpus:demo/theory_demo.xml')" Value='TheoryDemo' />
+<input type="button" value="Start timer!" onClick="doTimer()">
+<input type="button" value="Test" onClick="getMovie('score1').setBackground('http://mytutorblog.org/wp-content/uploads/2011/05/Prepare-for-a-test.jpg');">
+
+
+<br />
+<hr />
+<div id='result'>
+<table width='100%'>
+<tr>
+	<td width='33%'>
+	Request:</br>
+	<textarea name='resultxmltext' id='requestxmltextarea' rows='100' cols='75' style="width:100%"></textarea><br />
+	</td>
+	<td width='33%'>
+	Response:</br>
+	<textarea name='' id='realresponse' rows='100' cols='75' style="width:100%"></textarea><br />
+	</td>
+    <td width='33%'>
+	XML of Response:</br>
+	<textarea name='resultxmltext' id='resultxmltextarea' rows='100' cols='75' style="width:100%"></textarea><br />
+	</td>
+	</tr>
+	</table>
+	<input type='submit' value='Submit' />
+</div>
+</form>
+</body>
+</hml>
