@@ -37,6 +37,9 @@ function newData(name, fmt, data) {
 function Music21interface() {
 	var ajaxObj = createAJAXObject();
 	this.requestObj = createRequestObject();
+	var curUrl = window.location.href;
+	var arr = curUrl.split("/");
+	var hostProtocol = arr[0] + "//" + arr[2];
 	
 	this.queryMusic21 = function () {
 		musicxml = getMovie('score1').getMusicXML();
@@ -72,7 +75,7 @@ function Music21interface() {
 	
 		// Set te random number to add to URL request
 		nocache = Math.random();
-		ajaxObj.open('POST', 'http://larsj.local/music21interface',true);
+		ajaxObj.open('POST', hostProtocol+'/music21interface',true);
 		ajaxObj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		ajaxObj.send(jsontext);
 	
@@ -83,7 +86,7 @@ function Music21interface() {
 	
 		// Set te random number to add to URL request
 		nocache = Math.random();
-		ajaxObj.open('POST', 'http://larsj.local/music21interface',true);
+		ajaxObj.open('POST', hostProtocol+'/music21interface',true);
 		ajaxObj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		ajaxObj.send(jsonStr);
 	
