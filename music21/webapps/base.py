@@ -35,7 +35,8 @@ availableDataFormats = ['xml',
 
 availableFunctions = ['stream.transpose',
                       'corpus.parse',
-                      'transpose']
+                      'transpose',
+                      'augmentOrDiminish',]
 
 availableAttribtues = ['highestOffset',
                        'flat']
