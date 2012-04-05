@@ -39,6 +39,10 @@ environLocal = environment.Environment(_MOD)
 # data is loaded on demand. 
 _METADATA_BUNDLES = {'core':None, 'virtual':None, 'local':None}
 
+# update and access through property to make clear
+# that this is a corpus distribution or a no-corpus distribution
+_NO_CORPUS = False 
+
 # store all composers in the corpus (not virtual) 
 # as two element tuples of path name, full name
 COMPOSERS = [
@@ -409,6 +413,26 @@ def getComposerDir(composerName):
             match = dir     
             break
     return match
+
+
+def _noCorpus():
+    '''Return True or False if this is a corpus or noCoprus distrubution. 
+    '''
+    if _NO_CORPUS is None:
+        if corpus.getComposerDir('bach') is None:
+            _NO_CORPUS = True
+        else:
+            _NO_CORPUS = False
+    return _NO_CORPUS
+
+noCorpus = property(_noCorpus, doc='''
+    Get True or False if this is a noCorpus music21 distribution.
+
+    >>> from music21 import *
+    >>> corpus.noCorpus
+    False
+    ''')
+
 
 
 #-------------------------------------------------------------------------------
