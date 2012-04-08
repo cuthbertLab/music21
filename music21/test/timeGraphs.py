@@ -104,6 +104,7 @@ class M21CallTest(object):
         '''Perform setup routines for tests
         '''
         import music21
+        self.m21 = music21
 
 
 #-------------------------------------------------------------------------------
@@ -113,6 +114,7 @@ class TestTimeHumdrum(M21CallTest):
 
 class TestTimeMozart(M21CallTest):
     def testFocus(self):
+        music21 = self.m21
         a = music21.converter.parse(music21.corpus.getWork('k155')[0])
     #    ls = music21.lily.LilyString("{" + a[0].lily + "}")
     #    ls.showPNG()
@@ -120,21 +122,25 @@ class TestTimeMozart(M21CallTest):
 
 class TestTimeCapua1(M21CallTest):
     def testFocus(self):
+        music21 = self.m21
         c1 = music21.trecento.capua.Test()
         c1.testRunPiece()
 
 class TestTimeCapua2(M21CallTest):
     def testFocus(self):
+        music21 = self.m21
         music21.trecento.capua.ruleFrequency()
 
 class TestTimeIsmir(M21CallTest):
     def testFocus(self):
+        music21 = self.m21
         s1 = music21.corpus.parse('bach/bwv248')
         post = s1.musicxml
 
 
-class TestMakeMeasures(M21CallTest):
+class TestMakeMeasures(CallTest):
     def __init__(self):
+        import music21
         self.s = music21.stream.Stream()
         for i in range(10):
             n = music21.note.Note()
@@ -144,8 +150,10 @@ class TestMakeMeasures(M21CallTest):
         post = self.s.makeMeasures()
 
 
-class TestMakeTies(M21CallTest):
+class TestMakeTies(CallTest):
     def __init__(self):
+        import music21
+
         self.s = music21.stream.Stream()
         for i in range(100):
             n = music21.note.Note()
@@ -157,8 +165,9 @@ class TestMakeTies(M21CallTest):
         self.s.makeTies(inPlace=True)
 
 
-class TestMakeBeams(M21CallTest):
+class TestMakeBeams(CallTest):
     def __init__(self):
+        import music21
         self.s = music21.stream.Stream()
         for i in range(100):
             n = music21.note.Note()
@@ -170,8 +179,9 @@ class TestMakeBeams(M21CallTest):
         self.s.makeBeams(inPlace=True)
 
 
-class TestMakeAccidentals(M21CallTest):
+class TestMakeAccidentals(CallTest):
     def __init__(self):
+        import music21
         self.s = music21.stream.Stream()
         for i in range(100):
             n = music21.note.Note()
@@ -183,8 +193,9 @@ class TestMakeAccidentals(M21CallTest):
         self.s.makeAccidentals(inPlace=True)
 
 
-class TestMusicXMLOutput(M21CallTest):
+class TestMusicXMLOutput(CallTest):
     def __init__(self):
+        import music21
         self.s = music21.stream.Stream()
         for i in range(100):
             n = music21.note.Note()
@@ -195,10 +206,11 @@ class TestMusicXMLOutput(M21CallTest):
         post = self.s.musicxml
 
 
-class TestMusicXMLOutputParts(M21CallTest):
+class TestMusicXMLOutputParts(CallTest):
     '''This tries to isolate a problem whereby part creation is much faster than score creation. 
     '''
     def __init__(self):
+        import music21
         self.s = music21.corpus.parse('bach/bwv66.6', forceSource=True)
         #self.s = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
 
@@ -207,10 +219,11 @@ class TestMusicXMLOutputParts(M21CallTest):
             post = p.musicxml
 
 
-class TestMusicXMLOutputScore(M21CallTest):
+class TestMusicXMLOutputScore(CallTest):
     '''This tries to isolate a problem whereby part creation is much faster than score creation. 
     '''
     def __init__(self):
+        import music21
         self.s = music21.corpus.parse('bach/bwv66.6', forceSource=True)
         #self.s = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
 
@@ -220,23 +233,20 @@ class TestMusicXMLOutputScore(M21CallTest):
 
 class TestABCImport(M21CallTest):
 
-
-    def __init__(self):
-        pass
-
     def testFocus(self):
+        music21 = self.m21
         self.s = music21.corpus.parse('essenFolksong/erk20.abc', forceSource=True)
 
 
 class TestMetadataBundle(CallTest):
 
     def __init__(self):
-        pass
+        from music21.corpus import base
+        self.base = base
 
     def testFocus(self):
         # this opens and instantiates the metad
-        from music21.corpus import base
-        base._updateMetadataBundle()
+        self.base._updateMetadataBundle()
 
 
 
@@ -297,7 +307,6 @@ class TestMusicXMLObjectTypeChecking(CallTest):
         # note: this shows that using isinstance() is much faster than 
         # checking the tag attribute
 
-        from music21 import musicxml
         # create 500 time signatures
         n = []
         b = []
@@ -535,13 +544,19 @@ class TestImportCorpus(CallTest):
     def testFocus(self):
         import music21.corpus
 
-class TestImportCorpus2(CallTest):
-
-    def __init__(self):
-        pass
+class TestImportCorpus2(M21CallTest):
 
     def testFocus(self):
-        print 'hi'
+        music21 = self.m21
+        bc = music21.corpus.getBachChorales()
+
+
+class TestImportCorpus3(CallTest):
+    includeList = ['music21.corpus.*']
+
+    def testFocus(self):
+        import music21
+        bc = music21.corpus.parse('bach/bwv1.6')
 
 
 class TestImportStar(CallTest):
@@ -562,6 +577,7 @@ class TestImportStar(CallTest):
 class CallGraph:
 
     def __init__(self):
+        self.includeList = None
         #self.excludeList = ['pycallgraph.*','re.*','sre_*', 'copy*', '*xlrd*']
         self.excludeList = ['pycallgraph.*','re.*','sre_*', '*xlrd*']
         # these have been shown to be very fast
@@ -589,16 +605,20 @@ class CallGraph:
         #self.callTest = TestBigMusicXML
 
         #self.callTest = TestMeasuresA
+        #self.callTest = TestTimeMozart
         #self.callTest = TestTimeIsmir
         #self.callTest = TestGetContextByClassB
         #self.callTest = TestMeasuresB
-        self.callTest = TestImportCorpus
+        #self.callTest = TestImportCorpus
+        self.callTest = TestImportCorpus3
+        if hasattr(self.callTest, 'includeList'):
+            self.includeList = self.callTest.includeList
 
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
         '''
-        suffix = '.tif'
+        suffix = '.png'
         launcher = suffix[1:]
         try:
             fp = environLocal.getTempFile(suffix)
@@ -627,8 +647,11 @@ class CallGraph:
                 tf.close()
 
  
-        gf = pycallgraph.GlobbingFilter(exclude=self.excludeList)
-        # create instnace; will call setup routines
+        if self.includeList is not None:
+            gf = pycallgraph.GlobbingFilter(include=self.includeList, exclude=self.excludeList)
+        else:
+            gf = pycallgraph.GlobbingFilter(exclude=self.excludeList)
+        # create instance; will call setup routines
         ct = self.callTest()
 
         # start timer
