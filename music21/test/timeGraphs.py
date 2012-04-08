@@ -544,6 +544,19 @@ class TestImportCorpus2(CallTest):
         print 'hi'
 
 
+class TestImportStar(CallTest):
+    def testFocus(self):
+        import music21
+        for name in dir(music21):
+            mod = getattr(music21, name)
+            try:
+                reload(mod)
+            except: # non mods cannot reload
+                pass 
+
+
+
+
 #-------------------------------------------------------------------------------
 # handler
 class CallGraph:
@@ -580,6 +593,7 @@ class CallGraph:
         #self.callTest = TestGetContextByClassB
         #self.callTest = TestMeasuresB
         self.callTest = TestImportCorpus
+
 
     def run(self):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
