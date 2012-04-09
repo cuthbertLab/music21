@@ -1295,12 +1295,12 @@ class Test(unittest.TestCase):
         featureExtractors = features.extractorsById(featureExtractors, 
                             'jSymbolic')
         
-        #worksBach = corpus.bachChorales[100:143] # a middle range
-        worksMonteverdi = corpus.monteverdiMadrigals[:43]
-        worksHandel = corpus.handelMessiah # 43 total
+        #worksBach = corpus.getBachChorales()[100:143] # a middle range
+        worksMonteverdi = corpus.getMonteverdiMadrigals()[:43]
+        worksHandel = corpus.getHandelMessiah() # 43 total
         
-#         worksBach = corpus.bachChorales[:5] 
-#         worksMonteverdi = corpus.monteverdiMadrigals[:5]
+#         worksBach = corpus.getBachChorales()[:5] 
+#         worksMonteverdi = corpus.getMonteverdiMadrigals()[:5]
         
         # need to define what the class label will be
         ds = features.DataSet(classLabel='Composer')

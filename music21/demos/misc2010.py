@@ -12,7 +12,7 @@ def richardBreedGetWell():
 
     finds a few places in opus132 and nothing else
     '''
-    for workName in corpus.beethovenStringQuartets:
+    for workName in corpus.getBeethovenStringQuartets('.xml'):
         if 'opus132' not in workName:
             continue
         beethovenScore = converter.parse(workName)
@@ -78,7 +78,7 @@ def bachParallels():
     Proceedings of the fourth Conference on Interdisciplinary Musicology (CIM08)
     Thessaloniki, Greece, 3-6 July 2008, http://web.auth.gr/cim08/
     '''
-    for fn in corpus.bachChorales:
+    for fn in corpus.getBachChorales():
         print fn
         c = corpus.parseWork(fn)
         displayMe = False

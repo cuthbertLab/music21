@@ -68,7 +68,6 @@ from music21 import common
 from music21.base import Music21Exception
 from music21.humdrum import testFiles, canonicalOutput
 from music21 import dynamics 
-from music21.dynamics import Dynamic
 
 import os
 
@@ -1129,7 +1128,7 @@ class DynamSpine(HumdrumSpine):
             elif eventC.startswith('>'):
                 thisObject = dynamics.Crescendo()
             else:
-                thisObject = Dynamic(eventC)
+                thisObject = dynamics.Dynamic(eventC)
             
             if thisObject is not None:
                 thisObject.humdrumPosition = event.position
@@ -1742,6 +1741,9 @@ def hdStringToNote(contents):
         thisObject.articulations.append(music21.articulations.Tenuto())
     if contents.count('^'):
         thisObject.articulations.append(music21.articulations.Accent())
+    if contents.count(';'):
+        thisObject.expressions.append(music21.expressions.Fermata())
+
     
     # 3.2.5 Up & Down Bows
     if contents.count('v'):

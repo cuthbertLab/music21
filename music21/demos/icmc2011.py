@@ -684,7 +684,7 @@ class Test(unittest.TestCase):
         from music21 import graph
 
         results = {}
-        for fn in corpus.bachChorales[:2]:
+        for fn in corpus.getBachChorales()[:2]:
             s = corpus.parse(fn)
             ksScale = s.flat.getElementsByClass('KeySignature')[0].getScale()
             for p in s.parts:

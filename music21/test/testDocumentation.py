@@ -540,7 +540,7 @@ class Test(unittest.TestCase):
         # Create storage for the results
         results = stream.Stream()
         # Get file paths to all Chorales
-        for fp in corpus.bachChorales[310:330]:
+        for fp in corpus.getBachChorales()[310:330]:
             # Parse, and then analyze the key
             chorale = converter.parse(fp)
             key = chorale.analyze('key')

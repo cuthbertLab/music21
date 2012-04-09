@@ -4765,7 +4765,7 @@ class Test(unittest.TestCase):
     def xtestGraphVerticalBar(self):
 
         #streamList = corpus.parse('essenFolksong/han1')
-        streamList = corpus.bachChorales[100:108]
+        streamList = corpus.getBachChorales()[100:108]
         feList = ['m17', 'm18', 'm19', 'ql1']
         #labelList = [os.path.basename(fp) for fp in streamList]
         p = PlotFeatures(streamList, feList)

@@ -83,9 +83,12 @@ class CorpusException(Exception):
 
 #-------------------------------------------------------------------------------
 def _findPaths(fpRoot, extList):
-    '''Given a root fp file path, recursively search all contained paths for 
+    '''Given a root fp file path, recursively search all contained paths for files
+    in fpRoot matching any of the extensions in extList
     
     The `extList` is a list of file extensions. 
+    
+    NB: we've tried optimizing with fnmatch but it does not save any time.
     '''
     # can replace extension matching with a regex    
     #escape extension dots (if there) for regex
@@ -841,13 +844,13 @@ paths = getPaths()
 # libraries
 
 
-beethoven = getComposer('beethoven')
-josquin = getComposer('josquin')
-mozart = getComposer('mozart')
-monteverdi = getComposer('monteverdi')
-haydn = getComposer('haydn')
-handel = getComposer('handel')
-bach = getComposer('bach')
+#beethoven = getComposer('beethoven')
+#josquin = getComposer('josquin')
+#mozart = getComposer('mozart')
+#monteverdi = getComposer('monteverdi')
+#haydn = getComposer('haydn')
+#handel = getComposer('handel')
+#bach = getComposer('bach')
 
 # additional libraries to define
 
@@ -886,7 +889,7 @@ def getBachChorales(extList='xml'):
             post.append(candidate)
     return post
 
-bachChorales = getBachChorales('xml')
+bachChorales = property(getBachChorales)
 
 
 
@@ -1383,7 +1386,7 @@ def getHandelMessiah(extList='md'):
             post.append(candidate)
     return post
 
-handelMessiah = getHandelMessiah()
+#handelMessiah = getHandelMessiah()
 
 
 
@@ -1417,7 +1420,7 @@ def getMonteverdiMadrigals(extList='xml'):
             post.append(candidate)
     return post
 
-monteverdiMadrigals = getMonteverdiMadrigals('xml')
+#monteverdiMadrigals = getMonteverdiMadrigals('xml')
 
 def getBeethovenStringQuartets(extList=None):
     '''Return all Beethoven String Quartets.
@@ -1455,7 +1458,7 @@ def getBeethovenStringQuartets(extList=None):
             post.append(candidate)
     return candidates
 
-beethovenStringQuartets = getBeethovenStringQuartets('xml')
+#beethovenStringQuartets = getBeethovenStringQuartets('xml')
 
 
 

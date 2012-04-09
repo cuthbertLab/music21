@@ -570,7 +570,7 @@ def demoBachSearch():
 
 
 def demoBachSearchBrief():    
-    choraleList = corpus.bachChorales
+    choraleList = corpus.getBachChorales()
     results = stream.Stream()
     for filePath in choraleList:
       fileName = os.path.split(filePath)[1]

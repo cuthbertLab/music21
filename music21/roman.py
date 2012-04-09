@@ -64,7 +64,7 @@ def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = Fa
     <music21.roman.RomanNumeral V65 in F major>
 
 
-    Note that vi and vii in minor = #vi and #vii:
+    Note that vi and vii in minor signifies what you might think of alternatively as #vi and #vii:
     
     >>> rn3 = roman.romanNumeralFromChord(chord.Chord(['A4','C5','E-5']), key.Key('c'))
     >>> rn3
@@ -274,11 +274,12 @@ def figureFromChordAndKey(chordObj, keyObj=None):
         
         if diatonicIntervalNum == 1:
             if alter != rootFigureAlter and alterStr != '':
-                diatonicIntervalNum = 8 # mark altered octaves as 8 not 1
-                figureString = alterStr + str(diatonicIntervalNum)
-                if figureString not in allFigureStringList:
+                pass
+#                diatonicIntervalNum = 8 # mark altered octaves as 8 not 1
+#                figureString = alterStr + str(diatonicIntervalNum)
+#                if figureString not in allFigureStringList:
                     # filter duplicates and put at beginning
-                    allFigureStringList.insert(0, figureString)
+#                    allFigureStringList.insert(0, figureString)
         else:
             figureString = alterStr + str(diatonicIntervalNum)
             # filter out duplicates...
@@ -1447,13 +1448,24 @@ class TestExternal(unittest.TestCase):
 
     def testFromChordify(self):
         from music21 import corpus
-        b = corpus.parse('bwv10.7')
+        b = corpus.parse('bwv103.6')
         c = b.chordify()
         ckey = b.analyze('key')
+        figuresCache = {}
         for x in c.recurse():
             if 'Chord' in x.classes:
-                x.lyric = romanNumeralFromChord(x, ckey).figure
-                x.pitches = [pitch.Pitch('C4')]
+                rnc = romanNumeralFromChord(x, ckey)
+                figure = rnc.figure
+                if figure not in figuresCache:
+                    figuresCache[figure] = 1
+                else:
+                    figuresCache[figure] += 1 
+                x.lyric = figure
+                
+        sortedList = sorted(figuresCache, key=figuresCache.get, reverse=True)
+        for thisFigure in sortedList:
+            print thisFigure, figuresCache[thisFigure]
+            
         b.insert(0, c)
         b.show()
 
@@ -1462,4 +1474,4 @@ _DOC_ORDER = [RomanNumeral, fromChordAndKey]
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    music21.mainTest(TestExternal, 'noDocTest')

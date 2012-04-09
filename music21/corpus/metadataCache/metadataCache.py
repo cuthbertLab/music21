@@ -17,7 +17,7 @@ from music21 import common
 
 
 from music21 import environment
-_MOD = "cahce.py"
+_MOD = "metadataCache.py"
 environLocal = environment.Environment(_MOD)
 
 
