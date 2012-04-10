@@ -3198,6 +3198,31 @@ class Duration(DurationCommon):
             self.addDurationUnit(Duration(x))
 
 
+    def getGraceDuration(self):
+        '''Return a deep copy of this Duration as a GraceDuration instance with the same types.
+
+        >>> from music21 import *
+        >>> d = duration.Duration(1.25)
+        >>> gd = d.getGraceDuration()
+        >>> gd.quarterLength
+        0.0
+        >>> [(x.quarterLength, x.type) for x in gd.components]
+        [(0.0, 'quarter'), (0.0, '16th')]
+        '''
+        if self._componentsNeedUpdating:
+            self._updateComponents()
+        # manually copy all components
+        components = []
+        for c in self.components:
+            components.append(copy.deepcopy(c))
+        # create grace duration
+        gd = GraceDuration()
+        gd.components = components # set new components
+        gd.unlink()
+        gd.quarterLength = 0.0
+        return gd
+
+
 class GraceDuration(Duration):
     '''A Duration that, no matter how it is created, always has a quarter length of zero. 
 
@@ -3215,6 +3240,14 @@ class GraceDuration(Duration):
     '16th'
     >>> gd.quarterLength
     0.0
+
+    >>> gd = duration.GraceDuration(1.25)
+    >>> gd.type
+    'complex'
+    >>> gd.quarterLength
+    0.0
+    >>> [(x.quarterLength, x.type) for x in gd.components]
+    [(0.0, 'quarter'), (0.0, '16th')]
     '''
     def __init__(self, *arguments, **keywords):
         Duration.__init__(self, *arguments, **keywords)
@@ -3224,7 +3257,7 @@ class GraceDuration(Duration):
         if self._componentsNeedUpdating:
             self._updateComponents()
         self.unlink()
-        self.quarterLength = 0
+        self.quarterLength = 0.0
 
 class LongGraceDuration(Duration):
     def __init__(self):
