@@ -32,13 +32,11 @@ import time
 #from music21.humdrum import testFiles as humdrumTestFiles
 #
 #from music21 import common
-#
-#from music21 import environment
-_MOD = "test.timeGraphs.py"
-#environLocal = environment.Environment(_MOD)
 
 
-#--------from common.py------------------------------------
+
+# this class is duplicated from common.py in order to avoid 
+# import the module for clean testing
 class Timer(object):
     """An object for timing."""
         
@@ -398,10 +396,6 @@ class TestCommonContextSearches(CallTest):
     def testFocus(self):
         ts = self.s.parts[0].getElementsByClass(
             'Measure')[3].getContextByClass('TimeSignature')
-        #environLocal.printDebug(['ts', ts])
-
-        #beatStr = self.s.parts[0].getElementsByClass(
-        #    'Measure')[3].notes[3].beatStr
 
 
 class TestBigMusicXML(CallTest):
@@ -610,19 +604,27 @@ class CallGraph:
         #self.callTest = TestGetContextByClassB
         #self.callTest = TestMeasuresB
         #self.callTest = TestImportCorpus
-        self.callTest = TestImportCorpus3
+        #self.callTest = TestImportCorpus3
+
+        self.callTest = TestImportStar
+
+        # common to all call tests. 
         if hasattr(self.callTest, 'includeList'):
             self.includeList = self.callTest.includeList
 
-
-    def run(self):
+    def run(self, runWithEnviron=True):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
         '''
-        suffix = '.png'
-        launcher = suffix[1:]
-        try:
+        suffix = '.jpg'
+        format = suffix[1:]
+
+        if runWithEnviron:
+            from music21 import environment
+            _MOD = "test.timeGraphs.py"
+            environLocal = environment.Environment(_MOD)
             fp = environLocal.getTempFile(suffix)
-        except NameError:
+        # manually get a temporary fiel
+        else:
             import tempfile
             import os
             import sys
@@ -638,6 +640,7 @@ class CallGraph:
                 # on MacOS, fd returns an int, like 3, when this is called
                 # in some context (specifically, programmatically in a 
                 # TestExternal class. the fp is still valid and works
+                # TODO: this did not work on MacOS 10.6.8 w/ py 2.7
                     pass
                 else:
                     fd.close() 
@@ -663,14 +666,14 @@ class CallGraph:
         ct.testFocus() # run routine
 
         pycallgraph.stop_trace()
-        pycallgraph.make_dot_graph(fp, format=launcher)
+        pycallgraph.make_dot_graph(fp, format=format)
         print('elapsed time: %s' % t)
         # open the completed file
-        print "File path: " + fp
+        print('file path: ' + fp)
         try:
             from music21 import environment
             environLocal = environment.Environment(_MOD)
-            environLocal.launch(launcher, fp)
+            environLocal.launch(format, fp)
         except NameError:
             pass
 

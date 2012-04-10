@@ -155,52 +155,21 @@ class SettingsHandler(xml.sax.ContentHandler):
         return self._settings
 
 
+
 #-------------------------------------------------------------------------------
-class Environment(object):
+class _EnvironmentCore(object):
+    '''This private class should never be directly created; use the Environment object to access this object. 
+
+    Multiple Environment instances may exist, but all share access to the same _EnvironmentCore instance that is stored in this module.
+
+    The only case in which a new _EnvironmentCore is created if the forcePlatform argument is passed and is different than the stored forcePlatform argument. This is only used in testing. 
+
+    NOTE: this is a private class. All documentation for public methods should be placed in the Environment class.
     '''
-    The environment.Environment object stores user preferences as a dictionary-like object. 
-    Additionally, the Environment object provides convenience methods to music21 modules 
-    for getting temporary files, launching files with external applications, and 
-    printing debug and warning messages.
-
-    Generally, each module creates a single, module-level instance of Environment, 
-    passing the module's name during creation. 
-
-    For more a user-friendly interface for creating and editing settings, see 
-    the :class:`~music21.environment.UserSettings` object. 
-
-    >>> env = Environment(forcePlatform='darwin')
-    >>> env['musicxmlPath'] = '/Applications/Finale Reader.app'
-    >>> env['musicxmlPath']
-    '/Applications/Finale Reader.app'
-
-    '''
-
-    # define order to present names in documentation; use strings
-    _DOC_ORDER = ['read', 'write', 'getSettingsPath']
-    # documentation for all attributes (not properties or methods)
-    _DOC_ATTR = {
-    'modNameParent': 'A string representation of the module that contains this Environment instance.',
-    'ref': 'The Python dictionary used to store all internal settings.',
-    }
-
-    def __init__(self, modName=None, forcePlatform=None):
-        '''
-        Create an instance of this object, reading settings from disk. 
-
-        When created from a module, the `modName` parameter stores a string naming the module. This is used to identify the output of printDebug() calls.
-
-        The `forcePlatform` argument can be used for testing.
-
-        >>> from music21 import *
-        >>> myEnv = environment.Environment()
-        >>> post = myEnv['writeFormat']
-        >>> #_DOCS_SHOW post
-        >>> print "\'musicxml\'" #_DOCS_HIDE
-        'musicxml'
-        '''
-        self.ref = {}
-
+    def __init__(self, forcePlatform=None):
+        # only create one
+        #sys.stderr.write('creating singelton _EnvironmentCore\n')
+        self._ref = {}
         # define all settings that are paths
         # store names of all values that are keys; check for validity
         self._keysToPaths = [] 
@@ -213,37 +182,40 @@ class Environment(object):
         self._keysToPaths.append('localCorpusPath')
 
         # defines all valid keys in ref
-        self.loadDefaults(forcePlatform=forcePlatform) 
+        self._loadDefaults(forcePlatform=forcePlatform) 
         # read will only right over values if set in field
         if forcePlatform is None: # only read if not forcing platform
             self.read() # load a stored file if available
-        # store the name of the module that is using this object
-        # this is used for printing debug information
-        self.modNameParent = modName
 
-    def loadDefaults(self, forcePlatform=None):
+    def getKeysToPaths(self):
+        return self._keysToPaths
+
+    def getRefKeys(self):
+        return self._ref.keys()
+
+    def _loadDefaults(self, forcePlatform=None):
         '''Load defaults. All keys are derived from these defaults.
         '''
-        self.ref['directoryScratch'] = None # path to a directory for temporary files
-        self.ref['lilypondPath'] = None # path to lilypond
-        self.ref['lilypondVersion'] = None # version of lilypond
-        self.ref['lilypondFormat'] = 'pdf' 
-        self.ref['lilypondBackend'] = 'ps' 
+        self._ref['directoryScratch'] = None # path to a directory for temporary files
+        self._ref['lilypondPath'] = None # path to lilypond
+        self._ref['lilypondVersion'] = None # version of lilypond
+        self._ref['lilypondFormat'] = 'pdf' 
+        self._ref['lilypondBackend'] = 'ps' 
         # path to a MusicXML reader: default, will find "Finale Reader"
-        self.ref['musicxmlPath'] = None 
-        self.ref['midiPath'] = None # path to a midi reader
-        self.ref['graphicsPath'] = None # path to a graphics viewer
-        self.ref['vectorPath'] = None # path to a vector graphics viewer
-        self.ref['pdfPath'] = None # path to a pdf viewer
-        self.ref['showFormat'] = 'musicxml' 
-        self.ref['writeFormat'] = 'musicxml' 
-        self.ref['autoDownload'] = 'ask' 
-        self.ref['debug'] = 0
+        self._ref['musicxmlPath'] = None 
+        self._ref['midiPath'] = None # path to a midi reader
+        self._ref['graphicsPath'] = None # path to a graphics viewer
+        self._ref['vectorPath'] = None # path to a vector graphics viewer
+        self._ref['pdfPath'] = None # path to a pdf viewer
+        self._ref['showFormat'] = 'musicxml' 
+        self._ref['writeFormat'] = 'musicxml' 
+        self._ref['autoDownload'] = 'ask' 
+        self._ref['debug'] = 0
         # printing of missing import warnings
-        self.ref['warnings'] = 1 # default/non-zero is on
+        self._ref['warnings'] = 1 # default/non-zero is on
 
         # store a list of strings
-        self.ref['localCorpusSettings'] = [] 
+        self._ref['localCorpusSettings'] = [] 
 
         if forcePlatform is None:
             platform = common.getPlatform()
@@ -271,23 +243,10 @@ class Environment(object):
                 self.__setitem__(name, value) # use for key checking
 
     def restoreDefaults(self):
-        '''Restore only defaults for all parameters. Useful for testing. 
-
-        >>> from music21 import *
-        >>> a = environment.Environment()
-        >>> a['debug'] = 1
-        >>> a.restoreDefaults()
-        >>> a['debug']
-        0
-        '''
-        self.printDebug(['restoring Environment defaults'])
-        self.ref = {}
-        self.loadDefaults() # defines all valid keys in ref
-
+        self._ref = {}
+        self._loadDefaults() # defines all valid keys in ref
 
     def __getitem__(self, key):
-        '''Dictionary like getting. 
-        '''
         # could read file here to update from disk
         # could store last update tim and look of file is more recent
         # how, only doing read once is a bit more conservative
@@ -295,9 +254,9 @@ class Environment(object):
 
         # note: this will not get 'localCorpusPath' as there may be more tn 
         # one value
-        if key not in self.ref.keys():
+        if key not in self._ref.keys():
             raise EnvironmentException('no preference: %s' % key)
-        value = self.ref[key]
+        value = self._ref[key]
         valueStr = str(value).lower()
 
         if key in ['debug']: # debug expects a number
@@ -320,32 +279,14 @@ class Environment(object):
         return value
 
     def __setitem__(self, key, value):
-        '''Dictionary-like setting. Changes are made only to local dictionary.
-        Must call write() to make permanent
 
-        >>> from music21 import *
-        >>> a = environment.Environment()
-        >>> a['debug'] = 1
-        >>> a['graphicsPath'] = '/test&Encode'
-        >>> a['graphicsPath']
-        '/test&amp;Encode'
-        >>> a['autoDownload'] = 'adsf'
-        Traceback (most recent call last):
-        EnvironmentException: adsf is not an acceptable value for preference: autoDownload
-        >>> a['showFormat'] = 'adsf'
-        Traceback (most recent call last):
-        EnvironmentException: adsf is not an acceptable value for preference: showFormat
-        >>> a['showFormat'] = 'musicxml'
-        >>> a['localCorpusPath'] = '/path/to/local'
-
-        '''
         #saxutils.escape # used for escaping strings going to xml
         # with unicode encoding
         # http://www.xml.com/pub/a/2002/11/13/py-xml.html?page=2
         # saxutils.escape(msg).encode('UTF-8')
 
         # add local corpus path as a key
-        if key not in self.ref.keys() + ['localCorpusPath']:
+        if key not in self._ref.keys() + ['localCorpusPath']:
             raise EnvironmentException('no preference: %s' % key)
         if value == '':
             value = None # always replace '' with None
@@ -379,25 +320,23 @@ class Environment(object):
         # set value
         if key == 'localCorpusPath':
             # only add if unique
-            if value not in self.ref['localCorpusSettings']:
+            if value not in self._ref['localCorpusSettings']:
                 # check for malicious values here
-                self.ref['localCorpusSettings'].append(value)
+                self._ref['localCorpusSettings'].append(value)
         else:
-            self.ref[key] = value
+            self._ref[key] = value
 
     def __repr__(self):
         return '<Environment>'
 
     def __str__(self):
-        return repr(self.ref)
+        return repr(self._ref)
 
     def keys(self):
-        return self.ref.keys() + ['localCorpusPath']
+        return self._ref.keys() + ['localCorpusPath']
 
     #---------------------------------------------------------------------------
     def getSettingsPath(self):
-        '''Return the path to the platform specific settings file.
-        '''
         platform = common.getPlatform()
         if platform == 'win':
             # try to use defined app data directory for preference file
@@ -439,7 +378,7 @@ class Environment(object):
                 name = slot.get('name')
                 value = slot.get('value')
                 if name not in ref.keys():
-                    self.printDebug(['a preference is defined that is longer used: %s' % name])
+                    #self.printDebug(['a preference is defined that is longer used: %s' % name])
                     continue
                     # do not set, ignore for now
                     #raise EnvironmentException('no such defined preference: %s' % name)
@@ -448,12 +387,6 @@ class Environment(object):
 
 
     def read(self, fp=None):
-        '''
-        Load an XML preference file if and only if the file is available 
-        and has been written in the past. This means that no preference file 
-        will ever be written unless manually done so. If no preference file 
-        exists, the method returns None.
-        '''
         if fp == None:
             fp = self.getSettingsPath()
         if not os.path.exists(fp):
@@ -471,8 +404,8 @@ class Environment(object):
         f.close()    
 
         # load from XML into dictionary
-        # updates self.ref in place
-        self._fromSettings(h.getSettings(), self.ref)
+        # updates self._ref in place
+        self._fromSettings(h.getSettings(), self._ref)
 
     def _toSettings(self, ref):
         '''Convert a ref dictionary to a Settings object
@@ -495,23 +428,16 @@ class Environment(object):
 
 
     def write(self, fp=None):
-        '''
-        Write an XML preference file. This must be manually called to store 
-        any changes made to the object and access preferences later. 
-        If `fp` is None, the default storage location will be used.
-        '''
         if fp == None:
             fp = self.getSettingsPath()
 
         # need to use __getitem__ here b/c need to covnert debug value
         # to an integer
-        #self.printDebug([_MOD, 'writing preference file', self.ref])
-
         dir, fn = os.path.split(fp)
         if fp == None or not os.path.exists(dir):
             raise EnvironmentException('bad file path: %s' % fp)
 
-        settings = self._toSettings(self.ref)
+        settings = self._toSettings(self._ref)
 
         f = open(fp, 'w')
         f.write(settings.xmlStr())
@@ -521,14 +447,6 @@ class Environment(object):
     # utility methods for commonly needed OS services
 
     def getDefaultRootTempDir(self):
-        '''Use the Python tempfile.gettempdir() to get the system specified 
-        temporary directory, and try to add a new 'music21' directory, and 
-        then return this directory.
-
-        This method is only called if the no scratch directory preference has been set. 
-
-        If not able to create a 'music21' directory, the standard default is returned.
-        '''
         # this returns the root temp dir; this does not create a new dir
         dstDir = os.path.join(tempfile.gettempdir(), 'music21')
         # if this path already exists, we have nothing more to do
@@ -540,26 +458,18 @@ class Environment(object):
                 os.mkdir(dstDir)
             except OSError: # cannot make the directory
                 dstDir = tempfile.gettempdir()
-            self.printDebug([_MOD, 'using temporary directory:', dstDir])
             return dstDir
 
     def getRootTempDir(self):
-        '''Return a directory for writing temporary files. This does 
-        not create a new directory for each use, but either uses 
-        the user-set preference or gets the system-provided 
-        directory (with a music21 subdirectory, if possible).
-        '''
-        if self.ref['directoryScratch'] is None:
+        if self._ref['directoryScratch'] is None:
             return self.getDefaultRootTempDir()
         # check that the user-specified directory exists
-        elif not os.path.exists(self.ref['directoryScratch']):    
-            raise EnvironmentException('user-specified scratch directory (%s) does not exist; remove preference file or reset Environment' % self.ref['directoryScratch'])
+        elif not os.path.exists(self._ref['directoryScratch']):    
+            raise EnvironmentException('user-specified scratch directory (%s) does not exist; remove preference file or reset Environment' % self._ref['directoryScratch'])
         else:
-            return self.ref['directoryScratch']
+            return self._ref['directoryScratch']
 
     def getTempFile(self, suffix=''):
-        '''Return a file path to a temporary file with the specified suffix (file extension). 
-        '''
         # get the root dir, which may be the user-specified dir
         rootDir = self.getRootTempDir()
 
@@ -579,23 +489,10 @@ class Environment(object):
                 tf = tempfile.NamedTemporaryFile(dir=rootDir, suffix=suffix)
                 fp = tf.name
                 tf.close()
-
-        self.printDebug([_MOD, 'temporary file:', fp])
+        #self.printDebug([_MOD, 'temporary file:', fp])
         return fp
 
     def launch(self, fmt, fp, options='', app=None):
-        '''
-        Opens a file with an either default or user-specified applications.
-        
-        OMIT_FROM_DOCS
-
-        Optionally, can add additional command to erase files, if necessary 
-        Erase could be called from os or command-line arguments after opening
-        the file and then a short time delay.
-
-        TODO: Move showImageDirectfrom lilyString.py ; add MIDI
-        TODO: Switch to module subprocess to prevent hanging.
-        '''
         # see common.fileExtensions for format names 
         format, ext = common.findFormat(fmt)
         if format == 'lilypond':
@@ -615,7 +512,7 @@ class Environment(object):
             fpApp = None
 
         if environmentKey is not None:
-            fpApp = self.ref[environmentKey]
+            fpApp = self._ref[environmentKey]
 
         # substitute app provided via argument
         if app is not None:
@@ -639,6 +536,209 @@ class Environment(object):
         os.system(cmd)
 
 
+
+#-------------------------------------------------------------------------------
+# store instance with this module
+# this is module-level implementation of the singleton pattern
+# reloading the module wil force a recreation of the module
+_environStorage = {'instance':None, 'forcePlatform':None}
+# create singleton instance
+_environStorage['instance'] = _EnvironmentCore()
+
+
+#-------------------------------------------------------------------------------
+class Environment(object):
+    '''
+    The environment.Environment object stores user preferences as a dictionary-like object. 
+    Additionally, the Environment object provides convenience methods to music21 modules 
+    for getting temporary files, launching files with external applications, and 
+    printing debug and warning messages.
+
+    Generally, each module creates a single, module-level instance of Environment, 
+    passing the module's name during creation. 
+
+    For more a user-friendly interface for creating and editing settings, see 
+    the :class:`~music21.environment.UserSettings` object. 
+
+    >>> env = Environment(forcePlatform='darwin')
+    >>> env['musicxmlPath'] = '/Applications/Finale Reader.app'
+    >>> env['musicxmlPath']
+    '/Applications/Finale Reader.app'
+
+    '''
+
+    # define order to present names in documentation; use strings
+    _DOC_ORDER = ['read', 'write', 'getSettingsPath']
+    # documentation for all attributes (not properties or methods)
+    _DOC_ATTR = {
+    'modNameParent': 'A string representation of the module that contains this Environment instance.',
+    }
+
+    def __init__(self, modName=None, forcePlatform=None):
+        '''
+        Create an instance of this object, reading settings from disk. 
+
+        When created from a module, the `modName` parameter stores a string naming the module. This is used to identify the output of printDebug() calls.
+
+        The `forcePlatform` argument can be used for testing.
+
+        >>> from music21 import *
+        >>> myEnv = environment.Environment()
+        >>> post = myEnv['writeFormat']
+        >>> #_DOCS_SHOW post
+        >>> print "\'musicxml\'" #_DOCS_HIDE
+        'musicxml'
+        '''
+        self.modNameParent = modName
+        # only re-create the instance if forcing a different platform
+        # this only happens in testing
+        if forcePlatform != _environStorage['forcePlatform']:
+            _environStorage['instance'] = _EnvironmentCore(
+                forcePlatform=forcePlatform)
+
+    def getKeysToPaths(self):
+        ''' Get the keys that refer to file paths. 
+
+        >>> from music21 import *
+        >>> a = environment.Environment()
+        >>> a.getKeysToPaths()
+        ['lilypondPath', 'musicxmlPath', 'graphicsPath', 'vectorPath', 'pdfPath', 'midiPath', 'localCorpusPath']
+        '''
+        return _environStorage['instance'].getKeysToPaths()
+
+    def getRefKeys(self):
+        '''Get the raw keys stored in the internal reference dictionary. These are different than the keys() method in that the 'localCorpusPath' entry is not included.
+
+        >>> from music21 import *
+        >>> a = environment.Environment()
+        >>> a.getRefKeys()
+        ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
+        '''
+        return _environStorage['instance'].getRefKeys()
+
+    def restoreDefaults(self):
+        '''Restore only defaults for all parameters. Useful for testing. 
+
+        >>> from music21 import *
+        >>> a = environment.Environment()
+        >>> a['debug'] = 1
+        >>> a.restoreDefaults()
+        >>> a['debug']
+        0
+        '''
+        _environStorage['instance'].restoreDefaults()
+
+    def __getitem__(self, key):
+        return _environStorage['instance'].__getitem__(key)
+
+    def __setitem__(self, key, value):
+        '''Dictionary-like setting. Changes are made only to local dictionary.
+        Must call write() to make permanent
+
+        >>> from music21 import *
+        >>> a = environment.Environment()
+        >>> a['debug'] = 1
+        >>> a['graphicsPath'] = '/test&Encode'
+        >>> a['graphicsPath']
+        '/test&amp;Encode'
+        >>> a['autoDownload'] = 'adsf'
+        Traceback (most recent call last):
+        EnvironmentException: adsf is not an acceptable value for preference: autoDownload
+        >>> a['showFormat'] = 'adsf'
+        Traceback (most recent call last):
+        EnvironmentException: adsf is not an acceptable value for preference: showFormat
+        >>> a['showFormat'] = 'musicxml'
+        >>> a['localCorpusPath'] = '/path/to/local'
+
+        '''
+        _environStorage['instance'].__setitem__(key, value)
+
+    def __repr__(self):
+        return _environStorage['instance'].__repr__()
+
+    def __str__(self):
+        return _environStorage['instance'].__str__()
+
+    def keys(self):
+        '''Return valid keys to get and set values for the Environment instance.
+
+        >>> from music21 import *
+        >>> e = environment.Environment()
+        >>> e.keys()
+        ['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'localCorpusSettings', 'vectorPath', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath', 'localCorpusPath']
+
+        '''
+        return _environStorage['instance'].keys()
+
+    def getSettingsPath(self):
+        '''Return the path to the platform specific settings file.
+        '''
+        return _environStorage['instance'].getSettingsPath()
+
+    def read(self, fp=None):
+        '''
+        Load an XML preference file if and only if the file is available 
+        and has been written in the past. This means that no preference file 
+        will ever be written unless manually done so. If no preference file 
+        exists, the method returns None.
+        '''
+        return _environStorage['instance'].read(fp=fp)
+
+    def write(self, fp=None):
+        '''
+        Write an XML preference file. This must be manually called to store 
+        any changes made to the object and access preferences later. 
+        If `fp` is None, the default storage location will be used.
+        '''
+        return _environStorage['instance'].write(fp=fp)
+
+    def getDefaultRootTempDir(self):
+        '''Use the Python tempfile.gettempdir() to get the system specified 
+        temporary directory, and try to add a new 'music21' directory, and 
+        then return this directory.
+
+        This method is only called if the no scratch directory preference has been set. 
+
+        If not able to create a 'music21' directory, the standard default is returned.
+        '''
+        dstDir = _environStorage['instance'].getDefaultRootTempDir()
+        self.printDebug([_MOD, 'using temporary directory:', dstDir])
+        return dstDir
+
+    def getRootTempDir(self):
+        '''Return a directory for writing temporary files. This does 
+        not create a new directory for each use, but either uses 
+        the user-set preference or gets the system-provided 
+        directory (with a music21 subdirectory, if possible).
+        '''
+        return _environStorage['instance'].getRootTempDir()
+
+    def getTempFile(self, suffix=''):
+        '''Return a file path to a temporary file with the specified suffix (file extension). 
+        '''
+        fp = _environStorage['instance'].getTempFile(suffix=suffix)
+        self.printDebug([_MOD, 'temporary file:', fp])
+        return fp
+
+    def launch(self, fmt, fp, options='', app=None):
+        '''
+        Opens a file with an either default or user-specified applications.
+        
+        OMIT_FROM_DOCS
+
+        Optionally, can add additional command to erase files, if necessary 
+        Erase could be called from os or command-line arguments after opening
+        the file and then a short time delay.
+
+        TODO: Move showImageDirectfrom lilyString.py ; add MIDI
+        TODO: Switch to module subprocess to prevent hanging.
+        '''
+        return _environStorage['instance'].launch(fmt, fp, 
+                options=options, app=app)
+
+    #---------------------------------------------------------------------------
+    # methods local to each instance that is created in each module
+
     def printDebug(self, msg, statusLevel=common.DEBUG_USER, format=None):
         '''Format one or more data elements into string, and print it 
         to stderr. The first arg can be a list of string; lists are 
@@ -646,7 +746,16 @@ class Environment(object):
         '''
         #if not common.isNum(statusLevel):
         #    raise EnvironmentException('bad statusLevel argument given: %s' % statusLevel)
-        if self.__getitem__('debug') >= statusLevel:
+#         if self.__getitem__('debug') >= statusLevel:
+#             if common.isStr(msg):
+#                 msg = [msg] # make into a list
+#             if msg[0] != self.modNameParent and self.modNameParent != None:
+#                 msg = [self.modNameParent + ':'] + msg
+#             # pass list to common.formatStr
+#             msg = common.formatStr(*msg, format=format)
+#             sys.stderr.write(msg)
+
+        if _environStorage['instance'].__getitem__('debug') >= statusLevel:
             if common.isStr(msg):
                 msg = [msg] # make into a list
             if msg[0] != self.modNameParent and self.modNameParent != None:
@@ -654,6 +763,7 @@ class Environment(object):
             # pass list to common.formatStr
             msg = common.formatStr(*msg, format=format)
             sys.stderr.write(msg)
+
 
     def pd(self, msg, statusLevel=common.DEBUG_USER, format=None):
         '''Shortcut for printDebug. Useful as is typed frequently.
@@ -674,6 +784,7 @@ class Environment(object):
         msg = common.formatStr(*msg)
         sys.stderr.write(msg)
     
+
 
 
 #-------------------------------------------------------------------------------
@@ -756,7 +867,7 @@ class UserSettings(object):
 
         # before setting value, see if this is a path and test existence
         # this will accept localCorpusPath
-        if key in self._environment._keysToPaths:
+        if key in self._environment.getKeysToPaths():
             # try to expand user if found; otherwise return unaltered
             value = os.path.expanduser(value)
             if not os.path.exists(value):
@@ -791,7 +902,7 @@ class UserSettings(object):
     def keys(self):
         '''Return the keys found in the user's :class:`~music21.environment.Environment` object. 
         '''
-        return self._environment.ref.keys() + ['localCorpusPath']
+        return self._environment.getRefKeys() + ['localCorpusPath']
 
     def getSettingsPath(self):
         '''Return the path to the platform specific settings file.
@@ -898,7 +1009,8 @@ class Test(unittest.TestCase):
     def testToSettings(self):
 
         env = Environment(forcePlatform='darwin')
-        match = env._toSettings(env.ref).xmlStr()
+        match = _environStorage['instance']._toSettings(
+            _environStorage['instance']._ref).xmlStr()
         self.assertEqual("""<?xml version="1.0" encoding="utf-8"?>
 <settings>
   <preference name="lilypondBackend" value="ps"/>
@@ -922,7 +1034,8 @@ class Test(unittest.TestCase):
 
         # try adding some local corpus settings
         env['localCorpusSettings'] = ['a', 'b', 'c']
-        match = env._toSettings(env.ref).xmlStr()
+        match = _environStorage['instance']._toSettings(
+            _environStorage['instance']._ref).xmlStr()
         self.assertEqual("""<?xml version="1.0" encoding="utf-8"?>
 <settings>
   <preference name="lilypondBackend" value="ps"/>
@@ -957,12 +1070,14 @@ class Test(unittest.TestCase):
         ref = {}
         ref['localCorpusSettings'] = ['x', 'y', 'z']
         ref['midiPath'] = 'w'
-        settings = env._toSettings(ref)
+        settings = _environStorage['instance']._toSettings(ref)
 
-        # this will load values into the env.ref dictionary
-        env._fromSettings(settings, env.ref)
+        # this will load values into the env._ref dictionary
+        _environStorage['instance']._fromSettings(settings, 
+            _environStorage['instance']._ref)
         # get xml strings
-        match = env._toSettings(env.ref).xmlStr()
+        match = _environStorage['instance']._toSettings(
+            _environStorage['instance']._ref).xmlStr()
         self.assertEqual("""<?xml version="1.0" encoding="utf-8"?>
 <settings>
   <preference name="lilypondBackend" value="ps"/>
