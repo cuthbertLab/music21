@@ -2023,9 +2023,7 @@ class Duration(DurationCommon):
         self._componentsNeedUpdating = False
         # defer updating until necessary
         self._quarterLengthNeedsUpdating = False
-
         self._cachedIsLinked = None # store for access w/o looking at components
-
         if len(arguments) > 0:
             if common.isNum(arguments[0]):
                 self.quarterLength = arguments[0]
@@ -2132,11 +2130,11 @@ class Duration(DurationCommon):
         normal representation in quarterLength units.
         '''
         if len(self._components) >= 1:
-            for c in self._components:
+            for c in self._components: # these are Duration objects
                 c.unlink()
             self._cachedIsLinked = False
-        else: # there may be components and still a zero type
-            raise DurationException("zero DurationUnits in components: cannot link or unlink")
+#         else: # there may be components and still a zero type
+#             raise DurationException("zero DurationUnits in components: cannot link or unlink")
 
     def _isLinked(self):
         # reset _cachedIsLinked to None when components have changed
@@ -2269,7 +2267,6 @@ class Duration(DurationCommon):
         '''
         sets the QuarterLength
         '''
-        
         if self._qtrLength != value:
             if isinstance(value, int):
                 value = float(value)
@@ -2394,7 +2391,9 @@ class Duration(DurationCommon):
             self.addDurationUnit(DurationUnit(value)) # updates
             self._quarterLengthNeedsUpdating = True
 
-    type = property(_getType, _setType)
+    type = property(_getType, _setType, doc='''
+        Get or set the type of the Duration. 
+        ''')
 
 
     def setTypeUnlinked(self, value):
@@ -2579,7 +2578,7 @@ class Duration(DurationCommon):
         When there are more than one component, each component may have its 
         own tuplet. 
         '''
-        if self._componentsNeedUpdating == True:
+        if self._componentsNeedUpdating:
             self._updateComponents()
         if len(self.components) > 1:
             return None
@@ -2615,7 +2614,7 @@ class Duration(DurationCommon):
         5
         
         '''
-        if self._componentsNeedUpdating == True:
+        if self._componentsNeedUpdating:
             self._updateComponents()
             
         if len(self.components) > 1:
@@ -3199,14 +3198,32 @@ class Duration(DurationCommon):
             self.addDurationUnit(Duration(x))
 
 
-# TODO: remove when graces are implemented
 class GraceDuration(Duration):
-    def __init__(self):
-        Duration.__init__(self)
+    '''A Duration that, no matter how it is created, always has a quarter length of zero. 
 
-        # TODO: these cannot be unlinked presently like this because
-        # this objec is a subclass of Duration, not DurationUnit
-        #self.unlink()
+    GraceDuration can be created with an implied quarter length and type; these values are used to configure the duration, but then may not be relevant after instantiation. 
+
+    >>> from music21 import *
+    >>> gd = duration.GraceDuration(type='half')
+    >>> gd.quarterLength
+    0.0
+    >>> gd.type
+    'half'
+
+    >>> gd = duration.GraceDuration(.25)
+    >>> gd.type
+    '16th'
+    >>> gd.quarterLength
+    0.0
+    '''
+    def __init__(self, *arguments, **keywords):
+        Duration.__init__(self, *arguments, **keywords)
+
+        # update components to derive types; this sets ql, but this 
+        # will later be removed
+        if self._componentsNeedUpdating:
+            self._updateComponents()
+        self.unlink()
         self.quarterLength = 0
 
 class LongGraceDuration(Duration):

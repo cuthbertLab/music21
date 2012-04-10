@@ -10937,7 +10937,7 @@ class Opus(Stream):
 #-------------------------------------------------------------------------------
 class SpannerStorage(Stream):
     '''
-    For advanced use. This Stream subclass is used inside of a Spanner object to provide object storage.
+    For advanced use. This Stream subclass is only used inside of a Spanner object to provide object storage of connected elements (things the Spanner spans).
 
     This subclass name can be used to search in an object's DefinedContexts and find any and all locations that are SpannerStorage objects.
 
@@ -10954,6 +10954,11 @@ class SpannerStorage(Stream):
             self.spannerParent = keywords['spannerParent']
 
 
+#-------------------------------------------------------------------------------
+class GraceStream(Stream):
+    '''A Stream used to contain the notes that make up a section of grace notes. 
+    '''
+    # from the outside, this needs to have duration of zero
 
 
 
