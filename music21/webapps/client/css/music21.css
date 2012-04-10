@@ -1,0 +1,4 @@
+div#wrapper {width:1300px; margin: 0 auto; }
+
+div#content {float:left; width:800px}
+div#interface {float:right; width:500px}

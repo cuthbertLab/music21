@@ -1,4 +1,4 @@
-
+// Utility Functions
 function createAJAXObject() {
 	var request_type;
 	var browser = navigator.appName;
@@ -10,101 +10,162 @@ function createAJAXObject() {
 	return request_type;
 };
 
-function createRequestObject() {
-	var req_obj = Object();
-	req_obj.dataDict = {};
-	req_obj.commandList = [];
-	req_obj.returnList = {};
-};
 
-// Get Movie - provides access to the flash Object - accounts for browser differences
-function getMovie(movieName) {
-    if (navigator.appName.indexOf("Microsoft") != -1) {
-        return document.getElementById(movieName);
-    }
-    else {
-        return document[movieName]
-    }
-}
-function newData(name, fmt, data) {
-	d = Object();
-	d.fmt = fmt;
-	d.data = data;
-	return d;
-}
-
-
+// Main Music21 Interface Object
 function Music21interface() {
-	var ajaxObj = createAJAXObject();
-	this.requestObj = createRequestObject();
+	var self = this;
+	
 	var curUrl = window.location.href;
 	var arr = curUrl.split("/");
 	var hostProtocol = arr[0] + "//" + arr[2];
 	
-	this.queryMusic21 = function () {
-		musicxml = getMovie('score1').getMusicXML();
-			
-		var obj = {
-			"dataDict" : {
-				"sc" : {
-					"fmt" : "xml",
-					"data" : musicxml
-				}
-			},
-			"commandList" : [
-				{"function" : "transpose",
-				 "caller" : "sc",
-				 "argList" : ["'p5'"],
-				 "resultVariable" : "sc"}
-			],
-			"returnList" : [
-				{"name" : "sc",
-				"fmt" : "xml"}
-			]
-		};
-		obj.commandList[obj.commandList.length] = 
-				{"function" : "transpose",
-				 "caller" : "sc",
-				 "argList" : ["'p5'"],
-				 "resultVariable" : "sc"};
-		//obj.dataDict = {};
-		//obj.dataDict.sc = newData("name","xml",musicxml);
+	self.ajaxObj = createAJAXObject()
+	
+	// Allows user to build the request before sending
+	self.request = {
+		dataDict : new Object(),
+		commandList : [],
+		returnList : new Array(),
 		
-		var jsontext = JSON.stringify(obj);
-		document.getElementById('requestxmltextarea').value = jsontext;		
-	
-		// Set te random number to add to URL request
-		nocache = Math.random();
-		ajaxObj.open('POST', hostProtocol+'/music21interface',true);
-		ajaxObj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		ajaxObj.send(jsontext);
-	
-		ajaxObj.onreadystatechange = this.reply;
+		// Adds data to dataDict (replaces if key already exists)
+		addData : function (name, fmt, data) {
+			self.request.dataDict[name] = { "fmt" : fmt,
+											"data" : data};
+		},
+		
+		// Adds command to commandList
+		addCommand : function (type, resultVar, caller, command, argList) {
+			var cmdObj = new Object();
+			cmdObj[type] = command;
+			if (resultVar) {
+				cmdObj.resultVariable = resultVar;
+			}
+			if (caller) {
+				cmdObj.caller = caller;
+			}
+			if (argList) {
+				cmdObj.argList = argList;
+			}
+			self.request.commandList.push(cmdObj);
+		},
+		
+		// Adds variable name to returnList
+		addReturnVar : function (varName, fmt) {
+			self.request.returnList.push({name: varName, fmt: fmt});
+		},
+		
+		
+		// Clears the request object in preparation for a new request
+		clear : function() {
+			self.request.dataDict = new Object();
+			self.request.commandList = new Array();
+			self.request.returnList = new Array();
+		},
+		
+		// Combines the datadict, commandlist, returnlist into a json string
+		jsonText : function() {
+			var obj = {
+				dataDict : self.request.dataDict,
+				commandList : self.request.commandList,
+				returnList : self.request.returnList,
+			};
+			return JSON.stringify(obj);
+		}
 	};
 	
-    this.queryMusic21String = function (jsonStr) {
-	
-		// Set te random number to add to URL request
-		nocache = Math.random();
-		ajaxObj.open('POST', hostProtocol+'/music21interface',true);
-		ajaxObj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		ajaxObj.send(jsonStr);
-	
-		ajaxObj.onreadystatechange = this.reply;
-	};
-	
-	this.reply = function () {
-		if(ajaxObj.readyState == 4){
-			json_response = ajaxObj.responseText;
-			document.getElementById('realresponse').value = json_response;
-			//return;
-			
-			json_response_obj = JSON.parse(json_response);		
-			response_xml = json_response_obj['dataDict']['sc']['data'];
-			document.getElementById('resultxmltextarea').value = response_xml;
-			
-			getMovie('score1').loadMusicXML(response_xml);		
+	self.sendRequest = function () {
+		var jsonStr = this.request.jsonText();
+		this.ajaxObj.open('POST',this.opts.postUrl,true);
+		this.ajaxObj.setRequestHeader("Content-type", "application/json");
+		this.ajaxObj.send(jsonStr);	
+		this.ajaxObj.onreadystatechange = function() {
+			self.onServerReply();
 		};
-	}
+	};
 
-};
+	self.onServerReply = function () {
+		if(self.ajaxObj.readyState == 4){
+			var jsonStr = this.ajaxObj.responseText;
+			self.result.responseObj = JSON.parse(jsonStr);
+		}
+		if(self.result.responseObj.status == "error") {
+			self.onError();
+			
+		} else {
+			self.onSuccess();
+		}
+		
+	};
+	
+	// On reply functions, to be overridden in specific use cases
+	self.onError = function () {
+	};
+	
+	self.onSuccess = function () {
+	};
+	
+	self.result = {
+		responseObj : {},
+		getData : function (varName) {
+			if (self.result.responseObj.dataDict) {
+				if (varName in self.result.responseObj.dataDict) {
+					return self.result.responseObj.dataDict[varName].data;
+				} else {
+					//alert(varName + " not found in result object");
+					return null;
+				}
+			} else {
+				return null;
+			}
+		},
+		errorString : function() {
+			var str = "";
+			for (i = 0; i < self.result.responseObj.errorList.length; i++) {
+				str += self.result.responseObj.errorList[i] + "<br />";
+			}
+			return str;
+		}
+	};
+	
+	self.opts = {
+		curUrl : window.location.href,
+		postUrl : hostProtocol+"/music21interface"
+	};
+	
+	self.util = {
+		createNoteflightEmbed : function (divid, scoreid, noteflightid, width, height, scale) {
+			if(!scale) {
+				scale = 1.0;
+			}
+			var embedURL = "http://music21.sites.noteflight.com/scores/embed";
+			document.getElementById(divid).innerHTML = "<object id='"+scoreid+"' width='"+width+"' height='"+height+"'> \
+				<param name='movie' value='"+embedURL+"'></param> \
+				<param name='FlashVars' value='id="+noteflightid+"&scale="+scale+"&role=template&displayMode=paginated'></param> \
+				<param name='allowScriptAccess' value='always'/> \
+				<embed name='"+scoreid+"' src='"+embedURL+"' type='application/x-shockwave-flash' \
+					FlashVars='id="+noteflightid+"&scale="+scale+"&role=template&displayMode=paginated' \
+					width='"+width+"' height='"+height+"' \
+					allowScriptAccess='always'> \
+				</embed> \
+				</object>";
+			
+		},
+		
+		getNoteflightEmbed :  function(scoreid) {
+			if (navigator.appName.indexOf("Microsoft") != -1) {
+				return document.getElementById(scoreid);
+			}
+			else {
+				return document[scoreid]
+			}
+		},
+		sendMusicXMLToNoteflightEmbed : function (scoreid, musicxml) {
+			
+			self.util.getNoteflightEmbed(scoreid).loadMusicXML(musicxml)
+		},
+		getMusicXMLFromNoteflightEmbed : function (scoreid) {
+			return self.util.getNoteflightEmbed(scoreid).getMusicXML();
+		}
+	}
+	
+}
