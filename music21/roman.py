@@ -41,6 +41,56 @@ ENDWITHFLAT_RE = re.compile('[b\-]$')
 _scaleCache = {}
 _keyCache = {}
 
+
+functionalityScores =  { 
+    'I'  : 100,
+    'i'  : 90,
+    'V7' : 80,
+    'V'  : 70,
+    'V65' : 68,
+    'I6' : 65,
+    'V6' : 63,
+    'V43' : 61,
+    'I64' : 60,
+    'IV' : 60,
+    'i6' : 58,
+    'viio7' : 57,
+    'V42' : 55,
+    'viio65' : 53,
+    'viio6' : 52,
+    '#viio65' : 51,
+    'ii' : 50,
+    '#viio6' : 49,
+    'ii65' : 48,
+    'ii43' : 47,
+    'ii42' : 46,
+    'IV6' : 45,
+    'ii6' : 43,
+    'VI' : 42,
+    '#VI' : 41,
+    'vi' : 40,
+    '#viio' : 39,
+    'iio' : 37, ## common in Minor
+    'iio42' : 36,
+    'bII6' : 35, ## Neapolitan
+    'iio43' : 32,
+    'iio65' : 31,
+    '#vio' : 28,
+    '#vio6' : 28,
+    'III' : 22,
+    'v'  : 20,
+    'VII' : 19,
+    'VII7' : 18,
+    'IV65' : 17,
+    'IV7' : 16,
+    'iii' : 15,
+    'iii6' : 12,
+    'vi6' : 10,
+  }
+
+
+
+
 def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = False):
     '''
     takes a chord object and returns an appropriate chord name.  If keyObj is omitted,
@@ -599,6 +649,7 @@ class RomanNumeral(chord.Chord):
 
 
         self._parsingComplete = True
+        self._functionalityScore = None
         
     def __repr__(self):
         if hasattr(self.key, 'tonic'):
@@ -1077,6 +1128,40 @@ class RomanNumeral(chord.Chord):
             bassSD = 7
         return bassSD
 
+    def _getFunctionalityScore(self):
+        '''
+        Return or set a number from 1 to 100 representing the relative functionality of this RN.figure
+        (possibly given the mode, etc.)
+        
+        Numbers are ordinal not cardinal.
+
+        >>> from music21 import *
+        >>> rn1 = roman.RomanNumeral('V7')
+        >>> rn1.functionalityScore
+        80
+        
+        >>> rn2 = roman.RomanNumeral('vi6')
+        >>> rn2.functionalityScore
+        10
+        
+        >>> rn2.functionalityScore = 99
+        >>> rn2.functionalityScore
+        99
+        
+        '''
+        if self._functionalityScore is not None:
+            return self._functionalityScore
+        try:
+            score = functionalityScores[self.figure]
+        except KeyError:
+            score = 0
+        return score
+    
+    def _setFunctionalityScore(self, value):
+        self._functionalityScore = value
+    
+    functionalityScore = property(_getFunctionalityScore, _setFunctionalityScore)
+
 def fromChordAndKey(inChord, inKey):
     '''
     return the roman numeral string from the given chord in the given key.
@@ -1474,4 +1559,4 @@ _DOC_ORDER = [RomanNumeral, fromChordAndKey]
 
 
 if __name__ == "__main__":
-    music21.mainTest(TestExternal, 'noDocTest')
+    music21.mainTest(Test)
