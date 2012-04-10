@@ -245,7 +245,7 @@ class RequestObject():
                         if arg in self.parsedDataDict.keys():
                             argList[i] = self.parsedDataDict[arg]
                         else:
-                            argList[i] = eval(arg)
+                            argList[i] = arg
                 
                 if 'caller' in commandElement.keys(): # Caller Specified
                     callerName = commandElement['caller']
@@ -333,7 +333,7 @@ class RequestObject():
             
             if fmt == 'string' or fmt == 'str':
                 dataStr = str(data)
-            elif fmt == 'xml':
+            elif fmt == 'musicxml':
                 dataStr = data.musicxml
             elif fmt == 'reprtext':
                 dataStr = data._reprText()
