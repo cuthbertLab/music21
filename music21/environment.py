@@ -538,9 +538,9 @@ class _EnvironmentCore(object):
 
 
 #-------------------------------------------------------------------------------
-# store instance with this module
-# this is module-level implementation of the singleton pattern
-# reloading the module wil force a recreation of the module
+# store one instance of _EnvironmentCore within this module
+# this is a module-level implementation of the singleton pattern
+# reloading the module will force a recreation of the module
 _environStorage = {'instance':None, 'forcePlatform':None}
 # create singleton instance
 _environStorage['instance'] = _EnvironmentCore()
@@ -592,6 +592,7 @@ class Environment(object):
         self.modNameParent = modName
         # only re-create the instance if forcing a different platform
         # this only happens in testing
+        # otherwise, delegate all calls to the module-level instance
         if forcePlatform != _environStorage['forcePlatform']:
             _environStorage['instance'] = _EnvironmentCore(
                 forcePlatform=forcePlatform)
@@ -831,16 +832,16 @@ class UserSettings(object):
         self._environment.restoreDefaults()
         self._environment.write()
 
-
-    def _updateAllEnvironments(self):
-        '''Iterate through all modules; find any that have environLocal, and replace with a new environment.
-        '''
-        from music21 import base # must update this one to get show to work
-        reload(sys)
-        for mStr, m in sys.modules.items():
-            if hasattr(m, 'environLocal'):
-                #self._environment.printDebug(['reinstantiating Environment on %s' % m])
-                m.environLocal = Environment()
+# this is no longer necessaary
+#     def _updateAllEnvironments(self):
+#         '''Iterate through all modules; find any that have environLocal, and replace with a new environment.
+#         '''
+#         from music21 import base # must update this one to get show to work
+#         reload(sys)
+#         for mStr, m in sys.modules.items():
+#             if hasattr(m, 'environLocal'):
+#                 #self._environment.printDebug(['reinstantiating Environment on %s' % m])
+#                 m.environLocal = Environment()
 
     def __getitem__(self, key):
         '''Dictionary like getting. 
@@ -879,7 +880,7 @@ class UserSettings(object):
         # location specific, cannot test further
         self._environment.__setitem__(key, value)
         self._environment.write()
-        self._updateAllEnvironments()
+        #self._updateAllEnvironments()
 
     def __repr__(self):
         '''Return a string representation. 
