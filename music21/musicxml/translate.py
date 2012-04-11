@@ -532,7 +532,7 @@ def pitchToMx(p):
     mxPitch.set('octave', p.implicitOctave)
 
     mxNote = musicxmlMod.Note()
-    mxNote.setDefaults()
+    mxNote.setDefaults() # note: this sets the duration to a default value
     mxNote.set('pitch', mxPitch)
 
     if (p.accidental is not None and 
@@ -851,14 +851,16 @@ def durationToMx(d):
 
     '''
     from music21 import duration
-
     post = [] # rename mxNoteList for consistencuy
-    #environLocal.printDebug(['in _getMX', d, d.quarterLength])
+        
+    environLocal.printDebug(['in _getMX', d, d.quarterLength, 'isGrace', d.isGrace])
 
     if d.dotGroups is not None and len(d.dotGroups) > 1:
         d = d.splitDotGroups()
-
-    if d.isLinked == True or len(d.components) > 1: # most common case...
+    # most common case...
+    # a grace is not linked, but still needs to be processed as a grace
+    if (d.isLinked is True or len(d.components) > 1 or 
+        (len(d.components) > 1 and d.isGrace)): 
         for dur in d.components:
             mxDivisions = int(defaults.divisionsPerQuarter * 
                               dur.quarterLength)
@@ -872,9 +874,9 @@ def durationToMx(d):
             for x in range(int(dur.dots)):
                 # only need to create object
                 mxDotList.append(musicxmlMod.Dot())
-    
             mxNote = musicxmlMod.Note()
-            mxNote.set('duration', mxDivisions)
+            if not d.isGrace:
+                mxNote.set('duration', mxDivisions)
             mxNote.set('type', mxType)
             mxNote.set('dotList', mxDotList)
             post.append(mxNote)
@@ -891,23 +893,20 @@ def durationToMx(d):
         for x in range(int(d.dots)):
             # only need to create object
             mxDotList.append(musicxmlMod.Dot())
-
         mxNote = musicxmlMod.Note()
-        mxNote.set('duration', mxDivisions)
+        if not d.isGrace:
+            mxNote.set('duration', mxDivisions)
         mxNote.set('type', mxType)
         mxNote.set('dotList', mxDotList)
         post.append(mxNote)    
 
-        # second pass for ties if more than one components
-        # this assumes that all component are tied
-
+    # second pass for ties if more than one components
+    # this assumes that all component are tied
     for i in range(len(d.components)):
         dur = d.components[i]
         mxNote = post[i]
-
         # contains Tuplet, Dynamcs, Articulations
         mxNotations = musicxmlMod.Notations()
-
         # only need ties if more than one component
         mxTieList = []
         if len(d.components) > 1:
@@ -933,20 +932,24 @@ def durationToMx(d):
                     mxTied = musicxmlMod.Tied()
                     mxTied.set('type', type) 
                     mxNotations.append(mxTied)
-
         if len(d.components) > 1:
             mxNote.set('tieList', mxTieList)
-
         if len(dur.tuplets) > 0:
             # only getting first tuplet here
             mxTimeModification, mxTupletList = dur.tuplets[0].mx
             mxNote.set('timemodification', mxTimeModification)
             if mxTupletList != []:
                 mxNotations.componentList += mxTupletList
-
         # add notations to mxNote
         mxNote.set('notations', mxNotations)
 
+    # third pass if these are graces
+    if d.isGrace:
+        for mxNote in post:
+            # TODO: configure this object with per-duration configurations
+            mxGrace = musicxmlMod.Grace()
+            mxNote.graceObj = mxGrace
+            #environLocal.pd(['final mxNote with mxGrace duration', mxNote.get('duration')])
     return post # a list of mxNotes
 
 
@@ -2011,6 +2014,8 @@ def chordToMx(c, spannerBundle=None):
             # copy here, before merge
             mxNote = copy.deepcopy(mxNoteBase)
             mxNote = mxNote.merge(n.pitch.mx, returnDeepcopy=False)
+            if c.duration.isGrace:
+                mxNote.set('duration', None)                
             if chordPos > 0:
                 mxNote.set('chord', True)
             # if we do not have a component color, set color from the chord
@@ -2337,6 +2342,9 @@ def noteToMxNotes(n, spannerBundle=None):
     #for mxNote in n.duration.mx: # returns a list of mxNote objs
         # merge method returns a new object; but can use existing here
         mxNote = mxNote.merge(pitchMx, returnDeepcopy=False)
+        if n.duration.isGrace: 
+            # defaults may have been set; need to override here if a grace
+            mxNote.set('duration', None)
         # get color from within .editorial using property
         # only set note-level color for rests, otherwise set notehead
         if noteColor is not None and n.isRest:
@@ -2632,7 +2640,6 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
     # best to only set dvisions here, as clef, time sig, meter are not
     # required for each measure
     mxAttributes.setDefaultDivisions()
-
     # set the mxAttributes transposition; this assumes it is 
     # constant for an entire Part
     mxAttributes.transposeObj = mxTranspose # may be None
@@ -2674,6 +2681,7 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
     
     nonVoiceMeasureItems = None
     if m.hasVoices():
+        # all things that are not a Stream; elements simply positioned freely
         nonVoiceMeasureItems = m.getElementsNotOfClass('Stream')
         # store divisions for use in calculating backup of voices 
         divisions = mxAttributes.divisions

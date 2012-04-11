@@ -1891,7 +1891,8 @@ class Note(MusicXMLElement):
 
         # simple elements
         self.chord = False # boolean, default is false
-        self.duration = None # number, in div per quarter
+        # # number, in div per quarter; not defined for graces
+        self.duration = None 
         self.voice = None # numbers
 
         # note: to configre note size options, Type can have an attribute for

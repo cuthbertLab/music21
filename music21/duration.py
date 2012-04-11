@@ -2007,8 +2007,9 @@ class Duration(DurationCommon):
     >>> d3.quarterLength
     3.5
     
-    
     '''
+
+    isGrace = False
 
     def __init__(self, *arguments, **keywords):
         '''
@@ -3208,6 +3209,8 @@ class Duration(DurationCommon):
         0.0
         >>> [(x.quarterLength, x.type) for x in gd.components]
         [(0.0, 'quarter'), (0.0, '16th')]
+        >>> d.quarterLength
+        1.25
         '''
         if self._componentsNeedUpdating:
             self._updateComponents()
@@ -3240,6 +3243,8 @@ class GraceDuration(Duration):
     '16th'
     >>> gd.quarterLength
     0.0
+    >>> gd.isLinked
+    False
 
     >>> gd = duration.GraceDuration(1.25)
     >>> gd.type
@@ -3249,6 +3254,11 @@ class GraceDuration(Duration):
     >>> [(x.quarterLength, x.type) for x in gd.components]
     [(0.0, 'quarter'), (0.0, '16th')]
     '''
+
+    # TODO: there are many properties/methods of Duration that must
+    # be overridden to provide consisten behavior
+    isGrace = True
+
     def __init__(self, *arguments, **keywords):
         Duration.__init__(self, *arguments, **keywords)
 
@@ -3259,6 +3269,8 @@ class GraceDuration(Duration):
         self.unlink()
         self.quarterLength = 0.0
 
+
+# TODO: why does this exist?
 class LongGraceDuration(Duration):
     def __init__(self):
         Duration.__init__(self)

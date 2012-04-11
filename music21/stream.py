@@ -1148,7 +1148,6 @@ class Stream(music21.Music21Object):
         # using id() here b/c we do not want to get __eq__ comparisons
         if element is self: # cannot add this Stream into itself
             raise StreamException("this Stream cannot be contained within itself")
-
         if checkRedundancy:
             # TODO: might optimize this by storing a list of all obj ids with every insertion and deletion 
             idElement = id(element)
@@ -1158,7 +1157,6 @@ class Stream(music21.Music21Object):
             for e in self._endElements:
                 if idElement == id(e):
                     raise StreamException('the object (%s, id()=%s) is already found in this Stream (%s, id()=%s)' % (element, id(element), self, id(self)))
-            
         # if we do not purge locations here, we may have ids() for 
         # Stream that no longer exist stored in the locations entry
         # note that dead locations are also purged from DefinedContexts during
@@ -1460,47 +1458,22 @@ class Stream(music21.Music21Object):
         if not common.isListLike(others):
             # back into a list for list processing if single
             others = [others]
-
         updateIsFlat = False
-        for element in others:    
-            if element.isStream: # any on that is a Stream req update
+        for e in others:    
+            if e.isStream: # any on that is a Stream req update
                 updateIsFlat = True
-#             try:
-#                 item.isStream # will raise attribute error if not m21 obj
-#                 element = item
-#             #if not isinstance(item, music21.Music21Object): 
-#             except AttributeError:
-#                 #environLocal.printDebug(['wrapping item in ElementWrapper:', item])
-#                 raise StreamException('cannot append a non Music21Object. wrap it in a music21.ElementWrapper(item) first')
-            self._addElementPreProcess(element)
-    
+            self._addElementPreProcess(e)
             # add this Stream as a location for the new elements, with the 
             # the offset set to the current highestTime
-            element.addLocation(self, highestTime)
+            e.addLocation(self, highestTime)
             # need to explicitly set the activeSite of the element
-            element.activeSite = self 
-            self._elements.append(element)  
+            e.activeSite = self 
+            self._elements.append(e)  
 
-#             if element.duration.quarterLength == 0: 
-#                 # it might be a grace note
-#                 if 'NotRest' in element.classes and element.isGrace:
-#                     # no change to highestTime is needed
-#                     graces = self._getGracesAtOffset(highestTime)
-#                     #hp = self._highestPriorityAtOffset(highestTime, 
-#                     #                    gracesOnly=True)
-#                     #environLocal.printDebug(['got highest priority: hp'])
-#                     if len(graces) > 1:
-#                         hp = max([g.priority for g in graces])
-#                         # if highest priority found is greater than known
-#                         # must change what we have
-#                         if hp >= element.priority:
-#                             element.priority = hp + 1 # increment
-#             else:
-#                 # increment highestTime by quarterlength
-#                 highestTime += element.duration.quarterLength
-
-            if element.duration.quarterLength != 0: 
-                highestTime += element.duration.quarterLength
+            # TODO: may need to be replaced with a common almost equal
+            if e.duration.quarterLength != 0: 
+                #environLocal.pd(['incrementing highest time', 'e.duration.quarterLength', e.duration.quarterLength])
+                highestTime += e.duration.quarterLength
 
         # does not change sorted state
         storeSorted = self.isSorted    
@@ -1508,7 +1481,6 @@ class Stream(music21.Music21Object):
         self._elementsChanged(updateIsFlat=updateIsFlat)         
         self.isSorted = storeSorted
         self._setHighestTime(highestTime) # call after to store in cache
-
 
 
     def _storeAtEndCore(self, element):
@@ -9903,6 +9875,8 @@ class Measure(Stream):
         minDurDotted = False        
         sumDurQL = 0
         for e in self.notesAndRests:
+            if e.quarterLength == 0.0:
+                continue # case of grace durations
             sumDurQL += e.quarterLength
             if e.quarterLength < minDurQL:
                 minDurQL = e.quarterLength
@@ -10973,10 +10947,17 @@ class GraceStream(Stream):
         '''Overridden append method that copies appended elements and replaces their duration with a GraceDuration.
         '''
         if not common.isListLike(others):
-            # back into a list for list processing if single
             others = [others]
+        # replace and edit in place
+        othersEdited = []
+        for e in others:
+            e = copy.deepcopy(e) 
+            e.duration = e.duration.getGraceDuration()
+            #environLocal.pd(['appending GraceStream, before calling base class', e.quarterLength, e.duration.quarterLength])
+            othersEdited.append(e)
 
-
+        # call bass class append with elements modified durations
+        Stream.append(self, othersEdited)
 
 
 #-------------------------------------------------------------------------------
@@ -17899,10 +17880,116 @@ class Test(unittest.TestCase):
         for i in range(4):
             self.assertEqual(
             str(sLeft.parts[i].getElementsByClass('Measure')[0].keySignature), str(sRight.parts[i].getElementsByClass('Measure')[0].keySignature))
-
-
         #sLeft.show()
         #sRight.show()
+
+
+    def testGraceStreamA(self):
+
+        from music21 import stream, note, spanner
+
+        # the GraceStream transforms generic notes into Notes w/ grace
+        # durations; otherwise it is not necssary
+        gs = stream.GraceStream()
+        # the notes here are copies of the created notes
+        gs.append(note.Note('c4', quarterLength=.25))
+        gs.append(note.Note('d#4', quarterLength=.25))
+        gs.append(note.Note('g#4', quarterLength=.5))
+
+        #gs.show('t')
+        #gs.show()
+
+        # the total duration of the 
+        self.assertEqual(gs.duration.quarterLength, 0.0)
+
+        s = stream.Measure()
+        s.append(note.Note('G3'))
+        s.append(gs)
+        s.append(note.Note('A4'))
+
+        sp = spanner.Slur(gs[0], s[-1])
+        s.append(sp)
+
+        match = [str(x) for x in s.pitches]
+        self.assertEqual(match, ['G3', 'C4', 'D#4', 'G#4', 'A4'])
+
+        #s.show('text')
+
+#         p = stream.Part()
+#         p.append(s)
+#         p.show()
+        
+
+    def testGraceStreamB(self):
+        '''testing a graces w/o a grace stream'''
+        from music21 import stream, note, duration, dynamics
+
+        s = stream.Measure()
+        s.append(note.Note('G3'))
+        self.assertEqual(s.highestTime, 1.0)
+        # shows up in the same position as the following note, not the grace
+        s.append(dynamics.Dynamic('mp'))
+
+        gn1 = note.Note('d#4', quarterLength=.5)
+        # could create a NoteRest method to get a GraceNote from a Note
+        gn1.duration = gn1.duration.getGraceDuration()
+        self.assertEqual(gn1.duration.quarterLength, 0.0)
+        s.append(gn1)
+        # highest time is the same after adding the gracenote
+        self.assertEqual(s.highestTime, 1.0)
+
+        s.append(note.Note('A4'))
+        self.assertEqual(s.highestTime, 2.0)
+
+        # this works just fine
+        #s.show()
+
+        match = [str(e) for e in s.pitches]
+        self.assertEqual(match, ['G3', 'D#4', 'A4'])
+
+        #s.sort()
+
+        # this insert and shift creates an ambiguous situation
+        # the grace note seems to move with the note itself
+        s.insertAndShift(1, note.Note('c4'))
+        match = [str(e) for e in s.pitches]
+        self.assertEqual(match, ['G3', 'C4', 'D#4', 'A4'])
+        #s.show('t')
+        #s.show()
+        # inserting and shifting this results in it appearing before
+        # the note at offset 2
+        gn2 = note.Note('c#4', quarterLength=.25)
+        gn2.duration = gn2.duration.getGraceDuration()
+        s.insertAndShift(1, gn2)
+        #s.show('t')
+        #s.show()
+
+
+    def testGraceStreamC(self):
+        from music21 import stream
+
+        s = stream.Measure()
+        s.append(chord.Chord(['G3', 'd4']))
+
+        gc1 = chord.Chord(['d#4', 'a#4'], quarterLength=.5)
+        gc1.duration = gc1.duration.getGraceDuration()
+        s.append(gc1)
+
+        gc2 = chord.Chord(['e4', 'b4'], quarterLength=.5)
+        gc2.duration = gc2.duration.getGraceDuration()
+        s.append(gc2)        
+
+        s.append(chord.Chord(['f4', 'c5'], quarterLength=2))
+        
+        gc3 = chord.Chord(['f#4', 'c#5'], quarterLength=.5)
+        gc3.duration = gc2.duration.getGraceDuration()
+        s.append(gc3)        
+
+        s.append(chord.Chord(['e4', 'b4'], quarterLength=1))
+
+        #s.show()
+
+
 
 
 #-------------------------------------------------------------------------------
