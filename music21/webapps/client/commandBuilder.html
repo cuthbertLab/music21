@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>Untitled Document</title>
+<title>Music21 Command Builder</title>
 <link href="css/music21.css" rel="stylesheet" type="text/css" />
 
 <script language="javascript" src="javascript/json2.js"></script>
@@ -217,7 +217,7 @@ function setup() {
 
 <h2>Data:</h2>
 <p class="smaller">Enter data you wish to include in the request. May be used by name in later commands </p>
-<p class="smaller">format only needs to be specified for data that needs to be parsed; it is optional for primitives (int, float, bool) and raw strings</p>
+<p class="smaller">format only needs to be specified for data that needs to be parsed by converter.parse; it is optional for primitives (int, float, bool) and raw strings</p>
  <input id='varName' type="text" style="width:60px" placeholder='varName'/> (
  <input id='fmt' type="text"  style="width:60px" placeholder='format' />) =
  <input id='data' type="text"  style="width:80px" placeholder='data' />
@@ -247,7 +247,7 @@ Attribute: <input id='attribute' type="checkbox"  style="width:60px" value='1' o
 <hr />
 
 <p> Variable to send to noteflight: <input id='varToNoteflight' value='sc' /></p>
-<p class="smaller"> If nonempty, this variable will be automatically added to returnDict with return type musicxml when submitting</p>
+<p class="smaller"> If nonempty, this variable will be automatically added to returnDict with return type 'musicxml' when submitting</p>
 <hr />
 <p><input type="button" value="Send Generated Request" onclick="sendRequest()" /></p>
 
