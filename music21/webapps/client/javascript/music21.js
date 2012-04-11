@@ -25,12 +25,15 @@ function Music21interface() {
 	self.request = {
 		dataDict : new Object(),
 		commandList : [],
-		returnList : new Array(),
-		
+		returnDict : new Object(),
 		// Adds data to dataDict (replaces if key already exists)
 		addData : function (name, fmt, data) {
-			self.request.dataDict[name] = { "fmt" : fmt,
-											"data" : data};
+			var dataObj = new Object();
+			dataObj.data = data;
+			if(fmt) {
+				dataObj.fmt = fmt;
+			}
+			self.request.dataDict[name] = dataObj;
 		},
 		
 		// Adds command to commandList
@@ -49,9 +52,9 @@ function Music21interface() {
 			self.request.commandList.push(cmdObj);
 		},
 		
-		// Adds variable name to returnList
+		// Adds variable name to returnDict
 		addReturnVar : function (varName, fmt) {
-			self.request.returnList.push({name: varName, fmt: fmt});
+			self.request.returnDict[varName] = fmt;
 		},
 		
 		
@@ -59,23 +62,35 @@ function Music21interface() {
 		clear : function() {
 			self.request.dataDict = new Object();
 			self.request.commandList = new Array();
-			self.request.returnList = new Array();
+			self.request.returnDict = new Object();
 		},
 		
-		// Combines the datadict, commandlist, returnlist into a json string
+		// Combines the datadict, commandlist, returnDict into a json string
 		jsonText : function() {
 			var obj = {
 				dataDict : self.request.dataDict,
 				commandList : self.request.commandList,
-				returnList : self.request.returnList,
+				returnDict : self.request.returnDict
 			};
 			return JSON.stringify(obj);
+		},
+		prettyJsonText : function() {
+			var obj = {
+				dataDict : self.request.dataDict,
+				commandList : self.request.commandList,
+				returnDict : self.request.returnDict
+			};
+			return JSON.stringify(obj,undefined,2);
 		}
 	};
 	
 	self.sendRequest = function () {
-		var jsonStr = this.request.jsonText();
-		this.ajaxObj.open('POST',this.opts.postUrl,true);
+		var jsonStr = self.request.jsonText();
+		self.sendRawRequest(jsonStr)
+	};
+	
+	self.sendRawRequest = function (jsonStr) {
+		this.ajaxObj.open('POST',self.opts.postUrl,true);
 		this.ajaxObj.setRequestHeader("Content-type", "application/json");
 		this.ajaxObj.send(jsonStr);	
 		this.ajaxObj.onreadystatechange = function() {
@@ -86,13 +101,15 @@ function Music21interface() {
 	self.onServerReply = function () {
 		if(self.ajaxObj.readyState == 4){
 			var jsonStr = this.ajaxObj.responseText;
+			self.result.rawResponse = jsonStr;
 			self.result.responseObj = JSON.parse(jsonStr);
-		}
-		if(self.result.responseObj.status == "error") {
-			self.onError();
-			
-		} else {
-			self.onSuccess();
+		
+			if(self.result.responseObj.status == "error") {
+				self.onError();
+				
+			} else {
+				self.onSuccess();
+			}
 		}
 		
 	};
@@ -105,6 +122,7 @@ function Music21interface() {
 	};
 	
 	self.result = {
+		rawResponse : "",
 		responseObj : {},
 		getData : function (varName) {
 			if (self.result.responseObj.dataDict) {
@@ -132,7 +150,7 @@ function Music21interface() {
 		postUrl : hostProtocol+"/music21interface"
 	};
 	
-	self.util = {
+	self.noteflight = {
 		createNoteflightEmbed : function (divid, scoreid, noteflightid, width, height, scale) {
 			if(!scale) {
 				scale = 1.0;
@@ -161,10 +179,10 @@ function Music21interface() {
 		},
 		sendMusicXMLToNoteflightEmbed : function (scoreid, musicxml) {
 			
-			self.util.getNoteflightEmbed(scoreid).loadMusicXML(musicxml)
+			self.noteflight.getNoteflightEmbed(scoreid).loadMusicXML(musicxml)
 		},
 		getMusicXMLFromNoteflightEmbed : function (scoreid) {
-			return self.util.getNoteflightEmbed(scoreid).getMusicXML();
+			return self.noteflight.getNoteflightEmbed(scoreid).getMusicXML();
 		}
 	}
 	
