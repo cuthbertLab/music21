@@ -124,6 +124,7 @@ from music21 import tempo
 from music21 import text
 from music21 import tinyNotation
 
+from music21.vexflow import base as vexflow
 from music21 import voiceLeading
 from music21 import volume
 from music21 import xmlnode

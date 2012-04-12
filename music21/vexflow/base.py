@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Reyes
 #
-# Copyright:    (c) 2011 The music21 Project
+# Copyright:    (c) 2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -154,7 +154,7 @@ def fromPart(thisPart, mode='txt'):
 	pass
 
 def fromMeasure(thisMeasure, mode='txt'):
-	'''
+	r'''
 	Parses a music21 measure into Vex Flow code
 
 	TODO: Write tests
@@ -167,8 +167,8 @@ def fromMeasure(thisMeasure, mode='txt'):
 	var notes = [new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["Fn/4"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8"})];
 
 	>>> c = vexflow.fromMeasure(m, 'html')
-	>>> print c
-	BLANKLINE
+	>>> #_DOCS_SHOW print c
+
 	<!DOCTYPE HTML>
 	<html>
 	<head>
@@ -207,6 +207,8 @@ def fromMeasure(thisMeasure, mode='txt'):
 		</script>
 	</body>
 	</html>
+	
+	>>> assert(c.split('\n')[2] == '<html>') #_DOCS_HIDE
 	'''
 
 	if mode not in supportedDisplayModes:
@@ -267,38 +269,41 @@ class VexflowNote:
 
 	def __init__(self, music21note):
 		'''
+		>>> from music21 import *
 		>>> n = note.Note('C-')
-		>>> v = VexflowNote(n)
+		>>> v = vexflow.VexflowNote(n)
 		>>> v.vexflowAccidental
-		b
+		'b'
 	
 		>>> v.vexflowKey
-		Cb/3
+		'Cb/4'
 	
 		>>> v.vexflowDuration
-		q
+		'q'
 	
 		>>> v.vexflowCode
-		new Vex.Flow.StaveNote({keys: ["Cb/3"], duration: "q"})
+		'new Vex.Flow.StaveNote({keys: ["Cb/4"], duration: "q"})'
 	
 		>>> n = tinyNotation.TinyNotationNote('c##2.').note
 		>>> v = VexflowNote(n)
 		>>> v.vexflowAccidental
-		##
+		'##'
 	
 		>>> v.vexflowKey
-		C##/4
+		'C##/4'
 	
 		>>> v.vexflowDuration
-		hd
+		'hd'
 	
 		>>> v.vexflowCode
-		new Vex.Flow.StaveNote({keys: ["C##/4"], duration: "hd"})
+		'new Vex.Flow.StaveNote({keys: ["C##/4"], duration: "hd"})'
 		'''
 
 		self.originalNote = music21note
 
-		thisPitch = music21note.nameWithOctave
+		thisPitchName = music21note.pitch.name
+		thisPitchOctave = music21note.pitch.implicitOctave
+		thisPitch = thisPitchName + str(thisPitchOctave)
 		thisAccidental = music21note.accidental
 		if thisAccidental != None:
 			if thisAccidental.alter in vexflowAlterationToAccidental:
@@ -333,19 +338,21 @@ class VexflowNote:
 				 other VexFlow code
 			html: returns standalone HTML code for displaying just this note
 
+		>>> from music21 import *
 		>>> n = note.Note('C-')
-		>>> v = VexflowNote(n)
+		>>> v = vexflow.VexflowNote(n)
 		>>> v.show('txt')
-		new Vex.Flow.StaveNote({keys: ["Cb/3"], duration: "q"})
+		'new Vex.Flow.StaveNote({keys: ["Cb/4"], duration: "q"})'
 
 		>>> print v.show('html')
+		<BLANKLINE>
 		<!DOCTYPE HTML>
 		<html>
 		<head>
 			<meta name='author' content='Music21' />
 			<script src='http://code.jquery.com/jquery-latest.js'></script>
-			<script src='www.vexflow.com/vexflow.js'/></script>
-			</head>
+			<script src='http://www.vexflow.com/vexflow.js'/></script>
+		</head>
 		<body>
 			<canvas width=525 height=120 id='music21canvas'></canvas>
 			<script>
@@ -355,7 +362,7 @@ class VexflowNote:
 		 			var ctx = renderer.getContext();
 					var stave = new Vex.Flow.Stave(10,0,500);
 					stave.addClef('treble').setContext(ctx).draw();
-					var notes = [new Vex.Flow.StaveNote({keys: ["Cb/-"], duration: "q"})];
+					var notes = [new Vex.Flow.StaveNote({keys: ["Cb/4"], duration: "q"})];
 					var voice = new Vex.Flow.Voice({
 						num_beats: 1.0,
 						beat_value: 4,

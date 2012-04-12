@@ -55,6 +55,7 @@ __all__ = ['base',
            'romanText', 
            'scala', 
            'test', 'trecento',
+           'vexflow',
            'webapps', 
            
            # individual modules 
