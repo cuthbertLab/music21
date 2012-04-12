@@ -1574,4 +1574,4 @@ _DOC_ORDER = [RomanNumeral, fromChordAndKey]
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    music21.mainTest(Test, TestExternal)
