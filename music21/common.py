@@ -51,6 +51,7 @@ fileExtensions = {
     'romantext' : {'input': ['rntxt', 'rntext', 'romantext', 'rtxt'], 'output': 'rntxt'},
     'scala' : {'input': ['scl'], 'output': 'scl'},
     'braille' : {'input' : ['brailleTextDoesNotWork'], 'output' : 'txt'},
+    'vexflow' : {'input' : ['vexflowDoesNotWork'], 'output': 'html'},
 }
 
 
@@ -76,8 +77,8 @@ DEBUG_DEVEL = 63
 DEBUG_ALL = 255
 
 # used for checking preferences, and for setting environment variables
-VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'svg', 'lily.pdf', 'lily.png', 'lily.svg', 'braille']
-VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'svg', 'lily.pdf', 'lily.png', 'lily.svg', 'braille']
+VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'svg', 'lily.pdf', 'lily.png', 'lily.svg', 'braille', 'vexflow', 'vexflow.html', 'vexflow.js']
+VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'svg', 'lily.pdf', 'lily.png', 'lily.svg', 'braille', 'vexflow', 'vexflow.html', 'vexflow.js']
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
 
@@ -137,6 +138,8 @@ def findFormat(fmt):
     ('scala', '.scl')
     >>> common.findFormat('braille')
     ('braille', '.txt')
+    >>> common.findFormat('vexflow')
+    ('vexflow', '.html')
     
 
     Works the same whether you have a leading dot or not:

@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    (c) 2009-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -107,12 +107,13 @@ class TwelveToneRow(ToneRow):
         '''
         Returns a :class:`~music21.serial.TwelveToneMatrix` object for the row.  That object can just be printed (or displayed via .show())
         
-        >>> src = RowSchoenbergOp37()
+        >>> from music21 import *
+        >>> src = serial.RowSchoenbergOp37()
         >>> [p.name for p in src]
         ['D', 'C#', 'A', 'B-', 'F', 'E-', 'E', 'C', 'G#', 'G', 'F#', 'B']
         >>> len(src)
         12
-        >>> s37 = RowSchoenbergOp37().matrix()
+        >>> s37 = serial.RowSchoenbergOp37().matrix()
         >>> print s37
           0  B  7  8  3  1  2  A  6  5  4  9
           1  0  8  9  4  2  3  B  7  6  5  A
@@ -536,15 +537,15 @@ vienneseRows = [RowSchoenbergOp23No5, RowSchoenbergOp24Mvmt4, RowSchoenbergOp24M
 def pcToToneRow(pcSet):
     '''A convenience function that, given a list of pitch classes represented as integers 
 
-    >>> a = pcToToneRow(range(12))
+    >>> from music21 import *
+    >>> a = serial.pcToToneRow(range(12))
     >>> matrixObj = a.matrix()
     >>> print matrixObj
       0  1  2  3  4  5  6  7  8  9  A  B
       B  0  1  2  3  4  5  6  7  8  9  A
     ...
 
-    >>> import random
-    >>> a = pcToToneRow([4,5,0,6,7,2,'a',8,9,1,'b',3])
+    >>> a = serial.pcToToneRow([4,5,0,6,7,2,'a',8,9,1,'b',3])
     >>> matrixObj = a.matrix()
     >>> print matrixObj
       0  1  8  2  3  A  6  4  5  9  7  B

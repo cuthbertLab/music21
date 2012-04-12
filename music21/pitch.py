@@ -425,7 +425,7 @@ def convertHarmonicToCents(value):
     [0, -1200, -1902, -2400]
     
     So the fifth subharmonic of the 7th harmonic (remember floating point division for Python 2.x!),
-    which is C2->C3->G3->C4->E4->G4->B`4 --> B`3->E`3->B`2->G-`2
+    which is C2->C3->G3->C4->E4->G4->B\`4 --> B\`3->E\`3->B\`2->G-\`2
     
     >>> convertHarmonicToCents(7.0/5.0)
     583

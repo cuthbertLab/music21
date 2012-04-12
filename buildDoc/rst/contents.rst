@@ -121,6 +121,7 @@ Module Reference
    moduleText
    moduleTinyNotation
    moduleTrecentoPolyphonicSnippet
+   moduleVexflowBase
    moduleVoiceLeading
    moduleVolume
    moduleXmlnode

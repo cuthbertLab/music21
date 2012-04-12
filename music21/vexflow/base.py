@@ -128,6 +128,18 @@ def parse(music21Object, mode='txt'):
 		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
 	pass
 
+def fromObject(thisObject, mode='txt'):
+	'''
+	translates an arbitrary Music21Object into vexflow
+
+	Currently only works for Measures...
+
+	'''
+	if 'Measure' in thisObject.classes:
+		return fromMeasure(thisObject, mode)
+	else:
+		raise VexFlowUnsupportedException, 'Unsupported object type: ' + str(thisObject)
+
 def fromScore(thisScore, mode='txt'):
 	'''
 	Parses a music21 score into Vex Flow code
@@ -158,6 +170,7 @@ def fromMeasure(thisMeasure, mode='txt'):
 	Parses a music21 measure into Vex Flow code
 
 	TODO: Write tests
+	
 	>>> from music21 import *
 	>>> from music21 import vexflow
 	>>> b = corpus.parse('bwv1.6.mxl')
@@ -167,14 +180,14 @@ def fromMeasure(thisMeasure, mode='txt'):
 	var notes = [new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["Fn/4"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8"})];
 
 	>>> c = vexflow.fromMeasure(m, 'html')
-	>>> #_DOCS_SHOW print c
-
+	>>> print c
+	<BLANKLINE>
 	<!DOCTYPE HTML>
 	<html>
 	<head>
 		<meta name='author' content='Music21' />
 		<script src='http://code.jquery.com/jquery-latest.js'></script>
-		<script src='www.vexflow.com/vexflow.js'/></script>
+		<script src='http://www.vexflow.com/vexflow.js'/></script>
 	</head>
 	<body>
 		<canvas width=525 height=120 id='music21canvas'></canvas>
@@ -207,7 +220,7 @@ def fromMeasure(thisMeasure, mode='txt'):
 		</script>
 	</body>
 	</html>
-	
+
 	>>> assert(c.split('\n')[2] == '<html>') #_DOCS_HIDE
 	'''
 
@@ -265,38 +278,39 @@ class VexflowNote:
 	TODO: Verify that I'm not overwriting any base attribute names of music21
 
 	TODO: add setters/getters
+
+	>>> from music21 import *
+	>>> n = note.Note('C-')
+	>>> v = vexflow.VexflowNote(n)
+	>>> v.vexflowAccidental
+	'b'
+
+	>>> v.vexflowKey
+	'Cb/4'
+
+	>>> v.vexflowDuration
+	'q'
+
+	>>> v.vexflowCode
+	'new Vex.Flow.StaveNote({keys: ["Cb/4"], duration: "q"})'
+
+	>>> n = tinyNotation.TinyNotationNote('c##2.').note
+	>>> v = VexflowNote(n)
+	>>> v.vexflowAccidental
+	'##'
+
+	>>> v.vexflowKey
+	'C##/4'
+
+	>>> v.vexflowDuration
+	'hd'
+
+	>>> v.vexflowCode
+	'new Vex.Flow.StaveNote({keys: ["C##/4"], duration: "hd"})'
 	'''
 
 	def __init__(self, music21note):
 		'''
-		>>> from music21 import *
-		>>> n = note.Note('C-')
-		>>> v = vexflow.VexflowNote(n)
-		>>> v.vexflowAccidental
-		'b'
-	
-		>>> v.vexflowKey
-		'Cb/4'
-	
-		>>> v.vexflowDuration
-		'q'
-	
-		>>> v.vexflowCode
-		'new Vex.Flow.StaveNote({keys: ["Cb/4"], duration: "q"})'
-	
-		>>> n = tinyNotation.TinyNotationNote('c##2.').note
-		>>> v = VexflowNote(n)
-		>>> v.vexflowAccidental
-		'##'
-	
-		>>> v.vexflowKey
-		'C##/4'
-	
-		>>> v.vexflowDuration
-		'hd'
-	
-		>>> v.vexflowCode
-		'new Vex.Flow.StaveNote({keys: ["C##/4"], duration: "hd"})'
 		'''
 
 		self.originalNote = music21note

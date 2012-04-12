@@ -3128,7 +3128,7 @@ class Music21Object(JSONSerializer):
         if fp is None:
             fp = environLocal.getTempFile(ext)
 
-        if format in ['text', 'textline', 'musicxml', 'lilypond', 'lily']:        
+        if format in ['text', 'textline', 'musicxml', 'lilypond', 'lily', 'vexflow', 'vexflow.html']:        
             if format == 'text':
                 dataStr = self._reprText()
             elif format == 'textline':
@@ -3137,6 +3137,9 @@ class Music21Object(JSONSerializer):
                 dataStr = self.musicxml
             elif format in ['lilypond', 'lily']:
                 dataStr = self.lily.renderTemplate()
+            elif format.startswith('vexflow'):
+                import music21.vexflow
+                dataStr = music21.vexflow.fromObject(self, mode='html')
 
             f = open(fp, 'w')
             f.write(dataStr)
@@ -3200,6 +3203,7 @@ class Music21Object(JSONSerializer):
             lily.pdf
             lily.svg
             braille
+            vexflow
 
         N.B. score.write('lily') returns a bare lilypond file,
         score.show('lily') gives a png of a rendered lilypond file.
@@ -3250,6 +3254,11 @@ class Music21Object(JSONSerializer):
         elif fmt == 'braille':
             returnedFilePath = self.write(format)
             environLocal.launch(format, returnedFilePath, app=app)
+
+        elif fmt.startswith('vexflow'):
+            returnedFilePath = self.write(format)
+            environLocal.launch(format, returnedFilePath, app=app)
+
 
         else:
             raise Music21ObjectException('no such show format is supported:', fmt)

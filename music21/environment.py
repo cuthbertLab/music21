@@ -507,6 +507,14 @@ class _EnvironmentCore(object):
             environmentKey = 'musicxmlPath'
         elif format == 'midi':
             environmentKey = 'midiPath'
+        elif format == 'vexflow':
+            import webbrowser
+            if fp.find('\\'):
+                pass
+            else:
+                if fp.startswith('/'):
+                    fp = 'file://' + fp
+            return webbrowser.open(fp)
         else:
             environmentKey = None
             fpApp = None

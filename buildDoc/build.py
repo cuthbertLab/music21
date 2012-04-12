@@ -255,6 +255,7 @@ MODULES = [
     #    trecentoCadencebook
     trecentoPolyphonicSnippet,
 
+    vexflow,
     voiceLeading,
     volume,
 
