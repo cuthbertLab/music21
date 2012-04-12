@@ -131,6 +131,7 @@ def parse(music21Object, mode='txt'):
 def fromScore(thisScore, mode='txt'):
 	'''
 	Parses a music21 score into Vex Flow code
+	#TODO	
 	'''
 	if mode not in supportedDisplayModes:
 		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
