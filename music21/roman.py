@@ -52,7 +52,7 @@ functionalityScores =  {
     'V6' : 63,
     'V43' : 61,
     'I64' : 60,
-    'IV' : 60,
+    'IV' : 59,
     'i6' : 58,
     'viio7' : 57,
     'V42' : 55,
@@ -140,6 +140,12 @@ def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = Fa
     >>> rn9 = roman.romanNumeralFromChord(chord.Chord(['C4','E5','G5', 'C#6', 'C7', 'C#8']), key.Key('C'))
     >>> rn9
     <music21.roman.RomanNumeral I#853 in C major>
+
+    >>> rn10 = roman.romanNumeralFromChord(chord.Chord(['F#3', 'A3', 'E4', 'C5']), key.Key('d'))
+    >>> rn10
+    <music21.roman.RomanNumeral #iiio/7 in d minor>
+
+
     '''
     root = chordObj.root()
     thirdType = chordObj.semitonesFromChordStep(3)
@@ -195,7 +201,16 @@ def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = Fa
     elif isMajorThird is False:
         stepRoman = stepRoman.lower()
     inversionString = figureFromChordAndKey(chordObj, alteredKeyObj)
-    rn = RomanNumeral(rootAlterationString + stepRoman + fifthName + inversionString, keyObj)
+    if len(inversionString) > 0 and inversionString[0] == 'o':
+        if fifthName == 'o':
+            fifthName == ""
+    #print (inversionString, fifthName)
+    rnString = rootAlterationString + stepRoman + fifthName + inversionString
+    try:
+        rn = RomanNumeral(rnString, keyObj)
+    except fbNotation.ModifierException as strerror:
+        raise RomanNumeralException("Could not parse %s from chord %s as an RN in key %s: %s" % (rnString, chordObj, keyObj, strerror))
+        
     rn.pitches = chordObj.pitches
     return rn
 
