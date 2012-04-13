@@ -132,6 +132,11 @@ from music21 import xmlnode
 from music21.trecento import cadencebook as trecentoCadencebook
 from music21.trecento import polyphonicSnippet as trecentoPolyphonicSnippet
 
+
+from music21.webapps import base as webapps
+
+
+
 #from music21 import environment #redundant
 _MOD = "doc.build.py"
 environLocal = environment.Environment(_MOD)
@@ -258,6 +263,8 @@ MODULES = [
     vexflow,
     voiceLeading,
     volume,
+
+    webapps,
 
     xmlnode, 
     

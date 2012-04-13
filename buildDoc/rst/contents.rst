@@ -124,6 +124,7 @@ Module Reference
    moduleVexflowBase
    moduleVoiceLeading
    moduleVolume
+   moduleWebappsBase
    moduleXmlnode
 
 
