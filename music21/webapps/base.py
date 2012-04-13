@@ -137,7 +137,7 @@ def processJSONString(json_request_str):
     return json_result_str
 
 
-class RequestObject():
+class RequestObject(object):
     '''
     Object used to coordinate JSON requests to music21.
     
