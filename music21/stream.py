@@ -7023,7 +7023,7 @@ class Stream(music21.Music21Object):
                     candidateOffset = (e.getOffsetBySite(self) + 
                                    e.duration.quarterLength)
                 except:
-                    print self, e, id(e), e.offset, e.getSites()
+                    #print self, e, id(e), e.offset, e.getSites()
                     raise
                 if candidateOffset > max:
                     max = candidateOffset
@@ -7157,8 +7157,7 @@ class Stream(music21.Music21Object):
             self._unlinkedDuration = durationObj
         elif (durationObj is None):
             self._unlinkedDuration = None
-        else:
-            # need to permit Duration object assignment here
+        else: # need to permit Duration object assignment here
             raise Exception, 'this must be a Duration object, not %s' % durationObj
 
     duration = property(_getDuration, _setDuration, doc='''
@@ -7235,7 +7234,6 @@ class Stream(music21.Music21Object):
                 mm = ti.getSoundingMetronomeMark()
                 offsetMetronomeMarkPairs = [
                     [0.0, mm]] + offsetMetronomeMarkPairs
-            
         sec = 0.0
         for i, (o, mm) in enumerate(offsetMetronomeMarkPairs):
             # handle only one mm right away
@@ -10958,6 +10956,10 @@ class GraceStream(Stream):
 
         # call bass class append with elements modified durations
         Stream.append(self, othersEdited)
+
+
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -17990,7 +17992,12 @@ class Test(unittest.TestCase):
         #s.show()
 
 
-
+    def testStreamInstantA(self):
+        from music21 import stream
+        s = StreamInstant()
+        self.assertEqual(s.duration.quarterLength, 0.0)
+        s.append(note.Note())
+        self.assertEqual(s.duration.quarterLength, 0.0)
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

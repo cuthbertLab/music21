@@ -2952,6 +2952,21 @@ class Music21Object(JSONSerializer):
         doc = '''Get and set the duration of this object as a Duration object.
         ''')
 
+
+    def _getIsGrace(self):
+        return self.duration.isGrace
+
+    isGrace = property(_getIsGrace, doc = '''
+        Return True or False if this music21 object has a GraceDuration.
+
+        >>> from music21 import *
+        >>> n = note.Note()
+        >>> n.isGrace
+        False
+
+        ''')        
+
+
     def _getPriority(self):
         return self._priority
 
