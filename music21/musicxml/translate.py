@@ -734,7 +734,6 @@ def mxToDuration(mxNote, inputM21=None):
 
     '''
     from music21 import duration
-
     if inputM21 == None:
         d = duration.Duration
     else:
@@ -745,14 +744,13 @@ def mxToDuration(mxNote, inputM21=None):
         "cannont determine MusicXML duration without a reference to a measure (%s)" % mxNote)
 
     mxDivisions = mxNote.external['divisions']
-    if mxNote.duration != None: 
-        if mxNote.get('type') != None:
+    if mxNote.duration is not None: 
+        if mxNote.get('type') is not None:
             type = duration.musicXMLTypeToType(mxNote.get('type'))
             forceRaw = False
         else: # some rests do not define type, and only define duration
             type = None # no type to get, must use raw
             forceRaw = True
-
         mxDotList = mxNote.get('dotList')
         # divide mxNote duration count by divisions to get qL
         qLen = float(mxNote.duration) / float(mxDivisions)
@@ -762,29 +760,24 @@ def mxToDuration(mxNote, inputM21=None):
         if mxTimeModification is not None:
             tup = duration.Tuplet()
             tup.mx = mxNote # get all necessary config from mxNote
-
             #environLocal.printDebug(['created Tuplet', tup])
             # need to see if there is more than one component
             #self.components[0]._tuplets.append(tup)
         else:
             tup = None
-
         # two ways to create durations, raw and cooked
-   
         if forceRaw:
             #environLocal.printDebug(['forced to use raw duration', durRaw])
             durRaw = duration.Duration() # raw just uses qLen
             # the qLen set here may not be computable, but is not immediately
             # computed until setting components
             durRaw.quarterLength = qLen
-
             try:
                 d.components = durRaw.components
             except duration.DurationException:
                 environLocal.warn(['Duration._setMX', 'supplying quarterLength of 1 as type is not defined and raw quarterlength (%s) is not a computable duration' % qLen])
                 environLocal.printDebug(['Duration._setMX', 'raw qLen', qLen, type, 'mxNote.duration:', mxNote.duration, 'last mxDivisions:', mxDivisions])
                 durRaw.quarterLength = 1.
-
         else: # a cooked version builds up from pieces
             durUnit = duration.DurationUnit()
             durUnit.type = type
@@ -792,12 +785,20 @@ def mxToDuration(mxNote, inputM21=None):
             if not tup == None:
                 durUnit.appendTuplet(tup)
             durCooked = duration.Duration(components=[durUnit])
-
             if durUnit.quarterLength != durCooked.quarterLength:
                 environLocal.printDebug(['error in stored MusicXML representaiton and duration value', durCooked])
             # old way just used qLen
             #self.quarterLength = qLen
             d.components = durCooked.components
+    # if mxNote.duration is None, this is a grace note, and duration
+    # is based entirely on type
+    if mxNote.duration is None: 
+        durUnit = duration.DurationUnit()
+        durUnit.type = duration.musicXMLTypeToType(mxNote.get('type'))
+        durUnit.dots = len(mxNote.get('dotList'))
+        d.components = [durUnit]
+        #environLocal.pd(['got mx duration of None', d])
+
     return d
 
 
@@ -853,7 +854,7 @@ def durationToMx(d):
     from music21 import duration
     post = [] # rename mxNoteList for consistencuy
         
-    environLocal.printDebug(['in _getMX', d, d.quarterLength, 'isGrace', d.isGrace])
+    #environLocal.printDebug(['in _getMX', d, d.quarterLength, 'isGrace', d.isGrace])
 
     if d.dotGroups is not None and len(d.dotGroups) > 1:
         d = d.splitDotGroups()
@@ -2454,17 +2455,16 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
         # component assignments
         spannerBundle.freePendingComponentAssignment(n)
 
-
     # print object == 'no' and grace notes may have a type but not
     # a duration. they may be filtered out at the level of Stream 
     # processing
     if mxNote.get('printObject') == 'no':
         n.hideObjectOnPrint = True
-        environLocal.printDebug(['got mxNote with printObject == no'])
+        #environLocal.printDebug(['got mxNote with printObject == no'])
 
     mxGrace = mxNote.get('graceObj')
-    if mxGrace != None: # graces have a type but not a duration
-        environLocal.printDebug(['got mxNote with an mxGrace', 'duration', mxNote.get('duration')])
+#     if mxGrace != None: # graces have a type but not a duration
+#         environLocal.printDebug(['got mxNote with an mxGrace', 'duration', mxNote.get('duration')])
 
     n.pitch.mx = mxNote # required info will be taken from entire note
     #n.duration.mx = mxNote
@@ -2505,40 +2505,9 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
             fermataObj.mx = mxObj
             n.expressions.append(fermataObj)
             #environLocal.printDebug(['_setMX(), n.mxFermataList', mxFermataList])
-        
         # create spanners:
         mxNotationsToSpanners(n, mxNotations, spannerBundle)
 
-        # get slurs; requires a spanner bundle
-#         mxSlurList = mxNotations.getSlurs()
-#         for mxObj in mxSlurList:
-#             # look at all spanners and see if we have an open, matching
-#             # slur to place this in
-#             idFound = mxObj.get('number')
-#             # returns a new spanner bundle with just the result of the search
-#             #environLocal.printDebug(['spanner bundle: getByCompleteStatus(False)', spannerBundle.getByCompleteStatus(False)])
-# 
-#             #sb = spannerBundle.getByIdLocal(idFound).getByCompleteStatus(False)
-#             sb = spannerBundle.getByClassIdLocalComplete('Slur', idFound, False)
-#             if len(sb) > 0: # if we already have a slur
-#                 #environLocal.printDebug(['found a match in SpannerBundle'])
-#                 su = sb[0] # get the first
-#             else:    
-#                 # create a new slur
-#                 su = spanner.Slur()
-#                 su.idLocal = idFound
-#                 su.placement = mxObj.get('placement')
-#                 # type attribute, defined as start or stop, 
-#                 spannerBundle.append(su)
-# 
-#             # add a reference of this note to this spanner
-#             su.addComponents(n)
-#             #environLocal.pd(['adding n', n, id(n), 'su.getComponents', su.getComponents(), su.getComponentIds()])
-#             if mxObj.get('type') == 'stop':
-#                 su.completeStatus = True
-#                 # only add after complete
-#             #environLocal.printDebug(['got slur:', su, mxObj.get('placement'), mxObj.get('number')])
-    
     # gets the notehead object from the mxNote and sets value of the music21 note to the value of the notehead object        
     mxNotehead = mxNote.get('noteheadObj')
     if mxNotehead is not None:
@@ -2547,6 +2516,11 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
         if mxNotehead.get('color') is not None:
             n.color = mxNotehead.get('color')
 
+    # if this is grace
+    if mxGrace is not None:
+        #environLocal.pd(['found a grace note in mxToNote()', n.duration.quarterLength])
+        n = n.getGrace()
+        #environLocal.pd(['n.duration', n.duration, n.duration.type])
     return n
 
 
@@ -2586,7 +2560,7 @@ def mxToRest(mxNote, inputM21=None):
         #r.duration.mx = mxNote
         mxToDuration(mxNote, r.duration)
     except duration.DurationException:
-        environLocal.printDebug(['failed extaction of duration from musicxml', 'mxNote:', mxNote, r])
+        #environLocal.printDebug(['failed extaction of duration from musicxml', 'mxNote:', mxNote, r])
         raise
 
     if mxNote.get('color') is not None:
@@ -3114,12 +3088,11 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 #environLocal.printDebug(['got mxNote with printObject == no', 'measure number', m.number])
                 continue
 
-            mxGrace = mxNote.get('graceObj')
-            if mxGrace is not None: # graces have a type but not a duration
-                #TODO: add grace notes with duration equal to ZeroDuration
-                #environLocal.printDebug(['got mxNote with an mxGrace', 'duration', mxNote.get('duration'), 'measure number', 
-                #m.number])
-                continue
+#             mxGrace = mxNote.get('graceObj')
+#             if mxGrace is not None: # graces have a type but not a duration
+#                 #environLocal.printDebug(['got mxNote with an mxGrace', 'duration', mxNote.get('duration'), 'measure number', 
+#                 #m.number])
+#                 continue
 
             # the first note of a chord is not identified directly; only
             # by looking at the next note can we tell if we have the first
@@ -5146,6 +5119,18 @@ spirit</words>
 
         raw = s.musicxml # test roundtrip output
         self.assertEqual(raw.count('<bracket'), 12)
+
+
+    def testImportGraceA(self):
+        from music21 import converter, stream
+        from music21.musicxml import testPrimitive        
+
+        s = converter.parse(testPrimitive.graceNotes24a)
+        #s.show()        
+        match = [str(p) for p in s.pitches]
+        #print match
+        self.assertEqual(match, ['D5', 'C5', 'E5', 'D5', 'C5', 'D5', 'C5', 'D5', 'C5', 'D5', 'C5', 'E5', 'D5', 'C5', 'D5', 'C5', 'D5', 'C5', 'E5', 'E5', 'F4', 'C5', 'D#5', 'C5', 'D-5', 'A-4', 'C5', 'C5'])
+
 
 
 

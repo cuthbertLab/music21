@@ -17992,13 +17992,6 @@ class Test(unittest.TestCase):
         #s.show()
 
 
-    def testStreamInstantA(self):
-        from music21 import stream
-        s = StreamInstant()
-        self.assertEqual(s.duration.quarterLength, 0.0)
-        s.append(note.Note())
-        self.assertEqual(s.duration.quarterLength, 0.0)
-
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Stream, Measure]
