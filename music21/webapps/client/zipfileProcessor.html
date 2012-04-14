@@ -9,7 +9,7 @@
 <script type="text/javascript">
 
 function sendForm() {
-	document.getElementById('form1').action += document.getElementById('commandSelect').value;
+	document.getElementById('form1').action = "/music21/zipfileinterface" + document.getElementById('commandSelect').value;
 	document.getElementById('form1').submit();
 }
 
