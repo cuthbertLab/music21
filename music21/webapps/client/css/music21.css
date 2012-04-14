@@ -1,10 +1,13 @@
 
 body {font-family:"Trebuchet MS", Arial, Helvetica, sans-serif; background:#ccc}
 
-div#wrapper {width:1300px; margin: 0 auto}
+div#wrapper {width:1320px; margin: 0 auto; background:#fff; padding:10px}
 
 div#content {float:left; width:800px}
-div#interface {float:right; width:500px}
+div#interface {float:right; width:500px; background:#eee; padding:10px}
+div#footer {clear:both}
+
+p.footer {font-size:9px; text-align:center}
 
 p.smaller {font-size:12px}
 
