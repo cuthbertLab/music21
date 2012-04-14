@@ -147,7 +147,7 @@ function Music21interface() {
 	
 	self.opts = {
 		curUrl : window.location.href,
-		postUrl : hostProtocol+"/music21interface"
+		postUrl : hostProtocol+"/music21/jsoninterface"
 	};
 	
 	self.noteflight = {

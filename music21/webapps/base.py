@@ -23,9 +23,15 @@ from music21 import common
 from music21 import converter
 from music21 import stream
 from music21 import corpus
+from music21 import note
+from music21 import features
 
 import json
+import zipfile
+import cgi
+import re
 
+from StringIO import StringIO
 
 availableDataFormats = ['xml',
                         'musicxml',
@@ -45,7 +51,7 @@ availableFunctions = ['stream.transpose',
 availableAttribtues = ['highestOffset',
                        'flat']
 
-def modWSGIapplication(environ, start_response):
+def music21ModWSGIJSONApplication(environ, start_response):
     '''
     Application function in proper format for a MOD-WSGI Application:
     Reads the contents of a post request, and passes the JSON string to
@@ -85,7 +91,7 @@ def modWSGIapplication(environ, start_response):
     json_str_response = processJSONString(json_str)
 
     response_headers = [('Content-type', 'text/plain'),
-            ('Content-Length', str(len(json_str_response)))]
+        ('Content-Length', str(len(json_str_response)))]
 
     start_response(status, response_headers)
 
@@ -407,3 +413,116 @@ class RequestObject(object):
             return (True, returnVal)
         else:
             return (False, None)
+        
+        
+# -------------------
+# URL Application
+# -------------------
+def music21ModWSGIURLApplication(environ, start_response):
+    '''
+    Application function in proper format for a MOD-WSGI Application:
+    Reads the contents of a post request, and passes the JSON string to
+    webapps.processJSONData for further processing. 
+    Returns a proper HTML response.
+    
+    An interface for music21 using mod_wsgi
+    
+    To use, first install mod_wsgi and include it in the HTTPD.conf file.
+    
+    Add this file to the server, ideally not in the document root, 
+    on mac this could be /Library/WebServer/wsgi-scripts/music21wsgiapp.py
+    
+    Then edit the HTTPD.conf file to redirect any requests to WEBSERVER:/music21interface to call this file:
+    
+    WSGIScriptAlias /music21interface /Library/WebServer/wsgi-scripts/music21wsgiapp.py
+    
+    Further down the conf file, give the webserver access to this directory:
+    
+    <Directory "/Library/WebServer/wsgi-scripts">
+        Order allow,deny
+        Allow from all
+    </Directory>
+    
+    The mod_wsgi handler will call the application function below with the request
+    content in the environ variable.
+    
+    To use the post, send a POST request to WEBSERVER:/music21interface
+    where the contents of the POST is a JSON string.
+    
+    See processJSONSTring below for specifications about the structure of this string.
+    '''
+    status = '200 OK'
+
+    pathInfo = environ['PATH_INFO'] # Contents of path after mount point of wsgi app but before question mark
+    queryString = environ['QUERY_STRING'] # Contents of URL after question mark    
+    documentRoot = environ['DOCUMENT_ROOT'] # Document root of the server
+    
+    resultStr = ""
+        
+    for (k,v) in environ.iteritems():
+        resultStr += "\n"+str(k)+": "+str(v)+"\n"
+
+    response_headers = [('Content-type', 'text/plain'),
+            ('Content-Length', str(len(resultStr)))]
+
+    start_response(status, response_headers)
+
+    return [resultStr]
+
+def music21ModWSGIFileApplication(environ, start_response):
+    '''
+    Application function in proper format for a MOD-WSGI Application:
+    Reads the contents of a post request, and passes the JSON string to
+    webapps.processJSONData for further processing. 
+    Returns a proper HTML response.
+    
+    An interface for music21 using mod_wsgi
+    
+    To use, first install mod_wsgi and include it in the HTTPD.conf file.
+    
+    Add this file to the server, ideally not in the document root, 
+    on mac this could be /Library/WebServer/wsgi-scripts/music21wsgiapp.py
+    
+    Then edit the HTTPD.conf file to redirect any requests to WEBSERVER:/music21interface to call this file:
+    
+    WSGIScriptAlias /music21interface /Library/WebServer/wsgi-scripts/music21wsgiapp.py
+    
+    Further down the conf file, give the webserver access to this directory:
+    
+    <Directory "/Library/WebServer/wsgi-scripts">
+        Order allow,deny
+        Allow from all
+    </Directory>
+    
+    The mod_wsgi handler will call the application function below with the request
+    content in the environ variable.
+    
+    To use the post, send a POST request to WEBSERVER:/music21interface
+    where the contents of the POST is a JSON string.
+    
+    See processJSONSTring below for specifications about the structure of this string.
+    '''
+    status = '200 OK'
+
+    formFields = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
+
+
+    resultStr = ""
+    
+    fileData = formFields['file1'].file.read()
+    
+    uploadedFile = formFields['file1'].file
+    filename = formFields['file1'].filename
+    type = formFields['file1'].type
+    
+    resultStr += str(filename)+ "\n"
+    
+    resultStr += uploadedFile.read()
+
+
+    response_headers = [('Content-type', 'text/plain'), 
+            ('Content-Length', str(len(resultStr)))]
+
+    start_response(status, response_headers)
+
+    return [resultStr]

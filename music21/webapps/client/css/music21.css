@@ -1,5 +1,5 @@
 
-body {font-family:"Trebuchet MS", Arial, Helvetica, sans-serif}
+body {font-family:"Trebuchet MS", Arial, Helvetica, sans-serif; background:#ccc}
 
 div#wrapper {width:1300px; margin: 0 auto}
 
@@ -9,3 +9,16 @@ div#interface {float:right; width:500px}
 p.smaller {font-size:12px}
 
 p.code { font-family:"Courier New", Courier, monospace}
+
+/* Homepage-specific styles */
+
+div#homepagewrapper {width:700px; margin: 0 auto; background:#FFF; padding:10px}
+
+div.appCategoryContainer { margin-left:20px; }
+
+p.appDescription { margin-left:30px; margin-top:0px}
+
+
+/* File upload-specific styls */
+
+div#uploadcontainer {width:500px; margin: 0 auto; background:#FFF; padding:10px}
