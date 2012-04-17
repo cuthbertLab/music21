@@ -125,6 +125,7 @@ Module Reference
    moduleVoiceLeading
    moduleVolume
    moduleWebappsBase
+   moduleWebappsMusic21wsgiapp
    moduleXmlnode
 
 

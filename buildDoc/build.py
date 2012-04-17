@@ -124,13 +124,17 @@ from music21 import tempo
 from music21 import text
 from music21 import tinyNotation
 
+from music21.trecento import cadencebook as trecentoCadencebook
+from music21.trecento import polyphonicSnippet as trecentoPolyphonicSnippet
+
 from music21.vexflow import base as vexflow
 from music21 import voiceLeading
 from music21 import volume
+
+from music21.webapps import base as webapps
+from music21.webapps import music21wsgiapp as webappsMusic21WsgiApp
 from music21 import xmlnode
 
-from music21.trecento import cadencebook as trecentoCadencebook
-from music21.trecento import polyphonicSnippet as trecentoPolyphonicSnippet
 
 
 from music21.webapps import base as webapps
@@ -265,7 +269,8 @@ MODULES = [
     volume,
 
     webapps,
-
+    webappsMusic21WsgiApp,
+    
     xmlnode, 
     
 ]
@@ -298,16 +303,24 @@ class PartitionedName(object):
         return None
 
     def getSignature(self, partName):
-        '''Expand to include signatures when possible
+        '''Get the signatures (the calling arguments) for a method or property
 
         >>> from music21 import pitch, meter, duration
+        
+        `pitch.Pitch().midi` is a property so it returns u''
+        
         >>> a = PartitionedClass(pitch.Pitch)
         >>> a.getSignature('midi')
         u''
 
+        `meter.MeterSequence.load()` takes a required argument and has three default arguments.
+
         >>> a = PartitionedClass(meter.MeterSequence)
         >>> a.getSignature('load')
         u'(value, partitionRequest=None, autoWeight=False, targetWeight=None)'
+
+
+        `duration.Duration()` can take \*arguments or \*\*keywords.
 
         >>> a = PartitionedClass(duration.Duration)
         >>> a.getSignature('__init__')

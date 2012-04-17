@@ -69,12 +69,12 @@ def music21ModWSGIJSONApplication(environ, start_response):
     
     WSGIScriptAlias /music21interface /Library/WebServer/wsgi-scripts/music21wsgiapp.py
     
-    Further down the conf file, give the webserver access to this directory:
+    Further down the conf file, give the webserver access to this directory::
     
-    <Directory "/Library/WebServer/wsgi-scripts">
-        Order allow,deny
-        Allow from all
-    </Directory>
+        <Directory "/Library/WebServer/wsgi-scripts">
+            Order allow,deny
+            Allow from all
+        </Directory>
     
     The mod_wsgi handler will call the application function below with the request
     content in the environ variable.
@@ -229,27 +229,29 @@ class RequestObject(object):
         '''
         Parses JSON Commands specified in the self.commandList
         
-        In the JSON, commands are described by:
-        {"commandList:"[
-            {"function":"corpus.parse",
-             "argList":["'bwv7.7'"],
-             "resultVariable":"sc"},
-             
-            {"function":"transpose",
-             "caller":"sc",
-             "argList":["'p5'"],
-             "resultVariable":"sc"},
-             
-            
-            {"attribute":"flat",
-             "caller":"sc",
-             "resultVariable":"scFlat"},
-             
-            {"attribute":"higestOffset",
-             "caller":"scFlat",
-             "resultVariable":"ho"}
-             ]
-        }
+        In the JSON, commands are described by::
+
+            {"commandList:"[
+                {"function":"corpus.parse",
+                 "argList":["'bwv7.7'"],
+                 "resultVariable":"sc"},
+                 
+                {"function":"transpose",
+                 "caller":"sc",
+                 "argList":["'p5'"],
+                 "resultVariable":"sc"},
+                 
+                
+                {"attribute":"flat",
+                 "caller":"sc",
+                 "resultVariable":"scFlat"},
+                 
+                {"attribute":"higestOffset",
+                 "caller":"scFlat",
+                 "resultVariable":"ho"}
+                 ]
+            }
+
         '''
         
         for commandElement in self.commandList:
@@ -327,12 +329,12 @@ class RequestObject(object):
     def getResultObject(self):
         '''
         Returns a new object ready for json parsing with the string values of the objects
-        specified in self.returnDict in the formats specified in self.returnDict.
+        specified in self.returnDict in the formats specified in self.returnDict::
         
-        "returnDict":{
-            "myNum" : "int",
-            "ho"    : "int"
-        }
+            "returnDict":{
+                "myNum" : "int",
+                "ho"    : "int"
+            }
         '''
         return_obj = {};
         return_obj['status'] = "success"

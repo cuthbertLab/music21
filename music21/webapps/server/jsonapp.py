@@ -12,12 +12,12 @@ WSGIScriptAlias always calls application.
 
 WSGIScriptAlias /music21interface /Library/WebServer/wsgi-scripts/music21wsgiapp.py
 
-Further down the conf file, give the webserver access to this directory:
+Further down the conf file, give the webserver access to this directory::
 
-<Directory "/Library/WebServer/wsgi-scripts">
-    Order allow,deny
-    Allow from all
-</Directory>
+    <Directory "/Library/WebServer/wsgi-scripts">
+        Order allow,deny
+        Allow from all
+    </Directory>
 
 The mod_wsgi handler will call the application function below with the request
 content in the environ variable.

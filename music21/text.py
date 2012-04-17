@@ -540,7 +540,7 @@ class LanguageDetector(object):
     http://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
     unknown author.  No license given.
     
-    
+    See Trigram docs below...
     '''
     languageCodes = ['en', 'fr', 'it', 'de', 'cn']
     languageLong = {'en': 'English',
@@ -618,7 +618,10 @@ class LanguageDetector(object):
 
 #-------------------------------------------------------------------------------
 class Trigram(object):
-    '''the frequency of three character
+    '''
+    See LanguageDector above.  From http://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
+    
+    The frequency of three character
     sequences is calculated.  When treated as a vector, this information
     can be compared to other trigrams, and the difference between them
     seen as an angle.  The cosine of this angle varies between 1 for

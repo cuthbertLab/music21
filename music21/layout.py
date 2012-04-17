@@ -423,17 +423,24 @@ class StaffGroup(spanner.Spanner):
             self._barTogether = True
         elif value in ['no', False]:
             self._barTogether = False
+        elif value in ['Mensurstrich']:
+            self._barTogether = 'Mensurstrich'
         else:
             raise StaffGroupException('the bar together value %s is not acceptable' % value)
 
     barTogether = property(_getBarTogether, _setBarTogether, doc = '''
-        Get or set the barTogether value, with either Boolean values or yes or no strings.
+        Get or set the barTogether value, with either Boolean values 
+        or yes or no strings.  Or the string 'Mensurstrich' which
+        indicates baring between staves but not in staves.
 
         >>> from music21 import *
         >>> sg = layout.StaffGroup()
         >>> sg.barTogether = 'yes'
         >>> sg.barTogether
         True
+        >>> sg.barTogether = 'Mensurstrich'
+        >>> sg.barTogether
+        'Mensurstrich'
         ''')
 
     def _getSymbol(self):
