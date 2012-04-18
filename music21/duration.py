@@ -3270,6 +3270,16 @@ class GraceDuration(Duration):
         self.quarterLength = 0.0
 
 
+        # TODO: make these properties
+        self.slash = True # can be True, False, or None; make None go to True?
+        # values are unit interval percentages
+        self.stealTimePrevious = None
+        self.stealTimeFollowing = None
+        # make time is encoded in musicxml as divisions; here it can 
+        # by a duration; but should it be the duration suggested by the grace?
+        #self.makeTime = duration.Duration()
+
+
 # TODO: why does this exist?
 class LongGraceDuration(Duration):
     def __init__(self):

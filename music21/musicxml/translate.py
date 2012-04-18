@@ -508,7 +508,43 @@ def mxToRepeat(mxBarline, inputM21=None):
 
 
 
+#-------------------------------------------------------------------------------
+def mxGraceToGrace(noteOrChord, mxGrace=None):
+    '''Given a completely formed, non-grace Note or Chord, create and return a m21 grace version of the same.
 
+    If mxGrace is None, no change is made and the same object is returned.
+    '''
+    if mxGrace is None:
+        return noteOrChord
+
+    post = noteOrChord.getGrace()
+    if mxGrace.get('slash') in ['yes', None]:
+
+        post.duration.slash = True
+    else:
+        post.duration.slash = False
+
+    post.duration.stealTimePrevious = mxGrace.get('steal-time-previous')
+    post.duration.stealTimeFollowing = mxGrace.get('steal-time-following')
+
+    return post
+
+
+def durationToMxGrace(d, mxNoteList):
+    '''Given a music21 duration and a list of mxNotes, edit the mxNotes in place if the duration is a GraceDuration
+    '''
+    if d.isGrace: # this is a class attribute, not a property/method
+        for mxNote in mxNoteList:
+            mxGrace = musicxmlMod.Grace()
+            mxGrace.set('stealTimePrevious', d.stealTimePrevious)
+            mxGrace.set('stealTimeFollowing', d.stealTimeFollowing)
+            if d.slash:
+                mxGrace.set('slash', 'yes')
+            else:
+                mxGrace.set('slash', 'no')
+            # need to convert from duration to divisions
+            #mxGrace.set('makeTime', d.makeTime)
+            mxNote.graceObj = mxGrace
 
 
 #-------------------------------------------------------------------------------
@@ -945,13 +981,15 @@ def durationToMx(d):
         # add notations to mxNote
         mxNote.set('notations', mxNotations)
 
-    # third pass: see if these are graces
-    if d.isGrace:
-        for mxNote in post:
-            # TODO: configure this object with per-duration configurations
-            mxGrace = musicxmlMod.Grace()
-            mxNote.graceObj = mxGrace
-            #environLocal.pd(['final mxNote with mxGrace duration', mxNote.get('duration')])
+    # third pass: see if these are graces; will edit in place if necessary
+    durationToMxGrace(d, post)
+
+#     if d.isGrace: # this is a class attribute, not a property/method
+#         for mxNote in post:
+#             # TODO: configure this object with per-duration configurations
+#             mxGrace = musicxmlMod.Grace()
+#             mxNote.graceObj = mxGrace
+#             #environLocal.pd(['final mxNote with mxGrace duration', mxNote.get('duration')])
     return post # a list of mxNotes
 
 
@@ -2519,11 +2557,8 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
         if mxNotehead.get('color') is not None:
             n.color = mxNotehead.get('color')
 
-    # if this is grace
-    if mxGrace is not None:
-        #environLocal.pd(['found a grace note in mxToNote()', n.duration.quarterLength])
-        n = n.getGrace()
-        #environLocal.pd(['n.duration', n.duration, n.duration.type])
+    # translate if necessary, otherwise leaves unchanged
+    n = mxGraceToGrace(n, mxGrace)
     return n
 
 
@@ -5136,6 +5171,30 @@ spirit</words>
         
         raw = s.musicxml
         self.assertEqual(raw.count('<grace'), 15)
+
+
+
+    def testImportGraceB(self):
+        from music21 import note, stream
+
+        ng1 = note.Note('c4', quarterLength=.5).getGrace()
+        ng1.duration.stealTimeFollowing = .5
+        ng1.duration.slash = False
+        n1 = note.Note('g4', quarterLength=2)
+
+        ng2 = note.Note('c4', quarterLength=.5).getGrace()
+        ng2.duration.stealTimePrevious = .25
+        n2 = note.Note('d4', quarterLength=2)
+        
+        s = stream.Stream()
+        s.append([ng1, n1, ng2, n2])
+        #s.show()
+
+        raw = s.musicxml
+        self.assertEqual(raw.count('slash="no"'), 1)
+        self.assertEqual(raw.count('slash="yes"'), 1)
+        
+
 
 
 
