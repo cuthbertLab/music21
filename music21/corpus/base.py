@@ -756,6 +756,9 @@ def parse(workName, movementNumber=None, number=None,
     4
     
     '''
+    if workName in [None, '']:
+        raise CorpusException('a work name must be provided as an argument')
+
     if not common.isListLike(extList):
         extList = [extList]
 
