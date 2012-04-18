@@ -10927,37 +10927,37 @@ class SpannerStorage(Stream):
 
 
 #-------------------------------------------------------------------------------
-class GraceStream(Stream):
-    '''A Stream used to contain the notes that make up a section of grace notes. 
-    '''
-    # from the outside, this needs to have duration of zero
-    # this is achieved by using by making every note added to this stream
-    # a grace duration; does this mean we make copies of each object, 
-    # or change in place?
-    # might have utilities for a normal Stream to be transformed into a
-    # grace stream
-
-    def __init__(self, givenElements=None, *args, **keywords):
-        Stream.__init__(self, givenElements=givenElements, *args, **keywords)
-
-
-    def append(self, others):
-        '''Overridden append method that copies appended elements and replaces their duration with a GraceDuration.
-        '''
-        if not common.isListLike(others):
-            others = [others]
-        # replace and edit in place
-        othersEdited = []
-        for e in others:
-            e = copy.deepcopy(e) 
-            e.duration = e.duration.getGraceDuration()
-            #environLocal.pd(['appending GraceStream, before calling base class', e.quarterLength, e.duration.quarterLength])
-            othersEdited.append(e)
-
-        # call bass class append with elements modified durations
-        Stream.append(self, othersEdited)
-
-
+# class GraceStream(Stream):
+#     '''A Stream used to contain the notes that make up a section of grace notes. 
+#     '''
+#     # from the outside, this needs to have duration of zero
+#     # this is achieved by using by making every note added to this stream
+#     # a grace duration; does this mean we make copies of each object, 
+#     # or change in place?
+#     # might have utilities for a normal Stream to be transformed into a
+#     # grace stream
+# 
+#     def __init__(self, givenElements=None, *args, **keywords):
+#         Stream.__init__(self, givenElements=givenElements, *args, **keywords)
+# 
+# 
+#     def append(self, others):
+#         '''Overridden append method that copies appended elements and replaces their duration with a GraceDuration.
+#         '''
+#         if not common.isListLike(others):
+#             others = [others]
+#         # replace and edit in place
+#         othersEdited = []
+#         for e in others:
+#             e = copy.deepcopy(e) 
+#             e.duration = e.duration.getGraceDuration()
+#             #environLocal.pd(['appending GraceStream, before calling base class', e.quarterLength, e.duration.quarterLength])
+#             othersEdited.append(e)
+# 
+#         # call bass class append with elements modified durations
+#         Stream.append(self, othersEdited)
+# 
+# 
 
 
 
@@ -17886,34 +17886,34 @@ class Test(unittest.TestCase):
         #sRight.show()
 
 
-    def testGraceStreamA(self):
-
-        from music21 import stream, note, spanner
-
-        # the GraceStream transforms generic notes into Notes w/ grace
-        # durations; otherwise it is not necssary
-        gs = stream.GraceStream()
-        # the notes here are copies of the created notes
-        gs.append(note.Note('c4', quarterLength=.25))
-        gs.append(note.Note('d#4', quarterLength=.25))
-        gs.append(note.Note('g#4', quarterLength=.5))
-
-        #gs.show('t')
-        #gs.show()
-
-        # the total duration of the 
-        self.assertEqual(gs.duration.quarterLength, 0.0)
-
-        s = stream.Measure()
-        s.append(note.Note('G3'))
-        s.append(gs)
-        s.append(note.Note('A4'))
-
-        sp = spanner.Slur(gs[0], s[-1])
-        s.append(sp)
-
-        match = [str(x) for x in s.pitches]
-        self.assertEqual(match, ['G3', 'C4', 'D#4', 'G#4', 'A4'])
+#     def testGraceStreamA(self):
+# 
+#         from music21 import stream, note, spanner
+# 
+#         # the GraceStream transforms generic notes into Notes w/ grace
+#         # durations; otherwise it is not necssary
+#         gs = stream.GraceStream()
+#         # the notes here are copies of the created notes
+#         gs.append(note.Note('c4', quarterLength=.25))
+#         gs.append(note.Note('d#4', quarterLength=.25))
+#         gs.append(note.Note('g#4', quarterLength=.5))
+# 
+#         #gs.show('t')
+#         #gs.show()
+# 
+#         # the total duration of the 
+#         self.assertEqual(gs.duration.quarterLength, 0.0)
+# 
+#         s = stream.Measure()
+#         s.append(note.Note('G3'))
+#         s.append(gs)
+#         s.append(note.Note('A4'))
+# 
+#         sp = spanner.Slur(gs[0], s[-1])
+#         s.append(sp)
+# 
+#         match = [str(x) for x in s.pitches]
+#         self.assertEqual(match, ['G3', 'C4', 'D#4', 'G#4', 'A4'])
 
         #s.show('text')
 

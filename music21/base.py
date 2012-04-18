@@ -2963,6 +2963,9 @@ class Music21Object(JSONSerializer):
         >>> n = note.Note()
         >>> n.isGrace
         False
+        >>> ng = n.getGrace()
+        >>> ng.isGrace
+        True
 
         ''')        
 
