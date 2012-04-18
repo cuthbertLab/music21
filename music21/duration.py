@@ -3199,7 +3199,7 @@ class Duration(DurationCommon):
             self.addDurationUnit(Duration(x))
 
 
-    def getGraceDuration(self):
+    def getGraceDuration(self, appogiatura=False):
         '''Return a deep copy of this Duration as a GraceDuration instance with the same types.
 
         >>> from music21 import *
@@ -3219,7 +3219,10 @@ class Duration(DurationCommon):
         for c in self.components:
             components.append(copy.deepcopy(c))
         # create grace duration
-        gd = GraceDuration()
+        if appogiatura:
+            gd = AppogiaturaDuration()
+        else:
+            gd = GraceDuration()
         gd.components = components # set new components
         gd.unlink()
         gd.quarterLength = 0.0

@@ -766,7 +766,7 @@ class NotRest(GeneralNote):
         ''')
     
     #---------------------------------------------------------------------------
-    def getGrace(self):
+    def getGrace(self, appogiatura=False):
         '''Return a grace version of this NotRest
 
         >>> from music21 import *
@@ -780,12 +780,17 @@ class NotRest(GeneralNote):
         0.0
         >>> ng.isGrace
         True
+
+        >>> ng = n.getGrace(appogiatura=True)
+        >>> ng.duration.slash
+        False
         '''
         # NOTE: this means that we can not have grace rests
         # move this to GeneralNote to permit grace rests
         e = copy.deepcopy(self)
-        e.duration = e.duration.getGraceDuration()
+        e.duration = e.duration.getGraceDuration(appogiatura=appogiatura)
         return e
+
 
 
     #---------------------------------------------------------------------------
