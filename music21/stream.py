@@ -2485,20 +2485,6 @@ class Stream(music21.Music21Object):
         return None
 
 
-#     def _getGracesAtOffset(self, offset):
-#         '''Get all grace Notes or Chords that reside at a single offset and return these in a list. This is a utility method that may be made public if useful. This has less features than getElementsByOffset(), and must be as fast as possible, as will be called often in appending and inserting elements.
-#         '''
-#         post = []
-#         # we assume for now that grace notes are not found as endElements 
-#         for e in self._elements:
-#             o = e.getOffsetBySite(self)
-#             if common.almostEquals(o, offset):
-#                 # must be subclass of NotRest
-#                 if 'NotRest' in e.classes:
-#                     if e.isGrace:
-#                         post.append(e)
-#         return post
-
     def _highestPriorityAtOffset(self, offset):
         '''Return the highes priority for all elements found at a specific offset.
         This may be a public method if useful.
@@ -6316,9 +6302,10 @@ class Stream(music21.Music21Object):
             #environLocal.pd(['sorting _elements, _endElements'])
             self._elements.sort(
                 cmp=lambda x, y: cmp(
-                    x.getOffsetBySite(self), y.getOffsetBySite(self)
-                    ) or cmp(x.priority, y.priority) or 
-                    cmp(x.classSortOrder, y.classSortOrder)
+                    x.getOffsetBySite(self), y.getOffsetBySite(self)) 
+                    or cmp(x.priority, y.priority)  
+                    or cmp(x.classSortOrder, y.classSortOrder)
+                    or cmp(not x.isGrace, not y.isGrace) # sort graces first
                 )
             self._endElements.sort(
                 cmp=lambda x, y: cmp(x.priority, y.priority) or 
@@ -17960,11 +17947,12 @@ class Test(unittest.TestCase):
         #s.show()
         # inserting and shifting this results in it appearing before
         # the note at offset 2
-        gn2 = note.Note('c#4', quarterLength=.25)
-        gn2.duration = gn2.duration.getGraceDuration()
+        gn2 = note.Note('c#4', quarterLength=.25).getGrace()
         s.insertAndShift(1, gn2)
         #s.show('t')
         #s.show()
+        match = [str(e) for e in s.pitches]
+        self.assertEqual(match, ['G3', 'C#4', 'C4', 'D#4', 'A4'])
 
 
     def testGraceStreamC(self):
