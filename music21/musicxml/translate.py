@@ -945,7 +945,7 @@ def durationToMx(d):
         # add notations to mxNote
         mxNote.set('notations', mxNotations)
 
-    # third pass if these are graces
+    # third pass: see if these are graces
     if d.isGrace:
         for mxNote in post:
             # TODO: configure this object with per-duration configurations
@@ -2188,6 +2188,9 @@ def mxToChord(mxNoteList, inputM21=None, spannerBundle=None):
     #c.duration.mx = mxNoteList[0]
     mxToDuration(mxNoteList[0], c.duration)
 
+    # assume that first note in list has a grace object (and all do)
+    mxGrace = mxNoteList[0].get('graceObj')
+
     pitches = []
     ties = [] # store equally spaced list; use None if not defined
     noteheads = [] # store notehead attributes that correspond with pitches
@@ -2229,11 +2232,12 @@ def mxToChord(mxNoteList, inputM21=None, spannerBundle=None):
             # set color per pitch
             c.setColor(obj.get('color'), c.pitches[index])
     #set stem direction based upon pitches
-    index2 = 0
-    for obj2 in stemDirs:
-        if obj2 != 'unspecified':
-            c.setStemDirection(obj2, c.pitches[index2])
-        index2+=1
+    for i, sd in enumerate(stemDirs):
+        if sd != 'unspecified':
+            c.setStemDirection(sd, c.pitches[i])
+
+    if mxGrace is not None:
+        c = c.getGrace()
             
     return c
 
@@ -2464,8 +2468,6 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
         #environLocal.printDebug(['got mxNote with printObject == no'])
 
     mxGrace = mxNote.get('graceObj')
-#     if mxGrace != None: # graces have a type but not a duration
-#         environLocal.printDebug(['got mxNote with an mxGrace', 'duration', mxNote.get('duration')])
 
     n.pitch.mx = mxNote # required info will be taken from entire note
     #n.duration.mx = mxNote
@@ -5131,7 +5133,9 @@ spirit</words>
         match = [str(p) for p in s.pitches]
         #print match
         self.assertEqual(match, ['D5', 'C5', 'E5', 'D5', 'C5', 'D5', 'C5', 'D5', 'C5', 'D5', 'C5', 'E5', 'D5', 'C5', 'D5', 'C5', 'D5', 'C5', 'E5', 'E5', 'F4', 'C5', 'D#5', 'C5', 'D-5', 'A-4', 'C5', 'C5'])
-
+        
+        raw = s.musicxml
+        self.assertEqual(raw.count('<grace'), 15)
 
 
 
