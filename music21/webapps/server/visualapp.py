@@ -47,6 +47,9 @@ def music21ModWSGIVisualApplication(environ, start_response):
 
     pathInfo = environ['PATH_INFO'] # Contents of path after mount point of wsgi app but before question mark
     queryString = environ['QUERY_STRING'] # Contents of URL after question mark    
+    
+    documentRoot = environ['DOCUMENT_ROOT']
+    
         
     outputStr = ""
         
@@ -57,8 +60,11 @@ def music21ModWSGIVisualApplication(environ, start_response):
     tempPath = n.write('png')
     print tempPath
     
+    writePath = documentRoot + "/music21/OutputFiles/"
+    
+    
     fin = open(tempPath,'r')
-    fout = open("/Library/WebServer/Documents/OutputFiles/out.jpg","w")
+    fout = open(writePath+"out.jpg","w")
     fout.write(fin.read())
     fout.close()
         
@@ -71,7 +77,7 @@ def music21ModWSGIVisualApplication(environ, start_response):
     templateStr = tempPath
     
     
-    templateStr = imageEmbedTemplate(tempPath,'/OutputFiles/out.jpg')
+    templateStr = imageEmbedTemplate(tempPath,'/music21/OutputFiles/out.jpg')
     
     response_headers = [('Content-type', 'text/html'),('Content-Length', str(len(templateStr)))]
 
