@@ -17948,9 +17948,10 @@ class Test(unittest.TestCase):
         # inserting and shifting this results in it appearing before
         # the note at offset 2
         gn2 = note.Note('c#4', quarterLength=.25).getGrace()
+        gn2.duration.slash = False
         s.insertAndShift(1, gn2)
         #s.show('t')
-        #s.show()
+        s.show()
         match = [str(e) for e in s.pitches]
         self.assertEqual(match, ['G3', 'C#4', 'C4', 'D#4', 'A4'])
 

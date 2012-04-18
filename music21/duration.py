@@ -3277,21 +3277,21 @@ class GraceDuration(Duration):
         self.stealTimeFollowing = None
         # make time is encoded in musicxml as divisions; here it can 
         # by a duration; but should it be the duration suggested by the grace?
-        #self.makeTime = duration.Duration()
+        self.makeTime = False
 
 
-# TODO: why does this exist?
-class LongGraceDuration(Duration):
-    def __init__(self):
-        Duration.__init__(self)
+class AppogiaturaDuration(GraceDuration):
+    def __init__(self, *arguments, **keywords):
+        GraceDuration.__init__(self, *arguments, **keywords)
         #self.unlink()
-        self.quarterLength = 0        
+        self.slash = False # can be True, False, or None; make None go to True?
+        self.makeTime = True
 
-class AppogiaturaStartDuration(Duration):
-    pass
-
-class AppogiaturaStopDuration(Duration):
-    pass
+# class AppogiaturaStartDuration(Duration):
+#     pass
+# 
+# class AppogiaturaStopDuration(Duration):
+#     pass
 
 
 #-------------------------------------------------------------------------------
