@@ -1808,13 +1808,14 @@ def hdStringToNote(contents):
     # 3.2.9 Grace Notes and Groupettos
     # TODO: Rewrite after music21 gracenotes are implemented
     if contents.count('q'):
-        thisObject.duration.__class__ = music21.duration.GraceDuration
+        thisObject = thisObject.getGrace()
     elif contents.count('Q'):
-        thisObject.duration.__class__ = music21.duration.LongGraceDuration
+        thisObject = thisObject.getGrace()
+        thisObject.duration.slash = False
     elif contents.count('P'):
-        thisObject.duration.__class__ = music21.duration.AppogiaturaStartDuration
+        thisObject = thisObject.getGrace(appogiatura=True)
     elif  contents.count('p'):
-        thisObject.duration.__class__ = music21.duration.AppogiaturaStopDuration
+        pass # end appogiatura duration -- not needed in music21...
     
     # 3.2.10 Beaming
     # TODO: Support really complex beams
@@ -2132,10 +2133,20 @@ class Test(unittest.TestCase):
         #hf1.parseLines()
         #hf1.spineCollection.moveDynamicsAndLyricsToStreams()        
         s = hf1.stream #.show()
+
+class TestExternal(unittest.TestCase):
+
+    def runTest(self):
+        pass
+     
+    def testShowSousa(self):
+        hf1 = HumdrumDataCollection(testFiles.sousaStars)
+        hf1.stream.show()
     
+
 if __name__ == "__main__":
     #Test().testMoveDynamics()
-    music21.mainTest(Test)
+    music21.mainTest(TestExternal)
 
 #------------------------------------------------------------------------------
 # eof
