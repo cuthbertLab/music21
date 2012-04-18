@@ -22,21 +22,19 @@ Further down the conf file, give the webserver access to this directory:
 The mod_wsgi handler will call the application function below with the request
 content in the environ variable.
 
-To use the application, send a POST request to WEBSERVER:/music21interface
-where the contents of the POST is a JSON string.
-
-See docs for music21.webapps for specifications about the JSON string structure
 '''
 
 from music21 import webapps
 from music21 import corpus
+from music21 import common
+
+from os import path
 
 def music21ModWSGICorpusURLApplication(environ, start_response):
     '''
     Application function in proper format for a MOD-WSGI Application:
-    Reads the contents of a post request, and passes the JSON string to
-    webapps.processJSONData for further processing. 
-    Returns a proper HTML response.
+    A server-mounted app that uses portions of the URL to parse and return musicxml of manipulated sections of corpus files. 
+    Results can be returned either as a noteflight embed in the browser or downloaded as an xml file.
     
     '''
     status = '200 OK'
@@ -52,8 +50,28 @@ def music21ModWSGICorpusURLApplication(environ, start_response):
     resultStr = ""
     
     if len(pathParts) > 1 and pathParts[1] in ['corpusParse','corpusReduce']:
+        workList = corpus.getWorkList(pathParts[2])
+        if len(workList) >1:
+            resultStr = "Multiple choices for query "+pathParts[2]+". Please try one of the following\n"
+            for p in workList:
+                resultStr += path.splitext(path.basename(p))[0] + "\n"
+            response_headers = [('Content-type', 'text/plain'),
+            ('Content-Length', str(len(resultStr)))]
+    
+            start_response(status, response_headers)
+        
+            return [resultStr]
+        elif len(workList) == 0:
+            resultStr = "No results for for query "+pathParts[2]+"."
+            response_headers = [('Content-type', 'text/plain'),
+            ('Content-Length', str(len(resultStr)))]
+    
+            start_response(status, response_headers)
+        
+            return [resultStr]
+        workName = workList[0]
         try:
-            sc = corpus.parse(pathParts[2]).measures(int(pathParts[3]),int(pathParts[4]))
+            sc = corpus.parse(workName).measures(int(pathParts[3]),int(pathParts[4]))
             if pathParts[1] == 'corpusReduce':
                 sc = reduction(sc)
             resultStr = sc.musicxml
