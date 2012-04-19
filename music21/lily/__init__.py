@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ["lilyString", "score", "test"]
+__all__ = ["lilyString", "test"]
 
 from lilyString import TRANSPARENCY_START
 from lilyString import TRANSPARENCY_STOP

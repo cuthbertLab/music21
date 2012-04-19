@@ -3135,6 +3135,8 @@ class Music21Object(JSONSerializer):
         '''
         if fmt == None: # get setting in environment
             fmt = environLocal['writeFormat']
+        elif fmt.startswith('.'):
+            fmt = fmt[1:]
  
         format, ext = common.findFormat(fmt)
         if format not in common.VALID_WRITE_FORMATS:
@@ -3180,12 +3182,18 @@ class Music21Object(JSONSerializer):
             mf.close()
             return fp
 
-        elif fmt in ['pdf', 'lily.pdf',]:
-            return self.lily.createPDF()
-        elif fmt in ['png', 'lily.png']:
-            return self.lily.createPNG()
-        elif fmt in ['svg', 'lily.svg']:
-            return self.lily.createSVG()
+        elif format in ['pdf', 'lily.pdf',]:
+            if fp.endswith('.pdf'):
+                fp = fp[:-4]
+            return self.lily.createPDF(fp)
+        elif format in ['png', 'lily.png']:
+            if fp.endswith('.png'):
+                fp = fp[:-4]
+            return self.lily.createPNG(fp)
+        elif format in ['svg', 'lily.svg']:
+            if fp.endswith('.svg'):
+                fp = fp[:-4]
+            return self.lily.createSVG(fp)
         else:
             raise Music21ObjectException('cannot support writing in this format, %s yet' % format)
 

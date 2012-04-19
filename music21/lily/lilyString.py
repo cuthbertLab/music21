@@ -30,7 +30,7 @@ environLocal = environment.Environment(_MOD)
 try: 
     # optional imports for PIL 
     from PIL import Image
-    from PIL import ImageOps    
+    from PIL import ImageOps
     noPIL = False
 except ImportError:
     noPIL = True
@@ -190,9 +190,10 @@ scoreTitleMarkup=##f
         data.append(self.wrappedValue.encode('utf-8'))
         return "\n".join(data)
 
-    def writeTemp(self, ext=''):
-        fp = environLocal.getTempFile(ext)
-
+    def writeTemp(self, ext='', fp=None):
+        if fp == None:
+            fp = environLocal.getTempFile(ext)
+        
         #(fd, tempName) = tempfile.mkstemp()
         self.tempName = fp
 
@@ -201,12 +202,9 @@ scoreTitleMarkup=##f
         data.append(self.headerInformation)
         data.append(self.wrappedValue.encode('utf-8'))
 
-        try:
-            f = open(self.tempName, 'w')
-            f.write(''.join(data))
-            f.close()
-        except:
-            raise
+        f = open(self.tempName, 'w')
+        f.write(''.join(data))
+        f.close()
         return self.tempName
     
 
@@ -234,10 +232,10 @@ scoreTitleMarkup=##f
                 raise Exception("cannot find " + fileend)
             else:
                 fileform = fileend
-        return (fileform)
+        return fileform
 
-    def createPDF(self):
-        self.writeTemp() # do not need extension here
+    def createPDF(self, filename=None):
+        self.writeTemp(fp=filename) # do not need extension here
         lilyFile = self.runThroughLily()
         return lilyFile
 
@@ -254,10 +252,10 @@ scoreTitleMarkup=##f
                 command = ''
             os.system(command)
     
-    def createPNG(self):
+    def createPNG(self, filename=None):
         self.format = 'png'
         self.backend = 'eps'
-        self.writeTemp() # do not need extension here
+        self.writeTemp(fp=filename) # do not need extension here
         lilyFile = self.runThroughLily()
         if noPIL is False:
             try:
@@ -265,7 +263,7 @@ scoreTitleMarkup=##f
                 lilyImage2 = ImageOps.expand(lilyImage, 10, 'white')
                 if os.name == 'nt':
                     format = 'png'
-                # why are we changing format for darwin?
+                # why are we changing format for darwin? -- did not work before
                 elif sys.platform == 'darwin':
                     format = 'jpeg'
                 else: # default for all other platforms
@@ -299,15 +297,15 @@ scoreTitleMarkup=##f
         
         return lilyFile
         
-    def createSVG(self):
+    def createSVG(self, filename=None):
         self.format = 'svg'
         self.backend = 'svg'
-        self.writeTemp()
+        self.writeTemp(fp=filename)
         lilyFile = self.runThroughLily()
         return lilyFile
 
-    def showSVG(self):
-        lilyFile = self.createSVG()
+    def showSVG(self, filename=None):
+        lilyFile = self.createSVG(filename)
         environLocal.launch(self.format, lilyFile)
         return lilyFile
         
@@ -362,45 +360,6 @@ scoreTitleMarkup=##f
         return headOut
 
 
-# better here is to use and/or extend the environLocal.launch() method.
-
-#     def showImageDirect(self, imageFile, title = None, command = None):
-#         '''borrowed from and modified from the excellent PIL image library, but needed
-#         some changes to the NT handling'''
-#         
-#         if os.name == "nt":
-#             format = "PNG"
-#         elif sys.platform == "darwin":
-#             format = "JPEG"
-#             if not command:
-#                 command = "open -a /Applications/Preview.app"
-#         else:
-#             format = None
-#             if not command:
-#                 command = "xv"
-#                 if title:
-#                     command = command + " -name \"%s\"" % title
-#         
-#         if os.name == "nt":
-#             command = "start %s" % (imageFile)
-#             os.system(command)
-#             if self.savePNG is False:
-#                 def quickDel():
-#                     command = "del /f %s" % (imageFile)
-#                     os.system(command)
-#                 t = threading.Timer(6.0, quickDel)
-#                 t.start()  ## give 6 seconds for viewer to open before deleting  
-#         elif sys.platform == "darwin":
-#             # on darwin open returns immediately resulting in the temp
-#             # file removal while app is opening
-#             command = "(%s %s; sleep 20; rm -f %s)&" % (command, imageFile, imageFile)
-#             os.system(command)
-#         else:
-#             command = "(%s %s; rm -f %s)&" % (command, imageFile, imageFile)
-#             os.system(command)
-
-
-
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     pass
@@ -426,8 +385,8 @@ class TestExternal(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
-    music21.mainTest(Test)
-    #music21.mainTest(Test, TestExternal)
+    #music21.mainTest(Test)
+    music21.mainTest(Test, TestExternal)
 
 
 
