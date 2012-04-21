@@ -1013,9 +1013,6 @@ class Harmony(music21.Music21Object):
     def _getMultisetCardinality(self):
         return self.chord._getMultisetCardinality()
 
-    def _preDurationLily(self):
-        return self.chord._preDurationLily()
-
     def _setPitchNames(self, value):
         return self.chord._setPitchNames(value)
 

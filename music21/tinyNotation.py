@@ -574,7 +574,7 @@ class TestExternal(unittest.TestCase):
         myScale = "d8 e f g a b"
         time1 = meter.TimeSignature("3/4")
         tinyNotation = TinyNotationStream(myScale, time1)
-        tinyNotation.lily.showPDF()
+        tinyNotation.show('lily.pdf')
     
     def testMusicXMLExt(self):
         cadB = TinyNotationStream("c8 B- B- A c trip{d16 c B-} A8 B- A0", "2/4")
@@ -583,7 +583,7 @@ class TestExternal(unittest.TestCase):
 #        n1 = music21.note.Note()
 #        n1.duration.type = "whole"
 #        cadB.append(n1)
-#        cadB.lily.showPDF()
+#        cadB.show('lily.pdf')
         cadB.show()
 
 

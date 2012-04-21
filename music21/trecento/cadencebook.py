@@ -225,7 +225,8 @@ class GloriaSheet(TrecentoSheet):
     >>> gloriaNo20 = cadenceSpreadSheet.makeWork(20)
     >>> incipit = gloriaNo20.incipit
     >>> incipit.show('text')
-    {0.0} <music21.stream.Part ...>
+    {0.0} <music21.metadata.Metadata object at 0x...>
+    {0.0} <music21.stream.Part C>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.clef.TrebleClef>
@@ -234,7 +235,7 @@ class GloriaSheet(TrecentoSheet):
             {0.0} <music21.note.Note D>
         ...
             {2.0} <music21.bar.Barline style=final>
-    {0.0} <music21.stream.Part ...>
+    {0.0} <music21.stream.Part Ct>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.clef.BassClef>
@@ -245,7 +246,7 @@ class GloriaSheet(TrecentoSheet):
         {16.0} <music21.stream.Measure 9 offset=16.0>
             {0.0} <music21.note.Note B>
             {2.0} <music21.bar.Barline style=final>
-    {0.0} <music21.stream.Part ...>
+    {0.0} <music21.stream.Part T>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.clef.BassClef>
@@ -631,12 +632,14 @@ class TrecentoCadenceWork(object):
         '''
         Get the total lily output for the entire work
         '''
-        all = self.snippets
-        alllily = ''
-        for thing in all:
-            if thing.lily != '' and thing.lily != ' ' and thing.lily is not None:
-                alllily = alllily + thing.lily
-        return alllily
+        import music21.lily.translate
+        conv = music21.lily.translate.LilypondConverter()
+        allLily = u''
+        for snippet in self.snippets:
+            if snippet is not None:
+                conv.loadObject(snippet)
+                allLily += conv.allString 
+        return allLily
 
     def pmfcPageRange(self):
         '''
@@ -730,7 +733,7 @@ class TestExternal(unittest.TestCase):
     def runTest(self):
         pass
     
-    def xtestCredo(self):
+    def testCredo(self):
         '''
         testing a Credo in and Lilypond out
         '''
@@ -738,8 +741,21 @@ class TestExternal(unittest.TestCase):
         cs1 = CredoSheet() #filename = r'd:\docs\trecento\fischer\cadences.xls')
     #    cs1 = BallataSheet()
         credo1 = cs1.makeWork(2)
-        inc1 = credo1.snippets[4]
-        inc1.lily.showPNG()
+        conv = lily.translate.LilypondConverter()
+        conv.allString = credo1.getAllLily()
+        #conv.showPNG()
+
+    def testBallata(self):
+        '''
+        testing a Ballata in and Lilypond out
+        '''
+        
+        cs1 = BallataSheet() #filename = r'd:\docs\trecento\fischer\cadences.xls')
+        ballata1 = cs1.makeWork(58)
+        conv = lily.translate.LilypondConverter()
+        conv.allString = ballata1.getAllLily()
+        conv.showSVG()
+
 
     def xtestSnippetShow(self):
         '''
@@ -772,7 +788,7 @@ class TestExternal(unittest.TestCase):
             print thisRondeaux.title
             thisRondeaux.incipit.show('musicxml')
     
-    def testGloria(self):
+    def xtestGloria(self):
         '''
         test showing a Gloria's incipit to see if it works
         '''
@@ -781,7 +797,7 @@ class TestExternal(unittest.TestCase):
         if thisGloria.title != "":
             thisGloria.asScore().show()
 
-    def testAsScore(self):
+    def xtestAsScore(self):
         deduto = BallataSheet().workByTitle('deduto')
         self.assertEqual(deduto.title, u'Deduto sey a quel')
 #        for s in deduto.snippets:

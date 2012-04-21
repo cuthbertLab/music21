@@ -126,8 +126,7 @@ scoreTitleMarkup=##f
     headerInformation = "\\version \"" + version + "\"" + layout + fictaDef
     savePNG = False ## PNGs are deleted immediately.
     
-    def __init__(self, value = ""):
-        self.value = u""
+    def __init__(self, value = u""):
         if hasattr(value, "value"):
             self.value = value.value
         else:

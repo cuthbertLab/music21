@@ -1810,20 +1810,6 @@ class DurationUnit(DurationCommon):
         self._tuplets = self._tuplets + (newTuplet,)
         self._quarterLengthNeedsUpdating = True
 
-    def _getLily(self):
-        '''Simple lily duration: does not include tuplets; 
-        these appear in the Stream object, because of 
-        how lily represents triplets
-        '''
-        if self._typeNeedsUpdating:
-            self.updateType()
-        number_type = convertTypeToNumber(self.type)
-        dots = "." * int(self.dots)
-        if number_type < 1:
-           number_type = int(number_type * 16)
-        return str(number_type) + dots
-
-    lily = property(_getLily)
 
 
 
@@ -2677,20 +2663,6 @@ class Duration(DurationCommon):
 
     #---------------------------------------------------------------------------
     # output formats
-
-    def _getLily(self):
-        '''
-        Simple lily duration: does not include tuplets
-        These are taken care of in the lily processing in stream.Stream
-        since lilypond requires tuplets to be in groups
-
-        '''
-        msg = []
-        for dur in self.components:
-            msg.append(dur.lily)
-        return ''.join(msg)
-
-    lily = property(_getLily)
 
 
     def _getMidi(self):

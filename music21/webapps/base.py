@@ -528,3 +528,8 @@ def music21ModWSGIFileApplication(environ, start_response):
     start_response(status, response_headers)
 
     return [resultStr]
+
+class ResponseParser(object):
+    '''
+    Take a 
+    '''

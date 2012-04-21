@@ -1212,8 +1212,6 @@ def mxToDynamicList(mxDirection):
 def textExpressionToMx(te):
     '''Convert a TextExpression to a MusicXML mxDirection type.
     returns a musicxml.Direction object
-
-    >>> from music21 import *
     '''
     mxWords = musicxmlMod.Words(te.content)
     for src, dst in [#(te._positionDefaultX, 'default-x'), 
@@ -3435,7 +3433,7 @@ def streamPartToMx(part, instStream=None, meterStream=None,
 
 def streamToMx(s, spannerBundle=None):
     '''
-    Create and return a musicxml Score object. 
+    Create and return a musicxml Score object from a Stream or Score
 
     This is the most common entry point for 
     conversion of a Stream to MusicXML. This method is 

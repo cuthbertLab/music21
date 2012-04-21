@@ -706,29 +706,6 @@ class KeySignature(music21.Music21Object):
 
     mx = property(_getMX, _setMX)
 
-    def _getLily(self):
-        (p, m) = self.pitchAndMode
-        if m is None:
-            m = "major"
-        pn = p.lilyNoOctave()
-        return r'\key ' + pn + ' \\' + m
-    
-    lily = property(_getLily, doc = r'''
-        returns the Lilypond representation of a KeySignature object
-        
-        >>> from music21 import *
-        >>> d = key.KeySignature(-1)
-        >>> d.mode = 'minor'
-        >>> print d.lily
-        \key d \minor
-        
-        Major is assumed:
-        
-        >>> fsharp = key.KeySignature(6)
-        >>> print fsharp.lily
-        \key fis \major
-    ''')
-
 
     #---------------------------------------------------------------------------
     # override these methods for json functionality

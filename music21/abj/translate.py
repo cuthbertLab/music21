@@ -25,6 +25,7 @@ import unittest,doctest
 import music21
 import music21.note
 import music21.common
+from music21.lily.translate import LilypondConverter
 
 import re
 
@@ -70,7 +71,7 @@ def translateLilyStringPitch(lilyStringPitch):
     '''
     lilyStringPitch = lilyStringPitch.replace('is', 's')
     lilyStringPitch = lilyStringPitch.replace('es', 'f')
-    return lilyStringPitch   
+    return str(lilyStringPitch)
     
 
 def music21ObjectToAbjad(m21Object):
@@ -126,7 +127,9 @@ def noteToAbjad(m21Note):
     elif len(m21Note.duration.tuplets) > 0:
         raise AbjadTranslateException("cannot translate tuplet notes directly")
     
-    x = translateLilyStringPitch(str(m21Note.lily))
+    conv = LilypondConverter()
+    
+    x = translateLilyStringPitch(conv.fromGeneralNote(m21Note))
     abjadNote = abjad.Note(x)
     return abjadNote
 

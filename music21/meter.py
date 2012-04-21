@@ -23,7 +23,6 @@ import music21
 
 from music21 import common
 from music21 import duration
-from music21 import lily
 from music21 import beam
 from music21 import musicxml
 from music21.musicxml import translate as musicxmlTranslate
@@ -2179,7 +2178,6 @@ class TimeSignature(music21.Music21Object):
 
         # whether the TimeSignature object is inherited from 
         self.inherited = False 
-        self._lilyOut = None    
         self.symbol = "" # common, cut, single-number, normal
 
         # a parameter to determine if the denominator is represented
@@ -3465,28 +3463,6 @@ class TimeSignature(music21.Music21Object):
         return self.getBeat(currentQtrPosition)
     
 
-
-    #---------------------------------------------------------------------------
-    def _getLily(self):
-        '''
-        returns the lilypond representation of the timeSignature
-        
-        >>> from music21 import *
-        >>> a = TimeSignature('3/16')
-        >>> a.lily
-        \\time 3/16
-        '''
-        
-        # TODO: values need to be taken from self.displaySequence
-
-        if self._lilyOut is not None:
-            return self._lilyOut
-        return lily.LilyString("\\time " + str(self) + " ")
-    
-    def _setLily(self, newLily):
-        self._lilyOut = newLily
-    
-    lily = property(_getLily, _setLily)
 
 
 

@@ -160,7 +160,7 @@ class ReductiveNote(object):
         if 'noteheadFill' in self._parameters.keys():
             if self._parameters['noteheadFill'] is not None:
                 n.noteheadFill = self._parameters['noteheadFill']
-                #environLocal.pd(['set nothead fill:', n.noteheadFill])
+                #environLocal.printDebug(['set nothead fill:', n.noteheadFill])
         if 'textBelow' in self._parameters.keys():
             n.addLyric(self._parameters['textBelow'])
         if 'textAbove' in self._parameters.keys():

@@ -34,7 +34,6 @@ from music21 import instrument
 from music21 import interval
 from music21 import key
 from music21 import layout
-from music21 import lily as lilyModule
 from music21 import metadata
 from music21 import meter
 from music21 import musicxml as musicxmlMod
@@ -214,9 +213,11 @@ class Stream(music21.Music21Object):
 
         if givenElements is not None:
             # TODO: perhaps convert a single element into a list?
-            for e in givenElements:
-                self.insert(e)
-
+            try:
+                for e in givenElements:
+                    self.insert(e)
+            except AttributeError:
+                raise StreamException("Unable to insert %s")
 
     def __repr__(self):
         if self.id is not None:
@@ -2960,17 +2961,48 @@ class Stream(music21.Music21Object):
         anyhow in order to group the elements), so there is
         no need to call stream.sorted before running this.
         
+        if returnDict is True then it returns a dictionary of offsets
+        and everything at that offset.  If returnDict is False (default)
+        then only a list of lists of elements grouped by offset is returned.
+        (in other words, you'll need to call list[i][0].getOffsetBySite(self) to
+        get the offset)
+    
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> s.insert(3, note.Note('C'))
+        >>> s.insert(4, note.Note('C#'))
+        >>> s.insert(4, note.Note('D-'))
+        >>> s.insert(5, note.Note('D'))
+
+        >>> returnList = s.groupElementsByOffset()
+        >>> returnList
+        [[<music21.note.Note C>], [<music21.note.Note C#>, <music21.note.Note D->], [<music21.note.Note D>]]
+        
+        >>> returnDict = s.groupElementsByOffset(returnDict = True)
+        >>> returnDict
+        {3.0: [<music21.note.Note C>], 4.0: [<music21.note.Note C#>, <music21.note.Note D->], 5.0: [<music21.note.Note D>]}
+
+        Test that sorting still works...
+        
+        >>> s.insert(0, meter.TimeSignature('2/4'))
+        >>> s.insert(0, clef.TrebleClef()) # sorts first
+        >>> s.groupElementsByOffset()[0]
+        [<music21.clef.TrebleClef>, <music21.meter.TimeSignature 2/4>]
+    
+    
         it is DEFINITELY a feature that this method does not
         find elements within substreams that have the same
-        absolute offset.  See Score.lily for how this is
+        absolute offset.  See lily.translate.fromScore() for how this is
         useful.  For the other behavior, call Stream.flat first.
         
         '''
-        offsetsRepresented = common.DefaultHash()
+        offsetsRepresented = {} 
         for el in self.elements:
-            if not offsetsRepresented[el.offset]:
-                offsetsRepresented[el.offset] = []
-            offsetsRepresented[el.offset].append(el)
+            elOff = el.getOffsetBySite(self)
+            if elOff not in offsetsRepresented:
+                offsetsRepresented[elOff] = []
+            offsetsRepresented[elOff].append(el)
+
         if returnDict is True:
             return offsetsRepresented
         else:
@@ -5360,7 +5392,16 @@ class Stream(music21.Music21Object):
             # if there are voices, we must look at voice id values to only
             # connect ties to components in the same voice, assuming there
             # are voices in the next measure
-            mStart, mEnd = 0, lastTimeSignature.barDuration.quarterLength
+            mStart = 0
+            try:
+                mEnd = lastTimeSignature.barDuration.quarterLength
+            except AttributeError:
+                ts = m.getContextByClass('TimeSignature')
+                if ts is not None:
+                    lastTimeSignature = ts
+                    mEnd = lastTimeSignature.barDuration.quarterLength
+                else:
+                    mEnd = 4.0 # Default
             if m.hasVoices():
                 bundle = m.voices
                 mHasVoices = True
@@ -5745,13 +5786,15 @@ class Stream(music21.Music21Object):
     def makeNotation(self, meterStream=None, refStreamOrTimeRange=None,
                         inPlace=False, bestClef=False, **subroutineKeywords):
         '''
-        This method calls a sequence of Stream methods on this Stream to prepare notation, including creating voices for overlapped regions, Measures if necessary, creating ties, beams, and accidentals.
+        This method calls a sequence of Stream methods on this Stream to prepare 
+        notation, including creating voices for overlapped regions, Measures 
+        if necessary, creating ties, beams, and accidentals.
 
+        If `inPlace` is True, this is done in-place; 
+        if `inPlace` is False, this returns a modified deep copy.
 
-        If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
-
-
-        makeAccidentalsKeywords can be a dict specifying additional parameters to send to makeAccidentals
+        makeAccidentalsKeywords can be a dict specifying additional 
+        parameters to send to makeAccidentals
 
 
         >>> from music21 import *
@@ -8114,74 +8157,6 @@ class Stream(music21.Music21Object):
         return True
 
 
-    #---------------------------------------------------------------------------
-    def _getLily(self):
-        '''Returns the stream translated into Lilypond format.'''
-        if self._overriddenLily is not None:
-            return self._overriddenLily
-        #elif self._cache["lily"] is not None:
-        #    return self._cache["lily"]
-        # TODO: RESTORE CACHE WHEN Changes bubble up 
-        
-        lilyout = u"\n  { "
-#        if self.showTimeSignature is not False and self.timeSignature is not None:
-#            lilyout += self.timeSignature.lily
-    
-        for thisObject in self.elements:
-            if hasattr(thisObject, "startTransparency") and thisObject.startTransparency is True:
-                lilyout += lilyModule.TRANSPARENCY_START
-
-            if hasattr(thisObject.duration, "tuplets") and thisObject.duration.tuplets:
-                if thisObject.duration.tuplets[0].type == "start":
-                    numerator = str(int(thisObject.duration.tuplets[0].tupletNormal[0]))
-                    denominator = str(int(thisObject.duration.tuplets[0].tupletActual[0]))
-                    lilyout += "\\times " + numerator + "/" + denominator + " {"
-                    ### TODO-- should get the actual ratio not assume that the
-                    ### type of top and bottom are the same
-            if hasattr(thisObject, "lily"):
-                lilyout += unicode(thisObject.lily)
-                lilyout += " "
-            else:
-                pass
-            
-            if hasattr(thisObject.duration, "tuplets") and thisObject.duration.tuplets:
-                if thisObject.duration.tuplets[0].type == "stop":
-                    lilyout = lilyout.rstrip()
-                    lilyout += "} "
-
-            if hasattr(thisObject, "stopTransparency") and thisObject.stopTransparency is True:
-                lilyout += lilyModule.TRANSPARENCY_STOP
-        
-        lilyout += " } "
-        lilyObj = lilyModule.LilyString(lilyout)
-#        self._cache["lily"] = lilyObj
-        return lilyObj
-
-    def _setLily(self, value):
-        '''Sets the Lilypond output for the stream. Overrides what is obtained
-        from get_lily.'''
-        self._overriddenLily = value
-        self._cache["lily"] = None
-
-    lily = property(_getLily, _setLily, doc = r'''
-        returns or sets the lilypond output for the Stream.
-        Note that (for now at least), setting the Lilypond output for a Stream does not
-        change the stream itself.  It's just a way of overriding what is printed when .lily
-        is called.
-        
-        >>> from music21 import *
-        >>> s1 = stream.Stream()
-        >>> s1.append(clef.BassClef())
-        >>> s1.append(meter.TimeSignature("3/4"))
-        >>> k1 = key.KeySignature(5)
-        >>> k1.mode = 'minor'
-        >>> s1.append(k1)
-        >>> s1.append(note.Note("B-3"))   # quarter note
-        >>> s1.append(note.HalfNote("C#2"))
-        >>> s1.lily
-         { \clef "bass"  \time 3/4  \key gis \minor bes4 cis,2  } 
-    
-    ''')
 
 
 
@@ -8277,7 +8252,7 @@ class Stream(music21.Music21Object):
         return mxScore.xmlStr()
 
     musicxml = property(_getMusicXML,
-        doc = '''Return a complete MusicXML reprsentatoin as a string. 
+        doc = '''Return a complete MusicXML reprsentation as a string. 
         ''')
 
 
@@ -10289,12 +10264,6 @@ class Part(Stream):
             return None
 
 
-    def _getLily(self):
-        lv = Stream._getLily(self)
-        lv2 = lilyModule.LilyString("\t\n \\new Staff " + lv.value)
-        return lv2
-    
-    lily = property(_getLily)
 
 
 
@@ -10361,31 +10330,6 @@ class Score(Stream):
         # while a metadata object is often expected, adding here prob not       
         # a good idea. 
         #self.insert(0, metadata.Metadata())
-
-    def _getLily(self):
-        '''
-        returns the lily code for a score.
-        '''
-        ret = lilyModule.LilyString()
-        for thisOffsetPosition in self.groupElementsByOffset():
-            if len(thisOffsetPosition) > 1:
-                ret += " << "
-                for thisSubElement in thisOffsetPosition:
-                    if hasattr(thisSubElement, "lily"):
-                        ret += thisSubElement.lily
-                    else:
-                        # TODO: write out debug code here
-                        pass
-                ret += " >>\n"
-            else:
-                if hasattr(thisOffsetPosition[0], "lily"):
-                    ret += thisOffsetPosition[0].lily
-                else:
-                    # TODO: write out debug code here
-                    pass
-        return ret
-        
-    lily = property(_getLily)
 
 
     def _getParts(self):
@@ -10764,7 +10708,26 @@ class Score(Stream):
 #                 for q in mergePairTerminus:
 #                     pass
 
-
+#    def makeNotation(self, *args, **keywords):
+#        '''
+#        >>> from music21 import *
+#        >>> s = stream.Score()
+#        >>> p1 = stream.Part()
+#        >>> p2 = stream.Part()
+#        >>> n = note.Note('g')
+#        >>> n.quarterLength = 1.5
+#        >>> p1.repeatAppend(n, 10)
+#        >>> n2 = note.Note('f')
+#        >>> n2.quarterLength = 1
+#        >>> p2.repeatAppend(n2, 15)
+# 
+#        >>> s.insert(0, p1)
+#        >>> s.insert(0, p2)
+#        >>> sMeasures = s.makeNotation()
+#        >>> len(sMeasures.parts)
+#        2
+#        '''
+#        return Stream.makeNotation(self, *args, **keywords)
 
 
 class Opus(Stream):
@@ -10968,7 +10931,8 @@ class TestExternal(unittest.TestCase):
         a.insert(0, bestC)
         a.insert(0, ts)
         a.insert(0, b)
-        a.lily.showPNG()
+        
+        a.show('lily.png')
 
     def testLilySemiComplex(self):
         a = Stream()
@@ -11000,7 +10964,7 @@ class TestExternal(unittest.TestCase):
         a.insert(0, bestC)
         a.insert(0, ts)
         a.insert(0, b)
-        a.lily.showPNG()
+        a.show('lily.png')
 
         
     def testScoreLily(self):
@@ -11022,7 +10986,7 @@ class TestExternal(unittest.TestCase):
         score1.insert(ts)
         score1.insert(s1)
         score1.insert(s2)
-        score1.lily.showPNG()
+        a.show('lily.png')
         
 
     def testMXOutput(self):
@@ -11510,74 +11474,6 @@ class Test(unittest.TestCase):
         a.duration = newDuration
         self.assertEqual(a.duration.quarterLength, 2.0)
         self.assertEqual(a.highestTime, 4)
-
-    def testLilySimple(self):
-        a = Stream()
-        ts = meter.TimeSignature("3/4")
-        
-        b = Stream()
-        q = note.QuarterNote()
-        q.octave = 5
-        b.repeatInsert(q, [0,1,2,3])
-        
-        bestC = b.bestClef(allowTreble8vb = True)
-        a.insert(bestC)
-        a.insert(ts)
-        a.insert(b)
-        self.assertEqual(a.lily.value, u'\n  { \\clef "treble"  \\time 3/4  \n  { c\'\'4 c\'\'4 c\'\'4 c\'\'4  }   } ')
-
-    def testLilySemiComplex(self):
-        from music21 import pitch
-
-        a = Stream()
-        ts = meter.TimeSignature("3/8")
-        
-        b = Stream()
-        q = note.EighthNote()
-
-        dur1 = duration.Duration()
-        dur1.type = "eighth"
-        
-        tup1 = duration.Tuplet()
-        tup1.tupletActual = [5, dur1]
-        tup1.tupletNormal = [3, dur1]
-
-        q.octave = 2
-        q.duration.appendTuplet(tup1)
-        
-        
-        for i in range(0,5):
-            b.append(deepcopy(q))
-            b.elements[i].accidental = pitch.Accidental(i - 2)
-        
-        b.elements[0].duration.tuplets[0].type = "start"
-        b.elements[-1].duration.tuplets[0].type = "stop"
-        b2temp = b.elements[2]
-        c = b2temp.editorial
-        c.comment.text = "a real C"
-        
-        bestC = b.bestClef(allowTreble8vb = True)
-        a.insert(bestC)
-        a.insert(ts)
-        a.insert(b)
-        self.assertEqual(a.lily.value,  u'\n  { \\clef "bass"  \\time 3/8  \n  { \\times 3/5 {ceses,8 ces,8 c,8_"a real C" cis,8 cisis,8}  }   } ')
-
-    def testScoreLily(self):
-        c = note.Note("C4")
-        d = note.Note("D4")
-        ts = meter.TimeSignature("2/4")
-        s1 = Part()
-        s1.append(deepcopy(c))
-        s1.append(deepcopy(d))
-        s2 = Part()
-        s2.append(deepcopy(d))
-        s2.append(deepcopy(c))
-        score1 = Score()
-        score1.insert(ts)
-        score1.insert(s1)
-        score1.insert(s2)
-        self.assertEqual(u" << \\time 2/4 \t\n \\new Staff \n  { c'4 d'4  } \t\n \\new Staff \n  { d'4 c'4  }  >>\n", score1.lily.value)
-
 
 
     def testMeasureStream(self):

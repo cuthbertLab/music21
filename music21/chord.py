@@ -167,36 +167,6 @@ class Chord(note.NotRest):
             self.beams = beam.Beams()
 
         
-    def _preDurationLily(self):
-        '''
-        Method to return all the lilypond information that appears before the 
-        duration number.  This is called from GeneralNote .lily, but we are
-        overriding the previously defined call. 
-        
-        '''
-        baseName = "<"
-        baseName += self.editorial.lilyStart()
-        for thisPitch in self.pitches:
-            baseName += thisPitch.step.lower()
-            if (thisPitch.accidental):
-                baseName += thisPitch.accidental.lily
-            elif (self.editorial.ficta is not None):
-                baseName += self.editorial.ficta.lily
-            octaveModChars = ""
-            
-            if (thisPitch.implicitOctave < 3):
-                correctedOctave = 3 - thisPitch.implicitOctave 
-                octaveModChars = ',' * correctedOctave #  C3 = c ; C2 = c, ; C1 = c,,
-            else:
-                correctedOctave = thisPitch.implicitOctave - 3
-                octaveModChars  = '\'' * correctedOctave # C4 = c' ; C5 = c''  etc.
-            baseName += octaveModChars
-            if (self.editorial.ficta is not None):
-                baseName += "!"  # always display ficta
-            baseName += " "
-        baseName = baseName.rstrip()
-        baseName += ">"
-        return baseName
 
 
     def __deepcopy__(self, memo=None):
@@ -2661,9 +2631,9 @@ class Chord(note.NotRest):
         >>> from music21 import *
         >>> chord1 = chord.Chord(["C#4", "G5", "E6"])
         >>> chord2 = chord1.closedPosition()
-        >>> print(chord2.lily.value)
-        <cis' e' g'>4
-
+        >>> chord2
+        <music21.chord.Chord C#4 E4 G4>
+        
         >>> c2 = chord.Chord(["C#4", "G5", "E6"])
         >>> str(c2.closedPosition(2).pitches)
         '[C#2, E2, G2]'
@@ -3991,14 +3961,10 @@ class Test(unittest.TestCase):
         # duration shold store a Duration object
         #assert chord1.duration is None
 
-    def testLily(self):
-        chord1 = Chord(["C#4","E4","G5"])
-        self.assertEqual("<cis' e' g''>4", chord1.lily.value)
-
     def testClosedPosition(self):
         chord1 = Chord(["C#4", "G5", "E6"])
         chord2 = chord1.closedPosition()
-        self.assertEqual("<cis' e' g'>4", chord2.lily.value)
+        self.assertEqual(repr(chord2), "<music21.chord.Chord C#4 E4 G4>")
 
     def testPostTonalChordsA(self):
         c1 = Chord([0,1,3,6,8,9,12])

@@ -3,8 +3,9 @@ import unittest, doctest
 
 
 import music21
+from music21 import clef
+from music21 import metadata
 from music21 import meter
-from music21 import lily as lilyModule
 from music21 import note
 from music21 import stream
 
@@ -21,12 +22,12 @@ class PolyphonicSnippet(stream.Score):
     >>> from music21 import *
     >>> cantus = trecento.trecentoCadence.TrecentoCadenceStream("c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8", '6/8')
     >>> tenor = trecento.trecentoCadence.TrecentoCadenceStream("F1. f2. e4. d", '6/8')
-    >>> ps = trecento.polyphonicSnippet.PolyphonicSnippet([cantus, tenor, None, "8-8", "6/8"], parentPiece = "mom")
+    >>> ps = trecento.polyphonicSnippet.PolyphonicSnippet([cantus, tenor, None, "8-8", "6/8"], parentPiece = trecento.cadencebook.BallataSheet().makeWork(3))
     >>> ps.elements
-    [<music21.stream.Part ...>, <music21.stream.Part ...>]
-    >>> ps.elements[0] is cantus
+    [<music21.metadata.Metadata object at 0x...>, <music21.stream.Part C>, <music21.stream.Part T>]
+    >>> ps.elements[1] is cantus
     True
-    >>> ps.elements[0].classes
+    >>> ps.elements[1].classes
     ['Part', 'TrecentoCadenceStream', 'TinyNotationStream', 'Stream', 'Music21Object', 'JSONSerializer', 'object']
     >>> #_DOCS_SHOW ps.show()
     
@@ -57,7 +58,8 @@ class PolyphonicSnippet(stream.Score):
     []
     
     '''
-    
+    snippetName = ""
+
     def __init__(self, fiveExcelCells = None, parentPiece = None):
         stream.Score.__init__(self)
         if fiveExcelCells == None:
@@ -92,7 +94,9 @@ class PolyphonicSnippet(stream.Score):
             else:
                 self.cantus.id = 'C'
 
-    
+            md = metadata.Metadata()
+            md.title = self.header()
+            self.insert(0, md)    
             self._appendParts()
             self._padParts()
 
@@ -107,6 +111,8 @@ class PolyphonicSnippet(stream.Score):
             if thisVoice is not None:
                 if foundTs == False and len(thisVoice.getElementsByClass(meter.TimeSignature)) > 0:
                     foundTs = True
+                if len(thisVoice.getElementsByClass(clef.Clef)) == 0:
+                    thisVoice.insert(0, thisVoice.bestClef())
                 thisVoice.makeNotation(inPlace = True)
                 self.insert(0, thisVoice)
                 
@@ -125,50 +131,28 @@ class PolyphonicSnippet(stream.Score):
                     self.frontPadLine(thisVoice)
                 elif hasattr(self, 'backPadLine'):
                     self.backPadLine(thisVoice)
-
-        
-
-    def headerWithPageNums(self):
-        '''returns a string that prints an appropriate header for this cadence'''
-        if (self.parentPiece is not None):
-            parentPiece = self.parentPiece
-            headOut = " \\header { \n piece = \\markup \\bold \""
-            if (parentPiece.fischerNum):
-                headOut += str(parentPiece.fischerNum) + ". " 
-            if parentPiece.title:
-                headOut += parentPiece.title
-            if (parentPiece.pmfcVol and parentPiece.pmfcPageRange()):
-                headOut += " PMFC " + str(parentPiece.pmfcVol) + " " + parentPiece.pmfcPageRange()
-            headOut += "\" \n}\n";
-            return headOut
-        else:
-            return ""
-
-    def headerWithCadenceName(self):
-        pass
     
     def header(self):
-        return self.headerWithPageNums()
+        '''returns a string that prints an appropriate header for this cadence'''
+        if self.snippetName == "":
+            if (self.parentPiece is not None):
+                headOut = ""
+                parentPiece = self.parentPiece
+                if (parentPiece.fischerNum):
+                    headOut += str(parentPiece.fischerNum) + ". " 
+                if parentPiece.title:
+                    headOut += parentPiece.title
+                if (parentPiece.pmfcVol and parentPiece.pmfcPageRange()):
+                    headOut += " PMFC " + str(parentPiece.pmfcVol) + " " + parentPiece.pmfcPageRange()
+                return headOut
+            else:
+                return ""
+        else:
+            if (self.parentPiece is not None):
+                headOut = self.parentPiece.title + " -- " + self.snippetName
+            else:
+                return self.snippetName
                     
-    def lilyFromStream(self, thisStream):
-        lilyOut = lilyModule.LilyString("  \\new Staff { " + thisStream.bestClef().lily.value + " " + thisStream.lily.value + " } \n")
-        return lilyOut
-    
-    def _getLily(self):
-        thesepartStreams = self.parts
-        timeSig = self.timeSig
-
-        lilyOut = lilyModule.LilyString("\\score {\n")
-        lilyOut += "<< \\time " + str(timeSig) + "\n"
-        for thisStream in thesepartStreams:
-            lilyOut += self.lilyFromStream(thisStream)
-
-        lilyOut += ">>\n"
-        lilyOut += self.header() + "}\n"
-        return lilyOut
-
-    lily = property(_getLily)
-
     def findLongestCadence(self):
         '''
         returns the length. (in quarterLengths) for the longest line
@@ -370,12 +354,6 @@ class FrontPaddedSnippet(PolyphonicSnippet):
                         newFirstM.insert(nOffset, n)
         
 
-    def header(self):
-        headOut = " \\header { \n piece = \"" + self.parentPiece.title
-        if (self.snippetName):
-            headOut += " -- " + self.snippetName + " "
-        headOut += " \" \n}\n";
-        return headOut
 
 
 
@@ -403,7 +381,12 @@ class Test(unittest.TestCase):
                 self.assertNotEqual(a, obj)
                 self.assertNotEqual(b, obj)
 
-
+    def testLily(self):
+        from music21 import trecento
+        cantus = trecento.trecentoCadence.TrecentoCadenceStream("c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8", '6/8')
+        tenor = trecento.trecentoCadence.TrecentoCadenceStream("F1. f2. e4. d", '6/8')
+        ps = PolyphonicSnippet([cantus, tenor, None, "8-8", "6/8"], parentPiece = trecento.cadencebook.BallataSheet().makeWork(3) )
+        ps.show('lily.svg')
 
 #------------------------------------------------------------------------------
 # eof

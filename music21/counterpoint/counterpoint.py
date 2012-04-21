@@ -19,7 +19,6 @@ from music21 import converter
 from music21 import duration
 from music21 import interval
 from music21 import meter
-from music21 import lily
 from music21 import scale
 
 from music21 import stream

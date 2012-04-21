@@ -25,7 +25,6 @@ import time
 #import music21.humdrum
 #import music21.converter
 #import music21.corpus
-#import music21.lily
 #import music21.trecento.capua
 #
 #
@@ -114,8 +113,6 @@ class TestTimeMozart(M21CallTest):
     def testFocus(self):
         music21 = self.m21
         a = music21.converter.parse(music21.corpus.getWork('k155')[0])
-    #    ls = music21.lily.LilyString("{" + a[0].lily + "}")
-    #    ls.showPNG()
     #    a = music21.converter.parse(mxtf.ALL[1])
 
 class TestTimeCapua1(M21CallTest):

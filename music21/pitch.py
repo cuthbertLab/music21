@@ -1037,52 +1037,6 @@ class Accidental(music21.Music21Object):
                 value = getattr(other, attr)
                 setattr(self, attr, value)
 
-    def _getLily(self):
-        lilyRet = ""
-        if (self.name == "sharp"): lilyRet = "is"
-        if (self.name == "double-sharp"): lilyRet = "isis"
-        if (self.name == "flat"): lilyRet = "es"
-        if (self.name == "double-flat"): lilyRet = "eses"
-        if (self.name == "natural"): lilyRet = ""
-        if (self.name == "half-sharp"): lilyRet = "ih"
-        if (self.name == "one-and-a-half-sharp"): lilyRet = "isih"
-        if (self.name == "half-flat"): lilyRet = "eh"
-        if (self.name == "one-and-a-half-flat"): lilyRet = "eseh"
-        return lilyRet
-        
-    def _setLily(self, value):
-        if (value.count("isis") > 0): self.setAccidental("double-sharp")
-        elif (value.count("eses") > 0): self.setAccidental("double-flat")
-        elif (value.count("isih") > 0): 
-            self.setAccidental("one-and-a-half-sharp")
-        elif (value.count("eseh") > 0): 
-            self.setAccidental("one-and-a-half-flat")
-        elif (value.count("is") > 0): self.setAccidental("sharp")
-        elif (value.count("es") > 0): self.setAccidental("flat")
-        elif (value.count("ih") > 0): self.setAccidental("half-sharp")
-        elif (value.count("eh") > 0): self.setAccidental("half-flat")
-
-        if value.count("!") > 0:
-            self.displayType = "always"            
-        if value.count("?") > 0:
-            self.displayStyle = "parentheses"
-
-    # property
-    lily = property(_getLily, _setLily, doc =
-                    '''From music21 to Lilypond notation.''')
-
-    def lilyDisplayType(self):
-        lilyRet = ""
-        if self.displayStatus == True or self.displayType == "always" \
-           or self.displayType == "even-tied":
-            lilyRet += "!"
-        
-        if self.displayStyle == "parentheses" or self.displayStyle == "both":
-            lilyRet += "?"
-            ## no brackets for now
-
-        return lilyRet
-
 
     def _getMx(self):
         """From music21 to MusicXML
@@ -2436,17 +2390,6 @@ class Pitch(music21.Music21Object):
 
     musicxml = property(_getMusicXML)
 
-    def lilyNoOctave(self):
-        '''
-        returns the lilypond representation of the pitch
-        (with accidentals) but without octave.
-        '''
-        
-        baseName = self.step.lower()
-        if (self.accidental):
-            baseName += self.accidental.lily
-        return baseName
-    
 
 
     #---------------------------------------------------------------------------

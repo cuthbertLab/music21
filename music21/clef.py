@@ -17,7 +17,6 @@ import unittest
 import music21
 from music21 import common
 from music21 import musicxml
-from music21.lily import LilyString
 
 from music21 import environment
 _MOD = "clef.py"
@@ -29,7 +28,6 @@ class ClefException(Exception):
 
 
 
-# TODO: should lilyName, here and elsewhere, be a private variable, _lilyName?
 
 #-------------------------------------------------------------------------------
 class Clef(music21.Music21Object):
@@ -195,13 +193,6 @@ class PitchClef(Clef):
 
     def __init__(self):
         Clef.__init__(self)
-        self.lilyName = ""
-
-    
-    def _getLily(self):
-        return LilyString("\\clef \"" + self.lilyName + "\" ")
-
-    lily = property(_getLily)
 
 
 #-------------------------------------------------------------------------------
@@ -238,7 +229,6 @@ class TrebleClef(GClef):
         'G'
         '''
         GClef.__init__(self)
-        self.lilyName = "treble"
         self.line = 2
         self.lowestLine = (7*4) + 3  # 4 octaves + 3 notes = e4
 
@@ -253,7 +243,6 @@ class Treble8vbClef(TrebleClef):
         -1
         '''
         TrebleClef.__init__(self)
-        self.lilyName = "treble_8"
         self.octaveChange = -1
         self.lowestLine = (7*3) + 3
 
@@ -404,7 +393,6 @@ class BassClef(FClef):
         'F'
         '''
         FClef.__init__(self)
-        self.lilyName = "bass"
         self.line = 4
         self.lowestLine = (7*2) + 5
 

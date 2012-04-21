@@ -4,7 +4,6 @@
 import unittest, doctest
 
 import music21
-from music21 import lily
 from music21 import tinyNotation
 from music21.tinyNotation import *
 
@@ -18,7 +17,7 @@ class TrecentoCadenceStream(TinyNotationStream):
     >>> dLucaGloriaIncipit.rightBarline = 'final'
     >>> dLucaGloriaIncipit.elements
     [<music21.stream.Measure 1 offset=0.0>, <music21.stream.Measure 2 offset=3.0>, <music21.stream.Measure 3 offset=6.0>]
-    '''    
+    '''
     def getNote(self, stringRep, storedDict = {}):
         try:
             tcN = TrecentoCadenceNote(stringRep, storedDict)

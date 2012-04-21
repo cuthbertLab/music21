@@ -780,7 +780,6 @@ class Fermata(Expression):
     '''
     shape = "normal"
     type  = "upright" # for musicmxml, can be upright, upright-inverted
-    lily  = "\\fermata"
     tieAttach = 'last'
 
     def _getMX(self):
@@ -900,7 +899,7 @@ class Test(unittest.TestCase):
         self.assertEqual(st1n[2].quarterLength, 3.75)
         
 
-    def xtestGetRepeatExpression(self):
+    def testGetRepeatExpression(self):
         from music21 import stream, expressions, repeat
 
         te = expressions.TextExpression('lightly')

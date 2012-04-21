@@ -31,8 +31,8 @@ cents           interval.ChromaticInterval.cents    (tuning will eventually affe
 cleave          None                kern specific, not needed
 context         None                Not needed.  Use object.next and object.prev to get some context for many objects
 correl          None                Use numpy.corrcoef() or other, more sophisticated code
-deg             Key.degree(Note)    stream.analyze('key')
-degree          Key.degree(Note)    Returns a scale.ScaleDegree object which will have various representations
+deg             see scale           or stream.analyze('key')
+degree          see scale
 diss            analysis.kkdiss     NOT YET WRITTEN -- for music21 v2.0.
 ditto           None                Not needed.  Use copy.copy(object) or copy.deepcopy(object) to get another copy of an object
 encode          midi.(severaltools) Multifunction humdrum program.  Replaced by midi tools.  (NOT YET WRITTEN: simple midi in v0.3a; more complex in v2.0)
@@ -46,19 +46,19 @@ humdrum         None                Not needed.
 humsed          None                Not needed.
 humver          None                Not needed.
 infot           None                Use general purpose python information theory models
-iv              Chord.intervalVector  chord.intervalVector
+iv              Chord.intervalVector
 kern            myScore.write('kern')        Outputting to kern not planned at this time.
 key             Key.keyFromStream() NOT YET WRITTEN (2008-10-18) (v0.6b)
 melac           analysis.thomassen.MelodicAccent    NOT YET WRITTEN -- lower priority (v2.0 or later)
 metpos          meter.addAccentToStream()   NOT YET WRITTEN -- high priority (v0.3a)
-midi            midi.write()        NOT YET WRITTEN -- however, lily.ShowPNGandPlayMIDI() already works using the Lilypond midi functions
-midireset       midi.allOff()       NOT YET WRITTEN -- v2.0 -- good to have though...
+midi            .show('midi') 
+midireset       midi.allOff()       NOT NEEDED -- v2.0 -- but will be needed for direct midi access...
 mint            Interval(note1, stream.noteFollowingNote(note1))
 nf              Chord.normalForm    NOT YET WRITTEN -- (v0.6b)
 num             None                not needed
 patt            None                Not needed, However, see, for instance, trecento.find_trecento_fragments for an example of a pattern searching module
 pattern         None                see patt above
-pc              Note.pitchClass
+pc              Note.pitch.pitchClass
 pcset           Chord.pcset         NOT YET WRITTEN (v0.6); Returns PitchClassSet object.  PitchClassSet.forte, .normalForm, .primeForm, etc. will exist 
 perform         midi.play           For now use lily.ShowPNGandPlayMIDI()
 pf              PitchClassSet.primeForm   NOT YET WRITTEN -- see pcset
@@ -67,7 +67,7 @@ proof           None                Not needed; but something like this could be
 recode          "if"
 record          none yet...         Not yet determined if it is a good idea to record directly to music21 within music21 -- a MIDI to music21 converter should suffice.
 regexp          None                Use re module in Python core, not music21
-reihe           twelveTone.Row      NOT YET WRITTEN -- v0.6
+reihe           serial.TwelveToneRow      
 rend            None                Not needed.
 rid             None                Not needed.
 scramble        None                Use random module in Python core, not music21.  However, see composition tools for some sophisticated scrambling methods
@@ -80,8 +80,8 @@ strophe         Note.lyric.strophe[i] NOT YET WRITTEN
 synco           analysis.leeLHiggins    NOT YET WRITTEN -- low priority
 tacet           midi.allOff()       see midireset above; -i will not be supported
 timebase        None                Not needed.  stream.getElementsByOffset() will cover most uses
-tonh            Note.germanName     NOT YET WRITTEN -- simple, but low priority
-trans           Note.transpose(Interval), Stream.transpose(Interval), etc -- not yet written, but interval.getNoteAboveNote(Note, Interval) works fine.  Modal transpositions still are needed
+tonh            Note.pitch.germanName     
+trans           Note.transpose(Interval), Stream.transpose(Interval), etc
 urrhythm        analysis.JohnsonLaird.urrhythm(Stream)  NOT YET WRITTEN -- low priority
 veritas         None                Not needed.  use md5 or other checksum files
 vox             None                len(Chord.pitches()) works for a chord.  TwoStreamComparer has many methods for performing this function.

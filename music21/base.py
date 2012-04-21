@@ -3148,15 +3148,13 @@ class Music21Object(JSONSerializer):
         if fp is None:
             fp = environLocal.getTempFile(ext)
 
-        if format in ['text', 'textline', 'musicxml', 'lilypond', 'lily', 'vexflow', 'vexflow.html']:        
+        if format in ['text', 'textline', 'musicxml', 'vexflow', 'vexflow.html']:        
             if format == 'text':
                 dataStr = self._reprText()
             elif format == 'textline':
                 dataStr = self._reprTextLine()
             elif format == 'musicxml':
                 dataStr = self.musicxml
-            elif format in ['lilypond', 'lily']:
-                dataStr = self.lily.renderTemplate()
             elif format.startswith('vexflow'):
                 import music21.vexflow
                 dataStr = music21.vexflow.fromObject(self, mode='html')
@@ -3166,9 +3164,17 @@ class Music21Object(JSONSerializer):
             f.close()
             return fp
 
-        elif format == 'braille':
-            import music21.braille
-            dataStr = music21.braille.translate.objectToBraille(self)
+        elif format in ['braille', 'lily', 'lilypond']:
+            if format in ['lilypond', 'lily']:
+                import music21.lily.translate
+                conv = music21.lily.translate.LilypondConverter()
+                conv.loadObject(self) 
+                dataStr = conv.templatedString.encode('utf-8')
+            
+            elif format == 'braille':
+                import music21.braille
+                dataStr = music21.braille.translate.objectToBraille(self)
+            
             f = codecs.open(fp, mode='w', encoding='utf-8')
             f.write(dataStr)
             f.close()
@@ -3185,15 +3191,21 @@ class Music21Object(JSONSerializer):
         elif format in ['pdf', 'lily.pdf',]:
             if fp.endswith('.pdf'):
                 fp = fp[:-4]
-            return self.lily.createPDF(fp)
+            import music21.lily.translate
+            conv = music21.lily.translate.LilypondConverter(self)
+            return conv.createPDF(fp)
         elif format in ['png', 'lily.png']:
             if fp.endswith('.png'):
                 fp = fp[:-4]
-            return self.lily.createPNG(fp)
+            import music21.lily.translate
+            conv = music21.lily.translate.LilypondConverter(self)
+            return conv.createPNG(fp)
         elif format in ['svg', 'lily.svg']:
             if fp.endswith('.svg'):
                 fp = fp[:-4]
-            return self.lily.createSVG(fp)
+            import music21.lily.translate
+            conv = music21.lily.translate.LilypondConverter(self)
+            return conv.createSVG(fp)
         else:
             raise Music21ObjectException('cannot support writing in this format, %s yet' % format)
 
@@ -3263,15 +3275,19 @@ class Music21Object(JSONSerializer):
         # TODO: the lilypondFormat is not yet consulted
         elif fmt in ['lily.pdf', 'pdf']:
             #return self.lily.showPDF()
-            environLocal.launch('pdf', self.lily.createPDF(), app=app)
-        elif fmt in ['lily.png', 'png']:
+            import music21.lily.translate
+            conv = music21.lily.translate.LilypondConverter(self)
+            environLocal.launch('pdf', conv.createPDF(), app=app)
+        elif fmt in ['lily.png', 'png', 'lily', 'lilypond']:
             # TODO check that these use environLocal 
-            return self.lily.showPNG()
+            import music21.lily.translate
+            conv = music21.lily.translate.LilypondConverter(self)
+            return conv.showPNG()
         elif fmt in ['lily.svg', 'svg']:
             # TODO check that these use environLocal 
-            return self.lily.showSVG()
-        elif fmt in ['lily', 'lilypond']:
-            return self.lily.showPNG()
+            import music21.lily.translate
+            conv = music21.lily.translate.LilypondConverter(self)
+            return conv.showSVG()
 
         elif fmt in ['musicxml', 'midi']: # a format that writes a file
             returnedFilePath = self.write(format)
