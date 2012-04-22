@@ -154,7 +154,7 @@ class wwnortonExercise(object):
         for resultObj in ta.resultDict[taKey]:
             offset = offsetFunc(resultObj)
             correctLyric = lyricFunc(resultObj)
-            markerNote = markerPart.flat.getElementAtOrBefore(offset,classList={'Note'})
+            markerNote = markerPart.flat.getElementAtOrBefore(offset,classList=['Note'])
             if markerNote is None or markerNote.offset != offset:
                 print "No Marker"
                 continue

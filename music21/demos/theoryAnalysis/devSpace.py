@@ -122,7 +122,7 @@ def checkScaleDegrees(sc,scorePart,markerPart):
 
     # Check whether lyrics of marker part match scale degrees of score part at that offset
     for nMarker in sc.parts[markerPart].flat.getElementsByClass('Note'):
-        n = sc.parts[scorePart].flat.getElementAtOrBefore(nMarker.offset,classList={'Note'})
+        n = sc.parts[scorePart].flat.getElementAtOrBefore(nMarker.offset,classList=['Note'])
       
 
         if nMarker.lyric != str(exerciseScale.getScaleDegreeFromPitch(n.pitch)):
