@@ -14645,10 +14645,10 @@ class Test(unittest.TestCase):
             s.insert(0, p)
         # this is true as the sub-stream contain notes
         self.assertEqual(s.hasPartLikeStreams(), True)
-
+        
         self.assertEqual(s.getElementsByClass('Stream')[0].hasMeasures(), False)
         self.assertEqual(s.getElementsByClass('Stream')[1].hasMeasures(), False)
-
+        
         post = s.makeNotation(inPlace=False)
         self.assertEqual(post.hasPartLikeStreams(), True) 
         
@@ -14656,9 +14656,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.getElementsByClass(
             'Stream')[0].getElementsByClass('Measure')), 3)      
         self.assertEqual(len(post.getElementsByClass(
-            'Stream')[1].getElementsByClass('Measure')), 3)
-        # no time signature is created by makMeasures
-
+            'Stream')[1].getElementsByClass('Measure')), 3)        
         self.assertEqual(len(post.flat.getElementsByClass('TimeSignature')), 2)
         self.assertEqual(len(post.flat.getElementsByClass('Clef')), 2)
 
@@ -14675,23 +14673,22 @@ class Test(unittest.TestCase):
             s.insert(0, p)
         # this is true as the sub-stream contain notes
         self.assertEqual(s.hasPartLikeStreams(), True)
-
+        
         self.assertEqual(s.getElementsByClass('Stream')[0].hasMeasures(), False)
         self.assertEqual(s.getElementsByClass('Stream')[1].hasMeasures(), False)
-
+        
         # supply a meter stream
         post = s.makeNotation(inPlace=False, meterStream=stream.Stream(
             [meter.TimeSignature('3/4')]))
-
+        
         self.assertEqual(post.hasPartLikeStreams(), True) 
         
-        # three measures are made by default
+        # four measures are made due to passed-in time signature
         self.assertEqual(len(post.getElementsByClass(
             'Stream')[0].getElementsByClass('Measure')), 4)      
         self.assertEqual(len(post.getElementsByClass(
             'Stream')[1].getElementsByClass('Measure')), 4)
-        # no time signature is created by makMeasures
-
+        
         self.assertEqual(len(post.flat.getElementsByClass('TimeSignature')), 2)
         self.assertEqual(len(post.flat.getElementsByClass('Clef')), 2)
 
@@ -14707,26 +14704,21 @@ class Test(unittest.TestCase):
         for p in [p1, p2]:
             p.repeatAppend(note.Note(), 12)
             s.insert(0, p)
-
+        
         # create measures in the first part
         s.getElementsByClass('Stream')[0].makeNotation(inPlace=True, 
             meterStream=stream.Stream([meter.TimeSignature('3/4')]))
-
+        
         self.assertEqual(s.getElementsByClass('Stream')[0].hasMeasures(), True)
         self.assertEqual(s.getElementsByClass('Stream')[1].hasMeasures(), False)
-
-        # supply a meter stream
-        post = s.makeNotation(inPlace=False)
-
-        self.assertEqual(post.hasPartLikeStreams(), True) 
         
-        # three measures are made by default
+        post = s.makeNotation(inPlace=False)
+                
         self.assertEqual(len(post.getElementsByClass(
             'Stream')[0].getElementsByClass('Measure')), 4)      
         self.assertEqual(len(post.getElementsByClass(
             'Stream')[1].getElementsByClass('Measure')), 3)
-        # no time signature is created by makMeasures
-
+        
         self.assertEqual(len(post.flat.getElementsByClass('TimeSignature')), 2)
         self.assertEqual(len(post.flat.getElementsByClass('Clef')), 2)
 
