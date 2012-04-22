@@ -4979,7 +4979,6 @@ class Stream(music21.Music21Object):
                           searchContext=False,
                           sortByCreationTime=False)
             #environLocal.printDebug(['Stream.makeMeasures(): found meterStream', meterStream[0]])
-
         # if meterStream is a TimeSignature, use it
         elif isinstance(meterStream, meter.TimeSignature):
             ts = meterStream
@@ -5040,18 +5039,14 @@ class Stream(music21.Music21Object):
         while True:    
             m = Measure()
             m.number = measureCount + 1
-
             #environLocal.printDebug(['handling measure', m, m.number, 'current offset value', o, meterStream._reprTextLine()])
-
             # get active time signature at this offset
             # make a copy and it to the meter
             thisTimeSignature = meterStream.getElementAtOrBefore(o)
-
             #environLocal.printDebug(['m.number', m.number, 'meterStream.getElementAtOrBefore(o)', meterStream.getElementAtOrBefore(o), 'lastTimeSignature', lastTimeSignature, 'thisTimeSignature', thisTimeSignature ])
 
             if thisTimeSignature is None and lastTimeSignature is None:
                 raise StreamException('failed to find TimeSignature in meterStream; cannot process Measures')
-
             if thisTimeSignature is not lastTimeSignature and thisTimeSignature is not None:
                 lastTimeSignature = thisTimeSignature
                 # this seems redundant
@@ -5823,7 +5818,6 @@ class Stream(music21.Music21Object):
         if not self.hasMeasures():
             # only try to make voices if no Measures are defined
             returnStream.makeVoices(inPlace=True, fillGaps=True)
-
             # if this is not inPlace, it will return a newStream; if  
             # inPlace, this returns None
             # use inPlace=True, as already established above
@@ -5859,7 +5853,6 @@ class Stream(music21.Music21Object):
                 else:
                     m.makeAccidentals(useKeySignature=ksLast, 
                         searchKeySignatureByContext=False, **subroutineKeywords)
-
         #environLocal.printDebug(['makeNotation(): meterStream:', meterStream, meterStream[0]])
         measureStream.makeTies(meterStream, inPlace=True)
         #measureStream.makeBeams(inPlace=True)
@@ -10275,9 +10268,6 @@ class PartStaff(Part):
         Part.__init__(self, *args, **keywords)
 
 
-
-
-
 # 
 # class Performer(Stream):
 #     '''
@@ -10642,6 +10632,35 @@ class Score(Stream):
                     if match:
                         m.insert(e.getOffsetBySite(mNew), e)
         return post
+
+
+    def makeNotation(self, meterStream=None, refStreamOrTimeRange=None,
+                        inPlace=False, bestClef=False, **subroutineKeywords):
+        '''
+        This method overrides the makeNotation method on Stream, such that a Score object with one or more Parts or Streams that may not contain well-formed notation may be transformed and replaced by well-formed notation. 
+
+        If `inPlace` is True, this is done in-place; 
+        if `inPlace` is False, this returns a modified deep copy.
+
+        '''
+        if inPlace:
+            returnStream = self
+        else:
+            returnStream = copy.deepcopy(self)
+        # do not assume that we have parts here
+        for s in returnStream.getElementsByClass('Stream'):
+            # process all component Streams inPlace
+            s.makeNotation(meterStream=meterStream, refStreamOrTimeRange=refStreamOrTimeRange, inPlace=True, bestClef=bestClef, **subroutineKeywords)
+
+        # note: while the local-streams have updated their caches, the 
+        # containing score has an out-of-date cache of flat.
+        # this, must call elements changed
+        returnStream._elementsChanged()
+
+        if inPlace:
+            return None
+        else:
+            return returnStream
 
 
 # this was commented out as it is not immediately needed
@@ -14613,6 +14632,106 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sPost.getElementsByClass('Measure')[0].voices), 4)
         self.assertEqual(len(sPost.getElementsByClass('Measure')[1].voices), 4)        
 
+
+    def testMakeNotationScoreA(self):
+        '''Test makeNotation on Score objects
+        '''
+        from music21 import stream
+        s = stream.Score()
+        p1 = stream.Stream()
+        p2 = stream.Stream()
+        for p in [p1, p2]:
+            p.repeatAppend(note.Note(), 12)
+            s.insert(0, p)
+        # this is true as the sub-stream contain notes
+        self.assertEqual(s.hasPartLikeStreams(), True)
+
+        self.assertEqual(s.getElementsByClass('Stream')[0].hasMeasures(), False)
+        self.assertEqual(s.getElementsByClass('Stream')[1].hasMeasures(), False)
+
+        post = s.makeNotation(inPlace=False)
+        self.assertEqual(post.hasPartLikeStreams(), True) 
+        
+        # three measures are made by default
+        self.assertEqual(len(post.getElementsByClass(
+            'Stream')[0].getElementsByClass('Measure')), 3)      
+        self.assertEqual(len(post.getElementsByClass(
+            'Stream')[1].getElementsByClass('Measure')), 3)
+        # no time signature is created by makMeasures
+
+        self.assertEqual(len(post.flat.getElementsByClass('TimeSignature')), 2)
+        self.assertEqual(len(post.flat.getElementsByClass('Clef')), 2)
+
+
+    def testMakeNotationScoreB(self):
+        '''Test makeNotation on Score objects
+        '''
+        from music21 import stream, note, meter
+        s = stream.Score()
+        p1 = stream.Stream()
+        p2 = stream.Stream()
+        for p in [p1, p2]:
+            p.repeatAppend(note.Note(), 12)
+            s.insert(0, p)
+        # this is true as the sub-stream contain notes
+        self.assertEqual(s.hasPartLikeStreams(), True)
+
+        self.assertEqual(s.getElementsByClass('Stream')[0].hasMeasures(), False)
+        self.assertEqual(s.getElementsByClass('Stream')[1].hasMeasures(), False)
+
+        # supply a meter stream
+        post = s.makeNotation(inPlace=False, meterStream=stream.Stream(
+            [meter.TimeSignature('3/4')]))
+
+        self.assertEqual(post.hasPartLikeStreams(), True) 
+        
+        # three measures are made by default
+        self.assertEqual(len(post.getElementsByClass(
+            'Stream')[0].getElementsByClass('Measure')), 4)      
+        self.assertEqual(len(post.getElementsByClass(
+            'Stream')[1].getElementsByClass('Measure')), 4)
+        # no time signature is created by makMeasures
+
+        self.assertEqual(len(post.flat.getElementsByClass('TimeSignature')), 2)
+        self.assertEqual(len(post.flat.getElementsByClass('Clef')), 2)
+
+
+
+    def testMakeNotationScoreC(self):
+        '''Test makeNotation on Score objects
+        '''
+        from music21 import stream, note, meter
+        s = stream.Score()
+        p1 = stream.Stream()
+        p2 = stream.Stream()
+        for p in [p1, p2]:
+            p.repeatAppend(note.Note(), 12)
+            s.insert(0, p)
+
+        # create measures in the first part
+        s.getElementsByClass('Stream')[0].makeNotation(inPlace=True, 
+            meterStream=stream.Stream([meter.TimeSignature('3/4')]))
+
+        self.assertEqual(s.getElementsByClass('Stream')[0].hasMeasures(), True)
+        self.assertEqual(s.getElementsByClass('Stream')[1].hasMeasures(), False)
+
+        # supply a meter stream
+        post = s.makeNotation(inPlace=False)
+
+        self.assertEqual(post.hasPartLikeStreams(), True) 
+        
+        # three measures are made by default
+        self.assertEqual(len(post.getElementsByClass(
+            'Stream')[0].getElementsByClass('Measure')), 4)      
+        self.assertEqual(len(post.getElementsByClass(
+            'Stream')[1].getElementsByClass('Measure')), 3)
+        # no time signature is created by makMeasures
+
+        self.assertEqual(len(post.flat.getElementsByClass('TimeSignature')), 2)
+        self.assertEqual(len(post.flat.getElementsByClass('Clef')), 2)
+
+
+
     def testMakeTies(self):
 
         from music21 import corpus, meter
@@ -17847,7 +17966,7 @@ class Test(unittest.TestCase):
         gn2.duration.slash = False
         s.insertAndShift(1, gn2)
         #s.show('t')
-        s.show()
+        #s.show()
         match = [str(e) for e in s.pitches]
         self.assertEqual(match, ['G3', 'C#4', 'C4', 'D#4', 'A4'])
 

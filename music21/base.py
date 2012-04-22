@@ -3207,7 +3207,7 @@ class Music21Object(JSONSerializer):
             conv = music21.lily.translate.LilypondConverter(self)
             return conv.createSVG(fp)
         else:
-            raise Music21ObjectException('cannot support writing in this format, %s yet' % format)
+            raise Music21ObjectException('cannot yet support writing in the %s format' % format)
 
 
 
