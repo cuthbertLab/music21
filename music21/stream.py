@@ -918,12 +918,9 @@ class Stream(music21.Music21Object):
         >>> [e for e in s] == [n2]
         True
 
-
         No error is raised if the target is not found.
         
-
         >>> s.remove(n3)
-        
         '''
         try:
             i = self.index(target)

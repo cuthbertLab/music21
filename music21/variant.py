@@ -42,6 +42,17 @@ class Variant(music21.Music21Object):
                                     *args, **keywords)
 
 
+
+    def __getattr__(self, attr):
+        '''This will call all already-defined 
+        '''
+        environLocal.pd(['relaying unmatched attribute request to private Stream'])
+        try:
+            return getattr(self._stream, attr)
+        except:
+            raise
+        
+
     def append(self, others):
         self._stream.append(others)
 
@@ -72,6 +83,10 @@ class Variant(music21.Music21Object):
         ''')
 
 
+    def show(self, fmt=None, app=None):
+        '''Must override manually, otherwise Music21Object.show() is called.
+        '''
+        self._stream.show(fmt=fmt, app=app)
 
 
 # variant objs as groups
@@ -105,6 +120,31 @@ class Test(unittest.TestCase):
 
         self.assertEqual(o.highestOffset, 2.0)
         self.assertEqual(o.highestTime, 4.0)
+
+
+    def testBasicB(self):
+        '''Testing relaying attributes requests to private Stream with __getattr__
+        '''
+        from music21 import variant, stream, note
+
+        v = variant.Variant()
+        v.append(note.Note('G3', quarterLength=2.0))
+        v.append(note.Note('f3', quarterLength=2.0))
+        # these are Stream attributes
+        self.assertEqual(v.highestOffset, 0.0)
+        self.assertEqual(v.highestTime, 0.0)
+
+        self.assertEqual(len(v.notes), 2)
+        self.assertEqual(len(v.pitches), 2)
+        self.assertEqual(v.hasElementOfClass('Note'), True)
+        v.pop(1) # remove the last tiem
+
+        self.assertEqual(v.highestOffset, 0.0)
+        self.assertEqual(v.highestTime, 0.0)
+        self.assertEqual(len(v.notes), 1)
+        self.assertEqual(len(v.pitches), 1)
+
+        v.show('t')
 
 
 if __name__ == "__main__":

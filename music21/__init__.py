@@ -78,7 +78,7 @@ __all__ = ['base',
            'ratios', 'repeat', 'roman',
            'scale', 'search', 'serial', 'sieve', 'spanner', 'stream', 
            'tempo', 'text', 'tie', 'tinyNotation', 
-           'voiceLeading', 'volume',
+           'variant', 'voiceLeading', 'volume',
            'xmlnode',
         ]
 
