@@ -512,6 +512,31 @@ class GeneralNote(music21.Music21Object):
         else:
             return None
 
+    #---------------------------------------------------------------------------
+    def getGrace(self, appogiatura=False):
+        '''Return a grace version of this NotRest
+
+        >>> from music21 import *
+        >>> n = note.Note('G4', quarterLength=2)
+        >>> n.duration.quarterLength        
+        2.0
+        >>> n.isGrace
+        False
+        >>> ng = n.getGrace()
+        >>> ng.duration.quarterLength
+        0.0
+        >>> ng.isGrace
+        True
+
+        >>> ng = n.getGrace(appogiatura=True)
+        >>> ng.duration.slash
+        False
+        '''
+        # NOTE: this means that we can not have grace rests
+        # move this to GeneralNote to permit grace rests
+        e = copy.deepcopy(self)
+        e.duration = e.duration.getGraceDuration(appogiatura=appogiatura)
+        return e
 
 
     #---------------------------------------------------------------------------
@@ -665,34 +690,6 @@ class NotRest(GeneralNote):
         Get or set the note head fill status fo this NotRest.
         ''')
     
-    #---------------------------------------------------------------------------
-    def getGrace(self, appogiatura=False):
-        '''Return a grace version of this NotRest
-
-        >>> from music21 import *
-        >>> n = note.Note('G4', quarterLength=2)
-        >>> n.duration.quarterLength        
-        2.0
-        >>> n.isGrace
-        False
-        >>> ng = n.getGrace()
-        >>> ng.duration.quarterLength
-        0.0
-        >>> ng.isGrace
-        True
-
-        >>> ng = n.getGrace(appogiatura=True)
-        >>> ng.duration.slash
-        False
-        '''
-        # NOTE: this means that we can not have grace rests
-        # move this to GeneralNote to permit grace rests
-        e = copy.deepcopy(self)
-        e.duration = e.duration.getGraceDuration(appogiatura=appogiatura)
-        return e
-
-
-
     #---------------------------------------------------------------------------
     def _getVolume(self, forceParent=None):
         # lazy volume creation
