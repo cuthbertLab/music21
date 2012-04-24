@@ -18,7 +18,20 @@ from music21 import environment
 _MOD = "variant.py" # TODO: call variant
 environLocal = environment.Environment(_MOD)
 
+'''The :class:`~music21.variant.Variant` and its subclasses.
+'''
 
+
+# variant objs as groups
+# ossia1 as a group
+# variant group
+# idea of m5, m7; each have two variants, each belonging to one group
+
+# Stream.activateVariant() , take a group name as arg
+# if None is given, take first
+# overlapped content becomes
+# inPlace: replaces original; original becomes a variant
+# idea of performanceScale that realizes 
 
 
 
@@ -49,6 +62,10 @@ class Variant(music21.Music21Object):
     {0.0} <music21.variant.Variant object at ...>
     {0.0} <music21.note.Note C>
     '''
+
+    classSortOrder = 0  # variants should always come first?
+
+
     # this copies the init of Streams
     def __init__(self, givenElements=None, *args, **keywords):
         music21.Music21Object.__init__(self)
@@ -62,8 +79,10 @@ class Variant(music21.Music21Object):
         '''This defers all calls not defined in this Class to calls on the privately contained Stream.
         '''
         #environLocal.pd(['relaying unmatched attribute request to private Stream'])
-#         if attr in ['flat']: # if need to mask ability to flatten
-#             raise AttributeError
+
+        # must mask pitches so as not to recurse
+        if attr in ['flat', 'pitches']: 
+            raise AttributeError
         try:
             return getattr(self._stream, attr)
         except:
@@ -82,6 +101,9 @@ class Variant(music21.Music21Object):
 #                     setActiveSite=setActiveSite)
 
 
+    #---------------------------------------------------------------------------
+    # Stream  simulation/overrides
+
     def _getHighestTime(self):
         if self.exposeTime:
             return self._stream.highestTime
@@ -99,7 +121,6 @@ class Variant(music21.Music21Object):
 
         ''')
 
-
     def _getHighestOffset(self):
         if self.exposeTime:
             return self._stream.highestOffset
@@ -116,7 +137,6 @@ class Variant(music21.Music21Object):
         0.0
 
         ''')
-
 
     def show(self, fmt=None, app=None):
         '''
@@ -140,16 +160,46 @@ class Variant(music21.Music21Object):
         self._stream.show(fmt=fmt, app=app)
 
 
-# variant objs as groups
-# ossia1 as a group
-# variant group
-# idea of m5, m7; each have two variants, each belonging to one group
 
-# Stream.activateVariant() , take a group name as arg
-# if None is given, take first
-# overlapped content becomes
-# inPlace: replaces original; original becomes a variant
-# idea of performanceScale that realizes 
+    #---------------------------------------------------------------------------
+    # particular to this class
+
+    def _getContainedHighestTime(self):
+        return self._stream.highestTime
+
+    containedHighestTime = property(_getContainedHighestTime, doc='''
+        This property calls the contained Stream.highestTime.
+
+        >>> from music21 import *
+        >>> v = variant.Variant()
+        >>> v.append(note.Note(quarterLength=4))
+        >>> v.containedHighestTime
+        4.0
+        ''')
+
+    def _getContainedHighestOffset(self):
+        return self._stream.highestOffset
+
+    containedHighestOffset = property(_getContainedHighestOffset, doc='''
+        This property calls the contained Stream.highestOffset.
+
+        >>> from music21 import *
+        >>> v = variant.Variant()
+        >>> v.append(note.Note(quarterLength=4))
+        >>> v.append(note.Note())
+        >>> v.containedHighestOffset
+        4.0
+
+        ''')
+
+    def _getContainedSite(self):
+        return self._stream
+
+    containedSite = property(_getContainedSite, doc='''
+        Return a reference to the Stream contained in this Variant.
+        ''')
+
+
 
 class Test(unittest.TestCase):
 
@@ -186,17 +236,38 @@ class Test(unittest.TestCase):
         self.assertEqual(v.highestTime, 0.0)
 
         self.assertEqual(len(v.notes), 2)
-        self.assertEqual(len(v.pitches), 2)
         self.assertEqual(v.hasElementOfClass('Note'), True)
         v.pop(1) # remove the last tiem
 
         self.assertEqual(v.highestOffset, 0.0)
         self.assertEqual(v.highestTime, 0.0)
         self.assertEqual(len(v.notes), 1)
-        self.assertEqual(len(v.pitches), 1)
 
-        v.show('t')
+        #v.show('t')
 
+    def testVariantGroupA(self):
+        '''Variant groups are used to distinguish
+        '''
+        from music21 import variant
+        v1 = variant.Variant()
+        v1.groups.append('alt-a')
+
+        v1 = variant.Variant()
+        v1.groups.append('alt-b')
+        self.assertEqual('alt-b' in v1.groups, True)
+
+
+    def testVariantClassA(self):
+        from music21 import stream, variant, note
+
+        m1 = stream.Measure()
+        v1 = variant.Variant()
+        v1.append(m1)
+
+        self.assertEqual(v1.isClassOrSubclass(['Variant']), True)
+
+        self.assertEqual(v1.hasElementOfClass('Variant'), False)
+        self.assertEqual(v1.hasElementOfClass('Measure'), True)
 
 if __name__ == "__main__":
     music21.mainTest(Test)

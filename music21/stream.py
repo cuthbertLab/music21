@@ -722,6 +722,7 @@ class Stream(music21.Music21Object):
     def hasElementOfClass(self, className, forceFlat=False):
         '''Given a single class name as string, return True or False if an element with the specified class is found. The Stream must be flat, and only a single class name can be given.
         '''
+        #environLocal.pd(['calling hasElementOfClass()', className])
         for e in self._elements:
             if e.isClassOrSubclass([className]): 
                 return True
@@ -2621,14 +2622,11 @@ class Stream(music21.Music21Object):
 
         # need both _elements and _endElements
         for e in self.elements:
-            
             if classList is not None:
                 if not e.isClassOrSubclass(classList):
                     continue
-            
             match = False
             offset = e.getOffsetBySite(self)
-
             # if sorted, optimize by breaking after exceeding offsetEnd
             if self.isSorted:
                 if offset > offsetEnd:
@@ -8305,9 +8303,6 @@ class Stream(music21.Music21Object):
 
 
     def _getNotes(self):
-        '''
-        see property `notes`, below
-        '''
         if self._cache['notes'] is None:
            self._cache['notes'] = self.getElementsByClass('NotRest', 
                                   returnStreamSubClass=False)
@@ -9569,8 +9564,69 @@ class Stream(music21.Music21Object):
     #---------------------------------------------------------------------------
     # Variant control
     
-            
-        
+    def _getVariants(self):
+        if self._cache['variants'] is None:
+           self._cache['variants'] = self.getElementsByClass('Variant', 
+                                  returnStreamSubClass=False)
+        return self._cache['variants']
+                
+    variants = property(_getVariants, doc='''
+        Return a Stream containing all :class:`~music21.variant.Variant` objects in this Stream. 
+        ''')
+
+
+    def activateVariants(self, group=None, forceClassMatch=True, inPlace=True):
+        '''For any variants defined in this Stream, replace corresponding class with those found in the Variant.
+        '''
+        from music21 import variant
+
+        if not inPlace: # make a copy
+            returnObj = deepcopy(self)
+        else:
+            returnObj = self
+
+        # first, get target time spans of the variant
+        for v in self.variants:    
+            if group is not None:
+                if group not in v.groups:
+                    continue # skip those that are not part of this group
+
+            # create a replacement variant for each used variant; it 
+            # my not be added to the Stream if there are no matches
+            removed = variant.Variant() # what group should this have?
+
+            vStart = v.getOffsetBySite(returnObj)
+            targetsMatched = 0
+            for e in v.elements: # get components in the Variant
+                # get target offset relative to Stream
+                oInStream = vStart + e.getOffsetBySite(v.containedSite)
+                # get all elements at this offset, force a class match
+                targets = returnObj.getElementsByOffset(oInStream, 
+                                    classList=[e.classes[0]])
+                # only replace if we match the start
+                if len(targets) > 0:
+                    targetsMatched += 1
+                    # always assume we just want the first one?
+                    targetToReplace = targets[0]
+                    environLocal.pd(['found target to replace:', targetToReplace])
+                    # remove the target, place in removed Variant
+                    removed.append(targetToReplace)
+                    returnObj.remove(targetToReplace)
+                    # extract the variant component and insert into place
+                    returnObj.insert(oInStream, e)
+
+            # only remove old and add removed if we matched
+            if targetsMatched > 0:
+                # remove the original variant
+                returnObj.remove(v)
+                # place newly contained elements in position
+                returnObj.insert(vStart, removed)
+
+        # have to clear cached variants
+        self._elementsChanged()
+
+
+
 #-------------------------------------------------------------------------------
 class Voice(Stream):
     '''
@@ -9582,8 +9638,6 @@ class Voice(Stream):
     considered Voices here.
     '''
     pass
-
-
 
 
 
@@ -17985,6 +18039,204 @@ class Test(unittest.TestCase):
         s.append(chord.Chord(['e4', 'b4'], quarterLength=1))
 
         #s.show()
+
+    def testGetVariantsA(self):
+        from music21 import stream, note, variant
+        s = stream.Stream()
+        v1 = variant.Variant()
+        v2 = variant.Variant()
+        s.append(v1)
+        s.append(v2)
+        self.assertEqual(len(s.variants), 2)
+
+
+    def testActivateVariantsA(self):
+        '''This tests a single-measure variant
+        '''
+        from music21 import stream, note, variant
+        s = stream.Stream()
+        s.repeatAppend(note.Note('d2'), 12)
+        s.makeMeasures(inPlace=True)
+
+        v1 = variant.Variant()
+        m2Alt = stream.Measure()
+        m2Alt.repeatAppend(note.Note('G#4'), 4)
+        v1.append(m2Alt) # embed a complete Measure in v1
+
+        # insert the variant at the desired location
+        s.insert(4, v1)
+
+        self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
+        self.assertEqual(len(s.variants), 1)
+
+        s.activateVariants()
+
+        self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'G#', 'G#', 'G#', 'G#', 'D', 'D', 'D', 'D']")
+        self.assertEqual(len(s.variants), 1)
+
+        # activating again will restore the previous
+        s.activateVariants()
+
+        self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
+        self.assertEqual(len(s.variants), 1)
+
+
+
+    def testActivateVariantsB(self):
+        '''This tests two variants with different groups, each a single measure
+        '''
+        from music21 import stream, note, variant
+        s = stream.Stream()
+        s.repeatAppend(note.Note('d2'), 12)
+        s.makeMeasures(inPlace=True)
+
+        v1 = variant.Variant()
+        m2Alt = stream.Measure()
+        m2Alt.repeatAppend(note.Note('a#4'), 4)
+        v1.append(m2Alt) # embed a complete Measure in v1
+        v1.groups.append('m2-a')
+
+        v2 = variant.Variant()
+        m2Alt = stream.Measure()
+        m2Alt.repeatAppend(note.Note('b-4'), 4)
+        v2.append(m2Alt) # embed a complete Measure in v1
+        v2.groups.append('m2-b')
+
+
+        # insert the variant at the desired location
+        s.insert(4, v1)
+        s.insert(4, v2)
+
+
+        self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
+        self.assertEqual(len(s.variants), 2)
+
+
+        s.activateVariants(group='m2-a')
+        self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'A#', 'A#', 'A#', 'A#', 'D', 'D', 'D', 'D']")
+        self.assertEqual(len(s.variants), 2)
+
+
+        # if we try the same group twice, it is now not active, so there is no change
+        s.activateVariants(group='m2-a')
+        self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'A#', 'A#', 'A#', 'A#', 'D', 'D', 'D', 'D']")
+        self.assertEqual(len(s.variants), 2)
+
+
+        # activate a different variant
+        s.activateVariants('m2-b')
+        self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'B-', 'B-', 'B-', 'B-', 'D', 'D', 'D', 'D']")
+        self.assertEqual(len(s.variants), 2)
+
+        # TODO: 
+        # we now have 2 variants that have been stripped of their groups
+        match = [e.groups for e in s.variants]
+        self.assertEqual(str(match), '[[], []]')
+
+
+    def testActivateVariantsC(self):
+        '''This tests a two-measure variant
+        '''
+        from music21 import stream, note, variant
+        s = stream.Stream()
+        s.repeatAppend(note.Note('d2'), 12)
+        s.makeMeasures(inPlace=True)
+
+        v1 = variant.Variant()
+        m2Alt = stream.Measure()
+        m2Alt.repeatAppend(note.Note('G#4'), 4)
+        v1.append(m2Alt) # embed a complete Measure in v1
+        m3Alt = stream.Measure()
+        m3Alt.repeatAppend(note.Note('A#4'), 4)
+        v1.append(m3Alt) # embed a complete Measure in v1
+
+        # insert the variant at the desired location
+        s.insert(4, v1)
+
+        self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
+        self.assertEqual(len(s.variants), 1)
+
+        s.activateVariants()
+
+        self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'G#', 'G#', 'G#', 'G#', 'A#', 'A#', 'A#', 'A#']")
+        self.assertEqual(len(s.variants), 1)
+
+        # can restore the removed two measures
+        s.activateVariants()
+
+        self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
+        self.assertEqual(len(s.variants), 1)
+
+
+
+    def testActivateVariantsD(self):
+        '''This tests a note-level variant
+        '''
+
+        from music21 import stream, note, variant
+        s = stream.Stream()
+        s.repeatAppend(note.Note('d2'), 12)
+
+        v = variant.Variant()
+        v.append(note.Note('G#4'))
+        v.append(note.Note('a#4'))
+        v.append(note.Note('c#5'))
+
+        s.insert(5, v)
+
+        self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
+        self.assertEqual(len(s.notes), 12)
+        self.assertEqual(len(s.variants), 1)
+        
+        s.activateVariants()
+
+        self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'G#', 'A#', 'C#', 'D', 'D', 'D', 'D']")
+        self.assertEqual(len(s.notes), 12)
+        self.assertEqual(len(s.variants), 1)
+        s.show()
+
+        s.activateVariants()
+
+        self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
+        self.assertEqual(len(s.notes), 12)
+        self.assertEqual(len(s.variants), 1)
+
+        # note that if the start times of each component do not match, the
+        # variant part will not be matched
+
+
+    def testActivateVariantsD(self):
+        '''This tests a note-level variant with miss-matched rhythms
+        '''
+        from music21 import stream, note, variant
+        s = stream.Stream()
+        s.repeatAppend(note.Note('d2'), 12)
+
+        v = variant.Variant()
+        v.append(note.Note('G#4', quarterLength=.5))
+        v.append(note.Note('a#4', quarterLength=1.5))
+        v.append(note.Note('c#5', quarterLength=1))
+
+        s.insert(5, v)
+
+        self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
+        self.assertEqual(len(s.notes), 12)
+        self.assertEqual(len(s.variants), 1)
+        
+        s.activateVariants()
+
+        # TODO
+        # this only matches the Notes that start at the same position 
+
+        self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'G#', 'D', 'C#', 'D', 'D', 'D', 'D']")
+        self.assertEqual(len(s.notes), 12)
+        self.assertEqual(len(s.variants), 1)
+
+
+        self.assertEqual(str([p for p in s.variants[0].elements]), "[<music21.note.Note D>, <music21.note.Note D>]")
+
+
+
 
 
 #-------------------------------------------------------------------------------
