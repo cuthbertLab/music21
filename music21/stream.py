@@ -9566,6 +9566,8 @@ class Stream(music21.Music21Object):
             return None
 
 
+    #---------------------------------------------------------------------------
+    # Variant control
     
             
         

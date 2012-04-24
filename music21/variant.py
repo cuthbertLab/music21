@@ -20,47 +20,66 @@ environLocal = environment.Environment(_MOD)
 
 
 
-# Variant as base class Variant, as a subclass
-# try to use __getattr__ 
-# __setattr__
-# automatically defer all calls except flat, highest time
 
 
 class Variant(music21.Music21Object):
     '''A Music21Object that stores elements like a Stream, but does not represent itself externally a a Stream
 
-    >>> from music21 import variant
-    >>> o = variant.Variant()
+    >>> from music21 import *
+    >>> v = variant.Variant()
+    >>> v.repeatAppend(note.Note(), 8)
+    >>> len(v.notes)
+    8
+    >>> v.highestTime
+    0.0
+    >>> v.duration # handled by Music21Object
+    <music21.duration.Duration 0.0>
+    >>> v.isStream
+    False
+
+    >>> s = stream.Stream()
+    >>> s.append(v)
+    >>> s.append(note.Note())
+    >>> s.highestTime
+    1.0
+    >>> s.show('t')
+    {0.0} <music21.variant.Variant object at ...>
+    {0.0} <music21.note.Note C>
+    >>> s.flat.show('t')
+    {0.0} <music21.variant.Variant object at ...>
+    {0.0} <music21.note.Note C>
     '''
     # this copies the init of Streams
     def __init__(self, givenElements=None, *args, **keywords):
         music21.Music21Object.__init__(self)
 
         self.exposeTime = False
-
         self._stream = stream.Stream(givenElements=givenElements, 
                                     *args, **keywords)
 
 
-
     def __getattr__(self, attr):
-        '''This will call all already-defined 
+        '''This defers all calls not defined in this Class to calls on the privately contained Stream.
         '''
-        environLocal.pd(['relaying unmatched attribute request to private Stream'])
+        #environLocal.pd(['relaying unmatched attribute request to private Stream'])
+#         if attr in ['flat']: # if need to mask ability to flatten
+#             raise AttributeError
         try:
             return getattr(self._stream, attr)
         except:
             raise
         
 
-    def append(self, others):
-        self._stream.append(others)
-
-    def insert(self, offsetOrItemOrList, itemOrNone=None, 
-                     ignoreSort=False, setActiveSite=True):
-        self._stream.insert(offsetOrItemOrList=offsetOrItemOrList, 
-                    itemOrNone=itemOrNone, ignoreSort=ignoreSort, 
-                    setActiveSite=setActiveSite)
+#     def append(self, others):
+#         self._stream.append(others)
+# 
+#     def insert(self, offsetOrItemOrList, itemOrNone=None, 
+#                      ignoreSort=False, setActiveSite=True):
+#         '''This method delegates calls to the Stream.insert() method for the private Stream contained within this Variant.
+#         '''
+#         self._stream.insert(offsetOrItemOrList=offsetOrItemOrList, 
+#                     itemOrNone=itemOrNone, ignoreSort=ignoreSort, 
+#                     setActiveSite=setActiveSite)
 
 
     def _getHighestTime(self):
@@ -70,6 +89,14 @@ class Variant(music21.Music21Object):
             return 0.0
 
     highestTime = property(_getHighestTime, doc='''
+        This property masks calls to Stream.highestTime. Assuming `exposeTime` is False, this always returns zero, making the Variant always take zero time. 
+
+        >>> from music21 import *
+        >>> v = variant.Variant()
+        >>> v.append(note.Note(quarterLength=4))
+        >>> v.highestTime
+        0.0
+
         ''')
 
 
@@ -80,11 +107,35 @@ class Variant(music21.Music21Object):
             return 0.0
 
     highestOffset = property(_getHighestOffset, doc='''
+        This property masks calls to Stream.highestOffset. Assuming `exposeTime` is False, this always returns zero, making the Variant always take zero time. 
+
+        >>> from music21 import *
+        >>> v = variant.Variant()
+        >>> v.append(note.Note(quarterLength=4))
+        >>> v.highestOffset
+        0.0
+
         ''')
 
 
     def show(self, fmt=None, app=None):
-        '''Must override manually, otherwise Music21Object.show() is called.
+        '''
+        Call show() on the Stream contained by this Variant. 
+
+        This method must be overridden, otherwise Music21Object.show() is called.
+
+        >>> from music21 import *
+        >>> v = variant.Variant()
+        >>> v.repeatAppend(note.Note(quarterLength=.25), 8)
+        >>> v.show('t')
+        {0.0} <music21.note.Note C>
+        {0.25} <music21.note.Note C>
+        {0.5} <music21.note.Note C>
+        {0.75} <music21.note.Note C>
+        {1.0} <music21.note.Note C>
+        {1.25} <music21.note.Note C>
+        {1.5} <music21.note.Note C>
+        {1.75} <music21.note.Note C>
         '''
         self._stream.show(fmt=fmt, app=app)
 
