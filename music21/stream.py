@@ -46,7 +46,7 @@ from music21 import tie
 from music21 import metadata
 from music21 import repeat
 from music21 import tempo
-
+from collections import defaultdict
 
 from music21 import environment
 _MOD = "stream.py"
@@ -210,7 +210,9 @@ class Stream(music21.Music21Object):
         self.flattenedRepresentationOf = None 
         
         self._cache = common.DefaultHash()
-
+        self.analysisData = defaultdict(list)
+        self.analysisData['ResultDict'] = defaultdict(dict)
+        
         if givenElements is not None:
             # TODO: perhaps convert a single element into a list?
             try:
@@ -1082,7 +1084,7 @@ class Stream(music21.Music21Object):
                 newValue = copy.deepcopy(self._derivation)
                 newValue.setContainer(new)
                 setattr(new, name, newValue)
-            elif name == '_cache':
+            elif name == '_cache' or name == 'analysisData':
                 continue # skip for now
             elif name == '_elements':
                 # must manually add elements to 
@@ -1111,8 +1113,12 @@ class Stream(music21.Music21Object):
 #                     part, name])
 #                 raise StreamException('streams as attributes requires special handling')
             # use copy.deepcopy on all other elements, including contexts    
-            else: 
-                setattr(new, name, copy.deepcopy(part, memo))
+            else:
+                try: 
+                    deeplyCopiedObject = copy.deepcopy(part, memo)
+                    setattr(new, name, deeplyCopiedObject)
+                except TypeError:
+                    raise StreamException('Cannot deepcopy %s probably because it requires a default value in instantiation.' % name)
 
         # do after all other copying
         new._idLastDeepCopyOf = id(self)
