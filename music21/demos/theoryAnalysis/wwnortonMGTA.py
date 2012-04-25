@@ -149,9 +149,9 @@ class wwnortonExercise(object):
         self._partOffsetsToZero()
         return newPart
     
-    def compareMarkerLyricAnswer(self,ta,taKey,markerPartName,offsetFunc,lyricFunc):
+    def compareMarkerLyricAnswer(self,score,taKey,markerPartName,offsetFunc,lyricFunc):
         markerPart = self.studentExercise.parts[self.pn[markerPartName]]
-        for resultObj in ta.resultDict[taKey]:
+        for resultObj in score.analysisData['ResultDict'][taKey]:
             offset = offsetFunc(resultObj)
             correctLyric = lyricFunc(resultObj)
             markerNote = markerPart.flat.getElementAtOrBefore(offset,classList=['Note'])
@@ -177,7 +177,7 @@ class ex11_1_I(wwnortonExercise):
     '''
     def __init__(self):
         wwnortonExercise.__init__(self)
-        self.xmlFilename = 'S11_1_I_A.xml'
+        self.xmlFilename = '11_1_I_A.xml'
         self.pn['part1'] = 0
         self.pn['part2'] = 1
         self.loadOriginalExercise()
@@ -188,16 +188,15 @@ class ex11_1_I(wwnortonExercise):
         self.addMarkerPartFromExisting('part1', newPartName='harmIntervals',newPartTitle="3. Harmonic Intervals", rhythmType='chordify', direction = "below")
         
     def checkExercise(self):
-        ta = theoryAnalyzer.TheoryAnalyzer(self.studentExercise)
-        ta.keyMeasureMap = {0:'F'}
-        ta.identifyMotionType(self.pn['part1'],self.pn['part2'],dictKey='motionType')
-        ta.identifyScaleDegrees(self.pn['part1'],dictKey='p1ScaleDegrees')
-        ta.identifyHarmonicIntervals(self.pn['part1'],self.pn['part2'],dictKey='harmIntervals')
+        theoryAnalyzer.setKeyMeasureMap(self.studentExercise,{0:'F'})
+        theoryAnalyzer.identifyMotionType(self.studentExercise, self.pn['part1'],self.pn['part2'],dictKey='motionType')
+        theoryAnalyzer.identifyScaleDegrees(self.studentExercise, self.pn['part1'],dictKey='p1ScaleDegrees')
+        theoryAnalyzer.identifyHarmonicIntervals(self.studentExercise, self.pn['part1'],self.pn['part2'],dictKey='harmIntervals')
         
         scaleDegreeOffsetFunc = lambda resultObj: resultObj.n.offset
         scaleDegreeLyricTextFunc = lambda resultObj: resultObj.value
         
-        self.compareMarkerLyricAnswer(ta,taKey='p1ScaleDegrees',\
+        self.compareMarkerLyricAnswer(self.studentExercise,taKey='p1ScaleDegrees',\
                                 markerPartName='p1ScaleDegrees',\
                                 offsetFunc = scaleDegreeOffsetFunc,\
                                 lyricFunc = scaleDegreeLyricTextFunc)
@@ -205,7 +204,7 @@ class ex11_1_I(wwnortonExercise):
         motionTypeOffsetFunc = lambda resultObj: resultObj.offset()
         motionTypeLyricTextFunc = lambda resultObj: resultObj.value[0]
         
-        self.compareMarkerLyricAnswer(ta,taKey='motionType',\
+        self.compareMarkerLyricAnswer(self.studentExercise,taKey='motionType',\
                                 markerPartName='motionType',\
                                 offsetFunc = motionTypeOffsetFunc,\
                                 lyricFunc = motionTypeLyricTextFunc)
@@ -214,15 +213,15 @@ class ex11_1_I(wwnortonExercise):
         
         harmonicIntervalTextFunc = lambda resultObj: resultObj.value 
         
-        self.compareMarkerLyricAnswer(ta,taKey='harmIntervals',\
+        self.compareMarkerLyricAnswer(self.studentExercise,taKey='harmIntervals',\
                                 markerPartName='harmIntervals',\
                                 offsetFunc = harmonicIntervalOffsetFunc,\
                                 lyricFunc = harmonicIntervalTextFunc)
-    
+'''    
 class ex11_1_II(wwnortonExercise):
-    '''
+    
     Assignment 11.1 II. Resolving chordal dissonances
-    '''
+    
     def __init__(self):
         wwnortonExercise.__init__(self)
         self.xmlFilename = '11_1_II.xml'
@@ -236,31 +235,32 @@ class ex11_1_II(wwnortonExercise):
         self.addMarkerPartFromExisting('part1', newPartName='harmIntervals',newPartTitle="3. Harmonic Intervals", rhythmType='chordify', direction = "below")
         
     def checkExercise(self):
-        ta = theoryAnalyzer.TheoryAnalyzer(self.studentExercise)
-        ta.keyMeasureMap = {1:'C',2:'C',3:'d',4:'F',5:'G',6:'e',7:'g',8:'B-',9:'A-',10:'E',11:'f',12:'c#'}
         
-        ta.identifyScaleDegrees(self.pn['part1'],dictKey='p1ScaleDegrees')
-        ta.identifyScaleDegrees(self.pn['part2'],dictKey='p2ScaleDegrees')
-        ta.identifyHarmonicIntervals(self.pn['part1'],self.pn['part2'],dictKey='harmIntervals')
+        theoryAnalyzer.setKeyMeasureMap(self.studentExercise, {1:'C',2:'C',3:'d',4:'F',5:'G',6:'e',7:'g',8:'B-',9:'A-',10:'E',11:'f',12:'c#'})
+        
+        theoryAnalyzer.identifyScaleDegrees(self.studentExercise,self.pn['part1'],dictKey='p1ScaleDegrees')
+        theoryAnalyzer.identifyScaleDegrees(self.studentExercise,self.pn['part2'],dictKey='p2ScaleDegrees')
+        theoryAnalyzer.identifyHarmonicIntervals(self.studentExercise,self.pn['part1'],self.pn['part2'],dictKey='harmIntervals')
         
         scaleDegreeLyricTextFunc = lambda resultObj: resultObj.value
-        self.compareMarkerLyricAnswer(ta,taKey='p1ScaleDegrees',\
+        self.compareMarkerLyricAnswer(self.studentExercise,taKey='p1ScaleDegrees',\
                                 markerPartName='p1ScaleDegrees',\
                                 lyricFunc = scaleDegreeLyricTextFunc)
         
-        self.compareMarkerLyricAnswer(ta,taKey='p2ScaleDegrees',\
+        self.compareMarkerLyricAnswer(self.studentExercise,taKey='p2ScaleDegrees',\
                                 markerPartName='p2ScaleDegrees',\
                                 lyricFunc = scaleDegreeLyricTextFunc)
         
         harmonicIntervalOffsetFunc = lambda resultObj: resultObj.offset()
         harmonicIntervalTextFunc = lambda resultObj: resultObj.value 
         
-        self.compareMarkerLyricAnswer(ta,taKey='harmIntervals',\
+        self.compareMarkerLyricAnswer(self.studentExercise,taKey='harmIntervals',\
                                 markerPartName='harmIntervals',\
                                 offsetFunc = harmonicIntervalOffsetFunc,\
                                 lyricFunc = harmonicIntervalTextFunc)    
     
-    
+'''
+            
 class ex11_3_A(wwnortonExercise):
     '''
     Assignment 11.3 A. Writing a note-to-note counterpoint in eighteenth-century style
@@ -276,22 +276,20 @@ class ex11_3_A(wwnortonExercise):
         self.addMarkerPartFromExisting('part2', newPartName='harmIntervals',newPartTitle="1. Harmonic Intervals", direction = "below")
         
     def checkExercise(self):
-        ta = theoryAnalyzer.TheoryAnalyzer(self.studentExercise)
-        ta.keyMeasureMap = {0:'G',5:'D',8:'F'}
-        ta.identifyHarmonicIntervals(self.pn['part1'],self.pn['part2'],dictKey='harmIntervals')
-        ta.identifyCommonPracticeErrors(self.pn['part1'],self.pn['part2'],dictKey='counterpointErrors')
+        theoryAnalyzer.setKeyMeasureMap(self.studentExercise, {0:'G',5:'D',8:'F'})
+        theoryAnalyzer.identifyHarmonicIntervals(self.studentExercise, self.pn['part1'],self.pn['part2'],dictKey='harmIntervals')
+        theoryAnalyzer.identifyCommonPracticeErrors(self.studentExercise, self.pn['part1'],self.pn['part2'],dictKey='counterpointErrors')
                 
-        self.textResultString = ta.getResultsString(['counterpointErrors'])
+        self.textResultString = theoryAnalyzer.getResultsString(self.studentExercise, ['counterpointErrors'])
         
         harmonicIntervalOffsetFunc = lambda resultObj: resultObj.offset()
         
         harmonicIntervalTextFunc = lambda resultObj: resultObj.value 
-        self.compareMarkerLyricAnswer(ta,taKey='harmIntervals',\
+        self.compareMarkerLyricAnswer(self.studentExercise,taKey='harmIntervals',\
                                 markerPartName='harmIntervals',\
                                 offsetFunc = harmonicIntervalOffsetFunc, \
                                 lyricFunc = harmonicIntervalTextFunc)
         
-
 
 
 # ------------------------------------------------------------
@@ -307,10 +305,8 @@ class TestExternal(unittest.TestCase):
         pass
     
     def demo(self):
-        ex = ex11_3_A()
-        #ex.show()
-        #sc = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/Exercises/11_3_A_1_completed2.xml')
-        sc = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/Exercises/11_3_A_1_completed.xml')
+        ex = ex11_1_I()
+        sc = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/SampleStudentResponses/S11_1_IA_completed.xml')
         ex.loadStudentExercise(sc)
         ex.checkExercise()
         ex.showStudentExercise()

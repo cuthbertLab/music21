@@ -241,7 +241,7 @@ class VerticalSliceNTupletTheoryResult(TheoryResult):
         '''       
         for vsNum, partNumList in editorialMarkDict.items():
             for partNum in partNumList:
-                self.vsnt.verticalSlices[vsNum].noteFromPart(partNum).editorial.misc[editorialDictKey] = editorialValue
+                self.vsnt.verticalSlices[vsNum].getObjectsByPart(0, classFilterList=['Note']).editorial.misc[editorialDictKey] = editorialValue
 
 
 class Test(unittest.TestCase):
