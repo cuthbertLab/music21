@@ -68,20 +68,18 @@ def streamToBraille(music21Stream, debug=False, **keywords):
         allBrailleLines = []
         for music21Metadata in music21Stream.getElementsByClass(metadata.Metadata):
             if music21Metadata.title is not None:
-                allBrailleLines.append(music21Metadata.title)
+                allBrailleLines.append(unicode(music21Metadata.title, "utf-8"))
             if music21Metadata.composer is not None:
-                allBrailleLines.append(music21Metadata.composer)
+                allBrailleLines.append(unicode(music21Metadata.composer, "utf-8"))
         for p in music21Stream.getElementsByClass(stream.Part):
             try:
                 music21Part = p.makeNotation(cautionaryNotImmediateRepeat=False)
-            except Exception as e:
-                allBrailleLines.append("Make Notation bug / {0}".format(e))
-                continue
-            try:
-                braillePart = partToBraille(music21Part, debug, **keywords)
-                allBrailleLines.append(braillePart)
-            except Exception as e:
-                allBrailleLines.append("Transcription bug / {0}".format(e))
+            except stream.StreamException:
+                from music21.abc import translate as abcTrans
+                abcTrans.reBar(p)
+                music21Part = p.makeNotation(cautionaryNotImmediateRepeat=False)
+            braillePart = partToBraille(music21Part, debug, **keywords)
+            allBrailleLines.append(braillePart)            
         return u"\n".join(allBrailleLines)
     if isinstance(music21Stream, stream.Opus):
         pass
