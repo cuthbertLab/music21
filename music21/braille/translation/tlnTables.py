@@ -8,13 +8,9 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-"""
-TODO:
+import pprint
 
--> Map bestNames to Instrument Objects
-"""
-
-englishFrench = {u'a': [u'la'],
+englishToFrench = {u'a': [u'la'],
  u'a 2': [u'\xe0 2', u'a deux'],
  u'a double flat': [u'la double b\xe9mol'],
  u'a double sharp': [u'la double di\xe8se'],
@@ -54,7 +50,7 @@ englishFrench = {u'a': [u'la'],
                u'armonica de verre'],
  u'as': [u'comme'],
  u'at': [u'\xe0'],
- u'at (near) the sounding board': [u'pr\xe8s de la table'],
+ u'at the sounding board': [u'pr\xe8s de la table'],
  u'at a moderate speed': [u'mod\xe9r\xe9'],
  u'at the bridge': [u'sur le chevalet',
                     u'pr\xe8s du chevalet',
@@ -655,7 +651,7 @@ englishFrench = {u'a': [u'la'],
  u'zills': [u'cymbales digitales', u'sagattes', u'sagates', u'zill'],
  u'zils': [u'cymbales digitales', u'sagattes', u'sagates', u'zill']}
 
-englishGerman = {u'a': [u'ein', u'a'],
+englishToGerman = {u'a': [u'ein', u'a'],
  u'a double flat': [u'ases'],
  u'a double sharp': [u'aisis'],
  u'a flat': [u'as'],
@@ -684,7 +680,7 @@ englishGerman = {u'a': [u'ein', u'a'],
  u'antique cymbals': [u'crotales', u'cymbales antiques', u'antike cymbel'],
  u'anvil': [u'amboss', u'ambo\xdf'],
  u'armonica': [u'gl\xe4serspiel', u'glasharmonika'],
- u'at (near) the sounding board': [u'nahe am korpus anzupfen'],
+ u'at the sounding board': [u'nahe am korpus anzupfen'],
  u'at a moderate speed': [u'm\xe4ssig'],
  u'at a steady speed': [u'gehend'],
  u'at the bridge': [u'am steg'],
@@ -1251,7 +1247,7 @@ englishGerman = {u'a': [u'ein', u'a'],
  u'zills': [u'fingerzimbeln'],
  u'zils': [u'fingerzimbeln']}
 
-englishItalian = {u'a': [u'la'],
+englishToItalian = {u'a': [u'la'],
  u'a 2': [u'a due'],
  u'a double flat': [u'la doppio bemolle'],
  u'a double sharp': [u'la doppio diesis'],
@@ -1294,7 +1290,7 @@ englishItalian = {u'a': [u'la'],
  u'as if': [u'quasi'],
  u'as soft as possible': [u'estinto'],
  u'at': [u'a'],
- u'at (near) the sounding board': [u'presso la tavola'],
+ u'at the sounding board': [u'presso la tavola'],
  u'at choice': [u'ad libitum'],
  u'at pleasure': [u'a piacere'],
  u'at the bridge': [u'sul ponticello'],
@@ -2094,7 +2090,7 @@ englishItalian = {u'a': [u'la'],
  u'zills': [u'cimbalini'],
  u'zils': [u'cimbalini']}
 
-englishSpanish = {u'a': [u'la'],
+englishToSpanish = {u'a': [u'la'],
  u'a double flat': [u'la doble bemol'],
  u'a double sharp': [u'la doble sostenido'],
  u'a flat': [u'la bemol'],
@@ -2609,7 +2605,7 @@ englishSpanish = {u'a': [u'la'],
  u'zills': [u'cr\xf3talos', u'chinchines'],
  u'zils': [u'cr\xf3talos', u'chinchines']}
 
-englishRussian = {u'alto': [u"al't", u"kontral'to"],
+englishToRussian = {u'alto': [u"al't", u"kontral'to"],
  u'band': [u'dukhovoi orkestr'],
  u'baritone': [u'bariton'],
  u'bass': [u'bas'],
@@ -2685,7 +2681,7 @@ englishRussian = {u'alto': [u"al't", u"kontral'to"],
  u'woodwind instrument': [u'dereviannyi dukhvoi instrument'],
  u'xylophone': [u'ksilofon']}
 
-englishAbbreviation = {u'accented': [u'sf', u'sfz'],
+englishToAbbreviation = {u'accented': [u'sf', u'sfz'],
  u'accordion': [u'accdn', u'acc.'],
  u'alto': [u'a.'],
  u'alto clarinet': [u'a.cl.', u'a.kl.', u'alto cl.'],
@@ -2817,3 +2813,131 @@ englishAbbreviation = {u'accented': [u'sf', u'sfz'],
  u'wind machine': [u'windmachine'],
  u'wood block': [u'wd.bl.', u'wd. bl.'],
  u'xylophone': [u'xyl.', u'xil.']}
+
+#------------------------------------------------------------------------------
+# Methods to generate extra tables in tlnLookup.py
+
+# Method:
+# Take all dictionaries in tlnLookup.py
+# Rewrite appropriate dictionaries.
+# Rewrite all information to tlnLookup.py
+
+def rewriteLookup():
+    # define all dictionaries first,
+    # to avoid rewriting the lookup
+    # file if there are errors in
+    # transcription.
+    # ------------------------------
+    allDicts = [("englishToAll", englishToAll()), ("allToEnglish", allToEnglish()),
+                ("stringToInstrument", stringToInstrument()),
+                ("bestNameToClassName", instrBestNameToClassName())]
+    # ------------------------------
+    import os
+    fn = os.path.dirname(__file__) + os.path.sep + "tlnLookup.py"
+    f = open(fn, "w")
+    f.write("# -*- coding: utf-8 -*-\n")
+    f.write("#-------------------------------------------------------------------------------\n")
+    f.write("# Name:         {0}\n".format(fn))
+    f.write("# Purpose:      Bidirectional musical translation\n")
+    f.write("# Authors:      Jose Cabal-Ugaz\n")
+    f.write("#\n")
+    f.write("# Copyright:    (c) 2012 The music21 Project\n")
+    f.write("# License:      LGPL\n")
+    f.write("#-------------------------------------------------------------------------------\n")
+    f.write("# WARNING: Do not update file. Generated automatically.\n# Add or subtract elements from py instead.\n\n")
+    f.write("from music21.braille.translation import tlnTables\n\n")
+    f.write("englishToFrench = tlnTables.englishToFrench\n")
+    f.write("englishToGerman = tlnTables.englishToGerman\n")
+    f.write("englishToItalian = tlnTables.englishToItalian\n")
+    f.write("englishToSpanish = tlnTables.englishToSpanish\n")
+    f.write("englishToRussian = tlnTables.englishToRussian\n")
+    f.write("englishToAbbreviation = tlnTables.englishToAbbreviation")
+    for (dictName, dict) in allDicts:
+        f.write("\n\n{0} = \\\n".format(dictName))
+        f.write(pprint.pformat(dict))
+    f.close()
+
+
+
+def stringToInstrument():
+    import inspect
+    import re
+    from music21 import instrument
+    
+    allClasses = [tup[1] for tup in inspect.getmembers(instrument, inspect.isclass) 
+                  if issubclass(tup[1], instrument.Instrument)]
+    validInstruments = []
+    
+    for classDef in allClasses:
+        inst = classDef()
+        if not inst.bestName() is None and not len(inst.bestName()) == 0:
+            validInstruments.append((inst.bestName(), classDef.__name__))
+
+    transDict = englishToAll()
+    instrDict = {}
+
+    for (bestName, className) in validInstruments:
+        instName = re.compile(bestName.lower())
+        highestNumWords = 0
+        for englishTerm in transDict.keys():
+            find = re.match(instName, englishTerm)
+            if find is not None:
+                newName = "instrument.{0}".format(className)
+                if englishTerm not in instrDict or len(newName) > len(instrDict[englishTerm]):
+                    instrDict[englishTerm] = newName
+
+    return instrDict
+
+def updateEnglishToAll(allDicts):
+    englishToAll = None
+    for (dictName, dictInfo) in allDicts:
+        if dictName == "englishToAll":
+            englishToAll = dictInfo
+
+    for (dictName, dictInfo) in allDicts:
+        if dictName.endswith("ToEnglish"):
+            for (foreign, english) in dictInfo.items():
+                allToEnglish[foreign] = english
+
+    # if name ends in "English", 
+    
+    allDicts = [englishToFrench,englishToGerman,englishToAbbreviation,
+                englishToItalian,englishToSpanish, englishToRussian]
+    masterDict = {}
+    
+    for (key, value) in sorted(englishToFrench.items()):
+        if key not in masterDict:
+            masterDict[key] = {}
+        masterDict[key]["french"] = value
+    for (key, value) in sorted(englishToGerman.items()):
+        if key not in masterDict:
+            masterDict[key] = {}
+        masterDict[key]["german"] = value
+    for (key, value) in sorted(englishToItalian.items()):
+        if key not in masterDict:
+            masterDict[key] = {}
+        masterDict[key]["italian"] = value
+    for (key, value) in sorted(englishToSpanish.items()):
+        if key not in masterDict:
+            masterDict[key] = {}
+        masterDict[key]["spanish"] = value
+    for (key, value) in sorted(englishToRussian.items()):
+        if key not in masterDict:
+            masterDict[key] = {}
+        masterDict[key]["russian"] = value
+    for (key, value) in sorted(englishToAbbreviation.items()):
+        if key not in masterDict:
+            masterDict[key] = {}
+        masterDict[key]["abbreviation"] = value
+        
+    return masterDict
+
+#------------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    pass
+    #rewriteLookup()
+    #pprint.pprint(stringToInstrument())
+
+#------------------------------------------------------------------------------
+# eof
