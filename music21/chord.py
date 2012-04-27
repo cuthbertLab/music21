@@ -115,7 +115,7 @@ class Chord(note.NotRest):
         # keep it here in case we have no notes
         #self.duration = None  # inefficient, since note.Note.__init__ set it
         #del(self.pitch)
-
+        
         for n in notes:
             if isinstance(n, music21.pitch.Pitch):
                 # assign pitch to a new Note
@@ -1317,7 +1317,7 @@ class Chord(note.NotRest):
         
         
         As mentioned above, the property can also get its scale from context if
-        the chord is embedded in a Stream.  Let's great the same V in f#-minor
+        the chord is embedded in a Stream.  Let's create the same V in f#-minor
         again, but give it a context of c-sharp minor, and then c-minor instead:
         
         
@@ -1347,7 +1347,7 @@ class Chord(note.NotRest):
         '''
         from music21 import scale
         # roman numerals have this built in as the key attribute
-        if hasattr(self, 'key') and self.key is not None: 
+        if hasattr(self, 'key') and self.key is not None:
             # Key is a subclass of scale.DiatonicScale
             sc = self.key
         else:

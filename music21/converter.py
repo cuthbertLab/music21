@@ -913,6 +913,7 @@ class Converter(object):
         >>> c.parseURL(jeanieLightBrownURL)
         >>> jeanieStream = c.stream
         >>> jeanieStream.parts[0].measure(2).notes.show('text')
+        {0.0} <music21.harmony.ChordSymbol F>
         {0.0} <music21.note.Note C>
         {3.0} <music21.note.Note A>
         '''

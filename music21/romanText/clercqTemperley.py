@@ -656,7 +656,6 @@ class CTSong(object):
                 elif x[0].upper() in starters:
                     rn = music21.roman.RomanNumeral(atom, currentKey)
                     rn.duration.quarterLength = self._getDuration(indexofatom, splitFile, timeSig)
-                    
                     outputStream.append(rn)
                     if self._stringhasDotsandBars(expressionString):
                         for x in rn.pitches:
@@ -799,7 +798,7 @@ class CTSong(object):
         380.0
     
         '''
-        scoreObj = music21.stream.Score() 
+        scoreObj = music21.stream.Stream() 
  
         allSubsections = {}
         currentSubsectionName = None
@@ -859,7 +858,6 @@ class CTSong(object):
                 timeSigList.append([splitFile[splitFile.index(x) + 1], x[1:-1]])
         
         for atom in splitFile:
-           
             indexofatom = indexofatom + 1
             for element, temptime in timeSigList:
                 if atom.replace(':','') == element.replace('$',''):
@@ -989,7 +987,7 @@ class CTSong(object):
                         #should skip all bar lines and dots...
                         if atom != '|' and atom != '.':
                             raise CTSongException('invalid character found: %s' % atom)               
-
+               
                 
             listofRomans = currentSubsectionContents.flat.getElementsByClass(music21.roman.RomanNumeral)
             if putLyricOnNextItemInStream and len(listofRomans) >= 1:
@@ -1284,21 +1282,43 @@ class Test(unittest.TestCase):
 class TestExternal(unittest.TestCase):
     def runTest(self):
         pass
-    def testA(self):
+    
+    def testB(self):
+        from music21.romanText import clercqTemperley
+        BlitzkriegBopCT = '''
+% Blitzkrieg Bop
+
+BP: I | IV V | %THIS IS A COMMENT
+In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4
+Vr: $BP*3 I IV | I |
+Br: IV | | I | IV I | IV | | ii | IV V |
+Co: R |*4 I |*4
+S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co
+'''
+
+        s = clercqTemperley.CTSong(BlitzkriegBopCT)
+        scoreObj = s.toScore()
+        scoreObj.show()
+
+    def xtestA(self):
         from music21.romanText import clercqTemperley
         import os
         dt = 'C:/clercqTemperley/dt'
         tdc = 'C:/clercqTemperley/tdc'
-    
-        for x in os.listdir(dt):
+        '''
+        for x in os.listdir(tdc):
             print x
-            f = open(os.path.join(dt, x), 'r')
+            f = open(os.path.join(tdc, x), 'r')
             txt = f.read()
 
             s = clercqTemperley.CTSong(txt)
-            print s.toScore().highestOffset
+            for chord in s.toScore().flat.getElementsByClass('Chord'):
+                try:
+                    x = chord.pitches
+                except:
+                    print x, chord
         
-        '''
+        
         for num in range(1, 200):
             try:
                 fileName = 'C:\\dt\\%s.txt' % num
@@ -1319,9 +1339,9 @@ class TestExternal(unittest.TestCase):
 _DOC_ORDER = [CTSong, CTRule]
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
-    #from music21.romanText import clercqTemperley
-    #test = clercqTemperley.TestExternal()
-    #test.testA()
+    #music21.mainTest(Test)
+    from music21.romanText import clercqTemperley
+    test = clercqTemperley.TestExternal()
+    test.testB()
 #------------------------------------------------------------------------------
 # eof

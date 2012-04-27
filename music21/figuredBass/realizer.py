@@ -61,7 +61,7 @@ from music21.figuredBass import notation
 from music21.figuredBass import realizerScale
 from music21.figuredBass import rules
 from music21.figuredBass import segment
-from music21 import harmony, roman
+#from music21 import harmony, roman
 
 _MOD = 'realizer.py'
 
@@ -201,7 +201,7 @@ class FiguredBassLine(object):
         Use this method to add (bassNote, notationString) pairs to the bass line. Elements
         are realized in the order they are added.
         
-        
+        >>> from music21 import *
         >>> from music21.figuredBass import realizer
         >>> from music21 import key
         >>> from music21 import meter
@@ -229,9 +229,9 @@ class FiguredBassLine(object):
             self._fbList.append((bassObject, notationString)) #a bass note, and a notationString
             addLyricsToBassNote(bassObject, notationString) 
         #!---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects --------!     
-        elif isinstance(bassObject, harmony.ChordSymbol):
+        elif isinstance(bassObject, music21.harmony.ChordSymbol):
             self._fbList.append(bassObject) #a harmony object
-        elif isinstance(bassObject, roman.RomanNumeral):
+        elif isinstance(bassObject, music21.roman.RomanNumeral):
             self._fbList.append(bassObject) #a roman Numeral object
         else:
             raise FiguredBassLineException("Not a valid bassObject (only note.Note, harmony.ChordSymbol, and roman.RomanNumeral supported)")
@@ -321,6 +321,7 @@ class FiguredBassLine(object):
         contain :meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`
         for the one note.
         
+        >>> from music21 import *
         >>> from music21.figuredBass import realizer
         >>> from music21.figuredBass import rules
         >>> from music21 import key
@@ -366,7 +367,7 @@ class FiguredBassLine(object):
         for item in self._fbList:
             if isinstance(item, note.Note):
                 break
-            if isinstance(item, roman.RomanNumeral) or isinstance(item, harmony.ChordSymbol): #and item.isClassOrSubclass(harmony.Harmony):
+            if isinstance(item, music21.roman.RomanNumeral) or isinstance(item, music21.harmony.ChordSymbol): #and item.isClassOrSubclass(harmony.Harmony):
                 listOfHarmonyObjects = True
                 break
             

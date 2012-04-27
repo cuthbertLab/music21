@@ -2019,7 +2019,6 @@ def chordToMx(c, spannerBundle=None):
     >>> mxNoteList[2].get('chord')
     True
     
-    >>> from music21 import *
     >>> g = note.Note('c4')
     >>> g.notehead = 'diamond'
     >>> h = pitch.Pitch('g3')
@@ -2031,6 +2030,10 @@ def chordToMx(c, spannerBundle=None):
     >>> listOfMxNotes[1].noteheadObj.get('charData')
     'diamond'
     
+    
+    >>> rn = roman.RomanNumeral('V', key.Key('A-'))
+    >>> rn.pitches
+    [E-5, G5, B-5]
     '''
     if spannerBundle is not None and len(spannerBundle) > 0:
         # this will get all spanners that participate with this note
@@ -2388,8 +2391,9 @@ def noteToMxNotes(n, spannerBundle=None):
             # defaults may have been set; need to override here if a grace
             mxNote.set('duration', None)
         # get color from within .editorial using property
-        # only set note-level color for rests, otherwise set notehead
-        if noteColor is not None and n.isRest:
+        # exports color on note tag and notehead tag (there is no consensus on where to 
+        # export the color, so we do it to both
+        if noteColor is not None: # and n.isRest:
             mxNote.set('color', noteColor)
         if n.hideObjectOnPrint == True:
             mxNote.set('printObject', "no")
@@ -2707,6 +2711,12 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                     for sub in objList:
                         sub.voice = voiceId # the voice id is the voice number
                     mxMeasure.componentList += objList
+                elif 'ChordSymbol' in classes:
+                    if obj.writeAsChord:
+                        mxMeasure.componentList += chordToMx(obj, 
+                        spannerBundle=spannerBundle)
+                    else:
+                        mxMeasure.componentList.append(chordSymbolToMx(obj))
                 elif 'Chord' in classes:
                     # increment offset before getting mx, as this way a single
                     # chord provides only one value
@@ -2740,6 +2750,12 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
             if 'Note' in classes:
                 mxMeasure.componentList += noteToMxNotes(obj, 
                     spannerBundle=spannerBundle)
+            elif 'ChordSymbol' in classes:
+                if obj.writeAsChord:
+                    mxMeasure.componentList += chordToMx(obj, 
+                    spannerBundle=spannerBundle)
+                else:
+                    mxMeasure.componentList.append(chordSymbolToMx(obj))
             elif 'Chord' in classes:
                 mxMeasure.componentList += chordToMx(obj, 
                     spannerBundle=spannerBundle)
@@ -2754,8 +2770,6 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                 mxDirection.offset = mxOffset 
                 # positioning dynamics by offset, not position in measure
                 mxMeasure.insert(0, mxDirection)
-            elif 'ChordSymbol' in classes:
-                mxMeasure.componentList.append(chordSymbolToMx(obj))
             elif 'Segno' in classes:
                 mxOffset = int(defaults.divisionsPerQuarter * 
                            obj.getOffsetBySite(mFlat))
@@ -4982,7 +4996,7 @@ spirit</words>
 
         raw = s.musicxml
         # three color indications
-        self.assertEqual(raw.count("color="), 6)
+        self.assertEqual(raw.count("color="), 8) #exports to notehead AND note, so increased from 6 to 8
         # color set at note level only for rest, so only 1
         self.assertEqual(raw.count('note color="#11ff11"'), 1)
     
@@ -4994,7 +5008,7 @@ spirit</words>
         s = converter.parse(testPrimitive.colors01)
         #s.show()
         raw = s.musicxml
-        self.assertEqual(raw.count("color="), 6)
+        self.assertEqual(raw.count("color="), 8) #exports to notehead AND note, so increased from 6 to 8
         # color set at note level only for rest, so only 1
         self.assertEqual(raw.count('note color="#11ff11"'), 1)
 
