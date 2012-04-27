@@ -1299,7 +1299,6 @@ S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co
         s = clercqTemperley.CTSong(BlitzkriegBopCT)
         scoreObj = s.toScore()
         scoreObj.show()
-
     def xtestA(self):
         from music21.romanText import clercqTemperley
         import os
@@ -1339,9 +1338,9 @@ S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co
 _DOC_ORDER = [CTSong, CTRule]
 
 if __name__ == "__main__":
-    #music21.mainTest(Test)
-    from music21.romanText import clercqTemperley
-    test = clercqTemperley.TestExternal()
-    test.testB()
+    music21.mainTest(Test)
+   # from music21.romanText import clercqTemperley
+   # test = clercqTemperley.TestExternal()
+   # test.testB()
 #------------------------------------------------------------------------------
 # eof
