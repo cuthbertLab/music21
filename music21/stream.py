@@ -10001,6 +10001,10 @@ class Measure(Stream):
         if oldClef is not None:
             #environLocal.printDebug(['removing clef', oldClef])
             junk = self.pop(self.index(oldClef))
+        if clefObj is None:
+            # all that is needed is to remove the old clef
+            # there is no new clef - suppresses the clef of a stream
+            return
         self.insert(0, clefObj)
 
     clef = property(_getClef, _setClef)    
@@ -10035,11 +10039,16 @@ class Measure(Stream):
         >>> a.timeSignature = meter.TimeSignature('2/8')
         >>> a.timeSignature.numerator, a.timeSignature.denominator 
         (2, 8)
+        
         '''
         oldTimeSignature = self._getTimeSignature()
         if oldTimeSignature is not None:
             #environLocal.printDebug(['removing ts', oldTimeSignature])
             junk = self.pop(self.index(oldTimeSignature))
+        if tsObj is None:
+            # all that is needed is to remove the old time signature
+            # there is no new time signature - suppresses the time signature of a stream
+            return
         self.insert(0, tsObj)
 
     timeSignature = property(_getTimeSignature, _setTimeSignature)   
@@ -10085,6 +10094,10 @@ class Measure(Stream):
         if oldKey is not None:
             #environLocal.printDebug(['removing key', oldKey])
             junk = self.pop(self.index(oldKey))
+        if keyObj is None:
+            # all that is needed is to remove the old key signature
+            # there is no new key signature - suppresses the key signature of a stream
+            return
         self.insert(0, keyObj)
 
     keySignature = property(_getKeySignature, _setKeySignature)   
