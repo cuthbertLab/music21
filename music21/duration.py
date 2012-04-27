@@ -2623,8 +2623,10 @@ class Duration(DurationCommon):
             msg = ' tied to '.join(msg)
             msg += ' (%s total QL)' % (round(self._getQuarterLength(), 2))
             return msg
-        else:
+        if len(self.components) == 1:
             return self.components[0]._getFullName()
+        else: # zero components
+            return 'Zero Duration (0 total QL)'
 
     fullName = property(_getFullName, 
         doc = '''Return the most complete representation of this Duration, providing dots, type, tuplet, and quarter length representation. 
@@ -2658,6 +2660,9 @@ class Duration(DurationCommon):
         >>> d.fullName
         'Quarter Tuplet of 7/4ths (0.57QL)'
 
+        >>> d = duration.Duration(quarterLength=0)
+        >>> d.fullName
+        'Zero Duration (0 total QL)'
         ''')
 
 

@@ -9592,7 +9592,7 @@ class Stream(music21.Music21Object):
             returnObj = self
 
         # first, get target time spans of the variant
-        for v in self.variants:    
+        for v in returnObj.variants:    
             if group is not None:
                 if group not in v.groups:
                     continue # skip those that are not part of this group
@@ -18092,13 +18092,11 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'G#', 'G#', 'G#', 'G#', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.variants), 1)
-
         # activating again will restore the previous
         s.activateVariants()
 
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.variants), 1)
-
 
 
     def testActivateVariantsB(self):
@@ -18129,7 +18127,6 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.variants), 2)
-
 
         s.activateVariants(group='m2-a')
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'A#', 'A#', 'A#', 'A#', 'D', 'D', 'D', 'D']")
@@ -18179,6 +18176,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'G#', 'G#', 'G#', 'G#', 'A#', 'A#', 'A#', 'A#']")
         self.assertEqual(len(s.variants), 1)
+        s.show('t')
 
         # can restore the removed two measures
         s.activateVariants()
@@ -18212,7 +18210,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'G#', 'A#', 'C#', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.notes), 12)
         self.assertEqual(len(s.variants), 1)
-        s.show()
+        s.show('t')
 
         s.activateVariants()
 
@@ -18224,7 +18222,7 @@ class Test(unittest.TestCase):
         # variant part will not be matched
 
 
-    def testActivateVariantsD(self):
+    def testActivateVariantsE(self):
         '''This tests a note-level variant with miss-matched rhythms
         '''
         from music21 import stream, note, variant
