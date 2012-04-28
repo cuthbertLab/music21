@@ -17,6 +17,7 @@ and returning appropriate results.
 
 WORK IN PROGRESS
 '''
+#from __future__ import unicode_literals
 
 import music21
 from music21 import common
@@ -25,11 +26,23 @@ from music21 import stream
 from music21 import corpus
 from music21 import note
 from music21 import features
+from music21 import harmony
+from music21 import clef
+from music21 import tempo
+from music21.demos.bhadley import hack
+from music21.demos.theoryAnalysis import theoryAnalyzer
 
 import json
 import zipfile
 import cgi
 import re
+import unittest
+import doctest
+
+import commands
+
+import sys
+import traceback
 
 from StringIO import StringIO
 
@@ -41,15 +54,38 @@ availableDataFormats = ['xml',
                         'bool',
                         'boolean'
                         'int',
-                        'reprtext']
+                        'reprtext',
+                        'list',
+                        'int',
+                        'float']
 
 availableFunctions = ['stream.transpose',
                       'corpus.parse',
+                      'converter.parse',
                       'transpose',
-                      'augmentOrDiminish',]
+                      'augmentOrDiminish',
+                      'reduction',
+                      'createMensuralCanon',
+                      'checkLeadSheetPitches',
+                      'getResultsString',
+                      'colorResults',
+                      'identifyParallelFifths',
+                      'identifyParallelOctaves',
+                      'identifyHiddenFifths',
+                      'identifyHiddenOctaves',
+                      'theoryAnalyzer.TheoryAnalyzer',
+                      'changeColorOfAllNotes',
+                      'changeColorOfAllChords',
+                      '__getitem__',
+                      'writeMIDIFileToServer',
+                      'tempo.MetronomeMark',
+                      'insert',
+                      'commands.runPerceivedDissonanceAnalysis',
+                      'measures']
 
 availableAttribtues = ['highestOffset',
-                       'flat']
+                       'flat',
+                       '_theoryScore']
 
 def music21ModWSGIJSONApplication(environ, start_response):
     '''
@@ -136,11 +172,34 @@ def processJSONString(json_request_str):
     }
     
     '''
-    request_obj = RequestObject(json.loads(json_request_str))
+    agendaDict = AgendaDict()
+    
+    json_request_str = unicode(json_request_str, 'utf-8')
+
+    agendaDict.loadJson(json_request_str)
+    request_obj = RequestObject(agendaDict)
     request_obj.executeCommands()
     result_obj = request_obj.getResultObject();
     json_result_str = json.dumps(result_obj)
     return json_result_str
+
+class AgendaDict(dict):
+    '''
+    subclass of dictionary that represents data and commands to be run
+    through the request object and formats to be returned.
+    
+    '''
+    def loadJson(self, jsonRequestStr):
+        '''
+        Runs json.loads on jsonRequestStr
+        
+        
+        '''
+        tempDict = json.loads(jsonRequestStr)
+        for thing in tempDict:
+            self[thing] = tempDict[thing]
+        
+        
 
 
 class RequestObject(object):
@@ -165,13 +224,26 @@ class RequestObject(object):
             self.commandList = self.json_object['commandList']
         if "returnDict" in self.json_object.keys():
             self.returnDict = self.json_object['returnDict']
+      
+    def addError(self, errorString, exceptionObj = None):
+        '''
+        adds an error to the errorList array and prints the whole error to strerr
+        so both the user and the administrator know
+        '''      
+        print (isinstance(errorString, unicode))
+        self.errorList.append(errorString)
+        sys.stderr.write(errorString)
+        if exceptionObj is not None:
+            sys.stderr.write(unicode(exceptionObj))
+        traceback.print_exc(file=sys.stderr)
+
     def _parseData(self):
         '''
         Parses data specified as strings in self.dataDict into objects in self.parsedDataDict
         '''
         for (name,dataDictElement) in self.dataDict.iteritems():
             if 'data' not in dataDictElement.keys():
-                self.errorList.append("no data specified for data element "+str(dataDictElement))
+                self.errorList.append("no data specified for data element "+unicode(dataDictElement))
                 continue
 
             dataStr = dataDictElement['data']
@@ -208,14 +280,33 @@ class RequestObject(object):
                     else:
                         self.errorList.append("invalid boolean for data element "+str(dataDictElement))
                         continue
+                elif fmt == 'list':
+                    # in this case dataStr should actually be an list object.
+                    if not common.isListLike(dataStr):
+                        self.errorList.append("list format must actually be a list structure "+str(dataDictElement))
+                        continue
+                    data = []
+                    for elementStr in dataStr:
+                        if common.isStr(elementStr):
+                            (matchFound, dataElement) = self.parseStringToPrimitive(elementStr)
+                            if not matchFound:
+                                self.errorList.append("format could not be detected for data element  "+str(elementStr))
+                                continue
+                        else:
+                            dataElement = elementStr
+                        data.append(dataElement)
                 else:
                     if fmt in ['xml','musicxml']:                
                         if dataStr.find("<!DOCTYPE") == -1:
                             dataStr = """<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">""" + dataStr
                         if dataStr.find("<?xml") == -1:
                             dataStr = """<?xml version="1.0" encoding="UTF-8"?>""" + dataStr
-                    
-                    data = converter.parseData(dataStr)
+                    try:
+                        data = converter.parseData(dataStr)
+                    except converter.ConverterException as e:
+                        #self.errorList.append("Error parsing data variable "+name+": "+str(e)+"\n\n"+dataStr)
+                        self.addError("Error parsing data variable "+name+": "+unicode(e)+"\n\n"+dataStr,e)
+                        continue
             else: # No format specified
                 (matchFound, data) = self.parseStringToPrimitive(dataStr)
                 if not matchFound:
@@ -387,6 +478,7 @@ class RequestObject(object):
     def parseStringToPrimitive(self, strVal):
         returnVal = None
         foundMatch = False
+        
         if strVal in self.parsedDataDict.keys():
             returnVal = self.parsedDataDict[strVal]
             foundMatch = True
@@ -401,6 +493,9 @@ class RequestObject(object):
                 except:
                     if strVal == "True":
                         returnVal = True
+                        foundMatch = True
+                    elif strVal == "None":
+                        returnVal = None
                         foundMatch = True
                     elif strVal == "False":
                         foundMatch = True
@@ -529,7 +624,155 @@ def music21ModWSGIFileApplication(environ, start_response):
 
     return [resultStr]
 
-class ResponseParser(object):
+## Shortcuts - temporary procedures used for re-implementation of hackday demo. Will be moved 
+## to new home or removed when commandList can accommodate more complex structures (arrays, for loops...)
+
+def reduction(sc):
     '''
-    Take a 
+    Procedure that returns the annotated reduction of the given score. 
     '''
+    reductionStream = sc.chordify()
+    for c in reductionStream.flat.getElementsByClass('Chord'):
+        c.closedPosition(forceOctave=4, inPlace=True)
+        c.removeRedundantPitches(inPlace=True)
+        c.annotateIntervals()
+    return reductionStream
+
+def createMensuralCanon(sc):
+    '''
+    Implements music21 example of creating a mensural canon
+
+    '''
+    melody = sc.parts[0].flat.notesAndRests
+    
+    canonStream = stream.Score()
+    for scalar, t in [(1, 'p1'), (2, 'p-5'), (.5, 'p-11'), (1.5, -24)]:
+        part = melody.augmentOrDiminish(scalar, inPlace=False)
+        part.transpose(t, inPlace=True)
+        canonStream.insert(0, part)
+    
+    return canonStream
+
+def checkLeadSheetPitches(sc, returnType=''):
+    '''
+    Beth's code for chord symbols: returns answer if returnType = 'answerkey'
+    '''
+    nicePiece = sc
+    incorrectPiece = sc
+    
+    #incorrectPiece = messageconverter.parse('C:\Users\sample.xml')
+    
+    sopranoLine = nicePiece.getElementsByClass(stream.Part)[0]
+    chordLine = nicePiece.getElementsByClass(stream.Part)[1]
+    #chordLine.show('text')
+    #bassLine = nicePiece.part(2)
+    onlyChordSymbols = sopranoLine.flat.getElementsByClass(harmony.ChordSymbol)
+    newStream = stream.PartStaff()
+    newStream.append(clef.BassClef())
+    answerKey = stream.Score()
+    answerKey.append(sopranoLine)
+    for chordSymbol in onlyChordSymbols:
+        newStream.append(hack.realizePitches(chordSymbol))
+    
+    answerKey.insert(0,newStream)
+    
+    correctedAssignment, numCorrect = hack.correctChordSymbols(answerKey, incorrectPiece)
+    correctedAssignment.show('text')
+    answerKey.show('text')
+    
+    if returnType == 'answerkey':
+        returnScore = answerKey
+        message = 'answer key displayed'
+    else: 
+        returnScore = correctedAssignment
+        message = 'you got '+str(numCorrect)+' percent correct'
+
+    
+    return returnScore
+
+def changeColorOfAllNotes(sc, color):
+    '''
+    Iterate through all notes and change their color to the given color - 
+    used for testing color rendering in noteflight
+    '''
+    for n in sc.flat.getElementsByClass('Note'):
+        n.color = color 
+    return sc
+
+def changeColorOfAllChords(sc, color):
+    '''
+    Iterate through all notes and change their color to the given color - 
+    used for testing color rendering in noteflight
+    '''
+    for c in sc.flat.getElementsByClass('Chord'):
+        c.color = color 
+    return sc
+
+def writeMIDIFileToServer(sc):
+    '''
+    Iterate through all notes and change their color to the given color - 
+    used for testing color rendering in noteflight
+    '''
+    #documentRoot = environ['DOCUMENT_ROOT']
+    documentRoot = '/Library/WebServer/Documents'
+    urlPath = "/music21/OutputFiles/cognitionEx.mid"
+    writePath = documentRoot + urlPath
+    
+    sc.write('mid',writePath)
+    
+    return urlPath
+    
+
+## Tests 
+
+class Test(unittest.TestCase):
+    
+    def runTest(self):
+        pass
+    
+    def testAgendaDict(self):
+        jsonString = r'''
+        {
+    "dataDict": {
+        "myNum":
+            {"fmt" : "int",
+             "data" : "23"}
+    },
+    "commandList":[
+        {"function":"corpus.parse",
+         "argList":["'bwv7.7'"],
+         "resultVariable":"sc"},
+         
+        {"function":"transpose",
+         "caller":"sc",
+         "argList":["'p5'"],
+         "resultVariable":"sc"},
+         
+    
+        {"attribute":"flat",
+         "caller":"sc",
+         "resultVariable":"scFlat"},
+         
+        {"attribute":"highestOffset",
+         "caller":"scFlat",
+         "resultVariable":"ho"}
+    ],
+    "returnDict":{
+        "myNum" : "int",
+        "ho"    : "int"
+        }
+    }
+    '''
+        ad = AgendaDict()
+        ad.loadJson(jsonString)
+        self.assertEqual(ad['dataDict']['myNum']['data'], "23")
+
+#def fixXML(xmlStr):
+#    startOffset = 0
+#    while startOffset < len(xmlStr):
+#        xmlStr.find('color = ')
+#        
+
+if __name__ == '__main__':
+    music21.mainTest(Test)
+        

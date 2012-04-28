@@ -165,6 +165,7 @@ function setup() {
 	m21.noteflight.createNoteflightEmbed('noteflightembed','nfscore','fc79df30896da6aa03f90ff771015913ca6880be',750,400,1.0);
 
 	m21.onSuccess = function () {
+		document.getElementById('errorDisp').innerHTML = "";
 		document.getElementById('rawJSONResponse').value = JSON.stringify(m21.result.responseObj,null,2);
 		for (varName in m21.result.responseObj.dataDict) {
 			if(varName != returnVarToNoteflight) {

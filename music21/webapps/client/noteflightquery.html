@@ -27,7 +27,7 @@ m21interface = new Music21interface();
 <input id='command' size="50"/>
 <input type='button' onClick="m21interface.queryMusic21()" value='Query Music 21' />
 <input type='button' onClick="m21interface.queryMusic21String(document.getElementById('requestxmltextarea').value)" Value='Query Music 21 XML with Requst field ' />
-<input type='button' onClick="m21interface.sendToNoteflight()" Value='Response to Noteflight' />
+<input type='button' onClick="m21interface.noteflight.sendMusicXMLToNoteflightEmbed('score1',document.getElementById('resultxmltextarea').value)" Value='Response to Noteflight' />
 <br />
 
 
