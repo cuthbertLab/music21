@@ -881,7 +881,7 @@ class VerticalSlice(music21.Music21Object):
                 contentDict[partNum] = [element]
         
         self.contentDict = contentDict
-        
+        self._color = ''
         _DOC_ATTR = {
     'contentDict': 'Dictionary representing contents of vertical slices. the keys of the dictionary \
     are the part numbers and the element at each key is a list of music21 objects (allows for multiple voices \
@@ -892,7 +892,76 @@ class VerticalSlice(music21.Music21Object):
 #        partNoteList = self.getObjectsByPart(partNum, classFilterList=['Note'])
 #        if partNoteList:
 #            return [0]
+    def isConsonant(self):
+        '''
+        >>> from music21 import *
+        >>> vs1 = VerticalSlice({0:note.Note('A4'), 1:note.Note('B'), 2:note.Note('A')})
+        >>> vs1.isConsonant()
+        True
+        >>> vs2 = VerticalSlice({0:note.Note('A4'), 1:note.Note('B'), 2:note.Note('C#')})
+        >>> vs2.isConsonant()
+        False
+        >>> vs3 = VerticalSlice({0:note.Note('C'), 1:note.Note('G'), 2:chord.Chord(['C','E','G'])})
+        >>> vs3.isConsonant()
+        True
+        '''
+        return self.getChord().isConsonant() and False not in [x.isConsonant() for x in self.getObjectsByClass('Chord')]
+
+    def getChord(self):
+        '''
+        returns only notes as a chord
+        '''
+        return chord.Chord(self.getObjectsByClass(note.Note))
     
+    def makeAllSmallestDuration(self):
+        '''
+        >>> from music21 import *
+        >>> n1 =  note.Note('C4')
+        >>> n1.quarterLength = 1
+        >>> n2 =  note.Note('G4')
+        >>> n2.quarterLength = 2
+        >>> cs = harmony.ChordSymbol('C')
+        >>> cs.quarterLength = 4
+        >>> vs1 = VerticalSlice({0:n1, 1:n2, 2:cs})
+        >>> vs1.makeAllSmallestDuration()
+        >>> [x.quarterLength for x in vs1.objects]
+        [1.0, 1.0, 1.0]
+        '''
+        self.changeDurationofAllObjects(self.getShortestDuration())
+    def makeAllLargestDuration(self):
+        '''
+        >>> from music21 import *
+        >>> n1 =  note.Note('C4')
+        >>> n1.quarterLength = 1
+        >>> n2 =  note.Note('G4')
+        >>> n2.quarterLength = 2
+        >>> cs = harmony.ChordSymbol('C')
+        >>> cs.quarterLength = 4
+        >>> vs1 = VerticalSlice({0:n1, 1:n2, 2:cs})
+        >>> vs1.makeAllLargestDuration()
+        >>> [x.quarterLength for x in vs1.objects]
+        [4.0, 4.0, 4.0]
+        '''
+        self.changeDurationofAllObjects(self.getLongestDuration())
+        
+    def getShortestDuration(self):
+        leastQuarterLength = self.objects[0].quarterLength
+        for obj in self.objects:
+            if obj.quarterLength < leastQuarterLength:
+                leastQuarterLength = obj.quarterLength
+        return leastQuarterLength
+    
+    def getLongestDuration(self):
+        longestQuarterLength = self.objects[0].quarterLength
+        for obj in self.objects:
+            if obj.quarterLength > longestQuarterLength:
+                longestQuarterLength = obj.quarterLength
+        return longestQuarterLength
+    
+    def changeDurationofAllObjects(self, newQuarterLength):
+        for obj in self.objects:
+            obj.quarterLength = newQuarterLength
+        
     def getObjectsByPart(self, partNum, classFilterList=None ):
         '''
         return the list of music21 objects associated with that part number (if more than one). returns
@@ -1055,6 +1124,7 @@ class VerticalSlice(music21.Music21Object):
             return sorted(self.objects, key=lambda m21Obj: m21Obj.offset)[0].offset
         else:
             return sorted(self.objects, key=lambda m21Obj: m21Obj.offset)[-1].offset
+        
     
         
     def _setLyric(self, value):
@@ -1078,7 +1148,27 @@ class VerticalSlice(music21.Music21Object):
     def __repr__(self):
         return '<music21.voiceLeading.%s contentDict=%s  ' % (self.__class__.__name__, self.contentDict)
        #return '%s' % [x for x in self.contentDict.items()]
-                                                                
+       
+    def _setColor(self, color):
+        noteList = []
+        for partNum, objList in self.contentDict.items():
+            for el in objList:
+                noteList.append(el)
+        for obj in noteList:
+            obj.color = color
+    
+    def _getColor(self):
+        return self._color
+    
+    color = property(_getColor, _setColor)
+    
+    def notes(self):
+        n = []
+        for partNum, objList in self.contentDict():
+            for el in objList:
+                n.append(el)
+        return n
+                                      
 class VerticalSliceNTuplet(music21.Music21Object):
     '''a collection of n number of vertical slices'''
     def __init__(self, listofVerticalSlices): 
@@ -1674,7 +1764,6 @@ _DOC_ORDER = [VoiceLeadingQuartet, ThreeNoteLinearSegment, VerticalSlice, Vertic
 
 if __name__ == "__main__":
     music21.mainTest(Test)
-    music21.mainTest
 
 
 #------------------------------------------------------------------------------
