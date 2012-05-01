@@ -10652,9 +10652,16 @@ class Score(Stream):
 
         >>> from music21 import *
         >>> s = corpus.parse('bwv66.6')
+        >>> len(s.flat.notes)
+        165
         >>> post = s.partsToVoices(voiceAllocation=4)
         >>> len(post.parts)
         1
+        >>> len(post.parts[0].getElementsByClass('Measure')[0].voices)
+        4
+        >>> len(post.flat.notes)
+        165
+
         '''
         bundle = []
         if common.isNum(voiceAllocation):
