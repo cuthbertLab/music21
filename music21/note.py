@@ -104,6 +104,21 @@ class Lyric(music21.JSONSerializer):
             raise LyricException('Number best be number')
         self.number = number
 
+    def jsonAttributes(self):
+        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
+
+        >>> from music21 import *
+        >>> l = note.Lyric()
+        >>> l.jsonAttributes()
+        ['text', 'syllabic', 'number']
+
+        '''
+        # do not need self._autoGatherAttributes()
+        # as this uses public attributes (not underscore leading)
+        # must explicitly define
+        return ['text', 'syllabic', 'number']
+
+
     def __repr__(self):
         if self.text is not None:
             if self.syllabic is not None:

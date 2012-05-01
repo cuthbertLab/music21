@@ -37,6 +37,9 @@ class Test(unittest.TestCase):
     def testBasicA(self):
         from music21 import note, stream
 
+        t1 = note.Lyric('test')
+        #print t1.json
+
         n1 = note.Note('G#3', quarterLength=3)
         n1.lyric = 'testing'
         self.assertEqual(n1.pitch.nameWithOctave, 'G#3')        
@@ -59,6 +62,11 @@ class Test(unittest.TestCase):
         c1 = chord.Chord(['c2', 'a4', 'e5'], quarterLength=1.25)
 
         raw = c1.json
+
+        c2 = chord.Chord()
+        c2.json = raw
+        self.assertEqual(str(c1.pitches), '[C2, A4, E5]')
+        self.assertEqual(c1.quarterLength, 1.25)
 
         
 
