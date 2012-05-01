@@ -10752,7 +10752,21 @@ class Score(Stream):
 
 
     def flattenParts(self, classFilterList=['Note', 'Chord']):
-        '''Join all Parts into a single Part with all elements found in each Measure. 
+        '''Given a Score, combine all Parts into a single Part with all elements found in each Measure of the Score. 
+
+        The `classFilterList` can be used to specify which objects contained in Measures are transferred. 
+
+        >>> from music21 import *
+        >>> s = corpus.parse('bwv66.6')
+        >>> len(s.parts)
+        4
+        >>> len(s.flat.notes)
+        165
+        >>> post = s.flattenParts()
+        >>> 'Part' in post.classes
+        True
+        >>> len(post.flat.notes)
+        165
         '''
         post = self.parts[0].measureTemplate(fillWithRests=False)
         for i, m in enumerate(post.getElementsByClass('Measure')):

@@ -7304,7 +7304,7 @@ class Test(unittest.TestCase):
         s.append(key.Key('G'))
         raw = s.musicxml
         self.assertEqual(raw.find('<fifths>1</fifths>') > 0, True)
-
+        
         s = stream.Score()
         s.append(key.Key('G'))
         raw = s.musicxml
