@@ -9644,8 +9644,10 @@ class Stream(music21.Music21Object):
         ''')
 
 
-    def activateVariants(self, group=None, forceClassMatch=True, inPlace=True):
-        '''For any variants defined in this Stream, replace corresponding class with those found in the Variant.
+    def activateVariants(self, group=None, matchBySpan=True, inPlace=False):
+        '''For any :class:`~music21.variant.Variant` objects defined in this Stream, replace corresponding class with those found in the Variant.
+
+        
         '''
         from music21 import variant
 
@@ -9665,35 +9667,68 @@ class Stream(music21.Music21Object):
             removed = variant.Variant() # what group should this have?
 
             vStart = v.getOffsetBySite(returnObj)
-            targetsMatched = 0
-            for e in v.elements: # get components in the Variant
-                # get target offset relative to Stream
-                oInStream = vStart + e.getOffsetBySite(v.containedSite)
-                # get all elements at this offset, force a class match
-                targets = returnObj.getElementsByOffset(oInStream, 
-                                    classList=[e.classes[0]])
-                # only replace if we match the start
-                if len(targets) > 0:
-                    targetsMatched += 1
-                    # always assume we just want the first one?
-                    targetToReplace = targets[0]
-                    environLocal.pd(['found target to replace:', targetToReplace])
-                    # remove the target, place in removed Variant
-                    removed.append(targetToReplace)
-                    returnObj.remove(targetToReplace)
-                    # extract the variant component and insert into place
-                    returnObj.insert(oInStream, e)
 
-            # only remove old and add removed if we matched
-            if targetsMatched > 0:
-                # remove the original variant
+            # this method matches and removes on an individual basis        
+            if not matchBySpan:
+                targetsMatched = 0
+                for e in v.elements: # get components in the Variant
+                    # get target offset relative to Stream
+                    oInStream = vStart + e.getOffsetBySite(v.containedSite)
+                    # get all elements at this offset, force a class match
+                    targets = returnObj.getElementsByOffset(oInStream, 
+                                        classList=[e.classes[0]])
+                    # only replace if we match the start
+                    if len(targets) > 0:
+                        targetsMatched += 1
+                        # always assume we just want the first one?
+                        targetToReplace = targets[0]
+                        environLocal.pd(['matchBySpan', matchBySpan, 'found target to replace:', targetToReplace])
+                        # remove the target, place in removed Variant
+                        removed.append(targetToReplace)
+                        returnObj.remove(targetToReplace)
+                        # extract the variant component and insert into place
+                        returnObj.insert(oInStream, e)
+                # only remove old and add removed if we matched
+                if targetsMatched > 0:
+                    # remove the original variant
+                    returnObj.remove(v)
+                    # place newly contained elements in position
+                    returnObj.insert(vStart, removed)
+
+            # matching by span means that we remove all elements with the
+            # span defined by the variant
+            else:
+                vEnd = vStart + v.containedHighestTime
+                classes = [] # collect all classes found in this variant    
+                for e in v.elements:
+                    classes.append(e.classes[0])
+                targets = returnObj.getElementsByOffset(vStart, vEnd,
+                    includeEndBoundary=False, # do not get e tt start at end
+                    mustFinishInSpan=False, # if extends beyond, still get
+                    mustBeginInSpan=True,
+                    classList=classes)
+
+                # this will always remove elements before inserting
+                for e in targets:
+                    # need to get time relative to variant container's position
+                    oInVariant = e.getOffsetBySite(returnObj) - vStart
+                    removed.insert(oInVariant, e)
+                    environLocal.pd(['matchBySpan', matchBySpan, 'activateVariants', 'removing', e])
+                    returnObj.remove(e)
+                for e in v.elements:
+                    oInStream = vStart + e.getOffsetBySite(v.containedSite)
+                    returnObj.insert(oInStream, e)
+                # remove the source variant
                 returnObj.remove(v)
                 # place newly contained elements in position
                 returnObj.insert(vStart, removed)
 
-        # have to clear cached variants
-        self._elementsChanged()
-
+        # have to clear cached variants, as they are no longer the same
+        returnObj._elementsChanged()
+        if not inPlace:
+            return returnObj
+        else:
+            return None
 
 
 #-------------------------------------------------------------------------------
@@ -11108,6 +11143,7 @@ class SpannerStorage(Stream):
 class Test(unittest.TestCase):
     '''All Stream tests are found in test/testStream.py
     '''
+
     def runTest(self):
         pass
 

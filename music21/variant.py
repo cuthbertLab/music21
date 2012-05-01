@@ -209,7 +209,6 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-
     def testBasicA(self):
         from music21 import variant, stream, note
 

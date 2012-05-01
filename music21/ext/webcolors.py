@@ -518,7 +518,7 @@ def hex_to_name(hex_value, spec='css3'):
     """
     if spec not in SUPPORTED_SPECIFICATIONS:
         raise TypeError("'%s' is not a supported specification for color name lookups; supported specifications are: %s." % (spec,
-                                                                                                                             ', '.join(SUPPORTED_SPECIFICATIONS)))
+        ', '.join(SUPPORTED_SPECIFICATIONS)))
     normalized = normalize_hex(hex_value)
     try:
         name = globals()['%s_hex_to_names' % spec][normalized]

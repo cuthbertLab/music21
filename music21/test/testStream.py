@@ -7102,6 +7102,20 @@ class Test(unittest.TestCase):
 
         #s.show()
 
+    def testScoreShowA(self):
+        # this checks the specific handling of Score.makeNotation()
+        from music21 import stream, note, key
+        s = stream.Stream()
+        s.append(key.Key('G'))
+        raw = s.musicxml
+        self.assertEqual(raw.find('<fifths>1</fifths>') > 0, True)
+        
+        s = stream.Score()
+        s.append(key.Key('G'))
+        raw = s.musicxml
+        self.assertEqual(raw.find('<fifths>1</fifths>') > 0, True)
+
+
     def testGetVariantsA(self):
         from music21 import stream, note, variant
         s = stream.Stream()
@@ -7131,12 +7145,12 @@ class Test(unittest.TestCase):
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.variants), 1)
 
-        s.activateVariants()
+        s.activateVariants(matchBySpan=False, inPlace=True)
 
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'G#', 'G#', 'G#', 'G#', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.variants), 1)
         # activating again will restore the previous
-        s.activateVariants()
+        s.activateVariants(matchBySpan=False, inPlace=True)
 
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.variants), 1)
@@ -7171,19 +7185,19 @@ class Test(unittest.TestCase):
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.variants), 2)
 
-        s.activateVariants(group='m2-a')
+        s.activateVariants(group='m2-a', matchBySpan=False, inPlace=True)
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'A#', 'A#', 'A#', 'A#', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.variants), 2)
 
 
         # if we try the same group twice, it is now not active, so there is no change
-        s.activateVariants(group='m2-a')
+        s.activateVariants(group='m2-a', matchBySpan=False, inPlace=True)
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'A#', 'A#', 'A#', 'A#', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.variants), 2)
 
 
         # activate a different variant
-        s.activateVariants('m2-b')
+        s.activateVariants('m2-b', matchBySpan=False, inPlace=True)
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'B-', 'B-', 'B-', 'B-', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.variants), 2)
 
@@ -7191,7 +7205,6 @@ class Test(unittest.TestCase):
         # we now have 2 variants that have been stripped of their groups
         match = [e.groups for e in s.variants]
         self.assertEqual(str(match), '[[], []]')
-
 
     def testActivateVariantsC(self):
         '''This tests a two-measure variant
@@ -7215,18 +7228,16 @@ class Test(unittest.TestCase):
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.variants), 1)
 
-        s.activateVariants()
+        s.activateVariants(matchBySpan=False, inPlace=True)
 
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'G#', 'G#', 'G#', 'G#', 'A#', 'A#', 'A#', 'A#']")
         self.assertEqual(len(s.variants), 1)
-        s.show('t')
-
+        #s.show('t')
         # can restore the removed two measures
-        s.activateVariants()
+        s.activateVariants(matchBySpan=False, inPlace=True)
 
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.variants), 1)
-
 
 
     def testActivateVariantsD(self):
@@ -7248,14 +7259,13 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.notes), 12)
         self.assertEqual(len(s.variants), 1)
         
-        s.activateVariants()
+        s.activateVariants(matchBySpan=False, inPlace=True)
 
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'G#', 'A#', 'C#', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.notes), 12)
         self.assertEqual(len(s.variants), 1)
-        s.show('t')
-
-        s.activateVariants()
+        #s.show('t')
+        s.activateVariants(matchBySpan=False, inPlace=True)
 
         self.assertEqual(str([p.name for p in s.pitches]), "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.notes), 12)
@@ -7283,7 +7293,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.notes), 12)
         self.assertEqual(len(s.variants), 1)
         
-        s.activateVariants()
+        s.activateVariants(matchBySpan=False, inPlace=True)
 
         # TODO
         # this only matches the Notes that start at the same position 
@@ -7297,18 +7307,83 @@ class Test(unittest.TestCase):
 
 
 
-    def testScoreShowA(self):
-        # this checks the specific handling of Score.makeNotation()
-        from music21 import stream, note, key
+    def testActivateVariantsBySpanA(self):
+        # this tests replacing 1 note with a 3-note variant
+
+        from music21 import stream, note, variant, dynamics
+
         s = stream.Stream()
-        s.append(key.Key('G'))
-        raw = s.musicxml
-        self.assertEqual(raw.find('<fifths>1</fifths>') > 0, True)
+        s.repeatAppend(note.Note('d2'), 12)
+
+        v = variant.Variant()
+        v.insert(0, dynamics.Dynamic('ff'))
+        v.append(note.Note('G#4', quarterLength=.5))
+        v.append(note.Note('a#4', quarterLength=.25))
+        v.append(note.Note('c#5', quarterLength=.25))
+        s.insert(5, v)
         
-        s = stream.Score()
-        s.append(key.Key('G'))
-        raw = s.musicxml
-        self.assertEqual(raw.find('<fifths>1</fifths>') > 0, True)
+        # pre-check
+        self.assertEqual(len(s.flat.notes), 12)
+        self.assertEqual(str([p.name for p in s.pitches]), 
+            "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
+        self.assertEqual(len(s.getElementsByClass('Dynamic')), 0)
+
+        s.activateVariants(matchBySpan=True, inPlace=True)
+        self.assertEqual(len(s.flat.notes), 14) # replace 1 w/ 3, for +2
+        self.assertEqual(str([p.name for p in s.pitches]), 
+            "['D', 'D', 'D', 'D', 'D', 'G#', 'A#', 'C#', 'D', 'D', 'D', 'D', 'D', 'D']")
+        self.assertEqual(len(s.getElementsByClass('Dynamic')), 1)
+
+        #s.show('t')
+
+        s.activateVariants(matchBySpan=True, inPlace=True)
+        self.assertEqual(len(s.flat.notes), 12)
+        self.assertEqual(str([p.name for p in s.pitches]), 
+            "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
+        # TODO: as we are presently matching removal by classes in the Variant
+        # the variant now has no dynamics, and thus leaves the dyn from the 
+        # old variant here
+        self.assertEqual(len(s.getElementsByClass('Dynamic')), 1)
+
+        #s.show()
+
+    def testActivateVariantsBySpanB(self):
+        # this tests replacing 2 measures by a longer single measure
+
+        from music21 import stream, note, variant
+
+
+        s = stream.Stream()
+        s.repeatAppend(note.Note('d2'), 16)
+        s.makeMeasures(inPlace=True)
+
+        v1 = variant.Variant()
+        m2Alt = stream.Measure()
+        m2Alt.repeatAppend(note.Note('a#4'), 8)
+        m2Alt.timeSignature = meter.TimeSignature('8/4')
+        v1.append(m2Alt) # embed a complete Measure in v1
+        v1.groups.append('m2-a')
+
+        # insert the variant at the desired location
+        s.insert(4, v1)
+        self.assertEqual(len(s.flat.notes), 16) 
+        self.assertEqual(len(s.getElementsByClass('Measure')), 4) 
+        self.assertEqual(str([p.name for p in s.pitches]), 
+            "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
+
+        # replace 2 measures for 1
+        s.activateVariants(matchBySpan=True, inPlace=True)
+        self.assertEqual(len(s.flat.notes), 16) 
+        self.assertEqual(len(s.getElementsByClass('Measure')), 3) 
+        self.assertEqual(str([p.name for p in s.pitches]), 
+            "['D', 'D', 'D', 'D', 'A#', 'A#', 'A#', 'A#', 'A#', 'A#', 'A#', 'A#', 'D', 'D', 'D', 'D']")
+
+        # replace the one for two
+        s.activateVariants(matchBySpan=True, inPlace=True)
+        self.assertEqual(len(s.getElementsByClass('Measure')), 4) 
+        self.assertEqual(str([p.name for p in s.pitches]), 
+            "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
+
 
 
 #------------------------------------------------------------------------------
