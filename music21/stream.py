@@ -10477,6 +10477,18 @@ class Score(Stream):
     def measures(self, numberStart, numberEnd, 
         collect=['Clef', 'TimeSignature', 'Instrument', 'KeySignature'], gatherSpanners=True, searchContext=False):
         '''This method override the :meth:`~music21.stream.Stream.measures` method on Stream. This creates a new Score stream that has the same measure range for all Parts.
+
+        The `collect` argument is a list of classes that will be collected. 
+
+        >>> from music21 import *
+        >>> s = corpus.parse('bwv66.6')
+        >>> post = s.measures(3,5) # range is inclusive, i.e., [3, 5]
+        >>> len(post.parts)
+        4
+        >>> len(post.parts[0].getElementsByClass('Measure'))
+        3
+        >>> len(post.parts[1].getElementsByClass('Measure'))
+        3
         '''
         post = Score()
         # this calls on Music21Object, transfers id, groups
@@ -10570,10 +10582,8 @@ class Score(Stream):
         Measures found in multiple Parts with the same offset will be 
         appended to the same list. 
 
-
         If no parts are found in the score, then the normal 
         :meth:`~music21.stream.Stream.measureOffsetMap` routine is called.
-        
 
         This method is smart and does not assume that all Parts 
         have measures with identical offsets.
