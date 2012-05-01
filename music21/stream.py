@@ -11141,12 +11141,27 @@ class SpannerStorage(Stream):
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-    '''All Stream tests are found in test/testStream.py
+    '''Note: all Stream tests are found in test/testStream.py
     '''
 
     def runTest(self):
         pass
 
+    def testCopyAndDeepcopy(self):
+        '''Test copying all objects defined in this module
+        '''
+        for part in sys.modules[self.__module__].__dict__.keys():
+            if part.startswith('_') or part.startswith('__'):
+                continue
+            elif part in ['Test', 'TestExternal']:
+                continue
+            elif callable(part):
+                #environLocal.printDebug(['testing copying on', part])
+                obj = getattr(module, part)()
+                a = copy.copy(obj)
+                b = copy.deepcopy(obj)
+                self.assertNotEqual(a, obj)
+                self.assertNotEqual(b, obj)
 
 
 #-------------------------------------------------------------------------------

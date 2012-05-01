@@ -100,8 +100,6 @@ class NoteEditorial(music21.JSONSerializer):
     
     .. image:: images/noteEditorialFictaSharp.*
         :width: 103
-
-    
     
     '''
 
@@ -226,7 +224,6 @@ class Comment(music21.JSONSerializer):
             raise CommentException("Cannot deal with position: " + self.position)
         
     lily = property(_getLily)
-
 
 
 #-------------------------------------------------------------------------------

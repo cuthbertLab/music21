@@ -51,7 +51,7 @@ class LyricException(Exception):
     pass
 
 
-class Lyric(object):
+class Lyric(music21.JSONSerializer):
     '''
     An object representing a single Lyric as part of a note's .lyrics property.
     
@@ -217,6 +217,7 @@ class GeneralNote(music21.Music21Object):
 
         tempDuration = duration.Duration(**keywords)
         music21.Music21Object.__init__(self, duration = tempDuration)
+        # this sets the stored duration defined in Music21Object
         self._duration = tempDuration
 
         # only apply default if components are empty
@@ -241,6 +242,12 @@ class GeneralNote(music21.Music21Object):
 
     def jsonAttributes(self):
         '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
+
+        >>> from music21 import *
+        >>> gn = note.GeneralNote()
+        >>> gn.jsonAttributes()
+        ['_activeSite', '_activeSiteId', '_definedContexts', '_duration', '_idLastDeepCopyOf', '_overriddenLily', '_priority', 'lyrics', 'expressions', 'articulations', 'editorial', 'tie']
+
         '''
         # will already get _duration
         return self._autoGatherAttributes() + ['lyrics', 'expressions', 'articulations', 'editorial', 'tie']

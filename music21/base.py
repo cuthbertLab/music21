@@ -134,6 +134,298 @@ WEAKREF_ACTIVE = True
 
 
 #-------------------------------------------------------------------------------
+class JSONSerializerException(Exception):
+    pass
+
+class JSONSerializer(object):
+    '''Class that provides JSON output and input routines. Objects can inherit this class directly, or gain its functional through inheriting Music21Object. 
+    '''
+    # note that, since this inherits form object, other classes that inherit
+    # this class need to give object last
+    # e.g. class Text(music21.JSONSerializer, object):
+
+    def __init__(self):
+        pass
+
+    #---------------------------------------------------------------------------
+    # override these methods for json functionality
+
+    def _autoGatherAttributes(self):
+        '''Gather just the instance data members that are proceeded by an underscore. 
+        '''
+        post = []
+        # names that we always do not need
+        exclude = ['_classes']
+        # get class names that exclude instance names
+        # these names will be rejected in final accumulation
+        classNames = []
+        for bundle in inspect.classify_class_attrs(self.__class__):
+            if (bundle.name.startswith('_') and not 
+                bundle.name.startswith('__')):
+                classNames.append(bundle.name)
+        #environLocal.pd(['classNames', classNames])
+        for name in dir(self):
+            if name.startswith('_') and not name.startswith('__'):
+                attr = getattr(self, name)
+                #environLocal.pd(['inspect.isroutine()', attr, inspect.isroutine(attr)])
+                if (not inspect.ismethod(attr) and not 
+                    inspect.isfunction(attr) and not inspect.isroutine(attr)): 
+                    # class names stored are class attrs, not needed for 
+                    # reinstantiation
+                    if name not in classNames and name not in exclude:
+                        # store the name, not the attr
+                        post.append(name)
+        #environLocal.pd(['auto-derived jsonAttributes', post])
+        return post
+
+    def jsonAttributes(self):
+        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
+        '''
+        #return []
+        return self._autoGatherAttributes()
+
+
+    def jsonComponentFactory(self, idStr):
+        '''Given a stored string during JSON serialization, return an object. This method effectively converts a string class specification into a vanilla instance ready for specialization via stored data attributes. 
+
+        A subclass that overrides this method will have access to all modules necessary to create whatever objects necessary. 
+
+        '''
+        # keep in alpha
+        from music21 import base
+        from music21 import beam
+        from music21 import duration
+        from music21 import editorial
+        from music21 import note
+        from music21 import pitch
+
+        # base:
+        if '.DefinedContexts' in idStr:
+            return base.DefinedContexts()
+
+        # pitch module
+        elif '.Microtone' in idStr:
+            return pitch.Microtone()
+        elif '.Accidental' in idStr:
+            return pitch.Accidental()
+        elif '.Pitch' in idStr:
+            return pitch.Pitch()
+
+        # duration module
+        elif '.DurationUnit' in idStr:
+            return duration.DurationUnit()
+        elif '.Duration' in idStr:
+            return duration.Duration()
+
+        # editorial module
+        elif '.NoteEditorial' in idStr:
+            return editorial.NoteEditorial()
+        elif '.Comment' in idStr:
+            return editorial.Comment()
+
+        # note module
+        elif '.Lyric' in idStr:
+            return note.Lyric()
+        elif '.GeneralNote' in idStr:
+            return note.GeneralNote()
+        elif '.NotRest' in idStr:
+            return note.NotRest()
+        elif '.Note' in idStr:
+            return note.Note()
+        elif '.Rest' in idStr:
+            return note.Rest()
+
+
+        # beam module
+        elif '.Beam' in idStr:
+            return beam.Beam()
+        elif '.Beams' in idStr:
+            return beam.Beams()
+
+        else:
+            raise JSONSerializerException('cannot instantiate an object from id string: %s' % idStr)
+
+
+    #---------------------------------------------------------------------------
+    # core methods for getting and setting
+
+    def _getJSONDict(self, includeVersion=False):
+        '''Return a dictionary representation for JSON processing. All component objects are similarly encoded as dictionaries. This method is recursively called as needed to store dictionaries of component objects that are :class:`~music21.base.JSONSerializer` subclasses.
+
+        >>> from music21 import *
+        >>> t = metadata.Text('my text')
+        >>> t.language = 'en'
+        >>> post = t.json # cannot show string as self changes in context
+        '''
+        src = {'__class__': str(self.__class__)}
+        # always store the version used to create this data
+        if includeVersion:
+            src['__version__'] = VERSION
+
+        # flat data attributes
+        flatData = {}
+        for attr in self.jsonAttributes():
+            #environLocal.printDebug(['_getJSON', attr])
+            attrValue = getattr(self, attr)
+            # do not store None values; assume initial/unset state
+            if attrValue is None:
+                continue
+
+            # if, stored on this object, is an object w/ a json method
+            if hasattr(attrValue, 'json'):
+                #environLocal.pd(['attrValue', attrValue])
+                flatData[attr] = attrValue._getJSONDict()
+
+            # handle lists; look for objects that have json attributes
+            elif isinstance(attrValue, (list, tuple)):
+                flatData[attr] = []
+                for attrValueSub in attrValue:
+                    if hasattr(attrValueSub, 'json'):
+                        flatData[attr].append(attrValueSub._getJSONDict())
+                    else: # just store normal data
+                        flatData[attr].append(attrValueSub)
+
+            # handle dictionaries; look for objects that have json attributes
+            elif isinstance(attrValue, dict):
+                flatData[attr] = {}
+                for key in attrValue.keys():
+                    attrValueSub = attrValue[key]
+                    # skip None values for efficiency
+                    if attrValueSub is None:
+                        continue
+                    # see if this object stores a json object or otherwise
+                    if hasattr(attrValueSub, 'json'):
+                        flatData[attr][key] = attrValueSub._getJSONDict()
+                    else: # just store normal data
+                        flatData[attr][key] = attrValueSub
+            else:
+                flatData[attr] = attrValue
+        src['__attr__'] = flatData
+        return src
+
+    def _getJSON(self):
+        '''Return the dictionary returned by _getJSONDict() as a JSON string.
+        '''
+        # when called from json property, include version number;
+        # this should mean that only the outermost object has a version number
+        return json.dumps(self._getJSONDict(includeVersion=True))
+
+
+    def _isComponent(self, target):
+        '''Return a boolean if the provided object is a dictionary that defines a __class__ key, the necessary conditions to try to instantiate a component object with the jsonComponentFactory method.
+        '''
+        # on export, check for attribute
+        if isinstance(target, dict) and '__class__' in target.keys():
+            return True
+        return False
+
+    def _buildComponent(self, src):
+        # get instance from subclass overridden method
+        obj = self.jsonComponentFactory(src['__class__'])
+        # assign dictionary (property takes dictionary or string)
+        obj.json = src
+        return obj
+
+    def _setJSON(self, jsonStr):
+        '''Set this object based on a JSON string or instantiated dictionary representation.
+
+        >>> from music21 import *
+        >>> t = metadata.Text('my text')
+        >>> t.language = 'en'
+        >>> tNew = metadata.Text()
+        >>> tNew.json = t.json
+        >>> str(t)
+        'my text'
+        >>> t.language
+        'en'
+        '''
+        #environLocal.printDebug(['_setJSON: srcStr', jsonStr])
+        if isinstance(jsonStr, dict):
+            d = jsonStr # do not loads  
+        else:
+            d = json.loads(jsonStr)
+
+        for attr in d.keys():
+            #environLocal.printDebug(['_setJSON: attr', attr, d[attr]])
+            if attr == '__class__':
+                pass
+            elif attr == '__version__':
+                pass
+            elif attr == '__attr__':
+                for key in d[attr].keys():
+                    attrValue = d[attr][key]
+                    if attrValue == None or isinstance(attrValue, 
+                        (int, float)):
+                        setattr(self, key, attrValue)
+                    # handle a list or tuple, looking for dicts that define objs
+                    elif isinstance(attrValue, (list, tuple)):
+                        subList = []
+                        for attrValueSub in attrValue:
+                            if self._isComponent(attrValueSub):
+                                subList.append(
+                                    self._buildComponent(attrValueSub))
+                            else:
+                                subList.append(attrValueSub)
+                        setattr(self, key, subList)
+                    # handle a dictionary, looking for dicts that define objs
+                    elif isinstance(attrValue, dict):
+                        # could be a data dict or a dict of objects; 
+                        # if an object, will have a __class__ key
+                        if self._isComponent(attrValue):
+                            setattr(self, key, self._buildComponent(attrValue))
+                        # its a data dictionary; could contain objects as
+                        # dictionaries, or flat data                           
+                        else:
+                            subDict = {}
+                            for subKey in attrValue.keys():
+                                # this could be flat data or a obj definition
+                                # in a dictionary
+                                attrValueSub = attrValue[subKey]
+                                # if a dictionary, and defines a __class__, 
+                                # create an object
+                                if self._isComponent(attrValueSub):
+                                    subDict[subKey] = self._buildComponent(
+                                        attrValueSub)
+                                else:
+                                    subDict[subKey] = attrValueSub
+                            #setattr(self, key, subDict)
+                            dst = getattr(self, key)
+                            # updating the dictionary preserves default 
+                            # values created at init
+                            dst.update(subDict) 
+                    else: # assume a string
+                        setattr(self, key, attrValue)
+            else:
+                raise JSONSerializerException('cannot handle json attr: %s'% attr)
+
+    json = property(_getJSON, _setJSON, 
+        doc = '''Get or set string JSON data for this object. This method is only available if a JSONSerializer subclass object has been customized and configured by overriding the following methods: :meth:`~music21.base.JSONSerializer.jsonAttributes`, :meth:`~music21.base.JSONSerializer.jsonComponentFactory`.
+        ''')    
+
+    def jsonPrint(self):
+        print(json.dumps(self._getJSONDict(includeVersion=True), 
+            sort_keys=True, indent=2))
+
+    def jsonWrite(self, fp, format=True):
+        '''Given a file path, write JSON to a file for this object. Default file extension should be .json. File is opened and closed within this method call. 
+        '''
+        f = codecs.open(fp, mode='w', encoding='utf-8')
+        if not format:
+            f.write(json.dumps(self._getJSONDict(includeVersion=True)))
+        else:
+            f.write(json.dumps(self._getJSONDict(includeVersion=True), 
+            sort_keys=True, indent=2))
+        f.close()
+
+    def jsonRead(self, fp):
+        '''Given a file path, read JSON from a file to this object. Default file extension should be .json. File is opened and closed within this method call. 
+        '''
+        f = open(fp)
+        self.json = f.read()
+        f.close()
+
+
+#-------------------------------------------------------------------------------
 # make subclass of set once that is defined properly
 class Groups(list):   
     '''A list of strings used to identify associations that an element might 
@@ -202,7 +494,7 @@ class Groups(list):
 
 
 #-------------------------------------------------------------------------------
-class DefinedContexts(object):
+class DefinedContexts(JSONSerializer):
     '''An object, stored within a Music21Object, that stores (weak) references to a collection of objects that may be contextually relevant to this object.
 
     Some of these objects are locations, or Streams that contain this object. In this case the DefinedContexts object stores an offset value, used for determining position within a Stream. 
@@ -218,10 +510,8 @@ class DefinedContexts(object):
         # store an index of numbers for tagging the time of defined contexts; 
         # this is used to be able to descern the order of context as added
         self._timeIndex = 0
-
         # pass a reference to the object that contains this
         self.containedById = containedById
-
         # cache for performance
         self._lastID = -1 # cannot be None
         self._lastOffset = None
@@ -365,7 +655,7 @@ class DefinedContexts(object):
         postLocationKeys = []
         for idKey in self._definedContexts.keys():
             # make a random UUID
-            if idKey != None:
+            if idKey is not None:
                 newKey = uuid.uuid4()
             else:
                 newKey = idKey # keep None
@@ -498,9 +788,6 @@ class DefinedContexts(object):
             dict['time'] = timeValue
         if not updateNotAdd: # add new/missing information to dictionary
             self._definedContexts[idKey] = dict
-
-
-
 
 
     def remove(self, site):
@@ -799,21 +1086,6 @@ class DefinedContexts(object):
             if self._definedContexts[idKey]['class'] == 'SpannerStorage':
                 return True
         return False
-
-        # the long way to do this
-#         for idKey in self._locationKeys:
-#             objRef = self._definedContexts[idKey]['obj']
-#             if objRef is None:
-#                 continue
-#             if not WEAKREF_ACTIVE: 
-#                 obj = objRef
-#             else:
-#                 obj = common.unwrapWeakref(objRef)
-#             if obj is None:
-#                 continue
-#             if 'SpannerStorage' in obj.classes:
-#                 return True
-#         return False
 
     def getSiteCount(self):
         '''Return the number of non-dead sites, including None. This does not unwrap weakrefs for performance. 
@@ -1442,258 +1714,6 @@ class DefinedContexts(object):
                 pass
 
 
-
-
-#-------------------------------------------------------------------------------
-class JSONSerializerException(Exception):
-    pass
-
-
-class JSONSerializer(object):
-    '''Class that provides JSON output and input routines. Objects can inherit this class directly, or gain its functional through inheriting Music21Object. 
-    '''
-    # note that, since this inherits form object, other classes that inherit
-    # this class need to give object last
-    # e.g. class Text(music21.JSONSerializer, object):
-
-    def __init__(self):
-        pass
-
-    #---------------------------------------------------------------------------
-    # override these methods for json functionality
-
-    def _autoGatherAttributes(self):
-        '''Gather just the instance data members that are proceeded by an underscore. 
-        '''
-        post = []
-        # get class names that exclude instance names
-        classNames = []
-        for bundle in inspect.classify_class_attrs(self.__class__):
-            if (bundle.name.startswith('_') and not 
-                bundle.name.startswith('__')):
-                classNames.append(bundle.name)
-        #environLocal.pd(['classNames', classNames])
-        for name in dir(self):
-            if name.startswith('_') and not name.startswith('__'):
-                attr = getattr(self, name)
-                #environLocal.pd(['inspect.isroutine()', attr, inspect.isroutine(attr)])
-                if (not inspect.ismethod(attr) and not 
-                    inspect.isfunction(attr) and not inspect.isroutine(attr)): 
-                    # class names stored are class attrs, not needed for 
-                    # reinstantiation
-                    if name not in classNames:
-                        # store the name, not the attr
-                        post.append(name)
-        #environLocal.pd(['auto-derived jsonAttributes', post])
-        return post
-
-    def jsonAttributes(self):
-        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
-        '''
-        #return []
-        return self._autoGatherAttributes()
-
-
-    def jsonComponentFactory(self, idStr):
-        '''Given a stored string during JSON serialization, return an object'
-
-        The subclass that overrides this method will have access to all modules necessary to create whatever objects necessary. 
-        '''
-        from music21 import pitch
-        if '.Microtone' in idStr:
-            return pitch.Microtone()
-        elif '.Accidental' in idStr:
-            return pitch.Accidental()
-        elif '.Pitch' in idStr:
-            return pitch.Pitch()
-        elif '.DurationUnit' in idStr:
-            return pitch.DurationUnit()
-        elif '.Duration' in idStr:
-            return pitch.Duration()
-
-        else:
-            raise JSONSerializerException('cannot instantiate an object from id string: %s' % idStr)
-
-
-    #---------------------------------------------------------------------------
-    # core methods for getting and setting
-
-    def _getJSONDict(self, includeVersion=False):
-        '''Return a dictionary representation for JSON processing. All component objects are similarly encoded as dictionaries. This method is recursively called as needed to store dictionaries of component objects that are :class:`~music21.base.JSONSerializer` subclasses.
-
-        >>> from music21 import *
-        >>> t = metadata.Text('my text')
-        >>> t.language = 'en'
-        >>> post = t.json # cannot show string as self changes in context
-        '''
-        src = {'__class__': str(self.__class__)}
-        # always store the version used to create this data
-        if includeVersion:
-            src['__version__'] = VERSION
-
-        # flat data attributes
-        flatData = {}
-        for attr in self.jsonAttributes():
-            #environLocal.printDebug(['_getJSON', attr])
-            attrValue = getattr(self, attr)
-            # do not store None values; assume initial/unset state
-            if attrValue is None:
-                continue
-
-            # if, stored on this object, is an object w/ a json method
-            if hasattr(attrValue, 'json'):
-                #environLocal.pd(['attrValue', attrValue])
-                flatData[attr] = attrValue._getJSONDict()
-
-            # handle lists; look for objects that have json attributes
-            elif isinstance(attrValue, (list, tuple)):
-                flatData[attr] = []
-                for attrValueSub in attrValue:
-                    if hasattr(attrValueSub, 'json'):
-                        flatData[attr].append(attrValueSub._getJSONDict())
-                    else: # just store normal data
-                        flatData[attr].append(attrValueSub)
-
-            # handle dictionaries; look for objects that have json attributes
-            elif isinstance(attrValue, dict):
-                flatData[attr] = {}
-                for key in attrValue.keys():
-                    attrValueSub = attrValue[key]
-                    # skip None values for efficiency
-                    if attrValueSub is None:
-                        continue
-                    # see if this object stores a json object or otherwise
-                    if hasattr(attrValueSub, 'json'):
-                        flatData[attr][key] = attrValueSub._getJSONDict()
-                    else: # just store normal data
-                        flatData[attr][key] = attrValueSub
-            else:
-                flatData[attr] = attrValue
-        src['__attr__'] = flatData
-        return src
-
-    def _getJSON(self):
-        '''Return the dictionary returned by _getJSONDict() as a JSON string.
-        '''
-        # when called from json property, include version number;
-        # this should mean that only the outermost object has a version number
-        return json.dumps(self._getJSONDict(includeVersion=True))
-
-
-    def _isComponent(self, target):
-        '''Return a boolean if the provided object is a dictionary that defines a __class__ key, the necessary conditions to try to instantiate a component object with the jsonComponentFactory method.
-        '''
-        # on export, check for attribute
-        if isinstance(target, dict) and '__class__' in target.keys():
-            return True
-        return False
-
-    def _buildComponent(self, src):
-        # get instance from subclass overridden method
-        obj = self.jsonComponentFactory(src['__class__'])
-        # assign dictionary (property takes dictionary or string)
-        obj.json = src
-        return obj
-
-    def _setJSON(self, jsonStr):
-        '''Set this object based on a JSON string or instantiated dictionary representation.
-
-        >>> from music21 import *
-        >>> t = metadata.Text('my text')
-        >>> t.language = 'en'
-        >>> tNew = metadata.Text()
-        >>> tNew.json = t.json
-        >>> str(t)
-        'my text'
-        >>> t.language
-        'en'
-        '''
-        #environLocal.printDebug(['_setJSON: srcStr', jsonStr])
-        if isinstance(jsonStr, dict):
-            d = jsonStr # do not loads  
-        else:
-            d = json.loads(jsonStr)
-
-        for attr in d.keys():
-            #environLocal.printDebug(['_setJSON: attr', attr, d[attr]])
-            if attr == '__class__':
-                pass
-            elif attr == '__version__':
-                pass
-            elif attr == '__attr__':
-                for key in d[attr].keys():
-                    attrValue = d[attr][key]
-                    if attrValue == None or isinstance(attrValue, 
-                        (int, float)):
-                        setattr(self, key, attrValue)
-                    # handle a list or tuple, looking for dicts that define objs
-                    elif isinstance(attrValue, (list, tuple)):
-                        subList = []
-                        for attrValueSub in attrValue:
-                            if self._isComponent(attrValueSub):
-                                subList.append(
-                                    self._buildComponent(attrValueSub))
-                            else:
-                                subList.append(attrValueSub)
-                        setattr(self, key, subList)
-                    # handle a dictionary, looking for dicts that define objs
-                    elif isinstance(attrValue, dict):
-                        # could be a data dict or a dict of objects; 
-                        # if an object, will have a __class__ key
-                        if self._isComponent(attrValue):
-                            setattr(self, key, self._buildComponent(attrValue))
-                        # its a data dictionary; could contain objects as
-                        # dictionaries, or flat data                           
-                        else:
-                            subDict = {}
-                            for subKey in attrValue.keys():
-                                # this could be flat data or a obj definition
-                                # in a dictionary
-                                attrValueSub = attrValue[subKey]
-                                # if a dictionary, and defines a __class__, 
-                                # create an object
-                                if self._isComponent(attrValueSub):
-                                    subDict[subKey] = self._buildComponent(
-                                        attrValueSub)
-                                else:
-                                    subDict[subKey] = attrValueSub
-                            #setattr(self, key, subDict)
-                            dst = getattr(self, key)
-                            # updating the dictionary preserves default 
-                            # values created at init
-                            dst.update(subDict) 
-                    else: # assume a string
-                        setattr(self, key, attrValue)
-            else:
-                raise JSONSerializerException('cannot handle json attr: %s'% attr)
-
-    json = property(_getJSON, _setJSON, 
-        doc = '''Get or set string JSON data for this object. This method is only available if a JSONSerializer subclass object has been customized and configured by overriding the following methods: :meth:`~music21.base.JSONSerializer.jsonAttributes`, :meth:`~music21.base.JSONSerializer.jsonComponentFactory`.
-        ''')    
-
-    def jsonPrint(self):
-        print(json.dumps(self._getJSONDict(includeVersion=True), 
-            sort_keys=True, indent=2))
-
-    def jsonWrite(self, fp, format=True):
-        '''Given a file path, write JSON to a file for this object. Default file extension should be .json. File is opened and closed within this method call. 
-        '''
-        f = codecs.open(fp, mode='w', encoding='utf-8')
-        if not format:
-            f.write(json.dumps(self._getJSONDict(includeVersion=True)))
-        else:
-            f.write(json.dumps(self._getJSONDict(includeVersion=True), 
-            sort_keys=True, indent=2))
-        f.close()
-
-    def jsonRead(self, fp):
-        '''Given a file path, read JSON from a file to this object. Default file extension should be .json. File is opened and closed within this method call. 
-        '''
-        f = open(fp)
-        self.json = f.read()
-        f.close()
-
-
 #-------------------------------------------------------------------------------
 class Music21Object(JSONSerializer):
     '''
@@ -1718,12 +1738,7 @@ class Music21Object(JSONSerializer):
     Some of these may be intercepted by the subclassing object (e.g., duration within Note)
     '''
 
-    _duration = None
-    _definedContexts = None
-    id = None
-    _priority = 0 # default is zero
     classSortOrder = 20  # default classSortOrder
-    hideObjectOnPrint = False
     # these values permit fast class comparisons for performance crtical cases
     isStream = False
     isSpanner = False
@@ -1776,7 +1791,12 @@ class Music21Object(JSONSerializer):
 
         # store classes once when called
         self._classes = None 
+        # private duration storage; managed by property
+        self._duration = None
+        self._priority = 0 # default is zero
 
+        self.hideObjectOnPrint = False
+    
         if "id" in keywords:
             self.id = keywords["id"]            
         else:
@@ -1790,6 +1810,7 @@ class Music21Object(JSONSerializer):
             self.groups = keywords["groups"]
         else:
             self.groups = Groups()
+
         if "locations" in keywords:
             self._definedContexts = keywords["locations"]
         else:
