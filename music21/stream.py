@@ -8183,6 +8183,37 @@ class Stream(music21.Music21Object):
         return True
 
 
+    def isWellFormedNotation(self):
+        '''Return True if, given the context of this Stream or Stream subclass, contains what appears to be well-formed notation. This often means the formation of Measures, or a Score that contains Part with Measures. 
+
+        >>> from music21 import *
+        >>> s = corpus.parse('bwv66.6')
+        >>> s.isWellFormedNotation()
+        True
+        >>> s.parts[0].isWellFormedNotation()
+        True
+        >>> s.parts[0].getElementsByClass('Measure')[0].isWellFormedNotation()
+        True
+        '''
+        # if a measure, we assume we are well-formed
+        if 'Measure' in self.classes:
+            return True
+        elif 'Part' in self.classes:
+            if self.hasMeasures():
+                return True
+        elif self.hasPartLikeStreams():
+            # higher constraint than has part-like streams: has sub-streams
+            # with Measures
+            match = 0
+            count = 0
+            for s in self.getElementsByClass('Stream'):
+                count += 1
+                if s.hasMeasures():
+                    match += 1
+            if match == count:
+                return True
+        # all other conditions are not well-formed notation
+        return False
 
 
 
@@ -10751,15 +10782,18 @@ class Score(Stream):
             returnStream = self
         else:
             returnStream = copy.deepcopy(self)
-        # do not assume that we have parts here
-        for s in returnStream.getElementsByClass('Stream'):
-            # process all component Streams inPlace
-            s.makeNotation(meterStream=meterStream, refStreamOrTimeRange=refStreamOrTimeRange, inPlace=True, bestClef=bestClef, **subroutineKeywords)
 
-        # note: while the local-streams have updated their caches, the 
-        # containing score has an out-of-date cache of flat.
-        # this, must call elements changed
-        returnStream._elementsChanged()
+        # do not assume that we have parts here
+        if self.hasPartLikeStreams():
+            for s in returnStream.getElementsByClass('Stream'):
+                # process all component Streams inPlace
+                s.makeNotation(meterStream=meterStream, refStreamOrTimeRange=refStreamOrTimeRange, inPlace=True, bestClef=bestClef, **subroutineKeywords)    
+            # note: while the local-streams have updated their caches, the 
+            # containing score has an out-of-date cache of flat.
+            # this, must call elements changed
+            returnStream._elementsChanged()
+        else: # call the base method
+            Stream.makeNotation(self, meterStream=meterStream, refStreamOrTimeRange=refStreamOrTimeRange, inPlace=True, bestClef=bestClef, **subroutineKeywords) 
 
         if inPlace:
             return None

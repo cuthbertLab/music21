@@ -3374,8 +3374,9 @@ def streamPartToMx(part, instStream=None, meterStream=None,
         part.makeNotation(meterStream=meterStream,
                         refStreamOrTimeRange=refStreamOrTimeRange, 
                         inPlace=True)
-        #environLocal.printDebug(['Stream._getMXPart: post makeNotation, length', len(measureStream)])
         measureStream = part.getElementsByClass('Measure')
+
+        #environLocal.printDebug(['Stream._getMXPart: post makeNotation, length', len(measureStream)])
 
         # after calling measuresStream, need to update Spanners, as a deepcopy
         # has been made
@@ -3471,8 +3472,7 @@ def streamToMx(s, spannerBundle=None):
         from music21 import stream, note, metadata
         out = stream.Stream()
         m = stream.Measure()
-        r = note.Rest()
-        r.duration.type = 'whole'
+        r = note.Rest(quarterLength=4)
         m.append(r)
         out.append(m)
         # return the processing of this Stream
@@ -3576,6 +3576,7 @@ def streamToMx(s, spannerBundle=None):
         mxScorePart, mxPart = streamPartToMx(s, meterStream=meterStream, 
                               spannerBundle=spannerBundle)
         mxComponents.append([mxScorePart, mxPart, s])
+        #environLocal.pd(['mxComponents', mxComponents])
 
     # create score and part list
     # try to get mxScore from lead meta data first

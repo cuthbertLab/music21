@@ -7296,6 +7296,21 @@ class Test(unittest.TestCase):
         self.assertEqual(str([p for p in s.variants[0].elements]), "[<music21.note.Note D>, <music21.note.Note D>]")
 
 
+
+    def testScoreShowA(self):
+        # this checks the specific handling of Score.makeNotation()
+        from music21 import stream, note, key
+        s = stream.Stream()
+        s.append(key.Key('G'))
+        raw = s.musicxml
+        self.assertEqual(raw.find('<fifths>1</fifths>') > 0, True)
+
+        s = stream.Score()
+        s.append(key.Key('G'))
+        raw = s.musicxml
+        self.assertEqual(raw.find('<fifths>1</fifths>') > 0, True)
+
+
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
