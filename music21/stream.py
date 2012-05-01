@@ -8090,7 +8090,18 @@ class Stream(music21.Music21Object):
     # get boolean information from the Stream
 
     def hasMeasures(self):
-        '''Return a boolean value showing if this Stream contains Measures
+        '''Return a boolean value showing if this Stream contains Measures.
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> s.repeatAppend(note.Note(), 8)
+        >>> s.hasMeasures()
+        False
+        >>> s.makeMeasures(inPlace=True)
+        >>> len(s.getElementsByClass('Measure'))
+        2
+        >>> s.hasMeasures()
+        True
         '''
         if self._cache['hasMeasures'] is None:
             post = False
@@ -8120,7 +8131,17 @@ class Stream(music21.Music21Object):
 
 
     def hasPartLikeStreams(self):
-        '''Return a boolean value showing if this Stream contains multiple Parts, or Part-like sub-Streams. 
+        '''Return a boolean value showing if this Stream contains multiple Parts, or Part-like sub-Streams. Part-like sub-streams are Streams that contain Measures or Notes.
+        
+        >>> from music21 import *
+        >>> s = stream.Score()
+        >>> s.hasPartLikeStreams()
+        False
+        >>> p1 = stream.Part()
+        >>> p1.repeatAppend(note.Note(), 8)
+        >>> s.insert(0, p1)
+        >>> s.hasPartLikeStreams()
+        True
         '''
         if self._cache['hasPartLikeStreams'] is None:
             multiPart = False
@@ -8146,6 +8167,15 @@ class Stream(music21.Music21Object):
 
     def isTwelveTone(self):
         '''Return true if this Stream only employs twelve-tone equal-tempered pitch values. 
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> s.append(note.Note('G#4'))
+        >>> s.isTwelveTone()
+        True
+        >>> s.append(note.Note('G~4'))
+        >>> s.isTwelveTone()
+        False
         '''
         for p in self.pitches:
             if not p.isTwelveTone():
