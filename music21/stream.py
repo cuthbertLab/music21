@@ -10537,8 +10537,6 @@ class Score(Stream):
         '''Expand all repeats, as well as all repeat indications given by text expressions such as D.C. al Segno.
 
         This method always returns a new Stream, with deepcopies of all contained elements at all level.
-    
-        NOTE: This implementation is still incomplete.
         '''
         post = Score()
         # this calls on Music21Object, transfers id, groups
@@ -10648,9 +10646,15 @@ class Score(Stream):
     def partsToVoices(self, voiceAllocation=2, permitOneVoicePerPart=False):
         '''Given a multi-part :class:`~music21.stream.Score`, return a new Score that combines parts into voices. 
 
-        The `voiceAllocation` parameter can be an integer: if so, this many parts will each be grouped into one part as voices
+        The `voiceAllocation` parameter sets the maximum number of voices per Part.
 
-        The `permitOneVoicePerPart` parameter, if True, will encode a single voice inside a single Part, rather than leaving a single part alone. 
+        The `permitOneVoicePerPart` parameter, if True, will encode a single voice inside a single Part, rather than leaving it as a single Part alone, with no voices. 
+
+        >>> from music21 import *
+        >>> s = corpus.parse('bwv66.6')
+        >>> post = s.partsToVoices(voiceAllocation=4)
+        >>> len(post.parts)
+        1
         '''
         bundle = []
         if common.isNum(voiceAllocation):
