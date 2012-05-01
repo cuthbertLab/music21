@@ -70,6 +70,18 @@ class Test(unittest.TestCase):
 
         
 
+    def testBasicC(self):
+        from music21 import stream, note
+
+        s = stream.Stream()
+        s.append(note.Note('d2', quarterLength=2.0))
+        s.append(note.Note('g~6', quarterLength=.25))
+
+        # Derivation is not being identified has having a serialization method
+        #raw = s.json
+
+        #print raw
+
 
 
 

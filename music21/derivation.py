@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2011 The music21 Project
+# Copyright:    (c) 2011-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''This module defines objects for tracking the derivation of one :class:`~music21.stream.Stream` from another.
@@ -18,7 +18,7 @@ from music21 import common
 # imported by stream
 
 
-class Derivation(object):
+class Derivation(music21.JSONSerializer):
     '''
     >>> import copy
     >>> from music21 import *  
@@ -38,6 +38,8 @@ class Derivation(object):
     'measure'
     '''
     def __init__(self, container=None):
+        music21.JSONSerializer.__init__(self)
+
         # store a reference to the Stream that contains this derivation
         self._container = None
         self._containerId = None # store id to optimize w/o unwrapping
@@ -136,6 +138,13 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+    def testSerializationA(self):
+        from music21 import derivation
+
+        d = derivation.Derivation()
+        self.assertEqual(d.jsonAttributes(), ['_ancestor', '_ancestorId', '_container', '_containerId', '_method'])
+
+        self.assertEqual(hasattr(d, 'json'), True)
 
 
 #-------------------------------------------------------------------------------
@@ -151,6 +160,7 @@ if __name__ == "__main__":
 
 #------------------------------------------------------------------------------
 # eof
+
 
 
 

@@ -93,6 +93,8 @@ class Lyric(music21.JSONSerializer):
     '''
 
     def __init__(self, text=None, number=1, syllabic=None, applyRaw = False):
+        music21.JSONSerializer.__init__(self)
+
         # these are set by _setTextAndSyllabic
         self.text = None
         # given as begin, middle, end, or single

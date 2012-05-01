@@ -194,6 +194,7 @@ class JSONSerializer(object):
         # keep in alpha
         from music21 import base
         from music21 import beam
+        from music21 import derivation
         from music21 import duration
         from music21 import editorial
         from music21 import note
@@ -202,6 +203,10 @@ class JSONSerializer(object):
         # base:
         if '.DefinedContexts' in idStr:
             return base.DefinedContexts()
+
+        # derivation
+        if '.Derivation' in idStr:
+            return derivation.Derivation()
 
         # pitch module
         elif '.Microtone' in idStr:
@@ -265,8 +270,10 @@ class JSONSerializer(object):
         # flat data attributes
         flatData = {}
         for attr in self.jsonAttributes():
-            #environLocal.printDebug(['_getJSON', attr])
             attrValue = getattr(self, attr)
+
+            #environLocal.printDebug(['_getJSON', attr, "hasattr(attrValue, 'json')", hasattr(attrValue, 'json')])
+
             # do not store None values; assume initial/unset state
             if attrValue is None:
                 continue

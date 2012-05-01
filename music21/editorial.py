@@ -118,6 +118,8 @@ class NoteEditorial(music21.JSONSerializer):
     }
     
     def __init__(self):
+        music21.JSONSerializer.__init__(self)
+
         self.ficta = None  # Accidental object -- N.B. for PRINTING only not for determining intervals
         self.color = None
         self.misc  = {}
