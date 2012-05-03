@@ -910,8 +910,18 @@ class VerticalSlice(music21.Music21Object):
     def getChord(self):
         '''
         returns only notes as a chord
+         >>> vs1 = VerticalSlice({0:note.Note('A4'), 1:chord.Chord(['B','C','A']), 2:note.Note('A')})
+        >>> vs1.getChord()
+        <music21.chord.Chord A4 B C A A>
         '''
-        return chord.Chord(self.getObjectsByClass(note.Note))
+        pitches = []
+        for el in self.objects:
+            if el.isClassOrSubclass(['Chord']):
+                for x in el.pitches:
+                    pitches.append(x.name)
+            elif el.isClassOrSubclass(['Note']):
+                pitches.append(el)
+        return chord.Chord(pitches)
     
     def makeAllSmallestDuration(self):
         '''
@@ -1150,11 +1160,7 @@ class VerticalSlice(music21.Music21Object):
        #return '%s' % [x for x in self.contentDict.items()]
        
     def _setColor(self, color):
-        noteList = []
-        for partNum, objList in self.contentDict.items():
-            for el in objList:
-                noteList.append(el)
-        for obj in noteList:
+        for obj in self.objects:
             obj.color = color
     
     def _getColor(self):
@@ -1162,12 +1168,6 @@ class VerticalSlice(music21.Music21Object):
     
     color = property(_getColor, _setColor)
     
-    def notes(self):
-        n = []
-        for partNum, objList in self.contentDict():
-            for el in objList:
-                n.append(el)
-        return n
                                       
 class VerticalSliceNTuplet(music21.Music21Object):
     '''a collection of n number of vertical slices'''
