@@ -65,6 +65,7 @@ availableFunctions = ['stream.transpose',
                       'augmentOrDiminish',
                       'reduction',
                       'createMensuralCanon',
+                      'checkLeadSheetPitches',
                       'getResultsString',
                       'colorResults',
                       'identifyParallelFifths',
@@ -650,6 +651,135 @@ def createMensuralCanon(sc):
         canonStream.insert(0, part)
     
     return canonStream
+
+# The two methods below were written for Boston Music Hackday- 
+# these methods may be out-of-date and no longer
+# compatible with noteflight. These can be re-written easily if needed
+# the general idea of the methods is provided in the doctests.
+# Lars plans to refactor this file, so these methods will be moved and modified soon
+
+
+def correctChordSymbols(worksheet, studentResponse):
+    
+    '''
+    Written for hackday demo: accepts as parameters a stream with chord symbols (the worksheet)
+    and the student's attempt to write out the pitches for each chord symbol of the worksheet.
+    The student's work is returned with annotations, and the percentage correct is also returned
+    
+    >>> from music21 import *
+    >>> worksheet = stream.Stream()
+    >>> worksheet.append(harmony.ChordSymbol('C'))
+    >>> worksheet.append(harmony.ChordSymbol('G7'))
+    >>> worksheet.append(harmony.ChordSymbol('B-'))
+    >>> worksheet.append(harmony.ChordSymbol('D7/A')) 
+    >>> studentResponse = stream.Stream()
+    >>> studentResponse.append(clef.TrebleClef())
+
+    >>> studentResponse.append(chord.Chord(['C','E','G']))
+    >>> studentResponse.append(chord.Chord(['G', 'B', 'D5', 'F5']))
+    >>> studentResponse.append(chord.Chord(['B-', 'C']))
+    >>> studentResponse.append(chord.Chord(['D4', 'F#4', 'A4', 'C5']))
+    >>> newScore, percentCorrect = correctChordSymbols( worksheet, studentResponse)
+    >>> for x in newScore.notes:
+    ...  x.lyric
+    ':)'
+    ':)'
+    'PITCHES'
+    'INVERSION'
+    >>> percentCorrect
+    50.0
+    
+    
+    '''
+    numCorrect = 0
+    chords1 = worksheet.flat.getElementsByClass(music21.harmony.ChordSymbol)
+    totalNumChords = len(chords1)
+    chords2 = studentResponse.flat.getElementsByClass([music21.chord.Chord, music21.note.Note])
+    isCorrect = False
+    for chord1, chord2 in zip(chords1, chords2):
+        if chord1 not in studentResponse:
+            studentResponse.insertAndShift(chord2.offset, chord1)
+        if not('Chord' in chord2.classes):
+            chord2.lyric = "NOT A CHORD"
+            continue
+        newPitches = []
+        for x in chord2.pitches:
+            newPitches.append(str(x.name))
+        for pitch in chord1:
+           
+            if pitch.name in newPitches:
+                isCorrect = True
+            else:
+                isCorrect = False
+                break
+        if isCorrect == True:
+            newPitches1 = []
+            for y in chord1.pitches:
+                newPitches1.append(str(y.name))
+            p = chord1.sortDiatonicAscending()
+            o =  chord2.sortDiatonicAscending()
+           
+            a = []
+            b = []
+            for d in p.pitches:
+                a.append(str(d.name))
+            for k in o.pitches:
+                b.append(str(k.name))
+            if a != b:
+                chord2.lyric = "INVERSION"
+            else:
+                numCorrect = numCorrect + 1
+                chord2.lyric = ":)"
+        if isCorrect == False:
+            chord2.lyric = "PITCHES"
+
+    percentCorrect =  numCorrect*1.0/totalNumChords * 100
+    return (studentResponse, percentCorrect) #student's corrected score
+
+def checkLeadSheetPitches(worksheet, returnType=''):
+    '''
+    checker routine for hack day demo lead sheet chord symbols exercise. Accepts
+    a stream with both the chord symbols and student's chords, and returns the corrected
+    stream. if returnType=answerkey, the score is returned with the leadsheet pitches realized
+    
+    >>> from music21 import *
+    >>> worksheet = stream.Stream()
+    >>> worksheet.append(harmony.ChordSymbol('C'))
+    >>> worksheet.append(harmony.ChordSymbol('G7'))
+    >>> worksheet.append(harmony.ChordSymbol('B'))
+    >>> worksheet.append(harmony.ChordSymbol('D7/A')) 
+
+    >>> answerKey = checkLeadSheetPitches( worksheet, returnType = 'answerkey' )
+    >>> for x in answerKey.notes:
+    ...  x.pitches
+    [C3, E3, G3]
+    [G2, B2, D3, F3]
+    [B2, D#3, F#3]
+    [A2, C3, D3, F#3]
+    '''
+    #nicePiece = sc
+    #incorrectPiece = sc
+    
+    #incorrectPiece = messageconverter.parse('C:\Users\sample.xml')
+    
+    #sopranoLine = nicePiece.getElementsByClass(stream.Part)[0]
+    #chordLine = nicePiece.getElementsByClass(stream.Part)[1]
+    #chordLine.show('text')
+    #bassLine = nicePiece.part(2)
+    studentsAnswers = worksheet.flat.getElementsByClass(music21.chord.Chord)
+    answerKey = worksheet.flat.getElementsByClass(harmony.ChordSymbol)
+    
+    correctedAssignment, numCorrect = correctChordSymbols(answerKey, studentsAnswers)
+    
+    if returnType == 'answerkey':
+        
+        for chordSymbol in answerKey:
+            chordSymbol.writeAsChord = True
+        message = 'answer key displayed'
+        return answerKey
+    else: 
+        message = 'you got '+str(numCorrect)+' percent correct'
+        return correctedAssignment
 
 def changeColorOfAllNotes(sc, color):
     '''
