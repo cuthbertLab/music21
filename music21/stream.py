@@ -4368,7 +4368,7 @@ class Stream(music21.Music21Object):
                             includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)  
                     # concatenate any additional notes found
                     subNotes += subAdd.getElementsByClass(matchClasses)
-    
+
                 # make subNotes into a chord
                 if len(subNotes) > 0:
                     #environLocal.printDebug(['creating chord from subNotes', subNotes, 'inPlace', inPlace])
@@ -4418,14 +4418,15 @@ class Stream(music21.Music21Object):
         else: # useExactOffsets is True:        
             onAndOffOffsets = self.flat.notesAndRests._uniqueOffsetsAndEndTimes()
             #environLocal.pd(['makeChords: useExactOffsets=True; onAndOffOffsets:', onAndOffOffsets])
-
+            
             for i in range(len(onAndOffOffsets) - 1):
                 # get all notes within the start and the minwindow size
                 oStart = onAndOffOffsets[i]
                 oEnd = onAndOffOffsets[i+1]
                 sub = returnObj.getElementsByOffset(oStart, oEnd,
                         includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)  
-                # get once for speed         
+                # get once for speed   
+                    
                 subNotes = sub.getElementsByClass(matchClasses) 
                 #environLocal.printDebug(['subNotes', subNotes])
                 #subNotes.show('t')
@@ -4492,6 +4493,13 @@ class Stream(music21.Music21Object):
         returned. If a flat Stream of notes, or a Score of such 
         Streams is provided, no Measures will be returned. 
 
+        If using chordify with chord symbols, ensure that the chord symbols
+        have durations (by default the duration of a chord symbol object is 0, unlike
+        a chord object). If harmony objects are not provided a duration, they
+        will not be included in the chordified output pitches but may appear as chord symbol
+        in notation on the score. To realize the chord symbol durations on a score, call
+        :meth:`music21.harmony.realizeChordSymbolDurations` and pass in the score.
+        
         This functionlaity works by splitting all Durations in 
         all parts, or if multi-part by all unique offsets. All 
         simultaneous durations are then gathered into single chords. 
@@ -4525,10 +4533,26 @@ class Stream(music21.Music21Object):
         {5.0} <music21.note.Rest rest>
 
 
+        >>> s = stream.Stream()
+        >>> p2 = stream.Part()
+        >>> p1 = stream.Part()
+        >>> p2.insert(0, harmony.ChordSymbol('Cm', quarterLength = 4.0))
+        >>> p1.insert(2, note.Note('C'))
+        >>> p2.insert(4, harmony.ChordSymbol('D', quarterLength = 4.0))
+        >>> p1.insert(7, note.Note('A'))
+        >>> s.insert(0,p1)
+        >>> s.insert(0,p2)
+        >>> s.chordify().show('text')
+        {0.0} <music21.chord.Chord C3 E-3 G3>
+        {2.0} <music21.chord.Chord C C3 E-3 G3>
+        {3.0} <music21.chord.Chord C3 E-3 G3>
+        {4.0} <music21.chord.Chord D3 F#3 A3>
+        {7.0} <music21.chord.Chord A D3 F#3 A3>
+        
         OMIT_FROM_DOCS
         
         Test that chordifying 
-        
+    
         >>> f2 = stream.Score()
         >>> f2.insert(0, metadata.Metadata())
         >>> f2.append(note.Note('C4'))
