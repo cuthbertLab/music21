@@ -74,10 +74,29 @@ def getVerticalSlices(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest'
     [<music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.note.Note C>], 1: [<music21.note.Note F>]})  , <music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.note.Note C>], 1: [<music21.note.Note G>]})  ]
     >>> len(theoryAnalyzer.getVerticalSlices(sc))
     2
+
+    >>> sc4 = stream.Score()
+    >>> part4 = stream.Part()
+    >>> part4.append(chord.Chord(['A','B','C']))
+    >>> part4.append(chord.Chord(['A','B','C']))
+    >>> part4.append(chord.Chord(['A','B','C']))
+    >>> sc4.insert(part4)
+    >>> theoryAnalyzer.getVerticalSlices(sc4)
+    [<music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.chord.Chord A B C>]})  , <music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.chord.Chord A B C>]})  , <music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.chord.Chord A B C>]})  ]
+
+    >>> sc3 = stream.Score()
+    >>> p1 = stream.Part()
+    >>> p1.append(harmony.ChordSymbol('C', quarterLength = 1))
+    >>> p1.append(harmony.ChordSymbol('D', quarterLength = 3))
+    >>> p1.append(harmony.ChordSymbol('E7', quarterLength = 4))
+    >>> sc3.append(p1)
+    >>> getVerticalSlices(sc3)
+    [<music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.harmony.ChordSymbol C>]})  , <music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.harmony.ChordSymbol D>]})  , <music21.voiceLeading.VerticalSlice contentDict=defaultdict(<type 'list'>, {0: [<music21.harmony.ChordSymbol E7>]})  ]
+
     '''   
     
     vsList = []
-    if 'VerticalSlices' in score.analysisData.keys():
+    if 'VerticalSlices' in score.analysisData.keys() and score.analysisData['VerticalSlices'] != None:
         return score.analysisData['VerticalSlices']
 
     # if elements exist at same offset, return both 
@@ -94,7 +113,6 @@ def getVerticalSlices(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest'
             elementStream = part.flat.getElementsByOffset(c.offset,mustBeginInSpan=False, classList=classFilterList)
             #el = part.flat.getElementAtOrBefore(c.offset,classList=['Note','Rest', 'Chord', 'Harmony'])
             for el in elementStream.elements:
-                
                 #if el.isClassOrSubclass(['Rest']):
                     #TODO: currently rests are stored as None...change to store them as music21 Rests soon
                 #    contentDict[partNum].append(None) # rests are stored as None...change to store them as Rests soon
@@ -246,16 +264,16 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
     <music21.interval.ChromaticInterval 5> <music21.interval.ChromaticInterval 0>
 
 
-#        >>> sc3 = stream.Score()
-#        >>> part2 = stream.Part()
-#        >>> part2.append(harmony.ChordSymbol('C'))
-#        >>> part2.append(harmony.ChordSymbol('C'))
-#        >>> part2.append(harmony.ChordSymbol('C'))
-#        >>> sc3.insert(part2)
-#        >>> ta3 = TheoryAnalyzer(sc3)
-#        >>> len(ta3.getLinearSegments(0,2, ['Harmony']))
-#        2
-#        >>> ta3.getLinearSegments(0,2, ['Harmony'])
+    >>> sc3 = stream.Score()
+    >>> part2 = stream.Part()
+    >>> part2.append(harmony.ChordSymbol('D-', quarterLength = 1))
+    >>> part2.append(harmony.ChordSymbol('C11', quarterLength = 1))
+    >>> part2.append(harmony.ChordSymbol('C7', quarterLength = 1))
+    >>> sc3.insert(part2)
+    >>> len(theoryAnalyzer.getLinearSegments(sc3, 0,2, ['Harmony']))
+    2
+    >>> theoryAnalyzer.getLinearSegments(sc3,0,2, ['Harmony'])
+    [<music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.harmony.ChordSymbol D->, <music21.harmony.ChordSymbol C11>]  , <music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.harmony.ChordSymbol C11>, <music21.harmony.ChordSymbol C7>]  ]
     '''
     
     linearSegments = []
@@ -265,11 +283,11 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
         objects = []
         for n in range(0,lengthLinearSegment):
             objects.append(verticalSlices[i+n].getObjectsByPart(partNum, classFilterList))           
-       
+            #print objects
         if lengthLinearSegment == 3 and 'Note' in _getTypeOfAllObjects(objects):
             tnls = voiceLeading.ThreeNoteLinearSegment(objects[0], objects[1], objects[2])
             linearSegments.append(tnls)
-        elif lengthLinearSegment == 2 and ('Chord' or 'Harmony' in _getTypeOfAllObjects(objects)):
+        elif lengthLinearSegment == 2 and ('Chord' in _getTypeOfAllObjects(objects)):
             tcls = voiceLeading.TwoChordLinearSegment(objects[0], objects[1])
             linearSegments.append(tcls)
         else:
@@ -325,6 +343,8 @@ def getVerticalSliceNTuplets(score, ntupletNum):
         verticalSlices = getVerticalSlices(score)
     else:
         verticalSlices = score.analysisData['VerticalSlices']
+        if verticalSlices == None:
+            verticalSlices = getVerticalSlices(score)
     for i in range(0, len(verticalSlices)-(ntupletNum-1)):
         verticalSliceList = []
         for countNum in range(i,i+ntupletNum):
@@ -1201,7 +1221,8 @@ def removePassingTones(score, dictKey = 'unaccentedPassingTones'):
                 obj.activeSite.remove(obj)
                 break
         a.n1.duration = music21.duration.Duration(durationNewTone)
-    
+        score.stripTies(inPlace=True, matchByPitch=True, retainContainers=False)
+    score.analysisData['VerticalSlices'] = None
     
 def removeNeighborTones(score, dictKey = 'unaccentedNeighborTones'):
     '''
@@ -1242,7 +1263,9 @@ def removeNeighborTones(score, dictKey = 'unaccentedNeighborTones'):
                 obj.activeSite.remove(obj)
                 break
         a.n1.duration = music21.duration.Duration(durationNewTone)
+        score.stripTies(inPlace=True, matchByPitch=True, retainContainers=False)
         #a.n1.color = 'red'
+    score.analysisData['VerticalSlices'] = None
 
 def identifyNeighborTones(score, partNumToIdentify = None, color = None, dictKey = None, unaccentedOnly=True, \
                           editorialDictKey='isNeighborTone', editorialValue=True):
@@ -1927,4 +1950,5 @@ class TestExternal(unittest.TestCase):
         
 
 if __name__ == "__main__":
+
     music21.mainTest(Test)
