@@ -36,7 +36,7 @@ environLocal = environment.Environment(_MOD)
 
 CHORD_TYPES = {
              'major': ['', 'Maj'] , 
-             'minor': ['m', '-', 'min'] ,
+             'minor': ['m', 'min'] ,
              'augmented' : ['+', '#5'] , 
              'diminished' : ['dim', 'o'] ,
              'dominant' : ['7'],
@@ -290,7 +290,7 @@ class Harmony(chord.Chord):
         #by default a harmony object's duration is 0. Users can run realizeChordSymbolDuraitons method to
         #assign the correct duration to each harmony object given a score   
         self.duration = music21.duration.Duration(0)
-
+        
         for kw in keywords:
             if kw == 'root':
                 self._XMLroot = music21.pitch.Pitch(keywords[kw])
@@ -785,7 +785,17 @@ class ChordSymbol(Harmony):
     [D3, F3, A3]
     >>> harmony.ChordSymbol('D,35b7b9#11b13').pitches
     [D3, E-3, F#3, G#3, A3, B-3, C4]
-
+    
+    The '-' symbol and the 'b' symbol are interchangeable, they correspond to flat, not minor.
+    
+    >>> harmony.ChordSymbol('Am').pitches
+    [A2, C3, E3]
+    >>> harmony.ChordSymbol('Abm').pitches
+    [A-2, C-3, E-3]
+    >>> harmony.ChordSymbol('A-m').pitches
+    [A-2, C-3, E-3]
+    >>> harmony.ChordSymbol('F-dim7').pitches
+    [F-2, A--2, C--3, E---3]
     '''
         
             
@@ -825,7 +835,7 @@ class ChordSymbol(Harmony):
                 
         Triads:
             major (major third, perfect fifth)                           C        
-            minor (minor third, perfect fifth)                           Cm        C-    Cmin
+            minor (minor third, perfect fifth)                           Cm        Cmin
             augmented (major third, augmented fifth)                     C+        C#5
             diminished (minor third, diminished fifth)                   Cdim      Co
 
@@ -893,10 +903,10 @@ class ChordSymbol(Harmony):
         if ',' in prelimFigure:
             root = prelimFigure[0:prelimFigure.index(',')]
             st = prelimFigure.replace(',','')
-            st = prelimFigure.replace(root,'')
+            st = st.replace(root,'')
             prelimFigure = prelimFigure.replace(',','')
         else:
-            m1 = re.match(r"[A-Ga-g][b#]?", prelimFigure) #match not case sensitive, 
+            m1 = re.match(r"[A-Ga-g][b#-]?", prelimFigure) #match not case sensitive, 
             if m1:
                 root = m1.group()
                 st = prelimFigure.replace(m1.group(), '')  #remove the root and bass from the string and any additions/omitions/alterations/
@@ -1597,7 +1607,46 @@ class TestExternal(unittest.TestCase):
     #def realizeCSwithFB(self):
     #see demos.bhadley.HarmonyRealizer
         
-
+    def testALLChordTypes(self):
+        chordtypes = {'major': ['', 'Maj'] , 
+             'minor': ['m', '-', 'min'] ,
+             'augmented' : ['+', '#5'] , 
+             'diminished' : ['dim', 'o'] ,
+             'dominant' : ['7'],
+             'major-seventh' : [ 'M7', 'Maj7'],
+             'minor-seventh' : ['m7' , 'min7'] ,
+             'diminished-seventh' : ['dim7' , 'o7'] ,
+             'augmented-seventh' : ['7+', '7#5'] ,
+             'half-diminished' : ['m7b5'] ,
+             'major-minor' : ['mMaj7'] , 
+             'major-sixth' : ['6'] ,
+             'minor-sixth' : ['m6', 'min6'] ,
+             'dominant-ninth' : ['9'] ,
+             'major-ninth' : ['M9' , 'Maj9'] ,
+             'minor-ninth' : ['m9', 'min9'] ,
+             'dominant-11th' : ['11'] ,
+             'major-11th' : ['M11' , 'Maj11'] ,
+             'minor-11th' : ['m11' , 'min11'] ,
+             'dominant-13th' : ['13'] ,
+             'major-13th' : ['M13', 'Maj13'] ,
+             'minor-13th' : ['m13' , 'min13'] ,
+             'suspended-second' : ['sus2'] ,
+             'suspended-fourth' : ['sus' , 'sus4'] ,
+             'Neapolitan' : ['N6'] ,
+             'Italian' : ['It+6'] ,
+             'French' : ['Fr+6'] ,
+             'German' : ['Gr+6'] ,
+             'pedal' : ['pedal'] ,
+             'power' : ['power'] ,
+             'Tristan' : ['tristan'] }
+    
+        notes = ['A', 'B', 'C', 'D','E','F','G']
+        mod = ['','-','#']
+        for n in notes:
+            for m in mod:
+                for key, val in chordtypes.items():
+                    for type in val:
+                        print n+m+','+type, music21.harmony.ChordSymbol(n+m+','+type).pitches
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [ChordSymbol, Harmony, ChordStepModification]
