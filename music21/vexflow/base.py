@@ -24,6 +24,10 @@
 
 
 '''Objects for transcribing music21 objects as Vex Flow code
+	Here's the heirarchy:
+	A VexflowContext can be used to display multiple VexflowParts.
+	Each VexflowPart contains multiple VexflowStaves (one for each measure)
+	Each VexflowStave might contain multilpe VexflowVoices
 '''
 
 import unittest
@@ -40,14 +44,20 @@ UIDCounter = 0L
 
 supportedDisplayModes = ['txt', 'html']
 
-defaultCanvasWidth = 525
-defaultCanvasHeight = 120
+defaultCanvasWidth = '($(window).width()-10)'
+defaultCanvasHeight = '$(window).height()'
+defaultCanvasMargin = 10
 
 defaultStaveWidth = 500
+defaultStaveHeight = 90 #Derived from the vexflow.stave.JS file
 defaultStavePosition = (10,0)
 defaultStaveClef = 'treble'
 
+defaultInterSystemMargin = 30
+defaultIntraSystemMargin = 20
+
 defaultMeasureWidth = 500
+defaultMeasuresPerStave = 4
 
 defaultVoiceNumBeats = 4
 defaultVoiceBeatValue = 4
@@ -119,10 +129,35 @@ vexflowQuarterLengthToDuration = {
 	6.0: 'wd'
 }
 
+vexflowSharpsToKeySignatures = {
+	-7: 'Cb',
+	-6: 'Gb',
+	-5: 'Db',
+	-4: 'Ab',
+	-3: 'Eb',
+	-2: 'Bb',
+	-1: 'F',
+	0: 'C',
+	1: 'G',
+	2: 'D',
+	3: 'A',
+	4: 'E',
+	5: 'B',
+	6: 'F#',
+	7: 'C#'
+}
+
 htmlPreamble = "\n<!DOCTYPE HTML>\n<html>\n<head>\n\t<meta name='author' content=\
 'Music21' />\n\t<script src='http://code.jquery.com/jquery-latest.js'></script>\n\
 \t<script src='http://www.vexflow.com/vexflow.js'/></script>\n</head>\n<body>\n\t<canvas\
  width=525 height=120 id='music21canvas'></canvas>\n\t<script>\n\t\t$(document)\
+.ready(function(){"
+
+htmlCanvasPreamble= "\n<!DOCTYPE HTML>\n<html>\n<head>\n\t<meta name='author' content=\
+'Music21' />\n\t<script src='http://code.jquery.com/jquery-latest.js'></script>\n\
+\t<script src='http://www.vexflow.com/vexflow.js'/></script>\n</head>\n<body>\n\t"
+
+htmlCanvasPostamble="<script>\n\t\t$(document)\
 .ready(function(){"
 
 vexflowPreamble = "\n\t\t\tvar canvas = $('#music21canvas')[0];\n\t\t\tvar \
@@ -174,10 +209,24 @@ def fromScore(thisScore, mode='txt'):
 	'''
 	Parses a music21 score into Vex Flow code
 	#TODO
+
+	Here's the game plan:
+		Create a VexflowPart for each part
+			Each VexflowPart creates VexflowStaves
+		Create a VexflowContext to house all of the parts
 	'''
 	if mode not in supportedDisplayModes:
 		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
-	thisScore2 = thisScore.makeNotation()
+
+	thisScore2 = thisScore.makeNotation(inPlace=False)
+	theseParts = thisScore2.parts
+	numParts = len(theseParts)
+	vexflowParts = [None] * numParts
+	for thisPart in theseParts:
+		#make a vexflowPart object
+		thisVexflowPart = VexflowPart(thisPart, {'numParts':numParts})
+		pass
+
 	raise VexFlowUnsupportedException, 'Cannot display full scores yet'
 
 def fromRest(thisRest, mode='txt'):
@@ -275,7 +324,7 @@ def fromMeasure(rawMeasure, mode='txt'):
 	if mode not in supportedDisplayModes:
 		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
 	
-	thisMeasure = rawMeasure.makeNotation()
+	thisMeasure = rawMeasure.makeNotation(inPlace=False)
 	theseNotes = thisMeasure.flat.notes
 	numNotes = len(theseNotes)
 	if mode == 'txt':
@@ -694,6 +743,11 @@ class VexflowChord(object):
 		self._generateVexflowCode()
 
 	def _generateVexflowCode(self):
+		'''
+		Generates the vexflow code needed to display this chord in a browser
+		Note: this is an internal method. Call generateCode(mode='txt') to 
+			access the result of this method
+		'''
 		#self.notes = []
 		self.vexflowDuration = \
 			vexflowQuarterLengthToDuration[self.originalChord.duration.quarterLength]
@@ -866,44 +920,270 @@ class VexflowRest(object):
 		else:
 			self.originalRest.show('vexflow')
 
+class VexflowPart(object):
+	'''
+	A part is a wrapper for the vexflow code representing multiple measures
+		of music that should go in the same musical staff (as opposed to
+		a vexflow staff)
+	'''
+
+	def __init__(self, music21part, params={}):
+		global UIDCounter
+		self.UID = UIDCounter
+		UIDCounter += 1
+		self.originalPart = music21part
+		self.staves = []
+		self.numMeasures = 0
+		self.numLines = 0
+		self.lineWidth = 0
+		self.measureWidth = 0
+		self.leftMargin = 0
+		self.topMargin = 0
+		self.systemHeight = 0
+		self.vexflowCode = ''
+		self.params = params
+		if 'measuresPerStave' not in self.params:
+			self.params['measuresPerStave'] = defaultMeasuresPerStave
+		if 'canvasMargin' not in self.params:
+			self.params['canvasMargin'] = defaultCanvasMargin
+		if 'canvasWidth' not in self.params:
+			self.params['canvasWidth'] = defaultCanvasWidth
+		if 'staveHeight' not in self.params:
+			self.params['staveHeight'] = defaultStaveHeight
+		if 'numParts' not in self.params:
+			self.params['numParts'] = 1
+		if 'interSystemMargin' not in self.params:
+			self.params['interSystemMargin'] = defaultInterSystemMargin
+		if 'intraSystemMargin' not in self.params:
+			self.params['intraSystemMargin'] = defaultIntraSystemMargin
+		if 'context' not in self.params:
+			self.context = None
+		self._computeParams()
+		self._generateVexflowCode()
+
+	def _computeParams(self):
+		'''
+		Computes parameters necessary for placing the measures in the canvas
+		'''
+		self.lineWidth = '(' + str(self.params['canvasWidth']) + ' - (2*' + \
+			str(self.params['canvasMargin']) + '))'
+		self.measureWidth = '((' + str(self.lineWidth) + ') / ' + \
+			str(self.params['measuresPerStave']) + ')'
+		self.leftMargin = self.params['canvasMargin']
+		self.topMargin = self.params['canvasMargin']
+		self.systemHeight = '(' + str(self.params['numParts']) + ' * (' + \
+			str(self.params['staveHeight']) + ' + ' + \
+			str(self.params['intraSystemMargin']) + '))'
+	
+	def _generateVexflowCode(self):
+		'''
+		Generates the vexflow code to display this part
+		'''
+		self.numMeasures = -1
+		self.numLines = 0
+		self.staves = []
+		for thisMeasure in self.originalPart:
+			if 'Measure' not in thisMeasure.classes:
+				continue
+			self.numMeasures += 1
+			thisXPosition = '(' + str(self.numMeasures % \
+				self.params['measuresPerStave']) + ' * ' + \
+				str(self.measureWidth) + ' + ' + str(self.leftMargin) + ')'
+			self.numLines = int(self.numMeasures) / \
+				int(self.params['measuresPerStave'])
+			thisYPosition = '((' + str(self.numLines) + ' * (' + \
+				str(self.systemHeight) + ' + ' + \
+				str(self.params['interSystemMargin']) + ')) + ' + \
+				str(self.topMargin) + ')'
+			theseParams = {
+				'width': self.measureWidth,
+				'position': (thisXPosition, thisYPosition),
+				'name': 'stavePart' + str(self.UID) + 'Measure' + \
+					str(self.numMeasures) + 'Line' + str(self.numLines)
+			}
+			thisStave = VexflowStave(params=theseParams)
+			thisVoice = VexflowVoice(thisMeasure, {'name':'music21Voice' + \
+				str(self.numMeasures)})
+			thisStave.setVoice(thisVoice)
+			self.staves += [thisStave]
+
+		contextParams = {
+			'width': self.params['canvasWidth'],
+			'height': '((' + str(self.numLines) + ' * ('+str(self.systemHeight)+\
+				' + ' + str(self.params['interSystemMargin']) + ')) + 2* ' +\
+				str(self.topMargin) + ')'
+		}
+
+		if self.context == None:
+			self.context = VexflowContext(contextParams)
+		else:
+			self.context.setWidth(contextParams['width'])
+			self.context.setHeight(contextParams['height'])
+
+		self.vexflowCode = ''
+
+		for thisStave in self.staves:
+			for thisVoice in thisStave.vexflowVoices:
+				self.vexflowCode += thisVoice.generateCode('txt') + '\n'
+			self.vexflowCode += thisStave.generateCode('txt') + '\n'
+
+	def generateCode(self, mode='txt'):
+		'''
+		generates the vexflow code necessary to display this voice in a browser
+		'''
+		if mode=='txt':
+			return self.vexflowCode
+		elif mode=='html':
+			result = htmlCanvasPreamble + str(self.context.getCanvasHTML()) + \
+				htmlCanvasPostamble + '\n'
+			result += self.context.getJSCode(indentation=3) + '\n'
+			result += self.vexflowCode + '\n'
+			for thisStave in self.staves:
+				for thisVoice in thisStave.vexflowVoices:
+					result += str(thisVoice.voiceName) + '.draw(' + \
+					str(self.context.getContextName()) + ', ' + \
+					str(thisStave.staveName) + ');\n' + \
+					str(thisStave.staveName) + '.setContext(' + \
+					str(self.context.getContextName()) + ').draw();'
+
+			result += htmlConclusion
+			return result
+
+
 class VexflowVoice(object):
 	'''
 	A Voice in Vex Flow is a "lateral" grouping of notes
 		It's the equivalent to a :class:`~music21.stream.Part`
+
+	Requires either a Measure object or a Voice object
+		If those objects aren't already flat, flattens them.
 	
 	TODO: Look into music21 Voices
 	'''
 	
-	def __init__(self, params, music21voice = None):
+	def __init__(self, music21measure, params={}):
 		'''
-		params is a dict containing num_beats, beat_value, and other parameters
-			to be passed to the voice object
+		params is a dict containing various parameters to be passed to the 
+			voice object
 		'''
-		if music21voice != None:
-			if 'Voice' not in music21voice.classes:
-				pass
-
-		self.UID = UIDCounter
+		global UIDCounter
+		self.UID = long(UIDCounter)
 		UIDCounter += 1
 
+		if music21measure != None:
+			if not ('Measure' in music21measure.classes or \
+				'Voice' in music21measure.classes):
+				raise TypeError, 'must pass a music21 Measure object'
+			self.originalMeasure = music21measure
+			self.originalChords = music21measure.flat.makeChords(inPlace=False)
+
 		self.params = params
+		self.voiceCode = ''
+		self.noteCode = ''
 
-		if not 'num_beats' in self.params:
-			self.params['num_beats'] = defaultVoiceNumBeats
+		if 'name' in self.params:
+			self.voiceName = self.params['name']
+		else:
+			self.voiceName = 'music21Voice' + str(self.UID)
+			self.params['name'] = self.voiceName
 
-		if not 'beat_value' in self.params:
-			self.params['beat_value'] = defaultVoiceBeatValue
+		#Set the clef
+		theseClefs = self.originalChords.getElementsByClass('Clef')
+		if len(theseClefs) > 1:
+			raise VexFlowUnsupportedException, 'Vexflow cannot yet handle ' +\
+				'multiple clefs in a single measure'
+		elif len(theseClefs) == 1:
+			if 'TrebleClef' in theseClefs[0].classes or 'GClef' in theseClefs[0].classes:
+				self.clef = 'treble'
+			elif 'BassClef' in theseClefs[0].classes:
+				self.clef = 'bass'
+			elif 'AltoClef' in theseClefs[0].classes:
+				self.clef = 'alto'
+			elif 'TenorClef' in theseClefs[0].classes:
+				self.clef = 'tenor'
+			elif 'PercussionClef' in theseClefs[0].classes:
+				self.clef = 'percussion'
+			else:
+				raise VexFlowUnsupportedException, 'Vexflow only supports the ' +\
+					'following clefs: treble, bass, alto, tenor, percussion. ' +\
+					'Cannot parse ', theseClefs[0]
+		else:
+			self.clef = False
 
-		self.voiceName = 'music21Voice' + str(self.UID)
-		self.voiceCode = 'var ' + self.voiceName + ' = new Vex.Flow.Voice({' +\
-			'num_beats: ' + str(self.params['num_beats']) + ', ' + \
-			'beat_value: ' + str(self.params['beat_value']) + ', ' + \
+		#Set the key signature
+		theseKeySignatures = self.originalChords.getElementsByClass('KeySignature')
+		if len(theseKeySignatures) > 1:
+			raise VexFlowUnsupportedException, 'Vexflow cannot yet handle ' +\
+				'multiple key signatures in a single measure'
+		elif len(theseKeySignatures) == 1:
+			if theseKeySignatures[0].sharps in vexflowSharpsToKeySignatures:
+				self.keySignature = vexflowSharpsToKeySignatures[theseKeySignatures[0].sharps]
+			else:
+				raise VexFlowUnsupportedException, "Vexflow doesn't support this "+\
+					'Key Signature:', theseKeySignatures[0]
+		else:
+			self.keySignature = False
+
+		#Set the time signature
+		theseTimeSignatures = self.originalChords.getElementsByClass('TimeSignature')
+		if len(theseTimeSignatures) > 1:
+			raise VexFlowUnsupportedException, 'Vexflow cannot yet handle ' +\
+				'multiple time signatures in a single measure'
+		elif len(theseTimeSignatures) == 1:
+			self.numBeats = self.originalMeasure.highestTime
+			self.beatValue = 4
+			self.timeSignature='/'.join([str(theseTimeSignatures[0].numerator),\
+				str(theseTimeSignatures[0].denominator)])
+		else:
+			if not 'numBeats' in self.params:
+				self.params['numBeats'] = self.originalMeasure.highestTime
+	
+			if not 'beatValue' in self.params:
+				self.params['beatValue'] = 4
+
+			self.numBeats = self.params['numBeats']
+			self.beatValue = self.params['beatValue']
+			self.timeSignature = False
+
+		self._generateVexflowCode()
+
+	def _generateVexflowCode(self):
+		'''
+		Generates the code necessary to display this voice
+		'''
+		self.voiceCode = 'var ' + str(self.voiceName) + ' = new Vex.Flow.Voice({' +\
+			'num_beats: ' + str(self.numBeats) + ', ' + \
+			'beat_value: ' + str(self.beatValue) + ', ' + \
 			'resolution: Vex.Flow.RESOLUTION});'
 
-		self.notes = []
+		self.noteCode = 'var ' + self.voiceName + 'Notes = ['
+
+		for thisChord in self.originalChords:
+			if 'Chord' in thisChord.classes:
+				thisVexflowChord = VexflowChord(thisChord)
+				self.noteCode += thisVexflowChord.generateCode('txt')
+				self.noteCode += ', '
+		self.noteCode = self.noteCode[:-2] + '];'
+		self.vexflowCode = self.voiceCode + '\n' + self.noteCode + '\n' +\
+			str(self.voiceName) + '.addTickables(' + str(self.voiceName) + \
+			'Notes);'
+
+	def _generateVexflowStave(self):
+		'''
+		Generates the code necessary for a corresponding stave
+
+		Probably unecessary; User should instead create a new stave object and 
+			add this voice to it
+		'''
+		#TODO: create a "setStave" and "getStave" method
+		#	require a VexflowStave object
+		pass
 
 	def getBeaming(self):
 		'''
+		XXX: Moving to VexflowContext
+		XXX: Marked for deletion!
+
 		Beaming is a boolean value determining if the voice should be beamed
 
 		Note: So far only VexFlow's automatic beaming is supported
@@ -914,32 +1194,11 @@ class VexflowVoice(object):
 		return self.params['beaming']
 	
 	def getNumBeats(self):
-		return self.params['num_beats']
+		return self.params['numBeats']
 	
 	def getBeatValue(self):
-		return self.params['beat_value']
+		return self.params['beatValue']
 	
-	def getNotes(self):
-		return self.notes
-
-	def addNotes(self, notes):
-		'''
-		appends the notes to the already existing notes
-		draws by calling VexFlow's addTickables() method sequentially
-
-		TODO: check that notes is a list of VexflowNotes
-		TODO: if not, then convert
-		'''
-		self.notes += [notes]
-	
-	def setNotes(self, notes):
-		'''
-		Replaces self.notes with notes.
-
-		USE WITH CARE! Previous notes will be lost!
-		'''
-		self.notes = notes
-
 	def setBeaming(self, beaming):
 		'''
 		Beaming is a boolean value determining if the voice should be beamed
@@ -950,8 +1209,16 @@ class VexflowVoice(object):
 		self.params['beaming'] = beaming
 
 	def generateCode(self, mode='txt'):
-		#TODO
-		pass
+		'''
+		returns the vexflow code necessary to display this Voice in a browser
+			as a string
+		'''
+		if mode == 'txt':
+			return self.vexflowCode
+		elif mode == 'html':
+			raise VexFlowUnsupportedException, "Still working on it, sorry. " +\
+				'no standalone voices for you yet'
+
 			
 
 class VexflowStave(object):
@@ -972,9 +1239,14 @@ class VexflowStave(object):
 		params is a dictionary containing position, width, and other parameters
 			to be passed to the stave object
 		'''
+		global UIDCounter
 		self.UID = UIDCounter
 		UIDCounter += 1
 		self.params = params
+		self.vexflowVoices = []
+		self.voicesCode = ''
+		self.staveCode = ''
+		self.vexflowCode = ''
 		if 'width' not in self.params:
 			self.params['width'] = defaultStaveWidth
 		if 'position' not in self.params:
@@ -993,12 +1265,51 @@ class VexflowStave(object):
 		else:
 			self.staveName = 'music21Stave' + str(self.UID)
 
-		self.staveCode = 'var ' + self.staveName + ' = new Vex.Flow.STave(' +\
+		self._generateVexflow()
+	
+	def _generateVexflow(self):
+		self.staveCode = 'var ' + str(self.staveName) + ' = new Vex.Flow.Stave(' +\
 			str(self.params['position'][0])+','+str(self.params['position'][1])\
 			+ ',' + str(self.params['width']) + ');'
+
+		if len(self.vexflowVoices) > 0:
+			self.voicesCode = 'var ' + str(self.staveName) + 'Formatter = new'+\
+			' Vex.Flow.Formatter().joinVoices('
+
+			voiceList = '['
 		
-		if 'clef' not in self.params:
-			self.params['clef'] = defaultStaveClef
+			for thisVoice in self.vexflowVoices:
+				voiceList += str(thisVoice.voiceName) + ', '
+				if 'clef' not in self.params or not self.params['clef']:
+					self.params['clef'] = thisVoice.clef
+
+				if 'timeSignature' not in self.params or not \
+					self.params['timeSignature']:
+						self.params['timeSignature'] = thisVoice.timeSignature
+
+				if 'keySignature' not in self.params or not \
+					self.params['keySignature']:
+						self.params['keySignature'] = thisVoice.keySignature
+
+			voiceList = voiceList[:-2] + ']'
+			self.voicesCode += str(voiceList) + ').format(' + str(voiceList) + \
+				', ' + str(self.params['width'])  + ');'
+		else:
+			self.voicesCode = ''
+	
+		if 'clef' in self.params and self.params['clef']:
+			self.staveCode += '\n' + str(self.staveName) + '.addClef("' + \
+				str(self.params['clef']) + '");'
+
+		if 'keySignature' in self.params and self.params['keySignature']:
+			self.staveCode += '\n' + str(self.staveName) + '.addKeySignature('+\
+				'"' + str(self.params['keySignature']) + '");'
+
+		if 'timeSignature' in self.params and self.params['timeSignature']:
+			self.staveCode += '\n' + str(self.staveName) + '.addTimeSignature'+\
+				'("' + str(self.params['timeSignature']) + '");'
+
+		self.vexflowCode = str(self.staveCode) + '\n' + str(self.voicesCode)
 	
 	def getWidth(self):
 		return self.params['width']
@@ -1023,9 +1334,48 @@ class VexflowStave(object):
 	def getClef(self):
 		return self.params['clef']
 
+	def addVoice(self, thisVexflowVoice):
+		'''
+		Adds thisVexflowVoice (an instance of VexflowVoice) to this 
+			VexflowStave
+		'''
+		self.vexflowVoices += [thisVexflowVoice]
+		self._generateVexflow()
+	
+	def setVoice(self, theseVexflowVoices):
+		'''
+		Identical to setVoices, but implies that you can call with
+			single voice instead of a list of voices
+
+		XXX: Should I delete this method?
+		'''
+		self.setVoices(theseVexflowVoices)
+		
+	def setVoices(self, theseVexflowVoices):
+		'''
+		Replaces any existing voices attached to this Stave with 
+			theseVexflowVoices (a list of instances of VexflowVoice)
+		'''
+		if isinstance(theseVexflowVoices, list):
+			self.vexflowVoices = theseVexflowVoices
+		else:
+			self.vexflowVoices = [theseVexflowVoices]
+
+		self._generateVexflow()
+	
+	def getVoices(self):
+		return self.vexflowVoices
+
+
 	def generateCode(self, mode='txt'):
-		#TODO
-		pass
+		'''
+		Generates the vexflow code to display this staff in a browser
+		'''
+		if mode == 'txt':
+			return self.vexflowCode
+		elif mode == 'html':
+			raise VexFlowUnsupportedException, "Sorry, I haven't finished " + \
+				'support for standalone staves yet'
 
 class VexflowContext(object):
 	'''
@@ -1038,9 +1388,16 @@ class VexflowContext(object):
 		params is a dictionary containing width, height, and other parameters
 			to be passed to the canvas object
 		'''
+		global UIDCounter
 		self.UID = UIDCounter
 		UIDCounter += 1
 		self.params = params
+		self.canvasHTML = ''
+		self.canvasJSCode = ''
+		self.rendererName = ''
+		self.rendererCode = ''
+		self.contextName = ''
+		self.contextCode = ''
 		if canvasName == None:
 			#XXX Is this sufficient? Should I instead use a random string/hash?
 			self.canvasHTMLName = "music21Canvas" + str(self.UID)
@@ -1053,6 +1410,9 @@ class VexflowContext(object):
 			self.params['width'] = defaultCanvasWidth
 		if 'height' not in self.params:
 			self.params['height'] = defaultCanvasHeight
+
+		self.generateHTML()
+		self.generateJS()
 
 	def generateHTML(self, applyAttributes=False):
 		'''
@@ -1093,6 +1453,11 @@ class VexflowContext(object):
 		
 		self.canvasJSCode = 'var ' + self.canvasJSName + ' = $("#' + \
 			self.canvasHTMLName + '")[0];'
+
+		if applyAttributes:
+			self.canvasJSCode += ' ' + self.canvasJSName + '.width =' + \
+				str(self.getWidth()) +'; ' + self.canvasJSName + '.height = ' +\
+				str(self.getHeight()) + ';'
 		
 		self.rendererName = 'music21Renderer' + str(self.UID)
 		self.rendererCode = 'var ' + self.rendererName + ' = new Vex.Flow.' + \
