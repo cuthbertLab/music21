@@ -1701,6 +1701,11 @@ class ABCHandler(object):
     def __add__(self, other):
         '''Return a new handler adding the tokens in both
 
+
+        Contrived example appending two separate keys.
+        
+        Used in polyphonic metadata merge
+        
         >>> from music21 import *
         >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\n' 
         >>> ah1 = abc.ABCHandler()
@@ -1708,7 +1713,7 @@ class ABCHandler(object):
         >>> len(ah1)
         3
 
-        >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\n' 
+        >>> abcStr = 'M:3/4\\nL:1/4\\nK:D\\n' 
         >>> ah2 = abc.ABCHandler()
         >>> junk = ah2.process(abcStr)
         >>> len(ah2)
@@ -1717,11 +1722,14 @@ class ABCHandler(object):
         >>> ah3 = ah1 + ah2
         >>> len(ah3)
         6
-        
+        >>> ah3.tokens[0] == ah1.tokens[0]
+        True
+        >>> ah3.tokens[3] == ah2.tokens[0]
+        True
 
         '''
         ah = self.__class__() # will get the same class type
-        ah.tokens = self._tokens + other._tokens
+        ah.tokens = self.tokens + other.tokens
         return ah
 
 
@@ -1884,6 +1892,9 @@ class ABCHandler(object):
         >>> ah = abc.ABCHandler()
         >>> junk = ah.process(abcStr)
         >>> tokenColls = ah.splitByVoice()
+        >>> tokenColls[0]
+        <music21.abc.base.ABCHandler object at 0x...>
+        
         >>> [t.src for t in tokenColls[0].tokens] # common headers are first
         ['M:6/8', 'L:1/8', 'K:G']
         >>> # then each voice
@@ -1893,6 +1904,15 @@ class ABCHandler(object):
         ['V:2 name="violin" snm="v"', 'B', 'd', 'B', 'A', 'c', 'A', '|', 'G', 'A', 'G', 'D3', '|', 'B', 'd', 'B', 'A', 'c', 'A', '|', 'G', 'A', 'G', 'D6', '||']
         >>> [t.src for t in tokenColls[3].tokens] 
         ['V:3 name="Bass" snm="b" clef=bass', 'D3', 'D3', '|', 'D6', '|', 'D3', 'D3', '|', 'D6', '||']
+
+        Then later the metadata can be merged at the start of each voice...
+        
+        >>> mergedTokens = tokenColls[0] + tokenColls[1]
+        >>> mergedTokens
+        <music21.abc.base.ABCHandler object at 0x...>
+        >>> [t.src for t in mergedTokens.tokens] 
+        ['M:6/8', 'L:1/8', 'K:G', 'V:1 name="Whistle" snm="wh"', 'B3', 'A3', '|', 'G6', '|', 'B3', 'A3', '|', 'G6', '||']
+
 
         '''
 
@@ -2148,11 +2168,9 @@ class ABCHandlerBar(ABCHandler):
         self.rightBarToken = None
 
     def __add__(self, other):
-        '''Return a new handler adding the tokens in both. This must also set bar tokens if available.
-        '''
         ah = self.__class__() # will get the same class type
         ah.tokens = self._tokens + other._tokens
-        # get defined tokesn
+        # get defined tokens
         for barAttr in ['leftBarToken', 'rightBarToken']:
             bOld = getattr(self, barAttr)
             bNew = getattr(other, barAttr)

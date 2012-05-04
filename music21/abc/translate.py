@@ -321,10 +321,13 @@ def abcToStreamScore(abcHandler, inputM21=None):
     if len(tokenCollections) == 1:
         partHandlers.append(tokenCollections[0])
     else:
-        # add meta data to each Part
+        # add metadata -- stored in tokenCollections[0] -- to each Part (stored in tokenCollections[i]) 
         for i in range(1, len(tokenCollections)):
             # concatenate abc handler instances
-            partHandlers.append(tokenCollections[0] + tokenCollections[i])
+            newABCHandler = tokenCollections[0] + tokenCollections[i]        
+            #dummy = [t.src for t in newABCHandler.tokens]    
+            #print dummy 
+            partHandlers.append(newABCHandler)
 
     # find if this token list defines measures
     # this should probably operate at the level of tunes, not the entire
@@ -425,6 +428,10 @@ def reBar(music21Part, inPlace=True):
         music21Measure = allMeasures[measureIndex]
         if music21Measure.timeSignature is not None:
             lastTimeSignature = music21Measure.timeSignature
+        
+        if lastTimeSignature is None:
+            raise ABCTranslateException("No time signature found in this Part")
+        
         tsEnd = lastTimeSignature.barDuration.quarterLength
         mEnd = music21Measure.highestTime
         music21Measure.number += mnOffset
@@ -449,6 +456,10 @@ def reBar(music21Part, inPlace=True):
 
     if not inPlace:
         return music21Part
+
+class ABCTranslateException(music21.Music21Exception):
+    pass
+
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
