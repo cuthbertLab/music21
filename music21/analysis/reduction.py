@@ -867,7 +867,7 @@ class Test(unittest.TestCase):
         sr.chordReduction = chords
         #sr.score = src
         post = sr.reduce()
-        #post.show()        
+        post.show()        
 
 
     def testExtractionD(self):
@@ -968,7 +968,7 @@ class Test(unittest.TestCase):
                 # weight
                 self.assertTrue(common.almostEquals(dataMatch[2], dataTarget[2]))
 
-    def testPartReductionB(self):
+    def testPartReductionB(self, show=False):
         '''Artificially create test cases.
         '''
         from music21 import stream, note, dynamics, graph, analysis
@@ -988,7 +988,9 @@ class Test(unittest.TestCase):
             #p.makeMeasures(inPlace=True)
             s.insert(0, p)
             pCount += 1
-        #s.show()
+
+        if show is True:
+            s.show()
 
         pr = analysis.reduction.PartReduction(s, normalize=False)
         pr.process()
@@ -996,8 +998,10 @@ class Test(unittest.TestCase):
         target = [(0, [[0.0, 1.0, 0.07857142857142858, '#666666'], [1.0, 3.0, 0.09999999999999999, '#666666'], [4.0, 2.0, 0.04285714285714286, '#666666'], [6.0, 4.0, 0.12142857142857143, '#666666'], [10.0, 2.0, 0.07857142857142858, '#666666']]), (1, [[0.0, 1.0, 0.07857142857142858, '#666666'], [1.0, 3.0, 0.09999999999999999, '#666666'], [4.0, 2.0, 0.04285714285714286, '#666666'], [6.0, 4.0, 0.12142857142857143, '#666666'], [10.0, 2.0, 0.07857142857142858, '#666666']])]
 
         self._matchWeightedData(match, target)
-        #p = graph.PlotDolan(s, title='Dynamics')
-        #p.process()
+
+        if show is True:
+            p = graph.PlotDolan(s, title='Dynamics')
+            p.process()
 
 
     def testPartReductionC(self):
@@ -1130,7 +1134,11 @@ class Test(unittest.TestCase):
 #                             segmentByTarget=True, normalizeByPart=False)
 #         p.process()
 
-
+class TestExternal(unittest.TestCase):
+    
+    def testPartReductionB(self):
+        t = Test()
+        t.testPartReductionB(show=True)
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []

@@ -21,7 +21,7 @@ import sys
 from time import time
 
 from music21 import scale, stream, note, pitch
-from music21.audioSearch.base import *
+from music21.audioSearch import base as audioSearchBase
 from music21.audioSearch import recording
 from music21 import environment
 _MOD = 'audioSearch/transcriber.py'
@@ -44,22 +44,23 @@ def runTranscribe(show=True, plot=True, useMic=True,
                   seconds=20.0, useScale=None, saveFile=True):
     '''
     runs all the methods to record from audio for `seconds` length (default 10.0)
-    and transcribe the resulting melody.
+    and transcribe the resulting melody returning a music21.Score object
     
+    if `show` is True, show the stream.  
     
-    if `useMic` is false it will load a file from disk.
-    
-    
-    if `show` is True then the score will be displayed.
-
-
     if `plot` is True then a Tk graph of the frequencies will be displayed.
     
-    
+    if `useMic` is True then use the microphone.  If False it will load the file of `saveFile`
+    or the default temp file to run transcriptions from.
+        
     a different scale besides the chromatic scale can be specified by setting `useScale`.
     See :ref:`moduleScale` for a list of allowable scales. (or a custom one can be given).
     Microtonal scales are totally accepted, as are retuned scales where A != 440hz.
 
+    if `saveFile` is False then then the recorded audio is saved to disk.  If
+    set to `True` then `environLocal.getRootTempDir() + os.path.sep + 'ex.wav'` is
+    used as the filename.  If set to anything else then it will use that as the
+    filename. 
     '''
     if useScale is None:
         useScale = scale.ChromaticScale('C4')
@@ -75,15 +76,15 @@ def runTranscribe(show=True, plot=True, useMic=True,
     # the rest of the score
     time_start = time()
     if useMic is True:
-        freqFromAQList = getFrequenciesFromMicrophone(length=seconds, storeWaveFilename=WAVE_FILENAME)
+        freqFromAQList = audioSearchBase.getFrequenciesFromMicrophone(length=seconds, storeWaveFilename=WAVE_FILENAME)
     else:
-        freqFromAQList = getFrequenciesFromAudioFile(waveFilename=WAVE_FILENAME)
+        freqFromAQList = audioSearchBase.getFrequenciesFromAudioFile(waveFilename=WAVE_FILENAME)
         
-    detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale)
-    detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
-    (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
-    (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
-    myScore, length_part = notesAndDurationsToStream(notesList, durationList, removeRestsAtBeginning=True)    
+    detectedPitchesFreq = audioSearchBase.detectPitchFrequencies(freqFromAQList, useScale)
+    detectedPitchesFreq = audioSearchBase.smoothFrequencies(detectedPitchesFreq)
+    (detectedPitchObjects, listplot) = audioSearchBase.pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
+    (notesList, durationList) = audioSearchBase.joinConsecutiveIdenticalPitches(detectedPitchObjects)
+    myScore, length_part = audioSearchBase.notesAndDurationsToStream(notesList, durationList, removeRestsAtBeginning=True)    
 
     if show == True:
         myScore.show()        
@@ -94,6 +95,57 @@ def runTranscribe(show=True, plot=True, useMic=True,
     environLocal.printDebug("* END")    
         
     return myScore
+
+def monophonicStreamFromFile(fileName, useScale=None):
+    '''
+    Reads in a .wav file and returns a stream representing the transcribed, monophonic audio.
+
+    `fileName` should be the complete path to a file on the disk.
+
+    a different scale besides the chromatic scale can be specified by setting `useScale`.
+    See :ref:`moduleScale` for a list of allowable scales. (or a custom one can be given).
+    Microtonal scales are totally accepted, as are retuned scales where A != 440hz.
+
+    
+    >>> from music21 import *
+    >>> waveFile = os.path.dirname(__file__) + os.path.sep + 'test_audio.wav' #_DOCS_HIDE
+    >>> #_DOCS_SHOW waveFile = 'test_audio.wav'
+    >>> p = audioSearch.transcriber.monophonicStreamFromFile(waveFile)
+    >>> p
+    <music21.stream.Part ...>
+    >>> p.show('text')
+    {0.0} <music21.note.Note C>
+    {0.25} <music21.note.Note C>
+    {0.75} <music21.note.Note D>
+    {1.75} <music21.note.Note E>
+    {2.75} <music21.note.Note F>
+    {3.75} <music21.note.Note G>
+    {4.75} <music21.note.Note A>
+    {5.75} <music21.note.Note B>
+    {6.75} <music21.note.Note C>
+    {7.25} <music21.note.Rest rest>
+    {7.75} <music21.note.Note C>
+    {8.25} <music21.note.Note C>
+    {8.5} <music21.note.Note E>
+    {9.5} <music21.note.Note G>
+    {10.5} <music21.note.Note C>
+    {11.0} <music21.note.Note C>
+    {11.25} <music21.note.Note A>
+    {12.25} <music21.note.Note F>
+    {13.25} <music21.note.Note D>
+    {15.25} <music21.note.Note D>
+    {16.25} <music21.note.Rest rest>
+    {17.25} <music21.note.Note G>
+    '''
+    freqFromAQList = audioSearchBase.getFrequenciesFromAudioFile(waveFilename=fileName)
+        
+    detectedPitchesFreq = audioSearchBase.detectPitchFrequencies(freqFromAQList, useScale)
+    detectedPitchesFreq = audioSearchBase.smoothFrequencies(detectedPitchesFreq)
+    (detectedPitchObjects, listplot) = audioSearchBase.pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
+    (notesList, durationList) = audioSearchBase.joinConsecutiveIdenticalPitches(detectedPitchObjects)
+    myScore, length_part = audioSearchBase.notesAndDurationsToStream(notesList, durationList, removeRestsAtBeginning=True)    
+    return myScore.parts[0]
+
 
 
 class TestExternal(unittest.TestCase):
@@ -113,6 +165,7 @@ class TestExternal(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(TestExternal)
 
 

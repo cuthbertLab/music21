@@ -2399,8 +2399,14 @@ class Test(unittest.TestCase):
 
 
     def testExpandRepeatsImportedA(self):
+        '''
+        tests expanding repeats in a piece with repeats midmeasure
+        
+        Also has grace notes so it tests our importing of grace notes
+        '''
+        
         from music21 import corpus
-        s = corpus.parse('banjoreel')
+        s = corpus.parse('ryansMammoth/banjoreel')
         #s.show()
         self.assertEqual(len(s.parts), 1)        
         self.assertEqual(len(s.parts[0].getElementsByClass('Measure')), 11)        

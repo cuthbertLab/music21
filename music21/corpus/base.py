@@ -245,6 +245,14 @@ def addPath(fp):
     >>> from music21 import *
     >>> #_DOCS_SHOW coprus.addPath('~/Documents')
 
+    alternatively, add a directory permanently (see link above for more details):
+    
+    >>> from music21 import *
+    >>> #_DOCS_SHOW us = environment.UserSettings()
+    >>> #_DOCS_SHOW us['localCorpusPath'] = 'd:/desktop/'
+    
+    (then best is to restart music21)
+
     '''
     if fp is None or not os.path.exists(fp):
         raise CorpusException("an invalid file path has been provided: %s" % fp)
@@ -903,6 +911,10 @@ class BachChoraleList(object):
     
     Note that multiple chorales share the same title, so it's best to
     iterate over one of the other lists to get them all.
+    
+    The list of chorales comes from http://en.wikipedia.org/wiki/List_of_chorale_harmonisations_by_Johann_Sebastian_Bach
+    which does not have all chorales in the Bärenreitter-Kirnbergger or Riemenschneider
+    numberings since it only includes BWV 250-438.
 
 
     >>> from music21 import *
@@ -919,6 +931,13 @@ class BachChoraleList(object):
     kalmus 358
     >>> #_DOCS_SHOW c = corpus.parse('bach/bwv' + str(info358['bwv']))
     >>> #_DOCS_SHOW c.show() # shows Bach BWV431    
+
+    More fully:
+    
+    >>> b = corpus.parse('bwv' + str(corpus.BachChoraleList().byRiemenschneider[2]['bwv']))
+    >>> b
+    <music21.stream.Score ...>
+    
     '''
     def __init__(self):
         self.prepareList()

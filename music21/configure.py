@@ -18,7 +18,13 @@ import threading
 import unittest
 import textwrap
 import distutils
-import webbrowser
+
+hasWebbrowser = False
+try:
+    import webbrowser
+    hasWebbrowser = True
+except:
+    pass
 
 try:
     import readline
@@ -744,7 +750,10 @@ class AskOpenInBrowser(YesOrNo):
         '''
         result = self.getResult()
         if result is True: # if True            
-            webbrowser.open_new(self._urlTarget)
+            if hasWebbrowser is True:
+                webbrowser.open_new(self._urlTarget)
+            else:
+                print("Point your browser to %s" % self._urlTarget)
         elif result is False:
             pass
             #self._writeToUser(['No URL is opened.', ' '])
@@ -856,7 +865,10 @@ class AskSendInstallationReport(YesOrNo):
         '''
         result = self.getResult()
         if result is True:
-            webbrowser.open(self._getMailToStr())
+            if hasWebbrowser is True:
+                webbrowser.open(self._getMailToStr())
+            else:
+                print("Could not open your mail program.  Sorry!")
 
 
 

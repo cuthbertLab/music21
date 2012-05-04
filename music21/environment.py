@@ -508,15 +508,18 @@ class _EnvironmentCore(object):
         elif format == 'midi':
             environmentKey = 'midiPath'
         elif format == 'vexflow':
-            import webbrowser
-            if fp.find('\\') != -1:
-                pass
-            else:
-                if fp.startswith('/'):
-                    fp = 'file://' + fp
-            
-            webbrowser.open(fp)
-            return
+            try:
+                import webbrowser
+                if fp.find('\\') != -1:
+                    pass
+                else:
+                    if fp.startswith('/'):
+                        fp = 'file://' + fp
+                
+                webbrowser.open(fp)
+                return
+            except:
+                print "Cannot open webbrowser, sorry.  go to file://%s" % fp
         else:
             environmentKey = None
             fpApp = None

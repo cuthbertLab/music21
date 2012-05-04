@@ -33,7 +33,10 @@ environLocal = environment.Environment(_MOD)
 
 
 def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
-    '''Handler conversion of a single Part of a multi-part score. Results, as a Part, are built into the provided inputM21 object (a Score or similar Stream) or a newly created Stream.
+    '''
+    Handler conversion of a single Part of a multi-part score. 
+    Results, as a Part, are built into the provided inputM21 object 
+    (a Score or similar Stream) or a newly created Stream.
     '''
     from music21 import metadata
     from music21 import spanner

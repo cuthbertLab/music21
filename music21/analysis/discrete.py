@@ -4,7 +4,7 @@
 # Purpose:      Framework for modular, windowed analysis
 #
 # Authors:      Jared Sadoian
-# Authors:      Christopher Ariza
+#               Christopher Ariza
 #
 # Copyright:    (c) 2010-2011 The music21 Project
 # License:      LGPL
@@ -811,6 +811,9 @@ class BellmanBudge(KeyWeightKeyAnalysis):
         12
         >>> len(a._getWeights('minor'))
         12            
+        >>> a._getWeights('major')
+        [16.8, 0.86, 12.95, 1.41, ... ]
+
         '''
         weightType = weightType.lower()
         # note: only one value is different from KrumhanslSchmuckler

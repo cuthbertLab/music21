@@ -15,7 +15,6 @@
 
 
 import unittest
-import webbrowser
 import urllib
 import re
 import math

@@ -6,9 +6,9 @@
 # Authors:      Neena Parikh
 #               Christopher Ariza
 #               Michael Scott Cuthbert
-#               
+#               Jose Cabal-Ugaz
 #
-# Copyright:    (c) 2009-11 The music21 Project
+# Copyright:    (c) 2009-12 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 

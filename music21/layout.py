@@ -228,6 +228,9 @@ class SystemLayout(music21.Music21Object):
     '''Parameters for configuring a system's layout.
 
     SystemLayout objects may be found on Measure or Part Streams.    
+    
+    Importantly, if isNew is True then this object represents the start of a new system.
+    
 
     >>> from music21 import *
     >>> sl = layout.SystemLayout(leftMargin=234, rightMargin=124, distance=3, isNew=True)

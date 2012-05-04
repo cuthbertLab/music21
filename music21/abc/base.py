@@ -881,7 +881,7 @@ class ABCNote(ABCToken):
     General usage requires multi-pass processing. After being tokenized, 
     each ABCNote needs a number of attributes updates. Attributes to 
     be updated after tokenizing, and based on the linear sequence of 
-    tokens: `inBar`, `inBeam`, `inSlur`, `inGrace`, 
+    tokens: `inBar`, `inBeam` (not used), `inSlur` (not used), `inGrace` (not used), 
     `activeDefaultQuarterLength`, `brokenRhythmMarker`, and 
     `activeKeySignature`.  
 
