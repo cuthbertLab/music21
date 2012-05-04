@@ -232,6 +232,8 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                 measureNumber += 1
             p._appendCore(dst)
 
+    reBar(p, inPlace=True)
+    
     # clefs are not typically defined, but if so, are set to the first measure
     # following the meta data, or in the open stream
     if not clefSet:
@@ -461,9 +463,14 @@ def reBar(music21Part, inPlace=True):
             m2.number = m1.number + 1
             mnOffset += 1
             music21Part.insert(m1.offset + m1.highestTime, m2)
+        elif (mEnd + music21Measure.paddingLeft) < tsEnd and measureIndex != len(allMeasures) - 1:
+            # The first and last measures are allowed to be incomplete
+            music21Measure.timeSignature = music21Measure.bestTimeSignature()
+            if allMeasures[measureIndex+1].timeSignature is None:
+                allMeasures[measureIndex+1].timeSignature = lastTimeSignature
+
     if not inPlace:
         return music21Part
-
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
