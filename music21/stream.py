@@ -5516,6 +5516,7 @@ class Stream(music21.Music21Object):
 
         OMIT_FROM_DOCS
         TODO: inPlace=False does not work in many cases
+        TODO: inPlace=True should return nothing
         '''
 
         #environLocal.printDebug(['calling Stream.makeBeams()'])
@@ -5550,10 +5551,11 @@ class Stream(music21.Music21Object):
                     noteGroups.append(v.notesAndRests)
             else:
                 noteGroups.append(m.notesAndRests)
+            
             #environLocal.printDebug(['noteGroups', noteGroups, 'len(noteGroups[0])',  len(noteGroups[0])])
 
             for noteStream in noteGroups:
-                if len(noteStream) <= 1: 
+                if len(noteStream) <= 1:
                     continue # nothing to beam
                 durList = []
                 for n in noteStream:
@@ -5572,15 +5574,22 @@ class Stream(music21.Music21Object):
                 # getBeams can take a list of Durations; however, this cannot
                 # distinguish a Note from a Rest; thus, we can submit a flat 
                 # stream of note or note-like entities; will return
-                # the saem lost of beam objects
-                beamsList = lastTimeSignature.getBeams(noteStream)
+                # the same list of beam objects
+                
+                offset = 0.0
+                if m.paddingLeft != 0.0:
+                    offset = m.paddingLeft
+                elif noteStream.highestTime < lastTimeSignature.barDuration.quarterLength:
+                    offset = lastTimeSignature.barDuration.quarterLength - noteStream.highestTime
+                beamsList = lastTimeSignature.getBeams(noteStream, measureStartOffset=offset)
+                
                 for i in range(len(noteStream)):
                     # this may try to assign a beam to a Rest
                     noteStream[i].beams = beamsList[i]
                 # apply tuple types in place; this modifies the durations 
                 # in dur list
                 duration.updateTupletType(durList)
-
+            
         del mColl # remove Stream no longer needed
         return returnObj
 
@@ -11208,6 +11217,3 @@ if __name__ == "__main__":
 
 #------------------------------------------------------------------------------
 # eof
-
-
-
