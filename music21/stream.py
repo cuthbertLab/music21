@@ -4586,14 +4586,22 @@ class Stream(music21.Music21Object):
 
         mStream = allParts[0].getElementsByClass('Measure')
         mCount = len(mStream)
+        hasMeasures = True
         if mCount == 0:
+            hasMeasures = False
             mCount = 1 # treat as a single measure
+        else:
+            partsMeasureCache = []
+            for p in allParts:
+                partsMeasureCache.append(p.getElementsByClass('Measure'))
+        
+        
         for i in range(mCount): # may be 1
             # first, collect all unique offsets for each measure
             uniqueOffsets = []
-            for p in allParts:
-                if p.hasMeasures():
-                    m = p.getElementsByClass('Measure')[i]
+            for pNum, p in enumerate(allParts):
+                if hasMeasures is True: # has measures
+                    m = partsMeasureCache[pNum][i]
                 else:
                     m = p # treat the entire part as one measure
                 mFlatNotes = m.flat.notesAndRests
@@ -4603,10 +4611,10 @@ class Stream(music21.Music21Object):
                         uniqueOffsets.append(t)
             #environLocal.printDebug(['chordify: uniqueOffsets for all parts, m', uniqueOffsets, i])
             uniqueOffsets = sorted(uniqueOffsets)
-            for p in allParts:
+            for pNum, p in enumerate(allParts):
                 # get one measure at a time
-                if p.hasMeasures():
-                    m = p.getElementsByClass('Measure')[i]
+                if hasMeasures is True:
+                    m = partsMeasureCache[pNum][i]
                 else:
                     m = p # treat the entire part as one measure
                 # working with a copy, in place can be true
@@ -4635,8 +4643,8 @@ class Stream(music21.Music21Object):
             for i, m in enumerate(mStream.getElementsByClass('Measure')):
                 # get highest time before removal
                 mQl = m.duration.quarterLength
-                # remove any Streams (aka Voices) found in the Measure
                 m.removeByClass('GeneralNote')
+                # remove any Streams (aka Voices) found in the Measure
                 m.removeByClass('Stream')
                 # get offset in original measure
                 mOffsetStart = m.getOffsetBySite(allParts[0])        
@@ -4766,7 +4774,7 @@ class Stream(music21.Music21Object):
             groups = [(srcObj, None)]
         #environLocal.printDebug(['_getOffsetMap', groups])
         for group, voiceIndex in groups:
-            for e in group:
+            for e in group._elements:
                 # do not include barlines
                 if isinstance(e, bar.Barline):
                     continue
