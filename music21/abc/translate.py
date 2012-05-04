@@ -379,21 +379,10 @@ def reBar(music21Part, inPlace=True):
     
     The whole part is in 2/4 time, but there are some measures expressed in 4/4 time
     without an explicit time signature change, an error in abc parsing due to the
-    omission of barlines.
-    
-     
-    >>> music21Part.measure(15).show("text") # Highest Time is 4.0, double that of 2/4 time
-    {0.0} <music21.note.Note A>
-    {1.0} <music21.note.Note A>
-    {2.0} <music21.note.Note A>
-    {2.5} <music21.note.Note B->
-    {3.0} <music21.note.Note A>
-    {3.5} <music21.note.Note G>
-
-    
-    The method will split those measures such that they conform to the last time signature,
-    in this case 2/4. The default is to reBar in place. The measure numbers are updated
-    accordingly.
+    omission of barlines. The method will split those measures such that they conform 
+    to the last time signature, in this case 2/4. The default is to reBar in place. 
+    The measure numbers are updated accordingly. (NOTE: reBar is called automatically
+    in abcToStreamPart)
     
     
     The key signature and clef are assumed to be the same in the second measure after the
@@ -402,7 +391,6 @@ def reBar(music21Part, inPlace=True):
     signature, except in the case that a new time signature is indicated.
     
     
-    >>> translate.reBar(music21Part)
     >>> music21Part.measure(15).show("text")
     {0.0} <music21.note.Note A>
     {1.0} <music21.note.Note A>
@@ -418,16 +406,6 @@ def reBar(music21Part, inPlace=True):
     
     
     >>> music21Part2 = irl[14][1] # 4/4 time signature
-    >>> music21Part2.measure(1).show("text")
-    {0.0} <music21.note.Note C>
-    {1.0} <music21.note.Note A>
-    {1.5} <music21.note.Note G>
-    {2.0} <music21.note.Note E>
-    {2.5} <music21.note.Note G>
-    {4.0} <music21.note.Note E>
-    
-    
-    >>> translate.reBar(music21Part2)
     >>> music21Part2.measure(1).show("text")
     {0.0} <music21.note.Note C>
     {1.0} <music21.note.Note A>
@@ -569,6 +547,7 @@ class Test(unittest.TestCase):
         af = abc.ABCFile()
         s = abcToStreamScore(af.readstr(tf))
 
+        s.show('text')
         self.assertEqual(len(s.parts), 3)
         # must flatten b/c  there are measures
         self.assertEqual(len(s.parts[0].flat.notesAndRests), 6)
