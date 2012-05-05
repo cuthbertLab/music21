@@ -861,9 +861,16 @@ def getVerticalSliceFromObject(music21Obj, scoreObjectIsFrom, classFilterList=No
 
 
 class VerticalSlice(music21.Music21Object):
-    ''' A vertical slice of music21 objects that occur simultaneously in a score. The vertical slice 
-    is instantiated by passing in a dictionary of the form {partNumber : [ music21Objects ] } 
-    Typically vertical slices are created by :meth:`~music21.theoryAnalzyer.getVerticalSlices`
+    ''' A vertical slice object exists as a more accessible method of accessing information about
+    vertical moments in a score. A vertical slice is instantiated by passing in a dictionary of 
+    the form {partNumber : [ music21Objects ] } 
+    To create vertical slices out of a score, call by :meth:`~music21.theoryAnalzyer.getVerticalSlices`
+    
+    Vertical slices are useful to provide direct and easy access to objects in a part. A list of vertical
+    slices, although similar to the list of chords from a chordified score, provides easier access to partnumber
+    information and identity of objects in the score. Plus, the objects in a vertical slice points directly
+    to the objects in the score, so modifying a vertical slice taken from a score is the same as modyfing the elements
+    of the vertical slice in the score directly.
     
 
     >>> from music21 import *
@@ -887,44 +894,55 @@ class VerticalSlice(music21.Music21Object):
     are the part numbers and the element at each key is a list of music21 objects (allows for multiple voices \
     in a single part'
     }
-    #method should be depricated...and will be as soon as we fix the other code that uses this    
-#    def noteFromPart(self,partNum):
-#        partNoteList = self.getObjectsByPart(partNum, classFilterList=['Note'])
-#        if partNoteList:
-#            return [0]
+
     def isConsonant(self):
         '''
+        evaluates whether this vertical slice moment is consonant or dissonant according to the common-practice
+        consonance rules. Method generates chord of all simultaneously sounding pitches, then calls 
+        :meth:`~music21.chord.isConsonant`
+        
         >>> from music21 import *
-        >>> vs1 = VerticalSlice({0:note.Note('A4'), 1:note.Note('B'), 2:note.Note('A')})
-        >>> vs1.isConsonant()
-        True
-        >>> vs2 = VerticalSlice({0:note.Note('A4'), 1:note.Note('B'), 2:note.Note('C#')})
-        >>> vs2.isConsonant()
+        >>> VerticalSlice({0:note.Note('A4'), 1:note.Note('B4'), 2:note.Note('A4')}).isConsonant()
         False
-        >>> vs3 = VerticalSlice({0:note.Note('C'), 1:note.Note('G'), 2:chord.Chord(['C','E','G'])})
-        >>> vs3.isConsonant()
+        >>> VerticalSlice({0:note.Note('A4'), 1:note.Note('B4'), 2:note.Note('C#4')}).isConsonant()
+        False
+        >>> VerticalSlice({0:note.Note('C3'), 1:note.Note('G5'), 2:chord.Chord(['C3','E4','G5'])}).isConsonant()
+        True
+        >>> VerticalSlice({0:note.Note('A3'), 1:note.Note('B3'), 2:note.Note('C4')}).isConsonant()
+        False
+        >>> VerticalSlice({0:note.Note('C1'), 1:note.Note('C2'), 2:note.Note('C3'), 3:note.Note('G1'), 4:note.Note('G2'), 5:note.Note('G3')}).isConsonant()
+        True
+        >>> VerticalSlice({0:note.Note('A3'), 1:harmony.ChordSymbol('Am')}).isConsonant()
         True
         '''
-        return self.getChord().isConsonant() and False not in [x.isConsonant() for x in self.getObjectsByClass('Chord')]
+        return self.getChord().isConsonant()
 
     def getChord(self):
         '''
-        returns only notes as a chord
-         >>> vs1 = VerticalSlice({0:note.Note('A4'), 1:chord.Chord(['B','C','A']), 2:note.Note('A')})
+        extracts all simultaneously sounding pitches (from chords, notes, harmony objects, etc.) and returns
+        as a chord. Pretty much returns the vertical slice to a chordified output.
+        
+        >>> from music21 import *
+        >>> vs1 = VerticalSlice({0:note.Note('A4'), 1:chord.Chord(['B','C','A']), 2:note.Note('A')})
         >>> vs1.getChord()
         <music21.chord.Chord A4 B C A A>
+        >>> VerticalSlice({0:note.Note('A3'), 1:chord.Chord(['F3','D4','A4']), 2:harmony.ChordSymbol('Am')}).getChord()
+        <music21.chord.Chord A3 F3 D4 A4 A2 C3 E3>
         '''
         pitches = []
         for el in self.objects:
             if el.isClassOrSubclass(['Chord']):
                 for x in el.pitches:
-                    pitches.append(x.name)
+                    pitches.append(x.nameWithOctave)
             elif el.isClassOrSubclass(['Note']):
                 pitches.append(el)
         return chord.Chord(pitches)
     
     def makeAllSmallestDuration(self):
         '''
+        locate the smallest duration of all elements in the vertical slice and assign this duration
+        to each element
+        
         >>> from music21 import *
         >>> n1 =  note.Note('C4')
         >>> n1.quarterLength = 1
@@ -938,8 +956,12 @@ class VerticalSlice(music21.Music21Object):
         [1.0, 1.0, 1.0]
         '''
         self.changeDurationofAllObjects(self.getShortestDuration())
+        
     def makeAllLargestDuration(self):
         '''
+        locate the largest duration of all elements in the vertical slice and assign this duration
+        to each element
+        
         >>> from music21 import *
         >>> n1 =  note.Note('C4')
         >>> n1.quarterLength = 1
@@ -955,6 +977,20 @@ class VerticalSlice(music21.Music21Object):
         self.changeDurationofAllObjects(self.getLongestDuration())
         
     def getShortestDuration(self):
+        '''
+        returns the smallest quarterLength that exists among all elements
+        
+        >>> from music21 import *
+        >>> n1 =  note.Note('C4')
+        >>> n1.quarterLength = 1
+        >>> n2 =  note.Note('G4')
+        >>> n2.quarterLength = 2
+        >>> cs = harmony.ChordSymbol('C')
+        >>> cs.quarterLength = 4
+        >>> vs1 = VerticalSlice({0:n1, 1:n2, 2:cs})
+        >>> vs1.getShortestDuration()
+        1.0
+        '''
         leastQuarterLength = self.objects[0].quarterLength
         for obj in self.objects:
             if obj.quarterLength < leastQuarterLength:
@@ -962,6 +998,20 @@ class VerticalSlice(music21.Music21Object):
         return leastQuarterLength
     
     def getLongestDuration(self):
+        '''
+        returns the longest duration that exists among all elements
+        
+        >>> from music21 import *
+        >>> n1 =  note.Note('C4')
+        >>> n1.quarterLength = 1
+        >>> n2 =  note.Note('G4')
+        >>> n2.quarterLength = 2
+        >>> cs = harmony.ChordSymbol('C')
+        >>> cs.quarterLength = 4
+        >>> vs1 = VerticalSlice({0:n1, 1:n2, 2:cs})
+        >>> vs1.getLongestDuration()
+        4.0
+        '''
         longestQuarterLength = self.objects[0].quarterLength
         for obj in self.objects:
             if obj.quarterLength > longestQuarterLength:
@@ -969,6 +1019,21 @@ class VerticalSlice(music21.Music21Object):
         return longestQuarterLength
     
     def changeDurationofAllObjects(self, newQuarterLength):
+        '''
+        changes the duration of all objects in vertical slice
+        
+        >>> from music21 import *
+        >>> n1 =  note.Note('C4')
+        >>> n1.quarterLength = 1
+        >>> n2 =  note.Note('G4')
+        >>> n2.quarterLength = 2
+        >>> cs = harmony.ChordSymbol('C')
+        >>> cs.quarterLength = 4
+        >>> vs1 = VerticalSlice({0:n1, 1:n2, 2:cs})
+        >>> vs1.changeDurationofAllObjects(1.5)
+        >>> [x.quarterLength for x in vs1.objects]
+        [1.5, 1.5, 1.5]
+        '''
         for obj in self.objects:
             obj.quarterLength = newQuarterLength
         
@@ -999,21 +1064,7 @@ class VerticalSlice(music21.Music21Object):
             return retList[0]
         else:
             return None
-#    def _getNoteList(self):
-#
-#        noteList = []
-#        for part, m21object in self.contentDict.items():
-#            if m21object == None:
-#                continue
-#            else:
-#                noteList.extend(m21object)
-#        return noteList 
-#    
-#    noteList = property(_getNoteList, doc = '''
-#        the a list of only the note objects in the vertical slice 
-#    
-#    
-#    ''')    
+ 
     
     def getObjectsByClass(self, classFilterList, partNums=None):
         '''
@@ -1157,16 +1208,24 @@ class VerticalSlice(music21.Music21Object):
     
     def __repr__(self):
         return '<music21.voiceLeading.%s contentDict=%s  ' % (self.__class__.__name__, self.contentDict)
-       #return '%s' % [x for x in self.contentDict.items()]
        
     def _setColor(self, color):
+    
         for obj in self.objects:
             obj.color = color
     
     def _getColor(self):
         return self._color
     
-    color = property(_getColor, _setColor)
+    color = property(_getColor, _setColor, doc = '''
+        sets the color of each element in the vertical slice
+        
+        >>> from music21 import *
+        >>> vs1 = voiceLeading.VerticalSlice({1:note.Note('C'), 2:harmony.ChordSymbol('C')})
+        >>> vs1.color = 'blue'
+        >>> [x.color for x in vs1.objects]
+        ['blue', 'blue']
+    ''')
     
                                       
 class VerticalSliceNTuplet(music21.Music21Object):
