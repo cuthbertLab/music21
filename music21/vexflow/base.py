@@ -52,12 +52,14 @@ defaultStaveWidth = 500
 defaultStaveHeight = 90 #Derived from the vexflow.stave.JS file
 defaultStavePosition = (10,0)
 defaultStaveClef = 'treble'
+defaultStaveKeySignature = 'C'
 
 defaultInterSystemMargin = 60
 defaultIntraSystemMargin = 20
 
 defaultMeasureWidth = 500
 defaultMeasuresPerStave = 4
+defaultMeasureMargin = 50
 
 defaultVoiceNumBeats = 4
 defaultVoiceBeatValue = 4
@@ -66,6 +68,7 @@ defaultBeamingStatus = False #Just until it's working properly
 
 defaultAccidentalDisplayStatus = True 
 defaultClefDisplayStatus = False
+defaultKeySignatureDisplayStatus = False
 
 defaultNoteQuarterLength = 1
 
@@ -208,7 +211,7 @@ htmlPreamble = "\n<!DOCTYPE HTML>\n<html>\n<head>\n\t<meta name='author' content
 
 htmlCanvasPreamble= "\n<!DOCTYPE HTML>\n<html>\n<head>\n\t<meta name='author' content=\
 'Music21' />\n\t<script src='http://code.jquery.com/jquery-latest.js'></script>\n\
-\t" + vexflowLocalCopy + "\n</head>\n<body>\n\t"
+\t" + vexflowGlobalCopy + "\n</head>\n<body>\n\t"
 
 htmlCanvasPostamble="<script>\n\t\t$(document)\
 .ready(function(){"
@@ -1161,6 +1164,9 @@ class VexflowPart(object):
 			self.params['interSystemMargin'] = defaultInterSystemMargin
 		if 'intraSystemMargin' not in self.params:
 			self.params['intraSystemMargin'] = defaultIntraSystemMargin
+		if 'measureMargin' not in self.params:
+			#Leaves a margin around the notes in a measure
+			self.params['measureMargin'] = defaultMeasureMargin
 		if 'context' not in self.params:
 			self.context = None
 		else:
@@ -1177,6 +1183,8 @@ class VexflowPart(object):
 			str(self.params['canvasMargin']) + '))'
 		self.measureWidth = '((' + str(self.lineWidth) + ') / ' + \
 			str(self.params['measuresPerStave']) + ')'
+		self.notesWidth = '((' + self.measureWidth + ') - ' + \
+			str(self.params['measureMargin']) + ')'
 		self.leftMargin = self.params['canvasMargin']
 		self.topMargin = self.params['canvasMargin']
 		self.systemHeight = '(' + str(self.params['numParts']) + ' * (' + \
@@ -1192,6 +1200,7 @@ class VexflowPart(object):
 		self.numMeasures = -1
 		self.numLines = 0
 		self.staves = []
+		previousKeySignature = False
 		for thisMeasure in self.originalPart:
 			if 'Measure' not in thisMeasure.classes:
 				continue
@@ -1213,14 +1222,20 @@ class VexflowPart(object):
 				'name': 'stavePart' + str(self.params['partIndex']) + 'Measure' + \
 					str(self.numMeasures) + 'Line' + str(self.numLines) + 'ID' + \
 					str(self.UID),
-				'clef': self.clef
+				'clef': self.clef,
+				'notesWidth': self.notesWidth
 			}
 			
 			#Display the clef at the start of new lines
-			theseParams['clefDisplayStatus'] = (self.numMeasures % \
+			isNewLine = (self.numMeasures % \
 				self.params['measuresPerStave'] == 0)
+			theseParams['clefDisplayStatus'] = isNewLine
+			theseParams['keySignatureDisplayStatus'] = isNewLine
 			
-			#if theseParams['clefDisplayStatus']:
+			if previousKeySignature:
+				theseParams['keySignature'] = previousKeySignature
+
+			#if theseParams['keySignatureDisplayStatus']:
 				#print "Part: %d, Measure: %d, Line: %d" % \
 					#(self.params['partIndex'], self.numMeasures, self.numLines)
 
@@ -1234,6 +1249,7 @@ class VexflowPart(object):
 			if len(thisMeasure.getElementsByClass('Voice')) == 0:
 				theseVoices = VexflowVoice(thisMeasure, \
 					params=voiceParams)
+				previousKeySignature = theseVoices.keySignature
 			else:
 				theseVoices = []
 				music21voices = thisMeasure.getElementsByClass('Voice')
@@ -1243,6 +1259,7 @@ class VexflowPart(object):
 					voiceParams['name'] = voiceParams['name'][:-1] + str(index)
 					theseVoices += [VexflowVoice(thisVoice, \
 						params=voiceParams)]
+					previousKeySignature = thisVoice.keySignature
 			thisStave.setVoice(theseVoices)
 			self.staves += [thisStave]
 
@@ -1334,6 +1351,7 @@ class VexflowVoice(object):
 		self.voiceCode = ''
 		self.noteCode = ''
 		self.clefDisplayStatus = defaultClefDisplayStatus
+		self.keySignatureDisplayStatus = defaultKeySignatureDisplayStatus
 
 		if 'name' in self.params:
 			self.voiceName = self.params['name']
@@ -1367,13 +1385,23 @@ class VexflowVoice(object):
 			raise VexFlowUnsupportedException, 'Vexflow cannot yet handle ' +\
 				'multiple key signatures in a single measure'
 		elif len(theseKeySignatures) == 1:
+			self.keySignatureDisplayStatus = True
 			if theseKeySignatures[0].sharps in vexflowSharpsToKeySignatures:
-				self.keySignature = vexflowSharpsToKeySignatures[theseKeySignatures[0].sharps]
+				self.keySignature = \
+					vexflowSharpsToKeySignatures[theseKeySignatures[0].sharps]
 			else:
 				raise VexFlowUnsupportedException, "Vexflow doesn't support this "+\
 					'Key Signature:', theseKeySignatures[0]
 		else:
-			self.keySignature = False
+			if 'keySignature' in self.params:
+				self.keySignature = self.params['keySignature']
+			else:
+				self.keySignature = defaultStaveKeySignature
+				#print "%s got the default key" % self.params['name'] #XXX k
+				#print 'Params: ', self.params
+			if 'keySignatureDisplayStatus' in self.params:
+				self.keySignatureDisplayStatus = \
+					self.params['keySignatureDisplayStatus']
 
 		#Set the time signature
 		theseTimeSignatures = self.originalChords.getElementsByClass('TimeSignature')
@@ -1509,6 +1537,9 @@ class VexflowStave(object):
 		self.vexflowCode = ''
 		if 'width' not in self.params:
 			self.params['width'] = defaultStaveWidth
+		if 'notesWidth' not in self.params:
+			self.params['notesWidth'] = '(' + str(self.params['width']) +\
+				' - ' + str(defaultMeasureMargin) + ')'
 		if 'position' not in self.params:
 			self.params['position'] = defaultStavePosition
 
@@ -1553,7 +1584,7 @@ class VexflowStave(object):
 
 			voiceList = voiceList[:-2] + ']'
 			self.voicesCode += str(voiceList) + ').format(' + str(voiceList) + \
-				', ' + str(self.params['width'])  + ');'
+				', ' + str(self.params['notesWidth'])  + ');'
 		else:
 			self.voicesCode = ''
 	
@@ -1562,7 +1593,8 @@ class VexflowStave(object):
 			self.staveCode += '\n' + str(self.staveName) + '.addClef("' + \
 				str(self.params['clef']) + '");'
 
-		if 'keySignature' in self.params and self.params['keySignature']:
+		if 'keySignatureDisplayStatus' in self.params and \
+			'keySignature' in self.params and self.params['keySignatureDisplayStatus']:
 			self.staveCode += '\n' + str(self.staveName) + '.addKeySignature('+\
 				'"' + str(self.params['keySignature']) + '");'
 
@@ -1615,6 +1647,13 @@ class VexflowStave(object):
 			not self.params['clefDisplayStatus']:
 			self.params['clefDisplayStatus'] = \
 				thisVexflowVoice.params['clefDisplayStatus']
+
+		if 'keySignatureDisplayStatus' not in self.params or \
+			not self.params['keySignatureDisplayStatus']:
+			self.params['keySignatureDisplayStatus'] = \
+				thisVexflowVoice.params['keySignatureDisplayStatus']
+
+		#print 'Sig: %s, Display?: %s' % (self.params['keySignature'], self.params['keySignatureDisplayStatus']) #XXX k
 		self._generateVexflow()
 	
 	def setVoice(self, theseVexflowVoices):
@@ -1637,15 +1676,27 @@ class VexflowStave(object):
 			self.vexflowVoices = [theseVexflowVoices]
 
 		self.params['clef'] = defaultStaveClef
+		self.params['keySignature'] = defaultStaveKeySignature
 		for thisVoice in self.vexflowVoices:
 			if 'clefDisplayStatus' not in self.params or \
 				(not self.params['clefDisplayStatus'] and \
 				'clefDisplayStatus' in thisVoice.params):
 				self.params['clefDisplayStatus'] += \
 					thisVoice.params['clefDisplayStatus']
+
+			if 'keySignatureDisplayStatus' not in self.params or \
+				(not self.params['keySignatureDisplayStatus'] and \
+				'keySignatureDisplayStatus' in thisVoice.params):
+				self.params['keySignatureDisplayStatus'] += \
+					thisVoice.params['keySignatureDisplayStatus']
+
 			if thisVoice.clef:
 				self.params['clef'] = thisVoice.clef
 
+			if thisVoice.keySignature:
+				self.params['keySignature'] = thisVoice.keySignature
+
+		#print 'Sig: %s, Display?: %s' % (self.params['keySignature'], self.params['keySignatureDisplayStatus']) #XXX k
 		self._generateVexflow()
 	
 	def getVoices(self):
