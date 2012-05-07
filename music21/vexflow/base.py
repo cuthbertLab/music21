@@ -258,6 +258,12 @@ def fromObject(thisObject, mode='txt'):
 		return fromChord(thisObject, mode)
 	elif 'Measure' in thisObject.classes:
 		return fromMeasure(thisObject, mode)
+	elif 'Part' in thisObject.classes:
+		return fromPart(thisObject, mode)
+	elif 'Score' in thisObject.classes:
+		return fromScore(thisObject, mode)
+	elif 'Stream' in thisObject.classes:
+		return fromStream(thisObject, mode)
 	else:
 		raise VexFlowUnsupportedException, 'Unsupported object type: ' + str(thisObject)
 
@@ -274,8 +280,22 @@ def fromScore(thisScore, mode='txt'):
 	if mode not in supportedDisplayModes:
 		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
 
-	
-	raise VexFlowUnsupportedException, 'Cannot display full scores yet'
+	return VexflowScore(thisScore.makeNotation(inPlace=False)).generateCode(mode)
+
+def fromStream(thisStream, mode='txt'):
+	'''
+	Parses a music21 stream into Vex Flow code
+
+	Checks if it has parts. If so, parses like a Score.
+	Otherwise, just flattens it and parses it like a Part
+	'''
+	if mode not in supportedDisplayModes:
+		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
+
+	theseParts = thisStream.getElementsByClass('Part')
+	if len(theseParts) == 0:
+		return VexflowPart(music21.stream.Part(thisStream.flat).makeNotation(inPlace=False)).generateCode(mode)
+	return VexflowScore(music21.stream.Score(thisStream).makeNotation(inPlace=False)).generateCode(mode)
 
 def fromRest(thisRest, mode='txt'):
 	'''
@@ -283,7 +303,7 @@ def fromRest(thisRest, mode='txt'):
 	'''
 	if mode not in supportedDisplayModes:
 		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
-	return VexflowRest(thisRest).generateCode(mode)
+	return VexflowRest(thisRest.makeNotation(inPlace=False)).generateCode(mode)
 
 def fromNote(thisNote, mode='txt'):
 	'''
@@ -291,7 +311,7 @@ def fromNote(thisNote, mode='txt'):
 	'''
 	if mode not in supportedDisplayModes:
 		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
-	return VexflowNote(thisNote).generateCode(mode)
+	return VexflowNote(thisNote.makeNotation(inPlace=False)).generateCode(mode)
 
 def fromChord(thisChord, mode='txt'):
 	'''
@@ -299,7 +319,7 @@ def fromChord(thisChord, mode='txt'):
 	'''
 	if mode not in supportedDisplayModes:
 		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
-	return VexflowChord(thisChord).generateCode(mode)
+	return VexflowChord(thisChord.makeNotation(inPlace=False)).generateCode(mode)
 
 
 def fromPart(thisPart, mode='txt'):
@@ -308,9 +328,9 @@ def fromPart(thisPart, mode='txt'):
 	'''
 	if mode not in supportedDisplayModes:
 		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
-	raise VexFlowUnsupportedException, 'Cannot display full parts yet'
+	return VexflowPart(thisPart.makeNotation(inPlace=False)).generateCode(mode)
 
-def fromMeasure(rawMeasure, mode='txt'):
+def fromMeasure(thisMeasure, mode='txt'):
 	r'''
 	Parses a music21 measure into Vex Flow code
 
@@ -372,44 +392,7 @@ def fromMeasure(rawMeasure, mode='txt'):
 	if mode not in supportedDisplayModes:
 		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
 	
-	thisMeasure = rawMeasure.makeNotation(inPlace=False)
-	theseNotes = thisMeasure.flat.notes
-	numNotes = len(theseNotes)
-	if mode == 'txt':
-		resultingText = "var notes = ["
-		for i in xrange(numNotes):
-			thisNote = theseNotes[i]
-			thisVexflow = VexflowNote(thisNote)
-			resultingText += thisVexflow.generateCode('txt')
-			if i < numNotes - 1:
-				resultingText += ", "
-		resultingText += "];"
-		return resultingText
-
-	if mode == 'html':
-		resultingText = htmlPreamble + vexflowPreamble + "\n\t\t\tvar stave ="+\
-			" new Vex.Flow.Stave(10,0,500);\n\t\t\tstave.addClef('treble')." + \
-			"setContext(ctx).draw();"
-		resultingText += "\n\t\t\tvar notes = [\n\t\t\t"
-		for i in xrange(numNotes):
-			thisNote = theseNotes[i]
-			thisVexflow = VexflowNote(thisNote)
-			resultingText += "\t" + thisVexflow.generateCode('txt')
-			if i < numNotes - 1:
-				resultingText += ","
-			resultingText += "\n\t\t\t"
-
-		#XXX Need to intelligently set the num_beats in the measure. can I get the quarter length of the whole measure?
-		numbeats = 4
-		beatvalue = 4
-		resultingText += "];\n\t\t\tvar voice = new Vex.Flow.Voice({\n\t\t\t" +\
-			"\tnum_beats: " + str(numbeats) +\
-			",\n\t\t\t\tbeat_value: " + str(beatvalue) + ",\n\t\t\t\tresolution: Vex.Flow.RESO"+\
-			"LUTION\n\t\t\t});\n\t\t\tvoice.addTickables(notes);\n\t\t\tv"+\
-			"ar formatter = new Vex.Flow.Formatter().joinVoices([voice])."+\
-			"format([voice], 500);\n\t\t\tvoice.draw(ctx, stave);\n"
-		resultingText += htmlConclusion
-		return resultingText
+	return VexflowVoice(thisMeasure.makeNotation(inPlace=False)).generateCode(mode)
 
 def vexflowClefFromClef(music21clef, params={}):
 	'''
