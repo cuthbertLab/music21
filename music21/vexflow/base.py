@@ -505,6 +505,7 @@ def vexflowDurationFromNote(music21note, params={}):
 	Given a music21 Note (or Pitch) object, returns the vexflow duration
 
 	TODO: unit tests
+	TODO tuplet: handle tuplets and propogate that information out
 	'''
 	thisQuarterLength = music21note.duration.quarterLength
 	if thisQuarterLength in vexflowQuarterLengthToDuration:
@@ -520,6 +521,7 @@ def vexflowKeyAndDurationFromNote(music21note, params={}):
 	Given a music21 Note (or Pitch) object, returns the vexflow key and duration
 
 	TODO: unit tests
+	TODO tuplet: handle tuplets and propogate that information out
 	'''
 	if 'Pitch' in music21note.classes:
 		thisPitch = music21note
@@ -573,6 +575,9 @@ def vexflowKeyAccidentalAndDurationFromNote(music21note, params={}):
 	Given a music21 Note (or Pitch) object, returns the vexflow key and duration
 
 	TODO: unit tests
+	TODO tuplet: handle tuplets and propogate that information out
+		Use duration.tuplets[0].tupletActual which gives us:
+			(number of notes in tuplet, duration of what each should look like)
 	'''
 	if 'Pitch' in music21note.classes:
 		thisPitch = music21note
@@ -674,6 +679,9 @@ class VexflowNote(object):
 		self.originalNote = music21note
 		self.accidentalDisplayStatus = None
 		self.params = params
+		#TODO tuplet: add variables for if it's the start of a tuplet
+		self.isTuplet = False
+		self.tupletLength = 0
 		self._generateVexflowCode()
 
 	def _generateVexflowCode(self):
@@ -829,6 +837,9 @@ class VexflowChord(object):
 
 		self.accidentalDisplayStatus = None
 		self.params = params
+		#TODO tuplet: add variables for if it's the start of a tuplet
+		self.isTuplet = False
+		self.tupletLength = 0
 		self._generateVexflowCode()
 
 	def _generateVexflowCode(self):
@@ -841,6 +852,8 @@ class VexflowChord(object):
 		self.vexflowDuration = \
 			vexflowQuarterLengthToDuration[self.originalChord.duration.quarterLength]
 		self.vexflowCode = 'new Vex.Flow.StaveNote({keys: ["'
+
+		#TODO tuplet: set the tuplet variables here
 
 		thesePitches = self.originalChord.pitches
 		theseAccidentals = []
@@ -960,6 +973,9 @@ class VexflowRest(object):
 		self.originalRest = music21rest
 		self.vexflowKey = position
 		self.params = params
+		#TODO tuplet: add variables for if it's the start of a tuplet
+		self.isTuplet = False
+		self.tupletLength = 0
 		self.vexflowCode = ''
 		self._generateVexflowCode()
 
@@ -1271,6 +1287,8 @@ class VexflowPart(object):
 	def beamCode(self, contextName, indentation=3):
 		'''
 		Generates the code for beaming all of the staves in this part
+
+		TODO: look at note.beams.getTypes() == 'start' or 'stop'
 		'''
 		beams = []
 		for thisStave in self.staves:
@@ -1435,6 +1453,9 @@ class VexflowVoice(object):
 					{'clef': self.clef})
 				self.noteCode += thisVexflowRest.generateCode('txt')
 				self.noteCode += ', '
+			#TODO tuplet: if the note is the start of a tuplet, remember that it's the start of one and figure out how many
+			#	Later we'll do notes.slice(indexOfStart, lengthOfTuplet)
+			#	For now, we'll just throw an exception if the tuplet isn't complete
 		self.noteCode = self.noteCode[:-2] + '];'
 
 		self.vexflowCode = self.voiceCode + '\n' + self.noteCode + '\n' +\
@@ -1487,8 +1508,18 @@ class VexflowVoice(object):
 		if mode == 'txt':
 			return self.vexflowCode
 		elif mode == 'html':
-			raise VexFlowUnsupportedException, "Still working on it, sorry. " +\
-				'no standalone voices for you yet'
+			result = htmlPreamble + vexflowPreamble
+			result += "\n\t\t\tvar stave = new Vex.Flow.Stave(" + \
+				str(defaultStavePosition[0]) + "," + \
+				str(defaultStavePosition[1]) + "," + \
+				str(defaultStaveWidth) + ");\n\t\t\tstave.addClef('" + \
+				str(defaultStaveClef) + "').setContext(ctx).draw();\n\t\t\t" + \
+				str(self.vexflowCode)+"\n\t\t\tvar formatter = new Vex.Flow.F"+\
+				"ormatter().joinVoices(["+str(self.voiceName)+"]).format([" + \
+				str(self.voiceName)+"], "+str(defaultStaveWidth)+");\n\t\t\t" +\
+				str(self.voiceName)+".draw(ctx, stave);\n"
+			result += htmlConclusion
+			return result
 
 			
 
