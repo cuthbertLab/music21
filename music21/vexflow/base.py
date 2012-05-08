@@ -303,7 +303,7 @@ def fromRest(thisRest, mode='txt'):
 	'''
 	if mode not in supportedDisplayModes:
 		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
-	return VexflowRest(thisRest.makeNotation(inPlace=False)).generateCode(mode)
+	return VexflowRest(thisRest).generateCode(mode)
 
 def fromNote(thisNote, mode='txt'):
 	'''
@@ -311,7 +311,7 @@ def fromNote(thisNote, mode='txt'):
 	'''
 	if mode not in supportedDisplayModes:
 		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
-	return VexflowNote(thisNote.makeNotation(inPlace=False)).generateCode(mode)
+	return VexflowNote(thisNote).generateCode(mode)
 
 def fromChord(thisChord, mode='txt'):
 	'''
@@ -319,7 +319,7 @@ def fromChord(thisChord, mode='txt'):
 	'''
 	if mode not in supportedDisplayModes:
 		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
-	return VexflowChord(thisChord.makeNotation(inPlace=False)).generateCode(mode)
+	return VexflowChord(thisChord).generateCode(mode)
 
 
 def fromPart(thisPart, mode='txt'):
@@ -682,6 +682,9 @@ class VexflowNote(object):
 		#TODO tuplet: add variables for if it's the start of a tuplet
 		self.isTuplet = False
 		self.tupletLength = 0
+		self.vexflowKey = ''
+		self.vexflowDuration = ''
+		self.vexflowAccidental = ''
 		self._generateVexflowCode()
 
 	def _generateVexflowCode(self):
@@ -818,7 +821,7 @@ class VexflowChord(object):
 	TODO: write unit tests
 	'''
 
-	def __init__(self, notes, params):
+	def __init__(self, notes, params={}):
 		'''
 		notes must be an array_like grouping of either Music21 or VexFlow Notes
 		notes can instead be a music21.chord.Chord object
@@ -1323,13 +1326,12 @@ class VexflowPart(object):
 
 class VexflowVoice(object):
 	'''
-	A Voice in Vex Flow is a "lateral" grouping of notes
-		It's the equivalent to a :class:`~music21.stream.Part`
+	A Voice in Vex Flow is a "lateral" grouping of notes in one measure
+		It's the equivalent to a :class:`~music21.stream.Measure`
 
 	Requires either a Measure object or a Voice object
 		If those objects aren't already flat, flattens them.
 	
-	TODO: Look into music21 Voices
 	'''
 	
 	def __init__(self, music21measure, params={}):
