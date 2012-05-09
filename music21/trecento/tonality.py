@@ -140,9 +140,9 @@ class TonalityCounter(object):
     
             myDict[firstNote.step][cadenceNote.step] += 1
             if firstNote.step == cadenceNote.step:
-                allLily += incip.lily
-                allLily += cadence.lily
-            
+                #FIX!!! allLily += incip.lily
+                #FIX!!! allLily += cadence.lily
+                pass
             output += "%30s %4s %4s\n" % (thisWork.title[0:30], firstNote.name, cadenceNote.name)
 
         bigTotalSame = 0

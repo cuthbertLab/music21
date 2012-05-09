@@ -66,33 +66,35 @@ def dynamicStrFromDecimal(n):
     >>> dynamics.dynamicStrFromDecimal(1)
     'fff'
     '''
-    if n == 0:
+    if n <= 0:
         return 'n'
-    elif n > 0 and n < .1:
+    elif n < .11:
+        return 'pppp'
+    elif n < .16:
         return 'ppp'
-    elif n >= .1 and n < .2:
+    elif n < .26:
         return 'pp'
-    elif n >= .2 and n < .35:
+    elif n < .36:
         return 'p'
-    elif n >= .35 and n < .5:
+    elif n < .5:
         return 'mp'
-    elif n >= .5 and n < .65:
+    elif n < .65:
         return 'mf'
-    elif n >= .65 and n < .8:
+    elif n < .8:
         return 'f'
-    elif n >= .8 and n < .9:
+    elif n < .9:
         return 'ff'
-    elif n >= .9:
+    else:
         return 'fff'
 
 # defaults used for volume scalar
 dyanmicStrToScalar = {
              None: .5, # default value
               'n': 0,
-              'pppp': 0.05,
-              'ppp': .1,
-              'pp': .15,
-              'p': .3,
+              'pppp': 0.1,
+              'ppp': .15,
+              'pp': .25,
+              'p': .35,
               'mp': .45,
               'mf': .55,
               'f': .7,
@@ -134,7 +136,8 @@ class Dynamic(music21.Music21Object):
     >>> pp2 = dynamics.Dynamic(0.15) # on 0 to 1 scale
     >>> pp2.value
     'pp'
-    
+    >>> pp2.volumeScalar
+    0.15
     
     Dynamics can be placed anywhere in a stream.
     
@@ -218,7 +221,7 @@ class Dynamic(music21.Music21Object):
         else:
             raise DynamicException('cannot set as volume scalar to: %s', value)
 
-    volumeScalar = property(_getVolumeScalar, _setVolumeScalar, doc='''
+    volumeScalar = property(_getVolumeScalar, _setVolumeScalar, doc=r'''
         Get or set the volume scalar for this dynamic. If not explicitly set, a default volume scalar will be provided. Any number between 0 and 1 can be used to set the volume scalar, overriding the expected behavior. 
 
         As mezzo is at .5, the unit interval range is doubled for generating final output. The default output is .5.
@@ -227,6 +230,20 @@ class Dynamic(music21.Music21Object):
         >>> d = dynamics.Dynamic('mf')
         >>> d.volumeScalar
         0.55...
+
+        int(volumeScalar \* 127) gives the MusicXML <sound dynamics="x"/> tag 
+
+        >>> print d.musicxml
+        <?xml...
+        <direction>
+            <direction-type>
+              <dynamics default-x="-36" default-y="-80">
+                <mf/>
+              </dynamics>
+            </direction-type>
+            <offset>0</offset>
+            <sound dynamics="69"/>
+        </direction>...
         ''')
 
 

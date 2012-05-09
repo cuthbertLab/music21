@@ -1129,10 +1129,17 @@ def dynamicToMx(d):
 
     >>> from music21 import *
     >>> a = dynamics.Dynamic('ppp')
+    >>> a.volumeScalar
+    0.1
     >>> a._positionRelativeY = -10
     >>> b = musicxml.translate.dynamicToMx(a)
     >>> b[0][0][0].get('tag')
     'ppp'
+    >>> b[1].get('tag')
+    'sound'
+    >>> b[1].get('dynamics')
+    '12'
+
     '''
     mxDynamicMark = musicxmlMod.DynamicMark(d.value)
     mxDynamics = musicxmlMod.Dynamics()
@@ -1147,6 +1154,15 @@ def dynamicToMx(d):
     mxDirectionType.append(mxDynamics)
     mxDirection = musicxmlMod.Direction()
     mxDirection.append(mxDirectionType)
+    
+    # sound...
+    vS = d.volumeScalar
+    if vS is not None:
+        mxSound = musicxmlMod.Sound()
+        dynamicVolume = int(vS * 127)
+        mxSound.set('dynamics', str(dynamicVolume))
+        mxDirection.append(mxSound)
+
     mxDirection.set('placement', d._positionPlacement)
     return mxDirection
 

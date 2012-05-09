@@ -381,6 +381,12 @@ class Test(unittest.TestCase):
                 self.assertNotEqual(a, obj)
                 self.assertNotEqual(b, obj)
 
+
+class TestExternal(unittest.TestCase):
+    pass
+
+    def runTest(self):
+        pass
     def testLily(self):
         from music21 import trecento
         cantus = trecento.trecentoCadence.TrecentoCadenceStream("c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8", '6/8')
@@ -392,4 +398,4 @@ class Test(unittest.TestCase):
 # eof
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    music21.mainTest(Test, TestExternal)

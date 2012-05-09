@@ -1155,6 +1155,9 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net.nextPitch('g', 1, 'a-2', 'ascending', alteredDegrees=alteredDegrees)
         B2
         '''
+        if pitchOrigin is None:
+            raise Exception("No pitch origin for calling next on this pitch!")
+        
         if common.isStr(pitchOrigin):
             pitchOrigin = pitch.Pitch(pitchOrigin)
         else:

@@ -746,7 +746,10 @@ class VoiceLeadingQuartet(music21.Music21Object):
             return False
         
     def opensIncorrectly(self):
-        '''Returns true if the opening or second harmonic interval is PU, P8, or P5, to accommodate an anacrusis.
+        '''
+        In the style of 16th century Counterpoint (not Bach Chorale style)
+        
+        Returns true if the opening or second harmonic interval is PU, P8, or P5, to accommodate an anacrusis.
         also checks to see if opening establishes tonic or dominant harmony (uses 
         :meth:`~music21.roman.identifyAsTonicOrDominant`
         
@@ -785,6 +788,8 @@ class VoiceLeadingQuartet(music21.Music21Object):
 
     def closesIncorrectly(self):
         '''
+        In the style of 16th century Counterpoint (not Bach Chorale style)
+
         returns true if closing harmonic interval is a P8 or PU and the interval approaching the close is
         6 - 8, 10 - 8, or 3 - U. Must be in contrary motion, and if in minor key, the leading tone resolves to the tonic.
         
@@ -895,6 +900,8 @@ class VerticalSlice(music21.Music21Object):
     in a single part'
     }
 
+
+    
     def isConsonant(self):
         '''
         evaluates whether this vertical slice moment is consonant or dissonant according to the common-practice
@@ -1282,6 +1289,9 @@ class VerticalSliceTriplet(VerticalSliceNTuplet):
         >>> tbtm = VerticalSliceTriplet([vs1, vs2, vs3])
         >>> tbtm.hasPassingTone(0)
         True
+        >>> tbtm.hasPassingTone(1)
+        False
+
         '''  
         if partNumToIdentify in self.tnlsDict.keys():
             
