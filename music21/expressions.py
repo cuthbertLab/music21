@@ -646,6 +646,22 @@ class WholeStepTrill(Trill):
 
 
 #-------------------------------------------------------------------------------
+# TODO: is this a subclass of Trill?
+class Shake(Ornament):
+    def __init__(self):
+        Ornament.__init__(self)
+        self.size = music21.interval.Interval("M2")
+        self.quarterLength = 0.25
+
+# TODO: is this a subclass of appogiatura?
+class Schleifer(Ornament):
+    def __init__(self):
+        Ornament.__init__(self)
+        self.size = music21.interval.Interval("M2")
+        self.quarterLength = 0.25
+
+
+#-------------------------------------------------------------------------------
 class Turn(Ornament):
     def __init__(self):
         Ornament.__init__(self)
@@ -957,12 +973,25 @@ class TrillExtension(spanner.Spanner):
 
     def __repr__(self):
         msg = spanner.Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.spanner.TrillExtension ')
+        msg = msg.replace(self._reprHead, '<music21.expressions.TrillExtension ')
         return msg
 
 
 
 
+
+class Tremolo(spanner.Spanner):
+    '''A tremolo, which may be a single or multi-note spanner
+    '''
+    # musicxml defines a start, stop, and a continue; will try to avoid continue
+    def __init__(self, *arguments, **keywords):
+        spanner.Spanner.__init__(self, *arguments, **keywords)
+
+
+    def __repr__(self):
+        msg = spanner.Spanner.__repr__(self)
+        msg = msg.replace(self._reprHead, '<music21.expressions.Tremolo ')
+        return msg
 
 
 

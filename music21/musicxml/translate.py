@@ -1662,7 +1662,7 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
             mxNoteList[0].notationsObj.componentList.append(mxOrnaments)
             mxOrnamentsList = [mxOrnaments] # emulate returned obj
         mxOrnamentsList[0].append(mxWavyLine) # add to first
-        environLocal.pd(['wl', 'mxOrnamentsList', mxOrnamentsList ])
+        #environLocal.pd(['wl', 'mxOrnamentsList', mxOrnamentsList ])
 
     for su in spannerBundle.getByClass('Glissando'):     
         mxGlissando = musicxmlMod.Glissando()
@@ -1862,6 +1862,27 @@ def mxNotationsToSpanners(target, mxNotations, spannerBundle):
             su.completeStatus = True
             # only add after complete
 
+    mxTremoloList = mxNotations.getTremolos()
+    for mxObj in mxTremoloList:
+        environLocal.pd(['mxTremoloList', mxObj])
+        idFound = mxObj.get('number')
+        sb = spannerBundle.getByClassIdLocalComplete('Tremolo', 
+            idFound, False)
+        if len(sb) > 0: # if we already have 
+            su = sb[0] # get the first
+        else: # create a new spanner
+            environLocal.pd(['creating Tremolo'])
+            su = expressions.Tremolo()
+            su.idLocal = idFound
+            #su.placement = mxObj.get('placement')
+            spannerBundle.append(su)
+        # add a reference of this note to this spanner
+        su.addComponents(target)
+        # can be stop or None; we can have empty single-element tremolo
+        if mxObj.get('type') in ['stop', None]:
+            su.completeStatus = True
+            # only add after complete
+
     mxGlissandoList = mxNotations.getGlissandi()
     for mxObj in mxGlissandoList:
         idFound = mxObj.get('number')
@@ -2026,10 +2047,13 @@ def mxOrnamentToOrnament(mxOrnament):
 
     elif isinstance(mxOrnament, musicxmlMod.Turn):
         orn = expressions.Turn()
-        orn.placement = mxOrnament.get('placement')
     elif isinstance(mxOrnament, musicxmlMod.InvertedTurn):
         orn = expressions.InvertedTurn()
-        orn.placement = mxOrnament.get('placement')
+
+    elif isinstance(mxOrnament, musicxmlMod.Shake):
+        orn = expressions.Shake()
+    elif isinstance(mxOrnament, musicxmlMod.Schleifer):
+        orn = expressions.Schleifer()
 
     return orn # may be None
 
@@ -4112,7 +4136,7 @@ class Test(unittest.TestCase):
         ex = s.measures(2, 3) # this needs to get all spanners too
 
         # all spanners are referenced over; even ones that may not be relevant
-        self.assertEqual(len(ex.flat.spanners), 13)
+        self.assertEqual(len(ex.flat.spanners), 14)
         #ex.show()
         
         # slurs are on measures 2, 3
@@ -5033,6 +5057,48 @@ spirit</words>
                     countTrill += 1
         self.assertEqual(countTrill, 54)
 
+
+    def testOrnamentC(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        # has many ornaments
+        s = converter.parse(testPrimitive.notations32a)
+
+        #s.flat.show('t')
+        self.assertEqual(len(s.flat.getElementsByClass('Tremolo')), 1)
+
+
+        count = 0
+        for n in s.flat.notes:
+            for e in n.expressions:
+                if 'Turn' in e.classes:
+                    count += 1
+        self.assertEqual(count, 4) # include inverted turn
+
+        count = 0
+        for n in s.flat.notes:
+            for e in n.expressions:
+                if 'InvertedTurn' in e.classes:
+                    count += 1
+        self.assertEqual(count, 1)
+
+        count = 0
+        for n in s.flat.notes:
+            for e in n.expressions:
+                if 'Shake' in e.classes:
+                    count += 1
+        self.assertEqual(count, 1)
+
+        count = 0
+        for n in s.flat.notes:
+            for e in n.expressions:
+                if 'Schleifer' in e.classes:
+                    count += 1
+        self.assertEqual(count, 1)
+
+
+            
 
     def testNoteColorA(self):
         from music21 import note, stream, chord

@@ -41,7 +41,7 @@ environLocal = environment.Environment(_MOD)
 # are >= to this value
 # if changes are made here that are not compatible, the m21 version number
 # needs to be increased and this number needs to be set to that value
-VERSION_MINIMUM = (0, 6, 3) 
+VERSION_MINIMUM = (0, 6, 4) 
 
 
 # new objects to add: octave-shift, in direction-type
@@ -232,6 +232,15 @@ class TagLib(object):
 ('trill-mark', False, TrillMark), 
 ('mordent', False, Mordent), 
 ('inverted-mordent', False, InvertedMordent), 
+
+('turn', False, Turn), 
+('delayed-turn', False, DelayedTurn), 
+('inverted-turn', False, InvertedTurn), 
+('accidental-mark', True, AccidentalMark), 
+('shake', False, Shake), 
+('schleifer', False, Schleifer), 
+('tremolo', False, Tremolo), 
+
 ('attributes', False, Attributes), 
 ('divisions', True), 
 ('forward', False, Forward), 
@@ -2143,6 +2152,26 @@ class Notations(MusicXMLElementList):
         return post
 
 
+    def getTremolos(self):
+        '''Get one or more tremolo line objects Stored in Ornaments
+
+        >>> from music21 import *
+        >>> t = musicxml.Tremolo()
+        >>> o = musicxml.Ornaments()
+        >>> n = musicxml.Notations()
+        >>> o.append(t)
+        >>> n.append(o)
+        >>> n.getTremolos()
+        [<tremolo >]
+        '''
+        post = []        
+        for part in self.componentList:
+            if isinstance(part, Ornaments):
+                for sub in part:
+                    if isinstance(sub, Tremolo):
+                        post.append(sub)
+        return post
+
 
 class Dynamics(MusicXMLElementList):
     def __init__(self, type=None):
@@ -2390,7 +2419,7 @@ class InvertedMordent(MusicXMLElement):
         MusicXMLElement.__init__(self)
         self._tag = 'inverted-mordent'
 
-# TODO: import
+
 class Turn(MusicXMLElement):
     def __init__(self, type=None):
         MusicXMLElement.__init__(self)
@@ -2406,6 +2435,14 @@ class InvertedTurn(MusicXMLElement):
         MusicXMLElement.__init__(self)
         self._tag = 'inverted-turn'
 
+class AccidentalMark(MusicXMLElement):
+    '''Used inside an ornament definition; chardata holds the
+    accidental type
+    '''
+    def __init__(self, type=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'accidental-mark'
+
 class Shake(MusicXMLElement):
     def __init__(self, type=None):
         MusicXMLElement.__init__(self)
@@ -2416,10 +2453,18 @@ class Schleifer(MusicXMLElement): # type of slide
         MusicXMLElement.__init__(self)
         self._tag = 'schleifer'
 
-class Tremolo(MusicXMLElement): # type of slide
+
+class Tremolo(MusicXMLElement): 
+    '''Tremolo may or may not extend over multiple notes.
+    Char data may store integer number.
+    '''
     def __init__(self, type=None):
         MusicXMLElement.__init__(self)
         self._tag = 'tremolo'
+        # type may or may not be defined
+        self._attr['type'] = None # start or stop; 
+        self._attr['number'] = None # for id
+
 
 
 
@@ -2938,6 +2983,15 @@ class Handler(xml.sax.ContentHandler):
         self._beamObj = None
         self._barlineObj = None
         self._endingObj = None
+
+        self._turnObj = None
+        self._delayedTurnObj = None
+        self._invertedTurnObj = None
+        self._accidentalMarkObj = None
+        self._shakeObj = None
+        self._schleiferObj = None
+        self._tremoloObj = None
+
         self._segnoObj = None
         self._codaObj = None
         self._repeatObj = None
@@ -3180,8 +3234,46 @@ class Handler(xml.sax.ContentHandler):
             self._mordentObj.loadAttrs(attrs)
 
         elif name == 'inverted-mordent': 
+            #environLocal.pd(['got ornament', name])
             self._invertedMordentObj = InvertedMordent()
             self._invertedMordentObj.loadAttrs(attrs)
+
+
+ 
+        elif name == 'turn':
+            #environLocal.pd(['got ornament', name])
+            self._turnObj = Turn()
+            self._turnObj.loadAttrs(attrs)
+ 
+        elif name == 'delayed-turn':
+            #environLocal.pd(['got ornament', name])
+            self._delayedTurnObj = DelayedTurn()
+            self._delayedTurnObj.loadAttrs(attrs)
+ 
+        elif name == 'inverted-turn':
+            #environLocal.pd(['got ornament', name])
+            self._invertedTurnObj = InvertedTurn()
+            self._invertedTurnObj.loadAttrs(attrs)
+ 
+        elif name == 'accidental-mark':
+            #environLocal.pd(['got ornament', name])
+            self._accidentalMarkObj = AccidentalMark()
+            self._accidentalMarkObj.loadAttrs(attrs)
+# 
+        elif name == 'shake':
+            self._shakeObj = Shake()
+            self._shakeObj.loadAttrs(attrs)
+
+        elif name == 'schleifer':
+            self._schleiferObj = Schleifer()
+            self._schleiferObj.loadAttrs(attrs)
+ 
+        elif name == 'tremolo':
+            #environLocal.pd(['got ornament', name])
+            self._tremoloObj = Tremolo()
+            self._tremoloObj.loadAttrs(attrs)
+
+
 
         elif name == 'grace':
             #environLocal.printDebug('creating mxGrace object')
@@ -3429,6 +3521,7 @@ class Handler(xml.sax.ContentHandler):
             self._endingObj = Ending()
             self._endingObj.loadAttrs(attrs)
 
+
         elif name == 'segno':
             self._segnoObj = Segno()
             self._segnoObj.loadAttrs(attrs)
@@ -3590,6 +3683,43 @@ class Handler(xml.sax.ContentHandler):
         elif name == 'inverted-mordent': 
             self._ornamentsObj.append(self._invertedMordentObj)
             self._invertedMordentObj = None
+
+
+        elif name == 'turn':
+            self._ornamentsObj.append(self._turnObj)
+            self._turnObj = None
+# 
+        elif name == 'delayed-turn':
+            self._ornamentsObj.append(self._delayedTurnObj)
+            self._delayedTurnObj = None
+# 
+        elif name == 'inverted-turn':
+            self._ornamentsObj.append(self._invertedTurnObj)
+            self._invertedTurnObj = None
+ 
+        elif name == 'accidental-mark':
+            # accidental-mark can be found either after a turn in ornaments
+            # or in notations by itself
+            if self._ornamentsObj is not None:
+                self._ornamentsObj.append(self._accidentalMarkObj)
+            elif self._notationsObj is not None:
+                self._notationsObj.append(self._accidentalMarkObj)
+            else:
+                raise MusicXMLException('cannot find destination for AccidentalMark object')
+            self._accidentalMarkObj = None
+
+        elif name == 'shake':
+            self._ornamentsObj.append(self._shakeObj)
+            self._shakeObj = None
+
+        elif name == 'schleifer':
+            self._ornamentsObj.append(self._schleiferObj)
+            self._schleiferObj = None
+
+        elif name == 'tremolo':
+            self._ornamentsObj.append(self._tremoloObj)
+            self._tremoloObj = None
+
 
 
         elif name == 'sound':
@@ -4158,6 +4288,8 @@ class Handler(xml.sax.ContentHandler):
         elif name == 'repeat': 
             self._barlineObj.repeatObj = self._repeatObj
             self._repeatObj = None
+
+
 
 
 
