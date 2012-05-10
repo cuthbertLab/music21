@@ -4534,6 +4534,22 @@ class Stream(music21.Music21Object):
 
 
         >>> s = stream.Stream()
+        >>> p1 = stream.Part()
+        >>> p1.insert(0, harmony.ChordSymbol('Cm', quarterLength = 4.0))
+        >>> p1.insert(2, note.Note('C'))
+        >>> p1.insert(4, harmony.ChordSymbol('D', quarterLength = 4.0))
+        >>> p1.insert(7, note.Note('A'))
+        >>> s.insert(0,p1)
+        >>> s.chordify().show('text')
+        {0.0} <music21.chord.Chord C3 E-3 G3>
+        {2.0} <music21.chord.Chord C C3 E-3 G3>
+        {3.0} <music21.chord.Chord C3 E-3 G3>
+        {4.0} <music21.chord.Chord D3 F#3 A3>
+        {7.0} <music21.chord.Chord A D3 F#3 A3>
+        
+        OMIT_FROM_DOCS
+        
+        >>> s = stream.Stream()
         >>> p2 = stream.Part()
         >>> p1 = stream.Part()
         >>> p2.insert(0, harmony.ChordSymbol('Cm', quarterLength = 4.0))
@@ -4548,8 +4564,7 @@ class Stream(music21.Music21Object):
         {3.0} <music21.chord.Chord C3 E-3 G3>
         {4.0} <music21.chord.Chord D3 F#3 A3>
         {7.0} <music21.chord.Chord A D3 F#3 A3>
-        
-        OMIT_FROM_DOCS
+
         
         Test that chordifying 
     

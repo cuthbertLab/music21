@@ -287,10 +287,6 @@ class Harmony(chord.Chord):
         self._degreesList = []
         self._pitchesAndDegrees = []
         
-        #by default a harmony object's duration is 0. Users can run realizeChordSymbolDuraitons method to
-        #assign the correct duration to each harmony object given a score   
-        self.duration = music21.duration.Duration(0)
-        
         for kw in keywords:
             if kw == 'root':
                 self._XMLroot = music21.pitch.Pitch(keywords[kw])
@@ -677,8 +673,12 @@ class ChordSymbol(Harmony):
     
     All :class:`~music21.harmony.ChordSymbol` inherit from :class:`~music21.chord.Chord` so you can
     consider these objects as chords, although they have a unique representation in a score. ChordSymbols,
-    unlike chords, by default appear as chord symbols in a score. To obtain the chord representation of the
-    in the score, change the :attr:`music21.harmony.ChordSymbol.writeAsChord` to True.
+    unlike chords, by default appear as chord symbols in a score and have duration of 0.
+    To obtain the chord representation of the in the score, change the 
+    :attr:`music21.harmony.ChordSymbol.writeAsChord` to True. Unless otherwise specified, the duration
+    of this chord object will become 1.0. If you have a leadsheet, run 
+    :meth:`music21.harmony.realizeChordSymbolDurations` on the stream to assign the correct (according to
+    offsets) duration to each harmony object.)
     
     The music xml-based approach to instantiating Chord Symbol objects:
      
@@ -808,8 +808,10 @@ class ChordSymbol(Harmony):
                 self.XMLkind = keywords[kw]
             if kw == 'kindStr':
                 self.XMLkindStr = keywords[kw]
-                
+
         Harmony.__init__(self, figure, **keywords)
+        if 'duration' not in keywords and 'quarterLength' not in keywords:  
+            self.duration = music21.duration.Duration(0)
     
     #def __repr__(self):
     #    return '<music21.harmony.%s %s>' % (self.__class__.__name__, self.figure)

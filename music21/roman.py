@@ -657,7 +657,7 @@ class RomanNumeral(harmony.Harmony):
         
         self._setKeyOrScale(keyOrScale)
         harmony.Harmony.__init__(self, figure)
-
+        
         self._parsingComplete = True
         self._functionalityScore = None
         
@@ -795,7 +795,7 @@ class RomanNumeral(harmony.Harmony):
                 interval.ChromaticInterval(-1 * flatAlteration))
             scaleAlter = pitch.Accidental(-1 * flatAlteration)
             workingFigure = self.frontFlat.sub('', workingFigure)
-            frontAlterationString = fm
+            frontAlterationString = fm.group(0)
         elif self.frontFlatAlt.match(workingFigure):
             fm = self.frontFlatAlt.match(workingFigure)
             flatAlteration = len(fm.group(1))
@@ -803,7 +803,7 @@ class RomanNumeral(harmony.Harmony):
                 interval.GenericInterval(1), interval.ChromaticInterval(-1 * flatAlteration))
             scaleAlter = pitch.Accidental(-1 * flatAlteration)
             workingFigure = self.frontFlatAlt.sub('', workingFigure)
-            frontAlterationString = fm
+            frontAlterationString = fm.group(0)
         elif self.frontSharp.match(workingFigure):
             sm = self.frontSharp.match(workingFigure)
             sharpAlteration = len(sm.group(1))
@@ -811,14 +811,14 @@ class RomanNumeral(harmony.Harmony):
                 interval.GenericInterval(1), interval.ChromaticInterval(1 * sharpAlteration))
             scaleAlter = pitch.Accidental(sharpAlteration)
             workingFigure = self.frontSharp.sub('', workingFigure)
-            frontAlterationString = sm
+            frontAlterationString = sm.group(0)
         else: 
             transposeInterval = None
             scaleAlter = None
+       
         self.frontAlterationString = frontAlterationString
         self.frontAlterationTransposeInterval = transposeInterval
         self.frontAlterationAccidental = scaleAlter
-
         romanNumeralAlone = ""
         if not self.romanNumerals.match(workingFigure):
             raise RomanException("No roman numeral found in %s " % (workingFigure))
