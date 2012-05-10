@@ -2360,7 +2360,7 @@ class Dashes(MusicXMLElement):
 
 
 class Ornaments(MusicXMLElementList):
-    '''The Ornaments tag wraps the following muscixml entities: trill-mark, turn, delayed-turn, inverted-turn, shake, wavy-line, mordent, inverted mordent, schleifer, termolo, other-ornament. 
+    '''The Ornaments tag wraps the following muscixml entities: trill-mark, turn, delayed-turn, inverted-turn, shake, wavy-line, mordent, inverted mordent, schleifer, tremolo, other-ornament. 
 
     Ornaments are stored on the notations object. 
     '''
@@ -2373,13 +2373,11 @@ class Ornaments(MusicXMLElementList):
         return self.componentList 
 
 
-
 class TrillMark(MusicXMLElement):
     def __init__(self, type=None):
         MusicXMLElement.__init__(self)
         self._tag = 'trill-mark'
         self._attr['placement'] = None # above/below
-
 
 class Mordent(MusicXMLElement):
     def __init__(self, type=None):
@@ -2391,6 +2389,38 @@ class InvertedMordent(MusicXMLElement):
     def __init__(self, type=None):
         MusicXMLElement.__init__(self)
         self._tag = 'inverted-mordent'
+
+# TODO: import
+class Turn(MusicXMLElement):
+    def __init__(self, type=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'turn'
+
+class DelayedTurn(MusicXMLElement):
+    def __init__(self, type=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'delayed-turn'
+
+class InvertedTurn(MusicXMLElement):
+    def __init__(self, type=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'inverted-turn'
+
+class Shake(MusicXMLElement):
+    def __init__(self, type=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'shake'
+
+class Schleifer(MusicXMLElement): # type of slide
+    def __init__(self, type=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'schleifer'
+
+class Tremolo(MusicXMLElement): # type of slide
+    def __init__(self, type=None):
+        MusicXMLElement.__init__(self)
+        self._tag = 'tremolo'
+
 
 
 

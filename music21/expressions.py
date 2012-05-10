@@ -273,12 +273,12 @@ class TextExpression(Expression, text.TextFormat):
 
 #-------------------------------------------------------------------------------
 class Ornament(Expression):
-    connectedToPrevious = True  
-    # should follow directly on previous; true for most "ornaments".
-    tieAttach = 'first' # attach to first note of a tied group.
 
     def __init__(self):
         Expression.__init__(self)
+        self.connectedToPrevious = True  
+        # should follow directly on previous; true for most "ornaments".
+        self.tieAttach = 'first' # attach to first note of a tied group.
 
     def realize(self, sourceObject):
         '''
@@ -288,19 +288,21 @@ class Ornament(Expression):
         '''
         return ([], sourceObject, [])
 
-class GeneralMordent(Ornament):
-    direction = ""  # up or down
-    size = None # music21.interval.Interval (General, etc.) class
-    quarterLength = 0.125 # 32nd note default 
 
+#-------------------------------------------------------------------------------
+class GeneralMordent(Ornament):
+    '''Base class for all Mordent types.
+    '''
     def __init__(self):
         Ornament.__init__(self)
-
+        self.direction = ""  # up or down
+        self.size = None # music21.interval.Interval (General, etc.) class
+        self.quarterLength = 0.125 # 32nd note default 
         self.size = music21.interval.Interval(2)
 
     def realize(self, srcObject):
         '''
-        realize a mordent.
+        Realize a mordent.
         
         returns a three-element tuple.
         The first is a list of the two notes that the beginning of the note were converted to.
@@ -339,7 +341,6 @@ class GeneralMordent(Ornament):
             transposeInterval = self.size.reverse()
         else:
             transposeInterval = self.size
-            
         mordNotes = []
         
         firstNote = copy.deepcopy(srcObject)
@@ -360,17 +361,23 @@ class GeneralMordent(Ornament):
 
         for n in mordNotes:            
             n.accidental = currentKeySig.accidentalByStep(n.step)
-            
-            
         remainderNote = copy.deepcopy(srcObject)
         remainderNote.duration.quarterLength = remainderDuration
         #TODO clear just mordent here...
         return (mordNotes, remainderNote, [])
 
+#-------------------------------------------------------------------------------
 class Mordent(GeneralMordent):
-    direction = "down"
+    '''
+    >>> from music21 import *
+    >>> m = expressions.Mordent()
+    >>> m.direction
+    'down'
+    '''
+
     def __init__(self):
         GeneralMordent.__init__(self)
+        self.direction = "down" # up or down
 
     def _getMX(self):
         mxMordent = musicxml.Mordent()
@@ -393,11 +400,12 @@ class WholeStepMordent(Mordent):
         self.size = music21.interval.Interval("M2")
 
 
-
+#-------------------------------------------------------------------------------
 class InvertedMordent(GeneralMordent):
-    direction = "up"
+
     def __init__(self):
         GeneralMordent.__init__(self)
+        self.direction = "up"
 
     def _getMX(self):
         mxInvertedMordent = musicxml.InvertedMordent()
@@ -407,6 +415,8 @@ class InvertedMordent(GeneralMordent):
         pass
 
     mx = property(_getMX, _setMX)
+
+
 
 class HalfStepInvertedMordent(InvertedMordent):
     def __init__(self):
@@ -420,16 +430,16 @@ class WholeStepInvertedMordent(InvertedMordent):
 
 
 
-
+#-------------------------------------------------------------------------------
 class Trill(Ornament):
-    placement = 'above'
-    nachschlag = False # play little notes at the end of the trill?
-    tieAttach = 'all'
-    quarterLength = 0.125
-
     def __init__(self):
         Ornament.__init__(self)
         self.size = music21.interval.Interval("M2")
+
+        self.placement = 'above'
+        self.nachschlag = False # play little notes at the end of the trill?
+        self.tieAttach = 'all'
+        self.quarterLength = 0.125
 
     def realize(self, srcObject):
         '''
@@ -556,15 +566,17 @@ class WholeStepTrill(Trill):
         Trill.__init__(self)
         self.size = music21.interval.Interval("M2")
 
-class Turn(Ornament):
-    placement = 'above'
-    nachschlag = False # play little notes at the end of the trill?
-    tieAttach = 'all'
-    quarterLength = 0.25
 
+
+#-------------------------------------------------------------------------------
+class Turn(Ornament):
     def __init__(self):
         Ornament.__init__(self)
         self.size = music21.interval.Interval("M2")
+        self.placement = 'above'
+        self.nachschlag = False # play little notes at the end of the trill?
+        self.tieAttach = 'all'
+        self.quarterLength = 0.25
 
     def realize(self, srcObject):
         '''
@@ -661,7 +673,10 @@ class InvertedTurn(Turn):
     def __init__(self):
         Turn.__init__(self)
         self.size = self.size.reverse()
-        
+
+
+
+#-------------------------------------------------------------------------------
 class GeneralAppoggiatura(Ornament):
     direction = ""  # up or down -- up means the grace note is below and goes up to the actual note
     size = None # music21.interval.Interval (General, etc.) class

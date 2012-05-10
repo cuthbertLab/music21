@@ -9688,7 +9688,6 @@ class Stream(music21.Music21Object):
     def activateVariants(self, group=None, matchBySpan=True, inPlace=False):
         '''For any :class:`~music21.variant.Variant` objects defined in this Stream, replace corresponding class with those found in the Variant.
 
-        
         '''
         from music21 import variant
 
@@ -9706,7 +9705,6 @@ class Stream(music21.Music21Object):
             # create a replacement variant for each used variant; it 
             # my not be added to the Stream if there are no matches
             removed = variant.Variant() # what group should this have?
-
             vStart = v.getOffsetBySite(returnObj)
 
             # this method matches and removes on an individual basis        

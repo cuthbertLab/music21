@@ -62,6 +62,7 @@ class Test(unittest.TestCase):
         c1 = chord.Chord(['c2', 'a4', 'e5'], quarterLength=1.25)
 
         raw = c1.json
+        print raw
 
         c2 = chord.Chord()
         c2.json = raw

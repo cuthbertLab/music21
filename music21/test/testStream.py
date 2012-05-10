@@ -7317,8 +7317,6 @@ class Test(unittest.TestCase):
             "['D', 'D', 'D', 'D', 'D', 'G#', 'A#', 'C#', 'D', 'D', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.getElementsByClass('Dynamic')), 1)
 
-        #s.show('t')
-
         s.activateVariants(matchBySpan=True, inPlace=True)
         self.assertEqual(len(s.flat.notes), 12)
         self.assertEqual(str([p.name for p in s.pitches]), 
@@ -7361,12 +7359,13 @@ class Test(unittest.TestCase):
         self.assertEqual(str([p.name for p in s.pitches]), 
             "['D', 'D', 'D', 'D', 'A#', 'A#', 'A#', 'A#', 'A#', 'A#', 'A#', 'A#', 'D', 'D', 'D', 'D']")
 
+
         # replace the one for two
         s.activateVariants(matchBySpan=True, inPlace=True)
         self.assertEqual(len(s.getElementsByClass('Measure')), 4) 
         self.assertEqual(str([p.name for p in s.pitches]), 
             "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
-
+        #s.show()
 
 
 #------------------------------------------------------------------------------

@@ -1130,7 +1130,7 @@ def dynamicToMx(d):
     >>> from music21 import *
     >>> a = dynamics.Dynamic('ppp')
     >>> a.volumeScalar
-    0.1
+    0.15
     >>> a._positionRelativeY = -10
     >>> b = musicxml.translate.dynamicToMx(a)
     >>> b[0][0][0].get('tag')
@@ -1138,7 +1138,7 @@ def dynamicToMx(d):
     >>> b[1].get('tag')
     'sound'
     >>> b[1].get('dynamics')
-    '12'
+    '19'
 
     '''
     mxDynamicMark = musicxmlMod.DynamicMark(d.value)
@@ -1263,7 +1263,6 @@ def mxToTextExpression(mxDirection):
     '''
     Given an mxDirection, create one or more TextExpressions
     '''
-
     from music21 import expressions
     post = []
     mxWordsList = mxDirection.getWords()
@@ -1917,7 +1916,6 @@ def mxDirectionToSpanners(targetLast, mxDirection, spannerBundle):
         else:
             raise TranslateException('unidentified mxType of mxWedge:', mxType)
 
-
     mxBracket = mxDirection.getBracket() 
     if mxBracket is not None:
         mxType = mxBracket.get('type')
@@ -1980,6 +1978,7 @@ def mxDirectionToSpanners(targetLast, mxDirection, spannerBundle):
             raise TranslateException('unidentified mxType of mxBracket:', mxType)
 
 
+#-------------------------------------------------------------------------------
 
 
 def articulationsAndExpressionsToMx(target, mxNoteList):
@@ -1995,6 +1994,9 @@ def articulationsAndExpressionsToMx(target, mxNoteList):
 
     # notations and articulations are mixed in musicxml
     for expObj in target.expressions:
+        # TODO: this is relying on the presence of an MX attribute
+        # to determine if it can be shown; another method should
+        # be used
         if hasattr(expObj, 'mx'):
             # some expressions must be wrapped in a musicxml ornament
             if 'Ornament' in expObj.classes:
@@ -2005,6 +2007,34 @@ def articulationsAndExpressionsToMx(target, mxNoteList):
                 mxNoteList[0].notationsObj.componentList.append(expObj.mx)
 
 
+def mxOrnamentToOrnament(mxOrnament):
+    '''Convert mxOrnament into a music21 ornament. This only processes non-spanner ornaments. Many mxOrnaments are spanners: these are handled elsewhere. 
+
+    Returns None if cannot be converted or not defined. 
+    '''
+    from music21 import expressions
+    orn = None
+    #environLocal.pd(['calling mxOrnamentToOrnament with', mxOrnament])
+    if isinstance(mxOrnament, musicxmlMod.TrillMark):
+        orn = expressions.Trill()
+        orn.placement = mxOrnament.get('placement')
+    elif isinstance(mxOrnament, musicxmlMod.Mordent):
+        orn = expressions.Mordent()
+    elif isinstance(mxOrnament, musicxmlMod.InvertedMordent):
+        orn = expressions.InvertedMordent()
+
+    elif isinstance(mxOrnament, musicxmlMod.Turn):
+        orn = expressions.Turn()
+        orn.placement = mxOrnament.get('placement')
+    elif isinstance(mxOrnament, musicxmlMod.InvertedTurn):
+        orn = expressions.InvertedTurn()
+        orn.placement = mxOrnament.get('placement')
+
+    return orn # may be None
+
+
+def ornamentToMxOrnament(orn):
+    
 
 #-------------------------------------------------------------------------------
 # Chords
@@ -2563,7 +2593,17 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
             fermataObj = expressions.Fermata()
             fermataObj.mx = mxObj
             n.expressions.append(fermataObj)
-            #environLocal.printDebug(['_setMX(), n.mxFermataList', mxFermataList])
+
+        mxOrnamentsList = mxNotations.getOrnaments()
+#         if len(mxOrnamentsList) > 0:
+#             environLocal.printDebug(['mxOrnamentsList:', mxOrnamentsList])
+        for mxOrnamentsObj in mxOrnamentsList:
+            for mxObj in mxOrnamentsObj:
+                post = mxOrnamentToOrnament(mxObj)
+                if post is not None:
+                    n.expressions.append(post)
+                    #environLocal.printDebug(['adding to epxressions', post])
+
         # create spanners:
         mxNotationsToSpanners(n, mxNotations, spannerBundle)
 
@@ -4990,9 +5030,23 @@ spirit</words>
         raw = s.musicxml
         #s.show()
 
+        self.assertEqual(raw.count('<trill-mark'), 2)
         self.assertEqual(raw.count('<ornaments>'), 6)
         self.assertEqual(raw.count('<inverted-mordent/>'), 2)
-        self.assertEqual(raw.count('<mordent/>'), 2)
+
+
+
+    def testOrnamentB(self):
+        from music21 import stream, note, expressions, chord, corpus
+
+        s = corpus.parse('opus133')
+        ex = s.parts[0]        
+        countTrill = 0
+        for n in ex.flat.notes:
+            for e in n.expressions:
+                if 'Trill' in e.classes:
+                    countTrill += 1
+        self.assertEqual(countTrill, 54)
 
 
     def testNoteColorA(self):
