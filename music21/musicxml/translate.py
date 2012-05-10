@@ -1997,6 +1997,7 @@ def articulationsAndExpressionsToMx(target, mxNoteList):
         # TODO: this is relying on the presence of an MX attribute
         # to determine if it can be shown; another method should
         # be used
+        #replace with calls to ornamentToMxOrnament
         if hasattr(expObj, 'mx'):
             # some expressions must be wrapped in a musicxml ornament
             if 'Ornament' in expObj.classes:
@@ -2034,7 +2035,10 @@ def mxOrnamentToOrnament(mxOrnament):
 
 
 def ornamentToMxOrnament(orn):
-    
+    pass
+#     ornamentsObj = musicxmlMod.Ornaments()
+#     ornamentsObj.append(expObj.mx)
+
 
 #-------------------------------------------------------------------------------
 # Chords
@@ -2491,25 +2495,6 @@ def noteToMxNotes(n, spannerBundle=None):
             mxNoteList[0].stem = n.stemDirection
 
     articulationsAndExpressionsToMx(n, mxNoteList)
-
-    # if we have any articulations, they only go on the first of any 
-    # component notes
-#     mxArticulations = musicxmlMod.Articulations()
-#     for artObj in n.articulations:
-#         mxArticulations.append(artObj.mx) # returns mxArticulationMark to append to mxArticulations
-#     if len(mxArticulations) > 0:
-#         mxNoteList[0].notationsObj.componentList.append(mxArticulations)
-# 
-#     # notations and articulations are mixed in musicxml
-#     for expObj in n.expressions:
-#         if hasattr(expObj, 'mx'):
-#             # some expressions must be wrapped in a musicxml ornament
-#             if 'Ornament' in expObj.classes:
-#                 ornamentsObj = musicxmlMod.Ornaments()
-#                 ornamentsObj.append(expObj.mx)
-#                 mxNoteList[0].notationsObj.componentList.append(ornamentsObj)
-#             else:
-#                 mxNoteList[0].notationsObj.componentList.append(expObj.mx)
 
     # some spanner produce direction tags, and sometimes these need
     # to go before or after the notes of this element

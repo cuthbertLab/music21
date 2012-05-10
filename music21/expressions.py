@@ -368,11 +368,14 @@ class GeneralMordent(Ornament):
 
 #-------------------------------------------------------------------------------
 class Mordent(GeneralMordent):
-    '''
+    '''A normal Mordent.
+
     >>> from music21 import *
     >>> m = expressions.Mordent()
     >>> m.direction
     'down'
+    >>> m.size
+    <music21.interval.Interval M2>
     '''
 
     def __init__(self):
@@ -390,11 +393,29 @@ class Mordent(GeneralMordent):
 
 
 class HalfStepMordent(Mordent):
+    '''A half step normal Mordent.
+
+    >>> from music21 import *
+    >>> m = expressions.HalfStepMordent()
+    >>> m.direction
+    'down'
+    >>> m.size
+    <music21.interval.Interval m2>
+    '''
     def __init__(self):
         Mordent.__init__(self)
         self.size = music21.interval.Interval("m2")
 
 class WholeStepMordent(Mordent):
+    '''A whole step normal Mordent.
+
+    >>> from music21 import *
+    >>> m = expressions.WholeStepMordent()
+    >>> m.direction
+    'down'
+    >>> m.size
+    <music21.interval.Interval M2>
+    '''
     def __init__(self):
         Mordent.__init__(self)
         self.size = music21.interval.Interval("M2")
@@ -402,7 +423,15 @@ class WholeStepMordent(Mordent):
 
 #-------------------------------------------------------------------------------
 class InvertedMordent(GeneralMordent):
+    '''An inverted Mordent.
 
+    >>> from music21 import *
+    >>> m = expressions.InvertedMordent()
+    >>> m.direction
+    'up'
+    >>> m.size
+    <music21.interval.Interval M2>
+    '''
     def __init__(self):
         GeneralMordent.__init__(self)
         self.direction = "up"
@@ -419,11 +448,29 @@ class InvertedMordent(GeneralMordent):
 
 
 class HalfStepInvertedMordent(InvertedMordent):
+    '''A half-step inverted Mordent.
+
+    >>> from music21 import *
+    >>> m = expressions.HalfStepInvertedMordent()
+    >>> m.direction
+    'up'
+    >>> m.size
+    <music21.interval.Interval m2>
+    '''
     def __init__(self):
         InvertedMordent.__init__(self)
         self.size = music21.interval.Interval("m2")
 
 class WholeStepInvertedMordent(InvertedMordent):
+    '''A whole-step inverted Mordent.
+
+    >>> from music21 import *
+    >>> m = expressions.WholeStepInvertedMordent()
+    >>> m.direction
+    'up'
+    >>> m.size
+    <music21.interval.Interval M2>
+    '''
     def __init__(self):
         InvertedMordent.__init__(self)
         self.size = music21.interval.Interval("M2")
@@ -432,6 +479,16 @@ class WholeStepInvertedMordent(InvertedMordent):
 
 #-------------------------------------------------------------------------------
 class Trill(Ornament):
+    '''A basic trill marker.
+
+    >>> from music21 import *
+    >>> m = expressions.Trill()
+    >>> m.placement
+    'above'
+    >>> m.size
+    <music21.interval.Interval M2>
+    '''
+
     def __init__(self):
         Ornament.__init__(self)
         self.size = music21.interval.Interval("M2")
@@ -526,6 +583,8 @@ class Trill(Ornament):
         else:
             return (trillNotes, None, [])
 
+
+    # TODO: these will be removed
     def _getMX(self):
         '''
         Returns a musicxml.TrillMark object
@@ -557,11 +616,29 @@ class Trill(Ornament):
 
 
 class HalfStepTrill(Trill):
+    '''A basic trill marker.
+
+    >>> from music21 import *
+    >>> m = expressions.HalfStepTrill()
+    >>> m.placement
+    'above'
+    >>> m.size
+    <music21.interval.Interval m2>
+    '''
     def __init__(self):
         Trill.__init__(self)
         self.size = music21.interval.Interval("m2")
 
 class WholeStepTrill(Trill):
+    '''A basic trill marker.
+
+    >>> from music21 import *
+    >>> m = expressions.WholeStepTrill()
+    >>> m.placement
+    'above'
+    >>> m.size
+    <music21.interval.Interval M2>
+    '''
     def __init__(self):
         Trill.__init__(self)
         self.size = music21.interval.Interval("M2")
