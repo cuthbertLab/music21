@@ -685,6 +685,7 @@ class VexflowNote(object):
 		self.vexflowKey = ''
 		self.vexflowDuration = ''
 		self.vexflowAccidental = ''
+		self.stemDirection = ''
 		self._generateVexflowCode()
 
 	def _generateVexflowCode(self):
@@ -701,13 +702,24 @@ class VexflowNote(object):
 		elif self.accidentalDisplayStatus == None:
 			self.accidentalDisplayStatus = defaultAccidentalDisplayStatus
 
+		if self.originalNote.stemDirection == u'up':
+			self.stemDirection = 'Vex.Flow.StaveNote.STEM_UP'
+		elif self.originalNote.stemDirection == u'down':
+			self.stemDirection = 'Vex.Flow.StaveNote.STEM_DOWN'
+
 		#otherwise keep the previous accidentalDisplayStatus
 
 		(self.vexflowKey, self.vexflowAccidental, self.vexflowDuration) = \
 			vexflowKeyAccidentalAndDurationFromNote(self.originalNote, params=self.params)
 
 		self.vexflowCode = 'new Vex.Flow.StaveNote({keys: ["'+self.vexflowKey+ \
-			'"], duration: "' + self.vexflowDuration + '"})'
+			'"], duration: "' + self.vexflowDuration + '"'
+		if self.stemDirection != '':
+			self.vexflowCode += ', stem_direction: ' + self.stemDirection + '})'
+		else:
+			self.vexflowCode +=  '})'
+
+
 		if self.accidentalDisplayStatus:
 			self.vexflowCode += '.addAccidental(0, new Vex.Flow.Accidental(' +\
 				'"' + self.vexflowAccidental + '"))'
@@ -843,6 +855,7 @@ class VexflowChord(object):
 		#TODO tuplet: add variables for if it's the start of a tuplet
 		self.isTuplet = False
 		self.tupletLength = 0
+		self.stemDirection = ''
 		self._generateVexflowCode()
 
 	def _generateVexflowCode(self):
@@ -860,6 +873,11 @@ class VexflowChord(object):
 
 		thesePitches = self.originalChord.pitches
 		theseAccidentals = []
+
+		if self.originalChord.stemDirection == u'up':
+			self.stemDirection = 'Vex.Flow.StaveNote.STEM_UP'
+		elif self.originalChord.stemDirection == u'down':
+			self.stemDirection = 'Vex.Flow.StaveNote.STEM_DOWN'
 
 		for index in xrange(len(thesePitches)):
 			thisPitch = thesePitches[index]
@@ -900,7 +918,22 @@ class VexflowChord(object):
 					'Vex.Flow.Accidental("' + str(thisAccidental) + '"))']
 
 		self.vexflowCode = self.vexflowCode[:-3] + '], duration: "' + \
-			self.vexflowDuration + '"})' + ''.join(theseAccidentals)
+			self.vexflowDuration + '"'
+
+		if self.stemDirection != '':
+			self.vexflowCode += ', stem_direction: ' + self.stemDirection + '})'
+		else:
+			self.vexflowCode +=  '})'
+
+		for thisExpression in  self.originalChord.expressions:
+			if 'Fermata' in thisExpression.classes:
+				#"a@a" = fermata above staff. "a@u" = fermata below staff
+				#setPosition(3) means place this fermata above the staff
+				#setPosition(4) would put it below the staff
+				self.vexflowCode += '.addArticulation(0, new Vex.Flow.Articu'+\
+					'lation("a@a").setPosition(3))' 
+
+ 		self.vexflowCode += ''.join(theseAccidentals)
 
 		try:
 			self.vexflowCode += '.addDotToAll()' * self.originalChord.duration.dots
@@ -1348,7 +1381,7 @@ class VexflowVoice(object):
 				'Voice' in music21measure.classes):
 				raise TypeError, 'must pass a music21 Measure object'
 			self.originalMeasure = music21measure
-			self.originalChords = music21measure.flat.makeChords(inPlace=False)
+			self.originalNotes = music21measure.flat
 
 		self.params = params
 		self.voiceCode = ''
@@ -1367,7 +1400,7 @@ class VexflowVoice(object):
 			#self.params['octaveModifier'] = 0
 
 		#Set the clef
-		theseClefs = self.originalChords.getElementsByClass('Clef')
+		theseClefs = self.originalNotes.getElementsByClass('Clef')
 		if len(theseClefs) > 1:
 			raise VexFlowUnsupportedException, 'Vexflow cannot yet handle ' +\
 				'multiple clefs in a single measure'
@@ -1383,7 +1416,7 @@ class VexflowVoice(object):
 				self.clefDisplayStatus = self.params['clefDisplayStatus']
 
 		#Set the key signature
-		theseKeySignatures = self.originalChords.getElementsByClass('KeySignature')
+		theseKeySignatures = self.originalNotes.getElementsByClass('KeySignature')
 		if len(theseKeySignatures) > 1:
 			raise VexFlowUnsupportedException, 'Vexflow cannot yet handle ' +\
 				'multiple key signatures in a single measure'
@@ -1407,7 +1440,7 @@ class VexflowVoice(object):
 					self.params['keySignatureDisplayStatus']
 
 		#Set the time signature
-		theseTimeSignatures = self.originalChords.getElementsByClass('TimeSignature')
+		theseTimeSignatures = self.originalNotes.getElementsByClass('TimeSignature')
 		if len(theseTimeSignatures) > 1:
 			raise VexFlowUnsupportedException, 'Vexflow cannot yet handle ' +\
 				'multiple time signatures in a single measure'
@@ -1444,14 +1477,23 @@ class VexflowVoice(object):
 		noteName = self.voiceName + 'Notes'
 		self.noteCode = 'var ' + noteName + ' = ['
 
-		for thisChord in self.originalChords:
-			if 'Chord' in thisChord.classes:
-				thisVexflowChord = VexflowChord(thisChord, params=\
+		beamStart = False #Used to generate beam code
+		beamEnd = False
+		beams = []
+
+		for thisNote in self.originalNotes:
+			if 'Note' in thisNote.classes:
+				thisVexflowNote = VexflowNote(thisNote, params=\
+					{'clef': self.clef})
+				self.noteCode += thisVexflowNote.generateCode('txt')
+				self.noteCode += ', '
+			elif 'Chord' in thisNote.classes:
+				thisVexflowChord = VexflowChord(thisNote, params=\
 					{'clef': self.clef})
 				self.noteCode += thisVexflowChord.generateCode('txt')
 				self.noteCode += ', '
-			elif 'Rest' in thisChord.classes:
-				thisVexflowRest = VexflowRest(thisChord, params=\
+			elif 'Rest' in thisNote.classes:
+				thisVexflowRest = VexflowRest(thisNote, params=\
 					{'clef': self.clef})
 				self.noteCode += thisVexflowRest.generateCode('txt')
 				self.noteCode += ', '
