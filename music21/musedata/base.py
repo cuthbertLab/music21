@@ -653,7 +653,7 @@ class MuseDataMeasure(object):
         #m.rightBarline = None
 
         if mNumber != '':
-            m.number = mNumber
+            m.number = int(mNumber)
         return m
 
     def hasNotes(self):
