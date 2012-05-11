@@ -803,7 +803,7 @@ def addGroupingAttributes(allSegments, music21Part, **partKeywords):
             currentTimeSig = allMeasures[0].bestTimeSignature()
         else:
             currentTimeSig = allMeasures[1].bestTimeSignature()
-    except stream.StreamException:
+    except (stream.StreamException, meter.MeterException):
         currentTimeSig = meter.TimeSignature('4/4')
 
     descendingChords = True
