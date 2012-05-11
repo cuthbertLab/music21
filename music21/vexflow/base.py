@@ -66,7 +66,7 @@ defaultVoiceBeatValue = 4
 
 defaultBeamingStatus = False #Just until it's working properly
 
-defaultAccidentalDisplayStatus = True 
+defaultAccidentalDisplayStatus = False
 defaultClefDisplayStatus = False
 defaultKeySignatureDisplayStatus = False
 
@@ -724,6 +724,14 @@ class VexflowNote(object):
 			self.vexflowCode += '.addAccidental(0, new Vex.Flow.Accidental(' +\
 				'"' + self.vexflowAccidental + '"))'
 
+		for thisExpression in  self.originalNote.expressions:
+			if 'Fermata' in thisExpression.classes:
+				#"a@a" = fermata above staff. "a@u" = fermata below staff
+				#setPosition(3) means place this fermata above the staff
+				#setPosition(4) would put it below the staff
+				self.vexflowCode += '.addArticulation(0, new Vex.Flow.Articu'+\
+					'lation("a@a").setPosition(3))' 
+
 		try:
 			self.vexflowCode += '.addDotToAll()' * self.originalNote.duration.dots
 		except:
@@ -1024,6 +1032,13 @@ class VexflowRest(object):
 		self.vexflowCode = 'new Vex.Flow.StaveNote({keys: ["'+self.vexflowKey+ \
 			'"], duration: "' + thisVexflowDuration + '"})'
 
+		for thisExpression in  self.originalRest.expressions:
+			if 'Fermata' in thisExpression.classes:
+				#"a@a" = fermata above staff. "a@u" = fermata below staff
+				#setPosition(3) means place this fermata above the staff
+				#setPosition(4) would put it below the staff
+				self.vexflowCode += '.addArticulation(0, new Vex.Flow.Articu'+\
+					'lation("a@a").setPosition(3))' 
 		try:
 			self.vexflowCode += '.addDotToAll()' * self.originalRest.duration.dots
 		except:
