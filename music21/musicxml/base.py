@@ -74,11 +74,13 @@ VERSION_MINIMUM = (0, 6, 4)
 
 
 #-------------------------------------------------------------------------------
+# these single-entity tags are bundled together. 
+# order here may matter in performance
+
 DYNAMIC_MARKS = ['p', 'pp', 'ppp', 'pppp', 'ppppp', 'pppppp',
         'f', 'ff', 'fff', 'ffff', 'fffff', 'ffffff',
         'mp', 'mf', 'sf', 'sfp', 'sfpp', 'fp', 'rf', 'rfz', 'sfz', 'sffz', 'fz']
 
-# order here may matter
 ARTICULATION_MARKS = ['staccato', 'accent', 'strong-accent', 'tenuto', 
             'detached-legato', 'staccatissimo', 'spiccato', 
             'scoop',  'plop', 'doit',  'falloff', 'breath-mark',
@@ -96,14 +98,12 @@ TECHNICAL_MARKS = ['up-bow', 'down-bow', 'harmonic', 'open-string',
 def yesNoToBoolean(value):
     if value in ['yes', True]:
         return True
-    else:
-        return False
+    return False
 
 def booleanToYesNo(value):
     if value:
         return 'yes'
-    else:
-        return 'no'
+    return 'no'
 
 #-------------------------------------------------------------------------------
 class TagException(Exception):
@@ -203,186 +203,186 @@ class TagLib(object):
         # all tags under collection must be defined here, even if they do not   
         # have an object but are defined only as simple entities
         _tags = [
-('voice', True), 
-('note', False, Note), 
-('duration', True), # no object, just a tag
-('type', True), 
-('beam', True, Beam), 
-('step', True), 
-('stem', True), 
-('pitch', False, Pitch), 
-('octave', True), 
-('alter', True), 
-('notations', False, Notations), 
-('measure', False, Measure), 
-('slur', False, Slur), 
-('articulations', False, Articulations), 
-('rest', False, Rest), 
-('accidental', True, Accidental), 
-('direction', False, Direction), 
-('direction-type', False, DirectionType), 
-('dot', False, Dot), 
-('dynamics', False, Dynamics), 
-('tied', False, Tied), 
-('tie', False, Tie), 
-('chord', False), 
-('lyric', False, Lyric), 
-('syllabic', True), 
-('text', True),
-('trill-mark', False, TrillMark), 
-('mordent', False, Mordent), 
-('inverted-mordent', False, InvertedMordent), 
-
-('turn', False, Turn), 
-('delayed-turn', False, DelayedTurn), 
-('inverted-turn', False, InvertedTurn), 
-('accidental-mark', True, AccidentalMark), 
-('shake', False, Shake), 
-('schleifer', False, Schleifer), 
-('tremolo', False, Tremolo), 
-
-('attributes', False, Attributes), 
-('divisions', True), 
-('forward', False, Forward), 
-('backup', False, Backup), 
-('grace', False, Grace),  
-
-# this position is not based on measured tag usage
-('sound', False, Sound),  
-('words', True, Words),  
-('offset', True),  # no object
-('print', False, Print),  
-('page-layout', False, PageLayout),  
-('page-margins', False, PageMargins),  
-('page-height', True),  
-('page-width', True),  
-('system-layout', False, SystemLayout),  
-('system-margins', False, SystemMargins),  
-('right-margin', True),  
-('left-margin', True),  
-('system-distance', True),  
-
-('metronome', False, Metronome), # no char data
-('beat-unit', True, BeatUnit),
-('beat-unit-dot', False, BeatUnitDot),
-('per-minute', True, PerMinute),
-
-('time-modification', False, TimeModification), 
-('actual-notes', True), 
-('normal-notes', True), 
-('normal-type', True), 
-('normal-dot', True), 
-('tuplet', False, Tuplet), 
-('notehead', True, Notehead), 
-('technical', False, Technical), 
-
-('wedge', False, Wedge), 
-('octave-shift', False, OctaveShift), 
-('bracket', False, Bracket), 
-('wavy-line', False, WavyLine), 
-('glissando', True, Glissando), 
-('dashes', False, Dashes), 
-
-('ornaments', False, Ornaments), 
-('part', False, Part), 
-('key', False, Key), 
-('fifths', True), 
-('mode', True), 
-('cancel', True), 
-('key-step', True, KeyStep), 
-('key-alter', True, KeyAlter), 
-('key-octave', True, KeyOctave), 
-('transpose', False, Transpose), 
-('diatonic', True), 
-('chromatic', True), 
-('octave-change', True), 
-('time', False, Time), 
-('beats', True, Beats), 
-('beat-type', True, BeatType), 
-('clef', False, Clef), 
-('sign', True), 
-('line', True), 
-('clef-octave-change', True), 
-('staff', True), 
-('fermata', True, Fermata), 
-('barline', False, Barline), 
-('ending', False, Ending), 
-
-('segno', False, Segno),  
-('coda', False, Coda),  
-
-('bar-style', True), 
-('repeat', False, Repeat), 
-('measure-style', False, MeasureStyle), 
-('multiple-rest', True), 
-('staves', True), 
-('display-step', True, DisplayStep), 
-('display-octave', True, DisplayOctave),
-        ]
+        ('voice', True), 
+        ('note', False, Note), 
+        ('duration', True), # no object, just a tag
+        ('type', True), 
+        ('beam', True, Beam), 
+        ('step', True), 
+        ('stem', True), 
+        ('pitch', False, Pitch), 
+        ('octave', True), 
+        ('alter', True), 
+        ('notations', False, Notations), 
+        ('measure', False, Measure), 
+        ('slur', False, Slur), 
+        ('articulations', False, Articulations), 
+        ('rest', False, Rest), 
+        ('accidental', True, Accidental), 
+        ('direction', False, Direction), 
+        ('direction-type', False, DirectionType), 
+        ('dot', False, Dot), 
+        ('dynamics', False, Dynamics), 
+        ('tied', False, Tied), 
+        ('tie', False, Tie), 
+        ('chord', False), 
+        ('lyric', False, Lyric), 
+        ('syllabic', True), 
+        ('text', True),
+        ('trill-mark', False, TrillMark), 
+        ('mordent', False, Mordent), 
+        ('inverted-mordent', False, InvertedMordent), 
+        
+        ('turn', False, Turn), 
+        ('delayed-turn', False, DelayedTurn), 
+        ('inverted-turn', False, InvertedTurn), 
+        ('accidental-mark', True, AccidentalMark), 
+        ('shake', False, Shake), 
+        ('schleifer', False, Schleifer), 
+        ('tremolo', False, Tremolo), 
+        
+        ('attributes', False, Attributes), 
+        ('divisions', True), 
+        ('forward', False, Forward), 
+        ('backup', False, Backup), 
+        ('grace', False, Grace),  
+        
+        # this position is not based on measured tag usage
+        ('sound', False, Sound),  
+        ('words', True, Words),  
+        ('offset', True),  # no object
+        ('print', False, Print),  
+        ('page-layout', False, PageLayout),  
+        ('page-margins', False, PageMargins),  
+        ('page-height', True),  
+        ('page-width', True),  
+        ('system-layout', False, SystemLayout),  
+        ('system-margins', False, SystemMargins),  
+        ('right-margin', True),  
+        ('left-margin', True),  
+        ('system-distance', True),  
+        
+        ('metronome', False, Metronome), # no char data
+        ('beat-unit', True, BeatUnit),
+        ('beat-unit-dot', False, BeatUnitDot),
+        ('per-minute', True, PerMinute),
+        
+        ('time-modification', False, TimeModification), 
+        ('actual-notes', True), 
+        ('normal-notes', True), 
+        ('normal-type', True), 
+        ('normal-dot', True), 
+        ('tuplet', False, Tuplet), 
+        ('notehead', True, Notehead), 
+        ('technical', False, Technical), 
+        
+        ('wedge', False, Wedge), 
+        ('octave-shift', False, OctaveShift), 
+        ('bracket', False, Bracket), 
+        ('wavy-line', False, WavyLine), 
+        ('glissando', True, Glissando), 
+        ('dashes', False, Dashes), 
+        
+        ('ornaments', False, Ornaments), 
+        ('part', False, Part), 
+        ('key', False, Key), 
+        ('fifths', True), 
+        ('mode', True), 
+        ('cancel', True), 
+        ('key-step', True, KeyStep), 
+        ('key-alter', True, KeyAlter), 
+        ('key-octave', True, KeyOctave), 
+        ('transpose', False, Transpose), 
+        ('diatonic', True), 
+        ('chromatic', True), 
+        ('octave-change', True), 
+        ('time', False, Time), 
+        ('beats', True, Beats), 
+        ('beat-type', True, BeatType), 
+        ('clef', False, Clef), 
+        ('sign', True), 
+        ('line', True), 
+        ('clef-octave-change', True), 
+        ('staff', True), 
+        ('fermata', True, Fermata), 
+        ('barline', False, Barline), 
+        ('ending', False, Ending), 
+        
+        ('segno', False, Segno),  
+        ('coda', False, Coda),  
+        
+        ('bar-style', True), 
+        ('repeat', False, Repeat), 
+        ('measure-style', False, MeasureStyle), 
+        ('multiple-rest', True), 
+        ('staves', True), 
+        ('display-step', True, DisplayStep), 
+        ('display-octave', True, DisplayOctave),
+                ]
         _tags += DYNAMIC_MARKS
         _tags += ARTICULATION_MARKS
         _tags += TECHNICAL_MARKS
         _tags += [('other-dynamics', True, DynamicMark), 
-('other-articulation', True, ArticulationMark), 
-('other-technical', True, TechnicalMark), 
-('score-partwise', False), 
-('score-timewise', False),  
-('movement-title', True), 
-('movement-number', True), 
-('work', False, Work), 
-('work-title', True), 
-('work-number', True), 
-('opus', False), 
-('identification', False, Identification),  
-('rights', True), 
-('creator', True, Creator), 
-('credit', False, Credit), 
-('credit-words', True, CreditWords), 
-('encoding', False, Encoding), 
-('software', True, Software), 
-('encoding-date', True), 
-('part-list', False, PartList), 
-('part-group', False, PartGroup), 
-('group-name', True), 
-('group-symbol', True), 
-('group-barline', True), 
-('group-name-display', False), 
-('group-abbreviation', False), 
-('group-abbreviation-display', False), 
-('group-time', False), 
-('solo', False), 
-('ensemble', False), 
-('score-part', False, ScorePart), 
-('score-instrument', False, ScoreInstrument), 
-('instrument-name', True), 
-('instrument-abbreviation', True), 
-('part-name', True),
-
-('harmony', False, Harmony), 
-('inversion', True), 
-('function', True), 
-('root', False, Root), 
-('root-step', True), 
-('root-alter', True), 
-('kind', True, Kind), 
-('bass', False, Bass), 
-('bass-step', True), 
-('bass-alter', True), 
-('degree', False, Degree), 
-('degree-value', True, DegreeValue), 
-('degree-alter', True, DegreeAlter), 
-('degree-type', True, DegreeType), 
- 
-('midi-instrument', False, MIDIInstrument),
-('midi-channel', True), 
-('midi-program', True), 
-('volume', False), 
-('pan', False), 
-('elevation', False),
-('midi-name', False), 
-('midi-bank', False), 
-('midi-unpitched', False), 
-('double', False),  
+        ('other-articulation', True, ArticulationMark), 
+        ('other-technical', True, TechnicalMark), 
+        ('score-partwise', False), 
+        ('score-timewise', False),  
+        ('movement-title', True), 
+        ('movement-number', True), 
+        ('work', False, Work), 
+        ('work-title', True), 
+        ('work-number', True), 
+        ('opus', False), 
+        ('identification', False, Identification),  
+        ('rights', True), 
+        ('creator', True, Creator), 
+        ('credit', False, Credit), 
+        ('credit-words', True, CreditWords), 
+        ('encoding', False, Encoding), 
+        ('software', True, Software), 
+        ('encoding-date', True), 
+        ('part-list', False, PartList), 
+        ('part-group', False, PartGroup), 
+        ('group-name', True), 
+        ('group-symbol', True), 
+        ('group-barline', True), 
+        ('group-name-display', False), 
+        ('group-abbreviation', False), 
+        ('group-abbreviation-display', False), 
+        ('group-time', False), 
+        ('solo', False), 
+        ('ensemble', False), 
+        ('score-part', False, ScorePart), 
+        ('score-instrument', False, ScoreInstrument), 
+        ('instrument-name', True), 
+        ('instrument-abbreviation', True), 
+        ('part-name', True),
+        
+        ('harmony', False, Harmony), 
+        ('inversion', True), 
+        ('function', True), 
+        ('root', False, Root), 
+        ('root-step', True), 
+        ('root-alter', True), 
+        ('kind', True, Kind), 
+        ('bass', False, Bass), 
+        ('bass-step', True), 
+        ('bass-alter', True), 
+        ('degree', False, Degree), 
+        ('degree-value', True, DegreeValue), 
+        ('degree-alter', True, DegreeAlter), 
+        ('degree-type', True, DegreeType), 
+         
+        ('midi-instrument', False, MIDIInstrument),
+        ('midi-channel', True), 
+        ('midi-program', True), 
+        ('volume', False), 
+        ('pan', False), 
+        ('elevation', False),
+        ('midi-name', False), 
+        ('midi-bank', False), 
+        ('midi-unpitched', False), 
+        ('double', False),  
         ]
 
         # order matters: keep order here
@@ -425,6 +425,9 @@ class TagLib(object):
 
     def __getitem__(self, key):
         return self._t[key]
+
+    def keys(self):
+        return self._t.keys()
 
     #---------------------------------------------------------------------------
     # utilities for error checking and debugging
@@ -2937,142 +2940,145 @@ class Handler(xml.sax.ContentHandler):
             self.t = TagLib()
         else:
             self.t = tagLib
-
-        # this might be used in startElement() to speed up processing
-        # this is not opperational yet
-        #self._currentObj = None # store current mx object for processing
+        #environLocal.pd(['creating Handler'])
 
         # this is in use in characters()
         self._currentTag = None # store current tag object
 
+        self._mxObjs = {} # store by key
+        # initialize all to None
+        for k in self.t.keys():
+            self._mxObjs[k] = None
+
         # all objects built in processing
         # scoreObj is returned as content, contains everything
         # stores version of m21 used to create this file
-        self._scoreObj = Score(music21.VERSION) 
+        self._mxObjs['score'] = Score(music21.VERSION) 
 
         # component objects; these might be better stored
         # in a dictionary, where _activeTags['tagName'] = None
 
-        self._creatorObj = None
-        self._creditObj = None
-        self._creditWordsObj = None
-        self._workObj = None
-        self._identificationObj = None
-        self._encodingObj = None
-        self._softwareObj = None
-
-        self._partListObj = None  # added to score obj
-        self._partGroupObj = None
-        self._scorePartObj = None
-        self._scoreInstrumentObj = None
-        self._midiInstrumentObj = None
-
         self._parts = [] # added to score obj
 
-        self._partObj = None
-        self._measureObj = None
-        self._noteObj = None
-        self._forwardObj = None
-        self._backupObj = None
+#         self._mxObjs['creator'] = None
+#         self._mxObjs['credit'] = None
+#         self._mxObjs['credit-words'] = None
+#         self._mxObjs['work'] = None
+#         self._mxObjs['identification'] = None
+#         self._mxObjs['encoding'] = None
+#         self._mxObjs['software'] = None
+# 
+#         self._mxObjs['part-list'] = None  # added to score obj
+#         self._mxObjs['part-group'] = None
+#         self._mxObjs['score-part'] = None
+#         self._mxObjs['score-instrument'] = None
+#         self._mxObjs['midi-instrument'] = None
+# 
+#         self._mxObjs['part'] = None
+#         self._mxObjs['measure'] = None
+#         self._mxObjs['note'] = None
+#         self._mxObjs['forward'] = None
+#         self._mxObjs['backup'] = None
+# 
+#         self._mxObjs['rest'] = None
+#         self._mxObjs['display-step'] = None
+#         self._mxObjs['display-octave'] = None
+# 
+#         self._mxObjs['pitch'] = None
+#         self._mxObjs['beam'] = None
+#         self._mxObjs['barline'] = None
+#         self._mxObjs['ending'] = None
+# 
+#         self._mxObjs['turn'] = None
+#         self._mxObjs['delayed-turn'] = None
+#         self._mxObjs['inverted-turn'] = None
+#         self._mxObjs['accidental-mark'] = None
+#         self._mxObjs['shake'] = None
+#         self._mxObjs['schleifer'] = None
+#         self._mxObjs['tremolo'] = None
+# 
+#         self._mxObjs['segno'] = None
+#         self._mxObjs['coda'] = None
+#         self._mxObjs['repeat'] = None
+#         self._mxObjs['attributes'] = None
 
-        self._restObj = None
-        self._displayStepObj = None
-        self._displayOctaveObj = None
-
-        self._pitchObj = None
-        self._beamObj = None
-        self._barlineObj = None
-        self._endingObj = None
-
-        self._turnObj = None
-        self._delayedTurnObj = None
-        self._invertedTurnObj = None
-        self._accidentalMarkObj = None
-        self._shakeObj = None
-        self._schleiferObj = None
-        self._tremoloObj = None
-
-        self._segnoObj = None
-        self._codaObj = None
-        self._repeatObj = None
-        self._attributesObj = None
         # need to store last attribute obj accross multiple measures
         self._attributesObjLast = None
         # need to store last divisions accross mulitple mesausers
         self._divisionsLast = None
-
-        self._keyObj = None
-        self._keyStepObj = None
-        self._keyAlterObj = None
-        self._keyOctaveObj = None
-        self._noteheadObj = None
-        self._measureStyleObj = None
-
-        self._transposeObj = None
-        self._notationsObj = None
-        self._slurObj = None
-        self._tiedObj = None
-        self._fermataObj = None
-
-        self._ornamentsObj = None
-        self._trillMarkObj = None
-        self._mordentObj = None
-        self._invertedMordentObj = None
-
-        self._timeObj = None
-        # store last encountered
+# 
+#         self._mxObjs['key'] = None
+#         self._mxObjs['key-step'] = None
+#         self._mxObjs['key-alter'] = None
+#         self._mxObjs['key-octave'] = None
+#         self._mxObjs['notehead'] = None
+#         self._mxObjs['measure-style'] = None
+# 
+#         self._mxObjs['transpose'] = None
+#         self._mxObjs['notations'] = None
+#         self._mxObjs['slur'] = None
+#         self._mxObjs['tied'] = None
+#         self._mxObjs['fermata'] = None
+# 
+#         self._mxObjs['ornaments'] = None
+#         self._mxObjs['trill-mark'] = None
+#         self._mxObjs['mordent'] = None
+#         self._mxObjs['inverted-mordent'] = None
+# 
+#         self._mxObjs['time'] = None
+#         # store last encountered
         self._timeObjLast = None
-
-        self._clefObj = None
-        self._tieObj = None
-        self._accidentalObj = None
-        self._lyricObj = None
-        self._dotObj = None
-
-        self._timeModificationObj = None
-        self._tupletObj = None
-        self._dynamicsObj = None
-        self._dynamicMarkObj = None
-        self._articulationsObj = None
-        self._articulationMarkObj = None
-        self._articulationsObj = None
-        self._articulationMarkObj = None
-        self._technicalObj = None
-        self._technicalMarkObj = None
-
-        self._directionObj = None
-        self._directionTypeObj = None
-        self._graceObj = None
-
-        self._wedgeObj = None
-        self._octaveShiftObj = None
-        self._bracketObj = None
-        self._wavyLineObj = None
-        self._glissandoObj = None
-        self._dashesObj = None
-
-        self._wordsObj = None
-        self._soundObj = None
-
-        self._metronomeObj = None
-        self._beatUnitObj = None
-        self._beatUnitDotObj = None
-        self._perMinuteObj = None
-
-        self._harmonyObj = None
-        self._rootObj = None
-        self._kindObj = None
-        self._bassObj = None
-        self._degreeObj = None
-        self._degreeValueObj = None
-        self._degreeAlterObj = None
-        self._degreeTypeObj = None
-
-        self._printObj = None
-        self._pageLayoutObj = None
-        self._pageMarginsObj = None
-        self._systemLayoutObj = None
-        self._systemMarginsObj = None
+# 
+#         self._mxObjs['clef'] = None
+#         self._mxObjs['tie'] = None
+#         self._mxObjs['accidental'] = None
+#         self._mxObjs['lyric'] = None
+#         self._mxObjs['dot'] = None
+# 
+#         self._mxObjs['time-modification'] = None
+#         self._mxObjs['tuplet'] = None
+#         self._mxObjs['dynamics'] = None
+#         self._mxObjs['dynamic-mark'] = None
+#         self._mxObjs['articulations'] = None
+#         self._mxObjs['articulation-mark'] = None
+#         self._mxObjs['articulations'] = None
+#         self._mxObjs['articulation-mark'] = None
+#         self._mxObjs['technical'] = None
+#         self._mxObjs['technical-mark'] = None
+# 
+#         self._mxObjs['direction'] = None
+#         self._mxObjs['direction-type'] = None
+#         self._mxObjs['grace'] = None
+# 
+#         self._mxObjs['wedge'] = None
+#         self._mxObjs['octave-shift'] = None
+#         self._mxObjs['bracket'] = None
+#         self._mxObjs['wavy-line'] = None
+#         self._mxObjs['glissando'] = None
+#         self._mxObjs['dashes'] = None
+# 
+#         self._mxObjs['words'] = None
+#         self._mxObjs['sound'] = None
+# 
+#         self._mxObjs['metronome'] = None
+#         self._mxObjs['beat-unit'] = None
+#         self._mxObjs['beat-unit-dot'] = None
+#         self._mxObjs['per-minute'] = None
+# 
+#         self._mxObjs['harmony'] = None
+#         self._mxObjs['root'] = None
+#         self._mxObjs['kind'] = None
+#         self._mxObjs['bass'] = None
+#         self._mxObjs['degree'] = None
+#         self._mxObjs['degree-value'] = None
+#         self._mxObjs['degree-alter'] = None
+#         self._mxObjs['degree-type'] = None
+# 
+#         self._mxObjs['print'] = None
+#         self._mxObjs['page-layout'] = None
+#         self._mxObjs['page-margins'] = None
+#         self._mxObjs['system-layout'] = None
+#         self._mxObjs['system-margins'] = None
 
     def setDocumentLocator(self, locator):
         '''A locator object can be used to get line numbers from the XML document.'''
@@ -3119,7 +3125,7 @@ class Handler(xml.sax.ContentHandler):
     #---------------------------------------------------------------------------
     def startElement(self, name, attrs):
 
-        # environLocal.printDebug([self._debugTagStr('start', name, attrs)], common.DEBUG_ALL)
+        #environLocal.printDebug([self._debugTagStr('start', name, attrs)])
 
         if name in self.t.tagsAll:
             self._currentTag = self.t[name]
@@ -3136,411 +3142,410 @@ class Handler(xml.sax.ContentHandler):
         
         # place most commonly used tags first
         if name == 'note':
-            self._noteObj = Note()      
+            self._mxObjs[name] = Note()      
             # store a reference to the measure containing
-            self._noteObj.external['measure'] = self._measureObj
-            self._noteObj.external['attributes'] = self._attributesObjLast
-            self._noteObj.external['divisions'] = self._divisionsLast
-            self._noteObj.loadAttrs(attrs)
+            self._mxObjs[name].external['measure'] = self._mxObjs['measure']
+            self._mxObjs[name].external['attributes'] = self._attributesObjLast
+            self._mxObjs[name].external['divisions'] = self._divisionsLast
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'beam':
-            self._beamObj = Beam()
-            self._beamObj.loadAttrs(attrs)
+            self._mxObjs[name] = Beam()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'pitch':
-            self._pitchObj = Pitch()
+            self._mxObjs[name] = Pitch()
 
         elif name == 'notations': 
-            self._notationsObj = Notations()
+            self._mxObjs[name] = Notations()
 
         elif name == 'rest':
-            self._restObj = Rest()
+            self._mxObjs[name] = Rest()
 
         elif name == 'measure':
-            self._measureObj = Measure()
-            self._measureObj.external['attributes'] = self._attributesObjLast
-            self._measureObj.external['divisions'] = self._divisionsLast
+            self._mxObjs[name] = Measure()
+            self._mxObjs[name].external['attributes'] = self._attributesObjLast
+            self._mxObjs[name].external['divisions'] = self._divisionsLast
             # some attributes definitions do store time, and refer only
             # to the last defined time value; store here for access
-            self._measureObj.external['time'] = self._timeObjLast
-            self._measureObj.loadAttrs(attrs)
+            self._mxObjs[name].external['time'] = self._timeObjLast
+            self._mxObjs[name].loadAttrs(attrs)
 
-            #environLocal.printDebug(['setting divisions from self._divisionsLast', 'self._measureObj.get("number")', self._measureObj.get("number"),  self._divisionsLast])
+            #environLocal.printDebug(['setting divisions from self._divisionsLast', 'self._mxObjs['measure'].get("number")', self._mxObjs['measure'].get("number"),  self._divisionsLast])
 
 
         elif name == 'slur':
-            self._slurObj = Slur()
-            self._slurObj.loadAttrs(attrs)
+            self._mxObjs[name] = Slur()
+            self._mxObjs[name].loadAttrs(attrs)
 
 
         elif name == 'accidental':
-            self._accidentalObj = Accidental()
-            self._accidentalObj.loadAttrs(attrs)
+            self._mxObjs[name] = Accidental()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'tie':
-            self._tieObj = Tie()
-            self._tieObj.loadAttrs(attrs)
+            self._mxObjs[name] = Tie()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'tied':
-            self._tiedObj = Tied()
-            self._tiedObj.loadAttrs(attrs)
+            self._mxObjs[name] = Tied()
+            self._mxObjs[name].loadAttrs(attrs)
 
 
         elif name == 'direction': 
-            self._directionObj = Direction()
-            self._directionObj.loadAttrs(attrs)
+            self._mxObjs[name] = Direction()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'direction-type': 
-            self._directionTypeObj = DirectionType()
+            self._mxObjs[name] = DirectionType()
 
         elif name == 'dot': 
-            self._dotObj = Dot()
+            self._mxObjs[name] = Dot()
 
         elif name == 'dynamics': 
-            self._dynamicsObj = Dynamics()
-            self._dynamicsObj.loadAttrs(attrs) # loads placement and pos args
+            self._mxObjs[name] = Dynamics()
+            self._mxObjs[name].loadAttrs(attrs) # loads placement and pos args
 
         elif name == 'time-modification': 
-            self._timeModificationObj = TimeModification()
+            self._mxObjs[name] = TimeModification()
 
         elif name == 'tuplet': 
-            self._tupletObj = Tuplet()
-            self._tupletObj.loadAttrs(attrs)
+            self._mxObjs[name] = Tuplet()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'forward':
-            self._forwardObj = Forward()
+            self._mxObjs[name] = Forward()
 
         elif name == 'backup':
-            self._backupObj = Backup()
+            self._mxObjs[name] = Backup()
 
         elif name == 'articulations': 
-            self._articulationsObj = Articulations()
+            self._mxObjs[name] = Articulations()
 
         elif name == 'attributes':
-            self._attributesObj = Attributes()
-
-
+            self._mxObjs[name] = Attributes()
 
         elif name == 'lyric':
-            self._lyricObj = Lyric()
-            self._lyricObj.loadAttrs(attrs)
+            self._mxObjs[name] = Lyric()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'trill-mark': 
-            self._trillMarkObj = TrillMark()
-            self._trillMarkObj.loadAttrs(attrs)
+            self._mxObjs[name] = TrillMark()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'mordent': 
-            self._mordentObj = Mordent()
-            self._mordentObj.loadAttrs(attrs)
+            self._mxObjs[name] = Mordent()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'inverted-mordent': 
             #environLocal.pd(['got ornament', name])
-            self._invertedMordentObj = InvertedMordent()
-            self._invertedMordentObj.loadAttrs(attrs)
+            self._mxObjs[name] = InvertedMordent()
+            self._mxObjs[name].loadAttrs(attrs)
 
 
  
         elif name == 'turn':
             #environLocal.pd(['got ornament', name])
-            self._turnObj = Turn()
-            self._turnObj.loadAttrs(attrs)
+            self._mxObjs[name] = Turn()
+            self._mxObjs[name].loadAttrs(attrs)
  
         elif name == 'delayed-turn':
             #environLocal.pd(['got ornament', name])
-            self._delayedTurnObj = DelayedTurn()
-            self._delayedTurnObj.loadAttrs(attrs)
+            self._mxObjs[name] = DelayedTurn()
+            self._mxObjs[name].loadAttrs(attrs)
  
         elif name == 'inverted-turn':
             #environLocal.pd(['got ornament', name])
-            self._invertedTurnObj = InvertedTurn()
-            self._invertedTurnObj.loadAttrs(attrs)
+            self._mxObjs[name] = InvertedTurn()
+            self._mxObjs[name].loadAttrs(attrs)
  
         elif name == 'accidental-mark':
             #environLocal.pd(['got ornament', name])
-            self._accidentalMarkObj = AccidentalMark()
-            self._accidentalMarkObj.loadAttrs(attrs)
+            self._mxObjs[name] = AccidentalMark()
+            self._mxObjs[name].loadAttrs(attrs)
 # 
         elif name == 'shake':
-            self._shakeObj = Shake()
-            self._shakeObj.loadAttrs(attrs)
+            self._mxObjs[name] = Shake()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'schleifer':
-            self._schleiferObj = Schleifer()
-            self._schleiferObj.loadAttrs(attrs)
+            self._mxObjs[name] = Schleifer()
+            self._mxObjs[name].loadAttrs(attrs)
  
         elif name == 'tremolo':
             #environLocal.pd(['got ornament', name])
-            self._tremoloObj = Tremolo()
-            self._tremoloObj.loadAttrs(attrs)
+            self._mxObjs[name] = Tremolo()
+            self._mxObjs[name].loadAttrs(attrs)
 
 
 
         elif name == 'grace':
             #environLocal.printDebug('creating mxGrace object')
-            self._graceObj = Grace()
-            self._graceObj.loadAttrs(attrs)
+            self._mxObjs[name] = Grace()
+            self._mxObjs[name].loadAttrs(attrs)
 
 
         # the position in this group (print to sys distance) may not 
         # be optimized
         elif name == 'print':
             #environLocal.printDebug(['found print tag'])
-            self._printObj = Print()
-            self._printObj.loadAttrs(attrs)
+            self._mxObjs[name] = Print()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'page-layout':
             # has one attr, not yet supported -- margin-type
-            self._pageLayoutObj = PageLayout() 
+            self._mxObjs[name] = PageLayout() 
 
         elif name == 'page-margins':
             # has no attrs
-            self._pageMarginsObj = PageMargins() 
+            self._mxObjs[name] = PageMargins() 
 
 
 
         elif name == 'system-layout':
             # has no attrs
-            self._systemLayoutObj = SystemLayout() 
+            self._mxObjs[name] = SystemLayout() 
 
         elif name == 'system-margins':
             # has no attrs
-            self._systemMarginsObj = SystemMargins() 
+            self._mxObjs[name] = SystemMargins() 
 
 
         elif name == 'notehead': 
-            self._noteheadObj = Notehead()
-            self._noteheadObj.loadAttrs(attrs)
+            self._mxObjs[name] = Notehead()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'technical': 
-            self._technicalObj = Technical()
+            self._mxObjs[name] = Technical()
 
 
         elif name == 'words': 
-            self._wordsObj = Words()
-            self._wordsObj.loadAttrs(attrs)
+            self._mxObjs[name] = Words()
+            self._mxObjs[name].loadAttrs(attrs)
 
 
 
         elif name == 'wedge': 
-            self._wedgeObj = Wedge()
-            self._wedgeObj.loadAttrs(attrs)
+            self._mxObjs[name] = Wedge()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'octave-shift': 
-            self._octaveShiftObj = OctaveShift()
-            self._octaveShiftObj.loadAttrs(attrs)
+            self._mxObjs[name] = OctaveShift()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'bracket': 
-            self._bracketObj = Bracket()
-            self._bracketObj.loadAttrs(attrs)
+            self._mxObjs[name] = Bracket()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'wavy-line': 
-            self._wavyLineObj = WavyLine()
-            self._wavyLineObj.loadAttrs(attrs)
+            self._mxObjs[name] = WavyLine()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'glissando': 
-            self._glissandoObj = Glissando()
-            self._glissandoObj.loadAttrs(attrs)
+            self._mxObjs[name] = Glissando()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'dashes': 
-            self._dashesObj = Dashes()
-            self._dashesObj.loadAttrs(attrs)
+            self._mxObjs[name] = Dashes()
+            self._mxObjs[name].loadAttrs(attrs)
 
 
 
         elif name == 'ornaments': 
-            self._ornamentsObj = Ornaments()
+            self._mxObjs[name] = Ornaments()
 
         elif name in DYNAMIC_MARKS:
-            self._dynamicMarkObj = DynamicMark(name)
+            self._mxObjs['dynamic-mark'] = DynamicMark(name)
 
         elif name == 'other-dynamics':
-            self._dynamicMarkObj = DynamicMark(name)
+            self._mxObjs['dynamic-mark'] = DynamicMark(name)
 
         elif name in ARTICULATION_MARKS:
             #environLocal.printDebug(['articulation mark mx obj creation', name])
-            self._articulationMarkObj = ArticulationMark(name)
-            self._articulationMarkObj.loadAttrs(attrs)
+            self._mxObjs['articulation-mark'] = ArticulationMark(name)
+            self._mxObjs['articulation-mark'].loadAttrs(attrs)
 
         elif name == 'other-articulation':
-            self._articulationMarkObj = ArticulationMark(name)
+            self._mxObjs['articulation-mark'] = ArticulationMark(name)
 
         elif name in TECHNICAL_MARKS:
-            self._technicalMarkObj = TechnicalMark(name)
-            self._technicalMarkObj.loadAttrs(attrs)
+            self._mxObjs['technical-mark'] = TechnicalMark(name)
+            self._mxObjs['technical-mark'].loadAttrs(attrs)
 
         elif name == 'other-technical':
-            self._technicalMarkObj = TechnicalMark(name)
+            self._mxObjs['technical-mark'] = TechnicalMark(name)
 
         elif name == 'fermata':
-            self._fermataObj = Fermata()
-            self._fermataObj.loadAttrs(attrs)
+            self._mxObjs[name] = Fermata()
+            self._mxObjs[name].loadAttrs(attrs)
 
 
         elif name == 'sound':
-            self._soundObj = Sound()
-            self._soundObj.loadAttrs(attrs)
+            self._mxObjs[name] = Sound()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'metronome':  # branch location not optimized
-            self._metronomeObj = Metronome()
-            self._metronomeObj.loadAttrs(attrs) # parenthesis is only
+            self._mxObjs[name] = Metronome()
+            self._mxObjs[name].loadAttrs(attrs) # parenthesis is only
 
         elif name == 'beat-unit':  
-            self._beatUnitObj = BeatUnit() # no attrs
+            self._mxObjs[name] = BeatUnit() # no attrs
 
         elif name == 'beat-unit-dot':  
-            self._beatUnitDotObj = BeatUnitDot() # no attrs
+            self._mxObjs[name] = BeatUnitDot() # no attrs
 
         elif name == 'per-minute':  
-            self._perMinuteObj = PerMinute() # no attrs
+            self._mxObjs[name] = PerMinute() # no attrs
 
 
         elif name == 'harmony':
-            self._harmonyObj = Harmony()
-            self._harmonyObj.loadAttrs(attrs)
+            self._mxObjs[name] = Harmony()
+            self._mxObjs[name].loadAttrs(attrs)
         elif name == 'root':
-            self._rootObj = Root()
-            self._rootObj.loadAttrs(attrs)
+            self._mxObjs[name] = Root()
+            self._mxObjs[name].loadAttrs(attrs)
         elif name == 'bass':
-            self._bassObj = Bass()
-            self._bassObj.loadAttrs(attrs)
+            self._mxObjs[name] = Bass()
+            self._mxObjs[name].loadAttrs(attrs)
         elif name == 'kind':
-            self._kindObj = Kind()
-            self._kindObj.loadAttrs(attrs)
+            self._mxObjs[name] = Kind()
+            self._mxObjs[name].loadAttrs(attrs)
         elif name == 'degree':
-            self._degreeObj = Degree()
-            self._degreeObj.loadAttrs(attrs)
+            self._mxObjs[name] = Degree()
+            self._mxObjs[name].loadAttrs(attrs)
         elif name == 'degree-value':
-            self._degreeValueObj = DegreeValue()
-            self._degreeValueObj.loadAttrs(attrs)
+            self._mxObjs[name] = DegreeValue()
+            self._mxObjs[name].loadAttrs(attrs)
         elif name == 'degree-alter':
-            self._degreeAlterObj = DegreeAlter()
-            self._degreeAlterObj.loadAttrs(attrs)
+            self._mxObjs[name] = DegreeAlter()
+            self._mxObjs[name].loadAttrs(attrs)
         elif name == 'degree-type':
-            self._degreeTypeObj = DegreeType()
-            self._degreeTypeObj.loadAttrs(attrs)
+            self._mxObjs[name] = DegreeType()
+            self._mxObjs[name].loadAttrs(attrs)
 
 
+        # only this or score-timewise is called
         elif name == 'score-partwise':
-            self._scoreObj.loadAttrs(attrs)
-            self._scoreObj.format = 'score-partwise'
+            self._mxObjs['score'].loadAttrs(attrs)
+            self._mxObjs['score'].format = 'score-partwise'
 
         elif name == 'score-timewise':
-            self._scoreObj.loadAttrs(attrs)
-            self._scoreObj.format = 'score-timewise'
+            self._mxObjs['score'].loadAttrs(attrs)
+            self._mxObjs['score'].format = 'score-timewise'
             raise MusicXMLException('timewise is not supported')
 
         elif name == 'work':
-            self._workObj = Work()
+            self._mxObjs[name] = Work()
 
         elif name == 'identification':
-            self._identificationObj = Identification()
+            self._mxObjs[name] = Identification()
 
         elif name == 'creator':
-            self._creatorObj = Creator()
-            self._creatorObj.loadAttrs(attrs)
+            self._mxObjs[name] = Creator()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'credit':
-            self._creditObj = Credit()
-            self._creditObj.loadAttrs(attrs)
+            self._mxObjs[name] = Credit()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'credit-words':
-            self._creditWordsObj = CreditWords()
-            self._creditWordsObj.loadAttrs(attrs)
+            self._mxObjs[name] = CreditWords()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'encoding':
-            self._encodingObj = Encoding()
+            self._mxObjs[name] = Encoding()
 
         elif name == 'software':
-            self._softwareObj = Software()
+            self._mxObjs[name] = Software()
 
 
         # formerly part of handler partList
         elif name == 'part-list':
-            self._partListObj = PartList()
+            #environLocal.pd(['creating PartList'])
+            self._mxObjs[name] = PartList()
 
         elif name == 'part-group':
-            self._partGroupObj = PartGroup()
-            self._partGroupObj.loadAttrs(attrs)
+            self._mxObjs[name] = PartGroup()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'score-part':
-            self._scorePartObj = ScorePart()
-            self._scorePartObj.loadAttrs(attrs)
+            self._mxObjs[name] = ScorePart()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'score-instrument':
-            self._scoreInstrumentObj = ScoreInstrument()
-            self._scoreInstrumentObj.loadAttrs(attrs)
+            self._mxObjs[name] = ScoreInstrument()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'midi-instrument': # maybe soud def tag
-            self._midiInstrumentObj = MIDIInstrument()
-            self._midiInstrumentObj.loadAttrs(attrs)
+            self._mxObjs[name] = MIDIInstrument()
+            self._mxObjs[name].loadAttrs(attrs)
 
 
         # part of handler part
         elif name == 'part':
-            self._partObj = Part()
-            self._partObj.loadAttrs(attrs)
+            self._mxObjs[name] = Part()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'key':
-            self._keyObj = Key()
+            self._mxObjs[name] = Key()
 
         elif name == 'key-step':
-            self._keyStepObj = KeyStep()
+            self._mxObjs[name] = KeyStep()
 
         elif name == 'key-alter':
-            self._keyAlterObj = KeyAlter()
+            self._mxObjs[name] = KeyAlter()
 
         elif name == 'key-octave':
-            self._keyOctaveObj = KeyOctave()
-            self._keyOctaveObj.loadAttrs(attrs)
+            self._mxObjs[name] = KeyOctave()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'transpose':
-            self._transposeObj = Transpose()
+            self._mxObjs[name] = Transpose()
 
         elif name == 'time':
-            self._timeObj = Time()
-            self._timeObj.loadAttrs(attrs)
+            self._mxObjs[name] = Time()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'clef':
-            self._clefObj = Clef()
-            self._clefObj.loadAttrs(attrs)
+            self._mxObjs[name] = Clef()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'measure-style':
-            self._measureStyleObj = MeasureStyle()
+            self._mxObjs[name] = MeasureStyle()
 
         elif name == 'display-step':
-            self._displayStepObj = DisplayStep()
+            self._mxObjs[name] = DisplayStep()
 
         elif name == 'display-octave':
-            self._displayOctaveObj = DisplayOctave()
+            self._mxObjs[name] = DisplayOctave()
 
         elif name == 'barline':
-            self._barlineObj = Barline()
-            self._barlineObj.loadAttrs(attrs)
+            self._mxObjs[name] = Barline()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'ending':
-            self._endingObj = Ending()
-            self._endingObj.loadAttrs(attrs)
+            self._mxObjs[name] = Ending()
+            self._mxObjs[name].loadAttrs(attrs)
 
 
         elif name == 'segno':
-            self._segnoObj = Segno()
-            self._segnoObj.loadAttrs(attrs)
+            self._mxObjs[name] = Segno()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'coda':
-            self._codaObj = Coda()
-            self._codaObj.loadAttrs(attrs)
+            self._mxObjs[name] = Coda()
+            self._mxObjs[name].loadAttrs(attrs)
 
         elif name == 'repeat': 
-            self._repeatObj = Repeat()
-            self._repeatObj.loadAttrs(attrs)
+            self._mxObjs[name] = Repeat()
+            self._mxObjs[name].loadAttrs(attrs)
 
 
 
 
     #---------------------------------------------------------------------------
     def endElement(self, name):
-#         environLocal.printDebug([self._debugTagStr('end', name)],  
-#                 common.DEBUG_ALL)
+        #environLocal.printDebug([self._debugTagStr('end', name)])
 
         # not in use yet
 #         if name in self.t.tagsAll:
@@ -3549,176 +3554,181 @@ class Handler(xml.sax.ContentHandler):
 
         # place most commonly used tags first
         if name == 'note':
-            self._measureObj.componentList.append(self._noteObj)
-            self._noteObj = None
+            self._mxObjs['measure'].componentList.append(self._mxObjs['note'])
+            self._mxObjs['note'] = None
 
         elif name == 'voice':
-            if self._noteObj != None: # not a forward/backup tag
-                self._noteObj.voice = self._currentTag.charData
+            if self._mxObjs['note'] is not None: # not a forward/backup tag
+                self._mxObjs['note'].voice = self._currentTag.charData
             else: # inside of backup tag
                 pass
                 #environLocal.printDebug([' cannot deal with this voice', self._currentTag.charData])
 
         elif name == 'duration':
-            if self._noteObj != None: # not a forward/backup tag
-                self._noteObj.duration = self._currentTag.charData
-            elif self._backupObj != None:
-                self._backupObj.duration = self._currentTag.charData
-            elif self._forwardObj != None:
-                self._forwardObj.duration = self._currentTag.charData
+            if self._mxObjs['note'] is not None: # not a forward/backup tag
+                self._mxObjs['note'].duration = self._currentTag.charData
+            elif self._mxObjs['backup'] is not None:
+                self._mxObjs['backup'].duration = self._currentTag.charData
+            elif self._mxObjs['forward'] is not None:
+                self._mxObjs['forward'].duration = self._currentTag.charData
             else: # ignoring figured-bass
                 pass
                 #raise MusicXMLException('cannot handle duration tag at: %s' % self._getLocation())
 
         elif name == 'type':
-            self._noteObj.type = self._currentTag.charData
+            self._mxObjs['note'].type = self._currentTag.charData
 
         elif name == 'stem':
-            self._noteObj.stem = self._currentTag.charData
+            self._mxObjs['note'].stem = self._currentTag.charData
 
         elif name == 'beam':
-            self._beamObj.charData = self._currentTag.charData
-            self._noteObj.beamList.append(self._beamObj)
-            self._beamObj = None
+            self._mxObjs['beam'].charData = self._currentTag.charData
+            self._mxObjs['note'].beamList.append(self._mxObjs['beam'])
+            self._mxObjs['beam'] = None
 
         elif name == 'pitch':
-            self._noteObj.pitchObj = self._pitchObj
-            self._pitchObj = None
+            self._mxObjs['note'].pitchObj = self._mxObjs['pitch']
+            self._mxObjs['pitch'] = None
 
         elif name == 'step':
-            self._pitchObj.step = self._currentTag.charData
+            self._mxObjs['pitch'].step = self._currentTag.charData
 
         elif name == 'octave':
-            self._pitchObj.octave = self._currentTag.charData
+            self._mxObjs['pitch'].octave = self._currentTag.charData
 
         elif name == 'alter':
-            self._pitchObj.alter = self._currentTag.charData
+            self._mxObjs['pitch'].alter = self._currentTag.charData
 
 
         elif name == 'notations': 
-            self._noteObj.notationsObj = self._notationsObj
-            self._notationsObj = None
+            self._mxObjs['note'].notationsObj = self._mxObjs['notations']
+            self._mxObjs['notations'] = None
 
         elif name == 'rest':
-            self._noteObj.restObj = self._restObj
-            self._restObj = None
+            self._mxObjs['note'].restObj = self._mxObjs['rest']
+            self._mxObjs['rest'] = None
 
         elif name == 'measure': # in endElement
             # measures need to be stored in order; numbers may have odd values
             # update note start times w/ measure utility method
-            self._measureObj.update()
-            self._partObj.componentList.append(self._measureObj)
-            self._measureObj = None # clear to avoid mistakes
+            self._mxObjs['measure'].update()
+            self._mxObjs['part'].componentList.append(self._mxObjs['measure'])
+            self._mxObjs['measure'] = None # clear to avoid mistakes
+            #environLocal.pd(['added measure to part:', self._mxObjs['part']])
 
 
         elif name == 'slur': 
-            self._notationsObj.componentList.append(self._slurObj)
-            self._slurObj = None
+            self._mxObjs['notations'].componentList.append(self._mxObjs['slur'])
+            self._mxObjs['slur'] = None
 
         elif name == 'accidental':
-            self._accidentalObj.charData = self._currentTag.charData
-            self._noteObj.accidentalObj = self._accidentalObj
-            self._accidentalObj = None
+            self._mxObjs['accidental'].charData = self._currentTag.charData
+            self._mxObjs['note'].accidentalObj = self._mxObjs['accidental']
+            self._mxObjs['accidental'] = None
 
 
         elif name == 'tie':
-            self._noteObj.tieList.append(self._tieObj)
+            self._mxObjs['note'].tieList.append(self._mxObjs['tie'])
 
 
         elif name == 'tied':
-            self._notationsObj.componentList.append(self._tiedObj)
-            self._tiedObj = None
+            self._mxObjs['notations'].componentList.append(self._mxObjs['tied'])
+            self._mxObjs['tied'] = None
 
         elif name == 'direction':
             # only append if direction has components
-            if self._directionObj.componentList != []:
-                self._measureObj.componentList.append(self._directionObj)
-            self._directionObj = None
+            if self._mxObjs['direction'].componentList != []:                    
+                self._mxObjs['measure'].componentList.append(
+                    self._mxObjs['direction'])
+            self._mxObjs['direction'] = None
 
         elif name == 'direction-type': 
             # only append of direction-type has components
-            if self._directionTypeObj.componentList != []:
-                self._directionObj.componentList.append(self._directionTypeObj)
-            self._directionTypeObj = None
-
+            if self._mxObjs['direction-type'].componentList != []:
+                self._mxObjs['direction'].componentList.append(
+                    self._mxObjs['direction-type'])
+            self._mxObjs['direction-type'] = None
 
         elif name == 'chord':
-            self._noteObj.chord = True            
+            self._mxObjs['note'].chord = True            
 
         elif name == 'dot': 
-            self._noteObj.dotList.append(self._dotObj)
-
+            self._mxObjs['note'].dotList.append(self._mxObjs['dot'])
 
         elif name == 'dynamics': 
-            if self._notationsObj != None: 
-                self._notationsObj.componentList.append(self._dynamicsObj)
-            elif self._directionTypeObj != None: 
-                self._directionTypeObj.componentList.append(self._dynamicsObj)
+            if self._mxObjs['notations'] is not None: 
+                self._mxObjs['notations'].componentList.append(
+                    self._mxObjs['dynamics'])
+            elif self._mxObjs['direction-type'] is not None: 
+                self._mxObjs['direction-type'].componentList.append(
+                    self._mxObjs['dynamics'])
             else:
-                raise MusicXMLException('do not know where these dyanmics go', self._dynamicsObj)
-            self._dynamicsObj = None
+                raise MusicXMLException('do not know where these dyanmics go', self._mxObjs['dynamics'])
+            self._mxObjs['dynamics'] = None
 
 
         elif name == 'lyric':
-            if self._noteObj != None: # can be associtaed w/ harmony tag
-                self._noteObj.lyricList.append(self._lyricObj)
+            if self._mxObjs['note'] != None: # can be associtaed w/ harmony tag
+                self._mxObjs['note'].lyricList.append(self._mxObjs['lyric'])
             else:
                 environLocal.printDebug(['cannot deal with this lyric'])
-            self._lyricObj = None
+            self._mxObjs['lyric'] = None
 
         elif name == 'syllabic':
-            self._lyricObj.syllabic = self._currentTag.charData
+            self._mxObjs['lyric'].syllabic = self._currentTag.charData
 
         elif name == 'text':
-            self._lyricObj.text = self._currentTag.charData
+            self._mxObjs['lyric'].text = self._currentTag.charData
 
         elif name == 'trill-mark': 
-            self._ornamentsObj.append(self._trillMarkObj)
-            self._trillMarkObj = None
+            self._mxObjs['ornaments'].append(self._mxObjs['trill-mark'])
+            self._mxObjs['trill-mark'] = None
 
         elif name == 'mordent': 
-            self._ornamentsObj.append(self._mordentObj)
-            self._mordentObj = None
+            self._mxObjs['ornaments'].append(self._mxObjs['mordent'])
+            self._mxObjs['mordent'] = None
 
         elif name == 'inverted-mordent': 
-            self._ornamentsObj.append(self._invertedMordentObj)
-            self._invertedMordentObj = None
+            self._mxObjs['ornaments'].append(self._mxObjs['inverted-mordent'])
+            self._mxObjs['inverted-mordent'] = None
 
 
         elif name == 'turn':
-            self._ornamentsObj.append(self._turnObj)
-            self._turnObj = None
+            self._mxObjs['ornaments'].append(self._mxObjs['turn'])
+            self._mxObjs['turn'] = None
 # 
         elif name == 'delayed-turn':
-            self._ornamentsObj.append(self._delayedTurnObj)
-            self._delayedTurnObj = None
+            self._mxObjs['ornaments'].append(self._mxObjs['delayed-turn'])
+            self._mxObjs['delayed-turn'] = None
 # 
         elif name == 'inverted-turn':
-            self._ornamentsObj.append(self._invertedTurnObj)
-            self._invertedTurnObj = None
+            self._mxObjs['ornaments'].append(self._mxObjs['inverted-turn'])
+            self._mxObjs['inverted-turn'] = None
  
         elif name == 'accidental-mark':
             # accidental-mark can be found either after a turn in ornaments
             # or in notations by itself
-            if self._ornamentsObj is not None:
-                self._ornamentsObj.append(self._accidentalMarkObj)
-            elif self._notationsObj is not None:
-                self._notationsObj.append(self._accidentalMarkObj)
+            if self._mxObjs['ornaments'] is not None:
+                self._mxObjs['ornaments'].append(
+                    self._mxObjs['accidental-mark'])
+            elif self._mxObjs['notations'] is not None:
+                self._mxObjs['notations'].append(
+                    self._mxObjs['accidental-mark'])
             else:
                 raise MusicXMLException('cannot find destination for AccidentalMark object')
-            self._accidentalMarkObj = None
+            self._mxObjs['accidental-mark'] = None
 
         elif name == 'shake':
-            self._ornamentsObj.append(self._shakeObj)
-            self._shakeObj = None
+            self._mxObjs['ornaments'].append(self._mxObjs['shake'])
+            self._mxObjs['shake'] = None
 
         elif name == 'schleifer':
-            self._ornamentsObj.append(self._schleiferObj)
-            self._schleiferObj = None
+            self._mxObjs['ornaments'].append(self._mxObjs['schleifer'])
+            self._mxObjs['schleifer'] = None
 
         elif name == 'tremolo':
-            self._ornamentsObj.append(self._tremoloObj)
-            self._tremoloObj = None
+            self._mxObjs['ornaments'].append(self._mxObjs['tremolo'])
+            self._mxObjs['tremolo'] = None
 
 
 
@@ -3726,571 +3736,605 @@ class Handler(xml.sax.ContentHandler):
             # sound can be store either in a Measure (less common) or in a
             # <direction> (not a <direction-type>)
             # if a direction obj is open, add there
-            if self._directionObj is not None:
+            if self._mxObjs['direction'] is not None:
                 #environLocal.printDebug(['inserting <sound> into _directionObj'])
-                self._directionObj.componentList.append(self._soundObj)
-            elif self._measureObj is not None:
-                self._measureObj.componentList.append(self._soundObj)
+                self._mxObjs['direction'].componentList.append(
+                    self._mxObjs['sound'])
+            elif self._mxObjs['measure'] is not None:
+                self._mxObjs['measure'].componentList.append(
+                    self._mxObjs['sound'])
                 #environLocal.printDebug(['inserting <sound> into _measureObj'])
-            self._soundObj = None
+            self._mxObjs['sound'] = None
 
 
         elif name == 'metronome':  # branch location not optimized
-            if self._directionTypeObj is not None: 
+            if self._mxObjs['direction-type'] is not None: 
                 #environLocal.printDebug(['closing Metronome'])
-                self._directionTypeObj.componentList.append(self._metronomeObj)
+                self._mxObjs['direction-type'].componentList.append(
+                    self._mxObjs['metronome'])
             else:
-                raise MusicXMLException('missing a direction tyoe container for a Metronome: %s' % self._metronomeObj)
-            self._metronomeObj = None
+                raise MusicXMLException('missing a direction tyoe container for a Metronome: %s' % self._mxObjs['metronome'])
+            self._mxObjs['metronome'] = None
 
         elif name == 'beat-unit':  
-            if self._metronomeObj is not None: 
-                self._beatUnitObj.charData = self._currentTag.charData
-                self._metronomeObj.componentList.append(self._beatUnitObj)
+            if self._mxObjs['metronome'] is not None: 
+                self._mxObjs['beat-unit'].charData = self._currentTag.charData
+                self._mxObjs['metronome'].componentList.append(
+                    self._mxObjs['beat-unit'])
                 #environLocal.printDebug(['adding <beat-unit> to metronome'])
             else:
-                raise MusicXMLException('found a <beat-unit> tag without a metronome object to store it within: %s' % self._beatUnitObj)
-            self._beatUnitObj = None
+                raise MusicXMLException('found a <beat-unit> tag without a metronome object to store it within: %s' % self._mxObjs['beat-unit'])
+            self._mxObjs['beat-unit'] = None
 
         elif name == 'beat-unit-dot':  
             # no char data
-            if self._metronomeObj is not None: 
-                self._metronomeObj.componentList.append(self._beatUnitDotObj)
+            if self._mxObjs['metronome'] is not None: 
+                self._mxObjs['metronome'].componentList.append(
+                    self._mxObjs['beat-unit-dot'])
                 #environLocal.printDebug(['adding <beat-unit-dot> to metronome'])
             else:
-                raise MusicXMLException('found a <beat-unit-dot> tag without a metronome object to store it within: %s' % self._beatUnitObj)
-            self._beatUnitDotObj = None
+                raise MusicXMLException('found a <beat-unit-dot> tag without a metronome object to store it within: %s' % self._mxObjs['beat-unit'])
+            self._mxObjs['beat-unit-dot'] = None
 
         elif name == 'per-minute':
-            if self._metronomeObj is not None: 
-                self._perMinuteObj.charData = self._currentTag.charData
-                self._metronomeObj.componentList.append(self._perMinuteObj)
+            if self._mxObjs['metronome'] is not None: 
+                self._mxObjs['per-minute'].charData = self._currentTag.charData
+                self._mxObjs['metronome'].componentList.append(
+                    self._mxObjs['per-minute'])
                 #environLocal.printDebug(['adding <per-minute> to metronome'])
             else:
-                raise MusicXMLException('found a <per-minute> tag without a metronome object to store it within: %s' % self._perMinuteObj)
-            self._perMinuteObj = None
+                raise MusicXMLException('found a <per-minute> tag without a metronome object to store it within: %s' % self._mxObjs['per-minute'])
+            self._mxObjs['per-minute'] = None
 
 
         elif name == 'time-modification': 
-            self._noteObj.timeModificationObj = self._timeModificationObj
-            self._timeModificationObj = None
+            self._mxObjs['note'].timeModificationObj = self._mxObjs[
+                                                      'time-modification']
+            self._mxObjs['time-modification'] = None
 
         elif name == 'actual-notes': 
-            self._timeModificationObj.actualNotes = self._currentTag.charData
+            self._mxObjs['time-modification'].actualNotes = self._currentTag.charData
 
         elif name == 'normal-notes': 
-            self._timeModificationObj.normalNotes = self._currentTag.charData
+            self._mxObjs['time-modification'].normalNotes = self._currentTag.charData
 
         elif name == 'normal-type':
-            self._timeModificationObj.normalType = self._currentTag.charData
+            self._mxObjs['time-modification'].normalType = self._currentTag.charData
 
         elif name == 'normal-dot': 
-            self._timeModificationObj.normalDot = self._currentTag.charData
+            self._mxObjs['time-modification'].normalDot = self._currentTag.charData
 
         elif name == 'tuplet': 
-            self._notationsObj.componentList.append(self._tupletObj)
-            self._tupletObj = None
+            self._mxObjs['notations'].componentList.append(
+                self._mxObjs['tuplet'])
+            self._mxObjs['tuplet'] = None
 
 
 
 
         elif name == 'attributes': # in endElement
-            self._measureObj._attributesObjList.append(self._attributesObj)
+            self._mxObjs['measure']._attributesObjList.append(
+                self._mxObjs['attributes'])
             # this is the most recently found atttributes obj; not the final
-            self._measureObj.attributesObj = self._attributesObj
+            self._mxObjs['measure'].attributesObj = self._mxObjs['attributes']
             # update last found
-            self._attributesObjLast = copy.deepcopy(self._attributesObj)
+            self._attributesObjLast = copy.deepcopy(self._mxObjs['attributes'])
             # remove current, as loaded into measure
-            self._attributesObj = None
+            self._mxObjs['attributes'] = None
 
         elif name == 'divisions':
-            self._attributesObj.divisions = self._currentTag.charData
+            self._mxObjs['attributes'].divisions = self._currentTag.charData
             self._divisionsLast = self._currentTag.charData
     
         elif name == 'forward':
-            self._measureObj.componentList.append(self._forwardObj)
-            self._forwardObj = None
+            self._mxObjs['measure'].componentList.append(
+                self._mxObjs['forward'])
+            self._mxObjs['forward'] = None
 
         elif name == 'backup':
-            self._measureObj.componentList.append(self._backupObj)
-            self._backupObj = None
+            self._mxObjs['measure'].componentList.append(self._mxObjs['backup'])
+            self._mxObjs['backup'] = None
 
         elif name == 'grace':
-            self._noteObj.graceObj = self._graceObj
-            self._graceObj = None
+            self._mxObjs['note'].graceObj = self._mxObjs['grace']
+            self._mxObjs['grace'] = None
 
         # harmony and related objects
         elif name == 'harmony':
-            self._measureObj.componentList.append(self._harmonyObj)
-            self._harmonyObj = None
+            self._mxObjs['measure'].componentList.append(
+                self._mxObjs['harmony'])
+            self._mxObjs['harmony'] = None
 
         elif name == 'root':
-            self._harmonyObj.rootObj = self._rootObj
-            self._rootObj = None
+            self._mxObjs['harmony'].rootObj = self._mxObjs['root']
+            self._mxObjs['root'] = None
         elif name == 'root-step':
-            self._rootObj.rootStep = self._currentTag.charData
+            self._mxObjs['root'].rootStep = self._currentTag.charData
         elif name == 'root-alter':
-            self._rootObj.rootAlter = self._currentTag.charData
+            self._mxObjs['root'].rootAlter = self._currentTag.charData
 
         elif name == 'inversion':
-            self._harmonyObj.inversion = self._currentTag.charData
+            self._mxObjs['harmony'].inversion = self._currentTag.charData
         elif name == 'function':
-            self._harmonyObj.function = self._currentTag.charData
+            self._mxObjs['harmony'].function = self._currentTag.charData
 
         elif name == 'bass':
-            self._harmonyObj.bassObj = self._bassObj
-            self._bassObj = None
+            self._mxObjs['harmony'].bassObj = self._mxObjs['bass']
+            self._mxObjs['bass'] = None
         elif name == 'bass-step':
-            self._bassObj.bassStep = self._currentTag.charData
+            self._mxObjs['bass'].bassStep = self._currentTag.charData
         elif name == 'bass-alter':
-            self._bassObj.bassAlter = self._currentTag.charData
+            self._mxObjs['bass'].bassAlter = self._currentTag.charData
 
         elif name == 'kind':
-            self._kindObj.charData = self._currentTag.charData
-            self._harmonyObj.kindObj = self._kindObj
-            self._kindObj = None
+            self._mxObjs['kind'].charData = self._currentTag.charData
+            self._mxObjs['harmony'].kindObj = self._mxObjs['kind']
+            self._mxObjs['kind'] = None
 
         elif name == 'degree':
-            self._harmonyObj.degreeObj = self._degreeObj
-            self._degreeObj = None
+            self._mxObjs['harmony'].degreeObj = self._mxObjs['degree']
+            self._mxObjs['degree'] = None
         elif name == 'degree-value':
-            self._degreeValueObj.charData = self._currentTag.charData
-            self._degreeObj.componentList.append(self._degreeValueObj)
-            self._degreeValueObj = None
+            self._mxObjs['degree-value'].charData = self._currentTag.charData
+            self._mxObjs['degree'].componentList.append(
+                self._mxObjs['degree-value'])
+            self._mxObjs['degree-value'] = None
         elif name == 'degree-alter':
-            self._degreeAlterObj.charData = self._currentTag.charData
-            self._degreeObj.componentList.append(self._degreeAlterObj)
-            self._degreeAlterObj = None
+            self._mxObjs['degree-alter'].charData = self._currentTag.charData
+            self._mxObjs['degree'].componentList.append(
+                self._mxObjs['degree-alter'])
+            self._mxObjs['degree-alter'] = None
         elif name == 'degree-type':
-            self._degreeTypeObj.charData = self._currentTag.charData
-            self._degreeObj.componentList.append(self._degreeTypeObj)
-            self._degreeTypeObj = None
+            self._mxObjs['degree-type'].charData = self._currentTag.charData
+            self._mxObjs['degree'].componentList.append(
+                self._mxObjs['degree-type'])
+            self._mxObjs['degree-type'] = None
 
 
 
         # the position of print through sys-dist may not be optimized
         elif name == 'print':
             # print are stored in Measure, before attributes
-            if self._measureObj != None: # in case a print elsewhere
-                self._measureObj.componentList.append(self._printObj)
-                self._printObj = None
+            if self._mxObjs['measure'] != None: # in case a print elsewhere
+                self._mxObjs['measure'].componentList.append(
+                    self._mxObjs['print'])
+                self._mxObjs['print'] = None
 
         elif name == 'page-layout':
             # has no attrs
-            if self._printObj != None: # in case found elsewhere
-                self._printObj.componentList.append(self._pageLayoutObj)
-                self._pageLayoutObj = None
+            if self._mxObjs['print'] != None: # in case found elsewhere
+                self._mxObjs['print'].componentList.append(
+                    self._mxObjs['page-layout'])
+                self._mxObjs['page-layout'] = None
 
         elif name == 'page-margins':
-            if self._pageLayoutObj != None: # in case found elsewhere
-                self._pageLayoutObj.componentList.append(self._pageMarginsObj)
-                self._pageMarginsObj = None
+            if self._mxObjs['page-layout'] != None: # in case found elsewhere
+                self._mxObjs['page-layout'].componentList.append(
+                    self._mxObjs['page-margins'])
+                self._mxObjs['page-margins'] = None
 
         elif name == 'page-height': # simple element
-            if self._pageLayoutObj != None: # in case found elsewhere
-                self._pageLayoutObj.pageHeight = self._currentTag.charData
+            if self._mxObjs['page-layout'] != None: # in case found elsewhere
+                self._mxObjs['page-layout'].pageHeight = self._currentTag.charData
 
         elif name == 'page-width': # simple element
-            if self._pageLayoutObj != None: # in case found elsewhere
-                self._pageLayoutObj.pageWidth = self._currentTag.charData
-
+            if self._mxObjs['page-layout'] != None: # in case found elsewhere
+                self._mxObjs['page-layout'].pageWidth = self._currentTag.charData
 
         elif name == 'system-layout':
             # has no attrs
-            if self._printObj != None: # in case found elsewhere
-                self._printObj.componentList.append(self._systemLayoutObj)
-                self._systemLayoutObj = None
+            if self._mxObjs['print'] != None: # in case found elsewhere
+                self._mxObjs['print'].componentList.append(
+                    self._mxObjs['system-layout'])
+                self._mxObjs['system-layout'] = None
 
         elif name == 'system-margins':
-            if self._systemLayoutObj != None: # in case found elsewhere
-                self._systemLayoutObj.componentList.append(self._systemMarginsObj)
-                self._systemMarginsObj = None
+            if self._mxObjs['system-layout'] != None: # in case found elsewhere
+                self._mxObjs['system-layout'].componentList.append(
+                    self._mxObjs['system-margins'])
+                self._mxObjs['system-margins'] = None
 
         elif name == 'left-margin': # simple element
-            if self._systemMarginsObj != None: # in case found elsewhere
-                self._systemMarginsObj.leftMargin = self._currentTag.charData
-            elif self._pageMarginsObj != None: # in case found elsewhere
-                self._pageMarginsObj.leftMargin = self._currentTag.charData
-
+            if self._mxObjs['system-margins'] != None: # in case found elsewhere
+                self._mxObjs['system-margins'].leftMargin = self._currentTag.charData
+            elif self._mxObjs['page-margins'] != None: # in case found elsewhere
+                self._mxObjs['page-margins'].leftMargin = self._currentTag.charData
 
         elif name == 'right-margin': # simple element
-            if self._systemMarginsObj != None: # in case found elsewhere
-                self._systemMarginsObj.rightMargin = self._currentTag.charData
-            elif self._pageMarginsObj != None: # in case found elsewhere
-                self._pageMarginsObj.rightMargin = self._currentTag.charData
+            if self._mxObjs['system-margins'] != None: # in case found elsewhere
+                self._mxObjs['system-margins'].rightMargin = self._currentTag.charData
+            elif self._mxObjs['page-margins'] != None: # in case found elsewhere
+                self._mxObjs['page-margins'].rightMargin = self._currentTag.charData
 
         elif name == 'system-distance': # simple element
-            if self._systemLayoutObj != None: # in case found elsewhere
-                self._systemLayoutObj.systemDistance = self._currentTag.charData
+            if self._mxObjs['system-layout'] != None: # in case found elsewhere
+                self._mxObjs['system-layout'].systemDistance = self._currentTag.charData
 
 
         elif name == 'notehead':
-            self._noteheadObj.charData = self._currentTag.charData
-            self._noteObj.noteheadObj = self._noteheadObj
-            self._noteheadObj = None
+            self._mxObjs['notehead'].charData = self._currentTag.charData
+            self._mxObjs['note'].noteheadObj = self._mxObjs['notehead']
+            self._mxObjs['notehead'] = None
 
         elif name == 'articulations': 
-            self._notationsObj.componentList.append(self._articulationsObj)
-            self._articulationsObj = None
+            self._mxObjs['notations'].componentList.append(
+                self._mxObjs['articulations'])
+            self._mxObjs['articulations'] = None
 
         elif name == 'technical': 
-            self._notationsObj.componentList.append(self._technicalObj)
-            self._technicalObj = None
+            self._mxObjs['notations'].componentList.append(
+                self._mxObjs['technical'])
+            self._mxObjs['technical'] = None
 
         elif name == 'offset':
-            if self._directionObj is not None:
+            if self._mxObjs['direction'] is not None:
                 #environLocal.printDebug(['got an offset tag for a directionObj', self._currentTag.charData])
-                self._directionObj.offset = self._currentTag.charData
+                self._mxObjs['direction'].offset = self._currentTag.charData
             else: # ignoring figured-bass
                 environLocal.printDebug(['got an offset tag but no open directionObj', self._currentTag.charData])
                 pass
 
         elif name == 'words':
-            if self._directionTypeObj is not None: 
-                #environLocal.printDebug(['closing Words', 'self._wordsObj.charData',  self._wordsObj.charData])
+            if self._mxObjs['direction-type'] is not None: 
+                #environLocal.printDebug(['closing Words', 'self._mxObjs['words'].charData',  self._mxObjs['words'].charData])
                 # must manually attach collected charData
-                self._wordsObj.charData = self._currentTag.charData
-                self._directionTypeObj.componentList.append(self._wordsObj)
+                self._mxObjs['words'].charData = self._currentTag.charData
+                self._mxObjs['direction-type'].componentList.append(
+                                        self._mxObjs['words'])
             else:
-                raise MusicXMLException('missing a container for a Words: %s' % self._wordsObj)
-            self._wordsObj = None
+                raise MusicXMLException('missing a container for a Words: %s' % self._mxObjs['words'])
+            self._mxObjs['words'] = None
 
 
         elif name == 'wedge': 
-            if self._directionTypeObj is not None: 
-                self._directionTypeObj.componentList.append(self._wedgeObj)
+            if self._mxObjs['direction-type'] is not None: 
+                self._mxObjs['direction-type'].componentList.append(
+                    self._mxObjs['wedge'])
             else:
-                raise MusicXMLException('missing direction type container: %s' % self._wedgeObj)
-            self._wedgeObj = None
+                raise MusicXMLException('missing direction type container: %s' % self._mxObjs['wedge'])
+            self._mxObjs['wedge'] = None
 
 
         elif name == 'octave-shift': 
-            if self._directionTypeObj is not None: 
-                self._directionTypeObj.componentList.append(
-                    self._octaveShiftObj)
+            if self._mxObjs['direction-type'] is not None: 
+                self._mxObjs['direction-type'].componentList.append(
+                    self._mxObjs['octave-shift'])
             else:
-                raise MusicXMLException('missing direction type container: %s' % self._octaveShiftObj)
-            self._octaveShiftObj = None
+                raise MusicXMLException('missing direction type container: %s' % self._mxObjs['octave-shift'])
+            self._mxObjs['octave-shift'] = None
 
         elif name == 'bracket': 
-            if self._directionTypeObj is not None: 
-                self._directionTypeObj.componentList.append(
-                    self._bracketObj)
+            if self._mxObjs['direction-type'] is not None: 
+                self._mxObjs['direction-type'].componentList.append(
+                    self._mxObjs['bracket'])
             else:
-                raise MusicXMLException('missing direction type container: %s' % self._bracketObj)
-            self._bracketObj = None
+                raise MusicXMLException('missing direction type container: %s' % self._mxObjs['bracket'])
+            self._mxObjs['bracket'] = None
 
         elif name == 'wavy-line': 
             # goes in ornaments, which is in notations
-            self._ornamentsObj.append(self._wavyLineObj)
-            self._wavyLineObj = None
+            self._mxObjs['ornaments'].append(self._mxObjs['wavy-line'])
+            self._mxObjs['wavy-line'] = None
 
         elif name == 'glissando': 
             # goes in notations
-            self._glissandoObj.charData = self._currentTag.charData            
-            self._notationsObj.append(self._glissandoObj)
-            self._glissandoObj = None
+            self._mxObjs['glissando'].charData = self._currentTag.charData            
+            self._mxObjs['notations'].append(self._mxObjs['glissando'])
+            self._mxObjs['glissando'] = None
 
         elif name == 'dashes': 
-            if self._directionTypeObj is not None: 
-                self._directionTypeObj.componentList.append(self._dashesObj)
+            if self._mxObjs['direction-type'] is not None: 
+                self._mxObjs['direction-type'].componentList.append(
+                    self._mxObjs['dashes'])
             else:
-                raise MusicXMLException('missing direction type container: %s' % self._dashesObj)
-            self._dashesObj = None
-
+                raise MusicXMLException('missing direction type container: %s' % self._mxObjs['dashes'])
+            self._mxObjs['dashes'] = None
 
 
         elif name == 'segno':
-            if self._directionTypeObj != None: 
+            if self._mxObjs['direction-type'] != None: 
                 #environLocal.printDebug(['closing Segno'])
-                self._directionTypeObj.componentList.append(self._segnoObj)
+                self._mxObjs['direction-type'].componentList.append(
+                    self._mxObjs['segno'])
             else:
-                raise MusicXMLException('missing a container for a Segno: %s' % self._segnoObj)
-            self._segnoObj = None
+                raise MusicXMLException('missing a container for a Segno: %s' % self._mxObjs['segno'])
+            self._mxObjs['segno'] = None
 
         elif name == 'coda':
-            if self._directionTypeObj != None: 
+            if self._mxObjs['direction-type'] != None: 
                 #environLocal.printDebug(['closing Coda'])
-                self._directionTypeObj.componentList.append(self._codaObj)
+                self._mxObjs['direction-type'].componentList.append(
+                    self._mxObjs['coda'])
             else:
-                raise MusicXMLException('missing a container for a Coda: %s' % self._codaObj)
-            self._codaObj = None
+                raise MusicXMLException('missing a container for a Coda: %s' % self._mxObjs['coda'])
+            self._mxObjs['coda'] = None
 
 
         elif name == 'ornaments': 
-            self._notationsObj.append(self._ornamentsObj)
-            self._ornamentsObj = None
-
+            self._mxObjs['notations'].append(self._mxObjs['ornaments'])
+            self._mxObjs['ornaments'] = None
 
         elif name in DYNAMIC_MARKS:
-            self._dynamicsObj.componentList.append(self._dynamicMarkObj)
-            self._dynamicMarkObj = None
+            self._mxObjs['dynamics'].componentList.append(
+                self._mxObjs['dynamic-mark'])
+            self._mxObjs['dynamic-mark'] = None
 
         elif name == 'other-dynamics':
-            self._dynamicMarkObj.charData = self._currentTag.charData            
-            self._dynamicsObj.componentList.append(self._dynamicMarkObj)
-            self._dynamicMarkObj = None
+            self._mxObjs['dynamic-mark'].charData = self._currentTag.charData            
+            self._mxObjs['dynamics'].componentList.append(
+                self._mxObjs['dynamic-mark'])
+            self._mxObjs['dynamic-mark'] = None
 
         elif name in ARTICULATION_MARKS:
-            self._articulationsObj.componentList.append(
-                self._articulationMarkObj)
-            self._articulationMarkObj = None
+            self._mxObjs['articulations'].componentList.append(
+                self._mxObjs['articulation-mark'])
+            self._mxObjs['articulation-mark'] = None
 
         elif name == 'other-articulation':
-            self._articulationMarkObj.charData = self._currentTag.charData            
-            self._articulationsObj.componentList.append(self._dynamicMarkObj)
-            self._articulationMarkObj = None
+            self._mxObjs['articulation-mark'].charData = self._currentTag.charData            
+            self._mxObjs['articulations'].componentList.append(
+                self._mxObjs['articulation-mark'])
+            self._mxObjs['articulation-mark'] = None
 
         elif name in TECHNICAL_MARKS:
-            if self._technicalObj != None:
-                self._technicalObj.componentList.append(self._technicalMarkObj)
-            else:
-                # could be w/n <frame-note>
+            if self._mxObjs['technical'] != None:
+                self._mxObjs['technical'].componentList.append(
+                    self._mxObjs['technical-mark'])
+            else: # could be w/n <frame-note>
                 pass
-            self._technicalMarkObj = None
+            self._mxObjs['technical-mark'] = None
 
         elif name == 'other-technical':
-            self._technicalMarkObj.charData = self._currentTag.charData            
-            self._technicalObj.componentList.append(self._technicalMarkObj)
-            self._technicalMarkObj = None
+            self._mxObjs['technical-mark'].charData = self._currentTag.charData            
+            self._mxObjs['technical'].componentList.append(
+                self._mxObjs['technical-mark'])
+            self._mxObjs['technical-mark'] = None
 
         elif name == 'fermata':
-            self._fermataObj.charData = self._currentTag.charData  
-            self._notationsObj.componentList.append(self._fermataObj)
-            self._fermataObj = None
-
+            self._mxObjs['fermata'].charData = self._currentTag.charData  
+            self._mxObjs['notations'].componentList.append(
+                self._mxObjs['fermata'])
+            self._mxObjs['fermata'] = None
 
 
         # formerly part of handler score
         elif name == 'movement-title':
-            self._scoreObj.movementTitle = self._currentTag.charData
+            self._mxObjs['score'].movementTitle = self._currentTag.charData
 
         elif name == 'movement-number':
-            self._scoreObj.movementNumber = self._currentTag.charData
+            self._mxObjs['score'].movementNumber = self._currentTag.charData
 
         elif name == 'work':
-            self._scoreObj.workObj = self._workObj
-            self._workObj = None
+            self._mxObjs['score'].workObj = self._mxObjs['work']
+            self._mxObjs['work'] = None
 
         elif name == 'work-title':
-            self._workObj.workTitle = self._currentTag.charData
+            self._mxObjs['work'].workTitle = self._currentTag.charData
 
         elif name == 'work-number':
-            self._workObj.workNumber = self._currentTag.charData
+            self._mxObjs['work'].workNumber = self._currentTag.charData
 
         elif name == 'identification':
-            self._scoreObj.identificationObj = self._identificationObj
-            self._identificationObj = None
+            self._mxObjs['score'].identificationObj = self._mxObjs['identification']
+            self._mxObjs['identification'] = None
 
         elif name == 'rights':
-            self._identificationObj.rights = self._currentTag.charData
+            self._mxObjs['identification'].rights = self._currentTag.charData
 
         elif name == 'creator':
-            self._creatorObj.charData = self._currentTag.charData
-            self._identificationObj.creatorList.append(self._creatorObj)
-            self._creatorObj = None
+            self._mxObjs['creator'].charData = self._currentTag.charData
+            self._mxObjs['identification'].creatorList.append(
+                self._mxObjs['creator'])
+            self._mxObjs['creator'] = None
 
         elif name == 'credit':
-            self._scoreObj.creditList.append(self._creditObj)
-            self._creditObj = None
+            self._mxObjs['score'].creditList.append(self._mxObjs['credit'])
+            self._mxObjs['credit'] = None
 
         elif name == 'credit-words':
-            self._creditWordsObj.charData = self._currentTag.charData
-            self._creditObj.append(self._creditWordsObj)
-            self._creditWordsObj = None
+            self._mxObjs['credit-words'].charData = self._currentTag.charData
+            self._mxObjs['credit'].append(self._mxObjs['credit-words'])
+            self._mxObjs['credit-words'] = None
 
         elif name == 'encoding':
-            self._identificationObj.encodingObj = self._encodingObj
-            self._encodingObj = None
+            self._mxObjs['identification'].encodingObj = self._mxObjs['encoding']
+            self._mxObjs['encoding'] = None
 
         elif name == 'software':
-            self._softwareObj.charData = self._currentTag.charData
-            self._encodingObj.softwareList.append(self._softwareObj)
-            self._softwareObj = None
+            self._mxObjs['software'].charData = self._currentTag.charData
+            self._mxObjs['encoding'].softwareList.append(
+                self._mxObjs['software'])
+            self._mxObjs['software'] = None
 
         elif name == 'encoding-date':
-            self._encodingObj.encodingDate = self._currentTag.charData
+            self._mxObjs['encoding'].encodingDate = self._currentTag.charData
 
 
         # formerly part of handler part list
         elif name == 'part-group':
-            self._partListObj.componentList.append(self._partGroupObj)
-            self._partGroupObj = None 
+            self._mxObjs['part-list'].componentList.append(
+                self._mxObjs['part-group'])
+            self._mxObjs['part-group'] = None 
 
         elif name == 'group-name':
-            self._partGroupObj.groupName = self._currentTag.charData
+            self._mxObjs['part-group'].groupName = self._currentTag.charData
 
         elif name == 'group-symbol':
-            self._partGroupObj.groupSymbol = self._currentTag.charData
+            self._mxObjs['part-group'].groupSymbol = self._currentTag.charData
 
         elif name == 'group-barline':
-            self._partGroupObj.groupBarline = self._currentTag.charData
+            self._mxObjs['part-group'].groupBarline = self._currentTag.charData
 
         elif name == 'score-instrument':
-            self._scorePartObj.scoreInstrumentList.append(
-                self._scoreInstrumentObj)
-            self._scoreInstrumentObj = None
+            self._mxObjs['score-part'].scoreInstrumentList.append(
+                self._mxObjs['score-instrument'])
+            self._mxObjs['score-instrument'] = None
 
         elif name == 'instrument-name':
-            self._scoreInstrumentObj.instrumentName = self._currentTag.charData
+            self._mxObjs['score-instrument'].instrumentName = self._currentTag.charData
 
         elif name == 'instrument-abbreviation':
-            self._scoreInstrumentObj.instrumentAbbreviation = self._currentTag.charData
+            self._mxObjs['score-instrument'].instrumentAbbreviation = self._currentTag.charData
 
         elif name == 'score-part':
-            self._partListObj.componentList.append(self._scorePartObj)
-            self._scorePartObj = None 
+            self._mxObjs['part-list'].componentList.append(
+                self._mxObjs['score-part'])
+            self._mxObjs['score-part'] = None 
 
         elif name == 'part-name':
             # copy completed character data and clear
-            self._scorePartObj.partName = self._currentTag.charData
+            self._mxObjs['score-part'].partName = self._currentTag.charData
 
         elif name == 'score-instrument':                
-            self._scorePartObj.scoreInstrumentList.append(
-                self._scoreInstrumentObj)
-            self._scoreInstrumentObj = None
+            self._mxObjs['score-part'].scoreInstrumentList.append(
+                self._mxObjs['score-instrument'])
+            self._mxObjs['score-instrument'] = None
 
         elif name == 'midi-instrument':                
             if self.t['score-part'].status: # may be in a <sound> def
-                self._scorePartObj.midiInstrumentList.append( 
-                    self._midiInstrumentObj)
-                self._midiInstrumentObj = None
+                self._mxObjs['score-part'].midiInstrumentList.append( 
+                    self._mxObjs['midi-instrument'])
+                self._mxObjs['midi-instrument'] = None
              
         elif name == 'midi-channel':
             if self.t['score-part'].status:
-                self._midiInstrumentObj.midiChannel = self._currentTag.charData
+                self._mxObjs['midi-instrument'].midiChannel = self._currentTag.charData
 
         elif name == 'midi-program':
             if self.t['score-part'].status:
-                self._midiInstrumentObj.midiProgram = self._currentTag.charData
-
+                self._mxObjs['midi-instrument'].midiProgram = self._currentTag.charData
 
         # formerly part of handler part
         elif name == 'part':
-            self._parts.append(self._partObj) # outermost container
-            self._partObj = None # clear to avoid mistakes
+            #environLocal.pd(['got part:', self._mxObjs['part']])
+            self._parts.append(self._mxObjs['part']) # outermost container
+            self._mxObjs['part'] = None # clear to avoid mistakes
 
         elif name == 'key':
-            self._attributesObj.keyList.append(self._keyObj)
-            self._keyObj = None
+            self._mxObjs['attributes'].keyList.append(self._mxObjs['key'])
+            self._mxObjs['key'] = None
 
         elif name == 'fifths':
-            self._keyObj.fifths = self._currentTag.charData
+            self._mxObjs['key'].fifths = self._currentTag.charData
 
         elif name == 'mode':
-            self._keyObj.mode = self._currentTag.charData
+            self._mxObjs['key'].mode = self._currentTag.charData
 
         elif name == 'cancel':
-            self._keyObj.cancel = self._currentTag.charData
+            self._mxObjs['key'].cancel = self._currentTag.charData
 
         elif name == 'key-step':
-            self._keyStepObj.charData = self._currentTag.charData
-            self._keyObj.nonTraditionalKeyList.append(self._keyStepObj)
-            self._keyStepObj = None
+            self._mxObjs['key-step'].charData = self._currentTag.charData
+            self._mxObjs['key'].nonTraditionalKeyList.append(
+                                    self._mxObjs['key-step'])
+            self._mxObjs['key-step'] = None
 
         elif name == 'key-alter':
-            self._keyAlterObj.charData = self._currentTag.charData
-            self._keyObj.nonTraditionalKeyList.append(self._keyAlterObj)
-            self._keyAlterObj = None
+            self._mxObjs['key-alter'].charData = self._currentTag.charData
+            self._mxObjs['key'].nonTraditionalKeyList.append(
+                    self._mxObjs['key-alter'])
+            self._mxObjs['key-alter'] = None
 
         elif name == 'key-octave':
-            self._keyOctaveObj.charData = self._currentTag.charData
-            self._keyObj.nonTraditionalKeyList.append(self._keyOctaveObj)
-            self._keyOctaveObj = None
+            self._mxObjs['key-octave'].charData = self._currentTag.charData
+            self._mxObjs['key'].nonTraditionalKeyList.append(
+                self._mxObjs['key-octave'])
+            self._mxObjs['key-octave'] = None
 
         elif name == 'transpose':
-            self._attributesObj.transposeObj = self._transposeObj
-            #environLocal.printDebug(['setting transpose object', self._transposeObj])
-            self._transposeObj = None
+            self._mxObjs['attributes'].transposeObj = self._mxObjs['transpose']
+            #environLocal.printDebug(['setting transpose object', self._mxObjs['transpose']])
+            self._mxObjs['transpose'] = None
 
         elif name == 'diatonic':
-            self._transposeObj.diatonic = self._currentTag.charData
+            self._mxObjs['transpose'].diatonic = self._currentTag.charData
 
         elif name == 'chromatic':
-            self._transposeObj.chromatic = self._currentTag.charData
+            self._mxObjs['transpose'].chromatic = self._currentTag.charData
 
         elif name == 'octave-change':
-            self._transposeObj.octaveChange = self._currentTag.charData
+            self._mxObjs['transpose'].octaveChange = self._currentTag.charData
 
         elif name == 'double': 
-            self._transposeObj.double = self._currentTag.charData
+            self._mxObjs['transpose'].double = self._currentTag.charData
 
         elif name == 'time':
-            self._attributesObj.timeList.append(self._timeObj)
-            self._timeObjLast = copy.deepcopy(self._timeObj)
-            self._timeObj = None
+            self._mxObjs['attributes'].timeList.append(self._mxObjs['time'])
+            self._timeObjLast = copy.deepcopy(self._mxObjs['time'])
+            self._mxObjs['time'] = None
 
         elif name == 'staves':
-            self._attributesObj.staves = self._currentTag.charData
+            self._mxObjs['attributes'].staves = self._currentTag.charData
 
         elif name == 'beats':
-            self._timeObj.componentList.append(
+            self._mxObjs['time'].componentList.append(
                 Beats(self._currentTag.charData))
-            #self._timeObj.beats = self._currentTag.charData
+            #self._mxObjs['time'].beats = self._currentTag.charData
 
         elif name == 'beat-type':
-            self._timeObj.componentList.append(
+            self._mxObjs['time'].componentList.append(
                 BeatType(self._currentTag.charData))
-            #self._timeObj.beatType = self._currentTag.charData
+            #self._mxObjs['time'].beatType = self._currentTag.charData
 
         elif name == 'clef':
-            self._attributesObj.clefList.append(self._clefObj)
-            self._clefObj = None
+            self._mxObjs['attributes'].clefList.append(self._mxObjs['clef'])
+            self._mxObjs['clef'] = None
 
         elif name == 'multiple-rest':
-            self._measureStyleObj.multipleRest = self._currentTag.charData
+            self._mxObjs['measure-style'].multipleRest = self._currentTag.charData
 
         elif name == 'measure-style':
-            self._attributesObj.measureStyleObj = self._measureStyleObj
-            self._measureStyleObj = None
+            self._mxObjs['attributes'].measureStyleObj = self._mxObjs['measure-style']
+            self._mxObjs['measure-style'] = None
 
         elif name == 'sign':
-            self._clefObj.sign = self._currentTag.charData
+            self._mxObjs['clef'].sign = self._currentTag.charData
 
         elif name == 'line':
-            self._clefObj.line = self._currentTag.charData
+            self._mxObjs['clef'].line = self._currentTag.charData
 
         elif name == 'clef-octave-change':
-            self._clefObj.clefOctaveChange = self._currentTag.charData
-            #environLocal.printDebug(['got coc tag', self._clefObj])
+            self._mxObjs['clef'].clefOctaveChange = self._currentTag.charData
+            #environLocal.printDebug(['got coc tag', self._mxObjs['clef']])
 
 
         elif name == 'display-step':
             # chara data loaded in object
-            self._restObj.componentList.append(self._displayStepObj)
-            self._displayStepObj = None
+            self._mxObjs['rest'].componentList.append(
+                self._mxObjs['display-step'])
+            self._mxObjs['display-step'] = None
 
         elif name == 'display-octave':
-            self._restObj.componentList.append(self._displayOctaveObj)
-            self._displayOctaveObj = None
+            self._mxObjs['rest'].componentList.append(
+                self._mxObjs['display-octave'])
+            self._mxObjs['display-octave'] = None
 
 
         elif name == 'staff': 
-            if self._noteObj != None: # not a forward/backup tag
-                self._noteObj.staff = self._currentTag.charData
-            elif self._directionObj != None: # not a forward/backup tag
-                self._directionObj.staff = self._currentTag.charData
+            if self._mxObjs['note'] is not None: # not a forward/backup tag
+                self._mxObjs['note'].staff = self._currentTag.charData
+            # not a forward/backup tag
+            elif self._mxObjs['direction'] is not None: 
+                self._mxObjs['direction'].staff = self._currentTag.charData
             else:
                 pass
                 #environLocal.printDebug([' cannot deal with this staff', self._currentTag.charData])
 
         elif name == 'barline': 
-            self._measureObj.componentList.append(self._barlineObj)
-            self._barlineObj = None
+            self._mxObjs['measure'].componentList.append(
+                self._mxObjs['barline'])
+            self._mxObjs['barline'] = None
 
         elif name == 'ending':
-            self._barlineObj.endingObj = self._endingObj
-            self._endingObj = None
+            self._mxObjs['barline'].endingObj = self._mxObjs['ending']
+            self._mxObjs['ending'] = None
 
         elif name == 'bar-style': 
-            self._barlineObj.barStyle = self._currentTag.charData
+            self._mxObjs['barline'].barStyle = self._currentTag.charData
 
         elif name == 'repeat': 
-            self._barlineObj.repeatObj = self._repeatObj
-            self._repeatObj = None
-
-
-
+            self._mxObjs['barline'].repeatObj = self._mxObjs['repeat']
+            self._mxObjs['repeat'] = None
 
 
         # clear and end
@@ -4304,9 +4348,11 @@ class Handler(xml.sax.ContentHandler):
 
     #---------------------------------------------------------------------------
     def getContent(self):
-        self._scoreObj.partListObj = self._partListObj
-        self._scoreObj.componentList = self._parts
-        return self._scoreObj
+        #environLocal.pd(["self._mxObjs['part-list']", self._mxObjs['part-list']])
+
+        self._mxObjs['score'].partListObj = self._mxObjs['part-list']
+        self._mxObjs['score'].componentList = self._parts
+        return self._mxObjs['score']
 
 
 
@@ -4361,10 +4407,8 @@ class Document(object):
                 raise DocumentException(msg)
             else:
                 environLocal.printDebug(msg)
-
         # this is a MusicXML Score object
         self.score = h.getContent()
-
         if audit:
             self.tagLib.statRun()
             self.tagLib.statClear()
@@ -5230,7 +5274,6 @@ class Test(unittest.TestCase):
 
     def testSpannersA(self):
         from music21.musicxml import testPrimitive
-
         glissCount = 0
         wavyCount = 0
 
