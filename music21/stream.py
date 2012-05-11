@@ -1812,7 +1812,7 @@ class Stream(music21.Music21Object):
             else:
                 targetMove.append(t)
 
-        environLocal.pd(['split', targetSplit, 'move', targetMove])
+        #environLocal.pd(['split', targetSplit, 'move', targetMove])
 
         for t in targetSplit:
             # must retain origina, as a deepcopy, if necessary, has

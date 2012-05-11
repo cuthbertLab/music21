@@ -130,6 +130,22 @@ class XMLNode(object):
             if value.strip() != '': # only modify if not nothing
                 self._attr[key] = value        
 
+    def hasAttrs(self):
+        '''
+        >>> from music21 import *
+        >>> a = xmlnode.XMLNode()
+        >>> a.hasAttrs()
+        False
+        >>> a = musicxml.Pitch()
+        >>> a.hasAttrs()
+        False
+        >>> a = musicxml.Beam()
+        >>> a.hasAttrs()
+        True
+        '''
+        if len(self._attr) > 0:
+            return True
+        return False
 
     #---------------------------------------------------------------------------
     def _convertNameCrossReference(self, name):
@@ -310,6 +326,8 @@ class XMLNode(object):
 
     #---------------------------------------------------------------------------
     # getters and setters, properties
+    # uniform get/set methods are used so as to not have to distinguish between
+    # attributes and contained entities
 
     def _getTag(self):
         return self._tag

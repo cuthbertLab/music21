@@ -2409,8 +2409,8 @@ class Test(unittest.TestCase):
         s = corpus.parse('ryansMammoth/banjoreel')
         #s.show()
         self.assertEqual(len(s.parts), 1)        
-        self.assertEqual(len(s.parts[0].getElementsByClass('Measure')), 11)        
-        self.assertEqual(len(s.parts[0].flat.notes), 58)        
+        self.assertEqual(len(s.parts[0].getElementsByClass('Measure')), 12)        
+        self.assertEqual(len(s.parts[0].flat.notes), 59)        
 
         bars = s.parts[0].flat.getElementsByClass('Barline')
         self.assertEqual(len(bars), 3)        
@@ -2418,8 +2418,8 @@ class Test(unittest.TestCase):
         s2 = s.expandRepeats()    
         #s2.show()
 
-        self.assertEqual(len(s2.parts[0].getElementsByClass('Measure')), 20)        
-        self.assertEqual(len(s2.parts[0].flat.notes), 105)        
+        self.assertEqual(len(s2.parts[0].getElementsByClass('Measure')), 22)        
+        self.assertEqual(len(s2.parts[0].flat.notes), 107)        
     
 
     def testExpandRepeatsImportedB(self):
@@ -2988,8 +2988,10 @@ class Test(unittest.TestCase):
         ex = Expander(s.parts[0])
         post = ex.process()
         #post.show()
+        #print [n.nameWithOctave for n in post.flat.notes]
         self.assertEqual([n.nameWithOctave for n in post.flat.notes], 
-            ['F#4', u'G4', u'G3', 'F#4', u'G4', u'G3', u'A4', u'B4', u'C5', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', 'F#4', u'G4', u'G3', 'F#4', u'G4', u'G3', u'A4', u'B4', u'C5', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'C5', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', 'F#4', u'E4', u'D4', u'C5', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'C5', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', 'F#4', u'E4', u'D4', u'C5', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4'])
+            ['F#4', u'G4', u'G3', 'F#4', u'G4', u'G3', u'A4', u'B4', u'G4', u'C5', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', 'F#4', u'G4', u'G3', 'F#4', u'G4', u'G3', u'A4', u'B4', u'G4', u'C5', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'C5', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', 'F#4', u'E4', u'D4', u'C5', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'C5', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', 'F#4', u'E4', u'D4', u'C5', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4', u'A4', u'B4', u'G4', u'A4', 'F#4', u'G4']
+)
 
 
 
