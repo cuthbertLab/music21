@@ -62,7 +62,7 @@ def dynamicStrFromDecimal(n):
     
     >>> from music21 import *
     >>> dynamics.dynamicStrFromDecimal(0.25)
-    'p'
+    'pp'
     >>> dynamics.dynamicStrFromDecimal(1)
     'fff'
     '''
@@ -135,7 +135,7 @@ class Dynamic(music21.Music21Object):
     
     >>> pp2 = dynamics.Dynamic(0.15) # on 0 to 1 scale
     >>> pp2.value
-    'pp'
+    'ppp'
     >>> pp2.volumeScalar
     0.15
     
