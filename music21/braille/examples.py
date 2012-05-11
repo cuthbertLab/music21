@@ -25,8 +25,8 @@ A piano reduction of Giuseppi Verdi's famous aria from the opera
 Rigoletto, "La Donna É Mobile," in Bb major and 3/8 time.
 
 
->>> from music21 import converter
->>> verdi = converter.parse("http://static.musescore.com/29836/5862119bda/score.mxl")
+>>> from music21 import corpus
+>>> verdi = corpus.parse('verdi/laDonnaEMobile')
 >>> #_DOCS_SHOW verdi.show('braille')
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠁⠀⠅⠜⠄⠜⠁⠇⠇⠑⠛⠗⠑⠞⠞⠕⠜⠋⠄⠍⠀⠦⠨⠑⠦⠑⠦⠑⠀⠀
@@ -86,6 +86,9 @@ The exposition to movement 1 of Mozart's K545.
 ⠀⠀⠀⠇⠜⠘⠷⠚⠑⠓⠘⠷⠸⠙⠋⠓⠘⠷⠚⠑⠓⠘⠷⠸⠙⠋⠓⠀⠘⠳⠸⠳⠘⠳⠧⠣⠅⠀
 """
 
+import music21
+import unittest
+
 from music21 import key
 from music21 import note
 from music21 import tempo
@@ -102,8 +105,13 @@ def happyBirthday():
     return hb
 
 #-------------------------------------------------------------------------------
+class Test(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
 if __name__ == "__main__":
-    pass
+    music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof
