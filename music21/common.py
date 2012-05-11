@@ -1451,7 +1451,9 @@ def getCorpusContentDirs():
     >>> from music21 import *
     >>> fp = common.getCorpusContentDirs()
     >>> fp # this test will be fragile, depending on composition of dirs
-    ['airdsAirs', 'bach', 'beethoven', 'ciconia', 'corelli', 'cpebach', 'demos', 'essenFolksong', 'handel', 'haydn', 'josquin', 'leadSheet', 'license.txt', 'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'ryansMammoth', 'schoenberg', 'schumann', 'theoryExercises', 'trecento']
+    ['airdsAirs', 'bach', 'beethoven', 'ciconia', 'corelli', 'cpebach', 'demos', 'essenFolksong', 'handel', 'haydn', 
+    'josquin', 'leadSheet', 'license.txt', 'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'ryansMammoth', 
+    'schoenberg', 'schumann', 'theoryExercises', 'trecento', 'verdi']
     '''
     dir = getCorpusFilePath()
     post = []
