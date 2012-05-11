@@ -64,7 +64,7 @@ defaultMeasureMargin = 50
 defaultVoiceNumBeats = 4
 defaultVoiceBeatValue = 4
 
-defaultBeamingStatus = False #Just until it's working properly
+defaultBeamingStatus = True #Just until it's working properly
 
 defaultAccidentalDisplayStatus = False
 defaultClefDisplayStatus = False
@@ -154,52 +154,52 @@ vexflowSharpsToKeySignatures = {
 }
 
 #XXX: Delete this before committing!
-vexflowLocalCopy = '<script src="raffazizzi-vexflow-d8660e5/src/header.js">\
-\n</script><script src="raffazizzi-vexflow-d8660e5/src/vex.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/flow.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/tables.js"></script>\n\
-<script src="raffazizzi-vexflow-d8660e5/src/fonts/vexflow_font.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/glyph.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/stave.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/staveconnector.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/tabstave.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/tickcontext.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/tickable.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/note.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/barnote.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/ghostnote.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/stavenote.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/tabnote.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/beam.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/voice.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/voicegroup.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/modifier.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/modifiercontext.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/accidental.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/dot.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/formatter.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/stavetie.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/tabtie.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/tabslide.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/bend.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/vibrato.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/annotation.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/articulation.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/tuning.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/stavemodifier.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/keysignature.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/timesignature.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/clef.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/music.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/keymanager.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/renderer.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/raphaelcontext.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/stavevolta.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/staverepetition.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/stavebarline.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/stavesection.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/stavehairpin.js"></script>\
-\n<script src="raffazizzi-vexflow-d8660e5/src/tuplet.js"></script>'
+vexflowLocalCopy = '<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/header.js">\
+\n</script><script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/vex.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/flow.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/tables.js"></script>\n\
+<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/fonts/vexflow_font.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/glyph.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/stave.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/staveconnector.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/tabstave.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/tickcontext.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/tickable.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/note.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/barnote.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/ghostnote.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/stavenote.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/tabnote.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/beam.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/voice.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/voicegroup.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/modifier.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/modifiercontext.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/accidental.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/dot.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/formatter.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/stavetie.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/tabtie.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/tabslide.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/bend.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/vibrato.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/annotation.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/articulation.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/tuning.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/stavemodifier.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/keysignature.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/timesignature.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/clef.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/music.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/keymanager.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/renderer.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/raphaelcontext.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/stavevolta.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/staverepetition.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/stavebarline.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/stavesection.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/stavehairpin.js"></script>\
+\n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/tuplet.js"></script>'
 
 vexflowGlobalCopy = "<script src='http://www.vexflow.com/vexflow.js'/></script>"
 
@@ -686,6 +686,8 @@ class VexflowNote(object):
 		self.vexflowDuration = ''
 		self.vexflowAccidental = ''
 		self.stemDirection = ''
+		self.beamStart = False
+		self.beamStop = False
 		self._generateVexflowCode()
 
 	def _generateVexflowCode(self):
@@ -701,13 +703,18 @@ class VexflowNote(object):
 				self.originalNote.accidental.displayStatus
 		elif self.accidentalDisplayStatus == None:
 			self.accidentalDisplayStatus = defaultAccidentalDisplayStatus
+		#otherwise keep the previous accidentalDisplayStatus
 
 		if self.originalNote.stemDirection == u'up':
 			self.stemDirection = 'Vex.Flow.StaveNote.STEM_UP'
 		elif self.originalNote.stemDirection == u'down':
 			self.stemDirection = 'Vex.Flow.StaveNote.STEM_DOWN'
 
-		#otherwise keep the previous accidentalDisplayStatus
+		if self.originalNote.beams and 'start' in self.originalNote.beams.getTypes():
+			self.beamStart = True
+		elif self.originalNote.beams and 'stop' in self.originalNote.beams.getTypes():
+			self.beamStop = True
+
 
 		(self.vexflowKey, self.vexflowAccidental, self.vexflowDuration) = \
 			vexflowKeyAccidentalAndDurationFromNote(self.originalNote, params=self.params)
@@ -864,6 +871,8 @@ class VexflowChord(object):
 		self.isTuplet = False
 		self.tupletLength = 0
 		self.stemDirection = ''
+		self.beamStart = False
+		self.beamStop = False
 		self._generateVexflowCode()
 
 	def _generateVexflowCode(self):
@@ -886,6 +895,11 @@ class VexflowChord(object):
 			self.stemDirection = 'Vex.Flow.StaveNote.STEM_UP'
 		elif self.originalChord.stemDirection == u'down':
 			self.stemDirection = 'Vex.Flow.StaveNote.STEM_DOWN'
+
+		if self.originalChord.beams and 'start' in self.originalChord.beams.getTypes():
+			self.beamStart = True
+		elif self.originalChord.beams and 'stop' in self.originalChord.beams.getTypes():
+			self.beamStop = True
 
 		for index in xrange(len(thesePitches)):
 			thisPitch = thesePitches[index]
@@ -1139,9 +1153,14 @@ class VexflowScore(object):
 			thisPart = self.originalParts[index]
 			previousParams['partIndex'] = index
 	
+			if self.context != None:
+				previousParams['context'] = self.context
+
 			thisVexflowPart = VexflowPart(thisPart, previousParams)
 			
-			self.context = thisVexflowPart.context
+			if self.context == None:
+				self.context = thisVexflowPart.context
+
 			self.vexflowParts[index] = thisVexflowPart
 			previousParams = thisVexflowPart.params
 
@@ -1150,6 +1169,7 @@ class VexflowScore(object):
 
 		self.partsCode = '\n'.join([part.generateCode('txt') for part in self.vexflowParts])
 		self.vexflowCode = self.context.getJSCode(indentation=3) + '\n'
+		self.vexflowCode += 'var lastProblemNote;\n'
 		self.vexflowCode += self.partsCode
 	
 	def generateCode(self, mode = 'txt'):
@@ -1166,11 +1186,14 @@ class VexflowScore(object):
 			for thisPart in self.vexflowParts:
 				for thisStave in thisPart.staves:
 					for thisVoice in thisStave.vexflowVoices:
+						(beamPreamble, beamPostamble) = thisVoice.beamCode(self.context.getContextName())
+						result += beamPreamble
 						result += str(thisVoice.voiceName) + '.draw(' + \
 						str(self.context.getContextName()) + ', ' + \
 						str(thisStave.staveName) + ');\n' + \
 						str(thisStave.staveName) + '.setContext(' + \
 						str(self.context.getContextName()) + ').draw();'
+						result += beamPostamble
 
 			result += htmlConclusion
 			return result
@@ -1333,18 +1356,19 @@ class VexflowPart(object):
 				self.vexflowCode += thisVoice.generateCode('txt') + '\n'
 			self.vexflowCode += thisStave.generateCode('txt') + '\n'
 
-		self.vexflowCode += self.beamCode(self.context.getContextName())
-
 	def beamCode(self, contextName, indentation=3):
 		'''
 		Generates the code for beaming all of the staves in this part
 
-		TODO: look at note.beams.getTypes() == 'start' or 'stop'
+		Returns as an array containing the preamble and postamble
 		'''
-		beams = []
+		preamble = []
+		postamble = []
 		for thisStave in self.staves:
-			beams += [thisStave.beamCode(contextName, indentation=indentation)]
-		return ('\n' + ('\t'*indentation)).join(beams)
+			(pre, post) = thisStave.beamCode(contextName, indentation=indentation)
+			preamble += [pre]
+			postamble += [post]
+		return [('\n' + ('\t' * indentation)).join(preamble), ('\n' + ('\t' * indentation)).join(postamble)]
 
 	def generateCode(self, mode='txt'):
 		'''
@@ -1401,6 +1425,7 @@ class VexflowVoice(object):
 		self.params = params
 		self.voiceCode = ''
 		self.noteCode = ''
+		self.beams = []
 		self.clefDisplayStatus = defaultClefDisplayStatus
 		self.keySignatureDisplayStatus = defaultKeySignatureDisplayStatus
 
@@ -1492,29 +1517,51 @@ class VexflowVoice(object):
 		noteName = self.voiceName + 'Notes'
 		self.noteCode = 'var ' + noteName + ' = ['
 
-		beamStart = False #Used to generate beam code
-		beamEnd = False
-		beams = []
+		beamStarted = False
+		theseBeams = []
+		thisBeamStart = None
+		index = 0
 
-		for thisNote in self.originalNotes:
+		for thisNote  in self.originalNotes:
 			if 'Note' in thisNote.classes:
 				thisVexflowNote = VexflowNote(thisNote, params=\
 					{'clef': self.clef})
 				self.noteCode += thisVexflowNote.generateCode('txt')
 				self.noteCode += ', '
+
+				if not beamStarted and thisVexflowNote.beamStart:
+					thisBeamStart = index
+					beamStarted = True
+				elif beamStarted and thisVexflowNote.beamStop:
+					theseBeams += [(thisBeamStart, index)]
+					beamStarted = False
+
+				index+= 1
 			elif 'Chord' in thisNote.classes:
 				thisVexflowChord = VexflowChord(thisNote, params=\
 					{'clef': self.clef})
 				self.noteCode += thisVexflowChord.generateCode('txt')
 				self.noteCode += ', '
+
+				if not beamStarted and thisVexflowChord.beamStart:
+					thisBeamStart = index
+					beamStarted = True
+				elif beamStarted and thisVexflowChord.beamStop:
+					theseBeams += [(thisBeamStart, index)]
+					beamStarted = False
+
+				index+= 1
 			elif 'Rest' in thisNote.classes:
 				thisVexflowRest = VexflowRest(thisNote, params=\
 					{'clef': self.clef})
 				self.noteCode += thisVexflowRest.generateCode('txt')
 				self.noteCode += ', '
+				index+= 1
 			#TODO tuplet: if the note is the start of a tuplet, remember that it's the start of one and figure out how many
 			#	Later we'll do notes.slice(indexOfStart, lengthOfTuplet)
 			#	For now, we'll just throw an exception if the tuplet isn't complete
+
+		self.beams = theseBeams
 		self.noteCode = self.noteCode[:-2] + '];'
 
 		self.vexflowCode = self.voiceCode + '\n' + self.noteCode + '\n' +\
@@ -1534,15 +1581,25 @@ class VexflowVoice(object):
 		'''
 		Returns the code for the beams for this voice
 
+		Returns it as an array containing the beam preamble and postamble
+
 		Will return code even if it shouldn't be beamed
 			Check self.getBeaming() before applying this
 		'''
-		beamName = str(self.voiceName) + 'Beam'
+		baseBeamName = str(self.voiceName) + 'Beam'
 		noteName = str(self.voiceName) + 'Notes'
-		beamingCode = 'var ' + beamName + ' = new Vex.Flow.Beam('+noteName+');\n'+\
-			('\t'*indentation) + beamName + '.setContext(' + str(contextName) +\
-			').draw();'
-		return beamingCode
+		preamble = ''
+		postamble = ''
+
+		for index in xrange(len(self.beams)):
+			thisBeam = self.beams[index]
+			thisBeamName = baseBeamName + str(index)
+
+			preamble += '\n' + ('\t' * indentation) + 'var ' + thisBeamName +\
+				' = new Vex.Flow.Beam('+noteName+'.slice(' + str(thisBeam[0])+\
+				',' + str(thisBeam[1]+1) + '));'
+			postamble += '\n' + ('\t'*indentation) + thisBeamName + '.setContext(' + str(contextName) + ').draw();'
+		return [preamble, postamble]
 	
 	def getNumBeats(self):
 		return self.numBeats
@@ -1689,12 +1746,17 @@ class VexflowStave(object):
 	def beamCode(self, contextName, indentation=3):
 		'''
 		Generates the code for beaming all of the voices on this stave
+
+		Returns an array containing the preamble and postamble
 		'''
-		beams = []
+		preamble = []
+		postamble = []
 		for thisVoice in self.vexflowVoices:
 			if thisVoice.getBeaming():
-				beams += [thisVoice.beamCode(contextName, indentation=indentation)]
-		return ('\n' + ('\t' * indentation)).join(beams)
+				(pre, post) = thisVoice.beamCode(contextName, indentation=indentation)
+				preamble += [pre]
+				postamble += [post]
+		return [('\n' + ('\t' * indentation)).join(preamble), ('\n' + ('\t' * indentation)).join(postamble)]
 
 	def getParam(self, param):
 		'''
