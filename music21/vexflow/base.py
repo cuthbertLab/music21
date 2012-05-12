@@ -1225,16 +1225,13 @@ class VexflowScore(object):
 						continue
 
 					if thisLineNum != thisStartLineNum:
-						#Tie would span two lines
-						#For now, VexFlow can't gracefully handle this...
-						print "Tie spanning two lines at line:",thisLineNum
-						print "Ignoring"
-						#Because this is something the end user should know, log
-						#	it in the console
-						result +='\nconsole.log("Tie spanning two lines at li'+\
-							'ne '+str(thisLineNum)+'. Ignored.");\n'
+						result +='\nvar '+thisTieName+'Start = new Vex.Flow.StaveTie({\n'+'first_note: '+thisTieStart+'\n});'
+						result +='\nvar '+thisTieName+'End = new Vex.Flow.StaveTie({\n'+'last_note: '+thisTieEnd+'\n});'
+						result += '\n'+thisTieName+'Start.setContext('+str(self.context.getContextName())+').draw();'
+						result += '\n'+thisTieName+'End.setContext('+str(self.context.getContextName())+').draw();'
 						tieStart = True
 						continue
+
 
 					thisTieName = str(self.context.getContextName()) + 'Tie' + \
 						str(tieNum)
