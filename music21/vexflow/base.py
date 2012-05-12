@@ -220,7 +220,7 @@ vexflowPreamble = "\n\t\t\tvar canvas = $('#music21canvas')[0];\n\t\t\tvar \
 renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);\n \
 \t\t\tvar ctx = renderer.getContext();"
 
-htmlConclusion = "\t\t});\n\t</script>\n</body>\n</html>"
+htmlConclusion = "\n\t\t});\n\t</script>\n</body>\n</html>"
 
 #-------------------------------------------------------------------------------
 #Exception classes
@@ -334,7 +334,7 @@ def fromMeasure(thisMeasure, mode='txt'):
 	r'''
 	Parses a music21 measure into Vex Flow code
 
-	TODO: Write tests
+	TODO: Fix tests
 	TODO: thisMeasure2 = thisMeasure.makeNotation()
 	
 	>>> from music21 import *
@@ -342,7 +342,9 @@ def fromMeasure(thisMeasure, mode='txt'):
 	>>> m = b.parts[0].measures(0,1)[2]
 	>>> d = vexflow.fromMeasure(m)
 	>>> print d
-	var notes = [new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["Fn/4"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8"}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8"})];
+	var music21Voice0 = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Voice0.addTickables(music21Voice0Notes);
 
 	>>> c = vexflow.fromMeasure(m, 'html')
 	>>> print c
@@ -360,27 +362,14 @@ def fromMeasure(thisMeasure, mode='txt'):
 			$(document).ready(function(){
 				var canvas = $('#music21canvas')[0];
 				var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
-	 			var ctx = renderer.getContext();
+				var ctx = renderer.getContext();
 				var stave = new Vex.Flow.Stave(10,0,500);
 				stave.addClef('treble').setContext(ctx).draw();
-				var notes = [
-					new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "8"}),
-					new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8"}),
-					new Vex.Flow.StaveNote({keys: ["Fn/4"], duration: "8"}),
-					new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8"}),
-					new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8"}),
-					new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8"}),
-					new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8"}),
-					new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8"})
-				];
-				var voice = new Vex.Flow.Voice({
-					num_beats: 4,
-					beat_value: 4,
-					resolution: Vex.Flow.RESOLUTION
-				});
-				voice.addTickables(notes);
-				var formatter = new Vex.Flow.Formatter().joinVoices([voice]).format([voice], 500);
-				voice.draw(ctx, stave);
+				var music21Voice0 = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Voice0.addTickables(music21Voice0Notes);
+				var formatter = new Vex.Flow.Formatter().joinVoices([music21Voice0]).format([music21Voice0], 500);
+				music21Voice0.draw(ctx, stave);
 			});
 		</script>
 	</body>
@@ -688,6 +677,8 @@ class VexflowNote(object):
 		self.stemDirection = ''
 		self.beamStart = False
 		self.beamStop = False
+		self.tieStart = False
+		self.tieStop = False
 		self._generateVexflowCode()
 
 	def _generateVexflowCode(self):
@@ -714,6 +705,11 @@ class VexflowNote(object):
 			self.beamStart = True
 		elif self.originalNote.beams and 'stop' in self.originalNote.beams.getTypes():
 			self.beamStop = True
+
+		if self.originalNote.tie and self.originalNote.tie.type == 'start':
+			self.tieStart = True
+		elif self.originalNote.tie and self.originalNote.tie.type == 'stop':
+			self.tieStop = True
 
 
 		(self.vexflowKey, self.vexflowAccidental, self.vexflowDuration) = \
@@ -873,6 +869,8 @@ class VexflowChord(object):
 		self.stemDirection = ''
 		self.beamStart = False
 		self.beamStop = False
+		self.tieStart = False
+		self.tieStop = False
 		self._generateVexflowCode()
 
 	def _generateVexflowCode(self):
@@ -895,6 +893,11 @@ class VexflowChord(object):
 			self.stemDirection = 'Vex.Flow.StaveNote.STEM_UP'
 		elif self.originalChord.stemDirection == u'down':
 			self.stemDirection = 'Vex.Flow.StaveNote.STEM_DOWN'
+
+		if self.originalChord.tie and self.originalChord.tie.type == 'start':
+			self.tieStart = True
+		elif self.originalChord.tie and self.originalChord.tie.type == 'stop':
+			self.tieStop = True
 
 		if self.originalChord.beams and 'start' in self.originalChord.beams.getTypes():
 			self.beamStart = True
@@ -1182,11 +1185,18 @@ class VexflowScore(object):
 			result = htmlCanvasPreamble + str(self.context.getCanvasHTML()) + \
 				htmlCanvasPostamble + '\n'
 			result += self.vexflowCode + '\n'
+
+			tieCode = ''
+			partialTies = []
 			
 			for thisPart in self.vexflowParts:
 				for thisStave in thisPart.staves:
 					for thisVoice in thisStave.vexflowVoices:
 						(beamPreamble, beamPostamble) = thisVoice.beamCode(self.context.getContextName())
+						(thisTieCode, thesePartialTies) = thisVoice.tieCode(self.context.getContextName())
+						thesePartialTies = [(thisPartialTie + [thisStave.getLineNum()]) for thisPartialTie in thesePartialTies]
+						tieCode += '\n' + thisTieCode
+						partialTies += thesePartialTies
 						result += beamPreamble
 						result += str(thisVoice.voiceName) + '.draw(' + \
 						str(self.context.getContextName()) + ', ' + \
@@ -1194,6 +1204,48 @@ class VexflowScore(object):
 						str(thisStave.staveName) + '.setContext(' + \
 						str(self.context.getContextName()) + ').draw();'
 						result += beamPostamble
+
+			tieStart = True
+			thisTieStart = None
+			thisStartLineNum = None
+			tieNum = 0
+			for (thisTie, thisName, thisLineNum) in partialTies:
+				if tieStart:
+					thisTieStart = str(thisName)+'['+str(thisTie[0])+']'
+					thisStartLineNum = thisLineNum
+					tieStart = False
+				else:
+					thisTieEnd = str(thisName)+'['+str(thisTie[1])+']'
+
+					if thisTieStart == None or thisTieEnd == None:
+						print 'uh oh... got mixed up somewhere'
+						print partialTies
+						print 'Ignoring'
+						tieStart = True
+						continue
+
+					if thisLineNum != thisStartLineNum:
+						#Tie would span two lines
+						#For now, VexFlow can't gracefully handle this...
+						print "Tie spanning two lines at line:",thisLineNum
+						print "Ignoring"
+						#Because this is something the end user should know, log
+						#	it in the console
+						result +='\nconsole.log("Tie spanning two lines at li'+\
+							'ne '+str(thisLineNum)+'. Ignored.");\n'
+						tieStart = True
+						continue
+
+					thisTieName = str(self.context.getContextName()) + 'Tie' + \
+						str(tieNum)
+
+					result +='\nvar '+thisTieName+' = new Vex.Flow.StaveTie({\n'+\
+						'first_note: '+thisTieStart+',\nlast_note: '+thisTieEnd\
+						+',\nfirst_indices: [0],\nlast_indices: [0]\n});'
+					result += '\n'+thisTieName+'.setContext('+\
+						str(self.context.getContextName())+').draw();'
+					tieStart = True
+
 
 			result += htmlConclusion
 			return result
@@ -1296,7 +1348,8 @@ class VexflowPart(object):
 					str(self.numMeasures) + 'Line' + str(self.numLines) + 'ID' + \
 					str(self.UID),
 				'clef': self.clef,
-				'notesWidth': self.notesWidth
+				'notesWidth': self.notesWidth,
+				'lineNum': self.numLines
 			}
 			
 			#Display the clef at the start of new lines
@@ -1426,6 +1479,7 @@ class VexflowVoice(object):
 		self.voiceCode = ''
 		self.noteCode = ''
 		self.beams = []
+		self.ties = []
 		self.clefDisplayStatus = defaultClefDisplayStatus
 		self.keySignatureDisplayStatus = defaultKeySignatureDisplayStatus
 
@@ -1517,6 +1571,9 @@ class VexflowVoice(object):
 		noteName = self.voiceName + 'Notes'
 		self.noteCode = 'var ' + noteName + ' = ['
 
+		tieStarted = False
+		theseTies = []
+		thisTieStart = None
 		beamStarted = False
 		theseBeams = []
 		thisBeamStart = None
@@ -1536,6 +1593,17 @@ class VexflowVoice(object):
 					theseBeams += [(thisBeamStart, index)]
 					beamStarted = False
 
+				if not tieStarted and thisVexflowNote.tieStart:
+					thisTieStart = index
+					tieStarted = True
+				elif not tieStarted and thisVexflowNote.tieStop:
+					#could mean tie began in previous bar
+					theseTies += [(None, index)]
+					tieStarted = False
+				elif tieStarted and thisVexflowNote.tieStop:
+					theseTies += [(thisTieStart, index)]
+					tieStarted = False
+
 				index+= 1
 			elif 'Chord' in thisNote.classes:
 				thisVexflowChord = VexflowChord(thisNote, params=\
@@ -1550,6 +1618,13 @@ class VexflowVoice(object):
 					theseBeams += [(thisBeamStart, index)]
 					beamStarted = False
 
+				if not tieStarted and thisVexflowNote.tieStart:
+					thisTieStart = index
+					tieStarted = True
+				elif tieStarted and thisVexflowNote.tieStop:
+					theseTies += [(thisTieStart, index)]
+					tieStarted = False
+
 				index+= 1
 			elif 'Rest' in thisNote.classes:
 				thisVexflowRest = VexflowRest(thisNote, params=\
@@ -1562,6 +1637,10 @@ class VexflowVoice(object):
 			#	For now, we'll just throw an exception if the tuplet isn't complete
 
 		self.beams = theseBeams
+		if tieStarted:
+			#Partial tie across the bar, beginning on this page
+			theseTies += [(thisTieStart, None)]
+		self.ties = theseTies
 		self.noteCode = self.noteCode[:-2] + '];'
 
 		self.vexflowCode = self.voiceCode + '\n' + self.noteCode + '\n' +\
@@ -1598,8 +1677,41 @@ class VexflowVoice(object):
 			preamble += '\n' + ('\t' * indentation) + 'var ' + thisBeamName +\
 				' = new Vex.Flow.Beam('+noteName+'.slice(' + str(thisBeam[0])+\
 				',' + str(thisBeam[1]+1) + '));'
-			postamble += '\n' + ('\t'*indentation) + thisBeamName + '.setContext(' + str(contextName) + ').draw();'
+			postamble += '\n' + ('\t'*indentation) + thisBeamName + '.setCont'+\
+				'ext(' + str(contextName) + ').draw();'
 		return [preamble, postamble]
+	
+	def tieCode(self, contextName, indentation=3):
+		'''
+		Returns the code for the ties for this voice
+
+		Returns it as an array containing the completed ties within this voice,
+			and the partial ties that go across the bar line
+		'''
+		baseTieName = str(self.voiceName) + 'Tie'
+		noteName = str(self.voiceName) + 'Notes'
+		fullTies = []
+		partialTies = []
+
+		for index in xrange(len(self.ties)):
+			thisTie = self.ties[index]
+			if thisTie[0] != None and thisTie[1] != None:
+				#TODO: add support for multiple ties in a chord
+				thisTieName = baseTieName + str(index)
+				thisTieCode = ('\t'*indentation)+'var '+thisTieName+' = new V'+\
+					'ex.Flow.StaveTie({\n'+('\t'*(indentation+1))+'first_note'+\
+					': '+noteName+'['+str(thisTie[0])+'],\n'+('\t'*(indentation\
+					+1))+'last_note: '+noteName+'['+str(thisTie[1])+'],\n'+\
+					('\t'*(indentation+1))+'first_indices: [0],\n'+('\t'*\
+					(indentation+1))+'last_indices: [0]\n'+('\t'*indentation)+\
+					'});'
+				thisTieCode += '\n'+('\t'*indentation)+thisTieName+'.setConte'+\
+					'xt('+str(contextName)+').draw();'
+				fullTies += [thisTieCode]
+			else:
+				partialTies += [[thisTie, noteName]]
+
+		return ('\n'.join(fullTies), partialTies)
 	
 	def getNumBeats(self):
 		return self.numBeats
@@ -1742,6 +1854,18 @@ class VexflowStave(object):
 		(x,y) position in relation to the top left corner of the canvas
 		'''
 		return self.params['position']
+	
+	def getLineNum(self):
+		'''
+		Tries to get the line number of this stave
+
+		Maybe should use getParam('lineNum') instead
+		'''
+		if 'lineNum' in self.params:
+			return self.params['lineNum']
+		else:
+			#XXX Should I do something different here?
+			return 0
 	
 	def beamCode(self, contextName, indentation=3):
 		'''
@@ -2004,12 +2128,9 @@ _DOC_ORDER = []
 
 
 if __name__ == "__main__":
-    # sys.arg test options will be used in mainTest()
-    music21.mainTest(Test)
+	# sys.arg test options will be used in mainTest()
+	music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof
-
-
-
 
