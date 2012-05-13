@@ -2635,9 +2635,9 @@ _DOC_ORDER = []
 
 if __name__ == "__main__":
 	# sys.arg test options will be used in mainTest()
-	#XXX RESTORE: music21.mainTest(Test)
-	import doctest
-	doctest.testmod()
+	music21.mainTest(Test)
+	#import doctest
+	#doctest.testmod()
 
 #------------------------------------------------------------------------------
 # eof
