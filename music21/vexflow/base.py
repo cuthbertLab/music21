@@ -19,8 +19,6 @@
 
 
 #TODO: review variable names for consistency
-#TODO: use new modular key and duration from note functions in classes
-#TODO: make classes inherit from object
 
 
 '''Objects for transcribing music21 objects as Vex Flow code
@@ -39,39 +37,290 @@ _MOD = 'vexflow.base.py'
 environLocal = environment.Environment(_MOD)
 
 #Class variables
-global UIDCounter 
-UIDCounter = 0L
 
-supportedDisplayModes = ['txt', 'html']
+'''
+Unique Identifiers used for namespace collision avoidance
+'''
+global _UIDCounter 
+_UIDCounter = 0L
 
+'''
+Vexflow generateCode() and fromObject() methods currently accept these modes
+'''
+supportedDisplayModes = [
+	'txt',
+	'html'
+]
+
+'''
+Can call fromObject on the following types of music21 objects
+'''
+supportedMusic21Classes = [
+	'Note',
+	'Pitch',
+	'Rest',
+	'Chord',
+	'Measure',
+	'Part',
+	'Score',
+	'Stream',
+	'Voice'
+]
+
+'''
+Valid values for various VexFlow Properties
+These come from the Tables.js file
+'''
+validVexFlowKeySignatures = [
+	"C",
+	"Am",
+	"F",
+	"Dm",
+	"Bb",
+	"Gm",
+	"Eb",
+	"Cm",
+	"Ab",
+	"Fm",
+	"Db",
+	"Bbm",
+	"Gb",
+	"Ebm",
+	"Cb",
+	"Abm",
+	"G",
+	"Em",
+	"D",
+	"Bm",
+	"A",
+	"F#m",
+	"E",
+	"C#m",
+	"B",
+	"G#m",
+	"F#",
+	"D#m",
+	"C#",
+	"A#m"
+]
+
+validVexFlowClefs = [
+	'treble',
+	'bass',
+	'tenor',
+	'alto',
+	'percussion'
+]
+
+#VexFlow calls pitch values "keys"
+validVexFlowKeys = [
+	'C',
+	'CN',
+	'C#',
+	'C##',
+	'CB',
+	'CBB',
+	'D',
+	'DN',
+	'D#',
+	'D##',
+	'DB',
+	'DBB',
+	'E',
+	'EN',
+	'E#',
+	'E##',
+	'EB',
+	'EBB',
+	'F',
+	'FN',
+	'F#',
+	'F##',
+	'FB',
+	'FBB',
+	'G',
+	'GN',
+	'G#',
+	'G##',
+	'GB',
+	'GBB',
+	'A',
+	'AN',
+	'A#',
+	'A##',
+	'AB',
+	'ABB',
+	'B',
+	'BN',
+	'B#',
+	'B##',
+	'BB',
+	'BBB',
+	'R',
+	'X',
+]
+
+#Allow for different glyphs other than standard western notation for notes
+validVexFlowNoteGlyphs = [
+	#  Diamond 
+	'D0',
+	'D1',
+	'D2',
+	'D3',
+	
+	#  Triangle 
+	'T0',
+	'T1',
+	'T2',
+	'T3',
+	
+	#  Cross 
+	'X0',
+	'X1',
+	'X2',
+	'X3'
+]
+
+#Instead of using the letter name for a VexFlow key, can use an integer
+#	0 = c, 1 = c#, ..., 11=b
+#	This table uses sharps
+validVexFlowIntegerToNotes = range(12)
+
+#Valid vex flow articulation codes and their meanings
+validVexFlowArticulationsToMeanings = {
+	"a.": 'Stacato',
+	"av": 'Staccatissimo',
+	"a>": 'Accent',
+	"a-": 'Tenuto',
+	"a^": 'Marcato',
+	"a+": 'Left hand pizzicato',
+	"ao": 'Snap pizzicato',
+	"ah": 'Natural harmonic or open note',
+	"a@a": 'Fermata above staff',
+	"a@u": 'Fermata below staff',
+	"a|": 'Bow up - up stroke',
+	"am": 'Bow down - down stroke',
+	"a,": 'Choked'
+}
+
+ValidVexFlowAccidentals = [
+	'bb',
+	'b',
+	'n',
+	'#',
+	'##'
+]
+
+#When the duration is followed by an 'h', it displays a 'harmonic' note
+#When the duration is followed by an 'm', it displays a 'muted' note
+#When the duration is followed by a 'd', it displays a dotted note
+#When the duration is followed by an 'r', it displays a rest
+validVexFlowDurations = [
+	'8', #Eigth note
+	'8d',
+	'8h',
+	'8m',
+	'8r',
+	'16', #Sixteenth note
+	'16d',
+	'16h',
+	'16m',
+	'16r',
+	'32', #Thirty-second note
+	'32d',
+	'32h',
+	'32m',
+	'32r',
+	'64', #Sixty-fourth note
+	'64d',
+	'64h',
+	'64m',
+	'64r',
+	'b', #Has the duration of a thirty-second note
+	'h', #Half note
+	'hd',
+	'hh',
+	'hm',
+	'hr',
+	'q', #Quarter note
+	'qd',
+	'qh',
+	'qm',
+	'qr',
+	'w', #Whole note
+	'wh',
+	'wm',
+	'wr'
+]
+
+'''
+Default canvas parameters. Can be anything that implements __str__
+Each should be valid jQuery, javascript, or VexFlow code 
+	as those are the only scripts currently imported
+'''
 defaultCanvasWidth = '($(window).width()-10)'
 defaultCanvasHeight = '$(window).height()'
 defaultCanvasMargin = 10
 
+'''
+Default stave parameters for the VexFlow staves
+Can be anything that implements __str__
+Each should be valid jQuery, javascript, or Vexflow code
+	as those are the only scripts currently imported
+
+>>> assert defaultStaveClef in validVexFlowClefs #_DOCS_HIDE
+>>> assert defaultKeySignature in validVexFlowKeySignatures #_DOCS_HIDE
+'''
 defaultStaveWidth = 500
 defaultStaveHeight = 90 #Derived from the vexflow.stave.JS file
 defaultStavePosition = (10,0)
 defaultStaveClef = 'treble'
 defaultStaveKeySignature = 'C'
 
-defaultInterSystemMargin = 60
-defaultIntraSystemMargin = 20
+'''
+Default parameters for postitioning the staves of the score
 
+IntraSystemMargin is the space between staves in the same system
+InterSystemMargin is the space between the bottom of one system and the top of
+	the next
+'''
+defaultIntraSystemMargin = 20
+defaultInterSystemMargin = 60
+
+'''
+Default parameters for setting measures within one staff line
+'''
 defaultMeasureWidth = 500
 defaultMeasuresPerStave = 4
 defaultMeasureMargin = 50
 
-defaultVoiceNumBeats = 4
-defaultVoiceBeatValue = 4
+'''
+Determines if voices should be beamed by default
+Can specify on a measure-by-measure basis
+'''
+defaultBeamingStatus = True
 
-defaultBeamingStatus = True #Just until it's working properly
-
+'''
+Determines whether accidentals, clefs, and key signatures should be displayed by
+	default.
+Can be set for individually notes or measures
+'''
 defaultAccidentalDisplayStatus = False
 defaultClefDisplayStatus = False
 defaultKeySignatureDisplayStatus = False
 
+'''
+If the user tries to create a Vexflow21 Object from a musical object without a
+	duration, sets the default quarterLength to this property
+'''
 defaultNoteQuarterLength = 1
 
+'''
+Table to go from the alter attribute of a :class:`music21.pitch.Accidental`
+	object to the VexFlow code representing that accidental
+
+Not all accidentals supported by Music21 are supported by VexFlow
+'''
 vexflowAlterationToAccidental = {
 	-2.0: 'bb',
 	-1.0: 'b',
@@ -80,6 +329,11 @@ vexflowAlterationToAccidental = {
 	2.0: '##'
 }
 
+'''
+Table taken from VexFlow Tables.js
+
+Goes from VexFlow duration codes to the number of ticks per note
+'''
 vexflowDurationToTicks = {
 	'8': 2048,
 	'8d': 3072,
@@ -118,6 +372,10 @@ vexflowDurationToTicks = {
 	'wr': 16384
 }
 
+'''
+Table going from the quarterLength attribute of a 
+	:class:`music21.duration.Duration` object to a VexFlow duration code
+'''
 vexflowQuarterLengthToDuration = {
 	0.0625: '64',
 	0.09375: '64d',
@@ -135,6 +393,10 @@ vexflowQuarterLengthToDuration = {
 	6.0: 'wd'
 }
 
+'''
+Table going from the sharps attribute of a :class:`music21.key.KeySignature`
+	object to a VexFlow key signature code
+'''
 vexflowSharpsToKeySignatures = {
 	-7: 'Cb',
 	-6: 'Gb',
@@ -153,7 +415,7 @@ vexflowSharpsToKeySignatures = {
 	7: 'C#'
 }
 
-#XXX: Delete this before committing!
+#XXX: Delete this before final commit
 vexflowLocalCopy = '<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/header.js">\
 \n</script><script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/vex.js"></script>\
 \n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/flow.js"></script>\
@@ -201,6 +463,9 @@ vexflowLocalCopy = '<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5
 \n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/stavehairpin.js"></script>\
 \n<script src="http://localhost/uap/raffazizzi-vexflow-d8660e5/src/tuplet.js"></script>'
 
+'''
+Variables used in generating full HTML pages within which to view the VexFlow
+'''
 vexflowGlobalCopy = "<script src='http://www.vexflow.com/vexflow.js'/></script>"
 
 htmlPreamble = "\n<!DOCTYPE HTML>\n<html>\n<head>\n\t<meta name='author' content=\
@@ -227,36 +492,35 @@ htmlConclusion = "\n\t\t});\n\t</script>\n</body>\n</html>"
 
 class VexFlowUnsupportedException(music21.Music21Exception):
 	'''
-	This feature or object cannot yet be transcribed from music21 to Vex Flow
+	This feature or object is not supported by the VexFlow JavaScript library
+	'''
+	pass
+
+class Vexflow21UnsupportedException(music21.Music21Exception):
+	'''
+	This feature or object cannot be converted from music21 to VexFlow code yet
 	'''
 	pass
 
 #-------------------------------------------------------------------------------
-def parse(music21Object, mode='txt'):
-	'''
-	Parses a music21 object into Vex Flow code
-	
-	Supported modes: txt
-	Supported music21 Objects: 
-	'''
-	if mode not in supportedDisplayModes:
-		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
-	pass
-
 def fromObject(thisObject, mode='txt'):
 	'''
-	translates an arbitrary Music21Object into vexflow
+	Attempts to translate an arbitrary Music21Object into vexflow
 
-	Currently only works for Measures...
-
+	Able to translate anything in vexflow.supportedMusic21Classes
+	XXX: Unit Tests (one for each supportedMusic21Class)
 	'''
 	if 'Note' in thisObject.classes:
+		return fromNote(thisObject, mode)
+	elif 'Pitch' in thisObject.classes:
 		return fromNote(thisObject, mode)
 	elif 'Rest' in thisObject.classes:
 		return fromRest(thisObject, mode)
 	elif 'Chord' in thisObject.classes:
 		return fromChord(thisObject, mode)
 	elif 'Measure' in thisObject.classes:
+		return fromMeasure(thisObject, mode)
+	elif 'Voice' in thisObject.classes:
 		return fromMeasure(thisObject, mode)
 	elif 'Part' in thisObject.classes:
 		return fromPart(thisObject, mode)
@@ -265,20 +529,255 @@ def fromObject(thisObject, mode='txt'):
 	elif 'Stream' in thisObject.classes:
 		return fromStream(thisObject, mode)
 	else:
-		raise VexFlowUnsupportedException, 'Unsupported object type: ' + str(thisObject)
+		raise Vexflow21UnsupportedException, 'Unsupported object type: ' + str(thisObject)
 
 def fromScore(thisScore, mode='txt'):
 	'''
 	Parses a music21 score into Vex Flow code
-	#TODO
 
-	Here's the game plan:
-		Create a VexflowPart for each part
-			Each VexflowPart creates VexflowStaves
-		Create a VexflowContext to house all of the parts
+	XXX: Unit Tests
+	>>> from music21 import *
+	>>> a = corpus.parse('bwv66.6')
+	>>> print vexflow.fromScore(a, mode='txt') # doctest +SKIP
+	var music21Canvas110JS = $("#music21Canvas110")[0]; music21Canvas110JS.width =($(window).width()-10); music21Canvas110JS.height = ((3 * ((4 * (90 + 20)) + 60)) + 2* 10);
+				var music21Renderer110 = new Vex.Flow.Renderer(music21Canvas110JS, Vex.Flow.Renderer.Backends.CANVAS);
+				var music21Context110 = music21Renderer110.getContext();
+	<BLANKLINE>
+	var music21Stave0Part0Voice = new Vex.Flow.Voice({num_beats: 1.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave0Part0VoiceNotes = [new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+	music21Stave0Part0Voice.addTickables(music21Stave0Part0VoiceNotes);
+	var stavePart0Measure0Line0ID89 = new Vex.Flow.Stave((0 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (0*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	stavePart0Measure0Line0ID89.addClef("treble");
+	stavePart0Measure0Line0ID89.addKeySignature("A");
+	stavePart0Measure0Line0ID89.addTimeSignature("4/4");
+	var stavePart0Measure0Line0ID89Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave0Part0Voice]).format([music21Stave0Part0Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave1Part0Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave1Part0VoiceNotes = [new Vex.Flow.StaveNote({keys: ["An/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}).addArticulation(0, new Vex.Flow.Articulation("a@a").setPosition(3)), new Vex.Flow.StaveNote({keys: ["En/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+	music21Stave1Part0Voice.addTickables(music21Stave1Part0VoiceNotes);
+	var stavePart0Measure1Line0ID89 = new Vex.Flow.Stave((1 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (0*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart0Measure1Line0ID89Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave1Part0Voice]).format([music21Stave1Part0Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave2Part0Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave2Part0VoiceNotes = [new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["An/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}).addArticulation(0, new Vex.Flow.Articulation("a@a").setPosition(3)), new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+	music21Stave2Part0Voice.addTickables(music21Stave2Part0VoiceNotes);
+	var stavePart0Measure2Line0ID89 = new Vex.Flow.Stave((2 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (0*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart0Measure2Line0ID89Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave2Part0Voice]).format([music21Stave2Part0Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave3Part0Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave3Part0VoiceNotes = [new Vex.Flow.StaveNote({keys: ["An/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["G#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}).addArticulation(0, new Vex.Flow.Articulation("a@a").setPosition(3)), new Vex.Flow.StaveNote({keys: ["An/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Stave3Part0Voice.addTickables(music21Stave3Part0VoiceNotes);
+	var stavePart0Measure3Line0ID89 = new Vex.Flow.Stave((3 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (0*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart0Measure3Line0ID89Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave3Part0Voice]).format([music21Stave3Part0Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave4Part0Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave4Part0VoiceNotes = [new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["En/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Stave4Part0Voice.addTickables(music21Stave4Part0VoiceNotes);
+	var stavePart0Measure4Line1ID89 = new Vex.Flow.Stave((0 * (((($(window).width()-10) - (2*10))) / 4) + 10),((1 * ((4 * (90 + 20)) + 60)) + 10 + (0*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	stavePart0Measure4Line1ID89.addClef("treble");
+	stavePart0Measure4Line1ID89.addKeySignature("A");
+	var stavePart0Measure4Line1ID89Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave4Part0Voice]).format([music21Stave4Part0Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave5Part0Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave5Part0VoiceNotes = [new Vex.Flow.StaveNote({keys: ["An/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}).addArticulation(0, new Vex.Flow.Articulation("a@a").setPosition(3)), new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+	music21Stave5Part0Voice.addTickables(music21Stave5Part0VoiceNotes);
+	var stavePart0Measure5Line1ID89 = new Vex.Flow.Stave((1 * (((($(window).width()-10) - (2*10))) / 4) + 10),((1 * ((4 * (90 + 20)) + 60)) + 10 + (0*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart0Measure5Line1ID89Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave5Part0Voice]).format([music21Stave5Part0Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave6Part0Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave6Part0VoiceNotes = [new Vex.Flow.StaveNote({keys: ["An/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["An/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Stave6Part0Voice.addTickables(music21Stave6Part0VoiceNotes);
+	var stavePart0Measure6Line1ID89 = new Vex.Flow.Stave((2 * (((($(window).width()-10) - (2*10))) / 4) + 10),((1 * ((4 * (90 + 20)) + 60)) + 10 + (0*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart0Measure6Line1ID89Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave6Part0Voice]).format([music21Stave6Part0Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave7Part0Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave7Part0VoiceNotes = [new Vex.Flow.StaveNote({keys: ["G#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["G#/4"], duration: "h", stem_direction: Vex.Flow.StaveNote.STEM_UP}).addArticulation(0, new Vex.Flow.Articulation("a@a").setPosition(3))];
+	music21Stave7Part0Voice.addTickables(music21Stave7Part0VoiceNotes);
+	var stavePart0Measure7Line1ID89 = new Vex.Flow.Stave((3 * (((($(window).width()-10) - (2*10))) / 4) + 10),((1 * ((4 * (90 + 20)) + 60)) + 10 + (0*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart0Measure7Line1ID89Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave7Part0Voice]).format([music21Stave7Part0Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave8Part0Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave8Part0VoiceNotes = [new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "h", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Stave8Part0Voice.addTickables(music21Stave8Part0VoiceNotes);
+	var stavePart0Measure8Line2ID89 = new Vex.Flow.Stave((0 * (((($(window).width()-10) - (2*10))) / 4) + 10),((2 * ((4 * (90 + 20)) + 60)) + 10 + (0*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	stavePart0Measure8Line2ID89.addClef("treble");
+	stavePart0Measure8Line2ID89.addKeySignature("A");
+	var stavePart0Measure8Line2ID89Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave8Part0Voice]).format([music21Stave8Part0Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave9Part0Voice = new Vex.Flow.Voice({num_beats: 3.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave9Part0VoiceNotes = [new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["E#/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}).addAccidental(0, new Vex.Flow.Accidental("#")), new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}).addArticulation(0, new Vex.Flow.Articulation("a@a").setPosition(3))];
+	music21Stave9Part0Voice.addTickables(music21Stave9Part0VoiceNotes);
+	var stavePart0Measure9Line2ID89 = new Vex.Flow.Stave((1 * (((($(window).width()-10) - (2*10))) / 4) + 10),((2 * ((4 * (90 + 20)) + 60)) + 10 + (0*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart0Measure9Line2ID89Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave9Part0Voice]).format([music21Stave9Part0Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	<BLANKLINE>
+	var music21Stave0Part1Voice = new Vex.Flow.Voice({num_beats: 1.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave0Part1VoiceNotes = [new Vex.Flow.StaveNote({keys: ["En/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Stave0Part1Voice.addTickables(music21Stave0Part1VoiceNotes);
+	var stavePart1Measure0Line0ID111 = new Vex.Flow.Stave((0 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (1*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	stavePart1Measure0Line0ID111.addClef("treble");
+	stavePart1Measure0Line0ID111.addKeySignature("A");
+	stavePart1Measure0Line0ID111.addTimeSignature("4/4");
+	var stavePart1Measure0Line0ID111Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave0Part1Voice]).format([music21Stave0Part1Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave1Part1Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave1Part1VoiceNotes = [new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["En/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["En/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["En/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Stave1Part1Voice.addTickables(music21Stave1Part1VoiceNotes);
+	var stavePart1Measure1Line0ID111 = new Vex.Flow.Stave((1 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (1*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart1Measure1Line0ID111Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave1Part1Voice]).format([music21Stave1Part1Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave2Part1Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave2Part1VoiceNotes = [new Vex.Flow.StaveNote({keys: ["En/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["G#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["En/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["G#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Stave2Part1Voice.addTickables(music21Stave2Part1VoiceNotes);
+	var stavePart1Measure2Line0ID111 = new Vex.Flow.Stave((2 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (1*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart1Measure2Line0ID111Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave2Part1Voice]).format([music21Stave2Part1Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave3Part1Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave3Part1VoiceNotes = [new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["G#/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["E#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}).addAccidental(0, new Vex.Flow.Accidental("#")), new Vex.Flow.StaveNote({keys: ["C#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Stave3Part1Voice.addTickables(music21Stave3Part1VoiceNotes);
+	var stavePart1Measure3Line0ID111 = new Vex.Flow.Stave((3 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (1*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart1Measure3Line0ID111Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave3Part1Voice]).format([music21Stave3Part1Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave4Part1Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave4Part1VoiceNotes = [new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["En/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["D#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}).addAccidental(0, new Vex.Flow.Accidental("#")), new Vex.Flow.StaveNote({keys: ["C#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Stave4Part1Voice.addTickables(music21Stave4Part1VoiceNotes);
+	var stavePart1Measure4Line1ID111 = new Vex.Flow.Stave((0 * (((($(window).width()-10) - (2*10))) / 4) + 10),((1 * ((4 * (90 + 20)) + 60)) + 10 + (1*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	stavePart1Measure4Line1ID111.addClef("treble");
+	stavePart1Measure4Line1ID111.addKeySignature("A");
+	var stavePart1Measure4Line1ID111Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave4Part1Voice]).format([music21Stave4Part1Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave5Part1Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave5Part1VoiceNotes = [new Vex.Flow.StaveNote({keys: ["C#/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["En/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["En/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Stave5Part1Voice.addTickables(music21Stave5Part1VoiceNotes);
+	var stavePart1Measure5Line1ID111 = new Vex.Flow.Stave((1 * (((($(window).width()-10) - (2*10))) / 4) + 10),((1 * ((4 * (90 + 20)) + 60)) + 10 + (1*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart1Measure5Line1ID111Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave5Part1Voice]).format([music21Stave5Part1Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave6Part1Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave6Part1VoiceNotes = [new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["G#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Stave6Part1Voice.addTickables(music21Stave6Part1VoiceNotes);
+	var stavePart1Measure6Line1ID111 = new Vex.Flow.Stave((2 * (((($(window).width()-10) - (2*10))) / 4) + 10),((1 * ((4 * (90 + 20)) + 60)) + 10 + (1*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart1Measure6Line1ID111Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave6Part1Voice]).format([music21Stave6Part1Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave7Part1Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave7Part1VoiceNotes = [new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["E#/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}).addAccidental(0, new Vex.Flow.Accidental("#")), new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["F#/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["C#/4"], duration: "h", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Stave7Part1Voice.addTickables(music21Stave7Part1VoiceNotes);
+	var stavePart1Measure7Line1ID111 = new Vex.Flow.Stave((3 * (((($(window).width()-10) - (2*10))) / 4) + 10),((1 * ((4 * (90 + 20)) + 60)) + 10 + (1*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart1Measure7Line1ID111Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave7Part1Voice]).format([music21Stave7Part1Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave8Part1Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave8Part1VoiceNotes = [new Vex.Flow.StaveNote({keys: ["C#/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Dn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["En/4"], duration: "h", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Dn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["C#/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Stave8Part1Voice.addTickables(music21Stave8Part1VoiceNotes);
+	var stavePart1Measure8Line2ID111 = new Vex.Flow.Stave((0 * (((($(window).width()-10) - (2*10))) / 4) + 10),((2 * ((4 * (90 + 20)) + 60)) + 10 + (1*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	stavePart1Measure8Line2ID111.addClef("treble");
+	stavePart1Measure8Line2ID111.addKeySignature("A");
+	var stavePart1Measure8Line2ID111Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave8Part1Voice]).format([music21Stave8Part1Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave9Part1Voice = new Vex.Flow.Voice({num_beats: 3.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave9Part1VoiceNotes = [new Vex.Flow.StaveNote({keys: ["Bn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["C#/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Dn/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["C#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Stave9Part1Voice.addTickables(music21Stave9Part1VoiceNotes);
+	var stavePart1Measure9Line2ID111 = new Vex.Flow.Stave((1 * (((($(window).width()-10) - (2*10))) / 4) + 10),((2 * ((4 * (90 + 20)) + 60)) + 10 + (1*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart1Measure9Line2ID111Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave9Part1Voice]).format([music21Stave9Part1Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	<BLANKLINE>
+	var music21Stave0Part2Voice = new Vex.Flow.Voice({num_beats: 1.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave0Part2VoiceNotes = [new Vex.Flow.StaveNote({keys: ["Fn/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Gn/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+	music21Stave0Part2Voice.addTickables(music21Stave0Part2VoiceNotes);
+	var stavePart2Measure0Line0ID132 = new Vex.Flow.Stave((0 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (2*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	stavePart2Measure0Line0ID132.addClef("bass");
+	stavePart2Measure0Line0ID132.addKeySignature("A");
+	stavePart2Measure0Line0ID132.addTimeSignature("4/4");
+	var stavePart2Measure0Line0ID132Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave0Part2Voice]).format([music21Stave0Part2Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave1Part2Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave1Part2VoiceNotes = [new Vex.Flow.StaveNote({keys: ["A#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Gn/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Fn/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Gn/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+	music21Stave1Part2Voice.addTickables(music21Stave1Part2VoiceNotes);
+	var stavePart2Measure1Line0ID132 = new Vex.Flow.Stave((1 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (2*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart2Measure1Line0ID132Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave1Part2Voice]).format([music21Stave1Part2Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave2Part2Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave2Part2VoiceNotes = [new Vex.Flow.StaveNote({keys: ["Fn/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Cn/6"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Cn/6"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Bn/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["A#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["A#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+	music21Stave2Part2Voice.addTickables(music21Stave2Part2VoiceNotes);
+	var stavePart2Measure2Line0ID132 = new Vex.Flow.Stave((2 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (2*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart2Measure2Line0ID132Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave2Part2Voice]).format([music21Stave2Part2Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave3Part2Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave3Part2VoiceNotes = [new Vex.Flow.StaveNote({keys: ["A#/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Bn/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["A#/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Gn/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Fn/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["A#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+	music21Stave3Part2Voice.addTickables(music21Stave3Part2VoiceNotes);
+	var stavePart2Measure3Line0ID132 = new Vex.Flow.Stave((3 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (2*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart2Measure3Line0ID132Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave3Part2Voice]).format([music21Stave3Part2Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave4Part2Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave4Part2VoiceNotes = [new Vex.Flow.StaveNote({keys: ["Gn/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Gn/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Gn/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Fn/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["E#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+	music21Stave4Part2Voice.addTickables(music21Stave4Part2VoiceNotes);
+	var stavePart2Measure4Line1ID132 = new Vex.Flow.Stave((0 * (((($(window).width()-10) - (2*10))) / 4) + 10),((1 * ((4 * (90 + 20)) + 60)) + 10 + (2*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	stavePart2Measure4Line1ID132.addClef("bass");
+	stavePart2Measure4Line1ID132.addKeySignature("A");
+	var stavePart2Measure4Line1ID132Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave4Part2Voice]).format([music21Stave4Part2Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave5Part2Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave5Part2VoiceNotes = [new Vex.Flow.StaveNote({keys: ["D#/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Bn/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["A#/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Gn/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Fn/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Cn/6"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+	music21Stave5Part2Voice.addTickables(music21Stave5Part2VoiceNotes);
+	var stavePart2Measure5Line1ID132 = new Vex.Flow.Stave((1 * (((($(window).width()-10) - (2*10))) / 4) + 10),((1 * ((4 * (90 + 20)) + 60)) + 10 + (2*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart2Measure5Line1ID132Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave5Part2Voice]).format([music21Stave5Part2Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave6Part2Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave6Part2VoiceNotes = [new Vex.Flow.StaveNote({keys: ["Bn/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Bn/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["A#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["A#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+	music21Stave6Part2Voice.addTickables(music21Stave6Part2VoiceNotes);
+	var stavePart2Measure6Line1ID132 = new Vex.Flow.Stave((2 * (((($(window).width()-10) - (2*10))) / 4) + 10),((1 * ((4 * (90 + 20)) + 60)) + 10 + (2*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart2Measure6Line1ID132Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave6Part2Voice]).format([music21Stave6Part2Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave7Part2Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave7Part2VoiceNotes = [new Vex.Flow.StaveNote({keys: ["Bn/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["A#/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["A#/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Gn/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "h", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}).addAccidental(0, new Vex.Flow.Accidental("#"))];
+	music21Stave7Part2Voice.addTickables(music21Stave7Part2VoiceNotes);
+	var stavePart2Measure7Line1ID132 = new Vex.Flow.Stave((3 * (((($(window).width()-10) - (2*10))) / 4) + 10),((1 * ((4 * (90 + 20)) + 60)) + 10 + (2*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart2Measure7Line1ID132Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave7Part2Voice]).format([music21Stave7Part2Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave8Part2Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave8Part2VoiceNotes = [new Vex.Flow.StaveNote({keys: ["D#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["A#/5"], duration: "h", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Gn/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["F#/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}).addAccidental(0, new Vex.Flow.Accidental("#"))];
+	music21Stave8Part2Voice.addTickables(music21Stave8Part2VoiceNotes);
+	var stavePart2Measure8Line2ID132 = new Vex.Flow.Stave((0 * (((($(window).width()-10) - (2*10))) / 4) + 10),((2 * ((4 * (90 + 20)) + 60)) + 10 + (2*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	stavePart2Measure8Line2ID132.addClef("bass");
+	stavePart2Measure8Line2ID132.addKeySignature("A");
+	var stavePart2Measure8Line2ID132Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave8Part2Voice]).format([music21Stave8Part2Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave9Part2Voice = new Vex.Flow.Voice({num_beats: 3.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave9Part2VoiceNotes = [new Vex.Flow.StaveNote({keys: ["Gn/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Gn/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["F#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}).addAccidental(0, new Vex.Flow.Accidental("#"))];
+	music21Stave9Part2Voice.addTickables(music21Stave9Part2VoiceNotes);
+	var stavePart2Measure9Line2ID132 = new Vex.Flow.Stave((1 * (((($(window).width()-10) - (2*10))) / 4) + 10),((2 * ((4 * (90 + 20)) + 60)) + 10 + (2*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart2Measure9Line2ID132Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave9Part2Voice]).format([music21Stave9Part2Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	<BLANKLINE>
+	var music21Stave0Part3Voice = new Vex.Flow.Voice({num_beats: 1.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave0Part3VoiceNotes = [new Vex.Flow.StaveNote({keys: ["Fn/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["E#/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+	music21Stave0Part3Voice.addTickables(music21Stave0Part3VoiceNotes);
+	var stavePart3Measure0Line0ID153 = new Vex.Flow.Stave((0 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (3*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	stavePart3Measure0Line0ID153.addClef("bass");
+	stavePart3Measure0Line0ID153.addKeySignature("A");
+	stavePart3Measure0Line0ID153.addTimeSignature("4/4");
+	var stavePart3Measure0Line0ID153Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave0Part3Voice]).format([music21Stave0Part3Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave1Part3Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave1Part3VoiceNotes = [new Vex.Flow.StaveNote({keys: ["D#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["E#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Fn/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["E#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+	music21Stave1Part3Voice.addTickables(music21Stave1Part3VoiceNotes);
+	var stavePart3Measure1Line0ID153 = new Vex.Flow.Stave((1 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (3*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart3Measure1Line0ID153Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave1Part3Voice]).format([music21Stave1Part3Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave2Part3Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave2Part3VoiceNotes = [new Vex.Flow.StaveNote({keys: ["Fn/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["A#/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Cn/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Fn/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}).addAccidental(0, new Vex.Flow.Accidental("#"))];
+	music21Stave2Part3Voice.addTickables(music21Stave2Part3VoiceNotes);
+	var stavePart3Measure2Line0ID153 = new Vex.Flow.Stave((2 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (3*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart3Measure2Line0ID153Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave2Part3Voice]).format([music21Stave2Part3Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave3Part3Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave3Part3VoiceNotes = [new Vex.Flow.StaveNote({keys: ["D#/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["A#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["D#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["D#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+	music21Stave3Part3Voice.addTickables(music21Stave3Part3VoiceNotes);
+	var stavePart3Measure3Line0ID153 = new Vex.Flow.Stave((3 * (((($(window).width()-10) - (2*10))) / 4) + 10),((0 * ((4 * (90 + 20)) + 60)) + 10 + (3*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart3Measure3Line0ID153Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave3Part3Voice]).format([music21Stave3Part3Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave4Part3Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave4Part3VoiceNotes = [new Vex.Flow.StaveNote({keys: ["E#/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["D#/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["E#/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Fn/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Gn/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["A#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Stave4Part3Voice.addTickables(music21Stave4Part3VoiceNotes);
+	var stavePart3Measure4Line1ID153 = new Vex.Flow.Stave((0 * (((($(window).width()-10) - (2*10))) / 4) + 10),((1 * ((4 * (90 + 20)) + 60)) + 10 + (3*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	stavePart3Measure4Line1ID153.addClef("bass");
+	stavePart3Measure4Line1ID153.addKeySignature("A");
+	var stavePart3Measure4Line1ID153Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave4Part3Voice]).format([music21Stave4Part3Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave5Part3Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave5Part3VoiceNotes = [new Vex.Flow.StaveNote({keys: ["D#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["E#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Fn/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Fn/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+	music21Stave5Part3Voice.addTickables(music21Stave5Part3VoiceNotes);
+	var stavePart3Measure5Line1ID153 = new Vex.Flow.Stave((1 * (((($(window).width()-10) - (2*10))) / 4) + 10),((1 * ((4 * (90 + 20)) + 60)) + 10 + (3*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart3Measure5Line1ID153Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave5Part3Voice]).format([music21Stave5Part3Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave6Part3Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave6Part3VoiceNotes = [new Vex.Flow.StaveNote({keys: ["Bn/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Gn/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}).addAccidental(0, new Vex.Flow.Accidental("#")), new Vex.Flow.StaveNote({keys: ["D#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+	music21Stave6Part3Voice.addTickables(music21Stave6Part3VoiceNotes);
+	var stavePart3Measure6Line1ID153 = new Vex.Flow.Stave((2 * (((($(window).width()-10) - (2*10))) / 4) + 10),((1 * ((4 * (90 + 20)) + 60)) + 10 + (3*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart3Measure6Line1ID153Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave6Part3Voice]).format([music21Stave6Part3Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave7Part3Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave7Part3VoiceNotes = [new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["A#/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["A#/4"], duration: "h", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Stave7Part3Voice.addTickables(music21Stave7Part3VoiceNotes);
+	var stavePart3Measure7Line1ID153 = new Vex.Flow.Stave((3 * (((($(window).width()-10) - (2*10))) / 4) + 10),((1 * ((4 * (90 + 20)) + 60)) + 10 + (3*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart3Measure7Line1ID153Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave7Part3Voice]).format([music21Stave7Part3Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave8Part3Voice = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave8Part3VoiceNotes = [new Vex.Flow.StaveNote({keys: ["F#/4"], duration: "h", stem_direction: Vex.Flow.StaveNote.STEM_UP}).addAccidental(0, new Vex.Flow.Accidental("#")), new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["A#/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
+	music21Stave8Part3Voice.addTickables(music21Stave8Part3VoiceNotes);
+	var stavePart3Measure8Line2ID153 = new Vex.Flow.Stave((0 * (((($(window).width()-10) - (2*10))) / 4) + 10),((2 * ((4 * (90 + 20)) + 60)) + 10 + (3*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	stavePart3Measure8Line2ID153.addClef("bass");
+	stavePart3Measure8Line2ID153.addKeySignature("A");
+	var stavePart3Measure8Line2ID153Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave8Part3Voice]).format([music21Stave8Part3Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	var music21Stave9Part3Voice = new Vex.Flow.Voice({num_beats: 3.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+	var music21Stave9Part3VoiceNotes = [new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["D#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
+	music21Stave9Part3Voice.addTickables(music21Stave9Part3VoiceNotes);
+	var stavePart3Measure9Line2ID153 = new Vex.Flow.Stave((1 * (((($(window).width()-10) - (2*10))) / 4) + 10),((2 * ((4 * (90 + 20)) + 60)) + 10 + (3*(90+20))),(((($(window).width()-10) - (2*10))) / 4));
+	var stavePart3Measure9Line2ID153Formatter = new Vex.Flow.Formatter().joinVoices([music21Stave9Part3Voice]).format([music21Stave9Part3Voice], (((((($(window).width()-10) - (2*10))) / 4)) - 50));
+	<BLANKLINE>
 	'''
 	if mode not in supportedDisplayModes:
-		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
+		raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
 
 	return VexflowScore(thisScore.makeNotation(inPlace=False)).generateCode(mode)
 
@@ -288,9 +787,11 @@ def fromStream(thisStream, mode='txt'):
 
 	Checks if it has parts. If so, parses like a Score.
 	Otherwise, just flattens it and parses it like a Part
+
+	XXX: Unit Tests. One for a score, one for a part, and one for a tinyNotationStream
 	'''
 	if mode not in supportedDisplayModes:
-		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
+		raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
 
 	theseParts = thisStream.getElementsByClass('Part')
 	if len(theseParts) == 0:
@@ -300,42 +801,49 @@ def fromStream(thisStream, mode='txt'):
 def fromRest(thisRest, mode='txt'):
 	'''
 	Parses a music21 rest into Vex Flow code
+
+	XXX: Unit Tests
 	'''
 	if mode not in supportedDisplayModes:
-		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
+		raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
 	return VexflowRest(thisRest).generateCode(mode)
 
 def fromNote(thisNote, mode='txt'):
 	'''
 	Parses a music21 note into Vex Flow code
+
+	XXX: Unit Tests
 	'''
 	if mode not in supportedDisplayModes:
-		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
+		raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
 	return VexflowNote(thisNote).generateCode(mode)
 
 def fromChord(thisChord, mode='txt'):
 	'''
 	Parses a music21 chord into Vex Flow code
+
+	XXX: Unit Tests
 	'''
 	if mode not in supportedDisplayModes:
-		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
+		raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
 	return VexflowChord(thisChord).generateCode(mode)
 
 
 def fromPart(thisPart, mode='txt'):
 	'''
 	Parses a music21 part into Vex Flow code
+
+	XXX: Unit Tests
 	'''
 	if mode not in supportedDisplayModes:
-		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
+		raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
 	return VexflowPart(thisPart.makeNotation(inPlace=False)).generateCode(mode)
 
 def fromMeasure(thisMeasure, mode='txt'):
 	r'''
 	Parses a music21 measure into Vex Flow code
 
-	TODO: Fix tests
-	TODO: thisMeasure2 = thisMeasure.makeNotation()
+	TODO: Tests should be working. Just need to double check this
 	
 	>>> from music21 import *
 	>>> b = corpus.parse('bwv1.6.mxl')
@@ -379,13 +887,15 @@ def fromMeasure(thisMeasure, mode='txt'):
 	'''
 
 	if mode not in supportedDisplayModes:
-		raise VexFlowUnsupportedException, 'Unsupported mode: ' + str(mode)
+		raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
 	
 	return VexflowVoice(thisMeasure.makeNotation(inPlace=False)).generateCode(mode)
 
 def vexflowClefFromClef(music21clef, params={}):
 	'''
 	Given a music21 clef object, returns the vexflow clef
+
+	XXX: Unit Tests, one per clef?
 	'''
 	if 'TenorClef' in music21clef.classes:
 		return 'tenor'
@@ -409,7 +919,7 @@ def vexflowKeyFromNote(music21note, params={}):
 	'''
 	Given a music21 Note (or Pitch) object, returns the vexflow 'key'
 
-	TODO: unit tests
+	XXX: unit tests
 	'''
 	if 'Pitch' in music21note.classes:
 		thisPitch = music21note
@@ -450,9 +960,9 @@ def vexflowKeyFromNote(music21note, params={}):
 
 def vexflowKeyAndAccidentalFromNote(music21note, params={}):
 	'''
-	Given a music21 Note (or Pitch) object, returns the vexflow 'key'
+	Given a music21 Note (or Pitch) object, returns the VexFlow 'key'
 
-	TODO: unit tests
+	XXX: unit tests
 	'''
 	if 'Pitch' in music21note.classes:
 		thisPitch = music21note
@@ -493,7 +1003,7 @@ def vexflowDurationFromNote(music21note, params={}):
 	'''
 	Given a music21 Note (or Pitch) object, returns the vexflow duration
 
-	TODO: unit tests
+	XXX: unit tests
 	TODO tuplet: handle tuplets and propogate that information out
 	'''
 	thisQuarterLength = music21note.duration.quarterLength
@@ -509,7 +1019,7 @@ def vexflowKeyAndDurationFromNote(music21note, params={}):
 	'''
 	Given a music21 Note (or Pitch) object, returns the vexflow key and duration
 
-	TODO: unit tests
+	XXX: unit tests
 	TODO tuplet: handle tuplets and propogate that information out
 	'''
 	if 'Pitch' in music21note.classes:
@@ -563,7 +1073,7 @@ def vexflowKeyAccidentalAndDurationFromNote(music21note, params={}):
 	'''
 	Given a music21 Note (or Pitch) object, returns the vexflow key and duration
 
-	TODO: unit tests
+	XXX: unit tests
 	TODO tuplet: handle tuplets and propogate that information out
 		Use duration.tuplets[0].tupletActual which gives us:
 			(number of notes in tuplet, duration of what each should look like)
@@ -792,7 +1302,7 @@ class VexflowNote(object):
 		'''
 
 		if mode not in supportedDisplayModes:
-			raise VexFlowUnsupportedException, "VexFlow doesn't support this "\
+			raise Vexflow21UnsupportedException, "VexFlow doesn't support this "\
 				+ "display mode yet. " + str(mode)
 
 		if not cache:
@@ -825,7 +1335,7 @@ class VexflowNote(object):
 		Displays the Vex Flow javascript for rendering this object
 		'''
 		if mode not in supportedDisplayModes:
-			raise VexFlowUnsupportedException, 'Unsupported display mode:', mode
+			raise Vexflow21UnsupportedException, 'Unsupported display mode:', mode
 
 		if mode == 'txt':
 			print self.generateCode('txt')
@@ -851,7 +1361,7 @@ class VexflowChord(object):
 		'''
 		try:
 			if 'Chord' not in notes.classes:
-				raise VexFlowUnsupportedException, 'Cannot create a Chord from'\
+				raise Vexflow21UnsupportedException, 'Cannot create a Chord from'\
 					 + str(notes)
 			self.originalChord = notes
 		except AttributeError:
@@ -976,7 +1486,7 @@ class VexflowChord(object):
 		html: standalone html which can be displayed in a browser
 		'''
 		if mode not in supportedDisplayModes:
-			raise VexFlowUnsupportedException, 'Unsupported display mode:', mode
+			raise Vexflow21UnsupportedException, 'Unsupported display mode:', mode
 
 		if mode == 'txt':
 			return self.vexflowCode
@@ -1005,7 +1515,7 @@ class VexflowChord(object):
 		Displays the Vex Flow javascript for rendering this object
 		'''
 		if mode not in supportedDisplayModes:
-			raise VexFlowUnsupportedException, 'Unsupported display mode:', mode
+			raise Vexflow21UnsupportedException, 'Unsupported display mode:', mode
 
 		if mode == 'txt':
 			print self.generateCode('txt')
@@ -1088,7 +1598,7 @@ class VexflowRest(object):
 		html: standalone html which can be displayed in a browser
 		'''
 		if mode not in supportedDisplayModes:
-			raise VexFlowUnsupportedException, 'Unsupported display mode:', mode
+			raise Vexflow21UnsupportedException, 'Unsupported display mode:', mode
 
 		if mode == 'txt':
 			return self.vexflowCode
@@ -1117,7 +1627,7 @@ class VexflowRest(object):
 		Displays the Vex Flow javascript for rendering this object
 		'''
 		if mode not in supportedDisplayModes:
-			raise VexFlowUnsupportedException, 'Unsupported display mode:', mode
+			raise Vexflow21UnsupportedException, 'Unsupported display mode:', mode
 
 		if mode == 'txt':
 			print self.generateCode('txt')
@@ -1172,7 +1682,6 @@ class VexflowScore(object):
 
 		self.partsCode = '\n'.join([part.generateCode('txt') for part in self.vexflowParts])
 		self.vexflowCode = self.context.getJSCode(indentation=3) + '\n'
-		self.vexflowCode += 'var lastProblemNote;\n'
 		self.vexflowCode += self.partsCode
 	
 	def generateCode(self, mode = 'txt'):
@@ -1256,9 +1765,9 @@ class VexflowPart(object):
 	'''
 
 	def __init__(self, music21part, params={}):
-		global UIDCounter
-		self.UID = UIDCounter
-		UIDCounter += 1
+		global _UIDCounter
+		self.UID = _UIDCounter
+		_UIDCounter += 1
 		self.originalPart = music21part
 		self.staves = []
 		self.numMeasures = 0
@@ -1461,9 +1970,9 @@ class VexflowVoice(object):
 		params is a dict containing various parameters to be passed to the 
 			voice object
 		'''
-		global UIDCounter
-		self.UID = UIDCounter
-		UIDCounter += 1
+		global _UIDCounter
+		self.UID = _UIDCounter
+		_UIDCounter += 1
 
 		if music21measure != None:
 			if not ('Measure' in music21measure.classes or \
@@ -1493,7 +2002,7 @@ class VexflowVoice(object):
 		#Set the clef
 		theseClefs = self.originalNotes.getElementsByClass('Clef')
 		if len(theseClefs) > 1:
-			raise VexFlowUnsupportedException, 'Vexflow cannot yet handle ' +\
+			raise Vexflow21UnsupportedException, 'Vexflow cannot yet handle ' +\
 				'multiple clefs in a single measure'
 		elif len(theseClefs) == 1:
 			self.clefDisplayStatus = True
@@ -1509,7 +2018,7 @@ class VexflowVoice(object):
 		#Set the key signature
 		theseKeySignatures = self.originalNotes.getElementsByClass('KeySignature')
 		if len(theseKeySignatures) > 1:
-			raise VexFlowUnsupportedException, 'Vexflow cannot yet handle ' +\
+			raise Vexflow21UnsupportedException, 'Vexflow cannot yet handle ' +\
 				'multiple key signatures in a single measure'
 		elif len(theseKeySignatures) == 1:
 			self.keySignatureDisplayStatus = True
@@ -1517,7 +2026,7 @@ class VexflowVoice(object):
 				self.keySignature = \
 					vexflowSharpsToKeySignatures[theseKeySignatures[0].sharps]
 			else:
-				raise VexFlowUnsupportedException, "Vexflow doesn't support this "+\
+				raise VexFlowUnsupportedException, "VexFlow doesn't support this "+\
 					'Key Signature:', theseKeySignatures[0]
 		else:
 			if 'keySignature' in self.params:
@@ -1533,7 +2042,7 @@ class VexflowVoice(object):
 		#Set the time signature
 		theseTimeSignatures = self.originalNotes.getElementsByClass('TimeSignature')
 		if len(theseTimeSignatures) > 1:
-			raise VexFlowUnsupportedException, 'Vexflow cannot yet handle ' +\
+			raise Vexflow21UnsupportedException, 'Vexflow cannot yet handle ' +\
 				'multiple time signatures in a single measure'
 		elif len(theseTimeSignatures) == 1:
 			self.numBeats = self.originalMeasure.highestTime
@@ -1766,9 +2275,9 @@ class VexflowStave(object):
 		params is a dictionary containing position, width, and other parameters
 			to be passed to the stave object
 		'''
-		global UIDCounter
-		self.UID = UIDCounter
-		UIDCounter += 1
+		global _UIDCounter
+		self.UID = _UIDCounter
+		_UIDCounter += 1
 		self.params = params
 		self.vexflowVoices = []
 		self.voicesCode = ''
@@ -1966,7 +2475,7 @@ class VexflowStave(object):
 		if mode == 'txt':
 			return self.vexflowCode
 		elif mode == 'html':
-			raise VexFlowUnsupportedException, "Sorry, I haven't finished " + \
+			raise Vexflow21UnsupportedException, "Sorry, I haven't finished " + \
 				'support for standalone staves yet'
 
 class VexflowContext(object):
@@ -1980,9 +2489,9 @@ class VexflowContext(object):
 		params is a dictionary containing width, height, and other parameters
 			to be passed to the canvas object
 		'''
-		global UIDCounter
-		self.UID = UIDCounter
-		UIDCounter += 1
+		global _UIDCounter
+		self.UID = _UIDCounter
+		_UIDCounter += 1
 		self.params = params
 		self.canvasHTML = ''
 		self.canvasJSCode = ''
@@ -2126,7 +2635,9 @@ _DOC_ORDER = []
 
 if __name__ == "__main__":
 	# sys.arg test options will be used in mainTest()
-	music21.mainTest(Test)
+	#XXX RESTORE: music21.mainTest(Test)
+	import doctest
+	doctest.testmod()
 
 #------------------------------------------------------------------------------
 # eof
