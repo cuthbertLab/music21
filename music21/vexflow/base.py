@@ -2812,16 +2812,19 @@ class VexflowVoice(object):
 		if mode == 'txt':
 			return self.vexflowCode
 		elif mode == 'html':
+			(beamPre, beamPost) = self.beamCode('ctx')
 			result = htmlPreamble + vexflowPreamble
 			result += "\n\t\t\tvar stave = new Vex.Flow.Stave(" + \
 				str(defaultStavePosition[0]) + "," + \
 				str(defaultStavePosition[1]) + "," + \
 				str(defaultStaveWidth) + ");\n\t\t\tstave.addClef('" + \
 				str(defaultStaveClef) + "').setContext(ctx).draw();\n\t\t\t" + \
-				str(self.vexflowCode)+"\n\t\t\tvar formatter = new Vex.Flow.F"+\
+				str(self.vexflowCode)
+			result += beamPre + "\n\t\t\tvar formatter = new Vex.Flow.F"+\
 				"ormatter().joinVoices(["+str(self.voiceName)+"]).format([" + \
 				str(self.voiceName)+"], "+str(defaultStaveWidth)+");\n\t\t\t" +\
 				str(self.voiceName)+".draw(ctx, stave);\n"
+			result += beamPost
 			result += htmlConclusion
 			return result
 
@@ -2840,7 +2843,7 @@ class VexflowStave(object):
 		generateCode should take a VexflowContext object as a param
 	'''
 	
-	def __init__(self, params):
+	def __init__(self, params={}):
 		'''
 		params is a dictionary containing position, width, and other parameters
 			to be passed to the stave object
@@ -2981,12 +2984,12 @@ class VexflowStave(object):
 		if 'clefDisplayStatus' not in self.params or \
 			not self.params['clefDisplayStatus']:
 			self.params['clefDisplayStatus'] = \
-				thisVexflowVoice.params['clefDisplayStatus']
+				thisVexflowVoice.clefDisplayStatus
 
 		if 'keySignatureDisplayStatus' not in self.params or \
 			not self.params['keySignatureDisplayStatus']:
 			self.params['keySignatureDisplayStatus'] = \
-				thisVexflowVoice.params['keySignatureDisplayStatus']
+				thisVexflowVoice.keySignatureDisplayStatus
 
 		#print 'Sig: %s, Display?: %s' % (self.params['keySignature'], self.params['keySignatureDisplayStatus']) #XXX k
 		self._generateVexflow()
@@ -3045,15 +3048,32 @@ class VexflowStave(object):
 		if mode == 'txt':
 			return self.vexflowCode
 		elif mode == 'html':
-			raise Vexflow21UnsupportedException, "Sorry, I haven't finished " + \
-				'support for standalone staves yet'
+			result = htmlPreamble + vexflowPreamble
+			drawTheseVoices = []
+			drawTheseBeams = []
+			for thisVoice in self.vexflowVoices:
+				(beamPre, beamPost) = thisVoice.beamCode('ctx')
+				result += '\n' + thisVoice.generateCode('txt')
+				result += '\n' + beamPre
+				drawTheseVoices += [str(thisVoice.voiceName) + '.draw(ctx, ' + \
+					str(self.staveName) + ');\n']
+				if thisVoice.getBeaming():
+					drawTheseBeams += [beamPost]
+
+			result += self.vexflowCode
+			result += '\n' + str(self.staveName) + '.setContext(ctx).draw();'
+			result += '\n' + ''.join(drawTheseVoices) + '\n'
+			result += '\n'.join(drawTheseBeams)
+			result += htmlConclusion
+			return result
+
 
 class VexflowContext(object):
 	'''
 	Contains information about the canvas, formatter, and renderer
 	'''
 
-	def __init__(self, params, canvasName = None):
+	def __init__(self, params={}, canvasName = None):
 		'''
 		canvasName is the name of the canvas within the html code
 		params is a dictionary containing width, height, and other parameters
@@ -3174,9 +3194,11 @@ class VexflowContext(object):
 
 	def setHeight(self, height):
 		self.params['height'] = height
+		self.generateJS()
 
 	def setWidth(self, width):
 		self.params['width'] = width
+		self.generateJS()
 
 #-------------------------------------------------------------------------------
 #TODO Here go Tests
