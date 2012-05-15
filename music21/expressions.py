@@ -382,14 +382,14 @@ class Mordent(GeneralMordent):
         GeneralMordent.__init__(self)
         self.direction = "down" # up or down
 
-    def _getMX(self):
-        mxMordent = musicxml.Mordent()
-        return mxMordent
-
-    def _setMX(self, mxMordent):
-        pass
-
-    mx = property(_getMX, _setMX)
+#     def _getMX(self):
+#         mxMordent = musicxml.Mordent()
+#         return mxMordent
+# 
+#     def _setMX(self, mxMordent):
+#         pass
+# 
+#     mx = property(_getMX, _setMX)
 
 
 class HalfStepMordent(Mordent):
@@ -436,14 +436,14 @@ class InvertedMordent(GeneralMordent):
         GeneralMordent.__init__(self)
         self.direction = "up"
 
-    def _getMX(self):
-        mxInvertedMordent = musicxml.InvertedMordent()
-        return mxInvertedMordent
-
-    def _setMX(self, mxInvertedMordent):
-        pass
-
-    mx = property(_getMX, _setMX)
+#     def _getMX(self):
+#         mxInvertedMordent = musicxml.InvertedMordent()
+#         return mxInvertedMordent
+# 
+#     def _setMX(self, mxInvertedMordent):
+#         pass
+# 
+#     mx = property(_getMX, _setMX)
 
 
 
@@ -583,36 +583,35 @@ class Trill(Ornament):
         else:
             return (trillNotes, None, [])
 
-
-    # TODO: these will be removed
-    def _getMX(self):
-        '''
-        Returns a musicxml.TrillMark object
-        >>> a = Trill()
-        >>> a.placement = 'above'
-        >>> mxTrillMark = a.mx
-        >>> mxTrillMark.get('placement')
-        'above'
-        '''
-        mxTrillMark = musicxml.TrillMark()
-        mxTrillMark.set('placement', self.placement)
-        return mxTrillMark
-
-
-    def _setMX(self, mxTrillMark):
-        '''
-        Given an mxTrillMark, load instance
-
-        >>> mxTrillMark = musicxml.TrillMark()
-        >>> mxTrillMark.set('placement', 'above')
-        >>> a = Trill()
-        >>> a.mx = mxTrillMark
-        >>> a.placement
-        'above'
-        '''
-        self.placement = mxTrillMark.get('placement')
-
-    mx = property(_getMX, _setMX)
+# 
+#     def _getMX(self):
+#         '''
+#         Returns a musicxml.TrillMark object
+#         >>> a = Trill()
+#         >>> a.placement = 'above'
+#         >>> mxTrillMark = a.mx
+#         >>> mxTrillMark.get('placement')
+#         'above'
+#         '''
+#         mxTrillMark = musicxml.TrillMark()
+#         mxTrillMark.set('placement', self.placement)
+#         return mxTrillMark
+# 
+# 
+#     def _setMX(self, mxTrillMark):
+#         '''
+#         Given an mxTrillMark, load instance
+# 
+#         >>> mxTrillMark = musicxml.TrillMark()
+#         >>> mxTrillMark.set('placement', 'above')
+#         >>> a = Trill()
+#         >>> a.mx = mxTrillMark
+#         >>> a.placement
+#         'above'
+#         '''
+#         self.placement = mxTrillMark.get('placement')
+# 
+#     mx = property(_getMX, _setMX)
 
 
 class HalfStepTrill(Trill):
@@ -644,14 +643,16 @@ class WholeStepTrill(Trill):
         self.size = music21.interval.Interval("M2")
 
 
-
-#-------------------------------------------------------------------------------
-# TODO: is this a subclass of Trill?
-class Shake(Ornament):
+class Shake(Trill):
     def __init__(self):
         Ornament.__init__(self)
         self.size = music21.interval.Interval("M2")
         self.quarterLength = 0.25
+
+
+
+
+#-------------------------------------------------------------------------------
 
 # TODO: is this a subclass of appogiatura?
 class Schleifer(Ornament):
@@ -714,7 +715,7 @@ class Turn(Ornament):
             raise ExpressionException("Cannot realize a turn if there is no size given")
         if srcObject.duration == None or srcObject.duration.quarterLength == 0:
             raise ExpressionException("Cannot steal time from an object with no duration")
-        if srcObject.duration.quarterLength < 4*self.quarterLength:
+        if srcObject.duration.quarterLength < 4 * self.quarterLength:
             raise ExpressionException("The note is not long enough to realize a turn")
         
         remainderDuration = srcObject.duration.quarterLength - 4 * self.quarterLength
@@ -741,7 +742,6 @@ class Turn(Ornament):
         fourthNote = copy.deepcopy(srcObject)
         #TODO: remove expressions
         fourthNote.duration.quarterLength = self.quarterLength
-        
     
         turnNotes.append(firstNote)
         turnNotes.append(secondNote)
@@ -751,7 +751,6 @@ class Turn(Ornament):
         currentKeySig = srcObject.getContextByClass(music21.key.KeySignature)
         if currentKeySig is None:
             currentKeySig = music21.key.KeySignature(0)
-
        
         for n in turnNotes:
             n.accidental = currentKeySig.accidentalByStep(n.step)
@@ -830,7 +829,6 @@ class GeneralAppoggiatura(Ornament):
         if currentKeySig is None:
             currentKeySig = music21.key.KeySignature(0)
 
-
         #TODO clear just mordent here...
         return (appogNote, remainderNote, [])
 
@@ -866,7 +864,7 @@ class WholeStepInvertedAppoggiatura(InvertedAppoggiatura):
 
 
 
-
+#-------------------------------------------------------------------------------
 class Fermata(Expression):
     '''
     Fermatas by default get appended to the last
@@ -890,37 +888,37 @@ class Fermata(Expression):
     type  = "upright" # for musicmxml, can be upright, upright-inverted
     tieAttach = 'last'
 
-    def _getMX(self):
-        '''
-        Advanced feature: 
-        
-        As a getter gives the music21.musicxml object for the Fermata
-        or as a setter changes the current fermata to have
-        the characteristics of the musicxml object to fit this
-        type:
-        
-        >>> from music21 import *
-        >>> a = Fermata()
-        >>> mxFermata = a.mx
-        >>> mxFermata.get('type')
-        'upright'
-
-  
-        >>> mxFermata2 = musicxml.Fermata()
-        >>> mxFermata2.set('type', 'upright-inverted')
-        >>> a.mx = mxFermata2
-        >>> a.type
-        'upright-inverted'
-
-        '''
-        mxFermata = musicxml.Fermata()
-        mxFermata.set('type', self.type)
-        return mxFermata
-
-    def _setMX(self, mxFermata):
-        self.type = mxFermata.get('type')
-
-    mx = property(_getMX, _setMX)
+#     def _getMX(self):
+#         '''
+#         Advanced feature: 
+#         
+#         As a getter gives the music21.musicxml object for the Fermata
+#         or as a setter changes the current fermata to have
+#         the characteristics of the musicxml object to fit this
+#         type:
+#         
+#         >>> from music21 import *
+#         >>> a = Fermata()
+#         >>> mxFermata = a.mx
+#         >>> mxFermata.get('type')
+#         'upright'
+# 
+#   
+#         >>> mxFermata2 = musicxml.Fermata()
+#         >>> mxFermata2.set('type', 'upright-inverted')
+#         >>> a.mx = mxFermata2
+#         >>> a.type
+#         'upright-inverted'
+# 
+#         '''
+#         mxFermata = musicxml.Fermata()
+#         mxFermata.set('type', self.type)
+#         return mxFermata
+# 
+#     def _setMX(self, mxFermata):
+#         self.type = mxFermata.get('type')
+# 
+#     mx = property(_getMX, _setMX)
 
 
 
@@ -942,7 +940,7 @@ class TrillExtension(spanner.Spanner):
     >>> te.getDurationBySite(s).quarterLength
     2.0
     >>> print te
-    <music21.spanner.TrillExtension <music21.note.Note C><music21.note.Note C>>
+    <music21.expressions.TrillExtension <music21.note.Note C><music21.note.Note C>>
     '''
     # musicxml defines a start, stop, and a continue; will try to avoid continue
     # note that this always includes a trill symbol
@@ -1088,11 +1086,11 @@ class Test(unittest.TestCase):
         #print realizeOrnaments(n1)
         
 
-    def testCPEBachRealizeOrnaments(self):
-        from music21 import corpus
-        cpe = corpus.parse('cpebach/h186').parts[0].measures(1,4)
-        cpe2 = cpe.realizeOrnaments()
-        #cpe2.show()
+#     def testCPEBachRealizeOrnaments(self):
+#         from music21 import corpus
+#         cpe = corpus.parse('cpebach/h186').parts[0].measures(1,4)
+#         cpe2 = cpe.realizeOrnaments()
+#         #cpe2.show()
 
 
     def testTrillExtensionA(self):

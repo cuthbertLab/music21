@@ -2018,15 +2018,17 @@ def articulationsAndExpressionsToMx(target, mxNoteList):
         # TODO: this is relying on the presence of an MX attribute
         # to determine if it can be shown; another method should
         # be used
-        #replace with calls to ornamentToMxOrnament
-        if hasattr(expObj, 'mx'):
+        #replace with calls to 
+        mx = ornamentToMx(expObj)
+        if mx is not None:
             # some expressions must be wrapped in a musicxml ornament
+            # a m21 Ornament subclass may not be the same as a mxl ornament
             if 'Ornament' in expObj.classes:
                 ornamentsObj = musicxmlMod.Ornaments()
-                ornamentsObj.append(expObj.mx)
+                ornamentsObj.append(mx)
                 mxNoteList[0].notationsObj.componentList.append(ornamentsObj)
             else:
-                mxNoteList[0].notationsObj.componentList.append(expObj.mx)
+                mxNoteList[0].notationsObj.componentList.append(mx)
 
 
 def mxOrnamentToOrnament(mxOrnament):
@@ -2058,10 +2060,40 @@ def mxOrnamentToOrnament(mxOrnament):
     return orn # may be None
 
 
-def ornamentToMxOrnament(orn):
-    pass
-#     ornamentsObj = musicxmlMod.Ornaments()
-#     ornamentsObj.append(expObj.mx)
+def ornamentToMx(orn):
+    '''Convert a music21 object to musicxml object; return None if no conversion is possible. 
+    '''
+    mx = None
+    if 'Shake' in orn.classes:
+        pass # not yet translating, but a subclass of Trill
+    elif 'Trill' in orn.classes:
+        mx = musicxmlMod.TrillMark()
+        mx.set('placement', orn.placement)
+    elif 'Fermata' in orn.classes:
+        mx = musicxmlMod.Fermata()
+        mx.set('type', orn.type)
+    elif 'Mordent' in orn.classes:
+        mx = musicxmlMod.Mordent()
+    elif 'InvertedMordent' in orn.classes:
+        mx = musicxmlMod.InvertedMordent()
+    elif 'Trill' in orn.classes:
+        mx = musicxmlMod.TrillMark()
+        mx.set('placement', orn.placement)
+
+    elif 'Turn' in orn.classes:
+        mx = musicxmlMod.Turn()
+    elif 'DelayedTurn' in orn.classes:
+        mx = musicxmlMod.DelayedTurn()
+    elif 'InvertedTurn' in orn.classes:
+        mx = musicxmlMod.InvertedTurn()
+
+    elif 'Schleifer' in orn.classes:
+        mx = musicxmlMod.Schleifer()
+
+    else:
+        environLocal.pd(['no musicxml conversion for:', orn])
+
+    return mx
 
 
 #-------------------------------------------------------------------------------
@@ -5042,7 +5074,7 @@ spirit</words>
         self.assertEqual(raw.count('<trill-mark'), 2)
         self.assertEqual(raw.count('<ornaments>'), 6)
         self.assertEqual(raw.count('<inverted-mordent/>'), 2)
-
+        self.assertEqual(raw.count('<mordent/>'), 2)
 
 
     def testOrnamentB(self):
