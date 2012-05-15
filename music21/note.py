@@ -156,34 +156,34 @@ class Lyric(music21.JSONSerializer):
         #environLocal.printDebug(['Lyric:', 'self.text', self.text, 'self.syllabic', self.syllabic])
 
     #---------------------------------------------------------------------------
-    def _getMX(self):
-        '''
-        Returns an mxLyric
-
-        >>> from music21 import *
-        >>> a = note.Lyric()
-        >>> a.text = 'hello'
-        >>> mxLyric = a.mx
-        >>> mxLyric.get('text')
-        'hello'
-        '''
-        return musicxmlTranslate.lyricToMx(self)
-
-    def _setMX(self, mxLyric):
-        '''Given an mxLyric, fill the necessary parameters
-        
-        >>> from music21 import *
-        >>> mxLyric = musicxml.Lyric()
-        >>> mxLyric.set('text', 'hello')
-        >>> a = Lyric()
-        >>> a.mx = mxLyric
-        >>> a.text
-        'hello'
-        '''
-        musicxmlTranslate.mxToLyric(mxLyric, inputM21=self)
-
-    mx = property(_getMX, _setMX)    
-
+#     def _getMX(self):
+#         '''
+#         Returns an mxLyric
+# 
+#         >>> from music21 import *
+#         >>> a = note.Lyric()
+#         >>> a.text = 'hello'
+#         >>> mxLyric = a.mx
+#         >>> mxLyric.get('text')
+#         'hello'
+#         '''
+#         return musicxmlTranslate.lyricToMx(self)
+# 
+#     def _setMX(self, mxLyric):
+#         '''Given an mxLyric, fill the necessary parameters
+#         
+#         >>> from music21 import *
+#         >>> mxLyric = musicxml.Lyric()
+#         >>> mxLyric.set('text', 'hello')
+#         >>> a = Lyric()
+#         >>> a.mx = mxLyric
+#         >>> a.text
+#         'hello'
+#         '''
+#         musicxmlTranslate.mxToLyric(mxLyric, inputM21=self)
+# 
+#     mx = property(_getMX, _setMX)    
+# 
 
 
 

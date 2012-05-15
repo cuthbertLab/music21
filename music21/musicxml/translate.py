@@ -556,7 +556,7 @@ def pitchToMx(p):
 
     >>> from music21 import *
     >>> a = pitch.Pitch('g#4')
-    >>> c = a.mx
+    >>> c = musicxml.translate.pitchToMx(a)
     >>> c.get('pitch').get('step')
     'G'
     '''
@@ -590,7 +590,7 @@ def mxToPitch(mxNote, inputM21=None):
     >>> c = musicxml.Note()
     >>> c.set('pitch', b)
     >>> a = pitch.Pitch('g#4')
-    >>> a.mx = c
+    >>> a = musicxml.translate.mxToPitch(c)
     >>> print(a)
     E-3
     '''
@@ -634,7 +634,7 @@ def mxToPitch(mxNote, inputM21=None):
             p.accidental.displayStatus = False
     p.octave = int(mxPitch.get('octave'))
     p._pitchSpaceNeedsUpdating = True
-
+    return p
 
 def pitchToMusicXML(p):
     from music21 import stream, note
@@ -2160,7 +2160,8 @@ def chordToMx(c, spannerBundle=None):
         #for pitchObj in c.pitches:
             # copy here, before merge
             mxNote = copy.deepcopy(mxNoteBase)
-            mxNote = mxNote.merge(n.pitch.mx, returnDeepcopy=False)
+            mxPitch = pitchToMx(n.pitch)
+            mxNote = mxNote.merge(mxPitch, returnDeepcopy=False)
             if c.duration.isGrace:
                 mxNote.set('duration', None)                
             if chordPos > 0:
@@ -2230,7 +2231,7 @@ def chordToMx(c, spannerBundle=None):
 
     # only applied to first note
     for lyricObj in c.lyrics:
-        mxNoteList[0].lyricList.append(lyricObj.mx)
+        mxNoteList[0].lyricList.append(lyricToMx(lyricObj))
 
 
     # if we have any articulations, they only go on the first of any 
@@ -2482,7 +2483,8 @@ def noteToMxNotes(n, spannerBundle=None):
         #environLocal.printDebug(['noteToMxNotes(): spannerBundle post-filter by component:', spannerBundle, n, id(n)])
 
     mxNoteList = []
-    pitchMx = n.pitch.mx
+    #pitchMx = n.pitch.mx
+    pitchMx = pitchToMx(n.pitch)
     noteColor = n.color
 
     # todo: this is not yet implemented in music21 note objects; to do
@@ -2596,7 +2598,8 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
 
     mxGrace = mxNote.get('graceObj')
 
-    n.pitch.mx = mxNote # required info will be taken from entire note
+    #n.pitch.mx = mxNote # required info will be taken from entire note
+    mxToPitch(mxNote, n.pitch)
     #n.duration.mx = mxNote
     mxToDuration(mxNote, n.duration)
     n.beams.mx = mxNote.beamList
@@ -3271,7 +3274,8 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
 
                     for mxLyric in mxNote.lyricList:
                         lyricObj = note.Lyric()
-                        lyricObj.mx = mxLyric
+                        #lyricObj.mx = mxLyric
+                        mxToLyric(mxLyric, lyricObj)
                         n.lyrics.append(lyricObj)
                     nLast = n # update
 
@@ -3302,7 +3306,8 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 # add any accumulated lyrics
                 for mxLyric in mxLyricList:
                     lyricObj = note.Lyric()
-                    lyricObj.mx = mxLyric
+                    #lyricObj.mx = mxLyric
+                    mxToLyric(mxLyric, lyricObj)
                     c.lyrics.append(lyricObj)
 
                 _addToStaffReference(mxNoteList, c, staffReference)
