@@ -7,7 +7,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2011 The music21 Project
+# Copyright:    (c) 2009-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
@@ -284,7 +284,7 @@ class StreamFreezer(object):
     def writePickle(self, fp=None):
         '''For a supplied Stream, write a pickled version.
         '''
-        if fp == None:
+        if fp is None:
             dir = environLocal.getRootTempDir()
             fp = self._getPickleFp(dir)
         elif os.sep in fp: # assume its a complete path
@@ -293,7 +293,7 @@ class StreamFreezer(object):
             dir = environLocal.getRootTempDir()
             fp = os.path.join(dir, fp)
 
-        self.stream.setupPickleScaffold()
+        self.stream.setupSerializationScaffold()
 
         environLocal.printDebug(['writing fp', fp])
         f = open(fp, 'wb') # binary
@@ -325,7 +325,7 @@ class StreamFreezer(object):
             environLocal.warn('this pickled file is out of data and my not function properly.')
 
         self.stream = storage['stream']
-        self.stream.teardownPickleScaffold()
+        self.stream.teardownSerializationScaffold()
         #self.stream._printDefinedContexts()
 
 
@@ -908,14 +908,10 @@ class Converter(object):
         
         
         >>> from music21 import *
-        >>> jeanieLightBrownURL = 'http://www.wikifonia.org/node/4391'
+        >>> #_DOCS_SHOW jeanieLightBrownURL = 'http://www.wikifonia.org/node/4391'
         >>> c = converter.Converter()
-        >>> c.parseURL(jeanieLightBrownURL)
-        >>> jeanieStream = c.stream
-        >>> jeanieStream.parts[0].measure(2).notes.show('text')
-        {0.0} <music21.harmony.ChordSymbol F>
-        {0.0} <music21.note.Note C>
-        {3.0} <music21.note.Note A>
+        >>> #_DOCS_SHOW c.parseURL(jeanieLightBrownURL)
+        >>> #_DOCS_SHOW jeanieStream = c.stream
         '''
         autoDownload = environLocal['autoDownload']
         if autoDownload == 'allow':
@@ -928,7 +924,6 @@ class Converter(object):
         matchedWikifonia = re.search("wikifonia.org/node/(\d+)", url)
         if matchedWikifonia:
             url = 'http://static.wikifonia.org/' + matchedWikifonia.group(1) + '/musicxml.xml'
-
 
         # this format check is here first to see if we can find the format
         # in the url; if forcing a format we do not need this
@@ -1009,11 +1004,7 @@ def parse(value, *args, **keywords):
     in a file of multipiece file.
     
     
-    `format` specifies the format to parse the line of text or the file as.
-    
-    
-    
-    
+    `format` specifies the format to parse the line of text or the file as.    
     
     A string of text is first checked to see if it is a 
     filename that exists on disk.  If not it is searched

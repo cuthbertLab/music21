@@ -654,7 +654,8 @@ class Shake(Trill):
 
 #-------------------------------------------------------------------------------
 
-# TODO: is this a subclass of appogiatura?
+# TODO: BaroqueSlide
+# this is a slide or culee
 class Schleifer(Ornament):
     def __init__(self):
         Ornament.__init__(self)
@@ -758,8 +759,8 @@ class Turn(Ornament):
         remainderNote = copy.deepcopy(srcObject)
         remainderNote.duration.quarterLength = remainderDuration
         
-        
         return ([], remainderNote, turnNotes)
+
 
 class InvertedTurn(Turn):
     def __init__(self):

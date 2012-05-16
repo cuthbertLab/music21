@@ -112,8 +112,6 @@ class Derivation(music21.JSONSerializer):
         '''
         post = common.unwrapWeakref(self._container)
         self._container = post
-#         post = common.unwrapWeakref(self._ancestor)
-#         self._ancestor = post
 
 
     def wrapWeakref(self):
@@ -124,11 +122,6 @@ class Derivation(music21.JSONSerializer):
             self._containerId = id(self._container) 
             post = common.wrapWeakref(self._container)
             self._container = post
-
-#         if not common.isWeakref(self._ancestor):
-#             self._ancestorId = id(self._ancestor)             
-#             post = common.wrapWeakref(self._ancestor)
-#             self._ancestor = post
 
 
 

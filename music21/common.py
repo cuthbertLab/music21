@@ -20,7 +20,6 @@ import unittest, doctest
 import fractions
 import decimal
 import time
-import weakref
 import hashlib
 import imp
 import random
@@ -1791,6 +1790,7 @@ def wrapWeakref(referent):
     utility function that wraps objects as weakrefs but does not wrap
     already wrapped objects
     '''
+    import weakref
     #if type(referent) is weakref.ref:
 #     if isinstance(referent, weakref.ref):
 #         return referent
@@ -1825,6 +1825,7 @@ def unwrapWeakref(referent):
     >>> common.unwrapWeakref(a2.strong) is common.unwrapWeakref(a2.weak)
     True
     '''
+    import weakref
     if type(referent) is weakref.ref:
         return referent()
     else:
@@ -1846,10 +1847,10 @@ def isWeakref(referent):
     >>> common.isWeakref(common.wrapWeakref(a1))
     True
     '''
+    import weakref
     if type(referent) is weakref.ref:
         return True
-    else:
-        return False
+    return False
 
 
 def findWeakRef(target):

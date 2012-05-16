@@ -62,27 +62,49 @@ class Test(unittest.TestCase):
         c1 = chord.Chord(['c2', 'a4', 'e5'], quarterLength=1.25)
 
         raw = c1.json
-        print raw
 
         c2 = chord.Chord()
         c2.json = raw
         self.assertEqual(str(c1.pitches), '[C2, A4, E5]')
         self.assertEqual(c1.quarterLength, 1.25)
 
-        
-
+    # TODO: replace with file-like objects for temporary writing
     def testBasicC(self):
-        from music21 import stream, note
+        from music21 import stream, note, converter
+        import copy
 
         s = stream.Stream()
-        s.append(note.Note('d2', quarterLength=2.0))
+        n1 = note.Note('d2', quarterLength=2.0)
+        s.append(n1)
         s.append(note.Note('g~6', quarterLength=.25))
 
-        # Derivation is not being identified has having a serialization method
-        #raw = s.json
+        fp = '/_scratch/test.pickle'
+        converter.freeze(s, fp)
 
-        #print raw
+        post = converter.unfreeze(s, fp)
+        self.assertEqual(len(post.notes), 1)
+        self.assertEqual(str(post.notes[0]), 'D2')
 
+
+    # TODO: replace with file-like objects for temporary writing
+    # this presently fails
+    def testBasicD(self):
+        from music21 import stream, note, converter, spanner
+        import copy
+
+        s = stream.Stream()
+        n1 = note.Note('d2', quarterLength=2.0)
+        n2 = note.Note('e2', quarterLength=2.0)
+        sp = spanner.Slur(n1, n2)
+        s.append(n1)
+        s.append(n2)
+        s.append(sp)
+        fp = '/_scratch/test.pickle'
+        converter.freeze(s, fp)
+
+        post = converter.unfreeze(s, fp)
+        self.assertEqual(len(post.notes), 1)
+        self.assertEqual(str(post.notes[0]), 'D2')
 
 
 

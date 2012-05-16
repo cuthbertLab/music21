@@ -383,7 +383,7 @@ class Test(unittest.TestCase):
         self.assertEqual(midStream[1].getOffsetBySite(midStream), 10.0)
 
         # component notes still have a location set to srcStream
-        self.assertEqual(midStream[1][0].getOffsetBySite(srcStream), 3.0)
+        #self.assertEqual(midStream[1][0].getOffsetBySite(srcStream), 3.0)
 
         # component notes still have a location set to midStream[1]
         self.assertEqual(midStream[1][0].getOffsetBySite(midStream[1]), 3.0)        
@@ -1664,14 +1664,12 @@ class Test(unittest.TestCase):
         self.assertEqual(s1.activeSite, s3)
         post = s1.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
-        # TODO: isolated activeSite mangling problem here
-        #self.assertEqual(s1.activeSite, s3)
+        self.assertEqual(s1.activeSite, s3)
 
         post = s2.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
         
-
-        # now we in sert a clef in s2; s2 will get this clef first
+        # now we in sort a clef in s2; s2 will get this clef first
         s2.insert(0, clef.TenorClef())
         # only second part should ahve tenor clef
         post = s2.getClefs()[0]
@@ -1681,25 +1679,32 @@ class Test(unittest.TestCase):
         post = s1.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
-        # but s2 flat
+        # s2 flat gets the tenor clef; it was inserted in it
         post = s2.flat.getClefs()[0]
         self.assertEqual(isinstance(post, clef.TenorClef), True)
 
+        # a copy copies the clef; so we still get the same clef
         s2FlatCopy = copy.deepcopy(s2.flat)
         post = s2FlatCopy.getClefs()[0]
         self.assertEqual(isinstance(post, clef.TenorClef), True)
 
-
-        # but s1 flat
+        # s1 flat will get the alto clef; it still has a pathway
         post = s1.flat.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
+        # once we create a deepcopy of s1, it is no longer connected to 
+        # its parent if purge orphans and it is not in s3
         s1FlatCopy = copy.deepcopy(s1.flat)
+        self.assertEqual(len(s1FlatCopy.getClefs(returnDefault=False)), 1)
         post = s1FlatCopy.getClefs()[0]
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
+        post = s1.flat.getClefs()[0]
+        self.assertEqual(isinstance(post, clef.AltoClef), True)
         #environLocal.printDebug(['s1.activeSite', s1.activeSite])
+        self.assertEqual(s3 in s1.getSites(), True)
         s1Measures = s1.makeMeasures()
+        #print s1Measures[0].clef
         self.assertEqual(isinstance(s1Measures[0].clef, clef.AltoClef), True)
 
         s2Measures = s2.makeMeasures()
@@ -7347,6 +7352,24 @@ class Test(unittest.TestCase):
         self.assertEqual(str([p.name for p in s.pitches]), 
             "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
         #s.show()
+
+
+    def testSerializationScaffoldA(self):
+        from music21 import note, stream, pitch
+        n1 = note.Note()
+
+        s1 = stream.Stream()
+        s2 = stream.Stream()
+
+        s1.append(n1)
+        s2.append(n1)
+        
+        s2.setupSerializationScaffold()
+        s2.teardownSerializationScaffold()
+
+        self.assertEqual(s2.hasElement(n1), True)
+        self.assertEqual(s1 in n1.getSites(), True)
+        self.assertEqual(s2 in n1.getSites(), True)
 
 
 #------------------------------------------------------------------------------

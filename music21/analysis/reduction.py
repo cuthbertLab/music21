@@ -867,7 +867,7 @@ class Test(unittest.TestCase):
         sr.chordReduction = chords
         #sr.score = src
         post = sr.reduce()
-        post.show()        
+        #post.show()        
 
 
     def testExtractionD(self):

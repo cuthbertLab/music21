@@ -644,6 +644,7 @@ class Accidental(music21.Music21Object):
     }
 
     def __init__(self, specifier='natural'):
+        music21.Music21Object.__init__(self)
 
         # managed by properties
         self._displayType = "normal" # always, never, unless-repeated, even-tied
