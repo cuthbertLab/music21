@@ -100,7 +100,7 @@ def music21ModWSGIJSONApplication(environ, start_response):
     Add this file to the server, ideally not in the document root, 
     on mac this could be /Library/WebServer/wsgi-scripts/music21wsgiapp.py
     
-    Then edit the HTTPD.conf file to redirect any requests to WEBSERVER:/music21interface to call this file:
+    Then edit the httpd.conf file to redirect any requests to WEBSERVER:/music21interface to call this file:
     
     WSGIScriptAlias /music21interface /Library/WebServer/wsgi-scripts/music21wsgiapp.py
     
