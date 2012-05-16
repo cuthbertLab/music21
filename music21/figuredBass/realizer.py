@@ -75,8 +75,6 @@ def figuredBassFromStream(streamPart):
     a realized version of the same line.
     
     
-    .. note:: This example corresponds to example 1b in "fbREALIZER: AUTOMATIC FIGURED BASS REALIZATION FOR MUSIC INFORMATION RETRIEVAL IN music21," which was submitted for consideration for the 12th International Society for Music Information Retrieval Conference (`ISMIR 2011 <http://ismir2011.ismir.net/>`_).
-        
     >>> from music21 import tinyNotation
     >>> from music21.figuredBass import realizer
     >>> s = tinyNotation.TinyNotationStream('C4 D8_6 E8_6 F4 G4_7 c1', '4/4')
@@ -501,13 +499,11 @@ class Realization(object):
     generation of realizations as a :class:`~music21.stream.Score`.
     
     
-    See the :mod:`~music21.figuredBass.examples` module for examples on the generation
-    of realizations.
-    
-    
-    .. note:: A possibility progression is a valid progression through a string of 
-        :class:`~music21.figuredBass.segment.Segment` instances.
-        See :mod:`~music21.figuredBass.possibility` for more details on possibilities.
+    * See the :mod:`~music21.figuredBass.examples` module for examples on the generation
+      of realizations.
+    * A possibility progression is a valid progression through a string of 
+      :class:`~music21.figuredBass.segment.Segment` instances.
+      See :mod:`~music21.figuredBass.possibility` for more details on possibilities.
     '''
     _DOC_ORDER = ['getNumSolutions', 'generateRandomRealization', 'generateRandomRealizations', 'generateAllRealizations',
                   'getAllPossibilityProgressions', 'getRandomPossibilityProgression', 'generateRealizationFromPossibilityProgression']
