@@ -210,9 +210,9 @@ class Volume(object):
         >>> s.insert([0, dynamics.Dynamic('p'), 1, dynamics.Dynamic('mp'), 2, dynamics.Dynamic('mf'), 3, dynamics.Dynamic('f')])
 
         >>> s.notes[0].volume.getRealized()
-        0.42519...
+        0.496...
         >>> s.notes[1].volume.getRealized()
-        0.42519...
+        0.496...
         >>> s.notes[2].volume.getRealized()
         0.63779...
         >>> s.notes[7].volume.getRealized()
@@ -482,10 +482,10 @@ class Test(unittest.TestCase):
         self.assertEqual(v1.getRealizedStr(), '0.5')
 
         d1 = dynamics.Dynamic('p')
-        self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.3')
+        self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.35')
 
         d1 = dynamics.Dynamic('ppp')
-        self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.1')
+        self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.15')
 
 
         d1 = dynamics.Dynamic('fff')
@@ -498,11 +498,11 @@ class Test(unittest.TestCase):
         self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '1.0')
 
         d1 = dynamics.Dynamic('ppp')
-        self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.2')
+        self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.3')
         d1 = dynamics.Dynamic('mp')
         self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.9')
         d1 = dynamics.Dynamic('p')
-        self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.6')
+        self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.7')
 
 
     def testGetRealizedB(self):
@@ -546,7 +546,7 @@ class Test(unittest.TestCase):
         # calling realize will set all to new cached values
         volume.realizeVolume(s)
         match = [n.volume.cachedRealizedStr for n in s.notes]
-        self.assertEqual(match, ['0.21', '0.21', '0.43', '0.43', '0.64', '0.64', '0.99', '0.99', '0.78', '0.78', '1.0', '1.0', '0.14', '0.14', '0.78', '0.78'])
+        self.assertEqual(match, ['0.35', '0.35', '0.5', '0.5', '0.64', '0.64', '0.99', '0.99', '0.78', '0.78', '1.0', '1.0', '0.21', '0.21', '0.78', '0.78'])
 
         # we can get the same results without using realizeVolume, though
         # this uses slower context searches
@@ -556,7 +556,7 @@ class Test(unittest.TestCase):
         for i, d in enumerate(['pp', 'p', 'mp', 'f', 'mf', 'ff', 'ppp', 'mf']):
             s.insert(i*2, dynamics.Dynamic(d))
         match = [n.volume.cachedRealizedStr for n in s.notes]
-        self.assertEqual(match, ['0.21', '0.21', '0.43', '0.43', '0.64', '0.64', '0.99', '0.99', '0.78', '0.78', '1.0', '1.0', '0.14', '0.14', '0.78', '0.78'])
+        self.assertEqual(match, ['0.35', '0.35', '0.5', '0.5', '0.64', '0.64', '0.99', '0.99', '0.78', '0.78', '1.0', '1.0', '0.21', '0.21', '0.78', '0.78'])
 
         # loooking at raw velocity values
         match = [n.volume.velocity for n in s.notes]
@@ -565,7 +565,7 @@ class Test(unittest.TestCase):
         # can set velocity with realized values
         volume.realizeVolume(s, setAbsoluteVelocity=True)
         match = [n.volume.velocity for n in s.notes]
-        self.assertEqual(match, [27, 27, 54, 54, 81, 81, 126, 126, 99, 99, 127, 127, 18, 18, 99, 99])
+        self.assertEqual(match, [45, 45, 63, 63, 81, 81, 126, 126, 99, 99, 127, 127, 27, 27, 99, 99])
 
         #s.show('midi')
 
