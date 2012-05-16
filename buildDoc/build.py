@@ -41,6 +41,7 @@ from music21 import beam
 from music21.braille import basic as brailleBasic
 from music21.braille import examples as brailleExamples
 from music21.braille import translate as brailleTranslate
+from music21.braille import segment as brailleSegment
 
 from music21 import clef
 from music21 import chord
@@ -132,7 +133,7 @@ from music21 import voiceLeading
 from music21 import volume
 
 from music21.webapps import base as webapps
-from music21.webapps import music21wsgiapp as webappsMusic21WsgiApp
+#from music21.webapps import music21wsgiapp as webappsMusic21WsgiApp
 from music21 import xmlnode
 
 
@@ -186,6 +187,7 @@ MODULES = [
     brailleBasic,
     brailleExamples,
     brailleTranslate,
+    brailleSegment,
 
     clef, 
     common,
@@ -269,7 +271,7 @@ MODULES = [
     volume,
 
     webapps,
-    webappsMusic21WsgiApp,
+#    webappsMusic21WsgiApp,
     
     xmlnode, 
     
