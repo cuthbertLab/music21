@@ -292,7 +292,7 @@ Default parameters for setting measures within one staff line
 '''
 defaultMeasureWidth = 500
 defaultMeasuresPerStave = 4
-defaultMeasureMargin = 50
+defaultMeasureMargin = 75
 
 '''
 Determines if voices should be beamed by default
@@ -2303,6 +2303,9 @@ class VexflowScore(object):
 						tieStart = True
 						continue
 
+					thisTieName = str(self.context.getContextName()) + 'Tie' + \
+						str(tieNum)
+
 					if thisLineNum != thisStartLineNum:
 						result +='\nvar '+thisTieName+'Start = new Vex.Flow.StaveTie({\n'+'first_note: '+thisTieStart+'\n});'
 						result +='\nvar '+thisTieName+'End = new Vex.Flow.StaveTie({\n'+'last_note: '+thisTieEnd+'\n});'
@@ -2310,10 +2313,6 @@ class VexflowScore(object):
 						result += '\n'+thisTieName+'End.setContext('+str(self.context.getContextName())+').draw();'
 						tieStart = True
 						continue
-
-
-					thisTieName = str(self.context.getContextName()) + 'Tie' + \
-						str(tieNum)
 
 					result +='\nvar '+thisTieName+' = new Vex.Flow.StaveTie({\n'+\
 						'first_note: '+thisTieStart+',\nlast_note: '+thisTieEnd\
