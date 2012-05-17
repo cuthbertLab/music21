@@ -133,6 +133,7 @@ function setup() {
 </body>
 </html>
 """)
+    
     htmlData = htmlData.safe_substitute(musicxml=musicxml, title=title)
     return (htmlData, 'text/html')
 
