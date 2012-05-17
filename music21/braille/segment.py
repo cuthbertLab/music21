@@ -16,7 +16,6 @@ This module was made in consultation with the manual "Introduction to Braille
 Music Transcription, Second Edition" by Mary Turner De Garmo, 2005. It is
 available from the Library of Congress `here <http://www.loc.gov/nls/music/>`_,
 and will henceforth be referred to as BMTM.
-
 """
 
 from music21 import articulations, bar, chord, clef, dynamics, environment, \
@@ -94,6 +93,11 @@ SEGMENT_SHOWHEADING = True
 SEGMENT_SUPPRESSOCTAVEMARKS = False
 SEGMENT_ENDHYPHEN = False
 SEGMENT_MEASURENUMBERWITHDOT = False
+
+SEGMENT_SLURLONGPHRASEWITHBRACKETS = True
+SEGMENT_SHOWSHORTSLURSANDTIESTOGETHER = False
+SEGMENT_SHOWLONGSLURSANDTIESTOGETHER = False
+SEGMENT_SEGMENTBREAKS=[]
 
 #-------------------------------------------------------------------------------
 
@@ -765,8 +769,9 @@ def findSegments(music21Part, **partKeywords):
     """
     # Slurring
     # --------
-    slurLongPhraseWithBrackets = True
-    showShortSlursAndTiesTogether, showLongSlursAndTiesTogether = False, False
+    slurLongPhraseWithBrackets = SEGMENT_SLURLONGPHRASEWITHBRACKETS
+    showShortSlursAndTiesTogether, showLongSlursAndTiesTogether = \
+    SEGMENT_SHOWSHORTSLURSANDTIESTOGETHER, SEGMENT_SHOWLONGSLURSANDTIESTOGETHER
 
     if 'slurLongPhraseWithBrackets' in partKeywords:
         slurLongPhraseWithBrackets = partKeywords['slurLongPhraseWithBrackets']
@@ -783,7 +788,7 @@ def findSegments(music21Part, **partKeywords):
 
     # Raw Segments
     # ------------
-    segmentBreaks = None
+    segmentBreaks = SEGMENT_SEGMENTBREAKS
     if 'segmentBreaks' in partKeywords:
         segmentBreaks = partKeywords['segmentBreaks']
     allSegments = getRawSegments(music21Part, segmentBreaks)
@@ -799,8 +804,10 @@ def findSegments(music21Part, **partKeywords):
     
     return allSegments
 
-def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = True,
-                        showShortSlursAndTiesTogether = True, showLongSlursAndTiesTogether = True):
+
+def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = SEGMENT_SLURLONGPHRASEWITHBRACKETS,
+                        showShortSlursAndTiesTogether = SEGMENT_SHOWSHORTSLURSANDTIESTOGETHER, 
+                        showLongSlursAndTiesTogether = SEGMENT_SHOWLONGSLURSANDTIESTOGETHER):
     """
     Takes in a :class:`~music21.stream.Part` and three keywords:
     
@@ -885,35 +892,34 @@ def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = True,
     
     
     Below, a tie has been added between the first two notes of the short phrase
-    defined above. If showShortSlursAndTiesTogether is set to its default value 
-    of True, then the slurs and ties are shown together (i.e. the note has both 
-    a shortSlur and a tie).
-    
-    
+    defined above. If showShortSlursAndTiesTogether is set to its default value of 
+    False, then the slur on either side of the phrase is reduced by the amount that 
+    ties are present, as shown below.
+
+
     >>> from music21 import tie
     >>> short.notes[0].tie = tie.Tie("start")
     >>> shortB = copy.deepcopy(short)
-    >>> prepareSlurredNotes(shortB)
+    >>> segment.prepareSlurredNotes(shortB)
     >>> shortB.notes[0].shortSlur
-    True
-    >>> shortB.notes[0].tie
-    <music21.tie.Tie start>
-    
-    
-    If showShortSlursAndTiesTogether is set to False, then the slur on either
-    side of the phrase is reduced by the amount that ties are present, as 
-    shown below.
-    
-    
-    >>> shortC = copy.deepcopy(short)
-    >>> prepareSlurredNotes(shortC, showShortSlursAndTiesTogether=False)
-    >>> shortC.notes[0].shortSlur
     Traceback (most recent call last):
     AttributeError: 'Note' object has no attribute 'shortSlur'
+    >>> shortB.notes[0].tie
+    <music21.tie.Tie start>
+    >>> shortB.notes[1].shortSlur
+    True
+  
+  
+    If showShortSlursAndTiesTogether is set to True, then the slurs and ties are 
+    shown together (i.e. the note has both a shortSlur and a tie).
+
+  
+    >>> shortC = copy.deepcopy(short)
+    >>> segment.prepareSlurredNotes(shortC, showShortSlursAndTiesTogether=True)
+    >>> shortC.notes[0].shortSlur
+    True
     >>> shortC.notes[0].tie
     <music21.tie.Tie start>
-    >>> shortC.notes[1].shortSlur
-    True
     """
     if len(music21Part.spannerBundle) > 0:
         allNotes = music21Part.flat.notes
@@ -947,7 +953,7 @@ def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = True,
                     allNotes[beginIndex + 1].beginLongDoubleSlur = True
                     allNotes[endIndex - 1].endLongDoubleSlur = True
 
-def getRawSegments(music21Part, segmentBreaks=None):
+def getRawSegments(music21Part, segmentBreaks=SEGMENT_SEGMENTBREAKS):
     """
     Takes in a :class:`~music21.stream.Part` and a segmentBreaks list which 
     contains (measureNumber, offsetStart) tuples. These tuples determine how
@@ -1067,7 +1073,7 @@ def getRawSegments(music21Part, segmentBreaks=None):
     mnStart = 10E5
     offsetStart = 0.0
     segmentIndex = 0
-    if not segmentBreaks is None:
+    if len(segmentBreaks) > 0:
         (mnStart, offsetStart) = segmentBreaks[segmentIndex]
     currentSegment = BrailleSegment()
     for music21Measure in music21Part.getElementsByClass(stream.Measure, stream.Voice):
@@ -1133,20 +1139,18 @@ def extractBrailleElements(music21Measure):
     so they are not returned by this method, as seen below.
     
     
-    >>> allElements = segment.extractBrailleElements(measure)
-    >>> import pprint
-    >>> pprint.pprint(allElements)
-    [<music21.meter.TimeSignature 2/4>,
-     <music21.clef.TrebleClef>,
-     <music21.note.Note C>,
-     <music21.note.Note C>,
-     <music21.note.Note C>,
-     <music21.note.Note C>,
-     <music21.note.Note D>,
-     <music21.note.Note D>,
-     <music21.note.Note D>,
-     <music21.note.Note D>,
-     <music21.bar.Barline style=final>]
+    >>> segment.extractBrailleElements(measure)
+    2/4
+    <music21.clef.TrebleClef>
+    <music21.note.Note C>
+    <music21.note.Note C>
+    <music21.note.Note C>
+    <music21.note.Note C>
+    <music21.note.Note D>
+    <music21.note.Note D>
+    <music21.note.Note D>
+    <music21.note.Note D>
+    <music21.bar.Barline style=final>
     """
     allElements = BrailleElementGrouping()
     for music21Object in music21Measure:
@@ -1330,9 +1334,9 @@ def addGroupingAttributes(allSegments, **partKeywords):
     currentKeySig = key.KeySignature(0)
     currentTimeSig = meter.TimeSignature("4/4")
     
-    descendingChords = True
-    showClefSigns = False
-    upperFirstInNoteFingering = True
+    descendingChords = GROUPING_DESC_CHORDS
+    showClefSigns = GROUPING_SHOW_CLEFS
+    upperFirstInNoteFingering = GROUPING_UPPERFIRST_NOTEFINGERING
 
     if 'showClefSigns' in partKeywords:
         showClefSigns = partKeywords['showClefSigns']
