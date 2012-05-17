@@ -11,22 +11,46 @@
 '''
 Webapps is a module designed for using music21 with a webserver.
 
-This file includes the classes and functions used to parse and process requests to music21 running on a server.
+This file includes application-specific components of the webserver.
 
-For information about how to set up a server to use music21, look at the files in webapps.server
-For details about shortcut commands available for music21 server requests, see webapps.templates
-For examples of application-specific commands and templates, see webapps.apps
-For details about various output template options available, see webapps.templates
+It includes a set of applicationInitializers which augment agendas with data and commands
+specific to a given application as well as a set of commands specific to the various applications.
 
 '''
-import commands
+
+import unittest
+import doctest
+
+from music21 import converter
+import music21
 
 def setupURLCorpusParseApp(agenda):
+    '''
+    Augments an agenda with the data and commands related to the URL Corpus Parse App.
+    
+    
+    
+    >>> agenda = music21.webapps.Agenda()
+    >>> agenda.addData('measureEnd','4')
+    >>> agenda.addData('workName',"'bwv7.7'")
+    >>> agenda.addData('command',"commands.reduction")
+    >>> agenda.addData('output',"musicxmlDownload")
+    >>> setupURLCorpusParseApp(agenda)
+    >>> processor = music21.webapps.CommandProcessor(agenda)
+    >>> processor.executeCommands()
+    >>> (responseData, responseContentType) = processor.getOutput()
+    >>> responseContentType
+    'application/vnd.recordare.musicxml+xml'
+    >>> converter.parse(responseData).flat.highestOffset
+    16.5
+    '''
     
     if agenda.getData('measureStart') == None:
         agenda.addData('measureStart',0)
     if agenda.getData('measureEnd') == None:
         agenda.addData('measureEnd','None')
+    if agenda.getData('command') == None:
+        agenda.addData('command','')
         
     agenda.addCommand('function','sc',None,'corpus.parse',['workName'])
     agenda.addCommand('function','sc','sc','measures',['measureStart','measureEnd'])
@@ -43,6 +67,8 @@ def setupURLCorpusParseApp(agenda):
         
     elif agenda.getData('output') == 'vexflow':
         agenda.setOutputTemplate('templates.vexflow',['sc'])
+    elif agenda.getData('output') == 'braille':
+        agenda.setOutputTemplate('templates.braille',['sc'])
 
 def setupZipfileApp(agenda):
     pass
@@ -52,3 +78,16 @@ def setupCognitionApp(agenda):
     pass
 
 applicationInitializers = {'corpusParseApp':setupURLCorpusParseApp}
+
+#-------------------------------------------------------------------------------
+# Tests 
+#-------------------------------------------------------------------------------
+
+class Test(unittest.TestCase):
+    
+    def runTest(self):
+        pass
+
+if __name__ == '__main__':
+    music21.mainTest(Test)
+        

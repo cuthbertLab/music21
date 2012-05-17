@@ -28,4 +28,4 @@ for music21.webapps.base
 
 from music21 import webapps
 
-application = webapps.modWSGIMultipartFormDataApplication
+application = webapps.ModWSGIApplication

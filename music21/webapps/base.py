@@ -13,14 +13,79 @@ Webapps is a module designed for using music21 with a webserver.
 
 This file includes the classes and functions used to parse and process requests to music21 running on a server.
 
-Look at the documentation for 
-
 For information about how to set up a server to use music21, look at the files in webapps.server
-For details about shortcut commands available for music21 server requests, see webapps.templates
 For examples of application-specific commands and templates, see webapps.apps
 For details about various output template options available, see webapps.templates
 
+**Overview of Processing a Request**
+
+1.  The GET and POST data from the request are combined into an agenda object
+    The POST data can in the formats 'application/json', 'multipart/form-data' or 'application/x-www-form-urlencoded'
+    For more information, see the documentation for Agenda and makeAgendaFromRequest
+
+2.  If an appName is specified, additional data and commands are added to the agenda
+    For more information, see the applicationInitializers in apps.py
+
+3.  A CommandProcessor is created for the agenda
+
+4.  The processor parses its dataDict into primitives or music21 objects and saves them to a parsedDataDict
+    For more information, see commandProcessor._parseData()
+
+5.  The processor executes its commandList, modifying its internal parsedDataDict
+    For more information, see commandProcessor.executeCommands()
+
+6.  If outputTemplate is specified, the processor uses a template to generate and output.
+    For more information, see commandProcessor.getOutput() and the templates in templates.py
+
+7.  Otherwise, the data will be returned as JSON, where the variables in the agenda's returnList specify which
+    variables to include in the returned JSON.
+    
+9.  If an error occurs, an error message will be returned to the user 
+
+**Full JSON Example:**
+
+Below is an example of a complete JSON request:
+{
+    "dataDict": {
+        "myNum": {
+            "fmt": "int", 
+            "data": "23"
+        }
+    }, 
+    "returnDict": {
+        "myNum": "int", 
+        "ho": "int"
+    }, 
+    "commandList": [
+        {
+            "function": "corpus.parse", 
+            "argList": [
+                "'bwv7.7'"
+            ], 
+            "resultVariable": "sc"
+        }, 
+        {
+            "function": "transpose", 
+            "argList": [
+                "'p5'"
+            ], 
+            "caller": "sc", 
+            "resultVariable": "sc"
+        }, 
+        {
+            "attribute": "flat", 
+            "caller": "sc", 
+            "resultVariable": "scFlat"
+        }, 
+        {
+            "attribute": "highestOffset", 
+            "caller": "scFlat", 
+            "resultVariable": "ho"
+        }
+    ]
+}
 '''
+
 import unittest
 import doctest
 
@@ -69,33 +134,43 @@ availableDataFormats = ['xml',
                         'int',
                         'float']
 
-# Commands of type function must either be in this list or in the corresponding list
-# in webapps.templates, webapps.commands, or webapps.apps.*
-availableFunctions = ['stream.transpose',
-                      'corpus.parse',
-                      'converter.parse',
-                      'transpose',
-                      'augmentOrDiminish',
-                      'reduction',
-                      'createMensuralCanon',
+# Commands of type function (no caller) must be in this list
+availableFunctions = ['', # A blank string symbolizes no operation, the commandElement will be ignored rather than failing.
                       'checkLeadSheetPitches',
-                      'getResultsString',
+                      'colorAllChords',
+                      'colorAllNotes',
                       'colorResults',
-                      'theoryAnalyzer.identifyParallelFifths',
-                      'theoryAnalyzer.identifyParallelOctaves',
+                      'commands.reduction',
+                      'commands.runPerceivedDissonanceAnalysis',
+                      'commands.generateIntervals',
+                      'converter.parse',
+                      'corpus.parse',
+                      'createMensuralCanon',
+                      'getResultsString',
+                      'generateChords',
+                      'reduction',
+                      'stream.transpose',
+                      'tempo.MetronomeMark',
                       'theoryAnalyzer.identifyHiddenFifths',
                       'theoryAnalyzer.identifyHiddenOctaves',
-                      'colorAllNotes',
-                      'colorAllChords',
-                      '__getitem__',
+                      'theoryAnalyzer.identifyParallelFifths',
+                      'theoryAnalyzer.identifyParallelOctaves',
                       'writeMIDIFileToServer',
-                      'tempo.MetronomeMark',
+                      
+                      '__getitem__',
+                      'augmentOrDiminish',
                       'insert',
-                      'commands.runPerceivedDissonanceAnalysis',
                       'measures',
-                      'generateChords',
-                      'commands.generateIntervals',
-                      'commands.reduction']
+                      'transpose'
+                      ] 
+
+# Commands of type method (have a caller) must be in this list
+availableMethods = ['__getitem__',
+                    'augmentOrDiminish',
+                    'insert',
+                    'measures'
+                    'transpose',
+                    ]
 
 # Commands of type attribute must be in this list
 availableAttribtues = ['highestOffset',
@@ -107,64 +182,12 @@ availableAttribtues = ['highestOffset',
 availableOutputTemplates = ['templates.noteflightEmbed',
                             'templates.musicxmlText',
                             'templates.musicxmlFile',
-                            'templates.vexflow']
+                            'templates.vexflow',
+                            'templates.braille']
 
 #-------------------------------------------------------------------------------
 
-def ModWSGIApplication(environ, start_response, requestFormat):
-    '''
-    Application function in proper format for a mod_wsgi Application:
-    Reads the contents of a post request, and passes the data string to
-    webapps.processDataString for further processing. 
-        
-    For an example of how to install this application on a server see webapps.server.wsgiapp.py
-    
-    The request to the application should have the following structures:
-
-    >>> environ = {}              # environ is usually created by the server. Manually constructing dictionary for demonstrated
-    >>> wsgiInput = StringIO.StringIO()    # wsgi.input is usually a buffer containing the contents of a POST request. Using StringIO to demonstrate
-    >>> wsgiInput.write(sampleFormDataSimple)
-    >>> wsgiInput.seek(0)
-    >>> environ['wsgi.input'] = wsgiInput
-    >>> environ['QUERY_STRING'] = ""
-    >>> environ['DOCUMENT_ROOT'] = "/Library/WebServer/Documents"
-    >>> environ['HTTP_HOST'] = "ciconia.mit.edu"
-    >>> environ['SCRIPT_NAME'] = "/music21/unifiedinterface"
-    >>> start_response = lambda status, headers: None         # usually called by mod_wsgi server. Used to initiate response
-    >>> #modWSGIMultipartFormDataApplication(environ, start_response)
-    ['{"status": "success", "dataDict": {"a": {"fmt": "int", "data": "3"}}, "errorList": []}']
-    '''
-    # This additional environment information is needed primarily in the context of writing files to a
-    # to a file on the server or including links back to the server in returned HTML templates    
-    documentRoot = environ['DOCUMENT_ROOT']     # Path to ducment root     e.g. /Library/WebServer/Documents
-    hostName = environ['HTTP_HOST']             # Host name                e.g. ciconia.mit.edu
-    scriptName = environ['SCRIPT_NAME']         # Mount point on server    e.g. /music21/unifiedinterface
-    serverConfigInfo = {"DOCUMENT_ROOT":documentRoot,
-                        "HTTP_HOST":hostName,
-                        "SCRIPT_NAME":scriptName}
-
-    # Get content of request: is in a file-like object that will need to be .read() to get content
-    requestInput = environ['wsgi.input']
-    try:        
-        agenda = makeAgendaFromRequest(requestInput,environ,requestFormat)
-        processor = CommandProcessor(agenda)
-        processor.executeCommands()
-        (responseData, responseContentType) = processor.getOutput()
-        #(responseData, responseContentType) = (str(agenda), 'text/plain')
-        
-    # Handle any unexpected exceptions
-    except Exception as e:
-        errorData = 'music21_server_error:\n'
-        errorData += traceback.format_exc()
-        sys.stderr.write(errorData)
-        (responseData, responseContentType) = (errorData, 'text/plain')
-
-    start_response('200 OK', [('Content-type', responseContentType),
-                              ('Content-Length', str(len(responseData)))])
-
-    return [responseData]
-
-def modWSGIJSONApplication(environ, start_response):
+def ModWSGIApplication(environ, start_response):
     '''
     Application function in proper format for a mod_wsgi Application:
     Reads the contents of a post request, and passes the data string to
@@ -183,39 +206,43 @@ def modWSGIJSONApplication(environ, start_response):
     >>> environ['DOCUMENT_ROOT'] = "/Library/WebServer/Documents"
     >>> environ['HTTP_HOST'] = "ciconia.mit.edu"
     >>> environ['SCRIPT_NAME'] = "/music21/unifiedinterface"
+    >>> environ['CONTENT_TYPE'] = "application/json"
     >>> start_response = lambda status, headers: None         # usually called by mod_wsgi server. Used to initiate response
-    >>> modWSGIJSONApplication(environ, start_response)
+    >>> ModWSGIApplication(environ, start_response)
     ['{"status": "success", "dataDict": {"a": {"fmt": "int", "data": "3"}}, "errorList": []}']
     '''
-    return ModWSGIApplication(environ,start_response,'text/json')
-
-def modWSGIMultipartFormDataApplication(environ, start_response):
-    '''
-    Application function in proper format for a mod_wsgi Application:
-    Reads the contents of a post request, and passes the data string to
-    webapps.processDataString for further processing. 
-        
-    For an example of how to install this application on a server see webapps.server.wsgiapp.py
+    # This additional environment information is needed primarily in the context of writing files to a
+    # to a file on the server or including links back to the server in returned HTML templates    
+    documentRoot = environ['DOCUMENT_ROOT']     # Path to ducment root     e.g. /Library/WebServer/Documents
+    hostName = environ['HTTP_HOST']             # Host name                e.g. ciconia.mit.edu
+    scriptName = environ['SCRIPT_NAME']         # Mount point on server    e.g. /music21/unifiedinterface
+    serverConfigInfo = {"DOCUMENT_ROOT":documentRoot,
+                        "HTTP_HOST":hostName,
+                        "SCRIPT_NAME":scriptName}
     
-    The request to the application should have the following structures:
-    '''
-#    Works on server, having trouble implementing it via a doctest:
-#
-#    >>> environ = {}              # environ is usually created by the server. Manually constructing dictionary for demonstrated
-#    >>> wsgiInput = StringIO.StringIO()    # wsgi.input is usually a buffer containing the contents of a POST request. Using StringIO to demonstrate
-#    >>> wsgiInput.write(sampleFormDataSimple)
-#    >>> wsgiInput.seek(0)
-#    >>> environ['wsgi.input'] = wsgiInput
-#    >>> environ['QUERY_STRING'] = ""
-#    >>> environ['DOCUMENT_ROOT'] = "/Library/WebServer/Documents"
-#    >>> environ['HTTP_HOST'] = "ciconia.mit.edu"
-#    >>> environ['SCRIPT_NAME'] = "/music21/unifiedinterface"
-#    >>> start_response = lambda status, headers: None         # usually called by mod_wsgi server. Used to initiate response
-#    >>> #modWSGIMultipartFormDataApplication(environ, start_response)
-#    ['{"status": "success", "dataDict": {"a": {"fmt": "int", "data": "3"}}, "errorList": []}']
-#    '''
-    return ModWSGIApplication(environ,start_response,'multipart/form-data')
+    requestFormat = str(environ.get("CONTENT_TYPE")).split(';')[0]
 
+    # Get content of request: is in a file-like object that will need to be .read() to get content
+    requestInput = environ['wsgi.input']
+    try:        
+        agenda = makeAgendaFromRequest(requestInput,environ,requestFormat)
+        processor = CommandProcessor(agenda)
+        processor.executeCommands()
+        (responseData, responseContentType) = processor.getOutput()
+        #(responseData, responseContentType) = (str(debug), 'text/plain')
+        
+    # Handle any unexpected exceptions
+    # TODO: Change output based on environment variables...
+    except Exception as e:
+        errorData = 'music21_server_error:\n'
+        errorData += traceback.format_exc()
+        sys.stderr.write(errorData)
+        (responseData, responseContentType) = (errorData, 'text/plain')
+
+    start_response('200 OK', [('Content-type', responseContentType),
+                              ('Content-Length', str(len(responseData)))])
+
+    return [responseData]
 
 #-------------------------------------------------------------------------------
 
@@ -234,7 +261,7 @@ def makeAgendaFromRequest(requestInput, environ, requestFormat = None):
     >>> requestInput.seek(0)
     
     >>> environ = {"QUERY_STRING":"b=3", "DOCUMENT_ROOT": "/Library/WebServer/Documents", "HTTP_HOST": "ciconia.mit.edu", "SCRIPT_NAME": "/music21/unifiedinterface"}
-    >>> agenda = makeAgendaFromRequest(requestInput, environ, 'text/json')
+    >>> agenda = makeAgendaFromRequest(requestInput, environ, 'application/json')
     >>> agenda
     {'dataDict': {u'a': {u'data': 3}, 'b': {'data': '3'}}, 'returnDict': {}, 'commandList': []}
    
@@ -249,7 +276,7 @@ def makeAgendaFromRequest(requestInput, environ, requestFormat = None):
     combinedFormFields = {}
     
     # Determine the correct format of the input. Combine the post and get data into combinedFormFields dictionary.
-    if requestFormat == 'text/json':
+    if requestFormat == 'application/json':
         agenda.loadJson(requestInput.read())
     elif requestFormat == 'multipart/form-data':
         postFormFields = cgi.FieldStorage(requestInput, environ = environ)  
@@ -268,7 +295,6 @@ def makeAgendaFromRequest(requestInput, environ, requestFormat = None):
            
     # Load json as first priority if it is set
     if 'json' in combinedFormFields:
-        print combinedFormFields['json']
         agenda.loadJson(combinedFormFields['json'])
     
     # These keys will not go into dataDataDict
@@ -324,8 +350,47 @@ def setupApplication(agenda, appName = None):
 
 class Agenda(dict):
     '''
-    Subclass of dictionary that represents data and commands to be run through
-    the command processor
+    Subclass of dictionary that represents data and commands to be processed by a CommandProcessor.
+    
+    The Agenda contains the following keys:
+    
+    **'dataDict'** whose value is a dictionary specifying data to be inputted to the processor of the form:
+        "dataDict" : {"<VARIABLE_1_NAME>": {"data": "<VARIABLE_1_DATA>",
+                                            "fmt":  "<VARIABLE_1_FMT>"},
+                      "<VARIABLE_2_NAME>": {"data": "<VARIABLE_2_DATA>",
+                                            "fmt":  "<VARIABLE_2_FMT>"},
+                      etc.
+                      }
+        where the variable formats are elements of availableDataFormats ("str","int","musicxml", etc.)
+    
+    **'commandList'**  whose value is a list specifying commands to be executed by the processor of the form::
+        "commandList" : [{"type":       "<CMD_1_TYPE>",
+                          "resultVar":  "<CMD_1_RESULT_VARIABLE>",
+                          "caller":     "<CMD_1_CALLER>",
+                          "command":    "<CMD_1_COMMAND_NAME>",
+                          "argList":    ['<CMD_1_ARG_1>','<CMD_1_ARG_2>'...]},
+                          
+                          {"type":      "<CMD_2_TYPE>",
+                          "resultVar":  "<CMD_2_RESULT_VARIABLE>",
+                          "caller":     "<CMD_2_CALLER>",
+                          "command":    "<CMD_2_COMMAND_NAME>",
+                          "argList":    ['<CMD_2_ARG_1>','<CMD_2_ARG_2>'...]},
+                          etc.
+                          ]
+        Calling .executeCommands() iterates through the commandList sequentially, calling the equivalent of:
+        <CMD_n_RESULT_VARAIBLE> = <CMD_n_CALLER>.<CMD_n_COMMAND_NAME>(<CMD_n_ARG_1>,<CMD_n_ARG_2>...)
+        
+        where the command TYPE is "function", "method", or "attribute"
+    
+    **'returnList'** whose value is a list specifying the variables to be returned from the server.
+        "returnList" : ["<VARIABLE_1_NAME>","<VARIABLE_2_NAME>", etc.]
+        
+        returnList is used to limit JSON output to only the relevant variables. If returnList is not specified,
+        the entire set of variables in the processor's environment will be returned in string format.
+        
+    **'outputTemplate'**  which specifies the return template to be used
+    **'outputArgList'**   which specifies what arguments to pass the return template
+    
     '''
     def __init__(self):
         '''
@@ -436,6 +501,12 @@ class Agenda(dict):
         '''
         Specifies the output template that will be used for the agenda.
         
+        >>> agenda = Agenda()
+        >>> agenda
+        {'dataDict': {}, 'returnDict': {}, 'commandList': []}
+        >>> agenda.setOutputTemplate('templates.noteflightEmbed',['sc'])
+        >>> agenda
+        {'dataDict': {}, 'returnDict': {}, 'outputArgList': ['sc'], 'commandList': [], 'outputTemplate': 'templates.noteflightEmbed'}
         '''
         self['outputTemplate'] = outputTemplate
         self['outputArgList'] = outputArgList
@@ -465,16 +536,20 @@ class Agenda(dict):
 
 class CommandProcessor(object):
     '''
-    Object used to coordinate requests to music21.
+    Processes server request for music21.
     
-    Takes a agenda string as input, parses data specified in dataDict,
-    executes the commands in commandList, and returns data specified
-    in the returnDict.
-    
-    If outputTemplate and outputArgs are specified, result will be generated
-    by the corresponding outputTemplate (image embeds, file writes, etc.)
+    Takes an Agenda (dict) as input, containing the keys:
+    'dataDict'
+    'commandList'
+    'returnDict'
+    'outputTemplate'
+    'outputArgList'
+
     '''
     def __init__(self,agenda):
+        '''
+        Given an agenda 
+        '''
         self.agenda = agenda
         self.rawDataDict = {}
         self.parsedDataDict = {}
@@ -569,10 +644,7 @@ class CommandProcessor(object):
                     data = []
                     for elementStr in dataStr:
                         if common.isStr(elementStr):
-                            (matchFound, dataElement) = self.parseStringToPrimitive(elementStr)
-                            if not matchFound:
-                                self.recordError("format could not be detected for data element  "+str(elementStr))
-                                continue
+                            dataElement = self.parseStringToPrimitive(elementStr)
                         else:
                             dataElement = elementStr
                         data.append(dataElement)
@@ -589,10 +661,9 @@ class CommandProcessor(object):
                         self.recordError("Error parsing data variable "+name+": "+unicode(e)+"\n\n"+dataStr,e)
                         continue
             else: # No format specified
-                (matchFound, data) = self.parseStringToPrimitive(dataStr)
-                if not matchFound:
-                    self.recordError("format could not be detected for data element  "+str(dataDictElement))
-                    continue
+                dataStr = str(dataStr)
+                data = self.parseStringToPrimitive(dataStr)
+                
                 
             self.parsedDataDict[name] = data
                 
@@ -636,7 +707,13 @@ class CommandProcessor(object):
                 
                 if functionName in self.parsedDataDict.keys():
                     functionName = self.parsedDataDict[functionName]
-                if functionName not in availableFunctions:
+                if functionName == '':
+                    if 'caller' in commandElement.keys() and  'resultVariable' in commandElement.keys():
+                        callerName = commandElement['caller']
+                        resultVarName = commandElement['resultVariable']
+                        self.parsedDataDict[resultVarName]
+                    continue
+                elif functionName not in availableFunctions:
                     self.recordError("unknown function "+str(functionName)+" :"+str(commandElement))
                     continue
                 
@@ -645,10 +722,7 @@ class CommandProcessor(object):
                 else:
                     argList = commandElement['argList']
                     for (i,arg) in enumerate(argList):
-                        (matchFound, parsedArg) = self.parseStringToPrimitive(arg)
-                        if not matchFound:
-                            self.recordError("invalid argument "+str(arg)+" :"+str(commandElement))
-                            continue
+                        parsedArg = self.parseStringToPrimitive(arg)
                         argList[i] = parsedArg
 
                 if 'caller' in commandElement.keys(): # Caller Specified
@@ -759,46 +833,72 @@ class CommandProcessor(object):
         return errorStr
     
     def parseStringToPrimitive(self, strVal):
-        returnVal = None
-        foundMatch = False
+        '''
+        Determines what format a given string is in and returns a value in that format..
+        First checks if it is the name of a variable defined in the parsedDataDict or the
+        name of an allowable function. In either of these cases, it will return the actual value
+        of the data or the actual function.
         
-        if strVal in self.parsedDataDict.keys():
+        Next, it will check if the string is an int, float, boolean, or none, returning the appropriate value.
+        If it is a quoted string then it will remove the quotes on the ends and return it as a string.
+        If no type can be determined, raises an exception
+        
+        >>> agenda = Agenda()
+        >>> agenda.addData("a",2)
+        >>> agenda.addData("b",[1,2,3],"list")
+        >>> processor = CommandProcessor(agenda)
+        >>> processor.parseStringToPrimitive("a")
+        2
+        >>> processor.parseStringToPrimitive("b")
+        [1, 2, 3]
+        >>> processor.parseStringToPrimitive("1.0")
+        1.0
+        >>> processor.parseStringToPrimitive("2")
+        2
+        >>> processor.parseStringToPrimitive("True")
+        True
+        >>> processor.parseStringToPrimitive("False")
+        False
+        >>> processor.parseStringToPrimitive("None") == None
+        True
+        >>> processor.parseStringToPrimitive("'hi'")
+        'hi'
+        >>> processor.parseStringToPrimitive("'Madam I\'m Adam'")
+        "Madam I'm Adam"
+        '''
+        returnVal = None
+        
+        strVal = strVal.strip() # removes whitespace on ends
+        
+        if strVal in self.parsedDataDict.keys(): # Used to specify data via variable name
             returnVal = self.parsedDataDict[strVal]
-            foundMatch = True
-        elif strVal in availableFunctions: #Used to specify function via variable name
+        elif strVal in availableFunctions: # Used to specify function via variable name
             returnVal = strVal
-            foundMatch = True
         else:
             try:
                 returnVal = int(strVal)
-                foundMatch = True
             except:
                 try:
                     returnVal = float(strVal)
-                    foundMatch = True
                 except:
                     if strVal == "True":
                         returnVal = True
-                        foundMatch = True
+                        
                     elif strVal == "None":
                         returnVal = None
-                        foundMatch = True
+                        
                     elif strVal == "False":
-                        foundMatch = True
                         returnVal = False
-                    elif strVal.count("'") == 2: # Single Quoted String
-                        returnVal = strVal.replace("'","") # remove excess quotes
-                        foundMatch = True
-                    elif strVal.count("\"") == 2: # Double Quoted String
-                        returnVal = strVal.replace("\"","") # remove excess quotes
-                        foundMatch = True
-                    else:
+                        
+                    elif strVal[0] == '"' and strVal[-1] == '"': # Double Quoted String
+                        returnVal = strVal[1:-1] # remove quotes
+                        
+                    elif strVal[0] == "'" and strVal[-1] == "'": # Single Quoted String
+                        returnVal = strVal[1:-1] # remove quotes
+                        
+                    else: 
                         returnVal = cgi.escape(str(strVal))
-                        foundMatch = True
-        if foundMatch:
-            return (True, returnVal)
-        else:
-            return (False, None)
+        return returnVal
     
     def getOutput(self):
         '''
@@ -807,11 +907,10 @@ class CommandProcessor(object):
         will return json by default.
         
         Return is of the tyle (output, outputType) where outputType is a content-type ready for returning to the server:
-        "text/plain", "text/json", "text/html", etc.
+        "text/plain", "application/json", "text/html", etc.
         '''
-        print self.outputTemplate
         if self.outputTemplate == "":
-            output =  json.dumps(self.getResultObject(),indent=4)
+            output =  json.dumps(self.getResultObject())
             outputType = 'text/plain'
             
         elif self.outputTemplate not in availableOutputTemplates:
@@ -822,10 +921,7 @@ class CommandProcessor(object):
         else:
             argList = self.outputArgList
             for (i,arg) in enumerate(argList):
-                (matchFound, parsedArg) = self.parseStringToPrimitive(arg)
-                if not matchFound:
-                    self.recordError("invalid argument in outputTemplate: "+str(arg)+" :")
-                    return (None, None)
+                parsedArg = self.parseStringToPrimitive(arg)
                 argList[i] = parsedArg             
             (output, outputType) = eval(self.outputTemplate)(*argList)
         return (output, outputType)
