@@ -50,9 +50,12 @@ class BrailleText():
             noteGrouping = elementKeywords['noteGrouping']
             showLeadingOctave = elementKeywords['showLeadingOctave']
             forceHyphen = False
+            forceNewline = False
             if 'forceHyphen' in elementKeywords:
                 forceHyphen = elementKeywords['forceHyphen']
-            self.addNoteGrouping(noteGrouping, showLeadingOctave, withHyphen, forceHyphen)
+            if 'forceNewline' in elementKeywords:
+                forceNewline = elementKeywords['forceNewline']
+            self.addNoteGrouping(noteGrouping, showLeadingOctave, withHyphen, forceHyphen, forceNewline)
         elif 'inaccord' in elementKeywords:
             inaccord = elementKeywords['inaccord']
             self.addInaccord(inaccord)
@@ -126,7 +129,8 @@ class BrailleText():
             self.makeNewLine()
         self.currentLine.append(measureNumber, addSpace = False)
 
-    def addNoteGrouping(self, noteGrouping, showLeadingOctave = False, withHyphen = False, forceHyphen = False):
+    def addNoteGrouping(self, noteGrouping, showLeadingOctave = False, withHyphen = False,
+                         forceHyphen = False, forceNewline = False):
         addSpace = True
         if not self.currentLine.containsNoteGrouping:
             if self.rightHandSymbol or self.leftHandSymbol:
@@ -148,8 +152,8 @@ class BrailleText():
             else:
                 self.currentLine.append(noteGrouping, addSpace = addSpace)
         except BrailleTextException:
-            if self.lineLength - self.currentLine.textLocation > self.lineLength / 4 <= len(noteGrouping):
-                raise BrailleTextException("Split Note Grouping")
+            if not forceNewline and self.lineLength - self.currentLine.textLocation > self.lineLength / 4 <= len(noteGrouping):
+                    raise BrailleTextException("Split Note Grouping")
             elif not showLeadingOctave:
                 raise BrailleTextException("Recalculate Note Grouping With Leading Octave")
             else:
