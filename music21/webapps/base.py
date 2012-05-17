@@ -9,16 +9,22 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''
-Functions for implementing server-based web interfaces. 
+Webapps is a module designed for using music21 with a webserver.
 
-This module reads JSON strings as POSTs and implements
-the interaction mapping the request contents to music21 functions
-and returning appropriate results.
+This file includes the classes and functions used to parse and process requests to music21 running on a server.
 
-WORK IN PROGRESS
+Look at the documentation for 
+
+For information about how to set up a server to use music21, look at the files in webapps.server
+For details about shortcut commands available for music21 server requests, see webapps.templates
+For examples of application-specific commands and templates, see webapps.apps
+For details about various output template options available, see webapps.templates
+
 '''
-#from __future__ import unicode_literals
+import unittest
+import doctest
 
+# music21 imports
 import music21
 from music21 import common
 from music21 import converter
@@ -31,20 +37,25 @@ from music21 import clef
 from music21 import tempo
 from music21.demos.theoryAnalysis import theoryAnalyzer
 
+# webapps imports
+import commands
+import templates
+import apps
+
+# python library imports
 import json
 import zipfile
 import cgi
+import urlparse
 import re
-import unittest
-import doctest
-
-import commands
-
 import sys
 import traceback
 
-from StringIO import StringIO
+import StringIO
 
+#-------------------------------------------------------------------------------
+
+# Valid format types for data input to the server
 availableDataFormats = ['xml',
                         'musicxml',
                         'abc',
@@ -58,6 +69,8 @@ availableDataFormats = ['xml',
                         'int',
                         'float']
 
+# Commands of type function must either be in this list or in the corresponding list
+# in webapps.templates, webapps.commands, or webapps.apps.*
 availableFunctions = ['stream.transpose',
                       'corpus.parse',
                       'converter.parse',
@@ -68,181 +81,449 @@ availableFunctions = ['stream.transpose',
                       'checkLeadSheetPitches',
                       'getResultsString',
                       'colorResults',
-                      'identifyParallelFifths',
-                      'identifyParallelOctaves',
-                      'identifyHiddenFifths',
-                      'identifyHiddenOctaves',
-                      'theoryAnalyzer.TheoryAnalyzer',
-                      'changeColorOfAllNotes',
-                      'changeColorOfAllChords',
+                      'theoryAnalyzer.identifyParallelFifths',
+                      'theoryAnalyzer.identifyParallelOctaves',
+                      'theoryAnalyzer.identifyHiddenFifths',
+                      'theoryAnalyzer.identifyHiddenOctaves',
+                      'colorAllNotes',
+                      'colorAllChords',
                       '__getitem__',
                       'writeMIDIFileToServer',
                       'tempo.MetronomeMark',
                       'insert',
                       'commands.runPerceivedDissonanceAnalysis',
-                      'measures']
+                      'measures',
+                      'generateChords',
+                      'commands.generateIntervals',
+                      'commands.reduction']
 
+# Commands of type attribute must be in this list
 availableAttribtues = ['highestOffset',
                        'flat',
-                       '_theoryScore']
+                       '_theoryScore',
+                       'musicxml']
 
-def music21ModWSGIJSONApplication(environ, start_response):
+# Commands of type attribute must be in this list
+availableOutputTemplates = ['templates.noteflightEmbed',
+                            'templates.musicxmlText',
+                            'templates.musicxmlFile']
+
+#-------------------------------------------------------------------------------
+
+def ModWSGIApplication(environ, start_response, requestFormat):
     '''
-    Application function in proper format for a MOD-WSGI Application:
-    Reads the contents of a post request, and passes the JSON string to
-    webapps.processJSONData for further processing. 
-    Returns a proper HTML response.
+    Application function in proper format for a mod_wsgi Application:
+    Reads the contents of a post request, and passes the data string to
+    webapps.processDataString for further processing. 
+        
+    For an example of how to install this application on a server see webapps.server.wsgiapp.py
     
-    An interface for music21 using mod_wsgi
-    
-    To use, first install mod_wsgi and include it in the HTTPD.conf file.
-    
-    Add this file to the server, ideally not in the document root, 
-    on mac this could be /Library/WebServer/wsgi-scripts/music21wsgiapp.py
-    
-    Then edit the httpd.conf file to redirect any requests to WEBSERVER:/music21interface to call this file:
-    
-    WSGIScriptAlias /music21interface /Library/WebServer/wsgi-scripts/music21wsgiapp.py
-    
-    Further down the conf file, give the webserver access to this directory::
-    
-        <Directory "/Library/WebServer/wsgi-scripts">
-            Order allow,deny
-            Allow from all
-        </Directory>
-    
-    The mod_wsgi handler will call the application function below with the request
-    content in the environ variable.
-    
-    To use the post, send a POST request to WEBSERVER:/music21interface
-    where the contents of the POST is a JSON string.
-    
-    See processJSONSTring below for specifications about the structure of this string.
+    The request to the application should have the following structures:
+
+    >>> environ = {}              # environ is usually created by the server. Manually constructing dictionary for demonstrated
+    >>> wsgiInput = StringIO.StringIO()    # wsgi.input is usually a buffer containing the contents of a POST request. Using StringIO to demonstrate
+    >>> wsgiInput.write(sampleFormDataSimple)
+    >>> wsgiInput.seek(0)
+    >>> environ['wsgi.input'] = wsgiInput
+    >>> environ['QUERY_STRING'] = ""
+    >>> environ['DOCUMENT_ROOT'] = "/Library/WebServer/Documents"
+    >>> environ['HTTP_HOST'] = "ciconia.mit.edu"
+    >>> environ['SCRIPT_NAME'] = "/music21/unifiedinterface"
+    >>> start_response = lambda status, headers: None         # usually called by mod_wsgi server. Used to initiate response
+    >>> #modWSGIMultipartFormDataApplication(environ, start_response)
+    ['{"status": "success", "dataDict": {"a": {"fmt": "int", "data": "3"}}, "errorList": []}']
     '''
-    status = '200 OK'
+    # This additional environment information is needed primarily in the context of writing files to a
+    # to a file on the server or including links back to the server in returned HTML templates    
+    documentRoot = environ['DOCUMENT_ROOT']     # Path to ducment root     e.g. /Library/WebServer/Documents
+    hostName = environ['HTTP_HOST']             # Host name                e.g. ciconia.mit.edu
+    scriptName = environ['SCRIPT_NAME']         # Mount point on server    e.g. /music21/unifiedinterface
+    serverConfigInfo = {"DOCUMENT_ROOT":documentRoot,
+                        "HTTP_HOST":hostName,
+                        "SCRIPT_NAME":scriptName}
 
-    json_str = environ['wsgi.input'].read()
+    # Get content of request: is in a file-like object that will need to be .read() to get content
+    requestInput = environ['wsgi.input']
+    try:        
+        agenda = makeAgendaFromRequest(requestInput,environ,requestFormat)
+        processor = CommandProcessor(agenda)
+        processor.executeCommands()
+        (responseData, responseContentType) = processor.getOutput()
+        #(responseData, responseContentType) = (str(agenda), 'text/plain')
+        
+    # Handle any unexpected exceptions
+    except Exception as e:
+        errorData = 'music21_server_error:\n'
+        errorData += traceback.format_exc()
+        sys.stderr.write(errorData)
+        (responseData, responseContentType) = (errorData, 'text/plain')
 
-    json_str_response = processJSONString(json_str)
+    start_response('200 OK', [('Content-type', responseContentType),
+                              ('Content-Length', str(len(responseData)))])
 
-    response_headers = [('Content-type', 'text/plain'),
-        ('Content-Length', str(len(json_str_response)))]
+    return [responseData]
 
-    start_response(status, response_headers)
-
-    return [json_str_response]
-
-def processJSONString(json_request_str):
+def modWSGIJSONApplication(environ, start_response):
     '''
-    Takes in a raw JSON string, parses the structure into an object **WHAT KIND OF OBJECT**,
-    executes the corresponding music21 functions, and returns a string of raw JSON detailing the result
-    '''
+    Application function in proper format for a mod_wsgi Application:
+    Reads the contents of a post request, and passes the data string to
+    webapps.processDataString for further processing. 
+        
+    For an example of how to install this application on a server see webapps.server.wsgiapp.py
     
-    '''
-    {
-    "dataDict": {
-        "myNum":
-            {"fmt" : "int",
-             "data" : "23"}
-    },
-    "commandList":[
-        {"function":"corpus.parse",
-         "argList":["'bwv7.7'"],
-         "resultVariable":"sc"},
-         
-        {"function":"transpose",
-         "caller":"sc",
-         "argList":["'p5'"],
-         "resultVariable":"sc"},
-         
-    
-        {"attribute":"flat",
-         "caller":"sc",
-         "resultVariable":"scFlat"},
-         
-        {"attribute":"highestOffset",
-         "caller":"scFlat",
-         "resultVariable":"ho"}
-    ],
-    "returnDict":{
-        "myNum" : "int",
-        "ho"    : "int"
-        }
-    }
-    
-    '''
-    agendaDict = AgendaDict()
-    
-    json_request_str = unicode(json_request_str, 'utf-8')
+    The request to the application should have the following structures:
 
-    agendaDict.loadJson(json_request_str)
-    request_obj = RequestObject(agendaDict)
-    request_obj.executeCommands()
-    result_obj = request_obj.getResultObject();
-    json_result_str = json.dumps(result_obj)
-    return json_result_str
+    >>> environ = {}              # environ is usually created by the server. Manually constructing dictionary for demonstrated
+    >>> wsgiInput = StringIO.StringIO()    # wsgi.input is usually a buffer containing the contents of a POST request. Using StringIO to demonstrate
+    >>> wsgiInput.write('{"dataDict":{"a":{"data":3}},"returnDict":{"a":"int"}}')
+    >>> wsgiInput.seek(0)
+    >>> environ['wsgi.input'] = wsgiInput
+    >>> environ['QUERY_STRING'] = ""
+    >>> environ['DOCUMENT_ROOT'] = "/Library/WebServer/Documents"
+    >>> environ['HTTP_HOST'] = "ciconia.mit.edu"
+    >>> environ['SCRIPT_NAME'] = "/music21/unifiedinterface"
+    >>> start_response = lambda status, headers: None         # usually called by mod_wsgi server. Used to initiate response
+    >>> modWSGIJSONApplication(environ, start_response)
+    ['{"status": "success", "dataDict": {"a": {"fmt": "int", "data": "3"}}, "errorList": []}']
+    '''
+    return ModWSGIApplication(environ,start_response,'text/json')
 
-class AgendaDict(dict):
+def modWSGIMultipartFormDataApplication(environ, start_response):
     '''
-    subclass of dictionary that represents data and commands to be run
-    through the request object and formats to be returned.
+    Application function in proper format for a mod_wsgi Application:
+    Reads the contents of a post request, and passes the data string to
+    webapps.processDataString for further processing. 
+        
+    For an example of how to install this application on a server see webapps.server.wsgiapp.py
     
+    The request to the application should have the following structures:
     '''
+#    Works on server, having trouble implementing it via a doctest:
+#
+#    >>> environ = {}              # environ is usually created by the server. Manually constructing dictionary for demonstrated
+#    >>> wsgiInput = StringIO.StringIO()    # wsgi.input is usually a buffer containing the contents of a POST request. Using StringIO to demonstrate
+#    >>> wsgiInput.write(sampleFormDataSimple)
+#    >>> wsgiInput.seek(0)
+#    >>> environ['wsgi.input'] = wsgiInput
+#    >>> environ['QUERY_STRING'] = ""
+#    >>> environ['DOCUMENT_ROOT'] = "/Library/WebServer/Documents"
+#    >>> environ['HTTP_HOST'] = "ciconia.mit.edu"
+#    >>> environ['SCRIPT_NAME'] = "/music21/unifiedinterface"
+#    >>> start_response = lambda status, headers: None         # usually called by mod_wsgi server. Used to initiate response
+#    >>> #modWSGIMultipartFormDataApplication(environ, start_response)
+#    ['{"status": "success", "dataDict": {"a": {"fmt": "int", "data": "3"}}, "errorList": []}']
+#    '''
+    return ModWSGIApplication(environ,start_response,'multipart/form-data')
+
+
+#-------------------------------------------------------------------------------
+
+def makeAgendaFromRequest(requestInput, environ, requestFormat = None):
+    '''
+    Takes in a file-like requestInput (has .read()) containing form/multipart data
+    and a dictionary-like serverConfigInfo, containing at a minimum keys QUERY
+    Combines information from form fields and server info into an agenda object
+    that can be used with the CommandProcessor.
+    
+    Note that variables specified via query string will always be returned as a list,
+    regardless of how many times the variable is specified.
+    
+    >>> requestInput = StringIO.StringIO() # requestInput should be buffer from the server application. Using StringIO for demonstration
+    >>> requestInput.write('{"dataDict":{"a":{"data":3}}}')
+    >>> requestInput.seek(0)
+    
+    >>> environ = {"QUERY_STRING":"b=3", "DOCUMENT_ROOT": "/Library/WebServer/Documents", "HTTP_HOST": "ciconia.mit.edu", "SCRIPT_NAME": "/music21/unifiedinterface"}
+    >>> agenda = makeAgendaFromRequest(requestInput, environ, 'text/json')
+    >>> agenda
+    {'dataDict': {u'a': {u'data': 3}, 'b': {'data': '3'}}, 'returnDict': {}, 'commandList': []}
+   
+    >>> environ2 = {"QUERY_STRING":"a=2&b=3&b=4","DOCUMENT_ROOT": "/Library/WebServer/Documents", "HTTP_HOST": "ciconia.mit.edu", "SCRIPT_NAME": "/music21/unifiedinterface"}
+    >>> agenda2 = makeAgendaFromRequest(requestInput, environ2, 'multipart/form-data')
+    >>> agenda2
+    {'dataDict': {'a': {'data': '2'}, 'b': {'data': ['3', '4']}}, 'returnDict': {}, 'commandList': []}
+
+    '''
+    agenda = Agenda()
+    
+    combinedFormFields = {}
+    
+    # Determine the correct format of the input. Combine the post and get data into combinedFormFields dictionary.
+    if requestFormat == 'text/json':
+        agenda.loadJson(requestInput.read())
+    elif requestFormat == 'multipart/form-data':
+        postFormFields = cgi.FieldStorage(requestInput, environ = environ)  
+        for key in postFormFields:
+            value = postFormFields.getlist(key)
+            if len(value) == 1:
+                value = value[0]
+            combinedFormFields[key] = value
+        
+    # Add GET fields:
+    getFormFields = urlparse.parse_qs(environ['QUERY_STRING']) # Parse GET request in URL to dict
+    for (key,value) in getFormFields.iteritems():
+        if len(value) == 1:
+            value = value[0]
+        combinedFormFields[key] = value
+           
+    # Load json as first priority if it is set
+    if 'json' in combinedFormFields:
+        print combinedFormFields['json']
+        agenda.loadJson(combinedFormFields['json'])
+    
+    # These keys will not go into dataDataDict
+    reservedKeys = ['json','appName','dataDict','commandList','returnDict','appName','outputTemplate','outputArgList','uploadedFile']
+
+    # Add remaining form fields as variables in dataDict. Will replace duplicates with new value
+    for k in combinedFormFields:
+        if k not in reservedKeys:
+            agenda['dataDict'][k] = {"data": combinedFormFields[k]}
+
+    # Process uploaded file
+    if 'uploadedFile' in combinedFormFields:
+        result = processFileUpload(combinedFormFields['uploadedFile'])
+        if result is not None:
+            agenda['uploadedFile'] = result
+ 
+    # For other reserved keys, load the value into the topmost level of the agenda
+    if 'appName' in combinedFormFields:
+        agenda['appName'] = combinedFormFields['appName']     
+    if 'outputTemplate' in combinedFormFields:
+        agenda['outputTemplate'] = combinedFormFields['outputTemplate']  
+    if 'outputArgList' in combinedFormFields:
+        agenda['outputArgList'] = combinedFormFields['outputArgList']
+    
+    # Allows the appName to direct final processing
+    if 'appName' in agenda:
+        setupApplication(agenda)
+    
+    return agenda
+
+def processFileUpload(fileData):
+    '''
+    Converts the file upload Data from a multipart/form-data into a StringIO
+    object that will behave like a file (has .read() etc.)
+    '''
+    fileObject = StringIO.StringIO(fileData)
+    return fileObject
+
+def setupApplication(agenda, appName = None):
+    if appName == None:
+        if 'appName' in agenda:
+            appName = agenda['appName']
+        else:
+            raise Exception("appName is None and no appName key in agenda.")
+    
+    if appName not in apps.applicationInitializers.keys():
+        raise Exception ("Unknown appName: " + appName)
+    
+    # Run initializer on agenda - edits it in place.
+    apps.applicationInitializers[appName](agenda)
+
+#-------------------------------------------------------------------------------
+
+class Agenda(dict):
+    '''
+    Subclass of dictionary that represents data and commands to be run through
+    the command processor
+    '''
+    def __init__(self):
+        '''
+        Initializes core key values 'dataDict', 'commandList', 'returnDict'
+        >>> agenda = Agenda()
+        >>> agenda
+        {'dataDict': {}, 'returnDict': {}, 'commandList': []}
+        '''
+        self['dataDict'] = dict()
+        self['commandList'] = list()
+        self['returnDict'] = dict()
+        dict.__init__(self)
+        
+    def __setitem__(self, key, value):
+        '''
+        Raises an error if one attempts to set 'dataDict', 'returnDict', or 'commandList'
+        to values that are not of the corresponding dict/list type.
+        >>> agenda = Agenda()
+        >>> agenda
+        {'dataDict': {}, 'returnDict': {}, 'commandList': []}
+        >>> agenda['dataDict'] = {"a":{"data":2}}
+        >>> agenda
+        {'dataDict': {'a': {'data': 2}}, 'returnDict': {}, 'commandList': []}
+        
+        '''
+        if key in ['dataDict','returnDict'] and type(value) is not dict:
+            raise Exception('value for key: '+ str(key) + ' must be dict')
+            return
+        
+        elif key in ['commandList'] and type(value) is not list:
+            raise Exception('value for key: '+ str(key) + ' must be list')
+            return
+        
+        dict.__setitem__(self,key,value)
+    
+    def addData(self, variableName, data, fmt = None):
+        '''
+        Given a variable name, data, and optionally format, constructs the proper dataDictElement structure,
+        and adds it to the dataDict of the agenda.
+        
+        >>> agenda = Agenda()
+        >>> agenda
+        {'dataDict': {}, 'returnDict': {}, 'commandList': []}
+        >>> agenda.addData('a', 2)
+        >>> agenda
+        {'dataDict': {'a': {'data': 2}}, 'returnDict': {}, 'commandList': []}
+        >>> agenda.addData(variableName='b', data=[1,2,3], fmt='list')
+        >>> agenda
+        {'dataDict': {'a': {'data': 2}, 'b': {'fmt': 'list', 'data': [1, 2, 3]}}, 'returnDict': {}, 'commandList': []}
+        
+        '''
+        dataDictElement = {}
+        dataDictElement['data'] = data
+        if fmt != None:
+            dataDictElement['fmt'] = fmt
+        self['dataDict'][variableName] = dataDictElement
+        
+    def getData(self, variableName):
+        '''
+        Given a variable name, returns the data stored in the agenda for that variable name. If no data is stored,
+        returns the value None.        
+        >>> agenda = Agenda()
+        >>> agenda
+        {'dataDict': {}, 'returnDict': {}, 'commandList': []}
+        >>> agenda.getData('a') == None
+        True
+        >>> agenda.addData('a', 2)
+        >>> agenda.getData('a')
+        2
+        '''
+        if variableName in self['dataDict'].keys():
+            return self['dataDict'][variableName]['data']
+        else:
+            return None
+        
+    def addCommand(self, type, resultVar, caller, command, argList = None):
+        '''
+        Adds the specified command to the commandList of the agenda. type is either "function" or "attribute". 
+        resultVar, caller, and command are strings that will result in the form shown below. Set an argument as 
+        none to 
+        argList should be a list of data encoded in an appropriate format (see parseStringToPrimitive for more information)
+        
+        <resultVar> = <caller>.<command>(<argList>)
+        
+        >>> agenda = Agenda()
+        >>> agenda
+        {'dataDict': {}, 'returnDict': {}, 'commandList': []}
+        >>> agenda.addCommand('function','sc','sc','transpose',['p5'])
+        >>> agenda
+        {'dataDict': {}, 'returnDict': {}, 'commandList': [{'function': 'transpose', 'argList': ['p5'], 'caller': 'sc', 'resultVariable': 'sc'}]}
+        >>> agenda.addCommand('attribute','scFlat','sc','flat')
+        >>> agenda
+        {'dataDict': {}, 'returnDict': {}, 'commandList': [{'function': 'transpose', 'argList': ['p5'], 'caller': 'sc', 'resultVariable': 'sc'}, {'attribute': 'flat', 'caller': 'sc', 'resultVariable': 'scFlat'}]}
+        
+        '''
+        commandListElement = {}
+        commandListElement[type] = command
+        if resultVar != None:
+            commandListElement['resultVariable'] = resultVar
+        if caller != None:
+            commandListElement['caller'] = caller
+        if argList != None:
+            commandListElement['argList'] = argList
+            
+        self['commandList'].append(commandListElement)
+        
+    def setOutputTemplate(self, outputTemplate, outputArgList):
+        '''
+        Specifies the output template that will be used for the agenda.
+        
+        '''
+        self['outputTemplate'] = outputTemplate
+        self['outputArgList'] = outputArgList
+    
     def loadJson(self, jsonRequestStr):
         '''
-        Runs json.loads on jsonRequestStr
+        Runs json.loads on jsonRequestStr and loads the resulting structure into the agenda object.
         
-        
+        >>> agenda = Agenda()
+        >>> agenda
+        {'dataDict': {}, 'returnDict': {}, 'commandList': []}
+        >>> agenda.loadJson(sampleJsonStringSimple)
+        >>> agenda
+        {'dataDict': {u'myNum': {u'fmt': u'int', u'data': u'23'}}, 'returnDict': {u'myNum': u'int'}, 'commandList': []}
+
         '''
         tempDict = json.loads(jsonRequestStr)
-        for thing in tempDict:
-            self[thing] = tempDict[thing]
-        
-        
+        for (key, value) in tempDict.iteritems():
+            if isinstance(key, unicode):
+                key = str(key)
+            if isinstance(value, unicode):
+                value = str(value)
+            self[key] = value
 
+        
+#-------------------------------------------------------------------------------
 
-class RequestObject(object):
+class CommandProcessor(object):
     '''
-    Object used to coordinate JSON requests to music21.
+    Object used to coordinate requests to music21.
     
-    Takes a json string as input, parses data specified in dataDict,
+    Takes a agenda string as input, parses data specified in dataDict,
     executes the commands in commandList, and returns data specified
     in the returnDict.
+    
+    If outputTemplate and outputArgs are specified, result will be generated
+    by the corresponding outputTemplate (image embeds, file writes, etc.)
     '''
-    def __init__(self,json_object):
-        self.json_object = json_object
-        self.dataDict = {}
+    def __init__(self,agenda):
+        self.agenda = agenda
+        self.rawDataDict = {}
         self.parsedDataDict = {}
         self.commandList = []
         self.errorList = []
         self.returnDict = {}
-        if "dataDict" in self.json_object.keys():
-            self.dataDict = json_object['dataDict']
+        self.outputTemplate = ""
+        self.outputArgList = []
+        
+        if "dataDict" in agenda.keys():
+            self.rawDataDict = agenda['dataDict']
             self._parseData()
-        if "commandList" in self.json_object.keys():
-            self.commandList = self.json_object['commandList']
-        if "returnDict" in self.json_object.keys():
-            self.returnDict = self.json_object['returnDict']
+        
+        if "commandList" in agenda.keys():
+            self.commandList = agenda['commandList']
+        
+        if "returnDict" in agenda.keys():
+            self.returnDict = agenda['returnDict']
+
+        if "outputTemplate" in agenda.keys():
+            self.outputTemplate = agenda['outputTemplate']
+
+        if "outputArgList" in agenda.keys():
+            self.outputArgList = agenda['outputArgList']
       
-    def addError(self, errorString, exceptionObj = None):
+    def recordError(self, errorString, exceptionObj = None):
         '''
-        adds an error to the errorList array and prints the whole error to strerr
-        so both the user and the administrator know
-        '''      
-        print (isinstance(errorString, unicode))
-        self.errorList.append(errorString)
-        sys.stderr.write(errorString)
+        Adds an error to the internal errorList array and prints the whole error to stderr
+        so both the user and the administrator know. Error string represents a brief, human-readable
+        message decribing the error.
+        
+        Errors are appended to the errorList as a tuple (errorString,errorTraceback) where errorTraceback
+        is the traceback of the exception if exceptionObj is specified, otherwise errorTraceback is the empty string
+        '''
+        errorTraceback = ''    
         if exceptionObj is not None:
-            sys.stderr.write(unicode(exceptionObj))
-        traceback.print_exc(file=sys.stderr)
+            errorTraceback += traceback.format_exc()
+        
+        sys.stderr.write(errorString)
+        sys.stderr.write(errorTraceback)
+        self.errorList.append(('music21_server_error: '+errorString,errorTraceback))
+
 
     def _parseData(self):
         '''
         Parses data specified as strings in self.dataDict into objects in self.parsedDataDict
         '''
-        for (name,dataDictElement) in self.dataDict.iteritems():
+        for (name,dataDictElement) in self.rawDataDict.iteritems():
             if 'data' not in dataDictElement.keys():
-                self.errorList.append("no data specified for data element "+unicode(dataDictElement))
+                self.recordError("no data specified for data element "+unicode(dataDictElement))
                 continue
 
             dataStr = dataDictElement['data']
@@ -251,10 +532,10 @@ class RequestObject(object):
                 fmt = dataDictElement['fmt']
                 
                 if name in self.parsedDataDict.keys():
-                    self.errorList.append("duplicate definition for data named "+str(name)+" "+str(dataDictElement))
+                    self.recordError("duplicate definition for data named "+str(name)+" "+str(dataDictElement))
                     continue
                 if fmt not in availableDataFormats:
-                    self.errorList.append("invalid data format for data element "+str(dataDictElement))
+                    self.recordError("invalid data format for data element "+str(dataDictElement))
                     continue
                 
                 if fmt == 'string' or fmt == 'str':
@@ -263,13 +544,13 @@ class RequestObject(object):
                     elif dataStr.count("\"") == 2: # Double Quoted String
                         data = dataStr.replace("\"","") # remove excess quotes
                     else:
-                        self.errorList.append("invalid string (not in quotes...) for data element "+str(dataDictElement))
+                        self.recordError("invalid string (not in quotes...) for data element "+str(dataDictElement))
                         continue
                 elif fmt == 'int':
                     try:
                         data = int(dataStr)
                     except:
-                        self.errorList.append("invalid integer for data element "+str(dataDictElement))
+                        self.recordError("invalid integer for data element "+str(dataDictElement))
                         continue
                 elif fmt in ['bool','boolean']:
                     if dataStr in ['true','True']:
@@ -277,19 +558,19 @@ class RequestObject(object):
                     elif dataStr in ['false','False']:
                         data = False
                     else:
-                        self.errorList.append("invalid boolean for data element "+str(dataDictElement))
+                        self.recordError("invalid boolean for data element "+str(dataDictElement))
                         continue
                 elif fmt == 'list':
                     # in this case dataStr should actually be an list object.
                     if not common.isListLike(dataStr):
-                        self.errorList.append("list format must actually be a list structure "+str(dataDictElement))
+                        self.recordError("list format must actually be a list structure "+str(dataDictElement))
                         continue
                     data = []
                     for elementStr in dataStr:
                         if common.isStr(elementStr):
                             (matchFound, dataElement) = self.parseStringToPrimitive(elementStr)
                             if not matchFound:
-                                self.errorList.append("format could not be detected for data element  "+str(elementStr))
+                                self.recordError("format could not be detected for data element  "+str(elementStr))
                                 continue
                         else:
                             dataElement = elementStr
@@ -303,13 +584,13 @@ class RequestObject(object):
                     try:
                         data = converter.parseData(dataStr)
                     except converter.ConverterException as e:
-                        #self.errorList.append("Error parsing data variable "+name+": "+str(e)+"\n\n"+dataStr)
-                        self.addError("Error parsing data variable "+name+": "+unicode(e)+"\n\n"+dataStr,e)
+                        #self.recordError("Error parsing data variable "+name+": "+str(e)+"\n\n"+dataStr)
+                        self.recordError("Error parsing data variable "+name+": "+unicode(e)+"\n\n"+dataStr,e)
                         continue
             else: # No format specified
                 (matchFound, data) = self.parseStringToPrimitive(dataStr)
                 if not matchFound:
-                    self.errorList.append("format could not be detected for data element  "+str(dataDictElement))
+                    self.recordError("format could not be detected for data element  "+str(dataDictElement))
                     continue
                 
             self.parsedDataDict[name] = data
@@ -346,14 +627,16 @@ class RequestObject(object):
         
         for commandElement in self.commandList:
             if 'function' in commandElement.keys() and 'attribute'  in commandElement.keys():
-                self.errorList.append("cannot specify both function and attribute for:  "+str(commandElement))
+                self.recordError("cannot specify both function and attribute for:  "+str(commandElement))
                 continue
             
             if 'function' in commandElement.keys():
                 functionName = commandElement['function']
                 
+                if functionName in self.parsedDataDict.keys():
+                    functionName = self.parsedDataDict[functionName]
                 if functionName not in availableFunctions:
-                    self.errorList.append("unknown function "+str(functionName)+" :"+str(commandElement))
+                    self.recordError("unknown function "+str(functionName)+" :"+str(commandElement))
                     continue
                 
                 if 'argList' not in commandElement.keys():
@@ -363,19 +646,19 @@ class RequestObject(object):
                     for (i,arg) in enumerate(argList):
                         (matchFound, parsedArg) = self.parseStringToPrimitive(arg)
                         if not matchFound:
-                            self.errorList.append("invalid argument "+str(arg)+" :"+str(commandElement))
+                            self.recordError("invalid argument "+str(arg)+" :"+str(commandElement))
                             continue
                         argList[i] = parsedArg
 
                 if 'caller' in commandElement.keys(): # Caller Specified
                     callerName = commandElement['caller']
                     if callerName not in self.parsedDataDict.keys():
-                        self.errorList.append(callerName+" not defined "+str(commandElement))
+                        self.recordError(callerName+" not defined "+str(commandElement))
                         continue
                     try:
                         result = eval("self.parsedDataDict[callerName]."+functionName+"(*argList)")
                     except Exception as e:
-                        self.errorList.append("Error: "+str(e)+" executing function "+str(functionName)+" :"+str(commandElement))
+                        self.recordError("Error: "+str(e)+" executing function "+str(functionName)+" :"+str(commandElement))
                         continue
                     
                     
@@ -390,22 +673,22 @@ class RequestObject(object):
                 attribtueName = commandElement['attribute']
                 
                 if attribtueName not in availableAttribtues:
-                    self.errorList.append("unknown attribute "+str(attribtueName)+" :"+str(commandElement))
+                    self.recordError("unknown attribute "+str(attribtueName)+" :"+str(commandElement))
                     continue
                 
                 if 'args'  in commandElement.keys():
-                    self.errorList.append("No args should be specified with attribute :"+str(commandElement))
+                    self.recordError("No args should be specified with attribute :"+str(commandElement))
                     continue
                 
                 if 'caller' in commandElement.keys(): # Caller Specified
                     callerName = commandElement['caller']
                     if callerName not in self.parsedDataDict.keys():
-                        self.errorList.append(callerName+" not defined "+str(commandElement))
+                        self.recordError(callerName+" not defined "+str(commandElement))
                         continue
                     result = eval("self.parsedDataDict[callerName]."+attribtueName)
                     
                 else: # No caller specified
-                    self.errorList.append("Caller must be specified with attribute :"+str(commandElement))
+                    self.recordError("Caller must be specified with attribute :"+str(commandElement))
                     continue
 
                 if 'resultVariable' in commandElement.keys():
@@ -413,7 +696,7 @@ class RequestObject(object):
                     self.parsedDataDict[resultVarName] = result
                     
             else:
-                self.errorList.append("must specify function or attribute for:  "+str(commandElement))
+                self.recordError("must specify function or attribute for:  "+str(commandElement))
                 continue
             
     def getResultObject(self):
@@ -438,10 +721,10 @@ class RequestObject(object):
         
         for (dataName,fmt) in self.returnDict.iteritems():
             if dataName not in self.parsedDataDict.keys():
-                self.errorList.append("Data element "+dataName+" not defined at time of return");
+                self.recordError("Data element "+dataName+" not defined at time of return");
                 continue
             if fmt not in availableDataFormats:
-                self.errorList.append("Format "+fmt+" not available");
+                self.recordError("Format "+fmt+" not available");
                 continue
             
             data = self.parsedDataDict[dataName]
@@ -481,6 +764,9 @@ class RequestObject(object):
         if strVal in self.parsedDataDict.keys():
             returnVal = self.parsedDataDict[strVal]
             foundMatch = True
+        elif strVal in availableFunctions: #Used to specify function via variable name
+            returnVal = strVal
+            foundMatch = True
         else:
             try:
                 returnVal = int(strVal)
@@ -505,323 +791,98 @@ class RequestObject(object):
                     elif strVal.count("\"") == 2: # Double Quoted String
                         returnVal = strVal.replace("\"","") # remove excess quotes
                         foundMatch = True
+                    else:
+                        returnVal = cgi.escape(str(strVal))
+                        foundMatch = True
         if foundMatch:
             return (True, returnVal)
         else:
             return (False, None)
+    
+    def getOutput(self):
+        '''
+        Generates the output of the processor. Uses the attributes outputTemplate and outputArgList from the agenda
+        to determine which format the output should be in. If an outputTemplate is unspecified or known,
+        will return json by default.
         
+        Return is of the tyle (output, outputType) where outputType is a content-type ready for returning to the server:
+        "text/plain", "text/json", "text/html", etc.
+        '''
+        print self.outputTemplate
+        if self.outputTemplate == "":
+            output =  json.dumps(self.getResultObject())
+            outputType = 'text/plain'
+        elif self.outputTemplate not in availableOutputTemplates:
+            self.recordError("Unknown output template "+str(self.outputTemplate))
+            output =  json.dumps(self.getResultObject())
+            outputType = 'text/plain'
+        else:
+            argList = self.outputArgList
+            for (i,arg) in enumerate(argList):
+                (matchFound, parsedArg) = self.parseStringToPrimitive(arg)
+                if not matchFound:
+                    self.recordError("invalid argument in outputTemplate: "+str(arg)+" :")
+                    return (None, None)
+                argList[i] = parsedArg             
+            (output, outputType) = eval(self.outputTemplate)(*argList)
+        return (output, outputType)
+#-------------------------------------------------------------------------------
+# Tests 
+#-------------------------------------------------------------------------------
+
+
+sampleFormDataSimple = '------WebKitFormBoundarytO99C5T6SZEHKAIb\r\nContent-Disposition: form-data; name="a"\r\n\r\n7\r\n------WebKitFormBoundarytO99C5T6SZEHKAIb\r\nContent-Disposition: form-data; name="b"\r\n\r\n8\r\n------WebKitFormBoundarytO99C5T6SZEHKAIb\r\nContent-Disposition: form-data; name="json"\r\n\r\n{"dataDict":{"c":{"data":7}},\r\n        "returnDict":{"a":"int"}\r\n        }\r\n------WebKitFormBoundarytO99C5T6SZEHKAIb--\r\n'
+
+sampleJsonStringSimple = r'''
+    {
+    "dataDict": {
+        "myNum":
+            {"fmt" : "int",
+             "data" : "23"}
+             },
+    "returnDict":{
+        "myNum" : "int"}
+    }'''
+
         
-# -------------------
-# URL Application
-# -------------------
-def music21ModWSGIURLApplication(environ, start_response):
-    '''
-    Application function in proper format for a MOD-WSGI Application:
-    Reads the contents of a post request, and passes the JSON string to
-    webapps.processJSONData for further processing. 
-    Returns a proper HTML response.
+sampleJsonString = r'''
+        {
+    "dataDict": {
+        "myNum":
+            {"fmt" : "int",
+             "data" : "23"}
+    },
+    "commandList":[
+        {"function":"corpus.parse",
+         "argList":["'bwv7.7'"],
+         "resultVariable":"sc"},
+         
+        {"function":"transpose",
+         "caller":"sc",
+         "argList":["'p5'"],
+         "resultVariable":"sc"},
+         
     
-    An interface for music21 using mod_wsgi
-    
-    To use, first install mod_wsgi and include it in the HTTPD.conf file.
-    
-    Add this file to the server, ideally not in the document root, 
-    on mac this could be /Library/WebServer/wsgi-scripts/music21wsgiapp.py
-    
-    Then edit the HTTPD.conf file to redirect any requests to WEBSERVER:/music21interface to call this file:
-    
-    WSGIScriptAlias /music21interface /Library/WebServer/wsgi-scripts/music21wsgiapp.py
-    
-    Further down the conf file, give the webserver access to this directory:
-    
-    <Directory "/Library/WebServer/wsgi-scripts">
-        Order allow,deny
-        Allow from all
-    </Directory>
-    
-    The mod_wsgi handler will call the application function below with the request
-    content in the environ variable.
-    
-    To use the post, send a POST request to WEBSERVER:/music21interface
-    where the contents of the POST is a JSON string.
-    
-    See processJSONSTring below for specifications about the structure of this string.
-    '''
-    status = '200 OK'
-
-    pathInfo = environ['PATH_INFO'] # Contents of path after mount point of wsgi app but before question mark
-    queryString = environ['QUERY_STRING'] # Contents of URL after question mark    
-    documentRoot = environ['DOCUMENT_ROOT'] # Document root of the server
-    
-    resultStr = ""
-        
-    for (k,v) in environ.iteritems():
-        resultStr += "\n"+str(k)+": "+str(v)+"\n"
-
-    response_headers = [('Content-type', 'text/plain'),
-            ('Content-Length', str(len(resultStr)))]
-
-    start_response(status, response_headers)
-
-    return [resultStr]
-
-def music21ModWSGIFileApplication(environ, start_response):
-    '''
-    Application function in proper format for a MOD-WSGI Application:
-    Reads the contents of a post request, and passes the JSON string to
-    webapps.processJSONData for further processing. 
-    Returns a proper HTML response.
-    
-    An interface for music21 using mod_wsgi
-    
-    To use, first install mod_wsgi and include it in the HTTPD.conf file.
-    
-    Add this file to the server, ideally not in the document root, 
-    on mac this could be /Library/WebServer/wsgi-scripts/music21wsgiapp.py
-    
-    Then edit the HTTPD.conf file to redirect any requests to WEBSERVER:/music21interface to call this file:
-    
-    WSGIScriptAlias /music21interface /Library/WebServer/wsgi-scripts/music21wsgiapp.py
-    
-    Further down the conf file, give the webserver access to this directory:
-    
-    <Directory "/Library/WebServer/wsgi-scripts">
-        Order allow,deny
-        Allow from all
-    </Directory>
-    
-    The mod_wsgi handler will call the application function below with the request
-    content in the environ variable.
-    
-    To use the post, send a POST request to WEBSERVER:/music21interface
-    where the contents of the POST is a JSON string.
-    
-    See processJSONSTring below for specifications about the structure of this string.
-    '''
-    status = '200 OK'
-
-    formFields = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
-
-
-    resultStr = ""
-    
-    fileData = formFields['file1'].file.read()
-    
-    uploadedFile = formFields['file1'].file
-    filename = formFields['file1'].filename
-    type = formFields['file1'].type
-    
-    resultStr += str(filename)+ "\n"
-    
-    resultStr += uploadedFile.read()
-
-
-    response_headers = [('Content-type', 'text/plain'), 
-            ('Content-Length', str(len(resultStr)))]
-
-    start_response(status, response_headers)
-
-    return [resultStr]
-
-## Shortcuts - temporary procedures used for re-implementation of hackday demo. Will be moved 
-## to new home or removed when commandList can accommodate more complex structures (arrays, for loops...)
-
-def reduction(sc):
-    '''
-    Procedure that returns the annotated reduction of the given score. 
-    '''
-    reductionStream = sc.chordify()
-    for c in reductionStream.flat.getElementsByClass('Chord'):
-        c.closedPosition(forceOctave=4, inPlace=True)
-        c.removeRedundantPitches(inPlace=True)
-        c.annotateIntervals()
-    return reductionStream
-
-def createMensuralCanon(sc):
-    '''
-    Implements music21 example of creating a mensural canon
-
-    '''
-    melody = sc.parts[0].flat.notesAndRests
-    
-    canonStream = stream.Score()
-    for scalar, t in [(1, 'p1'), (2, 'p-5'), (.5, 'p-11'), (1.5, -24)]:
-        part = melody.augmentOrDiminish(scalar, inPlace=False)
-        part.transpose(t, inPlace=True)
-        canonStream.insert(0, part)
-    
-    return canonStream
-
-# The two methods below were written for Boston Music Hackday- 
-# these methods may be out-of-date and no longer
-# compatible with noteflight. These can be re-written easily if needed
-# the general idea of the methods is provided in the doctests.
-# Lars plans to refactor this file, so these methods will be moved and modified soon
-
-
-def correctChordSymbols(worksheet, studentResponse):
-    
-    '''
-    Written for hackday demo: accepts as parameters a stream with chord symbols (the worksheet)
-    and the student's attempt to write out the pitches for each chord symbol of the worksheet.
-    The student's work is returned with annotations, and the percentage correct is also returned
-    
-    >>> from music21 import *
-    >>> worksheet = stream.Stream()
-    >>> worksheet.append(harmony.ChordSymbol('C'))
-    >>> worksheet.append(harmony.ChordSymbol('G7'))
-    >>> worksheet.append(harmony.ChordSymbol('B-'))
-    >>> worksheet.append(harmony.ChordSymbol('D7/A')) 
-    >>> studentResponse = stream.Stream()
-    >>> studentResponse.append(clef.TrebleClef())
-
-    >>> studentResponse.append(chord.Chord(['C','E','G']))
-    >>> studentResponse.append(chord.Chord(['G', 'B', 'D5', 'F5']))
-    >>> studentResponse.append(chord.Chord(['B-', 'C']))
-    >>> studentResponse.append(chord.Chord(['D4', 'F#4', 'A4', 'C5']))
-    >>> newScore, percentCorrect = correctChordSymbols( worksheet, studentResponse)
-    >>> for x in newScore.notes:
-    ...  x.lyric
-    ':)'
-    ':)'
-    'PITCHES'
-    'INVERSION'
-    >>> percentCorrect
-    50.0
-    
-    
-    '''
-    numCorrect = 0
-    chords1 = worksheet.flat.getElementsByClass(music21.harmony.ChordSymbol)
-    totalNumChords = len(chords1)
-    chords2 = studentResponse.flat.getElementsByClass([music21.chord.Chord, music21.note.Note])
-    isCorrect = False
-    for chord1, chord2 in zip(chords1, chords2):
-        if chord1 not in studentResponse:
-            studentResponse.insertAndShift(chord2.offset, chord1)
-        if not('Chord' in chord2.classes):
-            chord2.lyric = "NOT A CHORD"
-            continue
-        newPitches = []
-        for x in chord2.pitches:
-            newPitches.append(str(x.name))
-        for pitch in chord1:
-           
-            if pitch.name in newPitches:
-                isCorrect = True
-            else:
-                isCorrect = False
-                break
-        if isCorrect == True:
-            newPitches1 = []
-            for y in chord1.pitches:
-                newPitches1.append(str(y.name))
-            p = chord1.sortDiatonicAscending()
-            o =  chord2.sortDiatonicAscending()
-           
-            a = []
-            b = []
-            for d in p.pitches:
-                a.append(str(d.name))
-            for k in o.pitches:
-                b.append(str(k.name))
-            if a != b:
-                chord2.lyric = "INVERSION"
-            else:
-                numCorrect = numCorrect + 1
-                chord2.lyric = ":)"
-        if isCorrect == False:
-            chord2.lyric = "PITCHES"
-
-    percentCorrect =  numCorrect*1.0/totalNumChords * 100
-    return (studentResponse, percentCorrect) #student's corrected score
-
-def checkLeadSheetPitches(worksheet, returnType=''):
-    '''
-    checker routine for hack day demo lead sheet chord symbols exercise. Accepts
-    a stream with both the chord symbols and student's chords, and returns the corrected
-    stream. if returnType=answerkey, the score is returned with the leadsheet pitches realized
-    
-    >>> from music21 import *
-    >>> worksheet = stream.Stream()
-    >>> worksheet.append(harmony.ChordSymbol('C'))
-    >>> worksheet.append(harmony.ChordSymbol('G7'))
-    >>> worksheet.append(harmony.ChordSymbol('B'))
-    >>> worksheet.append(harmony.ChordSymbol('D7/A')) 
-
-    >>> answerKey = checkLeadSheetPitches( worksheet, returnType = 'answerkey' )
-    >>> for x in answerKey.notes:
-    ...  x.pitches
-    [C3, E3, G3]
-    [G2, B2, D3, F3]
-    [B2, D#3, F#3]
-    [A2, C3, D3, F#3]
-    '''
-    #nicePiece = sc
-    #incorrectPiece = sc
-    
-    #incorrectPiece = messageconverter.parse('C:\Users\sample.xml')
-    
-    #sopranoLine = nicePiece.getElementsByClass(stream.Part)[0]
-    #chordLine = nicePiece.getElementsByClass(stream.Part)[1]
-    #chordLine.show('text')
-    #bassLine = nicePiece.part(2)
-    studentsAnswers = worksheet.flat.getElementsByClass(music21.chord.Chord)
-    answerKey = worksheet.flat.getElementsByClass(harmony.ChordSymbol)
-    
-    correctedAssignment, numCorrect = correctChordSymbols(answerKey, studentsAnswers)
-    
-    if returnType == 'answerkey':
-        
-        for chordSymbol in answerKey:
-            chordSymbol.writeAsChord = True
-        message = 'answer key displayed'
-        return answerKey
-    else: 
-        message = 'you got '+str(numCorrect)+' percent correct'
-        return correctedAssignment
-
-def changeColorOfAllNotes(sc, color):
-    '''
-    Iterate through all notes and change their color to the given color - 
-    used for testing color rendering in noteflight
-    '''
-    for n in sc.flat.getElementsByClass('Note'):
-        n.color = color 
-    return sc
-
-def changeColorOfAllChords(sc, color):
-    '''
-    Iterate through all notes and change their color to the given color - 
-    used for testing color rendering in noteflight
-    '''
-    for c in sc.flat.getElementsByClass('Chord'):
-        c.color = color 
-    return sc
-
-def writeMIDIFileToServer(sc):
-    '''
-    Iterate through all notes and change their color to the given color - 
-    used for testing color rendering in noteflight
-    '''
-    #documentRoot = environ['DOCUMENT_ROOT']
-    documentRoot = '/Library/WebServer/Documents'
-    urlPath = "/music21/OutputFiles/cognitionEx.mid"
-    writePath = documentRoot + urlPath
-    
-    sc.write('mid',writePath)
-    
-    return urlPath
-    
-
-## Tests 
+        {"attribute":"flat",
+         "caller":"sc",
+         "resultVariable":"scFlat"},
+         
+        {"attribute":"highestOffset",
+         "caller":"scFlat",
+         "resultVariable":"ho"}
+    ],
+    "returnDict":{
+        "myNum" : "int",
+        "ho"    : "int"
+        }
+    }'''
 
 class Test(unittest.TestCase):
     
     def runTest(self):
         pass
     
-    def testAgendaDict(self):
+    def testAgenda(self):
         jsonString = r'''
         {
     "dataDict": {
@@ -854,7 +915,7 @@ class Test(unittest.TestCase):
         }
     }
     '''
-        ad = AgendaDict()
+        ad = Agenda()
         ad.loadJson(jsonString)
         self.assertEqual(ad['dataDict']['myNum']['data'], "23")
 

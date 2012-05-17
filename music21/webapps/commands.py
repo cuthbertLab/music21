@@ -5,10 +5,118 @@ import copy
 from music21 import corpus
 from music21 import key
 from music21 import metadata
+from music21 import interval
+from music21 import pitch
+from music21 import chord
+from music21 import stream
+from music21 import harmony
+from music21 import scale
+from music21 import clef
+
 from music21.demos.theoryAnalysis import theoryAnalyzer
 
+import random
 
-notes = ['c','c#','d','e-','e','f','f#','g','a-','a','b-','b']
+
+#---------------
+
+def reduction(sc):
+    reductionStream = sc.chordify()
+    for c in reductionStream.flat.getElementsByClass('Chord'):
+        c.closedPosition(forceOctave=4, inPlace=True)
+        c.removeRedundantPitches(inPlace=True)
+        c.annotateIntervals()
+    return reductionStream
+
+#---------------
+
+def generateIntervals(numIntervals,kind = None, octaveSpacing = None):
+    if kind in ['anyChords','majorChords','diatonicTriads','diatonicTriadInversions']:
+        return generateChords(numIntervals,kind)
+    
+    sc = stream.Stream()
+    for i in range(numIntervals):        
+        loPs = pitch.convertNameToPs("C3")
+        hiPs = pitch.convertNameToPs("C#5")        
+        startPs = random.randrange(loPs,hiPs)
+        startPitch = pitch.Pitch(ps=startPs)
+        numHalfSteps = random.randrange(-19,20)
+        intv = interval.ChromaticInterval(numHalfSteps)
+        if kind == 'consonant':
+            invType = random.choice(['m3','M3','P5','m6','M6','P8'])
+            intv = interval.Interval(invType)
+        elif kind == 'noAugDim':
+            invType = random.choice(['m2','M2','m3','M3','P4','P5','m6','M6','m7','M7'])
+            intv = interval.Interval(invType)
+        elif kind == 'dissonant':
+            invType = random.choice(['m2','M2','m3','M3','P4','P5','m6','M6','m7','M7'])
+            intv = interval.Interval(invType)
+        endPitch = intv.transposePitch(startPitch)
+        
+        if kind == 'diatonic':
+            startPitchName = random.choice('abcdefg')
+            endPitchName = random.choice('abcdefg')
+            startPitch = pitch.Pitch(random.choice('abcdefg'))
+            endPitch = pitch.Pitch(random.choice('abcdefg'))
+
+        if octaveSpacing is not None:
+            startPitch.octave = 4
+            endPitch.octave = 4 - octaveSpacing
+        
+        c = chord.Chord([startPitch,endPitch])
+        c.volume.velocity = 127
+        c.quarterLength=2
+        sc.append(c)
+    c = chord.Chord(['C','G'])
+    c.quarterLength=2
+    sc.append(c)
+    return sc
+
+traidInversions = [[1,3,5],[1,3,6],[1,4,6]]
+
+def generateChords(numChords,kind):
+    sc = stream.Stream()
+    scl = scale.MajorScale('C')
+    #possibleChordTypes = [l[0] for l in harmony.CHORD_TYPES.values()]
+    possibleChordTypes =['53','63','64']
+    if kind == 'diatonicTriads':
+        for i in range(numChords):
+            startDegree = random.randrange(0,8)
+            inversion = random.randrange(0,3)
+            chordPitches = []
+            testDegrees = [d+startDegree-1 for d in traidInversions[inversion] ]
+            print testDegrees
+            chordPitches = [scl.pitchFromDegree(d+startDegree-1) for d in traidInversions[inversion] ]
+            print chordPitches
+            chordType = possibleChordTypes[random.randrange(0,len(possibleChordTypes))]
+            c = chord.Chord(chordPitches)
+            c.quarterLength=2
+            sc.append(c)
+        c = chord.Chord(['C','E','G'])
+        c.quarterLength=2
+        sc.append(c)
+        return sc
+    else:
+        for i in range(numChords):
+            loPs = pitch.convertNameToPs("C4")
+            hiPs = pitch.convertNameToPs("C#5")        
+            startPs = random.randrange(loPs,hiPs)
+            startPitch = pitch.Pitch(ps=startPs)
+            startPitchName = startPitch.name
+            chordType = possibleChordTypes[random.randrange(0,len(possibleChordTypes))]
+            print startPitchName+','+chordType
+            c = harmony.ChordSymbol(startPitchName+','+chordType)
+            c.writeAsChord = True
+            c.quarterLength=2
+            c.volume.velocity = 127
+            sc.append(c)
+        c = chord.Chord(['C','E','G'])
+        c.quarterLength=2
+        sc.append(c)
+        return sc
+        
+    return sc
+
 
 def runPerceivedDissonanceAnalysis(scoreIn, offsetList, keyStr=None):
     '''
@@ -122,7 +230,181 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
     analysisData = {'stream': score, 'numUserIdentified': user, 'numMusic21Identified':music21VS, 'numBothIdentified':both, 'accuracy': both*100.0/music21VS , 'romans': romanFigureList, 'key': pieceKey}
     return analysisData
 
+## Shortcuts - temporary procedures used for re-implementation of hackday demo. Will be moved 
+## to new home or removed when commandList can accommodate more complex structures (arrays, for loops...)
 
+def createMensuralCanon(sc):
+    '''
+    Implements music21 example of creating a mensural canon
+
+    '''
+    melody = sc.parts[0].flat.notesAndRests
+    
+    canonStream = stream.Score()
+    for scalar, t in [(1, 'p1'), (2, 'p-5'), (.5, 'p-11'), (1.5, -24)]:
+        part = melody.augmentOrDiminish(scalar, inPlace=False)
+        part.transpose(t, inPlace=True)
+        canonStream.insert(0, part)
+    
+    return canonStream
+
+def correctChordSymbols(worksheet, studentResponse):
+    
+    '''
+    Written for hackday demo: accepts as parameters a stream with chord symbols (the worksheet)
+    and the student's attempt to write out the pitches for each chord symbol of the worksheet.
+    The student's work is returned with annotations, and the percentage correct is also returned
+    
+    >>> from music21 import *
+    >>> worksheet = stream.Stream()
+    >>> worksheet.append(harmony.ChordSymbol('C'))
+    >>> worksheet.append(harmony.ChordSymbol('G7'))
+    >>> worksheet.append(harmony.ChordSymbol('B-'))
+    >>> worksheet.append(harmony.ChordSymbol('D7/A')) 
+    >>> studentResponse = stream.Stream()
+    >>> studentResponse.append(clef.TrebleClef())
+
+    >>> studentResponse.append(chord.Chord(['C','E','G']))
+    >>> studentResponse.append(chord.Chord(['G', 'B', 'D5', 'F5']))
+    >>> studentResponse.append(chord.Chord(['B-', 'C']))
+    >>> studentResponse.append(chord.Chord(['D4', 'F#4', 'A4', 'C5']))
+    >>> newScore, percentCorrect = correctChordSymbols( worksheet, studentResponse)
+    >>> for x in newScore.notes:
+    ...  x.lyric
+    ':)'
+    ':)'
+    'PITCHES'
+    'INVERSION'
+    >>> percentCorrect
+    50.0
+    
+    
+    '''
+    numCorrect = 0
+    chords1 = worksheet.flat.getElementsByClass(music21.harmony.ChordSymbol)
+    totalNumChords = len(chords1)
+    chords2 = studentResponse.flat.getElementsByClass([music21.chord.Chord, music21.note.Note])
+    isCorrect = False
+    for chord1, chord2 in zip(chords1, chords2):
+        if chord1 not in studentResponse:
+            studentResponse.insertAndShift(chord2.offset, chord1)
+        if not('Chord' in chord2.classes):
+            chord2.lyric = "NOT A CHORD"
+            continue
+        newPitches = []
+        for x in chord2.pitches:
+            newPitches.append(str(x.name))
+        for pitch in chord1:
+           
+            if pitch.name in newPitches:
+                isCorrect = True
+            else:
+                isCorrect = False
+                break
+        if isCorrect == True:
+            newPitches1 = []
+            for y in chord1.pitches:
+                newPitches1.append(str(y.name))
+            p = chord1.sortDiatonicAscending()
+            o =  chord2.sortDiatonicAscending()
+           
+            a = []
+            b = []
+            for d in p.pitches:
+                a.append(str(d.name))
+            for k in o.pitches:
+                b.append(str(k.name))
+            if a != b:
+                chord2.lyric = "INVERSION"
+            else:
+                numCorrect = numCorrect + 1
+                chord2.lyric = ":)"
+        if isCorrect == False:
+            chord2.lyric = "PITCHES"
+
+    percentCorrect =  numCorrect*1.0/totalNumChords * 100
+    return (studentResponse, percentCorrect) #student's corrected score
+
+def checkLeadSheetPitches(worksheet, returnType=''):
+    '''
+    checker routine for hack day demo lead sheet chord symbols exercise. Accepts
+    a stream with both the chord symbols and student's chords, and returns the corrected
+    stream. if returnType=answerkey, the score is returned with the leadsheet pitches realized
+    
+    >>> from music21 import *
+    >>> worksheet = stream.Stream()
+    >>> worksheet.append(harmony.ChordSymbol('C'))
+    >>> worksheet.append(harmony.ChordSymbol('G7'))
+    >>> worksheet.append(harmony.ChordSymbol('B'))
+    >>> worksheet.append(harmony.ChordSymbol('D7/A')) 
+
+    >>> answerKey = checkLeadSheetPitches( worksheet, returnType = 'answerkey' )
+    >>> for x in answerKey.notes:
+    ...  x.pitches
+    [C3, E3, G3]
+    [G2, B2, D3, F3]
+    [B2, D#3, F#3]
+    [A2, C3, D3, F#3]
+    '''
+    #nicePiece = sc
+    #incorrectPiece = sc
+    
+    #incorrectPiece = messageconverter.parse('C:\Users\sample.xml')
+    
+    #sopranoLine = nicePiece.getElementsByClass(stream.Part)[0]
+    #chordLine = nicePiece.getElementsByClass(stream.Part)[1]
+    #chordLine.show('text')
+    #bassLine = nicePiece.part(2)
+    studentsAnswers = worksheet.flat.getElementsByClass(music21.chord.Chord)
+    answerKey = worksheet.flat.getElementsByClass(harmony.ChordSymbol)
+    
+    correctedAssignment, numCorrect = correctChordSymbols(answerKey, studentsAnswers)
+    
+    if returnType == 'answerkey':
+        
+        for chordSymbol in answerKey:
+            chordSymbol.writeAsChord = True
+        message = 'answer key displayed'
+        return answerKey
+    else: 
+        message = 'you got '+str(numCorrect)+' percent correct'
+        return correctedAssignment
+
+
+def colorAllNotes(sc, color):
+    '''
+    Iterate through all notes and change their color to the given color - 
+    used for testing color rendering in noteflight
+    '''
+    for n in sc.flat.getElementsByClass('Note'):
+        n.color = color 
+    return sc
+
+def colorAllChords(sc, color):
+    '''
+    Iterate through all chords and change their color to the given color - 
+    used for testing color rendering in noteflight
+    '''
+    for c in sc.flat.getElementsByClass('Chord'):
+        c.color = color 
+    return sc
+
+def writeMIDIFileToServer(sc):
+    '''
+    Iterate through all notes and change their color to the given color - 
+    used for testing color rendering in noteflight
+    '''
+    #documentRoot = environ['DOCUMENT_ROOT']
+    documentRoot = '/Library/WebServer/Documents'
+    urlPath = "/music21/OutputFiles/cognitionEx.mid"
+    writePath = documentRoot + urlPath
+    
+    sc.write('mid',writePath)
+    
+    return urlPath
+
+#------------------------------------------------------------------------
+# Tests
 
 
 class Test(unittest.TestCase):
