@@ -100,7 +100,7 @@ def noteflightEmbed(outputStream, title):
     musicxml = outputStream.musicxml
     musicxml = musicxml.replace('\n','')
     musicxml = musicxml.replace('\'','\\\'')
-    htmlData = Template("""
+    htmlStr = """
 <html>
 <head>
 <title>Music21 URL App Response</title>
@@ -132,7 +132,8 @@ function setup() {
 
 </body>
 </html>
-""")
+    """
+    htmlData = Template(htmlStr)
     
     htmlData = htmlData.safe_substitute(musicxml=musicxml, title=title)
     return (htmlData, 'text/html')
