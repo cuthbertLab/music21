@@ -396,10 +396,15 @@ class BrailleSegment(collections.defaultdict):
                         continue
                     showLeadingOctave = True
                     if self.suppressOctaveMarks:
-                        showLeadingOctave = False  
+                        showLeadingOctave = False
                     brailleNoteGroupingB = basic.transcribeNoteGrouping(sngB, showLeadingOctave)
-                    brailleText.addElement(noteGrouping = brailleNoteGroupingB,
-                        showLeadingOctave = True, withHyphen = noteGrouping.withHyphen, forceHyphen = True)
+                    try:
+                        brailleText.addElement(noteGrouping = brailleNoteGroupingB,
+                            showLeadingOctave = True, withHyphen = noteGrouping.withHyphen, forceHyphen = True)
+                    except text.BrailleTextException as bte:
+                        brailleText.addElement(noteGrouping = brailleNoteGroupingB,
+                            showLeadingOctave = True, withHyphen = noteGrouping.withHyphen, forceHyphen = True,
+                            forceNewline=True)
                     isSolved = True
                     self[self._currentGroupingKey-0.5] = sngA
                     self[self._currentGroupingKey+0.5] = sngB
@@ -1155,6 +1160,9 @@ def extractBrailleElements(music21Measure):
     allElements = BrailleElementGrouping()
     for music21Object in music21Measure:
         try:
+            if isinstance(music21Object, bar.Barline):
+                if music21Object.style == 'regular':
+                    continue
             setAffinityCode(music21Object)
             music21Object._brailleEnglish = [str(music21Object)]
             allElements.append(music21Object)
