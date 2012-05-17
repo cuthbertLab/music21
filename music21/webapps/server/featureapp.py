@@ -385,7 +385,7 @@ def getUploadForm():
         <tr><td align='left'>"""
     
     # Heading and description
-    html += """ <h1>Music21 Feature Extraction:</h1>
+    html += """ <h1><span style="font-family:'Courier New', Courier, monospace">music21</span> Feature Extraction:</h1>
         <a href='/music21/webapps/client'>Back</a>
 
         <hr />

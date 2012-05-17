@@ -30,4 +30,4 @@ See docs for music21.webapps for specifications about the JSON string structure
 
 from music21 import webapps
 
-application = webapps.music21ModWSGIJSONApplication
+application = webapps.modWSGIJSONApplication

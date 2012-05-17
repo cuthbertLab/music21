@@ -7,7 +7,9 @@
 #
 # Copyright:    (c) 2012 The music21 Project
 # License:      LGPL
-#-------------------------------------------------------------------------------    
+#-------------------------------------------------------------------------------  
+
+  
 def musicxmlText(sc):
     musicxml = sc.musicxml
     return (musicxml, 'text/plain')
@@ -16,6 +18,14 @@ def musicxmlFile(sc):
     musicxml = sc.musicxml
     return (musicxml,'application/vnd.recordare.musicxml+xml')
     #('Content-disposition','attachment; filename='+filename)
+    
+def vexflow(sc):
+    from music21 import vexflow
+    output = vexflow.fromObject(sc, mode='html')
+    return (output,'text/html')
+    #('Content-disposition','attachment; filename='+filename)
+    
+
 def noteflightEmbed(sc, title):
     musicxml = sc.musicxml
     musicxml = musicxml.replace('\n','')

@@ -59,7 +59,6 @@ def music21ModWSGIUnifiedApplication(environ, start_response):
     
     for k in environ:
         resultStr += "   "+k+": "+ str(environ[k])+"\n"
-        
 
     response_headers = [('Content-type', 'text/plain'),('Content-Length', str(len(resultStr)))]
 

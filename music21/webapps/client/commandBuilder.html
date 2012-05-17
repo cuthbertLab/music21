@@ -160,7 +160,6 @@ function clearRequest() {
 	
 	updateRequestJSON();
 }
-
 function setup() {
 	m21.noteflight.createNoteflightEmbed('noteflightembed','nfscore','fc79df30896da6aa03f90ff771015913ca6880be',750,400,1.0);
 
@@ -185,9 +184,7 @@ function setup() {
 
 	updateRequestJSON();
 }
-
 </script>
-
 
 </head>
 
@@ -213,7 +210,6 @@ function setup() {
 
 <div id='interface'>
 
-<form id="form1">
 <p><input type="button" value="Clear Request" onclick="clearRequest()" /></p>
 <hr />
 
@@ -239,7 +235,6 @@ Attribute: <input id='attribute' type="checkbox"  style="width:60px" value='1' o
  (<input id='arguments' type="text"  style="width:60px" placeholder='arguments' />)</span>
 <p><input type="button" value="Add Command" onclick="addCommand()" /></p>
 <p id='commandListDisp'  class="code"> </p>
-
 <hr />
 <h2>Return:</h2>
 <p class="smaller">Select the variables and their format that should be returned in the JSON response </p>
@@ -248,7 +243,7 @@ Attribute: <input id='attribute' type="checkbox"  style="width:60px" value='1' o
 <p id='returnListDisp'  class="code"> </p>
 <hr />
 
-<p> Variable to send to noteflight: <input id='varToNoteflight' value='sc' /></p>
+<p> Variable to send to noteflight: <input id='varToNoteflight' type="text" value='sc' /></p>
 <p class="smaller"> If nonempty, this variable will be automatically added to returnDict with return type 'musicxml' when submitting</p>
 <hr />
 <p><input type="button" value="Send Generated Request" onclick="sendRequest()" /></p>
@@ -259,8 +254,6 @@ Attribute: <input id='attribute' type="checkbox"  style="width:60px" value='1' o
 <h3>Results:</h3>
 <textarea id='resultDisp' style="width:450px; height:100px"></textarea>
 
-
-</form>
 
 </div>
 <div id="footer">

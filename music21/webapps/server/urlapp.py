@@ -149,14 +149,6 @@ def music21ModWSGICorpusURLApplication(environ, start_response):
             
 application = music21ModWSGICorpusURLApplication
 
-def reduction(sc):
-    reductionStream = sc.chordify()
-    for c in reductionStream.flat.getElementsByClass('Chord'):
-        c.closedPosition(forceOctave=4, inPlace=True)
-        c.removeRedundantPitches(inPlace=True)
-        c.annotateIntervals()
-    return reductionStream
-
 def noteflightEmbedTemplate(musicxml, title):
     musicxml = musicxml.replace('\n','')
     musicxml = musicxml.replace('\'','\\\'')
@@ -199,3 +191,11 @@ function setup() {
 </html>
 """
     return htmlData
+
+def reduction(sc):
+    reductionStream = sc.chordify()
+    for c in reductionStream.flat.getElementsByClass('Chord'):
+        c.closedPosition(forceOctave=4, inPlace=True)
+        c.removeRedundantPitches(inPlace=True)
+        c.annotateIntervals()
+    return reductionStream

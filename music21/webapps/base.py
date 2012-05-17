@@ -106,7 +106,8 @@ availableAttribtues = ['highestOffset',
 # Commands of type attribute must be in this list
 availableOutputTemplates = ['templates.noteflightEmbed',
                             'templates.musicxmlText',
-                            'templates.musicxmlFile']
+                            'templates.musicxmlFile',
+                            'templates.vexflow']
 
 #-------------------------------------------------------------------------------
 
@@ -810,12 +811,14 @@ class CommandProcessor(object):
         '''
         print self.outputTemplate
         if self.outputTemplate == "":
-            output =  json.dumps(self.getResultObject())
+            output =  json.dumps(self.getResultObject(),indent=4)
             outputType = 'text/plain'
+            
         elif self.outputTemplate not in availableOutputTemplates:
             self.recordError("Unknown output template "+str(self.outputTemplate))
-            output =  json.dumps(self.getResultObject())
+            output =  json.dumps(self.getResultObject(),indent=4)
             outputType = 'text/plain'
+            
         else:
             argList = self.outputArgList
             for (i,arg) in enumerate(argList):

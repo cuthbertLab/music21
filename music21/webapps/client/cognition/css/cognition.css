@@ -1,7 +1,7 @@
 
 body {font-family:"Trebuchet MS", Arial, Helvetica, sans-serif; background:#ccc}
 
-div#wrapper {width:800px; margin: 0 auto; background:#fff; padding:10px}
+div#wrapper {width:800px; margin: 0 auto; background:#fff; padding:10px;}
 
 div#displaywrapper {width:500px; height:30px; margin: 0 auto; background:#EEE; padding:0px; position:relative;}
 div#displayprogress {width:0px; height:30px; margin: 0 0 auto 0; background:#BBB; padding:0px;}
