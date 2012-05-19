@@ -41,7 +41,7 @@ function Music21interface() {
 			var cmdObj = new Object();
 			cmdObj[type] = command;
 			if (resultVar) {
-				cmdObj.resultVariable = resultVar;
+				cmdObj.resultVar = resultVar;
 			}
 			if (caller) {
 				cmdObj.caller = caller;
@@ -147,7 +147,7 @@ function Music21interface() {
 	
 	self.opts = {
 		curUrl : window.location.href,
-		postUrl : hostProtocol+"/music21/jsoninterface"
+		postUrl : hostProtocol+"/music21/webinterface"
 	};
 	
 	self.noteflight = {

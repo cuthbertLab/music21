@@ -23,7 +23,29 @@ from music21 import corpus
 import music21
 from string import Template
 
-  
+
+outputShortcuts = {
+    "show(musicxml)"    : "templates.musicxmlText",
+    "musicxmlDisplay"   : "templates.musicxmlText",
+    "musicxml"          : "templates.musicxmlText",
+    
+    "write(musicxml)"   : "templates.musicxmlFile",
+    "musicxmlDownload"  : "templates.musicxmlFile",
+    "musicxmlFile"      : "templates.musicxmlFile",
+    
+    "show(vexflow)"     : "templates.vexflow",
+    "vexflow"           : "templates.vexflow",
+    
+    "show(braille)"     : "templates.braille",
+    "braille"           : "templates.braille",
+    
+    "show(noteflight)"  : "templates.noteflightEmbed",
+    "noteflight"        : "templates.noteflightEmbed",
+}
+
+# These are output templates which take a single parameter, an output stream
+streamOutputs = ["musicxmlText","musicxmlFile","vexflow","braille","noteflightEmbed"]
+ 
 def musicxmlText(outputStream):
     '''
     Takes in a stream outputStream and returns its musicxml with content-type 'text/plain' for displaying in a browser
@@ -82,7 +104,7 @@ def braille(outputStream):
     brailleOutput = u"<html><body><pre>" + btranslate.objectToBraille(outputStream) + u"</pre></body></html>"
     return (brailleOutput.encode('utf-8'), 'text/html; charset=utf-8')   
 
-def noteflightEmbed(outputStream, title):
+def noteflightEmbed(outputStream):
     '''
     Takes in a stream outputStream, and a string title. Returns the HTML for a page containing a noteflight
     flash embed of the stream and the title title
@@ -90,11 +112,9 @@ def noteflightEmbed(outputStream, title):
     TODO: Change javascript and noteflight embed to relate to be server-specific
   
     >>> sc = corpus.parse('bwv7.7').measures(0,2)
-    >>> (output, contentType) = noteflightEmbed(sc, "My Title")
+    >>> (output, contentType) = noteflightEmbed(sc)
     >>> contentType
     'text/html'
-    >>> "My Title" in output
-    True
     '''
     
     musicxml = outputStream.musicxml
@@ -125,7 +145,7 @@ function setup() {
 </head>
 <body onload="setup()">
 
-<h1>$title</h1> 
+<h1>Music21 Output</h1> 
 <div id="noteflightembed">
 </div>
 
@@ -135,7 +155,7 @@ function setup() {
     """
     htmlData = Template(htmlStr)
     
-    htmlData = htmlData.safe_substitute(musicxml=musicxml, title=title)
+    htmlData = htmlData.safe_substitute(musicxml=musicxml)
     return (htmlData, 'text/html')
 
 #-------------------------------------------------------------------------------

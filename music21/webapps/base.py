@@ -37,7 +37,7 @@ For details about various output template options available, see webapps.templat
 6.  If outputTemplate is specified, the processor uses a template to generate and output.
     For more information, see commandProcessor.getOutput() and the templates in templates.py
 
-7.  Otherwise, the data will be returned as JSON, where the variables in the agenda's returnList specify which
+7.  Otherwise, the data will be returned as JSON, where the variables in the agenda's returnDict specify which
     variables to include in the returned JSON.
     
 9.  If an error occurs, an error message will be returned to the user 
@@ -62,7 +62,7 @@ Below is an example of a complete JSON request:
             "argList": [
                 "'bwv7.7'"
             ], 
-            "resultVariable": "sc"
+            "resultVar": "sc"
         }, 
         {
             "function": "transpose", 
@@ -70,17 +70,17 @@ Below is an example of a complete JSON request:
                 "'p5'"
             ], 
             "caller": "sc", 
-            "resultVariable": "sc"
+            "resultVar": "sc"
         }, 
         {
             "attribute": "flat", 
             "caller": "sc", 
-            "resultVariable": "scFlat"
+            "resultVar": "scFlat"
         }, 
         {
             "attribute": "highestOffset", 
             "caller": "scFlat", 
-            "resultVariable": "ho"
+            "resultVar": "ho"
         }
     ]
 }
@@ -132,11 +132,11 @@ availableDataFormats = ['xml',
                         'reprtext',
                         'list',
                         'int',
-                        'float']
+                        'float',
+                        'file']
 
 # Commands of type function (no caller) must be in this list
-availableFunctions = ['', # A blank string symbolizes no operation, the commandElement will be ignored rather than failing.
-                      'checkLeadSheetPitches',
+availableFunctions = ['checkLeadSheetPitches',
                       'colorAllChords',
                       'colorAllNotes',
                       'colorResults',
@@ -156,20 +156,14 @@ availableFunctions = ['', # A blank string symbolizes no operation, the commandE
                       'theoryAnalyzer.identifyParallelFifths',
                       'theoryAnalyzer.identifyParallelOctaves',
                       'writeMIDIFileToServer',
-                      
-                      '__getitem__',
-                      'augmentOrDiminish',
-                      'insert',
-                      'measures',
-                      'transpose'
                       ] 
 
 # Commands of type method (have a caller) must be in this list
 availableMethods = ['__getitem__',
                     'augmentOrDiminish',
                     'insert',
-                    'measures'
-                    'transpose',
+                    'measures',
+                    'transpose'
                     ]
 
 # Commands of type attribute must be in this list
@@ -210,26 +204,18 @@ def ModWSGIApplication(environ, start_response):
     >>> start_response = lambda status, headers: None         # usually called by mod_wsgi server. Used to initiate response
     >>> ModWSGIApplication(environ, start_response)
     ['{"status": "success", "dataDict": {"a": {"fmt": "int", "data": "3"}}, "errorList": []}']
-    '''
-    # This additional environment information is needed primarily in the context of writing files to a
-    # to a file on the server or including links back to the server in returned HTML templates    
-    documentRoot = environ['DOCUMENT_ROOT']     # Path to ducment root     e.g. /Library/WebServer/Documents
-    hostName = environ['HTTP_HOST']             # Host name                e.g. ciconia.mit.edu
-    scriptName = environ['SCRIPT_NAME']         # Mount point on server    e.g. /music21/unifiedinterface
-    serverConfigInfo = {"DOCUMENT_ROOT":documentRoot,
-                        "HTTP_HOST":hostName,
-                        "SCRIPT_NAME":scriptName}
-    
-    requestFormat = str(environ.get("CONTENT_TYPE")).split(';')[0]
+    '''    
 
     # Get content of request: is in a file-like object that will need to be .read() to get content
+    requestFormat = str(environ.get("CONTENT_TYPE")).split(';')[0]
     requestInput = environ['wsgi.input']
+
     try:        
         agenda = makeAgendaFromRequest(requestInput,environ,requestFormat)
         processor = CommandProcessor(agenda)
+        #(responseData, responseContentType) = (str(processor.parsedDataDict), 'text/plain')
         processor.executeCommands()
         (responseData, responseContentType) = processor.getOutput()
-        #(responseData, responseContentType) = (str(debug), 'text/plain')
         
     # Handle any unexpected exceptions
     # TODO: Change output based on environment variables...
@@ -246,45 +232,66 @@ def ModWSGIApplication(environ, start_response):
 
 #-------------------------------------------------------------------------------
 
-def makeAgendaFromRequest(requestInput, environ, requestFormat = None):
+def makeAgendaFromRequest(requestInput, environ, requestType = None):
     '''
-    Takes in a file-like requestInput (has .read()) containing form/multipart data
-    and a dictionary-like serverConfigInfo, containing at a minimum keys QUERY
-    Combines information from form fields and server info into an agenda object
+    Combines information from POST data and server info into an agenda object
     that can be used with the CommandProcessor.
-    
-    Note that variables specified via query string will always be returned as a list,
-    regardless of how many times the variable is specified.
+
+    Takes in a file-like requestInput (has .read()) containing POST data,
+    a dictionary-like environ from the server containing at a minimum a value for the keys QUERY_STRING,
+    and a requestType specifying the content-type of the POST data ('application/json','multipart/form-data', etc.)
+        
+    Note that variables specified via query string will be returned as a list if
+    they are specified more than once (e.g. ?b=3&b=4 will yeld ['3', '4'] as the value of b
     
     >>> requestInput = StringIO.StringIO() # requestInput should be buffer from the server application. Using StringIO for demonstration
     >>> requestInput.write('{"dataDict":{"a":{"data":3}}}')
     >>> requestInput.seek(0)
     
-    >>> environ = {"QUERY_STRING":"b=3", "DOCUMENT_ROOT": "/Library/WebServer/Documents", "HTTP_HOST": "ciconia.mit.edu", "SCRIPT_NAME": "/music21/unifiedinterface"}
+    >>> environ = {"QUERY_STRING":"b=3"}
     >>> agenda = makeAgendaFromRequest(requestInput, environ, 'application/json')
     >>> agenda
     {'dataDict': {u'a': {u'data': 3}, 'b': {'data': '3'}}, 'returnDict': {}, 'commandList': []}
    
-    >>> environ2 = {"QUERY_STRING":"a=2&b=3&b=4","DOCUMENT_ROOT": "/Library/WebServer/Documents", "HTTP_HOST": "ciconia.mit.edu", "SCRIPT_NAME": "/music21/unifiedinterface"}
+    >>> environ2 = {"QUERY_STRING":"a=2&b=3&b=4"}
     >>> agenda2 = makeAgendaFromRequest(requestInput, environ2, 'multipart/form-data')
     >>> agenda2
     {'dataDict': {'a': {'data': '2'}, 'b': {'data': ['3', '4']}}, 'returnDict': {}, 'commandList': []}
 
     '''
+    
     agenda = Agenda()
     
     combinedFormFields = {}
     
-    # Determine the correct format of the input. Combine the post and get data into combinedFormFields dictionary.
-    if requestFormat == 'application/json':
-        agenda.loadJson(requestInput.read())
-    elif requestFormat == 'multipart/form-data':
+    # Use requestType to process the POST data into the agenda
+    if requestType is None:
+        requestType = str(environ.get("CONTENT_TYPE")).split(';')[0]
+    
+    if requestType == 'application/json':
+        combinedFormFields['json'] = requestInput.read()
+    
+    elif requestType == 'multipart/form-data':
         postFormFields = cgi.FieldStorage(requestInput, environ = environ)  
         for key in postFormFields:
-            value = postFormFields.getlist(key)
+            if hasattr(postFormFields[key],'filename') and postFormFields[key].filename != None: # Its an uploaded file
+                value = postFormFields[key].file
+            else:
+                value = postFormFields.getlist(key)
+                if len(value) == 1:
+                    value = value[0]
+            combinedFormFields[key] = value
+            
+    elif requestType == 'application/x-www-form-urlencoded':
+        postFormFields =urlparse.parse_qs(requestInput.read())
+        for (key, value) in postFormFields.iteritems():
             if len(value) == 1:
                 value = value[0]
             combinedFormFields[key] = value
+       
+    # Load json into the agenda first
+    if 'json' in combinedFormFields:
+        agenda.loadJson(combinedFormFields['json'])
         
     # Add GET fields:
     getFormFields = urlparse.parse_qs(environ['QUERY_STRING']) # Parse GET request in URL to dict
@@ -292,32 +299,22 @@ def makeAgendaFromRequest(requestInput, environ, requestFormat = None):
         if len(value) == 1:
             value = value[0]
         combinedFormFields[key] = value
-           
-    # Load json as first priority if it is set
-    if 'json' in combinedFormFields:
-        agenda.loadJson(combinedFormFields['json'])
+
+    # Add remaining form fields to agenda
+    for (key, value) in combinedFormFields.iteritems():
+        if key in ['dataDict','commandList','returnDict','json']: # These values can only be specified via JSON, JSON already loaded
+            pass
+            
+        elif key in ['appName','outputTemplate','outputArgList']:
+            agenda[key] = value
+            
+        elif type(value) == file:
+            agenda['dataDict'][key] = {"data":value,
+                                       "fmt":"file"}
     
-    # These keys will not go into dataDataDict
-    reservedKeys = ['json','appName','dataDict','commandList','returnDict','appName','outputTemplate','outputArgList','uploadedFile']
-
-    # Add remaining form fields as variables in dataDict. Will replace duplicates with new value
-    for k in combinedFormFields:
-        if k not in reservedKeys:
-            agenda['dataDict'][k] = {"data": combinedFormFields[k]}
-
-    # Process uploaded file
-    if 'uploadedFile' in combinedFormFields:
-        result = processFileUpload(combinedFormFields['uploadedFile'])
-        if result is not None:
-            agenda['uploadedFile'] = result
- 
-    # For other reserved keys, load the value into the topmost level of the agenda
-    if 'appName' in combinedFormFields:
-        agenda['appName'] = combinedFormFields['appName']     
-    if 'outputTemplate' in combinedFormFields:
-        agenda['outputTemplate'] = combinedFormFields['outputTemplate']  
-    if 'outputArgList' in combinedFormFields:
-        agenda['outputArgList'] = combinedFormFields['outputArgList']
+        else: # Put in data dict
+            agenda['dataDict'][key] = {"data": value}
+             
     
     # Allows the appName to direct final processing
     if 'appName' in agenda:
@@ -325,15 +322,15 @@ def makeAgendaFromRequest(requestInput, environ, requestFormat = None):
     
     return agenda
 
-def processFileUpload(fileData):
-    '''
-    Converts the file upload Data from a multipart/form-data into a StringIO
-    object that will behave like a file (has .read() etc.)
-    '''
-    fileObject = StringIO.StringIO(fileData)
-    return fileObject
 
 def setupApplication(agenda, appName = None):
+    '''
+    Given an agenda, determines which application is desired either from the appName parameter
+    or if the appName parameter is none, from the value associated with the "appName" key in the agenda.
+    
+    If the application name is a valid application name, calls the appropriate application initializer
+    from apps.py on the agenda.
+    '''
     if appName == None:
         if 'appName' in agenda:
             appName = agenda['appName']
@@ -345,6 +342,7 @@ def setupApplication(agenda, appName = None):
     
     # Run initializer on agenda - edits it in place.
     apps.applicationInitializers[appName](agenda)
+
 
 #-------------------------------------------------------------------------------
 
@@ -382,10 +380,11 @@ class Agenda(dict):
         
         where the command TYPE is "function", "method", or "attribute"
     
-    **'returnList'** whose value is a list specifying the variables to be returned from the server.
-        "returnList" : ["<VARIABLE_1_NAME>","<VARIABLE_2_NAME>", etc.]
+    **'returnDict'** whose value is a list specifying the variables to be returned from the server.
+        "returnDict" : {"<VARIABLE_1_NAME>": "<VARIABLE_1_FORMAT",
+                        "<VARIABLE_2_NAME>": "<VARIABLE_2_FORMAT", etc.}
         
-        returnList is used to limit JSON output to only the relevant variables. If returnList is not specified,
+        returnDict is used to limit JSON output to only the relevant variables. If returnDict is not specified,
         the entire set of variables in the processor's environment will be returned in string format.
         
     **'outputTemplate'**  which specifies the return template to be used
@@ -468,7 +467,7 @@ class Agenda(dict):
         
     def addCommand(self, type, resultVar, caller, command, argList = None):
         '''
-        Adds the specified command to the commandList of the agenda. type is either "function" or "attribute". 
+        Adds the specified command to the commandList of the agenda. type is either "function", "attribute" or method. 
         resultVar, caller, and command are strings that will result in the form shown below. Set an argument as 
         none to 
         argList should be a list of data encoded in an appropriate format (see parseStringToPrimitive for more information)
@@ -480,16 +479,16 @@ class Agenda(dict):
         {'dataDict': {}, 'returnDict': {}, 'commandList': []}
         >>> agenda.addCommand('function','sc','sc','transpose',['p5'])
         >>> agenda
-        {'dataDict': {}, 'returnDict': {}, 'commandList': [{'function': 'transpose', 'argList': ['p5'], 'caller': 'sc', 'resultVariable': 'sc'}]}
+        {'dataDict': {}, 'returnDict': {}, 'commandList': [{'function': 'transpose', 'argList': ['p5'], 'caller': 'sc', 'resultVar': 'sc'}]}
         >>> agenda.addCommand('attribute','scFlat','sc','flat')
         >>> agenda
-        {'dataDict': {}, 'returnDict': {}, 'commandList': [{'function': 'transpose', 'argList': ['p5'], 'caller': 'sc', 'resultVariable': 'sc'}, {'attribute': 'flat', 'caller': 'sc', 'resultVariable': 'scFlat'}]}
+        {'dataDict': {}, 'returnDict': {}, 'commandList': [{'function': 'transpose', 'argList': ['p5'], 'caller': 'sc', 'resultVar': 'sc'}, {'attribute': 'flat', 'caller': 'sc', 'resultVar': 'scFlat'}]}
         
-        '''
+        '''        
         commandListElement = {}
         commandListElement[type] = command
         if resultVar != None:
-            commandListElement['resultVariable'] = resultVar
+            commandListElement['resultVar'] = resultVar
         if caller != None:
             commandListElement['caller'] = caller
         if argList != None:
@@ -525,10 +524,10 @@ class Agenda(dict):
         '''
         tempDict = json.loads(jsonRequestStr)
         for (key, value) in tempDict.iteritems():
-            if isinstance(key, unicode):
-                key = str(key)
-            if isinstance(value, unicode):
-                value = str(value)
+#            if isinstance(key, unicode):
+#                key = str(key)
+#            if isinstance(value, unicode):
+#                value = str(value)
             self[key] = value
 
         
@@ -584,13 +583,15 @@ class CommandProcessor(object):
         Errors are appended to the errorList as a tuple (errorString,errorTraceback) where errorTraceback
         is the traceback of the exception if exceptionObj is specified, otherwise errorTraceback is the empty string
         '''
-        errorTraceback = ''    
+        errorTraceback = u''    
         if exceptionObj is not None:
             errorTraceback += traceback.format_exc()
+            
+        errorString = errorString.encode('ascii','ignore')
         
         sys.stderr.write(errorString)
         sys.stderr.write(errorTraceback)
-        self.errorList.append(('music21_server_error: '+errorString,errorTraceback))
+        self.errorList.append((('music21_server_error: '+errorString).encode('ascii','ignore'),errorTraceback.encode('ascii','ignore')))
 
 
     def _parseData(self):
@@ -648,6 +649,8 @@ class CommandProcessor(object):
                         else:
                             dataElement = elementStr
                         data.append(dataElement)
+                elif fmt == 'file':
+                    data = dataStr
                 else:
                     if fmt in ['xml','musicxml']:                
                         if dataStr.find("<!DOCTYPE") == -1:
@@ -677,103 +680,221 @@ class CommandProcessor(object):
             {"commandList:"[
                 {"function":"corpus.parse",
                  "argList":["'bwv7.7'"],
-                 "resultVariable":"sc"},
+                 "resultVar":"sc"},
                  
-                {"function":"transpose",
+                {"method":"transpose",
                  "caller":"sc",
                  "argList":["'p5'"],
-                 "resultVariable":"sc"},
+                 "resultVar":"sc"},
                  
                 
                 {"attribute":"flat",
                  "caller":"sc",
-                 "resultVariable":"scFlat"},
+                 "resultVar":"scFlat"},
                  
                 {"attribute":"higestOffset",
                  "caller":"scFlat",
-                 "resultVariable":"ho"}
+                 "resultVar":"ho"}
                  ]
             }
 
         '''
         
         for commandElement in self.commandList:
-            if 'function' in commandElement.keys() and 'attribute'  in commandElement.keys():
-                self.recordError("cannot specify both function and attribute for:  "+str(commandElement))
+            typeKeysInCommandList = [k for k in commandElement.keys() if k in ['function', 'attribute', 'method']]
+            if len(typeKeysInCommandList) != 1:
+                self.recordError("Must have exactly one key denoting type ('function', 'attribute', or 'method'):  "+str(commandElement))
                 continue
+            commandType = typeKeysInCommandList[0]
             
-            if 'function' in commandElement.keys():
-                functionName = commandElement['function']
-                
-                if functionName in self.parsedDataDict.keys():
-                    functionName = self.parsedDataDict[functionName]
-                if functionName == '':
-                    if 'caller' in commandElement.keys() and  'resultVariable' in commandElement.keys():
-                        callerName = commandElement['caller']
-                        resultVarName = commandElement['resultVariable']
-                        self.parsedDataDict[resultVarName]
-                    continue
-                elif functionName not in availableFunctions:
-                    self.recordError("unknown function "+str(functionName)+" :"+str(commandElement))
-                    continue
-                
-                if 'argList' not in commandElement.keys():
-                    argList = []
-                else:
-                    argList = commandElement['argList']
-                    for (i,arg) in enumerate(argList):
-                        parsedArg = self.parseStringToPrimitive(arg)
-                        argList[i] = parsedArg
-
-                if 'caller' in commandElement.keys(): # Caller Specified
-                    callerName = commandElement['caller']
-                    if callerName not in self.parsedDataDict.keys():
-                        self.recordError(callerName+" not defined "+str(commandElement))
-                        continue
-                    try:
-                        result = eval("self.parsedDataDict[callerName]."+functionName+"(*argList)")
-                    except Exception as e:
-                        self.recordError("Error: "+str(e)+" executing function "+str(functionName)+" :"+str(commandElement))
-                        continue
-                    
-                    
-                else: # No caller specified
-                    result = eval(functionName)(*argList)
-                
-                if 'resultVariable' in commandElement.keys():
-                    resultVarName = commandElement['resultVariable']
-                    self.parsedDataDict[resultVarName] = result
-                    
-            elif 'attribute' in commandElement.keys():
-                attribtueName = commandElement['attribute']
-                
-                if attribtueName not in availableAttribtues:
-                    self.recordError("unknown attribute "+str(attribtueName)+" :"+str(commandElement))
-                    continue
-                
-                if 'args'  in commandElement.keys():
-                    self.recordError("No args should be specified with attribute :"+str(commandElement))
-                    continue
-                
-                if 'caller' in commandElement.keys(): # Caller Specified
-                    callerName = commandElement['caller']
-                    if callerName not in self.parsedDataDict.keys():
-                        self.recordError(callerName+" not defined "+str(commandElement))
-                        continue
-                    result = eval("self.parsedDataDict[callerName]."+attribtueName)
-                    
-                else: # No caller specified
-                    self.recordError("Caller must be specified with attribute :"+str(commandElement))
-                    continue
-
-                if 'resultVariable' in commandElement.keys():
-                    resultVarName = commandElement['resultVariable']
-                    self.parsedDataDict[resultVarName] = result
-                    
+            if commandType == 'function':
+                self.executeFunctionCommand(commandElement)
+            elif commandType == 'attribute':
+                self.executeAttributeCommand(commandElement)
+            elif  commandType == 'method':
+                self.executeMethodCommand(commandElement)
             else:
-                self.recordError("must specify function or attribute for:  "+str(commandElement))
+                self.recordError("No type specified for:  "+str(commandElement))
                 continue
+        return
+        
+    def executeFunctionCommand(self, commandElement):
+        '''
+        Executes the function command specified by commandElement.
+        
+        Function command elements should be dictionaries of the form:
+        
+        {'function': "<FUNCTION_NAME>",
+         'argList': ["<ARG_1>","<ARG_2>", etc.],
+         'resultVar' : "<RESULT_VARIABLE>"}
+         
+        Executing it yields the equivalent of: <RESULT_VARIABLE> = <FUNCTION_NAME>(ARG_1, ARG_2, ...)
+        
+        The keys argList and resultVar are optional. A commandElement without argList will just call <FUNCTION_NAME>()
+        with no arguments and a commandElement without resutlVar will not assign the result of the function to any variable.
+        
+        
+        '''
+        # Get function name
+        if 'function' not in commandElement.keys():
+            self.recordError("No function specified for function command: "+str(commandElement))
+            return
             
+        functionName = commandElement['function']
+        
+        # Allows users to create aliases for functions via the dataDict.
+        # i.e. processingCommand = commands.reduction
+        # then calling a command element with processingCommand(sc) will yield
+        # the same result as commands.reduction(sc)
+        if functionName in self.parsedDataDict.keys():
+            functionName = self.parsedDataDict[functionName]
+        
+        # Make sure function is valid for processing on webserver
+        if functionName not in availableFunctions:
+            self.recordError("Function "+str(functionName)+" not available on webserver:"+str(commandElement))
+            return
+        
+        # Process arguments
+        if 'argList' not in commandElement.keys():
+            argList = []
+        else:
+            argList = commandElement['argList']
+            for (i,arg) in enumerate(argList):
+                parsedArg = self.parseStringToPrimitive(arg)
+                argList[i] = parsedArg
+        
+        # Call the function
+        try:
+            result = eval(functionName)(*argList)
+        except Exception as e:
+            self.recordError("Error: "+str(e)+" executing function "+str(functionName)+" :"+str(commandElement))
+            return
+        
+        # Save it if resutlVar specified
+        if 'resultVar' in commandElement.keys():
+            resultVarName = commandElement['resultVar']
+            self.parsedDataDict[resultVarName] = result
+                   
+            
+    def executeAttributeCommand(self, commandElement):
+        '''
+        Executes the attribute command specified by commandElement
+
+        Function command elements should be dictionaries of the form:
+        
+        {'attributeName': "<ATTRIBUTE_NAME>",
+         'caller': "<CALLER_VARIABLE>",
+         'resultVar' : "<RESULT_VARIABLE>"}
+         
+        Executing it yields the equivalent of: <RESULT_VARIABLE> = <CALLER_VARIABLE>.<ATTRIBUTE_NAME>.
+        
+        ALl three keys 'attributeName', 'caller', and 'resultVar' are required.
+
+        ''' 
+        # Make sure the appropriate keys are set:
+        if 'attribute' not in commandElement.keys():
+            self.recordError("No attribute specified for attribute command: "+str(commandElement))
+            return
+        
+        if 'caller' not in commandElement.keys():
+            self.recordError("calle must be specified with attribute :"+str(commandElement))
+            return
+        
+        if 'resultVar' not in commandElement.keys():
+            self.recordError("resultVar must be specified with attribute :"+str(commandElement))
+            return
+        
+        # Get attribute name
+        attributeName = commandElement['attribute']
+        
+        # Make sure attribute is valid for processing on webserver
+        if attributeName not in availableAttribtues:
+            self.recordError("Attribute "+str(attributeName)+" not available on webserver :"+str(commandElement))
+            return
+        
+        # Get the caller and result variable names
+        callerName = commandElement['caller']
+        resultVarName = commandElement['resultVar']
+
+        # Make sure the caller is defined        
+        if callerName not in self.parsedDataDict.keys():
+            self.recordError(callerName+" not defined "+str(commandElement))
+            return
+        
+        # Check that the caller has the desired attribute
+        caller = self.parsedDataDict[callerName]
+        if not hasattr(caller, attributeName):
+            self.recordError("caller "+str(callerName)+": "+str(caller) +" has no attribute "+str(attributeName)+": "+str(commandElement))
+            return
+    
+        self.parsedDataDict[resultVarName] = getattr(caller, attributeName)
+            
+    def executeMethodCommand(self, commandElement):
+        '''
+        {'methodName': "<METHOD_NAME>",
+         'caller': "<CALLER_VARIABLE>",
+         'argList': ["<ARG_1>","<ARG_2>", etc.],
+         'resultVar' : "<RESULT_VARIABLE>"}
+         
+        Executing it yields the equivalent of: <RESULT_VARIABLE> = <CALLER_VARIABLE>.<METHOD_NAME>(ARG_1, ARG_2, ...)
+        
+        The keys argList and resultVar are optional. A commandElement without argList will just call <CALLER_VARIABLE>.<METHOD_NAME>()
+        with no arguments and a commandElement without resutlVar will not assign the result of the function to any variable.
+        
+        ''' 
+        # Make sure the appropriate keys are set:
+        if 'method' not in commandElement.keys():
+            self.recordError("No methodName specified for method command: "+str(commandElement))
+            return
+        if 'caller' not in commandElement.keys():
+            self.recordError("No caller specified for method command: "+str(commandElement))
+            return
+        
+        # Get method name and caller name
+        methodName = commandElement['method']        
+        callerName = commandElement['caller']
+        
+        # Make sure the method is valid for processing on webserver
+        if methodName not in availableMethods:
+            self.recordError("Method "+str(methodName)+" not available on webserver :"+str(commandElement))
+            return
+    
+        # Process arguments
+        if 'argList' not in commandElement.keys():
+            argList = []
+        else:
+            argList = commandElement['argList']
+            for (i,arg) in enumerate(argList):
+                parsedArg = self.parseStringToPrimitive(arg)
+                argList[i] = parsedArg
+
+        # Make sure the caller is defined        
+        if callerName not in self.parsedDataDict.keys():
+            self.recordError(callerName+" not defined "+str(commandElement))
+            return
+        
+        # Check that the caller has the desired method
+        caller = self.parsedDataDict[callerName]
+        if not hasattr(caller, methodName):
+            self.recordError("caller "+str(callerName)+": "+str(caller) +" has no method "+str(methodName)+": "+str(commandElement))
+            return
+        
+        if not callable(getattr(caller, methodName)):
+            self.recordError(str(callerName)+"."+str(methodName) +" is not callable: "+str(commandElement))
+            return
+
+        # Call the method        
+        try:
+            result = getattr(caller, methodName)(*argList)
+        except Exception as e:
+            self.recordError("Error: "+str(e)+" executing method "+str(methodName)+" :"+str(commandElement))
+            return
+        
+        # Save it if resutlVar specified
+        if 'resultVar' in commandElement.keys():
+            resultVarName = commandElement['resultVar']
+            self.parsedDataDict[resultVarName] = result
+                      
     def getResultObject(self):
         '''
         Returns a new object ready for json parsing with the string values of the objects
@@ -794,7 +915,12 @@ class CommandProcessor(object):
             return_obj['errorList'] = self.errorList
             return return_obj
         
-        for (dataName,fmt) in self.returnDict.iteritems():
+        if len(self.returnDict.keys()) == 0:
+            iterItems = [(k, 'str') for k in self.parsedDataDict.keys()]
+        else:
+            iterItems = self.returnDict.iteritems()
+        
+        for (dataName,fmt) in iterItems:
             if dataName not in self.parsedDataDict.keys():
                 self.recordError("Data element "+dataName+" not defined at time of return");
                 continue
@@ -811,7 +937,7 @@ class CommandProcessor(object):
             elif fmt == 'reprtext':
                 dataStr = data._reprText()
             else:
-                dataStr = str(data)
+                dataStr = unicode(data)
                 
             return_obj['dataDict'][dataName] = {"fmt":fmt, "data":dataStr}
             
@@ -909,22 +1035,29 @@ class CommandProcessor(object):
         Return is of the tyle (output, outputType) where outputType is a content-type ready for returning to the server:
         "text/plain", "application/json", "text/html", etc.
         '''
+        if len(self.errorList) > 0:
+            output = "<br />".join([":".join(e) for e in self.errorList])
+            outputType = 'text/html'
+        
         if self.outputTemplate == "":
             output =  json.dumps(self.getResultObject())
-            outputType = 'text/plain'
+            output = unicode(output).encode('utf-8')
+            outputType = 'text/html; charset=utf-8'
             
         elif self.outputTemplate not in availableOutputTemplates:
             self.recordError("Unknown output template "+str(self.outputTemplate))
             output =  json.dumps(self.getResultObject(),indent=4)
-            outputType = 'text/plain'
+            output = unicode(output).encode('utf-8')
+            outputType = 'text/html; charset=utf-8'
             
         else:
             argList = self.outputArgList
             for (i,arg) in enumerate(argList):
                 parsedArg = self.parseStringToPrimitive(arg)
-                argList[i] = parsedArg             
+                argList[i] = parsedArg  
             (output, outputType) = eval(self.outputTemplate)(*argList)
         return (output, outputType)
+    
 #-------------------------------------------------------------------------------
 # Tests 
 #-------------------------------------------------------------------------------
@@ -954,21 +1087,21 @@ sampleJsonString = r'''
     "commandList":[
         {"function":"corpus.parse",
          "argList":["'bwv7.7'"],
-         "resultVariable":"sc"},
+         "resultVar":"sc"},
          
-        {"function":"transpose",
+        {"method":"transpose",
          "caller":"sc",
          "argList":["'p5'"],
-         "resultVariable":"sc"},
+         "resultVar":"sc"},
          
     
         {"attribute":"flat",
          "caller":"sc",
-         "resultVariable":"scFlat"},
+         "resultVar":"scFlat"},
          
         {"attribute":"highestOffset",
          "caller":"scFlat",
-         "resultVariable":"ho"}
+         "resultVar":"ho"}
     ],
     "returnDict":{
         "myNum" : "int",
@@ -992,21 +1125,21 @@ class Test(unittest.TestCase):
     "commandList":[
         {"function":"corpus.parse",
          "argList":["'bwv7.7'"],
-         "resultVariable":"sc"},
+         "resultVar":"sc"},
          
-        {"function":"transpose",
+        {"method":"transpose",
          "caller":"sc",
          "argList":["'p5'"],
-         "resultVariable":"sc"},
+         "resultVar":"sc"},
          
     
         {"attribute":"flat",
          "caller":"sc",
-         "resultVariable":"scFlat"},
+         "resultVar":"scFlat"},
          
         {"attribute":"highestOffset",
          "caller":"scFlat",
-         "resultVariable":"ho"}
+         "resultVar":"ho"}
     ],
     "returnDict":{
         "myNum" : "int",
