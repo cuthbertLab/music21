@@ -60,6 +60,10 @@ function addCommand() {
 			argList[i] = argList[i].replace(/^\s+|\s+$/g,"");
 		}
 	}
+	
+	if(caller && type == 'function') {
+		type = 'method';
+	}
 	m21.request.addCommand(type,resultVar,caller,command,argList);
 	
 	if(resultVar) {
@@ -69,7 +73,7 @@ function addCommand() {
 		document.getElementById('commandListDisp').innerHTML += caller + ".";
 	}
 	document.getElementById('commandListDisp').innerHTML += command;
-	if(type == 'function') {
+	if(type != 'attribute') {
 		document.getElementById('commandListDisp').innerHTML += "(";
 		if(arguments) {
 			for(i in argList) {
