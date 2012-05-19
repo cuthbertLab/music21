@@ -12,6 +12,8 @@ b:<br />
 <input name='b' type="text" value='3' /><br />
 c:<br />
 <input name='c' type="text" value='"bwv7.7"' /><br />
+
+<input name='uploadedFile' type='file' /><br />
 json:<br />
 <textarea name='json'  cols="70" rows="50">
 {
@@ -23,26 +25,26 @@ json:<br />
     "commandList":[
         {"function":"corpus.parse",
          "argList":["c"],
-         "resultVariable":"sc"},
+         "resultVar":"sc"},
          
-        {"function":"measures",
+        {"method":"measures",
          "caller":"sc",
          "argList":["a","b"],
-         "resultVariable":"sc"},
+         "resultVar":"sc"},
          
-        {"function":"transpose",
+        {"method":"transpose",
          "caller":"sc",
          "argList":["'p5'"],
-         "resultVariable":"sc"},
+         "resultVar":"sc"},
          
     
         {"attribute":"flat",
          "caller":"sc",
-         "resultVariable":"scFlat"},
+         "resultVar":"scFlat"},
          
         {"attribute":"highestOffset",
          "caller":"scFlat",
-         "resultVariable":"ho"}
+         "resultVar":"ho"}
     ],
     "returnDict":{
         "a"    : "int",
