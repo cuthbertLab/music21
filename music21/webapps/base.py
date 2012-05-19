@@ -65,7 +65,7 @@ Below is an example of a complete JSON request:
             "resultVar": "sc"
         }, 
         {
-            "function": "transpose", 
+            "method": "transpose", 
             "argList": [
                 "'p5'"
             ], 
@@ -362,17 +362,16 @@ class Agenda(dict):
         where the variable formats are elements of availableDataFormats ("str","int","musicxml", etc.)
     
     **'commandList'**  whose value is a list specifying commands to be executed by the processor of the form::
-        "commandList" : [{"type":       "<CMD_1_TYPE>",
-                          "resultVar":  "<CMD_1_RESULT_VARIABLE>",
-                          "caller":     "<CMD_1_CALLER>",
-                          "command":    "<CMD_1_COMMAND_NAME>",
-                          "argList":    ['<CMD_1_ARG_1>','<CMD_1_ARG_2>'...]},
+        "commandList" : [{"<CMD_1_TYPE>": "<CMD_2_COMMAND_NAME>",
+                          "resultVar":    "<CMD_1_RESULT_VARIABLE>",
+                          "caller":       "<CMD_1_CALLER>",
+                          "command":      "<CMD_1_COMMAND_NAME>",
+                          "argList":      ['<CMD_1_ARG_1>','<CMD_1_ARG_2>'...]},
                           
-                          {"type":      "<CMD_2_TYPE>",
-                          "resultVar":  "<CMD_2_RESULT_VARIABLE>",
-                          "caller":     "<CMD_2_CALLER>",
-                          "command":    "<CMD_2_COMMAND_NAME>",
-                          "argList":    ['<CMD_2_ARG_1>','<CMD_2_ARG_2>'...]},
+                          "<CMD_2_TYPE>": "<CMD_2_COMMAND_NAME>",
+                          "resultVar":    "<CMD_2_RESULT_VARIABLE>",
+                          "caller":       "<CMD_2_CALLER>",
+                          "argList":      ['<CMD_2_ARG_1>','<CMD_2_ARG_2>'...]},
                           etc.
                           ]
         Calling .executeCommands() iterates through the commandList sequentially, calling the equivalent of:
@@ -477,12 +476,12 @@ class Agenda(dict):
         >>> agenda = Agenda()
         >>> agenda
         {'dataDict': {}, 'returnDict': {}, 'commandList': []}
-        >>> agenda.addCommand('function','sc','sc','transpose',['p5'])
+        >>> agenda.addCommand('method','sc','sc','transpose',['p5'])
         >>> agenda
-        {'dataDict': {}, 'returnDict': {}, 'commandList': [{'function': 'transpose', 'argList': ['p5'], 'caller': 'sc', 'resultVar': 'sc'}]}
+        {'dataDict': {}, 'returnDict': {}, 'commandList': [{'argList': ['p5'], 'caller': 'sc', 'method': 'transpose', 'resultVar': 'sc'}]}
         >>> agenda.addCommand('attribute','scFlat','sc','flat')
         >>> agenda
-        {'dataDict': {}, 'returnDict': {}, 'commandList': [{'function': 'transpose', 'argList': ['p5'], 'caller': 'sc', 'resultVar': 'sc'}, {'attribute': 'flat', 'caller': 'sc', 'resultVar': 'scFlat'}]}
+        {'dataDict': {}, 'returnDict': {}, 'commandList': [{'argList': ['p5'], 'caller': 'sc', 'method': 'transpose', 'resultVar': 'sc'}, {'attribute': 'flat', 'caller': 'sc', 'resultVar': 'scFlat'}]}
         
         '''        
         commandListElement = {}
@@ -676,7 +675,28 @@ class CommandProcessor(object):
         Parses JSON Commands specified in the self.commandList
         
         In the JSON, commands are described by::
-
+        **'commandList'**  whose value is a list specifying commands to be executed by the processor of the form::
+            "commandList" : [{"<CMD_1_TYPE>": "<CMD_2_COMMAND_NAME>",
+                              "resultVar":    "<CMD_1_RESULT_VARIABLE>",
+                              "caller":       "<CMD_1_CALLER>",
+                              "command":      "<CMD_1_COMMAND_NAME>",
+                              "argList":      ['<CMD_1_ARG_1>','<CMD_1_ARG_2>'...]},
+                              
+                              "<CMD_2_TYPE>": "<CMD_2_COMMAND_NAME>",
+                              "resultVar":    "<CMD_2_RESULT_VARIABLE>",
+                              "caller":       "<CMD_2_CALLER>",
+                              "argList":      ['<CMD_2_ARG_1>','<CMD_2_ARG_2>'...]},
+                              etc.
+                              ]
+            Calling .executeCommands() iterates through the commandList sequentially, calling the equivalent of:
+            <CMD_n_RESULT_VARAIBLE> = <CMD_n_CALLER>.<CMD_n_COMMAND_NAME>(<CMD_n_ARG_1>,<CMD_n_ARG_2>...)
+            
+            where the command TYPE is "function" (no caller), "method" (has a caller), or "attribute"
+            
+            See executeFunctionCommand, executeMethodCommand, and executeAttribtueCommand for more information about the format
+            required for those commands.
+            
+        EXAMPLE:
             {"commandList:"[
                 {"function":"corpus.parse",
                  "argList":["'bwv7.7'"],
@@ -782,7 +802,7 @@ class CommandProcessor(object):
 
         Function command elements should be dictionaries of the form:
         
-        {'attributeName': "<ATTRIBUTE_NAME>",
+        {'attribute': "<ATTRIBUTE_NAME>",
          'caller': "<CALLER_VARIABLE>",
          'resultVar' : "<RESULT_VARIABLE>"}
          
@@ -831,7 +851,7 @@ class CommandProcessor(object):
             
     def executeMethodCommand(self, commandElement):
         '''
-        {'methodName': "<METHOD_NAME>",
+        {'method': "<METHOD_NAME>",
          'caller': "<CALLER_VARIABLE>",
          'argList': ["<ARG_1>","<ARG_2>", etc.],
          'resultVar' : "<RESULT_VARIABLE>"}
