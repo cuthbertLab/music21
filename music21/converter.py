@@ -56,6 +56,8 @@ import zipfile
 #     import pickle as pickleMod
 
 import pickle as pickleMod
+import StringIO # this module is not supported in python3
+# use io.StringIO  in python 3, avail in 2.6, not 2.5
 
 
 import music21
@@ -265,13 +267,14 @@ class StreamFreezer(object):
 
     def __init__(self, streamObj=None):
         # must make a deepcopy, as we will be altering DefinedContexts
-        self.stream = copy.deepcopy(streamObj)
-        # call _elementsChanged to clear cache
-        #self.stream._elementsChanged()
-        #self.stream = streamObj
 
-#         for x in dir(self.stream):
-#             test = getattr(
+        self.stream = None
+        if streamObj is not None:
+            #self.stream = copy.deepcopy(streamObj)
+            self.stream = streamObj
+            # call _elementsChanged to clear cache
+            self.stream._elementsChanged()
+            #self.stream = streamObj
 
     def _getPickleFp(self, dir):
         if dir == None:
@@ -279,6 +282,24 @@ class StreamFreezer(object):
         # cannot get data from stream, as offsets are broken
         streamStr = str(time.time())
         return os.path.join(dir, 'm21-' + common.getMd5(streamStr) + '.p')
+
+
+    def _packStream(self, streamObj):
+        '''Prepare the passed in Stream in place, return storage dictionary format
+        '''        
+        streamObj.setupSerializationScaffold()
+        storage = {'stream': self.stream, 'm21Version': music21.VERSION}
+        return storage
+    
+    def _unpackStream(self, storage):
+        '''Convert from storage dictionary to Stream.
+        '''
+        version = storage['m21Version']
+        if version != music21.VERSION:
+            environLocal.warn('this pickled file is out of data and my not function properly.')
+        streamObj = storage['stream']
+        streamObj.teardownSerializationScaffold()
+        return streamObj
 
     #---------------------------------------------------------------------------
     def writePickle(self, fp=None):
@@ -292,18 +313,35 @@ class StreamFreezer(object):
         else:
             dir = environLocal.getRootTempDir()
             fp = os.path.join(dir, fp)
-
-        self.stream.setupSerializationScaffold()
+    
+        storage = self._packStream(self.stream)
 
         environLocal.printDebug(['writing fp', fp])
         f = open(fp, 'wb') # binary
         # a negative protocal value will get the highest protocal; 
         # this is generally desirable 
-
-        storage = {'stream': self.stream, 'm21Version': music21.VERSION}
+        # packStream() returns a storage dictionary
         pickleMod.dump(storage, f, protocol=-1)
         f.close()
         return fp
+
+    def writePickleInMemory(self):
+        '''Return a pickled file-like object. 
+        '''
+        f = StringIO.StringIO()
+        storage = self._packStream(self.stream)
+        pickleMod.dump(storage, f, protocol=-1)
+        #f.close()
+        # perhaps try to append a '\n'
+        # f.write()
+        return f
+
+    def writePickleStr(self):
+        '''Return a pickled as String
+        '''
+        storage = self._packStream(self.stream)
+        return pickleMod.dumps(storage, protocol=-1)
+
 
     def openPickle(self, fp):
         '''For a supplied file path to a pickled stream, unpickle
@@ -318,17 +356,21 @@ class StreamFreezer(object):
         f = open(fp, 'rb')
         storage = pickleMod.load(f)
         f.close()
-        #self.stream._printDefinedContexts()
+        self.stream = self._unpackStream(storage)
 
-        version = storage['m21Version']
-        if version != music21.VERSION:
-            environLocal.warn('this pickled file is out of data and my not function properly.')
+    def openPickleInMemory(self, fileLike):
+        '''Pass in a file-like object and have it be unpickled
+        '''
+        # TODO: this does not yet work
+        storage = pickleMod.load(fileLike)
+        self.stream = self._unpackStream(storage)
 
-        self.stream = storage['stream']
-        self.stream.teardownSerializationScaffold()
-        #self.stream._printDefinedContexts()
-
-
+    def openPickleStr(self, fileLike):
+        '''Open a String as a pickle
+        '''
+        # TODO: this does not yet work
+        storage = pickleMod.loads(fileLike)
+        self.stream = self._unpackStream(storage)
 
 
 #-------------------------------------------------------------------------------
@@ -1095,6 +1137,36 @@ def unfreeze(fp):
     '''
     v = StreamFreezer()
     v.openPickle(fp)
+    return v.stream
+
+def freezeInMemory(streamObj):
+    '''Given a StreamObject and a file path, pickle and return a file-like object.
+
+    The object is returned.
+    '''
+    v = StreamFreezer(streamObj)
+    return v.writePickleInMemory() # returns fp
+
+def unfreezeInMemory(fileLike):
+    '''Given a file path of a pickled Stream, attempt to parse the file into a Stream.
+    '''
+    v = StreamFreezer()
+    v.openPickleInMemory(fileLike)
+    return v.stream
+
+def freezeStr(streamObj):
+    '''Given a StreamObject and a file path, pickle and return a file-like object.
+
+    A string is returned.
+    '''
+    v = StreamFreezer(streamObj)
+    return v.writePickleStr() # returns a string
+
+def unfreezeStr(strData):
+    '''Given a file path of a pickled Stream, attempt to parse the file into a Stream.
+    '''
+    v = StreamFreezer()
+    v.openPickleStr(strData)
     return v.stream
 
 

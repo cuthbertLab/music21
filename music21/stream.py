@@ -1890,11 +1890,26 @@ class Stream(music21.Music21Object):
     def unwrapWeakref(self):
         '''Overridden method for unwrapping all Weakrefs.
         '''
-        # call base method
+        # call base method: this gets defined contexts and active site
         music21.Music21Object.unwrapWeakref(self)
         # for contained objects that have weak refs
         self._derivation.unwrapWeakref()
-        
+        # this presently is not a weakref but in case of future changes
+#         if common.isWeakref(self.flattenedRepresentationOf):
+#             post = common.unwrapWeakref(objRef)
+#             self.flattenedRepresentationOf = post
+
+
+    def wrapWeakref(self):
+        '''Overridden method for unwrapping all Weakrefs.
+        '''
+        # call base method: this gets defined contexts and active site
+        music21.Music21Object.wrapWeakref(self)
+        self._derivation.wrapWeakref()
+#         if not common.isWeakref(self.flattenedRepresentationOf):
+#             post = common.wrapWeakref(objRef)
+#             self.flattenedRepresentationOf = post
+
 
     def setupSerializationScaffold(self):
         '''Prepare this stream and all of its contents for pickling, that
@@ -11158,9 +11173,13 @@ class SpannerStorage(Stream):
         # must provide a keyword argument with a reference to the spanner parent
         # could name spannerContainer or other?
         #environLocal.printDebug('keywords', keywords)
+        # TODO: this might be better stored as weak ref
         self.spannerParent = None
         if 'spannerParent' in keywords.keys():
             self.spannerParent = keywords['spannerParent']
+
+    # NOTE: for serialization, this will need to properly tage
+    # the spanner parent by updating the scaffolding code. 
 
 
 #-------------------------------------------------------------------------------

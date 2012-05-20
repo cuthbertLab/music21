@@ -294,7 +294,6 @@ class Spanner(music21.Music21Object):
         True
         '''
         # delegate to Stream subclass
-        # will return None if weakref is dead
         return self._components.__getitem__(key)
 
     def __len__(self):

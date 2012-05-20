@@ -612,7 +612,8 @@ class DefinedContexts(JSONSerializer):
         for idKey in self._definedContexts.keys():
             if WEAKREF_ACTIVE:
             #if common.isWeakref(self._definedContexts[idKey]['obj']):
-                target = self._definedContexts[idKey]['obj']            
+                target = self._definedContexts[idKey]['obj']
+                environLocal.pd(['   target start', target])            
                 if target is not None:
                     if common.isWeakref(target):
                         environLocal.printDebug(['unwrapping:', self._definedContexts[idKey]['obj']])
@@ -622,6 +623,7 @@ class DefinedContexts(JSONSerializer):
                     # if it is not stored elsewhere
                     if target is not None:
                         target.unwrapWeakref()
+                environLocal.pd(['   target end', target])            
 
     def wrapWeakref(self):
         '''Wrap all stored objects with weakrefs.
@@ -3067,7 +3069,6 @@ class Music21Object(JSONSerializer):
         '''
         pass
 
-
     def unwrapWeakref(self):
         '''Public interface to operation on DefinedContexts.
 
@@ -3081,12 +3082,15 @@ class Music21Object(JSONSerializer):
         >>> aM21Obj.unwrapWeakref()
 
         '''
-        #environLocal.printDebug(['unwrapWeakref on:', self])
+        environLocal.printDebug(['Music21Object: unwrapWeakref on:', self])
         self._definedContexts.unwrapWeakref()
         # doing direct access; not using property activeSite, as filters
         # through global WEAKREF_ACTIVE setting
         if self._activeSite is not None:
             self._activeSite = common.unwrapWeakref(self._activeSite)
+
+        environLocal.printDebug(['   self._activeSite:', self._activeSite])
+
         self._unwrapPrivateWeakref()
 
     def wrapWeakref(self):
@@ -5324,6 +5328,7 @@ class Test(unittest.TestCase):
             'P1: Soprano: Instrument 1')
 
         self.assertEqual(str(measures[0].previous()), 'P1: Soprano: Instrument 1') 
+
 
 
 #-------------------------------------------------------------------------------

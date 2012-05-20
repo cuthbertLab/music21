@@ -81,9 +81,9 @@ class Test(unittest.TestCase):
         fp = '/_scratch/test.pickle'
         converter.freeze(s, fp)
 
-        post = converter.unfreeze(s, fp)
-        self.assertEqual(len(post.notes), 1)
-        self.assertEqual(str(post.notes[0]), 'D2')
+        post = converter.unfreeze(fp)
+        self.assertEqual(len(post.notes), 2)
+        self.assertEqual(str(post.notes[0].pitch), 'D2')
 
 
     # TODO: replace with file-like objects for temporary writing
@@ -98,13 +98,13 @@ class Test(unittest.TestCase):
         sp = spanner.Slur(n1, n2)
         s.append(n1)
         s.append(n2)
-        s.append(sp)
-        fp = '/_scratch/test.pickle'
-        converter.freeze(s, fp)
+        #s.append(sp)
+        temp = converter.freezeStr(s)
 
-        post = converter.unfreeze(s, fp)
-        self.assertEqual(len(post.notes), 1)
-        self.assertEqual(str(post.notes[0]), 'D2')
+        post = converter.unfreezeStr(temp)
+
+        self.assertEqual(len(post.notes), 2)
+        self.assertEqual(str(post.notes[0].pitch), 'D2')
 
 
 
