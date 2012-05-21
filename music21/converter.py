@@ -264,7 +264,6 @@ class PickleFilter(object):
 class StreamFreezer(object):
     '''This class is used to freeze a Stream, preparing it for pickling. 
     '''
-
     def __init__(self, streamObj=None):
         # must make a deepcopy, as we will be altering DefinedContexts
 

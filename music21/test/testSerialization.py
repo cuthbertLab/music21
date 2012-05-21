@@ -68,7 +68,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(c1.pitches), '[C2, A4, E5]')
         self.assertEqual(c1.quarterLength, 1.25)
 
-    # TODO: replace with file-like objects for temporary writing
+
     def testBasicC(self):
         from music21 import stream, note, converter
         import copy
@@ -78,16 +78,13 @@ class Test(unittest.TestCase):
         s.append(n1)
         s.append(note.Note('g~6', quarterLength=.25))
 
-        fp = '/_scratch/test.pickle'
-        converter.freeze(s, fp)
+        temp = converter.freezeStr(s)
+        post = converter.unfreezeStr(temp)
 
-        post = converter.unfreeze(fp)
         self.assertEqual(len(post.notes), 2)
         self.assertEqual(str(post.notes[0].pitch), 'D2')
 
 
-    # TODO: replace with file-like objects for temporary writing
-    # this presently fails
     def testBasicD(self):
         from music21 import stream, note, converter, spanner
         import copy
