@@ -96,7 +96,7 @@ class Test(unittest.TestCase):
         s.append(n1)
         s.append(n2)
         #s.append(sp)
-        s = copy.deepcopy()
+        #s = copy.deepcopy()
         temp = converter.freezeStr(s)
 
         post = converter.unfreezeStr(temp)
