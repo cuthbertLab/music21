@@ -161,7 +161,7 @@ validVexFlowKeys = [
 ]
 
 #Allow for different glyphs other than standard western notation for notes
-validVexFlowNoteGlyphs = [
+validVexFlowNoteheadGlyphs = [
 	#  Diamond 
 	'D0',
 	'D1',
@@ -420,18 +420,16 @@ Variables used in generating full HTML pages within which to view the VexFlow
 '''
 vexflowGlobalCopy = "<script src='http://www.vexflow.com/vexflow.js'/></script>"
 
-htmlPreamble = "\n<!DOCTYPE HTML>\n<html>\n<head>\n\t<meta name='author' content=\
-'Music21' />\n\t<script src='http://code.jquery.com/jquery-latest.js'></script>\n\
-\t" + vexflowGlobalCopy + "\n</head>\n<body>\n\t<canvas\
- width=525 height=120 id='music21canvas'></canvas>\n\t<script>\n\t\t$(document)\
-.ready(function(){"
+htmlPreamble = "\n<!DOCTYPE HTML>\n<html>\n<head>\n\t<meta name='author' conten\
+t='Music21' />\n\t<script src='http://code.jquery.com/jquery-latest.js'></scrip\
+t>\n\t" + vexflowGlobalCopy + "\n</head>\n<body>\n\t<canvas width=525 height=12\
+0 id='music21canvas'></canvas>\n\t<script>\n\t\t$(document).ready(function(){"
 
-htmlCanvasPreamble= "\n<!DOCTYPE HTML>\n<html>\n<head>\n\t<meta name='author' content=\
-'Music21' />\n\t<script src='http://code.jquery.com/jquery-latest.js'></script>\n\
-\t" + vexflowGlobalCopy + "\n</head>\n<body>\n\t"
+htmlCanvasPreamble= "\n<!DOCTYPE HTML>\n<html>\n<head>\n\t<meta name='author' c\
+ontent='Music21' />\n\t<script src='http://code.jquery.com/jquery-latest.js'></\
+script>\n\t" + vexflowGlobalCopy + "\n</head>\n<body>\n\t"
 
-htmlCanvasPostamble="<script>\n\t\t$(document)\
-.ready(function(){"
+htmlCanvasPostamble="<script>\n\t\t$(document).ready(function(){"
 
 vexflowPreamble = "\n\t\t\tvar canvas = $('#music21canvas')[0];\n\t\t\tvar \
 renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);\n \
@@ -835,7 +833,8 @@ def fromObject(thisObject, mode='txt'):
 	elif 'Stream' in thisObject.classes:
 		return fromStream(thisObject, mode)
 	else:
-		raise Vexflow21UnsupportedException, 'Unsupported object type: ' + str(thisObject)
+		raise Vexflow21UnsupportedException, 'Unsupported object type: ' + \
+			str(thisObject)
 
 def fromScore(thisScore, mode='txt'):
 	'''
@@ -1132,8 +1131,10 @@ def fromStream(thisStream, mode='txt'):
 
 	theseParts = thisStream.getElementsByClass('Part')
 	if len(theseParts) == 0:
-		return VexflowPart(music21.stream.Part(thisStream.flat).makeNotation(inPlace=False)).generateCode(mode)
-	return VexflowScore(music21.stream.Score(thisStream).makeNotation(inPlace=False)).generateCode(mode)
+		return VexflowPart(music21.stream.Part(thisStream.flat).makeNotation(\
+			inPlace=False)).generateCode(mode)
+	return VexflowScore(music21.stream.Score(thisStream).makeNotation(inPlace=\
+		False)).generateCode(mode)
 
 def fromRest(thisRest, mode='txt'):
 	'''
@@ -1390,7 +1391,8 @@ def fromMeasure(thisMeasure, mode='txt'):
 	if mode not in supportedDisplayModes:
 		raise Vexflow21UnsupportedException, 'Unsupported mode: ' + str(mode)
 	
-	return VexflowVoice(thisMeasure.makeNotation(inPlace=False)).generateCode(mode)
+	return VexflowVoice(thisMeasure.makeNotation(inPlace=False)).generateCode(\
+		mode)
 
 def vexflowClefFromClef(music21clef, params={}):
 	'''
@@ -1767,8 +1769,8 @@ class VexflowNote(object):
 
 		access via generateCode()
 		'''
-		if self.accidentalDisplayStatus == None and self.originalNote.accidental != None and \
-			self.originalNote.accidental.displayStatus != None:
+		if self.accidentalDisplayStatus ==None and self.originalNote.accidental\
+			!= None and self.originalNote.accidental.displayStatus != None:
 
 			self.accidentalDisplayStatus = \
 				self.originalNote.accidental.displayStatus
@@ -1781,9 +1783,13 @@ class VexflowNote(object):
 		elif self.originalNote.stemDirection == u'down':
 			self.stemDirection = 'Vex.Flow.StaveNote.STEM_DOWN'
 
-		if self.originalNote.beams and 'start' in self.originalNote.beams.getTypes():
+		if self.originalNote.beams and 'start' in \
+			self.originalNote.beams.getTypes():
+
 			self.beamStart = True
-		elif self.originalNote.beams and 'stop' in self.originalNote.beams.getTypes():
+		elif self.originalNote.beams and 'stop' in \
+			self.originalNote.beams.getTypes():
+
 			self.beamStop = True
 
 		if self.originalNote.tie and self.originalNote.tie.type == 'start':
@@ -1793,7 +1799,8 @@ class VexflowNote(object):
 
 
 		(self.vexflowKey, self.vexflowAccidental, self.vexflowDuration) = \
-			vexflowKeyAccidentalAndDurationFromNote(self.originalNote, params=self.params)
+			vexflowKeyAccidentalAndDurationFromNote(self.originalNote, params=\
+			self.params)
 
 		self.vexflowCode = 'new Vex.Flow.StaveNote({keys: ["'+self.vexflowKey+ \
 			'"], duration: "' + self.vexflowDuration + '"'
@@ -1816,7 +1823,7 @@ class VexflowNote(object):
 					'lation("a@a").setPosition(3))' 
 
 		try:
-			self.vexflowCode += '.addDotToAll()' * self.originalNote.duration.dots
+			self.vexflowCode += '.addDotToAll()'*self.originalNote.duration.dots
 		except:
 			print "Couldn't add dots."
 			print "Duration:", self.originalNote.duration
@@ -1872,8 +1879,8 @@ class VexflowNote(object):
 		'''
 
 		if mode not in supportedDisplayModes:
-			raise Vexflow21UnsupportedException, "VexFlow doesn't support this "\
-				+ "display mode yet. " + str(mode)
+			raise Vexflow21UnsupportedException, "VexFlow doesn't support this"\
+				+ " display mode yet. " + str(mode)
 
 		if not cache:
 			self._generateVexflowCode()
@@ -1905,7 +1912,8 @@ class VexflowNote(object):
 		Displays the Vex Flow javascript for rendering this object
 		'''
 		if mode not in supportedDisplayModes:
-			raise Vexflow21UnsupportedException, 'Unsupported display mode:', mode
+			raise Vexflow21UnsupportedException, 'Unsupported display mode:',\
+				mode
 
 		if mode == 'txt':
 			print self.generateCode('txt')
@@ -1931,8 +1939,8 @@ class VexflowChord(object):
 		'''
 		try:
 			if 'Chord' not in notes.classes:
-				raise Vexflow21UnsupportedException, 'Cannot create a Chord from'\
-					 + str(notes)
+				raise Vexflow21UnsupportedException, 'Cannot create a Chord ' +\
+					'from ' + str(notes)
 			self.originalChord = notes
 		except AttributeError:
 			if not hasattr(notes, '__contains__'):
@@ -1961,7 +1969,8 @@ class VexflowChord(object):
 		'''
 		#self.notes = []
 		self.vexflowDuration = \
-			vexflowQuarterLengthToDuration[self.originalChord.duration.quarterLength]
+			vexflowQuarterLengthToDuration[self.originalChord.duration.\
+				quarterLength]
 		self.vexflowCode = 'new Vex.Flow.StaveNote({keys: ["'
 
 		#TODO tuplet: set the tuplet variables here
@@ -1979,9 +1988,13 @@ class VexflowChord(object):
 		elif self.originalChord.tie and self.originalChord.tie.type == 'stop':
 			self.tieStop = True
 
-		if self.originalChord.beams and 'start' in self.originalChord.beams.getTypes():
+		if self.originalChord.beams and 'start' in \
+			self.originalChord.beams.getTypes():
+
 			self.beamStart = True
-		elif self.originalChord.beams and 'stop' in self.originalChord.beams.getTypes():
+		elif self.originalChord.beams and 'stop' in \
+			self.originalChord.beams.getTypes():
+
 			self.beamStop = True
 
 		for index in xrange(len(thesePitches)):
@@ -2041,7 +2054,7 @@ class VexflowChord(object):
  		self.vexflowCode += ''.join(theseAccidentals)
 
 		try:
-			self.vexflowCode += '.addDotToAll()' * self.originalChord.duration.dots
+			self.vexflowCode +='.addDotToAll()'*self.originalChord.duration.dots
 		except:
 			print "Couldn't add dots."
 			print "Duration:", self.originalChord.duration
@@ -2056,7 +2069,7 @@ class VexflowChord(object):
 		html: standalone html which can be displayed in a browser
 		'''
 		if mode not in supportedDisplayModes:
-			raise Vexflow21UnsupportedException, 'Unsupported display mode:', mode
+			raise Vexflow21UnsupportedException,'Unsupported display mode:',mode
 
 		if mode == 'txt':
 			return self.vexflowCode
@@ -2085,7 +2098,7 @@ class VexflowChord(object):
 		Displays the Vex Flow javascript for rendering this object
 		'''
 		if mode not in supportedDisplayModes:
-			raise Vexflow21UnsupportedException, 'Unsupported display mode:', mode
+			raise Vexflow21UnsupportedException,'Unsupported display mode:',mode
 
 		if mode == 'txt':
 			print self.generateCode('txt')
@@ -2124,7 +2137,8 @@ class VexflowRest(object):
 		'''
 		Generates the vexflow code needed to render this rest object
 		'''
-		thisVexflowDuration = vexflowDurationFromNote(self.originalRest, params=self.params) + 'r'
+		thisVexflowDuration = vexflowDurationFromNote(self.originalRest, \
+			params=self.params) + 'r'
 
 		self.vexflowCode = 'new Vex.Flow.StaveNote({keys: ["'+self.vexflowKey+ \
 			'"], duration: "' + thisVexflowDuration + '"})'
@@ -2137,7 +2151,7 @@ class VexflowRest(object):
 				self.vexflowCode += '.addArticulation(0, new Vex.Flow.Articu'+\
 					'lation("a@a").setPosition(3))' 
 		try:
-			self.vexflowCode += '.addDotToAll()' * self.originalRest.duration.dots
+			self.vexflowCode += '.addDotToAll()'*self.originalRest.duration.dots
 		except:
 			print "Couldn't add dots."
 			print "Duration:", self.originalRest.duration
@@ -2168,7 +2182,7 @@ class VexflowRest(object):
 		html: standalone html which can be displayed in a browser
 		'''
 		if mode not in supportedDisplayModes:
-			raise Vexflow21UnsupportedException, 'Unsupported display mode:', mode
+			raise Vexflow21UnsupportedException,'Unsupported display mode:',mode
 
 		if mode == 'txt':
 			return self.vexflowCode
@@ -2197,7 +2211,7 @@ class VexflowRest(object):
 		Displays the Vex Flow javascript for rendering this object
 		'''
 		if mode not in supportedDisplayModes:
-			raise Vexflow21UnsupportedException, 'Unsupported display mode:', mode
+			raise Vexflow21UnsupportedException,'Unsupported display mode:',mode
 
 		if mode == 'txt':
 			print self.generateCode('txt')
@@ -2250,7 +2264,8 @@ class VexflowScore(object):
 		if self.context == None:
 			self.context = previousParams['context']
 
-		self.partsCode = '\n'.join([part.generateCode('txt') for part in self.vexflowParts])
+		self.partsCode = '\n'.join([part.generateCode('txt') for part in \
+			self.vexflowParts])
 		self.vexflowCode = self.context.getJSCode(indentation=3) + '\n'
 		self.vexflowCode += self.partsCode
 	
@@ -2271,9 +2286,13 @@ class VexflowScore(object):
 			for thisPart in self.vexflowParts:
 				for thisStave in thisPart.staves:
 					for thisVoice in thisStave.vexflowVoices:
-						(beamPreamble, beamPostamble) = thisVoice.beamCode(self.context.getContextName())
-						(thisTieCode, thesePartialTies) = thisVoice.tieCode(self.context.getContextName())
-						thesePartialTies = [(thisPartialTie + [thisStave.getLineNum()]) for thisPartialTie in thesePartialTies]
+						(beamPreamble, beamPostamble) = \
+							thisVoice.beamCode(self.context.getContextName())
+						(thisTieCode, thesePartialTies) = \
+							thisVoice.tieCode(self.context.getContextName())
+						thesePartialTies = [(thisPartialTie + \
+							[thisStave.getLineNum()]) for thisPartialTie in \
+							thesePartialTies]
 						tieCode += '\n' + thisTieCode
 						partialTies += thesePartialTies
 						result += beamPreamble
@@ -2307,16 +2326,21 @@ class VexflowScore(object):
 						str(tieNum)
 
 					if thisLineNum != thisStartLineNum:
-						result +='\nvar '+thisTieName+'Start = new Vex.Flow.StaveTie({\n'+'first_note: '+thisTieStart+'\n});'
-						result +='\nvar '+thisTieName+'End = new Vex.Flow.StaveTie({\n'+'last_note: '+thisTieEnd+'\n});'
-						result += '\n'+thisTieName+'Start.setContext('+str(self.context.getContextName())+').draw();'
-						result += '\n'+thisTieName+'End.setContext('+str(self.context.getContextName())+').draw();'
+						result +='\nvar '+thisTieName+'Start = new Vex.Flow.S'+\
+							'taveTie({\n'+'first_note: '+thisTieStart+'\n});'
+						result +='\nvar '+thisTieName+'End = new Vex.Flow.Sta'+\
+							'veTie({\n'+'last_note: '+thisTieEnd+'\n});'
+						result += '\n'+thisTieName+'Start.setContext('+\
+							str(self.context.getContextName())+').draw();'
+						result += '\n'+thisTieName+'End.setContext('+\
+							str(self.context.getContextName())+').draw();'
 						tieStart = True
 						continue
 
-					result +='\nvar '+thisTieName+' = new Vex.Flow.StaveTie({\n'+\
-						'first_note: '+thisTieStart+',\nlast_note: '+thisTieEnd\
-						+',\nfirst_indices: [0],\nlast_indices: [0]\n});'
+					result +='\nvar '+thisTieName+' = new Vex.Flow.StaveTie({'+\
+						'\nfirst_note: '+thisTieStart+',\nlast_note: '+\
+						thisTieEnd+',\nfirst_indices: [0],\nlast_indices: [0]'+\
+						'\n});'
 					result += '\n'+thisTieName+'.setContext('+\
 						str(self.context.getContextName())+').draw();'
 					tieStart = True
@@ -2391,7 +2415,8 @@ class VexflowPart(object):
 			str(self.params['staveHeight']) + ' + ' + \
 			str(self.params['intraSystemMargin']) + '))'
 
-		self.clef = vexflowClefFromClef(self.originalPart.flat.getElementsByClass('Clef')[0])
+		self.clef = vexflowClefFromClef(self.originalPart.flat.\
+			getElementsByClass('Clef')[0])
 	
 	def _generateVexflowCode(self):
 		'''
@@ -2419,8 +2444,8 @@ class VexflowPart(object):
 			theseParams = {
 				'width': self.measureWidth,
 				'position': (thisXPosition, thisYPosition),
-				'name': 'stavePart' + str(self.params['partIndex']) + 'Measure' + \
-					str(self.numMeasures) + 'Line' + str(self.numLines) + 'ID' + \
+				'name': 'stavePart'+str(self.params['partIndex'])+ 'Measure' + \
+					str(self.numMeasures)+'Line' + str(self.numLines) + 'ID' + \
 					str(self.UID),
 				'clef': self.clef,
 				'notesWidth': self.notesWidth,
@@ -2466,7 +2491,7 @@ class VexflowPart(object):
 
 		contextParams = {
 			'width': self.params['canvasWidth'],
-			'height': '((' + str(self.numLines + 1) + ' * ('+str(self.systemHeight)+\
+			'height': '(('+str(self.numLines+1)+ ' * ('+str(self.systemHeight)+\
 				' + ' + str(self.params['interSystemMargin']) + ')) + 2* ' +\
 				str(self.topMargin) + ')'
 		}
@@ -2493,10 +2518,11 @@ class VexflowPart(object):
 		preamble = []
 		postamble = []
 		for thisStave in self.staves:
-			(pre, post) = thisStave.beamCode(contextName, indentation=indentation)
+			(pre, post)=thisStave.beamCode(contextName, indentation=indentation)
 			preamble += [pre]
 			postamble += [post]
-		return [('\n' + ('\t' * indentation)).join(preamble), ('\n' + ('\t' * indentation)).join(postamble)]
+		return [('\n' + ('\t' * indentation)).join(preamble), \
+			('\n' + ('\t' * indentation)).join(postamble)]
 
 	def generateCode(self, mode='txt'):
 		'''
@@ -2585,7 +2611,7 @@ class VexflowVoice(object):
 				self.clefDisplayStatus = self.params['clefDisplayStatus']
 
 		#Set the key signature
-		theseKeySignatures = self.originalNotes.getElementsByClass('KeySignature')
+		theseKeySignatures=self.originalNotes.getElementsByClass('KeySignature')
 		if len(theseKeySignatures) > 1:
 			raise Vexflow21UnsupportedException, 'Vexflow cannot yet handle ' +\
 				'multiple key signatures in a single measure'
@@ -2595,8 +2621,8 @@ class VexflowVoice(object):
 				self.keySignature = \
 					vexflowSharpsToKeySignatures[theseKeySignatures[0].sharps]
 			else:
-				raise VexFlowUnsupportedException, "VexFlow doesn't support this "+\
-					'Key Signature:', theseKeySignatures[0]
+				raise VexFlowUnsupportedException, "VexFlow doesn't support t"+\
+					'his Key Signature:', theseKeySignatures[0]
 		else:
 			if 'keySignature' in self.params:
 				self.keySignature = self.params['keySignature']
@@ -2609,7 +2635,8 @@ class VexflowVoice(object):
 					self.params['keySignatureDisplayStatus']
 
 		#Set the time signature
-		theseTimeSignatures = self.originalNotes.getElementsByClass('TimeSignature')
+		theseTimeSignatures = self.originalNotes.getElementsByClass(\
+			'TimeSignature')
 		if len(theseTimeSignatures) > 1:
 			raise Vexflow21UnsupportedException, 'Vexflow cannot yet handle ' +\
 				'multiple time signatures in a single measure'
@@ -2638,7 +2665,7 @@ class VexflowVoice(object):
 		'''
 		Generates the code necessary to display this voice
 		'''
-		self.voiceCode = 'var ' + str(self.voiceName) + ' = new Vex.Flow.Voice({' +\
+		self.voiceCode='var '+str(self.voiceName) + ' = new Vex.Flow.Voice({' +\
 			'num_beats: ' + str(self.numBeats) + ', ' + \
 			'beat_value: ' + str(self.beatValue) + ', ' + \
 			'resolution: Vex.Flow.RESOLUTION});'
@@ -2879,7 +2906,7 @@ class VexflowStave(object):
 		self._generateVexflow()
 	
 	def _generateVexflow(self):
-		self.staveCode = 'var ' + str(self.staveName) + ' = new Vex.Flow.Stave(' +\
+		self.staveCode = 'var '+str(self.staveName)+ ' = new Vex.Flow.Stave(' +\
 			str(self.params['position'][0])+','+str(self.params['position'][1])\
 			+ ',' + str(self.params['width']) + ');'
 
@@ -2914,7 +2941,8 @@ class VexflowStave(object):
 				str(self.params['clef']) + '");'
 
 		if 'keySignatureDisplayStatus' in self.params and \
-			'keySignature' in self.params and self.params['keySignatureDisplayStatus']:
+			'keySignature' in self.params and self.params[\
+			'keySignatureDisplayStatus']:
 			self.staveCode += '\n' + str(self.staveName) + '.addKeySignature('+\
 				'"' + str(self.params['keySignature']) + '");'
 
@@ -2955,10 +2983,12 @@ class VexflowStave(object):
 		postamble = []
 		for thisVoice in self.vexflowVoices:
 			if thisVoice.getBeaming():
-				(pre, post) = thisVoice.beamCode(contextName, indentation=indentation)
+				(pre, post) = thisVoice.beamCode(contextName, \
+					indentation=indentation)
 				preamble += [pre]
 				postamble += [post]
-		return [('\n' + ('\t' * indentation)).join(preamble), ('\n' + ('\t' * indentation)).join(postamble)]
+		return [('\n' + ('\t' * indentation)).join(preamble), \
+			('\n' + ('\t' * indentation)).join(postamble)]
 
 	def getParam(self, param):
 		'''
@@ -3089,7 +3119,6 @@ class VexflowContext(object):
 		self.contextName = ''
 		self.contextCode = ''
 		if canvasName == None:
-			#XXX Is this sufficient? Should I instead use a random string/hash?
 			self.canvasHTMLName = "music21Canvas" + str(self.UID)
 		else:
 			self.canvasHTMLName = str(canvasName)
@@ -3183,7 +3212,9 @@ class VexflowContext(object):
 		return self.contextName
 	
 	def getJSCode(self, indentation=1, cache=True, applyAttributes=True):
-		if not cache or not self.canvasJSCode or not self.rendererCode or not self.contextCode:
+		if not cache or not self.canvasJSCode or not self.rendererCode or not \
+			self.contextCode:
+
 			self.generateJS(applyAttributes=applyAttributes)
 
 		jsCode = self.canvasJSCode + '\n' + ('\t' * indentation)
@@ -3200,7 +3231,6 @@ class VexflowContext(object):
 		self.generateJS()
 
 #-------------------------------------------------------------------------------
-#TODO Here go Tests
 class Test(unittest.TestCase):
     
     def runTest(self):
