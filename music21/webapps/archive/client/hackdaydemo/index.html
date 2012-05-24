@@ -1,378 +1,187 @@
-<!DOCTYPE html>
-<!-- saved from url=(0027)http://web.mit.edu/music21/ -->
-<html class="dj_webkit dj_chrome dj_contentbox"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>music21: a Toolkit for Computer-Aided Musicology</title>
+<html>
+<head>
+<title>Music 21 Online</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
-<script type="text/javascript">
-        var djConfig = {
-            parseOnLoad: true,
-            isDebug: false
-        };
-</script>
+<script language="javascript" src="../javascript/json2.js"></script>
+<script language="javascript" src="../javascript/music21.js"></script>
 
-<link rel="stylesheet" type="text/css" href="index_files/tundra.css">
-<link rel="stylesheet" type="text/css" href="index_files/Lightbox.css">
+<script language="javascript">
 
-<script type="text/javascript" src="index_files/dojo.xd.js"></script>
+m21 = new Music21interface();
 
-<script>
-dojo.require('dojox.image.Lightbox')
-
-function fixBot() {
-  wS = dojo.byId("whiteSection")
-  h1 = wS.offsetTop + wS.offsetHeight
-  rS = dojo.byId("rightSection")
-  h2 = rS.offsetTop + rS.offsetHeight
-
-  botSec = dojo.byId("botSection")
-  if (h1 > h2) { botSec.style.top = h1 + 10 + "px" }
-  else         { botSec.style.top = h2 + 10 + "px" }
-}
-
-function cuthPubLBsetup() {
-   lb1 = new dojox.image.Lightbox( { title:"music21 module code", group: "cuth", href:"top_right_expanded.jpg" });
-   lb2 = new dojox.image.Lightbox( { title:"<span class='blueExample'>tinyNotation</span>.TinyNotationStream<br>&nbsp;&nbsp;('<span class='greenExample'>c4 d8 f g16 a g f#</span>', '<span class='greenExample'>3/4</span>').show()", group: "cuth", href:"tinyNotation1.jpg" });
-   lb3 = new dojox.image.Lightbox( { title:"Schoenberg twelve-tone row as a matrix", group: "cuth", href:"serial_row.jpg" });
-   lb4 = new dojox.image.Lightbox( { title:"Websearches triggered by texts", group: "cuth", href:"magnificat_search.jpg" });
-   lb5 = new dojox.image.Lightbox( { title:"Automatic anotation of German note names", group: "cuth", href:"auto_bach_german.jpg" });
-   lb6 = new dojox.image.Lightbox( { title:"Chopin Pitch/Note-Length Distributions", group: "cuth", href:"chopin_mazurka_distribution.jpg" });
-   lb7 = new dojox.image.Lightbox( { title:"Rhythms used in a Mazurka", group: "cuth", href:"most_common_chopin.jpg" });
-
-   lb1.startup()
-   lb2.startup()
-   lb3.startup()
-   lb4.startup()
-   lb5.startup()
-   lb6.startup()
-   lb7.startup()
-}
-
-function cuthPubLBrun() {
-   lb1.show()
-
-}
-
-dojo.addOnLoad( fixBot )
-dojo.addOnLoad( cuthPubLBsetup )
-</script><script type="text/javascript" charset="utf-8" src="index_files/Lightbox.xd.js"></script>
-<style>
-
-BODY {
-   background: white url(index_files/bg_top_mid.gif) repeat-x;
-   font-family: Georgia, palatino, "Times New Roman", serif;
-   font-size: 13px;
-   line-height: 18px;
-}
-
-H1 {
-   font-size: 22px;
-   color: #301540;
-}
-
-A {
-   color: #8025a0;
-   text-decoration: none;
-   border-bottom: 1px dotted #aa30ff;
-}
-
-A.visited {
-   color: #a025e0;
-   text-decoration: none;
-   border-bottom: 1px dotted #aa30ff;
-}
-
-H2 A {
-   border-bottom: none;
-}
-
-IMG { border-width: 0px 0px 0px 0px;
-    }
-
-B {
-   color: #301540;
-}
-SMALL { font-size: 10px; line-height: 12px; }
-
-.dateline {
-   color: #666677;
-   font-size: 11px;
-   margin-top: 10px;
-   margin-bottom: -12px;
-}
-
-
-#mainContainer {
-   position: absolute;
-   top: 0px;
-   left: 0px;
-   height: 100%;
-   width: 100%;
-}
-
-#topLeft {
-	background: url(index_files/bg_top_left.jpg) no-repeat;
-	width: 631px;
-	height: 70px;
-	position: absolute;
-	top: 0px;
-	left: 200px;
-	cursor: pointer;
-}
-
-#topRight {
-	background: url(index_files/bg_top_right.jpg) no-repeat;
-	width: 355px;
-	height: 392px;
-	position: absolute;
-	top: 0px;
-	left: 831px;
-	z-index: 50;
-	margin-bottom: 0px;
-}
-
-
-
-#firstTextSection {
-   position: relative;
-   top: 80px;
-}
-
-#whiteSection {
-	position: absolute;
-	top: -3px;
-	left: 75px;
-	width: 725px;
-	height: 1606px;
-}
-
-#rightSection {
-	position: absolute;
-	top: 311px;
-	left: 834px;
-	width: 350px;
-	text-align: justify;
-}
-
-#botSection {
-   background: url(index_files/bot_bg.jpg);
-   position: relative;
-   top: 1000px;
-}
-
-#midWhite {
-   background: url(index_files/mid_whiteblack.jpg) repeat-x;
-   width: 100%;
-   height: 36px;
-}
-
-#botTop {
-   display: none;
-/*   background: url(index_files/bot_titles.jpg) no-repeat;
-   width: 1016px;
-   height: 108px;
-   position: relative;
-   top: 20px;
-   left: 20px;
-*/}
-
-#botMid {
-   display: none;
-/*   background: url(index_files/bot_mid.jpg) repeat-y;
-   width: 1016px;
-   position: relative;
-   top: 0px;
-   left: 20px;
-*/
-}
-
-#botBot {
-   display: none;
-/*
-   background: url(index_files/bot_bot.jpg) no-repeat;
-   width: 1016px;
-   height: 52px;
-   position: relative;
-   top: 0px;
-   left: 20px;
-*/
-}
-
-#publications {
-   color: #eeeeee;
-}
-
-#otherLinks {
-   color: #f5f5f5;
-}
-
-#botTable H2 {
-   color: #ffaa66;
-   font-size: 1.3em;
-   margin-bottom: 6px;
-}
-
-#publications A {
-   color: #f0f5d0;
-   border-bottom: 1px dotted #666655;
-}
-
-#otherLinks A {
-   color: #f0f5d0;
-   border-bottom: 1px dotted #777766;
-}
-
-
-#botTable .gray {
-   color: #c0c0c0;
-}
-
-.m21 {
-   font-family: "Courier New", "courier", monospaced;
-   font-size: 90%;
-}
-
-.shadeddotted {
-  background-color: #fafaf0;
-  border: 1px black dotted;
-  padding: 5px 5px 5px 5px
-}
-
-.indentExample {
-   font-family: "Courier New", "courier", monospaced;
-   font-size: 90%;
-   margin-left: 20px;
-}
-
-.greenExample {
-   color: #00a000;
-}
-
-.blueExample {
-   color: #0000e0;
-}
-</style>
-
-
-<script type="text/javascript" charset="utf-8" src="index_files/Dialog.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/_base.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/move.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/TimedMoveable.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/fx.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/_Widget.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/_Templated.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/_FormMixin.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/_DialogMixin.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/DialogUnderlay.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/ContentPane.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/common.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/TooltipDialog.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/Mover.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/Moveable.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/Toggler.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/_base.xd(1).js"></script><script type="text/javascript" charset="utf-8" src="index_files/string.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/parser.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/cache.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/_Contained.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/_LayoutWidget.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/html.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/loading.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/common.xd(1).js"></script><script type="text/javascript" charset="utf-8" src="index_files/autoscroll.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/focus.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/manager.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/place.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/popup.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/scroll.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/sniff.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/typematic.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/wai.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/window.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/stamp.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/_Container.xd.js"></script><script type="text/javascript" charset="utf-8" src="index_files/AdapterRegistry.xd.js"></script>
-
-<script lang='javascript'>
-
-// Get Movie - provides access to Object - accounts for browser differences
-function getMovie(movieName) {
-    if (navigator.appName.indexOf("Microsoft") != -1) {
-        return document.getElementById(movieName);
-    }
-    else {
-        return document[movieName]
-    }
-}
-
-function sendToNoteflight() {
-	getMovie('score1').loadMusicXML(document.getElementById('resultxmltextarea').value);		
-}
-
-/* 
- * createObject()
- * 
- * creates an AJAX HTTP Request object - accounts for browser differences
- */
-
-function createObject() {
-	var request_type;
-	var browser = navigator.appName;
-	if(browser == "Microsoft Internet Explorer"){
-		request_type = new ActiveXObject("Microsoft.XMLHTTP");
-	}else{
-		request_type = new XMLHttpRequest();
-	}
-		return request_type;
-}
-
-
-/* 
- * queryMusic21(cmd)
- * 
- * Takes the given command cmd in the form "cmd:args;cmd:args" and queries music21
- * Once the server loads, it will call music21Reply() 
- */
-// track the object between query and reply
-var http = createObject();
-
-function queryMusic21(cmd) {
-	musicxml = getMovie('score1').getMusicXML();
-//	document.getElementById('requestxmltextarea').value = musicxml;		
+function theoryChecker(opt) {
+	m21.request.clear();
+	var xmltext = m21.noteflight.getMusicXMLFromNoteflightEmbed('nfscore');
+	m21.request.addData("returnSc","xml",xmltext);
 	
-	var parameters="xmltext="+musicxml+"&cmd="+cmd+"&appname=noteflight"
+	m21.request.addCommand("function","","","theoryAnalyzer.identifyParallelOctaves",["returnSc","None","None","'#FF0000'"]);	
+	
+	
+	m21.request.addReturnVar("returnSc","musicxml");
+	//m21.request.addReturnVar("returnStr","str");
+	m21.sendRequest();
 
-	// Set te random number to add to URL request
-	nocache = Math.random();
-	http.open('POST', '/music21interface/process',true);
-	http.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-	http.send(parameters)
-
-	http.onreadystatechange = reply;
 }
 
-/* 
- * reply()
- * 
- * Displays the result of the request in the textarea and updates the Noteflight Display
- */
-function reply() {
-	if(http.readyState == 4){
-		var response = http.responseText;
-		//document.getElementById('resultxmltextarea').value = response;
-		//return;
-		var responsearr = response.split("---");
-		document.getElementById('message').innerHTML = responsearr[1];
-		
-		document.getElementById('responsetextarea').value = responsearr[0];
-		
-		getMovie('score1').loadMusicXML(responsearr[0]);		
+function showCorpus(corpusFile) {
+	m21.request.clear();
+	
+	m21.request.addCommand("function","returnSc","","corpus.parse",[corpusFile])
+	
+	m21.request.addReturnVar("returnSc","musicxml");
+	m21.sendRequest();
+}
+
+function reduction() {
+	m21.request.clear();
+	var xmltext = m21.noteflight.getMusicXMLFromNoteflightEmbed('nfscore');
+	m21.request.addData("sc","xml",xmltext);
+
+	m21.request.addCommand("function","returnSc","","reduction",["sc"])
+	
+	m21.request.addReturnVar("returnSc","musicxml");
+	m21.sendRequest();
+}
+
+function generateCanon() {
+	m21.request.clear();
+	var xmltext = m21.noteflight.getMusicXMLFromNoteflightEmbed('nfscore');
+	m21.request.addData("sc","xml",xmltext);
+
+	m21.request.addCommand("function","returnSc","","createMensuralCanon",["sc"])
+	
+	m21.request.addReturnVar("returnSc","musicxml");
+	m21.sendRequest();
+}
+
+function checkleadsheetpitches(opt) {
+	if(opt == "correction") {
+		var argList = ["sc","''"];	
 	}
+	else if(opt == "answerkey") {
+		var argList = ["sc","'answerkey'"];
+	}
+	
+	
+	m21.request.clear();
+	var xmltext = m21.noteflight.getMusicXMLFromNoteflightEmbed('nfscore');
+	m21.request.addData("sc","xml",xmltext);
+
+	m21.request.addCommand("function","returnSc","","checkLeadSheetPitches",argList)
+	
+	m21.request.addReturnVar("returnSc","musicxml");
+	
+	m21.sendRequest()
 }
 
+function setup() {
+	m21.noteflight.createNoteflightEmbed('noteflightembed','nfscore','fc79df30896da6aa03f90ff771015913ca6880be',750,500,1.2);
+	m21.onSuccess = function () {
+		m21.noteflight.sendMusicXMLToNoteflightEmbed('nfscore',m21.result.getData("returnSc"));
+		document.getElementById('message').innerHTML = m21.result.getData('returnStr');
+	};
+	
+	m21.onError = function () {
+		alert(m21.result.errorString());
+	};
+}
+
+var current_view = 0;
+function changeView(targetNum) {
+	for(var i = 0; i<=6; i++) {
+		document.getElementById('form'+i).style.display='none';
+	}
+	document.getElementById('form'+targetNum).style.display='';
+}
 </script>
+
 </head>
-<body class="tundra">
-<div id="mainContainer">
-  <div id="topLeft" onClick="window.location = &#39;http://web.mit.edu/music21/&#39;"></div>
-  <div id="topRight"><img src="index_files/blank.gif" alt="pubPhotos" width="350" height="380" border="0" usemap="#Map">
-    <map name="Map">
-      <area shape="rect" coords="43,61,262,263" href="http://web.mit.edu/music21">
-    </map>
-  </div>
-  <div id="firstTextSection">
-    <div id="whiteSection">
-      <object id="score1" width="750" height="500">
-      <param name="movie" value="http://music21dev.scc.noteflight.com/scores/embed"></param>
-      <param name="FlashVars" value="id=b322a0c4be0eff7ba444514bacee89d18a2c9c6c&scale=1.25&role=template"></param>
-      <param name="allowScriptAccess" value="always"/>
-      <embed name="score1" src="http://music21dev.scc.noteflight.com/scores/embed" type="application/x-shockwave-flash"
-        FlashVars="id=b322a0c4be0eff7ba444514bacee89d18a2c9c6c&scale=1.25&role=template"
-        width="750" height="500"
-        allowScriptAccess="always">
-      </embed>
-    </object>
-
-    
-
-	</div>
-    <div id="rightSection">
-    <p id='message'></p>
-    <form>
-	<textarea id='command' style="width:100%;display" rows="5"></textarea><br />
-	<input type='button' style="display" onClick="queryMusic21(document.getElementById('command').value)" Value='Query Music 21' /><br />
-	<input type='button' onClick="queryMusic21('canon')" Value='Generate Canon' />
-	<input type='button' onClick="queryMusic21('reduction')" Value='Reduction' />
-	<input type='button' onClick="queryMusic21('idparallelfifths')" Value='Highlight Parallel Fifths' />
-	<input type='button' onClick="queryMusic21('idparalleloctaves')" Value='Highlight Parallel Octaves' />
-	<input type='button' onClick="queryMusic21('idhiddenfifths')" Value='Highlight Hidden Fifths' />
-	<input type='button' onClick="queryMusic21('idhiddenoctaves')" Value='Highlight Hidden Octaves' />
-    <br />
-	<input type='button' onClick="queryMusic21('checkleadsheetpitches')" Value='Check Lead Sheet Chord Pitches' />
-    <br />
-    <select name="corpusfile" id="corpusfile">
+<body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" style="background-image:url(images/background.gif);font-family:calibri" onLoad="setup()">
+<!-- Save for Web Slices (music21template.psd) -->
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td align="center">
+<table id="Table_01" width="1220" height="727" border="0" cellpadding="0" cellspacing="0">
+	<tr>
+		<td colspan="7">
+			<img border='0' src="images/music21_01.gif" width="1259" height="36" alt=""></td>
+	</tr>
+	<tr>
+		<td rowspan="3">
+			<img border='0' src="images/music21_02.gif" width="29" height="691" alt=""></td>
+		<td colspan="5">
+			<img border='0' src="images/music21_03.gif" alt="" width="1200" height="69" usemap="#Map"></td>
+		<td rowspan="3">
+			<img border='0' src="images/music21_04.gif" width="30" height="691" alt=""></td>
+            
+	</tr>
+	<tr style="background:#FFF">
+		<td>
+			<img border='0' src="images/music21_05.gif" width="28" height="566" alt=""></td>
+		<td width="772" height="566" align="center" valign="middle" style="background:#FFF">
+      <div id='noteflightembed'> </div>
+		<td style="background:#CCC" width="2"></td>
+		<td width="419" height="566" valign="top" style="background:#FFF">
+        
+        <table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0" style="margin-left:5px">
+        <tr height="260"><td valign="top">
+        
+		<table width="100%" height="100%" cellpadding="10" cellspacing="0" border="0" align="center">
+        <tr height="50%">
+            <td width="33%" align="center" valign="top"><a href="javascript:changeView(1)"><img border='0' src='images/img1.jpg' />Theory Checker</a></td>
+            <td width="33%" align="center" valign="top"><a href="javascript:changeView(2)"><img border='0' src='images/img2.jpg' />Canon Generator</a></td>
+            <td width="33%" align="center" valign="top"><a href="javascript:changeView(3)"><img border='0' src='images/img5.jpg' />Chord Symbol Realization</a></td>
+        </tr>
+        <tr height="50%">
+            <td width="33%" align="center" valign="top"><a href="javascript:changeView(4)"><img border='0' src='images/img6.jpg' />Score Reduction</a></td>
+            <td width="33%" align="center" valign="top"><a href="javascript:changeView(5)"><img border='0' src='images/img3.jpg' />Display Corpus File</a></td>
+            <td width="33%" align="center" valign="top"><a href="javascript:changeView(6)"><img border='0' src='images/img4.jpg' />Advanced</a></td>
+        </tr>        
+        </table>
+        
+        </td></tr>
+        <tr height="41"><td valign="top">
+        <hr style="border: 0;color: #000;background-color: #000;height: 4px;"/>
+    	<p style="margin:0"><b>Status: </b><span id='message' style="color:#039">select a function to execute</span></p>
+        <hr style="border: 0;color: #000;background-color: #000;height: 2px;"/>
+        </td></tr>
+        <tr height="275"><td valign="top">
+        <form>
+        <span id='form0' style="display:">
+        Please select a category above to begin
+        </span>
+        <span id='form1' style="display:none">
+        	<h2>Theory Checker:</h2>
+        	<p>Analyze the score for the following music theory violations. Found violations will be highlighted in red and displayed above.	</p>
+            <input type='button' onClick="theoryChecker('identifyParallelFifths')" Value='Highlight Parallel Fifths' />
+            <input type='button' onClick="theoryChecker('identifyParallelOctaves')" Value='Highlight Parallel Octaves' />
+            <input type='button' onClick="theoryChecker('identifyHiddenFifths')" Value='Highlight Hidden Fifths' />
+            <input type='button' onClick="theoryChecker('identifyHiddenOctaves')" Value='Highlight Hidden Octaves' />
+        </span>
+        <span id='form2' style="display:none">
+        <h2>Mensural Canon Generator:</h2>
+        <p>Generates a mensural canon from the given soprano (top) line. See <a href="http://en.wikipedia.org/wiki/Canon_(music)#Mensuration_and_tempo_canons">wikipedia</a> for more information.</p>
+	<input type='button' onClick="generateCanon()" Value='Generate Canon' />
+        </span>
+        <span id='form3' style="display:none">
+        <h2>Chord Symbol Realization</h2>
+        <p>Music21 can realize chore symbols.  "Check Chord Pitches" will correct and annotate a student's attempt at writing the chord pitches, as well as display a percentage correct. "Realize Chord Symbols" displays the realized chord symbols answer:</p>
+	<input type='button' onClick="checkleadsheetpitches('correction')" Value='Check Chord Pitches' /><br />
+	<input type='button' onClick="checkleadsheetpitches('answerkey')" Value='Realize Chord Symbols (show answer)' />
+        </span>
+        <span id='form4' style="display:none">
+        <h2>Score Reduction:</h2>
+        <p>Combines all staves into one part, annotates the intervals, and appends the reduced score to the bottom of the system.</p>
+	<input type='button' onClick="reduction()" Value='Reduction' />    <br />
+        </span>
+        <span id='form5' style="display:none">
+        <h2>Display Corpus File:</h2>
+        <p>Load one of the 500+ MusicXML scores included in Music21's corpus, or load one of the two demo scores used for our presentation.</p>
+            <select name="corpusfile" id="corpusfile">
+<option value = 'chord_realization_exercise.mxl'>chord_realization_exercise.mxl</option>
+<option value = 'chorale_with_parallels.mxl'>chorale_with_parallels.mxl</option>
+<option value = 'bach/bwv7.7.xml'>bach/bwv7.7.xml</option>
 <option value = 'bach/bwv1.6.xml'>bach/bwv1.6.xml</option>
 <option value = 'bach/bwv10.7.xml'>bach/bwv10.7.xml</option>
 <option value = 'bach/bwv101.7.xml'>bach/bwv101.7.xml</option>
@@ -745,7 +554,6 @@ function reply() {
 <option value = 'bach/bwv67.7.xml'>bach/bwv67.7.xml</option>
 <option value = 'bach/bwv69.6-a.xml'>bach/bwv69.6-a.xml</option>
 <option value = 'bach/bwv69.6.xml'>bach/bwv69.6.xml</option>
-<option value = 'bach/bwv7.7.xml'>bach/bwv7.7.xml</option>
 <option value = 'bach/bwv70.11.xml'>bach/bwv70.11.xml</option>
 <option value = 'bach/bwv70.7.xml'>bach/bwv70.7.xml</option>
 <option value = 'bach/bwv72.6.xml'>bach/bwv72.6.xml</option>
@@ -883,31 +691,43 @@ function reply() {
 <option value = 'schumann/opus41no1/movement4.xml'>schumann/opus41no1/movement4.xml</option>
 <option value = 'schumann/opus41no1/movement5.xml'>schumann/opus41no1/movement5.xml</option>
 <option value = 'schumann/opus48no2.xml'>schumann/opus48no2.xml</option></select>
-	<input type='button' onClick="queryMusic21('showcorpus:' + document.getElementById('corpusfile').value)" Value='Display ' />
+	<input type='button' onClick="showCorpus('\''+document.getElementById('corpusfile').value+'\'')" Value='Display ' />
+
+        
+        
+        </span>
+        <span id='form6' style="display:none">
+        <h2>Advanced:</h2>
+        <p>Exposes the command interface directly:</p>
+	<textarea id='command' style="width:100%;display" rows="5"></textarea><br />
+	<input type='button' style="display" onClick="queryMusic21(document.getElementById('command').value)" Value='Query Music 21' />
+            </span>
+        <hr style="border: 0;color: #000;background-color: #000;height: 2px;"/>
+            <form>
 	<textarea id='responsetextarea' style="width:100%;display:none" rows="50"></textarea><br />
     </form>
+        
+        </td></tr>
+        </table>
+        
+        
+        </td>
+		<td style="background:#FFF">
+			<img border='0' src="images/music21_09.gif" width="16" height="566" alt=""></td>
+	</tr>
+	<tr>
+		<td colspan="5">
+			<img border='0' src="images/music21_10.gif" width="1200" height="56" alt=""></td>
+	</tr>
+</table>
+</td>
+</tr>
+</table>
+<!-- End Save for Web Slices -->
 
-    </div>
-  <div id="botSection" style="top: 1823px; ">
-    <div id="midWhite"></div>
-    <div id="botTop"></div>
-    <div id="botMid">
-    </div>
-    <div id="botBot"></div>
-  </div>
-</div>
-</div>
-
-<div class="dojoxLightbox dijitContentPane" dojoattachpoint="containerNode" id="dojoxLightboxDialog" widgetid="dojoxLightboxDialog" style="display: none; position: absolute; " title="" role="group">
-	<div style="position:relative">
-		<div dojoattachpoint="imageContainer" class="dojoxLightboxContainer" dojoattachevent="onclick: _onImageClick">
-			<img dojoattachpoint="imgNode" src="index_files/blank(1).gif" class="dojoxLightboxImage" alt="">
-			<div class="dojoxLightboxFooter" dojoattachpoint="titleNode">
-				<div class="dijitInline LightboxClose" dojoattachpoint="closeNode"></div>
-				<div class="dijitInline LightboxNext" dojoattachpoint="nextNode"></div>	
-				<div class="dijitInline LightboxPrev" dojoattachpoint="prevNode"></div>
-				<div class="dojoxLightboxText" dojoattachpoint="titleTextNode"><span dojoattachpoint="textNode"></span><span dojoattachpoint="groupCount" class="dojoxLightboxGroupText"></span></div>
-			</div>
-		</div>
-	</div>
-</div></body></html>
+<map name="Map">
+  <area shape="rect" coords="912,-15,1227,61" href="http://www.mit.edu">
+  <area shape="rect" coords="27,-11,823,65" href="http://web.mit.edu/music21">
+</map>
+</body>
+</html>
