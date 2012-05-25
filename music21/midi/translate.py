@@ -9,8 +9,10 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-
-#Quantization takes place on the stream...
+'''
+Module to translate MIDI data to music21 Streams.  Note that quantization of
+notes takes place in the :meth:`~music21.stream.Stream.quantize` method not here.
+'''
 
 
 import unittest
@@ -41,11 +43,31 @@ class TranslateException(Exception):
 # Durations
 
 def offsetToMidi(o):
-    '''Convert an offset value to MIDI ticks.
+    '''
+    Helper function to convert a music21 offset value to MIDI ticks, depends on *defaults.ticksPerQuarter*
+    
+    Returns an int
+    
+    >>> from music21 import *
+    >>> print defaults.ticksPerQuarter
+    1024
+    >>> midi.translate.offsetToMidi(20.5)
+    20992
     '''
     return int(round(o * defaults.ticksPerQuarter))
 
 def durationToMidi(d):
+    '''
+    Helper function to converts a :class:`~music21.duration.Duration` object to midi ticks.
+    
+    Depends on *defaults.ticksPerQuarter*, Returns an int.
+    
+    >>> from music21 import *
+    >>> n = note.Note()
+    >>> n.duration.type = 'half'
+    >>> midi.translate.durationToMidi(n.duration)
+    2048
+    '''
     if d._quarterLengthNeedsUpdating:
         d.updateQuarterLength()
     return int(round(d.quarterLength * defaults.ticksPerQuarter))
@@ -54,11 +76,10 @@ def midiToDuration(ticks, ticksPerQuarter=None, inputM21DurationObject=None):
     '''    
     Converts a number of MIDI Ticks to a music21 duration.Duration() object.
     
-    
     Optional parameters include ticksPerQuarter -- in case something other
     than the default.ticksPerQuarter (1024) is used in this file.  And
-    it can take a music21 duration.Duration() object to modify (this is
-    what 
+    it can take a :class:`~music21.duration.Duration` object to modify, specified
+    as *inputM21DurationObject*
     
     
     >>> from music21 import *
@@ -67,6 +88,14 @@ def midiToDuration(ticks, ticksPerQuarter=None, inputM21DurationObject=None):
     <music21.duration.Duration 1.0>
     >>> d.type
     'quarter'
+    
+    >>> n = note.Note()
+    >>> midi.translate.midiToDuration(3072, inputM21DurationObject=n.duration)
+    <music21.duration.Duration 3.0>
+    >>> n.duration.type
+    'half'
+    >>> n.duration.dots
+    1
     '''
     if inputM21DurationObject is None:
         from music21 import duration
@@ -151,6 +180,10 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
 
     The `inputM21` parameter can be a Note or None; in the case of None, a Note object is created. 
 
+    In this example, we start a NOTE_ON event at offset 1.0 that lasts for 2.0 quarter notes until we
+    send a zero-velocity NOTE_ON (=NOTE_OFF) event for the same pitch.
+
+
     >>> from music21 import *
 
     >>> mt = midi.MidiTrack(1)
@@ -177,6 +210,18 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     1.0
     >>> n.volume.velocity
     94
+    
+    An `inputM21` object can be given in which case it's set.
+    
+    >>> m = note.Note()
+    >>> dummy = midiEventsToNote([dt1, me1, dt2, me2], inputM21=m)
+    >>> m.pitch
+    A2
+    >>> m.duration.quarterLength
+    1.0
+    >>> m.volume.velocity
+    94
+
     '''
     if inputM21 == None:
         from music21 import note
@@ -210,26 +255,39 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     # TODO: handle chords
     if (tOff - tOn) != 0:
         n.duration.midi = (tOff - tOn), ticksPerQuarter
-    else:       
+    else:
         #environLocal.printDebug(['cannot translate found midi event with zero duration:', eOn, n])
         # for now, substitute 1
-        n.quarterLength = 1
+        n.quarterLength = 1.0
 
     return n
 
 
 def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
-    '''Translate Note to four MIDI events.
+    '''
+    Translate Note to four MIDI events -- the DeltaTime for the start of the note (0), the NOTE_ON event, the
+    DeltaTime to the end of the note, and the NOTE_OFF event.
+
+    If `includeDeltaTime` is not True then the DeltaTime events aren't returned, thus only two events are returned.
+    
+    The `channel` can be specified, otherwise channel 1 is assumed.
 
     >>> from music21 import *
-    >>> n1 = note.Note()
+    >>> n1 = note.Note('C#4')
     >>> eventList = midi.translate.noteToMidiEvents(n1)
     >>> eventList
-    [<MidiEvent DeltaTime, t=0, track=None, channel=1>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=1>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=60, velocity=0>]
+    [<MidiEvent DeltaTime, t=0, track=None, channel=1>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=61, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=1>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=61, velocity=0>]
+
     >>> n1.duration.quarterLength = 2.5
     >>> eventList = noteToMidiEvents(n1)
     >>> eventList
-    [<MidiEvent DeltaTime, t=0, track=None, channel=1>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=2560, track=None, channel=1>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=60, velocity=0>]
+    [<MidiEvent DeltaTime, t=0, track=None, channel=1>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=61, velocity=90>, <MidiEvent DeltaTime, t=2560, track=None, channel=1>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=61, velocity=0>]
+
+    Omitting initial DeltaTime:
+
+    >>> eventList2 = noteToMidiEvents(n1, includeDeltaTime=False, channel=9)
+    >>> eventList2
+    [<MidiEvent NOTE_ON, t=None, track=None, channel=9, pitch=61, velocity=90>, <MidiEvent NOTE_OFF, t=None, track=None, channel=9, pitch=61, velocity=0>]
     '''
     n = inputM21
 
@@ -290,6 +348,8 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
 
 def noteToMidiFile(inputM21): 
     '''
+    Converts a single Music21 Note to an entire :class:`~music21.midi.base.MidiFile` object.
+
     >>> from music21 import *
     >>> n1 = note.Note()
     >>> n1.quarterLength = 6
@@ -320,6 +380,7 @@ def noteToMidiFile(inputM21):
 
 def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     '''
+    Creates a Chord from a list of :class:`~music21.midi.base.MidiEvent` and :class:`~music21.midi.base.DeltaTime` objects.
 
     >>> from music21 import *
     >>> mt = midi.MidiTrack(1)
@@ -421,6 +482,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
 
 def chordToMidiEvents(inputM21, includeDeltaTime=True):
     '''
+    Translates a :class:`~music21.chord.Chord` object to a list of midi events (like noteToMidiEvents above)
+
     >>> from music21 import *
     >>> c = chord.Chord(['c3','g#4', 'b5'])
     >>> eventList = midi.translate.chordToMidiEvents(c)
@@ -514,6 +577,9 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
 
 
 def chordToMidiFile(inputM21): 
+    '''
+    Similar to `noteToMidiFile`, translates a Chord to a fully-formed MidiFile object.
+    '''
     # this can be consolidated with noteToMidiFile
     c = inputM21
 
@@ -535,6 +601,11 @@ def chordToMidiFile(inputM21):
 #-------------------------------------------------------------------------------
 def instrumentToMidiEvents(inputM21, includeDeltaTime=True, 
                             midiTrack=None, channel=1):
+    '''
+    Converts a :class:`~music21.instrument.Instrument` object to a list of MidiEvents
+    
+    TODO: DOCS and TESTS
+    '''
     inst = inputM21
     mt = midiTrack # midi track 
     events = []
@@ -552,12 +623,12 @@ def instrumentToMidiEvents(inputM21, includeDeltaTime=True,
 
 
 
-
 #-------------------------------------------------------------------------------
 # Meta events
 
 def midiEventsToTimeSignature(eventList):
-    '''Convert a single MIDI event into a music21 TimeSignature object.
+    '''
+    Convert a single MIDI event into a music21 TimeSignature object.
 
     >>> from music21 import *
     >>> mt = midi.MidiTrack(1)
@@ -596,7 +667,10 @@ def midiEventsToTimeSignature(eventList):
     return ts
 
 def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
-    '''Translate a m21 TiemSignature to a pair of events, including a DeltaTime.
+    '''
+    Translate a :class:`~music21.meter.TimeSignature` to a pair of events, including a DeltaTime.
+
+    Returns a two-element list
 
     >>> from music21 import *
     >>> ts = meter.TimeSignature('5/4')
@@ -632,7 +706,8 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
 
 
 def midiEventsToKeySignature(eventList):
-    '''Convert a single MIDI event into a music21 TimeSignature object.
+    '''
+    Convert a single MIDI event into a :class:`~music21.key.KeySignature` object.
 
     >>> from music21 import *
     >>> mt = midi.MidiTrack(1)
@@ -642,17 +717,21 @@ def midiEventsToKeySignature(eventList):
     >>> ks = midi.translate.midiEventsToKeySignature(me1)
     >>> ks
     <music21.key.KeySignature of 2 sharps>
+    >>> ks.mode
+    'major'
 
     >>> me2 = midi.MidiEvent(mt)
     >>> me2.type = "KEY_SIGNATURE"
-    >>> me2.data = midi.putNumbersAsList([-2, 0]) # b- major
+    >>> me2.data = midi.putNumbersAsList([-2, 1]) # g minor
     >>> me2.data
-    '\\xfe\\x00'
+    '\\xfe\\x01'
     >>> midi.getNumbersAsList(me2.data)
-    [254, 0]
+    [254, 1]
     >>> ks = midi.translate.midiEventsToKeySignature(me2)
     >>> ks
     <music21.key.KeySignature of 2 flats>
+    >>> ks.mode
+    'minor'
 
     '''
     # This meta event is used to specify the key (number of sharps or flats) and scale (major or minor) of a sequence. A positive value for the key specifies the number of sharps and a negative value specifies the number of flats. A value of 0 for the scale specifies a major key and a value of 1 specifies a minor key.
@@ -682,7 +761,9 @@ def midiEventsToKeySignature(eventList):
     return ks
 
 def keySignatureToMidiEvents(ks, includeDeltaTime=True):
-    '''Convert a single MIDI event into a music21 TimeSignature object.
+    '''Convert a single :class:`~music21.key.KeySignature` object to a two-element list of midi events,
+    where the first is an empty DeltaTime (unless includeDeltaTime is False) and the second
+    is a KEY_SIGNATURE :class:`~music21.midi.base.MidiEvent`
 
     >>> from music21 import *
     >>> ks = key.KeySignature(2)
@@ -693,11 +774,12 @@ def keySignatureToMidiEvents(ks, includeDeltaTime=True):
     <MidiEvent KEY_SIGNATURE, t=None, track=None, channel=1, data='\\x02\\x00'>
 
     >>> ks = key.KeySignature(-5)
+    >>> ks.mode = 'minor'
     >>> ks
     <music21.key.KeySignature of 5 flats>
     >>> eventList = midi.translate.keySignatureToMidiEvents(ks)
     >>> eventList[1]
-    <MidiEvent KEY_SIGNATURE, t=None, track=None, channel=1, data='\\xfb\\x00'>
+    <MidiEvent KEY_SIGNATURE, t=None, track=None, channel=1, data='\\xfb\\x01'>
     '''
     mt = None # use a midi track set to None
     eventList = []
@@ -721,9 +803,10 @@ def keySignatureToMidiEvents(ks, includeDeltaTime=True):
 
 
 def midiEventsToTempo(eventList):
-    '''Convert a single MIDI event into a music21 TimeSignature object.
+    '''
+    Convert a single MIDI event into a music21 Tempo object.
 
-    >>> from music21 import *
+    TODO: Need Tests
     '''
     from music21 import tempo
 
@@ -740,7 +823,7 @@ def midiEventsToTempo(eventList):
     return mm
 
 def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
-    '''Given any TempoIndication, covert to a MIDI tempo indication. 
+    '''Given any TempoIndication, convert it to a MIDI tempo indication. 
 
     >>> from music21 import *
     >>> mm = tempo.MetronomeMark(number=90)
@@ -807,9 +890,14 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
 
 
 def _getPacket(trackId, offset, midiEvent, obj, lastInstrument=None):
-    '''Pack a dictionary of parameters for each event. Packets are used for sorting and configuring all note events. Includes offset, any cent shift, the midi event, and the source object.
+    '''
+    Pack a dictionary of parameters for each event. 
+    Packets are used for sorting and configuring all note events. 
+    Includes offset, any cent shift, the midi event, and the source object.
 
     Offset and duration values stored here are MIDI ticks, not quarter lengths.
+
+    TODO: Test
     '''
     post = {}
     post['trackId'] = trackId
@@ -836,9 +924,15 @@ def _getPacket(trackId, offset, midiEvent, obj, lastInstrument=None):
     return post
 
 def _streamToPackets(s, trackId=1):
-    '''Convert a Stream to packets. This assumes that the Stream has already been flattened, ties have been stripped, and instruments, if necessary, have been added. 
+    '''
+    Convert a Stream to packets. 
+    This assumes that the Stream has already been flattened, 
+    ties have been stripped, and instruments, 
+    if necessary, have been added. 
 
-    In converting from a Stream to MIDI, this is called first, resulting in a collection of packets by offset. Then, packets to events is called.
+    In converting from a Stream to MIDI, this is called first, 
+    resulting in a collection of packets by offset. 
+    Then, packets to events is called.
     '''
     # store all events by offset by offset without delta times
     # as (absTime, event)
@@ -911,9 +1005,15 @@ def _streamToPackets(s, trackId=1):
 
 def _processPackets(packets, channelForInstrument={}, channelsDyanmic=[], 
         initChannelForTrack={}):
-    '''Given a list of packets, assign each to a channel. Do each track one at time, based on the track id. Shift to different channels if a pitch bend is necessary. Keep track of which channels are available. Need to insert a program change in the empty channel to based on last instrument. Insert pitch bend messages as well, one for start of event, one for end of event.
+    '''
+    Given a list of packets, assign each to a channel. 
+    Do each track one at time, based on the track id. 
+    Shift to different channels if a pitch bend is necessary. 
+    Keep track of which channels are available. 
+    Need to insert a program change in the empty channel 
+    to based on last instrument. Insert pitch bend messages as well, 
+    one for start of event, one for end of event.
 
-    The `channels` argument is a list of channels to use.
     '''
     #allChannels = range(1, 10) + range(11, 17) # all but 10
     uniqueChannelEvents = {} # dict of (start, stop, usedChannel) : channel
@@ -1101,13 +1201,19 @@ def _processPackets(packets, channelForInstrument={}, channelsDyanmic=[],
 
 
 def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None):
-    '''Given a list of packets, sort all packets and add proper delta times. Optionally filters packets by track Id. 
+    '''
+    Given a list of packets, sort all packets and add proper 
+    delta times. Optionally filters packets by track Id. 
 
-    At this stage MIDI event objects have been created. The key process here is finding the adjacent time between events and adding DeltaTime events before each MIDI event.
+    At this stage MIDI event objects have been created. 
+    The key process here is finding the adjacent time 
+    between events and adding DeltaTime events before each MIDI event.
 
     Delta time channel values are derived from the the previous midi event. 
 
-    If `trackIdFilter` is not None, process only packets with a matching track id. this can be used to filter out events associated with a track. 
+    If `trackIdFilter` is not None, process only packets with 
+    a matching track id. this can be used to filter out events 
+    associated with a track. 
     '''
     #environLocal.printDebug(['_packetsToEvents', 'got packets:', len(packetsSrc)])
     # add delta times
@@ -1140,9 +1246,12 @@ def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None):
 
 
 def packetsToMidiTrack(packets, trackId=1, channels=None):
-    '''Given packets already allocated with channel and/or instrument assignments, place these in a MidiTrack.
+    '''
+    Given packets already allocated with channel 
+    and/or instrument assignments, place these in a MidiTrack.
 
-    Note that all packets can be sent; only those with matching trackIds will be collected into the resulting track
+    Note that all packets can be sent; only those with 
+    matching trackIds will be collected into the resulting track
 
     The `channels` defines a collection of channels available for this Track
 
@@ -1166,7 +1275,6 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     '''
     Note that quantization takes place in stream.py since it's useful not just for MIDI.
 
-
     >>> from music21 import *
     >>> import os
     >>> fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid')
@@ -1178,6 +1286,8 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     1
     >>> mt = mf.tracks[0] 
     >>> s = midi.translate.midiTrackToStream(mt)
+    >>> s
+    <music21.stream.Stream ...>
     >>> len(s.notesAndRests)
     11
     '''
@@ -1387,9 +1497,13 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
 
     
 def _prepareStreamForMidi(s):
-    '''Given a score, prepare it for midding processing. In particular, place MetronomeMark objects at Score level, or elsewhere, place it in the the first part.
+    '''
+    Given a score, prepare it for midding processing. 
+    In particular, place MetronomeMark objects at 
+    Score level, or elsewhere, place it in the the first part.
     
-    Note: will make a deepcopy()
+    Note: will make a deepcopy() of the stream. (QUESTION: Could this
+    be done with a shallow copy?)
     '''
     from music21 import volume
 
@@ -1417,7 +1531,11 @@ def _prepareStreamForMidi(s):
     return s
 
 def streamsToMidiTracks(inputM21):
-    '''Given a multipart stream, return a list of MIDI tracks. 
+    '''
+    Given a multipart stream, return a list of MIDI tracks. 
+
+    Note: will make a deepcopy() of the stream. (QUESTION: Could this
+    be done with a shallow copy?)
     '''
     from music21 import stream
     # makes a deepcopy
@@ -1548,7 +1666,8 @@ def streamsToMidiTracks(inputM21):
 
 def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
     inputM21=None):
-    '''Given a list of midiTracks, populate this Stream with sub-streams for each part. 
+    '''
+    Given a list of midiTracks, populate this Stream with sub-streams for each part. 
     '''
     from music21 import stream
     if inputM21 == None:
@@ -1597,6 +1716,8 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
 
 def streamToMidiFile(inputM21):
     '''
+    Converts a Stream to a :class:`~music21.midi.base.MidiFile` object.
+    
     >>> from music21 import *
     >>> s = stream.Stream()
     >>> n = note.Note('g#')
@@ -1625,6 +1746,11 @@ def streamToMidiFile(inputM21):
 
 def midiFileToStream(mf, inputM21=None):
     '''
+    Main routine to convert a :class:`~music21.midi.base.MidiFile` object to a 
+    :class:`~music21.stream.Stream` object.
+    
+    The `inputM21` object can specify an existing Stream (or Stream subclass) to fill.
+
     >>> from music21 import *
     >>> import os
     >>> fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid')
@@ -1635,6 +1761,8 @@ def midiFileToStream(mf, inputM21=None):
     >>> len(mf.tracks)
     1
     >>> s = midi.translate.midiFileToStream(mf)
+    >>> s
+    <music21.stream.Stream ...>
     >>> len(s.flat.notesAndRests)
     11
     '''
