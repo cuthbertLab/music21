@@ -279,6 +279,27 @@ class Spanner(music21.Music21Object):
         return new
 
 
+    #---------------------------------------------------------------------------
+    # as _components is private Stream, unwrap/wrap methods need to override
+    # Music21Object to get at these objects 
+    def unwrapWeakref(self):
+        '''Overridden method for unwrapping all Weakrefs.
+        '''
+        # call base method: this gets defined contexts and active site
+        music21.Music21Object.unwrapWeakref(self)
+        # for contained objects that have weak refs
+        self._components.unwrapWeakref()
+        # this presently is not a weakref but in case of future changes
+
+
+    def wrapWeakref(self):
+        '''Overridden method for unwrapping all Weakrefs.
+        '''
+        # call base method: this gets defined contexts and active site
+        music21.Music21Object.wrapWeakref(self)
+        self._components.wrapWeakref()
+
+    #---------------------------------------------------------------------------
     def __getitem__(self, key):
         '''
         >>> from music21 import *
@@ -972,6 +993,9 @@ class SpannerBundle(object):
                 break
         if remove is not None:
             self._pendingComponentAssignment.pop(remove)
+
+
+
 
 #-------------------------------------------------------------------------------
 # connect two or more notes anywhere in the score

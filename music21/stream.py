@@ -1066,6 +1066,7 @@ class Stream(music21.Music21Object):
                 setattr(new, name, self._activeSite)
             # attributes that require special handling
             elif name == '_definedContexts':
+                # this calls __deepcopy__ in DefinedContexts
                 newValue = copy.deepcopy(part, memo)
                 newValue.containedById = id(new)
                 setattr(new, name, newValue)

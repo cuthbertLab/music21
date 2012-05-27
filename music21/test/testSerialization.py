@@ -95,8 +95,11 @@ class Test(unittest.TestCase):
         sp = spanner.Slur(n1, n2)
         s.append(n1)
         s.append(n2)
-        #s.append(sp)
-        #s = copy.deepcopy()
+        s.append(sp)
+
+        # the deepcopy is what creates the bug in the preservation of a weakref
+        #s = copy.deepcopy(s)
+
         temp = converter.freezeStr(s)
 
         post = converter.unfreezeStr(temp)
