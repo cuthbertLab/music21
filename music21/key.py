@@ -11,7 +11,10 @@
 #-------------------------------------------------------------------------------
 '''This module defines objects for representing key signatures as well as key 
 areas. The :class:`~music21.key.KeySignature` is used in 
-:class:`~music21.stream.Measure` objects for defining notated key signatures. 
+:class:`~music21.stream.Measure` objects for defining notated key signatures.
+
+The :class:`~music21.key.Key` object is a fuller representation not just of
+a key signature but also of the key of a region. 
 '''
 
 import doctest, unittest
@@ -308,6 +311,38 @@ class KeyException(Exception):
 
 #-------------------------------------------------------------------------------
 class KeySignature(music21.Music21Object):
+    '''
+    A KeySignature object specifies the signature to be used for a piece; it takes
+    in zero, one, or two arguments.  The first argument is an int giving the number of sharps,
+    or if negative the number of flats.  The second argument (deprecated -- do not use)
+    specifies the mode of the piece ('major', 'minor', or None for unknown).
+    
+    If you are starting with the name of a key, see the :class:`~music21.key.Key` object.
+
+    >>> from music21 import *
+
+    >>> A = key.KeySignature(3)
+    >>> A
+    <music21.key.KeySignature of 3 sharps>
+
+    >>> Eflat = key.KeySignature(-3)
+    >>> Eflat
+    <music21.key.KeySignature of 3 flats>
+
+
+    If you want to get a real Key, then use the :class:`~music21.key.Key` object instead:
+
+    >>> illegal = key.KeySignature('c#')
+    Traceback (most recent call last):
+    KeySignatureException: Cannot get a KeySignature from this "number" of sharps: "c#"; did you mean to use a key.Key() object instead?
+    
+    >>> legal = key.Key('c#')
+    >>> legal.sharps
+    4
+    >>> legal
+    <music21.key.Key of c# minor>
+    '''
+
 
     # note that musicxml permits non-tradtional keys by specifying
     # one or more altered tones; these are given as pairs of 
@@ -316,15 +351,18 @@ class KeySignature(music21.Music21Object):
     classSortOrder = 2
     
     def __init__(self, sharps=None, mode=None):
-        '''
-        >>> from music21 import *
-
-        >>> a = key.KeySignature(3)
-        >>> a
-        <music21.key.KeySignature of 3 sharps>
-        '''
         music21.Music21Object.__init__(self)
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
+
+        try:
+            if sharps is not None and \
+                  (sharps != int(sharps)):
+                raise KeySignatureException('Cannot get a KeySignature from this "number" of sharps: "%s"; ' % sharps + 
+                    'did you mean to use a key.Key() object instead?')
+        except ValueError:
+            raise KeySignatureException('Cannot get a KeySignature from this "number" of sharps: "%s"; ' % sharps + 
+                    'did you mean to use a key.Key() object instead?')
+            
         self._sharps = sharps
         # optionally store mode, if known
         self._mode = mode

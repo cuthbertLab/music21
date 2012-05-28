@@ -12,7 +12,7 @@
 
 #TODO: review variable names for consistency
 
-'''Objects for transcribing music21 objects as Vex Flow code
+'''Objects for transcribing music21 objects as VexFlow code
 
     Here's the hierarchy:
 
@@ -24,8 +24,11 @@
 import unittest
 import music21
 
-from music21 import pitch
 from music21 import common
+from music21 import pitch
+from music21 import stream
+
+
 from music21 import environment
 _MOD = 'vexflow.base.py'
 environLocal = environment.Environment(_MOD)
@@ -97,7 +100,7 @@ validVexFlowNoteheadGlyphs = [
 ]
 
 
-#Valid vex flow articulation codes and their meanings
+#Valid vexflow articulation codes and their meanings
 #not used...
 validVexFlowArticulationsToMeanings = {
     "a.": 'Staccato',
@@ -171,7 +174,7 @@ defaultInterSystemMargin = 60
 Default parameters for setting measures within one staff line
 '''
 defaultMeasureWidth = 500
-defaultMeasuresPerStave = 4
+defaultMeasuresPerSystem = 4
 defaultMeasureMargin = 75
 
 '''
@@ -182,8 +185,7 @@ defaultBeamingStatus = True
 
 '''
 Determines whether accidentals, clefs, and key signatures should be displayed by
-    default.
-Can be set for individually notes or measures
+default on this measure.  Can be set for individually notes or measures.
 '''
 defaultAccidentalDisplayStatus = False
 defaultClefDisplayStatus = False
@@ -406,7 +408,7 @@ def fromObject(thisObject, mode='txt'):
 
 def fromScore(thisScore, mode='txt'):
     '''
-    Parses a music21 score into Vex Flow code
+    Parses a music21 score into VexFlow code
 
     >>> from music21 import *
     >>> a = corpus.parse('bwv66.6')
@@ -485,7 +487,7 @@ def fromRest(thisRest, mode='txt'):
 
 def fromNote(thisNote, mode='txt'):
     '''
-    Parses a music21 note into Vex Flow string code
+    Parses a music21 note into VexFlow string code
 
     >>> from music21 import *
     >>> print vexflow.fromNote(note.Note('C4'), mode='txt')
@@ -499,7 +501,7 @@ def fromNote(thisNote, mode='txt'):
 
 def fromChord(thisChord, mode='txt'):
     '''
-    Parses a music21 chord into Vex Flow code
+    Parses a music21 chord into VexFlow code
 
     >>> from music21 import *
     >>> a = chord.Chord(['C3', 'E-3', 'G3', 'C4'])
@@ -546,7 +548,7 @@ def fromChord(thisChord, mode='txt'):
 
 def fromPart(thisPart, mode='txt'):
     '''
-    Parses a music21 part into Vex Flow code
+    Parses a music21 part into VexFlow code
 
     >>> from music21 import *
     >>> a = corpus.parse('bwv66.6').parts[1]
@@ -558,7 +560,7 @@ def fromPart(thisPart, mode='txt'):
 
 def fromMeasure(thisMeasure, mode='txt'):
     r'''
-    Parses a music21 measure into Vex Flow code
+    Parses a music21 measure into VexFlow code
 
     >>> from music21 import *
     >>> b = corpus.parse('bwv1.6.mxl')
@@ -622,6 +624,8 @@ def vexflowClefFromClef(music21clef):
             'Cannot parse ', music21clef
 
 #-------------------------------------------------------------------------------
+# primitives...
+
 class VexflowObject(object):
     '''
     A general class for all VexflowObjects to inherit from.  See specific
@@ -1010,7 +1014,7 @@ class VexflowNote(VexflowObject):
     >>> v.vexflowCode()
     'new Vex.Flow.StaveNote({keys: ["C##/4"], duration: "hd", stem_direction: Vex.Flow.StaveNote.STEM_UP}).addDotToAll()'
     '''
-    def __init__(self, music21note, clef=None):
+    def __init__(self, music21note = None, clef=None):
         '''
         music21note must be a :class:`music21.note.Note` object.
         '''
@@ -1049,7 +1053,7 @@ class VexflowChord(VexflowObject):
     TODO: write unit tests
     '''
 
-    def __init__(self, music21Chord, clef=None):
+    def __init__(self, music21Chord = None, clef=None):
         '''
         notes must be an array_like grouping of either Music21 or VexFlow Notes
         notes can instead be a music21.chord.Chord object
@@ -1106,12 +1110,12 @@ class VexflowChord(VexflowObject):
         
 class VexflowRest(VexflowObject):
     '''
-    Class for representing rests in Vex Flow
-
+    Class for representing rests in VexFlow
     '''
-    def __init__(self, music21rest, clef=None):
+    def __init__(self, music21rest = None, clef=None):
         '''
         music21rest must be a :class:`music21.note.Rest` object.
+
         position is where the rest should appear on the staff
             'b/4' is the middle of the treble clef
         '''
@@ -1139,132 +1143,578 @@ class VexflowRest(VexflowObject):
         vexflowCode += self.dotCode()        
         return vexflowCode
 
-class VexflowScore(object):
-    '''
-    Represents the code for multiple VexflowPart objects
-    '''
+#--------------containers----------------------------------#
+#         from smallest to largest                         #
 
-    def __init__(self, music21score, params={}):
-        self.originalScore = music21score
-        self.notatedScore = self.originalScore.makeNotation(inPlace=False)
-        self.originalParts = self.notatedScore.parts
-        self.numParts = len(self.originalParts)
-        self.vexflowParts = [None] * self.numParts
-        self.context = None
+class VexflowVoice(object):
+    '''
+    A Voice in VexFlow is a "lateral" grouping of notes in one measure
+        It's the equivalent to a :class:`~music21.stream.Measure`
+
+    Requires either a :class:`~music21.stream.Measure` object or a 
+    :class:`~music21.stream.Voice` object
+
+    If those objects aren't already flat, flattens them in the process. 
+    '''
+    
+    def __init__(self, music21measure = None, params={}):
+        '''
+        params is a dict containing various parameters to be passed to the 
+            voice object
+        '''
+        global _UIDCounter
+        self.UID = _UIDCounter
+        _UIDCounter += 1
+
+        if music21measure != None:
+            if not ('Measure' in music21measure.classes or \
+                'Voice' in music21measure.classes):
+                raise TypeError, 'must pass a music21 Measure object'
+            self.originalMeasure = music21measure
+            self.originalFlat = music21measure.flat
+        else:
+            self.originalMeasure = stream.Measure()
+            self.originalFlat = self.originalMeasure.flat
+
         self.params = params
-        self.partsCode = ''
-        self.vexflowCode = ''
+        
+        self._vexflowObjects = None
+        self._beamPreamble = None
+        self._beamPost = None
+        
+        self.clefDisplayStatus = defaultClefDisplayStatus
+        self.keySignatureDisplayStatus = defaultKeySignatureDisplayStatus
 
-        self._generateVexflowCode()
+        if 'name' in self.params:
+            self.voiceName = self.params['name']
+        else:
+            self.voiceName = 'music21Voice' + str(self.UID)
+            self.params['name'] = self.voiceName
 
-    def _generateVexflowCode(self):
-        '''
-        Generates the code necessary to display this score
-        '''
-        previousParams = {'numParts': self.numParts}
-        if self.context != None:
-            previousParams['context'] = self.context
-            previousParams['canvasWidth'] = self.context.getWidth()
+        #if 'octaveModifier' not in self.params:
+            #Used for bass clef
+            #self.params['octaveModifier'] = 0
 
-        for index in xrange(self.numParts):
-            #make a vexflowPart object
-            thisPart = self.originalParts[index]
-            previousParams['partIndex'] = index
+        #Set the clef
+        theseClefs = self.originalFlat.getElementsByClass('Clef')
+        if len(theseClefs) > 1:
+            raise Vexflow21UnsupportedException, 'Vexflow cannot yet handle ' +\
+                'multiple clefs in a single measure'
+        elif len(theseClefs) == 1:
+            self.clefDisplayStatus = True
+            self.clef = vexflowClefFromClef(theseClefs[0])
+        else:
+            if 'clef' in self.params:
+                self.clef = self.params['clef']
+            else:
+                self.clef = defaultStaveClef
+            if 'clefDisplayStatus' in self.params:
+                self.clefDisplayStatus = self.params['clefDisplayStatus']
+
+        #Set the key signature
+        theseKeySignatures = self.originalFlat.getElementsByClass('KeySignature')
+        if len(theseKeySignatures) > 1:
+            raise Vexflow21UnsupportedException, 'Vexflow cannot yet handle ' +\
+                'multiple key signatures in a single measure'
+        elif len(theseKeySignatures) == 1:
+            self.keySignatureDisplayStatus = True
+            if theseKeySignatures[0].sharps in vexflowSharpsToKeySignatures:
+                self.keySignature = \
+                    vexflowSharpsToKeySignatures[theseKeySignatures[0].sharps]
+            else:
+                raise VexFlowUnsupportedException, "VexFlow doesn't support this "+\
+                    'Key Signature:', theseKeySignatures[0]
+        else:
+            if 'keySignature' in self.params:
+                self.keySignature = self.params['keySignature']
+            else:
+                self.keySignature = defaultStaveKeySignature
+                #print "%s got the default key" % self.params['name'] #XXX k
+                #print 'Params: ', self.params
+            if 'keySignatureDisplayStatus' in self.params:
+                self.keySignatureDisplayStatus = \
+                    self.params['keySignatureDisplayStatus']
+
+        #Set the time signature
+        theseTimeSignatures = self.originalFlat.getElementsByClass('TimeSignature')
+        if len(theseTimeSignatures) > 1:
+            raise Vexflow21UnsupportedException, 'Vexflow cannot yet handle ' +\
+                'multiple time signatures in a single measure'
+        elif len(theseTimeSignatures) == 1:
+            self.numBeats = self.originalMeasure.highestTime
+            self.beatValue = 4
+            self.timeSignature='/'.join([str(theseTimeSignatures[0].numerator),\
+                str(theseTimeSignatures[0].denominator)])
+        else:
+            if not 'numBeats' in self.params:
+                self.params['numBeats'] = self.originalMeasure.highestTime
     
-            if self.context != None:
-                previousParams['context'] = self.context
+            if not 'beatValue' in self.params:
+                self.params['beatValue'] = 4
 
-            thisVexflowPart = VexflowPart(thisPart, previousParams)
+            self.numBeats = self.params['numBeats']
+            self.beatValue = self.params['beatValue']
+            self.timeSignature = False
+        
+        if 'beaming' not in self.params:
+            self.params['beaming'] = defaultBeamingStatus
+
+    def voiceCode(self):
+        '''
+        Creates the code to create a new voice object with the
+        name stored in `self.voiceName`.
+        
+        >>> from music21 import *
+        >>> s = stream.Measure()
+        >>> s.append(note.Note('c4'))
+        >>> s.append(note.Note('d4'))
+        >>> vfv = vexflow.VexflowVoice(s)
+        >>> vfv.voiceName = 'myVoice'
+        >>> vfv.voiceCode()
+        'var myVoice = new Vex.Flow.Voice({num_beats: 2.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});'
+        '''
+        
+        return ''.join(['var ',
+                        str(self.voiceName),
+                        ' = new Vex.Flow.Voice({',
+                        'num_beats: ' + str(self.numBeats) + ', ',
+                        'beat_value: ' + str(self.beatValue) + ', ',
+                        'resolution: Vex.Flow.RESOLUTION});'])
+
+    def vexflowObjects(self):
+        '''
+        returns a list of all the notesAndRests in the originalMeasure
+        represented as VexflowObjects
+
+        >>> from music21 import *
+        >>> s = stream.Measure()
+        >>> s.append(note.Note('c4'))
+        >>> s.append(note.Note('d4'))
+        >>> vfv = vexflow.VexflowVoice(s)
+        >>> vfv.vexflowObjects()
+        [<music21.vexflow.base.VexflowNote object at 0x...>, <music21.vexflow.base.VexflowNote object at 0x...>]
+        '''
+        if self._vexflowObjects is not None:
+            return self._vexflowObjects
+        else:
+            vfo = []
+            for thisObject in self.originalFlat.notesAndRests:
+                if 'Note' in thisObject.classes:
+                    thisVexflowObj = VexflowNote(thisObject, clef = self.clef)
+                elif 'Chord' in thisObject.classes:
+                    thisVexflowObj = VexflowChord(thisObject, clef = self.clef)
+                elif 'Rest' in thisObject.classes:
+                    thisVexflowObj = VexflowRest(thisObject, clef= self.clef)
+                else:
+                    raise Exception("what is it? %s" % thisObject)
+                vfo.append(thisVexflowObj)
+            self._vexflowObjects = vfo
+            return vfo
+    
+    def notesCode(self):
+        '''
+        note the plural.  Generates an String that is a Javascript array
+        of all the vexflow notes in a measure:
+
+        >>> from music21 import *
+        >>> s = stream.Measure()
+        >>> s.append(note.Note('c4'))
+        >>> s.append(note.Note('d4'))
+        >>> vfv = vexflow.VexflowVoice(s)
+        >>> vfv.voiceName = 'myVoice'
+        >>> vfv.notesCode()
+        'var myVoiceNotes = [new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "q"}), new Vex.Flow.StaveNote({keys: ["Dn/4"], duration: "q"})];'
+        '''
+        notes = []
+        for thisVexflowObj in self.vexflowObjects():
+            notes.append(thisVexflowObj.vexflowCode())
+        noteName = self.voiceName + 'Notes'
+        noteCode = 'var ' + noteName + ' = [' + ', '.join(notes) + '];'
+        return noteCode
+
+    def vexflowCode(self):
+        '''
+        Returns a string that generates the code necessary to display this voice.
+
+        >>> from music21 import *
+        >>> s = stream.Measure()
+        >>> s.append(note.Note('c4'))
+        >>> s.append(note.Note('d4'))
+        >>> vfv = vexflow.VexflowVoice(s)
+        >>> vfv.voiceName = 'myVoice'
+        >>> print vfv.vexflowCode()
+        var myVoice = new Vex.Flow.Voice({num_beats: 2.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+        var myVoiceNotes = [new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "q"}), new Vex.Flow.StaveNote({keys: ["Dn/4"], duration: "q"})];
+        myVoice.addTickables(myVoiceNotes);
+        '''
+        return self.voiceCode() + '\n' + self.notesCode() + '\n' +\
+            str(self.voiceName) + '.addTickables(' + str(self.voiceName) + \
+            'Notes);'
+
+    def getBeaming(self):
+        '''
+        Beaming is a boolean value determining if the voice should be beamed
+
+        Note: So far only VexFlow's automatic beaming is supported
+            Cannot manually modify beams
+        '''
+        return self.params['beaming']
+
+    def _beamCode(self, contextName = 'ctx', indentation=3):
+        '''
+        Returns the preamble and the postamble code for the beams for this voice
+
+        Returns it as an array containing the beam preamble and postamble
+
+        Will return code even if it shouldn't be beamed
+            Check self.getBeaming() before applying this
+        '''
+        if self._beamPreamble is not None and self._beamPost is not None:
+            return [self._beamPreamble, self._beamPost]
+
+        
+        baseBeamName = str(self.voiceName) + 'Beam'
+        noteGroupName = str(self.voiceName) + 'Notes'
+        preamble = ''
+        postamble = ''
+
+        theseBeams = []
+        beamStartIndex = None
+        for index, thisVexflowObj in enumerate(self.vexflowObjects()):
+            if not isinstance(thisVexflowObj, VexflowRest):
+                if beamStartIndex is None and thisVexflowObj.beamStart:
+                    beamStartIndex = index
+                elif beamStartIndex is not None and thisVexflowObj.beamStop:
+                    beamInfo = (beamStartIndex, index)
+                    theseBeams.append(beamInfo)
+                    beamStartIndex = None
+
+
+        for index in range(len(theseBeams)):
+            thisBeam = theseBeams[index]
+            thisBeamName = baseBeamName + str(index)
+
+            preamble += '\n' + ('    ' * indentation) + 'var ' + thisBeamName +\
+                ' = new Vex.Flow.Beam('+noteGroupName+'.slice(' + str(thisBeam[0])+\
+                ',' + str(thisBeam[1]+1) + '));'
+            postamble += '\n' + ('    '*indentation) + thisBeamName + \
+                '.setContext(' + str(contextName) + ').draw();'
+
+        self._beamPreamble = preamble
+        self._beamPost = postamble
+        
+        return [preamble, postamble]
+    
+    def createBeamCode(self, contextName = 'ctx', indentation=3):
+        '''
+        returns the code to create beams for this staff.
+        '''
+        return self._beamCode(contextName, indentation)[0]
+
+    def drawBeamCode(self, contextName = 'ctx', indentation=3):
+        '''
+        returns the code to draw beams on this staff.
+        '''
+        return self._beamCode(contextName, indentation)[1]
+
+    
+    def tieCode(self, contextName = 'ctx', indentation=3):
+        '''
+        Returns the code for the ties for this voice
+
+        Returns it as a two-element tuple containing [0] a list of code
+        for the completed ties within this voice,
+        and [1] a two-element array for partial ties that go across the bar line
+        consisting of (0) a two-element tuple of the start index,
+        and end index (None), and (1) the string name of the Note group
+        to which element [0][0] belongs.
             
-            if self.context == None:
-                self.context = thisVexflowPart.context
-
-            self.vexflowParts[index] = thisVexflowPart
-            previousParams = thisVexflowPart.params
-
-        if self.context == None:
-            self.context = previousParams['context']
-
-        self.partsCode = '\n'.join([part.generateCode('txt') for part in self.vexflowParts])
-        self.vexflowCode = self.context.getJSCode(indentation=3) + '\n'
-        self.vexflowCode += self.partsCode
-    
-    def generateCode(self, mode = 'txt'):
+        N.B. Bug: Only the first index of a chord is tied.
         '''
-        returns the vexflow code needed to render this object in a browser
+        baseTieName = str(self.voiceName) + 'Tie'
+        noteGroupName = str(self.voiceName) + 'Notes'
+
+        tieStarted = False
+        theseTies = []
+        thisTieStart = None
+
+        for index, thisVexflowObj in enumerate(self.vexflowObjects()):
+            if not isinstance(thisVexflowObj, VexflowRest):
+                if not tieStarted and thisVexflowObj.tieStart:
+                    thisTieStart = index
+                    tieStarted = True
+                elif not tieStarted and thisVexflowObj.tieStop:
+                    #could mean tie began in previous bar
+                    theseTies += [(None, index)]
+                    tieStarted = False
+                elif tieStarted and thisVexflowObj.tieStop:
+                    theseTies += [(thisTieStart, index)]
+                    tieStarted = False
+            
+            #TODO tuplet: if the note is the start of a tuplet, remember that it's the start of one and figure out how many
+            #    Later we'll do notes.slice(indexOfStart, lengthOfTuplet)
+            #    For now, we'll just throw an exception if the tuplet isn't complete
+
+        if tieStarted:
+            #Partial tie across the bar, beginning on this page
+            theseTies += [(thisTieStart, None)]
+
+
+        fullTies = []
+        partialTies = []
+
+        for index in range(len(theseTies)):
+            (tieStartIndex, tieEndIndex) = theseTies[index]
+            if tieStartIndex != None and tieEndIndex != None:
+                #TODO: add support for multiple ties in a chord
+                thisTieName = baseTieName + str(index)
+                thisTieCode = ''.join([
+                    ('    '*indentation),
+                    'var ',
+                    thisTieName,
+                    ' = new Vex.Flow.StaveTie({\n',
+                    ('    '*(indentation + 1)),
+                    'first_note: ',
+                    noteGroupName,
+                    '[' + str(tieStartIndex) + '],\n',
+                    ('    '*(indentation + 1)),
+                    'last_note: ',
+                    noteGroupName,
+                    '[' + str(tieEndIndex) + '],\n',
+                    ('    ' * (indentation + 1)),
+                    'first_indices: [0],\n',
+                    ('    ' * (indentation + 1)),
+                    'last_indices: [0]\n',
+                    ('    ' * indentation),
+                    '});',
+                    '\n',
+                    ('    '*indentation),
+                    thisTieName,
+                    '.setContext(',
+                    str(contextName),
+                    ').draw();'
+                    ])
+                fullTies.append(thisTieCode)
+            else:
+                partialTies.append([theseTies[index], noteGroupName])
+        return (fullTies, partialTies)
+    
+    def setBeaming(self, beaming):
+        '''
+        Beaming is a boolean value determining if the voice should be beamed
+
+        Note: So far only VexFlow's automatic beaming is supported
+            Cannot manually modify beams
+        '''
+        self.params['beaming'] = beaming
+
+    def generateCode(self, mode='txt'):
+        '''
+        returns the vexflow code necessary to display this Voice in a browser
+            as a string
         '''
         if mode == 'txt':
-            return self.vexflowCode
-        elif mode=='html':
-            result = htmlCanvasPreamble + str(self.context.getCanvasHTML()) + \
-                htmlCanvasPostamble + '\n'
-            result += self.vexflowCode + '\n'
-
-            tieCode = ''
-            partialTies = []
-            
-            for thisPart in self.vexflowParts:
-                for thisStave in thisPart.staves:
-                    for thisVoice in thisStave.vexflowVoices:
-                        (beamPreamble, beamPostamble) = thisVoice.beamCode(self.context.getContextName())
-                        (thisTieCode, thesePartialTies) = thisVoice.tieCode(self.context.getContextName())
-                        thesePartialTies = [(thisPartialTie + [thisStave.getLineNum()]) for thisPartialTie in thesePartialTies]
-                        tieCode += '\n' + thisTieCode
-                        partialTies += thesePartialTies
-                        result += beamPreamble
-                        result += str(thisVoice.voiceName) + '.draw(' + \
-                        str(self.context.getContextName()) + ', ' + \
-                        str(thisStave.staveName) + ');\n' + \
-                        str(thisStave.staveName) + '.setContext(' + \
-                        str(self.context.getContextName()) + ').draw();'
-                        result += beamPostamble
-
-            tieStart = True
-            thisTieStart = None
-            thisStartLineNum = None
-            tieNum = 0
-            for (thisTie, thisName, thisLineNum) in partialTies:
-                if tieStart:
-                    thisTieStart = str(thisName)+'['+str(thisTie[0])+']'
-                    thisStartLineNum = thisLineNum
-                    tieStart = False
-                else:
-                    thisTieEnd = str(thisName)+'['+str(thisTie[1])+']'
-
-                    if thisTieStart == None or thisTieEnd == None:
-                        print 'uh oh... got mixed up somewhere'
-                        print partialTies
-                        print 'Ignoring'
-                        tieStart = True
-                        continue
-
-                    thisTieName = str(self.context.getContextName()) + 'Tie' + \
-                        str(tieNum)
-
-                    if thisLineNum != thisStartLineNum:
-                        result +='\nvar '+thisTieName+'Start = new Vex.Flow.StaveTie({\n'+'first_note: '+thisTieStart+'\n});'
-                        result +='\nvar '+thisTieName+'End = new Vex.Flow.StaveTie({\n'+'last_note: '+thisTieEnd+'\n});'
-                        result += '\n'+thisTieName+'Start.setContext('+str(self.context.getContextName())+').draw();'
-                        result += '\n'+thisTieName+'End.setContext('+str(self.context.getContextName())+').draw();'
-                        tieStart = True
-                        continue
-
-                    result +='\nvar '+thisTieName+' = new Vex.Flow.StaveTie({\n'+\
-                        'first_note: '+thisTieStart+',\nlast_note: '+thisTieEnd\
-                        +',\nfirst_indices: [0],\nlast_indices: [0]\n});'
-                    result += '\n'+thisTieName+'.setContext('+\
-                        str(self.context.getContextName())+').draw();'
-                    tieStart = True
-
+            return self.vexflowCode()
+        elif mode == 'html':
+            result = htmlPreamble + vexflowPreamble
+            defaultStaff = staffString()
+            result += "".join([
+                    "            ",
+                    defaultStaff,
+                    "\n",
+                    "            stave.addClef('",
+                    str(defaultStaveClef),
+                    "').setContext(ctx).draw();\n",
+                    "            ",
+                    self.vexflowCode()])
+            result += self.createBeamCode('ctx') +\
+                "\n            var formatter = new Vex.Flow.Formatter()." +\
+                "joinVoices(["+str(self.voiceName)+"]).format([" + \
+                str(self.voiceName)+"], "+str(defaultStaveWidth)+");\n            " +\
+                str(self.voiceName)+".draw(ctx, stave);\n"
+            result += self.drawBeamCode('ctx')
             result += htmlConclusion
             return result
 
+class VexflowStave(object):
+    '''
+    A "Stave"[sic] in VexFlow is the object for the graphic staff to be displayed.
+    It usually represents a Measure that might have one or more Voices on it.
+    
+    TODO: generateCode should take a VexflowContext object as a param
+    '''
+    def __init__(self, params={}):
+        '''
+        params is a dictionary containing position, width, and other parameters to be passed to the stave object
+        '''
+        global _UIDCounter
+        self.UID = _UIDCounter
+        _UIDCounter += 1
+        self.params = params
+        self.vexflowVoices = []
+        if 'width' not in self.params:
+            self.params['width'] = defaultStaveWidth
+        if 'notesWidth' not in self.params:
+            self.params['notesWidth'] = '(' + str(self.params['width']) +\
+                ' - ' + str(defaultMeasureMargin) + ')'
+        if 'position' not in self.params:
+            self.params['position'] = defaultStavePosition
+
+        if 'name' in self.params:
+            self.staveName = self.params['name']
+        else:
+            self.staveName = 'music21Stave' + str(self.UID)
+    
+    def staveCode(self):
+        '''
+        JavaScript/VexFlow code for putting clefs, timeSignatures, etc. on the staff.
+        '''
+        
+        staveCode = staffString(str(self.params['position'][0]), str(self.params['position'][1]), str(self.params['width']), self.staveName)
+        for thisVoice in self.vexflowVoices:
+            if 'clef' not in self.params or not self.params['clef']:
+                self.params['clef'] = thisVoice.clef
+            if 'timeSignature' not in self.params or not self.params['timeSignature']:
+                self.params['timeSignature'] = thisVoice.timeSignature
+            if 'keySignature' not in self.params or not self.params['keySignature']:
+                self.params['keySignature'] = thisVoice.keySignature
+
+        if 'clefDisplayStatus' in self.params and \
+            'clef' in self.params and self.params['clefDisplayStatus']:
+            staveCode += '\n' + self.staveName + '.addClef("' + \
+                str(self.params['clef']) + '");'
+        if 'keySignatureDisplayStatus' in self.params and 'keySignature' in self.params and self.params['keySignatureDisplayStatus']:
+            staveCode += '\n' + self.staveName + '.addKeySignature("' + str(self.params['keySignature']) + '");'
+
+        if 'timeSignature' in self.params and self.params['timeSignature']:
+            staveCode += '\n' + self.staveName + '.addTimeSignature("' + str(self.params['timeSignature']) + '");'
+        return staveCode
+    
+    def formatterCode(self):
+        '''
+        code for setting up a formatter to join voices
+        '''
+        if len(self.vexflowVoices) > 0:
+            formatterCode = 'var ' + self.staveName + 'Formatter = ' +\
+                'new Vex.Flow.Formatter().joinVoices('
+
+            voiceList = []
+            for thisVoice in self.vexflowVoices:
+                voiceList.append(thisVoice.voiceName)
+            voiceListStr = '[' + ', '.join(voiceList) + ']'
+            formatterCode += voiceListStr + ').format(' + voiceListStr + ', ' + str(self.params['notesWidth'])  + ');'
+            return formatterCode
+        else:
+            return ''
+
+    
+    def vexflowCode(self):      
+        # code for joining multiple voices (needed even if only one...
+        
+        return self.staveCode() + '\n' + self.formatterCode()
+    
+    def getWidth(self):
+        return self.params['width']
+    
+    def getLineNum(self):
+        '''
+        Tries to get the line number of this stave
+
+        '''
+        if 'lineNum' in self.params:
+            return self.params['lineNum']
+        else:
+            #XXX Should I do something different here?
+            return 0
+    
+    def beamCode(self, contextName, indentation=3):
+        '''
+        Generates the code for beaming all of the voices on this stave
+
+        Returns an array containing the preamble and postamble
+        '''
+        preamble = []
+        postamble = []
+        for thisVoice in self.vexflowVoices:
+            if thisVoice.getBeaming():
+                (pre, post) = thisVoice.beamCode(contextName, \
+                    indentation=indentation)
+                preamble += [pre]
+                postamble += [post]
+        return [('\n' + ('    ' * indentation)).join(preamble), ('\n' + ('    ' * indentation)).join(postamble)]
+
+#    def addVoice(self, thisVexflowVoice):
+#        '''
+#        Adds thisVexflowVoice (an instance of VexflowVoice) to this VexflowStave
+#        '''
+#        self.vexflowVoices += [thisVexflowVoice]
+#        if 'clefDisplayStatus' not in self.params or not self.params['clefDisplayStatus']:
+#            self.params['clefDisplayStatus'] = thisVexflowVoice.clefDisplayStatus
+#            
+#        if 'keySignatureDisplayStatus' not in self.params or not self.params['keySignatureDisplayStatus']:
+#            self.params['keySignatureDisplayStatus'] = thisVexflowVoice.keySignatureDisplayStatus
+#
+#        #print 'Sig: %s, Display?: %s' % (self.params['keySignature'], self.params['keySignatureDisplayStatus']) #XXX k
+            
+    def setVoices(self, theseVexflowVoices):
+        '''
+        Replaces any existing voices attached to this Stave with theseVexflowVoices (a list of instances of VexflowVoice)
+        '''
+        if isinstance(theseVexflowVoices, list):
+            self.vexflowVoices = theseVexflowVoices
+        else:
+            self.vexflowVoices = [theseVexflowVoices]
+            
+        self.params['clef'] = defaultStaveClef
+        self.params['keySignature'] = defaultStaveKeySignature
+        for thisVoice in self.vexflowVoices:
+            if 'clefDisplayStatus' not in self.params or (not self.params['clefDisplayStatus'] and \
+                                                          'clefDisplayStatus' in thisVoice.params):
+                self.params['clefDisplayStatus'] += thisVoice.params['clefDisplayStatus']
+                
+            if 'keySignatureDisplayStatus' not in self.params or \
+                    (not self.params['keySignatureDisplayStatus'] and \
+                    'keySignatureDisplayStatus' in thisVoice.params):
+                self.params['keySignatureDisplayStatus'] += thisVoice.params['keySignatureDisplayStatus']
+
+            if thisVoice.clef:
+                self.params['clef'] = thisVoice.clef
+            if thisVoice.keySignature:
+                self.params['keySignature'] = thisVoice.keySignature
+
+        #print 'Sig: %s, Display?: %s' % (self.params['keySignature'], self.params['keySignatureDisplayStatus']) #XXX k
+    
+
+    def generateCode(self, mode='txt'):
+        '''
+        Generates the vexflow code to display this staff in a browser
+        '''
+        if mode == 'txt':
+            return self.vexflowCode()
+        elif mode == 'html':
+            result = htmlPreamble + vexflowPreamble
+            drawTheseVoices = []
+            drawTheseBeams = []
+            for thisVoice in self.vexflowVoices:
+                (beamPre, beamPost) = thisVoice.beamCode('ctx')
+                result += '\n' + thisVoice.generateCode('txt')
+                result += '\n' + beamPre
+                drawTheseVoices += [str(thisVoice.voiceName) + '.draw(ctx, ' + str(self.staveName) + ');\n']
+                if thisVoice.getBeaming():
+                    drawTheseBeams += [beamPost]
+
+            result += self.vexflowCode()
+            result += '\n' + str(self.staveName) + '.setContext(ctx).draw();'
+            result += '\n' + ''.join(drawTheseVoices) + '\n'
+            result += '\n'.join(drawTheseBeams)
+            result += htmlConclusion
+            return result
 
 class VexflowPart(object):
     '''
     A part is a wrapper for the vexflow code representing multiple measures
-        of music that should go in the same musical staff (as opposed to
-        a vexflow staff)
+    of music that should go in the same musical staff (as opposed to
+    a vexflow Stave)
     '''
 
     def __init__(self, music21part, params={}):
@@ -1274,7 +1724,7 @@ class VexflowPart(object):
         self.originalPart = music21part
         self.staves = []
         self.numMeasures = 0
-        self.numLines = 0
+        self.numSystems = 0
         self.lineWidth = 0
         self.measureWidth = 0
         self.leftMargin = 0
@@ -1282,8 +1732,8 @@ class VexflowPart(object):
         self.systemHeight = 0
         self.vexflowCode = ''
         self.params = params
-        if 'measuresPerStave' not in self.params:
-            self.params['measuresPerStave'] = defaultMeasuresPerStave
+        if 'measuresPerSystem' not in self.params:
+            self.params['measuresPerSystem'] = defaultMeasuresPerSystem
         if 'canvasMargin' not in self.params:
             self.params['canvasMargin'] = defaultCanvasMargin
         if 'canvasWidth' not in self.params:
@@ -1316,7 +1766,7 @@ class VexflowPart(object):
         self.lineWidth = '(' + str(self.params['canvasWidth']) + ' - (2*' + \
             str(self.params['canvasMargin']) + '))'
         self.measureWidth = '((' + str(self.lineWidth) + ') / ' + \
-            str(self.params['measuresPerStave']) + ')'
+            str(self.params['measuresPerSystem']) + ')'
         self.notesWidth = '((' + self.measureWidth + ') - ' + \
             str(self.params['measureMargin']) + ')'
         self.leftMargin = self.params['canvasMargin']
@@ -1332,7 +1782,7 @@ class VexflowPart(object):
         Generates the vexflow code to display this part
         '''
         self.numMeasures = -1
-        self.numLines = 0
+        self.numSystems = 0
         self.staves = []
         previousKeySignature = False
         for thisMeasure in self.originalPart:
@@ -1340,11 +1790,11 @@ class VexflowPart(object):
                 continue
             self.numMeasures += 1
             thisXPosition = '(' + str(self.numMeasures % \
-                self.params['measuresPerStave']) + ' * ' + \
+                self.params['measuresPerSystem']) + ' * ' + \
                 str(self.measureWidth) + ' + ' + str(self.leftMargin) + ')'
-            self.numLines = int(self.numMeasures) / \
-                int(self.params['measuresPerStave'])
-            thisYPosition = '((' + str(self.numLines) + ' * (' + \
+            self.numSystems = int(self.numMeasures) / \
+                int(self.params['measuresPerSystem'])
+            thisYPosition = '((' + str(self.numSystems) + ' * (' + \
                 str(self.systemHeight) + ' + ' + \
                 str(self.params['interSystemMargin']) + ')) + ' + \
                 str(self.topMargin) + ' + (' + str(self.params['partIndex']) + \
@@ -1354,16 +1804,16 @@ class VexflowPart(object):
                 'width': self.measureWidth,
                 'position': (thisXPosition, thisYPosition),
                 'name': 'stavePart' + str(self.params['partIndex']) + 'Measure' + \
-                    str(self.numMeasures) + 'Line' + str(self.numLines) + 'ID' + \
+                    str(self.numMeasures) + 'Line' + str(self.numSystems) + 'ID' + \
                     str(self.UID),
                 'clef': self.clef,
                 'notesWidth': self.notesWidth,
-                'lineNum': self.numLines
+                'lineNum': self.numSystems
             }
             
-            #Display the clef at the start of new lines
+            #Display the clef and keySignature at the start of new lines
             isNewLine = (self.numMeasures % \
-                self.params['measuresPerStave'] == 0)
+                self.params['measuresPerSystem'] == 0)
             theseParams['clefDisplayStatus'] = isNewLine
             theseParams['keySignatureDisplayStatus'] = isNewLine
             
@@ -1372,7 +1822,7 @@ class VexflowPart(object):
 
             #if theseParams['keySignatureDisplayStatus']:
                 #print "Part: %d, Measure: %d, Line: %d" % \
-                    #(self.params['partIndex'], self.numMeasures, self.numLines)
+                    #(self.params['partIndex'], self.numMeasures, self.numSystems)
 
             thisStave = VexflowStave(params=theseParams)
 
@@ -1389,7 +1839,7 @@ class VexflowPart(object):
                 theseVoices = []
                 music21voices = thisMeasure.getElementsByClass('Voice')
                 voiceParams['name'] += '0'
-                for index in xrange(len(music21voices)):
+                for index in range(len(music21voices)):
                     thisVoice = music21voices[index]
                     voiceParams['name'] = voiceParams['name'][:-1] + str(index)
                     theseVoices += [VexflowVoice(thisVoice, \
@@ -1400,7 +1850,7 @@ class VexflowPart(object):
 
         contextParams = {
             'width': self.params['canvasWidth'],
-            'height': '((' + str(self.numLines + 1) + ' * ('+str(self.systemHeight)+\
+            'height': '((' + str(self.numSystems + 1) + ' * ('+str(self.systemHeight)+\
                 ' + ' + str(self.params['interSystemMargin']) + ')) + 2* ' +\
                 str(self.topMargin) + ')'
         }
@@ -1434,529 +1884,148 @@ class VexflowPart(object):
 
     def generateCode(self, mode='txt'):
         '''
-        generates the vexflow code necessary to display this voice in a browser
+        generates the vexflow code necessary to display this part in a browser
         '''
         if mode=='txt':
             return self.vexflowCode
         elif mode=='html':
-            result = htmlCanvasPreamble + str(self.context.getCanvasHTML()) + \
+            result = htmlCanvasPreamble + self.context.getCanvasHTML() + \
                 htmlCanvasPostamble + '\n'
             result += self.context.getJSCode(indentation=3) + '\n'
             result += self.vexflowCode + '\n'
             for thisStave in self.staves:
                 for thisVoice in thisStave.vexflowVoices:
                     result += str(thisVoice.voiceName) + '.draw(' + \
-                    str(self.context.getContextName()) + ', ' + \
+                    self.context.contextName + ', ' + \
                     str(thisStave.staveName) + ');\n' + \
                     str(thisStave.staveName) + '.setContext(' + \
-                    str(self.context.getContextName()) + ').draw();'
+                    self.context.contextName + ').draw();'
 
             result += htmlConclusion
             return result
     
-    def getContext(self):
-        return self.context
 
 
-class VexflowVoice(object):
+class VexflowScore(object):
     '''
-    A Voice in Vex Flow is a "lateral" grouping of notes in one measure
-        It's the equivalent to a :class:`~music21.stream.Measure`
-
-    Requires either a Measure object or a Voice object
-        If those objects aren't already flat, flattens them.
-    
+    Represents the code for multiple VexflowPart objects
     '''
-    
-    def __init__(self, music21measure, params={}):
-        '''
-        params is a dict containing various parameters to be passed to the 
-            voice object
-        '''
-        global _UIDCounter
-        self.UID = _UIDCounter
-        _UIDCounter += 1
 
-        if music21measure != None:
-            if not ('Measure' in music21measure.classes or \
-                'Voice' in music21measure.classes):
-                raise TypeError, 'must pass a music21 Measure object'
-            self.originalMeasure = music21measure
-            self.originalNotes = music21measure.flat
-
+    def __init__(self, music21score, params={}):
+        self.originalScore = music21score
+        self.notatedScore = self.originalScore.makeNotation(inPlace=False)
+        self.originalParts = self.notatedScore.parts
+        self.numParts = len(self.originalParts)
+        self.vexflowParts = [None] * self.numParts
+        self.context = None
         self.params = params
-        self.voiceCode = ''
-        self.noteCode = ''
-        self.beams = []
-        self.ties = []
-        self.clefDisplayStatus = defaultClefDisplayStatus
-        self.keySignatureDisplayStatus = defaultKeySignatureDisplayStatus
+        self.partsCode = ''
 
-        if 'name' in self.params:
-            self.voiceName = self.params['name']
-        else:
-            self.voiceName = 'music21Voice' + str(self.UID)
-            self.params['name'] = self.voiceName
 
-        #if 'octaveModifier' not in self.params:
-            #Used for bass clef
-            #self.params['octaveModifier'] = 0
+    def vexflowCode(self):
+        '''
+        Generates the code necessary to display this score
+        '''
+        previousParams = {'numParts': self.numParts}
+        if self.context != None:
+            previousParams['context'] = self.context
+            previousParams['canvasWidth'] = self.context.getWidth()
 
-        #Set the clef
-        theseClefs = self.originalNotes.getElementsByClass('Clef')
-        if len(theseClefs) > 1:
-            raise Vexflow21UnsupportedException, 'Vexflow cannot yet handle ' +\
-                'multiple clefs in a single measure'
-        elif len(theseClefs) == 1:
-            self.clefDisplayStatus = True
-            self.clef = vexflowClefFromClef(theseClefs[0])
-        else:
-            if 'clef' in self.params:
-                self.clef = self.params['clef']
-            else:
-                self.clef = defaultStaveClef
-            if 'clefDisplayStatus' in self.params:
-                self.clefDisplayStatus = self.params['clefDisplayStatus']
-
-        #Set the key signature
-        theseKeySignatures = self.originalNotes.getElementsByClass('KeySignature')
-        if len(theseKeySignatures) > 1:
-            raise Vexflow21UnsupportedException, 'Vexflow cannot yet handle ' +\
-                'multiple key signatures in a single measure'
-        elif len(theseKeySignatures) == 1:
-            self.keySignatureDisplayStatus = True
-            if theseKeySignatures[0].sharps in vexflowSharpsToKeySignatures:
-                self.keySignature = \
-                    vexflowSharpsToKeySignatures[theseKeySignatures[0].sharps]
-            else:
-                raise VexFlowUnsupportedException, "VexFlow doesn't support this "+\
-                    'Key Signature:', theseKeySignatures[0]
-        else:
-            if 'keySignature' in self.params:
-                self.keySignature = self.params['keySignature']
-            else:
-                self.keySignature = defaultStaveKeySignature
-                #print "%s got the default key" % self.params['name'] #XXX k
-                #print 'Params: ', self.params
-            if 'keySignatureDisplayStatus' in self.params:
-                self.keySignatureDisplayStatus = \
-                    self.params['keySignatureDisplayStatus']
-
-        #Set the time signature
-        theseTimeSignatures = self.originalNotes.getElementsByClass('TimeSignature')
-        if len(theseTimeSignatures) > 1:
-            raise Vexflow21UnsupportedException, 'Vexflow cannot yet handle ' +\
-                'multiple time signatures in a single measure'
-        elif len(theseTimeSignatures) == 1:
-            self.numBeats = self.originalMeasure.highestTime
-            self.beatValue = 4
-            self.timeSignature='/'.join([str(theseTimeSignatures[0].numerator),\
-                str(theseTimeSignatures[0].denominator)])
-        else:
-            if not 'numBeats' in self.params:
-                self.params['numBeats'] = self.originalMeasure.highestTime
+        for index in range(self.numParts):
+            #make a vexflowPart object
+            thisPart = self.originalParts[index]
+            previousParams['partIndex'] = index
     
-            if not 'beatValue' in self.params:
-                self.params['beatValue'] = 4
+            if self.context != None:
+                previousParams['context'] = self.context
 
-            self.numBeats = self.params['numBeats']
-            self.beatValue = self.params['beatValue']
-            self.timeSignature = False
-        
-        if 'beaming' not in self.params:
-            self.params['beaming'] = defaultBeamingStatus
+            thisVexflowPart = VexflowPart(thisPart, previousParams)
+            
+            if self.context == None:
+                self.context = thisVexflowPart.context
 
-        self._generateVexflowCode()
+            self.vexflowParts[index] = thisVexflowPart
+            previousParams = thisVexflowPart.params
 
-    def _generateVexflowCode(self):
-        '''
-        Generates the code necessary to display this voice
-        '''
-        self.voiceCode = 'var ' + str(self.voiceName) + ' = new Vex.Flow.Voice({' +\
-            'num_beats: ' + str(self.numBeats) + ', ' + \
-            'beat_value: ' + str(self.beatValue) + ', ' + \
-            'resolution: Vex.Flow.RESOLUTION});'
+        if self.context == None:
+            self.context = previousParams['context']
 
-        noteName = self.voiceName + 'Notes'
-        self.noteCode = 'var ' + noteName + ' = ['
-
-        tieStarted = False
-        theseTies = []
-        thisTieStart = None
-        beamStarted = False
-        theseBeams = []
-        thisBeamStart = None
-        index = 0
-
-        for thisNote  in self.originalNotes:
-            if 'Note' in thisNote.classes:
-                thisVexflowNote = VexflowNote(thisNote, clef = self.clef)
-                self.noteCode += thisVexflowNote.generateCode('txt')
-                self.noteCode += ', '
-
-                if not beamStarted and thisVexflowNote.beamStart:
-                    thisBeamStart = index
-                    beamStarted = True
-                elif beamStarted and thisVexflowNote.beamStop:
-                    theseBeams += [(thisBeamStart, index)]
-                    beamStarted = False
-
-                if not tieStarted and thisVexflowNote.tieStart:
-                    thisTieStart = index
-                    tieStarted = True
-                elif not tieStarted and thisVexflowNote.tieStop:
-                    #could mean tie began in previous bar
-                    theseTies += [(None, index)]
-                    tieStarted = False
-                elif tieStarted and thisVexflowNote.tieStop:
-                    theseTies += [(thisTieStart, index)]
-                    tieStarted = False
-
-                index+= 1
-            elif 'Chord' in thisNote.classes:
-                thisVexflowChord = VexflowChord(thisNote, clef = self.clef)
-                self.noteCode += thisVexflowChord.generateCode('txt')
-                self.noteCode += ', '
-
-                if not beamStarted and thisVexflowChord.beamStart:
-                    thisBeamStart = index
-                    beamStarted = True
-                elif beamStarted and thisVexflowChord.beamStop:
-                    theseBeams += [(thisBeamStart, index)]
-                    beamStarted = False
-
-                if not tieStarted and thisVexflowNote.tieStart:
-                    thisTieStart = index
-                    tieStarted = True
-                elif tieStarted and thisVexflowNote.tieStop:
-                    theseTies += [(thisTieStart, index)]
-                    tieStarted = False
-
-                index+= 1
-            elif 'Rest' in thisNote.classes:
-                thisVexflowRest = VexflowRest(thisNote, clef= self.clef)
-                self.noteCode += thisVexflowRest.generateCode('txt')
-                self.noteCode += ', '
-                index+= 1
-            #TODO tuplet: if the note is the start of a tuplet, remember that it's the start of one and figure out how many
-            #    Later we'll do notes.slice(indexOfStart, lengthOfTuplet)
-            #    For now, we'll just throw an exception if the tuplet isn't complete
-
-        self.beams = theseBeams
-        if tieStarted:
-            #Partial tie across the bar, beginning on this page
-            theseTies += [(thisTieStart, None)]
-        self.ties = theseTies
-        self.noteCode = self.noteCode[:-2] + '];'
-
-        self.vexflowCode = self.voiceCode + '\n' + self.noteCode + '\n' +\
-            str(self.voiceName) + '.addTickables(' + str(self.voiceName) + \
-            'Notes);'
-
-    def getBeaming(self):
-        '''
-        Beaming is a boolean value determining if the voice should be beamed
-
-        Note: So far only VexFlow's automatic beaming is supported
-            Cannot manually modify beams
-        '''
-        return self.params['beaming']
-
-    def beamCode(self, contextName, indentation=3):
-        '''
-        Returns the code for the beams for this voice
-
-        Returns it as an array containing the beam preamble and postamble
-
-        Will return code even if it shouldn't be beamed
-            Check self.getBeaming() before applying this
-        '''
-        baseBeamName = str(self.voiceName) + 'Beam'
-        noteName = str(self.voiceName) + 'Notes'
-        preamble = ''
-        postamble = ''
-
-        for index in xrange(len(self.beams)):
-            thisBeam = self.beams[index]
-            thisBeamName = baseBeamName + str(index)
-
-            preamble += '\n' + ('    ' * indentation) + 'var ' + thisBeamName +\
-                ' = new Vex.Flow.Beam('+noteName+'.slice(' + str(thisBeam[0])+\
-                ',' + str(thisBeam[1]+1) + '));'
-            postamble += '\n' + ('    '*indentation) + thisBeamName + '.setCont'+\
-                'ext(' + str(contextName) + ').draw();'
-        return [preamble, postamble]
+        self.partsCode = '\n'.join([part.generateCode('txt') for part in self.vexflowParts])
+        vexflowCode = self.context.getJSCode(indentation=3) + '\n'
+        vexflowCode += self.partsCode
+        return vexflowCode
     
-    def tieCode(self, contextName, indentation=3):
+    def generateCode(self, mode = 'txt'):
         '''
-        Returns the code for the ties for this voice
-
-        Returns it as an array containing the completed ties within this voice,
-            and the partial ties that go across the bar line
-        '''
-        baseTieName = str(self.voiceName) + 'Tie'
-        noteName = str(self.voiceName) + 'Notes'
-        fullTies = []
-        partialTies = []
-
-        for index in xrange(len(self.ties)):
-            thisTie = self.ties[index]
-            if thisTie[0] != None and thisTie[1] != None:
-                #TODO: add support for multiple ties in a chord
-                thisTieName = baseTieName + str(index)
-                thisTieCode = ('    '*indentation)+'var '+thisTieName+' = new V'+\
-                    'ex.Flow.StaveTie({\n'+('    '*(indentation+1))+'first_note'+\
-                    ': '+noteName+'['+str(thisTie[0])+'],\n'+('    '*(indentation\
-                    +1))+'last_note: '+noteName+'['+str(thisTie[1])+'],\n'+\
-                    ('    '*(indentation+1))+'first_indices: [0],\n'+('    '*\
-                    (indentation+1))+'last_indices: [0]\n'+('    '*indentation)+\
-                    '});'
-                thisTieCode += '\n'+('    '*indentation)+thisTieName+'.setConte'+\
-                    'xt('+str(contextName)+').draw();'
-                fullTies += [thisTieCode]
-            else:
-                partialTies += [[thisTie, noteName]]
-
-        return ('\n'.join(fullTies), partialTies)
-    
-    def getNumBeats(self):
-        return self.numBeats
-    
-    def getBeatValue(self):
-        return self.params['beatValue']
-    
-    def setBeaming(self, beaming):
-        '''
-        Beaming is a boolean value determining if the voice should be beamed
-
-        Note: So far only VexFlow's automatic beaming is supported
-            Cannot manually modify beams
-        '''
-        self.params['beaming'] = beaming
-
-    def generateCode(self, mode='txt'):
-        '''
-        returns the vexflow code necessary to display this Voice in a browser
-            as a string
+        returns the vexflow code needed to render this object in a browser
         '''
         if mode == 'txt':
-            return self.vexflowCode
-        elif mode == 'html':
-            (beamPre, beamPost) = self.beamCode('ctx')
-            result = htmlPreamble + vexflowPreamble
-            defaultStaff = staffString()
-            result += "".join([
-					"			",
-					defaultStaff,
-					"\n",
-					"            stave.addClef('",
-					str(defaultStaveClef),
-					"').setContext(ctx).draw();\n",
-					"            ",
-					str(self.vexflowCode)])
-            result += beamPre + "\n            var formatter = new Vex.Flow.F"+\
-                "ormatter().joinVoices(["+str(self.voiceName)+"]).format([" + \
-                str(self.voiceName)+"], "+str(defaultStaveWidth)+");\n            " +\
-                str(self.voiceName)+".draw(ctx, stave);\n"
-            result += beamPost
+            return self.vexflowCode()
+        elif mode=='html':
+            vfc = self.vexflowCode() # sets too many other things currently, such as context
+            result = htmlCanvasPreamble + str(self.context.getCanvasHTML()) + \
+                htmlCanvasPostamble + '\n'
+            result += vfc + '\n'
+
+            tieCode = ''
+            partialTies = []
+            
+            for thisPart in self.vexflowParts:
+                for thisStave in thisPart.staves:
+                    for thisVoice in thisStave.vexflowVoices:
+                        contextName = self.context.contextName
+                        (thisTieCode, thesePartialTies) = thisVoice.tieCode(contextName)
+                        thesePartialTies = [(thisPartialTie + [thisStave.getLineNum()]) for thisPartialTie in thesePartialTies]
+                        tieCode += '\n'
+                        tieCode += '\n'.join(thisTieCode)
+                        partialTies += thesePartialTies
+                        result += thisVoice.createBeamCode(contextName)
+                        result += str(thisVoice.voiceName) + '.draw(' + \
+                            contextName + ', ' + \
+                            str(thisStave.staveName) + ');\n' + \
+                            str(thisStave.staveName) + '.setContext(' + \
+                            contextName + ').draw();'
+                        result += thisVoice.drawBeamCode(contextName)
+
+            tieStart = True
+            thisTieStart = None
+            thisStartLineNum = None
+            tieNum = 0
+            for (thisTie, thisName, thisLineNum) in partialTies:
+                if tieStart:
+                    thisTieStart = str(thisName)+'['+str(thisTie[0])+']'
+                    thisStartLineNum = thisLineNum
+                    tieStart = False
+                else:
+                    thisTieEnd = str(thisName)+'['+str(thisTie[1])+']'
+
+                    if thisTieStart == None or thisTieEnd == None:
+                        print 'uh oh... got mixed up somewhere'
+                        print partialTies
+                        print 'Ignoring'
+                        tieStart = True
+                        continue
+
+                    thisTieName = self.context.contextName + 'Tie' + \
+                        str(tieNum)
+
+                    if thisLineNum != thisStartLineNum:
+                        result +='\nvar '+thisTieName+'Start = new Vex.Flow.StaveTie({\n'+'first_note: '+thisTieStart+'\n});'
+                        result +='\nvar '+thisTieName+'End = new Vex.Flow.StaveTie({\n'+'last_note: '+thisTieEnd+'\n});'
+                        result += '\n'+thisTieName+'Start.setContext('+self.context.contextName+').draw();'
+                        result += '\n'+thisTieName+'End.setContext('+self.context.contextName+').draw();'
+                        tieStart = True
+                        continue
+
+                    result +='\nvar '+thisTieName+' = new Vex.Flow.StaveTie({\n'+\
+                        'first_note: '+thisTieStart+',\nlast_note: '+thisTieEnd\
+                        +',\nfirst_indices: [0],\nlast_indices: [0]\n});'
+                    result += '\n'+thisTieName+'.setContext('+\
+                        self.context.contextName+').draw();'
+                    tieStart = True
+
             result += htmlConclusion
             return result
-
-            
-
-class VexflowStave(object):
-	'''
-	A Stave in Vex Flow is the object for the graphic staff to be displayed
-	
-	NOTE: Because of the way Vexflow is set up, each measure is contained
-	    in it's own stave
-	
-	TODO: write accessors/modifiers
-	TODO: unit tests
-	TODO: generate code and show
-	    generateCode should take a VexflowContext object as a param
-	'''
-	def __init__(self, params={}):
-		'''
-		params is a dictionary containing position, width, and other parameters to be passed to the stave object
-		'''
-		global _UIDCounter
-		self.UID = _UIDCounter
-		_UIDCounter += 1
-		self.params = params
-		self.vexflowVoices = []
-		self.voicesCode = ''
-		self.staveCode = ''
-		self.vexflowCode = ''
-		if 'width' not in self.params:
-			self.params['width'] = defaultStaveWidth
-		if 'notesWidth' not in self.params:
-			self.params['notesWidth'] = '(' + str(self.params['width']) +\
-				' - ' + str(defaultMeasureMargin) + ')'
-		if 'position' not in self.params:
-			self.params['position'] = defaultStavePosition
-
-        #if context == None:
-        #    self.context = vexflow.VexflowContext()
-        #else:
-        #    if not isinstance(context, vexflow.VexflowContext):
-        #        raise VexFlowUnsupportedException, 'Context must be a ' +\
-        #            'VexflowContext object, not ' + type(context)
-        #    self.context = context
-		if 'name' in self.params:
-			self.staveName = self.params['name']
-		else:
-			self.staveName = 'music21Stave' + str(self.UID)
-		self._generateVexflow()
-    
-	def _generateVexflow(self):
-		self.staveCode = staffString(str(self.params['position'][0]), str(self.params['position'][1]), str(self.params['width']), self.staveName)
-		if len(self.vexflowVoices) > 0:
-			self.voicesCode = 'var ' + str(self.staveName) + 'Formatter = new Vex.Flow.Formatter().joinVoices('
-
-			voiceList = '['
-        
-			for thisVoice in self.vexflowVoices:
-				voiceList += str(thisVoice.voiceName) + ', '
-				if 'clef' not in self.params or not self.params['clef']:
-					self.params['clef'] = thisVoice.clef
-				if 'timeSignature' not in self.params or not self.params['timeSignature']:
-					self.params['timeSignature'] = thisVoice.timeSignature
-				if 'keySignature' not in self.params or not self.params['keySignature']:
-					self.params['keySignature'] = thisVoice.keySignature
-
-			voiceList = voiceList[:-2] + ']'
-			self.voicesCode += str(voiceList) + ').format(' + str(voiceList) + ', ' + str(self.params['notesWidth'])  + ');'
-		else:
-			self.voicesCode = ''
-		if 'clefDisplayStatus' in self.params and \
-			'clef' in self.params and self.params['clefDisplayStatus']:
-			self.staveCode += '\n' + str(self.staveName) + '.addClef("' + \
-				str(self.params['clef']) + '");'
-		if 'keySignatureDisplayStatus' in self.params and 'keySignature' in self.params and self.params['keySignatureDisplayStatus']:
-			self.staveCode += '\n' + str(self.staveName) + '.addKeySignature("' + str(self.params['keySignature']) + '");'
-
-		if 'timeSignature' in self.params and self.params['timeSignature']:
-			self.staveCode += '\n' + str(self.staveName) + '.addTimeSignature("' + str(self.params['timeSignature']) + '");'
-
-		self.vexflowCode = str(self.staveCode) + '\n' + str(self.voicesCode)
-    
-	def getWidth(self):
-		return self.params['width']
-	
-	def getLineNum(self):
-		'''
-		Tries to get the line number of this stave
-
-        Maybe should use getParam('lineNum') instead
-		'''
-		if 'lineNum' in self.params:
-			return self.params['lineNum']
-		else:
-			#XXX Should I do something different here?
-			return 0
-    
-	def beamCode(self, contextName, indentation=3):
-		'''
-		Generates the code for beaming all of the voices on this stave
-
-		Returns an array containing the preamble and postamble
-		'''
-		preamble = []
-		postamble = []
-		for thisVoice in self.vexflowVoices:
-			if thisVoice.getBeaming():
-				(pre, post) = thisVoice.beamCode(contextName, \
-					indentation=indentation)
-				preamble += [pre]
-				postamble += [post]
-		return [('\n' + ('    ' * indentation)).join(preamble), ('\n' + ('    ' * indentation)).join(postamble)]
-
-	def getParam(self, param):
-		'''
-		Attempts to retrieve an arbitray parameter
-
-		If no such parameter exists, returns None
-		'''
-		if param in self.params:
-			return param
-		else:
-			return None
-
-	def getClef(self):
-		return self.params['clef']
-
-	def addVoice(self, thisVexflowVoice):
-		'''
-		Adds thisVexflowVoice (an instance of VexflowVoice) to this VexflowStave
-		'''
-		self.vexflowVoices += [thisVexflowVoice]
-		if 'clefDisplayStatus' not in self.params or not self.params['clefDisplayStatus']:
-			self.params['clefDisplayStatus'] = thisVexflowVoice.clefDisplayStatus
-			
-		if 'keySignatureDisplayStatus' not in self.params or not self.params['keySignatureDisplayStatus']:
-			self.params['keySignatureDisplayStatus'] = thisVexflowVoice.keySignatureDisplayStatus
-
-        #print 'Sig: %s, Display?: %s' % (self.params['keySignature'], self.params['keySignatureDisplayStatus']) #XXX k
-		self._generateVexflow()
-            
-	def setVoices(self, theseVexflowVoices):
-		'''
-		Replaces any existing voices attached to this Stave with theseVexflowVoices (a list of instances of VexflowVoice)
-		'''
-		if isinstance(theseVexflowVoices, list):
-			self.vexflowVoices = theseVexflowVoices
-		else:
-			self.vexflowVoices = [theseVexflowVoices]
-			
-		self.params['clef'] = defaultStaveClef
-		self.params['keySignature'] = defaultStaveKeySignature
-		for thisVoice in self.vexflowVoices:
-			if 'clefDisplayStatus' not in self.params or (not self.params['clefDisplayStatus'] and \
-														  'clefDisplayStatus' in thisVoice.params):
-				self.params['clefDisplayStatus'] += thisVoice.params['clefDisplayStatus']
-				
-			if 'keySignatureDisplayStatus' not in self.params or \
-					(not self.params['keySignatureDisplayStatus'] and \
-					'keySignatureDisplayStatus' in thisVoice.params):
-				self.params['keySignatureDisplayStatus'] += thisVoice.params['keySignatureDisplayStatus']
-
-			if thisVoice.clef:
-				self.params['clef'] = thisVoice.clef
-			if thisVoice.keySignature:
-				self.params['keySignature'] = thisVoice.keySignature
-
-        #print 'Sig: %s, Display?: %s' % (self.params['keySignature'], self.params['keySignatureDisplayStatus']) #XXX k
-		self._generateVexflow()
-    
-	def getVoices(self):
-		return self.vexflowVoices
-
-
-	def generateCode(self, mode='txt'):
-		'''
-		Generates the vexflow code to display this staff in a browser
-		'''
-		if mode == 'txt':
-			return self.vexflowCode
-		elif mode == 'html':
-			result = htmlPreamble + vexflowPreamble
-			drawTheseVoices = []
-			drawTheseBeams = []
-			for thisVoice in self.vexflowVoices:
-				(beamPre, beamPost) = thisVoice.beamCode('ctx')
-				result += '\n' + thisVoice.generateCode('txt')
-				result += '\n' + beamPre
-				drawTheseVoices += [str(thisVoice.voiceName) + '.draw(ctx, ' + str(self.staveName) + ');\n']
-				if thisVoice.getBeaming():
-					drawTheseBeams += [beamPost]
-
-			result += self.vexflowCode
-			result += '\n' + str(self.staveName) + '.setContext(ctx).draw();'
-			result += '\n' + ''.join(drawTheseVoices) + '\n'
-			result += '\n'.join(drawTheseBeams)
-			result += htmlConclusion
-			return result
 
 
 class VexflowContext(object):
@@ -1981,7 +2050,6 @@ class VexflowContext(object):
         self.contextName = ''
         self.contextCode = ''
         if canvasName == None:
-            #XXX Is this sufficient? Should I instead use a random string/hash?
             self.canvasHTMLName = "music21Canvas" + str(self.UID)
         else:
             self.canvasHTMLName = str(canvasName)
@@ -2049,10 +2117,7 @@ class VexflowContext(object):
         self.contextName = 'music21Context' + str(self.UID)
         self.contextCode = 'var ' + self.contextName+ ' = '+self.rendererName +\
             '.getContext();'
-    
-    def getCanvasHTMLName(self):
-        return self.canvasHTMLName
-    
+        
     def getHeight(self):
         return self.params['height']
 
@@ -2064,16 +2129,7 @@ class VexflowContext(object):
             self.generateHTML(applyAttributes=applyAttributes)
 
         return self.canvasHTML
-    
-    def getCanvasJSName(self):
-        return self.canvasJSName
-    
-    def getRendererName(self):
-        return self.rendererName
-
-    def getContextName(self):
-        return self.contextName
-    
+       
     def getJSCode(self, indentation=1, cache=True, applyAttributes=True):
         if not cache or not self.canvasJSCode or not self.rendererCode or not self.contextCode:
             self.generateJS(applyAttributes=applyAttributes)
@@ -2186,7 +2242,7 @@ class TestExternal(unittest.TestCase):
         '''
         from music21 import corpus, note
         b = note.Note('B4') 
-        b = corpus.parse('bwv66.6')
+        b = corpus.parse('bwv1.6')
         b.show('vexflow')
     
 #-------------------------------------------------------------------------------

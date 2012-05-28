@@ -8,7 +8,7 @@
 #               Jackie Rogoff
 #               Beth Hadley
 #
-# Copyright:    (c) 2009 The music21 Project
+# Copyright:    (c) 2009-12 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 

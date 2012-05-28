@@ -1484,7 +1484,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     s._elementsChanged()
     # quantize to nearest 16th
     if quantizePost:    
-        s.quantize([8, 3], processOffsets=True, processDurations=True)
+        s.quantize([8, 3], processOffsets=True, processDurations=True, inPlace=True)
 
     if voicesRequired:
         pass

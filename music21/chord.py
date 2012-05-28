@@ -2394,6 +2394,24 @@ class Chord(note.NotRest):
         >>> c12.isConsonant()
         False
         
+        
+        OMIT_FROM_DOCS
+        
+        weird things if some notes have octaves and some dont...
+        
+        
+        >>> c13 = chord.Chord(['A4','B4','A'])
+        >>> c14 = c13.removeRedundantPitchNames(inPlace = False)
+        >>> c14
+        <music21.chord.Chord A4 B4>
+        >>> i14 = interval.notesToInterval(c14.pitches[0], c14.pitches[1])
+        >>> i14
+        <music21.interval.Interval M2>
+        >>> i14.isConsonant()
+        False
+        >>> c13.isConsonant()
+        False
+        
         '''
         c2 = self.removeRedundantPitchNames(inPlace = False)
         if len(c2.pitches) == 1:  
@@ -2642,10 +2660,23 @@ class Chord(note.NotRest):
         >>> str(c3.closedPosition(6).pitches)
         '[C#6, E6, G6]'
 
-        >>> c4 = chord.Chord(["C#4", "C5", "F7"])
+        TODO: FIX: should not have two Fs
+
+        >>> c4 = chord.Chord(["C#4", "C5", "F7", "F8"])
         >>> c4.closedPosition(4, inPlace = True)
         >>> str(c4.pitches)
-        '[C#4, F4, C5]'
+        '[C#4, F4, F4, C5]'
+
+
+        Implicit octaves work fine...
+        
+        TODO: FIX: should not have two As
+        
+        >>> c4 = chord.Chord(["A4", "B4", "A"])
+        >>> c4.closedPosition(4, inPlace = True)
+        >>> str(c4.pitches)
+        '[A4, A4, B4]'
+
         '''
         #environLocal.printDebug(['calling closedPosition()', inPlace])
         if inPlace:
@@ -2666,12 +2697,16 @@ class Chord(note.NotRest):
                 while pBass.octave != forceOctave:
                     # shift octave of all pitches
                     for p in returnObj.pitches:
+                        if p.octave is None:
+                            p.octave = p.implicitOctave
                         p.octave += dif
 
         # can change these pitches in place
         for p in returnObj.pitches:
             # bring each pitch down octaves until pitch space is 
             # within an octave
+            if p.octave is None:
+                p.octave = p.implicitOctave
             while p.ps > pBass.ps + 12:
                 p.octave -= 1      
 

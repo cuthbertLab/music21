@@ -7840,31 +7840,48 @@ class Stream(music21.Music21Object):
 
 
     def quantize(self, quarterLengthDivisors=[4, 3], 
-            processOffsets=True, processDurations=False):
+            processOffsets=True, processDurations=True, inPlace=False, recurse=True):
         '''
         Quantize time values in this Stream by snapping offsets 
         and/or durations to the nearest multiple of a quarter length value 
         given as one or more divisors of 1 quarter length. The quantized 
         value found closest to a divisor multiple will be used.
 
-
         The `quarterLengthDivisors` provides a flexible way to provide quantization 
         settings. For example, [2] will snap all events to eighth note grid. 
         [4, 3] will snap events to sixteenth notes and eighth note triplets, 
         whichever is closer. [4, 6] will snap events to sixteenth notes and 
         sixteenth note triplets. 
-
+    
+        `processOffsets` determines whether the Offsets are quantized.
+    
+        `processDurations` determines whether the Durations are quantized.
+        
+        Both are set to True by default.  Setting both to False does nothing to the Stream.
+        
+        if `inPlace` is True then the quantization is done on the Stream itself.  If False
+        (default) then a new quantized Stream of the same class is returned.
+        
+        If `recurse` is True then all substreams are also quantized.  If False (default)
+        then only the highest level of the Stream is quantized.
+        
 
         >>> from music21 import *
         >>> n = note.Note()
         >>> n.quarterLength = .49
         >>> s = stream.Stream()
-        >>> s.repeatInsert(n, [0.1, .49, .9, 1.51])
-        >>> s.quantize([4], processOffsets=True, processDurations=True)
+        >>> s.repeatInsert(n, [0.1, .49, .9])
+        >>> nshort = note.Note()
+        >>> nshort.quarterLength = .26
+        >>> s.repeatInsert(nshort, [1.49, 1.76])
+        >>> s.quantize([4], processOffsets=True, processDurations=True, inPlace=True)
         >>> [e.offset for e in s]
-        [0.0, 0.5, 1.0, 1.5]
+        [0.0, 0.5, 1.0, 1.5, 1.75]
         >>> [e.duration.quarterLength for e in s]
-        [0.5, 0.5, 0.5, 0.5]
+        [0.5, 0.5, 0.5, 0.25, 0.25]
+        
+        
+        TODO: test recurse and inPlace etc.
         '''
         # this presently is not trying to avoid overlaps that
         # result from quantization; this may be necessary
@@ -7879,19 +7896,34 @@ class Stream(music21.Music21Object):
 
         # if we have a min of .25 (sixteenth)
         quarterLengthMin = quarterLengthDivisors[0]
-        for e in self._elements:
-            if processOffsets:
-                o = e.getOffsetBySite(self)
-                oNew = bestMatch(o, quarterLengthDivisors)
-                #oNew = common.nearestMultiple(o, quarterLengthMin)
-                e.setOffsetBySite(self, oNew)
-            if processDurations:
-                if e.duration != None:
-                    ql = e.duration.quarterLength
-                    qlNew = bestMatch(ql, quarterLengthDivisors)
-                    #qlNew = common.nearestMultiple(ql, quarterLengthMin)
-                    e.duration.quarterLength = qlNew
 
+        if inPlace is False:
+            returnStream = copy.deepcopy(self)
+        else:
+            returnStream = self
+        
+        useStreams = [returnStream]
+        if recurse is True:
+            for obj in returnStream.recurse():
+                if 'Stream' in obj.classes:
+                    useStreams.append(obj)
+                
+        for useStream in useStreams:
+            for e in useStream._elements:
+                if processOffsets:
+                    o = e.getOffsetBySite(useStream)
+                    oNew = bestMatch(o, quarterLengthDivisors)
+                    #oNew = common.nearestMultiple(o, quarterLengthMin)
+                    e.setOffsetBySite(useStream, oNew)
+                if processDurations:
+                    if e.duration != None:
+                        ql = e.duration.quarterLength
+                        qlNew = bestMatch(ql, quarterLengthDivisors)
+                        #qlNew = common.nearestMultiple(ql, quarterLengthMin)
+                        e.duration.quarterLength = qlNew
+
+        if inPlace is False:
+            return returnStream
 
     def expandRepeats(self, copySpanners=True):
         '''Expand this Stream with repeats. Nested repeats given with :class:`~music21.bar.Repeat` objects, or repeats and sections designated with :class:`~music21.repeat.RepeatExpression` objects, are all expanded.

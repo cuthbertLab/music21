@@ -3395,7 +3395,7 @@ class Test(unittest.TestCase):
                 n.quarterLength = srcDur[i]                
                 s.insert(srcOffset[i], n)
 
-            s.quantize(divList, processOffsets=True, processDurations=True)
+            s.quantize(divList, processOffsets=True, processDurations=True, inPlace=True)
 
             targetOffset = [e.offset for e in s]
             targetDur = [e.duration.quarterLength for e in s]
