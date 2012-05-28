@@ -145,8 +145,14 @@ def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = Fa
     >>> rn10
     <music21.roman.RomanNumeral #iiio/7 in d minor>
 
-
     '''
+    stepAdjustments = {'minor' : {3: -1, 6: -1, 7: -1},
+                       'diminished' : {3: -1, 5: -1, 6: -1, 7: -2},
+                       'half-diminished': {3: -1, 5: -1, 6: -1, 7: -1},
+                       'augmented': {5: 1},
+                       }
+    
+    
     root = chordObj.root()
     thirdType = chordObj.semitonesFromChordStep(3)
     if thirdType == 4:
@@ -1508,3 +1514,6 @@ _DOC_ORDER = [RomanNumeral]
 
 if __name__ == "__main__":
     music21.mainTest(Test)
+
+#------------------------------------------------------------------------------
+# eof

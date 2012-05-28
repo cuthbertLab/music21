@@ -139,7 +139,7 @@ def runPerceivedDissonanceAnalysis(scoreIn, offsetList, keyStr=None):
     each of which is a dictionary containing these keys:
     {'stream', 'numUserIdentified', 'numMusic21Identified', 'numBothIdentified', 'accuracy', 'romans', 'key'}
 
-
+    >>> from music21 import *
     >>> piece = corpus.parse('bwv7.7').measures(0,3)
     >>> offsetList = [1.1916666666666667,2.3641666666666667,3.6041666666666665,4.5808333333333335,\
                       6.131666666666667,8.804166666666667,10.148333333333333,11.700833333333334]
@@ -413,10 +413,8 @@ class Test(unittest.TestCase):
         pass
 
 
-
-
 if __name__ == "__main__":
-
     music21.mainTest(Test)
 
-
+#------------------------------------------------------------------------------
+# eof

@@ -191,6 +191,8 @@ def ModWSGIApplication(environ, start_response):
     
     The request to the application should have the following structures:
 
+    >>> from music21 import *
+    >>> import StringIO
     >>> environ = {}              # environ is usually created by the server. Manually constructing dictionary for demonstrated
     >>> wsgiInput = StringIO.StringIO()    # wsgi.input is usually a buffer containing the contents of a POST request. Using StringIO to demonstrate
     >>> wsgiInput.write('{"dataDict":{"a":{"data":3}},"returnDict":{"a":"int"}}')
@@ -202,7 +204,7 @@ def ModWSGIApplication(environ, start_response):
     >>> environ['SCRIPT_NAME'] = "/music21/unifiedinterface"
     >>> environ['CONTENT_TYPE'] = "application/json"
     >>> start_response = lambda status, headers: None         # usually called by mod_wsgi server. Used to initiate response
-    >>> ModWSGIApplication(environ, start_response)
+    >>> webapps.ModWSGIApplication(environ, start_response)
     ['{"status": "success", "dataDict": {"a": {"fmt": "int", "data": "3"}}, "errorList": []}']
     '''    
 
@@ -244,17 +246,19 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
     Note that variables specified via query string will be returned as a list if
     they are specified more than once (e.g. ?b=3&b=4 will yeld ['3', '4'] as the value of b
     
+    >>> from music21 import *
+    >>> import StringIO
     >>> requestInput = StringIO.StringIO() # requestInput should be buffer from the server application. Using StringIO for demonstration
     >>> requestInput.write('{"dataDict":{"a":{"data":3}}}')
     >>> requestInput.seek(0)
     
     >>> environ = {"QUERY_STRING":"b=3"}
-    >>> agenda = makeAgendaFromRequest(requestInput, environ, 'application/json')
+    >>> agenda = webapps.makeAgendaFromRequest(requestInput, environ, 'application/json')
     >>> agenda
     {'dataDict': {u'a': {u'data': 3}, 'b': {'data': '3'}}, 'returnDict': {}, 'commandList': []}
    
     >>> environ2 = {"QUERY_STRING":"a=2&b=3&b=4"}
-    >>> agenda2 = makeAgendaFromRequest(requestInput, environ2, 'multipart/form-data')
+    >>> agenda2 = webapps.makeAgendaFromRequest(requestInput, environ2, 'multipart/form-data')
     >>> agenda2
     {'dataDict': {'a': {'data': '2'}, 'b': {'data': ['3', '4']}}, 'returnDict': {}, 'commandList': []}
 
@@ -393,7 +397,9 @@ class Agenda(dict):
     def __init__(self):
         '''
         Initializes core key values 'dataDict', 'commandList', 'returnDict'
-        >>> agenda = Agenda()
+
+        >>> from music21 import *
+        >>> agenda = webapps.Agenda()
         >>> agenda
         {'dataDict': {}, 'returnDict': {}, 'commandList': []}
         '''
@@ -406,7 +412,9 @@ class Agenda(dict):
         '''
         Raises an error if one attempts to set 'dataDict', 'returnDict', or 'commandList'
         to values that are not of the corresponding dict/list type.
-        >>> agenda = Agenda()
+
+        >>> from music21 import *
+        >>> agenda = webapps.Agenda()
         >>> agenda
         {'dataDict': {}, 'returnDict': {}, 'commandList': []}
         >>> agenda['dataDict'] = {"a":{"data":2}}
@@ -429,7 +437,8 @@ class Agenda(dict):
         Given a variable name, data, and optionally format, constructs the proper dataDictElement structure,
         and adds it to the dataDict of the agenda.
         
-        >>> agenda = Agenda()
+        >>> from music21 import *
+        >>> agenda = webapps.Agenda()
         >>> agenda
         {'dataDict': {}, 'returnDict': {}, 'commandList': []}
         >>> agenda.addData('a', 2)
@@ -450,7 +459,9 @@ class Agenda(dict):
         '''
         Given a variable name, returns the data stored in the agenda for that variable name. If no data is stored,
         returns the value None.        
-        >>> agenda = Agenda()
+
+        >>> from music21 import *
+        >>> agenda = webapps.Agenda()
         >>> agenda
         {'dataDict': {}, 'returnDict': {}, 'commandList': []}
         >>> agenda.getData('a') == None
@@ -471,9 +482,10 @@ class Agenda(dict):
         none to 
         argList should be a list of data encoded in an appropriate format (see parseStringToPrimitive for more information)
         
-        <resultVar> = <caller>.<command>(<argList>)
+            <resultVar> = <caller>.<command>(<argList>)
         
-        >>> agenda = Agenda()
+        >>> from music21 import *
+        >>> agenda = webapps.Agenda()
         >>> agenda
         {'dataDict': {}, 'returnDict': {}, 'commandList': []}
         >>> agenda.addCommand('method','sc','sc','transpose',['p5'])
@@ -499,7 +511,8 @@ class Agenda(dict):
         '''
         Specifies the output template that will be used for the agenda.
         
-        >>> agenda = Agenda()
+        >>> from music21 import *
+        >>> agenda = webapps.Agenda()
         >>> agenda
         {'dataDict': {}, 'returnDict': {}, 'commandList': []}
         >>> agenda.setOutputTemplate('templates.noteflightEmbed',['sc'])
@@ -513,7 +526,8 @@ class Agenda(dict):
         '''
         Runs json.loads on jsonRequestStr and loads the resulting structure into the agenda object.
         
-        >>> agenda = Agenda()
+        >>> from music21 import *
+        >>> agenda = webapps.Agenda()
         >>> agenda
         {'dataDict': {}, 'returnDict': {}, 'commandList': []}
         >>> agenda.loadJson(sampleJsonStringSimple)
@@ -536,13 +550,15 @@ class CommandProcessor(object):
     '''
     Processes server request for music21.
     
-    Takes an Agenda (dict) as input, containing the keys:
-    'dataDict'
-    'commandList'
-    'returnDict'
-    'outputTemplate'
-    'outputArgList'
+    Takes an Agenda (dict) as input, containing the keys::
+        'dataDict'
+        'commandList'
+        'returnDict'
+        'outputTemplate'
+        'outputArgList'
 
+
+    TODO: MORE DOCS!
     '''
     def __init__(self,agenda):
         '''
@@ -989,10 +1005,12 @@ class CommandProcessor(object):
         If it is a quoted string then it will remove the quotes on the ends and return it as a string.
         If no type can be determined, raises an exception
         
-        >>> agenda = Agenda()
+        >>> from music21 import *
+        >>> agenda = webapps.Agenda()
         >>> agenda.addData("a",2)
         >>> agenda.addData("b",[1,2,3],"list")
-        >>> processor = CommandProcessor(agenda)
+
+        >>> processor = webapps.CommandProcessor(agenda)
         >>> processor.parseStringToPrimitive("a")
         2
         >>> processor.parseStringToPrimitive("b")
@@ -1173,4 +1191,6 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     music21.mainTest(Test)
-        
+
+#------------------------------------------------------------------------------
+# eof        

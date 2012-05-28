@@ -503,7 +503,6 @@ class Test(unittest.TestCase):
         # Iterate over the Chords and prepare presentation
         for c in reduction.flat.getElementsByClass('Chord'):
             c.closedPosition(forceOctave=4, inPlace=True)
-            c.removeRedundantPitches(inPlace=True)
             c.annotateIntervals()
         # Add the reduction and display the results
         sExcerpt.insert(0, reduction)
@@ -511,12 +510,12 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(sExcerpt.flat.getElementsByClass('Chord')), 13)
 
-        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[1]), '<music21.chord.Chord E4 G4 B4 E5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[1]), '<music21.chord.Chord E4 G4 B4>')
 
-        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[2]), '<music21.chord.Chord E4 G4 E5>')
-        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[3]), '<music21.chord.Chord D4 F4 A4 D5>')
-        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[4]), '<music21.chord.Chord D4 F4 A4 D5>')
-        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[5]), '<music21.chord.Chord D4 F4 A4 D5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[2]), '<music21.chord.Chord E4 G4>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[3]), '<music21.chord.Chord D4 F4 A4>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[4]), '<music21.chord.Chord D4 F4 A4>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[5]), '<music21.chord.Chord D4 F4 A4>')
         self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[6]), '<music21.chord.Chord A4 C5 E5>')
         self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[7]), '<music21.chord.Chord A4 C5>')
 
@@ -526,7 +525,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[10]), '<music21.chord.Chord F4 G4 A4 D5>')
 
         self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[11]), '<music21.chord.Chord F4 A4 D5>')
-        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[12]), '<music21.chord.Chord E4 G4 B4 E5>')
+        self.assertEqual(str(sExcerpt.flat.getElementsByClass('Chord')[12]), '<music21.chord.Chord E4 G4 B4>')
 
 
     def testExamplesE(self):

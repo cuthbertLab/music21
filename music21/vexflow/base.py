@@ -371,11 +371,14 @@ def fromObject(thisObject, mode='txt'):
     >>> trebleVoice
     <music21.stream.Voice 0>
 
+
+    >>> vexflow._UIDCounter = 0L #_DOCS_HIDE
     >>> print vexflow.fromObject(measure1)
     var music21Voice0 = new Vex.Flow.Voice({num_beats: 1.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
     var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
     music21Voice0.addTickables(music21Voice0Notes);
 
+    >>> vexflow._UIDCounter = 0L #_DOCS_HIDE
     >>> print vexflow.fromObject(trebleVoice)
     var music21Voice0 = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
     var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["An/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}).addArticulation(0, new Vex.Flow.Articulation("a@a").setPosition(3)), new Vex.Flow.StaveNote({keys: ["En/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
@@ -566,6 +569,7 @@ def fromMeasure(thisMeasure, mode='txt'):
     >>> b = corpus.parse('bwv1.6.mxl')
     >>> m = b.parts[0].measures(0,1)[2]
     >>> d = vexflow.fromMeasure(m)
+    >>> vexflow._UIDCounter = 0L #_DOCS_HIDE
     >>> print d
     var music21Voice0 = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
     var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
@@ -2192,18 +2196,20 @@ class Test(unittest.TestCase):
         self.assertMultiLineEqual(htmlOut, expectedOutput)
 
     
-	def testMeasureParts(self):
-		self.maxDiff = 30000
-		from music21 import corpus, common
-		b = corpus.parse('bwv1.6.mxl')
-		m = b.parts[0].measures(0,1)[2]
-		d = fromMeasure(m)
-		expectedOutputText = r'''var music21Voice0 = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
+    def testMeasureParts(self):
+        self.maxDiff = 30000
+        from music21 import corpus, common
+        b = corpus.parse('bwv1.6.mxl')
+        m = b.parts[0].measures(0,1)[2]
+        _UIDCounter = 0L
+        d = fromMeasure(m)
+        expectedOutputText = r'''var music21Voice0 = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
 var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
 music21Voice0.addTickables(music21Voice0Notes);'''
-		self.assertMultiLineEqual(d, expectedOutputText)
-		c = fromMeasure(m, 'html')
-		expectedOutput = r'''<!DOCTYPE HTML>
+        self.assertMultiLineEqual(d, expectedOutputText)
+        _UIDCounter = 0L
+        c = fromMeasure(m, 'html')
+        expectedOutput = r'''<!DOCTYPE HTML>
 <html>
 <head>
     <meta name='author' content='Music21' />
@@ -2222,13 +2228,16 @@ music21Voice0.addTickables(music21Voice0Notes);'''
             var music21Voice0 = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
 var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
 music21Voice0.addTickables(music21Voice0Notes);
+            var music21Voice0Beam0 = new Vex.Flow.Beam(music21Voice0Notes.slice(0,8));
             var formatter = new Vex.Flow.Formatter().joinVoices([music21Voice0]).format([music21Voice0], 500);
             music21Voice0.draw(ctx, stave);
+
+            music21Voice0Beam0.setContext(ctx).draw();
         });
     </script>
 </body>
 </html>'''
-		self.assertMultiLineEqual(c, expectedOutput)
+        self.assertMultiLineEqual(c, expectedOutput)
         #assert(common.basicallyEqual(c, expectedOutput))  #only whitespace differences
 
 

@@ -2637,7 +2637,7 @@ class Chord(note.NotRest):
         else:
             raise ChordException("Not a triad or Seventh, cannot determine inversion.")
  
-    def closedPosition(self, forceOctave=None, inPlace=False):
+    def closedPosition(self, forceOctave=None, inPlace=False, leaveRedundantPitches=False):
         '''Returns a new Chord object with the same pitch classes, 
         but now in closed position.
 
@@ -2651,32 +2651,63 @@ class Chord(note.NotRest):
         >>> chord2 = chord1.closedPosition()
         >>> chord2
         <music21.chord.Chord C#4 E4 G4>
+
+
+        Force octave changes the octave of the bass note (and all notes above it...)
         
         >>> c2 = chord.Chord(["C#4", "G5", "E6"])
-        >>> str(c2.closedPosition(2).pitches)
+        >>> str(c2.closedPosition(forceOctave = 2).pitches)
         '[C#2, E2, G2]'
 
         >>> c3 = chord.Chord(["C#4", "G5", "E6"])
-        >>> str(c3.closedPosition(6).pitches)
+        >>> str(c3.closedPosition(forceOctave = 6).pitches)
         '[C#6, E6, G6]'
 
-        TODO: FIX: should not have two Fs
 
+
+        Redundant pitches are removed by default, but can be retained...
+        
         >>> c4 = chord.Chord(["C#4", "C5", "F7", "F8"])
-        >>> c4.closedPosition(4, inPlace = True)
-        >>> str(c4.pitches)
+        >>> c5 = c4.closedPosition(4, inPlace = False)
+        >>> str(c5.pitches)
+        '[C#4, F4, C5]'
+        >>> c6 = c4.closedPosition(4, inPlace = False, leaveRedundantPitches=True)
+        >>> str(c6.pitches)
         '[C#4, F4, F4, C5]'
 
 
         Implicit octaves work fine...
+                
+        >>> c7 = chord.Chord(["A4", "B4", "A"])
+        >>> c7.closedPosition(4, inPlace = True)
+        >>> str(c7.pitches)
+        '[A4, B4]'
         
-        TODO: FIX: should not have two As
+        OMIT_FROM_DOCS
+        Very specialized fears...
         
-        >>> c4 = chord.Chord(["A4", "B4", "A"])
-        >>> c4.closedPosition(4, inPlace = True)
-        >>> str(c4.pitches)
-        '[A4, A4, B4]'
+        Duplicate octaves were not working
+        
+        >>> c7b = chord.Chord(["A4", "B4", "A5"])
+        >>> c7b.closedPosition(inPlace = True)
+        >>> str(c7b.pitches)
+        '[A4, B4]'
 
+        but the bass must remain A4:
+        
+        >>> c7c = chord.Chord(["A4", "B4", "A5", "G##6"])
+        >>> c7c.closedPosition(inPlace = True)
+        >>> str(c7c.pitches)
+        '[A4, B4, G##5]'
+        >>> str(c7c.bass())
+        'A4'
+
+        complex chord for semiclosed-position testing...
+        
+        >>> c8 = chord.Chord(['C3','E5','C#6','E-7', 'G8','C9','E#9'])
+        >>> c8.closedPosition(inPlace=True)
+        >>> str(c8.pitches)
+        '[C3, C#3, E-3, E3, E#3, G3]'
         '''
         #environLocal.printDebug(['calling closedPosition()', inPlace])
         if inPlace:
@@ -2707,24 +2738,70 @@ class Chord(note.NotRest):
             # within an octave
             if p.octave is None:
                 p.octave = p.implicitOctave
-            while p.ps > pBass.ps + 12:
+            while p.ps >= pBass.ps + 12:
                 p.octave -= 1      
+            # check for a bass of C4 and the note B#7 added to it, should be B#4 not B#3...
+            if p.diatonicNoteNum < pBass.diatonicNoteNum:
+                p.octave += 1
+
+        if leaveRedundantPitches is not True:
+            returnObj.removeRedundantPitches(inPlace=True) #here we can always be in place...
 
         # if not inPlace, creates a second new chord object!
-        if inPlace == False:
-            return returnObj.sortAscending(inPlace=True) 
-        else:
-            returnObj.sortAscending(inPlace = True)
-
-    def _semiClosedPosition(self):
-        '''
-        TODO: Write
+        returnObj.sortAscending(inPlace=True)
         
+        if inPlace == False:
+            return returnObj
+
+    def semiClosedPosition(self, forceOctave=None, inPlace=False, leaveRedundantPitches=False):
+        '''
+        Similar to :meth:`~music21.chord.Chord.ClosedPosition` in that it
         moves everything within an octave EXCEPT if there's already 
         a pitch at that step, then it puts it up an octave.  It's a 
         very useful display standard for dense post-tonal chords.
+        
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['C3','E5','C#6','E-7', 'G8','C9','E#9'])
+        >>> c2 = c1.semiClosedPosition(inPlace=False)
+        >>> c2.pitches
+        [C3, E-3, G3, C#4, E4, E#5]
+        
+        `leaveRedundantPitches` still works, and gives them a new octave!
+        
+        >>> c3 = c1.semiClosedPosition(inPlace=False, leaveRedundantPitches=True)
+        >>> c3.pitches
+        [C3, E-3, G3, C4, E4, C#5, E#5]
+        
+        of course `forceOctave` still works, as does `inPlace=True`.
+
+        >>> c1.semiClosedPosition(forceOctave=2, inPlace=True, leaveRedundantPitches=True)
+        >>> c1.pitches
+        [C2, E-2, G2, C3, E3, C#4, E#4]
+        
         '''
-        raise ChordException('not yet implemented')
+        if inPlace is False:
+            c2 = self.closedPosition(forceOctave, inPlace, leaveRedundantPitches)
+        else:
+            self.closedPosition(forceOctave, inPlace, leaveRedundantPitches)
+            c2 = self
+        startOctave = c2.bass().octave
+        remainingPitches = copy.copy(c2.pitches) # no deepcopy needed
+        
+        while len(remainingPitches) > 0:
+            usedSteps = []
+            newRemainingPitches = []
+            for i,p in enumerate(remainingPitches):
+                if p.step not in usedSteps:
+                    usedSteps.append(p.step)
+                else:
+                    p.octave += 1
+                    newRemainingPitches.append(p)
+            remainingPitches = newRemainingPitches
+        
+        c2.sortAscending(inPlace=True)
+
+        if inPlace is False:
+            return c2
 
     #---------------------------------------------------------------------------
     # annotations
@@ -3362,15 +3439,15 @@ class Chord(note.NotRest):
 
         >>> from music21 import *
         >>> c1 = chord.Chord(['c2', 'e3', 'g4', 'e3'])
-        >>> c1.removeRedundantPitches()
+        >>> c1.removeRedundantPitches(inPlace=True)
         >>> c1.pitches
         [C2, G4, E3]
         >>> c1.forteClass
         '3-11B'
 
         >>> c2 = chord.Chord(['c2', 'e3', 'g4', 'c5'])
-        >>> c2.removeRedundantPitches()
-        >>> c2.pitches
+        >>> c2c = c2.removeRedundantPitches(inPlace=False)
+        >>> c2c.pitches
         [C2, E3, G4, C5]
 
 
@@ -3385,7 +3462,7 @@ class Chord(note.NotRest):
         >>> p2 = pitch.Pitch('B')
         >>> p2.octave = -1
         >>> c3 = chord.Chord([p1, p2])
-        >>> c3.removeRedundantPitches()
+        >>> c3.removeRedundantPitches(inPlace=True)
         >>> c3.pitches
         [B-1]
         
@@ -3410,12 +3487,12 @@ class Chord(note.NotRest):
 
         >>> from music21 import *
         >>> c1 = chord.Chord(['c2', 'e3', 'g4', 'e3'])
-        >>> c1.removeRedundantPitchClasses()
+        >>> c1.removeRedundantPitchClasses(inPlace=True)
         >>> c1.pitches
         [C2, G4, E3]
 
         >>> c2 = chord.Chord(['c5', 'e3', 'g4', 'c2', 'e3', 'f-4'])
-        >>> c2.removeRedundantPitchClasses()
+        >>> c2.removeRedundantPitchClasses(inPlace=True)
         >>> c2.pitches
         [C5, G4, E3]
 
@@ -3426,14 +3503,14 @@ class Chord(note.NotRest):
     def removeRedundantPitchNames(self, inPlace=True):
         '''Remove all but the FIRST instance of a pitch class with more than one instance of that pitch name
         regardless of octave (but note that spelling matters, so that in the example, the F-flat stays even
-        though there is already an E.
+        though there is already an E.)
 
         If `inPlace` is True, a copy is not made and None is returned; otherwise a copy is made and that 
         copy is returned.
 
         >>> from music21 import *
         >>> c2 = chord.Chord(['c5', 'e3', 'g4', 'c2', 'e3', 'f-4'])
-        >>> c2.removeRedundantPitchNames()
+        >>> c2.removeRedundantPitchNames(inPlace = True)
         >>> c2.pitches
         [C5, G4, E3, F-4]
 

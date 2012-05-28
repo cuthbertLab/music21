@@ -25,13 +25,14 @@ This example, after parsing a polyphonic work stored as an Opus and creating a S
 >>> # Iterate over the Chords and prepare presentation
 >>> for c in reduction.flat.getElementsByClass('Chord'):
 ...     c.closedPosition(forceOctave=4, inPlace=True)
-...     c.removeRedundantPitches(inPlace=True)
 ...     c.annotateIntervals()
 ...
 >>> # Add the reduction and display the results
 >>> sExcerpt.insert(0, reduction)
 >>> sExcerpt.show()   # doctest: +SKIP
 
+(Note that this example shows some octaves retained...this has been fixed in newer releases)
+`TODO: Fix example`
 
 .. image:: images/examples-04.*
     :width: 600
