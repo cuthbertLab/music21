@@ -6987,7 +6987,12 @@ class Stream(music21.Music21Object):
     # possible rename recurseList
     def recurse(self, direction='downward', streamsOnly=False, 
         restoreActiveSites=True, skipDuplicates=True, classFilter=[]):
-        '''Return a list of all Music21Objects, starting with self, continuing with self's elements, and whenever finding a Stream subclass in self, that Stream subclasse's elements. 
+        '''
+        Iterate over a list of all Music21Objects contained in the Stream, 
+        starting with self, continuing with self's elements, 
+        and whenever finding a Stream subclass in self, that Stream subclass's elements.
+        
+        TODO: WRITE DOCS AND TESTS ETC.!!!! 
         '''
         if direction in ['downward']:
             return [e for e in         
