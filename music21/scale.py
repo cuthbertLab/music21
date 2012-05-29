@@ -1594,6 +1594,11 @@ class ConcreteScale(Scale):
         True
         >>> sc.getScaleDegreeFromPitch('d#', comparisonAttribute='pitchClass')
         1
+        >>> sc.getScaleDegreeFromPitch('e') == None
+        True
+        >>> sc.getScaleDegreeFromPitch('e', comparisonAttribute='step')
+        1
+        
 
 
         >>> sc = scale.HarmonicMinorScale('a')
@@ -1611,6 +1616,63 @@ class ConcreteScale(Scale):
             comparisonAttribute=comparisonAttribute, 
             direction=direction)
         return post
+
+    def getScaleDegreeAndAccidentalFromPitch(self, pitchTarget, 
+            direction=DIRECTION_ASCENDING, comparisonAttribute='name'):
+        '''
+        Given a scale (or :class:`~music21.key.Key` object) and a pitch, return a two-element
+        tuple of the degree of the scale and an accidental (or None) needed to get this
+        pitch.
+        
+        >>> from music21 import *
+        >>> cmaj = key.Key('C')
+        >>> cmaj.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('E'))
+        (3, None)
+        >>> cmaj.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('E-'))
+        (3, <accidental flat>)
+        
+        
+        The Direction of a melodic minor scale is significant
+        
+        >>> amin = scale.MelodicMinorScale('a')
+        >>> amin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G'), direction=scale.DIRECTION_DESCENDING)
+        (7, None)
+        >>> amin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G'), direction=scale.DIRECTION_ASCENDING)
+        (7, <accidental flat>)
+        >>> amin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G-'), direction=scale.DIRECTION_ASCENDING)
+        (7, <accidental double-flat>)
+        
+        Returns (None, None) if for some reason this scale does not have this step (a whole-tone scale,
+        for instance)
+        '''        
+        scaleStep = self.getScaleDegreeFromPitch(pitchTarget, direction, comparisonAttribute)
+        if scaleStep is not None:
+            return (scaleStep, None)
+        else:
+            scaleStepNormal = self.getScaleDegreeFromPitch(pitchTarget, direction, comparisonAttribute='step')
+            pitchesFound = self.pitchesFromScaleDegrees([scaleStepNormal])
+            if len(pitchesFound) == 0:
+                return (None, None)
+            else:
+                foundPitch = pitchesFound[0]
+            if foundPitch.accidental is None:
+                foundAlter = 0
+            else:
+                foundAlter = foundPitch.accidental.alter
+            
+            if pitchTarget.accidental is None:
+                pitchAlter = 0
+            else:
+                pitchAlter = pitchTarget.accidental.alter
+            
+            alterDiff = pitchAlter - foundAlter
+            
+            if alterDiff == 0: 
+                # should not happen...
+                return (scaleStepNormal, None)
+            else:
+                alterAccidental = pitch.Accidental(alterDiff)
+                return (scaleStepNormal, alterAccidental)
 
 
     def next(self, pitchOrigin=None, direction='ascending', stepSize=1, 

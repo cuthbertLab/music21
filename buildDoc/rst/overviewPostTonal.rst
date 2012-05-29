@@ -166,7 +166,7 @@ We might divide this row into trichords, present each of those trichords as Chor
 
 >>> bStream = stream.Stream()
 >>> for i in range(0,12,3):
-...     c = chord.Chord(aRow[i:i+3])
+...     c = chord.Chord(aRow.pitches[i:i+3])
 ...     c.addLyric(c.primeFormString)
 ...     c.addLyric(c.forteClass)
 ...     bStream.append(c)

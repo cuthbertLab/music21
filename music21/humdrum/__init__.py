@@ -21,73 +21,73 @@ import music21.humdrum
 score1 = music21.humdrum.parseFile("chopin.krn")
 
 #-----------------------------------------------------------------------
-Humdrum programs and their closest music21 equivalents:
+Humdrum programs and their closest music21 equivalents::
 
-HUMDRUM         music21             NOTES
----------------------------------------------------------------------------
-assemble        None                Use python commands to unite objects
-census          None                Use python to create census equivalents
-cents           interval.ChromaticInterval.cents    (tuning will eventually affect this; produces cents w.r.t. interval not middle C)
-cleave          None                kern specific, not needed
-context         None                Not needed.  Use object.next and object.prev to get some context for many objects
-correl          None                Use numpy.corrcoef() or other, more sophisticated code
-deg             see scale           or stream.analyze('key')
-degree          see scale
-diss            analysis.kkdiss     NOT YET WRITTEN -- for music21 v2.0.
-ditto           None                Not needed.  Use copy.copy(object) or copy.deepcopy(object) to get another copy of an object
-encode          midi.(severaltools) Multifunction humdrum program.  Replaced by midi tools.  (NOT YET WRITTEN: simple midi in v0.3a; more complex in v2.0)
-extract         None                Use python commands to extract objects with certain properties
-fields          None                Not needed.
-fin2hum         music21.musicxml.parseFile(filename) (Outputting to Kern is not a priority of the music21 team for now; We do not read Finale files in Enigma, only those in musicXML.  An Enigma to music21 converter is a low priority.  Software to do this is available from recordare
-freq            note.Note.freq440
-hint            twoStreams.TwoStreamComparer.intervalToOtherStreamWhenAttacked()   or other similar functions
-hum2fin         myScore.write('musicxml')      Writes to musicXML.  A music21 to enigma converter is an extremely low priority since musicXML has made writing new Enigma files essentially obsolete.
-humdrum         None                Not needed.
-humsed          None                Not needed.
-humver          None                Not needed.
-infot           None                Use general purpose python information theory models
-iv              Chord.intervalVector
-kern            myScore.write('kern')        Outputting to kern not planned at this time.
-key             Key.keyFromStream() NOT YET WRITTEN (2008-10-18) (v0.6b)
-melac           analysis.thomassen.MelodicAccent    NOT YET WRITTEN -- lower priority (v2.0 or later)
-metpos          meter.addAccentToStream()   NOT YET WRITTEN -- high priority (v0.3a)
-midi            .show('midi') 
-midireset       midi.allOff()       NOT NEEDED -- v2.0 -- but will be needed for direct midi access...
-mint            Interval(note1, stream.noteFollowingNote(note1))
-nf              Chord.normalForm    NOT YET WRITTEN -- (v0.6b)
-num             None                not needed
-patt            None                Not needed, However, see, for instance, trecento.find_trecento_fragments for an example of a pattern searching module
-pattern         None                see patt above
-pc              Note.pitch.pitchClass
-pcset           Chord.pcset         NOT YET WRITTEN (v0.6); Returns PitchClassSet object.  PitchClassSet.forte, .normalForm, .primeForm, etc. will exist 
-perform         midi.play           For now use lily.ShowPNGandPlayMIDI()
-pf              PitchClassSet.primeForm   NOT YET WRITTEN -- see pcset
-pitch           Note.name + str(Note.octave)
-proof           None                Not needed; but something like this could be useful for each encoding format, however.
-recode          "if"
-record          none yet...         Not yet determined if it is a good idea to record directly to music21 within music21 -- a MIDI to music21 converter should suffice.
-regexp          None                Use re module in Python core, not music21
-reihe           serial.TwelveToneRow      
-rend            None                Not needed.
-rid             None                Not needed.
-scramble        None                Use random module in Python core, not music21.  However, see composition tools for some sophisticated scrambling methods
-semits          Note.pitchClass, Note.midiNote or Interval.chromatic.  Also Accidental.alter
-simil           None                Download http://www.mindrot.org/projects/py-editdist/ ; Possibly to be embedded later esp. for different costs...
-smf             midi.write          See midi above
-solfa           Key.chromaticSolfege(Note)  NOT YET WRITTEN
-solfg           Note.frenchSolfege  NOT YET WRITTEN -- see also to be written chromaticFixedDoSolfege()
-strophe         Note.lyric.strophe[i] NOT YET WRITTEN
-synco           analysis.leeLHiggins    NOT YET WRITTEN -- low priority
-tacet           midi.allOff()       see midireset above; -i will not be supported
-timebase        None                Not needed.  stream.getElementsByOffset() will cover most uses
-tonh            Note.pitch.germanName     
-trans           Note.transpose(Interval), Stream.transpose(Interval), etc
-urrhythm        analysis.JohnsonLaird.urrhythm(Stream)  NOT YET WRITTEN -- low priority
-veritas         None                Not needed.  use md5 or other checksum files
-vox             None                len(Chord.pitches()) works for a chord.  TwoStreamComparer has many methods for performing this function.
-xdelta          None                Not needed.
-yank            "if"
-ydelta          None                Not needed.
+    HUMDRUM         music21             NOTES
+    ---------------------------------------------------------------------------
+    assemble        None                Use python commands to unite objects
+    census          None                Use python to create census equivalents
+    cents           interval.ChromaticInterval.cents    (tuning will eventually affect this; produces cents w.r.t. interval not middle C)
+    cleave          None                kern specific, not needed
+    context         None                Not needed.  Use object.next and object.prev to get some context for many objects
+    correl          None                Use numpy.corrcoef() or other, more sophisticated code
+    deg             see :class:`~music21.scale.Scale`           or stream.analyze('key')
+    degree          see :class:`~music21.scale.Scale`
+    diss            analysis.kkdiss     NOT YET WRITTEN -- for music21 v2.0.
+    ditto           None                Not needed.  Use copy.copy(object) or copy.deepcopy(object) to get another copy of an object
+    encode          midi.(severaltools) Multifunction humdrum program.  See the midi directory for some replacements.
+    extract         None                Use python commands to extract objects with certain properties
+    fields          None                Not needed.
+    fin2hum         music21.converter.parse(filename)    Currently we only parse MusicXML files; as far as I know, Enigma Transport Format did not take off and is rarely used. (Outputting to Kern is not a priority of the music21 team for now; We do not read Finale files in Enigma, only those in musicXML.  An Enigma to music21 converter is a low priority.  Software to do this is available from recordare
+    freq            see :meth:`~music21.note.Note.freq440`
+    hint            twoStreams.TwoStreamComparer.intervalToOtherStreamWhenAttacked()   or other similar functions
+    hum2fin         myScore.write('musicxml')      Writes to musicXML.  A music21 to enigma converter is an extremely low priority since musicXML has made writing new Enigma files essentially obsolete.
+    humdrum         None                Not needed.
+    humsed          None                Not needed.
+    humver          None                Not needed.
+    infot           None                Use general purpose python information theory models
+    iv              :meth:`~music21.chord.Chord.intervalVector`
+    kern            myScore.write('kern')        NOT YET WRITTEN Outputting to kern is a lower priority.
+    key             see :meth:`~music21.stream.Stream.analyze`('key')
+    melac           analysis.thomassen.MelodicAccent    NOT YET WRITTEN -- lower priority but easily done (v2.0 or later)
+    metpos          1.0/beatStrength()    the beatStrength of an object is essentially something similar but inverted.  beatStrength handles irregular meters.
+    midi            .show('midi') 
+    midireset       None                Not needed for now because we do not write directly to MIDI.  A midi.allOff() will be needed for direct midi access...
+    mint            Interval(note1, note2)
+    nf              :meth:`~music21.chord.Chord.normalForm`
+    num             None                not needed
+    patt            search.*            see also, for instance, trecento.find_trecento_fragments for an example of a pattern searching module
+    pattern         search.*            see patt above
+    pc              :meth:`~music21.pitch.Pitch.pitchClass`
+    pcset           see Pitch.* and Chord.*         Pitch.pitchClass and pitchClassString, Chord.normalForm, .primeForm, .intervalVector, etc.
+    perform         .show('midi')
+    pf              :meth:`~music21.chord.Chord.normalForm`
+    pitch           :meth:`~music21.pitch.Pitch.noteNameWithOctave`
+    proof           None                Not needed; However, something like this could be useful for each encoding format.
+    recode          "if"
+    record          none yet...         Not yet determined if it is a good idea to record directly to music21 within music21 -- a MIDI to music21 converter should suffice.  But note that audioSearch.recording gives recording transcription abilities
+    regexp          None                Use re module in Python core, not music21
+    reihe           :class:`~music21.serial.TwelveToneRow`
+    rend            None                Not needed.
+    rid             None                Not needed.
+    scramble        None                Use random module in Python core, not music21.  However, see composition tools for some sophisticated scrambling methods
+    semits          :meth:`~music21.pitch.Pitch.ps`, :meth:`~music21.pitch.Pitch.p.midiNote` or :meth:`~music21.interval.Interval.chromatic`.  See also :class:`music21.pitch.Accidental`, esp. the `.alter` property.
+    simil           None                Download http://www.mindrot.org/projects/py-editdist/ ; Possibly to be embedded later esp. for different costs...
+    smf             .write('midi')      See midi above
+    solfa           None                NOT YET WRITTEN -- 
+    solfg           Note.frenchSolfege  NOT YET WRITTEN -- see also to be written chromaticFixedDoSolfege()
+    strophe         Note.lyric.strophe[i] NOT YET WRITTEN
+    synco           analysis.leeLHiggins    NOT YET WRITTEN -- low priority
+    tacet           midi.allOff()       see midireset above; -i will not be supported
+    timebase        None                Not needed.  stream.getElementsByOffset() will cover most uses
+    tonh            Note.pitch.germanName     
+    trans           Note.transpose(Interval), Stream.transpose(Interval), etc
+    urrhythm        analysis.JohnsonLaird.urrhythm(Stream)  NOT YET WRITTEN -- low priority
+    veritas         None                Not needed.  use md5 or other checksum files
+    vox             None                len(Chord.pitches()) works for a chord.  TwoStreamComparer has many methods for performing this function.
+    xdelta          None                Not needed.
+    yank            "if"
+    ydelta          None                Not needed.
 '''
 
 __ALL__ = ['spineParser','testFiles','questions']
