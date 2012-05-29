@@ -693,8 +693,9 @@ class VexflowObject(object):
 
         Currently supported modes:
             txt: returns the VexFlow code which can be used in conjunction with
-                 other VexFlow code
-            html: returns standalone HTML code for displaying just this note
+                 other VexFlow code.
+            html: returns standalone HTML code for displaying just this note.
+
 
         >>> from music21 import *
         >>> n = note.Note('C-')
@@ -1164,7 +1165,7 @@ class VexflowVoice(object):
     def __init__(self, music21measure = None, params={}):
         '''
         params is a dict containing various parameters to be passed to the 
-            voice object
+        voice object
         '''
         global _UIDCounter
         self.UID = _UIDCounter

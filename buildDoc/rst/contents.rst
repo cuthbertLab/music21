@@ -89,6 +89,7 @@ Module Reference
    moduleFiguredBassSegment
    moduleGraph
    moduleHarmony
+   moduleHumdrum
    moduleHumdrumSpineParser
    moduleInstrument
    moduleInterval

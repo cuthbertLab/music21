@@ -79,6 +79,7 @@ from music21 import graph
 
 from music21 import harmony
 
+from music21 import humdrum
 from music21.humdrum import spineParser as humdrumSpineParser
 
 from music21 import instrument
@@ -222,6 +223,7 @@ MODULES = [
     graph,
     
     harmony,
+    humdrum,
     humdrumSpineParser,
     
     instrument,

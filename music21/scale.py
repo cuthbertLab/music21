@@ -1673,7 +1673,97 @@ class ConcreteScale(Scale):
             else:
                 alterAccidental = pitch.Accidental(alterDiff)
                 return (scaleStepNormal, alterAccidental)
-
+    
+    # uses "traditional" chromatic solfeg and mostly Shearer Hullah (if needed)
+    _solfegSyllables = {1: {-2: 'def',
+                            -1: 'de',
+                             0: 'do',
+                             1: 'di',
+                             2: 'dis',
+                             },
+                        2: {-2: 'raf',
+                            -1: 'ra',
+                             0: 're',
+                             1: 'ri',
+                             2: 'ris',
+                             },
+                        3: {-2: 'mef',
+                            -1: 'me',
+                             0: 'mi',
+                             1: 'mis',
+                             2: 'mish',
+                             },
+                        4: {-2: 'fef',
+                            -1: 'fe',
+                             0: 'fa',
+                             1: 'fi',
+                             2: 'fis',
+                             },
+                        5: {-2: 'sef',
+                            -1: 'se',
+                             0: 'sol',
+                             1: 'si',
+                             2: 'sis',
+                             },
+                        6: {-2: 'lef',
+                            -1: 'le',
+                             0: 'la',
+                             1: 'li',
+                             2: 'lis',
+                             },
+                        7: {-2: 'tef',
+                            -1: 'te',
+                             0: 'ti',
+                             1: 'tis',
+                             2: 'tish',
+                             },
+                        }
+    _humdrumSolfegSyllables = copy.deepcopy(_solfegSyllables)
+    _humdrumSolfegSyllables[3][1] = 'my'
+    _humdrumSolfegSyllables[5] = {-2: 'sef', -1: 'se', 0: 'so', 1:'si', 2:'sis'}
+    _humdrumSolfegSyllables[7][1] = 'ty'
+    
+    def solfeg(self, pitchTarget=None, direction=DIRECTION_ASCENDING, variant="music21", chromatic=True):
+        '''
+        Returns the chromatic solfege (or diatonic if chromatic is False) for a given pitch in a given
+        scale.
+        
+        The `variant` method lets one specify either the default `music21` or `humdrum` solfeg representation
+        for altered notes.
+         
+         
+        >>> from music21 import *
+        >>> eflatMaj = key.Key('E-')
+        >>> eflatMaj.solfeg(pitch.Pitch('G'))
+        'mi'
+        >>> eflatMaj.solfeg(pitch.Pitch('A'))
+        'fi'
+        >>> eflatMaj.solfeg(pitch.Pitch('A'), chromatic=False)
+        'fa'        
+        >>> eflatMaj.solfeg(pitch.Pitch('G#'), variant='music21') #default
+        'mis'
+        >>> eflatMaj.solfeg(pitch.Pitch('G#'), variant='humdrum')
+        'my'
+        '''
+        (scaleDeg, accidental) = self.getScaleDegreeAndAccidentalFromPitch(pitchTarget, direction)
+        if variant == 'music21':
+            syllableDict = self._solfegSyllables
+        elif variant == 'humdrum':
+            syllableDict = self._humdrumSolfegSyllables
+        else:
+            raise ScaleException("Unknown solfeg variant %s" % variant)
+        if scaleDeg > 7:
+            raise ScaleException("Cannot call solfeg on non-7-degree scales")
+        elif scaleDeg is None:
+            raise ScaleException("Unknown scale degree for this pitch")
+        
+        if chromatic is True:
+            if accidental is None:
+                return syllableDict[scaleDeg][0]
+            else:                
+                return syllableDict[scaleDeg][accidental.alter]
+        else:
+            return syllableDict[scaleDeg][0]
 
     def next(self, pitchOrigin=None, direction='ascending', stepSize=1, 
         getNeighbor=True):
