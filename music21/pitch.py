@@ -606,6 +606,33 @@ class Microtone(music21.JSONSerializer):
 
 
 #-------------------------------------------------------------------------------
+
+def _getSpanishCardinal(int):
+    if int == 1:
+        return ''
+    elif int == 2:
+        return 'doble'
+    elif int == 3:
+        return 'triple'
+    elif int == 4:
+        return 'cuádruple'
+
+def _getSpanishSolfege(pitch):
+        if pitch == 'A':
+            return 'la '
+        if pitch == 'B':
+            return 'si '
+        if pitch == 'C':
+            return 'do '
+        if pitch == 'D':
+            return 're '
+        if pitch == 'E':
+            return 'mi '
+        if pitch == 'F':
+            return 'fa '
+        if pitch == 'G':
+            return 'sol '
+        
 class Accidental(music21.Music21Object):
     '''
     Accidental class, representing the symbolic and numerical representation of pitch deviation from a pitch name (e.g., G, B). 
@@ -1131,7 +1158,9 @@ class Pitch(music21.Music21Object):
     
     '''
     # define order to present names in documentation; use strings
-    _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi', 'french', 'german']
+    
+    _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi', 'french', 'german', 'spanish']
+
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
     }
@@ -2305,6 +2334,61 @@ class Pitch(music21.Music21Object):
         >>> print pitch.Pitch('B#').german
         His
     ''')
+    
+
+        
+    
+    def _getSpanish(self):
+        if self.accidental is not None:
+            tempAlter = self.accidental.alter
+        else:
+            tempAlter = 0
+        tempStep = self.step
+        solfege = _getSpanishSolfege(tempStep)
+        if tempAlter != int(tempAlter):
+            raise PitchException('Unsupported accidental type.')
+        else:
+            if tempAlter == 0:
+                return solfege
+            elif abs(tempAlter) > 4:
+                raise PitchException('Unsupported accidental type.')
+            elif tempAlter in [-4,-3,-2,-1]:
+                return solfege + _getSpanishCardinal(abs(tempAlter)) + ' bèmol'
+            elif tempAlter in [1,2,3,4]:
+                return solfege + _getSpanishCardinal(abs(tempAlter)) + ' sostenido'
+    
+    spanish = property(_getSpanish, 
+        doc ='''
+        Read-only attribute. Returns the name 
+        of a Pitch in Spanish
+        (Microtones and Quartertones raise an error).
+        
+        
+        >>> from music21 import *
+        >>> print pitch.Pitch('B-').spanish
+        si bèmol
+        >>> print pitch.Pitch('E-').spanish
+        mi bèmol
+        >>> print pitch.Pitch('C#').spanish
+        do sostenido
+        >>> print pitch.Pitch('A--').spanish
+        la doble bèmol
+        >>> p1 = pitch.Pitch('C')
+        >>> p1.accidental = pitch.Accidental('half-sharp')
+        >>> p1.spanish
+        Traceback (most recent call last):
+        PitchException: Unsupported accidental type.
+    
+        
+        Note these rarely used pitches:
+        
+        
+        >>> print pitch.Pitch('B--').spanish
+        si doble bèmol
+        >>> print pitch.Pitch('B#').spanish
+        si sostenido
+    ''')
+    
 
     def _getFrench(self):
         if self.accidental is not None:
