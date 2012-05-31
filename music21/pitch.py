@@ -4567,7 +4567,7 @@ class Test(unittest.TestCase):
 
 
     def testQuarterToneA(self):
-        import stream, note, scale, pitch
+        import stream, note, scale
 
         p1 = Pitch('D#~')
         #environLocal.printDebug([p1, p1.accidental])
@@ -4597,7 +4597,7 @@ class Test(unittest.TestCase):
         for x in range(1, 10):
             n = note.Note(sc.pitchFromDegree(x % sc.getDegreeMaxUnique()))
             n.quarterLength = .5
-            n.pitch.accidental = pitch.Accidental(alterList[x])
+            n.pitch.accidental = Accidental(alterList[x])
             s.append(n)
 
         match = [str(n.pitch) for n in s.notes]
