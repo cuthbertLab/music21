@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------------------
 '''
 Classes and functions for creating and manipulating pitches, pitch-space, and accidentals.
-Used extensively by note.py
+Used extensively by note.py8
 '''
 
 import os
@@ -1158,8 +1158,7 @@ class Pitch(music21.Music21Object):
     
     '''
     # define order to present names in documentation; use strings
-    
-    _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi', 'french', 'german', 'spanish']
+    _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi', 'french', 'german', 'italian', 'spanish']
 
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
@@ -2333,6 +2332,67 @@ class Pitch(music21.Music21Object):
         Heses
         >>> print pitch.Pitch('B#').german
         His
+    ''')
+    
+    def _getItalian(self):
+        if self.accidental is not None:
+            tempAlter = self.accidental.alter
+        else:
+            tempAlter = 0
+        tempStep = self.step
+        if tempAlter != int(tempAlter):
+            raise PitchException('Incompatible with quarter-tones')
+        else:
+            tempAlter = int(tempAlter)
+            
+        cardinalityMap = {1: " ", 2: " doppio ", 3: " triplo ", 4: " quadruplo "}
+        solfeggeMap = {"C": "do", "D": "re", "E": "mi", "F": "fa", "G": "sol", "A": "la", "B": "si"}
+        
+        if tempAlter == 0:
+            return solfeggeMap[tempStep]
+        elif tempAlter > 0:
+            if tempAlter > 4:
+                raise PitchException('Entirely too many sharps')
+            return solfeggeMap[tempStep] + cardinalityMap[tempAlter] + "diesis"
+        else: # flats
+            tempAlter = tempAlter*-1
+            if tempAlter > 4:
+                raise PitchException('Entirely too many flats')
+            return solfeggeMap[tempStep] + cardinalityMap[tempAlter] + "bemolle"
+    
+    italian = property(_getItalian, 
+        doc ='''
+        Read-only attribute. Returns the name 
+        of a Pitch in the Italian system 
+        (F-sharp is fa diesis, C-flat is do bemolle, etc.)
+        (Microtones and Quartertones raise an error).  
+        
+        
+        >>> from music21 import *
+        >>> print pitch.Pitch('B-').italian
+        si bemolle
+        >>> print pitch.Pitch('B').italian
+        si
+        >>> print pitch.Pitch('E-9').italian
+        mi bemolle
+        >>> print pitch.Pitch('C#').italian
+        do diesis
+        >>> print pitch.Pitch('A--4').italian
+        la doppio bemolle
+        >>> p1 = pitch.Pitch('C')
+        >>> p1.accidental = pitch.Accidental('half-sharp')
+        >>> p1.italian
+        Traceback (most recent call last):
+        PitchException: Incompatible with quarter-tones
+    
+        
+        Note these rarely used pitches:
+        
+        
+        >>> print pitch.Pitch('E####').italian
+        mi quadruplo diesis
+        >>> print pitch.Pitch('D---').italian
+        re triplo bemolle
     ''')
     
 
