@@ -1959,10 +1959,12 @@ class TestExternal(unittest.TestCase):
         
         #sc.show()
     def removeNHTones(self):
+        from music21 import *
+        from music21.demos.theoryAnalysis import *
         p = corpus.parse('handel/hwv56/movement1-01.md').measures(0,20)
         p.show()
-        music21.demos.theoryAnalysis.theoryAnalyzer.removePassingTones(p)
-        music21.demos.theoryAnalysis.theoryAnalyzer.removeNeighborTones(p)
+        theoryAnalyzer.removePassingTones(p)
+        theoryAnalyzer.removeNeighborTones(p)
         p.show()
         
 if __name__ == "__main__":
