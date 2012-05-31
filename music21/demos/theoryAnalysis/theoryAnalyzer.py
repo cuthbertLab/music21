@@ -40,8 +40,25 @@ dissonant harmonic intervals, etc. These analysis methods typically operate in t
 2) these bits are analyzed for certain attributes, according to analysis methods in :class:`~music21.voiceLeading`
 3) the results are stored in the score's analysisData dictionary, (and also returned as a list depending on which method is called)
 
+OMIT_FROM_DOCS
+This module was originally written for the WWNorton theory checking project, but re-factored to provide a more
+general interface to identifying common music-theory type analysis of a score. Thus, most methods are 'identify'
+methods, which color the score, print to the result dict, etc. If this module were to be re-written, all 'identify'
+methods should be changed to 'get' methods and return lists of notable atoms, and one single identify method should
+be written to color/write comments, etc. But for now, all methods serve their purpose and the appropriate get methods
+can easily be written (reference getPassingTones for example)
 '''
-    
+_DOC_ORDER = ['removePassingTones', 'removeNeighborTones', 'getPassingTones', 'getNeighborTones', 'getParallelFifths', 
+              'getHarmonicIntervals','getMelodicIntervals', 'getParallelOctaves',
+              'identifyParallelOctaves', 'identifyParallelUnisons', 'identifyHiddenFifths', 'identifyParallelFifths',
+              'identifyHiddenOctaves', 'identifyImproperResolutions', 'identifyLeapNotSetWithStep','identifyOpensIncorrectly', 
+              'identifyClosesIncorrectly', 'identifyPassingTones',
+              'identifyNeighborTones', 'identifyDissonantHarmonicIntervals', 
+              'identifyImproperDissonantIntervals', 'identifyDissonantMelodicIntervals', 'identifyObliqueMotion', 
+              'identifySimilarMotion', 'identifyParallelMotion', 'identifyContraryMotion', 'identifyOutwardContraryMotion',
+              'identifyScaleDegrees', 'identifyMotionType', 'identifyCommonPracticeErrors', 'getVerticalSlices', 
+              'getVerticalSliceNTuplets', 'getVLQs', 'getThreeNoteLinearSegments', 'getLinearSegments',
+              'getNotes']
 #---------------------------------------------------------------------------------------
 # Methods to split the score up into little pieces for analysis
 # The little pieces are all from voiceLeading.py, such as
@@ -109,24 +126,27 @@ def getVerticalSlices(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest'
         contentDict = defaultdict(list)
         partNum= 0
         
-        for part in score.parts:
-            elementStream = part.flat.getElementsByOffset(c.offset,mustBeginInSpan=False, classList=classFilterList)
+        if len(score.parts) > 1:
+            for part in score.parts:
+                elementStream = part.flat.getElementsByOffset(c.offset,mustBeginInSpan=False, classList=classFilterList)
+                #el = part.flat.getElementAtOrBefore(c.offset,classList=['Note','Rest', 'Chord', 'Harmony'])
+                for el in elementStream.elements:
+                    contentDict[partNum].append(el)    
+                partNum+=1
+        else:
+            elementStream = score.flat.getElementsByOffset(c.offset,mustBeginInSpan=False, classList=classFilterList)
             #el = part.flat.getElementAtOrBefore(c.offset,classList=['Note','Rest', 'Chord', 'Harmony'])
             for el in elementStream.elements:
-                #if el.isClassOrSubclass(['Rest']):
-                    #TODO: currently rests are stored as None...change to store them as music21 Rests soon
-                #    contentDict[partNum].append(None) # rests are stored as None...change to store them as Rests soon
-                # else:
                 contentDict[partNum].append(el)    
             partNum+=1
+                    
         vs = voiceLeading.VerticalSlice(contentDict)
         vsList.append(vs)
-    score.analysisData['VerticalSlices'] = vsList
+    if classFilterList==['Note', 'Chord', 'Harmony', 'Rest']:
+        score.analysisData['VerticalSlices'] = vsList
     
     return vsList
-    
-    
-    
+     
 def getVLQs(score, partNum1, partNum2):
     '''
     extracts and returns a list of the :class:`~music21.voiceLeading.VoiceLeadingQuartet` 
@@ -147,8 +167,6 @@ def getVLQs(score, partNum1, partNum2):
     >>> sc.insert(part1)
     >>> theoryAnalyzer.getVLQs(sc, 0, 1)
     [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note C> , v1n2=<music21.note.Note G>, v2n1=<music21.note.Note D>, v2n2=<music21.note.Note E>  , <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note G> , v1n2=<music21.note.Note C>, v2n1=<music21.note.Note E>, v2n2=<music21.note.Note F>  ]
-
-
     >>> len(theoryAnalyzer.getVLQs(sc, 0, 1))
     2
     '''
@@ -186,7 +204,6 @@ def getVLQs(score, partNum1, partNum2):
  
     return vlqList
     
-
 def getThreeNoteLinearSegments(score, partNum):
     '''
     extracts and returns a list of the :class:`~music21.voiceLeading.ThreeNoteLinearSegment` 
@@ -208,9 +225,6 @@ def getThreeNoteLinearSegments(score, partNum):
     2
     >>> theoryAnalyzer.getThreeNoteLinearSegments(sc, 0)[1]
     <music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note G> n2=<music21.note.Note C> n3=<music21.note.Note C> 
-
-
-
     '''
     # Caches the list of TNLS once they have been computed
     # for a specified partNum
@@ -263,7 +277,6 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
     <music21.interval.ChromaticInterval -7> <music21.interval.ChromaticInterval -2>
     <music21.interval.ChromaticInterval 5> <music21.interval.ChromaticInterval 0>
 
-
     >>> sc3 = stream.Score()
     >>> part2 = stream.Part()
     >>> part2.append(harmony.ChordSymbol('D-', quarterLength = 1))
@@ -279,6 +292,7 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
     linearSegments = []
     #no caching here - possibly implement later on...
     verticalSlices = getVerticalSlices(score)
+
     for i in range(0, len(verticalSlices)-lengthLinearSegment+1):
         objects = []
         for n in range(0,lengthLinearSegment):
@@ -287,12 +301,13 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
         if lengthLinearSegment == 3 and 'Note' in _getTypeOfAllObjects(objects):
             tnls = voiceLeading.ThreeNoteLinearSegment(objects[0], objects[1], objects[2])
             linearSegments.append(tnls)
-        elif lengthLinearSegment == 2 and ('Chord' in _getTypeOfAllObjects(objects)):
+        elif lengthLinearSegment == 2 and ('Chord' in _getTypeOfAllObjects(objects)) and None not in objects:
             tcls = voiceLeading.TwoChordLinearSegment(objects[0], objects[1])
             linearSegments.append(tcls)
         else:
-            nols = voiceLeading.NObjectLinearSegment(objects)
-            linearSegments.append(nols)
+            if None not in objects:
+                nols = voiceLeading.NObjectLinearSegment(objects)
+                linearSegments.append(nols)
     return linearSegments
 
 def _getTypeOfAllObjects(objectList):
@@ -401,7 +416,6 @@ def getHarmonicIntervals(score, partNum1, partNum2):
         hInvList.append(hIntv)
                 
     return hInvList
-
 
 def getMelodicIntervals(score, partNum):
     '''
@@ -552,9 +566,7 @@ def _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFu
                 if color is not None:
                     tr.color(color)
                 _updateScoreResultDict(score, dictKey, tr)
-                    
-
-                
+                        
 def _identifyBasedOnHarmonicInterval(score, partNum1, partNum2, color, dictKey, testFunction, textFunction, valueFunction=None):
     if valueFunction == None:
         valueFunction = testFunction
@@ -575,8 +587,7 @@ def _identifyBasedOnHarmonicInterval(score, partNum1, partNum2, color, dictKey, 
                 if color is not None:
                     tr.color(color)
                 _updateScoreResultDict(score, dictKey, tr)
-                
-                
+                               
 def _identifyBasedOnMelodicInterval(score, partNum, color, dictKey, testFunction, textFunction):
     
     if partNum == None:
@@ -614,8 +625,6 @@ def _identifyBasedOnNote(score, partNum, color, dictKey, testFunction, textFunct
                 _updateScoreResultDict(score, dictKey, tr)
                    
 def _identifyBasedOnVerticalSlice(score, color, dictKey, testFunction, textFunction, responseOffsetMap=[]):
-   
-    
     if 'VerticalSlices' not in score.analysisData.keys():
         vslist = getVerticalSlices(score)
     for vs in score.analysisData['VerticalSlices']:
@@ -814,9 +823,7 @@ def getParallelOctaves(score, partNum1=None, partNum2=None):
         return [tr.vlq for tr in score.analysisData['ResultDict']['parallelOctaves']]
     else:
         return None
-    
-   
-    
+       
 def identifyParallelUnisons(score, partNum1 = None, partNum2 = None, color = None,dictKey = 'parallelUnisons'):
     '''
     Identifies parallel unisons (calls :meth:`~music21.voiceLeading.parallelUnison`) between 
@@ -1066,6 +1073,7 @@ def identifyClosesIncorrectly(score, partNum1 = None, partNum2 = None, color = N
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color, startIndex=-1)    
 
 # Using the Vertical Slice N Tuplet Template
+
 def identifyPassingTones(score, partNumToIdentify = None, color = None, dictKey = None, unaccentedOnly=True, \
                          editorialDictKey=None,editorialValue=True):
     '''
@@ -1107,7 +1115,6 @@ def identifyPassingTones(score, partNumToIdentify = None, color = None, dictKey 
     testFunction = lambda vst, pn: vst.hasPassingTone(pn, unaccentedOnly)
     textFunction = lambda vsnt, pn:  vsnt.tnlsDict[pn].n2.name + ' identified as a passing tone in part ' + str(pn+1)
     _identifyBasedOnVerticalSliceNTuplet(score, partNumToIdentify, dictKey, testFunction, textFunction, color, editorialDictKey, editorialValue, editorialMarkDict={1:[partNumToIdentify]}, nTupletNum=3)
-
 
 def getPassingTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly=True):
     '''
@@ -1180,7 +1187,6 @@ def getNeighborTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly
         return [tr.vsnt.tnlsDict[tr.partNumIdentified].n2 for tr in score.analysisData['ResultDict'][dictKey]]
     else:
         return None
-
 
 def removePassingTones(score, dictKey = 'unaccentedPassingTones'):
     '''
@@ -1344,7 +1350,6 @@ def identifyDissonantHarmonicIntervals(score, partNum1 = None, partNum2 = None, 
                  + " between part " + str(pn1 + 1) + " and part " + str(pn2 + 1)
     _identifyBasedOnHarmonicInterval(score, partNum1, partNum2, color, dictKey, testFunction, textFunction)
 
-
 def identifyImproperDissonantIntervals(score, partNum1 = None, partNum2 = None, color = None, \
                                        dictKey = 'improperDissonantIntervals', unaccentedOnly=True):
     '''
@@ -1404,8 +1409,7 @@ def identifyImproperDissonantIntervals(score, partNum1 = None, partNum2 = None, 
                     _updateScoreResultDict(score, dictKey, tr)
 
         removeFromResultDict(score, ['h1','pt1', 'pt2', 'nt1', 'nt2'])
-    
-    
+       
 def identifyDissonantMelodicIntervals(score, partNum = None, color = None, dictKey = 'dissonantMelodicIntervals'):
     '''
     Identifies dissonant melodic intervals (A2, A4, d5, m7, M7) in the part (if specified) 
@@ -1813,7 +1817,6 @@ def colorResults(score, color='red', typeList=None):
             for result in score.analysisData['ResultDict'][resultType]:
                 result.color(color)
 
-
 def removeFromResultDict(score, dictKeys):  
     '''
     remove a a result entry or entries from the resultDict by specifying which key or keys in the dictionary
@@ -1879,7 +1882,6 @@ def setKeyMeasureMap(score, keyMeasureMap):
     '''
     score.analysisData['KeyMeasureMap'] = keyMeasureMap
     
-    
 def keyAtMeasure(score, measureNumber):
     '''
     uses keyMeasureMap to return music21 key object. If keyMeasureMap not specified,
@@ -1918,7 +1920,6 @@ def keyAtMeasure(score, measureNumber):
     else:
         return score.analyze('key')
 
-
 class TheoryAnalyzerException(music21.Music21Exception):
     pass
 
@@ -1926,9 +1927,19 @@ class TheoryAnalyzerException(music21.Music21Exception):
 
 class Test(unittest.TestCase):
     
-    def runTest(self):
-        pass
+    def chordMotionExample(self):
+        from music21 import harmony
+        p = corpus.parse('leadsheet').flat.getElementsByClass('Harmony')
+        harmony.realizeChordSymbolDurations(p)
+        averageMotion = 0
+        l = music21.demos.theoryAnalysis.theoryAnalyzer.getLinearSegments(p,0,2, ['Harmony'])
+        for x in l:
+            averageMotion+= abs(x.rootInterval().intervalClass)
+        averageMotion=averageMotion/len(l)
+        self.assertEqual(averageMotion, 4)
+    
         
+    
 class TestExternal(unittest.TestCase):
     
     def runTest(self):
@@ -1947,8 +1958,15 @@ class TestExternal(unittest.TestCase):
         identifyCommonPracticeErrors(sc)
         
         #sc.show()
+    def removeNHTones(self):
+        p = corpus.parse('handel/hwv56/movement1-01.md').measures(0,20)
+        p.show()
+        music21.demos.theoryAnalysis.theoryAnalyzer.removePassingTones(p)
+        music21.demos.theoryAnalysis.theoryAnalyzer.removeNeighborTones(p)
+        p.show()
         
-
 if __name__ == "__main__":
 
     music21.mainTest(Test)
+
+    
