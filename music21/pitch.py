@@ -1131,7 +1131,7 @@ class Pitch(music21.Music21Object):
     
     '''
     # define order to present names in documentation; use strings
-    _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi']
+    _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi', 'french', 'german']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
     }
@@ -2306,6 +2306,78 @@ class Pitch(music21.Music21Object):
         His
     ''')
 
+    def _getFrench(self):
+        if self.accidental is not None:
+            tempAlter = self.accidental.alter
+        else:
+            tempAlter = 0
+        tempStep = self.step
+        if tempAlter != int(tempAlter):
+            raise PitchException('On ne peut pas utiliser les microtones avec "french." Quelle Dommage!')
+        elif abs(tempAlter) > 4.0:
+            raise PitchException('On ne peut pas utiliser les altération avec puissance supérieure à quatre avec "french." Ça me fait une belle jambe!')
+        else:
+            tempAlter = int(tempAlter)
+        if tempStep == 'A':
+            tempStep = 'la'
+        if tempStep == 'B':
+            tempStep = 'si'
+        if tempStep == 'C':
+            tempStep = 'do'
+        if tempStep == 'D':
+            tempStep = 'ré'
+        if tempStep == 'E':
+            tempStep = 'mi'
+        if tempStep == 'F':
+            tempStep = 'fa'
+        if tempStep == 'G':
+            tempStep = 'sol'
+        
+        if tempAlter == 0:
+            return tempStep
+        elif abs(tempAlter) == 1.0:
+            tempNumberedStep = tempStep
+        elif abs(tempAlter) == 2.0:
+            tempNumberedStep = tempStep + ' double'
+        elif abs(tempAlter) == 3.0:
+            tempNumberedStep = tempStep + ' triple'
+        elif abs(tempAlter) == 4.0:  
+            tempNumberedStep = tempStep + ' quadruple'
+        
+        if tempAlter/abs(tempAlter) == 1.0: #sharps are positive
+            tempName = tempNumberedStep + ' dièse'
+            return tempName
+        else: # flats are negative
+            tempName = tempNumberedStep + ' bémol'
+            return tempName
+        
+    
+    french = property(_getFrench, 
+        doc ='''
+        Read-only attribute. Returns the name 
+        of a Pitch in the French system 
+        (where A = la, B = si, B-flat = si bémol, C-sharp = do dièse, etc.)
+        (Microtones and Quartertones raise an error).  Note that 
+        do is used instead of the also acceptable ut.
+        
+        
+        >>> from music21 import *
+        >>> print pitch.Pitch('B-').french
+        si bémol
+        >>> print pitch.Pitch('B').french
+        si
+        >>> print pitch.Pitch('E-').french
+        mi bémol
+        >>> print pitch.Pitch('C#').french
+        do dièse
+        >>> print pitch.Pitch('A--').french
+        la double bémol
+        >>> p1 = pitch.Pitch('C')
+        >>> p1.accidental = pitch.Accidental('half-sharp')
+        >>> p1.french
+        Traceback (most recent call last):
+        PitchException: On ne peut pas utiliser les microtones avec "french." Quelle Dommage!
+    ''')
 
     def _getFrequency(self):        
         return self._getfreq440()
