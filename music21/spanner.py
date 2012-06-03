@@ -180,7 +180,7 @@ class Spanner(music21.Music21Object):
     def __init__(self, *arguments, **keywords):
         music21.Music21Object.__init__(self)
 
-        self._cache = common.DefaultHash()    
+        self._cache = {} #common.DefaultHash()    
 
         # store this so subclasses can replace
         if self.__module__ != '__main__':
@@ -382,7 +382,7 @@ class Spanner(music21.Music21Object):
 #         for c in self._components._elements:
 #             post.append(id(c))
 #         return post
-        if self._cache['componentIds'] is None:
+        if 'componentIds' not in self._cache or self._cache['componentIds'] is None:
             self._cache['componentIds'] = [id(c) for c in self._components._elements]
         return self._cache['componentIds']
 
@@ -427,8 +427,8 @@ class Spanner(music21.Music21Object):
 
         self._components._elementsChanged()
         # always clear cache
-        if self._cache > 0:
-            self._cache = common.DefaultHash()
+        if len(self._cache) > 0:
+            self._cache = {} #common.DefaultHash()
 
     def hasComponent(self, component):  
         '''Return True if this Spanner has the component.'''
@@ -469,8 +469,8 @@ class Spanner(music21.Music21Object):
             #environLocal.printDebug(['Spanner.replaceComponent:', 'old', e, 'new', new])
 
         # always clear cache
-        if self._cache > 0:
-            self._cache = common.DefaultHash()
+        if len(self._cache) > 0:
+            self._cache = {} #common.DefaultHash()
 
         #environLocal.printDebug(['replaceComponent()', 'id(old)', id(old), 'id(new)', id(new)])
 
@@ -636,7 +636,7 @@ class SpannerBundle(object):
     If a Stream or Stream subclass is provided as an argument, all Spanners on this Stream will be accumulated herein. 
     '''
     def __init__(self, *arguments, **keywords):
-        self._cache = common.DefaultHash()    
+        self._cache = {} #common.DefaultHash()    
         self._storage = []
         for arg in arguments:
             if common.isListLike(arg):
@@ -659,8 +659,8 @@ class SpannerBundle(object):
 
     def append(self, other):
         self._storage.append(other)
-        if self._cache > 0:
-            self._cache = common.DefaultHash()
+        if len(self._cache) > 0:
+            self._cache = {} #common.DefaultHash()
 
     def __len__(self):
         return len(self._storage)
@@ -693,8 +693,8 @@ class SpannerBundle(object):
             self._storage.remove(item)
         else:
             raise SpannerBundleException('cannot match object for removal: %s' % item)
-        if self._cache > 0:
-            self._cache = common.DefaultHash()
+        if len(self._cache) > 0:
+            self._cache = {} #common.DefaultHash()
 
     def __repr__(self):
         return '<music21.spanner.SpannerBundle of size %s>' % self.__len__()
@@ -732,7 +732,7 @@ class SpannerBundle(object):
         1
         '''
         cacheKey = 'idLocal-%s' % idLocal
-        if self._cache[cacheKey] is None:
+        if cacheKey not in self._cache or self._cache[cacheKey] is None:
             post = self.__class__()
             for sp in self._storage:
                 if sp.idLocal == idLocal:
@@ -797,7 +797,7 @@ class SpannerBundle(object):
 
         idTarget = id(component)
         cacheKey = 'getByComponent-%s' % idTarget
-        if self._cache[cacheKey] is None:
+        if cacheKey not in self._cache or self._cache[cacheKey] is None:
             post = self.__class__()
             for sp in self._storage: # storage is a list of spanners
                 if idTarget in sp.getComponentIds():
@@ -834,8 +834,8 @@ class SpannerBundle(object):
                 #post.append(sp)
                 #environLocal.printDebug(['replaceComponent()', sp, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new)])
 
-        if self._cache > 0:
-            self._cache = common.DefaultHash()
+        if len(self._cache) > 0:
+            self._cache = {} #common.DefaultHash()
 
     def getByClass(self, className):
         '''Given a spanner class, return a bundle of all Spanners of the desired class. 
@@ -865,7 +865,7 @@ class SpannerBundle(object):
 #         return post
 
         cacheKey = 'getByClass-%s' % className
-        if self._cache[cacheKey] is None:
+        if cacheKey not in self._cache or self._cache[cacheKey] is None:
             post = self.__class__()
             for sp in self._storage:
                 if common.isStr(className):

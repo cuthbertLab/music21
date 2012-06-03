@@ -481,7 +481,7 @@ class Test(unittest.TestCase):
 
     def testOverlapsA(self):
         a = Stream()
-        # here, the thir item overlaps with the first
+        # here, the third item overlaps with the first
         for offset, dur in [(0,12), (3,2), (11,3)]:
             n = note.Note('G#')
             n.duration = duration.Duration()
@@ -4910,7 +4910,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s1.activeSite, s2)
         junk = s1.semiFlat
         self.assertEqual(s1.activeSite, s2)
-        junk = s1.flat
+        junk = s1.flat  # the order of these two calls ensures that _getFlatFromSemiflat is called
         self.assertEqual(s1.activeSite, s2)
         
         # this works fine

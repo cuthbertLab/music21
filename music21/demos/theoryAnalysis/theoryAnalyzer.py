@@ -59,6 +59,41 @@ _DOC_ORDER = ['removePassingTones', 'removeNeighborTones', 'getPassingTones', 'g
               'identifyScaleDegrees', 'identifyMotionType', 'identifyCommonPracticeErrors', 'getVerticalSlices', 
               'getVerticalSliceNTuplets', 'getVLQs', 'getThreeNoteLinearSegments', 'getLinearSegments',
               'getNotes']
+def addAnalysisData(score):
+    '''
+    adds an attribute "analysisData" to a Stream object if it does not exist.
+
+    also adds to any embedded Streams...
+
+    >>> from music21 import *
+    >>> from music21.demos.theoryAnalysis import theoryAnalyzer
+    >>> p = stream.Part()
+    >>> s = stream.Score()
+    >>> s.insert(0, p)
+    >>> hasattr(p, 'analysisData')
+    False
+    >>> hasattr(s, 'analysisData')
+    False
+    >>> theoryAnalyzer.addAnalysisData(s)
+    >>> hasattr(p, 'analysisData')
+    True
+    >>> hasattr(s, 'analysisData')
+    True
+    >>> 'ResultDict' in p.analysisData
+    True
+    '''
+    
+    # adds analysisData if it does not exist...
+    if not(hasattr(score, 'analysisData')):
+        score.analysisData = defaultdict(list)
+        score.analysisData['ResultDict'] = defaultdict(dict)
+    for s in score.recurse(streamsOnly = True):
+        if not(hasattr(s, 'analysisData')):
+            s.analysisData = defaultdict(list)
+            s.analysisData['ResultDict'] = defaultdict(dict)
+        
+
+
 #---------------------------------------------------------------------------------------
 # Methods to split the score up into little pieces for analysis
 # The little pieces are all from voiceLeading.py, such as
@@ -113,6 +148,7 @@ def getVerticalSlices(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest'
     '''   
     
     vsList = []
+    addAnalysisData(score)
     if 'VerticalSlices' in score.analysisData.keys() and score.analysisData['VerticalSlices'] != None:
         return score.analysisData['VerticalSlices']
 
@@ -173,7 +209,8 @@ def getVLQs(score, partNum1, partNum2):
     # Caches the list of VLQs once they have been computed
     # for a specified set of partNums
     vlqCacheKey = str(partNum1) + "," + str(partNum2)
-    
+
+    addAnalysisData(score)    
     if 'vlqs' in score.analysisData.keys() and vlqCacheKey in score.analysisData['vlqs'].keys():
         return score.analysisData['vlqs'][vlqCacheKey]
     
@@ -230,7 +267,8 @@ def getThreeNoteLinearSegments(score, partNum):
     # for a specified partNum
     
     tnlsCacheKey = str(partNum)
-        
+    addAnalysisData(score)
+
     if 'ThreeNoteLinearSegments' in score.analysisData.keys() and tnlsCacheKey in score.analysisData['ThreeNoteLinearSegments'].keys():
         return score.analysisData['ThreeNoteLinearSegments'][tnlsCacheKey]
     else:
@@ -354,6 +392,7 @@ def getVerticalSliceNTuplets(score, ntupletNum):
     '''
 
     verticalSliceNTuplets = []
+    addAnalysisData(score)
     if 'VerticalSlices' not in score.analysisData.keys():
         verticalSlices = getVerticalSlices(score)
     else:
@@ -541,6 +580,7 @@ def _updateScoreResultDict(score, dictKey, tr):
 def _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction=None, color=None, \
                         startIndex=0, endIndex = None, editorialDictKey=None,editorialValue=None, editorialMarkList=[]):
     
+    addAnalysisData(score)
 
     if partNum1 == None or partNum2 == None:
         for (partNum1,partNum2) in getAllPartNumPairs(score):
@@ -568,6 +608,7 @@ def _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFu
                 _updateScoreResultDict(score, dictKey, tr)
                         
 def _identifyBasedOnHarmonicInterval(score, partNum1, partNum2, color, dictKey, testFunction, textFunction, valueFunction=None):
+    addAnalysisData(score)
     if valueFunction == None:
         valueFunction = testFunction
     
@@ -589,7 +630,7 @@ def _identifyBasedOnHarmonicInterval(score, partNum1, partNum2, color, dictKey, 
                 _updateScoreResultDict(score, dictKey, tr)
                                
 def _identifyBasedOnMelodicInterval(score, partNum, color, dictKey, testFunction, textFunction):
-    
+    addAnalysisData(score)    
     if partNum == None:
         for partNum in range(0, len(score.parts)):
             _identifyBasedOnMelodicInterval(score, partNum, color, dictKey, testFunction, textFunction)
@@ -606,7 +647,8 @@ def _identifyBasedOnMelodicInterval(score, partNum, color, dictKey, testFunction
                 _updateScoreResultDict(score, dictKey, tr)
                 
 def _identifyBasedOnNote(score, partNum, color, dictKey, testFunction, textFunction): 
-    
+    addAnalysisData(score)
+
     if partNum == None: 
         for partNum in range(0, len(score.parts)):
             _identifyBasedOnNote(score, partNum, color, dictKey, testFunction, textFunction)
@@ -625,6 +667,7 @@ def _identifyBasedOnNote(score, partNum, color, dictKey, testFunction, textFunct
                 _updateScoreResultDict(score, dictKey, tr)
                    
 def _identifyBasedOnVerticalSlice(score, color, dictKey, testFunction, textFunction, responseOffsetMap=[]):
+    addAnalysisData(score)
     if 'VerticalSlices' not in score.analysisData.keys():
         vslist = getVerticalSlices(score)
     for vs in score.analysisData['VerticalSlices']:
@@ -644,6 +687,7 @@ def _identifyBasedOnVerticalSlice(score, color, dictKey, testFunction, textFunct
 def _identifyBasedOnVerticalSliceNTuplet(score, partNumToIdentify, dictKey, testFunction, textFunction=None, color=None, \
                                          editorialDictKey=None,editorialValue=None, editorialMarkDict={}, nTupletNum=3):        
 
+    addAnalysisData(score)
     if partNumToIdentify == None:
         for partNum in range(0,len(score.parts)):
             _identifyBasedOnVerticalSliceNTuplet(score, partNum, dictKey, testFunction,  textFunction, color, \
@@ -662,6 +706,7 @@ def _identifyBasedOnVerticalSliceNTuplet(score, partNumToIdentify, dictKey, test
 
 def _identifyBasedOnThreeNoteLinearSegment(score, partNum, color, dictKey, testFunction, textFunction):            
 
+    addAnalysisData(score)
     if partNum == None:
         for partNum in range(0,len(score.parts)):
             _identifyBasedOnThreeNoteLinearSegment(score, partNum, color, dictKey, testFunction, textFunction)
@@ -753,6 +798,7 @@ def getParallelFifths(score, partNum1=None, partNum2 = None):
     '''
     testFunction = lambda vlq: vlq.parallelFifth()
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey='parallelFifths', testFunction=testFunction)
+
     if score.analysisData['ResultDict'] and 'parallelFifths' in score.analysisData['ResultDict'].keys():
         return [tr.vlq for tr in score.analysisData['ResultDict']['parallelFifths']]
     else:
@@ -1785,6 +1831,7 @@ def getResultsString(score, typeList=None):
     Closing harmony is not in style
     '''
     resultStr = ""
+    addAnalysisData(score)
     for resultType in score.analysisData['ResultDict'].keys():
         if typeList is None or resultType in typeList:
             resultStr+=resultType+": \n"
@@ -1799,6 +1846,7 @@ def getHTMLResultsString(score, typeList=None):
     returns string of all results found by calling all identify methods on the TheoryAnalyzer score
     '''
     resultStr = ""
+    addAnalysisData(score)
     for resultType in score.analysisData['ResultDict'].keys():
         if typeList is None or resultType in typeList:
             resultStr+="<b>"+resultType+"</B>: <br /><ul>"
@@ -1812,6 +1860,7 @@ def colorResults(score, color='red', typeList=None):
     '''
     colors the notes of all results found in typeList by calling all identify methods on Theory Analyzer.
     '''
+    addAnalysisData(score)
     for resultType in score.analysisData['ResultDict'].keys():
         if typeList is None or resultType in typeList:
             for result in score.analysisData['ResultDict'][resultType]:
@@ -1823,8 +1872,9 @@ def removeFromResultDict(score, dictKeys):
     you'd like remove. Pass in a list of dictKeys or just a single dictionary key.
     
     >>> from music21 import *
-    >>> from music21.demos.theoryAnalysis import *
+    >>> from music21.demos.theoryAnalysis import theoryAnalyzer
     >>> sc = stream.Score()
+    >>> theoryAnalyzer.addAnalysisData(sc)
     >>> sc.analysisData['ResultDict'] = {'sampleDictKey': 'sample response', 'h1':'another sample response', 5:'third sample response'}
     >>> theoryAnalyzer.removeFromResultDict(sc, 'sampleDictKey')
     >>> sc.analysisData['ResultDict']
@@ -1833,6 +1883,7 @@ def removeFromResultDict(score, dictKeys):
     >>> sc.analysisData['ResultDict']
     {}
     '''  
+    addAnalysisData(score)
     if isinstance(dictKeys, list):
         for dictKey in dictKeys:
             try:
@@ -1848,6 +1899,7 @@ def removeFromResultDict(score, dictKeys):
             #raise TheoryAnalyzerException('got a dictKey to remove from resultDictionary that wasn''t in the dictionary: %s', dictKeys)
 #        
 def getKeyMeasureMap(score):
+    addAnalysisData(score)
     if 'KeyMeasureMap' in score.analysisData.keys():
         return score.analysisData['KeyMeasureMap']
     else:
@@ -1880,6 +1932,7 @@ def setKeyMeasureMap(score, keyMeasureMap):
     >>> theoryAnalyzer.getKeyMeasureMap(sc)
     {1: 'C', 2: 'a'}
     '''
+    addAnalysisData(score)
     score.analysisData['KeyMeasureMap'] = keyMeasureMap
     
 def keyAtMeasure(score, measureNumber):
@@ -1959,8 +2012,8 @@ class TestExternal(unittest.TestCase):
         
         #sc.show()
     def removeNHTones(self):
-        from music21 import *
-        from music21.demos.theoryAnalysis import *
+        from music21 import corpus
+        from music21.demos.theoryAnalysis import theoryAnalyzer
         p = corpus.parse('handel/hwv56/movement1-01.md').measures(0,20)
         p.show()
         theoryAnalyzer.removePassingTones(p)

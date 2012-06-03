@@ -648,7 +648,7 @@ class Accidental(music21.Music21Object):
     Natural-sharp etc. (for canceling a previous flat) are not yet supported.
 
 
-    >>> from music21 import pitch
+    >>> from music21 import *
     >>> a = pitch.Accidental('sharp')
     >>> a.name, a.alter, a.modifier
     ('sharp', 1.0, '#')

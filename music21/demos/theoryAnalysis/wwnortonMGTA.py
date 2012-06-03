@@ -151,6 +151,7 @@ class wwnortonExercise(object):
     
     def compareMarkerLyricAnswer(self,score,taKey,markerPartName,offsetFunc,lyricFunc):
         markerPart = self.studentExercise.parts[self.pn[markerPartName]]
+        addAnalysisData(score)
         for resultObj in score.analysisData['ResultDict'][taKey]:
             offset = offsetFunc(resultObj)
             correctLyric = lyricFunc(resultObj)

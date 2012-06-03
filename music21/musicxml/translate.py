@@ -2968,11 +2968,15 @@ def _addToStaffReference(mxObject, target, staffReference):
 
 
 def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
-    '''Translate an mxMeasure (a MusicXML :class:`~music21.musicxml.Measure` object) into a music21 :class:`~music21.stream.Measure`.
+    '''Translate an mxMeasure (a MusicXML :class:`~music21.musicxml.Measure` object) 
+    into a music21 :class:`~music21.stream.Measure`.
 
-    If an `inputM21` object reference is provided, this object will be configured and returned; otherwise, a new :class:`~music21.stream.Measure` object is created.  
+    If an `inputM21` object reference is provided, this object will be 
+    configured and returned; otherwise, a new :class:`~music21.stream.Measure` object is created.  
 
-    The `spannerBundle` that is passed in is used to accumulate any created Spanners. This Spanners are not inserted into the Stream here. 
+    The `spannerBundle` that is passed in is used to accumulate any created Spanners. 
+    This Spanners are not inserted into the Stream here. 
+        
     '''
     from music21 import stream
     from music21 import chord
@@ -3769,6 +3773,9 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     '''Load a part into a new Stream or one provided by `inputM21` given an mxScore and a part name.
 
     The `spannerBundle` reference, when passed in, is used to accumulate Spanners. These are not inserted here. 
+
+    Though it is incorrect MusicXML, PDFtoMusic creates empty measures when it should create full 
+    measures of rests (possibly hidden).  This routine fixes that bug.  See http://musescore.org/en/node/15129 
     '''
     #environLocal.printDebug(['calling Stream._setMXPart'])
 
@@ -3862,8 +3869,20 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
         # offsets within measure; if the .highestTime value is greater
         # use this as the next offset
 
-        if m.highestTime >= lastTimeSignature.barDuration.quarterLength:
-            mOffsetShift = m.highestTime
+        mHighestTime = m.highestTime
+        lastTimeSignatureQuarterLength = lastTimeSignature.barDuration.quarterLength
+
+        if mHighestTime >= lastTimeSignatureQuarterLength :
+            mOffsetShift = mHighestTime
+        
+        elif mHighestTime == 0.0 and len(m.flat.notesAndRests) == 0:
+            ## this routine fixes a bug in PDFtoMusic and other MusicXML writers
+            ## that omit empty rests in a Measure.  It is a very quick test if
+            r = note.Rest()
+            r.duration.quarterLength = lastTimeSignatureQuarterLength 
+            m.insert(0.0, r)
+            mOffsetShift = lastTimeSignatureQuarterLength
+                        
         else: # use time signature
             # for the first measure, this may be a pickup
             # must detect this when writing, as next measures offsets will be 
@@ -3873,11 +3892,11 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
                 if m.barDurationProportion() < 1.0:
                     m.padAsAnacrusis()
                     #environLocal.printDebug(['incompletely filled Measure found on musicxml import; interpreting as a anacrusis:', 'padingLeft:', m.paddingLeft])
-                mOffsetShift = m.highestTime
+                mOffsetShift = mHighestTime
             # assume that, even if measure is incomplete, the next bar should
             # start at the duration given by the time signature, not highestTime
             else:
-                mOffsetShift = lastTimeSignature.barDuration.quarterLength 
+                mOffsetShift = lastTimeSignatureQuarterLength
         oMeasure += mOffsetShift
 
     # if we have multiple staves defined, add more parts, and transfer elements

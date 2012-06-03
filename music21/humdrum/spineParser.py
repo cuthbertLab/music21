@@ -106,6 +106,10 @@ class HumdrumDataCollection(object):
         definitions mid-spine, so I don't think this limitation is a problem.
         (Craig Stuart Sapp confirmed this to me)
     
+        The Aarden/Miller Palestrina dataset uses `\*-` followed by `\*\*kern`
+        at the changes of sections thus some parsing of multiple exclusive
+        interpretations in a protospine may be necessary.
+    
     (2) Split spines are assumed to be voices in a single spine staff.
     
     

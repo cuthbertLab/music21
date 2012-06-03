@@ -208,10 +208,11 @@ class Stream(music21.Music21Object):
         # when deriving a flat stream, store a reference to the non-flat Stream          
         # from which this was taken
         self.flattenedRepresentationOf = None 
-        
-        self._cache = common.DefaultHash()
-        self.analysisData = defaultdict(list)
-        self.analysisData['ResultDict'] = defaultdict(dict)
+
+        self._cache = {}
+
+        #self.analysisData = defaultdict(list)
+        #self.analysisData['ResultDict'] = defaultdict(dict)
         
         if givenElements is not None:
             # TODO: perhaps convert a single element into a list?
@@ -220,6 +221,7 @@ class Stream(music21.Music21Object):
                     self.insert(e)
             except AttributeError:
                 raise StreamException("Unable to insert %s")
+
 
     def __repr__(self):
         if self.id is not None:
@@ -417,9 +419,9 @@ class Stream(music21.Music21Object):
         # resetting the cache removes lowest and highest time storage
         # a slight performance optimization: not creating unless needed
         if len(self._cache) > 0:
-            if keepIndex:
+            if keepIndex and 'index' in self._cache:
                 indexCache = self._cache['index']
-            self._cache = common.DefaultHash()
+            self._cache = {} #common.DefaultHash()
             if keepIndex:
                 self._cache['index'] = indexCache
 
@@ -429,7 +431,7 @@ class Stream(music21.Music21Object):
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
 
-        if self._cache["elements"] is None:
+        if 'elements' not in self._cache or self._cache["elements"] is None:
             # this list concatenation may take time; thus, only do when
             # _elementsChanged has been called
             self._cache["elements"] = self._elements + self._endElements
@@ -868,7 +870,7 @@ class Stream(music21.Music21Object):
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
 
-        if self._cache['index'] is not None:
+        if 'index' in self._cache and self._cache['index'] is not None:
             try:
                 return self._cache['index'][id(obj)]
             except KeyError:
@@ -6434,7 +6436,7 @@ class Stream(music21.Music21Object):
             #environLocal.pd(['_elements', self._elements])
 
     def _getSorted(self):
-        if self._cache['sorted'] is None:
+        if 'sorted' not in self._cache or self._cache['sorted'] is None:
             shallowElements = copy.copy(self._elements) # already a copy
             shallowEndElements = copy.copy(self._endElements) # already a copy
             s = copy.copy(self)
@@ -6566,7 +6568,7 @@ class Stream(music21.Music21Object):
 
         # storing .elements in here necessitates
         # create a new, independent cache instance in the flat representation
-        sNew._cache = common.DefaultHash()
+        sNew._cache = {} #common.DefaultHash()
         sNew._elements = []
         sNew._endElements = []
         sNew._elementsChanged()
@@ -6626,10 +6628,14 @@ class Stream(music21.Music21Object):
     
 
     def _getFlatFromSemiFlat(self):
-        '''If the semiflat form is available, derive flat from semiflat.
+        '''
+        If the semiflat form is available, derive flat from semiflat.
         '''  
         # this must not be None!  
-        sf = self._cache['semiFlat']
+        if 'semiFlat' in self._cache:
+            sf = self._cache['semiFlat']
+        else:
+            raise StreamException('_getFlatFromSemiFlat can only be called if ._cache["semiFlat"] has been created from a previous .semiFlat call')
         sNew = copy.copy(sf)
         sNew._derivation = derivation.Derivation()
         # unwrapping a weak ref here
@@ -6638,7 +6644,7 @@ class Stream(music21.Music21Object):
         sNew.setDerivation(sf._derivation.getAncestor())
         sNew.derivationMethod = 'flat'
         # create a new, independent cache instance in the flat representation
-        sNew._cache = common.DefaultHash()
+        sNew._cache = {} #common.DefaultHash()
         sNew._elements = []
         sNew._endElements = []
         sNew._elementsChanged() # clear caches
@@ -6660,8 +6666,8 @@ class Stream(music21.Music21Object):
 
 
     def _getFlat(self):
-        if self._cache['flat'] is None:
-            if self._cache['semiFlat'] is not None:
+        if 'flat' not in self._cache or self._cache['flat'] is None:
+            if 'semiFlat' in self._cache and self._cache['semiFlat'] is not None:
                 self._cache['flat'] = self._getFlatFromSemiFlat()
             else:
                 self._cache['flat'] = self._getFlatOrSemiFlat(
@@ -6815,7 +6821,7 @@ class Stream(music21.Music21Object):
 
 
     def _getSemiFlat(self):
-        if self._cache['semiFlat'] is None:
+        if 'semiFlat' not in self._cache or self._cache['semiFlat'] is None:
             #environLocal.pd(['using cached semiFlat', self])
             self._cache['semiFlat'] = self._getFlatOrSemiFlat(
                                     retainContainers=True)
@@ -6859,7 +6865,7 @@ class Stream(music21.Music21Object):
 
 
     def _getSpannerBundle(self):
-        if self._cache['spannerBundle'] is None:
+        if 'spannerBundle' not in self._cache or self._cache['spannerBundle'] is None:
            self._cache['spannerBundle'] = spanner.SpannerBundle(self.flat.spanners)
         return self._cache['spannerBundle']
 
@@ -7052,7 +7058,7 @@ class Stream(music21.Music21Object):
         >>> p.highestOffset
         4.0
         '''
-        if self._cache["HighestOffset"] is not None:
+        if 'HighestOffset' in self._cache and self._cache["HighestOffset"] is not None:
             pass # return cache unaltered
         elif len(self._elements) == 0:
             self._cache["HighestOffset"] = 0.0
@@ -7110,13 +7116,16 @@ class Stream(music21.Music21Object):
         47.0
         >>> r = q.flat
         
+        OMIT_FROM_DOCS
+        
         Make sure that the cache really is empty
-        >>> r._cache['HighestTime']
+        >>> 'HighestTime' in r._cache
+        False
         >>> r.highestTime # 44 + 3
         47.0
         '''
 #         environLocal.printDebug(['_getHighestTime', 'isSorted', self.isSorted, self])
-        if self._cache["HighestTime"] is not None:
+        if 'HighestTime' in self._cache and self._cache["HighestTime"] is not None:
             pass # return cache unaltered
         elif len(self._elements) == 0:
             self._cache["HighestTime"] = 0.0
@@ -7193,7 +7202,7 @@ class Stream(music21.Music21Object):
         >>> r.lowestOffset
         97.0
         '''
-        if self._cache["LowestOffset"] is not None:
+        if 'lowestOffset' in self._cache and self._cache["LowestOffset"] is not None:
             pass # return cache unaltered
         elif len(self._elements) == 0:
             self._cache["LowestOffset"] = 0.0
@@ -7243,7 +7252,7 @@ class Stream(music21.Music21Object):
         '''
         if self._unlinkedDuration is not None:
             return self._unlinkedDuration
-        elif self._cache["Duration"] is not None:
+        elif 'Duration' in self._cache and self._cache["Duration"] is not None:
             #environLocal.printDebug(['returning cached duration'])
             return self._cache["Duration"]
         else:
@@ -8218,7 +8227,7 @@ class Stream(music21.Music21Object):
         >>> s.hasMeasures()
         True
         '''
-        if self._cache['hasMeasures'] is None:
+        if 'hasMeasures' not in self._cache or self._cache['hasMeasures'] is None:
             post = False
             # do not need to look in endElements
             for obj in self._elements:
@@ -8233,7 +8242,7 @@ class Stream(music21.Music21Object):
     def hasVoices(self):
         '''Return a boolean value showing if this Stream contains Voices
         '''
-        if self._cache['hasVoices'] is None:
+        if 'hasVoices' not in self._cache or self._cache['hasVoices'] is None:
             post = False
             # do not need to look in endElements
             for obj in self._elements:
@@ -8258,7 +8267,7 @@ class Stream(music21.Music21Object):
         >>> s.hasPartLikeStreams()
         True
         '''
-        if self._cache['hasPartLikeStreams'] is None:
+        if 'hasPartLikeStreams' not in self._cache or self._cache['hasPartLikeStreams'] is None:
             multiPart = False
             if not self.isFlat: # if flat, does not have parts!
                 # do not need to look in endElements
@@ -8434,7 +8443,7 @@ class Stream(music21.Music21Object):
         '''
         see property `notesAndRests`, below
         '''
-        if self._cache['notesAndRests'] is None:
+        if 'notesAndRests' not in self._cache or self._cache['notesAndRests'] is None:
             #environLocal.printDebug(['updating noteAndRests cache:', str(self), id(self)])
             # as this Stream will be retained, we do not want it to be 
             # the same class as the source, thus, do not return subclass
@@ -8487,7 +8496,7 @@ class Stream(music21.Music21Object):
 
 
     def _getNotes(self):
-        if self._cache['notes'] is None:
+        if 'notes' not in self._cache or self._cache['notes'] is None:
            self._cache['notes'] = self.getElementsByClass('NotRest', 
                                   returnStreamSubClass=False)
         return self._cache['notes']
@@ -9027,7 +9036,7 @@ class Stream(music21.Music21Object):
         N.B. there may be gaps in the flattened representation of the stream
         but not in the unflattened.  Hence why "isSequence" calls self.flat.isGapless
         '''
-        if self._cache["GapStream"]:
+        if 'GapStream' in self._cache and self._cache["GapStream"] is not None:
             return self._cache["GapStream"]
         
         sortedElements = self.sorted.elements
@@ -9057,7 +9066,7 @@ class Stream(music21.Music21Object):
             return gapStream
 
     def _getIsGapless(self):
-        if self._cache["isGapless"] is not None:
+        if 'isGapless' in self._cache and self._cache["isGapless"] is not None:
             return self._cache["isGapless"]
         else:
             if self.findGaps() is None:
@@ -9749,7 +9758,7 @@ class Stream(music21.Music21Object):
     # Variant control
     
     def _getVariants(self):
-        if self._cache['variants'] is None:
+        if 'variants' not in self._cache or self._cache['variants'] is None:
            self._cache['variants'] = self.getElementsByClass('Variant', 
                                   returnStreamSubClass=False)
         return self._cache['variants']
@@ -10607,7 +10616,7 @@ class Score(Stream):
 
     def _getParts(self):
 #         return self.getElementsByClass('Part')
-        if self._cache['parts'] is None:
+        if 'parts' not in self._cache or self._cache['parts'] is None:
            self._cache['parts'] = self.getElementsByClass('Part', 
                                   returnStreamSubClass=False)
         return self._cache['parts']
