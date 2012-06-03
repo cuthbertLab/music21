@@ -36,7 +36,10 @@ environLocal = environment.Environment(_MOD)
 
 
 class Variant(music21.Music21Object):
-    '''A Music21Object that stores elements like a Stream, but does not represent itself externally a a Stream
+    '''A Music21Object that stores elements like a Stream, but does not represent itself externally to a Stream; i.e., the contents of a Variant are not flattened.
+
+    This is accomplished not by subclassing, but by object composition: similar to the Spanner, the Variant contains a Stream as a private attribute. Calls to this Stream, for the Variant, are automatically delegated by use of the __getattr__ method. Special casses are overridden or managed as necessary: e.g., the Duration of a Variant is generally always zero. 
+
 
     >>> from music21 import *
     >>> v = variant.Variant()
@@ -91,17 +94,6 @@ class Variant(music21.Music21Object):
         except:
             raise
         
-
-#     def append(self, others):
-#         self._stream.append(others)
-# 
-#     def insert(self, offsetOrItemOrList, itemOrNone=None, 
-#                      ignoreSort=False, setActiveSite=True):
-#         '''This method delegates calls to the Stream.insert() method for the private Stream contained within this Variant.
-#         '''
-#         self._stream.insert(offsetOrItemOrList=offsetOrItemOrList, 
-#                     itemOrNone=itemOrNone, ignoreSort=ignoreSort, 
-#                     setActiveSite=setActiveSite)
 
 
     #---------------------------------------------------------------------------
