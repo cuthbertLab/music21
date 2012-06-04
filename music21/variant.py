@@ -40,6 +40,7 @@ class Variant(music21.Music21Object):
 
     This is accomplished not by subclassing, but by object composition: similar to the Spanner, the Variant contains a Stream as a private attribute. Calls to this Stream, for the Variant, are automatically delegated by use of the __getattr__ method. Special casses are overridden or managed as necessary: e.g., the Duration of a Variant is generally always zero. 
 
+    To use Variants from a Stream, see the :func:`~music21.stream.Stream.activateVariants` method. 
 
     >>> from music21 import *
     >>> v = variant.Variant()
@@ -95,6 +96,8 @@ class Variant(music21.Music21Object):
             raise
         
 
+    def __len__(self):
+        return len(self._stream)
 
     #---------------------------------------------------------------------------
     # Stream  simulation/overrides

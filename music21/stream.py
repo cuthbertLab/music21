@@ -9765,11 +9765,35 @@ class Stream(music21.Music21Object):
                 
     variants = property(_getVariants, doc='''
         Return a Stream containing all :class:`~music21.variant.Variant` objects in this Stream. 
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> s.repeatAppend(note.Note(), 8)
+        >>> v1 = variant.Variant([note.Note('D#4'), note.Note('F#4')])
+        >>> s.insert(3, v1)
+        >>> [p for p in s.pitches]
+        [C4, C4, C4, C4, C4, C4, C4, C4]
+        >>> len(s.variants[0])
+        2
         ''')
 
 
     def activateVariants(self, group=None, matchBySpan=True, inPlace=False):
-        '''For any :class:`~music21.variant.Variant` objects defined in this Stream, replace corresponding class with those found in the Variant.
+        '''For any :class:`~music21.variant.Variant` objects defined in this Stream (or selected by matching the `group` parameter), replace elements defined in the Variant with those in the calling Stream. Elements replaced will be gathered into a new Variant. 
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> s.repeatAppend(note.Note(), 8)
+        >>> v1 = variant.Variant([note.Note('D#4'), note.Note('F#4')])
+        >>> s.insert(3, v1)
+        >>> [p for p in s.pitches]
+        [C4, C4, C4, C4, C4, C4, C4, C4]
+        >>> s.activateVariants(inPlace=True)
+        >>> [p for p in s.pitches]
+        [C4, C4, C4, D#4, F#4, C4, C4, C4, C4]
+        >>> s.activateVariants(inPlace=True)
+        >>> [p for p in s.pitches]
+        [C4, C4, C4, C4, C4, C4, C4, C4]
 
         '''
         from music21 import variant
