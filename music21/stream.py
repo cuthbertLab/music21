@@ -1143,6 +1143,17 @@ class Stream(music21.Music21Object):
                 # update based on last id, new object
                 if e.hasSpannerSite():
                     spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
+
+        variants = new.variants
+        if len(variants) > 0:
+            for e in new.semiFlat:
+                # TODO
+                # if e is presently part of an (old) variant,
+                # the Variant may need to be update
+                # if to iterate through all variants and call replaceComponent 
+                pass #if 
+                
+
         return new
 
     #---------------------------------------------------------------------------

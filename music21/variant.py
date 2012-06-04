@@ -153,6 +153,36 @@ class Variant(music21.Music21Object):
     def __len__(self):
         return len(self._stream)
 
+
+    def replaceElement(self, old, new):
+        '''When copying a Spanner, we need to update the spanner with new references for copied components (if the Notes of a Slur have beenc copied, that Slur's Note references need references to the new Notes). Given the old component, this method will replace the old with the new.
+
+        The `old` parameter can be either an object or object id. 
+
+        This method is very similar to the replaceComponent method on Spanner. 
+
+        >>> from music21 import *
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('f#')
+        >>> c1 = clef.AltoClef()
+        >>> c2 = clef.BassClef()
+        >>> sl = spanner.Spanner(n1, n2, c1)
+        >>> sl.replaceComponent(c1, c2)
+        >>> sl[-1] == c2
+        True
+        '''
+        if old is None:
+            return None # do nothing
+        if common.isNum(old):
+            # this must be id(obj), not obj.id
+            e = self._stream.getElementByObjectId(old)
+            if e is not None:
+                self._stream.replace(e, new, allTargetSites=False)
+        else:
+            # do not do all Sites: only care about this one
+            self._stream.replace(old, new, allTargetSites=False)
+
+
     #---------------------------------------------------------------------------
     # Stream  simulation/overrides
 

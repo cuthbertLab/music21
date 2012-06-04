@@ -828,7 +828,7 @@ class SpannerBundle(object):
             idTarget = id(old)
 
         #post = self.__class__() # return a bundle of spanners that had changes
-        for sp in self._storage: # a list
+        for sp in self._storage: # Spanners in a list
             #environLocal.printDebug(['looking at spanner', sp, sp.getComponentIds()])
             # must check to see if this id is in this spanner
             if idTarget in sp.getComponentIds():
