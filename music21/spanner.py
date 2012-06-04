@@ -282,6 +282,8 @@ class Spanner(music21.Music21Object):
     #---------------------------------------------------------------------------
     # as _components is private Stream, unwrap/wrap methods need to override
     # Music21Object to get at these objects 
+    # this is the same as with Variants
+    
     def unwrapWeakref(self):
         '''Overridden method for unwrapping all Weakrefs.
         '''
