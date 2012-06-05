@@ -4,24 +4,31 @@
 # Purpose:      Translate MusicXML and music21 objects
 #
 # Authors:      Christopher Ariza
+#               Evan Lynch
 #
 # Copyright:    (c) 2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+'''
+Contains :class:`~music21.variant.Variant` and its subclasses, as well as functions for merging
+and showing different variant streams. These functions and the variant class should only be
+used when variants of a score are the same length and contain the same measure structure at
+this time.
+'''
 
 import unittest
 import copy
 
 import music21
+import copy
 
 from music21 import common
 from music21 import stream
 from music21 import environment
+from music21 import note
+
 _MOD = "variant.py" # TODO: call variant
 environLocal = environment.Environment(_MOD)
-
-'''The :class:`~music21.variant.Variant` and its subclasses.
-'''
 
 
 # variant objs as groups
@@ -36,6 +43,418 @@ environLocal = environment.Environment(_MOD)
 # idea of performanceScale that realizes 
 
 
+#-- Functions
+def mergeVariantStreams(streams, variantNames, inPlace = False):
+    '''
+    Pass this function a list of streams (they must be of the same length or a VariantException will be raised).
+    It will return a stream which merges the differences between the streams into variant objects keeping the
+    first stream in the list as the default. If inPlace is True, the first stream in the list will be modified,
+    otherwise a new stream will be returned. Pass a list of names to associate variants with their sources, if this list
+    does not contain an entry for each non-default variant, naming may not behave properly. Variants that have the
+    same differences from the default will be saved as separate variant objects (i.e. more than once under different names).
+    Also, note that a streams with bars of differing lengths will not behave properly.
+    
+    >>> from music21 import *
+    >>> stream1 = stream.Stream()
+    >>> stream2paris = stream.Stream()
+    >>> stream3london = stream.Stream()
+    >>> data1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),
+    ...    ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),
+    ...    ('b', 'quarter'), ('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter')]
+    >>> data2 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter'),
+    ...    ('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'),
+    ...    ('b', 'quarter'), ('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter')]
+    >>> data3 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),
+    ...    ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),
+    ...    ('c', 'quarter'), ('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter')]
+    >>> for pitchName,durType in data1:
+    ...    n = note.Note(pitchName)
+    ...    n.duration.type = durType
+    ...    stream1.append(n)
+    >>> for pitchName,durType in data2:
+    ...    n = note.Note(pitchName)
+    ...    n.duration.type = durType
+    ...    stream2paris.append(n)
+    >>> for pitchName,durType in data3:
+    ...    n = note.Note(pitchName)
+    ...    n.duration.type = durType
+    ...    stream3london.append(n)
+    >>> mergedStreams = mergeVariantStreams([stream1, stream2paris, stream3london], ['paris', 'london'])
+    >>> mergedStreams.show('t')
+    {0.0} <music21.note.Note A>
+    {1.0} <music21.variant.Variant object at ...>
+    {1.0} <music21.note.Note B>
+    {1.5} <music21.note.Note C>
+    {2.0} <music21.note.Note A>
+    {3.0} <music21.variant.Variant object at ...>
+    {3.0} <music21.note.Note A>
+    {4.0} <music21.note.Note B>
+    {4.5} <music21.variant.Variant object at ...>
+    {4.5} <music21.note.Note C>
+    {5.0} <music21.note.Note A>
+    {6.0} <music21.note.Note A>
+    {7.0} <music21.variant.Variant object at ...>
+    {7.0} <music21.note.Note B>
+    {8.0} <music21.note.Note C>
+    {9.0} <music21.variant.Variant object at ...>
+    {9.0} <music21.note.Note D>
+    {10.0} <music21.note.Note E>
+    
+    >>> mergedStreams.activateVariants('london').show('t')
+    {0.0} <music21.note.Note A>
+    {1.0} <music21.variant.Variant object at ...>
+    {1.0} <music21.note.Note B>
+    {1.5} <music21.note.Note C>
+    {2.0} <music21.note.Note A>
+    {3.0} <music21.variant.Variant object at ...>
+    {3.0} <music21.note.Note A>
+    {4.0} <music21.note.Note B>
+    {4.5} <music21.variant.Variant object at ...>
+    {4.5} <music21.note.Note C>
+    {5.0} <music21.note.Note A>
+    {6.0} <music21.note.Note A>
+    {7.0} <music21.variant.Variant object at ...>
+    {7.0} <music21.note.Note C>
+    {8.0} <music21.note.Note C>
+    {9.0} <music21.variant.Variant object at ...>
+    {9.0} <music21.note.Note D>
+    {10.0} <music21.note.Note E>
+        
+    If the streams contain parts and measures, the merge function will iterate through them and determine
+    and store variant differences within each measure/part.
+    
+    >>> stream1 = stream.Stream()
+    >>> stream2 = stream.Stream()
+    >>> data1M1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter')]
+    >>> data1M2 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
+    >>> data1M3 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
+    >>> data2M1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
+    >>> data2M2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
+    >>> data2M3 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+    >>> data1 = [data1M1, data1M2, data1M3]
+    >>> data2 = [data2M1, data2M2, data2M3]
+    >>> tempPart = stream.Part()
+    >>> for d in data1:
+    ...    m = stream.Measure()
+    ...    for pitchName,durType in d:
+    ...        n = note.Note(pitchName)
+    ...        n.duration.type = durType
+    ...        m.append(n)
+    ...    tempPart.append(m)
+    >>> stream1.append(tempPart)
+    >>> tempPart = stream.Part()
+    >>> for d in data2:
+    ...    m = stream.Measure()
+    ...    for pitchName,durType in d:
+    ...        n = note.Note(pitchName)
+    ...        n.duration.type = durType
+    ...        m.append(n)
+    ...    tempPart.append(m)
+    >>> stream2.append(tempPart)
+    >>> mergedStreams = mergeVariantStreams([stream1, stream2], ['paris'])
+    >>> mergedStreams.show('t')
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.variant.Variant object at ...>
+            {1.0} <music21.note.Note B>
+            {1.5} <music21.note.Note C>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.variant.Variant object at ...>
+            {3.0} <music21.note.Note A>
+        {4.0} <music21.stream.Measure 0 offset=4.0>
+            {0.0} <music21.note.Note B>
+            {0.5} <music21.variant.Variant object at ...>
+            {0.5} <music21.note.Note C>
+            {1.0} <music21.note.Note A>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note B>
+        {8.0} <music21.stream.Measure 0 offset=8.0>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.variant.Variant object at ...>
+            {1.0} <music21.note.Note D>
+            {2.0} <music21.note.Note E>
+            {3.0} <music21.note.Note E>
+    >>> #_DOCS_SHOW mergedStreams.show()
+    
+    
+    .. image:: images/variant_measuresAndParts.*
+        :width: 600
+    
+    >>> for p in mergedStreams.getElementsByClass(stream.Part):
+    ...    for m in p.getElementsByClass(stream.Measure):
+    ...        m.activateVariants('paris', inPlace = True)
+    >>> mergedStreams.show('t')
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.variant.Variant object at ...>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.variant.Variant object at ...>
+            {3.0} <music21.note.Note G>
+        {4.0} <music21.stream.Measure 0 offset=4.0>
+            {0.0} <music21.note.Note B>
+            {0.5} <music21.variant.Variant object at ...>
+            {0.5} <music21.note.Note C>
+            {1.5} <music21.note.Note A>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note B>
+        {8.0} <music21.stream.Measure 0 offset=8.0>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.variant.Variant object at ...>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note A>
+    >>> #_DOCS_SHOW mergedStreams.show()
+    
+    
+    .. image:: images/variant_measuresAndParts2.*
+        :width: 600
+    
+    If barlines do not match up, an exception will be thrown. Here two streams that are identical
+    are merged, except one is in 3/4, the other in 4/4. This throws an exception.
+    
+    >>> streamDifferentMeasures = stream.Stream()
+    >>> dataDiffM1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter')]
+    >>> dataDiffM2 = [ ('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter')]
+    >>> dataDiffM3 = [('a', 'quarter'), ('b', 'quarter'), ('c', 'quarter')]
+    >>> dataDiffM4 = [('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
+    >>> dataDiff = [dataDiffM1, dataDiffM2, dataDiffM3, dataDiffM4]
+    >>> streamDifferentMeasures.insert(0.0, meter.TimeSignature('3/4'))
+    >>> tempPart = stream.Part()
+    >>> for d in dataDiff:
+    ...    m = stream.Measure()
+    ...    for pitchName,durType in d:
+    ...        n = note.Note(pitchName)
+    ...        n.duration.type = durType
+    ...        m.append(n)
+    ...    tempPart.append(m)
+    >>> streamDifferentMeasures.append(tempPart)
+    >>> mergedStreams = mergeVariantStreams([stream1, streamDifferentMeasures], ['paris'])
+    Traceback (most recent call last):
+    ...
+    VariantException: _mergeVariants cannot merge streams which are of different lengths
+    '''
+    
+    if inPlace == True:
+        returnObj = streams[0]
+    else:
+        returnObj = copy.deepcopy(streams[0])
+
+    variantNames.insert(0, None) # Adds a None element at beginning (corresponding to default variant streams[0])
+    while len(streams) > len(variantNames): # Adds Blank names if too few
+        variantNames.append(None)
+    while len(streams) < len(variantNames): # Removes extra names
+        variantNames.pop
+    
+    zipped = zip(streams,variantNames)
+    
+    for s,variantName in zipped[1:]:
+        if returnObj.highestTime != s.highestTime:
+            raise VariantException('cannot merge streams of different lengths')
+     
+        if returnObj.getElementsByClass(stream.Part).elements != [] : # If parts exist, iterate through them.
+            for i in range(len(returnObj.getElementsByClass(stream.Part).elements)):
+                returnObjPart = returnObj.getElementsByClass(stream.Part).elements[i]
+                sPart = s.getElementsByClass(stream.Part).elements[i]
+                if returnObjPart.getElementsByClass(stream.Measure).elements != []: # If measures exist and parts exist, iterate through them both.
+                    for j in range(len(returnObjPart.getElementsByClass(stream.Measure).elements)):
+                        returnObjMeasure = returnObjPart.getElementsByClass(stream.Measure).elements[j]
+                        sMeasure = sPart.getElementsByClass(stream.Measure).elements[j]
+                        _mergeVariants(returnObjMeasure,sMeasure,variantName = variantName, inPlace = True)
+                else: # If parts exist but no measures.
+                    _mergeVariants(returnObjPart,sPart,variantName = variantName, inPlace = True)
+        else:
+            if returnObj.getElementsByClass(stream.Measure).elements != []: #If no parts, but still measures, iterate through them.
+                for j in range(len(returnObj.getElementsByClass(stream.Measure).elements)):
+                    returnObjMeasure = returnObj.getElementsByClass(stream.Measure).elements[j]
+                    sMeasure = s.getElementsByClass(stream.Measure).elements[j]
+                    _mergeVariants(returnObjMeasure,sMeasure, variantName = variantName, inPlace = True)
+            else: # If no parts and no measures.
+                _mergeVariants(returnObj,s,variantName = variantName, inPlace = True)
+           
+    return returnObj
+
+def _mergeVariants(streamA, streamB, containsVariants = False, variantName = None, inPlace = False):
+    '''
+    This is a helper function for mergeVariantStreams which takes two streams (which cannot contain container
+    streams like measures and parts) and merges the second into the first via variant objects.
+    If the first already contains variant objects, containsVariants should be set to true and the
+    function will compare streamB to the streamA as well as the variant streams contained in streamA.
+    Note that variant streams in streamB will be ignored and lost.
+    
+    >>> from music21 import *
+    >>> stream1 = stream.Stream()
+    >>> stream2 = stream.Stream()
+    >>> data1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),
+    ...    ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),
+    ...    ('b', 'quarter'), ('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter')]
+    >>> data2 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter'),
+    ...    ('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'),
+    ...    ('b', 'quarter'), ('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter')]
+    >>> for pitchName,durType in data1:
+    ...    n = note.Note(pitchName)
+    ...    n.duration.type = durType
+    ...    stream1.append(n)
+    >>> for pitchName,durType in data2:
+    ...    n = note.Note(pitchName)
+    ...    n.duration.type = durType
+    ...    stream2.append(n)
+    >>> mergedStreams = _mergeVariants(stream1, stream2, variantName = 'paris')
+    >>> mergedStreams.show('t')
+    {0.0} <music21.note.Note A>
+    {1.0} <music21.variant.Variant object at ...>
+    {1.0} <music21.note.Note B>
+    {1.5} <music21.note.Note C>
+    {2.0} <music21.note.Note A>
+    {3.0} <music21.variant.Variant object at ...>
+    {3.0} <music21.note.Note A>
+    {4.0} <music21.note.Note B>
+    {4.5} <music21.variant.Variant object at ...>
+    {4.5} <music21.note.Note C>
+    {5.0} <music21.note.Note A>
+    {6.0} <music21.note.Note A>
+    {7.0} <music21.note.Note B>
+    {8.0} <music21.note.Note C>
+    {9.0} <music21.variant.Variant object at ...>
+    {9.0} <music21.note.Note D>
+    {10.0} <music21.note.Note E>
+    
+    >>> mergedStreams.activateVariants('paris').show('t')
+    {0.0} <music21.note.Note A>
+    {1.0} <music21.variant.Variant object at ...>
+    {1.0} <music21.note.Note B>
+    {2.0} <music21.note.Note A>
+    {3.0} <music21.variant.Variant object at ...>
+    {3.0} <music21.note.Note G>
+    {4.0} <music21.note.Note B>
+    {4.5} <music21.variant.Variant object at ...>
+    {4.5} <music21.note.Note C>
+    {5.5} <music21.note.Note A>
+    {6.0} <music21.note.Note A>
+    {7.0} <music21.note.Note B>
+    {8.0} <music21.note.Note C>
+    {9.0} <music21.variant.Variant object at ...>
+    {9.0} <music21.note.Note B>
+    {10.0} <music21.note.Note A>
+    
+    >>> stream1.append(note.Note('e'))
+    >>> mergedStreams = _mergeVariants(stream1, stream2, variantName = ['paris'])
+    Traceback (most recent call last):
+    ...
+    VariantException: _mergeVariants cannot merge streams which are of different lengths
+    '''
+    # TODO: Add the feature for merging a stream to a stream with existing variants (it has to compare against both the stream and the contained variant)
+    if (streamA.getElementsByClass(stream.Measure).elements != []) or \
+    (streamA.getElementsByClass(stream.Part).elements != []) or \
+    (streamB.getElementsByClass(stream.Measure).elements != []) or \
+    (streamB.getElementsByClass(stream.Part).elements != []):
+        raise VariantException('_mergeVariants cannot merge streams which contain measures or parts.')
+    
+    if streamA.highestTime != streamB.highestTime:
+        raise VariantException('_mergeVariants cannot merge streams which are of different lengths')
+    
+    if inPlace == True:
+        returnObj = streamA
+    else:
+        returnObj = copy.deepcopy(streamA)
+    
+    i=0
+    j=0
+    inVariant = False
+    streamAnotes = streamA.flat.notesAndRests
+    streamBnotes = streamB.flat.notesAndRests
+    while i<len(streamAnotes) and j<len(streamBnotes):
+        if i == len(streamAnotes):
+            i = len(streamAnotes)-1
+        if j == len(streamBnotes):
+            break
+        if streamAnotes[i].getOffsetBySite(streamA.flat) == streamBnotes[j].getOffsetBySite(streamB.flat): # Comparing Notes at same offset TODO: Will not work until __eq__ overwritten for Generalized Notes
+            if streamAnotes[i] != streamBnotes[j]: # If notes are different, start variant if not started and append note.
+                if inVariant == False:
+                    variantStart = streamBnotes[j].getOffsetBySite(streamB.flat)
+                    inVariant = True
+                    noteBuffer = []
+                    noteBuffer.append(streamBnotes[j])
+                else:
+                    noteBuffer.append(streamBnotes[j])
+            else: # If notes are the same, end and insert variant if in variant. 
+                if inVariant == True:
+                    returnObj.insert(variantStart,_generateVariant(noteBuffer,streamB,variantStart,variantName))
+                    inVariant = False
+                    noteBuffer = []
+                else:
+                    inVariant = False
+                
+            i += 1
+            j += 1
+            continue
+                
+        elif streamAnotes[i].getOffsetBySite(streamA.flat) > streamBnotes[j].getOffsetBySite(streamB.flat):
+            if inVariant == False:
+                variantStart = streamBnotes[j].getOffsetBySite(streamB.flat)
+                noteBuffer = []
+                noteBuffer.append(streamBnotes[j])
+                inVariant = True
+            else:
+                noteBuffer.append(streamBnotes[j])
+            j += 1
+            continue
+        
+        else: #Less-than
+            i += 1
+            continue
+    
+    if inVariant == True: #insert final variant if exists
+        returnObj.insert(variantStart,_generateVariant(noteBuffer,streamB,variantStart,variantName))
+        inVariant = False
+        noteBuffer = []
+    
+    if inPlace == True:
+        return None
+    else:
+        return returnObj
+
+def _generateVariant(noteList, originStream, start, variantName = None):
+    '''
+    Helper function for mergeVariantStreams which takes a list of consecutive notes from a stream and returns
+    a variant object containing the notes from the list at the offsets derived from their original context.
+    
+    >>> originStream = stream.Stream()
+    >>> data = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),
+    ...    ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),
+    ...    ('b', 'quarter'), ('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter')]
+    >>> for pitchName,durType in data:
+    ...    n = note.Note(pitchName)
+    ...    n.duration.type = durType
+    ...    originStream.append(n)
+    >>> noteList = []
+    >>> for n in originStream.notes[2:5]:
+    ...    noteList.append(n)
+    >>> start = originStream.notes[2].offset
+    >>> variantName = 'paris'
+    >>> v = _generateVariant(noteList, originStream, start, variantName)
+    >>> v.show('t')
+    {0.0} <music21.note.Note C>
+    {0.5} <music21.note.Note A>
+    {1.5} <music21.note.Note A>
+    
+    >>> v.groups
+    ['paris']
+    
+    '''
+    returnVariant = music21.variant.Variant()
+    for n in noteList:
+        returnVariant.insert(n.getOffsetBySite(originStream.flat)-start, n)
+    if variantName is not None:
+        returnVariant.groups = [ variantName ]
+    return returnVariant
+
+
+#--- Classes
+class VariantException(Exception):
+    pass
 
 class Variant(music21.Music21Object):
     '''A Music21Object that stores elements like a Stream, but does not represent itself externally to a Stream; i.e., the contents of a Variant are not flattened.
@@ -61,10 +480,10 @@ class Variant(music21.Music21Object):
     >>> s.append(note.Note())
     >>> s.highestTime
     1.0
-    >>> s.show('t')
+    >>> s.show('t') # doctest: +ELLIPSIS
     {0.0} <music21.variant.Variant object at ...>
     {0.0} <music21.note.Note C>
-    >>> s.flat.show('t')
+    >>> s.flat.show('t') # doctest: +ELLIPSIS
     {0.0} <music21.variant.Variant object at ...>
     {0.0} <music21.note.Note C>
     '''
@@ -293,8 +712,6 @@ class Variant(music21.Music21Object):
         Return a reference to the Stream contained in this Variant.
         ''')
 
-
-
 #-------------------------------------------------------------------------------
 class VariantBundle(object):
     '''A utility object for processing collections of Varaints. 
@@ -414,7 +831,6 @@ class Test(unittest.TestCase):
         self.assertEqual(v1.hasElementOfClass('Variant'), False)
         self.assertEqual(v1.hasElementOfClass('Measure'), True)
 
-
     def testDeepCopyVariantA(self):
         from music21 import note, stream, variant
     
@@ -495,7 +911,4 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     music21.mainTest(Test)
-
-
-
-
+    
