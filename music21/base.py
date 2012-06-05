@@ -1103,6 +1103,19 @@ class DefinedContexts(JSONSerializer):
                 return True
         return False
 
+    def hasVariantSite(self):
+        '''
+        Return True if this object is found in 
+        any Variant. This is determined by looking for 
+        a VariantStorage Stream class as a Site.
+        '''
+        for idKey in self._locationKeys:
+            if self._definedContexts[idKey]['isDead']:
+                continue 
+            if self._definedContexts[idKey]['class'] == 'VariantStorage':
+                return True
+        return False
+
     def getSiteCount(self):
         '''Return the number of non-dead sites, including None. This does not unwrap weakrefs for performance. 
         '''
@@ -1753,6 +1766,7 @@ class Music21Object(JSONSerializer):
     # these values permit fast class comparisons for performance crtical cases
     isStream = False
     isSpanner = False
+    isVariant = False
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['searchActiveSiteByAttr', 'getContextAttr', 'setContextAttr']
@@ -2307,20 +2321,29 @@ class Music21Object(JSONSerializer):
             post.append(obj.spannerParent)
         return post
 
-        # get reference to actual spanner stored in each SpannerStorage obj
-        # these are the Spanners
 
-#         found = []
-#         for site in self._definedContexts.getSites():
-#             if site is None:
-#                 continue
-#             if 'SpannerStorage' in site.classes:
-#                 found.append(site)
-#         post = []
-# 
-#         for obj in found:
-#             post.append(obj.spannerParent)
-#         return post
+    def hasVariantSite(self):
+        '''Return True if this object is found in 
+        any Variant
+        This is determined by looking 
+        for a VariantStorage Stream class as a Site.
+
+
+        >>> from music21 import *
+        >>> n1 = note.Note()
+        >>> n2 = note.Note()
+        >>> n3 = note.Note()
+        >>> v1 = variant.Variant([n1, n2])
+        >>> n1.hasSpannerSite()
+        False
+        >>> n1.hasVariantSite()
+        True
+        >>> n2.hasVariantSite()
+        True
+        >>> n3.hasVariantSite()
+        False
+        '''
+        return self._definedContexts.hasVariantSite()
 
     def removeLocationBySite(self, site):
         '''Remove a location in the :class:`~music21.base.DefinedContexts` object.

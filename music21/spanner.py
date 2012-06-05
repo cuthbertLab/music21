@@ -380,10 +380,6 @@ class Spanner(music21.Music21Object):
     def getComponentIds(self):
         '''Return all id() for all stored objects.
         '''
-#         post = []
-#         for c in self._components._elements:
-#             post.append(id(c))
-#         return post
         if 'componentIds' not in self._cache or self._cache['componentIds'] is None:
             self._cache['componentIds'] = [id(c) for c in self._components._elements]
         return self._cache['componentIds']
@@ -817,11 +813,6 @@ class SpannerBundle(object):
         '''
         #environLocal.printDebug(['SpannerBundle.replaceComponent()', 'old', old, 'new', new, 'len(self._storage)', len(self._storage)])
 
-# TODO: should return this, but get strange errors
-#         if len(self._storage) == 0:
-#             return
-
-        # this call is affecting objects
         if common.isNum(old): # assume this is an id
             idTarget = old
         else:

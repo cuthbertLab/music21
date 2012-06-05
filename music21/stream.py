@@ -1144,14 +1144,22 @@ class Stream(music21.Music21Object):
                 if e.hasSpannerSite():
                     spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
 
-        variants = new.variants
-        if len(variants) > 0:
-            for e in new.semiFlat:
-                # TODO
-                # if e is presently part of an (old) variant,
-                # the Variant may need to be update
-                # if to iterate through all variants and call replaceComponent 
-                pass #if 
+        variantBundle = new.variantBundle
+        if len(variantBundle) > 0:
+            for e in new:
+                # only do once for each level; lower-levels done later
+                if e.isStream:
+                    continue 
+                if e.isVariant:
+                    continue # copied already
+                # if we find an obj tt has a variant site, it is pointing
+                # to an old variant, not the newly copied ones; now, we need
+                # to re-sync it with the variants in the VariantBundle
+                if e.hasVariantSite(): 
+                    # will scan each known variant over all elements
+                    # this possible by optimized by selecting just a relevent
+                    # time region
+                    variantBundle.replaceElement(e._idLastDeepCopyOf, e)
                 
 
         return new

@@ -70,21 +70,23 @@ class Variant(music21.Music21Object):
     '''
 
     classSortOrder = 0  # variants should always come first?
-
+    isVariant = True
 
     # this copies the init of Streams
     def __init__(self, givenElements=None, *args, **keywords):
         music21.Music21Object.__init__(self)
-
+        self._cache = {}
         self.exposeTime = False
-        self._stream = stream.Stream(givenElements=givenElements, 
-                                    *args, **keywords)
+        self._stream = stream.VariantStorage(givenElements=givenElements, 
+                                             *args, **keywords)
 
     def __deepcopy__(self, memo):
         new = self.__class__()
         old = self
         for name in self.__dict__.keys():
             if name.startswith('__'):
+                continue
+            if name == '_cache':
                 continue
             part = getattr(self, name)
             # functionality duplicated from Music21Object
@@ -155,8 +157,14 @@ class Variant(music21.Music21Object):
         return len(self._stream)
 
 
+    def getElementIds(self):
+        if 'elementIds' not in self._cache or self._cache['elementIds'] is None:
+            self._cache['elementIds'] = [id(c) for c in self._stream._elements]
+        return self._cache['elementIds']
+
+
     def replaceElement(self, old, new):
-        '''When copying a Spanner, we need to update the spanner with new references for copied components (if the Notes of a Slur have beenc copied, that Slur's Note references need references to the new Notes). Given the old component, this method will replace the old with the new.
+        '''When copying a Variant, we need to update the Variant with new references for copied elements. Given the old component, this method will replace the old with the new.
 
         The `old` parameter can be either an object or object id. 
 
@@ -312,6 +320,26 @@ class VariantBundle(object):
     def __repr__(self):
         return '<music21.variant.VariantBundle of size %s>' % self.__len__()
 
+    def replaceElement(self, old, new):
+        '''Given a variant component (an object), replace all old components with new components for all Variant objects contained in this bundle.
+
+        The `old` parameter can be either an object or object id. 
+
+        If no replacements are found, no errors are raised.
+        '''
+        # idTarget is the old id that we want to replace
+        if common.isNum(old): # assume this is an id
+            idTarget = old
+        else:
+            idTarget = id(old)
+
+        # looking at each variant, if we w find that it includes an id to 
+        # an object listed as old, replace it with the object listed as new
+        for v in self._storage: # Variants in a list
+            if idTarget in v.getElementIds():
+                v.replaceElement(old, new)
+
+
 
 #-------------------------------------------------------------------------------
 
@@ -407,8 +435,17 @@ class Test(unittest.TestCase):
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
         # but, when we copy the Stream, our copied variant will point to
-        # objects in the old Stream, not the new one
-        
+        # objects in the old Stream, not the new one; the Stream __deepcopy__       
+        # method specifically manages this by re-linking copied elements
+        # to the Varaiants
+        sCopy = copy.deepcopy(s)
+        self.assertEqual(len(sCopy.variants), 1)
+        self.assertEqual(str([p for p in sCopy.pitches]), 
+            '[G4, G4, G4, G4, G4, G4, G4, G4]')
+        sCopy.activateVariants(inPlace=True)
+        self.assertEqual(str([p for p in sCopy.pitches]), 
+            '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
+
 
 
     def testVariantBundleA(self):
