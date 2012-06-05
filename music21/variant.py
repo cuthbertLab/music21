@@ -101,8 +101,11 @@ class Variant(music21.Music21Object):
             # this means that the new object is not really free of the 
             # old elements it described
             elif name == '_stream':
-                for c in old._stream:
-                    new._stream.insert(c.getOffsetBySite(old._stream), c)
+                # this passes references; does not copy contained
+                #for c in old._stream:
+                #    new._stream.insert(c.getOffsetBySite(old._stream), c)
+                # this copies the contained stream
+                new._stream = copy.deepcopy(old._stream)
             else: 
                 #environLocal.printDebug(['Spanner.__deepcopy__', name])
                 newValue = copy.deepcopy(part, memo)
@@ -414,18 +417,20 @@ class Test(unittest.TestCase):
 
     def testDeepCopyVariantA(self):
         from music21 import note, stream, variant
-
+    
         s = stream.Stream()
         s.repeatAppend(note.Note('G4'), 8)
         vn1 = note.Note('F#4')
         vn2 = note.Note('A-4')
-
+    
         v1 = variant.Variant([vn1, vn2])
         v1Copy = copy.deepcopy(v1)
-        # does not copy stored objects; they point to the same Notes vn1/vn2
-        self.assertEqual(v1Copy[0] is v1[0], True)
-        self.assertEqual(v1Copy[1] is v1[1], True)
-
+        # copies stored objects; they point to the different Notes vn1/vn2
+        self.assertEqual(v1Copy[0] is v1[0], False)
+        self.assertEqual(v1Copy[1] is v1[1], False)
+        self.assertEqual(v1[0] is vn1, True)
+        self.assertEqual(v1Copy[0] is vn1, False)
+    
         # normal in-place variant functionality
         s.insert(5, v1)
         self.assertEqual(str([p for p in s.pitches]), 
@@ -433,17 +438,43 @@ class Test(unittest.TestCase):
         sv = s.activateVariants(inPlace=False)
         self.assertEqual(str([p for p in sv.pitches]), 
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
-
-        # but, when we copy the Stream, our copied variant will point to
-        # objects in the old Stream, not the new one; the Stream __deepcopy__       
-        # method specifically manages this by re-linking copied elements
-        # to the Varaiants
+    
+        # test functionality on a deepcopy    
         sCopy = copy.deepcopy(s)
         self.assertEqual(len(sCopy.variants), 1)
         self.assertEqual(str([p for p in sCopy.pitches]), 
             '[G4, G4, G4, G4, G4, G4, G4, G4]')
         sCopy.activateVariants(inPlace=True)
         self.assertEqual(str([p for p in sCopy.pitches]), 
+            '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
+
+
+    def testDeepCopyVariantB(self):
+        from music21 import note, stream, variant
+    
+        s = stream.Stream()
+        s.repeatAppend(note.Note('G4'), 8)
+        vn1 = note.Note('F#4')
+        vn2 = note.Note('A-4')
+        v1 = variant.Variant([vn1, vn2])
+        s.insert(5, v1)
+    
+        # as we deepcopy the elements in the variants, we have new Notes
+        sCopy = copy.deepcopy(s)
+        sCopy.activateVariants(inPlace=True)
+        self.assertEqual(str([p for p in sCopy.pitches]), 
+            '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
+        # can transpose the note in place
+        sCopy.notes[5].transpose(12, inPlace=True)
+        self.assertEqual(str([p for p in sCopy.pitches]), 
+            '[G4, G4, G4, G4, G4, F#5, A-4, G4, G4]')
+    
+        # however, if the the Variant deepcopy still references the original
+        # notes it had, then when we try to activate the variant in the 
+        # in original Stream, we would get unexpected results (the octave shift)
+    
+        s.activateVariants(inPlace=True)
+        self.assertEqual(str([p for p in s.pitches]), 
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
 
