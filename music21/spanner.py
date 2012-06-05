@@ -639,7 +639,7 @@ class SpannerBundle(object):
     '''
     def __init__(self, *arguments, **keywords):
         self._cache = {} #common.DefaultHash()    
-        self._storage = []
+        self._storage = [] # a simple List, not a Stream
         for arg in arguments:
             if common.isListLike(arg):
                 for e in arg:

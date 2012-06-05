@@ -18,6 +18,7 @@ import doctest, unittest
 import sys
 from copy import deepcopy
 import itertools
+from collections import defaultdict
 
 import music21 # needed to do fully-qualified isinstance name checking
 
@@ -46,7 +47,6 @@ from music21 import tie
 from music21 import metadata
 from music21 import repeat
 from music21 import tempo
-from collections import defaultdict
 
 from music21 import environment
 _MOD = "stream.py"
@@ -3503,6 +3503,17 @@ class Stream(music21.Music21Object):
         2
         ''')
 
+
+    def _getSpannerBundle(self):
+        if 'spannerBundle' not in self._cache or self._cache['spannerBundle'] is None:
+           self._cache['spannerBundle'] = spanner.SpannerBundle(self.flat.spanners)
+        return self._cache['spannerBundle']
+
+    spannerBundle = property(_getSpannerBundle, 
+        doc = '''A high-level object for Spanner management. This is only a gettable property. 
+        ''')
+
+
     #---------------------------------------------------------------------------
     # handling transposition values and status
 
@@ -6875,16 +6886,6 @@ class Stream(music21.Music21Object):
         ''')
 
 
-    def _getSpannerBundle(self):
-        if 'spannerBundle' not in self._cache or self._cache['spannerBundle'] is None:
-           self._cache['spannerBundle'] = spanner.SpannerBundle(self.flat.spanners)
-        return self._cache['spannerBundle']
-
-    spannerBundle = property(_getSpannerBundle, 
-        doc = '''A high-level object for Spanner management. This is only a gettable property. 
-        ''')
-
-
     def _yieldElementsDownward(self, streamsOnly=False, 
             restoreActiveSites=True, classFilter=[]):
         '''Yield all containers (Stream subclasses), including self, and going downward.
@@ -9789,6 +9790,20 @@ class Stream(music21.Music21Object):
         ''')
 
 
+    def _getVariantBundle(self):
+        from music21 import variant # variant imports Stream
+
+        if ('variantBundle' not in self._cache or 
+            self._cache['variantBundle'] is None):
+            # variants are only gotten for this level of the Stream
+            self._cache['variantBundle'] = variant.VariantBundle(self.variants)
+        return self._cache['variantBundle']
+
+    variantBundle = property(_getVariantBundle, 
+        doc = '''A high-level object for Variant management. This is only a gettable property. Note that only Variants found on this Stream level (not the flat representation) are gathered in the bundle. 
+        ''')
+
+
     def activateVariants(self, group=None, matchBySpan=True, inPlace=False):
         '''For any :class:`~music21.variant.Variant` objects defined in this Stream (or selected by matching the `group` parameter), replace elements defined in the Variant with those in the calling Stream. Elements replaced will be gathered into a new Variant. 
 
@@ -11241,6 +11256,8 @@ class Opus(Stream):
 
 
 #-------------------------------------------------------------------------------
+# Special stream sub-classes that are instantiated as hidden attributes within other Music21Objects (i.e., Spanner and Variant). 
+
 class SpannerStorage(Stream):
     '''
     For advanced use. This Stream subclass is only used inside of a Spanner object to provide object storage of connected elements (things the Spanner spans).
@@ -11262,6 +11279,23 @@ class SpannerStorage(Stream):
 
     # NOTE: for serialization, this will need to properly tage
     # the spanner parent by updating the scaffolding code. 
+
+
+class VariantStorage(Stream):
+    '''
+    For advanced use. This Stream subclass is only used inside of a Variant object to provide object storage of connected elements (things the Variant defines).
+
+    This subclass name can be used to search in an object's DefinedContexts and find any and all locations that are VariantStorage objects.
+
+    A `variantParent` keyword argument must be provided by the Variant in creation. 
+    '''
+    def __init__(self, *arguments, **keywords):
+        Stream.__init__(self, *arguments, **keywords)
+        # must provide a keyword argument with a reference to the variant parent
+        self.variantParent = None
+        if 'variantParent' in keywords.keys():
+            self.variantParent = keywords['variantParent']
+
 
 
 #-------------------------------------------------------------------------------
