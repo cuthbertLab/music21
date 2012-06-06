@@ -108,6 +108,8 @@ from music21 import note
 
 from music21.noteworthy import translate as noteworthyTranslate
 
+from music21.demos.theoryAnalysis import theoryAnalyzer as demosTheoryAnalysisTheoryAnalyzer
+
 from music21 import pitch
 from music21 import roman
 from music21 import repeat
@@ -264,6 +266,7 @@ MODULES = [
     tempo,     
     text,
     tinyNotation,
+    demosTheoryAnalysisTheoryAnalyzer,
     # trecento
     #    trecentoCadencebook
     trecentoPolyphonicSnippet,
@@ -390,12 +393,14 @@ class PartitionedModule(PartitionedName):
             # these are evaluated class names, not strings
             for orderedObj in self.srcNameEval._DOC_ORDER:
                 if hasattr(orderedObj, 'func_name'):
-                    orderedName = orderedObj.func_name
+                    orderedName = orderedObj.func_name  
                 elif hasattr(orderedObj, '__name__'):
-                    orderedName = orderedObj.__name__
-                else:
-                    environLocal.printDebug(['cannot get a string name of object:', orderedObj])
-                    continue
+                    orderedName = orderedObj.__name__ 
+                else: #assume class-level method
+                    orderedName = orderedObj
+                    #environLocal.printDebug(['cannot get a string name of object:', orderedObj])
+                    #continue
+                
                 self.namesOrdered.append(orderedName)
 
         else:
@@ -1495,12 +1500,16 @@ class ModuleDoc(RestructuredWriter):
 
         # file name for this module; leave off music21 part
         fn = self.modName.split('.')
-        if len(fn) == 2:
-            self.fileRef = 'module' + capFirst(fn[1])
-        elif len(fn) == 3:
-            self.fileRef = 'module' + capFirst(fn[1]) + capFirst(fn[2])
-        else:
-            raise Exception('cannot determine file name from module name: %s' % self.modName)
+        self.fileRef = 'module'
+        for index in range(1,len(fn)):
+            self.fileRef = self.fileRef + capFirst(fn[index])
+            
+#        if len(fn) == 2:
+#            self.fileRef = 'module' + capFirst(fn[1])
+#        elif len(fn) == 3:
+#            self.fileRef = 'module' + capFirst(fn[1]) + capFirst(fn[2])
+#        else:
+#            raise Exception('cannot determine file name from module name: %s' % self.modName)
 
         self.fileName = self.fileRef + '.rst'
         # references used in rst table of contents

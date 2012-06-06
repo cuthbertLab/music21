@@ -28,7 +28,8 @@ of our automatic documentation system.
 Documenting modules and classes
 ---------------------------------------------------
 
-music21 documentation for modules is found inside the module itself, usually in triple-quoted strings, like this::
+music21 documentation for modules is found inside the module itself, at the very top and before the import statements.
+This module-level documentation, usually in triple-quoted strings, might look like this::
 
   '''
   I am documentation for this module!
@@ -43,10 +44,87 @@ If you're going to edit docs you'll need the latest version of Sphinx.  Go to th
 
   easy_install -U Sphinx
   easy_install rst2pdf
-  
+ 
+Sphinx uses special characters to identify formatting of documentation. For example, to write a heading you can write:
+Helpful tips on Sphinx formatting may be found here:  `Sphinx Documentation Formatting <http://sphinx.pocoo.org/rest.html>`_ 
+
+The code would look like this::
+
+	**This is bold**
+
+The documentation looks like this:
+**This is bold**
+
+The code would look like this::
+
+	*This is italics*
+
+The documentation looks like this:
+*This is italics*
+
+This is a one-line code sample::
+	
+	``print variableName``
+	
+The documentation looks like this:	
+``print variableName``
+
+You may also use links in your documentation. For example, if in one method you'd like to link to
+another method's documentation, write::
+
+	:meth:`~music21.note.GeneralNote.addLyric`
+
+The documentation looks like this:
+:meth:`~music21.note.GeneralNote.addLyric`
+
+Or you would like to link to another class, write::
+
+	:class:`~music21.note.Note`
+	
+The documentation looks like this:
+:class:`~music21.note.Note`
+
+Sometimes pictures are useful to visually describe code to readers or to show the results of a .show() method call, etc.
+This is easy with sphinx. Just copy and paste the picture you'd like to use into the buildDoc/rst/images folder, 
+and reference it in your documentation like this::
+
+    .. image:: images/completebach.*
+        :width: 300
+
+The documentation looks like this:
+
+.. image:: images/completebach.*
+    :width: 300
+    
+Finally, if there is a section of your documentation that you'd rather sphinx not format at all, 
+append two colons to the last line of formatted text, followed by a space, followed by the *indented* text
+block, followed by a space. Text written after this space will be formatted. For example, in your code write::
+	
+	...blah blah blah this text is formatted. now I'm ready for not-formatted text, so I put two colons::
+	
+		this text is NOT formatted
+		it must be indented
+		
+		line breaks and spacing is preserved
+		**bold** sphinx formatting is not observed
+		
+	Now I'm back to sphinx formatting...**now this is bold!*
+
+The documentation looks like this:
+
+...blah blah blah this text is formatted. now I'm ready for not-formatted text, so I put two colons::
+	
+	this text is NOT formatted
+	it must be indented
+	
+	line breaks and spacing is preserved
+	**bold** sphinx formatting is not observed
+		
+Now I'm back to sphinx formatting. **now this is bold!**
+
 
 Displaying only some of the test code in the documentation
-----------------------------------------------------------
+--------------------------------------------------------------------------------
 
 We use doctests a lot in music21 -- if you run /music21/test/test.py, it will run
 not only all the code in class Test() but also all the code in the documentation
@@ -99,12 +177,12 @@ generated from the module, while the lilypond file is not generated
 during doctests.  Together with OMIT_FROM_DOCS, it's a great way to
 have your cake and eat it too.
 
-Ordering Module-Level Names
--------------------------------------------------
+Ordering Module-Level Class Names and Module-Level Functions
+-----------------------------------------------------------------------------
 
-Classes, module-level function, etc. are by default presented in the order in which they appear in the module.
-If that's not what you want, then create a list called `_DOC_ORDER` which is a list of the class and/or 
-function names in the module. These values are given as evaluated names, not strings. 
+Classes are by default presented in the order in which they appear in the module. Module-level functions
+are by default sorted alphabetically. If that's not what you want, then create a list called `_DOC_ORDER` 
+which is a list of the class and/or function names in the module. These values are given as evaluated names, not strings. 
 
 Since this list uses classes and not strings, this list must come at the end of the module, after the Test classes 
 and before calling `music21.mainTest()`
@@ -117,15 +195,8 @@ At the end of note.py for instance, we write::
         music21.mainTest(Test)
 
 
-Documenting Module-Level Functions
--------------------------------------------------
-
-Module-level functions should have a documentation string and doctest-compatible examples. 
-(DEMO NEEDED)
-
-
 Ordering Class-Level Names
-----------------------------
+------------------------------------------------------
 
 Classes can define a `_DOC_ORDER` attribute which functions the same as the module-level
 `_DOC_ORDER`, that is it defines the order of attributes, properties, and/or methods in the class. 
@@ -145,8 +216,8 @@ The following abbreviated example is from pitch.py::
         def __init__(self, name=None):
             pass
 
-Documenting Properties
-----------------------
+Documenting Class-Level Properties
+---------------------------------------------------
 
 To document a property do something like this::
 
@@ -165,7 +236,7 @@ To document a property do something like this::
       '''
 
 Documenting Class-Level Attributes
-----------------------------------
+--------------------------------------------------------------
 
 Class-level attributes, names that are neither properties not methods, 
 can place their documentation in a dictionary called `_DOC_ATTR`.  The keys of the dictionary 
@@ -226,19 +297,20 @@ The following abbreviated example, showing the updating of the `_DOC_ATTR` inher
         def __init__(self, notes = [], **keywords):
             pass
 
-
-
-Documenting Class-Level Properties
--------------------------------------
-
-Class-level property definitions must pass a `doc` argument to the the `property()` global function. Included doctests will be presented in documentation and run as doctests.  
-
-
-
 Documenting Class-Level Methods
--------------------------------------
+-----------------------------------------------------------------
 
-Class-level methods should have a documentation string and doctest-compatible examples. 
+This is the most common type of documentation, and it ensures both excellent documentation and doctests. 
+A typical example of source code might look like this::
 
-
-
+	class className():
+		[instance variables, __init__, etc.]
+		def myNewMethod(self,parameters):
+		    '''
+		    this is documentation for this method
+		    >>> myInstance = className()
+		    >>> myInstance.myNewMethod(someParameters)
+		    >>> myUnicorn.someInstanceVariable
+		    'value'
+		    '''
+			[method code]

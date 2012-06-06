@@ -1393,10 +1393,11 @@ class ChordSymbol(Harmony):
         self._degreesList = degrees.split()
 
         return notationString
+    
 def realizeChordSymbolDurations(piece):
     '''Returns music21 stream with duration attribute of chord symbols correctly set. 
     Duration of chord symbols is based on the surrounding chord symbols; The chord symbol
-    continues duration until another chord symbol is located or the piece ends. Usefull for 
+    continues duration until another chord symbol is located or the piece ends. Useful for 
     
 
     >>> from music21 import *

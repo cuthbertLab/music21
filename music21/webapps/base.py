@@ -19,71 +19,66 @@ For details about various output template options available, see webapps.templat
 
 **Overview of Processing a Request**
 
-1.  The GET and POST data from the request are combined into an agenda object
-    The POST data can in the formats 'application/json', 'multipart/form-data' or 'application/x-www-form-urlencoded'
-    For more information, see the documentation for Agenda and makeAgendaFromRequest
+1. The GET and POST data from the request are combined into an agenda object. The POST data can in the formats ``'application/json', 'multipart/form-data' or 'application/x-www-form-urlencoded'``. For more information, see the documentation for Agenda and makeAgendaFromRequest
 
-2.  If an appName is specified, additional data and commands are added to the agenda
-    For more information, see the applicationInitializers in apps.py
+2. If an appName is specified, additional data and commands are added to the agenda. For more information, see the applicationInitializers in apps.py.
 
-3.  A CommandProcessor is created for the agenda
+3. A CommandProcessor is created for the agenda
 
-4.  The processor parses its dataDict into primitives or music21 objects and saves them to a parsedDataDict
-    For more information, see commandProcessor._parseData()
+4. The processor parses its dataDict into primitives or music21 objects and saves them to a parsedDataDict. For more information, see ``commandProcessor._parseData()``
 
-5.  The processor executes its commandList, modifying its internal parsedDataDict
-    For more information, see commandProcessor.executeCommands()
+5. The processor executes its commandList, modifying its internal parsedDataDict. For more information, see :meth:`~music21.webapps.base.CommandProcessor.executeCommands`
 
-6.  If outputTemplate is specified, the processor uses a template to generate and output.
-    For more information, see commandProcessor.getOutput() and the templates in templates.py
+6. If outputTemplate is specified, the processor uses a template to generate and output. For more information, see :meth:`~music21.webapps.base.CommandProcessor.getOutput` and the templates in templates.py
 
-7.  Otherwise, the data will be returned as JSON, where the variables in the agenda's returnDict specify which
-    variables to include in the returned JSON.
-    
-9.  If an error occurs, an error message will be returned to the user 
+7. Otherwise, the data will be returned as JSON, where the variables in the agenda's returnDict specify which variables to include in the returned JSON.
+
+8. If an error occurs, an error message will be returned to the user 
 
 **Full JSON Example:**
 
-Below is an example of a complete JSON request:
-{
-    "dataDict": {
-        "myNum": {
-            "fmt": "int", 
-            "data": "23"
-        }
-    }, 
-    "returnDict": {
-        "myNum": "int", 
-        "ho": "int"
-    }, 
-    "commandList": [
-        {
-            "function": "corpus.parse", 
-            "argList": [
-                "'bwv7.7'"
-            ], 
-            "resultVar": "sc"
+Below is an example of a complete JSON request::
+
+    {
+        "dataDict": {
+            "myNum": {
+                "fmt": "int", 
+                "data": "23"
+            }
         }, 
-        {
-            "method": "transpose", 
-            "argList": [
-                "'p5'"
-            ], 
-            "caller": "sc", 
-            "resultVar": "sc"
+        "returnDict": {
+            "myNum": "int", 
+            "ho": "int"
         }, 
-        {
-            "attribute": "flat", 
-            "caller": "sc", 
-            "resultVar": "scFlat"
-        }, 
-        {
-            "attribute": "highestOffset", 
-            "caller": "scFlat", 
-            "resultVar": "ho"
-        }
-    ]
-}
+        "commandList": [
+            {
+                "function": "corpus.parse", 
+                "argList": [
+                    "'bwv7.7'"
+                ], 
+                "resultVar": "sc"
+            }, 
+            {
+                "method": "transpose", 
+                "argList": [
+                    "'p5'"
+                ], 
+                "caller": "sc", 
+                "resultVar": "sc"
+            }, 
+            {
+                "attribute": "flat", 
+                "caller": "sc", 
+                "resultVar": "scFlat"
+            }, 
+            {
+                "attribute": "highestOffset", 
+                "caller": "scFlat", 
+                "resultVar": "ho"
+            }
+        ]
+    }
+    
 '''
 
 import unittest
@@ -187,7 +182,7 @@ def ModWSGIApplication(environ, start_response):
     Reads the contents of a post request, and passes the data string to
     webapps.processDataString for further processing. 
         
-    For an example of how to install this application on a server see webapps.server.wsgiapp.py
+    For an example of how to install this application on a server see music21.webapps.server.wsgiapp.py
     
     The request to the application should have the following structures:
 
@@ -239,24 +234,22 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
     Combines information from POST data and server info into an agenda object
     that can be used with the CommandProcessor.
 
-    Takes in a file-like requestInput (has .read()) containing POST data,
+    Takes in a file-like requestInput (has ``.read()``) containing POST data,
     a dictionary-like environ from the server containing at a minimum a value for the keys QUERY_STRING,
     and a requestType specifying the content-type of the POST data ('application/json','multipart/form-data', etc.)
         
     Note that variables specified via query string will be returned as a list if
-    they are specified more than once (e.g. ?b=3&b=4 will yeld ['3', '4'] as the value of b
+    they are specified more than once (e.g. ``?b=3&b=4`` will yeld ``['3', '4']`` as the value of b
     
     >>> from music21 import *
     >>> import StringIO
     >>> requestInput = StringIO.StringIO() # requestInput should be buffer from the server application. Using StringIO for demonstration
     >>> requestInput.write('{"dataDict":{"a":{"data":3}}}')
     >>> requestInput.seek(0)
-    
     >>> environ = {"QUERY_STRING":"b=3"}
     >>> agenda = webapps.makeAgendaFromRequest(requestInput, environ, 'application/json')
     >>> agenda
-    {'dataDict': {u'a': {u'data': 3}, 'b': {'data': '3'}}, 'returnDict': {}, 'commandList': []}
-   
+    {'dataDict': {u'a': {u'data': 3}, 'b': {'data': '3'}}, 'returnDict': {}, 'commandList': []} 
     >>> environ2 = {"QUERY_STRING":"a=2&b=3&b=4"}
     >>> agenda2 = webapps.makeAgendaFromRequest(requestInput, environ2, 'multipart/form-data')
     >>> agenda2
@@ -333,7 +326,7 @@ def setupApplication(agenda, appName = None):
     or if the appName parameter is none, from the value associated with the "appName" key in the agenda.
     
     If the application name is a valid application name, calls the appropriate application initializer
-    from apps.py on the agenda.
+    from music21.webapps.apps.py on the agenda.
     '''
     if appName == None:
         if 'appName' in agenda:
@@ -356,46 +349,54 @@ class Agenda(dict):
     
     The Agenda contains the following keys:
     
-    **'dataDict'** whose value is a dictionary specifying data to be inputted to the processor of the form:
-        "dataDict" : {"<VARIABLE_1_NAME>": {"data": "<VARIABLE_1_DATA>",
-                                            "fmt":  "<VARIABLE_1_FMT>"},
-                      "<VARIABLE_2_NAME>": {"data": "<VARIABLE_2_DATA>",
-                                            "fmt":  "<VARIABLE_2_FMT>"},
-                      etc.
-                      }
-        where the variable formats are elements of availableDataFormats ("str","int","musicxml", etc.)
+*   **'dataDict'** whose value is a dictionary specifying data to be input to the  processor of the form::
     
-    **'commandList'**  whose value is a list specifying commands to be executed by the processor of the form::
-        "commandList" : [{"<CMD_1_TYPE>": "<CMD_2_COMMAND_NAME>",
-                          "resultVar":    "<CMD_1_RESULT_VARIABLE>",
-                          "caller":       "<CMD_1_CALLER>",
-                          "command":      "<CMD_1_COMMAND_NAME>",
-                          "argList":      ['<CMD_1_ARG_1>','<CMD_1_ARG_2>'...]},
-                          
-                          "<CMD_2_TYPE>": "<CMD_2_COMMAND_NAME>",
-                          "resultVar":    "<CMD_2_RESULT_VARIABLE>",
-                          "caller":       "<CMD_2_CALLER>",
-                          "argList":      ['<CMD_2_ARG_1>','<CMD_2_ARG_2>'...]},
+            "dataDict" : {"<VARIABLE_1_NAME>": {"data": "<VARIABLE_1_DATA>",
+                                                "fmt":  "<VARIABLE_1_FMT>"},
+                          "<VARIABLE_2_NAME>": {"data": "<VARIABLE_2_DATA>",
+                                                "fmt":  "<VARIABLE_2_FMT>"},
                           etc.
-                          ]
-        Calling .executeCommands() iterates through the commandList sequentially, calling the equivalent of:
-        <CMD_n_RESULT_VARAIBLE> = <CMD_n_CALLER>.<CMD_n_COMMAND_NAME>(<CMD_n_ARG_1>,<CMD_n_ARG_2>...)
+                          }
         
-        where the command TYPE is "function", "method", or "attribute"
+    where the variable formats are elements of availableDataFormats ("str","int","musicxml", etc.)
     
-    **'returnDict'** whose value is a list specifying the variables to be returned from the server.
-        "returnDict" : {"<VARIABLE_1_NAME>": "<VARIABLE_1_FORMAT",
-                        "<VARIABLE_2_NAME>": "<VARIABLE_2_FORMAT", etc.}
+*     **'commandList'**  whose value is a list specifying commands to be executed by the processor of the form::
+    
+            "commandList" : [{"<CMD_1_TYPE>": "<CMD_2_COMMAND_NAME>",
+                              "resultVar":    "<CMD_1_RESULT_VARIABLE>",
+                              "caller":       "<CMD_1_CALLER>",
+                              "command":      "<CMD_1_COMMAND_NAME>",
+                              "argList":      ['<CMD_1_ARG_1>','<CMD_1_ARG_2>'...]},
+                              
+                              "<CMD_2_TYPE>": "<CMD_2_COMMAND_NAME>",
+                              "resultVar":    "<CMD_2_RESULT_VARIABLE>",
+                              "caller":       "<CMD_2_CALLER>",
+                              "argList":      ['<CMD_2_ARG_1>','<CMD_2_ARG_2>'...]},
+                              etc.
+                              ]
+                              
+    Calling :meth:`~music21.webapps.base.CommandProcessor.executeCommands` iterates through 
+    the commandList sequentially, calling the equivalent of ``<CMD_n_RESULT_VARAIBLE> = <CMD_n_CALLER>.<CMD_n_COMMAND_NAME>(<CMD_n_ARG_1>,<CMD_n_ARG_2>...)``
+    where the command TYPE is "function", "method", or "attribute"
+    
+*    **'returnDict'** whose value is a list specifying the variables to be returned from the server::
+    
+            "returnDict" : {"<VARIABLE_1_NAME>": "<VARIABLE_1_FORMAT",
+                            "<VARIABLE_2_NAME>": "<VARIABLE_2_FORMAT", etc.}
         
-        returnDict is used to limit JSON output to only the relevant variables. If returnDict is not specified,
-        the entire set of variables in the processor's environment will be returned in string format.
-        
-    **'outputTemplate'**  which specifies the return template to be used
-    **'outputArgList'**   which specifies what arguments to pass the return template
+    returnDict is used to limit JSON output to only the relevant variables. If returnDict is not specified,
+    the entire set of variables in the processor's environment will be returned in string format.
+    
+*    **'outputTemplate'**  which specifies the return template to be used
+    
+*    **'outputArgList'**   which specifies what arguments to pass the return template
     
     '''
     def __init__(self):
         '''
+    
+        Agenda initialization function:
+        
         Initializes core key values 'dataDict', 'commandList', 'returnDict'
 
         >>> from music21 import *
@@ -480,9 +481,10 @@ class Agenda(dict):
         Adds the specified command to the commandList of the agenda. type is either "function", "attribute" or method. 
         resultVar, caller, and command are strings that will result in the form shown below. Set an argument as 
         none to 
-        argList should be a list of data encoded in an appropriate format (see parseStringToPrimitive for more information)
+        argList should be a list of data encoded in an appropriate 
+        format (see :meth:`~music21.webapps.base.CommandProcessor.parseStringToPrimitive` for more information)
         
-            <resultVar> = <caller>.<command>(<argList>)
+            ``<resultVar> = <caller>.<command>(<argList>)``
         
         >>> from music21 import *
         >>> agenda = webapps.Agenda()
@@ -551,17 +553,20 @@ class CommandProcessor(object):
     Processes server request for music21.
     
     Takes an Agenda (dict) as input, containing the keys::
+    
         'dataDict'
         'commandList'
         'returnDict'
         'outputTemplate'
         'outputArgList'
 
-
+    OMIT_FROM_DOCS
+    
     TODO: MORE DOCS!
     '''
     def __init__(self,agenda):
         '''
+        OMIT_FROM_DOCS
         Given an agenda 
         '''
         self.agenda = agenda
@@ -595,7 +600,7 @@ class CommandProcessor(object):
         so both the user and the administrator know. Error string represents a brief, human-readable
         message decribing the error.
         
-        Errors are appended to the errorList as a tuple (errorString,errorTraceback) where errorTraceback
+        Errors are appended to the errorList as a tuple (errorString, errorTraceback) where errorTraceback
         is the traceback of the exception if exceptionObj is specified, otherwise errorTraceback is the empty string
         '''
         errorTraceback = u''    
@@ -690,29 +695,35 @@ class CommandProcessor(object):
         '''
         Parses JSON Commands specified in the self.commandList
         
-        In the JSON, commands are described by::
+        In the JSON, commands are described by:
+        
         **'commandList'**  whose value is a list specifying commands to be executed by the processor of the form::
-            "commandList" : [{"<CMD_1_TYPE>": "<CMD_2_COMMAND_NAME>",
-                              "resultVar":    "<CMD_1_RESULT_VARIABLE>",
-                              "caller":       "<CMD_1_CALLER>",
-                              "command":      "<CMD_1_COMMAND_NAME>",
-                              "argList":      ['<CMD_1_ARG_1>','<CMD_1_ARG_2>'...]},
-                              
-                              "<CMD_2_TYPE>": "<CMD_2_COMMAND_NAME>",
-                              "resultVar":    "<CMD_2_RESULT_VARIABLE>",
-                              "caller":       "<CMD_2_CALLER>",
-                              "argList":      ['<CMD_2_ARG_1>','<CMD_2_ARG_2>'...]},
-                              etc.
-                              ]
-            Calling .executeCommands() iterates through the commandList sequentially, calling the equivalent of:
-            <CMD_n_RESULT_VARAIBLE> = <CMD_n_CALLER>.<CMD_n_COMMAND_NAME>(<CMD_n_ARG_1>,<CMD_n_ARG_2>...)
+        
+                "commandList" : [{"<CMD_1_TYPE>": "<CMD_2_COMMAND_NAME>",
+                                  "resultVar":    "<CMD_1_RESULT_VARIABLE>",
+                                  "caller":       "<CMD_1_CALLER>",
+                                  "command":      "<CMD_1_COMMAND_NAME>",
+                                  "argList":      ['<CMD_1_ARG_1>','<CMD_1_ARG_2>'...]},
+                                  
+                                  "<CMD_2_TYPE>": "<CMD_2_COMMAND_NAME>",
+                                  "resultVar":    "<CMD_2_RESULT_VARIABLE>",
+                                  "caller":       "<CMD_2_CALLER>",
+                                  "argList":      ['<CMD_2_ARG_1>','<CMD_2_ARG_2>'...]},
+                                  etc.
+                                  ]
+                                  
+        Calling .executeCommands() iterates through the commandList sequentially, calling the equivalent of::
+                
+                <CMD_n_RESULT_VARAIBLE> = <CMD_n_CALLER>.<CMD_n_COMMAND_NAME>(<CMD_n_ARG_1>,<CMD_n_ARG_2>...)
             
-            where the command TYPE is "function" (no caller), "method" (has a caller), or "attribute"
+        where the command TYPE is "function" (no caller), "method" (has a caller), or "attribute"
             
-            See executeFunctionCommand, executeMethodCommand, and executeAttribtueCommand for more information about the format
-            required for those commands.
+        See :meth:`~music21.webapps.base.CommandProcessor.executeFunctionCommand`, :meth:`~music21.webapps.base.CommandProcessor.executeMethodCommand`, 
+        and :meth:`~music21.webapps.base.CommandProcessor.executeAttributeCommand` for more information about the format
+        required for those commands.
             
-        EXAMPLE:
+        EXAMPLE::
+        
             {"commandList:"[
                 {"function":"corpus.parse",
                  "argList":["'bwv7.7'"],
@@ -758,15 +769,15 @@ class CommandProcessor(object):
         '''
         Executes the function command specified by commandElement.
         
-        Function command elements should be dictionaries of the form:
+        Function command elements should be dictionaries of the form::
         
-        {'function': "<FUNCTION_NAME>",
-         'argList': ["<ARG_1>","<ARG_2>", etc.],
-         'resultVar' : "<RESULT_VARIABLE>"}
+            {'function': "<FUNCTION_NAME>",
+             'argList': ["<ARG_1>","<ARG_2>", etc.],
+             'resultVar' : "<RESULT_VARIABLE>"}
          
-        Executing it yields the equivalent of: <RESULT_VARIABLE> = <FUNCTION_NAME>(ARG_1, ARG_2, ...)
+        Executing it yields the equivalent of: ``<RESULT_VARIABLE> = <FUNCTION_NAME>(ARG_1, ARG_2, ...)``
         
-        The keys argList and resultVar are optional. A commandElement without argList will just call <FUNCTION_NAME>()
+        The keys argList and resultVar are optional. A commandElement without argList will just call ``<FUNCTION_NAME>()``
         with no arguments and a commandElement without resutlVar will not assign the result of the function to any variable.
         
         
@@ -816,15 +827,15 @@ class CommandProcessor(object):
         '''
         Executes the attribute command specified by commandElement
 
-        Function command elements should be dictionaries of the form:
+        Function command elements should be dictionaries of the form::
         
-        {'attribute': "<ATTRIBUTE_NAME>",
-         'caller': "<CALLER_VARIABLE>",
-         'resultVar' : "<RESULT_VARIABLE>"}
+            {'attribute': "<ATTRIBUTE_NAME>",
+             'caller': "<CALLER_VARIABLE>",
+             'resultVar' : "<RESULT_VARIABLE>"}
          
-        Executing it yields the equivalent of: <RESULT_VARIABLE> = <CALLER_VARIABLE>.<ATTRIBUTE_NAME>.
+        Executing it yields the equivalent of: ``<RESULT_VARIABLE> = <CALLER_VARIABLE>.<ATTRIBUTE_NAME>.``
         
-        ALl three keys 'attributeName', 'caller', and 'resultVar' are required.
+        All three keys 'attributeName', 'caller', and 'resultVar' are required.
 
         ''' 
         # Make sure the appropriate keys are set:
@@ -867,14 +878,16 @@ class CommandProcessor(object):
             
     def executeMethodCommand(self, commandElement):
         '''
-        {'method': "<METHOD_NAME>",
-         'caller': "<CALLER_VARIABLE>",
-         'argList': ["<ARG_1>","<ARG_2>", etc.],
-         'resultVar' : "<RESULT_VARIABLE>"}
-         
-        Executing it yields the equivalent of: <RESULT_VARIABLE> = <CALLER_VARIABLE>.<METHOD_NAME>(ARG_1, ARG_2, ...)
+        Example::
         
-        The keys argList and resultVar are optional. A commandElement without argList will just call <CALLER_VARIABLE>.<METHOD_NAME>()
+            {'method': "<METHOD_NAME>",
+             'caller': "<CALLER_VARIABLE>",
+             'argList': ["<ARG_1>","<ARG_2>", etc.],
+             'resultVar' : "<RESULT_VARIABLE>"}
+         
+        Executing it yields the equivalent of ``<RESULT_VARIABLE> = <CALLER_VARIABLE>.<METHOD_NAME>(ARG_1, ARG_2, ...)``
+        
+        The keys argList and resultVar are optional. A commandElement without argList will just call ``<CALLER_VARIABLE>.<METHOD_NAME>()``
         with no arguments and a commandElement without resutlVar will not assign the result of the function to any variable.
         
         ''' 
@@ -1070,7 +1083,7 @@ class CommandProcessor(object):
         to determine which format the output should be in. If an outputTemplate is unspecified or known,
         will return json by default.
         
-        Return is of the tyle (output, outputType) where outputType is a content-type ready for returning to the server:
+        Return is of the style (output, outputType) where outputType is a content-type ready for returning to the server:
         "text/plain", "application/json", "text/html", etc.
         '''
         if len(self.errorList) > 0:
