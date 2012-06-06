@@ -286,6 +286,7 @@ class StreamFreezer(object):
     def _packStream(self, streamObj):
         '''Prepare the passed in Stream in place, return storage dictionary format
         '''        
+        # do all things necessary to setup the stream
         streamObj.setupSerializationScaffold()
         storage = {'stream': self.stream, 'm21Version': music21.VERSION}
         return storage

@@ -31,17 +31,6 @@ _MOD = "variant.py" # TODO: call variant
 environLocal = environment.Environment(_MOD)
 
 
-# variant objs as groups
-# ossia1 as a group
-# variant group
-# idea of m5, m7; each have two variants, each belonging to one group
-
-# Stream.activateVariant() , take a group name as arg
-# if None is given, take first
-# overlapped content becomes
-# inPlace: replaces original; original becomes a variant
-# idea of performanceScale that realizes 
-
 
 #-- Functions
 def mergeVariantStreams(streams, variantNames, inPlace = False):
@@ -254,6 +243,7 @@ def mergeVariantStreams(streams, variantNames, inPlace = False):
         if returnObj.highestTime != s.highestTime:
             raise VariantException('cannot merge streams of different lengths')
      
+
         if returnObj.getElementsByClass(stream.Part).elements != [] : # If parts exist, iterate through them.
             for i in range(len(returnObj.getElementsByClass(stream.Part).elements)):
                 returnObjPart = returnObj.getElementsByClass(stream.Part).elements[i]
@@ -452,7 +442,12 @@ def _generateVariant(noteList, originStream, start, variantName = None):
     return returnVariant
 
 
-#--- Classes
+
+
+
+#-------------------------------------------------------------------------------
+# classes
+
 class VariantException(Exception):
     pass
 

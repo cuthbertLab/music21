@@ -609,21 +609,23 @@ class DefinedContexts(JSONSerializer):
         False
         '''
         self.purgeLocations(rescanIsDead=True)
+
         for idKey in self._definedContexts.keys():
             if WEAKREF_ACTIVE:
             #if common.isWeakref(self._definedContexts[idKey]['obj']):
                 target = self._definedContexts[idKey]['obj']
-                environLocal.pd(['   target start', target])            
-                if target is not None:
-                    if common.isWeakref(target):
-                        environLocal.printDebug(['unwrapping:', self._definedContexts[idKey]['obj']])
-                        target = common.unwrapWeakref(target)
-                        self._definedContexts[idKey]['obj'] = target
+                if target is None:
+                    continue
+                if common.isWeakref(target):
+                    environLocal.pd(['   target start', target])            
+                    #environLocal.printDebug(['unwrapping:', self._definedContexts[idKey]['obj']])
+                    target = common.unwrapWeakref(target)
+                    self._definedContexts[idKey]['obj'] = target
                     # we may need to unwrap the weakrefs in this Stream
                     # if it is not stored elsewhere
-                    if target is not None:
-                        target.unwrapWeakref()
-                environLocal.pd(['   target end', target])            
+#                     if target is not None:
+#                         self._definedContexts[idKey]['obj'].unwrapWeakref()
+                    environLocal.pd(['   target end', target])            
 
     def wrapWeakref(self):
         '''Wrap all stored objects with weakrefs.
@@ -856,9 +858,10 @@ class DefinedContexts(JSONSerializer):
         if idKey == self._lastID:
             self._lastID = -1 # cannot be None
             self._lastOffset = None
-
-        if idKey == None:
+        if idKey is None:
             raise Exception('trying to remove None idKey')
+
+        #environLocal.pd(['removeById', idKey, 'self._definedContexts.keys()', self._definedContexts.keys()])
         del self._definedContexts[idKey]
         if idKey in self._locationKeys:
             self._locationKeys.pop(self._locationKeys.index(idKey))
@@ -1223,17 +1226,20 @@ class DefinedContexts(JSONSerializer):
                         self._definedContexts[idKey]['obj'])
                 else:
                     obj = self._definedContexts[idKey]['obj']
-
                 if obj is None: # if None, it no longer exists
                     self._definedContexts[idKey]['isDead'] = True
-
         # use previously set isDead entry, so as not to
         # unwrap all references
+        remove = []
         for idKey in self._locationKeys:
             if idKey is None: 
                 continue
             if self._definedContexts[idKey]['isDead']:
-                self.removeById(idKey)
+                remove.append(idKey)
+        for idKey in remove:
+            # this call changes the ._locationKeys list, and thus must be 
+            # out side _locationKeys loop
+            self.removeById(idKey)
         
 # this function was removed b/c 
 # containedById may not always be correct;
@@ -2390,6 +2396,7 @@ class Music21Object(JSONSerializer):
     def purgeOrphans(self):
         '''A Music21Object may, due to deep copying or other reasons, have contain a site (with an offset); yet, that site may no longer contain the Music21Object. These lingering sites are called orphans. This methods gets rid of them. 
         '''
+        #environLocal.pd(['purging orphans'])
         orphans = []
         # TODO: how can this be optimized to not use getSites, so as to 
         # not unwrap weakrefs?
@@ -3123,13 +3130,17 @@ class Music21Object(JSONSerializer):
 
         '''
         environLocal.printDebug(['Music21Object: unwrapWeakref on:', self])
+
+        self.purgeOrphans()
+
+        # this purgesLocations too
         self._definedContexts.unwrapWeakref()
         # doing direct access; not using property activeSite, as filters
         # through global WEAKREF_ACTIVE setting
         if self._activeSite is not None:
             self._activeSite = common.unwrapWeakref(self._activeSite)
 
-        environLocal.printDebug(['   self._activeSite:', self._activeSite])
+        #environLocal.printDebug(['   self._activeSite:', self._activeSite])
 
     def wrapWeakref(self):
         '''Public interface to operation on DefinedContexts.
@@ -3174,15 +3185,13 @@ class Music21Object(JSONSerializer):
         >>> oldActiveSiteId == newActiveSiteId
         False
         '''
-        self._definedContexts.freezeIds()
+        #self._definedContexts.freezeIds()
 
         # _activeSite could be a weak ref; may need to manage
         if self._activeSite is not None:
             #environLocal.printDebug(['freezeIds: adjusting _activeSiteId', self._activeSite])
             self._activeSiteId = uuid.uuid4() # a place holder
-
-        if self._idLastDeepCopyOf is not None:
-            self._idLastDeepCopyOf = None # clear
+        self._idLastDeepCopyOf = None # clear
 
 
     def unfreezeIds(self):
@@ -3208,7 +3217,7 @@ class Music21Object(JSONSerializer):
         True
         '''
         #environLocal.printDebug(['unfreezing ids', self])
-        self._definedContexts.unfreezeIds()
+        #self._definedContexts.unfreezeIds()
 
         if self._activeSite is not None:
             obj = common.unwrapWeakref(self._activeSite)

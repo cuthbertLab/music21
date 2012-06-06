@@ -98,14 +98,19 @@ class Test(unittest.TestCase):
         s.append(sp)
 
         # the deepcopy is what creates the bug in the preservation of a weakref
-        #s = copy.deepcopy(s)
 
+        #sCopy = copy.deepcopy(s)
+
+#         n1Copy = sCopy._elements[0]
+#         n2Copy = sCopy._elements[1]
+#         spCopy = sCopy._elements[2]
+# 
         temp = converter.freezeStr(s)
+        #temp = converter.freezeStr(sCopy)
 
-        post = converter.unfreezeStr(temp)
-
-        self.assertEqual(len(post.notes), 2)
-        self.assertEqual(str(post.notes[0].pitch), 'D2')
+#         post = converter.unfreezeStr(temp)
+#         self.assertEqual(len(post.notes), 2)
+#         self.assertEqual(str(post.notes[0].pitch), 'D2')
 
 
 

@@ -421,6 +421,7 @@ class Stream(music21.Music21Object):
         if len(self._cache) > 0:
             if keepIndex and 'index' in self._cache:
                 indexCache = self._cache['index']
+            # alway clear cache when elements have changed
             self._cache = {} #common.DefaultHash()
             if keepIndex:
                 self._cache['index'] = indexCache
@@ -1144,6 +1145,7 @@ class Stream(music21.Music21Object):
                 if e.hasSpannerSite():
                     spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
 
+        # this is presently not necessary
 #         variantBundle = new.variantBundle
 #         if len(variantBundle) > 0:
 #             for e in new:
@@ -1946,7 +1948,7 @@ class Stream(music21.Music21Object):
         >>> a.setupSerializationScaffold()
         '''
 
-        # remove all caches
+        # this removes all caches
         self._elementsChanged()
 
         environLocal.printDebug(['calling setupSerializationScaffold()', self])
@@ -1956,10 +1958,10 @@ class Stream(music21.Music21Object):
                 element.setupSerializationScaffold() # recurse
             else:
                 # this is done here for all elements
-                element.freezeIds()
+                #element.freezeIds()
                 element.unwrapWeakref()
         # this must be done for all Streams
-        self.freezeIds()
+        #self.freezeIds()
         # this calls overridden method
         self.unwrapWeakref()
 
@@ -1978,14 +1980,14 @@ class Stream(music21.Music21Object):
         #environLocal.printDebug(['calling teardownSerializationScaffold'])
         self._derivation.wrapWeakref()
         self.wrapWeakref()
-        self.unfreezeIds()
+        #self.unfreezeIds()
         for element in self.elements:
             if element.isStream:
                 element.teardownSerializationScaffold()
             else:
                 #environLocal.printDebug(['processing music21 obj', element])
                 element.wrapWeakref()
-                element.unfreezeIds()
+                #element.unfreezeIds()
 
 
     #---------------------------------------------------------------------------
