@@ -88,6 +88,7 @@ def figuredBassFromStream(streamPart):
     
     .. image:: images/figuredBass/fbRealizer_fbStreamPart.*
         :width: 500
+            
     '''
     sf = streamPart.flat
     sfn = sf.notes
@@ -114,6 +115,10 @@ def figuredBassFromStream(streamPart):
         ts = tsList[0]
     
     fb = FiguredBassLine(myKey, ts)
+    if streamPart.hasMeasures():
+        paddingLeft = streamPart.measure(0).paddingLeft
+        if paddingLeft != 0.0:
+            fb._paddingLeft = paddingLeft
     
     for n in sfn:
         if len(n.lyrics) > 0:
@@ -190,6 +195,7 @@ class FiguredBassLine(object):
         '''
         self.inKey = inKey
         self.inTime = inTime
+        self._paddingLeft = 0.0
         self._overlayedParts = stream.Part()
         self._fbScale = realizerScale.FiguredBassScale(inKey.pitchFromDegree(1), inKey.mode)
         self._fbList = []
@@ -250,15 +256,39 @@ class FiguredBassLine(object):
         
         .. image:: images/figuredBass/fbRealizer_bassLine.*
             :width: 200
+           
+            
+        >>> from music21 import corpus
+        >>> sBach = corpus.parse('bach/bwv307')
+        >>> sBach['bass'].measure(0).show("text")
+        {0.0} <music21.clef.BassClef>
+        {0.0} <music21.key.KeySignature of 2 flats>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.note.Note B->
+        {0.5} <music21.note.Note C>
+        >>> fbLine = realizer.figuredBassFromStream(sBach['bass'])
+        >>> fbLine.generateBassLine().measure(1).show("text")
+        {0.0} <music21.clef.BassClef>
+        {0.0} <music21.key.KeySignature of 2 flats>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {3.0} <music21.note.Note B->
+        {3.5} <music21.note.Note C>
         '''
         bassLine = stream.Part()
         bassLine.append(copy.deepcopy(self.inTime))
         bassLine.append(key.KeySignature(self.inKey.sharps))
-
         bassLine.append(clef.BassClef())
+        r = None
+        if self._paddingLeft != 0.0:
+            r = note.Rest(quarterLength = self._paddingLeft)
+            bassLine.append(r)
         for (bassNote, notationString) in self._fbList:
             bassLine.append(bassNote)
-
+        
+        bassLine.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        if r is not None:
+            bassLine[0].pop(3)
+            bassLine[0].padAsAnacrusis()
         return bassLine
     
     def retrieveSegments(self, fbRules = rules.Rules(), numParts = 4, maxPitch = pitch.Pitch('B5')):
@@ -405,7 +435,9 @@ class FiguredBassLine(object):
         elif len(segmentList) == 0:
             raise FiguredBassLineException("No (bassNote, notationString) pairs to realize.")
 
-        return Realization(realizedSegmentList = segmentList, inKey = self.inKey, inTime = self.inTime, overlayedParts = self._overlayedParts[0:-1])
+        return Realization(realizedSegmentList = segmentList, inKey = self.inKey, 
+                           inTime = self.inTime, overlayedParts = self._overlayedParts[0:-1],
+                           paddingLeft = self._paddingLeft)
 
     def generateRandomRealization(self):         
         '''
@@ -490,8 +522,6 @@ class FiguredBassLine(object):
             segmentList.reverse()
             return True
 
-#FiguredBass = FiguredBassLine
-
 class Realization(object):
     '''
     Returned by :class:`~music21.figuredBass.realizer.FiguredBassLine` after calling
@@ -520,6 +550,8 @@ class Realization(object):
             self._inTime = fbLineOutputs['inTime']
         if 'overlayedParts' in fbLineOutputs:
             self._overlayedParts = fbLineOutputs['overlayedParts']
+        if 'paddingLeft' in fbLineOutputs:
+            self._paddingLeft = fbLineOutputs['paddingLeft']
         self.keyboardStyleOutput = True 
 
     def getNumSolutions(self):
@@ -608,6 +640,8 @@ class Realization(object):
             return progression
         
         currMovements = self._segmentList[0].movements
+        if self.getNumSolutions() == 0:
+            raise FiguredBassLineException("Zero solutions")
         prevPossib = random.sample(currMovements.keys(), 1)[0]
         progression.append(prevPossib)
         
@@ -626,15 +660,19 @@ class Realization(object):
         sol = stream.Score()
         
         bassLine = stream.Part()
-        bassLine.append(copy.deepcopy(self._inTime))
-        bassLine.append(copy.deepcopy(self._keySig))
-        
+        bassLine.append([copy.deepcopy(self._keySig), copy.deepcopy(self._inTime)])
+        r = None
+        if self._paddingLeft != 0.0:
+            r = note.Rest(quarterLength = self._paddingLeft)
+            bassLine.append(copy.deepcopy(r))
+            
         if self.keyboardStyleOutput:
             rightHand = stream.Part()
-            sol.insert(0, rightHand)
-            rightHand.append(copy.deepcopy(self._inTime))
-            rightHand.append(copy.deepcopy(self._keySig))
-    
+            sol.insert(0.0, rightHand)
+            rightHand.append([copy.deepcopy(self._keySig), copy.deepcopy(self._inTime)])
+            if r is not None:
+                rightHand.append(copy.deepcopy(r))
+
             for segmentIndex in range(len(self._segmentList)):
                 possibA = possibilityProgression[segmentIndex]
                 bassNote = self._segmentList[segmentIndex].bassNote
@@ -643,14 +681,21 @@ class Realization(object):
                 rhChord = chord.Chord(rhPitches)
                 rhChord.quarterLength = self._segmentList[segmentIndex].quarterLength
                 rightHand.append(rhChord)
-            rightHand.insert(0, clef.TrebleClef()) 
+            rightHand.insert(0.0, clef.TrebleClef())
+            
+            rightHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+            if r is not None:
+                rightHand[0].pop(3)
+                rightHand[0].padAsAnacrusis()
+                
         else: # Chorale-style output
             upperParts = []
             for partNumber in range(len(possibilityProgression[0]) - 1):
                 fbPart = stream.Part()
-                sol.insert(0, fbPart)
-                fbPart.append(copy.deepcopy(self._inTime))
-                fbPart.append(copy.deepcopy(self._keySig))
+                sol.insert(0.0, fbPart)
+                fbPart.append([copy.deepcopy(self._keySig), copy.deepcopy(self._inTime)])
+                if r is not None:
+                    fbPart.append(copy.deepcopy(r))
                 upperParts.append(fbPart)
 
             for segmentIndex in range(len(self._segmentList)):
@@ -664,10 +709,19 @@ class Realization(object):
                     upperParts[partNumber].append(n1)
                     
             for upperPart in upperParts:
-                upperPart.insert(0, upperPart.bestClef(True)) 
-                              
-        bassLine.insert(0, clef.BassClef())             
-        sol.insert(0, bassLine)
+                upperPart.insert(0.0, upperPart.bestClef(True))
+                upperPart.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+                if r is not None:
+                    upperPart[0].pop(3)
+                    upperPart[0].padAsAnacrusis()
+
+                     
+        bassLine.insert(0.0, clef.BassClef())
+        bassLine.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        if r is not None:
+            bassLine[0].pop(3)
+            bassLine[0].padAsAnacrusis()           
+        sol.insert(0.0, bassLine)
         return sol
 
     def generateAllRealizations(self):
@@ -679,69 +733,27 @@ class Realization(object):
             of time for a Realization which has more than 100 solutions.
         '''
         allSols = stream.Score()
-        bassLine = stream.Part()
         possibilityProgressions = self.getAllPossibilityProgressions()
         if len(possibilityProgressions) == 0:
-            raise FiguredBassLineException("zero realizations")
-        if self.keyboardStyleOutput:
-            rightHand = stream.Part()
-            for music21Part in self._overlayedParts:
-                allSols.insert(0, music21Part)
-            allSols.insert(0, rightHand)
-            
-            for possibilityProgression in possibilityProgressions:
-                bassLine.append(copy.deepcopy(self._inTime))
-                bassLine.append(copy.deepcopy(self._keySig))
-                rightHand.append(copy.deepcopy(self._inTime))
-                rightHand.append(copy.deepcopy(self._keySig))
-                for segmentIndex in range(len(self._segmentList)):
-                    possibA = possibilityProgression[segmentIndex]
-                    bassNote = self._segmentList[segmentIndex].bassNote
-                    bassLine.append(copy.deepcopy(bassNote))  
-                    rhPitches = possibA[len(self._overlayedParts):-1]                         
-                    rhChord = chord.Chord(rhPitches)
-                    rhChord.quarterLength = self._segmentList[segmentIndex].quarterLength
-                    rightHand.append(rhChord)
-                rightHand.insert(0, clef.TrebleClef())
-        else: # Chorale-style output
-            upperParts = []
-            possibilityProgression = self.getRandomPossibilityProgression()
-            for music21Part in self._overlayedParts:
-                upperParts.insert(0, music21Part)
-
-            for partNumber in range(len(self._overlayedParts), len(possibilityProgression[0]) - 1):
-                fbPart = stream.Part()
-                allSols.insert(0, fbPart)
-                upperParts.append(fbPart)
-                
-            for possibilityProgression in possibilityProgressions:
-                bassLine.append(copy.deepcopy(self._inTime))
-                bassLine.append(copy.deepcopy(self._keySig))
-                for upperPart in upperParts:
-                    upperPart.append(copy.deepcopy(self._inTime))
-                    upperPart.append(copy.deepcopy(self._keySig))
-
-                for segmentIndex in range(len(self._segmentList)):
-                    possibA = possibilityProgression[segmentIndex]
-                    bassNote = self._segmentList[segmentIndex].bassNote
-                    bassLine.append(copy.deepcopy(bassNote))
-                    for partNumber in range(len(self._overlayedParts), len(possibA) - 1):
-                        n1 = note.Note(possibA[partNumber])
-                        n1.quarterLength = self._segmentList[segmentIndex].quarterLength
-                        upperParts[partNumber].append(n1)
-                
-                for upperPart in upperParts:
-                    upperPart.insert(0, upperPart.bestClef(True)) 
-  
-        bassLine.insert(0, clef.BassClef())
-        allSols.insert(0, bassLine)
-        return allSols        
+            raise FiguredBassLineException("Zero solutions")
+        sol0 = self.generateRealizationFromPossibilityProgression(possibilityProgressions[0])
+        for music21Part in sol0:
+            allSols.append(music21Part)
+        
+        for possibIndex in range(1, len(possibilityProgressions)):
+            solX = self.generateRealizationFromPossibilityProgression(possibilityProgressions[possibIndex])
+            for partIndex in range(len(solX)):
+                for music21Measure in solX[partIndex]:
+                    allSols[partIndex].append(music21Measure)
+        
+        return allSols
 
     def generateRandomRealization(self):
         '''
         Generates a random unique realization as a :class:`~music21.stream.Score`.
         '''
-        return self.generateRandomRealizations(1)
+        possibilityProgression = self.getRandomPossibilityProgression()
+        return self.generateRealizationFromPossibilityProgression(possibilityProgression)
 
     def generateRandomRealizations(self, amountToGenerate = 20):
         '''
@@ -753,74 +765,19 @@ class Realization(object):
         '''
         if amountToGenerate > self.getNumSolutions():
             return self.generateAllRealizations()
+        
         allSols = stream.Score()
-        bassLine = stream.Part()
-
-        if self.keyboardStyleOutput:
-            rightHand = stream.Part()
-            for music21Part in self._overlayedParts:
-                allSols.insert(0, music21Part)
-            allSols.insert(0, rightHand)
-            
-            for solutionCounter in range(amountToGenerate):
-                bassLine.append(copy.deepcopy(self._inTime))
-                bassLine.append(copy.deepcopy(self._keySig))
-                rightHand.append(copy.deepcopy(self._inTime))
-                rightHand.append(copy.deepcopy(self._keySig))
-                possibilityProgression = self.getRandomPossibilityProgression()
-                for segmentIndex in range(len(self._segmentList)):
-                    possibA = possibilityProgression[segmentIndex]
-                    length = self._segmentList[segmentIndex].quarterLength
-                    if length == 0.0:
-                        continue
-                    bassNote = self._segmentList[segmentIndex].bassNote
-                    bassNote.quarterLength = length
-                    bassLine.append(copy.deepcopy(bassNote))  
-                    rhPitches = possibA[len(self._overlayedParts):-1]                           
-                    rhChord = chord.Chord(rhPitches)
-                    rhChord.quarterLength = length
-                    rightHand.append(rhChord)
-                rightHand.insert(0, clef.TrebleClef()) 
-        else: # Chorale-style output
-            upperParts = []
-            possibilityProgression = self.getRandomPossibilityProgression()
-
-            for music21Part in self._overlayedParts:
-                upperParts.insert(0, music21Part)
-
-            for partNumber in range(len(self._overlayedParts), len(possibilityProgression[0]) - 1):
-                fbPart = stream.Part()
-                allSols.insert(0, fbPart)
-                upperParts.append(fbPart)
-
-            for solutionCounter in range(amountToGenerate):
-                bassLine.append(copy.deepcopy(self._inTime))
-                bassLine.append(copy.deepcopy(self._keySig))
-                for upperPart in upperParts:
-                    upperPart.append(copy.deepcopy(self._inTime))
-                    upperPart.append(copy.deepcopy(self._keySig))
-
-                possibilityProgression = self.getRandomPossibilityProgression()
-                for segmentIndex in range(len(self._segmentList)):
-                    possibA = possibilityProgression[segmentIndex]
-                    length = self._segmentList[segmentIndex].quarterLength
-                    if length == 0.0:
-                        continue
-                    bassNote = self._segmentList[segmentIndex].bassNote
-                    bassNote.quarterLength = length
-                    bassLine.append(copy.deepcopy(bassNote))
-                    for partNumber in range(len(self._overlayedParts), len(possibA) - 1):
-                        n1 = note.Note(possibA[partNumber])
-                        n1.quarterLength = length
-                        upperParts[partNumber].append(n1)
-                        
-                for upperPart in upperParts:
-                    upperPart.insert(0, upperPart.bestClef(True)) 
-  
-        bassLine.insert(0, clef.BassClef())
-        allSols.insert(0, bassLine)
-        return allSols        
-
+        sol0 = self.generateRandomRealization()
+        for music21Part in sol0:
+            allSols.append(music21Part)
+        
+        for solutionCounter in range(1, amountToGenerate):
+            solX = self.generateRandomRealization()
+            for partIndex in range(len(solX)):
+                for music21Measure in solX[partIndex]:
+                    allSols[partIndex].append(music21Measure)
+        
+        return allSols
 
 _DOC_ORDER = [figuredBassFromStream, figuredBassFromStreamPart, addLyricsToBassNote, FiguredBassLine, Realization]
 
