@@ -534,6 +534,15 @@ class Variant(music21.Music21Object):
     # Music21Object to get at these objects 
     # this is the same as with Spanners
 
+    def purgeOrphans(self):
+        self._stream.purgeOrphans()
+        music21.Music21Object.purgeOrphans(self)
+
+    def purgeLocations(self, rescanIsDead=False):
+        # must override Music21Object to purge locations from the contained
+        self._stream.purgeLocations(rescanIsDead=rescanIsDead)
+        music21.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
+
     def unwrapWeakref(self):
         '''Overridden method for unwrapping all Weakrefs.
         '''

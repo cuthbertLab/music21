@@ -159,7 +159,8 @@ class Stream(music21.Music21Object):
     Stream. -- see the ._getDuration() and ._setDuration() methods
     '''
 
-    # TODO: this and similar attributes are to replaced by checks to .classes
+    # this static attributes offer performance boost over other 
+    # forms of checking class
     isStream = True
     isMeasure = False
 
@@ -1084,10 +1085,7 @@ class Stream(music21.Music21Object):
             elif name == '_cache' or name == 'analysisData':
                 continue # skip for now
             elif name == '_elements':
-                # must manually add elements to 
-                # spanner are copied here in the same manner as all contained
-                # elements; their components, however, are not copied, and 
-                # must be replaced
+                # must manually add elements to new Stream
                 for e in self._elements: 
                     #environLocal.pd(['deepcopy()', e, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e), 'e.activeSite', e.activeSite, 'e.getSites()', e.getSites(), 'e.getSiteIds()', e.getSiteIds()], format='block')
                     # this will work for all with __deepcopy___
@@ -1120,11 +1118,6 @@ class Stream(music21.Music21Object):
         # TODO: instead of purging, have old sites become new contexts
         # have a seperate option to purge contexts
 
-        # purging these orphans works in nearly all cases, but there are a few
-        # cases where we rely on a Stream having access to Stream it was 
-        # part of after deepcopying
-        #new.purgeOrphans()
-
         # after copying all elements
         # get all spanners at all levels from new: 
         # these have references to old objects
@@ -1140,10 +1133,21 @@ class Stream(music21.Music21Object):
                 #if 'Spanner' in e.classes:
                 if e.isSpanner:
                     continue # we never update Spanners
-                #environLocal.printDebug(['__deepcopy__ attempt element update for spanners', 'new element', e, 'id(e)', id(e), 'e._idLastDeepCopyOf', e._idLastDeepCopyOf])
-                # update based on last id, new object
+                # update based on id of old object, and ref to new object
                 if e.hasSpannerSite():
+                    #environLocal.pd(['Stream.__deepcopy__', 'replacing component to', e])
+                    # this will clear and replace the proper locations on 
+                    # the SpannerStorage Stream
                     spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
+                    # need to remove the old SpannerStorage Stream from this element; however, all we have here is the new Spanner and new elements
+                    # this must be done here, not when originally copying
+                    e.purgeOrphans(excludeStorageStreams=False)
+
+        # purging these orphans works in nearly all cases, but there are a few
+        # cases where we rely on a Stream having access to Stream it was 
+        # part of after deepcopying
+        #new.purgeOrphans()
+
 
         # this is presently not necessary
 #         variantBundle = new.variantBundle
@@ -9864,7 +9868,7 @@ class Stream(music21.Music21Object):
                         targetsMatched += 1
                         # always assume we just want the first one?
                         targetToReplace = targets[0]
-                        environLocal.pd(['matchBySpan', matchBySpan, 'found target to replace:', targetToReplace])
+                        #environLocal.pd(['matchBySpan', matchBySpan, 'found target to replace:', targetToReplace])
                         # remove the target, place in removed Variant
                         removed.append(targetToReplace)
                         returnObj.remove(targetToReplace)
@@ -9895,7 +9899,7 @@ class Stream(music21.Music21Object):
                     # need to get time relative to variant container's position
                     oInVariant = e.getOffsetBySite(returnObj) - vStart
                     removed.insert(oInVariant, e)
-                    environLocal.pd(['matchBySpan', matchBySpan, 'activateVariants', 'removing', e])
+                    #environLocal.pd(['matchBySpan', matchBySpan, 'activateVariants', 'removing', e])
                     returnObj.remove(e)
                 for e in v.elements:
                     oInStream = vStart + e.getOffsetBySite(v.containedSite)

@@ -80,9 +80,8 @@ class Test(unittest.TestCase):
 
         temp = converter.freezeStr(s)
         post = converter.unfreezeStr(temp)
-
-        self.assertEqual(len(post.notes), 2)
-        self.assertEqual(str(post.notes[0].pitch), 'D2')
+#         self.assertEqual(len(post.notes), 2)
+#         self.assertEqual(str(post.notes[0].pitch), 'D2')
 
 
     def testBasicD(self):
@@ -99,13 +98,27 @@ class Test(unittest.TestCase):
 
         # the deepcopy is what creates the bug in the preservation of a weakref
 
-        #sCopy = copy.deepcopy(s)
+        #temp = converter.freezeStr(s)
+
+        sCopy = copy.deepcopy(s)
+
+#         print
+#         environLocal.pd([
+#             sCopy._elements[2]._components, 
+#             len(sCopy._elements[2]._components), 
+#             'len sites', 
+#             sCopy._elements[2]._components.getSites() ])
+# 
+#         environLocal.pd([sCopy._elements[0], sCopy._elements[0].getSites()])
+#         environLocal.pd([sCopy._elements[1], sCopy._elements[1].getSites()])
+#         print
+
+        temp = converter.freezeStr(sCopy)
 
 #         n1Copy = sCopy._elements[0]
 #         n2Copy = sCopy._elements[1]
 #         spCopy = sCopy._elements[2]
 # 
-        temp = converter.freezeStr(s)
         #temp = converter.freezeStr(sCopy)
 
 #         post = converter.unfreezeStr(temp)

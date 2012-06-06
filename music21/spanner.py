@@ -265,6 +265,7 @@ class Spanner(music21.Music21Object):
                 newValue = copy.deepcopy(part, memo)
                 newValue.containedById = id(new)
                 setattr(new, name, newValue)
+
             # do not deepcopy _components, as this will copy the 
             # contained objects
             elif name == '_components':
@@ -283,13 +284,25 @@ class Spanner(music21.Music21Object):
     # as _components is private Stream, unwrap/wrap methods need to override
     # Music21Object to get at these objects 
     # this is the same as with Variants
-    
+
+    def purgeOrphans(self):
+        self._components.purgeOrphans()
+        music21.Music21Object.purgeOrphans(self)
+
+    def purgeLocations(self, rescanIsDead=False):
+        # must override Music21Object to purge locations from the contained
+        # Stream
+        # base method to perform purge on the Sream
+        self._components.purgeLocations(rescanIsDead=rescanIsDead)
+        music21.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
+            
     def unwrapWeakref(self):
         '''Overridden method for unwrapping all Weakrefs.
         '''
         # call base method: this gets defined contexts and active site
         music21.Music21Object.unwrapWeakref(self)
         # for contained objects that have weak refs
+        environLocal.pd(['spanner unwrapping contained stream'])
         self._components.unwrapWeakref()
         # this presently is not a weakref but in case of future changes
 
@@ -455,6 +468,9 @@ class Spanner(music21.Music21Object):
         if common.isNum(old):
             # this must be id(obj), not obj.id
             e = self._components.getElementByObjectId(old)
+            # e here is the old element that was spanned by this Spanner
+            
+
             #environLocal.printDebug(['current Spanner.componentIds()', self.getComponentIds()])
             #environLocal.printDebug(['Spanner.replaceComponent:', 'getElementById result', e, 'old target', old])
             if e is not None:
@@ -465,6 +481,8 @@ class Spanner(music21.Music21Object):
             # do not do all Sites: only care about this one
             self._components.replace(old, new, allTargetSites=False)
             #environLocal.printDebug(['Spanner.replaceComponent:', 'old', e, 'new', new])
+
+        # while this Spanner now has proper elements in its _components Stream, the element replaced likely has a site left-over from its previous Spanner
 
         # always clear cache
         if len(self._cache) > 0:
@@ -821,6 +839,7 @@ class SpannerBundle(object):
         #post = self.__class__() # return a bundle of spanners that had changes
         for sp in self._storage: # Spanners in a list
             #environLocal.printDebug(['looking at spanner', sp, sp.getComponentIds()])
+
             # must check to see if this id is in this spanner
             if idTarget in sp.getComponentIds():
                 sp.replaceComponent(old, new)
