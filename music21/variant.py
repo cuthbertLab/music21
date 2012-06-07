@@ -717,51 +717,51 @@ class Variant(music21.Music21Object):
         ''')
 
 #-------------------------------------------------------------------------------
-class VariantBundle(object):
-    '''A utility object for processing collections of Varaints. 
-
-    This object serves a very similar purpose as the SpannerBundle; Variants and Spanners are similar in design and both require special handling in copying. 
-    '''
-
-    def __init__(self, *arguments, **keywords):
-        self._storage = [] # a simple list, not a Stream
-        for arg in arguments:
-            if common.isListLike(arg):
-                for e in arg:
-                    self._storage.append(e)    
-            # take a Stream and use its .variants property to get all Variants            
-            elif arg.isStream:
-                for e in arg.variants:
-                    self._storage.append(e)
-            # assume its a spanner
-            elif 'Variant' in arg.classes:
-                self._storage.append(arg)
-
-
-    def __len__(self):
-        return len(self._storage)
-
-    def __repr__(self):
-        return '<music21.variant.VariantBundle of size %s>' % self.__len__()
-
-    def replaceElement(self, old, new):
-        '''Given a variant component (an object), replace all old components with new components for all Variant objects contained in this bundle.
-
-        The `old` parameter can be either an object or object id. 
-
-        If no replacements are found, no errors are raised.
-        '''
-        # idTarget is the old id that we want to replace
-        if common.isNum(old): # assume this is an id
-            idTarget = old
-        else:
-            idTarget = id(old)
-
-        # looking at each variant, if we w find that it includes an id to 
-        # an object listed as old, replace it with the object listed as new
-        for v in self._storage: # Variants in a list
-            if idTarget in v.getElementIds():
-                v.replaceElement(old, new)
+# class VariantBundle(object):
+#     '''A utility object for processing collections of Varaints. 
+# 
+#     This object serves a very similar purpose as the SpannerBundle; Variants and Spanners are similar in design and both require special handling in copying. 
+#     '''
+# 
+#     def __init__(self, *arguments, **keywords):
+#         self._storage = [] # a simple list, not a Stream
+#         for arg in arguments:
+#             if common.isListLike(arg):
+#                 for e in arg:
+#                     self._storage.append(e)    
+#             # take a Stream and use its .variants property to get all Variants            
+#             elif arg.isStream:
+#                 for e in arg.variants:
+#                     self._storage.append(e)
+#             # assume its a spanner
+#             elif 'Variant' in arg.classes:
+#                 self._storage.append(arg)
+# 
+# 
+#     def __len__(self):
+#         return len(self._storage)
+# 
+#     def __repr__(self):
+#         return '<music21.variant.VariantBundle of size %s>' % self.__len__()
+# 
+#     def replaceElement(self, old, new):
+#         '''Given a variant component (an object), replace all old components with new components for all Variant objects contained in this bundle.
+# 
+#         The `old` parameter can be either an object or object id. 
+# 
+#         If no replacements are found, no errors are raised.
+#         '''
+#         # idTarget is the old id that we want to replace
+#         if common.isNum(old): # assume this is an id
+#             idTarget = old
+#         else:
+#             idTarget = id(old)
+# 
+#         # looking at each variant, if we w find that it includes an id to 
+#         # an object listed as old, replace it with the object listed as new
+#         for v in self._storage: # Variants in a list
+#             if idTarget in v.getElementIds():
+#                 v.replaceElement(old, new)
 
 
 
@@ -899,19 +899,19 @@ class Test(unittest.TestCase):
 
 
 
-    def testVariantBundleA(self):
-        from music21 import note, stream, variant
-
-        s = stream.Stream()
-        s.repeatAppend(note.Note('G4'), 8)
-        vn1 = note.Note('F#4')
-        vn2 = note.Note('A-4')
-        v1 = variant.Variant([vn1, vn2])
-        s.insert(5, v1)
-
-        vb = s.variantBundle
-        self.assertEqual(str(vb), '<music21.variant.VariantBundle of size 1>')
-        self.assertEqual(len(vb), 1) # has one variant
+#     def testVariantBundleA(self):
+#         from music21 import note, stream, variant
+# 
+#         s = stream.Stream()
+#         s.repeatAppend(note.Note('G4'), 8)
+#         vn1 = note.Note('F#4')
+#         vn2 = note.Note('A-4')
+#         v1 = variant.Variant([vn1, vn2])
+#         s.insert(5, v1)
+# 
+#         vb = s.variantBundle
+#         self.assertEqual(str(vb), '<music21.variant.VariantBundle of size 1>')
+#         self.assertEqual(len(vb), 1) # has one variant
 
 if __name__ == "__main__":
     music21.mainTest(Test)

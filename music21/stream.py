@@ -9804,19 +9804,19 @@ class Stream(music21.Music21Object):
         ''')
 
 
-    def _getVariantBundle(self):
-        from music21 import variant # variant imports Stream
-
-        if ('variantBundle' not in self._cache or 
-            self._cache['variantBundle'] is None):
-            # variants are only gotten for this level of the Stream
-            self._cache['variantBundle'] = variant.VariantBundle(self.variants)
-        return self._cache['variantBundle']
-
-    variantBundle = property(_getVariantBundle, 
-        doc = '''A high-level object for Variant management. This is only a gettable property. Note that only Variants found on this Stream level (not the flat representation) are gathered in the bundle. 
-        ''')
-
+#     def _getVariantBundle(self):
+#         from music21 import variant # variant imports Stream
+# 
+#         if ('variantBundle' not in self._cache or 
+#             self._cache['variantBundle'] is None):
+#             # variants are only gotten for this level of the Stream
+#             self._cache['variantBundle'] = variant.VariantBundle(self.variants)
+#         return self._cache['variantBundle']
+# 
+#     variantBundle = property(_getVariantBundle, 
+#         doc = '''A high-level object for Variant management. This is only a gettable property. Note that only Variants found on this Stream level (not the flat representation) are gathered in the bundle. 
+#         ''')
+# 
 
     def activateVariants(self, group=None, matchBySpan=True, inPlace=False):
         '''For any :class:`~music21.variant.Variant` objects defined in this Stream (or selected by matching the `group` parameter), replace elements defined in the Variant with those in the calling Stream. Elements replaced will be gathered into a new Variant. 
