@@ -9,13 +9,23 @@
 #-------------------------------------------------------------------------------
 
 """
-Methods for exporting music21 data as braille. The most important method, and the only
-one that is needed to translate music into braille, is :meth:`~music21.braille.translate.objectToBraille`.
-This method, as well as the others, accept keyword arguments that serve to modify
-the output. They divide into two categories, although they can all be passed in together.
+Methods for exporting music21 data as braille. 
 
 
-Translate keywords:
+This module was made in consultation with the manual "Introduction to Braille 
+Music Transcription, Second Edition" by Mary Turner De Garmo, 2005. It is
+available from the Library of Congress `here <http://www.loc.gov/nls/music/>`_,
+and will henceforth be referred to as BMTM.
+
+
+The most important method, and the only one that is needed to translate music 
+into braille, is :meth:`~music21.braille.translate.objectToBraille`. This method, 
+as well as the others, accept keyword arguments that serve to modify the output.
+If no keyword arguments are needed, then using the method is equivalent to
+calling :meth:`~music21.base.Music21Object.show` on the music.
+
+
+Keywords:
 
 
 * **inPlace** (False): If False, then :meth:`~music21.stream.Stream.makeNotation` is called
@@ -23,12 +33,16 @@ Translate keywords:
   :class:`~music21.stream.PartStaff` instances. Copies of those objects are then
   used to transcribe the music. If True, the transcription is done "as is." 
   This is useful for strict transcription because sometimes :meth:`~music21.stream.Stream.makeNotation` 
-  introduces some unwanted artifacts in the music.
+  introduces some unwanted artifacts in the music. However, the music needs
+  to be organized into measures for transcription to work.
 * **debug** (False): If True, a braille-english representation of the music is returned. Useful
   for knowing how the music was interpreted by the braille transcriber.
 
 
-Segment keywords:
+The rest of the keywords are segment keywords. A segment is "a group of measures occupying 
+more than one braille line." Music is divided into segments so as to "present the music to 
+the reader in a meaningful manner and to give him convenient reference points to use in 
+memorization" (BMTM, 71). Some of these keywords are changed automatically in context.
 
 
 * **cancelOutgoingKeySig** (True): If True, whenever a key signature change is encountered, the new
@@ -38,7 +52,7 @@ Segment keywords:
   present in the music.
 * **dummyRestLength** (None) For a given positive integer n, adds n "dummy rests" near the beginning 
   of a segment. Designed for test purposes, as the rests are used to demonstrate measure division at 
-  the end of braille lines. 
+  the end of braille lines.
 * **maxLineLength** (40): The maximum amount of braille characters that should be present in a line of braille.
 * **segmentBreaks** ([]): A list consisting of (measure number, offset start) tuples indicating where the
   music should be broken into segments.
@@ -58,14 +72,16 @@ Segment keywords:
 * **slurLongPhraseWithBrackets** (True): If True, then the slur of a long phrase (4+ consecutive notes) is brailled
   using the bracket slur. If False, the double slur is used instead.
 * **suppressOctaveMarks** (True): If True, then all octave marks are suppressed. Designed for test purposes, as
-  octave marks were not presented in the Braille Music Transcription Manual until Chapter 7.
-* **upperFirstInNoteFingering** (True)
+  octave marks were not presented in BMTM until Chapter 7.
+* **upperFirstInNoteFingering** (True): If True, then whenever there is a choice fingering (i.e. 5|4), the upper
+  number is transcribed before the lower number. If False, the reverse is the case.
 """
 
 from music21 import metadata, stream, tinyNotation
 from music21.braille import segment
 import itertools
 import music21
+import re
 import unittest
 
 #-------------------------------------------------------------------------------
@@ -78,6 +94,13 @@ def objectToBraille(music21Obj, **keywords):
     >>> from music21.braille import translate
     >>> from music21 import tinyNotation
     >>> samplePart = tinyNotation.TinyNotationStream("C4 D16 E F G# r4 e2.", "3/4")
+    >>> #_DOCS_SHOW samplePart.show()
+    
+    
+        .. image:: images/objectToBraille.*
+            :width: 700
+
+
     >>> print translate.objectToBraille(samplePart)    
     ⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠸⠹⠵⠋⠛⠩⠓⠧⠀⠐⠏⠄⠣⠅
@@ -136,22 +159,31 @@ def scoreToBraille(music21Score, **keywords):
     """
     allBrailleLines = []
     for music21Metadata in music21Score.getElementsByClass(metadata.Metadata):
-        if music21Metadata.title is not None:
-            allBrailleLines.append(unicode(music21Metadata.title, "utf-8"))
-        if music21Metadata.composer is not None:
-            allBrailleLines.append(unicode(music21Metadata.composer, "utf-8"))
+        allBrailleLines.append(metadataToString(music21Metadata))
     for p in music21Score.getElementsByClass(stream.Part):
         braillePart = partToBraille(p, **keywords)
         allBrailleLines.append(braillePart)            
     return u"\n".join(allBrailleLines)
 
 def metadataToString(music21Metadata):
+    """
+    >>> from music21.braille import translate
+    >>> from music21 import corpus
+    >>> corelli = corpus.parse("corelli")
+    >>> corelli[0].__class__
+    <class 'music21.metadata.Metadata'>
+    >>> print translate.metadataToString(corelli[0])
+    Title: Church Sonatas, Op. 3: Sonata I 
+    Movement Name: [Movement 1]
+    Number: 3
+    Movement Number: 1
+    """
     allBrailleLines = []
-    if music21Metadata.title is not None:
-        allBrailleLines.append(unicode("Title: " + music21Metadata.title, "utf-8"))
-    if music21Metadata.composer is not None:
-        allBrailleLines.append(unicode("Composer: " + music21Metadata.composer, "utf-8"))
-        
+    for key in music21Metadata._workIds:
+        value = music21Metadata._workIds[key]
+        if value is not None:
+            n = u" ".join(re.findall(r"([A-Z]*[a-z]+)", key))
+            allBrailleLines.append("{0}: {1}".format(n.title(), value))  
     return u"\n".join(allBrailleLines)
 
 def opusToBraille(music21Opus, **keywords):
