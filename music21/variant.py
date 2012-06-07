@@ -561,6 +561,16 @@ class Variant(music21.Music21Object):
         self._stream.wrapWeakref()
 
 
+    def freezeIds(self):
+        music21.Music21Object.freezeIds(self)
+        self._stream.freezeIds()
+
+    def unfreezeIds(self):
+        music21.Music21Object.unfreezeIds(self)
+        self._stream.unfreezeIds()
+
+
+
     def __getattr__(self, attr):
         '''This defers all calls not defined in this Class to calls on the privately contained Stream.
         '''

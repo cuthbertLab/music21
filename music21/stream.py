@@ -1955,19 +1955,20 @@ class Stream(music21.Music21Object):
         # this removes all caches
         self._elementsChanged()
 
-        environLocal.printDebug(['calling setupSerializationScaffold()', self])
+        #environLocal.printDebug(['calling setupSerializationScaffold()', self])
         for element in self.elements:
             #if hasattr(element, "elements"): # recurse time:
             if element.isStream:
                 element.setupSerializationScaffold() # recurse
             else:
                 # this is done here for all elements
-                #element.freezeIds()
                 element.unwrapWeakref()
+                element.freezeIds()
+
         # this must be done for all Streams
-        #self.freezeIds()
         # this calls overridden method
         self.unwrapWeakref()
+        self.freezeIds()
 
     def teardownSerializationScaffold(self):
         '''After rebuilding this stream from pickled storage, prepare this as a normal Stream.
@@ -1981,18 +1982,26 @@ class Stream(music21.Music21Object):
         >>> a.setupSerializationScaffold()
         >>> a.teardownSerializationScaffold()
         '''
-        #environLocal.printDebug(['calling teardownSerializationScaffold'])
+        #environLocal.printDebug(['calling teardownSerializationScaffold', self])
+
+        # turn off sorting before teardown
+        storedAutoSort = self.autoSort
+        self.autoSort = False
+
         self._derivation.wrapWeakref()
+        self.unfreezeIds()
         self.wrapWeakref()
-        #self.unfreezeIds()
         for element in self.elements:
             if element.isStream:
                 element.teardownSerializationScaffold()
             else:
-                #environLocal.printDebug(['processing music21 obj', element])
+                #environLocal.printDebug(['   processing music21 obj', element])
+                element.unfreezeIds()
                 element.wrapWeakref()
-                #element.unfreezeIds()
 
+        # restore to whatever it was
+        self.autoSort = storedAutoSort
+        self._elementsChanged()
 
     #---------------------------------------------------------------------------
     # display methods; in the same manner as show() and write()

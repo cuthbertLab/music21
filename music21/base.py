@@ -614,7 +614,7 @@ class DefinedContexts(JSONSerializer):
         '''
         self.purgeLocations(rescanIsDead=True)
 
-        environLocal.pd(['self', self, 'self._definedContexts.keys()', self._definedContexts.keys()])
+        #environLocal.pd(['self', self, 'self._definedContexts.keys()', self._definedContexts.keys()])
         for idKey in self._definedContexts.keys():
             if WEAKREF_ACTIVE:
             #if common.isWeakref(self._definedContexts[idKey]['obj']):
@@ -622,7 +622,6 @@ class DefinedContexts(JSONSerializer):
                 if target is None:
                     continue
                 if common.isWeakref(target):
-                    environLocal.pd(['   target start', target, 'idKey', idKey])            
                     #environLocal.printDebug(['unwrapping:', self._definedContexts[idKey]['obj']])
                     target = common.unwrapWeakref(target)
                     self._definedContexts[idKey]['obj'] = target
@@ -630,7 +629,6 @@ class DefinedContexts(JSONSerializer):
                     # if it is not stored elsewhere
 #                     if target is not None:
 #                         self._definedContexts[idKey]['obj'].unwrapWeakref()
-                    environLocal.pd(['   target end', target, id(target)])            
 
     def wrapWeakref(self):
         '''Wrap all stored objects with weakrefs.
@@ -721,6 +719,10 @@ class DefinedContexts(JSONSerializer):
         True
         '''
         #environLocal.printDebug(['defined context entering unfreeze ids', self._definedContexts])
+
+        # for encoding to serial, this should be done after weakref unwrapping     
+        # for decoding to serial, this should be done before weakref wrapping
+
         post = {}
         postLocationKeys = []
         for idKey in self._definedContexts.keys():
@@ -3151,7 +3153,7 @@ class Music21Object(JSONSerializer):
         >>> aM21Obj.unwrapWeakref()
 
         '''
-        environLocal.printDebug(['Music21Object: unwrapWeakref on:', self])
+        #environLocal.printDebug(['Music21Object: unwrapWeakref on:', self])
 
         self.purgeOrphans()
 
@@ -3207,8 +3209,7 @@ class Music21Object(JSONSerializer):
         >>> oldActiveSiteId == newActiveSiteId
         False
         '''
-        #self._definedContexts.freezeIds()
-
+        self._definedContexts.freezeIds()
         # _activeSite could be a weak ref; may need to manage
         if self._activeSite is not None:
             #environLocal.printDebug(['freezeIds: adjusting _activeSiteId', self._activeSite])
@@ -3239,7 +3240,7 @@ class Music21Object(JSONSerializer):
         True
         '''
         #environLocal.printDebug(['unfreezing ids', self])
-        #self._definedContexts.unfreezeIds()
+        self._definedContexts.unfreezeIds()
 
         if self._activeSite is not None:
             obj = common.unwrapWeakref(self._activeSite)

@@ -175,7 +175,8 @@ class Spanner(music21.Music21Object):
     >>> sp1._components.spannerParent == sp1
     True
     '''
-    isSpanner = True
+    # this class attribute provides performance optimized class selection
+    isSpanner = True 
 
     def __init__(self, *arguments, **keywords):
         music21.Music21Object.__init__(self)
@@ -302,10 +303,9 @@ class Spanner(music21.Music21Object):
         # call base method: this gets defined contexts and active site
         music21.Music21Object.unwrapWeakref(self)
         # for contained objects that have weak refs
-        environLocal.pd(['spanner unwrapping contained stream'])
+        #environLocal.pd(['spanner unwrapping contained stream'])
         self._components.unwrapWeakref()
         # this presently is not a weakref but in case of future changes
-
 
     def wrapWeakref(self):
         '''Overridden method for unwrapping all Weakrefs.
@@ -313,6 +313,16 @@ class Spanner(music21.Music21Object):
         # call base method: this gets defined contexts and active site
         music21.Music21Object.wrapWeakref(self)
         self._components.wrapWeakref()
+
+
+    def freezeIds(self):
+        music21.Music21Object.freezeIds(self)
+        self._components.freezeIds()
+
+    def unfreezeIds(self):
+        music21.Music21Object.unfreezeIds(self)
+        self._components.unfreezeIds()
+
 
     #---------------------------------------------------------------------------
     def __getitem__(self, key):
