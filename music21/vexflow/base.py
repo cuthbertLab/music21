@@ -691,11 +691,8 @@ class VexflowObject(object):
         '''
         Returns the VexFlow code for a single note in the desired display mode
 
-        Currently supported modes:
-            txt: returns the VexFlow code which can be used in conjunction with
-                 other VexFlow code.
-            html: returns standalone HTML code for displaying just this note.
-
+        Currently supported modes are `txt` (returns the VexFlow code which can be used in conjunction with
+        other VexFlow code) and `html` (returns standalone HTML code for displaying just this note.)
 
         >>> from music21 import *
         >>> n = note.Note('C-')
@@ -2040,9 +2037,10 @@ class VexflowContext(object):
 
     def __init__(self, params={}, canvasName = None):
         '''
-        canvasName is the name of the canvas within the html code
-        params is a dictionary containing width, height, and other parameters
-            to be passed to the canvas object
+        `canvasName` is the name of the canvas within the html code.
+        
+        `params` is a dictionary containing width, height, and other parameters
+        to be passed to the canvas object
         '''
         global _UIDCounter
         self.UID = _UIDCounter

@@ -205,6 +205,51 @@ class Repeat(repeat.RepeatMark, Barline):
     >>> rep
     <music21.bar.Repeat direction=end times=3>
 
+    To apply a repeat barline assign it to either the `.leftBarline` or `.rightBarline` attribute
+    of a measure.
+    
+    >>> m = stream.Measure()
+    >>> m.leftBarline = bar.Repeat(direction='start')
+    >>> m.rightBarline = bar.Repeat(direction='end')
+    >>> m.insert(0.0, meter.TimeSignature('4/4'))
+    >>> m.repeatAppend(note.Note('D--5'), 4)
+    >>> p = stream.Part()
+    >>> p.insert(0.0, m)
+    >>> p.show('text')
+    {0.0} <music21.stream.Measure 0 offset=0.0>
+        {0.0} <music21.bar.Repeat direction=start>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.note.Note D-->
+        {1.0} <music21.note.Note D-->
+        {2.0} <music21.note.Note D-->
+        {3.0} <music21.note.Note D-->
+        {4.0} <music21.bar.Repeat direction=end>
+
+    The method :meth:`~music21.stream.Part.expandRepeats` on a 
+    :class:`~music21.stream.Part` object expands the repeats, but
+    does not update measure numbers
+
+
+    >>> q = p.expandRepeats()
+    >>> q.show('text')
+    {0.0} <music21.stream.Measure 0 offset=0.0>
+        {0.0} <music21.bar.Barline style=double>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.note.Note D-->
+        {1.0} <music21.note.Note D-->
+        {2.0} <music21.note.Note D-->
+        {3.0} <music21.note.Note D-->
+        {4.0} <music21.bar.Barline style=double>
+    {4.0} <music21.stream.Measure 0 offset=4.0>
+        {0.0} <music21.bar.Barline style=double>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.note.Note D-->
+        {1.0} <music21.note.Note D-->
+        {2.0} <music21.note.Note D-->
+        {3.0} <music21.note.Note D-->
+        {4.0} <music21.bar.Barline style=double>
+
+
     '''
     _repeatDots = None # not sure what this is for; inherited from old modles
 

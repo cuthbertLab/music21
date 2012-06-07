@@ -13,7 +13,9 @@
 '''
 This module provides the base class for all RepeatMark objects: entities that denote repeats.
 
-Some RepeatMark objects are Expression objects; others are Bar objects. 
+Some RepeatMark objects are Expression objects; others are Bar objects. See for instance,
+:class:`~music21.bar.Repeat` which represents a normal barline repeat.
+
 '''
 import copy
 import doctest, unittest

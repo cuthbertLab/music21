@@ -178,7 +178,7 @@ def approximateNoteSearch(thisStream, otherStreams):
     >>> o2.id = 'o2'
     >>> o3 = converter.parse("c8 d16 e32 FF32 a'8 b-8", "4/4")
     >>> o3.id = 'o3'
-    >>> l = approximateNoteSearch(s, [o1, o2, o3])
+    >>> l = search.approximateNoteSearch(s, [o1, o2, o3])
     >>> for i in l:
     ...    print i.id, i.matchProbability
     o1 0.666666...
@@ -217,7 +217,7 @@ def approximateNoteSearchNoRhythm(thisStream, otherStreams):
     >>> o2.id = 'o2'
     >>> o3 = converter.parse("c4 d e GG CCC r", "4/4")
     >>> o3.id = 'o3'
-    >>> l = approximateNoteSearchNoRhythm(s, [o1, o2, o3])
+    >>> l = search.approximateNoteSearchNoRhythm(s, [o1, o2, o3])
     >>> for i in l:
     ...    print i.id, i.matchProbability
     o1 0.83333333...
@@ -255,7 +255,7 @@ def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
     >>> o2.id = 'o2'
     >>> o3 = converter.parse("c4 d e GG CCC r", "4/4")
     >>> o3.id = 'o3'
-    >>> l = approximateNoteSearchOnlyRhythm(s, [o1, o2, o3])
+    >>> l = search.approximateNoteSearchOnlyRhythm(s, [o1, o2, o3])
     >>> for i in l:
     ...    print i.id, i.matchProbability
     o1 0.5
@@ -294,7 +294,7 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
     >>> o3.id = 'o3'
     >>> o4 = converter.parse("c1 d1 e1 FF1 a'1 b-1", "4/4")
     >>> o4.id = 'o4'
-    >>> l = approximateNoteSearchWeighted(s, [o1, o2, o3, o4])
+    >>> l = search.approximateNoteSearchWeighted(s, [o1, o2, o3, o4])
     >>> for i in l:
     ...    print i.id, i.matchProbability
     o3 0.83333...
@@ -327,15 +327,15 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
 
 def translateStreamToString(inputStream):
     '''
-    takes a stream of notes only and returns
+    takes a stream of notesAndRests only and returns
     a string for searching on.
     
     >>> from music21 import *
-    >>> s = converter.parse("c4 d8 e16 FF8. a'8 b-2.", "3/4")
-    >>> sn = s.flat.notes
-    >>> streamString = translateStreamToString(sn)
+    >>> s = converter.parse("c4 d8 r16 FF8. a'8 b-2.", "3/4")
+    >>> sn = s.flat.notesAndRests
+    >>> streamString = search.translateStreamToString(sn)
     >>> print streamString
-    <P>F@<)KQFF_
+    <P>F<)KQFF_
     >>> len(streamString)  
     12
     '''
@@ -347,13 +347,13 @@ def translateStreamToString(inputStream):
 
 def translateStreamToStringNoRhythm(inputStream):
     '''
-    takes a stream of notes only and returns
+    takes a stream of notesAndRests only and returns
     a string for searching on.
     
     >>> from music21 import *
     >>> s = converter.parse("c4 d e FF a' b-", "4/4")
-    >>> sn = s.flat.notes
-    >>> translateStreamToStringNoRhythm(sn)
+    >>> sn = s.flat.notesAndRests
+    >>> search.translateStreamToStringNoRhythm(sn)
     '<>@)QF'
     '''
     b = ''
@@ -364,13 +364,13 @@ def translateStreamToStringNoRhythm(inputStream):
   
 def translateStreamToStringOnlyRhythm(inputStream):
     '''
-    takes a stream of notes only and returns
+    takes a stream of notesAndRests only and returns
     a string for searching on.
     
     >>> from music21 import *
     >>> s = converter.parse("c4 d8 e16 FF8. a'8 b-2.", "3/4")
-    >>> sn = s.flat.notes
-    >>> streamString = translateStreamToStringOnlyRhythm(sn)
+    >>> sn = s.flat.notesAndRests
+    >>> streamString = search.translateStreamToStringOnlyRhythm(sn)
     >>> print streamString
     PF<KF_
     >>> len(streamString)  
@@ -391,9 +391,9 @@ def translateNoteToByte(n):
 
     >>> from music21 import *
     >>> n = note.Note("C4")
-    >>> translateNoteToByte(n)
+    >>> search.translateNoteToByte(n)
     '<'
-    >>> ord(translateNoteToByte(n)) == n.midi
+    >>> ord(search.translateNoteToByte(n)) == n.midi
     True
 
 
@@ -418,7 +418,7 @@ def translateNoteWithDurationToBytes(n):
     >>> from music21 import *
     >>> n = note.Note("C4")
     >>> n.duration.quarterLength = 3  # dotted half
-    >>> trans = translateNoteWithDurationToBytes(n)
+    >>> trans = search.translateNoteWithDurationToBytes(n)
     >>> trans
     '<_'
     >>> (2**(ord(trans[1])/10.0))/256  # approximately 3
@@ -445,7 +445,7 @@ def translateDurationToBytes(n):
     >>> from music21 import *
     >>> n = note.Note("C4")
     >>> n.duration.quarterLength = 3  # dotted half
-    >>> trans = translateDurationToBytes(n)
+    >>> trans = search.translateDurationToBytes(n)
     >>> trans
     '_'
     >>> (2**(ord(trans[0])/10.0))/256  # approximately 3

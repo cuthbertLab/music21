@@ -4089,9 +4089,17 @@ class Stream(music21.Music21Object):
         >>> from music21 import *
 
         >>> a = stream.Stream()
-        >>> n = note.Note()
+        >>> n = note.Note('D--')
         >>> n.duration.type = "whole"
         >>> a.repeatAppend(n, 10)
+        >>> a.show('text')
+        {0.0} <music21.note.Note D-->
+        {4.0} <music21.note.Note D-->
+        {8.0} <music21.note.Note D-->
+        {12.0} <music21.note.Note D-->
+        ...
+        {36.0} <music21.note.Note D-->
+        
         >>> a.duration.quarterLength
         40.0
         >>> a[9].offset
@@ -7167,7 +7175,7 @@ class Stream(music21.Music21Object):
             return 0.0
 #        #take the case where a whole note appears a 0.0, but a textExpression (ql=0) at 0.25 -- isSorted would be true, but highestTime should be 4.0 not 0.25
         else:
-            max = 0
+            max = 0.0
             # TODO: this may not be the fastest way to do this
             for e in self._elements:
                 try:
@@ -7198,9 +7206,12 @@ class Stream(music21.Music21Object):
 
 
         >>> from music21 import *
+        >>> p1 = stream.Stream()
+        >>> p1.highestTime
+        0.0
+
         >>> n = note.Note('A-')
         >>> n.quarterLength = 3
-        >>> p1 = stream.Stream()
         >>> p1.insert(0, n)
         >>> p1.highestTime
         3.0
@@ -7975,9 +7986,17 @@ class Stream(music21.Music21Object):
             return returnStream
 
     def expandRepeats(self, copySpanners=True):
-        '''Expand this Stream with repeats. Nested repeats given with :class:`~music21.bar.Repeat` objects, or repeats and sections designated with :class:`~music21.repeat.RepeatExpression` objects, are all expanded.
+        '''Expand this Stream with repeats. Nested repeats 
+        given with :class:`~music21.bar.Repeat` objects, or 
+        repeats and sections designated with 
+        :class:`~music21.repeat.RepeatExpression` objects, are all expanded.
 
-        This method always returns a new Stream, with deepcopies of all contained elements at all levels.
+        This method always returns a new Stream, with 
+        deepcopies of all contained elements at all levels.
+
+        Uses the :class:`~music21.repeat.Expander` object in the `repeat` module.
+        
+        TODO: DOC TEST
         '''
         if not self.hasMeasures():
             raise StreamException('cannot process repeats on Stream that does not contian measures')
