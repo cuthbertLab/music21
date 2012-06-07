@@ -141,7 +141,7 @@ class Test(unittest.TestCase):
     
         data = converter.freezeStr(s, fmt='pickle')
         sPost = converter.unfreezeStr(data)
-        self.assertEqual(len(s.notes), 5)
+        self.assertEqual(len(sPost.notes), 5)
         #sPost.show()
 
 
