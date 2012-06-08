@@ -1938,7 +1938,6 @@ class Stream(music21.Music21Object):
 #             post = common.wrapWeakref(objRef)
 #             self.flattenedRepresentationOf = post
 
-
     def setupSerializationScaffold(self):
         '''Prepare this stream and all of its contents for pickling, that
         is, serializing and storing an object representation on disk.
@@ -1989,8 +1988,10 @@ class Stream(music21.Music21Object):
         self.autoSort = False
 
         self._derivation.wrapWeakref()
+
         self.unfreezeIds()
         self.wrapWeakref()
+
         for element in self.elements:
             if element.isStream:
                 element.teardownSerializationScaffold()

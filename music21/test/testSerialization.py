@@ -144,6 +144,35 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sPost.notes), 5)
         #sPost.show()
 
+    def testBasicG(self):
+        from music21 import stream, note, converter, spanner
+        
+        s = stream.Score()
+        s.repeatAppend(note.Note('G4'), 5)
+        for i, syl in enumerate(['se-', 'ri-', 'al-', 'iz-', 'ing']):
+            s.notes[i].addLyric(syl)
+        s.append(spanner.Slur(s.notes[0], s.notes[-1]))
+            
+        data = converter.freezeStr(s, fmt='jsonpickle')
+        #print data
+        sPost = converter.unfreezeStr(data)
+        self.assertEqual(len(sPost.notes), 5)
+        #sPost.show()
+
+
+    def testBasicH(self):
+        from music21 import stream, note, corpus, converter
+        s = corpus.parse('bwv66.6')
+
+        temp = converter.freezeStr(s, fmt='jsonpickle')        
+        sPost = converter.unfreezeStr(temp)
+        #sPost.show()
+        self.assertEqual(len(s.flat.notes), len(sPost.flat.notes))
+
+        self.assertEqual(len(s.parts[0].notes), len(sPost.parts[0].notes))
+
+        #sPost.show()
+
 
 #------------------------------------------------------------------------------
 

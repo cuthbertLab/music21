@@ -394,14 +394,10 @@ class StreamFreezer(object):
         return out
 
 
-    def _parseOpenFmt(self, fp):
+    def _parseOpenFmt(self, storage):
         '''Look at the file and determine the format
         '''
-        f = open(fp, 'r')
-        storage = f.read() # TODO: do not read entire file
-        f.close()
-
-        if storage.startswith('{"m21Version"'):
+        if storage.startswith('{"m21Version": {"py/tuple"'):
             return 'jsonpickle'
         else:
             return 'pickle'
@@ -416,8 +412,11 @@ class StreamFreezer(object):
             dir = environLocal.getRootTempDir()
             fp = os.path.join(dir, fp)
 
-        fmt = self._parseOpenFmt(fp)
+        f = open(fp, 'r')
+        fileData = f.read() # TODO: do not read entire file
+        f.close()
 
+        fmt = self._parseOpenFmt(fileData)
         if fmt == 'pickle':
             #environLocal.printDebug(['opening fp', fp])
             f = open(fp, 'rb')
@@ -434,10 +433,20 @@ class StreamFreezer(object):
 
         self.stream = self._unpackStream(storage)
 
-    def openStr(self, fileLike):
+
+    def openStr(self, fileData):
         '''Open a String as a pickle
         '''
-        storage = pickleMod.loads(fileLike)
+        fmt = self._parseOpenFmt(fileData)
+
+        if fmt == 'pickle':
+            storage = pickleMod.loads(fileData)
+        elif fmt == 'jsonpickle':
+            import jsonpickle
+            storage = jsonpickle.decode(fileData)
+        else:
+            raise ConverterException('bad StreamFreezer format: %s' % fmt)
+
         self.stream = self._unpackStream(storage)
 
 

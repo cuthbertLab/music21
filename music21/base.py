@@ -51,7 +51,7 @@ import json
 import sys
 import types
 import unittest, doctest
-import uuid
+#import uuid
 import inspect
 
 #-------------------------------------------------------------------------------
@@ -674,10 +674,11 @@ class DefinedContexts(JSONSerializer):
         # need to store self._locationKeys as well
         post = {}
         postLocationKeys = []
+        counter = common.SingletonCounter()
+
         for idKey in self._definedContexts.keys():
-            # make a random UUID
             if idKey is not None:
-                newKey = uuid.uuid4()
+                newKey = counter() # uuid.uuid4()
             else:
                 newKey = idKey # keep None
             # might want to store old id?
@@ -688,6 +689,10 @@ class DefinedContexts(JSONSerializer):
         self._definedContexts = post
         self._locationKeys = postLocationKeys
         #environLocal.printDebug(['post freezeids', self._definedContexts])
+
+        # clear this for setting later
+        self.containedById = counter()
+        self._lastID = -1 # set to inactive
 
     def unfreezeIds(self):
         '''Restore keys to be the id() of the object they contain.
@@ -2970,7 +2975,9 @@ class Music21Object(JSONSerializer):
         elif self._activeSiteId is not None:
             activeSiteId = self._activeSiteId
         
-        if activeSiteId is not None and self._definedContexts.hasSiteId(activeSiteId):
+        if (activeSiteId is not None and 
+            self._definedContexts.hasSiteId(activeSiteId)):
+
         # if activeSiteId is not None and activeSiteId in self._definedContexts.coordinates:
             return self._definedContexts.getOffsetBySiteId(activeSiteId)
             #return self._definedContexts.coordinates[activeSiteId]['offset']
@@ -2979,7 +2986,8 @@ class Music21Object(JSONSerializer):
         else:
             # try to look for it in all objects
             environLocal.printDebug(['doing a manual activeSite search: probably means that id(self.activeSite) (%s) is not equal to self._activeSiteId (%s)' % (id(self.activeSite), self._activeSiteId)])
-            offset = self._definedContexts.getOffsetByObjectMatch(self.activeSite)
+            offset = self._definedContexts.getOffsetByObjectMatch(
+                    self.activeSite)
             return offset
 
             environLocal.printDebug(['self._definedContexts', self._definedContexts._definedContexts])
@@ -3185,10 +3193,6 @@ class Music21Object(JSONSerializer):
         # through global WEAKREF_ACTIVE setting
         self._activeSite = common.wrapWeakref(self._activeSite)
         # this is done both here and in unfreezeIds()
-        # not sure if both are necesary
-        if self._activeSite is not None:
-            obj = common.unwrapWeakref(self._activeSite)
-            self._activeSiteId = id(obj)
 
 
     def freezeIds(self):
@@ -3209,11 +3213,11 @@ class Music21Object(JSONSerializer):
         >>> oldActiveSiteId == newActiveSiteId
         False
         '''
+        counter = common.SingletonCounter()
+
         self._definedContexts.freezeIds()
         # _activeSite could be a weak ref; may need to manage
-        if self._activeSite is not None:
-            #environLocal.printDebug(['freezeIds: adjusting _activeSiteId', self._activeSite])
-            self._activeSiteId = uuid.uuid4() # a place holder
+        self._activeSiteId = None # uuid.uuid4() # a place holder
         self._idLastDeepCopyOf = None # clear
 
 
@@ -3242,10 +3246,14 @@ class Music21Object(JSONSerializer):
         #environLocal.printDebug(['unfreezing ids', self])
         self._definedContexts.unfreezeIds()
 
+        # restore contained by ide
+        self._definedContexts.containedById = id(self)
+
+        # assuming should be called before wrapping weakrefs
         if self._activeSite is not None:
+            # this should not be necessary
             obj = common.unwrapWeakref(self._activeSite)
             self._activeSiteId = id(obj)
-
 
 
 

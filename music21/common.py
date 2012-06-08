@@ -1922,6 +1922,24 @@ def stripAccents(inputString):
     #    return inputString
 
 
+
+#-------------------------------------------------------------------------------
+_singletonCounter = {}
+_singletonCounter['value'] = 0
+
+class SingletonCounter(object):
+    '''A simple counter that can produce unique numbers regardless of how many instances exist. 
+    '''
+    def __init__(self):
+        pass
+
+    def __call__(self):
+        post = _singletonCounter['value']
+        _singletonCounter['value'] += 1
+        return post
+
+
+
 #-------------------------------------------------------------------------------
 class Iterator(object):
     '''A simple Iterator object used to handle iteration of Streams and other 
