@@ -1201,9 +1201,34 @@ def parse(value, *args, **keywords):
 def freeze(streamObj, fmt=None, fp=None):
     '''Given a StreamObject and a file path, pickle and store the Stream to a file.
 
+    fmt can be 'pickle', 'jsonpickle' or 'jsonnative' at present.  See docs for the
+    :class:`~music21.converter.StreamFreezer` object. 
+
     If no file path is given, a temporary file is used.
 
     The file path is returned.
+    
+    >>> from music21 import *
+    >>> c = converter.parse('c4 d e f', '4/4')
+    >>> c.show('text')
+    {0.0} <music21.meter.TimeSignature 4/4>
+    {0.0} <music21.note.Note C>
+    {1.0} <music21.note.Note D>
+    {2.0} <music21.note.Note E>
+    {3.0} <music21.note.Note F>
+    >>> fp = converter.freeze(c, fmt='pickle')
+    >>> #_DOCS_SHOW fp
+    '/tmp/music21/sjiwoe.p'
+
+    The file can then be "defrosted" back into a Stream using the `unfreeze` method.
+
+    >>> d = converter.unfreeze(fp)
+    >>> d.show('text')
+    {0.0} <music21.meter.TimeSignature 4/4>
+    {0.0} <music21.note.Note C>
+    {1.0} <music21.note.Note D>
+    {2.0} <music21.note.Note E>
+    {3.0} <music21.note.Note F>
     '''
     v = StreamFreezer(streamObj)
     return v.write(fmt=fmt, fp=fp) # returns fp
@@ -1211,6 +1236,10 @@ def freeze(streamObj, fmt=None, fp=None):
 
 def unfreeze(fp):
     '''Given a file path of a pickled Stream, attempt to parse the file into a Stream.
+    
+    Uses the :class:`~music21.converter.StreamFreezer` object. 
+    
+    See the documentation for :meth:`~music21.converter.freeze` for demos.
     '''
     v = StreamFreezer()
     v.open(fp)
