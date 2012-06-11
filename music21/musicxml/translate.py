@@ -2600,7 +2600,16 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
 
     #n.pitch.mx = mxNote # required info will be taken from entire note
     mxToPitch(mxNote, n.pitch)
-    #n.duration.mx = mxNote
+
+    if mxGrace is not None:
+        #environLocal.pd(['mxGrace', mxGrace, mxNote, n.duration])
+        # in some casses grace notes may not have an assigned duration type
+        # this default type is set here, before assigning to n.duration
+        if mxNote.type is None:
+            #environLocal.pd(['mxToNote', 'mxNote that is a grace missing duration type'])
+            mxNote.type = 'eighth'    
+
+    # the n.duration object here will be configured based on mxNote
     mxToDuration(mxNote, n.duration)
     n.beams.mx = mxNote.beamList
     
