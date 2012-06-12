@@ -91,6 +91,14 @@ from music21 import environment
 _MOD = 'converter.py'
 environLocal = environment.Environment(_MOD)
 
+
+try:
+    import jsonpickle
+except ImportError:
+    pass
+
+
+
 #-------------------------------------------------------------------------------
 class ArchiveManagerException(Exception):
     pass
@@ -362,7 +370,6 @@ class StreamFreezer(object):
             pickleMod.dump(storage, f, protocol=-1)
             f.close()
         elif fmt == 'jsonpickle':
-            import jsonpickle
             data = jsonpickle.encode(storage)
             f = open(fp, 'w') 
             f.write(data)
@@ -384,7 +391,6 @@ class StreamFreezer(object):
         if fmt == 'pickle':
             out = pickleMod.dumps(storage, protocol=-1)
         elif fmt == 'jsonpickle':
-            import jsonpickle
             out = jsonpickle.encode(storage)
         else:
             raise ConverterException('bad StreamFreezer format: %s' % fmt)
@@ -423,7 +429,6 @@ class StreamFreezer(object):
             storage = pickleMod.load(f)
             f.close()
         elif fmt == 'jsonpickle':
-            import jsonpickle
             f = open(fp, 'r')
             data = f.read()
             f.close()
@@ -442,7 +447,6 @@ class StreamFreezer(object):
         if fmt == 'pickle':
             storage = pickleMod.loads(fileData)
         elif fmt == 'jsonpickle':
-            import jsonpickle
             storage = jsonpickle.decode(fileData)
         else:
             raise ConverterException('bad StreamFreezer format: %s' % fmt)
