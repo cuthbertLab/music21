@@ -122,6 +122,7 @@ Module Reference
    moduleTempo
    moduleText
    moduleTinyNotation
+   moduleDemosTheoryAnalysisTheoryAnalyzer
    moduleTrecentoPolyphonicSnippet
    moduleVexflowBase
    moduleVoiceLeading
