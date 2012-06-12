@@ -1158,8 +1158,7 @@ class Pitch(music21.Music21Object):
     
     '''
     # define order to present names in documentation; use strings
-    _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi', 'german', 'french', 'spanish', 'italian']
-
+    _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi', 'german', 'french', 'spanish', 'italian','dutch']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
     }
@@ -2333,6 +2332,55 @@ class Pitch(music21.Music21Object):
         >>> print pitch.Pitch('B#').german
         His
     ''')
+    
+    def _getDutch(self):
+        if self.accidental is not None:
+            tempAlter = self.accidental.alter
+        else:
+            tempAlter = 0
+        tempStep = self.step
+        if tempAlter != int(tempAlter):
+            raise PitchException('Quarter-tones not supported')
+        else:
+            tempAlter = int(tempAlter)
+        if tempAlter == 0:
+            return tempStep
+        if tempAlter > 0:
+            return tempStep + (tempAlter * 'is')
+        else:
+            if tempStep in ['C','D','F','G','B']:
+                firstFlatName = 'es'
+            else:
+                firstFlatName = 's'
+            multipleFlats = abs(tempAlter) - 1
+            return tempStep + firstFlatName + (multipleFlats * 'es')
+        
+    dutch = property(_getDutch,
+                      doc ='''
+        Read-only attribute. Returns the name 
+        of a Pitch in the German system 
+        (where B-flat = B, B = H, etc.)
+        (Microtones and Quartertones raise an error).
+        
+        
+        >>> from music21 import *
+        >>> print pitch.Pitch('B-').dutch
+        Bes
+        >>> print pitch.Pitch('B').dutch
+        B
+        >>> print pitch.Pitch('E-').dutch
+        Es
+        >>> print pitch.Pitch('C#').dutch
+        Cis
+        >>> print pitch.Pitch('A--').dutch
+        Ases
+        >>> p1 = pitch.Pitch('C')
+        >>> p1.accidental = pitch.Accidental('half-sharp')
+        >>> p1.dutch
+        Traceback (most recent call last):
+        PitchException: Quarter-tones not supported
+    ''')
+        
     
     def _getItalian(self):
         if self.accidental is not None:
