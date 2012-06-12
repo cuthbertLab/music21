@@ -87,15 +87,14 @@ from music21.romanText import translate as romanTextTranslate
 
 from music21.noteworthy import translate as noteworthyTranslate
 
+# the jsonpickle is provided as an extension
+from music21.ext import jsonpickle
+
 from music21 import environment
 _MOD = 'converter.py'
 environLocal = environment.Environment(_MOD)
 
 
-try:
-    import jsonpickle
-except ImportError:
-    pass
 
 
 
