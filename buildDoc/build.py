@@ -131,6 +131,7 @@ from music21 import tinyNotation
 from music21.trecento import cadencebook as trecentoCadencebook
 from music21.trecento import polyphonicSnippet as trecentoPolyphonicSnippet
 
+from music21 import variant
 from music21.vexflow import base as vexflow
 from music21 import voiceLeading
 from music21 import volume
@@ -271,6 +272,7 @@ MODULES = [
     #    trecentoCadencebook
     trecentoPolyphonicSnippet,
 
+    variant,
     vexflow,
     voiceLeading,
     volume,

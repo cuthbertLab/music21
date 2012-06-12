@@ -1158,7 +1158,7 @@ class Pitch(music21.Music21Object):
     
     '''
     # define order to present names in documentation; use strings
-    _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi', 'french', 'german', 'italian', 'spanish']
+    _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi', 'german', 'french', 'spanish', 'italian']
 
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {

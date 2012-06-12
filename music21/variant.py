@@ -17,7 +17,6 @@ this time.
 '''
 
 import unittest
-import copy
 
 import music21
 import copy
@@ -170,8 +169,8 @@ def mergeVariantStreams(streams, variantNames, inPlace = False):
     .. image:: images/variant_measuresAndParts.*
         :width: 600
     
-    >>> for p in mergedStreams.getElementsByClass(stream.Part):
-    ...    for m in p.getElementsByClass(stream.Measure):
+    >>> for p in mergedStreams.getElementsByClass('Part'):
+    ...    for m in p.getElementsByClass('Measure'):
     ...        m.activateVariants('paris', inPlace = True)
     >>> mergedStreams.show('t')
     {0.0} <music21.stream.Part ...>
@@ -226,7 +225,7 @@ def mergeVariantStreams(streams, variantNames, inPlace = False):
     VariantException: _mergeVariants cannot merge streams which are of different lengths
     '''
     
-    if inPlace == True:
+    if inPlace is True:
         returnObj = streams[0]
     else:
         returnObj = copy.deepcopy(streams[0])
@@ -242,24 +241,29 @@ def mergeVariantStreams(streams, variantNames, inPlace = False):
     for s,variantName in zipped[1:]:
         if returnObj.highestTime != s.highestTime:
             raise VariantException('cannot merge streams of different lengths')
-     
 
-        if returnObj.getElementsByClass(stream.Part).elements != [] : # If parts exist, iterate through them.
-            for i in range(len(returnObj.getElementsByClass(stream.Part).elements)):
-                returnObjPart = returnObj.getElementsByClass(stream.Part).elements[i]
-                sPart = s.getElementsByClass(stream.Part).elements[i]
-                if returnObjPart.getElementsByClass(stream.Measure).elements != []: # If measures exist and parts exist, iterate through them both.
-                    for j in range(len(returnObjPart.getElementsByClass(stream.Measure).elements)):
-                        returnObjMeasure = returnObjPart.getElementsByClass(stream.Measure).elements[j]
-                        sMeasure = sPart.getElementsByClass(stream.Measure).elements[j]
+        returnObjParts = returnObj.getElementsByClass('Part')
+        if len(returnObjParts) != 0: # If parts exist, iterate through them.
+            sParts = s.getElementsByClass('Part')
+            for i in range(len(returnObjParts)):
+                returnObjPart = returnObjParts[i]
+                sPart = sParts[i]
+                
+                returnObjMeasures = returnObjPart.getElementsByClass('Measure')
+                if len(returnObjMeasures) != 0: # If measures exist and parts exist, iterate through them both.
+                    for j in range(len(returnObjMeasures)):
+                        returnObjMeasure = returnObjMeasures[j]
+                        sMeasure = sPart.getElementsByClass('Measure')[j]
                         _mergeVariants(returnObjMeasure,sMeasure,variantName = variantName, inPlace = True)
+                
                 else: # If parts exist but no measures.
                     _mergeVariants(returnObjPart,sPart,variantName = variantName, inPlace = True)
         else:
-            if returnObj.getElementsByClass(stream.Measure).elements != []: #If no parts, but still measures, iterate through them.
-                for j in range(len(returnObj.getElementsByClass(stream.Measure).elements)):
-                    returnObjMeasure = returnObj.getElementsByClass(stream.Measure).elements[j]
-                    sMeasure = s.getElementsByClass(stream.Measure).elements[j]
+            returnObjMeasures = returnObj.getElementsByClass('Measure')
+            if len(returnObjMeasures) != 0: #If no parts, but still measures, iterate through them.
+                for j in range(len(returnObjMeasures)):
+                    returnObjMeasure = returnObjMeasures[j]
+                    sMeasure = s.getElementsByClass('Measure')[j]
                     _mergeVariants(returnObjMeasure,sMeasure, variantName = variantName, inPlace = True)
             else: # If no parts and no measures.
                 _mergeVariants(returnObj,s,variantName = variantName, inPlace = True)
@@ -336,16 +340,16 @@ def _mergeVariants(streamA, streamB, containsVariants = False, variantName = Non
     VariantException: _mergeVariants cannot merge streams which are of different lengths
     '''
     # TODO: Add the feature for merging a stream to a stream with existing variants (it has to compare against both the stream and the contained variant)
-    if (streamA.getElementsByClass(stream.Measure).elements != []) or \
-    (streamA.getElementsByClass(stream.Part).elements != []) or \
-    (streamB.getElementsByClass(stream.Measure).elements != []) or \
-    (streamB.getElementsByClass(stream.Part).elements != []):
+    if (len(streamA.getElementsByClass('Measure')) is not 0) or \
+    (len(streamA.getElementsByClass('Part')) is not 0) or \
+    (len(streamB.getElementsByClass('Measure')) is not 0) or \
+    (len(streamB.getElementsByClass('Part')) is not 0):
         raise VariantException('_mergeVariants cannot merge streams which contain measures or parts.')
     
     if streamA.highestTime != streamB.highestTime:
         raise VariantException('_mergeVariants cannot merge streams which are of different lengths')
     
-    if inPlace == True:
+    if inPlace is True:
         returnObj = streamA
     else:
         returnObj = copy.deepcopy(streamA)
@@ -362,7 +366,7 @@ def _mergeVariants(streamA, streamB, containsVariants = False, variantName = Non
             break
         if streamAnotes[i].getOffsetBySite(streamA.flat) == streamBnotes[j].getOffsetBySite(streamB.flat): # Comparing Notes at same offset TODO: Will not work until __eq__ overwritten for Generalized Notes
             if streamAnotes[i] != streamBnotes[j]: # If notes are different, start variant if not started and append note.
-                if inVariant == False:
+                if inVariant is False:
                     variantStart = streamBnotes[j].getOffsetBySite(streamB.flat)
                     inVariant = True
                     noteBuffer = []
@@ -370,7 +374,7 @@ def _mergeVariants(streamA, streamB, containsVariants = False, variantName = Non
                 else:
                     noteBuffer.append(streamBnotes[j])
             else: # If notes are the same, end and insert variant if in variant. 
-                if inVariant == True:
+                if inVariant is True:
                     returnObj.insert(variantStart,_generateVariant(noteBuffer,streamB,variantStart,variantName))
                     inVariant = False
                     noteBuffer = []
@@ -382,7 +386,7 @@ def _mergeVariants(streamA, streamB, containsVariants = False, variantName = Non
             continue
                 
         elif streamAnotes[i].getOffsetBySite(streamA.flat) > streamBnotes[j].getOffsetBySite(streamB.flat):
-            if inVariant == False:
+            if inVariant is False:
                 variantStart = streamBnotes[j].getOffsetBySite(streamB.flat)
                 noteBuffer = []
                 noteBuffer.append(streamBnotes[j])
@@ -396,12 +400,12 @@ def _mergeVariants(streamA, streamB, containsVariants = False, variantName = Non
             i += 1
             continue
     
-    if inVariant == True: #insert final variant if exists
+    if inVariant is True: #insert final variant if exists
         returnObj.insert(variantStart,_generateVariant(noteBuffer,streamB,variantStart,variantName))
         inVariant = False
         noteBuffer = []
     
-    if inPlace == True:
+    if inPlace is True:
         return None
     else:
         return returnObj

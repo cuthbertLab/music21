@@ -124,6 +124,7 @@ Module Reference
    moduleTinyNotation
    moduleDemosTheoryAnalysisTheoryAnalyzer
    moduleTrecentoPolyphonicSnippet
+   moduleVariant
    moduleVexflowBase
    moduleVoiceLeading
    moduleVolume
@@ -140,5 +141,3 @@ Developer Reference
    documenting
    buildingDocumentation
    usingEclipse
-
-
