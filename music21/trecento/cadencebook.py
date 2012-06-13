@@ -31,8 +31,7 @@ from music21 import metadata
 from music21 import meter
 from music21 import note
 
-from music21.trecento import xlrd
-from music21.trecento.xlrd import sheet # may not be necessary
+from music21.ext import xlrd
 from music21.trecento import trecentoCadence
 from music21.trecento import polyphonicSnippet
 from music21.trecento.polyphonicSnippet import *

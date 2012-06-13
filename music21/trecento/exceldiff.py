@@ -2,7 +2,7 @@
 
 import sys
 
-from music21.trecento import xlrd
+from music21.ext import xlrd
 
 sys.path.append('/mit/cuthbert/www/music21')
 

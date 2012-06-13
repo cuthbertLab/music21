@@ -224,6 +224,7 @@ class Repeat(repeat.RepeatMark, Barline):
         {2.0} <music21.note.Note D-->
         {3.0} <music21.note.Note D-->
         {4.0} <music21.bar.Repeat direction=end>
+    >>> p.write(fp='d:/desktop/testRepeat.xml')
 
     The method :meth:`~music21.stream.Part.expandRepeats` on a 
     :class:`~music21.stream.Part` object expands the repeats, but
@@ -253,7 +254,12 @@ class Repeat(repeat.RepeatMark, Barline):
     '''
     _repeatDots = None # not sure what this is for; inherited from old modles
 
-    def __init__(self, style='light-heavy', direction='start', times=None):
+    def __init__(self, direction='start', times=None):
+        if direction == 'start':
+            style = 'heavy-light'
+        else:
+            style = 'light-heavy'
+        
         Barline.__init__(self, style=style)
 
         self._direction = None # either start or end
