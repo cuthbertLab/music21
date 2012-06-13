@@ -173,6 +173,68 @@ class Test(unittest.TestCase):
 
         #sPost.show()
 
+    def testBasicJ(self):
+        from music21 import stream, note, converter
+
+        p1 = stream.Part()
+        for m in range(3):
+            m = stream.Measure()
+            for n in range(4):
+                m.append(note.Note('C4'))
+            p1.append(m)
+
+        p2 = stream.Part()
+        for m in range(3):
+            m = stream.Measure()
+            for n in range(4):
+                m.append(note.Note('G4'))
+            p2.append(m)
+
+        s = stream.Score()
+        s.insert(0, p1)
+        s.insert(0, p2)
+        #s.show()
+
+        temp = converter.freezeStr(s, fmt='pickle')        
+        sPost = converter.unfreezeStr(temp)
+        self.assertEqual(len(sPost.parts), 2)
+        self.assertEqual(len(sPost.parts[0].getElementsByClass('Measure')), 3)
+        self.assertEqual(len(sPost.parts[1].getElementsByClass('Measure')), 3)
+        self.assertEqual(len(sPost.flat.notes), 24)
+
+
+    def testBasicI(self):
+        from music21 import stream, note, converter
+
+        p1 = stream.Part()
+        p1.repeatAppend(note.Note('C4'), 12)
+        p1.makeMeasures(inPlace = True)
+        p2 = stream.Part()
+        p2.repeatAppend(note.Note('G4'), 12)
+        p2.makeMeasures(inPlace = True)
+        s = stream.Score()
+        s.insert(0, p1)
+        s.insert(0, p2)
+        #s.show()
+
+        temp = converter.freezeStr(s, fmt='pickle')        
+        sPost = converter.unfreezeStr(temp)
+        self.assertEqual(len(sPost.parts), 2)
+        self.assertEqual(len(sPost.parts[0].getElementsByClass('Measure')), 3)
+        self.assertEqual(len(sPost.parts[1].getElementsByClass('Measure')), 3)
+        self.assertEqual(len(sPost.flat.notes), 24)
+
+
+
+
+    def xtestBasicK(self):
+        # this fails due to finding a weakref
+        from music21 import corpus, converter
+        s = corpus.parse('beethoven/opus133')
+        data = converter.freezeStr(s, fmt='pickle')
+
+
+
 
 #------------------------------------------------------------------------------
 

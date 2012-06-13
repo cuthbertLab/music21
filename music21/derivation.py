@@ -120,7 +120,6 @@ class Derivation(music21.JSONSerializer):
         self._container = post
         #environLocal.pd(['derivation post unwrap: self._container', self._container])
 
-
     def wrapWeakref(self):
         '''Wrap all stored objects with weakrefs.
         '''

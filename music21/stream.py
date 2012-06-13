@@ -1918,10 +1918,10 @@ class Stream(music21.Music21Object):
     def unwrapWeakref(self):
         '''Overridden method for unwrapping all Weakrefs.
         '''
+        self._derivation.unwrapWeakref()
         # call base method: this gets defined contexts and active site
         music21.Music21Object.unwrapWeakref(self)
         # for contained objects that have weak refs
-        self._derivation.unwrapWeakref()
         # this presently is not a weakref but in case of future changes
 #         if common.isWeakref(self.flattenedRepresentationOf):
 #             post = common.unwrapWeakref(objRef)
@@ -1938,9 +1938,11 @@ class Stream(music21.Music21Object):
 #             post = common.wrapWeakref(objRef)
 #             self.flattenedRepresentationOf = post
 
-    def setupSerializationScaffold(self):
+    def setupSerializationScaffold(self, topLevel=True, streamIdsFound=None):
         '''Prepare this stream and all of its contents for pickling, that
         is, serializing and storing an object representation on disk.
+
+        The `topLevel` argument is to keep track of recursive calls. 
 
         >>> from music21 import *
 
@@ -1954,16 +1956,27 @@ class Stream(music21.Music21Object):
         # this removes all caches
         self._elementsChanged()
 
+        # get all Stream that are in this hiearchy
+        if topLevel:
+            streamsFound = self._yieldElementsDownward(streamsOnly=True, 
+                       restoreActiveSites=True)
+            streamIdsFound = [id(s) for s in streamsFound]
+            #environLocal.pd(['setupSerializationScaffold', streamIdsFound])
+        if streamIdsFound is not None:
+            self.purgeUndeclaredIds(streamIdsFound)
+
         #environLocal.printDebug(['calling setupSerializationScaffold()', self])
-        for element in self.elements:
+        for e in self._elements + self._endElements:
             #if hasattr(element, "elements"): # recurse time:
-            if element.isStream:
-                element.setupSerializationScaffold() # recurse
+            if e.isStream:
+                e.setupSerializationScaffold(topLevel=False, 
+                    streamIdsFound=streamIdsFound) # recurse
             else:
                 # this is done here for all elements
-                element.unwrapWeakref()
-                element.freezeIds()
-
+                e.purgeUndeclaredIds(streamIdsFound)
+                e.unwrapWeakref()
+                e.freezeIds()
+                    
         # this must be done for all Streams
         # this calls overridden method
         self.unwrapWeakref()
@@ -1992,13 +2005,13 @@ class Stream(music21.Music21Object):
         self.unfreezeIds()
         self.wrapWeakref()
 
-        for element in self.elements:
-            if element.isStream:
-                element.teardownSerializationScaffold()
+        for e in self._elements + self._endElements:
+            if e.isStream:
+                e.teardownSerializationScaffold()
             else:
-                #environLocal.printDebug(['   processing music21 obj', element])
-                element.unfreezeIds()
-                element.wrapWeakref()
+                #environLocal.printDebug(['   processing music21 obj', e])
+                e.unfreezeIds()
+                e.wrapWeakref()
 
         # restore to whatever it was
         self.autoSort = storedAutoSort
