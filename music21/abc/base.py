@@ -729,7 +729,7 @@ class ABCBar(ABCToken):
         from music21 import bar
         if self.isRepeat():
             if self.repeatForm in ['end', 'start']:
-                post = bar.Repeat(self.barStyle, direction=self.repeatForm)
+                post = bar.Repeat(direction=self.repeatForm)
             # bidirectional repeat tokens should already have been replaced
             # by end and start
             else:

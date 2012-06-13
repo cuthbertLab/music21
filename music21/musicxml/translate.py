@@ -428,7 +428,7 @@ def tempoIndicationToMx(ti):
 def repeatToMx(r):
     '''
     >>> from music21 import *
-    >>> b = bar.Repeat('light-heavy')
+    >>> b = bar.Repeat(direction='end')
     >>> mxBarline = b.mx
     >>> mxBarline.get('barStyle')
     'light-heavy'

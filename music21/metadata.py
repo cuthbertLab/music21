@@ -2415,7 +2415,7 @@ class Test(unittest.TestCase):
         self.assertEqual(rmd.noteCount, 165)
         self.assertEqual(rmd.quarterLength, 36.0)
 
-        self.assertEqual(rmd.json, '{"__attr__": {"_urls": [], "quarterLength": 36.0, "noteCount": 165, "_contributors": [], "timeSignatureFirst": "4/4", "keySignatureFirst": "sharps 3, mode minor", "_workIds": {"movementName": {"__attr__": {"_data": "bwv66.6.mxl"}, "__class__": "<class \'music21.metadata.Text\'>"}}}, "__version__": [0, 6, 3], "__class__": "<class \'music21.metadata.RichMetadata\'>"}')
+        self.assertEqual(rmd.json, '{"__attr__": {"_urls": [], "quarterLength": 36.0, "noteCount": 165, "_contributors": [], "timeSignatureFirst": "4/4", "keySignatureFirst": "sharps 3, mode minor", "_workIds": {"movementName": {"__attr__": {"_data": "bwv66.6.mxl"}, "__class__": "<class \'music21.metadata.Text\'>"}}}, "__version__": [1, 0, 0], "__class__": "<class \'music21.metadata.RichMetadata\'>"}')
 
 
 #-------------------------------------------------------------------------------

@@ -224,7 +224,7 @@ class Repeat(repeat.RepeatMark, Barline):
         {2.0} <music21.note.Note D-->
         {3.0} <music21.note.Note D-->
         {4.0} <music21.bar.Repeat direction=end>
-    >>> p.write(fp='d:/desktop/testRepeat.xml')
+
 
     The method :meth:`~music21.stream.Part.expandRepeats` on a 
     :class:`~music21.stream.Part` object expands the repeats, but

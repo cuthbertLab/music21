@@ -624,10 +624,12 @@ class MuseDataMeasure(object):
             dataFlag = data[16:].strip()
             if ':|' in dataFlag:
                 repeatForm = None # can be first, second
-                bl = bar.Repeat(blStyle, direction='end')
+                bl = bar.Repeat(direction='end')
+                bl.style = blStyle
             elif '|:' in dataFlag:   
                 repeatForm = None # can be first, second
-                bl = bar.Repeat(blStyle, direction='start')       
+                bl = bar.Repeat(direction='start')       
+                bl.style = blStyle
         return bl
 
 

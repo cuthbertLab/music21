@@ -49,7 +49,7 @@ class ModuleGather(object):
             'abj/translate.py', 
             ]
         # skip any path that contains this string
-        self.pathSkip = ['obsolete', 'xlrd']
+        self.pathSkip = ['obsolete', 'xlrd', 'jsonpickle', 'ext']
         # search on init
         self._walk()
 
@@ -84,8 +84,8 @@ class ModuleGather(object):
             skip = False
             for fnSkip in self.moduleSkip:
                 if fp.endswith(fnSkip):
-                    skip = True   
-                    break    
+                    skip = True
+                    break
             for dirSkip in self.pathSkip:
                 if dirSkip in fp:
                     skip = True  
