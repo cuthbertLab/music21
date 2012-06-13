@@ -298,10 +298,9 @@ class StreamFreezer(object):
         # must make a deepcopy, as we will be altering DefinedContexts
         self.stream = None
         if streamObj is not None:
-            # deepcopy only necessary if serialization damages source
-            # object; it should not now. 
-            #self.stream = copy.deepcopy(streamObj)
-            self.stream = streamObj
+            # deepcopy necessary because we mangle sites in the new objects
+            self.stream = copy.deepcopy(streamObj)
+            #self.stream = streamObj
 
     def _getPickleFp(self, dir):
         if dir == None:

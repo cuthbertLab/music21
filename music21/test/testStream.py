@@ -7368,7 +7368,9 @@ class Test(unittest.TestCase):
         s2.teardownSerializationScaffold()
 
         self.assertEqual(s2.hasElement(n1), True)
-        self.assertEqual(s1 in n1.getSites(), True)
+        # the scaffold has removes all non-conatined sites, so n1
+        # no longer has s1 as a site
+        self.assertEqual(s1 in n1.getSites(), False)
         self.assertEqual(s2 in n1.getSites(), True)
 
 

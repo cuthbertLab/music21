@@ -1940,9 +1940,11 @@ class Stream(music21.Music21Object):
 
     def setupSerializationScaffold(self, topLevel=True, streamIdsFound=None):
         '''Prepare this stream and all of its contents for pickling, that
-        is, serializing and storing an object representation on disk.
+        is, serializing and storing an object representation on file or as a string.
 
-        The `topLevel` argument is to keep track of recursive calls. 
+        The `topLevel` and `streamIdsFound` arguments are used to keep track of recursive calls. 
+
+        Note that this is a destructive process: elements contained within this Stream will have their sites cleared of all contents not in the hierarchy of the Streams. Thus, a deepcopy of the Stream may be necessary before calling this method. 
 
         >>> from music21 import *
 
