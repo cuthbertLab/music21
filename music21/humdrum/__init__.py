@@ -25,12 +25,12 @@ assemble_     None                                               Use python comm
 census_       None                                               Use python to create census equivalents
 cents_        `interval.ChromaticInterval.cents`                 (tuning will eventually affect this; produces cents w.r.t. interval not middle C)
 cleave_       None                                               kern specific, not needed
-context_      None                                               Not needed.  Use object.next and object.prev to get some context for many objects
+context_      None                                               Not needed.  Use object.next and object.prev to get some context for many objects and :meth:`~music21.stream.Stream.getContextByClass` to find the most recent object of a given type
 correl_       None                                               Use numpy.corrcoef() or other, more sophisticated code
-deg_          Several Tools, see Notes                           Closest is :meth:`~music21.scale.Scale.getScaleDegreeAndAccidentalFromPitch`. See also `stream.Stream.analyze('key')`
+deg_          Several tools, see Notes                           Closest is :meth:`~music21.scale.Scale.getScaleDegreeAndAccidentalFromPitch`. See also `stream.Stream.analyze('key')`
 degree_       see above for "`deg`"
 diss_         To-Do                                              Will be "analysis.kkdiss".
-ditto_        None                                               Use `copy.copy(object)` or `copy.deepcopy(object)` to get another copy of an object
+ditto_        see Notes                                          :meth:`~music21.stream.Stream.choridfy` and the VerticalSlice objects accomplish similar things. Use `copy.copy(object)` or `copy.deepcopy(object)` to get another copy of an object
 encode_       `midi.(severaltools)`                              Multifunction humdrum program.  See the midi directory for some replacements.
 extract_      None                                               Use python commands to extract objects with certain properties
 fields_       None                                               Not needed.
@@ -45,33 +45,33 @@ infot_        None                                               Use general pur
 iv_           :meth:`~music21.chord.Chord.intervalVector` 
 kern_         To-Do                                              Not needed for general work, but a `myScore.write('kern')` call for outputting to kern is a priority.
 key_          :meth:`~music21.stream.Stream.analyze` ('key')
-melac_        see Notes                                          :meth:`~music21.analysis.metrical.thomassenMelodicAccent`.  incorporates humdrum additions to first and last note.
+melac_        see Notes                                          :meth:`~music21.analysis.metrical.thomassenMelodicAccent`.  incorporates humdrum additions for giving accent of the first and last notes.
 metpos_       `1.0/obj.beatStrength()`                           the beatStrength of an object is essentially something similar but inverted.  beatStrength handles irregular meters.
 midi_         `.show('midi')`
 midireset_    None                                               Not needed for now because we do not write directly to MIDI.  A midi.allOff() will be needed for direct midi access...
 mint_         `interval.Interval(note1, note2)`                  Or :meth:`~music21.stream.Stream.melodicIntervals`
-nf_           :meth:`~music21.chord.Chord.normalForm`
+nf_           :meth:`~music21.chord.Chord.normalForm`            Also :meth:`~music21.chord.Chord.primeForm`, :meth:`~music21.chord.Chord.intervalVector`, :meth:`~music21.chord.Chord.forteClass`, :meth:`~music21.chord.Chord.getZRelation` etc.
 num_          None                                               not needed; try: `for i in range(s.flat.getElementsByClass(X))` etc.
 patt_         `search.*`                                         see also, for instance, trecento.find_trecento_fragments for an example of a pattern searching module
 pattern_      `search.*`                                         see patt above
 pc_           :meth:`~music21.pitch.Pitch.pitchClass`
 pcset_        see `Pitch.*` and `Chord.*`                        Pitch.pitchClass and pitchClassString, Chord.normalForm, .primeForm, .intervalVector, etc.
 perform_      `.show('midi')`
-pf_           :meth:`~music21.chord.Chord.normalForm`
+pf_           :meth:`~music21.chord.Chord.primeForm`             Also :meth:`~music21.chord.Chord.normalForm` etc.
 pitch_        :meth:`~music21.pitch.Pitch.nameWithOctave`
 proof_        None                                               Not needed, see `humdrum` command above; However, something like this could be useful for each encoding format.
 recode_       `"if"`
-record_       None yet...                                        Not yet determined if it is a good idea to record directly to music21 within music21 -- a MIDI to music21 converter should suffice.  But note that audioSearch.recording gives recording transcription abilities
+record_       None yet...                                        Not yet determined if it is a good idea to record directly to music21 within music21 -- our MIDI to music21 converter should suffice.  But note that audioSearch.recording gives recording transcription abilities
 regexp_       None                                               Use `re` module in Python core, not music21
 reihe_        :class:`~music21.serial.TwelveToneRow`
 rend_         None                                               Not needed. Object properties perform the same function.
-rid_          None                                               Not needed. Use `getElementsByClass` or `getElementsNotOfClass` instead
+rid_          None                                               Not needed. Use :meth:`~music21.stream.Stream.getElementsByClass` or :meth:`~music21.stream.Stream.getElementsNotOfClass` instead
 scramble_     None                                               Use random module in Python core, not music21.  However, see composition tools for some sophisticated scrambling methods
 semits_       see Notes                                          :meth:`~music21.pitch.Pitch.ps`, :meth:`~music21.pitch.Pitch.p.midiNote` or :meth:`~music21.interval.Interval.chromatic`.  See also :class:`music21.pitch.Accidental`, esp. the `.alter` property.
 simil_        None                                               Download http://www.mindrot.org/projects/py-editdist/ ; Possibly to be embedded later esp. for different costs...
 smf_          `.write('midi')`                                   See midi above
 solfa_        :meth:`~music21.scale.ConcreteScale.solfeg`        Use variant='humdrum' to get exact humdrum solfeg syllables
-solfg_        None                                               Very easily written by users
+solfg_        :meth:`~music21.pitch.Pitch.french`                Also .dutch, .italian, .spanish
 strophe_      :meth:`~music21.text.assembleLyrics`               You probably won't need this though
 synco_        To-Do                                              Will be "analysis.leeLHiggins" but not yet written -- low priority
 tacet_        None                                               see `midireset` above; -i will not be supported
