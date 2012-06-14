@@ -324,6 +324,11 @@ class Spanner(music21.Music21Object):
         self._components.unfreezeIds()
 
 
+    def getSpannerStorageId(self):
+        '''Return the object id of the SpannerStorage object
+        '''
+        return id(self._components)
+
     #---------------------------------------------------------------------------
     def __getitem__(self, key):
         '''
@@ -736,6 +741,14 @@ class SpannerBundle(object):
     list = property(_getList, 
         doc='''Return the bundle as a list.
         ''')
+
+    def getSpannerStorageIds(self):
+        '''Return all SpannerStorage ids from all contained Spanners
+        '''
+        post = []
+        for x in self._storage:
+            post.append(x.getSpannerStorageId())
+        return post
 
     def getByIdLocal(self, idLocal=None):
         '''Get spanners by `idLocal` or `complete` status.

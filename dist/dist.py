@@ -243,8 +243,10 @@ class Distributor(object):
         '''Perform all uploads.
         '''
         self._uploadPyPi()
-        for fp in [self.fpTar, self.fpEgg, self.fpWin, 
-            self.fpTarNoCorpus, self.fpEggNoCorpus]:
+        # put in reverse order as to be listed
+        for fp in [self.fpEggNoCorpus, self.fpTarNoCorpus, 
+                   self.fpWin, self.fpEgg, self.fpTar
+            ]:
             self._uploadGoogleCode(fp)
 
 

@@ -298,7 +298,8 @@ class StreamFreezer(object):
         # must make a deepcopy, as we will be altering DefinedContexts
         self.stream = None
         if streamObj is not None:
-            # deepcopy necessary because we mangle sites in the new objects
+            # deepcopy necessary because we mangle sites in the objects
+            # before serialization
             self.stream = copy.deepcopy(streamObj)
             #self.stream = streamObj
 

@@ -1955,17 +1955,27 @@ class Stream(music21.Music21Object):
         >>> a.setupSerializationScaffold()
         '''
 
-        # this removes all caches
-        self._elementsChanged()
-
         # get all Stream that are in this hiearchy
         if topLevel:
+            # get all Streams in this hierarchy
             streamsFound = self._yieldElementsDownward(streamsOnly=True, 
                        restoreActiveSites=True)
             streamIdsFound = [id(s) for s in streamsFound]
+
+            # get all ids in Spanners
+            spannerBundle = self.spannerBundle
+            streamIdsFound += spannerBundle.getSpannerStorageIds()
+
+            # TODO: a similar routine need to be done for Variants, getting
+            # ids of contained Stream and passing them to purgeUndeclaredIds
+
             #environLocal.pd(['setupSerializationScaffold', streamIdsFound])
         if streamIdsFound is not None:
-            self.purgeUndeclaredIds(streamIdsFound)
+            # excludeStorageStreams is False as we have spanner storage ids
+            self.purgeUndeclaredIds(streamIdsFound, excludeStorageStreams=False)
+
+        # remove all caches again; the spanner bundle will be here
+        self._elementsChanged()
 
         #environLocal.printDebug(['calling setupSerializationScaffold()', self])
         for e in self._elements + self._endElements:
@@ -1975,7 +1985,8 @@ class Stream(music21.Music21Object):
                     streamIdsFound=streamIdsFound) # recurse
             else:
                 # this is done here for all elements
-                e.purgeUndeclaredIds(streamIdsFound)
+                e.purgeUndeclaredIds(streamIdsFound, 
+                                    excludeStorageStreams=False)
                 e.unwrapWeakref()
                 e.freezeIds()
                     
