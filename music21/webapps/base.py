@@ -135,9 +135,10 @@ availableFunctions = ['checkLeadSheetPitches',
                       'colorAllChords',
                       'colorAllNotes',
                       'colorResults',
+                      'commands.generateIntervals',
                       'commands.reduction',
                       'commands.runPerceivedDissonanceAnalysis',
-                      'commands.generateIntervals',
+                      'commands.writeMIDIFileToServer',
                       'converter.parse',
                       'corpus.parse',
                       'createMensuralCanon',
@@ -150,12 +151,12 @@ availableFunctions = ['checkLeadSheetPitches',
                       'theoryAnalyzer.identifyHiddenOctaves',
                       'theoryAnalyzer.identifyParallelFifths',
                       'theoryAnalyzer.identifyParallelOctaves',
-                      'writeMIDIFileToServer',
                       ] 
 
 # Commands of type method (have a caller) must be in this list
 availableMethods = ['__getitem__',
                     'augmentOrDiminish',
+                    'chordify',
                     'insert',
                     'measures',
                     'transpose'
@@ -482,7 +483,7 @@ class Agenda(dict):
         resultVar, caller, and command are strings that will result in the form shown below. Set an argument as 
         none to 
         argList should be a list of data encoded in an appropriate 
-        format (see :meth:`~music21.webapps.base.CommandProcessor.parseStringToPrimitive` for more information)
+        format (see :meth:`~music21.webapps.base.CommandProcessor.parseInputToPrimitive` for more information)
         
             ``<resultVar> = <caller>.<command>(<argList>)``
         
@@ -665,7 +666,7 @@ class CommandProcessor(object):
                     data = []
                     for elementStr in dataStr:
                         if common.isStr(elementStr):
-                            dataElement = self.parseStringToPrimitive(elementStr)
+                            dataElement = self.parseInputToPrimitive(elementStr)
                         else:
                             dataElement = elementStr
                         data.append(dataElement)
@@ -685,7 +686,7 @@ class CommandProcessor(object):
                         continue
             else: # No format specified
                 dataStr = str(dataStr)
-                data = self.parseStringToPrimitive(dataStr)
+                data = self.parseInputToPrimitive(dataStr)
                 
                 
             self.parsedDataDict[name] = data
@@ -807,7 +808,7 @@ class CommandProcessor(object):
         else:
             argList = commandElement['argList']
             for (i,arg) in enumerate(argList):
-                parsedArg = self.parseStringToPrimitive(arg)
+                parsedArg = self.parseInputToPrimitive(arg)
                 argList[i] = parsedArg
         
         # Call the function
@@ -914,7 +915,7 @@ class CommandProcessor(object):
         else:
             argList = commandElement['argList']
             for (i,arg) in enumerate(argList):
-                parsedArg = self.parseStringToPrimitive(arg)
+                parsedArg = self.parseInputToPrimitive(arg)
                 argList[i] = parsedArg
 
         # Make sure the caller is defined        
@@ -936,7 +937,8 @@ class CommandProcessor(object):
         try:
             result = getattr(caller, methodName)(*argList)
         except Exception as e:
-            self.recordError("Error: "+str(e)+" executing method "+str(methodName)+" :"+str(commandElement))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            self.recordError("Error: "+str(exc_type)+" executing method "+str(methodName)+" :"+str(commandElement))
             return
         
         # Save it if resutlVar specified
@@ -1007,16 +1009,19 @@ class CommandProcessor(object):
             errorStr += e + "\n"
         return errorStr
     
-    def parseStringToPrimitive(self, strVal):
+    def parseInputToPrimitive(self, inpVal):
         '''
-        Determines what format a given string is in and returns a value in that format..
+        Determines what format a given input is in and returns a value in that format..
         First checks if it is the name of a variable defined in the parsedDataDict or the
         name of an allowable function. In either of these cases, it will return the actual value
         of the data or the actual function.
         
         Next, it will check if the string is an int, float, boolean, or none, returning the appropriate value.
         If it is a quoted string then it will remove the quotes on the ends and return it as a string.
-        If no type can be determined, raises an exception
+        If it has square braces indicating a list, the inner elements will be parsed using this same function recursively.
+        (Note that recursive lists like [1, 2, [3, 4]] are not yet supported
+        
+        If the input corresponds to none of these types, it is returned as a string.
         
         >>> from music21 import *
         >>> agenda = webapps.Agenda()
@@ -1024,26 +1029,41 @@ class CommandProcessor(object):
         >>> agenda.addData("b",[1,2,3],"list")
 
         >>> processor = webapps.CommandProcessor(agenda)
-        >>> processor.parseStringToPrimitive("a")
+        >>> processor.parseInputToPrimitive("a")
         2
-        >>> processor.parseStringToPrimitive("b")
+        >>> processor.parseInputToPrimitive("b")
         [1, 2, 3]
-        >>> processor.parseStringToPrimitive("1.0")
+        >>> processor.parseInputToPrimitive("1.0")
         1.0
-        >>> processor.parseStringToPrimitive("2")
+        >>> processor.parseInputToPrimitive("2")
         2
-        >>> processor.parseStringToPrimitive("True")
+        >>> processor.parseInputToPrimitive("True")
         True
-        >>> processor.parseStringToPrimitive("False")
+        >>> processor.parseInputToPrimitive("False")
         False
-        >>> processor.parseStringToPrimitive("None") == None
+        >>> processor.parseInputToPrimitive("None") == None
         True
-        >>> processor.parseStringToPrimitive("'hi'")
+        >>> processor.parseInputToPrimitive("'hi'")
         'hi'
-        >>> processor.parseStringToPrimitive("'Madam I\'m Adam'")
+        >>> processor.parseInputToPrimitive("'Madam I\'m Adam'")
         "Madam I'm Adam"
+        >>> processor.parseInputToPrimitive("[1,2,3]")
+        [1, 2, 3]
+        >>> processor.parseInputToPrimitive("[1,'hi',3.0,True, a, justAStr]")
+        [1, 'hi', 3.0, True, 2, 'justAStr']
         '''
         returnVal = None
+        
+        if common.isNum(inpVal):
+            return inpVal
+        
+        if common.isListLike(inpVal):
+            return [self.parseInputToPrimitive(element) for element in inpVal]
+        
+        if not common.isStr(inpVal):
+            self.recordError("Unknown type for parseInputToPrimitive "+str(inpVal))
+        
+        strVal = inpVal
         
         strVal = strVal.strip() # removes whitespace on ends
         
@@ -1073,6 +1093,9 @@ class CommandProcessor(object):
                     elif strVal[0] == "'" and strVal[-1] == "'": # Single Quoted String
                         returnVal = strVal[1:-1] # remove quotes
                         
+                    elif strVal[0] == "[" and strVal[-1] == "]": # List
+                        listElements = strVal[1:-1].split(",") # remove [] and split by commas
+                        returnVal = [self.parseInputToPrimitive(element) for element in listElements]
                     else: 
                         returnVal = cgi.escape(str(strVal))
         return returnVal
@@ -1104,7 +1127,7 @@ class CommandProcessor(object):
         else:
             argList = self.outputArgList
             for (i,arg) in enumerate(argList):
-                parsedArg = self.parseStringToPrimitive(arg)
+                parsedArg = self.parseInputToPrimitive(arg)
                 argList[i] = parsedArg  
             (output, outputType) = eval(self.outputTemplate)(*argList)
         return (output, outputType)

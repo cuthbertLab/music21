@@ -227,7 +227,7 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
     score.metadata.composer = scoreIn.metadata.composer
     score.metadata.movementName = scoreIn.metadata.movementName
     #score.show()
-    analysisData = {'stream': score, 'numUserIdentified': user, 'numMusic21Identified':music21VS, 'numBothIdentified':both, 'accuracy': both*100.0/music21VS , 'romans': romanFigureList, 'key': pieceKey}
+    analysisData = {'stream': score, 'numUserIdentified': user, 'numMusic21Identified':music21VS, 'numBothIdentified':both, 'accuracy': both*100.0/music21VS if music21VS!= 0 else 100, 'romans': romanFigureList, 'key': pieceKey}
     return analysisData
 
 ## Shortcuts - temporary procedures used for re-implementation of hackday demo. Will be moved 
@@ -394,8 +394,12 @@ def writeMIDIFileToServer(sc):
     Iterate through all notes and change their color to the given color - 
     used for testing color rendering in noteflight
     '''
+    # For now, the document root is hard coded, future implementations could
+    # try to use environment variables
+    
     #documentRoot = environ['DOCUMENT_ROOT']
-    documentRoot = '/Library/WebServer/Documents'
+    #documentRoot = '/Library/WebServer/Documents'
+    documentRoot = '/Library/Server/Web/Data/Sites/Default'
     urlPath = "/music21/OutputFiles/cognitionEx.mid"
     writePath = documentRoot + urlPath
     
