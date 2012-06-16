@@ -48,9 +48,9 @@ function hardCodedPiece() {
 	key = "C";
 	
 	m21.request.addCommand('function','mm','','tempo.MetronomeMark',['None',tempo])
-	m21.request.addCommand('function','','sc','insert',[0,'mm']);
-	//m21.request.addCommand('function','sc','sc','measures',[0,3]);
-	m21.request.addCommand('function','midPath','','writeMIDIFileToServer',['sc'])
+	m21.request.addCommand('method','','sc','insert',[0,'mm']);
+	//m21.request.addCommand('method','sc','sc','measures',[0,3]);
+	m21.request.addCommand('function','midPath','','commands.writeMIDIFileToServer',['sc'])
 	m21.request.addReturnVar('sc','musicxml');
 	m21.request.addReturnVar('midPath','str');
 	
@@ -79,9 +79,9 @@ function generateIntervals() {
 	key = "C";
 	
 	m21.request.addCommand('function','mm','','tempo.MetronomeMark',['None',tempo])
-	m21.request.addCommand('function','','sc','insert',[0,'mm']);
+	m21.request.addCommand('method','','sc','insert',[0,'mm']);
 	//m21.request.addCommand('function','sc','sc','measures',[0,3]);
-	m21.request.addCommand('function','midPath','','writeMIDIFileToServer',['sc'])
+	m21.request.addCommand('function','midPath','','commands.writeMIDIFileToServer',['sc'])
 	m21.request.addReturnVar('sc','musicxml');
 	m21.request.addReturnVar('midPath','str');
 	
@@ -105,13 +105,13 @@ function selectPiece(workName) {
 	m21.request.clear();
 	m21.request.addData('workName','str',workNameWithQuotes)
 	m21.request.addCommand('function','sc','','corpus.parse',['workName'])
-	m21.request.addCommand('function','sc','sc','measures',[0,3]);
+	m21.request.addCommand('method','sc','sc','measures',[0,3]);
 	key = "b"
 	//m21.request.addCommand('function','sc','','converter.parse',['"/Library/WebServer/Documents/music21/OutputFiles/generatedSample.xml"'])
 	
 	m21.request.addCommand('function','mm','','tempo.MetronomeMark',['None',tempo])
-	m21.request.addCommand('function','','sc','insert',[0,'mm']);
-	m21.request.addCommand('function','midPath','','writeMIDIFileToServer',['sc'])
+	m21.request.addCommand('method','','sc','insert',[0,'mm']);
+	m21.request.addCommand('function','midPath','','commands.writeMIDIFileToServer',['sc'])
 	m21.request.addReturnVar('sc','musicxml');
 	m21.request.addReturnVar('midPath','str');
 	
@@ -150,16 +150,14 @@ function submitAnswer() {
 	m21.request.addData('sc','musicxml',scoreMusicXML);
 	
 	m21.request.addCommand('function', 'analysisResultsDict', '', 'commands.runPerceivedDissonanceAnalysis', ['sc','offsetList',"'b'"]);
-	m21.request.addCommand('function', 'fullStreamData', 'analysisResultsDict', '__getitem__', ['"fullStreamData"']);
-	m21.request.addCommand('function', 'resultSc', 'fullStreamData', '__getitem__', ['"stream"']);
-	m21.request.addCommand('function', 'numUserIdentified', 'fullStreamData', '__getitem__', ['"numUserIdentified"']);
-	m21.request.addCommand('function', 'numMusic21Identified', 'fullStreamData', '__getitem__', ['"numMusic21Identified"']);
-	m21.request.addCommand('function', 'numBothIdentified', 'fullStreamData', '__getitem__', ['"numBothIdentified"']);
-	m21.request.addCommand('function', 'accuracy', 'fullStreamData', '__getitem__', ['"accuracy"']);
-	m21.request.addCommand('function', 'romans', 'fullStreamData', '__getitem__', ['"romans"']);
-	m21.request.addCommand('function', 'intervals', 'fullStreamData', '__getitem__', ['"intervals"']);
-	m21.request.addCommand('function', 'intervalsText', 'fullStreamData', '__getitem__', ['"intervalsText"']);
-	m21.request.addCommand('function', 'key', 'fullStreamData', '__getitem__', ['"key"']);
+	m21.request.addCommand('method', 'fullStreamData', 'analysisResultsDict', '__getitem__', ['"fullScore"']);
+	m21.request.addCommand('method', 'resultSc', 'fullStreamData', '__getitem__', ['"stream"']);
+	m21.request.addCommand('method', 'numUserIdentified', 'fullStreamData', '__getitem__', ['"numUserIdentified"']);
+	m21.request.addCommand('method', 'numMusic21Identified', 'fullStreamData', '__getitem__', ['"numMusic21Identified"']);
+	m21.request.addCommand('method', 'numBothIdentified', 'fullStreamData', '__getitem__', ['"numBothIdentified"']);
+	m21.request.addCommand('method', 'accuracy', 'fullStreamData', '__getitem__', ['"accuracy"']);
+	m21.request.addCommand('method', 'romans', 'fullStreamData', '__getitem__', ['"romans"']);
+m21.request.addCommand('method', 'key', 'fullStreamData', '__getitem__', ['"key"']);
 
 	m21.request.addReturnVar('resultSc','musicxml');
 	m21.request.addReturnVar('fullStreamData','str');
@@ -169,8 +167,6 @@ function submitAnswer() {
 	m21.request.addReturnVar('accuracy','float');
 	m21.request.addReturnVar('fullStreamData','str');
 	m21.request.addReturnVar('romans','str');
-	m21.request.addReturnVar('intervals','str');
-	m21.request.addReturnVar('intervalsText','str');
 	m21.request.addReturnVar('key','str');
 	
 	m21.onSuccess = function() {
@@ -184,11 +180,7 @@ function submitAnswer() {
 		document.getElementById('accuracy').innerHTML = Math.round(m21.result.getData('accuracy'))+"%"
 
 
-		if(document.getElementById('generatedKind').value == 'diatonicTriads') {
-			document.getElementById('romans').innerHTML = m21.result.getData('romans')
-		} else {
-			document.getElementById('romans').innerHTML = m21.result.getData('intervalsText')
-		}
+		document.getElementById('romans').innerHTML = m21.result.getData('romans')
 		listenToResultsTransition();
 	}
 	m21.sendRequest();
