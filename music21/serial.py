@@ -5,6 +5,7 @@
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
+#               Carl Lian
 #
 # Copyright:    (c) 2009-2012 The music21 Project
 # License:      LGPL
@@ -149,6 +150,42 @@ class TwelveToneRow(ToneRow):
         #environLocal.printDebug(['calling matrix start: len row:', self.row, 'len self', len(self)])
 
         return matrixObj
+    
+    def isAllInterval(self):
+        
+        '''
+        Describes whether or not a twelve-tone row is an all-interval row.
+        
+        >>> from music21 import *
+        >>> chromatic = serial.pcToToneRow(range(0,12))
+        >>> [p.pitchClass for p in chromatic]
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        >>> chromatic.isAllInterval()
+        False
+        >>> bergLyric = serial.pcToToneRow(serial.RowBergLyricSuite().row)
+        >>> [p.pitchClass for p in bergLyric]
+        [5, 4, 0, 9, 7, 2, 8, 1, 3, 6, 10, 11]
+        >>> bergLyric.isAllInterval()
+        True
+        '''
+        
+        if len(self) != 12:
+            raise SerialException("isAllInterval requires a 12-tone-row")
+            #as of the writing this is unnecessary because pcToToneRow will return an exception,
+            #but this is here in case this is ever changed.
+        else:
+            pitchList = [p.pitchClass for p in self]
+            intervalList = []
+            for i in range(0,11):
+                interval = (pitchList[i+1] - pitchList[i]) % 12
+                intervalList.append(interval)
+            tempAllInterval = True
+            for i in range(1,11):
+                if i not in intervalList:
+                    tempAllInterval = False
+            return tempAllInterval
+                    
+            
         
 
 
