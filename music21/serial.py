@@ -177,8 +177,8 @@ class TwelveToneRow(ToneRow):
             pitchList = [p.pitchClass for p in self]
             intervalList = []
             for i in range(0,11):
-                interval = (pitchList[i+1] - pitchList[i]) % 12
-                intervalList.append(interval)
+                consecutivePitchInterval = (pitchList[i+1] - pitchList[i]) % 12
+                intervalList.append(consecutivePitchInterval)
             tempAllInterval = True
             for i in range(1,11):
                 if i not in intervalList:
