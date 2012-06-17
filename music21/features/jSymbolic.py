@@ -3533,8 +3533,8 @@ def getExtractorByTypeAndNumber(type, number):
 
 
 
-# list all implemented features features
-# 39 implemented features
+# Number of jsymbolic features implemented: 70
+# Number of jsymbolic features not implemented: 42
 featureExtractors = [
 
 MelodicIntervalHistogramFeature, # m1

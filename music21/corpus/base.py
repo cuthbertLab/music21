@@ -758,11 +758,17 @@ def parse(workName, movementNumber=None, number=None,
     Example, get a chorale by Bach.  Note that the source type does not need to be
     specified, nor does the name Bach even (since it's the only piece with the title BWV 66.6)
 
+
     >>> from music21 import *
     >>> bachChorale = corpus.parse('bwv66.6')
     >>> len(bachChorale.parts)
     4
+    >>> bachChorale.corpusDIR
+    'bach/bwv66.6.mxl'
     
+    >>> s = corpus.parse('trecento/PMFC_13_05-Gloria Rosetta.mxl')
+    >>> s.corpusDIR
+    'trecento/PMFC_13_05-Gloria Rosetta.mxl'
     '''
     if workName in [None, '']:
         raise CorpusException('a work name must be provided as an argument')
@@ -787,9 +793,20 @@ def parse(workName, movementNumber=None, number=None,
         raise CorpusException("Could not find a work that met this criteria %s" % workName)
     else: # greater than zero:
         fp = post[0] # get first
-      
-    return converter.parse(fp, forceSource=forceSource, number=number)
+        
+    #return converter.parse(fp, forceSource=forceSource, number=number)
 
+    streamObj = converter.parse(fp, forceSource=forceSource, number=number)
+    _addCorpusDIR(streamObj, fp)
+    return streamObj
+
+def _addCorpusDIR(streamObj, filepath):   
+    # metadata attribute added to store the file path, for use later in identifying the score
+    #if streamObj.metadata == None:
+    #    streamObj.insert(metadata.Metadata())
+    if 'music21/corpus/' in filepath:
+        filepath = filepath[filepath.index('music21/corpus')+15:]
+    streamObj.corpusDIR = filepath
 
 def parseWork(*arguments, **keywords):
     '''This function exists for backwards compatibility. All calls should use :func:`~music21.corpus.parse` instead.

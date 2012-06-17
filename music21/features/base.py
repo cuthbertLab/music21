@@ -621,7 +621,7 @@ class OutputFormat(object):
 class OutputTabOrange(OutputFormat):
     '''Tab delimited file format used with Orange.
 
-    http://orange.biolab.si/doc/reference/tabdelimited.htm
+    http://orange.biolab.si/doc/reference/Orange.data.formats/
     '''
     def __init__(self, dataSet=None):
         OutputFormat.__init__(self, dataSet=dataSet)
@@ -1147,12 +1147,132 @@ def vectorById(streamObj, id, library=['jSymbolic', 'native']):
         return None # could raise exception
     return fe.extract().vector
     
+def alljSymbolicFeatures(streamObj):
+    '''
+    extract all feature objects implemented in features.jSymbolic
+    and returns a list of :class:`~music21.features.Feature` objects
+    
+    >>> from music21 import *
+    >>> s = corpus.parse('bwv66.6')
+    >>> features.alljSymbolicFeatures(s)[0:2]
+    [<music21.features.base.Feature object at .........>, <music21.features.base.Feature object at .........>]
+    '''    
+    
+    from music21.features import jSymbolic
+    ret = []
+    for featureName in jSymbolic.featureExtractors:
+        try:
+            ret.append( featureName(streamObj).extract() )
+        except:
+            ret.append([None])
+    return ret 
+            
+def allNativeFeatures(streamObj):
+    '''    
+    extract all feature objects implemented in features.native
+    and returns a list of :class:`~music21.features.Feature` objects
+    
+    >>> from music21 import * 
+    >>> s = corpus.parse('bwv66.6')
+    >>> s = corpus.parse('bwv66.6')
+    >>> features.allNativeFeatures(s)[0:2]
+    [<music21.features.base.Feature object at .........>, <music21.features.base.Feature object at .........>]
 
+    '''
+    from music21.features import native
+    ret = []
+    for featureName in native.featureExtractors:
+        try: ret.append( featureName(streamObj).extract() )
+        except: ret.append([None])
+    return ret 
+    
+def alljSymbolicVectors(streamObj):
+    '''
+    >>> from music21 import *
+    >>> s = corpus.parse('bwv66.6.mxl')
+    >>> features.alljSymbolicVectors(s)[1:5]
+    [[2.440251572327044], [2], [1], [0.36477987421383645]]
+    '''
+    from music21 import features
+    ret = []
+    for feature in features.alljSymbolicFeatures(streamObj):
+        try: ret.append( feature.vector )
+        except: ret.append([None])
+    return ret
+ 
+def allNativeVectors(streamObj):
+    '''
+    >>> from music21 import *
+    >>> s = corpus.parse('bwv66.6.mxl')
+    >>> features.allNativeVectors(s)[0:4]
+    [[1], [1.2642604260880534], [3], [1.0]]
+    '''
+    from music21 import features
+    ret = []
+    for feature in features.allNativeFeatures(streamObj):
+        try: ret.append( feature.vector )
+        except: return([None])
+    return ret
+    
+def getIndex(featureString, extractorType=None):
+    '''
+    returns the list index of the given feature extractor and the feature extractor
+    category (jsymbolic or native). If feature extractor string is not in either 
+    jsymbolic or native feature extractors, returns None
+    
+    optionally include the extractorType ('jsymbolic' or 'native' if known
+    and searching will be made more efficient
+    
+    >>> from music21 import *
+    >>> features.getIndex('Range')
+    (59, 'jsymbolic')
+    >>> features.getIndex('Ends With Landini Melodic Contour')
+    (19, 'native')
+    >>> features.getIndex('abrandnewfeature!')
+    >>> features.getIndex('Fifths Pitch Histogram','jsymbolic')
+    (68, 'jsymbolic')
+    >>> features.getIndex('Tonal Certainty','native')
+    (1, 'native')
+    '''
+    from music21.features import jSymbolic, native
+
+    if extractorType == None or extractorType == 'jsymbolic':
+        indexcnt=0
+        for feature in jSymbolic.featureExtractors:
+    
+            if feature().name  == featureString:
+                return indexcnt, 'jsymbolic'
+            indexcnt+=1
+    if extractorType == None or extractorType == 'native':
+        indexcnt=0  
+        for feature in native.featureExtractors:
+            if feature().name == featureString:
+                return indexcnt, 'native'
+            indexcnt+=1
+        
+        return None
+
+
+    
+    
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     
     def runTest(self):
         pass
+
+#    def testGetAllExtractorsMethods(self):
+#        '''
+#        ahh..this test taks a realy long time....
+#        '''
+#        from music21 import stream, features, pitch
+#        s = corpus.parse('bwv66.6').measures(1,5)
+#        self.assertEqual( len(features.alljSymbolicFeatures(s)), 70)
+#        self.assertEqual(len (features.allNativeFeatures(s)),21)
+#        self.assertEqual(str(features.alljSymbolicVectors(s)[1:5]), 
+#'[[2.6630434782608696], [2], [2], [0.391304347826087]]')
+#        self.assertEqual(str(features.allNativeVectors(s)[0:4]),
+#'[[1], [1.0328322202181006], [2], [1.0]]')
 
     def testStreamFormsA(self):
 
