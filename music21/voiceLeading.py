@@ -16,6 +16,20 @@ Objects to represent unique elements in a score that contain special analysis ro
 to identify certain aspects of music theory. for use especially with theoryAnalyzer, which will
 divide a score up into these segments, returning a list of segments to later analyze
 
+The list of objects included here are:
+
+* :class:`~music21.voiceLeading.VoiceLeadingQuartet` : two by two matrix of notes
+
+* :class:`~music21.voiceLeading.VerticalSlice` : vertical context in a score, composed of any music21 objects
+    * :class:`~music21.voiceLeading.VerticalSliceNTuplet` : group of three contiguous verticalSlice objects
+        * :class:`~music21.voiceLeading.VerticalSliceTriplet` : three vertical slices
+
+* :class:`~music21.voiceLeading.NObjectLinearSegment` : n (any number) of music21 objects
+    * :class:`~music21.voiceLeading.NNoteLinearSegment` : n (any number) of notes
+        * :class:`~music21.voiceLeading.ThreeNoteLinearSegment` : three notes in the same part of a score
+    * :class:`~music21.voiceLeading.NChordLinearSegment` : preliminary implementation of n(any number) chords
+        * :class:`~music21.voiceLeading.TwoChordLinearSegment` : 2 chord objects
+
 '''
 import unittest, doctest
 

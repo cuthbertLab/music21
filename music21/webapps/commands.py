@@ -74,8 +74,38 @@ def generateIntervals(numIntervals,kind = None, octaveSpacing = None):
 
 traidInversions = [[1,3,5],[1,3,6],[1,4,6]]
 
-def generateChords(numChords,kind):
-    sc = stream.Stream()
+def generateChords(numChords,kind=''):
+    '''
+    Randomly generate a score of chords for use with the perceived dissonances
+    app. These chords may be dissonant or consonant. if kind = 'diatonicTriads',
+    only diatonic triads will be generated
+        
+    >>> from music21 import *
+    >>> sc = webapps.commands.generateChords(4,'diatonicTriads')
+    >>> a = webapps.commands.runPerceivedDissonanceAnalysis(sc,[1.2,3.2,5.2])
+    >>> chords = a['fullScore']['stream'].flat.getElementsByClass('Chord')
+    >>> chords[0].color != None
+    True
+    >>> chords[1].color != None
+    True
+    >>> chords[2].color != None
+    True
+    >>> chords[3].color in [None, '#cc3300']
+    True
+    >>> sc2 = webapps.commands.generateChords(4)
+    >>> a = webapps.commands.runPerceivedDissonanceAnalysis(sc2,[1.2,3.2])
+    >>> chords = a['fullScore']['stream'].flat.getElementsByClass('Chord')
+    >>> chords[0].color != None
+    True
+    >>> chords[1].color != None
+    True
+    >>> chords[2].color in [None, '#cc3300']
+    True
+    >>> chords[3].color in [None, '#cc3300']
+    True
+    '''
+    sc = stream.Score()
+    p = stream.Part()
     scl = scale.MajorScale('C')
     #possibleChordTypes = [l[0] for l in harmony.CHORD_TYPES.values()]
     possibleChordTypes =['53','63','64']
@@ -85,16 +115,13 @@ def generateChords(numChords,kind):
             inversion = random.randrange(0,3)
             chordPitches = []
             testDegrees = [d+startDegree-1 for d in traidInversions[inversion] ]
-            print testDegrees
             chordPitches = [scl.pitchFromDegree(d+startDegree-1) for d in traidInversions[inversion] ]
-            print chordPitches
             chordType = possibleChordTypes[random.randrange(0,len(possibleChordTypes))]
             c = chord.Chord(chordPitches)
             c.quarterLength=2
-            sc.append(c)
-        c = chord.Chord(['C','E','G'])
-        c.quarterLength=2
-        sc.append(c)
+            p.append(c)
+        p.makeMeasures(inPlace=True)
+        sc.append(p)
         return sc
     else:
         for i in range(numChords):
@@ -104,18 +131,14 @@ def generateChords(numChords,kind):
             startPitch = pitch.Pitch(ps=startPs)
             startPitchName = startPitch.name
             chordType = possibleChordTypes[random.randrange(0,len(possibleChordTypes))]
-            print startPitchName+','+chordType
             c = harmony.ChordSymbol(startPitchName+','+chordType)
             c.writeAsChord = True
             c.quarterLength=2
             c.volume.velocity = 127
-            sc.append(c)
-        c = chord.Chord(['C','E','G'])
-        c.quarterLength=2
-        sc.append(c)
+            p.append(c)
+        p.makeMeasures(inPlace=True)
+        sc.append(p)
         return sc
-        
-    return sc
 
 
 def runPerceivedDissonanceAnalysis(scoreIn, offsetList, keyStr=None):
@@ -192,6 +215,43 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
     runs comparison on score to identify dissonances, then compares to the user's offsetList of identified
     dissonances. The score is colored according to the results, and appropriate information is returned
     as a dictionary. See runPerceivedDissonanceAnalysis for full details and an example.
+    
+    *Color key*
+    * Green: the user also recognizes this as a dissonant vertical slice GREEN
+    * Red: the user did not recognize as a dissonant vertical slice RED
+    * Blue: the user recognized it as a dissonant vertical slice BLUE
+       
+    >>> from music21 import *
+    >>> s = stream.Score()
+    >>> p = stream.Part()
+    >>> c1 = chord.Chord(['C3','E3','G3'])
+    >>> c1.isConsonant()
+    True
+    >>> p.append(c1)
+    >>> c2 = chord.Chord(['C3','B3','D#'])
+    >>> c2.isConsonant()
+    False
+    >>> p.append(c2)
+    >>> c3 = chord.Chord(['D3','F#3','A'])
+    >>> c3.isConsonant()
+    True
+    >>> p.append(c3)
+    >>> c4 = chord.Chord(['B-4','F#4','A-3'])
+    >>> c4.isConsonant()
+    False
+    >>> p.append(c4)
+    >>> p.makeMeasures(inPlace=True)
+    >>> s.append(p)
+    >>> aData = webapps.commands.determineDissonantIdentificationAccuracy(s, [2.3,3.2])
+    >>> chords = aData['stream'].flat.getElementsByClass('Chord')
+    >>> chords[0].color == None #BLACK (by default)
+    True
+    >>> chords[1].color #RED
+    '#cc3300'
+    >>> chords[2].color #BLUE
+    '#0033cc'
+    >>> chords[3].color #GREEN
+    '#00cc33'
     '''
 
     score = scoreIn.sliceByGreatestDivisor(addTies=True)
@@ -213,7 +273,7 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
             if not vs.isConsonant(): #music21 recognizes this as a dissonant vertical slice
                 music21VS+=1
                 if _withinRange(offsetList, currentVSOffset, nextVSOffset):
-                    vs.color = '#00cc33' #the user also recognizes this as a dissonant vertical slice GREEn
+                    vs.color = '#00cc33' # the user also recognizes this as a dissonant vertical slice GREEN
                     both+=1
                     c = vs.getChord()
                     romanFigureList.append(music21.roman.romanNumeralFromChord(c, pieceKey).figure)
@@ -419,6 +479,8 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     music21.mainTest(Test)
+
+    
 
 #------------------------------------------------------------------------------
 # eof

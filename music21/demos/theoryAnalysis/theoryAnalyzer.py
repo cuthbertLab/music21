@@ -16,7 +16,7 @@ Module Introduction
 ===========================================
 
 Theory Analyzer methods provide easy analysis tools for common music theory type queries regarding
-a piece of music, such as finding the parallel fifths, locating the passing tones, finding
+a :class:`~music21.stream.Score` (**must have parts**), such as finding the parallel fifths, locating the passing tones, finding
 dissonant harmonic intervals, etc. These analysis methods typically operate in the following way:
 
 1. the score is automatically parsed into small bits for analysis (such as :class:`~music21.voiceLeading.VerticalSlice`, :class:`~music21.voiceLeading.VoiceLeadingQuartet`,  etc.)
