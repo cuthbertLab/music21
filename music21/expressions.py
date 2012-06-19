@@ -724,7 +724,7 @@ class Turn(Ornament):
         transposeIntervalDown = self.size.reverse()
         turnNotes = []
         
-        #TODO: if nachshlag...
+        #TODO: if nachschlag...
         
         firstNote = copy.deepcopy(srcObject)
         #TODO: remove expressions

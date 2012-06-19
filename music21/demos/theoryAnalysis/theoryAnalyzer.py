@@ -151,7 +151,11 @@ from music21.demos.theoryAnalysis import theoryResult
 
 import string
 import unittest
-from sets import Set
+try:
+    s = set()
+except:
+    from sets import Set as set
+    
 from collections import defaultdict
 
 from music21 import environment
@@ -466,7 +470,7 @@ def _getTypeOfAllObjects(objectList):
     setList = []
     for obj in objectList:
         if obj != None:
-            setList.append(Set(obj.classes))
+            setList.append(set(obj.classes))
     if setList:
         lastSet = setList[0]
         
