@@ -500,9 +500,14 @@ class BrailleGrandSegment():
                         gkLeft = gkRight-1
                     try:
                         groupingKeysLeft.remove(gkLeft)
+                    except ValueError:
+                        raise BrailleSegmentException("Misaligned braille groupings: groupingKeyLeft was %s, groupingKeyRight was %s, rightSegment was %s, leftSegment was %s" % (gkLeft, gkRight, rightSegment, leftSegment))
+
+                    try:
                         combinedGroupingKeys.append((gkRight,gkLeft))
                     except ValueError:
-                        raise BrailleSegmentException("Misaligned braille groupings")
+                        raise BrailleSegmentException("Misaligned braille groupings could not append combinedGroupingKeys")
+
         
         while len(groupingKeysLeft) > 0:
             gkLeft = groupingKeysLeft.pop(0)
