@@ -205,9 +205,53 @@ class Chord(note.NotRest):
         3
         '''
         return len(self._components)
+    
+    def __eq__(self, other):
+        '''
+        A music21 chord object is equal to another object if that object is also a chord,
+        if the chords have the same number of notes, the same articulation, the same ties (if any),
+        the same duration, and the same pitches. 
+        
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e', 'g#'])
+        >>> c2 = chord.Chord(['c', 'e', 'g#'])
+        >>> c1 == c2
+        True
+        >>> c2.duration.quarterLength = 2.0
+        >>> c1 == c2
+        False
+        '''
+        
+        if isinstance(other, Chord):
+            if len(self._components) == len(other._components):
+                for i in range(len(self._components)):
+                    if self._components[i] != other._components[i]:
+                        return False
+                return self.duration == other.duration
+            
+    def __ne__(self, other):
+        '''
+        Inequality. 
+        
+        >>> from music21 import *
+        >>> c1 = chord.Chord(['c', 'e', 'g#'])
+        >>> c2 = chord.Chord(['c', 'e', 'g#'])
+        >>> c1 != c2
+        False
+        >>> c2.duration.quarterLength = 2.0
+        >>> c1 != c2
+        True
+        
+        '''
+        
+        return not self.__eq__(other)
+        
+        
+        
+        
 
     def __getitem__(self, key):
-        '''Get item makes access pitch components fo the Chord easier
+        '''Get item makes access pitch components for the Chord easier
         '''
         
         if common.isStr(key) and key.count('.') == 1:

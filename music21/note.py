@@ -1385,6 +1385,43 @@ class Rest(GeneralNote):
 
     def __repr__(self):
         return "<music21.note.Rest %s>" % self.name
+    
+    def __eq__(self, other):
+        '''
+        A Music21 rest is equal to another object if that object is also a rest which 
+        has the same duration.
+        
+        >>> from music21 import *
+        >>> r1 = note.Rest()
+        >>> r2 = note.Rest()
+        >>> r1 == r2
+        True
+        >>> r2.duration.quarterLength = 1.3333
+        >>> r1 == r2
+        False
+        >>> r1 == note.Note()
+        False
+        '''
+        
+        return isinstance(other, Rest) and self.duration == other.duration
+    
+    def __ne__(self, other):
+        '''
+        Inequality
+        
+        >>> from music21 import *
+        >>> r1 = note.Rest()
+        >>> r2 = note.Rest()
+        >>> r1 != r2
+        False
+        >>> r2.duration.quarterLength = 2.0
+        >>> r1 != r2
+        True
+        >>> r1 != note.Note()
+        True
+        '''
+        
+        return not self == other
 
 
     def _getFullName(self):

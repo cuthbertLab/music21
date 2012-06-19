@@ -254,6 +254,7 @@ class Repeat(repeat.RepeatMark, Barline):
     '''
     _repeatDots = None # not sure what this is for; inherited from old modles
 
+
     def __init__(self, direction='start', times=None):
         if direction == 'start':
             style = 'heavy-light'
@@ -278,6 +279,12 @@ class Repeat(repeat.RepeatMark, Barline):
     def _setDirection(self, value):
         if value.lower() in ['start', 'end']:
             self._direction = value.lower()
+            if self._direction=='end':
+                self.style='light-heavy'
+            elif self._direction=='start':
+                self.style='heavy-light'
+        
+        
         else:
             raise BarException('cannot set repeat direction to: %s' % value)
 
@@ -286,6 +293,8 @@ class Repeat(repeat.RepeatMark, Barline):
 
     direction = property(_getDirection, _setDirection, 
         doc = '''Get or set the direction of this Repeat barline. Can be start or end. 
+        
+        TODO: show how changing direction changes style.
         ''')
 
     def _setTimes(self, value):

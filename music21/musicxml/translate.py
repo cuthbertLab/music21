@@ -461,7 +461,7 @@ def mxToRepeat(mxBarline, inputM21=None):
 
     >>> from music21 import *
     >>> mxRepeat = musicxml.Repeat()
-    >>> mxRepeat.set('direction', 'forward')
+    >>> mxRepeat.set('direction', 'backward')
     >>> mxRepeat.get('times') == None
     True
     >>> mxBarline = musicxml.Barline()
@@ -469,10 +469,15 @@ def mxToRepeat(mxBarline, inputM21=None):
     >>> mxBarline.set('repeatObj', mxRepeat)
     >>> b = bar.Repeat()
     >>> b.mx = mxBarline
+    
+    Test that the music21 style for a backwards repeat is called "final"
+    (because it resembles a final barline) but that the musicxml style
+    is called light-heavy.
+    
     >>> b.style
     'final'
     >>> b.direction
-    'start'
+    'end'
     >>> b.mx.get('barStyle')
     'light-heavy'
     '''

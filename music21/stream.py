@@ -47,6 +47,7 @@ from music21 import tie
 from music21 import metadata
 from music21 import repeat
 from music21 import tempo
+from music21 import search
 
 from music21 import environment
 _MOD = "stream.py"
@@ -9970,7 +9971,8 @@ class Stream(music21.Music21Object):
             return returnObj
         else:
             return None
-
+        
+        
 
 #-------------------------------------------------------------------------------
 class Voice(Stream):
