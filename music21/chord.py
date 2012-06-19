@@ -206,45 +206,67 @@ class Chord(note.NotRest):
         '''
         return len(self._components)
     
-    def __eq__(self, other):
-        '''
-        A music21 chord object is equal to another object if that object is also a chord,
-        if the chords have the same number of notes, the same articulation, the same ties (if any),
-        the same duration, and the same pitches. 
-        
-        >>> from music21 import *
-        >>> c1 = chord.Chord(['c', 'e', 'g#'])
-        >>> c2 = chord.Chord(['c', 'e', 'g#'])
-        >>> c1 == c2
-        True
-        >>> c2.duration.quarterLength = 2.0
-        >>> c1 == c2
-        False
-        '''
-        
-        if isinstance(other, Chord):
-            if len(self._components) == len(other._components):
-                for i in range(len(self._components)):
-                    if self._components[i] != other._components[i]:
-                        return False
-                return self.duration == other.duration
-            
-    def __ne__(self, other):
-        '''
-        Inequality. 
-        
-        >>> from music21 import *
-        >>> c1 = chord.Chord(['c', 'e', 'g#'])
-        >>> c2 = chord.Chord(['c', 'e', 'g#'])
-        >>> c1 != c2
-        False
-        >>> c2.duration.quarterLength = 2.0
-        >>> c1 != c2
-        True
-        
-        '''
-        
-        return not self.__eq__(other)
+#    def __eq__(self, other):
+#        '''
+#        A music21 chord object is equal to another object if that object is also a chord,
+#        if the chords have the same number of notes, the same articulation, the same ties (if any),
+#        the same duration, and the same pitches. 
+#        
+#        >>> from music21 import *
+#        >>> c1 = chord.Chord(['c', 'e', 'g#'])
+#        >>> c2 = chord.Chord(['c', 'e', 'g#'])
+#        >>> c1 == c2
+#        True
+#        >>> c2.duration.quarterLength = 2.0
+#        >>> c1 == c2
+#        False
+#
+#
+#        Notes and Chords return False
+#        
+#        >>> n1 = note.Note('c')
+#        >>> c1 == n1
+#        False
+#        '''
+#        
+#        if isinstance(other, Chord):
+#            if len(self._components) == len(other._components):
+#                for i in range(len(self._components)):
+#                    if self._components[i] != other._components[i]:
+#                        return False
+#                if self.duration == other.duration:
+#                    if (sorted(list(set(self.articulations))) ==
+#                        sorted(list(set(other.articulations)))):
+#                        # Tie objects if present compare only type
+#                        if self.tie == other.tie:
+#                            return True
+#                        else:
+#                            return False
+#                    else:
+#                        return False
+#                else:
+#                    return False
+#            else:
+#                return False
+#        else:
+#            return False
+#            
+#    def __ne__(self, other):
+#        '''
+#        Inequality. 
+#        
+#        >>> from music21 import *
+#        >>> c1 = chord.Chord(['c', 'e', 'g#'])
+#        >>> c2 = chord.Chord(['c', 'e', 'g#'])
+#        >>> c1 != c2
+#        False
+#        >>> c2.duration.quarterLength = 2.0
+#        >>> c1 != c2
+#        True
+#        
+#        '''
+#        
+#        return not self.__eq__(other)
         
         
         
