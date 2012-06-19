@@ -40,6 +40,8 @@ class TranslateException(Exception):
 class NoteheadException(TranslateException):
     pass
 
+class XMLBarException(TranslateException):
+    pass
 
 # def mod6IdLocal(spannerObj):
 #     '''
@@ -448,7 +450,7 @@ def repeatToMx(r):
 #         elif self.direction == 'bidirectional':
 #             environLocal.printDebug(['skipping bi-directional repeat'])
     else:
-        raise BarException('cannot handle direction format:', r.direction)
+        raise music21.bar.BarException('cannot handle direction format:', r.direction)
 
     if r.times != None:
         mxRepeat.set('times', r.times)
@@ -494,7 +496,7 @@ def mxToRepeat(mxBarline, inputM21=None):
 
     mxRepeat = mxBarline.get('repeatObj')
     if mxRepeat == None:
-        raise BarException('attempting to create a Repeat from an MusicXML bar that does not define a repeat')
+        raise music21.bar.BarException('attempting to create a Repeat from an MusicXML bar that does not define a repeat')
 
     mxDirection = mxRepeat.get('direction')
 
@@ -505,7 +507,7 @@ def mxToRepeat(mxBarline, inputM21=None):
     elif mxDirection.lower() == 'backward':
         r.direction = 'end'
     else:
-        raise bar.BarException('cannot handle mx direction format:', mxDirection)
+        raise music21.bar.BarException('cannot handle mx direction format:', mxDirection)
 
     if mxRepeat.get('times') != None:
         # make into a number
@@ -1017,7 +1019,7 @@ def mxToOffset(mxDirection, mxDivisions):
     '''
     if mxDivisions is None:
         raise TranslateException(
-        "cannont determine MusicXML duration without a reference to a measure (%s)" % mxNote)
+        "cannont determine MusicXML duration without a reference to a measure (%s)" % mxDirection)
     if mxDirection.offset is None:
         return 0.0
     else:
@@ -1582,7 +1584,7 @@ def mxToInstrument(mxScorePart, inputM21=None):
     # note: transposition values is not set in this operation, but in 
     # mxToStreamPart
     if inputM21 is None:
-        i = instrument.Instrument()
+        i = music21.instrument.Instrument()
     else:
         i = inputM21
 
@@ -2713,7 +2715,7 @@ def mxToRest(mxNote, inputM21=None):
     try:
         #r.duration.mx = mxNote
         mxToDuration(mxNote, r.duration)
-    except duration.DurationException:
+    except music21.duration.DurationException:
         #environLocal.printDebug(['failed extaction of duration from musicxml', 'mxNote:', mxNote, r])
         raise
 
@@ -5397,6 +5399,28 @@ spirit</words>
         raw = s.musicxml
         self.assertEqual(raw.count('slash="no"'), 1)
         self.assertEqual(raw.count('slash="yes"'), 1)
+        
+        
+    def testBarException(self):
+        from music21 import musicxml
+        from music21 import bar
+        mxBarline = musicxml.Barline()
+        mxBarline.set('barStyle', 'light-heavy')
+        #Rasing the BarException
+        self.assertRaises( bar.BarException, mxToRepeat, mxBarline)
+        
+        mxRepeat = musicxml.Repeat()
+        mxRepeat.set('direction', 'backward')
+        mxBarline.set('repeatObj', mxRepeat)
+        
+        #all fine now, no exceptions here
+        mxToRepeat(mxBarline)
+        
+        #Raising the BarException       
+        mxBarline.set('barStyle', 'wunderbar')
+        self.assertRaises( bar.BarException, mxToRepeat, mxBarline)
+        
+        
         
 
 
