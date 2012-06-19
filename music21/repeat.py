@@ -1708,7 +1708,6 @@ class RepeatFinder(object):
         
         #Do not need a repeat at the beginning
         if RepeatFinder(s).getQuarterLengthOfPickupMeasure() != 0 or barStart != 1:
-            #print "this doesn't do anything!!!!!!!"
             s.measure(barStart).leftBarline = music21.bar.Repeat(direction='start')
             
         if inPlace:
@@ -1968,7 +1967,7 @@ class RepeatFinder(object):
                 
 
         for startingBar, firstEndingBar, repeatSignBar in repeatEndingBars:
-            print startingBar, firstEndingBar, repeatSignBar
+            #print startingBar, firstEndingBar, repeatSignBar
             RepeatFinder(s).insertRepeat(startingBar, repeatSignBar, True)                
             lengthOfRepeatEnding = repeatSignBar - firstEndingBar + 1
             lengthOfRepeatedSection = firstEndingBar - startingBar + 1
@@ -2060,7 +2059,7 @@ class Test(unittest.TestCase):
         self.assertEqual(ex._findInnermostRepeatIndices(s), [0])
 
 
-    def testRepeatCoherenceB(self):
+    def testRepeatCoherenceB2(self):
         from music21 import stream, bar, repeat, note
 
         # a nested repeat; acceptable
@@ -2774,7 +2773,8 @@ class Test(unittest.TestCase):
         self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'A4', 'A4'])
 
     def testExpandRepeatExpressionC(self):
-        import stream, note, repeat
+        import stream, note
+        import music21.repeat as repeat
 
         # da capo al fine
         m1 = stream.Measure()
@@ -2801,7 +2801,8 @@ class Test(unittest.TestCase):
 
 
     def testExpandRepeatExpressionD(self):
-        import stream, note, repeat
+        import stream, note
+        import music21.repeat as repeat
 
         # da capo al coda
         m1 = stream.Measure()
@@ -2828,40 +2829,10 @@ class Test(unittest.TestCase):
         # three measure repeat
         self.assertEqual(len(post.getElementsByClass('Measure')), 7)
         self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4', 'A4', 'A4', 'B4', 'B4'])
-
-
-    def testExpandRepeatExpressionD(self):
-        import stream, note, repeat
-
-        # da capo al coda
-        m1 = stream.Measure()
-        m1.repeatAppend(note.Note('c4', type='half'), 2)
-        m2 = stream.Measure()
-        m2.repeatAppend(note.Note('e4', type='half'), 2)
-        m2.append(repeat.Coda('to coda'))
-        m3 = stream.Measure()
-        m3.repeatAppend(note.Note('g4', type='half'), 2)
-        m3.append(repeat.DaCapoAlCoda())
-        m4 = stream.Measure()
-        m4.append(repeat.Coda())
-        m4.repeatAppend(note.Note('a4', type='half'), 2)
-        m5 = stream.Measure()
-        m5.repeatAppend(note.Note('b4', type='half'), 2)
-
-        s = stream.Part()
-        s.append([m1, m2, m3, m4, m5])
-        self.assertEqual(len(s.getElementsByClass('Measure')), 5)
-        #s.show()
-        ex = Expander(s)
-        post = ex.process()
-        #post.show()
-        # three measure repeat
-        self.assertEqual(len(post.getElementsByClass('Measure')), 7)
-        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4', 'A4', 'A4', 'B4', 'B4'])
-
 
     def testExpandRepeatExpressionE(self):
-        import stream, note, repeat
+        import stream, note
+        import music21.repeat as repeat
 
         # dal segno simple
         m1 = stream.Measure()
@@ -2889,7 +2860,8 @@ class Test(unittest.TestCase):
 
 
     def testExpandRepeatExpressionF(self):
-        import stream, note, repeat
+        import stream, note
+        import music21.repeat as repeat
         # dal segno al fine
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4', type='half'), 2)
@@ -2918,7 +2890,8 @@ class Test(unittest.TestCase):
 
 
     def testExpandRepeatExpressionG(self):
-        import stream, note, repeat
+        import stream, note
+        import music21.repeat as repeat
         # dal segno al coda
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4', type='half'), 2)
