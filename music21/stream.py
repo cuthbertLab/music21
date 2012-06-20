@@ -5,6 +5,7 @@
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
+#               Evan Lynch
 #
 # Copyright:    (c) 2009-2012 The music21 Project
 # License:      LGPL
@@ -22,6 +23,7 @@ from collections import defaultdict
 
 import music21 # needed to do fully-qualified isinstance name checking
 
+from operator import attrgetter
 from music21 import bar
 from music21 import common
 #from music21 import classCache
@@ -901,13 +903,16 @@ class Stream(music21.Music21Object):
         raise StreamException('cannot find object (%s) in Stream' % obj)
 
 
-    def remove(self, target, firstMatchOnly=True):
+    def remove(self, targetOrList, firstMatchOnly=True, shiftOffsets = False): #, renumberMeasures = False):
         '''
         Remove an object from this Stream. Additionally, this Stream is 
         removed from the object's sites in :class:`~music21.base.DefinedContexts`.
 
 
-        By default, only the first match is removed. This can be adjusted with the `firstMatchOnly` parameters. 
+        By default, only the first match is removed. This can be adjusted with the `firstMatchOnly` parameters.
+        If a list of objects is passed, they will all be removed. If shiftOffsets is True, then offsets will be
+        corrected after object removal. It is more efficient to pass a list of objects than to call remove on
+        each object individually if shiftOffsets is True.
 
 
         >>> from music21 import *
@@ -929,24 +934,112 @@ class Stream(music21.Music21Object):
         No error is raised if the target is not found.
         
         >>> s.remove(n3)
+        
+        >>> s2 = stream.Stream()
+        >>> c = clef.TrebleClef()
+        >>> n1, n2, n3, n4 = note.Note('a'), note.Note('b'), note.Note('c'), note.Note('d')
+        >>> n5, n6, n7, n8 = note.Note('e'), note.Note('f'), note.Note('g'), note.Note('a')
+        >>> s2.insert(0.0, c)
+        >>> s2.append([n1,n2,n3,n4,n5,n6,n7,n8])
+        >>> s2.remove(n1, shiftOffsets = True)
+        >>> s2.show('text')
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.note.Note B>
+        {1.0} <music21.note.Note C>
+        {2.0} <music21.note.Note D>
+        {3.0} <music21.note.Note E>
+        {4.0} <music21.note.Note F>
+        {5.0} <music21.note.Note G>
+        {6.0} <music21.note.Note A>
+        
+        >>> s2.remove([n3, n6, n4], shiftOffsets = True)
+        >>> s2.show('text')
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.note.Note B>
+        {1.0} <music21.note.Note E>
+        {2.0} <music21.note.Note G>
+        {3.0} <music21.note.Note A>
+        
         '''
-        try:
-            i = self.index(target)
-        except StreamException:
-            return # if not found, no error is raised
-        match = None
-        baseElementCount = len(self._elements)
-        if i < baseElementCount:
-            match = self._elements.pop(i)
-        else: # its in end elements
-            match = self._endElements.pop(i-baseElementCount) 
-
-        if match is not None:
-            # removing an object will never change the sort status
-            self._elementsChanged(clearIsSorted=False)
-            match.removeLocationBySite(self)
-
-
+        if type(targetOrList) is list:
+            targetList = sorted(targetOrList, key=lambda target: target.getOffsetBySite(self))
+            
+            if shiftOffsets:
+                shiftDur = 0.0
+            for i,target in enumerate(targetList):   
+                try:
+                    indexInStream = self.index(target)
+                except StreamException:
+                    return # if not found, no error is raised
+                match = None
+                matchedEndElement = False
+                baseElementCount = len(self._elements)
+                if indexInStream < baseElementCount:
+                    match = self._elements.pop(indexInStream)
+                else:
+                    match = self._endElements.pop(indexInStream-baseElementCount)
+                    matchedEndElement = True
+                
+                if match is not None:
+                    if shiftOffsets is True:
+                        matchOffset = match.getOffsetBySite(self)
+                    
+                    self._elementsChanged(clearIsSorted=False)
+                    match.removeLocationBySite(self)
+                
+                if shiftOffsets is True and matchedEndElement is False:
+                    matchDuration = match.duration.quarterLength
+                    shiftedRegionStart = matchOffset + matchDuration
+                    if i+1 < len(targetList):
+                        shiftedRegionEnd = targetList[i+1].getOffsetBySite(self)
+                    else:
+                        shiftedRegionEnd = self.duration.quarterLength
+                
+                    shiftDur = shiftDur + matchDuration
+                    if shiftDur != 0.0:
+                        for e in self.getElementsByOffset(shiftedRegionStart,
+                            shiftedRegionEnd,
+                            includeEndBoundary = False,
+                            mustFinishInSpan = False,
+                            mustBeginInSpan = True):
+                            
+                            elementOffset = e.getOffsetBySite(self)
+                            e.setOffsetBySite(self, elementOffset-shiftDur)
+                #if renumberMeasures is True and matchedEndElement is False:
+                 #   pass # This should maybe just call a function renumberMeasures
+        else:
+            target = targetOrList
+            try:
+                i = self.index(target)
+            except StreamException:
+                return # if not found, no error is raised
+            match = None
+            matchedEndElement = False
+            baseElementCount = len(self._elements)
+            if i < baseElementCount:
+                match = self._elements.pop(i)
+            else: # its in end elements
+                match = self._endElements.pop(i-baseElementCount) 
+                matchedEndElement = True
+    
+            if match is not None:
+                if shiftOffsets is True: 
+                    matchOffset = match.getOffsetBySite(self)
+                # removing an object will never change the sort status
+                self._elementsChanged(clearIsSorted=False)
+                match.removeLocationBySite(self)
+                
+                if shiftOffsets is True and matchedEndElement is False: #shift all elements after the deletion point
+                    shiftDur = match.duration.quarterLength
+                    if shiftDur != 0.0:
+                        for e in self._elements:
+                            elementOffset = e.getOffsetBySite(self)
+                            if elementOffset < matchOffset+shiftDur: #shift only elements after the deleted section
+                                continue 
+                            e.setOffsetBySite(self, elementOffset-shiftDur)
+               # if renumberMeasures is True and matchedEndElement is False and type(match):
+                #    pass #This should just call a function renumberMeasures
+            
     def pop(self, index):
         '''Return and remove the object found at the user-specified index value. Index values are those found in `elements` and are not necessary offset order. 
 
@@ -1657,47 +1750,65 @@ class Stream(music21.Music21Object):
         2.0
         >>> len(st3)
         2
+        
+        N.B. -- using this method on a list assumes that you'll be inserting
+        contiguous objects; you can't shift things that are separated, as this
+        following FAILED example shows.
+        
+        >>> n1 = note.HalfNote('G')
+        >>> st4 = stream.Stream()
+        >>> st4.repeatAppend(n1, 3)
+        >>> st4.insertAndShift([2.0, note.Note('e'), 4.0, note.Note('f')])
+        >>> st4.show('text')
+        {0.0} <music21.note.Note G>
+        {2.0} <music21.note.Note E>
+        {4.0} <music21.note.Note F>
+        {5.0} <music21.note.Note G>
+        {7.0} <music21.note.Note G>
         '''
         # need to find the highest time after the insert  
         if itemOrNone is not None: # we have an offset and an element
             #if hasattr(itemOrNone, 'duration') and itemOrNone.duration is not None:
-            if itemOrNone.duration is not None:
-                dur = itemOrNone.duration.quarterLength
+            insertObject = itemOrNone
+            if insertObject.duration is not None:
+                qL = insertObject.duration.quarterLength
             else:
-                dur = 0.0
-            lowestOffsetInsert = offsetOrItemOrList
-            highestTimeInsert = offsetOrItemOrList + dur
+                qL = 0.0
+            offset = offsetOrItemOrList
+            lowestOffsetInsert = offset
+            highestTimeInsert = offset + qL
         elif itemOrNone == None and isinstance(offsetOrItemOrList, list):
             # need to find which has the max combined offset and dur
+            insertList = offsetOrItemOrList
             highestTimeInsert = 0.0
             lowestOffsetInsert = None
             i = 0
-            while i < len(offsetOrItemOrList):
-                o = offsetOrItemOrList[i]
-                e = offsetOrItemOrList[i+1]
+            while i < len(insertList):
+                o = insertList[i]
+                e = insertList[i+1]
                 #if hasattr(e, 'duration')  and e.duration is not None:
                 if e.duration is not None:
-                    dur = e.duration.quarterLength
+                    qL = e.duration.quarterLength
                 else:
-                    dur = 0.0
-                if o + dur > highestTimeInsert:
-                    highestTimeInsert = o + dur
+                    qL = 0.0
+                if o + qL > highestTimeInsert:
+                    highestTimeInsert = o + qL
                 if o < lowestOffsetInsert or lowestOffsetInsert is None:
                     lowestOffsetInsert = o
                 i += 2
         else: # using native offset
             #if hasattr(offsetOrItemOrList, 'duration'):
-            if offsetOrItemOrList.duration is not None:
-                dur = offsetOrItemOrList.duration.quarterLength
+            insertObject = offsetOrItemOrList
+            if insertObject.duration is not None:
+                qL = insertObject.duration.quarterLength
             else:
-                dur = 0.0
+                qL = 0.0
             # should this be getOffsetBySite(None)?
-            highestTimeInsert = offsetOrItemOrList.offset + dur
-            lowestOffsetInsert = offsetOrItemOrList.offset
+            highestTimeInsert = insertObject.offset + qL
+            lowestOffsetInsert = insertObject.offset
 
         # this shift is the additional time to move due to the duration
         # of the newly inserted elements
-        shiftDur = highestTimeInsert - lowestOffsetInsert
 
         #environLocal.printDebug(['insertAndShift()', 'adding one or more elements', 'lowestOffsetInsert', lowestOffsetInsert, 'highestTimeInsert', highestTimeInsert])
 
@@ -1723,7 +1834,10 @@ class Stream(music21.Music21Object):
         else:
             shiftPos = 0
 
-        if shiftPos > 0:
+        if shiftPos <= 0:
+            pass  # no need to move any objects
+        # See testStream.py - testInsertAndShiftNoDuration clef insertion at offset 3 which gives shiftPos < 0
+        else:
             # need to move all the elements already in this stream
             for e in self._elements:
                 o = e.getOffsetBySite(self)
@@ -9841,7 +9955,7 @@ class Stream(music21.Music21Object):
     
     def _getVariants(self):
         if 'variants' not in self._cache or self._cache['variants'] is None:
-           self._cache['variants'] = self.getElementsByClass('Variant', 
+            self._cache['variants'] = self.getElementsByClass('Variant', 
                                   returnStreamSubClass=False)
         return self._cache['variants']
                 
@@ -9879,100 +9993,606 @@ class Stream(music21.Music21Object):
 
         >>> from music21 import *
         >>> s = stream.Stream()
-        >>> s.repeatAppend(note.Note(), 8)
-        >>> v1 = variant.Variant([note.Note('D#4'), note.Note('F#4')])
-        >>> s.insert(3, v1)
-        >>> [p for p in s.pitches]
-        [C4, C4, C4, C4, C4, C4, C4, C4]
-        >>> s.activateVariants(inPlace=True)
-        >>> [p for p in s.pitches]
-        [C4, C4, C4, D#4, F#4, C4, C4, C4, C4]
-        >>> s.activateVariants(inPlace=True)
-        >>> [p for p in s.pitches]
-        [C4, C4, C4, C4, C4, C4, C4, C4]
+        >>> s.repeatAppend(note.Note('C4'), 8)
+        >>> v1 = variant.Variant([note.Note('D#4')])
+        >>> v1.append(note.Note('F#4'))
+        >>> v1.groups = ['paris']
+        >>> s.insert(3.0, v1)
+        >>> s.show('text')
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note C>
+        {2.0} <music21.note.Note C>
+        {3.0} <music21.variant.Variant object at ...>
+        {3.0} <music21.note.Note C>
+        {4.0} <music21.note.Note C>
+        {5.0} <music21.note.Note C>
+        {6.0} <music21.note.Note C>
+        {7.0} <music21.note.Note C>
+        
+        >>> s.activateVariants('paris', inPlace=True)
+        >>> s.show('text')
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note C>
+        {2.0} <music21.note.Note C>
+        {3.0} <music21.variant.Variant object at ...>
+        {3.0} <music21.note.Note D#>
+        {4.0} <music21.note.Note F#>
+        {5.0} <music21.note.Note C>
+        {6.0} <music21.note.Note C>
+        {7.0} <music21.note.Note C>
+        
+        >>> s.activateVariants('default', inPlace=True)
+        >>> s.show('text')
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note C>
+        {2.0} <music21.note.Note C>
+        {3.0} <music21.variant.Variant object at ...>
+        {3.0} <music21.note.Note C>
+        {4.0} <music21.note.Note C>
+        {5.0} <music21.note.Note C>
+        {6.0} <music21.note.Note C>
+        {7.0} <music21.note.Note C>
+        
+        Note that repeatedly activating variants (inPlace = True) loses the group names.
+        
+        >>> v1 = s.variants[0]
+        >>> v1.replacementDuration = 4.0
+        >>> v1.groups = ['paris']
+        >>> s.activateVariants('paris', inPlace=True)
+        >>> s.show('text')
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note C>
+        {2.0} <music21.note.Note C>
+        {3.0} <music21.variant.Variant object at ...>
+        {3.0} <music21.note.Note D#>
+        {4.0} <music21.note.Note F#>
+        {5.0} <music21.note.Note C>
+        
+        >>> v1 = s.variants[0]
+        >>> v1.replacementDuration = 1.0
+        >>> s.activateVariants('default', inPlace=True)
+        >>> s.show('text')
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note C>
+        {2.0} <music21.note.Note C>
+        {3.0} <music21.variant.Variant object at ...>
+        {3.0} <music21.note.Note C>
+        {4.0} <music21.note.Note C>
+        {5.0} <music21.note.Note C>
+        {6.0} <music21.note.Note C>
+        {7.0} <music21.note.Note F#>
+        {8.0} <music21.note.Note C>
 
         '''
         from music21 import variant
-
+        
         if not inPlace: # make a copy
             returnObj = deepcopy(self)
         else:
             returnObj = self
-
-        # first, get target time spans of the variant
+            
+        elongationVariants = []
+        deletionVariants = []
+        
         for v in returnObj.variants:    
             if group is not None:
                 if group not in v.groups:
                     continue # skip those that are not part of this group
 
-            # create a replacement variant for each used variant; it 
-            # my not be added to the Stream if there are no matches
-            removed = variant.Variant() # what group should this have?
-            vStart = v.getOffsetBySite(returnObj)
-
-            # this method matches and removes on an individual basis        
-            if not matchBySpan:
-                targetsMatched = 0
-                for e in v.elements: # get components in the Variant
-                    # get target offset relative to Stream
-                    oInStream = vStart + e.getOffsetBySite(v.containedSite)
-                    # get all elements at this offset, force a class match
-                    targets = returnObj.getElementsByOffset(oInStream, 
-                                        classList=[e.classes[0]])
-                    # only replace if we match the start
-                    if len(targets) > 0:
-                        targetsMatched += 1
-                        # always assume we just want the first one?
-                        targetToReplace = targets[0]
-                        #environLocal.pd(['matchBySpan', matchBySpan, 'found target to replace:', targetToReplace])
-                        # remove the target, place in removed Variant
-                        removed.append(targetToReplace)
-                        returnObj.remove(targetToReplace)
-                        # extract the variant component and insert into place
-                        returnObj.insert(oInStream, e)
-                # only remove old and add removed if we matched
-                if targetsMatched > 0:
-                    # remove the original variant
-                    returnObj.remove(v)
-                    # place newly contained elements in position
-                    returnObj.insert(vStart, removed)
-
-            # matching by span means that we remove all elements with the
-            # span defined by the variant
-            else:
-                vEnd = vStart + v.containedHighestTime
-                classes = [] # collect all classes found in this variant    
-                for e in v.elements:
-                    classes.append(e.classes[0])
-                targets = returnObj.getElementsByOffset(vStart, vEnd,
-                    includeEndBoundary=False, # do not get e tt start at end
-                    mustFinishInSpan=False, # if extends beyond, still get
-                    mustBeginInSpan=True,
-                    classList=classes)
-
-                # this will always remove elements before inserting
-                for e in targets:
-                    # need to get time relative to variant container's position
-                    oInVariant = e.getOffsetBySite(returnObj) - vStart
-                    removed.insert(oInVariant, e)
-                    #environLocal.pd(['matchBySpan', matchBySpan, 'activateVariants', 'removing', e])
-                    returnObj.remove(e)
-                for e in v.elements:
-                    oInStream = vStart + e.getOffsetBySite(v.containedSite)
-                    returnObj.insert(oInStream, e)
-                # remove the source variant
-                returnObj.remove(v)
-                # place newly contained elements in position
-                returnObj.insert(vStart, removed)
-
+            lengthType = v.lengthType
+            
+            #save insertions to perform last
+            if lengthType == 'elongation':
+                elongationVariants.append(v)
+            #save deletions to perform after replacements
+            elif lengthType == 'deletion':
+                deletionVariants.append(v)
+            #Deal with cases in which variant is the same length as what it replaces first.
+            elif lengthType == 'replacement':
+                returnObj._insertReplacementVariant(v, matchBySpan)
+                
+        #Now deal with deletions
+        deletedRegionsForRemoval = []
+        for v in deletionVariants:
+            deletedRegion = returnObj._insertDeletionVariant(v, matchBySpan)
+            deletedRegionsForRemoval.append(deletedRegion)
+        returnObj._removeOrExpandGaps(deletedRegionsForRemoval, isRemove = True, inPlace = True) #Squeeze out the remaining gaps
+                
+        #Before we can deal with insertions, we have to expand the stream to make space.
+        insertionRegionsForExpansion = []
+        for v in elongationVariants:
+            lengthDifference = v.replacementDuration - v.containedHighestTime
+            insertionStart = v.getOffsetBySite(returnObj) + v.replacementDuration
+            insertionRegionsForExpansion.append((insertionStart, -1 * lengthDifference, [v]))   #Saves the information for each gap to be expanded
+        returnObj._removeOrExpandGaps(insertionRegionsForExpansion, isRemove = False, inPlace = True)   #Expands the appropriate gaps in the stream.
+        
+        # Now deal with elements associated with insertions.
+        for v in elongationVariants:
+            returnObj._insertInsertionVariant(v, matchBySpan)
+            
         # have to clear cached variants, as they are no longer the same
         returnObj._elementsChanged()
         if not inPlace:
             return returnObj
         else:
             return None
+    
+    def _insertReplacementVariant(self, v, matchBySpan = True):
+        '''
+        Helper function for activateVariants. Activates variants which are the same size there the
+        region they replace.
+        
+        >>> from music21 import *
+        >>> v = variant.Variant()
+        >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
+        >>> variantDataM2 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
+        >>> variantData = [variantDataM1, variantDataM2]
+        >>> for d in variantData:
+        ...    m = stream.Measure()
+        ...    for pitchName,durType in d:
+        ...        n = note.Note(pitchName)
+        ...        n.duration.type = durType
+        ...        m.append(n)
+        ...    v.append(m)
+        >>> v.groups = ['paris']
+        >>> v.replacementDuration = 8.0
+        
+        >>> s = stream.Stream()
+        >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
+        >>> streamDataM2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
+        >>> streamDataM3 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+        >>> streamDataM4 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+        >>> streamData = [streamDataM1, streamDataM2, streamDataM3, streamDataM4]
+        >>> for d in streamData:
+        ...    m = stream.Measure()
+        ...    for pitchName,durType in d:
+        ...        n = note.Note(pitchName)
+        ...        n.duration.type = durType
+        ...        m.append(n)
+        ...    s.append(m)
+        >>> s.insert(4.0, v)
+        
+        >>> s._insertReplacementVariant(v)
+        >>> s.show('text')
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note G>
+        {4.0} <music21.variant.Variant object at ...>
+        {4.0} <music21.stream.Measure 0 offset=4.0>
+            {0.0} <music21.note.Note B>
+            {0.5} <music21.note.Note C>
+            {1.0} <music21.note.Note A>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note B>
+        {8.0} <music21.stream.Measure 0 offset=8.0>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note D>
+            {2.0} <music21.note.Note E>
+            {3.0} <music21.note.Note E>
+        {12.0} <music21.stream.Measure 0 offset=12.0>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note A>
+        '''
+        from music21 import variant
+        
+        removed = variant.Variant() # replacement variant
+        removed.groups = ['default'] #for now, default
+        vStart = v.getOffsetBySite(self)       
+        # this method matches and removes on an individual basis        
+        if not matchBySpan:
+            targetsMatched = 0
+            for e in v.elements: # get components in the Variant
+                # get target offset relative to Stream
+                oInStream = vStart + e.getOffsetBySite(v.containedSite)
+                # get all elements at this offset, force a class match
+                targets = self.getElementsByOffset(oInStream, 
+                                    classList=[e.classes[0]])
+                # only replace if we match the start
+                if len(targets) > 0:
+                    targetsMatched += 1
+                    # always assume we just want the first one?
+                    targetToReplace = targets[0]
+                    #environLocal.pd(['matchBySpan', matchBySpan, 'found target to replace:', targetToReplace])
+                    # remove the target, place in removed Variant
+                    removed.append(targetToReplace)
+                    self.remove(targetToReplace)
+                    # extract the variant component and insert into place
+                    self.insert(oInStream, e)
+            # only remove old and add removed if we matched
+            if targetsMatched > 0:
+                # remove the original variant
+                self.remove(v)
+                # place newly contained elements in position
+                self.insert(vStart, removed)
+
+        # matching by span means that we remove all elements with the
+        # span defined by the variant
+        else:
+            vEnd = vStart + v.containedHighestTime
+            classes = [] # collect all classes found in this variant    
+            for e in v.elements:
+                classes.append(e.classes[0])
+            targets = self.getElementsByOffset(vStart, vEnd,
+                includeEndBoundary=False, # do not get e tt start at end
+                mustFinishInSpan=False, # if extends beyond, still get
+                mustBeginInSpan=True,
+                classList=classes)
+
+            # this will always remove elements before inserting
+            for e in targets:
+                # need to get time relative to variant container's position
+                oInVariant = e.getOffsetBySite(self) - vStart
+                removed.insert(oInVariant, e)
+                #environLocal.pd(['matchBySpan', matchBySpan, 'activateVariants', 'removing', e])
+                self.remove(e)
+            for e in v.elements:
+                oInStream = vStart + e.getOffsetBySite(v.containedSite)
+                self.insert(oInStream, e)
+            # remove the source variant
+            self.remove(v)
+            # place newly contained elements in position
+            self.insert(vStart, removed)
+    
+    def _insertDeletionVariant(self, v, matchBySpan = True):
+        '''
+        Helper function for activateVariants used for inserting variants that are shorter than
+        the region they replace. Inserts elements in the variant and deletes elements in the
+        replaced region but does not close gaps.
+        
+        Returns a tuple describing the region where elements were removed, the
+        gap is left behind to be dealt with by _removeOrExpandGaps.
+        Tuple is of form (startOffset, lengthOfDeletedRegion, []). The empty list is expected by _removeOrExpandGaps
+        and describes the list of elements which should be exempted from shifting for a particular gap. In the 
+        case of deletion, no elements need be exempted.
+        
+        >>> from music21 import *
+        >>> v = variant.Variant()
+        >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
+        >>> variantDataM2 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
+        >>> variantData = [variantDataM1, variantDataM2]
+        >>> for d in variantData:
+        ...    m = stream.Measure()
+        ...    for pitchName,durType in d:
+        ...        n = note.Note(pitchName)
+        ...        n.duration.type = durType
+        ...        m.append(n)
+        ...    v.append(m)
+        >>> v.groups = ['paris']
+        >>> v.replacementDuration = 12.0
+        
+        >>> s = stream.Stream()
+        >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
+        >>> streamDataM2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
+        >>> streamDataM3 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+        >>> streamDataM4 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+        >>> streamData = [streamDataM1, streamDataM2, streamDataM3, streamDataM4]
+        >>> for d in streamData:
+        ...    m = stream.Measure()
+        ...    for pitchName,durType in d:
+        ...        n = note.Note(pitchName)
+        ...        n.duration.type = durType
+        ...        m.append(n)
+        ...    s.append(m)
+        >>> s.insert(4.0, v)
         
         
+        >>> deletedRegion = s._insertDeletionVariant(v)
+        >>> s.show('text')
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note G>
+        {4.0} <music21.variant.Variant object at ...>
+        {4.0} <music21.stream.Measure 0 offset=4.0>
+            {0.0} <music21.note.Note B>
+            {0.5} <music21.note.Note C>
+            {1.0} <music21.note.Note A>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note B>
+        {8.0} <music21.stream.Measure 0 offset=8.0>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note D>
+            {2.0} <music21.note.Note E>
+            {3.0} <music21.note.Note E>
+        
+        '''
+        from music21 import variant
+        
+        lengthDifference = v.replacementDuration - v.containedHighestTime #length of the deleted region
+        removed = variant.Variant() # what group should this have?
+        removed.groups = ['default'] #for now, default
+        removed.replacementDuration = v.containedHighestTime
+        vStart = v.getOffsetBySite(self)
+        
+        #deal with the overlapping region first (limit by class)
+        vEnd = vStart + v.containedHighestTime
+        classes = [] # collect all classes found in this variant    
+        for e in v.elements:
+            classes.append(e.classes[0])
+        targets = self.getElementsByOffset(vStart, vEnd,
+            includeEndBoundary=False, # do not get e tt start at end
+            mustFinishInSpan=False, # if extends beyond, still get
+            mustBeginInSpan=True,
+            classList=classes)
+
+        # this will always remove elements before inserting
+        for e in targets:
+            oInVariant = e.getOffsetBySite(self) - vStart
+            removed.insert(oInVariant, e)
+            self.remove(e)
+        
+        #Next deal with elements in the deleted section (do not limit by class)
+        deletionStart = vEnd
+        deletionEnd = vEnd + lengthDifference
+        targets = self.getElementsByOffset(deletionStart, deletionEnd,
+            includeEndBoundary=False,
+            mustFinishInSpan=False,
+            mustBeginInSpan=True)
+        
+        for e in targets:
+            oInVariant = e.getOffsetBySite(self) - vStart
+            removed.insert(oInVariant, e)
+            self.remove(e)
+        
+        #Next put in the elements from the variant
+        for e in v.elements:
+            oInStream = vStart + e.getOffsetBySite(v.containedSite)
+            self.insert(oInStream, e)
+        
+        # remove the source variant
+        self.remove(v)
+        # place newly contained elements in position
+        self.insert(vStart, removed)
+        
+        #each variant leaves a gap, this saves the required information about those gaps
+        return (deletionStart, lengthDifference, [])
+    
+    def _insertInsertionVariant(self, v, matchBySpan = True):
+        '''
+        Helper function for activateVariants. _removeOrExpandGaps must be called on the expanded regions before this function
+        or it will not work properly.
+        
+        >>> from music21 import *
+        >>> v = variant.Variant()
+        >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
+        >>> variantDataM2 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
+        >>> variantData = [variantDataM1, variantDataM2]
+        >>> for d in variantData:
+        ...    m = stream.Measure()
+        ...    for pitchName,durType in d:
+        ...        n = note.Note(pitchName)
+        ...        n.duration.type = durType
+        ...        m.append(n)
+        ...    v.append(m)
+        >>> v.groups = ['paris']
+        >>> v.replacementDuration = 4.0
+        
+        >>> s = stream.Stream()
+        >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
+        >>> streamDataM2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
+        >>> streamDataM3 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+        >>> streamDataM4 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+        >>> streamData = [streamDataM1, streamDataM2, streamDataM3, streamDataM4]
+        >>> for d in streamData:
+        ...    m = stream.Measure()
+        ...    for pitchName,durType in d:
+        ...        n = note.Note(pitchName)
+        ...        n.duration.type = durType
+        ...        m.append(n)
+        ...    s.append(m)
+        >>> s.insert(4.0, v)
+        
+        >>> insertionRegionsForExpansion = [(8.0, 4.0, [v])]
+        >>> s._removeOrExpandGaps(insertionRegionsForExpansion, isRemove = False, inPlace = True)
+        
+        >>> s._insertInsertionVariant(v)
+        >>> s.show('text')
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note G>
+        {4.0} <music21.variant.Variant object at ...>
+        {4.0} <music21.stream.Measure 0 offset=4.0>
+            {0.0} <music21.note.Note B>
+            {0.5} <music21.note.Note C>
+            {1.0} <music21.note.Note A>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note B>
+        {8.0} <music21.stream.Measure 0 offset=8.0>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note D>
+            {2.0} <music21.note.Note E>
+            {3.0} <music21.note.Note E>
+        {12.0} <music21.stream.Measure 0 offset=12.0>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note A>
+        {16.0} <music21.stream.Measure 0 offset=16.0>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note A>
+        
+        '''
+        from music21 import variant
+        
+        lengthDifference = v.replacementDuration - v.containedHighestTime
+        removed = variant.Variant() # what group should this have?
+        removed.groups = ['default'] #for now, default
+        removed.replacementDuration = v.containedHighestTime
+        vStart = v.getOffsetBySite(self)
+                
+        #First deal with the elements in the overlapping section (limit by class)
+        vEnd = vStart + v.replacementDuration
+        classes = [] # collect all classes found in this variant    
+        for e in v.elements:
+            classes.append(e.classes[0])
+        targets = self.getElementsByOffset(vStart, vEnd,
+            includeEndBoundary=False, # do not get e tt start at end
+            mustFinishInSpan=False, # if extends beyond, still get
+            mustBeginInSpan=True,
+            classList=classes)
+
+        # this will always remove elements before inserting
+        for e in targets:
+            oInVariant = e.getOffsetBySite(self) - vStart
+            removed.insert(oInVariant, e)
+            self.remove(e)
+        
+        #Next deal with elements in the inserted section (do not limit by class)
+        insertionStart = vEnd
+        insertionEnd = vEnd + lengthDifference
+        targets = self.getElementsByOffset(insertionStart, insertionEnd,
+            includeEndBoundary=False,
+            mustFinishInSpan=False,
+            mustBeginInSpan=True)
+        
+        for e in targets:
+            oInVariant = e.getOffsetBySite(self) - vStart
+            removed.insert(oInVariant, e)
+            self.remove(e)
+        
+        
+        #Next put in the elements from the variant
+        for e in v.elements:
+            oInStream = vStart + e.getOffsetBySite(v.containedSite)
+            self.insert(oInStream, e)
+        
+        # remove the source variant
+        self.remove(v)
+        # place newly contained elements in position
+        self.insert(vStart, removed)
+    
+    def _removeOrExpandGaps(self, listOffsetDurExemption, isRemove = True, inPlace = False, exemptClasses = None):
+        '''
+        Helper for activateVariants. Takes a list of tuples in the form (startoffset, duration, [list, of, exempt, objects]). If isRemove is True,
+        gaps with duration will be closed at each startOffset. Exempt objects are useful for gap-expansion with variants. The gap must push all objects
+        that occur after the insertion ahead, but the variant object itself should not be moved except by other gaps. This is poorly written
+        and should be re-written, but its difficult to describe.
+        
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> s.insert(5.0, note.Note('a'))
+        >>> s.insert(10.0, note.Note('b'))
+        >>> s.insert(11.0, note.Note('c'))
+        >>> s.insert(12.0, note.Note('d'))
+        >>> s.insert(13.0, note.Note('e'))
+        >>> s.insert(20.0, note.Note('f'))
+        >>> n = note.Note('g')
+        >>> s.insert(15.0, n)
+        
+        >>> sGapsRemoved = s._removeOrExpandGaps([(0.0,5.0, []), (6.0,4.0, []), (14.0,6.0, [n])], isRemove = True)
+        >>> sGapsRemoved.show('text')
+        {0.0} <music21.note.Note A>
+        {1.0} <music21.note.Note B>
+        {2.0} <music21.note.Note C>
+        {3.0} <music21.note.Note D>
+        {4.0} <music21.note.Note E>
+        {15.0} <music21.note.Note G>
+        {5.0} <music21.note.Note F>
+        
+        >>> sGapsExpanded = s._removeOrExpandGaps([(0.0,5.0, []), (11.0,5.0, []), (14.0,1.0, [n])], isRemove = False)
+        >>> sGapsExpanded.show('text')
+        {10.0} <music21.note.Note A>
+        {15.0} <music21.note.Note B>
+        {21.0} <music21.note.Note C>
+        {22.0} <music21.note.Note D>
+        {23.0} <music21.note.Note E>
+        {25.0} <music21.note.Note G>
+        {31.0} <music21.note.Note F>
+        
+        '''
+        if inPlace is True:
+            returnObj = self
+        else:
+            returnObj = copy.deepcopy(self)
+        
+        returnObjDuration = returnObj.duration.quarterLength
+        
+        # If any classes should be exempt from gap closing or expanding, this deals with those.
+        classList = []
+        if exemptClasses is None:
+            classList = None
+        else:
+            for e in returnObj.elements:
+                if type(e) not in classList:
+                    classList.append(type(e))
+            for c in exemptClasses:
+                if c in classList:
+                    classList.remove(c)
+        
+        
+        if isRemove is True:    
+            shiftDur = 0.0
+            listSorted = sorted(listOffsetDurExemption, key=lambda target: target[0])
+            for i,durTuple in enumerate(listSorted):
+                startOffset, duration, exemptObjects = durTuple
+                if i+1 < len(listSorted):
+                    endOffset = listSorted[i+1][0]
+                    includeEnd = False
+                else:
+                    endOffset = returnObjDuration
+                    includeEnd = True
+                    
+                shiftDur = shiftDur + duration
+                for e in returnObj.getElementsByOffset(startOffset+duration,
+                    endOffset,
+                    includeEndBoundary = includeEnd,
+                    mustFinishInSpan = False,
+                    mustBeginInSpan = True,
+                    classList = classList):
+                    
+                    if e in exemptObjects:
+                        continue
+                    
+                    elementOffset = e.getOffsetBySite(returnObj)
+                    e.setOffsetBySite(returnObj, elementOffset-shiftDur)
+        else:
+            shiftDur = 0.0
+            shiftsDict = {}
+            listSorted = sorted(listOffsetDurExemption, key=lambda target: target[0])
+            for i, durTuple in enumerate(listSorted):
+                startOffset, duration, exemptObjects = durTuple
+                
+                if i+1 < len(listSorted):
+                    endOffset = listSorted[i+1][0]
+                    includeEnd = False
+                else:
+                    endOffset = returnObjDuration
+                    includeEnd = True
+                    
+                exemptShift = shiftDur
+                shiftDur = shiftDur + duration
+                shiftsDict[startOffset] = shiftDur, endOffset, includeEnd, exemptObjects, exemptShift
+            
+            for offset in sorted(shiftsDict.keys(), key=lambda offset: -offset):
+                shiftDur, endOffset, includeEnd, exemptObjects, exemptShift = shiftsDict[offset]
+                for e in returnObj.getElementsByOffset(offset,
+                    endOffset,
+                    includeEndBoundary = includeEnd,
+                    mustFinishInSpan = False,
+                    mustBeginInSpan = True,
+                    classList = classList):
+                    
+                    if e in exemptObjects:
+                        elementOffset = e.getOffsetBySite(returnObj)
+                        e.setOffsetBySite(returnObj, elementOffset+exemptShift)
+                        continue
+                    
+                    elementOffset = e.getOffsetBySite(returnObj)
+                    e.setOffsetBySite(returnObj, elementOffset+shiftDur)
+                    
+        if inPlace is True:
+            return
+        else:
+            return returnObj
 
 #-------------------------------------------------------------------------------
 class Voice(Stream):

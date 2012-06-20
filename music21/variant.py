@@ -20,11 +20,13 @@ import unittest
 
 import music21
 import copy
+import difflib
 
 from music21 import common
 from music21 import stream
 from music21 import environment
 from music21 import note
+from music21 import search
 
 _MOD = "variant.py" # TODO: call variant
 environLocal = environment.Environment(_MOD)
@@ -32,6 +34,588 @@ environLocal = environment.Environment(_MOD)
 
 
 #-- Functions
+def mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace = False):
+    '''
+    Takes two streams of measures and returns a stream (new if inPlace is False) with the second
+    merged with the first as variants. This function differs from mergeVariantStreams by
+    dealing with streams that are of different length. This function matches measures that are
+    exactly equal and creates variant objects for regions of measures that differ at all. If more
+    refined variants are sought (with variation within the bar considered and related but different
+    bars associated with each other), use variant.refineVariant().
+    
+    In this example, the second bar has been deleted in the second version, a new bar has been inserted between the
+    original third and fourth bars, and two bars have been added at the end.
+    
+    >>> from music21 import *
+    >>> data1M1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter')]
+    >>> data1M2 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
+    >>> data1M3 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
+    >>> data1M4 = [('d', 'quarter'), ('g', 'eighth'), ('g', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
+    
+    >>> data2M1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter')]
+    >>> data2M2 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
+    >>> data2M3 = [('f', 'quarter'), ('g', 'eighth'), ('g', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
+    >>> data2M4 = [('d', 'quarter'), ('g', 'eighth'), ('g', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
+    >>> data2M5 = [('e', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
+    >>> data2M6 = [('e', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
+    
+    >>> data1 = [data1M1, data1M2, data1M3, data1M4]
+    >>> data2 = [data2M1, data2M2, data2M3, data2M4, data2M5, data2M6]
+    >>> stream1 = stream.Stream()
+    >>> stream2 = stream.Stream()
+    >>> for d in data1:
+    ...    m = stream.Measure()
+    ...    for pitchName,durType in d:
+    ...        n = note.Note(pitchName)
+    ...        n.duration.type = durType
+    ...        m.append(n)
+    ...    stream1.append(m)
+    >>> for d in data2:
+    ...    m = stream.Measure()
+    ...    for pitchName,durType in d:
+    ...        n = note.Note(pitchName)
+    ...        n.duration.type = durType
+    ...        m.append(n)
+    ...    stream2.append(m)
+    >>> #_DOCS_SHOW stream1.show()
+    
+    
+    .. image:: images/variant_measuresStreamMergeStream1.*
+        :width: 600
+    
+    >>> #_DOCS_SHOW stream2.show()
+    
+    
+    .. image:: images/variant_measuresStreamMergeStream2.*
+        :width: 600
+
+    >>> mergedStream = mergeVariantMeasureStreams(stream1, stream2, 'paris', inPlace = False)
+    >>> mergedStream.show('text')
+    {0.0} <music21.stream.Measure 0 offset=0.0>
+        {0.0} <music21.note.Note A>
+        {1.0} <music21.note.Note B>
+        {1.5} <music21.note.Note C>
+        {2.0} <music21.note.Note A>
+        {3.0} <music21.note.Note A>
+    {4.0} <music21.variant.Variant object at ...>
+    {4.0} <music21.stream.Measure 0 offset=4.0>
+        {0.0} <music21.note.Note B>
+        {0.5} <music21.note.Note C>
+        {1.0} <music21.note.Note A>
+        {2.0} <music21.note.Note A>
+        {3.0} <music21.note.Note B>
+    {8.0} <music21.stream.Measure 0 offset=8.0>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+        {2.0} <music21.note.Note E>
+        {3.0} <music21.note.Note E>
+    {12.0} <music21.variant.Variant object at ...>
+    {12.0} <music21.stream.Measure 0 offset=12.0>
+        {0.0} <music21.note.Note D>
+        {1.0} <music21.note.Note G>
+        {1.5} <music21.note.Note G>
+        {2.0} <music21.note.Note A>
+        {3.0} <music21.note.Note B>
+    {16.0} <music21.variant.Variant object at ...>
+    
+    >>> mergedStream.variants[0].replacementDuration
+    4.0
+    >>> mergedStream.variants[1].replacementDuration
+    0.0
+    
+    >>> parisStream = mergedStream.activateVariants('paris', inPlace = False)
+    >>> parisStream.show('text')
+    {0.0} <music21.stream.Measure 0 offset=0.0>
+        {0.0} <music21.note.Note A>
+        {1.0} <music21.note.Note B>
+        {1.5} <music21.note.Note C>
+        {2.0} <music21.note.Note A>
+        {3.0} <music21.note.Note A>
+    {4.0} <music21.variant.Variant object at ...>
+    {4.0} <music21.stream.Measure 0 offset=4.0>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+        {2.0} <music21.note.Note E>
+        {3.0} <music21.note.Note E>
+    {8.0} <music21.variant.Variant object at ...>
+    {8.0} <music21.stream.Measure 0 offset=8.0>
+        {0.0} <music21.note.Note F>
+        {1.0} <music21.note.Note G>
+        {1.5} <music21.note.Note G>
+        {2.0} <music21.note.Note A>
+        {3.0} <music21.note.Note B>
+    {12.0} <music21.stream.Measure 0 offset=12.0>
+        {0.0} <music21.note.Note D>
+        {1.0} <music21.note.Note G>
+        {1.5} <music21.note.Note G>
+        {2.0} <music21.note.Note A>
+        {3.0} <music21.note.Note B>
+    {16.0} <music21.variant.Variant object at ...>
+    {16.0} <music21.stream.Measure 0 offset=16.0>
+        {0.0} <music21.note.Note E>
+        {0.5} <music21.note.Note C>
+        {1.5} <music21.note.Note A>
+        {2.0} <music21.note.Note A>
+        {3.0} <music21.note.Note B>
+    {20.0} <music21.stream.Measure 0 offset=20.0>
+        {0.0} <music21.note.Note E>
+        {1.0} <music21.note.Note D>
+        {2.0} <music21.note.Note E>
+        {3.0} <music21.note.Note E>
+    
+    >>> parisStream.variants[0].replacementDuration
+    0.0
+    >>> parisStream.variants[1].replacementDuration
+    4.0
+    >>> parisStream.variants[2].replacementDuration
+    8.0
+    '''
+    if inPlace is True:
+        returnObj = streamX
+    else:
+        returnObj = copy.deepcopy(streamX)
+    
+    regions = _getRegionsFromStreams(returnObj,streamY)
+    for regionType, xRegionStartMeasure, xRegionEndMeasure, yRegionStartMeasure, yRegionEndMeasure in regions: # Note that the 'end' measure indices are 1 greater than the 0-indexed number of the measure.
+        if xRegionStartMeasure >= len(returnObj.getElementsByClass('Measure')):
+            startOffset = returnObj.duration.quarterLength #This deals with insertion at the end case where returnObj.measure(xRegionStartMeasure+1) does not exist.
+        else:
+            startOffset = returnObj.measure(xRegionStartMeasure+1).getOffsetBySite(returnObj)
+        if regionType is 'equal':
+            #yRegion = streamY.measures(yRegionStartMeasure+1, yRegionEndMeasure)
+            continue #Do nothing
+        elif regionType is 'replace':
+            xRegion = returnObj.measures(xRegionStartMeasure+1, xRegionEndMeasure)
+            replacementDuration = xRegion.duration.quarterLength
+            yRegion = streamY.measures(yRegionStartMeasure+1, yRegionEndMeasure)                      
+        elif regionType is 'delete':
+            xRegion = returnObj.measures(xRegionStartMeasure+1, xRegionEndMeasure)
+            replacementDuration = xRegion.duration.quarterLength
+            yRegion = None
+        elif regionType is 'insert':
+            yRegion = streamY.measures(yRegionStartMeasure+1, yRegionEndMeasure)
+            replacementDuration = 0.0
+        addVariant(returnObj, startOffset, yRegion, variantName = variantName, replacementDuration = replacementDuration)
+    return returnObj
+
+    
+def addVariant(s,startOffset, sVariant, variantName = None, variantGroups = None, replacementDuration = None):
+    '''
+    Takes a stream, the location of the variant to be added to that stream (startOffset), the content of the
+    variant to be added (sVariant), and the duration of the section of the stream which the variant
+    replaces (replacementDuration). If replacementDuration is 0, this is an insertion. If sVariant is 
+    None, this is a deletion.
+    
+    >>> from music21 import *
+    >>> data1M1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter')]
+    >>> data1M3 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
+    >>> data1M2 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
+    >>> data2M2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
+    >>> data1 = [data1M1, data1M2, data1M3]
+    >>> tempPart = stream.Part()
+    >>> stream1 = stream.Stream()
+    >>> stream2 = stream.Stream()
+    >>> for d in data1:
+    ...    m = stream.Measure()
+    ...    for pitchName,durType in d:
+    ...        n = note.Note(pitchName)
+    ...        n.duration.type = durType
+    ...        m.append(n)
+    ...    stream1.append(m)
+    >>> m = stream.Measure()
+    >>> for pitchName,durType in data2M2:
+    ...    n = note.Note(pitchName)
+    ...    n.duration.type = durType
+    ...    m.append(n)
+    >>> stream2.append(m)
+    >>> addVariant(stream1, 4.0, stream2, variantName = 'rhythmic switch', replacementDuration = 4.0)
+    >>> stream1.show('text')
+    {0.0} <music21.stream.Measure 0 offset=0.0>
+        {0.0} <music21.note.Note A>
+        {1.0} <music21.note.Note B>
+        {1.5} <music21.note.Note C>
+        {2.0} <music21.note.Note A>
+        {3.0} <music21.note.Note A>
+    {4.0} <music21.variant.Variant object at ...>
+    {4.0} <music21.stream.Measure 0 offset=4.0>
+        {0.0} <music21.note.Note B>
+        {0.5} <music21.note.Note C>
+        {1.0} <music21.note.Note A>
+        {2.0} <music21.note.Note A>
+        {3.0} <music21.note.Note B>
+    {8.0} <music21.stream.Measure 0 offset=8.0>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+        {2.0} <music21.note.Note E>
+        {3.0} <music21.note.Note E>
+    
+    >>> stream1 = stream.Stream()
+    >>> stream1.repeatAppend(note.Note('e'), 6)
+    >>> variant1 = variant.Variant()
+    >>> variant1.repeatAppend(note.Note('f'), 3)
+    >>> startOffset = 3.0
+    >>> addVariant(stream1, startOffset, variant1, variantName = 'paris', replacementDuration = 3.0)
+    >>> stream1.show('text')
+    {0.0} <music21.note.Note E>
+    {1.0} <music21.note.Note E>
+    {2.0} <music21.note.Note E>
+    {3.0} <music21.variant.Variant object at ...>
+    {3.0} <music21.note.Note E>
+    {4.0} <music21.note.Note E>
+    {5.0} <music21.note.Note E>
+    '''
+    tempVariant = music21.variant.Variant()
+    
+    if variantGroups is not None:
+        tempVariant.groups = variantGroups
+    if variantName is not None:
+        tempVariant.groups.append(variantName)
+        
+    tempVariant.replacementDuration = replacementDuration
+           
+    if sVariant is None: #deletion
+        pass
+    else: #replacement or insertion
+        sVariantMeasures = sVariant.getElementsByClass('Measure')
+        if sVariantMeasures == []: # If there are no measures, work element-wise
+            for e in sVariant:
+                offset = e.getOffsetBySite(sVariant)+startOffset
+                tempVariant.insert(offset, e)
+        else: # if there are measures work measure-wise
+            for m in sVariantMeasures:
+                tempVariant.append(m)
+
+    s.insert(startOffset, tempVariant)
+
+
+
+def refineVariant(s, sVariant, inPlace = False):
+    '''
+    Given a stream and variant contained in that stream, returns a stream with that variant 'refined.'
+    It is refined in the sense that, (with the best estimates) measures which have been determined
+    to be related are merged within the measure. Suppose a four-bar phrase in a piece is a slightly
+    different five-bar phrase in a variant. In the variant, every F# has been replaced by an F,
+    and the last bar is repeated. Given this streams, mergeVariantMeasureStreams would return
+    the first stream with a single variant object containing the entire 5 bars of the variant.
+    Calling refineVariant on this stream and that variant object would result in a variant object
+    in the measures for each F#/F pair, and a variant object containing the added bar at the end.
+    For a more detailed explanation of how similar measures are properly associated with each other
+    look at the documentation for _getBestListandScore
+    
+    Note that this code does not work properly yet.
+    
+    >>> from music21 import *
+    >>> v = variant.Variant()
+    >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
+    >>> variantDataM2 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
+    >>> variantData = [variantDataM1, variantDataM2]
+    >>> for d in variantData:
+    ...    m = stream.Measure()
+    ...    for pitchName,durType in d:
+    ...        n = note.Note(pitchName)
+    ...        n.duration.type = durType
+    ...        m.append(n)
+    ...    v.append(m)
+    >>> v.groups = ['paris']
+    >>> v.replacementDuration = 8.0
+    
+    >>> s = stream.Stream()
+    >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
+    >>> streamDataM2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
+    >>> streamDataM3 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+    >>> streamDataM4 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+    >>> streamData = [streamDataM1, streamDataM2, streamDataM3, streamDataM4]
+    >>> for d in streamData:
+    ...    m = stream.Measure()
+    ...    for pitchName,durType in d:
+    ...        n = note.Note(pitchName)
+    ...        n.duration.type = durType
+    ...        m.append(n)
+    ...    s.append(m)
+    >>> s.insert(4.0, v)
+
+    >>> refineVariant(s, v, inPlace = True)
+    >>> s.show('text')
+    {0.0} <music21.stream.Measure 0 offset=0.0>
+        {0.0} <music21.note.Note A>
+        {1.0} <music21.note.Note B>
+        {2.0} <music21.note.Note A>
+        {3.0} <music21.note.Note G>
+    {4.0} <music21.stream.Measure 0 offset=4.0>
+        {0.0} <music21.note.Note B>
+        {0.5} <music21.variant.Variant object at ...>
+        {0.5} <music21.note.Note C>
+        {1.5} <music21.note.Note A>
+        {2.0} <music21.note.Note A>
+        {3.0} <music21.note.Note B>
+    {8.0} <music21.stream.Measure 0 offset=8.0>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.variant.Variant object at ...>
+        {1.0} <music21.note.Note B>
+        {2.0} <music21.note.Note A>
+        {3.0} <music21.note.Note A>
+    {12.0} <music21.stream.Measure 0 offset=12.0>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note B>
+        {2.0} <music21.note.Note A>
+        {3.0} <music21.note.Note A>
+    
+    '''
+    # stream that will be returned
+    if not (sVariant in s.variants):
+        raise VariantException('sVariant not found in stream s.')
+    
+    if inPlace is True:
+        returnObject = s
+        variantRegion = sVariant
+    else:
+        sVariantIndex = s.variants.index(sVariant)
+        
+        returnObject = copy.deepcopy(s)
+        variantRegion = returnObject.variants(sVariantIndex)
+        
+    
+    # useful parameters from variant and its location
+    variantGroups = sVariant.groups
+    replacementDuration = sVariant.replacementDuration
+    startOffset = sVariant.getOffsetBySite(s)
+    endOffset = replacementDuration+startOffset
+    
+    # region associated with the given variant in the stream
+    returnRegion = returnObject.getElementsByOffset(startOffset, offsetEnd = endOffset, includeEndBoundary=False, classList = ['Measure'])
+
+    # associating measures in variantRegion to those in returnRegion -> This is done via 0 indexed lists corresponding to measures
+    returnRegionMeasureList = [i for i in range(len(returnRegion))]
+    badnessDict = {}
+    listDict = {}
+    variantMeasureList, badness = _getBestListandScore(returnRegion, variantRegion, badnessDict, listDict)
+    
+    # badness is a measure of how different the streams are. The list returned, variantMeasureList, minimizes that quantity.
+    
+    # mentioned lists are compared via difflib for optimal edit regions (equal, delete, insert, replace)
+    sm = difflib.SequenceMatcher()
+    sm.set_seqs(returnRegionMeasureList, variantMeasureList)
+    regions = sm.get_opcodes()
+    
+    # each region is processed for variants.
+    for regionType, returnStart, returnEnd, variantStart, variantEnd in regions:
+        startOffset = returnRegion[returnStart].getOffsetBySite(returnRegion)
+        endOffset = returnRegion[returnEnd-1].getOffsetBySite(returnRegion)+returnRegion[returnEnd-1].duration.quarterLength       
+        if regionType is 'equal':
+            returnSubRegion = returnRegion.measures(returnStart+1, returnEnd)
+            variantSubRegion = variantRegion.measures(variantStart+1, variantEnd)
+            mergeVariantStreams([returnSubRegion, variantSubRegion], variantGroups, inPlace = True)
+            continue
+        
+        elif regionType is 'replace':
+            returnSubRegion = returnRegion.measures(returnStart+1, returnEnd)
+            replacementDuration = returnSubRegion.duration.quarterLength
+            variantSubRegion = variantRegion.measures(variantStart+1, variantEnd)                      
+        elif regionType is 'delete':
+            returnSubRegion = returnRegion.measures(returnStart+1, returnEnd)
+            replacementDuration = returnSubRegion.duration.quarterLength
+            variantSubRegion = None
+        elif regionType is 'insert':
+            variantSubRegion = variantRegion.measures(variantStart+1, variantEnd)
+            replacementDuration = 0.0
+        addVariant(returnRegion, startOffset, variantSubRegion, variantGroups = variantGroups, replacementDuration = replacementDuration)
+            
+    returnObject.remove(variantRegion) # The original variant object has been replaced by more refined variant objects and so should be deleted.
+    if inPlace:
+        return
+    else:
+        return returnObject
+
+def _getBestListandScore(streamX, streamY, badnessDict, listDict, isNone = False, streamXindex = -1, streamYindex = -1):
+    '''
+    This is a recursive function which makes a map between two related streams of measures.
+    It is designed for streams of measures that contain few if any measures that are actually
+    identical and that have a different number of measures (within reason). For example,
+    if one stream has 10 bars of eighth notes and the second stream has the same ten bars
+    of eighth notes except with some dotted rhythms mixed in and the fifth bar is repeated.
+    The first, streamX, is the reference stream. This function returns a list of
+    integers with length len(streamY) which maps each measure of StreamY to the measure
+    in streamX it is most likely associated with. For example, if the returned list is
+    [0, 2, 3, 'addedBar', 4]. This indicates that streamY is most similar to streamX
+    after the second bar of streamX has been removed and a new bar inserted between
+    bars 4 and 5. Note that this list has measures 0-indexed. This function generates this map by
+    minimizing the difference or 'badness' for the sequence of measures on the whole as determined
+    by the helper function _simscore which compares measures for similarity. 'addedBar' appears
+    in the list where this function has determined that the bar appearing
+    in streamY does not have a counterpart in streamX anywhere and is an insertion.
+    
+    >>> from music21 import *
+    >>> badnessDict = {}
+    >>> listDict = {}
+    >>> stream1 = stream.Stream()
+    >>> stream2 = stream.Stream()
+    
+    >>> data1M1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter')]
+    >>> data1M2 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
+    >>> data1M3 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
+    
+    >>> data2M1 = [('a', 'quarter'), ('b', 'quarter'), ('c', 'quarter'), ('g#', 'quarter')]
+    >>> data2M2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
+    >>> data2M3 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+    >>> data2M4 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+    >>> data1 = [data1M1, data1M2, data1M3]
+    >>> data2 = [data2M1, data2M2, data2M3, data2M4]
+    >>> for d in data1:
+    ...    m = stream.Measure()
+    ...    for pitchName,durType in d:
+    ...        n = note.Note(pitchName)
+    ...        n.duration.type = durType
+    ...        m.append(n)
+    ...    stream1.append(m)
+    >>> for d in data2:
+    ...    m = stream.Measure()
+    ...    for pitchName,durType in d:
+    ...        n = note.Note(pitchName)
+    ...        n.duration.type = durType
+    ...        m.append(n)
+    ...    stream2.append(m)
+    >>> kList, kBadness = _getBestListandScore(stream1, stream2, badnessDict, listDict, isNone = False)
+    >>> kList
+    [0, 1, 2, 'addedBar']
+    '''
+    # Initialize 'Best' Values for maximizing algorithm
+    bestScore = 1
+    bestNormalizedScore = 1
+    bestList = []
+    
+    # Base Cases:
+    if streamYindex>=len(streamY):
+        listDict[(streamXindex,streamYindex,isNone)] = []
+        badnessDict[(streamXindex,streamYindex,isNone)] = 0.0
+        return [],0
+    
+    # Query Dict for existing results    
+    if (streamXindex, streamYindex, isNone) in badnessDict.keys():
+        badness = badnessDict[(streamXindex,streamYindex,isNone)]
+        bestList = listDict[(streamXindex,streamYindex,isNone)]
+        return bestList, badness
+    
+    #Get salient similarity score
+    if streamXindex is -1 and streamYindex is -1:
+        simscore = 0
+    elif isNone:
+        simscore = 0.5
+    else:
+        simscore = _diffscore(streamX[streamXindex],streamY[streamYindex])
+    
+
+    # Check the added bar case:
+    kList, kBadness = _getBestListandScore(streamX, streamY, badnessDict, listDict, isNone = True, streamXindex = streamXindex, streamYindex = streamYindex+1)
+    if kList is None:
+        kList = []
+    if len(kList) is not 0:
+        normalizedBadness = kBadness/float(len(kList))
+    else:
+        normalizedBadness = 0
+    if normalizedBadness <= bestNormalizedScore:
+        bestScore = kBadness
+        bestNormalizedScore = normalizedBadness
+        bestList = kList
+    
+    # Check the other cases
+    for k in range(streamXindex+1,len(streamX)):
+        kList, kBadness = _getBestListandScore(streamX, streamY, badnessDict, listDict, isNone = False, streamXindex = k, streamYindex = streamYindex+1)
+        if kList is None:
+            kList = []
+        if len(kList) is not 0:
+            normalizedBadness = kBadness/float(len(kList))
+        else:
+            normalizedBadness = 0
+        if normalizedBadness <= bestNormalizedScore:
+            bestScore = kBadness
+            bestNormalizedScore = normalizedBadness
+            bestList = kList
+
+    # Prepare and Return Results
+    returnList = copy.deepcopy(bestList)
+    if isNone:
+        returnList.insert(0, 'addedBar')
+    elif streamXindex is -1:
+        pass
+    else:
+        returnList.insert(0, streamXindex)
+    badness = bestScore + simscore
+    
+    badnessDict[(streamXindex, streamYindex,isNone)] = badness
+    listDict[(streamXindex, streamYindex,isNone)] = returnList
+    return returnList, badness
+
+def _diffscore(measureX, measureY):
+    '''
+    Helper function for _getBestListandScore which compares to measures and returns a value
+    associated with their similarity. The higher the normalized (0,1) value the poorer the match.
+    This should be calibrated such that the value that appears in _getBestListandScore for
+    isNone is true (i.e. testing when a bar does not associate with any existing bars the reference
+    stream), is well matched with the similarity scores generated by this function.
+    
+    >>> from music21 import *
+    >>> m1 = stream.Measure()
+    >>> m2 = stream.Measure()
+    >>> m1.append([note.Note('e'), note.Note('f'), note.Note('g'), note.Note('a')])
+    >>> m2.append([note.Note('e'), note.Note('f'), note.Note('g#'), note.Note('a')])
+    >>> _diffscore(m1, m2)
+    0.02083333...
+    
+    '''
+    if measureX is measureY:
+        return 0.0
+    
+    pitchSumX, pitchSumY = 0.0,0.0
+    for n in measureX.notes:
+        pitchSumX += n.pitchClass
+    for n in measureY.notes:
+        pitchSumY += n.pitchClass
+    
+    xAveragePitch = pitchSumX / float(len(measureX.notes))
+    yAveragePitch = pitchSumY / float(len(measureY.notes))
+    
+    return abs(yAveragePitch-xAveragePitch)/12.0
+
+def _getRegionsFromStreams(streamX,streamY):
+    '''
+    Takes in two streams, returns a list of 5-tuples via difflib.get_opcodes() working on measure differences.
+    
+    >>> from music21 import *
+    >>> s1 = converter.parse("d4 e8. f16 GG4 b'4 b-2 c4 d8. e16 FF4 a'4 b-2", "2/4")
+    >>> #                     *0:Eq  *1:Rep        * *3:Eq             *6:In
+    >>> s2 = converter.parse("d4 e8. f16 FF4 b'4 c4 d8. e16 FF4 a'4 b-2 b-2", "2/4")
+    >>> s1m = s1.makeMeasures()
+    >>> s2m = s2.makeMeasures()
+    >>> regions = _getRegionsFromStreams(s1m, s2m)
+    >>> regions
+    [('equal', 0, 1, 0, 1), ('replace', 1, 3, 1, 2), ('equal', 3, 6, 2, 5), ('insert', 6, 6, 5, 6)]
+    
+    '''
+    hashesX = getMeasureHashes(streamX)
+    hashesY = getMeasureHashes(streamY)
+    sm = difflib.SequenceMatcher()
+    sm.set_seqs(hashesX,hashesY)
+    regions = sm.get_opcodes()
+    return regions
+
+def getMeasureHashes(s):
+    '''
+    Takes in a stream containing measures and returns a list of hashes, one for each measure. Currently
+    implemented with search.translateStreamToString()
+    
+    >>> from music21 import *
+    >>> s = converter.parse("c4 d8. e16 FF4 a'4 b-2", "2/4")
+    >>> sm = s.makeMeasures()
+    >>> hashes = getMeasureHashes(sm)
+    >>> hashes
+    ['<P>K@<', ')PQP', 'FZ']
+    '''
+    hashes = []
+    for m in s.getElementsByClass('Measure'):
+        hashes.append(search.translateStreamToString(m.notesAndRests))
+    return hashes
+
+
 def mergeVariantStreams(streams, variantNames, inPlace = False):
     '''
     Pass this function a list of streams (they must be of the same length or a VariantException will be raised).
@@ -168,6 +752,7 @@ def mergeVariantStreams(streams, variantNames, inPlace = False):
     
     .. image:: images/variant_measuresAndParts.*
         :width: 600
+        
     
     >>> for p in mergedStreams.getElementsByClass('Part'):
     ...    for m in p.getElementsByClass('Measure'):
@@ -452,6 +1037,8 @@ def _generateVariant(noteList, originStream, start, variantName = None):
 #-------------------------------------------------------------------------------
 # classes
 
+
+
 class VariantException(Exception):
     pass
 
@@ -497,6 +1084,8 @@ class Variant(music21.Music21Object):
         self.exposeTime = False
         self._stream = stream.VariantStorage(givenElements=givenElements, 
                                              *args, **keywords)
+        
+        self._replacementDuration = None
 
     def __deepcopy__(self, memo):
         new = self.__class__()
@@ -574,7 +1163,12 @@ class Variant(music21.Music21Object):
         self._stream.unfreezeIds()
 
 
-
+    '''
+    def __repr__(self):
+        return "<music21.variant.%s offset=%s groups=%s>" % \
+            (self.__class__.__name__, self.offset, self.groups)
+    '''
+    
     def __getattr__(self, attr):
         '''This defers all calls not defined in this Class to calls on the privately contained Stream.
         '''
@@ -728,6 +1322,39 @@ class Variant(music21.Music21Object):
 
     containedSite = property(_getContainedSite, doc='''
         Return a reference to the Stream contained in this Variant.
+        ''')
+    
+    def _getReplacementDuration(self):
+        if self._replacementDuration is None:
+            return self._stream.duration.quarterLength
+        else:
+            return self._replacementDuration
+    
+    def _setReplacementDuration(self, value):
+        self._replacementDuration = value
+    
+    replacementDuration = property(_getReplacementDuration, _setReplacementDuration, doc='''
+        Set or Return the quarterLength duration in the main stream which this variant
+        object replaces in the variant version of the stream. If replacementDuration is
+        not set, it is assumed to be the same length as the variant. If, it is set to 0,
+        the variant should be interpreted as an insertion. Setting replacementDuration
+        to None will return the value to the default which is the duration of the variant
+        itself.
+        ''')
+    
+    def _getLengthType(self):
+        lengthDifference = self.replacementDuration - self.containedHighestTime
+        if lengthDifference > 0.0:
+            return 'deletion'
+        elif lengthDifference < 0.0:
+            return 'elongation'
+        else:
+            return 'replacement'
+    
+    lengthType = property(_getLengthType, doc='''
+        Returns 'deletion' if variant is shorter than the region it replaces, 'elongation'
+        if the variant is longer than the region it replaces, and 'replacement' if it is
+        the same length.
         ''')
 
 #-------------------------------------------------------------------------------
