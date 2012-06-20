@@ -54,12 +54,12 @@ def musicxmlText(outputStream):
     >>> sc = corpus.parse('bwv7.7').measures(0,2)
     >>> (output, contentType) = musicxmlText(sc)
     >>> contentType
-    'text/plain'
+    'text/plain; charset=utf-8'
     >>> 'score-partwise' in output
     True
     '''
     musicxml = outputStream.musicxml
-    return (musicxml, 'text/plain')
+    return (musicxml.encode('utf-8'), 'text/plain; charset=utf-8')   
 
 def musicxmlFile(outputStream):
     '''
@@ -69,12 +69,12 @@ def musicxmlFile(outputStream):
     >>> sc = corpus.parse('bwv7.7').measures(0,2)
     >>> (output, contentType) = musicxmlFile(sc)
     >>> contentType
-    'application/vnd.recordare.musicxml+xml'
+    'application/vnd.recordare.musicxml+xml; charset=utf-8'
     >>> 'score-partwise' in output
     True
     '''
     musicxml = outputStream.musicxml
-    return (musicxml,'application/vnd.recordare.musicxml+xml')
+    return (musicxml.encode('utf-8'), 'application/vnd.recordare.musicxml+xml; charset=utf-8')
     
 def vexflow(outputStream):
     '''
@@ -85,11 +85,11 @@ def vexflow(outputStream):
     >>> sc = corpus.parse('bwv7.7').measures(0,2)
     >>> (output, contentType) = webapps.templates.vexflow(sc)
     >>> contentType
-    'text/html'
+    'text/html; charset=utf-8'
     '''
     from music21 import vexflow
     outputHTML = vexflow.fromObject(outputStream, mode='html')
-    return (outputHTML,'text/html')
+    return (outputHTML.encode('utf-8'), 'text/html; charset=utf-8')   
  
 def braille(outputStream):
     '''
@@ -119,7 +119,7 @@ def noteflightEmbed(outputStream):
     >>> sc = corpus.parse('bwv7.7').measures(0,2)
     >>> (output, contentType) = webapps.templates.noteflightEmbed(sc)
     >>> contentType
-    'text/html'
+    'text/html; charset=utf-8'
     '''
     
     musicxml = outputStream.musicxml
@@ -161,7 +161,7 @@ function setup() {
     htmlData = Template(htmlStr)
     
     htmlData = htmlData.safe_substitute(musicxml=musicxml)
-    return (htmlData, 'text/html')
+    return (htmlData.encode('utf-8'), 'text/html; charset=utf-8')   
 
 #-------------------------------------------------------------------------------
 # Tests 

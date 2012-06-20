@@ -286,7 +286,6 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
     score.insert(metadata.Metadata())
     score.metadata.composer = scoreIn.metadata.composer
     score.metadata.movementName = scoreIn.metadata.movementName
-    #score.show()
     analysisData = {'stream': score, 'numUserIdentified': user, 'numMusic21Identified':music21VS, 'numBothIdentified':both, 'accuracy': both*100.0/music21VS if music21VS!= 0 else 100, 'romans': romanFigureList, 'key': pieceKey}
     return analysisData
 

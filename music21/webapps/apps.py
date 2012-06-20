@@ -43,7 +43,7 @@ def setupURLCorpusParseApp(agenda):
     >>> processor.executeCommands()
     >>> (responseData, responseContentType) = processor.getOutput()
     >>> responseContentType
-    'application/vnd.recordare.musicxml+xml'
+    'application/vnd.recordare.musicxml+xml; charset=utf-8'
     >>> converter.parse(responseData).flat.highestOffset
     16.5
     '''
