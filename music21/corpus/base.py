@@ -754,15 +754,16 @@ def parse(workName, movementNumber=None, number=None,
     will be ignored.  This should not be needed if the file has been changed, since the filetime of the file and
     the filetime of the pickled version are compared.  But it might be needed if the music21 parsing routine has changed.
     
-
     Example, get a chorale by Bach.  Note that the source type does not need to be
     specified, nor does the name Bach even (since it's the only piece with the title BWV 66.6)
-
 
     >>> from music21 import *
     >>> bachChorale = corpus.parse('bwv66.6')
     >>> len(bachChorale.parts)
     4
+    
+    OMIT_FROM_DOCS
+    
     >>> bachChorale.corpusFilepath
     'bach/bwv66.6.mxl'
     

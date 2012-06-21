@@ -73,7 +73,11 @@ the conf file.
 	but I'm always searching for better ways to do this. Let me know if you've found one.
 	
 	For the time being, you'll have to provide the tarred folders of python2.7, music21, and mrjob
-	for installation. The installation scripts in the conf file look like this::
+	for installation. If you've made changes to the music21 source-code, you'll want to prepare a new
+	installation package (tar.gz it) and upload that. If you'd like to use the latest release of music21,
+	simply download tar.gz folder from  http://code.google.com/p/music21/downloads/list
+	
+	The installation scripts in the conf file look like this::
 
 
 		*install_python27.sh*
