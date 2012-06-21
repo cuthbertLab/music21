@@ -2801,7 +2801,7 @@ class Test(unittest.TestCase):
 
 
     def testExpandRepeatExpressionD(self):
-        import stream, note
+        from music21 import stream, note
         import music21.repeat as repeat
 
         # da capo al coda
