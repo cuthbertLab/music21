@@ -164,6 +164,7 @@ class Consumer(multiprocessing.Process):
             environLocal.printDebug("Next task: %s" % next_task.fp)
             answer = next_task()
             self.result_queue.put(answer)
+        self.terminate()
         return
 
 
@@ -254,10 +255,10 @@ def mainQueueRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
     for fp in modGather.modulePaths:
         num_jobs += 1
         tasks.put(Task(modGather, fp))
-    
     for i in range(10):
         num_jobs += 1
         tasks.put(DummyTask())
+    
     #NO # Add a poison pill for each consumer
     #for i in xrange(num_consumers):
     #    tasks.put(None)
@@ -265,12 +266,11 @@ def mainQueueRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
     # Start printing results
     summaryOutput = []
     totalTests = 0
-    while num_jobs > 1:
+    while num_jobs > 0:
         num_jobs -= 1    
         try:
-            #print "trying to get..."
-            (moduleName, textTestResult) = results.get(timeout=60)
-            #print "got!"
+            #print "trying to get... %d" % num_jobs
+            (moduleName, textTestResult) = results.get()
         except Exception as exc:
             errorMsg = 'failed on get! %s' % exc
             environLocal.printDebug(errorMsg)
@@ -279,7 +279,7 @@ def mainQueueRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
         if moduleName is not None:
             eCount = 0
             fCount = 0
-            print '%s: %s' % (moduleName, textTestResult)
+            print '%d: %s: %s' % (num_jobs, moduleName, textTestResult)
             summaryOutput.append('%s: %s' % (moduleName, textTestResult))
             for e in textTestResult.errors:
                 print e[0], e[1]
@@ -288,8 +288,10 @@ def mainQueueRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
                 print f[0], f[1]
                 summaryOutput.append('%s: %s' % (f[0], f[1]))
             totalTests += textTestResult.testsRun
+            #print "got! %d" % num_jobs
             sys.stdout.flush()
         sys.stderr.flush()
+
 
     #for errMsg in sys.stderr.log:
     #    print errMsg
