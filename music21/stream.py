@@ -1980,8 +1980,6 @@ class Stream(music21.Music21Object):
                     addBreaks=True, addIndent=True):
         '''
         >>> from music21 import *
-
-        >>> import note
         >>> s1 = stream.Stream()
         >>> s2 = stream.Stream()
         >>> s3 = stream.Stream()

@@ -8,7 +8,7 @@ from music21.trecento import cadencebook
 from music21.trecento.cadencebook import *
 from music21.tinyNotation import TinyNotationException
 
-def test():
+def xtest():
     countTimeSig()
     makePDFfromPieces()
 

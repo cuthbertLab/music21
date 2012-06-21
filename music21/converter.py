@@ -1698,7 +1698,7 @@ class Test(unittest.TestCase):
 
 
     def testConversionMidiBasic(self):
-        import common
+        from music21 import common
 
         dir = common.getPackageDir(relative=False, remapSep=os.sep)
         for fp in dir:
@@ -1728,7 +1728,7 @@ class Test(unittest.TestCase):
 
 
     def testConversionMidiNotes(self):
-        import common, meter, key
+        from music21 import common, meter, key
 
         fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test01.mid')
         # a simple file created in athenacl

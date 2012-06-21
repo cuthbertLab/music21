@@ -4615,7 +4615,7 @@ class Test(unittest.TestCase):
 
 
     def testQuarterToneA(self):
-        import stream, note, scale
+        from music21 import stream, note, scale
 
         p1 = Pitch('D#~')
         #environLocal.printDebug([p1, p1.accidental])

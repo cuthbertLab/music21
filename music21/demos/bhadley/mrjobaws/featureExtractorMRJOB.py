@@ -24,15 +24,13 @@ from music21.features import base
 
 class MRFeatureExtractor(MRJob):
     def mapper(self, key, fileName):
-        try:
-            data = awsutility.getStreamAndmd5(fileName.split()[0]) #.split()[0] because line is read in by protocol
-            for dataList in data:
-                streamObj, md5hash = dataList
-                jsymbolicVectors = base.alljSymbolicVectors(streamObj)
-                nativeVectors = base.allNativeVectors(streamObj)
-                yield md5hash, (streamObj.metadata.corpusFilepath, jsymbolicVectors, nativeVectors)
-        except:
-            yield 'fail', fileName
+        data = awsutility.getStreamAndmd5(fileName.split()[0]) #.split()[0] because line is read in by protocol
+        for dataList in data:
+            streamObj, md5hash = dataList
+            jsymbolicVectors = base.alljSymbolicVectors(streamObj)
+            nativeVectors = base.allNativeVectors(streamObj)
+            yield md5hash, (streamObj.metadata.corpusDIR, jsymbolicVectors, nativeVectors)
+
     #def reducer(self, word, occurrences):
     #    yield word, sum(occurrences)
     # reducer not needed, simply outputing data

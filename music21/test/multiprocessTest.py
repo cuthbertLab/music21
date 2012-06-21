@@ -58,7 +58,7 @@ class ModuleGather(object):
             'configure.py', # runs oddly...
             ]
         # skip any path that contains this string
-        self.pathSkip = ['abj', 'obsolete', 'xlrd', 'jsonpickle', 'ext', 'server']
+        self.pathSkip = ['abj', 'obsolete', 'xlrd', 'jsonpickle', 'ext', 'server', 'mrjobaws']
         # search on init
         self._walk()
 
@@ -206,6 +206,12 @@ class Task(object):
     def __str__(self):
         return '%s * %s' % (self.a, self.b)
 
+class DummyTask(object):
+    fp = "Dummy"
+    
+    def __call__(self):
+        time.sleep(.1)
+        return (None, None)
 
 class StdErrHolder(object):
     def __init__(self):
@@ -249,6 +255,9 @@ def mainQueueRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
         num_jobs += 1
         tasks.put(Task(modGather, fp))
     
+    for i in range(10):
+        num_jobs += 1
+        tasks.put(DummyTask())
     #NO # Add a poison pill for each consumer
     #for i in xrange(num_consumers):
     #    tasks.put(None)
@@ -256,10 +265,12 @@ def mainQueueRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
     # Start printing results
     summaryOutput = []
     totalTests = 0
-    while num_jobs:
+    while num_jobs > 1:
         num_jobs -= 1    
         try:
-            (moduleName, textTestResult) = results.get()
+            #print "trying to get..."
+            (moduleName, textTestResult) = results.get(timeout=60)
+            #print "got!"
         except Exception as exc:
             errorMsg = 'failed on get! %s' % exc
             environLocal.printDebug(errorMsg)
@@ -277,7 +288,8 @@ def mainQueueRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
                 print f[0], f[1]
                 summaryOutput.append('%s: %s' % (f[0], f[1]))
             totalTests += textTestResult.testsRun
-    
+            sys.stdout.flush()
+        sys.stderr.flush()
 
     #for errMsg in sys.stderr.log:
     #    print errMsg
@@ -291,6 +303,7 @@ def mainQueueRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
     print "-------------------------------------------------------------------------"
     print "Ran %d tests in %.4f seconds" % (totalTests, elapsedTime)
     print "\n\n(waiting for subprocesses to terminate...can take a few seconds)"
+    sys.stdout.flush()
 
 
     for w in consumers:

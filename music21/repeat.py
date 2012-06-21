@@ -2860,7 +2860,7 @@ class Test(unittest.TestCase):
 
 
     def testExpandRepeatExpressionF(self):
-        import stream, note
+        from music21 import stream, note
         import music21.repeat as repeat
         # dal segno al fine
         m1 = stream.Measure()
@@ -2890,7 +2890,7 @@ class Test(unittest.TestCase):
 
 
     def testExpandRepeatExpressionG(self):
-        import stream, note
+        from music21 import stream, note
         import music21.repeat as repeat
         # dal segno al coda
         m1 = stream.Measure()

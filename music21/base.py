@@ -4249,7 +4249,7 @@ class ElementWrapper(Music21Object):
         '''Test ElementWrapper equality
 
         >>> import music21
-        >>> import note
+        >>> from music21 import note
         >>> n = note.Note("C#")
         >>> a = music21.ElementWrapper(n)
         >>> a.offset = 3.0
@@ -4328,7 +4328,8 @@ class ElementWrapper(Music21Object):
         In other words, it is essentially the same object in a different context
              
         >>> import music21
-        >>> import note
+        >>> from music21 import note
+
         >>> aE = music21.ElementWrapper(obj = "hello")
         
         >>> bE = copy.copy(aE)
