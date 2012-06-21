@@ -212,7 +212,7 @@ class DummyTask(object):
     
     def __call__(self):
         time.sleep(.1)
-        return (None, None)
+        return (None, "dummy")
 
 class StdErrHolder(object):
     def __init__(self):
@@ -266,7 +266,8 @@ def mainQueueRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
     # Start printing results
     summaryOutput = []
     totalTests = 0
-    while num_jobs > 0:
+    totalDummy = 0
+    while (results.empty() is False and tasks.empty() is False):
         num_jobs -= 1    
         try:
             #print "trying to get... %d" % num_jobs
