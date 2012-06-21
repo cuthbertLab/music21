@@ -763,11 +763,11 @@ def parse(workName, movementNumber=None, number=None,
     >>> bachChorale = corpus.parse('bwv66.6')
     >>> len(bachChorale.parts)
     4
-    >>> bachChorale.corpusDIR
+    >>> bachChorale.corpusFilepath
     'bach/bwv66.6.mxl'
     
     >>> s = corpus.parse('trecento/PMFC_13_05-Gloria Rosetta.mxl')
-    >>> s.corpusDIR
+    >>> s.corpusFilepath
     'trecento/PMFC_13_05-Gloria Rosetta.mxl'
     '''
     if workName in [None, '']:
@@ -797,16 +797,23 @@ def parse(workName, movementNumber=None, number=None,
     #return converter.parse(fp, forceSource=forceSource, number=number)
 
     streamObj = converter.parse(fp, forceSource=forceSource, number=number)
-    _addCorpusDIR(streamObj, fp)
+    _addCorpusFilepath(streamObj, fp)
     return streamObj
 
-def _addCorpusDIR(streamObj, filepath):   
+def _addCorpusFilepath(streamObj, filepath):   
     # metadata attribute added to store the file path, for use later in identifying the score
     #if streamObj.metadata == None:
     #    streamObj.insert(metadata.Metadata())
-    if 'music21/corpus/' in filepath:
-        filepath = filepath[filepath.index('music21/corpus')+15:]
-    streamObj.corpusDIR = filepath
+    cfp = common.getCorpusFilePath()
+    lenCFP = len(cfp) + len(os.sep)
+    if filepath.startswith(cfp):
+        fp2 = filepath[lenCFP:]
+        ### corpus fix for windows
+        dirsEtc = fp2.split(os.sep)
+        fp3 = '/'.join(dirsEtc)
+        streamObj.corpusFilepath = fp3
+    else:
+        streamObj.corpusFilepath = filepath
 
 def parseWork(*arguments, **keywords):
     '''This function exists for backwards compatibility. All calls should use :func:`~music21.corpus.parse` instead.
