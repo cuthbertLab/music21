@@ -606,7 +606,7 @@ class Test(unittest.TestCase):
         s3.append(n5)
         s3.append(n6)
         s3.makeMeasures()
-
+        
         self.assertTrue(n4.getContextByClass(stream.Measure) is n5.getContextByClass(stream.Measure))
         self.assertTrue(n4.getContextByClass(Clef) is bc1)
         self.assertTrue(n5.getContextByClass(Clef) is tc1)

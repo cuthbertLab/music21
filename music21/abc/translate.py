@@ -506,6 +506,9 @@ class Test(unittest.TestCase):
 
 
     def testGetMetaData(self):
+        '''
+        NB -- only title is checked. not meter or key
+        '''
 
         from music21 import abc
         from music21.abc import testFiles

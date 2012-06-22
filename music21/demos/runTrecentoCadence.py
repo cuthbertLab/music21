@@ -7,10 +7,6 @@ import random
 import doctest, unittest
 
 
-def xtest():
-    countTimeSig()
-    makePDFfromPieces()
-
 def countTimeSig():
     import music21
 
@@ -155,6 +151,8 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+    def testA(self):
+        self.assertEqual(5,5) ## something really wrong!??
 
 if __name__ == "__main__":    
     #makePDFfromPiecesWithCapua()

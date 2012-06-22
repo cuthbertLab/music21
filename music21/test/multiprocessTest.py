@@ -13,12 +13,15 @@
 '''
 multiprocess testing...
 '''
+from Queue import Empty as EmptyQueueException
 import multiprocessing
 import time
 
 import unittest, doctest
 import os, imp, sys
+import types
 
+import music21
 from music21 import base
 from music21 import common
 from music21 import environment
@@ -84,7 +87,7 @@ class ModuleGather(object):
 
     def _getName(self, fp):
         r'''
-        Given full file path, find a name for the the module
+        Given full file path, find a name for the the module with : as the separator.
         
         >>> from music21.test import test as testModule
         >>> mg = testModule.ModuleGather()
@@ -94,24 +97,26 @@ class ModuleGather(object):
         fn = fp.replace(self.dirParent, '') # remove parent
         if fn.startswith(os.sep):
             fn = fn[1:]
-        fn = fn.replace(os.sep, ':') # replace w/ dots
+        fn = fn.replace(os.sep, '_') # replace w/ colon
+        fn = fn.replace('.py', '')
+        return fn
+
+    def _getNamePeriod(self, fp):
+        r'''
+        Given full file path, find a name for the the module with . as the separator.
+        
+        >>> from music21.test import test as testModule
+        >>> mg = testModule.ModuleGather()
+        >>> #_DOCS_SHOW mg._getName(r'D:\Web\eclipse\music21base\music21\trecento\findSevs.py')
+        'trecento.findSevs'
+        '''
+        fn = fp.replace(self.dirParent, '') # remove parent
+        if fn.startswith(os.sep):
+            fn = fn[1:]
+        fn = fn.replace(os.sep, '.') # replace w/ period
         fn = fn.replace('.py', '')
         return fn
      
-    def load(self, restoreEnvironmentDefaults=False):
-        '''
-        Return a list of module objects that are not in the skip list.
-        
-        N.B. the list is a list of actual module objects not names,
-        therefore cannot be pickled.
-        '''
-        modules = []
-        for fp in self.modulePaths:
-            moduleObject = self.getModule(fp, restoreEnvironmentDefaults)
-            if moduleObject is not None:
-                modules.append(moduleObject)
-        return modules
-
     def getModule(self, fp, restoreEnvironmentDefaults = False):
         '''
         gets one module object from the file path
@@ -130,8 +135,15 @@ class ModuleGather(object):
         if skip:
             return None
         name = self._getName(fp)
+        #print name, fp
+        #sys.stdout.flush()
+
         try:
             mod = imp.load_source(name, fp) 
+        except ImportError as impError:
+            environLocal.printDebug(['failed import:', fp, '\n', 
+                '\tEXCEPTION:', str(impError).strip()])
+            return None
         except Exception as excp: # this takes all exceptions!
             environLocal.printDebug(['failed import:', fp, '\n', 
                 '\tEXCEPTION:', str(excp).strip()])
@@ -141,49 +153,115 @@ class ModuleGather(object):
                 mod.environLocal.restoreDefaults()
         return mod
 
-
-                 
-
-
-class Consumer(multiprocessing.Process):
-    
-    def __init__(self, task_queue, result_queue):
-        multiprocessing.Process.__init__(self)
-        self.task_queue   = task_queue
-        self.result_queue = result_queue
-
-    def run(self):
-        proc_name = self.name
-        while True:
-            next_task = self.task_queue.get()
-            if next_task is None:
-                # Poison pill means we should exit
-                #print '%s: Exiting' % proc_name
+    def getModuleWithoutImp(self, fp, restoreEnvironmentDefaults = False):
+        '''
+        gets one module object from the file path without using Imp
+        '''
+        skip = False
+        for fnSkip in self.moduleSkip:
+            if fp.endswith(fnSkip):
+                skip = True
                 break
-            #print '%s: %s' % (proc_name, next_task)
-            environLocal.printDebug("Next task: %s" % next_task.fp)
-            answer = next_task()
-            self.result_queue.put(answer)
-        self.terminate()
-        return
+        if skip:
+            return "skip"
+        for dirSkip in self.pathSkip:
+            if dirSkip in fp:
+                skip = True  
+                break
+        if skip:
+            return "skip"
+        moduleName = self._getNamePeriod(fp)
+        moduleNames = moduleName.split('.')
+        currentModule = music21
+        for thisName in moduleNames:
+            if hasattr(currentModule, thisName):
+                currentModule = object.__getattribute__(currentModule, thisName)
+                if not isinstance(currentModule, types.ModuleType):
+                    return "fail"
+            else:
+                return "fail"
+        mod = currentModule
+        
+        if restoreEnvironmentDefaults:
+            if hasattr(mod, 'environLocal'):
+                mod.environLocal.restoreDefaults()
+        return mod
 
 
 
-class Task(object):
-    def __init__(self, modGath, fp):
-        self.modGath = modGath
-        self.fp = fp
+def multime(multinum):
+    sleeptime = multinum[0]/100.0
+    if multinum[0] == 90:
+        raise Exception("Ha! 90!") 
+    print multinum, sleeptime
+    sys.stdout.flush()
+    time.sleep(sleeptime)
+    x = multinum[0] * multinum[1]
+    return (x, multinum[0])
 
-    def __call__(self):
-        verbosity = False
-        moduleObject = self.modGath.getModule(self.fp)
-        environLocal.printDebug('running %s \n' % self.fp)
-        if moduleObject is None:
-            environLocal.printDebug('%s is skipped \n' % self.fp)
-            return (None, None)
-        moduleName = self.modGath._getName(self.fp)
+def examplePoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
+    '''
+    demo of a pool runner with failures and successes...
+    '''
+    poolSize = 2 #multiprocessing.cpu_count()
+    print 'Creating %d processes for multiprocessing' % poolSize
+    pool = multiprocessing.Pool(processes=poolSize)
+
+    storage = []
+    
+    numbers = [50, 20, 10, 5, 700, 90]
+    res = pool.imap_unordered(multime, ((i,10) for i in numbers))
+    continueIt = True
+    timeouts = 0
+    eventsProcessed = 0
+    while continueIt is True:
+        try:
+            newResult = res.next(timeout=1)
+            print newResult
+            timeouts = 0
+            eventsProcessed += 1
+            storage.append(newResult)
+        except multiprocessing.TimeoutError:
+            timeouts += 1
+            print "TIMEOUT!"
+            if timeouts > 3 and eventsProcessed > 0:
+                print "Giving up..."
+                continueIt = False
+                pool.close()
+                pool.join()
+        except StopIteration:
+            continueIt = False
+            pool.close()    
+            pool.join()
+        except Exception as excp:
+            exceptionLog = ("UntrappedException", "%s" % excp)
+            storage.append(exceptionLog)
+
+    storageTwo = [i[1] for i in storage]
+    for x in numbers:
+        if x not in storageTwo:
+            failLog = ("Fail", x)
+            storage.append(failLog)
+    print storage
+
+def runOneModuleWithoutImp(args):
+    modGath = args[0] # modGather object
+    fp = args[1]
+    verbosity = False
+    moduleObject = modGath.getModuleWithoutImp(fp)
+    environLocal.printDebug('running %s \n' % fp)
+    if moduleObject == 'skip':
+        environLocal.printDebug('%s is skipped \n' % fp)
+        return ("Skipped", fp)
+    elif moduleObject == 'fail':
+        environLocal.printDebug('%s is in the music21 directory but not imported in music21. Skipped -- fix! \n' % fp)
+        return ("NotInTree", fp, '%s is in the music21 directory but not imported in music21. Skipped -- fix!' % modGath._getNamePeriod(fp))
+
+    
+    try:
+        moduleName = modGath._getName(fp)
         docTestOptions = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
-
+    
         
         s1 = doctest.DocTestSuite(optionflags=docTestOptions)
     
@@ -201,119 +279,215 @@ class Task(object):
             pass        
         environLocal.printDebug('running Tests...\n')
         runner = unittest.TextTestRunner(verbosity=verbosity)
-        testResult = runner.run(s1)  
-        return (moduleName, testResult)
-    
-    def __str__(self):
-        return '%s * %s' % (self.a, self.b)
+        try:
+            testResult = runner.run(s1)  
+            
+            # need to make testResult pickleable by removing the instancemethod parts...
+            trE = []
+            for e in testResult.errors:
+                trE.append(e[1])
+            trF = []
+            for f in testResult.failures:
+                trF.append(f[1])
+            testResult.errors = trE
+            testResult.failures = trF
+            return ("TestsRun", fp, moduleName, testResult)
+        except Exception as excp:
+            environLocal.printDebug('*** Exception in running %s: %s...\n' % (moduleName, excp))
+            return ("TrappedException", fp, moduleName, str(excp))
+    except Exception as excp:
+        environLocal.printDebug('*** Large Exception in running %s: %s...\n' % (fp, excp))
+        return ("LargeException", fp, str(excp))
 
-class DummyTask(object):
-    fp = "Dummy"
+def runOneModule(args): 
+    modGath = args[0] # modGather object
+    fp = args[1]
+    verbosity = False
+    try:
+        moduleObject = modGath.getModule(fp)
+    except ImportError:
+        environLocal.printDebug('*** ImportError in running %s...\n' % (fp))
+        return ("Import Error", fp)
+    try:
+        environLocal.printDebug('running %s \n' % fp)
+        if moduleObject is None:
+            environLocal.printDebug('%s is skipped \n' % fp)
+            return ("Skipped", fp)
+        moduleName = modGath._getName(fp)
+        docTestOptions = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
     
-    def __call__(self):
-        time.sleep(.1)
-        return (None, "dummy")
-
-class StdErrHolder(object):
-    def __init__(self):
-        self.log = []
+        
+        s1 = doctest.DocTestSuite(optionflags=docTestOptions)
     
-    def write(self, s):
-        self.log.append(s)
-
-def mainQueueRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
+        
+        # get Test classes in moduleObject
+        if not hasattr(moduleObject, 'Test'):
+            environLocal.printDebug('%s has no Test class' % moduleObject)
+        else:
+            s1.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(moduleObject.Test))
+        try:
+            s3 = doctest.DocTestSuite(moduleObject, optionflags=docTestOptions)
+            s1.addTests(s3)
+        except ValueError:
+            environLocal.printDebug('%s cannot load Doctests' % moduleObject)
+            pass        
+        environLocal.printDebug('running Tests...\n')
+        runner = unittest.TextTestRunner(verbosity=verbosity)
+        try:
+            testResult = runner.run(s1)  
+            
+            # need to make testResult pickleable by removing the instancemethod parts...
+            trE = []
+            for e in testResult.errors:
+                trE.append(e[1])
+            trF = []
+            for f in testResult.failures:
+                trF.append(f[1])
+            testResult.errors = trE
+            testResult.failures = trF
+            return ("TestsRun", fp, moduleName, testResult)
+        except Exception as excp:
+            environLocal.printDebug('*** Exception in running %s: %s...\n' % (moduleName, excp))
+            return ("TrappedException", fp, moduleName, str(excp))
+    except Exception as excp:
+        environLocal.printDebug('*** Large Exception in running %s: %s...\n' % (fp, excp))
+        return ("LargeException", fp, str(excp))
+    
+    
+def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
     '''Run all tests. Group can be test and external
-
-    >>> print(None)
-    None
     '''    
-
-#    oldStderr = sys.stderr
-#    sys.stderr = StdErrHolder()
-
-    # Establish communication queues
-    tasks   = multiprocessing.Queue()
-    results = multiprocessing.Queue()
     
     timeStart = time.time()
-    # Start consumers
-    num_consumers = multiprocessing.cpu_count()
-    print 'Creating %d processes for multiprocessing' % num_consumers
-    consumers = [ Consumer(tasks, results)
-                  for i in xrange(num_consumers) ]
-    for w in consumers:
-        w.start()
+    poolSize = multiprocessing.cpu_count()
+    print 'Creating %d processes for multiprocessing' % poolSize
     
+
     modGather = ModuleGather()
 
-    environLocal.printDebug('looking for Test classes...\n')
-    # look over each module and gather doc tests and unittests
+    maxTimeout = 120
+    pathsToRun = modGather.modulePaths
 
+    pool = multiprocessing.Pool(processes=poolSize)
+    res = pool.imap_unordered(runOneModuleWithoutImp, ((modGather,fp) for fp in pathsToRun))
 
-    ## add tasks
-    num_jobs = 0
-    for fp in modGather.modulePaths:
-        num_jobs += 1
-        tasks.put(Task(modGather, fp))
-    for i in range(10):
-        num_jobs += 1
-        tasks.put(DummyTask())
-    
-    #NO # Add a poison pill for each consumer
-    #for i in xrange(num_consumers):
-    #    tasks.put(None)
-    
-    # Start printing results
+    continueIt = True
+    timeouts = 0
+    eventsProcessed = 0
     summaryOutput = []
-    totalTests = 0
-    totalDummy = 0
-    while (results.empty() is False and tasks.empty() is False):
-        num_jobs -= 1    
+    
+    while continueIt is True:
         try:
-            #print "trying to get... %d" % num_jobs
-            (moduleName, textTestResult) = results.get()
-        except Exception as exc:
-            errorMsg = 'failed on get! %s' % exc
-            environLocal.printDebug(errorMsg)
-            summaryOutput.append(errorMsg)
-            (moduleName, textTestResult) = (None, None)
-        if moduleName is not None:
-            eCount = 0
-            fCount = 0
-            print '%d: %s: %s' % (num_jobs, moduleName, textTestResult)
-            summaryOutput.append('%s: %s' % (moduleName, textTestResult))
-            for e in textTestResult.errors:
-                print e[0], e[1]
-                summaryOutput.append('%s: %s' % (e[0], e[1]))
-            for f in textTestResult.failures:
-                print f[0], f[1]
-                summaryOutput.append('%s: %s' % (f[0], f[1]))
-            totalTests += textTestResult.testsRun
-            #print "got! %d" % num_jobs
-            sys.stdout.flush()
-        sys.stderr.flush()
+            newResult = res.next(timeout=1)
+            if timeouts >= 5:
+                print ""
+            print newResult
+            timeouts = 0
+            eventsProcessed += 1
+            summaryOutput.append(newResult)
+        except multiprocessing.TimeoutError:
+            timeouts += 1
+            if timeouts == 5 and eventsProcessed > 0:
+                print "Delay in processing, seconds: ",
+            elif timeouts == 5:
+                print "Starting first modules, should take 5-10 seconds: ",
+            if timeouts % 5 == 0:
+                print str(timeouts) + " ",
+            if timeouts > maxTimeout and eventsProcessed > 0:
+                print "\nToo many delays, giving up..."
+                continueIt = False
+                printSummary(summaryOutput, timeStart, pathsToRun)
+                pool.close()
+                exit()
+        except StopIteration:
+            continueIt = False
+            pool.close()    
+            pool.join()
+        except Exception as excp:
+            eventsProcessed += 1
+            exceptionLog = ("UntrappedException", "%s" % excp)
+            summaryOutput.append(exceptionLog)
 
+    #print summaryOutput
 
-    #for errMsg in sys.stderr.log:
-    #    print errMsg
-        
-    timeEnd = time.time()
-    elapsedTime = timeEnd - timeStart
+    printSummary(summaryOutput, timeStart, pathsToRun)
+
+def printSummary(summaryOutput, timeStart, pathsToRun):
+
+    summaryOutputTwo = [i[1] for i in summaryOutput]
+    for fp in pathsToRun:
+        if fp not in summaryOutputTwo:
+            failLog = ("NoResult", fp)
+            summaryOutput.append(failLog)
+
+    totalTests = 0
+
+    skippedSummary = []
+    successSummary = []
+    errorsFoundSummary = []
+    otherSummary = []
+    for l in summaryOutput:
+        (returnCode, fp) = (l[0], l[1])
+        if returnCode == 'Skipped':
+            skippedSummary.append("Skipped: %s" % fp)
+        elif returnCode == 'NoResult':
+            otherSummary.append("Silent test fail for %s: Run separately!" % fp)
+        elif returnCode == 'UntrappedException':
+            otherSummary.append("Untrapped Exception for unknown module: %s" % fp)
+        elif returnCode == 'TrappedException':
+            (moduleName, excp) = (l[2], l[3])
+            otherSummary.append("Trapped Exception for module %s, at %s: %s" % (moduleName, fp, excp))
+        elif returnCode == 'LargeException':
+            excp = l[2]
+            otherSummary.append("Large Exception for file %s: %s" % (fp, excp))
+        elif returnCode == 'ImportError':
+            otherSummary.append("Import Error for %s" % fp)
+        elif returnCode == 'NotInTree':
+            otherSummary.append("Not in Tree Error: %s " % l[2]) 
+        elif returnCode == 'TestsRun':
+            (moduleName, textTestResultObj) = (l[2], l[3])
+            testsRun = textTestResultObj.testsRun
+            totalTests += testsRun
+            if textTestResultObj.wasSuccessful():
+                successSummary.append("%s successfully ran %d tests" % (moduleName, testsRun))
+            else:
+                errorsList = textTestResultObj.errors # not the original errors list! see pickle note above
+                failuresList = textTestResultObj.failures
+                errorsFoundSummary.append("\n-----------\n%s had %d ERRORS and %d FAILURES in %d tests:" %(moduleName, len(errorsList), len(failuresList), testsRun))
+
+                for e in errorsList:
+                    print e
+                    errorsFoundSummary.append('%s' % (e))
+                for f in failuresList:
+                    print f
+                    errorsFoundSummary.append('%s' % (f))
+#                for e in errorsList:
+#                    print e[0], e[1]
+#                    errorsFoundSummary.append('%s: %s' % (e[0], e[1]))
+#                for f in failuresList:
+#                    print f[0], f[1]
+#                    errorsFoundSummary.append('%s: %s' % (f[0], f[1]))    
+        else:
+            otherSummary.append("Unknown return code %s" % l)
+
 
     print "\n\n---------------SUMMARY---------------------------------------------------"
-    for l in summaryOutput:
+    for l in skippedSummary:
+        print l
+    for l in successSummary:
+        print l
+    for l in otherSummary:
+        print l
+    for l in errorsFoundSummary:
         print l
     print "-------------------------------------------------------------------------"
+    elapsedTime = time.time() - timeStart
     print "Ran %d tests in %.4f seconds" % (totalTests, elapsedTime)
-    print "\n\n(waiting for subprocesses to terminate...can take a few seconds)"
     sys.stdout.flush()
 
 
-    for w in consumers:
-        w.terminate()
-
-
-#    sys.stderr = oldStderr
-
 if __name__ == '__main__':
-    mainQueueRunner()
+    #mg = ModuleGather()
+    #mm = mg.getModuleWithoutImp('trecento.capua')
+    #print mm
+    mainPoolRunner()
