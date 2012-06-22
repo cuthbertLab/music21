@@ -11,6 +11,7 @@
 
 import unittest, doctest
 import music21
+import os
 from music21 import *
 from music21 import features
 from music21.features import jSymbolic
@@ -52,9 +53,12 @@ def md5OfCorpusFile(fileDir, scoreNumber=None):
     '3b8c4b8db4288c43efde44ddcdb4d8d2'
     
     >>> s = corpus.parse('bwv431')
+    >>> s.corpusFilepath
+    'bach/bwv431.mxl'
     >>> b = md5OfCorpusFile(s.corpusFilepath)
     >>> b
     '3b8c4b8db4288c43efde44ddcdb4d8d2'
+
     >>> a == b
     True
     
@@ -63,7 +67,7 @@ def md5OfCorpusFile(fileDir, scoreNumber=None):
     '''
     
     corpusFP = common.getCorpusFilePath()
-    fileIn = open(corpusFP+'/'+fileDir,'r')
+    fileIn = open(corpusFP + os.sep + fileDir,'r')
     md5 = common.getMd5 ( fileIn.read() )
     if scoreNumber:
         return md5 + '.' + scoreNumber
