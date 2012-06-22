@@ -54,24 +54,30 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace = False):
     
     >>> data2M1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter')]
     >>> data2M2 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
-    >>> data2M3 = [('f', 'quarter'), ('g', 'eighth'), ('g', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
+    >>> data2M3 = [('e', 'quarter'), ('g', 'eighth'), ('g', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
     >>> data2M4 = [('d', 'quarter'), ('g', 'eighth'), ('g', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
-    >>> data2M5 = [('e', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
-    >>> data2M6 = [('e', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
+    >>> data2M5 = [('f', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
+    >>> data2M6 = [('g', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
     
     >>> data1 = [data1M1, data1M2, data1M3, data1M4]
     >>> data2 = [data2M1, data2M2, data2M3, data2M4, data2M5, data2M6]
     >>> stream1 = stream.Stream()
     >>> stream2 = stream.Stream()
+    >>> mNumber = 1
     >>> for d in data1:
     ...    m = stream.Measure()
+    ...    m.number = mNumber
+    ...    mNumber += 1
     ...    for pitchName,durType in d:
     ...        n = note.Note(pitchName)
     ...        n.duration.type = durType
     ...        m.append(n)
     ...    stream1.append(m)
+    >>> mNumber = 1
     >>> for d in data2:
     ...    m = stream.Measure()
+    ...    m.number = mNumber
+    ...    mNumber += 1
     ...    for pitchName,durType in d:
     ...        n = note.Note(pitchName)
     ...        n.duration.type = durType
@@ -91,26 +97,26 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace = False):
 
     >>> mergedStream = mergeVariantMeasureStreams(stream1, stream2, 'paris', inPlace = False)
     >>> mergedStream.show('text')
-    {0.0} <music21.stream.Measure 0 offset=0.0>
+    {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.note.Note A>
         {1.0} <music21.note.Note B>
         {1.5} <music21.note.Note C>
         {2.0} <music21.note.Note A>
         {3.0} <music21.note.Note A>
     {4.0} <music21.variant.Variant object at ...>
-    {4.0} <music21.stream.Measure 0 offset=4.0>
+    {4.0} <music21.stream.Measure 2 offset=4.0>
         {0.0} <music21.note.Note B>
         {0.5} <music21.note.Note C>
         {1.0} <music21.note.Note A>
         {2.0} <music21.note.Note A>
         {3.0} <music21.note.Note B>
-    {8.0} <music21.stream.Measure 0 offset=8.0>
+    {8.0} <music21.stream.Measure 3 offset=8.0>
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Note D>
         {2.0} <music21.note.Note E>
         {3.0} <music21.note.Note E>
     {12.0} <music21.variant.Variant object at ...>
-    {12.0} <music21.stream.Measure 0 offset=12.0>
+    {12.0} <music21.stream.Measure 4 offset=12.0>
         {0.0} <music21.note.Note D>
         {1.0} <music21.note.Note G>
         {1.5} <music21.note.Note G>
@@ -125,40 +131,40 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace = False):
     
     >>> parisStream = mergedStream.activateVariants('paris', inPlace = False)
     >>> parisStream.show('text')
-    {0.0} <music21.stream.Measure 0 offset=0.0>
+    {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.note.Note A>
         {1.0} <music21.note.Note B>
         {1.5} <music21.note.Note C>
         {2.0} <music21.note.Note A>
         {3.0} <music21.note.Note A>
     {4.0} <music21.variant.Variant object at ...>
-    {4.0} <music21.stream.Measure 0 offset=4.0>
+    {4.0} <music21.stream.Measure 2 offset=4.0>
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Note D>
         {2.0} <music21.note.Note E>
         {3.0} <music21.note.Note E>
     {8.0} <music21.variant.Variant object at ...>
-    {8.0} <music21.stream.Measure 0 offset=8.0>
-        {0.0} <music21.note.Note F>
+    {8.0} <music21.stream.Measure 3 offset=8.0>
+        {0.0} <music21.note.Note E>
         {1.0} <music21.note.Note G>
         {1.5} <music21.note.Note G>
         {2.0} <music21.note.Note A>
         {3.0} <music21.note.Note B>
-    {12.0} <music21.stream.Measure 0 offset=12.0>
+    {12.0} <music21.stream.Measure 4 offset=12.0>
         {0.0} <music21.note.Note D>
         {1.0} <music21.note.Note G>
         {1.5} <music21.note.Note G>
         {2.0} <music21.note.Note A>
         {3.0} <music21.note.Note B>
     {16.0} <music21.variant.Variant object at ...>
-    {16.0} <music21.stream.Measure 0 offset=16.0>
-        {0.0} <music21.note.Note E>
+    {16.0} <music21.stream.Measure 5 offset=16.0>
+        {0.0} <music21.note.Note F>
         {0.5} <music21.note.Note C>
         {1.5} <music21.note.Note A>
         {2.0} <music21.note.Note A>
         {3.0} <music21.note.Note B>
-    {20.0} <music21.stream.Measure 0 offset=20.0>
-        {0.0} <music21.note.Note E>
+    {20.0} <music21.stream.Measure 6 offset=20.0>
+        {0.0} <music21.note.Note G>
         {1.0} <music21.note.Note D>
         {2.0} <music21.note.Note E>
         {3.0} <music21.note.Note E>

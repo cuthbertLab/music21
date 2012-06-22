@@ -7346,7 +7346,7 @@ class Test(unittest.TestCase):
 
 
         # replace the one for two
-        s.activateVariants(matchBySpan=True, inPlace=True)
+        s.activateVariants("default", matchBySpan=True, inPlace=True)
         self.assertEqual(len(s.getElementsByClass('Measure')), 4) 
         self.assertEqual(str([p.name for p in s.pitches]), 
             "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")

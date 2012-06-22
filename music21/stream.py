@@ -9987,91 +9987,169 @@ class Stream(music21.Music21Object):
 # 
 
     def activateVariants(self, group=None, matchBySpan=True, inPlace=False):
-        '''For any :class:`~music21.variant.Variant` objects defined in this Stream (or selected by matching the `group` parameter), replace elements defined in the Variant with those in the calling Stream. Elements replaced will be gathered into a new Variant. 
+        '''For any :class:`~music21.variant.Variant` objects defined in this Stream (or selected by matching the `group` parameter),
+        replace elements defined in the Variant with those in the calling Stream. Elements replaced will be gathered into a new Variant
+        given the group 'default'. If a variant is activated with .replacementDuration different from its length, the appropriate elements
+        in the stream will have their offsets shifted, and measure numbering will be fixed. If matchBySpan is True, variants with lengthType
+        'replacement' will replace all of the elements in the replacement region of comparable class. If matchBySpan is False, elements will
+        be swapped in when a match is found between an element in the variant and an element in the replcement region of the string.
 
         >>> from music21 import *
-        >>> s = stream.Stream()
-        >>> s.repeatAppend(note.Note('C4'), 8)
-        >>> v1 = variant.Variant([note.Note('D#4')])
-        >>> v1.append(note.Note('F#4'))
-        >>> v1.groups = ['paris']
-        >>> s.insert(3.0, v1)
-        >>> s.show('text')
-        {0.0} <music21.note.Note C>
-        {1.0} <music21.note.Note C>
-        {2.0} <music21.note.Note C>
-        {3.0} <music21.variant.Variant object at ...>
-        {3.0} <music21.note.Note C>
-        {4.0} <music21.note.Note C>
-        {5.0} <music21.note.Note C>
-        {6.0} <music21.note.Note C>
-        {7.0} <music21.note.Note C>
+        >>> s = converter.parse("d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                  d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1", "4/4")
+        >>> s.makeMeasures(inPlace = True)
+        >>> v1stream = converter.parse("       a2. b-8 a8", "4/4")
+        >>> v2stream1 = converter.parse("                                      d4 f4 a2", "4/4")
+        >>> v2stream2 = converter.parse("                                                 d4 f4 AA2", "4/4")
         
-        >>> s.activateVariants('paris', inPlace=True)
-        >>> s.show('text')
-        {0.0} <music21.note.Note C>
-        {1.0} <music21.note.Note C>
-        {2.0} <music21.note.Note C>
-        {3.0} <music21.variant.Variant object at ...>
-        {3.0} <music21.note.Note D#>
-        {4.0} <music21.note.Note F#>
-        {5.0} <music21.note.Note C>
-        {6.0} <music21.note.Note C>
-        {7.0} <music21.note.Note C>
+        >>> v1 = variant.Variant()
+        >>> v1measure = stream.Measure()
+        >>> v1.insert(0.0, v1measure)
+        >>> for e in v1stream.notesAndRests:
+        ...    v1measure.insert(e.offset, e)
         
-        >>> s.activateVariants('default', inPlace=True)
-        >>> s.show('text')
-        {0.0} <music21.note.Note C>
-        {1.0} <music21.note.Note C>
-        {2.0} <music21.note.Note C>
-        {3.0} <music21.variant.Variant object at ...>
-        {3.0} <music21.note.Note C>
-        {4.0} <music21.note.Note C>
-        {5.0} <music21.note.Note C>
-        {6.0} <music21.note.Note C>
-        {7.0} <music21.note.Note C>
+        >>> v2 = variant.Variant()
+        >>> v2measure1 = stream.Measure()
+        >>> v2measure2 = stream.Measure()
+        >>> v2.insert(0.0, v2measure1)
+        >>> v2.insert(4.0, v2measure2)
+        >>> for e in v2stream1.notesAndRests:
+        ...    v2measure1.insert(e.offset, e)
+        >>> for e in v2stream2.notesAndRests:
+        ...    v2measure2.insert(e.offset, e)
         
-        Note that repeatedly activating variants (inPlace = True) loses the group names.
+        >>> v3 = variant.Variant()
+        >>> v2.replacementDuration = 4.0
+        >>> v3.replacementDuration = 4.0
+        >>> v1.groups = ["docvariants"]
+        >>> v2.groups = ["docvariants"]
+        >>> v3.groups = ["docvariants"]
         
-        >>> v1 = s.variants[0]
-        >>> v1.replacementDuration = 4.0
-        >>> v1.groups = ['paris']
-        >>> s.activateVariants('paris', inPlace=True)
-        >>> s.show('text')
-        {0.0} <music21.note.Note C>
-        {1.0} <music21.note.Note C>
-        {2.0} <music21.note.Note C>
-        {3.0} <music21.variant.Variant object at ...>
-        {3.0} <music21.note.Note D#>
-        {4.0} <music21.note.Note F#>
-        {5.0} <music21.note.Note C>
+        >>> s.insert(4.0, v1)    # replacement variant
+        >>> s.insert(12.0, v2)  # insertion variant (2 bars replace 1 bar)
+        >>> s.insert(20.0, v3)  # deletion variant (0 bars replace 1 bar)
         
-        >>> v1 = s.variants[0]
-        >>> v1.replacementDuration = 1.0
-        >>> s.activateVariants('default', inPlace=True)
-        >>> s.show('text')
-        {0.0} <music21.note.Note C>
-        {1.0} <music21.note.Note C>
-        {2.0} <music21.note.Note C>
-        {3.0} <music21.variant.Variant object at ...>
-        {3.0} <music21.note.Note C>
-        {4.0} <music21.note.Note C>
-        {5.0} <music21.note.Note C>
-        {6.0} <music21.note.Note C>
-        {7.0} <music21.note.Note F#>
-        {8.0} <music21.note.Note C>
+        >>> docvariant = s.activateVariants('docvariants')
+        
+        >>> #_DOCS_SHOW s.show()
+    
+        .. image:: images/stream_activateVariants1.*
+            :width: 600
+            
+        >>> #_DOCS_SHOW docvariant.show()
+        
+        .. image:: images/stream_activateVariants2.*
+            :width: 600
+            
+        >>> docvariant.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note D>
+            {1.0} <music21.note.Note E>
+            {2.0} <music21.note.Note F>
+            {3.0} <music21.note.Note G>
+        {4.0} <music21.variant.Variant object at ...>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+            {0.0} <music21.note.Note A>
+            {3.0} <music21.note.Note B->
+            {3.5} <music21.note.Note A>
+        {8.0} <music21.stream.Measure 3 offset=8.0>
+            {0.0} <music21.note.Note G>
+            {1.0} <music21.note.Note A>
+            {1.5} <music21.note.Note G>
+            {2.0} <music21.note.Note F>
+            {3.0} <music21.note.Note E>
+        {12.0} <music21.variant.Variant object at ...>
+        {12.0} <music21.stream.Measure 4 offset=12.0>
+            {0.0} <music21.note.Note D>
+            {1.0} <music21.note.Note F>
+            {2.0} <music21.note.Note A>
+        {16.0} <music21.stream.Measure 5 offset=16.0>
+            {0.0} <music21.note.Note D>
+            {1.0} <music21.note.Note F>
+            {2.0} <music21.note.Note A>
+        {20.0} <music21.stream.Measure 6 offset=20.0>
+            {0.0} <music21.note.Note D>
+            {1.0} <music21.note.Note E>
+            {2.0} <music21.note.Note F>
+            {3.0} <music21.note.Note G>
+        {24.0} <music21.variant.Variant object at ...>
+        {24.0} <music21.stream.Measure 7 offset=24.0>
+            {0.0} <music21.note.Note G>
+            {1.0} <music21.note.Note A>
+            {1.5} <music21.note.Note B->
+            {2.0} <music21.note.Note C>
+            {3.0} <music21.note.Note C>
+        {28.0} <music21.stream.Measure 8 offset=28.0>
+            {0.0} <music21.note.Note F>
+            {4.0} <music21.bar.Barline style=final>
+            
+        After a variant group has been activated, the regions it replaced are stored as variants with the group 'default'.
+        It should be noted that this means .activateVariants should rarely if ever be used on a stream which is returned
+        by activateVariants because the group information is lost.
+        
+        >>> defaultvariant = docvariant.activateVariants('default')
+        >>> #_DOCS_SHOW defaultvariant.show()
+        
+        .. image:: images/stream_activateVariants3.*
+            :width: 600
+            
+        >>> defaultvariant.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note D>
+            {1.0} <music21.note.Note E>
+            {2.0} <music21.note.Note F>
+            {3.0} <music21.note.Note G>
+        {4.0} <music21.variant.Variant object at ...>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+            {0.0} <music21.note.Note A>
+            {2.0} <music21.note.Note B->
+            {3.0} <music21.note.Note A>
+        {8.0} <music21.stream.Measure 3 offset=8.0>
+            {0.0} <music21.note.Note G>
+            {1.0} <music21.note.Note A>
+            {1.5} <music21.note.Note G>
+            {2.0} <music21.note.Note F>
+            {3.0} <music21.note.Note E>
+        {12.0} <music21.variant.Variant object at ...>
+        {12.0} <music21.stream.Measure 4 offset=12.0>
+            {0.0} <music21.note.Note D>
+            {2.0} <music21.note.Note A>
+        {16.0} <music21.stream.Measure 5 offset=16.0>
+            {0.0} <music21.note.Note D>
+            {1.0} <music21.note.Note E>
+            {2.0} <music21.note.Note F>
+            {3.0} <music21.note.Note G>
+        {20.0} <music21.variant.Variant object at ...>
+        {20.0} <music21.stream.Measure 6 offset=20.0>
+            {0.0} <music21.note.Note A>
+            {2.0} <music21.note.Note B->
+            {3.0} <music21.note.Note A>
+        {24.0} <music21.stream.Measure 7 offset=24.0>
+            {0.0} <music21.note.Note G>
+            {1.0} <music21.note.Note A>
+            {1.5} <music21.note.Note B->
+            {2.0} <music21.note.Note C>
+            {3.0} <music21.note.Note C>
+        {28.0} <music21.stream.Measure 8 offset=28.0>
+            {0.0} <music21.note.Note F>
+            {4.0} <music21.bar.Barline style=final>
 
         '''
         from music21 import variant
         
-        if not inPlace: # make a copy
+        if not inPlace: # make a copy if inPlace is False
             returnObj = deepcopy(self)
         else:
             returnObj = self
             
+        # Define Lists to cache variants
         elongationVariants = []
         deletionVariants = []
         
+        #Loop through all variants, deal with replacement variants and save insertion and deletion for later.
         for v in returnObj.variants:    
             if group is not None:
                 if group not in v.groups:
@@ -10089,25 +10167,39 @@ class Stream(music21.Music21Object):
             elif lengthType == 'replacement':
                 returnObj._insertReplacementVariant(v, matchBySpan)
                 
-        #Now deal with deletions
-        deletedRegionsForRemoval = []
+        #---Now deal with deletions before insertion variants.
+        deletedMeasures = [] #For keeping track of which measure numbers have been removed
+        insertedMeasures = [] #For keeping track of where new measures without measure numbers have been inserted, will be a list of tuples (measureNumberPrior, [List, of, inserted, measures])
+        
+        deletedRegionsForRemoval = [] #For keeping track of the sections that are deleted (so the offset gap can be closed later)
+        
         for v in deletionVariants:
-            deletedRegion = returnObj._insertDeletionVariant(v, matchBySpan)
-            deletedRegionsForRemoval.append(deletedRegion)
-        returnObj._removeOrExpandGaps(deletedRegionsForRemoval, isRemove = True, inPlace = True) #Squeeze out the remaining gaps
-                
+            deletedRegion, vDeletedMeasures, vInsertedMeasuresTuple = returnObj._insertDeletionVariant(v, matchBySpan) #deletes and inserts
+            deletedRegionsForRemoval.append(deletedRegion) #Saves the deleted region
+            deletedMeasures.extend(vDeletedMeasures) # Saves the deleted measure numbers
+            insertedMeasures.append(vInsertedMeasuresTuple) #saves the inserted numberless measures (this will be empty unless there are more bars in the variant than in the replacement region, which is unlikely for a deletion variant.
+       
+        returnObj._removeOrExpandGaps(deletedRegionsForRemoval, isRemove = True, inPlace = True) #Squeeze out the gaps that were saved.    
+        
+        
         #Before we can deal with insertions, we have to expand the stream to make space.
-        insertionRegionsForExpansion = []
-        for v in elongationVariants:
+        insertionRegionsForExpansion = [] #For saving the insertion regions
+        for v in elongationVariants: #go through all elongation variants to find the insertion regions.
             lengthDifference = v.replacementDuration - v.containedHighestTime
             insertionStart = v.getOffsetBySite(returnObj) + v.replacementDuration
             insertionRegionsForExpansion.append((insertionStart, -1 * lengthDifference, [v]))   #Saves the information for each gap to be expanded
-        returnObj._removeOrExpandGaps(insertionRegionsForExpansion, isRemove = False, inPlace = True)   #Expands the appropriate gaps in the stream.
         
-        # Now deal with elements associated with insertions.
+        returnObj._removeOrExpandGaps(insertionRegionsForExpansion, isRemove = False, inPlace = True)  #Expands the appropriate gaps in the stream.
+
+        # Now deal with elongation variants properly
         for v in elongationVariants:
-            returnObj._insertInsertionVariant(v, matchBySpan)
+            vInsertedMeasuresTuple, vDeletedMeasures = returnObj._insertInsertionVariant(v, matchBySpan) #deletes and inserts
+            insertedMeasures.append(vInsertedMeasuresTuple) # Saves the numberless inserted measures
+            deletedMeasures.extend(vDeletedMeasures) # Saves deleted measures if any (it is unlikely that there will be unless there are fewer measures in the variant than the replacement region, which is unlikely for an elongation variant)
             
+        #Now fix measure numbers given the saved information
+        returnObj._fixMeasureNumbers(deletedMeasures, insertedMeasures)
+        
         # have to clear cached variants, as they are no longer the same
         returnObj._elementsChanged()
         if not inPlace:
@@ -10150,7 +10242,11 @@ class Stream(music21.Music21Object):
         ...    s.append(m)
         >>> s.insert(4.0, v)
         
-        >>> s._insertReplacementVariant(v)
+        >>> deletedMeasures, insertedMeasuresTuple = s._insertReplacementVariant(v)
+        >>> deletedMeasures
+        []
+        >>> insertedMeasuresTuple
+        (0, [])
         >>> s.show('text')
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.note.Note A>
@@ -10200,6 +10296,9 @@ class Stream(music21.Music21Object):
                     self.remove(targetToReplace)
                     # extract the variant component and insert into place
                     self.insert(oInStream, e)
+                    
+                    if type(targetToReplace) is music21.stream.Measure:
+                        e.number = targetToReplace.number
             # only remove old and add removed if we matched
             if targetsMatched > 0:
                 # remove the original variant
@@ -10212,6 +10311,9 @@ class Stream(music21.Music21Object):
         else:
             vEnd = vStart + v.containedHighestTime
             classes = [] # collect all classes found in this variant    
+            deletedMeasures = []
+            insertedMeasures = []
+            highestNumber = None
             for e in v.elements:
                 classes.append(e.classes[0])
             targets = self.getElementsByOffset(vStart, vEnd,
@@ -10227,13 +10329,25 @@ class Stream(music21.Music21Object):
                 removed.insert(oInVariant, e)
                 #environLocal.pd(['matchBySpan', matchBySpan, 'activateVariants', 'removing', e])
                 self.remove(e)
+                if type(e) is music21.stream.Measure: #Save deleted measure numbers.
+                    deletedMeasures.append(e.number)
             for e in v.elements:
                 oInStream = vStart + e.getOffsetBySite(v.containedSite)
                 self.insert(oInStream, e)
+                if type(e) is music21.stream.Measure:
+                    if deletedMeasures != []: #If there measure numbers left to use, use them.
+                        e.number = deletedMeasures.pop(False) #Assign the next highest deleted measure number
+                        highestNumber = e.number #Save the highest number used so far (for use in the case that there are extra measures with no numbers at the end)
+                    else:
+                        e.number = 0
+                        insertedMeasures.append(e) # If no measure numbers left, add this numberless measure to insertedMeasures
             # remove the source variant
             self.remove(v)
             # place newly contained elements in position
             self.insert(vStart, removed)
+            
+            # If deletedMeasures != [], then there were more deleted measures than inserted and the remaining numbers in deletedMeasures are those that were removed.
+            return deletedMeasures, (highestNumber, insertedMeasures) #In the case that the variant and stream are in the same time-signature, this should return []
     
     def _insertDeletionVariant(self, v, matchBySpan = True):
         '''
@@ -10278,7 +10392,13 @@ class Stream(music21.Music21Object):
         >>> s.insert(4.0, v)
         
         
-        >>> deletedRegion = s._insertDeletionVariant(v)
+        >>> deletedRegion, deletedMeasures, insertedMeasuresTuple = s._insertDeletionVariant(v)
+        >>> deletedRegion
+        (12.0, 4.0, [])
+        >>> deletedMeasures
+        [0]
+        >>> insertedMeasuresTuple
+        (0, [])
         >>> s.show('text')
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.note.Note A>
@@ -10301,6 +10421,7 @@ class Stream(music21.Music21Object):
         '''
         from music21 import variant
         
+        deletedMeasures = [] # For keeping track of what measure numbers are deleted
         lengthDifference = v.replacementDuration - v.containedHighestTime #length of the deleted region
         removed = variant.Variant() # what group should this have?
         removed.groups = ['default'] #for now, default
@@ -10320,6 +10441,8 @@ class Stream(music21.Music21Object):
 
         # this will always remove elements before inserting
         for e in targets:
+            if type(e) is music21.stream.Measure: #if a measure is deleted, save its number
+                deletedMeasures.append(e.number)
             oInVariant = e.getOffsetBySite(self) - vStart
             removed.insert(oInVariant, e)
             self.remove(e)
@@ -10333,12 +10456,23 @@ class Stream(music21.Music21Object):
             mustBeginInSpan=True)
         
         for e in targets:
+            if type(e) is music21.stream.Measure: #if a measures is deleted save its number
+                deletedMeasures.append(e.number)
             oInVariant = e.getOffsetBySite(self) - vStart
             removed.insert(oInVariant, e)
             self.remove(e)
         
         #Next put in the elements from the variant
+        highestNumber = None
+        insertedMeasures = []
         for e in v.elements:
+            if type(e) is music21.stream.Measure:
+                if deletedMeasures != []: #If there are deleted numbers still saved, assign this measure the next highest and remove it from the list.
+                    e.number = deletedMeasures.pop(False)
+                    highestNumber = e.number #Save the highest number assigned so far. If there are numberless inserted measures at the end, this will name where to begin numbering.
+                else:
+                    e.number = 0
+                    insertedMeasures.append(e) #If there are no deleted numbers left (unlikely) save the inserted measures for renumbering later.
             oInStream = vStart + e.getOffsetBySite(v.containedSite)
             self.insert(oInStream, e)
         
@@ -10348,7 +10482,7 @@ class Stream(music21.Music21Object):
         self.insert(vStart, removed)
         
         #each variant leaves a gap, this saves the required information about those gaps
-        return (deletionStart, lengthDifference, [])
+        return (deletionStart, lengthDifference, []), deletedMeasures, (highestNumber, insertedMeasures) #In most cases, inserted measures should be [].
     
     def _insertInsertionVariant(self, v, matchBySpan = True):
         '''
@@ -10388,7 +10522,13 @@ class Stream(music21.Music21Object):
         >>> insertionRegionsForExpansion = [(8.0, 4.0, [v])]
         >>> s._removeOrExpandGaps(insertionRegionsForExpansion, isRemove = False, inPlace = True)
         
-        >>> s._insertInsertionVariant(v)
+        >>> insertedMeasuresTuple, deletedMeasures = s._insertInsertionVariant(v)
+        >>> measurePrior, insertedMeasures = insertedMeasuresTuple
+        >>> measurePrior
+        0
+        >>> len(insertedMeasures)
+        1
+        
         >>> s.show('text')
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.note.Note A>
@@ -10421,6 +10561,7 @@ class Stream(music21.Music21Object):
         '''
         from music21 import variant
         
+        deletedMeasures = []
         lengthDifference = v.replacementDuration - v.containedHighestTime
         removed = variant.Variant() # what group should this have?
         removed.groups = ['default'] #for now, default
@@ -10438,8 +10579,10 @@ class Stream(music21.Music21Object):
             mustBeginInSpan=True,
             classList=classes)
 
-        # this will always remove elements before inserting
+        # this will always remove elements before inserting        
         for e in targets:
+            if type(e) is music21.stream.Measure: # Save deleted measure numbers.
+                deletedMeasures.append(e.number)
             oInVariant = e.getOffsetBySite(self) - vStart
             removed.insert(oInVariant, e)
             self.remove(e)
@@ -10452,22 +10595,46 @@ class Stream(music21.Music21Object):
             mustFinishInSpan=False,
             mustBeginInSpan=True)
         
-        for e in targets:
+        for e in targets: # I think targets should always be []
             oInVariant = e.getOffsetBySite(self) - vStart
             removed.insert(oInVariant, e)
             self.remove(e)
         
-        
         #Next put in the elements from the variant
+        highestMeasure = None
+        insertedMeasures = []
         for e in v.elements:
+            if type(e) is music21.stream.Measure: # If there are deleted measure numbers left, assign the next inserted measure the next highest number and remove it.
+                if deletedMeasures != []:
+                    e.number = deletedMeasures.pop(False)
+                    highestMeasure = e.number # Save the highest number assigned so far so we know where to being numbering new measures.
+                else:
+                    e.number = 0
+                    insertedMeasures.append(e) # If there are no deleted measures, we have begun inserting as yet unnumbered measures, save which those are.
             oInStream = vStart + e.getOffsetBySite(v.containedSite)
             self.insert(oInStream, e)
+        
+        if highestMeasure is None: #If the highestMeasure is None (which will occur if the variant is a strict insertion and replaces no measures,
+                                    #we need to choose the highest measure number prior to the variant.
+            measuresToCheck = self.getElementsByOffset(0.0, v.getOffsetBySite(self),
+                includeEndBoundary=True,
+                mustFinishInSpan=False,
+                mustBeginInSpan=True,
+                classList = [music21.stream.Measure])
+            if measuresToCheck != []:
+                for m in measuresToCheck:
+                    if m.number > highestMeasure:
+                        highestMeasure = m.number
+            else:
+                highestMeasure = 0
         
         # remove the source variant
         self.remove(v)
         # place newly contained elements in position
         self.insert(vStart, removed)
-    
+        
+        return (highestMeasure, insertedMeasures), deletedMeasures
+
     def _removeOrExpandGaps(self, listOffsetDurExemption, isRemove = True, inPlace = False, exemptClasses = None):
         '''
         Helper for activateVariants. Takes a list of tuples in the form (startoffset, duration, [list, of, exempt, objects]). If isRemove is True,
@@ -10591,7 +10758,92 @@ class Stream(music21.Music21Object):
             return
         else:
             return returnObj
-
+    
+    def _fixMeasureNumbers(self, deletedMeasures, insertedMeasures):
+        '''
+        Corrects the measures numbers of a string of measures given a list of measure numbers that have been deleted and a 
+        list of tuples (highest measure number below insertion, number of inserted measures).
+        
+        >>> from music21 import *
+        >>> s = converter.parse("d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    g1", "4/4")
+        >>> s.makeMeasures(inPlace=True)
+        >>> s[-1].offset = 20.0
+        >>> s.remove(s.measure(2))
+        >>> deletedMeasures = [2]
+        >>> m1 = stream.Measure()
+        >>> m1.repeatAppend(note.Note('e'),4)
+        >>> s.insert(12.0, m1)
+        >>> m2 = stream.Measure()
+        >>> m2.repeatAppend(note.Note('f'),4)
+        >>> s.insert(16.0, m2)
+        >>> insertedMeasures = [(3, [m1, m2])]
+        >>> s._fixMeasureNumbers(deletedMeasures, insertedMeasures)
+        >>> fixedNumbers = []
+        >>> for m in s.getElementsByClass("Measure"):
+        ...    fixedNumbers.append( m.number )
+        >>> fixedNumbers
+        [1, 2, 3, 4, 5]
+        
+        '''
+        deletedMeasures.extend(insertedMeasures)
+        allMeasures = deletedMeasures
+        
+        if allMeasures is [] or allMeasures is None:
+            return
+        allMeasures.sort(key = lambda x: type(x) is tuple and x[0] or x)
+        
+        oldMeasures = self.getElementsByClass("Measure")
+        newMeasures = []
+        
+        cummulativeNumberShift = 0
+        oldCorrections = {}
+        newCorrections = {}
+        # the inserted measures must be treated differently than the original measures.
+        # an inserted measure should not shift itself, but it should shift measures with the same number.
+        # However, inserted measures should still be shifted by every other correction.
+        
+        # First collect dictionaries of shift boundaries and the amount of the shift.
+        # at the same time, five un-numbered measures numbers that make sense.
+        for measureNumber in allMeasures:
+            if type(measureNumber) is tuple: #tuple implies insertion
+                measurePrior, extendedMeasures = measureNumber
+                if len(extendedMeasures) is 0: #No measures were added, therefore no shift.
+                    continue
+                cummulativeNumberShift += len(extendedMeasures)
+                nextMeasure = measurePrior + 1
+                for m in extendedMeasures:
+                    oldMeasures.remove(m)
+                    newMeasures.append(m)
+                    m.number = nextMeasure
+                    nextMeasure += 1
+                oldCorrections[measurePrior+1] = cummulativeNumberShift
+                newCorrections[nextMeasure] = cummulativeNumberShift
+            else: #integer implies deletion
+                cummulativeNumberShift -= 1
+                oldCorrections[measureNumber+1] = cummulativeNumberShift
+                newCorrections[measureNumber+1] = cummulativeNumberShift
+        
+        # Second, make corrections based on the dictionaries. The key is the measure number
+        # above which measures should be shifted by the value up to the next key. It is easiest
+        # to do this in reverse order so there is no overlapping.
+        previousBoundary = None
+        for k in sorted(oldCorrections.keys(), key = lambda x: -x):
+            shift = oldCorrections[k]
+            for m in oldMeasures:
+                if previousBoundary is None or m.number < previousBoundary:
+                    if m.number >= k:
+                        m.number = m.number + shift
+            previousBoundary = k
+        
+        previousBoundary = None
+        for k in sorted(newCorrections.keys(), key = lambda x: -x):
+            shift = newCorrections[k]
+            for m in newMeasures:
+                if previousBoundary is None or m.number < previousBoundary:
+                    if m.number >= k:
+                        m.number = m.number + shift
+            previousBoundary = k
+        
 #-------------------------------------------------------------------------------
 class Voice(Stream):
     '''
