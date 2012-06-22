@@ -1,19 +1,20 @@
-'''Python script to find out certain statistics about the trecento cadences'''
+# -*- coding: utf-8 -*-
+'''
+Python script to find out certain statistics about the trecento cadences
+'''
 
 import random
 import doctest, unittest
 
-import music21
-from music21.trecento import cadencebook
-from music21.trecento.cadencebook import *
-from music21.tinyNotation import TinyNotationException
 
 def xtest():
     countTimeSig()
     makePDFfromPieces()
 
 def countTimeSig():
-    ballataObj = BallataSheet()
+    import music21
+
+    ballataObj = music21.trecento.cadencebook.BallataSheet()
 
     timeSigCounter = {}
     totalPieces = 0.0
@@ -46,7 +47,7 @@ def sortByPMFC(work1, work2):
             return 0        
 
 def makePDFfromPieces(start = 1, finish = 2):
-    ballataObj = BallataSheet()
+    ballataObj = music21.trecento.cadencebook.BallataSheet()
 
     retrievedPieces = []
     for i in range(start, finish):  ## some random pieces
@@ -83,7 +84,7 @@ def makePDFfromPieces(start = 1, finish = 2):
 #    lStr.runThroughLily()
 
 def makePDFfromPiecesWithCapua(start = 2, finish = 3):
-    ballataObj = BallataSheet()
+    ballataObj = music21.trecento.cadencebook.BallataSheet()
 
     retrievedPieces = []
     for i in range(start, finish):  ## some random pieces
@@ -132,13 +133,13 @@ def makePDFfromPiecesWithCapua(start = 2, finish = 3):
 
 
 def checkValidity():
-    ballataObj = BallataSheet()
+    ballataObj = music21.trecento.cadencebook.BallataSheet()
 
     for i in range(1,378):
         randomPiece = ballataObj.makeWork(i) #random.randint(231, 312)
         try:
             incipitStreams = randomPiece.incipitStreams()
-        except TinyNotationException, inst:
+        except music21.tinyNotation.TinyNotationException as inst:
             raise Exception(randomPiece.title + " had problem " + inst.args)
 
 
@@ -156,10 +157,10 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":    
-    makePDFfromPiecesWithCapua()
-    #music21.mainTest(Test)
+    #makePDFfromPiecesWithCapua()
+    import music21
+    music21.mainTest(Test)
 
 
 #------------------------------------------------------------------------------
 # eof
-
