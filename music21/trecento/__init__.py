@@ -6,7 +6,6 @@ import cadencebook
 import capua
 import findTrecentoFragments
 import tonality
-import runCadence
 
 #from music21.trecento import *
 
