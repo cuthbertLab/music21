@@ -71,7 +71,6 @@ function generateIntervals() {
 	tempo = document.getElementById('generatedTempo').value
 	
 	updateTempo()
-	workNameWithQuotes = "\"" + workName + "\""
 	kindWithQuotes = "\"" + kind + "\""
 	//alert('submitting request'+workNameWithQuotes);
 	m21.request.clear();
@@ -319,10 +318,10 @@ function noteflightEventHandler(e)
 </div>
 <!--- Listening and Responding --->
 <div id='listenrespond' style="display:none">
-<div id='displaywrapper' onclick="trigger">
+<div id='displaywrapper'>
 <div id='pause' style="display:none" onclick="pause()">X
 </div>
-<div id='displayprogress' onclick="trigger">
+<div id='displayprogress'>
 </div>
 </div>
 
