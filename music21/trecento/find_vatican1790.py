@@ -5,7 +5,7 @@ from music21.trecento import cadencebook
 
 def find():
     ballatas = cadencebook.BallataSheet()
-    allLily = lily.LilyString()
+    allLily = lily.lilyString.LilyString()
     for ballata in ballatas:
         if (ballata.timeSigBegin == "6/8" or ballata.timeSigBegin == "9/8"):
             incipit = ballata.incipit

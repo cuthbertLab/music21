@@ -67,7 +67,7 @@ def md5OfCorpusFile(fileDir, scoreNumber=None):
     '''
     
     corpusFP = common.getCorpusFilePath()
-    fileIn = open(corpusFP + os.sep + fileDir,'r')
+    fileIn = open(corpusFP + os.sep + fileDir,'rb')
     md5 = common.getMd5 ( fileIn.read() )
     if scoreNumber:
         return md5 + '.' + scoreNumber

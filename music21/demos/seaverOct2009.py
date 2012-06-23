@@ -8,16 +8,6 @@ from music21.humdrum import *
 import music21.note
 import music21.pitch
 import music21.stream
-from music21 import clef
-from music21 import common
-from music21 import corpus
-from music21 import converter
-from music21 import graph
-from music21 import instrument
-from music21 import lily
-from music21 import meter
-from music21 import stream
-from music21 import note
 
 
 def simple1():
@@ -48,58 +38,56 @@ def simple3():
     '''
     reduce all measures of Chopin mazurkas to their rhythmic components and give the measure numbers (harder: render in notation) of all measures sorted by pattern.
     '''
+    import copy
+
     def lsort(keyname):
         return len(rhythmicHash[keyname])
     
-    defaultPitch = music21.pitch.Pitch("C3")    
-    
-    import copy
-    from music21.converter import parse
-    from music21.stream import Stream, Measure
-    
+    defaultPitch = music21.pitch.Pitch("C3")      
     
     #  semiFlat lets me get all Measures no matter where they reside in the tree structure
-    measureStream = parse(testFiles.mazurka6).semiFlat[Measure]
+    measureStream = converter.parse(testFiles.mazurka6).semiFlat.getElementsByClass('Measure')
     rhythmicHash = common.DefaultHash(default = list, callDefault = True )
 
     for thisMeasure in measureStream:
-        if not almostEquals(thisMeasure.duration.quarterLength, 3.0):
+        if not common.almostEquals(thisMeasure.duration.quarterLength, 3.0):
             continue
-        notes = thisMeasure.flat.getNotes()
-        rhythmicStream = Measure()
+        notes = thisMeasure.flat.notesAndRests  # n.b. won't work any more because of voices...
+        if len(notes) == 0:
+            continue
+        rhythmicStream = stream.Measure()
         
         offsetString = "" ## comma separated string of offsets 
         for thisNote in notes:
             rhythmNote = copy.deepcopy(thisNote)
             if rhythmNote.isNote:
-                rhythmNote.pitch = defaultPitch
+                rhythmNote.pitch = copy.deepcopy(defaultPitch)
             elif rhythmNote.isChord:
-                rhythmNote          = music21.note.Note()
-                rhythmNote.pitch    = defaultPitch
-                rhythmNote.duration = thisNote.duration
+                rhythmNote          = note.Note()
+                rhythmNote.pitch    = copy.deepcopy(defaultPitch)
+                rhythmNote.duration = copy.deepcopy(thisNote.duration)
                             
             if not rhythmNote.isRest:
                 offsetString += str(rhythmNote.offset) + ", "
             
-            if thisNote.isChord:
-                thisNote.pitch = defaultPitch
             rhythmicStream.append(rhythmNote)
             
-        notes[0].lyric = str(thisMeasure.number)
+        #notes[0].lyric = str(thisMeasure.number)
         if len(rhythmicHash[offsetString]) == 0: # if it is our first encounter with the rhythm, add the rhythm alone in blue
             for thisNote in rhythmicStream:
                 thisNote.color = "blue"
             rhythmicHash[offsetString].append(rhythmicStream)
-        thisMeasure.getNotes()[0].editorial.comment.text = str(thisMeasure.number)
+        thisMeasure.flat.notesAndRests[0].editorial.comment.text = str(thisMeasure.number)
         rhythmicHash[offsetString].append(thisMeasure)
 
-    allLily = lily.LilyString()
-    allLily += meter.TimeSignature('3/4').lily + " "
+    s = stream.Part()
+    s.insert(0, meter.TimeSignature('3/4'))
+    
     for thisRhythmProfile in sorted(rhythmicHash, key=lsort, reverse=True):
         for thisMeasure in rhythmicHash[thisRhythmProfile]:
-            thisLily = " " + str(thisMeasure.bestClef().lily) + " " + str(thisMeasure.lily) + "\n"
-            allLily += thisLily
-    allLily.showPNG()
+            thisMeasure.insert(0, thisMeasure.bestClef())
+            s.append(thisMeasure)
+    s.show('lily.png')
 
 def simple4a(show=True):
     '''
@@ -381,21 +369,6 @@ Myke Cuthbert
 '''
 
 
-class Chorales(object):
-    '''
-    move to top level module perhaps, because of such general use
-    '''
-    pass
-
-    def all(self):
-        pass
-    
-class Chorale(object):
-    pass
-
-class ReducedChorale(Chorale):
-    pass
-
 def js_q1():
     '''
     give all cadential arrivals on a first inversion chord, 6 or 65. 
@@ -489,6 +462,8 @@ class TestExternal(unittest.TestCase):
 #        for func in tests:
 #            func(show=True)
 
+    def testSimple3(self):
+        simple3()
 
 
 class Test(unittest.TestCase):
@@ -496,7 +471,8 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def testBasic(self):
+        
+    def xtestBasic(self):
         '''seaverOct2009: Test non-showing functions
         '''
         for func in tests:

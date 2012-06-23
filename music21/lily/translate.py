@@ -354,11 +354,16 @@ scoreTitleMarkup=##f
     #----------------elements in or out of Streams------------------------------------#
     def fromGeneralNote(self, noteObj):
         r'''
-        read-only property that returns a LilyString of the lilypond representation of
+        read-only property that returns a string of the lilypond representation of
         a note (or via subclassing, rest or chord)
         
         >>> from music21 import *
         >>> conv = lily.translate.LilypondConverter()
+
+        >>> n0 = note.Note("D4")
+        >>> n0.editorial.color = 'blue'
+        >>> print conv.fromGeneralNote(n0)
+        \color "blue" d'4
 
         >>> n1 = note.Note("C#5")
         >>> n1.tie = tie.Tie('start')
@@ -366,6 +371,7 @@ scoreTitleMarkup=##f
         >>> n1.quarterLength = 1.25
         >>> print conv.fromGeneralNote(n1)
         cis''4~ cis''16~
+        
 
         >>> r1 = note.Rest()
         >>> r1.duration.type = "half"
@@ -384,16 +390,17 @@ scoreTitleMarkup=##f
         '''
         c = noteObj.classes
         lilyInternalTieCharacter = u'~'     
-        if 'Rest' in c:
-            lilyInternalTieCharacter = u' ' # when separating components, dont tie them
-            baseName = u'r'
-        elif 'Chord' in c:
-            baseName = self.chordPreDurationLily(noteObj)
-        else:
-            baseName = self.notePreDurationLily(noteObj)
-
+        baseName = u''
         if noteObj.editorial is not None:
             baseName += noteObj.editorial.lilyStart()
+
+        if 'Rest' in c:
+            lilyInternalTieCharacter = u' ' # when separating components, dont tie them
+            baseName += u'r'
+        elif 'Chord' in c:
+            baseName += self.chordPreDurationLily(noteObj)
+        else:
+            baseName += self.notePreDurationLily(noteObj)
 
         allNames = u""
         if hasattr(noteObj.duration, "components") and len(
@@ -821,7 +828,7 @@ scoreTitleMarkup=##f
         return lilyFile
         
     def showPNG(self):
-        '''Take the LilyString, run it through LilyPond, and then show it as a PNG file.
+        '''Take the object, run it through LilyPond, and then show it as a PNG file.
         On Windows, the PNG file will not be deleted, so you  will need to clean out
         TEMP every once in a while
         '''

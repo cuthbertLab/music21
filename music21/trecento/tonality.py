@@ -33,7 +33,6 @@ from music21.note import Note
 from music21 import interval
 from music21.trecento import cadencebook
 from music21 import lily
-from music21.lily import lilyString
 from music21.trecento import capua
 from music21.trecento import polyphonicSnippet
 from music21.common import DefaultHash
@@ -98,7 +97,7 @@ class TonalityCounter(object):
         self.storedDict = None
     
     def run(self):
-        allLily = lily.LilyString()
+        allLily = lily.lilyString.LilyString()
         output = ""
         streamName = self.streamName
         

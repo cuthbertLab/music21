@@ -18,7 +18,7 @@ def find():
                 print(ballata.title + ' has a seventh somewhere')
 #        except:
 #            pass
-    lS = lily.LilyString("{" + alllily + "}")
+    lS = lily.lilyString.LilyString("{" + alllily + "}")
     lS.showPDF()
     #makePDF(alllily)
     #print alllily
@@ -36,7 +36,7 @@ def findinwork(work):
                 if interval.generic == 7:
                     containssev = True
                     streamLily = astream.lily
-                    lS = lily.Lilystring("{" + streamLily + "}")
+                    lS = lily.lilyString.Lilystring("{" + streamLily + "}")
                     lS.showPNG()
                     print(interval.note1.lilyName + ' -- ' + interval.note2.lilyName)
                     #interval.note1.editorial.color = "blue" #this doesn't actually work yet....
@@ -110,7 +110,7 @@ def test1(row):
     work = ballatas.makeWork(row)
     if findinwork(work):
         sevlily = work.getAllLily()
-        lS = lily.LilyString(sevlily)
+        lS = lily.lilyString.LilyString(sevlily)
         lS.showPNG()
         print('done')
         
@@ -123,7 +123,7 @@ def findsevinrange(startrow, endrow):
         work = ballatas.makeWork(row)
         streamLily += findinwork2(work)
     if streamLily != '':
-        lS = lily.LilyString(streamLily)
+        lS = lily.lilyString.LilyString(streamLily)
         lS.showPDF()
     print('done')
 
@@ -141,7 +141,7 @@ def findsixinrange(startrow, endrow):
         work = ballatas.makeWork(row)
         streamLily += findsixinwork(work)
     if streamLily != '':
-        lS = lily.LilyString(streamLily)
+        lS = lily.lilyString.LilyString(streamLily)
         lS.showPDF()
     print('done')
     
@@ -154,7 +154,7 @@ def findintervalinrange(startrow, endrow, intervalnum, makePDF=True):
         streamLily += findintervalinwork(work, intervalnum)
     if streamLily != '':
         if makePDF:
-            lS = lily.LilyString(streamLily)
+            lS = lily.lilyString.LilyString(streamLily)
             lS.showPDF()
     print('done')
 

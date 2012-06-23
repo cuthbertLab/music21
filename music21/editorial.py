@@ -140,7 +140,7 @@ class NoteEditorial(music21.JSONSerializer):
 
     def lilyStart(self):
         r'''
-        A method that returns a string (not LilyString) containing the 
+        A method that returns a string containing the 
         lilypond output that comes before the note.
         
         >>> from music21 import *
@@ -186,7 +186,7 @@ class NoteEditorial(music21.JSONSerializer):
     
     def lilyEnd(self):
         r'''
-        returns a string (not LilyString) of editorial lily
+        returns a string of editorial lily
         instructions to come after the note.  Currently it is
         just info to turn off hidding of notes.
         '''

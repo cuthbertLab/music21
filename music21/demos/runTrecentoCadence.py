@@ -72,7 +72,7 @@ def makePDFfromPieces(start = 1, finish = 2):
         if randomCadB2 is not None:
             lilyString += randomCadB2.lily()
 
-    lS = lily.LilyString(lilyString)
+    lS = lily.lilyString.LilyString(lilyString)
     lS.showPDF()
 #    lStr = lily.LilyString(lilyString)
 #    print lStr.encode('utf-8')
@@ -119,9 +119,9 @@ def makePDFfromPiecesWithCapua(start = 2, finish = 3):
                 capua.runRulesOnStream(thisStream)
             lilyString += randomCadB2.lily()
 
-    lS = lily.LilyString(lilyString)
+    lS = lily.lilyString.LilyString(lilyString)
     lS.showPDF()
-#    lStr = lily.LilyString(lilyString)
+#    lStr = lily.lilyString.LilyString(lilyString)
 #    print lStr.encode('utf-8')
 #    lStr.writeTemp()
 #    lStr.runThroughLily()

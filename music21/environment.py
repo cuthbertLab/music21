@@ -744,7 +744,6 @@ class Environment(object):
         Erase could be called from os or command-line arguments after opening
         the file and then a short time delay.
 
-        TODO: Move showImageDirectfrom lilyString.py ; add MIDI
         TODO: Switch to module subprocess to prevent hanging.
         '''
         return _environStorage['instance'].launch(fmt, fp, 

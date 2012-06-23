@@ -712,7 +712,7 @@ def correctedMaj3():
     '''Find all cases where a Major 3rd moves inward to unison (within the next two or three notes, excluding rests)
     and see how often the PMFC editors correct it to Minor 3 and how often Capua gets it'''
 
-    lilyAll = lily.LilyString()
+    lilyAll = lily.lilyString.LilyString()
     
     ballataObj = cadencebook.BallataSheet()
     totalDict = {
@@ -781,7 +781,7 @@ def correctedMin6():
         }
 
     notesToCheck = 2 # allows Landini cadences, but note much more
-    lilyAll = lily.LilyString()
+    lilyAll = lily.lilyString.LilyString()
 
     for i in range(2, 459):  # all ballate   
 #    for i in range(232, 373):  # all of Landini ballate

@@ -8,7 +8,7 @@ from music21 import metadata
 from music21.note import Note, Rest
 from music21 import interval
 from music21 import search
-from music21.lily import LilyString
+from music21 import lily
 
 from music21.trecento import cadencebook
 from music21.trecento import trecentoCadence
@@ -107,7 +107,7 @@ def searchForNotes(notesStr):
                             thisCadence.header() + "\n}\n"
                     print("In piece %r found in stream %d: %s" % (thisWork.title, i, notesList))
     if streamLily:
-        lS = LilyString(streamLily)
+        lS = lily.lilyString.LilyString(streamLily)
         lS.showPNG()
 
 def searchForIntervals(notesStr):
@@ -151,7 +151,7 @@ def searchForIntervals(notesStr):
 
     if streamLily:
         print(streamLily)
-        LilyString(streamLily).showPDF()
+        lily.lilyString.LilyString(streamLily).showPDF()
 
 def findRandomVerona():
     searchForNotes("A4 F4 G4 E4 F4 G4")  #p. 4 cadence 1
