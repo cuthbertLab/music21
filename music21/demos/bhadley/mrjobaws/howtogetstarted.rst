@@ -66,36 +66,90 @@ you to buy time on a Hadoop cluster on an hourly basis. It also works with your 
 To install with pip, run in your linux command line:
 `pip install mrjob` 
 
+To understand the map-reduce algorithm and how you can use mrjob to implement it, a helpful
+video to view is:
+`PyCon 2011 MRJOB Presentation` <http://pyvideo.org/video/404/pycon-2011--mrjob--distributed-computing-for-ever>`
+
 **How-To Run A Job**
 
-1. You provide an input text file, full of formatted data or files to process. This
+0. Amazon Elastic MapReduce is available in limited areas worldwide. When you run your job, Amazon
+will choose the cluster closest to you. But unfortunately if you don't live in the following general regions,
+Amazon Elastic MapReduce won't work for you (yet!)
+
+	* US East (Northern Virginia)
+	* US West (Oregon)
+	* US West (Northern California)
+	* EU (Ireland)
+	* Asia Pacific (Singapore)
+	* Asia Pacific (Tokyo)
+	* South America (Sao Paulo) Regions
+
+
+1. Provide an input text file, full of formatted data or files to process. This
 text file is then broken into small, processable units by the mrjob protocol.
 Several different protocols may be chosen, depending on what format you've written
 your input file in. `full details here <http://packages.python.org/mrjob/protocols.html?highlight=protocol#`_
 
-2. You write the mrjobclass, and define the mapper and reducer functions. The standard
-word counter example is included below (from mrjob website)
+2. Write your mrjobclass, and define the mapper and reducer functions. This can be quite simple, because
+all you typically do in the class is call music21 functions, which do the computation, and return the result.
+If you've written programs using music21, you can typically just copy and paste them in to the mapper function,
+and, return the output. 
 
-from mrjob.job import MRJob
+Be aware that both the mapper and reducer functions are run on all the instances on a subset of the input data from
+the text file. Thus, design your mapper to run independently on every piece of input specified by the input protocol.
 
-class MRWordCounter(MRJob):
-    def mapper(self, key, line):
-        for word in line.split():
-            yield word, 1
+When writing your mrjob, it is advisable to wrap ALL your code in a `try`, `except` block, because
+although mrjob tries hard to recover from failures, it would be a pity to run a big job and
+generate lots of good data, then fail because one file had a parsing error.
 
-    def reducer(self, word, occurrences):
-        yield word, sum(occurrences)
+The standard word-counting map-reduce algorithm, as given on the mrjob website, is below::
 
-if __name__ == '__main__':
-    MRWordCounter.run()
+	from mrjob.job import MRJob
 
-3. You test your mrjob locally by running
+	class MRWordCounter(MRJob):
+	    def mapper(self, key, line):
+	        for word in line.split():
+	            yield word, 1
+	
+	    def reducer(self, word, occurrences):
+	        yield word, sum(occurrences)
+	
+	if __name__ == '__main__':
+	    MRWordCounter.run()
+
+A skeleton mrjob for music21 purposes might look like this:
+	
+	fro music21 import *
+	from mrjob.job import MRJob
+	
+	class myMusic21Process(MRJob):
+	    def mapper(self, key, line):
+	    	try:
+		        # input might be a music file, and run music21 commands here to get data from the file
+		        # yield all data as key, value pairs
+		        yield 'someKey', someValue
+			except:
+				yield 'mappter_fail', line
+	    def reducer(self, word, occurrences):
+	    	try:
+		        # this function could combine or process the output from the mapper
+		        # if you don't want to use the reducer, don't include it
+		        # output from the reducer is also in key, value pairs
+		        yield word, sum(occurrences)
+			except:
+				yield 'reducer_fail', line
+				
+	if __name__ == '__main__':
+	    MRWordCounter.run()
+
+
+3. Test your mrjob by running it locally (on your computer)
 `python nameOfMRJOB.py < NAME_OF_INPUT_FILE.txt > NAME_OF_DESIRED_OUTPUT_FILE`
 
-4. Your job runs locally, and your output will be located in the same directory as your mrjob.py file, unless
+4. Your output from the local run will be located in the same directory as your mrjob.py file, unless
 you specified otherwise
 
-5. if everything passes, then you're ready to run on EMR. First thing, get 
+5. If everything works, then you're ready to run on EMR. First, get 
 an `amazon web services account` <`http://aws.amazon.com/`>_ and sign up for EMR if you're not
 already signed up. Take special note of your access key and secret access key, and be sure
 to save your the .PEM file in a secure place. You won't be able to regenerate that, although you
@@ -104,7 +158,7 @@ can always generate new key pairs.
 6. With your account all set up, you must provide a .mrjob.conf file before running your job, with
 full specifications for running on EMR. See conf.rst for documentation on how to establish a conf file.
 
-7. Now you're ready to run! Enter into command line
+7. Now you're ready to deploy your job! Enter into command line
 `python nameOfMRJOB.py -r emr < NAME_OF_INPUT_FILE.txt > NAME_OF_DESIRED_OUTPUT_FILE`
 
 Hopefully you will see a transcript of the process in the command shell. At some point

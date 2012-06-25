@@ -4,8 +4,29 @@ a mrjob on amazon web services using elastic map reduce.
 For more information: http://packages.python.org/mrjob/configs-basics.html#mrjob-conf
 Complete list of configuration options: http://packages.python.org/mrjob/configs-runners.html
 
-An example conf file for music21 mrjobs might look like this::
+The conf file must be in a specific format readable by mrjob. You can write
+it in two formats: JSON, or YAML. Yaml looks cleaner and will cause you
+less grief, so if you can install the yaml module for pyton: `sudo apt-get install python-yaml`
 
+A standard mrjob conf file for running music21 tasks (using YAML) might look like this::
+	runners: 
+	  emr: 
+	    aws_access_key_id: YOUR_ACCESS_KEY_HERE
+	    aws_secret_access_key: YOUR_SECRET_ACCESS_KEY_HERE
+	    ami_version: 2.1.0
+	    num_ec2_instances: 10
+	    ec2_instance_type: m1.small
+	    ec2_key_pair: EMR
+	    ec2_key_pair_file: /home/bhadley/Desktop/pem/EMRm21.pem
+	    ssh_tunnel_to_job_tracker: true
+	    enable_emr_debugging: true
+	    bootstrap_scripts: ['/home/bhadley/Desktop/bootstrapScripts/install_music21.sh']
+	    bootstrap_files: ['/home/bhadley/Desktop/bootstrapFiles/music21-1.0.0.tar.gz']
+	    jobconf: 
+	      mapred.task.timeout: 3600000
+	      mapreduce.task.timeout: 3600000
+
+And the same thing, but with JSON format::
 	{"runners": 
 	 {
 	
@@ -13,17 +34,15 @@ An example conf file for music21 mrjobs might look like this::
 	  {
 	    "aws_access_key_id": "YOUR_ACCESS_KEY_HERE",
 	    "aws_secret_access_key": "YOUR_SECRET_ACCESS_KEY_HERE",
-	    "num_ec2_instances": 2, (The number of slave instances you'd like to use)
+	    "ami_version": 2.1.0
+	    "num_ec2_instances": 10,
 	    "ec2_instance_type": "m1.small", 
 	    "ec2_key_pair": EMR,
 	    "ec2_key_pair_file": /directory/to/your/PEMFile/EMR.pem ,
-	    "ssh_tunnel_to_job_tracker": true, (should be true if you want to be able to debug)
-	    "bootstrap_scripts": ['/directory/to/python/installation/script/install_python27.sh',
-	    '/directory/to/music21/installation/script/install_music21.sh',
-	    '/directory/to/mrjob/installation/script/install_mrjob.sh'],
-	    "bootstrap_files": ['/directory/to/tarred/python2.7/Python-2.7.2.tar.bz2',
-	    '/directory/to/tarred/music21/music21-1.0.tar.gz',
-	    '/directory/to/tarred/mrjob/mrjob-0.3.3.2.tar.gz']
+	    "ssh_tunnel_to_job_tracker": true,
+	    "enable_emr_debugging": true,
+	    "bootstrap_scripts": ['/directory/to/music21/installation/script/install_music21.sh']
+	    "bootstrap_files": ['/directory/to/tarred/music21/music21-1.0.tar.gz']
 	  }
 	 }
 	
@@ -39,28 +58,37 @@ the conf file.
 	you pay hourly, and this is not prorated so if your job only takes 20 minutes but runs
 	on 20 instances, you pay for 20 full hours of computation. Run tests to
 	establish efficient and cost-effective choices
+* ami_version: Set this to the latest version, 2.1.0 (as of June 2012). Default is, unfortunately, the first
+	version, 1.0. The latest version obviously has many more features, including Python 2.6 rather than 2.5 (on version 1.0)
+	`Details on Versions Here` <http://docs.amazonwebservices.com/ElasticMapReduce/latest/DeveloperGuide/EnvironmentConfig_AMIVersion.html>
+
+	* If you find you'll need a more recent version of Python than 2.6.6, you'll have to install Python
+	during bootstrapping, and of course re-install mrjob as well. This will increase your bootstrapping
+	time considerably! (500ish seconds!) To do so, append the file path to the tar.bz2 python installation
+	folder in bootstrap_files, and include the scripin bootstrap_scripts.
+
 * ec2_instance_type: the type of slave instances you'd like to use
 	specs of all types of instances are available here: http://aws.amazon.com/ec2/instance-types/
 	pricing is available here: http://aws.amazon.com/elasticmapreduce/pricing/
 	*Standard Instances*
-	* m1.small
-	* m1.medium
-	* m1.large
-	* m1.xlarge
-	* Micro Instances*
-	* t1.micro
+	==============					===============		===============	    ============			====================================
+	Instance Type					Price ($)				Processing Time		Running Time (sec)	Normalized Instance Hours Charged
+	==============					===============		================	============			====================================
+	m1.small 						0.095				16 minutes			257		n				1
+	m1.large 						0.38				8 minutes			151		n				4
+	m1.xlarge						0.76				6 minutes			107		n				8  
 	*High Memory Instances*
-	* m2.xlarge
-	* m2.2xlarge
-	* m2.4xlarge
+	m2.xlarge						0.54				6 minutes			88						6	
+	m2.2xlarge						1.11				7 minutes			89		n				12	
+	m2.4xlarge						2.22				--							n				24
 	*High-CPU Instances*
-	* c1.medium
-	* c1.xlarge
+	c1.medium 						0.195				7 minutes			123						2
+	c1.xlarge						0.78				6 minutes			108		n				8	
 	*Cluster Compute Instances*
-	* cc1.4xlarge
-	* cc2.8xlarge
+	cc1.4xlarge						1.57				--							n				16
+	cc2.8xlarge						2.90				--							n				29
 	*Cluster GPU Instances*
-	* cg1.4xlarge
+	cg1.4xlarge						2.52				--							n				25
 
 * Bootstrapping
 	Although I'm still investigating and I know there's got to be a better way,
@@ -105,3 +133,21 @@ the conf file.
 		tar xvfz mrjob-0.3.3.2.tar.gz
 		cd mrjob-0.3.3.2
 		sudo python setup.py install
+		
+* EMR time-out. The default task timeout (the maximum time an instance is allowed to 
+process a single step function) is by default 10 minutes. If the timeout is exceeded,
+the job fails, terminates, and logs a timeout error. Booh. This is to help you keep track
+of rougue instances. If you'd like to change this timeout, set `mapred.task.timeout`
+and `mapreduce.task.timeout`. Units are in seconds. The reason to set both is to make
+sure it works for whichever version of Hadoop the instance happens to be running.
+		
+		
+
+		
+		
+		
+		
+		
+		
+		
+		
