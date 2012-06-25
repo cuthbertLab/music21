@@ -11,8 +11,18 @@
 '''This module defines an object representation of MusicXML, used for converting to and from MusicXML and music21.
 '''
 
-import sys, os, copy
+import sys
+
+# in order for sax parsing to properly handle unicode strings w/ unicode chars
+# stored in StringIO.StringIO, this update is necessary
+# http://stackoverflow.com/questions/857597/setting-the-encoding-for-sax-parser-in-python
+
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+import os, copy
 import unittest, doctest
+import codecs
 import StringIO # this module is not supported in python3
 # use io.StringIO  in python 3, avail in 2.6, not 2.5
 
@@ -3820,18 +3830,19 @@ class Document(object):
 
     def _load(self, fileLike, file=True, audit=False):
         saxparser = self._getParser()
-
         #t = common.Timer()
         #t.start()
-
         # call the handler with tagLib
         h = Handler(self.tagLib) 
         saxparser.setContentHandler(h)
 
         if not file:
+            # StringIO.StringIO is supposed to handle unicode
             fileLikeOpen = StringIO.StringIO(fileLike)
+
         else: # TODO: should this be codecs.open()?
             fileLikeOpen = open(fileLike)
+            #fileLikeOpen = codecs.open(fileLike, encoding='utf-8')
 
         # the file always needs to be closed, otherwise
         # subsequent parsing operations produce an unclosed token error
@@ -3857,7 +3868,7 @@ class Document(object):
 
 
     def read(self, xmlString, audit=False):
-        '''load musicxml form a string, instead of a file
+        '''Load MusicXML from a string, instead of from a file.
         '''
         self._load(xmlString, False, audit)
 
@@ -3882,7 +3893,6 @@ class Document(object):
 
     def reprTest(self):
         '''Basic display for testing'''
-
         print('+'*20 + ' ' + self.getBestTitle())
         print(self.score)
         print()
@@ -4734,6 +4744,25 @@ class Test(unittest.TestCase):
                                         wavyCount += 1;
         self.assertEqual(glissCount, 2)
         self.assertEqual(wavyCount, 4)
+
+
+
+    def testUnicodeCharsA(self):
+        from music21.musicxml import testPrimitive
+        from music21 import converter
+
+        # low level musicxml object test
+        d = Document()
+        d.read(testPrimitive.unicodeStrWithNonAscii)
+        # make sure that unicode char is passed through
+        match = d.score.identificationObj.creatorList[0].charData
+        self.assertEqual(u'© Someone Else', match)
+
+        # the ultimate round trip test
+        s = converter.parse(testPrimitive.unicodeStrWithNonAscii)
+        raw = s.musicxml
+        s = converter.parse(raw)
+        self.assertEqual(u'© Someone Else', s.metadata.composer)
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":

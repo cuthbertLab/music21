@@ -17233,6 +17233,400 @@ otaveShifts33d = """<?xml version="1.0" encoding="UTF-8"?>
 """
 
 
+unicodeStrWithNonAscii = u"""<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE score-partwise
+  PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
+  'http://www.musicxml.org/dtds/partwise.dtd'>
+<score-partwise>
+  <movement-title>Music21 Fragment</movement-title>
+  <identification>
+    <creator type="composer">© Someone Else</creator>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name>Soprano</part-name>
+      <score-instrument id="Ia5c7ffd3fddaf34e01aba22cc7675e84">
+        <instrument-name>Instrument 1</instrument-name>
+      </score-instrument>
+      <midi-instrument id="Ia5c7ffd3fddaf34e01aba22cc7675e84">
+        <midi-channel>1</midi-channel>
+        <midi-program>1</midi-program>
+      </midi-instrument>
+    </score-part>
+    <score-part id="P2">
+      <part-name>Alto</part-name>
+      <score-instrument id="I81a3ccc830fc582b8da480f89085ce86">
+        <instrument-name>Instrument 2</instrument-name>
+      </score-instrument>
+      <midi-instrument id="I81a3ccc830fc582b8da480f89085ce86">
+        <midi-channel>2</midi-channel>
+        <midi-program>1</midi-program>
+      </midi-instrument>
+    </score-part>
+    <score-part id="P3">
+      <part-name>Tenor</part-name>
+      <score-instrument id="I3fe5d663307a3f4b6af18a6834007735">
+        <instrument-name>Instrument 3</instrument-name>
+      </score-instrument>
+      <midi-instrument id="I3fe5d663307a3f4b6af18a6834007735">
+        <midi-channel>3</midi-channel>
+        <midi-program>1</midi-program>
+      </midi-instrument>
+    </score-part>
+    <score-part id="P4">
+      <part-name>Bass</part-name>
+      <score-instrument id="I787c2e658336b11931730747a2db2687">
+        <instrument-name>Instrument 4</instrument-name>
+      </score-instrument>
+      <midi-instrument id="I787c2e658336b11931730747a2db2687">
+        <midi-channel>4</midi-channel>
+        <midi-program>1</midi-program>
+      </midi-instrument>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="0">
+      <attributes>
+        <divisions>10080</divisions>
+        <key>
+          <fifths>2</fifths>
+          <mode>minor</mode>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>E</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>5040</duration>
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam>begin</beam>
+        <notations/>
+      </note>
+      <note>
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>4</octave>
+        </pitch>
+        <duration>5040</duration>
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam>end</beam>
+        <notations/>
+      </note>
+    </measure>
+  </part>
+  <part id="P2">
+    <measure number="0">
+      <attributes>
+        <divisions>10080</divisions>
+        <key>
+          <fifths>2</fifths>
+          <mode>minor</mode>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>B</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>10080</duration>
+        <type>quarter</type>
+        <stem>up</stem>
+        <notations/>
+      </note>
+    </measure>
+  </part>
+  <part id="P3">
+    <measure number="0">
+      <attributes>
+        <divisions>10080</divisions>
+        <key>
+          <fifths>2</fifths>
+          <mode>minor</mode>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>F</sign>
+          <line>4</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>5040</duration>
+        <type>eighth</type>
+        <stem>down</stem>
+        <beam>begin</beam>
+        <notations/>
+      </note>
+      <note>
+        <pitch>
+          <step>A</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>5040</duration>
+        <type>eighth</type>
+        <stem>down</stem>
+        <beam>end</beam>
+        <notations/>
+      </note>
+    </measure>
+  </part>
+  <part id="P4">
+    <measure number="0">
+      <attributes>
+        <divisions>10080</divisions>
+        <key>
+          <fifths>2</fifths>
+          <mode>minor</mode>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>F</sign>
+          <line>4</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>E</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>10080</duration>
+        <type>quarter</type>
+        <stem>down</stem>
+        <notations/>
+      </note>
+    </measure>
+  </part>
+</score-partwise>
+"""
+
+
+unicodeStrNoNonAscii = u"""<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE score-partwise
+  PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
+  'http://www.musicxml.org/dtds/partwise.dtd'>
+<score-partwise>
+  <movement-title>Music21 Fragment</movement-title>
+  <identification>
+    <creator type="composer">Music21</creator>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name>Soprano</part-name>
+      <score-instrument id="Ia5c7ffd3fddaf34e01aba22cc7675e84">
+        <instrument-name>Instrument 1</instrument-name>
+      </score-instrument>
+      <midi-instrument id="Ia5c7ffd3fddaf34e01aba22cc7675e84">
+        <midi-channel>1</midi-channel>
+        <midi-program>1</midi-program>
+      </midi-instrument>
+    </score-part>
+    <score-part id="P2">
+      <part-name>Alto</part-name>
+      <score-instrument id="I81a3ccc830fc582b8da480f89085ce86">
+        <instrument-name>Instrument 2</instrument-name>
+      </score-instrument>
+      <midi-instrument id="I81a3ccc830fc582b8da480f89085ce86">
+        <midi-channel>2</midi-channel>
+        <midi-program>1</midi-program>
+      </midi-instrument>
+    </score-part>
+    <score-part id="P3">
+      <part-name>Tenor</part-name>
+      <score-instrument id="I3fe5d663307a3f4b6af18a6834007735">
+        <instrument-name>Instrument 3</instrument-name>
+      </score-instrument>
+      <midi-instrument id="I3fe5d663307a3f4b6af18a6834007735">
+        <midi-channel>3</midi-channel>
+        <midi-program>1</midi-program>
+      </midi-instrument>
+    </score-part>
+    <score-part id="P4">
+      <part-name>Bass</part-name>
+      <score-instrument id="I787c2e658336b11931730747a2db2687">
+        <instrument-name>Instrument 4</instrument-name>
+      </score-instrument>
+      <midi-instrument id="I787c2e658336b11931730747a2db2687">
+        <midi-channel>4</midi-channel>
+        <midi-program>1</midi-program>
+      </midi-instrument>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="0">
+      <attributes>
+        <divisions>10080</divisions>
+        <key>
+          <fifths>2</fifths>
+          <mode>minor</mode>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>E</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>5040</duration>
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam>begin</beam>
+        <notations/>
+      </note>
+      <note>
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>4</octave>
+        </pitch>
+        <duration>5040</duration>
+        <type>eighth</type>
+        <stem>up</stem>
+        <beam>end</beam>
+        <notations/>
+      </note>
+    </measure>
+  </part>
+  <part id="P2">
+    <measure number="0">
+      <attributes>
+        <divisions>10080</divisions>
+        <key>
+          <fifths>2</fifths>
+          <mode>minor</mode>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>B</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>10080</duration>
+        <type>quarter</type>
+        <stem>up</stem>
+        <notations/>
+      </note>
+    </measure>
+  </part>
+  <part id="P3">
+    <measure number="0">
+      <attributes>
+        <divisions>10080</divisions>
+        <key>
+          <fifths>2</fifths>
+          <mode>minor</mode>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>F</sign>
+          <line>4</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>5040</duration>
+        <type>eighth</type>
+        <stem>down</stem>
+        <beam>begin</beam>
+        <notations/>
+      </note>
+      <note>
+        <pitch>
+          <step>A</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>5040</duration>
+        <type>eighth</type>
+        <stem>down</stem>
+        <beam>end</beam>
+        <notations/>
+      </note>
+    </measure>
+  </part>
+  <part id="P4">
+    <measure number="0">
+      <attributes>
+        <divisions>10080</divisions>
+        <key>
+          <fifths>2</fifths>
+          <mode>minor</mode>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>F</sign>
+          <line>4</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>E</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>10080</duration>
+        <type>quarter</type>
+        <stem>down</stem>
+        <notations/>
+      </note>
+    </measure>
+  </part>
+</score-partwise>
+"""
+
+
+
+
 ALL = [articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a, restsDurations02a, rhythmDurations03a, chordsThreeNotesDuration21c,
 beams01, timeSignatures11c, timeSignatures11d, clefs12a, beams02, tuplets23a, tuplets23b, tupletsNested23d, keySignatures13a,
 
@@ -17251,6 +17645,10 @@ graceNotes24a, transposingInstruments72a, transposing01,
 mixedVoices1a, mixedVoices1b, mixedVoices2, 
 
 colors01, triplets01, textBoxes01, otaveShifts33d,
+
+unicodeStrNoNonAscii,
+unicodeStrWithNonAscii, 
+
 ]
 
 
@@ -17277,8 +17675,8 @@ class Test(unittest.TestCase):
         pass
 
     def testBasic(self):
+        # a basic test to make sure each parse
         from music21 import converter
-
         for testMaterial in ALL:
             a = converter.parse(testMaterial)
 

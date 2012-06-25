@@ -222,6 +222,7 @@ class PickleFilter(object):
         '''
         self.fp = fp
         self.forceSource = forceSource
+        #environLocal.pd(['creating pickle filter'])
 
     def _getPickleFp(self, dir):
         if dir == None:
@@ -644,7 +645,7 @@ class ConverterMusicXML(object):
         self._mxScore = c.score #  the mxScore object from the musicxml Document
         if len(self._mxScore) == 0:
             #print xmlString
-            raise ConverterException('score from xmlString (%s...) has no parts defined' % xmlString[:30])
+            raise ConverterException('score from xmlString (%s...) either has no parts defined or was incompletely parsed' % xmlString[:30])
         self.load()
 
     def parseFile(self, fp, number=None):
@@ -702,7 +703,7 @@ class ConverterMusicXML(object):
             arch = ArchiveManager(fpDst)
             if arch.isArchive():
                 c.read(arch.getData())
-            else: # its a file path
+            else: # its a file path or a raw musicxml string
                 c.open(fpDst)
 
         # get mxScore object from .score attribute
@@ -1006,6 +1007,9 @@ class Converter(object):
         if common.isListLike(dataStr):
             format = 'tinyNotation'
 
+#         if type(dataStr) == unicode:
+#             environLocal.pd(['Converter.parseData: got a unicode string'])
+
         # get from data in string if not specified        
         if format is None: # its a string
             dataStr = dataStr.lstrip()
@@ -1202,10 +1206,12 @@ def parse(value, *args, **keywords):
     else:   
         format = None
 
-    if common.isListLike(value) and len(value) == 2 and value[1] == None and os.path.exists(value[0]):
-        ## comes from corpus.search
+    if (common.isListLike(value) and len(value) == 2 and 
+        value[1] == None and os.path.exists(value[0])):
+        # comes from corpus.search
         return parseFile(value[0], format=format)
-    elif common.isListLike(value) and len(value) == 2 and isinstance(value[1], int) and os.path.exists(value[0]):
+    elif (common.isListLike(value) and len(value) == 2 and 
+        isinstance(value[1], int) and os.path.exists(value[0])):
         return parseFile(value[0], format=format).getScoreByNumber(value[1])
     elif common.isListLike(value) or len(args) > 0: # tiny notation list
         if len(args) > 0: # add additional args to a list
