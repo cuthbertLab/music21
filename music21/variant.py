@@ -282,14 +282,17 @@ def addVariant(s,startOffset, sVariant, variantName = None, variantGroups = None
     if sVariant is None: #deletion
         pass
     else: #replacement or insertion
-        sVariantMeasures = sVariant.getElementsByClass('Measure')
-        if sVariantMeasures == []: # If there are no measures, work element-wise
-            for e in sVariant:
-                offset = e.getOffsetBySite(sVariant)+startOffset
-                tempVariant.insert(offset, e)
-        else: # if there are measures work measure-wise
-            for m in sVariantMeasures:
-                tempVariant.append(m)
+        if type(sVariant) is music21.stream.Measure: #sVariant is a measure put it in a variant and insert.
+            tempVariant.append(sVariant)
+        else: #sVariant is not a measure
+            sVariantMeasures = sVariant.getElementsByClass('Measure')
+            if sVariantMeasures == []: # If there are no measures, work element-wise
+                for e in sVariant:
+                    offset = e.getOffsetBySite(sVariant)+startOffset
+                    tempVariant.insert(offset, e)
+            else: # if there are measures work measure-wise
+                for m in sVariantMeasures:
+                    tempVariant.append(m)
 
     s.insert(startOffset, tempVariant)
 
@@ -1020,7 +1023,7 @@ def _generateVariant(noteList, originStream, start, variantName = None):
     >>> start = originStream.notes[2].offset
     >>> variantName = 'paris'
     >>> v = _generateVariant(noteList, originStream, start, variantName)
-    >>> v.show('t')
+    >>> v.show('text')
     {0.0} <music21.note.Note C>
     {0.5} <music21.note.Note A>
     {1.5} <music21.note.Note A>
@@ -1037,8 +1040,132 @@ def _generateVariant(noteList, originStream, start, variantName = None):
     return returnVariant
 
 
-
-
+def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByMeasureNumber = False, recurseInMeasures = False):
+    '''
+    Some MusicXML files are generate with full parts that have only a few non-rest measures instead of ossia parts. This function
+    takes two streams, one interpreted as an ossia. It outputs a stream with the ossia part merged into the stream as a variant.
+    If compareByMeasureNumber is True, then the ossia measures will be paired with the measures in the mainpart that have the
+    same measure.number. Otherwise, they will be paired by offset. In most cases these should have the same result.
+    
+    Questions I need to answer:
+    1) Is it Sibelius that fails to make ossia-type parts in the xml file, or is it music21 which parses it incorrectly? I think the former.
+    2) Do other sources of MusicXML make ossia-type parts differently (with the ossia-type tag)
+    3) Should the .show() method or something similar on a variant be able to make musicXML with the ossia-tag done correctly?
+    4) Will software like Siblius be able to read musicXML files with ossia parts?
+    
+    >>> from music21 import *
+    >>> mainstream = converter.parse("  A4 B4 C4 D4   E1    F2 E2     E8 F8 F4 G2   G2 G4 F4   F4 F4 F4 F4   G1      ", "4/4")
+    >>> ossiastream = converter.parse(" r1            r1    r1        E4 E4 F4 G4   r1         F2 F2         r1      ", "4/4")
+    >>> mainstream.makeMeasures(inPlace = True)
+    >>> ossiastream.makeMeasures(inPlace = True)
+    
+    >>> mainpart = stream.Part()
+    >>> for m in mainstream:
+    ...    mainpart.insert(m.offset, m)
+    >>> ossiapart = stream.Part()
+    >>> for m in ossiastream:
+    ...    ossiapart.insert(m.offset, m)
+    
+    >>> s = stream.Stream()
+    >>> s.insert(0.0, ossiapart)
+    >>> s.insert(0.0, mainpart)
+    >>> #_DOCS_SHOW s.show()
+    
+    >>> mainpartWithOssiaVariantsFT = variant.mergePartAsOssia(mainpart, ossiapart,
+    ...                                                            ossiaName = 'Parisian Variant',
+    ...                                                            inPlace = False,
+    ...                                                            compareByMeasureNumber = False,
+    ...                                                            recurseInMeasures = True)
+    >>> mainpartWithOssiaVariantsTT = variant.mergePartAsOssia(mainpart, ossiapart,
+    ...                                                            ossiaName = 'Parisian Variant',
+    ...                                                            inPlace = False,
+    ...                                                            compareByMeasureNumber = True,
+    ...                                                            recurseInMeasures = True)
+    >>> mainpartWithOssiaVariantsFF = variant.mergePartAsOssia(mainpart, ossiapart,
+    ...                                                            ossiaName = 'Parisian Variant',
+    ...                                                            inPlace = False,
+    ...                                                            compareByMeasureNumber = False,
+    ...                                                            recurseInMeasures = False)
+    >>> mainpartWithOssiaVariantsTF = variant.mergePartAsOssia(mainpart, ossiapart,
+    ...                                                            ossiaName = 'Parisian Variant',
+    ...                                                            inPlace = False,
+    ...                                                            compareByMeasureNumber = True,
+    ...                                                            recurseInMeasures = False)
+                                                                
+    >>> mainpartWithOssiaVariantsFT.show('text') == mainpartWithOssiaVariantsTT.show('text')
+    {0.0} <music21.stream.Measure ...
+    True
+    
+    >>> mainpartWithOssiaVariantsFF.show('text') == mainpartWithOssiaVariantsFT.show('text')
+    {0.0} <music21.stream.Measure ...
+    True
+    
+    >>> mainpartWithOssiaVariantsFT.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+    ...
+    {12.0} <music21.stream.Measure 4 offset=12.0>
+        {0.0} <music21.variant.Variant object at ...>
+        {0.0} <music21.note.Note E>
+        {0.5} <music21.note.Note F>
+        {1.0} <music21.note.Note F>
+        {2.0} <music21.note.Note G>
+    {16.0} <music21.stream.Measure 5 offset=16.0>
+    ...
+    {20.0} <music21.stream.Measure 6 offset=20.0>
+        {0.0} <music21.variant.Variant object at ...>
+        {0.0} <music21.note.Note F>
+        {1.0} <music21.note.Note F>
+        {2.0} <music21.note.Note F>
+        {3.0} <music21.note.Note F>
+    ...
+    
+    >>> mainpartWithOssiaVariantsFF.activateVariants('Parisian Variant').show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+    ...
+    {12.0} <music21.variant.Variant object at ...>
+    {12.0} <music21.stream.Measure 4 offset=12.0>
+        {0.0} <music21.note.Note E>
+        {1.0} <music21.note.Note E>
+        {2.0} <music21.note.Note F>
+        {3.0} <music21.note.Note G>
+    {16.0} <music21.stream.Measure 5 offset=16.0>
+    ...
+    {20.0} <music21.variant.Variant object at ...>
+    {20.0} <music21.stream.Measure 6 offset=20.0>
+        {0.0} <music21.note.Note F>
+        {2.0} <music21.note.Note F>
+    ...
+    
+    '''
+    if inPlace is True:
+        returnObj = mainpart
+    else:
+        returnObj = copy.deepcopy(mainpart)
+    
+    if compareByMeasureNumber is True:
+        for ossiaMeasure in ossiapart.getElementsByClass("Measure"):
+            if len(ossiaMeasure.notes) > 0: #If the measure is not just rests
+                ossiaNumber = ossiaMeasure.number
+                returnMeasure = returnObj.measure(ossiaNumber)
+                if recurseInMeasures is True: 
+                    mergeVariantStreams([returnMeasure, ossiaMeasure], [ossiaName], inPlace = True)
+                else:
+                    ossiaOffset = returnMeasure.getOffsetBySite(returnObj)
+                    addVariant(returnObj, ossiaOffset, ossiaMeasure, variantName = ossiaName, variantGroups = None, replacementDuration = None)
+    else:
+        for ossiaMeasure in ossiapart.getElementsByClass("Measure"):
+            if len(ossiaMeasure.notes) > 0: #If the measure is not just rests
+                ossiaOffset = ossiaMeasure.getOffsetBySite(ossiapart)
+                if recurseInMeasures is True:
+                    returnMeasure = returnObj.getElementsByOffset(ossiaOffset, classList = [stream.Measure])[0]
+                    mergeVariantStreams([returnMeasure, ossiaMeasure], [ossiaName], inPlace = True)
+                else:
+                    addVariant(returnObj, ossiaOffset, ossiaMeasure, variantName = ossiaName, variantGroups = None, replacementDuration = None)
+        
+    if inPlace is True:
+        return
+    else:
+        return returnObj
 
 #-------------------------------------------------------------------------------
 # classes
