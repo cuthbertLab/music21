@@ -1042,23 +1042,21 @@ def _generateVariant(noteList, originStream, start, variantName = None):
 
 def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByMeasureNumber = False, recurseInMeasures = False):
     '''
-    Some MusicXML files are generate with full parts that have only a few non-rest measures instead of ossia parts. This function
-    takes two streams, one interpreted as an ossia. It outputs a stream with the ossia part merged into the stream as a variant.
+    Some MusicXML files are generated with full parts that have only a few non-rest measures instead of ossia parts, such as those
+    created by Sibelius 7. This function
+    takes two streams (mainpart and ossiapart), the second interpreted as an ossia. It outputs a stream with the ossia part merged into the stream as a 
+    group of variants.
+    
     If compareByMeasureNumber is True, then the ossia measures will be paired with the measures in the mainpart that have the
     same measure.number. Otherwise, they will be paired by offset. In most cases these should have the same result.
     
-    Questions I need to answer:
-    1) Is it Sibelius that fails to make ossia-type parts in the xml file, or is it music21 which parses it incorrectly? I think the former.
-    2) Do other sources of MusicXML make ossia-type parts differently (with the ossia-type tag)
-    3) Should the .show() method or something similar on a variant be able to make musicXML with the ossia-tag done correctly?
-    4) Will software like Siblius be able to read musicXML files with ossia parts?
-    
     >>> from music21 import *
     >>> mainstream = converter.parse("  A4 B4 C4 D4   E1    F2 E2     E8 F8 F4 G2   G2 G4 F4   F4 F4 F4 F4   G1      ", "4/4")
-    >>> ossiastream = converter.parse(" r1            r1    r1        E4 E4 F4 G4   r1         F2 F2         r1      ", "4/4")
+    >>> ossiastream = converter.parse(" r1            r1    r1        E4 E4 F4 G4   r1         F2    F2      r1      ", "4/4")
     >>> mainstream.makeMeasures(inPlace = True)
     >>> ossiastream.makeMeasures(inPlace = True)
     
+    >>> # mainstream.__class__ = stream.Part
     >>> mainpart = stream.Part()
     >>> for m in mainstream:
     ...    mainpart.insert(m.offset, m)
@@ -1166,6 +1164,7 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByM
         return
     else:
         return returnObj
+
 
 #-------------------------------------------------------------------------------
 # classes

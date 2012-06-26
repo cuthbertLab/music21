@@ -10167,7 +10167,7 @@ class Stream(music21.Music21Object):
             elif lengthType == 'replacement':
                 returnObj._insertReplacementVariant(v, matchBySpan)
                 
-        #---Now deal with deletions before insertion variants.
+        #Now deal with deletions before insertion variants.
         deletedMeasures = [] #For keeping track of which measure numbers have been removed
         insertedMeasures = [] #For keeping track of where new measures without measure numbers have been inserted, will be a list of tuples (measureNumberPrior, [List, of, inserted, measures])
         
@@ -10674,6 +10674,8 @@ class Stream(music21.Music21Object):
         {31.0} <music21.note.Note F>
         
         '''
+        
+        
         if inPlace is True:
             returnObj = self
         else:
@@ -10844,6 +10846,108 @@ class Stream(music21.Music21Object):
                         m.number = m.number + shift
             previousBoundary = k
         
+
+    def showVariantAsOssialikePart(self, containedPart, variantGroups, inPlace = False):
+        '''
+        Takes a part within the score and a variant within that part. Puts the variant object
+        in a part surrounded by hidden rests to mimic the appearence of an ossia despite limited
+        musicXML support for ossia staves. Note that this will ignore variants with .lengthType
+        'elongation' and 'deletion' as there is no good way to represent ossia staves like those
+        by this method.
+        
+        >>> from music21 import *
+        >>> sPartStream = converter.parse("     d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                  d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1", "4/4")
+        >>> sPartStream.makeMeasures(inPlace = True)
+        >>> v1stream = converter.parse("                      a2. b-8 a8", "4/4")
+        >>> v2stream = converter.parse("                                                    d4 f4 a2", "4/4")
+        
+        >>> v1 = variant.Variant()
+        >>> v1measure = stream.Measure()
+        >>> v1.insert(0.0, v1measure)
+        >>> for e in v1stream.notesAndRests:
+        ...    v1measure.insert(e.offset, e)
+        
+        >>> v2 = variant.Variant()
+        >>> v2measure = stream.Measure()
+        >>> v2.insert(0.0, v2measure)
+        >>> for e in v2stream.notesAndRests:
+        ...    v2measure.insert(e.offset, e)
+        
+        >>> v3 = variant.Variant()
+        >>> v2.replacementDuration = 4.0
+        >>> v3.replacementDuration = 4.0
+        >>> v1.groups = ["variant1"]
+        >>> v2.groups = ["variant2"]
+        >>> v3.groups = ["variant3"]
+        
+        >>> sPart = stream.Part()
+        >>> for e in sPartStream:
+        ...    sPart.insert(e.offset, e)
+        
+        >>> sPart.insert(4.0, v1)
+        >>> sPart.insert(12.0, v2)
+        >>> sPart.insert(20.0, v3) #This is a deletion variant and will be skipped
+        >>> s = stream.Score()
+        >>> s.insert(0.0, sPart)
+        >>> streamWithOssia = s.showVariantAsOssialikePart(sPart, ['variant1', 'variant2', 'variant3'], inPlace = False)
+        >>> streamWithOssia.show()
+        
+        '''
+        from music21 import variant
+        
+        #containedPart must be in self, or an exception is raised.
+        if not (containedPart in self):
+            raise variant.VariantException("Could not find %s in %s" % (containedPart, self))
+        
+        if inPlace is True:
+            returnObj = self
+            returnPart = containedPart
+        else:
+            returnObj = copy.deepcopy(self)
+            containedPartIndex = self.parts.index(containedPart)
+            returnPart = returnObj.parts[containedPartIndex]
+
+        #First build a new part object that is the same length as returnPart but entirely hidden rests.
+        #This is done by copying the part and removing unnecessary objects including irrelevant variants
+        #but saving relevant variants.
+        for variantGroup in variantGroups:
+            newPart = copy.deepcopy(returnPart)
+            expressedVariantsExist = False
+            for e in newPart.elements: #For reasons I cannot explain, using e in newPart does not work because removing the variant elements causes the measures they are associated to be skipped and remain unprocessed.
+                if type(e) is music21.variant.Variant:
+                    elementGroups = e.groups
+                    if not( variantGroup in elementGroups ) or e.lengthType in ['elongation', 'deletion']:
+                        newPart.remove(e)
+                    else:
+                        expressedVariantsExist = True                
+                elif type(e) in [music21.note.Note, music21.chord.Chord, music21.note.Rest]:
+                    nQuarterLength = e.duration.quarterLength
+                    nOffset = e.getOffsetBySite(newPart)
+                    newPart.remove(e)
+                    r = note.Rest()
+                    r.hideObjectOnPrint = True
+                    r.duration.quarterLenght = nQuarterLength
+                    newPart.insert(nOffset, r)
+                elif type(e) is music21.stream.Measure: #Recurse if measure
+                    measureDuration = e.duration.quarterLength
+                    for n in e.notesAndRests:
+                        e.remove(n)
+                    r = note.Rest()
+                    r.duration.quarterLength = measureDuration
+                    r.hideObjectOnPrint = True
+                    e.insert(0.0, r)
+                
+                e.hideObjectOnPrint = True
+                    
+            newPart.activateVariants(variantGroup, inPlace = True, matchBySpan = True)
+            if expressedVariantsExist:
+                returnObj.insert(0.0, newPart)
+            
+        if inPlace:
+            return
+        else:
+            return returnObj
+    
 #-------------------------------------------------------------------------------
 class Voice(Stream):
     '''
