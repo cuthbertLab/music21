@@ -11,9 +11,15 @@
 #-------------------------------------------------------------------------------
 
 '''
-The music21 corpus provides a collection of freely distributable music in MusicXML, Humdrum, and other representations. The corpus package provides an interface to this data.
+The music21 corpus provides a collection of freely distributable 
+music in MusicXML, Humdrum, and other representations. The corpus 
+package provides an interface to this data.
 
-To see a complete listing of the works in the music21 corpus, visit  :ref:`referenceCorpus`.
+To see a complete listing of the works in the music21 corpus, 
+visit  :ref:`referenceCorpus`.  Note that music21 does not own
+most of the music in the corpus -- it has been licensed to us (or
+in a free license).  It may not be free in all parts of the world,
+but to the best of our knowledge is true for the US.
 '''
 
 
@@ -167,7 +173,7 @@ def getCorePaths(extList=None, expandExtensions=True):
     
     >>> a = corpus.getCorePaths()
     >>> len(a) # the current number of paths; update when adding to corpus
-    2209
+    2210
 
     >>> a = corpus.getCorePaths('krn')
     >>> len(a) >= 4
@@ -236,16 +242,28 @@ def getLocalPaths(extList=None, expandExtensions=True):
 
 
 def addPath(fp):
-    '''Add a directory path to the local corpus on a temporary basis, i.e., just for the current Python session. All directories contained within the provided directory will be searched for files with file extensions matching the currently readable file types. Any number of file paths can be added one at a time. 
+    '''
+    Add a directory path to the Local Corpus on a 
+    *temporary* basis, i.e., just for the current Python 
+    session. All directories contained within the provided 
+    directory will be searched for files with file extensions 
+    matching the currently readable file types. Any number of 
+    file paths can be added one at a time. 
 
-    An error will be raised if the file path does not exist, is already defined as a temporary, or is already being searched by being defined with the :class:`~music21.environment.Environment` 'localCorpusSettings' setting.
+    An error will be raised if the file path does not exist, 
+    is already defined as a temporary, or is already being 
+    searched by being defined with the 
+    :class:`~music21.environment.Environment` 'localCorpusSettings' setting.
 
-    To permanently add a path to the list of stored local corpus paths, set the 'localCorpusPath' or 'localCorpusSettings' setting of the :class:`~music21.environment.UserSettings` object. 
+    To permanently add a path to the list of stored local corpus paths, 
+    set the 'localCorpusPath' or 'localCorpusSettings' setting of 
+    the :class:`~music21.environment.UserSettings` object. 
 
     >>> from music21 import *
     >>> #_DOCS_SHOW coprus.addPath('~/Documents')
 
-    alternatively, add a directory permanently (see link above for more details):
+    alternatively, add a directory permanently (see link above 
+    for more details):
     
     >>> from music21 import *
     >>> #_DOCS_SHOW us = environment.UserSettings()
@@ -270,7 +288,10 @@ def addPath(fp):
 
 def getPaths(extList=None, expandExtensions=True, 
     domain=['core', 'virtual', 'local']):
-    '''Get paths from core, virtual, and/or local domains. This is the public interface for getting all corpus paths with one function. 
+    '''
+    Get paths from core, virtual, and/or local domains. 
+    This is the public interface for getting all corpus 
+    paths with one function. 
     '''
     post = []
     if 'core' in domain:
@@ -337,7 +358,13 @@ def search(query, field=None, domain=['core', 'virtual', 'local'],
 
 #-------------------------------------------------------------------------------
 def getComposer(composerName, extList=None):
-    '''Return all components of the corpus that match a composer's or a collection's name. An `extList`, if provided, defines which extensions are returned. An `extList` of None returns all extensions. 
+    '''
+    Return all filenames in the corpus that match a composer's 
+    or a collection's name. An `extList`, if provided, defines 
+    which extensions are returned. An `extList` of None (default) returns 
+    all extensions. 
+    
+    Note that xml and mxl are treated equivalently.
 
     >>> from music21 import *
     >>> a = corpus.getComposer('beethoven')
@@ -373,8 +400,9 @@ def getComposer(composerName, extList=None):
     return post
 
 def getComposerDir(composerName):
-    '''Given the name of a composer, get the path to the top-level directory
-    of that composer 
+    '''
+    Given the name of a composer, get the path 
+    to the top-level directory of that composer 
 
     >>> from music21 import *
     >>> import os
@@ -386,9 +414,6 @@ def getComposerDir(composerName):
     True
     >>> a = corpus.getComposerDir('mozart')
     >>> a.endswith(os.path.join('corpus', os.sep, 'mozart'))
-    True
-    >>> a = corpus.getComposerDir('luca')
-    >>> a.endswith(os.path.join('corpus', os.sep, 'luca'))
     True
     '''
     match = None
@@ -448,7 +473,11 @@ noCorpus = property(_noCorpus, doc='''
 
 #-------------------------------------------------------------------------------
 def getWorkList(workName, movementNumber=None, extList=None):
-    '''Search the corpus and return a list of works, always in a list. If no matches are found, an empty list is returned.
+    '''
+    Search the corpus and return a list of filenames of works, 
+    always in a list. 
+    
+    If no matches are found, an empty list is returned.
 
     >>> from music21 import *
     >>> len(corpus.getWorkList('beethoven/opus18no1'))
@@ -466,7 +495,7 @@ def getWorkList(workName, movementNumber=None, extList=None):
     >>> len(corpus.getWorkList('handel/hwv56', (2,1), '.md'))
     1
 
-    >>> len(corpus.getWorkList('bach/bwv1080', 2, '.md'))
+    >>> len(corpus.getWorkList('bach/artOfFugue_bwv1080', 2, '.md'))
     1
 
     '''
@@ -1390,7 +1419,8 @@ class BachChoraleList(object):
                 
 
 def getHandelMessiah(extList='md'):
-    '''Return the file name of all of handel's messiah.
+    '''
+    Return a list of the filenames of all parts of Handel's Messiah.
 
     >>> from music21 import *
     >>> a = corpus.getHandelMessiah()
@@ -1438,7 +1468,8 @@ def getHandelMessiah(extList='md'):
 
 
 def getMonteverdiMadrigals(extList='xml'):
-    '''Return the file name of all Monteverdi madrigals.
+    '''
+    Return a list of the filenames of all Monteverdi madrigals.
 
     >>> from music21 import *
     >>> a = corpus.getMonteverdiMadrigals()
@@ -1470,7 +1501,8 @@ def getMonteverdiMadrigals(extList='xml'):
 #monteverdiMadrigals = getMonteverdiMadrigals('xml')
 
 def getBeethovenStringQuartets(extList=None):
-    '''Return all Beethoven String Quartets.
+    '''
+    Return a list of all Beethoven String Quartet filenames.
 
     >>> from music21 import *
     >>> a = corpus.getBeethovenStringQuartets()
@@ -1638,15 +1670,15 @@ class Test(unittest.TestCase):
     def testGetWorkList(self):
         self.assertEqual(len(getPaths('.md')) >= 38, True)
 
-        self.assertEqual(len(getWorkList('bach/bwv1080', 1, '.zip')), 1)
+        self.assertEqual(len(getWorkList('bach/artOfFugue_bwv1080', 1, '.zip')), 1)
 
         self.assertEqual(len(getWorkList('handel/hwv56', (1,1), '.md')), 1)
 
         self.assertEqual(len(getWorkList('handel/hwv56', '1-01', '.md')), 1)
 
-        self.assertEqual(len(getWorkList('bach/bwv1080')), 21)
+        self.assertEqual(len(getWorkList('bach/artOfFugue_bwv1080')), 21)
 
-        self.assertEqual(len(getWorkList('bach/bwv1080', 1)), 1)
+        self.assertEqual(len(getWorkList('bach/artOfFugue_bwv1080', 1)), 1)
 
 
         # there are two versions of this file        

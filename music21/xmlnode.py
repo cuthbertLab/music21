@@ -375,7 +375,11 @@ class XMLNode(object):
             raise XMLNodeException('this object does not have a %s (or %s) attribute' % (name, candidates))
         
     def get(self, name):
-        '''Get a data attrbiute from this XMLNode. If available in the attribute dictionary, return this first. If available as an object attribute, return this second. 
+        '''
+        Get a data attribute from this XMLNode. If available in the 
+        attribute dictionary, return this first. 
+        
+        If available as an object attribute, return this second. 
         '''
         #if name in self._attr.keys():
         try:
@@ -420,7 +424,8 @@ class XMLNode(object):
 
     #---------------------------------------------------------------------------
     def __repr__(self):
-        '''Provide a linear string representation of the element. This is not XML, but a simple format for viewing contents of elements.'''
+        '''Provide a linear string representation of the element. 
+        This is not XML, but a simple format for viewing contents of elements.'''
         msg = []
         # NOTE: this fails in python3:
         msg.append(u'<%s ' % self._tag)
@@ -458,8 +463,12 @@ class XMLNode(object):
             doc.appendChild(doctype)
         return doc
 
-    def toxml(self, doc=None, parent=None, stringOut=0):
-        '''Provides XML output as either a text string or as DOM node. This method can be called recursively to build up nodes on a DOM tree. This method will assume that if an self.charData attribute has been defined this is a text element for this node. Attributes, sub entities, and sub nodes are obtained via subclassed method calls.
+    def toxml(self, doc=None, parent=None, stringOut=False):
+        '''Provides XML output as either a text string or as DOM node. 
+        This method can be called recursively to build up nodes on a DOM tree. 
+        This method will assume that if an self.charData attribute has been 
+        defined this is a text element for this node. Attributes, sub 
+        entities, and sub nodes are obtained via subclassed method calls.
         '''
         if doc == None:
             doc = self.getNewDoc()

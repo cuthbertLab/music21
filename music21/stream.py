@@ -10890,7 +10890,7 @@ class Stream(music21.Music21Object):
         >>> s = stream.Score()
         >>> s.insert(0.0, sPart)
         >>> streamWithOssia = s.showVariantAsOssialikePart(sPart, ['variant1', 'variant2', 'variant3'], inPlace = False)
-        >>> streamWithOssia.show()
+        >>> #_DOCS_SHOW streamWithOssia.show()
         
         '''
         from music21 import variant

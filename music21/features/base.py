@@ -214,11 +214,14 @@ class FeatureExtractor(object):
 
 #-------------------------------------------------------------------------------
 class StreamForms(object):
-    '''A dictionary-like wrapper of a Stream, providing numerous representations, generated on-demand, and cached.
+    '''A dictionary-like wrapper of a Stream, providing 
+    numerous representations, generated on-demand, and cached.
 
-    A single StreamForms object can be created for an entire Score, as well as one for each Part and/or Voice. 
+    A single StreamForms object can be created for an 
+    entire Score, as well as one for each Part and/or Voice. 
 
-    A DataSet object manages one or more StreamForms objects, and exposes them to FeatureExtractors for usage.
+    A DataSet object manages one or more StreamForms 
+    objects, and exposes them to FeatureExtractors for usage.
     '''
     def __init__(self, streamObj, prepareStream=True):   
         self.stream = streamObj
@@ -535,7 +538,8 @@ class DataInstance(object):
         '''Set the class label, as well as the class value if known. The class label is the attribute name used to define the class of this data instance.
 
         >>> from music21 import *
-        >>> s = corpus.parse('bwv66.6')
+        >>> #_DOCS_SHOW s = corpus.parse('bwv66.6')
+        >>> s = stream.Stream() #_DOCS_HIDE
         >>> di = features.DataInstance(s)
         >>> di.setClassLabel('Composer', 'Bach')
         '''
@@ -823,7 +827,8 @@ class DataSetException(music21.Music21Exception):
     pass
 
 class DataSet(object):
-    '''A set of features, as well as a collection of data to opperate on
+    '''
+    A set of features, as well as a collection of data to operate on
 
     Multiple DataInstance objects, a FeatureSet, and an OutputFormat. 
 
@@ -1153,7 +1158,8 @@ def alljSymbolicFeatures(streamObj):
     and returns a list of :class:`~music21.features.Feature` objects
     
     >>> from music21 import *
-    >>> s = corpus.parse('bwv66.6')
+    >>> #_DOCS_SHOW s = corpus.parse('bwv66.6')
+    >>> s = converter.parse('c4 d e2', '4/4') #_DOCS_HIDE
     >>> features.alljSymbolicFeatures(s)[0:2]
     [<music21.features.base.Feature object at .........>, <music21.features.base.Feature object at .........>]
     '''    
@@ -1173,9 +1179,11 @@ def allNativeFeatures(streamObj):
     and returns a list of :class:`~music21.features.Feature` objects
     
     >>> from music21 import * 
-    >>> s = corpus.parse('bwv66.6')
-    >>> s = corpus.parse('bwv66.6')
-    >>> features.allNativeFeatures(s)[0:2]
+    >>> #_DOCS_SHOW s = corpus.parse('bwv66.6')
+    >>> s = converter.parse('c4 d e2', '4/4') #_DOCS_HIDE
+    >>> allFeatures = features.allNativeFeatures(s)
+    >>> len(allFeatures)
+    >>> allFeatures[0:2]
     [<music21.features.base.Feature object at .........>, <music21.features.base.Feature object at .........>]
 
     '''

@@ -127,7 +127,7 @@ class Test(unittest.TestCase):
 
 class TestExternal(unittest.TestCase):
     
-    def testBachDetune(self):
+    def xtestBachDetune(self):
         from music21 import corpus
         import random
         b = corpus.parse('bwv66.6')
@@ -179,6 +179,54 @@ class TestExternal(unittest.TestCase):
         for i in range(len(measures)):
             sp.streamIn = measures[i]
             sp.play()
+
+    def xtestPlayRealTime(self):
+        '''
+        doesn't work -- no matter what there's always at least a small lag, even with queues
+        '''
+        
+        from music21 import stream, note
+        import random
+        
+        def getRandomStream():
+            s = stream.Stream()
+            for i in range(4):
+                n = note.Note()
+                n.ps = random.randint(48, 72)
+                s.append(n)
+            lastN = note.Note()
+            #lastN.duration.quarterLength = .75
+            s.append(lastN)
+            return s
+        
+        def restoreList(timeList):
+            timeCounter = timeList[0]
+            streamPlayer = timeList[1]
+            currentPos = streamPlayer.pygame.mixer.music.get_pos() 
+            if currentPos < 500 and timeCounter.lastPos >= 500: 
+                timeCounter.times -= 1
+                if timeCounter.times > 0:
+                    streamPlayer.streamIn = getRandomStream()
+                    #timeCounter.oldIOFile = timeCounter.storedIOFile
+                    timeCounter.storedIOFile = streamPlayer.getStringIOFile()
+                    streamPlayer.pygame.mixer.music.queue(timeCounter.storedIOFile)
+                    timeCounter.lastPos = currentPos
+            else:
+                timeCounter.lastPos = currentPos
+        
+        class TimePlayer():
+            ready = False
+            times = 3
+            lastPos = 1000
+
+        timeCounter = TimePlayer()
+
+        b = getRandomStream()
+        sp = StreamPlayer(b)
+        timeCounter.storedIOFile = sp.getStringIOFile()
+        while timeCounter.times > 0:
+            timeCounter.ready = False
+            sp.playStringIOFile(timeCounter.storedIOFile, busyFunction=restoreList, busyArgs=[timeCounter, sp], busyWaitMilliseconds = 30)
 
 if __name__ == '__main__':
     import music21

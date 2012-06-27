@@ -2121,18 +2121,21 @@ class MetadataBundle(music21.JSONSerializer):
                     number = int(md.number)
                 else:
                     number = md.number
-                result = (self._accessPaths[key], number)
-                include = False
-                if extList != None:
-                    for ext in extList:
-                        if result[0].endswith(ext) or\
-                            (ext.endswith('xml') and (result[0].endswith('mxl') or result[0].endswith('mx'))):
-                            include = True
-                            break
-                else:
-                    include = True
-                if include and result not in post:
-                    post.append(result)  
+                try:
+                    result = (self._accessPaths[key], number)
+                    include = False
+                    if extList != None:
+                        for ext in extList:
+                            if result[0].endswith(ext) or\
+                                (ext.endswith('xml') and (result[0].endswith('mxl') or result[0].endswith('mx'))):
+                                include = True
+                                break
+                    else:
+                        include = True
+                    if include and result not in post:
+                        post.append(result)  
+                except KeyError:
+                    pass # in metadata cache, but no longer in filesystem
         return post
 
 

@@ -889,10 +889,10 @@ def getVerticalSliceFromObject(music21Obj, scoreObjectIsFrom, classFilterList=No
     (under development)
     
     >>> from music21 import *
-    >>> c = corpus.parse('bach')
+    >>> c = corpus.parse('bach/bwv66.6')
     >>> n1 = c.flat.getElementsByClass(note.Note)[0]
     >>> voiceLeading.getVerticalSliceFromObject(n1, c)
-    <music21.voiceLeading.VerticalSlice contentDict={0: [<music21.note.Note F>], 1: [<music21.note.Note F>], 2: [<music21.note.Note C>], 3: [<music21.note.Note A>], 4: [<music21.note.Note F>]}  
+    <music21.voiceLeading.VerticalSlice contentDict={0: [<music21.note.Note C#>], 1: [<music21.note.Note E>], 2: [<music21.note.Note A>], 3: [<music21.note.Note A>]}  
     '''
     offsetOfObject =  music21Obj.getOffsetBySite(scoreObjectIsFrom.flat)
     

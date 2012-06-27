@@ -14,7 +14,7 @@ music21 translates to Lilypond format and if Lilypond is installed on the
 local computer, can automatically generate .pdf, .png, and .svg versions
 of musical files using Lilypond
 
-this replaces (April 2012) the old LilyString() conversion methods.
+this replaces (June 2012) the old LilyString() conversion methods.
 '''
 
 import os
@@ -30,7 +30,7 @@ import copy
 import music21
 from music21 import duration
 from music21 import environment
-_MOD = 'lily.translate.py'
+_MOD = 'lily.translate2012.py'
 environLocal = environment.Environment(_MOD)
 
 
@@ -853,70 +853,11 @@ scoreTitleMarkup=##f
         environLocal.launch(self.format, lilyFile)
         return lilyFile
         
-        
 
-class LilypondImporter(object):
-    accidentalConvert = {"isis": "double-sharp",
-                         "eses": "double-flat",
-                         "isih": "one-and-a-half-sharp",
-                         "is": "sharp",
-                         "es": "flat",
-                         "ih": "half-sharp",
-                         "eh": "half-flat",
-                         "one-and-a-half-flat": "eseh",
-                         }
-    
-    '''
-    stub of a class for future work in importing from Lilypond.
-    
-    MUSIC21 DOES NOT SUPPORT IMPORTING FROM LILYPOND CURRENTLY.
-    
-    Lilypond files are extremely complex and can contain Scheme language
-    code, thus complete parsing without running a Scheme interpreter is
-    impossible.  This class just has a few conversion routines
-    '''
-    def toAccidental(self, value, accidentalObject = None):
-        '''
-        Converts a string to an accidental (or adds it to the current
-        accidentalObject).  If accidentalObject passed in is None
-        returns the new accidental
-        
-        >>> from music21 import *
-        >>> importer = lily.translate.LilypondImporter()
-        >>> acc = importer.toAccidental('eses')
-        >>> acc
-        <accidental double-flat>
-        >>> acc2 = importer.toAccidental('eh!?')
-        >>> acc2
-        <accidental half-flat>
-        >>> acc2.displayType
-        'always'
-        >>> acc2.displayStyle
-        'parentheses'
 
-        '''
-        
-        if accidentalObject is None:
-            returnAccidental = True
-            from music21 import pitch
-            accidentalObject = pitch.Accidental()
-        else:
-            returnAccidental = False
 
-        if value.endswith('?'):
-            value = value[0:len(value)-1]
-            accidentalObject.displayStyle = "parentheses"
-        if value.endswith('!'):
-            value = value[0:len(value)-1]
-            accidentalObject.displayType = "always"
 
-        if value in self.accidentalConvert:
-            accidentalObject.name = self.accidentalConvert[value]
-        else:
-            raise LilyTranslateException('Cannot convert this value to an accidental %s.' % value)
 
-        if returnAccidental is True:
-            return accidentalObject
 
 
 class LilyTranslateException(Exception):
@@ -1066,5 +1007,6 @@ if __name__ == "__main__":
     
 #------------------------------------------------------------------------------
 # eof
+
 
 

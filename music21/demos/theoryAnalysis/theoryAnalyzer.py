@@ -2069,11 +2069,9 @@ def getKeyAtMeasure(score, measureNumber):
     >>> theoryAnalyzer.getKeyAtMeasure(s, 5)
     <music21.key.Key of a minor>
     
-    OMIT_FROM_DOCS
-    
-    >>> sc = corpus.parse('bach')
+    >>> sc = corpus.parse('bach/bwv66.6')
     >>> theoryAnalyzer.getKeyAtMeasure(sc, 5)
-    <music21.key.Key of F major>
+    <music21.key.Key of f# minor>
     
     '''
     
