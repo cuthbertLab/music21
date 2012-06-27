@@ -44,12 +44,24 @@ class StreamPlayer(object):
     >>> for i in range(0, 127):
     ...    keyDetune.append(random.randint(-30, 30))
     
-    >>> b = corpus.parse('bwv66.6')
-    >>> for n in b.flat.notes:
+    >>> #_DOCS_SHOW b = corpus.parse('bwv66.6')
+    >>> #_DOCS_SHOW for n in b.flat.notes:
+    >>> class Mock(): midi = 20 #_DOCS_HIDE -- should not playback in doctests, see TestExternal
+    >>> n = Mock() #_DOCS_HIDE
+    >>> for i in [1]: #_DOCS_HIDE
     ...    n.microtone = keyDetune[n.midi]
-    >>> sp = midi.realtime.StreamPlayer(b)
-    >>> sp.play()
+    >>> #_DOCS_SHOW sp = midi.realtime.StreamPlayer(b)
+    >>> #_DOCS_SHOW sp.play()
      
+    The stream is stored (unaltered) in `StreamPlayer.streamIn`, and can be changed any time the
+    midi file is not playing.
+     
+    A number of mixer controls can be passed in with keywords:
+    
+      mixerFreq (default 44100 -- CD quality)
+      mixerBitSize (default -16 (=unsigned 16bit) -- really, are you going to do 24bit audio with Python?? :-)  )
+      mixerChannels (default 2 = stereo)
+      mixerBuffer (default 1024 = number of samples)
     '''
     mixerInitialized = False
     
@@ -84,23 +96,28 @@ class StreamPlayer(object):
         
         self.streamIn = streamIn
     
-    def play(self, busyFunction = None, busyArgs = None, endFunction = None, endArgs = None, busyWaitMilliseconds = 30):
+    def play(self, busyFunction = None, busyArgs = None, endFunction = None, endArgs = None, busyWaitMilliseconds = 50):
+        streamStringIOFile = self.getStringIOFile()
+        self.playStringIOFile(streamStringIOFile, busyFunction, busyArgs, endFunction, endArgs, busyWaitMilliseconds)
+
+    def getStringIOFile(self):
         streamMidiFile = self.streamIn.midiFile
         streamMidiWritten = streamMidiFile.writestr()
-        streamStringIOFile = stringIOModule.StringIO(streamMidiWritten)
-        self.playStringIOFile(streamStringIOFile, busyFunction, busyArgs, endFunction, endArgs, busyWaitMilliseconds)
+        return stringIOModule.StringIO(streamMidiWritten)
     
-    def playStringIOFile(self, stringIOFile, busyFunction = None, busyArgs = None, endFunction = None, endArgs = None, busyWaitMilliseconds = 30):
+    def playStringIOFile(self, stringIOFile, busyFunction = None, busyArgs = None, endFunction = None, endArgs = None, busyWaitMilliseconds = 50):
         pygameClock = self.pygame.time.Clock()
         try:
             self.pygame.mixer.music.load(stringIOFile)
         except self.pygame.error:
             raise StreamPlayerException("Could not play music file %s because: %s" % (stringIOFile, self.pygame.get_error()))
         self.pygame.mixer.music.play()
+        framerate = int(1000/busyWaitMilliseconds) # coerce into int even if given a float.
+        
         while self.pygame.mixer.music.get_busy():
             if busyFunction is not None:
                 busyFunction.__call__(busyArgs)
-            pygameClock.tick(busyWaitMilliseconds)
+            pygameClock.tick(framerate)
         
         if endFunction is not None:
             endFunction.__call__(endArgs)
@@ -121,8 +138,48 @@ class TestExternal(unittest.TestCase):
             n.microtone = keyDetune[n.midi]
         sp = StreamPlayer(b)
         sp.play()
+
+    def xtestBusyCallback(self):
+        '''
+        tests to see if the busyCallback function is called properly
+        '''
+        
+        from music21 import corpus
+        import random
+        
+        def busyCounter(timeList):
+            timeCounter = timeList[0]
+            timeCounter.times += timeCounter.updateTime
+            print "hi! waited %d milliseconds" % (timeCounter.times)
+        
+        class Mock():
+            times = 0
+        
+        timeCounter = Mock()
+        timeCounter.updateTime = 500
+        
+        b = corpus.parse('bach/bwv66.6')
+        keyDetune = []
+        for i in range(0, 127):
+            keyDetune.append(random.randint(-30, 30))
+        for n in b.flat.notes:
+            n.microtone = keyDetune[n.midi]
+        sp = StreamPlayer(b)
+        sp.play(busyFunction=busyCounter, busyArgs=[timeCounter], busyWaitMilliseconds = 500)
             
+    def xtestPlayOneMeasureAtATime(self):
+        from music21 import corpus
+        b = corpus.parse('bwv66.6')
+        measures = [] # store for later
+        maxMeasure = len(b.parts[0].getElementsByClass('Measure'))
+        for i in range(maxMeasure):
+            measures.append(b.measure(i))
+        sp = StreamPlayer(b)
+                
+        for i in range(len(measures)):
+            sp.streamIn = measures[i]
+            sp.play()
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(TestExternal)
