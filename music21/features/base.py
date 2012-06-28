@@ -242,9 +242,10 @@ class StreamForms(object):
 
     def _prepareStream(self, streamObj):
         '''Common routines done on Streams prior to processing. Return a new Stream
-        '''
-        #streamObj = streamObj.expandRepeats()
-        streamObj = streamObj.stripTies(retainContainers=True, inPlace=False)
+        '''   
+        # this causes lots of deepcopys, but an inPlace operation loses 
+        #accuracy on feature extractors         
+        streamObj = streamObj.stripTies(retainContainers=True)
         return streamObj
 
     def __getitem__(self, key):
@@ -403,7 +404,13 @@ class StreamForms(object):
                 parts = [self._base] # emulate a list
             for p in parts:
                 # will be flat
-                p = p.stripTies(retainContainers=False)
+                
+                # edit June 2012:
+                # was causing millions of deepcopy calls
+                # so I made it inPlace, but for some reason
+                # code errored with 'p =' not present
+                # also, this part has measures...so should retainContains be True?
+                p = p.stripTies(retainContainers=False, inPlace=True)
                 # noNone means that we will see all connections, even w/ a gap
                 post = p.findConsecutiveNotes(skipRests=True, 
                     skipChords=False, skipGaps=True, noNone=True)
@@ -425,9 +432,13 @@ class StreamForms(object):
             else:
                 parts = [self._base] # emulate a list
             for p in parts:
-                # this may be unnecessary but we cannot accessed cached part
-                # data
-                p = p.stripTies(retainContainers=False) # will be flat
+                # this may be unnecessary but we cannot accessed cached part data
+                
+                # edit June 2012:
+                # was causing lots of deepcopy calls, so I made
+                # it inPlace=True, but errors when 'p =' no present
+                # also, this part has measures...so should retainContains be True?
+                p = p.stripTies(retainContainers=False, inPlace=True) # will be flat
                 # noNone means that we will see all connections, even w/ a gap
                 post = p.findConsecutiveNotes(skipRests=True, 
                     skipChords=False, skipGaps=True, noNone=True)
@@ -533,7 +544,7 @@ class DataInstance(object):
         if hasattr(self.stream, 'voices'):
             for v in self.stream.voices:
                 self._formsByPart.append(StreamForms(v))
-
+  
     def setClassLabel(self, classLabel, classValue=None):
         '''Set the class label, as well as the class value if known. The class label is the attribute name used to define the class of this data instance.
 
@@ -985,7 +996,7 @@ class DataSet(object):
             # rows will align with data the order of DataInstances
             self._features.append(row)
 
-    def getFeaturesAsList(self, includeClassLabel=True, includeId=True):
+    def getFeaturesAsList(self, includeClassLabel=True, includeId=True, concatenateLists=True):
         '''Get processed data as a list of lists, merging any sub-lists in multi-dimensional features. 
         '''
         post = []
@@ -996,11 +1007,17 @@ class DataSet(object):
             if includeId:
                 v.append(di.getId())
             for f in row:
-                v += f.vector
+                if concatenateLists:
+                    v += f.vector
+                else:
+                    v.append(f.vector)
             if includeClassLabel:
                 v.append(di.getClassValue())
             post.append(v)
-        return post
+        if not includeClassLabel and not includeId:
+            return post[0]
+        else:
+            return post
 
     def getUniqueClassValues(self):
         '''Return a list of unique class values.
@@ -1024,7 +1041,7 @@ class DataSet(object):
         return outputFormat
 
     def _getOutputFormatFromFilePath(self, fp):
-        '''Get an output format form a file path if possible, otherwise return None.
+        '''Get an output format from a file path if possible, otherwise return None.
 
         >>> from music21 import *
         >>> ds = features.DataSet()
@@ -1064,6 +1081,39 @@ class DataSet(object):
 
         outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
         
+def allFeaturesAsList(streamInput):
+    '''
+    returns a tuple containing ALL currentingly implemented feature extractors. The first
+    in the tuple are jsymbolic vectors, and the second native vectors. Vectors are NOT nested
+    
+    streamInput can be Add a Stream, DataInstance, or path to a corpus or local file to this data set.
+    
+    >>> from music21 import *
+    >>> #_DOCS_SHOW s = corpus.parse('bwv66.6')
+    >>> s = converter.parse('c4 d e2', '4/4') #_DOCS_HIDE
+    >>> f = allFeaturesAsList(s)
+    >>> f[1][0:3]
+    [[1], [0.6899992497638124], [2]]
+    >>> len(f[0]) > 65
+    True
+    >>> len(f[1]) > 20
+    True
+    '''
+    from music21.features import jSymbolic, native
+    ds = DataSet(classLabel='')
+    f = [f for f in jSymbolic.featureExtractors]
+    ds.addFeatureExtractors(f)
+    ds.addData(streamInput)
+    ds.process()
+    jsymb = ds.getFeaturesAsList( includeClassLabel=False, includeId=False, concatenateLists=False)
+    ds._featureExtractors = []
+    ds._features = []
+    n = [f for f in native.featureExtractors]
+    ds.addFeatureExtractors(n)
+    ds.process()
+    nat = ds.getFeaturesAsList(includeClassLabel=False, includeId=False, concatenateLists=False)
+            
+    return (jsymb, nat)
 
 
 #-------------------------------------------------------------------------------
@@ -1151,77 +1201,7 @@ def vectorById(streamObj, id, library=['jSymbolic', 'native']):
     if fe is None:
         return None # could raise exception
     return fe.extract().vector
-    
-def alljSymbolicFeatures(streamObj):
-    '''
-    extract all feature objects implemented in features.jSymbolic
-    and returns a list of :class:`~music21.features.Feature` objects
-    
-    >>> from music21 import *
-    >>> #_DOCS_SHOW s = corpus.parse('bwv66.6')
-    >>> s = converter.parse('c4 d e2', '4/4') #_DOCS_HIDE
-    >>> features.alljSymbolicFeatures(s)[0:2]
-    [<music21.features.base.Feature object at .........>, <music21.features.base.Feature object at .........>]
-    '''    
-    
-    from music21.features import jSymbolic
-    ret = []
-    for featureName in jSymbolic.featureExtractors:
-        try:
-            ret.append( featureName(streamObj).extract() )
-        except:
-            ret.append([None])
-    return ret 
-            
-def allNativeFeatures(streamObj):
-    '''    
-    extract all feature objects implemented in features.native
-    and returns a list of :class:`~music21.features.Feature` objects
-    
-    >>> from music21 import * 
-    >>> #_DOCS_SHOW s = corpus.parse('bwv66.6')
-    >>> s = converter.parse('c4 d e2', '4/4') #_DOCS_HIDE
-    >>> allFeatures = features.allNativeFeatures(s)
-    >>> len(allFeatures)
-    >>> allFeatures[0:2]
-    [<music21.features.base.Feature object at .........>, <music21.features.base.Feature object at .........>]
 
-    '''
-    from music21.features import native
-    ret = []
-    for featureName in native.featureExtractors:
-        try: ret.append( featureName(streamObj).extract() )
-        except: ret.append([None])
-    return ret 
-    
-def alljSymbolicVectors(streamObj):
-    '''
-    >>> from music21 import *
-    >>> s = corpus.parse('bwv66.6.mxl')
-    >>> features.alljSymbolicVectors(s)[1:5]
-    [[2.440251572327044], [2], [1], [0.36477987421383645]]
-    '''
-    from music21 import features
-    ret = []
-    for feature in features.alljSymbolicFeatures(streamObj):
-        try: ret.append( feature.vector )
-        except: ret.append([None])
-    return ret
- 
-def allNativeVectors(streamObj):
-    '''
-    >>> from music21 import *
-    >>> s = corpus.parse('bwv66.6.mxl')
-    >>> features.allNativeVectors(s)[0:4]
-    [[1], [1.2642604260880534], [3], [1.0]]
-    '''
-    from music21 import features
-    ret = []
-    for feature in features.allNativeFeatures(streamObj):
-        try: ret.append( feature.vector )
-        except: return([None])
-    return ret
-    
 def getIndex(featureString, extractorType=None):
     '''
     returns the list index of the given feature extractor and the feature extractor
@@ -1259,8 +1239,6 @@ def getIndex(featureString, extractorType=None):
             indexcnt+=1
         
         return None
-
-
     
     
 #-------------------------------------------------------------------------------
@@ -1687,6 +1665,7 @@ _DOC_ORDER = [FeatureExtractor]
 
 if __name__ == "__main__":
     music21.mainTest(Test)
+    
 
 #------------------------------------------------------------------------------
 # eof

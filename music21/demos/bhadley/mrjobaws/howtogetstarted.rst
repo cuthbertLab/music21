@@ -147,7 +147,7 @@ A skeleton mrjob for music21 purposes might look like this:
 `python nameOfMRJOB.py < NAME_OF_INPUT_FILE.txt > NAME_OF_DESIRED_OUTPUT_FILE`
 
 4. Your output from the local run will be located in the same directory as your mrjob.py file, unless
-you specified otherwise
+you specified otherwise.
 
 5. If everything works, then you're ready to run on EMR. First, get 
 an `amazon web services account` <`http://aws.amazon.com/`>_ and sign up for EMR if you're not
@@ -161,14 +161,41 @@ full specifications for running on EMR. See conf.rst for documentation on how to
 7. Now you're ready to deploy your job! Enter into command line
 `python nameOfMRJOB.py -r emr < NAME_OF_INPUT_FILE.txt > NAME_OF_DESIRED_OUTPUT_FILE`
 
-Hopefully you will see a transcript of the process in the command shell. At some point
-bootstrapping will begin, and because you're installing the entirety of python2.7, music21, and mrjob,
-this unfortunately will take about 15 minutes. If anyone makes any breakthroughs about how to 
-get this faster, please let me know!
+	Your terminal will show a brief, summary, log of what's happending with your job:
 
-8. After bootstrapping, you will see readouts of the percentage of mapping done and the percentage of 
-reducing done. If the job was successful, the final count will be 100%, and the job will terminate. Your
-output file (located in whatever directory you specified) will contain the run's output.
+	* `Uploading input to ..., creating tmp directory...., writing master bootstrap script, Copying non-input files into`
+		The first step that mrjob does is uplad your scripts, bootstrapping files, data input, etc. to a folder in s3 (Amazon's
+		online cloud storage system.) This won't take long.
+	* `Creating Elastic MapReduce job flow`, `Job flow created with ID: .....` Now your job
+	has been created! You will be able to view your job and its status realtime if you log into
+	your aws account, click on AWS Management Console, then Amazon Elastic MapReduce tab. 
+	You should see your job there with a status such as "STARTING". If at any time you'd like to t
+	erminate your taks, you can easily do this through this window.
+	* `Job launched 30.4s ago, status STARTING: Starting instances`: the remote CPUs are starting up...per your
+	request...feel the power! =) Depending on availability, this may take a few seconds to a couple of minutes.
+	* `Job launched 273.1s ago, status BOOTSTRAPPING: Running bootstrap actions`: now mrjob is configuring all those
+	instances with the specific bootstrapping files you'd like them to have. In our case, this includes installing
+	music21. You may also install Python 2.7 at this time (because Python 2.6 is default if running with ami version 2.1.0)
+	The timeout (maximum time that mrjob will run bootstrapping before quiting) is 45 minutes. I surely hope your bootstrapping
+doesn't take that long! Regardless, you're not charged for the time you spend bootstrapping =)
+	* `Opening ssh tunnel to Hadoop job tracker`
+	Yeah! This means your bootstrapping worked, and your jobs are about to be deployed. You now have the capability to ssh
+	directlying into your instances, if you'd like.
+	* `Connect to job tracker at: http://localhost:#####/jobtracker.jsp` This is a very important line! This gives the url
+	you can go to to view the status of your job. open this window now and you'll get much better status updates about the
+	health of your job than in the terminal.
+	* `Job launched 639.8s ago, status RUNNING: Running step (featureExtractionTest.bhadley.20120626.170931.990145: Step 1 of 1)
+ map  50% reduce   0%` You will soon see lots of these lines...These let you know your job is in progress. The percentages
+	are 'speculative' numbers, just a guess hadoop makes about the status of your job. Don't think that when they reach 100%
+	your job will be done any time soon...This just indicates that 100% of the mappers have begun processing. For a better
+	indication of the status of your job, use the url as notes above.
+		* as your job runs, you can calculate how much it's costing and view how much has finished processing. When your job finishes,
+		regardless of the end status (terminated, failed, successfully quit), any output from your mappers/reducers will be located
+		in s3 in the appropriate bucket. This prevents you from losing valuable data if many of our mappers execute fine, 
+		but just a few take forevor and you terminate the job before they've completed.
+	* if the job finished successfully, you'd see final data printed to the screen about counters, number of successful
+	mappers/reducers/etc, and your final output will be streamed to the output file you specified. Your output will
+	also be available on s3 permanently.
 
 9. If something went wrong, and there was a fatal error, mrjob will shut down the instances and jobflow, 
 and occasionally print a useful error message to the terminal. If not, it's always a good idea to

@@ -71,25 +71,30 @@ the conf file.
 	specs of all types of instances are available here: http://aws.amazon.com/ec2/instance-types/
 	pricing is available here: http://aws.amazon.com/elasticmapreduce/pricing/
 	*Standard Instances*
-	==============					===============		===============	    ============			====================================
-	Instance Type					Price ($)				Processing Time		Running Time (sec)	Normalized Instance Hours Charged
-	==============					===============		================	============			====================================
-	m1.small 						0.095				16 minutes			257		n				1
-	m1.large 						0.38				8 minutes			151		n				4
-	m1.xlarge						0.76				6 minutes			107		n				8  
+	==============					===============		====================================
+	Instance Type					Price ($)			Normalized Instance Hours
+	==============					===============		====================================
+	m1.small 						0.095				1
+	m1.large 						0.38				4
+	m1.xlarge						0.76				8  
 	*High Memory Instances*
-	m2.xlarge						0.54				6 minutes			88						6	
-	m2.2xlarge						1.11				7 minutes			89		n				12	
-	m2.4xlarge						2.22				--							n				24
+	m2.xlarge						0.54				6	
+	m2.2xlarge						1.11				12	
+	m2.4xlarge						2.22				24
 	*High-CPU Instances*
-	c1.medium 						0.195				7 minutes			123						2
-	c1.xlarge						0.78				6 minutes			108		n				8	
+	c1.medium 						0.195				2
+	c1.xlarge						0.78				8	
 	*Cluster Compute Instances*
-	cc1.4xlarge						1.57				--							n				16
-	cc2.8xlarge						2.90				--							n				29
+	cc1.4xlarge						1.57				16
+	cc2.8xlarge						2.90				29
 	*Cluster GPU Instances*
-	cg1.4xlarge						2.52				--							n				25
+	cg1.4xlarge						2.52				25
 
+	When you run your job, you will see the number of normalized instnace hours charged. Each normalized
+	instance hour roughly costs $0.095. If you run 10 instances of the c1.medium for two hours, for example,
+	you will see 40 (that's 10 instances * 2 normalized instance hours per instance * 2 hours time)
+	you will be charged about $4 (that's 10 instances * 2 hours * $0.195 per hour = $3.9)
+	FYI: this is roughly equivalent to 40*0.095=$3.80
 * Bootstrapping
 	Although I'm still investigating and I know there's got to be a better way,
 	so far I've found that the amazon ec2 instances only have python 2.5 running
