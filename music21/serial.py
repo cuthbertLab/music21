@@ -280,6 +280,47 @@ class TwelveToneRow(ToneRow):
                 return newRow            
             else:
                 raise SerialException("Invalid transformation type.")
+    
+    def findTransformations(self, otherRow):
+        ''' 
+        
+        Gives the list of (zero-centered) serial transformations taking one twelve-tone row,
+        to another. Each transformation is given as a tuple of the transformation type and
+        index.
+        
+        >>> from music21 import *
+        >>> chromatic = serial.pcToToneRow([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1])
+        >>> reversechromatic = serial.pcToToneRow([8, 7, 6, 5, 4, 3, 2, 1, 0, 11, 10, 9])
+        >>> chromatic.findTransformations(reversechromatic)
+        [('I', 8), ('R', 9)]
+        >>> schoenberg25 = serial.pcToToneRow(serial.RowSchoenbergOp25.row)
+        >>> schoenberg26 = serial.pcToToneRow(serial.RowSchoenbergOp26.row)
+        >>> schoenberg25.findTransformations(schoenberg26)
+        []
+        
+        '''
+    
+        otherRowPitches = otherRow.pitches()
+        transformationList = []
+        firstPitch = otherRowPitches[0]
+        lastPitch = otherRowPitches[-1]
+        
+        if otherRow.pitches() == self.zeroCenteredRowTransformation('P',firstPitch).pitches():
+            transformation = 'P', firstPitch
+            transformationList.append(transformation)
+        if otherRow.pitches() == self.zeroCenteredRowTransformation('I',firstPitch).pitches():
+            transformation = 'I', firstPitch
+            transformationList.append(transformation)
+        if otherRow.pitches() == self.zeroCenteredRowTransformation('R',lastPitch).pitches():
+            transformation  = 'R', lastPitch
+            transformationList.append(transformation)
+        if otherRow.pitches() == self.zeroCenteredRowTransformation('RI',lastPitch).pitches():
+            transformation = 'RI', lastPitch
+            transformationList.append(transformation)
+            
+        return transformationList
+        
+        
             
         
 
