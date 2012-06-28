@@ -66,8 +66,9 @@ class StreamException(Exception):
 
 #-------------------------------------------------------------------------------
 class StreamIterator(object):
-    '''A simple Iterator object used to handle iteration of Streams and other 
-    list-like objects. 
+    '''An Iterator object used to handle iteration of Streams. The :meth:`~music21.stream.Stream.__iter__` method returns this object, passing a reference to self. 
+
+    Note that this iterator automatically sets the active site of returned elements to the the source Stream. 
     '''
     def __init__(self, srcStream):
         self.srcStream = srcStream
@@ -99,28 +100,24 @@ class Stream(music21.Music21Object):
     '''
     This is the fundamental container for Music21Objects; 
     objects may be ordered and/or placed in time based on 
-    offsets from the start of this container's offset. 
-
+    offsets from the start of this container.
     
-    Like the base class, Music21Object, Streams have offsets, 
-    priority, id, and groups
-    they also have an elements attribute which returns a list of elements; 
+    As a subclass of Music21Object, Streams have offsets, 
+    priority, id, and groups. 
 
-    
-    The Stream has a duration that is usually the 
-    release time of the chronologically last element in the Stream (that is,
-    the highest onset plus duration of any element in the Stream).
-    However, it can either explicitly set in which case we say that the
-    duration is unlinked.
+    Streams may be embedded within other Streams. As each Stream can have its own offset, when Streams are embedded the offset of an element is relatively only to its parent Stream. The :attr:`~music21.stream.Stream.flat` property provides access to a flat representation of all embedded Streams, with offsets relative to the top-level Stream. 
 
-
-    Streams may be embedded within other Streams.
-    
+    The Stream :attr:`~music21.stream.Stream.elements` attribute provides the contents of the Stream as a list. Direct access to, and manipulation of, the elements list is not recommended. Instead, use the host of high-level methods available. 
+ 
+    The Stream, like all Music21Objects, has a :class:`music21.duration.Duration` that is usually the 
+    "release" time of the chronologically last element in the Stream (that is,
+    the highest onset plus the duration of any element in the Stream).
+    The duration, however, can be "unlinked" and explicitly set independent of the Stream's contents.
 
     The first element passed to the Stream is an optional list,
     tuple, or other Stream of music21 objects which is used to
-    populate the Stream by inserting each object at its `.offset`
-    property.  Other arguments and keywords are ignored, but are
+    populate the Stream by inserting each object at its :attr:`~music21.base.Music21Object.offset` 
+    property. Other arguments and keywords are ignored, but are
     allowed so that subclassing the Stream is easier. 
 
 
@@ -136,7 +133,7 @@ class Stream(music21.Music21Object):
     5
     
     
-    Demonstration of starting a Stream with other elements,
+    This is a demonstration of creating a Stream with other elements,
     including embedded Streams (in this case, :class:`music21.stream.Part`,
     a Stream subclass):
 
@@ -150,6 +147,8 @@ class Stream(music21.Music21Object):
     >>> p1.id = 'embeddedPart'
     >>> p1.append(note.Rest()) # quarter rest
     >>> s2 = stream.Stream([c1, n1, p1])
+    >>> s2.duration.quarterLength
+    1.5
     >>> s2.show('text')
     {0.0} <music21.clef.TrebleClef>
     {0.0} <music21.stream.Part embeddedPart>
@@ -157,12 +156,9 @@ class Stream(music21.Music21Object):
     {1.0} <music21.note.Note E->
     
 
-    OMIT_FROM_DOCS
-    TODO: Get Stream Duration working -- should be the total length of the 
-    Stream. -- see the ._getDuration() and ._setDuration() methods
     '''
 
-    # this static attributes offer performance boost over other 
+    # this static attributes offer a performance boost over other 
     # forms of checking class
     isStream = True
     isMeasure = False
@@ -181,7 +177,6 @@ class Stream(music21.Music21Object):
 
     'flattenedRepresentationOf': 'When this flat Stream is derived from another non-flat stream, a reference to the source Stream is stored here.',
     }
-
 
     def __init__(self, givenElements=None, *args, **keywords):
         music21.Music21Object.__init__(self)
@@ -239,15 +234,9 @@ class Stream(music21.Music21Object):
     #---------------------------------------------------------------------------
     # sequence like operations
 
-    # if we want to have all the features of a mutable sequence, 
-    # we should implement
-    # append(), count(), index(), extend(), insert(), 
-    # pop(), remove(), reverse() and sort(), like Python standard list objects.
-    # But we're not there yet.
-
     def __len__(self):
-        '''Get the total number of elements
-        Does not recurse into objects
+        '''Get the total number of elements in the Stream.
+        This method does not recurse into and count elements in contained Streams. 
 
         >>> from music21 import *
         >>> a = stream.Stream()
@@ -270,21 +259,19 @@ class Stream(music21.Music21Object):
 
     def __iter__(self):
         '''
-        A Stream can return an iterator.  Same as running x in a.elements
+        The Stream iterator, used in all for loops and similar iteration routines. This method returns the specialized :class:`music21.stream.StreamIterator` class, which adds necessary Stream-specific features. 
         '''
         return StreamIterator(self)
 
 
     def __getitem__(self, key):
-        '''Get a Music21Object from the stream in current order; sorted if isSorted is True,
-        but not necessarily.
+        '''Get a Music21Object from the Stream using a variety of keys or indices. 
         
-        if an int is given, returns that index
-        if a class is given, it runs getElementsByClass and returns that list
-        if a string is given it first runs getElementById on the stream then if that
-             fails, getElementsByGroup on the stream returning that list.
+        If an int is given, the Music21Object at the index is returned. If the Stream is sorted (if isSorted is True), the elements are returned in order.
 
-        ## maybe it should, but does not yet:    if a float is given, returns the element at that offset
+        If a class name is given (as a string or name), :meth:`~music21.stream.Stream.getElementsByClass` is used to return a Stream of the elements that match the requested class.
+
+        If a string is given, :meth:`~music21.stream.Stream.getElementById` first, then (if no results are found) :meth:`~music21.stream.Stream.getElementsByGroup` is used to collect and return elements as a Stream.
 
         >>> from music21 import *
         >>> a = stream.Stream()
@@ -372,11 +359,10 @@ class Stream(music21.Music21Object):
     def _elementsChanged(self, updateIsFlat=True, clearIsSorted=True, 
         memo=None, keepIndex=False):
         '''
-        Call any time _elements is changed. Called by methods that add or change
-        elements.
-    
-        If `appendOnly` is True, it will be assumed that the only change has been appending an element.
+        This method is called any time the elements in the Stream are changed. 
 
+        The various arguments permit optimizing the clearing of cached data in situations when completely dropping all cached data is excessive. 
+    
         >>> from music21 import *
         >>> a = stream.Stream()
         >>> a.isFlat
@@ -431,8 +417,8 @@ class Stream(music21.Music21Object):
                 self._cache['index'] = indexCache
 
     def _getElements(self):
-        # this method is now important, in that it combines self._elements
-        # and self._endElements
+        '''Combines the two storage lists, _elements and _endElements, such that they appear as a single list. 
+        '''
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
 
@@ -447,7 +433,6 @@ class Stream(music21.Music21Object):
     def _setElements(self, value):
         '''
         TODO: this should be removed, as this is a bad way to add elements, as locations are not set properly. 
-
         '''
         if (not common.isListLike(value) and hasattr(value, 'isStream') and 
             value.isStream):
@@ -471,9 +456,9 @@ class Stream(music21.Music21Object):
         return value
         
     elements = property(_getElements, _setElements, 
-        doc='''The low-level storage list of all Streams. Directly getting, setting, and manipulating this list is reserved for advanced usage.
+        doc='''A list representing the elements contained in the Stream. 
 
-        When setting .elements, a list of Music21Objects can be provided, or a complete Stream. If a complete Stream is provided, elements are extracted from that Stream. This has the advantage of transferring offset correctly and geting _endElements. 
+        Directly getting, setting, and manipulating this list is reserved for advanced usage. Instead, use the the provided high-level methods. When setting .elements, a list of Music21Objects can be provided, or a complete Stream. If a complete Stream is provided, elements are extracted from that Stream. This has the advantage of transferring offset correctly and geting _endElements. 
 
         >>> from music21 import *
         >>> a = stream.Stream()
@@ -497,8 +482,7 @@ class Stream(music21.Music21Object):
         ''')
 
     def __setitem__(self, key, value):
-        '''Insert items at index positions. Index positions are based
-        on position in self.elements. 
+        '''Insert an item at a currently filled index position, as represented in the the elements list.
 
         >>> from music21 import *
         >>> a = stream.Stream()
@@ -537,8 +521,8 @@ class Stream(music21.Music21Object):
 
 
     def __delitem__(self, key):
-        '''Delete items at index positions. Index positions are based
-        on position in self.elements. 
+        '''Delete element at an index position. Index positions are based
+        on positions in self.elements. 
 
         >>> from music21 import *
         >>> a = stream.Stream()
@@ -606,6 +590,8 @@ class Stream(music21.Music21Object):
 
     def setDerivation(self, target):
         '''Manually set the Stream that this Stream was derived from. This operation is generally completed automatically. 
+
+        See :class:`~music21.derivation.Derivation` for more information. 
         '''
         self._derivation.setAncestor(target)
 
@@ -617,6 +603,8 @@ class Stream(music21.Music21Object):
     derivesFrom = property(_getDerivation, 
         doc = '''Return a reference to the Stream that created this Stream, if such a Stream exists. 
 
+        See :class:`~music21.derivation.Derivation` for more information. 
+
         >>> from music21 import *
         >>> s1 = stream.Stream()
         >>> s1.repeatAppend(note.Note(), 10)
@@ -627,8 +615,6 @@ class Stream(music21.Music21Object):
         ''')
 
     def _getDerivationChain(self):
-        '''Return a list of all Streams that created this Stream, if such a Stream exists. 
-        '''
         post = []
         focus = self
         while True:
@@ -641,7 +627,8 @@ class Stream(music21.Music21Object):
         return post
 
     derivationChain = property(_getDerivationChain, 
-        doc = '''Return a list Stream subclasses that this Stream was derved from. This provides a way to obtain all Streams that this element passed through, such as those created by getElementsByClass or flat searches. 
+        doc = '''
+        Return a list Streams that this Stream was derved from. This provides a way to obtain all Streams that this element passed through, such as those created by :meth:`~music21.stream.Stream.getElementsByClass` or :attr:`~music21.stream.Stream.flat`. 
 
         >>> from music21 import *
         >>> s1 = stream.Stream()
@@ -655,8 +642,6 @@ class Stream(music21.Music21Object):
 
 
     def _getRootDerivation(self):
-        '''Return a reference to the Stream that created this Stream, if such a Stream exists. 
-        '''
         chain = self._getDerivationChain()
         if len(chain) > 0:
             return self._getDerivationChain()[-1]
@@ -664,7 +649,7 @@ class Stream(music21.Music21Object):
             return None
 
     rootDerivation = property(_getRootDerivation, 
-        doc = '''Return a reference to the oldest source of this Stream; that is, chain calls to derivesFrom until we get to a Stream that cannot be further derived. 
+        doc = '''Return a reference to the oldest source of this Stream; that is, chain calls to :attr:`~music21.stream.Stream.derivesFrom` until we get to a Stream that cannot be further derived. 
 
         >>> from music21 import *
         >>> s1 = stream.Stream()
@@ -676,8 +661,6 @@ class Stream(music21.Music21Object):
         ''')
 
 
-
-
     def _getDerivationMethod(self):
         return self._derivation.getMethod()
         
@@ -687,8 +670,7 @@ class Stream(music21.Music21Object):
     derivationMethod = property(_getDerivationMethod, _setDerivationMethod,     
         doc='''
         Returns or sets a string representing how
-        this stream was derived from another stream.
-        
+        this stream was derived from another Stream.
         
         There are currently no limitations on this string.
         This might change.
@@ -711,6 +693,8 @@ class Stream(music21.Music21Object):
     def hasElement(self, obj):
         '''Return True if an element, provided as an argument, is contained in this Stream.
 
+        This method is based on object equivalence, not parameter equivalence of different objects.
+
         >>> from music21 import *
         >>> s = stream.Stream()
         >>> n1 = note.Note('g')
@@ -729,7 +713,17 @@ class Stream(music21.Music21Object):
         return False
 
     def hasElementOfClass(self, className, forceFlat=False):
-        '''Given a single class name as string, return True or False if an element with the specified class is found. The Stream must be flat, and only a single class name can be given.
+        '''Given a single class name as string, return True or False if an element with the specified class is found. Only a single class name can be given.
+
+        >>> from music21 import *
+        >>> s = stream.Stream()
+        >>> s.append(meter.TimeSignature('5/8'))
+        >>> s.append(note.Note('d-2'))
+        >>> s.insert(dynamics.Dynamic('fff'))
+        >>> s.hasElementOfClass('TimeSignature')
+        True
+        >>> s.hasElementOfClass('Measure')
+        False
         '''
         #environLocal.pd(['calling hasElementOfClass()', className])
         for e in self._elements:
@@ -740,29 +734,7 @@ class Stream(music21.Music21Object):
                 return True
         return False
 
-#         cacheKey = 'hasElementOfClass-%s' % str(className)
-#         try:
-#             return self._cache[cacheKey]
-#         except:
-#             pass
-# 
-#         for e in self._elements:
-#             if e.isClassOrSubclass([className]): 
-#                 self._cache[cacheKey] = True
-#                 return True
-#         for e in self._endElements:
-#             if e.isClassOrSubclass([className]): 
-#                 self._cache[cacheKey] = True
-#                 return True
-#         self._cache[cacheKey] = False
-#         return False
 
-#         if forceFlat and not self.isFlat:
-#             raise StreamException('cannot use hasElementOfClass on a non-flat Stream')
-#         if self._cache['classCache'] is None:
-#             self._cache['classCache'] = classCache.ClassCache()
-#             self._cache['classCache'].load(self)
-#         return self._cache['classCache'].hasElementOfClass(className)
 
     def hasElementByObjectId(self, objId):
         '''Return True if an element object id, provided as an argument, is contained in this Stream.

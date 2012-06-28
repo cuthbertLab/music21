@@ -4750,14 +4750,14 @@ class Test(unittest.TestCase):
     def testUnicodeCharsA(self):
         from music21.musicxml import testPrimitive
         from music21 import converter
-
+        
         # low level musicxml object test
         d = Document()
         d.read(testPrimitive.unicodeStrWithNonAscii)
         # make sure that unicode char is passed through
         match = d.score.identificationObj.creatorList[0].charData
         self.assertEqual(u'© Someone Else', match)
-
+        
         # the ultimate round trip test
         s = converter.parse(testPrimitive.unicodeStrWithNonAscii)
         raw = s.musicxml
