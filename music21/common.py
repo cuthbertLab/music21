@@ -1457,7 +1457,7 @@ def getCorpusContentDirs():
     dir = getCorpusFilePath()
     post = []
     # dirs to exclude; all files will be retained
-    exclude = ['__init__.py', 'base.py', 'metadataCache', 'virtual.py'] 
+    exclude = ['__init__.py', 'base.py', 'metadataCache', 'virtual.py', 'chorales.py'] 
     for fn in os.listdir(dir):
         if fn not in exclude:
             if not fn.endswith('.pyc') and not fn.startswith('.'):
