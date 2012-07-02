@@ -1244,6 +1244,7 @@ class GraphScatter(Graph):
 
     def process(self):
         '''
+        runs the data through the processor and if doneAction == 'show' (default), show the graph
         '''
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
@@ -1252,13 +1253,32 @@ class GraphScatter(Graph):
         xValues = []
         yValues = []
         i = 0
-        for x, y in self.data:
+        for row in self.data:
+            if len(row) < 2:
+                raise GraphException("Need at least two points for a graph data object!")
+            x = row[0]
+            y = row[1]
             xValues.append(x)
             yValues.append(y)
         xValues.sort()
         yValues.sort()
-        for x, y in self.data:
-            ax.plot(x, y, 'o', color=getColor(self.colors[i%len(self.colors)]), alpha=self.alpha)
+
+        for row in self.data:
+            x = row[0]
+            y = row[1]
+            figureType = 'o'
+            color = getColor(self.colors[i%len(self.colors)])
+            alpha = self.alpha
+            if len(row) >= 3:
+                displayData = row[2]
+                if 'color' in displayData:
+                    color = displayData['color']
+                if 'figureType' in displayData:
+                    figureType = displayData['figureType']
+                if 'alpha' in displayData:
+                    alpha = displayData['alpha']
+                    
+            ax.plot(x, y, figureType, color=color, alpha=self.alpha)
             i += 1
         # values are sorted, so no need to use max/min
         self.setAxisRange('y', (yValues[0], yValues[-1]), pad=True)
