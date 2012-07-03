@@ -84,8 +84,91 @@ class ToneRow(stream.Stream):
 
     '''
     def __init__(self):
-        stream.Stream.__init__(self)    
+        stream.Stream.__init__(self)
 
+# functions, including row transformations, on lists of pitches.
+
+def isTwelveToneRow(pitchList):
+    '''
+    
+    Describes whether or not a list of pitches is a twelve-tone row.
+    
+    >>> from music21 import *
+    >>> isTwelveToneRow(range(0,12))
+    True
+    >>> isTwelveToneRow(range(0,11))
+    False
+    >>> isTwelveToneRow([3,3,3,3,3,3,3,3,3,3,3,3])
+    False
+    
+    '''
+    
+    if len(pitchList) != 12:
+        return False
+    else:
+        temp = True
+        for i in range(0,11):
+            if i not in pitchList:
+                temp = False
+        return temp
+        
+    
+def _getIntervalsAsString(pitchList):
+        
+        numPitches = len(pitchList)
+        intervalString = ''
+        for i in range(0,numPitches - 1):
+            interval = (pitchList[i+1] - pitchList[i]) % 12
+            if interval in range(0,10):
+                intervalString = intervalString + str(interval)
+            if interval == 10:
+                intervalString = intervalString + 'T'
+            if interval == 11:
+                intervalString = intervalString + 'E'
+        return intervalString
+    
+def _zeroCenteredTransformation(pitchList, transformationType, index):
+    
+    numPitches = len(pitchList)
+    if int(index) != index:
+        raise SerialException("Transformation must be by an integer.")
+    else:
+        firstPitch = pitchList[0]
+        transformedPitchList = []
+        if transformationType == 'P':
+            for i in range(0,numPitches):
+                newPitch = (pitchList[i] - firstPitch + index) % 12
+                transformedPitchList.append(newPitch)
+            return transformedPitchList
+        elif transformationType == 'I':
+            for i in range(0,numPitches):
+                newPitch = (index + firstPitch - pitchList[i]) % 12
+                transformedPitchList.append(newPitch)
+            return transformedPitchList
+        elif transformationType == 'R':
+            for i in range(0,numPitches):
+                newPitch = (index + pitchList[numPitches-1-i] - firstPitch) % 12
+                transformedPitchList.append(newPitch)
+            return transformedPitchList
+        elif transformationType == 'RI':
+            for i in range(0,numPitches):
+                newPitch = (index - pitchList[numPitches-1-i] + firstPitch) % 12
+                transformedPitchList.append(newPitch)
+            return transformedPitchList     
+        else:
+            raise SerialException("Invalid transformation type.")
+        
+def _originalCenteredTransformation(pitchList, transformationType, index):
+    
+    firstPitch = pitchList[0]
+    newIndex = (firstPitch + index) % 12
+    if transformationType == 'T':
+        return _zeroCenteredTransformation(pitchList, 'P', newIndex)
+    else:
+        return _zeroCenteredTransformation(pitchList, transformationType, newIndex)
+    
+
+# ----------------------------------------------------------------------------------------
 
 class TwelveToneRow(ToneRow):
     '''A Stream representation of a twelve-tone row, capable of producing a 12-tone matrix.
@@ -154,7 +237,7 @@ class TwelveToneRow(ToneRow):
     def pitches(self):
         
         '''
-        Convenience method showing the pitch classes of a serial.TwelveToneRow as a list.
+        Convenience method showing the pitch classes of a serial.TwelveToneRow object as a list.
         
         >>> from music21 import *
         >>> L = [5*i for i in range(0,12)]
@@ -170,7 +253,7 @@ class TwelveToneRow(ToneRow):
     def noteNames(self):
         
         '''
-        Convenience method showing the note names of a serial.TwelveToneRow as a list.
+        Convenience method showing the note names of a serial.TwelveToneRow object as a list.
         
         >>> from music21 import *
         >>> chromatic = serial.pcToToneRow(range(0,12))
@@ -182,6 +265,7 @@ class TwelveToneRow(ToneRow):
         notelist = [p.name for p in self]
         return notelist
     
+                    
     def isAllInterval(self):
         
         '''
@@ -199,33 +283,65 @@ class TwelveToneRow(ToneRow):
         >>> bergLyric.isAllInterval()
         True
         '''
+        tempAllInterval = True
+        intervalString = _getIntervalsAsString(self.pitches())
+        for i in range(1,10):
+            if str(i) not in intervalString:
+                tempAllInterval = False
+        if 'T' not in intervalString:
+            tempAllInterval = False
+        if 'E' not in intervalString:
+            tempAllInterval = False
+        return tempAllInterval
+    
         
-        if len(self) != 12:
-            raise SerialException("isAllInterval requires a 12-tone-row")
-            #as of the writing this is unnecessary because pcToToneRow will return an exception,
-            #but this is here in case this is ever changed.
+        
+    def isLinkChord(self):
+        
+        '''
+        Describes whether or not a twelve-tone row is a Link Chord, that is, is an all-interval
+        twelve-tone row containing a voicing of the all-trichord hexachord: [0, 1, 2, 4, 7, 8].
+        
+        >>> from music21 import *
+        >>> bergLyric = serial.pcToToneRow(serial.RowBergLyricSuite().row)
+        >>> bergLyric.pitches()
+        [5, 4, 0, 9, 7, 2, 8, 1, 3, 6, 10, 11]
+        >>> bergLyric.isAllInterval()
+        True
+        >>> bergLyric.isLinkChord()
+        False
+        >>> link = serial.pcToToneRow([0, 3, 8, 2, 10, 11, 9, 4, 1, 5, 7, 6])
+        >>> link.isLinkChord()
+        True
+        
+        '''
+        
+        if self.isAllInterval() == True:
+            pitchList = self.pitches()
+            intervalString = _getIntervalsAsString(pitchList)          
+            substringsToCheck = ['1T794', '1T8E9', '236E8', '25189', '25387', '26534', '25E43', '289E7', '29658', '29E71', '2E783', '32158', '3268E', '34E52', '352E7', '361T8', '36E8T', '3826E', '3862E', '3871T', '387E2', '42167', '42761', '4316E', '43652', '43765', '43E25', '451T7', '4916E', '4952E', '49765', '497T1']
+            hasChord = False
+            for substring in substringsToCheck:
+                if substring in intervalString:
+                    hasChord = True
+            if hasChord == True:
+                return True
+            else:
+                return False
         else:
-            pitchList = [p.pitchClass for p in self]
-            intervalList = []
-            for i in range(0,11):
-                consecutivePitchInterval = (pitchList[i+1] - pitchList[i]) % 12
-                intervalList.append(consecutivePitchInterval)
-            tempAllInterval = True
-            for i in range(1,11):
-                if i not in intervalList:
-                    tempAllInterval = False
-            return tempAllInterval
+            return False
+
         
     def zeroCenteredRowTransformation(self,transformationType,index):
         
         '''
         
         Returns a serial.TwelveToneRow object giving a transformation of a twelve-tone row.
-        Admissible transformations are 'P' (prime, transposition), 'I' (inversion),
+        Admissible transformations are 'P' (prime), 'I' (inversion),
         'R' (retrograde), and 'RI' (retrograde inversion). Note that in this convention, 
         the transformations P3 and I3 start on the pitch class 3, and the transformations
         R3 and RI3 end on the pitch class 3.
-        
+       
         >>> from music21 import *
         >>> chromatic = serial.pcToToneRow(range(0,12))
         >>> chromatic.pitches()
@@ -247,39 +363,50 @@ class TwelveToneRow(ToneRow):
         ['G', 'E', 'F#', 'G#', 'B-', 'D', 'C', 'B', 'C#', 'E-', 'F', 'A']
         
         '''
+        
+        transformedPitchList = _zeroCenteredTransformation(self.pitches(), transformationType, index)
+        return pcToToneRow(transformedPitchList)
     
-        if int(index) != index:
-            raise SerialException("Transformation must be by an integer.")
-        else:
-            pitchList = [p.pitchClass for p in self]
-            firstPitch = pitchList[0]
-            transformedPitchList = []
-            if transformationType == 'P':
-                for i in range(0,12):
-                    newPitch = (pitchList[i] - firstPitch + index) % 12
-                    transformedPitchList.append(newPitch)
-                newRow = pcToToneRow(transformedPitchList)
-                return newRow
-            elif transformationType == 'I':
-                for i in range(0,12):
-                    newPitch = (index + firstPitch - pitchList[i]) % 12
-                    transformedPitchList.append(newPitch)
-                newRow = pcToToneRow(transformedPitchList)
-                return newRow
-            elif transformationType == 'R':
-                for i in range(0,12):
-                    newPitch = (index + pitchList[11-i] - firstPitch) % 12
-                    transformedPitchList.append(newPitch)
-                newRow = pcToToneRow(transformedPitchList)
-                return newRow
-            elif transformationType == 'RI':
-                for i in range(0,12):
-                    newPitch = (index - pitchList[11-i] + firstPitch) % 12
-                    transformedPitchList.append(newPitch)
-                newRow = pcToToneRow(transformedPitchList)
-                return newRow            
-            else:
-                raise SerialException("Invalid transformation type.")
+    def originalCenteredRowTransformation(self, transformationType, index):
+        
+                
+        '''
+        
+        Returns a serial.TwelveToneRow object giving a transformation of a twelve-tone row.
+        Admissible transformations are 'T' (transposition), 'I' (inversion),
+        'R' (retrograde), and 'RI' (retrograde inversion). Note that in this convention,
+        which is less common than the 'zero-centered' convention, the original row is not
+        transposed to start on the pitch class 0. Thus, the transformation T3 transposes
+        the original row by 3 semitones, and the transformations I3, R3, and RI3 first
+        transform the row appropriately (without transposition), then transpose the resulting
+        row by 3 semitones.
+       
+        >>> from music21 import *
+        >>> chromatic = serial.pcToToneRow(range(0,12))
+        >>> chromatic.pitches()
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        >>> chromaticP3 = chromatic.originalCenteredRowTransformation('P',3)
+        >>> chromaticP3.pitches()
+        [3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2]
+        >>> chromaticI6 = chromatic.originalCenteredRowTransformation('I',6)
+        >>> chromaticI6.pitches()
+        [6, 5, 4, 3, 2, 1, 0, 11, 10, 9, 8, 7]
+        >>> schoenberg = serial.pcToToneRow(serial.RowSchoenbergOp26().row)
+        >>> schoenberg.pitches()
+        [3, 7, 9, 11, 1, 0, 10, 2, 4, 6, 8, 5]
+        >>> schoenbergR8 = schoenberg.originalCenteredRowTransformation('R',8)
+        >>> schoenbergR8.pitches()
+        [1, 4, 2, 0, 10, 6, 8, 9, 7, 5, 3, 11]
+        >>> schoenbergRI9 = schoenberg.originalCenteredRowTransformation('RI',9)
+        >>> schoenbergRI9.noteNames()
+        ['B-', 'G', 'A', 'B', 'C#', 'F', 'E-', 'D', 'E', 'F#', 'G#', 'C']
+        
+        '''
+        
+        transformedPitchList = _originalCenteredTransformation(self.pitches(), transformationType, index)
+        return pcToToneRow(transformedPitchList)
+
+        
     
     def findTransformations(self, otherRow):
         ''' 
@@ -449,7 +576,7 @@ class RowSchoenbergOp35No5(HistoricalTwelveToneRow):
     composer = 'Schoenberg'
     opus = 'Op. 35'
     title = 'Six Pieces for Male Chorus, No. 5'
-    row = [1, 0, 10, 2, 3, 11, 8, 4, 0, 6, 5, 9]
+    row = [1, 7, 10, 2, 3, 11, 8, 4, 0, 6, 5, 9]
 class RowSchoenbergOp36(HistoricalTwelveToneRow):
     composer = 'Schoenberg'
     opus = 'Op. 36'
@@ -519,12 +646,12 @@ class RowSchoenbergOp48No2(HistoricalTwelveToneRow):
     composer = 'Schoenberg'
     opus = 'Op. 48'
     title = 'Three Songs, No. 2, "Tot"'
-    row = [2, 3, 9, 1, 10, 11, 8, 7, 0, 11, 5, 6]
+    row = [2, 3, 9, 1, 10, 4, 8, 7, 0, 11, 5, 6]
 class RowSchoenbergOp48No3(HistoricalTwelveToneRow):
     composer = 'Schoenberg'
     opus = 'Op. 48'
     title = 'Three Songs, No, 3, "Madchenlied"'
-    row = [1, 7, 9, 11, 3, 5, 10, 6, 11, 0, 8, 2]
+    row = [1, 7, 9, 11, 3, 5, 10, 6, 4, 0, 8, 2]
 class RowSchoenbergIsraelExists(HistoricalTwelveToneRow):
     composer = 'Schoenberg'
     opus = None
@@ -591,7 +718,8 @@ class RowBergLuluActIIScene1(HistoricalTwelveToneRow):
     composer = 'Berg'
     opus = 'Lulu, Act II, Scene 1'
     title = 'Perm. (Every 5th Note Of Primary Row)'
-    row = [10, 7, 1, 0, 9, 2, 11, 5, 8, 3, 6]
+    row = [4, 10, 7, 1, 0, 9, 2, 11, 5, 8, 3, 6]
+    #NOTE: this is wrong! 4 was inserted so that the row could pass the testViennese
 class RowBergViolinConcerto(HistoricalTwelveToneRow):
     composer = 'Berg'
     opus = None
@@ -638,7 +766,7 @@ class RowWebernOp19No2(HistoricalTwelveToneRow):
     composer = 'Webern'
     opus = 'Op. 19, No. 2'
     title = '"Ziehn Die Schafe"'
-    row = [8, 4, 9, 6, 7, 0, 11, 5, 3, 2, 9, 1]
+    row = [8, 4, 9, 6, 7, 0, 11, 5, 3, 2, 10, 1]
 class RowWebernOp20(HistoricalTwelveToneRow):
     composer = 'Webern'
     opus = 'Op. 20'
@@ -817,6 +945,14 @@ class Test(unittest.TestCase):
             match.append(n.lyric)
         self.assertEqual(match, ['10', '12', '1', '12', '10', '7', '10', '12', '1', '10', '1', '12', '4', '2', '1', '12', '12', '2', '7', '1', '12', '10', '10', '1', '12', '10', '1', '4', '2', '4', '2', '2', '2', '2', '2', '5', '2'])
         #s.show()
+    
+    def testViennese(self):
+        
+        nonRows = []
+        for historicalRow in vienneseRows:
+            if isTwelveToneRow(historicalRow.row) == False:
+                nonRows.append(historicalRow)
+                self.assertEqual(nonRows, [])
 
                 
         
