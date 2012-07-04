@@ -301,6 +301,8 @@ class TwelveToneRow(ToneRow):
         '''
         Describes whether or not a twelve-tone row is a Link Chord, that is, is an all-interval
         twelve-tone row containing a voicing of the all-trichord hexachord: [0, 1, 2, 4, 7, 8].
+
+        Named for John Link who discovered them.
         
         >>> from music21 import *
         >>> bergLyric = serial.pcToToneRow(serial.RowBergLyricSuite().row)
@@ -453,7 +455,9 @@ class TwelveToneRow(ToneRow):
 
 
 class HistoricalTwelveToneRow(TwelveToneRow):
-    '''A 12-tone row used in the historical literature. Added attributes to document the the historical context of the row. 
+    '''
+    A 12-tone row used in the historical literature. 
+    Added attributes to document the the historical context of the row. 
     '''
     composer = None
     opus = None

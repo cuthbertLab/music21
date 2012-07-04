@@ -130,7 +130,8 @@ The music21 :ref:`moduleSerial` module provides a Stream-based representation of
 
 For example, we can create an instance of the row from Alban Berg's *Violin Concerto*, use the show() method to display its contents as text, and then create and print a :class:`~music21.serial.TwelveToneMatrix` object. 
 
->>> from music21 import serial
+>>> from music21 import *
+
 >>> aRow = serial.RowBergViolinConcerto()
 >>> aRow.show('text')    
 {0.0} G
@@ -145,6 +146,7 @@ For example, we can create an instance of the row from Alban Berg's *Violin Conc
 {0.0} C#
 {0.0} E-
 {0.0} F
+
 >>> aMatrix = aRow.matrix()
 >>> print(aMatrix)
   0  3  7  B  2  5  9  1  4  6  8  A
@@ -166,7 +168,7 @@ We might divide this row into trichords, present each of those trichords as Chor
 
 >>> bStream = stream.Stream()
 >>> for i in range(0,12,3):
-...     c = chord.Chord(aRow.pitches[i:i+3])
+...     c = chord.Chord(aRow[i:i+3])
 ...     c.addLyric(c.primeFormString)
 ...     c.addLyric(c.forteClass)
 ...     bStream.append(c)

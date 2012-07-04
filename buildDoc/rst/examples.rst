@@ -49,7 +49,7 @@ This example search the entire collection of Bach Chorales stored in the corpus 
 >>> # Create storage for the results
 >>> results = stream.Stream()
 >>> # Get file paths to all Chorales
->>> for fp in corpus.bachChorales: 
+>>> for fp in corpus.getBachChorales(): 
 ...     # Parse, and then analyze the key
 ...     chorale = converter.parse(fp)
 ...     keyObj = chorale.analyze('key')

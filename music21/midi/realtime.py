@@ -127,7 +127,7 @@ class Test(unittest.TestCase):
 
 class TestExternal(unittest.TestCase):
     
-    def xtestBachDetune(self):
+    def testBachDetune(self):
         from music21 import corpus
         import random
         b = corpus.parse('bwv66.6')

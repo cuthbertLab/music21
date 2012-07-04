@@ -133,9 +133,9 @@ Both stage 1 and stage 2 Musedata file formats are supported by Music21. Multi-p
 
 If a directory or zipped archive is passed to the :func:`music21.converter.parse` function, the contained files will be treated as a collection of Musedata parts.
 
->>> corpus.getWork('bach/bwv1080/16')  # doctest: +SKIP
-'/Users/ariza/_x/src/music21/music21/corpus/bach/bwv1080/16.zip'
->>> s = corpus.parse('bach/bwv1080/16')
+>>> corpus.getWork('bach/artOfFugue_bwv1080/16')  # doctest: +SKIP
+'/Users/ariza/_x/src/music21/music21/corpus/bach/artOfFugue_bwv1080/16.zip'
+>>> s = corpus.parse('bach/artOfFugue_bwv1080/16')
 
 
 Getting Musedata Files

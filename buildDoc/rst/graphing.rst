@@ -234,8 +234,8 @@ A basic example follows::
 
 The following example demonstrates basic customization with keyword arguments using the same data obtained above::
 
-    >>> b = graph.Graph3DPolygonBars(title='Random Data', alpha=.8,\
-        barWidth=.2, doneAction='show', colors=['b','r','g']) 
+    >>> b = graph.Graph3DPolygonBars(title='Random Data', alpha=.8,
+    ...                  barWidth=.2, doneAction='show', colors=['b','r','g']) 
     >>> b.setData(data)
     >>> b.process()   # doctest: +SKIP
 

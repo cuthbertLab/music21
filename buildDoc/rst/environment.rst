@@ -27,13 +27,13 @@ Environment configuration files are not created by default. To create an environ
 
 After creating an environment file, the resulting XML preference file can be edited directly by the user. To find where the XML file is written, the :meth:`~music21.environment.UserSettings.getSettingsPath` method can be called. This path will be different depending on your platform and/or user name. 
 
->>> us.getSettingsPath()
+>>> us.getSettingsPath() # doctest: +SKIP
 '/Users/ariza/.music21rc'
 
 Settings can be edited directly in the XML file or through the UserSettings object interface. The UserSettings object acts as a Python dictionary. To view the names of user-configurable parameters, call the keys() method.
 
->>> us.keys()
-['lilypondBackend', 'pdfPath', 'lilypondVersion', 'graphicsPath', 'warnings', 'showFormat', 'writeFormat', 'lilypondPath', 'directoryScratch', 'lilypondFormat', 'debug', 'musicxmlPath', 'autoDownload', 'midiPath']
+>>> sorted(us.keys())
+['autoDownload', 'debug', 'directoryScratch', 'graphicsPath', 'lilypondBackend', 'lilypondFormat', 'lilypondPath', 'lilypondVersion', 'localCorpusPath', 'localCorpusSettings', 'midiPath', 'musicxmlPath', 'pdfPath', 'showFormat', 'vectorPath', 'warnings', 'writeFormat']
 
 
 To set and write a preference, a key and value pair must be provided using Python dictionary-like syntax. For example, to set the Music21 scratch directory, the 'directoryScratch' key can be set to a file path of the user's choice. Changes are made immediately to the environment configuration file. To see the current setting, the value can be accesed by key.

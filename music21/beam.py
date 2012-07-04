@@ -11,10 +11,23 @@
 #-------------------------------------------------------------------------------
 
 '''
-Beam objects, added to :class:`~music21.note.Note` 
-and :class:`~music21.chord.Chord` objects `beam` list, 
-found on :attr:`~music21.note.Note.beams` and 
-:attr:`~music21.chord.Chord.beams` attributes. 
+The module defines Beam and Beams (note plural) objects.
+
+The Beams object holds multiple Beam objects (e.g., a 32nd note might
+have three Beam objects in its Beam object).
+
+The Beams object is stored in :class:`~music21.note.Note` 
+and :class:`~music21.chord.Chord` objects as their 
+:attr:`~music21.note.Note.beams` attributes.   Beams objects can
+largely be treated as a list.
+
+See `meter.TimeSignature`.:meth:`~music21.meter.TimeSignature.getBeams` for a way of getting
+beam information for a measure given the meter.  
+The `meter.TimeSignature`.:attr:`~music21.meter.TimeSignature.beamSequence`
+attribute holds information about how to beam given the TimeSignature
+
+Run `stream.Stream`.:meth:`~music21.stream.Stream.makeBeams` to set beaming information
+automatically given the current meter.
 
 '''
 

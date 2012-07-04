@@ -153,6 +153,7 @@ write documentation/test-code like this::
    >>> c2 = note.Note('C-')
    >>> c2.step
    'C'
+   
    '''
    
 and what you'll get in your documentation is:

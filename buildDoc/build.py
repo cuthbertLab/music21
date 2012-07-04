@@ -1637,7 +1637,7 @@ class Documentation(RestructuredWriter):
         self.dirRst = os.path.join(self.dir, 'rst')
         self.dirBuildHtml = os.path.join(self.dirBuild, 'html')
         #self.dirBuildLatex = os.path.join(self.dirBuild, 'latex')
-        #self.dirBuildPdf = os.path.join(self.dirBuild, 'pdf')
+        self.dirBuildPdf = os.path.join(self.dirBuild, 'pdf')
         self.dirBuildDoctrees = os.path.join(self.dir, 'doctrees')
 
         for fp in [self.dirBuild, self.dirBuildHtml, 

@@ -186,9 +186,13 @@ class JSONSerializer(object):
 
 
     def jsonComponentFactory(self, idStr):
-        '''Given a stored string during JSON serialization, return an object. This method effectively converts a string class specification into a vanilla instance ready for specialization via stored data attributes. 
+        '''
+        Given a stored string during JSON serialization, return an object. 
+        This method effectively converts a string class specification into 
+        a vanilla instance ready for specialization via stored data attributes. 
 
-        A subclass that overrides this method will have access to all modules necessary to create whatever objects necessary. 
+        A subclass that overrides this method will have access to all 
+        modules necessary to create whatever objects necessary. 
 
         '''
         # keep in alpha
@@ -255,7 +259,11 @@ class JSONSerializer(object):
     # core methods for getting and setting
 
     def _getJSONDict(self, includeVersion=False):
-        '''Return a dictionary representation for JSON processing. All component objects are similarly encoded as dictionaries. This method is recursively called as needed to store dictionaries of component objects that are :class:`~music21.base.JSONSerializer` subclasses.
+        '''
+        Return a dictionary representation for JSON processing. 
+        All component objects are similarly encoded as dictionaries. 
+        This method is recursively called as needed to store dictionaries 
+        of component objects that are :class:`~music21.base.JSONSerializer` subclasses.
 
         >>> from music21 import *
         >>> t = metadata.Text('my text')
@@ -319,7 +327,11 @@ class JSONSerializer(object):
 
 
     def _isComponent(self, target):
-        '''Return a boolean if the provided object is a dictionary that defines a __class__ key, the necessary conditions to try to instantiate a component object with the jsonComponentFactory method.
+        '''
+        Return a boolean if the provided object is a 
+        dictionary that defines a __class__ key, the necessary 
+        conditions to try to instantiate a component object 
+        with the jsonComponentFactory method.
         '''
         # on export, check for attribute
         if isinstance(target, dict) and '__class__' in target.keys():
@@ -334,7 +346,9 @@ class JSONSerializer(object):
         return obj
 
     def _setJSON(self, jsonStr):
-        '''Set this object based on a JSON string or instantiated dictionary representation.
+        '''
+        Set this object based on a JSON string 
+        or instantiated dictionary representation.
 
         >>> from music21 import *
         >>> t = metadata.Text('my text')

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         test.py
-# Purpose:      Controller for all tests in music21.
+# Purpose:      Controller for all module tests in music21.
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:  b  (c) 2009-2012 The music21 Project
+# Copyright:    (c) 2009-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 

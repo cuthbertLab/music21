@@ -2024,12 +2024,16 @@ class Stream(music21.Music21Object):
 #             self.flattenedRepresentationOf = post
 
     def setupSerializationScaffold(self, topLevel=True, streamIdsFound=None):
-        '''Prepare this stream and all of its contents for pickling, that
+        '''
+        Prepare this stream and all of its contents for pickle/pickling, that
         is, serializing and storing an object representation on file or as a string.
 
         The `topLevel` and `streamIdsFound` arguments are used to keep track of recursive calls. 
 
-        Note that this is a destructive process: elements contained within this Stream will have their sites cleared of all contents not in the hierarchy of the Streams. Thus, a deepcopy of the Stream may be necessary before calling this method. 
+        Note that this is a destructive process: elements contained within this Stream 
+        will have their sites cleared of all contents not in the hierarchy 
+        of the Streams. Thus, a deepcopy of the Stream may be necessary before 
+        calling this method. 
 
         >>> from music21 import *
 
@@ -2081,7 +2085,8 @@ class Stream(music21.Music21Object):
         self.freezeIds()
 
     def teardownSerializationScaffold(self):
-        '''After rebuilding this stream from pickled storage, prepare this as a normal Stream.
+        '''
+        After rebuilding this stream from pickled storage, prepare this as a normal Stream.
 
         >>> from music21 import *
 
@@ -5704,11 +5709,19 @@ class Stream(music21.Music21Object):
 
 
     def makeBeams(self, inPlace=True):
-        '''Return a new Measure, or Stream of Measures, with beams applied to all notes. Measures with Voices will process voices independently. 
+        '''
+        Return a new Measure, or Stream of Measures, with beams applied to all notes. 
+        Measures with Voices will process voices independently. 
 
-        In the process of making Beams, this method also updates tuplet types. This is destructive and thus changes an attribute of Durations in Notes.
+        In the process of making Beams, this method also updates tuplet types. 
+        This is destructive and thus changes an attribute of Durations in Notes.
+
+        Note that `makeBeams()` is automatically called in show('musicxml') and other formats
+        if there is no beaming information in the piece (see `haveBeamsBeenMade`)
 
         If `inPlace` is True, this is done in-place; if `inPlace` is False, this returns a modified deep copy.
+
+        See :meth:`~music21.meter.TimeSignature.getBeams` for the algorithm used.
 
         >>> from music21 import *
 
@@ -5719,9 +5732,17 @@ class Stream(music21.Music21Object):
         >>> aMeasure.repeatAppend(aNote,16)
         >>> bMeasure = aMeasure.makeBeams()
 
+        >>> for i in range(0, 4):
+        ...   print i, bMeasure.notes[i].beams
+        0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
+        1 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>
+        2 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>
+        3 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
+
         OMIT_FROM_DOCS
         TODO: inPlace=False does not work in many cases
         TODO: inPlace=True should return nothing
+        TODO: inPlace default should be False
         '''
 
         #environLocal.printDebug(['calling Stream.makeBeams()'])
@@ -5800,7 +5821,11 @@ class Stream(music21.Music21Object):
 
     def haveBeamsBeenMade(self):
         # could be called: hasAccidentalDisplayStatusSet
-        '''If any Note in this Stream has .beams defined, it as assumed that Beams have not been set and/or makeBeams has not been run. If any Beams exist, this method returns True, regardless of if makeBeams has actually been run.
+        '''
+        If any Note in this Stream has .beams defined, it as 
+        assumed that Beams have not been set and/or makeBeams 
+        has not been run. If any Beams exist, this method 
+        returns True, regardless of if makeBeams has actually been run.
         '''
         for n in self.flat.notes:
             if n.beams is not None and len(n.beams.beamsList) > 0:

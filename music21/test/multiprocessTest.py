@@ -3,10 +3,9 @@
 # Name:         multiprocesssTest.py
 # Purpose:      Controller for all tests in music21 run concurrently.
 #
-# Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+# Authors:      Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009-2012 The music21 Project
+# Copyright:    (c) 2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -18,7 +17,7 @@ import multiprocessing
 import time
 
 import unittest, doctest
-import os, imp, sys
+import os, sys
 import types
 
 import music21
@@ -117,41 +116,6 @@ class ModuleGather(object):
         fn = fn.replace('.py', '')
         return fn
      
-    def getModule(self, fp, restoreEnvironmentDefaults = False):
-        '''
-        gets one module object from the file path
-        '''
-        skip = False
-        for fnSkip in self.moduleSkip:
-            if fp.endswith(fnSkip):
-                skip = True
-                break
-        if skip:
-            return None
-        for dirSkip in self.pathSkip:
-            if dirSkip in fp:
-                skip = True  
-                break
-        if skip:
-            return None
-        name = self._getName(fp)
-        #print name, fp
-        #sys.stdout.flush()
-
-        try:
-            mod = imp.load_source(name, fp) 
-        except ImportError as impError:
-            environLocal.printDebug(['failed import:', fp, '\n', 
-                '\tEXCEPTION:', str(impError).strip()])
-            return None
-        except Exception as excp: # this takes all exceptions!
-            environLocal.printDebug(['failed import:', fp, '\n', 
-                '\tEXCEPTION:', str(excp).strip()])
-            return None
-        if restoreEnvironmentDefaults:
-            if hasattr(mod, 'environLocal'):
-                mod.environLocal.restoreDefaults()
-        return mod
 
     def getModuleWithoutImp(self, fp, restoreEnvironmentDefaults = False):
         '''
@@ -299,60 +263,6 @@ def runOneModuleWithoutImp(args):
         environLocal.printDebug('*** Large Exception in running %s: %s...\n' % (fp, excp))
         return ("LargeException", fp, str(excp))
 
-def runOneModule(args): 
-    modGath = args[0] # modGather object
-    fp = args[1]
-    verbosity = False
-    try:
-        moduleObject = modGath.getModule(fp)
-    except ImportError:
-        environLocal.printDebug('*** ImportError in running %s...\n' % (fp))
-        return ("Import Error", fp)
-    try:
-        environLocal.printDebug('running %s \n' % fp)
-        if moduleObject is None:
-            environLocal.printDebug('%s is skipped \n' % fp)
-            return ("Skipped", fp)
-        moduleName = modGath._getName(fp)
-        docTestOptions = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
-    
-        
-        s1 = doctest.DocTestSuite(optionflags=docTestOptions)
-    
-        
-        # get Test classes in moduleObject
-        if not hasattr(moduleObject, 'Test'):
-            environLocal.printDebug('%s has no Test class' % moduleObject)
-        else:
-            s1.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(moduleObject.Test))
-        try:
-            s3 = doctest.DocTestSuite(moduleObject, optionflags=docTestOptions)
-            s1.addTests(s3)
-        except ValueError:
-            environLocal.printDebug('%s cannot load Doctests' % moduleObject)
-            pass        
-        environLocal.printDebug('running Tests...\n')
-        runner = unittest.TextTestRunner(verbosity=verbosity)
-        try:
-            testResult = runner.run(s1)  
-            
-            # need to make testResult pickleable by removing the instancemethod parts...
-            trE = []
-            for e in testResult.errors:
-                trE.append(e[1])
-            trF = []
-            for f in testResult.failures:
-                trF.append(f[1])
-            testResult.errors = trE
-            testResult.failures = trF
-            return ("TestsRun", fp, moduleName, testResult)
-        except Exception as excp:
-            environLocal.printDebug('*** Exception in running %s: %s...\n' % (moduleName, excp))
-            return ("TrappedException", fp, moduleName, str(excp))
-    except Exception as excp:
-        environLocal.printDebug('*** Large Exception in running %s: %s...\n' % (fp, excp))
-        return ("LargeException", fp, str(excp))
-    
     
 def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
     '''Run all tests. Group can be test and external
