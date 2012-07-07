@@ -3169,8 +3169,8 @@ class Stream(music21.Music21Object):
     
         it is DEFINITELY a feature that this method does not
         find elements within substreams that have the same
-        absolute offset.  See lily.translate.fromScore() for how this is
-        useful.  For the other behavior, call Stream.flat first.
+        absolute offset.  See lily.translate for how this is
+        useful for finding voices.  For the other behavior, call Stream.flat first or Stream.recurse()
         
         '''
         offsetsRepresented = {} 
@@ -12279,21 +12279,30 @@ class Opus(Stream):
     #---------------------------------------------------------------------------
     def write(self, fmt=None, fp=None):
         '''
-        Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user's Environment.
+        Displays an object in a format provided by the fmt argument or, if not provided, the 
+        format set in the user's Environment.
 
-        This method overrides the behavior specified in :class:`~music21.base.Music21Object`.
+        This method overrides the behavior specified in :class:`~music21.base.Music21Object` for all
+        formats besides explicit lily.x calls.
         '''
-        for s in self.scores:
-            s.write(fmt=fmt, fp=fp)
+        if fmt is not None and 'lily' in fmt:
+            Stream.write(self, fmt, fp)
+        else:
+            for s in self.scores:
+                s.write(fmt=fmt, fp=fp)
 
     def show(self, fmt=None, app=None):
         '''
         Displays an object in a format provided by the fmt argument or, if not provided, the format set in the user's Environment.
 
-        This method overrides the behavior specified in :class:`~music21.base.Music21Object`.
+        This method overrides the behavior specified in :class:`~music21.base.Music21Object` for all
+        formats besides explicit lily.x calls.
         '''
-        for s in self.scores:
-            s.show(fmt=fmt, app=app)
+        if fmt is not None and 'lily' in fmt:
+            Stream.show(self, fmt, app)
+        else:
+            for s in self.scores:
+                s.show(fmt=fmt, app=app)
 
 
 

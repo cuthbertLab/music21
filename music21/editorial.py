@@ -13,6 +13,7 @@
 '''Editorial objects store comments and other meta-data associated with specific :class:`~music21.note.Note` objects or other music21 objects. 
 '''
 
+from __future__ import unicode_literals
 
 import doctest, unittest
 import music21
@@ -146,12 +147,12 @@ class NoteEditorial(music21.JSONSerializer):
         >>> from music21 import *
         >>> n = note.Note()
         >>> n.editorial.lilyStart()   
-        ''
+        u''
         >>> n.editorial.ficta = pitch.Accidental("Sharp")
         >>> n.editorial.color = "blue"
         >>> n.editorial.hidden = True
-        >>> n.editorial.lilyStart()
-        u'\\ficta \\color "blue" \\hideNotes '
+        >>> print n.editorial.lilyStart()
+        \ficta \color "blue" \hideNotes
         
         '''
         baseRet = ""
@@ -160,20 +161,21 @@ class NoteEditorial(music21.JSONSerializer):
         if self.color:
             baseRet += self.colorLilyStart()
         if self.hidden is True:
-            baseRet += "\\hideNotes "
+            baseRet += r"\hideNotes "
             
         return baseRet
 
     def fictaLilyStart(self):
         r''' 
-        returns \\ficta -- called out so it is more easily subclassed'''
-        return "\\ficta "
+        returns \ficta -- called out so it is more easily subclassed
+        '''
+        return r"\ficta "
 
     def colorLilyStart(self):
         r'''
-        returns \\color "theColorName" -- called out so it is more easily subclassed
+        returns \color "theColorName" -- called out so it is more easily subclassed
         '''
-        return u"\\color \"" + self.color + "\" "
+        return r'\color "' + self.color + '" '
 
     def lilyAttached(self):
         r'''returns any information that should be attached under the note,
@@ -208,7 +210,7 @@ class Comment(music21.JSONSerializer):
     >>> n.editorial.comment.text = "hello"
     >>> n.editorial.comment.position = "above"
     >>> n.editorial.comment.lily
-    '^"hello"'
+    u'^"hello"'
     
     '''
     def __init__(self):

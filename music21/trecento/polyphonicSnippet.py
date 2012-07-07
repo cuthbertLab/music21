@@ -329,7 +329,7 @@ class FrontPaddedSnippet(PolyphonicSnippet):
             for i in range(0, shortMeasures):
                 newRest = note.Rest()
                 newRest.duration = copy.deepcopy(shortDuration)    
-                newRest.transparent = 1
+                newRest.transparent = True
                 if hasMeasures:
                     m = stream.Measure()
                     m.number = 1 + i
@@ -338,9 +338,9 @@ class FrontPaddedSnippet(PolyphonicSnippet):
                 else:
                     thisStream.insert(shortDuration.quarterLength * i, newRest)                
                 if i == 0:
-                    newRest.startTransparency = 1
+                    newRest.startTransparency = True
                 elif i == (shortMeasures - 1):
-                    newRest.stopTransparency = 1
+                    newRest.stopTransparency = True
 
             if hasMeasures:
                 newFirstM = thisStream.getElementsByClass('Measure')[0]

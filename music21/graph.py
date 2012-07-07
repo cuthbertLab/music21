@@ -253,7 +253,7 @@ class Graph(object):
         except NameError:
             raise GraphException('could not find matplotlib, graphing is not allowed')
         self.data = None
-        # define a component dictionary for each axist
+        # define a component dictionary for each axis
         self.axis = {}
         self.axisKeys = ['x', 'y']
         self.grid = True
@@ -379,7 +379,14 @@ class Graph(object):
             raise GraphException('not such done action: %s' % action)
 
     def setTicks(self, axisKey, pairs):
-        '''pairs are positions and labels
+        '''
+        Set the tick-labels for a given graph or plot's axisKey
+        (generally 'x', and 'y') with a set of pairs
+        
+        Pairs are tuples of positions and labels.
+
+        N.B. -- both 'x' and 'y' ticks have to be set in
+        order to get matplotlib to display either...
         '''
         if pairs != None:
             positions = []
@@ -391,16 +398,47 @@ class Graph(object):
             #environLocal.printDebug(['got labels', labels])
             self.axis[axisKey]['ticks'] = positions, labels
 
-    def setAxisRange(self, axisKey, valueRange, pad=.1):
+    def setIntegerTicksFromData(self, unsortedData, axisKey = 'y', dataSteps = 8):
+        '''
+        Set the ticks for an axis (usually 'y') given the data
+        '''
+        maxData = max(unsortedData)
+        yTicks = []
+        yTickStep = int(round(maxData / (dataSteps+0.0)))
+        if yTickStep <= 1:
+            yTickStep = 2
+        for y in range(0, maxData + 1, yTickStep):
+            yTicks.append([y, '%s' % y])
+        yTicks.sort()
+        positions = []
+        labels = []
+
+        for value, label in yTicks:
+            positions.append(value)
+            labels.append(label)
+
+        self.axis[axisKey]['ticks'] = positions, labels
+        
+
+    def setAxisRange(self, axisKey, valueRange, paddingFraction =.1):
+        '''
+        Set the range for the axis for a given axis key
+        (generally, 'x', or 'y')
+        
+        ValueRange is a two-element tuple of the lowest
+        number and the highest.
+        
+        By default there is a padding of 10% of the range
+        in either direction.  Set paddingFraction = 0 to
+        eliminate this shift
+        '''
+        
         if axisKey not in self.axisKeys:
             raise GraphException('No such axis exists: %s' % axisKey)
         # find a shift
-        if pad != False:
+        if paddingFraction != 0:
             range = valueRange[1] - valueRange[0]
-            if pad is not False: # use a default
-                shift = range * pad # add 10 percent of range
-            else:
-                shift = pad # alternatively, provide a value directly
+            shift = range * paddingFraction # add 10 percent of range
         else:
             shift = 0
         # set range with shift
@@ -953,7 +991,7 @@ class GraphHorizontalBar(Graph):
         #environLocal.printDebug(['got xMin, xMax for points', xMin, xMax, ])
 
         self.setAxisRange('y', (0, len(keys) * self._barSpace))
-        self.setAxisRange('x', (xMin, xMax), pad=True)
+        self.setAxisRange('x', (xMin, xMax))
         self.setTicks('y', yTicks)  
 
         # first, see if ticks have been set externally
@@ -1085,8 +1123,8 @@ class GraphHorizontalBarWeighted(Graph):
 
         # NOTE: these pad values determine extra space inside the graph that
         # is not filled with data, a sort of inner margin
-        self.setAxisRange('y', (0, len(keys) * self._barSpace), pad=.05)
-        self.setAxisRange('x', (xMin, xMax), pad=.01)
+        self.setAxisRange('y', (0, len(keys) * self._barSpace), paddingFraction=.05)
+        self.setAxisRange('x', (xMin, xMax), paddingFraction=.01)
         self.setTicks('y', yTicks)  
 
         # first, see if ticks have been set externally
@@ -1215,8 +1253,8 @@ class GraphScatterWeighted(Graph):
                         "%s" % zList[i], size=6,
                         va="baseline", ha="left", multialignment="left")
 
-        self.setAxisRange('y', (yMin, yMax), pad=True)
-        self.setAxisRange('x', (xMin, xMax), pad=True)
+        self.setAxisRange('y', (yMin, yMax),)
+        self.setAxisRange('x', (xMin, xMax),)
 
         self._adjustAxisSpines(ax)
         self._applyFormatting(ax)
@@ -1281,8 +1319,8 @@ class GraphScatter(Graph):
             ax.plot(x, y, figureType, color=color, alpha=self.alpha)
             i += 1
         # values are sorted, so no need to use max/min
-        self.setAxisRange('y', (yValues[0], yValues[-1]), pad=True)
-        self.setAxisRange('x', (xValues[0], xValues[-1]), pad=True)
+        self.setAxisRange('y', (yValues[0], yValues[-1]))
+        self.setAxisRange('x', (xValues[0], xValues[-1]))
 
         self._adjustAxisSpines(ax)
         self._applyFormatting(ax)
@@ -2467,7 +2505,10 @@ class PlotWindowedAmbitus(PlotWindowedAnalysis):
 # histograms
 
 class PlotHistogram(PlotStream):
-    '''Base class for Stream plotting classes.
+    '''
+    Base class for Stream plotting classes.
+
+    Plots take a Stream as their arguments, Graphs take any data.
 
     '''
     format = 'histogram'
@@ -2632,6 +2673,8 @@ class PlotHistogramPitchClass(PlotHistogram):
             self.graph.setFigureSize([6,6])
         if 'title' not in keywords:
             self.graph.setTitle('Pitch Class Histogram')
+
+
 
 
 class PlotHistogramQuarterLength(PlotHistogram):

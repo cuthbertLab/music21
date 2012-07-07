@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ["translate", "lilyString", "test"]
+__all__ = ["translate", "lilyObjects"]
 
 import translate
-import lilyString
-import test
+import lilyObjects
 #------------------------------------------------------------------------------
 # eof
 

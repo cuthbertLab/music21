@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    (c) 2007-2011 The music21 Project
+# Copyright:    (c) 2007-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
@@ -32,7 +32,6 @@ from re import match
 from music21.note import Note
 from music21 import interval
 from music21.trecento import cadencebook
-from music21 import lily
 from music21.trecento import capua
 from music21.trecento import polyphonicSnippet
 from music21.common import DefaultHash
@@ -93,13 +92,14 @@ class TonalityCounter(object):
         self.streamName = streamName
         self.cadenceName = cadenceName
         self.output = ""
-        self.displayLily = ""
+        self.displayStream = None
         self.storedDict = None
     
     def run(self):
-        allLily = lily.lilyString.LilyString()
+        from music21 import stream
         output = ""
         streamName = self.streamName
+        allScores = stream.Opus()
         
         myDict = ph({'A': ph(), 'B': ph(), 'C': ph(), 'D': ph(), 'E': ph(), 'F': ph(), 'G': ph()})
         for thisWork in self.worksList:
@@ -139,9 +139,8 @@ class TonalityCounter(object):
     
             myDict[firstNote.step][cadenceNote.step] += 1
             if firstNote.step == cadenceNote.step:
-                #FIX!!! allLily += incip.lily
-                #FIX!!! allLily += cadence.lily
-                pass
+                allScores.insert(0, incip)
+                allScores.insert(0, cadence)
             output += "%30s %4s %4s\n" % (thisWork.title[0:30], firstNote.name, cadenceNote.name)
 
         bigTotalSame = 0
@@ -161,7 +160,7 @@ class TonalityCounter(object):
         output += "Total Same %4d %3.1f%%\n" % (bigTotalSame, (bigTotalSame * 100.0)/(bigTotalSame + bigTotalDiff))
         output += "Total Diff %4d %3.1f%%\n" % (bigTotalDiff, (bigTotalDiff * 100.0)/(bigTotalSame + bigTotalDiff))
         self.storedDict = myDict
-        self.displayLily = allLily
+        self.displayStream = allScores
         self.output = output
 
 def landiniTonality(show = True):
@@ -306,7 +305,7 @@ def anonBallataTonality(show = True):
         print(tCounter.output)
         print("Generating Lilypond PNG of all pieces where the first note of the tenor is the same pitchclass as the last note of Cadence A")
         print("It might take a while, esp. on the first Lilypond run...")
-        #tCounter.displayLily.showPNG()
+        tCounter.displayStream.show('lily.png')
 
 def sacredTonality(show = True):
     '''
@@ -335,7 +334,7 @@ def sacredTonality(show = True):
     tCounter.run()
     if show is True:
         print(tCounter.output)
-        #tCounter.displayLily.showPNG()
+        tCounter.displayStream.show('lily.png')
 
 def testAll(show = True, fast = False):
         sacredTonality(show)

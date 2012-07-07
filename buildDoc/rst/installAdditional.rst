@@ -43,8 +43,9 @@ The paradox is that if you are using 64-bit windows but 32-bit Python
 http://www.lfd.uci.edu/~gohlke/pythonlibs/
 
 
-PIL has been a particular problem on the Mac over the past few years.
-If it's particularly important to you
+PIL (which is only used in audiosearch and to make slightly better PNGs from
+Lilypond) has been a particular problem on the Mac over the past few years.
+If it's really important to you
 Mac Users may to download MacPorts from
 http://www.macports.org/install.php .  After installing, 
 open up a terminal and type:
@@ -77,9 +78,14 @@ http://www.lfd.uci.edu/~gohlke/pythonlibs/
 
 pyaudio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Allows for recording within python.  
+Allows for recording within python.  We use it for the audioSearch module, and nowhere else.
+Not essential.
 
 
+pygame
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Allows for realtime MIDI performance.  We use it in the midi.realtime module, and nowhere else
+Not essential.
 
 
 

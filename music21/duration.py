@@ -2035,13 +2035,14 @@ class Duration(DurationCommon):
         if 'quarterLength' in keywords:
             self.quarterLength = keywords['quarterLength']
 
-        # linkages are a list of things used to connect durations.  
-        # If undefined, Ties are used.  Other sorts of things could be 
+        # linkage specifies the thing used to connect durations.  
+        # If undefined, nothing is used.  "tie" is the most common linkage
+        # Other sorts of things could be 
         # dotted-ties, arrows, none, etc. As of Sep. 2008 -- not used.
-        if "linkages" in keywords:
-            self.linkages = keywords["linkages"]
+        if "linkage" in keywords:
+            self.linkage = keywords["linkages"]
         else:
-            self.linkages = []
+            self.linkage = None
         
     def __repr__(self):
         '''Provide a representation.

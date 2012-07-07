@@ -110,7 +110,7 @@ class TestExternal(unittest.TestCase):
         st.show()
     
 if __name__ == "__main__":
-    music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof

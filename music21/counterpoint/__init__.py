@@ -1,6 +1,6 @@
-__all__ = ["counterpoint"]
+__all__ = ["species"]
 
-import counterpoint
+import species
 #------------------------------------------------------------------------------
 # eof
 

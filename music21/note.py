@@ -600,6 +600,7 @@ class NotRest(GeneralNote):
         self._noteheadParen = False
         self._stemDirection = 'unspecified'
         self._volume = None # created on demand
+        self.duration.linkage = 'tie'
 
     def jsonAttributes(self):
         '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
@@ -1587,16 +1588,20 @@ class Test(unittest.TestCase):
         self.assertEqual(note1.duration.componentIndexAtQtrPosition(4.5), 1)
         note1.duration.sliceComponentAtPosition(1.0)
         
-        matchStr = u"c'4~ c'2.~ c'4"
+        matchStr = "c'4~\nc'2.~\nc'4"
         from music21.lily.translate import LilypondConverter
         conv = LilypondConverter()
-        outStr = conv.fromObject(note1)
-        
-        self.assertEqual(outStr, matchStr)
+        conv.appendM21ObjectToContext(note1)
+        outStr = str(conv.context).replace(' ', '').strip()
+        #print outStr
+        self.assertEqual(matchStr, outStr)
         i = 0
         for thisNote in (note1.splitAtDurations()):
-            matchSub = matchStr.split(' ')[i]
-            self.assertEqual(conv.fromObject(thisNote), matchSub)
+            matchSub = matchStr.split('\n')[i]
+            conv = LilypondConverter()
+            conv.appendM21ObjectToContext(thisNote)
+            outStr = str(conv.context).replace(' ', '').strip()
+            self.assertEqual(matchSub, outStr)
             i += 1
        
 

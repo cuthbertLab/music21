@@ -470,6 +470,11 @@ class _EnvironmentCore(object):
             return self._ref['directoryScratch']
 
     def getTempFile(self, suffix=''):
+        '''
+        gets a temporary file with a suffix that will work for a bit.
+        note that the file is closed after finding, so some older versions
+        of python/OSes, etc. will immediately delete the file.
+        '''
         # get the root dir, which may be the user-specified dir
         rootDir = self.getRootTempDir()
 

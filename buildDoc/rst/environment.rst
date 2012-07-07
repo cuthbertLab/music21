@@ -11,7 +11,7 @@ configure and customize settings.  These settings will be saved
 so that the next time the user starts Python, the settings will still
 work.
 
-Environment configuration is particularly useful for setting default third-party applications (necessary for handling Music21 output in different media formats such as MusicXML, lilypond, and graphics files) and for setting a default scratch directory (for writing output without providing explitic file paths).
+Environment configuration is particularly useful for setting default third-party applications (necessary for handling Music21 output in different media formats such as MusicXML, Lilypond, and graphics files) and for setting a default scratch directory (for writing output without providing explitic file paths).
 
 Environment configuration can be handled with two objects. The :class:`~music21.environment.Environment` object provides lower-level access and control, as well as a numerous utiity methods for music21 modules. The :class:`~music21.environment.UserSettings` object is a convenience class for users to quickly set and check settings, and is reccommended for general usage. For complete information on the Environment and UserSettings objects, see :mod:`~music21.environment`.
 
