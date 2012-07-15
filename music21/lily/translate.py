@@ -204,8 +204,11 @@ class LilypondConverter(object):
             self.loadObjectFromScore(m21ObjectIn, makeNotation = False)
         elif 'Opus' in c:
             self.loadObjectFromOpus(m21ObjectIn, makeNotation = False)
-        else:
-            raise LilyTranslateException("Unknown stream type %s." % (m21objectIn.__class__))
+        else: # treat as part...
+            scoreObj = stream.Score()
+            scoreObj.insert(0, m21ObjectIn)
+            self.loadObjectFromScore(scoreObj, makeNotation = False)
+            #raise LilyTranslateException("Unknown stream type %s." % (m21ObjectIn.__class__))
             
     
     def loadObjectFromOpus(self, opusIn = None, makeNotation = True):
