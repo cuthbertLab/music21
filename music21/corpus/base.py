@@ -11,9 +11,9 @@
 #-------------------------------------------------------------------------------
 
 '''
-The music21 corpus provides a collection of freely distributable 
+The music21 corpus includes a collection of freely distributable 
 music in MusicXML, Humdrum, and other representations. The corpus 
-package provides an interface to this data.
+package is an interface for easily working with this data.
 
 To see a complete listing of the works in the music21 corpus, 
 visit  :ref:`referenceCorpus`.  Note that music21 does not own
@@ -771,8 +771,11 @@ def parse(workName, movementNumber=None, number=None,
     '''
     The most important method call for corpus.
     
-    Similar to converer.parse(), the method searches the corpus (including the virtual corpus)
-    for a work fitting the workName description and returns a :class:`music21.stream.Stream`.
+    Similar to the :meth:`~music21.converter.parse` method of converter (which takes in
+    a filepath on the local hard drive), this 
+    method searches the corpus (including the virtual corpus)
+    for a work fitting the workName description and 
+    returns a :class:`music21.stream.Stream`.
 
     If `movementNumber` is defined, and a movement is included in the corpus, that movement will be returned. 
 
@@ -791,14 +794,10 @@ def parse(workName, movementNumber=None, number=None,
     >>> len(bachChorale.parts)
     4
     
-    OMIT_FROM_DOCS
+    After parsing, the file path within the corpus is stored as `.corpusFilePath`
     
     >>> bachChorale.corpusFilepath
     'bach/bwv66.6.mxl'
-    
-    >>> s = corpus.parse('trecento/PMFC_13_05-Gloria Rosetta.mxl')
-    >>> s.corpusFilepath
-    'trecento/PMFC_13_05-Gloria Rosetta.mxl'
     '''
     if workName in [None, '']:
         raise CorpusException('a work name must be provided as an argument')

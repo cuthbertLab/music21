@@ -1542,7 +1542,13 @@ class MeterSequence(MeterTerminal):
         else:
             if not common.isNum(value):
                 raise MeterException('weight values must be numbers')
-            totalRatio = self._numerator / float(self._denominator)
+            try:
+                totalRatio = self._numerator / float(self._denominator)
+            except TypeError:
+                raise MeterException("Something wrong with the type of this numerator %s %s or this denominator %s %s" % 
+                                     (self._numerator, type(self._numerator),
+                                      self._denominator, type(self._denominator)))
+                
             for mt in self._partition:
             #for mt in self:
                 partRatio = mt._numerator / float(mt._denominator)

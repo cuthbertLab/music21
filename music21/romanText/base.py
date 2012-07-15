@@ -1022,9 +1022,29 @@ class RTFile(object):
         pass
 
     def open(self, filename): 
-        '''Open a file for reading
         '''
-        self.file = codecs.open(filename, encoding='utf-8')
+        Open a file for reading, trying a variety of codecs and then
+        trying them again with an ignore if it is not possible.
+        '''
+        self.file = None
+        for encoding in ('utf-8', 'macintosh', 'latin-1', 'utf-16'):
+            try:
+                self.file = codecs.open(filename, encoding=encoding)
+                if self.file is not None:
+                    break
+            except UnicodeDecodeError:
+                pass
+        if self.file is None:
+            for encoding in ('utf-8', 'macintosh', 'latin-1', 'utf-16', None):
+                try:
+                    self.file = codecs.open(filename, encoding=encoding, errors='ignore')
+                    if self.file is not None:
+                        break
+                except UnicodeDecodeError:
+                    pass
+            if self.file is None:
+                raise RomanTextException("Cannot parse file %s, possibly a broken codec?" % filename)
+                    
         self.filename = filename
 
     def openFileLike(self, fileLike):

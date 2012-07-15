@@ -1480,7 +1480,7 @@ def chordSymbolToMx(cs):
 
     # can assign None to these if None
     mxHarmony.set('inversion', cs.XMLinversion)
-    if cs.romanNumeral is not None:
+    if cs._roman is not None:
         mxHarmony.set('function', cs.romanNumeral.figure)
 
     if cs.XMLroot is not None:        

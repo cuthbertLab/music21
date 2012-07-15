@@ -965,7 +965,7 @@ class Converter(object):
             # presently, all text files are treated as roman text
             # may need to handle various text formats
             self._converter = ConverterRomanText()
-        elif format.lower() in ['romantext']:
+        elif format.lower() in ['romantext', 'rntxt']:
             self._converter = ConverterRomanText()
         else:
             raise ConverterException('no such format: %s' % format)
@@ -1013,15 +1013,20 @@ class Converter(object):
         # get from data in string if not specified        
         if format is None: # its a string
             dataStr = dataStr.lstrip()
-            if dataStr.startswith('<?xml') or dataStr.startswith('musicxml:'):
+            format, dataStr = self.formatFromHeader(dataStr)
+
+            if format is not None:
+                pass  
+            elif dataStr.startswith('<?xml') or dataStr.startswith('musicxml:'):
                 format = 'musicxml'
             elif dataStr.startswith('MThd') or dataStr.startswith('midi:'):
                 format = 'midi'
             elif dataStr.startswith('!!!') or dataStr.startswith('**') or dataStr.startswith('humdrum:'):
                 format = 'humdrum'
-            elif dataStr.startswith('tinynotation:'):
+            elif dataStr.lower().startswith('tinynotation:'):
                 format = 'tinyNotation'
-            # assume must define a meter and a key
+            
+            # assume MuseData must define a meter and a key
             elif 'WK#:' in dataStr and 'measure' in dataStr:
                 format = 'musedata'
             elif 'M:' in dataStr and 'K:' in dataStr:
@@ -1100,6 +1105,39 @@ class Converter(object):
         self._converter.parseFile(fp, number=number)
 
 
+    validHeaderFormats = ['musicxml', 'midi', 'humdrum', 'tinyNotation', 'musedata', 'abc', 'romanText']
+
+    def formatFromHeader(self, dataStr):
+        '''
+        if dataStr begins with a text header such as  "tinyNotation:" then
+        return that format plus the dataStr with the head removed.
+        
+        Else, return (None, dataStr) where dataStr is the original untouched.
+        
+        Not case sensitive.
+        
+        >>> from music21 import *
+        >>> c = converter.Converter()
+        >>> c.formatFromHeader('tinynotation: C4 E2')
+        ('tinyNotation', 'C4 E2')
+        
+        >>> c.formatFromHeader('C4 E2')
+        (None, 'C4 E2')
+        '''
+        
+        dataStrStartLower = dataStr[:20].lower()
+            
+        format = None
+        for possibleFormat in self.validHeaderFormats:
+            if dataStrStartLower.startswith(possibleFormat.lower() + ':'):
+                format = possibleFormat
+                dataStr = dataStr[len(format) + 1:]
+                dataStr = dataStr.lstrip()
+                break
+        return (format, dataStr)
+            
+
+
     #---------------------------------------------------------------------------
     # properties
 
@@ -1171,7 +1209,7 @@ def parse(value, *args, **keywords):
 
 
     >>> from music21 import *
-    >>> s = converter.parse(["E4 r f# g=lastG trip{b-8 a g} c", "3/4"])
+    >>> s = converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c")
     >>> s.getElementsByClass(meter.TimeSignature)[0]
     <music21.meter.TimeSignature 3/4>
     
@@ -1212,6 +1250,7 @@ def parse(value, *args, **keywords):
         return parseFile(value[0], format=format)
     elif (common.isListLike(value) and len(value) == 2 and 
         isinstance(value[1], int) and os.path.exists(value[0])):
+        # corpus or other file with movement number
         return parseFile(value[0], format=format).getScoreByNumber(value[1])
     elif common.isListLike(value) or len(args) > 0: # tiny notation list
         if len(args) > 0: # add additional args to a list

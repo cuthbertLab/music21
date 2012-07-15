@@ -426,13 +426,15 @@ class RomanNumeral(harmony.Harmony):
     
     
     >>> neapolitan = roman.RomanNumeral('N6', 'c#') # could also use "bII6"
+    >>> neapolitan.key
+    <music21.key.Key of c# minor>
+
     >>> neapolitan.isMajorTriad()
     True
     >>> neapolitan.scaleDegreeWithAlteration
     (2, <accidental flat>)
     >>> neapolitan.pitches  # default octaves
     [F#4, A4, D5]
-
 
     >>> neapolitan2 = roman.RomanNumeral('bII6', 'g#') 
     >>> neapolitan2.pitches
@@ -1138,7 +1140,18 @@ class RomanNumeral(harmony.Harmony):
         return bassSD
 
     def _getFunctionalityScore(self):
-        '''
+        if self._functionalityScore is not None:
+            return self._functionalityScore
+        try:
+            score = functionalityScores[self.figure]
+        except KeyError:
+            score = 0
+        return score
+    
+    def _setFunctionalityScore(self, value):
+        self._functionalityScore = value
+    
+    functionalityScore = property(_getFunctionalityScore, _setFunctionalityScore, doc='''
         Return or set a number from 1 to 100 representing the relative functionality of this RN.figure
         (possibly given the mode, etc.)
         
@@ -1156,20 +1169,7 @@ class RomanNumeral(harmony.Harmony):
         >>> rn2.functionalityScore = 99
         >>> rn2.functionalityScore
         99
-        
-        '''
-        if self._functionalityScore is not None:
-            return self._functionalityScore
-        try:
-            score = functionalityScores[self.figure]
-        except KeyError:
-            score = 0
-        return score
-    
-    def _setFunctionalityScore(self, value):
-        self._functionalityScore = value
-    
-    functionalityScore = property(_getFunctionalityScore, _setFunctionalityScore)
+        ''')
 
 def identifyAsTonicOrDominant(inChord, inKey):
     '''

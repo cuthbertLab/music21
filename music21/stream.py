@@ -1556,9 +1556,12 @@ class Stream(music21.Music21Object):
             # back into a list for list processing if single
             others = [others]
         updateIsFlat = False
-        for e in others:    
-            if e.isStream: # any on that is a Stream req update
-                updateIsFlat = True
+        for e in others:
+            try:
+                if e.isStream: # any on that is a Stream req update
+                    updateIsFlat = True
+            except AttributeError:
+                raise StreamException("The object you tried to add to the Stream, %r, is not a Music21Object.  Use an ElementWrapper object if this is what you intend" % e)
             self._addElementPreProcess(e)
             # add this Stream as a location for the new elements, with the 
             # the offset set to the current highestTime
@@ -3348,7 +3351,7 @@ class Stream(music21.Music21Object):
         # manipulate startMeasure to add desired context objects
         for className in collect:
             # first, see if it is in this Measure
-            if startMeasure.hasElementOfClass(className):
+            if startMeasure is None or startMeasure.hasElementOfClass(className):
                 continue
 
             # placing missing objects in outer container, not Measure
@@ -3398,6 +3401,14 @@ class Stream(music21.Music21Object):
         >>> a = corpus.parse('bach/bwv324.xml')
         >>> a.parts[0].measure(3)
         <music21.stream.Measure 3 offset=0.0>
+
+
+        OMIT_FROM_DOCS
+        
+        Getting a non-existent measure should return None, but it doesnt!
+        
+        #>>> print a.measure(0)
+        #None
         '''
         # we must be able to obtain a measure from this (not a flat) 
         # representation (e.g., this is a Stream or Part, not a Score)

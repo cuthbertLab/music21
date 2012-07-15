@@ -11,17 +11,8 @@
 #-------------------------------------------------------------------------------
 
 '''
-The music21 corpus provides a collection of freely distributable 
-music in MusicXML, Humdrum, and other representations. The corpus 
-package provides an interface to this data.
-
-To see a complete listing of the works in the music21 corpus, 
-visit  :ref:`referenceCorpus`.  Note that music21 does not own
-most of the music in the corpus -- it has been licensed to us (or
-in a free license).  It may not be free in all parts of the world,
-but to the best of our knowledge is true for the US.
-
-This file provides access to Bach's chorales and includes the Iterator()
+This file makes it easier to access Bach's chorales through various
+numbering schemes and filters and includes the Iterator()
 class for easily iterating through the chorale collection.
 '''
 
@@ -934,7 +925,7 @@ class Iterator(object):
     BachChoraleIterator(1,26,'riemenschneider') iterates through the riemenschneider numbered chorales from 1 to 26.
     Additionally, the following kwargs can be set:
     
-    returnType = either 'stream' or 'filename'
+    returnType = either 'stream' (default) or 'filename'
     
     iterationType = either 'number' or 'index'
     
@@ -987,7 +978,7 @@ class Iterator(object):
     bach/bwv358
     bach/bwv83.5
     
-    Finally, the numberList, which by default includes all chorales in the chosen numberingSystem,
+    The numberList, which by default includes all chorales in the chosen numberingSystem,
     can be set like the titleList. In the following example, note that the first chorale in the given
     numberList will not be part of the iteration because the first currentNumber is set to 2 at the 
     start by the first argument. (If iterationType = 'index' setting the currentNumber to 1 and the
@@ -1004,6 +995,12 @@ class Iterator(object):
     bach/bwv281
     bach/bwv337
     bach/bwv278
+    
+    
+    For the first 20 chorales in the Riemenschneider numbering system, there are professionally
+    annotated roman numeral analyses in romanText format, courtesy of Dmitri Tymoczko of Princeton
+    University.  To get them as an additional part to the score set returnType to "stream", and
+    add a keyword "analysis = True":
     
     '''
     _DOC_ORDER = ['numberingSystem', 'currentNumber', 'highestNumber', 'titleList', 'numberList', 'returnType', 'iterationType']
@@ -1028,6 +1025,7 @@ class Iterator(object):
         self._numberingSystem = None
         self._returnType = 'stream'
         self._iterationType = 'number'
+        self.analysis = False
         
         self._choraleList1 = ChoraleList() #For budapest, baerenreiter
         self._choraleList2 = ChoraleListRKBWV() #for kalmus, riemenschneider, title, and bwv
@@ -1043,6 +1041,8 @@ class Iterator(object):
                 self.titleList = kwargs[key]
             elif key is 'iterationType':
                 self.iterationType = kwargs[key]
+            elif key is 'analysis':
+                self.analysis = kwargs[key]
         
         #These assignements must come after .iterationType
 
@@ -1177,6 +1177,14 @@ class Iterator(object):
         
         if self._returnType is 'stream':
             chorale = base.parse(filename)
+            if self.numberingSystem is 'riemenschneider' and self.analysis == True:
+                try:
+                    riemenschneiderName = 'bach/choraleAnalyses/riemenschneider%03d.rntxt' % (self._currentIndex + 1)
+                    analysis = base.parse(riemenschneiderName)
+                    if analysis is not None:
+                        chorale.insert(0, analysis.parts[0])
+                except: # fail silently
+                    pass
             return chorale
         elif self._returnType is 'filename':
             return filename
@@ -1546,5 +1554,16 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+class TestExternal(unittest.TestCase):
+
+    def runTest(self):
+        pass
+
+    def testGetRiemenschneider1(self):
+        from music21 import corpus
+        for chorale in corpus.chorales.Iterator(1, 2, numberingSystem = 'riemenschneider', analysis=True):
+            chorale.show()
+
+
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    music21.mainTest(TestExternal)

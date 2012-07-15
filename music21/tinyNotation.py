@@ -93,7 +93,7 @@ class TinyNotationStream(stream.Stream):
     Example in 3/4:
     
     >>> from music21 import *
-    >>> stream1 = tinyNotation.TinyNotationStream("E4 r f# g=lastG trip{b-8 a g} c4~ c", "3/4")
+    >>> stream1 = tinyNotation.TinyNotationStream("3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
     >>> stream1.show('text')
     {0.0} <music21.meter.TimeSignature 3/4>
     {0.0} <music21.note.Note E>
@@ -121,6 +121,7 @@ class TinyNotationStream(stream.Stream):
     TRIP    = compile('trip\{')
     QUAD    = compile('quad\{')
     ENDBRAC = compile('\}')
+    TIMESIG = compile('(\d+\/\d+)')
     
     def __init__(self, stringRep = "", timeSignature = None):
         stream.Stream.__init__(self)
@@ -137,30 +138,43 @@ class TinyNotationStream(stream.Stream):
             barDuration = timeSignature.barDuration
 
         noteList = []
-        dict1 = { 'inTrip': False,
-                  'inQuad': False,
-                  'beginTuplet': False,
-                  'endTuplet': False,
-                  'lastDuration': None, 
-                  'barDuration': barDuration,
-                  'lastNoteTied': False, }
+        if timeSignature is not None and hasattr(timeSignature, "barDuration"):
+            noteList.append(timeSignature)
+
+        
+        parseStatus = { 
+                        'inTrip': False,
+                        'inQuad': False,
+                        'beginTuplet': False,
+                        'endTuplet': False,
+                        'lastDuration': None, 
+                        'barDuration': barDuration,
+                        'lastNoteTied': False, }
 
         for thisNoteStr in noteStrs:
             if self.TRIP.match(thisNoteStr):
                 thisNoteStr = self.TRIP.sub('', thisNoteStr)
-                dict1['inTrip'] = True
-                dict1['beginTuplet'] = True
+                parseStatus['inTrip'] = True
+                parseStatus['beginTuplet'] = True
             elif self.QUAD.match(thisNoteStr):
                 thisNoteStr = self.QUAD.sub('', thisNoteStr)
-                dict1['inQuad'] = True
-                dict1['beginTuplet'] = True
+                parseStatus['inQuad'] = True
+                parseStatus['beginTuplet'] = True
             elif self.ENDBRAC.search(thisNoteStr):
                 thisNoteStr = self.ENDBRAC.sub('', thisNoteStr)
-                dict1['endTuplet'] = True
+                parseStatus['endTuplet'] = True
+            elif self.TIMESIG.match(thisNoteStr):
+                newTime = self.TIMESIG.match(stringRep).group(1)
+                timeSignature = meter.TimeSignature(newTime)
+                barDuration = timeSignature.barDuration
+                parseStatus['barDuration'] = barDuration
+                noteList.append(timeSignature)
+                continue
+                    
 
             tN = None
             try:
-                tN = self.getNote(thisNoteStr, dict1)
+                tN = self.getNote(thisNoteStr, parseStatus)
             except music21.duration.DurationException, (value):
                 raise music21.duration.DurationException(str(value) + " in context " + str(thisNoteStr))
 #            except Exception, (value):
@@ -168,21 +182,19 @@ class TinyNotationStream(stream.Stream):
             
             noteList.append(tN.note)
 
-            if dict1['endTuplet'] == True:
-                dict1['endTuplet'] = False
+            if parseStatus['endTuplet'] == True:
+                parseStatus['endTuplet'] = False
                 
-                if dict1['inTrip'] == True:
-                    dict1['inTrip'] = False
-                elif dict1['inQuad'] == True:
-                    dict1['inQuad'] = False
+                if parseStatus['inTrip'] == True:
+                    parseStatus['inTrip'] = False
+                elif parseStatus['inQuad'] == True:
+                    parseStatus['inQuad'] = False
                 else:
                     raise TinyNotationException("unexpected end bracket in TinyNotationStream")
 
-            dict1['beginTuplet'] = False
+            parseStatus['beginTuplet'] = False
 
         
-        if timeSignature is not None and hasattr(timeSignature, "barDuration"):
-            self.append(timeSignature)
         for thisNote in noteList:
             self.append(thisNote)
                 

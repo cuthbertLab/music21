@@ -54,7 +54,7 @@ C##4
 
 As with nearly all music21 objects, we can call the :class:`~music21.base.Music21Object.show` method to display this Pitch in notation.
 
->>> p1.show()  # doctest: +SKIP
+>>> p2.show()  # doctest: +SKIP
 
 .. image:: images/overviewNotes-01.*
     :width: 600

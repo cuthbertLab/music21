@@ -23,16 +23,16 @@ and other objects out of an rntxt file by running this:
 >>> from music21 import *
 >>> monteverdi = corpus.parse('monteverdi/madrigal.3.1.rntxt')
 >>> monteverdi.show('text')
-    {0.0} <music21.metadata.Metadata object at 0x...>
-    {0.0} <music21.stream.Part ...>
-        {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.meter.TimeSignature 4/4>
-            {0.0} <music21.key.KeySignature of 1 flat>
-            {0.0} <music21.roman.RomanNumeral vi in F major>
-            {3.0} <music21.roman.RomanNumeral V[no3] in F major>
-        {4.0} <music21.stream.Measure 2 offset=4.0>
-            {0.0} <music21.roman.RomanNumeral I in F major>
-            {3.0} <music21.roman.RomanNumeral IV in F major>
+{0.0} <music21.metadata.Metadata object at 0x...>
+{0.0} <music21.stream.Part ...>
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.key.KeySignature of 1 flat>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.roman.RomanNumeral vi in F major>
+        {3.0} <music21.roman.RomanNumeral V[no3] in F major>
+    {4.0} <music21.stream.Measure 2 offset=4.0>
+        {0.0} <music21.roman.RomanNumeral I in F major>
+        {3.0} <music21.roman.RomanNumeral IV in F major>
     ...
 
 Then the stream can be analyzed with something like this, storing
@@ -458,11 +458,71 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                 # may need to adjust duration of last chord added
                 previousRn.quarterLength = tsCurrent.barDuration.quarterLength - o
                 p.append(m)
+
+    fixPickupMeasure(p)
     p.makeBeams(inPlace=True)
     p.makeAccidentals(inPlace=True)
     s.insert(0, p)
     return s
 
+def fixPickupMeasure(partObject):
+    '''
+    fix a pickup measure if any.
+
+    We determine a pickup measure by being measure 0 and not having an RN object at the beginning.
+
+
+    Demonstration: an otherwise incorrect part
+    
+    >>> from music21 import *
+    >>> p = stream.Part()
+    >>> m0 = stream.Measure()
+    >>> m0.number = 0
+    >>> k0 = key.Key('G')
+    >>> m0.insert(0, k0)
+    >>> m0.insert(0, meter.TimeSignature('4/4'))
+    >>> m0.insert(2, roman.RomanNumeral('V', k0))
+    >>> m1 = stream.Measure()
+    >>> m1.number = 1
+    >>> m2 = stream.Measure()
+    >>> m2.number = 2
+    >>> p.insert(0, m0)
+    >>> p.insert(4, m1)
+    >>> p.insert(8, m2)
+    
+    After running fixPickupMeasure()
+    
+    >>> romanText.translate.fixPickupMeasure(p)
+    >>> p.show('text')
+    {0.0} <music21.stream.Measure 0 offset=0.0>
+        {0.0} <music21.key.Key of G major>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.roman.RomanNumeral V in G major>
+    {2.0} <music21.stream.Measure 1 offset=2.0>
+    <BLANKLINE>
+    {6.0} <music21.stream.Measure 2 offset=6.0>
+    <BLANKLINE>
+    >>> m0.paddingLeft
+    2.0
+    '''
+    m0 = partObject.measure(0)
+    if m0 is None:
+        return
+    rnObjects = m0.getElementsByClass('RomanNumeral')
+    if len(rnObjects) == 0:
+        return
+    if rnObjects[0].offset == 0:
+        return
+    newPadding = rnObjects[0].offset
+    for el in m0:
+        if el.offset < newPadding: # should be zero for Clefs, etc.
+            pass
+        else:
+            el.offset = el.offset - newPadding
+    m0.paddingLeft = newPadding
+    for el in partObject: # adjust all other measures backwards
+        if el.offset > 0:
+            el.offset -= newPadding
 
 def romanTextToStreamOpus(rtHandler, inputM21=None):
     '''Return either a Score object, or, if a multi-movement work is defined, an Opus object. 

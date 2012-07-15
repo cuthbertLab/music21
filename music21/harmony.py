@@ -260,6 +260,8 @@ class Harmony(chord.Chord):
     >>> h.pitches
     [E3, G3, B-3, C4]
     
+    
+    
     ''' 
     
     def __init__(self, figure = None, **keywords):
@@ -601,6 +603,10 @@ class Harmony(chord.Chord):
         raise HarmonyException('not a valid pitch specification: %s' % value)
 
     def _getRoman(self):
+        if self._roman is None:
+            from music21 import roman
+            self._roman = roman.romanNumeralFromChord(self)
+        
         return self._roman
 
     romanNumeral = property(_getRoman, _setRoman, doc= '''
@@ -1652,7 +1658,7 @@ class TestExternal(unittest.TestCase):
                         print n+m+','+type, music21.harmony.ChordSymbol(n+m+','+type).pitches
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [ChordSymbol, Harmony, ChordStepModification]
+_DOC_ORDER = [Harmony, ChordSymbol, ChordStepModification]
 
 
 if __name__ == "__main__":
