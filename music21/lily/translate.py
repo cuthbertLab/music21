@@ -186,6 +186,9 @@ class LilypondConverter(object):
         r'''
         create a Lilypond object hierarchy in self.topLevelObject from an
         arbitrary music21 object.
+        
+        
+        TODO: Add test for TinyNotationStream...
         '''
         from music21 import stream
         c = m21ObjectIn.classes
@@ -311,24 +314,34 @@ class LilypondConverter(object):
                \clef "treble" 
                \key fis \minor 
                \time 4/4
-        cis'' 8  
-        b' 8  
-        \bar "|"  %{ end measure 0 %} 
-        a' 4  
-        b' 4  
-        cis'' 4 \fermata   
-        e'' 4  
-        \bar "|"  %{ end measure 1 %} 
-        cis'' 4  
-        ...
+               \once \override Stem #'direction = #DOWN 
+               cis'' 8  
+               \once \override Stem #'direction = #DOWN 
+               b' 8  
+               \bar "|"  %{ end measure 0 %} 
+               \once \override Stem #'direction = #UP 
+               a' 4  
+               \once \override Stem #'direction = #DOWN 
+               b' 4  
+               \once \override Stem #'direction = #DOWN 
+               cis'' 4  \fermata  
+               \once \override Stem #'direction = #DOWN 
+               e'' 4  
+               \bar "|"  %{ end measure 1 %} 
+               \once \override Stem #'direction = #DOWN 
+               cis'' 4  
+               ...
         } 
         <BLANKLINE>
         \new Staff { \partial 32*8 
             \clef "treble"...
-        e' 4  
-        \bar "|"  %{ end measure 0 %} 
-        fis' 4  
-        e' 4
+            \once \override Stem #'direction = #UP 
+            e' 4  
+            \bar "|"  %{ end measure 0 %} 
+            \once \override Stem #'direction = #UP 
+            fis' 4  
+            \once \override Stem #'direction = #UP 
+            e' 4  
         ...
         } 
         <BLANKLINE>
@@ -378,9 +391,8 @@ class LilypondConverter(object):
                                                             simpleString = newContext,
                                                             music = lpMusic)
         
-        self.newContext(lpMusicList)
-        for el in part:
-                self.appendM21ObjectToContext(el)
+        self.newContext(lpMusicList)    
+        self.appendObjectsToContextFromStream(part)
                     
         lyObject = self.closeMeasure()
         if lyObject is not None:
@@ -390,13 +402,50 @@ class LilypondConverter(object):
         return lpPrefixCompositeMusic
 
 
+    def appendObjectsToContextFromStream(self, streamObject):
+        for groupedElements in streamObject.groupElementsByOffset():
+            if len(groupedElements) == 1: # one thing at that moment...
+                el = groupedElements[0]
+                self.appendM21ObjectToContext(el)
+            else: # voices or other More than one thing at once...
+                # if voices
+                voiceList = []
+                for el in groupedElements:
+                    if 'Voice' in el.classes:
+                        voiceList.append(el)
+                    else:
+                        self.appendM21ObjectToContext(el)
+                
+                if len(voiceList) > 0:
+                    musicList2 = []
+                    lp2GroupedMusicList = lyo.LyGroupedMusicList()
+                    lp2SimultaneousMusic = lyo.LySimultaneousMusic()
+                    lp2MusicList = lyo.LyMusicList()
+                    lp2SimultaneousMusic.musicList = lp2MusicList
+                    lp2GroupedMusicList.simultaneousMusic = lp2SimultaneousMusic
+
+                    for voice in voiceList:
+                        lpPrefixCompositeMusic = self.lyPrefixCompositeMusicFromStream(voice)
+                        musicList2.append(lpPrefixCompositeMusic)
+                    
+                    lp2MusicList.contents = musicList2
+                    
+                    contextObject = self.context
+                    currentMusicList = contextObject.contents
+                    currentMusicList.append(lp2GroupedMusicList)
+                    lp2GroupedMusicList.setParent(self.context)
+    
+
     def appendM21ObjectToContext(self, thisObject):
         '''
         converts any type of object into a lilyObject of LyMusic (
         LySimpleMusic, LyEmbeddedScm etc.) type
         '''
-                ### treat complex duration objects as multiple objects
-        if thisObject.duration.type == 'complex':
+        ### treat complex duration objects as multiple objects
+        c = thisObject.classes
+
+        
+        if 'Stream' not in c and thisObject.duration.type == 'complex':
             thisObjectSplit = thisObject.splitAtDurations()
             for subComponent in thisObjectSplit:
                 self.appendM21ObjectToContext(subComponent)
@@ -409,7 +458,6 @@ class LilypondConverter(object):
             lyScheme = lyo.LyEmbeddedScm(self.transparencyStartScheme)
             currentMusicList.append(lyScheme)
             
-        c = thisObject.classes
         lyObject = None
         if "Measure" in c:
             ## lilypond does not put groups around measures...
@@ -424,10 +472,8 @@ class LilypondConverter(object):
                 currentMusicList.append(padObj)
                 padObj.setParent(contextObject)
 
-            for el in thisObject:
-                ## do something for Voices!
-                self.appendM21ObjectToContext(el)
-            
+            ## here we go!
+            self.appendObjectsToContextFromStream(thisObject)            
             self.currentMeasure = thisObject
 
         elif "Stream" in c:
@@ -508,6 +554,8 @@ class LilypondConverter(object):
 
         '''
         self.setContextForTupletStart(noteOrRest)
+        self.setStemCode(noteOrRest)        
+        
         lpSimpleMusic = self.lySimpleMusicFromNoteOrRest(noteOrRest)
         self.context.contents.append(lpSimpleMusic)
         lpSimpleMusic.setParent(self.context)
@@ -574,6 +622,16 @@ class LilypondConverter(object):
         
         return mlSM
 
+    def setStemCode(self, noteOrRest):
+        if hasattr(noteOrRest, 'stemDirection') and noteOrRest.stemDirection is not None:
+            stemDirection = noteOrRest.stemDirection.upper()
+            if stemDirection in ['UP', 'DOWN']:
+                stemFile = r'''\once \override Stem #'direction = #%s ''' % stemDirection
+                lpStemScheme = lyo.LyEmbeddedScm(stemFile)
+                self.context.contents.append(lpStemScheme)
+                lpStemScheme.setParent(self.context)
+
+
     def lySimpleMusicFromChord(self, chordObj):
         '''
         
@@ -585,7 +643,8 @@ class LilypondConverter(object):
         >>> print conv.lySimpleMusicFromChord(c1)
          < cis, e' dis''  !  > 2.. 
         '''
-        
+        self.setStemCode(chordObj)
+
         chordBodyElements = []
         for p in chordObj.pitches:
             chordBodyElementParts = []

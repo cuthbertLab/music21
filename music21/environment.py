@@ -790,7 +790,7 @@ class Environment(object):
 
     def warn(self, msg, header=None):
         '''To print a warning to the user, send a list of strings to this
-        method. 
+        method. Similar to printDebug but even if debug is off.
         '''
         if common.isStr(msg):
             msg = [msg] # make into a list

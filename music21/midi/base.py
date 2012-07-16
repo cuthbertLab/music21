@@ -711,9 +711,15 @@ class MidiEvent(object):
                 data = chr(self._parameter1) + chr(self._parameter2) 
             elif self.type in ['PROGRAM_CHANGE']:
                 #environLocal.printDebug(['trying to add program change data: %s' % self.data])
-                data = chr(self.data) 
+                try:
+                    data = chr(self.data) 
+                except TypeError:
+                    raise MidiException("Got incorrect data for %s in .data: %s, cannot parse Program Change" % (self, self.data))
             else:  # all other messages
-                data = chr(self.data) 
+                try:
+                    data = chr(self.data) 
+                except TypeError:
+                    raise MidiException("Got incorrect data for %s in .data: %s, cannot parse Miscellaneous Message" % (self, self.data))
             return x + data 
 
         elif channelModeMessages.hasattr(self.type): 
@@ -979,8 +985,11 @@ class MidiTrack(object):
         str = ""
         for e in self.events: 
             # this writes both delta time and message events
-            ew = e.write()
-            str = str + ew
+            try:
+                ew = e.write()
+                str = str + ew
+            except MidiException as me:
+                environLocal.warn("Conversion error for %s: %s; ignored." % (e, me))
         return "MTrk" + putNumber(len(str), 4) + str 
     
     def __repr__(self): 

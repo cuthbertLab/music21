@@ -1846,7 +1846,10 @@ class VexflowPart(object):
                     voiceParams['name'] = voiceParams['name'][:-1] + str(index)
                     theseVoices += [VexflowVoice(thisVoice, \
                         params=voiceParams)]
-                    previousKeySignature = thisVoice.keySignature
+                    try:
+                        previousKeySignature = thisVoice.keySignature
+                    except AttributeError: ### SHOULDNT HAPPEN
+                        pass
             thisStave.setVoices(theseVoices)
             self.staves += [thisStave]
 
