@@ -229,7 +229,7 @@ class Graph(object):
     colorBackgroundData, colorBackgroundFigure, colorGrid, title, 
     doneAction (see below), 
     figureSize, colors, tickFontSize, titleFontSize, labelFontSize, 
-    fontFamily.
+    fontFamily, marker, markerSize.
 
     Graph objects do not manipulate Streams or other music21 data; they only 
     manipulate raw data formatted for each Graph subclass, hence it is
@@ -257,6 +257,9 @@ class Graph(object):
         self.axis = {}
         self.axisKeys = ['x', 'y']
         self.grid = True
+        self._axisRangesAlreadySet = {}
+        for axisKey in self.axisKeys:
+            self._axisRangesAlreadySet[axisKey] = False
 
         if 'alpha' in keywords:
             self.alpha = keywords['alpha']
@@ -284,7 +287,7 @@ class Graph(object):
             self.colorGrid = keywords['colorGrid']
         else:
             self.colorGrid = '#666666'
-
+        
         if 'title' in keywords:
             self.setTitle(keywords['title'])
         else:
@@ -300,6 +303,16 @@ class Graph(object):
         else: # default is to write a file
             self.setFigureSize([6,6])
 
+        if 'marker' in keywords:
+            self.marker = keywords['marker']
+        else:
+            self.marker = 'o'
+        
+        if 'markerSize' in keywords:
+            self.markerSize = keywords['marker']
+        else:
+            self.markerSize = 6
+        
         # define a list of one or more colors
         # these will be applied cyclically to data prsented
         if 'colors' in keywords:
@@ -444,6 +457,8 @@ class Graph(object):
         # set range with shift
         self.axis[axisKey]['range'] = (valueRange[0]-shift,
                                        valueRange[1]+shift)
+        
+        self._axisRangesAlreadySet[axisKey] = True
 
     def setAxisLabel(self, axisKey, label):
         if axisKey not in self.axisKeys:
@@ -1304,23 +1319,28 @@ class GraphScatter(Graph):
         for row in self.data:
             x = row[0]
             y = row[1]
-            figureType = 'o'
+            marker = self.marker
             color = getColor(self.colors[i%len(self.colors)])
             alpha = self.alpha
+            markerSize = self.markerSize
             if len(row) >= 3:
                 displayData = row[2]
                 if 'color' in displayData:
                     color = displayData['color']
-                if 'figureType' in displayData:
-                    figureType = displayData['figureType']
+                if 'marker' in displayData:
+                    marker = displayData['marker']
                 if 'alpha' in displayData:
                     alpha = displayData['alpha']
+                if 'markerSize' in displayData:
+                    markerSize = displayData['markerSize']
                     
-            ax.plot(x, y, figureType, color=color, alpha=self.alpha)
+            ax.plot(x, y, marker, color=color, alpha=alpha, ms=markerSize)
             i += 1
         # values are sorted, so no need to use max/min
-        self.setAxisRange('y', (yValues[0], yValues[-1]))
-        self.setAxisRange('x', (xValues[0], xValues[-1]))
+        if not self._axisRangesAlreadySet['y']:
+            self.setAxisRange('y', (yValues[0], yValues[-1]))
+        if not self._axisRangesAlreadySet['x']:
+            self.setAxisRange('x', (xValues[0], xValues[-1]))
 
         self._adjustAxisSpines(ax)
         self._applyFormatting(ax)
@@ -1351,6 +1371,15 @@ class GraphHistogram(Graph):
         Graph.__init__(self, *args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
+        if 'binWidth' in keywords:
+            self.binWidth = keywords['binWidth']
+        else:
+            self.binWidth = 0.8
+            
+        if 'alpha' in keywords:
+            self.alpha = keywords['alpha']
+        else:
+            self.alpha = 0.8
 
     def process(self):
         # figure size can be set w/ figsize=(5,10)
@@ -1360,10 +1389,13 @@ class GraphHistogram(Graph):
 
         x = []
         y = []
-        for a, b in self.data:
+        binWidth = self.binWidth
+        color = getColor(self.colors[0])
+        alpha = self.alpha
+        for a,b in self.data:
             x.append(a)
             y.append(b)
-        ax.bar(x, y, alpha=.8, color=getColor(self.colors[0]))
+        ax.bar(x, y, width = binWidth, alpha=alpha, color=color)
 
         self._adjustAxisSpines(ax)
         self._applyFormatting(ax)
@@ -3276,12 +3308,21 @@ class PlotDolan(PlotHorizontalBarWeighted):
         if len(instStream) == 0:
             return # do not set anything
         
-        if len(instStream) == 4:
+        if len(instStream) == 4 and self.streamObj.getElementById('Soprano') is not None:
             pgOrc = [
                 {'name':'Soprano', 'color':'purple', 'match':['soprano', '0']},
                 {'name':'Alto', 'color':'orange', 'match':['alto', '1']},
                 {'name':'Tenor', 'color':'lightgreen', 'match':['tenor']},
                 {'name':'Bass', 'color':'mediumblue', 'match':['bass']}, 
+            ]
+            self.partGroups = pgOrc
+            
+        elif len(instStream) == 4 and self.streamObj.getElementById('Viola') is not None:
+            pgOrc = [
+                {'name':'1st Violin', 'color':'purple', 'match':['1st violin', '0', 'violin 1']},
+                {'name':'2nd Violin', 'color':'orange', 'match':['2nd violin', '1', 'violin 2']},
+                {'name':'Viola', 'color':'lightgreen', 'match':['viola']},
+                {'name':'Cello', 'color':'mediumblue', 'match':['cello', 'violoncello', "'cello"]}, 
             ]
             self.partGroups = pgOrc
 

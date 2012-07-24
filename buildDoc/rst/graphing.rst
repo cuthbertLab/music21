@@ -158,16 +158,21 @@ The `doneAction` keyword argument determines what happens after the :meth:`~musi
 
 A basic example follows::
 
-    >>> from music21 import graph
-    >>> a = graph.GraphScatter(doneAction='show')
-    >>> data = [(x, x*x) for x in range(50)]
-    >>> a.setData(data)
+    >>> from music21 import *
+    >>> a = graph.GraphScatter(title = 'Chromatic Scale', doneAction='show')
+    >>> data = []
+    >>> for midiNumber in range(36,120):
+    ...     n = note.Note()
+    ...     n.midi = midiNumber
+    ...     frequency = n.frequency
+    ...		data.append( (midiNumber, int(frequency) ) )
+    >>>     a.setData(data)
     >>> a.process()  # doctest: +SKIP
 
 .. image:: images/graphing-01.*
-    :width: 600
+    :width: 700
 
-Numerous parameters can be specified through keyword arguments when creating a scatter plot. 
+Numerous parameters can be specified through keyword arguments when creating a scatter plot, and also attached to each point.
 
 The 'alpha' keyword argument sets transparency, from 0 (transparent) to 1 (opaque).
 
@@ -177,33 +182,80 @@ The 'colors' keyword argument sets the colors of data points, specified as HTML 
 
 This example provides basic customization to a scatter graph::
 
-    >>> from music21 import graph
-    >>> a = graph.GraphScatter(title='Exponential Graph', alpha=1, doneAction='show')
-    >>> data = [(x, x*x) for x in range(50)]
+    >>> from music21 import *
+    >>> a = graph.GraphScatter(title = 'Color-coded chromatic scale showing C major', doneAction='show')
+    >>> data = []
+    >>> for midiNumber in range(36,120):
+    ...	    n = note.Note()
+    ...	    n.midi = midiNumber
+    ...	    frequency = n.frequency
+    ...	    if n.pitchClass in [0, 2, 4, 5, 7, 9, 11]:
+    ...	        alpha = 1
+    ...	        marker = 'o'
+    ...	        color = 'white'
+    ...	        markerSize = 10
+    ...     else:
+    ...	        alpha = 1
+    ...	        marker = 'd'
+    ...	        color = 'black'
+    ...	        markerSize = 8
+    ...	    data.append( (midiNumber, int(frequency), {'color':color, 'alpha': alpha, 'marker': marker, 'markerSize':markerSize} ) )
     >>> a.setData(data)
+    >>> a.setAxisLabel('x', 
     >>> a.process()  # doctest: +SKIP
 
 .. image:: images/graphing-02.*
-    :width: 600
+    :width: 700
 
 
 
 Two-Dimensional Histogram
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A histogram provides a bar graph for measuring the count of single items. Data for this graph is provided as a list of *x*, *y* data pairs; however, unlike with a scatter plot, there can be only one definition for each *x* value. 
+A histogram provides a bar graph for measuring the count of single items. Data for this graph is provided as a list of *x*, *y* data pairs; however, unlike with a scatter plot, there can be only one definition for each *x* value. The example below takes the first hundred Bach Chorales in the Riemenschneider numbering system and
+counts the number of times each duration of note occurs in the soprano and bass parts. Then it displays the
+result as a histogram. The first column in each pair is the soprano frequency, and the second (which has 
+been shifted by one bin width) is the bass frequency.
 
 A basic example follows::
 
-    >>> import random
-    >>> from music21 import graph
-    >>> a = graph.GraphHistogram(doneAction='show')
-    >>> data = [(x, random.choice(range(30))) for x in range(50)]
+    >>> from music21 import *
+    >>> sopranoDict = {}
+    >>> bassDict = {}
+    >>> data =[]
+    >>> for chorale in corpus.chorales.Iterator(1, 100):
+    ...     soprano, bass = chorale.getElementById('Soprano'), chorale.getElementById('Bass')
+    ...     if soprano is not None:
+    ...         soprano = soprano.flat.notes
+    ...         for n in soprano:
+    ...             noteLength = n.duration.quarterLength
+    ...             if noteLength in sopranoDict:
+    ...                 sopranoDict[noteLength] += 1
+    ...             else:
+    ...                 sopranoDict[noteLength] = 1
+    ...     if bass is not None:
+    ...         bass = bass.flat.notes
+    ...         for n in bass:
+    ...             noteLength = n.duration.quarterLength
+    ...             if noteLength in bassDict:
+    ...                 bassDict[noteLength] += 1
+    ...             else:
+    ...                 bassDict[noteLength] = 1
+    
+    >>> for key in sopranoDict:
+    ...     data.append((key, sopranoDict[key]))
+    
+    >>> for key in bassDict:
+    ...     data.append((key+0.125, bassDict[key]))
+            
+    >>> a = graph.GraphHistogram(title="Frequency of note durations in Bach's Chorales comparing soprano and bass parts", doneAction='show', binWidth = 0.125)
     >>> a.setData(data)
-    >>> a.process()  # doctest: +SKIP
-
+    >>> a.setAxisLabel('x', 'Note duration in quarter lengths (soprano, bass)')
+    >>> a.setAxisLabel('y', 'Number')
+    >>> a.process() # doctest: +SKIP
+    
 .. image:: images/graphing-03.*
-    :width: 600
+    :width: 700
 
 
 

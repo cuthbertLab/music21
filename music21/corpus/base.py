@@ -216,7 +216,7 @@ def getVirtualPaths(extList=None, expandExtensions=True):
 
 def getLocalPaths(extList=None, expandExtensions=True):
     '''
-    Access files in additional directories supplied by the user and defined in environement settings. If addtional paths are added on a per-session basis witht the :func:`~music21.corpus.addPath` function, these paths are also retuned with this method. 
+    Access files in additional directories supplied by the user and defined in environment settings. If additional paths are added on a per-session basis witht the :func:`~music21.corpus.addPath` function, these paths are also retuned with this method. 
     '''
     extList = _translateExtensions(extList=extList,
                 expandExtensions=expandExtensions)

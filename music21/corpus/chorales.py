@@ -19,6 +19,7 @@ class for easily iterating through the chorale collection.
 import music21
 from music21.corpus import base
 import unittest, doctest
+import copy
 
 
 from music21 import environment
@@ -996,11 +997,27 @@ class Iterator(object):
     bach/bwv337
     bach/bwv278
     
+    Elements in the iterator can be accessed by index as well as slice.
     
+    >>> for chorale in corpus.chorales.Iterator(returnType = 'filename')[4:10]:
+    ...    print chorale
+    bach/bwv86.6
+    bach/bwv267
+    bach/bwv281
+    bach/bwv17.7
+    bach/bwv40.8
+    bach/bwv248.12-2
+    bach/bwv38.6
+    
+    >>> print corpus.chorales.Iterator(returnType = 'filename')[55]
+    bach/bwv159.5
+    
+      
     For the first 20 chorales in the Riemenschneider numbering system, there are professionally
     annotated roman numeral analyses in romanText format, courtesy of Dmitri Tymoczko of Princeton
     University.  To get them as an additional part to the score set returnType to "stream", and
     add a keyword "analysis = True":
+    
     
     '''
     _DOC_ORDER = ['numberingSystem', 'currentNumber', 'highestNumber', 'titleList', 'numberList', 'returnType', 'iterationType']
@@ -1060,6 +1077,33 @@ class Iterator(object):
         else:
             return len(self.numberList)
     
+    def __getitem__(self,key):
+        if isinstance(key, slice):
+            returnObj = copy.deepcopy(self)
+            returnObj.currentNumber = key.start
+            returnObj.highestNumber = key.stop
+            return returnObj
+        else:
+            if self.numberingSystem is None:
+                raise BachException("NumberingSystem not set. Cannot find index.")
+            
+            elif self.numberingSystem is 'title':
+                if key in range(len(self.titleList)):
+                    return self._returnChorale(key)
+                else:
+                    raise IndexError("%s is not in the range of the titleList." % key)
+            
+            elif self.iterationType is 'index' or self.numberingSystem is 'bwv':
+                if key in range(len(self.numberList)):
+                    return self._returnChorale(key)
+                else:
+                    raise IndexError("%s is not in the range of the numberList." % key)
+            elif self.iterationType is 'number':
+                if key in self.numberList:
+                    return self._returnChorale(key)
+                else:
+                    raise IndexError("%s is not in the numberList" % key)
+    
     def next(self):
         '''
         At each iteration, the _currentIndex is incremented, and the next chorale is parsed based upon its bwv number which is queried via
@@ -1068,12 +1112,12 @@ class Iterator(object):
         if self._currentIndex > self._highestIndex:
             raise StopIteration
         else:
-            nextChorale = self._returnCurrent()
+            nextChorale = self._returnChorale()
             self._currentIndex += 1
             return nextChorale
     
     #---Functions
-    def _returnCurrent(self):
+    def _returnChorale(self, choraleIndex = None):
         '''
         This returns a chorale based upon the _currentIndex and the numberingSystem. The numberList is the list
         of valid numbers in the selected numbering system. The _currentIndex is the location in the numberList
@@ -1082,7 +1126,7 @@ class Iterator(object):
         
         >>> from music21 import *
         >>> BCI = corpus.chorales.Iterator()
-        >>> riemenschneider1 = BCI._returnCurrent()
+        >>> riemenschneider1 = BCI._returnChorale()
         >>> riemenschneider1.show('text')
         {0.0} <music21.text.TextBox "BWV 269">
         {0.0} <music21.text.TextBox "PDF © 2004...">
@@ -1098,7 +1142,7 @@ class Iterator(object):
         
         
         >>> BCI.currentNumber = BCI.highestNumber
-        >>> riemenschneider371 = BCI._returnCurrent()
+        >>> riemenschneider371 = BCI._returnChorale()
         >>> riemenschneider371.show('text')
         {0.0} <music21.text.TextBox "BWV 278">
         {0.0} <music21.text.TextBox "PDF © 2004...">
@@ -1114,13 +1158,13 @@ class Iterator(object):
         
         
         >>> BCI.numberingSystem = 'title'
-        >>> BCI._returnCurrent()
+        >>> BCI._returnChorale()
         Traceback (most recent call last):
         ...
         BachException: Cannot parse Chorales because no titles to parse.
         
         >>> BCI.titleList = ['Christ lag in Todesbanden', 'Aus meines Herzens Grunde']
-        >>> christlag = BCI._returnCurrent()
+        >>> christlag = BCI._returnChorale()
         >>> christlag.show('text')
         {0.0} <music21.text.TextBox "BWV 278">
         {0.0} <music21.text.TextBox "PDF © 2004...">
@@ -1135,7 +1179,7 @@ class Iterator(object):
         ...
         
         >>> BCI.currentNumber += 1
-        >>> ausmeines = BCI._returnCurrent()
+        >>> ausmeines = BCI._returnChorale()
         >>> ausmeines.show('text')
         {0.0} <music21.text.TextBox "BWV 269">
         {0.0} <music21.text.TextBox "PDF © 2004...">
@@ -1152,28 +1196,33 @@ class Iterator(object):
         
         >>> BCI.numberingSystem = 'kalmus'
         >>> BCI.returnType = 'filename'
-        >>> BCI._returnCurrent()
-        'bach/bwv253'       
+        >>> BCI._returnChorale()
+        'bach/bwv253'   
+        
+        >>> BCI._returnChorale(3)
+        'bach/bwv48.3'    
         
         
         '''
+        if choraleIndex is None:
+            choraleIndex = self._currentIndex
         if self.numberingSystem is None:
             raise BachException("Cannot parse Chorales because no .numberingSystem set.")
         elif self.numberingSystem is 'title':
             if self._titleList is None:
                 raise BachException("Cannot parse Chorales because no titles to parse.")
             else:
-                filename = 'bach/bwv'+ str(self._choraleList2.byTitle[self.titleList[self._currentIndex]]['bwv'])
+                filename = 'bach/bwv'+ str(self._choraleList2.byTitle[self.titleList[choraleIndex]]['bwv'])
         elif self.numberingSystem is 'riemenschneider':
-            filename = 'bach/bwv' + str(self._choraleList2.byRiemenschneider[self._numberList[self._currentIndex]]['bwv'])
+            filename = 'bach/bwv' + str(self._choraleList2.byRiemenschneider[self._numberList[choraleIndex]]['bwv'])
         elif self.numberingSystem is 'baerenreiter':
-            filename = 'bach/bwv' + str(self._choraleList1.byBaerenreiter[self._numberList[self._currentIndex]]['bwv'])
+            filename = 'bach/bwv' + str(self._choraleList1.byBaerenreiter[self._numberList[choraleIndex]]['bwv'])
         elif self.numberingSystem is 'budapest':
-            filename = 'bach/bwv' + str(self._choraleList1.byBudapest[self._numberList[self._currentIndex]]['bwv'])
+            filename = 'bach/bwv' + str(self._choraleList1.byBudapest[self._numberList[choraleIndex]]['bwv'])
         elif self.numberingSystem is 'kalmus':
-            filename = 'bach/bwv' + str(self._choraleList2.byKalmus[self._numberList[self._currentIndex]]['bwv'])
+            filename = 'bach/bwv' + str(self._choraleList2.byKalmus[self._numberList[choraleIndex]]['bwv'])
         else:
-            filename = 'bach/bwv' + str(self._numberList[self._currentIndex])
+            filename = 'bach/bwv' + str(self._numberList[choraleIndex])
         
         if self._returnType is 'stream':
             chorale = base.parse(filename)
