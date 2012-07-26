@@ -108,7 +108,7 @@ def _evaluateMeasure(mOrD, measure, lengths):
 def _getTargetBeforeOrAtObj(music21Obj, targetClassList):
     '''
     Takes two arguments: music21Obj, targetObj
-    If music21Obj has some set of context, returns the list of targetClass at or before music21Obj.
+    If music21Obj has some set of contexts, returns the list of object of class targetClass at or before music21Obj.
     If no such instance exists, of if the only context is None, returns None.
     NOTE: This has no other use than to act as an alternate way of getting the closest instance of a mensuration or divisione for :class:`music21.medren.GeneralMensuralNote`. 
     
@@ -161,7 +161,7 @@ class _TranslateMensuralMeasure:
     '''
     The class :class:`music21.medren._TranslateMensuralMeasure` takes a mensuration or divisione sign and a list comprising one measure's worth of mensural objects as arguments.
     The method :meth:`music21.medren._TranslateMensuralMeasure.getMinimaLengths` takes no arguments, and returns a list of floats corresponding to the length (in minima) of each object in the measure.
-    The methods :meth:`music21.medren._TranslateMensuralMeasure._getLengthsItalian` and :meth:`music21.medren._getLengthsFrench` are there simply to aid :meth:`music21.medren._TranslateMensuralMeasure.getMinimaLengths`.
+    The methods :meth:`music21.medren._TranslateMensuralMeasure.getLengthsItalian` and :meth:`music21.medren.getLengthsFrench` are there simply to aid :meth:`music21.medren._TranslateMensuralMeasure.getMinimaLengths`.
     Currently, this class is used only to improve the efficiency of :attr:`music21.medren.GeneralMensuralNote.duration`.
     
     Note: French notation and dragmas currently not supported.
@@ -277,14 +277,14 @@ class _TranslateMensuralMeasure:
         
     def getMinimaLengths(self):
         if isinstance(self.mOrD, music21.medren.Divisione):
-           self.minimaLengthList = self._getLengthsItalian()
+           self.minimaLengthList = self.getLengthsItalian()
         elif isinstance(self.mOrD, music21.medren.Mensuration):
-           self.minimaLengthList = self._getLengthsFrench()
+           self.minimaLengthList = selfgetLengthsFrench()
         else:
            raise MedRenException('%s not recognized as mensuration or divisione' % mensurationOrDivisione)
         return self.minimaLengthList
        
-    def _getLengthsItalian(self):
+    def getLengthsItalian(self):
         #########################################################################################################################################
             
         def processMeasure(measure, lengths, change_list, change_nums, diff_list, lenRem, releases = None, multi = 0):
@@ -992,13 +992,13 @@ class _TranslateMensuralMeasure:
         
         return minimaLengths
         
-    def _getLengthsFrench(self):
+    def getLengthsFrench(self):
         raise MedRenException('French notation currently not supported')
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 class Mensuration(meter.TimeSignature):
     '''
-    An object representing a mensuration sign in early music:
+    An object representing a mensuration sign found in French notation.
     
     >>> from music21 import *
     >>> ODot = medren.Mensuration(tempus = 'perfect', prolation = 'major')
@@ -1054,8 +1054,8 @@ class Mensuration(meter.TimeSignature):
         self._minimaPerMeasure = mPM
     
     minimaPerMeasure = property(_getMinimaPerMeasure, _setMinimaPerMeasure,
-                                doc = '''Returns the number of minima in a "measure" (the number of minims before a punctus occurs) for the given divisione.
-                                The number of minima in a measure can also be set, but this is really only used for special cases of duration.
+                                doc = '''Used to get or set the number of minima in a 'measure' under the given divisione.
+                                
                                 
                                 >>> from music21 import *
                                 >>> c = medren.Mensuration('imperfect', 'minor')
@@ -1085,7 +1085,7 @@ class Mensuration(meter.TimeSignature):
    
 class Divisione(meter.TimeSignature):
     '''
-    An object that represents a divisione found in Italian Notation:
+    An object representing a divisione found in Italian Notation:
     
     >>> from music21 import *
     >>> d = medren.Divisione('senaria imperfecta')
@@ -1133,8 +1133,7 @@ class Divisione(meter.TimeSignature):
         self._minimaPerMeasure = mPM 
     
     minimaPerMeasure = property(_getMinimaPerMeasure, _setMinimaPerMeasure, 
-                                doc = '''Returns the number of minima in a "measure" (the number of minims before a punctus occurs) for the given divisione.
-                                The number of minima in a measure can also be set, but this is really only used for special cases of duration.
+                                doc = '''Used to get and set the number of minima in a 'measure' (the number of minima before a punctus occurs) under the given divisione.
                                 
                                 >>> from music21 import *
                                 >>> n = medren.Divisione('.n.')
@@ -1147,7 +1146,7 @@ class Divisione(meter.TimeSignature):
         
 class Punctus(music21.base.Music21Object):
     '''
-    An object that represents a punctus, found in Italian notation.
+    An object representing a punctus, found in Italian notation.
     '''
     def __init__(self):
         self._fontString = '0x70'
@@ -1161,15 +1160,13 @@ class Punctus(music21.base.Music21Object):
 
 class GeneralMensuralNote(music21.base.Music21Object):
     '''
-    An object representing a generalized mensural note object (a note or a rest). This is arguably the most important mensural object, since it is responsible for getting the context and determining the contextual duration for both :class:`music21.medren.MensuralNote` and :class:`music21.medren.MensrualRest`.
-    :class:`musci21.medren.GeneralMensuralNote` takes a mensural type ('longa', 'brevis', 'minima', etc.) or abbreviation ('L', 'B', 'M', etc.) as an argument. This defaults to 'brevis'.
-    The object's mensural type can be set and accessed via the property :attr:`music21.medren.GeneralMensuralNote.mensuralType`
-    The duration of a general mensural object can be set and accessed using the property :attr:`music21.medren.GeneralMensuralNote.duration`. If the duration cannot be determined, it is set to 0 (for more specific instances, see the :attr:`music21.medren.GeneralMensuralNote.duration` documentation).
+    The base class object for :class:`music21.medren.MensuralNote` and :class:`music21.medren.MensuralRest`. This is arguably the most important mensural object, since it is responsible for getting the context and determining the contextual duration of objects within both subclasses.
+    A :class:`musci21.medren.GeneralMensuralNote` object takes a mensural type ('longa', 'brevis', 'minima', etc.) or its abbreviation ('L', 'B', 'M', etc.) as an argument. The default value for this argument is 'brevis'.
     
-    Two general mensural notes are considered equal if they have the same mensural type, are present in the same context, and have the same offset in the context (if it exists).
+    The object's mensural type can be set and accessed via the property :attr:`music21.medren.GeneralMensuralNote.mensuralType`.
+    The duration of a general mensural note can be set and accessed using the property :attr:`music21.medren.GeneralMensuralNote.duration`. If the duration of an general mensural note cannot be determined from context, it is set to 0. For more specific examples of this, please see the :attr:`music21.medren.GeneralMensuralNote.duration` documentation.
     
-    The method :meth:`music21.medren.GeneralMensuralNote._determineMensurationOrDivisione` attempts to get the mensuration or divisione sign from a note's context.
-    The method :meth:`music21.medren.GeneralMensualNote._getSurroundingMeasure` attempts to get the measure containing the general mensural note.
+    Two general mensural notes are considered equal if they have the same mensural type, are present in the same context, and have the same offset within that context.
     '''
     def __init__(self, mensuralTypeOrAbbr = 'brevis'):
         music21.base.Music21Object.__init__(self)
@@ -1267,12 +1264,12 @@ class GeneralMensuralNote(music21.base.Music21Object):
             
     duration = property(_getDuration, _setDuration,
                         doc = '''
-                        The duration of an :class:`music21.medren.GeneralMensuralNote` can be access and set using the :attr:`music21.medren.GeneralMensuralNote.duration`. 
-                        The duration of a general mensural note is by default 0. If a subclass is not specified (:class:`music21.medren.MensuralNote` or :class:music21.medren.MensuralRest`), the duration will remain 0 unless set to some other value.
-                        If a mensural note or a mensural rest has no context (is not part of a stream), the duration will remain 0 unless set to some other value, since duration is dependant on context. 
-                        Furthermore, if a mensural note or a mensural rest has context, but a mensuration or divisione cannot be found or determined from the context, the duration will remain 0.
+                        The duration of a :class:`music21.medren.GeneralMensuralNote` object can be accessed and set using the :attr:`music21.medren.GeneralMensuralNote.duration` property. 
+                        The duration of a general mensural note is by default 0. If the object's subclass is not specified (:class:`music21.medren.MensuralNote` or :class:`music21.medren.MensuralRest`), the duration will remain 0 unless set to some other value.
+                        If a general mensural note has no context, the duration will remain 0 since duration is context dependant. 
+                        Finally, if a mensural note or a mensural rest has context, but a mensuration or divisione cannot be found or determined from that context, the duration will remain 0.
                         
-                        Note: no support yet for French notation.
+                        Note: French notation not yet supported.
                         
                         >>> from music21 import *
                         >>> mn = medren.GeneralMensuralNote('B')
@@ -1317,7 +1314,7 @@ class GeneralMensuralNote(music21.base.Music21Object):
     #Using Music21Object.getContextByClass makes _getDuration go into an infinite loop. Thus, the alternative method. 
     def _determineMensurationOrDivisione(self):
         '''
-        If the mensural rest has context which contains a mensuration sign or divisione, it returns the mensuration sign or divisione closest to but before itself.
+        If the general mensural note has context which contains a mensuration or divisione sign, it returns the mensuration or divisione sign closest to but before itself.
         Otherwise, it tries to determine the mensuration sign from the context. If no mensuration sign can be determined, it throws an error.
         If no context is present, returns None. 
         
@@ -1348,9 +1345,9 @@ class GeneralMensuralNote(music21.base.Music21Object):
     
     def _getSurroundingMeasure(self):
         '''
-        Returns a list of the objects (ordered by offset) that are within the measure containing the mensural rest.
-        If the mensural rest has no context, returns an empty list.
-        If the mensural rest has more than one context, only the surrounding measure of the first context is returned.
+        Returns a list of the objects (ordered by offset) that are within the measure containing the general mensural note.
+        If the general mensural note has no context, returns an empty list.
+        If the general mensural note has more than one context, only the surrounding measure of the first context is returned.
         
         >>> from music21 import *
         >>> s_1 = stream.Stream()
@@ -1480,13 +1477,13 @@ class MensuralNote(GeneralMensuralNote, music21.note.Note):
     An object representing a mensural note commonly found in medieval and renaissance music.
     Takes pitch and mensural type as arguments, but defaults to 'C' and 'brevis'.
     Pitch and and mensural type can also be set using the properties :attr:`music21.medren.MensuralNote.pitch` and :attr:`music21.medren.MensuralNote.mensuralType` respectively.
-    The utf-8 code for the Ciconia font character can be accessed via the propert:attr:r:`music21.medren.MensuralNote.fontString`
+    The utf-8 code for the Ciconia font character can be accessed via the property :attr:`music21.medren.MensuralNote.fontString`
 
     The note stems can can be set using the method :meth:`music21.medren.MensuralNote.setStem`. A note's stems can be displayed using the method :meth:`music21.medren.MensuralNote.getStems`.
     Stems may only be added to notes shorter than a brevis. For additional detail, see the documentation for :meth:`music21.medren.MensuralNote.setStem`.
     
-    The note flags can bej set using the method :meth:`music21.medren.MensuralNote.setFlag`. A note's flags can be displayed using the method :meth:`music21.medren.MensuralNote.getFlags`.
-    Note the flags may be added to stems that exist for the given note. For addition, see the documentation for :meth:`music21.medren.MensuralNote.setFlag`.
+    The note flags can be set using the method :meth:`music21.medren.MensuralNote.setFlag`. A note's flags can be displayed using the method :meth:`music21.medren.MensuralNote.getFlags`.
+    Flags may only be added to stems that exist for the given note. For additional detail, see the documentation for :meth:`music21.medren.MensuralNote.setFlag`.
     
     Two mensural notes are considered equal if they match in pitch, articulation, and are equal as general mensural notes.
     
@@ -1607,7 +1604,7 @@ class MensuralNote(GeneralMensuralNote, music21.note.Note):
     
     fontString = property(_getFontString, 
                           doc = ''' The utf-8 code corresponding to a mensural note in Ciconia font.
-                          Note that semiminima with a left flag on the upper stem and any flag on the lower stem, semiminima with a right flag on the upperstem and on the lowerstem, and any red or unfilled notes with sidestems have no corresponding characters
+                          Note that semiminima with a left flag on the upper stem and any flag on the lower stem, semiminima with a right flag on the upperstem and on the lowerstem, and any red or unfilled notes with sidestems have no corresponding characters in the Cicionia font.
                           
                           >>> from music21 import *
                           >>> mn = medren.MensuralNote('A', 'M')
@@ -1662,11 +1659,12 @@ class MensuralNote(GeneralMensuralNote, music21.note.Note):
     def setStem(self, direction):
         #NOTE: This method makes it possible to have a semibrevis with a sidestem and a downstem. This doesn't mean anything so far as I can tell.
         '''
-        Takes one argument: direction
-        Adds a stem to a note. Any note less than or equal to a minima gets an upstem by default.
-        Any note can have at most two stems. Valid stem directions are "down", and "side". 
-        Down stems can be applied to any note less than or equal to a brevis.
-        Side stems in Italian notation are the equivalent of dots, but may only be applied to notes of the type semibrevis and minima (hence, a dotted note may not have a side stem,  and vice versa).
+        Takes one argument: direction.
+        
+        Adds a stem to a note. Any note with length less than or equal to a minima gets an upstem by default.
+        Any note can have at most two stems. Valid stem directions are "down" and "side". 
+        Downstems can be applied to any note with length less than or equal to a brevis.
+        Side stems in Italian notation are the equivalent of dots, but may only be applied to notes of the type semibrevis and minima (hence, a dotted note may not have a side stem, and vice versa).
         Setting stem direction to None removes all but the default number of stems. 
         
         >>> from music21 import *
@@ -1726,13 +1724,14 @@ class MensuralNote(GeneralMensuralNote, music21.note.Note):
     
     def setFlag(self, stemDirection, orientation):
         '''
-        Takes two arguments: stemDirection and orientation
+        Takes two arguments: stemDirection and orientation.
+        
         stemDirection may be 'up' or 'down' (sidestems cannot have flags), and orientation may be 'left' or 'right'.
         If the note has a stem with direction stemDirection, a flag with the specified orientation is added.
-        Any stem may only have up to one flag, so setting a flag overrides whatever flag was previously there.
+        Any stem may only have up to one flag, so setting a flag overrides whatever flag was previously present.
         Setting the orientation of a flag to None returns that stem to its default flag setting ('right' for semiminima, None otherwise).
         
-        A minima may not have a flag on its upstem, while a semiminima always has a flag on its upstem. The flag orientation for a semiminima is 'right' by default, but may be set to left. 
+        A minima may not have a flag on its upstem, while a semiminima always has a flag on its upstem. The flag orientation for a semiminima is 'right' by default, but may be set to 'left'. 
         Any note with a downstem may also have a flag on that stem. 
         
         >>> from music21 import *
@@ -2394,8 +2393,7 @@ class Ligature(music21.base.Music21Object):
                             notes.append(music21.medren.MensuralNote(self.pitches[ind], 'longa'))
             
         return notes
-#-----------------------------------------------------------------------------------------------------------------------------------------
-                     
+#-----------------------------------------------------------------------------------------------------------------------------------------               
 def setBarlineStyle(score, newStyle, oldStyle = 'regular', inPlace = True):
     '''
     Converts any right barlines in the previous style (oldStyle; default = 'regular')
