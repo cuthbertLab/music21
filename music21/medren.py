@@ -64,7 +64,7 @@ _validMensuralAbbr = [None, 'Mx', 'L', 'B', 'SB', 'M', 'SM']
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------   
 def _evaluateMeasure(mOrD, measure, lengths):
         ''':meth:`music21.medren._evaluateMeasure takes a mensuration or divisione, a measure's worth of mensural objects in a list, and a list of lengths corresponding to each of those objects as arguments.
-        This method returns the ``strength'' of the measure based on those lengths. A ``strong'' measure has longer notes on its stronger beats. Only valid for Italian notation.'''
+        This method returns the ``strength'' of the measure based on those lengths. A ``strong'' measure has longer notes on its stronger beats. Only valid for Trecento notation.'''
     
         typeStrength = {'semibrevis': 1.0, 'minima': 0.5, 'semiminima':0.25}
            
@@ -102,7 +102,7 @@ def _evaluateMeasure(mOrD, measure, lengths):
                     beatStrength = 0.125
             strength += typeStrength[measure[i].mensuralType]*beatStrength
             curBeat += lengths[i]
-        strength -= abs(mOrD.minimaPerMeasure - curBeat)
+        strength -= abs(mOrD.minimaPerBrevis - curBeat)
         return strength
 
 def _getTargetBeforeOrAtObj(music21Obj, targetClassList):
@@ -200,7 +200,7 @@ class _TranslateMensuralMeasure:
     >>> measure[2].setFlag('up', 'left')
     >>> TMM = medren._TranslateMensuralMeasure(mOrD, measure)
     >>> TMM.getMinimaLengths()
-    [1.0, 0.5, 0.5, 0.66666666666666663, 0.66666666666666663, 0.66666666666666663]
+    [1.0, 0.5, 0.5, 0.666..., 0.666..., 0.666...]
     >>>
     >>>
     >>> mOrD = medren.Divisione('.p.')
@@ -217,7 +217,7 @@ class _TranslateMensuralMeasure:
     ...    mn.setFlag('up', 'left')
     >>> TMM = medren._TranslateMensuralMeasure(mOrD, measure)
     >>> TMM.getMinimaLengths()
-    [0.66666666666666663, 0.66666666666666663, 0.66666666666666663, 0.5, 0.5, 0.5, 0.5, 2.0]
+    [0.666..., 0.666..., 0.666..., 0.5, 0.5, 0.5, 0.5, 2.0]
     >>>
     >>>
     >>> mOrD = medren.Divisione('.o.')
@@ -231,7 +231,7 @@ class _TranslateMensuralMeasure:
     >>> measure = [medren.MensuralNote('A', n) for n in names]
     >>> TMM = medren._TranslateMensuralMeasure(mOrD, measure)
     >>> TMM.getMinimaLengths()
-    [0.66666666666666663, 0.66666666666666663, 0.66666666666666663, 2.0, 4.0]
+    [0.666..., 0.666..., 0.666..., 2.0, 4.0]
     >>>
     >>>
     >>> mOrD = medren.Divisione('.d.')
@@ -264,7 +264,7 @@ class _TranslateMensuralMeasure:
     ...    mn.setStem('down')
     >>> TMM = medren._TranslateMensuralMeasure(mOrD, measure)
     >>> TMM.getMinimaLengths()
-    [0.5, 0.5, 0.5, 0.5, 4.0, 4.0, 4.0, 4.0, 4.0, 0.66666666666666663, 0.66666666666666663, 0.66666666666666663]
+    [0.5, 0.5, 0.5, 0.5, 4.0, 4.0, 4.0, 4.0, 4.0, 0.666..., 0.666..., 0.666...]
     '''
     
     def __init__(self, mensurationOrDivisione = None, measure = [], pDS = False):
@@ -367,7 +367,7 @@ class _TranslateMensuralMeasure:
         
         ##################################################################################################################################
             
-        minRem = self.mOrD.minimaPerMeasure
+        minRem = self.mOrD.minimaPerBrevis
         minRem_tracker = self.processing_downstems
         minimaLengths = self.minimaLengthList[:]
         
@@ -397,20 +397,20 @@ class _TranslateMensuralMeasure:
             
             #Gets rid of everything known 
             if obj.mensuralType == 'maxima':
-                minimaLength = float(4)*self.mOrD.minimaPerMeasure
+                minimaLength = float(4)*self.mOrD.minimaPerBrevis
             elif obj.mensuralType == 'longa':
-                minimaLength = float(2)*self.mOrD.minimaPerMeasure
+                minimaLength = float(2)*self.mOrD.minimaPerBrevis
             elif obj.mensuralType == 'brevis':
-                minimaLength = float(self.mOrD.minimaPerMeasure)
+                minimaLength = float(self.mOrD.minimaPerBrevis)
             elif minimaLengths[i] == 0 and \
             ( isinstance(obj, music21.medren.MensuralNote) or isinstance(obj, music21.medren.MensuralRest) ):
                 #Dep on mOrD
                 if obj.mensuralType == 'semibrevis':
                     if isinstance(obj, music21.medren.MensuralRest):
                         if self.mOrD.standardSymbol in ['.q.', '.i.']:
-                            minimaLength = self.mOrD.minimaPerMeasure/float(2)
+                            minimaLength = self.mOrD.minimaPerBrevis/float(2)
                         elif self.mOrD.standardSymbol in ['.p.', '.n.']:
-                            minimaLength = self.mOrD.minimaPerMeasure/float(3)
+                            minimaLength = self.mOrD.minimaPerBrevis/float(3)
                         else: 
                             semibrevis_list.append(i)
                     else:
@@ -961,7 +961,7 @@ class _TranslateMensuralMeasure:
                     newMensuralMeasure = [music21.medren.MensuralNote('A', 'SB') for i in range(len(semibrevis_downstem))]
                     
                     newMOrD = music21.medren.Divisione('.d.')
-                    newMOrD.minimaPerMeasure = minRem_changeable
+                    newMOrD.minimaPerBrevis = minRem_changeable
                         
                     tempTMM = music21.medren._TranslateMensuralMeasure(mensurationOrDivisione = newMOrD, measure = newMensuralMeasure, pDS = True)
                     for i in range(len(semibrevis_downstem)):
@@ -981,7 +981,7 @@ class _TranslateMensuralMeasure:
         
         if not minRem_tracker:
             newMOrD = music21.medren.Divisione(self.mOrD.standardSymbol)
-            newMOrD.minimaPerMeasure = 2*self.mOrD.minimaPerMeasure
+            newMOrD.minimaPerBrevis = 2*self.mOrD.minimaPerBrevis
             tempTMM = music21.medren._TranslateMensuralMeasure(newMOrD, self.mensuralMeasure)
             minimaLengths = tempTMM.getMinimaLengths()
             
@@ -999,6 +999,9 @@ class _TranslateMensuralMeasure:
 class Mensuration(meter.TimeSignature):
     '''
     An object representing a mensuration sign found in French notation.
+    Takes four optional arguments: tempus, prolation, mode, and maximode. Defaults are 'perfect', 'minor', 'perfect', and None respectively.
+    
+    Valid values for tempus and mode are 'perfect' and 'imperfect'. Valid values for prolation and maximode are 'major' and 'minor'.
     
     >>> from music21 import *
     >>> ODot = medren.Mensuration(tempus = 'perfect', prolation = 'major')
@@ -1017,28 +1020,28 @@ class Mensuration(meter.TimeSignature):
         # self._scalingFactor = scalingFactor still don't get why this is here...
         self._fontString = ''
         self.timeString = None
-        self._minimaPerMeasure = 0
+        self._minimaPerBrevis = 0
         
         if tempus == 'perfect' and prolation == 'major':
             self.timeString = '9/8'
             self.standardSymbol = 'O-dot'
             self._fontString = '0x50'
-            self._minimaPerMeasure = 9
+            self._minimaPerBrevis = 9
         elif tempus == 'perfect' and prolation == 'minor':
             self.timeString = '6/8'
             self.standardSymbol = 'C-dot'
             self._fontString = '0x63'
-            self._minimaPerMeasure = 6
+            self._minimaPerBrevis = 6
         elif tempus == 'imperfect' and prolation == 'major':
             self.timeString = '3/4'
             self.standardSymbol = 'O'
             self._fontString = '0x4f'
-            self._minimaPerMeasure = 6
+            self._minimaPerBrevis = 6
         elif tempus == 'imperfect' and prolation == 'minor':
             self.timeString = '2/4'
             self.standardSymbol = 'C'
             self._fontString = '0x43'
-            self._minimaPerMeasure = 4
+            self._minimaPerBrevis = 4
         else:
             raise MedRenException('cannot make out the mensuration from tempus %s and prolation %s' % (tempus, prolation)) 
 
@@ -1048,21 +1051,21 @@ class Mensuration(meter.TimeSignature):
         return '<music21.medren.Mensuration %s>' % self.standardSymbol
     
     def _getMinimaPerMeasure(self):
-        return self._minimaPerMeasure
+        return self._minimaPerBrevis
     
     def _setMinimaPerMeasure(self, mPM):
-        self._minimaPerMeasure = mPM
+        self._minimaPerBrevis = mPM
     
-    minimaPerMeasure = property(_getMinimaPerMeasure, _setMinimaPerMeasure,
+    minimaPerBrevis = property(_getMinimaPerMeasure, _setMinimaPerMeasure,
                                 doc = '''Used to get or set the number of minima in a 'measure' under the given divisione.
                                 
                                 
                                 >>> from music21 import *
                                 >>> c = medren.Mensuration('imperfect', 'minor')
-                                >>> c.minimaPerMeasure
+                                >>> c.minimaPerBrevis
                                 4
-                                >>> c.minimaPerMeasure = 8
-                                >>> c.minimaPerMeasure
+                                >>> c.minimaPerBrevis = 8
+                                >>> c.minimaPerBrevis
                                 8
                                 ''')
     
@@ -1085,23 +1088,37 @@ class Mensuration(meter.TimeSignature):
    
 class Divisione(meter.TimeSignature):
     '''
-    An object representing a divisione found in Italian Notation:
+    An object representing a divisione found in Trecento Notation.
+    Takes one argument, nameOrSymbol. This is the name of the divisione, or its corresponding letter. 
+    The default value for this argument is '.p.' 
+    
+    Valid names are 'quaternaria', 'senaria imperfect', 'senaria perfecta', 'novenaria', 'octonaria', and 'duodenaria'.
+    The corresponding symbols are '.q.', '.i.', '.p.', '.n.', '.o.', and '.d.'. 
     
     >>> from music21 import *
     >>> d = medren.Divisione('senaria imperfecta')
     >>> d.standardSymbol
     '.i.'
+    >>> d = medren.Divisione('.p.')
+    >>> d.name
+    'senaria perfecta'
+    >>> d = medren.Divisione('q')
+    >>> d.standardSymbol
+    '.q.'
     '''    
     def __init__(self, nameOrSymbol = '.p.'):
         self.name = None
         self.standardSymbol = None
-        self._minimaPerMeasure = 0
+        self._minimaPerBrevis = 0
+        
+        if len(nameOrSymbol) == 1:
+            nameOrSymbol = '.' + nameOrSymbol + '.'
         
         for d in _validDivisiones:
             if nameOrSymbol in d:
                 self.name = d[0]
                 self.standardSymbol = d[1]
-                self._minimaPerMeasure = _validDivisiones[d]
+                self._minimaPerBrevis = _validDivisiones[d]
                 
         if self.standardSymbol == None:
             self.timeString = None
@@ -1127,26 +1144,26 @@ class Divisione(meter.TimeSignature):
         return '<music21.medren.Divisione %s>' % self.standardSymbol
     
     def _getMinimaPerMeasure(self):
-        return self._minimaPerMeasure
+        return self._minimaPerBrevis
     
     def _setMinimaPerMeasure(self, mPM):
-        self._minimaPerMeasure = mPM 
+        self._minimaPerBrevis = mPM 
     
-    minimaPerMeasure = property(_getMinimaPerMeasure, _setMinimaPerMeasure, 
+    minimaPerBrevis = property(_getMinimaPerMeasure, _setMinimaPerMeasure, 
                                 doc = '''Used to get and set the number of minima in a 'measure' (the number of minima before a punctus occurs) under the given divisione.
                                 
                                 >>> from music21 import *
                                 >>> n = medren.Divisione('.n.')
-                                >>> n.minimaPerMeasure
+                                >>> n.minimaPerBrevis
                                 9
-                                >>> n.minimaPerMeasure = 18
-                                >>> n.minimaPerMeasure
+                                >>> n.minimaPerBrevis = 18
+                                >>> n.minimaPerBrevis
                                 18
                                 ''')
         
 class Punctus(music21.base.Music21Object):
     '''
-    An object representing a punctus, found in Italian notation.
+    An object representing a punctus, found in Trecento notation.
     '''
     def __init__(self):
         self._fontString = '0x70'
@@ -1161,7 +1178,10 @@ class Punctus(music21.base.Music21Object):
 class GeneralMensuralNote(music21.base.Music21Object):
     '''
     The base class object for :class:`music21.medren.MensuralNote` and :class:`music21.medren.MensuralRest`. This is arguably the most important mensural object, since it is responsible for getting the context and determining the contextual duration of objects within both subclasses.
-    A :class:`musci21.medren.GeneralMensuralNote` object takes a mensural type ('longa', 'brevis', 'minima', etc.) or its abbreviation ('L', 'B', 'M', etc.) as an argument. The default value for this argument is 'brevis'.
+    A :class:`musci21.medren.GeneralMensuralNote` object takes a mensural type or its abbreviation as an argument. The default value for this argument is 'brevis'.
+    
+    Valid mensural types are 'maxima', 'longa', 'brevis', 'semibrevis', 'minima', and 'semiminima'.
+    The corresponding abbreviations are 'Mx', 'L', 'B', 'SB', 'M', and 'SM'.
     
     The object's mensural type can be set and accessed via the property :attr:`music21.medren.GeneralMensuralNote.mensuralType`.
     The duration of a general mensural note can be set and accessed using the property :attr:`music21.medren.GeneralMensuralNote.duration`. If the duration of an general mensural note cannot be determined from context, it is set to 0. For more specific examples of this, please see the :attr:`music21.medren.GeneralMensuralNote.duration` documentation.
@@ -1228,7 +1248,7 @@ class GeneralMensuralNote(music21.base.Music21Object):
             raise MedRenException('%s is not a valid mensural type or abbreviation' % mensuralTypeOrAbbr)
     
     mensuralType = property(_getMensuralType, _setMensuralType,
-                        doc = '''Name of the mensural length of the rest (brevis, longa, etc.):
+                        doc = '''Name of the mensural length of the general mensural note (brevis, longa, etc.):
                         
                         >>> from music21 import *
                         >>> gmn = medren.GeneralMensuralNote('maxima')
@@ -1269,8 +1289,6 @@ class GeneralMensuralNote(music21.base.Music21Object):
                         If a general mensural note has no context, the duration will remain 0 since duration is context dependant. 
                         Finally, if a mensural note or a mensural rest has context, but a mensuration or divisione cannot be found or determined from that context, the duration will remain 0.
                         
-                        Note: French notation not yet supported.
-                        
                         >>> from music21 import *
                         >>> mn = medren.GeneralMensuralNote('B')
                         >>> mn.duration.quarterLength
@@ -1278,12 +1296,16 @@ class GeneralMensuralNote(music21.base.Music21Object):
                         >>> mn = medren.MensuralNote('A', 'B')
                         >>> mn.duration.quarterLength
                         0.0
+                        
+                        However, given a subclass, a context (a stream), and a divisione, the duration of a general mensural note can be determined:
+                        
+                        >>> from music21 import *
                         >>> s = stream.Stream()
                         >>> s.append(medren.Divisione('.p.'))
                         >>> for i in range(3):
                         ...    s.append(medren.MensuralNote('A', 'SB'))
                         >>> s.append(medren.Punctus())
-                        >>> s.append(medren.MensuralNote('B', 'SB'))
+                        >>> s.append(medren.MensuralRest('SB'))
                         >>> s.append(medren.MensuralNote('B', 'SB'))
                         >>> s.append(medren.Punctus())
                         >>> s.append(medren.MensuralNote('A', 'B'))
@@ -1296,8 +1318,8 @@ class GeneralMensuralNote(music21.base.Music21Object):
                         1.0
                         2.0
                         3.0
-                        >>>
-                        >>>  
+                        
+                        Note: French notation is not yet supported.
                         ''')
     
     def _getTranslator(self):
@@ -1488,7 +1510,6 @@ class MensuralNote(GeneralMensuralNote, music21.note.Note):
     Two mensural notes are considered equal if they match in pitch, articulation, and are equal as general mensural notes.
     
     Additional methods regarding color, duration, mensural type are inherited from :class:`music21.medren.GeneralMensuralNote`.
-    
     '''
     
     # scaling? 
@@ -1664,7 +1685,7 @@ class MensuralNote(GeneralMensuralNote, music21.note.Note):
         Adds a stem to a note. Any note with length less than or equal to a minima gets an upstem by default.
         Any note can have at most two stems. Valid stem directions are "down" and "side". 
         Downstems can be applied to any note with length less than or equal to a brevis.
-        Side stems in Italian notation are the equivalent of dots, but may only be applied to notes of the type semibrevis and minima (hence, a dotted note may not have a side stem, and vice versa).
+        Side stems in Trecento notation are the equivalent of dots, but may only be applied to notes of the type semibrevis and minima (hence, a dotted note may not have a side stem, and vice versa).
         Setting stem direction to None removes all but the default number of stems. 
         
         >>> from music21 import *
@@ -1820,8 +1841,6 @@ class Ligature(music21.base.Music21Object):
     -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     
     Example:
-    >>> #_DOCS_SHOW mergedStreams.show()
-    
     
     .. image:: images/medren_Ligature_Mensural-Example.*
         :width: 600
@@ -1841,12 +1860,13 @@ class Ligature(music21.base.Music21Object):
     >>> l2 = medren.Ligature(['F4','G4','A4','B-4','D5'])
     >>> l2.setStem(4, 'down', 'left')
     >>> l2.setReverse(4, True)
-    >>> print [n.fullName for n in l2.notes]
-    ['brevis F4 ', 'brevis G4 ', 'brevis A4 ', 'brevis B4-flat ', 'longa D5 ']
+    >>> print [(n.mensuralType, n.pitch) for n in l2.notes]
+    [('brevis', F4), ('brevis', G4), ('brevis', A4), ('brevis', B4-flat), ('longa', D5)]
     
+    Note that ligatures cannot be displayed yet. 
     '''
 
-    def __init__(self, pitches = [], color = 'black', filled = 'yes'):
+    def __init__(self, pitches = None, color = 'black', filled = 'yes'):
         self.pitches = []
         
         for p in pitches:
@@ -2498,22 +2518,30 @@ def transferTies(score, inPlace = True):
 
 def convertHouseStyle(score, durationScale = 2, barlineStyle = 'tick', tieTransfer = True, inPlace = False):
     '''
-    The :meth:`music21.medren.convertHouseStyle` method is best explained by the following images:
-    >>> #_DOCS_SHOW mergedStreams.show()
-
+    The method :meth:`music21.medren.convertHouseStyle` takes a score, durationScale, barlineStyle, tieTransfer, and inPlace as arguments. Of these, only score is not optional.
+    Default values for durationScale, barlineStyle, tieTransfer, and inPlace are 2, 'tick', True, and False respectively. 
+    
+    Changing :attr:`music21.medren.convertHouseStyle.barlineStyle` changes how the barlines are displayed within the piece. 
+    Changing :attr:`music21.medren.convertHouseStyle.durationScale` keeps ratios of note durations constant, but scales each duration by the specified value. 
+    If changing the duration scale causes tied notes, and :attr:`music21.medren.convertHouseStyle.tieTransfer` is set to True, the total duration is transferred to the first note, and all remaining space is left blank.
+    
+    Examples:
+    The first image shows the original score.
+    The second image shows the score with each note's duration scaled by 2, and with the barline style set to 'tick'. The circled area shows a space left blank due to tieTransfer being True. 
+    
+    >>> from music21 import *
+    >>> gloria = corpus.parse('luca/gloria')
+    >>> gloria.show()
+    
     .. image:: images/medren_convertHouseStyle_1.*
         :width: 600
     
-    >>> #_DOCS_SHOW mergedStreams.show()
+    >>> from music21 import *
+    >>> gloria = corpus.parse('luca/gloria')
+    >>> newGloria = medren.convertHouseStyle(gloria, durationScale = 2, barlineStyle = 'tick', tieTransfer = True)
 
     .. image:: images/medren_convertHouseStyle_2.*
         :width: 600
-    
-    >>> #_DOCS_SHOW mergedStreams.show()
-
-    .. image:: images/medren_convertHouseStyle_3.*
-        :width: 600
-    
     '''
     
     if inPlace is False:
