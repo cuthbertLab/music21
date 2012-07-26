@@ -662,22 +662,32 @@ class TwelveToneRow(ToneRow):
 
 # ------- parsing functions for atonal music -------
 
+# add defaults
+# add hyperlinks
+# first describe what function , then explain arguments, then explain what is returned.
+# caps on things
+# doc order
+
 def getContiguousSegmentsOfLength(inputpart, length, reps, chords):
     
     '''
-    Given a part object or a stream object with one part, returns a list
+
+    Given a stream.Part object or a stream object with one part, returns a list
     of contiguous segments of notes with a given length,
     subject to constraints specified in the last two arguments. Each list is given
     as a tuple of the list of notes and the number of the measure on which it starts. The third
     argument specifies how repetitions of pitch classes are dealt with and the fourth
     specifies how chords are dealt with.
     
-    The third argument may be set to 'skipconsecutive,' 'ignoreall,' or 'rowsonly'.
+    The third argument may be set to 'skipconsecutive', 'rowsonly', or 'includeall'
     The first setting treats immediate repetitions of pitch classes as one instance of the
     same pitch class. The second disregards all repetitions of pitch classes and continues
     appending notes to the contiguous segments until the appropriate number of distinct
     pitch classes are found. The third only finds segments of consecutive pitch classes
     which are pairwise distinct, i.e. tone rows.
+    
+    The fourth argument must be set to 'skipchords'
+    
     
     >>> from music21 import *
     >>> s = stream.Stream()
@@ -830,13 +840,13 @@ def getContiguousSegmentsOfLength(inputpart, length, reps, chords):
     return listOfPitchLists
     
 
-
+#chordify - search multiple parts simultaneously
 
 
 def findSegments(inputstream, segmentlist, reps, chords):
     
     '''
-    Given a stream object and list of segments of pitch classes (each given as a list), returns a list of all
+    Given a stream object and list of contiguous segments of pitch classes (each given as a list), returns a list of all
     instances of the segment in the stream subject to the constraints on repetitions of pitches
     and how chords are dealt with as described in getContinuousSegmentsOfLength. Each
     instance is given as a tuple of the segment of notes, the number of the measure in which it appears, and,
@@ -995,7 +1005,8 @@ def findTransposedSegments(inputstream, segmentlist, reps, chords):
     [([<music21.note.Note G>, <music21.note.Note A>], 3, 1), ([<music21.note.Note A>, <music21.note.Note B>], 3, 1), 
     ([<music21.note.Note G>, <music21.note.Note A>], 3, 2), ([<music21.note.Note A>, <music21.note.Note B>], 3, 2)]
     
-    __OMIT_FROM__DOCS
+    __OMIT_FROM_DOCS__
+    
     >>> findTransposedSegments(newpart, [[0, 1], [12, 13]], 'skipconsecutive', 'skipchords')
     [([<music21.note.Note E>, <music21.note.Note F>], 1), ([<music21.note.Note B>, <music21.note.Note C>], 5)]
     
