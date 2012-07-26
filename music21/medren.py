@@ -105,57 +105,58 @@ def _evaluateMeasure(mOrD, measure, lengths):
         strength -= abs(mOrD.minimaPerBrevis - curBeat)
         return strength
 
-def _getTargetBeforeOrAtObj(music21Obj, targetClassList):
-    '''
-    Takes two arguments: music21Obj, targetObj
-    If music21Obj has some set of contexts, returns the list of object of class targetClass at or before music21Obj.
-    If no such instance exists, of if the only context is None, returns None.
-    NOTE: This has no other use than to act as an alternate way of getting the closest instance of a mensuration or divisione for :class:`music21.medren.GeneralMensuralNote`. 
-    
-    >>> from music21 import *
-    >>> n = note.Note('A')
-    >>> medren._getTargetBeforeOrAtObj(n, note.Note)
-    []
-    >>> n_1 = note.Note('B')
-    >>> n_1.duration = duration.Duration(2.5)
-    >>> n_2 = note.Note('C')
-    >>> n_2.duration = duration.Duration(0.5)
-    >>> s_1 = stream.Stream()
-    >>> s_1.append(n_1)
-    >>> s_1.append(n)
-    >>> s_1.append(n_2)
-    >>> medren._getTargetBeforeOrAtObj(n, note.Note)
-    [<music21.note.Note B>, <music21.note.Note A>]
-    >>> n_3 = note.Note('D')
-    >>> n_3.duration = duration.Duration(1.0)
-    >>> n_4 = note.Note('E')
-    >>> n_4.duration = duration.Duration(1.5)
-    >>> m = stream.Measure()
-    >>> m.append(n_3)
-    >>> m.append(n)
-    >>> s = stream.Score()
-    >>> s.append(n_4)
-    >>> s.append(meter.TimeSignature())
-    >>> s.append(m)
-    >>> medren._getTargetBeforeOrAtObj(n, meter.TimeSignature)
-    [<music21.meter.TimeSignature 4/4>]
-    '''
-    #Get contacts by class
-    #Improve efficiency
-    cList = []
-    
-    if not isinstance(targetClassList, list):
-        targetClassList = [targetClassList]
-    
-    tempSites = music21Obj.getSites()[1:]
-    if len(tempSites) > 0:
-        for s in tempSites:
-            for i in range(int(s.lowestOffset), int(s.getOffsetByElement(music21Obj))+1):
-                cList += s.getElementsByOffset(i, i+1, classList = targetClassList).recurse()[1:]
-        cList += music21.medren._getTargetBeforeOrAtObj(s, targetClassList)
-    
-    return list(set(cList))
-
+#===============================================================================
+# def _getTargetBeforeOrAtObj(music21Obj, targetClassList):
+#    '''
+#    Takes two arguments: music21Obj, targetObj
+#    If music21Obj has some set of contexts, returns the list of object of class targetClass at or before music21Obj.
+#    If no such instance exists, of if the only context is None, returns None.
+#    NOTE: This has no other use than to act as an alternate way of getting the closest instance of a mensuration or divisione for :class:`music21.medren.GeneralMensuralNote`. 
+#    
+#    >>> from music21 import *
+#    >>> n = note.Note('A')
+#    >>> medren._getTargetBeforeOrAtObj(n, note.Note)
+#    []
+#    >>> n_1 = note.Note('B')
+#    >>> n_1.duration = duration.Duration(2.5)
+#    >>> n_2 = note.Note('C')
+#    >>> n_2.duration = duration.Duration(0.5)
+#    >>> s_1 = stream.Stream()
+#    >>> s_1.append(n_1)
+#    >>> s_1.append(n)
+#    >>> s_1.append(n_2)
+#    >>> medren._getTargetBeforeOrAtObj(n, note.Note)
+#    [<music21.note.Note B>, <music21.note.Note A>]
+#    >>> n_3 = note.Note('D')
+#    >>> n_3.duration = duration.Duration(1.0)
+#    >>> n_4 = note.Note('E')
+#    >>> n_4.duration = duration.Duration(1.5)
+#    >>> m = stream.Measure()
+#    >>> m.append(n_3)
+#    >>> m.append(n)
+#    >>> s = stream.Score()
+#    >>> s.append(n_4)
+#    >>> s.append(meter.TimeSignature())
+#    >>> s.append(m)
+#    >>> medren._getTargetBeforeOrAtObj(n, meter.TimeSignature)
+#    [<music21.meter.TimeSignature 4/4>]
+#    '''
+#    #Get contacts by class
+#    #Improve efficiency
+#    cList = []
+#    
+#    if not isinstance(targetClassList, list):
+#        targetClassList = [targetClassList]
+#    
+#    tempSites = music21Obj.getSites()[1:]
+#    if len(tempSites) > 0:
+#        for s in tempSites:
+#            for i in range(int(s.lowestOffset), int(s.getOffsetByElement(music21Obj))+1):
+#                cList += s.getElementsByOffset(i, i+1, classList = targetClassList).recurse()[1:]
+#        cList += music21.medren._getTargetBeforeOrAtObj(s, targetClassList)
+#    
+#    return list(set(cList))
+#===============================================================================
 
 class _TranslateMensuralMeasure:
     '''
@@ -1269,7 +1270,7 @@ class GeneralMensuralNote(music21.base.Music21Object):
         If a general mensural note has no context, the duration will remain 0 since duration is context dependant. 
         Finally, if a mensural note or a mensural rest has context, but a mensuration or divisione cannot be found or determined from that context, the duration will remain 0.
         
-        Note: French notation not yet supported.
+        Every time a duration is changed, the method :meth:`music21.medren.GeneralMensuralNote.updateDurationFromMensuration`` should be called.
         
         >>> from music21 import *
         >>> mn = medren.GeneralMensuralNote('B')
@@ -1279,8 +1280,9 @@ class GeneralMensuralNote(music21.base.Music21Object):
         >>> mn.duration.quarterLength
         0.0
         
+        However, if subclass is given, context (a stream) is given, and a divisioned is given, duration can be determined.
         
-        
+        >>> from music21 import *
         >>> s = stream.Stream()
         >>> s.append(medren.Divisione('.p.'))
         >>> for i in range(3):
@@ -1299,7 +1301,9 @@ class GeneralMensuralNote(music21.base.Music21Object):
         1.0
         1.0
         2.0
-        3.0    
+        3.0
+        
+        Note: French notation not yet supported.    
         '''
         mLen, mDur = 0, 0
         if self._gettingDuration is True:
@@ -1434,10 +1438,10 @@ class GeneralMensuralNote(music21.base.Music21Object):
                                 break
                             else:
                                 mList.insert(j, tempList[j])
-            for i in range(len(mList)):
-                if mList[i] is self:
-                    index = i 
-                    break
+        
+        for i in range(len(mList)):
+            if mList[i] is self:
+                index = i
         
         return mList, index
             
@@ -1551,7 +1555,7 @@ class MensuralNote(GeneralMensuralNote, music21.note.Note):
     def __eq__(self, other):
         '''
         Same as music21.medren.GeneralNote.__eq__, but also tests equality of pitch and articulation.
-        Only pitch is shown as a test. For other cases, please see the docs for music21.medren.GeneralMensuralNote.__eq__
+        Only pitch is shown as a test. For other cases, please see the docs for :meth:``music21.medren.GeneralMensuralNote.__eq__``
         
         >>> from music21 import *
         >>> m = medren.MensuralNote('A', 'minima')
@@ -1818,7 +1822,7 @@ class MensuralNote(GeneralMensuralNote, music21.note.Note):
         
         
 class Ligature(music21.base.Music21Object):
-  
+    
     '''
     An object that represents a ligature commonly found in medieval and Renaissance music. 
     Initialization takes a list of the pitches in the ligature as a required argument.
@@ -1867,7 +1871,7 @@ class Ligature(music21.base.Music21Object):
     >>> l2.setStem(4, 'down', 'left')
     >>> l2.setReverse(4, True)
     >>> print [(n.mensuralType, n.pitch) for n in l2.notes]
-    [('brevis', F4), ('brevis', G4), ('brevis', A4), ('brevis', B4-flat), ('longa', D5)]
+    [('brevis', F4), ('brevis', G4), ('brevis', A4), ('brevis', B-4), ('longa', D5)]
     
     Note that ligatures cannot be displayed yet. 
     '''
@@ -2537,7 +2541,8 @@ def convertHouseStyle(score, durationScale = 2, barlineStyle = 'tick', tieTransf
     
     >>> from music21 import *
     >>> gloria = corpus.parse('luca/gloria')
-    >>> gloria.show()
+    >>> #_DOCS_HIDE gloria.show()
+    
     
     .. image:: images/medren_convertHouseStyle_1.*
         :width: 600
@@ -2545,7 +2550,8 @@ def convertHouseStyle(score, durationScale = 2, barlineStyle = 'tick', tieTransf
     >>> from music21 import *
     >>> gloria = corpus.parse('luca/gloria')
     >>> newGloria = medren.convertHouseStyle(gloria, durationScale = 2, barlineStyle = 'tick', tieTransfer = True)
-
+    >>> #_DOCS_HIDE newGloria.show()
+    
     .. image:: images/medren_convertHouseStyle_2.*
         :width: 600
     '''
