@@ -1579,17 +1579,18 @@ class VexflowStave(object):
         if 'position' not in self.params:
             self.params['position'] = defaultStavePosition
 
-        if 'name' in self.params:
-            self.staveName = self.params['name']
-        else:
-            self.staveName = 'music21Stave' + str(self.UID)
-
         if 'UIDCounter' in self.params:
             self.UIDCounter = self.params['UIDCounter']
             self.UID = self.UIDCounter.readAndIncrement()
         else:
             self.UIDCounter = UIDCounter()
             self.UID = 0
+
+        if 'name' in self.params:
+            self.staveName = self.params['name']
+        else:
+            self.staveName = 'music21Stave' + str(self.UID)
+
 
     
     def staveCode(self):

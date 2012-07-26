@@ -6359,7 +6359,6 @@ class Stream(music21.Music21Object):
         for sequential notes with matching pitches. The `matchByPitch` option can 
         be used to use this technique. 
 
-
         >>> from music21 import *
 
         >>> a = stream.Stream()
@@ -6373,7 +6372,6 @@ class Stream(music21.Music21Object):
         >>> m = m.stripTies()
         >>> len(m.flat.notes)
         1
-        >>> 
         '''
         #environLocal.printDebug(['calling stripTies'])
         if not inPlace: # make a copy
