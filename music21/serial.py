@@ -668,25 +668,28 @@ class TwelveToneRow(ToneRow):
 # caps on things
 # doc order
 
-def getContiguousSegmentsOfLength(inputpart, length, reps, chords):
+def getContiguousSegmentsOfLength(inputPart, length, reps, chords = 'skipChords'):
     
     '''
-
-    Given a stream.Part object or a stream object with one part, returns a list
-    of contiguous segments of notes with a given length,
-    subject to constraints specified in the last two arguments. Each list is given
-    as a tuple of the list of notes and the number of the measure on which it starts. The third
-    argument specifies how repetitions of pitch classes are dealt with and the fourth
-    specifies how chords are dealt with.
     
-    The third argument may be set to 'skipconsecutive', 'rowsonly', or 'includeall'
+    Finds contiguous segments of notes in a stream,
+    where the number of notes in the segment is specified. 
+    
+    The inputPart must be a stream.Part object or otherwise a stream object with at most one part.
+    The length is an integer specifying the desired number of notes in each contiguous segment.
+    
+    The reps argument specifies how repeated pitch classes are dealt with. 
+    It may be set to 'skipConsecutive', 'rowsOnly', or 'includeAll'.
     The first setting treats immediate repetitions of pitch classes as one instance of the
-    same pitch class. The second disregards all repetitions of pitch classes and continues
-    appending notes to the contiguous segments until the appropriate number of distinct
-    pitch classes are found. The third only finds segments of consecutive pitch classes
-    which are pairwise distinct, i.e. tone rows.
+    same pitch class. The second only finds segments of consecutive pitch classes
+    which are distinct, i.e. tone rows. The third includes all repeated pitches.
     
-    The fourth argument must be set to 'skipchords'
+    The 'chord' argument specifies how chords are dealt with. At the present time, it must be 
+    set to 'skipChords', which ignores any segment containing a chord.
+    
+    The returned list gives all contiguous segments with the desired number of notes subject
+    to the specified constraints on repetitions and chords. Each entry of the list is a tuple of a
+    contiguous segment of notes and the measure number of its first note.
     
     
     >>> from music21 import *
@@ -714,12 +717,12 @@ def getContiguousSegmentsOfLength(inputpart, length, reps, chords):
     >>> s.append(n7)
     >>> s = s.makeMeasures()
     >>> s.makeTies()
-    >>> serial.getContiguousSegmentsOfLength(s, 3, 'skipconsecutive', 'skipchords')
+    >>> serial.getContiguousSegmentsOfLength(s, 3, 'skipConsecutive', 'skipChords')
     [([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 3), 
     ([<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>], 3)]
-    >>> serial.getContiguousSegmentsOfLength(s, 3, 'rowsonly', 'skipchords')
+    >>> serial.getContiguousSegmentsOfLength(s, 3, 'rowsOnly', 'skipChords')
     [([<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>], 4)]
-    >>> serial.getContiguousSegmentsOfLength(s, 3, 'includeall', 'skipchords')
+    >>> serial.getContiguousSegmentsOfLength(s, 3, 'includeAll', 'skipChords')
     [([<music21.note.Note G>, <music21.note.Note G>, <music21.note.Note A>], 3), 
     ([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note A>], 3), 
     ([<music21.note.Note A>, <music21.note.Note A>, <music21.note.Note B>], 3), 
@@ -740,7 +743,7 @@ def getContiguousSegmentsOfLength(inputpart, length, reps, chords):
     ...    n.quarterLength = 1
     ...    part.append(n)
     >>> part = part.makeMeasures()
-    >>> serial.getContiguousSegmentsOfLength(part, 3, 'rowsonly', 'skipchords')
+    >>> serial.getContiguousSegmentsOfLength(part, 3, 'rowsOnly', 'skipChords')
     [([<music21.note.Note C#>, <music21.note.Note E>, <music21.note.Note D#>], 1), 
     ([<music21.note.Note E>, <music21.note.Note D#>, <music21.note.Note F>], 1), 
     ([<music21.note.Note D#>, <music21.note.Note F>, <music21.note.Note E>], 1), 
@@ -753,20 +756,20 @@ def getContiguousSegmentsOfLength(inputpart, length, reps, chords):
     
     listOfPitchLists = []
     currentPitchLists = []
-    inputpart = inputpart.stripTies(False, False, True)
+    inputPart = inputPart.stripTies(False, False, True)
     
-    if len(inputpart.getElementsByClass(stream.Part)) == 0:
-        measures = inputpart.getElementsByClass(stream.Measure)
-    elif len(inputpart.getElementsByClass(stream.Part)) == 1:
-        measures = inputpart.parts[0].getElementsByClass(stream.Measure)
+    if len(inputPart.getElementsByClass(stream.Part)) == 0:
+        measures = inputPart.getElementsByClass(stream.Measure)
+    elif len(inputPart.getElementsByClass(stream.Part)) == 1:
+        measures = inputPart.parts[0].getElementsByClass(stream.Measure)
     else:
         raise SerialException("serial.getContiguousSegmentsOfLength can only applied to streams with one part.")
     
     
     
-    if chords == 'skipchords':
+    if chords == 'skipChords':
         pitchList = []
-        if reps == 'skipconsecutive':
+        if reps == 'skipConsecutive':
             for m in measures:
                 for n in m.flat.notes:
                     add = False
@@ -798,7 +801,7 @@ def getContiguousSegmentsOfLength(inputpart, length, reps, chords):
 #                            listOfPitchLists.append((list(pitchList), pitchList[0].measureNumber))
 #                    elif len(n.pitches) > 1:
 #                        pitchList = []
-        elif reps == 'rowsonly':
+        elif reps == 'rowsOnly':
             for m in measures:
                 for n in m.flat.notes:
                     if len(n.pitches) == 1:
@@ -821,7 +824,7 @@ def getContiguousSegmentsOfLength(inputpart, length, reps, chords):
                         
             return listOfPitchLists
         
-        elif reps == 'includeall':
+        elif reps == 'includeAll':
             for m in measures:
                 for n in m.flat.notes:
                     if len(n.pitches) == 1:
@@ -843,7 +846,7 @@ def getContiguousSegmentsOfLength(inputpart, length, reps, chords):
 #chordify - search multiple parts simultaneously
 
 
-def findSegments(inputstream, segmentlist, reps, chords):
+def findSegments(inputStream, segmentlist, reps, chords):
     
     '''
     Given a stream object and list of contiguous segments of pitch classes (each given as a list), returns a list of all
@@ -878,20 +881,20 @@ def findSegments(inputstream, segmentlist, reps, chords):
     >>> part.append(n7)
     >>> newpart = part.makeMeasures()
     >>> newpart.makeTies()
-    >>> findSegments(newpart, [[7, 9, 11]], 'skipconsecutive', 'skipchords')
+    >>> findSegments(newpart, [[7, 9, 11]], 'skipConsecutive', 'skipChords')
     [([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 3)]
-    >>> findSegments(newpart, [[7, 9, 11], [9, 11, 0]], 'skipconsecutive', 'skipchords')
+    >>> findSegments(newpart, [[7, 9, 11], [9, 11, 0]], 'skipConsecutive', 'skipChords')
     [([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 3), 
     ([<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>], 3)]
     >>> s = stream.Stream()
     >>> s.repeatAppend(newpart, 2)
-    >>> findSegments(s, [[7, -3, 11]], 'skipconsecutive', 'skipchords')
+    >>> findSegments(s, [[7, -3, 11]], 'skipConsecutive', 'skipChords')
     [([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 3, 1), 
     ([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 3, 2)]
     
     __OMIT_FROM_DOCS__
     
-    >>> findSegments(newpart, [[7, 9, 11], [9, 11, 0], [7, -3, 11]], 'skipconsecutive', 'skipchords')
+    >>> findSegments(newpart, [[7, 9, 11], [9, 11, 0], [7, -3, 11]], 'skipConsecutive', 'skipChords')
     [([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 3), 
     ([<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>], 3)]
     
@@ -900,7 +903,7 @@ def findSegments(inputstream, segmentlist, reps, chords):
     segs = []
     donealready = []
     contigdict = {}
-    parts = inputstream.getElementsByClass(stream.Part)
+    parts = inputStream.getElementsByClass(stream.Part)
     numparts = len(parts)
          
     if numparts == 0:
@@ -917,7 +920,7 @@ def findSegments(inputstream, segmentlist, reps, chords):
                 if length in contigdict:
                     contig = contigdict[length]
                 else:
-                    contig = getContiguousSegmentsOfLength(inputstream, len(segment), reps, chords)
+                    contig = getContiguousSegmentsOfLength(inputStream, len(segment), reps, chords)
                     contigdict[length] = contig           
                 for contiguousseg in contig:
                     pitchlist = [n.pitchClass for n in contiguousseg[0]]
@@ -962,7 +965,7 @@ def findSegments(inputstream, segmentlist, reps, chords):
                         
     return segs
 
-def findTransposedSegments(inputstream, segmentlist, reps, chords):
+def findTransposedSegments(inputStream, segmentlist, reps, chords):
     
     '''
     Given a stream object and list of segments of pitch classes (each given as a list), returns a list of all
@@ -997,17 +1000,17 @@ def findTransposedSegments(inputstream, segmentlist, reps, chords):
     >>> part.append(n7)
     >>> newpart = part.makeMeasures()
     >>> newpart.makeTies()
-    >>> findTransposedSegments(newpart, [[0, 1]], 'skipconsecutive', 'skipchords')
+    >>> findTransposedSegments(newpart, [[0, 1]], 'skipConsecutive', 'skipChords')
     [([<music21.note.Note E>, <music21.note.Note F>], 1), ([<music21.note.Note B>, <music21.note.Note C>], 5)]
     >>> s = stream.Stream()
     >>> s.repeatAppend(newpart, 2)
-    >>> findTransposedSegments(s, [[12, 2]], 'skipconsecutive', 'skipchords')
+    >>> findTransposedSegments(s, [[12, 2]], 'skipConsecutive', 'skipChords')
     [([<music21.note.Note G>, <music21.note.Note A>], 3, 1), ([<music21.note.Note A>, <music21.note.Note B>], 3, 1), 
     ([<music21.note.Note G>, <music21.note.Note A>], 3, 2), ([<music21.note.Note A>, <music21.note.Note B>], 3, 2)]
     
     __OMIT_FROM_DOCS__
     
-    >>> findTransposedSegments(newpart, [[0, 1], [12, 13]], 'skipconsecutive', 'skipchords')
+    >>> findTransposedSegments(newpart, [[0, 1], [12, 13]], 'skipConsecutive', 'skipChords')
     [([<music21.note.Note E>, <music21.note.Note F>], 1), ([<music21.note.Note B>, <music21.note.Note C>], 5)]
     
     '''
@@ -1016,7 +1019,7 @@ def findTransposedSegments(inputstream, segmentlist, reps, chords):
     segs = []
     donealready = []
     contigdict = {}
-    parts = inputstream.getElementsByClass(stream.Part)
+    parts = inputStream.getElementsByClass(stream.Part)
     numparts = len(parts)
     
     if numparts == 0:
@@ -1029,7 +1032,7 @@ def findTransposedSegments(inputstream, segmentlist, reps, chords):
                 if length in contigdict:
                     contig = contigdict[length]
                 else:
-                    contig = getContiguousSegmentsOfLength(inputstream, length, reps, chords)
+                    contig = getContiguousSegmentsOfLength(inputStream, length, reps, chords)
                     contigdict[length] = contig
                 for contiguousseg in contig:
                     if intervals == pcToToneRow([n.pitchClass for n in contiguousseg[0]]).getIntervalsAsString():
@@ -1059,7 +1062,7 @@ def findTransposedSegments(inputstream, segmentlist, reps, chords):
     return segs
 
 
-def findTransformedSegments(inputstream, segmentlist, reps, chords, convention):
+def findTransformedSegments(inputStream, segmentlist, reps, chords, convention):
     
     '''
     Given a stream object and list of segments of pitch classes (each given as a list), returns a list of all
@@ -1083,7 +1086,7 @@ def findTransformedSegments(inputstream, segmentlist, reps, chords, convention):
     ...    n.quarterLength = 1
     ...    part.append(n)
     >>> part = part.makeMeasures()
-    >>> serial.findTransformedSegments(part, [[2, 5, 4]], 'rowsonly', 'skipchords', 'zero')
+    >>> serial.findTransformedSegments(part, [[2, 5, 4]], 'rowsOnly', 'skipChords', 'zero')
     [([<music21.note.Note C#>, <music21.note.Note E>, <music21.note.Note D#>], [('P', 1)], 1), 
     ([<music21.note.Note F>, <music21.note.Note E>, <music21.note.Note G>], [('RI', 7)], 1)]
     
@@ -1092,7 +1095,7 @@ def findTransformedSegments(inputstream, segmentlist, reps, chords, convention):
     
     >>> s = stream.Stream()
     >>> s.repeatAppend(part, 2)
-    >>> serial.findTransformedSegments(s, [[2, -7, 4]], 'skipconsecutive', 'skipchords', 'original')
+    >>> serial.findTransformedSegments(s, [[2, -7, 4]], 'skipConsecutive', 'skipChords', 'original')
     [([<music21.note.Note C#>, <music21.note.Note E>, <music21.note.Note D#>], [('P', 11)], 1, 1), 
     ([<music21.note.Note F>, <music21.note.Note E>, <music21.note.Note G>], [('RI', 5)], 1, 1), 
     ([<music21.note.Note C#>, <music21.note.Note E>, <music21.note.Note D#>], [('P', 11)], 1, 2), 
@@ -1103,7 +1106,7 @@ def findTransformedSegments(inputstream, segmentlist, reps, chords, convention):
     segs = []
     donealready = []
     contigdict = {}
-    parts = inputstream.getElementsByClass(stream.Part)
+    parts = inputStream.getElementsByClass(stream.Part)
     numparts = len(parts)
     
     if numparts == 0:
@@ -1121,7 +1124,7 @@ def findTransformedSegments(inputstream, segmentlist, reps, chords, convention):
                 if length in contigdict:
                     contig = contigdict[length]
                 else:
-                    contig = getContiguousSegmentsOfLength(inputstream, length, reps, chords)
+                    contig = getContiguousSegmentsOfLength(inputStream, length, reps, chords)
                     contigdict[length] = contig
                 if convention == 'zero':
                     for contiguousseg in contig:
@@ -1204,7 +1207,7 @@ def _checkMultisetEquivalence(multiset1, multiset2):
             
 
 
-def findSets(inputstream, multisetlist, reps, chords):
+def findSets(inputStream, multisetlist, reps, chords):
     
     '''
     
@@ -1228,7 +1231,7 @@ def findSets(inputstream, multisetlist, reps, chords):
     >>> part.append(n2)
     >>> part.append(n1)
     >>> part = part.makeMeasures()
-    >>> findSets(part, [[5, 4, 4]], 'includeall', 'skipchords')
+    >>> findSets(part, [[5, 4, 4]], 'includeAll', 'skipChords')
     [([<music21.note.Note E>, <music21.note.Note E>, <music21.note.Note F>], 1), 
     ([<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note E>], 2)]
     
@@ -1236,11 +1239,11 @@ def findSets(inputstream, multisetlist, reps, chords):
     
     >>> s = stream.Stream()
     >>> s.repeatAppend(part, 2)
-    >>> findSets(part, [[5, 4, 4]], 'rowsonly', 'skipchords')
+    >>> findSets(part, [[5, 4, 4]], 'rowsOnly', 'skipChords')
     []
-    >>> findSets(part, [[5, 4, 4]], 'skipconsecutive', 'skipchords')
+    >>> findSets(part, [[5, 4, 4]], 'skipConsecutive', 'skipChords')
     [([<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note E>], 1)]
-    >>> findSets(s, [[-7, 16, 4], [5, 4, 4]], 'includeall', 'skipchords')
+    >>> findSets(s, [[-7, 16, 4], [5, 4, 4]], 'includeAll', 'skipChords')
     [([<music21.note.Note E>, <music21.note.Note E>, <music21.note.Note F>], 1, 1), 
     ([<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note E>], 2, 1), 
     ([<music21.note.Note E>, <music21.note.Note E>, <music21.note.Note F>], 1, 2), 
@@ -1252,7 +1255,7 @@ def findSets(inputstream, multisetlist, reps, chords):
     multisets = []
     donealready = []
     contigdict = {}
-    parts = inputstream.getElementsByClass(stream.Part)
+    parts = inputStream.getElementsByClass(stream.Part)
     numparts = len(parts)
     
     if numparts == 0:
@@ -1270,7 +1273,7 @@ def findSets(inputstream, multisetlist, reps, chords):
                 if length in contigdict:
                     contig = contigdict[length]
                 else:
-                    contig = getContiguousSegmentsOfLength(inputstream, length, reps, chords)
+                    contig = getContiguousSegmentsOfLength(inputStream, length, reps, chords)
                     contigdict[length] = contig
                 for contiguousseg in contig:
                     pitchmultiset = [n.pitchClass for n in contiguousseg[0]]
@@ -1306,7 +1309,7 @@ def findSets(inputstream, multisetlist, reps, chords):
 
     return multisets
 
-def findTransposedSets(inputstream, multisetlist, reps, chords):
+def findTransposedSets(inputStream, multisetlist, reps, chords):
     
     '''
     
@@ -1333,7 +1336,7 @@ def findTransposedSets(inputstream, multisetlist, reps, chords):
     ...    n.quarterLength = 2
     ...    part.repeatAppend(n, 2)
     >>> part = part.makeMeasures()
-    >>> instancelist = serial.findTransposedSets(part, [[1, 2, 3]], 'skipconsecutive', 'skipchords')
+    >>> instancelist = serial.findTransposedSets(part, [[1, 2, 3]], 'skipConsecutive', 'skipChords')
     >>> print instancelist
     [([<music21.note.Note D>, <music21.note.Note E>, <music21.note.Note E->], 3),
     ([<music21.note.Note E->, <music21.note.Note E>, <music21.note.Note D>], 5), 
@@ -1357,9 +1360,9 @@ def findTransposedSets(inputstream, multisetlist, reps, chords):
             for j in multiset:
                 transposition.append((j+i) % 12)
             transposedmultisets.append(transposition)
-    return findSets(inputstream, transposedmultisets, reps, chords)
+    return findSets(inputStream, transposedmultisets, reps, chords)
 
-def findTransposedAndInvertedSets(inputstream, multisetlist, reps, chords):
+def findTransposedAndInvertedSets(inputStream, multisetlist, reps, chords):
     
     '''
     
@@ -1384,13 +1387,13 @@ def findTransposedAndInvertedSets(inputstream, multisetlist, reps, chords):
     ...     n.quarterLength = 1
     ...     s.append(n)
     >>> s = s.makeMeasures()
-    >>> serial.findTransposedAndInvertedSets(s, [[0, 4, 7]], 'rowsonly', 'skipchords')
+    >>> serial.findTransposedAndInvertedSets(s, [[0, 4, 7]], 'rowsOnly', 'skipChords')
     [([<music21.note.Note G>, <music21.note.Note E>, <music21.note.Note C>], 1), 
     ([<music21.note.Note C>, <music21.note.Note E->, <music21.note.Note G>], 1)]
     
     __OMIT_FROM_DOCS__
     
-    >>> serial.findTransposedAndInvertedSets(s, [[0, 4, 7], [0, 3, 7]], 'rowsonly', 'skipchords')
+    >>> serial.findTransposedAndInvertedSets(s, [[0, 4, 7], [0, 3, 7]], 'rowsOnly', 'skipChords')
     [([<music21.note.Note G>, <music21.note.Note E>, <music21.note.Note C>], 1), 
     ([<music21.note.Note C>, <music21.note.Note E->, <music21.note.Note G>], 1)]
     
@@ -1402,7 +1405,7 @@ def findTransposedAndInvertedSets(inputstream, multisetlist, reps, chords):
         row = pcToToneRow(multiset)
         inversion = row.originalCenteredTransformation('I', 0).pitches()
         multisetlist.append(inversion)
-    return findTransposedSets(inputstream, multisetlist, reps, chords)
+    return findTransposedSets(inputStream, multisetlist, reps, chords)
         
             
     
