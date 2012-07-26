@@ -1018,6 +1018,13 @@ class Iterator(object):
     University.  To get them as an additional part to the score set returnType to "stream", and
     add a keyword "analysis = True":
     
+    If chorales are accessed through the Iterator(), the metadata.title attribute will have the
+    correct German title. This is different from the metadata returned by the parser which does
+    not give the German title but rather the BWV number.
+    
+    >>> corpus.chorales.Iterator(returnType = 'stream')[1].metadata.title
+    'Ich dank dir, lieber Herre'
+    
     
     '''
     _DOC_ORDER = ['numberingSystem', 'currentNumber', 'highestNumber', 'titleList', 'numberList', 'returnType', 'iterationType']
@@ -1140,6 +1147,8 @@ class Iterator(object):
                 {0.0} <music21.note.Note G>
         ...
         
+        >>> riemenschneider1.metadata.title
+        'Aus meines Herzens Grunde'
         
         >>> BCI.currentNumber = BCI.highestNumber
         >>> riemenschneider371 = BCI._returnChorale()
@@ -1155,6 +1164,9 @@ class Iterator(object):
                 {0.0} <music21.meter.TimeSignature 4/4>
                 {0.0} <music21.note.Note B>
         ...
+        
+        >>> riemenschneider371.metadata.title
+        'Christ lag in Todesbanden'
         
         
         >>> BCI.numberingSystem = 'title'
@@ -1178,6 +1190,9 @@ class Iterator(object):
                 {0.0} <music21.note.Note B>
         ...
         
+        >>> christlag.metadata.title
+        'Christ lag in Todesbanden'
+        
         >>> BCI.currentNumber += 1
         >>> ausmeines = BCI._returnChorale()
         >>> ausmeines.show('text')
@@ -1193,6 +1208,8 @@ class Iterator(object):
                 {0.0} <music21.note.Note G>
         ...
         
+        >>> ausmeines.metadata.title
+        'Aus meines Herzens Grunde'
         
         >>> BCI.numberingSystem = 'kalmus'
         >>> BCI.returnType = 'filename'
@@ -1212,17 +1229,25 @@ class Iterator(object):
             if self._titleList is None:
                 raise BachException("Cannot parse Chorales because no titles to parse.")
             else:
-                filename = 'bach/bwv'+ str(self._choraleList2.byTitle[self.titleList[choraleIndex]]['bwv'])
-        elif self.numberingSystem is 'riemenschneider':
-            filename = 'bach/bwv' + str(self._choraleList2.byRiemenschneider[self._numberList[choraleIndex]]['bwv'])
-        elif self.numberingSystem is 'baerenreiter':
-            filename = 'bach/bwv' + str(self._choraleList1.byBaerenreiter[self._numberList[choraleIndex]]['bwv'])
-        elif self.numberingSystem is 'budapest':
-            filename = 'bach/bwv' + str(self._choraleList1.byBudapest[self._numberList[choraleIndex]]['bwv'])
-        elif self.numberingSystem is 'kalmus':
-            filename = 'bach/bwv' + str(self._choraleList2.byKalmus[self._numberList[choraleIndex]]['bwv'])
+                title = self.titleList[choraleIndex]
+                filename = 'bach/bwv'+ str(self._choraleList2.byTitle[title]['bwv'])
         else:
-            filename = 'bach/bwv' + str(self._numberList[choraleIndex])
+            choraleNumber = self._numberList[choraleIndex]
+            if self.numberingSystem is 'riemenschneider':
+                filename = 'bach/bwv' + str(self._choraleList2.byRiemenschneider[choraleNumber]['bwv'])
+                title = self._choraleList2.byRiemenschneider[choraleNumber]['title']
+            elif self.numberingSystem is 'baerenreiter':
+                filename = 'bach/bwv' + str(self._choraleList1.byBaerenreiter[choraleNumber]['bwv'])
+                title = self._choraleList2.byBaerenreiter[choraleNumber]['title']
+            elif self.numberingSystem is 'budapest':
+                filename = 'bach/bwv' + str(self._choraleList1.byBudapest[choraleNumber]['bwv'])
+                title = self._choraleList2.byBudapest[choraleNumber]['title']
+            elif self.numberingSystem is 'kalmus':
+                filename = 'bach/bwv' + str(self._choraleList2.byKalmus[choraleNumber]['bwv'])
+                title = self._choraleList2.byKalmus[choraleNumber]['title']
+            else:
+                filename = 'bach/bwv' + str(choraleNumber)
+                title = str(choraleNumber)
         
         if self._returnType is 'stream':
             chorale = base.parse(filename)
@@ -1234,6 +1259,10 @@ class Iterator(object):
                         chorale.insert(0, analysis.parts[0])
                 except: # fail silently
                     pass
+            # Store the correct title in metadata (replacing the chorale number as it is parsed)
+            if chorale.metadata is None:
+                chorale.metadata = music21.metadata.Metadata()
+            chorale.metadata.title = title
             return chorale
         elif self._returnType is 'filename':
             return filename

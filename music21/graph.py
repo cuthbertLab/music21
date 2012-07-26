@@ -552,7 +552,7 @@ class Graph(object):
                         #environLocal.printDebug(['setting labels', labels])
                         ax.set_xticklabels(labels, fontsize=self.tickFontSize,
                             family=self.fontFamily, 
-                         horizontalalignment=self.xTickLabelHorizontalAlignment, verticalalignment=self.xTickLabelVerticalAlignment, 
+                            horizontalalignment=self.xTickLabelHorizontalAlignment, verticalalignment=self.xTickLabelVerticalAlignment, 
                             rotation=self.xTickLabelRotation,
                             y=-.01)
 
@@ -568,10 +568,12 @@ class Graph(object):
                             family=self.fontFamily,
                             horizontalalignment='right', verticalalignment='center')
             else: # apply some default formatting to default ticks
-                ax.set_xticklabels(ax.get_xticks(),
-                    fontsize=self.tickFontSize, family=self.fontFamily) 
-                ax.set_yticklabels(ax.get_yticks(),
-                    fontsize=self.tickFontSize, family=self.fontFamily) 
+                if axis == 'x':
+                    ax.set_xticklabels(ax.get_xticks(),
+                        fontsize=self.tickFontSize, family=self.fontFamily) 
+                elif axis == 'y':
+                    ax.set_yticklabels(ax.get_yticks(),
+                        fontsize=self.tickFontSize, family=self.fontFamily) 
 
 
         if self.title:
@@ -1430,6 +1432,16 @@ class GraphGroupedVerticalBar(Graph):
             self.roundDigits = keywords['roundDigits']
         else:
             self.roundDigits = 1
+        
+        if 'groupLabelHeight' in keywords:
+            self.groupLabelHeight = keywords['groupLabelHeight']
+        else:
+            self.groupLabelHeight = 0.0
+            
+        if 'binWidth' in keywords:
+            self.binWidth = keywords['binWidth']
+        else:
+            self.binWidth = 1
 
     def labelBars(self, ax, rects):
         # attach some text labels
@@ -1449,7 +1461,9 @@ class GraphGroupedVerticalBar(Graph):
             # get for legend
             subLabels = sorted(b.keys())
             break
-        widthShift = 1 / float(barsPerGroup)
+        
+        binWidth = self.binWidth
+        widthShift = binWidth / float(barsPerGroup)
 
         xVals = []
         yBundles = []
@@ -1465,10 +1479,11 @@ class GraphGroupedVerticalBar(Graph):
                 # get position, then get bar group
                 yVals.append(yBundles[j][i])
             xValsShifted = []
+            xLabels = []
             for x in xVals:
                 xValsShifted.append(x + (widthShift * i))
 
-            rect = ax.bar(xValsShifted, yVals, width=widthShift, alpha=.8, 
+            rect = ax.bar(xValsShifted, yVals, width=widthShift, alpha=.8,
                     color=getColor(self.colors[i % len(self.colors)]))
             rects.append(rect)
 

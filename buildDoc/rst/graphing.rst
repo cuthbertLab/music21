@@ -201,7 +201,8 @@ This example provides basic customization to a scatter graph::
     ...	        markerSize = 8
     ...	    data.append( (midiNumber, int(frequency), {'color':color, 'alpha': alpha, 'marker': marker, 'markerSize':markerSize} ) )
     >>> a.setData(data)
-    >>> a.setAxisLabel('x', 
+    >>> a.setAxisLabel('x', 'midi number')
+    >>> a.setAxisLabel('y', 'frequency')
     >>> a.process()  # doctest: +SKIP
 
 .. image:: images/graphing-02.*
