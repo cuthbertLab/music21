@@ -168,7 +168,8 @@ def findInstallationsEggInfoStr():
 
 
 def getUserData():
-    '''Return a dictionary with user data
+    '''
+    Return a dictionary with user data
     '''
     post = {}
     try:
@@ -197,7 +198,8 @@ def getUserData():
 
 
 def _crawlPathUpward(start, target):
-    '''Ascend up paths given a start; return when target file has been found.
+    '''
+    Ascend up paths given a start; return when target file has been found.
     '''
     lastDir = start
     thisDir = lastDir
@@ -219,7 +221,8 @@ def _crawlPathUpward(start, target):
 
 
 def findSetup():    
-    '''Find the setup.py script 
+    '''
+    Find the setup.py script and returns the path to the setup.py file.
     '''
     # find setup.py
     # look in current directory and ascending
@@ -252,6 +255,10 @@ def findSetup():
 #-------------------------------------------------------------------------------
 # error objects, not exceptions
 class DialogError(object):
+    '''
+    DialogError is a normal object, not an Exception.
+    '''
+    
     def __init__(self, src=None):
         self.src = src
     def __repr__(self):
@@ -259,23 +266,33 @@ class DialogError(object):
 
 
 class KeyInterruptError(DialogError):
+    '''
+    Subclass of DialogError that deals with Keyboard Interruptions. 
+    '''
+    
     def __init__(self, src=None):
         DialogError.__init__(self, src=src)
 
 class IncompleteInput(DialogError):
-    '''The user has provided incomplete input that cannot be understood. 
+    '''
+    Subclass of DialogError that runs when the user has provided 
+    incomplete input that cannot be understood. 
     '''
     def __init__(self, src=None):
         DialogError.__init__(self, src=src)
 
 class NoInput(DialogError):
-    '''The user has provided no input, and there is not a default.
+    '''
+    Subclass of DialogError for when the user has provided no input, and there is not a default.
     '''
     def __init__(self, src=None):
         DialogError.__init__(self, src=src)
 
 class BadConditions(DialogError):
-    '''The users system does support the action of the dialog: something is missing or otherwise prohibits operation. 
+    '''
+    Subclass of DialogError for when the user's system does support the 
+    action of the dialog: something is missing or 
+    otherwise prohibits operation. 
     '''
     def __init__(self, src=None):
         DialogError.__init__(self, src=src)

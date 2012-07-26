@@ -35,7 +35,26 @@ environLocal = environment.Environment(_MOD)
 class RepeatMark(object):
     '''Base class of all repeat objects, including RepeatExpression objects and Repeat (Barline) objects. 
 
-    This object is used to for multiple-inheritance of such objects and to filter by class.
+    This object is used to for multiple-inheritance of such objects and to filter by class in order
+    to get all things that mark repeats.
+
+    The RepeatMark is not itself a :class:`~music21.base.Music21Object` so you should use multiple
+    inheritance to put these things in Streams.
+    
+    The following demonstration shows how a user might see if a Stream has any repeats in it.
+    
+    >>> from music21 import *
+    >>> class PartialRepeat(repeat.RepeatMark, base.Music21Object):
+    ...    def __init__(self):
+    ...        base.Music21Object.__init__(self)
+
+    >>> s = stream.Stream()
+    >>> s.append(note.Note())
+    >>> s.append(PartialRepeat())
+    >>> repeats = s.getElementsByClass(repeat.RepeatMark)
+    >>> if len(repeats) > 0:
+    ...    print "Stream has %d repeat(s) in it" % (len(repeats))
+    Stream has 1 repeat(s) in it
     '''
     def __init__(self):
         pass
@@ -50,9 +69,9 @@ class RepeatExpression(RepeatMark, expressions.Expression):
     '''
     This class models any mark added to a Score to mark 
     repeat start and end points that are designated by 
-    text expressions or symbols.
+    text expressions or symbols, such as D.S. Al Coda, etc.
 
-    Repeat(Barline) objects are not RepeatExpression objects, 
+    N.B. Repeat(Barline) objects are not RepeatExpression objects, 
     but both are RepeatMark subclasses. 
 
     This class stores internally a 
@@ -153,8 +172,8 @@ class RepeatExpression(RepeatMark, expressions.Expression):
 class RepeatExpressionMarker(RepeatExpression):
     '''
     Some repeat expressions are markers of positions 
-    in the score; these classes model those makers, 
-    such as Coda, Segno, and Fine.
+    in the score to jump to; these classes model those makers, 
+    such as Coda, Segno, and Fine, which are subclassed below.
     '''
     def __init__(self):
         RepeatExpression.__init__(self)
@@ -182,10 +201,13 @@ class Coda(RepeatExpressionMarker):
 
 
 class Segno(RepeatExpressionMarker):
-    '''The fine word as placed in a score. 
+    '''The segno sign as placed in a score. 
 
     >>> from music21 import *
     >>> rm = repeat.Segno()
+    >>> rm.useSymbol
+    True
+
     '''
     # note that only Coda and Segno have non-text expression forms
     def __init__(self):
@@ -296,7 +318,7 @@ class AlSegno(RepeatExpressionCommand):
     Jump to the sign. Presumably a forward jump, not a repeat.
 
     >>> from music21 import *
-    >>> rm = repeat.DaCapoAlFine()
+    >>> rm = repeat.AlSegno()
     '''
     def __init__(self, text=None):
         RepeatExpressionCommand.__init__(self)
@@ -376,6 +398,67 @@ repeatExpressionReference = [Coda(), Segno(), Fine(), DaCapo(), DaCapoAlFine(),
 
 
 
+#-------------------------------
+def insertRepeatEnding(s, start, end, endingNumber=1, inPlace=False):
+    '''
+    Designates a range of measures as being repeated endings (i.e. first and second endings) 
+    within a stream s, where s either contains measures,
+    or contains parts which contain measures.  Start and end are integers corresponding to the first and last measure
+    number of the "repeatNum" ending.  e.g. if start=6, end=7, and repeatNum=2, the method adds a second ending
+    from measures 6 to 7.
+
+    Does not (yet) add a :class:`~music21.bar.RepeatMark` to the end of the first ending.
+
+    Example: create first and second endings over measures 4-6 and measures 11-13 of a chorale, respectively.
+            
+    >>> from music21 import *
+    >>> c1 = corpus.parse(corpus.getBachChorales()[1])
+    >>> repeat.insertRepeatEnding(c1,  4,  6, 1, inPlace=True)
+    >>> repeat.insertRepeatEnding(c1, 11, 13, 2, inPlace=True)
+
+    We now have 8 repeatBrackets since each part gets its own first and second ending.
+
+    >>> repeatBrackets = c1.flat.getElementsByClass(spanner.RepeatBracket)
+    >>> len(repeatBrackets)
+    8
+    >>> len(c1.parts[0].getElementsByClass(spanner.RepeatBracket))
+    2
+    '''
+    
+    if not inPlace:
+        s = copy.deepcopy(s)
+        
+    if s == None:
+        return None #or raise an exception!
+
+    
+    if not s.hasMeasures():
+        for part in s.parts:
+            insertRepeatEnding(part, start, end, endingNumber, inPlace=True)
+        if inPlace:
+            return
+        else:
+            return s
+    
+    
+    measures = [ s.measure(i) for i in range(start, end+1) ]
+    rb = spanner.RepeatBracket(measures, number=endingNumber)
+    rbOffset = measures[0].getOffsetBySite(s)   #adding repeat bracket to stream at beginning of repeated section.  
+                                                #Maybe better at end?
+    s.insert(rbOffset, rb)
+    
+    if inPlace is True:
+        return
+    else:
+        return s
+
+
+
+
+
+
+
+
 
 # from musicxml
 # Dacapo indicates to go back to the beginning of the movement. When used it always has the value "yes".
@@ -399,21 +482,71 @@ repeatExpressionReference = [Coda(), Segno(), Fine(), DaCapo(), DaCapoAlFine(),
 
 
 
+
 class ExpanderException(Exception):
     pass
 
 class Expander(object):
     '''
-    Expand a single Part or Part-like Stream with repeats. Nested 
+    The Expander object can expand a single Part or Part-like Stream with repeats. Nested 
     repeats given with :class:`~music21.bar.Repeat` objects, or 
     repeats and sections designated with 
     :class:`~music21.repeat.RepeatExpression` objects, are all expanded.
 
     This class is a utility processor. Direct usage is more commonly 
     from the :meth:`~music21.stream.Stream.expandRepeats` method.
+
+    To use this object directly, call :meth:`~music21.repeat.Expander.process` on the
+    score
+    
+    >>> from music21 import *
+    >>> s = converter.parse('tinynotation: 3/4 C4 D E')
+    >>> s.makeMeasures(inPlace = True)
+    >>> s.measure(1).rightBarline = bar.Repeat(direction='end', times=3)
+    >>> e = repeat.Expander(s)
+    >>> s2 = e.process()
+    >>> s2.show('text') 
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.BassClef>
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+        {2.0} <music21.note.Note E>
+        {3.0} <music21.bar.Barline style=double>
+    {3.0} <music21.stream.Measure 1 offset=3.0>
+        {0.0} <music21.clef.BassClef>
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+        {2.0} <music21.note.Note E>
+        {3.0} <music21.bar.Barline style=double>
+    {6.0} <music21.stream.Measure 1 offset=6.0>
+        {0.0} <music21.clef.BassClef>
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+        {2.0} <music21.note.Note E>
+        {3.0} <music21.bar.Barline style=double>
+
+
+    OMIT_FROM_DOCS
+    
+    TODO: Note bug: barline style = double for each!  Clefs and TimesSignatures should only be in first one!
+
+    Test empty expander:
+    
+    >>> e = repeat.Expander()
+
     '''
-    def __init__(self, streamObj):
+    def __init__(self, streamObj = None):
         self._src = streamObj
+        if streamObj is not None:
+            self._setup()
+    
+    def _setup(self):
+        '''
+        run several setup routines.
+        '''    
         # get and store the source measure count; this is presumed to
         # be a Stream with Measures
         self._srcMeasureStream = self._src.getElementsByClass('Measure')
@@ -1313,8 +1446,8 @@ class Expander(object):
         # TODO: need to copy spanners from each sub-group into their newest conects; must be done here as more than one connection is made
 
         return post
-    
-    
+
+
     
     
 #----------------------------------------------------------
@@ -1335,6 +1468,9 @@ class RepeatFinder(object):
     An object for finding and simplifying repeated sections of music.
     
     Can be passed a stream which contains measures, or which contains parts which contain measures.  
+    
+    the defaultMeasureHashFunction is a function that hashes a measure to search for similar passages.
+    By default it's search.translateStreamToString.
     '''
     
     def __init__(self, inpStream=None, defaultMeasureHashFunction=search.translateStreamToString):
@@ -1653,9 +1789,7 @@ class RepeatFinder(object):
         bar specified by barStart and inserts an end-repeat at the bar specified
         by barEnd.  Works on either a stream with measures, or a stream
         with parts containing measures.
-        
-
-        
+                
         >>> from music21 import *
         >>> from copy import deepcopy
         >>> chorale1 = corpus.parse(corpus.getBachChorales()[1])
@@ -1717,55 +1851,6 @@ class RepeatFinder(object):
             
             
     #TODO: Code coverage test for insertRepeatEnding
-    def insertRepeatEnding(self, start, end, endingNumber=1, inPlace=False):
-        '''
-        Inserts repeated endings (i.e. first and second endings) into stream s, where s either contains measures,
-        or contains parts which contain measures.  Start and end are integers corresponding to the first and last measure
-        number of the "repeatNum" ending.  e.g. if start=4, end=6, and repeatNum=2, we have a second ending
-        from measures 4 to 6.
-                
-        
-        >>> from music21 import *
-        >>> c1 = corpus.parse(corpus.getBachChorales()[1])
-        >>> repeat.RepeatFinder(c1).insertRepeatEnding( 4, 6, 1, True)
-        >>> repeat.RepeatFinder(c1).insertRepeatEnding( 11, 13, 2, True)
-        >>> repeatBrackets = c1.flat.getElementsByClass(spanner.RepeatBracket)
-        >>> len(repeatBrackets)
-        8
-        >>> len(c1.parts[0].getElementsByClass(spanner.RepeatBracket))
-        2
-        '''
-        
-        if self.s is None:
-            raise NoInternalStream("This function only works when RepeatFinder is initialized with a stream")
-    
-        if inPlace:
-            s = self.s
-        else:
-            s = copy.deepcopy(self.s)
-            
-        if s == None:
-            return None #or raise an exception!
-
-        
-        if not s.hasMeasures():
-            for part in s.parts:
-                RepeatFinder(part).insertRepeatEnding(start, end, endingNumber, True)
-            if inPlace:
-                return
-            else:
-                return s
-        
-        
-        measures = [ s.measure(i) for i in range(start, end+1) ]
-        rb = spanner.RepeatBracket(measures, number=endingNumber)
-        rbOffset = measures[0].getOffsetBySite(s)   #adding repeat bracket to stream at beginning of repeated section.  Maybe better at end?
-        s.insert(rbOffset, rb)
-        
-        if inPlace:
-            return
-        else:
-            return s
 
         
 #TODO: mGroups = None by default, then find it if necessary...
@@ -1818,8 +1903,8 @@ class RepeatFinder(object):
             lengthOfRepeatEnding = repeatSignBar - firstEndingBar + 1
             lengthOfRepeatedSection = firstEndingBar - startingBar + 1
             startOfSecondEnding = repeatSignBar + lengthOfRepeatedSection
-            self.insertRepeatEnding( firstEndingBar, repeatSignBar, 1, True)
-            self.insertRepeatEnding( startOfSecondEnding, startOfSecondEnding + lengthOfRepeatEnding, 2, True)
+            insertRepeatEnding(s, firstEndingBar, repeatSignBar, 1, True)
+            insertRepeatEnding(s, startOfSecondEnding, startOfSecondEnding + lengthOfRepeatEnding, 2, True)
         
         self.deleteMeasures(toDelete, True)
         
@@ -1972,12 +2057,11 @@ class RepeatFinder(object):
             lengthOfRepeatEnding = repeatSignBar - firstEndingBar + 1
             lengthOfRepeatedSection = firstEndingBar - startingBar + 1
             startOfSecondEnding = repeatSignBar + lengthOfRepeatedSection
-            RepeatFinder(s).insertRepeatEnding( firstEndingBar, repeatSignBar, 1, True)
-            RepeatFinder(s).insertRepeatEnding( startOfSecondEnding, startOfSecondEnding + lengthOfRepeatEnding, 2, True)
+            insertRepeatEnding(s, firstEndingBar, repeatSignBar, 1, True)
+            insertRepeatEnding(s, startOfSecondEnding, startOfSecondEnding + lengthOfRepeatEnding, 2, True)
             
-        for startBar, endBar in repeatBars:
-            
-            RepeatFinder(s).insertRepeat(startBar, endBar, True)
+        for startBar, endBar in repeatBars:            
+            insertRepeat(s, startBar, endBar, True)
         
         RepeatFinder(s).deleteMeasures(toDelete, True)
         

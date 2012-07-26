@@ -413,12 +413,15 @@ class StreamForms(object):
                 p = p.stripTies(retainContainers=False, inPlace=True)
                 # noNone means that we will see all connections, even w/ a gap
                 post = p.findConsecutiveNotes(skipRests=True, 
-                    skipChords=False, skipGaps=True, noNone=True)
+                    skipChords=True, skipGaps=True, noNone=True)
                 for i, n in enumerate(post):
                     if i < len(post) - 1: # if not last
                         iNext = i + 1
                         nNext = post[iNext]
-                        histo[abs(n.midi - nNext.midi)] += 1
+                        try:
+                            histo[abs(n.midi - nNext.midi)] += 1
+                        except:
+                            pass # problem with not having midi
             self._forms['midiIntervalHistogram'] = histo
             return self._forms['midiIntervalHistogram']
 

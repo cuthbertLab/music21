@@ -29,11 +29,14 @@ attribute holds information about how to beam given the TimeSignature
 Run `stream.Stream`.:meth:`~music21.stream.Stream.makeBeams` to set beaming information
 automatically given the current meter.
 
+
+
 '''
 
 import unittest, doctest
 
 import music21
+from music21 import common
 from music21 import duration
 from music21 import musicxml
 musicxmlMod = musicxml # alias
@@ -163,7 +166,20 @@ class Beams(music21.JSONSerializer):
     '''
     The Beams object stores in it attribute beamsList (a list) all
     the Beam objects defined above.  Thus len(beam.Beams) tells you how many
-    beams the note currently has on it.
+    beams the note currently has on it, and iterating over a Beams object gives 
+    you each Beam.
+    
+    >>> from music21 import *
+    >>> n = note.Note(type='16th')
+    >>> isinstance(n.beams, beam.Beams)
+    True
+    >>> n.beams.fill(2, 'start')
+    >>> len(n.beams)
+    2
+    >>> for thisBeam in n.beams:
+    ...     thisBeam.type
+    'start'
+    'start'
     '''
     
     def __init__(self):
@@ -176,7 +192,9 @@ class Beams(music21.JSONSerializer):
         # add to base class
         return ['beamsList', 'feathered']
 
-        
+    def __iter__(self):
+        return common.Iterator(self.beamsList)
+
     def __len__(self):
         return len(self.beamsList)
 
@@ -195,14 +213,15 @@ class Beams(music21.JSONSerializer):
         self.beamsList.append(obj)
 
 
-    def fill(self, level=None):
+    def fill(self, level=None, type=None):
         '''
         A quick way of setting the beams list for a particular duration,
         for instance, fill("16th") will clear the current list of beams in the
         Beams object and add two beams.  fill(2) will do the same (though note
         that that is an int, not a string).
         
-        It does not do anything to the direction that the beams are going in.
+        It does not do anything to the direction that the beams are going in, or by default.
+        Either set type here or call setAll() on the Beams object afterwards.
         
         Both "eighth" and "8th" work.  Adding more than six beams (i.e. things like
         512th notes) raises an error.
@@ -213,11 +232,13 @@ class Beams(music21.JSONSerializer):
         >>> len(a)
         2
         
-        >>> a.fill('32nd')
+        >>> a.fill('32nd', type='start')
         >>> len(a)
         3
         >>> a.beamsList[2]
         <music21.beam.Beam object at 0x...>
+        >>> a.beamsList[2].type
+        'start'
 
         OMIT_FROM_DOCS
         >>> a.fill(4)
@@ -255,6 +276,8 @@ class Beams(music21.JSONSerializer):
             obj.number = i
             self.beamsList.append(obj)
 
+        if type is not None:
+            self.setAll(type)
 
     def setAll(self, type, direction=None):
         '''

@@ -2000,23 +2000,66 @@ class Pitch(music21.Music21Object):
         else:
             return self.name + str(self.octave)
 
-    nameWithOctave = property(_getNameWithOctave, 
-        doc = '''
-        The pitch name with an octave designation. 
-        If no octave as been set, no octave value is returned. 
-
+    def _setNameWithOctave(self, value):
+        '''
+        Sets pitch name and octave
         
-        Read only attribute.  Set name and octave separately (TODO: Change).
-
+        Test exception:
         >>> from music21 import *
-        >>> a = pitch.Pitch('G#4')
-        >>> a.nameWithOctave
-        'G#4'
-        >>> a.name = 'A-'
-        >>> a.octave = -1
-        >>> a.nameWithOctave
-        'A--1'
+        >>> a = pitch.Pitch()
+        >>> a.nameWithOctave = 'C#9'
+        >>> a.nameWithOctave = 'C#'
+        Traceback (most recent call last):
+        PitchException: Cannot set a nameWithOctave with 'C#'
+        '''
+        try:
+            lenVal = len(value)
+            name = value[0:lenVal-1]
+            octave = int(value[-1])
+            self.name = name
+            self.octave = octave
+        except:
+            raise PitchException("Cannot set a nameWithOctave with '%s'" % value)
         
+    nameWithOctave = property(_getNameWithOctave, 
+                              _setNameWithOctave,
+                              doc = '''
+        Return or set the pitch name with an octave designation. 
+        If no octave as been set, no octave value is returned. 
+        
+        >>> from music21 import *
+        >>> gSharp = pitch.Pitch('G#4')
+        >>> gSharp.nameWithOctave
+        'G#4'
+
+        >>> dFlatFive = pitch.Pitch()
+        >>> dFlatFive.step = 'D'
+        >>> dFlatFive.accidental = pitch.Accidental('flat')
+        >>> dFlatFive.octave = 5
+        >>> dFlatFive.nameWithOctave
+        'D-5'
+        >>> dFlatFive.nameWithOctave = 'C#6'
+        >>> dFlatFive.name
+        'C#'
+        >>> dFlatFive.octave
+        6
+
+
+        N.B. -- it's generally better to set the name and octave separately, especially
+        since you may at some point encounter very low pitches such as "A octave -1", which
+        will be interpreted as "A-flat, octave 1".  Our crude setting algorithm also does
+        not support octaves above 9.
+
+        >>> lowA = pitch.Pitch()
+        >>> lowA.name = 'A'
+        >>> lowA.octave = -1
+        >>> lowA.nameWithOctave
+        'A-1'                
+        >>> lowA.nameWithOctave = lowA.nameWithOctave
+        >>> lowA.name
+        'A-'
+        >>> lowA.octave
+        1
         ''')
 
     def _getUnicodeNameWithOctave(self):

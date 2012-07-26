@@ -123,7 +123,9 @@ Module Reference
    moduleText
    moduleTinyNotation
    moduleDemosTheoryAnalysisTheoryAnalyzer
+   moduleTrecentoCadencebook
    moduleTrecentoPolyphonicSnippet
+   moduleTrecentoTonality
    moduleVariant
    moduleVexflowBase
    moduleVoiceLeading

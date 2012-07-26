@@ -9,7 +9,9 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-'''The features implemented here are based on those found in jSymbolic and defined in Cory McKay's MA Thesis, "Automatic Genre Classification of MIDI Recordings"
+'''
+The features implemented here are based on those found in jSymbolic and 
+defined in Cory McKay's MA Thesis, "Automatic Genre Classification of MIDI Recordings"
 
 The LGPL jSymbolic system can be found here: http://jmir.sourceforge.net/jSymbolic.html
 '''
@@ -63,11 +65,11 @@ class DurationFeature(featuresModule.FeatureExtractor):
 class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
     '''
     >>> from music21 import *
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv887')
     >>> fe = features.jSymbolic.MelodicIntervalHistogramFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [1.0, 0.2222..., 0.777777777..., 0.44444..., 0.1111..., 0.44444..., 0.11111..., 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    [0.146..., 0.853..., 1.0, 0.292..., 0.209..., 0.139..., 0.101..., 0.257..., 0.22299..., 0.456..., 0.1289..., 0.0871..., 0.233..., 0.07317..., 0.03832..., 0.031..., 0.0278..., 0.0139..., 0.01742..., 0.00348..., 0.0, 0.017..., 0.003484..., 0.01742..., 0.00348..., 0.0, 0.00348..., 0.0, 0.0174..., 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     '''
     id = 'M1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):

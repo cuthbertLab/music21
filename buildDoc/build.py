@@ -309,6 +309,8 @@ class PartitionedName(object):
             self.srcObj = self.srcNameEval()
         except TypeError:
             self.srcObj = None
+        
+
 
     def getElement(self, partName):
         return None

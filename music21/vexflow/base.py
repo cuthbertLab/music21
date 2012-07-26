@@ -36,12 +36,6 @@ environLocal = environment.Environment(_MOD)
 #Class variables
 
 '''
-Unique Identifiers used for namespace collision avoidance
-'''
-global _UIDCounter 
-_UIDCounter = 0   # no need for Long int -- python automatically converts
-
-'''
 Vexflow generateCode() and fromObject() methods currently accept these modes
 '''
 supportedDisplayModes = [
@@ -293,6 +287,30 @@ htmlConclusion = r'''
 </body>
 </html>'''
 
+class UIDCounter(object):
+    '''
+    generic counter object for keeping track of the number of objects used.
+    
+    >>> from music21 import *
+    >>> uidc = vexflow.UIDCounter(UIDStart = 20)
+    >>> uidc.UID
+    20
+    >>> uidc.readAndIncrement()
+    20
+    >>> uidc.readAndIncrement()
+    21
+    >>> uidc.UID
+    22
+    '''
+    
+    def __init__(self, UIDStart = 0):
+        self.UID = UIDStart
+    
+    def readAndIncrement(self):
+        UID = self.UID
+        self.UID += 1
+        return UID
+    
 
 def staffString(xPosStr = str(defaultStavePosition[0]), yPosStr = str(defaultStavePosition[1]), staffWidth = str(defaultStaveWidth), staveName = 'stave'):
 	'''
@@ -372,13 +390,11 @@ def fromObject(thisObject, mode='txt'):
     <music21.stream.Voice 0>
 
 
-    >>> vexflow._UIDCounter = 0L #_DOCS_HIDE
     >>> print vexflow.fromObject(measure1)
     var music21Voice0 = new Vex.Flow.Voice({num_beats: 1.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
     var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
     music21Voice0.addTickables(music21Voice0Notes);
 
-    >>> vexflow._UIDCounter = 0L #_DOCS_HIDE
     >>> print vexflow.fromObject(trebleVoice)
     var music21Voice0 = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
     var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["An/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Bn/4"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}), new Vex.Flow.StaveNote({keys: ["C#/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN}).addArticulation(0, new Vex.Flow.Articulation("a@a").setPosition(3)), new Vex.Flow.StaveNote({keys: ["En/5"], duration: "q", stem_direction: Vex.Flow.StaveNote.STEM_DOWN})];
@@ -569,7 +585,6 @@ def fromMeasure(thisMeasure, mode='txt'):
     >>> b = corpus.parse('bwv1.6.mxl')
     >>> m = b.parts[0].measures(0,1)[2]
     >>> d = vexflow.fromMeasure(m)
-    >>> vexflow._UIDCounter = 0L #_DOCS_HIDE
     >>> print d
     var music21Voice0 = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
     var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
@@ -1157,17 +1172,14 @@ class VexflowVoice(object):
     :class:`~music21.stream.Voice` object
 
     If those objects aren't already flat, flattens them in the process. 
+
+    params is a dict containing various parameters to be passed to the 
+    voice object.  Most important is the UIDCounter parameter which keeps
+    track of the number of objects created
+
     '''
     
     def __init__(self, music21measure = None, params={}):
-        '''
-        params is a dict containing various parameters to be passed to the 
-        voice object
-        '''
-        global _UIDCounter
-        self.UID = _UIDCounter
-        _UIDCounter += 1
-
         if music21measure != None:
             if not ('Measure' in music21measure.classes or \
                 'Voice' in music21measure.classes):
@@ -1186,6 +1198,14 @@ class VexflowVoice(object):
         
         self.clefDisplayStatus = defaultClefDisplayStatus
         self.keySignatureDisplayStatus = defaultKeySignatureDisplayStatus
+
+        if 'UIDCounter' in self.params:
+            self.UIDCounter = self.params['UIDCounter']
+            self.UID = self.UIDCounter.readAndIncrement()
+        else:
+            self.UIDCounter = UIDCounter()
+            self.UID = 0
+
 
         if 'name' in self.params:
             self.voiceName = self.params['name']
@@ -1549,9 +1569,6 @@ class VexflowStave(object):
         '''
         params is a dictionary containing position, width, and other parameters to be passed to the stave object
         '''
-        global _UIDCounter
-        self.UID = _UIDCounter
-        _UIDCounter += 1
         self.params = params
         self.vexflowVoices = []
         if 'width' not in self.params:
@@ -1566,6 +1583,14 @@ class VexflowStave(object):
             self.staveName = self.params['name']
         else:
             self.staveName = 'music21Stave' + str(self.UID)
+
+        if 'UIDCounter' in self.params:
+            self.UIDCounter = self.params['UIDCounter']
+            self.UID = self.UIDCounter.readAndIncrement()
+        else:
+            self.UIDCounter = UIDCounter()
+            self.UID = 0
+
     
     def staveCode(self):
         '''
@@ -1720,9 +1745,6 @@ class VexflowPart(object):
     '''
 
     def __init__(self, music21part, params={}):
-        global _UIDCounter
-        self.UID = _UIDCounter
-        _UIDCounter += 1
         self.originalPart = music21part
         self.staves = []
         self.numMeasures = 0
@@ -1757,6 +1779,14 @@ class VexflowPart(object):
             self.context = None
         else:
             self.context = self.params['context']
+
+        if 'UIDCounter' in self.params:
+            self.UIDCounter = self.params['UIDCounter']
+            self.UID = self.UIDCounter.readAndIncrement()
+        else:
+            self.UIDCounter = UIDCounter()
+            self.UID = 0
+
 
         self._computeParams()
         self._generateVexflowCode()
@@ -1810,7 +1840,8 @@ class VexflowPart(object):
                     str(self.UID),
                 'clef': self.clef,
                 'notesWidth': self.notesWidth,
-                'lineNum': self.numSystems
+                'lineNum': self.numSystems,
+                'UIDCounter': self.UIDCounter,
             }
             
             #Display the clef and keySignature at the start of new lines
@@ -2045,9 +2076,6 @@ class VexflowContext(object):
         `params` is a dictionary containing width, height, and other parameters
         to be passed to the canvas object
         '''
-        global _UIDCounter
-        self.UID = _UIDCounter
-        _UIDCounter += 1
         self.params = params
         self.canvasHTML = ''
         self.canvasJSCode = ''
@@ -2055,6 +2083,13 @@ class VexflowContext(object):
         self.rendererCode = ''
         self.contextName = ''
         self.contextCode = ''
+        if 'UIDCounter' in self.params:
+            self.UIDCounter = self.params['UIDCounter']
+            self.UID = self.UIDCounter.readAndIncrement()
+        else:
+            self.UIDCounter = UIDCounter()
+            self.UID = 0
+
         if canvasName == None:
             self.canvasHTMLName = "music21Canvas" + str(self.UID)
         else:
@@ -2066,6 +2101,7 @@ class VexflowContext(object):
             self.params['width'] = defaultCanvasWidth
         if 'height' not in self.params:
             self.params['height'] = defaultCanvasHeight
+
 
         self.generateHTML()
         self.generateJS()
@@ -2203,13 +2239,11 @@ class Test(unittest.TestCase):
         from music21 import corpus, common
         b = corpus.parse('bwv1.6.mxl')
         m = b.parts[0].measures(0,1)[2]
-        _UIDCounter = 0L
         d = fromMeasure(m)
         expectedOutputText = r'''var music21Voice0 = new Vex.Flow.Voice({num_beats: 4.0, beat_value: 4, resolution: Vex.Flow.RESOLUTION});
 var music21Voice0Notes = [new Vex.Flow.StaveNote({keys: ["Gn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Fn/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["An/3"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP}), new Vex.Flow.StaveNote({keys: ["Cn/4"], duration: "8", stem_direction: Vex.Flow.StaveNote.STEM_UP})];
 music21Voice0.addTickables(music21Voice0Notes);'''
         self.assertMultiLineEqual(d, expectedOutputText)
-        _UIDCounter = 0L
         c = fromMeasure(m, 'html')
         expectedOutput = r'''<!DOCTYPE HTML>
 <html>
@@ -2248,9 +2282,6 @@ class TestExternal(unittest.TestCase):
         pass
 
     def testShowMeasureWithAccidentals(self):
-        '''
-        TODO: How does this class work?
-        '''
         from music21 import corpus, note
         b = note.Note('B4') 
         b = corpus.parse('bwv1.6')
@@ -2263,11 +2294,8 @@ _DOC_ORDER = []
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
-    music21.mainTest(Test, TestExternal)
-#elif __name__ == 'music21.vexflow.base':
-    #import doctest
-    #doctest.testmod()
-    #print 'Tests run'
+    import music21
+    music21.mainTest(TestExternal)
 
 #------------------------------------------------------------------------------
 # eof

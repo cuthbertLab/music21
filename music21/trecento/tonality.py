@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         tonality.py
-# Purpose:      Methods for exploring Tonality in the Trecento
+# Purpose:      Methods for exploring tonality in the Trecento
 #
 # Authors:      Michael Scott Cuthbert
 #
@@ -10,8 +10,6 @@
 #-------------------------------------------------------------------------------
 
 '''
-music21.trecento.tonality
-
 These functions show how music21 can be used to analyze whether the idea
 of tonal closure applies in the music of the Italian fourteenth century
 by seeing how often the first note of the tenor (or the given voice stream

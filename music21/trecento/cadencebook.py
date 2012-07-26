@@ -297,7 +297,12 @@ class TrecentoCadenceWork(object):
         beginSnippetPositions -- a list of the excel spreadsheet columns in which an incipit of some section can be found. (default = [8])
         endSnippetPositions   -- a list of the excel spreadsheet columns in which an cadence of some section can be found. (default = [])
     
-
+    OMIT_FROM_DOCS
+    
+    test just creating an empty TrecentoCadenceWork:
+    
+    >>> from music21 import *
+    >>> tcw = trecento.cadencebook.TrecentoCadenceWork()
     '''
     beginSnippetPositions = [8]
     endSnippetPositions = []
@@ -321,9 +326,12 @@ class TrecentoCadenceWork(object):
 
         self.snippets = []
         self.snippets.append(self.incipit)
-        otherS = self.getOtherSnippets()
-        if otherS is not None:
-            self.snippets += otherS        
+        try:
+            otherS = self.getOtherSnippets()
+            if otherS is not None:
+                self.snippets += otherS        
+        except IndexError: # no rowvalues, etc. probably from documentation building...
+            pass
                 
         if isinstance(self.fischerNum, float):
             self.fischerNum = int(self.fischerNum)

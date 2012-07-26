@@ -98,7 +98,7 @@ def configureMxPartGroupFromStaffGroup(staffGroup):
     elif staffGroup.barTogether in [False]:
         mxPartGroup.set('groupBarline', 'no')
     elif staffGroup.barTogether == 'Mensurstrich':
-        mxPartGroup.set('groupBarline', 'no')
+        mxPartGroup.set('groupBarline', 'Mensurstrich')
     #environLocal.printDebug(['configureMxPartGroupFromStaffGroup: mxPartGroup', mxPartGroup])
     return mxPartGroup
 

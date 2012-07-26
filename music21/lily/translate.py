@@ -154,7 +154,9 @@ class LilypondConverter(object):
             self.context = self.storedContexts.pop()
         except:
             self.context = self.topLevelObject
-    
+
+
+    #------------ Set a complete Lilypond Tree from a music21 object ----------#     
     def textFromMusic21Object(self, m21ObjectIn):
         r'''
         get a proper lilypond text file for writing from a music21 object
@@ -184,10 +186,10 @@ class LilypondConverter(object):
     
     def loadFromMusic21Object(self, m21ObjectIn):
         r'''
-        create a Lilypond object hierarchy in self.topLevelObject from an
+        Create a Lilypond object hierarchy in self.topLevelObject from an
         arbitrary music21 object.
         
-        
+        TODO: Add tests...
         TODO: Add test for TinyNotationStream...
         '''
         from music21 import stream
@@ -251,7 +253,6 @@ class LilypondConverter(object):
         
         self.context.contents = contents
 
-
     
     def loadObjectFromScore(self, scoreIn = None, makeNotation = True):
         r'''
@@ -282,6 +283,8 @@ class LilypondConverter(object):
 
         self.context.contents = contents
         
+        
+    #------- return Lily objects or append to the current context -----------#
     def lyScoreBlockFromScore(self, scoreIn):
         
         lpCompositeMusic = lyo.LyCompositeMusic()
@@ -403,6 +406,47 @@ class LilypondConverter(object):
 
 
     def appendObjectsToContextFromStream(self, streamObject):
+        r'''
+        takes a Stream and appends all the elements in it to the current
+        context's .contents list, and deals with creating Voices in it.
+        
+        (should eventually replace the main Score parts finding tools)
+        
+        >>> from music21 import *
+        >>> lpc = lily.translate.LilypondConverter()
+        >>> lpMusicList = lyo.LyMusicList()
+        >>> lpc.context = lpMusicList
+        >>> lpc.context.contents
+        []
+        >>> c = converter.parse('tinynotation: 3/4 c4 d- e#')
+        >>> lpc.appendObjectsToContextFromStream(c)
+        >>> print lpc.context.contents
+        [<music21.lily.lilyObjects.LyEmbeddedScm...>, <music21.lily.lilyObjects.LySimpleMusic...>, <music21.lily.lilyObjects.LySimpleMusic...>, <music21.lily.lilyObjects.LySimpleMusic...]
+        >>> print lpc.context
+        \time 3/4
+        c' 4  
+        des' 4  
+        eis' 4  
+        <BLANKLINE>
+
+
+        >>> v1 = stream.Voice()
+        >>> v1.append(note.Note("C5", quarterLength = 4.0))
+        >>> v2 = stream.Voice()
+        >>> v2.append(note.Note("C#5", quarterLength = 4.0))
+        >>> m = stream.Measure()
+        >>> m.insert(0, v1)
+        >>> m.insert(0, v2)
+        >>> lpMusicList = lyo.LyMusicList()
+        >>> lpc.context = lpMusicList
+        >>> lpc.appendObjectsToContextFromStream(m)
+        >>> print lpc.context # internal spaces removed...
+          << \new Voice { c'' 1  
+                  } 
+           \new Voice { cis'' 1  
+                  } 
+            >>        
+        '''
         for groupedElements in streamObject.groupElementsByOffset():
             if len(groupedElements) == 1: # one thing at that moment...
                 el = groupedElements[0]
@@ -554,8 +598,9 @@ class LilypondConverter(object):
 
         '''
         self.setContextForTupletStart(noteOrRest)
-        self.setStemCode(noteOrRest)        
-        
+        #self.appendBeamCode(noteOrRest)
+        self.appendStemCode(noteOrRest)        
+
         lpSimpleMusic = self.lySimpleMusicFromNoteOrRest(noteOrRest)
         self.context.contents.append(lpSimpleMusic)
         lpSimpleMusic.setParent(self.context)
@@ -622,9 +667,76 @@ class LilypondConverter(object):
         
         return mlSM
 
-    def setStemCode(self, noteOrRest):
-        if hasattr(noteOrRest, 'stemDirection') and noteOrRest.stemDirection is not None:
-            stemDirection = noteOrRest.stemDirection.upper()
+    def appendBeamCode(self, noteOrChord):
+        r'''
+        Adds an LyEmbeddedScm object to the context's contents if the object's has a .beams
+        attribute.
+        
+        >>> from music21 import *
+        >>> lpc = lily.translate.LilypondConverter()
+        >>> lpMusicList = lyo.LyMusicList()
+        >>> lpc.context = lpMusicList
+        >>> lpc.context.contents
+        []
+        >>> n1 = note.Note(quarterLength = 0.25)
+        >>> n2 = note.Note(quarterLength = 0.25)
+        >>> n1.beams.fill(2, 'start')
+        >>> n2.beams.fill(2, 'stop')
+
+        >>> lpc.appendBeamCode(n1)
+        >>> print lpc.context.contents
+        [<music21.lily.lilyObjects.LyEmbeddedScm object at 0x...>, <music21.lily.lilyObjects.LyEmbeddedScm object at 0x...>]
+        >>> print lpc.context
+        \set stemLeftBeamCount = #0
+        \set stemRightBeamCount = #2
+        '''
+        leftBeams = 0
+        rightBeams = 0
+        if hasattr(noteOrChord, 'beams'):
+            if noteOrChord.beams is not None:
+                for b in noteOrChord.beams:
+                    if b.type == 'start':
+                        rightBeams += 1
+                    elif b.type == 'continue':
+                        rightBeams += 1
+                        leftBeams += 1
+                    elif b.type == 'stop':
+                        leftBeams += 1
+                    elif b.type == 'partial':
+                        if b.direction == 'left':
+                            leftBeams += 1
+                        else: # better wrong direction than none
+                            rightBeams += 1
+            beamText = r'''\set stemLeftBeamCount = #%d''' % leftBeams
+            lpBeamScheme = lyo.LyEmbeddedScm(beamText)
+            self.context.contents.append(lpBeamScheme)
+            lpBeamScheme.setParent(self.context)
+            beamText = r'''\set stemRightBeamCount = #%d''' % rightBeams
+            lpBeamScheme = lyo.LyEmbeddedScm(beamText)
+            self.context.contents.append(lpBeamScheme)
+            lpBeamScheme.setParent(self.context)
+
+    def appendStemCode(self, noteOrChord):
+        r'''
+        Adds an LyEmbeddedScm object to the context's contents if the object's stem direction
+        is set (currrently, only "up" and "down" are supported).
+        
+        >>> from music21 import *
+        >>> lpc = lily.translate.LilypondConverter()
+        >>> lpMusicList = lyo.LyMusicList()
+        >>> lpc.context = lpMusicList
+        >>> lpc.context.contents
+        []
+        >>> n = note.Note()
+        >>> n.stemDirection = 'up'
+        >>> lpc.appendStemCode(n)
+        >>> print lpc.context.contents
+        [<music21.lily.lilyObjects.LyEmbeddedScm object at 0x...>]
+        >>> print lpc.context.contents[0]
+        \once \override Stem #'direction = #UP
+        '''
+        if hasattr(noteOrChord, 'stemDirection') and noteOrChord.stemDirection is not None:
+            stemDirection = noteOrChord.stemDirection.upper()
             if stemDirection in ['UP', 'DOWN']:
                 stemFile = r'''\once \override Stem #'direction = #%s ''' % stemDirection
                 lpStemScheme = lyo.LyEmbeddedScm(stemFile)
@@ -643,7 +755,8 @@ class LilypondConverter(object):
         >>> print conv.lySimpleMusicFromChord(c1)
          < cis, e' dis''  !  > 2.. 
         '''
-        self.setStemCode(chordObj)
+        #self.appendBeamCode(chordObj)
+        self.appendStemCode(chordObj)
 
         chordBodyElements = []
         for p in chordObj.pitches:
@@ -1199,22 +1312,24 @@ class Test(unittest.TestCase):
 class TestExternal(unittest.TestCase):
 
 
-    def xtestConvertNote(self):
+    def testConvertNote(self):
         from music21 import note
         n = note.Note("C5")
         n.show('lily.png')
     
-    def xtestConvertChorale(self):
-        b.show('lily.svg')        
+    def testConvertChorale(self):
+        for n in b.flat:
+            n.beams = None
+        b.parts[0].show('lily.svg')
 
-    def testSlowConvertOpus(self):
+    def xtestSlowConvertOpus(self):
         from music21 import corpus
         fifeOpus = corpus.parse('miscFolk/americanfifeopus.abc')
         fifeOpus.show('lily.png')
     
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    music21.mainTest(TestExternal)
     
 #------------------------------------------------------------------------------
 # eof

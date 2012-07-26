@@ -11586,8 +11586,20 @@ class Measure(Stream):
 
    
 class Part(Stream):
-    '''A Stream subclass for designating music that is
-    considered a single part.
+    '''
+    A Stream subclass for designating music that is considered a single part.
+    
+    When put into a Score object, Part objects are all collected in the `Score.parts`
+    call.  Otherwise they mostly work like generic Streams.
+    
+    Generally the hierarchy goes: Score > Part > Measure > Voice, but you are not
+    required to stick to this.
+    
+    Part groupings (piano braces, etc.) are found in the :ref:`moduleLayout` module
+    in the :class:`~music21.layout.StaffGroup` Spanner object.
+    
+    OMIT_FROM_DOCS
+    Check that this is True and works for everything before suggesting that it works!
     
     May be enclosed in a staff (for instance, 2nd and 3rd trombone
     on a single staff), may enclose staves (piano treble and piano bass),

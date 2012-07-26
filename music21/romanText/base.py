@@ -4,14 +4,15 @@
 # Purpose:      music21 classes for processing roman numeral analysis text files
 #
 # Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2011 The music21 Project
+# Copyright:    (c) 2011-12 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-
-
-'''Objects for processing roman numeral analysis text files, as defined and demonstrated by Dmitri Tymoczko.
 '''
+Objects for processing roman numeral analysis text files, as defined and demonstrated by Dmitri Tymoczko.
+'''
+#from __future__ import unicode_literals
 
 import unittest
 import re
@@ -44,6 +45,8 @@ reAnalyticKeyAtom = re.compile('[A-Ga-g]+[b#]*:')
 reKeySignatureAtom = re.compile('KS\-?[0-7]')
 # must distinguish b3 from bVII; there may be b1.66.5
 reBeatAtom = re.compile('b[1-9.]+')
+reRepeatStartAtom = re.compile('\|\|\:')
+reRepeatStopAtom = re.compile('\:\|\|')
 
 
 
@@ -66,6 +69,10 @@ class RTToken(object):
 
     A multi-pass parsing procedure is likely necessary, as RomanText permits variety of groupings and markings.
 
+    >>> from music21 import *
+    >>> rtt = romanText.RTToken('||:')
+    >>> rtt
+    <RTToken '||:'>
     '''
     def __init__(self, src=u''):
         self.src = src # store source character sequence
@@ -115,15 +122,32 @@ class RTToken(object):
         return False
 
     def isAtom(self):
-        '''Atoms are any untagged data; generally only found inside of a measure definition. 
+        '''
+        Atoms are any untagged data; generally only found inside of a measure definition. 
         '''
         return False
 
 
 class RTTagged(RTToken):
-    '''In roman text, some data elements are tagged: there is tag, followed by some data. In other elements, there is just data.
+    '''
+    In romanText, some data elements are tags, that is a tag name,
+    a colon, optional whitespace, and data. In non-RTTagged elements, there is just data.
 
-    All tagged tokens are subclasses of this class. Examples are Title:
+    All tagged tokens are subclasses of this class. Examples are:
+    
+        Title: Die Jahrzeiten
+        Composer: Fanny Mendelssohn
+        
+    >>> from music21 import *
+    >>> rttag = romanText.RTTagged('Title: Die Jahrzeiten')
+    >>> rttag.tag
+    'Title'
+    >>> rttag.data
+    'Die Jahrzeiten'
+    >>> rttag.isTitle()
+    True
+    >>> rttag.isComposer()
+    False
     '''
     def __init__(self, src =u''):
         RTToken.__init__(self, src)
@@ -244,21 +268,39 @@ class RTTagged(RTToken):
 
 
 class RTMeasure(RTToken):
-    '''In roman text, measures are given one per line and always start with 'm'.
+    '''
+    In RomanText, measures are given one per line and always start with 'm'.  For instance:
+    
+        m4 i b3 v b4 VI
+        m5 b2 g: IV b4 V
+        m6 i
+        m7 D: V
 
-    Measure ranges can be used and copied, such as m3-4=m1-2
+    Measure ranges can be used and copied, such as:
+    
+        m8-m9=m4-m5
 
-    Variants are not part of the tag, but are read into an attribute: m1var1 ii
+    RTMeasure objects can also define variant readings for a measure:
+    
+        m1     ii
+        m1var1 ii b2 ii6 b3 IV
+    
+    Variants are not part of the tag, but are read into an attribute.
+
+    Endings are indicated by a single letter after the measure number, such as
+    "a" for first ending.
+
+    >>> from music21 import *
+    >>> rtm = romanText.RTMeasure('m15a V6 b1.5 V6/5 b2 I b3 viio6')
+    >>> rtm.data
+    'V6 b1.5 V6/5 b2 I b3 viio6'
+    >>> rtm.number
+    [15]
+    >>> rtm.repeatLetter
+    ['a']
+
     '''
     def __init__(self, src =u''):
-        '''
-        >>> from music21 import *
-        >>> rtm = romanText.RTMeasure('m15 V6 b1.5 V6/5 b2 I b3 viio6')
-        >>> rtm.data
-        'V6 b1.5 V6/5 b2 I b3 viio6'
-        >>> rtm.number
-        [15]
-        '''
         RTToken.__init__(self, src)
         # try to split off tag from data
         self.tag = '' # the measure number or range
@@ -368,14 +410,21 @@ class RTMeasure(RTToken):
 
 
 class RTAtom(RTToken):
-    '''In roman text, within each measure are definitions of chords, phrases boundaries, open/close parenthesis, and beat indicators. These will be called Atoms, as they are data that is not tagged.
+    '''
+    In RomanText, definitions of chords, phrases boundaries, open/close parenthesis, beat indicators, etc.
+    appear within measures (RTMeasure objects). These individual elements will be called Atoms, as 
+    they are data that is not tagged.
 
-    Store a reference to the container (a RTMeasure) in each atom.
+    Each atom store a reference to its container (normally an RTMeasure).
+
+    >>> from music21 import *
+    >>> chordIV = romanText.RTAtom('IV')
+    >>> beat4 = romanText.RTAtom('b4')
+    
+    however, see RTChord, RTBeat, etc. which are subclasses of RTAtom specifically for storing chords, beats, etc.
+    
     '''
     def __init__(self, src =u'', container=None):
-        '''
-        >>> from music21 import *
-        '''
         # this stores the source
         RTToken.__init__(self, src)
         self.container = container
@@ -390,10 +439,14 @@ class RTAtom(RTToken):
 
 
 class RTChord(RTAtom):
+    r'''
+    An RTAtom subclass that defines a chord.  Also contains a reference to the container.
+    
+    >>> from music21 import *
+    >>> chordIV = romanText.RTChord('IV')
+    '''
+    
     def __init__(self, src =u'', container=None):
-        '''
-        >>> from music21 import *
-        '''
         RTAtom.__init__(self, src, container)
 
         # store offset within measure
@@ -406,17 +459,21 @@ class RTChord(RTAtom):
 
 
 class RTBeat(RTAtom):
+    r'''
+    An RTAtom subclass that defines a beat definition.  Also contains a reference to the container.
+    
+    >>> from music21 import *
+    >>> beatFour = romanText.RTBeat('b4')
+    '''
     def __init__(self, src =u'', container=None):
-        '''
-        >>> from music21 import *
-        '''
         RTAtom.__init__(self, src, container)
 
     def __repr__(self):
         return '<RTBeat %r>' % self.src
 
     def getOffset(self, timeSignature):
-        '''Given a time signature, return the offset position specified by this beat.
+        '''
+        Given a time signature, return the offset position specified by this beat.
 
         >>> from music21 import *
         >>> rtb = romanText.RTBeat('b1.5')
@@ -439,8 +496,6 @@ class RTBeat(RTAtom):
         >>> rtc = romanText.RTBeat('b1.66.5')
         >>> rtc.getOffset(meter.TimeSignature('6/8'))
         1.25
-        
-
         '''
         from music21 import meter
         beatStr = self.src.replace('b', '')
@@ -739,13 +794,51 @@ class RTEllisonStop(RTPhraseMarker):
     def __repr__(self):
         return '<RTEllisonStop %r>' % self.src
 
+class RTRepeat(RTAtom):
+    def __init__(self, src =u'', container=None):
+        '''
+        >>> from music21 import *
+        >>> repeat = romanText.RTRepeat('||:')
+        >>> repeat
+        <RTRepeat '||:'>
+        '''
+        RTAtom.__init__(self, src, container)
 
+    def __repr__(self):
+        return '<RTRepeat %r>' % self.src
+
+
+class RTRepeatStart(RTRepeat):
+    def __init__(self, src =u'||:', container=None):
+        '''
+        >>> from music21 import *
+        >>> repeat = romanText.RTRepeatStart()
+        >>> repeat
+        <RTRepeatStart u'||:'>
+        '''
+        RTRepeat.__init__(self, src, container)
+
+    def __repr__(self):
+        return '<RTRepeatStart %r>' % self.src
+
+class RTRepeatStop(RTRepeat):
+    def __init__(self, src =u':||', container=None):
+        '''
+        >>> from music21 import *
+        >>> repeat = romanText.RTRepeatStop()
+        >>> repeat
+        <RTRepeatStop u':||'>
+        '''
+        RTRepeat.__init__(self, src, container)
+
+    def __repr__(self):
+        return '<RTRepeatStop %r>' % self.src
 
 #-------------------------------------------------------------------------------
 class RTHandler(object):
 
     # divide elements of a character stream into objects and handle
-    # store in a list, and pass global information to compontns
+    # store in a list, and pass global information to components
     def __init__(self):
         # tokens are ABC objects in a linear stream
         # tokens are strongly divided between header and body, so can 
@@ -806,9 +899,9 @@ class RTHandler(object):
         >>> str(rth._tokenizeAtoms('= m3'))
         '[]'
 
-        >>> tokenList = rth._tokenizeAtoms('g;: V b2 ?(Bb: VII7 b3 III b4 ?)Bb: i')
+        >>> tokenList = rth._tokenizeAtoms('g;: ||: V b2 ?(Bb: VII7 b3 III b4 ?)Bb: i :||')
         >>> str(tokenList)
-        "[<RTKey 'g;:'>, <RTChord 'V'>, <RTBeat 'b2'>, <RTOptionalKeyOpen '?(Bb:'>, <RTChord 'VII7'>, <RTBeat 'b3'>, <RTChord 'III'>, <RTBeat 'b4'>, <RTOptionalKeyClose '?)Bb:'>, <RTChord 'i'>]"
+        "[<RTKey 'g;:'>, <RTRepeatStart '||:'>, <RTChord 'V'>, <RTBeat 'b2'>, <RTOptionalKeyOpen '?(Bb:'>, <RTChord 'VII7'>, <RTBeat 'b3'>, <RTChord 'III'>, <RTBeat 'b4'>, <RTOptionalKeyClose '?)Bb:'>, <RTChord 'i'>, <RTRepeatStop ':||'>]"
         '''
         post = []
         # break by spaces
@@ -838,6 +931,10 @@ class RTHandler(object):
                 post.append(RTAnalyticKey(word, container))
             elif reKeySignatureAtom.match(word) is not None:
                 post.append(RTKeySignature(word, container))
+            elif reRepeatStartAtom.match(word) is not None:
+                post.append(RTRepeatStart(word, container))
+            elif reRepeatStopAtom.match(word) is not None:
+                post.append(RTRepeatStop(word, container))
 
             else: # only option is that it is a chord
                 post.append(RTChord(word, container))

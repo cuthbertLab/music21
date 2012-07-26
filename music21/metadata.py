@@ -2408,7 +2408,7 @@ class Test(unittest.TestCase):
 
 
     def testRichMetadataA(self):
-        from music21 import corpus, metadata
+        from music21 import base, corpus, metadata
 
         s = corpus.parse('bwv66.6')
         rmd = metadata.RichMetadata()
@@ -2417,8 +2417,8 @@ class Test(unittest.TestCase):
 
         self.assertEqual(rmd.noteCount, 165)
         self.assertEqual(rmd.quarterLength, 36.0)
-
-        self.assertEqual(rmd.json, '{"__attr__": {"_urls": [], "quarterLength": 36.0, "noteCount": 165, "_contributors": [], "timeSignatureFirst": "4/4", "keySignatureFirst": "sharps 3, mode minor", "_workIds": {"movementName": {"__attr__": {"_data": "bwv66.6.mxl"}, "__class__": "<class \'music21.metadata.Text\'>"}}}, "__version__": [1, 0, 0], "__class__": "<class \'music21.metadata.RichMetadata\'>"}')
+        versionRepr = repr(list(base.VERSION))
+        self.assertEqual(rmd.json, '{"__attr__": {"_urls": [], "quarterLength": 36.0, "noteCount": 165, "_contributors": [], "timeSignatureFirst": "4/4", "keySignatureFirst": "sharps 3, mode minor", "_workIds": {"movementName": {"__attr__": {"_data": "bwv66.6.mxl"}, "__class__": "<class \'music21.metadata.Text\'>"}}}, "__version__": ' + versionRepr + ', "__class__": "<class \'music21.metadata.RichMetadata\'>"}')
 
 
 #-------------------------------------------------------------------------------
