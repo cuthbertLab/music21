@@ -165,6 +165,7 @@ class ToneRow(stream.Stream):
         '''
         Convenience function returning a music21.TwelveToneRow object with the same pitches.
         Note that the TwelveToneRow object may not be a twelve tone row.
+        
         >>> from music21 import *
         >>> a = serial.pcToToneRow(range(0,11))
         >>> type(a)
@@ -661,10 +662,10 @@ class TwelveToneRow(ToneRow):
 
 # ------- parsing functions for atonal music -------
 
-def getContiguousSegmentsAtLength(part, length, reps, chords):
+def getContiguousSegmentsOfLength(inputpart, length, reps, chords):
     
     '''
-    Given a part of a stream object or a stream without parts, returns a list
+    Given a part object or a stream object with one part, returns a list
     of contiguous segments of notes with a given length,
     subject to constraints specified in the last two arguments. Each list is given
     as a tuple of the list of notes and the number of the measure on which it starts. The third
@@ -679,36 +680,36 @@ def getContiguousSegmentsAtLength(part, length, reps, chords):
     which are pairwise distinct, i.e. tone rows.
     
     >>> from music21 import *
-    >>> part = stream.Stream()
+    >>> s = stream.Stream()
     >>> n1 = note.Note('e4')
     >>> n1.quarterLength = 6
-    >>> part.append(n1)
+    >>> s.append(n1)
     >>> n2 = note.Note('f4')
     >>> n2.quarterLength = 1
-    >>> part.append(n2)
+    >>> s.append(n2)
     >>> n3 = chord.Chord(['g4', 'b4'])
     >>> n3.quarterLength = 1
-    >>> part.append(n3)
+    >>> s.append(n3)
     >>> n4 = note.Note('g4')
     >>> n4.quarterLength = 1
-    >>> part.repeatAppend(n4, 2)
+    >>> s.repeatAppend(n4, 2)
     >>> n5 = note.Note('a4')
     >>> n5.quarterLength = 3
-    >>> part.repeatAppend(n5, 2)
+    >>> s.repeatAppend(n5, 2)
     >>> n6 = note.Note('b4')
     >>> n6.quarterLength = 1
-    >>> part.append(n6)
+    >>> s.append(n6)
     >>> n7 = note.Note('c5')
     >>> n7.quarterLength = 1
-    >>> part.append(n7)
-    >>> newpart = part.makeMeasures()
-    >>> newpart.makeTies()
-    >>> serial.getContiguousSegmentsAtLength(newpart, 3, 'skipconsecutive', 'skipchords')
+    >>> s.append(n7)
+    >>> s = s.makeMeasures()
+    >>> s.makeTies()
+    >>> serial.getContiguousSegmentsOfLength(s, 3, 'skipconsecutive', 'skipchords')
     [([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 3), 
     ([<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>], 3)]
-    >>> serial.getContiguousSegmentsAtLength(newpart, 3, 'rowsonly', 'skipchords')
+    >>> serial.getContiguousSegmentsOfLength(s, 3, 'rowsonly', 'skipchords')
     [([<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>], 4)]
-    >>> serial.getContiguousSegmentsAtLength(newpart, 3, 'includeall', 'skipchords')
+    >>> serial.getContiguousSegmentsOfLength(s, 3, 'includeall', 'skipchords')
     [([<music21.note.Note G>, <music21.note.Note G>, <music21.note.Note A>], 3), 
     ([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note A>], 3), 
     ([<music21.note.Note A>, <music21.note.Note A>, <music21.note.Note B>], 3), 
@@ -728,7 +729,8 @@ def getContiguousSegmentsAtLength(part, length, reps, chords):
     >>> for n in notelist:
     ...    n.quarterLength = 1
     ...    part.append(n)
-    >>> serial.getContiguousSegmentsAtLength(part, 3, 'rowsonly', 'skipchords')
+    >>> part = part.makeMeasures()
+    >>> serial.getContiguousSegmentsOfLength(part, 3, 'rowsonly', 'skipchords')
     [([<music21.note.Note C#>, <music21.note.Note E>, <music21.note.Note D#>], 1), 
     ([<music21.note.Note E>, <music21.note.Note D#>, <music21.note.Note F>], 1), 
     ([<music21.note.Note D#>, <music21.note.Note F>, <music21.note.Note E>], 1), 
@@ -737,14 +739,20 @@ def getContiguousSegmentsAtLength(part, length, reps, chords):
     '''
     
     #reps settings: skipconsecutive, rowsonly, includeall
-    #chords settings: skipchords, splitchords, getonenotefromchord
+    #chords settings: skipchords, readfrombottom, readfromtop
     
     listOfPitchLists = []
     currentPitchLists = []
-    rowsize = length
-    part = part.stripTies()
-    part = part.makeMeasures()
-    measures = part.getElementsByClass(stream.Measure)
+    inputpart = inputpart.stripTies(False, False, True)
+    
+    if len(inputpart.getElementsByClass(stream.Part)) == 0:
+        measures = inputpart.getElementsByClass(stream.Measure)
+    elif len(inputpart.getElementsByClass(stream.Part)) == 1:
+        measures = inputpart.parts[0].getElementsByClass(stream.Measure)
+    else:
+        raise SerialException("serial.getContiguousSegmentsOfLength can only applied to streams with one part.")
+    
+    
     
     if chords == 'skipchords':
         pitchList = []
@@ -830,7 +838,7 @@ def findSegments(inputstream, segmentlist, reps, chords):
     '''
     Given a stream object and list of segments of pitch classes (each given as a list), returns a list of all
     instances of the segment in the stream subject to the constraints on repetitions of pitches
-    and how chords are dealt with as described in getContinuousSegmentsAtLength. Each
+    and how chords are dealt with as described in getContinuousSegmentsOfLength. Each
     instance is given as a tuple of the segment of notes, the number of the measure in which it appears, and,
     if the stream object contains parts, the part in which it appears (where a lower number
     denotes a higher part).
@@ -881,18 +889,27 @@ def findSegments(inputstream, segmentlist, reps, chords):
     
     segs = []
     donealready = []
-    for segment in segmentlist:
-        used = False
-        for usedsegment in donealready:
-            segmentrow = pcToToneRow(segment)
+    contigdict = {}
+    parts = inputstream.getElementsByClass(stream.Part)
+    numparts = len(parts)
+         
+    if numparts == 0:
+        for segment in segmentlist:
+            used = False
+            for usedsegment in donealready:
+                segmentrow = pcToToneRow(segment)
+                if used == False:
+                    if segmentrow.isSameRow(pcToToneRow(usedsegment)) == True:
+                        used = True
             if used == False:
-                if segmentrow.isSameRow(pcToToneRow(usedsegment)) == True:
-                    used = True
-        if used == False:
-            donealready.append(segment)
-            length = len(segment)       
-            if len(inputstream.getElementsByClass(stream.Part)) == 0:
-                for contiguousseg in getContiguousSegmentsAtLength(inputstream, len(segment), reps, chords):
+                donealready.append(segment)
+                length = len(segment)
+                if length in contigdict:
+                    contig = contigdict[length]
+                else:
+                    contig = getContiguousSegmentsOfLength(inputstream, len(segment), reps, chords)
+                    contigdict[length] = contig           
+                for contiguousseg in contig:
                     pitchlist = [n.pitchClass for n in contiguousseg[0]]
                     samemod12 = True
                     for j in range(0,length):
@@ -901,10 +918,29 @@ def findSegments(inputstream, segmentlist, reps, chords):
                                 samemod12 = False
                     if samemod12 == True:
                         segs.append((contiguousseg[0], contiguousseg[1]))
-            else:
-                for i in range (0,len(inputstream.getElementsByClass(stream.Part))):
-                    part = inputstream.getElementsByClass(stream.Part)[i]
-                    for contiguousseg in getContiguousSegmentsAtLength(part, len(segment), reps, chords):
+    else:
+        for segment in segmentlist:
+            used = False
+            for usedsegment in donealready:
+                segmentrow = pcToToneRow(segment)
+                if used == False:
+                    if segmentrow.isSameRow(pcToToneRow(usedsegment)) == True:
+                        used = True
+            if used == False:
+                donealready.append(segment)
+                length = len(segment)
+                if length in contigdict:
+                    contig = contigdict[length]
+                else:
+                    contiglist = []
+                    for i in range(0,numparts):
+                        part = parts[i]
+                        contigforpart = getContiguousSegmentsOfLength(part, length, reps, chords)
+                        contiglist.append((contigforpart, i+1))
+                    contig = contiglist
+                    contigdict[length] = contig
+                for partcontiguousseg in contig:
+                    for contiguousseg in partcontiguousseg[0]:
                         pitchlist = [n.pitchClass for n in contiguousseg[0]]
                         samemod12 = True
                         for j in range(0,length):
@@ -912,7 +948,7 @@ def findSegments(inputstream, segmentlist, reps, chords):
                                 if pitchlist[j] != segment[j] % 12:
                                     samemod12 = False
                         if samemod12 == True:
-                            segs.append((contiguousseg[0], contiguousseg[1], i + 1))
+                            segs.append((contiguousseg[0], contiguousseg[1], partcontiguousseg[1]))
                         
     return segs
 
@@ -921,7 +957,7 @@ def findTransposedSegments(inputstream, segmentlist, reps, chords):
     '''
     Given a stream object and list of segments of pitch classes (each given as a list), returns a list of all
     instances of the segment and its transpositions in the stream subject to the constraints on repetitions of pitches
-    and how chords are dealt with as described in getContinuousSegmentsAtLength. Each
+    and how chords are dealt with as described in getContinuousSegmentsOfLength. Each
     instance is given as a tuple of the segment of notes, the number of the measure in which it appears, and,
     if the stream object contains parts, the part in which it appears (where a lower number
     denotes a higher part).
@@ -968,22 +1004,46 @@ def findTransposedSegments(inputstream, segmentlist, reps, chords):
     
     segs = []
     donealready = []
-    for segment in segmentlist:
-        row = pcToToneRow([n for n in segment])
-        intervals = row.getIntervalsAsString()
-        if intervals not in donealready:
-            donealready.append(intervals)
-            length = len(segment)
-            if len(inputstream.getElementsByClass(stream.Part)) == 0:
-                for contiguousseg in getContiguousSegmentsAtLength(inputstream, len(segment), reps, chords):
+    contigdict = {}
+    parts = inputstream.getElementsByClass(stream.Part)
+    numparts = len(parts)
+    
+    if numparts == 0:
+        for segment in segmentlist:
+            row = pcToToneRow([n for n in segment])
+            intervals = row.getIntervalsAsString()
+            if intervals not in donealready:
+                donealready.append(intervals)
+                length = len(segment)
+                if length in contigdict:
+                    contig = contigdict[length]
+                else:
+                    contig = getContiguousSegmentsOfLength(inputstream, length, reps, chords)
+                    contigdict[length] = contig
+                for contiguousseg in contig:
                     if intervals == pcToToneRow([n.pitchClass for n in contiguousseg[0]]).getIntervalsAsString():
                         segs.append((contiguousseg[0], contiguousseg[1]))
-            else:
-                for i in range(0,len(inputstream.getElementsByClass(stream.Part))):
-                    part = inputstream.getElementsByClass(stream.Part)[i]
-                    for contiguousseg in getContiguousSegmentsAtLength(part, len(segment), reps, chords):
+    else:
+        for segment in segmentlist:
+            row = pcToToneRow([n for n in segment])
+            intervals = row.getIntervalsAsString()
+            if intervals not in donealready:
+                donealready.append(intervals)
+                length = len(segment)
+                if length in contigdict:
+                    contig = contigdict[length]
+                else:
+                    contiglist = []
+                    for i in range(0,numparts):
+                        part = parts[i]
+                        contigforpart = getContiguousSegmentsOfLength(part, length, reps, chords)
+                        contiglist.append((contigforpart, i+1))
+                    contig = contiglist
+                    contigdict[length] = contig
+                for partcontiguousseg in contig:
+                    for contiguousseg in partcontiguousseg[0]:
                         if intervals == pcToToneRow([n.pitchClass for n in contiguousseg[0]]).getIntervalsAsString():
-                            segs.append((contiguousseg[0], contiguousseg[1], i + 1))
+                            segs.append((contiguousseg[0], contiguousseg[1], partcontiguousseg[1]))
             
     return segs
 
@@ -993,7 +1053,7 @@ def findTransformedSegments(inputstream, segmentlist, reps, chords, convention):
     '''
     Given a stream object and list of segments of pitch classes (each given as a list), returns a list of all
     instances of the segment and its transformations in the stream subject to the constraints on repetitions of pitches,
-    how chords are dealt with as described in getContinuousSegmentsAtLength, and a transformation index convention. 
+    how chords are dealt with as described in getContinuousSegmentsOfLength, and a transformation index convention. 
     Each instance is given as a tuple of the segment of notes, the transformation of the original row,
     the number of the measure in which it appears, and,
     if the stream object contains parts, the part in which it appears (where a lower number
@@ -1011,9 +1071,11 @@ def findTransformedSegments(inputstream, segmentlist, reps, chords, convention):
     >>> for n in notelist:
     ...    n.quarterLength = 1
     ...    part.append(n)
+    >>> part = part.makeMeasures()
     >>> serial.findTransformedSegments(part, [[2, 5, 4]], 'rowsonly', 'skipchords', 'zero')
     [([<music21.note.Note C#>, <music21.note.Note E>, <music21.note.Note D#>], [('P', 1)], 1), 
     ([<music21.note.Note F>, <music21.note.Note E>, <music21.note.Note G>], [('RI', 7)], 1)]
+    
     
     __OMIT_FROM_DOCS__
     
@@ -1029,49 +1091,81 @@ def findTransformedSegments(inputstream, segmentlist, reps, chords, convention):
     
     segs = []
     donealready = []
-    for segment in segmentlist:
-        row = pcToToneRow([n for n in segment])
-        used = False
-        for usedrow in donealready:
+    contigdict = {}
+    parts = inputstream.getElementsByClass(stream.Part)
+    numparts = len(parts)
+    
+    if numparts == 0:
+        for segment in segmentlist:
+            row = pcToToneRow([n for n in segment])
+            used = False
+            for usedrow in donealready:
+                if used == False:
+                    if row.findZeroCenteredTransformations != []:
+                        used = True
             if used == False:
-                if row.findZeroCenteredTransformations != []:
-                    used = True
-        if used == False:
-            donealready.append(segment)
-            length = len(segment)
-            row = pcToToneRow(segment)
-            if convention == 'zero':
-                if len(inputstream.getElementsByClass(stream.Part)) == 0:
-                    for contiguousseg in getContiguousSegmentsAtLength(inputstream, length, reps, chords):
-                        transformations = row.findZeroCenteredTransformations(pcToToneRow(
-                                                [n.pitchClass for n in contiguousseg[0]]))
-                        if transformations != []:
-                            segs.append((contiguousseg[0], transformations, contiguousseg[1]))
-                else:    
-                    for i in range(0,len(inputstream.getElementsByClass(stream.Part))):
-                        part = inputstream.getElementsByClass(stream.Part)[i]
-                        for contiguousseg in getContiguousSegmentsAtLength(part, length, reps, chords):
+                donealready.append(segment)
+                length = len(segment)
+                row = pcToToneRow(segment)
+                if length in contigdict:
+                    contig = contigdict[length]
+                else:
+                    contig = getContiguousSegmentsOfLength(inputstream, length, reps, chords)
+                    contigdict[length] = contig
+                if convention == 'zero':
+                    for contiguousseg in contig:
                             transformations = row.findZeroCenteredTransformations(pcToToneRow(
-                                                [n.pitchClass for n in contiguousseg[0]]))
+                                                    [n.pitchClass for n in contiguousseg[0]]))
                             if transformations != []:
-                                segs.append((contiguousseg[0], transformations, contiguousseg[1], i + 1))
-            elif convention == 'original':
-                if len(inputstream.getElementsByClass(stream.Part)) == 0:
-                    for contiguousseg in getContiguousSegmentsAtLength(inputstream, length, reps, chords):
-                        transformations = row.findOriginalCenteredTransformations(pcToToneRow(
-                                                [n.pitchClass for n in contiguousseg[0]]))
-                        if transformations != []:
-                            segs.append((contiguousseg[0], transformations, contiguousseg[1]))
-                else:    
-                    for i in range(0,len(inputstream.getElementsByClass(stream.Part))):
-                        part = inputstream.getElementsByClass(stream.Part)[i]
-                        for contiguousseg in getContiguousSegmentsAtLength(part, length, reps, chords):
+                                segs.append((contiguousseg[0], transformations, contiguousseg[1]))
+                elif convention == 'original':
+                    for contiguousseg in contig:
                             transformations = row.findOriginalCenteredTransformations(pcToToneRow(
-                                                [n.pitchClass for n in contiguousseg[0]]))
+                                                    [n.pitchClass for n in contiguousseg[0]]))
                             if transformations != []:
-                                segs.append((contiguousseg[0], transformations, contiguousseg[1], i + 1))
-            else:
-                raise SerialException("Invalid convention - choose 'zero' or 'original'.")
+                                segs.append((contiguousseg[0], transformations, contiguousseg[1]))
+                else:
+                    raise SerialException("Invalid convention - choose 'zero' or 'original'.")
+    
+    else:
+        for segment in segmentlist:
+            row = pcToToneRow([n for n in segment])
+            used = False
+            for usedrow in donealready:
+                if used == False:
+                    if row.findZeroCenteredTransformations != []:
+                        used = True
+            if used == False:
+                donealready.append(segment)
+                length = len(segment)
+                row = pcToToneRow(segment)
+                if length in contigdict:
+                    contig = contigdict[length]
+                else:
+                    contiglist = []
+                    for i in range(0,numparts):
+                        part = parts[i]
+                        contigforpart = getContiguousSegmentsOfLength(part, length, reps, chords)
+                        contiglist.append((contigforpart, i+1))
+                    contig = contiglist
+                    contigdict[length] = contig
+                    if convention == 'zero':
+                        for partcontiguousseg in contig:
+                            for contiguousseg in partcontiguousseg[0]:
+                                transformations = row.findZeroCenteredTransformations(pcToToneRow(
+                                                            [n.pitchClass for n in contiguousseg[0]]))
+                                if transformations != []:
+                                    segs.append((contiguousseg[0], transformations, contiguousseg[1], partcontiguousseg[1]))
+                    elif convention == 'original':
+                        for partcontiguousseg in contig:
+                            for contiguousseg in partcontiguousseg[0]:
+                                transformations = row.findOriginalCenteredTransformations(pcToToneRow(
+                                                        [n.pitchClass for n in contiguousseg[0]]))
+                                if transformations != []:
+                                    segs.append((contiguousseg[0], transformations, contiguousseg[1], partcontiguousseg[1]))
+                    else:
+                        raise SerialException("Invalid convention - choose 'zero' or 'original'.")
+
     return segs
 
 
@@ -1106,7 +1200,7 @@ def findSets(inputstream, multisetlist, reps, chords):
     Given a stream object and list of (unordered) multisets of pitch classes (each given as a list), 
     returns a list of all
     instances of the set in the stream subject to the constraints on repetitions of pitches
-    and how chords are dealt with as described in getContinuousSegmentsAtLength. Note that a multiset
+    and how chords are dealt with as described in getContinuousSegmentsOfLength. Note that a multiset
     is a generalization of a set in which multiple apperances of the same element (in this case, pitch class) 
     in the multi-set are allowed, hence the use of the list, rather than the set, type. Each
     instance of the multiset is given as a tuple of the segment of notes, the number of the measure in which it appears, and,
@@ -1122,6 +1216,7 @@ def findSets(inputstream, multisetlist, reps, chords):
     >>> part.repeatAppend(n1, 2)
     >>> part.append(n2)
     >>> part.append(n1)
+    >>> part = part.makeMeasures()
     >>> findSets(part, [[5, 4, 4]], 'includeall', 'skipchords')
     [([<music21.note.Note E>, <music21.note.Note E>, <music21.note.Note F>], 1), 
     ([<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note E>], 2)]
@@ -1145,28 +1240,59 @@ def findSets(inputstream, multisetlist, reps, chords):
     
     multisets = []
     donealready = []
-    for multiset in multisetlist:
-        length = len(multiset)
-        used = False
-        for usedset in donealready:
+    contigdict = {}
+    parts = inputstream.getElementsByClass(stream.Part)
+    numparts = len(parts)
+    
+    if numparts == 0:
+        for multiset in multisetlist:
+            length = len(multiset)
+            used = False
+            for usedset in donealready:
+                if used == False:
+                    if _checkMultisetEquivalence(usedset, multiset) == True:
+                        used = True
             if used == False:
-                if _checkMultisetEquivalence(usedset, multiset) == True:
-                    used = True
-        if used == False:
-            if len(inputstream.getElementsByClass(stream.Part)) == 0: 
-                for contiguousseg in getContiguousSegmentsAtLength(inputstream, length, reps, chords):
+                donealready.append(multiset)
+                length = len(multiset)
+                row = pcToToneRow(multiset)
+                if length in contigdict:
+                    contig = contigdict[length]
+                else:
+                    contig = getContiguousSegmentsOfLength(inputstream, length, reps, chords)
+                    contigdict[length] = contig
+                for contiguousseg in contig:
                     pitchmultiset = [n.pitchClass for n in contiguousseg[0]]
                     if _checkMultisetEquivalence(pitchmultiset,multiset) == True:
                         multisets.append((contiguousseg[0], contiguousseg[1]))
-                    donealready.append(multiset)
-            else:
-                for i in range(0, len(inputstream.getElementsByClass(stream.Part))):
-                    for contiguousseg in getContiguousSegmentsAtLength(
-                                                    inputstream.getElementsByClass(stream.Part)[i], length, reps, chords):
+    else:
+        for multiset in multisetlist:
+            length = len(multiset)
+            used = False
+            for usedset in donealready:
+                if used == False:
+                    if _checkMultisetEquivalence(usedset, multiset) == True:
+                        used = True
+            if used == False:
+                donealready.append(multiset)
+                length = len(multiset)
+                row = pcToToneRow(multiset)
+                if length in contigdict:
+                    contig = contigdict[length]
+                else:
+                    contiglist = []
+                    for i in range(0,numparts):
+                        part = parts[i]
+                        contigforpart = getContiguousSegmentsOfLength(part, length, reps, chords)
+                        contiglist.append((contigforpart, i+1))
+                    contig = contiglist
+                    contigdict[length] = contig
+                for partcontiguousseg in contig:
+                    for contiguousseg in partcontiguousseg[0]:
                         pitchmultiset = [n.pitchClass for n in contiguousseg[0]]
                         if _checkMultisetEquivalence(pitchmultiset,multiset) == True:
-                            multisets.append((contiguousseg[0], contiguousseg[1], i + 1))
-                        donealready.append(multiset)
+                            multisets.append((contiguousseg[0], contiguousseg[1], partcontiguousseg[1]))
+
     return multisets
 
 def findTransposedSets(inputstream, multisetlist, reps, chords):
@@ -1176,7 +1302,7 @@ def findTransposedSets(inputstream, multisetlist, reps, chords):
     Given a stream object and list of (unordered) multisets of pitch classes (each given as a list), 
     returns a list of all
     instances of the set, with its transpositions in the stream subject to the constraints on repetitions of pitches
-    and how chords are dealt with as described in getContinuousSegmentsAtLength. Note that a multiset
+    and how chords are dealt with as described in getContinuousSegmentsOfLength. Note that a multiset
     is a generalization of a set in which multiple apperances of the same element (in this case, pitch class) 
     in the multi-set are allowed, hence the use of the list, rather than the set, type. Each
     instance of the multiset is given as a tuple of the segment of notes, the number of the measure in which it appears, and,
@@ -1195,6 +1321,7 @@ def findTransposedSets(inputstream, multisetlist, reps, chords):
     >>> for n in [n1, n2, n3, n4, n5, n6, n7]:
     ...    n.quarterLength = 2
     ...    part.repeatAppend(n, 2)
+    >>> part = part.makeMeasures()
     >>> instancelist = serial.findTransposedSets(part, [[1, 2, 3]], 'skipconsecutive', 'skipchords')
     >>> print instancelist
     [([<music21.note.Note D>, <music21.note.Note E>, <music21.note.Note E->], 3),
@@ -1220,6 +1347,52 @@ def findTransposedSets(inputstream, multisetlist, reps, chords):
                 transposition.append((j+i) % 12)
             transposedmultisets.append(transposition)
     return findSets(inputstream, transposedmultisets, reps, chords)
+
+def findTransposedAndInvertedSets(inputstream, multisetlist, reps, chords):
+    
+    '''
+    
+    Given a stream object and list of (unordered) multisets of pitch classes (each given as a list), 
+    returns a list of all
+    instances of the set, with its transpositions and inversions in the stream subject to the constraints on repetitions of pitches
+    and how chords are dealt with as described in getContinuousSegmentsOfLength. Note that a multiset
+    is a generalization of a set in which multiple apperances of the same element (in this case, pitch class) 
+    in the multi-set are allowed, hence the use of the list, rather than the set, type. Each
+    instance of the multiset is given as a tuple of the segment of notes, the number of the measure in which it appears, and,
+    if the stream object contains parts, the part in which it appears (where a lower number
+    denotes a higher part).
+    
+    >>> from music21 import *
+    >>> s = stream.Stream()
+    >>> n1 = note.Note('c4')
+    >>> n2 = note.Note('e-4')
+    >>> n3 = note.Note('g4')
+    >>> n4 = note.Note('e4')
+    >>> n5 = note.Note('c4')
+    >>> for n in [n1, n2, n3, n4, n5]:
+    ...     n.quarterLength = 1
+    ...     s.append(n)
+    >>> s = s.makeMeasures()
+    >>> serial.findTransposedAndInvertedSets(s, [[0, 4, 7]], 'rowsonly', 'skipchords')
+    [([<music21.note.Note G>, <music21.note.Note E>, <music21.note.Note C>], 1), 
+    ([<music21.note.Note C>, <music21.note.Note E->, <music21.note.Note G>], 1)]
+    
+    __OMIT_FROM_DOCS__
+    
+    >>> serial.findTransposedAndInvertedSets(s, [[0, 4, 7], [0, 3, 7]], 'rowsonly', 'skipchords')
+    [([<music21.note.Note G>, <music21.note.Note E>, <music21.note.Note C>], 1), 
+    ([<music21.note.Note C>, <music21.note.Note E->, <music21.note.Note G>], 1)]
+    
+    '''
+    
+    
+    multisetlistcopy = list(multisetlist)
+    for multiset in multisetlistcopy:
+        row = pcToToneRow(multiset)
+        inversion = row.originalCenteredTransformation('I', 0).pitches()
+        multisetlist.append(inversion)
+    return findTransposedSets(inputstream, multisetlist, reps, chords)
+        
             
     
         
