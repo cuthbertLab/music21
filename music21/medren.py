@@ -1189,9 +1189,9 @@ class GeneralMensuralNote(music21.base.Music21Object):
     Two general mensural notes are considered equal if they have the same mensural type, are present in the same context, and have the same offset within that context.
     '''
     def __init__(self, mensuralTypeOrAbbr = 'brevis'):
+        self._gettingDuration = False
         music21.base.Music21Object.__init__(self)
         self._duration = None
-            
         if mensuralTypeOrAbbr in _validMensuralTypes:
             self._mensuralType = mensuralTypeOrAbbr
         elif mensuralTypeOrAbbr in _validMensuralAbbr:
@@ -1262,8 +1262,48 @@ class GeneralMensuralNote(music21.base.Music21Object):
                         MedRenException: blah is not a valid mensural type or abbreviation
                         ''')
     
-    def _getDuration(self):
+    def updateDurationFromMensuration(self):
+        '''
+        The duration of a :class:`music21.medren.GeneralMensuralNote` object can be accessed and set using the :attr:`music21.medren.GeneralMensuralNote.duration` property. 
+        The duration of a general mensural note is by default 0. If the object's subclass is not specified (:class:`music21.medren.MensuralNote` or :class:`music21.medren.MensuralRest`), the duration will remain 0 unless set to some other value.
+        If a general mensural note has no context, the duration will remain 0 since duration is context dependant. 
+        Finally, if a mensural note or a mensural rest has context, but a mensuration or divisione cannot be found or determined from that context, the duration will remain 0.
+        
+        Note: French notation not yet supported.
+        
+        >>> from music21 import *
+        >>> mn = medren.GeneralMensuralNote('B')
+        >>> mn.duration.quarterLength
+        0.0
+        >>> mn = medren.MensuralNote('A', 'B')
+        >>> mn.duration.quarterLength
+        0.0
+        
+        
+        
+        >>> s = stream.Stream()
+        >>> s.append(medren.Divisione('.p.'))
+        >>> for i in range(3):
+        ...    s.append(medren.MensuralNote('A', 'SB'))
+        >>> s.append(medren.Punctus())
+        >>> s.append(medren.MensuralNote('B', 'SB'))
+        >>> s.append(medren.MensuralNote('B', 'SB'))
+        >>> s.append(medren.Punctus())
+        >>> s.append(medren.MensuralNote('A', 'B'))
+        >>> for mn in s:
+        ...    if isinstance(mn, medren.GeneralMensuralNote):
+        ...        mn.updateDurationFromMensuration()
+        ...        print mn.duration.quarterLength
+        1.0
+        1.0
+        1.0
+        1.0
+        2.0
+        3.0    
+        '''
         mLen, mDur = 0, 0
+        if self._gettingDuration is True:
+            return duration.Duration(0)
         mOrD = self._determineMensurationOrDivisione()
         index = self._getSurroundingMeasure()[1]
         if self._getTranslator() is not None:
@@ -1273,54 +1313,9 @@ class GeneralMensuralNote(music21.base.Music21Object):
                 mDur = 0.25
             tempTMM = self._getTranslator()
             mLen = tempTMM.getMinimaLengths()[index]
-        self._duration = duration.Duration(mLen*mDur)
-        return self._duration
+        #print "MDUR! " + str(mDur) + "MLEN " + str(mLen) + "index " + str(index) + " MEASURE " + str(self._getSurroundingMeasure()[0])
+        self.duration = duration.Duration(mLen*mDur)
     
-    def _setDuration(self, dur):
-        if isinstance(dur, music21.duration.Duration):
-            self._duration = dur
-        else:
-            self._duration = duration.Duration(dur)
-            
-    duration = property(_getDuration, _setDuration,
-                        doc = '''
-                        The duration of a :class:`music21.medren.GeneralMensuralNote` object can be accessed and set using the :attr:`music21.medren.GeneralMensuralNote.duration` property. 
-                        The duration of a general mensural note is by default 0. If the object's subclass is not specified (:class:`music21.medren.MensuralNote` or :class:`music21.medren.MensuralRest`), the duration will remain 0 unless set to some other value.
-                        If a general mensural note has no context, the duration will remain 0 since duration is context dependant. 
-                        Finally, if a mensural note or a mensural rest has context, but a mensuration or divisione cannot be found or determined from that context, the duration will remain 0.
-                        
-                        >>> from music21 import *
-                        >>> mn = medren.GeneralMensuralNote('B')
-                        >>> mn.duration.quarterLength
-                        0.0
-                        >>> mn = medren.MensuralNote('A', 'B')
-                        >>> mn.duration.quarterLength
-                        0.0
-                        
-                        However, given a subclass, a context (a stream), and a divisione, the duration of a general mensural note can be determined:
-                        
-                        >>> from music21 import *
-                        >>> s = stream.Stream()
-                        >>> s.append(medren.Divisione('.p.'))
-                        >>> for i in range(3):
-                        ...    s.append(medren.MensuralNote('A', 'SB'))
-                        >>> s.append(medren.Punctus())
-                        >>> s.append(medren.MensuralRest('SB'))
-                        >>> s.append(medren.MensuralNote('B', 'SB'))
-                        >>> s.append(medren.Punctus())
-                        >>> s.append(medren.MensuralNote('A', 'B'))
-                        >>> for mn in s:
-                        ...    if isinstance(mn, medren.GeneralMensuralNote):
-                        ...        print mn.duration.quarterLength
-                        1.0
-                        1.0
-                        1.0
-                        1.0
-                        2.0
-                        3.0
-                        
-                        Note: French notation is not yet supported.
-                        ''')
     
     def _getTranslator(self):
         mOrD = self._determineMensurationOrDivisione()
@@ -1356,14 +1351,20 @@ class GeneralMensuralNote(music21.base.Music21Object):
         <music21.medren.Divisione .q.>
         '''
         
-        mOrD = music21.medren._getTargetBeforeOrAtObj(self, [music21.medren.Mensuration, music21.medren.Divisione])
-        #mOrD = self.getContextByClass((music21.medren.Mensuration, music21.medren.Divisione))
-        if len(mOrD)> 0:
-            mOrD = mOrD[0] #Gets most recent M or D
+        #mOrD = music21.medren._getTargetBeforeOrAtObj(self, [music21.medren.Mensuration, music21.medren.Divisione])
+        searchClasses = (music21.medren.Mensuration, music21.medren.Divisione)
+        mOrD = self.getContextByClass(searchClasses)
+        if mOrD is not None:
+            return mOrD
         else:
-            mOrD = None #TODO: try to determine mensuration for French Notation
+            return None
         
-        return mOrD
+#        if len(mOrD)> 0:
+#            mOrD = mOrD[0] #Gets most recent M or D
+#        else:
+#            mOrD = None #TODO: try to determine mensuration for French Notation
+#        
+#        return mOrD
     
     def _getSurroundingMeasure(self):
         '''
@@ -1409,6 +1410,7 @@ class GeneralMensuralNote(music21.base.Music21Object):
                 if isinstance(site, music21.stream.Measure):
                     mList += tempList
                 else:
+                    tempList = self.activeSite
                     currentIndex = int(tempList.index(self)) 
                     for i in range(currentIndex-1, -1, -1):
                         # Punctus and ligature marks indicate a new measure
@@ -1432,7 +1434,10 @@ class GeneralMensuralNote(music21.base.Music21Object):
                                 break
                             else:
                                 mList.insert(j, tempList[j])
-            index = int(mList.index(self))
+            for i in range(len(mList)):
+                if mList[i] is self:
+                    index = i 
+                    break
         
         return mList, index
             
@@ -1446,6 +1451,7 @@ class MensuralRest(GeneralMensuralNote, music21.note.Rest):
     
     # scaling?
     def __init__(self, *arguments, **keywords):
+        self._gettingDuration = False
         music21.note.Rest.__init__(self, *arguments, **keywords)
         
         self._mensuralType = 'brevis'
@@ -1514,8 +1520,8 @@ class MensuralNote(GeneralMensuralNote, music21.note.Note):
     
     # scaling? 
     def __init__(self, *arguments, **keywords):
+        self._gettingDuration = False        
         music21.note.Note.__init__(self, *arguments, **keywords)
-        
         self._mensuralType = 'brevis'    
         
         if len(arguments) > 1:
@@ -2666,7 +2672,7 @@ def testStretto():
 
 
 if __name__ == '__main__':
-    music21.mainTest(TestExternal)
+    music21.mainTest() #TestExternal)
 #    almaRedemptoris = converter.parse("C4 E F G A G G G A B c G", '4/4') #liber 277 (pdf401)
 #    puer = converter.parse('G4 d d d e d c c d c e d d', '4/4') # puer natus est 408 (pdf 554)
 #    almaRedemptoris.title = "Alma Redemptoris Mater LU p. 277"
