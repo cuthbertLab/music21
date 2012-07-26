@@ -90,6 +90,10 @@ class ToneRow(stream.Stream):
     'row': 'A list representing the pitch class values of the row.',
     }
     
+    _DOC_ORDER = ['pitches', 'noteNames', 'isTwelveToneRow', 'isSameRow', 'getIntervalsAsString', 
+                  'zeroCenteredTransformation', 'originalCenteredTransformation',
+                  'findZeroCenteredTransformations', 'findOriginalCenteredTransformations']
+    
     def __init__(self):
         stream.Stream.__init__(self)
         
@@ -443,6 +447,7 @@ class ToneRow(stream.Stream):
 # ----------------------------------------------------------------------------------------
 
 class TwelveToneRow(ToneRow):
+    
     '''A Stream representation of a twelve-tone row, capable of producing a 12-tone matrix.
     '''
     #row = None
@@ -450,6 +455,9 @@ class TwelveToneRow(ToneRow):
     #_DOC_ATTR = {
     #'row': 'A list representing the pitch class values of the row.',
     #}
+    
+    _DOC_ORDER = ['matrix', 'isAllInterval', 'getLinkClassification', 'isLinkChord', 'areCombinatorial']
+    
 
     def __init__(self):
         ToneRow.__init__(self)
@@ -1207,7 +1215,7 @@ def _checkMultisetEquivalence(multiset1, multiset2):
             
 
 
-def findSets(inputStream, multisetlist, reps, chords):
+def findMultisets(inputStream, multisetlist, reps, chords):
     
     '''
     
@@ -1231,7 +1239,7 @@ def findSets(inputStream, multisetlist, reps, chords):
     >>> part.append(n2)
     >>> part.append(n1)
     >>> part = part.makeMeasures()
-    >>> findSets(part, [[5, 4, 4]], 'includeAll', 'skipChords')
+    >>> findMultisets(part, [[5, 4, 4]], 'includeAll', 'skipChords')
     [([<music21.note.Note E>, <music21.note.Note E>, <music21.note.Note F>], 1), 
     ([<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note E>], 2)]
     
@@ -1239,11 +1247,11 @@ def findSets(inputStream, multisetlist, reps, chords):
     
     >>> s = stream.Stream()
     >>> s.repeatAppend(part, 2)
-    >>> findSets(part, [[5, 4, 4]], 'rowsOnly', 'skipChords')
+    >>> findMultisets(part, [[5, 4, 4]], 'rowsOnly', 'skipChords')
     []
-    >>> findSets(part, [[5, 4, 4]], 'skipConsecutive', 'skipChords')
+    >>> findMultisets(part, [[5, 4, 4]], 'skipConsecutive', 'skipChords')
     [([<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note E>], 1)]
-    >>> findSets(s, [[-7, 16, 4], [5, 4, 4]], 'includeAll', 'skipChords')
+    >>> findMultisets(s, [[-7, 16, 4], [5, 4, 4]], 'includeAll', 'skipChords')
     [([<music21.note.Note E>, <music21.note.Note E>, <music21.note.Note F>], 1, 1), 
     ([<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note E>], 2, 1), 
     ([<music21.note.Note E>, <music21.note.Note E>, <music21.note.Note F>], 1, 2), 
@@ -1309,7 +1317,7 @@ def findSets(inputStream, multisetlist, reps, chords):
 
     return multisets
 
-def findTransposedSets(inputStream, multisetlist, reps, chords):
+def findTransposedMultisets(inputStream, multisetlist, reps, chords):
     
     '''
     
@@ -1336,7 +1344,7 @@ def findTransposedSets(inputStream, multisetlist, reps, chords):
     ...    n.quarterLength = 2
     ...    part.repeatAppend(n, 2)
     >>> part = part.makeMeasures()
-    >>> instancelist = serial.findTransposedSets(part, [[1, 2, 3]], 'skipConsecutive', 'skipChords')
+    >>> instancelist = serial.findTransposedMultisets(part, [[1, 2, 3]], 'skipConsecutive', 'skipChords')
     >>> print instancelist
     [([<music21.note.Note D>, <music21.note.Note E>, <music21.note.Note E->], 3),
     ([<music21.note.Note E->, <music21.note.Note E>, <music21.note.Note D>], 5), 
@@ -1360,9 +1368,9 @@ def findTransposedSets(inputStream, multisetlist, reps, chords):
             for j in multiset:
                 transposition.append((j+i) % 12)
             transposedmultisets.append(transposition)
-    return findSets(inputStream, transposedmultisets, reps, chords)
+    return findMultisets(inputStream, transposedmultisets, reps, chords)
 
-def findTransposedAndInvertedSets(inputStream, multisetlist, reps, chords):
+def findTransposedAndInvertedMultisets(inputStream, multisetlist, reps, chords):
     
     '''
     
@@ -1387,13 +1395,13 @@ def findTransposedAndInvertedSets(inputStream, multisetlist, reps, chords):
     ...     n.quarterLength = 1
     ...     s.append(n)
     >>> s = s.makeMeasures()
-    >>> serial.findTransposedAndInvertedSets(s, [[0, 4, 7]], 'rowsOnly', 'skipChords')
+    >>> serial.findTransposedAndInvertedMultisets(s, [[0, 4, 7]], 'rowsOnly', 'skipChords')
     [([<music21.note.Note G>, <music21.note.Note E>, <music21.note.Note C>], 1), 
     ([<music21.note.Note C>, <music21.note.Note E->, <music21.note.Note G>], 1)]
     
     __OMIT_FROM_DOCS__
     
-    >>> serial.findTransposedAndInvertedSets(s, [[0, 4, 7], [0, 3, 7]], 'rowsOnly', 'skipChords')
+    >>> serial.findTransposedAndInvertedMultisets(s, [[0, 4, 7], [0, 3, 7]], 'rowsOnly', 'skipChords')
     [([<music21.note.Note G>, <music21.note.Note E>, <music21.note.Note C>], 1), 
     ([<music21.note.Note C>, <music21.note.Note E->, <music21.note.Note G>], 1)]
     
@@ -1405,7 +1413,7 @@ def findTransposedAndInvertedSets(inputStream, multisetlist, reps, chords):
         row = pcToToneRow(multiset)
         inversion = row.originalCenteredTransformation('I', 0).pitches()
         multisetlist.append(inversion)
-    return findTransposedSets(inputStream, multisetlist, reps, chords)
+    return findTransposedMultisets(inputStream, multisetlist, reps, chords)
         
             
     
@@ -1846,7 +1854,7 @@ def pcToToneRow(pcSet):
     
 def rowToMatrix(p):
     '''
-    takes a row of numbers of converts it to a 12-tone 
+    takes a row of numbers of converts it to a 12-tone matrix.
     '''
     
     i = [(12-x) % 12 for x in p]
@@ -1938,7 +1946,9 @@ class Test(unittest.TestCase):
         
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [ToneRow, TwelveToneRow, TwelveToneMatrix]
+_DOC_ORDER = ['ToneRow', 'TwelveToneRow', 'pcToToneRow', 'TwelveToneMatrix', 'rowToMatrix', 'getContiguousSegmentsOfLength', 'findSegments',
+              'findTransposedSegments', 'findTransformedSegments', 'findMultisets', 'findTransposedMultisets', 
+              'findTransposedAndInvertedMultisets']
 
 if __name__ == "__main__":
     music21.mainTest(Test)
