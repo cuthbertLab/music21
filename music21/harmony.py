@@ -40,11 +40,11 @@ CHORD_TYPES = {
              'augmented' : ['+', '#5'] , 
              'diminished' : ['dim', 'o'] ,
              'dominant' : ['7'],
-             'major-seventh' : [ 'M7', 'Maj7'],
+             'major-seventh' : [  'Maj7','M7'],
              'minor-seventh' : ['m7' , 'min7'] ,
-             'diminished-seventh' : ['dim7' , 'o7'] ,
+             'diminished-seventh' : [ 'o7', 'dim7'] ,
              'augmented-seventh' : ['7+', '7#5'] ,
-             'half-diminished' : ['m7b5'] ,
+             'half-diminished' : ['/o7','m7b5'] ,
              'major-minor' : ['mMaj7'] , 
              'major-sixth' : ['6'] ,
              'minor-sixth' : ['m6', 'min6'] ,
@@ -291,9 +291,15 @@ class Harmony(chord.Chord):
         
         for kw in keywords:
             if kw == 'root':
-                self._XMLroot = music21.pitch.Pitch(keywords[kw])
+                if common.isStr(keywords[kw]):
+                    self._XMLroot = music21.pitch.Pitch(keywords[kw])
+                else:
+                    self._XMLroot = keywords[kw]
             elif kw == 'bass':
-                self._XMLbass= music21.pitch.Pitch(keywords[kw])
+                if common.isStr(keywords[kw]):
+                    self._XMLbass = music21.pitch.Pitch(keywords[kw])
+                else:
+                    self._XMLbass = keywords[kw]
             elif kw == 'inversion':
                 self._XMLinversion = int(keywords[kw])
             elif kw == 'duration' or kw == 'quarterLength':
@@ -478,6 +484,7 @@ class Harmony(chord.Chord):
 #            self._updatePitches()
 #        return self._degreesList
 
+
     def _setRoot(self, value):
         if hasattr(value, 'classes') and 'Pitch' in value.classes:
             self._XMLroot = value
@@ -623,6 +630,8 @@ class Harmony(chord.Chord):
 
         ''')
 
+
+
 '''XML DESCRIPTION OF CHORD SYMBOLS:
 Triads:
     major (major third, perfect fifth) [C]
@@ -720,7 +729,7 @@ class ChordSymbol(Harmony):
     >>> harmony.ChordSymbol('C7+').pitches
     [C3, E3, G#3, B-3]
     >>> harmony.ChordSymbol('Cm7b5').pitches #half-diminished
-    [C3, E3, G-3, B-3]
+    [C3, E-3, G-3, B-3]
     >>> harmony.ChordSymbol('CmMaj7').pitches
     [C3, E-3, G3, B3]
     >>> harmony.ChordSymbol('C6').pitches
@@ -808,7 +817,7 @@ class ChordSymbol(Harmony):
     def __init__(self, figure = None, **keywords):
         self.XMLkind = '' # a string from defined list of chord symbol harmonies
         self.XMLkindStr = '' # the presentation of the kind or label of symbol
-        self.writeToMXLAsChord = False
+
         for kw in keywords:
             if kw == 'kind':
                 self.XMLkind = keywords[kw]
@@ -1023,6 +1032,7 @@ class ChordSymbol(Harmony):
         'FN6/D-'
         '''
         figure = self.XMLroot.name
+
         if self.XMLkind in CHORD_TYPES.keys():
             figure += CHORD_TYPES[self.XMLkind][0]
         if self.XMLroot.name != self.XMLbass.name:
@@ -1350,7 +1360,7 @@ class ChordSymbol(Harmony):
         elif kind == 'augmented-seventh':
             notationString = '1,3,#5,-7'
         elif kind == 'half-diminished':
-            notationString = '1,3,-5,-7'
+            notationString = '1,-3,-5,-7'
         elif kind == 'major-minor' or kind == 'minor-major':
             notationString = '1,-3,5,7'
         elif kind == 'major-sixth':
