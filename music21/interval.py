@@ -842,33 +842,29 @@ class DiatonicInterval(music21.Music21Object):
         if self.specifier is not None:
             self.name = (prefixSpecs[self.specifier] +
                         str(self.generic.undirected))
-
             self.niceName = (niceSpecNames[self.specifier] + " " +
                              self.generic.niceName)
-
-            self.directedName = (prefixSpecs[self.specifier] +
-                                 str(self.generic.directed))
-
-            self.directedNiceName = (directionTerms[self.generic.direction] + 
-                                    " " + self.niceName)
-
             self.simpleName = (prefixSpecs[self.specifier] +
                               str(self.generic.simpleUndirected))
-
             self.simpleNiceName = (niceSpecNames[self.specifier] + " " +
                                   self.generic.simpleNiceName)
-
             self.semiSimpleName = (prefixSpecs[self.specifier] +
                                  str(self.generic.semiSimpleUndirected))
-
             self.semiSimpleNiceName = (niceSpecNames[self.specifier] + " " + 
                                     self.generic.semiSimpleNiceName)
 
+            self.directedName = (prefixSpecs[self.specifier] +
+                                 str(self.generic.directed))
+            self.directedNiceName = (directionTerms[self.generic.direction] + 
+                                    " " + self.niceName)
             self.directedSimpleName = (prefixSpecs[self.specifier] +
                                      str(self.generic.simpleDirected))
-
+            self.directedSemiSimpleName = (prefixSpecs[self.specifier] +
+                                 str(self.generic.semiSimpleDirected))
             self.directedSimpleNiceName = (directionTerms[
                 self.generic.direction] + " " + self.simpleNiceName)
+            self.directedSemiSimpleNiceName = (directionTerms[
+                self.generic.direction] + " " + self.semiSimpleNiceName)
 
             self.specificName = niceSpecNames[self.specifier]
             self.prefectable = self.generic.perfectable
