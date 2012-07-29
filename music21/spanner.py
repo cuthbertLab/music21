@@ -65,10 +65,14 @@ class Spanner(music21.Music21Object):
     >>> sp1.getComponents()
     [<music21.note.Note C>, <music21.note.Note D>, <music21.note.Note E>]
     
+    We can iterate over them:
+    
+    >>> for n in sp1:
+    ...    print(n),
+    <music21.note.Note C> <music21.note.Note D> <music21.note.Note E>
     
     Now we put the notes and the spanner into a Stream object.  Note that
     the convention is to put the spanner at the beginning:
-    
     
     >>> s = stream.Stream()
     >>> s.append([n1, n2, n3])
@@ -96,7 +100,7 @@ class Spanner(music21.Music21Object):
     <music21.spanner.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
 
 
-    (3) we can get the spanner by looking at the list getSpannerSites() on any object.
+    (3) we can get the spanner by looking at the list getSpannerSites() on any object that has a spanner:
     
 
     >>> n2.getSpannerSites()
@@ -346,6 +350,9 @@ class Spanner(music21.Music21Object):
         '''
         # delegate to Stream subclass
         return self._components.__getitem__(key)
+
+    def __iter__(self):
+        return common.Iterator(self._components)
 
     def __len__(self):
         return len(self._components._elements)
