@@ -261,8 +261,9 @@ class LyLilypondTop(LyObject):
     r'''
     corresponds to the highest level lilypond object in Appendix C:
     
+    ::
     
-    `lilypond: /* empty */
+      `lilypond: /* empty */
              | lilypond toplevel_expression
              | lilypond assignment
              | lilypond error
@@ -966,40 +967,42 @@ class LyGroupedMusicList(LyObject):
 
 class LySchemeFunction(LyObject):
     '''
-    Unsupported for now, represents all of:
+    Unsupported for now, represents all of::
     
-function_scm_argument: embedded_scm
-  116                      | simple_string
-
-  117 function_arglist_music_last: EXPECT_MUSIC function_arglist music
-
-  118 function_arglist_nonmusic_last: EXPECT_MARKUP 
-                                        function_arglist 
-                                        full_markup 
-  119                               | EXPECT_MARKUP 
-                                        function_arglist 
-                                        simple_string 
-  120                               | EXPECT_SCM 
-                                        function_arglist 
-                                        function_scm_argument 
-
-  121 function_arglist_nonmusic: EXPECT_NO_MORE_ARGS
-  122                          | EXPECT_MARKUP 
-                                   function_arglist_nonmusic 
-                                   full_markup 
-  123                          | EXPECT_MARKUP 
-                                   function_arglist_nonmusic 
-                                   simple_string 
-  124                          | EXPECT_SCM 
-                                   function_arglist_nonmusic 
-                                   function_scm_argument 
-
-  125 function_arglist: EXPECT_NO_MORE_ARGS
-  126                 | function_arglist_music_last
-  127                 | function_arglist_nonmusic_last
-
-  128 generic_prefix_music_scm: MUSIC_FUNCTION function_arglist
-'''
+        function_scm_argument: embedded_scm
+          116                      | simple_string
+        
+          117 function_arglist_music_last: EXPECT_MUSIC function_arglist music
+        
+          118 function_arglist_nonmusic_last: EXPECT_MARKUP 
+                                                function_arglist 
+                                                full_markup 
+          119                               | EXPECT_MARKUP 
+                                                function_arglist 
+                                                simple_string 
+          120                               | EXPECT_SCM 
+                                                function_arglist 
+                                                function_scm_argument 
+        
+          121 function_arglist_nonmusic: EXPECT_NO_MORE_ARGS
+          122                          | EXPECT_MARKUP 
+                                           function_arglist_nonmusic 
+                                           full_markup 
+          123                          | EXPECT_MARKUP 
+                                           function_arglist_nonmusic 
+                                           simple_string 
+          124                          | EXPECT_SCM 
+                                           function_arglist_nonmusic 
+                                           function_scm_argument 
+        
+          125 function_arglist: EXPECT_NO_MORE_ARGS
+          126                 | function_arglist_music_last
+          127                 | function_arglist_nonmusic_last
+        
+          128 generic_prefix_music_scm: MUSIC_FUNCTION function_arglist
+    
+    We have ususally been using LyEmbeddedScm for this
+    '''
     def __init__(self, content = None):
         LyObject.__init__(self)
         self.content = content
@@ -1379,6 +1382,7 @@ class LyChordBody(LyObject):
 
 class LyChordBodyElement(LyObject):
     r'''
+    Contains a note or a drum pitch or a music function::
     
       chord_body_element: pitch 
                             exclamations (a string of zero or more ! marks)
@@ -1654,6 +1658,7 @@ class LyOptionalRest(LyObject):
 
 class LySimpleElement(LyObject):
     r'''
+    A single note, lyric element, drum pitch or hidden rest::
 
         simple_element: pitch 
                         exclamations (a string of zero or more ! marks)

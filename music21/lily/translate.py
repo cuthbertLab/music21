@@ -110,7 +110,7 @@ class LilypondConverter(object):
                    }
     
     def __init__(self):
-        self.topLevelObject= lyo.LyLilypondTop()
+        self.topLevelObject = lyo.LyLilypondTop()
         self.setupTools()
         self.context = self.topLevelObject
         self.storedContexts = []
@@ -615,7 +615,8 @@ class LilypondConverter(object):
             LySimpleChordElements containing
             LySimpleElement containing
             LyPitch  AND
-            LyMultipliedDuration containing
+            LyMultipliedDuration containing:
+            
                 LyMultipliedDuration containing
                 LyStenoDuration
         

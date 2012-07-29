@@ -29,10 +29,15 @@ from music21.analysis import correlate as analysisCorrelate
 from music21.analysis import discrete as analysisDiscrete
 from music21.analysis import metrical as analysisMetrical
 from music21.analysis import patel as analysisPatel
+from music21.analysis import reduction as analysisReduction
+from music21.analysis import search as analysisSearch
 from music21.analysis import windowed as analysisWindowed
 
-
 from music21 import articulations
+
+from music21.audioSearch import base as audioSearch
+from music21.audioSearch import recording as audioSearchRecording
+from music21.audioSearch import transcriber as audioSearchTranscriber
 
 from music21 import bar
 from music21 import base
@@ -40,11 +45,15 @@ from music21 import beam
 
 from music21.braille import basic as brailleBasic
 from music21.braille import examples as brailleExamples
-from music21.braille import translate as brailleTranslate
 from music21.braille import segment as brailleSegment
+from music21.braille import text as brailleText
+from music21.braille import translate as brailleTranslate
 
-from music21 import clef
+#chant
 from music21 import chord
+#chordTables
+#classCache
+from music21 import clef
 from music21 import common
 
 from music21 import composition
@@ -53,27 +62,37 @@ from music21.composition import phasing as compositionPhasing
 from music21 import converter
 
 from music21.corpus import base as corpus
+from music21.corpus import chorales as corpusChorales
 
+from music21.counterpoint import species as counterpointSpecies
+
+#demos
+from music21.demos.theoryAnalysis import theoryAnalyzer as demosTheoryAnalysisTheoryAnalyzer
+
+# defaults
+# derivation
+# doc folder
 from music21 import duration
 from music21 import dynamics
 from music21 import editorial
 from music21 import environment
 from music21 import expressions
+# ext folder
 
 from music21.features import base as features
 from music21.features import jSymbolic as featuresJSymbolic
 from music21.features import native as featuresNative
 
-from music21.figuredBass import checker as fbChecker
-from music21.figuredBass import examples as fbExamples
-from music21.figuredBass import fbPitch
-from music21.figuredBass import notation as fbNotation
-from music21.figuredBass import possibility as fbPossibility
-from music21.figuredBass import realizer as fbRealizer
-from music21.figuredBass import realizerScale as fbRealizerScale
-from music21.figuredBass import resolution as fbResolution
-from music21.figuredBass import rules as fbRules
-from music21.figuredBass import segment as fbSegment
+from music21.figuredBass import checker as figuredBassChecker
+from music21.figuredBass import examples as figuredBassExamples
+from music21.figuredBass import fbPitch as figuredBassFbPitch
+from music21.figuredBass import notation as figuredBassNotation
+from music21.figuredBass import possibility as figuredBassPossibility
+from music21.figuredBass import realizer as figuredBassRealizer
+from music21.figuredBass import realizerScale as figuredBassRealizerScale
+from music21.figuredBass import resolution as figuredBassResolution
+from music21.figuredBass import rules as figuredBassRules
+from music21.figuredBass import segment as figuredBassSegment
 
 from music21 import graph
 
@@ -86,38 +105,43 @@ from music21 import instrument
 from music21 import interval
 from music21 import intervalNetwork
 
-
 from music21 import key
+
+from music21 import layout
+from music21.lily import lilyObjects as lilyLilyObjects
+from music21.lily import translate as lilyTranslate
 
 from music21 import medren
 from music21 import metadata
 from music21 import meter
 
 from music21.midi import base as midi
+from music21.midi import realtime as midiRealtime
 from music21.midi import translate as midiTranslate
+
 from music21.musedata import base as musedata
 from music21.musedata import translate as musedataTranslate
 from music21.musedata import base40 as musedataBase40
+
 from music21.musicxml import base as musicxml
 from music21.musicxml import translate as musicxmlTranslate
-from music21.romanText import base as romanText
-from music21.romanText import translate as romanTextTranslate
-from music21.romanText import clercqTemperley as romanTextClercqTemperley
 
 from music21 import note
 
+from music21.noteworthy import base as noteworthy
 from music21.noteworthy import translate as noteworthyTranslate
 
-from music21.demos.theoryAnalysis import theoryAnalyzer as demosTheoryAnalysisTheoryAnalyzer
+from music21.romanText import base as romanText
+from music21.romanText import clercqTemperley as romanTextClercqTemperley
+from music21.romanText import translate as romanTextTranslate
 
 from music21 import pitch
 from music21 import roman
 from music21 import repeat
-from music21 import scale
 
 from music21.scala import base as scala
 
-
+from music21 import scale
 from music21 import search
 from music21 import serial
 from music21 import sieve
@@ -125,7 +149,12 @@ from music21 import spanner
 from music21 import stream
 
 from music21 import tempo
+
+from music21.test import test
+from music21.test import multiprocessTest as testMultiprocessTest
+
 from music21 import text
+from music21 import tie
 from music21 import tinyNotation
 
 from music21.trecento import cadencebook as trecentoCadencebook
@@ -133,6 +162,7 @@ from music21.trecento import polyphonicSnippet as trecentoPolyphonicSnippet
 from music21.trecento import tonality as trecentoTonality
 
 from music21 import variant
+
 from music21.vexflow import base as vexflow
 from music21 import voiceLeading
 from music21 import volume
@@ -174,6 +204,7 @@ NO_DOC = 'No documentation.'
 MODULES = [
     abc,
     abcTranslate,
+    
     abjTranslate,
 
     # analysis.
@@ -181,26 +212,40 @@ MODULES = [
     analysisDiscrete,
     analysisMetrical,
     analysisPatel,
+    analysisReduction,
+    analysisSearch,
     analysisWindowed,
     
     articulations,
 
+    audioSearch,
+    audioSearchRecording,
+    audioSearchTranscriber,
+    
     bar,
     base,
     beam,
     
     brailleBasic,
     brailleExamples,
-    brailleTranslate,
     brailleSegment,
+    brailleText,
+    brailleTranslate,
 
+    chord, 
     clef, 
     common,
     #composition
     compositionPhasing,
+
     converter,
+    
     corpus, 
-    chord, 
+    corpusChorales,
+
+    counterpointSpecies,
+
+    demosTheoryAnalysisTheoryAnalyzer,
 
     duration, 
     dynamics,
@@ -213,20 +258,21 @@ MODULES = [
     featuresJSymbolic,
     featuresNative,
     
-    fbChecker,
-    fbExamples,
-    fbPitch,
-    fbNotation,
-    fbPossibility,
-    fbRealizer,
-    fbRealizerScale,
-    fbResolution,
-    fbRules,
-    fbSegment,
+    figuredBassChecker,
+    figuredBassExamples,
+    figuredBassFbPitch,
+    figuredBassNotation,
+    figuredBassPossibility,
+    figuredBassRealizer,
+    figuredBassRealizerScale,
+    figuredBassResolution,
+    figuredBassRules,
+    figuredBassSegment,
     
     graph,
     
     harmony,
+
     humdrum,
     humdrumSpineParser,
     
@@ -236,28 +282,40 @@ MODULES = [
     
     key,
 
+    layout,
+
+    lilyLilyObjects,
+    lilyTranslate,
+
     medren,
-    meter, 
     metadata,
+    meter, 
+    
     midi,
+    midiRealtime,
     midiTranslate,
+    
     musedata,
     musedataTranslate,
     musedataBase40,
+    
     musicxmlTranslate,
 
     note, 
+    
     noteworthyTranslate,
 
     pitch,
 
     repeat,
     roman, 
+
     romanText,
     romanTextTranslate,
     romanTextClercqTemperley,
 
     scala,
+
     scale,     
     search,
     serial,     
@@ -265,10 +323,15 @@ MODULES = [
     spanner,
     stream,     
   
-    tempo,     
+    tempo, 
+    
+    test,
+    testMultiprocessTest,
+        
     text,
+    tie,
+    
     tinyNotation,
-    demosTheoryAnalysisTheoryAnalyzer,
     # trecento
     trecentoCadencebook,
     trecentoPolyphonicSnippet,
@@ -1708,12 +1771,16 @@ class Documentation(RestructuredWriter):
         '''Write a .rst file for each module defined in modulesToBuild.
         Add the file reference to the list of chaptersModuleRef.
         '''
-        for module in self.modulesToBuild:
+        totalModules = len(self.modulesToBuild)
+        for i, module in enumerate(self.modulesToBuild):
             #environLocal.printDebug(['writing rst documentation:', module])
 
             a = ModuleDoc(module)
             # for debugging, can comment these three lines out and 
             # edit rst files directly
+            percentageLength = int((i*100.0)/totalModules)
+            
+            print("writing module doc as .rst... [%3s%%] %s" % (percentageLength, a.fileName))
             f = open(os.path.join(self.dirRst, a.fileName), 'w')
             f.write(a.getRestructured().encode( "utf-8" ) )
             f.close()
@@ -1743,8 +1810,11 @@ class Documentation(RestructuredWriter):
         '''
         if format not in FORMATS:
             raise Exception, 'bad format'
+        print ("Writing module references")
         self.writeModuleReference()    
+        print ("Writing generated chapters")
         self.writeGeneratedChapters()    
+        print ("Writing contents")
         self.writeContents()    
 
         if format == 'html':

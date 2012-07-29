@@ -66,7 +66,12 @@ class Beam(music21.JSONSerializer):
     Two ways of doing the same thing
     >>> b3 = beam.Beam(type = 'partial', direction = 'left')
     >>> b4 = beam.Beam('partial', 'left')
+    >>> b4.number = 1
     
+    >>> print b4
+    <music21.beam.Beam 1/partial/left>
+    >>> print b2
+    <music21.beam.Beam None/start>
     '''
 
     def __init__(self, type = None, direction = None):
@@ -78,12 +83,17 @@ class Beam(music21.JSONSerializer):
         self.number = None 
 
     def jsonAttributes(self):
-        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation.
+        '''
+        Define all attributes of this object that should be JSON serialized for storage and re-instantiation.
+        
+        >>> from music21 import *
+        >>> print beam.Beam().jsonAttributes()
+        ['type', 'direction', 'independentAngle', 'number']
         '''
         # add to base class
         return ['type', 'direction', 'independentAngle', 'number']
 
-    def __str__(self):
+    def __repr__(self):
         if self.direction == None:
             return '<music21.beam.Beam %s/%s>' % (self.number, self.type)
         else:
@@ -103,11 +113,36 @@ class Beam(music21.JSONSerializer):
         >>> b.get('number')
         1
 
+        >>> a.type = 'continue'
+        >>> b = a.mx
+        >>> b.get('charData')
+        'continue'
+
+        >>> a.type = 'stop'
+        >>> b = a.mx
+        >>> b.get('charData')
+        'end'
+
         >>> a.type = 'partial'
         >>> a.direction = 'left'
         >>> b = a.mx
         >>> b.get('charData')
         'backward hook'
+
+        >>> a.direction = 'right'
+        >>> b = a.mx
+        >>> b.get('charData')
+        'forward hook'
+
+        >>> a.direction = None
+        >>> b = a.mx
+        Traceback (most recent call last):
+        BeamException: partial beam defined without a direction set (set to None)
+
+        >>> a.type = 'crazy'
+        >>> b = a.mx
+        Traceback (most recent call last):
+        BeamException: unexpected beam type encountered (crazy)
         '''
         mxBeam = musicxmlMod.Beam()
         if self.type == 'start':
@@ -140,6 +175,35 @@ class Beam(music21.JSONSerializer):
         >>> a.mx = mxBeam
         >>> a.type
         'start'
+
+        >>> mxBeam.set('charData', 'continue')
+        >>> a.mx = mxBeam
+        >>> a.type
+        'continue'
+
+        >>> mxBeam.set('charData', 'end')
+        >>> a.mx = mxBeam
+        >>> a.type
+        'stop'
+
+        >>> mxBeam.set('charData', 'forward hook')
+        >>> a.mx = mxBeam
+        >>> a.type
+        'partial'
+        >>> a.direction
+        'right'
+
+        >>> mxBeam.set('charData', 'backward hook')
+        >>> a.mx = mxBeam
+        >>> a.type
+        'partial'
+        >>> a.direction
+        'left'
+
+        >>> mxBeam.set('charData', 'crazy')
+        >>> a.mx = mxBeam
+        Traceback (most recent call last):
+        BeamException: unexpected beam type encountered (crazy)
         '''
 
         mxType = mxBeam.get('charData')
@@ -180,14 +244,24 @@ class Beams(music21.JSONSerializer):
     ...     thisBeam.type
     'start'
     'start'
+
+    >>> print n.beams
+    <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
     '''
-    
+    _DOC_ATTR = {
+    'feathered': 'Boolean determining if this is a feathered beam or not (does nothing for now).',
+    }
     def __init__(self):
         self.beamsList = []
         self.feathered = False
 
     def jsonAttributes(self):
-        '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation.
+        '''
+        Define all attributes of this object that should be JSON serialized for storage and re-instantiation.
+        
+        >>> from music21 import *
+        >>> beam.Beams().jsonAttributes()
+        ['beamsList', 'feathered']
         '''
         # add to base class
         return ['beamsList', 'feathered']
@@ -206,7 +280,17 @@ class Beams(music21.JSONSerializer):
 
 
     def append(self, type=None, direction=None):
-        '''Append a new Beam object to this Beams, automatically creating the Beam object and incrementing the number count. 
+        '''
+        Append a new Beam object to this Beams, automatically creating the Beam object and incrementing the number count. 
+        
+        >>> from music21 import *
+        >>> beams = beam.Beams()
+        >>> beams.append('start')
+        >>> beams.beamsList
+        [<music21.beam.Beam 1/start>]
+        >>> beams.append('partial', 'right')
+        >>> beams.beamsList
+        [<music21.beam.Beam 1/start>, <music21.beam.Beam 2/partial/right>]
         '''
         obj = Beam(type, direction)
         obj.number = len(self.beamsList) + 1
@@ -236,20 +320,28 @@ class Beams(music21.JSONSerializer):
         >>> len(a)
         3
         >>> a.beamsList[2]
-        <music21.beam.Beam object at 0x...>
+        <music21.beam.Beam 3/start>
         >>> a.beamsList[2].type
         'start'
+
+
+        Filling a smaller number wipes larger numbers of beams:
+        >>> a.fill('eighth', type='start')
+        >>> len(a)
+        1
 
         OMIT_FROM_DOCS
         >>> a.fill(4)
         >>> len(a)
         4
+        >>> a.fill('128th')
+        >>> len(a)
+        5
         >>> a.fill('256th')
         >>> len(a)
         6
         >>> a.fill(7)
         Traceback (most recent call last):
-        ...
         BeamException: cannot fill beams for level 7
         '''
         self.beamsList = []
@@ -295,9 +387,12 @@ class Beams(music21.JSONSerializer):
         >>> a.getTypes()
         ['start', 'start']
 
+        >>> a.setAll('sexy')
+        Traceback (most recent call last):
+        BeamException: beam type cannot be sexy
         '''
         if type not in ['start', 'stop', 'continue', 'partial']:
-            raise BeamException('beam type cannot be %' %  type)
+            raise BeamException('beam type cannot be %s' %  type)
         for beam in self.beamsList:
             beam.type = type
             beam.direction = direction
@@ -320,13 +415,22 @@ class Beams(music21.JSONSerializer):
         'partial'
         >>> a.beamsList[1].direction
         'right'
+
+
+        >>> a.setByNumber(30, 'stop')
+        Traceback (most recent call last):
+        IndexError: beam number 30 cannot be accessed
+
+        >>> a.setByNumber(2, 'crazy')
+        Traceback (most recent call last):
+        BeamException: beam type cannot be crazy
         '''
         # permit providing one argument hyphenated
         if '-' in type:
             type, direction = type.split('-')
 
         if type not in ['start', 'stop', 'continue', 'partial']:
-            raise BeamException('beam type cannot be %' %  type)
+            raise BeamException('beam type cannot be %s' % type)
 
         if number not in self.getNumbers():
             raise IndexError('beam number %s cannot be accessed' % number)
@@ -346,6 +450,10 @@ class Beams(music21.JSONSerializer):
         >>> a.setAll('start')
         >>> a.getByNumber(2).type
         'start'
+        
+        >>> a.getByNumber(30)
+        Traceback (most recent call last):
+        IndexError: beam number 30 cannot be accessed
         '''
         if number not in self.getNumbers():
             raise IndexError('beam number %s cannot be accessed' % number)
@@ -403,6 +511,13 @@ class Beams(music21.JSONSerializer):
     def _getMX(self):
         '''
         Returns a list of mxBeam objects
+
+        >>> from music21 import *
+        >>> a = beam.Beams()
+        >>> a.fill(2, type='start')
+        >>> mxBeamList = a.mx
+        >>> len(mxBeamList)
+        2
         '''
         mxBeamList = []
         for beamObj in self.beamsList:

@@ -12,7 +12,7 @@
 Methods and Classes useful in searching within scores.
 
 For searching a group of scores see the search functions within
-:ref:~`moduleCorpusBase`.
+:ref:`moduleCorpusBase` .
 
 '''
 
@@ -139,6 +139,11 @@ def rhythmicSearch(thisStream, searchStream):
     
     
     OMIT_FROM_DOCS
+    
+    >>> s = stream.Stream()
+    >>> search.rhythmicSearch(pf, s)
+    Traceback (most recent call last):
+    SearchException: the search Stream cannot be empty
     
     why doesn't this work?  thisStream[found].expressions.append(expressions.TextExpression("*"))
     
@@ -396,7 +401,7 @@ def translateNoteToByte(n):
     >>> ord(search.translateNoteToByte(n)) == n.midi
     True
 
-
+    Chords are currently just searched on the first note (or treated as a rest if none)
     '''
     if n.isRest:
         return chr(127)
@@ -538,8 +543,6 @@ class SearchException(music21.Music21Exception):
 
 
 class Test(unittest.TestCase):
-    def runTest(self):
-        pass
 
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module

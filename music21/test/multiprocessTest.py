@@ -10,7 +10,15 @@
 #-------------------------------------------------------------------------------
 
 '''
-multiprocess testing...
+Multiprocess testing.  Tests all doctests and Test unittest objects in all
+modules that are imported when running "import music21".  Runs threads on
+each core of a multicore system.
+
+N.B. this gets a slightly different set of modules than test/test.py does
+because the `imp` module is not available for threaded processing.  Running
+both modules gives a great coverage.
+
+Run test/testDocumentation after this.
 '''
 from Queue import Empty as EmptyQueueException
 import multiprocessing

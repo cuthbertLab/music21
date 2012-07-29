@@ -1,0 +1,4 @@
+global-include *.py *.txt *.xml *.krn *.mxl *.pdf *.html *.css *.js *.png *.tiff *.jpg *.xls *.mid *.abc *.json *.md *.zip *.rntxt *.command *.scl *.nwctxt *.wav 
+prune dist
+prune buildDoc
+prune obsolete

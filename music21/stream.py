@@ -6388,7 +6388,8 @@ class Stream(music21.Music21Object):
             return returnObj # exit
 
         # assume this is sorted
-        # need to just get .notesAndRests, as there may be other objects in the Measure         # that come before the first Note, such as a SystemLayout object
+        # need to just get .notesAndRests, as there may be other objects in the Measure         
+        # that come before the first Note, such as a SystemLayout object
         notes = returnObj.flat.notesAndRests
 
         posConnected = [] # temporary storage for index of tied notes

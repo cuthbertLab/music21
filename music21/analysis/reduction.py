@@ -400,6 +400,8 @@ class PartReduction(object):
 
     '''
     def __init__(self, srcScore=None, *args, **keywords):
+        if srcScore is None:
+            return
         if 'Score' not in srcScore.classes:
             raise PartReductionException('provided Stream must be Score')
         self._score = srcScore

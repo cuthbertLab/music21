@@ -8,6 +8,10 @@
 # Copyright:    (c) 2010-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+'''
+Module to test all the code excerpts in the rst files in the music21 documentation.
+'''
+
 
 import time
 import os, os.path

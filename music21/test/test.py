@@ -9,6 +9,12 @@
 # Copyright:    (c) 2009-2012 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+'''
+Controller to run all module tests in the music21 folders.
+
+Runs great, but slowly on multiprocessor systems.
+'''
+
 
 
 import unittest, doctest

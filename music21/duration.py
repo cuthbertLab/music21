@@ -1907,6 +1907,8 @@ class ZeroDuration(DurationUnit):
     '''
     Represents any Music21 element that does not last any length of time.
     '''
+    isGrace = False
+
     def __init__(self):
         DurationUnit.__init__(self)
         self.unlink()

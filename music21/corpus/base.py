@@ -1112,13 +1112,16 @@ class Test(unittest.TestCase):
 
     def testBachKeys(self):
         from music21 import key
-        for fp in getComposer('bach')[-5:]: # get the last 10
+        keyObjs = []
+        for fp in getComposer('bach')[-4:]: # get the last 4
             s = parse(fp)
             # get keys from first part
             keyStream = s.parts[0].flat.getElementsByClass(key.KeySignature)
             keyObj = keyStream[0]
+            keyObjs.append(keyObj)
             #environLocal.printDebug([keyObj])
 
+        self.assertEqual(len(keyObjs), 4)
 
     def testEssenImport(self):
 

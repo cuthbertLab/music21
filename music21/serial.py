@@ -1071,7 +1071,6 @@ def findTransposedSegments(inputStream, segmentlist, reps, chords):
 
 
 def findTransformedSegments(inputStream, segmentlist, reps, chords, convention):
-    
     '''
     Given a stream object and list of segments of pitch classes (each given as a list), returns a list of all
     instances of the segment and its transformations in the stream subject to the constraints on repetitions of pitches,
@@ -1108,7 +1107,6 @@ def findTransformedSegments(inputStream, segmentlist, reps, chords, convention):
     ([<music21.note.Note F>, <music21.note.Note E>, <music21.note.Note G>], [('RI', 5)], 1, 1), 
     ([<music21.note.Note C#>, <music21.note.Note E>, <music21.note.Note D#>], [('P', 11)], 1, 2), 
     ([<music21.note.Note F>, <music21.note.Note E>, <music21.note.Note G>], [('RI', 5)], 1, 2)]
-    
     '''
     
     segs = []

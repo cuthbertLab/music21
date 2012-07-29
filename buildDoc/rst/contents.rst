@@ -54,21 +54,30 @@ Module Reference
    moduleAnalysisDiscrete
    moduleAnalysisMetrical
    moduleAnalysisPatel
+   moduleAnalysisReduction
+   moduleAnalysisSearch
    moduleAnalysisWindowed
    moduleArticulations
+   moduleAudioSearchBase
+   moduleAudioSearchRecording
+   moduleAudioSearchTranscriber
    moduleBar
    moduleBase
    moduleBeam
    moduleBrailleBasic
    moduleBrailleExamples
-   moduleBrailleTranslate
    moduleBrailleSegment
+   moduleBrailleText
+   moduleBrailleTranslate
+   moduleChord
    moduleClef
    moduleCommon
    moduleCompositionPhasing
    moduleConverter
    moduleCorpusBase
-   moduleChord
+   moduleCorpusChorales
+   moduleCounterpointSpecies
+   moduleDemosTheoryAnalysisTheoryAnalyzer
    moduleDuration
    moduleDynamics
    moduleEditorial
@@ -95,10 +104,14 @@ Module Reference
    moduleInterval
    moduleIntervalNetwork
    moduleKey
+   moduleLayout
+   moduleLilyLilyObjects
+   moduleLilyTranslate
    moduleMedren
-   moduleMeter
    moduleMetadata
+   moduleMeter
    moduleMidiBase
+   moduleMidiRealtime
    moduleMidiTranslate
    moduleMusedataBase
    moduleMusedataTranslate
@@ -120,9 +133,11 @@ Module Reference
    moduleSpanner
    moduleStream
    moduleTempo
+   moduleTestTest
+   moduleTestMultiprocessTest
    moduleText
+   moduleTie
    moduleTinyNotation
-   moduleDemosTheoryAnalysisTheoryAnalyzer
    moduleTrecentoCadencebook
    moduleTrecentoPolyphonicSnippet
    moduleTrecentoTonality

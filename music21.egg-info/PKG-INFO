@@ -1,0 +1,29 @@
+Metadata-Version: 1.1
+Name: music21
+Version: 1.1.0
+Summary: A Toolkit for Computer-Aided Musical Analysis and Manipulation.
+Home-page: http://code.google.com/p/music21
+Author: Michael Scott Cuthbert, the music21 project, others
+Author-email: cuthbert@mit.edu
+License: LGPL
+Download-URL: http://music21.googlecode.com/files/music21-1.1.0.tar.gz
+Description: A Toolkit for Computer-Aided Musical Analysis and Manipulation. Developed at MIT. Michael Scott Cuthbert, Principal Investigator, Christopher Ariza, Lead Programmer. The development of music21 is supported by the generosity of the Seaver Institute.
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)
+Classifier: Natural Language :: English
+Classifier: Operating System :: MacOS
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Multimedia :: Sound/Audio
+Classifier: Topic :: Multimedia :: Sound/Audio :: MIDI
+Classifier: Topic :: Artistic Software
+Classifier: Topic :: Software Development :: Libraries :: Python Modules

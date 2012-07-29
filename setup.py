@@ -57,29 +57,32 @@ def _getPackageData():
 def _getClassifiers():
     # http://pypi.python.org/pypi?:action=list_classifiers
     classifiers = [
-            'Development Status :: 4 - Beta',
+            'Development Status :: 5 - Production/Stable',
             'Environment :: Console',
-             'Intended Audience :: End Users/Desktop',
-             'Intended Audience :: Developers',
-             'Intended Audience :: Education',
-             'Intended Audience :: Science/Research',
-             'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
-             'Natural Language :: English', 
-             'Operating System :: MacOS',
-             'Operating System :: Microsoft :: Windows',
-             'Operating System :: POSIX',
-             'Operating System :: OS Independent',
-             'Programming Language :: Python',
-             'Topic :: Multimedia :: Sound/Audio',
-             'Topic :: Artistic Software',
-             'Topic :: Software Development :: Libraries :: Python Modules',
-             ]
+            'Environment :: Web Environment',
+            'Intended Audience :: End Users/Desktop',
+            'Intended Audience :: Developers',
+            'Intended Audience :: Education',
+            'Intended Audience :: Science/Research',
+            'License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)',
+            'Natural Language :: English', 
+            'Operating System :: MacOS',
+            'Operating System :: Microsoft :: Windows',
+            'Operating System :: POSIX',
+            'Operating System :: OS Independent',
+            'Programming Language :: Python',
+            'Topic :: Multimedia :: Sound/Audio',
+            'Topic :: Multimedia :: Sound/Audio :: MIDI',
+            'Topic :: Artistic Software',
+            'Topic :: Software Development :: Libraries :: Python Modules',
+            ]
     return classifiers
      
 
 #-------------------------------------------------------------------------------
 def writeManifestTemplate(fpPackageDir):
-    '''The manifest input file is used by distutils to make the 'sdist' distribution. This is not used in the creation of EGG files. 
+    '''
+    The manifest input file is used by distutils to make the 'sdist' distribution. This is not used in the creation of EGG files. 
     '''
     dst = os.path.join(fpPackageDir, 'MANIFEST.in')
     msg = []
@@ -93,10 +96,12 @@ def writeManifestTemplate(fpPackageDir):
     msg.append('prune buildDoc\n')
     msg.append('prune obsolete\n')
 
-    f = open(dst, 'w')
-    f.writelines(msg)
-    f.close()
-
+    try:
+        f = open(dst, 'w')
+        f.writelines(msg)
+        f.close()
+    except Exception as e:
+        raise Exception('Could not write MANIFEST.in in %s : %s' % (fpPackageDir, str(e)))
 
 
 def runDisutils(bdistType=None):
@@ -108,14 +113,15 @@ def runDisutils(bdistType=None):
         print('using setuptools')
         from setuptools import setup
     else:
+        print('using distutils')
         from distutils.core import setup
 
     setup(name = 'music21', 
         version = music21.VERSION_STR,
         description = DESCRIPTION, 
         long_description = DESCRIPTION_LONG,
-        author = 'Michael Scott Cuthbert, Christopher Ariza, others',
-        #author_email = '',
+        author = 'Michael Scott Cuthbert, the music21 project, others',
+        author_email = 'cuthbert@mit.edu',
         license = 'LGPL', 
         url = 'http://code.google.com/p/music21',
         classifiers = _getClassifiers(),
@@ -127,23 +133,24 @@ def runDisutils(bdistType=None):
         
 
 #-------------------------------------------------------------------------------
-if len(sys.argv) == 1: # no args
-    print('welcome to music21\nto run setup.py for installation, enter, as an administrator (or with sudo): python setup.py install\n')
-
-elif sys.argv[1] in ['bdist', 'sdist', 'register', 'bdist_mpkg',
-                        'bdist_rpm', 'bdist_deb', 'bdist_wininst',
-                        'bdist_egg']:
-    import music21
-    fpMusic21 = music21.__path__[0] # list, get first item
-    fpPackageDir = os.path.dirname(fpMusic21)
-    print('fpPackageDir = %s' % fpPackageDir)
-    writeManifestTemplate(fpPackageDir)
-    runDisutils(sys.argv[1])
-
-elif sys.argv[1] in ['install']:
-    runDisutils('install')
-
-else:
-    print('cannot process provided arguments: %s\n' % sys.argv[1:])
+if __name__ == '__main__':
+    if len(sys.argv) == 1: # no args
+        print('welcome to music21\nto run setup.py for installation, enter, as an administrator (or with sudo): python setup.py install\n')
+    
+    elif sys.argv[1] in ['bdist', 'sdist', 'register', 'bdist_mpkg',
+                            'bdist_rpm', 'bdist_deb', 'bdist_wininst',
+                            'bdist_egg']:
+        import music21
+        fpMusic21 = music21.__path__[0] # list, get first item
+        fpPackageDir = os.path.dirname(fpMusic21)
+        print('fpPackageDir = %s' % fpPackageDir)
+        writeManifestTemplate(fpPackageDir)
+        runDisutils(sys.argv[1])
+    
+    elif sys.argv[1] in ['install']:
+        runDisutils('install')
+    
+    else:
+        print('cannot process provided arguments: %s\n' % sys.argv[1:])
 
 
