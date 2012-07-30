@@ -1448,7 +1448,7 @@ class GraphGroupedVerticalBar(Graph):
         # attach some text labels
         for rect in rects:
             height = rect.get_height()
-            ax.text(rect.get_x()+rect.get_width()/2., height+.05, '%s'%str(round(height, self.roundDigits)), ha='center', va='bottom', 
+            ax.text(rect.get_x()+rect.get_width()/2., height, '%s'%str(round(height, self.roundDigits)), ha='center', va='bottom', 
             fontsize=self.tickFontSize, family=self.fontFamily)
 
     def process(self):
@@ -1599,6 +1599,16 @@ class Graph3DPolygonBars(Graph):
             self.barWidth = keywords['barWidth']
         else:
             self.barWidth = .1
+        
+        if 'useKeyValues' in keywords:
+            self.useKeyValues = keywords['useKeyValues']
+        else:
+            self.useKeyValues = False
+            
+        if 'zeroFloor' in keywords:
+            self.zeroFloor = keywords['zeroFloor']
+        else:
+            self.zeroFloor = False
 
     def process(self):
         cc = lambda arg: matplotlib.colors.colorConverter.to_rgba(getColor(arg),
@@ -1640,7 +1650,10 @@ class Graph3DPolygonBars(Graph):
         #environLocal.printDebug(['3d axis range, x:', min(xVals), max(xVals)])
 
         # z values here end up being height of the graph
-        self.setAxisRange('z', (min(yVals), max(yVals)))
+        if self.zeroFloor is True:
+            self.setAxisRange('z', (0, max(yVals)))
+        else:
+            self.setAxisRange('z', (min(yVals), max(yVals)))
         #environLocal.printDebug(['3d axis range, z (from y):', min(yVals), max(yVals)])
 
         # y values are the z of the graph, the depth
@@ -1659,7 +1672,11 @@ class Graph3DPolygonBars(Graph):
         low, high = self.axis['y']['range']
         low = int(math.floor(low))
         high = int(math.ceil(high))
-        zs = range(low, high+1)
+        
+        if self.useKeyValues is True:
+            zs = zVals
+        else:
+            zs = range(low, high+1)
 
         poly = collections.PolyCollection(verts, facecolors=vertsColor)
         poly.set_alpha(self.alpha)

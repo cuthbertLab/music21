@@ -120,6 +120,20 @@ Analytical Graphing Objects
 -------------------------------------------------------
 
 Music21 features graphing objects that display the results of analysis
+Complete documentation for these graphing objects can be found with the following classes: :class:`~music21.graph.PlotWindowedKrumhanslSchmuckler`, :class:`~music21.graph.PlotWindowedKrumhanslKessler`, :class:`~music21.graph.PlotWindowedAardenEssen`, :class:`~music21.graph.PlotWindowedSimpleWeights`, :class:`~music21.graph.PlotWindowedBellmanBudge`,  :class:`~music21.graph.PlotWindowedTemperleyKostkaPayne`,
+:class:`~music21.graph.PlotWindowedAmbitus`, :class:`~music21.graph.PlotDolan`
+
+A basic example follows::
+
+    >>> from music21 import *
+    >>> haydn = corpus.parse('haydn/symphony94/02')
+    >>> plot = graph.PlotDolan(haydn)
+    >>> plot.process() # doctest: +SKIP
+
+.. image:: images/graphing-06.*
+     :width: 600
+
+:download:`See a larger version <images/graphing-bigDolan.png>`
 
 
 The ActivityMatch Object
@@ -170,7 +184,7 @@ A basic example follows::
     >>> a.process()  # doctest: +SKIP
 
 .. image:: images/graphing-01.*
-    :width: 700
+     :width: 700
 
 Numerous parameters can be specified through keyword arguments when creating a scatter plot, and also attached to each point.
 
@@ -209,56 +223,66 @@ This example provides basic customization to a scatter graph::
     :width: 700
 
 
-
-Two-Dimensional Histogram
+Grouped Bar Graph
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A histogram provides a bar graph for measuring the count of single items. Data for this graph is provided as a list of *x*, *y* data pairs; however, unlike with a scatter plot, there can be only one definition for each *x* value. The example below takes the first hundred Bach Chorales in the Riemenschneider numbering system and
-counts the number of times each duration of note occurs in the soprano and bass parts. Then it displays the
-result as a histogram. The first column in each pair is the soprano frequency, and the second (which has 
-been shifted by one bin width) is the bass frequency.
+This graph allows you to plot multiple sets of data in parallel bar graphs. Data for this graph is provided
+in a list of tuples of the form (dataLabel, {plotGroup: value, plotGroup2: value ... }). The example below takes
+iterates through the Bach Chorale corpus using the corpus.chorales.Iterator and stores the frequency at which
+each part exhibits notes of each quarter length present. It displays the normalized frequency of each quarterLength
+as four bars, each corresponding to an SATB part.
 
-A basic example follows::
+The example follows::
 
     >>> from music21 import *
-    >>> sopranoDict = {}
-    >>> bassDict = {}
-    >>> data =[]
-    >>> for chorale in corpus.chorales.Iterator(1, 100):
-    ...     soprano, bass = chorale.getElementById('Soprano'), chorale.getElementById('Bass')
-    ...     if soprano is not None:
-    ...         soprano = soprano.flat.notes
-    ...         for n in soprano:
-    ...             noteLength = n.duration.quarterLength
-    ...             if noteLength in sopranoDict:
-    ...                 sopranoDict[noteLength] += 1
-    ...             else:
-    ...                 sopranoDict[noteLength] = 1
-    ...     if bass is not None:
-    ...         bass = bass.flat.notes
-    ...         for n in bass:
-    ...             noteLength = n.duration.quarterLength
-    ...             if noteLength in bassDict:
-    ...                 bassDict[noteLength] += 1
-    ...             else:
-    ...                 bassDict[noteLength] = 1
-    
-    >>> for key in sopranoDict:
-    ...     data.append((key, sopranoDict[key]))
-    
-    >>> for key in bassDict:
-    ...     data.append((key+0.125, bassDict[key]))
-            
-    >>> a = graph.GraphHistogram(title="Frequency of note durations in Bach's Chorales comparing soprano and bass parts", doneAction='show', binWidth = 0.125)
-    >>> a.setData(data)
-    >>> a.setAxisLabel('x', 'Note duration in quarter lengths (soprano, bass)')
-    >>> a.setAxisLabel('y', 'Number')
+    >>> sopranoDict, altoDict, tenorDict, bassDict, data, noteTotal = {}, {}, {}, {}, [], 0.0
+    >>> for chorale in corpus.chorales.Iterator():
+    ...     soprano, alto, tenor, bass = chorale.getElementById('Soprano'), chorale.getElementById('Alto'), chorale.getElementById('Tenor'), chorale.getElementById('Bass')
+    ...     for (part, partDict) in [(soprano, sopranoDict), (alto, altoDict), (tenor, tenorDict), (bass, bassDict)]:
+    ...         if part is not None:
+    ...             part = part.flat.notes
+    ...             for n in part:
+    ...                 noteTotal += 1.0
+    ...                 noteLength = n.duration.quarterLength
+    ...                 if noteLength in partDict:
+    ...                     partDict[noteLength] += 1
+    ...                 else:
+    ...                     partDict[noteLength] = 1
+    >>> quarterLengths = list(set(sopranoDict.keys()+altoDict.keys()+tenorDict.keys()+bassDict.keys()))
+    >>> for ql in quarterLengths:
+    ...     if ql in sopranoDict:
+    ...         sopranoValue = sopranoDict[ql]/noteTotal
+    ...     else:
+    ...         sopranoValue = 0.0
+    ...     if ql in altoDict:
+    ...         altoValue = altoDict[ql]/noteTotal
+    ...     else:
+    ...         altoValue = 0.0
+    ...     if ql in tenorDict:
+    ...         tenorValue = tenorDict[ql]/noteTotal
+    ...     else:
+    ...         tenorValue = 0.0
+    ...     if ql in bassDict:
+    ...         bassValue = bassDict[ql]/noteTotal
+    ...     else:
+    ...         bassValue = 0.0
+    ...     data.append((ql, {'bass': bassValue, 'tenor': tenorValue, 'alto': altoValue, 'soprano': sopranoValue})) 
+    >>> a = graph.GraphGroupedVerticalBar(title="Frequency of note durations in Bach's Chorales",
+    ...                                   doneAction='show',
+    ...                                   binWidth = 1,
+    ...                                   colors = ['#605C7F', '#5c7f60', '#715c7f', '#3FEE32', '#01FFEE'],
+    ...                                   roundDigits = 4)
+    >>> a.setData(sorted(data, key = lambda datum: datum[0]))
+    >>> a.setAxisLabel('x', 'Note duration in quarter lengths')
+    >>> xtickValues = range(len(quarterLengths))
+    >>> xtickLabels = sorted(quarterLengths)
+    >>> a.axis['x']['ticks'] = (xtickValues, xtickLabels)
     >>> a.process() # doctest: +SKIP
-    
+
 .. image:: images/graphing-03.*
-    :width: 700
+    :width: 600
 
-
+:download:`See full-size graph <images/graphing-03.png>`
 
 Three-Dimensional Bar Graphs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -268,6 +292,8 @@ A three dimensional graph made of numerous rows of bars can be used to plot thre
 In addition to keyword arguments described for other graphs, this graph supports the following additional keyword arguments.
 
 The `barWidth` keyword argument sets the width of bars.
+The `useKeyValues` keyword argument determines whether or not the keys in the data dictionary are interpreted as numerical values or labels.
+The `zeroFloor` keyword argument determines whether or not the vertical axis is sized to contain 0 or not.
 
 A basic example follows::
 
@@ -285,17 +311,38 @@ A basic example follows::
     :width: 600
 
 
-The following example demonstrates basic customization with keyword arguments using the same data obtained above::
+Here is an example from music. This graphs the 12 major scales next to each other in terms of frequency showing which notes are present
+and which notes are not::
 
-    >>> b = graph.Graph3DPolygonBars(title='Random Data', alpha=.8,
-    ...                  barWidth=.2, doneAction='show', colors=['b','r','g']) 
-    >>> b.setData(data)
-    >>> b.process()   # doctest: +SKIP
+    >>> from music21 import *
+    >>> data = {0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[], 7:[], 8:[], 9:[], 10:[], 11:[]}
+    >>> majorScale = [0, 2, 4, 5, 7, 9, 11]
+    >>> for pitchClass in range(12):
+    ...     n = note.Note()
+    ...     n.pitchClass = pitchClass
+    ...     frequency = n.frequency
+    ...     for scale in data.keys():
+    ...         if (pitchClass - scale) % 12 in majorScale:
+    ...             data[scale].append((pitchClass, frequency))
+    >>> a = graph.Graph3DPolygonBars(title='The Twelve Major Scales',
+    ...                             alpha=.8,
+    ...                             barWidth=.2,
+    ...                             doneAction='show',
+    ...                             useKeyValues = True,
+    ...                             zeroFloor = True,
+    ...                             colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet']) 
+    >>> a.setData(data)
+    >>> a.axis['x']['ticks'] = (range(12), ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'])
+    >>> a.axis['y']['ticks'] = (range(12), ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'])
+    >>> a.setAxisLabel('y', 'Root Notes')
+    >>> a.setAxisLabel('x', 'Scale Degrees')
+    >>> a.setAxisLabel('z', 'Frequency in Hz')
+    >>> a.process()   # doctest: +SKIP
 
 .. image:: images/graphing-05.*
     :width: 600
 
-
+:download:`See full-size graph <images/graphing-05.png>`
 
 
 
