@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2011-2012 The music21 Project
+# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''This module defines objects for tracking the derivation of one :class:`~music21.stream.Stream` from another.

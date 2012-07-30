@@ -2,21 +2,21 @@
 
 
 mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0 obj="<mus...">
-  {0.0} <music21.humdrum.MiscTandam **kern humdrum control>
-  {0.0} <music21.humdrum.MiscTandam *staff2 humdrum control>
-  {0.0} <music21.humdrum.MiscTandam *>[I,A,A,B,B,C] humdrum control>
-  {0.0} <music21.humdrum.MiscTandam *>norep[I,A,B,C] humdrum control>
-  {0.0} <music21.humdrum.MiscTandam *>I humdrum control>
+  {0.0} <music21.humdrum.MiscTandem **kern humdrum control>
+  {0.0} <music21.humdrum.MiscTandem *staff2 humdrum control>
+  {0.0} <music21.humdrum.MiscTandem *>[I,A,A,B,B,C] humdrum control>
+  {0.0} <music21.humdrum.MiscTandem *>norep[I,A,B,C] humdrum control>
+  {0.0} <music21.humdrum.MiscTandem *>I humdrum control>
   {0.0} <music21.clef.BassClef object at ADDRESS>
   {0.0} <music21.key.KeySignature of 4 sharps>
   {0.0} <music21.meter.TimeSignature 3/4>
   {0.0} <music21.tempo.MetronomeMark 64.0>
 <Stream id=spine_1 offset=0.0 obj="[<ElementWrapper offset=0.0 obj="<mus...">
-  {0.0} <music21.humdrum.MiscTandam **kern humdrum control>
-  {0.0} <music21.humdrum.MiscTandam *staff1 humdrum control>
-  {0.0} <music21.humdrum.MiscTandam *>[I,A,A,B,B,C] humdrum control>
-  {0.0} <music21.humdrum.MiscTandam *>norep[I,A,B,C] humdrum control>
-  {0.0} <music21.humdrum.MiscTandam *>I humdrum control>
+  {0.0} <music21.humdrum.MiscTandem **kern humdrum control>
+  {0.0} <music21.humdrum.MiscTandem *staff1 humdrum control>
+  {0.0} <music21.humdrum.MiscTandem *>[I,A,A,B,B,C] humdrum control>
+  {0.0} <music21.humdrum.MiscTandem *>norep[I,A,B,C] humdrum control>
+  {0.0} <music21.humdrum.MiscTandem *>I humdrum control>
   {0.0} <music21.clef.TrebleClef object at ADDRESS>
   {0.0} <music21.key.KeySignature of 4 sharps>
   {0.0} <music21.meter.TimeSignature 3/4>
@@ -25,17 +25,17 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
     {0.0} <music21.note.Note G#>
     {1.0} <music21.note.Note G#>
 <Stream id=spine_2 offset=0.0 obj="[<ElementWrapper offset=0.0 obj="<mus...">
-  {0.0} <music21.humdrum.MiscTandam **dynam humdrum control>
-  {0.0} <music21.humdrum.MiscTandam *staff1/2 humdrum control>
-  {0.0} <music21.humdrum.MiscTandam *Ipiano humdrum control>
-  {0.0} <music21.humdrum.MiscTandam *>[I,A,A,B,B,C] humdrum control>
-  {0.0} <music21.humdrum.MiscTandam *>norep[I,A,B,C] humdrum control>
-  {0.0} <music21.humdrum.MiscTandam *>I humdrum control>
-  {0.0} <music21.humdrum.MiscTandam *clefG2 humdrum control>
-  {0.0} <music21.humdrum.MiscTandam *k[f#c#g#d#] humdrum control>
-  {0.0} <music21.humdrum.MiscTandam *c#: humdrum control>
-  {0.0} <music21.humdrum.MiscTandam *M3/4 humdrum control>
-  {0.0} <music21.humdrum.MiscTandam *MM64 humdrum control>
+  {0.0} <music21.humdrum.MiscTandem **dynam humdrum control>
+  {0.0} <music21.humdrum.MiscTandem *staff1/2 humdrum control>
+  {0.0} <music21.humdrum.MiscTandem *Ipiano humdrum control>
+  {0.0} <music21.humdrum.MiscTandem *>[I,A,A,B,B,C] humdrum control>
+  {0.0} <music21.humdrum.MiscTandem *>norep[I,A,B,C] humdrum control>
+  {0.0} <music21.humdrum.MiscTandem *>I humdrum control>
+  {0.0} <music21.humdrum.MiscTandem *clefG2 humdrum control>
+  {0.0} <music21.humdrum.MiscTandem *k[f#c#g#d#] humdrum control>
+  {0.0} <music21.humdrum.MiscTandem *c#: humdrum control>
+  {0.0} <music21.humdrum.MiscTandem *M3/4 humdrum control>
+  {0.0} <music21.humdrum.MiscTandem *MM64 humdrum control>
   <MEASURE Measure 1 offset=0.0>
     {0.0} <music21.dynamics.Dynamic p >
   <MEASURE Measure 2 offset=0.0>
@@ -46,7 +46,7 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
   <MEASURE Measure 7 offset=0.0>
   <MEASURE Measure 8 offset=0.0>
   <MEASURE Measure 0 offset=0.0>
-    {0.0} <music21.humdrum.MiscTandam *>A humdrum control>
+    {0.0} <music21.humdrum.MiscTandem *>A humdrum control>
   <MEASURE Measure 9 offset=0.0>
   <MEASURE Measure 10 offset=0.0>
   <MEASURE Measure 11 offset=0.0>
@@ -58,7 +58,7 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
   <MEASURE Measure 15 offset=0.0>
   <MEASURE Measure 16 offset=0.0>
   <MEASURE Measure 0 offset=0.0>
-    {0.0} <music21.humdrum.MiscTandam *>B humdrum control>
+    {0.0} <music21.humdrum.MiscTandem *>B humdrum control>
   <MEASURE Measure 17 offset=0.0>
   <MEASURE Measure 18 offset=0.0>
   <MEASURE Measure 19 offset=0.0>
@@ -78,7 +78,7 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
   <MEASURE Measure 31 offset=0.0>
   <MEASURE Measure 32 offset=0.0>
   <MEASURE Measure 0 offset=0.0>
-    {0.0} <music21.humdrum.MiscTandam *>C humdrum control>
+    {0.0} <music21.humdrum.MiscTandem *>C humdrum control>
     {0.0} <music21.dynamics.Dynamic p >
   <MEASURE Measure 33 offset=0.0>
   <MEASURE Measure 34 offset=0.0>
@@ -218,7 +218,7 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
     {0.666666666667} <music21.chord.Chord E4 G#4>
     {1.0} <music21.chord.Chord D#4 G#4>
   <MEASURE Measure 0 offset=5.0>
-    {0.0} <music21.humdrum.MiscTandam *>A humdrum control>
+    {0.0} <music21.humdrum.MiscTandem *>A humdrum control>
     {0.0} <music21.note.Note G#>
   <MEASURE Measure 9 offset=6.0>
     {0.0} <music21.note.Note G#>
@@ -262,7 +262,7 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
   <MEASURE Measure 16 offset=27.0>
     {0.0} <music21.note.Note C#>
   <MEASURE Measure 0 offset=29.0>
-    {0.0} <music21.humdrum.MiscTandam *>B humdrum control>
+    {0.0} <music21.humdrum.MiscTandem *>B humdrum control>
     {0.0} <music21.note.Note C##>
   <MEASURE Measure 17 offset=30.0>
     {0.0} <music21.note.Note D#>
@@ -360,7 +360,7 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
   <MEASURE Measure 32 offset=75.0>
     {0.0} <music21.note.Note C#>
   <MEASURE Measure 0 offset=77.0>
-    {0.0} <music21.humdrum.MiscTandam *>C humdrum control>
+    {0.0} <music21.humdrum.MiscTandem *>C humdrum control>
     {0.0} <music21.note.Note C#>
   <MEASURE Measure 33 offset=78.0>
     {0.0} <music21.note.Note C#>
@@ -396,7 +396,7 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
     {0.0} <music21.chord.Chord G#2 D#3>
     {1.0} <music21.chord.Chord G#2 D#3>
   <MEASURE Measure 0 offset=2.0>
-    {0.0} <music21.humdrum.MiscTandam *>A humdrum control>
+    {0.0} <music21.humdrum.MiscTandem *>A humdrum control>
     {0.0} <music21.note.Rest rest>
   <MEASURE Measure 9 offset=3.0>
     {0.0} <music21.note.Note B#>
@@ -430,7 +430,7 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
     {0.0} <music21.note.Note C#>
     {1.0} <music21.chord.Chord C#3 G#3 E4>
   <MEASURE Measure 0 offset=26.0>
-    {0.0} <music21.humdrum.MiscTandam *>B humdrum control>
+    {0.0} <music21.humdrum.MiscTandem *>B humdrum control>
     {0.0} <music21.note.Rest rest>
   <MEASURE Measure 17 offset=27.0>
     {0.0} <music21.note.Note G#>
@@ -501,7 +501,7 @@ mazurka6repr = '''<Stream id=spine_0 offset=0.0 obj="[<ElementWrapper offset=0.0
     {0.0} <music21.note.Note C#>
     {1.0} <music21.chord.Chord C#3 G#3 E4>
   <MEASURE Measure 0 offset=8.0>
-    {0.0} <music21.humdrum.MiscTandam *>C humdrum control>
+    {0.0} <music21.humdrum.MiscTandem *>C humdrum control>
     {0.0} <music21.note.Rest rest>
   <MEASURE Measure 33 offset=9.0>
     {0.0} <music21.note.Note A>

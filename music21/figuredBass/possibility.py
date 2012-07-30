@@ -1,12 +1,12 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         possibility.py
 # Purpose:      music21 class to define rule checking methods for a possibility
 #                represented as a tuple.
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    (c) 2011 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
 A possibility is a tuple with pitches, and is intended to encapsulate a possible

@@ -4,9 +4,10 @@
 # Purpose:      The Spanner base-class and subclasses
 #
 # Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2010-2012 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
 A spanner is a music21 object that represents a connection usually between 

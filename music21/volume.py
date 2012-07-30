@@ -6,7 +6,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2011 The music21 Project
+# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''This module defines the object model of Volume, covering all representation of amplitude, volume, velocity, and related parameters.  

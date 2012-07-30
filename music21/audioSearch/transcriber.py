@@ -7,8 +7,8 @@
 # Authors:      Jordi Bartolome
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2011 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 import unittest

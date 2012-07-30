@@ -1,37 +1,46 @@
 # -*- coding: utf-8 -*-
-
 '''
-The music21 Framework is Copyright (c) 2008-11 music21 lab 
+The music21 Framework is Copyright © 2008-2012 Michael Scott Cuthbert 
+and the music21 Project
+
 (Michael Scott Cuthbert, principal investigator; cuthbert@mit.edu)
 
 Some Rights Reserved
-Released under the LGPL license
+Released under the Lesser GNU Public License (LGPL)
+
+See license.txt file for the full license which represents your legal
+obligations in using, modifying, or distributing music21.
 
 Roughly speaking, this means that anyone can use this software for
 free, they can distribute it to anyone, so long as this acknowledgment
 of copyright and ownership remain publicly accessible.  You may also
 modify this software or use it in your own programs so long as you do
-not sell your product and so long as you make your product available
+so long as you make your product available
 under the same license.  You may also link to this code as a library
-from your commercial product so long as this code remains open and
-accessible, this license is made accessible, and the developers are
-credited.
+from your sold, proprietary commercial product so long as this code 
+remains open and accessible, this license is made accessible, 
+and the developers are credited.
 
-The development of music21 was supported by a grant
-from the Seaver Institute and with the support of the MIT
+The development of music21 was supported by grants
+from the Seaver Institute and the NEH/Digging into Data Challenge, 
+with the support of the MIT
 Music and Theater Arts section and the School of Humanities, Arts,
-and Social Sciences. 
+and Social Sciences.  Portions of music21 were originally part of
+the PMusic (Perl) library, developed by Cuthbert prior to arriving at MIT.
 
 music21 outputs a subset of XML data defined by the  MusicXML 2.0 
-standard, &copy; Recordare LLC;  License available at
-http://www.recordare.com/dtds/license.html
+standard, Copyright © Recordare LLC;  License available at
+http://www.recordare.com/dtds/license.html, now transferred to MakeMusic
 
 music21 incorporates Microsoft Excel reading via the included 
 xlrd library:
    Portions copyright (c) 2005-2006, Stephen John Machin, Lingfo Pty Ltd
    All rights reserved.
-see trecento/xlrd/licenses.py for the complete disclaimer and conditions
+see ext/xlrd/licenses.py for the complete disclaimer and conditions
 
+Files in the ext/ folder are not copyright music21 Project but whose distribution
+is compatible with music21.  The corpus files have copyrights retained by their
+owners who have allowed them to be included with music21.
 '''
 
 

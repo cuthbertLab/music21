@@ -6,8 +6,8 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2012 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 # base -- the convention within music21 is that __init__ files contain:
@@ -4614,9 +4614,9 @@ class ElementWrapper(Music21Object):
     ...         j.id = str(i) + "_wrapper"
     ...     if i <=2:
     ...         print j
-    <ElementWrapper id=0_wrapper offset=0.0 obj="<...Wave_read object at ...">
-    <ElementWrapper id=1_wrapper offset=1.0 obj="<...Wave_read object at ...">
-    <ElementWrapper offset=2.0 obj="<....Wave_read object at ...">
+    <ElementWrapper id=0_wrapper offset=0.0 obj="<...Wave_read object...">
+    <ElementWrapper id=1_wrapper offset=1.0 obj="<...Wave_read object...">
+    <ElementWrapper offset=2.0 obj="<....Wave_read object ...">
     '''
     obj = None
     _id = None

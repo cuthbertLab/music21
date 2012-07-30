@@ -6,8 +6,8 @@
 # Authors:      Jared Sadoian
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2010 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2010 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 '''This module describes classes for performing windowed and overlapping windowed analysis. The :class:`music21.analysis.windowed.WindowedAnalysis` provides a reusable framework for systematic overlapping window analysis at the starting at the level of the quarter note and moving to the size of an entire :class:`music21.stream.Stream`.

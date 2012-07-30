@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:          sieve.py
-# Purpose:       sieve opperations, after Iannis Xenakis.
+# Name:         sieve.py
+# Purpose:      sieve opperations, after Iannis Xenakis.
 #
-# Authors:       Christopher Ariza
+# Authors:      Christopher Ariza
 #
-# Copyright:     (c) 2003-2010 Christopher Ariza
-#                (c) 2010-2012 The music21 Project
-# License:       LGPL
+# Copyright:    Copyright © 2003,2010 Christopher Ariza
+#               Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''A comprehensive, object model of the Xenakis Sieve. :class:`music21.sieve.Sieve` objects can be created from high-level string notations, and used to generate line segments in various representation. Additional functionality is available through associated objects. 
 

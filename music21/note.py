@@ -6,8 +6,8 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2012 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''Classes and functions for creating and manipulating notes, ties, and durations.
 

@@ -1,13 +1,12 @@
 ﻿# -*- coding: utf-8 -*-
-#!/usr/bin/python
 #-------------------------------------------------------------------------------
 # Name:         corpus/virtual.py
 # Purpose:      Access to the Virtual corpus collection
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2010, 2012 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 'The virtual.py module is a library of references to remotely stored music data files, as well as meta-data necessary to download and, if available, access an already downloaded file.'

@@ -1,11 +1,11 @@
 #-------------------------------------------------------------------------------
-# Name:          dist.py
-# Purpose:       Distribution and uploading script
+# Name:         dist.py
+# Purpose:      Distribution and uploading script
 #
-# Authors:       Christopher Ariza
+# Authors:      Christopher Ariza
 #
-# Copyright:     (c) 2010-2012 Christopher Ariza
-# License:       GPL
+# Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 import os, sys, tarfile, zipfile

@@ -6,8 +6,8 @@
 # Authors:      Michael Scott Cuthbert
 #               Trevor Baca
 #
-# Copyright:    (c) 2011 The music21 Project / Victor Adan and Trevor Baca
-# License:      LGPL
+# Copyright:    Copyright © 2011 Michael Scott Cuthbert, the music21 Project, and Victor Adan and Trevor Baca
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 '''

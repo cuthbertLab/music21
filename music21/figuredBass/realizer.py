@@ -1,12 +1,12 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         realizer.py
 # Purpose:      music21 class to define a figured bass line, consisting of notes
 #                and figures in a given key.
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    (c) 2011 The music21 Project    
-# License:      LGPL
+# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
 This module, the heart of fbRealizer, is all about realizing a bass line of (bassNote, notationString)

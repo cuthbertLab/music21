@@ -4,8 +4,8 @@
 # Purpose:      Division of stream.Part into segments for individual handling
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    (c) 2012 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 """

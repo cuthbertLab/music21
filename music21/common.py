@@ -6,8 +6,8 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza 
 #
-# Copyright:    (c) 2009-2011 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''Utility constants, dictionaries, functions, and objects used throughout music21.
 '''
@@ -1266,8 +1266,8 @@ def stripAddresses(textString, replacement = "ADDRESS"):
     
     while this is left alone:
 
-    >>> common.stripAddresses("{0.0} <music21.humdrum.MiscTandam *>I humdrum control>")
-    '{0.0} <music21.humdrum.MiscTandam *>I humdrum control>'
+    >>> common.stripAddresses("{0.0} <music21.humdrum.MiscTandem *>I humdrum control>")
+    '{0.0} <music21.humdrum.MiscTandem *>I humdrum control>'
     '''
     ADDRESS = re.compile('0x[0-9A-F]+')
     return ADDRESS.sub(replacement, textString)

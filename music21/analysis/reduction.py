@@ -5,8 +5,8 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2011-2012 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 '''Tools for generation reduction displays, showing a score and or a chord reduction, and one or more reductive representation lines.

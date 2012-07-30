@@ -5,8 +5,8 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2010 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2010 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 from music21.scala.base import *

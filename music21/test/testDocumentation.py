@@ -5,11 +5,11 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    (c) 2010-2012 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
-Module to test all the code excerpts in the rst files in the music21 documentation.
+Module to test all the code excerpts in the .rst files in the music21 documentation.
 '''
 
 

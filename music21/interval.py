@@ -8,8 +8,8 @@
 #               Amy Hailes 
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2011 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''This module defines various types of interval objects. 
 Fundamental classes are :class:`~music21.interval.Interval`, 

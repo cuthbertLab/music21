@@ -6,8 +6,8 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2011 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
 Music21 class for dealing with Roman Numeral analysis

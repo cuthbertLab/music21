@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Neena Parikh
 #
-# Copyright:    (c) 2009-2012 The music21 Project
+# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 

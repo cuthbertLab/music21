@@ -4,8 +4,8 @@
 # Purpose:      music21 class which contains lookup tables between print and braille
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    (c) 2011 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-----------------------------------------------------------------------------------
 
 c = {'128th':   u'\u2819',

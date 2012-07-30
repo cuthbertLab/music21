@@ -7,7 +7,7 @@
 # Authors:      Beth Hadley
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2011 The music21 Project
+# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''

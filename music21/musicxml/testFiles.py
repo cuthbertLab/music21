@@ -4,8 +4,6 @@
 # Purpose:      MusicXML test files
 #
 # Authors:      Christopher Ariza
-#
-# License:      LGPL
 #-------------------------------------------------------------------------------
 
 import music21

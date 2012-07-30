@@ -7,8 +7,9 @@
 #               Michael Scott Cuthbert
 #               (Will Ware -- see docs)
 #
-# Copyright:    (c) 2010-2011 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
+#               Some parts of this module are in the Public Domain
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
 Objects and tools for processing MIDI data. 

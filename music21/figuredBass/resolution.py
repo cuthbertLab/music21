@@ -1,11 +1,11 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         resolution.py
 # Purpose:      Defines standard resolutions for possibility instances
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    (c) 2011 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
 .. note:: The terminology, V43, viio, iv, etc. are explained more fully in *The Music Theory Handbook*

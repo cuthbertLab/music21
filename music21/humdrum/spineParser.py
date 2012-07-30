@@ -5,8 +5,8 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009-11 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
 music21.humdrum.spineParser is a collection of utilities for changing
@@ -977,7 +977,7 @@ class HumdrumSpine(object):
             for el in beginningStuff:
                 if 'Stream' in el.classes:
                     pass
-                elif 'MiscTandam' in el.classes:
+                elif 'MiscTandem' in el.classes:
                     pass
                 else:
                     m1.insert(0, el)
@@ -1001,7 +1001,7 @@ class HumdrumSpine(object):
             elif eventC.startswith('*'):
                 ## control processing
                 if eventC not in spinePathIndicators:
-                    thisObject = MiscTandam(eventC)
+                    thisObject = MiscTandem(eventC)
             elif eventC.startswith('='):
                 lastContainer  = hdStringToMeasure(eventC, lastContainer)
                 thisObject = lastContainer
@@ -1031,7 +1031,7 @@ class KernSpine(HumdrumSpine):
                 pass
             elif eventC.startswith('*'):
                 ## control processing
-                tempObject = kernTandamToObject(eventC)
+                tempObject = kernTandemToObject(eventC)
                 if tempObject is not None:
                     thisObject = tempObject
             elif eventC.startswith('='):
@@ -1119,7 +1119,7 @@ class DynamSpine(HumdrumSpine):
             elif eventC.startswith('*'):
                 ## control processing
                 if eventC not in spinePathIndicators:
-                    thisObject = MiscTandam(eventC)
+                    thisObject = MiscTandem(eventC)
             elif eventC.startswith('='):
                 if thisContainer is not None:
                     self.stream.append(thisContainer)
@@ -1421,9 +1421,9 @@ class SpineCollection(object):
         for thisSpine in self.spines:
             if thisSpine.parentSpine == None:
                 if thisSpine.spineType == 'kern':    
-                    for tandam in thisSpine.stream.getElementsByClass('MiscTandam'):
-                        if tandam.tandam.startswith('*staff'):
-                            staffInfo = int(tandam.tandam[6:]) # single staff
+                    for tandem in thisSpine.stream.getElementsByClass('MiscTandem'):
+                        if tandem.tandem.startswith('*staff'):
+                            staffInfo = int(tandem.tandem[6:]) # single staff
                             kernStreams[staffInfo] = thisSpine.stream
                             break
         for thisSpine in self.spines:
@@ -1431,9 +1431,9 @@ class SpineCollection(object):
                 if thisSpine.spineType != 'kern':    
                     stavesAppliedTo = []
                     prioritiesToSearch = {}
-                    for tandam in thisSpine.stream.flat.getElementsByClass('MiscTandam'):
-                        if tandam.tandam.startswith('*staff'):
-                            staffInfo = tandam.tandam[6:] # could be multiple staves
+                    for tandem in thisSpine.stream.flat.getElementsByClass('MiscTandem'):
+                        if tandem.tandem.startswith('*staff'):
+                            staffInfo = tandem.tandem[6:] # could be multiple staves
                             stavesAppliedTo = [int(x) for x in staffInfo.split('/')]
                             break
                     if thisSpine.spineType == 'dynam':
@@ -1919,29 +1919,29 @@ def hdStringToMeasure(contents, previousMeasure = None):
     return m1
 
 
-def kernTandamToObject(tandam):
+def kernTandemToObject(tandem):
     '''
     Kern uses symbols such as :samp:`*M5/4` and :samp:`*clefG2`, etc., to control processing
     
     This method converts them to music21 objects.
     
     >>> from music21 import *
-    >>> m = humdrum.spineParser.kernTandamToObject('*M3/1')
+    >>> m = humdrum.spineParser.kernTandemToObject('*M3/1')
     >>> m
     <music21.meter.TimeSignature 3/1>
     
     
     Unknown objects are converted to MiscTandem objects:
     
-    >>> m2 = humdrum.spineParser.kernTandamToObject('*TandyUnk')
+    >>> m2 = humdrum.spineParser.kernTandemToObject('*TandyUnk')
     >>> m2
-    <music21.humdrum.spineParser.MiscTandam *TandyUnk humdrum control>
+    <music21.humdrum.spineParser.MiscTandem *TandyUnk humdrum control>
     '''
-    # TODO: Cover more tandam controls as they're found
-    if tandam in spinePathIndicators:
+    # TODO: Cover more tandem controls as they're found
+    if tandem in spinePathIndicators:
         return None
-    elif tandam.startswith("*clef"):
-        clefType = tandam[5:]
+    elif tandem.startswith("*clef"):
+        clefType = tandem[5:]
         if clefType == "-":
             return music21.clef.NoClef()
         elif clefType == "X":
@@ -1963,9 +1963,9 @@ def kernTandamToObject(tandam):
                 clefifier = music21.clef.standardClefFromXN(clefType)
                 return clefifier
             except music21.clef.ClefException:
-                raise HumdrumException("Unknown clef type %s found", tandam)
-    elif tandam.startswith("*MM"):
-        metronomeMark = tandam[3:]
+                raise HumdrumException("Unknown clef type %s found", tandem)
+    elif tandem.startswith("*MM"):
+        metronomeMark = tandem[3:]
         try:
             metronomeMark = float(metronomeMark)
             MM = music21.tempo.MetronomeMark(number=metronomeMark)    
@@ -1976,52 +1976,52 @@ def kernTandamToObject(tandam):
             metronomeMark = re.sub(']\s*$','', metronomeMark)
             MS = music21.tempo.MetronomeMark(text=metronomeMark)
             return MS
-    elif tandam.startswith("*M"):
-        meterType = tandam[2:]
+    elif tandem.startswith("*M"):
+        meterType = tandem[2:]
         return music21.meter.TimeSignature(meterType)
-    elif tandam.startswith("*IC"):
-        instrumentClass = tandam[3:]
+    elif tandem.startswith("*IC"):
+        instrumentClass = tandem[3:]
         # TODO: DO SOMETHING WITH INSTRUMENT CLASS; not in hum2xml
-    elif tandam.startswith("*IG"):
-        instrumentGroup = tandam[3:]
+    elif tandem.startswith("*IG"):
+        instrumentGroup = tandem[3:]
         # TODO: DO SOMETHING WITH INSTRUMENT GROUP; not in hum2xml
-    elif tandam.startswith("*ITr"):
+    elif tandem.startswith("*ITr"):
         instrumentTransposing = True
         # TODO: DO SOMETHING WITH TRANSPOSING INSTRUMENTS; not in hum2xml
-    elif tandam.startswith("*I"):
-        instrument = tandam[2:]
+    elif tandem.startswith("*I"):
+        instrument = tandem[2:]
         # TODO: SOMETHING WITH INSTRUMENTS; not in hum2xml
-    elif tandam.startswith("*k"):
-        numSharps = tandam.count('#')
+    elif tandem.startswith("*k"):
+        numSharps = tandem.count('#')
         if numSharps == 0:
-            numSharps = -1 * (tandam.count('-'))
+            numSharps = -1 * (tandem.count('-'))
         return music21.key.KeySignature(numSharps)
-    elif tandam.endswith(":"):
-        thisKey = tandam[1:-1]
+    elif tandem.endswith(":"):
+        thisKey = tandem[1:-1]
         return music21.key.Key(thisKey)
     else:
-        return MiscTandam(tandam)
+        return MiscTandem(tandem)
 
-#    elif tandam.startswith("*>"):
+#    elif tandem.startswith("*>"):
 #        # TODO: Something with 4.2 Repetitions; not in hum2xml
 #        pass
-#    elif tandam.startswith("*tb"):
-#        timeBase = tandam[4:]
+#    elif tandem.startswith("*tb"):
+#        timeBase = tandem[4:]
 #        # TODO: Findout what timeBase means; not in hum2xml
 #        pass
-#    elif tandam.startswith("*staff"):
-#        staffNumbers = tandam[6:]
+#    elif tandem.startswith("*staff"):
+#        staffNumbers = tandem[6:]
 #        # TODO: make staff numbers relevant; not in hum2xml
 
 # TODO: Parse editorial signifiers
 
 
-class MiscTandam(music21.Music21Object):
-    def __init__(self, tandam = ""):
+class MiscTandem(music21.Music21Object):
+    def __init__(self, tandem = ""):
         music21.Music21Object.__init__(self)
-        self.tandam = tandam
+        self.tandem = tandem
     def __repr__(self):
-        return "<music21.humdrum.spineParser.MiscTandam %s humdrum control>" % self.tandam
+        return "<music21.humdrum.spineParser.MiscTandem %s humdrum control>" % self.tandem
            
 class Test(unittest.TestCase):
 

@@ -1,11 +1,11 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         checker.py
 # Purpose:      music21 class which can parse a stream of parts and check your homework
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    (c) 2012 The music21 Project    
-# License:      LGPL
+# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 import collections

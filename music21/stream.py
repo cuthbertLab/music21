@@ -7,8 +7,8 @@
 #               Christopher Ariza
 #               Evan Lynch
 #
-# Copyright:    (c) 2009-2012 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''The :class:`~music21.stream.Stream` and its subclasses, a subclass of the :class:`~music21.base.Music21Object`, is the fundamental container of offset-positioned notation and musical elements in music21. Common Stream subclasses, such as the :class:`~music21.stream.Measure` and :class:`~music21.stream.Score` objects, are defined in this module. 
 '''
@@ -1674,7 +1674,7 @@ class Stream(music21.Music21Object):
         self.insert(item.getOffsetBySite(None), item)
 
     def insertAndShift(self, offsetOrItemOrList, itemOrNone=None):
-        '''Insert an item at a specified or native offset, and shit any elements found in the Stream to start at the end of the added elements.
+        '''Insert an item at a specified or native offset, and shift any elements found in the Stream to start at the end of the added elements.
 
         This presently does not shift elements that have durations that extend into the lowest insert position.
 

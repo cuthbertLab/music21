@@ -6,15 +6,16 @@
 # Authors:      Christopher Reyes
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2012 The music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
 #TODO: review variable names for consistency
 
-'''Objects for transcribing music21 objects as VexFlow code
+'''
+Objects for transcribing music21 objects as VexFlow code
 
-    Here's the hierarchy:
+Here's the hierarchy:
 
     A VexflowContext can be used to display multiple VexflowParts.
     Each VexflowPart contains multiple VexflowStaves (one for each measure)

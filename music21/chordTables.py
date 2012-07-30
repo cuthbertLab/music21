@@ -5,9 +5,9 @@
 #
 # Authors:       Christopher Ariza
 #
-# Copyright:     (c) 2001-2011 Christopher Ariza
-# Copyright:     (c) 2011 The music21 Project
-# License:       LGPL
+# Copyright:    Copyright © 2001-2011 Christopher Ariza
+# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL
 #-------------------------------------------------------------------------------
 
 '''This module stores numerous data lists used in deriving set-class values and other post-tonal chord representations. All features of this module are made available through :class:`~music21.chord.Chord` objects. Use of this module directly is thus not necessary.

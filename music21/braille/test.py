@@ -5,8 +5,8 @@
 # Purpose:      Examples from "Introduction to Braille Music Transcription"
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    (c) 2012 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 from music21 import articulations, bar, chord, clef, converter, dynamics, \

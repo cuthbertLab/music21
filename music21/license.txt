@@ -1,11 +1,12 @@
 #-------------------------------------------------------------------------------
 # Name:         license.txt
 # Purpose:      The following license applies to all Python files distributed 
-#               with music21. This licenses does not apply to other content
-#               distributed with this package. 
-# Copyright:    music21 is "Copyright (c) 2009-12 The music21 Project" and is
-#               freely licensed under the GNU Lesser General Public License
-#               reprinted below.
+#               with music21 and text and images in the documentation. 
+#               This licenses does not apply to other content
+#               distributed with this package, particularly the corpus files. 
+# Copyright:    music21 is "Copyright © 2009-12 Michael Scott Cuthbert and the 
+#               music21 Project" and is freely licensed under the GNU Lesser 
+#               General Public License v3 or subsequent versions, reprinted below.
 #
 #-------------------------------------------------------------------------------
 

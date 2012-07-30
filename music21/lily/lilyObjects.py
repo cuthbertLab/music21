@@ -5,8 +5,8 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    (c) 2007-2012 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2007-2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 from __future__ import unicode_literals

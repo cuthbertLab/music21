@@ -1,11 +1,11 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         examples.py
 # Purpose:      music21 class which allows running of test cases
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    (c) 2010-2011 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2010-2011 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
 Each of the example methods in this module provides a figured bass line as a 

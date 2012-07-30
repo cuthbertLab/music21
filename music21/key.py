@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
+# Copyright:    Copyright © 2009, 2010, 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
 '''This module defines objects for representing key signatures as well as key 

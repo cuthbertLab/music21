@@ -1,11 +1,12 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         trecento/cadencebook.py
 # Purpose:      classes for reading in trecento cadences from a MS Excel spreadsheet
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2009, 2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
 The file trecento/cadences.xls contains (in a modified TinyNotation format) incipits

@@ -4,8 +4,8 @@
 # Purpose:      music21 class which allows transcription of music21 data to braille
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    (c) 2012 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 """
