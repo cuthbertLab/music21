@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Module to determine how often we would expect to have Francesco\'s cadences happen by chance
 '''

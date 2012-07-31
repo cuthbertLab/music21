@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Search for Vatican 1790 missing piece: find all ballatas in triple time
 

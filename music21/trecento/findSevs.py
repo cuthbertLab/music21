@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import music21
 from music21 import *
 from music21 import lily

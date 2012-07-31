@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         quodJactatur.py
 # Purpose:      module for exploring the properties of QuodJactatur
