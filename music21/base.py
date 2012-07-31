@@ -5891,7 +5891,7 @@ def mainTest(*testClasses):
     if 'onlyDocTest' in sys.argv:
         testClasses = [] # remove cases
     for t in testClasses:
-        if not isinstance(t, str):
+        if not isinstance(t, basestring):
             if displayNames:
                 for tName in unittest.defaultTestLoader.getTestCaseNames(t):
                     print('Unit Test Method: %s' % tName)

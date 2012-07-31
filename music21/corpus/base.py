@@ -21,7 +21,7 @@ most of the music in the corpus -- it has been licensed to us (or
 in a free license).  It may not be free in all parts of the world,
 but to the best of our knowledge is true for the US.
 '''
-
+from __future__ import unicode_literals
 
 import re
 import os
@@ -103,13 +103,17 @@ def _findPaths(fpRoot, extList):
 
     matched = []
     # walk each top-level dir
+    fpRoot = unicode(fpRoot) # force fpRoot to be unicode so that dir names are properly resolved...
     for dirpath, dirnames, filenames in os.walk(fpRoot):
         if '.svn' in dirnames:
             # removing in place will stop recursion into these dirs
             dirnames.remove('.svn')
         for fn in filenames:
-            if fn.startswith('.'): 
-                continue
+            try:
+                if fn.startswith('.'): 
+                    continue
+            except UnicodeDecodeError as ude:
+                raise CorpusException("Incorrect filename in corpus path: %s: %s" % (fn, ude))
             for ext in extList:
                 if fn.endswith(ext):
                     matched.append(os.path.join(dirpath, fn))
@@ -137,7 +141,7 @@ def _translateExtensions(extList=None, expandExtensions=True):
     ['.abc', '.ly', '.lily', '.mid', '.midi', '.xml', '.mxl', '.mx', '.md', '.musedata', '.zip', '.krn', '.rntxt', '.rntext', '.romantext', '.rtxt', '.nwctxt', '.nwc']
 
     >>> corpus.base._translateExtensions('.mid', False)
-    ['.mid']
+    [u'.mid']
     >>> corpus.base._translateExtensions('.mid', True)
     ['.mid', '.midi']
     '''
@@ -173,8 +177,7 @@ def getCorePaths(extList=None, expandExtensions=True):
     
     >>> a = corpus.getCorePaths()
     >>> len(a) # the current number of paths; update when adding to corpus
-    2231
-
+    2330
     >>> a = corpus.getCorePaths('krn')
     >>> len(a) >= 4
     True
@@ -797,7 +800,7 @@ def parse(workName, movementNumber=None, number=None,
     After parsing, the file path within the corpus is stored as `.corpusFilePath`
     
     >>> bachChorale.corpusFilepath
-    'bach/bwv66.6.mxl'
+    u'bach/bwv66.6.mxl'
     '''
     if workName in [None, '']:
         raise CorpusException('a work name must be provided as an argument')
@@ -1113,7 +1116,7 @@ class Test(unittest.TestCase):
     def testBachKeys(self):
         from music21 import key
         keyObjs = []
-        for fp in getComposer('bach')[-4:]: # get the last 4
+        for fp in getComposer('bach')[23:28]: # get 5 in the middle
             s = parse(fp)
             # get keys from first part
             keyStream = s.parts[0].flat.getElementsByClass(key.KeySignature)
@@ -1121,7 +1124,7 @@ class Test(unittest.TestCase):
             keyObjs.append(keyObj)
             #environLocal.printDebug([keyObj])
 
-        self.assertEqual(len(keyObjs), 4)
+        self.assertEqual(len(keyObjs), 5)
 
     def testEssenImport(self):
 
