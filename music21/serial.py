@@ -77,6 +77,9 @@ class TwelveToneMatrix(stream.Stream):
                 return Music21Object.__repr__(self)
         else:
             return Music21Object.__repr__(self)
+#-------------------------------------------------------------------------------
+
+historicalDict = {'RowWebernOp29': ('Webern', 'Op. 29', 'Cantata I', [3, 11, 2, 1, 5, 4, 7, 6, 10, 9, 0, 8]), 'RowWebernOp28': ('Webern', 'Op. 28', 'String Quartet', [1, 0, 3, 2, 6, 7, 4, 5, 9, 8, 11, 10]), 'RowSchoenbergOp24Mvmt5': ('Schoenberg', 'Op. 24', 'Serenade, Mvt. 5, "Tanzscene"', [9, 10, 0, 3, 4, 6, 5, 7, 8, 11, 1, 2]), 'RowSchoenbergOp24Mvmt4': ('Schoenberg', 'Op. 24', 'Serenade, Mvt. 4, "Sonett"', [4, 2, 3, 11, 0, 1, 8, 6, 9, 5, 7, 10]), 'RowSchoenbergJakobsleiter': ('Schoenberg', None, 'Die Jakobsleiter', [1, 2, 5, 4, 8, 7, 0, 3, 11, 10, 6, 9]), 'RowSchoenbergOp27No4': ('Schoenberg', 'Op. 27 No. 4', 'Four Pieces for Mixed Chorus, No. 4', [1, 3, 10, 6, 8, 4, 11, 0, 2, 9, 5, 7]), 'RowWebernOp23': ('Webern', 'Op. 23', 'Three Songs', [8, 3, 7, 4, 10, 6, 2, 5, 1, 0, 9, 11]), 'RowBergLuluActIIScene1': ('Berg', 'Lulu, Act II, Scene 1', 'Perm. (Every 5th Note Of Transposed Primary Row)', [10, 7, 1, 0, 9, 2, 4, 11, 5, 8, 3, 6]), 'RowSchoenbergOp27No1': ('Schoenberg', 'Op. 27 No. 1', 'Four Pieces for Mixed Chorus, No. 1', [6, 5, 2, 8, 7, 1, 3, 4, 10, 9, 11, 0]), 'RowBergLuluActIScene20': ('Berg', 'Lulu, Act I , Scene XX', 'Perm. (Every 7th Note Of Transposed Primary Row)', [10, 6, 3, 8, 5, 11, 4, 2, 9, 0, 1, 7]), 'RowSchoenbergOp27No3': ('Schoenberg', 'Op. 27 No. 3', 'Four Pieces for Mixed Chorus, No. 3', [7, 6, 2, 4, 5, 3, 11, 0, 8, 10, 9, 1]), 'RowSchoenbergOp27No2': ('Schoenberg', 'Op. 27 No. 2', 'Four Pieces for Mixed Chorus, No. 2', [0, 11, 4, 10, 2, 8, 3, 7, 6, 5, 9, 1]), 'RowSchoenbergFragPiano': ('Schoenberg', None, 'Fragment For Piano', [6, 9, 0, 7, 1, 2, 8, 11, 5, 10, 4, 3]), 'RowSchoenbergOp50B': ('Schoenberg', 'Op. 50B', 'De Profundis', [3, 9, 8, 4, 2, 10, 7, 11, 0, 6, 5, 1]), 'RowSchoenbergOp50C': ('Schoenberg', 'Op. 50C', 'Modern Psalms, The First Psalm', [4, 3, 0, 8, 11, 7, 5, 9, 6, 10, 1, 2]), 'RowSchoenbergOp50A': ('Schoenberg', 'Op. 50A', 'Three Times A Thousand Years', [7, 9, 6, 4, 5, 11, 10, 2, 0, 1, 3, 8]), 'RowSchoenbergMosesAron': ('Schoenberg', None, 'Moses And Aron', [9, 10, 4, 2, 3, 1, 7, 5, 6, 8, 11, 0]), 'RowWebernOp25': ('Webern', 'Op. 25', 'Three Songs', [7, 4, 3, 6, 1, 5, 2, 11, 10, 0, 9, 8]), 'RowSchoenbergOp23No5': ('Schoenberg', 'Op. 23, No. 5', 'Five Piano Pieces', [1, 9, 11, 7, 8, 6, 10, 2, 4, 3, 0, 5]), 'RowSchoenbergOp28No1': ('Schoenberg', 'Op. 28 No. 1', 'Three Satires for Mixed Chorus, No. 1', [0, 4, 7, 1, 9, 11, 5, 3, 2, 6, 8, 10]), 'RowSchoenbergOp28No3': ('Schoenberg', 'Op. 28 No. 3', 'Three Satires for Mixed Chorus, No. 3', [5, 6, 4, 8, 2, 10, 7, 9, 3, 11, 1, 0]), 'RowWebernOp21': ('Webern', 'Op. 21', 'Chamber Symphony', [5, 8, 7, 6, 10, 9, 3, 4, 0, 1, 2, 11]), 'RowSchoenbergIsraelExists': ('Schoenberg', None, 'Israel Exists Again', [0, 3, 4, 9, 11, 5, 2, 1, 10, 8, 6, 7]), 'RowSchoenbergOp35No2': ('Schoenberg', 'Op. 35', 'Six Pieces for Male Chorus, No. 2', [6, 9, 7, 1, 0, 2, 5, 11, 10, 3, 4, 8]), 'RowSchoenbergOp35No3': ('Schoenberg', 'Op. 35', 'Six Pieces for Male Chorus, No. 3', [3, 6, 7, 8, 5, 0, 9, 10, 4, 11, 2, 1]), 'RowSchoenbergOp35No1': ('Schoenberg', 'Op. 35', 'Six Pieces for Male Chorus, No. 1', [2, 11, 3, 5, 4, 1, 8, 10, 9, 6, 0, 7]), 'RowSchoenbergOp48No1': ('Schoenberg', 'Op. 48', 'Three Songs, No. 1, "Sommermud"', [1, 2, 0, 6, 3, 5, 4, 10, 11, 7, 9, 8]), 'RowSchoenbergOp35No5': ('Schoenberg', 'Op. 35', 'Six Pieces for Male Chorus, No. 5', [1, 7, 10, 2, 3, 11, 8, 4, 0, 6, 5, 9]), 'RowSchoenbergOp29': ('Schoenberg', 'Op. 29', 'Suite', [3, 7, 6, 10, 2, 11, 0, 9, 8, 4, 5, 1]), 'RowBergLyricSuitePerm': ('Berg', None, 'Lyric Suite, Last Mvt. Permutation', [5, 6, 10, 4, 1, 9, 2, 8, 7, 3, 0, 11]), 'RowWebernOp20': ('Webern', 'Op. 20', 'String Trio', [8, 7, 2, 1, 6, 5, 9, 10, 3, 4, 0, 11]), 'RowSchoenbergOp46': ('Schoenberg', 'Op. 46', 'A Survivor From Warsaw', [6, 7, 0, 8, 4, 3, 11, 10, 5, 9, 1, 2]), 'RowSchoenbergFragOrganSonata': ('Schoenberg', None, 'Fragment of Sonata For Organ', [1, 7, 11, 3, 9, 2, 8, 6, 10, 5, 0, 4]), 'RowSchoenbergOp44': ('Schoenberg', 'Op. 44', 'Prelude To A Suite From "Genesis"', [10, 6, 2, 5, 4, 0, 11, 8, 1, 3, 9, 7]), 'RowSchoenbergOp45': ('Schoenberg', 'Op. 45', 'String Trio', [2, 10, 3, 9, 4, 1, 11, 8, 6, 7, 5, 0]), 'RowSchoenbergOp33A': ('Schoenberg', 'Op. 33A', 'Two Piano Pieces, No. 1', [10, 5, 0, 11, 9, 6, 1, 3, 7, 8, 2, 4]), 'RowSchoenbergOp25': ('Schoenberg', 'Op.25', 'Suite for Piano', [4, 5, 7, 1, 6, 3, 8, 2, 11, 0, 9, 10]), 'RowSchoenbergOp26': ('Schoenberg', 'Op. 26', 'Wind Quintet', [3, 7, 9, 11, 1, 0, 10, 2, 4, 6, 8, 5]), 'RowSchoenbergOp33B': ('Schoenberg', 'Op. 33B', 'Two Piano Pieces, No. 2', [11, 1, 5, 3, 9, 8, 6, 10, 7, 4, 0, 2]), 'RowBergViolinConcerto': ('Berg', None, 'Concerto For Violin And Orchestra', [7, 10, 2, 6, 9, 0, 4, 8, 11, 1, 3, 5]), 'RowWebernOp22': ('Webern', 'Op. 22', 'Quartet For Violin, Clarinet, Tenor Sax, And Piano', [6, 3, 2, 5, 4, 8, 9, 10, 11, 1, 7, 0]), 'RowBergLulu': ('Berg', None, 'Lulu: Primary Row', [0, 4, 5, 2, 7, 9, 6, 8, 11, 10, 3, 1]), 'RowWebernOp30': ('Webern', 'Op. 30', 'Variations For Orchestra', [9, 10, 1, 0, 11, 2, 3, 6, 5, 4, 7, 8]), 'RowWebernOp31': ('Webern', 'Op. 31', 'Cantata II', [6, 9, 5, 4, 8, 3, 7, 11, 10, 2, 1, 0]), 'RowWebernOpNo17No1': ('Webern', 'Op. 17, No. 1', '"Armer Sunder, Du"', [11, 10, 5, 6, 3, 4, 7, 8, 9, 0, 1, 2]), 'RowWebernOp24': ('Webern', 'Op. 24', 'Concerto For Nine Instruments', [11, 10, 2, 3, 7, 6, 8, 4, 5, 0, 1, 9]), 'RowSchoenbergOp48No2': ('Schoenberg', 'Op. 48', 'Three Songs, No. 2, "Tot"', [2, 3, 9, 1, 10, 4, 8, 7, 0, 11, 5, 6]), 'RowWebernOp27': ('Webern', 'Op. 27', 'Variations For Piano', [3, 11, 10, 2, 1, 0, 6, 4, 7, 5, 9, 8]), 'RowSchoenbergOp47': ('Schoenberg', 'Op. 47', 'Fantasy For Violin And Piano', [10, 9, 1, 11, 5, 7, 3, 4, 0, 2, 8, 6]), 'RowWebernOp19No2': ('Webern', 'Op. 19, No. 2', '"Ziehn Die Schafe"', [8, 4, 9, 6, 7, 0, 11, 5, 3, 2, 10, 1]), 'RowWebernOp19No1': ('Webern', 'Op. 19, No. 1', '"Weiss Wie Lilien"', [7, 10, 6, 5, 3, 9, 8, 1, 2, 11, 4, 0]), 'RowWebernOp26': ('Webern', 'Op. 26', 'Das Augenlicht', [8, 10, 9, 0, 11, 3, 4, 1, 5, 2, 6, 7]), 'RowSchoenbergFragPianoPhantasia': ('Schoenberg', None, 'Fragment of Phantasia For Piano', [1, 5, 3, 6, 4, 8, 0, 11, 2, 9, 10, 7]), 'RowBergDerWein': ('Berg', None, 'Der Wein', [2, 4, 5, 7, 9, 10, 1, 6, 8, 0, 11, 3]), 'RowBergWozzeckPassacaglia': ('Berg', None, 'Wozzeck, Act I, Scene 4 "Passacaglia"', [3, 11, 7, 1, 0, 6, 4, 10, 9, 5, 8, 2]), 'RowWebernOp18No1': ('Webern', 'Op. 18, No. 1', '"Schatzerl Klein"', [0, 11, 5, 8, 10, 9, 3, 4, 1, 7, 2, 6]), 'RowWebernOp18No2': ('Webern', 'Op. 18, No. 2', '"Erlosung"', [6, 9, 5, 8, 4, 7, 3, 11, 2, 10, 1, 0]), 'RowWebernOp18No3': ('Webern', 'Op. 18, No. 3', '"Ave, Regina Coelorum"', [4, 3, 7, 6, 5, 11, 10, 2, 1, 0, 9, 8]), 'RowSchoenbergOp42': ('Schoenberg', 'Op. 42', 'Concerto For Piano And Orchestra', [3, 10, 2, 5, 4, 0, 6, 8, 1, 9, 11, 7]), 'RowSchoenbergOp48No3': ('Schoenberg', 'Op. 48', 'Three Songs, No, 3, "Madchenlied"', [1, 7, 9, 11, 3, 5, 10, 6, 4, 0, 8, 2]), 'RowSchoenbergOp37': ('Schoenberg', 'Op. 37', 'Fourth String Quartet', [2, 1, 9, 10, 5, 3, 4, 0, 8, 7, 6, 11]), 'RowSchoenbergOp36': ('Schoenberg', 'Op. 36', 'Concerto for Violin and Orchestra', [9, 10, 3, 11, 4, 6, 0, 1, 7, 8, 2, 5]), 'RowSchoenbergOp34': ('Schoenberg', 'Op. 34', 'Accompaniment to a Film Scene', [3, 6, 2, 4, 1, 0, 9, 11, 10, 8, 5, 7]), 'RowBergChamberConcerto': ('Berg', None, 'Chamber Concerto', [11, 7, 5, 9, 2, 3, 6, 8, 0, 1, 4, 10]), 'RowSchoenbergOp32': ('Schoenberg', 'Op. 32', 'Von Heute Auf Morgen', [2, 3, 9, 1, 11, 5, 8, 7, 4, 0, 10, 6]), 'RowSchoenbergOp31': ('Schoenberg', 'Op. 31', 'Variations for Orchestra', [10, 4, 6, 3, 5, 9, 2, 1, 7, 8, 11, 0]), 'RowSchoenbergOp30': ('Schoenberg', 'Op. 30', 'Third String Quartet', [7, 4, 3, 9, 0, 5, 6, 11, 10, 1, 8, 2]), 'RowBergLyricSuite': ('Berg', None, 'Lyric Suite Primary Row', [5, 4, 0, 9, 7, 2, 8, 1, 3, 6, 10, 11]), 'RowSchoenbergOp41': ('Schoenberg', 'Op. 41', 'Ode To Napoleon', [1, 0, 4, 5, 9, 8, 3, 2, 6, 7, 11, 10]), 'RowWebernOp17No3': ('Webern', 'Op. 17, No. 3', '"Heiland, Unsere Missetaten..."', [8, 5, 4, 3, 7, 6, 0, 1, 2, 11, 10, 9]), 'RowWebernOp17No2': ('Webern', 'Op. 17, No. 2', '"Liebste Jungfrau"', [1, 0, 11, 7, 8, 2, 3, 6, 5, 4, 9, 10])}
 
 #-------------------------------------------------------------------------------
 class ToneRow(stream.Stream):
@@ -104,7 +107,7 @@ class ToneRow(stream.Stream):
     def pitches(self):
         
         '''
-        Convenience method showing the pitch classes of a serial.ToneRow object as a list.
+        Convenience function showing the pitch classes of a :class:`~music21.serial.ToneRow` as a list.
         
         >>> from music21 import *
         >>> L = [5*i for i in range(0,12)]
@@ -123,7 +126,7 @@ class ToneRow(stream.Stream):
     def noteNames(self):
         
         '''
-        Convenience method showing the note names of a serial.ToneRow object as a list.
+        Convenience function showing the note names of a :class:`~music21.serial.ToneRow` as a list.
         
         >>> from music21 import *
         >>> chromatic = serial.pcToToneRow(range(0,12))
@@ -141,8 +144,8 @@ class ToneRow(stream.Stream):
     def isTwelveToneRow(self):
         
         '''
-        Describes whether or not a serial.ToneRow object constitutes a twelve-tone row. Note that a
-        serial.TwelveToneRow object might not be a twelve-tone row.
+        Describes whether or not a :class:`~music21.serial.ToneRow` constitutes a twelve-tone row. Note that a
+        :class:`~music21.serial.TwelveToneRow` object might not be a twelve-tone row.
         
         >>> from music21 import *
         >>> serial.pcToToneRow(range(0,12)).isTwelveToneRow()
@@ -159,7 +162,7 @@ class ToneRow(stream.Stream):
             return False
         else:
             temp = True
-            for i in range(0,11):
+            for i in range(0,12):
                 if i not in pitchList:
                     temp = False
             return temp
@@ -167,8 +170,8 @@ class ToneRow(stream.Stream):
     def makeTwelveToneRow(self):
         
         '''
-        Convenience function returning a music21.TwelveToneRow object with the same pitches.
-        Note that the TwelveToneRow object may not be a twelve tone row.
+        Convenience function returning a :class:`~music21.serial.TwelveToneRow` with the same pitches.
+        Note that a :class:`~music21.serial.ToneRow` may be created without being a true twelve tone row.
         
         >>> from music21 import *
         >>> a = serial.pcToToneRow(range(0,11))
@@ -224,7 +227,7 @@ class ToneRow(stream.Stream):
         
         '''
         
-        Returns the string of intervals between consecutive pitch classes of a serial.ToneRow object.
+        Returns the string of intervals between consecutive pitch classes of a :class:`~music21.serial.ToneRow`.
         'T' = 10, 'E' = 11.
         
         >>> from music21 import *
@@ -254,11 +257,13 @@ class ToneRow(stream.Stream):
         
         '''
         
-        Returns a serial.ToneRow object giving a transformation of a tone row.
-        Admissible transformations are 'P' (prime), 'I' (inversion),
-        'R' (retrograde), and 'RI' (retrograde inversion). Note that in this convention, 
-        the transformations P3 and I3 start on the pitch class 3, and the transformations
-        R3 and RI3 end on the pitch class 3.
+        Returns a :class:`~music21.serial.ToneRow` giving a transformation of a tone row.
+        Admissible transformationTypes are 'P' (prime), 'I' (inversion),
+        'R' (retrograde), and 'RI' (retrograde inversion).
+        
+        In the "zero-centered" convention, 
+        the transformations Pn and In start on the pitch class n, and the transformations
+        Rn and RIn end on the pitch class n.
        
         >>> from music21 import *
         >>> chromatic = serial.pcToToneRow(range(0,12))
@@ -270,7 +275,7 @@ class ToneRow(stream.Stream):
         >>> chromaticI6 = chromatic.zeroCenteredTransformation('I',6)
         >>> chromaticI6.pitches()
         [6, 5, 4, 3, 2, 1, 0, 11, 10, 9, 8, 7]
-        >>> schoenberg = serial.pcToToneRow(serial.RowSchoenbergOp26().row)
+        >>> schoenberg = serial.getHistoricalRowByName('RowSchoenbergOp26')
         >>> schoenberg.pitches()
         [3, 7, 9, 11, 1, 0, 10, 2, 4, 6, 8, 5]
         >>> schoenbergR8 = schoenberg.zeroCenteredTransformation('R',8)
@@ -316,26 +321,28 @@ class ToneRow(stream.Stream):
         
         '''
         
-        Returns a serial.ToneRow object giving a transformation of a tone row.
+        Returns a :class:`~music21.serial.ToneRow` giving a transformation of a tone row.
         Admissible transformations are 'T' (transposition), 'I' (inversion),
-        'R' (retrograde), and 'RI' (retrograde inversion). Note that in this convention,
-        which is less common than the 'zero-centered' convention, the original row is not
-        transposed to start on the pitch class 0. Thus, the transformation T3 transposes
-        the original row by 3 semitones, and the transformations I3, R3, and RI3 first
+        'R' (retrograde), and 'RI' (retrograde inversion).
+        
+        In the "original-centered" convention,
+        which is less common than the "zero-centered" convention, the original row is not initially
+        transposed to start on the pitch class 0. Thus, the transformation Tn transposes
+        the original row up by n semitones, and the transformations In, Rn, and RIn first
         transform the row appropriately (without transposition), then transpose the resulting
-        row by 3 semitones.
+        row by n semitones.
        
         >>> from music21 import *
         >>> chromatic = serial.pcToToneRow(range(0,12))
         >>> chromatic.pitches()
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-        >>> chromaticP3 = chromatic.originalCenteredTransformation('P',3)
+        >>> chromaticP3 = chromatic.originalCenteredTransformation('T',3)
         >>> chromaticP3.pitches()
         [3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2]
         >>> chromaticI6 = chromatic.originalCenteredTransformation('I',6)
         >>> chromaticI6.pitches()
         [6, 5, 4, 3, 2, 1, 0, 11, 10, 9, 8, 7]
-        >>> schoenberg = serial.pcToToneRow(serial.RowSchoenbergOp26().row)
+        >>> schoenberg = serial.getHistoricalRowByName('RowSchoenbergOp26')
         >>> schoenberg.pitches()
         [3, 7, 9, 11, 1, 0, 10, 2, 4, 6, 8, 5]
         >>> schoenbergR8 = schoenberg.originalCenteredTransformation('R',8)
@@ -352,6 +359,8 @@ class ToneRow(stream.Stream):
         newIndex = (firstPitch + index) % 12
         if transformationType == 'T':
             return self.zeroCenteredTransformation('P', newIndex)
+        if transformationType == 'P':
+            raise SerialException("Invalid Transformation Type.")
         else:
             return self.zeroCenteredTransformation(transformationType, newIndex)
         
@@ -359,17 +368,19 @@ class ToneRow(stream.Stream):
     def findZeroCenteredTransformations(self, otherRow):
         ''' 
         
-        Gives the list of zero-centered serial transformations taking one tone row
+        Gives the list of zero-centered serial transformations taking one :class:`~music21.serial.ToneRow`
         to another, the second specified in the argument. Each transformation is given as a
         tuple of the transformation type and index.
+        
+        See :meth:`~music21.serial.zeroCenteredTransformation` for an explanation of this convention.
         
         >>> from music21 import *
         >>> chromatic = serial.pcToToneRow([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1])
         >>> reversechromatic = serial.pcToToneRow([8, 7, 6, 5, 4, 3, 2, 1, 0, 11, 10, 9])
         >>> chromatic.findZeroCenteredTransformations(reversechromatic)
         [('I', 8), ('R', 9)]
-        >>> schoenberg25 = serial.pcToToneRow(serial.RowSchoenbergOp25.row)
-        >>> schoenberg26 = serial.pcToToneRow(serial.RowSchoenbergOp26.row)
+        >>> schoenberg25 = serial.getHistoricalRowByName('RowSchoenbergOp25')
+        >>> schoenberg26 = serial.pcToToneRow(serial.getHistoricalRowByName('RowSchoenbergOp26').row)
         >>> schoenberg25.findZeroCenteredTransformations(schoenberg26)
         []
         >>> schoenberg26.findZeroCenteredTransformations(schoenberg26.zeroCenteredTransformation('RI',8))
@@ -402,17 +413,19 @@ class ToneRow(stream.Stream):
     def findOriginalCenteredTransformations(self, otherRow):
         ''' 
         
-        Gives the list of original-centered serial transformations taking one tone row
+        Gives the list of original-centered serial transformations taking one :class:`~music21.serial.ToneRow`
         to another, the second specified in the argument. Each transformation is given as a tuple
         of the transformation type and index.
+        
+        See :meth:`~music21.serial.originalCenteredTransformation` for an explanation of this convention.
         
         >>> from music21 import *
         >>> chromatic = serial.pcToToneRow([2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 0, 1])
         >>> reversechromatic = serial.pcToToneRow([8, 7, 6, 5, 4, 3, 2, 1, 0, 'B', 'A', 9])
         >>> chromatic.findOriginalCenteredTransformations(reversechromatic)
         [('I', 6), ('R', 7)]
-        >>> schoenberg25 = serial.pcToToneRow(serial.RowSchoenbergOp25.row)
-        >>> schoenberg26 = serial.pcToToneRow(serial.RowSchoenbergOp26.row)
+        >>> schoenberg25 = serial.getHistoricalRowByName('RowSchoenbergOp25')
+        >>> schoenberg26 = serial.getHistoricalRowByName('RowSchoenbergOp26')
         >>> schoenberg25.findOriginalCenteredTransformations(schoenberg26)
         []
         >>> schoenberg26.findOriginalCenteredTransformations(schoenberg26.originalCenteredTransformation('RI',8))
@@ -428,8 +441,8 @@ class ToneRow(stream.Stream):
         newFirstPitch = otherRowPitches[0]
         newLastPitch = otherRowPitches[-1]
         
-        if otherRowPitches == self.originalCenteredTransformation('P',(newFirstPitch - oldFirstPitch) % 12).pitches():
-            transformation = 'P', (newFirstPitch - oldFirstPitch) % 12
+        if otherRowPitches == self.originalCenteredTransformation('T',(newFirstPitch - oldFirstPitch) % 12).pitches():
+            transformation = 'T', (newFirstPitch - oldFirstPitch) % 12
             transformationList.append(transformation)
         if otherRowPitches == self.originalCenteredTransformation('I',(newFirstPitch - oldFirstPitch) % 12).pitches():
             transformation = 'I', (newFirstPitch - oldFirstPitch) % 12
@@ -472,12 +485,12 @@ class TwelveToneRow(ToneRow):
         Returns a :class:`~music21.serial.TwelveToneMatrix` object for the row.  That object can just be printed (or displayed via .show())
         
         >>> from music21 import *
-        >>> src = serial.RowSchoenbergOp37()
+        >>> src = serial.getHistoricalRowByName('RowSchoenbergOp37')
         >>> [p.name for p in src]
         ['D', 'C#', 'A', 'B-', 'F', 'E-', 'E', 'C', 'G#', 'G', 'F#', 'B']
         >>> len(src)
         12
-        >>> s37 = serial.RowSchoenbergOp37().matrix()
+        >>> s37 = serial.getHistoricalRowByName('RowSchoenbergOp37').matrix()
         >>> print s37
           0  B  7  8  3  1  2  A  6  5  4  9
           1  0  8  9  4  2  3  B  7  6  5  A
@@ -514,11 +527,33 @@ class TwelveToneRow(ToneRow):
 
         return matrixObj
     
+    def findHistorical(self):
+        
+        '''
+        Checks if a given :class:`music21.serial.TwelveToneRow` is the same as any of the historical
+        twelve-tone rows stored by music21: see :func:`music21.serial.getHistoricalRowByName`.
+        Returns a list of the historical rows to which the input row is identical.
+        
+        >>> from music21 import *
+        >>> row = serial.pcToToneRow([2, 3, 9, 1, 11, 5, 8, 7, 4, 0, 10, 6])
+        >>> row.findHistorical()
+        ['RowSchoenbergOp32']
+        >>> chromatic = serial.pcToToneRow(range(0,12))
+        >>> chromatic.findHistorical()
+        []
+        
+        '''
+        
+        samerows = []
+        for historicalrow in historicalDict:
+            if self.isSameRow(getHistoricalRowByName(historicalrow)):
+                samerows.append(historicalrow)
+        return samerows
                     
     def isAllInterval(self):
         
         '''
-        Describes whether or not a twelve-tone row is an all-interval row.
+        Describes whether or not a :class:`~music21.serial.TwelveToneRow` is an all-interval row.
         
         >>> from music21 import *
         >>> chromatic = serial.pcToToneRow(range(0,12))
@@ -526,22 +561,26 @@ class TwelveToneRow(ToneRow):
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
         >>> chromatic.isAllInterval()
         False
-        >>> bergLyric = serial.pcToToneRow(serial.RowBergLyricSuite().row)
+        >>> bergLyric = serial.getHistoricalRowByName('RowBergLyricSuite')
         >>> bergLyric.pitches()
         [5, 4, 0, 9, 7, 2, 8, 1, 3, 6, 10, 11]
         >>> bergLyric.isAllInterval()
         True
         '''
-        tempAllInterval = True
-        intervalString = self.getIntervalsAsString()
-        for i in range(1,10):
-            if str(i) not in intervalString:
+        
+        if self.isTwelveToneRow() == False:
+            raise SerialException("An all-interval row must be a twelve-tone row.")
+        else:
+            tempAllInterval = True
+            intervalString = self.getIntervalsAsString()
+            for i in range(1,10):
+                if str(i) not in intervalString:
+                    tempAllInterval = False
+            if 'T' not in intervalString:
                 tempAllInterval = False
-        if 'T' not in intervalString:
-            tempAllInterval = False
-        if 'E' not in intervalString:
-            tempAllInterval = False
-        return tempAllInterval
+            if 'E' not in intervalString:
+                tempAllInterval = False
+            return tempAllInterval
     
     def getLinkClassification(self):
         
@@ -554,7 +593,7 @@ class TwelveToneRow(ToneRow):
         Named for John Link who discovered them.
         
         >>> from music21 import *
-        >>> bergLyric = serial.pcToToneRow(serial.RowBergLyricSuite().row)
+        >>> bergLyric = serial.getHistoricalRowByName('RowBergLyricSuite')
         >>> bergLyric.pitches()
         [5, 4, 0, 9, 7, 2, 8, 1, 3, 6, 10, 11]
         >>> bergLyric.isAllInterval()
@@ -581,28 +620,30 @@ class TwelveToneRow(ToneRow):
 
         numchords = len(fullLinkIntervals)
         
-        rowchecklist = [self, self.zeroCenteredTransformation('I',0), self.zeroCenteredTransformation('R',0), self.zeroCenteredTransformation('RI',0)]
-        
-        specialintervals = []
-        classification = None
-        for row in rowchecklist:
-            intervals = row.getIntervalsAsString()
-            for i in range(0,numchords):
-                if fullLinkIntervals[i] == intervals:
-                    classification = linkClassification[i]
-                    specialintervals.append(specialLinkIntervals[i])
-        if specialintervals == []:
-            return None, []
-        else:
-            return classification, specialintervals
+        if self.isTwelveToneRow() == False:
+            raise SerialException("A Link Chord must be a twelve-tone row.")
+        else: 
+            rowchecklist = [self, self.zeroCenteredTransformation('I',0), self.zeroCenteredTransformation('R',0), self.zeroCenteredTransformation('RI',0)]
+            specialintervals = []
+            classification = None
+            for row in rowchecklist:
+                intervals = row.getIntervalsAsString()
+                for i in range(0,numchords):
+                    if fullLinkIntervals[i] == intervals:
+                        classification = linkClassification[i]
+                        specialintervals.append(specialLinkIntervals[i])
+            if specialintervals == []:
+                return None, []
+            else:
+                return classification, specialintervals
 
     def isLinkChord(self):
         
         '''
-        Describes whether or not a twelve-tone row is a Link Chord.
+        Describes whether or not a :class:`~music21.serial.TwelveToneRow` is a Link Chord.
         
         >>> from music21 import *
-        >>> bergLyric = serial.pcToToneRow(serial.RowBergLyricSuite().row)
+        >>> bergLyric = serial.getHistoricalRowByName('RowBergLyricSuite')
         >>> bergLyric.pitches()
         [5, 4, 0, 9, 7, 2, 8, 1, 3, 6, 10, 11]
         >>> bergLyric.isAllInterval()
@@ -627,14 +668,16 @@ class TwelveToneRow(ToneRow):
     def areCombinatorial(self, transType1, index1, transType2, index2, convention):
         
         '''
-        Describes whether or not two transformations, with one of the zero-centered
-        and original-centered conventions specified (as in the zeroCenteredRowTransformation
-        and originalCenteredRowTransformation methods), of a twelve-tone row are combinatorial.
+        Describes whether or not two transformations of a twelve-tone row are combinatorial.
+        
         The first and second arguments describe one transformation, while the third and fourth
-        describe another.
+        describe another. One of the zero-centered or original-centered conventions for tone row
+        transformations must be specified in the last argument; see 
+        :meth:`~music21.serial.zeroCenteredTransformation` and 
+        :meth:`~music21.serial.originalCenteredTransformation` explanations of these conventions.
         
         >>> from music21 import *
-        >>> moses = serial.pcToToneRow(serial.RowSchoenbergMosesAron.row)
+        >>> moses = serial.getHistoricalRowByName('RowSchoenbergMosesAron')
         >>> moses.pitches()
         [9, 10, 4, 2, 3, 1, 7, 5, 6, 8, 11, 0]
         >>> moses.areCombinatorial('P', 1, 'I', 4, 'zero')
@@ -643,57 +686,56 @@ class TwelveToneRow(ToneRow):
         False
         '''
         
-        if convention == 'zero':
-            testRow = []
-            trans1 = self.zeroCenteredTransformation(transType1, index1)
-            pitches1 = trans1.pitches()
-            trans2 = self.zeroCenteredTransformation(transType2, index2)
-            pitches2 = trans2.pitches()
-            for i in range(0,6):
-                testRow.append(pitches1[i])
-            for i in range(0,6):
-                testRow.append(pitches2[i])
-            return pcToToneRow(testRow).isTwelveToneRow()
-        if convention == 'original':
-            testRow = []
-            trans1 = self.originalCenteredTransformation(transType1, index1)
-            pitches1 = trans1.pitches()
-            trans2 = self.originalCenteredTransformation(transType2, index2)
-            pitches2 = trans2.pitches()
-            for i in range(0,6):
-                testRow.append(pitches1[i])
-            for i in range(0,6):
-                testRow.append(pitches2[6+i])
-            return pcToToneRow(testRow).isTwelveToneRow()
+        if self.isTwelveToneRow() == False:
+            raise SerialException("Combinatoriality applies only to twelve-tone rows.")
         else:
-            raise SerialException("Invalid convention - choose 'zero' or 'original'.")
+            if convention == 'zero':
+                testRow = []
+                trans1 = self.zeroCenteredTransformation(transType1, index1)
+                pitches1 = trans1.pitches()
+                trans2 = self.zeroCenteredTransformation(transType2, index2)
+                pitches2 = trans2.pitches()
+                for i in range(0,6):
+                    testRow.append(pitches1[i])
+                for i in range(0,6):
+                    testRow.append(pitches2[i])
+                return pcToToneRow(testRow).isTwelveToneRow()
+            elif convention == 'original':
+                testRow = []
+                trans1 = self.originalCenteredTransformation(transType1, index1)
+                pitches1 = trans1.pitches()
+                trans2 = self.originalCenteredTransformation(transType2, index2)
+                pitches2 = trans2.pitches()
+                for i in range(0,6):
+                    testRow.append(pitches1[i])
+                for i in range(0,6):
+                    testRow.append(pitches2[6+i])
+                return pcToToneRow(testRow).isTwelveToneRow()
+            else:
+                raise SerialException("Invalid convention - choose 'zero' or 'original'.")
 
 # ------- parsing functions for atonal music -------
 
-# add defaults
-# add hyperlinks
-# first describe what function , then explain arguments, then explain what is returned.
-# caps on things
-# doc order
 
-def getContiguousSegmentsOfLength(inputPart, length, reps, chords = 'skipChords'):
+def getContiguousSegmentsOfLength(inputPart, length, reps = 'skipConsecutive', chords = 'skipChords'):
     
     '''
     
-    Finds contiguous segments of notes in a stream,
-    where the number of notes in the segment is specified. 
+    Finds contiguous segments of notes in a :class:`~music21.stream.Stream`
+    where the desired number of notes in the segment is specified. 
     
-    The inputPart must be a stream.Part object or otherwise a stream object with at most one part.
+    The inputPart must be a :class:`~music21.stream.Part` or otherwise a 
+    :class:`~music21.stream.Stream` with at most one part.
     The length is an integer specifying the desired number of notes in each contiguous segment.
     
-    The reps argument specifies how repeated pitch classes are dealt with. 
-    It may be set to 'skipConsecutive', 'rowsOnly', or 'includeAll'.
+    The "reps" argument specifies how repeated pitch classes are dealt with. 
+    It may be set to 'skipConsecutive' (default), 'rowsOnly', or 'includeAll'.
     The first setting treats immediate repetitions of pitch classes as one instance of the
     same pitch class. The second only finds segments of consecutive pitch classes
     which are distinct, i.e. tone rows. The third includes all repeated pitches.
     
-    The 'chord' argument specifies how chords are dealt with. At the present time, it must be 
-    set to 'skipChords', which ignores any segment containing a chord.
+    The "chords" argument specifies how chords are dealt with. At the present time, it must be 
+    set to 'skipChords' (default), which ignores any segment containing a chord.
     
     The returned list gives all contiguous segments with the desired number of notes subject
     to the specified constraints on repetitions and chords. Each entry of the list is a tuple of a
@@ -725,12 +767,17 @@ def getContiguousSegmentsOfLength(inputPart, length, reps, chords = 'skipChords'
     >>> s.append(n7)
     >>> s = s.makeMeasures()
     >>> s.makeTies()
+    >>> #_DOCS_SHOW s.show()
+    
+    .. image:: images/serial-01.png
+        :width: 500
+        
     >>> serial.getContiguousSegmentsOfLength(s, 3, 'skipConsecutive', 'skipChords')
     [([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 3), 
     ([<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>], 3)]
-    >>> serial.getContiguousSegmentsOfLength(s, 3, 'rowsOnly', 'skipChords')
+    >>> serial.getContiguousSegmentsOfLength(s, 3, 'rowsOnly')
     [([<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>], 4)]
-    >>> serial.getContiguousSegmentsOfLength(s, 3, 'includeAll', 'skipChords')
+    >>> serial.getContiguousSegmentsOfLength(s, 3, 'includeAll')
     [([<music21.note.Note G>, <music21.note.Note G>, <music21.note.Note A>], 3), 
     ([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note A>], 3), 
     ([<music21.note.Note A>, <music21.note.Note A>, <music21.note.Note B>], 3), 
@@ -758,9 +805,6 @@ def getContiguousSegmentsOfLength(inputPart, length, reps, chords = 'skipChords'
     ([<music21.note.Note F>, <music21.note.Note E>, <music21.note.Note G>], 1)]
 
     '''
-    
-    #reps settings: skipconsecutive, rowsonly, includeall
-    #chords settings: skipchords, readfrombottom, readfromtop
     
     listOfPitchLists = []
     currentPitchLists = []
@@ -796,19 +840,6 @@ def getContiguousSegmentsOfLength(inputPart, length, reps, chords = 'skipChords'
                                                          pitchList[0].measureNumber))
                     elif len(n.pitches) > 1:
                             pitchList = []
-# --- below code doesn't work properly, but also seems to me like it would be the least useful
-# --- thing to do with repeated pitches
-#        elif reps == 'skipall':
-#            for m in measures:
-#                for n in m.flat.notes:
-#                    if len(n.pitches) == 1 and n not in pitchList:
-#                        pitchList.append(n)
-#                        if len(pitchList) == length + 1:
-#                            pitchList.remove(pitchList[0])
-#                        if len(pitchList) == length:
-#                            listOfPitchLists.append((list(pitchList), pitchList[0].measureNumber))
-#                    elif len(n.pitches) > 1:
-#                        pitchList = []
         elif reps == 'rowsOnly':
             for m in measures:
                 for n in m.flat.notes:
@@ -851,21 +882,25 @@ def getContiguousSegmentsOfLength(inputPart, length, reps, chords = 'skipChords'
     return listOfPitchLists
     
 
-#chordify - search multiple parts simultaneously
-
-
-def findSegments(inputStream, segmentlist, reps, chords):
+def findSegments(inputStream, segmentList, reps = 'skipConsecutive', chords = 'skipChords'):
     
     '''
-    Given a stream object and list of contiguous segments of pitch classes (each given as a list), returns a list of all
-    instances of the segment in the stream subject to the constraints on repetitions of pitches
-    and how chords are dealt with as described in getContinuousSegmentsOfLength. Each
-    instance is given as a tuple of the segment of notes, the number of the measure in which it appears, and,
-    if the stream object contains parts, the part in which it appears (where a lower number
-    denotes a higher part).
+    Finds all instances of given contiguous segments of pitch classes within a :class:`~music21.stream.Stream`.
+    
+    The inputStream may be any :class:`~music21.stream.Stream`, and the segmentList is a list of contiguous segments to
+    be searched for, each segment being given as a list of pitch classes. The "reps" and "chords" settings specify how
+    repeated pitches and chords, respectively, are handled; the possible settings are the same as those in
+    :func:`~music21.serial.getContiguousSegmentsOfLength`.
+    
+    The output is a list of instances of the segments in the segmentList, subject to the constraints specified in the last
+    two arguments. Each instance is given as a tuple of a list of notes in the segment, the measure number on which
+    the segment begins, and, if applicable, the number of the part in which the segment appears. Part numbering starts with 1
+    in the top line, 2 in the next-highest line, and so forth.
     
     >>> from music21 import *
     >>> part = stream.Part()
+    >>> sig = meter.TimeSignature('2/4')
+    >>> part.append(sig)
     >>> n1 = note.Note('e4')
     >>> n1.quarterLength = 6
     >>> part.append(n1)
@@ -888,23 +923,36 @@ def findSegments(inputStream, segmentlist, reps, chords):
     >>> n7.quarterLength = 1
     >>> part.append(n7)
     >>> newpart = part.makeMeasures()
-    >>> newpart.makeTies()
-    >>> findSegments(newpart, [[7, 9, 11]], 'skipConsecutive', 'skipChords')
-    [([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 3)]
-    >>> findSegments(newpart, [[7, 9, 11], [9, 11, 0]], 'skipConsecutive', 'skipChords')
-    [([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 3), 
-    ([<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>], 3)]
+    >>> newpart.makeTies() #newpart is displayed below; each part of s is a copy of newpart.
+    >>> serial.findSegments(newpart, [[7, 9, 11]], 'skipConsecutive', 'skipChords')
+    [([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 5)]
+    >>> serial.findSegments(newpart, [[7, 9, 11], [9, 11, 0]])
+    [([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 5), 
+    ([<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>], 6)]
+    
+    One can also search for segments of different lengths, simultaneously. Below, 'B' refers to the
+    pitch class 11, which only coincidentally is the same as that of the note B.
+    
+    >>> serial.findSegments(newpart, [[7, 9, 11], ['B', 0]], 'skipConsecutive', 'skipChords')
+    [([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 5), 
+    ([<music21.note.Note B>, <music21.note.Note C>], 9)]
+    
     >>> s = stream.Stream()
     >>> s.repeatAppend(newpart, 2)
+    >>> #_DOCS_SHOW s.show() 
+    
+    .. image:: images/serial-02.png
+        :width: 500
+    
     >>> findSegments(s, [[7, -3, 11]], 'skipConsecutive', 'skipChords')
-    [([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 3, 1), 
-    ([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 3, 2)]
+    [([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 5, 1), 
+    ([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 5, 2)]
     
     __OMIT_FROM_DOCS__
     
     >>> findSegments(newpart, [[7, 9, 11], [9, 11, 0], [7, -3, 11]], 'skipConsecutive', 'skipChords')
-    [([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 3), 
-    ([<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>], 3)]
+    [([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 5), 
+    ([<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>], 6)]
     
     '''
     
@@ -915,7 +963,7 @@ def findSegments(inputStream, segmentlist, reps, chords):
     numparts = len(parts)
          
     if numparts == 0:
-        for segment in segmentlist:
+        for segment in segmentList:
             used = False
             for usedsegment in donealready:
                 segmentrow = pcToToneRow(segment)
@@ -923,6 +971,7 @@ def findSegments(inputStream, segmentlist, reps, chords):
                     if segmentrow.isSameRow(pcToToneRow(usedsegment)) == True:
                         used = True
             if used == False:
+                segment = pcToToneRow(segment).pitches() #to deal with things like 'A' and 'B' as pitches
                 donealready.append(segment)
                 length = len(segment)
                 if length in contigdict:
@@ -940,7 +989,7 @@ def findSegments(inputStream, segmentlist, reps, chords):
                     if samemod12 == True:
                         segs.append((contiguousseg[0], contiguousseg[1]))
     else:
-        for segment in segmentlist:
+        for segment in segmentList:
             used = False
             for usedsegment in donealready:
                 segmentrow = pcToToneRow(segment)
@@ -948,6 +997,7 @@ def findSegments(inputStream, segmentlist, reps, chords):
                     if segmentrow.isSameRow(pcToToneRow(usedsegment)) == True:
                         used = True
             if used == False:
+                segment = pcToToneRow(segment).pitches()
                 donealready.append(segment)
                 length = len(segment)
                 if length in contigdict:
@@ -973,15 +1023,20 @@ def findSegments(inputStream, segmentlist, reps, chords):
                         
     return segs
 
-def findTransposedSegments(inputStream, segmentlist, reps, chords):
+def findTransposedSegments(inputStream, segmentlist, reps = 'skipConsecutive', chords = 'skipChords'):
     
     '''
-    Given a stream object and list of segments of pitch classes (each given as a list), returns a list of all
-    instances of the segment and its transpositions in the stream subject to the constraints on repetitions of pitches
-    and how chords are dealt with as described in getContinuousSegmentsOfLength. Each
-    instance is given as a tuple of the segment of notes, the number of the measure in which it appears, and,
-    if the stream object contains parts, the part in which it appears (where a lower number
-    denotes a higher part).
+    Finds all instances of given contiguous segments, with transpositions, of pitch classes within a :class:`~music21.stream.Stream`.
+    
+    The inputStream may be any :class:`~music21.stream.Stream`, and the segmentList is a list of contiguous segments to
+    be searched for, each segment being given as a list of pitch classes. The "reps" and "chords" settings specify how
+    repeated pitches and chords, respectively, are handled; the possible settings are the same as those in
+    :func:`~music21.serial.getContiguousSegmentsOfLength`.
+    
+    The output is a list of instances of the segments in the segmentList, subject to the constraints specified in the last
+    two arguments. Each instance is given as a tuple of a list of notes in the segment, the measure number on which
+    the segment begins, and, if applicable, the number of the part in which the segment appears. Part numbering starts with 1
+    in the top line, 2 in the next-highest line, and so forth.
     
     >>> from music21 import *
     >>> part = stream.Part()
@@ -1008,18 +1063,28 @@ def findTransposedSegments(inputStream, segmentlist, reps, chords):
     >>> part.append(n7)
     >>> newpart = part.makeMeasures()
     >>> newpart.makeTies()
+    >>> #_DOCS_SHOW newpart.show()
+    
+    .. image:: images/serial-01.png
+        :width: 500
+    
     >>> findTransposedSegments(newpart, [[0, 1]], 'skipConsecutive', 'skipChords')
-    [([<music21.note.Note E>, <music21.note.Note F>], 1), ([<music21.note.Note B>, <music21.note.Note C>], 5)]
+    [([<music21.note.Note E>, <music21.note.Note F>], 1), 
+    ([<music21.note.Note B>, <music21.note.Note C>], 5)]
     >>> s = stream.Stream()
-    >>> s.repeatAppend(newpart, 2)
-    >>> findTransposedSegments(s, [[12, 2]], 'skipConsecutive', 'skipChords')
-    [([<music21.note.Note G>, <music21.note.Note A>], 3, 1), ([<music21.note.Note A>, <music21.note.Note B>], 3, 1), 
-    ([<music21.note.Note G>, <music21.note.Note A>], 3, 2), ([<music21.note.Note A>, <music21.note.Note B>], 3, 2)]
+    >>> s.repeatAppend(newpart, 2) #s has two parts, each of which is a copy of newpart.
+    >>> findTransposedSegments(s, [[12, 2]])
+    [([<music21.note.Note G>, <music21.note.Note A>], 3, 1), 
+    ([<music21.note.Note A>, <music21.note.Note B>], 3, 1), 
+    ([<music21.note.Note G>, <music21.note.Note A>], 3, 2), 
+    ([<music21.note.Note A>, <music21.note.Note B>], 3, 2)]
     
     __OMIT_FROM_DOCS__
     
     >>> findTransposedSegments(newpart, [[0, 1], [12, 13]], 'skipConsecutive', 'skipChords')
     [([<music21.note.Note E>, <music21.note.Note F>], 1), ([<music21.note.Note B>, <music21.note.Note C>], 5)]
+    >>> findTransposedSegments(newpart, [[9, 'A', 'B']], 'rowsOnly', 'skipChords')
+    []
     
     '''
     
@@ -1070,15 +1135,24 @@ def findTransposedSegments(inputStream, segmentlist, reps, chords):
     return segs
 
 
-def findTransformedSegments(inputStream, segmentlist, reps, chords, convention):
+def findTransformedSegments(inputStream, segmentList, reps = 'skipConsecutive', chords = 'skipChords', convention = 'original'):
     '''
-    Given a stream object and list of segments of pitch classes (each given as a list), returns a list of all
-    instances of the segment and its transformations in the stream subject to the constraints on repetitions of pitches,
-    how chords are dealt with as described in getContinuousSegmentsOfLength, and a transformation index convention. 
-    Each instance is given as a tuple of the segment of notes, the transformation of the original row,
-    the number of the measure in which it appears, and,
-    if the stream object contains parts, the part in which it appears (where a lower number
-    denotes a higher part).
+    Finds all instances of given contiguous segments of pitch classes, with serial transformations,
+    within a :class:`~music21.stream.Stream`.
+    
+    The inputStream may be any :class:`~music21.stream.Stream`, and the segmentList is a list of contiguous segments to
+    be searched for, each segment being given as a list of pitch classes. The "reps" and "chords" settings specify how
+    repeated pitches and chords, respectively, are handled; the possible settings are the same as those in
+    :func:`~music21.serial.getContiguousSegmentsOfLength`. The convention for serial transformations must be specified to either
+    'zero' or 'original', as described in :meth:`~music21.serial.zeroCenteredTransformation` and
+    :func:`~music21.serial.originalCenteredTransformation` - the default setting is 'original', as to relate found segments
+    directly to the given segments, without first transposing the given segment to begin on the pitch class 0.
+    
+    The output is a list of instances of the segments in the segmentList, subject to the constraints specified in the last
+    two arguments. Each instance is given as a tuple of a list of notes in the segment, the serial transformation relating
+    the found segment to the original segment, the measure number on which
+    the segment begins, and, if applicable, the number of the part in which the segment appears. Part numbering starts with 1
+    in the top line, 2 in the next-highest line, and so forth.
     
     >>> from music21 import *
     >>> n1 = note.Note('c#4')
@@ -1093,7 +1167,15 @@ def findTransformedSegments(inputStream, segmentlist, reps, chords, convention):
     ...    n.quarterLength = 1
     ...    part.append(n)
     >>> part = part.makeMeasures()
-    >>> serial.findTransformedSegments(part, [[2, 5, 4]], 'rowsOnly', 'skipChords', 'zero')
+    >>> #_DOCS_SHOW part.show()
+    
+    .. image:: images/serial-04.png
+        :width: 150
+        
+    >>> serial.findTransformedSegments(part, [[2, 5, 4]], 'rowsOnly')
+    [([<music21.note.Note C#>, <music21.note.Note E>, <music21.note.Note D#>], [('T', 11)], 1),
+    ([<music21.note.Note F>, <music21.note.Note E>, <music21.note.Note G>], [('RI', 5)], 1)]
+    >>> serial.findTransformedSegments(part, [[2, 5, 4]], 'rowsOnly', convention = 'zero')
     [([<music21.note.Note C#>, <music21.note.Note E>, <music21.note.Note D#>], [('P', 1)], 1), 
     ([<music21.note.Note F>, <music21.note.Note E>, <music21.note.Note G>], [('RI', 7)], 1)]
     
@@ -1102,10 +1184,10 @@ def findTransformedSegments(inputStream, segmentlist, reps, chords, convention):
     
     >>> s = stream.Stream()
     >>> s.repeatAppend(part, 2)
-    >>> serial.findTransformedSegments(s, [[2, -7, 4]], 'skipConsecutive', 'skipChords', 'original')
-    [([<music21.note.Note C#>, <music21.note.Note E>, <music21.note.Note D#>], [('P', 11)], 1, 1), 
+    >>> serial.findTransformedSegments(s, [[2, -7, 4]])
+    [([<music21.note.Note C#>, <music21.note.Note E>, <music21.note.Note D#>], [('T', 11)], 1, 1), 
     ([<music21.note.Note F>, <music21.note.Note E>, <music21.note.Note G>], [('RI', 5)], 1, 1), 
-    ([<music21.note.Note C#>, <music21.note.Note E>, <music21.note.Note D#>], [('P', 11)], 1, 2), 
+    ([<music21.note.Note C#>, <music21.note.Note E>, <music21.note.Note D#>], [('T', 11)], 1, 2), 
     ([<music21.note.Note F>, <music21.note.Note E>, <music21.note.Note G>], [('RI', 5)], 1, 2)]
     '''
     
@@ -1116,7 +1198,7 @@ def findTransformedSegments(inputStream, segmentlist, reps, chords, convention):
     numparts = len(parts)
     
     if numparts == 0:
-        for segment in segmentlist:
+        for segment in segmentList:
             row = pcToToneRow([n for n in segment])
             used = False
             for usedrow in donealready:
@@ -1148,7 +1230,7 @@ def findTransformedSegments(inputStream, segmentlist, reps, chords, convention):
                     raise SerialException("Invalid convention - choose 'zero' or 'original'.")
     
     else:
-        for segment in segmentlist:
+        for segment in segmentList:
             row = pcToToneRow([n for n in segment])
             used = False
             for usedrow in donealready:
@@ -1213,19 +1295,25 @@ def _checkMultisetEquivalence(multiset1, multiset2):
             
 
 
-def findMultisets(inputStream, multisetlist, reps, chords):
-    
+def findMultisets(inputStream, multisetList, reps = 'skipConsecutive', chords = 'skipChords'):
     '''
     
-    Given a stream object and list of (unordered) multisets of pitch classes (each given as a list), 
-    returns a list of all
-    instances of the set in the stream subject to the constraints on repetitions of pitches
-    and how chords are dealt with as described in getContinuousSegmentsOfLength. Note that a multiset
-    is a generalization of a set in which multiple apperances of the same element (in this case, pitch class) 
-    in the multi-set are allowed, hence the use of the list, rather than the set, type. Each
-    instance of the multiset is given as a tuple of the segment of notes, the number of the measure in which it appears, and,
-    if the stream object contains parts, the part in which it appears (where a lower number
-    denotes a higher part).
+    Finds all instances of given multisets of pitch classes within a :class:`~music21.stream.Stream`. A multiset
+    is a generalization of a set, in which the order of the elements in the multiset does not matter, but multiple instances
+    of the same thing (in this case, same pitch class) are treated as distinct elements. Thus, two multisets of pitch classes
+    are considered to be equal if and only if the number of times any given pitch class appears in one multiset is the same as
+    the number of times the pitch class appears in the other multiset.
+
+    The inputStream may be any :class:`~music21.stream.Stream`, and the multisetList is a list of multisets to
+    be searched for, each multiset being given as a list of pitch classes. Note that the order of pitch classes given in a multiset
+    does not matter. The "reps" and "chords" settings specify how
+    repeated pitches and chords, respectively, are handled; the possible settings are the same as those in
+    :func:`~music21.serial.getContiguousSegmentsOfLength`.
+    
+    The output is a list of instances of the multisets in the multisetList, subject to the constraints specified in the last
+    two arguments. Each instance is given as a tuple of a list of notes in the multisets (in the order in which the notes appear),
+    the measure number on which the multiset begins, and, if applicable, the number of the part in which the multiset appears. 
+    Part numbering starts with 1 in the top line, 2 in the next-highest line, and so forth.
     
     >>> from music21 import *
     >>> part = stream.Part()
@@ -1237,6 +1325,11 @@ def findMultisets(inputStream, multisetlist, reps, chords):
     >>> part.append(n2)
     >>> part.append(n1)
     >>> part = part.makeMeasures()
+    >>> #_DOCS_SHOW part.show()
+    
+    .. image:: images/serial-05.png
+        :width: 150
+    
     >>> findMultisets(part, [[5, 4, 4]], 'includeAll', 'skipChords')
     [([<music21.note.Note E>, <music21.note.Note E>, <music21.note.Note F>], 1), 
     ([<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note E>], 2)]
@@ -1245,9 +1338,9 @@ def findMultisets(inputStream, multisetlist, reps, chords):
     
     >>> s = stream.Stream()
     >>> s.repeatAppend(part, 2)
-    >>> findMultisets(part, [[5, 4, 4]], 'rowsOnly', 'skipChords')
+    >>> findMultisets(part, [[5, 4, 4]], 'rowsOnly')
     []
-    >>> findMultisets(part, [[5, 4, 4]], 'skipConsecutive', 'skipChords')
+    >>> findMultisets(part, [[5, 4, 4]])
     [([<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note E>], 1)]
     >>> findMultisets(s, [[-7, 16, 4], [5, 4, 4]], 'includeAll', 'skipChords')
     [([<music21.note.Note E>, <music21.note.Note E>, <music21.note.Note F>], 1, 1), 
@@ -1265,7 +1358,7 @@ def findMultisets(inputStream, multisetlist, reps, chords):
     numparts = len(parts)
     
     if numparts == 0:
-        for multiset in multisetlist:
+        for multiset in multisetList:
             length = len(multiset)
             used = False
             for usedset in donealready:
@@ -1286,7 +1379,7 @@ def findMultisets(inputStream, multisetlist, reps, chords):
                     if _checkMultisetEquivalence(pitchmultiset,multiset) == True:
                         multisets.append((contiguousseg[0], contiguousseg[1]))
     else:
-        for multiset in multisetlist:
+        for multiset in multisetList:
             length = len(multiset)
             used = False
             for usedset in donealready:
@@ -1315,19 +1408,23 @@ def findMultisets(inputStream, multisetlist, reps, chords):
 
     return multisets
 
-def findTransposedMultisets(inputStream, multisetlist, reps, chords):
+def findTransposedMultisets(inputStream, multisetList, reps = 'skipConsecutive', chords = 'skipChords'):
     
     '''
     
-    Given a stream object and list of (unordered) multisets of pitch classes (each given as a list), 
-    returns a list of all
-    instances of the set, with its transpositions in the stream subject to the constraints on repetitions of pitches
-    and how chords are dealt with as described in getContinuousSegmentsOfLength. Note that a multiset
-    is a generalization of a set in which multiple apperances of the same element (in this case, pitch class) 
-    in the multi-set are allowed, hence the use of the list, rather than the set, type. Each
-    instance of the multiset is given as a tuple of the segment of notes, the number of the measure in which it appears, and,
-    if the stream object contains parts, the part in which it appears (where a lower number
-    denotes a higher part).
+    Finds all instances of given multisets of pitch classes, with transpositions, within a :class:`~music21.stream.Stream`. A multiset
+    is a generalization of a set, as described in :meth:`~music21.serial.findMultisets`.
+
+    The inputStream may be any :class:`~music21.stream.Stream`, and the multisetList is a list of multisets to
+    be searched for, each multiset being given as a list of pitch classes. Note that the order of pitch classes given in a multiset
+    does not matter. The "reps" and "chords" settings specify how
+    repeated pitches and chords, respectively, are handled; the possible settings are the same as those in
+    :func:`~music21.serial.getContiguousSegmentsOfLength`.
+    
+    The output is a list of instances of the multisets in the multisetList, subject to the constraints specified in the last
+    two arguments. Each instance is given as a tuple of a list of notes in the multisets (in the order in which the notes appear),
+    the measure number on which the multiset begins, and, if applicable, the number of the part in which the multiset appears. 
+    Part numbering starts with 1 in the top line, 2 in the next-highest line, and so forth.
     
     >>> from music21 import *
     >>> part = stream.Part()
@@ -1342,7 +1439,12 @@ def findTransposedMultisets(inputStream, multisetlist, reps, chords):
     ...    n.quarterLength = 2
     ...    part.repeatAppend(n, 2)
     >>> part = part.makeMeasures()
-    >>> instancelist = serial.findTransposedMultisets(part, [[1, 2, 3]], 'skipConsecutive', 'skipChords')
+    >>> #_DOCS_SHOW part.show()
+    
+    .. image:: images/serial-06.png
+        :width: 500
+    
+    >>> instancelist = serial.findTransposedMultisets(part, [[1, 2, 3]])
     >>> print instancelist
     [([<music21.note.Note D>, <music21.note.Note E>, <music21.note.Note E->], 3),
     ([<music21.note.Note E->, <music21.note.Note E>, <music21.note.Note D>], 5), 
@@ -1360,7 +1462,7 @@ def findTransposedMultisets(inputStream, multisetlist, reps, chords):
     '''
     
     transposedmultisets = []
-    for multiset in multisetlist:
+    for multiset in multisetList:
         for i in range(0,12):
             transposition = []
             for j in multiset:
@@ -1368,19 +1470,23 @@ def findTransposedMultisets(inputStream, multisetlist, reps, chords):
             transposedmultisets.append(transposition)
     return findMultisets(inputStream, transposedmultisets, reps, chords)
 
-def findTransposedAndInvertedMultisets(inputStream, multisetlist, reps, chords):
+def findTransposedAndInvertedMultisets(inputStream, multisetlist, reps = 'skipConsecutive', chords = 'skipChords'):
     
     '''
     
-    Given a stream object and list of (unordered) multisets of pitch classes (each given as a list), 
-    returns a list of all
-    instances of the set, with its transpositions and inversions in the stream subject to the constraints on repetitions of pitches
-    and how chords are dealt with as described in getContinuousSegmentsOfLength. Note that a multiset
-    is a generalization of a set in which multiple apperances of the same element (in this case, pitch class) 
-    in the multi-set are allowed, hence the use of the list, rather than the set, type. Each
-    instance of the multiset is given as a tuple of the segment of notes, the number of the measure in which it appears, and,
-    if the stream object contains parts, the part in which it appears (where a lower number
-    denotes a higher part).
+    Finds all instances of given multisets of pitch classes, with transpositions and inversions, within a :class:`~music21.stream.Stream`. 
+    A multiset is a generalization of a set, as described in :meth:`~music21.serial.findMultisets`.
+
+    The inputStream may be any :class:`~music21.stream.Stream`, and the multisetList is a list of multisets to
+    be searched for, each multiset being given as a list of pitch classes. Note that the order of pitch classes given in a multiset
+    does not matter. The "reps" and "chords" settings specify how
+    repeated pitches and chords, respectively, are handled; the possible settings are the same as those in
+    :func:`~music21.serial.getContiguousSegmentsOfLength`.
+    
+    The output is a list of instances of the multisets in the multisetList, subject to the constraints specified in the last
+    two arguments. Each instance is given as a tuple of a list of notes in the multisets (in the order in which the notes appear),
+    the measure number on which the multiset begins, and, if applicable, the number of the part in which the multiset appears. 
+    Part numbering starts with 1 in the top line, 2 in the next-highest line, and so forth.
     
     >>> from music21 import *
     >>> s = stream.Stream()
@@ -1389,17 +1495,24 @@ def findTransposedAndInvertedMultisets(inputStream, multisetlist, reps, chords):
     >>> n3 = note.Note('g4')
     >>> n4 = note.Note('e4')
     >>> n5 = note.Note('c4')
-    >>> for n in [n1, n2, n3, n4, n5]:
+    >>> for n in [n1, n2, n3, n4]:
     ...     n.quarterLength = 1
     ...     s.append(n)
+    >>> n5.quarterLength = 4
+    >>> s.append(n5)
     >>> s = s.makeMeasures()
-    >>> serial.findTransposedAndInvertedMultisets(s, [[0, 4, 7]], 'rowsOnly', 'skipChords')
+    >>> #_DOCS_SHOW s.show()
+    
+    .. image:: images/serial-07.png
+        :width: 150
+        
+    >>> serial.findTransposedAndInvertedMultisets(s, [[0, 4, 7]], 'rowsOnly')
     [([<music21.note.Note G>, <music21.note.Note E>, <music21.note.Note C>], 1), 
     ([<music21.note.Note C>, <music21.note.Note E->, <music21.note.Note G>], 1)]
     
     __OMIT_FROM_DOCS__
     
-    >>> serial.findTransposedAndInvertedMultisets(s, [[0, 4, 7], [0, 3, 7]], 'rowsOnly', 'skipChords')
+    >>> serial.findTransposedAndInvertedMultisets(s, [[0, 4, 7], [0, 3, 7]], 'rowsOnly')
     [([<music21.note.Note G>, <music21.note.Note E>, <music21.note.Note C>], 1), 
     ([<music21.note.Note C>, <music21.note.Note E->, <music21.note.Note G>], 1)]
     
@@ -1414,397 +1527,526 @@ def findTransposedAndInvertedMultisets(inputStream, multisetlist, reps, chords):
     return findTransposedMultisets(inputStream, multisetlist, reps, chords)
         
             
-    
-        
-    
                 
-            
+#---------------------------------------------------------------------            
         
+#
+#
+#class HistoricalTwelveToneRow(TwelveToneRow):
+#    '''
+#    A 12-tone row used in the historical literature. 
+#    Added attributes to document the the historical context of the row. 
+#    '''
+#    composer = None
+#    opus = None
+#    title = None
+#
+#    _DOC_ATTR = {
+#    'composer': 'The composers name.',
+#    'opus': 'The opus of the work, or None.',
+#    'title': 'The title of the work.',
+#    }
+#
+#
+#
+#class RowSchoenbergOp23No5(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 23, No. 5'
+#    title = 'Five Piano Pieces'
+#    row = [1, 9, 11, 7, 8, 6, 10, 2, 4, 3, 0, 5]
+#class RowSchoenbergOp24Mvmt4(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 24'
+#    title = 'Serenade, Mvt. 4, "Sonett"'
+#    row = [4, 2, 3, 11, 0, 1, 8, 6, 9, 5, 7, 10]
+#class RowSchoenbergOp24Mvmt5(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 24'
+#    title = 'Serenade, Mvt. 5, "Tanzscene"'
+#    row = [9, 10, 0, 3, 4, 6, 5, 7, 8, 11, 1, 2]
+#class RowSchoenbergOp25(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op.25'
+#    title = 'Suite for Piano'
+#    row = [4, 5, 7, 1, 6, 3, 8, 2, 11, 0, 9, 10]
+#class RowSchoenbergOp26(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 26'
+#    title = 'Wind Quintet'
+#    row = [3, 7, 9, 11, 1, 0, 10, 2, 4, 6, 8, 5]
+#class RowSchoenbergOp27No1(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 27 No. 1'
+#    title = 'Four Pieces for Mixed Chorus, No. 1'
+#    row = [6, 5, 2, 8, 7, 1, 3, 4, 10, 9, 11, 0]
+#class RowSchoenbergOp27No2(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 27 No. 2'
+#    title = 'Four Pieces for Mixed Chorus, No. 2'
+#    row = [0, 11, 4, 10, 2, 8, 3, 7, 6, 5, 9, 1]
+#class RowSchoenbergOp27No3(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 27 No. 3'
+#    title = 'Four Pieces for Mixed Chorus, No. 3'
+#    row = [7, 6, 2, 4, 5, 3, 11, 0, 8, 10, 9, 1]
+#class RowSchoenbergOp27No4(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 27 No. 4'
+#    title = 'Four Pieces for Mixed Chorus, No. 4'
+#    row = [1, 3, 10, 6, 8, 4, 11, 0, 2, 9, 5, 7]
+#class RowSchoenbergOp28No1(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 28 No. 1'
+#    title = 'Three Satires for Mixed Chorus, No. 1'
+#    row = [0, 4, 7, 1, 9, 11, 5, 3, 2, 6, 8, 10]
+#class RowSchoenbergOp28No3(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 28 No. 3'
+#    title = 'Three Satires for Mixed Chorus, No. 3'
+#    row = [5, 6, 4, 8, 2, 10, 7, 9, 3, 11, 1, 0]
+#class RowSchoenbergOp29(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 29'
+#    title = 'Suite'
+#    row = [3, 7, 6, 10, 2, 11, 0, 9, 8, 4, 5, 1]
+#class RowSchoenbergOp30(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 30'
+#    title = 'Third String Quartet'
+#    row = [7, 4, 3, 9, 0, 5, 6, 11, 10, 1, 8, 2]
+#class RowSchoenbergOp31(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 31'
+#    title = 'Variations for Orchestra'
+#    row = [10, 4, 6, 3, 5, 9, 2, 1, 7, 8, 11, 0]
+#class RowSchoenbergOp32(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 32'
+#    title = 'Von Heute Auf Morgen'
+#    row = [2, 3, 9, 1, 11, 5, 8, 7, 4, 0, 10, 6]
+#class RowSchoenbergOp33A(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 33A'
+#    title = 'Two Piano Pieces, No. 1'
+#    row = [10, 5, 0, 11, 9, 6, 1, 3, 7, 8, 2, 4]
+#class RowSchoenbergOp33B(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 33B'
+#    title = 'Two Piano Pieces, No. 2'
+#    row = [11, 1, 5, 3, 9, 8, 6, 10, 7, 4, 0, 2]
+#class RowSchoenbergOp34(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 34'
+#    title = 'Accompaniment to a Film Scene'
+#    row = [3, 6, 2, 4, 1, 0, 9, 11, 10, 8, 5, 7]
+#class RowSchoenbergOp35No1(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 35'
+#    title = 'Six Pieces for Male Chorus, No. 1'
+#    row = [2, 11, 3, 5, 4, 1, 8, 10, 9, 6, 0, 7]
+#class RowSchoenbergOp35No2(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 35'
+#    title = 'Six Pieces for Male Chorus, No. 2'
+#    row = [6, 9, 7, 1, 0, 2, 5, 11, 10, 3, 4, 8]
+#class RowSchoenbergOp35No3(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 35'
+#    title = 'Six Pieces for Male Chorus, No. 3'
+#    row = [3, 6, 7, 8, 5, 0, 9, 10, 4, 11, 2, 1]
+#class RowSchoenbergOp35No5(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 35'
+#    title = 'Six Pieces for Male Chorus, No. 5'
+#    row = [1, 7, 10, 2, 3, 11, 8, 4, 0, 6, 5, 9]
+#class RowSchoenbergOp36(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 36'
+#    title = 'Concerto for Violin and Orchestra'
+#    row = [9, 10, 3, 11, 4, 6, 0, 1, 7, 8, 2, 5]
+#class RowSchoenbergOp37(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 37'
+#    title = 'Fourth String Quartet'
+#    row = [2, 1, 9, 10, 5, 3, 4, 0, 8, 7, 6, 11]
+#class RowSchoenbergFragPianoPhantasia(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = None
+#    title = 'Fragment of Phantasia For Piano'
+#    row = [1, 5, 3, 6, 4, 8, 0, 11, 2, 9, 10, 7]
+#class RowSchoenbergFragOrganSonata(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = None
+#    title = 'Fragment of Sonata For Organ'
+#    row = [1, 7, 11, 3, 9, 2, 8, 6, 10, 5, 0, 4]
+#class RowSchoenbergFragPiano(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = None
+#    title = 'Fragment For Piano'
+#    row = [6, 9, 0, 7, 1, 2, 8, 11, 5, 10, 4, 3]
+#class RowSchoenbergOp41(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 41'
+#    title = 'Ode To Napoleon'
+#    row = [1, 0, 4, 5, 9, 8, 3, 2, 6, 7, 11, 10]
+#class RowSchoenbergOp42(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 42'
+#    title = 'Concerto For Piano And Orchestra'
+#    row = [3, 10, 2, 5, 4, 0, 6, 8, 1, 9, 11, 7]
+#class RowSchoenbergJakobsleiter(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = None
+#    title = 'Die Jakobsleiter'
+#    row = [1, 2, 5, 4, 8, 7, 0, 3, 11, 10, 6, 9]
+#class RowSchoenbergOp44(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 44'
+#    title = 'Prelude To A Suite From "Genesis"'
+#    row = [10, 6, 2, 5, 4, 0, 11, 8, 1, 3, 9, 7]
+#class RowSchoenbergOp45(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 45'
+#    title = 'String Trio'
+#    row = [2, 10, 3, 9, 4, 1, 11, 8, 6, 7, 5, 0]
+#class RowSchoenbergOp46(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 46'
+#    title = 'A Survivor From Warsaw'
+#    row = [6, 7, 0, 8, 4, 3, 11, 10, 5, 9, 1, 2]
+#class RowSchoenbergOp47(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 47'
+#    title = 'Fantasy For Violin And Piano'
+#    row = [10, 9, 1, 11, 5, 7, 3, 4, 0, 2, 8, 6]
+#class RowSchoenbergOp48No1(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 48'
+#    title = 'Three Songs, No. 1, "Sommermud"'
+#    row = [1, 2, 0, 6, 3, 5, 4, 10, 11, 7, 9, 8]
+#class RowSchoenbergOp48No2(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 48'
+#    title = 'Three Songs, No. 2, "Tot"'
+#    row = [2, 3, 9, 1, 10, 4, 8, 7, 0, 11, 5, 6]
+#class RowSchoenbergOp48No3(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 48'
+#    title = 'Three Songs, No, 3, "Madchenlied"'
+#    row = [1, 7, 9, 11, 3, 5, 10, 6, 4, 0, 8, 2]
+#class RowSchoenbergIsraelExists(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = None
+#    title = 'Israel Exists Again'
+#    row = [0, 3, 4, 9, 11, 5, 2, 1, 10, 8, 6, 7]
+#class RowSchoenbergOp50A(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 50A'
+#    title = 'Three Times A Thousand Years'
+#    row = [7, 9, 6, 4, 5, 11, 10, 2, 0, 1, 3, 8]
+#class RowSchoenbergOp50B(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 50B'
+#    title = 'De Profundis'
+#    row = [3, 9, 8, 4, 2, 10, 7, 11, 0, 6, 5, 1]
+#class RowSchoenbergOp50C(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = 'Op. 50C'
+#    title = 'Modern Psalms, The First Psalm'
+#    row = [4, 3, 0, 8, 11, 7, 5, 9, 6, 10, 1, 2]
+#class RowSchoenbergMosesAron(HistoricalTwelveToneRow):
+#    composer = 'Schoenberg'
+#    opus = None
+#    title = 'Moses And Aron'
+#    row = [9, 10, 4, 2, 3, 1, 7, 5, 6, 8, 11, 0]
+#
+## Berg
+#class RowBergChamberConcerto(HistoricalTwelveToneRow):
+#    composer = 'Berg'
+#    opus = None
+#    title = 'Chamber Concerto'
+#    row = [11, 7, 5, 9, 2, 3, 6, 8, 0, 1, 4, 10]
+#class RowBergWozzeckPassacaglia(HistoricalTwelveToneRow):
+#    composer = 'Berg'
+#    opus = None
+#    title = 'Wozzeck, Act I, Scene 4 "Passacaglia"'
+#    row = [3, 11, 7, 1, 0, 6, 4, 10, 9, 5, 8, 2]
+#class RowBergLyricSuite(HistoricalTwelveToneRow):
+#    composer = 'Berg'
+#    opus = None
+#    title = 'Lyric Suite Primary Row'
+#    row = [5, 4, 0, 9, 7, 2, 8, 1, 3, 6, 10, 11]
+#class RowBergLyricSuitePerm(HistoricalTwelveToneRow):
+#    composer = 'Berg'
+#    opus = None
+#    title = 'Lyric Suite, Last Mvt. Permutation'
+#    row = [5, 6, 10, 4, 1, 9, 2, 8, 7, 3, 0, 11]
+#class RowBergDerWein(HistoricalTwelveToneRow):
+#    composer = 'Berg'
+#    opus = None
+#    title = 'Der Wein'
+#    row = [2, 4, 5, 7, 9, 10, 1, 6, 8, 0, 11, 3]
+#class RowBergLulu(HistoricalTwelveToneRow):
+#    composer = 'Berg'
+#    opus = None
+#    title = 'Lulu: Primary Row'
+#    row = [0, 4, 5, 2, 7, 9, 6, 8, 11, 10, 3, 1]
+#class RowBergLuluActIScene20(HistoricalTwelveToneRow):
+#    composer = 'Berg'
+#    opus = 'Lulu, Act I , Scene XX'
+#    title = 'Perm. (Every 7th Note Of Transposed Primary Row)'
+#    row = [10, 6, 3, 8, 5, 11, 4, 2, 9, 0, 1, 7]
+#class RowBergLuluActIIScene1(HistoricalTwelveToneRow):
+#    composer = 'Berg'
+#    opus = 'Lulu, Act II, Scene 1'
+#    title = 'Perm. (Every 5th Note Of Transposed Primary Row)'
+#    row = [10, 7, 1, 0, 9, 2, 4, 11, 5, 8, 3, 6]
+#class RowBergViolinConcerto(HistoricalTwelveToneRow):
+#    composer = 'Berg'
+#    opus = None
+#    title = 'Concerto For Violin And Orchestra'
+#    row = [7, 10, 2, 6, 9, 0, 4, 8, 11, 1, 3, 5]
+#
+## Webern
+#class RowWebernOpNo17No1(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 17, No. 1'
+#    title = '"Armer Sunder, Du"'
+#    row = [11, 10, 5, 6, 3, 4, 7, 8, 9, 0, 1, 2]
+#class RowWebernOp17No2(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 17, No. 2'
+#    title = '"Liebste Jungfrau"'
+#    row = [1, 0, 11, 7, 8, 2, 3, 6, 5, 4, 9, 10]
+#class RowWebernOp17No3(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 17, No. 3'
+#    title = '"Heiland, Unsere Missetaten..."'
+#    row = [8, 5, 4, 3, 7, 6, 0, 1, 2, 11, 10, 9]
+#class RowWebernOp18No1(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 18, No. 1'
+#    title = '"Schatzerl Klein"'
+#    row = [0, 11, 5, 8, 10, 9, 3, 4, 1, 7, 2, 6]
+#class RowWebernOp18No2(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 18, No. 2'
+#    title = '"Erlosung"'
+#    row = [6, 9, 5, 8, 4, 7, 3, 11, 2, 10, 1, 0]
+#class RowWebernOp18No3(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 18, No. 3'
+#    title = '"Ave, Regina Coelorum"'
+#    row = [4, 3, 7, 6, 5, 11, 10, 2, 1, 0, 9, 8]
+#class RowWebernOp19No1(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 19, No. 1'
+#    title = '"Weiss Wie Lilien"'
+#    row = [7, 10, 6, 5, 3, 9, 8, 1, 2, 11, 4, 0]
+#class RowWebernOp19No2(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 19, No. 2'
+#    title = '"Ziehn Die Schafe"'
+#    row = [8, 4, 9, 6, 7, 0, 11, 5, 3, 2, 10, 1]
+#class RowWebernOp20(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 20'
+#    title = 'String Trio'
+#    row = [8, 7, 2, 1, 6, 5, 9, 10, 3, 4, 0, 11]
+#class RowWebernOp21(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 21'
+#    title = 'Chamber Symphony'
+#    row = [5, 8, 7, 6, 10, 9, 3, 4, 0, 1, 2, 11]
+#class RowWebernOp22(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 22'
+#    title = 'Quartet For Violin, Clarinet, Tenor Sax, And Piano'
+#    row = [6, 3, 2, 5, 4, 8, 9, 10, 11, 1, 7, 0]
+#class RowWebernOp23(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 23'
+#    title = 'Three Songs'
+#    row = [8, 3, 7, 4, 10, 6, 2, 5, 1, 0, 9, 11]
+#class RowWebernOp24(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 24'
+#    title = 'Concerto For Nine Instruments'
+#    row = [11, 10, 2, 3, 7, 6, 8, 4, 5, 0, 1, 9]
+#class RowWebernOp25(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 25'
+#    title = 'Three Songs'
+#    row = [7, 4, 3, 6, 1, 5, 2, 11, 10, 0, 9, 8]
+#class RowWebernOp26(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 26'
+#    title = 'Das Augenlicht'
+#    row = [8, 10, 9, 0, 11, 3, 4, 1, 5, 2, 6, 7]
+#class RowWebernOp27(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 27'
+#    title = 'Variations For Piano'
+#    row = [3, 11, 10, 2, 1, 0, 6, 4, 7, 5, 9, 8]
+#class RowWebernOp28(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 28'
+#    title = 'String Quartet'
+#    row = [1, 0, 3, 2, 6, 7, 4, 5, 9, 8, 11, 10]
+#class RowWebernOp29(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 29'
+#    title = 'Cantata I'
+#    row = [3, 11, 2, 1, 5, 4, 7, 6, 10, 9, 0, 8]
+#class RowWebernOp30(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 30'
+#    title = 'Variations For Orchestra'
+#    row = [9, 10, 1, 0, 11, 2, 3, 6, 5, 4, 7, 8]
+#class RowWebernOp31(HistoricalTwelveToneRow):
+#    composer = 'Webern'
+#    opus = 'Op. 31'
+#    title = 'Cantata II'
+#    row = [6, 9, 5, 4, 8, 3, 7, 11, 10, 2, 1, 0]
+#
+#
+#
+#vienneseRows = [RowSchoenbergOp23No5, RowSchoenbergOp24Mvmt4, RowSchoenbergOp24Mvmt5, RowSchoenbergOp25, RowSchoenbergOp26, RowSchoenbergOp27No1, RowSchoenbergOp27No2, RowSchoenbergOp27No3, RowSchoenbergOp27No4, RowSchoenbergOp28No1, RowSchoenbergOp28No3, RowSchoenbergOp29, RowSchoenbergOp30, RowSchoenbergOp31, RowSchoenbergOp32, RowSchoenbergOp33A, RowSchoenbergOp33B, RowSchoenbergOp34, RowSchoenbergOp35No1, RowSchoenbergOp35No2, RowSchoenbergOp35No3, RowSchoenbergOp35No5, RowSchoenbergOp36, RowSchoenbergOp37, RowSchoenbergFragPianoPhantasia, RowSchoenbergFragOrganSonata, RowSchoenbergFragPiano, RowSchoenbergOp41, RowSchoenbergOp42, RowSchoenbergJakobsleiter, RowSchoenbergOp44, RowSchoenbergOp45, RowSchoenbergOp46, RowSchoenbergOp47, RowSchoenbergOp48No1, RowSchoenbergOp48No2, RowSchoenbergOp48No3, RowSchoenbergIsraelExists, RowSchoenbergOp50A, RowSchoenbergOp50B, RowSchoenbergOp50C, RowSchoenbergMosesAron, RowBergChamberConcerto, RowBergWozzeckPassacaglia, RowBergLyricSuite, RowBergLyricSuitePerm, RowBergDerWein, RowBergLulu, RowBergLuluActIScene20, RowBergLuluActIIScene1, RowBergViolinConcerto, RowWebernOpNo17No1, RowWebernOp17No2, RowWebernOp17No3, RowWebernOp18No1, RowWebernOp18No2, RowWebernOp18No3, RowWebernOp19No1, RowWebernOp19No2, RowWebernOp20, RowWebernOp21, RowWebernOp22, RowWebernOp23, RowWebernOp24, RowWebernOp25, RowWebernOp26, RowWebernOp27, RowWebernOp28, RowWebernOp29, RowWebernOp30, RowWebernOp31]
+#
+#historicalDict = {}
+#for r in vienneseRows:
+#    print r
+#    rowname = str(r)[17:-2]
+#    historicalDict[rowname] = (r.composer, r.opus, r.title, r.row)
+#print historicalDict
 
 
 class HistoricalTwelveToneRow(TwelveToneRow):
+    
     '''
-    A 12-tone row used in the historical literature. 
-    Added attributes to document the the historical context of the row. 
+    Subclass of :class:`music21.serial.HistoricalRow` storing additional attributes of a twelve-tone row used in the historical literature.
+    
     '''
-    composer = None
-    opus = None
-    title = None
-
+    
     _DOC_ATTR = {
     'composer': 'The composers name.',
     'opus': 'The opus of the work, or None.',
     'title': 'The title of the work.',
     }
+    
+    composer = None
+    opus = None
+    title = None
+    
+    def __init__(self, composer, opus, title, row):
+        self.composer = composer
+        self.opus = opus
+        self.title = title
+        self.row = row
+        TwelveToneRow.__init__(self)
 
 
 
-class RowSchoenbergOp23No5(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 23, No. 5'
-    title = 'Five Piano Pieces'
-    row = [1, 9, 11, 7, 8, 6, 10, 2, 4, 3, 0, 5]
-class RowSchoenbergOp24Mvmt4(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 24'
-    title = 'Serenade, Mvt. 4, "Sonett"'
-    row = [4, 2, 3, 11, 0, 1, 8, 6, 9, 5, 7, 10]
-class RowSchoenbergOp24Mvmt5(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 24'
-    title = 'Serenade, Mvt. 5, "Tanzscene"'
-    row = [9, 10, 0, 3, 4, 6, 5, 7, 8, 11, 1, 2]
-class RowSchoenbergOp25(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op.25'
-    title = 'Suite for Piano'
-    row = [4, 5, 7, 1, 6, 3, 8, 2, 11, 0, 9, 10]
-class RowSchoenbergOp26(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 26'
-    title = 'Wind Quintet'
-    row = [3, 7, 9, 11, 1, 0, 10, 2, 4, 6, 8, 5]
-class RowSchoenbergOp27No1(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 27 No. 1'
-    title = 'Four Pieces for Mixed Chorus, No. 1'
-    row = [6, 5, 2, 8, 7, 1, 3, 4, 10, 9, 11, 0]
-class RowSchoenbergOp27No2(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 27 No. 2'
-    title = 'Four Pieces for Mixed Chorus, No. 2'
-    row = [0, 11, 4, 10, 2, 8, 3, 7, 6, 5, 9, 1]
-class RowSchoenbergOp27No3(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 27 No. 3'
-    title = 'Four Pieces for Mixed Chorus, No. 3'
-    row = [7, 6, 2, 4, 5, 3, 11, 0, 8, 10, 9, 1]
-class RowSchoenbergOp27No4(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 27 No. 4'
-    title = 'Four Pieces for Mixed Chorus, No. 4'
-    row = [1, 3, 10, 6, 8, 4, 11, 0, 2, 9, 5, 7]
-class RowSchoenbergOp28No1(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 28 No. 1'
-    title = 'Three Satires for Mixed Chorus, No. 1'
-    row = [0, 4, 7, 1, 9, 11, 5, 3, 2, 6, 8, 10]
-class RowSchoenbergOp28No3(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 28 No. 3'
-    title = 'Three Satires for Mixed Chorus, No. 3'
-    row = [5, 6, 4, 8, 2, 10, 7, 9, 3, 11, 1, 0]
-class RowSchoenbergOp29(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 29'
-    title = 'Suite'
-    row = [3, 7, 6, 10, 2, 11, 0, 9, 8, 4, 5, 1]
-class RowSchoenbergOp30(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 30'
-    title = 'Third String Quartet'
-    row = [7, 4, 3, 9, 0, 5, 6, 11, 10, 1, 8, 2]
-class RowSchoenbergOp31(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 31'
-    title = 'Variations for Orchestra'
-    row = [10, 4, 6, 3, 5, 9, 2, 1, 7, 8, 11, 0]
-class RowSchoenbergOp32(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 32'
-    title = 'Von Heute Auf Morgen'
-    row = [2, 3, 9, 1, 11, 5, 8, 7, 4, 0, 10, 6]
-class RowSchoenbergOp33A(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 33A'
-    title = 'Two Piano Pieces, No. 1'
-    row = [10, 5, 0, 11, 9, 6, 1, 3, 7, 8, 2, 4]
-class RowSchoenbergOp33B(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 33B'
-    title = 'Two Piano Pieces, No. 2'
-    row = [11, 1, 5, 3, 9, 8, 6, 10, 7, 4, 0, 2]
-class RowSchoenbergOp34(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 34'
-    title = 'Accompaniment to a Film Scene'
-    row = [3, 6, 2, 4, 1, 0, 9, 11, 10, 8, 5, 7]
-class RowSchoenbergOp35No1(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 35'
-    title = 'Six Pieces for Male Chorus, No. 1'
-    row = [2, 11, 3, 5, 4, 1, 8, 10, 9, 6, 0, 7]
-class RowSchoenbergOp35No2(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 35'
-    title = 'Six Pieces for Male Chorus, No. 2'
-    row = [6, 9, 7, 1, 0, 2, 5, 11, 10, 3, 4, 8]
-class RowSchoenbergOp35No3(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 35'
-    title = 'Six Pieces for Male Chorus, No. 3'
-    row = [3, 6, 7, 8, 5, 0, 9, 10, 4, 11, 2, 1]
-class RowSchoenbergOp35No5(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 35'
-    title = 'Six Pieces for Male Chorus, No. 5'
-    row = [1, 7, 10, 2, 3, 11, 8, 4, 0, 6, 5, 9]
-class RowSchoenbergOp36(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 36'
-    title = 'Concerto for Violin and Orchestra'
-    row = [9, 10, 3, 11, 4, 6, 0, 1, 7, 8, 2, 5]
-class RowSchoenbergOp37(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 37'
-    title = 'Fourth String Quartet'
-    row = [2, 1, 9, 10, 5, 3, 4, 0, 8, 7, 6, 11]
-class RowSchoenbergFragPianoPhantasia(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = None
-    title = 'Fragment of Phantasia For Piano'
-    row = [1, 5, 3, 6, 4, 8, 0, 11, 2, 9, 10, 7]
-class RowSchoenbergFragOrganSonata(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = None
-    title = 'Fragment of Sonata For Organ'
-    row = [1, 7, 11, 3, 9, 2, 8, 6, 10, 5, 0, 4]
-class RowSchoenbergFragPiano(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = None
-    title = 'Fragment For Piano'
-    row = [6, 9, 0, 7, 1, 2, 8, 11, 5, 10, 4, 3]
-class RowSchoenbergOp41(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 41'
-    title = 'Ode To Napoleon'
-    row = [1, 0, 4, 5, 9, 8, 3, 2, 6, 7, 11, 10]
-class RowSchoenbergOp42(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 42'
-    title = 'Concerto For Piano And Orchestra'
-    row = [3, 10, 2, 5, 4, 0, 6, 8, 1, 9, 11, 7]
-class RowSchoenbergJakobsleiter(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = None
-    title = 'Die Jakobsleiter'
-    row = [1, 2, 5, 4, 8, 7, 0, 3, 11, 10, 6, 9]
-class RowSchoenbergOp44(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 44'
-    title = 'Prelude To A Suite From "Genesis"'
-    row = [10, 6, 2, 5, 4, 0, 11, 8, 1, 3, 9, 7]
-class RowSchoenbergOp45(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 45'
-    title = 'String Trio'
-    row = [2, 10, 3, 9, 4, 1, 11, 8, 6, 7, 5, 0]
-class RowSchoenbergOp46(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 46'
-    title = 'A Survivor From Warsaw'
-    row = [6, 7, 0, 8, 4, 3, 11, 10, 5, 9, 1, 2]
-class RowSchoenbergOp47(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 47'
-    title = 'Fantasy For Violin And Piano'
-    row = [10, 9, 1, 11, 5, 7, 3, 4, 0, 2, 8, 6]
-class RowSchoenbergOp48No1(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 48'
-    title = 'Three Songs, No. 1, "Sommermud"'
-    row = [1, 2, 0, 6, 3, 5, 4, 10, 11, 7, 9, 8]
-class RowSchoenbergOp48No2(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 48'
-    title = 'Three Songs, No. 2, "Tot"'
-    row = [2, 3, 9, 1, 10, 4, 8, 7, 0, 11, 5, 6]
-class RowSchoenbergOp48No3(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 48'
-    title = 'Three Songs, No, 3, "Madchenlied"'
-    row = [1, 7, 9, 11, 3, 5, 10, 6, 4, 0, 8, 2]
-class RowSchoenbergIsraelExists(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = None
-    title = 'Israel Exists Again'
-    row = [0, 3, 4, 9, 11, 5, 2, 1, 10, 8, 6, 7]
-class RowSchoenbergOp50A(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 50A'
-    title = 'Three Times A Thousand Years'
-    row = [7, 9, 6, 4, 5, 11, 10, 2, 0, 1, 3, 8]
-class RowSchoenbergOp50B(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 50B'
-    title = 'De Profundis'
-    row = [3, 9, 8, 4, 2, 10, 7, 2, 0, 6, 5, 1]
-class RowSchoenbergOp50C(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = 'Op. 50C'
-    title = 'Modern Psalms, The First Psalm'
-    row = [4, 3, 0, 8, 9, 7, 5, 9, 6, 10, 1, 2]
-class RowSchoenbergMosesAron(HistoricalTwelveToneRow):
-    composer = 'Schoenberg'
-    opus = None
-    title = 'Moses And Aron'
-    row = [9, 10, 4, 2, 3, 1, 7, 5, 6, 8, 11, 0]
-
-# Berg
-class RowBergChamberConcerto(HistoricalTwelveToneRow):
-    composer = 'Berg'
-    opus = None
-    title = 'Chamber Concerto'
-    row = [11, 7, 5, 9, 2, 3, 6, 8, 0, 1, 4, 10]
-class RowBergWozzeckPassacaglia(HistoricalTwelveToneRow):
-    composer = 'Berg'
-    opus = None
-    title = 'Wozzeck, Act I, Scene 4 "Passacaglia"'
-    row = [3, 11, 7, 1, 0, 6, 4, 10, 9, 5, 8, 2]
-class RowBergLyricSuite(HistoricalTwelveToneRow):
-    composer = 'Berg'
-    opus = None
-    title = 'Lyric Suite Primary Row'
-    row = [5, 4, 0, 9, 7, 2, 8, 1, 3, 6, 10, 11]
-class RowBergLyricSuitePerm(HistoricalTwelveToneRow):
-    composer = 'Berg'
-    opus = None
-    title = 'Lyric Suite, Last Mvt. Permutation'
-    row = [5, 6, 10, 4, 1, 9, 2, 8, 7, 3, 0, 11]
-class RowBergDerWein(HistoricalTwelveToneRow):
-    composer = 'Berg'
-    opus = None
-    title = 'Der Wein'
-    row = [2, 4, 5, 7, 9, 10, 1, 6, 8, 0, 11, 3]
-class RowBergLulu(HistoricalTwelveToneRow):
-    composer = 'Berg'
-    opus = None
-    title = 'Lulu: Primary Row'
-    row = [0, 4, 5, 2, 7, 9, 6, 8, 11, 10, 3, 1]
-class RowBergLuluActIScene20(HistoricalTwelveToneRow):
-    composer = 'Berg'
-    opus = 'Lulu, Act I , Scene XX'
-    title = 'Perm. (Every 7th Note Of Primary Row)'
-    row = [10, 6, 3, 8, 5, 11, 4, 2, 9, 0, 1, 7]
-class RowBergLuluActIIScene1(HistoricalTwelveToneRow):
-    composer = 'Berg'
-    opus = 'Lulu, Act II, Scene 1'
-    title = 'Perm. (Every 5th Note Of Primary Row)'
-    row = [4, 10, 7, 1, 0, 9, 2, 11, 5, 8, 3, 6]
-    #NOTE: this is wrong! 4 was inserted so that the row could pass the testViennese
-class RowBergViolinConcerto(HistoricalTwelveToneRow):
-    composer = 'Berg'
-    opus = None
-    title = 'Concerto For Violin And Orchestra'
-    row = [7, 10, 2, 6, 9, 0, 4, 8, 11, 1, 3, 5]
-
-# Webern
-class RowWebernOpNo17No1(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. No. 17, No. 1'
-    title = '"Armer Sunder, Du"'
-    row = [11, 10, 5, 6, 3, 4, 7, 8, 9, 0, 1, 2]
-class RowWebernOp17No2(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 17, No. 2'
-    title = '"Liebste Jungfrau"'
-    row = [1, 0, 11, 7, 8, 2, 3, 6, 5, 4, 9, 10]
-class RowWebernOp17No3(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 17, No. 3'
-    title = '"Heiland, Unsere Missetaten..."'
-    row = [8, 5, 4, 3, 7, 6, 0, 1, 2, 11, 10, 9]
-class RowWebernOp18No1(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 18, No. 1'
-    title = '"Schatzerl Klein"'
-    row = [0, 11, 5, 8, 10, 9, 3, 4, 1, 7, 2, 6]
-class RowWebernOp18No2(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 18, No. 2'
-    title = '"Erlosung"'
-    row = [6, 9, 5, 8, 4, 7, 3, 11, 2, 10, 1, 0]
-class RowWebernOp18No3(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 18, No. 3'
-    title = '"Ave, Regina Coelorum"'
-    row = [4, 3, 7, 6, 5, 11, 10, 2, 1, 0, 9, 8]
-class RowWebernOp19No1(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 19, No. 1'
-    title = '"Weiss Wie Lilien"'
-    row = [7, 10, 6, 5, 3, 9, 8, 1, 2, 11, 4, 0]
-class RowWebernOp19No2(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 19, No. 2'
-    title = '"Ziehn Die Schafe"'
-    row = [8, 4, 9, 6, 7, 0, 11, 5, 3, 2, 10, 1]
-class RowWebernOp20(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 20'
-    title = 'String Trio'
-    row = [8, 7, 2, 1, 6, 5, 9, 10, 3, 4, 0, 11]
-class RowWebernOp21(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 21'
-    title = 'Chamber Symphony'
-    row = [5, 8, 7, 6, 10, 9, 3, 4, 0, 1, 2, 11]
-class RowWebernOp22(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 22'
-    title = 'Quartet For Violin, Clarinet, Tenor Sax, And Piano'
-    row = [6, 3, 2, 5, 4, 8, 9, 10, 11, 1, 7, 0]
-class RowWebernOp23(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 23'
-    title = 'Three Songs'
-    row = [8, 3, 7, 4, 10, 6, 2, 5, 1, 0, 9, 11]
-class RowWebernOp24(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 24'
-    title = 'Concerto For Nine Instruments'
-    row = [11, 10, 2, 3, 7, 6, 8, 4, 5, 0, 1, 9]
-class RowWebernOp25(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 25'
-    title = 'Three Songs'
-    row = [7, 4, 3, 6, 1, 5, 2, 11, 10, 0, 9, 8]
-class RowWebernOp26(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 26'
-    title = 'Das Augenlicht'
-    row = [8, 10, 9, 0, 11, 3, 4, 1, 5, 2, 6, 7]
-class RowWebernOp27(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 27'
-    title = 'Variations For Piano'
-    row = [3, 11, 10, 2, 1, 0, 6, 4, 7, 5, 9, 8]
-class RowWebernOp28(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 28'
-    title = 'String Quartet'
-    row = [1, 0, 3, 2, 6, 7, 4, 5, 9, 8, 11, 10]
-class RowWebernOp29(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 29'
-    title = 'Cantata I'
-    row = [3, 11, 2, 1, 5, 4, 7, 6, 10, 9, 0, 8]
-class RowWebernOp30(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 30'
-    title = 'Variations For Orchestra'
-    row = [9, 10, 1, 0, 11, 2, 3, 6, 5, 4, 7, 8]
-class RowWebernOp31(HistoricalTwelveToneRow):
-    composer = 'Webern'
-    opus = 'Op. 31'
-    title = 'Cantata II'
-    row = [6, 9, 5, 4, 8, 3, 7, 11, 10, 2, 1, 0]
-
-
-
-vienneseRows = [RowSchoenbergOp23No5, RowSchoenbergOp24Mvmt4, RowSchoenbergOp24Mvmt5, RowSchoenbergOp25, RowSchoenbergOp26, RowSchoenbergOp27No1, RowSchoenbergOp27No2, RowSchoenbergOp27No3, RowSchoenbergOp27No4, RowSchoenbergOp28No1, RowSchoenbergOp28No3, RowSchoenbergOp29, RowSchoenbergOp30, RowSchoenbergOp31, RowSchoenbergOp32, RowSchoenbergOp33A, RowSchoenbergOp33B, RowSchoenbergOp34, RowSchoenbergOp35No1, RowSchoenbergOp35No2, RowSchoenbergOp35No3, RowSchoenbergOp35No5, RowSchoenbergOp36, RowSchoenbergOp37, RowSchoenbergFragPianoPhantasia, RowSchoenbergFragOrganSonata, RowSchoenbergFragPiano, RowSchoenbergOp41, RowSchoenbergOp42, RowSchoenbergJakobsleiter, RowSchoenbergOp44, RowSchoenbergOp45, RowSchoenbergOp46, RowSchoenbergOp47, RowSchoenbergOp48No1, RowSchoenbergOp48No2, RowSchoenbergOp48No3, RowSchoenbergIsraelExists, RowSchoenbergOp50A, RowSchoenbergOp50B, RowSchoenbergOp50C, RowSchoenbergMosesAron, RowBergChamberConcerto, RowBergWozzeckPassacaglia, RowBergLyricSuite, RowBergLyricSuitePerm, RowBergDerWein, RowBergLulu, RowBergLuluActIScene20, RowBergLuluActIIScene1, RowBergViolinConcerto, RowWebernOpNo17No1, RowWebernOp17No2, RowWebernOp17No3, RowWebernOp18No1, RowWebernOp18No2, RowWebernOp18No3, RowWebernOp19No1, RowWebernOp19No2, RowWebernOp20, RowWebernOp21, RowWebernOp22, RowWebernOp23, RowWebernOp24, RowWebernOp25, RowWebernOp26, RowWebernOp27, RowWebernOp28, RowWebernOp29, RowWebernOp30, RowWebernOp31]
-
-
+def getHistoricalRowByName(row):
+    
+    '''
+    Given the name referring to a twelve-tone row used in the historical literature,
+    returns a :class:`music21.serial.HistoricalRow` object with attributes describing the row.
+    A :class:`music21.serial.TwelveToneRow` can then be created from the
+    :class:`music21.serial.HistoricalRow`.
+    
+    The names of the rows with stored attributes are below (each must be passed as a string, in single quotes).
+    
+    RowSchoenbergOp23No5
+    RowSchoenbergOp24Mvmt4
+    RowSchoenbergOp24Mvmt5
+    RowSchoenbergOp25
+    RowSchoenbergOp26
+    RowSchoenbergOp27No1
+    RowSchoenbergOp27No2
+    RowSchoenbergOp27No3
+    RowSchoenbergOp27No4
+    RowSchoenbergOp28No1
+    RowSchoenbergOp28No3
+    RowSchoenbergOp29
+    RowSchoenbergOp30
+    RowSchoenbergOp31
+    RowSchoenbergOp32
+    RowSchoenbergOp33A
+    RowSchoenbergOp33B
+    RowSchoenbergOp34
+    RowSchoenbergOp35No1
+    RowSchoenbergOp35No2
+    RowSchoenbergOp35No3
+    RowSchoenbergOp35No5
+    RowSchoenbergOp36
+    RowSchoenbergOp37
+    RowSchoenbergFragPianoPhantasia
+    RowSchoenbergFragOrganSonata
+    RowSchoenbergFragPiano
+    RowSchoenbergOp41
+    RowSchoenbergOp42
+    RowSchoenbergJakobsleiter
+    RowSchoenbergOp44
+    RowSchoenbergOp45
+    RowSchoenbergOp46
+    RowSchoenbergOp47
+    RowSchoenbergOp48No1
+    RowSchoenbergOp48No2
+    RowSchoenbergOp48No3
+    RowSchoenbergIsraelExists
+    RowSchoenbergOp50A
+    RowSchoenbergOp50B
+    RowSchoenbergOp50C
+    RowSchoenbergMosesAron
+    RowBergChamberConcerto
+    RowBergWozzeckPassacaglia
+    RowBergLyricSuite
+    RowBergLyricSuitePerm
+    RowBergDerWein
+    RowBergLulu
+    RowBergLuluActIScene20
+    RowBergLuluActIIScene1
+    RowBergViolinConcerto
+    RowWebernOpNo17No1
+    RowWebernOp17No2
+    RowWebernOp17No3
+    RowWebernOp18No1
+    RowWebernOp18No2
+    RowWebernOp18No3
+    RowWebernOp19No1
+    RowWebernOp19No2
+    RowWebernOp20
+    RowWebernOp21
+    RowWebernOp22
+    RowWebernOp23
+    RowWebernOp24
+    RowWebernOp25
+    RowWebernOp26
+    RowWebernOp27
+    RowWebernOp28
+    RowWebernOp29
+    RowWebernOp30
+    RowWebernOp31
+    
+    >>> from music21 import *
+    >>> a = serial.getHistoricalRowByName('RowWebernOp29')
+    >>> a.row
+    [3, 11, 2, 1, 5, 4, 7, 6, 10, 9, 0, 8]
+    >>> rowObj = a
+    >>> rowObj.pitches()
+    [3, 11, 2, 1, 5, 4, 7, 6, 10, 9, 0, 8]
+    >>> rowObj.isLinkChord()
+    False
+    
+    '''
+    
+    if row in historicalDict:
+        attr = historicalDict[row]
+        rowObj = HistoricalTwelveToneRow(attr[0], attr[1], attr[2], attr[3])
+        return rowObj
+    else:
+        raise SerialException("No historical row with given name found")
 
 #-------------------------------------------------------------------------------
 def pcToToneRow(pcSet):
@@ -1881,24 +2123,24 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def testRows(self):
-        from music21 import interval
-
-        self.assertEqual(len(vienneseRows), 71)
-
-        totalRows = 0
-        cRows = 0
-        for thisRow in vienneseRows:
-            thisRow = thisRow() 
-            self.assertEqual(isinstance(thisRow, TwelveToneRow), True)
-            
-            if thisRow.composer == "Berg":
-                continue
-            post = thisRow.title
-            
-            totalRows += 1
-            if thisRow[0].pitchClass == 0:
-                cRows += 1
+#    def testRows(self):
+#        from music21 import interval
+#
+#        self.assertEqual(len(vienneseRows), 71)
+#
+#        totalRows = 0
+#        cRows = 0
+#        for thisRow in vienneseRows:
+#            thisRow = thisRow() 
+#            self.assertEqual(isinstance(thisRow, TwelveToneRow), True)
+#            
+#            if thisRow.composer == "Berg":
+#                continue
+#            post = thisRow.title
+#            
+#            totalRows += 1
+#            if thisRow[0].pitchClass == 0:
+#                cRows += 1
             
 #             if interval.notesToInterval(thisRow[0], 
 #                                    thisRow[6]).intervalClass == 6:
@@ -1908,10 +2150,10 @@ class Test(unittest.TestCase):
 
     def testMatrix(self):
 
-        src = RowSchoenbergOp37()
+        src = getHistoricalRowByName('RowSchoenbergOp37')
         self.assertEqual([p.name for p in src], 
             ['D', 'C#', 'A', 'B-', 'F', 'E-', 'E', 'C', 'G#', 'G', 'F#', 'B'])
-        s37 = RowSchoenbergOp37().matrix()
+        s37 = getHistoricalRowByName('RowSchoenbergOp37').matrix()
         self.assertEqual([e.name for e in s37[0]], ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-', 'F#', 'F', 'E', 'A'])
 
 
@@ -1932,19 +2174,20 @@ class Test(unittest.TestCase):
         self.assertEqual(match, ['10', '12', '1', '12', '10', '7', '10', '12', '1', '10', '1', '12', '4', '2', '1', '12', '12', '2', '7', '1', '12', '10', '10', '1', '12', '10', '1', '4', '2', '4', '2', '2', '2', '2', '2', '5', '2'])
         #s.show()
     
-    def testViennese(self):
+    def testHistorical(self):
         
         nonRows = []
-        for historicalRow in vienneseRows:
-            if pcToToneRow(historicalRow.row).isTwelveToneRow() == False:
+        for historicalRow in historicalDict:
+            if getHistoricalRowByName(historicalRow).isTwelveToneRow() == False:
                 nonRows.append(historicalRow)
-                self.assertEqual(nonRows, [])
+        self.assertEqual(nonRows, [])
 
                 
         
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = ['ToneRow', 'TwelveToneRow', 'pcToToneRow', 'TwelveToneMatrix', 'rowToMatrix', 'getContiguousSegmentsOfLength', 'findSegments',
+_DOC_ORDER = ['ToneRow', 'TwelveToneRow', 'HistoricalRow', 'pcToToneRow', 'TwelveToneMatrix', 'rowToMatrix', 
+              'getHistoricalRowByName', 'getContiguousSegmentsOfLength', 'findSegments',
               'findTransposedSegments', 'findTransformedSegments', 'findMultisets', 'findTransposedMultisets', 
               'findTransposedAndInvertedMultisets']
 
