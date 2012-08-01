@@ -1706,19 +1706,8 @@ class Variant(music21.Music21Object):
         
         vStart = self.getOffsetBySite(contextStream)
         
-        if self.lengthType == 'replacement':
+        if self.lengthType == 'replacement' or self.lengthType == 'elongation':
             classes =[]
-            vEnd = vStart + self.containedHighestTime
-            for e in self.elements:
-                classes.append(e.classes[0])
-            returnStream = contextStream.getElementsByOffset(vStart, vEnd,
-                includeEndBoundary=False,
-                mustFinishInSpan=False,
-                mustBeginInSpan=True,
-                classList=classes)
-        
-        elif self.lengthType == 'elongation':
-            classes = []
             vEnd = vStart + self.replacementDuration
             for e in self.elements:
                 classes.append(e.classes[0])
