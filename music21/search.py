@@ -415,10 +415,11 @@ def translateNoteToByte(n):
 
 def translateNoteWithDurationToBytes(n):
     '''
-    takes a note.Note object and translates it to a two-byte representation
-
+    takes a note.Note object and translates it to a three-byte representation.
+    
     currently returns the chr() for the note's midi number. or chr(127) for rests
     followed by the log of the quarter length (fitted to 1-127, see formula below)
+    followed by 's', 'c', or 'e' if includetieByte is True and there is a tie
 
     >>> from music21 import *
     >>> n = note.Note("C4")
@@ -429,6 +430,11 @@ def translateNoteWithDurationToBytes(n):
     >>> (2**(ord(trans[1])/10.0))/256  # approximately 3
     2.828...
     
+    >>> n.tie = tie.Tie('end')
+    >>> trans = search.translateNoteWithDurationToBytes(n)
+    >>> trans
+    '<_e'
+    
     '''
     firstByte = translateNoteToByte(n)
     duration1to127 = int(math.log(n.duration.quarterLength * 256, 2)*10)
@@ -437,8 +443,44 @@ def translateNoteWithDurationToBytes(n):
     elif duration1to127 == 0:
         duration1to127 = 1
     secondByte = chr(duration1to127)
-    return firstByte + secondByte
+    
+    thirdByte = translateNoteTieToByte(n)
+    
+    return firstByte + secondByte + thirdByte
 
+def translateNoteTieToByte(n):
+    '''
+    takes a note.Note object and returns a one-byte representation
+    of its tie status.
+    's' if start tie, 'e' if end tie, 'c' if continue tie, and '' if no tie
+    
+    >>> from music21 import *
+    >>> n = note.Note("E")
+    >>> translateNoteTieToByte(n)
+    ''
+    
+    >>> n.tie = tie.Tie("start")
+    >>> translateNoteTieToByte(n)
+    's'
+    
+    >>> n.tie.type = 'continue'
+    >>> translateNoteTieToByte(n)
+    'c'
+    
+    >>> n.tie.type = 'end'
+    >>> translateNoteTieToByte(n)
+    'e'
+    '''
+    if n.tie is None:
+        return ''
+    elif n.tie.type == 'start':
+        return 's'
+    elif n.tie.type == 'continue':
+        return 'c'
+    elif n.tie.type == 'end':
+        return 'e'
+    else:
+        return ''
 
 def translateDurationToBytes(n):
     '''

@@ -119,7 +119,7 @@ The default Action` is to call :meth:`~music21.graph.Graph.show` method the grap
 Analytical Graphing Objects
 -------------------------------------------------------
 
-Music21 features graphing objects that display the results of analysis
+Music21 features graphing objects that display the results of analysis.
 Complete documentation for these graphing objects can be found with the following classes: :class:`~music21.graph.PlotWindowedKrumhanslSchmuckler`, :class:`~music21.graph.PlotWindowedKrumhanslKessler`, :class:`~music21.graph.PlotWindowedAardenEssen`, :class:`~music21.graph.PlotWindowedSimpleWeights`, :class:`~music21.graph.PlotWindowedBellmanBudge`,  :class:`~music21.graph.PlotWindowedTemperleyKostkaPayne`,
 :class:`~music21.graph.PlotWindowedAmbitus`, :class:`~music21.graph.PlotDolan`
 
@@ -227,8 +227,8 @@ Grouped Bar Graph
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This graph allows you to plot multiple sets of data in parallel bar graphs. Data for this graph is provided
-in a list of tuples of the form (dataLabel, {plotGroup: value, plotGroup2: value ... }). The example below takes
-iterates through the Bach Chorale corpus using the corpus.chorales.Iterator and stores the frequency at which
+in a list of tuples of the form (dataLabel, {plotGroup: value, plotGroup2: value ... }). The example below 
+iterates through the Bach Chorale corpus using corpus.chorales.Iterator and stores the frequency at which
 each part exhibits notes of each quarter length present. It displays the normalized frequency of each quarterLength
 as four bars, each corresponding to an SATB part.
 
@@ -250,23 +250,13 @@ The example follows::
     ...                     partDict[noteLength] = 1
     >>> quarterLengths = list(set(sopranoDict.keys()+altoDict.keys()+tenorDict.keys()+bassDict.keys()))
     >>> for ql in quarterLengths:
-    ...     if ql in sopranoDict:
-    ...         sopranoValue = sopranoDict[ql]/noteTotal
-    ...     else:
-    ...         sopranoValue = 0.0
-    ...     if ql in altoDict:
-    ...         altoValue = altoDict[ql]/noteTotal
-    ...     else:
-    ...         altoValue = 0.0
-    ...     if ql in tenorDict:
-    ...         tenorValue = tenorDict[ql]/noteTotal
-    ...     else:
-    ...         tenorValue = 0.0
-    ...     if ql in bassDict:
-    ...         bassValue = bassDict[ql]/noteTotal
-    ...     else:
-    ...         bassValue = 0.0
-    ...     data.append((ql, {'bass': bassValue, 'tenor': tenorValue, 'alto': altoValue, 'soprano': sopranoValue})) 
+    ...     values = []
+    ...     for partDict in [sopranoDict, altoDict, tenorDict, bassDict]:     
+    ...         if ql in partDict:
+    ...             values.append(partDict[ql]/noteTotal)
+    ...         else:
+    ...             values.append(0.0)
+    ...     data.append((ql, {'soprano': values[0], 'alto': values[1], 'tenor': values[2], 'bass': values[3]})) 
     >>> a = graph.GraphGroupedVerticalBar(title="Frequency of note durations in Bach's Chorales",
     ...                                   doneAction='show',
     ...                                   binWidth = 1,

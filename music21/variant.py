@@ -33,11 +33,155 @@ environLocal = environment.Environment(_MOD)
 
 
 
-#-- Functions
+#-------Public Merge Functions
+def mergeVariants(streamX, streamY, variantName, inPlace = False):
+    '''
+    Takes two streams objects or their derivatives (score, part, measure, etc.) which should be variant versions of the same stream,
+    and merges them (determines differences and stores those differences as variant objects in streamX) via the appropriate merge
+    function for their type. This will not know how to deal with scores meant for mergePartAsOssia(). If this is the intention, use
+    that function instead.
+    
+    >>> from music21 import *
+    >>> aScore, vScore= stream.Score(), stream.Score()
+    
+    >>> ap1 = stream.Part(converter.parse("  a4 b c d    e2 f2   g2 f4 g4 ", "4/4").makeMeasures())
+    >>> vp1 = stream.Part(converter.parse("  a4 b c e    e2 f2   g2 f4 a4 ", "4/4").makeMeasures())
+    
+    >>> ap2 = stream.Part(converter.parse("  a4 g f e    f2 e2   d2 g4 f4 ", "4/4").makeMeasures())
+    >>> vp2 = stream.Part(converter.parse("  a4 g f e    f2 g2   f2 g4 d4 ", "4/4").makeMeasures())
+    
+    >>> aScore.insert(0.0, ap1)
+    >>> aScore.insert(0.0, ap2)
+    >>> vScore.insert(0.0, vp1)
+    >>> vScore.insert(0.0, vp2)
+    
+    >>> mergedScore = variant.mergeVariants(aScore, vScore, variantName = 'docvariant', inPlace = False)
+    >>> mergedScore.show('text')
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.variant.Variant object at ...>
+    ...
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+    ...
+        {4.0} <music21.variant.Variant object at ...>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+    ...
+            {4.0} <music21.bar.Barline style=final>
+    
+    
+    >>> mergedPart = variant.mergeVariants(ap2, vp2, variantName = 'docvariant', inPlace = False)
+    >>> mergedPart.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+    ...
+    {4.0} <music21.variant.Variant object at ...>
+    {4.0} <music21.stream.Measure 2 offset=4.0>
+    ...
+        {4.0} <music21.bar.Barline style=final>
+    
+    >>> streamX = converter.parse("a4 b c d", "4/4")
+    >>> streamY = converter.parse("a4 d c b", "4/4")
+    >>> mergedStream = variant.mergeVariants(streamX, streamY, variantName = 'docvariant', inPlace = False)
+    >>> mergedStream.show('text')
+    {0.0} <music21.meter.TimeSignature 4/4>
+    {0.0} <music21.note.Note A>
+    {1.0} <music21.variant.Variant object at ...>
+    {1.0} <music21.note.Note B>
+    {2.0} <music21.note.Note C>
+    {3.0} <music21.variant.Variant object at ...>
+    {3.0} <music21.note.Note D>
+    
+    >>> streamY = converter.parse("a4 b c d e f g a", "4/4")
+    >>> variant.mergeVariants(streamX, streamY, variantName = 'docvariant', inPlace = False)
+    Traceback (most recent call last):
+    ...
+    VariantException: Could not determine what merging method to use. Try using a more specific merging function.
+    
+    '''
+    
+    if type(streamX) is music21.stream.Score:
+        return mergeVariantScores(streamX, streamY, variantName, inPlace = inPlace)
+    elif type(streamX) is music21.stream.Part or len(streamX.getElementsByClass("Measure")) > 0:
+        return mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace = inPlace)
+    elif len(streamX.notesAndRests) > 0 and streamX.duration.quarterLength == streamY.duration.quarterLength:
+        return mergeVariantsEqualDuration([streamX, streamY], [variantName], inPlace = inPlace)
+    else:
+        raise VariantException("Could not determine what merging method to use. Try using a more specific merging function.")
+
+def mergeVariantScores(aScore, vScore, variantName, inPlace = False):
+    '''
+    Takes two scores and merges them with mergeVariantMeasureStreams, part-by-part.
+    
+    >>> from music21 import *
+    >>> aScore, vScore= stream.Score(), stream.Score()
+    
+    >>> ap1 = stream.Part(converter.parse("  a4 b c d    e2 f2   g2 f4 g4 ", "4/4").makeMeasures())
+    >>> vp1 = stream.Part(converter.parse("  a4 b c e    e2 f2   g2 f4 a4 ", "4/4").makeMeasures())
+    
+    >>> ap2 = stream.Part(converter.parse("  a4 g f e    f2 e2   d2 g4 f4 ", "4/4").makeMeasures())
+    >>> vp2 = stream.Part(converter.parse("  a4 g f e    f2 g2   f2 g4 d4 ", "4/4").makeMeasures())
+    
+    >>> aScore.insert(0.0, ap1)
+    >>> aScore.insert(0.0, ap2)
+    >>> vScore.insert(0.0, vp1)
+    >>> vScore.insert(0.0, vp2)
+    
+    >>> mergedScores = variant.mergeVariantScores(aScore, vScore, variantName = 'docvariant', inPlace = False)
+    >>> mergedScores.show('text')
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.variant.Variant object at ...>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note C>
+            {3.0} <music21.note.Note D>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+            {0.0} <music21.note.Note E>
+            {2.0} <music21.note.Note F>
+        {8.0} <music21.variant.Variant object at ...>
+        {8.0} <music21.stream.Measure 3 offset=8.0>
+            {0.0} <music21.note.Note G>
+            {2.0} <music21.note.Note F>
+            {3.0} <music21.note.Note G>
+            {4.0} <music21.bar.Barline style=final>
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note G>
+            {2.0} <music21.note.Note F>
+            {3.0} <music21.note.Note E>
+        {4.0} <music21.variant.Variant object at ...>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+            {0.0} <music21.note.Note F>
+            {2.0} <music21.note.Note E>
+        {8.0} <music21.stream.Measure 3 offset=8.0>
+            {0.0} <music21.note.Note D>
+            {2.0} <music21.note.Note G>
+            {3.0} <music21.note.Note F>
+            {4.0} <music21.bar.Barline style=final>
+    
+    '''
+    if len(aScore.parts) != len(vScore.parts):
+        raise VariantException("These scores do not have the same number of parts and cannot be merged.")
+    
+    if inPlace is True:
+        returnObj = aScore
+    else:
+        returnObj = copy.deepcopy(aScore)
+    
+    for returnPart, vPart in zip(returnObj.parts, vScore.parts):
+        mergeVariantMeasureStreams(returnPart, vPart, variantName, inPlace = True)
+    
+    return returnObj
+    
+
 def mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace = False):
     '''
     Takes two streams of measures and returns a stream (new if inPlace is False) with the second
-    merged with the first as variants. This function differs from mergeVariantStreams by
+    merged with the first as variants. This function differs from mergeVariantsEqualDuration by
     dealing with streams that are of different length. This function matches measures that are
     exactly equal and creates variant objects for regions of measures that differ at all. If more
     refined variants are sought (with variation within the bar considered and related but different
@@ -204,7 +348,378 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace = False):
         addVariant(returnObj, startOffset, yRegion, variantName = variantName, replacementDuration = replacementDuration)
     return returnObj
 
+
+def mergeVariantsEqualDuration(streams, variantNames, inPlace = False):
+    '''
+    Pass this function a list of streams (they must be of the same length or a VariantException will be raised).
+    It will return a stream which merges the differences between the streams into variant objects keeping the
+    first stream in the list as the default. If inPlace is True, the first stream in the list will be modified,
+    otherwise a new stream will be returned. Pass a list of names to associate variants with their sources, if this list
+    does not contain an entry for each non-default variant, naming may not behave properly. Variants that have the
+    same differences from the default will be saved as separate variant objects (i.e. more than once under different names).
+    Also, note that a streams with bars of differing lengths will not behave properly.
     
+    >>> from music21 import *
+    >>> stream1 = stream.Stream()
+    >>> stream2paris = stream.Stream()
+    >>> stream3london = stream.Stream()
+    >>> data1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),
+    ...    ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),
+    ...    ('b', 'quarter'), ('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter')]
+    >>> data2 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter'),
+    ...    ('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'),
+    ...    ('b', 'quarter'), ('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter')]
+    >>> data3 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),
+    ...    ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),
+    ...    ('c', 'quarter'), ('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter')]
+    >>> for pitchName,durType in data1:
+    ...    n = note.Note(pitchName)
+    ...    n.duration.type = durType
+    ...    stream1.append(n)
+    >>> for pitchName,durType in data2:
+    ...    n = note.Note(pitchName)
+    ...    n.duration.type = durType
+    ...    stream2paris.append(n)
+    >>> for pitchName,durType in data3:
+    ...    n = note.Note(pitchName)
+    ...    n.duration.type = durType
+    ...    stream3london.append(n)
+    >>> mergedStreams = mergeVariantsEqualDuration([stream1, stream2paris, stream3london], ['paris', 'london'])
+    >>> mergedStreams.show('t')
+    {0.0} <music21.note.Note A>
+    {1.0} <music21.variant.Variant object at ...>
+    {1.0} <music21.note.Note B>
+    {1.5} <music21.note.Note C>
+    {2.0} <music21.note.Note A>
+    {3.0} <music21.variant.Variant object at ...>
+    {3.0} <music21.note.Note A>
+    {4.0} <music21.note.Note B>
+    {4.5} <music21.variant.Variant object at ...>
+    {4.5} <music21.note.Note C>
+    {5.0} <music21.note.Note A>
+    {6.0} <music21.note.Note A>
+    {7.0} <music21.variant.Variant object at ...>
+    {7.0} <music21.note.Note B>
+    {8.0} <music21.note.Note C>
+    {9.0} <music21.variant.Variant object at ...>
+    {9.0} <music21.note.Note D>
+    {10.0} <music21.note.Note E>
+    
+    >>> mergedStreams.activateVariants('london').show('t')
+    {0.0} <music21.note.Note A>
+    {1.0} <music21.variant.Variant object at ...>
+    {1.0} <music21.note.Note B>
+    {1.5} <music21.note.Note C>
+    {2.0} <music21.note.Note A>
+    {3.0} <music21.variant.Variant object at ...>
+    {3.0} <music21.note.Note A>
+    {4.0} <music21.note.Note B>
+    {4.5} <music21.variant.Variant object at ...>
+    {4.5} <music21.note.Note C>
+    {5.0} <music21.note.Note A>
+    {6.0} <music21.note.Note A>
+    {7.0} <music21.variant.Variant object at ...>
+    {7.0} <music21.note.Note C>
+    {8.0} <music21.note.Note C>
+    {9.0} <music21.variant.Variant object at ...>
+    {9.0} <music21.note.Note D>
+    {10.0} <music21.note.Note E>
+        
+    If the streams contain parts and measures, the merge function will iterate through them and determine
+    and store variant differences within each measure/part.
+    
+    >>> stream1 = stream.Stream()
+    >>> stream2 = stream.Stream()
+    >>> data1M1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter')]
+    >>> data1M2 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
+    >>> data1M3 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
+    >>> data2M1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
+    >>> data2M2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
+    >>> data2M3 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+    >>> data1 = [data1M1, data1M2, data1M3]
+    >>> data2 = [data2M1, data2M2, data2M3]
+    >>> tempPart = stream.Part()
+    >>> for d in data1:
+    ...    m = stream.Measure()
+    ...    for pitchName,durType in d:
+    ...        n = note.Note(pitchName)
+    ...        n.duration.type = durType
+    ...        m.append(n)
+    ...    tempPart.append(m)
+    >>> stream1.append(tempPart)
+    >>> tempPart = stream.Part()
+    >>> for d in data2:
+    ...    m = stream.Measure()
+    ...    for pitchName,durType in d:
+    ...        n = note.Note(pitchName)
+    ...        n.duration.type = durType
+    ...        m.append(n)
+    ...    tempPart.append(m)
+    >>> stream2.append(tempPart)
+    >>> mergedStreams = mergeVariantsEqualDuration([stream1, stream2], ['paris'])
+    >>> mergedStreams.show('t')
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.variant.Variant object at ...>
+            {1.0} <music21.note.Note B>
+            {1.5} <music21.note.Note C>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.variant.Variant object at ...>
+            {3.0} <music21.note.Note A>
+        {4.0} <music21.stream.Measure 0 offset=4.0>
+            {0.0} <music21.note.Note B>
+            {0.5} <music21.variant.Variant object at ...>
+            {0.5} <music21.note.Note C>
+            {1.0} <music21.note.Note A>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note B>
+        {8.0} <music21.stream.Measure 0 offset=8.0>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.variant.Variant object at ...>
+            {1.0} <music21.note.Note D>
+            {2.0} <music21.note.Note E>
+            {3.0} <music21.note.Note E>
+    >>> #_DOCS_SHOW mergedStreams.show()
+    
+    
+    .. image:: images/variant_measuresAndParts.*
+        :width: 600
+        
+    
+    >>> for p in mergedStreams.getElementsByClass('Part'):
+    ...    for m in p.getElementsByClass('Measure'):
+    ...        m.activateVariants('paris', inPlace = True)
+    >>> mergedStreams.show('t')
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.variant.Variant object at ...>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.variant.Variant object at ...>
+            {3.0} <music21.note.Note G>
+        {4.0} <music21.stream.Measure 0 offset=4.0>
+            {0.0} <music21.note.Note B>
+            {0.5} <music21.variant.Variant object at ...>
+            {0.5} <music21.note.Note C>
+            {1.5} <music21.note.Note A>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note B>
+        {8.0} <music21.stream.Measure 0 offset=8.0>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.variant.Variant object at ...>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note A>
+    >>> #_DOCS_SHOW mergedStreams.show()
+    
+    
+    .. image:: images/variant_measuresAndParts2.*
+        :width: 600
+    
+    If barlines do not match up, an exception will be thrown. Here two streams that are identical
+    are merged, except one is in 3/4, the other in 4/4. This throws an exception.
+    
+    >>> streamDifferentMeasures = stream.Stream()
+    >>> dataDiffM1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter')]
+    >>> dataDiffM2 = [ ('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter')]
+    >>> dataDiffM3 = [('a', 'quarter'), ('b', 'quarter'), ('c', 'quarter')]
+    >>> dataDiffM4 = [('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
+    >>> dataDiff = [dataDiffM1, dataDiffM2, dataDiffM3, dataDiffM4]
+    >>> streamDifferentMeasures.insert(0.0, meter.TimeSignature('3/4'))
+    >>> tempPart = stream.Part()
+    >>> for d in dataDiff:
+    ...    m = stream.Measure()
+    ...    for pitchName,durType in d:
+    ...        n = note.Note(pitchName)
+    ...        n.duration.type = durType
+    ...        m.append(n)
+    ...    tempPart.append(m)
+    >>> streamDifferentMeasures.append(tempPart)
+    >>> mergedStreams = mergeVariantsEqualDuration([stream1, streamDifferentMeasures], ['paris'])
+    Traceback (most recent call last):
+    ...
+    VariantException: _mergeVariants cannot merge streams which are of different lengths
+    '''
+    
+    if inPlace is True:
+        returnObj = streams[0]
+    else:
+        returnObj = copy.deepcopy(streams[0])
+
+    variantNames.insert(0, None) # Adds a None element at beginning (corresponding to default variant streams[0])
+    while len(streams) > len(variantNames): # Adds Blank names if too few
+        variantNames.append(None)
+    while len(streams) < len(variantNames): # Removes extra names
+        variantNames.pop
+    
+    zipped = zip(streams,variantNames)
+    
+    for s,variantName in zipped[1:]:
+        if returnObj.highestTime != s.highestTime:
+            raise VariantException('cannot merge streams of different lengths')
+
+        returnObjParts = returnObj.getElementsByClass('Part')
+        if len(returnObjParts) != 0: # If parts exist, iterate through them.
+            sParts = s.getElementsByClass('Part')
+            for i in range(len(returnObjParts)):
+                returnObjPart = returnObjParts[i]
+                sPart = sParts[i]
+                
+                returnObjMeasures = returnObjPart.getElementsByClass('Measure')
+                if len(returnObjMeasures) != 0: # If measures exist and parts exist, iterate through them both.
+                    for j in range(len(returnObjMeasures)):
+                        returnObjMeasure = returnObjMeasures[j]
+                        sMeasure = sPart.getElementsByClass('Measure')[j]
+                        _mergeVariants(returnObjMeasure,sMeasure,variantName = variantName, inPlace = True)
+                
+                else: # If parts exist but no measures.
+                    _mergeVariants(returnObjPart,sPart,variantName = variantName, inPlace = True)
+        else:
+            returnObjMeasures = returnObj.getElementsByClass('Measure')
+            if len(returnObjMeasures) != 0: #If no parts, but still measures, iterate through them.
+                for j in range(len(returnObjMeasures)):
+                    returnObjMeasure = returnObjMeasures[j]
+                    sMeasure = s.getElementsByClass('Measure')[j]
+                    _mergeVariants(returnObjMeasure,sMeasure, variantName = variantName, inPlace = True)
+            else: # If no parts and no measures.
+                _mergeVariants(returnObj,s,variantName = variantName, inPlace = True)
+           
+    return returnObj
+
+def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByMeasureNumber = False, recurseInMeasures = False):
+    '''
+    Some MusicXML files are generated with full parts that have only a few non-rest measures instead of ossia parts, such as those
+    created by Sibelius 7. This function
+    takes two streams (mainpart and ossiapart), the second interpreted as an ossia. It outputs a stream with the ossia part merged into the stream as a 
+    group of variants.
+    
+    If compareByMeasureNumber is True, then the ossia measures will be paired with the measures in the mainpart that have the
+    same measure.number. Otherwise, they will be paired by offset. In most cases these should have the same result.
+    
+    Note that this method has no way of knowing if a variant is supposed to be a different duration than the segment of stream which it replaces
+    because that information is not contained in the format of score this method is designed to deal with.
+    
+    >>> from music21 import *
+    >>> mainstream = converter.parse("  A4 B4 C4 D4   E1    F2 E2     E8 F8 F4 G2   G2 G4 F4   F4 F4 F4 F4   G1      ", "4/4")
+    >>> ossiastream = converter.parse(" r1            r1    r1        E4 E4 F4 G4   r1         F2    F2      r1      ", "4/4")
+    >>> mainstream.makeMeasures(inPlace = True)
+    >>> ossiastream.makeMeasures(inPlace = True)
+    
+    >>> # mainstream.__class__ = stream.Part
+    >>> mainpart = stream.Part()
+    >>> for m in mainstream:
+    ...    mainpart.insert(m.offset, m)
+    >>> ossiapart = stream.Part()
+    >>> for m in ossiastream:
+    ...    ossiapart.insert(m.offset, m)
+    
+    >>> s = stream.Stream()
+    >>> s.insert(0.0, ossiapart)
+    >>> s.insert(0.0, mainpart)
+    >>> #_DOCS_SHOW s.show()
+    
+    >>> mainpartWithOssiaVariantsFT = variant.mergePartAsOssia(mainpart, ossiapart,
+    ...                                                            ossiaName = 'Parisian Variant',
+    ...                                                            inPlace = False,
+    ...                                                            compareByMeasureNumber = False,
+    ...                                                            recurseInMeasures = True)
+    >>> mainpartWithOssiaVariantsTT = variant.mergePartAsOssia(mainpart, ossiapart,
+    ...                                                            ossiaName = 'Parisian Variant',
+    ...                                                            inPlace = False,
+    ...                                                            compareByMeasureNumber = True,
+    ...                                                            recurseInMeasures = True)
+    >>> mainpartWithOssiaVariantsFF = variant.mergePartAsOssia(mainpart, ossiapart,
+    ...                                                            ossiaName = 'Parisian Variant',
+    ...                                                            inPlace = False,
+    ...                                                            compareByMeasureNumber = False,
+    ...                                                            recurseInMeasures = False)
+    >>> mainpartWithOssiaVariantsTF = variant.mergePartAsOssia(mainpart, ossiapart,
+    ...                                                            ossiaName = 'Parisian Variant',
+    ...                                                            inPlace = False,
+    ...                                                            compareByMeasureNumber = True,
+    ...                                                            recurseInMeasures = False)
+                                                                
+    >>> mainpartWithOssiaVariantsFT.show('text') == mainpartWithOssiaVariantsTT.show('text')
+    {0.0} <music21.stream.Measure ...
+    True
+    
+    >>> mainpartWithOssiaVariantsFF.show('text') == mainpartWithOssiaVariantsFT.show('text')
+    {0.0} <music21.stream.Measure ...
+    True
+    
+    >>> mainpartWithOssiaVariantsFT.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+    ...
+    {12.0} <music21.stream.Measure 4 offset=12.0>
+        {0.0} <music21.variant.Variant object at ...>
+        {0.0} <music21.note.Note E>
+        {0.5} <music21.note.Note F>
+        {1.0} <music21.note.Note F>
+        {2.0} <music21.note.Note G>
+    {16.0} <music21.stream.Measure 5 offset=16.0>
+    ...
+    {20.0} <music21.stream.Measure 6 offset=20.0>
+        {0.0} <music21.variant.Variant object at ...>
+        {0.0} <music21.note.Note F>
+        {1.0} <music21.note.Note F>
+        {2.0} <music21.note.Note F>
+        {3.0} <music21.note.Note F>
+    ...
+    
+    >>> mainpartWithOssiaVariantsFF.activateVariants('Parisian Variant').show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+    ...
+    {12.0} <music21.variant.Variant object at ...>
+    {12.0} <music21.stream.Measure 4 offset=12.0>
+        {0.0} <music21.note.Note E>
+        {1.0} <music21.note.Note E>
+        {2.0} <music21.note.Note F>
+        {3.0} <music21.note.Note G>
+    {16.0} <music21.stream.Measure 5 offset=16.0>
+    ...
+    {20.0} <music21.variant.Variant object at ...>
+    {20.0} <music21.stream.Measure 6 offset=20.0>
+        {0.0} <music21.note.Note F>
+        {2.0} <music21.note.Note F>
+    ...
+    
+    '''
+    if inPlace is True:
+        returnObj = mainpart
+    else:
+        returnObj = copy.deepcopy(mainpart)
+    
+    if compareByMeasureNumber is True:
+        for ossiaMeasure in ossiapart.getElementsByClass("Measure"):
+            if len(ossiaMeasure.notes) > 0: #If the measure is not just rests
+                ossiaNumber = ossiaMeasure.number
+                returnMeasure = returnObj.measure(ossiaNumber)
+                if recurseInMeasures is True: 
+                    mergeVariantsEqualDuration([returnMeasure, ossiaMeasure], [ossiaName], inPlace = True)
+                else:
+                    ossiaOffset = returnMeasure.getOffsetBySite(returnObj)
+                    addVariant(returnObj, ossiaOffset, ossiaMeasure, variantName = ossiaName, variantGroups = None, replacementDuration = None)
+    else:
+        for ossiaMeasure in ossiapart.getElementsByClass("Measure"):
+            if len(ossiaMeasure.notes) > 0: #If the measure is not just rests
+                ossiaOffset = ossiaMeasure.getOffsetBySite(ossiapart)
+                if recurseInMeasures is True:
+                    returnMeasure = returnObj.getElementsByOffset(ossiaOffset, classList = [stream.Measure])[0]
+                    mergeVariantsEqualDuration([returnMeasure, ossiaMeasure], [ossiaName], inPlace = True)
+                else:
+                    addVariant(returnObj, ossiaOffset, ossiaMeasure, variantName = ossiaName, variantGroups = None, replacementDuration = None)
+        
+    if inPlace is True:
+        return
+    else:
+        return returnObj
+
+
+   
+#------ Public Helper Functions
+
 def addVariant(s,startOffset, sVariant, variantName = None, variantGroups = None, replacementDuration = None):
     '''
     Takes a stream, the location of the variant to be added to that stream (startOffset), the content of the
@@ -413,7 +928,7 @@ def refineVariant(s, sVariant, inPlace = False):
         if regionType is 'equal':
             returnSubRegion = returnRegion.measures(returnStart+1, returnEnd)
             variantSubRegion = variantRegion.measures(variantStart+1, variantEnd)
-            mergeVariantStreams([returnSubRegion, variantSubRegion], variantGroups, inPlace = True)
+            mergeVariantsEqualDuration([returnSubRegion, variantSubRegion], variantGroups, inPlace = True)
             continue
         
         elif regionType is 'replace':
@@ -434,6 +949,26 @@ def refineVariant(s, sVariant, inPlace = False):
         return
     else:
         return returnObject
+
+def getMeasureHashes(s):
+    '''
+    Takes in a stream containing measures and returns a list of hashes, one for each measure. Currently
+    implemented with search.translateStreamToString()
+    
+    >>> from music21 import *
+    >>> s = converter.parse("c4 d8. e16 FF4 a'4 b-2", "2/4")
+    >>> sm = s.makeMeasures()
+    >>> hashes = getMeasureHashes(sm)
+    >>> hashes
+    ['<P>K@<', ')PQP', 'FZ']
+    '''
+    hashes = []
+    for m in s.getElementsByClass('Measure'):
+        hashes.append(search.translateStreamToString(m.notesAndRests))
+    return hashes
+
+
+#----- Private Helper Functions
 
 def _getBestListandScore(streamX, streamY, badnessDict, listDict, isNone = False, streamXindex = -1, streamYindex = -1):
     '''
@@ -607,266 +1142,10 @@ def _getRegionsFromStreams(streamX,streamY):
     regions = sm.get_opcodes()
     return regions
 
-def getMeasureHashes(s):
-    '''
-    Takes in a stream containing measures and returns a list of hashes, one for each measure. Currently
-    implemented with search.translateStreamToString()
-    
-    >>> from music21 import *
-    >>> s = converter.parse("c4 d8. e16 FF4 a'4 b-2", "2/4")
-    >>> sm = s.makeMeasures()
-    >>> hashes = getMeasureHashes(sm)
-    >>> hashes
-    ['<P>K@<', ')PQP', 'FZ']
-    '''
-    hashes = []
-    for m in s.getElementsByClass('Measure'):
-        hashes.append(search.translateStreamToString(m.notesAndRests))
-    return hashes
-
-
-def mergeVariantStreams(streams, variantNames, inPlace = False):
-    '''
-    Pass this function a list of streams (they must be of the same length or a VariantException will be raised).
-    It will return a stream which merges the differences between the streams into variant objects keeping the
-    first stream in the list as the default. If inPlace is True, the first stream in the list will be modified,
-    otherwise a new stream will be returned. Pass a list of names to associate variants with their sources, if this list
-    does not contain an entry for each non-default variant, naming may not behave properly. Variants that have the
-    same differences from the default will be saved as separate variant objects (i.e. more than once under different names).
-    Also, note that a streams with bars of differing lengths will not behave properly.
-    
-    >>> from music21 import *
-    >>> stream1 = stream.Stream()
-    >>> stream2paris = stream.Stream()
-    >>> stream3london = stream.Stream()
-    >>> data1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),
-    ...    ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),
-    ...    ('b', 'quarter'), ('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter')]
-    >>> data2 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter'),
-    ...    ('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'),
-    ...    ('b', 'quarter'), ('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter')]
-    >>> data3 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),
-    ...    ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),
-    ...    ('c', 'quarter'), ('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter')]
-    >>> for pitchName,durType in data1:
-    ...    n = note.Note(pitchName)
-    ...    n.duration.type = durType
-    ...    stream1.append(n)
-    >>> for pitchName,durType in data2:
-    ...    n = note.Note(pitchName)
-    ...    n.duration.type = durType
-    ...    stream2paris.append(n)
-    >>> for pitchName,durType in data3:
-    ...    n = note.Note(pitchName)
-    ...    n.duration.type = durType
-    ...    stream3london.append(n)
-    >>> mergedStreams = mergeVariantStreams([stream1, stream2paris, stream3london], ['paris', 'london'])
-    >>> mergedStreams.show('t')
-    {0.0} <music21.note.Note A>
-    {1.0} <music21.variant.Variant object at ...>
-    {1.0} <music21.note.Note B>
-    {1.5} <music21.note.Note C>
-    {2.0} <music21.note.Note A>
-    {3.0} <music21.variant.Variant object at ...>
-    {3.0} <music21.note.Note A>
-    {4.0} <music21.note.Note B>
-    {4.5} <music21.variant.Variant object at ...>
-    {4.5} <music21.note.Note C>
-    {5.0} <music21.note.Note A>
-    {6.0} <music21.note.Note A>
-    {7.0} <music21.variant.Variant object at ...>
-    {7.0} <music21.note.Note B>
-    {8.0} <music21.note.Note C>
-    {9.0} <music21.variant.Variant object at ...>
-    {9.0} <music21.note.Note D>
-    {10.0} <music21.note.Note E>
-    
-    >>> mergedStreams.activateVariants('london').show('t')
-    {0.0} <music21.note.Note A>
-    {1.0} <music21.variant.Variant object at ...>
-    {1.0} <music21.note.Note B>
-    {1.5} <music21.note.Note C>
-    {2.0} <music21.note.Note A>
-    {3.0} <music21.variant.Variant object at ...>
-    {3.0} <music21.note.Note A>
-    {4.0} <music21.note.Note B>
-    {4.5} <music21.variant.Variant object at ...>
-    {4.5} <music21.note.Note C>
-    {5.0} <music21.note.Note A>
-    {6.0} <music21.note.Note A>
-    {7.0} <music21.variant.Variant object at ...>
-    {7.0} <music21.note.Note C>
-    {8.0} <music21.note.Note C>
-    {9.0} <music21.variant.Variant object at ...>
-    {9.0} <music21.note.Note D>
-    {10.0} <music21.note.Note E>
-        
-    If the streams contain parts and measures, the merge function will iterate through them and determine
-    and store variant differences within each measure/part.
-    
-    >>> stream1 = stream.Stream()
-    >>> stream2 = stream.Stream()
-    >>> data1M1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter')]
-    >>> data1M2 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
-    >>> data1M3 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
-    >>> data2M1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
-    >>> data2M2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
-    >>> data2M3 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
-    >>> data1 = [data1M1, data1M2, data1M3]
-    >>> data2 = [data2M1, data2M2, data2M3]
-    >>> tempPart = stream.Part()
-    >>> for d in data1:
-    ...    m = stream.Measure()
-    ...    for pitchName,durType in d:
-    ...        n = note.Note(pitchName)
-    ...        n.duration.type = durType
-    ...        m.append(n)
-    ...    tempPart.append(m)
-    >>> stream1.append(tempPart)
-    >>> tempPart = stream.Part()
-    >>> for d in data2:
-    ...    m = stream.Measure()
-    ...    for pitchName,durType in d:
-    ...        n = note.Note(pitchName)
-    ...        n.duration.type = durType
-    ...        m.append(n)
-    ...    tempPart.append(m)
-    >>> stream2.append(tempPart)
-    >>> mergedStreams = mergeVariantStreams([stream1, stream2], ['paris'])
-    >>> mergedStreams.show('t')
-    {0.0} <music21.stream.Part ...>
-        {0.0} <music21.stream.Measure 0 offset=0.0>
-            {0.0} <music21.note.Note A>
-            {1.0} <music21.variant.Variant object at ...>
-            {1.0} <music21.note.Note B>
-            {1.5} <music21.note.Note C>
-            {2.0} <music21.note.Note A>
-            {3.0} <music21.variant.Variant object at ...>
-            {3.0} <music21.note.Note A>
-        {4.0} <music21.stream.Measure 0 offset=4.0>
-            {0.0} <music21.note.Note B>
-            {0.5} <music21.variant.Variant object at ...>
-            {0.5} <music21.note.Note C>
-            {1.0} <music21.note.Note A>
-            {2.0} <music21.note.Note A>
-            {3.0} <music21.note.Note B>
-        {8.0} <music21.stream.Measure 0 offset=8.0>
-            {0.0} <music21.note.Note C>
-            {1.0} <music21.variant.Variant object at ...>
-            {1.0} <music21.note.Note D>
-            {2.0} <music21.note.Note E>
-            {3.0} <music21.note.Note E>
-    >>> #_DOCS_SHOW mergedStreams.show()
-    
-    
-    .. image:: images/variant_measuresAndParts.*
-        :width: 600
-        
-    
-    >>> for p in mergedStreams.getElementsByClass('Part'):
-    ...    for m in p.getElementsByClass('Measure'):
-    ...        m.activateVariants('paris', inPlace = True)
-    >>> mergedStreams.show('t')
-    {0.0} <music21.stream.Part ...>
-        {0.0} <music21.stream.Measure 0 offset=0.0>
-            {0.0} <music21.note.Note A>
-            {1.0} <music21.variant.Variant object at ...>
-            {1.0} <music21.note.Note B>
-            {2.0} <music21.note.Note A>
-            {3.0} <music21.variant.Variant object at ...>
-            {3.0} <music21.note.Note G>
-        {4.0} <music21.stream.Measure 0 offset=4.0>
-            {0.0} <music21.note.Note B>
-            {0.5} <music21.variant.Variant object at ...>
-            {0.5} <music21.note.Note C>
-            {1.5} <music21.note.Note A>
-            {2.0} <music21.note.Note A>
-            {3.0} <music21.note.Note B>
-        {8.0} <music21.stream.Measure 0 offset=8.0>
-            {0.0} <music21.note.Note C>
-            {1.0} <music21.variant.Variant object at ...>
-            {1.0} <music21.note.Note B>
-            {2.0} <music21.note.Note A>
-            {3.0} <music21.note.Note A>
-    >>> #_DOCS_SHOW mergedStreams.show()
-    
-    
-    .. image:: images/variant_measuresAndParts2.*
-        :width: 600
-    
-    If barlines do not match up, an exception will be thrown. Here two streams that are identical
-    are merged, except one is in 3/4, the other in 4/4. This throws an exception.
-    
-    >>> streamDifferentMeasures = stream.Stream()
-    >>> dataDiffM1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter')]
-    >>> dataDiffM2 = [ ('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter')]
-    >>> dataDiffM3 = [('a', 'quarter'), ('b', 'quarter'), ('c', 'quarter')]
-    >>> dataDiffM4 = [('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
-    >>> dataDiff = [dataDiffM1, dataDiffM2, dataDiffM3, dataDiffM4]
-    >>> streamDifferentMeasures.insert(0.0, meter.TimeSignature('3/4'))
-    >>> tempPart = stream.Part()
-    >>> for d in dataDiff:
-    ...    m = stream.Measure()
-    ...    for pitchName,durType in d:
-    ...        n = note.Note(pitchName)
-    ...        n.duration.type = durType
-    ...        m.append(n)
-    ...    tempPart.append(m)
-    >>> streamDifferentMeasures.append(tempPart)
-    >>> mergedStreams = mergeVariantStreams([stream1, streamDifferentMeasures], ['paris'])
-    Traceback (most recent call last):
-    ...
-    VariantException: _mergeVariants cannot merge streams which are of different lengths
-    '''
-    
-    if inPlace is True:
-        returnObj = streams[0]
-    else:
-        returnObj = copy.deepcopy(streams[0])
-
-    variantNames.insert(0, None) # Adds a None element at beginning (corresponding to default variant streams[0])
-    while len(streams) > len(variantNames): # Adds Blank names if too few
-        variantNames.append(None)
-    while len(streams) < len(variantNames): # Removes extra names
-        variantNames.pop
-    
-    zipped = zip(streams,variantNames)
-    
-    for s,variantName in zipped[1:]:
-        if returnObj.highestTime != s.highestTime:
-            raise VariantException('cannot merge streams of different lengths')
-
-        returnObjParts = returnObj.getElementsByClass('Part')
-        if len(returnObjParts) != 0: # If parts exist, iterate through them.
-            sParts = s.getElementsByClass('Part')
-            for i in range(len(returnObjParts)):
-                returnObjPart = returnObjParts[i]
-                sPart = sParts[i]
-                
-                returnObjMeasures = returnObjPart.getElementsByClass('Measure')
-                if len(returnObjMeasures) != 0: # If measures exist and parts exist, iterate through them both.
-                    for j in range(len(returnObjMeasures)):
-                        returnObjMeasure = returnObjMeasures[j]
-                        sMeasure = sPart.getElementsByClass('Measure')[j]
-                        _mergeVariants(returnObjMeasure,sMeasure,variantName = variantName, inPlace = True)
-                
-                else: # If parts exist but no measures.
-                    _mergeVariants(returnObjPart,sPart,variantName = variantName, inPlace = True)
-        else:
-            returnObjMeasures = returnObj.getElementsByClass('Measure')
-            if len(returnObjMeasures) != 0: #If no parts, but still measures, iterate through them.
-                for j in range(len(returnObjMeasures)):
-                    returnObjMeasure = returnObjMeasures[j]
-                    sMeasure = s.getElementsByClass('Measure')[j]
-                    _mergeVariants(returnObjMeasure,sMeasure, variantName = variantName, inPlace = True)
-            else: # If no parts and no measures.
-                _mergeVariants(returnObj,s,variantName = variantName, inPlace = True)
-           
-    return returnObj
 
 def _mergeVariants(streamA, streamB, containsVariants = False, variantName = None, inPlace = False):
     '''
-    This is a helper function for mergeVariantStreams which takes two streams (which cannot contain container
+    This is a helper function for mergeVariantsEqualDuration which takes two streams (which cannot contain container
     streams like measures and parts) and merges the second into the first via variant objects.
     If the first already contains variant objects, containsVariants should be set to true and the
     function will compare streamB to the streamA as well as the variant streams contained in streamA.
@@ -1006,7 +1285,7 @@ def _mergeVariants(streamA, streamB, containsVariants = False, variantName = Non
 
 def _generateVariant(noteList, originStream, start, variantName = None):
     '''
-    Helper function for mergeVariantStreams which takes a list of consecutive notes from a stream and returns
+    Helper function for mergeVariantsEqualDuration which takes a list of consecutive notes from a stream and returns
     a variant object containing the notes from the list at the offsets derived from their original context.
     
     >>> originStream = stream.Stream()
@@ -1040,130 +1319,7 @@ def _generateVariant(noteList, originStream, start, variantName = None):
     return returnVariant
 
 
-def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByMeasureNumber = False, recurseInMeasures = False):
-    '''
-    Some MusicXML files are generated with full parts that have only a few non-rest measures instead of ossia parts, such as those
-    created by Sibelius 7. This function
-    takes two streams (mainpart and ossiapart), the second interpreted as an ossia. It outputs a stream with the ossia part merged into the stream as a 
-    group of variants.
-    
-    If compareByMeasureNumber is True, then the ossia measures will be paired with the measures in the mainpart that have the
-    same measure.number. Otherwise, they will be paired by offset. In most cases these should have the same result.
-    
-    >>> from music21 import *
-    >>> mainstream = converter.parse("  A4 B4 C4 D4   E1    F2 E2     E8 F8 F4 G2   G2 G4 F4   F4 F4 F4 F4   G1      ", "4/4")
-    >>> ossiastream = converter.parse(" r1            r1    r1        E4 E4 F4 G4   r1         F2    F2      r1      ", "4/4")
-    >>> mainstream.makeMeasures(inPlace = True)
-    >>> ossiastream.makeMeasures(inPlace = True)
-    
-    >>> # mainstream.__class__ = stream.Part
-    >>> mainpart = stream.Part()
-    >>> for m in mainstream:
-    ...    mainpart.insert(m.offset, m)
-    >>> ossiapart = stream.Part()
-    >>> for m in ossiastream:
-    ...    ossiapart.insert(m.offset, m)
-    
-    >>> s = stream.Stream()
-    >>> s.insert(0.0, ossiapart)
-    >>> s.insert(0.0, mainpart)
-    >>> #_DOCS_SHOW s.show()
-    
-    >>> mainpartWithOssiaVariantsFT = variant.mergePartAsOssia(mainpart, ossiapart,
-    ...                                                            ossiaName = 'Parisian Variant',
-    ...                                                            inPlace = False,
-    ...                                                            compareByMeasureNumber = False,
-    ...                                                            recurseInMeasures = True)
-    >>> mainpartWithOssiaVariantsTT = variant.mergePartAsOssia(mainpart, ossiapart,
-    ...                                                            ossiaName = 'Parisian Variant',
-    ...                                                            inPlace = False,
-    ...                                                            compareByMeasureNumber = True,
-    ...                                                            recurseInMeasures = True)
-    >>> mainpartWithOssiaVariantsFF = variant.mergePartAsOssia(mainpart, ossiapart,
-    ...                                                            ossiaName = 'Parisian Variant',
-    ...                                                            inPlace = False,
-    ...                                                            compareByMeasureNumber = False,
-    ...                                                            recurseInMeasures = False)
-    >>> mainpartWithOssiaVariantsTF = variant.mergePartAsOssia(mainpart, ossiapart,
-    ...                                                            ossiaName = 'Parisian Variant',
-    ...                                                            inPlace = False,
-    ...                                                            compareByMeasureNumber = True,
-    ...                                                            recurseInMeasures = False)
-                                                                
-    >>> mainpartWithOssiaVariantsFT.show('text') == mainpartWithOssiaVariantsTT.show('text')
-    {0.0} <music21.stream.Measure ...
-    True
-    
-    >>> mainpartWithOssiaVariantsFF.show('text') == mainpartWithOssiaVariantsFT.show('text')
-    {0.0} <music21.stream.Measure ...
-    True
-    
-    >>> mainpartWithOssiaVariantsFT.show('text')
-    {0.0} <music21.stream.Measure 1 offset=0.0>
-    ...
-    {12.0} <music21.stream.Measure 4 offset=12.0>
-        {0.0} <music21.variant.Variant object at ...>
-        {0.0} <music21.note.Note E>
-        {0.5} <music21.note.Note F>
-        {1.0} <music21.note.Note F>
-        {2.0} <music21.note.Note G>
-    {16.0} <music21.stream.Measure 5 offset=16.0>
-    ...
-    {20.0} <music21.stream.Measure 6 offset=20.0>
-        {0.0} <music21.variant.Variant object at ...>
-        {0.0} <music21.note.Note F>
-        {1.0} <music21.note.Note F>
-        {2.0} <music21.note.Note F>
-        {3.0} <music21.note.Note F>
-    ...
-    
-    >>> mainpartWithOssiaVariantsFF.activateVariants('Parisian Variant').show('text')
-    {0.0} <music21.stream.Measure 1 offset=0.0>
-    ...
-    {12.0} <music21.variant.Variant object at ...>
-    {12.0} <music21.stream.Measure 4 offset=12.0>
-        {0.0} <music21.note.Note E>
-        {1.0} <music21.note.Note E>
-        {2.0} <music21.note.Note F>
-        {3.0} <music21.note.Note G>
-    {16.0} <music21.stream.Measure 5 offset=16.0>
-    ...
-    {20.0} <music21.variant.Variant object at ...>
-    {20.0} <music21.stream.Measure 6 offset=20.0>
-        {0.0} <music21.note.Note F>
-        {2.0} <music21.note.Note F>
-    ...
-    
-    '''
-    if inPlace is True:
-        returnObj = mainpart
-    else:
-        returnObj = copy.deepcopy(mainpart)
-    
-    if compareByMeasureNumber is True:
-        for ossiaMeasure in ossiapart.getElementsByClass("Measure"):
-            if len(ossiaMeasure.notes) > 0: #If the measure is not just rests
-                ossiaNumber = ossiaMeasure.number
-                returnMeasure = returnObj.measure(ossiaNumber)
-                if recurseInMeasures is True: 
-                    mergeVariantStreams([returnMeasure, ossiaMeasure], [ossiaName], inPlace = True)
-                else:
-                    ossiaOffset = returnMeasure.getOffsetBySite(returnObj)
-                    addVariant(returnObj, ossiaOffset, ossiaMeasure, variantName = ossiaName, variantGroups = None, replacementDuration = None)
-    else:
-        for ossiaMeasure in ossiapart.getElementsByClass("Measure"):
-            if len(ossiaMeasure.notes) > 0: #If the measure is not just rests
-                ossiaOffset = ossiaMeasure.getOffsetBySite(ossiapart)
-                if recurseInMeasures is True:
-                    returnMeasure = returnObj.getElementsByOffset(ossiaOffset, classList = [stream.Measure])[0]
-                    mergeVariantStreams([returnMeasure, ossiaMeasure], [ossiaName], inPlace = True)
-                else:
-                    addVariant(returnObj, ossiaOffset, ossiaMeasure, variantName = ossiaName, variantGroups = None, replacementDuration = None)
-        
-    if inPlace is True:
-        return
-    else:
-        return returnObj
+
 
 
 #-------------------------------------------------------------------------------
@@ -1489,6 +1645,115 @@ class Variant(music21.Music21Object):
         the same length.
         ''')
 
+    
+    def replacementElements(self, contextStream):
+        '''
+        Returns the stream which this variant replaces in a given context stream. This will have length self.replacementDuration.
+        In regions that are strictly replaced, only elements that share a class with an element in the variant
+        are captured. Elsewhere, all elements are captured.
+        
+        >>> from music21 import *
+        >>> s = converter.parse("d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                  d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1", "4/4")
+        >>> s.makeMeasures(inPlace = True)
+        >>> v1stream = converter.parse("       a2. b-8 a8", "4/4")
+        >>> v2stream1 = converter.parse("                                      d4 f4 a2", "4/4")
+        >>> v2stream2 = converter.parse("                                                 d4 f4 AA2", "4/4")
+        
+        >>> v1 = variant.Variant()
+        >>> v1measure = stream.Measure()
+        >>> v1.insert(0.0, v1measure)
+        >>> for e in v1stream.notesAndRests:
+        ...    v1measure.insert(e.offset, e)
+        
+        >>> v2 = variant.Variant()
+        >>> v2measure1 = stream.Measure()
+        >>> v2measure2 = stream.Measure()
+        >>> v2.insert(0.0, v2measure1)
+        >>> v2.insert(4.0, v2measure2)
+        >>> for e in v2stream1.notesAndRests:
+        ...    v2measure1.insert(e.offset, e)
+        >>> for e in v2stream2.notesAndRests:
+        ...    v2measure2.insert(e.offset, e)
+        
+        >>> v3 = variant.Variant()
+        >>> v2.replacementDuration = 4.0
+        >>> v3.replacementDuration = 4.0
+        
+        >>> s.insert(4.0, v1)    # replacement variant
+        >>> s.insert(12.0, v2)  # insertion variant (2 bars replace 1 bar)
+        >>> s.insert(20.0, v3)  # deletion variant (0 bars replace 1 bar)
+        
+        >>> v1.replacementElements(s).show('text')
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+            {0.0} <music21.note.Note A>
+            {2.0} <music21.note.Note B->
+            {3.0} <music21.note.Note A>
+            
+        >>> v2.replacementElements(s).show('text')
+        {12.0} <music21.stream.Measure 4 offset=12.0>
+            {0.0} <music21.note.Note D>
+            {2.0} <music21.note.Note A>
+            
+        >>> v3.replacementElements(s).show('text')
+        {20.0} <music21.stream.Measure 6 offset=20.0>
+            {0.0} <music21.note.Note A>
+            {2.0} <music21.note.Note B->
+            {3.0} <music21.note.Note A>
+        
+        '''
+        if self not in contextStream.variants:
+            raise VariantException("Variant not found in stream %s" % contextStream)
+        
+        vStart = self.getOffsetBySite(contextStream)
+        
+        if self.lengthType == 'replacement':
+            classes =[]
+            vEnd = vStart + self.containedHighestTime
+            for e in self.elements:
+                classes.append(e.classes[0])
+            returnStream = contextStream.getElementsByOffset(vStart, vEnd,
+                includeEndBoundary=False,
+                mustFinishInSpan=False,
+                mustBeginInSpan=True,
+                classList=classes)
+        
+        elif self.lengthType == 'elongation':
+            classes = []
+            vEnd = vStart + self.replacementDuration
+            for e in self.elements:
+                classes.append(e.classes[0])
+            returnStream = contextStream.getElementsByOffset(vStart, vEnd,
+                includeEndBoundary=False,
+                mustFinishInSpan=False,
+                mustBeginInSpan=True,
+                classList=classes)
+            
+        elif self.lengthType == 'deletion':
+            vMiddle = vStart + self.containedHighestTime
+            vEnd = vStart + self.replacementDuration
+            classes = [] # collect all classes found in this variant    
+            for e in self.elements:
+                classes.append(e.classes[0])
+            returnPart1 = contextStream.getElementsByOffset(vStart, vMiddle,
+                includeEndBoundary=False,
+                mustFinishInSpan=False,
+                mustBeginInSpan=True,
+                classList=classes)
+            returnPart2 = contextStream.getElementsByOffset(vMiddle, vEnd,
+                includeEndBoundary=False,
+                mustFinishInSpan=False,
+                mustBeginInSpan=True)
+            
+            returnStream = returnPart1
+            for e in returnPart2.elements:
+                oInPart = e.getOffsetBySite(returnPart2)
+                returnStream.insert(vMiddle-vStart+oInPart, e)
+            
+        if self in returnStream:
+            returnStream.remove(self)
+        
+        return returnStream
+    
 #-------------------------------------------------------------------------------
 # class VariantBundle(object):
 #     '''A utility object for processing collections of Varaints. 

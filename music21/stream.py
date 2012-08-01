@@ -10316,18 +10316,11 @@ class Stream(music21.Music21Object):
         # matching by span means that we remove all elements with the
         # span defined by the variant
         else:
-            vEnd = vStart + v.containedHighestTime
-            classes = [] # collect all classes found in this variant    
             deletedMeasures = []
             insertedMeasures = []
             highestNumber = None
-            for e in v.elements:
-                classes.append(e.classes[0])
-            targets = self.getElementsByOffset(vStart, vEnd,
-                includeEndBoundary=False, # do not get e tt start at end
-                mustFinishInSpan=False, # if extends beyond, still get
-                mustBeginInSpan=True,
-                classList=classes)
+            
+            targets = v.replacementElements(self)
 
             # this will always remove elements before inserting
             for e in targets:
@@ -10338,6 +10331,7 @@ class Stream(music21.Music21Object):
                 self.remove(e)
                 if type(e) is music21.stream.Measure: #Save deleted measure numbers.
                     deletedMeasures.append(e.number)
+            
             for e in v.elements:
                 oInStream = vStart + e.getOffsetBySite(v.containedSite)
                 self.insert(oInStream, e)
@@ -10434,36 +10428,13 @@ class Stream(music21.Music21Object):
         removed.groups = ['default'] #for now, default
         removed.replacementDuration = v.containedHighestTime
         vStart = v.getOffsetBySite(self)
+        deletionStart = vStart + v.containedHighestTime
         
-        #deal with the overlapping region first (limit by class)
-        vEnd = vStart + v.containedHighestTime
-        classes = [] # collect all classes found in this variant    
-        for e in v.elements:
-            classes.append(e.classes[0])
-        targets = self.getElementsByOffset(vStart, vEnd,
-            includeEndBoundary=False, # do not get e tt start at end
-            mustFinishInSpan=False, # if extends beyond, still get
-            mustBeginInSpan=True,
-            classList=classes)
+        targets = v.replacementElements(self)
 
         # this will always remove elements before inserting
         for e in targets:
             if type(e) is music21.stream.Measure: #if a measure is deleted, save its number
-                deletedMeasures.append(e.number)
-            oInVariant = e.getOffsetBySite(self) - vStart
-            removed.insert(oInVariant, e)
-            self.remove(e)
-        
-        #Next deal with elements in the deleted section (do not limit by class)
-        deletionStart = vEnd
-        deletionEnd = vEnd + lengthDifference
-        targets = self.getElementsByOffset(deletionStart, deletionEnd,
-            includeEndBoundary=False,
-            mustFinishInSpan=False,
-            mustBeginInSpan=True)
-        
-        for e in targets:
-            if type(e) is music21.stream.Measure: #if a measures is deleted save its number
                 deletedMeasures.append(e.number)
             oInVariant = e.getOffsetBySite(self) - vStart
             removed.insert(oInVariant, e)
@@ -10576,33 +10547,12 @@ class Stream(music21.Music21Object):
         vStart = v.getOffsetBySite(self)
                 
         #First deal with the elements in the overlapping section (limit by class)
-        vEnd = vStart + v.replacementDuration
-        classes = [] # collect all classes found in this variant    
-        for e in v.elements:
-            classes.append(e.classes[0])
-        targets = self.getElementsByOffset(vStart, vEnd,
-            includeEndBoundary=False, # do not get e tt start at end
-            mustFinishInSpan=False, # if extends beyond, still get
-            mustBeginInSpan=True,
-            classList=classes)
+        targets = v.replacementElements(self)
 
         # this will always remove elements before inserting        
         for e in targets:
             if type(e) is music21.stream.Measure: # Save deleted measure numbers.
                 deletedMeasures.append(e.number)
-            oInVariant = e.getOffsetBySite(self) - vStart
-            removed.insert(oInVariant, e)
-            self.remove(e)
-        
-        #Next deal with elements in the inserted section (do not limit by class)
-        insertionStart = vEnd
-        insertionEnd = vEnd + lengthDifference
-        targets = self.getElementsByOffset(insertionStart, insertionEnd,
-            includeEndBoundary=False,
-            mustFinishInSpan=False,
-            mustBeginInSpan=True)
-        
-        for e in targets: # I think targets should always be []
             oInVariant = e.getOffsetBySite(self) - vStart
             removed.insert(oInVariant, e)
             self.remove(e)
@@ -10856,7 +10806,7 @@ class Stream(music21.Music21Object):
 
     def showVariantAsOssialikePart(self, containedPart, variantGroups, inPlace = False):
         '''
-        Takes a part within the score and a variant within that part. Puts the variant object
+        Takes a part within the score and a list of variant groups within that part. Puts the variant object
         in a part surrounded by hidden rests to mimic the appearence of an ossia despite limited
         musicXML support for ossia staves. Note that this will ignore variants with .lengthType
         'elongation' and 'deletion' as there is no good way to represent ossia staves like those
