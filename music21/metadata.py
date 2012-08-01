@@ -2109,7 +2109,7 @@ class MetadataBundle(music21.JSONSerializer):
         0
         >>> post = mb.search('cicon', 'composer', extList=['.xml'])
         >>> len(post)
-        1
+        11
         '''
         post = []
         for key in self._storage.keys():

@@ -1924,7 +1924,7 @@ def findTransposedAndInvertedMultisets(inputStream, multisetlist, reps = 'skipCo
 class HistoricalTwelveToneRow(TwelveToneRow):
     
     '''
-    Subclass of :class:`music21.serial.HistoricalRow` storing additional attributes of a twelve-tone row used in the historical literature.
+    Subclass of :class:`music21.serial.TwelveToneRow` storing additional attributes of a twelve-tone row used in the historical literature.
     
     '''
     
@@ -2186,7 +2186,7 @@ class Test(unittest.TestCase):
         
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = ['ToneRow', 'TwelveToneRow', 'HistoricalRow', 'pcToToneRow', 'TwelveToneMatrix', 'rowToMatrix', 
+_DOC_ORDER = ['ToneRow', 'TwelveToneRow', 'pcToToneRow', 'TwelveToneMatrix', 'rowToMatrix', 
               'getHistoricalRowByName', 'getContiguousSegmentsOfLength', 'findSegments',
               'findTransposedSegments', 'findTransformedSegments', 'findMultisets', 'findTransposedMultisets', 
               'findTransposedAndInvertedMultisets']

@@ -4616,7 +4616,7 @@ class ElementWrapper(Music21Object):
     ...         print j
     <ElementWrapper id=0_wrapper offset=0.0 obj="<...Wave_read object...">
     <ElementWrapper id=1_wrapper offset=1.0 obj="<...Wave_read object...">
-    <ElementWrapper offset=2.0 obj="<....Wave_read object ...">
+    <ElementWrapper offset=2.0 obj="<...Wave_read object...">
     '''
     obj = None
     _id = None

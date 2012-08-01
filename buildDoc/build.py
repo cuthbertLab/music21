@@ -536,7 +536,8 @@ class PartitionedModule(PartitionedName):
 
         for name in self.namesOrdered:
             if name not in namesSupply:
-                raise Exception('module %s does not have name %s' % (self.srcNameStr, name))
+                environLocal.warn('module %s does not have name %s' % (self.srcNameStr, name))
+                continue
             junk = namesSupply.pop(namesSupply.index(name))
     
             i = self.names.index(name)
