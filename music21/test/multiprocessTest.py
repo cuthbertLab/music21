@@ -283,7 +283,7 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
 
     modGather = ModuleGather()
 
-    maxTimeout = 120
+    maxTimeout = 300
     pathsToRun = modGather.modulePaths
 
     pool = multiprocessing.Pool(processes=poolSize)
