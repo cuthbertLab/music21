@@ -10320,7 +10320,7 @@ class Stream(music21.Music21Object):
             insertedMeasures = []
             highestNumber = None
             
-            targets = v.replacementElements(self)
+            targets = v.replacedElements(self)
 
             # this will always remove elements before inserting
             for e in targets:
@@ -10430,7 +10430,7 @@ class Stream(music21.Music21Object):
         vStart = v.getOffsetBySite(self)
         deletionStart = vStart + v.containedHighestTime
         
-        targets = v.replacementElements(self)
+        targets = v.replacedElements(self)
 
         # this will always remove elements before inserting
         for e in targets:
@@ -10547,7 +10547,7 @@ class Stream(music21.Music21Object):
         vStart = v.getOffsetBySite(self)
                 
         #First deal with the elements in the overlapping section (limit by class)
-        targets = v.replacementElements(self)
+        targets = v.replacedElements(self)
 
         # this will always remove elements before inserting        
         for e in targets:

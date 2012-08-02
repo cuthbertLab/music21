@@ -1646,7 +1646,7 @@ class Variant(music21.Music21Object):
         ''')
 
     
-    def replacementElements(self, contextStream):
+    def replacedElements(self, contextStream = None, classList = None, keepOriginalOffsets = False):
         '''
         Returns the stream which this variant replaces in a given context stream. This will have length self.replacementDuration.
         In regions that are strictly replaced, only elements that share a class with an element in the variant
@@ -1683,34 +1683,44 @@ class Variant(music21.Music21Object):
         >>> s.insert(12.0, v2)  # insertion variant (2 bars replace 1 bar)
         >>> s.insert(20.0, v3)  # deletion variant (0 bars replace 1 bar)
         
-        >>> v1.replacementElements(s).show('text')
+        >>> v1.replacedElements(s).show('text')
         {4.0} <music21.stream.Measure 2 offset=4.0>
             {0.0} <music21.note.Note A>
             {2.0} <music21.note.Note B->
             {3.0} <music21.note.Note A>
             
-        >>> v2.replacementElements(s).show('text')
+        >>> v2.replacedElements(s).show('text')
         {12.0} <music21.stream.Measure 4 offset=12.0>
             {0.0} <music21.note.Note D>
             {2.0} <music21.note.Note A>
             
-        >>> v3.replacementElements(s).show('text')
+        >>> v3.replacedElements(s).show('text')
         {20.0} <music21.stream.Measure 6 offset=20.0>
             {0.0} <music21.note.Note A>
             {2.0} <music21.note.Note B->
             {3.0} <music21.note.Note A>
         
         '''
+        if contextStream is None:
+            contextStream = self.activeSite
+            if contextStream is None:
+                environLocal.printDebug("No contextStream or activeSite, finding most recently added site (dangerous)")
+                contextStream = self.getContextByClass('Stream')
+                if contextStream is None:
+                    raise VariantException("Cannot find a Stream context for this object...")
+        
         if self not in contextStream.variants:
             raise VariantException("Variant not found in stream %s" % contextStream)
         
         vStart = self.getOffsetBySite(contextStream)
         
         if self.lengthType == 'replacement' or self.lengthType == 'elongation':
-            classes =[]
             vEnd = vStart + self.replacementDuration
+            classes = []
             for e in self.elements:
                 classes.append(e.classes[0])
+            if classList is not None:
+                classes.extend(classList)
             returnStream = contextStream.getElementsByOffset(vStart, vEnd,
                 includeEndBoundary=False,
                 mustFinishInSpan=False,
@@ -1723,6 +1733,8 @@ class Variant(music21.Music21Object):
             classes = [] # collect all classes found in this variant    
             for e in self.elements:
                 classes.append(e.classes[0])
+            if classList is not None:
+                classes.extend(classList)
             returnPart1 = contextStream.getElementsByOffset(vStart, vMiddle,
                 includeEndBoundary=False,
                 mustFinishInSpan=False,
@@ -1741,7 +1753,78 @@ class Variant(music21.Music21Object):
         if self in returnStream:
             returnStream.remove(self)
         
+        #--This probably makes sense to do, but activateVariants for example only uses the offset in the original
+        #--anyways. Also, we are not changing measure numbers and should not as that will cause activateVariants to fail.
+        if keepOriginalOffsets is False:
+            for e in returnStream:
+                e.setOffsetBySite(returnStream, e.getOffsetBySite(returnStream) - vStart)
+                
         return returnStream
+    
+    def removeReplacedElementsFromStream(self, referenceStream=None, classList=None):
+        '''   
+        remove replaced elements from a referenceStream or activeSite
+ 
+        >>> from music21 import *
+        >>> v = variant.Variant()
+        >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
+        >>> variantDataM2 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
+        >>> variantData = [variantDataM1, variantDataM2]
+        >>> for d in variantData:
+        ...    m = stream.Measure()
+        ...    for pitchName,durType in d:
+        ...        n = note.Note(pitchName)
+        ...        n.duration.type = durType
+        ...        m.append(n)
+        ...    v.append(m)
+        >>> v.groups = ['paris']
+        >>> v.replacementDuration = 4.0
+       
+        >>> s = stream.Stream()
+        >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
+        >>> streamDataM2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
+        >>> streamDataM3 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+        >>> streamDataM4 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+        >>> streamData = [streamDataM1, streamDataM2, streamDataM3, streamDataM4]
+        >>> for d in streamData:
+        ...    m = stream.Measure()
+        ...    for pitchName,durType in d:
+        ...        n = note.Note(pitchName)
+        ...        n.duration.type = durType
+        ...        m.append(n)
+        ...    s.append(m)
+        >>> s.insert(4.0, v)
+ 
+        >>> v.removeReplacedElementsFromStream(s)
+        >>> s.show('t')
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note G>
+        {4.0} <music21.variant.Variant object at 0x...>
+        {8.0} <music21.stream.Measure 0 offset=8.0>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note A>
+        {12.0} <music21.stream.Measure 0 offset=12.0>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note A>
+        '''
+        if referenceStream is None:
+            referenceStream = self.activeSite
+            if referenceStream is None:
+                environLocal.printDebug("No referenceStream or activeSite, finding most recently added site (dangerous)")
+                referenceStream = self.getContextByClass('Stream')
+                if referenceStream is None:
+                    raise VariantException("Cannot find a Stream context for this object...")
+        # TODO: error if v not in referenceStream
+        replacedElements = self.replacemedElements(referenceStream, classList)
+        for el in replacedElements:
+            referenceStream.remove(el)
     
 #-------------------------------------------------------------------------------
 # class VariantBundle(object):
