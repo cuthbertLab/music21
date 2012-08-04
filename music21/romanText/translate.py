@@ -442,10 +442,10 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                         # use source to evaluation roman 
                         try:
                             asrc = a.src
-                            if kCurrent.mode == 'minor':
-                                if asrc.lower().startswith('vi'): #vi or vii w/ or w/o o
-                                    if asrc.upper() == a.src: # VI or VII to bVI or bVII
-                                        asrc = 'b' + asrc
+#                            if kCurrent.mode == 'minor':
+#                                if asrc.lower().startswith('vi'): #vi or vii w/ or w/o o
+#                                    if asrc.upper() == a.src: # VI or VII to bVI or bVII
+#                                        asrc = 'b' + asrc
                             rn = roman.RomanNumeral(asrc, copy.deepcopy(kCurrent))
                         except (roman.RomanNumeralException, 
                             common.Music21CommonException): 
