@@ -457,6 +457,7 @@ class JSONSerializer(object):
             }, 
             "_duration": {
               "__attr__": {
+                "_cachedIsLinked": true, 
                 "_components": [
                   {
                     "__attr__": {
@@ -464,8 +465,8 @@ class JSONSerializer(object):
                         0
                       ], 
                       "_link": true, 
-                      "_qtrLength": 0.0, 
-                      "_quarterLengthNeedsUpdating": true, 
+                      "_qtrLength": 1.0, 
+                      "_quarterLengthNeedsUpdating": false, 
                       "_tuplets": [], 
                       "_type": "quarter", 
                       "_typeNeedsUpdating": false
@@ -474,8 +475,8 @@ class JSONSerializer(object):
                   }
                 ], 
                 "_componentsNeedUpdating": false, 
-                "_qtrLength": 0.0, 
-                "_quarterLengthNeedsUpdating": true
+                "_qtrLength": 1.0, 
+                "_quarterLengthNeedsUpdating": false
               }, 
               "__class__": "<class 'music21.duration.Duration'>"
             }, 
@@ -524,6 +525,31 @@ class JSONSerializer(object):
                     "_timeIndex": 1
                   }, 
                   "__class__": "<class 'music21.base.DefinedContexts'>"
+                }, 
+                "_duration": {
+                  "__attr__": {
+                    "_cachedIsLinked": true, 
+                    "_components": [
+                      {
+                        "__attr__": {
+                          "_dots": [
+                            0
+                          ], 
+                          "_link": true, 
+                          "_qtrLength": 1.0, 
+                          "_quarterLengthNeedsUpdating": false, 
+                          "_tuplets": [], 
+                          "_type": "quarter", 
+                          "_typeNeedsUpdating": false
+                        }, 
+                        "__class__": "<class 'music21.duration.DurationUnit'>"
+                      }
+                    ], 
+                    "_componentsNeedUpdating": false, 
+                    "_qtrLength": 1.0, 
+                    "_quarterLengthNeedsUpdating": false
+                  }, 
+                  "__class__": "<class 'music21.duration.Duration'>"
                 }, 
                 "_microtone": {
                   "__attr__": {

@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 
 '''
-Run this module to process all files in the corpus. 
+Run this module to process all files in the corpus. Either the 'core', 'local', or 'virtual' corpus.
 '''
 
 from music21 import common

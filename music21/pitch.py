@@ -1202,7 +1202,7 @@ class Pitch(music21.Music21Object):
         
         
         '''
-        music21.Music21Object.__init__(self)
+        music21.Music21Object.__init__(self, **keywords)
 
         # this should not be set, as will be updated when needed
         self._ps = None # pitch space representation, w C4=60 (midi)

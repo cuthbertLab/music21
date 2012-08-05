@@ -179,8 +179,8 @@ A basic example follows::
     ...     n = note.Note()
     ...     n.midi = midiNumber
     ...     frequency = n.frequency
-    ...		data.append( (midiNumber, int(frequency) ) )
-    >>>     a.setData(data)
+    ...	    data.append( (midiNumber, int(frequency) ) )
+    >>> a.setData(data)
     >>> a.process()  # doctest: +SKIP
 
 .. image:: images/graphing-01.*

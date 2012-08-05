@@ -7,6 +7,17 @@
 # Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
+'''
+Builds various kinds of music21 distribution files and uploads them to PyPI and GoogleCode.
+
+To do a release, first run test/multiprocessTest.py then test/test.py (normally not necessary,
+because it's slower and mostly duplicates multiprocessTest, but should be done before making
+a release), then test/testDocumentation, test/testSerialization, and test/testStream.
+
+If all tests pass, run `corpus.cacheMetadata('core')`, buildDoc/build, buildDoc/upload, and
+finally this file.
+'''
+
 
 import os, sys, tarfile, zipfile
 

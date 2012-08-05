@@ -51,7 +51,16 @@ class Chord(note.NotRest):
 
     >>> from music21 import *
     >>> dmaj = chord.Chord(["D","F#","A"])
-
+    >>> dmaj
+    <music21.chord.Chord D F# A>
+    
+    Pitch names can also include octaves:
+    
+    >>> dmaj = chord.Chord(["D3","F#4","A5"])
+    >>> dmaj
+    <music21.chord.Chord D3 F#4 A5>
+    
+    
 
     Or you can combine already created Notes or Pitches:
 
@@ -68,11 +77,29 @@ class Chord(note.NotRest):
 
 
     >>> cmaj = chord.Chord([Cnote, Enote, Gnote])
-
+    >>> cmaj # default octave of 4 is used for these notes, since octave was not specified
+    <music21.chord.Chord C4 E4 G4>
     
     Chord has the ability to determine the root of a chord, as well as the bass note of a chord.
     In addition, Chord is capable of determining what type of chord a particular chord is, whether
     it is a triad or a seventh, major or minor, etc, as well as what inversion the chord is in.     
+    
+    OMIT_FROM_DOCS
+    
+    Test that durations are being created efficiently:
+    
+    >>> dmaj.duration
+    <music21.duration.Duration 1.0>
+    >>> cmaj.pitches[0] is Cnote.pitch
+    True
+    >>> Cnote.duration
+    <music21.duration.Duration 1.0>
+    >>> cmaj.duration
+    <music21.duration.Duration 1.0>
+    >>> cmaj.duration is Cnote.duration
+    True
+    
+    
     '''
     _bass = None
     _root = None
@@ -115,16 +142,29 @@ class Chord(note.NotRest):
         # keep it here in case we have no notes
         #self.duration = None  # inefficient, since note.Note.__init__ set it
         #del(self.pitch)
+        quickDuration = False
+        if 'duration' not in keywords:
+            keywords['duration'] = self.duration
+            quickDuration = True
         
         for n in notes:
             if isinstance(n, music21.pitch.Pitch):
                 # assign pitch to a new Note
-                newNote = note.Note()
-                newNote.pitch = n
+                if 'duration' in keywords:
+                    newNote = note.Note(n, duration=keywords['duration'])
+                else:
+                    newNote = note.Note(n)
                 self._components.append(newNote)
                 #self._components.append({'pitch':n})
             elif isinstance(n, music21.note.Note):
-                self._components.append(copy.deepcopy(n))
+                self._components.append(n)
+                if quickDuration is True:
+                    self.duration = n.duration
+                    #print "got it! %s" % n
+                    del(keywords['duration'])
+                    quickDuration = False
+                # no need for deepcopy...
+                #self._components.append(copy.deepcopy(n))
 
                 # TODO: need to provide self as argument, but currently
                 # cause problem on copy
@@ -138,28 +178,38 @@ class Chord(note.NotRest):
             elif isinstance(n, Chord):
                 for newNote in n._components:
                     self._components.append(copy.deepcopy(n))
-
+                if quickDuration is True:
+                    self.duration = n.duration
+                    del(keywords['duration'])
+                    quickDuration = False
                 # TODO: transfer all attributes from _components of other
 #                 for p in n.pitches:
 #                     # this might better make a deepcopy of the pitch
 #                     self._components.append({'pitch':p})
             elif isinstance(n, basestring) or isinstance(n, int):
-                self._components.append(note.Note(n))
+                if 'duration' in keywords:
+                    self._components.append(note.Note(n, duration=keywords['duration']))
+                else:
+                    self._components.append(note.Note(n))
                 #self._components.append({'pitch':music21.pitch.Pitch(n)})
             else:
                 raise ChordException("Could not process input argument %s" % n)
 
+        if quickDuration is True:
+            del(keywords['duration'])
+            quickDuration = False
+            
         if "duration" in keywords or "type" in keywords or \
             "quarterLength" in keywords: #dots dont cut it
             self.duration = music21.duration.Duration(**keywords)
 
-        elif len(notes) > 0:
-            for thisNote in notes:
-                # get duration from first note
-                # but should other notes have the same duration?
-                if hasattr(thisNote, "duration") and thisNote.duration != None:
-                    self.duration = notes[0].duration
-                    break
+#        elif len(notes) > 0:
+#            for thisNote in notes:
+#                # get duration from first note
+#                # but should other notes have the same duration?
+#                if hasattr(thisNote, "duration") and thisNote.duration != None:
+#                    self.duration = notes[0].duration
+#                    break
 
         if "beams" in keywords:
             self.beams = keywords["beams"]

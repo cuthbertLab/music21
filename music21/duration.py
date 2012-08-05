@@ -2419,7 +2419,7 @@ class Duration(DurationCommon):
         elif len(self.components) > 1:
             return None
         else: # there must be 1 or more components
-            raise DurationException("unexpected number DurationUnits in components: %s" % len(self.components))
+            raise DurationException("Cannot get dots on an object with zero DurationUnits in its duration.components")
 
     def _setDots(self, value):
         '''Set dots if a number, as first element
@@ -2446,7 +2446,7 @@ class Duration(DurationCommon):
         elif len(self.components) > 1:
             raise DurationException("setting type on Complex note: Myke and Chris need to decide what that means")
         else: # there must be 1 or more components
-            raise DurationException("zero DurationUnits in components")        
+            raise DurationException("Cannot set dots on an object with zero DurationUnits in its duration.components")        
 
     dots = property(_getDots, _setDots)
 
@@ -2463,7 +2463,7 @@ class Duration(DurationCommon):
         elif len(self.components) > 1:
             return None
         else: # there must be 1 or more components
-            raise DurationException("unexpected number DurationUnits in components: %s" % len(self.components))
+            raise DurationException("Cannot get dotGroups on an object with zero DurationUnits in its duration.components (will cause problems later even if dotGroups are ignored)")
 
     def _setDotGroups(self, value):
         '''Set dotGroups if a list, as first element

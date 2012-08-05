@@ -231,8 +231,10 @@ class GeneralNote(music21.Music21Object):
     'tie': 'either None or a :class:`~music21.note.Tie` object.'
     }    
     def __init__(self, *arguments, **keywords):
-
-        tempDuration = duration.Duration(**keywords)
+        if 'duration' not in keywords:
+            tempDuration = duration.Duration(**keywords)
+        else:
+            tempDuration = keywords['duration']
         music21.Music21Object.__init__(self, duration = tempDuration)
         # this sets the stored duration defined in Music21Object
         self._duration = tempDuration
@@ -818,6 +820,8 @@ class Note(NotRest):
     # Accepts an argument for pitch
     def __init__(self, *arguments, **keywords):
         NotRest.__init__(self, **keywords)
+        if 'duration' not in keywords:
+            keywords['duration'] = self.duration
 
         if len(arguments) > 0:
             if isinstance(arguments[0], pitch.Pitch):
@@ -825,7 +829,9 @@ class Note(NotRest):
             else: # assume first arg is pitch
                 self.pitch = pitch.Pitch(arguments[0], **keywords) 
         else: # supply a default pitch
-            self.pitch = pitch.Pitch('C4')
+            if 'name' in keywords:
+                del(keywords['name'])
+            self.pitch = pitch.Pitch('C4', **keywords)
 
         if "beams" in keywords:
             self.beams = keywords["beams"]

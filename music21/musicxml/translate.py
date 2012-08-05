@@ -4602,12 +4602,12 @@ spirit</words>
 
         s = stream.Stream()
         m1 = stream.Measure()
-        m1.repeatAppend(note.Note(duration=1), 4)    
+        m1.repeatAppend(note.Note(quarterLength=1), 4)    
         mm1 = tempo.MetronomeMark(number=60.0)
         m1.insert(0, mm1)
         
         m2 = stream.Measure()
-        m2.repeatAppend(note.Note(duration=1), 4)    
+        m2.repeatAppend(note.Note(quarterLength=1), 4)    
         # tempo.MetronomeMark(number=120.0)
         mmod1 = tempo.MetricModulation()
         # assign with an equivalent statement of the eight
@@ -4617,7 +4617,7 @@ spirit</words>
         m2.insert(0, mmod1)
         
         m3 = stream.Measure()
-        m3.repeatAppend(note.Note(duration=1), 4)    
+        m3.repeatAppend(note.Note(quarterLength=1), 4)    
         mmod2 = tempo.MetricModulation()
         mmod2.oldMetronome = mmod1.newMetronome.getEquivalentByReferent(1.5)
         # set the other side of eq based on the desired  referent

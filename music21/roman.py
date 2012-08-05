@@ -624,6 +624,10 @@ class RomanNumeral(harmony.Harmony):
     >>> r.key = key.Key('B-')
     >>> r.pitches
     [G5, B5, D6, F6]
+
+    >>> r = roman.RomanNumeral('vio', em)
+    >>> r.pitches
+    [C#5, E5, G5]
     '''
 
     frontFlat = re.compile('^(b+)')
@@ -635,8 +639,6 @@ class RomanNumeral(harmony.Harmony):
     omitNote = re.compile('\[no([1-9])\]')
     
     def __init__(self, figure=None, keyOrScale=None, caseMatters = True):
-        
-
         self.primaryFigure = None
         self.secondaryRomanNumeral = None
         self.secondaryRomanNumeralKey = None
@@ -835,7 +837,8 @@ class RomanNumeral(harmony.Harmony):
         # make vii always #vii and vi always #vi
         if self.frontAlterationString == "" and hasattr(useScale, 'mode') and \
              useScale.mode == 'minor' and self.caseMatters == True:
-            if self.scaleDegree == 6 and self.impliedQuality == 'minor':
+            if self.scaleDegree == 6 and \
+                  (self.impliedQuality == 'minor' or self.impliedQuality =='diminished' or self.impliedQuality == 'half-diminished'):
                 self.frontAlterationTransposeInterval = interval.Interval('A1')
                 self.frontAlterationAccidental = pitch.Accidental(1)
             elif self.scaleDegree == 7 and \

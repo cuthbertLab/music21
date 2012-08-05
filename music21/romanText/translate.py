@@ -114,6 +114,9 @@ OMIT_FROM_DOCS
 >>> x = converter.parse('romantext: m1 a: vi')
 >>> x.flat.getElementsByClass('RomanNumeral')[0].pitches
 [F#5, A5, C#6]
+
+>>> converter.parse('romantext: m1 a: vio').flat.getElementsByClass('RomanNumeral')[0].pitches
+[F#5, A5, C6]
 '''
 import unittest
 import music21

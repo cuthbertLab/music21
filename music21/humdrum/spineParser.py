@@ -73,6 +73,7 @@ import os
 
 spinePathIndicators = ["*+", "*-", "*^", "*v", "*x", "*"]
 
+
 class HumdrumDataCollection(object):
     '''
     A HumdrumDataCollection takes in a mandatory list where each element
@@ -951,8 +952,8 @@ class HumdrumSpine(object):
             if 'Stream' in el.classes:
                 if currentMeasureNumber != 0 or len(currentMeasure) > 0:
                     currentMeasure._elementsChanged()
-                    streamOut.append(currentMeasure)
-                    #streamOut._appendCore(currentMeasure)
+                    #streamOut.append(currentMeasure)
+                    streamOut._appendCore(currentMeasure)
                 currentMeasure = el
                 currentMeasureNumber = el.number
                 currentMeasureOffset = el.offset
@@ -963,8 +964,8 @@ class HumdrumSpine(object):
                     #currentMeasure.insert(el.offset - currentMeasureOffset, el)
                     currentMeasure._insertCore(el.offset - currentMeasureOffset, el)
                 else:
-                    streamOut.append(el)
-                    #streamOut._appendCore(el)
+                    #streamOut.append(el)
+                    streamOut._appendCore(el)
         streamOut._elementsChanged()
         if len(currentMeasure) > 0:
             streamOut.append(currentMeasure)
@@ -1012,7 +1013,8 @@ class HumdrumSpine(object):
                 thisObject.humdrumPosition = event.position
             
             if thisObject is not None:
-                self.stream.append(thisObject)
+                self.stream._appendCore(thisObject)
+        self.stream._elementsChanged()
 
 class KernSpine(HumdrumSpine):
     '''
@@ -1027,7 +1029,7 @@ class KernSpine(HumdrumSpine):
         currentBeamNumbers = 0
         
         for event in self.eventList:
-            eventC = str(event.contents)  # is str already; just for Eclipse completion
+            eventC = event.contents
             thisObject = None            
             if eventC == ".":
                 pass
@@ -1050,21 +1052,19 @@ class KernSpine(HumdrumSpine):
                 for noteToProcess in notesToProcess:
                     thisNote = hdStringToNote(noteToProcess)
                     chordNotes.append(thisNote)
-                thisObject = music21.chord.Chord(chordNotes)
+                thisObject = music21.chord.Chord(chordNotes, beams=chordNotes[-1].beams)
                 thisObject.duration = chordNotes[0].duration
-                thisObject.beams = chordNotes[-1].beams
 
-                if hasattr(thisObject, 'beams'):
-                    if currentBeamNumbers != 0 and len(thisObject.beams.beamsList) == 0:
-                        for i in range(currentBeamNumbers):
-                            thisObject.beams.append('continue')
-                    elif len(thisObject.beams.beamsList) > 0:
-                        if thisObject.beams.beamsList[0].type == 'stop':
-                            currentBeamNumbers = 0
-                        else:
-                            for i in range(len(thisObject.beams.beamsList)):
-                                if thisObject.beams.beamsList[i].type != 'stop':
-                                    currentBeamNumbers += 1
+                if currentBeamNumbers != 0 and len(thisObject.beams.beamsList) == 0:
+                    for i in range(currentBeamNumbers):
+                        thisObject.beams.append('continue')
+                elif len(thisObject.beams.beamsList) > 0:
+                    if thisObject.beams.beamsList[0].type == 'stop':
+                        currentBeamNumbers = 0
+                    else:
+                        for i in range(len(thisObject.beams.beamsList)):
+                            if thisObject.beams.beamsList[i].type != 'stop':
+                                currentBeamNumbers += 1
 
                 if inTuplet is False and len(thisObject.duration.tuplets) > 0:
                     inTuplet = True
@@ -1074,7 +1074,7 @@ class KernSpine(HumdrumSpine):
                     lastNote.duration.tuplets[0].type = 'stop'
                 lastNote = thisObject
 
-            else:
+            else: # Note or Rest
                 thisObject = hdStringToNote(eventC)
                 if hasattr(thisObject, 'beams'):
                     if currentBeamNumbers != 0 and len(thisObject.beams.beamsList) == 0:
@@ -1099,11 +1099,10 @@ class KernSpine(HumdrumSpine):
                 thisObject.humdrumPosition = event.position
                 thisObject.humdrumSpineId  = event.spineId                
                 thisObject.priority = event.position
-                self.stream.append(thisObject)
-                
-        #if len(thisContainer.getElementsNotOfClass(bar.Barline)) > 0:
-        #    self.stream.append(thisContainer)
-        ## move things before first measure to first measure!
+                self.stream._appendCore(thisObject)
+        
+        self.stream._elementsChanged()        
+        ## still to be done later... move things before first measure to first measure!
 
 class DynamSpine(HumdrumSpine):
     '''
@@ -1124,7 +1123,8 @@ class DynamSpine(HumdrumSpine):
                     thisObject = MiscTandem(eventC)
             elif eventC.startswith('='):
                 if thisContainer is not None:
-                    self.stream.append(thisContainer)
+                    thisContainer._elementsChanged()
+                    self.stream._appendCore(thisContainer)
                 thisContainer = hdStringToMeasure(eventC)                
             elif eventC.startswith('!'):
                 ## TODO: process comments
@@ -1140,10 +1140,11 @@ class DynamSpine(HumdrumSpine):
                 thisObject.humdrumPosition = event.position
                 thisObject.humdrumSpineId  = event.spineId                
                 if thisContainer is None:
-                    self.stream.append(thisObject)
+                    self.stream._appendCore(thisObject)
                 else:
-                    thisContainer.append(thisObject)
+                    thisContainer._appendCore(thisObject)
 
+        self.stream._elementsChanged()
 
 ####### END HUMDRUM SPINES
 
@@ -1202,24 +1203,26 @@ class SpineEvent(object):
     def __str__(self):
         return self.contents
 
-    def toNote(self):
+    def toNote(self, convertString = None):
         '''
         parse the object as a \*\*kern note and return the a
         :class:`~music21.note.Note` object (or Rest, or Chord)
         
         
         >>> from music21 import *
-        >>> se = music21.humdrum.spineParser.SpineEvent('CC#4')
+        >>> se = music21.humdrum.spineParser.SpineEvent('DD#4')
         >>> n = se.toNote()
         >>> n
-        <music21.note.Note C#>
+        <music21.note.Note D#>
         >>> n.octave
         2
         >>> n.duration.type
         'quarter'
         '''
-        
-        return hdStringToNote(self.contents)        
+        if convertString is None:
+            return hdStringToNote(self.contents)        
+        else:
+            return hdStringToNote(convertString)
 
 #------SPINE COLLECTION------------
 
@@ -1348,38 +1351,49 @@ class SpineCollection(object):
         take a parsed spineCollection as music21 objects and take
         subspines and put them in their proper location
         '''
-        for s in self.spines:
+        for thisSpine in self.spines:
             removeSpines = []
-            if s.parentSpine is None:
-                if s.childSpines != []:
-                    newStream = s.stream.__class__()
-                    insertPoints = sorted(s.childSpineInsertPoints)
-                    lastHumdrumPosition = -1
-                    for (elNum, el) in enumerate(s.stream):
-                        if hasattr(el, 'humdrumPosition'):
-                            humdrumPosition = el.humdrumPosition
-                            for i in insertPoints:
-                                if lastHumdrumPosition < i and humdrumPosition > i:
-                                    startPoint = newStream.highestTime
-                                    childrenToInsert = s.childSpineInsertPoints[i]
-                                    insertPoints.remove(i)
-                                    voiceNumber = 0
-                                    for insertSpine in childrenToInsert:
-                                        removeSpines.append(insertSpine.id)
-                                        voiceNumber += 1
-                                        for insertEl in insertSpine.stream:
-                                            if 'Measure' in insertEl.classes and insertSpine.isFirstVoice is False:
-                                                pass # only insert one measure object per spine
-                                            else:
-                                                insertEl.groups.append('voice' + str(voiceNumber))
-                                                #newStream.insert(startPoint + insertEl.offset, insertEl)
-                                                newStream._insertCore(startPoint + insertEl.offset, insertEl)
-                            lastHumdrumPosition = humdrumPosition
-                        newStream._elementsChanged()
-                        newStream._appendCore(el)
-                        #newStream.append(el)
-                    newStream._elementsChanged()
-                    s.stream = newStream
+            if thisSpine.parentSpine is not None:
+                continue
+            if len(thisSpine.childSpines) == 0:
+                continue
+            
+            # only spines with children spines and parent spines continue
+            newStream = thisSpine.stream.__class__()
+            insertPoints = sorted(thisSpine.childSpineInsertPoints)
+            lastHumdrumPosition = -1
+            # use _elements for being faster.
+            for (elNum, el) in enumerate(thisSpine.stream._elements):
+                try:
+                    humdrumPosition = el.humdrumPosition
+                    for i in insertPoints:
+                        if lastHumdrumPosition > i or humdrumPosition < i:
+                            continue
+                        ## insert a subspine into this Stream at the current location
+                        newStream._elementsChanged() # update highestTime
+                        startPoint = newStream.highestTime
+                        childrenToInsert = thisSpine.childSpineInsertPoints[i]
+                        insertPoints.remove(i)
+                        voiceNumber = 0
+                        for insertSpine in childrenToInsert:
+                            removeSpines.append(insertSpine.id)
+                            voiceNumber += 1
+                            voiceStr = 'voice' + str(voiceNumber)
+                            for insertEl in insertSpine.stream._elements:
+                                if insertSpine.isFirstVoice is False and 'Measure' in insertEl.classes:
+                                    pass # only insert one measure object per spine
+                                else:
+                                    insertEl.groups.append(voiceStr)
+                                    #newStream.insert(startPoint + insertEl.offset, insertEl)
+                                    newStream._insertCore(startPoint + insertEl.offset, insertEl)
+                        newStream._elementsChanged() # call between _insertCore and _appendCore
+                    lastHumdrumPosition = humdrumPosition
+                except AttributeError: # no el.humdrumPosition
+                    pass
+                newStream._appendCore(el)
+                #newStream.append(el)
+            newStream._elementsChanged()
+            thisSpine.stream = newStream
             #for removeMe in removeSpines:
             #    #needed for some tests
             #    self.removeSpineById(removeMe)
@@ -1502,12 +1516,14 @@ class SpineCollection(object):
                                         voicePart.groups.append(voiceName)
                                     mElOffset = mEl.offset
                                     el.remove(mEl)
-                                    voicePart.insert(mElOffset - lowestVoiceOffset, mEl)
+                                    voicePart._insertCore(mElOffset - lowestVoiceOffset, mEl)
                             #print voices
                             for voicePart in voices:
                                 if voicePart is not None:
                                     #voicePart.show('text')
-                                    el.insert(lowestVoiceOffset, voicePart)
+                                    voicePart._elementsChanged()
+                                    el._insertCore(lowestVoiceOffset, voicePart)
+                            el._elementsChanged()
                             #print el.number, "has voices at", lowestVoiceOffset
         
 
@@ -1622,6 +1638,8 @@ def hdStringToNote(contents):
     'Whole Triplet (2.67QL)'
     
     >>> n = hdStringToNote("e-00.")
+    >>> n.pitch
+    E-4
     >>> n.duration.quarterLength
     24.0
     >>> n.duration.fullName
@@ -1657,15 +1675,14 @@ def hdStringToNote(contents):
 
     thisObject = None
     if matchedNote:
-        thisObject = music21.note.Note()
         kernNoteName = matchedNote.group(1)
         step = kernNoteName[0].lower()
-        thisObject.step = step
         if (step == kernNoteName[0]): ## middle C or higher
             octave = 3 + len(kernNoteName)
         else: # below middle C
             octave = 4 - len(kernNoteName)
-        thisObject.octave = octave
+        thisObject = music21.note.Note(octave = octave)
+        thisObject.step = step
 
     # 3.3 -- Rests
     elif contents.count("r"):
@@ -1768,6 +1785,8 @@ def hdStringToNote(contents):
     
     # 3.2.7 Duration +
     # 3.2.8 N-Tuplets
+
+    ## SPEEDUP -- only search for rational after foundNumber...
     foundRational = re.search("(\d+)\%(\d+)", contents)
     foundNumber = re.search("(\d+)", contents)
     if foundRational:
@@ -1778,20 +1797,21 @@ def hdStringToNote(contents):
             thisObject.duration.dots = contents.count('.')            
         
     elif foundNumber:
-        durationString = foundNumber.group(1)
         durationType = int(foundNumber.group(1))
-        if durationString == '000': # for larger values, see http://wiki.humdrum.org/index.php/Rational_rhythms
-            thisObject.duration.type = 'maxima'
-            if contents.count('.'):
-                thisObject.duration.dots = contents.count('.')            
-        elif durationString == '00': # for larger values, see http://wiki.humdrum.org/index.php/Rational_rhythms
-            thisObject.duration.type = 'longa'
-            if contents.count('.'):
-                thisObject.duration.dots = contents.count('.')            
-        elif durationType == 0:
-            thisObject.duration.type = 'breve'
-            if contents.count('.'):
-                thisObject.duration.dots = contents.count('.')
+        if durationType == 0:
+            durationString = foundNumber.group(1)
+            if durationString == '000': # for larger values, see http://wiki.humdrum.org/index.php/Rational_rhythms
+                thisObject.duration.type = 'maxima'
+                if contents.count('.'):
+                    thisObject.duration.dots = contents.count('.')            
+            elif durationString == '00': # for larger values, see http://wiki.humdrum.org/index.php/Rational_rhythms
+                thisObject.duration.type = 'longa'
+                if contents.count('.'):
+                    thisObject.duration.dots = contents.count('.')            
+            else:
+                thisObject.duration.type = 'breve'
+                if contents.count('.'):
+                    thisObject.duration.dots = contents.count('.')
         elif durationType in duration.typeFromNumDict:
             thisObject.duration.type = duration.typeFromNumDict[durationType]
             if contents.count('.'):
@@ -2122,7 +2142,7 @@ class Test(unittest.TestCase):
                         GsharpCount += 1    
                 
         self.assertEqual(GsharpCount, 52)
-        masterStream.show()
+#        masterStream.show()
 
 #       masterStream.show('text')
         
@@ -2156,7 +2176,7 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == "__main__":
     #Test().testMoveDynamics()
-    music21.mainTest(Test) #TestExternal)
+    music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof

@@ -1951,7 +1951,7 @@ class MetadataBundle(music21.JSONSerializer):
     def addFromPaths(self, pathList):
         '''Parse and store metadata from numerous files.
 
-        If any files cannot be loaded, they file paths will be collected in a list. 
+        If any files cannot be loaded, their file paths will be collected in a list that is returned
 
         >>> from music21 import *
         >>> mb = metadata.MetadataBundle()
