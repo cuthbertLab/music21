@@ -29,8 +29,10 @@ import copy
 
 import re
 import music21
+from music21 import common
 from music21 import duration
 from music21 import environment
+from music21 import variant
 from music21.lily import lilyObjects as lyo
 _MOD = 'lily.translate2012.py'
 environLocal = environment.Environment(_MOD)
@@ -114,6 +116,7 @@ class LilypondConverter(object):
         self.setupTools()
         self.context = self.topLevelObject
         self.storedContexts = []
+        self.doNotOutput = []
         self.currentMeasure = None
 
     def setupTools(self):
@@ -369,39 +372,77 @@ class LilypondConverter(object):
         
         return lpGroupedMusicList
 
-    def lyPrefixCompositeMusicFromStream(self, part):
+    def lySequentialMusicFromStream(self, streamIn):
+        r'''
+        returns a LySequentialMusic object from a stream
+
+        >>> from music21 import *
+        >>> c = converter.parse('tinynotation: 3/4 C4 D E F2.')
+        >>> lpc = lily.translate.LilypondConverter()
+        >>> lySequentialMusicOut = lpc.lySequentialMusicFromStream(c)
+        >>> lySequentialMusicOut
+        <music21.lily.lilyObjects.LySequentialMusic object at 0x...>
+        >>> print lySequentialMusicOut
+        { \time 3/4
+         c 4  
+         d 4  
+         e 4  
+         f 2.  
+        } 
         '''
-        returns an LyPrefixCompositeMusic object from
-        a stream (generally a part, but who knows...)
-        '''
-        
-        c = part.classes
-        if 'Part' in c:
-            newContext = 'Staff'
-        elif 'Voice' in c:
-            newContext = 'Voice'
-        else:
-            newContext = 'Voice'
-        
         musicList = []
 
         lpMusicList = lyo.LyMusicList(contents = musicList)
         lpSequentialMusic = lyo.LySequentialMusic(musicList = lpMusicList)
-        lpGroupedMusicList = lyo.LyGroupedMusicList(sequentialMusic = lpSequentialMusic)
-        lpCompositeMusic = lyo.LyCompositeMusic(groupedMusicList = lpGroupedMusicList)
-        lpMusic = lyo.LyMusic(compositeMusic = lpCompositeMusic)
-        lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type = 'new',
-                                                            simpleString = newContext,
-                                                            music = lpMusic)
-        
         self.newContext(lpMusicList)    
-        self.appendObjectsToContextFromStream(part)
+        self.appendObjectsToContextFromStream(streamIn)
                     
         lyObject = self.closeMeasure()
         if lyObject is not None:
             musicList.append(lyObject)    
         
         self.restoreContext()
+        return lpSequentialMusic
+
+    def lyPrefixCompositeMusicFromStream(self, streamIn, contextType = None):
+        r'''
+        returns an LyPrefixCompositeMusic object from
+        a stream (generally a part, but who knows...)
+
+        >>> from music21 import *
+        >>> c = converter.parse('tinynotation: 3/4 C4 D E F2.')
+        >>> lpc = lily.translate.LilypondConverter()
+        >>> lyPrefixCompositeMusicOut = lpc.lyPrefixCompositeMusicFromStream(c, contextType='Staff')
+        >>> lyPrefixCompositeMusicOut 
+        <music21.lily.lilyObjects.LyPrefixCompositeMusic object at 0x...>
+        >>> print lyPrefixCompositeMusicOut
+        \new Staff { \time 3/4
+           c 4  
+           d 4  
+           e 4  
+           f 2.  
+          } 
+        '''
+        c = streamIn.classes
+        if contextType is None:
+            if 'Part' in c:
+                newContext = 'Staff'
+            elif 'Voice' in c:
+                newContext = 'Voice'
+            else:
+                newContext = 'Voice'
+        else:
+            newContext = contextType
+        
+        musicList = []
+
+        lpSequentialMusic = self.lySequentialMusicFromStream(streamIn)
+        lpGroupedMusicList = lyo.LyGroupedMusicList(sequentialMusic = lpSequentialMusic)
+        lpCompositeMusic = lyo.LyCompositeMusic(groupedMusicList = lpGroupedMusicList)
+        lpMusic = lyo.LyMusic(compositeMusic = lpCompositeMusic)
+        lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type = 'new',
+                                                            simpleString = newContext,
+                                                            music = lpMusic)        
         return lpPrefixCompositeMusic
 
 
@@ -446,10 +487,11 @@ class LilypondConverter(object):
            \new Voice { cis'' 1  
                   } 
             >>        
-        '''
+        '''        
         for groupedElements in streamObject.groupElementsByOffset():
             if len(groupedElements) == 1: # one thing at that moment...
                 el = groupedElements[0]
+                el.activeSite = streamObject
                 self.appendM21ObjectToContext(el)
             else: # voices or other More than one thing at once...
                 # if voices
@@ -458,6 +500,7 @@ class LilypondConverter(object):
                     if 'Voice' in el.classes:
                         voiceList.append(el)
                     else:
+                        el.activeSite = streamObject
                         self.appendM21ObjectToContext(el)
                 
                 if len(voiceList) > 0:
@@ -469,8 +512,9 @@ class LilypondConverter(object):
                     lp2GroupedMusicList.simultaneousMusic = lp2SimultaneousMusic
 
                     for voice in voiceList:
-                        lpPrefixCompositeMusic = self.lyPrefixCompositeMusicFromStream(voice)
-                        musicList2.append(lpPrefixCompositeMusic)
+                        if voice not in self.doNotOutput:
+                            lpPrefixCompositeMusic = self.lyPrefixCompositeMusicFromStream(voice)
+                            musicList2.append(lpPrefixCompositeMusic)
                     
                     lp2MusicList.contents = musicList2
                     
@@ -485,6 +529,9 @@ class LilypondConverter(object):
         converts any type of object into a lilyObject of LyMusic (
         LySimpleMusic, LyEmbeddedScm etc.) type
         '''
+        if thisObject in self.doNotOutput:
+            return
+        
         ### treat complex duration objects as multiple objects
         c = thisObject.classes
 
@@ -492,6 +539,7 @@ class LilypondConverter(object):
         if 'Stream' not in c and thisObject.duration.type == 'complex':
             thisObjectSplit = thisObject.splitAtDurations()
             for subComponent in thisObjectSplit:
+                subComponent.activeSite = thisObject.activeSite
                 self.appendM21ObjectToContext(subComponent)
             return
 
@@ -521,12 +569,12 @@ class LilypondConverter(object):
             self.currentMeasure = thisObject
 
         elif "Stream" in c:
-            try:
-                lyObject = self.lyPrefixCompositeMusicFromStream(thisObject)
-                currentMusicList.append(lyObject)
-                lyObject.setParent(contextObject)
-            except AttributeError as ae:
-                raise Exception("Cannot parse %s: %s" % (thisObject, str(ae)))
+            #try:
+            lyObject = self.lyPrefixCompositeMusicFromStream(thisObject)
+            currentMusicList.append(lyObject)
+            lyObject.setParent(contextObject)
+            #except AttributeError as ae:
+            #    raise Exception("Cannot parse %s: %s" % (thisObject, str(ae)))
         elif "Note" in c or "Rest" in c:
             self.appendContextFromNoteOrRest(thisObject)
         elif "Chord" in c:
@@ -545,6 +593,8 @@ class LilypondConverter(object):
             lyObject = self.lyEmbeddedScmFromTimeSignature(thisObject)
             currentMusicList.append(lyObject)
             lyObject.setParent(contextObject)
+        elif "Variant" in c:
+            self.appendContextFromVariant(thisObject)
         else:
             lyObject = None
 
@@ -954,33 +1004,45 @@ class LilypondConverter(object):
         will not work.
         
         If there are no tuplets, this routine does
-        nothing.
+        nothing.  If there are tuplets and they have type start then
+        it returns an lpMusicList object, which is the new context
         
         For now, no nested tuplets.  They're an
         easy extension, but there's too much
-        else missing to do it now...
+        else missing to do it now...        
         '''
         if inObj.duration.tuplets is None or len(inObj.duration.tuplets) == 0:
             return None
         elif inObj.duration.tuplets[0].type == 'start':
             numerator = str(int(inObj.duration.tuplets[0].tupletNormal[0]))
             denominator = str(int(inObj.duration.tuplets[0].tupletActual[0]))            
-            fraction = numerator + '/' + denominator
-            lpMusicList = lyo.LyMusicList()
-            lpSequentialMusic = lyo.LySequentialMusic(musicList = lpMusicList)
-            ## technically needed, but we can speed things up
-            #lpGroupedMusicList = lyo.LyGroupedMusicList(sequentialMusic = lpSequentialMusic)
-            #lpCompositeMusic = lyo.LyCompositeMusic(groupedMusicList = lpGroupedMusicList)
-            #lpMusic = lyo.LyMusic(compositeMusic = lpCompositeMusic)
-            lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type='times', 
-                                                                fraction = fraction,
-                                                                music = lpSequentialMusic)
-            self.context.contents.append(lpPrefixCompositeMusic)
-            lpPrefixCompositeMusic.setParent(self.context)
-            self.newContext(lpMusicList)
-
+            lpMusicList = self.setContextForTimeFraction(numerator, denominator)
         else:
             return None
+
+    def setContextForTimeFraction(self, numerator, denominator):
+        '''
+        Explicitly starts a new context for scaled music (tuplets, etc.)
+        for the given numerator and denominator
+        
+        Returns an lpMusicList object contained in an lpSequentialMusic object
+        in an lpPrefixCompositeMusic object which sets the times object to a particular
+        fraction.
+        '''
+        fraction = numerator + '/' + denominator
+        lpMusicList = lyo.LyMusicList()
+        lpSequentialMusic = lyo.LySequentialMusic(musicList = lpMusicList)
+        ## technically needed, but we can speed things up
+        #lpGroupedMusicList = lyo.LyGroupedMusicList(sequentialMusic = lpSequentialMusic)
+        #lpCompositeMusic = lyo.LyCompositeMusic(groupedMusicList = lpGroupedMusicList)
+        #lpMusic = lyo.LyMusic(compositeMusic = lpCompositeMusic)
+        lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type='times', 
+                                                            fraction = fraction,
+                                                            music = lpSequentialMusic)
+        self.context.contents.append(lpPrefixCompositeMusic)
+        lpPrefixCompositeMusic.setParent(self.context)
+        self.newContext(lpMusicList)
+        return lpMusicList
 
     def setContextForTupletStop(self, inObj):
         '''
@@ -992,6 +1054,62 @@ class LilypondConverter(object):
             self.restoreContext()
         else:
             return None
+
+    def appendContextFromVariant(self, variantObject):
+        #print "VARIANT FOUND"
+        # --bug w/ barlines... self.closeMeasure()
+        replacedElements = variantObject.replacedElements()
+
+        lpSequentialMusicVariant = self.lySequentialMusicFromStream(variantObject._stream)
+
+        replacedElementsLength = replacedElements.duration.quarterLength
+        variantLength = variantObject.containedHighestTime
+        if variantLength != replacedElementsLength:
+            numerator, denominator = common.decimalToTuplet(replacedElementsLength/variantLength)
+            fraction = str(numerator) + '/' + str(denominator)
+            lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='times', 
+                                                                fraction = fraction,
+                                                                music = lpSequentialMusicVariant)
+            lpInternalSequentialMusic = lyo.LySequentialMusic(musicList = lpVariantTuplet)
+            lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'new',
+                                                        simpleString = "Staff",
+                                                        music = lpInternalSequentialMusic)   
+        else:
+            lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'new',
+                                                        simpleString = "Staff",
+                                                        music = lpSequentialMusicVariant)   
+        optionalContextMod = r'''
+\with {
+      \remove "Time_signature_engraver"
+      alignAboveContext = #"main"
+      fontSize = #-3
+      \override StaffSymbol #'staff-space = #(magstep -3)
+      \override StaffSymbol #'thickness = #(magstep -3)
+      firstClef = ##f
+    } 
+    '''
+        lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod
+                
+        lpSequentialMusicStandard = self.lySequentialMusicFromStream(replacedElements)
+        for el in replacedElements:
+            self.doNotOutput.append(el)
+
+        musicList2 = []
+        musicList2.append(lpPrefixCompositeMusicVariant)
+        musicList2.append(lpSequentialMusicStandard )
+        
+        lp2MusicList = lyo.LyMusicList()
+        lp2MusicList.contents = musicList2
+        lp2SimultaneousMusic = lyo.LySimultaneousMusic()
+        lp2SimultaneousMusic.musicList = lp2MusicList
+        lp2GroupedMusicList = lyo.LyGroupedMusicList()
+        lp2GroupedMusicList.simultaneousMusic = lp2SimultaneousMusic
+        
+        contextObject = self.context
+        currentMusicList = contextObject.contents
+        currentMusicList.append(lp2GroupedMusicList)
+        lp2GroupedMusicList.setParent(self.context)
+
         
     def setHeaderFromMetadata(self, metadataObject = None, lpHeader = None):
         r'''
@@ -1330,7 +1448,7 @@ class TestExternal(unittest.TestCase):
     
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
-    music21.mainTest(TestExternal)
+    music21.mainTest()#TestExternal)
     
 #------------------------------------------------------------------------------
 # eof

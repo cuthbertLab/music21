@@ -858,11 +858,11 @@ def dotMultiplier(dots):
 
 def decimalToTuplet(decNum):
     '''
-    For simple decimals (mostly > 1), a quick way to figure out the
+    For simple decimals (usually > 1), a quick way to figure out the
     fraction in lowest terms that gives a valid tuplet.
 
     No it does not work really fast.  No it does not return tuplets with
-    denominators over 100.  Too bad, math geeks.  This is real life.
+    denominators over 100.  Too bad, math geeks.  This is real life.  :-)
 
     returns (numerator, denominator)
 
@@ -871,6 +871,19 @@ def decimalToTuplet(decNum):
     (3, 2)
     >>> common.decimalToTuplet(1.25)
     (5, 4)
+    
+    If decNum is < 1, the denominator will be greater than the numerator:
+    
+    >>> common.decimalToTuplet(.8)
+    (4, 5)
+
+    If decNum is <= 0, returns a ZeroDivisionError:
+
+    >>> common.decimalToTuplet(-.02)
+    Traceback (most recent call last):
+    ZeroDivisionError: number must be greater than zero
+    
+    
     '''
 
     def findSimpleFraction(working):
@@ -880,6 +893,13 @@ def decimalToTuplet(decNum):
                 if almostEquals(working, (j+0.0)/i):
                     return (int(j), int(i))
         return (0,0)
+
+    flipNumerator = False
+    if decNum <= 0:
+        raise ZeroDivisionError("number must be greater than zero")
+    if decNum < 1:
+        flipNumerator = True
+        decNum = 1.0/decNum
 
     remainder, multiplier = math.modf(decNum)
     working = decNum/multiplier
@@ -893,7 +913,11 @@ def decimalToTuplet(decNum):
     gcd = euclidGCD(int(jy), int(iy))
     jy = jy/gcd
     iy = iy/gcd
-    return (int(jy), int(iy))
+    
+    if flipNumerator is False:
+        return (int(jy), int(iy))
+    else:
+        return (int(iy), int(jy))
 
 
 
@@ -2176,13 +2200,16 @@ _DOC_ORDER = [fromRoman, toRoman, Scalar]
 
 if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions
+        import music21
+        music21.mainTest(Test)
+
 
         ## do this the old way to avoid music21 import
-        s1 = doctest.DocTestSuite(__name__, optionflags = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE))
-        s2 = unittest.defaultTestLoader.loadTestsFromTestCase(Test)
-        s1.addTests(s2)
-        runner = unittest.TextTestRunner()
-        runner.run(s1)  
+#        s1 = doctest.DocTestSuite(__name__, optionflags = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE))
+#        s2 = unittest.defaultTestLoader.loadTestsFromTestCase(Test)
+#        s1.addTests(s2)
+#        runner = unittest.TextTestRunner()
+#        runner.run(s1)  
 
     elif len(sys.argv) > 1:
         t = Test()

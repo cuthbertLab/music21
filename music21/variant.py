@@ -1344,6 +1344,9 @@ class Variant(music21.Music21Object):
     8
     >>> v.highestTime
     0.0
+    >>> v.containedHighestTime
+    8.0
+    
     >>> v.duration # handled by Music21Object
     <music21.duration.Duration 0.0>
     >>> v.isStream
@@ -1468,7 +1471,7 @@ class Variant(music21.Music21Object):
             raise AttributeError
         try:
             return getattr(self._stream, attr)
-        except:
+        except: ## make better -- should not say 'VariantStorage has no attribute...'
             raise
         
     def __getitem__(self, key):
@@ -1644,11 +1647,12 @@ class Variant(music21.Music21Object):
         if the variant is longer than the region it replaces, and 'replacement' if it is
         the same length.
         ''')
-
     
     def replacedElements(self, contextStream = None, classList = None, keepOriginalOffsets = False):
         '''
-        Returns the stream which this variant replaces in a given context stream. This will have length self.replacementDuration.
+        Returns a Stream containing the elements which this variant replaces in a given context stream. 
+        This Stream will have length self.replacementDuration.
+        
         In regions that are strictly replaced, only elements that share a class with an element in the variant
         are captured. Elsewhere, all elements are captured.
         
@@ -1684,21 +1688,72 @@ class Variant(music21.Music21Object):
         >>> s.insert(20.0, v3)  # deletion variant (0 bars replace 1 bar)
         
         >>> v1.replacedElements(s).show('text')
-        {4.0} <music21.stream.Measure 2 offset=4.0>
+        {0.0} <music21.stream.Measure 2 offset=0.0>
             {0.0} <music21.note.Note A>
             {2.0} <music21.note.Note B->
             {3.0} <music21.note.Note A>
             
         >>> v2.replacedElements(s).show('text')
-        {12.0} <music21.stream.Measure 4 offset=12.0>
+        {0.0} <music21.stream.Measure 4 offset=0.0>
             {0.0} <music21.note.Note D>
             {2.0} <music21.note.Note A>
             
         >>> v3.replacedElements(s).show('text')
+        {0.0} <music21.stream.Measure 6 offset=0.0>
+            {0.0} <music21.note.Note A>
+            {2.0} <music21.note.Note B->
+            {3.0} <music21.note.Note A>
+
+        >>> v3.replacedElements(s, keepOriginalOffsets = True).show('text')
         {20.0} <music21.stream.Measure 6 offset=20.0>
             {0.0} <music21.note.Note A>
             {2.0} <music21.note.Note B->
             {3.0} <music21.note.Note A>
+
+
+        A second example:
+        
+        >>> from music21 import *
+        >>> v = variant.Variant()
+        >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
+        >>> variantDataM2 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
+        >>> variantData = [variantDataM1, variantDataM2]
+        >>> for d in variantData:
+        ...    m = stream.Measure()
+        ...    for pitchName,durType in d:
+        ...        n = note.Note(pitchName)
+        ...        n.duration.type = durType
+        ...        m.append(n)
+        ...    v.append(m)
+        >>> v.groups = ['paris']
+        >>> v.replacementDuration = 4.0
+        
+        >>> s = stream.Stream()
+        >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
+        >>> streamDataM2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
+        >>> streamDataM3 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+        >>> streamDataM4 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+        >>> streamData = [streamDataM1, streamDataM2, streamDataM3, streamDataM4]
+        >>> for d in streamData:
+        ...    m = stream.Measure()
+        ...    for pitchName,durType in d:
+        ...        n = note.Note(pitchName)
+        ...        n.duration.type = durType
+        ...        m.append(n)
+        ...    s.append(m)
+        >>> s.insert(4.0, v)
+
+        >>> v.replacedElements(s).show('t')
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note B>
+            {0.5} <music21.note.Note C>
+            {1.5} <music21.note.Note A>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note B>
+        
+        >>> #print lily.translate.LilypondConverter().textFromMusic21Object(s)
+        >>> #s.show('lily.png')
+
         
         '''
         if contextStream is None:
@@ -1822,10 +1877,10 @@ class Variant(music21.Music21Object):
                 if referenceStream is None:
                     raise VariantException("Cannot find a Stream context for this object...")
         # TODO: error if v not in referenceStream
-        replacedElements = self.replacemedElements(referenceStream, classList)
+        replacedElements = self.replacedElements(referenceStream, classList)
         for el in replacedElements:
             referenceStream.remove(el)
-    
+
 #-------------------------------------------------------------------------------
 # class VariantBundle(object):
 #     '''A utility object for processing collections of Varaints. 

@@ -152,9 +152,7 @@ class HumdrumDataCollection(object):
             assert(self.parsePositionInStream == self.fileLength)
         except AssertionError:
             raise HumdrumException('getEventListFromDataStream failed: did not parse entire file')
-
         self.parseProtoSpinesAndEventCollections()
-        
         self.spineCollection = self.createHumdrumSpines()
         self.spineCollection.createMusic21Streams()
         self.parsedLines = True
@@ -952,7 +950,9 @@ class HumdrumSpine(object):
         for el in streamIn:
             if 'Stream' in el.classes:
                 if currentMeasureNumber != 0 or len(currentMeasure) > 0:
+                    currentMeasure._elementsChanged()
                     streamOut.append(currentMeasure)
+                    #streamOut._appendCore(currentMeasure)
                 currentMeasure = el
                 currentMeasureNumber = el.number
                 currentMeasureOffset = el.offset
@@ -960,10 +960,12 @@ class HumdrumSpine(object):
                     hasMeasureOne = True
             else:
                 if currentMeasureNumber != 0 or el.duration.quarterLength != 0:
-                    currentMeasure.insert(el.offset - currentMeasureOffset, el)
+                    #currentMeasure.insert(el.offset - currentMeasureOffset, el)
+                    currentMeasure._insertCore(el.offset - currentMeasureOffset, el)
                 else:
                     streamOut.append(el)
-        
+                    #streamOut._appendCore(el)
+        streamOut._elementsChanged()
         if len(currentMeasure) > 0:
             streamOut.append(currentMeasure)
         
@@ -1334,7 +1336,6 @@ class SpineCollection(object):
 
 
     def createMusic21Streams(self):
-        
         self.reclassSpines()
         self.parseMusic21()
         self.performInsertions()
@@ -1371,9 +1372,13 @@ class SpineCollection(object):
                                                 pass # only insert one measure object per spine
                                             else:
                                                 insertEl.groups.append('voice' + str(voiceNumber))
-                                                newStream.insert(startPoint + insertEl.offset, insertEl)
+                                                #newStream.insert(startPoint + insertEl.offset, insertEl)
+                                                newStream._insertCore(startPoint + insertEl.offset, insertEl)
                             lastHumdrumPosition = humdrumPosition
-                        newStream.append(el) 
+                        newStream._elementsChanged()
+                        newStream._appendCore(el)
+                        #newStream.append(el)
+                    newStream._elementsChanged()
                     s.stream = newStream
             #for removeMe in removeSpines:
             #    #needed for some tests
@@ -2114,10 +2119,11 @@ class Test(unittest.TestCase):
             elif hasattr(n, "pitches"):
                 if 'G#' in [p.name for p in n.pitches]:
                     if n.offset == 2:
-                        GsharpCount += 1
-                           
+                        GsharpCount += 1    
                 
         self.assertEqual(GsharpCount, 52)
+        masterStream.show()
+
 #       masterStream.show('text')
         
     def testParseSineNomine(self):
@@ -2150,7 +2156,7 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == "__main__":
     #Test().testMoveDynamics()
-    music21.mainTest(TestExternal)
+    music21.mainTest(Test) #TestExternal)
 
 #------------------------------------------------------------------------------
 # eof

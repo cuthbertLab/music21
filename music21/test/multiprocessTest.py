@@ -162,13 +162,13 @@ class ModuleGather(object):
 
 
 def multime(multinum):
-    sleeptime = multinum[0]/100.0
-    if multinum[0] == 90:
-        raise Exception("Ha! 90!") 
+    sleeptime = multinum[0]/1000.0
+    if multinum[0] == 900:
+        raise Exception("Ha! 900!") 
     print multinum, sleeptime
     sys.stdout.flush()
     time.sleep(sleeptime)
-    x = multinum[0] * multinum[1]
+    x = multinum[0] * multinum[1] / 10
     return (x, multinum[0])
 
 def examplePoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
@@ -181,7 +181,7 @@ def examplePoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False):
 
     storage = []
     
-    numbers = [50, 20, 10, 5, 700, 90]
+    numbers = [500, 200, 100, 50, 7000, 900]
     res = pool.imap_unordered(multime, ((i,10) for i in numbers))
     continueIt = True
     timeouts = 0

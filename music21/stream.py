@@ -1267,14 +1267,11 @@ class Stream(music21.Music21Object):
         A faster way of inserting elements that does no checks, 
         just insertion. 
         
-        
         Only be used in contexts that we know we have a proper, single Music21Object. 
         Best for usage when taking objects in a known Stream and creating a new Stream
 
-
         When using this method, the caller is responsible for calling Stream._elementsChanged 
         after all operations are completed.
-        
         '''
         #environLocal.printDebug(['_insertCore', 'self', self, 'offset', offset, 'element', element])
         # need to compare highest time before inserting the element in 
@@ -1413,7 +1410,6 @@ class Stream(music21.Music21Object):
 
         When using this method, the caller is responsible for calling 
         Stream._elementsChanged after all operations are completed.
-
         '''
         # NOTE: this is not called by append, as that is optimized 
         # for looping multiple elements

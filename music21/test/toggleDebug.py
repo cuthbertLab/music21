@@ -1,10 +1,31 @@
+# -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
+# Name:          test.toggleDebug.py
+# Purpose:       Changes debug on if off, off if on...
+#
+# Authors:       Michael Scott Cuthbert
+#
+# Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
+#-------------------------------------------------------------------------------
+'''
+Run from command line to toggle debug status.
+'''
+
+
 import music21.environment
 
-if __name__ == '__main__':
+def toggleDebug():
+    '''
+    Changes debug status from 0 to 1 or 1 to 0.  Reload environment after calling.
+    '''
     e = music21.environment.UserSettings()
     if e['debug'] == 1:
-        print 'debug was ' + str(e['debug']) + '; switching to 0'
+        print('debug was ' + str(e['debug']) + '; switching to 0')
         e['debug'] = 0
     else:
-        print 'debug was ' + str(e['debug']) + '; switching to 1'
+        print('debug was ' + str(e['debug']) + '; switching to 1')
         e['debug'] = 1
+
+if __name__ == '__main__':
+    toggleDebug()
