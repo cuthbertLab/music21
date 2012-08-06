@@ -1064,7 +1064,9 @@ class LilypondConverter(object):
 
         replacedElementsLength = replacedElements.duration.quarterLength
         variantLength = variantObject.containedHighestTime
-        if variantLength != replacedElementsLength:
+        if replacedElementsLength == 0:
+            pass # skip variant for now...
+        elif variantLength != replacedElementsLength:
             numerator, denominator = common.decimalToTuplet(replacedElementsLength/variantLength)
             fraction = str(numerator) + '/' + str(denominator)
             lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='times', 
