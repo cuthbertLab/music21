@@ -132,8 +132,8 @@ For example, we can create an instance of the row from Alban Berg's *Violin Conc
 
 >>> from music21 import *
 
->>> aRow = serial.RowBergViolinConcerto()
->>> aRow.show('text')    
+>>> aRow = serial.getHistoricalRowByName('RowBergViolinConcerto')
+>>> aRow.show('text')
 {0.0} G
 {0.0} B-
 {0.0} D
