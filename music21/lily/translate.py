@@ -197,6 +197,11 @@ class LilypondConverter(object):
         '''
         from music21 import stream
         c = m21ObjectIn.classes
+        if 'Stream' in c:
+            if len(m21ObjectIn.flat.variants) > 0:
+                ## has variants so we need to make a deepcopy...
+                m21ObjectIn = variant.makeAllVariantsReplacements(m21ObjectIn, recurse = True)
+        
         if ('Stream' not in c) or ('Measure' in c) or ('Voice' in c):
             scoreObj = stream.Score()
             partObj = stream.Part()
@@ -1064,9 +1069,7 @@ class LilypondConverter(object):
 
         replacedElementsLength = replacedElements.duration.quarterLength
         variantLength = variantObject.containedHighestTime
-        if replacedElementsLength == 0:
-            pass # skip variant for now...
-        elif variantLength != replacedElementsLength:
+        if variantLength != replacedElementsLength:
             numerator, denominator = common.decimalToTuplet(replacedElementsLength/variantLength)
             fraction = str(numerator) + '/' + str(denominator)
             lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='times', 
