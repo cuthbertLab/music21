@@ -9989,6 +9989,8 @@ class Stream(music21.Music21Object):
 #         ''')
 # 
 
+    #---- Variant Activation Methods
+    
     def activateVariants(self, group=None, matchBySpan=True, inPlace=False):
         '''For any :class:`~music21.variant.Variant` objects defined in this Stream (or selected by matching the `group` parameter),
         replace elements defined in the Variant with those in the calling Stream. Elements replaced will be gathered into a new Variant

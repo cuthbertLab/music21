@@ -346,7 +346,11 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace = False):
             yRegion = streamY.measures(yRegionStartMeasure+1, yRegionEndMeasure)
             replacementDuration = 0.0
         addVariant(returnObj, startOffset, yRegion, variantName = variantName, replacementDuration = replacementDuration)
-    return returnObj
+    
+    if inPlace is True:
+        return
+    else:
+        return returnObj
 
 
 def mergeVariantsEqualDuration(streams, variantNames, inPlace = False):
@@ -717,7 +721,7 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByM
         return returnObj
 
 
-   
+
 #------ Public Helper Functions
 
 def addVariant(s,startOffset, sVariant, variantName = None, variantGroups = None, replacementDuration = None):
@@ -1320,6 +1324,331 @@ def _generateVariant(noteList, originStream, start, variantName = None):
 
 
 
+#------- Variant Manipulation Methods
+def makeAllVariantsReplacements(streamWithVariants, variantNames = None, inPlace = False, recurse = False):
+    '''
+    This function takes a stream and a list of variantNames (default works on all variants), and changes all insertion (elongations with replacementDuration 0)
+    and deletion variants (with containedHighestTime 0) into variants with non-zero replacementDuration and non-null elements
+    by adding measures on the front of insertions and measures on the end
+    of deletions. This is designed to make it possible to format all variants in a readable way as a graphical ossia (via lilypond). If inPlace is True
+    it will perform this action on the stream itself; otherwise it will return a modified copy. If recurse is True, this
+    method will work on variants within container objects within the stream (like parts).
+    
+    >>> from music21 import *
+    >>> #                                         *                                            *                                *
+    >>> s = converter.parse("      d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                        d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1", "4/4")
+    >>> s2 = converter.parse("     d4 e4 f4 g4   a2. b-8 a8   g4 a8 g8 f4 e4    d2 a2   d4 f4 a2  d4 f4 AA2  d4 e4 f4 g4                 g4 a8 b-8 c'4 c4    f1", "4/4")
+    >>> #                                        replacement                            insertion                            deletion
+    >>> s.makeMeasures(inPlace = True)
+    >>> s2.makeMeasures(inPlace = True)
+    >>> mergeVariants(s, s2, variantName = 'london', inPlace = True)
+    
+    >>> newPart = stream.Part(s)
+    >>> newStream = stream.Score()
+    >>> newStream.append(newPart)
+    
+    >>> returnStream = makeAllVariantsReplacements(newStream, recurse = False)
+    >>> for v in returnStream.parts[0].variants:
+    ...     print (v.offset, v.lengthType, v.replacementDuration)
+    (4.0, 'replacement', 4.0)
+    (16.0, 'elongation', 0.0)
+    (20.0, 'deletion', 4.0)
+    
+    >>> returnStream = makeAllVariantsReplacements(newStream, variantNames = ['france'], recurse = True)
+    >>> for v in returnStream.parts[0].variants:
+    ...     print (v.offset, v.lengthType, v.replacementDuration)
+    (4.0, 'replacement', 4.0)
+    (16.0, 'elongation', 0.0)
+    (20.0, 'deletion', 4.0)
+    
+    >>> makeAllVariantsReplacements(newStream, recurse = True, inPlace = True)
+    >>> for v in newStream.parts[0].variants:
+    ...     print (v.offset, v.lengthType, v.replacementDuration, v.containedHighestTime)
+    (4.0, 'replacement', 4.0, 4.0)
+    (12.0, 'elongation', 4.0, 12.0)
+    (20.0, 'deletion', 8.0, 4.0)
+    
+    '''
+    
+    if inPlace is True:
+        returnStream = streamWithVariants
+    else:
+        returnStream = copy.deepcopy(streamWithVariants)
+                
+    if recurse is True:
+        for s in returnStream.recurse(streamsOnly = True):
+            _doVariantFixingOnStream(s, variantNames = variantNames)
+    else:
+        _doVariantFixingOnStream(returnStream, variantNames = variantNames)
+        
+    
+    if inPlace is True:
+        return
+    else:
+        return returnStream
+   
+def _doVariantFixingOnStream(s, variantNames = None):
+    '''
+    This is a helper function for makeAllVariantsReplacements. It iterates through the appropriate variants
+    and performs the variant changing operation to eliminate strict deletion and insertion variants.
+    
+    >>> from music21 import *
+    >>> #                            *                           *                                            *                                *                           *
+    >>> s = converter.parse("                   d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                        d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1    ", "4/4")
+    >>> s2 = converter.parse("     a4 b c d     d4 e4 f4 g4   a2. b-8 a8   g4 a8 g8 f4 e4    d2 a2   d4 f4 a2  d4 f4 AA2  d4 e4 f4 g4                 g4 a8 b-8 c'4 c4          ", "4/4")
+    >>> #                      initial insertion              replacement                            insertion                            deletion                        final deletion
+    >>> s.makeMeasures(inPlace = True)
+    >>> s2.makeMeasures(inPlace = True)
+    >>> variant.mergeVariants(s, s2, variantName = 'london', inPlace = True)
+    
+    >>> variant._doVariantFixingOnStream(s, 'london')
+    >>> s.show('text')
+    {0.0} <music21.variant.Variant object at ...>
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+    ...
+    {4.0} <music21.variant.Variant object at ...>
+    {4.0} <music21.stream.Measure 2 offset=4.0>
+    ...
+    {12.0} <music21.variant.Variant object at ...>
+    {12.0} <music21.stream.Measure 4 offset=12.0>
+    ...
+    {20.0} <music21.variant.Variant object at ...>
+    {20.0} <music21.stream.Measure 6 offset=20.0>
+    ...
+    {24.0} <music21.variant.Variant object at ...>
+    {24.0} <music21.stream.Measure 7 offset=24.0>
+    ...
+    
+    >>> for v in s.variants:
+    ...     print (v.offset, v.lengthType, v.replacementDuration)
+    (0.0, 'elongation', 4.0)
+    (4.0, 'replacement', 4.0)
+    (12.0, 'elongation', 4.0)
+    (20.0, 'deletion', 8.0)
+    (24.0, 'deletion', 8.0)
+    
+    
+    This also works on streams with variants that contain notes and rests rather than measures.
+    
+    >>> s = converter.parse('                     e4 b b b   f4 f f f   g4 a a a       ', '4/4')
+    >>> v1Stream = converter.parse('   a4 a a a                                       ', '4/4')
+    >>> #                              initial insertion     deletion
+    >>> v1 = variant.Variant(v1Stream.notes)
+    >>> v1.replacementDuration = 0.0
+    >>> v1.groups = ['london']
+    >>> s.insert(0.0, v1)
+    
+    >>> v2 = variant.Variant()
+    >>> v2.replacementDuration = 4.0
+    >>> v2.groups = ['london']
+    >>> s.insert(4.0, v2)
+    
+    >>> variant._doVariantFixingOnStream(s, 'london')
+    >>> for v in s.variants:
+    ...     print (v.offset, v.lengthType, v.replacementDuration, v.containedHighestTime)
+    (0.0, 'elongation', 1.0, 5.0)
+    (4.0, 'deletion', 5.0, 1.0)
+    '''
+    
+    for v in s.variants:
+        if type(variantNames) is list: #If variantNames are controlled
+            if set(v.groups) & set(variantNames) is []: # and if this variant is not in the controlled list
+                continue # then skip it
+        else: # otherwise, skip it unless it is a strict insertion of deletion
+            lengthType = v.lengthType
+            replacementDuration = v.replacementDuration
+            highestTime = v.containedHighestTime
+            
+            if lengthType is 'elongation' and replacementDuration == 0.0:
+                variantType = 'insertion'
+            elif lengthType is 'deletion' and highestTime == 0.0:
+                variantType = 'deletion'
+            else:
+                continue
+            
+            if v.getOffsetBySite(s) == 0.0:
+                isInitial = True
+                isFinal = False
+            elif v.getOffsetBySite(s)+v.replacementDuration == s.duration.quarterLength:
+                isInitial = False
+                isFinal = True
+            else:
+                isInitial = False
+                isFinal = False
+            
+            # If a non-final deletion or an INITIAL insertion, add the next element after the variant. TODO: add boolean logic for finalness of deletion
+            if (variantType is 'insertion' and (isInitial is True)) or (variantType is 'deletion' and (isFinal is False)):
+                targetElement = _getNextElements(s, v)
+                
+                #Delete initial clefs, etc. from initial insertion targetElement if it exists
+                if isinstance(targetElement, music21.stream.Stream):
+                    for e in targetElement.elements: # Must use .elements, because of removal of elements
+                        if isinstance(e, music21.clef.Clef) or isinstance(e, music21.meter.TimeSignature):
+                            targetElement.remove(e)
+                
+                v.append(targetElement)
+                    
+            # If a non-initial insertion or a FINAL deletion, add the previous element after the variant.
+            else: #elif (variantType is 'deletion' and (isFinal is True)) or (type is 'insertion' and (isInitial is False)):
+                targetElement = _getPreviousElements(s, v)
+                newVariantOffset = targetElement.getOffsetBySite(s)
+                # Need to shift elements to make way for new element at front
+                offsetShift = targetElement.duration.quarterLength
+                for e in v.containedSite:
+                    oldOffset = e.getOffsetBySite(v.containedSite)
+                    e.setOffsetBySite(v.containedSite, oldOffset+offsetShift)
+                v.insert(0.0, targetElement)
+                s.remove(v)
+                s.insert(newVariantOffset, v)
+                
+                # Give it a new replacementDuration including the added element
+            oldReplacementDuration = v.replacementDuration
+            v.replacementDuration = oldReplacementDuration + targetElement.duration.quarterLength
+
+
+def _getNextElements(s, v, numberOfElements = 1):
+    '''
+    This is a helper function for makeAllVariantsReplacements() which returns the next element in s
+    of the type of elements found in the variant v so that if can be added to v.
+    
+    >>> from music21 import *
+    >>> #                          *                       *
+    >>> s1 = converter.parse('             b4 c d e    f4 g a b   d4 e f g   ', '4/4')
+    >>> s2 = converter.parse(' e4 f g a    b4 c d e               d4 e f g   ', '4/4')
+    >>> #                      insertion               deletion
+    >>> s1.makeMeasures(inPlace = True)
+    >>> s2.makeMeasures(inPlace = True)
+    >>> mergedStream = variant.mergeVariants(s1, s2, 'london')
+    >>> for v in mergedStream.variants:
+    ...     returnElement = variant._getNextElements(mergedStream, v)
+    ...     print returnElement
+    <music21.stream.Measure 1 offset=0.0>
+    <music21.stream.Measure 3 offset=8.0>
+    
+    This also works on streams with variants that contain notes and rests rather than measures.
+    
+    >>> s = converter.parse('                     e4 b b b   f4 f f f   g4 a a a       ', '4/4')
+    >>> v1Stream = converter.parse('   a4 a a a                                       ', '4/4')
+    >>> #                              initial insertion     deletion
+    >>> v1 = variant.Variant(v1Stream.notes)
+    >>> v1.replacementDuration = 0.0
+    >>> v1.groups = ['london']
+    >>> s.insert(0.0, v1)
+    
+    >>> v2 = variant.Variant()
+    >>> v2.replacementDuration = 4.0
+    >>> v2.groups = ['london']
+    >>> s.insert(4.0, v2)
+    >>> for v in s.variants:
+    ...     returnElement = variant._getNextElements(s, v)
+    ...     print returnElement
+    <music21.note.Note E>
+    <music21.note.Note G>
+    '''
+    
+    
+    replacedElements = v.replacedElements(s)
+    lengthType = v.lengthType
+    # Get class of elements in variant or replaced Region
+    if lengthType is 'elongation':
+        vClass = type(v.getElementsByClass(['Measure', 'Note', 'Rest'])[0])
+        if isinstance(vClass, music21.note.GeneralNote):
+            vClass = music21.note.GeneralNote
+    else:
+        vClass = type(replacedElements.getElementsByClass(['Measure', 'Note', 'Rest'])[0])
+        if isinstance(vClass, music21.note.GeneralNote):
+            vClass = music21.note.GeneralNote
+    
+    # Get next element in s after v which is of type vClass
+    if lengthType is 'elongation':
+        variantOffset = v.getOffsetBySite(s)
+        potentialTargets = s.getElementsByOffset(variantOffset,
+                                          offsetEnd = s.highestTime,
+                                          includeEndBoundary = True,
+                                          mustFinishInSpan = False,
+                                          mustBeginInSpan = True,
+                                          classList = [vClass])
+        returnElement = potentialTargets[0]
+    
+    else:
+        replacementDuration = v.replacementDuration
+        variantOffset = v.getOffsetBySite(s)
+        potentialTargets = s.getElementsByOffset(variantOffset+replacementDuration,
+                                          offsetEnd = s.highestTime,
+                                          includeEndBoundary = True,
+                                          mustFinishInSpan = False,
+                                          mustBeginInSpan = True,
+                                          classList = [vClass])
+        returnElement = potentialTargets[0]
+    
+    
+    return returnElement
+                
+
+def _getPreviousElements(s, v, numberOfElements = 1):
+    '''
+    This is a helper function for makeAllVariantsReplacements() which returns the previous element in s
+    of the type of elements found in the variant v so that if can be added to v.
+    
+    >>> from music21 import *
+    >>> #                                      *                       *
+    >>> s1 = converter.parse(' a4 b c d                b4 c d e    f4 g a b    ', '4/4')
+    >>> s2 = converter.parse(' a4 b c d    e4 f g a    b4 c d e                ', '4/4')
+    >>> #                                  insertion               deletion
+    >>> s1.makeMeasures(inPlace = True)
+    >>> s2.makeMeasures(inPlace = True)
+    >>> mergedStream = variant.mergeVariants(s1, s2, 'london')
+    >>> for v in mergedStream.variants:
+    ...     returnElement = variant._getPreviousElements(mergedStream, v)
+    ...     print returnElement
+    <music21.stream.Measure 1 offset=0.0>
+    <music21.stream.Measure 2 offset=4.0>
+    
+    This also works on streams with variants that contain notes and rests rather than measures.
+    
+    >>> s = converter.parse('         b4 b b a            e4 b b b      g4 e e e       ', '4/4')
+    >>> v1Stream = converter.parse('           f4 f f f                                ', '4/4')
+    >>> #                                      insertion                final deletion
+    >>> v1 = variant.Variant(v1Stream.notes)
+    >>> v1.replacementDuration = 0.0
+    >>> v1.groups = ['london']
+    >>> s.insert(4.0, v1)
+    
+    >>> v2 = variant.Variant()
+    >>> v2.replacementDuration = 4.0
+    >>> v2.groups = ['london']
+    >>> s.insert(8.0, v2)
+    >>> for v in s.variants:
+    ...     returnElement = variant._getPreviousElements(s, v)
+    ...     print returnElement
+    <music21.note.Note A>
+    <music21.note.Note B>
+    '''
+
+    replacedElements = v.replacedElements(s)
+    lengthType = v.lengthType
+    # Get class of elements in variant or replaced Region
+    if lengthType is 'elongation':
+        vClass = type(v.getElementsByClass(['Measure', 'Note', 'Rest'])[0])
+        if isinstance(vClass, music21.note.GeneralNote):
+            vClass = music21.note.GeneralNote
+    else:
+        vClass = type(replacedElements.getElementsByClass(['Measure', 'Note', 'Rest'])[0])
+        if isinstance(vClass, music21.note.GeneralNote):
+            vClass = music21.note.GeneralNote
+    
+    # Get next element in s after v which is of type vClass
+    variantOffset = v.getOffsetBySite(s)
+    potentialTargets = s.getElementsByOffset(0.0,
+                                      offsetEnd = variantOffset,
+                                      includeEndBoundary = False,
+                                      mustFinishInSpan = False,
+                                      mustBeginInSpan = True,
+                                      classList = [vClass])
+    returnElement = potentialTargets[-1]
+    
+    return returnElement
+
 
 
 #-------------------------------------------------------------------------------
@@ -1876,7 +2205,9 @@ class Variant(music21.Music21Object):
                 referenceStream = self.getContextByClass('Stream')
                 if referenceStream is None:
                     raise VariantException("Cannot find a Stream context for this object...")
-        # TODO: error if v not in referenceStream
+        if self not in referenceStream.variants:
+            raise VariantException("Variant not found in stream %s" % referenceStream)
+        
         replacedElements = self.replacedElements(referenceStream, classList)
         for el in replacedElements:
             referenceStream.remove(el)
