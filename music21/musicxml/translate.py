@@ -3857,6 +3857,7 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     oMeasure = 0.0
     lastTimeSignature = None
     lastTransposition = None # may change at measure boundaries
+    lastMeasureWasShort = False  # keep track of whether the last measure was short...
 
     for i, mxMeasure in enumerate(mxPart):
         # t here is transposition, if defined; otherwise it is None
@@ -3906,6 +3907,7 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
         elif mHighestTime == 0.0 and len(m.flat.notesAndRests) == 0:
             ## this routine fixes a bug in PDFtoMusic and other MusicXML writers
             ## that omit empty rests in a Measure.  It is a very quick test if
+            ## the measure has any notes.  Slower if it does not.
             r = note.Rest()
             r.duration.quarterLength = lastTimeSignatureQuarterLength 
             m.insert(0.0, r)
@@ -3923,8 +3925,20 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
                 mOffsetShift = mHighestTime
             # assume that, even if measure is incomplete, the next bar should
             # start at the duration given by the time signature, not highestTime
+
+            ### no...let's not do this...
             else:
-                mOffsetShift = lastTimeSignatureQuarterLength
+                mOffsetShift = mHighestTime #lastTimeSignatureQuarterLength
+                if lastMeasureWasShort is True:
+                    if m.barDurationProportion() < 1.0:
+                        m.padAsAnacrusis() # probably a pickup after a repeat or phrase boundary or something
+                        lastMeasureWasShort = False
+                else:
+                    if mHighestTime < lastTimeSignatureQuarterLength:
+                        lastMeasureWasShort = True
+                    else:
+                        lastMeasureWasShort = False
+                        
         oMeasure += mOffsetShift
 
     # if we have multiple staves defined, add more parts, and transfer elements
