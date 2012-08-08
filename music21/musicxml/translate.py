@@ -3128,6 +3128,8 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     mxNoteList = [] # for accumulating notes in chords
     mxLyricList = [] # for accumulating lyrics assigned to chords
     nLast = None # store the last-create music21 note for Spanners
+    restAndNoteCount = {'rest': 0, 'note': 0}
+
 
     for i in range(len(mxMeasure)):
         # try to get the next object for chord comparisons
@@ -3292,6 +3294,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     for mxLyric in mxNote.lyricList:
                         mxLyricList.append(mxLyric)
                 else:
+                    restAndNoteCount['note'] += 1
                     try:
                         n = mxToNote(mxNote, spannerBundle=spannerBundle)
                     except TranslateException as strerror:
@@ -3316,6 +3319,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                         # deal with ornaments, trill, etc
                         pass
             else: # its a rest
+                restAndNoteCount['rest'] += 1
                 n = note.Rest()
                 n.mx = mxNote # assign mxNote to rest obj
                 _addToStaffReference(mxNote, n, staffReference)
@@ -3430,6 +3434,16 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 v.makeRests(inPlace=True)
             v._elementsChanged()
     m._elementsChanged()
+
+    if restAndNoteCount['rest'] == 1 and restAndNoteCount['note'] == 0:
+        # full measure rest with no notes...
+        if useVoices:
+            pass # should do this on a per voice basis...
+            m._fullMeasureRest = False
+        else:
+            m._fullMeasureRest = True
+    else:
+        m._fullMeasureRest = False
 
     return m, staffReference, transposition
 
@@ -3890,6 +3904,15 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
             ts.load('%s/%s' % (defaults.meterNumerator, 
                                defaults.meterDenominatorBeatType))
             lastTimeSignature = ts
+        
+        if m._fullMeasureRest is True:
+            r1 = m.getElementsByClass('Rest')[0]
+            if r1.duration.quarterLength == 4.0 and r1.duration.quarterLength != lastTimeSignature.barDuration.quarterLength:
+                r1.duration.quarterLength = lastTimeSignature.barDuration.quarterLength
+                m._elementsChanged()
+        
+        del(m._fullMeasureRest)
+        
         # add measure to stream at current offset for this measure
         streamPart._insertCore(oMeasure, m)
 
@@ -5239,9 +5262,10 @@ spirit</words>
         s = converter.parse(testPrimitive.colors01)
         #s.show()
         raw = s.musicxml
-        self.assertEqual(raw.count("color="), 8) #exports to notehead AND note, so increased from 6 to 8
+        expectedColors = 8
+        self.assertEqual(raw.count("color="), expectedColors, 'did not find the correct number of color statements: %d != %d \n %s' % (raw.count("color="), expectedColors, raw)) #exports to notehead AND note, so increased from 6 to 8
         # color set at note level only for rest, so only 1
-        self.assertEqual(raw.count('note color="#11ff11"'), 1)
+        self.assertEqual(raw.count('note color="#11ff11"'), 1, 'did not find the correct number of color statements: %s' % raw)
 
 
     def testTextBoxA(self):
