@@ -1001,7 +1001,7 @@ class MensuralClef(music21.clef.Clef):
     An object representing a mensural clef found in medieval and Renaissance music.
     
     >>> from music21 import *
-    >>> fclef = medren.MensualClef('F')
+    >>> fclef = medren.MensuralClef('F')
     >>> fclef.line
     3
     >>> fclef.fontString 
@@ -2488,14 +2488,14 @@ def breakMensuralStreamIntoBrevisLengths(inpStream):
     >>> s.append(medren.GeneralMensuralNote('B'))
     >>> medren.breakMensuralStreamIntoBrevisLengths(s)
     Traceback (most recent call last):
-    MedRen Exception: cannot combine objects of type <class 'music21.medren.GeneralMensuralNote'>, <class 'music21.stream.Measure'> within stream
-    >>>
+    MedRenException: cannot combine objects of type <class 'music21.stream.Part'>, <class 'music21.medren.GeneralMensuralNote'> within stream
+
     >>> s = stream.Score()
     >>> p.append(s)
     >>> medren.breakMensuralStreamIntoBrevisLengths(s)
     Traceback (most recent call last):
-    heirarchy violated by <class 'music21.medren.Score>
-    >>>
+    Hierarchy violated by <class 'music21.medren.Score>
+
     >>> p = stream.Part()
     >>> m.append(medren.MensuralNote('G','B'))
     >>> p.append(medren.Divisione('.q.'))
@@ -2543,7 +2543,7 @@ def breakMensuralStreamIntoBrevisLengths(inpStream):
                 newStream.append(item)
             tempStream_1_1, tempStream_1_2 = tempStream_1.splitByClass(None, lambda x: isHigherInHeirarchy(x, tempStream_1))
             if len(tempStream_1_1) > 0:
-                raise MedRenException('heirarchy of %s violated by %s' % (tempStream_1.__class__, tempStream_1_1[0].__class__))
+                raise MedRenException('Hierarchy of %s violated by %s' % (tempStream_1.__class__, tempStream_1_1[0].__class__))
             elif len(tempStream_1_2) > 0:
                 for e in tempStream_1_2:
                     if isinstance(e, music21.stream.Measure):
@@ -2590,7 +2590,7 @@ def convertMensuralStream(inpStream, inpMOrD = None):
     >>> SePerDureca.title = 'Se Per Dureca'
     >>> upper = stream.Part()
     >>> lower = stream.Part()
-    >>> 
+
     >>> def processStream(mStream, pitches, lengths, downStems = []):
     ...    pInd, lInd = 0, 0
     ...    while lInd < len(lengths):
@@ -2607,7 +2607,7 @@ def convertMensuralStream(inpStream, inpMOrD = None):
     ...                mStream.append(mn)
     ...            lInd += 1
     ...            pInd += 1
-    >>>
+
     >>> pitches_upper_1 = ['G4','G4','F4','E4','G4','F4','E4','G4','F4','E4','D4','E4','F4','E4','E4','F4','E4','D4','C4','D4','R','E4','F4','E4','D4','E4','D4','C4','D4','C4','D4','C4','D4','E4','R','G4','F4','E4','G4','A4','G4','F4','E4','D4','E4','F4','E4','D4','C4','D4','E4']
     >>> lengths_upper_1 = ['B','M','M','M','M','M','M','P','SB','SM','SM','SM','M','M','P','SB','SM','SM','SM','M','M','P','SB','SB','SB','P','M','M','M','M','M','M','P','SB','M','M','M','M','P','SB','M','M','M','M','P','SB','SM','SM','SM','M','M','P','SB','SM','SM','SM','M','M','P','L']
     >>> pitches_upper_2 = ['A4','A4','B-4','A4','G4','A4','G4','F4','G4','F4','E4','F4','E4','F4','G4','G4','A4','G4','F4','E4','D4','E4','R','F4','E4','D4','E4','D4','R','E4','F4','G4','D4','R','E4','F4','E4','D4','E4','D4','C4','D4','D4','E4','C4','D4','C4','D4','C4','B4','C4']
@@ -2617,7 +2617,7 @@ def convertMensuralStream(inpStream, inpMOrD = None):
     >>> downStems_upper_3 = [0]
     >>> pitches_upper_4 = ['A4','B4','A4','B4','G4','C5','B4','A4','C5','B4','A4','B4','C5','B4','A4','G4','A4','B4','C5','B4','A4','G4','F4','A4','A4','G4','F4','E4','R','G4','F4','G4','F4','E4','F4','E4','D4','C4','D4','R','A4','G4','A4','G4','F4','E4','D4','E4','R','F4','E4','D4','E4','D4']
     >>> lengths_upper_4 = ['M','M','M','M','SB','P','M','M','M','M','M','M','P','M','M','M','M','M','M','P','SB','SM','SM','SM','M','M','P','SB','M','SB','M','P','SB','SB','M','M','P','M','M','M','M','M','M','P','SB','SB','SB','P','SB','SM','SM','SM','SM','SM','SM','P','M','M','SM','SM','SM','SB','P','Mx']
-    >>> 
+
     >>> pitches_lower_1 = ['C4','G3','A','B3','C4','D4','C4','R','A3','B3','C4','D4','C4','B3']
     >>> lengths_lower_1 = ['L','B','SB','SB','SB','P','SB','SB','SB','P','SB','SB','SB','P','SB','SB','SB','P']
     >>> lowerlig = medren.Ligature(['A4','B4'])
@@ -2634,19 +2634,19 @@ def convertMensuralStream(inpStream, inpMOrD = None):
     >>> pitches_lower_5 = ['D4','E4','C4','D4','E4','E4','D4','C4','B3','A3','B3','C4','D4','D4','C4','D4','E4','D4','R','C4','C4','B3','C4','D4','C4','C4','A3','B3','C4','B3','B3','A3','B3','A3','B3','C4','D4']
     >>> lengths_lower_5 = ['SB','SB','P','SB','SB','P','SB','M','SB','M','P','SB','SB','M','M','P','SB','M','SB','M','P','SB','SB','SB','P','SB','M','SB','M','P','SB','SB','SB','P','SB','SB','P','SB','SB','SB','P','Mx'] 
     >>> downStems_lower_5 = [0,3,35]
-    >>>
+
     >>> SePerDureca.append(medren.Divisione('.p.'))
     >>> upperClef = medren.MensuralClef('C')
     >>> upperClef.line = 1
     >>> lowerClef = medren.MensuralClef('C')
     >>> lowerClef.line = 3
-    >>>
+
     >>> upper.append(upperClef)
     >>> processStream(upper, pitches_upper_1, lengths_upper_1)
     >>> processStream(upper, pitches_upper_2, lengths_upper_2)
     >>> processStream(upper, pitches_upper_3, lengths_upper_3, downStems_upper_3)
     >>> processStream(upper, pitches_upper_4, lengths_upper_4)
-    >>> 
+
     >>> lower.append(lowerClef)
     >>> processStream(lower, pitches_lower_1, lengths_lower_1)
     >>> lower.append(lowerlig)
@@ -2654,10 +2654,10 @@ def convertMensuralStream(inpStream, inpMOrD = None):
     >>> processStream(lower, pitches_lower_3, lengths_lower_3, downStems_lower_3)
     >>> processStream(lower, pitches_lower_4, lengths_lower_4, downStems_lower_4)
     >>> processStream(lower, pitches_lower_5, lengths_lower_5, downStems_lower_5)
-    >>>
-    >>> SePerDurecaConverted = medren.convertMensuralStream(sePerDureca)
-    >>> SePerDurecaConverted = medren.convertHouseStyle(durationScale = 1)
-    >>> #_DOCS_HIDE SePerDurecaConverted.show()
+
+    >>> SePerDurecaConverted = medren.convertMensuralStream(SePerDureca)
+    >>> SePerDurecaConverted2 = medren.convertHouseStyle(SePerDurecaConverted, durationScale = 2)
+    >>> #_DOCS_HIDE SePerDurecaConverted2.show()
     
     '''
     mOrD = inpMOrD

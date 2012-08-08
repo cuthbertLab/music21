@@ -3129,7 +3129,9 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     mxLyricList = [] # for accumulating lyrics assigned to chords
     nLast = None # store the last-create music21 note for Spanners
     restAndNoteCount = {'rest': 0, 'note': 0}
-
+    chordVoice = None # Sibelius 7.1 only puts a <voice> tag on the
+                      # first note of a chord, so we need to make sure
+                      # that we keep track of the last voice...
 
     for i in range(len(mxMeasure)):
         # try to get the next object for chord comparisons
@@ -3284,6 +3286,8 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             if mxNoteNext is not None and mxNoteNext.get('chord') is True:
                 if mxNote.get('chord') is False:
                     mxNote.set('chord', True) # set the first as a chord
+                if mxNote.voice is not None:
+                    chordVoice = mxNote.voice
 
             if mxNote.get('rest') in [None, False]: # it is a note
                 # if a chord, do not increment until chord is complete
@@ -3302,7 +3306,18 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     
                     _addToStaffReference(mxNote, n, staffReference)
                     if useVoices:
-                        m.voices[mxNote.voice]._insertCore(offsetMeasureNote, n)
+                        useVoice = mxNote.voice
+                        if useVoice is None:
+                            useVoice = chordVoice
+                            if useVoice is None:
+                                environLocal.warn("Cannot translate a note with a missing voice tag when no previous voice tag was given.  Assuming voice 1... Object is %r " % mxNote)
+                                useVoice = 1
+                        thisVoice = m.voices[useVoice]
+                        if thisVoice is None:
+                            environLocal.warn('Cannot find voice %d for Note %r; putting outside of voices...' % (mxNote.voice, mxNote))
+                            m._insertCore(offsetMeasureNote, n)
+                        else:
+                            thisVoice._insertCore(offsetMeasureNote, n)
                     else:
                         m._insertCore(offsetMeasureNote, n)
                     offsetIncrement = n.quarterLength
@@ -3348,7 +3363,18 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
 
                 _addToStaffReference(mxNoteList, c, staffReference)
                 if useVoices:
-                    m.voices[mxNote.voice]._insertCore(offsetMeasureNote, c)
+                    useVoice = mxNote.voice
+                    if useVoice is None:
+                        useVoice = chordVoice
+                        if useVoice is None:
+                            environLocal.warn("Cannot translate a note with a missing voice tag when no previous voice tag was given.  Assuming voice 1... Object is %r " % mxNote)
+                            useVoice = 1
+                    thisVoice = m.voices[useVoice]
+                    if thisVoice is None:
+                        environLocal.warn('Cannot find voice %d for Note %r; putting outside of voices...' % (mxNote.voice, mxNote))
+                        m._insertCore(offsetMeasureNote, c)
+                    else:          
+                        thisVoice._insertCore(offsetMeasureNote, c)
                 else:
                     m._insertCore(offsetMeasureNote, c)
                 mxNoteList = [] # clear for next chord
