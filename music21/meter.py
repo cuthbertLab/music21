@@ -3088,7 +3088,8 @@ class TimeSignature(music21.Music21Object):
 
 
     def setDisplay(self, value, partitionRequest=None):
-        '''Set an indendent display value
+        '''
+        Set an indendent display value for a meter.
 
         >>> from music21 import *
         >>> a = TimeSignature()

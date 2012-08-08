@@ -705,15 +705,36 @@ class Score(MusicXMLElementList):
     #---------------------------------------------------------------------------
     # utility methods unique to the score
     def getPartIds(self):
-        '''A quick way to get all valid part ids
+        '''
+        A quick way to get all valid part ids in the componentList
         '''
         post = []        
         for part in self.componentList:
             post.append(part.get('id'))
         return post
 
-    def getPartNames(self):
-        '''A quick way to get all valid par ids
+    def getPartIdsFromPartListObj(self):
+        '''
+        A quick way to get all valid part ids in the partListObj
+        for each one that is a ScorePart
+        '''
+        post = []        
+        for part in self.partListObj:
+            if isinstance(part, ScorePart):
+                post.append(part.get('id'))
+        return post
+
+    def partIdToNameDict(self):
+        '''
+        A quick way to get a mapping of valid part ids to the part names
+        from a :class:`~music21.musicxml.Score` (musicxml.Score)
+        object in the `.partListObj` property.
+        
+        Returns a dictionary mapping part id to part-name for each  :class:`~music21.musicxml.ScorePart`
+        in `.partListObj`.
+        
+        Note that dictionaries are not sorted, so the order of `.partListObj`
+        still needs to be used.
         '''
         post = {} # return a dictionary
         for part in self.partListObj:
@@ -761,7 +782,7 @@ class Score(MusicXMLElementList):
         >>> from music21.musicxml import testPrimitive
         >>> b = musicxml.Document()
         >>> b.read(testPrimitive.pitches01a)
-        >>> b.score.getScorePart(b.score.getPartNames().keys()[0])
+        >>> b.score.getScorePart(b.score.partIdToNameDict().keys()[0])
         <score-part id=P1 part-name=MusicXML Part>
         '''
         inst = None
@@ -782,7 +803,7 @@ class Score(MusicXMLElementList):
         >>> from music21.musicxml import testPrimitive
         >>> b = musicxml.Document()
         >>> b.read(testPrimitive.ALL[0])
-        >>> c = b.score.getPart(b.score.getPartNames().keys()[0])
+        >>> c = b.score.getPart(b.score.partIdToNameDict().keys()[0])
         >>> c
         <part id=P1 <measure width=983 number=1 <print <system-layout...
         >>> isinstance(c, musicxml.Part)
@@ -791,7 +812,7 @@ class Score(MusicXMLElementList):
         False
         '''
         idFound = None
-        partNames = self.getPartNames()    
+        partNames = self.partIdToNameDict()    
         if partId in partNames.keys():
             idFound = partId
         else:
@@ -979,6 +1000,10 @@ class Encoding(MusicXMLElement):
 
 
 class Software(MusicXMLElement):
+    '''
+    Defines the Software that created this MusicXML document.
+    '''
+    
     def __init__(self):
         MusicXMLElement.__init__(self)
         self._tag = 'software'
@@ -989,7 +1014,20 @@ class Software(MusicXMLElement):
 
 
 class PartList(MusicXMLElementList):
-    '''The PartList defines the parts, as well as their names and abbreviations. Additionally, the order of this list is used as a way specifying arrangements of brackets and/or braces that group parts in partGroup objects. The order of this list thus matters. 
+    '''
+    The PartList defines the parts, as well as their names and abbreviations.
+    
+    It stores the parts in its `.componentList` list in order.
+     
+    Additionally, the order of this list is used as a way 
+    specifying arrangements of brackets and/or braces that 
+    group parts in partGroup objects. 
+    
+    The order of this list thus matters. 
+    
+    The PartList for a score is usually accessed from the 
+    :class:`~music21.musicxml.Score` (`musicxml.Score`) object's
+    `.partListObj` parameter.
     '''
     def __init__(self):
         MusicXMLElementList.__init__(self)
@@ -1126,7 +1164,9 @@ class MIDIInstrument(MusicXMLElement):
 
 
 class Part(MusicXMLElementList):
-    '''This assumes a part-wise part'''
+    '''
+    This assumes a part-wise part
+    '''
     def __init__(self):
         MusicXMLElementList.__init__(self)
         self._tag = 'part'

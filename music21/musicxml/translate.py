@@ -4,6 +4,7 @@
 # Purpose:      Translate MusicXML and music21 objects
 #
 # Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
@@ -1033,16 +1034,27 @@ def mxToOffset(mxDirection, mxDivisions):
 # Meters
 
 def timeSignatureToMx(ts):
-    '''Returns a single mxTime object.
+    '''
+    Returns a single mxTime object from a meter.TimeSignature object.
     
     Compound meters are represented as multiple pairs of beat
     and beat-type elements
 
     >>> from music21 import *
     >>> a = meter.TimeSignature('3/4')
-    >>> b = timeSignatureToMx(a)
+    >>> b = musicxml.translate.timeSignatureToMx(a)
+    >>> b
+    <time <beats charData=3> <beat-type charData=4>>
+    
     >>> a = meter.TimeSignature('3/4+2/4')
-    >>> b = timeSignatureToMx(a)
+    >>> b = musicxml.translate.timeSignatureToMx(a)
+    >>> b
+    <time <beats charData=3> <beat-type charData=4> <beats charData=2> <beat-type charData=4>>
+    
+    >>> a.setDisplay('5/4')
+    >>> b = musicxml.translate.timeSignatureToMx(a)
+    >>> b
+    <time <beats charData=5> <beat-type charData=4>>
     '''
     from music21 import meter
     #mxTimeList = []
@@ -4000,8 +4012,11 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     else:
         return streamPart
 
-def mxToStream(mxScore, spannerBundle=None, inputM21=None):
-    '''Translate an mxScore into a music21 Score object.
+def mxToScore(mxScore, spannerBundle=None, inputM21=None):
+    '''
+    Translate an mxScore into a music21 Score object or puts it into the
+    given inputM21 object (which does not necessarily have to be a :class:`~music21.stream.Score`
+    object.  It can be any :class:`~music21.stream.Stream` object)
 
     All spannerBundles accumulated at all lower levels are inserted here.
     '''
@@ -4009,7 +4024,6 @@ def mxToStream(mxScore, spannerBundle=None, inputM21=None):
     # insert in lower positions if it makes sense
 
     from music21 import metadata
-    from music21 import spanner
     from music21 import layout
     from music21 import text
 
@@ -4019,13 +4033,18 @@ def mxToStream(mxScore, spannerBundle=None, inputM21=None):
     else:
         s = inputM21
     if spannerBundle == None:
+        from music21 import spanner
         spannerBundle = spanner.SpannerBundle()
 
-    partIdDictionary = mxScore.getPartNames()
+    mxPartIds = mxScore.getPartIdsFromPartListObj()
+    #print mxPartIds
+    #mxPartIdDictionary = mxScore.partIdToNameDict()
+    m21PartIdDictionary = {}
     # values are part names
-    partNameIds = partIdDictionary.keys()
-    partNameIds.sort()
-    for partId in partNameIds: # part names are part ids
+    #partNameIds = mxPartIdDictionary.keys()
+    #partNameIds.sort()
+    #for partId in partNameIds: # part names are part ids
+    for partId in mxPartIds: # part names are part ids
         # NOTE: setting partId not partId: might change
         # return the part; however, it is still already attached to the Score
         try:
@@ -4034,7 +4053,8 @@ def mxToStream(mxScore, spannerBundle=None, inputM21=None):
         except TranslateException as strerror:
             raise TranslateException('cannot translate part %s: %s' % (partId, strerror))
         # update dictionary to store music21 part
-        partIdDictionary[partId] = part
+        m21PartIdDictionary[partId] = part
+        #print("%r %s %r" % (m21PartIdDictionary, partId, part))
 
     # get part/staff groups
     #environLocal.printDebug(['partgroups:', mxScore.getPartGroupData()])
@@ -4044,7 +4064,10 @@ def mxToStream(mxScore, spannerBundle=None, inputM21=None):
         sg = layout.StaffGroup()
         for partId in partGroup['scorePartIds']:
             # get music21 part from partIdDictionary
-            sg.addComponents(partIdDictionary[partId])
+            try:
+                sg.addComponents(m21PartIdDictionary[partId])
+            except KeyError as ke:
+                raise TranslateException("Cannot find part in m21PartIdDictionary: %s \n   Full Dict:\n   %r " % (ke, m21PartIdDictionary))
         # use configuration routine to transfer/set attributes;
         # sets complete status as well
         configureStaffGroupFromMxPartGroup(sg, partGroup['partGroup'])
@@ -5428,7 +5451,7 @@ spirit</words>
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [mxToStream, streamToMx]
+_DOC_ORDER = [mxToScore, streamToMx]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

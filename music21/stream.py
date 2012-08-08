@@ -8612,9 +8612,13 @@ class Stream(music21.Music21Object):
         musicxmlTranslate.mxToStreamPart(mxScore, partId, inputM21=self)
 
     def _setMX(self, mxScore):
-        '''Given an mxScore, build into this stream
         '''
-        musicxmlTranslate.mxToStream(mxScore, inputM21=self)
+        Given an mxScore, build into this stream
+        
+        uses musicxml.translate.mxToScore even if the current Stream object is not
+        a stream.Score object.  But it always returns the right class.
+        '''
+        musicxmlTranslate.mxToScore(mxScore, inputM21=self)
     
     mx = property(_getMX, _setMX)
         

@@ -618,8 +618,8 @@ class ConverterMusicXML(object):
         self.forceSource = forceSource
 
     #---------------------------------------------------------------------------
-    def getPartNames(self):
-        return self._mxScore.getPartNames()
+    def partIdToNameDict(self):
+        return self._mxScore.partIdToNameDict()
 
     def load(self):
         '''Load all parts from a MusicXML object representation.

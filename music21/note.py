@@ -88,8 +88,6 @@ class Lyric(music21.JSONSerializer):
     3
     >>> l3.syllabic
     'single'
-
-    
     '''
 
     def __init__(self, text=None, number=1, syllabic=None, applyRaw = False):
@@ -152,39 +150,6 @@ class Lyric(music21.JSONSerializer):
         else: # assume single
             self.text = rawText
             self.syllabic = 'single'
-
-        #environLocal.printDebug(['Lyric:', 'self.text', self.text, 'self.syllabic', self.syllabic])
-
-    #---------------------------------------------------------------------------
-#     def _getMX(self):
-#         '''
-#         Returns an mxLyric
-# 
-#         >>> from music21 import *
-#         >>> a = note.Lyric()
-#         >>> a.text = 'hello'
-#         >>> mxLyric = a.mx
-#         >>> mxLyric.get('text')
-#         'hello'
-#         '''
-#         return musicxmlTranslate.lyricToMx(self)
-# 
-#     def _setMX(self, mxLyric):
-#         '''Given an mxLyric, fill the necessary parameters
-#         
-#         >>> from music21 import *
-#         >>> mxLyric = musicxml.Lyric()
-#         >>> mxLyric.set('text', 'hello')
-#         >>> a = Lyric()
-#         >>> a.mx = mxLyric
-#         >>> a.text
-#         'hello'
-#         '''
-#         musicxmlTranslate.mxToLyric(mxLyric, inputM21=self)
-# 
-#     mx = property(_getMX, _setMX)    
-# 
-
 
 
 
@@ -342,7 +307,6 @@ class GeneralNote(music21.Music21Object):
 
     def _setLyric(self, value): 
         '''
-        
         TODO: should check data here
         should split \\n separated lyrics into different lyrics
 
@@ -350,7 +314,8 @@ class GeneralNote(music21.Music21Object):
         lyrics
         '''
         self.lyrics = [] 
-        self.lyrics.append(Lyric(value))
+        if value is not None and value is not False:            
+            self.lyrics.append(Lyric(value))
 
     lyric = property(_getLyric, _setLyric, 
         doc = '''The lyric property can 
@@ -358,14 +323,22 @@ class GeneralNote(music21.Music21Object):
         Note, Chord, or Rest. This is a simplified version of the more general 
         :meth:`~music21.note.GeneralNote.addLyric` method.
         
-        
         >>> from music21 import *
-        >>> a = note.GeneralNote()
-        >>> a.lyric = 'test'
+        >>> a = note.Note('A4')
+        >>> a.lyrics
+        []
+        >>> a.lyric = 'hel-'
         >>> a.lyric
-        'test'
-
+        'hel'
+        >>> a.lyrics
+        [<music21.note.Lyric number=1 syllabic=begin text="hel">]
         
+        Eliminate Lyrics by setting a.lyric to None
+        
+        >>> a.lyric = None
+        >>> a.lyric
+        >>> a.lyrics
+        []
         ''')
 
     def addLyric(self, text, lyricNumber = None, applyRaw = False):

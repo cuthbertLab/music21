@@ -48,8 +48,19 @@ except ImportError:
 
 from music21 import corpus
 
-# for tests -- speeds things up a lot!
-b = corpus.parse('bach/bwv66.6')
+### speed up tests! move to music21 base...
+class _sharedCorpusTestObject(object):
+    sharedCache = {}
+
+sharedCacheObject = _sharedCorpusTestObject()
+
+def _getCachedCorpusFile(keyName):
+    #return corpus.parse(keyName)
+    if keyName not in sharedCacheObject.sharedCache:
+        sharedCacheObject.sharedCache[keyName] = corpus.parse(keyName)
+    return sharedCacheObject.sharedCache[keyName]
+
+
 #b.parts[0].measure(4)[2].color = 'blue'#.rightBarline = 'double'
 
 #-------------------------------------------------------------------------------
@@ -270,7 +281,8 @@ class LilypondConverter(object):
         
         >>> from music21 import *
         >>> lpc = lily.translate.LilypondConverter()
-        >>> #b = corpus.parse('bwv66.6')
+        >>> #_DOCS_SHOW b = corpus.parse('bach/bwv66.6')
+        >>> b = _getCachedCorpusFile('bach/bwv66.6') #_DOCS_HIDE
         >>> lpc.loadObjectFromScore(b)
         >>> #print lpc.topLevelObject
         '''
@@ -318,7 +330,8 @@ class LilypondConverter(object):
         
         >>> from music21 import *
         >>> lpc = lily.translate.LilypondConverter()
-        >>> #_DOCS_SHOW b = corpus.parse('bwv66.6')
+        >>> #_DOCS_SHOW b = corpus.parse('bach/bwv66.6')
+        >>> b = _getCachedCorpusFile('bach/bwv66.6') #_DOCS_HIDE
         >>> lpGroupedMusicList = lpc.lyGroupedMusicListFromScoreWithParts(b)
         >>> print lpGroupedMusicList
         << \new Staff { \partial 32*8 
@@ -1411,6 +1424,7 @@ class Test(unittest.TestCase):
     pass
     def testExplicitConvertChorale(self):
         lpc = LilypondConverter()
+        b = _getCachedCorpusFile('bach/bwv66.6')
         lpc.loadObjectFromScore(b, makeNotation = False)
         #print lpc.topLevelObject
 
@@ -1442,6 +1456,7 @@ class TestExternal(unittest.TestCase):
         n.show('lily.png')
     
     def testConvertChorale(self):
+        b = _getCachedCorpusFile('bach/bwv66.6')
         for n in b.flat:
             n.beams = None
         b.parts[0].show('lily.svg')

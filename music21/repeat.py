@@ -2654,7 +2654,7 @@ class Test(unittest.TestCase):
             
         mxlDocument = musicxml.Document()
         mxlDocument.read(raw)
-        s2 = musicxml.translate.mxToStream(mxlDocument.score)
+        s2 = musicxml.translate.mxToScore(mxlDocument.score)
         # now, reconverted from the musicxml, we have a RepeatExpression
         self.assertEqual(len(s2.flat.getElementsByClass(repeat.DaCapo)), 1)
 
