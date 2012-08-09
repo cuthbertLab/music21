@@ -921,7 +921,13 @@ class LilypondConverter(object):
             raise LilyTranslateException("DurationException for durationObject %s: %s" % (durationObj, de))
         
         if number_type < 1:
-           number_type = int(number_type * 16)
+            if number_type == 0.5:
+                number_type = r'\breve'
+            elif number_type == 0.25:
+                number_type = r'\longa'
+            else:
+                # no support for maxima...
+                number_type = int(number_type * 16)
         
         try:
             stenoDuration = lyo.LyStenoDuration(number_type, int(durationObj.dots))
@@ -1270,7 +1276,7 @@ class LilypondConverter(object):
 
         return self.tempName
     
-    def runThroughLily(self, format = 'png', backend = 'ps', fileName = None, skipWriting = False):
+    def runThroughLily(self, format = None, backend = None, fileName = None, skipWriting = False):
         '''
         creates a .ly file from self.topLevelObject via .writeLyFile
         then runs the file through Lilypond.
@@ -1287,8 +1293,13 @@ class LilypondConverter(object):
             if skipWriting is False:
                 fileName = self.writeLyFile(ext = 'ly', fp = fileName)
             
-        lilyCommand = '"' + self.LILYEXEC + '"' + " -f " + format + " " + \
-                    self.backendString + backend + " -o " + fileName + " " + fileName
+        
+        lilyCommand = '"' + self.LILYEXEC + '" ' 
+        if format is not None:
+            lilyCommand += "-f " + format + " "
+        if backend is not None:
+            lilyCommand += self.backendString + backend + " "
+        lilyCommand += "-o " + fileName + " " + fileName
         
         try:
             os.system(lilyCommand)    
@@ -1450,12 +1461,12 @@ class Test(unittest.TestCase):
 class TestExternal(unittest.TestCase):
 
 
-    def testConvertNote(self):
+    def xtestConvertNote(self):
         from music21 import note
         n = note.Note("C5")
         n.show('lily.png')
     
-    def testConvertChorale(self):
+    def xtestConvertChorale(self):
         b = _getCachedCorpusFile('bach/bwv66.6')
         for n in b.flat:
             n.beams = None
@@ -1465,10 +1476,29 @@ class TestExternal(unittest.TestCase):
         from music21 import corpus
         fifeOpus = corpus.parse('miscFolk/americanfifeopus.abc')
         fifeOpus.show('lily.png')
+
+    def xtestBreve(self):
+        from music21 import note, stream, meter
+        n = note.Note("C5")
+        n.duration.quarterLength = 8.0
+        m = stream.Measure()
+        m.append(meter.TimeSignature('8/4'))
+        m.append(n)
+        p = stream.Part()
+        p.append(m)
+        s = stream.Score()
+        s.append(p)
+        s.show('lily.png')
     
+    def testJosquin(self):
+        from music21 import converter
+        j = converter.parse('http://jrp.ccarh.org/cgi-bin/josquin?a=parallel&f=Jos2308-Ave_maris_stella', format='humdrum')
+        j.show('lilypond')
+
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
-    music21.mainTest()#TestExternal)
+    #music21.mainTest(Test)
+    music21.mainTest(TestExternal, 'noDocTest')
     
 #------------------------------------------------------------------------------
 # eof

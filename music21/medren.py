@@ -1035,6 +1035,7 @@ class MensuralClef(music21.clef.Clef):
             self._fontString = '0x4b'
         else:
             self._fontString = '0x5c'
+        return self._fontString
     
     fontString = property(_getFontString, 
                           doc = ''' Returns the utf-8 code corresponding to the mensural clef in Ciconia font''')

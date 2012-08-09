@@ -3694,7 +3694,7 @@ class Music21Object(JSONSerializer):
             vexflow
 
         N.B. score.write('lily') returns a bare lilypond file,
-        score.show('lily') gives a png of a rendered lilypond file.
+        score.show('lily') runs it through lilypond and displays it as a png.
 
 
         OMIT_FROM_DOCS        

@@ -304,7 +304,9 @@ class TinyNotationNote(object):
     LYRIC   = compile('\_(.*)')
 
 
-    def __init__(self, stringRep = None, storedDict = common.DefaultHash(default = False)):
+    def __init__(self, stringRep = None, storedDict = None):
+        if storedDict is None:
+            storedDict = common.DefaultHash(default = False)
         self.debug = False
         self.stringRep = stringRep
         self.storedDict = storedDict

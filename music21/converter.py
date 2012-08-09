@@ -1082,9 +1082,12 @@ class Converter(object):
         # this format check is here first to see if we can find the format
         # in the url; if forcing a format we do not need this
         # we do need the file extension to construct file path below
-        formatFromURL, ext = common.findFormatExtURL(url)
-        if formatFromURL is None: # cannot figure out what it is
-            raise ConverterException('cannot determine file format of url: %s' % url)
+        if format is None:
+            formatFromURL, ext = common.findFormatExtURL(url)
+            if formatFromURL is None: # cannot figure out what it is
+                raise ConverterException('cannot determine file format of url: %s' % url)
+        else:
+            ext = 'txt'
 
         dir = environLocal.getRootTempDir()
         dst = self._getDownloadFp(dir, ext, url)
