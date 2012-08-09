@@ -738,7 +738,8 @@ def lyricToMx(l):
     '''
     mxLyric = musicxmlMod.Lyric()
     mxLyric.set('text', l.text)
-    mxLyric.set('number', l.number)
+    # The next line may or may not be the best behavior. Saving the identifier in the case where it differs from the number may change the lyric ordering. I'm not sure yet.
+    mxLyric.set('number', l.identifier)      # Before identifier property added to note.Lyric() ---> mxLyric.set('number', l.number)
     # mxl expects begin, middle, end, as well as single
     mxLyric.set('syllabic', l.syllabic)
     return mxLyric
@@ -746,6 +747,23 @@ def lyricToMx(l):
 
 def mxToLyric(mxLyric, inputM21=None):
     '''Translate a MusicXML :class:`~music21.musicxml.Lyric` object to a music21 :class:`~music21.note.Lyric` object. 
+    
+    >>> from music21 import *
+    >>> mxLyric = musicxml.Lyric()
+    >>> mxLyric.set('text', 'word')
+    >>> mxLyric.set('number', 4)
+    >>> mxLyric.set('syllabic', 'single')
+    >>> lyricObj = note.Lyric()
+    >>> mxToLyric(mxLyric, lyricObj)
+    >>> lyricObj
+    <music21.note.Lyric number=4 syllabic=single text="word">
+    
+    >>> mxLyric.set('number', 'part2verse1')
+    
+    >>> mxToLyric(mxLyric, lyricObj)
+    >>> lyricObj
+    <music21.note.Lyric number=0 identifier="part2verse1" syllabic=single text="word">
+    
     '''
     if inputM21 == None:
         from music21 import note
@@ -754,7 +772,21 @@ def mxToLyric(mxLyric, inputM21=None):
         l = inputM21
 
     l.text = mxLyric.get('text')
-    l.number = mxLyric.get('number')
+    
+    
+    # This is new to account for identifiers
+    
+    number = mxLyric.get('number')
+    
+    if common.isNum(number):
+        l.number = number
+    else:
+        l.number = 0  #If musicXML lyric number is not a number, set it to 0. This tells the caller of
+                        #mxToLyric that a new number needs to be given based on the lyrics context amongst other lyrics.
+        l.identifier = number
+    
+    # Used to be l.number = mxLyric.get('number')
+    
     l.syllabic = mxLyric.get('syllabic')
 
 
@@ -3322,11 +3354,15 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                         m._insertCore(offsetMeasureNote, n)
                     offsetIncrement = n.quarterLength
 
+                    currentLyricNumber = 1
                     for mxLyric in mxNote.lyricList:
                         lyricObj = note.Lyric()
                         #lyricObj.mx = mxLyric
                         mxToLyric(mxLyric, lyricObj)
+                        if lyricObj.number == 0:
+                            lyricObj.number = currentLyricNumber
                         n.lyrics.append(lyricObj)
+                        currentLyricNumber += 1
                     nLast = n # update
 
                 if mxNote.get('notationsObj') is not None:
@@ -3355,11 +3391,15 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 #c.mx = mxNoteList
                 c = mxToChord(mxNoteList, spannerBundle=spannerBundle)
                 # add any accumulated lyrics
+                currentLyricNumber = 1
                 for mxLyric in mxLyricList:
                     lyricObj = note.Lyric()
                     #lyricObj.mx = mxLyric
                     mxToLyric(mxLyric, lyricObj)
+                    if lyricObj.number == 0:
+                        lyricObj.number = currentLyricNumber
                     c.lyrics.append(lyricObj)
+                    currentLyricNumber += 1
 
                 _addToStaffReference(mxNoteList, c, staffReference)
                 if useVoices:

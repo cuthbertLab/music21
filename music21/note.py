@@ -80,7 +80,7 @@ class Lyric(music21.JSONSerializer):
     <music21.note.Lyric number=3 syllabic=single text="hel-">
 
 
-    Lyrics have three properties: text, number, syllabic (single, begin, middle, end)
+    Lyrics have four properties: text, number, identifier, syllabic (single, begin, middle, end)
 
     >>> l3.text
     'hel-'
@@ -88,9 +88,15 @@ class Lyric(music21.JSONSerializer):
     3
     >>> l3.syllabic
     'single'
+    
+    Note musicXML only supports one 'identifier' attribute which is called 'number' but which
+    can be a number or a descriptive identifier like 'part2verse1.' To preserve lyric ordering,
+    music21 stores a number and a descriptive identifier separately. The descriptive identifier
+    is by default the same as the number, but in cases where a string identifier is present,
+    it will be different.
     '''
 
-    def __init__(self, text=None, number=1, syllabic=None, applyRaw = False):
+    def __init__(self, text=None, number=1, syllabic=None, applyRaw = False, identifier=None):
         music21.JSONSerializer.__init__(self)
 
         # these are set by _setTextAndSyllabic
@@ -100,9 +106,9 @@ class Lyric(music21.JSONSerializer):
         
         self._setTextAndSyllabic(text, applyRaw)
 
-        if not common.isNum(number):
-            raise LyricException('Number best be number')
         self.number = number
+        
+        self.identifier = identifier
 
     def jsonAttributes(self):
         '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
@@ -110,23 +116,32 @@ class Lyric(music21.JSONSerializer):
         >>> from music21 import *
         >>> l = note.Lyric()
         >>> l.jsonAttributes()
-        ['text', 'syllabic', 'number']
+        ['text', 'syllabic', 'number', 'identifier']
 
         '''
         # do not need self._autoGatherAttributes()
         # as this uses public attributes (not underscore leading)
         # must explicitly define
-        return ['text', 'syllabic', 'number']
+        return ['text', 'syllabic', 'number', 'identifier'] # If I understand what this does properly, than adding 'identifier' is reasonable.
 
 
     def __repr__(self):
-        if self.text is not None:
-            if self.syllabic is not None:
-                return '<music21.note.Lyric number=%d syllabic=%s text="%s">' % (self.number, self.syllabic, self.text)
+        if self._identifier is None:
+            if self.text is not None:
+                if self.syllabic is not None:
+                    return '<music21.note.Lyric number=%d syllabic=%s text="%s">' % (self.number, self.syllabic, self.text)
+                else:
+                    return '<music21.note.Lyric number=%d text="%s">' % (self.number, self.text)
             else:
-                return '<music21.note.Lyric number=%d text="%s">' % (self.number, self.text)
+                return '<music21.note.Lyric number=%d>' % (self.number)
         else:
-            return '<music21.note.Lyric number=%d>' % (self.number)
+            if self.text is not None:
+                if self.syllabic is not None:
+                    return '<music21.note.Lyric number=%d identifier="%s" syllabic=%s text="%s">' % (self.number, self.identifier, self.syllabic, self.text)
+                else:
+                    return '<music21.note.Lyric number=%d identifier="%s" text="%s">' % (self.number, self.identifier, self.text)
+            else:
+                return '<music21.note.Lyric number=%d identifier="%s">' % (self.number, self.identifier)
 
 
     def _setTextAndSyllabic(self, rawText, applyRaw):
@@ -150,7 +165,54 @@ class Lyric(music21.JSONSerializer):
         else: # assume single
             self.text = rawText
             self.syllabic = 'single'
-
+        
+    
+    def _getIdentifier(self):
+        '''For identifier property
+        
+        >>> from music21 import *
+        >>> l = note.Lyric()
+        >>> l.number = 12
+        >>> l.identifier
+        12
+        
+        >>> l.identifier = 'Rainbow'
+        >>> l.identifier
+        'Rainbow'
+        
+        '''
+        if self._identifier is None:
+            return self._number
+        else:
+            return self._identifier
+    
+    def _setIdentifier(self, value):
+        self._identifier = value
+    
+    
+    identifier = property(_getIdentifier, _setIdentifier, doc='''By default, this is the same as self.number. However,
+                                        if there is a descriptive identifier like 'part2verse1', it is stored here and will be
+                                        different from self.number. When converting to musicXML, this property will be stored in
+                                        the lyric 'number' attribute which can store a number or a descriptive identifier but
+                                        not both.
+                                        ''')
+        
+    
+    def _getNumber(self):
+        return self._number
+    
+    def _setNumber(self, value):
+        if not common.isNum(value):
+            raise LyricException('Number best be number')
+        else:
+            self._number = value
+    
+    number = property(_getNumber, _setNumber, doc='''This stores the number of the lyric (which determines the order lyrics appear
+                                                in the score if there are multiple lyrics). Unlike the musicXML lyric number attribute,
+                                                this value must always be a number; lyric order is always stored in this form. Descriptive
+                                                identifiers like 'part2verse1' which can be found in the musicXML lyric number attribute
+                                                should be stored in self.identifier.
+                                                ''')
 
 
 
@@ -341,8 +403,9 @@ class GeneralNote(music21.Music21Object):
         []
         ''')
 
-    def addLyric(self, text, lyricNumber = None, applyRaw = False):
-        '''Adds a lyric, or an additional lyric, to a Note, Chord, or Rest's lyric list. If `lyricNumber` is not None, a specific line of lyric text can be set. 
+    def addLyric(self, text, lyricNumber = None, applyRaw = False, lyricIdentifier=None):
+        '''Adds a lyric, or an additional lyric, to a Note, Chord, or Rest's lyric list. If `lyricNumber` is not None, a specific line of lyric text can be set. The lyricIdentifier
+        can also be set.
 
         >>> from music21 import *
         >>> n1 = note.Note()
@@ -402,7 +465,7 @@ class GeneralNote(music21.Music21Object):
             text = str(text)
         if lyricNumber is None:
             maxLyrics = len(self.lyrics) + 1
-            self.lyrics.append(Lyric(text, maxLyrics, applyRaw = applyRaw))
+            self.lyrics.append(Lyric(text, maxLyrics, applyRaw = applyRaw, identifier = lyricIdentifier))
         else:
             foundLyric = False
             for thisLyric in self.lyrics:
@@ -411,9 +474,9 @@ class GeneralNote(music21.Music21Object):
                     foundLyric = True
                     break
             if foundLyric is False:
-                self.lyrics.append(Lyric(text, lyricNumber, applyRaw = applyRaw))
+                self.lyrics.append(Lyric(text, lyricNumber, applyRaw = applyRaw, identifier = lyricIdentifier))
 
-    def insertLyric(self, text, index = 0, applyRaw = False):
+    def insertLyric(self, text, index = 0, applyRaw = False, identifier = None):
         '''Inserts a lyric into the Note, Chord, or Rest's lyric list in front of 
         the index specified (0 by default), using index + 1 as the inserted lyric's
         line number. shifts line numbers of all following lyrics in list 
@@ -436,7 +499,7 @@ class GeneralNote(music21.Music21Object):
             text = str(text)
         for lyric in self.lyrics[index:]:
             lyric.number += 1
-        self.lyrics.insert(index, Lyric(text, (index+ 1), applyRaw ))
+        self.lyrics.insert(index, Lyric(text, (index+ 1), applyRaw, identifier = identifier ))
         
     def hasLyrics(self):
         '''Return True if this object has any lyrics defined
