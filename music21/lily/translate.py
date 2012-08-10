@@ -1113,12 +1113,13 @@ class LilypondConverter(object):
         # --bug w/ barlines... self.closeMeasure()
         replacedElements = variantObject.replacedElements()
         replacedElementsClef = replacedElements[0].getContextByClass('Clef')
-        replacedElementsPart = replacedElements[0].getContextByClass('Part')
+
+        variantContainerPart = variantObject.getContextByClass('Part')
 
         variantObject.insert(0, replacedElementsClef)
         variantName = lyo.LyOptionalId(makeLettersOnlyId(variantObject.groups[0]))
 
-        partId = makeLettersOnlyId(replacedElementsPart.id)
+        partId = makeLettersOnlyId(variantContainerPart.id)
         #Getting the partId does not work yet because replacedElements[0].getContextByClass('Part') is not returning the expected object. I'm not sure why that is.
 
         #for n in variantObject._stream.flat.notesAndRests:
