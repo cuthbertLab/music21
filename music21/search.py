@@ -452,7 +452,7 @@ def translateNoteTieToByte(n):
     '''
     takes a note.Note object and returns a one-byte representation
     of its tie status.
-    's' if start tie, 'e' if end tie, 'c' if continue tie, and '' if no tie
+    's' if start tie, 'e' if stop tie, 'c' if continue tie, and '' if no tie
     
     >>> from music21 import *
     >>> n = note.Note("E")
@@ -467,7 +467,7 @@ def translateNoteTieToByte(n):
     >>> translateNoteTieToByte(n)
     'c'
     
-    >>> n.tie.type = 'end'
+    >>> n.tie.type = 'stop'
     >>> translateNoteTieToByte(n)
     'e'
     '''
@@ -477,7 +477,7 @@ def translateNoteTieToByte(n):
         return 's'
     elif n.tie.type == 'continue':
         return 'c'
-    elif n.tie.type == 'end':
+    elif n.tie.type == 'stop':
         return 'e'
     else:
         return ''

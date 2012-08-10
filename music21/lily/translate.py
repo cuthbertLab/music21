@@ -26,6 +26,7 @@ import time
 # import threading
 import unittest, doctest
 import copy
+import random
 
 import re
 import music21
@@ -62,6 +63,22 @@ def _getCachedCorpusFile(keyName):
 
 
 #b.parts[0].measure(4)[2].color = 'blue'#.rightBarline = 'double'
+
+def makeLettersOnlyId(inputString):
+    '''
+    >>> from music21 import *
+    >>> print lily.translate.makeLettersOnlyId('rainbow123@@dfas')
+    'rainbowxyzmmdfas'
+
+    '''
+    inputString = str(inputString)
+    returnString = ''
+    for c in inputString:
+        if not c.isalpha():
+            c = chr(ord(c) % 26 + 97)
+        returnString += c
+
+    return returnString
 
 #-------------------------------------------------------------------------------
 class LilypondConverter(object):
@@ -441,16 +458,20 @@ class LilypondConverter(object):
            f 2.  
           } 
         '''
+        optionalId = None
         c = streamIn.classes
         if contextType is None:
             if 'Part' in c:
                 newContext = 'Staff'
+                optionalId = lyo.LyOptionalId(makeLettersOnlyId(streamIn.id))
             elif 'Voice' in c:
                 newContext = 'Voice'
             else:
                 newContext = 'Voice'
         else:
             newContext = contextType
+            if 'Part' in c:
+                optionalId = lyo.LyOptionalId(makeLettersOnlyId(streamIn.id))
         
         musicList = []
 
@@ -458,9 +479,17 @@ class LilypondConverter(object):
         lpGroupedMusicList = lyo.LyGroupedMusicList(sequentialMusic = lpSequentialMusic)
         lpCompositeMusic = lyo.LyCompositeMusic(groupedMusicList = lpGroupedMusicList)
         lpMusic = lyo.LyMusic(compositeMusic = lpCompositeMusic)
-        lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type = 'new',
+        
+
+        if optionalId is None:
+            lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type = 'new',
                                                             simpleString = newContext,
-                                                            music = lpMusic)        
+                                                            music = lpMusic) 
+        else:
+            lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type = 'new',
+                                                            optionalId = optionalId,
+                                                            simpleString = newContext,
+                                                            music = lpMusic)    
         return lpPrefixCompositeMusic
 
 
@@ -1084,7 +1113,13 @@ class LilypondConverter(object):
         # --bug w/ barlines... self.closeMeasure()
         replacedElements = variantObject.replacedElements()
         replacedElementsClef = replacedElements[0].getContextByClass('Clef')
+        replacedElementsPart = replacedElements[0].getContextByClass('Part')
+
         variantObject.insert(0, replacedElementsClef)
+        variantName = lyo.LyOptionalId(makeLettersOnlyId(variantObject.groups[0]))
+
+        partId = makeLettersOnlyId(replacedElementsPart.id)
+        #Getting the partId does not work yet because replacedElements[0].getContextByClass('Part') is not returning the expected object. I'm not sure why that is.
 
         #for n in variantObject._stream.flat.notesAndRests:
         #    n.editorial.color = 'blue'
@@ -1101,6 +1136,7 @@ class LilypondConverter(object):
                                                                 music = lpSequentialMusicVariant)
             lpInternalSequentialMusic = lyo.LySequentialMusic(musicList = lpVariantTuplet)
             lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'new',
+                                                        optionalId = variantName,
                                                         simpleString = "Staff",
                                                         music = lpInternalSequentialMusic)   
         else:
@@ -1110,13 +1146,16 @@ class LilypondConverter(object):
         optionalContextMod = r'''
 \with {
       \remove "Time_signature_engraver"
-      alignAboveContext = #"main"
+      alignAboveContext = #"%s"
       fontSize = #-3
       \override StaffSymbol #'staff-space = #(magstep -3)
       \override StaffSymbol #'thickness = #(magstep -3)
+      \override TupletBracket #'bracket-visibility = ##f
+      \override TupletNumber #'stencil = ##f
       firstClef = ##f
     } 
-    '''
+    ''' % partId
+
         lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod
                 
         lpSequentialMusicStandard = self.lySequentialMusicFromStream(replacedElements)

@@ -1049,11 +1049,15 @@
      <octave>3</octave>
     </pitch>
     <duration>512</duration>
+    <tie type="stop" />
     <instrument id="P1-I1" />
     <voice>1</voice>
     <type>half</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+      <tied type="stop" />
+    </notations>
    </note>
   </measure>
   <measure number="16" width="122">
@@ -2258,16 +2262,12 @@
      <octave>3</octave>
     </pitch>
     <duration>64</duration>
-    <tie type="stop" />
     <instrument id="P1-I1" />
     <voice>1</voice>
     <type>16th</type>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
-    <notations>
-     <tied type="stop" />
-    </notations>
    </note>
   </measure>
   <measure number="32" width="189">
