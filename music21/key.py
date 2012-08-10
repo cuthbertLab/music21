@@ -32,7 +32,7 @@ from music21 import environment
 _MOD = "key.py"
 environLocal = environment.Environment(_MOD)
 
-
+import re
 
 
 #-------------------------------------------------------------------------------
