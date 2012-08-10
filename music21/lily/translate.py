@@ -1083,6 +1083,11 @@ class LilypondConverter(object):
         #print "VARIANT FOUND"
         # --bug w/ barlines... self.closeMeasure()
         replacedElements = variantObject.replacedElements()
+        replacedElementsClef = replacedElements[0].getContextByClass('Clef')
+        variantObject.insert(0, replacedElementsClef)
+
+        #for n in variantObject._stream.flat.notesAndRests:
+        #    n.editorial.color = 'blue'
 
         lpSequentialMusicVariant = self.lySequentialMusicFromStream(variantObject._stream)
 

@@ -9954,7 +9954,99 @@ class Stream(music21.Music21Object):
         else:
             return None
 
-
+    #---------------------------------------------------------------------------
+    # Lyric control
+    
+    def lyrics(self, ignoreBarlines = True, recurse = False):
+        '''
+        Returns a dict of lists of lyric objects (with the keys being the lyric numbers) found in self. Each list will have an element for each
+        note in the stream (which may be a note.Lyric() or None). By default, this method automatically
+        recurses through measures, but not other container streams.
+        
+        >>> from music21 import *
+        >>> s = converter.parse("a4 b c d     e f g a", "4/4")
+        >>> someLyrics = ['this', 'is', 'a', 'list', 'of', 'eight', 'lyric', 'words']
+        >>> for n,lyric in zip(s.notes, someLyrics):
+        ...     n.lyric = lyric
+        
+        >>> s.lyrics()[1]
+        [<music21.note.Lyric number=1 syllabic=single text="this">, ..., <music21.note.Lyric number=1 syllabic=single text="words">]
+        
+        >>> s.notes[3].lyric = None
+        >>> s.lyrics()[1]
+        [<music21.note.Lyric number=1 syllabic=single text="this">, ..., None, ..., <music21.note.Lyric number=1 syllabic=single text="words">]
+        
+        If ignoreBarlines is True, it will behave as if the elements in measures are all in a flattened stream (note that this is not stream.flat as it does not copy the elements)
+        together without measure containers. This means that even if recurse is False, lyrics() will still essentially recurse through measures.
+        
+        >>> s.makeMeasures(inPlace = True)
+        >>> s.lyrics()[1]
+        [<music21.note.Lyric number=1 syllabic=single text="this">, ..., None, ..., <music21.note.Lyric number=1 syllabic=single text="words">]
+        
+        >>> s.lyrics(ignoreBarlines = False).keys()
+        []
+        
+        If recurse is True, this method will recurse through all container streams and build a nested list structure mirroring the hierarchy of the stream.
+        Note that if ignoreBarlines is True, measure structure will not be reflected in the hierarchy, although if ignoreBarlines is False, it will.
+        
+        Note that streams which do not contain any instance of a lyric number will not appear anywhere in the final list (not as a [] or otherwise).
+        
+        >>> p = stream.Part(s)
+        >>> scr = stream.Score()
+        >>> scr.append(p)
+        
+        >>> scr.lyrics(ignoreBarlines = False, recurse = True)[1]
+        [[[<music21.note.Lyric number=1 syllabic=single text="this">, <..."is">, <..."a">, None], [<..."of">, <..."eight">, <..."lyric">, <..."words">]]]
+        
+        Notice that the measures are nested in the part which is nested in the score.
+        
+        >>> scr.lyrics(ignoreBarlines = True, recurse = True)[1]
+        [[<music21.note.Lyric number=1 syllabic=single text="this">, <..."is">, <..."a">, None, <..."of">, <..."eight">, <..."lyric">, <..."words">]]
+        
+        Notice that this time, the measure structure is ignored.
+        
+        >>> scr.lyrics(ignoreBarlines = True, recurse = False).keys()
+        []
+        
+        '''
+        returnLists = {}
+        numNotes = 0
+        for e in self:
+            if isinstance(e, music21.note.GeneralNote):
+                n = e
+                if len(n.lyrics) == 0:
+                    for key in returnLists:
+                        returnLists[key].append(None)
+                for l in n.lyrics:
+                    if not l.number in returnLists:
+                        returnLists[l.number] = [ None for i in range(numNotes) ]
+                    returnLists[l.number].append(l)
+                numNotes +=1
+            elif ignoreBarlines is True and isinstance(e, music21.stream.Measure):
+                m = e
+                for n in m.notesAndRests:
+                    if len(n.lyrics) == 0:
+                        for key in returnLists:
+                            returnLists[key].append(None)
+                    for l in n.lyrics:
+                        if not l.number in returnLists:
+                            returnLists[l.number] = [ None for i in range(numNotes) ]
+                        returnLists[l.number].append(l)
+                    numNotes +=1
+            elif recurse is True and isinstance(e, music21.stream.Stream):
+                s = e
+                sublists = s.lyrics(ignoreBarlines = ignoreBarlines, recurse = True)
+                for key in sublists:
+                    if not key in returnLists:
+                        returnLists[key] = []
+                    returnLists[key].append(sublists[key])
+            else: # e is a stream (could be a measure if ignoreBarlines is False) and recurse is False
+                pass # do nothing
+                
+        return returnLists
+    
+    
+    
     #---------------------------------------------------------------------------
     # Variant control
     
