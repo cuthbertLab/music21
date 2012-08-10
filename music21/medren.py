@@ -2530,8 +2530,8 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
     >>> s.append(p)
     >>> s.append(m)
     >>> t = medren.breakMensuralStreamIntoBrevisLengths(s)
-    getting measure 0...
-    
+    Getting measure 0...
+    ...
     >>> t.show('text')
     {0.0} <music21.medren.Divisione .q.>
     {0.0} <music21.stream.Part...>
@@ -2576,8 +2576,6 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
                     if mOrDInAsNone: #If first case or changed mOrD
                         mOrD = item
                     elif mOrD.standardSymbol != item.standardSymbol: #If higher, different mOrD found
-                        print mOrD
-                        print item
                         raise MedRenException('Mensuration or divisione %s not consistent within heirarchy' % item)
                     
             tempStream_1_1, tempStream_1_2 = tempStream_1.splitByClass(None, lambda x: isHigherInHeirarchy(x, tempStream_1))
@@ -2602,9 +2600,7 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
                 if mOrDInAsNone: #If first case or changed mOrD
                         mOrD = e
                         newStream.append(e)
-                elif mOrD.standardSymbol != e.standardSymbol: #If higher, different mOrD found
-                    print mOrD
-                    print e 
+                elif mOrD.standardSymbol != e.standardSymbol: #If higher, different mOrD found 
                     raise MedRenException('Mensuration or divisione %s not consistent within heirarchy' % e)
             elif isinstance(e, music21.medren.Ligature):
                 tempStream = music21.stream.Stream()
@@ -2613,9 +2609,9 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
                 for m in music21.medren.breakMensuralStreamIntoBrevisLengths(tempStream):
                     newStream.append(m)
             elif isinstance(e, music21.medren.GeneralMensuralNote) and e not in mensuralMeasure:
-                m = music21.stream.Measure()
+                m = music21.stream.Measure(number = measureNum)
                 
-                print 'getting measure %s...' % measureNum
+                print '    Getting measure %s...' % measureNum
                 mensuralMeasure = e._getSurroundingMeasure(mOrD)[0]
                 for item in mensuralMeasure:
                     m.append(item)
@@ -2631,52 +2627,176 @@ def convertMensuralStream(inpStream, inpMOrD = None):
     The converted stream preserves the structure of the original stream, converting only the mensural objects.
     
     This stream must have all of the qualifications present in the documentation for :meth:`music21.medren.breakMensuralStreamIntoBrevisLengths`.
-    Furthermore, no non-mensural objects (other than streams) may be present in the input streams.
+    Furthermore, no non-mensural objects (other than streams and formatting) may be present in the input streams.
+    
+    Examples:
+    
+    .. image:: images/medren_SePerDureca.*
+        :width: 600
+    
+    Padova, Biblioteca Universitaria, manoscritto 1115, folio Ar
+
+    >>> from music21 import *
+    >>> SePerDureca = stream.Score()
+    >>> SePerDureca.append(text.TextBox('Se Per Dureca'))
+    >>> SePerDureca.metadata = metadata.Metadata()
+    >>> SePerDureca.metadata.title = 'Se Per Dureca'
+    >>>
+    >>> upper = stream.Part()
+    >>> lower = stream.Part()
+    >>>
+    >>> def processStream(mStream, pitches, lengths, downStems = []):
+    ...    pInd, lInd = 0, 0
+    ...    while lInd < len(lengths):
+    ...        if lengths[lInd] == 'P':
+    ...            mStream.append(medren.Punctus())
+    ...            lInd += 1
+    ...        else:
+    ...            if pitches[pInd] == 'R':
+    ...                mStream.append(medren.MensuralRest(lengths[lInd]))
+    ...            else:
+    ...                mn = medren.MensuralNote(pitches[pInd], lengths[lInd])
+    ...                if lInd in downStems:
+    ...                    mn.setStem('down')
+    ...                mStream.append(mn)
+    ...            lInd += 1
+    ...            pInd += 1
+    >>>
+    >>> pitches_upper_1 = ['G4','G4','F4','E4','G4','F4','E4','G4','F4','E4','D4','E4','F4','E4','E4','F4','E4','D4','C4','D4','R','E4','F4','E4','D4','E4','D4','C4','D4','C4','D4','C4','D4','E4','R','G4','F4','E4','G4','A4','G4','F4','E4','D4','E4','F4','E4','D4','C4','D4','E4']
+    >>> lengths_upper_1 = ['B','M','M','M','M','M','M','P','SB','SM','SM','SM','M','M','P','SB','SM','SM','SM','M','M','P','SB','SB','SB','P','M','M','M','M','M','M','P','SB','M','M','M','M','P','SB','M','M','M','M','P','SB','SM','SM','SM','M','M','P','SB','SM','SM','SM','M','M','P','L']
+    >>> pitches_upper_2 = ['A4','A4','B-4','A4','G4','A4','G4','F4','G4','F4','E4','F4','E4','F4','G4','G4','A4','G4','F4','E4','D4','E4','R','F4','E4','D4','E4','D4','R','E4','F4','G4','D4','R','E4','F4','E','D4','E4','D4','C4','D4','D4','E4','C4','D4','C4','D4','C4','B4','C4']
+    >>> lengths_upper_2 = ['SB','SB','P','M','M','M','M','M','M','P','M','M','M','M','M','M','P','SB','SM','SM','SM','SM','SM','SM','P','SB','M','SM','SM','SM','M','P','SB','SB','M','M','P','SB','SB','M','M','P','M','M','M','M','M','M','P','SB','M','SB','M','P','SB','M','M','M','M','P','L']
+    >>> pitches_upper_3 = ['C5','C5','C5','B4','A4','B4','C5','B4','C5','B4','A4','G4','A4','B4','A4','B4','G4','G4','A4','G4','F4','E4','D4','E4','R','E4','F4','G4','F4','E4','F4','E4','F4','G4','R','G4','F4','G4','F4','E4','D4','E4','F4','E4']
+    >>> lengths_upper_3 = ['SB','SB','P','SM','SM','SM','M','M','M','M','P','SM','SM','SM','M','M','M','M','P','SB','SM','SM','SM','SM','SM','SM','P','SB','SB','M','M','P','M','M','M','M','M','M','P','SB','SB','M','M','P','SB','SM','SM','SM','M','M','P','L']
+    >>> downStems_upper_3 = [0]
+    >>> pitches_upper_4 = ['A4','B4','A4','B4','G4','C5','B4','A4','C5','B4','A4','B4','C5','B4','A4','G4','A4','B4','C5','B4','A4','G4','F4','A4','A4','G4','F4','E4','R','G4','F4','G4','F4','E4','F4','E4','D4','C4','D4','R','A4','G4','A4','G4','F4','E4','D4','E4','R','F4','E4','D4','E4','D4']
+    >>> lengths_upper_4 = ['M','M','M','M','SB','P','M','M','M','M','M','M','P','M','M','M','M','M','M','P','SB','SM','SM','SM','M','M','P','SB','M','SB','M','P','SB','SB','M','M','P','M','M','M','M','M','M','P','SB','SB','SB','P','SB','SM','SM','SM','SM','SM','SM','P','M','M','SM','SM','SM','SB','P','Mx']
+    >>> pitches_lower_1 = ['C4','G3','A','B3','C4','D4','C4','R','A3','B3','C4','D4','C4','B3']
+    >>> lengths_lower_1 = ['L','B','SB','SB','SB','P','SB','SB','SB','P','SB','SB','SB','P','SB','SB','SB','P']
+    >>> lowerlig = medren.Ligature(['A4','B4'])
+    >>> lowerlig.makeOblique(0)
+    >>> lowerlig.setStem(0, 'down', 'left')
+    >>> pitches_lower_2 = ['A4','C5','B4','A4']
+    >>> lengths_lower_2 = ['SB','SB','SB','P','L']
+    >>> pitches_lower_3 = ['A4','A4','G4','A4','B4','C5','C5','B4','A4','G4','G4','A4','B4','C5','D5','A4','R','G4','A4','B4','B4','C5','C5','D5','D5','A4','A4','G4','A4','B4','C5']
+    >>> lengths_lower_3 = ['SB','SB','P','SB','SB','SB','P','SB','M','SB','M','P','SB','SB','P','SB','SB','SB','P','SB','SB','SB','P','SB','SB','P','SB','M','SB','M','P','SB','M','SB','M','P','SB','SB','SB','P','L']
+    >>> downStems_lower_3 = [23]
+    >>> pitches_lower_4 = ['C4','C4','E4','D4','C4','C4','D4','E4','D4','R','C4','C4','D4','D4','C4','R','R','C4','D4','C4','D4','E4']
+    >>> lengths_lower_4 = ['SB','SB','B','B','SB','SB','SB','P','SB','SB','SB','P','SB','M','SB','M','P','SB','SB','SB','P','SB','SB','M','M','L']
+    >>> downStems_lower_4 = [0]
+    >>> pitches_lower_5 = ['D4','E4','C4','D4','E4','E4','D4','C4','B3','A3','B3','C4','D4','D4','C4','D4','E4','D4','R','C4','C4','A3','B3','C4','B3','B3','A3','B3','A3','B3','C4','D4']
+    >>> lengths_lower_5 = ['SB','SB','P','SB','SB','P','SB','M','SB','M','P','SB','SB','M','M','P','SB','M','SB','M','P','SB','SB','SB','P','SB','M','SB','M','P','SB','SB','SB','P','SB','SB','P','SB','SB','SB','P','Mx'] 
+    >>> downStems_lower_5 = [0,3]
+    >>>
+    >>> SePerDureca.append(medren.Divisione('.p.'))
+    >>> upperClef = medren.MensuralClef('C')
+    >>> upperClef.line = 1
+    >>> lowerClef = medren.MensuralClef('C')
+    >>> lowerClef.line = 3
+    >>>
+    >>> upper.append(upperClef)
+    >>> processStream(upper, pitches_upper_1, lengths_upper_1)
+    >>> processStream(upper, pitches_upper_2, lengths_upper_2)
+    >>> processStream(upper, pitches_upper_3, lengths_upper_3, downStems_upper_3)
+    >>> processStream(upper, pitches_upper_4, lengths_upper_4)
+    >>> lower.append(lowerClef)
+    >>> processStream(lower, pitches_lower_1, lengths_lower_1)
+    >>> lower.append(lowerlig)
+    >>> processStream(lower, pitches_lower_2, lengths_lower_2)
+    >>> processStream(lower, pitches_lower_3, lengths_lower_3, downStems_lower_3)
+    >>> processStream(lower, pitches_lower_4, lengths_lower_4, downStems_lower_4)
+    >>> processStream(lower, pitches_lower_5, lengths_lower_5, downStems_lower_5)
+    >>>
+    >>> SePerDureca.append(upper)
+    >>> SePerDureca.append(lower)
+    >>>
+    >>> SePerDurecaConverted = medren.convertMensuralStream(SePerDureca)
+    Getting brevis lengths...
+    ...
+    >>> SePerDurecaConverted2 = medren.convertHouseStyle(SePerDurecaConverted, durationScale = 1, barlineStyle = 'tick')
+    >>> #_DOCS_HIDE SePerDurecaConverted2.show()
+    
+    .. image:: images/medren_SePerDurecaConverted.*
+        :width: 600
     
     '''
     mOrD = inpMOrD
 
     convertedStream = inpStream.__class__()
     
+    print 'Getting brevis lengths...'
+    measuredStream = breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD)
+    
     convertedStream.append(music21.clef.TrebleClef())
     
     for e in measuredStream:
+        
         if isinstance(e, music21.medren.MensuralClef):
             pass
+        
         elif isinstance(e, music21.medren.Mensuration) or \
         isinstance(e, music21.medren.Divisione):
             mOrD = e
             convertedStream.append(meter.TimeSignature(mOrD.timeString))
         
-        if isinstance(e, music21.stream.Measure):
-            m = convertMensuralMeasure(e, convertedStream, mOrD)
-            
-            convertedStream.append(m)
+        elif isinstance(e, music21.stream.Measure):
+            print '    Converting measure %s' % e.number
+            measureList = convertMensuralMeasure(e, convertedStream, inpMOrD = mOrD)
+            for m in measureList:
+                convertedStream.append(m)
             
         elif isinstance(e, music21.stream.Stream):
             print 'Converting stream %s' % e
             convertedStream.append(music21.medren.convertMensuralStream(e, inpMOrD = mOrD))
+        
+        else:
+            convertedStream.append(e)
     
     return convertedStream
 
-def convertMensuralMeasure(mensuralMeasure, convertedStream, mOrD = None):
+def convertMensuralMeasure(mensuralMeasure, convertedStream, inpMOrD = None):
+    mOrD = inpMOrD
     m = music21.stream.Measure()
+    measureList = []
         
     mList = mensuralMeasure.recurse()[1:]
     tempTMM = _TranslateMensuralMeasure(mOrD, mList)    
     
     lenList = tempTMM.getMinimaLengths()
     
-    for i in range(len(mList)):
-        if isinstance(mList[i], Mesuration) or\
-        isinstance(mList[i], Divisione):
-            pass
+    for item in mList:
+        if isinstance(item, Mensuration) or \
+        isinstance(item, Divisione):
+            if mOrD is None:
+                mOrD = item
+            else:
+                raise MedRenException('Mensuration or divisione %s not consistent within heirarchy' % e) #Should already be caught by medren.breakMensuralStreamIntoBrevisLengths, but just in case...
+    mDur = 0
+    if mOrD is not None:
+        if mensuralMeasure.number == 0:
+            m.append(meter.TimeSignature(mOrD.timeString)) #Trusting that mensuration won't change while one voice is holding.
+        if mOrD.standardSymbol in ['.o.', '.d.']:
+            mDur = 0.25
         else:
+            mDur = 0.5
+    else:
+        raise MedRenException('Cannot find or determine mensuration or divisione')
+    
+    for i in range(len(mList)):
+        if isinstance(mList[i], MensuralRest):
+            n = music21.note.Rest()
+        elif isinstance(mList[i], MensuralNote):
             n = music21.note.Note(mList[i].pitch)
-        n.duration = duration.Duration(lenList[i]*mDur)
-        m.append(n)     
         
-    return m
+        n.duration = duration.Duration(lenList[i]*mDur)          
+        m.append(n) 
+        
+        measureList = [m]
+        if lenList[i] > mOrD.minimaPerBrevis:
+            for i in range(int(lenList[i]/mOrD.minimaPerBrevis)-1):
+                measureList.append(music21.stream.Measure())
+
+    return measureList
 #-----------------------------------------------------------------------------------------------------------------------------------------               
 def setBarlineStyle(score, newStyle, oldStyle = 'regular', inPlace = True):
     '''
@@ -2927,87 +3047,9 @@ def testStretto():
     for piece in [salve, adTe, etJesum]:
         cummingSchubertStrettoFuga(piece)        
 
-def testConvertMensuralStream():
-    from music21 import stream, metadata, medren
-    import copy
-    
-    SePerDureca = stream.Score()
-    SePerDureca.metadata = metadata.Metadata()
-    SePerDureca.metadata.title = 'Se Per Dureca'
-    
-    upper = stream.Part()
-    lower = stream.Part()
-    
-    def processStream(mStream, pitches, lengths, downStems = []):
-        pInd, lInd = 0, 0
-        while lInd < len(lengths):
-            if lengths[lInd] == 'P':
-                mStream.append(medren.Punctus())
-                lInd += 1
-            else:
-                if pitches[pInd] == 'R':
-                    mStream.append(medren.MensuralRest(lengths[lInd]))
-                else:
-                    mn = medren.MensuralNote(pitches[pInd], lengths[lInd])
-                    if lInd in downStems:
-                        mn.setStem('down')
-                    mStream.append(mn)
-                lInd += 1
-                pInd += 1
-    
-    pitches_upper_1 = ['G4','G4','F4','E4','G4','F4','E4','G4','F4','E4','D4','E4','F4','E4','E4','F4','E4','D4','C4','D4','R','E4','F4','E4','D4','E4','D4','C4','D4','C4','D4','C4','D4','E4','R','G4','F4','E4','G4','A4','G4','F4','E4','D4','E4','F4','E4','D4','C4','D4','E4']
-    lengths_upper_1 = ['B','M','M','M','M','M','M','P','SB','SM','SM','SM','M','M','P','SB','SM','SM','SM','M','M','P','SB','SB','SB','P','M','M','M','M','M','M','P','SB','M','M','M','M','P','SB','M','M','M','M','P','SB','SM','SM','SM','M','M','P','SB','SM','SM','SM','M','M','P','L']
-    pitches_upper_2 = ['A4','A4','B-4','A4','G4','A4','G4','F4','G4','F4','E4','F4','E4','F4','G4','G4','A4','G4','F4','E4','D4','E4','R','F4','E4','D4','E4','D4','R','E4','F4','G4','D4','R','E4','F4','E','D4','E4','D4','C4','D4','D4','E4','C4','D4','C4','D4','C4','B4','C4']
-    lengths_upper_2 = ['SB','SB','P','M','M','M','M','M','M','P','M','M','M','M','M','M','P','SB','SM','SM','SM','SM','SM','SM','P','SB','M','SM','SM','SM','M','P','SB','SB','M','M','P','SB','SB','M','M','P','M','M','M','M','M','M','P','SB','M','SB','M','P','SB','M','M','M','M','P','L']
-    pitches_upper_3 = ['C5','C5','C5','B4','A4','B4','C5','B4','C5','B4','A4','G4','A4','B4','A4','B4','G4','G4','A4','G4','F4','E4','D4','E4','R','E4','F4','G4','F4','E4','F4','E4','F4','G4','R','G4','F4','G4','F4','E4','D4','E4','F4','E4']
-    lengths_upper_3 = ['SB','SB','P','SM','SM','SM','M','M','M','M','P','SM','SM','SM','M','M','M','M','P','SB','SM','SM','SM','SM','SM','SM','P','SB','SB','M','M','P','M','M','M','M','M','M','P','SB','SB','M','M','P','SB','SM','SM','SM','M','M','P','L']
-    downStems_upper_3 = [0]
-    pitches_upper_4 = ['A4','B4','A4','B4','G4','C5','B4','A4','C5','B4','A4','B4','C5','B4','A4','G4','A4','B4','C5','B4','A4','G4','F4','A4','A4','G4','F4','E4','R','G4','F4','G4','F4','E4','F4','E4','D4','C4','D4','R','A4','G4','A4','G4','F4','E4','D4','E4','R','F4','E4','D4','E4','D4']
-    lengths_upper_4 = ['M','M','M','M','SB','P','M','M','M','M','M','M','P','M','M','M','M','M','M','P','SB','SM','SM','SM','M','M','P','SB','M','SB','M','P','SB','SB','M','M','P','M','M','M','M','M','M','P','SB','SB','SB','P','SB','SM','SM','SM','SM','SM','SM','P','M','M','SM','SM','SM','SB','P','Mx']
-    pitches_lower_1 = ['C4','G3','A','B3','C4','D4','C4','R','A3','B3','C4','D4','C4','B3']
-    lengths_lower_1 = ['L','B','SB','SB','SB','P','SB','SB','SB','P','SB','SB','SB','P','SB','SB','SB','P']
-    lowerlig = medren.Ligature(['A4','B4'])
-    lowerlig.makeOblique(0)
-    lowerlig.setStem(0, 'down', 'left')
-    pitches_lower_2 = ['A4','C5','B4','A4']
-    lengths_lower_2 = ['SB','SB','SB','P','L']
-    pitches_lower_3 = ['A4','A4','G4','A4','B4','C5','C5','B4','A4','G4','G4','A4','B4','C5','D5','A4','R','G4','A4','B4','B4','C5','C5','D5','D5','A4','A4','G4','A4','B4','C5']
-    lengths_lower_3 = ['SB','SB','P','SB','SB','SB','P','SB','M','SB','M','P','SB','SB','P','SB','SB','SB','P','SB','SB','SB','P','SB','SB','P','SB','M','SB','M','P','SB','M','SB','M','P','SB','SB','SB','P','L']
-    downStems_lower_3 = [23]
-    pitches_lower_4 = ['C4','C4','E4','D4','C4','C4','D4','E4','D4','R','C4','C4','D4','D4','C4','R','R','C4','D4','C4','D4','E4']
-    lengths_lower_4 = ['SB','SB','B','B','SB','SB','SB','P','SB','SB','SB','P','SB','M','SB','M','P','SB','SB','SB','P','SB','SB','SM','SM','L']
-    downStems_lower_4 = [0]
-    pitches_lower_5 = ['D4','E4','C4','D4','E4','E4','D4','C4','B3','A3','B3','C4','D4','D4','C4','D4','E4','D4','R','C4','C4','A3','B3','C4','B3','B3','A3','B3','A3','B3','C4','D4']
-    lengths_lower_5 = ['SB','SB','P','SB','SB','P','SB','M','SB','M','P','SB','SB','M','M','P','SB','M','SB','M','P','SB','SB','SB','P','SB','M','SB','M','P','SB','SB','SB','P','SB','SB','P','SB','SB','SB','P','Mx'] 
-    downStems_lower_5 = [0,3]
-    
-    SePerDureca.append(medren.Divisione('.p.'))
-    upperClef = medren.MensuralClef('C')
-    upperClef.line = 1
-    lowerClef = medren.MensuralClef('C')
-    lowerClef.line = 3
-    
-    upper.append(upperClef)
-    processStream(upper, pitches_upper_1, lengths_upper_1)
-    processStream(upper, pitches_upper_2, lengths_upper_2)
-    processStream(upper, pitches_upper_3, lengths_upper_3, downStems_upper_3)
-    processStream(upper, pitches_upper_4, lengths_upper_4)
-    lower.append(lowerClef)
-    processStream(lower, pitches_lower_1, lengths_lower_1)
-    lower.append(lowerlig)
-    processStream(lower, pitches_lower_2, lengths_lower_2)
-    processStream(lower, pitches_lower_3, lengths_lower_3, downStems_lower_3)
-    processStream(lower, pitches_lower_4, lengths_lower_4, downStems_lower_4)
-    processStream(lower, pitches_lower_5, lengths_lower_5, downStems_lower_5)
-    
-    SePerDureca.append(upper)
-    SePerDureca.append(lower)
-    return medren.convertMensuralStream(SePerDureca)
-
-
 if __name__ == '__main__':
-    music21.mainTest() #TestExternal)
-    #music21.medren.testConvertMensuralStream()
+    music21.mainTest(Test) #TestExternal)
+    #music21.medren.testConvertMensuralMeasure()
 #    almaRedemptoris = converter.parse("C4 E F G A G G G A B c G", '4/4') #liber 277 (pdf401)
 #    puer = converter.parse('G4 d d d e d c c d c e d d', '4/4') # puer natus est 408 (pdf 554)
 #    almaRedemptoris.title = "Alma Redemptoris Mater LU p. 277"
