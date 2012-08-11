@@ -430,7 +430,7 @@ def translateNoteWithDurationToBytes(n):
     >>> (2**(ord(trans[1])/10.0))/256  # approximately 3
     2.828...
     
-    >>> n.tie = tie.Tie('end')
+    >>> n.tie = tie.Tie('stop')
     >>> trans = search.translateNoteWithDurationToBytes(n)
     >>> trans
     '<_e'

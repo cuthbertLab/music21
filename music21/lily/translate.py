@@ -68,7 +68,7 @@ def makeLettersOnlyId(inputString):
     '''
     >>> from music21 import *
     >>> print lily.translate.makeLettersOnlyId('rainbow123@@dfas')
-    'rainbowxyzmmdfas'
+    rainbowxyzmmdfas
 
     '''
     inputString = str(inputString)
@@ -206,7 +206,7 @@ class LilypondConverter(object):
              #})
         \header { } 
         \score  {
-              << \new Staff { c' 4  
+              << \new Staff  = ... { c' 4  
                       }
                 >>
           }
@@ -353,7 +353,7 @@ class LilypondConverter(object):
         >>> b = _getCachedCorpusFile('bach/bwv66.6') #_DOCS_HIDE
         >>> lpGroupedMusicList = lpc.lyGroupedMusicListFromScoreWithParts(b)
         >>> print lpGroupedMusicList
-        << \new Staff { \partial 32*8 
+        << \new Staff  = Soprano { \partial 32*8 
                \clef "treble" 
                \key fis \minor 
                \time 4/4
@@ -376,7 +376,7 @@ class LilypondConverter(object):
                ...
         } 
         <BLANKLINE>
-        \new Staff { \partial 32*8 
+        \new Staff  = Alto { \partial 32*8 
             \clef "treble"...
             \once \override Stem #'direction = #UP 
             e' 4  
@@ -453,7 +453,7 @@ class LilypondConverter(object):
         >>> lyPrefixCompositeMusicOut 
         <music21.lily.lilyObjects.LyPrefixCompositeMusic object at 0x...>
         >>> print lyPrefixCompositeMusicOut
-        \new Staff { \time 3/4
+        \new Staff = ...{ \time 3/4
            c 4  
            d 4  
            e 4  
@@ -1115,7 +1115,9 @@ class LilypondConverter(object):
         replacedElements = variantObject.replacedElements()
         replacedElementsClef = replacedElements[0].getContextByClass('Clef')
 
-        variantContainerPart = variantObject.getContextByClass('Part')
+        variantContainerStream = variantObject.getContextByClass('Part')
+        if variantContainerStream is None:
+            variantContainerStream = variantObject.getContextByClass('Stream')
 
         variantObject.insert(0, replacedElementsClef)
         variantName = variantObject.groups[0]
@@ -1125,8 +1127,8 @@ class LilypondConverter(object):
             self.addedVariants.append(variantName)
             newVariant = True
 
-        partId = makeLettersOnlyId(variantContainerPart.id)
-        variantId = lyo.LyOptionalId(makeLettersOnlyId(variantName)+partId)
+        containerId = makeLettersOnlyId(variantContainerStream.id)
+        variantId = lyo.LyOptionalId(makeLettersOnlyId(variantName)+containerId)
 
         color = self.variantColors[self.addedVariants.index(variantName) % 6]
 
@@ -1156,7 +1158,7 @@ class LilypondConverter(object):
                                                             simpleString = "Staff",
                                                             music = lpSequentialMusicVariant)
         else: #newVariant is False
-        # This will reference existing contexts. This doesn't seem to have fixed the varying ossia heights problem though.
+        # This will reference existing contexts. This doesn't seem to have fixed the varying ossia heights problem though. Also, now need to add /startStaff and /stopStaff around each ossia's content.
             if variantLength != replacedElementsLength:
                 numerator, denominator = common.decimalToTuplet(replacedElementsLength/variantLength)
                 fraction = str(numerator) + '/' + str(denominator)
@@ -1184,7 +1186,7 @@ class LilypondConverter(object):
       \override TupletNumber #'stencil = ##f
       firstClef = ##f
     } 
-    ''' % partId
+    ''' % containerId
 
         lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod
                 
@@ -1571,7 +1573,7 @@ class TestExternal(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
-    #music21.mainTest(Test)
+    music21.mainTest(Test)
     music21.mainTest(TestExternal, 'noDocTest')
     
 #------------------------------------------------------------------------------
