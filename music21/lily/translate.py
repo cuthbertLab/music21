@@ -146,6 +146,8 @@ class LilypondConverter(object):
         self.storedContexts = []
         self.doNotOutput = []
         self.currentMeasure = None
+        self.addedVariants = []
+        self.variantColors = ['blue', 'red', 'purple', 'green', 'orange', 'yellow', 'grey']
 
     def setupTools(self):
         if os.path.exists(environLocal['lilypondPath']):
@@ -470,8 +472,7 @@ class LilypondConverter(object):
                 newContext = 'Voice'
         else:
             newContext = contextType
-            if 'Part' in c:
-                optionalId = lyo.LyOptionalId(makeLettersOnlyId(streamIn.id))
+            optionalId = lyo.LyOptionalId(makeLettersOnlyId(streamIn.id))
         
         musicList = []
 
@@ -1117,33 +1118,61 @@ class LilypondConverter(object):
         variantContainerPart = variantObject.getContextByClass('Part')
 
         variantObject.insert(0, replacedElementsClef)
-        variantName = lyo.LyOptionalId(makeLettersOnlyId(variantObject.groups[0]))
+        variantName = variantObject.groups[0]
+        if variantName in self.addedVariants:
+            newVariant = False
+        else:
+            self.addedVariants.append(variantName)
+            newVariant = True
 
         partId = makeLettersOnlyId(variantContainerPart.id)
-        #Getting the partId does not work yet because replacedElements[0].getContextByClass('Part') is not returning the expected object. I'm not sure why that is.
+        variantId = lyo.LyOptionalId(makeLettersOnlyId(variantName)+partId)
 
-        #for n in variantObject._stream.flat.notesAndRests:
-        #    n.editorial.color = 'blue'
+        color = self.variantColors[self.addedVariants.index(variantName) % 6]
+
+        for n in variantObject._stream.flat.notesAndRests:
+            n.editorial.color = color
 
         lpSequentialMusicVariant = self.lySequentialMusicFromStream(variantObject._stream)
 
         replacedElementsLength = replacedElements.duration.quarterLength
         variantLength = variantObject.containedHighestTime
-        if variantLength != replacedElementsLength:
-            numerator, denominator = common.decimalToTuplet(replacedElementsLength/variantLength)
-            fraction = str(numerator) + '/' + str(denominator)
-            lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='times', 
-                                                                fraction = fraction,
-                                                                music = lpSequentialMusicVariant)
-            lpInternalSequentialMusic = lyo.LySequentialMusic(musicList = lpVariantTuplet)
-            lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'new',
-                                                        optionalId = variantName,
-                                                        simpleString = "Staff",
-                                                        music = lpInternalSequentialMusic)   
-        else:
-            lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'new',
-                                                        simpleString = "Staff",
-                                                        music = lpSequentialMusicVariant)   
+        if newVariant is True:
+        # This will make 'new' contexts
+            if variantLength != replacedElementsLength:
+                numerator, denominator = common.decimalToTuplet(replacedElementsLength/variantLength)
+                fraction = str(numerator) + '/' + str(denominator)
+                lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='times', 
+                                                                    fraction = fraction,
+                                                                    music = lpSequentialMusicVariant)
+                lpInternalSequentialMusic = lyo.LySequentialMusic(musicList = lpVariantTuplet)
+                lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'new',
+                                                            optionalId = variantId,
+                                                            simpleString = "Staff",
+                                                            music = lpInternalSequentialMusic)   
+            else:
+                lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'new',
+                                                            optionalId = variantId,
+                                                            simpleString = "Staff",
+                                                            music = lpSequentialMusicVariant)
+        else: #newVariant is False
+        # This will reference existing contexts. This doesn't seem to have fixed the varying ossia heights problem though.
+            if variantLength != replacedElementsLength:
+                numerator, denominator = common.decimalToTuplet(replacedElementsLength/variantLength)
+                fraction = str(numerator) + '/' + str(denominator)
+                lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='times', 
+                                                                    fraction = fraction,
+                                                                    music = lpSequentialMusicVariant)
+                lpInternalSequentialMusic = lyo.LySequentialMusic(musicList = lpVariantTuplet)
+                lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'context',
+                                                            optionalId = variantId,
+                                                            simpleString = "Staff",
+                                                            music = lpInternalSequentialMusic)   
+            else:
+                lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'context',
+                                                            optionalId = variantId,
+                                                            simpleString = "Staff",
+                                                            music = lpSequentialMusicVariant)
         optionalContextMod = r'''
 \with {
       \remove "Time_signature_engraver"

@@ -1476,7 +1476,7 @@ def _doVariantFixingOnStream(s, variantNames = None):
                 isInitial = False
                 isFinal = False
             
-            # If a non-final deletion or an INITIAL insertion, add the next element after the variant. TODO: add boolean logic for finalness of deletion
+            # If a non-final deletion or an INITIAL insertion, add the next element after the variant.
             if (variantType is 'insertion' and (isInitial is True)) or (variantType is 'deletion' and (isFinal is False)):
                 targetElement = _getNextElements(s, v)
                 
@@ -1486,7 +1486,7 @@ def _doVariantFixingOnStream(s, variantNames = None):
                         if isinstance(e, music21.clef.Clef) or isinstance(e, music21.meter.TimeSignature):
                             targetElement.remove(e)
                 
-                v.append(targetElement)
+                v.append(copy.deepcopy(targetElement)) #Appends a copy!!!
                     
             # If a non-initial insertion or a FINAL deletion, add the previous element after the variant.
             else: #elif (variantType is 'deletion' and (isFinal is True)) or (type is 'insertion' and (isInitial is False)):
@@ -1497,7 +1497,7 @@ def _doVariantFixingOnStream(s, variantNames = None):
                 for e in v.containedSite:
                     oldOffset = e.getOffsetBySite(v.containedSite)
                     e.setOffsetBySite(v.containedSite, oldOffset+offsetShift)
-                v.insert(0.0, targetElement)
+                v.insert(0.0, copy.deepcopy(targetElement))
                 s.remove(v)
                 s.insert(newVariantOffset, v)
                 
