@@ -16,14 +16,16 @@ import os
 import wave
 import unittest, doctest
 
-import music21.scale
-import music21.pitch
 from music21 import common
-from music21 import search
+from music21 import exceptions21
 from music21 import features
-from music21 import environment, converter
-from music21 import metadata, note, stream
-from music21.audioSearch import recording
+from music21 import metadata
+from music21 import note
+from music21 import pitch
+from music21 import scale
+from music21 import stream
+
+from music21 import environment
 _MOD = 'audioSearch/base.py'
 environLocal = environment.Environment(_MOD)
 
@@ -33,7 +35,6 @@ recordSampleRate = 44100
 _missingImport = []
 try:
     import matplotlib.mlab # for find
-    import matplotlib.pyplot
 except ImportError:
     _missingImport.append('matplotlib')
 
@@ -150,7 +151,7 @@ def prepareThresholds(useScale=None):
     
     
     >>> from music21 import *
-    >>> l, p = music21.audioSearch.prepareThresholds(scale.MajorScale('A3'))
+    >>> l, p = audioSearch.prepareThresholds(scale.MajorScale('A3'))
     >>> for i in range(len(l)):
     ...    print "%s < %.2f < %s" % (p[i], l[i], p[i+1])
     A3 < 0.86 < B3
@@ -162,7 +163,7 @@ def prepareThresholds(useScale=None):
     G#4 < 1.24 < A4
     '''
     if useScale is None:
-        useScale = music21.scale.ChromaticScale('C4')
+        useScale = scale.ChromaticScale('C4')
     
     scPitches = useScale.pitches
     scPitchesRemainder = []
@@ -244,14 +245,14 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
             returnPitch = copy.deepcopy(pitches[i])            
             returnPitch.octave = oct - 4 ## PROBLEM
             #returnPitch.inputFrequency = inputPitchFrequency
-            name_note = music21.pitch.Pitch(str(pitches[i]))
+            name_note = pitch.Pitch(str(pitches[i]))
             return name_note.frequency, returnPitch
     # else:
     # above highest threshold
     returnPitch = copy.deepcopy(pitches[-1])
     returnPitch.octave = oct - 3
     returnPitch.inputFrequency = inputPitchFrequency
-    name_note = music21.pitch.Pitch(str(pitches[-1]))
+    name_note = pitch.Pitch(str(pitches[-1]))
     return name_note.frequency, returnPitch      
 
 def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=None):
@@ -277,7 +278,7 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=None):
     [A5, A5, A5, D5, D4, B4, A4, F4, E-4, C#3, B3, B3, B3, A3, G3, F3, F3, E3, F#3, F#3,...]   
     '''
     if useScale is None:
-        useScale = music21.scale.MajorScale('C4')
+        useScale = scale.MajorScale('C4')
 
     detectedPitchObjects = []
     (thresholds, pitches) = prepareThresholds(useScale)
@@ -316,7 +317,7 @@ def getFrequenciesFromMicrophone(length=10.0, storeWaveFilename=None):
     
     TODO -- find a way to test... or at least demo
     '''
-    
+    from music21.audioSearch import recording
     storedWaveSampleList = []
     environLocal.printDebug("* start recording")
     storedWaveSampleList = recording.samplesFromRecording(seconds=length,
@@ -437,14 +438,14 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     return (freqFromAQList, waveHandle, endSample)
         
 
-def detectPitchFrequencies(freqFromAQList, useScale=music21.scale.MajorScale('C4')):
+def detectPitchFrequencies(freqFromAQList, useScale=None):
     '''
     It detects the pitches of the notes from a list of frequencies, using thresholds which
-    depend on the used scale. The default value is the major scale C4.
+    depend on the useScale option. If useScale is None, the default value is the Major Scale beginning C4.
     
     >>> from music21 import *
     >>> freqFromAQList=[143.627689055,99.0835452019,211.004784689,4700.31347962,2197.9431119]
-    >>> pitchesList = detectPitchFrequencies(freqFromAQList, useScale=music21.scale.MajorScale('C4'))
+    >>> pitchesList = detectPitchFrequencies(freqFromAQList, useScale=scale.MajorScale('C4'))
     >>> for i in range(5):
     ...     print pitchesList[i]
     146.832383959
@@ -453,6 +454,8 @@ def detectPitchFrequencies(freqFromAQList, useScale=music21.scale.MajorScale('C4
     4698.63628668
     2093.0045224
     '''
+    if useScale is None:
+        useScale = scale.MajorScale('C4')
     (thresholds, pitches) = prepareThresholds(useScale)
     
     detectedPitchesFreq = []
@@ -625,8 +628,7 @@ def quantizeDuration(length):
 def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
     '''
     takes a list of lengths of notes (measured in
-    audio samples) and tries to estimate using
-    matplotlib.pyplot.hist what the length of a
+    audio samples) and tries to estimate what the length of a
     quarter note should be in this list.
     
     If mostRepeatedQuarterLength is another number, it still returns the
@@ -746,7 +748,8 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
     else: #case follower
         return sc,qle
 
-def decisionProcess(list, notePrediction, beginningData, lastNotePosition, countdown, firstNotePage=None, lastNotePage=None):
+def decisionProcess(list, notePrediction, beginningData, 
+                    lastNotePosition, countdown, firstNotePage=None, lastNotePage=None):
     '''
     It decides which of the given parts of the score has a better matching with 
     the recorded part of the song.
@@ -842,7 +845,7 @@ def decisionProcess(list, notePrediction, beginningData, lastNotePosition, count
     return position, countdown
 
     
-class AudioSearchException(music21.Music21Exception):
+class AudioSearchException(exceptions21.Music21Exception):
     pass
 
 #------------------------------------------
@@ -858,6 +861,7 @@ _DOC_ORDER = []
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 

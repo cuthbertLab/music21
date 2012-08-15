@@ -52,10 +52,12 @@ owners who have allowed them to be included with music21.
 __all__ = ['base', 
 
            # sub folders
-           'abc', 'abj', 'analysis', 'audioSearch',
+           'abc', 
+           # 'abj', # not full part of music21 and slow if abjad is included
+           'analysis', 'audioSearch',
            'braille', 
            'composition', 'counterpoint', 'corpus', 
-           'demos', 'doc',            
+           'demos', 'doc',
            'features', 'figuredBass', 
            'humdrum',
            'languageExcerpts', 'lily', 
@@ -75,7 +77,7 @@ __all__ = ['base',
            'chant', 'chord', 'chordTables', 
            'classCache', 'clef', 'common', 'configure', 'converter',
            'defaults', 'derivation', 'duration', 'dynamics',
-           'editorial', 'environment', 'expressions', 
+           'editorial', 'environment', 'exceptions21', 'expressions', 
            'graph', 
            'harmony', 
            'instrument', 'interval', 'intervalNetwork', 
@@ -91,7 +93,7 @@ __all__ = ['base',
            'xmlnode',
         ]
 
-
+#__all__.reverse()
 #print __all__
 # skipped purposely, "base", "xmlnode"
 

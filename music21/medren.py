@@ -3048,7 +3048,7 @@ def testStretto():
         cummingSchubertStrettoFuga(piece)        
 
 if __name__ == '__main__':
-    music21.mainTest(Test) #TestExternal)
+    music21.mainTest(TestExternal) #TestExternal)
     #music21.medren.testConvertMensuralMeasure()
 #    almaRedemptoris = converter.parse("C4 E F G A G G G A B c G", '4/4') #liber 277 (pdf401)
 #    puer = converter.parse('G4 d d d e d c c d c e d d', '4/4') # puer natus est 408 (pdf 554)

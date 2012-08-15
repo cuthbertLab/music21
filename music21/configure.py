@@ -19,13 +19,6 @@ import unittest
 import textwrap
 import distutils
 
-hasWebbrowser = False
-try:
-    import webbrowser
-    hasWebbrowser = True
-except:
-    pass
-
 try:
     import readline
 except ImportError:
@@ -767,6 +760,13 @@ class AskOpenInBrowser(YesOrNo):
         '''
         result = self.getResult()
         if result is True: # if True            
+            hasWebbrowser = False
+            try:
+                import webbrowser
+                hasWebbrowser = True
+            except:
+                pass
+            
             if hasWebbrowser is True:
                 webbrowser.open_new(self._urlTarget)
             else:
@@ -882,6 +882,13 @@ class AskSendInstallationReport(YesOrNo):
         '''
         result = self.getResult()
         if result is True:
+            hasWebbrowser = False
+            try:
+                import webbrowser
+                hasWebbrowser = True
+            except:
+                pass
+
             if hasWebbrowser is True:
                 webbrowser.open(self._getMailToStr())
             else:

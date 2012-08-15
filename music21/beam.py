@@ -30,6 +30,49 @@ Run `stream.Stream`.:meth:`~music21.stream.Stream.makeBeams` to set beaming info
 automatically given the current meter.
 
 
+Suppose you had a measure of two eighths and a quarter and wanted to explicitly beam the two eighth notes.
+You could do this:
+
+>>> from music21 import *
+>>> m = stream.Measure()
+>>> n1 = note.Note('C4', quarterLength = 0.5)
+>>> n2 = note.Note('D4', quarterLength = 0.5)
+>>> n3 = note.Note('E4', quarterLength = 1.0)
+>>> m.append(n1)
+>>> m.append(n2)
+>>> m.append(n3)
+>>> n1.beams.fill('eighth', type='start')
+>>> n2.beams.fill('eighth', type='stop')
+>>> n1.beams
+<music21.beam.Beams <music21.beam.Beam 1/start>>
+>>> n2.beams
+<music21.beam.Beams <music21.beam.Beam 1/stop>>
+
+
+But suppose you wanted something harder: two 16ths, an 8th, a quarter, 
+with the first 3 notes beamed?  The first note and 3rd are easy to do, using the
+method above:
+
+>>> m = stream.Measure()
+>>> n1 = note.Note('C4', quarterLength = 0.25)
+>>> n2 = note.Note('D4', quarterLength = 0.25)
+>>> n3 = note.Note('E4', quarterLength = 0.5)
+>>> n4 = note.Note('F4', quarterLength = 1.0)
+>>> for n in [n1, n2, n3, n4]:
+...     m.append(n)
+>>> n1.beams.fill('16th', type='start')
+>>> n3.beams.fill('eighth', type='stop')
+
+but the second note has an 8th beam that continues and a 16th beam that stops.  So you will need to set them separately:
+
+>>> n2.beams.append('continue')
+>>> n2.beams.append('stop')
+>>> n2.beams
+<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>
+
+To get rid of beams on a note do:
+
+>>> n2.beams.beamsList = []
 
 '''
 

@@ -903,11 +903,6 @@ def compressXML(filename, deleteOriginal=False):
         os.remove(filename)
 
 #-------------------------------------------------------------------------------
-# all paths
-
-paths = getPaths()
-
-#-------------------------------------------------------------------------------
 # libraries
 
 

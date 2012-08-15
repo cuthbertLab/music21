@@ -488,9 +488,15 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                         if o == 0:
                             if isinstance(a, romanTextModule.RTRepeatStart):
                                 m.leftBarline = bar.Repeat(direction='start')
+                            else:
+                                rtt = RomanTextUnprocessedToken(a)
+                                m.insert(o, rtt)
                         elif tsCurrent is not None and tsCurrent.barDuration.quarterLength == o:
                             if isinstance(a, romanTextModule.RTRepeatStop):
                                 m.rightBarline = bar.Repeat(direction='stop')
+                            else:
+                                rtt = RomanTextUnprocessedToken(a)
+                                m.insert(o, rtt)
                         else: # mid measure repeat signs
                             rtt = RomanTextUnprocessedToken(a)
                             m.insert(o, rtt)
@@ -939,7 +945,9 @@ _DOC_ORDER = []
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test)
+    from music21 import converter
+    r = converter.parse('d:/desktop/riemenschneider001.txt', format='romantext')
+    #music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof

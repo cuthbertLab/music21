@@ -9,15 +9,21 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
-This module defines classes for representing Scala scale data, including Scala pitch representations, storage, and files. 
+This module defines classes for representing Scala scale data, 
+including Scala pitch representations, storage, and files. 
 
 The Scala format is defined at the following URL:
 http://www.huygens-fokker.org/scala/scl_format.html
-We thank Manuel Op de Coul for allowing us to include the repository (as of May 11, 2011) with music21
 
-Utility functions are also provided to search and find scales in the Scala scale archive. File names can be found with the :func:`~music21.scala.search` function.
+We thank Manuel Op de Coul for allowing us to include 
+the repository (as of May 11, 2011) with music21
 
-To create a :class:`~music21.scale.ScalaScale` instance, simply provide a root pitch and the name of the scale. Scale names are given as a the scala .scl file name. 
+Utility functions are also provided to search and find 
+scales in the Scala scale archive. File names can be found 
+with the :func:`~music21.scala.search` function.
+
+To create a :class:`~music21.scale.ScalaScale` instance, simply 
+provide a root pitch and the name of the scale. Scale names are given as a the scala .scl file name. 
 
 >>> from music21 import *
 >>> mbiraScales = scala.search('mbira')
@@ -58,6 +64,9 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
+# global variable to cache the paths returned from getPaths()
+SCALA_PATHS = None
+
 def getPaths():    
     '''Get all scala scale paths. This is called once or the module and cached as SCALA_PATHS, which should be used instead of calls to this function. 
 
@@ -66,6 +75,12 @@ def getPaths():
     >>> len(a) >= 3800
     True
     '''
+    # declare that the copy of SCALA_PATHS here is the same
+    # as the outer scope.  See 
+    # http://stackoverflow.com/questions/423379/using-global-variables-in-a-function-other-than-the-one-that-created-them
+    global SCALA_PATHS
+    if SCALA_PATHS is not None:
+        return SCALA_PATHS
     moduleName = scl
     if not hasattr(moduleName, '__path__'):
         # when importing a package name (a directory) the moduleName        
@@ -95,11 +110,9 @@ def getPaths():
             fn = fn.replace('_', '')
             fn = fn.replace('-', '')
             paths[fp].append(fn)
-
+    SCALA_PATHS = paths
     return paths
 
-
-SCALA_PATHS = getPaths()
 
 
 #-------------------------------------------------------------------------------
@@ -384,7 +397,7 @@ def parse(target):
     # remove any spaces
     target = target.replace(' ', '')
     if match is None:
-        for fp in SCALA_PATHS.keys():
+        for fp in getPaths().keys():
             dir, fn = os.path.split(fp)
             # try exact match
             if target.lower() == fn.lower():
@@ -393,17 +406,17 @@ def parse(target):
 
     # try again, from cached reduced expressions
     if match is None:        
-        for fp in SCALA_PATHS.keys():
+        for fp in getPaths().keys():
             # look at alternative names
-            for alt in SCALA_PATHS[fp]:
+            for alt in getPaths()[fp]:
                 if target.lower() == alt:
                     match = fp
                     break
     if match is None:
         # accept partial matches
-        for fp in SCALA_PATHS.keys():
+        for fp in getPaths().keys():
             # look at alternative names
-            for alt in SCALA_PATHS[fp]:
+            for alt in getPaths()[fp]:
                 if target.lower() in alt:
                     match = fp
                     break
@@ -429,7 +442,7 @@ def search(target):
     # try from stored collections
     # remove any spaces
     target = target.replace(' ', '')
-    for fp in SCALA_PATHS.keys():
+    for fp in getPaths().keys():
         dir, fn = os.path.split(fp)
         # try exact match
         if target.lower() == fn.lower():
@@ -437,9 +450,9 @@ def search(target):
                 match.append(fp)
 
     # accept partial matches
-    for fp in SCALA_PATHS.keys():
+    for fp in getPaths().keys():
         # look at alternative names
-        for alt in SCALA_PATHS[fp]:
+        for alt in getPaths()[fp]:
             if target.lower() in alt:
                 if fp not in match:
                     match.append(fp)

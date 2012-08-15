@@ -13,19 +13,16 @@
 
 import copy
 import math
-import matplotlib.pyplot
 
 import os
 import random
 import sys
 from time import time
 
-from music21 import corpus
-from music21 import converter
-from music21 import environment
-from music21 import scale, stream, note, pitch
+from music21 import scale
 from music21.audioSearch.base import *
-from music21.audioSearch import recording
+
+from music21 import environment
 _MOD = 'audioSearch/transcriber.py'
 environLocal = environment.Environment(_MOD)
 
@@ -55,10 +52,14 @@ class ScoreFollower(object):
         self.begins = True
 
     def runScoreFollower(self, plot=False, useMic=False,
-                      seconds=15.0, useScale=scale.ChromaticScale('C4')):
+                      seconds=15.0, useScale=None):
         '''
-        It is the main program. It runs the 'repeatTranscription' until the performance ends.
+        The main program. It runs the 'repeatTranscription' until the performance ends.
+        
+        If `useScale` is none, then it uses a scale.ChromaticScale
         '''                  
+        if useScale is None:
+            useScale = scale.ChromaticScale('C4')
         self.seconds_recording = seconds        
         self.useMic = useMic
         self.useScale = useScale
@@ -68,6 +69,7 @@ class ScoreFollower(object):
             self.result = self.repeatTranscription()    
 
         if plot == True:
+            import matplotlib.pyplot
             matplotlib.pyplot.plot(listplot)
             matplotlib.pyplot.show()
         environLocal.printDebug("* END")
@@ -498,6 +500,7 @@ class TestExternal(unittest.TestCase):
         pass
     
     def xtestRunScoreFollower(self):
+        from music21 import corpus
         scNotes = corpus.parse('luca/gloria').parts[0].flat.notesAndRests
         ScF = ScoreFollower(scoreStream=scNotes)
         ScF.runScoreFollower(plot=False, useMic=True, seconds=10.0)

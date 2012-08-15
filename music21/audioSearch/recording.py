@@ -32,10 +32,9 @@ import time
 import unittest, doctest
 import wave
 
-import music21
 from music21 import common
 from music21 import environment
-_MOD = "chant.py"
+_MOD = "audiosearch.recording.py"
 environLocal = environment.Environment(_MOD)
 
 
@@ -140,6 +139,7 @@ _DOC_ORDER = []
 
 
 if __name__ == "__main__":
-    music21.mainTest(Test, 'noDocTest')
+    import music21
+    music21.mainTest(Test)
 #------------------------------------------------------------------------------
 # eof

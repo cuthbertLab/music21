@@ -27,18 +27,6 @@ from music21 import environment
 _MOD = 'audioSearch/transcriber.py'
 environLocal = environment.Environment(_MOD)
 
-
-_missingImport = []
-try:
-    import matplotlib.pyplot
-except ImportError:
-    _missingImport.append('matplotlib')
-
-if len(_missingImport) > 0:
-    if environLocal['warnings'] in [1, '1', True]:
-        pass
-        #environLocal.warn(common.getMissingImportStr(_missingImport), header='music21:')
-
                                        
 def runTranscribe(show=True, plot=True, useMic=True,
                   seconds=20.0, useScale=None, saveFile=True):
@@ -90,6 +78,7 @@ def runTranscribe(show=True, plot=True, useMic=True,
         myScore.show()        
     
     if plot == True:
+        import matplotlib.pyplot
         matplotlib.pyplot.plot(listplot)
         matplotlib.pyplot.show()
     environLocal.printDebug("* END")    
@@ -106,6 +95,7 @@ def monophonicStreamFromFile(fileName, useScale=None):
     See :ref:`moduleScale` for a list of allowable scales. (or a custom one can be given).
     Microtonal scales are totally accepted, as are retuned scales where A != 440hz.
 
+    We demonstrate with an audio file beginning with an ascending scale.
     
     >>> from music21 import *
     >>> waveFile = os.path.dirname(__file__) + os.path.sep + 'test_audio.wav' #_DOCS_HIDE
@@ -123,19 +113,7 @@ def monophonicStreamFromFile(fileName, useScale=None):
     {4.75} <music21.note.Note A>
     {5.75} <music21.note.Note B>
     {6.75} <music21.note.Note C>
-    {7.25} <music21.note.Rest rest>
-    {7.75} <music21.note.Note C>
-    {8.25} <music21.note.Note C>
-    {8.5} <music21.note.Note E>
-    {9.5} <music21.note.Note G>
-    {10.5} <music21.note.Note C>
-    {11.0} <music21.note.Note C>
-    {11.25} <music21.note.Note A>
-    {12.25} <music21.note.Note F>
-    {13.25} <music21.note.Note D>
-    {15.25} <music21.note.Note D>
-    {16.25} <music21.note.Rest rest>
-    {17.25} <music21.note.Note G>
+    ...
     '''
     freqFromAQList = audioSearchBase.getFrequenciesFromAudioFile(waveFilename=fileName)
         

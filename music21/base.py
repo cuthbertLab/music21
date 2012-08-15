@@ -54,23 +54,8 @@ import unittest, doctest
 #import uuid
 import inspect
 
-#-------------------------------------------------------------------------------
-class Music21Exception(Exception):
-    pass
-
-# should be renamed:
-class DefinedContextsException(Music21Exception):
-    pass
-
-class Music21ObjectException(Music21Exception):
-    pass
-
-class ElementException(Music21Exception):
-    pass
-
-class GroupException(Music21Exception):
-    pass
-
+#-----all exceptions are in the exceptions21 package.
+from music21.exceptions21 import *
 
 
 
@@ -2741,7 +2726,66 @@ class Music21Object(JSONSerializer):
     def getContextByClass(self, className, serialReverseSearch=True,
             callerFirst=None, sortByCreationTime=False, prioritizeActiveSite=True, getElementMethod='getElementAtOrBefore', 
             memo=None):
-        '''Search both DefinedContexts as well as associated objects 
+        '''
+        A very powerful method in music21 of fundamental importance:
+        Returns the element matching the className that is closest to this
+        element in its current hierarchy.  For instance, take this stream of
+        changing time signatures:
+        
+        >>> from music21 import *
+        >>> s1 = converter.parse('tinynotation: 3/4 C4 D E 2/4 F G A B 1/4 c')
+        >>> s2 = s1.makeMeasures()
+        >>> s2.show('t')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.meter.TimeSignature 3/4>
+            {0.0} <music21.clef.BassClef>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note D>
+            {2.0} <music21.note.Note E>
+        {3.0} <music21.stream.Measure 2 offset=3.0>
+            {0.0} <music21.meter.TimeSignature 2/4>
+            {0.0} <music21.note.Note F>
+            {1.0} <music21.note.Note G>
+        {5.0} <music21.stream.Measure 3 offset=5.0>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note B>
+        {7.0} <music21.stream.Measure 4 offset=7.0>
+            {0.0} <music21.meter.TimeSignature 1/4>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.bar.Barline style=final>
+        
+        
+        Let's get the last two notes of the piece, the B and high c:
+        
+        >>> c = s2.measure(4).notes[0]
+        >>> c
+        <music21.note.Note C>
+        
+        >>> b = s2.measure(3).notes[-1]
+        >>> b
+        <music21.note.Note B>
+        
+        Now when we run `getContextByClass('TimeSignature')` on c, we get a
+        time signature of 1/4.  
+        
+        >>> c.getContextByClass('TimeSignature')
+        <music21.meter.TimeSignature 1/4>
+        
+        Doing what we just did wouldn't be hard to do with other methods,
+        though `getContextByClass` makes it easier.  But the time signature 
+        context for b would be much harder to get without this method, since
+        in order to do it, it searches backwards within the measure, finds that
+        there's nothing there.  It goes to the previous measure and searches that
+        one backwards until it gets the proper TimeSignature of 2/4:
+        
+        >>> b.getContextByClass('TimeSignature')
+        <music21.meter.TimeSignature 2/4>
+        
+        The method is smart enough to stop when it gets to the beginning of the
+        part.  This is all you need to know for most uses.  The rest of the docs
+        are for advanced uses:        
+        
+        The methods searches both DefinedContexts as well as associated objects 
         to find a matching class. Returns None if not match is found. 
 
         The a reference to the caller is required to find the offset of the 
@@ -2760,7 +2804,6 @@ class Music21Object(JSONSerializer):
 
         The `getElementMethod` is a string that selects which Stream method is used to 
         get elements for searching. The strings 'getElementAtOrBefore' and 'getElementBeforeOffset' are currently accepted. 
-
         '''
         #if DEBUG_CONTEXT: print 'X: first call; looking for:', className, id(self), self
         from music21 import stream # needed for exception matching

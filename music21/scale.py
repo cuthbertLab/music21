@@ -1718,10 +1718,56 @@ class ConcreteScale(Scale):
                              2: 'tish',
                              },
                         }
-    _humdrumSolfegSyllables = copy.deepcopy(_solfegSyllables)
-    _humdrumSolfegSyllables[3][1] = 'my'
-    _humdrumSolfegSyllables[5] = {-2: 'sef', -1: 'se', 0: 'so', 1:'si', 2:'sis'}
-    _humdrumSolfegSyllables[7][1] = 'ty'
+    ####### TOO SLOW! 
+    #_humdrumSolfegSyllables = copy.deepcopy(_solfegSyllables)
+    #_humdrumSolfegSyllables[3][1] = 'my'
+    #_humdrumSolfegSyllables[5] = {-2: 'sef', -1: 'se', 0: 'so', 1:'si', 2:'sis'}
+    #_humdrumSolfegSyllables[7][1] = 'ty'
+    _humdrumSolfegSyllables = {1: {-2: 'def',
+                        -1: 'de',
+                         0: 'do',
+                         1: 'di',
+                         2: 'dis',
+                         },
+                    2: {-2: 'raf',
+                        -1: 'ra',
+                         0: 're',
+                         1: 'ri',
+                         2: 'ris',
+                         },
+                    3: {-2: 'mef',
+                        -1: 'me',
+                         0: 'mi',
+                         1: 'my',
+                         2: 'mish',
+                         },
+                    4: {-2: 'fef',
+                        -1: 'fe',
+                         0: 'fa',
+                         1: 'fi',
+                         2: 'fis',
+                         },
+                    5: {-2: 'sef',
+                        -1: 'se',
+                         0: 'so',
+                         1: 'si',
+                         2: 'sis',
+                         },
+                    6: {-2: 'lef',
+                        -1: 'le',
+                         0: 'la',
+                         1: 'li',
+                         2: 'lis',
+                         },
+                    7: {-2: 'tef',
+                        -1: 'te',
+                         0: 'ti',
+                         1: 'ty',
+                         2: 'tish',
+                         },
+                    }
+
+    
     
     def solfeg(self, pitchTarget=None, direction=DIRECTION_ASCENDING, variant="music21", chromatic=True):
         '''

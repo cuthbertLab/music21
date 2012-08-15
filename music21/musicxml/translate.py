@@ -1668,10 +1668,13 @@ def mxToInstrument(mxScorePart, inputM21=None):
 
 def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
     spannerBundle):
-    '''Convenience routine to create and add MusicXML objects from music21 objects provided as a target and as a SpannerBundle.
+    '''
+    Convenience routine to create and add MusicXML objects from music21 objects provided as a target and as a SpannerBundle. 
 
     The `target` parameter here may be music21 Note or Chord.
     This may edit the mxNoteList and direction lists in place, and thus returns None.
+    
+    TODO: Improve docs and show a test...
     '''
     if spannerBundle is None or len(spannerBundle) == 0:
         return
@@ -3659,6 +3662,26 @@ def streamPartToMx(part, instStream=None, meterStream=None,
     # mxScorePart contains mxInstrument
     return mxScorePart, mxPart
 
+def emptyObjectToMx():
+    '''
+    Create a blank score with 'This Page Intentionally Left blank' as a gag...
+
+    >>> from music21 import *
+    >>> musicxml.translate.emptyObjectToMx()
+    <score-partwise <work work-title=This Page Intentionally Left Blank>...<measure number=0 <attributes divisions=10080> <note <rest > duration=40320 type=whole...>>>>    
+    '''
+    from music21 import stream, note, metadata
+    out = stream.Stream()
+    m = stream.Measure()
+    r = note.Rest(quarterLength=4)
+    m.append(r)
+    out.append(m)
+    # return the processing of this Stream
+    md = metadata.Metadata(title='This Page Intentionally Left Blank')
+    out.insert(0, md)
+    # recursive call to this non-empty stream
+    return streamToMx(out)
+
 
 def streamToMx(s, spannerBundle=None):
     '''
@@ -3682,19 +3705,8 @@ def streamToMx(s, spannerBundle=None):
     from music21 import spanner
 
     if len(s) == 0:
-        # create an empty work
-        from music21 import stream, note, metadata
-        out = stream.Stream()
-        m = stream.Measure()
-        r = note.Rest(quarterLength=4)
-        m.append(r)
-        out.append(m)
-        # return the processing of this Stream
-        md = metadata.Metadata(title='This Page Intentionally Left Blank')
-        out.insert(0, md)
-        # recursive call to this non-empty stream
-        return streamToMx(out)
-
+        return emptyObjectToMx()
+    
     #environLocal.printDebug('calling Stream._getMX')
     # stores pairs of mxScorePart and mxScore
     mxComponents = []
@@ -3718,14 +3730,15 @@ def streamToMx(s, spannerBundle=None):
     # we need independent sub-stream elements to shift in presentation
     highestTime = 0
 
+    if spannerBundle is None: 
+        # no spanner bundle provided, get one from the flat stream
+        #spannerBundle = spanner.SpannerBundle(s.flat)
+        spannerBundle = s.spannerBundle
+        #environLocal.printDebug(['streamToMx(): loaded spannerBundle of size:', len(spannerBundle), 'id(spannerBundle)', id(spannerBundle)])
+
+
     if s.hasPartLikeStreams():
         #environLocal.printDebug('Stream._getMX: interpreting multipart')
-        # must set spanner after copying
-        if spannerBundle is None:
-            # no spanner bundle provided, get one from the flat stream
-            #spannerBundle = spanner.SpannerBundle(s.flat)
-            spannerBundle = s.spannerBundle
-            #environLocal.printDebug(['streamToMx(), hasPartLikeStreams(): loaded spannerBundle of size:', len(spannerBundle), 'id(spannerBundle)', id(spannerBundle)])
         streamOfStreams = s.getElementsByClass('Stream')
         for obj in streamOfStreams:
             # may need to copy element here
@@ -3781,12 +3794,6 @@ def streamToMx(s, spannerBundle=None):
         # if no instrument is provided it will be obtained through s
         # when _getMxPart is called
         #mxComponents.append(s._getMXPart(None, meterStream))
-
-        if spannerBundle is None:
-            # no spanner bundle provided, get one from the flat stream
-            #spannerBundle = spanner.SpannerBundle(s.flat)
-            spannerBundle = s.spannerBundle
-            #environLocal.printDebug(['streamToMx(): loaded spannerBundle of size:', len(spannerBundle), 'id(spannerBundle)', id(spannerBundle)])
         mxScorePart, mxPart = streamPartToMx(s, meterStream=meterStream,
                               spannerBundle=spannerBundle)
         mxComponents.append([mxScorePart, mxPart, s])

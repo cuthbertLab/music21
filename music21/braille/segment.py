@@ -18,16 +18,34 @@ available from the Library of Congress `here <http://www.loc.gov/nls/music/>`_,
 and will henceforth be referred to as BMTM.
 """
 
-from music21 import articulations, bar, chord, clef, dynamics, environment, \
-    expressions, key, layout, meter, note, spanner, stream, tempo
-from music21.braille import basic, lookup, text
+from music21 import bar
+from music21 import chord
+from music21 import clef
+from music21 import dynamics
+from music21 import expressions
+from music21 import exceptions21
+from music21 import key
+from music21 import layout
+from music21 import meter
+from music21 import note
+from music21 import spanner
+from music21 import stream
+from music21 import tempo
+
+from music21.braille import basic
+from music21.braille import lookup
+from music21.braille import text
+
 import collections
 import copy
 import itertools
 import music21
 import unittest
 
+
 symbols = lookup.symbols
+
+from music21 import environment
 environRules = environment.Environment('segment.py')
 
 AFFINITY_SIGNATURE = 3
@@ -288,13 +306,7 @@ class BrailleSegment(collections.defaultdict):
         """
         Extract a :class:`~music21.key.KeySignature`, :class:`~music21.meter.TimeSignature,
         :class:`~music21.tempo.TempoText` and :class:`~music21.tempo.MetronomeMark` and
-        add an appropriate braille heading to the brailleText object inputted.
-    
-        >>> from music21.braille import segment
-        >>> from music21 import key
-        >>> from music21 import meter
-        >>> from music21 import tempo
-        
+        add an appropriate braille heading to the brailleText object inputted.    
         """
         keySignature = None
         timeSignature = None
@@ -1445,6 +1457,7 @@ def fixArticulations(allSegments):
     * Staccato, Tenuto rule => "If two repeated notes appear to be tied, but either is marked 
       staccato or tenuto, they are treated as slurred instead of tied." (BMTM, 112)
     """
+    from music21 import articulations
     for brailleSegment in allSegments:
         newSegment = brailleSegment.consolidate()
         for noteGrouping in [newSegment[gpKey] for gpKey in newSegment.keys() if gpKey % 10 == AFFINITY_NOTEGROUP]:
@@ -1556,7 +1569,7 @@ def splitMeasure(music21Measure, value = 2, beatDivisionOffset = 0, useTimeSigna
 
 #-------------------------------------------------------------------------------
 
-class BrailleSegmentException(music21.Music21Exception):
+class BrailleSegmentException(exceptions21.Music21Exception):
     pass
     
 #-------------------------------------------------------------------------------
@@ -1567,6 +1580,7 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

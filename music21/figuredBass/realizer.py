@@ -43,7 +43,6 @@ See :meth:`~music21.figuredBass.realizer.figuredBassFromStream` for more details
 import collections
 import copy
 import itertools
-import music21
 import random
 import unittest
 
@@ -51,6 +50,7 @@ import unittest
 from music21 import chord
 from music21 import clef
 from music21 import environment
+from music21 import exceptions21
 from music21 import key
 from music21 import meter
 from music21 import note
@@ -61,7 +61,6 @@ from music21.figuredBass import notation
 from music21.figuredBass import realizerScale
 from music21.figuredBass import rules
 from music21.figuredBass import segment
-#from music21 import harmony, roman
 
 _MOD = 'realizer.py'
 
@@ -177,22 +176,31 @@ class FiguredBassLine(object):
     Currently, only 1:1 realization is supported, meaning that every bassNote is realized and the 
     :attr:`~music21.note.GeneralNote.quarterLength` or duration of a realization above a bassNote 
     is identical to that of the bassNote.
+
+
+    `inKey` defaults to C major.
+    
+    `inTime` defaults to 4/4.
+
+    >>> from music21.figuredBass import realizer
+    >>> from music21 import key
+    >>> from music21 import meter
+    >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
+    >>> fbLine.inKey
+    <music21.key.Key of B major>
+    >>> fbLine.inTime
+    <music21.meter.TimeSignature 3/4>
     '''
     _DOC_ORDER = ['addElement', 'generateBassLine', 'realize']
     _DOC_ATTR = {'inKey': 'A :class:`~music21.key.Key` which implies a scale value, scale mode, and key signature for a :class:`~music21.figuredBass.realizerScale.FiguredBassScale`.',
                  'inTime': 'A :class:`~music21.meter.TimeSignature` which specifies the time signature of realizations outputted to a :class:`~music21.stream.Score`.'}    
     
-    def __init__(self, inKey = key.Key('C'), inTime = meter.TimeSignature('4/4')):
-        '''
-        >>> from music21.figuredBass import realizer
-        >>> from music21 import key
-        >>> from music21 import meter
-        >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
-        >>> fbLine.inKey
-        <music21.key.Key of B major>
-        >>> fbLine.inTime
-        <music21.meter.TimeSignature 3/4>
-        '''
+    def __init__(self, inKey = None, inTime=None):
+        if inKey is None:
+            inKey = key.Key('C')
+        if inTime is None:
+            inTime = meter.TimeSignature('4/4')
+        
         self.inKey = inKey
         self.inTime = inTime
         self._paddingLeft = 0.0
@@ -229,16 +237,15 @@ class FiguredBassLine(object):
         >>> fbLine.addElement(roman.RomanNumeral('V'))
         '''
         bassObject.notationString = notationString
-        if isinstance(bassObject, note.Note):
+        c = bassObject.classes
+        if 'Note' in c:
             self._fbList.append((bassObject, notationString)) #a bass note, and a notationString
             addLyricsToBassNote(bassObject, notationString) 
         #!---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects --------!     
-        elif isinstance(bassObject, music21.harmony.ChordSymbol):
-            self._fbList.append(bassObject) #a harmony object
-        elif isinstance(bassObject, music21.roman.RomanNumeral):
+        elif 'RomanNumeral' in c or 'ChordSymbol' in c: #and item.isClassOrSubclass(harmony.Harmony):
             self._fbList.append(bassObject) #a roman Numeral object
         else:
-            raise FiguredBassLineException("Not a valid bassObject (only note.Note, harmony.ChordSymbol, and roman.RomanNumeral supported)")
+            raise FiguredBassLineException("Not a valid bassObject (only note.Note, harmony.ChordSymbol, and roman.RomanNumeral supported) was %r" % bassObject)
     
     def generateBassLine(self):
         '''
@@ -291,10 +298,18 @@ class FiguredBassLine(object):
             bassLine[0].padAsAnacrusis()
         return bassLine
     
-    def retrieveSegments(self, fbRules = rules.Rules(), numParts = 4, maxPitch = pitch.Pitch('B5')):
+    def retrieveSegments(self, fbRules = None, numParts = 4, maxPitch = None):
         '''
         generates the segmentList from an fbList, including any overlayed Segments
+
+        if fbRules is None, creates a new rules.Rules() object
+        
+        if maxPitch is None, uses pitch.Pitch('B5')
         '''
+        if fbRules is None:
+            fbRules = rules.Rules()
+        if maxPitch is None:
+            maxPitch = pitch.Pitch('B5')
         segmentList = []
         bassLine = self.generateBassLine()
         if len(self._overlayedParts) >= 1:
@@ -334,7 +349,7 @@ class FiguredBassLine(object):
     def overlayPart(self, music21Part):
         self._overlayedParts.append(music21Part)
         
-    def realize(self, fbRules = rules.Rules(), numParts = 4, maxPitch = pitch.Pitch('B5')):
+    def realize(self, fbRules = None, numParts = 4, maxPitch = None):
         '''
         Creates a :class:`~music21.figuredBass.segment.Segment` for each (bassNote, notationString) pair
         added using :meth:`~music21.figuredBass.realizer.FiguredBassLine.addElement`. Each Segment is associated
@@ -348,6 +363,11 @@ class FiguredBassLine(object):
         a FiguredBassLineException is raised. If only one pair is provided, the Realization will
         contain :meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`
         for the one note.
+
+        if `fbRules` is None, creates a new rules.Rules() object
+        
+        if `maxPitch` is None, uses pitch.Pitch('B5')
+
         
         >>> from music21 import *
         >>> from music21.figuredBass import realizer
@@ -387,15 +407,24 @@ class FiguredBassLine(object):
         13
 
         '''
-        
-        #!---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects --------!
+        if fbRules is None:
+            fbRules = rules.Rules()
+        if maxPitch is None:
+            from music21 import pitch
+            maxPitch = pitch.Pitch('B5')
+                    
         segmentList = []
 
         listOfHarmonyObjects = False
         for item in self._fbList:
-            if isinstance(item, note.Note):
+            try:
+                c = item.classes
+            except AttributeError:
+                continue
+            if 'Note' in c:
                 break
-            if isinstance(item, music21.roman.RomanNumeral) or isinstance(item, music21.harmony.ChordSymbol): #and item.isClassOrSubclass(harmony.Harmony):
+            #!---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects --------!
+            if 'RomanNumeral' in c or 'ChordSymbol' in c: #and item.isClassOrSubclass(harmony.Harmony):
                 listOfHarmonyObjects = True
                 break
             
@@ -781,7 +810,7 @@ class Realization(object):
 
 _DOC_ORDER = [figuredBassFromStream, figuredBassFromStreamPart, addLyricsToBassNote, FiguredBassLine, Realization]
 
-class FiguredBassLineException(music21.Music21Exception):
+class FiguredBassLineException(exceptions21.Music21Exception):
     pass
     
 #-------------------------------------------------------------------------------
@@ -791,6 +820,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

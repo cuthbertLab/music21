@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-#!/usr/bin/python
-
 
 import unittest, doctest
+import re
 
 import music21
 from music21 import tinyNotation
@@ -34,9 +33,12 @@ class TrecentoCadenceNote(TinyNotationNote):
     '''
     ## for trecento notation: a double dotted half = 9 eighths, not 7;
     def getDots(self, stringRep, noteObj):
-        if (self.DBLDOT.search(stringRep)):
+        DBLDOT  = '\.\.' 
+        DOT     = '\.'
+
+        if (re.search(DBLDOT, stringRep)):
             noteObj.duration.dotGroups = [1,1]
-        elif (self.DOT.search(stringRep)):
+        elif (re.search(DOT, stringRep)):
             noteObj.duration.dots = 1
 
 ###### test routines

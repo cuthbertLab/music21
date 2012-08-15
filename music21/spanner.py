@@ -238,20 +238,29 @@ class Spanner(music21.Music21Object):
         return ''.join(msg)
 
     def __deepcopy__(self, memo=None):
-        '''This produces a new, independent object containing references to the same components. Components linked in this Spanner must be manually re-set, likely using the replaceComponent() method.
+        '''
+        This produces a new, independent object containing references to the same components. 
+        Components linked in this Spanner must be manually re-set, likely using the 
+        replaceComponent() method.
 
         >>> from music21 import *
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> c1 = clef.AltoClef()
-        >>> c2 = clef.BassClef()
+
         >>> sp1 = spanner.Spanner(n1, n2, c1)
         >>> sp2 = copy.deepcopy(sp1)
         >>> len(sp2.getComponents())
         3
-        >>> sp2[0] == sp1[0]
+        >>> sp1 is sp2
+        False
+        >>> sp2[0] is sp1[0]
         True
-        >>> sp2[2] == sp1[2]
+        >>> sp2[2] is sp1[2]
+        True
+        >>> sp1[0] is n1
+        True
+        >>> sp2[0] is n1
         True
         '''
         new = self.__class__()
@@ -284,7 +293,6 @@ class Spanner(music21.Music21Object):
         # do after all other copying
         new._idLastDeepCopyOf = id(self)
         return new
-
 
     #---------------------------------------------------------------------------
     # as _components is private Stream, unwrap/wrap methods need to override
@@ -816,7 +824,9 @@ class SpannerBundle(object):
 
 
     def getByComponent(self, component):
-        '''Given a spanner component (an object), return a bundle of all Spanner objects that have this object as a component. 
+        '''
+        Given a spanner component (an object), 
+        return a new SpannerBundle of all Spanner objects that have this object as a component. 
 
         >>> from music21 import *
         >>> n1 = note.Note()
@@ -922,9 +932,25 @@ class SpannerBundle(object):
 
 
     def setIdLocalByClass(self, className, maxId=6):
-        '''Automatically set id local values for all members of the provided class. This is necessary in cases where spanners are newly created in potentially overlapping boundaries and need to be tagged for MusicXML or other output. Note that, if some Spanners already have ids, they will be overwritten.
+        '''
+        (See `setIdLocals()` for an explanation of what an idLocal is...)
+        
+        Automatically set idLocal values for all members of the provided class. 
+        This is necessary in cases where spanners are newly created in 
+        potentially overlapping boundaries and need to be tagged for MusicXML 
+        or other output. Note that, if some Spanners already have idLocals, 
+        they will be overwritten.
 
-        The `maxId` parameter sets the largest number used in id ass
+        The `maxId` parameter sets the largest number that is available for this
+        class.  In MusicXML it is 6.
+
+        Currently this method just iterates over the spanners of this class
+        and counts the number from 1-6 and then recycles numbers.  It does
+        not check whether more than 6 overlapping spanners of the same type
+        exist, nor does it reset the count to 1 after all spanners of that
+        class have been closed.  The example below demonstrates that the
+        position of the contents of the spanner have no bearing on 
+        its idLocal (since we don't even put anything into the spanners).
 
         >>> from music21 import *
         >>> su1 = spanner.Slur()
@@ -939,7 +965,6 @@ class SpannerBundle(object):
         >>> sb.setIdLocalByClass('Slur')
         >>> [sp.idLocal for sp in sb.getByClass('Slur')]
         [1, 2]
-
         '''
         found = []
         # note that this over rides previous values
@@ -949,7 +974,19 @@ class SpannerBundle(object):
                 
 
     def setIdLocals(self):
-        '''Set all id locals for all classes in this SpannerBundle. This will assure that each class has a unique id local number. This is destructive: existing id local values will be lost.
+        '''
+        Utility method for outputting MusicXML (and potentially other formats) for spanners.
+        
+        Each Spanner type (slur, line, glissando, etc.) in MusicXML has a number assigned to it.
+        We call this number, `idLocal`.  idLocal is a number from 1 to 6.  This does not mean
+        that your piece can only have six slurs total!  But it does mean that within a single
+        part, only up to 6 slurs can happen simultaneously.  But as soon as a slur stops, its
+        idLocal can be reused.
+        
+        This method set all idLocals for all classes in this SpannerBundle. 
+        This will assure that each class has a unique idLocal number. 
+        
+        Calling this method is destructive: existing idLocal values will be lost.
 
         >>> from music21 import *
         >>> su1 = spanner.Slur()

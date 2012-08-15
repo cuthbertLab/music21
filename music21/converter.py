@@ -62,18 +62,10 @@ import StringIO # this module is not supported in python3
 
 import music21
 
-from music21 import chord
-from music21 import clef
 from music21 import common
-from music21 import dynamics
-from music21 import expressions
 from music21 import humdrum
-from music21 import instrument
-from music21 import key
-from music21 import meter
 from music21 import midi
 from music21 import musicxml
-from music21 import note
 from music21 import stream
 from music21 import tinyNotation
 
@@ -1424,7 +1416,7 @@ class Test(unittest.TestCase):
         pass
 
     def testCopyAndDeepcopy(self):
-        '''Test copyinng all objects defined in this module
+        '''Test copying all objects defined in this module
         '''
         import sys, types, copy
         for part in sys.modules[self.__module__].__dict__.keys():
@@ -1444,6 +1436,8 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
         from music21.musicxml import testFiles
         from music21 import corpus
+        from music21 import dynamics
+        from music21 import note
 
 
         mxString = testPrimitive.pitches01a
@@ -1528,7 +1522,7 @@ class Test(unittest.TestCase):
 
 
     def testConversionMXChords(self):
-
+        from music21 import chord
         from music21.musicxml import testPrimitive
 
         mxString = testPrimitive.chordsThreeNotesDuration21c
@@ -1575,7 +1569,7 @@ class Test(unittest.TestCase):
 
 
     def testConversionMXClefPrimitive(self):
-
+        from music21 import clef
         from music21.musicxml import testPrimitive
         mxString = testPrimitive.clefs12a
         a = parse(mxString)
@@ -1587,7 +1581,7 @@ class Test(unittest.TestCase):
 
     def testConversionMXClefTimeCorpus(self):
     
-        from music21 import corpus
+        from music21 import corpus, clef, meter
         a = corpus.parse('luca')
 
         # there should be only one clef in each part
@@ -1609,7 +1603,7 @@ class Test(unittest.TestCase):
         ts = a.parts[1].flat.getElementsByClass(meter.TimeSignature)
         self.assertEqual(len(ts), 4)
 
-        from music21 import corpus
+
         a = corpus.parse('mozart/k156/movement4')
 
         # violin part
@@ -1634,6 +1628,7 @@ class Test(unittest.TestCase):
 
 
     def testConversionMXArticulations(self):
+        from music21 import note
         from music21.musicxml import testPrimitive
         mxString = testPrimitive.articulations01
         a = parse(mxString)
@@ -1655,6 +1650,7 @@ class Test(unittest.TestCase):
         #a.show()        
 
     def testConversionMXKey(self):
+        from music21 import key
         from music21.musicxml import testPrimitive
         mxString = testPrimitive.keySignatures13a
         a = parse(mxString)
@@ -1708,7 +1704,7 @@ class Test(unittest.TestCase):
     def testConversionMXTies(self):
         
         from music21.musicxml import testPrimitive
-        from music21 import stream, layout
+        from music21 import stream, layout, clef
 
         a = parse(testPrimitive.multiMeasureTies)
         #a.show()
@@ -1776,7 +1772,7 @@ class Test(unittest.TestCase):
 
 
     def testConversionMidiNotes(self):
-        from music21 import common, meter, key
+        from music21 import common, meter, key, chord, note
 
         fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test01.mid')
         # a simple file created in athenacl

@@ -95,7 +95,7 @@ class CallTest(object):
 
 
 class M21CallTest(object):
-    '''Base class for timed tests
+    '''Base class for timed tests that need music21 importerd
     '''
     def __init__(self):
         '''Perform setup routines for tests
@@ -550,19 +550,6 @@ class TestImportCorpus3(CallTest):
         bc = music21.corpus.parse('bach/bwv1.6')
 
 
-class TestImportStar(CallTest):
-    def testFocus(self):
-        import music21
-        for name in dir(music21):
-            mod = getattr(music21, name)
-            try:
-                reload(mod)
-            except: # non mods cannot reload
-                pass 
-
-
-
-
 #-------------------------------------------------------------------------------
 # handler
 class CallGraph:
@@ -570,7 +557,9 @@ class CallGraph:
     def __init__(self):
         self.includeList = None
         #self.excludeList = ['pycallgraph.*','re.*','sre_*', 'copy*', '*xlrd*']
-        self.excludeList = ['pycallgraph.*','re.*','sre_*', '*xlrd*']
+        self.excludeList = ['pycallgraph.*']
+        self.excludeList += ['re.*','sre_*']
+        self.excludeList += ['*xlrd*']
         # these have been shown to be very fast
         self.excludeList += ['*xmlnode*', 'xml.dom.*', 'codecs.*']
         #self.excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
@@ -596,31 +585,35 @@ class CallGraph:
         #self.callTest = TestBigMusicXML
 
         #self.callTest = TestMeasuresA
-        #self.callTest = TestTimeMozart
+        self.callTest = TestTimeMozart
         #self.callTest = TestTimeIsmir
         #self.callTest = TestGetContextByClassB
         #self.callTest = TestMeasuresB
         #self.callTest = TestImportCorpus
         #self.callTest = TestImportCorpus3
 
-        self.callTest = TestImportStar
+        #self.callTest = TestImportStar
 
         # common to all call tests. 
         if hasattr(self.callTest, 'includeList'):
             self.includeList = self.callTest.includeList
 
     def run(self, runWithEnviron=True):
-        '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
         '''
-        suffix = '.jpg'
+        Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
+        
+        Note that the default of runWithEnviron imports music21.environment.  That might
+        skew results
+        '''
+        suffix = '.svg'
         format = suffix[1:]
+        _MOD = "test.timeGraphs.py"
 
         if runWithEnviron:
             from music21 import environment
-            _MOD = "test.timeGraphs.py"
             environLocal = environment.Environment(_MOD)
             fp = environLocal.getTempFile(suffix)
-        # manually get a temporary fiel
+        # manually get a temporary file
         else:
             import tempfile
             import os
