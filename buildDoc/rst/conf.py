@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         conf.py
 # Purpose:      Documentation configuration file
@@ -6,8 +6,8 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    (c) 2009-2010 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2009-2010, 2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 import sys, os
@@ -40,7 +40,7 @@ except ImportError:
 # General substitutions.
 project = 'music21'
 release = music21.VERSION_STR
-copyright = '2009-2011 The music21 Project'
+copyright = 'Copyright &copy; 2009-2012, Michael Scott Cuthbert and the music21 Project'
 
 
 html_last_updated_fmt = '%b %d, %Y'
