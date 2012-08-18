@@ -797,7 +797,7 @@ class Test(unittest.TestCase):
         self.assertTrue(0.99 < ld.trigrams['fr'] - ld.trigrams['cn'] < 1.0)
         
         self.assertEqual('en', ld.mostLikelyLanguage(u"hello friends, this is a test of the ability of language detector to tell what language I am writing in."))
-        self.assertEqual('it', ld.mostLikelyLanguage(u"ciao amici! così trovo in quale lingua ho scritto questo passaggio. Spero che troverò che è stata scritta in italiano"))
+        self.assertEqual('it', ld.mostLikelyLanguage(u"ciao amici! cosÃ¬ trovo in quale lingua ho scritto questo passaggio. Spero che troverÃ² che Ã¨ stata scritta in italiano"))
 
         messiahGovernment = corpus.parse('handel/hwv56/movement1-13.md')
         forUntoUs = assembleLyrics(messiahGovernment)

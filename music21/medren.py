@@ -11,7 +11,7 @@
 '''
 Tools for working with medieval and Renaissance music -- see also the 
 trecento directory which works particularly on 14th-century Italian
-music.
+music. Objects representing the punctus and the divisione can be found there.
 '''
 import copy
 import music21
@@ -56,54 +56,8 @@ allowableStrettoIntervals = {
              (4, False)],
     }
 
-_validDivisiones = {(None, None):0, ('quaternaria','.q.'):4, ('senaria imperfecta', '.i.'):6, ('senaria perfecta', '.p.'):6, ('novenaria', '.n.'):9, ('octonaria', '.o.'):8, ('duodenaria', '.d.'):12}
-
 _validMensuralTypes = [None,'maxima', 'longa', 'brevis', 'semibrevis', 'minima', 'semiminima']
 _validMensuralAbbr = [None, 'Mx', 'L', 'B', 'SB', 'M', 'SM']
-      
-#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------   
-def _evaluateMeasure(mOrD, measure, lengths):
-        ''':meth:`music21.medren._evaluateMeasure takes a mensuration or divisione, a measure's worth of mensural objects in a list, and a list of lengths corresponding to each of those objects as arguments.
-        This method returns the ``strength'' of the measure based on those lengths. A ``strong'' measure has longer notes on its stronger beats. Only valid for Trecento notation.'''
-    
-        typeStrength = {'semibrevis': 1.0, 'minima': 0.5, 'semiminima':0.25}
-           
-        beatStrength = 0
-        strength = 0
-        curBeat = 0
-        for i in range(len(lengths)):
-            if abs(curBeat - round(curBeat)) < 0.0001: #Rounding error
-                curBeat = round(curBeat)
-            
-            if mOrD.standardSymbol in ['.i.', '.n.']:
-                if abs(curBeat % 3) < 0.0001:
-                    beatStrength = 1.0
-                elif curBeat % 3 - 1 or i % 3 == 2:
-                    beatStrength = float(1.0)/3
-                else:
-                    beatStrength = float(1.0)/9
-            elif mOrD.standardSymbol in ['.q.', '.o.', '.d.']:
-                if curBeat % 4 == 0:
-                    beatStrength = 1.0
-                elif curBeat % 4 == 2:
-                    beatStrength = 0.5
-                elif curBeat % 2 == 1:
-                    beatStrength = 0.25
-                else:
-                    beatStrength = 0.125
-            else:
-                if curBeat % 6 == 0:
-                    beatStrength = 1.0
-                elif curBeat % 2 == 0 and curBeat % 3 != 0:
-                    beatStrength = 0.5
-                elif curBeat % 2 == 1:
-                    beatStrength = 0.25
-                else:
-                    beatStrength = 0.125
-            strength += typeStrength[measure[i].mensuralType]*beatStrength
-            curBeat += lengths[i]
-        strength -= abs(mOrD.minimaPerBrevis - curBeat)
-        return strength
 
 #===============================================================================
 # def _getTargetBeforeOrAtObj(music21Obj, targetClassList):
@@ -158,843 +112,6 @@ def _evaluateMeasure(mOrD, measure, lengths):
 #    return list(set(cList))
 #===============================================================================
 
-class _TranslateMensuralMeasure:
-    '''
-    The class :class:`music21.medren._TranslateMensuralMeasure` takes a mensuration or divisione sign and a list comprising one measure's worth of mensural objects as arguments.
-    The method :meth:`music21.medren._TranslateMensuralMeasure.getMinimaLengths` takes no arguments, and returns a list of floats corresponding to the length (in minima) of each object in the measure.
-    The methods :meth:`music21.medren._TranslateMensuralMeasure.getLengthsItalian` and :meth:`music21.medren.getLengthsFrench` are there simply to aid :meth:`music21.medren._TranslateMensuralMeasure.getMinimaLengths`.
-    Currently, this class is used only to improve the efficiency of :attr:`music21.medren.GeneralMensuralNote.duration`.
-    
-    Note: French notation and dragmas currently not supported.
-    
-    >>> from music21 import *
-    >>> mOrD = medren.Divisione('.i.')
-    >>> names = ['SB', 'M', 'SB']
-    >>> measure = [medren.MensuralNote('A', n) for n in names]
-    >>> TMM = medren._TranslateMensuralMeasure(mOrD, measure)
-    >>> TMM.getMinimaLengths()
-    [2.0, 1.0, 3.0]
-    >>>
-    >>>
-    >>> mOrD = medren.Divisione('.n.')
-    >>> names = ['SB', 'M', 'M', 'M', 'SB', 'M']
-    >>> measure = [medren.MensuralNote('A', n) for n in names]
-    >>> TMM = medren._TranslateMensuralMeasure(mOrD, measure)
-    >>> TMM.getMinimaLengths()
-    [3.0, 1.0, 1.0, 1.0, 2.0, 1.0]
-    >>> names = ['SB', 'M', 'SB']
-    >>> measure = [medren.MensuralNote('A', n) for n in names]
-    >>> TMM = medren._TranslateMensuralMeasure(mOrD, measure)
-    >>> TMM.getMinimaLengths()
-    [2.0, 1.0, 6.0]
-    >>> measure[0].setStem('down')
-    >>> TMM = medren._TranslateMensuralMeasure(mOrD, measure)
-    >>> TMM.getMinimaLengths()
-    [5.0, 1.0, 3.0]
-    >>>
-    >>>
-    >>> mOrD = medren.Divisione('.q.')
-    >>> names = ['M', 'SM', 'SM', 'SM', 'SM', 'SM']
-    >>> measure = [medren.MensuralNote('A', n) for n in names]
-    >>> measure[4] = medren.MensuralRest('SM')
-    >>> measure[1].setFlag('up','left')
-    >>> measure[2].setFlag('up', 'left')
-    >>> TMM = medren._TranslateMensuralMeasure(mOrD, measure)
-    >>> TMM.getMinimaLengths()
-    [1.0, 0.5, 0.5, 0.666..., 0.666..., 0.666...]
-    >>>
-    >>>
-    >>> mOrD = medren.Divisione('.p.')
-    >>> names = ['M', 'SB', 'SM', 'SM']
-    >>> measure = [medren.MensuralNote('A', n) for n in names]
-    >>> measure[1].setStem('down')
-    >>> TMM = medren._TranslateMensuralMeasure(mOrD, measure)
-    >>> TMM.getMinimaLengths()
-    [1.0, 4.0, 0.5, 0.5]
-    >>> names = ['SM', 'SM', 'SM', 'SM', 'SM', 'SM', 'SM', 'SB']
-    >>> measure = [medren.MensuralNote('A', n) for n in names]
-    >>> measure[3] = medren.MensuralRest('SM')
-    >>> for mn in measure[:3]:
-    ...    mn.setFlag('up', 'left')
-    >>> TMM = medren._TranslateMensuralMeasure(mOrD, measure)
-    >>> TMM.getMinimaLengths()
-    [0.666..., 0.666..., 0.666..., 0.5, 0.5, 0.5, 0.5, 2.0]
-    >>>
-    >>>
-    >>> mOrD = medren.Divisione('.o.')
-    >>> names = ['SB', 'SB', 'SB']
-    >>> measure = [medren.MensuralNote('A', n) for n in names]
-    >>> measure[1].setStem('down')
-    >>> TMM = medren._TranslateMensuralMeasure(mOrD, measure)
-    >>> TMM.getMinimaLengths()
-    [2.0, 4.0, 2.0]
-    >>> names = ['SM', 'SM', 'SM', 'SB', 'SB']
-    >>> measure = [medren.MensuralNote('A', n) for n in names]
-    >>> TMM = medren._TranslateMensuralMeasure(mOrD, measure)
-    >>> TMM.getMinimaLengths()
-    [0.666..., 0.666..., 0.666..., 2.0, 4.0]
-    >>>
-    >>>
-    >>> mOrD = medren.Divisione('.d.')
-    >>> names = ['SB', 'SB']
-    >>> measure = [medren.MensuralNote('A', n) for n in names]
-    >>> TMM = medren._TranslateMensuralMeasure(mOrD, measure)
-    >>> TMM.getMinimaLengths()
-    [4.0, 8.0]
-    >>> names = ['SB', 'SB', 'SB']
-    >>> measure = [medren.MensuralNote('A', n) for n in names]
-    >>> TMM = medren._TranslateMensuralMeasure(mOrD, measure)
-    >>> TMM.getMinimaLengths()
-    [4.0, 4.0, 4.0]
-    >>> names = ['SB', 'SB', 'SB', 'SB']
-    >>> measure = [medren.MensuralNote('A', n) for n in names]
-    >>> TMM = medren._TranslateMensuralMeasure(mOrD, measure)
-    >>> TMM.getMinimaLengths()
-    [2.0, 2.0, 4.0, 4.0]
-    >>> measure[1].setStem('down')
-    >>> measure[2].setStem('down')
-    >>> TMM = medren._TranslateMensuralMeasure(mOrD, measure)
-    >>> TMM.getMinimaLengths()
-    [2.0, 4.0, 4.0, 2.0]
-    >>> names = ['SM', 'SM', 'SM', 'SM', 'SB', 'SB', 'SB', 'SB', 'SB', 'SM', 'SM', 'SM']
-    >>> measure = [medren.MensuralNote('A', n) for n in names]
-    >>> measure[3] = medren.MensuralRest('SM')
-    >>> for mn in measure[-3:]:
-    ...    mn.setFlag('up', 'left')
-    >>> for mn in measure[4:9]:
-    ...    mn.setStem('down')
-    >>> TMM = medren._TranslateMensuralMeasure(mOrD, measure)
-    >>> TMM.getMinimaLengths()
-    [0.5, 0.5, 0.5, 0.5, 4.0, 4.0, 4.0, 4.0, 4.0, 0.666..., 0.666..., 0.666...]
-    '''
-    
-    def __init__(self, mensurationOrDivisione = None, measure = [], pDS = False):
-                
-        self.mOrD = mensurationOrDivisione
-        self.mensuralMeasure = measure
-        self.minimaLengthList = [0 for i in range(len(self.mensuralMeasure))]
-        
-        self.processing_downstems = pDS
-        
-    def getMinimaLengths(self):
-        if isinstance(self.mOrD, music21.medren.Divisione):
-           self.minimaLengthList = self.getLengthsItalian()
-        elif isinstance(self.mOrD, music21.medren.Mensuration):
-           self.minimaLengthList = selfgetLengthsFrench()
-        else:
-           raise MedRenException('%s not recognized as mensuration or divisione' % mensurationOrDivisione)
-        return self.minimaLengthList
-       
-    def getLengthsItalian(self):
-        #########################################################################################################################################
-            
-        def processMeasure(measure, lengths, change_list, change_nums, diff_list, lenRem, releases = None, multi = 0):
-            '''
-            Gets all possible length combinations. Returns the lengths combination of the "strongest" measure, along with the remaining length in the measure. 
-            '''
-            
-            def allCombinations(list, num):
-                combs = [[]]
-                if num > 0:
-                    for i in range(len(list)):
-                        comb = [list[i]]
-                        for c in allCombinations(list[(i+1):], num-1):
-                            combs.append(comb + c)
-                combs.reverse()
-                return combs
-            
-            if isinstance(change_list, tuple):
-                change = change_list[0]
-            else:
-                change = change_list
-            if isinstance(change_nums, tuple):
-                change_num = change_nums[0]
-            else:
-                change_num = change_nums
-            if isinstance(diff_list, tuple):
-                diff = diff_list[0]
-            else:
-                diff = diff_list
-            if releases is not None and isinstance(releases, list):
-                release = releases[0]
-            else:
-                release = releases
-                
-            strength = music21.medren._evaluateMeasure(self.mOrD, measure, lengths)
-            lengths_changeable = lengths[:]
-            lengths_static = lengths[:]
-            remain = lenRem
-            lenRem_final  = lenRem
-            
-            if multi == 0:
-                for l in allCombinations(change, change_num):
-                    l.reverse()
-                    for i in l:
-                        lengths_changeable[i] += diff
-                        if release is not None:
-                            lengths_changeable[release] -= diff
-                        else:
-                            remain -= diff
-        
-                    newStrength = music21.medren._evaluateMeasure(self.mOrD, measure, lengths_changeable)
-                    if strength < newStrength and remain >= 0:
-                        lengths = lengths_changeable[:]
-                        strength = newStrength
-                        lenRem_final = remain
-                    lengths_changeable = lengths_static[:]
-                    remain = lenRem
-                return lengths, lenRem_final
-            
-            else:
-                for l in allCombinations(change, change_num):
-                    l.reverse()
-                    for i in l:
-                        lengths_changeable[i] += diff
-                        if release is not None:
-                            lengths_changeable[release] -= diff
-                            lengths_changeable, remain = processMeasure(measure, lengths_changeable, change_list[1:], change_nums[1:], diff_list[1:], remain, releases[1:], multi-1)
-                        else:
-                            remain -= diff
-                            lengths_changeable, remain = processMeasure(measure, lengths_changeable, change_list[1:], change_nums[1:], diff_list[1:], remain, multi-1)
-                    
-                    newStrength = music21.medren._evaluateMeasure(self.mOrD, measure, lengths_changeable)
-                    if strength < newStrength and remain >= 0:
-                        lengths = lengths_changeable[:]
-                        strength = newStrength
-                        lenRem_final = remain
-                    lengths_changeable = lengths_static[:]
-                    remain = lenRem
-                return lengths, lenRem_final
-        
-        ##################################################################################################################################
-            
-        minRem = self.mOrD.minimaPerBrevis
-        minRem_tracker = self.processing_downstems
-        minimaLengths = self.minimaLengthList[:]
-        
-        semibrevis_list = []
-        semibrevis_downstem = []
-        
-        semiminima_right_flag_list = []
-        semiminima_left_flag_list = []
-        semiminima_rest_list = []
-        
-        #Don't need these yet
-        #===================================================================
-        # dragmas_no_flag = []
-        # dragmas_RNo_flag = []
-        # dragmas_LNo_flag = []
-        # dragmas_NoR_flag = []
-        # dragmas_RR_flag = []
-        # dragmas_RL_flag = []
-        # dragmas_LR_flag = []
-        # dragmas_LL_flag = []
-        #===================================================================
-
-        for i in range(len(self.mensuralMeasure)):
-            obj = self.mensuralMeasure[i]
-            minimaLength = 0
-            #If its duration is set, doesn't need to be determined
-            
-            #Gets rid of everything known 
-            if obj.mensuralType == 'maxima':
-                minimaLength = float(4)*self.mOrD.minimaPerBrevis
-            elif obj.mensuralType == 'longa':
-                minimaLength = float(2)*self.mOrD.minimaPerBrevis
-            elif obj.mensuralType == 'brevis':
-                minimaLength = float(self.mOrD.minimaPerBrevis)
-            elif minimaLengths[i] == 0 and \
-            ( isinstance(obj, music21.medren.MensuralNote) or isinstance(obj, music21.medren.MensuralRest) ):
-                #Dep on mOrD
-                if obj.mensuralType == 'semibrevis':
-                    if isinstance(obj, music21.medren.MensuralRest):
-                        if self.mOrD.standardSymbol in ['.q.', '.i.']:
-                            minimaLength = self.mOrD.minimaPerBrevis/float(2)
-                        elif self.mOrD.standardSymbol in ['.p.', '.n.']:
-                            minimaLength = self.mOrD.minimaPerBrevis/float(3)
-                        else: 
-                            semibrevis_list.append(i)
-                    else:
-                        if 'side' in obj.getStems():
-                            minimaLength = 3.0
-                        elif 'down' in obj.getStems():
-                            semibrevis_downstem.append(i)
-                        else:
-                            semibrevis_list.append(i)
-                if obj.mensuralType == 'minima':
-                    if isinstance(obj, music21.medren.MensuralNote) and 'down' in obj.stems:
-                        raise MedRenException('Dragmas currently not supported')
-                    elif isinstance(obj, music21.medren.MensuralNote) and 'side' in obj.stems:
-                        minimaLength = 1.5
-                    else:
-                        minimaLength = 1.0
-                if obj.mensuralType == 'semiminima':
-                    if isinstance(obj, music21.medren.MensuralNote):
-                        if 'down' in obj.getStems():
-                            raise MedRenException('Dragmas currently not supported')
-                        elif obj.getFlags()['up'] == 'right':
-                            semiminima_right_flag_list.append(i)
-                        elif obj.getFlags()['up'] == 'left':
-                            semiminima_left_flag_list.append(i)
-                    if isinstance(obj, music21.medren.MensuralRest):
-                        semiminima_rest_list.append(i) 
-                minRem -= minimaLength
-            minimaLengths[i] = minimaLength
-
-        #Process everything else           
-        if self.mOrD.standardSymbol == '.i.':
-            if len(semibrevis_list) > 0:
-                avgSBLength = minRem/len(semibrevis_list)
-                for ind in semibrevis_list:
-                    if avgSBLength == 2:
-                        minimaLengths[ind] = 2.0
-                        minRem -= 2.0
-                    elif (2 < avgSBLength) and (avgSBLength < 3):
-                        if ind < (len(self.mensuralMeasure)-1) and self.mensuralMeasure[ind+1].mensuralType == 'minima':
-                            minimaLengths[ind] = 2.0
-                            minRem -= 2.0
-                        else:
-                            minimaLengths[ind] = 3.0
-                            minRem -= 3.0
-                    elif avgSBLength == 3.0:
-                        minimaLengths[ind] = 3.0
-                        minRem -= 3.0
-            minRem_tracker = minRem_tracker or (minRem > -0.0001) 
-        
-        elif self.mOrD.standardSymbol == '.n.':
-            extend_list = [] #brevises able to be lengthened
-            extend_num = 0
-            if len(semibrevis_list) > 0:
-                if semibrevis_list[-1] == (len(self.mensuralMeasure) - 1) and len(semibrevis_downstem) == 0:
-                    for ind in semibrevis_list[:-1]:
-                        if self.mensuralMeasure[ind+1].mensuralType == 'minima':
-                            minimaLengths[ind] = 2.0
-                            minRem -= 2.0
-                            extend_list.append(ind)
-                        else:
-                            minimaLengths[ind] = 3.0
-                            minRem -= 3.0
-                    minimaLengths[-1] = max(minRem, 3.0)
-                    minRem -= max(minRem, 3.0)
-            
-                    extend_num = min(minimaLengths[-1] - 3, len(extend_list))
-                    if minRem >= 0:
-                        minimaLengths, minRem = processMeasure(self.mensuralMeasure, minimaLengths, extend_list, extend_num, 1,  minRem, releases = -1)
-                else:
-                    for ind in semibrevis_list:
-                        if ind < (len(self.mensuralMeasure)-1) and self.mensuralMeasure[ind+1].mensuralType == 'minima':
-                            minimaLengths[ind] = 2.0
-                            minRem -= 2.0
-                            extend_list.append(ind)
-                        else:
-                            minimaLengths[ind] = 3.0
-                            minRem -= 3.0
-                    if len(semibrevis_downstem) == 0:
-                        extend_num = min(minRem, len(extend_list))
-                        if minRem >= 0:
-                            minimaLengths, minRem = processMeasure(self.mensuralMeasure, minimaLengths, extend_list, extend_num, 1, minRem)
-                    else:
-                        semibrevis_downstem = semibrevis_downstem[0]
-                        minimaLengths[semibrevis_downstem] = max(minRem, 3.0)
-                        minRem -= max(minRem, 3.0)
-                        extend_num = min(minimaLengths[semibrevis_downstem] - 4, len(extend_list))
-                        if semibrevis_downstem != len(self.mensuralMeasure) - 1:
-                            if minRem >= 0:
-                                minimaLengths, minRem = processMeasure(self.mensuralMeasure, minimaLengths, extend_list, extend_num, 1, minRem, releases = semibrevis_downstem)
-                minRem_tracker = minRem_tracker or (minRem > -0.0001)
-                        
-        elif self.mOrD.standardSymbol == '.q.' or self.mOrD.standardSymbol == '.p.':
-            extend_list = []
-            extend_num = 0
-            
-            if len(semibrevis_downstem) == 0:
-                semibrevis_downstem = None
-            else: #Only room for one downstem per measure
-                semibrevis_downstem = semibrevis_downstem[0] 
-                
-            for ind in semibrevis_list[:-1]:
-                minimaLengths[ind] = 2.0
-                minRem -= 2.0
-            
-            if semibrevis_downstem == (len(self.mensuralMeasure) - 1):
-                for ind in semiminima_right_flag_list+semiminima_left_flag_list+semiminima_rest_list:
-                    minimaLengths[ind] = 0.5
-                    minRem -= 0.5
-                minimaLengths[semibrevis_downstem] = minRem
-                minRem = 0
-            else:
-                strength = 0
-                minimaLengths_changeable = minimaLengths[:]
-                minimaLengths_static = minimaLengths[:]
-                minRem_changeable = minRem 
-                minRem_static = minRem
-                
-                if len(semiminima_right_flag_list) > 0 and len(semiminima_left_flag_list) > 0:
-                    lengths = [(0.5,0.5), (float(2)/3, 0.5), (0.5, float(2)/3), (float(2)/3, float(2)/3)]
-    
-                    for (left_length, right_length) in lengths:
-                        for ind in semiminima_left_flag_list:
-                            minimaLengths_changeable[ind] = left_length
-                            minRem_changeable -= left_length
-                        for ind in semiminima_right_flag_list:
-                            minimaLengths_changeable[ind] = right_length
-                            minRem_changeable -= right_length
-                            
-                        if left_length == right_length:
-                            for ind in semiminima_rest_list:
-                                minimaLengths_changeable[ind] = left_length
-                                minRem_changeable -= left_length
-                            if semibrevis_downstem is not None:
-                                if len(semibrevis_list) > 0:
-                                    minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                    minRem_changeable -= 2.0
-                                minimaLengths_changeable[semibrevis_downstem] = max(2.0, minRem_changeable)
-                                minRem_changeable -= max(2.0, minRem_changeable)
-                            else:
-                                if len(semibrevis_list) > 0 and semibrevis_list[-1] == len(self.mensuralMeasure) - 1:
-                                    minimaLengths_changeable[semibrevis_list[-1]] = max(2.0, minRem_changeable)
-                                    minRem_changeable -= max(2.0, minRem_changeable)
-                                else:
-                                    if len(semibrevis_list) > 0:
-                                        minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                        minRem_changeable -= 2.0
-                        else:
-                            master_list = semiminima_left_flag_list + semiminima_right_flag_list + semiminima_rest_list
-                            
-                            for ind in semiminima_rest_list:
-                                curIndex = int(master_list.index(ind))
-                                if ( curIndex == 0 and master_list[curIndex+1] in semiminima_left_flag_list ) or \
-                                     ( curIndex == len(master_list) - 1 and master_list[curIndex - 1] in semiminima_left_flag_list ) or \
-                                     ( master_list[curIndex-1] in semiminima_left_flag_list and master_list[curIndex+1] in semiminima_left_flag_list ):
-                                    minimaLengths_changeable[ind] = left_length
-                                    minRem_changeable -= left_length
-                                elif ( (curIndex == 0 and master_list[curIndex+1] in semiminima_right_flag_list) or
-                                     (curIndex == len(master_list) - 1 and master_list[curIndex - 1] in semiminima_right_flag_list) or
-                                     (master_list[curIndex-1] in semiminima_right_flag_list and master_list[curIndex+1] in semiminima_right_flag_list) ):
-                                    minimaLengths_changeable[ind] = right_length
-                                    minRem_changeable -= right_length
-                                else:
-                                    minimaLengths_changeable[ind] = 0.5
-                                    extend_list.append(ind)
-                                extend_list = list(set(extend_list)) #repeated iterations
-                            
-                            if semibrevis_downstem is not None:
-                                if len(semibrevis_list) > 0:
-                                    minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                    minRem_changeable -= 2.0
-                                minimaLengths_changeable[semibrevis_downstem] = max(minRem_changeable, 2.0)
-                                extend_num = min(6*minRem_changeable - 15.0, len(extend_list))
-                                minRem_changeable -= max(minRem_changeable, 2.0)
-                                if minRem_changeable >= 0:
-                                    minimaLengths_changeable, minRem_changeable = processMeasure(self.mensuralMeasure, minimaLengths_changeable, extend_list, extend_num, float(1)/6, minRem_changeable, releases = semibrevis_downstem)
-                            else:
-                                if len(semibrevis_list) > 0 and semibrevis_list[-1] == len(self.mensuralMeasure) - 1:
-                                    minimaLengths_changeable[semibrevis_list[-1]] = max(minRem_changeable, 2.0)
-                                    extend_num = min(6*minRem_changeable - 12.0, len(extend_list))
-                                    minRem_changeable -= max(minRem_changeable, 2.0)
-                                    if minRem_changeable >= 0:
-                                        minimaLengths_changeable, minRem_changeable = processMeasure(self.mensuralMeasure, minimaLengths_changeable, extend_list, extend_num, float(1)/6, minRem_changeable, releases = -1)
-                                else:
-                                    if len(semibrevis_list) > 0:
-                                        minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                        minRem_changeable -= 2.0
-                                    
-                                    extend_num = len(extend_list)
-                                    if minRem_changeable >= 0:
-                                        minimaLengths_changeable, minRem_changeable = processMeasure(self.mensuralMeasure, minimaLengths_changeable, extend_list, extend_num, float(1)/6, minRem_changeable)                                      
-                                    
-                        tempStrength = music21.medren._evaluateMeasure(self.mOrD, self.mensuralMeasure, minimaLengths_changeable)      
-
-                        if (tempStrength > strength) and (minRem_changeable > -0.0001): #Technically, >= 0, but rounding error occurs.
-                            minimaLengths = minimaLengths_changeable[:]
-                            minRem = minRem_changeable
-                            strength = tempStrength
-                        minimaLengths_changeable = minimaLengths_static
-                        minRem_tracker = minRem_tracker or (minRem_changeable > -0.0001)
-                        minRem_changeable = minRem_static
-                        
-                elif len(semiminima_left_flag_list) == 0 and len(semiminima_right_flag_list) == 0:
-                    
-                    if semibrevis_downstem is not None:
-                        if len(semibrevis_list) > 0:
-                            minimaLengths[semibrevis_list[-1]] = 2.0
-                            minRem -= 2.0
-                        minimaLengths[semibrevis_downstem] = max(minRem, 2.0)
-                        minRem -= max(minRem, 2.0)
-                    else:
-                        if len(semibrevis_list) > 0 and semibrevis_list[-1] == len(self.mensuralMeasure) - 1:
-                            minimaLengths[semibrevis_list[-1]] = max(minRem, 2.0)
-                            minRem -= max(minRem, 2.0)
-                        else:
-                            if len(semibrevis_list) > 0:
-                                minimaLengths[semibrevis_list[-1]] = 2.0
-                                minRem -= 2.0
-                    minRem_tracker = minRem_tracker or (minRem > -0.0001)            
-                else:
-                    lengths = [0.5, float(2)/3]
-                    master_list = semiminima_left_flag_list + semiminima_right_flag_list + semiminima_rest_list
-                    
-                    for length in lengths:
-                        for ind in master_list:
-                            minimaLengths_changeable[ind] = length
-                            minRem_changeable -= length
-                        
-                        if semibrevis_downstem is not None:
-                            if len(semibrevis_list) > 0:
-                                minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                minRem_changeable -= 2.0
-
-                            minimaLengths_changeable[semibrevis_downstem] = minRem_changeable
-                        else:
-                            if len(semibrevis_list) > 0 and semibrevis_list[-1] == len(self.mensuralMeasure) - 1:
-                                minimaLengths_changeable[semibrevis_list[-1]] = max(minRem_changeable, 2.0)
-                                minRem_changeable -= max(minRem_changeable, 2.0)
-                            else:
-                                if len(semibrevis_list) > 0:
-                                    minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                    minRem_changeable -= 2.0
-                                    
-                        tempStrength = music21.medren._evaluateMeasure(self.mOrD, self.mensuralMeasure, minimaLengths_changeable)
-                        
-                        if (tempStrength > strength) and (minRem_changeable > -0.0001):
-                            minimaLengths = minimaLengths_changeable[:]
-                            minRem = minRem_changeable
-                            strength = tempStrength
-                        minimaLengths_changeable = minimaLengths_static  
-                        minRem_tracker = minRem_tracker or (minRem_changeable > -0.0001)   
-                        minRem_changeable = minRem_static 
-                        
-        else:
-            extend_list_1 = []
-            extend_num_1 = 0
-            extend_list_2 = []
-            extend_num_2 = 0
-            
-            for ind in semibrevis_list[:-1]:
-                minimaLengths[ind] = 2.0
-                extend_list_1.append(ind)
-                minRem -= 2.0
-            
-            minimaLengths_changeable = minimaLengths[:]
-            minRem_changeable = minRem
-            minimaLengths_static = minimaLengths[:]
-            minRem_static = minRem
-               
-            if len(semibrevis_downstem) < 2:
-                if len(semibrevis_downstem) > 0 and semibrevis_downstem[0] == len(self.mensuralMeasure) - 1:
-                    for ind in semiminima_left_flag_list + semiminima_right_flag_list + semiminima_rest_list:
-                        minimaLengths[ind] = 0.5
-                        minRem -= 0.5
-                    if len(semibrevis_list) > 0:
-                        for ind in semibrevis_list:
-                            minimaLengths[ind] = 2.0
-                            minRem -= 2.0
-                            extend_list_1.append(ind)
-                    minimaLengths[semibrevis_downstem[0]] = max(minRem, 2.0)
-                    minRem -= max(minRem, 2.0)
-                else:
-                    if len(semiminima_left_flag_list) > 0 and len(semiminima_right_flag_list) > 0:
-                        lengths = [(0.5,0.5), (float(2)/3, 0.5), (0.5, float(2)/3), (float(2)/3, float(2)/3)]
-                        strength = 0
-    
-                        for (left_length, right_length) in lengths:
-                            
-                            for ind in semiminima_left_flag_list:
-                                minimaLengths_changeable[ind] = left_length
-                                minRem_changeable -= left_length
-                            for ind in semiminima_right_flag_list:
-                                minimaLengths_changeable[ind] = right_length
-                                minRem_changeable -= right_length
-                            
-                            if left_length == right_length:
-                                for ind in semiminima_rest_list:
-                                    minimaLengths_changeable[ind] = left_length
-                                    minRem_changeable -= left_length
-                                
-                                if len(semibrevis_downstem) > 0:
-                                    downstem = semibrevis_downstem[0]
-                                    if len(semibrevis_list) > 0:
-                                        minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                        extend_list_1.append(semibrevis_list[-1])
-                                        extend_list_1 = list(set(extend_list_1)) #For repeated iterations
-                                        minRem_changeable -= 2.0
-                                    
-                                    avgSBLen = minRem_changeable/len(semibrevis_list)
-                                    extend_num_1 = min(len(extend_list_1), 0.5*minRem_changeable - 2.0)
-                                    minimaLengths_changeable[downstem] = max(minRem_changeable, 4.0)
-                                    minRem -= max(minRem_changeable, 4.0)
-                                    
-                                    minimaLengths_changeable, minRem_changeable = processMeasure(self.mensuralMeasure, minimaLengths_changeable, extend_list_1, extend_num_1, 2.0, minRem_changeable, releases = downstem)
-                                
-                                else:
-                                    if len(semibrevis_list) > 0:
-                                        if semibrevis_list[-1] == len(self.mensuralMeasure) - 1:
-                                            minimaLengths_changeable[semibrevis_list[-1]] = max(minRem_changeable, 2.0)
-                                            extend_num_1 = min(len(extend_list_1), int(0.5*minRem_changeable - 1.0))
-                                            minRem -= max(minRem_changeable, 2.0)
-                                            
-                                            if minRem >= 0:
-                                                minimaLengths_changeable, minRem_changeable = processMeasure(self.mensuralMeasure, minimaLengths_changeable, extend_list_1, extend_num_1, 2.0, minRem_changeable, releases = -1)
-                                        else:
-                                            minimaLengths[semibrevis_list[-1]] = 2.0
-                                            extend_list_1.append(semibrevis_list[-1])
-                                            extend_list_1 = list(set(extend_list_1))
-                                            extend_num_1 = len(extend_list_1)
-                                            minRem -= 2.0
-                                            
-                                            if minRem >= 0:
-                                                minimaLengths_changeable, minRem_changeable = processMeasure(self.mensuralMeasure, minimaLengths_changeable, extend_list_1, extend_num_1, 2.0, minRem_changeable)
-                                
-                            else:
-                                master_list = semiminima_left_flag_list + semiminima_right_flag_list + semiminima_rest_list
-                                
-                                for ind in semiminima_rest_list:
-                                    curIndex = int(master_list.index(ind))
-                                    if ( curIndex == 0 and master_list[curIndex+1] in semiminima_left_flag_list ) or \
-                                         ( curIndex == len(master_list) - 1 and master_list[curIndex - 1] in semiminima_left_flag_list ) or \
-                                         ( master_list[curIndex-1] in semiminima_left_flag_list and master_list[curIndex+1] in semiminima_left_flag_list ):
-                                        minimaLengths_changeable[ind] = left_length
-                                        minRem_changeable -= left_length
-                                    elif ( curIndex == 0 and master_list[curIndex+1] in semiminima_right_flag_list ) or \
-                                         ( curIndex == len(master_list) - 1 and master_list[curIndex - 1] in semiminima_right_flag_list ) or \
-                                         ( master_list[curIndex-1] in semiminima_right_flag_list and master_list[curIndex+1] in semiminima_right_flag_list ):
-                                        minimaLengths_changeable[ind] = right_length
-                                        minRem_changeable -= right_length
-                                    else:
-                                        minimaLengths_changeable[ind] = 0.5
-                                        extend_list_2.append(ind)
-                                    extend_list_2 = list(set(extend_list_2))
-                                
-                                diff_list = (2.0, float(1)/6)
-                                if len(semibrevis_downstem) > 0:
-                                    downstem = semibrevis_downstem[0]
-                                    releases = [downstem, downstem]
-                                    
-                                    if len(semibrevis_list) > 0:
-                                        minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                        extend_list_1.append(semibrevis_list[-1])
-                                        extend_list_1 = list(set(extend_list_1))
-                                        change_nums = (len(extend_list_1), len(extend_list_2))
-                                        minRem_changeable -= 2.0
-                                    
-                                    extend_num_1 = min(len(extend_list_1), int(0.5(minRem_changeable - 2.0)))
-                                    extend_num_2 = min(len(extend_list_2), 6*minRem_changeable - 12.0)
-                                    minimaLengths_changeable[downstem] = max(minRem_changeable, 4.0)
-                                    minRem_changeable -= 4.0
-                                    change_list = (extend_list_1, extend_list_2)
-                                    change_nums = (extend_num_1, extend_num_2)
-                                    
-                                    minimaLengths_changeable, minRem_changeable = processMeasure(self.mensuralMeasure, minimaLengths_changeable, change_list, change_nums, diff_list, minRem_changeable, releases = releases, multi = 1)
-                                    
-                                else:
-                                    if len(semibrevis_list) > 0:
-                                        releases = [-1, -1]
-                                        if semibrevis_list[-1] == len(self.mensuralMeasure) - 1:
-                                            minimaLengths_changeable[semibrevis_list[-1]] = max(minRem_changeable, 2.0)
-                                            extend_num_1 = min(len(extend_list_1),int(0.5*minRem_changeable - 1.0))
-                                            extend_num_2 = min(len(extend_list_2), 6*minRem_changeable - 12.0)
-                                            minRem_changeable -= max(minRem_changeable, 2.0)
-                                            change_list = (extend_list_1, extend_list_2)
-                                            change_nums = (extend_num_1, extend_num_2)
-                                           
-                                            minimaLengths_changeable, minRem_changeable = processMeasure(self.mensuralMeasure, minimaLengths_changeable, change_list, change_nums, diff_list, minRem_changeable, releases = releases, multi = 1)
-                                        else:
-                                            minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                            extend_list_1.append(semibrevis_list[-1])
-                                            extend_list_1 = list(set(extend_list_1))
-                                            change_list = (extend_list_1, extend_list_2)
-                                            change_nums = (len(extend_list_1), len(extend_list_2))
-                                            minRem_changeable -= 2.0
-                                            
-                                            minimaLengths_changeable, minRem_changeable = processMeasure(self.mensuralMeasure, minimaLengths_changeable, change_list, change_nums, diff_list, minRem_changeable, multi = 1)
-                                    else:
-                                        extend_num_2 = len(extend_list_2)
-                                        minimaLengths_changeable, minRem_changeable = processMeasure(self.mensuralMeasure, minimaLengths_changeable, extend_list_2, extend_num_2, float(1)/6, minRem_changeable)
-                                          
-                            tempStrength = music21.medren._evaluateMeasure(self.mOrD, self.mensuralMeasure, minimaLengths_changeable)
-                            
-                            if tempStrength > strength and minRem_changeable > -0.0001:
-                                minimaLengths = minimaLengths_changeable[:]
-                                minRem = minRem_changeable
-                                strength = tempStrength
-                            minimaLengths_changeable = minimaLengths_static
-                            minRem_tracker = minRem_tracker or (minRem_changeable > -0.0001)
-                            minRem_changeable = minRem_static
-                    
-                    elif len(semiminima_left_flag_list) == 0 and len(semiminima_right_flag_list) == 0:
-                        if len(semibrevis_downstem) > 0:
-                            semibrevis_downstem = semibrevis_downstem[0]
-                            if len(semibrevis_list) > 0:
-                                minimaLengths[semibrevis_list[-1]] = 2.0
-                                extend_list_1.append(semibrevis_list[-1])
-                                minRem -= 2.0
-
-                            extend_num_1 = min(len(extend_list_1), int(0.5*minRem - 2.0))
-                            minimaLengths[semibrevis_downstem] = max(minRem, 4.0)
-                            minRem -= max(minRem, 4.0)                     
-                            
-                            if minRem >= 0:
-                                minimaLengths, minRem = processMeasure(self.mensuralMeasure, minimaLengths, extend_list_1, extend_num_1, 2.0, minRem, releases = semibrevis_downstem)
-                        
-                        else:
-                            if len(semibrevis_list) > 0:
-                                if semibrevis_list[-1] == len(self.mensuralMeasure) - 1:
-                                    minimaLengths[semibrevis_list[-1]] = max(minRem, 2.0)
-                                    extend_num_1 = min(len(extend_list_1), int(0.5*minRem - 1.0))
-                                    minRem -= max(minRem, 2.0)
-                                    
-                                    if minRem >= 0:
-                                        minimaLengths, minRem = processMeasure(self.mensuralMeasure, minimaLengths, extend_list_1, extend_num_1, 2.0, minRem, releases = -1)
-                                else:
-                                    minimaLengths[semibrevis_list[-1]] = 2.0
-                                    extend_list_1.append(semibrevis_list[-1])
-                                    extend_num_1 = len(extend_list_1)
-                                    minRem -= 2.0
-                                                
-                                    if minRem >= 0:
-                                        minimaLengths, minRem = processMeasure(self.mensuralMeasure, minimaLengths, extend_list_1, extend_num_1, 2.0, minRem)
-                        minRem_tracker = minRem_tracker or (minRem > -0.0001)
-                    
-                    else:
-                        lengths = [0.5, float(2)/3]
-                        strength = 0
-                        semiminima_master_list = semiminima_left_flag_list + semiminima_right_flag_list + semiminima_rest_list
-                        for length in lengths:
-                            for ind in semiminima_master_list:
-                                minimaLengths_changeable[ind] = length
-                                minRem_changeable -= length
-                            
-                            if len(semibrevis_downstem) > 0:
-                                downstem = semibrevis_downstem[0]
-                                if len(semibrevis_list) > 0:
-                                    minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                    extend_list_1.append(semibrevis_list[-1])
-                                    extend_list_1 = list(set(extend_list_1))
-                                    minRem_changeable -= 2.0
-                                
-                                extend_list_1 = list(set(extend_list_1))
-                                extend_num_1 = min(len(extend_list_1), int(0.5*minRem_changeable - 2.0))
-                                minimaLengths_changeable[downstem] = max(minRem_changeable, 4.0)
-                                minRem_changeable -= max(minRem_changeable, 4.0)
-                                
-                                if minRem_changeable >= 0:
-                                    minimaLengths_changeable, minRem_changeable = processMeasure(self.mensuralMeasure, minimaLengths_changeable, extend_list_1, extend_num_1, minRem_changeable, releases = semibrevis_downstem)
-                            
-                            else:
-                                if len(semibrevis_list) > 0: 
-                                    if semibrevis_list[-1] == len(self.mensuralMeasure) - 1:
-                                        minimaLengths_changeable[semibrevis_list[-1]] = max(minRem_changeable, 2.0)
-                                        extend_num_1 = min(len(extend_list_1), int(0.5*minRem_changeable - 1.0))
-                                        minRem_changeable -= max(minRem_changeable, 2.0)
-                                        
-                                        extend_list_1 = list(set(extend_list_1))
-                                        
-                                        if minRem_changeable >= 0:
-                                            minimaLengths_changeable, minRem_changeable = processMeasure(self.mensuralMeasure, minimaLengths_changeable, extend_list_1, extend_num_1, 2.0, minRem_changeable, releases = -1)
-                                    else:
-                                        minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                        extend_list_1.append(semibrevis_list[-1])
-                                        extend_num_1 = len(extend_list_1)
-                                        minRem_changeable -= 2.0
-                                        
-                                        extend_list_1 = list(set(extend_list_1))
-                                        
-                                        if minRem_changeable >= 0:
-                                            minimaLengths_changeable, minRem_changeable = processMeasure(self.mensuralMeasure, minimaLengths_changeable, extend_list_1, extend_num_1, 2.0, minRem_changeable)
-                            
-                            tempStrength = music21.medren._evaluateMeasure(self.mOrD, self.mensuralMeasure, minimaLengths_changeable)
-                            
-                            if tempStrength > strength and minRem_changeable > -0.0001:
-                                minimaLengths = minimaLengths_changeable[:]
-                                minRem = minRem_changeable
-                                strength = tempStrength
-                            minimaLengths_changeable = minimaLengths_static
-                            minRem_tracker = minRem_tracker or (minRem_changeable > -0.0001)
-                            minRem_changeable = minRem_static
-            
-            elif len(semibrevis_downstem) >= 2:
-                #Don't need to lengths other SBs, not enough room
-                #Hence, skip straight to semiminima 
-                
-                lengths = [(0.5, 0.5), (float(2)/3, 0.5), (0.5, float(2)/3), (float(2)/3, float(2)/3)]
-                strength = 0
-                
-                for length in lengths:
-                    left_length, right_length  = length
-                    
-                    if len(semibrevis_list) > 0:
-                        minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                        minRem_changeable -= 2.0
-                    
-                    for ind in semiminima_left_flag_list:
-                        minimaLengths_changeable[ind] = left_length
-                        minRem_changeable -= left_length
-                    for ind in semiminima_right_flag_list:
-                        minimaLengths_changeable[ind] = right_length
-                        minRem_changeable -= right_length
-                    
-                    if left_length == right_length:
-                        for ind in semiminima_rest_list:
-                            minimaLengths_changeable[ind] = left_length
-                            minRem_changeable -= left_length
-                    else:
-                        master_list = semiminima_left_flag_list + semiminima_right_flag_list + semiminima_rest_list
-                            
-                        for ind in semiminima_rest_list:
-                            curIndex = int(master_list.index(ind))
-                            if ( curIndex == 0 and master_list[curIndex+1] in semiminima_left_flag_list ) or \
-                                 ( curIndex == len(master_list) - 1 and master_list[curIndex - 1] in semiminima_left_flag_list ) or \
-                                 ( master_list[curIndex-1] in semiminima_left_flag_list and master_list[curIndex+1] in semiminima_left_flag_list ):
-                                minimaLengths_changeable[ind] = left_length
-                                minRem_changeable -= left_length
-                            elif ( curIndex == 0 and master_list[curIndex+1] in semiminima_right_flag_list ) or \
-                                 ( curIndex == len(master_list) - 1 and master_list[curIndex - 1] in semiminima_right_flag_list ) or \
-                                 ( master_list[curIndex-1] in semiminima_right_flag_list and master_list[curIndex+1] in semiminima_right_flag_list ):
-                                minimaLengths_changeable[ind] = right_length
-                                minRem_changeable -= right_length
-                            else:
-                                minimaLengths_changeable[ind] = 0.5
-                                extend_list_2.append(ind)
-                            
-                            extend_num_2 = len(extend_list_2)
-                            minimaLengths_changeable, minRem_changeable = minimaLengths_changeable, minRem_changeable = processMeasure(self.mensuralMeasure, minimaLengths_changeable, extend_list_2, extend_num_2, float(1)/6, minRem_changeable)
-                    
-                    newMensuralMeasure = [music21.medren.MensuralNote('A', 'SB') for i in range(len(semibrevis_downstem))]
-                    
-                    newMOrD = music21.medren.Divisione('.d.')
-                    newMOrD.minimaPerBrevis = minRem_changeable
-                        
-                    tempTMM = music21.medren._TranslateMensuralMeasure(mensurationOrDivisione = newMOrD, measure = newMensuralMeasure, pDS = True)
-                    for i in range(len(semibrevis_downstem)):
-                        minimaLengths_changeable[semibrevis_downstem[i]] = max(tempTMM.getMinimaLengths()[i], 4.0)
-                        minRem_changeable -= max(tempTMM.getMinimaLengths()[i], 4.0)
-                    
-                    tempStrength = music21.medren._evaluateMeasure(self.mOrD, self.mensuralMeasure, minimaLengths_changeable)
-                    
-                    if tempStrength > strength and minRem_changeable > -0.0001:
-                        minimaLengths = minimaLengths_changeable[:]
-                        minRem = minRem_changeable
-                        strength = tempStrength
-                    minimaLengths_changeable = minimaLengths_static[:]
-                    minRem_tracker = minRem_tracker or (minRem_changeable > -0.0001)
-                    minRem_changeable = minRem_static
-                    
-        
-        if not minRem_tracker:
-            newMOrD = music21.medren.Divisione(self.mOrD.standardSymbol)
-            newMOrD.minimaPerBrevis = 2*self.mOrD.minimaPerBrevis
-            tempTMM = music21.medren._TranslateMensuralMeasure(newMOrD, self.mensuralMeasure)
-            minimaLengths = tempTMM.getMinimaLengths()
-            
-        for i in range(len(minimaLengths)): #Float errors
-            ml = minimaLengths[i]
-            if abs(ml - round(ml)) < 0.0001:
-                minimaLengths[i] = round(ml)
-        
-        return minimaLengths
-        
-    def getLengthsFrench(self):
-        raise MedRenException('French notation currently not supported')
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 class MensuralClef(music21.clef.Clef):
     '''
@@ -1103,7 +220,7 @@ class Mensuration(meter.TimeSignature):
         self._minimaPerBrevis = mPM
     
     minimaPerBrevis = property(_getMinimaPerMeasure, _setMinimaPerMeasure,
-                                doc = '''Used to get or set the number of minima in a 'measure' under the given divisione.
+                                doc = '''Used to get or set the number of minima in a 'measure' under the given mensuration.
                                 
                                 
                                 >>> from music21 import *
@@ -1131,97 +248,6 @@ class Mensuration(meter.TimeSignature):
     
 #    def _setScalingFactor(self, newScalingFactor):
 #        pass
-   
-class Divisione(meter.TimeSignature):
-    '''
-    An object representing a divisione found in Trecento Notation.
-    Takes one argument, nameOrSymbol. This is the name of the divisione, or its corresponding letter. 
-    The default value for this argument is '.p.' 
-    
-    Valid names are 'quaternaria', 'senaria imperfect', 'senaria perfecta', 'novenaria', 'octonaria', and 'duodenaria'.
-    The corresponding symbols are '.q.', '.i.', '.p.', '.n.', '.o.', and '.d.'. 
-    
-    >>> from music21 import *
-    >>> d = medren.Divisione('senaria imperfecta')
-    >>> d.standardSymbol
-    '.i.'
-    >>> d = medren.Divisione('.p.')
-    >>> d.name
-    'senaria perfecta'
-    >>> d = medren.Divisione('q')
-    >>> d.standardSymbol
-    '.q.'
-    '''    
-    def __init__(self, nameOrSymbol = '.p.'):
-        self.name = None
-        self.standardSymbol = None
-        self._minimaPerBrevis = 0
-        
-        if len(nameOrSymbol) == 1:
-            nameOrSymbol = '.' + nameOrSymbol + '.'
-        
-        for d in _validDivisiones:
-            if nameOrSymbol in d:
-                self.name = d[0]
-                self.standardSymbol = d[1]
-                self._minimaPerBrevis = _validDivisiones[d]
-                
-        if self.standardSymbol == None:
-            self.timeString = None
-        elif self.standardSymbol == '.q.':
-            self.timeString = '2/4'
-        elif self.standardSymbol == '.i.':
-            self.timeString = '6/8'
-        elif self.standardSymbol == '.p.':
-            self.timeString = '3/4'
-        elif self.standardSymbol == '.n.':
-            self.timeString = '9/8'
-        elif self.standardSymbol == '.o.':
-            self.timeString = '2/4'
-        elif self.standardSymbol == '.d.':
-            self.timeString = '3/4'
-        else:
-            raise MedRenException('cannot make out the mensuration from name or symbol %s' % nameOrSymbol)
-        
-        if self.timeString is not None:    
-            meter.TimeSignature.__init__(self, self.timeString)
-    
-    def __str__(self):
-        return '<music21.medren.Divisione %s>' % self.standardSymbol
-    
-    __repr__ = __str__
-    
-    def _getMinimaPerMeasure(self):
-        return self._minimaPerBrevis
-    
-    def _setMinimaPerMeasure(self, mPM):
-        self._minimaPerBrevis = mPM 
-    
-    minimaPerBrevis = property(_getMinimaPerMeasure, _setMinimaPerMeasure, 
-                                doc = '''Used to get and set the number of minima in a 'measure' (the number of minima before a punctus occurs) under the given divisione.
-                                
-                                >>> from music21 import *
-                                >>> n = medren.Divisione('.n.')
-                                >>> n.minimaPerBrevis
-                                9
-                                >>> n.minimaPerBrevis = 18
-                                >>> n.minimaPerBrevis
-                                18
-                                ''')
-        
-class Punctus(music21.base.Music21Object):
-    '''
-    An object representing a punctus, found in Trecento notation.
-    '''
-    def __init__(self):
-        self._fontString = '0x70'
-        music21.base.Music21Object.__init__(self)
-    
-    def _getFontString(self):
-        return self._fontString
-    
-    fontString = property(_getFontString, 
-                          doc = '''The utf-8 code corresponding the punctus in Cicionia font''')
 
 class GeneralMensuralNote(music21.base.Music21Object):
     '''
@@ -1290,7 +316,7 @@ class GeneralMensuralNote(music21.base.Music21Object):
     def _setMensuralType(self, mensuralTypeOrAbbr):
         if mensuralTypeOrAbbr in _validMensuralTypes:
             self._mensuralType = mensuralTypeOrAbbr
-        elif t in _validMensuralAbbr:
+        elif mensuralTypeOrAbbr in _validMensuralAbbr:
             self.mensuralType = _validMensuralTypes[_validMensuralAbbr.index(mensuralTypeOrAbbr)]
         else:
             raise MedRenException('%s is not a valid mensural type or abbreviation' % mensuralTypeOrAbbr)
@@ -1310,7 +336,7 @@ class GeneralMensuralNote(music21.base.Music21Object):
                         MedRenException: blah is not a valid mensural type or abbreviation
                         ''')
     
-    def updateDurationFromMensuration(self, mensurationOrDivisione = None):
+    def updateDurationFromMensuration(self, mensuration = None):
         '''
         The duration of a :class:`music21.medren.GeneralMensuralNote` object can be accessed and set using the :attr:`music21.medren.GeneralMensuralNote.duration` property. 
         The duration of a general mensural note is by default 0. If the object's subclass is not specified (:class:`music21.medren.MensuralNote` or :class:`music21.medren.MensuralRest`), the duration will remain 0 unless set to some other value.
@@ -1327,17 +353,17 @@ class GeneralMensuralNote(music21.base.Music21Object):
         >>> mn.duration.quarterLength
         0.0
         
-        However, if subclass is given, context (a stream) is given, and a divisioned is given, duration can be determined.
+        However, if subclass is given, context (a stream) is given, and a mensuration or divisione is given, duration can be determined.
         
         >>> from music21 import *
         >>> s = stream.Stream()
-        >>> s.append(medren.Divisione('.p.'))
+        >>> s.append(trecento.notation.Divisione('.p.'))
         >>> for i in range(3):
         ...    s.append(medren.MensuralNote('A', 'SB'))
-        >>> s.append(medren.Punctus())
+        >>> s.append(trecento.notation.Punctus())
         >>> s.append(medren.MensuralNote('B', 'SB'))
         >>> s.append(medren.MensuralNote('B', 'SB'))
-        >>> s.append(medren.Punctus())
+        >>> s.append(trecento.notation.Punctus())
         >>> s.append(medren.MensuralNote('A', 'B'))
         >>> for mn in s:
         ...    if isinstance(mn, medren.GeneralMensuralNote):
@@ -1354,11 +380,11 @@ class GeneralMensuralNote(music21.base.Music21Object):
         '''
         mLen, mDur = 0, 0
         if self._gettingDuration is True:
-            return duration.Duration(0)
-        if mensurationOrDivisione is None:
+            return duration.ZeroDuration()
+        if mensuration is None:
             mOrD = self._determineMensurationOrDivisione()
         else:
-            mOrD = mensurationOrDivisione
+            mOrD = mensuration
         index = self._getSurroundingMeasure()[1]
         if self._getTranslator() is not None:
             if mOrD.standardSymbol in ['.q.', '.p.', '.i.', '.n.']:
@@ -1375,9 +401,9 @@ class GeneralMensuralNote(music21.base.Music21Object):
         mOrD = self._determineMensurationOrDivisione()
         measure, index = self._getSurroundingMeasure()
         TMM = None
-        if len(measure) > 0 and mOrD is not None:
+        if len(measure) > 0 and isinstance(mOrD, music21.trecento.notation.Divisione):
             if index == 0:
-                TMM = music21.medren._TranslateMensuralMeasure(mOrD, measure)
+                TMM = music21.trecento.notation.TranslateBrevisLength(mOrD, measure)
             elif index != -1:
                 TMM = measure[0]._getTranslator()
         return TMM
@@ -1385,9 +411,9 @@ class GeneralMensuralNote(music21.base.Music21Object):
     #Using Music21Object.getContextByClass makes _getDuration go into an infinite loop. Thus, the alternative method. 
     def _determineMensurationOrDivisione(self):
         '''
-        If the general mensural note has context which contains a mensuration or divisione sign, it returns the mensuration or divisione sign closest to but before itself.
+        If the general mensural notes has context which contains a mensuration or divisione sign, it returns the mensuration or divisione sign closest to but before itself.
         Otherwise, it tries to determine the mensuration sign from the context. If no mensuration sign can be determined, it throws an error.
-        If no context is present, returns None. 
+        If no context is present, returns None.
         
         >>> from music21 import *
         >>> gmn = medren.GeneralMensuralNote('longa')
@@ -1397,16 +423,16 @@ class GeneralMensuralNote(music21.base.Music21Object):
         >>> s_2 = stream.Stream()
         >>> s_3 = stream.Stream()
         >>> s_3.insert(3, gmn)
-        >>> s_2.insert(1, medren.Divisione('.q.'))
+        >>> s_2.insert(1, trecento.notation.Divisione('.q.'))
         >>> s_1.insert(2, medren.Mensuration('perfect', 'major'))
         >>> s_2.insert(2, s_3)
         >>> s_1.insert(3, s_2)
         >>> gmn._determineMensurationOrDivisione()
-        <music21.medren.Divisione .q.>
+        <music21.trecento.notation.Divisione .q.>
         '''
         
-        #mOrD = music21.medren._getTargetBeforeOrAtObj(self, [music21.medren.Mensuration, music21.medren.Divisione])
-        searchClasses = (music21.medren.Mensuration, music21.medren.Divisione)
+        #mOrD = music21.medren._getTargetBeforeOrAtObj(self, [music21.medren.Mensuration, music21.trecento.notation.Divisione])
+        searchClasses = (music21.medren.Mensuration, music21.trecento.notation.Divisione)
         mOrD = self.getContextByClass(searchClasses)
         if mOrD is not None:
             return mOrD
@@ -1427,7 +453,7 @@ class GeneralMensuralNote(music21.base.Music21Object):
         
         >>> from music21 import *
         >>> s_1 = stream.Stream()
-        >>> s_1.append(medren.Divisione('.p.'))
+        >>> s_1.append(trecento.notation.Divisione('.p.'))
         >>> l = medren.MensuralNote('A', 'longa')
         >>> s_1.append(l)
         >>> for i in range(4):
@@ -1435,13 +461,13 @@ class GeneralMensuralNote(music21.base.Music21Object):
         >>> gmn_1 = medren.GeneralMensuralNote('minima')
         >>> s_1.append(gmn_1)
         >>> s_1.append(medren.MensuralNote('C', 'minima'))
-        >>> s_1.append(medren.Punctus())
+        >>> s_1.append(trecento.notation.Punctus())
         >>> gmn_1._getSurroundingMeasure()
         ([<music21.medren.MensuralNote minima B>, <music21.medren.MensuralNote minima B>, <music21.medren.MensuralNote minima B>, <music21.medren.MensuralNote minima B>, <music21.medren.GeneralMensuralNote minima>, <music21.medren.MensuralNote minima C>], 4) 
         >>> 
         >>> s_2 = stream.Stream()
-        >>> s_2.append(medren.Divisione('.p.'))
-        >>> s_2.append(medren.Punctus())
+        >>> s_2.append(trecento.notation.Divisione('.p.'))
+        >>> s_2.append(trecento.notation.Punctus())
         >>> s_2.append(medren.MensuralNote('A', 'semibrevis'))
         >>> s_2.append(medren.MensuralNote('B', 'semibrevis'))
         >>> gmn_2 = medren.GeneralMensuralNote('semibrevis')
@@ -1471,11 +497,11 @@ class GeneralMensuralNote(music21.base.Music21Object):
                     currentIndex = int(tempList.index(self)) 
                     for i in range(currentIndex-1, -1, -1):
                         # Punctus and ligature marks indicate a new measure
-                        if isinstance(tempList[i], music21.medren.Punctus) or isinstance(tempList[i], music21.medren.Ligature):
+                        if isinstance(tempList[i], music21.trecento.notation.Punctus) or isinstance(tempList[i], music21.medren.Ligature):
                             break
                         if isinstance(tempList[i], music21.medren.GeneralMensuralNote):
                             # In Italian notation, brevis, longa, and maxima indicate a new measure
-                            if (isinstance(mOrD, music21.medren.Divisione) and
+                            if (isinstance(mOrD, music21.trecento.notation.Divisione) and
                                 tempList[i].mensuralType in ['brevis', 'longa', 'maxima']):
                                 break
                             else:
@@ -1483,10 +509,10 @@ class GeneralMensuralNote(music21.base.Music21Object):
                     mList.reverse()
                     mList.insert(currentIndex, self)
                     for j in range(currentIndex+1,len(tempList), 1):
-                        if isinstance(tempList[j], music21.medren.Punctus) or isinstance(tempList[j], music21.medren.Ligature):
+                        if isinstance(tempList[j], music21.trecento.notation.Punctus) or isinstance(tempList[j], music21.medren.Ligature):
                             break
                         if isinstance(tempList[j], music21.medren.GeneralMensuralNote):
-                            if (isinstance(mOrD, music21.medren.Divisione) and
+                            if (isinstance(mOrD, music21.trecento.notation.Divisione) and
                                 tempList[j].mensuralType in ['brevis', 'longa', 'maxima']):
                                 break
                             else:
@@ -1616,7 +642,7 @@ class MensuralNote(GeneralMensuralNote, music21.note.Note):
         >>> m == n
         False
         >>> s_2 = stream.Stream()
-        >>> s_2.append(medren.Divisione('.q.'))
+        >>> s_2.append(trecento.notation.Divisione('.q.'))
         >>> s_2.append(m)
         >>> s_2.append(n)
         >>> m == n
@@ -1706,7 +732,22 @@ class MensuralNote(GeneralMensuralNote, music21.note.Note):
                           >>> mn.fontString
                           '0x6d'
                           ''')
+    
+    def _setMensuralType(self, mensuralTypeOrAbbr):
+        GeneralMensuralNote._setMensuralType(self, mensuralTypeOrAbbr)
         
+        if self.mensuralType in ['minima', 'semiminima']:
+            self.stems = ['up']
+        else:
+            self.stems = []
+        
+        self.flags = dict((s, None) for s in self.stems)
+        if self._mensuralType == 'semiminima':
+            self.flags['up'] = 'right'
+     
+    mensuralType = property(GeneralMensuralNote._getMensuralType, _setMensuralType,
+                          doc = ''' See documentation in `music21.medren.GeneralMensuralType`''')
+    
     def _setColor(self, value):
         if value in ['black', 'red']:
             music21.note.Note._setColor(self, value)
@@ -1930,25 +971,32 @@ class Ligature(music21.base.Music21Object):
     '''
 
     def __init__(self, pitches = None, color = 'black', filled = 'yes'):
-        self.pitches = []
+        self._pitches = []
         
         if pitches is not None:
-            for p in pitches:
-                if isinstance(p, music21.pitch.Pitch):
-                    self.pitches.append(p)
-                else:
-                    self.pitches.append(music21.pitch.Pitch(p))
+            self.pitches = pitches
         
-        self.filled = filled
-        self.color = color
+        self._notes = []
+        
+        music21.base.Music21Object.__init__(self)
+    
+    def _getPitches(self):
+        return self._pitches
+    
+    def _setPitches(self, pitches):
+        for p in pitches:
+                if isinstance(p, music21.pitch.Pitch):
+                    self._pitches.append(p)
+                else:
+                    self._pitches.append(music21.pitch.Pitch(p))
+        
         self.noteheadShape = dict([(ind, 'square') for ind in range(self._ligatureLength())])
         self.stems = dict([(ind, (None,None)) for ind in range(self._ligatureLength())])
         self.maximaNotes = dict([(ind, False) for ind in range(self._ligatureLength())])
         self.reversedNotes = dict([(ind, False) for ind in range(self._ligatureLength())])
         
-        self._notes = []
-        
-        music21.base.Music21Object.__init__(self)
+    pitches = property(_getPitches, _setPitches,
+                       doc = '''A list of pitches comprising the ligature''')
     
     def _getNotes(self):
         if self._notes == []:
@@ -2394,7 +1442,7 @@ class Ligature(music21.base.Music21Object):
                         tempPitchPrev._setAccidental(None)
                         if (not self.isReversed(endIndex-1)) and (self.getStem(endIndex-1)[0] != 'up') and (self.getStem(endIndex) == ('down','left')) and (tempPitchCurrent > tempPitchPrev):
                                 self.reversedNotes[endIndex] = True
-                        else:
+                        else:                           
                             raise MedRenException('the note at index %d cannot be given reverse value %s' % (endIndex, value))
                     else:
                         raise MedRenException('no note exists at index %d' % (endIndex-1)) 
@@ -2512,28 +1560,28 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
     
     >>> p = stream.Part()
     >>> m.append(medren.MensuralNote('G','B'))
-    >>> p.append(medren.Divisione('.q.'))
+    >>> p.append(trecento.notation.Divisione('.q.'))
     >>> p.repeatAppend(medren.MensuralNote('A','SB'),2)
-    >>> p.append(medren.Punctus())
+    >>> p.append(trecento.notation.Punctus())
     >>> p.repeatAppend(medren.MensuralNote('B','M'),4)
-    >>> p.append(medren.Punctus())
+    >>> p.append(trecento.notation.Punctus())
     >>> p.append(medren.MensuralNote('C','B'))
-    >>> s.append(medren.Divisione('.p.'))
+    >>> s.append(trecento.notation.Divisione('.p.'))
     >>> s.append(p)
     >>> s.append(m)
     >>> medren.breakMensuralStreamIntoBrevisLengths(s)
     Traceback (most recent call last):
-    MedRenException: Mensuration or divisione <music21.medren.Divisione .q.> not consistent within heirarchy
+    MedRenException: Mensuration or divisione <music21.trecento.notation.Divisione .q.> not consistent within heirarchy
     
     >>> s = stream.Stream()
-    >>> s.append(medren.Divisione('.q.'))
+    >>> s.append(trecento.notation.Divisione('.q.'))
     >>> s.append(p)
     >>> s.append(m)
     >>> t = medren.breakMensuralStreamIntoBrevisLengths(s)
     Getting measure 0...
     ...
     >>> t.show('text')
-    {0.0} <music21.medren.Divisione .q.>
+    {0.0} <music21.trecento.notation.Divisione .q.>
     {0.0} <music21.stream.Part...>
         {0.0} <music21.stream.Measure...>  
             {0.0} <music21.medren.MensuralNote semibrevis A>
@@ -2572,7 +1620,7 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
             for item in tempStream_2:
                 newStream.append(item)
                 if isinstance(item, music21.medren.Mensuration) or \
-                isinstance(item, music21.medren.Divisione):
+                isinstance(item, music21.trecento.notation.Divisione):
                     if mOrDInAsNone: #If first case or changed mOrD
                         mOrD = item
                     elif mOrD.standardSymbol != item.standardSymbol: #If higher, different mOrD found
@@ -2596,7 +1644,7 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
             if isinstance(e, music21.medren.MensuralClef):
                 newStream.append(e)
             elif isinstance(e, music21.medren.Mensuration) or \
-            isinstance(e, music21.medren.Divisione):
+            isinstance(e, music21.trecento.notation.Divisione):
                 if mOrDInAsNone: #If first case or changed mOrD
                         mOrD = e
                         newStream.append(e)
@@ -2611,7 +1659,7 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
             elif isinstance(e, music21.medren.GeneralMensuralNote) and e not in mensuralMeasure:
                 m = music21.stream.Measure(number = measureNum)
                 
-                print '    Getting measure %s...' % measureNum
+                print 'Getting measure %s...' % measureNum
                 mensuralMeasure = e._getSurroundingMeasure(mOrD)[0]
                 for item in mensuralMeasure:
                     m.append(item)
@@ -2619,184 +1667,6 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
                 measureNum += 1 
             
     return newStream
-        
-def convertMensuralStream(inpStream, inpMOrD = None):
-    '''
-    Take one argument: input stream.
-    Converts an entire stream containing only mensural objects into one containing standard clef, note, and time signature objects.
-    The converted stream preserves the structure of the original stream, converting only the mensural objects.
-    
-    This stream must have all of the qualifications present in the documentation for :meth:`music21.medren.breakMensuralStreamIntoBrevisLengths`.
-    Furthermore, no non-mensural objects (other than streams and formatting) may be present in the input streams.
-    
-    Examples:
-    
-    .. image:: images/medren_SePerDureca.*
-        :width: 600
-    
-    Padova, Biblioteca Universitaria, manoscritto 1115, folio Ar
-
-    >>> from music21 import *
-    >>> SePerDureca = stream.Score()
-    >>> SePerDureca.append(text.TextBox('Se Per Dureca'))
-    >>> SePerDureca.metadata = metadata.Metadata()
-    >>> SePerDureca.metadata.title = 'Se Per Dureca'
-    >>>
-    >>> upper = stream.Part()
-    >>> lower = stream.Part()
-    >>>
-    >>> def processStream(mStream, pitches, lengths, downStems = []):
-    ...    pInd, lInd = 0, 0
-    ...    while lInd < len(lengths):
-    ...        if lengths[lInd] == 'P':
-    ...            mStream.append(medren.Punctus())
-    ...            lInd += 1
-    ...        else:
-    ...            if pitches[pInd] == 'R':
-    ...                mStream.append(medren.MensuralRest(lengths[lInd]))
-    ...            else:
-    ...                mn = medren.MensuralNote(pitches[pInd], lengths[lInd])
-    ...                if lInd in downStems:
-    ...                    mn.setStem('down')
-    ...                mStream.append(mn)
-    ...            lInd += 1
-    ...            pInd += 1
-    >>>
-    >>> pitches_upper_1 = ['G4','G4','F4','E4','G4','F4','E4','G4','F4','E4','D4','E4','F4','E4','E4','F4','E4','D4','C4','D4','R','E4','F4','E4','D4','E4','D4','C4','D4','C4','D4','C4','D4','E4','R','G4','F4','E4','G4','A4','G4','F4','E4','D4','E4','F4','E4','D4','C4','D4','E4']
-    >>> lengths_upper_1 = ['B','M','M','M','M','M','M','P','SB','SM','SM','SM','M','M','P','SB','SM','SM','SM','M','M','P','SB','SB','SB','P','M','M','M','M','M','M','P','SB','M','M','M','M','P','SB','M','M','M','M','P','SB','SM','SM','SM','M','M','P','SB','SM','SM','SM','M','M','P','L']
-    >>> pitches_upper_2 = ['A4','A4','B-4','A4','G4','A4','G4','F4','G4','F4','E4','F4','E4','F4','G4','G4','A4','G4','F4','E4','D4','E4','R','F4','E4','D4','E4','D4','R','E4','F4','G4','D4','R','E4','F4','E','D4','E4','D4','C4','D4','D4','E4','C4','D4','C4','D4','C4','B4','C4']
-    >>> lengths_upper_2 = ['SB','SB','P','M','M','M','M','M','M','P','M','M','M','M','M','M','P','SB','SM','SM','SM','SM','SM','SM','P','SB','M','SM','SM','SM','M','P','SB','SB','M','M','P','SB','SB','M','M','P','M','M','M','M','M','M','P','SB','M','SB','M','P','SB','M','M','M','M','P','L']
-    >>> pitches_upper_3 = ['C5','C5','C5','B4','A4','B4','C5','B4','C5','B4','A4','G4','A4','B4','A4','B4','G4','G4','A4','G4','F4','E4','D4','E4','R','E4','F4','G4','F4','E4','F4','E4','F4','G4','R','G4','F4','G4','F4','E4','D4','E4','F4','E4']
-    >>> lengths_upper_3 = ['SB','SB','P','SM','SM','SM','M','M','M','M','P','SM','SM','SM','M','M','M','M','P','SB','SM','SM','SM','SM','SM','SM','P','SB','SB','M','M','P','M','M','M','M','M','M','P','SB','SB','M','M','P','SB','SM','SM','SM','M','M','P','L']
-    >>> downStems_upper_3 = [0]
-    >>> pitches_upper_4 = ['A4','B4','A4','B4','G4','C5','B4','A4','C5','B4','A4','B4','C5','B4','A4','G4','A4','B4','C5','B4','A4','G4','F4','A4','A4','G4','F4','E4','R','G4','F4','G4','F4','E4','F4','E4','D4','C4','D4','R','A4','G4','A4','G4','F4','E4','D4','E4','R','F4','E4','D4','E4','D4']
-    >>> lengths_upper_4 = ['M','M','M','M','SB','P','M','M','M','M','M','M','P','M','M','M','M','M','M','P','SB','SM','SM','SM','M','M','P','SB','M','SB','M','P','SB','SB','M','M','P','M','M','M','M','M','M','P','SB','SB','SB','P','SB','SM','SM','SM','SM','SM','SM','P','M','M','SM','SM','SM','SB','P','Mx']
-    >>> pitches_lower_1 = ['C4','G3','A','B3','C4','D4','C4','R','A3','B3','C4','D4','C4','B3']
-    >>> lengths_lower_1 = ['L','B','SB','SB','SB','P','SB','SB','SB','P','SB','SB','SB','P','SB','SB','SB','P']
-    >>> lowerlig = medren.Ligature(['A4','B4'])
-    >>> lowerlig.makeOblique(0)
-    >>> lowerlig.setStem(0, 'down', 'left')
-    >>> pitches_lower_2 = ['A4','C5','B4','A4']
-    >>> lengths_lower_2 = ['SB','SB','SB','P','L']
-    >>> pitches_lower_3 = ['A4','A4','G4','A4','B4','C5','C5','B4','A4','G4','G4','A4','B4','C5','D5','A4','R','G4','A4','B4','B4','C5','C5','D5','D5','A4','A4','G4','A4','B4','C5']
-    >>> lengths_lower_3 = ['SB','SB','P','SB','SB','SB','P','SB','M','SB','M','P','SB','SB','P','SB','SB','SB','P','SB','SB','SB','P','SB','SB','P','SB','M','SB','M','P','SB','M','SB','M','P','SB','SB','SB','P','L']
-    >>> downStems_lower_3 = [23]
-    >>> pitches_lower_4 = ['C4','C4','E4','D4','C4','C4','D4','E4','D4','R','C4','C4','D4','D4','C4','R','R','C4','D4','C4','D4','E4']
-    >>> lengths_lower_4 = ['SB','SB','B','B','SB','SB','SB','P','SB','SB','SB','P','SB','M','SB','M','P','SB','SB','SB','P','SB','SB','M','M','L']
-    >>> downStems_lower_4 = [0]
-    >>> pitches_lower_5 = ['D4','E4','C4','D4','E4','E4','D4','C4','B3','A3','B3','C4','D4','D4','C4','D4','E4','D4','R','C4','C4','A3','B3','C4','B3','B3','A3','B3','A3','B3','C4','D4']
-    >>> lengths_lower_5 = ['SB','SB','P','SB','SB','P','SB','M','SB','M','P','SB','SB','M','M','P','SB','M','SB','M','P','SB','SB','SB','P','SB','M','SB','M','P','SB','SB','SB','P','SB','SB','P','SB','SB','SB','P','Mx'] 
-    >>> downStems_lower_5 = [0,3]
-    >>>
-    >>> SePerDureca.append(medren.Divisione('.p.'))
-    >>> upperClef = medren.MensuralClef('C')
-    >>> upperClef.line = 1
-    >>> lowerClef = medren.MensuralClef('C')
-    >>> lowerClef.line = 3
-    >>>
-    >>> upper.append(upperClef)
-    >>> processStream(upper, pitches_upper_1, lengths_upper_1)
-    >>> processStream(upper, pitches_upper_2, lengths_upper_2)
-    >>> processStream(upper, pitches_upper_3, lengths_upper_3, downStems_upper_3)
-    >>> processStream(upper, pitches_upper_4, lengths_upper_4)
-    >>> lower.append(lowerClef)
-    >>> processStream(lower, pitches_lower_1, lengths_lower_1)
-    >>> lower.append(lowerlig)
-    >>> processStream(lower, pitches_lower_2, lengths_lower_2)
-    >>> processStream(lower, pitches_lower_3, lengths_lower_3, downStems_lower_3)
-    >>> processStream(lower, pitches_lower_4, lengths_lower_4, downStems_lower_4)
-    >>> processStream(lower, pitches_lower_5, lengths_lower_5, downStems_lower_5)
-    >>>
-    >>> SePerDureca.append(upper)
-    >>> SePerDureca.append(lower)
-    >>>
-    >>> SePerDurecaConverted = medren.convertMensuralStream(SePerDureca)
-    Getting brevis lengths...
-    ...
-    >>> SePerDurecaConverted2 = medren.convertHouseStyle(SePerDurecaConverted, durationScale = 1, barlineStyle = 'tick')
-    >>> #_DOCS_HIDE SePerDurecaConverted2.show()
-    
-    .. image:: images/medren_SePerDurecaConverted.*
-        :width: 600
-    
-    '''
-    mOrD = inpMOrD
-
-    convertedStream = inpStream.__class__()
-    
-    print 'Getting brevis lengths...'
-    measuredStream = breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD)
-    
-    convertedStream.append(music21.clef.TrebleClef())
-    
-    for e in measuredStream:
-        
-        if isinstance(e, music21.medren.MensuralClef):
-            pass
-        
-        elif isinstance(e, music21.medren.Mensuration) or \
-        isinstance(e, music21.medren.Divisione):
-            mOrD = e
-            convertedStream.append(meter.TimeSignature(mOrD.timeString))
-        
-        elif isinstance(e, music21.stream.Measure):
-            print '    Converting measure %s' % e.number
-            measureList = convertMensuralMeasure(e, convertedStream, inpMOrD = mOrD)
-            for m in measureList:
-                convertedStream.append(m)
-            
-        elif isinstance(e, music21.stream.Stream):
-            print 'Converting stream %s' % e
-            convertedStream.append(music21.medren.convertMensuralStream(e, inpMOrD = mOrD))
-        
-        else:
-            convertedStream.append(e)
-    
-    return convertedStream
-
-def convertMensuralMeasure(mensuralMeasure, convertedStream, inpMOrD = None):
-    mOrD = inpMOrD
-    m = music21.stream.Measure()
-    measureList = []
-        
-    mList = mensuralMeasure.recurse()[1:]
-    tempTMM = _TranslateMensuralMeasure(mOrD, mList)    
-    
-    lenList = tempTMM.getMinimaLengths()
-    
-    for item in mList:
-        if isinstance(item, Mensuration) or \
-        isinstance(item, Divisione):
-            if mOrD is None:
-                mOrD = item
-            else:
-                raise MedRenException('Mensuration or divisione %s not consistent within heirarchy' % e) #Should already be caught by medren.breakMensuralStreamIntoBrevisLengths, but just in case...
-    mDur = 0
-    if mOrD is not None:
-        if mensuralMeasure.number == 0:
-            m.append(meter.TimeSignature(mOrD.timeString)) #Trusting that mensuration won't change while one voice is holding.
-        if mOrD.standardSymbol in ['.o.', '.d.']:
-            mDur = 0.25
-        else:
-            mDur = 0.5
-    else:
-        raise MedRenException('Cannot find or determine mensuration or divisione')
-    
-    for i in range(len(mList)):
-        if isinstance(mList[i], MensuralRest):
-            n = music21.note.Rest()
-        elif isinstance(mList[i], MensuralNote):
-            n = music21.note.Note(mList[i].pitch)
-        
-        n.duration = duration.Duration(lenList[i]*mDur)          
-        m.append(n) 
-        
-        measureList = [m]
-        if lenList[i] > mOrD.minimaPerBrevis:
-            for i in range(int(lenList[i]/mOrD.minimaPerBrevis)-1):
-                measureList.append(music21.stream.Measure())
-
-    return measureList
 #-----------------------------------------------------------------------------------------------------------------------------------------               
 def setBarlineStyle(score, newStyle, oldStyle = 'regular', inPlace = True):
     '''
@@ -2981,6 +1851,7 @@ class Test(unittest.TestCase):
         pass
    
 class TestExternal(unittest.TestCase):
+    
         
     def runTest(self):
         pass    
@@ -3034,7 +1905,6 @@ class TestExternal(unittest.TestCase):
         gloria = corpus.parse('luca/gloria')
         gloriaNew = convertHouseStyle(gloria)
         gloriaNew.show()
-
 
 def testStretto():
     from music21 import converter
