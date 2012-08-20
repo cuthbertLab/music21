@@ -9,10 +9,10 @@
 #-------------------------------------------------------------------------------
 
 import collections
-import music21
 import unittest
 
 from music21.braille import lookup
+from music21 import exceptions21
 
 symbols = lookup.symbols
 binary_dots = lookup.binary_dots
@@ -386,7 +386,7 @@ class BrailleTextLine():
     
 #-------------------------------------------------------------------------------        
 
-class BrailleTextException(music21.Music21Exception):
+class BrailleTextException(exceptions21.Music21Exception):
     pass
     
 #-------------------------------------------------------------------------------
@@ -397,6 +397,7 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

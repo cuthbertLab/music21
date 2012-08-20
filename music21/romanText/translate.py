@@ -119,9 +119,9 @@ OMIT_FROM_DOCS
 [F#5, A5, C6]
 '''
 import unittest
-import music21
 import copy
 
+from music21 import base
 from music21 import common
 from music21 import repeat
 from music21 import bar
@@ -136,7 +136,7 @@ environLocal = environment.Environment(_MOD)
 class RomanTextTranslateException(Exception):
     pass
 
-class RomanTextUnprocessedToken(music21.ElementWrapper):
+class RomanTextUnprocessedToken(base.ElementWrapper):
     pass
 
 def _copySingleMeasure(t, p, kCurrent):
@@ -945,9 +945,10 @@ _DOC_ORDER = []
 
 
 if __name__ == "__main__":
-    from music21 import converter
-    r = converter.parse('d:/desktop/riemenschneider001.txt', format='romantext')
-    #music21.mainTest(Test)
+    import music21
+    #from music21 import converter
+    #r = converter.parse('d:/desktop/riemenschneider001.txt', format='romantext')
+    music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof

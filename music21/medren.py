@@ -14,13 +14,21 @@ trecento directory which works particularly on 14th-century Italian
 music. Objects representing the punctus and the divisione can be found there.
 '''
 import copy
-import music21
+
+from music21 import bar
+from music21 import base
+from music21 import clef
 from music21 import common
 from music21 import duration
+from music21 import exceptions21
 from music21 import interval
 from music21 import meter
 from music21 import note
+from music21 import pitch
+from music21 import stream
 from music21 import tempo
+from music21 import trecento
+
 import unittest, doctest
 
 allowableStrettoIntervals = { 
@@ -113,7 +121,7 @@ _validMensuralAbbr = [None, 'Mx', 'L', 'B', 'SB', 'M', 'SM']
 #===============================================================================
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-class MensuralClef(music21.clef.Clef):
+class MensuralClef(clef.Clef):
     '''
     An object representing a mensural clef found in medieval and Renaissance music.
     
@@ -126,7 +134,7 @@ class MensuralClef(music21.clef.Clef):
     '''
     
     def __init__(self, sign = 'C'):
-        music21.clef.Clef.__init__(self)
+        clef.Clef.__init__(self)
         self._line = None
         
         if sign == 'C':
@@ -249,7 +257,7 @@ class Mensuration(meter.TimeSignature):
 #    def _setScalingFactor(self, newScalingFactor):
 #        pass
 
-class GeneralMensuralNote(music21.base.Music21Object):
+class GeneralMensuralNote(base.Music21Object):
     '''
     The base class object for :class:`music21.medren.MensuralNote` and :class:`music21.medren.MensuralRest`. This is arguably the most important mensural object, since it is responsible for getting the context and determining the contextual duration of objects within both subclasses.
     A :class:`musci21.medren.GeneralMensuralNote` object takes a mensural type or its abbreviation as an argument. The default value for this argument is 'brevis'.
@@ -264,7 +272,7 @@ class GeneralMensuralNote(music21.base.Music21Object):
     '''
     def __init__(self, mensuralTypeOrAbbr = 'brevis'):
         self._gettingDuration = False
-        music21.base.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
         self._duration = None
         if mensuralTypeOrAbbr in _validMensuralTypes:
             self._mensuralType = mensuralTypeOrAbbr
@@ -401,9 +409,9 @@ class GeneralMensuralNote(music21.base.Music21Object):
         mOrD = self._determineMensurationOrDivisione()
         measure, index = self._getSurroundingMeasure()
         TMM = None
-        if len(measure) > 0 and isinstance(mOrD, music21.trecento.notation.Divisione):
+        if len(measure) > 0 and isinstance(mOrD, trecento.notation.Divisione):
             if index == 0:
-                TMM = music21.trecento.notation.TranslateBrevisLength(mOrD, measure)
+                TMM = trecento.notation.TranslateBrevisLength(mOrD, measure)
             elif index != -1:
                 TMM = measure[0]._getTranslator()
         return TMM
@@ -431,8 +439,8 @@ class GeneralMensuralNote(music21.base.Music21Object):
         <music21.trecento.notation.Divisione .q.>
         '''
         
-        #mOrD = music21.medren._getTargetBeforeOrAtObj(self, [music21.medren.Mensuration, music21.trecento.notation.Divisione])
-        searchClasses = (music21.medren.Mensuration, music21.trecento.notation.Divisione)
+        #mOrD = music21.medren._getTargetBeforeOrAtObj(self, [Mensuration, trecento.notation.Divisione])
+        searchClasses = (Mensuration, trecento.notation.Divisione)
         mOrD = self.getContextByClass(searchClasses)
         if mOrD is not None:
             return mOrD
@@ -490,18 +498,19 @@ class GeneralMensuralNote(music21.base.Music21Object):
                 currentindex = 0
             else:
                 tempList = site.recurse()[1:]
-                if isinstance(site, music21.stream.Measure):
+                if isinstance(site, stream.Measure):
                     mList += tempList
                 else:
                     tempList = self.activeSite
                     currentIndex = int(tempList.index(self)) 
                     for i in range(currentIndex-1, -1, -1):
                         # Punctus and ligature marks indicate a new measure
-                        if isinstance(tempList[i], music21.trecento.notation.Punctus) or isinstance(tempList[i], music21.medren.Ligature):
+                        if isinstance(tempList[i], trecento.notation.Punctus) or \
+                            isinstance(tempList[i], Ligature):
                             break
-                        if isinstance(tempList[i], music21.medren.GeneralMensuralNote):
+                        if isinstance(tempList[i], GeneralMensuralNote):
                             # In Italian notation, brevis, longa, and maxima indicate a new measure
-                            if (isinstance(mOrD, music21.trecento.notation.Divisione) and
+                            if (isinstance(mOrD, trecento.notation.Divisione) and
                                 tempList[i].mensuralType in ['brevis', 'longa', 'maxima']):
                                 break
                             else:
@@ -509,10 +518,11 @@ class GeneralMensuralNote(music21.base.Music21Object):
                     mList.reverse()
                     mList.insert(currentIndex, self)
                     for j in range(currentIndex+1,len(tempList), 1):
-                        if isinstance(tempList[j], music21.trecento.notation.Punctus) or isinstance(tempList[j], music21.medren.Ligature):
+                        if isinstance(tempList[j], trecento.notation.Punctus) or \
+                            isinstance(tempList[j], Ligature):
                             break
-                        if isinstance(tempList[j], music21.medren.GeneralMensuralNote):
-                            if (isinstance(mOrD, music21.trecento.notation.Divisione) and
+                        if isinstance(tempList[j], GeneralMensuralNote):
+                            if (isinstance(mOrD, trecento.notation.Divisione) and
                                 tempList[j].mensuralType in ['brevis', 'longa', 'maxima']):
                                 break
                             else:
@@ -524,7 +534,7 @@ class GeneralMensuralNote(music21.base.Music21Object):
         
         return mList, index
             
-class MensuralRest(GeneralMensuralNote, music21.note.Rest):
+class MensuralRest(GeneralMensuralNote, note.Rest):
     '''
     An object representing a mensural rest. First argument is mensural type.
     The utf-8 code for the Ciconia font character can be accessed via the property :attr:`music21.medren.MensuralNote.fontString`
@@ -535,7 +545,7 @@ class MensuralRest(GeneralMensuralNote, music21.note.Rest):
     # scaling?
     def __init__(self, *arguments, **keywords):
         self._gettingDuration = False
-        music21.note.Rest.__init__(self, *arguments, **keywords)
+        note.Rest.__init__(self, *arguments, **keywords)
         
         self._mensuralType = 'brevis'
         
@@ -583,7 +593,7 @@ class MensuralRest(GeneralMensuralNote, music21.note.Rest):
                             '0x32'
                             ''')
 
-class MensuralNote(GeneralMensuralNote, music21.note.Note):
+class MensuralNote(GeneralMensuralNote, note.Note):
     '''
     An object representing a mensural note commonly found in medieval and renaissance music.
     Takes pitch and mensural type as arguments, but defaults to 'C' and 'brevis'.
@@ -604,7 +614,7 @@ class MensuralNote(GeneralMensuralNote, music21.note.Note):
     # scaling? 
     def __init__(self, *arguments, **keywords):
         self._gettingDuration = False        
-        music21.note.Note.__init__(self, *arguments, **keywords)
+        note.Note.__init__(self, *arguments, **keywords)
         self._mensuralType = 'brevis'    
         
         if len(arguments) > 1:
@@ -649,7 +659,7 @@ class MensuralNote(GeneralMensuralNote, music21.note.Note):
         False
         '''
         
-        eq = music21.medren.GeneralMensuralNote.__eq__(self, other)
+        eq = GeneralMensuralNote.__eq__(self, other)
         eq  = eq and hasattr(other, 'pitch')
         if eq:
             eq = eq and (self.pitch == other.pitch)
@@ -750,11 +760,11 @@ class MensuralNote(GeneralMensuralNote, music21.note.Note):
     
     def _setColor(self, value):
         if value in ['black', 'red']:
-            music21.note.Note._setColor(self, value)
+            note.Note._setColor(self, value)
         else:
             raise MedRenException('color %s not supported for mensural notes' % value)
     
-    color = property(music21.note.GeneralNote._getColor, _setColor,
+    color = property(note.GeneralNote._getColor, _setColor,
                      doc = '''The only valid colors for mensural notes are red and black
                      
                      >>> from music21 import *
@@ -915,8 +925,7 @@ class MensuralNote(GeneralMensuralNote, music21.note.Note):
             raise MedRenException('a flag cannot be added to a stem with direction %s' % stemDirection)  
         
         
-class Ligature(music21.base.Music21Object):
-    
+class Ligature(base.Music21Object):
     '''
     An object that represents a ligature commonly found in medieval and Renaissance music. 
     Initialization takes a list of the pitches in the ligature as a required argument.
@@ -971,24 +980,26 @@ class Ligature(music21.base.Music21Object):
     '''
 
     def __init__(self, pitches = None, color = 'black', filled = 'yes'):
+        base.Music21Object.__init__(self)
         self._pitches = []
         
         if pitches is not None:
             self.pitches = pitches
         
         self._notes = []
+        self.color = color
+        self.filled = filled
         
-        music21.base.Music21Object.__init__(self)
     
     def _getPitches(self):
         return self._pitches
     
     def _setPitches(self, pitches):
         for p in pitches:
-                if isinstance(p, music21.pitch.Pitch):
+                if isinstance(p, pitch.Pitch):
                     self._pitches.append(p)
                 else:
-                    self._pitches.append(music21.pitch.Pitch(p))
+                    self._pitches.append(pitch.Pitch(p))
         
         self.noteheadShape = dict([(ind, 'square') for ind in range(self._ligatureLength())])
         self.stems = dict([(ind, (None,None)) for ind in range(self._ligatureLength())])
@@ -1463,66 +1474,66 @@ class Ligature(music21.base.Music21Object):
             raise MedRenException('Ligatures must contain at least two notes')
             
         if self.getStem(ind)[0] == 'up':
-            notes.append(music21.medren.MensuralNote(self.pitches[ind], 'semibrevis'))
-            notes.append(music21.medren.MensuralNote(self.pitches[ind+1], 'semibrevis'))
+            notes.append(MensuralNote(self.pitches[ind], 'semibrevis'))
+            notes.append(MensuralNote(self.pitches[ind+1], 'semibrevis'))
             ind += 2
         elif self.getStem(ind)[0] == 'down':
             if self.getNoteheadShape(ind) == 'oblique':
-                notes.append(music21.medren.MensuralNote(self.pitches[ind], 'brevis'))
+                notes.append(MensuralNote(self.pitches[ind], 'brevis'))
             else:
                 if self.pitches[ind+1] < self.pitches[ind]:
-                    notes.append(music21.medren.MensuralNote(self.pitches[ind], 'brevis'))
+                    notes.append(MensuralNote(self.pitches[ind], 'brevis'))
                 else:
-                    notes.append(music21.medren.MensuralNote(self.pitches[ind], 'longa'))
+                    notes.append(MensuralNote(self.pitches[ind], 'longa'))
             ind += 1
         else:
             if self.isMaxima(ind):
-                notes.append(music21.medren.MensuralNote(self.pitches[ind], 'maxima'))
+                notes.append(MensuralNote(self.pitches[ind], 'maxima'))
             else:
                 if self.getNoteheadShape(ind) == 'oblique':
-                    notes.append(music21.medren.MensuralNote(self.pitches[ind], 'longa'))
+                    notes.append(MensuralNote(self.pitches[ind], 'longa'))
                 else:
                     if self.pitches[ind+1] < self.pitches[ind]:
-                        notes.append(music21.medren.MensuralNote(self.pitches[ind], 'longa'))
+                        notes.append(MensuralNote(self.pitches[ind], 'longa'))
                     else:
-                        notes.append(music21.medren.MensuralNote(self.pitches[ind], 'brevis'))
+                        notes.append(MensuralNote(self.pitches[ind], 'brevis'))
             ind += 1
             
         while ind < self._ligatureLength()-1:
             if self.getStem(ind)[0] == 'up':
-                notes.append(music21.medren.MensuralNote(self.pitches[ind],  'semibrevis'))
-                notes.append(music21.medren.MensuralNote(self.pitches[ind+1], 'semibrevis'))
+                notes.append(MensuralNote(self.pitches[ind],  'semibrevis'))
+                notes.append(MensuralNote(self.pitches[ind+1], 'semibrevis'))
                 ind += 2
             elif self.getStem(ind)[0] == 'down':
-                notes.append(music21.medren.MensuralNote(self.pitches[ind], 'longa'))
+                notes.append(MensuralNote(self.pitches[ind], 'longa'))
                 ind += 1
             else:
                 if self.isMaxima(ind):
-                    notes.append(music21.medren.MensuralNote(self.pitches[ind], 'maxima'))
+                    notes.append(MensuralNote(self.pitches[ind], 'maxima'))
                 else:
-                    notes.append(music21.medren.MensuralNote(self.pitches[ind], 'brevis'))
+                    notes.append(MensuralNote(self.pitches[ind], 'brevis'))
                 ind += 1
         
         if ind == self._ligatureLength() - 1:
             if self.getStem(ind)[0] == 'down':
                 if self.getNoteheadShape(ind) == 'oblique':
-                    notes.append(music21.medren.MensuralNote(self.pitches[ind], 'longa'))
+                    notes.append(MensuralNote(self.pitches[ind], 'longa'))
                 else:
                     if self.pitches[ind-1] < self.pitches[ind]:
-                        notes.append(music21.medren.MensuralNote(self.pitches[ind], 'longa'))
+                        notes.append(MensuralNote(self.pitches[ind], 'longa'))
                     else:
-                        notes.append(music21.medren.MensuralNote(self.pitches[ind], 'brevis'))
+                        notes.append(MensuralNote(self.pitches[ind], 'brevis'))
             else:
                 if self.isMaxima(ind):
-                    notes.append(music21.medren.MensuralNote(self.pitches[ind], 'maxima'))
+                    notes.append(MensuralNote(self.pitches[ind], 'maxima'))
                 else:
                     if self.getNoteheadShape(ind) == 'oblique':
-                        notes.append(music21.medren.MensuralNote(self.pitches[ind], 'brevis'))
+                        notes.append(MensuralNote(self.pitches[ind], 'brevis'))
                     else:
                         if self.pitches[ind-1] < self.pitches[ind]:
-                            notes.append(music21.medren.MensuralNote(self.pitches[ind], 'brevis'))
+                            notes.append(MensuralNote(self.pitches[ind], 'brevis'))
                         else:
-                            notes.append(music21.medren.MensuralNote(self.pitches[ind], 'longa'))
+                            notes.append(MensuralNote(self.pitches[ind], 'longa'))
             
         return notes
     
@@ -1606,21 +1617,21 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
     newStream = inpStream.__class__()
          
     def isHigherInHeirarchy(l, u):
-        heirarchy = [music21.stream.Stream, music21.stream.Score,  music21.stream.Part, music21.stream.Measure]
+        heirarchy = [stream.Stream, stream.Score,  stream.Part, stream.Measure]
         if heirarchy.index(u.__class__) == 0:
             return False
         else:
             return heirarchy.index(l.__class__) <= heirarchy.index(u.__class__)
     
-    tempStream_1, tempStream_2 = inpStream_copy.splitByClass(None, lambda x: isinstance(x, music21.stream.Stream))
+    tempStream_1, tempStream_2 = inpStream_copy.splitByClass(None, lambda x: isinstance(x, stream.Stream))
     if len(tempStream_1) > 0:
-        if len(tempStream_2) > 0 and tempStream_2.hasElementOfClass(music21.medren.GeneralMensuralNote):
+        if len(tempStream_2) > 0 and tempStream_2.hasElementOfClass(GeneralMensuralNote):
             raise MedRenException('cannot combine objects of type %s, %s within stream' % (tempStream_1[0].__class__, tempStream_2[0].__class__))
         else:
             for item in tempStream_2:
                 newStream.append(item)
-                if isinstance(item, music21.medren.Mensuration) or \
-                isinstance(item, music21.trecento.notation.Divisione):
+                if isinstance(item, Mensuration) or \
+                    isinstance(item, trecento.notation.Divisione):
                     if mOrDInAsNone: #If first case or changed mOrD
                         mOrD = item
                     elif mOrD.standardSymbol != item.standardSymbol: #If higher, different mOrD found
@@ -1631,33 +1642,33 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
                 raise MedRenException('Hierarchy of %s violated by %s' % (tempStream_1.__class__, tempStream_1_1[0].__class__))
             elif len(tempStream_1_2) > 0:
                 for e in tempStream_1_2:
-                    if isinstance(e, music21.stream.Measure):
+                    if isinstance(e, stream.Measure):
                         newStream.append(e)
                     else:
-                        newStream.append(music21.medren.breakMensuralStreamIntoBrevisLengths(e, mOrD))
+                        newStream.append(breakMensuralStreamIntoBrevisLengths(e, mOrD))
     else:
         measureNum = 0
         mensuralMeasure = []
         
         for e in inpStream_copy:
             
-            if isinstance(e, music21.medren.MensuralClef):
+            if isinstance(e, MensuralClef):
                 newStream.append(e)
-            elif isinstance(e, music21.medren.Mensuration) or \
-            isinstance(e, music21.trecento.notation.Divisione):
+            elif isinstance(e, Mensuration) or \
+                 isinstance(e, trecento.notation.Divisione):
                 if mOrDInAsNone: #If first case or changed mOrD
                         mOrD = e
                         newStream.append(e)
                 elif mOrD.standardSymbol != e.standardSymbol: #If higher, different mOrD found 
                     raise MedRenException('Mensuration or divisione %s not consistent within heirarchy' % e)
-            elif isinstance(e, music21.medren.Ligature):
-                tempStream = music21.stream.Stream()
+            elif isinstance(e, Ligature):
+                tempStream = stream.Stream()
                 for mn in e.notes:
                     tempStream.append(mn)
-                for m in music21.medren.breakMensuralStreamIntoBrevisLengths(tempStream):
+                for m in breakMensuralStreamIntoBrevisLengths(tempStream):
                     newStream.append(m)
-            elif isinstance(e, music21.medren.GeneralMensuralNote) and e not in mensuralMeasure:
-                m = music21.stream.Measure(number = measureNum)
+            elif isinstance(e, GeneralMensuralNote) and e not in mensuralMeasure:
+                m = stream.Measure(number = measureNum)
                 
                 print 'Getting measure %s...' % measureNum
                 mensuralMeasure = e._getSurroundingMeasure(mOrD)[0]
@@ -1667,6 +1678,7 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
                 measureNum += 1 
             
     return newStream
+
 #-----------------------------------------------------------------------------------------------------------------------------------------               
 def setBarlineStyle(score, newStyle, oldStyle = 'regular', inPlace = True):
     '''
@@ -1683,10 +1695,10 @@ def setBarlineStyle(score, newStyle, oldStyle = 'regular', inPlace = True):
     
     oldStyle = oldStyle.lower()
     for m in score.semiFlat:
-        if isinstance(m, music21.stream.Measure):
+        if isinstance(m, stream.Measure):
             barline = m.rightBarline
             if barline is None:
-                m.rightBarline = music21.bar.Barline(style = newStyle)
+                m.rightBarline = bar.Barline(style = newStyle)
             else:
                 if barline.style == oldStyle:
                     barline.style = newStyle
@@ -1842,7 +1854,7 @@ def cummingSchubertStrettoFuga(score):
         print ("%2d\t%3d\t%2d%%" % (l, strettoKeys[l], strettoKeys[l]*100/len(sn)-1))
     print "\n"
         
-class MedRenException(music21.Music21Exception):
+class MedRenException(exceptions21.Music21Exception):
     pass
 
 class Test(unittest.TestCase):
@@ -1886,7 +1898,7 @@ class TestExternal(unittest.TestCase):
         s.append([n1, n2])
 
     def xtestPythagSharps(self):
-        from music21 import corpus
+        from music21 import corpus, midi
         gloria = corpus.parse('luca/gloria')
         p = gloria.parts[0].flat
         for n in p.notes:
@@ -1896,7 +1908,7 @@ class TestExternal(unittest.TestCase):
                 n.pitch.microtone = 20
             elif n.step != 'B' and n.accidental is not None and n.accidental.name == 'flat':
                 n.pitch.microtone = -20
-        mts = music21.midi.translate.streamsToMidiTracks(p)
+        mts = midi.translate.streamsToMidiTracks(p)
 
         p.show('midi')
 
@@ -1918,7 +1930,8 @@ def testStretto():
         cummingSchubertStrettoFuga(piece)        
 
 if __name__ == '__main__':
-    music21.mainTest(TestExternal) #TestExternal)
+    import music21
+    music21.mainTest(Test) #TestExternal)
     #music21.medren.testConvertMensuralMeasure()
 #    almaRedemptoris = converter.parse("C4 E F G A G G G A B c G", '4/4') #liber 277 (pdf401)
 #    puer = converter.parse('G4 d d d e d c c d c e d d', '4/4') # puer natus est 408 (pdf 554)

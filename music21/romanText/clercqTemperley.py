@@ -16,7 +16,6 @@ The Clercq-Temperley file format and additional rock corpus analysis
 information may be located at http://theory.esm.rochester.edu/rock_corpus/
 
 '''
-import music21
 import re
 import copy
 import unittest
@@ -443,16 +442,18 @@ class CTSong(object):
     
     
     def _setHomeTimeSig(self, value):
+        from music21 import meter
         if hasattr(value, 'classes') and 'TimeSignature' in value.classes:
             self._homeTimeSig = value
             return
         try:
-            self._homeTimeSig = music21.meter.TimeSignature(value)
+            self._homeTimeSig = meter.TimeSignature(value)
             return
         except:
             raise CTSongException('not a valid time signature: %s' % value)
 
     def _getHomeTimeSig(self):
+        from music21 import meter
         #look at 'S' Rule and grab the home time Signature
         if self.text and 'S:' in self.text:
             lines = self.text.split('\n')
@@ -460,10 +461,10 @@ class CTSong(object):
                 if line.startswith('S:'):
                     for atom in line.split()[1:3]:
                         if '[' not in atom:
-                            self._homeTimeSig = music21.meter.TimeSignature('4/4')
+                            self._homeTimeSig = meter.TimeSignature('4/4')
                             return self._homeTimeSig
                         elif '/' in atom:
-                            self._homeTimeSig = music21.meter.TimeSignature(atom[1:-1])
+                            self._homeTimeSig = meter.TimeSignature(atom[1:-1])
                             return self._homeTimeSig
                         else:
                             pass
@@ -482,17 +483,19 @@ class CTSong(object):
     
 
     def _setHomeKeySig(self, value):
+        from music21 import key
         if hasattr(value, 'classes') and 'Key' in value.classes:
             self._homeKeySigSig = value
             return
         try:
-            m21keyStr = music21.key.convertKeyStringToMusic21KeyString(value)
-            self._homeKeySigSig = music21.key.Key(m21keyStr)
+            m21keyStr = key.convertKeyStringToMusic21KeyString(value)
+            self._homeKeySigSig = key.Key(m21keyStr)
             return
         except:
             raise CTSongException('not a valid key signature: %s' % value)
 
     def _getHomeKeySig(self):
+        from music21 import key
         #look at 'S' Rule and grab the home key Signature
         if self.text and 'S:' in self.text:
             lines = self.text.split('\n')
@@ -500,11 +503,11 @@ class CTSong(object):
                 if line.startswith('S:'):
                     for atom in line.split()[1:3]:
                         if '[' not in atom:
-                            self.homeKeySig = music21.key.Key('C')
+                            self.homeKeySig = key.Key('C')
                             return self._homeKeySigSig
                         elif not '/' in atom:
-                            m21keyStr = music21.key.convertKeyStringToMusic21KeyString(atom[1:-1])
-                            self._homeKeySigSig = music21.key.Key(m21keyStr)
+                            m21keyStr = key.convertKeyStringToMusic21KeyString(atom[1:-1])
+                            self._homeKeySigSig = key.Key(m21keyStr)
                             return self._homeKeySigSig
                         else:
                             pass
@@ -547,6 +550,8 @@ class CTSong(object):
         signature the character being analyzed is in
     
         '''
+        from music21 import meter
+        
         starters = ['I', '#', 'B', 'V', 'R', '.']
         starters2 = ['I', '#', 'B', 'V', 'R', '.', '[']
         searchlocation = containsIndex - 1
@@ -556,7 +561,7 @@ class CTSong(object):
         if atomBeingSearched[0].upper() in starters and not atomBeingSearched.endswith(':'):
             while previouschar[0].upper() in starters2 and not previouschar.endswith(':'):
                 if previouschar.startswith('[') and "/" in previouschar:
-                    timeSig = music21.meter.TimeSignature(previouschar[1:-1])
+                    timeSig = meter.TimeSignature(previouschar[1:-1])
                 elif previouschar.startswith('['): #could be a key
                     pass
                 else:
@@ -638,7 +643,13 @@ class CTSong(object):
         If there's a parsing error related to missing key signatures or time signatures, 
         it's probably here or in the methods this method depends on.
         '''
-        outputStream = music21.stream.Stream()
+        from music21 import stream
+        from music21 import meter
+        from music21 import key
+        from music21 import roman
+        from music21 import tie
+        
+        outputStream = stream.Stream()
         index = -1
         starters = ['I', '#', 'B', 'V']
         dur = 0
@@ -647,22 +658,22 @@ class CTSong(object):
             index = index + 1
             if expressionString:
                 if x.startswith('[') and "/" in x:
-                    timeSig = music21.meter.TimeSignature(x[1:-1])
+                    timeSig = meter.TimeSignature(x[1:-1])
                     outputStream.append(timeSig)
                 elif x.startswith('['):
-                    m21keyStr = music21.key.convertKeyStringToMusic21KeyString(x[1:-1])
-                    currentKey = music21.key.Key(m21keyStr)
+                    m21keyStr = key.convertKeyStringToMusic21KeyString(x[1:-1])
+                    currentKey = key.Key(m21keyStr)
                     outputStream.append(currentKey)
                 elif x[0].upper() in starters:
-                    rn = music21.roman.RomanNumeral(atom, currentKey)
+                    rn = roman.RomanNumeral(atom, currentKey)
                     rn.duration.quarterLength = self._getDuration(indexofatom, splitFile, timeSig)
                     outputStream.append(rn)
                     if self._stringhasDotsandBars(expressionString):
                         for x in rn.pitches:
-                            rn.setTie(music21.tie.Tie('start'), x) 
+                            rn.setTie(tie.Tie('start'), x) 
                 elif x == '|':
                     if self._stringhasDotsandBars(expressionString) and expressionString.split()[index - 2] == '|' :
-                        z = music21.roman.RomanNumeral(atom, currentKey)
+                        z = roman.RomanNumeral(atom, currentKey)
                         z.duration.quarterLength = timeSig.totalLength
                         outputStream.append(z)
                     elif self._barIsDouble(index, expressionString) and not self._stringhasDotsandBars(expressionString):
@@ -678,7 +689,7 @@ class CTSong(object):
                     pass
                 
         if pleaseAppend:
-            xy = music21.roman.RomanNumeral(atom, currentKey)
+            xy = roman.RomanNumeral(atom, currentKey)
             xy.duration.quarterLength = dur
             outputStream.append(xy)
         outputStream = outputStream.makeMeasures(finalBarline = None)
@@ -689,9 +700,9 @@ class CTSong(object):
             if expressionString:
                 if x.startswith('[') and "/" in x:
                     
-                    timeSig = music21.meter.TimeSignature(x[1:-1])
+                    timeSig = meter.TimeSignature(x[1:-1])
                     try:
-                        currentTimeSig = outputStream.measure(measureNumber).flat.getElementsByClass(music21.meter.TimeSignature)[0]
+                        currentTimeSig = outputStream.measure(measureNumber).flat.getElementsByClass(meter.TimeSignature)[0]
                         if str(currentTimeSig) != str(timeSig):
                             
                             outputStream.remove(currentTimeSig)
@@ -707,7 +718,7 @@ class CTSong(object):
                             #I | [2/4] | [4/4] . . .
                             #where the I is really IV I in the previous measure
                             
-                            newM = music21.stream.Measure()
+                            newM = stream.Measure()
                             newM.timeSignature = timeSig
                             outputStream.append(newM)
                             outputStream = outputStream.makeMeasures(finalBarline = None)
@@ -727,7 +738,7 @@ class CTSong(object):
         keys it finds..cleans up the stream a bit!
         Method called at the end of toScore()
         '''
-        keyList = scoreObj.flat.getElementsByClass(music21.key.KeySignature)
+        keyList = scoreObj.flat.getElementsByClass("KeySignature")
         index = 0
         if len(keyList) > 1:
             for x in keyList[1:]:
@@ -742,7 +753,7 @@ class CTSong(object):
         time signatures it finds..cleans up the stream a bit!
         method called at the end of toScore()
         '''
-        timeList = scoreObj.flat.getElementsByClass(music21.meter.TimeSignature)
+        timeList = scoreObj.flat.getElementsByClass("TimeSignature")
         index = 0
         if len(timeList) > 1:
             for x in timeList[1:]:
@@ -758,7 +769,7 @@ class CTSong(object):
         clefs it finds..cleans up the stream a bit!
         method called at the end of toScore()
         '''
-        for x in scoreObj.flat.getElementsByClass(music21.clef.TrebleClef):
+        for x in scoreObj.flat.getElementsByClass("TrebleClef"):
             scoreObj.remove(x)
         scoreObj.insert(0, music21.clef.TrebleClef())
         return scoreObj
@@ -771,7 +782,7 @@ class CTSong(object):
         doesn't relabel tied roman numeral chords.
         '''
         lastel = music21.roman.RomanNumeral(None, None)
-        for el in scoreObj.flat.getElementsByClass(music21.roman.RomanNumeral):
+        for el in scoreObj.flat.getElementsByClass("RomanNumeral"):
             if el.tie == None:
                 el.insertLyric(el.figure)
             elif lastel.figure != el.figure and el.figure != None:
@@ -798,7 +809,14 @@ class CTSong(object):
         380.0
     
         '''
-        scoreObj = music21.stream.Stream() 
+        from music21 import stream
+        from music21 import meter
+        from music21 import key
+        from music21 import roman
+        from music21 import note
+        from music21 import metadata
+        
+        scoreObj = stream.Stream() 
  
         allSubsections = {}
         currentSubsectionName = None
@@ -835,19 +853,19 @@ class CTSong(object):
         for x in splitFile[splitFile.index('S:') : splitFile.index('S:') + 3]:
             atomContents = x[1:-1]
             if x.startswith('[') and '/' in x:
-                homeTimeSig = music21.meter.TimeSignature(atomContents)
+                homeTimeSig = meter.TimeSignature(atomContents)
                 self._homeTimeSig = homeTimeSig
                 firsttimeSigFound = True
             elif x.startswith('[') and not '/' in x:
-                m21keyStr = music21.key.convertKeyStringToMusic21KeyString(atomContents)
-                homeKey = music21.key.Key(m21keyStr)
+                m21keyStr = key.convertKeyStringToMusic21KeyString(atomContents)
+                homeKey = key.Key(m21keyStr)
                 self._homeKeySigSig = homeKey
                 firstKeyFound = True
         if firsttimeSigFound == False:
-            homeTimeSig = music21.meter.TimeSignature('4/4')
+            homeTimeSig = meter.TimeSignature('4/4')
              
         if firstKeyFound == False:
-            homeKey = music21.key.Key('C')
+            homeKey = key.Key('C')
             #if no key set, make homeKey C Major
             
         #now just check to make sure time sig doesn't change in main strain....should
@@ -861,16 +879,16 @@ class CTSong(object):
             indexofatom = indexofatom + 1
             for element, temptime in timeSigList:
                 if atom.replace(':','') == element.replace('$',''):
-                    currentTimeSig = music21.meter.TimeSignature(temptime)
+                    currentTimeSig = meter.TimeSignature(temptime)
                     
             if indexofatom < jumpForwardIndexValue:
                 if atom.startswith('[') and atom.endswith(']'):
                     atomContents = atom[1:-1]
                     if re.match('[a-zA-Z]', atomContents):
-                        m21keyStr = music21.key.convertKeyStringToMusic21KeyString(atomContents)
-                        currentKey = music21.key.Key(m21keyStr)
+                        m21keyStr = key.convertKeyStringToMusic21KeyString(atomContents)
+                        currentKey = key.Key(m21keyStr)
                     else: 
-                        currentTimeSig = music21.meter.TimeSignature(atomContents)
+                        currentTimeSig = meter.TimeSignature(atomContents)
                 continue
     
             else:
@@ -886,7 +904,7 @@ class CTSong(object):
                                 referencedSubsection = match.group(1)
                             else:
                                 numRepeat = 1
-                            tempStream = music21.stream.Stream()
+                            tempStream = stream.Stream()
                             for i in range(numRepeat):
                                 for refEl in allSubsections[referencedSubsection]:
                                     tempStream.append(copy.deepcopy(refEl))
@@ -903,7 +921,7 @@ class CTSong(object):
                         currentSubsectionName = 'S'
                         currentSubsectionContents = scoreObj
                     else:
-                        currentSubsectionContents = music21.stream.Stream()
+                        currentSubsectionContents = stream.Stream()
                         if labelSubsectionsOnScore:
                             putLyricOnNextItemInStream = True
                             
@@ -938,7 +956,7 @@ class CTSong(object):
                     mList = myScoreTemp.getElementsByClass('Measure')
                     for i in range(repetitions - 1):
                         for x in mList[len(mList) - 1].notesAndRests:
-                            if x.isClassOrSubclass([music21.roman.RomanNumeral]):
+                            if x.isClassOrSubclass([roman.RomanNumeral]):
                                 try:
                                     del x.lyrics
                                 except:
@@ -948,17 +966,17 @@ class CTSong(object):
                 elif atom.startswith('[') and atom.endswith(']'):
                     atomContents = atom[1:-1]
                     if re.match('[a-zA-Z]', atomContents):
-                        m21keyStr = music21.key.convertKeyStringToMusic21KeyString(atomContents)
-                        currentKey = music21.key.Key(m21keyStr)
+                        m21keyStr = key.convertKeyStringToMusic21KeyString(atomContents)
+                        currentKey = key.Key(m21keyStr)
                         currentSubsectionContents.append(currentKey)
                     else:
-                        currentTimeSig = music21.meter.TimeSignature(atomContents)
+                        currentTimeSig = meter.TimeSignature(atomContents)
                         currentSubsectionContents.append(currentTimeSig)
                 elif atom == 'R':
                     if currentTimeSig == None:
-                        currentTimeSig = music21.meter.TimeSignature('4/4')
+                        currentTimeSig = meter.TimeSignature('4/4')
                     qlenrest = self._getDuration(indexofatom, splitFile, currentTimeSig)
-                    r1 = music21.note.Rest(quarterLength=qlenrest)
+                    r1 = note.Rest(quarterLength=qlenrest)
                     currentSubsectionContents.append(r1) 
                 elif atom[0].upper() in starters2 and not atom.endswith(':'):
                     originalAtom = atom
@@ -978,7 +996,7 @@ class CTSong(object):
                     else:
                         duration = self._getDuration(indexofatom, splitFile, currentTimeSig)
                         try:
-                            rn = music21.roman.RomanNumeral(atom, currentKey)
+                            rn = roman.RomanNumeral(atom, currentKey)
                             rn.duration.quarterLength = duration
                             currentSubsectionContents.append(rn)
                         except:
@@ -989,7 +1007,7 @@ class CTSong(object):
                             raise CTSongException('invalid character found: %s' % atom)               
                
                 
-            listofRomans = currentSubsectionContents.flat.getElementsByClass(music21.roman.RomanNumeral)
+            listofRomans = currentSubsectionContents.flat.getElementsByClass(roman.RomanNumeral)
             if putLyricOnNextItemInStream and len(listofRomans) >= 1:
                 listofRomans[0].addLyric(currentSubsectionName)
                 putLyricOnNextItemInStream = False      
@@ -1013,7 +1031,7 @@ class CTSong(object):
         scoreObj = self._removeDuplicateKeys(scoreObj)
         scoreObj = self._removeDuplicateMeters(scoreObj)
         
-        scoreObj.insert(music21.metadata.Metadata()) 
+        scoreObj.insert(metadata.Metadata()) 
         scoreObj.metadata.title = self.title
 
         return scoreObj
@@ -1193,17 +1211,18 @@ class CTRule(object):
         self._homeTimeSig = str(value)
          
     def _getHomeTimeSig(self):
+        from music21 import meter
         if self._homeTimeSig == None or self._homeTimeSig == '':
             if self._streamFromCTSong:
-                return self._streamFromCTSong.flat.getElementsByClass(music21.meter.TimeSignature)[0]
+                return self._streamFromCTSong.flat.getElementsByClass(meter.TimeSignature)[0]
             if self.text:
                 for atom in self.musicText.split():
                     if '[' not in atom:
-                        self._homeTimeSig = music21.meter.TimeSignature('4/4')
+                        self._homeTimeSig = meter.TimeSignature('4/4')
                         return self._homeTimeSig
                     else:
                         if '/' in atom:
-                            self._homeTimeSig = music21.meter.TimeSignature(atom[1:-1])
+                            self._homeTimeSig = meter.TimeSignature(atom[1:-1])
                             return self._homeTimeSig
         else:
             return self._homeTimeSig
@@ -1226,17 +1245,19 @@ class CTRule(object):
         self._homeKeySig = str(value)
          
     def _getHomeKeySig(self):
+        from music21 import key
+        
         if self._homeKeySig == None or self._homeKeySig == '':
             if self._streamFromCTSong:
-                return self._streamFromCTSong.flat.getElementsByClass(music21.key.KeySignature)[0]
+                return self._streamFromCTSong.flat.getElementsByClass(key.KeySignature)[0]
             if self.text:
                 for atom in self.musicText.split():
                     if '[' not in atom:
-                        self._homeKeySig = music21.key.Key(music21.key.convertKeyStringToMusic21KeyString('C'))
+                        self._homeKeySig = key.Key(key.convertKeyStringToMusic21KeyString('C'))
                         return self._homeKeySig
                     else:
                         if not '/' in atom:
-                            self._homeKeySig = music21.key.Key(music21.key.convertKeyStringToMusic21KeyString(atom[1:-1]))
+                            self._homeKeySig = key.Key(key.convertKeyStringToMusic21KeyString(atom[1:-1]))
                             return self._homeKeySig
         else:
             return self._homeKeySig
@@ -1262,11 +1283,13 @@ class CTRule(object):
         by the :meth:`~music21.romanText.clercqTemperley.CTSong.toScore` method on a 
         :class:`~music21.romanText.clercqTemperley.CTSong` object
         '''
+        from music21 import metadata
+        
         if self._streamFromCTSong:
             try:
                 self._streamFromCTSong.metadata.title
             except: 
-                self._streamFromCTSong.insert(music21.metadata.Metadata()) 
+                self._streamFromCTSong.insert(metadata.Metadata()) 
                 self._streamFromCTSong.metadata.title = self.sectionName
             return self._streamFromCTSong
         else:
@@ -1338,6 +1361,7 @@ S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co
 _DOC_ORDER = [CTSong, CTRule]
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
    # from music21.romanText import clercqTemperley
    # test = clercqTemperley.TestExternal()

@@ -12,8 +12,6 @@
 
 import unittest
 
-import music21
-
 from music21 import scale
 from music21 import stream
 from music21 import chord
@@ -423,6 +421,7 @@ class Test(unittest.TestCase):
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 

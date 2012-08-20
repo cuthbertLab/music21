@@ -14,7 +14,7 @@
  
 import unittest
 
-import music21
+from music21 import base
 from music21 import common
 from music21 import musicxml
 
@@ -30,7 +30,7 @@ class ClefException(Exception):
 
 
 #-------------------------------------------------------------------------------
-class Clef(music21.Music21Object):
+class Clef(base.Music21Object):
     '''
     A Clef is a basic music21 object for representing musical clefs
     (Treble, Bass, etc.)
@@ -60,7 +60,7 @@ class Clef(music21.Music21Object):
     classSortOrder = 0
 
     def __init__(self):
-        music21.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
         self.sign = None
         # line counts start from the bottom up, the reverse of musedata
         self.line = None
@@ -620,6 +620,7 @@ _DOC_ORDER = [Clef, TrebleClef, BassClef]
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 

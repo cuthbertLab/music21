@@ -8,7 +8,6 @@
 # License:      according to the files
 #-------------------------------------------------------------------------------
 
-import music21
 import unittest
 
 # musedata standard
@@ -3748,6 +3747,7 @@ class Test(unittest.TestCase):
             out = s.musicxml
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 

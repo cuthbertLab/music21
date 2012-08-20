@@ -22,8 +22,6 @@ Note that when the tests are run they just check that the program does not
 crash -- the numbers are not checked because the underlying data is changing
 too often.
 '''
-
-import music21
 import unittest
 from re import match
 
@@ -354,6 +352,7 @@ class TestExternal(unittest.TestCase):
         testAll(show = True, fast = False)
  
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test) #External)
 
 

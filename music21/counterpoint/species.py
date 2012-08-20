@@ -13,7 +13,6 @@ import copy
 import random
 import unittest, doctest
 
-import music21
 from music21.note import Note
 from music21 import converter
 from music21 import duration
@@ -1855,6 +1854,7 @@ class TestExternal(unittest.TestCase):
 
     
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test, TestExternal)
 
 

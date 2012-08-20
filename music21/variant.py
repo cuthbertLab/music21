@@ -18,10 +18,11 @@ this time.
 
 import unittest
 
-import music21
 import copy
 import difflib
 
+from music21 import base
+from music21 import exceptions21
 from music21 import common
 from music21 import stream
 from music21 import environment
@@ -58,12 +59,12 @@ def mergeVariants(streamX, streamY, variantName, inPlace = False):
     >>> mergedScore = variant.mergeVariants(aScore, vScore, variantName = 'docvariant', inPlace = False)
     >>> mergedScore.show('text')
     {0.0} <music21.stream.Part ...>
-        {0.0} <music21.variant.Variant object at ...>
+        {0.0} <music21.variant.Variant object of length 4.0>
     ...
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 1 offset=0.0>
     ...
-        {4.0} <music21.variant.Variant object at ...>
+        {4.0} <music21.variant.Variant object of length 8.0>
         {4.0} <music21.stream.Measure 2 offset=4.0>
     ...
             {4.0} <music21.bar.Barline style=final>
@@ -73,7 +74,7 @@ def mergeVariants(streamX, streamY, variantName, inPlace = False):
     >>> mergedPart.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
     ...
-    {4.0} <music21.variant.Variant object at ...>
+    {4.0} <music21.variant.Variant object of length 8.0>
     {4.0} <music21.stream.Measure 2 offset=4.0>
     ...
         {4.0} <music21.bar.Barline style=final>
@@ -84,10 +85,10 @@ def mergeVariants(streamX, streamY, variantName, inPlace = False):
     >>> mergedStream.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>
     {0.0} <music21.note.Note A>
-    {1.0} <music21.variant.Variant object at ...>
+    {1.0} <music21.variant.Variant object of length 1.0>
     {1.0} <music21.note.Note B>
     {2.0} <music21.note.Note C>
-    {3.0} <music21.variant.Variant object at ...>
+    {3.0} <music21.variant.Variant object of length 1.0>
     {3.0} <music21.note.Note D>
     
     >>> streamY = converter.parse("a4 b c d e f g a", "4/4")
@@ -97,10 +98,10 @@ def mergeVariants(streamX, streamY, variantName, inPlace = False):
     VariantException: Could not determine what merging method to use. Try using a more specific merging function.
     
     '''
-    
-    if type(streamX) is music21.stream.Score:
+    classesX = streamX.classes
+    if "Score" in classesX:
         return mergeVariantScores(streamX, streamY, variantName, inPlace = inPlace)
-    elif type(streamX) is music21.stream.Part or len(streamX.getElementsByClass("Measure")) > 0:
+    elif "Part" in classesX or len(streamX.getElementsByClass("Measure")) > 0:
         return mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace = inPlace)
     elif len(streamX.notesAndRests) > 0 and streamX.duration.quarterLength == streamY.duration.quarterLength:
         return mergeVariantsEqualDuration([streamX, streamY], [variantName], inPlace = inPlace)
@@ -128,7 +129,7 @@ def mergeVariantScores(aScore, vScore, variantName, inPlace = False):
     >>> mergedScores = variant.mergeVariantScores(aScore, vScore, variantName = 'docvariant', inPlace = False)
     >>> mergedScores.show('text')
     {0.0} <music21.stream.Part ...>
-        {0.0} <music21.variant.Variant object at ...>
+        {0.0} <music21.variant.Variant object of length 4.0>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.meter.TimeSignature 4/4>
@@ -139,7 +140,7 @@ def mergeVariantScores(aScore, vScore, variantName, inPlace = False):
         {4.0} <music21.stream.Measure 2 offset=4.0>
             {0.0} <music21.note.Note E>
             {2.0} <music21.note.Note F>
-        {8.0} <music21.variant.Variant object at ...>
+        {8.0} <music21.variant.Variant object of length 4.0>
         {8.0} <music21.stream.Measure 3 offset=8.0>
             {0.0} <music21.note.Note G>
             {2.0} <music21.note.Note F>
@@ -153,7 +154,7 @@ def mergeVariantScores(aScore, vScore, variantName, inPlace = False):
             {1.0} <music21.note.Note G>
             {2.0} <music21.note.Note F>
             {3.0} <music21.note.Note E>
-        {4.0} <music21.variant.Variant object at ...>
+        {4.0} <music21.variant.Variant object of length 8.0>
         {4.0} <music21.stream.Measure 2 offset=4.0>
             {0.0} <music21.note.Note F>
             {2.0} <music21.note.Note E>
@@ -247,7 +248,7 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace = False):
         {1.5} <music21.note.Note C>
         {2.0} <music21.note.Note A>
         {3.0} <music21.note.Note A>
-    {4.0} <music21.variant.Variant object at ...>
+    {4.0} <music21.variant.Variant object of length 0.0>
     {4.0} <music21.stream.Measure 2 offset=4.0>
         {0.0} <music21.note.Note B>
         {0.5} <music21.note.Note C>
@@ -259,14 +260,14 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace = False):
         {1.0} <music21.note.Note D>
         {2.0} <music21.note.Note E>
         {3.0} <music21.note.Note E>
-    {12.0} <music21.variant.Variant object at ...>
+    {12.0} <music21.variant.Variant object of length 4.0>
     {12.0} <music21.stream.Measure 4 offset=12.0>
         {0.0} <music21.note.Note D>
         {1.0} <music21.note.Note G>
         {1.5} <music21.note.Note G>
         {2.0} <music21.note.Note A>
         {3.0} <music21.note.Note B>
-    {16.0} <music21.variant.Variant object at ...>
+    {16.0} <music21.variant.Variant object of length 8.0>
     
     >>> mergedStream.variants[0].replacementDuration
     4.0
@@ -281,13 +282,13 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace = False):
         {1.5} <music21.note.Note C>
         {2.0} <music21.note.Note A>
         {3.0} <music21.note.Note A>
-    {4.0} <music21.variant.Variant object at ...>
+    {4.0} <music21.variant.Variant object of length 4.0>
     {4.0} <music21.stream.Measure 2 offset=4.0>
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Note D>
         {2.0} <music21.note.Note E>
         {3.0} <music21.note.Note E>
-    {8.0} <music21.variant.Variant object at ...>
+    {8.0} <music21.variant.Variant object of length 0.0>
     {8.0} <music21.stream.Measure 3 offset=8.0>
         {0.0} <music21.note.Note E>
         {1.0} <music21.note.Note G>
@@ -300,7 +301,7 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace = False):
         {1.5} <music21.note.Note G>
         {2.0} <music21.note.Note A>
         {3.0} <music21.note.Note B>
-    {16.0} <music21.variant.Variant object at ...>
+    {16.0} <music21.variant.Variant object of length 0.0>
     {16.0} <music21.stream.Measure 5 offset=16.0>
         {0.0} <music21.note.Note F>
         {0.5} <music21.note.Note C>
@@ -391,41 +392,41 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace = False):
     >>> mergedStreams = mergeVariantsEqualDuration([stream1, stream2paris, stream3london], ['paris', 'london'])
     >>> mergedStreams.show('t')
     {0.0} <music21.note.Note A>
-    {1.0} <music21.variant.Variant object at ...>
+    {1.0} <music21.variant.Variant object of length 1.0>
     {1.0} <music21.note.Note B>
     {1.5} <music21.note.Note C>
     {2.0} <music21.note.Note A>
-    {3.0} <music21.variant.Variant object at ...>
+    {3.0} <music21.variant.Variant object of length 1.0>
     {3.0} <music21.note.Note A>
     {4.0} <music21.note.Note B>
-    {4.5} <music21.variant.Variant object at ...>
+    {4.5} <music21.variant.Variant object of length 1.5>
     {4.5} <music21.note.Note C>
     {5.0} <music21.note.Note A>
     {6.0} <music21.note.Note A>
-    {7.0} <music21.variant.Variant object at ...>
+    {7.0} <music21.variant.Variant object of length 1.0>
     {7.0} <music21.note.Note B>
     {8.0} <music21.note.Note C>
-    {9.0} <music21.variant.Variant object at ...>
+    {9.0} <music21.variant.Variant object of length 2.0>
     {9.0} <music21.note.Note D>
     {10.0} <music21.note.Note E>
     
     >>> mergedStreams.activateVariants('london').show('t')
     {0.0} <music21.note.Note A>
-    {1.0} <music21.variant.Variant object at ...>
+    {1.0} <music21.variant.Variant object of length 1.0>
     {1.0} <music21.note.Note B>
     {1.5} <music21.note.Note C>
     {2.0} <music21.note.Note A>
-    {3.0} <music21.variant.Variant object at ...>
+    {3.0} <music21.variant.Variant object of length 1.0>
     {3.0} <music21.note.Note A>
     {4.0} <music21.note.Note B>
-    {4.5} <music21.variant.Variant object at ...>
+    {4.5} <music21.variant.Variant object of length 1.5>
     {4.5} <music21.note.Note C>
     {5.0} <music21.note.Note A>
     {6.0} <music21.note.Note A>
-    {7.0} <music21.variant.Variant object at ...>
+    {7.0} <music21.variant.Variant object of length 1.0>
     {7.0} <music21.note.Note C>
     {8.0} <music21.note.Note C>
-    {9.0} <music21.variant.Variant object at ...>
+    {9.0} <music21.variant.Variant object of length 2.0>
     {9.0} <music21.note.Note D>
     {10.0} <music21.note.Note E>
         
@@ -465,22 +466,22 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace = False):
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.note.Note A>
-            {1.0} <music21.variant.Variant object at ...>
+            {1.0} <music21.variant.Variant object of length 1.0>
             {1.0} <music21.note.Note B>
             {1.5} <music21.note.Note C>
             {2.0} <music21.note.Note A>
-            {3.0} <music21.variant.Variant object at ...>
+            {3.0} <music21.variant.Variant object of length 1.0>
             {3.0} <music21.note.Note A>
         {4.0} <music21.stream.Measure 0 offset=4.0>
             {0.0} <music21.note.Note B>
-            {0.5} <music21.variant.Variant object at ...>
+            {0.5} <music21.variant.Variant object of length 1.5>
             {0.5} <music21.note.Note C>
             {1.0} <music21.note.Note A>
             {2.0} <music21.note.Note A>
             {3.0} <music21.note.Note B>
         {8.0} <music21.stream.Measure 0 offset=8.0>
             {0.0} <music21.note.Note C>
-            {1.0} <music21.variant.Variant object at ...>
+            {1.0} <music21.variant.Variant object of length 3.0>
             {1.0} <music21.note.Note D>
             {2.0} <music21.note.Note E>
             {3.0} <music21.note.Note E>
@@ -498,21 +499,21 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace = False):
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.note.Note A>
-            {1.0} <music21.variant.Variant object at ...>
+            {1.0} <music21.variant.Variant object of length 1.0>
             {1.0} <music21.note.Note B>
             {2.0} <music21.note.Note A>
-            {3.0} <music21.variant.Variant object at ...>
+            {3.0} <music21.variant.Variant object of length 1.0>
             {3.0} <music21.note.Note G>
         {4.0} <music21.stream.Measure 0 offset=4.0>
             {0.0} <music21.note.Note B>
-            {0.5} <music21.variant.Variant object at ...>
+            {0.5} <music21.variant.Variant object of length 1.5>
             {0.5} <music21.note.Note C>
             {1.5} <music21.note.Note A>
             {2.0} <music21.note.Note A>
             {3.0} <music21.note.Note B>
         {8.0} <music21.stream.Measure 0 offset=8.0>
             {0.0} <music21.note.Note C>
-            {1.0} <music21.variant.Variant object at ...>
+            {1.0} <music21.variant.Variant object of length 3.0>
             {1.0} <music21.note.Note B>
             {2.0} <music21.note.Note A>
             {3.0} <music21.note.Note A>
@@ -657,7 +658,7 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByM
     {0.0} <music21.stream.Measure 1 offset=0.0>
     ...
     {12.0} <music21.stream.Measure 4 offset=12.0>
-        {0.0} <music21.variant.Variant object at ...>
+        {0.0} <music21.variant.Variant object of length 3.0>
         {0.0} <music21.note.Note E>
         {0.5} <music21.note.Note F>
         {1.0} <music21.note.Note F>
@@ -665,7 +666,7 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByM
     {16.0} <music21.stream.Measure 5 offset=16.0>
     ...
     {20.0} <music21.stream.Measure 6 offset=20.0>
-        {0.0} <music21.variant.Variant object at ...>
+        {0.0} <music21.variant.Variant object of length 4.0>
         {0.0} <music21.note.Note F>
         {1.0} <music21.note.Note F>
         {2.0} <music21.note.Note F>
@@ -675,7 +676,7 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByM
     >>> mainpartWithOssiaVariantsFF.activateVariants('Parisian Variant').show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
     ...
-    {12.0} <music21.variant.Variant object at ...>
+    {12.0} <music21.variant.Variant object of length 4.0>
     {12.0} <music21.stream.Measure 4 offset=12.0>
         {0.0} <music21.note.Note E>
         {1.0} <music21.note.Note E>
@@ -683,7 +684,7 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByM
         {3.0} <music21.note.Note G>
     {16.0} <music21.stream.Measure 5 offset=16.0>
     ...
-    {20.0} <music21.variant.Variant object at ...>
+    {20.0} <music21.variant.Variant object of length 4.0>
     {20.0} <music21.stream.Measure 6 offset=20.0>
         {0.0} <music21.note.Note F>
         {2.0} <music21.note.Note F>
@@ -761,7 +762,7 @@ def addVariant(s,startOffset, sVariant, variantName = None, variantGroups = None
         {1.5} <music21.note.Note C>
         {2.0} <music21.note.Note A>
         {3.0} <music21.note.Note A>
-    {4.0} <music21.variant.Variant object at ...>
+    {4.0} <music21.variant.Variant object of length 4.0>
     {4.0} <music21.stream.Measure 0 offset=4.0>
         {0.0} <music21.note.Note B>
         {0.5} <music21.note.Note C>
@@ -784,12 +785,12 @@ def addVariant(s,startOffset, sVariant, variantName = None, variantGroups = None
     {0.0} <music21.note.Note E>
     {1.0} <music21.note.Note E>
     {2.0} <music21.note.Note E>
-    {3.0} <music21.variant.Variant object at ...>
+    {3.0} <music21.variant.Variant object of length 0.0>
     {3.0} <music21.note.Note E>
     {4.0} <music21.note.Note E>
     {5.0} <music21.note.Note E>
     '''
-    tempVariant = music21.variant.Variant()
+    tempVariant = Variant()
     
     if variantGroups is not None:
         tempVariant.groups = variantGroups
@@ -801,7 +802,7 @@ def addVariant(s,startOffset, sVariant, variantName = None, variantGroups = None
     if sVariant is None: #deletion
         pass
     else: #replacement or insertion
-        if type(sVariant) is music21.stream.Measure: #sVariant is a measure put it in a variant and insert.
+        if "Measure" in sVariant.classes: #sVariant is a measure put it in a variant and insert.
             tempVariant.append(sVariant)
         else: #sVariant is not a measure
             sVariantMeasures = sVariant.getElementsByClass('Measure')
@@ -871,14 +872,14 @@ def refineVariant(s, sVariant, inPlace = False):
         {3.0} <music21.note.Note G>
     {4.0} <music21.stream.Measure 0 offset=4.0>
         {0.0} <music21.note.Note B>
-        {0.5} <music21.variant.Variant object at ...>
+        {0.5} <music21.variant.Variant object of length 1.5>
         {0.5} <music21.note.Note C>
         {1.5} <music21.note.Note A>
         {2.0} <music21.note.Note A>
         {3.0} <music21.note.Note B>
     {8.0} <music21.stream.Measure 0 offset=8.0>
         {0.0} <music21.note.Note C>
-        {1.0} <music21.variant.Variant object at ...>
+        {1.0} <music21.variant.Variant object of length 3.0>
         {1.0} <music21.note.Note B>
         {2.0} <music21.note.Note A>
         {3.0} <music21.note.Note A>
@@ -1175,38 +1176,38 @@ def _mergeVariants(streamA, streamB, containsVariants = False, variantName = Non
     >>> mergedStreams = _mergeVariants(stream1, stream2, variantName = 'paris')
     >>> mergedStreams.show('t')
     {0.0} <music21.note.Note A>
-    {1.0} <music21.variant.Variant object at ...>
+    {1.0} <music21.variant.Variant object of length 1.0>
     {1.0} <music21.note.Note B>
     {1.5} <music21.note.Note C>
     {2.0} <music21.note.Note A>
-    {3.0} <music21.variant.Variant object at ...>
+    {3.0} <music21.variant.Variant object of length 1.0>
     {3.0} <music21.note.Note A>
     {4.0} <music21.note.Note B>
-    {4.5} <music21.variant.Variant object at ...>
+    {4.5} <music21.variant.Variant object of length 1.5>
     {4.5} <music21.note.Note C>
     {5.0} <music21.note.Note A>
     {6.0} <music21.note.Note A>
     {7.0} <music21.note.Note B>
     {8.0} <music21.note.Note C>
-    {9.0} <music21.variant.Variant object at ...>
+    {9.0} <music21.variant.Variant object of length 2.0>
     {9.0} <music21.note.Note D>
     {10.0} <music21.note.Note E>
     
     >>> mergedStreams.activateVariants('paris').show('t')
     {0.0} <music21.note.Note A>
-    {1.0} <music21.variant.Variant object at ...>
+    {1.0} <music21.variant.Variant object of length 1.0>
     {1.0} <music21.note.Note B>
     {2.0} <music21.note.Note A>
-    {3.0} <music21.variant.Variant object at ...>
+    {3.0} <music21.variant.Variant object of length 1.0>
     {3.0} <music21.note.Note G>
     {4.0} <music21.note.Note B>
-    {4.5} <music21.variant.Variant object at ...>
+    {4.5} <music21.variant.Variant object of length 1.5>
     {4.5} <music21.note.Note C>
     {5.5} <music21.note.Note A>
     {6.0} <music21.note.Note A>
     {7.0} <music21.note.Note B>
     {8.0} <music21.note.Note C>
-    {9.0} <music21.variant.Variant object at ...>
+    {9.0} <music21.variant.Variant object of length 2.0>
     {9.0} <music21.note.Note B>
     {10.0} <music21.note.Note A>
     
@@ -1315,7 +1316,7 @@ def _generateVariant(noteList, originStream, start, variantName = None):
     ['paris']
     
     '''
-    returnVariant = music21.variant.Variant()
+    returnVariant = Variant()
     for n in noteList:
         returnVariant.insert(n.getOffsetBySite(originStream.flat)-start, n)
     if variantName is not None:
@@ -1403,19 +1404,19 @@ def _doVariantFixingOnStream(s, variantNames = None):
     
     >>> variant._doVariantFixingOnStream(s, 'london')
     >>> s.show('text')
-    {0.0} <music21.variant.Variant object at ...>
+    {0.0} <music21.variant.Variant object of length 8.0>
     {0.0} <music21.stream.Measure 1 offset=0.0>
     ...
-    {4.0} <music21.variant.Variant object at ...>
+    {4.0} <music21.variant.Variant object of length 4.0>
     {4.0} <music21.stream.Measure 2 offset=4.0>
     ...
-    {12.0} <music21.variant.Variant object at ...>
+    {12.0} <music21.variant.Variant object of length 12.0>
     {12.0} <music21.stream.Measure 4 offset=12.0>
     ...
-    {20.0} <music21.variant.Variant object at ...>
+    {20.0} <music21.variant.Variant object of length 4.0>
     {20.0} <music21.stream.Measure 6 offset=20.0>
     ...
-    {24.0} <music21.variant.Variant object at ...>
+    {24.0} <music21.variant.Variant object of length 4.0>
     {24.0} <music21.stream.Measure 7 offset=24.0>
     ...
     
@@ -1481,9 +1482,9 @@ def _doVariantFixingOnStream(s, variantNames = None):
                 targetElement = _getNextElements(s, v)
                 
                 #Delete initial clefs, etc. from initial insertion targetElement if it exists
-                if isinstance(targetElement, music21.stream.Stream):
+                if "Stream" in targetElement.classes:
                     for e in targetElement.elements: # Must use .elements, because of removal of elements
-                        if isinstance(e, music21.clef.Clef) or isinstance(e, music21.meter.TimeSignature):
+                        if "Clef" in e.classes or "TimeSignature" in e.classes:
                             targetElement.remove(e)
                 
                 v.append(copy.deepcopy(targetElement)) #Appends a copy!!!
@@ -1552,12 +1553,12 @@ def _getNextElements(s, v, numberOfElements = 1):
     # Get class of elements in variant or replaced Region
     if lengthType is 'elongation':
         vClass = type(v.getElementsByClass(['Measure', 'Note', 'Rest'])[0])
-        if isinstance(vClass, music21.note.GeneralNote):
-            vClass = music21.note.GeneralNote
+        if isinstance(vClass, note.GeneralNote):
+            vClass = note.GeneralNote
     else:
         vClass = type(replacedElements.getElementsByClass(['Measure', 'Note', 'Rest'])[0])
-        if isinstance(vClass, music21.note.GeneralNote):
-            vClass = music21.note.GeneralNote
+        if isinstance(vClass, note.GeneralNote):
+            vClass = note.GeneralNote
     
     # Get next element in s after v which is of type vClass
     if lengthType is 'elongation':
@@ -1630,12 +1631,12 @@ def _getPreviousElements(s, v, numberOfElements = 1):
     # Get class of elements in variant or replaced Region
     if lengthType is 'elongation':
         vClass = type(v.getElementsByClass(['Measure', 'Note', 'Rest'])[0])
-        if isinstance(vClass, music21.note.GeneralNote):
-            vClass = music21.note.GeneralNote
+        if isinstance(vClass, note.GeneralNote):
+            vClass = note.GeneralNote
     else:
         vClass = type(replacedElements.getElementsByClass(['Measure', 'Note', 'Rest'])[0])
-        if isinstance(vClass, music21.note.GeneralNote):
-            vClass = music21.note.GeneralNote
+        if isinstance(vClass, note.GeneralNote):
+            vClass = note.GeneralNote
     
     # Get next element in s after v which is of type vClass
     variantOffset = v.getOffsetBySite(s)
@@ -1656,10 +1657,10 @@ def _getPreviousElements(s, v, numberOfElements = 1):
 
 
 
-class VariantException(Exception):
+class VariantException(exceptions21.Music21Exception):
     pass
 
-class Variant(music21.Music21Object):
+class Variant(base.Music21Object):
     '''A Music21Object that stores elements like a Stream, but does not represent itself externally to a Stream; i.e., the contents of a Variant are not flattened.
 
     This is accomplished not by subclassing, but by object composition: similar to the Spanner, the Variant contains a Stream as a private attribute. Calls to this Stream, for the Variant, are automatically delegated by use of the __getattr__ method. Special casses are overridden or managed as necessary: e.g., the Duration of a Variant is generally always zero. 
@@ -1686,11 +1687,11 @@ class Variant(music21.Music21Object):
     >>> s.append(note.Note())
     >>> s.highestTime
     1.0
-    >>> s.show('t') # doctest: +ELLIPSIS
-    {0.0} <music21.variant.Variant object at ...>
+    >>> s.show('t') 
+    {0.0} <music21.variant.Variant object of length 8.0>
     {0.0} <music21.note.Note C>
-    >>> s.flat.show('t') # doctest: +ELLIPSIS
-    {0.0} <music21.variant.Variant object at ...>
+    >>> s.flat.show('t') 
+    {0.0} <music21.variant.Variant object of length 8.0>
     {0.0} <music21.note.Note C>
     '''
 
@@ -1699,7 +1700,7 @@ class Variant(music21.Music21Object):
 
     # this copies the init of Streams
     def __init__(self, givenElements=None, *args, **keywords):
-        music21.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
         self._cache = {}
         self.exposeTime = False
         self._stream = stream.VariantStorage(givenElements=givenElements, 
@@ -1749,18 +1750,18 @@ class Variant(music21.Music21Object):
 
     def purgeOrphans(self):
         self._stream.purgeOrphans()
-        music21.Music21Object.purgeOrphans(self)
+        base.Music21Object.purgeOrphans(self)
 
     def purgeLocations(self, rescanIsDead=False):
         # must override Music21Object to purge locations from the contained
         self._stream.purgeLocations(rescanIsDead=rescanIsDead)
-        music21.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
+        base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
 
     def unwrapWeakref(self):
         '''Overridden method for unwrapping all Weakrefs.
         '''
         # call base method: this gets defined contexts and active site
-        music21.Music21Object.unwrapWeakref(self)
+        base.Music21Object.unwrapWeakref(self)
         # for contained objects that have weak refs
         self._stream.unwrapWeakref()
         # this presently is not a weakref but in case of future changes
@@ -1770,24 +1771,22 @@ class Variant(music21.Music21Object):
         '''Overridden method for unwrapping all Weakrefs.
         '''
         # call base method: this gets defined contexts and active site
-        music21.Music21Object.wrapWeakref(self)
+        base.Music21Object.wrapWeakref(self)
         self._stream.wrapWeakref()
 
 
     def freezeIds(self):
-        music21.Music21Object.freezeIds(self)
+        base.Music21Object.freezeIds(self)
         self._stream.freezeIds()
 
     def unfreezeIds(self):
-        music21.Music21Object.unfreezeIds(self)
+        base.Music21Object.unfreezeIds(self)
         self._stream.unfreezeIds()
 
 
-    '''
     def __repr__(self):
-        return "<music21.variant.%s offset=%s groups=%s>" % \
-            (self.__class__.__name__, self.offset, self.groups)
-    '''
+        return "<music21.variant.%s object of length %s>" % \
+            (self.__class__.__name__, str(self.containedHighestTime))
     
     def __getattr__(self, attr):
         '''This defers all calls not defined in this Class to calls on the privately contained Stream.
@@ -2186,7 +2185,7 @@ class Variant(music21.Music21Object):
             {1.0} <music21.note.Note B>
             {2.0} <music21.note.Note A>
             {3.0} <music21.note.Note G>
-        {4.0} <music21.variant.Variant object at 0x...>
+        {4.0} <music21.variant.Variant object of length 8.0>
         {8.0} <music21.stream.Measure 0 offset=8.0>
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note B>
@@ -2410,5 +2409,6 @@ class Test(unittest.TestCase):
 #         self.assertEqual(len(vb), 1) # has one variant
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
     

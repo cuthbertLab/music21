@@ -24,7 +24,8 @@ or in :ref:`moduleMeter` (a ritardando, for instance).
 import unittest
 import copy
 
-import music21
+from music21 import exceptions21
+from music21 import base
 from music21 import common
 from music21 import duration
 
@@ -34,14 +35,14 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class SpannerException(Exception):
+class SpannerException(exceptions21.Music21Exception):
     pass
-class SpannerBundleException(Exception):
+class SpannerBundleException(exceptions21.Music21Exception):
     pass
 
 
 #-------------------------------------------------------------------------------
-class Spanner(music21.Music21Object):
+class Spanner(base.Music21Object):
     '''
     Spanner objects live on Streams in the same manner as other Music21Objects, but represent and store connections between one or more other Music21Objects.
 
@@ -184,7 +185,7 @@ class Spanner(music21.Music21Object):
     isSpanner = True 
 
     def __init__(self, *arguments, **keywords):
-        music21.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
 
         self._cache = {} #common.DefaultHash()    
 
@@ -301,20 +302,20 @@ class Spanner(music21.Music21Object):
 
     def purgeOrphans(self):
         self._components.purgeOrphans()
-        music21.Music21Object.purgeOrphans(self)
+        base.Music21Object.purgeOrphans(self)
 
     def purgeLocations(self, rescanIsDead=False):
         # must override Music21Object to purge locations from the contained
         # Stream
         # base method to perform purge on the Sream
         self._components.purgeLocations(rescanIsDead=rescanIsDead)
-        music21.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
+        base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
             
     def unwrapWeakref(self):
         '''Overridden method for unwrapping all Weakrefs.
         '''
         # call base method: this gets defined contexts and active site
-        music21.Music21Object.unwrapWeakref(self)
+        base.Music21Object.unwrapWeakref(self)
         # for contained objects that have weak refs
         #environLocal.pd(['spanner unwrapping contained stream'])
         self._components.unwrapWeakref()
@@ -324,16 +325,16 @@ class Spanner(music21.Music21Object):
         '''Overridden method for unwrapping all Weakrefs.
         '''
         # call base method: this gets defined contexts and active site
-        music21.Music21Object.wrapWeakref(self)
+        base.Music21Object.wrapWeakref(self)
         self._components.wrapWeakref()
 
 
     def freezeIds(self):
-        music21.Music21Object.freezeIds(self)
+        base.Music21Object.freezeIds(self)
         self._components.freezeIds()
 
     def unfreezeIds(self):
-        music21.Music21Object.unfreezeIds(self)
+        base.Music21Object.unfreezeIds(self)
         self._components.unfreezeIds()
 
 
@@ -2239,6 +2240,7 @@ _DOC_ORDER = [Spanner]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 

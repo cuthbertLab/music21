@@ -8,11 +8,11 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
-import music21
 import unittest
 import copy
 import re
 
+from music21 import exceptions21
 from music21 import pitch
 from music21 import key
 from music21 import note
@@ -332,7 +332,7 @@ class Notation(object):
         self.figures = figures
 
 
-class NotationException(music21.Music21Exception):
+class NotationException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
@@ -366,7 +366,7 @@ class Figure(object):
         return '<music21.figuredBass.notation %s %s %s>' % (self.__class__.__name__, self.number, self.modifier)
 
 
-class FigureException(music21.Music21Exception):
+class FigureException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
@@ -537,7 +537,7 @@ class Modifier(object):
         return pitchToAlter
 
 
-class ModifierException(music21.Music21Exception):
+class ModifierException(exceptions21.Music21Exception):
     pass   
 
 #-------------------------------------------------------------------------------
@@ -575,4 +575,5 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)

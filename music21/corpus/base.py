@@ -28,9 +28,9 @@ import os
 import doctest, unittest
 import zipfile
 
-import music21
 from music21 import common
 from music21 import converter
+from music21 import exceptions21
 from music21 import metadata
 from music21 import musicxml
 from music21.corpus import virtual
@@ -1270,6 +1270,7 @@ _DOC_ORDER = [parse, getWork]
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 

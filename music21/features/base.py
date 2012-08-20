@@ -11,12 +11,13 @@
 
 import unittest
 import os
-import music21
 
-from music21 import stream
 from music21 import common
-from music21 import corpus
 from music21 import converter
+from music21 import corpus
+from music21 import exceptions21
+from music21 import stream
+from music21 import text
 
 from music21 import environment
 _MOD = 'features/base.py'
@@ -26,7 +27,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class FeatureException(music21.Music21Exception):
+class FeatureException(exceptions21.Music21Exception):
     pass
 
 
@@ -80,7 +81,7 @@ class Feature(object):
 
 
 #-------------------------------------------------------------------------------
-class FeatureExtractorException(music21.Music21Exception):
+class FeatureExtractorException(exceptions21.Music21Exception):
     pass
 
 class FeatureExtractor(object):
@@ -492,7 +493,7 @@ class StreamForms(object):
             return self._forms['secondsMap']
 
         elif key in ['assembledLyrics']:
-            self._forms['assembledLyrics'] = music21.text.assembleLyrics(self._base)
+            self._forms['assembledLyrics'] = text.assembleLyrics(self._base)
             return self._forms['assembledLyrics']
         
         else:
@@ -605,7 +606,7 @@ class DataInstance(object):
 
 
 #-------------------------------------------------------------------------------
-class OutputFormatException(music21.Music21Exception):
+class OutputFormatException(exceptions21.Music21Exception):
     pass
 
 class OutputFormat(object):
@@ -837,7 +838,7 @@ class OutputARFF(OutputFormat):
 
 
 #-------------------------------------------------------------------------------
-class DataSetException(music21.Music21Exception):
+class DataSetException(exceptions21.Music21Exception):
     pass
 
 class DataSet(object):
@@ -1366,6 +1367,7 @@ class Test(unittest.TestCase):
     def testFeatureFail(self):
         import music21
         from music21 import stream, features
+        from music21 import base
 
         featureExtractors = ['p10', 'p11', 'p12', 'p13']
 
@@ -1379,7 +1381,7 @@ class Test(unittest.TestCase):
         # create problematic streams
         s = stream.Stream()
         #s.append(None) # will create a wrapper -- NOT ANYMORE
-        s.append(music21.ElementWrapper(None))
+        s.append(base.ElementWrapper(None))
         ds.addData(s, classValue='Monteverdi')
         ds.addData(s, classValue='Handel')
         
@@ -1667,6 +1669,7 @@ _DOC_ORDER = [FeatureExtractor]
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
     
 

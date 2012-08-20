@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-
-import music21
 #from music21 import *  # doing this because it will simplify the examples
 
 # note: this are temporarily commented out until they work
@@ -18,8 +16,10 @@ class Test(unittest.TestCase):
         Is this asking if all pithces above G4 are louder, or if, above G4, 
         as pitches get higher, are they louder?
         '''
+        from music21 import analysis
+        from music21 import converter
 
-        partStream = music21.converter.parseFile("dicterliebe1.xml")
+        partStream = converter.parseFile("dicterliebe1.xml")
 
         ## make monophonic or make chords have a single pitch object...
         notesAbove, notesBelow = analysis.partition(partStream, 'pitch', 'G4')
@@ -32,8 +32,10 @@ class Test(unittest.TestCase):
 
     def xtest002(self):
         '''Add explicit breath marks after each phrase.'''
+        from music21 import analysis
+        from music21 import converter
 
-        partStream = music21.converter.parseFile("dicterliebe1.xml")
+        partStream = converter.parseFile("dicterliebe1.xml")
         # we are frequently going to need a way to partition data into      
         # phrases. this will be a very common operation that will
         # need a number of different approaches
@@ -57,7 +59,10 @@ class Test(unittest.TestCase):
         Modify this to just adjust dynamics based on meter; this should be 
         reflected in muiscal output
         '''
-        partStream = music21.converter.parseFile("dicterliebe1.xml")
+        from music21 import analysis
+        from music21 import converter
+
+        partStream = converter.parse("dicterliebe1.xml")
         #for part in partStream.partData:
         # a part stream could have an iterator that partitions itself
         # into measure-lenght part streams
@@ -86,13 +91,16 @@ class Test(unittest.TestCase):
 
     def xtest005(self):
         '''Alphabetize a list of titles.'''
+        from music21 import analysis
+        from music21 import converter
+
         corpusDir = 'path/to/files'
         sort = []
         for fn in os.listdir(corpusDir):
             if not fn.endswith('.xml'): continue
             # we may have more than one thing that looks like a title
             titleCandidates = []
-            partStream = music21.converter.parseFile(fn)
+            partStream = converter.parse(fn)
             # pages might be represented as a stream of Page objects
             # this could be contained w/n a part stream
             pageStream = partStream['pages']
@@ -116,7 +124,10 @@ class Test(unittest.TestCase):
         How are the arpeggios delineated? Is it a aprt with only arpeggios, or
         are they intermingled?
         '''
-        partStream = music21.converter.parseFile("dicterliebe1.xml")
+        from music21 import analysis
+        from music21 import converter
+
+        partStream = converter.parseFile("dicterliebe1.xml")
 
         # we might look at arpeggios as a type of extractable phrase, 
         # looking fo open spacings, even rhythms, and chordal forms
@@ -766,6 +777,7 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 

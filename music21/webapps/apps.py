@@ -22,7 +22,6 @@ import unittest
 import doctest
 
 from music21 import converter
-import music21
 
 import templates
 
@@ -87,5 +86,6 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == '__main__':
+    import music21
     music21.mainTest(Test)
         

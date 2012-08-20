@@ -15,7 +15,6 @@ import copy
 import unittest
 import random
 
-import music21
 from music21 import bar
 from music21 import clef
 from music21 import converter
@@ -44,7 +43,7 @@ def pitchedPhase(cycles=None, show=False):
 
     '''
 
-    sSrc = music21.parse("""E16 F# B c# d F# E c# B F# d c# 
+    sSrc = converter.parse("""E16 F# B c# d F# E c# B F# d c# 
                               E16 F# B c# d F# E c# B F# d c#""", '12/16')
     sPost = stream.Score()
     sPost.title = 'phasing experiment'
@@ -288,6 +287,7 @@ _DOC_ORDER = [pitchedPhase]
 
 if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions
+        import music21
         music21.mainTest(TestExternal)
 
     elif len(sys.argv) > 1:

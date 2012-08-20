@@ -11,8 +11,6 @@
 
 import doctest, unittest
 
-import music21
-
 
 pitches01a = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
@@ -17684,6 +17682,7 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 

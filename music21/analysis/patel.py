@@ -10,9 +10,9 @@
 #-------------------------------------------------------------------------------
 
 import unittest, doctest
-import music21
 import math
 
+from music21 import exceptions21
 _MOD = 'patel.py'
 
 
@@ -105,7 +105,7 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     std = math.sqrt(std / float(totalElements - 1))
     return 100*(std/mean)
 
-class PatelException(music21.Music21Exception):
+class PatelException(exceptions21.Music21Exception):
     pass
 
 class Test(unittest.TestCase):
@@ -119,6 +119,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [melodicIntervalVariability]
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

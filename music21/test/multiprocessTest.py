@@ -32,7 +32,7 @@ import music21
 from music21 import base
 from music21 import common
 from music21 import environment
-_MOD = 'multip.py'
+_MOD = 'multiprocessTest.py'
 environLocal = environment.Environment(_MOD)
 
 

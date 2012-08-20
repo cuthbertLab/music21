@@ -26,14 +26,14 @@
 import string, copy, math
 import unittest, doctest
 
-import music21
+from music21 import base
 from music21 import musicxml
 from music21 import common
 from music21 import spanner
 
 
 #-------------------------------------------------------------------------------
-class PageLayout(music21.Music21Object):
+class PageLayout(base.Music21Object):
     '''Parameters for configuring a page's layout. -- covers both <print new-page> and <page-layout>
     elements in musicxml
 
@@ -55,7 +55,7 @@ class PageLayout(music21.Music21Object):
     True
     '''
     def __init__(self, *args, **keywords):
-        music21.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
         
         self.pageNumber = None
         self.leftMargin = None
@@ -225,7 +225,7 @@ class PageLayout(music21.Music21Object):
 
 
 #-------------------------------------------------------------------------------
-class SystemLayout(music21.Music21Object):
+class SystemLayout(base.Music21Object):
     '''Parameters for configuring a system's layout.
 
     SystemLayout objects may be found on Measure or Part Streams.    
@@ -245,7 +245,7 @@ class SystemLayout(music21.Music21Object):
     True
     '''
     def __init__(self, *args, **keywords):
-        music21.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
         
         self.leftMargin = None
         self.rightMargin = None
@@ -569,16 +569,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
-#     import sys
-# 
-#     if len(sys.argv) == 1: # normal conditions
-#         music21.mainTest(Test)
-#     elif len(sys.argv) > 1:
-#         a = Test()
-#         a.testBasic()
-# if __name__ == "__main__":
-
-    # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 

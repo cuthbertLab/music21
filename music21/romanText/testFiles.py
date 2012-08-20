@@ -12,11 +12,6 @@
 '''Objects for processing roman numeral analysis text files, as defined and demonstrated by Dmitri Tymoczko.
 '''
 import unittest
-import music21
-
-
-
-
 
 
 
@@ -697,6 +692,7 @@ _DOC_ORDER = []
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

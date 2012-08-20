@@ -98,8 +98,8 @@ A longer test showing the utility of the module:
 
 import doctest, unittest
 
-import music21
-
+from music21 import base
+from music21 import exceptions21
 from music21 import musicxml
 from music21 import environment
 _MOD = "articulations.py"
@@ -107,11 +107,11 @@ environLocal = environment.Environment(_MOD)
 
 
 
-class ArticulationException(Exception):
+class ArticulationException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
-class Articulation(music21.Music21Object):
+class Articulation(base.Music21Object):
     '''
     Base class for all Articulation sub-classes. 
     
@@ -121,7 +121,7 @@ class Articulation(music21.Music21Object):
     
     '''
     def __init__(self):
-        music21.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
         self._mxName = None # specified in subclasses
         self.placement = 'above'
         # declare a unit interval shift for the performance of this articulation
@@ -569,6 +569,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [Articulation]
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 

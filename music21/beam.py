@@ -78,17 +78,18 @@ To get rid of beams on a note do:
 
 import unittest, doctest
 
-import music21
+from music21 import base
 from music21 import common
+from music21 import exceptions21
 from music21 import duration
 from music21 import musicxml
 musicxmlMod = musicxml # alias
 
 
-class BeamException(Exception):
+class BeamException(exceptions21.Music21Exception):
     pass
 
-class Beam(music21.JSONSerializer):
+class Beam(base.JSONSerializer):
     '''
     A Beam is an object representation of one single beam, that is, one horizontal
     line connecting two notes together (or less commonly a note to a rest).  Thus it
@@ -269,7 +270,7 @@ class Beam(music21.JSONSerializer):
 
 
 #-------------------------------------------------------------------------------
-class Beams(music21.JSONSerializer):
+class Beams(base.JSONSerializer):
     '''
     The Beams object stores in it attribute beamsList (a list) all
     the Beam objects defined above.  Thus len(beam.Beams) tells you how many
@@ -597,6 +598,7 @@ _DOC_ORDER = [Beams, Beam]
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 

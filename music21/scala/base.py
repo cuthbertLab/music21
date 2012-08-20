@@ -48,9 +48,6 @@ except:
     from io import StringIO # python3 (also in python 2.6+)
 
 
-
-import music21 
-
 from music21 import common
 from music21 import interval
 # scl is the library of scala files
@@ -306,7 +303,8 @@ class ScalaStorage(object):
 #-------------------------------------------------------------------------------
 class ScalaFile(object):
     '''
-    Interface for reading and writing scala files. On reading, returns a :class:`~music21.scala.ScalaStorage` object.
+    Interface for reading and writing scala files. 
+    On reading, returns a :class:`~music21.scala.ScalaStorage` object.
 
     >>> from music21 import *
     >>> sf = scala.ScalaFile() 
@@ -363,7 +361,9 @@ class ScalaFile(object):
 
 #-------------------------------------------------------------------------------
 def parse(target):
-    '''Get a :class:`~music21.scala.ScalaStorage` object from the bundled SCL archive or a file path. 
+    '''
+    Get a :class:`~music21.scala.ScalaStorage` object from 
+    the bundled SCL archive or a file path. 
 
     >>> from music21 import scala
     >>> ss = scala.parse('balafon6')
@@ -579,6 +579,7 @@ _DOC_ORDER = []
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 

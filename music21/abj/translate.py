@@ -21,8 +21,8 @@ abjad 2.0 (not 1.1.1) to work.
 
 '''
 
+from music21 import exceptions21
 import unittest,doctest
-import music21
 import music21.note
 import music21.common
 import music21.lily.translate
@@ -55,7 +55,7 @@ if abjad is not None:
 
 
 
-class AbjadTranslateException(music21.Music21Exception):
+class AbjadTranslateException(exceptions21.Music21Exception):
     pass
 
 def translateLilyStringPitch(lilyStringPitch):
@@ -158,7 +158,7 @@ def streamToAbjad(m21Stream, makeNotation = True):
     
     >>> import abjad
     >>> import music21
-    >>> stream1 = music21.parse("c4 d8. e-16 FF2", "4/4")
+    >>> stream1 = music21.converter.parse("c4 d8. e-16 FF2", "4/4")
     >>> abjadContainer = music21.abj.streamToAbjad(stream1)
     >>> abjadContainer
     Staff{4}
@@ -201,6 +201,7 @@ _DOC_ORDER = [noteToAbjad, streamToAbjad]
 if __name__ == "__main__":
     import sys
     if len(sys.argv) == 1: # normal conditions
+        import music21
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
         a = Test()

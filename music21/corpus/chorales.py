@@ -16,7 +16,6 @@ numbering schemes and filters and includes the Iterator()
 class for easily iterating through the chorale collection.
 '''
 
-import music21
 from music21.corpus import base
 import unittest, doctest
 import copy
@@ -1644,4 +1643,5 @@ class TestExternal(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(TestExternal)

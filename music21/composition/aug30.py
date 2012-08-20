@@ -8,7 +8,6 @@ written on August 30, 2008
 converted to new system on Dec. 26, 2010
 '''
 
-import music21
 from music21 import *
 from music21.instrument import *
 import copy

@@ -17,8 +17,6 @@ files from a file or URL to a :class:`~music21.stream.Stream`, use the music21
 converter module's :func:`~music21.converter.parse` function. 
 '''
 
-
-import music21
 import unittest
 
 from music21.musedata import base as museDataModule
@@ -618,6 +616,7 @@ _DOC_ORDER = [museDataWorkToStreamScore]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 

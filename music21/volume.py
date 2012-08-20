@@ -14,7 +14,7 @@
  
 import unittest
 
-import music21
+from music21 import exceptions21
 from music21 import common
 from music21 import dynamics
 
@@ -25,7 +25,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class VolumeException(music21.Music21Exception):
+class VolumeException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
@@ -625,6 +625,7 @@ _DOC_ORDER = []
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 

@@ -18,12 +18,16 @@ which are stored under a Music21Object's .expressions attribute
 
 It also includes representations of things such as TextExpressions which
 are better attached to the Stream itself.
+
+TODO: replace .size with a string representing interval and then
+create interval.Interval objects only when necessary.
 '''
 import copy
 import doctest, unittest
 
-import music21
-import music21.interval
+from music21 import interval
+from music21 import base
+from music21 import exceptions21
 from music21 import musicxml
 from music21 import text
 from music21 import common
@@ -87,15 +91,15 @@ def realizeOrnaments(srcObject):
 
 
 #-------------------------------------------------------------------------------
-class ExpressionException(music21.Music21Exception):
+class ExpressionException(exceptions21.Music21Exception):
     pass
 
 
-class Expression(music21.Music21Object):
+class Expression(base.Music21Object):
     '''This base class is inherited by many diverse expressions. 
     '''
     def __init__(self):
-        music21.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
 
     def __repr__(self):
         return '<music21.expressions.%s>' % (self.__class__.__name__)
@@ -296,9 +300,9 @@ class GeneralMordent(Ornament):
     def __init__(self):
         Ornament.__init__(self)
         self.direction = ""  # up or down
-        self.size = None # music21.interval.Interval (General, etc.) class
+        self.size = None # interval.Interval (General, etc.) class
         self.quarterLength = 0.125 # 32nd note default 
-        self.size = music21.interval.Interval(2)
+        self.size = interval.Interval(2)
 
     def realize(self, srcObject):
         '''
@@ -327,6 +331,8 @@ class GeneralMordent(Ornament):
         ExpressionException: Cannot realize a mordent if I do not know its direction
 
         '''
+        from music21 import key
+        
         if self.direction != 'up' and self.direction != 'down':
             raise ExpressionException("Cannot realize a mordent if I do not know its direction")
         if self.size == "":
@@ -355,9 +361,9 @@ class GeneralMordent(Ornament):
         mordNotes.append(firstNote)
         mordNotes.append(secondNote)
         
-        currentKeySig = srcObject.getContextByClass(music21.key.KeySignature)
+        currentKeySig = srcObject.getContextByClass(key.KeySignature)
         if currentKeySig is None:
-            currentKeySig = music21.key.KeySignature(0)
+            currentKeySig = key.KeySignature(0)
 
         for n in mordNotes:            
             n.accidental = currentKeySig.accidentalByStep(n.step)
@@ -404,7 +410,7 @@ class HalfStepMordent(Mordent):
     '''
     def __init__(self):
         Mordent.__init__(self)
-        self.size = music21.interval.Interval("m2")
+        self.size = interval.Interval("m2")
 
 class WholeStepMordent(Mordent):
     '''A whole step normal Mordent.
@@ -418,7 +424,7 @@ class WholeStepMordent(Mordent):
     '''
     def __init__(self):
         Mordent.__init__(self)
-        self.size = music21.interval.Interval("M2")
+        self.size = interval.Interval("M2")
 
 
 #-------------------------------------------------------------------------------
@@ -459,7 +465,7 @@ class HalfStepInvertedMordent(InvertedMordent):
     '''
     def __init__(self):
         InvertedMordent.__init__(self)
-        self.size = music21.interval.Interval("m2")
+        self.size = interval.Interval("m2")
 
 class WholeStepInvertedMordent(InvertedMordent):
     '''A whole-step inverted Mordent.
@@ -473,7 +479,7 @@ class WholeStepInvertedMordent(InvertedMordent):
     '''
     def __init__(self):
         InvertedMordent.__init__(self)
-        self.size = music21.interval.Interval("M2")
+        self.size = interval.Interval("M2")
 
 
 
@@ -491,7 +497,7 @@ class Trill(Ornament):
 
     def __init__(self):
         Ornament.__init__(self)
-        self.size = music21.interval.Interval("M2")
+        self.size = interval.Interval("M2")
 
         self.placement = 'above'
         self.nachschlag = False # play little notes at the end of the trill?
@@ -524,7 +530,7 @@ class Trill(Ornament):
         ExpressionException: The note is not long enough to realize a trill
         
         '''
-        import music21.key
+        from music21 import key
         if self.size == "":
             raise ExpressionException("Cannot realize a trill if there is no size given")
         if srcObject.duration == None or srcObject.duration.quarterLength == 0:
@@ -556,9 +562,9 @@ class Trill(Ornament):
             trillNotes.append(firstNote)
             trillNotes.append(secondNote)
 
-        currentKeySig = srcObject.getContextByClass(music21.key.KeySignature)
+        currentKeySig = srcObject.getContextByClass(key.KeySignature)
         if currentKeySig is None:
-            currentKeySig = music21.key.KeySignature(0)
+            currentKeySig = key.KeySignature(0)
 
         for n in trillNotes:
             n.accidental = currentKeySig.accidentalByStep(n.step)
@@ -626,7 +632,7 @@ class HalfStepTrill(Trill):
     '''
     def __init__(self):
         Trill.__init__(self)
-        self.size = music21.interval.Interval("m2")
+        self.size = interval.Interval("m2")
 
 class WholeStepTrill(Trill):
     '''A basic trill marker.
@@ -640,13 +646,13 @@ class WholeStepTrill(Trill):
     '''
     def __init__(self):
         Trill.__init__(self)
-        self.size = music21.interval.Interval("M2")
+        self.size = interval.Interval("M2")
 
 
 class Shake(Trill):
     def __init__(self):
         Ornament.__init__(self)
-        self.size = music21.interval.Interval("M2")
+        self.size = interval.Interval("M2")
         self.quarterLength = 0.25
 
 
@@ -659,7 +665,7 @@ class Shake(Trill):
 class Schleifer(Ornament):
     def __init__(self):
         Ornament.__init__(self)
-        self.size = music21.interval.Interval("M2")
+        self.size = interval.Interval("M2")
         self.quarterLength = 0.25
 
 
@@ -667,7 +673,7 @@ class Schleifer(Ornament):
 class Turn(Ornament):
     def __init__(self):
         Ornament.__init__(self)
-        self.size = music21.interval.Interval("M2")
+        self.size = interval.Interval("M2")
         self.placement = 'above'
         self.nachschlag = False # play little notes at the end of the trill?
         self.tieAttach = 'all'
@@ -710,7 +716,7 @@ class Turn(Ornament):
             ...
         ExpressionException: The note is not long enough to realize a turn
         '''
-        import music21.key
+        from music21 import key
 
         if self.size is None:
             raise ExpressionException("Cannot realize a turn if there is no size given")
@@ -749,9 +755,9 @@ class Turn(Ornament):
         turnNotes.append(thirdNote)
         turnNotes.append(fourthNote)
 
-        currentKeySig = srcObject.getContextByClass(music21.key.KeySignature)
+        currentKeySig = srcObject.getContextByClass(key.KeySignature)
         if currentKeySig is None:
-            currentKeySig = music21.key.KeySignature(0)
+            currentKeySig = key.KeySignature(0)
        
         for n in turnNotes:
             n.accidental = currentKeySig.accidentalByStep(n.step)
@@ -772,11 +778,11 @@ class InvertedTurn(Turn):
 #-------------------------------------------------------------------------------
 class GeneralAppoggiatura(Ornament):
     direction = ""  # up or down -- up means the grace note is below and goes up to the actual note
-    size = None # music21.interval.Interval (General, etc.) class
+    size = None # interval.Interval (General, etc.) class
     
     def __init__(self):
         Ornament.__init__(self)
-        self.size = music21.interval.Interval(2)
+        self.size = interval.Interval(2)
         
     def realize(self, srcObject):
         '''
@@ -803,7 +809,7 @@ class GeneralAppoggiatura(Ornament):
         (<music21.note.Note B>, <music21.note.Note C>, [])
         
         '''
-        
+        from music21 import key
         if self.direction != 'up' and self.direction != 'down':
             raise ExpressionException("Cannot realize an Appoggiatura if I do not know its direction")
         if self.size == "":
@@ -826,9 +832,9 @@ class GeneralAppoggiatura(Ornament):
         remainderNote.duration.quarterLength = newDuration
         
         
-        currentKeySig = srcObject.getContextByClass(music21.key.KeySignature)
+        currentKeySig = srcObject.getContextByClass(key.KeySignature)
         if currentKeySig is None:
-            currentKeySig = music21.key.KeySignature(0)
+            currentKeySig = key.KeySignature(0)
 
         #TODO clear just mordent here...
         return (appogNote, remainderNote, [])
@@ -841,12 +847,12 @@ class Appoggiatura(GeneralAppoggiatura):
 class HalfStepAppoggiatura(Appoggiatura):
     def __init__(self):
         Appoggiatura.__init__(self)
-        self.size = music21.interval.Interval("m2")
+        self.size = interval.Interval("m2")
         
 class WholeStepAppoggiatura(Appoggiatura):
     def __init__(self):
         Appoggiatura.__init__(self)
-        self.size = music21.interval.Interval("M2")
+        self.size = interval.Interval("M2")
         
 class InvertedAppoggiatura(GeneralAppoggiatura):
     direction = "up"
@@ -856,12 +862,12 @@ class InvertedAppoggiatura(GeneralAppoggiatura):
 class HalfStepInvertedAppoggiatura(InvertedAppoggiatura):
     def __init__(self):
         InvertedAppoggiatura.__init__(self)
-        self.size = music21.interval.Interval("m2")
+        self.size = interval.Interval("m2")
         
 class WholeStepInvertedAppoggiatura(InvertedAppoggiatura):
     def __init__(self):
         InvertedAppoggiatura.__init__(self)
-        self.size = music21.interval.Interval("M2")
+        self.size = interval.Interval("M2")
 
 
 
@@ -926,7 +932,7 @@ class Fermata(Expression):
 #-------------------------------------------------------------------------------
 # spanner expressions
 
-class TrillExtensionException(music21.Music21Exception):
+class TrillExtensionException(exceptions21.Music21Exception):
     pass
 
 class TrillExtension(spanner.Spanner):
@@ -1126,6 +1132,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [TextExpression]
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

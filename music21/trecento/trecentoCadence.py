@@ -3,7 +3,6 @@
 import unittest, doctest
 import re
 
-import music21
 from music21 import tinyNotation
 from music21.tinyNotation import *
 
@@ -67,9 +66,10 @@ class Test(unittest.TestCase):
 
 
     def testTrecentoNote(self):
+        from music21 import note
         cn = TrecentoCadenceNote('AA-4.~')
         a = cn.note # returns the stored music21 note.
-        self.assertEqual(music21.note.sendNoteInfo(a),
+        self.assertEqual(note.sendNoteInfo(a),
                           '''Name: A-
 Step: A
 Octave: 2
@@ -80,11 +80,12 @@ QuarterLength: 1.5
 ''')
 
     def testDotGroups(self):
+        from music21 import note
         cn = TrecentoCadenceNote('c#2..')
         a = cn.note # returns the stored music21 note.
 
         # TODO: FIX!  not working right now because dot groups aren't. should be QL 4.5
-        self.assertEqual(music21.note.sendNoteInfo(a),
+        self.assertEqual(note.sendNoteInfo(a),
                           '''Name: C#
 Step: C
 Octave: 4
@@ -113,6 +114,7 @@ class TestExternal(unittest.TestCase):
         st.show()
     
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

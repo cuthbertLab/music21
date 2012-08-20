@@ -50,10 +50,10 @@ Example usage:
 import unittest, doctest
 import copy
 
-import music21
-
+from music21 import base
 from music21 import defaults
 from music21 import common
+from music21 import exceptions21
 from music21 import musicxml as musicxmlMod
 from music21.musicxml import translate as musicxmlTranslate
 
@@ -812,7 +812,7 @@ def updateTupletType(durationList):
 
 
 #-------------------------------------------------------------------------------
-class TupletException(Exception):
+class TupletException(exceptions21.Music21Exception):
     pass
 
 class Tuplet(object):
@@ -1283,7 +1283,7 @@ class Tuplet(object):
 
 
 #-------------------------------------------------------------------------------
-class DurationCommon(music21.JSONSerializer):
+class DurationCommon(base.JSONSerializer):
     '''A base class for both Duration and DurationUnit objects.
     '''
     #def __init__(self):
@@ -1927,7 +1927,7 @@ class ZeroDuration(DurationUnit):
 
 
 #-------------------------------------------------------------------------------
-class DurationException(Exception):
+class DurationException(exceptions21.Music21Exception):
     pass
 
 class Duration(DurationCommon):

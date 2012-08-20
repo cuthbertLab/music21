@@ -23,9 +23,10 @@ Here's the hierarchy:
 '''
 
 import unittest
-import music21
 
 from music21 import common
+from music21 import exceptions21
+from music21 import note
 from music21 import pitch
 from music21 import stream
 
@@ -343,13 +344,13 @@ def staffString(xPosStr = str(defaultStavePosition[0]), yPosStr = str(defaultSta
 #-------------------------------------------------------------------------------
 #Exception classes
 
-class VexFlowUnsupportedException(music21.Music21Exception):
+class VexFlowUnsupportedException(exceptions21.Music21Exception):
     '''
     This feature or object is not supported by the VexFlow JavaScript library
     '''
     pass
 
-class Vexflow21UnsupportedException(music21.Music21Exception):
+class Vexflow21UnsupportedException(exceptions21.Music21Exception):
     '''
     This feature or object cannot be converted from music21 to VexFlow code yet
     '''
@@ -408,7 +409,7 @@ def fromObject(thisObject, mode='txt'):
     if 'Note' in thisObject.classes:
         return fromNote(thisObject, mode)
     elif 'Pitch' in thisObject.classes:
-        return fromNote(music21.note.Note(thisObject), mode)
+        return fromNote(note.Note(thisObject), mode)
     elif 'Rest' in thisObject.classes:
         return fromRest(thisObject, mode)
     elif 'Chord' in thisObject.classes:
@@ -456,8 +457,8 @@ def fromStream(thisStream, mode='txt'):
 
     theseParts = thisStream.getElementsByClass('Part')
     if len(theseParts) == 0:
-        return VexflowPart(music21.stream.Part(thisStream.flat).makeNotation(inPlace=False)).generateCode(mode)
-    return VexflowScore(music21.stream.Score(thisStream).makeNotation(inPlace=False)).generateCode(mode)
+        return VexflowPart(stream.Part(thisStream.flat).makeNotation(inPlace=False)).generateCode(mode)
+    return VexflowScore(stream.Score(thisStream).makeNotation(inPlace=False)).generateCode(mode)
 
 def fromRest(thisRest, mode='txt'):
     '''

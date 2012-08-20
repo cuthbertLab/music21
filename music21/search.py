@@ -20,11 +20,13 @@ import copy
 import difflib
 import math
 import unittest, doctest
-import music21
-import music21.note
-import music21.duration
 
-class WildcardDuration(music21.duration.Duration):
+from music21 import base
+from music21 import exceptions21
+from music21 import note
+from music21 import duration
+
+class WildcardDuration(duration.Duration):
     '''
     a wildcard duration (it might define a duration
     in itself, but the methods here will see that it
@@ -32,7 +34,7 @@ class WildcardDuration(music21.duration.Duration):
     '''
     pass
 
-class Wildcard(music21.Music21Object):
+class Wildcard(base.Music21Object):
     '''
     An object that may have some properties defined, but others not that
     matches a single object in a music21 stream.  Equivalent to the
@@ -46,7 +48,7 @@ class Wildcard(music21.Music21Object):
     >>> st1.append(wc1)    
     '''
     def __init__(self):
-        music21.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
         self.duration = WildcardDuration()
 
 def rhythmicSearch(thisStream, searchStream):
@@ -580,7 +582,7 @@ def mostCommonMeasureRythms(streamIn, transposeDiatonic = False):
     sortedDicts = sorted(returnDicts, key=lambda k: k['number'], reverse=True)
     return sortedDicts
 
-class SearchException(music21.Music21Exception):
+class SearchException(exceptions21.Music21Exception):
     pass
 
 
@@ -610,6 +612,7 @@ _DOC_ORDER = []
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

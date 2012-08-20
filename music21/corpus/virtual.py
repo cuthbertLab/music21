@@ -14,7 +14,6 @@
 import doctest
 import unittest
 
-import music21
 from music21 import common
 from music21 import environment
 _MOD = 'converter.py'
@@ -205,6 +204,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = []
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
     #music21.mainTest(Test, TestExternal)
 

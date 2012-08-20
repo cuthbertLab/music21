@@ -23,10 +23,10 @@ except:
     from io import StringIO # python3 (also in python 2.6+)
 
 
-import music21
-
 from music21 import common
+from music21 import exceptions21
 from music21 import environment
+from music21 import key
 _MOD = 'romanText.base.py'
 environLocal = environment.Environment(_MOD)
 
@@ -51,13 +51,13 @@ reRepeatStopAtom = re.compile('\:\|\|')
 
 
 #-------------------------------------------------------------------------------
-class RomanTextException(music21.Music21Exception):
+class RomanTextException(exceptions21.Music21Exception):
     pass
-class RTTokenException(music21.Music21Exception):
+class RTTokenException(exceptions21.Music21Exception):
     pass
-class RTHandlerException(music21.Music21Exception):
+class RTHandlerException(exceptions21.Music21Exception):
     pass
-class RTFileException(music21.Music21Exception):
+class RTFileException(exceptions21.Music21Exception):
     pass
 
 
@@ -662,7 +662,7 @@ class RTKeySignature(RTAtom):
 
     def getKeySignature(self):
         numSharps = int(self.src[2:])
-        return music21.key.KeySignature(numSharps)
+        return key.KeySignature(numSharps)
 
 class RTOpenParens(RTAtom):
     def __init__(self, src =u'(', container=None):
@@ -1341,6 +1341,7 @@ _DOC_ORDER = []
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

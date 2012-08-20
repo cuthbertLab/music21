@@ -5,9 +5,8 @@ Created on Nov 5, 2009
 @author: cuthbert
 '''
 
-import music21
 from music21 import *
-import music21.analysis.correlate
+from music21.analysis import correlate
 from music21.trecento import cadencebook
 from music21 import graph
 

@@ -24,8 +24,9 @@ ensemble.py module.
 import unittest, doctest
 import sys
 
-import music21
+from music21 import base
 from music21 import musicxml
+from music21 import exceptions21
 from music21 import common
 from music21 import defaults
 from music21 import pitch
@@ -44,10 +45,10 @@ environLocal = environment.Environment(_MOD)
 #    '''
 #    eval(name + "()")
 
-class InstrumentException(music21.Music21Exception):
+class InstrumentException(exceptions21.Music21Exception):
     pass
 
-class Instrument(music21.Music21Object):
+class Instrument(base.Music21Object):
     '''
     Base class for all musical instruments.  Designed
     for subclassing, though usually a more specific
@@ -58,7 +59,7 @@ class Instrument(music21.Music21Object):
     classSortOrder = 1
 
     def __init__(self):
-        music21.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
 
         self.partId = None
         self.partName = None
@@ -1670,6 +1671,7 @@ _DOC_ORDER = [Instrument]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 

@@ -19,7 +19,6 @@ import unittest
 import math
 import copy
 
-import music21
 from music21 import midi as midiModule
 from music21 import defaults
 from music21 import common
@@ -2506,6 +2505,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [streamToMidiFile, midiFileToStream]
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

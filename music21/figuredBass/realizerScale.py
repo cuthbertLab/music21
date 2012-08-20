@@ -11,9 +11,9 @@
 
 import copy
 import itertools
-import music21
 import unittest
 
+from music21 import exceptions21
 from music21 import note
 from music21 import pitch
 from music21 import key
@@ -156,7 +156,7 @@ class FiguredBassScale(object):
         return "<music21.figuredBass.realizerScale FiguredBassScale>"
     
     
-class FiguredBassScaleException(music21.Music21Exception):
+class FiguredBassScaleException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
@@ -192,6 +192,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

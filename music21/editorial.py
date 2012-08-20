@@ -16,12 +16,13 @@
 from __future__ import unicode_literals
 
 import doctest, unittest
-import music21
+from music21 import exceptions21
+from music21 import base
 
-class EditorialException(Exception):
+class EditorialException(exceptions21.Music21Exception):
     pass
 
-class CommentException(Exception):
+class CommentException(exceptions21.Music21Exception):
     pass
 
 def getObjectsWithEditorial(listToSearch, editorialStringToFind, 
@@ -71,7 +72,7 @@ def getObjectsWithEditorial(listToSearch, editorialStringToFind,
             pass
     return listofOBJToReturn
     
-class NoteEditorial(music21.JSONSerializer):
+class NoteEditorial(base.JSONSerializer):
     '''Editorial comments and special effects that can be applied to notes
     Standard ones are stored as attributes.  Non-standard/one-off effects are
     stored in the dict called "misc":
@@ -119,7 +120,7 @@ class NoteEditorial(music21.JSONSerializer):
     }
     
     def __init__(self):
-        music21.JSONSerializer.__init__(self)
+        base.JSONSerializer.__init__(self)
 
         self.ficta = None  # Accidental object -- N.B. for PRINTING only not for determining intervals
         self.color = None
@@ -201,7 +202,7 @@ class NoteEditorial(music21.JSONSerializer):
         return baseRet
 
         
-class Comment(music21.JSONSerializer):
+class Comment(base.JSONSerializer):
     '''
     an object that adds text above or below a note:
     
@@ -214,6 +215,7 @@ class Comment(music21.JSONSerializer):
     
     '''
     def __init__(self):
+        base.JSONSerializer.__init__(self)
         self.position = "below"
         self.text = None
     
@@ -274,6 +276,7 @@ _DOC_ORDER = [NoteEditorial]
 if __name__ == "__main__":
     #import doctest
     #doctest.testmod()
+    import music21
     music21.mainTest(Test)
 
 

@@ -15,9 +15,11 @@
 import doctest, unittest
 import os
 
-import music21 # needed to properly do isinstance checking
+#import music21 # needed to properly do isinstance checking
 
 from music21 import base
+from music21 import exceptions21
+from music21 import languageExcerpts
 from music21 import environment
 from music21 import common
 
@@ -165,12 +167,12 @@ def postpendArticle(src, language=None):
 
 
 #-------------------------------------------------------------------------------
-class TextException(music21.Music21Exception):
+class TextException(exceptions21.Music21Exception):
     pass
 
 
 #-------------------------------------------------------------------------------
-class TextFormatException(music21.Music21Exception):
+class TextFormatException(exceptions21.Music21Exception):
     pass
 
 class TextFormat(object):
@@ -332,7 +334,7 @@ class TextFormat(object):
 #         return post
 
 #-------------------------------------------------------------------------------
-class TextBoxException(music21.Music21Exception):
+class TextBoxException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
@@ -557,7 +559,7 @@ class LanguageDetector(object):
     def readExcerpts(self):
         for languageCode in self.languageCodes:
             pair = '  '
-            f = open(os.path.dirname(music21.languageExcerpts.__file__) + os.path.sep + languageCode + '.txt')                
+            f = open(os.path.dirname(languageExcerpts.__file__) + os.path.sep + languageCode + '.txt')                
             self.trigrams[languageCode] = Trigram(f.read().split())
             f.close()
 
@@ -812,7 +814,7 @@ _DOC_ORDER = [TextBox, TextFormat]
 
 
 if __name__ == "__main__":
-
+    import music21
     music21.mainTest(Test)
 
 

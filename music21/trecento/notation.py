@@ -1,4 +1,14 @@
 # -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
+# Name:         trecento.notation.py
+# Purpose:      music21 classes for representing Trecento notation
+#
+# Authors:      Varun Ramaswamy
+#               Michael Scott Cuthbert
+#
+# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL
+#-------------------------------------------------------------------------------
 
 ''' 
 Tools for creating Punctus and Divisione objects unique to Trecento notation. Other objects found in medieval and renaissance music (such as rests, notes, and clef) can be found in the module `music21.medren`.
@@ -8,13 +18,17 @@ Also contains functions for converting Trecento notation to modern notation.
 import copy
 from re import compile, search, match
 
-import music21
+from music21 import base
+from music21 import clef
 from music21 import common
 from music21 import duration
+from music21 import exceptions21
 from music21 import interval
 from music21 import meter
 from music21 import note
+from music21 import stream
 from music21 import tempo
+from music21 import tinyNotation
 import unittest, doctest
 
 _validDivisiones = {(None, None):0, ('quaternaria','.q.'):4, ('senaria imperfecta', '.i.'):6, ('senaria perfecta', '.p.'):6, ('novenaria', '.n.'):9, ('octonaria', '.o.'):8, ('duodenaria', '.d.'):12}
@@ -22,128 +36,128 @@ _validDivisiones = {(None, None):0, ('quaternaria','.q.'):4, ('senaria imperfect
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-class TinyTrecentoNotationStream(music21.tinyNotation.TinyNotationStream):
-    
+class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
     '''
-These are modified from a standard lilypond format called TinyNotation.
-
-Here are some important points about how to create notes and streams:
-
-1. Note names are: a,b,c,d,e,f,g. r indicates a rest, and p indicates a punctus.
-
-
-2. Note octaves are specified as follows:
-    CC to BB = from C below bass clef to second-line B in bass clef
-    C to B = from bass clef C to B below middle C.
-    c  to b = from middle C to the middle of treble clef
-    c' to b' = from C in treble clef to B above treble clef (make sure you’re NOT putting in smart quotes)
-In 14th c. music, C to B and c to b will be most common
-
-
-3. Flats, sharps, and naturals are notated as #,- (not b), and (if needed) n.  
-If the accidental is above the staff (i.e., editorial), enclose it in parentheses: (#), etc.  Make sure that flats in the key signatures are explicitly specified.  
-
-
-4. The syntax structure for a mensural note is as follows: pitch(mensuralType)[stems]{flags}
-A mensuralType may be any of Mx for maxima, L for longa, B for brevis, SB for semibrevis, M for minima, or SM for semimina. 
-For more information on mensural types, please see the documentation for :class:`music21.medren.generalMensuralNote`.
-If no mensural type is specified, it is assumed to be the same as the previous note. I.e., c(SB) B c d is a string of semibrevises. 
-
->>> from music21 import *
->>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(M)')
->>> tTNN.note.pitch
-A4
->>> tTNN.note.mensuralType
-'minima'
-
-An additional stem may be added by specifying direction: S for a sidestem, D for a downstem, and an empty string to reset. 
-For example, adding [D] to a note string would add a downstem to that note. Stems must still follow the rules outlined in :meth:`music21.medren.MensuralNote.setStem()`.
-
->>> from music21 import *
->>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(SB)[S]')
->>> tTNN.note.getStems()
-['side']
->>> 
->>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(M)[D]')
->>> tTNN.note.getStems()
-['up', 'down']
-
-A flag may be added by specifying direction of stem and orientation of flag. Valid directions are U for up, D for down, and an empty string to reset (sidestems cannot have flags).
-Valid orietations are L for left, R for right, and an empty string to reset. For example, adding {DL} to a note string would add a left flag to that note's downstem.
-Flags must still follow the rules outlined in :meth:`music21.medren.MensuralNote.setFlag()`.
-
->>> from music21 import *
->>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(SM){UL}')
->>> tTNN.note.getStems()
-['up']
->>> tTNN.note.getFlags()
-{'up': 'left'}
-
-Multiple flags may be added by placing a space between direction-orientation pairs, as shown in the following complex example:
-
->>> from music21 import *
->>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(SM)[D]{UL DR}')
->>> tTNN.note.getStems()
-['up', 'down']
->>> tTNN.note.getFlags()
-{'down': 'right', 'up': 'left'}
-
-
-5. It is also possible to create ligatures using the TinyTrecentoNotationNote class. Put all notes in a ligature within < and > symbols.
-
->>> from music21 import *
->>> tTNN = trecento.notation.TinyTrecentoNotationNote('<f g a g f >')
->>> tTNN.note 
-<music21.medren.Ligature...>
-
-The notes within a ligature have the syntax pitch*notehead*[stems](maxima). Valid notehead shapes are s for square and o for oblique. Valid stem directions are U for up and D for down, and valid orientations are L for left and R for right.
-To set a note of a ligature as a maxima, append (Mx) to the note string. To set a note of a ligature as reversed, append a forward slash to the note string.
-Note, ligatures must follow the rules outlined by :class:`music21.medren.Ligature`.
-Examples:
-
->>> from music21 import*
->>> tTNN = trecento.notation.TinyTrecentoNotationNote('<f a[DL]/>')
->>> tTNN.note.getStem(1)
-('down', 'left')
->>> tTNN.note.isReversed(1)
-True
->>>
->>> tTNN = trecento.notation.TinyTrecentoNotationNote('<f*o* g a[UR] g f(Mx)>')
->>> print [n.mensuralType for n in tTNN.note.notes]
-['longa', 'brevis', 'semibrevis', 'semibrevis', 'maxima']
->>> tTNN.note.getNoteheadShape(1)
-'oblique'
-
-
-6. Separate objects in a TinyNotationStream by spaces. To add a mensural clef to the stream, add $, followed by the clef type (F or C) to the string. If the clef line on the staff is non-standard, include that after the type.
-For example, $F2 would indicate an F-clef on the second line of the staff. To add a divisione to a tiny notation stream, simply include the divisione abbreviation in the string. For example, .p. would indicate senaria perfecta.
-
->>> from music21 import *
->>> tTNS = trecento.notation.TinyTrecentoNotationStream('$C3 .p. c(SB) d e p d(B) <e d c>')
->>> tTNS.show('text')
-{0.0} <music21.clef.MensuralClef>
-{0.0} <music21.trecento.notation.Divisione .p.>
-{0.0} <music21.medren.MensuralNote semibrevis C>
-{0.0} <music21.medren.MensuralNote semibrevis D>
-{0.0} <music21.medren.MensuralNote semibrevis E>
-{0.0} <music21.trecento.notation.Punctus...>
-{0.0} <music21.medren.MensuralNote brevis D>
-{0.0} <music21.medren.Ligature...>
-'''
+    These are modified from a standard lilypond format called TinyNotation.
     
+    Here are some important points about how to create notes and streams:
+    
+    1. Note names are: a,b,c,d,e,f,g. r indicates a rest, and p indicates a punctus.
+    
+    
+    2. Note octaves are specified as follows:
+        CC to BB = from C below bass clef to second-line B in bass clef
+        C to B = from bass clef C to B below middle C.
+        c  to b = from middle C to the middle of treble clef
+        c' to b' = from C in treble clef to B above treble clef (make sure you’re NOT putting in smart quotes)
+    In 14th c. music, C to B and c to b will be most common
+    
+    
+    3. Flats, sharps, and naturals are notated as #,- (not b), and (if needed) n.  
+    If the accidental is above the staff (i.e., editorial), enclose it in parentheses: (#), etc.  Make sure that flats in the key signatures are explicitly specified.  
+    
+    
+    4. The syntax structure for a mensural note is as follows: pitch(mensuralType)[stems]{flags}
+    A mensuralType may be any of Mx for maxima, L for longa, B for brevis, SB for semibrevis, M for minima, or SM for semimina. 
+    For more information on mensural types, please see the documentation for :class:`music21.medren.generalMensuralNote`.
+    If no mensural type is specified, it is assumed to be the same as the previous note. I.e., c(SB) B c d is a string of semibrevises. 
+    
+    >>> from music21 import *
+    >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(M)')
+    >>> tTNN.note.pitch
+    A4
+    >>> tTNN.note.mensuralType
+    'minima'
+    
+    An additional stem may be added by specifying direction: S for a sidestem, D for a downstem, and an empty string to reset. 
+    For example, adding [D] to a note string would add a downstem to that note. Stems must still follow the rules outlined in :meth:`music21.medren.MensuralNote.setStem()`.
+    
+    >>> from music21 import *
+    >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(SB)[S]')
+    >>> tTNN.note.getStems()
+    ['side']
+    >>> 
+    >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(M)[D]')
+    >>> tTNN.note.getStems()
+    ['up', 'down']
+    
+    A flag may be added by specifying direction of stem and orientation of flag. Valid directions are U for up, D for down, and an empty string to reset (sidestems cannot have flags).
+    Valid orietations are L for left, R for right, and an empty string to reset. For example, adding {DL} to a note string would add a left flag to that note's downstem.
+    Flags must still follow the rules outlined in :meth:`music21.medren.MensuralNote.setFlag()`.
+    
+    >>> from music21 import *
+    >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(SM){UL}')
+    >>> tTNN.note.getStems()
+    ['up']
+    >>> tTNN.note.getFlags()
+    {'up': 'left'}
+    
+    Multiple flags may be added by placing a space between direction-orientation pairs, as shown in the following complex example:
+    
+    >>> from music21 import *
+    >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(SM)[D]{UL DR}')
+    >>> tTNN.note.getStems()
+    ['up', 'down']
+    >>> tTNN.note.getFlags()
+    {'down': 'right', 'up': 'left'}
+    
+    
+    5. It is also possible to create ligatures using the TinyTrecentoNotationNote class. Put all notes in a ligature within < and > symbols.
+    
+    >>> from music21 import *
+    >>> tTNN = trecento.notation.TinyTrecentoNotationNote('<f g a g f >')
+    >>> tTNN.note 
+    <music21.medren.Ligature...>
+    
+    The notes within a ligature have the syntax pitch*notehead*[stems](maxima). Valid notehead shapes are s for square and o for oblique. Valid stem directions are U for up and D for down, and valid orientations are L for left and R for right.
+    To set a note of a ligature as a maxima, append (Mx) to the note string. To set a note of a ligature as reversed, append a forward slash to the note string.
+    Note, ligatures must follow the rules outlined by :class:`music21.medren.Ligature`.
+    Examples:
+    
+    >>> from music21 import*
+    >>> tTNN = trecento.notation.TinyTrecentoNotationNote('<f a[DL]/>')
+    >>> tTNN.note.getStem(1)
+    ('down', 'left')
+    >>> tTNN.note.isReversed(1)
+    True
+    >>>
+    >>> tTNN = trecento.notation.TinyTrecentoNotationNote('<f*o* g a[UR] g f(Mx)>')
+    >>> print [n.mensuralType for n in tTNN.note.notes]
+    ['longa', 'brevis', 'semibrevis', 'semibrevis', 'maxima']
+    >>> tTNN.note.getNoteheadShape(1)
+    'oblique'
+    
+    
+    6. Separate objects in a TinyNotationStream by spaces. To add a mensural clef to the stream, add $, followed by the clef type (F or C) to the string. If the clef line on the staff is non-standard, include that after the type.
+    For example, $F2 would indicate an F-clef on the second line of the staff. To add a divisione to a tiny notation stream, simply include the divisione abbreviation in the string. For example, .p. would indicate senaria perfecta.
+    
+    >>> from music21 import *
+    >>> tTNS = trecento.notation.TinyTrecentoNotationStream('$C3 .p. c(SB) d e p d(B) <e d c>')
+    >>> tTNS.show('text')
+    {0.0} <music21.clef.MensuralClef>
+    {0.0} <music21.trecento.notation.Divisione .p.>
+    {0.0} <music21.medren.MensuralNote semibrevis C>
+    {0.0} <music21.medren.MensuralNote semibrevis D>
+    {0.0} <music21.medren.MensuralNote semibrevis E>
+    {0.0} <music21.trecento.notation.Punctus...>
+    {0.0} <music21.medren.MensuralNote brevis D>
+    {0.0} <music21.medren.Ligature...>
+    '''
     CLEF = compile('(\$[A-Z]\d?)')
     DIVISIONE = compile('(\.[a-z]\.)')
     
     def __init__(self, stringRep = "", div = None):
-        music21.stream.Stream.__init__(self)
+        tinyNotation.TinyNotationStream.__init__(self)
         self.stringRep = stringRep
         divisione, mensuralClef = None, None
         storedDict = {}
         objList = []
         
         noteStrs  = []
-        
+        from music21 import medren
+
         def breakString(string, startBreakChar, endBreakChar, func = lambda s: s.split()):
+            
             broken = []
             while len(string) > 0:
                 startInd = string.find(startBreakChar)
@@ -162,7 +176,7 @@ For example, $F2 would indicate an F-clef on the second line of the staff. To ad
                     string = string[endInd+1:]
                 
                 else:
-                    raise music21.trecento.notation.TrecentoNotationException('%s, %s invalid ligature indices' % (startInd, endInd))
+                    raise TrecentoNotationException('%s, %s invalid ligature indices' % (startInd, endInd))
             return broken
             
             
@@ -176,22 +190,22 @@ For example, $F2 would indicate an F-clef on the second line of the staff. To ad
             
             if self.CLEF.match(ns) is not None:
                 clefString = self.CLEF.match(ns).group()[1:]
-                clef = music21.medren.MensuralClef(clefString[0])
+                clef = medren.MensuralClef(clefString[0])
                 if len(clefString) > 1:
                     clef.line = clefString[1]
                 objList.append(clef)
             
             elif self.DIVISIONE.match(ns) is not None:
                 divisioneString = self.DIVISIONE.match(ns).group()
-                objList.append(music21.trecento.notation.Divisione(divisioneString))
+                objList.append(Divisione(divisioneString))
             
             else:
                 tTN = None
                 try:
                     tTN = self.getNote(ns, storedDict)
                     objList.append(tTN.note)
-                except music21.trecento.notation.TrecentoNotationException, (value):
-                    raise music21.trecento.notation.TrecentoNotationException('%s in context %s' % (value, ns))
+                except TrecentoNotationException, (value):
+                    raise TrecentoNotationException('%s in context %s' % (value, ns))
         
         for obj in objList:
             self.append(obj)
@@ -200,7 +214,7 @@ For example, $F2 would indicate an F-clef on the second line of the staff. To ad
         
         return TinyTrecentoNotationNote(stringRep, storedDict)    
 
-class TinyTrecentoNotationNote(music21.tinyNotation.TinyNotationNote):
+class TinyTrecentoNotationNote(tinyNotation.TinyNotationNote):
     ''' 
     For documentation please see :class:`music21.trecento.notation.TinyTrecentoNotationStream`.
     '''
@@ -217,25 +231,25 @@ class TinyTrecentoNotationNote(music21.tinyNotation.TinyNotationNote):
         if (self.OCTAVE2.match(stringRep)) is not None: # BB etc.
             step = self.OCTAVE2.match(stringRep)
             octave = 3 - len(step.group(1))
-            pitchObj = music21.pitch.Pitch(step.group(1)[0])
+            pitchObj = pitch.Pitch(step.group(1)[0])
             pitchObj.octave = octave
             
         elif (self.OCTAVE3.match(stringRep)) is not None:
             step = self.OCTAVE3.match(stringRep).group(1)
             octave = 3
-            pitchObj = music21.pitch.Pitch(step)
+            pitchObj = pitch.Pitch(step)
             pitchObj.octave = octave
             
         elif (self.OCTAVE5.match(stringRep)) is not None: # must match octave 5 then 4!
             step = self.OCTAVE5.match(stringRep)
             octave = 4 + len(step.group(2))
-            pitchObj = music21.pitch.Pitch(step.group(1)[0])
+            pitchObj = pitch.Pitch(step.group(1)[0])
             pitchObj.octave = octave
             
         elif (self.OCTAVE4.match(stringRep)) is not None: 
             step = self.OCTAVE4.match(stringRep).group(1)
             octave = 4
-            pitchObj = music21.pitch.Pitch(step)
+            pitchObj = pitch.Pitch(step)
             pitchObj.octave = octave
         else:
             raise TrecentoNotationException("could not get pitch information from " + str(stringRep))
@@ -243,27 +257,29 @@ class TinyTrecentoNotationNote(music21.tinyNotation.TinyNotationNote):
         return pitchObj
     
     def customPitchMatch(self, stringRep, storedDict):
-        
+        from music21 import medren
+
         noteLikeObject = None
         storedDict['lastDuration'] = duration.ZeroDuration()
             
         if self.LIGATURE.search(stringRep) is not None:
-            noteLikeObj = music21.medren.Ligature()
+            noteLikeObj = medren.Ligature()
             
         elif self.PUNCTUS.search(stringRep) is not None:
-            noteLikeObj = music21.trecento.notation.Punctus()
+            noteLikeObj = Punctus()
             
         elif self.REST.search(stringRep) is not None:
-            noteLikeObj = music21.medren.MensuralRest()
+            noteLikeObj = medren.MensuralRest()
             
         else:
-            noteLikeObj = music21.medren.MensuralNote(self._getPitch(stringRep))
+            noteLikeObj = medren.MensuralNote(self._getPitch(stringRep))
         
         return noteLikeObj
     
     def customNotationMatch(self, noteLikeObject, stringRep, storedDict):
+        from music21 import medren
         
-        if isinstance(noteLikeObject, music21.medren.Ligature): #Ligature syntax
+        if isinstance(noteLikeObject, medren.Ligature): #Ligature syntax
             
             ligString = stringRep[1:-1] 
             ligList = ligString.split()
@@ -338,13 +354,13 @@ class TinyTrecentoNotationNote(music21.tinyNotation.TinyNotationNote):
         
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-class Punctus(music21.base.Music21Object):
+class Punctus(base.Music21Object):
     '''
     An object representing a punctus, found in Trecento notation.
     '''
     def __init__(self):
         self._fontString = '0x70'
-        music21.base.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
     
     def _getFontString(self):
         return self._fontString
@@ -430,7 +446,7 @@ class Divisione(meter.TimeSignature):
                                 ''')
         
 def convertTrecentoStream(inpStream, inpDiv = None):
-    '''
+    u'''
     Take one argument: input stream.
     Converts an entire stream containing only mensural and trecento objects into one containing modern clef, note, and time signature objects.
     The converted stream preserves the structure of the original stream, converting only the mensural and trecento objects.
@@ -442,27 +458,30 @@ def convertTrecentoStream(inpStream, inpDiv = None):
     .. image:: images/medren_SePerDureca.*
         :width: 600
     
-    Anonymous, Se per dure�a.  Padua, Biblioteca Universitaria, MS 1115.  Folio Ar.
+    Anonymous, Se per dureça.  Padua, Biblioteca Universitaria, MS 1115.  Folio Ar.
     
     >>> from music21 import *
-    >>>
-    >>> upperString = """
-    .p. $C1 g(B) g(M) f e g f e p g(SB) f(SM) e d e(M) f p e(SB) e(SM) f e d(M) c p d(SB) r e p f(M) e d e d c p d(SB) c(M) d c d p e(SB) r(M) g f e p g(SB) a(SM) g f e(M) d p e(SB) f(SM) e d c(M) d e(L) 
-    a(SB) a p b(M) a g a g f p g f e f e f p g(SB) g(SM) a g f e d p e(SB) r(M) f(SM) e d e(M) p d(SB) r e(M) f p g(SB) d r(SM) e p f e d e d c p d(SB) d(M) e(SB) c(M) p d(SB) c(M) d c B c(L) 
-    c'(SB)[D] c' p c'(SM) b a  b(M) c' b c' p b(SM) a g a(M) b a b p g(SB) g(SM) a g f e d p e(SB) r e(M) f p g f e f e f p g(SB) r g(M) f p g(SB) f(SM) e d e(M) f e(L) 
-    a(M) b a b g(SB) p c'(M) b a c' b a p  b c' b a g a p b(SB) c'(SM) b a g(M) f p a(SB) a(M) g(SB) f(M) p e(SB) r g(M) f p g f e f e d p c(SB) d r p a g(SM) a g f e d p e(SB) r f(SM) e d e(SB) d(Mx)
-    """
-    >>>
-    >>> lowerString = """
-    .p. $C3 c(L) G(B) A(SB) B c p d c r p A B c p d c B p <A*o*[DL] G> A c B A(L) 
-    A(SB) A p  G A B p c c(M) B(SB) A(M) p G(SB) G p A B c p d A r p G[D] A p B B(M) c(SB) c(M) p d(SB) d(M) A(SB) A(M) p G(SB) A B C(L) 
-    c(SB)[D] c e(B) d c(SB) c d p e d r p c c(M) d(SB) d(M) p c(SB) r r p c d c(M) d e(L) 
-    d(SB)[D] e p c[D] d p e e(M) d(SB) c(M) p B(SB) A B(M) c p d(SB) d(M) c(SB) d(M) p e(SB) d r p c c c(M) A(SB) B(M) p c(SB) B B p A B[D] p A B c d(Mx)
-    """
-    >>>
-    >>> SePerDureca.append(trecento.notation.TinyTrecentoNotationStream(upperString)
-    >>> SePerDureca.append(trecento.notation.TinyTrecentoNotationStream(lowerString)
-    >>> 
+    >>> upperString = ".p. $C1 g(B) g(M) f e g f e p g(SB) f(SM) e d e(M) f p e(SB) e(SM) f e d(M) c p "
+    >>> upperString += "d(SB) r e p f(M) e d e d c p d(SB) c(M) d c d p e(SB) r(M) g f e p g(SB) a(SM) g f e(M) d p "
+    >>> upperString += "e(SB) f(SM) e d c(M) d e(L) a(SB) a p b(M) a g a g f p g f e f e f p "
+    >>> upperString += "g(SB) g(SM) a g f e d p e(SB) r(M) f(SM) e d e(M) p d(SB) r e(M) f p "
+    >>> upperString += "g(SB) d r(SM) e p f e d e d c p d(SB) d(M) e(SB) c(M) p d(SB) c(M) d c B c(L) "
+    >>> upperString += "c'(SB)[D] c' p c'(SM) b a  b(M) c' b c' p b(SM) a g a(M) b a b p "
+    >>> upperString += "g(SB) g(SM) a g f e d p e(SB) r e(M) f p g f e f e f p g(SB) r g(M) f p "
+    >>> upperString += "g(SB) f(SM) e d e(M) f e(L) a(M) b a b g(SB) p c'(M) b a c' b a p "
+    >>> upperString += "b c' b a g a p b(SB) c'(SM) b a g(M) f p a(SB) a(M) g(SB) f(M) p "
+    >>> upperString += "e(SB) r g(M) f p g f e f e d p c(SB) d r p a g(SM) a g f e d p e(SB) r f(SM) e d e(SB) d(Mx)"
+
+    >>> lowerString = ".p. $C3 c(L) G(B) A(SB) B c p d c r p A B c p d c B p <A*o*[DL] G> A c B A(L) "
+    >>> lowerString += "A(SB) A p  G A B p c c(M) B(SB) A(M) p G(SB) G p A B c p d A r p G[D] A p "
+    >>> lowerString += "B B(M) c(SB) c(M) p d(SB) d(M) A(SB) A(M) p G(SB) A B C(L) "
+    >>> lowerString += "c(SB)[D] c e(B) d c(SB) c d p e d r p c c(M) d(SB) d(M) p c(SB) r r p "
+    >>> lowerString += "c d c(M) d e(L) d(SB)[D] e p c[D] d p e e(M) d(SB) c(M) p B(SB) A B(M) c p "
+    >>> lowerString += "d(SB) d(M) c(SB) d(M) p e(SB) d r p c c c(M) A(SB) B(M) p c(SB) B B p A B[D] p A B c d(Mx)"
+
+    >>> SePerDureca.append(trecento.notation.TinyTrecentoNotationStream(upperString))
+    >>> SePerDureca.append(trecento.notation.TinyTrecentoNotationStream(lowerString))
+
     >>> SePerDurecaConverted = trecento.notation.convertTrecentoStream(SePerDureca)
     Getting measure 0...
     ...
@@ -474,37 +493,39 @@ def convertTrecentoStream(inpStream, inpDiv = None):
         :width: 600
     
     '''
+    from music21 import medren
+
     div = inpDiv
     offset = 0
 
     convertedStream = inpStream.__class__()
-    measuredStream = music21.medren.breakMensuralStreamIntoBrevisLengths(inpStream, inpDiv)
+    measuredStream = medren.breakMensuralStreamIntoBrevisLengths(inpStream, inpDiv)
     print ''
     
     for e in measuredStream:
         
-        if isinstance(e, music21.metadata.Metadata) or \
-        isinstance(e, music21.text.TextBox): #Formatting
+        if isinstance(e, metadata.Metadata) or \
+        isinstance(e, text.TextBox): #Formatting
             convertedStream.append(e)
         
-        elif isinstance(e, music21.medren.MensuralClef):
+        elif isinstance(e, medren.MensuralClef):
             pass
         
         elif isinstance(e, Divisione):
             div = e
         
-        elif isinstance(e, music21.stream.Measure):
+        elif isinstance(e, stream.Measure):
             print '    Converting measure %s' % e.number
             measureList = convertBrevisLength(e, convertedStream, inpDiv = div, measureNumOffset = offset)
             for m in measureList:
                 convertedStream.append(m)
             
-        elif isinstance(e, music21.stream.Stream):
+        elif isinstance(e, stream.Stream):
             print 'Converting stream %s' % e
             convertedStream.insert(0, convertTrecentoStream(e, inpDiv = div))
         
         else:
-            raise MedRenException('Object %s cannot be processed as part of a trecento stream' % e)
+            raise medren.MedRenException('Object %s cannot be processed as part of a trecento stream' % e)
     
     return convertedStream
 
@@ -518,9 +539,10 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv = None, measureNum
     
     This acts as a helper method to improve the efficiency of :meth:`music21.trecento.notation.convertTrecentoStream`.
     '''
+    from music21 import medren
     
     div = inpDiv
-    m = music21.stream.Measure(number = brevisLength.number + measureNumOffset)
+    m = stream.Measure(number = brevisLength.number + measureNumOffset)
     rem = None
     measureList = []
         
@@ -540,7 +562,7 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv = None, measureNum
         rem = div.barDuration.quarterLength
         
         if brevisLength.number == 0:
-            m.append(music21.clef.TrebleClef())
+            m.append(clef.TrebleClef())
             m.append(meter.TimeSignature(div.timeString)) #Trusting that divisione won't change while one voice is holding.
         if div.standardSymbol in ['.o.', '.d.']:
             mDur = 0.25
@@ -552,36 +574,36 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv = None, measureNum
 
                 
     if lenList[0] > div.minimaPerBrevis: #Longa, Maxima
-        startNote = music21.note.Note(mList[0].pitch)
+        startNote = note.Note(mList[0].pitch)
         startNote.duration = div.barDuration
-        startNote.tie = music21.tie.Tie('start')
+        startNote.tie = tie.Tie('start')
         m.append(startNote)
         measureList.append(m)
         
         for j in range(int(lenList[0]/div.minimaPerBrevis) - 2):
             measureNumOffset += 1
             
-            tempMeasure = music21.stream.Measure(number = brevisLength.number + measureNumOffset)
-            tempNote = music21.note.Note(mList[0].pitch)
+            tempMeasure = stream.Measure(number = brevisLength.number + measureNumOffset)
+            tempNote = note.Note(mList[0].pitch)
             tempNote.duration = div.barDuration
-            tempNote.tie = music21.tie.Tie('continue')
+            tempNote.tie = tie.Tie('continue')
             tempMeasure.append(tempNote)
             measureList.append(tempMeasure)
         
         measureNumOffset += 1
-        finalMeasure = music21.stream.Measure(number = brevisLength.number + measureNumOffset)
-        finalNote = music21.note.Note(mList[0].pitch)
+        finalMeasure = stream.Measure(number = brevisLength.number + measureNumOffset)
+        finalNote = note.Note(mList[0].pitch)
         finalNote.duration = div.barDuration
-        finalNote.tie = music21.tie.Tie('end')
+        finalNote.tie = tie.Tie('end')
         finalMeasure.append(finalNote)
         measureList.append(finalMeasure)
         
     else:
         for i in range(len(mList)):
-            if isinstance(mList[i], music21.medren.MensuralRest):
-                n = music21.note.Rest()
-            elif isinstance(mList[i], music21.medren.MensuralNote):
-                n = music21.note.Note(mList[i].pitch)
+            if isinstance(mList[i], medren.MensuralRest):
+                n = note.Rest()
+            elif isinstance(mList[i], medren.MensuralNote):
+                n = note.Note(mList[i].pitch)
             
             dur = lenList[i]*mDur
             
@@ -591,15 +613,15 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv = None, measureNum
                 rem -= dur
             else: #Syncopated across barline
                 n.duration = duration.Duration(rem)
-                n.tie = music21.tie.Tie('start')
+                n.tie = tie.Tie('start')
                 m.append(n)
                 measureList.append(m)
                 measureNumOffset += 1
                 
-                m = music21.stream.Measure(number = brevisLength.number + measureNumOffset)
-                n_tied = music21.note.Note(mList[i].pitch)
+                m = stream.Measure(number = brevisLength.number + measureNumOffset)
+                n_tied = note.Note(mList[i].pitch)
                 n_tied.duration = duration.Duration(dur - rem)
-                n_tied.tie = music21.tie.Tie('end')
+                n_tied.tie = tie.Tie('end')
                 m.append(n_tied)
                 rem = div.barDuration.quarterLength - dur + rem
         measureList.append(m)
@@ -776,7 +798,8 @@ class TranslateBrevisLength:
        
     def _translate(self):
         #########################################################################################################################################
-            
+        from music21 import medren
+
         def processBL(bl, lengths, change_list, change_nums, diff_list, lenRem, releases = None, multi = 0):
             '''
             Gets all possible length combinations. Returns the lengths combination of the "strongest" list, along with the remaining length. 
@@ -893,10 +916,10 @@ class TranslateBrevisLength:
             elif obj.mensuralType == 'brevis':
                 minimaLength = float(self.div.minimaPerBrevis)
             elif minimaLengths[i] == 0 and \
-            ( isinstance(obj, music21.medren.MensuralNote) or isinstance(obj, music21.medren.MensuralRest) ):
+            ( isinstance(obj, medren.MensuralNote) or isinstance(obj, medren.MensuralRest) ):
                 #Dep on div
                 if obj.mensuralType == 'semibrevis':
-                    if isinstance(obj, music21.medren.MensuralRest):
+                    if isinstance(obj, medren.MensuralRest):
                         if self.div.standardSymbol in ['.q.', '.i.']:
                             minimaLength = self.div.minimaPerBrevis/float(2)
                         elif self.div.standardSymbol in ['.p.', '.n.']:
@@ -911,21 +934,21 @@ class TranslateBrevisLength:
                         else:
                             semibrevis_list.append(i)
                 if obj.mensuralType == 'minima':
-                    if isinstance(obj, music21.medren.MensuralNote) and 'down' in obj.stems:
+                    if isinstance(obj, medren.MensuralNote) and 'down' in obj.stems:
                         raise TrecentoNotationException('Dragmas currently not supported')
-                    elif isinstance(obj, music21.medren.MensuralNote) and 'side' in obj.stems:
+                    elif isinstance(obj, medren.MensuralNote) and 'side' in obj.stems:
                         minimaLength = 1.5
                     else:
                         minimaLength = 1.0
                 if obj.mensuralType == 'semiminima':
-                    if isinstance(obj, music21.medren.MensuralNote):
+                    if isinstance(obj, medren.MensuralNote):
                         if 'down' in obj.getStems():
                             raise TrecentoNotationException('Dragmas currently not supported')
                         elif obj.getFlags()['up'] == 'right':
                             semiminima_right_flag_list.append(i)
                         elif obj.getFlags()['up'] == 'left':
                             semiminima_left_flag_list.append(i)
-                    if isinstance(obj, music21.medren.MensuralRest):
+                    if isinstance(obj, medren.MensuralRest):
                         semiminima_rest_list.append(i) 
                 minRem -= minimaLength
             minimaLengths[i] = minimaLength
@@ -1448,7 +1471,7 @@ class TranslateBrevisLength:
                             extend_num_2 = len(extend_list_2)
                             minimaLengths_changeable, minRem_changeable = minimaLengths_changeable, minRem_changeable = processBL(self.brevisLength, minimaLengths_changeable, extend_list_2, extend_num_2, float(1)/6, minRem_changeable)
                     
-                    newMensuralBL = [music21.medren.MensuralNote('A', 'SB') for i in range(len(semibrevis_downstem))]
+                    newMensuralBL = [medren.MensuralNote('A', 'SB') for i in range(len(semibrevis_downstem))]
                     
                     newDiv = Divisione('.d.')
                     newDiv.minimaPerBrevis = minRem_changeable
@@ -1483,7 +1506,7 @@ class TranslateBrevisLength:
         
         return minimaLengths
 
-class TrecentoNotationException(music21.Music21Exception):
+class TrecentoNotationException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1594,4 +1617,5 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == '__main__':
+    import music21
     music21.mainTest(Test)

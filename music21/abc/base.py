@@ -20,7 +20,6 @@ ABC conversion from a file or URL to a :class:`~music21.stream.Stream` is availa
 Low level ABC conversion is facilitated by the objects in this module and :func:`music21.abc.translate.abcToStreamScore`.
 '''
 
-import music21
 import unittest
 import re, codecs
 
@@ -2665,6 +2664,7 @@ _DOC_ORDER = [ABCFile, ABCHandler, ABCHandlerBar]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 

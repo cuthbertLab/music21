@@ -75,7 +75,8 @@ class Distributor(object):
 
 
     def updatePaths(self):
-        '''Process output of build scripts. Get most recently produced distributions.
+        '''
+        Process output of build scripts. Get most recently produced distributions.
         '''
         contents = os.listdir(self.fpDistDir)
         for fn in contents:
@@ -84,7 +85,8 @@ class Distributor(object):
                 self.fpEgg = fp
             elif self.version in fn and fn.endswith('.exe'):
                 fpNew = fp.replace('.macosx-10.6-intel.exe', '.exe')
-                os.rename(fp, fpNew)
+                if fpNew != fp:
+                    os.rename(fp, fpNew)
                 self.fpWin = fpNew
             elif self.version in fn and fn.endswith('.tar.gz'):
                 self.fpTar = fp
@@ -94,10 +96,8 @@ class Distributor(object):
             if fn == None:
                 environLocal.warn('missing fn path')
             else:
-                environLocal.warn(fn)
-
-
-
+                environLocal.warn(fn)   
+    
     def removeCorpus(self, fp):
         '''Remove the corpus from a compressed file (.tar.gz or .egg) and create a new music21-noCorpus version.
 
@@ -302,5 +302,5 @@ if __name__ == '__main__':
     d.buildNoCorpus = False
     d.build()
     d.updatePaths()
-    d.upload()
+    #d.upload()
     

@@ -805,7 +805,7 @@ class AskInstall(YesOrNo):
             self._writeToUser(['You must authorize writing in the following directory:', getSitePackages(), ' ', 'Please provide your user password to complete this opperation.', ''])
 
             stdoutSrc = sys.stdout
-            stderrSrc = sys.stderr
+            #stderrSrc = sys.stderr
 
             fileLikeOpen = StringIO.StringIO()
             sys.stdout = fileLikeOpen
@@ -817,7 +817,7 @@ class AskInstall(YesOrNo):
 
             fileLikeOpen.close()
             sys.stdout = stdoutSrc
-            sys.stderr = stderrSrc
+            #sys.stderr = stderrSrc
             return post
 
     def _performAction(self, simulate=False):

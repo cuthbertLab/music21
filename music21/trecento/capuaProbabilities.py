@@ -3,7 +3,6 @@
 Module to determine how often we would expect to have Francesco\'s cadences happen by chance
 '''
 
-import music21
 from music21 import common, note, trecento
 from music21.trecento import cadencebook
 import random

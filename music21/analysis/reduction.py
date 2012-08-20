@@ -17,7 +17,6 @@
 import doctest, unittest
 import copy
 
-import music21 
 from music21 import stream, note, expressions
 from music21 import instrument
 from music21 import pitch
@@ -1186,6 +1185,7 @@ _DOC_ORDER = []
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 

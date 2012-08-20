@@ -18,8 +18,9 @@ import os
 import string, copy, math
 import unittest, doctest
 
-import music21
+from music21 import base
 from music21 import common
+from music21 import exceptions21
 from music21 import musicxml
 musicxmlMod = musicxml # alias as to avoid name conflict below
 from music21 import defaults
@@ -440,17 +441,17 @@ def convertHarmonicToCents(value):
 
 
 #-------------------------------------------------------------------------------
-class AccidentalException(music21.Music21Exception):
+class AccidentalException(exceptions21.Music21Exception):
     pass
 
-class PitchException(music21.Music21Exception):
+class PitchException(exceptions21.Music21Exception):
     pass
 
-class MicrotoneException(music21.Music21Exception):
+class MicrotoneException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
-class Microtone(music21.JSONSerializer):
+class Microtone(base.JSONSerializer):
     '''
     The Microtone object defines a pitch transformation above 
     or below a standard Pitch and its Accidental.
@@ -499,7 +500,7 @@ class Microtone(music21.JSONSerializer):
     0.3333...
     '''
     def __init__(self, centsOrString=0):
-        music21.JSONSerializer.__init__(self)
+        base.JSONSerializer.__init__(self)
 
         self._centShift = 0
         self._harmonicShift = 1 # the first harmonic is the start
@@ -633,7 +634,7 @@ def _getSpanishSolfege(pitch):
         if pitch == 'G':
             return 'sol '
         
-class Accidental(music21.Music21Object):
+class Accidental(base.Music21Object):
     '''
     Accidental class, representing the symbolic and numerical representation of pitch deviation from a pitch name (e.g., G, B). 
     
@@ -671,7 +672,7 @@ class Accidental(music21.Music21Object):
     }
 
     def __init__(self, specifier='natural'):
-        music21.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
 
         # managed by properties
         self._displayType = "normal" # always, never, unless-repeated, even-tied
@@ -1139,7 +1140,7 @@ class Accidental(music21.Music21Object):
 
 
 #-------------------------------------------------------------------------------
-class Pitch(music21.Music21Object):
+class Pitch(base.Music21Object):
     '''
     An object for storing pitch values. 
     All values are represented internally as a 
@@ -1202,7 +1203,7 @@ class Pitch(music21.Music21Object):
         
         
         '''
-        music21.Music21Object.__init__(self, **keywords)
+        base.Music21Object.__init__(self, **keywords)
 
         # this should not be set, as will be updated when needed
         self._ps = None # pitch space representation, w C4=60 (midi)
@@ -4836,6 +4837,7 @@ _DOC_ORDER = [Pitch, Accidental]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
     #t = Test()
     #t.testAccidentalsCautionary()

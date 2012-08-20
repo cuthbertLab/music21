@@ -24,7 +24,6 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 
 import unittest
 import sys
-import music21
 
 from music21 import meter
 from music21 import pitch
@@ -1459,6 +1458,7 @@ _DOC_ORDER = [analyzeStream, DiscreteAnalysis, Ambitus, MelodicIntervalDiversity
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 

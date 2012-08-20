@@ -16,14 +16,14 @@ import unittest, doctest, copy
 import os, sys
 import os.path
 
-import music21
-import music21.note
-import music21.stream
 from music21 import clef
 from music21 import common
 from music21 import duration
 from music21 import expressions
-from music21 import Music21Exception
+from music21 import exceptions21
+from music21 import note
+from music21 import stream
+
 
 from music21 import environment
 _MOD = "chant.py"
@@ -41,7 +41,7 @@ def fromStream(inputStream):
     
     out += "%%\n"
  
-class GregorianStream(music21.stream.Stream):
+class GregorianStream(stream.Stream):
     r'''
     >>> from music21 import *
     >>> s = chant.GregorianStream()
@@ -94,7 +94,7 @@ class GregorianStream(music21.stream.Stream):
         return "(" + clef.sign.lower() + str(clef.line) + ")"
  
  
-class GregorianNote(music21.note.Note):
+class GregorianNote(note.Note):
     '''
     A GregorianNote is a subclass of :class:`~music21.note.Note` that
     contains extra attributes which represent the interpretation or
@@ -106,8 +106,8 @@ class GregorianNote(music21.note.Note):
     
     Example: a very special note.
     
-    
-    >>> n = music21.chant.GregorianNote("C4")
+    >>> from music21 import *
+    >>> n = chant.GregorianNote("C4")
     >>> n.liquescent = True 
     >>> n.quilisma = True
     >>> n.basicShape = 'virga'  # default: punctus
@@ -145,7 +145,7 @@ class GregorianNote(music21.note.Note):
     choralSign = False
    
     def __init__(self, *arguments, **keywords):
-        music21.note.Note.__init__(self, *arguments, **keywords)
+        note.Note.__init__(self, *arguments, **keywords)
        
     def toGABC(self, useClef = None, nextNote = None):
         letter = self.toBasicGABC(useClef)
@@ -508,7 +508,7 @@ SCOREGOESHERE
    
         
     
-class ChantException(music21.Music21Exception):
+class ChantException(exceptions21.Music21Exception):
     pass
  
  
@@ -530,7 +530,7 @@ class TestExternal(unittest.TestCase):
         s.append(clef.AltoClef())
     
         n = GregorianNote("C4")
-        l = music21.note.Lyric("Po")
+        l = note.Lyric("Po")
         l.syllabic = "start"
         n.lyrics.append(l)
         n.oriscus = True
@@ -571,6 +571,7 @@ _DOC_ORDER = []
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(TestExternal)
 
 #------------------------------------------------------------------------------

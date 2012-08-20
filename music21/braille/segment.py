@@ -39,7 +39,6 @@ from music21.braille import text
 import collections
 import copy
 import itertools
-import music21
 import unittest
 
 

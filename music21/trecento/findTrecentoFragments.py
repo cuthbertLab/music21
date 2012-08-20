@@ -4,7 +4,6 @@
 '''Runs a series of tests against the database to see if any of the following unidentified fragments are in there...'''
 
 
-import music21
 from music21 import metadata
 from music21.note import Note, Rest
 from music21 import interval

@@ -48,24 +48,22 @@ import doctest
 import unittest
 import math
 import re
-import music21.articulations
-import music21.chord
-import music21.dynamics
-
+from music21 import articulations
+from music21 import chord
+from music21 import dynamics
+from music21 import base
 from music21 import duration
 from music21 import bar
-
-import music21.key
-#import music21.measure
-import music21.note
-import music21.expressions
-import music21.tempo
-import music21.tie
-import music21.meter
-import music21.clef
-import music21.stream
+from music21 import key
+from music21 import note
+from music21 import expressions
+from music21 import tempo
+from music21 import tie
+from music21 import meter
+from music21 import clef
+from music21 import stream
 from music21 import common
-from music21.base import Music21Exception
+from music21 import exceptions21
 from music21.humdrum import testFiles, canonicalOutput
 from music21 import dynamics 
 
@@ -188,7 +186,7 @@ class HumdrumDataCollection(object):
         ...               "**kern\t**dynam\n" + \
         ...               "C4\tpp\n" + \
         ...               "D8\t.\n"
-        >>> hdc = music21.humdrum.spineParser.HumdrumDataCollection(eventString)
+        >>> hdc = humdrum.spineParser.HumdrumDataCollection(eventString)
         >>> eList = hdc.parseEventListFromDataStream()
         >>> eList is hdc.eventList
         True
@@ -271,7 +269,7 @@ class HumdrumDataCollection(object):
         ...               "**kern\t**dynam\n" + \
         ...               "C4\tpp\n" + \
         ...               "D8\t.\n"
-        >>> hdc = music21.humdrum.spineParser.HumdrumDataCollection(eventString)
+        >>> hdc = humdrum.spineParser.HumdrumDataCollection(eventString)
         >>> protoSpines, eventCollections = hdc.parseProtoSpinesAndEventCollections()
         >>> protoSpines is hdc.protoSpines
         True
@@ -446,11 +444,11 @@ class HumdrumDataCollection(object):
                     elif thisEvent.contents == "*-":  ## terminate spine
                         currentSpine.endingPosition = i
                     elif thisEvent.contents == "*^":  ## split spine assume they are voices
-                        newSpine1 = spineCollection.addSpine(streamClass = music21.stream.Voice)
+                        newSpine1 = spineCollection.addSpine(streamClass = stream.Voice)
                         newSpine1.insertPoint = i+1
                         newSpine1.parentSpine = currentSpine
                         newSpine1.isFirstVoice = True
-                        newSpine2 = spineCollection.addSpine(streamClass = music21.stream.Voice)
+                        newSpine2 = spineCollection.addSpine(streamClass = stream.Voice)
                         newSpine2.insertPoint = i+1
                         newSpine2.parentSpine = currentSpine
                         currentSpine.endingPosition = i # will be overridden if merged
@@ -478,7 +476,7 @@ class HumdrumDataCollection(object):
                                 newSpineList.append(mergerActive)
                             # or make a new spine...
                             else:
-                                s = spineCollection.addSpine(streamClass = music21.stream.Part)
+                                s = spineCollection.addSpine(streamClass = stream.Part)
                                 s.insertPoint = i
                                 newSpineList.append(s)
                             
@@ -514,7 +512,7 @@ class HumdrumDataCollection(object):
             raise HumdrumException("okay, you got at least one spine, but it aint got a stream in it; have you thought of taking up kindergarten teaching? (just kidding, check your data or file a bug report)")
 
         else:
-            masterStream = music21.stream.Score()
+            masterStream = stream.Score()
             for thisSpine in self.spineCollection:
                 thisSpine.stream.id = "spine_" + str(thisSpine.id)
             for thisSpine in self.spineCollection:
@@ -581,7 +579,7 @@ class SpineLine(HumdrumLine):
     
     
     >>> from music21 import *
-    >>> hsl = music21.humdrum.spineParser.SpineLine(
+    >>> hsl = humdrum.spineParser.SpineLine(
     ...         position = 7, contents="C4\t!local comment\t*M[4/4]\t.\n")
     >>> hsl.position
     7
@@ -633,7 +631,7 @@ class GlobalReference(HumdrumLine):
 
 
     >>> from music21 import *
-    >>> gr = music21.humdrum.spineParser.GlobalReference(
+    >>> gr = humdrum.spineParser.GlobalReference(
     ...        position = 20, contents = "!!!COM: Stravinsky, Igor Fyodorovich\n")
     >>> gr.position
     20
@@ -687,7 +685,7 @@ class GlobalComment(HumdrumLine):
 
 
     >>> from music21 import *
-    >>> com1 = music21.humdrum.spineParser.GlobalComment(
+    >>> com1 = humdrum.spineParser.GlobalComment(
     ...          position = 4, contents='!! this comment is global')
     >>> com1.position
     4
@@ -747,10 +745,10 @@ class HumdrumSpine(object):
 
 
     >>> from music21 import *
-    >>> SE = music21.humdrum.spineParser.SpineEvent
+    >>> SE = humdrum.spineParser.SpineEvent
     >>> spineEvents = [SE('**kern'),SE('c,4'), SE('d#8')]
     >>> spine1Id = 5
-    >>> spine1 = music21.humdrum.spineParser.HumdrumSpine(spine1Id, spineEvents)
+    >>> spine1 = humdrum.spineParser.HumdrumSpine(spine1Id, spineEvents)
     >>> spine1.insertPoint = 5
     >>> spine1.endingPosition = 6
     >>> spine1.parentSpine = 3  # spine 3 is the previous spine leading to this one
@@ -761,7 +759,7 @@ class HumdrumSpine(object):
     don't have circular references
 
 
-    >>> spineCollection1 = music21.humdrum.spineParser.SpineCollection()
+    >>> spineCollection1 = humdrum.spineParser.SpineCollection()
     >>> spine1.spineCollection = spineCollection1
 
 
@@ -788,13 +786,13 @@ class HumdrumSpine(object):
     as the streamClass argument:
     
     
-    >>> spine2 = music21.humdrum.spineParser.HumdrumSpine(
-    ...              streamClass = music21.stream.Part)
+    >>> spine2 = humdrum.spineParser.HumdrumSpine(
+    ...              streamClass = stream.Part)
     >>> spine2.stream
     <music21.stream.Part ...>
     
     '''
-    def __init__(self, id=0, eventList = None, streamClass = music21.stream.Stream):
+    def __init__(self, id=0, eventList = None, streamClass = stream.Stream):
         self.id = id
         if eventList is None:
             eventList = []
@@ -943,7 +941,7 @@ class HumdrumSpine(object):
             {0.0} <music21.note.Note D>        
         '''
         streamOut = streamIn.__class__()
-        currentMeasure = music21.stream.Measure()
+        currentMeasure = stream.Measure()
         currentMeasure.number = 0
         currentMeasureNumber = 0
         currentMeasureOffset = 0
@@ -1009,7 +1007,7 @@ class HumdrumSpine(object):
                 lastContainer  = hdStringToMeasure(eventC, lastContainer)
                 thisObject = lastContainer
             else:
-                thisObject = music21.base.ElementWrapper(event)
+                thisObject = base.ElementWrapper(event)
                 thisObject.humdrumPosition = event.position
             
             if thisObject is not None:
@@ -1052,7 +1050,7 @@ class KernSpine(HumdrumSpine):
                 for noteToProcess in notesToProcess:
                     thisNote = hdStringToNote(noteToProcess)
                     chordNotes.append(thisNote)
-                thisObject = music21.chord.Chord(chordNotes, beams=chordNotes[-1].beams)
+                thisObject = chord.Chord(chordNotes, beams=chordNotes[-1].beams)
                 thisObject.duration = chordNotes[0].duration
 
                 if currentBeamNumbers != 0 and len(thisObject.beams.beamsList) == 0:
@@ -1179,7 +1177,7 @@ class SpineEvent(object):
     
     
     >>> from music21 import *
-    >>> se1 = music21.humdrum.spineParser.SpineEvent('EEE-8')
+    >>> se1 = humdrum.spineParser.SpineEvent('EEE-8')
     >>> se1.position = 40
     >>> se1.contents
     'EEE-8'
@@ -1210,7 +1208,7 @@ class SpineEvent(object):
         
         
         >>> from music21 import *
-        >>> se = music21.humdrum.spineParser.SpineEvent('DD#4')
+        >>> se = humdrum.spineParser.SpineEvent('DD#4')
         >>> n = se.toNote()
         >>> n
         <music21.note.Note D#>
@@ -1255,7 +1253,7 @@ class SpineCollection(object):
         self.iterIndex -= 1
         return thisSpine
         
-    def addSpine(self, streamClass = music21.stream.Part):
+    def addSpine(self, streamClass = stream.Part):
         '''
         creates a new spine in the collection and returns it.
         
@@ -1269,13 +1267,13 @@ class SpineCollection(object):
         
         
         >>> from music21 import *
-        >>> hsc = music21.humdrum.spineParser.SpineCollection()
+        >>> hsc = humdrum.spineParser.SpineCollection()
         >>> newSpine = hsc.addSpine()
         >>> newSpine.id
         0
         >>> newSpine.stream
         <music21.stream.Part ...>
-        >>> newSpine2 = hsc.addSpine(streamClass = music21.stream.Stream)
+        >>> newSpine2 = hsc.addSpine(streamClass = stream.Stream)
         >>> newSpine2.id
         1
         >>> newSpine2
@@ -1315,7 +1313,8 @@ class SpineCollection(object):
         '''
         deletes a spine from the SpineCollection (after inserting, integrating, etc.)
 
-        >>> hsc = music21.humdrum.spineParser.SpineCollection()
+        >>> from music21 import *
+        >>> hsc = humdrum.spineParser.SpineCollection()
         >>> newSpine = hsc.addSpine()
         >>> newSpine.id
         0
@@ -1465,7 +1464,7 @@ class SpineCollection(object):
                                 if el.priority in prioritiesToSearch:
                                     try:
                                         el.activeSite.insert(el.offset, prioritiesToSearch[el.priority])
-                                    except music21.stream.StreamException: # may appear twice because of voices...
+                                    except stream.StreamException: # may appear twice because of voices...
                                         pass
                                         #el.activeSite.insert(el.offset, copy.deepcopy(prioritiesToSearch[el.priority]))
                     elif thisSpine.spineType == 'lyrics' or thisSpine.spineType == 'text':
@@ -1511,7 +1510,7 @@ class SpineCollection(object):
                                     voiceNumber = int(voiceName[5])
                                     voicePart = voices[voiceNumber]
                                     if voicePart is None:
-                                        voices[voiceNumber] = music21.stream.Voice()
+                                        voices[voiceNumber] = stream.Voice()
                                         voicePart = voices[voiceNumber]
                                         voicePart.groups.append(voiceName)
                                     mElOffset = mEl.offset
@@ -1613,7 +1612,7 @@ class EventCollection(object):
             retEvents.append(self.getSpineOccurring(i))
         return retEvents
         
-class HumdrumException(Music21Exception):
+class HumdrumException(exceptions21.Music21Exception):
     '''
     General Exception class for problems relating to Humdrum
     '''
@@ -1621,7 +1620,7 @@ class HumdrumException(Music21Exception):
 
 def hdStringToNote(contents):
     '''
-    returns a music21.note.Note (or Rest or Unpitched, etc.) 
+    returns a :class:`~music21.note.Note` (or Rest or Unpitched, etc.) 
     matching the current SpineEvent.
     Does not check to see that it is sane or part of a :samp:`**kern` spine, etc.
 
@@ -1630,14 +1629,14 @@ def hdStringToNote(contents):
     http://wiki.humdrum.org/index.php/Rational_rhythms
     are fully implemented:
 
-
-    >>> n = hdStringToNote("CC3%2")
+    >>> from music21 import *
+    >>> n = humdrum.spineParser.hdStringToNote("CC3%2")
     >>> n.duration.quarterLength
     2.6666666...
     >>> n.duration.fullName
     'Whole Triplet (2.67QL)'
     
-    >>> n = hdStringToNote("e-00.")
+    >>> n = humdrum.spineParser.hdStringToNote("e-00.")
     >>> n.pitch
     E-4
     >>> n.duration.quarterLength
@@ -1645,7 +1644,7 @@ def hdStringToNote(contents):
     >>> n.duration.fullName
     'Perfect Longa'
     
-    >>> n = hdStringToNote("F#000")
+    >>> n = humdrum.spineParser.hdStringToNote("F#000")
     >>> n.duration.quarterLength
     32.0
     >>> n.duration.fullName
@@ -1658,7 +1657,7 @@ def hdStringToNote(contents):
     but contradicts the specification in
     http://www.lib.virginia.edu/artsandmedia/dmmc/Music/Humdrum/kern_hlp.html#tuplets    
 
-    >>> n = hdStringToNote("6..fff")
+    >>> n = humdrum.spineParser.hdStringToNote("6..fff")
     >>> n.duration.quarterLength
     1.166666...
     >>> n.duration.dots
@@ -1681,12 +1680,12 @@ def hdStringToNote(contents):
             octave = 3 + len(kernNoteName)
         else: # below middle C
             octave = 4 - len(kernNoteName)
-        thisObject = music21.note.Note(octave = octave)
+        thisObject = note.Note(octave = octave)
         thisObject.step = step
 
     # 3.3 -- Rests
     elif contents.count("r"):
-        thisObject = music21.note.Rest()
+        thisObject = note.Rest()
     else:
         raise HumdrumException("Could not parse %s for note information" % contents)
 
@@ -1715,33 +1714,33 @@ def hdStringToNote(contents):
         for i in range(0, contents.count(')')):
             pass # slur end
     if contents.count('['):
-        thisObject.tie = music21.tie.Tie("start")
+        thisObject.tie = tie.Tie("start")
     elif contents.count(']'):
-        thisObject.tie = music21.tie.Tie("stop")
+        thisObject.tie = tie.Tie("stop")
     elif contents.count('_'):
-        thisObject.tie = music21.tie.Tie("continue")
+        thisObject.tie = tie.Tie("continue")
     
     ## 3.2.3 Ornaments    
     if contents.count('t'):
-        thisObject.expressions.append(music21.expressions.HalfStepTrill())
+        thisObject.expressions.append(expressions.HalfStepTrill())
     elif contents.count('T'):
-        thisObject.expressions.append(music21.expressions.WholeStepTrill())
+        thisObject.expressions.append(expressions.WholeStepTrill())
     
     if contents.count('w'):
-        thisObject.expressions.append(music21.expressions.HalfStepInvertedMordent())
+        thisObject.expressions.append(expressions.HalfStepInvertedMordent())
     elif contents.count('W'):
-        thisObject.expressions.append(music21.expressions.WholeStepInvertedMordent())
+        thisObject.expressions.append(expressions.WholeStepInvertedMordent())
     elif contents.count('m'):
-        thisObject.expressions.append(music21.expressions.HalfStepMordent())
+        thisObject.expressions.append(expressions.HalfStepMordent())
     elif contents.count('M'):
-        thisObject.expressions.append(music21.expressions.WholeStepMordent())
+        thisObject.expressions.append(expressions.WholeStepMordent())
 
     if contents.count('S'):
-        thisObject.expressions.append(music21.expressions.Turn())
+        thisObject.expressions.append(expressions.Turn())
     elif contents.count('$'):
-        thisObject.expressions.append(music21.expressions.InvertedTurn())
+        thisObject.expressions.append(expressions.InvertedTurn())
     elif contents.count('R'):
-        t1 = music21.expressions.Turn()
+        t1 = expressions.Turn()
         t1.connectedToPrevious = True  ## true by default, but explicitly
         thisObject.expressions.append(t1)
     
@@ -1751,31 +1750,31 @@ def hdStringToNote(contents):
         pass
     
     if contents.count("O"):
-        thisObject.expressions.append(music21.expressions.Ornament())  
+        thisObject.expressions.append(expressions.Ornament())  
         # generic ornament
     
     # 3.2.4 Articulation Marks
     if contents.count('\''):
-        thisObject.articulations.append(music21.articulations.Staccato())
+        thisObject.articulations.append(articulations.Staccato())
     if contents.count('"'):
-        thisObject.articulations.append(music21.articulations.Pizzicato())
+        thisObject.articulations.append(articulations.Pizzicato())
     if contents.count('`'):
         # called 'attacca' mark but means staccatissimo:
         # http://www.music-cog.ohio-state.edu/Humdrum/representations/kern.rep.html
-        thisObject.articulations.append(music21.articulations.Staccatissimo())
+        thisObject.articulations.append(articulations.Staccatissimo())
     if contents.count('~'):
-        thisObject.articulations.append(music21.articulations.Tenuto())
+        thisObject.articulations.append(articulations.Tenuto())
     if contents.count('^'):
-        thisObject.articulations.append(music21.articulations.Accent())
+        thisObject.articulations.append(articulations.Accent())
     if contents.count(';'):
-        thisObject.expressions.append(music21.expressions.Fermata())
+        thisObject.expressions.append(expressions.Fermata())
 
     
     # 3.2.5 Up & Down Bows
     if contents.count('v'):
-        thisObject.articulations.append(music21.articulations.UpBow())
+        thisObject.articulations.append(articulations.UpBow())
     elif contents.count('u'):
-        thisObject.articulations.append(music21.articulations.DownBow())
+        thisObject.articulations.append(articulations.DownBow())
     
     # 3.2.6 Stem Directions
     if contents.count('/'):
@@ -1864,7 +1863,7 @@ def hdStringToMeasure(contents, previousMeasure = None):
     kern uses an equals sign followed by processing instructions to
     create new measures.  Here is how...
     '''
-    m1 = music21.stream.Measure()
+    m1 = stream.Measure()
     rematchMN = re.search("(\d+)([a-z]?)", contents)
 
 
@@ -1932,7 +1931,7 @@ def hdStringToMeasure(contents, previousMeasure = None):
                 ("Cannot import a double bar visually rendered as a single bar -- not sure exactly what that would mean anyhow.")
 
     if contents.count(';'):
-        barline.pause = music21.expressions.Fermata()
+        barline.pause = expressions.Fermata()
 
 
     if previousMeasure is not None:
@@ -1968,42 +1967,42 @@ def kernTandemToObject(tandem):
     elif tandem.startswith("*clef"):
         clefType = tandem[5:]
         if clefType == "-":
-            return music21.clef.NoClef()
+            return clef.NoClef()
         elif clefType == "X":
-            return music21.clef.PercussionClef()
+            return clef.PercussionClef()
         elif clefType == "Gv2": # undocumented in Humdrum, but appears in Huron's Chorales
-            return music21.clef.Treble8vbClef()
+            return clef.Treble8vbClef()
         elif clefType == "Gv": # unknown if ever used but better safe...
-            return music21.clef.Treble8vbClef()
+            return clef.Treble8vbClef()
         elif clefType == "G^2": # unknown if ever used but better safe...
-            return music21.clef.Treble8vaClef()
+            return clef.Treble8vaClef()
         elif clefType == "G^": # unknown if ever used but better safe...
-            return music21.clef.Treble8vaClef()
+            return clef.Treble8vaClef()
         elif clefType == "Fv4": # unknown if ever used but better safe...
-            return music21.clef.Bass8vbClef()
+            return clef.Bass8vbClef()
         elif clefType == "Fv": # unknown if ever used but better safe...
-            return music21.clef.Bass8vbClef()
+            return clef.Bass8vbClef()
         else:
             try:
-                clefifier = music21.clef.standardClefFromXN(clefType)
+                clefifier = clef.standardClefFromXN(clefType)
                 return clefifier
-            except music21.clef.ClefException:
+            except clef.ClefException:
                 raise HumdrumException("Unknown clef type %s found", tandem)
     elif tandem.startswith("*MM"):
         metronomeMark = tandem[3:]
         try:
             metronomeMark = float(metronomeMark)
-            MM = music21.tempo.MetronomeMark(number=metronomeMark)    
+            MM = tempo.MetronomeMark(number=metronomeMark)    
             return MM
         except ValueError:
             # assuming that metronomeMark here is text now 
             metronomeMark = re.sub('^\[','', metronomeMark)
             metronomeMark = re.sub(']\s*$','', metronomeMark)
-            MS = music21.tempo.MetronomeMark(text=metronomeMark)
+            MS = tempo.MetronomeMark(text=metronomeMark)
             return MS
     elif tandem.startswith("*M"):
         meterType = tandem[2:]
-        return music21.meter.TimeSignature(meterType)
+        return meter.TimeSignature(meterType)
     elif tandem.startswith("*IC"):
         instrumentClass = tandem[3:]
         # TODO: DO SOMETHING WITH INSTRUMENT CLASS; not in hum2xml
@@ -2020,10 +2019,10 @@ def kernTandemToObject(tandem):
         numSharps = tandem.count('#')
         if numSharps == 0:
             numSharps = -1 * (tandem.count('-'))
-        return music21.key.KeySignature(numSharps)
+        return key.KeySignature(numSharps)
     elif tandem.endswith(":"):
         thisKey = tandem[1:-1]
-        return music21.key.Key(thisKey)
+        return key.Key(thisKey)
     else:
         return MiscTandem(tandem)
 
@@ -2041,9 +2040,9 @@ def kernTandemToObject(tandem):
 # TODO: Parse editorial signifiers
 
 
-class MiscTandem(music21.Music21Object):
+class MiscTandem(base.Music21Object):
     def __init__(self, tandem = ""):
-        music21.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
         self.tandem = tandem
     def __repr__(self):
         return "<music21.humdrum.spineParser.MiscTandem %s humdrum control>" % self.tandem
@@ -2101,7 +2100,7 @@ class Test(unittest.TestCase):
         self.assertEqual(m0.rightBarline.style, "regular")
         self.assertEqual(m0.rightBarline.repeat_dots, "both")
         assert m0.rightBarline.pause is not None
-        assert isinstance(m0.rightBarline.pause, music21.expressions.Fermata)
+        assert isinstance(m0.rightBarline.pause, expressions.Fermata)
 
     def xtestFakePiece(self):
         '''
@@ -2176,6 +2175,7 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == "__main__":
     #Test().testMoveDynamics()
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

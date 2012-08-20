@@ -19,9 +19,8 @@ import urllib
 import re
 import math
 
-import music21
-
 from music21.features import base as featuresModule
+from music21 import text
 
 from music21 import environment
 _MOD = 'features/native.py'
@@ -907,7 +906,7 @@ class LanguageFeature(featuresModule.FeatureExtractor):
         self.description = 'Languge of the lyrics of the piece given as a numeric value from text.LanguageDetector.mostLikelyLanguageNumeric().'
         self.dimensions = 1
         self.discrete = True
-        self.languageDetector = music21.text.LanguageDetector()
+        self.languageDetector = text.LanguageDetector()
     def _process(self):
         '''Do processing necessary, storing result in _feature.
         '''
@@ -1000,6 +999,7 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

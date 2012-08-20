@@ -4,11 +4,11 @@
 # Purpose:      A graph of intervals, for scales and harmonies. 
 #
 # Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2010-2011 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
-
 
 '''An BoundIntervalNetwork defines a scale or harmonic unit as a (weighted) 
 digraph, or directed graph, where pitches are nodes and intervals are 
@@ -33,7 +33,6 @@ finals, or other attributes of the network.
 import unittest, doctest
 import copy
 
-import music21
 from music21 import interval
 from music21 import common
 from music21 import pitch
@@ -3051,6 +3050,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [BoundIntervalNetwork]
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 

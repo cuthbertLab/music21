@@ -17,7 +17,6 @@ See the chapter :ref:`overviewFormats` for more information and examples of conv
 import unittest, doctest, random
 import sys
 
-import music21
 from music21 import common
 from music21 import converter
 from music21 import stream
@@ -55,7 +54,7 @@ class ActivityMatch(object):
     '''
 
     def __init__(self, streamObj):
-        if not isinstance(streamObj, music21.stream.Stream):
+        if not hasattr(streamObj, "classes") or "Stream" not in streamObj.classes:
             raise CorrelateException, 'non-stream provided as argument'
         self.streamObj = streamObj
         self.data = None
@@ -224,6 +223,7 @@ class Test(unittest.TestCase):
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 

@@ -20,7 +20,7 @@ a key signature but also of the key of a region.
 import doctest, unittest
 import copy
 
-import music21
+from music21 import base
 from music21 import pitch
 from music21 import note
 from music21 import interval
@@ -310,7 +310,7 @@ class KeyException(Exception):
 
 
 #-------------------------------------------------------------------------------
-class KeySignature(music21.Music21Object):
+class KeySignature(base.Music21Object):
     '''
     A KeySignature object specifies the signature to be used for a piece; it takes
     in zero, one, or two arguments.  The first argument is an int giving the number of sharps,
@@ -351,7 +351,7 @@ class KeySignature(music21.Music21Object):
     classSortOrder = 2
     
     def __init__(self, sharps=None, mode=None):
-        music21.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
 
         try:
@@ -1037,6 +1037,7 @@ _DOC_ORDER = [KeySignature, Key]
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 

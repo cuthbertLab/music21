@@ -21,9 +21,9 @@ import unittest
 import copy
 import math
 
-import music21
-
 from music21 import common
+from music21 import base
+from music21 import exceptions21
 from music21.features import base as featuresModule
 
 from music21 import environment
@@ -2419,7 +2419,7 @@ class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
         for c in self.data['chordify.getElementsByClass.Chord']:
             # create a group to aggregate all groups for each pitch in this 
             # chord
-            g = music21.Groups()
+            g = base.Groups()
             for p in c.pitches:
                 for gSub in p.groups:
                     g.append(gSub) # add to temporary group; will act as a set
@@ -2460,7 +2460,7 @@ class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
         for c in self.data['chordify.getElementsByClass.Chord']:
             # create a group to aggregate all groups for each pitch in this 
             # chord
-            g = music21.Groups()
+            g = base.Groups()
             for p in c.pitches:
                 for gSub in p.groups:
                     g.append(gSub) # add to temporary group; will act as a set
@@ -2495,7 +2495,7 @@ class VariabilityOfNumberOfIndependentVoicesFeature(
         for c in self.data['chordify.getElementsByClass.Chord']:
             # create a group to aggregate all groups for each pitch in this 
             # chord
-            g = music21.Groups()
+            g = base.Groups()
             for p in c.pitches:
                 for gSub in p.groups:
                     g.append(gSub) # add to temporary group; will act as a set
@@ -3995,6 +3995,7 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

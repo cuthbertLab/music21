@@ -20,8 +20,6 @@ including :class:`~music21.serial.ToneRow` subclasses.
 import unittest, doctest
 import copy
 
-import music21
-import music21.note
 from music21 import base
 from music21 import note
 from music21 import chord
@@ -191,11 +189,10 @@ class ToneRow(stream.Stream):
         >>> type(a)
         <class 'music21.serial.TwelveToneRow'>
         '''
-        
         pcSet = self.pitchClasses()
         a = TwelveToneRow()
         for thisPc in pcSet:
-            p = music21.pitch.Pitch()
+            p = pitch.Pitch()
             p.pitchClass = thisPc
             a.append(p)
         return a
@@ -2460,14 +2457,14 @@ def pcToToneRow(pcSet):
     if len(pcSet) == 12:
         a = TwelveToneRow()
         for thisPc in pcSet:
-            p = music21.pitch.Pitch()
+            p = pitch.Pitch()
             p.pitchClass = thisPc
             a.append(p)
         return a
     else:
         a = ToneRow()
         for thisPc in pcSet:
-            p = music21.pitch.Pitch()
+            p = pitch.Pitch()
             p.pitchClass = thisPc
             a.append(p)
         return a
@@ -2577,16 +2574,8 @@ _DOC_ORDER = ['ToneRow', 'TwelveToneRow', 'HistoricalTwelveToneRow', 'Contiguous
               'findTransposedAndInvertedMultisets', 'labelTransposedAndInvertedMultisets']
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
-
-#     import sys
-#     if len(sys.argv) == 1: # normal conditions
-#         music21.mainTest(Test)
-# 
-#     elif len(sys.argv) > 1:
-#         t = Test()
-# 
-#         t.testMatrix()
 
 #------------------------------------------------------------------------------
 # eof

@@ -54,7 +54,8 @@ __all__ = ['base',
            # sub folders
            'abc', 
            # 'abj', # not full part of music21 and slow if abjad is included
-           'analysis', 'audioSearch',
+           'analysis', 
+           'audioSearch',
            'braille', 
            'composition', 'counterpoint', 'corpus', 
            'demos', 'doc',
@@ -100,26 +101,25 @@ __all__ = ['base',
 #-------------------------------------------------------------------------------
 # for sub packages, need to manually add the modules in these subpackages
 #from music21.analysis import *
+import sys
+x = sys.stdout
 
 
 #-------------------------------------------------------------------------------
 # base Music21Object -- all objects should inherit from this!
-
 import base
 from base import *
 
 #-------------------------------------------------------------------------------
 # place the parse function directly in the music21 namespace
 # this cannot go in music21/base.py
-
-import converter
-parse = converter.parse
+#import converter
+#parse = converter.parse
 
 
 #------------------------------------------------------------------------------
 # this bring all of the __all__ names into the music21 package namespace
 from music21 import *
-
 #------------------------------------------------------------------------------
 # eof
 

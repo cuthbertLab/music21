@@ -10,7 +10,6 @@
 
 import collections
 import copy
-import music21
 import unittest
 
 from music21 import stream
@@ -712,6 +711,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

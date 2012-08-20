@@ -2,8 +2,6 @@
 import copy
 import unittest, doctest
 
-
-import music21
 from music21 import clef
 from music21 import metadata
 from music21 import meter
@@ -399,4 +397,5 @@ class TestExternal(unittest.TestCase):
 # eof
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test, TestExternal)

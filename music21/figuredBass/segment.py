@@ -12,11 +12,11 @@
 import collections
 import copy
 import itertools
-import music21
 import unittest
 
 from music21 import chord
 from music21 import environment
+from music21 import exceptions21
 from music21 import key
 from music21 import note
 from music21 import pitch
@@ -804,7 +804,7 @@ def printRules(rulesList, maxLength = 4):
         print ruleToPrint   
 
 
-class SegmentException(music21.Music21Exception):
+class SegmentException(exceptions21.Music21Exception):
     pass
     
 #-------------------------------------------------------------------------------
@@ -814,6 +814,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

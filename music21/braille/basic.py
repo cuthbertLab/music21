@@ -8,7 +8,6 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
-import music21
 import unittest
 
 from music21 import articulations
@@ -17,6 +16,7 @@ from music21 import chord
 from music21 import clef
 from music21 import dynamics
 from music21 import environment
+from music21 import exceptions21
 from music21 import expressions
 from music21 import interval
 from music21 import note
@@ -1215,7 +1215,7 @@ def numberToBraille(sampleNumber, withNumberSign = True):
 
 #-------------------------------------------------------------------------------
 
-class BrailleBasicException(music21.Music21Exception):
+class BrailleBasicException(exceptions21.Music21Exception):
     pass
     
 #-------------------------------------------------------------------------------
@@ -1226,6 +1226,7 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

@@ -61,8 +61,9 @@ import copy
 import unittest, doctest
 import re
 
-import music21
+from music21 import base
 from music21 import common
+from music21 import exceptions21
 from music21 import pitch
 from music21 import interval
 from music21 import intervalNetwork
@@ -83,15 +84,15 @@ TERMINUS_LOW = intervalNetwork.TERMINUS_LOW
 TERMINUS_HIGH = intervalNetwork.TERMINUS_HIGH
 
 #-------------------------------------------------------------------------------
-class ScaleException(Exception):
+class ScaleException(exceptions21.Music21Exception):
     pass
 
-class Scale(music21.Music21Object):
+class Scale(base.Music21Object):
     '''
     Generic base class for all scales, both abstract and concrete.
     '''
     def __init__(self):
-        music21.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
         self.type = 'Scale' # could be mode, could be other indicator
 
 
@@ -3684,6 +3685,7 @@ _DOC_ORDER = [ConcreteScale, AbstractScale]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 # store implicit tonic or Not

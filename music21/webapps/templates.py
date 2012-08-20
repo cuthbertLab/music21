@@ -20,7 +20,6 @@ import unittest
 import doctest
 
 from music21 import corpus
-import music21
 from string import Template
 
 
@@ -173,6 +172,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == '__main__':
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

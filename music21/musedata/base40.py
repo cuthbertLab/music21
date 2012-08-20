@@ -9,8 +9,9 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
-import music21
 import unittest
+from music21 import exceptions21
+
 from music21 import pitch
 from music21 import note
 from music21 import interval
@@ -339,7 +340,7 @@ def base40ActualInterval(base40NumA, base40NumB):
     except IndexError:
         raise Base40Exception('Unusual interval- Limitation of music21.interval')
     
-class Base40Exception(music21.Music21Exception):
+class Base40Exception(exceptions21.Music21Exception):
     pass
     
 #-------------------------------------------------------------------------------
@@ -354,6 +355,7 @@ _DOC_ORDER = [base40ActualInterval]
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

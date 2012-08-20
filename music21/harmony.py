@@ -17,12 +17,14 @@ roman numerals, or other chord representations with a defined root.
 
 import unittest
 
-import music21
 from music21 import common
+from music21 import exceptions21
 from music21 import pitch
+from music21 import duration
 #from music21 import roman
 from music21 import interval
 from music21 import chord
+from music21 import key
 
 import re
 import copy
@@ -35,7 +37,7 @@ environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------
 
-class HarmonyException(Exception):
+class HarmonyException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
@@ -127,19 +129,19 @@ class Harmony(chord.Chord):
             if kw == 'root':
                 if common.isStr(keywords[kw]):
                     keywords[kw].replace('b', '-')
-                    self.root(music21.pitch.Pitch(keywords[kw]))
+                    self.root(pitch.Pitch(keywords[kw]))
                 else:
                     self.root(keywords[kw])
             elif kw == 'bass':
                 if common.isStr(keywords[kw]):
                     keywords[kw].replace('b', '-')
-                    self.bass(music21.pitch.Pitch(keywords[kw]))
+                    self.bass(pitch.Pitch(keywords[kw]))
                 else:
                     self.bass(keywords[kw])
             elif kw == 'inversion':
                 self.inversion(int(keywords[kw]))
             elif kw == 'duration' or kw == 'quarterLength':
-                self.duration = music21.duration.Duration(keywords[kw])
+                self.duration = duration.Duration(keywords[kw])
             else:
                 pass
 
@@ -150,7 +152,7 @@ class Harmony(chord.Chord):
         except:
             pass
         if val and self.duration.quarterLength == 0:
-            self.duration = music21.duration.Duration(1)
+            self.duration = duration.Duration(1)
 
     def _getWriteAsChord(self):
         return self._writeAsChord
@@ -197,7 +199,7 @@ class Harmony(chord.Chord):
 
     def _setKeyOrScale(self, keyOrScale):
         if common.isStr(keyOrScale):
-            self._key = music21.key.Key(keyOrScale)
+            self._key = key.Key(keyOrScale)
         else:
             self._key = key
 
@@ -258,15 +260,17 @@ class Harmony(chord.Chord):
         return self.chordStepModifications
 
     #---------------------------------------------------------------------------
-    #TODO: move this attribute to roman class which inherets from harmony.Harmony objects
+    #TODO: move this attribute to roman class which inherits from harmony.Harmony objects
     def _setRoman(self, value):
         if hasattr(value, 'classes') and 'RomanNumeral' in value.classes:
             self._roman = value
             return
+
+        from music21 import roman
         try: # try to create
-            self._roman = music21.roman.RomanNumeral(value)
+            self._roman = roman.RomanNumeral(value)
             return
-        except music21.Music21Exception:
+        except exceptions21.Music21Exception:
             pass
         raise HarmonyException('not a valid pitch specification: %s' % value)
 
@@ -772,7 +776,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
 
     An example of using this algorithm for identifying chords "in the wild":
     
-    >>> score = music21.corpus.parse('bach/bwv380')
+    >>> score = corpus.parse('bach/bwv380')
     >>> excerpt = score.measures(2, 3)
     >>> cs = []
     >>> for c in excerpt.chordify().flat.getElementsByClass(chord.Chord):
@@ -1166,7 +1170,7 @@ class ChordSymbol(Harmony):
 
         Harmony.__init__(self, figure, **keywords)
         if 'duration' not in keywords and 'quarterLength' not in keywords:
-            self.duration = music21.duration.Duration(0)
+            self.duration = duration.Duration(0)
 
 #---------------------------------------------------------------------------
 
@@ -1213,15 +1217,15 @@ class ChordSymbol(Harmony):
 
         if 'add' in remaining:
             degree = remaining[remaining.index('add') + 3: ]
-            self.addChordStepModification(music21.harmony.ChordStepModification('add', int(degree)))
+            self.addChordStepModification(ChordStepModification('add', int(degree)))
             return
         if 'alter' in remaining:
             degree = remaining[remaining.index('alter') + 5: ]
-            self.addChordStepModification(music21.harmony.ChordStepModification('alter', int(degree)))
+            self.addChordStepModification(ChordStepModification('alter', int(degree)))
             return
         if 'omit' in remaining or 'subtract' in remaining:
             degree = remaining[remaining.index('omit') + 4: ]
-            self.addChordStepModification(music21.harmony.ChordStepModification('subtract', int(degree)))
+            self.addChordStepModification(ChordStepModification('subtract', int(degree)))
             return
 
         st = st.replace(',', '')
@@ -1277,7 +1281,7 @@ class ChordSymbol(Harmony):
                     degrees.append([int(m3.group()), semiToneAlter])
 
         for degree, alterBy in degrees:
-            self.addChordStepModification(music21.harmony.ChordStepModification('add', degree, alterBy))
+            self.addChordStepModification(ChordStepModification('add', degree, alterBy))
 
     def findFigure(self):
         '''
@@ -1398,19 +1402,19 @@ class ChordSymbol(Harmony):
 
         while self._hasPitchAboveC4(pitches) :
             i = -1
-            for pitch in pitches:
+            for thisPitch in pitches:
                 i = i + 1
-                temp = str(pitch.name) + str((pitch.octave - 1))
-                pitches[i] = music21.pitch.Pitch(temp)
+                temp = str(thisPitch.name) + str((thisPitch.octave - 1))
+                pitches[i] = pitch.Pitch(temp)
 
         #but if this has created pitches below lowest note (the A 3 octaves below middle C)
         #on a standard piano, we're going to have to bump all the octaves back up
         while self._hasPitchBelowA1(pitches) :
             i = -1
-            for pitch in pitches:
+            for thisPitch in pitches:
                 i = i + 1
-                temp = str(pitch.name) + str((pitch.octave + 1))
-                pitches[i] = music21.pitch.Pitch(temp)
+                temp = str(thisPitch.name) + str((thisPitch.octave + 1))
+                pitches[i] = pitch.Pitch(temp)
 
         self.pitches = pitches
         self.sortDiatonicAscending(inPlace=True)
@@ -1481,12 +1485,13 @@ class ChordSymbol(Harmony):
         -->
 
         '''
+        from music21 import scale
 
         ChordStepModifications = self.chordStepModifications
         if ChordStepModifications != None:
             for hD in ChordStepModifications:
 
-                sc = music21.scale.MajorScale(self.root())
+                sc = scale.MajorScale(self.root())
                 if hD.modType == 'add':
                     if self.bass() != None:
                         p = sc.pitchFromDegree(hD.degree, self.bass())
@@ -1586,7 +1591,7 @@ class ChordSymbol(Harmony):
             pitches[5] = pitch.Pitch(pitches[5].name + str(pitches[5].octave + 1))
         else:
             return pitches
-        c = music21.chord.Chord(pitches)
+        c = chord.Chord(pitches)
         c = c.sortDiatonicAscending()
 
         return c.pitches
@@ -1775,7 +1780,7 @@ class TestExternal(unittest.TestCase):
 
     def testReadInXML(self):
         from music21 import harmony
-        from music21 import corpus
+        from music21 import corpus, stream
         testFile = corpus.parse('leadSheet/fosterBrownHair.xml')
 
 
@@ -1783,7 +1788,7 @@ class TestExternal(unittest.TestCase):
         testFile = harmony.realizeChordSymbolDurations(testFile)
         #testFile.show()
         chordSymbols = testFile.flat.getElementsByClass(harmony.ChordSymbol)
-        s = music21.stream.Stream()
+        s = stream.Stream()
 
         for cS in chordSymbols:
             cS.writeAsChord = False
@@ -1794,7 +1799,7 @@ class TestExternal(unittest.TestCase):
         #self.assertEqual(len(csChords), 40)
 #
     def testChordRealization(self):
-        from music21 import harmony, corpus, note
+        from music21 import harmony, corpus, note, stream
         #There is a test file under demos called ComprehensiveChordSymbolsTestFile.xml
         #that should contain a complete iteration of tests of chord symbol objects
         #this test makes sure that no error exists, and checks that 57 chords were
@@ -1805,7 +1810,7 @@ class TestExternal(unittest.TestCase):
         testFile = harmony.realizeChordSymbolDurations(testFile)
         chords = testFile.flat.getElementsByClass(harmony.ChordSymbol)
         #testFile.show()
-        s = music21.stream.Stream()
+        s = stream.Stream()
 #        i = 0
         for x in chords:
             # print x.pitchesu
@@ -1866,7 +1871,7 @@ class TestExternal(unittest.TestCase):
             for m in mod:
                 for key, val in chordKinds.items():
                     for type in val:
-                        print n + m + ',' + type, music21.harmony.ChordSymbol(n + m + ',' + type).pitches
+                        print n + m + ',' + type, ChordSymbol(n + m + ',' + type).pitches
 
 
     def labelChordSymbols(self):
@@ -1876,7 +1881,7 @@ class TestExternal(unittest.TestCase):
         '''
         from music21.demos.theoryAnalysis import theoryAnalyzer
         from music21 import harmony, corpus
-        score = music21.corpus.parse('bach/bwv380')
+        score = corpus.parse('bach/bwv380')
         excerpt = score.measures(2, 3)
         
         theoryAnalyzer.removePassingTones(excerpt)
@@ -1929,6 +1934,7 @@ if __name__ == "__main__":
 #    from music21 import  *
 #    t = harmony.TestExternal()
 #    t.labelChordSymbols()
+    import music21
     music21.mainTest(Test)
 
 

@@ -1,7 +1,6 @@
 import unittest, doctest
-
-import music21
 import copy
+
 from music21 import corpus
 from music21 import key
 from music21 import metadata
@@ -253,7 +252,8 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
     >>> chords[3].color #GREEN
     '#00cc33'
     '''
-
+    from music21 import roman
+    
     score = scoreIn.sliceByGreatestDivisor(addTies=True)
     vsList = theoryAnalyzer.getVerticalSlices(score)
     user = len(offsetList)
@@ -276,7 +276,7 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
                     vs.color = '#00cc33' # the user also recognizes this as a dissonant vertical slice GREEN
                     both+=1
                     c = vs.getChord()
-                    romanFigureList.append(music21.roman.romanNumeralFromChord(c, pieceKey).figure)
+                    romanFigureList.append(roman.romanNumeralFromChord(c, pieceKey).figure)
                 else:
                     vs.color = '#cc3300'  #the user did not recognize as a dissonant vertical slice RED
             else: #music21 did not recognize this as a dissonant vertical slice
@@ -339,10 +339,12 @@ def correctChordSymbols(worksheet, studentResponse):
     
     
     '''
+    from music21 import harmony
+    
     numCorrect = 0
-    chords1 = worksheet.flat.getElementsByClass(music21.harmony.ChordSymbol)
+    chords1 = worksheet.flat.getElementsByClass(harmony.ChordSymbol)
     totalNumChords = len(chords1)
-    chords2 = studentResponse.flat.getElementsByClass([music21.chord.Chord, music21.note.Note])
+    chords2 = studentResponse.flat.notes
     isCorrect = False
     for chord1, chord2 in zip(chords1, chords2):
         if chord1 not in studentResponse:
@@ -405,6 +407,8 @@ def checkLeadSheetPitches(worksheet, returnType=''):
     [B2, D#3, F#3]
     [A2, C3, D3, F#3]
     '''
+    from music21 import chord
+    from music21 import harmony
     #nicePiece = sc
     #incorrectPiece = sc
     
@@ -414,7 +418,7 @@ def checkLeadSheetPitches(worksheet, returnType=''):
     #chordLine = nicePiece.getElementsByClass(stream.Part)[1]
     #chordLine.show('text')
     #bassLine = nicePiece.part(2)
-    studentsAnswers = worksheet.flat.getElementsByClass(music21.chord.Chord)
+    studentsAnswers = worksheet.flat.getElementsByClass(chord.Chord)
     answerKey = worksheet.flat.getElementsByClass(harmony.ChordSymbol)
     
     correctedAssignment, numCorrect = correctChordSymbols(answerKey, studentsAnswers)
@@ -477,6 +481,7 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
     

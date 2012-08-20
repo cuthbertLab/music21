@@ -15,7 +15,6 @@
 
 import unittest, doctest 
 
-import music21
 from music21 import environment
 _MOD = "chordTables.py"
 environLocal = environment.Environment(_MOD)
@@ -2766,6 +2765,7 @@ _DOC_ORDER = [addressToForteName, addressToPrimeForm, addressToForteName]
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 

@@ -46,7 +46,7 @@ The :class:`music21.sieve.PitchSieve` class provides a quick generation of :clas
 import copy, string, random
 import unittest, doctest
 
-import music21
+from music21 import exceptions21
 from music21 import pitch
 from music21 import common
 from music21 import interval
@@ -57,19 +57,19 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class UnitException(Exception):
+class UnitException(exceptions21.Music21Exception):
     pass
 
-class ResidualException(Exception):
+class ResidualException(exceptions21.Music21Exception):
     pass
 
-class SieveException(Exception):
+class SieveException(exceptions21.Music21Exception):
     pass
 
-class CompressionSegmentException(Exception):
+class CompressionSegmentException(exceptions21.Music21Exception):
     pass
 
-class PitchSieveException(Exception):
+class PitchSieveException(exceptions21.Music21Exception):
     pass
 
 LGROUP = '{'
@@ -1999,17 +1999,11 @@ _DOC_ORDER = []
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
-    # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
-
-
 
 
 
 
 #------------------------------------------------------------------------------
 # eof
-
-
-
-

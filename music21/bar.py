@@ -15,7 +15,7 @@
 
 import unittest, doctest
 
-import music21
+from music21 import base
 from music21 import expressions
 from music21 import repeat
 from music21 import musicxml
@@ -86,7 +86,7 @@ def standardizeBarStyle(value):
  
 
 #-------------------------------------------------------------------------------
-class Barline(music21.Music21Object):
+class Barline(base.Music21Object):
     '''A representation of a barline. 
     Barlines are conventionally assigned to Measure objects 
     using the leftBarline and rightBarline attributes.
@@ -123,7 +123,7 @@ class Barline(music21.Music21Object):
     classSortOrder = -5 
 
     def __init__(self, style = None, location = None):
-        music21.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
 
         # this will raise an exception on error from property
         self.style = style
@@ -385,6 +385,7 @@ class Test(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    import music21
     music21.mainTest(Test)
 
 

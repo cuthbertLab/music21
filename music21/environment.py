@@ -26,7 +26,6 @@ import tempfile
 import doctest, unittest
 import xml.sax
 
-import music21
 from music21 import common
 from music21 import xmlnode
 
@@ -573,7 +572,6 @@ _environStorage = {'instance':None, 'forcePlatform':None}
 # create singleton instance
 _environStorage['instance'] = _EnvironmentCore()
 
-
 #-------------------------------------------------------------------------------
 class Environment(object):
     '''
@@ -1013,7 +1011,6 @@ def get(key):
     us = UserSettings()
     return us[key]
     
-
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     '''Unit tests
@@ -1164,12 +1161,13 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
+
 _DOC_ORDER = [UserSettings, Environment, Preference]
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 
 #------------------------------------------------------------------------------
 # eof
-

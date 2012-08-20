@@ -16,9 +16,10 @@ Music21 class for dealing with Roman Numeral analysis
 import doctest,unittest
 import copy
 import re
-import music21
+
 from music21 import chord
 from music21 import common
+from music21 import exceptions21
 from music21 import interval
 from music21 import key
 from music21 import pitch
@@ -395,10 +396,10 @@ def expandShortHand(shorthand):
         
 
 #-------------------------------------------------------------------------------
-class RomanException(music21.Music21Exception):
+class RomanException(exceptions21.Music21Exception):
     pass
 
-class RomanNumeralException(music21.Music21Exception):
+class RomanNumeralException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
@@ -1509,6 +1510,7 @@ _DOC_ORDER = [RomanNumeral]
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

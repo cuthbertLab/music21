@@ -12,7 +12,6 @@
 
 import unittest, doctest
 
-import music21
 from music21.musicxml import translate as musicxmlTranslate
 
 
@@ -112,6 +111,7 @@ class Test(unittest.TestCase):
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

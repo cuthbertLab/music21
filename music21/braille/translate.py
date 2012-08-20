@@ -77,10 +77,9 @@ memorization" (BMTM, 71). Some of these keywords are changed automatically in co
   number is transcribed before the lower number. If False, the reverse is the case.
 """
 
-from music21 import metadata, stream, tinyNotation
+from music21 import metadata, stream, tinyNotation, exceptions21
 from music21.braille import segment
 import itertools
-import music21
 import re
 import unittest
 
@@ -266,7 +265,7 @@ _DOC_ORDER = [objectToBraille]
 
 #-------------------------------------------------------------------------------
 
-class BrailleTranslateException(music21.Music21Exception):
+class BrailleTranslateException(exceptions21.Music21Exception):
     pass
     
 #-------------------------------------------------------------------------------
@@ -276,6 +275,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

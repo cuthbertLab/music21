@@ -25,9 +25,9 @@ arguments, the methods only :meth:`~music21.pitch.Pitch.transpose` each
 '''
 
 import copy
-import music21
 import unittest
 
+from music21 import exceptions21
 from music21 import chord
 from music21 import note
 from music21 import stream
@@ -766,7 +766,7 @@ _DOC_ORDER = [augmentedSixthToDominant,
               diminishedSeventhToMajorSubdominant, diminishedSeventhToMinorSubdominant]
 
 #-------------------------------------------------------------------------------
-class ResolutionException(music21.Music21Exception):
+class ResolutionException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
@@ -776,6 +776,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

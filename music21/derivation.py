@@ -13,7 +13,7 @@
 
 import doctest, unittest
 
-import music21
+from music21 import base
 from music21 import common
 # imported by stream
 
@@ -23,7 +23,7 @@ environLocal = environment.Environment(_MOD)
 
 
 
-class Derivation(music21.JSONSerializer):
+class Derivation(base.JSONSerializer):
     '''
     >>> import copy
     >>> from music21 import *  
@@ -43,7 +43,7 @@ class Derivation(music21.JSONSerializer):
     'measure'
     '''
     def __init__(self, container=None):
-        music21.JSONSerializer.__init__(self)
+        base.JSONSerializer.__init__(self)
 
         # store a reference to the Stream that contains this derivation
         self._container = None
@@ -154,6 +154,7 @@ _DOC_ORDER = []
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 

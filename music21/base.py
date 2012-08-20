@@ -58,13 +58,8 @@ import inspect
 from music21.exceptions21 import *
 
 
-
 from music21 import common
 from music21 import environment
-
-# needed for temporal manipulations; not music21 objects
-from music21 import tie
-
 _MOD = 'music21.base.py'
 environLocal = environment.Environment(_MOD)
 
@@ -3902,6 +3897,8 @@ class Music21Object(JSONSerializer):
         (<music21.tie.Tie start>, <music21.tie.Tie stop>)
         '''
         from music21 import duration
+        # needed for temporal manipulations; not music21 objects
+        from music21 import tie
 
         if self.duration == None:
             raise Exception('cannot split an element that has a Duration of None')
@@ -4033,6 +4030,9 @@ class Music21Object(JSONSerializer):
         >>> [n.quarterLength for n in post]
         [1.0, 1.0, 1.0]
         '''
+        # needed for temporal manipulations; not music21 objects
+        from music21 import tie
+
         if self.duration == None:
             raise Music21ObjectException('cannot split an element that has a Duration of None')
 
@@ -4165,6 +4165,9 @@ class Music21Object(JSONSerializer):
         >>> g.tie is None
         True
         '''
+        # needed for temporal manipulations; not music21 objects
+        from music21 import tie
+
         if self.duration == None:
             raise Exception('cannot split an element that has a Duration of None')
 

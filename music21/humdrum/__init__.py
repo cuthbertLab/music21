@@ -151,11 +151,11 @@ ydelta_       None                                               Not needed.
 .. _ydelta: http://www.music-cog.ohio-state.edu/Humdrum/commands/ydelta.html
 '''
 
-__ALL__ = ['spineParser','testFiles','questions']
+__ALL__ = ['spineParser','testFiles']
 
 import spineParser
 import testFiles
-import questions
+#import questions
 
 def parseFile(filename):
     '''

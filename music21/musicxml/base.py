@@ -10,15 +10,21 @@
 #-------------------------------------------------------------------------------
 '''This module defines an object representation of MusicXML, used for converting to and from MusicXML and music21.
 '''
-
 import sys
 
 # in order for sax parsing to properly handle unicode strings w/ unicode chars
 # stored in StringIO.StringIO, this update is necessary
 # http://stackoverflow.com/questions/857597/setting-the-encoding-for-sax-parser-in-python
 
+# N.B. This breaks IDLE!
+currentStdOut = sys.stdout
+currentStdIn = sys.stdin
+currentStdErr = sys.stderr
 reload(sys)
 sys.setdefaultencoding('utf-8')
+sys.stdout = currentStdOut
+sys.stdin = currentStdIn
+sys.stderr = currentStdErr
 
 import os, copy
 import unittest, doctest
@@ -34,9 +40,10 @@ except ImportError:
 import xml.sax
 import xml.dom.minidom
 
-import music21
+from music21.base import VERSION
 from music21 import defaults
 from music21 import common
+from music21 import exceptions21
 from music21 import xmlnode
 xml.dom.minidom.Element.writexml = xmlnode.fixed_writexml
 
@@ -745,7 +752,9 @@ class Score(MusicXMLElementList):
     def getPartGroupData(self):
         '''Get part groups organized by part id in dictionaries.
 
-        Returns a list of dictionaries, each dictionary containing number, a list of part ids, and a mx PartGroup object.
+        Returns a list of dictionaries, 
+        each dictionary containing number, a list of part ids, 
+        and a mx PartGroup object.
         '''
         open = []
         closed = []
@@ -3007,7 +3016,7 @@ class Handler(xml.sax.ContentHandler):
         # all objects built in processing
         # scoreObj is returned as content, contains everything
         # stores version of m21 used to create this file
-        self._mxObjs['score'] = Score(music21.VERSION) 
+        self._mxObjs['score'] = Score(VERSION) 
 
         # component objects; these might be better stored
         # in a dictionary, where _activeTags['tagName'] = None
@@ -4811,6 +4820,7 @@ if __name__ == "__main__":
     reload(sys)
     sys.setdefaultencoding("utf-8")
 
+    import music21
     music21.mainTest(Test)
 
 # 

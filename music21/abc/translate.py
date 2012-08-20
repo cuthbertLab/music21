@@ -20,14 +20,14 @@ module's :func:`~music21.converter.parse` function.
 '''
 
 import copy
-import music21
 import unittest
 
 from music21.abc import base as abcModule
 
 from music21 import environment
-from music21 import stream
+from music21 import exceptions21
 from music21 import meter
+from music21 import stream
 
 _MOD = 'abc.translate.py'
 environLocal = environment.Environment(_MOD)
@@ -464,7 +464,7 @@ def reBar(music21Part, inPlace=True):
     if not inPlace:
         return music21Part
 
-class ABCTranslateException(music21.Music21Exception):
+class ABCTranslateException(exceptions21.Music21Exception):
     pass
 
 
@@ -814,6 +814,7 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 

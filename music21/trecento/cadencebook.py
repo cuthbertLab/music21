@@ -22,10 +22,7 @@ import random
 import re
 import os
 
-import music21
-import music21.duration
-from music21.duration import DurationException
-
+from music21 import duration
 from music21 import expressions
 from music21 import metadata
 from music21 import meter
@@ -35,7 +32,6 @@ from music21.ext import xlrd
 from music21.trecento import trecentoCadence
 from music21.trecento import polyphonicSnippet
 from music21.trecento.polyphonicSnippet import *
-
 
 class TrecentoSheet(object):
     '''
@@ -69,6 +65,7 @@ class TrecentoSheet(object):
             try:
                 xbook = xlrd.open_workbook(self.filename)        
             except IOError:
+                import music21
                 xbook = xlrd.open_workbook(music21.trecento.__path__[0] + os.sep + self.filename)
 
             
@@ -613,8 +610,8 @@ class TrecentoCadenceWork(object):
             if (thisVoice):
                 try:
                     returnBlock[i] = trecentoCadence.TrecentoCadenceStream(thisVoice, currentTimeSig)
-                except DurationException, (value):
-                    raise DurationException("Problems in line %s: specifically %s" % (thisVoice,  value))
+                except duration.DurationException, (value):
+                    raise duration.DurationException("Problems in line %s: specifically %s" % (thisVoice,  value))
 #                except Exception, (value):
 #                    raise Exception("Unknown Problems in line %s: specifically %s" % (thisVoice,  value))
 
@@ -863,6 +860,7 @@ class TestExternal(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test) #, TestExternal)
 
 

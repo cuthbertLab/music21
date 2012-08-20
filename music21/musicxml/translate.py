@@ -17,7 +17,6 @@
 import unittest
 import copy
 
-import music21
 from music21 import musicxml as musicxmlMod
 from music21 import defaults
 from music21 import common
@@ -436,6 +435,7 @@ def repeatToMx(r):
     >>> mxBarline.get('barStyle')
     'light-heavy'
     '''
+    from music21 import bar
     mxBarline = musicxmlMod.Barline()
     if r.style is not None:
         mxBarline.set('barStyle', r.musicXMLBarStyle)
@@ -451,7 +451,7 @@ def repeatToMx(r):
 #         elif self.direction == 'bidirectional':
 #             environLocal.printDebug(['skipping bi-directional repeat'])
     else:
-        raise music21.bar.BarException('cannot handle direction format:', r.direction)
+        raise bar.BarException('cannot handle direction format:', r.direction)
 
     if r.times != None:
         mxRepeat.set('times', r.times)
@@ -497,7 +497,7 @@ def mxToRepeat(mxBarline, inputM21=None):
 
     mxRepeat = mxBarline.get('repeatObj')
     if mxRepeat == None:
-        raise music21.bar.BarException('attempting to create a Repeat from an MusicXML bar that does not define a repeat')
+        raise bar.BarException('attempting to create a Repeat from an MusicXML bar that does not define a repeat')
 
     mxDirection = mxRepeat.get('direction')
 
@@ -508,7 +508,7 @@ def mxToRepeat(mxBarline, inputM21=None):
     elif mxDirection.lower() == 'backward':
         r.direction = 'end'
     else:
-        raise music21.bar.BarException('cannot handle mx direction format:', mxDirection)
+        raise bar.BarException('cannot handle mx direction format:', mxDirection)
 
     if mxRepeat.get('times') != None:
         # make into a number
@@ -637,7 +637,7 @@ def mxToPitch(mxNote, inputM21=None):
             # but in the source, there was not a defined accidental
             try:
                 p.accidental = pitch.Accidental(float(acc))
-            except music21.pitch.AccidentalException:
+            except pitch.AccidentalException:
                 raise TranslateException('incorrect accidental %s for pitch %s' % (str(acc), p))
             p.accidental.displayStatus = False
     p.octave = int(mxPitch.get('octave'))
@@ -1627,8 +1627,9 @@ def instrumentToMx(i):
 def mxToInstrument(mxScorePart, inputM21=None):
     # note: transposition values is not set in this operation, but in 
     # mxToStreamPart
+    from music21 import instrument
     if inputM21 is None:
-        i = music21.instrument.Instrument()
+        i = instrument.Instrument()
     else:
         i = inputM21
 
@@ -2753,6 +2754,7 @@ def mxToRest(mxNote, inputM21=None):
     If an `inputM21` object reference is provided, this object will be configured; otherwise, a new :class:`~music21.note.Rest` object is created and returned.
     '''
     from music21 import note
+    from music21 import duration
 
     if inputM21 == None:
         r = note.Rest()
@@ -2762,7 +2764,7 @@ def mxToRest(mxNote, inputM21=None):
     try:
         #r.duration.mx = mxNote
         mxToDuration(mxNote, r.duration)
-    except music21.duration.DurationException:
+    except duration.DurationException:
         #environLocal.printDebug(['failed extaction of duration from musicxml', 'mxNote:', mxNote, r])
         raise
 
@@ -5566,6 +5568,7 @@ _DOC_ORDER = [mxToScore, streamToMx]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 

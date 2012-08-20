@@ -8,7 +8,6 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-import music21
 import unittest
 
 
@@ -472,6 +471,7 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 

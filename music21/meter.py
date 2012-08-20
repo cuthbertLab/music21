@@ -19,11 +19,11 @@ import unittest, doctest
 import re, copy
 #import fractions # available in 2.6 and greater
 
-import music21
-
-from music21 import common
-from music21 import duration
+from music21 import base
 from music21 import beam
+from music21 import common
+from music21 import exceptions21
+from music21 import duration
 from music21 import musicxml
 from music21.musicxml import translate as musicxmlTranslate
 from music21 import environment
@@ -279,7 +279,7 @@ def proportionToFraction(value):
 
 
 #-------------------------------------------------------------------------------
-class MeterException(Exception):
+class MeterException(exceptions21.Music21Exception):
     pass
 
 class TimeSignatureException(MeterException):
@@ -2087,7 +2087,7 @@ class MeterSequence(MeterTerminal):
 
 
 #-------------------------------------------------------------------------------
-class TimeSignature(music21.Music21Object):
+class TimeSignature(base.Music21Object):
     '''The TimeSignature object is multi-faceted representation of nested hierarchical structures.
 
     For complete details on using this object, see :ref:`overviewMeters`.
@@ -2096,6 +2096,8 @@ class TimeSignature(music21.Music21Object):
 
     >>> from music21 import *
     >>> ts = TimeSignature('3/4')
+    >>> ts.ratioString
+    '3/4'
     >>> ts.beatCount
     3
     >>> ts.beatCountName
@@ -2139,6 +2141,8 @@ class TimeSignature(music21.Music21Object):
 
 
     >>> ts = meter.TimeSignature('6/8')
+    >>> print ts.ratioString
+    6/8
     >>> ts.beatCount
     2
     >>> ts.beatDuration.quarterLength
@@ -2180,7 +2184,7 @@ class TimeSignature(music21.Music21Object):
         }
     
     def __init__(self, value='4/4', partitionRequest=None):
-        music21.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
 
         # whether the TimeSignature object is inherited from 
         self.inherited = False 
@@ -2201,9 +2205,22 @@ class TimeSignature(music21.Music21Object):
             duration.typeFromNumDict[16], duration.typeFromNumDict[32], 
             duration.typeFromNumDict[64], duration.typeFromNumDict[128]]
 
-    def __str__(self):
+    def _getRatioString(self):
+        '''
+        returns a simple string representing the time signature ratio:
+        
+        >>> from music21 import *
+        >>> threeFour = meter.TimeSignature('3/4')
+        >>> threeFour.ratioString
+        '3/4'
+        '''
         return str(int(self.numerator)) + "/" + str(int(self.denominator))
 
+    ratioString = property(_getRatioString)
+
+    def __str__(self):
+        return self.ratioString
+    
     def __repr__(self):
         return "<music21.meter.TimeSignature %s>" % self.__str__()
 
@@ -2866,7 +2883,7 @@ class TimeSignature(music21.Music21Object):
         [<music21.beam.Beams <music21.beam.Beam 1/start>>, <music21.beam.Beams <music21.beam.Beam 1/continue>>, <music21.beam.Beams <music21.beam.Beam 1/stop>>]
         '''
 
-        if isinstance(srcList, music21.Music21Object):
+        if isinstance(srcList, base.Music21Object):
             durList = []
             for n in srcList:
                 durList.append(n.duration)
@@ -3654,6 +3671,7 @@ class TestExternal(unittest.TestCase):
         a.show()
 
     def testBasic(self):
+        import music21
         from music21 import stream
         a = stream.Stream()
         for meterStrDenominator in [1,2,4,8,16,32]:
@@ -3666,6 +3684,7 @@ class TestExternal(unittest.TestCase):
         a.show()
 
     def testCompound(self):
+        import music21
         from music21 import stream
         import random
 
@@ -3686,6 +3705,7 @@ class TestExternal(unittest.TestCase):
 
 
     def testMeterBeam(self):
+        import music21
         from music21 import stream, note
         ts = music21.meter.TimeSignature('6/8', 2)
         b = [duration.Duration('16th')] * 12
@@ -4100,7 +4120,7 @@ _DOC_ORDER = [TimeSignature, CompoundTimeSignature]
 
 
 if __name__ == "__main__":
-    # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 

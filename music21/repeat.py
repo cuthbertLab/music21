@@ -20,7 +20,7 @@ Some RepeatMark objects are Expression objects; others are Bar objects. See for 
 import copy
 import doctest, unittest
 
-import music21
+from music21 import exceptions21
 from music21 import expressions
 from music21 import search
 from music21 import spanner
@@ -62,7 +62,7 @@ class RepeatMark(object):
 
 
 #-------------------------------------------------------------------------------
-class RepeatExpressionException(music21.Music21Exception):
+class RepeatExpressionException(exceptions21.Music21Exception):
     pass
 
 class RepeatExpression(RepeatMark, expressions.Expression):
@@ -503,11 +503,12 @@ def insertRepeat(s, start, end, inPlace=False):
             else:
                 return s
                 
-        s.measure(end).rightBarline = music21.bar.Repeat(direction='end', times=2)
+        from music21 import bar
+        s.measure(end).rightBarline = bar.Repeat(direction='end', times=2)
         
         #Place a starting repeat, if needed
         if start != 1 or RepeatFinder(s).getQuarterLengthOfPickupMeasure() != 0:
-            s.measure(start).leftBarline = music21.bar.Repeat(direction='start')
+            s.measure(start).leftBarline = bar.Repeat(direction='start')
             
         if inPlace:
             return
@@ -600,7 +601,7 @@ def deleteMeasures(s, toDelete, inPlace=False):
                 return s
         
         #correct the measure numbers
-        measures = s.getElementsByClass(music21.stream.Measure)
+        measures = s.getElementsByClass("Measure")
         if len(measures) is not 0:
             i = measures[0].number
             
@@ -1613,13 +1614,13 @@ class Expander(object):
     
 #----------------------------------------------------------
 
-class UnequalPartsLengthException(music21.Music21Exception):
+class UnequalPartsLengthException(exceptions21.Music21Exception):
     pass
 
-class InsufficientLengthException(music21.Music21Exception):
+class InsufficientLengthException(exceptions21.Music21Exception):
     pass
 
-class NoInternalStreamException(music21.Music21Exception):
+class NoInternalStreamException(exceptions21.Music21Exception):
     pass
 
 
@@ -1810,9 +1811,9 @@ class RepeatFinder(object):
         #Check for different parts and change mlist to a list of
         # measure-streams: [<measures from part1>, <measures from part2>, ... ]
         if s.hasMeasures():
-            mlists = [s.getElementsByClass(music21.stream.Measure)]
+            mlists = [s.getElementsByClass("Measure")]
         else:
-            mlists = [ p.getElementsByClass(music21.stream.Measure) for p in s.parts ]
+            mlists = [ p.getElementsByClass("Measure") for p in s.parts ]
             
         #Check for unequal lengths
         for i in range(len(mlists)-1):
@@ -4384,6 +4385,7 @@ _DOC_ORDER = [RepeatExpression, RepeatExpressionMarker, Coda, Segno, Fine, Repea
         #TODO: fix the DocOrder! (look at it...)
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

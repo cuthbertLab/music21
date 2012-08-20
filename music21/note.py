@@ -17,11 +17,12 @@ The :class:`~music21.pitch.Pitch` object is stored within, and used to configure
 import copy
 import unittest
 
-import music21
+from music21 import base
 from music21 import articulations
 from music21 import common
 from music21 import defaults
 from music21 import duration
+from music21 import exceptions21
 from music21 import instrument
 from music21 import interval
 from music21 import editorial
@@ -47,11 +48,11 @@ noteheadTypeNames = ['slash', 'triangle', 'diamond', 'square', 'cross', 'x' , 'c
 stemDirectionNames = ['up', 'down', 'noStem', 'double', 'unspecified', 'none']
 
 #-------------------------------------------------------------------------------
-class LyricException(Exception):
+class LyricException(exceptions21.Music21Exception):
     pass
 
 
-class Lyric(music21.JSONSerializer):
+class Lyric(base.JSONSerializer):
     '''
     An object representing a single Lyric as part of a note's .lyrics property.
     
@@ -97,7 +98,7 @@ class Lyric(music21.JSONSerializer):
     '''
 
     def __init__(self, text=None, number=1, syllabic=None, applyRaw = False, identifier=None):
-        music21.JSONSerializer.__init__(self)
+        base.JSONSerializer.__init__(self)
 
         # these are set by _setTextAndSyllabic
         self.text = None
@@ -217,7 +218,7 @@ class Lyric(music21.JSONSerializer):
 
 
 #-------------------------------------------------------------------------------
-class GeneralNote(music21.Music21Object):
+class GeneralNote(base.Music21Object):
     '''
     A GeneralNote object is the base class object 
     for the :class:`~music21.note.Note`, 
@@ -262,7 +263,7 @@ class GeneralNote(music21.Music21Object):
             tempDuration = duration.Duration(**keywords)
         else:
             tempDuration = keywords['duration']
-        music21.Music21Object.__init__(self, duration = tempDuration)
+        base.Music21Object.__init__(self, duration = tempDuration)
         # this sets the stored duration defined in Music21Object
         self._duration = tempDuration
 
@@ -324,7 +325,7 @@ class GeneralNote(music21.Music21Object):
             elif self.duration.tuplets[0].type == "stop":
                 ret += " (in fact STOPS the tuplet)"
         if len(self.expressions) > 0:
-            if (isinstance(self.expressions[0], music21.expressions.Fermata)):
+            if (isinstance(self.expressions[0], expressions.Fermata)):
                 ret += " has Fermata"
         return ret
 
@@ -1532,8 +1533,8 @@ def sendNoteInfo(music21noteObject):
     called by trecento.trecentoCadence, among other places
     '''
     retstr = ""
-    a = music21noteObject  
-    if (isinstance(a, music21.note.Note)):
+    a = music21noteObject
+    if (isinstance(a, Note)):
         retstr += "Name: " + a.name + "\n"
         retstr += "Step: " + a.step + "\n"
         retstr += "Octave: " + str(a.octave) + "\n"
@@ -1552,7 +1553,7 @@ def sendNoteInfo(music21noteObject):
         elif a.duration.tuplets[0].type == "stop":
             retstr += "   in fact STOPS the tuplet group\n"
     if len(a.expressions) > 0:
-        if (isinstance(a.expressions[0], music21.expressions.Fermata)):
+        if (isinstance(a.expressions[0], expressions.Fermata)):
             retstr += "Has a fermata on it\n"
     return retstr
 
@@ -2002,6 +2003,7 @@ _DOC_ORDER = [Note, Rest]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 

@@ -17,9 +17,9 @@ as well as other methods, functions, and objects related to chords.
 import copy
 import unittest
 
-import music21
+from music21 import duration
 from music21 import interval
-
+from music21 import exceptions21
 #from music21.note import Note
 from music21 import musicxml
 from music21 import midi as midiModule
@@ -39,7 +39,7 @@ _MOD = "chord.py"
 environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------
-class ChordException(music21.Music21Exception):
+class ChordException(exceptions21.Music21Exception):
     pass
 
 class Chord(note.NotRest):
@@ -150,7 +150,7 @@ class Chord(note.NotRest):
             quickDuration = True
 
         for n in notes:
-            if isinstance(n, music21.pitch.Pitch):
+            if isinstance(n, pitch.Pitch):
                 # assign pitch to a new Note
                 if 'duration' in keywords:
                     newNote = note.Note(n, duration=keywords['duration'])
@@ -158,7 +158,7 @@ class Chord(note.NotRest):
                     newNote = note.Note(n)
                 self._components.append(newNote)
                 #self._components.append({'pitch':n})
-            elif isinstance(n, music21.note.Note):
+            elif isinstance(n, note.Note):
                 self._components.append(n)
                 if quickDuration is True:
                     self.duration = n.duration
@@ -203,7 +203,7 @@ class Chord(note.NotRest):
 
         if "duration" in keywords or "type" in keywords or \
             "quarterLength" in keywords: #dots dont cut it
-            self.duration = music21.duration.Duration(**keywords)
+            self.duration = duration.Duration(**keywords)
 
 #        elif len(notes) > 0:
 #            for thisNote in notes:
@@ -1273,7 +1273,7 @@ class Chord(note.NotRest):
         if (newbass):
             if common.isStr(newbass):
                 newbass = newbass.replace('b', '-')
-                self._bass = music21.pitch.Pitch(newbass)
+                self._bass = pitch.Pitch(newbass)
             else:
                 self._bass = newbass
             self._inversion = None # reset inversion if root changes
@@ -1338,7 +1338,7 @@ class Chord(note.NotRest):
         if newroot:
             if common.isStr(newroot):
                 newroot = newroot.replace('b', '-')
-                self._root = music21.pitch.Pitch(newroot)
+                self._root = pitch.Pitch(newroot)
             else:
                 self._root = newroot
             self._inversion = None # reset inversion if root changes
@@ -2063,25 +2063,25 @@ class Chord(note.NotRest):
 
         Returns false if is not an augmented triad.
 
-        >>> import music21.chord
-        >>> c = music21.chord.Chord(["C4", "E4", "G#4"])
+        >>> from music21 import *
+        >>> c = chord.Chord(["C4", "E4", "G#4"])
         >>> c.isAugmentedTriad()
         True
-        >>> c = music21.chord.Chord(["C4", "E4", "G4"])
+        >>> c = chord.Chord(["C4", "E4", "G4"])
         >>> c.isAugmentedTriad()
         False
 
         Other spellings will give other roots!
-        >>> c = music21.chord.Chord(["C4", "E4", "A-4"])
+        >>> c = chord.Chord(["C4", "E4", "A-4"])
         >>> c.isAugmentedTriad()
         True
         >>> c.root()
         A-4
 
-        >>> c = music21.chord.Chord(["C4", "F-4", "A-4"])
+        >>> c = chord.Chord(["C4", "F-4", "A-4"])
         >>> c.isAugmentedTriad()
         True
-        >>> c = music21.chord.Chord(["B#4", "F-4", "A-4"])
+        >>> c = chord.Chord(["B#4", "F-4", "A-4"])
         >>> c.isAugmentedTriad()
         False
         '''
@@ -3934,16 +3934,16 @@ class Test(unittest.TestCase):
 
 
     def testConstruction(self):
-        HighEFlat = note.Note ()
+        HighEFlat = note.Note()
         HighEFlat.name = 'E-'
         HighEFlat.octave = 5
 
         a = note.Note()
         b = note.Note()
-        assert isinstance(a, music21.note.Note)
-        assert isinstance(a, music21.note.Note)
-        assert isinstance(b, music21.note.Note)
-        assert isinstance(b, music21.note.Note)
+        assert isinstance(a, note.Note)
+        assert isinstance(a, note.Note)
+        assert isinstance(b, note.Note)
+        assert isinstance(b, note.Note)
 
         MiddleC = note.Note()
         MiddleC.name = 'C'
@@ -4275,21 +4275,24 @@ class Test(unittest.TestCase):
         self.assertEqual(c1.pitchedCommonName, 'C#-diminished seventh chord')
 
     def testScaleDegreesA(self):
+        from music21 import key
+        from music21 import stream
+        
         chord1 = Chord(["C#5", "E#5", "G#5"])
-        st1 = music21.stream.Stream()
-        st1.append(music21.key.Key('c#'))   # c-sharp minor
+        st1 = stream.Stream()
+        st1.append(key.Key('c#'))   # c-sharp minor
         st1.append(chord1)
         self.assertEqual(repr(chord1.scaleDegrees), "[(1, None), (3, <accidental sharp>), (5, None)]")
 
-        st2 = music21.stream.Stream()
-        st2.append(music21.key.Key('c'))    # c minor
+        st2 = stream.Stream()
+        st2.append(key.Key('c'))    # c minor
         st2.append(chord1)          # same pitches as before gives different scaleDegrees
         sd2 = chord1.scaleDegrees
         self.assertEqual(repr(sd2), "[(1, <accidental sharp>), (3, <accidental double-sharp>), (5, <accidental sharp>)]")
 
 
-        st3 = music21.stream.Stream()
-        st3.append(music21.key.Key('C'))    # C major
+        st3 = stream.Stream()
+        st3.append(key.Key('C'))    # C major
         chord2 = Chord(["C4", "C#4", "D4", "E-4", "E4", "F4"])  # 1st 1/2 of chromatic
         st3.append(chord2)
         sd3 = chord2.scaleDegrees
@@ -4603,6 +4606,7 @@ _DOC_ORDER = [Chord]
 
 if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

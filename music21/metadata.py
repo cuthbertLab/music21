@@ -36,8 +36,9 @@ import os
 import inspect
 import re
 
-import music21
+from music21 import base
 from music21 import common
+from music21 import exceptions21
 from music21 import musicxml
 from music21 import text
 
@@ -49,7 +50,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class MetadataException(Exception):
+class MetadataException(exceptions21.Music21Exception):
     pass
 
 
@@ -240,7 +241,7 @@ def workIdToAbbreviation(value):
 
 
 #-------------------------------------------------------------------------------
-class Text(music21.JSONSerializer):
+class Text(base.JSONSerializer):
     '''One unit of text data: a title, a name, or some other text data. Store the string and a language name or code. This object can be used and/or subclassed for a variety for of text storage.
     '''
     def __init__(self, data='', language=None):
@@ -251,6 +252,7 @@ class Text(music21.JSONSerializer):
         >>> str(td)
         'concerto in d'
         '''
+        base.JSONSerializer.__init__(self)
         if isinstance(data, Text): # if this is a Text obj, get data
             # accessing private attributes here; not desirable
             self._data = data._data
@@ -311,7 +313,7 @@ class Text(music21.JSONSerializer):
 
 
 #-------------------------------------------------------------------------------
-class Date(music21.JSONSerializer):
+class Date(base.JSONSerializer):
     '''A single date value, specified by year, month, day, hour, minute, and second. Note that this class has been created, instead of using Python's datetime, to provide greater flexibility for processing unconventional dates, ancient dates, dates with error, and date ranges. 
 
     The :attr:`~music21.metadata.Date.datetime` property can be used to retrieve a datetime object when necessary.
@@ -335,6 +337,7 @@ class Date(music21.JSONSerializer):
         'uncertain'
 
         '''
+        base.JSONSerializer.__init__(self)
         self.year = None
         self.month = None
         self.day = None
@@ -619,7 +622,7 @@ class Date(music21.JSONSerializer):
 
 
 #-------------------------------------------------------------------------------
-class DateSingle(music21.JSONSerializer):
+class DateSingle(base.JSONSerializer):
     '''Store a date, either as certain, approximate, or uncertain relevance.
 
     The relevance attribute is limited within each DateSingle subclass depending on 
@@ -640,6 +643,7 @@ class DateSingle(music21.JSONSerializer):
         >>> str(dd)
         '1805/03/12'
         '''
+        base.JSONSerializer.__init__(self)
         self._data = [] # store a list of one or more Date objects
         self._relevance = None # managed by property
 
@@ -841,7 +845,7 @@ class DateSelection(DateSingle):
 
 
 #-------------------------------------------------------------------------------
-class Contributor(music21.JSONSerializer):
+class Contributor(base.JSONSerializer):
     '''A person that contributed to a work. Can be a composer, lyricist, 
     arranger, or other type of contributor. 
     In MusicXML, these are "creator" elements.  
@@ -860,6 +864,7 @@ class Contributor(music21.JSONSerializer):
         'contributor'
 
         '''
+        base.JSONSerializer.__init__(self)
         if 'role' in keywords.keys():
             # stored in self._role
             self.role = keywords['role'] # validated with property
@@ -1123,7 +1128,7 @@ class Copyright(object):
 #     'ocy' : 'countryOfComposition',
 #     'opc' : 'localeOfComposition', # origin in abc
 
-class Metadata(music21.Music21Object):
+class Metadata(base.Music21Object):
     '''Metadata represent data for a work or fragment, 
     including title, composer, dates, and other relevant information.
 
@@ -1154,7 +1159,7 @@ class Metadata(music21.Music21Object):
         >>> md.title
         'Rhapsody in Blue'
         '''
-        music21.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
 
         # a list of Contributor objects
         # there can be more than one composer, or any other combination
@@ -1881,12 +1886,13 @@ class RichMetadata(Metadata):
 
 
 #-------------------------------------------------------------------------------
-class MetadataBundle(music21.JSONSerializer):
+class MetadataBundle(base.JSONSerializer):
     '''An object that provides access to, searches within, and storage and loading of multiple Metadata objects.
 
     Additionally, multiple MetadataBundles can be merged for additional processing
     '''
     def __init__(self, name='default'):
+        base.JSONSerializer.__init__(self)
 
         # all keys are strings, all value are Metadata
         # there is apparently a performance boost for using all-string keys
@@ -2422,11 +2428,12 @@ class Test(unittest.TestCase):
 
 
 #-------------------------------------------------------------------------------
-_DOC_ORDER = [Text, Date, 
+_DOC_ORDER = [Metadata, Text, Date, 
             DateSingle, DateRelative, DateBetween, DateSelection, 
-            Contributor, Metadata]
+            Contributor]
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 

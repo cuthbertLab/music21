@@ -15,10 +15,6 @@ import doctest, unittest
 from decimal import Decimal
 import fractions
 
-import music21
-import music21.common
-
-
 
 
 class IntervalRatio(object):
@@ -204,6 +200,7 @@ class Test(unittest.TestCase):
         unison = ET(0)
 
 if __name__ == "__main__":    
+    import music21
     music21.mainTest(Test)
 
 

@@ -17,8 +17,9 @@ from __future__ import unicode_literals
 
 import unittest, doctest, copy
 
-import music21
-import music21.note
+from music21 import base
+from music21 import exceptions21
+from music21 import note
 from music21 import common
 from music21 import duration
 from music21 import expressions
@@ -100,18 +101,18 @@ def convertTempoByNumber(numberSrc, quarterLengthBeatSrc,
 
 
 #-------------------------------------------------------------------------------
-class TempoException(Exception):
+class TempoException(exceptions21.Music21Exception):
     pass
 
 
 #-------------------------------------------------------------------------------
-class TempoIndication(music21.Music21Object):
+class TempoIndication(base.Music21Object):
     '''A generic base class for all tempo indications to inherit. Can be used to filter out all types of tempo indications. 
     '''
     classSortOrder = 1
 
     def __init__(self):
-        music21.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
 
     def getSoundingMetronomeMark(self, found=None):
         '''Get the appropriate MetronomeMark from anu sort of TempoIndication, regardless of class.
@@ -659,7 +660,7 @@ class MetronomeMark(TempoIndication):
         '''Return a new MetronomeMark object that has an equivalent speed but different number and referent values based on a supplied referent (given as a Duration type, quarterLength, or Duration object).
 
         >>> from music21 import *
-        >>> mm1 = music21.tempo.MetronomeMark(number=60, referent=1.0)
+        >>> mm1 = tempo.MetronomeMark(number=60, referent=1.0)
         >>> mm1.getEquivalentByReferent(.5)
         <music21.tempo.MetronomeMark larghetto Eighth=120.0>
         >>> mm1.getEquivalentByReferent(duration.Duration('half'))
@@ -824,8 +825,7 @@ class MetricModulation(TempoIndication):
     def _setOldMetronome(self, value):
         if value is None:
             pass # allow setting as None
-        elif not isinstance(value, (MetronomeMark, 
-                                    music21.tempo.MetronomeMark)):
+        elif not hasattr(value, "classes") or "MetronomeMark" not in value.classes:
             raise MetricModulationException('oldMetronome property must be set with a MetronomeMark instance')
         self._oldMetronome = value
 
@@ -897,8 +897,9 @@ class MetricModulation(TempoIndication):
     def _setNewMetronome(self, value):
         if value is None:
             pass # allow setting as None
-        elif not isinstance(value, (MetronomeMark, 
-                                    music21.tempo.MetronomeMark)):
+        elif not hasattr(value, "classes") or "MetronomeMark" not in value.classes:
+#        elif not isinstance(value, (MetronomeMark, 
+#                                    music21.tempo.MetronomeMark)):
             raise MetricModulationException('newMetronome property must be set with a MetronomeMark instance')
         self._newMetronome = value
 
@@ -1183,7 +1184,7 @@ def interpolateElements(element1, element2, sourceStream,
         elOffsetSrc = el.getOffsetBySite(sourceStream)
         try:
             el.getOffsetBySite(destinationStream)
-        except music21.DefinedContextsException:
+        except base.DefinedContextsException:
             if autoAdd is True:
                 destinationOffset = (scaleAmount * (elOffsetSrc - startOffsetSrc)) + startOffsetDest
                 destinationStream.insert(destinationOffset, el)
@@ -1221,7 +1222,7 @@ class Test(unittest.TestCase):
 
 
     def testSetup(self):
-        MM1 = MetronomeMark(number=60, referent=music21.note.QuarterNote())
+        MM1 = MetronomeMark(number=60, referent=note.QuarterNote())
         self.assertEqual(MM1.number, 60)
 
         TM1 = TempoText("Lebhaft")
@@ -1232,17 +1233,17 @@ class Test(unittest.TestCase):
 
         from music21 import tempo
         # test with no arguments
-        tm = music21.tempo.TempoText()
+        tm = tempo.TempoText()
 
         #environLocal.printDebug(['testing tempo instantion', tm])
 
-        tm = music21.tempo.TempoText("adagio")
-        mm = music21.tempo.MetronomeMark("adagio")
+        tm = tempo.TempoText("adagio")
+        mm = tempo.MetronomeMark("adagio")
         self.assertEqual(mm.number, 56)
         self.assertEqual(mm.numberImplicit, True)
 
         self.assertEqual(mm.number, 56)
-        tm2 = music21.tempo.TempoText(u"très vite")
+        tm2 = tempo.TempoText(u"très vite")
 
         self.assertEqual(tm2.text, u'très vite')
         mm = tm2.getMetronomeMark()
@@ -1571,7 +1572,7 @@ _DOC_ORDER = [MetronomeMark, TempoText, MetricModulation, interpolateElements]
 
 
 if __name__ == "__main__":
-
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

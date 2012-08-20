@@ -29,10 +29,10 @@ import copy
 import random
 
 import re
-import music21
 from music21 import common
 from music21 import duration
 from music21 import environment
+from music21 import exceptions21
 from music21 import variant
 from music21.lily import lilyObjects as lyo
 _MOD = 'lily.translate2012.py'
@@ -1573,8 +1573,9 @@ class TestExternal(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
-    music21.mainTest(TestExternal, 'noDocTest')
+    #music21.mainTest(TestExternal, 'noDocTest')
     
 #------------------------------------------------------------------------------
 # eof

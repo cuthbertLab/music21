@@ -18,7 +18,8 @@ subclasses, the :class:`~music21.dynamics.Dynamic` object is often specialized b
 import unittest, doctest
 import copy
 
-import music21
+from music21 import base
+from music21 import exceptions21
 from music21 import musicxml as musicxmlMod 
 from music21.musicxml import translate as musicxmlTranslate
 from music21 import common
@@ -107,14 +108,14 @@ dyanmicStrToScalar = {
 
 
 #-------------------------------------------------------------------------------
-class DynamicException(Exception):
+class DynamicException(exceptions21.Music21Exception):
     pass
 
-class WedgeException(Exception):
+class WedgeException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
-class Dynamic(music21.Music21Object):
+class Dynamic(base.Music21Object):
     '''
     Object representation of Dynamics.
     
@@ -159,7 +160,7 @@ class Dynamic(music21.Music21Object):
     classSortOrder = 10
     
     def __init__(self, value=None):
-        music21.Music21Object.__init__(self)
+        base.Music21Object.__init__(self)
 
         if not common.isStr(value):
             # assume it is a number, try to convert
@@ -451,10 +452,10 @@ class Test(unittest.TestCase):
         from music21 import corpus
         import music21
         a = corpus.parse('opus41no1/movement2') # has dynamics!
-        b = a.parts[0].flat.getElementsByClass(music21.dynamics.Dynamic)
+        b = a.parts[0].flat.getElementsByClass("Dynamic")
         self.assertEquals(len(b), 35)
 
-        b = a.parts[0].flat.getElementsByClass(music21.dynamics.DynamicWedge)
+        b = a.parts[0].flat.getElementsByClass("DynamicWedge")
         self.assertEquals(len(b), 2)
 
 
@@ -507,6 +508,7 @@ _DOC_ORDER = [Dynamic, dynamicStrFromDecimal]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 

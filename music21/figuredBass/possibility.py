@@ -67,10 +67,10 @@ The application of these methods is controlled by corresponding instance variabl
 '''
 
 import itertools
-import music21
 import unittest
 
 from music21 import chord
+from music21 import exceptions21
 from music21 import interval
 from music21 import pitch
 from music21 import voiceLeading
@@ -954,7 +954,7 @@ consequentPossibilityMethods.sort(None, lambda x: x.__name__)
 _DOC_ORDER = singlePossibilityMethods + [partPairs] + consequentPossibilityMethods
 
 
-class PossibilityException(music21.Music21Exception):
+class PossibilityException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
@@ -964,6 +964,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

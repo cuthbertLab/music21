@@ -12,7 +12,6 @@
 from music21 import articulations, bar, chord, clef, converter, dynamics, \
     expressions, key, meter, note, pitch, spanner, stream, tempo, tinyNotation
 from music21.braille import translate
-import music21
 import unittest
 
 
@@ -2975,6 +2974,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------

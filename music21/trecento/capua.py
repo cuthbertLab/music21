@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-import music21
+from music21 import stream
 from music21.trecento import cadencebook
 from music21 import note
 from music21.pitch import Accidental
@@ -935,7 +935,7 @@ def ruleFrequency():
 
 def showFourA():
     ballataObj = cadencebook.BallataSheet()
-    showStream = music21.stream.Stream()
+    showStream = stream.Stream()
     for i in range(2, 45): #459): # all ballate
         pieceObj = ballataObj.makeWork(i)  ## N.B. -- we now use Excel column numbers
 
@@ -1076,6 +1076,7 @@ class Test(unittest.TestCase):
 
 if (__name__ == "__main__"):
     #runPiece(267)
+    import music21
     music21.mainTest(Test) #, TestExternal)
     
 #    test()

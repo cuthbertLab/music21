@@ -59,9 +59,8 @@ import pickle as pickleMod
 import StringIO # this module is not supported in python3
 # use io.StringIO  in python 3, avail in 2.6, not 2.5
 
-
-import music21
-
+from music21 import base
+from music21 import exceptions21
 from music21 import common
 from music21 import humdrum
 from music21 import midi
@@ -316,7 +315,7 @@ class StreamFreezer(object):
         '''        
         # do all things necessary to setup the stream
         streamObj.setupSerializationScaffold()
-        storage = {'stream': streamObj, 'm21Version': music21.VERSION}
+        storage = {'stream': streamObj, 'm21Version': base.VERSION}
         return storage
 
     def _teardownStream(self, streamObj):
@@ -328,7 +327,7 @@ class StreamFreezer(object):
         '''Convert from storage dictionary to Stream.
         '''
         version = storage['m21Version']
-        if version != music21.VERSION:
+        if version != base.VERSION:
             environLocal.warn('this pickled file is out of data and my not function properly.')
         streamObj = storage['stream']
         streamObj.teardownSerializationScaffold()
@@ -1991,6 +1990,7 @@ _DOC_ORDER = [parse, parseFile, parseData, parseURL, freeze, unfreeze, freezeStr
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
+    import music21
     music21.mainTest(Test)
 
 

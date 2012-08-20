@@ -20,8 +20,6 @@ import unittest, doctest, random
 import sys
 import math
 
-import music21
-
 from music21 import common
 from music21 import meter
 from music21.pitch import Pitch
@@ -399,6 +397,7 @@ _DOC_ORDER = [WindowedAnalysis]
 
 if __name__ == "__main__":
     if len(sys.argv) == 1: # normal conditions
+        import music21
         music21.mainTest(Test)
     elif len(sys.argv) > 1:
         a = Test()
