@@ -16,7 +16,7 @@ Also contains functions for converting Trecento notation to modern notation.
 '''
 
 import copy
-from re import compile, search, match
+import re
 
 from music21 import base
 from music21 import clef
@@ -24,10 +24,13 @@ from music21 import common
 from music21 import duration
 from music21 import exceptions21
 from music21 import interval
+from music21 import metadata
 from music21 import meter
 from music21 import note
+from music21 import pitch
 from music21 import stream
 from music21 import tempo
+from music21 import text
 from music21 import tinyNotation
 import unittest, doctest
 
@@ -143,15 +146,18 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
     {0.0} <music21.medren.MensuralNote brevis D>
     {0.0} <music21.medren.Ligature...>
     '''
-    CLEF = compile('(\$[A-Z]\d?)')
-    DIVISIONE = compile('(\.[a-z]\.)')
+    regularExpressions = {'CLEF': '(\$[A-Z]\d?)',
+                          'DIVISIONE': '(\.[a-z]\.)'}
     
     def __init__(self, stringRep = "", div = None):
+        if 'TRIP' not in self.regularExpressions:
+            self.regularExpressions.update(tinyNotation.TinyNotationStream.regularExpressions)
         tinyNotation.TinyNotationStream.__init__(self)
         self.stringRep = stringRep
         divisione, mensuralClef = None, None
         storedDict = {}
         objList = []
+
         
         noteStrs  = []
         from music21 import medren
@@ -218,14 +224,21 @@ class TinyTrecentoNotationNote(tinyNotation.TinyNotationNote):
     ''' 
     For documentation please see :class:`music21.trecento.notation.TinyTrecentoNotationStream`.
     '''
-    LIGATURE = compile('\<.+\>')
-    PUNCTUS = compile('p')
-    MENSURALTYPE = compile('\([A-Z][A-Za-z]?\)')
-    STEMS = compile('\[[A-Z]?(\s[A-Z])*\]')
-    FLAGS = compile('\{([A-Z][A-Z])?(\s[A-Z][A-Z])*\}')
-    LIG_STEMS = compile('\[[A-Z][A-Z]\]')
-    LIG_NOTEHEAD = compile('\*[a-z]\*')
-    LIG_REVERSE = compile('.\/')
+    regularExpressions = {
+                    'LIGATURE': '\<.+\>',
+                    'PUNCTUS': 'p',
+                    'MENSURALTYPE': '\([A-Z][A-Za-z]?\)',
+                    'STEMS': '\[[A-Z]?(\s[A-Z])*\]',
+                    'FLAGS': '\{([A-Z][A-Z])?(\s[A-Z][A-Z])*\}',
+                    'LIG_STEMS': '\[[A-Z][A-Z]\]',
+                    'LIG_NOTEHEAD': '\*[a-z]\*',
+                    'LIG_REVERSE': '.\/',
+                    }
+
+    def __init__(self, stringRep = "", timeSignature = None):
+        if tinyNotation.TinyNotationNote.regularExpressions['REST'] not in self.regularExpressions:
+            self.regularExpressions.update(tinyNotation.TinyNotationNote.regularExpressions)
+        tinyNotation.TinyNotationNote.__init__(self, stringRep, timeSignature)
     
     def _getPitch(self, stringRep):
         if (self.OCTAVE2.match(stringRep)) is not None: # BB etc.
@@ -479,6 +492,7 @@ def convertTrecentoStream(inpStream, inpDiv = None):
     >>> lowerString += "c d c(M) d e(L) d(SB)[D] e p c[D] d p e e(M) d(SB) c(M) p B(SB) A B(M) c p "
     >>> lowerString += "d(SB) d(M) c(SB) d(M) p e(SB) d r p c c c(M) A(SB) B(M) p c(SB) B B p A B[D] p A B c d(Mx)"
 
+    >>> SePerDureca = stream.Stream()
     >>> SePerDureca.append(trecento.notation.TinyTrecentoNotationStream(upperString))
     >>> SePerDureca.append(trecento.notation.TinyTrecentoNotationStream(lowerString))
 

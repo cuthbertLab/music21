@@ -1128,7 +1128,7 @@ class Stream(base.Music21Object):
         for name in self.__dict__.keys():
             if name.startswith('__'):
                 continue
-            part = getattr(self, name)
+            attrValue = getattr(self, name)
                     
             # all subclasses of Music21Object that define their own
             # __deepcopy__ methods must be sure to not try to copy activeSite
@@ -1139,7 +1139,7 @@ class Stream(base.Music21Object):
             # attributes that require special handling
             elif name == '_definedContexts':
                 # this calls __deepcopy__ in DefinedContexts
-                newValue = copy.deepcopy(part, memo)
+                newValue = copy.deepcopy(attrValue, memo)
                 newValue.containedById = id(new)
                 setattr(new, name, newValue)
             elif name == 'flattenedRepresentationOf':
@@ -1173,10 +1173,21 @@ class Stream(base.Music21Object):
                     new._storeAtEndCore(copy.deepcopy(e, memo))
             else:
                 try: 
-                    deeplyCopiedObject = copy.deepcopy(part, memo)
+                    deeplyCopiedObject = copy.deepcopy(attrValue, memo)
                     setattr(new, name, deeplyCopiedObject)
                 except TypeError:
-                    raise StreamException('Cannot deepcopy %s probably because it requires a default value in instantiation.' % name)
+                    if not isinstance(attrValue, base.Music21Object):
+                        # shallow copy then...
+                        try:
+                            shallowlyCopiedObject = copy.copy(attrValue, memo)
+                            setattr(new, name, shallowlyCopiedObject)
+                            environLocal.printDebug('__deepcopy__: Could not deepcopy %s in %s, not a music21Object so making a shallow copy' % (name, self))
+                        except TypeError:
+                            # just link...
+                            environLocal.printDebug('__deepcopy__: Could not copy (deep or shallow) %s in %s, not a music21Object so just making a link' % (name, self))
+                            setattr(new, name, attrValue)
+                    else: # raise error for our own problem.
+                        raise StreamException('__deepcopy__: Cannot deepcopy Music21Object %s probably because it requires a default value in instantiation.' % name)
 
         # after performing deepcopying, defind context may contain sites
         # that the copied obj does not belong to

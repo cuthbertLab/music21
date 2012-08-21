@@ -5,8 +5,8 @@
 #
 # Authors:      Christopher Reyes
 #
-# Copyright:    (c) 2011 The music21 Project
-# License:      LGPL
+# Copyright:    (c) 2011-12 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 from music21.vexflow.base import *
