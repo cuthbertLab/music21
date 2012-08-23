@@ -73,6 +73,7 @@ Module Reference
    moduleClef
    moduleCommon
    moduleCompositionPhasing
+   moduleContour
    moduleConverter
    moduleCorpusBase
    moduleCorpusChorales

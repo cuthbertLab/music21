@@ -76,7 +76,7 @@ __all__ = ['base',
            'articulations', 
            'bar', 'beam', # base listed above...
            'chant', 'chord', 'chordTables', 
-           'classCache', 'clef', 'common', 'configure', 'converter',
+           'classCache', 'clef', 'common', 'configure', 'contour', 'converter',
            'defaults', 'derivation', 'duration', 'dynamics',
            'editorial', 'environment', 'exceptions21', 'expressions', 
            'graph', 

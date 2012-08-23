@@ -59,6 +59,7 @@ from music21 import common
 from music21 import composition
 from music21.composition import phasing as compositionPhasing
 
+from music21 import contour
 from music21 import converter
 
 from music21.corpus import base as corpus
@@ -238,6 +239,7 @@ MODULES = [
     #composition
     compositionPhasing,
 
+    contour,
     converter,
     
     corpus, 

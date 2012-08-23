@@ -440,7 +440,6 @@ def insertRepeatEnding(s, start, end, endingNumber=1, inPlace=False):
         else:
             return s
     
-    
     measures = [ s.measure(i) for i in range(start, end+1) ]
     rb = spanner.RepeatBracket(measures, number=endingNumber)
     rbOffset = measures[0].getOffsetBySite(s)   #adding repeat bracket to stream at beginning of repeated section.  
@@ -521,7 +520,7 @@ def insertRepeat(s, start, end, inPlace=False):
 def deleteMeasures(s, toDelete, inPlace=False):
         '''
         Given a stream s and a list of numbers, toDelete, removes each measure with a number
-        corresponding to a number in toDelete and then Renumbers the remaining measures in the stream.
+        corresponding to a number in toDelete and then renumbers the remaining measures in the stream.
                 
         
         >>> from music21 import *
@@ -1624,6 +1623,7 @@ class NoInternalStreamException(exceptions21.Music21Exception):
     pass
 
 
+#TODO: change terminology for defaultHash.  It's not really a hash function...
 class RepeatFinder(object):
     '''
     An object for finding and simplifying repeated sections of music. Must be passed a stream 
@@ -2229,7 +2229,7 @@ class RepeatFinder(object):
         Returns a stream with first and second endings with repeats substituted in when appropriate.
         Does not detect sections that are more than 16 measure apart.
         
-        mGroup is the result of calling getSimilarMeasureGroupsFromlist( getMeasureSimilarityList(s)).
+        mGroup is the result of calling getSimilarMeasureGroupsFromlist( SimilarityList(s)).
         
         
     
@@ -2550,7 +2550,7 @@ class RepeatFinder(object):
                 repeatBars.append((startBar, endBar))
                 toDelete.extend(mGroup[1])
                                 
-            elif len( mGroup[0] ) >= repeatEndingThreshold and distance <= maxAcceptableDistance:
+            elif len( mGroup[0] ) >= repeatEndingThreshold and distance <= maxAcceptableDistance and distance > 0:
                 startingBar = mGroup[0][0]
                 firstEndingBar = mGroup[0][-1]+1
                 repeatSignBar = mGroup[1][0]-1
@@ -4336,53 +4336,14 @@ class Test(unittest.TestCase):
 #         s.show()
 #         post = s.expandRepeats()    
 
-    '''
-    def testGetQuarterLengthOfPickup(self):
-        pass
-    
-    def testHasPickup(self):
-        pass
-    
-    def testGetMeasureSimilarityList(self):
-        pass
-    
-    def testGetSimilarMeasuresTuples(self):
-        pass
-    
-    def testCreateRepeatFromSimilarMeasureGroups(self):
-        pass
-    
-    def testCreateFirstAndSecondEndingsFromSimilarMeasureGroups(self):
-        pass
-    
-    def testInsertRepeat(self):
-        pass
-    
-    def testInsertRepeatEnding(self):
-        pass
-    
-    def testDeleteMeasures(self):
-        pass
-    
-    def testSimplify(self):
-        pass
-    
-    def testGetSimilarMeasureSpans(self):
-        pass
-        
-    '''
-    
-    #TODO: delete above.
+
     
     
-    
-    #TODO: _OMIT_FROM_DOCS_ for doctests...
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [RepeatExpression, RepeatExpressionMarker, Coda, Segno, Fine, RepeatExpressionCommand, DaCapo, DaCapoAlFine, 
               DaCapoAlCoda, AlSegno, DalSegno, DalSegnoAlFine, DalSegnoAlCoda, RepeatFinder]
-        #TODO: fix the DocOrder! (look at it...)
 
 if __name__ == "__main__":
     import music21
