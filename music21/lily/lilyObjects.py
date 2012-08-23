@@ -669,6 +669,16 @@ class LyPaperBlock(LyObject):
         else:
             return self.outputDef.stringOutput()
 
+class LyLayout(LyObject):
+
+    def __init__(self):
+        LyObject.__init__(self)
+
+    def stringOutput(self):
+        theseStrings = [self.backslash + "layout {", " " + self.backslash + "context {", "   " + self.backslash + "RemoveEmptyStaffContext", "   " + self.backslash + "override VerticalAxisGroup #'remove-first = ##t", " " + "}", "}"]
+
+        return self.newlineSeparateStringOutputIfNotNone(theseStrings)
+
 class LyOutputDef(LyObject):
     '''
     ugly grammar since it doesnt close curly bracket...
@@ -808,6 +818,7 @@ class LyAlternativeMusic(LyObject):
         
     def stringOutput(self):
         if self.musicList is None:
+
             return None
         else:
             return self.backslash + "alternative" + self.encloseCurly(self.musicList)
@@ -835,10 +846,11 @@ class LySequentialMusic(LyObject):
     Can be explicitly tagged with "\sequential" if displayTag is True
     '''
     
-    def __init__(self, musicList = None, displayTag = False):
+    def __init__(self, musicList = None, displayTag = False, beforeMatter = None):
         LyObject.__init__(self)
         self.musicList = musicList
         self.displayTag = displayTag
+        self.beforeMatter = beforeMatter
     
     def stringOutput(self):
         if self.musicList is not None:
@@ -848,7 +860,42 @@ class LySequentialMusic(LyObject):
         tag = ""
         if self.displayTag is True:
             tag = self.backslash + "sequential "
-        return tag + '{ ' + musicListSO + ' } ' + self.newlineIndent #self.encloseCurly(musicListSO)
+        
+        if self.beforeMatter == 'startStaff':
+            beforeMatter = self.backslash + 'startStaff '
+        else:
+            beforeMatter = ''
+        
+        return tag + '{ ' + beforeMatter + musicListSO + ' } ' + self.newlineIndent #self.encloseCurly(musicListSO)
+
+
+class LyOssiaMusic(LyObject):
+    r'''
+    represents ossia music.
+
+    Can be tagged with \startStaff and \stopStaff if startstop is True
+    '''
+
+    def __init__(self, musicList = None, startstop = True):
+        LyObject.__init__(self)
+        self.musicList = musicList
+        self.startstop = startstop
+
+    def stringOutput(self):
+        if self.startstop is True:
+            start = self.backslash + "startStaff "
+            stop = self.backslash + "stopStaff"
+        else:
+            start, stop = "", ""
+
+        if self.musicList is not None:
+            musicListSO = self.musicList.stringOutput()
+        else:
+            musicListSO = ""
+
+
+        return '{' + start + musicListSO + ' ' + stop + '}' + self.newlineIndent
+
 
 class LySimultaneousMusic(LyObject):
     r'''
@@ -932,16 +979,22 @@ class LyCompositeMusic(LyObject):
     '''
     one of LyPrefixCompositeMusic or LyGroupedMusicList stored in self.content
     '''
-    def __init__(self, prefixCompositeMusic = None, groupedMusicList = None):
+    def __init__(self, prefixCompositeMusic = None, groupedMusicList = None, newLyrics = None):
         LyObject.__init__(self)
         self.prefixCompositeMusic = prefixCompositeMusic
         self.groupedMusicList = groupedMusicList 
+        self.newLyrics = newLyrics
     
     def stringOutput(self):
+        if self.newLyrics is not None:
+            newLyrics = self.newLyrics
+        else:
+            newLyrics = ''
+
         if self.prefixCompositeMusic is not None:
-            return str(self.prefixCompositeMusic)
+            return str(self.prefixCompositeMusic) +'\n'+ str(newLyrics)
         elif self.groupedMusicList is not None:
-            return str(self.groupedMusicList)
+            return str(self.groupedMusicList) + '\n' + str(newLyrics)
         else:
             raise Exception('Need to define either prefixCompositeMusic or groupedMusicList')
     
@@ -1180,6 +1233,8 @@ class LyNewLyrics(LyObject):
             else:
                 outputString += c + " "
 
+        return outputString
+
 class LyReRhythmedMusic(LyObject):
     def __init__(self, groupedMusic = None, newLyrics = None):
         LyObject.__init__(self)
@@ -1242,13 +1297,13 @@ class LyPropertyOperation(LyObject):
         self.value3 = value3
     
     def stringOutput(self):
-        if mode == 'set':
-            return self.value1 + ' = ' + self.value2 + ' '
-        elif mode == 'unset':
+        if self.mode == 'set':
+            return self.backslash + 'set ' + self.value1 + ' = ' + self.value2 + ' '
+        elif self.mode == 'unset':
             return self.backslash + 'unset ' + self.value1 + ' '
-        elif mode == 'override':
+        elif self.mode == 'override':
             return self.backslash + 'override ' + self.value1 + ' ' + self.value2 + ' = ' + self.value3 + ' '
-        elif mode == 'revert':
+        elif self.mode == 'revert':
             return self.backslash + 'revert ' + self.value1 + ' ' + self.value2 + ' '
     
 class LyContextDefMod(LyObject):

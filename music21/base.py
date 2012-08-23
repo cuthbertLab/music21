@@ -3608,7 +3608,7 @@ class Music21Object(JSONSerializer):
     #---------------------------------------------------------------------------
     # display and writing
 
-    def write(self, fmt=None, fp=None): #pragma: no cover
+    def write(self, fmt=None, fp=None, **keywords): #pragma: no cover
         '''
         Write out a file of music notation (or an image, etc.) in a given format.  If
         fp is specified as a file path then the file will be placed there.  If it is not
@@ -3654,6 +3654,8 @@ class Music21Object(JSONSerializer):
             if format in ['lilypond', 'lily']:
                 import music21.lily.translate
                 conv = music21.lily.translate.LilypondConverter()
+                if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
+                    conv.coloredVariants = True
                 dataStr = conv.textFromMusic21Object(self).encode('utf-8')
             
             elif format == 'braille':
@@ -3678,6 +3680,8 @@ class Music21Object(JSONSerializer):
                 fp = fp[:-4]
             import music21.lily.translate
             conv = music21.lily.translate.LilypondConverter()
+            if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
+                conv.coloredVariants = True
             conv.loadFromMusic21Object(self)
             return conv.createPDF(fp)
         elif format in ['png', 'lily.png']:
@@ -3685,6 +3689,8 @@ class Music21Object(JSONSerializer):
                 fp = fp[:-4]
             import music21.lily.translate
             conv = music21.lily.translate.LilypondConverter()
+            if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
+                conv.coloredVariants = True
             conv.loadFromMusic21Object(self)
             return conv.createPNG(fp)
         elif format in ['svg', 'lily.svg']:
@@ -3692,6 +3698,8 @@ class Music21Object(JSONSerializer):
                 fp = fp[:-4]
             import music21.lily.translate
             conv = music21.lily.translate.LilypondConverter()
+            if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
+                conv.coloredVariants = True
             conv.loadFromMusic21Object(self)
             return conv.createSVG(fp)
         else:
@@ -3715,7 +3723,7 @@ class Music21Object(JSONSerializer):
         '''
         return self.__repr__()
 
-    def show(self, fmt=None, app=None): #pragma: no cover
+    def show(self, fmt=None, app=None, **keywords): #pragma: no cover
         '''
         Displays an object in a format provided by the 
         fmt argument or, if not provided, the format set in the user's Environment 
@@ -3765,18 +3773,24 @@ class Music21Object(JSONSerializer):
             #return self.lily.showPDF()
             import music21.lily.translate
             conv = music21.lily.translate.LilypondConverter()
+            if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
+                conv.coloredVariants = True
             conv.loadFromMusic21Object(self)
             environLocal.launch('pdf', conv.createPDF(), app=app)
         elif fmt in ['lily.png', 'png', 'lily', 'lilypond']:
             # TODO check that these use environLocal 
             import music21.lily.translate
             conv = music21.lily.translate.LilypondConverter()
+            if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
+                conv.coloredVariants = True
             conv.loadFromMusic21Object(self)
             return conv.showPNG()
         elif fmt in ['lily.svg', 'svg']:
             # TODO check that these use environLocal 
             import music21.lily.translate
             conv = music21.lily.translate.LilypondConverter()
+            if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
+                conv.coloredVariants = True
             conv.loadFromMusic21Object(self)
             return conv.showSVG()
 

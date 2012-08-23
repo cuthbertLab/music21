@@ -892,7 +892,7 @@ def refineVariant(s, sVariant, inPlace = False):
     '''
     # stream that will be returned
     if not (sVariant in s.variants):
-        raise VariantException('sVariant not found in stream s.')
+        raise VariantException('%s not found in stream %s.' % (sVariant, s))
     
     if inPlace is True:
         returnObject = s
@@ -911,7 +911,7 @@ def refineVariant(s, sVariant, inPlace = False):
     endOffset = replacementDuration+startOffset
     
     # region associated with the given variant in the stream
-    returnRegion = returnObject.getElementsByOffset(startOffset, offsetEnd = endOffset, includeEndBoundary=False, classList = ['Measure'])
+    returnRegion = variantRegion.replacedElements(returnObject)
 
     # associating measures in variantRegion to those in returnRegion -> This is done via 0 indexed lists corresponding to measures
     returnRegionMeasureList = [i for i in range(len(returnRegion))]
@@ -955,6 +955,65 @@ def refineVariant(s, sVariant, inPlace = False):
     else:
         return returnObject
 
+
+def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, inPlace = False):
+    '''
+    There seem to be some problems with this function and it isn't well tested.
+    It is not recommended to use it at this time.
+    
+    '''
+    # stream that will be returned
+    if inPlace is True:
+        returnObject = streamX
+        variantObject = streamY
+    else:
+        returnObject = copy.deepcopy(streamX)
+        variantObject = copy.deepcopy(streamY)
+        
+
+    
+
+    # associating measures in variantRegion to those in returnRegion -> This is done via 0 indexed lists corresponding to measures
+    returnObjectMeasureList = [i for i in range(len(returnObject.getElementsByClass("Measure")))]
+    badnessDict = {}
+    listDict = {}
+    variantObjectMeasureList, badness = _getBestListandScore(returnObject.getElementsByClass("Measure"), variantObject.getElementsByClass("Measure"), badnessDict, listDict)
+    
+    # badness is a measure of how different the streams are. The list returned, variantMeasureList, minimizes that quantity.
+    
+    # mentioned lists are compared via difflib for optimal edit regions (equal, delete, insert, replace)
+    sm = difflib.SequenceMatcher()
+    sm.set_seqs(returnObjectMeasureList, variantObjectMeasureList)
+    regions = sm.get_opcodes()
+    
+    # each region is processed for variants.
+    for regionType, returnStart, returnEnd, variantStart, variantEnd in regions:
+        startOffset = returnObject.measure(returnStart+1).getOffsetBySite(returnObject)
+        endOffset = returnObject.measure(returnEnd-1).getOffsetBySite(returnObject)+returnObject.measure(returnEnd-1).duration.quarterLength       
+        if regionType is 'equal':
+            returnSubRegion = returnObject.measures(returnStart+1, returnEnd)
+            variantSubRegion = variantObject.measures(variantStart+1, variantEnd)
+            mergeVariantMeasureStreams(returnSubRegion, variantSubRegion, [variantName], inPlace = True)
+            continue
+        
+        elif regionType is 'replace':
+            returnSubRegion = returnObject.measures(returnStart+1, returnEnd)
+            replacementDuration = returnSubRegion.duration.quarterLength
+            variantSubRegion = variantObject.measures(variantStart+1, variantEnd)                      
+        elif regionType is 'delete':
+            returnSubRegion = returnObject.measures(returnStart+1, returnEnd)
+            replacementDuration = returnSubRegion.duration.quarterLength
+            variantSubRegion = None
+        elif regionType is 'insert':
+            variantSubRegion = variantObject.measures(variantStart+1, variantEnd)
+            replacementDuration = 0.0
+        addVariant(returnObject, startOffset, variantSubRegion, variantGroups = [variantName], replacementDuration = replacementDuration)
+            
+    if inPlace:
+        return
+    else:
+        return returnObject
+
 def getMeasureHashes(s):
     '''
     Takes in a stream containing measures and returns a list of hashes, one for each measure. Currently
@@ -968,9 +1027,14 @@ def getMeasureHashes(s):
     ['<P>K@<', ')PQP', 'FZ']
     '''
     hashes = []
-    for m in s.getElementsByClass('Measure'):
-        hashes.append(search.translateStreamToString(m.notesAndRests))
-    return hashes
+    if isinstance(s, list):
+        for m in s:
+            hashes.append(search.translateStreamToString(m.notesAndRests))
+        return hashes
+    else:
+        for m in s.getElementsByClass('Measure'):
+            hashes.append(search.translateStreamToString(m.notesAndRests))
+        return hashes
 
 
 #----- Private Helper Functions
@@ -1108,22 +1172,22 @@ def _diffscore(measureX, measureY):
     >>> m1.append([note.Note('e'), note.Note('f'), note.Note('g'), note.Note('a')])
     >>> m2.append([note.Note('e'), note.Note('f'), note.Note('g#'), note.Note('a')])
     >>> _diffscore(m1, m2)
-    0.02083333...
+    0.4
     
     '''
-    if measureX is measureY:
-        return 0.0
+    hashes = getMeasureHashes([measureX, measureY])
+    if hashes[0] == hashes[1]:
+        baseValue = 0.0
+    else:
+        baseValue = 0.4
+
+    numberDelta = measureX.number - measureY.number
+
+    distanceModifier = float(numberDelta) * 0.001
+
+
+    return baseValue + distanceModifier
     
-    pitchSumX, pitchSumY = 0.0,0.0
-    for n in measureX.notes:
-        pitchSumX += n.pitchClass
-    for n in measureY.notes:
-        pitchSumY += n.pitchClass
-    
-    xAveragePitch = pitchSumX / float(len(measureX.notes))
-    yAveragePitch = pitchSumY / float(len(measureY.notes))
-    
-    return abs(yAveragePitch-xAveragePitch)/12.0
 
 def _getRegionsFromStreams(streamX,streamY):
     '''
@@ -1708,6 +1772,9 @@ class Variant(base.Music21Object):
         
         self._replacementDuration = None
 
+        if 'name' in keywords:
+            self.groups.append(keywords['name'])
+
     def __deepcopy__(self, memo):
         new = self.__class__()
         old = self
@@ -1976,7 +2043,7 @@ class Variant(base.Music21Object):
         the same length.
         ''')
     
-    def replacedElements(self, contextStream = None, classList = None, keepOriginalOffsets = False):
+    def replacedElements(self, contextStream = None, classList = None, keepOriginalOffsets = False, includeSpacers = False):
         '''
         Returns a Stream containing the elements which this variant replaces in a given context stream. 
         This Stream will have length self.replacementDuration.
@@ -2097,8 +2164,14 @@ class Variant(base.Music21Object):
         
         vStart = self.getOffsetBySite(contextStream)
         
+        if includeSpacers is True:
+            spacerDuration = self.getElementsByClass("SpacerRest")[0].duration.quarterLength
+        else:
+            spacerDuration = 0.0
+        
+
         if self.lengthType == 'replacement' or self.lengthType == 'elongation':
-            vEnd = vStart + self.replacementDuration
+            vEnd = vStart + self.replacementDuration + spacerDuration
             classes = []
             for e in self.elements:
                 classes.append(e.classes[0])

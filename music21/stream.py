@@ -9971,7 +9971,7 @@ class Stream(base.Music21Object):
     #---------------------------------------------------------------------------
     # Lyric control
     
-    def lyrics(self, ignoreBarlines = True, recurse = False):
+    def lyrics(self, ignoreBarlines = True, recurse = False, skipTies = False):
         '''
         Returns a dict of lists of lyric objects (with the keys being the lyric numbers) found in self. Each list will have an element for each
         note in the stream (which may be a note.Lyric() or None). By default, this method automatically
@@ -9983,8 +9983,9 @@ class Stream(base.Music21Object):
         >>> for n,lyric in zip(s.notes, someLyrics):
         ...     n.lyric = lyric
         
-        >>> s.lyrics()[1]
-        [<music21.note.Lyric number=1 syllabic=single text="this">, ..., <music21.note.Lyric number=1 syllabic=single text="words">]
+
+        >>> s.lyrics()
+        {1: [<music21.note.Lyric number=1 syllabic=single text="this">, ..., <music21.note.Lyric number=1 syllabic=single text="words">]}
         
         >>> s.notes[3].lyric = None
         >>> s.lyrics()[1]
@@ -10025,40 +10026,66 @@ class Stream(base.Music21Object):
         '''
         returnLists = {}
         numNotes = 0
+
+        #---------------------
+        
+        def appendLyricsFromNote(n, returnLists, numNonesToAppend):
+            if len(n.lyrics) == 0:
+                for key in returnLists:
+                    returnLists[key].append(None)
+                return
+                
+            addLyricNums = []
+            for l in n.lyrics:
+                if not l.number in returnLists:
+                    returnLists[l.number] = [ None for i in range(numNonesToAppend) ]
+                returnLists[l.number].append(l)
+                addLyricNums.append(l.number)
+            for key in returnLists:
+                if key not in addLyricNums:
+                    returnLists[key].append(None)
+
+       #------------------------ 
+
+
         for e in self:
             eclasses = e.classes
-            if "GeneralNote" in eclasses:
-                n = e
-                if len(n.lyrics) == 0:
-                    for key in returnLists:
-                        returnLists[key].append(None)
-                for l in n.lyrics:
-                    if not l.number in returnLists:
-                        returnLists[l.number] = [ None for i in range(numNotes) ]
-                    returnLists[l.number].append(l)
-                numNotes +=1
-            elif ignoreBarlines is True and "Measure" in eclasses:
+            if ignoreBarlines is True and "Measure" in eclasses:
                 m = e
-                for n in m.notesAndRests:
-                    if len(n.lyrics) == 0:
-                        for key in returnLists:
-                            returnLists[key].append(None)
-                    for l in n.lyrics:
-                        if not l.number in returnLists:
-                            returnLists[l.number] = [ None for i in range(numNotes) ]
-                        returnLists[l.number].append(l)
-                    numNotes +=1
+                for n in m.notes:
+                    if skipTies is True:
+                        if n.tie is None or n.tie.type == 'start':
+                            appendLyricsFromNote(n, returnLists, numNotes)
+                            numNotes +=1
+                        else:
+                            pass #do nothing if end tie and skipTies is True
+                    else:
+                        appendLyricsFromNote(n, returnLists, numNotes)
+                        numNotes +=1
+
             elif recurse is True and "Stream" in eclasses:
                 s = e
-                sublists = s.lyrics(ignoreBarlines = ignoreBarlines, recurse = True)
+                sublists = s.lyrics(ignoreBarlines = ignoreBarlines, recurse = True, skipTies = skipTies)
                 for key in sublists:
                     if not key in returnLists:
                         returnLists[key] = []
                     returnLists[key].append(sublists[key])
+            elif "NotRest" in eclasses: #elif "Stream" not in eclasses and hasattr(e, "lyrics"):
+                n = e
+                if skipTies is True:
+                    if n.tie is None or n.tie.type == 'start':
+                        appendLyricsFromNote(n, returnLists, numNotes)
+                        numNotes +=1
+                    else:
+                        pass #do nothing if end tie and skipTies is True
+                else:
+                    appendLyricsFromNote(n, returnLists, numNotes)
+                    numNotes +=1
             else: # e is a stream (could be a measure if ignoreBarlines is False) and recurse is False
                 pass # do nothing
                 
         return returnLists
+
     
     
     
@@ -11015,6 +11042,78 @@ class Stream(base.Music21Object):
             return
         else:
             return returnObj
+
+    def makeVariantBlocks(self):
+        '''
+
+        from music21 import *
+
+
+
+        '''
+        #forDeletion = []
+        variantsToBeDone = self.variants.elements
+
+        for v in variantsToBeDone:
+            #if v in forDeletion:
+             #   continue
+
+            #highestVariant = {}
+            
+            startOffset = v.getOffsetBySite(self)
+            endOffset = v.replacementDuration + startOffset
+            conflictingVariants = self.getElementsByOffset(offsetStart= startOffset,
+                                                    offsetEnd = endOffset,
+                                                    includeEndBoundary = False,
+                                                    mustFinishInSpan = False,
+                                                    mustBeginInSpan = True,
+                                                    classList = [music21.variant.Variant])
+            for cV in conflictingVariants:
+                #if cV in forDeletion:
+                #    continue
+                oldReplacementDuration = cV.replacementDuration
+                cVname = cV.groups[0]
+                cVoffset = cV.getOffsetBySite(self)
+                
+                #if cVname in highestVariant:
+                    #hVendOffset, hV = highestVariant[cVname]
+                    #hVstartOffset = hV.getOffsetBySite(self)
+
+                 #   if cV.replacementDuration + cVoffset > hVendOffset:
+                  #      highestVariant[cVname] = (cV.replacementDuration + cVoffset, cV)
+                   #     shiftOffset = cVoffset-hVendOffset
+                    #    r = note.SpacerRest()
+                     #   r.duration.quarterLength = shiftOffset
+                      #  r.hideObjectOnPrint = True
+                       # hV.insert(hVendOffset, r)
+                       # for el in cV._stream:
+                       #     oldOffset = el.getOffsetBySite(cV._stream)
+                       #     hV.insert(hVendOffset+shiftOffset+oldOffset, el)
+                       # hV.replacementDuration += shiftOffset + cV.replacementDuration
+                       # forDeletion.append(cV)
+                       # variantsToBeDone.append(hV)
+                    #else:
+                     #   pass
+                #else:
+                    #highestVariant[cVname] = (cV.replacementDuration + cVoffset, cV)
+                if cV.getOffsetBySite(self) == startOffset:
+                    continue # do nothing
+                else:
+                    shiftOffset = cV.getOffsetBySite(self) - startOffset
+                    r = note.SpacerRest()
+                    r.duration.quarterLength = shiftOffset
+                    r.hideObjectOnPrint = True
+                    for el in cV._stream:
+                        oldOffset = el.getOffsetBySite(cV._stream)
+                        el.setOffsetBySite(cV._stream, oldOffset+shiftOffset)
+                    cV.insert(0.0, r)
+                    cV.replacementDuration = oldReplacementDuration
+                    self.remove(cV)
+                    self.insert(startOffset, cV)
+                    variantsToBeDone.append(cV)
+
+        #for v in forDeletion:
+        #    self.remove(v)
     
 #-------------------------------------------------------------------------------
 class Voice(Stream):

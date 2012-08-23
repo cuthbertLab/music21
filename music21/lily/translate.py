@@ -34,6 +34,7 @@ from music21 import duration
 from music21 import environment
 from music21 import exceptions21
 from music21 import variant
+from music21 import note
 from music21.lily import lilyObjects as lyo
 _MOD = 'lily.translate2012.py'
 environLocal = environment.Environment(_MOD)
@@ -133,6 +134,8 @@ class LilypondConverter(object):
                    'final': '|.',
                    'heavy-light': '.|',
                    'heavy-heavy': '.|.',
+                   'start-repeat': '|:',
+                   'end-repeat': ':|',
                    # no music21 support for |.| lightHeavyLight yet
                    'tick': '\'',
                    #'short': '', # no lilypond support??
@@ -148,6 +151,8 @@ class LilypondConverter(object):
         self.currentMeasure = None
         self.addedVariants = []
         self.variantColors = ['blue', 'red', 'purple', 'green', 'orange', 'yellow', 'grey']
+        self.coloredVariants = False
+        self.variantMode = False
 
     def setupTools(self):
         if os.path.exists(environLocal['lilypondPath']):
@@ -206,11 +211,13 @@ class LilypondConverter(object):
              #})
         \header { } 
         \score  {
-              << \new Staff  = ... { c' 4  
+              << \new Staff  = ... { \stopStaff }
+               \context Staff  = ... { \startStaff c' 4  
                       }
                 >>
           }
         \paper { }
+        ...
         '''
         self.loadFromMusic21Object(m21ObjectIn)
         s = str(self.topLevelObject)
@@ -231,6 +238,7 @@ class LilypondConverter(object):
             if len(m21ObjectIn.flat.variants) > 0:
                 ## has variants so we need to make a deepcopy...
                 m21ObjectIn = variant.makeAllVariantsReplacements(m21ObjectIn, recurse = True)
+                m21ObjectIn.makeVariantBlocks()
         
         if ('Stream' not in c) or ('Measure' in c) or ('Voice' in c):
             scoreObj = stream.Score()
@@ -288,6 +296,10 @@ class LilypondConverter(object):
         lpOutputDefBody = lyo.LyOutputDefBody(outputDefHead = lpOutputDefHead)
         lpOutputDef = lyo.LyOutputDef(outputDefBody = lpOutputDefBody)
         contents.append(lpOutputDef)
+
+        lpLayout = lyo.LyLayout()
+
+        contents.append(lpLayout)
         
         self.context.contents = contents
 
@@ -315,22 +327,29 @@ class LilypondConverter(object):
         lpOutputDefHead = lyo.LyOutputDefHead(defType = 'paper')
         lpOutputDefBody = lyo.LyOutputDefBody(outputDefHead = lpOutputDefHead)
         lpOutputDef = lyo.LyOutputDef(outputDefBody = lpOutputDefBody)
-        contents = [lpVersionScheme, lpColorScheme, lpHeader, lpScoreBlock, lpOutputDef]
+        lpLayout = lyo.LyLayout()
+        contents = [lpVersionScheme, lpColorScheme, lpHeader, lpScoreBlock, lpOutputDef, lpLayout]
         
         if scoreIn.metadata is not None:
             self.setHeaderFromMetadata(scoreIn.metadata, lpHeader = lpHeader)
 
+        
+
         self.context.contents = contents
         
         
+
+
     #------- return Lily objects or append to the current context -----------#
     def lyScoreBlockFromScore(self, scoreIn):
         
         lpCompositeMusic = lyo.LyCompositeMusic()
         self.newContext(lpCompositeMusic)
 
-        if hasattr(scoreIn, 'parts') and len(scoreIn.parts) > 0:
-            lpGroupedMusicList = self.lyGroupedMusicListFromScoreWithParts(scoreIn)
+        # Also get the variants, and the total number of measures here and make start each staff context with { \stopStaff s1*n} where n is the number of measures.
+        if hasattr(scoreIn, 'parts') and len(scoreIn.parts) > 0: # or has variants
+            lpPartsAndOssiaInit = self.lyPartsAndOssiaInitFromScore(scoreIn)
+            lpGroupedMusicList = self.lyGroupedMusicListFromScoreWithParts(scoreIn, scoreInit = lpPartsAndOssiaInit)
             lpCompositeMusic.groupedMusicList = lpGroupedMusicList
         else:
             # treat as a part...
@@ -344,16 +363,194 @@ class LilypondConverter(object):
         
         return lpScoreBlock
 
-    def lyGroupedMusicListFromScoreWithParts(self, scoreIn):
+    def lyPartsAndOssiaInitFromScore(self, scoreIn):
+        '''
+        Takes in a score and returns a block that starts each part context and variant context
+        with an identifier and {\stopStaff s1*n} where n is the number of measures in the score.
+        
+        >>> from music21 import *
+        >>> lpc = lily.translate.LilypondConverter()
+        >>> s = stream.Score()
+        >>> p1,p2 = stream.Part(), stream.Part()
+        >>> p1.append(variant.Variant(name = 'london'))
+        >>> p2.append(variant.Variant(name = 'london'))
+        >>> p1.append(variant.Variant(name = 'rome'))
+        >>> p2.append(variant.Variant(name = 'rome'))
+        >>> p1.repeatAppend(stream.Measure(), 10)
+        >>> p2.repeatAppend(stream.Measure(), 10)
+        >>> p1.id = 'pa'
+        >>> p2.id = 'pb'
+        >>> s.append(p1)
+        >>> s.append(p2)
+        >>> print lpc.lyPartsAndOssiaInitFromScore(s)
+        \\new Staff  = pa { \stopStaff } 
+        \\new Staff  = londonpa
+                    \with {
+                          \\remove "Time_signature_engraver"
+                          alignAboveContext = #"pa"
+                          fontSize = #-3
+                          \override StaffSymbol #'staff-space = #(magstep -3)
+                          \override StaffSymbol #'thickness = #(magstep -3)
+                          \override TupletBracket #'bracket-visibility = ##f
+                          \override TupletNumber #'stencil = ##f
+                          \override Clef #'transparent = ##t
+                        }
+                 { \stopStaff } 
+        \\new Staff  = romepa 
+                    \with {
+                          \\remove "Time_signature_engraver"
+                          alignAboveContext = #"pa"
+                          fontSize = #-3
+                          \override StaffSymbol #'staff-space = #(magstep -3)
+                          \override StaffSymbol #'thickness = #(magstep -3)
+                          \override TupletBracket #'bracket-visibility = ##f
+                          \override TupletNumber #'stencil = ##f
+                          \override Clef #'transparent = ##t
+                        }
+                 { \stopStaff } 
+        \\new Staff  = pb { \stopStaff } 
+        \\new Staff  = londonpb 
+                    \with {
+                          \\remove "Time_signature_engraver"
+                          alignAboveContext = #"pb"
+                          fontSize = #-3
+                          \override StaffSymbol #'staff-space = #(magstep -3)
+                          \override StaffSymbol #'thickness = #(magstep -3)
+                          \override TupletBracket #'bracket-visibility = ##f
+                          \override TupletNumber #'stencil = ##f
+                          \override Clef #'transparent = ##t
+                        }
+                 { \stopStaff } 
+        \\new Staff  = romepb 
+                    \with {
+                          \\remove "Time_signature_engraver"
+                          alignAboveContext = #"pb"
+                          fontSize = #-3
+                          \override StaffSymbol #'staff-space = #(magstep -3)
+                          \override StaffSymbol #'thickness = #(magstep -3)
+                          \override TupletBracket #'bracket-visibility = ##f
+                          \override TupletNumber #'stencil = ##f
+                          \override Clef #'transparent = ##t
+                        }
+                 { \stopStaff } 
+        <BLANKLINE>
+        '''
+        lpMusicList = lyo.LyMusicList()
+
+        musicList = []
+
+
+        optionalContextMod = r'''
+            \with {
+                  \remove "Time_signature_engraver"
+                  alignAboveContext = #"%s"
+                  fontSize = #-3
+                  \override StaffSymbol #'staff-space = #(magstep -3)
+                  \override StaffSymbol #'thickness = #(magstep -3)
+                  \override TupletBracket #'bracket-visibility = ##f
+                  \override TupletNumber #'stencil = ##f
+                  \override Clef #'transparent = ##t
+                  \consists "Default_bar_line_engraver"
+                }
+        '''
+
+        lpMusic = '{ \stopStaff %s}'
+
+        for p in scoreIn.parts:
+            partIdText = makeLettersOnlyId(p.id)
+            partId = lyo.LyOptionalId(partIdText)
+            spacerDuration = self.getLySpacersFromStream(p)
+            lpPrefixCompositeMusicPart = lyo.LyPrefixCompositeMusic(type = 'new',
+                                                            optionalId = partId,
+                                                            simpleString = 'Staff',
+                                                            music = lpMusic % spacerDuration)
+            #lpPrefixCompositeMusicPart.optionalContextMod = r'''
+            #    \with {
+            #          \consists "Default_bar_line_engraver"
+            #    }
+            #'''
+
+            musicList.append(lpPrefixCompositeMusicPart)  
+            
+            variantsAddedForPart = []
+            for v in p.variants:
+                variantName = v.groups[0]
+                if not variantName in variantsAddedForPart:
+                    self.addedVariants.append(variantName)
+                    variantsAddedForPart.append(variantName)
+                    variantId = lyo.LyOptionalId(makeLettersOnlyId(variantName)+partIdText)
+                    lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'new',
+                                                                optionalId = variantId,
+                                                                simpleString = 'Staff',
+                                                                music = lpMusic % spacerDuration)
+                    
+                    lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod % partIdText
+                    musicList.append(lpPrefixCompositeMusicVariant)
+
+        lpMusicList.contents = musicList
+
+        return lpMusicList
+
+    
+    def getLySpacersFromStream(self, streamIn, measuresOnly = True):
+        '''
+        >>> from music21 import *
+        >>> m1 = stream.Measure(converter.parse("a2.", "3/4"))
+        >>> m2 = stream.Measure(converter.parse("b2.", "3/4"))
+        >>> m3 = stream.Measure(converter.parse("a1", "4/4"))
+        >>> m4 = stream.Measure(converter.parse("b1", "4/4"))
+        >>> m5 = stream.Measure(converter.parse("c1", "4/4"))
+        >>> m6 = stream.Measure(converter.parse("a2", "2/4"))
+        >>> streamIn = stream.Stream([m1, m2, m3, m4, m5, m6])
+        >>> lpc = lily.translate.LilypondConverter()
+        >>> print lpc.getLySpacersFromStream(streamIn)
+        s2. s2. s1 s1 s1 s2
+
+        '''
+
+        returnString = ''
+        mostRecentDur = ''
+        recentDurCount = 0
+        for el in streamIn:
+            if not "Measure" in el.classes:
+                continue
+            if el.duration.quarterLength == 0.0:
+                continue
+
+            try:
+                dur = str(self.lyMultipliedDurationFromDuration(el.duration))
+            except:
+                dur = '2.'
+            #if dur == mostRecentDur:
+            #    recentDurCount += 1
+            #else:
+            returnString = returnString + 's'+ dur
+            #    mostRecentDur = dur
+            #    recentDurCount = 0
+
+        #if recentDurCount != 0:
+         #   returnString = returnString + '*' + str(recentDurCount)
+
+        return returnString
+
+
+    def lyGroupedMusicListFromScoreWithParts(self, scoreIn, scoreInit = None):
         r'''
         
         >>> from music21 import *
         >>> lpc = lily.translate.LilypondConverter()
         >>> #_DOCS_SHOW b = corpus.parse('bach/bwv66.6')
         >>> b = _getCachedCorpusFile('bach/bwv66.6') #_DOCS_HIDE
-        >>> lpGroupedMusicList = lpc.lyGroupedMusicListFromScoreWithParts(b)
+        >>> lpPartsAndOssiaInit = lpc.lyPartsAndOssiaInitFromScore(b)
+        >>> lpGroupedMusicList = lpc.lyGroupedMusicListFromScoreWithParts(b, scoreInit = lpPartsAndOssiaInit)
         >>> print lpGroupedMusicList
-        << \new Staff  = Soprano { \partial 32*8 
+        <BLANKLINE>
+        << \new Staff  = Soprano { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. } 
+          \new Staff  = Alto { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. } 
+          \new Staff  = Tenor { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. } 
+          \new Staff  = Bass { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. } 
+        <BLANKLINE>
+        \context Staff  = Soprano { \startStaff \partial 32*8 
                \clef "treble" 
                \key fis \minor 
                \time 4/4
@@ -361,7 +558,7 @@ class LilypondConverter(object):
                cis'' 8  
                \once \override Stem #'direction = #DOWN 
                b' 8  
-               \bar "|"  %{ end measure 0 %} 
+               | %{ end measure 0 %} 
                \once \override Stem #'direction = #UP 
                a' 4  
                \once \override Stem #'direction = #DOWN 
@@ -370,17 +567,17 @@ class LilypondConverter(object):
                cis'' 4  \fermata  
                \once \override Stem #'direction = #DOWN 
                e'' 4  
-               \bar "|"  %{ end measure 1 %} 
+               | %{ end measure 1 %} 
                \once \override Stem #'direction = #DOWN 
                cis'' 4  
                ...
         } 
         <BLANKLINE>
-        \new Staff  = Alto { \partial 32*8 
+        \context Staff  = Alto { \startStaff \partial 32*8 
             \clef "treble"...
             \once \override Stem #'direction = #UP 
             e' 4  
-            \bar "|"  %{ end measure 0 %} 
+            | %{ end measure 0 %} 
             \once \override Stem #'direction = #UP 
             fis' 4  
             \once \override Stem #'direction = #UP 
@@ -401,15 +598,74 @@ class LilypondConverter(object):
 
         self.newContext(lpMusicList)
         
-        for p in scoreIn.parts:
-            compositeMusicList.append(self.lyPrefixCompositeMusicFromStream(p))
+        
+        if scoreInit is None:
+            for p in scoreIn.parts:
+                compositeMusicList.append(self.lyPrefixCompositeMusicFromStream(p))
+        else:
+            compositeMusicList.append(scoreInit)
+            for p in scoreIn.parts:
+                compositeMusicList.append(self.lyPrefixCompositeMusicFromStream(p, type='context', beforeMatter = 'startStaff'))
 
         self.restoreContext()
         lpMusicList.contents = compositeMusicList
         
         return lpGroupedMusicList
 
-    def lySequentialMusicFromStream(self, streamIn):
+    
+    def lyNewLyricsFromStream(self, streamIn, sId = None):
+        '''
+        returns a LyNewLyrics object
+        This is a little bit of a hack. This should be switched over to using a prefixed context thing with \new Lyric = "id" \with { } {}
+
+        >>> from music21 import *
+        >>> 
+
+        '''
+
+        lyricsDict = streamIn.lyrics(skipTies = True)
+        
+        if sId is None:
+            sId = makeLettersOnlyId(streamIn.id)
+        streamId = "#"+ lyo.LyObject().quoteString(sId)
+
+        lpGroupedMusicLists = []
+        for lyricNum in sorted(lyricsDict):
+            lyricList = []
+            lpAlignmentProperty = lyo.LyPropertyOperation(mode = 'set', value1 = 'alignBelowContext', value2 = streamId)
+            lyricList.append(lpAlignmentProperty)
+            inWord = False
+            for el in lyricsDict[lyricNum]:
+                if el is None and inWord:
+                    text = ' _ '
+                elif el is None and inWord is False:
+                    text = ' _ '
+                elif el.text == '':
+                    text = ' _ '
+                else:
+                    if el.syllabic == 'end':
+                        text = el.text + '__'
+                        inWord = False
+                    elif el.syllabic == 'begin' or el.syllabic == 'middle':
+                        text = el.text + ' --'
+                        inWord = True
+                    else:
+                        text = el.text
+                      
+                lpLyricElement = lyo.LyLyricElement(text)
+                lyricList.append(lpLyricElement)
+
+            lpLyricList = lyo.LyMusicList(lyricList)
+            
+            lpSequentialMusic = lyo.LySequentialMusic(musicList = lpLyricList)
+            lpGroupedMusicList = lyo.LyGroupedMusicList(sequentialMusic = lpSequentialMusic)
+            lpGroupedMusicLists.append(lpGroupedMusicList)
+        
+        lpNewLyrics = lyo.LyNewLyrics(groupedMusicLists = lpGroupedMusicLists)
+
+        return lpNewLyrics
+
+    def lySequentialMusicFromStream(self, streamIn, beforeMatter = None):
         r'''
         returns a LySequentialMusic object from a stream
 
@@ -430,7 +686,7 @@ class LilypondConverter(object):
         musicList = []
 
         lpMusicList = lyo.LyMusicList(contents = musicList)
-        lpSequentialMusic = lyo.LySequentialMusic(musicList = lpMusicList)
+        lpSequentialMusic = lyo.LySequentialMusic(musicList = lpMusicList, beforeMatter = beforeMatter)
         self.newContext(lpMusicList)    
         self.appendObjectsToContextFromStream(streamIn)
                     
@@ -441,7 +697,7 @@ class LilypondConverter(object):
         self.restoreContext()
         return lpSequentialMusic
 
-    def lyPrefixCompositeMusicFromStream(self, streamIn, contextType = None):
+    def lyPrefixCompositeMusicFromStream(self, streamIn, contextType = None, type = None, beforeMatter = None):
         r'''
         returns an LyPrefixCompositeMusic object from
         a stream (generally a part, but who knows...)
@@ -474,20 +730,23 @@ class LilypondConverter(object):
             newContext = contextType
             optionalId = lyo.LyOptionalId(makeLettersOnlyId(streamIn.id))
         
-        musicList = []
 
-        lpSequentialMusic = self.lySequentialMusicFromStream(streamIn)
+        lpNewLyrics = self.lyNewLyricsFromStream(streamIn, sId = makeLettersOnlyId(streamIn.id))
+
+        lpSequentialMusic = self.lySequentialMusicFromStream(streamIn, beforeMatter = beforeMatter)
         lpGroupedMusicList = lyo.LyGroupedMusicList(sequentialMusic = lpSequentialMusic)
-        lpCompositeMusic = lyo.LyCompositeMusic(groupedMusicList = lpGroupedMusicList)
+        lpCompositeMusic = lyo.LyCompositeMusic(groupedMusicList = lpGroupedMusicList, newLyrics = lpNewLyrics)
         lpMusic = lyo.LyMusic(compositeMusic = lpCompositeMusic)
-        
+
+        if type is None:
+            type = 'new'
 
         if optionalId is None:
-            lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type = 'new',
+            lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type = type,
                                                             simpleString = newContext,
                                                             music = lpMusic) 
         else:
-            lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type = 'new',
+            lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type = type,
                                                             optionalId = optionalId,
                                                             simpleString = newContext,
                                                             music = lpMusic)    
@@ -497,7 +756,8 @@ class LilypondConverter(object):
     def appendObjectsToContextFromStream(self, streamObject):
         r'''
         takes a Stream and appends all the elements in it to the current
-        context's .contents list, and deals with creating Voices in it.
+        context's .contents list, and deals with creating Voices in it. It also deals with
+        variants in it.
         
         (should eventually replace the main Score parts finding tools)
         
@@ -537,6 +797,8 @@ class LilypondConverter(object):
             >>        
         '''        
         for groupedElements in streamObject.groupElementsByOffset():
+            #print groupedElements
+
             if len(groupedElements) == 1: # one thing at that moment...
                 el = groupedElements[0]
                 el.activeSite = streamObject
@@ -544,13 +806,22 @@ class LilypondConverter(object):
             else: # voices or other More than one thing at once...
                 # if voices
                 voiceList = []
+                variantList = []
+                otherList = []
                 for el in groupedElements:
                     if 'Voice' in el.classes:
                         voiceList.append(el)
+                    elif 'Variant' in el.classes:
+                        variantList.append(el)
                     else:
                         el.activeSite = streamObject
-                        self.appendM21ObjectToContext(el)
+                        otherList.append(el)
                 
+                if len(variantList) > 0:
+                    for v in variantList:
+                        v.activeSite = streamObject
+                    self.appendContextFromVariant(variantList, activeSite = streamObject, coloredVariants = self.coloredVariants)
+
                 if len(voiceList) > 0:
                     musicList2 = []
                     lp2GroupedMusicList = lyo.LyGroupedMusicList()
@@ -570,6 +841,10 @@ class LilypondConverter(object):
                     currentMusicList = contextObject.contents
                     currentMusicList.append(lp2GroupedMusicList)
                     lp2GroupedMusicList.setParent(self.context)
+
+                if len(otherList) > 0:
+                    for el in otherList:
+                        self.appendM21ObjectToContext(el)
     
 
     def appendM21ObjectToContext(self, thisObject):
@@ -602,6 +877,7 @@ class LilypondConverter(object):
         if "Measure" in c:
             ## lilypond does not put groups around measures...
             ## it does however need barline ends
+            ## also, if variantMode is True, the last note in each "measure" should have \noBeam
             closeMeasureObj = self.closeMeasure() # could be None
             if closeMeasureObj is not None:
                 currentMusicList.append(closeMeasureObj)
@@ -637,12 +913,12 @@ class LilypondConverter(object):
             lyObject = self.lyEmbeddedScmFromKeySignature(thisObject)
             currentMusicList.append(lyObject)
             lyObject.setParent(contextObject)
-        elif "TimeSignature" in c:
+        elif "TimeSignature" in c and self.variantMode is False:
             lyObject = self.lyEmbeddedScmFromTimeSignature(thisObject)
             currentMusicList.append(lyObject)
             lyObject.setParent(contextObject)
         elif "Variant" in c:
-            self.appendContextFromVariant(thisObject)
+            self.appendContextFromVariant(thisObject, coloredVariants = self.coloredVariants)
         else:
             lyObject = None
 
@@ -695,6 +971,14 @@ class LilypondConverter(object):
         <BLANKLINE>
 
         '''
+        if self.variantMode is True:
+            #Then should attach \noBeam to note if it is the last note
+            if "NotRest" in noteOrRest.classes:
+                n = noteOrRest
+                activeSite = n.activeSite
+                if n.getOffsetBySite(activeSite) + n.duration.quarterLength == activeSite.duration.quarterLength:
+                    pass
+
         self.setContextForTupletStart(noteOrRest)
         #self.appendBeamCode(noteOrRest)
         self.appendStemCode(noteOrRest)        
@@ -752,8 +1036,14 @@ class LilypondConverter(object):
                     simpleElementParts.append('! ')
                 if noteOrRest.pitch.accidental.displayStyle == 'parentheses':
                     simpleElementParts.append('? ')
+        elif "SpacerRest" in c:
+            simpleElementParts.append("s ")
         elif 'Rest' in c:
-            simpleElementParts.append("r ")
+            if noteOrRest.hideObjectOnPrint is True:
+                simpleElementParts.append("s ")
+            else:
+                simpleElementParts.append("r ")
+
 
         lpMultipliedDuration = self.lyMultipliedDurationFromDuration(noteOrRest.duration)
         simpleElementParts.append(lpMultipliedDuration)
@@ -890,9 +1180,9 @@ class LilypondConverter(object):
         postEvents = []
 
         # remove this hack once lyrics work 
-        if generalNote.lyric is not None: # hack that uses markup...
-            postEvents.append(r'_\markup { "' + generalNote.lyric + '" }\n ')
-
+        #if generalNote.lyric is not None: # hack that uses markup...
+        #    postEvents.append(r'_\markup { "' + generalNote.lyric + '" }\n ')
+        # consider this hack removed. Yeah!
         
         if (hasattr(generalNote, 'tie') and generalNote.tie is not None):
             if (generalNote.tie.type != "stop"):
@@ -944,7 +1234,7 @@ class LilypondConverter(object):
             octaveModChars  = u'\'' * correctedOctave # C4 = c', C5 = c''  etc.
         return octaveModChars        
 
-    def lyMultipliedDurationFromDuration(self, durationObj):
+    def lyMultipliedDurationFromDuration(self, durationObj):        
         try:
             number_type = duration.convertTypeToNumber(durationObj.type) # module call
         except duration.DurationException as de:
@@ -1109,97 +1399,53 @@ class LilypondConverter(object):
         else:
             return None
 
-    def appendContextFromVariant(self, variantObject):
-        #print "VARIANT FOUND"
-        # --bug w/ barlines... self.closeMeasure()
-        replacedElements = variantObject.replacedElements()
-        replacedElementsClef = replacedElements[0].getContextByClass('Clef')
+    def appendContextFromVariant(self, variantObjectOrList, activeSite = None, coloredVariants = False):
+        '''
+        '''
+        musicList = []
+        
+        if isinstance(variantObjectOrList, variant.Variant):
+            variantObject = variantObjectOrList
+            replacedElements = variantObject.replacedElements(activeSite)
+            lpPrefixCompositeMusicVariant = self.lyPrefixCompositeMusicFromVariant(variantObject, replacedElements, coloredVariants = coloredVariants)
+            lpSequentialMusicStandard = self.lySequentialMusicFromStream(replacedElements)
+            musicList.append(lpPrefixCompositeMusicVariant)
+            musicList.append(lpSequentialMusicStandard)
+        
+        elif type(variantObjectOrList) is list:
+            longestReplacementLength = -1
+            variantDict = {}
+            for variantObject in variantObjectOrList:
+                variantName = variantObject.groups[0]
+                if variantName in variantDict:
+                    variantDict[variantName].append(variantObject)
+                else:
+                    variantDict[variantName] = [variantObject]
+            
 
-        variantContainerStream = variantObject.getContextByClass('Part')
-        if variantContainerStream is None:
-            variantContainerStream = variantObject.getContextByClass('Stream')
-
-        variantObject.insert(0, replacedElementsClef)
-        variantName = variantObject.groups[0]
-        if variantName in self.addedVariants:
-            newVariant = False
-        else:
-            self.addedVariants.append(variantName)
-            newVariant = True
-
-        containerId = makeLettersOnlyId(variantContainerStream.id)
-        variantId = lyo.LyOptionalId(makeLettersOnlyId(variantName)+containerId)
-
-        color = self.variantColors[self.addedVariants.index(variantName) % 6]
-
-        for n in variantObject._stream.flat.notesAndRests:
-            n.editorial.color = color
-
-        lpSequentialMusicVariant = self.lySequentialMusicFromStream(variantObject._stream)
-
-        replacedElementsLength = replacedElements.duration.quarterLength
-        variantLength = variantObject.containedHighestTime
-        if newVariant is True:
-        # This will make 'new' contexts
-            if variantLength != replacedElementsLength:
-                numerator, denominator = common.decimalToTuplet(replacedElementsLength/variantLength)
-                fraction = str(numerator) + '/' + str(denominator)
-                lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='times', 
-                                                                    fraction = fraction,
-                                                                    music = lpSequentialMusicVariant)
-                lpInternalSequentialMusic = lyo.LySequentialMusic(musicList = lpVariantTuplet)
-                lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'new',
-                                                            optionalId = variantId,
-                                                            simpleString = "Staff",
-                                                            music = lpInternalSequentialMusic)   
-            else:
-                lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'new',
-                                                            optionalId = variantId,
-                                                            simpleString = "Staff",
-                                                            music = lpSequentialMusicVariant)
-        else: #newVariant is False
-        # This will reference existing contexts. This doesn't seem to have fixed the varying ossia heights problem though. Also, now need to add /startStaff and /stopStaff around each ossia's content.
-            if variantLength != replacedElementsLength:
-                numerator, denominator = common.decimalToTuplet(replacedElementsLength/variantLength)
-                fraction = str(numerator) + '/' + str(denominator)
-                lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='times', 
-                                                                    fraction = fraction,
-                                                                    music = lpSequentialMusicVariant)
-                lpInternalSequentialMusic = lyo.LySequentialMusic(musicList = lpVariantTuplet)
-                lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'context',
-                                                            optionalId = variantId,
-                                                            simpleString = "Staff",
-                                                            music = lpInternalSequentialMusic)   
-            else:
-                lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'context',
-                                                            optionalId = variantId,
-                                                            simpleString = "Staff",
-                                                            music = lpSequentialMusicVariant)
-        optionalContextMod = r'''
-\with {
-      \remove "Time_signature_engraver"
-      alignAboveContext = #"%s"
-      fontSize = #-3
-      \override StaffSymbol #'staff-space = #(magstep -3)
-      \override StaffSymbol #'thickness = #(magstep -3)
-      \override TupletBracket #'bracket-visibility = ##f
-      \override TupletNumber #'stencil = ##f
-      firstClef = ##f
-    } 
-    ''' % containerId
-
-        lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod
+            for key in variantDict:
+                variantList = variantDict[key]
+                if len(variantList) == 1:
+                    variantObject = variantList[0]
+                    replacedElements = variantObject.replacedElements(activeSite)
+                    lpPrefixCompositeMusicVariant = self.lyPrefixCompositeMusicFromVariant(variantObject, replacedElements, coloredVariants = coloredVariants)
+                    musicList.append(lpPrefixCompositeMusicVariant)
+                else:
+                    lpPrefixCompositeMusicVariant, replacedElements = self.lyPrefixCompositeMusicFromRelatedVariants(variantList, activeSite = activeSite, coloredVariants = coloredVariants)
+                    musicList.append(lpPrefixCompositeMusicVariant)
                 
-        lpSequentialMusicStandard = self.lySequentialMusicFromStream(replacedElements)
-        for el in replacedElements:
-            self.doNotOutput.append(el)
-
-        musicList2 = []
-        musicList2.append(lpPrefixCompositeMusicVariant)
-        musicList2.append(lpSequentialMusicStandard )
+                if longestReplacementLength < replacedElements.duration.quarterLength:
+                    longestReplacementLength = replacedElements.duration.quarterLength
+                    longestReplacedElements = replacedElements
+                
+            lpSequentialMusicStandard = self.lySequentialMusicFromStream(longestReplacedElements)
+            
+            musicList.append(lpSequentialMusicStandard)
+            for el in longestReplacedElements:
+                self.doNotOutput.append(el)
         
         lp2MusicList = lyo.LyMusicList()
-        lp2MusicList.contents = musicList2
+        lp2MusicList.contents = musicList
         lp2SimultaneousMusic = lyo.LySimultaneousMusic()
         lp2SimultaneousMusic.musicList = lp2MusicList
         lp2GroupedMusicList = lyo.LyGroupedMusicList()
@@ -1210,7 +1456,455 @@ class LilypondConverter(object):
         currentMusicList.append(lp2GroupedMusicList)
         lp2GroupedMusicList.setParent(self.context)
 
+    
+    def lyPrefixCompositeMusicFromRelatedVariants(self, variantList, activeSite = None, coloredVariants = False):
+        '''
+
+        >>> from music21 import *
+        >>> s1 = converter.parse("a4 a a a  a1", "4/4")
+        >>> s2 = converter.parse("b4 b b b", "4/4")
+        >>> s3 = converter.parse("c4 c c c", "4/4")
+        >>> s4 = converter.parse("d4 d d d", "4/4")
+        >>> s5 = converter.parse("e4 e e e  f f f f  g g g g  a a a a  b b b b", "4/4")
+
+        >>> for s in [ s1, s2, s3, s4, s5]:
+        ...     s.makeMeasures(inPlace = True)
+
+        >>> activeSite = stream.Part(s5)
+
+        >>> v1 = variant.Variant()
+        >>> for el in s1:
+        ...     v1.append(el)
+        >>> v1.replacementDuration = 4.0
+
+        >>> v2 = variant.Variant()
+        >>> sp2 = note.SpacerRest()
+        >>> sp2.duration.quarterLength = 4.0
+        >>> v2.replacementDuration = 4.0
+        >>> v2.append(sp2)
+        >>> for el in s2:
+        ...     v2.append(el)
+
+        >>> v3 = variant.Variant()
+        >>> sp3 = note.SpacerRest()
+        >>> sp3.duration.quarterLength = 8.0
+        >>> v3.replacementDuration = 4.0
+        >>> v3.append(sp3)
+        >>> for el in s3:
+        ...     v3.append(el) 
+
+        >>> v4 = variant.Variant()
+        >>> sp4 = note.SpacerRest()
+        >>> sp4.duration.quarterLength = 16.0
+        >>> v4.replacementDuration = 4.0
+        >>> v4.append(sp4)
+        >>> for el in s4:
+        ...     v4.append(el)
+
+        >>> variantList = [v4,v1,v3,v2]
+        >>> for v in variantList :
+        ...     v.groups = ['london']
+        ...     activeSite.insert(0.0, v)
+
+
+        >>> lpc = lily.translate.LilypondConverter()
+
+        >>> print lpc.lyPrefixCompositeMusicFromRelatedVariants(variantList, activeSite = activeSite)[0]
+        \\new Staff  = ... 
+                \with {
+                      \\remove "Time_signature_engraver"
+                      alignAboveContext = #"..."
+                      fontSize = #-3
+                      \override StaffSymbol #'staff-space = #(magstep -3)
+                      \override StaffSymbol #'thickness = #(magstep -3)
+                      \override TupletBracket #'bracket-visibility = ##f
+                      \override TupletNumber #'stencil = ##f
+                      \override Clef #'transparent = ##t
+                    } 
+                     { { \\times 1/2 {\startStaff \clef "treble" 
+            \\time 4/4
+            \clef "treble"
+            a' 4  
+            a' 4  
+            a' 4  
+            a' 4  
+            | %{ end measure 1 %}
+            a' 1
+            \\bar "|."  %{ end measure 2 %}
+             \stopStaff}
+             }
+        <BLANKLINE>
+          {\startStaff \clef "treble" 
+            \\time 4/4
+            b' 4  
+            b' 4  
+            b' 4  
+            b' 4  
+            \\bar "|."  %{ end measure 1 %} 
+             \stopStaff}
+        <BLANKLINE>
+          {\startStaff \clef "treble" 
+            \\time 4/4
+            c' 4  
+            c' 4  
+            c' 4  
+            c' 4  
+            \\bar "|."  %{ end measure 1 %} 
+             \stopStaff}
+        <BLANKLINE>
+          s 1  
+          {\startStaff \clef "treble" 
+            \\time 4/4
+            d' 4  
+            d' 4  
+            d' 4  
+            d' 4  
+            \\bar "|."  %{ end measure 1 %} 
+             \stopStaff}
+        <BLANKLINE>
+           } 
+        <BLANKLINE>
+
+        '''
         
+        # Order List
+        
+        def findOffsetOfFirstNonSpacerElement(inputStream):
+            for el in inputStream:
+                if "SpacerRest" in el.classes:
+                    pass
+                else:
+                    return el.getOffsetBySite(inputStream)
+
+        variantList.sort(key = lambda v: findOffsetOfFirstNonSpacerElement(v._stream))
+
+        
+        # Stuff that can be done on the first element only (clef, new/old, id, color)
+        replacedElements = variantList[0].replacedElements(activeSite)
+        replacedElementsClef = replacedElements[0].getContextByClass('Clef')
+
+        variantContainerStream = variantList[0].getContextByClass('Part')
+        if variantContainerStream is None:
+            variantContainerStream = variantList[0].getContextByClass('Stream')
+
+        variantList[0].insert(0.0, replacedElementsClef)
+        variantName = variantList[0].groups[0]
+        if variantName in self.addedVariants:
+            newVariant = False
+        else:
+            self.addedVariants.append(variantName)
+            newVariant = True
+
+        containerId = makeLettersOnlyId(variantContainerStream.id)
+        variantId = lyo.LyOptionalId(makeLettersOnlyId(variantName)+containerId)
+
+        if coloredVariants is True:
+            color = self.variantColors[self.addedVariants.index(variantName) % 6]
+
+        
+
+        #######################
+
+        musicList = []
+        highestOffsetSoFar = 0.0
+        
+        self.variantMode = True
+
+        for v in variantList:
+            # For each variant in the list, we make a lilypond representation of the
+            # spacer between this variant and the previous if it is non-zero and append it
+            # Then we strip off the spacer and make a lilypond representation of the variant
+            # with the appropriate tupletting if any and append that.
+            # At the end we make a new lilypond context for it and return it.
+
+            firstOffset = findOffsetOfFirstNonSpacerElement(v._stream)
+
+            if firstOffset < highestOffsetSoFar:
+                raise LilyTranslateException("Should not have overlapping variants.")
+            else:
+                spacerDuration = firstOffset - highestOffsetSoFar
+                highestOffsetSoFar = v.replacementDuration + firstOffset
+
+            # make spacer with spacerDuration and append
+            if spacerDuration > 0.0:
+                spacer = note.SpacerRest()
+                spacer.duration.quarterLength = spacerDuration
+                lySpacer = self.lySimpleMusicFromNoteOrRest(spacer)
+                musicList.append(lySpacer)
+
+            if coloredVariants is True:
+                for n in v._stream.flat.notesAndRests:
+                    n.editorial.color = color# make thing (with or without fraction)
+
+            # Strip off spacer
+            endOffset = v.containedHighestTime
+            vStripped = variant.Variant(v._stream.getElementsByOffset(firstOffset,
+                                        offsetEnd = endOffset))
+            vStripped.replacementDuration = v.replacementDuration
+
+
+            replacedElementsLength = vStripped.replacementDuration
+            variantLength = vStripped.containedHighestTime - firstOffset
+
+
+            if variantLength != replacedElementsLength:
+                numerator, denominator = common.decimalToTuplet(replacedElementsLength/variantLength)
+                fraction = str(numerator) + '/' + str(denominator)
+                lpOssiaMusicVariantPreFraction = self.lyOssiaMusicFromVariant(vStripped)
+                lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='times', 
+                                                            fraction = fraction,
+                                                            music = lpOssiaMusicVariantPreFraction)
+
+                lpOssiaMusicVariant = lyo.LySequentialMusic(musicList = lpVariantTuplet)
+            else:
+                lpOssiaMusicVariant = self.lyOssiaMusicFromVariant(vStripped)
+
+            musicList.append(lpOssiaMusicVariant)
+
+            longestVariant = v
+
+        # The last variant in the iteration should have the highestOffsetSoFar,
+        # so it has the appropriate replacementElements to return can compare with the rest in
+        # appendContextFromVariant.
+
+        replacedElements = longestVariant.replacedElements(activeSite, includeSpacers = True)
+
+
+
+        lpMusicList = lyo.LyMusicList(musicList)
+        lpInternalSequentialMusic = lyo.LySequentialMusic(musicList = lpMusicList )
+
+        if newVariant is True:
+            lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'new',
+                                                            optionalId = variantId,
+                                                            simpleString = "Staff",
+                                                            music = lpInternalSequentialMusic)
+        else: #newVariant is False
+            lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'context',
+                                                            optionalId = variantId,
+                                                            simpleString = "Staff",
+                                                            music = lpInternalSequentialMusic)
+                
+
+        #optionalContextMod = r'''
+        #\with {
+        #      \remove "Time_signature_engraver"
+        #      alignAboveContext = #"%s"
+        #      fontSize = ##-3
+        #      \override StaffSymbol #'staff-space = #(magstep -3)
+        #      \override StaffSymbol #'thickness = #(magstep -3)
+        #      \override TupletBracket #'bracket-visibility = ##f
+        #      \override TupletNumber #'stencil = ##f
+        #      \override Clef #'transparent = ##t
+        #    } 
+        #    ''' % containerId #\override BarLine #'transparent = ##t is the best way of fixing #the barlines that I have come up with.
+#
+        #lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod
+
+        self.variantMode = False
+
+        return lpPrefixCompositeMusicVariant, replacedElements
+
+
+    def lyPrefixCompositeMusicFromVariant(self, variantObject, replacedElements, coloredVariants = False):
+        '''
+        
+        >>> from music21 import *
+        >>> pstream = converter.parse("a4 b c d   e4 f g a", "4/4")
+        >>> pstream.makeMeasures(inPlace = True)
+        >>> p = stream.Part(pstream)
+        >>> p.id = 'p1'
+        >>> vstream = converter.parse("a4. b8 c4 d", "4/4")
+        >>> vstream.makeMeasures(inPlace = True)
+        >>> v = variant.Variant(vstream)
+        >>> v.groups = ['london']
+        >>> p.insert(0.0, v)
+        >>> lpc = lily.translate.LilypondConverter()
+        >>> replacedElements = v.replacedElements()
+        >>> lpPrefixCompositeMusicVariant = lpc.lyPrefixCompositeMusicFromVariant(v, replacedElements)
+        >>> print lpPrefixCompositeMusicVariant
+        \\new Staff  = londonpx 
+        \with {
+              \\remove "Time_signature_engraver"
+              alignAboveContext = #"px"
+              fontSize = #-3
+              \override StaffSymbol #'staff-space = #(magstep -3)
+              \override StaffSymbol #'thickness = #(magstep -3)
+              \override TupletBracket #'bracket-visibility = ##f
+              \override TupletNumber #'stencil = ##f
+              \override Clef #'transparent = ##t
+            } 
+            { {\startStaff \clef "treble" 
+          \clef "treble" 
+          \\time 4/4
+          a' 4.  
+          b' 8  
+          c' 4  
+          d' 4  
+          \\bar "|."  %{ end measure 1 %} 
+           \stopStaff} 
+        <BLANKLINE>
+           }
+        <BLANKLINE>
+
+        >>> replacedElements.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note C>
+            {3.0} <music21.note.Note D>
+
+        >>> print lpc.addedVariants
+        [u'london']
+        
+        '''
+        replacedElementsClef = replacedElements[0].getContextByClass('Clef')
+
+        variantContainerStream = variantObject.getContextByClass('Part')
+        if variantContainerStream is None:
+            variantContainerStream = variantObject.getContextByClass('Stream')
+
+        if not replacedElementsClef in variantObject.elements:
+            variantObject.insert(0, replacedElementsClef)
+
+        variantName = variantObject.groups[0]
+        if variantName in self.addedVariants:
+            newVariant = False
+        else:
+            self.addedVariants.append(variantName)
+            newVariant = True
+
+        containerId = makeLettersOnlyId(variantContainerStream.id)
+        variantId = lyo.LyOptionalId(makeLettersOnlyId(variantName)+containerId)
+
+        if coloredVariants is True:
+            color = self.variantColors[self.addedVariants.index(variantName) % 6]
+            for n in variantObject._stream.flat.notesAndRests:
+                n.editorial.color = color
+
+        
+
+        musicList = []
+
+        if len(variantObject.getElementsByClass("SpacerRest")) > 0:
+            spacer = variantObject.getElementsByClass("SpacerRest")[0]
+            spacerDur = spacer.duration.quarterLength
+            if spacer.duration.quarterLength > 0.0:
+                lySpacer = self.lySimpleMusicFromNoteOrRest(spacer)
+                musicList.append(lySpacer)
+            variantObject.remove(spacer)
+        else:
+            spacerDur = 0.0
+
+        lpOssiaMusicVariant = self.lyOssiaMusicFromVariant(variantObject)
+
+
+        replacedElementsLength = variantObject.replacementDuration
+        variantLength = variantObject.containedHighestTime - spacerDur
+        
+        self.variantMode = True
+        if variantLength != replacedElementsLength:
+            numerator, denominator = common.decimalToTuplet(replacedElementsLength/variantLength)
+            fraction = str(numerator) + '/' + str(denominator)
+            lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='times', 
+                                                        fraction = fraction,
+                                                        music = lpOssiaMusicVariant)
+            lpInternalSequentialMusic = lyo.LySequentialMusic(musicList = lpVariantTuplet)
+            musicList.append(lpInternalSequentialMusic)  
+        else:
+            musicList.append(lpOssiaMusicVariant)
+        
+
+        lpMusicList = lyo.LyMusicList(musicList)
+        lpOssiaMusicVariantWithSpacer = lyo.LySequentialMusic(musicList = lpMusicList )
+        
+        if newVariant is True:
+            lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'new',
+                                                        optionalId = variantId,
+                                                        simpleString = "Staff",
+                                                        music = lpOssiaMusicVariantWithSpacer)
+        else:
+            lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type = 'context',
+                                                          optionalId = variantId,
+                                                          simpleString = "Staff",
+                                                          music = lpOssiaMusicVariantWithSpacer)
+
+#        optionalContextMod = r'''
+#\with {
+#      \remove "Time_signature_engraver"
+#      alignAboveContext = #"%s"
+#      fontSize = #-3
+#      \override StaffSymbol #'staff-space = #(magstep -3)
+#      \override StaffSymbol #'thickness = #(magstep -3)
+#      \override TupletBracket #'bracket-visibility = ##f
+#      \override TupletNumber #'stencil = ##f
+#      \override Clef #'transparent = ##t
+#    } 
+#    ''' % containerId #\override BarLine #'transparent = ##t is the best way of fixing the #barlines that I have come up with.
+#
+#        lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod
+
+        self.variantMode = False
+
+        return lpPrefixCompositeMusicVariant
+
+        #musicList2 = []
+        #musicList2.append(lpPrefixCompositeMusicVariant)
+        #musicList2.append(lpSequentialMusicStandard )
+        #
+        #lp2MusicList = lyo.LyMusicList()
+        #lp2MusicList.contents = musicList2
+        #lp2SimultaneousMusic = lyo.LySimultaneousMusic()
+        #lp2SimultaneousMusic.musicList = lp2MusicList
+        #lp2GroupedMusicList = lyo.LyGroupedMusicList()
+        #lp2GroupedMusicList.simultaneousMusic = lp2SimultaneousMusic
+        #
+        #contextObject = self.context
+        #currentMusicList = contextObject.contents
+        #currentMusicList.append(lp2GroupedMusicList)
+        #lp2GroupedMusicList.setParent(self.context)
+
+        
+    def lyOssiaMusicFromVariant(self, variantIn):
+        r'''
+        returns a LyOssiaMusic object from a stream
+
+        >>> from music21 import *
+        >>> c = converter.parse('tinynotation: 3/4 C4 D E F2.')
+        >>> v = variant.Variant(c)
+        >>> lpc = lily.translate.LilypondConverter()
+        >>> lySequentialMusicOut = lpc.lySequentialMusicFromStream(v)
+        >>> lySequentialMusicOut
+        <music21.lily.lilyObjects.LySequentialMusic object at 0x...>
+        >>> print lySequentialMusicOut
+        { \time 3/4
+         c 4  
+         d 4  
+         e 4  
+         f 2.  
+        } 
+        '''
+        musicList = []
+
+        lpMusicList = lyo.LyMusicList(contents = musicList)
+        lpOssiaMusic = lyo.LyOssiaMusic(musicList = lpMusicList)
+        self.newContext(lpMusicList)    
+        
+        self.variantMode = True
+        self.appendObjectsToContextFromStream(variantIn._stream)
+                    
+        lyObject = self.closeMeasure()
+        if lyObject is not None:
+            musicList.append(lyObject)    
+        
+        self.restoreContext()
+
+        self.variantMode = False
+        
+        return lpOssiaMusic
+
     def setHeaderFromMetadata(self, metadataObject = None, lpHeader = None):
         r'''
         Returns a lilypond.lilyObjects.LyLilypondHeader object
@@ -1255,7 +1949,7 @@ class LilypondConverter(object):
         lpHeaderBody.assignments = lpHeaderBodyAssignments
         return lpHeader
 
-    def closeMeasure(self):
+    def closeMeasure(self, barChecksOnly = False):
         r'''
         return a LyObject or None for the end of the previous Measure
         
@@ -1281,18 +1975,25 @@ class LilypondConverter(object):
         #    return None
         #elif m.rightBarline.style == 'regular':
         #    return None
+        
+        if self.variantMode is True:
+            barChecksOnly = True
+
+        lpBarline = lyo.LyEmbeddedScm()
+
+        if barChecksOnly is True:
+            barString = "|"
+        elif m.rightBarline is None:
+            barString = lpBarline.backslash + 'bar ' + lpBarline.quoteString("|")
         else:
-            if m.rightBarline is not None:
-                barString = self.barlineDict[m.rightBarline.style]
-            else:
-                barString = "|"
-            lpBarline = lyo.LyEmbeddedScm()
-            if m.number is not None:
-                barString = lpBarline.backslash + 'bar ' + lpBarline.quoteString(barString) + lpBarline.comment("end measure %d" % m.number)
-            else:
-                barString = lpBarline.backslash + 'bar ' + lpBarline.quoteString(barString)
-            lpBarline.content = barString
-            return lpBarline
+            barString = lpBarline.backslash + 'bar ' + lpBarline.quoteString(self.barlineDict[m.rightBarline.style])
+        
+        if m.number is not None:
+            barString += lpBarline.comment("end measure %d" % m.number)
+
+        
+        lpBarline.content = barString
+        return lpBarline
 
     def getSchemeForPadding(self, measureObject):
         r'''

@@ -1508,7 +1508,16 @@ class Rest(GeneralNote):
     mx = property(_getMX, _setMX)    
 
 
+class SpacerRest(Rest):
+    '''
+    This is exactly the same as a rest, but it is a SpacerRest.
+    This object should only be used for making hidden space in a score in lilypond.
+    '''
+    def __init__(self, *arguments, **keywords):
+            Rest.__init__(self, **keywords)
 
+    def __repr__(self):
+        return "<music21.note.SpacerRest %s duration=%s>" % (self.name, self.duration.quarterLength)
 
 
 #-------------------------------------------------------------------------------
