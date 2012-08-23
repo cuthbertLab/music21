@@ -31,6 +31,7 @@ from music21 import pitch
 from music21 import stream
 from music21 import tempo
 from music21 import text
+from music21 import tie
 from music21 import tinyNotation
 import unittest, doctest
 
@@ -514,29 +515,30 @@ def convertTrecentoStream(inpStream, inpDiv = None):
 
     convertedStream = inpStream.__class__()
     measuredStream = medren.breakMensuralStreamIntoBrevisLengths(inpStream, inpDiv)
+    raise Exception('Measures: %s' % measuredStream.recurse())
     print ''
     
     for e in measuredStream:
         
-        if isinstance(e, metadata.Metadata) or \
-        isinstance(e, text.TextBox): #Formatting
+        if ('Metadata' in e.classes) or  ('TextBox' in e.classes): #Formatting
             convertedStream.append(e)
         
-        elif isinstance(e, medren.MensuralClef):
+        elif 'MensuralClef' in e.classes:
             pass
         
-        elif isinstance(e, Divisione):
+        elif 'Divisione' in e.classes:
             div = e
         
-        elif isinstance(e, stream.Measure):
+        elif e.isMeasure:
             print '    Converting measure %s' % e.number
             measureList = convertBrevisLength(e, convertedStream, inpDiv = div, measureNumOffset = offset)
             for m in measureList:
                 convertedStream.append(m)
             
-        elif isinstance(e, stream.Stream):
+        elif e.isStream:
             print 'Converting stream %s' % e
-            convertedStream.insert(0, convertTrecentoStream(e, inpDiv = div))
+            convertedPart = convertTrecentoStream(e, inpDiv = div)
+            convertedStream.insert(0, convertedPart)
         
         else:
             raise medren.MedRenException('Object %s cannot be processed as part of a trecento stream' % e)
@@ -561,12 +563,13 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv = None, measureNum
     measureList = []
         
     mList = brevisLength.recurse()[1:]
+    
     tempTBL = TranslateBrevisLength(div, mList)    
     
-    lenList = tempTBL.getMinimaLengths()
+    lenList = tempTBL.getKnownLengths()
     
     for item in mList:
-        if isinstance(item, Divisione):
+        if 'Divisione' in item.classes:
             if div is None:
                 div = item
             else:
@@ -614,9 +617,9 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv = None, measureNum
         
     else:
         for i in range(len(mList)):
-            if isinstance(mList[i], medren.MensuralRest):
+            if 'MensuralRest' in mList[i].classes:
                 n = note.Rest()
-            elif isinstance(mList[i], medren.MensuralNote):
+            elif 'MensuralNote' in mList[i].classes:
                 n = note.Note(mList[i].pitch)
             
             dur = lenList[i]*mDur
@@ -642,146 +645,97 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv = None, measureNum
                           
     return measureList
 
-class TranslateBrevisLength:
+class TranslateBrevisLength(object):
     '''
     The class :class:`music21.trecento.notation.TranslateBrevisLength` takes a divisione sign and a list comprising one brevis length's worth of mensural or trecento objects as arguments.
-    The method :meth:`music21.trecento.notation.TranslateBrevisLength.getMinimaLengths` takes no arguments, and returns a list of floats corresponding to the length (in minima) of each object in the list.
+    The method :meth:`music21.trecento.notation.TranslateBrevisLength.getKnownLengths` takes no arguments, and returns a list of floats corresponding to the length (in minima) of each object in the list.
     Currently, this class is used only to improve the efficiency of :attr:`music21.medren.GeneralMensuralNote.duration`.
     
     This acts a helper class to improve the efficiency of :class:`music21.trecento.notation.convertBrevisLength`.
     
     >>> from music21 import *
-    >>> div = trecento.notation.Divisione('.i.')
-    >>> names = ['SB', 'M', 'SB']
-    >>> BL = [medren.MensuralNote('A', n) for n in names]
-    >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
-    >>> TBL.getMinimaLengths()
-    [2.0, 1.0, 3.0]
     >>>
     >>>
-    >>> div = trecento.notation.Divisione('.n.')
-    >>> names = ['SB', 'M', 'M', 'M', 'SB', 'M']
-    >>> BL = [medren.MensuralNote('A', n) for n in names]
-    >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
-    >>> TBL.getMinimaLengths()
-    [3.0, 1.0, 1.0, 1.0, 2.0, 1.0]
-    >>> names = ['SB', 'M', 'SB']
-    >>> BL = [medren.MensuralNote('A', n) for n in names]
-    >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
-    >>> TBL.getMinimaLengths()
-    [2.0, 1.0, 6.0]
-    >>> BL[0].setStem('down')
-    >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
-    >>> TBL.getMinimaLengths()
-    [5.0, 1.0, 3.0]
     >>>
-    >>>
-    >>> div = trecento.notation.Divisione('.q.')
-    >>> names = ['M', 'SM', 'SM', 'SM', 'SM', 'SM']
-    >>> BL = [medren.MensuralNote('A', n) for n in names]
-    >>> BL[4] = medren.MensuralRest('SM')
-    >>> BL[1].setFlag('up','left')
-    >>> BL[2].setFlag('up', 'left')
-    >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
-    >>> TBL.getMinimaLengths()
-    [1.0, 0.5, 0.5, 0.666..., 0.666..., 0.666...]
-    >>>
-    >>>
-    >>> div = trecento.notation.Divisione('.p.')
-    >>> names = ['M', 'SB', 'SM', 'SM']
-    >>> BL = [medren.MensuralNote('A', n) for n in names]
-    >>> BL[1].setStem('down')
-    >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
-    >>> TBL.getMinimaLengths()
-    [1.0, 4.0, 0.5, 0.5]
-    >>> names = ['SM', 'SM', 'SM', 'SM', 'SM', 'SM', 'SM', 'SB']
-    >>> BL = [medren.MensuralNote('A', n) for n in names]
-    >>> BL[3] = medren.MensuralRest('SM')
-    >>> for mn in BL[:3]:
-    ...    mn.setFlag('up', 'left')
-    >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
-    >>> TBL.getMinimaLengths()
-    [0.666..., 0.666..., 0.666..., 0.5, 0.5, 0.5, 0.5, 2.0]
-    >>>
-    >>>
-    >>> div = trecento.notation.Divisione('.o.')
-    >>> names = ['SB', 'SB', 'SB']
-    >>> BL = [medren.MensuralNote('A', n) for n in names]
-    >>> BL[1].setStem('down')
-    >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
-    >>> TBL.getMinimaLengths()
-    [2.0, 4.0, 2.0]
-    >>> names = ['SM', 'SM', 'SM', 'SB', 'SB']
-    >>> BL = [medren.MensuralNote('A', n) for n in names]
-    >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
-    >>> TBL.getMinimaLengths()
-    [0.666..., 0.666..., 0.666..., 2.0, 4.0]
-    >>>
-    >>>
-    >>> div = trecento.notation.Divisione('.d.')
-    >>> names = ['SB', 'SB']
-    >>> BL = [medren.MensuralNote('A', n) for n in names]
-    >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
-    >>> TBL.getMinimaLengths()
-    [4.0, 8.0]
-    >>> names = ['SB', 'SB', 'SB']
-    >>> BL = [medren.MensuralNote('A', n) for n in names]
-    >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
-    >>> TBL.getMinimaLengths()
-    [4.0, 4.0, 4.0]
-    >>> names = ['SB', 'SB', 'SB', 'SB']
-    >>> BL = [medren.MensuralNote('A', n) for n in names]
-    >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
-    >>> TBL.getMinimaLengths()
-    [2.0, 2.0, 4.0, 4.0]
-    >>> BL[1].setStem('down')
-    >>> BL[2].setStem('down')
-    >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
-    >>> TBL.getMinimaLengths()
-    [2.0, 4.0, 4.0, 2.0]
-    >>> names = ['SM', 'SM', 'SM', 'SM', 'SB', 'SB', 'SB', 'SB', 'SB', 'SM', 'SM', 'SM']
-    >>> BL = [medren.MensuralNote('A', n) for n in names]
-    >>> BL[3] = medren.MensuralRest('SM')
-    >>> for mn in BL[-3:]:
-    ...    mn.setFlag('up', 'left')
-    >>> for mn in BL[4:9]:
-    ...    mn.setStem('down')
-    >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
-    >>> TBL.getMinimaLengths()
-    [0.5, 0.5, 0.5, 0.5, 4.0, 4.0, 4.0, 4.0, 4.0, 0.666..., 0.666..., 0.666...]
+    
+#    >>> names = ['SM', 'SM', 'SM', 'SM', 'SB', 'SB', 'SB', 'SB', 'SB', 'SM', 'SM', 'SM']
+#    >>> BL = [medren.MensuralNote('A', n) for n in names]
+#    >>> BL[3] = medren.MensuralRest('SM')
+#    >>> for mn in BL[-3:]:
+#    ...    mn.setFlag('up', 'left')
+#    >>> for mn in BL[4:9]:
+#    ...    mn.setStem('down')
+#    >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+#    >>> TBL.getKnownLengths()
+#    [0.5, 0.5, 0.5, 0.5, 4.0, 4.0, 4.0, 4.0, 4.0, 0.666..., 0.666..., 0.666...]
     '''
     
     def __init__(self, divisione = None, BL = [], pDS = False):
                 
         self.div = divisione
         self.brevisLength = BL
-        self.minimaLengthList = [0 for i in range(len(self.brevisLength))]
         
-        self.processing_downstems = pDS
+        self.unchangeableNoteLengthsList = []
+        self.unknownLengthsDict = {'semibrevis':[], 
+                                   'semibrevis_downstem':[], 
+                                   'semiminima_right_flag':[], 
+                                   'seminima_left_flag':[], 
+                                   'semiminima_rest':[]
+                                   }
+        self.knownLengthsList = []
+        
+        self.numberOfBreves = 0
+        self.numberOfDownstems = 0
+        self.numberOfLeftFlags = 0
+        self.numberOfRightFlags = 0
+        self.numberOfSMRests = 0
+        
+        self.minimaRemaining = self.div.minimaPerBrevis
+        self.minRem_tracker = pDS
         self.doubleNum = 0
         
-    def getMinimaLengths(self):
-        if isinstance(self.div, Divisione):
-           self.minimaLengthList = self._translate()
+    def getKnownLengths(self):
+        if 'Divisione' in self.div.classes:
+           self.knownLengthsList = self.translate()
         else:
            raise TrecentoNotationException('%s not recognized as divisione' % divisione)
-        return self.minimaLengthList
+        return self.knownLengthsList
     
-    def _evaluateBL(self, div, BL, lengths):
-        ''':meth:`TranslateBrevisLength._evaluateBL takes divisione, a brevis length's worth of mensural or trecento objects in a list, and a list of lengths corresponding to each of those objects as arguments.
-        This method returns the ``strength'' of the list based on those lengths. A ``strong'' list has longer notes on its stronger beats. Only valid for Trecento notation.'''
-    
+    def getBreveStrength(self, lengths):
+        ''':meth:`TranslateBrevisLength._evaluateBL takes divisione, a brevis 
+        length's worth of mensural or trecento objects in a list, and a list of lengths 
+        corresponding to each of those objects as arguments.
+        This method returns the ``strength'' of the list based on those lengths. 
+        A ``strong'' list has longer notes on its stronger beats. Only valid for Trecento notation.
+        
+        
+        In this example, we test two possible interpretations for the same measure
+        and see that the second is more logical.  Note that the strength itself is meaningless
+        except when compared to other possible lengths for the same notes.
+        
+        >>> from music21 import *
+        >>> div = trecento.notation.Divisione('.n.')
+        >>> names = ['SB', 'M', 'M', 'M', 'SB']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> TBL.getBreveStrength([2.0, 1.0, 1.0, 1.0, 4.0])
+        2.0555...
+        >>> TBL.getBreveStrength([3.0, 1.0, 1.0, 1.0, 3.0])
+        2.8333...
+        '''
+        div = self.div
+        BL = self.brevisLength
         typeStrength = {'semibrevis': 1.0, 'minima': 0.5, 'semiminima':0.25}
            
         beatStrength = 0
         strength = 0
         curBeat = 0
         for i in range(len(lengths)):
-            if abs(curBeat - round(curBeat)) < 0.0001: #Rounding error
+            if common.almostEquals(curBeat - round(curBeat), 0): #Rounding error
                 curBeat = round(curBeat)
             
             if div.standardSymbol in ['.i.', '.n.']:
-                if abs(curBeat % 3) < 0.0001:
+                if common.almostEquals(curBeat % 3, 0):
                     beatStrength = 1.0
                 elif curBeat % 3 - 1 or i % 3 == 2:
                     beatStrength = float(1.0)/3
@@ -805,98 +759,183 @@ class TranslateBrevisLength:
                     beatStrength = 0.25
                 else:
                     beatStrength = 0.125
-            strength += typeStrength[BL[i].mensuralType]*beatStrength
-            curBeat += lengths[i]
-        strength -= abs(div.minimaPerBrevis - curBeat)
-        return strength
-       
-    def _translate(self):
-        #########################################################################################################################################
-        from music21 import medren
+            strength += typeStrength[BL[i].mensuralType] * beatStrength
+            lengthI = lengths[i]
+            if lengthI is None:
+                lengthI = 0.0
+            curBeat += lengthI
+        
+        lastSBLen = div.minimaPerBrevis
+        if  (len(self.unknownLengthsDict['semibrevis']) > 0) and \
+            (self.unknownLengthsDict['semibrevis'][-1] == len(self.brevisLength) - 1):
+            lastSBLen = lengths[ self.unknownLengthsDict['semibrevis'][-1] ]
 
-        def processBL(bl, lengths, change_list, change_nums, diff_list, lenRem, releases = None, multi = 0):
-            '''
-            Gets all possible length combinations. Returns the lengths combination of the "strongest" list, along with the remaining length. 
-            '''
+        strength -= abs(div.minimaPerBrevis - curBeat)
+        
+        from music21 import medren
+        for i, item in enumerate(self.brevisLength):
+            if isinstance(item, medren.MensuralNote) and (not 'down' in item.getStems()) and (lengths[i] > lastSBLen):
+                strength = 0
+        
+        return strength
+
+    def determineStrongestMeasureLengths(self, lengths, change_tup, num_tup, diff_tup, lenRem, shrinkable_indices = (), multi = None):
+        '''
+        Gets all possible length combinations. Returns the lengths combination of the "strongest" list, 
+        along with the remaining length. 
+        
+        lengths =    list of lengths to be updated
+        change_tup = tuple, each element is the sub-list of self.brevisLength to be changed.  
+        num_tup =    tuple, each element is an integer, the maximum number of elements in the corresponding list
+                     list of change_tup that can be changed
+        diff_tup =   tuple, each element is the amount by which to change the elements of the corresponding list in change_tup.
+        lenRem =     input of the remaining SM in the measure. Gets updated and returned.
+        shrinkable_indices = tuple of indices of elements able to take up slack (i.e. ending SB, or downstem SB)
+        
+        >>> from music21 import *
+        >>> div = trecento.notation.Divisione('.n.')
+        >>> names = ['SB', 'M', 'M', 'M', 'SB']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)     
+        >>> TBL.determineStrongestMeasureLengths([2.0, 1.0, 1.0, 1.0, 4.0], ([0],), (1,), (1.0,), 0.0, shrinkable_indices = (-1,))
+        ([3.0, 1.0, 1.0, 1.0, 3.0], 0.0)
+        '''
+        
+        if not (len(change_tup) == len(num_tup)) and (len(change_tup) == len(diff_tup)):
+            raise Exception('Invalid syntax: change_tup, num_tup, and diff_tup must have the same length')
+        
+        change = change_tup[0]
+        change_num = num_tup[0]
+        diff = diff_tup[0]
+        release = None
+
+        if len(shrinkable_indices) > 0:
+            release = shrinkable_indices[0]
+        
+        if multi is None:
+            multi = len(change_tup) - 1
             
-            def allCombinations(list, num):
-                combs = [[]]
-                if num > 0:
-                    for i in range(len(list)):
-                        comb = [list[i]]
-                        for c in allCombinations(list[(i+1):], num-1):
-                            combs.append(comb + c)
-                combs.reverse()
-                return combs
+        strength = self.getBreveStrength(lengths)
+        lengths_changeable = lengths[:]
+        lengths_static = lengths[:]
+        remain = lenRem
+        lenRem_final  = lenRem
+
+        for l in _allCombinations(change, change_num):
+            for i in l:
+                lengths_changeable[i] += diff
+                if release is not None:
+                    lengths_changeable[release] -= diff
+                    if multi > 0:
+                        lengths_changeable, remain = self.determineStrongestMeasureLengths(lengths_changeable, change_tup[1:], num_tup[1:], diff_tup[1:], remain, shrinkable_indices = shrinkable_indices[1:], multi = multi-1)
+                else:
+                    remain -= diff
+                    if multi > 0:
+                        lengths_changeable, remain = self.determineStrongestMeasureLengths(lengths_changeable, change_tup[1:], num_tup[1:], diff_tup[1:], remain, shrinkable_indices = (), multi = multi-1)
+    
+            newStrength = self.getBreveStrength(lengths_changeable)
             
-            if isinstance(change_list, tuple):
-                change = change_list[0]
-            else:
-                change = change_list
-            if isinstance(change_nums, tuple):
-                change_num = change_nums[0]
-            else:
-                change_num = change_nums
-            if isinstance(diff_list, tuple):
-                diff = diff_list[0]
-            else:
-                diff = diff_list
-            if releases is not None and isinstance(releases, list):
-                release = releases[0]
-            else:
-                release = releases
-                
-            strength = self._evaluateBL(self.div, bl, lengths)
-            lengths_changeable = lengths[:]
-            lengths_static = lengths[:]
+            if strength < newStrength and remain > -0.0001:
+                lengths = lengths_changeable[:]
+                strength = newStrength
+                lenRem_final = remain
+            lengths_changeable = lengths_static[:]
             remain = lenRem
-            lenRem_final  = lenRem
-            
-            if multi == 0:
-                for l in allCombinations(change, change_num):
-                    l.reverse()
-                    for i in l:
-                        lengths_changeable[i] += diff
-                        if release is not None:
-                            lengths_changeable[release] -= diff
-                        else:
-                            remain -= diff
+        return lengths, lenRem_final
+
+
+    def getUnchangeableNoteLengths(self):
+        '''
+        takes the music in self.brevisLength and returns a list where element i in this list
+        corresponds to the length in minimas of element i in self.brevisLength.  If the length
+        cannot be determined without taking into account the context (e.g., semiminims, semibreves)
+        then None is placed in that list.        
+
+        >>> from music21 import *
+        >>> div = trecento.notation.Divisione('.i.')
+        >>> names = ['SB', 'M','SB']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> TBL.getUnchangeableNoteLengths()
+        [None, 1.0, None]
         
-                    newStrength = self._evaluateBL(self.div, bl, lengths_changeable)
-                    if strength < newStrength and remain >= 0:
-                        lengths = lengths_changeable[:]
-                        strength = newStrength
-                        lenRem_final = remain
-                    lengths_changeable = lengths_static[:]
-                    remain = lenRem
-                return lengths, lenRem_final
+        >>> names = ['B']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> TBL.getUnchangeableNoteLengths()
+        [6.0]
+        
+        >>> names = ['L']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> TBL.getUnchangeableNoteLengths()
+        [12.0]
+        
+        >>> names = ['Mx']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> TBL.getUnchangeableNoteLengths()
+        [24.0]
+        '''
+        unchangeableNoteLengthsList = []
+        for obj in self.brevisLength:
+            minimaLength = None
+            #If its duration is set, doesn't need to be determined
             
+            #Gets rid of everything known 
+            if obj.mensuralType == 'maxima':
+                minimaLength = float(4)*self.div.minimaPerBrevis
+            elif obj.mensuralType == 'longa':
+                minimaLength = float(2)*self.div.minimaPerBrevis
+            elif obj.mensuralType == 'brevis':
+                minimaLength = float(self.div.minimaPerBrevis)
             else:
-                for l in allCombinations(change, change_num):
-                    l.reverse()
-                    for i in l:
-                        lengths_changeable[i] += diff
-                        if release is not None:
-                            lengths_changeable[release] -= diff
-                            lengths_changeable, remain = processBL(bl, lengths_changeable, change_list[1:], change_nums[1:], diff_list[1:], remain, releases[1:], multi-1)
+                objC = obj.classes
+                if 'GeneralMensuralNote' in objC:
+                    #Dep on div
+                    if obj.mensuralType == 'semibrevis':
+                        if 'MensuralRest' in obj.classes:
+                            if self.div.standardSymbol in ['.q.', '.i.']:
+                                minimaLength = self.div.minimaPerBrevis/float(2)
+                            elif self.div.standardSymbol in ['.p.', '.n.']:
+                                minimaLength = self.div.minimaPerBrevis/float(3)
+                            else: # we don't know it...
+                                pass
                         else:
-                            remain -= diff
-                            lengths_changeable, remain = processBL(bl, lengths_changeable, change_list[1:], change_nums[1:], diff_list[1:], remain, multi-1)
-                    
-                    newStrength = self._evaluateBL(self.div, bl, lengths_changeable)
-                    if strength < newStrength and remain >= 0:
-                        lengths = lengths_changeable[:]
-                        strength = newStrength
-                        lenRem_final = remain
-                    lengths_changeable = lengths_static[:]
-                    remain = lenRem
-                return lengths, lenRem_final
-        
-        ##################################################################################################################################
-            
-        minRem = self.div.minimaPerBrevis
-        minRem_tracker = self.processing_downstems
-        minimaLengths = self.minimaLengthList[:]
+                            if 'side' in obj.getStems(): # oblique-stemmed semibreve
+                                minimaLength = 3.0
+                            else: # WHO THe heck knows a semibreve's length!!! :-)
+                                pass
+                    elif obj.mensuralType == 'minima':
+                        if 'MensuralNote' in obj.classes and 'down' in obj.stems:
+                            raise TrecentoNotationException('Dragmas currently not supported')
+                        elif 'MensuralNote' in obj.classes and 'side' in obj.stems:
+                            minimaLength = 1.5
+                        else:
+                            minimaLength = 1.0
+                    elif obj.mensuralType == 'semiminima':
+                        pass
+            unchangeableNoteLengthsList.append(minimaLength)
+        return unchangeableNoteLengthsList
+
+
+    def classifyUnknownNotesByType(self, unchangeableNoteLengthsList):
+        '''
+        returns a dictionary where keys are types of notes ('semibrevis_downstem')
+        and the values are a list of indices in self.brevisLength (and unchangeableNoteLengthsList)
+        which are those types...
+
+        >>> from music21 import *
+        >>> div = trecento.notation.Divisione('.n.')
+        >>> names = ['SB', 'M', 'M', 'M', 'SB', 'M']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> unchangeableNoteLengths = TBL.getUnchangeableNoteLengths()
+        >>> kldict = TBL.classifyUnknownNotesByType(unchangeableNoteLengths)
+        >>> print kldict['semibrevis']
+        [0, 4]
+        '''
+        unchangeableNoteLengths = unchangeableNoteLengthsList
         
         semibrevis_list = []
         semibrevis_downstem = []
@@ -919,606 +958,776 @@ class TranslateBrevisLength:
 
         for i in range(len(self.brevisLength)):
             obj = self.brevisLength[i]
-            minimaLength = 0
-            #If its duration is set, doesn't need to be determined
+            knownLength = unchangeableNoteLengths[i]
+            if knownLength is not None:
+                continue
             
-            #Gets rid of everything known 
-            if obj.mensuralType == 'maxima':
-                minimaLength = float(4)*self.div.minimaPerBrevis
-            elif obj.mensuralType == 'longa':
-                minimaLength = float(2)*self.div.minimaPerBrevis
-            elif obj.mensuralType == 'brevis':
-                minimaLength = float(self.div.minimaPerBrevis)
-            elif minimaLengths[i] == 0 and \
-            ( isinstance(obj, medren.MensuralNote) or isinstance(obj, medren.MensuralRest) ):
-                #Dep on div
-                if obj.mensuralType == 'semibrevis':
-                    if isinstance(obj, medren.MensuralRest):
-                        if self.div.standardSymbol in ['.q.', '.i.']:
-                            minimaLength = self.div.minimaPerBrevis/float(2)
-                        elif self.div.standardSymbol in ['.p.', '.n.']:
-                            minimaLength = self.div.minimaPerBrevis/float(3)
-                        else: 
-                            semibrevis_list.append(i)
+            if obj.mensuralType == 'semibrevis':
+                if 'MensuralRest' in obj.classes:
+                    if self.div.standardSymbol not in ['.q.', '.i.', '.p.', '.n.']:
+                        semibrevis_list.append(i)
+                else:
+                    if 'side' in obj.getStems():
+                        pass # shouldnt happen since length is known...
+                    elif 'down' in obj.getStems():
+                        semibrevis_downstem.append(i)
                     else:
-                        if 'side' in obj.getStems():
-                            minimaLength = 3.0
-                        elif 'down' in obj.getStems():
-                            semibrevis_downstem.append(i)
-                        else:
-                            semibrevis_list.append(i)
-                if obj.mensuralType == 'minima':
-                    if isinstance(obj, medren.MensuralNote) and 'down' in obj.stems:
+                        semibrevis_list.append(i)
+            elif obj.mensuralType == 'minima':
+                pass
+            elif obj.mensuralType == 'semiminima':
+                if 'MensuralNote' in obj.classes:
+                    if 'down' in obj.getStems():
                         raise TrecentoNotationException('Dragmas currently not supported')
-                    elif isinstance(obj, medren.MensuralNote) and 'side' in obj.stems:
-                        minimaLength = 1.5
-                    else:
-                        minimaLength = 1.0
-                if obj.mensuralType == 'semiminima':
-                    if isinstance(obj, medren.MensuralNote):
-                        if 'down' in obj.getStems():
-                            raise TrecentoNotationException('Dragmas currently not supported')
-                        elif obj.getFlags()['up'] == 'right':
-                            semiminima_right_flag_list.append(i)
-                        elif obj.getFlags()['up'] == 'left':
-                            semiminima_left_flag_list.append(i)
-                    if isinstance(obj, medren.MensuralRest):
-                        semiminima_rest_list.append(i) 
-                minRem -= minimaLength
-            minimaLengths[i] = minimaLength
+                    elif obj.getFlags()['up'] == 'right':
+                        semiminima_right_flag_list.append(i)
+                    elif obj.getFlags()['up'] == 'left':
+                        semiminima_left_flag_list.append(i)
+                if 'MensuralRest' in obj.classes:
+                    semiminima_rest_list.append(i) 
+
+        retDict = {'semibrevis':semibrevis_list,
+                   'semibrevis_downstem':semibrevis_downstem,
+                   'semiminima_right_flag':semiminima_right_flag_list,
+                   'semiminima_left_flag':semiminima_left_flag_list,
+                   'semiminima_rest':semiminima_rest_list,
+                   }
+        
+        self.numberOfSemibreves = len(retDict['semibrevis'])
+        self.numberOfDownstems = len(retDict['semibrevis_downstem'])
+        self.numberOfRightFlags = len(retDict['semiminima_right_flag'])
+        self.numberOfLeftFlags = len(retDict['semiminima_left_flag'])
+        self.numbefOfSMRests = len(retDict['semiminima_rest'])
+        
+        self.hasLastSB = False
+        if self.numberOfSemibreves > 0:
+            self.hasLastSB = ( retDict['semibrevis'][-1] == (len(self.brevisLength) - 1) )
+        
+        return retDict
+        
+    def translate(self):
+        '''
+        translates and returns a list of lengths for all the notes in self.brevisLength
+        '''        
+        self.unchangeableNoteLengthsList = self.getUnchangeableNoteLengths()
+        self.unknownLengthsDict = self.classifyUnknownNotesByType(self.unchangeableNoteLengthsList)
+
+        for kl in self.unchangeableNoteLengthsList:
+            if kl is not None and kl <= self.minimaRemaining:
+                self.minimaRemaining -= kl
+                
 
         #Process everything else           
         if self.div.standardSymbol == '.i.':
-            if len(semibrevis_list) > 0:
-                avgSBLength = minRem/len(semibrevis_list)
-                for ind in semibrevis_list:
-                    if avgSBLength == 2:
-                        minimaLengths[ind] = 2.0
-                        minRem -= 2.0
-                    elif (2 < avgSBLength) and (avgSBLength < 3):
-                        if ind < (len(self.brevisLength)-1) and self.brevisLength[ind+1].mensuralType == 'minima':
-                            minimaLengths[ind] = 2.0
-                            minRem -= 2.0
-                        else:
-                            minimaLengths[ind] = 3.0
-                            minRem -= 3.0
-                    elif avgSBLength == 3.0:
-                        minimaLengths[ind] = 3.0
-                        minRem -= 3.0
-            minRem_tracker = minRem_tracker or (minRem > -0.0001) 
-        
+            knownLengthsList = self.translateDivI()        
         elif self.div.standardSymbol == '.n.':
-            extend_list = [] #brevises able to be lengthened
-            extend_num = 0
-            if len(semibrevis_list) > 0:
-                if semibrevis_list[-1] == (len(self.brevisLength) - 1) and len(semibrevis_downstem) == 0:
-                    for ind in semibrevis_list[:-1]:
-                        if self.brevisLength[ind+1].mensuralType == 'minima':
-                            minimaLengths[ind] = 2.0
-                            minRem -= 2.0
-                            extend_list.append(ind)
-                        else:
-                            minimaLengths[ind] = 3.0
-                            minRem -= 3.0
-                    minimaLengths[-1] = max(minRem, 3.0)
-                    minRem -= max(minRem, 3.0)
-            
-                    extend_num = min(minimaLengths[-1] - 3, len(extend_list))
-                    if minRem >= 0:
-                        minimaLengths, minRem = processBL(self.brevisLength, minimaLengths, extend_list, extend_num, 1,  minRem, releases = -1)
-                else:
-                    for ind in semibrevis_list:
-                        if ind < (len(self.brevisLength)-1) and self.brevisLength[ind+1].mensuralType == 'minima':
-                            minimaLengths[ind] = 2.0
-                            minRem -= 2.0
-                            extend_list.append(ind)
-                        else:
-                            minimaLengths[ind] = 3.0
-                            minRem -= 3.0
-                    if len(semibrevis_downstem) == 0:
-                        extend_num = min(minRem, len(extend_list))
-                        if minRem >= 0:
-                            minimaLengths, minRem = processBL(self.brevisLength, minimaLengths, extend_list, extend_num, 1, minRem)
-                    else:
-                        semibrevis_downstem = semibrevis_downstem[0]
-                        minimaLengths[semibrevis_downstem] = max(minRem, 3.0)
-                        minRem -= max(minRem, 3.0)
-                        extend_num = min(minimaLengths[semibrevis_downstem] - 4, len(extend_list))
-                        if semibrevis_downstem != len(self.brevisLength) - 1:
-                            if minRem >= 0:
-                                minimaLengths, minRem = processBL(self.brevisLength, minimaLengths, extend_list, extend_num, 1, minRem, releases = semibrevis_downstem)
-                minRem_tracker = minRem_tracker or (minRem > -0.0001)
-                        
+            knownLengthsList = self.translateDivN()                        
         elif self.div.standardSymbol == '.q.' or self.div.standardSymbol == '.p.':
-            extend_list = []
-            extend_num = 0
-            
-            if len(semibrevis_downstem) == 0:
-                semibrevis_downstem = None
-            else: #Only room for one downstem per brevis length
-                semibrevis_downstem = semibrevis_downstem[0] 
-                
-            for ind in semibrevis_list[:-1]:
-                minimaLengths[ind] = 2.0
-                minRem -= 2.0
-            
-            if semibrevis_downstem == (len(self.brevisLength) - 1):
-                for ind in semiminima_right_flag_list+semiminima_left_flag_list+semiminima_rest_list:
-                    minimaLengths[ind] = 0.5
-                    minRem -= 0.5
-                minimaLengths[semibrevis_downstem] = minRem
-                minRem = 0
-            else:
-                strength = 0
-                minimaLengths_changeable = minimaLengths[:]
-                minimaLengths_static = minimaLengths[:]
-                minRem_changeable = minRem 
-                minRem_static = minRem
-                
-                if len(semiminima_right_flag_list) > 0 and len(semiminima_left_flag_list) > 0:
-                    lengths = [(0.5,0.5), (float(2)/3, 0.5), (0.5, float(2)/3), (float(2)/3, float(2)/3)]
-    
-                    for (left_length, right_length) in lengths:
-                        for ind in semiminima_left_flag_list:
-                            minimaLengths_changeable[ind] = left_length
-                            minRem_changeable -= left_length
-                        for ind in semiminima_right_flag_list:
-                            minimaLengths_changeable[ind] = right_length
-                            minRem_changeable -= right_length
-                            
-                        if left_length == right_length:
-                            for ind in semiminima_rest_list:
-                                minimaLengths_changeable[ind] = left_length
-                                minRem_changeable -= left_length
-                            if semibrevis_downstem is not None:
-                                if len(semibrevis_list) > 0:
-                                    minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                    minRem_changeable -= 2.0
-                                minimaLengths_changeable[semibrevis_downstem] = max(2.0, minRem_changeable)
-                                minRem_changeable -= max(2.0, minRem_changeable)
-                            else:
-                                if len(semibrevis_list) > 0 and semibrevis_list[-1] == len(self.brevisLength) - 1:
-                                    minimaLengths_changeable[semibrevis_list[-1]] = max(2.0, minRem_changeable)
-                                    minRem_changeable -= max(2.0, minRem_changeable)
-                                else:
-                                    if len(semibrevis_list) > 0:
-                                        minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                        minRem_changeable -= 2.0
-                        else:
-                            master_list = semiminima_left_flag_list + semiminima_right_flag_list + semiminima_rest_list
-                            
-                            for ind in semiminima_rest_list:
-                                curIndex = int(master_list.index(ind))
-                                if ( curIndex == 0 and master_list[curIndex+1] in semiminima_left_flag_list ) or \
-                                     ( curIndex == len(master_list) - 1 and master_list[curIndex - 1] in semiminima_left_flag_list ) or \
-                                     ( master_list[curIndex-1] in semiminima_left_flag_list and master_list[curIndex+1] in semiminima_left_flag_list ):
-                                    minimaLengths_changeable[ind] = left_length
-                                    minRem_changeable -= left_length
-                                elif ( (curIndex == 0 and master_list[curIndex+1] in semiminima_right_flag_list) or
-                                     (curIndex == len(master_list) - 1 and master_list[curIndex - 1] in semiminima_right_flag_list) or
-                                     (master_list[curIndex-1] in semiminima_right_flag_list and master_list[curIndex+1] in semiminima_right_flag_list) ):
-                                    minimaLengths_changeable[ind] = right_length
-                                    minRem_changeable -= right_length
-                                else:
-                                    minimaLengths_changeable[ind] = 0.5
-                                    extend_list.append(ind)
-                                extend_list = list(set(extend_list)) #repeated iterations
-                            
-                            if semibrevis_downstem is not None:
-                                if len(semibrevis_list) > 0:
-                                    minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                    minRem_changeable -= 2.0
-                                minimaLengths_changeable[semibrevis_downstem] = max(minRem_changeable, 2.0)
-                                extend_num = min(6*minRem_changeable - 15.0, len(extend_list))
-                                minRem_changeable -= max(minRem_changeable, 2.0)
-                                if minRem_changeable >= 0:
-                                    minimaLengths_changeable, minRem_changeable = processBL(self.brevisLength, minimaLengths_changeable, extend_list, extend_num, float(1)/6, minRem_changeable, releases = semibrevis_downstem)
-                            else:
-                                if len(semibrevis_list) > 0 and semibrevis_list[-1] == len(self.brevisLength) - 1:
-                                    minimaLengths_changeable[semibrevis_list[-1]] = max(minRem_changeable, 2.0)
-                                    extend_num = min(6*minRem_changeable - 12.0, len(extend_list))
-                                    minRem_changeable -= max(minRem_changeable, 2.0)
-                                    if minRem_changeable >= 0:
-                                        minimaLengths_changeable, minRem_changeable = processBL(self.brevisLength, minimaLengths_changeable, extend_list, extend_num, float(1)/6, minRem_changeable, releases = -1)
-                                else:
-                                    if len(semibrevis_list) > 0:
-                                        minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                        minRem_changeable -= 2.0
-                                    
-                                    extend_num = len(extend_list)
-                                    if minRem_changeable >= 0:
-                                        minimaLengths_changeable, minRem_changeable = processBL(self.brevisLength, minimaLengths_changeable, extend_list, extend_num, float(1)/6, minRem_changeable)                                      
-                                    
-                        tempStrength = self._evaluateBL(self.div, self.brevisLength, minimaLengths_changeable)      
+            knownLengthsList = self.translateDivPQ()
+        else:  # .o. or .d.
+            knownLengthsList = self.translateDivOD()
 
-                        if (tempStrength > strength) and (minRem_changeable > -0.0001): #Technically, >= 0, but rounding error occurs.
-                            minimaLengths = minimaLengths_changeable[:]
-                            minRem = minRem_changeable
-                            strength = tempStrength
-                        minimaLengths_changeable = minimaLengths_static
-                        minRem_tracker = minRem_tracker or (minRem_changeable > -0.0001)
-                        minRem_changeable = minRem_static
-                        
-                elif len(semiminima_left_flag_list) == 0 and len(semiminima_right_flag_list) == 0:
-                    
-                    if semibrevis_downstem is not None:
-                        if len(semibrevis_list) > 0:
-                            minimaLengths[semibrevis_list[-1]] = 2.0
-                            minRem -= 2.0
-                        minimaLengths[semibrevis_downstem] = max(minRem, 2.0)
-                        minRem -= max(minRem, 2.0)
-                    else:
-                        if len(semibrevis_list) > 0 and semibrevis_list[-1] == len(self.brevisLength) - 1:
-                            minimaLengths[semibrevis_list[-1]] = max(minRem, 2.0)
-                            minRem -= max(minRem, 2.0)
-                        else:
-                            if len(semibrevis_list) > 0:
-                                minimaLengths[semibrevis_list[-1]] = 2.0
-                                minRem -= 2.0
-                    minRem_tracker = minRem_tracker or (minRem > -0.0001)            
-                else:
-                    lengths = [0.5, float(2)/3]
-                    master_list = semiminima_left_flag_list + semiminima_right_flag_list + semiminima_rest_list
-                    
-                    for length in lengths:
-                        for ind in master_list:
-                            minimaLengths_changeable[ind] = length
-                            minRem_changeable -= length
-                        
-                        if semibrevis_downstem is not None:
-                            if len(semibrevis_list) > 0:
-                                minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                minRem_changeable -= 2.0
-
-                            minimaLengths_changeable[semibrevis_downstem] = minRem_changeable
-                        else:
-                            if len(semibrevis_list) > 0 and semibrevis_list[-1] == len(self.brevisLength) - 1:
-                                minimaLengths_changeable[semibrevis_list[-1]] = max(minRem_changeable, 2.0)
-                                minRem_changeable -= max(minRem_changeable, 2.0)
-                            else:
-                                if len(semibrevis_list) > 0:
-                                    minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                    minRem_changeable -= 2.0
-                                    
-                        tempStrength = self._evaluateBL(self.div, self.brevisLength, minimaLengths_changeable)
-                        
-                        if (tempStrength > strength) and (minRem_changeable > -0.0001):
-                            minimaLengths = minimaLengths_changeable[:]
-                            minRem = minRem_changeable
-                            strength = tempStrength
-                        minimaLengths_changeable = minimaLengths_static  
-                        minRem_tracker = minRem_tracker or (minRem_changeable > -0.0001)   
-                        minRem_changeable = minRem_static 
-                        
-        else:
-            extend_list_1 = []
-            extend_num_1 = 0
-            extend_list_2 = []
-            extend_num_2 = 0
-            
-            for ind in semibrevis_list[:-1]:
-                minimaLengths[ind] = 2.0
-                extend_list_1.append(ind)
-                minRem -= 2.0
-            
-            minimaLengths_changeable = minimaLengths[:]
-            minRem_changeable = minRem
-            minimaLengths_static = minimaLengths[:]
-            minRem_static = minRem
-               
-            if len(semibrevis_downstem) < 2:
-                if len(semibrevis_downstem) > 0 and semibrevis_downstem[0] == len(self.brevisLength) - 1:
-                    for ind in semiminima_left_flag_list + semiminima_right_flag_list + semiminima_rest_list:
-                        minimaLengths[ind] = 0.5
-                        minRem -= 0.5
-                    if len(semibrevis_list) > 0:
-                        for ind in semibrevis_list:
-                            minimaLengths[ind] = 2.0
-                            minRem -= 2.0
-                            extend_list_1.append(ind)
-                    minimaLengths[semibrevis_downstem[0]] = max(minRem, 2.0)
-                    minRem -= max(minRem, 2.0)
-                else:
-                    if len(semiminima_left_flag_list) > 0 and len(semiminima_right_flag_list) > 0:
-                        lengths = [(0.5,0.5), (float(2)/3, 0.5), (0.5, float(2)/3), (float(2)/3, float(2)/3)]
-                        strength = 0
-    
-                        for (left_length, right_length) in lengths:
-                            
-                            for ind in semiminima_left_flag_list:
-                                minimaLengths_changeable[ind] = left_length
-                                minRem_changeable -= left_length
-                            for ind in semiminima_right_flag_list:
-                                minimaLengths_changeable[ind] = right_length
-                                minRem_changeable -= right_length
-                            
-                            if left_length == right_length:
-                                for ind in semiminima_rest_list:
-                                    minimaLengths_changeable[ind] = left_length
-                                    minRem_changeable -= left_length
-                                
-                                if len(semibrevis_downstem) > 0:
-                                    downstem = semibrevis_downstem[0]
-                                    if len(semibrevis_list) > 0:
-                                        minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                        extend_list_1.append(semibrevis_list[-1])
-                                        extend_list_1 = list(set(extend_list_1)) #For repeated iterations
-                                        minRem_changeable -= 2.0
-                                    
-                                    avgSBLen = minRem_changeable/len(semibrevis_list)
-                                    extend_num_1 = min(len(extend_list_1), 0.5*minRem_changeable - 2.0)
-                                    minimaLengths_changeable[downstem] = max(minRem_changeable, 4.0)
-                                    minRem -= max(minRem_changeable, 4.0)
-                                    
-                                    minimaLengths_changeable, minRem_changeable = processBL(self.brevisLength, minimaLengths_changeable, extend_list_1, extend_num_1, 2.0, minRem_changeable, releases = downstem)
-                                
-                                else:
-                                    if len(semibrevis_list) > 0:
-                                        if semibrevis_list[-1] == len(self.brevisLength) - 1:
-                                            minimaLengths_changeable[semibrevis_list[-1]] = max(minRem_changeable, 2.0)
-                                            extend_num_1 = min(len(extend_list_1), int(0.5*minRem_changeable - 1.0))
-                                            minRem -= max(minRem_changeable, 2.0)
-                                            
-                                            if minRem >= 0:
-                                                minimaLengths_changeable, minRem_changeable = processBL(self.brevisLength, minimaLengths_changeable, extend_list_1, extend_num_1, 2.0, minRem_changeable, releases = -1)
-                                        else:
-                                            minimaLengths[semibrevis_list[-1]] = 2.0
-                                            extend_list_1.append(semibrevis_list[-1])
-                                            extend_list_1 = list(set(extend_list_1))
-                                            extend_num_1 = len(extend_list_1)
-                                            minRem -= 2.0
-                                            
-                                            if minRem >= 0:
-                                                minimaLengths_changeable, minRem_changeable = processBL(self.brevisLength, minimaLengths_changeable, extend_list_1, extend_num_1, 2.0, minRem_changeable)
-                                
-                            else:
-                                master_list = semiminima_left_flag_list + semiminima_right_flag_list + semiminima_rest_list
-                                
-                                for ind in semiminima_rest_list:
-                                    curIndex = int(master_list.index(ind))
-                                    if ( curIndex == 0 and master_list[curIndex+1] in semiminima_left_flag_list ) or \
-                                         ( curIndex == len(master_list) - 1 and master_list[curIndex - 1] in semiminima_left_flag_list ) or \
-                                         ( master_list[curIndex-1] in semiminima_left_flag_list and master_list[curIndex+1] in semiminima_left_flag_list ):
-                                        minimaLengths_changeable[ind] = left_length
-                                        minRem_changeable -= left_length
-                                    elif ( curIndex == 0 and master_list[curIndex+1] in semiminima_right_flag_list ) or \
-                                         ( curIndex == len(master_list) - 1 and master_list[curIndex - 1] in semiminima_right_flag_list ) or \
-                                         ( master_list[curIndex-1] in semiminima_right_flag_list and master_list[curIndex+1] in semiminima_right_flag_list ):
-                                        minimaLengths_changeable[ind] = right_length
-                                        minRem_changeable -= right_length
-                                    else:
-                                        minimaLengths_changeable[ind] = 0.5
-                                        extend_list_2.append(ind)
-                                    extend_list_2 = list(set(extend_list_2))
-                                
-                                diff_list = (2.0, float(1)/6)
-                                if len(semibrevis_downstem) > 0:
-                                    downstem = semibrevis_downstem[0]
-                                    releases = [downstem, downstem]
-                                    
-                                    if len(semibrevis_list) > 0:
-                                        minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                        extend_list_1.append(semibrevis_list[-1])
-                                        extend_list_1 = list(set(extend_list_1))
-                                        change_nums = (len(extend_list_1), len(extend_list_2))
-                                        minRem_changeable -= 2.0
-                                    
-                                    extend_num_1 = min(len(extend_list_1), int(0.5(minRem_changeable - 2.0)))
-                                    extend_num_2 = min(len(extend_list_2), 6*minRem_changeable - 12.0)
-                                    minimaLengths_changeable[downstem] = max(minRem_changeable, 4.0)
-                                    minRem_changeable -= 4.0
-                                    change_list = (extend_list_1, extend_list_2)
-                                    change_nums = (extend_num_1, extend_num_2)
-                                    
-                                    minimaLengths_changeable, minRem_changeable = processBL(self.brevisLength, minimaLengths_changeable, change_list, change_nums, diff_list, minRem_changeable, releases = releases, multi = 1)
-                                    
-                                else:
-                                    if len(semibrevis_list) > 0:
-                                        releases = [-1, -1]
-                                        if semibrevis_list[-1] == len(self.brevisLength) - 1:
-                                            minimaLengths_changeable[semibrevis_list[-1]] = max(minRem_changeable, 2.0)
-                                            extend_num_1 = min(len(extend_list_1),int(0.5*minRem_changeable - 1.0))
-                                            extend_num_2 = min(len(extend_list_2), 6*minRem_changeable - 12.0)
-                                            minRem_changeable -= max(minRem_changeable, 2.0)
-                                            change_list = (extend_list_1, extend_list_2)
-                                            change_nums = (extend_num_1, extend_num_2)
-                                           
-                                            minimaLengths_changeable, minRem_changeable = processBL(self.brevisLength, minimaLengths_changeable, change_list, change_nums, diff_list, minRem_changeable, releases = releases, multi = 1)
-                                        else:
-                                            minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                            extend_list_1.append(semibrevis_list[-1])
-                                            extend_list_1 = list(set(extend_list_1))
-                                            change_list = (extend_list_1, extend_list_2)
-                                            change_nums = (len(extend_list_1), len(extend_list_2))
-                                            minRem_changeable -= 2.0
-                                            
-                                            minimaLengths_changeable, minRem_changeable = processBL(self.brevisLength, minimaLengths_changeable, change_list, change_nums, diff_list, minRem_changeable, multi = 1)
-                                    else:
-                                        extend_num_2 = len(extend_list_2)
-                                        minimaLengths_changeable, minRem_changeable = processBL(self.brevisLength, minimaLengths_changeable, extend_list_2, extend_num_2, float(1)/6, minRem_changeable)
-                                          
-                            tempStrength = self._evaluateBL(self.div, self.brevisLength, minimaLengths_changeable)
-                            
-                            if tempStrength > strength and minRem_changeable > -0.0001:
-                                minimaLengths = minimaLengths_changeable[:]
-                                minRem = minRem_changeable
-                                strength = tempStrength
-                            minimaLengths_changeable = minimaLengths_static
-                            minRem_tracker = minRem_tracker or (minRem_changeable > -0.0001)
-                            minRem_changeable = minRem_static
-                    
-                    elif len(semiminima_left_flag_list) == 0 and len(semiminima_right_flag_list) == 0:
-                        if len(semibrevis_downstem) > 0:
-                            semibrevis_downstem = semibrevis_downstem[0]
-                            if len(semibrevis_list) > 0:
-                                minimaLengths[semibrevis_list[-1]] = 2.0
-                                extend_list_1.append(semibrevis_list[-1])
-                                minRem -= 2.0
-
-                            extend_num_1 = min(len(extend_list_1), int(0.5*minRem - 2.0))
-                            minimaLengths[semibrevis_downstem] = max(minRem, 4.0)
-                            minRem -= max(minRem, 4.0)                     
-                            
-                            if minRem >= 0:
-                                minimaLengths, minRem = processBL(self.brevisLength, minimaLengths, extend_list_1, extend_num_1, 2.0, minRem, releases = semibrevis_downstem)
-                        
-                        else:
-                            if len(semibrevis_list) > 0:
-                                if semibrevis_list[-1] == len(self.brevisLength) - 1:
-                                    minimaLengths[semibrevis_list[-1]] = max(minRem, 2.0)
-                                    extend_num_1 = min(len(extend_list_1), int(0.5*minRem - 1.0))
-                                    minRem -= max(minRem, 2.0)
-                                    
-                                    if minRem >= 0:
-                                        minimaLengths, minRem = processBL(self.brevisLength, minimaLengths, extend_list_1, extend_num_1, 2.0, minRem, releases = -1)
-                                else:
-                                    minimaLengths[semibrevis_list[-1]] = 2.0
-                                    extend_list_1.append(semibrevis_list[-1])
-                                    extend_num_1 = len(extend_list_1)
-                                    minRem -= 2.0
-                                                
-                                    if minRem >= 0:
-                                        minimaLengths, minRem = processBL(self.brevisLength, minimaLengths, extend_list_1, extend_num_1, 2.0, minRem)
-                        minRem_tracker = minRem_tracker or (minRem > -0.0001)
-                    
-                    else:
-                        lengths = [0.5, float(2)/3]
-                        strength = 0
-                        semiminima_master_list = semiminima_left_flag_list + semiminima_right_flag_list + semiminima_rest_list
-                        for length in lengths:
-                            for ind in semiminima_master_list:
-                                minimaLengths_changeable[ind] = length
-                                minRem_changeable -= length
-                            
-                            if len(semibrevis_downstem) > 0:
-                                downstem = semibrevis_downstem[0]
-                                if len(semibrevis_list) > 0:
-                                    minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                    extend_list_1.append(semibrevis_list[-1])
-                                    extend_list_1 = list(set(extend_list_1))
-                                    minRem_changeable -= 2.0
-                                
-                                extend_list_1 = list(set(extend_list_1))
-                                extend_num_1 = min(len(extend_list_1), int(0.5*minRem_changeable - 2.0))
-                                minimaLengths_changeable[downstem] = max(minRem_changeable, 4.0)
-                                minRem_changeable -= max(minRem_changeable, 4.0)
-                                
-                                if minRem_changeable >= 0:
-                                    minimaLengths_changeable, minRem_changeable = processBL(self.brevisLength, minimaLengths_changeable, extend_list_1, extend_num_1, minRem_changeable, releases = semibrevis_downstem)
-                            
-                            else:
-                                if len(semibrevis_list) > 0: 
-                                    if semibrevis_list[-1] == len(self.brevisLength) - 1:
-                                        minimaLengths_changeable[semibrevis_list[-1]] = max(minRem_changeable, 2.0)
-                                        extend_num_1 = min(len(extend_list_1), int(0.5*minRem_changeable - 1.0))
-                                        minRem_changeable -= max(minRem_changeable, 2.0)
-                                        
-                                        extend_list_1 = list(set(extend_list_1))
-                                        
-                                        if minRem_changeable >= 0:
-                                            minimaLengths_changeable, minRem_changeable = processBL(self.brevisLength, minimaLengths_changeable, extend_list_1, extend_num_1, 2.0, minRem_changeable, releases = -1)
-                                    else:
-                                        minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                                        extend_list_1.append(semibrevis_list[-1])
-                                        extend_num_1 = len(extend_list_1)
-                                        minRem_changeable -= 2.0
-                                        
-                                        extend_list_1 = list(set(extend_list_1))
-                                        
-                                        if minRem_changeable >= 0:
-                                            minimaLengths_changeable, minRem_changeable = processBL(self.brevisLength, minimaLengths_changeable, extend_list_1, extend_num_1, 2.0, minRem_changeable)
-                            
-                            tempStrength = self._evaluateBL(self.div, self.brevisLength, minimaLengths_changeable)
-                            
-                            if tempStrength > strength and minRem_changeable > -0.0001:
-                                minimaLengths = minimaLengths_changeable[:]
-                                minRem = minRem_changeable
-                                strength = tempStrength
-                            minimaLengths_changeable = minimaLengths_static
-                            minRem_tracker = minRem_tracker or (minRem_changeable > -0.0001)
-                            minRem_changeable = minRem_static
-            
-            elif len(semibrevis_downstem) >= 2:
-                #Don't need to lengths other SBs, not enough room
-                #Hence, skip straight to semiminima 
-                
-                lengths = [(0.5, 0.5), (float(2)/3, 0.5), (0.5, float(2)/3), (float(2)/3, float(2)/3)]
-                strength = 0
-                
-                for length in lengths:
-                    left_length, right_length  = length
-                    
-                    if len(semibrevis_list) > 0:
-                        minimaLengths_changeable[semibrevis_list[-1]] = 2.0
-                        minRem_changeable -= 2.0
-                    
-                    for ind in semiminima_left_flag_list:
-                        minimaLengths_changeable[ind] = left_length
-                        minRem_changeable -= left_length
-                    for ind in semiminima_right_flag_list:
-                        minimaLengths_changeable[ind] = right_length
-                        minRem_changeable -= right_length
-                    
-                    if left_length == right_length:
-                        for ind in semiminima_rest_list:
-                            minimaLengths_changeable[ind] = left_length
-                            minRem_changeable -= left_length
-                    else:
-                        master_list = semiminima_left_flag_list + semiminima_right_flag_list + semiminima_rest_list
-                            
-                        for ind in semiminima_rest_list:
-                            curIndex = int(master_list.index(ind))
-                            if ( curIndex == 0 and master_list[curIndex+1] in semiminima_left_flag_list ) or \
-                                 ( curIndex == len(master_list) - 1 and master_list[curIndex - 1] in semiminima_left_flag_list ) or \
-                                 ( master_list[curIndex-1] in semiminima_left_flag_list and master_list[curIndex+1] in semiminima_left_flag_list ):
-                                minimaLengths_changeable[ind] = left_length
-                                minRem_changeable -= left_length
-                            elif ( curIndex == 0 and master_list[curIndex+1] in semiminima_right_flag_list ) or \
-                                 ( curIndex == len(master_list) - 1 and master_list[curIndex - 1] in semiminima_right_flag_list ) or \
-                                 ( master_list[curIndex-1] in semiminima_right_flag_list and master_list[curIndex+1] in semiminima_right_flag_list ):
-                                minimaLengths_changeable[ind] = right_length
-                                minRem_changeable -= right_length
-                            else:
-                                minimaLengths_changeable[ind] = 0.5
-                                extend_list_2.append(ind)
-                            
-                            extend_num_2 = len(extend_list_2)
-                            minimaLengths_changeable, minRem_changeable = minimaLengths_changeable, minRem_changeable = processBL(self.brevisLength, minimaLengths_changeable, extend_list_2, extend_num_2, float(1)/6, minRem_changeable)
-                    
-                    newMensuralBL = [medren.MensuralNote('A', 'SB') for i in range(len(semibrevis_downstem))]
-                    
-                    newDiv = Divisione('.d.')
-                    newDiv.minimaPerBrevis = minRem_changeable
-                        
-                    tempTBL = TranslateBrevisLength(divisione = newDiv, BL = newMensuralBL, pDS = True)
-                    for i in range(len(semibrevis_downstem)):
-                        minimaLengths_changeable[semibrevis_downstem[i]] = max(tempTBL.getMinimaLengths()[i], 4.0)
-                        minRem_changeable -= max(tempTBL.getMinimaLengths()[i], 4.0)
-                    
-                    tempStrength = self._evaluateBL(self.div, self.brevisLength, minimaLengths_changeable)
-                    
-                    if tempStrength > strength and minRem_changeable > -0.0001:
-                        minimaLengths = minimaLengths_changeable[:]
-                        minRem = minRem_changeable
-                        strength = tempStrength
-                    minimaLengths_changeable = minimaLengths_static[:]
-                    minRem_tracker = minRem_tracker or (minRem_changeable > -0.0001)
-                    minRem_changeable = minRem_static
-                    
-        
-        if not minRem_tracker:
+        if not self.minRem_tracker:
             self.doubleNum += 1
             newDiv = Divisione(self.div.standardSymbol)
             newDiv.minimaPerBrevis = 2*self.div.minimaPerBrevis
-            tempTBL = TranslateBrevisLength(newDiv, self.brevisLength)
-            minimaLengths = tempTBL.getMinimaLengths()
+            raise Exception('measure: %s, minRem: %s' % (self.brevisLength, self.minimaRemaining))
+            tempTBL = TranslateBrevisLength(newDiv, self.brevisLength[:])
+            knownLengthList = tempTBL.getKnownLengths()
             
-        for i in range(len(minimaLengths)): #Float errors
-            ml = minimaLengths[i]
-            if abs(ml - round(ml)) < 0.0001:
-                minimaLengths[i] = round(ml)
+        for i in range(len(knownLengthsList)): #Float errors
+          ml = knownLengthsList[i]
+          try:
+              if abs(ml - round(ml)) < 0.0001:
+                  knownLengthsList[i] = round(ml)
+          except TypeError:
+              raise TypeError('ml is screwed up! %s' % ml)
+           
+        return knownLengthsList
+
+    def translateDivI(self, unchangeableNoteLengthsList = None, unknownLengthsDict = None, minRem = None):
+        '''
+        >>> from music21 import *
+        >>> div = trecento.notation.Divisione('.i.')
+        >>> names = ['SB', 'M', 'SB']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> unchlist = TBL.getUnchangeableNoteLengths()
+        >>> unkldict = TBL.classifyUnknownNotesByType(unchlist)        
+        >>> TBL.translateDivI(unchlist, unkldict, 5.0)
+        [2.0, 1.0, 3.0]
+        '''
         
-        return minimaLengths
+        if unchangeableNoteLengthsList is None:
+            unchangeableNoteLengthsList = self.unchangeableNoteLengthsList
+        else:
+            self.unchangeableNoteLengthsList = unchangeableNoteLengthsList
+            
+        if unknownLengthsDict is None:
+            unknownLengthsDict = self.unknownLengthsDict
+        else:
+            self.unknownLengthsDict = unknownLengthsDict
+            
+        if minRem is None:
+            minRem = self.minimaRemaining
+
+        semibrevis_list = unknownLengthsDict['semibrevis']
+
+        knownLengthsList = unchangeableNoteLengthsList[:]
+
+        if self.numberOfSemibreves > 0:
+            avgSBLength = minRem/self.numberOfSemibreves
+            for ind in semibrevis_list:
+                if avgSBLength == 2:
+                    knownLengthsList[ind] = 2.0
+                    minRem -= 2.0
+                elif (2 < avgSBLength) and (avgSBLength < 3):
+                    if ind < (len(self.brevisLength)-1) and self.brevisLength[ind+1].mensuralType == 'minima':
+                        knownLengthsList[ind] = 2.0
+                        minRem -= 2.0
+                    else:
+                        knownLengthsList[ind] = 3.0
+                        minRem -= 3.0
+                elif avgSBLength == 3.0:
+                    knownLengthsList[ind] = 3.0
+                    minRem -= 3.0
+
+        if minRem > -0.0001:
+            self.minimaRemaining = minRem
+            self.minRem_tracker = True
+
+        return knownLengthsList
+
+    def translateDivN(self, unchangeableNoteLengthsList = None, unknownLengthsDict = None, minRem = None):
+        '''
+        >>> from music21 import *    
+        >>> div = trecento.notation.Divisione('.n.')
+        >>> names = ['SB', 'M', 'M', 'M', 'SB', 'M']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> unchlist = TBL.getUnchangeableNoteLengths()
+        >>> unkldict = TBL.classifyUnknownNotesByType(unchlist)
+        >>> TBL.translateDivN(unchlist, unkldict, 5.0)
+        [3.0, 1.0, 1.0, 1.0, 2.0, 1.0]
+        
+        >>> BL[-2].setStem('down')
+        >>> unchlist = TBL.getUnchangeableNoteLengths()
+        >>> unkldict = TBL.classifyUnknownNotesByType(unchlist)
+        >>> TBL.translateDivN(unchlist, unkldict, 5.0)
+        [2.0, 1.0, 1.0, 1.0, 3.0, 1.0]
+        
+        >>> names = ['SB', 'M', 'M', 'M', 'SB']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> unchlist = TBL.getUnchangeableNoteLengths()
+        >>> unkldict = TBL.classifyUnknownNotesByType(unchlist)
+        >>> TBL.translateDivN(unchlist, unkldict, 6.0)
+        [3.0, 1.0, 1.0, 1.0, 3.0]
+        
+        
+        >>> names = ['SB', 'M', 'SB']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> unchlist = TBL.getUnchangeableNoteLengths()
+        >>> unkldict = TBL.classifyUnknownNotesByType(unchlist)
+        >>> TBL.translateDivN(unchlist, unkldict, 8.0)
+        [2.0, 1.0, 6.0]
+        
+        >>> BL[0].setStem('down')
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> unchlist = TBL.getUnchangeableNoteLengths()
+        >>> unkldict = TBL.classifyUnknownNotesByType(unchlist)
+        >>> TBL.translateDivN(unchlist, unkldict, 8.0)
+        [5.0, 1.0, 3.0]
+        '''
+        
+        if unchangeableNoteLengthsList is None:
+            unchangeableNoteLengthsList = self.unchangeableNoteLengthsList
+        else:
+            self.unchangeableNoteLengthsList = unchangeableNoteLengthsList
+            
+        if unknownLengthsDict is None:
+            unknownLengthsDict = self.unknownLengthsDict
+        else:
+            self.unknownLengthsDict = unknownLengthsDict
+        
+        if minRem is None:
+            minRem = self.minimaRemaining
+                
+        semibrevis_list = unknownLengthsDict['semibrevis']
+        semibrevis_downstem = unknownLengthsDict['semibrevis_downstem']
+        semibrevis_downstem_index = None
+        
+        if self.numberOfDownstems > 0:
+            semibrevis_downstem_index = semibrevis_downstem[0] #Only room for one downstem
+
+        knownLengthsList = unchangeableNoteLengthsList[:]
+        extend_list = [] #brevises able to be lengthened
+        extend_num = 0
+        if self.numberOfSemibreves > 0:
+            
+            for ind in semibrevis_list[:-1]:
+                # make all but final non-downstem semibreves followed by minima = 2.0 
+                if self.brevisLength[ind+1].mensuralType == 'minima':
+                    knownLengthsList[ind] = 2.0
+                    minRem -= 2.0
+                    extend_list.append(ind)
+                else: # if not followed by minima -- make 3.0
+                    knownLengthsList[ind] = 3.0
+                    minRem -= 3.0
+            
+            shrink_tup = ()
+            if self.numberOfDownstems > 0:
+                
+                if (not self.hasLastSB) and (self.brevisLength[semibrevis_list[-1]+1].mensuralType == 'minima'):
+                    knownLengthsList[semibrevis_list[-1]] = 2.0
+                    minRem -= 2.0
+                    extend_list.append(semibrevis_list[-1])
+                
+                else:
+                    knownLengthsList[semibrevis_list[-1]] = 3.0
+                    minRem -= 3.0
+                
+                knownLengthsList[semibrevis_downstem_index] = max(minRem, 3)
+                minRem -= knownLengthsList[semibrevis_downstem_index]
+                
+                extend_num = min(knownLengthsList[semibrevis_downstem_index] - 3, len(extend_list))
+                shrink_tup += semibrevis_downstem_index, 
+            
+            else: #no downstems
+                
+                if self.hasLastSB:
+                    knownLengthsList[semibrevis_list[-1]] = max(minRem, 3.0)
+                    minRem -= knownLengthsList[-1]
+                    
+                    extend_num = min(knownLengthsList[-1]- 3, len(extend_list))
+                    shrink_tup += -1,
+                    
+                elif self.numberOfSemibreves > 0: #SBs, but no last SB
+                    if (self.brevisLength[semibrevis_list[-1]+1].mensuralType == 'minima'):
+                        knownLengthsList[semibrevis_list[-1]] = 2.0
+                        minRem -= 2.0
+                        extend_list.append(semibrevis_list[-1])
+                
+                    else:
+                        knownLengthsList[semibrevis_list[-1]] = 3.0
+                        minRem -= 3.0
+                    
+                    extend_num = len(extend_list)
+                        
+            if (minRem > -0.0001) and (semibrevis_downstem_index != (len(self.brevisLength) - 1)):  
+                change_tup = (extend_list,)
+                num_tup = (extend_num,)
+                diff_tup = (1,)
+                
+                knownLengthsList, minRem = self.determineStrongestMeasureLengths(knownLengthsList, change_tup, num_tup, diff_tup, minRem, shrinkable_indices = shrink_tup)
+                
+        if minRem > -0.0001:
+            self.minimaRemaining = minRem
+            self.minRem_tracker = True
+
+        return knownLengthsList
+
+    def translateDivPQ(self, unchangeableNoteLengthsList = None, unknownLengthsDict = None, minRem = None):
+        '''
+        >>> from music21 import *
+        >>> div = trecento.notation.Divisione('.q.')
+        >>> names = ['SB','SB']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]        
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> unchlist = TBL.getUnchangeableNoteLengths()
+        >>> unkldict = TBL.classifyUnknownNotesByType(unchlist)
+        >>> TBL.translateDivPQ(unchlist, unkldict, 4.0)
+        [2.0, 2.0]
+        
+        >>> names = ['M', 'SM', 'SM', 'SM', 'SM', 'SM']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> BL[4] = medren.MensuralRest('SM')
+        >>> BL[1].setFlag('up','left')
+        >>> BL[2].setFlag('up', 'left')
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> unchlist = TBL.getUnchangeableNoteLengths()
+        >>> unkldict = TBL.classifyUnknownNotesByType(unchlist)
+        >>> TBL.translateDivPQ(unchlist, unkldict, 3.0)
+        [1.0, 0.5, 0.5, 0.666..., 0.666..., 0.666...]
+
+        >>> div = trecento.notation.Divisione('.p.')
+                >>> names = ['SB','SB', 'SB']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]        
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> unchlist = TBL.getUnchangeableNoteLengths()
+        >>> unkldict = TBL.classifyUnknownNotesByType(unchlist)
+        >>> TBL.translateDivPQ(unchlist, unkldict, 6.0)
+        [2.0, 2.0, 2.0]
+        
+        >>> names = ['M', 'SB', 'SM', 'SM']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> BL[1].setStem('down')
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> unchlist = TBL.getUnchangeableNoteLengths()
+        >>> unkldict = TBL.classifyUnknownNotesByType(unchlist)
+        >>> TBL.translateDivPQ(unchlist, unkldict, 5.0)
+        [1.0, 4.0, 0.5, 0.5]
+        
+        >>> names = ['SM', 'SM', 'SM', 'SM', 'SM', 'SM', 'SM', 'SB']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> BL[3] = medren.MensuralRest('SM')
+        >>> for mn in BL[:3]:
+        ...    mn.setFlag('up', 'left')
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> unchlist = TBL.getUnchangeableNoteLengths()
+        >>> unkldict = TBL.classifyUnknownNotesByType(unchlist)
+        >>> TBL.translateDivPQ(unchlist, unkldict, 6.0)
+        [0.666..., 0.666..., 0.666..., 0.5, 0.5, 0.5, 0.5, 2.0]
+        '''
+        
+        if unchangeableNoteLengthsList is None:
+            unchangeableNoteLengthsList = self.unchangeableNoteLengthsList
+        else:
+            self.unchangeableNoteLengthsList = unchangeableNoteLengthsList
+            
+        if unknownLengthsDict is None:
+            unknownLengthsDict = self.unknownLengthsDict
+        else:
+            self.unknownLengthsDict = unknownLengthsDict
+        
+        if minRem is None:
+            minRem = self.minimaRemaining
+        
+        semibrevis_list = unknownLengthsDict['semibrevis']
+        semibrevis_downstem = unknownLengthsDict['semibrevis_downstem']
+        semiminima_right_flag_list = unknownLengthsDict['semiminima_right_flag']
+        semiminima_left_flag_list = unknownLengthsDict['semiminima_left_flag']
+        semiminima_rest_list = unknownLengthsDict['semiminima_rest']
+
+        knownLengthsList = unchangeableNoteLengthsList[:]
+
+        extend_list = []
+        extend_num = 0
+        
+        semibrevis_downstem_index = None
+        if self.numberOfDownstems > 0: #Only room for one downstem per brevis length
+            semibrevis_downstem_index = semibrevis_downstem[0]
+            
+        for ind in semibrevis_list[:-1]:
+            knownLengthsList[ind] = 2.0
+            minRem -= 2.0
+        
+        if semibrevis_downstem_index == (len(self.brevisLength) - 1):
+            for ind in semiminima_right_flag_list+semiminima_left_flag_list+semiminima_rest_list:
+                knownLengthsList[ind] = 0.5
+                minRem -= 0.5
+            knownLengthsList[semibrevis_downstem_index] = minRem
+            minRem = 0
+            
+        else:
+            strength = 0
+            knownLengthsList_changeable = knownLengthsList[:]
+            knownLengthsList_static = knownLengthsList[:]
+            minRem_changeable = minRem 
+            minRem_static = minRem
+            
+            change_tup = ()
+            num_tup = ()
+            diff_tup = ()
+            shrink_tup = ()
+            
+
+            lengths = [(0.5,0.5), (float(2)/3, 0.5), (0.5, float(2)/3), (float(2)/3, float(2)/3)]
+
+            for (left_length, right_length) in lengths:
+                for ind in semiminima_left_flag_list:
+                    knownLengthsList_changeable[ind] = left_length
+                    minRem_changeable -= left_length
+                for ind in semiminima_right_flag_list:
+                    knownLengthsList_changeable[ind] = right_length
+                    minRem_changeable -= right_length
+                    
+                if left_length == right_length:
+                    
+                    for ind in semiminima_rest_list:
+                        knownLengthsList_changeable[ind] = left_length
+                        minRem_changeable -= left_length
+                        
+                    if self.numberOfDownstems > 0:
+                        
+                        if self.numberOfSemibreves > 0:
+                            knownLengthsList_changeable[semibrevis_list[-1]] = 2.0
+                            minRem_changeable -= 2.0
+                            
+                        knownLengthsList_changeable[semibrevis_downstem_index] = max(2.0, minRem_changeable)
+                        minRem_changeable -= knownLengthsList_changeable[semibrevis_downstem_index]
+                        
+                    else: #no downstems
+                        
+                        if self.hasLastSB:
+                            knownLengthsList_changeable[semibrevis_list[-1]] = max(2.0, minRem_changeable)
+                            minRem_changeable -= knownLengthsList_changeable[semibrevis_list[-1]]
+                        
+                        elif self.numberOfSemibreves > 0: #semibreves, but no ending SB
+                            knownLengthsList_changeable[semibrevis_list[-1]] = 2.0
+                            minRem_changeable -= 2.0
+                                
+                else: #left_length != right_length
+                    
+                    master_list = semiminima_left_flag_list + semiminima_right_flag_list + semiminima_rest_list
+                    
+                    for ind in semiminima_rest_list:
+                        
+                        curIndex = int(master_list.index(ind))
+                       
+                        # SM Rest is first among all SMs, followed by left flag SM
+                        # or, SM Rest is last among all SMs, preceded by left flag SM
+                        # or, SM Rest is surrounded by left flag SMs. 
+                        # Then, SM rest = left_length
+                        if ( curIndex == 0 and master_list[curIndex+1] in semiminima_left_flag_list ) or \
+                             ( curIndex == len(master_list) - 1 and master_list[curIndex - 1] in semiminima_left_flag_list ) or \
+                             ( master_list[curIndex-1] in semiminima_left_flag_list and master_list[curIndex+1] in semiminima_left_flag_list ):
+                            
+                            knownLengthsList_changeable[ind] = left_length
+                            minRem_changeable -= left_length
+                        
+                        # Same as above, but with right flag SMs. 
+                        # Then, SM rest = right_length                 
+                        elif ( (curIndex == 0 and master_list[curIndex+1] in semiminima_right_flag_list) or
+                             (curIndex == len(master_list) - 1 and master_list[curIndex - 1] in semiminima_right_flag_list) or
+                             (master_list[curIndex-1] in semiminima_right_flag_list and master_list[curIndex+1] in semiminima_right_flag_list) ):
+                            
+                            knownLengthsList_changeable[ind] = right_length
+                            minRem_changeable -= right_length
+                        
+                        #Otherwise, we don't know. Append SM Rest to extend list. 
+                        else:
+                            knownLengthsList_changeable[ind] = 0.5
+                            extend_list.append(ind)
+                        extend_list = _removeRepeatedElements(extend_list) # account for iterations w/o changing order.
+                    
+                    if self.numberOfDownstems > 0:
+                        
+                        if self.numberOfSemibreves > 0:
+                            knownLengthsList_changeable[semibrevis_list[-1]] = 2.0
+                            minRem_changeable -= 2.0
+                        
+                        knownLengthsList_changeable[semibrevis_downstem_index] = max(minRem_changeable, 2.0)
+                        extend_num = min(6*minRem_changeable - 15.0, len(extend_list))
+                        minRem_changeable -= knownLengthsList_changeable[semibrevis_downstem_index]
+                        
+                        shrink_tup += semibrevis_downstem_index,
+
+                    else: #No downstems
+                        if self.hasLastSB:
+                            
+                            knownLengthsList_changeable[semibrevis_list[-1]] = max(minRem_changeable, 2.0)
+                            extend_num = min(6*minRem_changeable - 12.0, len(extend_list))
+                            minRem_changeable -= max(minRem_changeable, 2.0)
+                            
+                            shrink_tup += -1,
+                        
+                        elif self.numberOfSemibreves > 0: #SBs, but no last SB
+                            knownLengthsList_changeable[semibrevis_list[-1]] = 2.0
+                            minRem_changeable -= 2.0
+                            extend_num = len(extend_list)
+                    
+                    change_tup += extend_list,
+                    num_tup += extend_num,
+                    diff_tup += float(1)/6,
+                            
+                    if minRem_changeable > -0.0001:
+                        knownLengthsList_changeable, minRem_changeable = self.determineStrongestMeasureLengths(knownLengthsList_changeable, change_tup, num_tup, diff_tup, minRem_changeable, shrinkable_indices = shrink_tup)
+                            
+                tempStrength = self.getBreveStrength(knownLengthsList_changeable) 
+                self.minimaRemaining = minRem_changeable     
+
+                if (tempStrength > strength) and (minRem_changeable > -0.0001): #Technically, >= 0, but rounding error occurs.
+                    knownLengthsList = knownLengthsList_changeable[:]
+                    minRem = minRem_changeable
+                    strength = tempStrength
+                
+                knownLengthsList_changeable = knownLengthsList_static
+                
+                if minRem_changeable > -0.0001:
+                    self.minRem_tracker = True
+                
+                minRem_changeable = minRem_static
+
+        return knownLengthsList
+
+    def translateDivOD(self, unchangeableNoteLengthsList = None, unknownLengthsDict = None, minRem = None):
+        '''
+        >>> from music21 import *
+        >>> div = trecento.notation.Divisione('.o.')
+        >>> names = ['SB', 'SB', 'SB']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> BL[1].setStem('down')
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> unchlist = TBL.getUnchangeableNoteLengths()
+        >>> unkldict = TBL.classifyUnknownNotesByType(unchlist)
+        >>> TBL.translateDivOD(unchlist, unkldict, 8.0)
+        [2.0, 4.0, 2.0]
+        
+        >>> names = ['SM', 'SM', 'SM', 'SB', 'SB']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> unchlist = TBL.getUnchangeableNoteLengths()
+        >>> unkldict = TBL.classifyUnknownNotesByType(unchlist)
+        >>> TBL.translateDivOD(unchlist, unkldict, 8.0)
+        [0.666..., 0.666..., 0.666..., 2.0, 3.999...]
+
+        >>> div = trecento.notation.Divisione('.d.')
+        >>> names = ['SB', 'SB']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> unchlist = TBL.getUnchangeableNoteLengths()
+        >>> unkldict = TBL.classifyUnknownNotesByType(unchlist)
+        >>> TBL.translateDivOD(unchlist, unkldict, 12.0)
+        [4.0, 8.0]
+        
+        >>> names = ['SB', 'SB', 'SB']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> unchlist = TBL.getUnchangeableNoteLengths()
+        >>> unkldict = TBL.classifyUnknownNotesByType(unchlist)
+        >>> TBL.translateDivOD(unchlist, unkldict, 12.0)
+        [4.0, 4.0, 4.0]
+        
+        >>> names = ['SB', 'SB', 'SB', 'SB']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> unchlist = TBL.getUnchangeableNoteLengths()
+        >>> unkldict = TBL.classifyUnknownNotesByType(unchlist)
+        >>> TBL.translateDivOD(unchlist, unkldict, 12.0)
+        [2.0, 2.0, 4.0, 4.0]
+        
+        >>> BL[1].setStem('down')
+        >>> BL[2].setStem('down')
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> unchlist = TBL.getUnchangeableNoteLengths()
+        >>> unkldict = TBL.classifyUnknownNotesByType(unchlist)
+        >>> TBL.translateDivOD(unchlist, unkldict, 12.0)
+        [2.0, 4.0, 4.0, 2.0]
+        
+        >>> names = ['SB', 'SB','SM', 'SM','SM','SM','SB','SB']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
+        >>> unchlist = TBL.getUnchangeableNoteLengths()
+        >>> unkldict = TBL.classifyUnknownNotesByType(unchlist)
+        >>> TBL.translateDivOD(unchlist, unkldict, 12.0)
+        [2.0, 2.0, 0.5, 0.5, 0.5, 0.5, 2.0, 4.0]
+        '''
+        
+        if unchangeableNoteLengthsList is None:
+            unchangeableNoteLengthsList = self.unchangeableNoteLengthsList
+        else:
+            self.unchangeableNoteLengthsList = unchangeableNoteLengthsList
+            
+        if unknownLengthsDict is None:
+            unknownLengthsDict = self.unknownLengthsDict
+        else:
+            self.unknownLengthsDict = unknownLengthsDict
+        
+        if minRem is None:
+            minRem = self.minimaRemaining
+        
+        semibrevis_list = unknownLengthsDict['semibrevis']
+        semibrevis_downstem = unknownLengthsDict['semibrevis_downstem']
+        semiminima_right_flag_list = unknownLengthsDict['semiminima_right_flag']
+        semiminima_left_flag_list = unknownLengthsDict['semiminima_left_flag']
+        semiminima_rest_list = unknownLengthsDict['semiminima_rest']
+
+        knownLengthsList = unchangeableNoteLengthsList[:]
+
+        extend_list_1 = []
+        extend_num_1 = 0
+        extend_list_2 = []
+        extend_num_2 = 0
+        
+        for ind in semibrevis_list[:-1]:
+            knownLengthsList[ind] = 2.0
+            extend_list_1.append(ind)
+            minRem -= 2.0
+        
+        knownLengthsList_changeable = knownLengthsList[:]
+        minRem_changeable = minRem
+        knownLengthsList_static = knownLengthsList[:]
+        minRem_static = minRem
+                
+        if self.numberOfDownstems > 0 and semibrevis_downstem[0] == len(self.brevisLength) - 1:
+            
+            for ind in semiminima_left_flag_list + semiminima_right_flag_list + semiminima_rest_list:
+                knownLengthsList[ind] = 0.5
+                minRem -= 0.5
+                
+            if self.numberOfSemibreves:
+                for ind in semibrevis_list:
+                    knownLengthsList[ind] = 2.0
+                    minRem -= 2.0
+                                    
+            knownLengthsList[semibrevis_downstem[0]] = max(minRem, 2.0)
+            minRem -= max(minRem, 2.0)
+        
+        else:
+        
+            lengths = [(0.5,0.5), (float(2)/3, 0.5), (0.5, float(2)/3), (float(2)/3, float(2)/3)]
+            strength = 0
+
+            for (left_length, right_length) in lengths:
+                
+                change_tup = ()
+                num_tup = ()
+                diff_tup = ()
+                shrink_tup = ()
+                
+                for ind in semiminima_left_flag_list:
+                    knownLengthsList_changeable[ind] = left_length
+                    minRem_changeable -= left_length
+                for ind in semiminima_right_flag_list:
+                    knownLengthsList_changeable[ind] = right_length
+                    minRem_changeable -= right_length
+                    
+                if left_length == right_length:
+                    
+                    for ind in semiminima_rest_list:
+                        knownLengthsList_changeable[ind] = left_length
+                        minRem_changeable -= left_length
+                                                
+                else: #left_length != right_length
+                    
+                    master_list = semiminima_left_flag_list + semiminima_right_flag_list + semiminima_rest_list
+                    
+                    for ind in semiminima_rest_list:
+                        curIndex = int(master_list.index(ind))
+                        if ( curIndex == 0 and master_list[curIndex+1] in semiminima_left_flag_list ) or \
+                             ( curIndex == len(master_list) - 1 and master_list[curIndex - 1] in semiminima_left_flag_list ) or \
+                             ( master_list[curIndex-1] in semiminima_left_flag_list and master_list[curIndex+1] in semiminima_left_flag_list ):
+                            
+                            knownLengthsList_changeable[ind] = left_length
+                            minRem_changeable -= left_length
+                                        
+                        elif ( (curIndex == 0 and master_list[curIndex+1] in semiminima_right_flag_list) or
+                             (curIndex == len(master_list) - 1 and master_list[curIndex - 1] in semiminima_right_flag_list) or
+                             (master_list[curIndex-1] in semiminima_right_flag_list and master_list[curIndex+1] in semiminima_right_flag_list) ):
+                            
+                            knownLengthsList_changeable[ind] = right_length
+                            minRem_changeable -= right_length
+                         
+                        else:
+                            knownLengthsList_changeable[ind] = 0.5
+                            extend_list.append(ind)
+                        extend_list = _removeRepeatedElements(extend_list_2)
+                        
+                if self.numberOfDownstems > 0:
+                                    
+                    if self.numberOfSemibreves > 0:
+                        knownLengthsList_changeable[semibrevis_list[-1]] = 2.0
+                        extend_list_1.append(semibrevis_list[-1])
+                        minRem_changeable -= 2.0
+                    extend_list_1 = _removeRepeatedElements(extend_list_1)
+                    
+                    extend_num_1 = min(len(extend_list_1), 0.5*minRem_changeable - 2.0)
+                    extend_num_2 = min(len(extend_list_2), 6*minRem_changeable - 24.0)
+                    
+                    if self.numberOfDownstems < 2:
+                        semibrevis_downstem_index = semibrevis_downstem[0]
+                        
+                        knownLengthsList_changeable[semibrevis_downstem_index] = max(minRem_changeable, 4.0)
+                        minRem_changeable -= knownLengthsList_changeable[semibrevis_downstem_index]
+     
+                        shrink_tup += semibrevis_downstem_index,
+                        if len(extend_list_2) > 0:
+                            shrink_tup += semibrevis_downstem_index,
+                    
+                    else: #downstems > 2
+
+                        from music21 import medren
+                        newMensuralBL = [medren.MensuralNote('A', 'SB') for i in range(len(semibrevis_downstem))]
+                        
+                        newDiv = Divisione('.d.')
+                        newDiv.minimaPerBrevis = minRem_changeable
+                            
+                        tempTBL = TranslateBrevisLength(divisione = newDiv, BL = newMensuralBL, pDS = True)
+                        dSLengthList = tempTBL.getKnownLengths()
+                        
+                        for i, ind in enumerate(semibrevis_downstem):
+                            knownLengthsList_changeable[ind] = dSLengthList[i]
+                        #Don't need shrink_tup. There is no room to extend anything.
+                    
+                else: #No downstems
+                    
+                    if self.numberOfSemibreves > 0:
+                        
+                        if self.hasLastSB:
+                            knownLengthsList_changeable[semibrevis_list[-1]] = max(minRem_changeable, 2.0)
+                            extend_num_1 = min(len(extend_list_1), int(0.5*minRem_changeable - 1.0))
+                            minRem_changeable -= knownLengthsList_changeable[semibrevis_list[-1]]
+                            
+                            shrink_tup += -1,
+                            if len(extend_list_2) > 0:
+                                shrink_tup += -1,
+                                                
+                        else:
+                            knownLengthsList[semibrevis_list[-1]] = 2.0
+                            extend_list_1.append(semibrevis_list[-1])
+                            extend_list_1 = _removeRepeatedElements(extend_list_1)
+                            extend_num_1 = len(extend_list_1)
+                            extend_num_2 = len(extend_list_2)
+                            minRem_changeable -= 2.0
+                                
+                change_tup += extend_list_1, extend_list_2
+                num_tup += extend_num_1, extend_num_2
+                diff_tup += 2.0, float(1)/6
+            
+                if minRem_changeable > -0.0001:
+                    knownLengthsList_changeable, minRem_changeable = self.determineStrongestMeasureLengths(knownLengthsList_changeable, change_tup, num_tup, diff_tup, minRem_changeable, shrinkable_indices = shrink_tup)
+                
+                tempStrength = self.getBreveStrength(knownLengthsList_changeable)
+                
+                if tempStrength > strength and minRem_changeable > -0.0001:
+                    knownLengthsList = knownLengthsList_changeable[:]
+                    minRem = minRem_changeable
+                    strength = tempStrength
+                
+                knownLengthsList_changeable = knownLengthsList_static
+                
+                if minRem_changeable > -0.0001:
+                    self.minRem_tracker = True
+                
+                minRem_changeable = minRem_static
+                    
+        return knownLengthsList
+
+def _allCombinations(list, num):
+    '''
+    >>> _allCombinations(['a', 'b'], 2)
+    [[], ['b'], ['a', 'b'], ['a']]
+
+    >>> _allCombinations(['a', 'b', 'c'], 2)
+    [[], ['c'], ['b', 'c'], ['b'], ['a', 'b'], ['a', 'c'], ['a']]
+
+    '''
+    
+    combs = []
+    if num > 0:
+        for i in range(len(list)):
+            comb = [list[i]]
+            for c in _allCombinations(list[(i+1):], num-1):
+                combs.append(comb + c)
+    combs.reverse()
+    combs.insert(0, [])
+    return combs
+
+def _removeRepeatedElements(listOrTup): #So I don't have to use set
+    
+    newListOrTup = None
+    if type(listOrTup) == list:
+        newListOrTup = []
+    elif type(listOrTup) == tuple:
+        newListOrTup = ()
+    
+    for item in listOrTup:
+        if item not in newListOrTup:
+            newListOrTup.append(item)
+    return newListOrTup
+    
 
 class TrecentoNotationException(exceptions21.Music21Exception):
     pass
