@@ -771,7 +771,8 @@ class CTSong(object):
         '''
         for x in scoreObj.flat.getElementsByClass("TrebleClef"):
             scoreObj.remove(x)
-        scoreObj.insert(0, music21.clef.TrebleClef())
+        from music21 import clef
+        scoreObj.insert(0, clef.TrebleClef())
         return scoreObj
 
     def labelRomanNumerals(self, scoreObj):
@@ -781,7 +782,8 @@ class CTSong(object):
         labelRomanNumerals=False is passed as a parameter. Method labeling 
         doesn't relabel tied roman numeral chords.
         '''
-        lastel = music21.roman.RomanNumeral(None, None)
+        from music21 import roman
+        lastel = roman.RomanNumeral(None, None)
         for el in scoreObj.flat.getElementsByClass("RomanNumeral"):
             if el.tie == None:
                 el.insertLyric(el.figure)

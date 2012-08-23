@@ -9,7 +9,8 @@
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-'''Utility routines for processing text in scores and other musical objects. 
+'''
+Utility routines for processing text in scores and other musical objects. 
 '''
 
 import doctest, unittest

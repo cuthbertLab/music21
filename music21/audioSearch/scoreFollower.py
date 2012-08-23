@@ -20,6 +20,7 @@ import sys
 from time import time
 
 from music21 import scale
+from music21 import search
 from music21.audioSearch.base import *
 
 from music21 import environment

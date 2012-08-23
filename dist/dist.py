@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         dist.py
 # Purpose:      Distribution and uploading script
@@ -85,6 +86,8 @@ class Distributor(object):
                 self.fpEgg = fp
             elif self.version in fn and fn.endswith('.exe'):
                 fpNew = fp.replace('.macosx-10.6-intel.exe', '.exe')
+                fpNew = fpNew.replace('.macosx-10.7-x86_64.exe', '.exe')
+                fpNew = fpNew.replace('.macosx-10.8-x86_64.exe', '.exe')
                 if fpNew != fp:
                     os.rename(fp, fpNew)
                 self.fpWin = fpNew

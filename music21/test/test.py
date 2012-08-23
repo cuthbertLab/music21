@@ -85,6 +85,8 @@ class ModuleGather(object):
         # the results of this are stored in self.curFiles, self.dirList
         os.path.walk(self.dirParent, self._visitFunc, '')
         self.modulePaths.sort()
+        #for p in self.modulePaths:
+        #    print p# self.modulePaths
         self.modulePaths.reverse()
 
     def _getName(self, fp):
@@ -152,7 +154,7 @@ class ModuleGather(object):
 
 
 
-def main(testGroup=['test'], restoreEnvironmentDefaults=False):
+def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
     '''Run all tests. Group can be test and external
 
     >>> print(None)
@@ -171,9 +173,14 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False):
 
     environLocal.printDebug('looking for Test classes...\n')
     # look over each module and gather doc tests and unittests
+    totalModules = 0
+    
     for module in common.sortModules(modules):
         unitTestCases = []
-    
+        if limit is not None:
+            if totalModules > limit:
+                break
+        totalModules += 1
         # get Test classes in module
         if not hasattr(module, 'Test'):
             environLocal.printDebug('%s has no Test class' % module)
@@ -214,7 +221,7 @@ if __name__ == '__main__':
     reload(sys)
     sys.setdefaultencoding("UTF-8")
 
-    # if optional command line args are given, assume they are  
+    # if optional command line arguments are given, assume they are  
     # test group arguments
     if len(sys.argv) >= 2:
         main(sys.argv[1:])

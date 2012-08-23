@@ -67,8 +67,8 @@ class ModuleGather(object):
             'mrjobaws.py', # takes too long.
             'configure.py', # runs oddly...
             ]
-        # skip any path that contains this string
-        self.pathSkip = ['abj', 'obsolete', 'xlrd', 'jsonpickle', 'ext', 'server', 'mrjobaws']
+        # skip any path that starts with this string
+        self.pathSkip = ['abj', 'obsolete', 'ext', 'server', 'demos']
         # search on init
         self._walk()
 
@@ -137,7 +137,8 @@ class ModuleGather(object):
         if skip:
             return "skip"
         for dirSkip in self.pathSkip:
-            if dirSkip in fp:
+            dirSkipSlash = os.sep + dirSkip + os.sep
+            if dirSkipSlash in fp:
                 skip = True  
                 break
         if skip:
@@ -149,9 +150,9 @@ class ModuleGather(object):
             if hasattr(currentModule, thisName):
                 currentModule = object.__getattribute__(currentModule, thisName)
                 if not isinstance(currentModule, types.ModuleType):
-                    return "fail"
+                    return "notInTree"
             else:
-                return "fail"
+                return "notInTree"
         mod = currentModule
         
         if restoreEnvironmentDefaults:
@@ -225,7 +226,7 @@ def runOneModuleWithoutImp(args):
     if moduleObject == 'skip':
         environLocal.printDebug('%s is skipped \n' % fp)
         return ("Skipped", fp)
-    elif moduleObject == 'fail':
+    elif moduleObject == 'notInTree':
         environLocal.printDebug('%s is in the music21 directory but not imported in music21. Skipped -- fix! \n' % fp)
         return ("NotInTree", fp, '%s is in the music21 directory but not imported in music21. Skipped -- fix!' % modGath._getNamePeriod(fp))
 

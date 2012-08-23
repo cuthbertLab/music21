@@ -1,12 +1,12 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         corpus/metadataCache/cache.py
 # Purpose:      Build the metadata cache
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    (c) 2010-2012 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 '''
