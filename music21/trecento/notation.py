@@ -183,7 +183,7 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
                     string = string[endInd+1:]
                 
                 else:
-                    raise TrecentoNotationException('%s, %s invalid ligature indices' % (startInd, endInd))
+                    raise TrecentoNotationException('%s, %s invalid indices' % (startInd, endInd))
             return broken
             
             
@@ -479,19 +479,19 @@ def convertTrecentoStream(inpStream, inpDiv = None):
     >>> upperString += "d(SB) r e p f(M) e d e d c p d(SB) c(M) d c d p e(SB) r(M) g f e p g(SB) a(SM) g f e(M) d p "
     >>> upperString += "e(SB) f(SM) e d c(M) d e(L) a(SB) a p b(M) a g a g f p g f e f e f p "
     >>> upperString += "g(SB) g(SM) a g f e d p e(SB) r(M) f(SM) e d e(M) p d(SB) r e(M) f p "
-    >>> upperString += "g(SB) d r(SM) e p f e d e d c p d(SB) d(M) e(SB) c(M) p d(SB) c(M) d c B c(L) "
+    >>> upperString += "g(SB) d r(M) e p f e d e d c p d(SB) d(M) e(SB) c(M) p d(SB) c(M) d c B c(L) "
     >>> upperString += "c'(SB)[D] c' p c'(SM) b a  b(M) c' b c' p b(SM) a g a(M) b a b p "
     >>> upperString += "g(SB) g(SM) a g f e d p e(SB) r e(M) f p g f e f e f p g(SB) r g(M) f p "
     >>> upperString += "g(SB) f(SM) e d e(M) f e(L) a(M) b a b g(SB) p c'(M) b a c' b a p "
     >>> upperString += "b c' b a g a p b(SB) c'(SM) b a g(M) f p a(SB) a(M) g(SB) f(M) p "
-    >>> upperString += "e(SB) r g(M) f p g f e f e d p c(SB) d r p a g(SM) a g f e d p e(SB) r f(SM) e d e(SB) d(Mx)"
+    >>> upperString += "e(SB) r g(M) f p g f e f e d p c(SB) d r p a g(SM) a g f e d p e(M) r f(SM) e d e(SB) d(Mx)"
 
     >>> lowerString = ".p. $C3 c(L) G(B) A(SB) B c p d c r p A B c p d c B p <A*o*[DL] G> A c B A(L) "
     >>> lowerString += "A(SB) A p  G A B p c c(M) B(SB) A(M) p G(SB) G p A B c p d A r p G[D] A p "
     >>> lowerString += "B B(M) c(SB) c(M) p d(SB) d(M) A(SB) A(M) p G(SB) A B C(L) "
     >>> lowerString += "c(SB)[D] c e(B) d c(SB) c d p e d r p c c(M) d(SB) d(M) p c(SB) r r p "
     >>> lowerString += "c d c(M) d e(L) d(SB)[D] e p c[D] d p e e(M) d(SB) c(M) p B(SB) A B(M) c p "
-    >>> lowerString += "d(SB) d(M) c(SB) d(M) p e(SB) d r p c c c(M) A(SB) B(M) p c(SB) B B p A B[D] p A B c d(Mx)"
+    >>> lowerString += "d(SB) d(M) c(SB) d(M) p e(SB) d r p c c(M) A(SB) B(M) p c(SB) B B p A B[D] p A B c d(Mx)"
 
     >>> SePerDureca = stream.Stream()
     >>> SePerDureca.append(trecento.notation.TinyTrecentoNotationStream(upperString))
@@ -501,8 +501,7 @@ def convertTrecentoStream(inpStream, inpDiv = None):
     Getting measure 0...
     ...
     
-    >>> SePerDurecaConverted2 = medren.convertHouseStyle(SePerDurecaConverted, durationScale = 1, barlineStyle = 'tick')
-    >>> #_DOCS_HIDE SePerDurecaConverted2.show()
+    >>> #_DOCS_HIDE SePerDurecaConverted.show()
 
     .. image:: images/medren_SePerDurecaConverted.*
         :width: 600
@@ -512,10 +511,19 @@ def convertTrecentoStream(inpStream, inpDiv = None):
 
     div = inpDiv
     offset = 0
+    hierarchy = ['measure', 'part', 'score']
 
-    convertedStream = inpStream.__class__()
+    convertedStream = None
+    if 'measure' in inpStream.classes:
+        convertedStream = stream.Measure()
+    elif 'part' in inpStream.classes:
+        convertedStream = stream.Part()
+    elif 'score' in inpStream.classes:
+        convertedStream = stream.Measure()
+    else:
+        convertedStream = stream.Stream()
+    
     measuredStream = medren.breakMensuralStreamIntoBrevisLengths(inpStream, inpDiv)
-    raise Exception('Measures: %s' % measuredStream.recurse())
     print ''
     
     for e in measuredStream:
@@ -587,9 +595,7 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv = None, measureNum
             mDur = 0.5
     else:
         raise TrecentoNotationException('Cannot find or determine  or divisione')
-    
-
-                
+                    
     if lenList[0] > div.minimaPerBrevis: #Longa, Maxima
         startNote = note.Note(mList[0].pitch)
         startNote.duration = div.barDuration
@@ -652,12 +658,7 @@ class TranslateBrevisLength(object):
     Currently, this class is used only to improve the efficiency of :attr:`music21.medren.GeneralMensuralNote.duration`.
     
     This acts a helper class to improve the efficiency of :class:`music21.trecento.notation.convertBrevisLength`.
-    
-    >>> from music21 import *
-    >>>
-    >>>
-    >>>
-    
+
 #    >>> names = ['SM', 'SM', 'SM', 'SM', 'SB', 'SB', 'SB', 'SB', 'SB', 'SM', 'SM', 'SM']
 #    >>> BL = [medren.MensuralNote('A', n) for n in names]
 #    >>> BL[3] = medren.MensuralRest('SM')
@@ -676,7 +677,7 @@ class TranslateBrevisLength(object):
         self.brevisLength = BL
         
         self.unchangeableNoteLengthsList = []
-        self.unknownLengthsDict = {'semibrevis':[], 
+        self.unknownLengthsDict = {'semibrevis':[],
                                    'semibrevis_downstem':[], 
                                    'semiminima_right_flag':[], 
                                    'seminima_left_flag':[], 
@@ -1016,32 +1017,36 @@ class TranslateBrevisLength(object):
             if kl is not None and kl <= self.minimaRemaining:
                 self.minimaRemaining -= kl
                 
-
-        #Process everything else           
-        if self.div.standardSymbol == '.i.':
-            knownLengthsList = self.translateDivI()        
-        elif self.div.standardSymbol == '.n.':
-            knownLengthsList = self.translateDivN()                        
-        elif self.div.standardSymbol == '.q.' or self.div.standardSymbol == '.p.':
-            knownLengthsList = self.translateDivPQ()
-        else:  # .o. or .d.
-            knownLengthsList = self.translateDivOD()
+        
+        if None in self.unchangeableNoteLengthsList:
+            #Process everything else           
+            if self.div.standardSymbol == '.i.':
+                knownLengthsList = self.translateDivI()        
+            elif self.div.standardSymbol == '.n.':
+                knownLengthsList = self.translateDivN()                        
+            elif self.div.standardSymbol == '.q.' or self.div.standardSymbol == '.p.':
+                knownLengthsList = self.translateDivPQ()
+            else:  # .o. or .d.
+                knownLengthsList = self.translateDivOD()
+        else:
+            self.minRem_tracker = True
+            knownLengthsList = self.unchangeableNoteLengthsList[:]
 
         if not self.minRem_tracker:
             self.doubleNum += 1
             newDiv = Divisione(self.div.standardSymbol)
             newDiv.minimaPerBrevis = 2*self.div.minimaPerBrevis
-            raise Exception('measure: %s, minRem: %s' % (self.brevisLength, self.minimaRemaining))
+            return self.brevisLength
             tempTBL = TranslateBrevisLength(newDiv, self.brevisLength[:])
             knownLengthList = tempTBL.getKnownLengths()
             
         for i in range(len(knownLengthsList)): #Float errors
-          ml = knownLengthsList[i]
-          try:
-              if abs(ml - round(ml)) < 0.0001:
-                  knownLengthsList[i] = round(ml)
-          except TypeError:
-              raise TypeError('ml is screwed up! %s' % ml)
+         ml = knownLengthsList[i]
+         try:
+             if abs(ml - round(ml)) < 0.0001:
+                 knownLengthsList[i] = round(ml)
+         except TypeError:
+             raise TypeError('ml is screwed up! %s' % ml)
            
         return knownLengthsList
 
@@ -1231,7 +1236,7 @@ class TranslateBrevisLength(object):
     def translateDivPQ(self, unchangeableNoteLengthsList = None, unknownLengthsDict = None, minRem = None):
         '''
         >>> from music21 import *
-        >>> div = trecento.notation.Divisione('.q.')
+        >>> div = trecento.notation.Divisione('.q.')        
         >>> names = ['SB','SB']
         >>> BL = [medren.MensuralNote('A', n) for n in names]        
         >>> TBL = trecento.notation.TranslateBrevisLength(div, BL)
@@ -1314,11 +1319,21 @@ class TranslateBrevisLength(object):
             minRem -= 2.0
         
         if semibrevis_downstem_index == (len(self.brevisLength) - 1):
+           
             for ind in semiminima_right_flag_list+semiminima_left_flag_list+semiminima_rest_list:
                 knownLengthsList[ind] = 0.5
                 minRem -= 0.5
-            knownLengthsList[semibrevis_downstem_index] = minRem
-            minRem = 0
+            
+            if self.numberOfSemibreves > 0:
+                knownLengthsList[semibrevis_list[-1]] = 2.0
+                minRem -= 2.0
+            
+            knownLengthsList[semibrevis_downstem_index] = max(minRem, 2.0)
+            minRem -= max(minRem, 2.0)
+            
+            if minRem > -0.0001:
+                self.minimaRemaining = minRem
+                self.minRem_tracker = True
             
         else:
             strength = 0
@@ -1332,7 +1347,6 @@ class TranslateBrevisLength(object):
             diff_tup = ()
             shrink_tup = ()
             
-
             lengths = [(0.5,0.5), (float(2)/3, 0.5), (0.5, float(2)/3), (float(2)/3, float(2)/3)]
 
             for (left_length, right_length) in lengths:
@@ -1551,7 +1565,7 @@ class TranslateBrevisLength(object):
         knownLengthsList_static = knownLengthsList[:]
         minRem_static = minRem
                 
-        if self.numberOfDownstems > 0 and semibrevis_downstem[0] == len(self.brevisLength) - 1:
+        if self.numberOfDownstems == 1 and semibrevis_downstem[0] == len(self.brevisLength) - 1:
             
             for ind in semiminima_left_flag_list + semiminima_right_flag_list + semiminima_rest_list:
                 knownLengthsList[ind] = 0.5
@@ -1564,6 +1578,11 @@ class TranslateBrevisLength(object):
                                     
             knownLengthsList[semibrevis_downstem[0]] = max(minRem, 2.0)
             minRem -= max(minRem, 2.0)
+            
+            if minRem > -0.0001:
+                self.minimaRemaining = minRem
+                self.minRem_tracker = True
+            
         
         else:
         

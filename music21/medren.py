@@ -280,6 +280,9 @@ class GeneralMensuralNote(base.Music21Object):
             self.mensuralType = _validMensuralTypes[_validMensuralAbbr.index(mensuralTypeOrAbbr)]
         else:
             raise MedRenException('%s is not a valid mensural type or abbreviation' % mensuralTypeOrAbbr)
+        
+        self.lenList = []
+        
     
     def __repr__(self):
         return '<music21.medren.GeneralMensuralNote %s>' % self.mensuralType
@@ -389,32 +392,43 @@ class GeneralMensuralNote(base.Music21Object):
         mLen, mDur = 0, 0
         if self._gettingDuration is True:
             return duration.ZeroDuration()
+        
         if mensuration is None:
             mOrD = self._determineMensurationOrDivisione()
+            
         else:
             mOrD = mensuration
-        index = self._getSurroundingMeasure()[1]
-        if self._getTranslator() is not None:
+            
+        index = self._getTranslator(mensurationOrDivisione = mOrD)
+        
+        if len(self.lenList) > 0:
             if mOrD.standardSymbol in ['.q.', '.p.', '.i.', '.n.']:
                 mDur = 0.5
             else:
                 mDur = 0.25
-            tempTMM = self._getTranslator()
-            mLen = tempTMM.getMinimaLengths()[index]
+            mLen = self.lenList[index]
         #print "MDUR! " + str(mDur) + "MLEN " + str(mLen) + "index " + str(index) + " MEASURE " + str(self._getSurroundingMeasure()[0])
-        self.duration = duration.Duration(mLen*mDur)
+            self.duration = duration.Duration(mLen*mDur)
+        else:
+            self.duration = duration.ZeroDuration()
     
     
-    def _getTranslator(self):
-        mOrD = self._determineMensurationOrDivisione()
-        measure, index = self._getSurroundingMeasure()
-        TMM = None
-        if len(measure) > 0 and isinstance(mOrD, trecento.notation.Divisione):
+    def _getTranslator(self, mensurationOrDivisione = None):
+
+        mOrD = mensurationOrDivisione
+        if mOrD is None:
+            mOrD = self._determineMensurationOrDivisione()
+        measure, index = self._getSurroundingMeasure(mensurationOrDivisione = mOrD)
+        
+        self._gettingDuration = True
+        if len(measure) > 0 and 'Divisione' in mOrD.classes:
             if index == 0:
-                TMM = trecento.notation.TranslateBrevisLength(mOrD, measure)
+                self.lenList = trecento.notation.TranslateBrevisLength(mOrD, measure).getKnownLengths()
             elif index != -1:
-                TMM = measure[0]._getTranslator()
-        return TMM
+                tempMN = measure[0]
+                self.lenList = tempMN.lenList
+        self._gettingDuraton = False
+        return index
     
     #Using Music21Object.getContextByClass makes _getDuration go into an infinite loop. Thus, the alternative method. 
     def _determineMensurationOrDivisione(self):
@@ -488,49 +502,55 @@ class GeneralMensuralNote(base.Music21Object):
         mOrD = mensurationOrDivisione
         if mOrD is None:
             mOrD = self._determineMensurationOrDivisione()
-        
+
         mList = []
         currentIndex, index = -1, -1
+        indOffset = 0 
+        
         if len(self.getSites()) > 1:
             site = self.getSites()[1]
             if self.mensuralType in ['brevis', 'longa', 'maxima']:
                 mList = [self]
-                currentindex = 0
+                currentIndex = 0
             else:
                 tempList = site.recurse()[1:]
-                if isinstance(site, stream.Measure):
+                if site.isMeasure:
                     mList += tempList
                 else:
-                    tempList = self.activeSite
-                    currentIndex = int(tempList.index(self)) 
+                    
+                    for ind, item in enumerate(tempList):
+                        if self is item:
+                            currentIndex = ind
+                                       
                     for i in range(currentIndex-1, -1, -1):
                         # Punctus and ligature marks indicate a new measure
-                        if isinstance(tempList[i], trecento.notation.Punctus) or \
-                            isinstance(tempList[i], Ligature):
+                        if ('Punctus' in tempList[i].classes) or ('Ligature' in tempList[i].classes):
+                            indOffset = i+1
                             break
-                        if isinstance(tempList[i], GeneralMensuralNote):
+                        elif 'GeneralMensuralNote' in tempList[i].classes:
                             # In Italian notation, brevis, longa, and maxima indicate a new measure
-                            if (isinstance(mOrD, trecento.notation.Divisione) and
-                                tempList[i].mensuralType in ['brevis', 'longa', 'maxima']):
+                            if ('Divisione' in mOrD.classes) and \
+                            (tempList[i].mensuralType in ['brevis', 'longa', 'maxima']):
+                                indOffset = i+1
                                 break
                             else:
                                 mList.insert(i, tempList[i])
+                        else:
+                            indOffset += 1
+                    
                     mList.reverse()
                     mList.insert(currentIndex, self)
                     for j in range(currentIndex+1,len(tempList), 1):
-                        if isinstance(tempList[j], trecento.notation.Punctus) or \
-                            isinstance(tempList[j], Ligature):
+                        if ('Punctus' in tempList[j].classes) or ('Ligature' in tempList[j].classes):
                             break
-                        if isinstance(tempList[j], GeneralMensuralNote):
-                            if (isinstance(mOrD, trecento.notation.Divisione) and
-                                tempList[j].mensuralType in ['brevis', 'longa', 'maxima']):
+                        if 'GeneralMensuralNote' in tempList[j].classes:
+                            if ('Divisione' in mOrD.classes) and \
+                            (tempList[j].mensuralType in ['brevis', 'longa', 'maxima']):
                                 break
                             else:
                                 mList.insert(j, tempList[j])
         
-        for i in range(len(mList)):
-            if mList[i] is self:
-                index = i
+        index = currentIndex - indOffset
         
         return mList, index
             
@@ -568,6 +588,8 @@ class MensuralRest(GeneralMensuralNote, note.Rest):
             self._fontString = '0x32'
         elif self.mensuralType == 'minima':
             self._fontString = '0x33'
+        
+        self.lenList = []
         
     def __repr__(self):
         return '<music21.medren.MensuralRest %s>' % self.mensuralType  
@@ -637,6 +659,8 @@ class MensuralNote(GeneralMensuralNote, note.Note):
             
         self._duration = None
         self._fontString = ''
+        
+        self.lenList = []
     
     def __repr__(self):
         return '<music21.medren.MensuralNote %s %s>' % (self.mensuralType, self.name)
@@ -1548,7 +1572,7 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
     Each brevis length worth of objects in the original are stored in the mensural stream as a mensural object.
     
     No substream of the original stream can contain both stream and mensural type objects, otherwise the stream cannot be processed. 
-    Furthermore, no stream can contain higher heirarchy stream types. The stream type heirarchy is :class:`music21.stream.Stream`, followed by :class:`music21.stream.Score`, :class:`music21.stream.Part`, then :class:`music21.stream.Measure`.
+    Furthermore, no stream can contain higher hierarchy stream types. The stream type hierarchy is :class:`music21.stream.Stream`, followed by :class:`music21.stream.Score`, :class:`music21.stream.Part`, then :class:`music21.stream.Measure`.
     Finally, a mensuration or divisione must be present or determinable, otherwise the stream cannot be converted. If multiple mensurations are present, they must change only at the highest stream instance.
     Otherwise, this causes a inconsistency when converting the stream.
     
@@ -1582,7 +1606,7 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
     >>> s.append(m)
     >>> medren.breakMensuralStreamIntoBrevisLengths(s)
     Traceback (most recent call last):
-    MedRenException: Mensuration or divisione <music21.trecento.notation.Divisione .q.> not consistent within heirarchy
+    MedRenException: Mensuration or divisione <music21.trecento.notation.Divisione .q.> not consistent within hierarchy
     
     >>> s = stream.Stream()
     >>> s.append(trecento.notation.Divisione('.q.'))
@@ -1616,33 +1640,52 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
     inpStream_copy = copy.deepcopy(inpStream) #Preserve your input
     newStream = inpStream.__class__()
          
-    def isHigherInHeirarchy(l, u):
-        heirarchy = [stream.Stream, stream.Score,  stream.Part, stream.Measure]
-        if heirarchy.index(u.__class__) == 0:
+    def isHigherInhierarchy(l, u):
+        hierarchy = ['Stream', 'Score',  'Part', 'Measure']
+        uclass0 = None
+        for tryClass in u.classes:
+            if tryClass in hierarchy:
+                uclass0 = tryClass
+                break
+
+        lclass0 = None
+        for tryClass in l.classes:
+            if tryClass in hierarchy:
+                lclass0 = tryClass
+                break
+
+
+        if uclass0 is None:
+            raise MedRenException("Cannot find class in our hierarchy of streams: %s" % (u))
+        if lclass0 is None:
+            raise MedRenException("Cannot find class in our hierarchy of streams: %s" % (l))
+            
+        if hierarchy.index(uclass0) == 0:
             return False
         else:
-            return heirarchy.index(l.__class__) <= heirarchy.index(u.__class__)
+            return hierarchy.index(lclass0) <= hierarchy.index(uclass0)
     
-    tempStream_1, tempStream_2 = inpStream_copy.splitByClass(None, lambda x: isinstance(x, stream.Stream))
+    tempStream_1, tempStream_2 = inpStream_copy.splitByClass(None, lambda x: x.isStream)
     if len(tempStream_1) > 0:
         if len(tempStream_2) > 0 and tempStream_2.hasElementOfClass(GeneralMensuralNote):
             raise MedRenException('cannot combine objects of type %s, %s within stream' % (tempStream_1[0].__class__, tempStream_2[0].__class__))
         else:
             for item in tempStream_2:
+                
                 newStream.append(item)
-                if isinstance(item, Mensuration) or \
-                    isinstance(item, trecento.notation.Divisione):
+                if ('Mensuration' in item.classes) or ('Divisione' in item.classes):
                     if mOrDInAsNone: #If first case or changed mOrD
                         mOrD = item
                     elif mOrD.standardSymbol != item.standardSymbol: #If higher, different mOrD found
-                        raise MedRenException('Mensuration or divisione %s not consistent within heirarchy' % item)
+                        raise MedRenException('Mensuration or divisione %s not consistent within hierarchy' % item)
                     
-            tempStream_1_1, tempStream_1_2 = tempStream_1.splitByClass(None, lambda x: isHigherInHeirarchy(x, tempStream_1))
+            tempStream_1_1, tempStream_1_2 = tempStream_1.splitByClass(None, lambda x: isHigherInhierarchy(x, tempStream_1))
             if len(tempStream_1_1) > 0:
                 raise MedRenException('Hierarchy of %s violated by %s' % (tempStream_1.__class__, tempStream_1_1[0].__class__))
             elif len(tempStream_1_2) > 0:
                 for e in tempStream_1_2:
-                    if isinstance(e, stream.Measure):
+                    
+                    if e.isMeasure:
                         newStream.append(e)
                     else:
                         newStream.append(breakMensuralStreamIntoBrevisLengths(e, mOrD))
@@ -1652,26 +1695,26 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None):
         
         for e in inpStream_copy:
             
-            if isinstance(e, MensuralClef):
+            if 'MensuralClef' in e.classes:
                 newStream.append(e)
-            elif isinstance(e, Mensuration) or \
-                 isinstance(e, trecento.notation.Divisione):
+            elif ('Mensuration' in e.classes) or ('Divisione' in e.classes):
                 if mOrDInAsNone: #If first case or changed mOrD
                         mOrD = e
                         newStream.append(e)
                 elif mOrD.standardSymbol != e.standardSymbol: #If higher, different mOrD found 
-                    raise MedRenException('Mensuration or divisione %s not consistent within heirarchy' % e)
-            elif isinstance(e, Ligature):
+                    raise MedRenException('Mensuration or divisione %s not consistent within hierarchy' % e)
+            elif 'Ligature' in e.classes:
                 tempStream = stream.Stream()
                 for mn in e.notes:
                     tempStream.append(mn)
                 for m in breakMensuralStreamIntoBrevisLengths(tempStream):
                     newStream.append(m)
-            elif isinstance(e, GeneralMensuralNote) and e not in mensuralMeasure:
+            elif ('GeneralMensuralNote' in e.classes) and (e not in mensuralMeasure):
                 m = stream.Measure(number = measureNum)
                 
                 print 'Getting measure %s...' % measureNum
                 mensuralMeasure = e._getSurroundingMeasure(mOrD)[0]
+                print 'mensuralMeasure %s' % mensuralMeasure
                 for item in mensuralMeasure:
                     m.append(item)
                 newStream.append(m)
