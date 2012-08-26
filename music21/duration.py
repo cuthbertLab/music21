@@ -57,8 +57,6 @@ from music21 import exceptions21
 from music21 import musicxml as musicxmlMod
 from music21.musicxml import translate as musicxmlTranslate
 
-from music21.midi import translate as midiTranslate
-
 from music21 import environment
 _MOD = "duration.py"  
 environLocal = environment.Environment(_MOD)
@@ -2672,117 +2670,6 @@ class Duration(DurationCommon):
     #---------------------------------------------------------------------------
     # output formats
 
-
-    def _getMidi(self):
-        return midiTranslate.durationToMidi(self)
-
-#         if self._quarterLengthNeedsUpdating:
-#             self.updateQuarterLength()
-#         return int(round(self.quarterLength * defaults.ticksPerQuarter))
-
-    def _setMidi(self, value):
-        # its a pair of value, ticks per quarterLength
-        if isinstance(value, list) or isinstance(value, tuple): 
-            ticks = value[0]
-            ticksPerQuarter = value[1]
-        else:
-            ticks = value
-            ticksPerQuarter = defaults.ticksPerQuarter
-
-        return midiTranslate.midiToDuration(ticks, ticksPerQuarter, inputM21DurationObject=self)
-
-        # given a value in ticks
-#         self._qtrLength = float(ticks) / ticksPerQuarter
-#         self._componentsNeedUpdating = True
-#         self._quarterLengthNeedsUpdating = False
-
-
-    midi = property(_getMidi, _setMidi, 
-        doc='''
-        Get or set a duration value in MIDI ticks. 
-        MIDI duration values are measured in ticks per quarter. 
-        The music21 default ticks per quarter setting is set in 
-        defaults.py (1024 by default).
-
-
-        >>> from music21 import *
-        >>> d = duration.Duration()
-        >>> d.midi = 1024
-        >>> d.type
-        'quarter'
-        >>> d.type = '16th'
-        >>> d.quarterLength
-        0.25
-        >>> d.midi
-        256
-
-
-        More complex rhythms can also be set automatically:
-        
-        
-        >>> d2 = duration.Duration()
-        >>> d2.midi = 1200
-        >>> d2.type
-        'complex'
-        >>> d2.quarterLength
-        1.171875
-        >>> d2.components
-        [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.125>, <music21.duration.DurationUnit 0.046875>]
-        >>> d2.components[2].type
-        '128th'
-        >>> d2.components[2].dots
-        1
-        ''')
-
-
-#     def _getMX(self):
-#         '''
-#         Returns a list of one or more musicxml.Note() objects with all rhythms
-#         and ties necessary. mxNote objects are incompletely specified, lacking full representation and information on pitch, etc.
-# 
-#         >>> a = Duration()
-#         >>> a.quarterLength = 3
-#         >>> b = a.mx
-#         >>> len(b) == 1
-#         True
-#         >>> isinstance(b[0], musicxmlMod.Note)
-#         True
-# 
-#         >>> a = Duration()
-#         >>> a.quarterLength = .33333333
-#         >>> b = a.mx
-#         >>> len(b) == 1
-#         True
-#         >>> isinstance(b[0], musicxmlMod.Note)
-#         True
-#         '''
-#         return musicxmlTranslate.durationToMx(self)
-# 
-#     def _setMX(self, mxNote):
-#         '''
-#         Given a single MusicXML Note object, read in and create a
-#         Duration
-# 
-#         mxNote must have a defined _measure attribute that is a reference to the
-#         MusicXML Measure that contains it
-# 
-#         >>> from music21 import musicxml
-#         >>> a = musicxml.Note()
-#         >>> a.setDefaults()
-#         >>> m = musicxml.Measure()
-#         >>> m.setDefaults()
-#         >>> a.external['measure'] = m # assign measure for divisions ref
-#         >>> a.external['divisions'] = m.external['divisions']
-#         >>> c = Duration()
-#         >>> c.mx = a
-#         >>> c.quarterLength
-#         1.0
-#         '''   
-#         musicxmlTranslate.mxToDuration(mxNote, self)
-# 
-#     mx = property(_getMX, _setMX)
-
-
     def _getMusicXML(self):
         '''Return a complete MusicXML string with defaults.
         '''
@@ -2801,9 +2688,10 @@ class Duration(DurationCommon):
         if format == None:
             raise DurationException('bad format (%s) provided to write()' % fmt)
         elif format == 'musicxml':
+            from music21.musicxml import translate as musicxmlTranslate
             if fp == None:
                 fp = environLocal.getTempFile(ext)
-            dataStr = self.musicxml
+            dataStr = musicxmlTranslate.durationToMusicXML(self)
         else:
             raise DurationException('cannot support writing in this format, %s yet' % format)
         f = open(fp, 'w')

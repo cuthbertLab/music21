@@ -347,48 +347,6 @@ class Chord(note.NotRest):
                 raise KeyError('cannot access component with: %s' % key)
 
 
-    #---------------------------------------------------------------------------
-    # properties for i/o
-
-    def _getMidiEvents(self):
-        return midiTranslate.chordToMidiEvents(self)
-
-    def _setMidiEvents(self, eventList, ticksPerQuarter):
-
-        midiTranslate.midiEventsToChord(eventList,
-            ticksPerQuarter, self)
-
-    midiEvents = property(_getMidiEvents, _setMidiEvents,
-        doc='''Get or set this Chord as a list of :class:`music21.midi.base.MidiEvent` objects.
-
-        >>> from music21 import *
-        >>> c = chord.Chord(['c3','g#4', 'b5'])
-        >>> c.volume = volume.Volume(velocity=90)
-        >>> c.volume.velocityIsRelative = False
-        >>> c.midiEvents
-        [<MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=48, velocity=90>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=68, velocity=90>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=83, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=48, velocity=0>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=68, velocity=0>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=83, velocity=0>]
-        ''')
-
-    def _getMidiFile(self):
-        '''Provide a complete MIDI file representation.
-        '''
-        return midiTranslate.chordToMidiFile(self)
-
-    midiFile = property(_getMidiFile,
-        doc='''Return a complete :class:`music21.midi.base.MidiFile` object based on the Chord.
-
-        The :class:`music21.midi.base.MidiFile` object can be used to write a MIDI file
-        of this Chord with default parameters using the :meth:`music21.midi.base.MidiFile.write`
-        method, given a file path. The file must be opened in 'wb' mode.
-
-        >>> from music21 import *
-        >>> c = chord.Chord(['c3','g#4', 'b5'])
-        >>> mf = c.midiFile
-        >>> #_DOCS_SHOW mf.open('/Volumes/xdisc/_scratch/midi.mid', 'wb')
-        >>> #_DOCS_SHOW mf.write()
-        >>> #_DOCS_SHOW mf.close()
-        ''')
-
     # moved to musicxml.translate
     def _getMX(self):
         return musicxmlTranslate.chordToMx(self)

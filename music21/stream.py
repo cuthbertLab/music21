@@ -39,10 +39,7 @@ from music21 import key
 from music21 import layout
 from music21 import metadata
 from music21 import meter
-from music21 import musicxml as musicxmlMod
 from music21.musicxml import translate as musicxmlTranslate
-from music21 import midi as midiModule
-from music21.midi import translate as midiTranslate
 from music21 import note
 from music21 import spanner
 from music21 import tie
@@ -8551,37 +8548,6 @@ class Stream(base.Music21Object):
                 return True
         # all other conditions are not well-formed notation
         return False
-
-
-
-    #---------------------------------------------------------------------------
-
-    def _getMidiFile(self):
-        '''Return a complete :class:`music21.midi.base.MidiFile` object based on the Stream.
-
-        The :class:`music21.midi.base.MidiFile` object can be used to write a MIDI file of this Stream with default parameters using the :meth:`music21.midi.base.MidiFile.write` method, given a file path. The file must be opened in 'wb' mode.  
-
-        >>> from music21 import *
-        >>> sc = scale.PhrygianScale('g')
-        >>> s = stream.Stream()
-        >>> x=[s.append(note.Note(sc.pitchFromDegree(i%11),quarterLength=.25)) for i in range(60)]
-        >>> mf = s.midiFile
-        >>> #_DOCS_SHOW mf.open('/Volumes/xdisc/_scratch/midi.mid', 'wb')
-        >>> #_DOCS_SHOW mf.write()
-        >>> #_DOCS_SHOW mf.close()
-
-        '''
-        return midiTranslate.streamToMidiFile(self)
-
-    def _setMidiFile(self, mf):
-        '''Given a :class:`music21.midi.base.MidiFile` object, configure a Stream
-        '''
-        return midiTranslate.midiFileToStream(mf, inputM21=self)
-
-    midiFile = property(_getMidiFile, _setMidiFile,
-        doc = '''Get or set a :class:`music21.midi.base.MidiFile` object.
-        ''')
-
 
 
     #---------------------------------------------------------------------------

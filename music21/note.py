@@ -1065,16 +1065,6 @@ class Note(NotRest):
     frequency = property(_getFrequency, _setFrequency, 
         doc = '''Return or set the frequency from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.frequency`.
         ''')
-    
-    def _getFreq440(self): 
-        return self.pitch.freq440
-
-    def _setFreq440(self, value): 
-        self.pitch.freq440 = value
-
-    freq440 = property(_getFreq440, _setFreq440, 
-        doc = '''Return or set the freq440 value from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.freq440`.
-        ''')
 
     def _getOctave(self): 
         return self.pitch.octave
@@ -1297,45 +1287,6 @@ class Note(NotRest):
         >>> n.microtone = 25
         >>> n.fullName
         'D (+25c) 16th Note'
-        ''')
-
-    #---------------------------------------------------------------------------
-    # format conversions
-
-    def _getMidiEvents(self):
-        return midiTranslate.noteToMidiEvents(self)
-
-
-    def _setMidiEvents(self, eventList, ticksPerQuarter=None):
-        midiTranslate.midiEventsToNote(eventList, 
-            ticksPerQuarter, self)
-
-    midiEvents = property(_getMidiEvents, _setMidiEvents, 
-        doc='''Get or set this Note as a list of :class:`music21.midi.base.MidiEvent` objects.
-
-        >>> from music21 import *
-        >>> n = note.Note()
-        >>> n.midiEvents
-        [<MidiEvent DeltaTime, t=0, track=None, channel=1>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=1>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=60, velocity=0>]
-
-        ''')
-
-    def _getMidiFile(self):
-        # this method is defined in GeneralNote
-        return midiTranslate.noteToMidiFile(self)
-
-
-    midiFile = property(_getMidiFile,
-        doc = '''Return a complete :class:`music21.midi.base.MidiFile` object based on the Note.
-
-        The :class:`music21.midi.base.MidiFile` object can be used to write a MIDI file of this Note with default parameters using the :meth:`music21.midi.base.MidiFile.write` method, given a file path. The file must be opened in 'wb' mode.  
-
-        >>> from music21 import *
-        >>> n = note.Note()
-        >>> mf = n.midiFile
-        >>> #_DOCS_SHOW mf.open('/Volumes/xdisc/_scratch/midi.mid', 'wb')
-        >>> #_DOCS_SHOW mf.write()
-        >>> #_DOCS_SHOW mf.close()
         ''')
 
 
@@ -1644,7 +1595,7 @@ class Test(unittest.TestCase):
         a5 = Note()
         a5.name = "A"
         a5.octave = 5
-        self.assertAlmostEquals(a5.freq440, 880.0)
+        self.assertAlmostEquals(a5.frequency, 880.0)
         self.assertEqual(a5.pitchClass, 9)
     
 

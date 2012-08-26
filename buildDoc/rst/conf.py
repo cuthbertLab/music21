@@ -40,7 +40,7 @@ except ImportError:
 # General substitutions.
 project = 'music21'
 release = music21.VERSION_STR
-copyright = 'Copyright &copy; 2009-2012, Michael Scott Cuthbert and the music21 Project'
+copyright = '2009-2012, Michael Scott Cuthbert and the music21 Project'
 
 
 html_last_updated_fmt = '%b %d, %Y'

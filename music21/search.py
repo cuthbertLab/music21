@@ -12,7 +12,7 @@
 Methods and Classes useful in searching within scores.
 
 For searching a group of scores see the search functions within
-:ref:`moduleCorpusBase` .
+:ref:`moduleCorpus.Base` .
 
 '''
 

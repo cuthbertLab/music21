@@ -3668,8 +3668,9 @@ class Music21Object(JSONSerializer):
             return fp
 
         elif format == 'midi':
-            # returns a midi file object
-            mf = self.midiFile
+            # returns a midi.MidiFile object
+            from music21.midi import translate as midiTranslate
+            mf = midiTranslate.music21ObjectToMidiFile(self)
             mf.open(fp, 'wb') # write binary
             mf.write()
             mf.close()

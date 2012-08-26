@@ -11,8 +11,9 @@ Music21 Documentation
    what
    quickStart
    usersGuide_02_notes
-   overviewNotes
+   usersGuide_03_pitches
    overviewStreams
+   usersGuide_06_chords
    overviewFormats
    overviewPostTonal
    overviewMeters

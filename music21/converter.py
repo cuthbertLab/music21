@@ -732,7 +732,8 @@ class ConverterMusicXML(object):
 
 #-------------------------------------------------------------------------------
 class ConverterMidi(object):
-    '''Simple class wrapper for parsing MIDI.
+    '''
+    Simple class wrapper for parsing MIDI.
     '''
 
     def __init__(self):
@@ -740,21 +741,25 @@ class ConverterMidi(object):
         self._stream = stream.Score()
 
     def parseData(self, strData, number=None):
-        '''Get MIDI data from a binary string representation.
         '''
+        Get MIDI data from a binary string representation.
+        '''
+        from music21.midi import translate as midiTranslate
         mf = midi.MidiFile()
         # do not need to call open or close on MidiFile instance
         mf.readstr(strData)
-        self._stream.midiFile = mf
+        midiTranslate.midiFileToStream(mf, self._stream)
 
     def parseFile(self, fp, number=None):
-        '''Get MIDI data from a file path.'''
-
+        '''
+        Get MIDI data from a file path.
+        '''
+        from music21.midi import translate as midiTranslate
         mf = midi.MidiFile()
         mf.open(fp)
         mf.read()
         mf.close()
-        self._stream.midiFile = mf
+        midiTranslate.midiFileToStream(mf, self._stream)
 
     def _getStream(self):
         return self._stream

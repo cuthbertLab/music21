@@ -81,7 +81,7 @@ Streams store their objects internally on a list called
 deal with this directly. 
 
 The most common use of Streams is as places to store Notes. For an 
-introduction to what you can do with Notes, see :ref:`overviewNotes`; 
+introduction to what you can do with Notes, see :ref:`usersGuide_02_notes`; 
 and for complete documentation on Notes, see :ref:`moduleNote`.
 
 Notes, like all Music21Objects, have a .duration property (which is a 

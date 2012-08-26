@@ -20,6 +20,7 @@ From an idea of Joe "Codeswell":
 Requires pygame: http://www.pygame.org/download.shtml
 '''
 from music21.base import Music21Exception
+from music21.midi import translate as midiTranslate
 
 import unittest
 
@@ -101,7 +102,7 @@ class StreamPlayer(object):
         self.playStringIOFile(streamStringIOFile, busyFunction, busyArgs, endFunction, endArgs, busyWaitMilliseconds)
 
     def getStringIOFile(self):
-        streamMidiFile = self.streamIn.midiFile
+        streamMidiFile = midiTranslate.streamToMidiFile(self.streamIn)
         streamMidiWritten = streamMidiFile.writestr()
         return stringIOModule.StringIO(streamMidiWritten)
     

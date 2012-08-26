@@ -19,13 +19,14 @@ import unittest
 import math
 import copy
 
-from music21 import midi as midiModule
+from music21.midi import base as midiModule
 from music21 import defaults
 from music21 import common
 
 # modules that import this include stream.py, chord.py, note.py
 # thus, cannot import these here
 
+from music21 import exceptions21
 from music21 import environment
 _MOD = "midi.translate.py"  
 environLocal = environment.Environment(_MOD)
@@ -34,7 +35,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class TranslateException(Exception):
+class TranslateException(exceptions21.Music21Exception):
     pass
 
 
@@ -57,7 +58,7 @@ def offsetToMidi(o):
 
 def durationToMidi(d):
     '''
-    Helper function to converts a :class:`~music21.duration.Duration` object to midi ticks.
+    Converts a :class:`~music21.duration.Duration` object to midi ticks.
     
     Depends on *defaults.ticksPerQuarter*, Returns an int.
     
@@ -66,6 +67,18 @@ def durationToMidi(d):
     >>> n.duration.type = 'half'
     >>> midi.translate.durationToMidi(n.duration)
     2048
+    
+    >>> d = duration.Duration()
+    >>> dReference = midiToDuration(1024, inputM21DurationObject = d)
+    >>> dReference is d
+    True
+    >>> d.type
+    'quarter'
+    >>> d.type = '16th'
+    >>> d.quarterLength
+    0.25
+    >>> midi.translate.durationToMidi(d)
+    256
     '''
     if d._quarterLengthNeedsUpdating:
         d.updateQuarterLength()
@@ -95,6 +108,24 @@ def midiToDuration(ticks, ticksPerQuarter=None, inputM21DurationObject=None):
     'half'
     >>> n.duration.dots
     1
+    
+    More complex rhythms can also be set automatically:
+    
+    >>> d2 = duration.Duration()
+    >>> d2reference = midi.translate.midiToDuration(1200, inputM21DurationObject=d2)
+    >>> d2 is d2reference
+    True
+    >>> d2.type
+    'complex'
+    >>> d2.quarterLength
+    1.171875
+    >>> d2.components
+    [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.125>, <music21.duration.DurationUnit 0.046875>]
+    >>> d2.components[2].type
+    '128th'
+    >>> d2.components[2].dots
+    1
+
     '''
     if inputM21DurationObject is None:
         from music21 import duration
@@ -167,8 +198,19 @@ def getEndEvents(mt=None, channel=1):
 
     return events
 
+#-------------------------------------------------------------------------------
+# Multiobject conversion
 
-
+def music21ObjectToMidiFile(music21Object):
+    classes = music21Object.classes
+    if 'Stream' in classes:
+        return streamToMidiFile(music21Object)
+    elif 'Note' in classes:
+        return noteToMidiFile(music21Object)
+    elif 'Chord' in classes:
+        return chordToMidiFile(music21Object)
+    else:
+        raise TranslateException("Cannot translate this object to MIDI: %s" % music21Object)
 
 
 #-------------------------------------------------------------------------------
@@ -202,7 +244,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     >>> me2.pitch = 45
     >>> me2.velocity = 0
 
-    >>> n = midiEventsToNote([dt1, me1, dt2, me2])
+    >>> n = midi.translate.midiEventsToNote([dt1, me1, dt2, me2])
     >>> n.pitch
     <music21.pitch.Pitch A2>
     >>> n.duration.quarterLength
@@ -213,7 +255,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     An `inputM21` object can be given in which case it's set.
     
     >>> m = note.Note()
-    >>> dummy = midiEventsToNote([dt1, me1, dt2, me2], inputM21=m)
+    >>> dummy = midi.translate.midiEventsToNote([dt1, me1, dt2, me2], inputM21=m)
     >>> m.pitch
     <music21.pitch.Pitch A2>
     >>> m.duration.quarterLength
@@ -253,7 +295,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     # here we are handling an occasional error that probably should not happen
     # TODO: handle chords
     if (tOff - tOn) != 0:
-        n.duration.midi = (tOff - tOn), ticksPerQuarter
+        midiToDuration(tOff - tOn, ticksPerQuarter, n.duration)
     else:
         #environLocal.printDebug(['cannot translate found midi event with zero duration:', eOn, n])
         # for now, substitute 1
@@ -278,13 +320,13 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
     [<MidiEvent DeltaTime, t=0, track=None, channel=1>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=61, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=1>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=61, velocity=0>]
 
     >>> n1.duration.quarterLength = 2.5
-    >>> eventList = noteToMidiEvents(n1)
+    >>> eventList = midi.translate.noteToMidiEvents(n1)
     >>> eventList
     [<MidiEvent DeltaTime, t=0, track=None, channel=1>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=61, velocity=90>, <MidiEvent DeltaTime, t=2560, track=None, channel=1>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=61, velocity=0>]
 
     Omitting initial DeltaTime:
 
-    >>> eventList2 = noteToMidiEvents(n1, includeDeltaTime=False, channel=9)
+    >>> eventList2 = midi.translate.noteToMidiEvents(n1, includeDeltaTime=False, channel=9)
     >>> eventList2
     [<MidiEvent NOTE_ON, t=None, track=None, channel=9, pitch=61, velocity=90>, <MidiEvent NOTE_OFF, t=None, track=None, channel=9, pitch=61, velocity=0>]
     '''
@@ -320,7 +362,7 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
     if includeDeltaTime:
         # add note off / velocity zero message
         dt = midiModule.DeltaTime(mt, channel=channel)
-        dt.time = n.duration.midi
+        dt.time = durationToMidi(n.duration)
         # add to track events
         eventList.append(dt)
 
@@ -471,7 +513,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     c.volume = volumes # can set a list to volume property
     # can simply use last-assigned pair of tOff, tOn
     if (tOff - tOn) != 0:
-        c.duration.midi = (tOff - tOn), ticksPerQuarter
+        midiToDuration(tOff - tOn, ticksPerQuarter, c.duration)
     else:
         #environLocal.printDebug(['cannot translate found midi event with zero duration:', eventList, c])
         # for now, substitute 1
@@ -485,10 +527,11 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
 
     >>> from music21 import *
     >>> c = chord.Chord(['c3','g#4', 'b5'])
+    >>> c.volume = volume.Volume(velocity=90)
+    >>> c.volume.velocityIsRelative = False
     >>> eventList = midi.translate.chordToMidiEvents(c)
     >>> eventList
     [<MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=48, velocity=90>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=68, velocity=90>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_ON, t=None, track=None, channel=1, pitch=83, velocity=90>, <MidiEvent DeltaTime, t=1024, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=48, velocity=0>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=68, velocity=0>, <MidiEvent DeltaTime, t=0, track=None, channel=None>, <MidiEvent NOTE_OFF, t=None, track=None, channel=1, pitch=83, velocity=0>]
-
     '''
     from music21 import volume
     mt = None # midi track 
@@ -549,7 +592,7 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
             dt = midiModule.DeltaTime(mt)
             # for a chord, only the first delta time should have the dur
             if i == 0:
-                dt.time = c.duration.midi
+                dt.time = durationToMidi(c.duration)
             else:
                 dt.time = 0
             eventList.append(dt)
@@ -1455,7 +1498,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                 #composite.append(chordSub)
                 # create a chord here
                 c = chord.Chord()
-                c._setMidiEvents(chordSub, ticksPerQuarter)
+                midiEventsToChord(chordSub, ticksPerQuarter, c)
                 o = notes[i][0][0] / float(ticksPerQuarter)
                 s._insertCore(o, c)
                 #iSkip = len(chordSub) # amount of accumulated chords
@@ -1464,7 +1507,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                 #composite.append(notes[i])
                 # create a note here
                 n = note.Note()
-                n._setMidiEvents(notes[i], ticksPerQuarter)
+                midiEventsToNote(notes[i], ticksPerQuarter, n)
                 # the time is the first value in the first pair
                 # need to round, as floating point error is likely
                 o = notes[i][0][0] / float(ticksPerQuarter)
@@ -1474,7 +1517,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
             i += 1
     elif len(notes) == 1: # rare case of just one note
         n = note.Note()
-        n._setMidiEvents(notes[0], ticksPerQuarter)
+        midiEventsToNote(notes[0], ticksPerQuarter, n)
         # the time is the first value in the first pair
         # need to round, as floating point error is likely
         o = notes[0][0][0] / float(ticksPerQuarter)
@@ -1727,6 +1770,14 @@ def streamToMidiFile(inputM21):
     1
     >>> len(mf.tracks[0].events)
     22
+    
+    >>> sc = scale.PhrygianScale('g')
+    >>> s = stream.Stream()
+    >>> x=[s.append(note.Note(sc.pitchFromDegree(i % 11), quarterLength=.25)) for i in range(60)]
+    >>> mf = midi.translate.streamToMidiFile(s)
+    >>> #_DOCS_SHOW mf.open('/Volumes/xdisc/_scratch/midi.mid', 'wb')
+    >>> #_DOCS_SHOW mf.write()
+    >>> #_DOCS_SHOW mf.close()  
     '''
     s = inputM21
     midiTracks = streamsToMidiTracks(s)
@@ -1797,7 +1848,7 @@ class Test(unittest.TestCase):
         from music21 import note
         n1 = note.Note('A4')
         n1.quarterLength = 2.0
-        eventList = n1.midiEvents
+        eventList = noteToMidiEvents(n1)
         self.assertEqual(len(eventList), 4)
 
         self.assertEqual(isinstance(eventList[0], midiModule.DeltaTime), True)

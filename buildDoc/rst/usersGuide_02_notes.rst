@@ -142,10 +142,10 @@ A couple of things that you'll notice:
     except when it doesn't, which is never when you'd expect. 
     
         *(The history
-        and theory behind `floats` will be explained to you at length by any
+        and theory behind* `floats` *will be explained to you at length by any
         computer scientist, usually when he or she is
         the only thing standing between you and the bar at a party. Really, we 
-        shouldn't be using them anymore, but for the fact that for our computers 
+        shouldn't be using them anymore, except for the fact that for our computers 
         they're so much faster to work with than decimals.)*  
     
     The difference between the string `'5'` and
@@ -430,14 +430,14 @@ as a '`midi`' file, don't expect to be overwhelmed.
     >>> note = note.Note("C#3") 
     
     Well now you're in a bind.  You've got your `Note` object stored as `note`, but
-    we *need* the `note` *module* in order to create new Notes and now you have
+    we *need* the `note` *module* in order to create new `Note` objects and now you have
     no way of getting it. (this is the problem that "polluting the namespace" causes
     that your Python guru friend might have warned you about).  So unless you're
     Emperor Leopold of Austria who complained that there were "too many notes,"
     you're probably going to want to make more `note.Note` objects in the future,
     so don't use `note` as a variable name. (The same goes with `pitch`, `scale`,
-    `key`, `clef`, and so on.  You'll see me use variable names like myNote and
-    myClef to avoid the problem).
+    `key`, `clef`, and so on.  You'll see me use variable names like `myNote` and
+    `myClef` to avoid the problem).
 
- Okay, now you have the basics of `Note` objects down, let's go on to `Pitch` and
- `Duration` objects by clicking "Next" below, right.
+Okay, now you have the basics of `Note` objects down, let's go on to `Pitch` and
+`Duration` objects by clicking "Next" below, right.

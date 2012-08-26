@@ -31,11 +31,11 @@ deg_          Several tools, see Notes                           Closest is :met
 degree_       see above for "`deg`"
 diss_         To-Do                                              Will be "analysis.kkdiss".
 ditto_        see Notes                                          :meth:`~music21.stream.Stream.choridfy` and the VerticalSlice objects accomplish similar things. Use `copy.copy(object)` or `copy.deepcopy(object)` to get another copy of an object
-encode_       `midi.(severaltools)`                              Multifunction humdrum program.  See the midi directory for some replacements.
+encode_       `midi.(severaltools)`                              Multifunction humdrum program.  See the midi directory for some replacements.  Or for simple conversion, `converter.parse` and `show('midi')` do this automatically
 extract_      None                                               Use python commands to extract objects with certain properties
 fields_       None                                               Not needed.
 fin2hum_      `music21.converter.parse` (filename)               Currently we only parse MusicXML files; as far as I know, Enigma Transport Format did not take off and is rarely used. An Enigma to music21 converter is very low priority.  Software to convert Enigma to MusicXML is available from recordare
-freq_         see :meth:`~music21.pitch.Pitch.freq440` 
+freq_         see :meth:`~music21.pitch.Pitch.frequency` 
 hint_         see Notes                                          :meth:`~music21.stream.Stream.attachIntervalsBetweenStreams` See trecento.capua demo to show how it can be done.
 hum2fin_      `.write('musicxml')`                               Writes to musicXML.  A music21 to Enigma converter will not be written (obsolete format)
 humdrum_      None                                               Not needed.  The `spineParser` will report errors when parsing.

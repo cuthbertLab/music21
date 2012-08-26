@@ -2675,7 +2675,7 @@ class Pitch(base.Music21Object):
             return 440.0 * (self._twelfth_root_of_two ** A4offset)
             
     def _setfreq440(self, value):
-        self._overridden_freq440 = value
+        self.ps = convertFqToPs(value)
 
     freq440 = property(_getfreq440, _setfreq440, doc='''
     Gets the frequency of the note as if it's in an equal temperment

@@ -80,7 +80,7 @@ http://docs.python.org/tutorial/controlflow.html
 To install music21, view :ref:`install`. With some basic Python knowledge, 
 start with :ref:`quickStart` for a rapid introduction to music21.
 
-The :ref:`overviewNotes`, :ref:`overviewStreams`, :ref:`overviewFormats`, 
+The :ref:`usersGuide_02_notes`, :ref:`overviewStreams`, :ref:`overviewFormats`, 
 and :ref:`overviewPostTonal` chapters provide surveys of important features of key components of the music21 toolkit.
 
 The main body of the documentation, however, is the module documentation. 

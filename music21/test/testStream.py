@@ -3232,7 +3232,7 @@ class Test(unittest.TestCase):
         # must be an even number
         self.assertEqual(len(post[0].events) % 2, 0)
 
-        mf = s.midiFile
+        mf = midiTranslate.streamToMidiFile(s)
         match = [(0, 'SEQUENCE_TRACK_NAME', None), (0, 'PITCH_BEND', None), (0, 'NOTE_ON', 56), (512, 'NOTE_OFF', 56), (0, 'NOTE_ON', 56), (512, 'NOTE_OFF', 56), (0, 'NOTE_ON', 56), (512, 'NOTE_OFF', 56), (0, 'NOTE_ON', 56), (512, 'NOTE_OFF', 56), (0, 'NOTE_ON', 56), (512, 'NOTE_OFF', 56), (0, 'NOTE_ON', 56), (512, 'NOTE_OFF', 56), (0, 'END_OF_TRACK', None)]
 
         procCompare(mf, match)
@@ -3242,7 +3242,7 @@ class Test(unittest.TestCase):
         n.quarterLength = 1.5
         s.repeatAppend(n, 3)
 
-        mf = s.midiFile
+        mf = midiTranslate.streamToMidiFile(s)
         match = [(0, 'SEQUENCE_TRACK_NAME', None), (0, 'PITCH_BEND', None), (0, 'NOTE_ON', 56), (1536, 'NOTE_OFF', 56), (0, 'NOTE_ON', 56), (1536, 'NOTE_OFF', 56), (0, 'NOTE_ON', 56), (1536, 'NOTE_OFF', 56), (0, 'END_OF_TRACK', None)]
         procCompare(mf, match)
 
@@ -3254,7 +3254,7 @@ class Test(unittest.TestCase):
             n.quarterLength = d
             s.append(n)
 
-        mf = s.midiFile
+        mf = midiTranslate.streamToMidiFile(s)
         match = [(0, 'SEQUENCE_TRACK_NAME', None), (0, 'NOTE_ON', 36), (256, 'NOTE_OFF', 36), (0, 'NOTE_ON', 49), (512, 'NOTE_OFF', 49), (0, 'NOTE_ON', 56), (1536, 'NOTE_OFF', 56), (0, 'NOTE_ON', 46), (1024, 'NOTE_OFF', 46), (0, 'NOTE_ON', 69), (2048, 'NOTE_OFF', 69), (0, 'END_OF_TRACK', None)] 
         procCompare(mf, match)
 
@@ -3270,7 +3270,7 @@ class Test(unittest.TestCase):
             n.quarterLength = d
             s.append(n)
         #s.show('midi')
-        mf = s.midiFile
+        mf = midiTranslate.streamToMidiFile(s)
         match = [(0, 'SEQUENCE_TRACK_NAME', None), 
         (0, 'NOTE_ON', 36), (1024, 'NOTE_OFF', 36), 
         (512, 'NOTE_ON', 49), (1024, 'NOTE_OFF', 49), 
@@ -3291,7 +3291,7 @@ class Test(unittest.TestCase):
             n.quarterLength = d
             s.append(n)
         #s.show('midi')
-        mf = s.midiFile
+        mf = midiTranslate.streamToMidiFile(s)
         match = [(0, 'SEQUENCE_TRACK_NAME', None), 
         (0, 'NOTE_ON', 36), (1024, 'NOTE_OFF', 36), 
         (256, 'NOTE_ON', 49), (1024, 'NOTE_OFF', 49), 
@@ -3311,7 +3311,7 @@ class Test(unittest.TestCase):
             n.quarterLength = d
             s.append(n)
         #s.show('midi')
-        mf = s.midiFile
+        mf = midiTranslate.streamToMidiFile(s)
         match = [(0, 'SEQUENCE_TRACK_NAME', None), 
         (0, 'NOTE_ON', 36), (1024, 'NOTE_OFF', 36), 
         (2048, 'NOTE_ON', 49), (1024, 'NOTE_OFF', 49), 
@@ -3336,7 +3336,7 @@ class Test(unittest.TestCase):
             n.quarterLength = d
             s.append(n)
         #s.show('midi')
-        mf = s.midiFile
+        mf = midiTranslate.streamToMidiFile(s)
         match = [(0, 'SEQUENCE_TRACK_NAME', None), (0, 'NOTE_ON', 36), (1024, 'NOTE_OFF', 36), (1024, 'NOTE_ON', 53), (0, 'NOTE_ON', 68), (0, 'NOTE_ON', 72), (1024, 'NOTE_OFF', 53), (0, 'NOTE_OFF', 68), (0, 'NOTE_OFF', 72), (512, 'NOTE_ON', 46), (1024, 'NOTE_OFF', 46), (2048, 'NOTE_ON', 38), (0, 'NOTE_ON', 69), (512, 'NOTE_OFF', 38), (0, 'NOTE_OFF', 69), (0, 'NOTE_ON', 37), (0, 'NOTE_ON', 58), (0, 'NOTE_ON', 92), (512, 'NOTE_OFF', 37), (0, 'NOTE_OFF', 58), (0, 'NOTE_OFF', 92), (1024, 'NOTE_ON', 54), (0, 'NOTE_ON', 69), (0, 'NOTE_ON', 73), (4096, 'NOTE_OFF', 54), (0, 'NOTE_OFF', 69), (0, 'NOTE_OFF', 73), (0, 'END_OF_TRACK', None)]
         procCompare(mf, match)
 
@@ -3362,7 +3362,7 @@ class Test(unittest.TestCase):
         #part.show('musicxml')
         #part.show('midi')
 
-        mf = part.midiFile
+        mf = midiTranslate.streamToMidiFile(part)
         match = [(0, 'SEQUENCE_TRACK_NAME', None), (0, 'PROGRAM_CHANGE', None), (0, 'PITCH_BEND', None), (0, 'PROGRAM_CHANGE', None), (0, 'KEY_SIGNATURE', None), (0, 'TIME_SIGNATURE', None), (0, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69), (0, 'NOTE_ON', 71), (1024, 'NOTE_OFF', 71), (0, 'NOTE_ON', 73), (1024, 'NOTE_OFF', 73), (0, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69), (0, 'NOTE_ON', 68), (1024, 'NOTE_OFF', 68), (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), (0, 'NOTE_ON', 68), (2048, 'NOTE_OFF', 68), (0, 'NOTE_ON', 66), (2048, 'NOTE_OFF', 66), (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), (0, 'NOTE_ON', 66), (2048, 'NOTE_OFF', 66), (0, 'NOTE_ON', 66), (512, 'NOTE_OFF', 66), (0, 'NOTE_ON', 65), (512, 'NOTE_OFF', 65), (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), (0, 'END_OF_TRACK', None)]
         procCompare(mf, match)
 
