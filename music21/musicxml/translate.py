@@ -2520,7 +2520,22 @@ def noteToMxNotes(n, spannerBundle=None):
     Translate a music21 :class:`~music21.note.Note` into a
     list of :class:`~music21.musicxml.Note` objects.
 
-    Note that, some note-attached spanners, such as octave shifts, produce direction (and direction types) in this method.
+    Because of "complex" durations, the number of 
+    `musicxml.Note` objects could be more than one.
+
+    Note that, some note-attached spanners, such 
+    as octave shifts, produce direction (and direction types) 
+    in this method.
+    
+    >>> from music21 import *
+    >>> n = note.Note('D#5')
+    >>> n.quarterLength = 2.25
+    >>> musicxmlNoteList = musicxml.translate.noteToMxNotes(n)
+    >>> len(musicxmlNoteList)
+    2
+    >>> musicxmlHalf = musicxmlNoteList[0]
+    >>> musicxmlHalf
+    <note <pitch step=D alter=1 octave=5> duration=20160 <tie type=start> type=half <accidental charData=sharp> <notations <tied type=start>>> 
     '''
     #Attributes of notes are merged from different locations: first from the 
     #duration objects, then from the pitch objects. Finally, GeneralNote 
@@ -2616,9 +2631,29 @@ def noteToMxNotes(n, spannerBundle=None):
 
 
 def mxToNote(mxNote, spannerBundle=None, inputM21=None):
-    '''Translate a MusicXML :class:`~music21.musicxml.Note` to a :class:`~music21.note.Note`.
+    '''
+    Translate a MusicXML :class:`~music21.musicxml.Note` 
+    to a :class:`~music21.note.Note`.
 
-    The `spanners` parameter can be a list or a Stream for storing and processing Spanner objects.
+    The `spannerBundle` parameter can be a list or a Stream 
+    for storing and processing Spanner objects.
+    
+    If inputM21 is not `None` then that object is used
+    for translating. Otherwise a new Note is created.
+    
+    Returns a `note.Note` object.
+    
+    >>> from music21 import *
+    >>> mxNote = musicxml.Note()
+    >>> mxNote.setDefaults()
+    >>> mxMeasure = musicxml.Measure()
+    >>> mxMeasure.setDefaults()
+    >>> mxMeasure.append(mxNote)
+    >>> mxNote.external['measure'] = mxMeasure # manually create ref
+    >>> mxNote.external['divisions'] = mxMeasure.external['divisions']
+    >>> n = musicxml.translate.mxToNote(mxNote)
+    >>> n
+    <music21.note.Note C>
     '''
     from music21 import articulations
     from music21 import expressions
@@ -2887,7 +2922,14 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                     mxMeasure.componentList += objList
                 elif 'GeneralNote' in classes:
                     offsetMeasureNote += obj.quarterLength
-                    objList = obj.mx # .mx here returns a list of notes
+
+                    ## returns a list of note objects...
+                    if 'Note' in classes:
+                        objList = noteToMxNotes(obj)
+                    elif 'Rest' in classes:
+                        objList = restToMxNotes(obj)
+                    elif 'Unpitched' in classes:
+                        environLocal.warn("skipping Unpitched object")
                     # need to set voice for each contained mx object
                     for sub in objList:
                         sub.voice = voiceId # the voice id is the voice number
@@ -2919,9 +2961,14 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
             elif 'Chord' in classes:
                 mxMeasure.componentList += chordToMx(obj,
                     spannerBundle=spannerBundle)
-            elif 'GeneralNote' in classes: # this includes chords
-                # .mx here returns a list of notes; this could be a rest
-                mxMeasure.componentList += obj.mx
+            elif 'GeneralNote' in classes: # this includes chords so caught before.
+                mxList = None
+                if 'Note' in classes:
+                    mxList = noteToMxNotes(obj)
+                elif 'Rest' in classes:
+                    mxList = restToMxNotes(obj)
+                
+                mxMeasure.componentList += mxList
             elif 'Dynamic' in classes:
                 # returns an mxDirection object
                 mxOffset = int(defaults.divisionsPerQuarter *
@@ -3372,7 +3419,8 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             else: # its a rest
                 restAndNoteCount['rest'] += 1
                 n = note.Rest()
-                n.mx = mxNote # assign mxNote to rest obj
+                mxToRest(mxNote, inputM21=n)
+                #n.mx = mxNote # assign mxNote to rest obj
                 _addToStaffReference(mxNote, n, staffReference)
                 #m.insert(offsetMeasureNote, n)
                 if useVoices:

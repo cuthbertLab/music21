@@ -847,11 +847,11 @@ class Note(NotRest):
     _DOC_ORDER = ['duration', 'quarterLength', 'nameWithOctave', 'pitchClass']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
-    'isNote': 'Boolean read-only value describing if this object is a Note.',
-    'isUnpitched': 'Boolean read-only value describing if this is Unpitched.',
-    'isRest': 'Boolean read-only value describing if this is a Rest.',
-    'beams': 'A :class:`~music21.beam.Beams` object.',
-    'pitch': 'A :class:`~music21.pitch.Pitch` object.',
+    'isNote': 'Boolean read-only value describing if this object is a Note (True).',
+    'isUnpitched': 'Boolean read-only value describing if this is Unpitched (False).',
+    'isRest': 'Boolean read-only value describing if this is a Rest (False).',
+    'beams': 'A :class:`~music21.beam.Beams` object that contains information about the beaming of this note.',
+    'pitch': 'A :class:`~music21.pitch.Pitch` object containing all the information about the note\'s pitch.  Many `.pitch` properties and methods are also made `Note` properties also',
     }
 
     # Accepts an argument for pitch
@@ -962,7 +962,7 @@ class Note(NotRest):
 
     name = property(_getName, _setName, 
         doc = '''Return or set the pitch name from the :class:`~music21.pitch.Pitch` object. 
-        See :attr:`~music21.pitch.Pitch.name`.
+        See `Pitch`'s attribute :attr:`~music21.pitch.Pitch.name`.
         ''')
 
     def _getNameWithOctave(self): 
@@ -973,7 +973,7 @@ class Note(NotRest):
     nameWithOctave = property(_getNameWithOctave, _setNameWithOctave,
         doc = '''
         Return or set the pitch name with octave from the :class:`~music21.pitch.Pitch` object. 
-        See :attr:`~music21.pitch.Pitch.nameWithOctave`.
+        See `Pitch`'s attribute :attr:`~music21.pitch.Pitch.nameWithOctave`.
         ''')
 
 
@@ -990,7 +990,10 @@ class Note(NotRest):
             raise NoteException('cannot set pitch name with provided object: %s' % value)
 
     pitchNames = property(_getPitchNames, _setPitchNames, 
-        doc = '''Return a list of Pitch names from  :attr:`~music21.pitch.Pitch.name`. This property is designed to provide an interface analogous to that found on :class:`~music21.chord.Chord`.
+        doc = '''
+        Return a list of Pitch names from  :attr:`~music21.pitch.Pitch.name`. 
+        This property is designed to provide an interface analogous to 
+        that found on :class:`~music21.chord.Chord`: :attr:`~music21.chord.Chord.pitchNames`.
 
         >>> from music21 import *
         >>> n = note.Note('g#')
@@ -1308,7 +1311,7 @@ class Note(NotRest):
             ticksPerQuarter, self)
 
     midiEvents = property(_getMidiEvents, _setMidiEvents, 
-        doc='''Get or set this chord as a list of :class:`music21.midi.base.MidiEvent` objects.
+        doc='''Get or set this Note as a list of :class:`music21.midi.base.MidiEvent` objects.
 
         >>> from music21 import *
         >>> n = note.Note()
@@ -1334,34 +1337,6 @@ class Note(NotRest):
         >>> #_DOCS_SHOW mf.write()
         >>> #_DOCS_SHOW mf.close()
         ''')
-
-
-    def _getMX(self):
-        return musicxmlTranslate.noteToMxNotes(self)
-
-    def _setMX(self, mxNote):
-        '''Given an mxNote, fill the necessary parameters of a Note
-    
-        >>> from music21 import *
-        >>> mxNote = musicxml.Note()
-        >>> mxNote.setDefaults()
-        >>> mxMeasure = musicxml.Measure()
-        >>> mxMeasure.setDefaults()
-        >>> mxMeasure.append(mxNote)
-        >>> mxNote.external['measure'] = mxMeasure # manually create ref
-        >>> mxNote.external['divisions'] = mxMeasure.external['divisions']
-        >>> n = note.Note('c')
-        >>> n.mx = mxNote
-        '''
-        musicxmlTranslate.mxToNote(mxNote, inputM21=self)
-
-
-    mx = property(_getMX, _setMX)    
-
-
-
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -1492,23 +1467,6 @@ class Rest(GeneralNote):
         >>> note.Rest(type='whole').fullName
         'Whole Rest'
         ''')
-
-
-    def _getMX(self):
-        '''
-        Returns a List of mxNotes
-        Attributes of notes are merged from different locations: first from the 
-        duration objects, then from the pitch objects. Finally, GeneralNote 
-        attributes are added
-        '''
-        return musicxmlTranslate.restToMxNotes(self)
-
-    def _setMX(self, mxNote):
-        '''Given an mxNote, fille the necessary parameters
-        '''
-        musicxmlTranslate.mxToRest(mxNote, inputM21=self)
-
-    mx = property(_getMX, _setMX)    
 
 
 class SpacerRest(Rest):
