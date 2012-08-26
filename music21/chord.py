@@ -524,14 +524,14 @@ class Chord(note.NotRest):
         >>> from music21 import *
         >>> c = chord.Chord(['C4', 'A4', 'E5'])
         >>> c.bass()
-        C4
+        <music21.pitch.Pitch C4>
         >>> c.root()
-        A4
+        <music21.pitch.Pitch A4>
         >>> c.pitches = ['C#4', 'A#4', 'E#5']
         >>> c.bass()
-        C#4
+        <music21.pitch.Pitch C#4>
         >>> c.root()
-        A#4
+        <music21.pitch.Pitch A#4>
 
         '''
 
@@ -553,14 +553,14 @@ class Chord(note.NotRest):
         >>> from music21 import *
         >>> c = chord.Chord(["C4", "E4", "G#4"])
         >>> c.pitches
-        [C4, E4, G#4]
+        [<music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch G#4>]
         >>> [p.midi for p in c.pitches]
         [60, 64, 68]
 
         >>> d = chord.Chord()
         >>> d.pitches = c.pitches
         >>> d.pitches
-        [C4, E4, G#4]
+        [<music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch G#4>]
         ''')
 
     def _setTie(self, value):
@@ -1222,11 +1222,10 @@ class Chord(note.NotRest):
         '''returns the bass Pitch or sets it to the given Pitch.
         example:
 
-
         >>> from music21 import *
         >>> cmaj1stInv = chord.Chord(['C4', 'E3', 'G5'])
         >>> cmaj1stInv.bass()
-        E3
+        <music21.pitch.Pitch E3>
 
 
         The bass is usually defined to the lowest note in the chord,
@@ -1238,10 +1237,10 @@ class Chord(note.NotRest):
 
         >>> vo9 = chord.Chord(['B3', 'D4', 'F4', 'A-4'])
         >>> vo9.bass()
-        B3
+        <music21.pitch.Pitch B3>
         >>> vo9.bass(pitch.Pitch('G3'))
         >>> vo9.bass()
-        G3
+        <music21.pitch.Pitch G3>
 
         By default this method uses an algorithm to find the bass among the chord's
         pitches, if no bass has been previously specified. If this is not intended,
@@ -1254,11 +1253,11 @@ class Chord(note.NotRest):
 
         >>> d = harmony.ChordSymbol('CM')
         >>> d.bass()
-        C3
+        <music21.pitch.Pitch C3>
 
         >>> d = harmony.ChordSymbol('Cm/E-')
         >>> d.bass()
-        E-3
+        <music21.pitch.Pitch E-3>
 
         OMIT_FROM_DOCS
 
@@ -1266,7 +1265,7 @@ class Chord(note.NotRest):
 
         >>> a = chord.Chord(['C4'])
         >>> a.bass()
-        C4
+        <music21.pitch.Pitch C4>
 
 
         '''
@@ -1294,7 +1293,7 @@ class Chord(note.NotRest):
         >>> from music21 import *
         >>> cmaj = chord.Chord(['C4', 'E3', 'G4'])
         >>> cmaj._findBass() # returns E3
-        E3
+        <music21.pitch.Pitch E3>
         '''
 
         lowest = None
@@ -1317,7 +1316,7 @@ class Chord(note.NotRest):
         >>> from music21 import *
         >>> cmaj = chord.Chord(['E3', 'C4', 'G5'])
         >>> cmaj.root()
-        C4
+        <music21.pitch.Pitch C4>
 
         By default this method uses an algorithm to find the root among the chord's
         pitches, if no root has been previously specified. If this is not intended,
@@ -1332,7 +1331,7 @@ class Chord(note.NotRest):
         >>> d.root(find=False) == None
         True
         >>> d.root()
-        C4
+        <music21.pitch.Pitch C4>
 
         '''
         if newroot:
@@ -1357,8 +1356,8 @@ class Chord(note.NotRest):
         example:
         >>> from music21 import *
         >>> cmaj = chord.Chord(['E', 'G', 'C'])
-        >>> cmaj.findRoot() # returns C
-        C
+        >>> cmaj.findRoot()
+        <music21.pitch.Pitch C>
         '''
         oldRoots = copy.copy(self.pitches)
         newRoots = []
@@ -1467,12 +1466,12 @@ class Chord(note.NotRest):
         >>> rn.key
         <music21.key.Key of f# minor>
         >>> rn.pitches
-        [C#5, E#5, G#5]
+        [<music21.pitch.Pitch C#5>, <music21.pitch.Pitch E#5>, <music21.pitch.Pitch G#5>]
         >>> rn.scaleDegrees
         [(5, None), (7, <accidental sharp>), (2, None)]
         >>> rn2 = roman.RomanNumeral('N6', k)
         >>> rn2.pitches
-        [B4, D5, G5]
+        [<music21.pitch.Pitch B4>, <music21.pitch.Pitch D5>, <music21.pitch.Pitch G5>]
         >>> rn2.scaleDegrees # N.B. -- natural form used for minor!
         [(4, None), (6, None), (2, <accidental flat>)]
 
@@ -1599,7 +1598,7 @@ class Chord(note.NotRest):
         >>> from music21 import *
         >>> cMaj1stInv = chord.Chord(['E3','C4','G5'])
         >>> cMaj1stInv.third
-        E3
+        <music21.pitch.Pitch E3>
         >>> cMaj1stInv.third.octave
         3
         '''
@@ -1613,7 +1612,7 @@ class Chord(note.NotRest):
         >>> from music21 import *
         >>> cMaj1stInv = chord.Chord(['E3','C4','G5'])
         >>> cMaj1stInv.fifth
-        G5
+        <music21.pitch.Pitch G5>
         >>> cMaj1stInv.fifth.midi
         79
 
@@ -1629,7 +1628,7 @@ class Chord(note.NotRest):
         >>> from music21 import *
         >>> bDim7_2ndInv = chord.Chord(['F2','A-3','B4','D5'])
         >>> bDim7_2ndInv.seventh
-        A-3
+        <music21.pitch.Pitch A-3>
         '''
         return self.getChordStep(7)
 
@@ -1650,7 +1649,7 @@ class Chord(note.NotRest):
         >>> from music21 import *
         >>> cmaj = chord.Chord(['C','E','G#'])
         >>> cmaj.getChordStep(3) # will return the third of the chord
-        E
+        <music21.pitch.Pitch E>
         >>> gis = cmaj.getChordStep(5) # will return the fifth of the chord
         >>> gis.name
         'G#'
@@ -2076,7 +2075,7 @@ class Chord(note.NotRest):
         >>> c.isAugmentedTriad()
         True
         >>> c.root()
-        A-4
+        <music21.pitch.Pitch A-4>
 
         >>> c = chord.Chord(["C4", "F-4", "A-4"])
         >>> c.isAugmentedTriad()
@@ -2233,9 +2232,12 @@ class Chord(note.NotRest):
         >>> c = chord.Chord(['A-3','C4','E-4','F#4'])
         >>> c.isAugmentedSixth()
         True
+        
+        Spelling matters
+        
         >>> c.pitches[3].getEnharmonic(inPlace = True)
-        >>> c.pitches
-        [A-3, C4, E-4, G-4]
+        >>> c
+        <music21.chord.Chord A-3 C4 E-4 G-4>
         >>> c.isAugmentedSixth()
         False
 
@@ -2831,12 +2833,12 @@ class Chord(note.NotRest):
         Force octave changes the octave of the bass note (and all notes above it...)
 
         >>> c2 = chord.Chord(["C#4", "G5", "E6"])
-        >>> str(c2.closedPosition(forceOctave = 2).pitches)
-        '[C#2, E2, G2]'
+        >>> c2.closedPosition(forceOctave = 2)
+        <music21.chord.Chord C#2 E2 G2>
 
         >>> c3 = chord.Chord(["C#4", "G5", "E6"])
-        >>> str(c3.closedPosition(forceOctave = 6).pitches)
-        '[C#6, E6, G6]'
+        >>> c3.closedPosition(forceOctave = 6)
+        <music21.chord.Chord C#6 E6 G6>
 
 
 
@@ -2844,19 +2846,19 @@ class Chord(note.NotRest):
 
         >>> c4 = chord.Chord(["C#4", "C5", "F7", "F8"])
         >>> c5 = c4.closedPosition(4, inPlace = False)
-        >>> str(c5.pitches)
-        '[C#4, F4, C5]'
+        >>> c5
+        <music21.chord.Chord C#4 F4 C5>
         >>> c6 = c4.closedPosition(4, inPlace = False, leaveRedundantPitches=True)
-        >>> str(c6.pitches)
-        '[C#4, F4, F4, C5]'
+        >>> c6
+        <music21.chord.Chord C#4 F4 F4 C5>
 
 
         Implicit octaves work fine...
 
         >>> c7 = chord.Chord(["A4", "B4", "A"])
         >>> c7.closedPosition(4, inPlace = True)
-        >>> str(c7.pitches)
-        '[A4, B4]'
+        >>> c7
+        <music21.chord.Chord A4 B4>
 
         OMIT_FROM_DOCS
         Very specialized fears...
@@ -2865,15 +2867,15 @@ class Chord(note.NotRest):
 
         >>> c7b = chord.Chord(["A4", "B4", "A5"])
         >>> c7b.closedPosition(inPlace = True)
-        >>> str(c7b.pitches)
-        '[A4, B4]'
+        >>> c7b
+        <music21.chord.Chord A4 B4>
 
         but the bass must remain A4:
 
         >>> c7c = chord.Chord(["A4", "B4", "A5", "G##6"])
         >>> c7c.closedPosition(inPlace = True)
-        >>> str(c7c.pitches)
-        '[A4, B4, G##5]'
+        >>> c7c
+        <music21.chord.Chord A4 B4 G##5>
         >>> str(c7c.bass())
         'A4'
 
@@ -2881,8 +2883,8 @@ class Chord(note.NotRest):
 
         >>> c8 = chord.Chord(['C3','E5','C#6','E-7', 'G8','C9','E#9'])
         >>> c8.closedPosition(inPlace=True)
-        >>> str(c8.pitches)
-        '[C3, C#3, E-3, E3, E#3, G3]'
+        >>> c8
+        <music21.chord.Chord C3 C#3 E-3 E3 E#3 G3>
         '''
         #environLocal.printDebug(['calling closedPosition()', inPlace])
         if inPlace:
@@ -2938,20 +2940,20 @@ class Chord(note.NotRest):
         >>> from music21 import *
         >>> c1 = chord.Chord(['C3','E5','C#6','E-7', 'G8','C9','E#9'])
         >>> c2 = c1.semiClosedPosition(inPlace=False)
-        >>> c2.pitches
-        [C3, E-3, G3, C#4, E4, E#5]
+        >>> c2
+        <music21.chord.Chord C3 E-3 G3 C#4 E4 E#5>
 
         `leaveRedundantPitches` still works, and gives them a new octave!
 
         >>> c3 = c1.semiClosedPosition(inPlace=False, leaveRedundantPitches=True)
-        >>> c3.pitches
-        [C3, E-3, G3, C4, E4, C#5, E#5]
+        >>> c3
+        <music21.chord.Chord C3 E-3 G3 C4 E4 C#5 E#5>
 
         of course `forceOctave` still works, as does `inPlace=True`.
 
         >>> c1.semiClosedPosition(forceOctave=2, inPlace=True, leaveRedundantPitches=True)
-        >>> c1.pitches
-        [C2, E-2, G2, C3, E3, C#4, E#4]
+        >>> c1
+        <music21.chord.Chord C2 E-2 G2 C3 E3 C#4 E#4>
 
         '''
         if inPlace is False:
@@ -3614,16 +3616,18 @@ class Chord(note.NotRest):
 
         >>> from music21 import *
         >>> c1 = chord.Chord(['c2', 'e3', 'g4', 'e3'])
+        >>> c1
+        <music21.chord.Chord C2 E3 G4 E3>
         >>> c1.removeRedundantPitches(inPlace=True)
-        >>> c1.pitches
-        [C2, G4, E3]
+        >>> c1
+        <music21.chord.Chord C2 G4 E3>
         >>> c1.forteClass
         '3-11B'
 
         >>> c2 = chord.Chord(['c2', 'e3', 'g4', 'c5'])
         >>> c2c = c2.removeRedundantPitches(inPlace=False)
-        >>> c2c.pitches
-        [C2, E3, G4, C5]
+        >>> c2c
+        <music21.chord.Chord C2 E3 G4 C5>
 
 
         It is a known bug that because pitch.nameWithOctave gives
@@ -3639,7 +3643,7 @@ class Chord(note.NotRest):
         >>> c3 = chord.Chord([p1, p2])
         >>> c3.removeRedundantPitches(inPlace=True)
         >>> c3.pitches
-        [B-1]
+        [<music21.pitch.Pitch B-1>]
 
 
         The first pitch survives:
@@ -3664,12 +3668,12 @@ class Chord(note.NotRest):
         >>> c1 = chord.Chord(['c2', 'e3', 'g4', 'e3'])
         >>> c1.removeRedundantPitchClasses(inPlace=True)
         >>> c1.pitches
-        [C2, G4, E3]
+        [<music21.pitch.Pitch C2>, <music21.pitch.Pitch G4>, <music21.pitch.Pitch E3>]
 
         >>> c2 = chord.Chord(['c5', 'e3', 'g4', 'c2', 'e3', 'f-4'])
         >>> c2.removeRedundantPitchClasses(inPlace=True)
         >>> c2.pitches
-        [C5, G4, E3]
+        [<music21.pitch.Pitch C5>, <music21.pitch.Pitch G4>, <music21.pitch.Pitch E3>]
 
         '''
         return self._removePitchByRedundantAttribute('pitchClass',
@@ -3685,9 +3689,11 @@ class Chord(note.NotRest):
 
         >>> from music21 import *
         >>> c2 = chord.Chord(['c5', 'e3', 'g4', 'c2', 'e3', 'f-4'])
+        >>> c2
+        <music21.chord.Chord C5 E3 G4 C2 E3 F-4>
         >>> c2.removeRedundantPitchNames(inPlace = True)
-        >>> c2.pitches
-        [C5, G4, E3, F-4]
+        >>> c2
+        <music21.chord.Chord C5 G4 E3 F-4>
 
         '''
         return self._removePitchByRedundantAttribute('name',
@@ -3889,6 +3895,16 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+    def pitchOut(self, listIn):
+        '''
+        make tests for old-style pitch representation still work.
+        '''
+        out = "["
+        for p in listIn:
+            out += str(p) + ', '
+        out = out[0:len(out)-2]
+        out += "]"
+        return out
 
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
@@ -4594,7 +4610,7 @@ class Test(unittest.TestCase):
             s.append(n)
         self.assertEqual(len(s.notes), 3)
         self.assertEqual(s.highestOffset, 2.0)
-        self.assertEqual(str(s.pitches), '[D2, E-1, B-6]')
+        self.assertEqual(str(s.pitches), '[<music21.pitch.Pitch D2>, <music21.pitch.Pitch E-1>, <music21.pitch.Pitch B-6>]')
 
 
 

@@ -500,21 +500,21 @@ class Modifier(object):
         >>> m3 = notation.Modifier('n')
         >>> p1a = pitch.Pitch('D5')
         >>> m1.modifyPitch(p1a) # Sharp
-        D#5
+        <music21.pitch.Pitch D#5>
         >>> m2.modifyPitch(p1a) # Flat
-        D-5
+        <music21.pitch.Pitch D-5>
         >>> p1b = pitch.Pitch('D#5')
         >>> m3.modifyPitch(p1b)
-        D5
+        <music21.pitch.Pitch D5>
          
         OMIT_FROM_DOCS
         >>> m4 = notation.Modifier('##')
         >>> m5 = notation.Modifier('--')
         >>> p2 = pitch.Pitch('F5')
         >>> m4.modifyPitch(p2) # Double Sharp
-        F##5
+        <music21.pitch.Pitch F##5>
         >>> m5.modifyPitch(p2) # Double Flat
-        F--5
+        <music21.pitch.Pitch F--5>
         '''
         if not inPlace:
             pitchToAlter = copy.deepcopy(pitchToAlter)
@@ -551,9 +551,9 @@ def convertToPitch(pitchString):
     >>> from music21.figuredBass import realizerScale
     >>> pitchString = 'C5'
     >>> realizerScale.convertToPitch(pitchString)
-    C5
+    <music21.pitch.Pitch C5>
     >>> realizerScale.convertToPitch(pitch.Pitch('E4')) # does nothing
-    E4
+    <music21.pitch.Pitch E4>
     '''
     if isinstance(pitchString, pitch.Pitch):
         return pitchString

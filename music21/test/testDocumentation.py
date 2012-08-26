@@ -21,14 +21,14 @@ import music21
 _MOD = "test.testDocumentation.py"  
 
 skipModules = [
-               'documenting.rst', # contains info the screws up testing
+               'documenting.rst', # contains info that screws up testing
                ]
 
 def main():
     music21init = music21.__file__
     music21dir = os.path.dirname(music21init)
     music21basedir = os.path.dirname(music21dir)
-    builddocRstDir = music21basedir + os.sep + 'builddoc' + os.sep + 'rst'
+    builddocRstDir = music21basedir + os.sep + 'builddoc' + os.sep + 'staticDocs'
     
     totalTests = 0
     totalFailures = 0

@@ -270,9 +270,9 @@ class StreamFreezer(object):
     >>> s.repeatAppend(note.Note('C4'), 8) 
     >>> temp = [s[n].transpose(n, inPlace=True) for n in range(len(s))]
 
-    >>> sf = StreamFreezer(s) # provide a Stream at init
+    >>> sf = converter.StreamFreezer(s) # provide a Stream at init
     >>> data = sf.writeStr(fmt='pickle') # pickle is default format; jsonpickle
-    >>> sfOut = StreamFreezer() 
+    >>> sfOut = converter.StreamFreezer() 
     >>> sfOut.openStr(data)
     >>> s = sfOut.stream
     >>> s.show('t')
@@ -355,9 +355,14 @@ class StreamFreezer(object):
             return 'jsonnative'
 
     def write(self, fmt=None, fp=None):
-        '''For a supplied Stream, write a serialized version.
         '''
-
+        For a supplied Stream, write a serialized version to
+        disk in either 'pickle' or 'jsonpickle' format and
+        return the filepath to the file.
+        
+        N.B. jsonpickle is the better format for transporting from
+        one computer to another, but still has some bugs.
+        '''
         fmt = self._parseWriteFmt(fmt)
 
         if fp is None:

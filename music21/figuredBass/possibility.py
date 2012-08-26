@@ -221,7 +221,7 @@ def pitchesWithinLimit(possibA, maxPitch = pitch.Pitch('B5')):
     True
     >>> resPossib = resolution.dominantSeventhToMajorTonic(domPossib)
     >>> resPossib # Contains C6 > B5
-    (C6, E5, C4, C3)
+    (<music21.pitch.Pitch C6>, <music21.pitch.Pitch E5>, <music21.pitch.Pitch C4>, <music21.pitch.Pitch C3>)
     >>> possibility.pitchesWithinLimit(resPossib)
     False 
     '''
@@ -931,9 +931,16 @@ def partPairs(possibA, possibB):
     >>> possibA1 = (C5, G4, E4, C4)
     >>> possibB1 = (B4, F4, D4, D4)
     >>> possibility.partPairs(possibA1, possibA1)
-    [(C5, C5), (G4, G4), (E4, E4), (C4, C4)]
+    [(<music21.pitch.Pitch C5>, <music21.pitch.Pitch C5>), 
+     (<music21.pitch.Pitch G4>, <music21.pitch.Pitch G4>), 
+     (<music21.pitch.Pitch E4>, <music21.pitch.Pitch E4>), 
+     (<music21.pitch.Pitch C4>, <music21.pitch.Pitch C4>)]
     >>> possibility.partPairs(possibA1, possibB1)
-    [(C5, B4), (G4, F4), (E4, D4), (C4, D4)]
+    [(<music21.pitch.Pitch C5>, <music21.pitch.Pitch B4>), 
+     (<music21.pitch.Pitch G4>, <music21.pitch.Pitch F4>), 
+     (<music21.pitch.Pitch E4>, <music21.pitch.Pitch D4>), 
+     (<music21.pitch.Pitch C4>, <music21.pitch.Pitch D4>)]
+
     '''
     return list(itertools.izip(possibA, possibB))
 

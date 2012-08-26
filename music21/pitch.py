@@ -612,27 +612,27 @@ def _getSpanishCardinal(int):
     if int == 1:
         return ''
     elif int == 2:
-        return 'doble'
+        return ' doble'
     elif int == 3:
-        return 'triple'
+        return ' triple'
     elif int == 4:
-        return 'cuádruple'
+        return ' cuádruple'
 
 def _getSpanishSolfege(pitch):
         if pitch == 'A':
-            return 'la '
+            return 'la'
         if pitch == 'B':
-            return 'si '
+            return 'si'
         if pitch == 'C':
-            return 'do '
+            return 'do'
         if pitch == 'D':
-            return 're '
+            return 're'
         if pitch == 'E':
-            return 'mi '
+            return 'mi'
         if pitch == 'F':
-            return 'fa '
+            return 'fa'
         if pitch == 'G':
-            return 'sol '
+            return 'sol'
         
 class Accidental(base.Music21Object):
     '''
@@ -1178,10 +1178,19 @@ class Pitch(base.Music21Object):
         >>> from music21 import *
         >>> p1 = pitch.Pitch('a#')
         >>> p1
+        <music21.pitch.Pitch A#>
+        
+        Printing a `pitch.Pitch` object or converting it 
+        to a string gives a more compact form:
+        
+        >>> print(p1)
         A#
+        >>> str(p1)
+        'A#'
+        
         >>> p2 = pitch.Pitch(3)
         >>> p2
-        E-
+        <music21.pitch.Pitch E->
         
         
         This is B-double flat in octave 3, not B- in octave -3.
@@ -1266,6 +1275,9 @@ class Pitch(base.Music21Object):
                 self.ps = keywords['ps']
 
     def __repr__(self):
+        return '<music21.pitch.Pitch %s>' % self.__str__()
+
+    def __str__(self):
         name = self.nameWithOctave
         if self.microtone.cents != 0:
             return name + self._microtone.__repr__()
@@ -1413,13 +1425,13 @@ class Pitch(base.Music21Object):
         
         >>> b = pitch.Pitch('C4')
         >>> b.accidental = 1.5
-        >>> b
+        >>> print(b)
         C#4(+50c)
         >>> b.accidental = 1.65
-        >>> b
+        >>> print(b)
         C#~4(+15c)
         >>> b.accidental = 1.95
-        >>> b
+        >>> print(b)
         C##4(-5c)
         ''')
 
@@ -1455,16 +1467,16 @@ class Pitch(base.Music21Object):
         >>> p.ps
         63.0
         >>> p.microtone = 33 # adjustment in cents     
-        >>> p
-        E-4(+33c)
+        >>> str(p)
+        'E-4(+33c)'
         >>> (p.name, p.nameWithOctave) # these representations are unchanged
         ('E-', 'E-4')
         >>> p.microtone = '(-12c' # adjustment in cents     
         >>> p
-        E-4(-12c)
+        <music21.pitch.Pitch E-4(-12c)>
         >>> p.microtone = pitch.Microtone(-30)
         >>> p
-        E-4(-30c)
+        <music21.pitch.Pitch E-4(-30c)>
         
         ''')
 
@@ -1568,22 +1580,22 @@ class Pitch(base.Music21Object):
 
         >>> from music21 import *
         >>> p = pitch.Pitch('G#~')
-        >>> p, p.microtone
-        (G#~, (+0c))
+        >>> str(p), p.microtone
+        ('G#~', (+0c))
         >>> p.convertQuarterTonesToMicrotones(inPlace=True)
         >>> p.ps
         68.5
-        >>> p, p.microtone
-        (G#(+50c), (+50c))
+        >>> str(p), p.microtone
+        ('G#(+50c)', (+50c))
         
         >>> p = pitch.Pitch('A`')
-        >>> p, p.microtone
-        (A`, (+0c))
+        >>> str(p), p.microtone
+        ('A`', (+0c))
         >>> x = p.convertQuarterTonesToMicrotones(inPlace=False)
-        >>> x, x.microtone
-        (A(-50c), (-50c))
-        >>> p, p.microtone
-        (A`, (+0c))
+        >>> str(x), x.microtone
+        ('A(-50c)', (-50c))
+        >>> str(p), p.microtone
+        ('A`', (+0c))
         '''
         if inPlace:
             returnObj = self
@@ -1620,25 +1632,25 @@ class Pitch(base.Music21Object):
         >>> from music21 import *
         >>> p = pitch.Pitch('g3')
         >>> p.microtone = 78
-        >>> p
-        G3(+78c)
+        >>> str(p)
+        'G3(+78c)'
         >>> p.convertMicrotonesToQuarterTones(inPlace=True)
-        >>> p
-        G#3(-22c)
+        >>> str(p)
+        'G#3(-22c)'
         
         >>> p = pitch.Pitch('d#3')
         >>> p.microtone = 46
         >>> p
-        D#3(+46c)
+        <music21.pitch.Pitch D#3(+46c)>
         >>> p.convertMicrotonesToQuarterTones(inPlace=True)
         >>> p
-        D#~3(-4c)
+        <music21.pitch.Pitch D#~3(-4c)>
         
         >>> p = pitch.Pitch('f#2')
         >>> p.microtone = -38
         >>> p.convertMicrotonesToQuarterTones(inPlace=True)
-        >>> p
-        F~2(+12c)
+        >>> str(p)
+        'F~2(+12c)'
 
         '''
         if inPlace:
@@ -1682,12 +1694,12 @@ class Pitch(base.Music21Object):
         True
         >>> p.ps = 61.5 # get a quarter tone
         >>> p
-        C#~4
+        <music21.pitch.Pitch C#~4>
         >>> p.ps = 61.7 # set a microtone
-        >>> p
+        >>> print(p)
         C#~4(+20c)
         >>> p.ps = 61.4 # set a microtone
-        >>> p
+        >>> print(p)
         C#~4(-10c)
 
         '''
@@ -1734,14 +1746,11 @@ class Pitch(base.Music21Object):
         >>> a.ps
         60.0
         
-        
-        Changing the ps value for
-        A will change the step and octave:
-        
+        Changing the ps value for `a` will change the step and octave:
         
         >>> a.ps = 45
         >>> a
-        A2
+        <music21.pitch.Pitch A2>
         >>> a.ps
         45.0
 
@@ -1750,26 +1759,22 @@ class Pitch(base.Music21Object):
         C# and D-flat.  Thus "implicitAccidental"
         will be true after setting our pitch to 61:
         
-        
         >>> a.ps = 61
         >>> a
-        C#4
+        <music21.pitch.Pitch C#4>
         >>> a.ps
         61.0
         >>> a.implicitAccidental
         True
         
-        
         Microtones are allowed, as are extreme ranges:
-        
         
         >>> b = pitch.Pitch('B9')
         >>> b.accidental = pitch.Accidental('half-flat')
         >>> b
-        B`9
+        <music21.pitch.Pitch B`9>
         >>> b.ps
         130.5
-        
         ''')
 
     def _updatePitchSpace(self):
@@ -1874,7 +1879,7 @@ class Pitch(base.Music21Object):
         >>> veryHighFHalfFlat.octave = 12
         >>> veryHighFHalfFlat.accidental = pitch.Accidental('half-flat')
         >>> veryHighFHalfFlat
-        F`12
+        <music21.pitch.Pitch F`12>
         >>> veryHighFHalfFlat.ps
         160.5
         >>> veryHighFHalfFlat.midi
@@ -1884,7 +1889,7 @@ class Pitch(base.Music21Object):
         >>> notAsHighNote = pitch.Pitch()
         >>> notAsHighNote.ps = veryHighFHalfFlat.midi
         >>> notAsHighNote
-        F9
+        <music21.pitch.Pitch F9>
 
 
 
@@ -2187,12 +2192,12 @@ class Pitch(base.Music21Object):
         >>> a = pitch.Pitch('a3')
         >>> a.pitchClass = 3
         >>> a
-        E-3
+        <music21.pitch.Pitch E-3>
         >>> a.implicitAccidental
         True
         >>> a.pitchClass = 'A'
         >>> a
-        B-3
+        <music21.pitch.Pitch B-3>
         '''
         # permit the submission of strings, like A an dB
         value = convertPitchClassToNumber(value)
@@ -2644,10 +2649,12 @@ class Pitch(base.Music21Object):
         'A'
         >>> a.octave
         4
-        >>> a.frequency = 450.0 # microtones are captured
+        
+        Microtones are captured if the frequency doesn't correspond to any standard note.
+        
+        >>> a.frequency = 450.0
         >>> a
-        A~4(-11c)
-
+        <music21.pitch.Pitch A~4(-11c)>
     ''')
 
 
@@ -2707,32 +2714,32 @@ class Pitch(base.Music21Object):
 
         >>> from music21 import *
         >>> p = pitch.Pitch('a4')
-        >>> p.getHarmonic(2)
+        >>> print(p.getHarmonic(2))
         A5
-        >>> p.getHarmonic(3)
+        >>> print(p.getHarmonic(3))
         E6(+2c)
-        >>> p.getHarmonic(4)
+        >>> print(p.getHarmonic(4))
         A6
-        >>> p.getHarmonic(5)
+        >>> print(p.getHarmonic(5))
         C#7(-14c)
-        >>> p.getHarmonic(6)
+        >>> print(p.getHarmonic(6))
         E7(+2c)
-        >>> p.getHarmonic(7)
+        >>> print(p.getHarmonic(7))
         F#~7(+19c)
-        >>> p.getHarmonic(8)
+        >>> print(p.getHarmonic(8))
         A7
         
 
         >>> p2 = p.getHarmonic(2)
         >>> p2
-        A5
+        <music21.pitch.Pitch A5>
         >>> p2.fundamental
-        A4
+        <music21.pitch.Pitch A4>
         >>> p2.transpose('p5', inPlace=True)
         >>> p2
-        E6
+        <music21.pitch.Pitch E6>
         >>> p2.fundamental
-        E5
+        <music21.pitch.Pitch E5>
 
         
         Or we can iterate over a list of the next 8 odd harmonics:
@@ -2749,19 +2756,19 @@ class Pitch(base.Music21Object):
         >>> q = pitch.Pitch('C4')
         >>> q.microtone = 10
         >>> q.getHarmonic(2)
-        C5(+10c)
+        <music21.pitch.Pitch C5(+10c)>
         >>> q.getHarmonic(3)
-        G5(+12c)
+        <music21.pitch.Pitch G5(+12c)>
         
         
         The fundamental is stored with the harmonic. 
 
 
         >>> h7 = pitch.Pitch("A4").getHarmonic(7)
-        >>> h7
+        >>> print(h7)
         F#~7(+19c)
         >>> h7.fundamental
-        A4
+        <music21.pitch.Pitch A4>
         >>> h7.harmonicString()
         '7thH/A4'
         >>> h7.harmonicString('A3')
@@ -2770,16 +2777,16 @@ class Pitch(base.Music21Object):
         
         >>> h2 = h7.getHarmonic(2)
         >>> h2
-        F#~8(+19c)
+        <music21.pitch.Pitch F#~8(+19c)>
         >>> h2.fundamental
-        F#~7(+19c)
+        <music21.pitch.Pitch F#~7(+19c)>
         >>> h2.fundamental.fundamental
-        A4
+        <music21.pitch.Pitch A4>
         >>> h2.transpose(-24, inPlace=True)
         >>> h2
-        F#~6(+19c)
+        <music21.pitch.Pitch F#~6(+19c)>
         >>> h2.fundamental.fundamental
-        A2
+        <music21.pitch.Pitch A2>
         
         '''
         centShift = convertHarmonicToCents(number)
@@ -3000,7 +3007,7 @@ class Pitch(base.Music21Object):
 
         >>> from music21 import *
         >>> pitch.Pitch('g4').harmonicAndFundamentalFromPitch('c3')
-        (3, C3(-2c))
+        (3, <music21.pitch.Pitch C3(-2c)>)
 
         '''
         if common.isStr(target):
@@ -3102,27 +3109,22 @@ class Pitch(base.Music21Object):
         >>> from music21 import *
         >>> p1 = pitch.Pitch('C#3')
         >>> p2 = p1.getHigherEnharmonic()
-        >>> p2
+        >>> print(p2)
         D-3
 
         >>> p1 = pitch.Pitch('C#3')
         >>> p1.getHigherEnharmonic(inPlace=True)
-        >>> p1
+        >>> print(p1)
         D-3
-        
-        
         
         The method even works for certain CRAZY enharmonics
         
-        
         >>> p3 = pitch.Pitch('D--3')
         >>> p4 = p3.getHigherEnharmonic()
-        >>> p4
+        >>> print(p4)
         E----3
         
-        
         But not for things that are just utterly insane:
-        
         
         >>> p4.getHigherEnharmonic()
         Traceback (most recent call last):
@@ -3155,12 +3157,12 @@ class Pitch(base.Music21Object):
         >>> from music21 import *
         >>> p1 = pitch.Pitch('C-3')
         >>> p2 = p1.getLowerEnharmonic()
-        >>> p2
+        >>> print(p2)
         B2
 
         >>> p1 = pitch.Pitch('C#3')
         >>> p1.getLowerEnharmonic(inPlace=True)
-        >>> p1
+        >>> print(p1)
         B##2
         '''
         intervalObj = interval.Interval('-d2')
@@ -3209,12 +3211,12 @@ class Pitch(base.Music21Object):
         >>> p2 = pitch.Pitch("A#2")
         >>> p2.simplifyEnharmonic(inPlace = True)
         >>> p2
-        A#2
+        <music21.pitch.Pitch A#2>
         
         >>> p3 = pitch.Pitch("E--3")
         >>> p4 = p3.transpose(interval.Interval('-A5'))
         >>> p4.simplifyEnharmonic()
-        F#2
+        <music21.pitch.Pitch F#2>
 
 
         Setting mostCommon = True simplifies enharmonics
@@ -3222,8 +3224,8 @@ class Pitch(base.Music21Object):
 
 
         >>> pList = [pitch.Pitch("A#4"), pitch.Pitch("B-4"), pitch.Pitch("G-4"), pitch.Pitch("F#4")]
-        >>> [p.simplifyEnharmonic(mostCommon = True) for p in pList]
-        [B-4, B-4, F#4, F#4]
+        >>> [str(p.simplifyEnharmonic(mostCommon = True)) for p in pList]
+        ['B-4', 'B-4', 'F#4', 'F#4']
 
 
 
@@ -3234,8 +3236,8 @@ class Pitch(base.Music21Object):
 
 
         >>> pList = [pitch.Pitch("B"), pitch.Pitch("C#"), pitch.Pitch("G"), pitch.Pitch("A--")]
-        >>> [p.simplifyEnharmonic() for p in pList]
-        [B, C#, G, G]
+        >>> [str(p.simplifyEnharmonic()) for p in pList]
+        ['B', 'C#', 'G', 'G']
 
 
         >>> pList = [pitch.Pitch("C-"), pitch.Pitch("B#")]
@@ -3292,15 +3294,14 @@ class Pitch(base.Music21Object):
         N.B.: n1.name == getEnharmonic(getEnharmonic(n1)).name is not necessarily true.
         For instance: 
         
-            getEnharmonic(E##) => F#; getEnharmonic(F#) => G-
-            
-            getEnharmonic(A--) => G; getEnharmonic(G) => F##
-
+            getEnharmonic(E##) => F# 
+            getEnharmonic(F#) => G-
+            getEnharmonic(A--) => G
+            getEnharmonic(G) => F##
 
         However, for all cases not involving double sharps or flats 
         (and even many that do), getEnharmonic(getEnharmonic(n)) = n
-    
-    
+        
         For the most ambiguous cases, it's good to know that these are the enharmonics:
         
                C <-> B#, D <-> C##, E <-> F-; F <-> E#, G <-> F##, A <-> B--, B <-> C-
@@ -3308,30 +3309,28 @@ class Pitch(base.Music21Object):
     
         However, isEnharmonic() for A## and B certainly returns true.
     
-
         >>> from music21 import *
         >>> p = pitch.Pitch('d#')
-        >>> p.getEnharmonic()
+        >>> print(p.getEnharmonic())
         E-
         >>> p = pitch.Pitch('e-8')
-        >>> p.getEnharmonic()
+        >>> print(p.getEnharmonic())
         D#8
         
         
         Other tests:
         
-        
-        >>> pitch.Pitch('c-3').getEnharmonic()
+        >>> print(pitch.Pitch('c-3').getEnharmonic())
         B2
-        >>> pitch.Pitch('e#2').getEnharmonic()
+        >>> print(pitch.Pitch('e#2').getEnharmonic())
         F2
-        >>> pitch.Pitch('f#2').getEnharmonic()
+        >>> print(pitch.Pitch('f#2').getEnharmonic())
         G-2
-        >>> pitch.Pitch('c##5').getEnharmonic()
+        >>> print(pitch.Pitch('c##5').getEnharmonic())
         D5
-        >>> pitch.Pitch('g3').getEnharmonic() 
+        >>> print(pitch.Pitch('g3').getEnharmonic())
         F##3
-        >>> pitch.Pitch('B7').getEnharmonic()
+        >>> print(pitch.Pitch('B7').getEnharmonic())
         C-8
 
 
@@ -3340,10 +3339,10 @@ class Pitch(base.Music21Object):
 
         >>> p = pitch.Pitch('a-')
         >>> p.getEnharmonic()
-        G#
+        <music21.pitch.Pitch G#>
         >>> p = pitch.Pitch('B#')
         >>> p.getEnharmonic()
-        C
+        <music21.pitch.Pitch C>
 
         '''
         psRef = self.ps
@@ -3395,18 +3394,25 @@ class Pitch(base.Music21Object):
 #         if need be.  Or getAllCommonEnharmonics(note) which returns all possible enharmonics that
 #         do not involve triple or more accidentals.
 # 
-    def getAllCommmonEnharmonics(self, alterLimit=2):
+    def getAllCommonEnharmonics(self, alterLimit=2):
         '''Return all common unique enharmonics for a pitch, or those that do not involve more than two accidentals.
 
         >>> from music21 import *
         >>> p = pitch.Pitch('c#3')
-        >>> p.getAllCommmonEnharmonics()
-        [D-3, B##2]
+        >>> p.getAllCommonEnharmonics()
+        [<music21.pitch.Pitch D-3>, <music21.pitch.Pitch B##2>]
+        
         >>> p = pitch.Pitch('g-6')
-        >>> p.getAllCommmonEnharmonics()
-        [F#6, E##6]
-        >>> p.getAllCommmonEnharmonics(alterLimit=3)
-        [A---6, F#6, E##6]
+        >>> p.getAllCommonEnharmonics()
+        [<music21.pitch.Pitch F#6>, <music21.pitch.Pitch E##6>]
+        
+        By setting alterLimit to a higher or lower number we
+        can limit the maximum number of notes to return:
+        
+        >>> p.getAllCommonEnharmonics(alterLimit=1)
+        [<music21.pitch.Pitch F#6>]
+        >>> [str(eh) for eh in p.getAllCommonEnharmonics(alterLimit=3)]
+        ['A---6', 'F#6', 'E##6']
         '''
         post = []
         c = self.simplifyEnharmonic(inPlace=False)
@@ -3530,17 +3536,17 @@ class Pitch(base.Music21Object):
         >>> aPitch = pitch.Pitch('g4')
         >>> bPitch = aPitch.transpose('m3')
         >>> bPitch
-        B-4
+        <music21.pitch.Pitch B-4>
         >>> aInterval = interval.Interval(-6)
         >>> bPitch = aPitch.transpose(aInterval)
         >>> bPitch
-        C#4
+        <music21.pitch.Pitch C#4>
         
         >>> aPitch
-        G4
+        <music21.pitch.Pitch G4>
         >>> aPitch.transpose(aInterval, inPlace=True)
         >>> aPitch
-        C#4
+        <music21.pitch.Pitch C#4>
         
         OMIT_FROM_DOCS
         
@@ -3548,12 +3554,12 @@ class Pitch(base.Music21Object):
         >>> dPitch = pitch.Pitch('D2')
         >>> lowC = dPitch.transpose('m-23')
         >>> lowC
-        C#-1
+        <music21.pitch.Pitch C#-1>
         
         
         >>> otherPitch = pitch.Pitch('D2')
         >>> otherPitch.transpose('m-23', inPlace = True)
-        >>> otherPitch
+        >>> print(otherPitch)
         C#-1
         '''
         #environLocal.printDebug(['Pitch.transpose()', value])
@@ -3586,20 +3592,24 @@ class Pitch(base.Music21Object):
 
         >>> from music21 import *
         >>> pitch.Pitch('g5').transposeBelowTarget(pitch.Pitch('c#4'))
-        G3
-        >>> # if already below the target, make no change
+        <music21.pitch.Pitch G3>
+        
+        if already below the target, make no change
+        
         >>> pitch.Pitch('g#3').transposeBelowTarget(pitch.Pitch('c#6'))
-        G#3
-        >>> # accept the same pitch
+        <music21.pitch.Pitch G#3>
+        
+        accept the same pitch
+        
         >>> pitch.Pitch('g#8').transposeBelowTarget(pitch.Pitch('g#1'))
-        G#1
+        <music21.pitch.Pitch G#1>
 
         >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'))
-        G#2
+        <music21.pitch.Pitch G#2>
         >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'), minimize=True)
-        G#7
+        <music21.pitch.Pitch G#7>
         >>> pitch.Pitch('f#2').transposeBelowTarget(pitch.Pitch('f#8'), minimize=True)
-        F#8
+        <music21.pitch.Pitch F#8>
         '''
         # TODO: add inPlace as an option, default is True
         src = self
@@ -3630,21 +3640,26 @@ class Pitch(base.Music21Object):
 
         >>> from music21 import *
         >>> pitch.Pitch('d2').transposeAboveTarget(pitch.Pitch('e4'))
-        D5
-        >>> # if already above the target, make no change
+        <music21.pitch.Pitch D5>
+        
+        if already above the target, make no change
+        
         >>> pitch.Pitch('d7').transposeAboveTarget(pitch.Pitch('e2'))
-        D7
-        >>> # accept the same pitch
+        <music21.pitch.Pitch D7>
+        
+        accept the same pitch
+        
         >>> pitch.Pitch('d2').transposeAboveTarget(pitch.Pitch('d8'))
-        D8
+        <music21.pitch.Pitch D8>
 
-        >>> # if minimize is True, we go the closest position
+        if minimize is True, we go the closest position
+        
         >>> pitch.Pitch('d#8').transposeAboveTarget(pitch.Pitch('d2'), minimize=True)
-        D#2
+        <music21.pitch.Pitch D#2>
         >>> pitch.Pitch('d7').transposeAboveTarget(pitch.Pitch('e2'), minimize=True)
-        D3
+        <music21.pitch.Pitch D3>
         >>> pitch.Pitch('d0').transposeAboveTarget(pitch.Pitch('e2'), minimize=True)
-        D3
+        <music21.pitch.Pitch D3>
 
         '''
         src = self
@@ -4186,7 +4201,7 @@ class Pitch(base.Music21Object):
         >>> newChord.quarterLength = 1
         >>> pitchList = newChord.pitches
         >>> pitchList
-        [D3, G3, D5]
+        [<music21.pitch.Pitch D3>, <music21.pitch.Pitch G3>, <music21.pitch.Pitch D5>]
         '''
         
         #Takes in a chord, finds the interval between the notes
@@ -4708,18 +4723,18 @@ class Test(unittest.TestCase):
         p = pitch.Pitch('a4')
         p.microtone = 25
         
-        self.assertEqual(repr(p), 'A4(+25c)')
+        self.assertEqual(str(p), 'A4(+25c)')
         self.assertEqual(p.ps, 69.25)
 
         p.microtone = '-10'
-        self.assertEqual(repr(p), 'A4(-10c)')
+        self.assertEqual(str(p), 'A4(-10c)')
         self.assertEqual(p.ps, 68.90)
 
         self.assertEqual(p.pitchClass, 9)
 
 
         p = p.transpose(12)
-        self.assertEqual(repr(p), 'A5(-10c)')
+        self.assertEqual(str(p), 'A5(-10c)')
         self.assertEqual(p.ps, 80.90)
 
 
@@ -4786,9 +4801,9 @@ class Test(unittest.TestCase):
         p = pitch.Pitch("C4")
         p.microtone = 5
         for i in range(11):
-            match.append(copy.deepcopy(p))
+            match.append(str(p))
             p.microtone = p.microtone.cents - 1
-        self.assertEqual(str(match), '[C4(+5c), C4(+4c), C4(+3c), C4(+2c), C4(+1c), C4, C4(-1c), C4(-2c), C4(-3c), C4(-4c), C4(-5c)]')
+        self.assertEqual(str(match), "['C4(+5c)', 'C4(+4c)', 'C4(+3c)', 'C4(+2c)', 'C4(+1c)', 'C4', 'C4(-1c)', 'C4(-2c)', 'C4(-3c)', 'C4(-4c)', 'C4(-5c)']")
 
 
 
@@ -4802,8 +4817,8 @@ class Test(unittest.TestCase):
         for fq in f:
             p = pitch.Pitch()
             p.frequency = fq
-            pList.append(p)
-        self.assertEqual(str(pList), '[A4, A~4(+21c), B`4(-11c), B4(+4c), B~4(+17c), C~5(-22c), C#5(-14c), C#~5(-7c), C##5(-2c), D~5(+1c), E-5(+3c), E`5(+3c), E5(+2c), E~5(-1c), F5(-4c), F~5(-9c), F#5(-16c), F#~5(-23c), F#~5(+19c), G5(+10c), G~5(-1c), G#5(-12c), G#~5(-24c), G#~5(+14c)]')
+            pList.append(str(p))
+        self.assertEqual(str(pList), "['A4', 'A~4(+21c)', 'B`4(-11c)', 'B4(+4c)', 'B~4(+17c)', 'C~5(-22c)', 'C#5(-14c)', 'C#~5(-7c)', 'C##5(-2c)', 'D~5(+1c)', 'E-5(+3c)', 'E`5(+3c)', 'E5(+2c)', 'E~5(-1c)', 'F5(-4c)', 'F~5(-9c)', 'F#5(-16c)', 'F#~5(-23c)', 'F#~5(+19c)', 'G5(+10c)', 'G~5(-1c)', 'G#5(-12c)', 'G#~5(-24c)', 'G#~5(+14c)']")
 
 
     def testJsonSerializationA(self):

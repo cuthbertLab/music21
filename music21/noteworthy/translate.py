@@ -291,7 +291,7 @@ class NoteworthyTranslator(object):
         >>> nwt.currentClef = 'BASS'
         >>> p = nwt.getPitchFromPositionInfo('b3^') # removes ties
         >>> p
-        G-3
+        <music21.pitch.Pitch G-3>
         '''
         pos = posInfo.rstrip('^') # remove any tie
 ### What does this do???            
@@ -311,7 +311,7 @@ class NoteworthyTranslator(object):
         >>> nwt.currentClef = 'BASS'
         >>> pList = nwt.getMultiplePitchesFromPositionInfo('1,b3,5')
         >>> pList
-        [E3, G-3, B3]
+        [<music21.pitch.Pitch E3>, <music21.pitch.Pitch G-3>, <music21.pitch.Pitch B3>]
         '''
 
         dictionaries = noteworthyModule.dictionaries
@@ -336,7 +336,7 @@ class NoteworthyTranslator(object):
         >>> nwt.currentClef = 'BASS'
         >>> p = nwt.getOnePitchFromPosition('b3')
         >>> p
-        G-3
+        <music21.pitch.Pitch G-3>
         >>> p.ps
         54.0
         '''
@@ -878,5 +878,5 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test)#, TestExternal)
 

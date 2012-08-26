@@ -2190,11 +2190,6 @@ def chordToMx(c, spannerBundle=None):
     False
     >>> listOfMxNotes[1].noteheadObj.get('charData')
     'diamond'
-
-
-    >>> rn = roman.RomanNumeral('V', key.Key('A-'))
-    >>> rn.pitches
-    [E-5, G5, B-5]
     '''
     if spannerBundle is not None and len(spannerBundle) > 0:
         # this will get all spanners that participate with this note
@@ -4221,6 +4216,18 @@ class Test(unittest.TestCase):
     def testBasic(self):
         pass
 
+    def pitchOut(self, listIn):
+        '''
+        make tests for old-style pitch representation still work.
+        '''
+        out = "["
+        for p in listIn:
+            out += str(p) + ', '
+        out = out[0:len(out)-2]
+        out += "]"
+        return out
+
+
     def testBarRepeatConversion(self):
 
         from music21 import converter, corpus, bar
@@ -5055,18 +5062,18 @@ spirit</words>
 
         self.assertEqual(str(i3.transposition), '<music21.interval.Interval P-5>')
 
-        self.assertEqual(str([p for p in s.parts[0].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, A4, A4, A4, A4]')
-        self.assertEqual(str([p for p in s.parts[1].flat.pitches]), '[B4, B4, B4, B4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, B4, B4, B4, B4, B4, B4]')
-        self.assertEqual(str([p for p in s.parts[2].flat.pitches]), '[E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5]')
+        self.assertEqual(self.pitchOut([p for p in s.parts[0].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, A4, A4, A4, A4]')
+        self.assertEqual(self.pitchOut([p for p in s.parts[1].flat.pitches]), '[B4, B4, B4, B4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, B4, B4, B4, B4, B4, B4]')
+        self.assertEqual(self.pitchOut([p for p in s.parts[2].flat.pitches]), '[E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5]')
 
         sSounding = s.toSoundingPitch(inPlace=False)
-        self.assertEqual(str([p for p in sSounding.parts[0].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
-        self.assertEqual(str([p for p in sSounding.parts[1].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
-        self.assertEqual(str([p for p in sSounding.parts[2].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
+        self.assertEqual(self.pitchOut([p for p in sSounding.parts[0].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
+        self.assertEqual(self.pitchOut([p for p in sSounding.parts[1].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
+        self.assertEqual(self.pitchOut([p for p in sSounding.parts[2].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
 
         # chordification by default places notes at sounding pitch
         sChords = s.chordify()
-        self.assertEqual(str([p for p in sChords.flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
+        self.assertEqual(self.pitchOut([p for p in sChords.flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
         #sChords.show()
 
 

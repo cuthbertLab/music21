@@ -684,8 +684,8 @@ def findSegments(music21Part, **partKeywords):
     ---begin segment---
     <music21.braille.segment BrailleSegment>
     Measure 0, Signature Grouping 1:
-    sharps -3, mode None
-    4/4
+    <music21.key.KeySignature of 3 flats>
+    <music21.meter.TimeSignature 4/4>
     ===
     Measure 0, Note Grouping 1:
     <music21.clef.TrebleClef>
@@ -1024,7 +1024,7 @@ def getRawSegments(music21Part, segmentBreaks=SEGMENT_SEGMENTBREAKS):
     ---begin segment---
     <music21.braille.segment BrailleSegment>
     Measure 1, Signature Grouping 1:
-    3/4
+    <music21.meter.TimeSignature 3/4>
     ===
     Measure 1, Note Grouping 1:
     <music21.clef.TrebleClef>
@@ -1059,7 +1059,7 @@ def getRawSegments(music21Part, segmentBreaks=SEGMENT_SEGMENTBREAKS):
     ---begin segment---
     <music21.braille.segment BrailleSegment>
     Measure 1, Signature Grouping 1:
-    3/4
+    <music21.meter.TimeSignature 3/4>
     ===
     Measure 1, Note Grouping 1:
     <music21.clef.TrebleClef>
@@ -1161,7 +1161,7 @@ def extractBrailleElements(music21Measure):
     
     
     >>> segment.extractBrailleElements(measure)
-    2/4
+    <music21.meter.TimeSignature 2/4>
     <music21.clef.TrebleClef>
     <music21.note.Note C>
     <music21.note.Note C>

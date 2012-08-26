@@ -483,7 +483,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('bwv1080', '16')
         self.assertEqual(len(s.parts[0].getKeySignatures()), 1)
-        self.assertEqual(str(s.parts[0].getKeySignatures()[0]), 'sharps -1, mode None')
+        self.assertEqual(str(s.parts[0].getKeySignatures()[0]), '<music21.key.KeySignature of 1 flat>')
 
         notes = s.parts[0].flat.notesAndRests
         self.assertEqual(str(notes[2].accidental), '<accidental sharp>')
@@ -509,7 +509,7 @@ class Test(unittest.TestCase):
         fpDir = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01')
         s = converter.parse(fpDir)
         p = s.parts['Clarinet in A']
-        self.assertEqual(str(p.getElementsByClass('Measure')[0].keySignature), 'sharps 3, mode None')
+        self.assertEqual(str(p.getElementsByClass('Measure')[0].keySignature), '<music21.key.KeySignature of 3 sharps>')
         self.assertEqual(str(p.flat.notesAndRests[0]), '<music21.note.Note A>')
 
         #s.show()
@@ -546,7 +546,7 @@ class Test(unittest.TestCase):
         s = corpus.parse('k168', 1)
 
         self.assertEqual(len(s.parts), 4)
-        self.assertEqual(str(s.parts[0].flat.getElementsByClass('TimeSignature')[0]), '4/4')
+        self.assertEqual(str(s.parts[0].flat.getElementsByClass('TimeSignature')[0]), '<music21.meter.TimeSignature 4/4>')
     
         self.assertEqual([n.offset for n in s.parts[0].getElementsByClass('Measure')[0].notes], [0.0, 3.0, 3.5, 3.75])
 
@@ -559,7 +559,7 @@ class Test(unittest.TestCase):
         s = corpus.parse('k169', 3)
         
         self.assertEqual(len(s.parts), 4)
-        self.assertEqual(str(s.parts[0].flat.getElementsByClass('TimeSignature')[0]), '3/4')
+        self.assertEqual(str(s.parts[0].flat.getElementsByClass('TimeSignature')[0]), '<music21.meter.TimeSignature 3/4>')
     
         self.assertEqual([n.offset for n in s.parts[0].getElementsByClass('Measure')[0].notes], [0.0, 2.0])
 

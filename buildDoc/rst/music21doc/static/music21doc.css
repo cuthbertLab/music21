@@ -135,6 +135,10 @@ p {
     margin: 0.8em 0 0.5em 0;
 }
 
+em { font-family:Georgia, "Times New Roman", Times, serif;
+	 font-size: 90%;
+	}
+
 a {
     color: #CA7900;
     text-decoration: none;

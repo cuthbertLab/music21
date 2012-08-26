@@ -1198,9 +1198,9 @@ class Test(unittest.TestCase):
 
         ks = key.KeySignature(3, 'major')
         post = corpus.search(str(ks), 'keySignature')
-        self.assertEqual(len(post) >= 32, True)
+        self.assertEqual(len(post) >= 32, True, len(post))
 
-        post = corpus.search('sharps (.*), mode phry(.*)', 'keySignature')
+        post = corpus.search('mode phry(.*)', 'keySignature')
         self.assertEqual(len(post) >= 9, True)
 
         # searching virtual entries

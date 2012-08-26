@@ -10,7 +10,8 @@
 #-------------------------------------------------------------------------------
 
 '''
-Run this module to process all files in the corpus. Either the 'core', 'local', or 'virtual' corpus.
+Run this module to process all files in the corpus. 
+Either the 'core', 'local', or 'virtual' corpus.
 '''
 
 from music21 import common
@@ -60,7 +61,7 @@ def cacheMetadata(domainList=['core', 'virtual']):
             
         paths = getPaths()
     
-        environLocal.printDebug([
+        environLocal.warn([
             'metadata cache: starting processing of paths:', len(paths)])
     
         #mdb.addFromPaths(paths[-3:])
@@ -69,10 +70,10 @@ def cacheMetadata(domainList=['core', 'virtual']):
         #print mdb._storage
         mdb.write() # will use a default file path based on domain
 
-        environLocal.printDebug(['cache: writing time:', t, 'md items:', len(mdb._storage)])
+        environLocal.warn(['cache: writing time:', t, 'md items:', len(mdb._storage)])
         del mdb
 
-    environLocal.printDebug(['cache: final writing time:', t])
+    environLocal.warn(['cache: final writing time:', t])
     
     for fp in fpError:
         environLocal.warn('path failed to parse: %s' % fp)        

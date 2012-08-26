@@ -501,8 +501,8 @@ class TwelveToneRow(ToneRow):
           5  4  0  1  8  6  7  3  B  A  9  2
           4  3  B  0  7  5  6  2  A  9  8  1
         ...
-        >>> [e for e in s37[0]]
-        [C, B, G, G#, E-, C#, D, B-, F#, F, E, A]
+        >>> [str(e) for e in s37[0]]
+        ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-', 'F#', 'F', 'E', 'A']
 
         
         '''        
@@ -3316,18 +3316,18 @@ def pcToToneRow(pcSet):
     >>> from music21 import *
     >>> a = serial.pcToToneRow(range(12))
     >>> a.show('text')
-    {0.0} C
-    {0.0} C#
-    {0.0} D
-    {0.0} E-
-    {0.0} E
-    {0.0} F
-    {0.0} F#
-    {0.0} G
-    {0.0} G#
-    {0.0} A
-    {0.0} B-
-    {0.0} B
+    {0.0} <music21.pitch.Pitch C>
+    {0.0} <music21.pitch.Pitch C#>
+    {0.0} <music21.pitch.Pitch D>
+    {0.0} <music21.pitch.Pitch E->
+    {0.0} <music21.pitch.Pitch E>
+    {0.0} <music21.pitch.Pitch F>
+    {0.0} <music21.pitch.Pitch F#>
+    {0.0} <music21.pitch.Pitch G>
+    {0.0} <music21.pitch.Pitch G#>
+    {0.0} <music21.pitch.Pitch A>
+    {0.0} <music21.pitch.Pitch B->
+    {0.0} <music21.pitch.Pitch B>
     >>> matrixObj = a.matrix()
     >>> print matrixObj
       0  1  2  3  4  5  6  7  8  9  A  B

@@ -1531,7 +1531,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sMeasures.getElementsByClass('Measure')), 1) # one measure
         self.assertEqual(len(sMeasures[0]), 3) 
         # first is sig
-        self.assertEqual(str(sMeasures[0][0]), '4/4') 
+        self.assertEqual(str(sMeasures[0][0]), '<music21.meter.TimeSignature 4/4>') 
         # second is clef
         self.assertEqual(isinstance(sMeasures[0][1], clef.AltoClef), True)
         #environLocal.printDebug(['here', sMeasures[0][2]])
@@ -2203,7 +2203,7 @@ class Test(unittest.TestCase):
         m34 = s.parts[0].getElementsByClass('Measure')[33]
         c = m34.getElementsByClass('Chord')
         # assuming not showing accidental b/c of key
-        self.assertEqual(str(c[1].pitches), '[B-4, D5, F5]')
+        self.assertEqual(str(c[1].pitches), '[<music21.pitch.Pitch B-4>, <music21.pitch.Pitch D5>, <music21.pitch.Pitch F5>]')
         # because of key
         self.assertEqual(str(c[1].pitches[0].accidental.displayStatus), 'False')
 
@@ -2211,7 +2211,7 @@ class Test(unittest.TestCase):
         m74 = s.parts[0].getElementsByClass('Measure')[73]
         c = m74.getElementsByClass('Chord')
         # has correct pitches but natural not showing on C
-        self.assertEqual(str(c[0].pitches), '[C5, E5, G5]')
+        self.assertEqual(str(c[0].pitches), '[<music21.pitch.Pitch C5>, <music21.pitch.Pitch E5>, <music21.pitch.Pitch G5>]')
         self.assertEqual(str(c[0].pitches[0].accidental), 'None')
 
     def testMakeAccidentalsC(self):
@@ -3883,7 +3883,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         s = converter.parse('g8 e f g e f g a', '2/8')
         sSub = s.measures(3,3)  
-        self.assertEqual(str(sSub.pitches), "[E4, F4]")
+        self.assertEqual(str(sSub.pitches), "[<music21.pitch.Pitch E4>, <music21.pitch.Pitch F4>]")
         #sSub.show()
         
 
@@ -4751,9 +4751,9 @@ class Test(unittest.TestCase):
             'Rest')), 2)
 
         self.assertEqual(str(scoreChordify.getElementsByClass(
-            'Chord')[0].pitches), '[D2, D3]')
+            'Chord')[0].pitches), '[<music21.pitch.Pitch D2>, <music21.pitch.Pitch D3>]')
         self.assertEqual(str(scoreChordify.getElementsByClass(
-            'Chord')[1].pitches), '[D2, D#3]')
+            'Chord')[1].pitches), '[<music21.pitch.Pitch D2>, <music21.pitch.Pitch D#3>]')
 
 
     def testChordifyA(self):
@@ -4771,7 +4771,7 @@ class Test(unittest.TestCase):
         post = s.chordify()
         self.assertEqual(len(post.getElementsByClass('Chord')), 12)
         self.assertEqual(str(post.getElementsByClass('Chord')[0].pitches), 
-            '[C4, G4]')
+            '[<music21.pitch.Pitch C4>, <music21.pitch.Pitch G4>]')
 
 
         p1 = stream.Part()
@@ -4788,7 +4788,7 @@ class Test(unittest.TestCase):
         post = s.chordify()
         self.assertEqual(len(post.getElementsByClass('Chord')), 2)
         self.assertEqual(str(post.getElementsByClass('Chord')[0].pitches), 
-            '[C4, G4]')
+            '[<music21.pitch.Pitch C4>, <music21.pitch.Pitch G4>]')
         #post.show()
 
         #s.show()
@@ -5631,7 +5631,7 @@ class Test(unittest.TestCase):
         sSrc.append(note.QuarterNote('E4'))
         sMeasures = sSrc.makeMeasures()
         # added 4/4 here as default
-        self.assertEqual(str(sMeasures[0].timeSignature), '4/4')
+        self.assertEqual(str(sMeasures[0].timeSignature), '<music21.meter.TimeSignature 4/4>')
 
         # no time signature are in the source
         self.assertEqual(len(sSrc.flat.getElementsByClass('TimeSignature')), 0)
@@ -5640,7 +5640,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sSrc.flat.getElementsByClass('TimeSignature')), 1)
 
         sMeasuresTwoFour = sSrc.makeMeasures()
-        self.assertEqual(str(sMeasuresTwoFour[0].timeSignature), '2/4')
+        self.assertEqual(str(sMeasuresTwoFour[0].timeSignature), '<music21.meter.TimeSignature 2/4>')
         self.assertEqual(sMeasuresTwoFour.isSorted, True)
         
         # check how many time signature we have:
@@ -5965,7 +5965,7 @@ class Test(unittest.TestCase):
 
         ts = s.parts[0].getElementsByClass(
             'Measure')[3].getContextByClass('TimeSignature')
-        self.assertEqual(str(ts), '4/4')
+        self.assertEqual(str(ts), '<music21.meter.TimeSignature 4/4>')
         #environLocal.printDebug(['ts', ts])
 
         beatStr = s.parts[0].getElementsByClass(
@@ -6822,8 +6822,11 @@ class Test(unittest.TestCase):
         #s.show() 
         chords = s.chordify()
         m1 = chords.getElementsByClass('Measure')
-        match = [(n.pitches, str(round(n.offset, 2)), str(round(n.quarterLength, 3))) for n in m1[0].notes]
-        self.assertEqual(str(match), "[([B-4, B-2], '0.0', '0.667'), ([C5, B-2], '0.67', '0.667'), ([B-4, B-2], '1.33', '0.667'), ([A4, B-2], '2.0', '2.0')]")
+        match = [([str(p) for p in n.pitches], str(round(n.offset, 2)), str(round(n.quarterLength, 3))) for n in m1[0].notes]
+        self.assertEqual(str(match), "[(['B-4', 'B-2'], '0.0', '0.667'), " + \
+                                     "(['C5', 'B-2'], '0.67', '0.667'), " + \
+                                     "(['B-4', 'B-2'], '1.33', '0.667'), " + \
+                                     "(['A4', 'B-2'], '2.0', '2.0')]")
 
         #chords.show()
         raw = m1[0].musicxml

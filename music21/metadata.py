@@ -1849,7 +1849,7 @@ class RichMetadata(Metadata):
         if len(tsStream) > 0:
             # just store the string representation  
             # re-instantiating TimeSignature objects is expensive
-            self.timeSignatureFirst = str(tsStream[0])
+            self.timeSignatureFirst = tsStream[0].ratioString
         
         # this presently does not work properly b/c ts comparisons are not
         # built-in; need to add __eq__ methods to MeterTerminal
@@ -2360,7 +2360,7 @@ class Test(unittest.TestCase):
         # update rmd with stream
         rmd.update(s)
 
-        self.assertEqual(rmd.keySignatureFirst, 'sharps -1, mode major')
+        self.assertEqual(rmd.keySignatureFirst, '<music21.key.KeySignature of 1 flat, mode major>')
 
         self.assertEqual(str(rmd.timeSignatureFirst), '2/4')
 
@@ -2370,7 +2370,7 @@ class Test(unittest.TestCase):
         self.assertEqual(rmdNew.composer, 'Johannes Ciconia')
 
         self.assertEqual(str(rmdNew.timeSignatureFirst), '2/4')
-        self.assertEqual(str(rmdNew.keySignatureFirst), 'sharps -1, mode major')
+        self.assertEqual(str(rmdNew.keySignatureFirst), '<music21.key.KeySignature of 1 flat, mode major>')
 
 #         self.assertEqual(rmd.pitchLowest, 55)
 #         self.assertEqual(rmd.pitchHighest, 65)
@@ -2382,12 +2382,12 @@ class Test(unittest.TestCase):
         rmd.merge(s.metadata)
 
         rmd.update(s)
-        self.assertEqual(str(rmd.keySignatureFirst), 'sharps 3, mode minor')
+        self.assertEqual(str(rmd.keySignatureFirst), '<music21.key.KeySignature of 3 sharps, mode minor>')
         self.assertEqual(str(rmd.timeSignatureFirst), '4/4')
 
         rmdNew.json = rmd.json
         self.assertEqual(str(rmdNew.timeSignatureFirst), '4/4')
-        self.assertEqual(str(rmdNew.keySignatureFirst), 'sharps 3, mode minor')
+        self.assertEqual(str(rmdNew.keySignatureFirst), '<music21.key.KeySignature of 3 sharps, mode minor>')
 
 
         # test that work id values are copied
@@ -2424,7 +2424,7 @@ class Test(unittest.TestCase):
         self.assertEqual(rmd.noteCount, 165)
         self.assertEqual(rmd.quarterLength, 36.0)
         versionRepr = repr(list(base.VERSION))
-        self.assertEqual(rmd.json, '{"__attr__": {"_urls": [], "quarterLength": 36.0, "noteCount": 165, "_contributors": [], "timeSignatureFirst": "4/4", "keySignatureFirst": "sharps 3, mode minor", "_workIds": {"movementName": {"__attr__": {"_data": "bwv66.6.mxl"}, "__class__": "<class \'music21.metadata.Text\'>"}}}, "__version__": ' + versionRepr + ', "__class__": "<class \'music21.metadata.RichMetadata\'>"}')
+        self.assertEqual(rmd.json, '{"__attr__": {"_urls": [], "quarterLength": 36.0, "noteCount": 165, "_contributors": [], "timeSignatureFirst": "4/4", "keySignatureFirst": "<music21.key.KeySignature of 3 sharps, mode minor>", "_workIds": {"movementName": {"__attr__": {"_data": "bwv66.6.mxl"}, "__class__": "<class \'music21.metadata.Text\'>"}}}, "__version__": ' + versionRepr + ', "__class__": "<class \'music21.metadata.RichMetadata\'>"}')
 
 
 #-------------------------------------------------------------------------------

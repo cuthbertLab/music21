@@ -68,8 +68,8 @@ class Segment(object):
         4
         >>> s1.pitchNamesInChord
         ['C', 'E', 'G']
-        >>> s1.allPitchesAboveBass
-        [C3, E3, G3, C4, E4, G4, C5, E5, G5]
+        >>> [str(p) for p in s1.allPitchesAboveBass]
+        ['C3', 'E3', 'G3', 'C4', 'E4', 'G4', 'C5', 'E5', 'G5']
         >>> s1.segmentChord
         <music21.chord.Chord C3 E3 G3 C4 E4 G4 C5 E5 G5>
         '''
@@ -165,7 +165,7 @@ class Segment(object):
         True       parallelOctaves               False                         None
         True       hiddenFifth                   False                         None
         True       hiddenOctave                  False                         None
-        False      couldBeItalianA6Resolution    True                          [C3, C3, E3, G3], True
+        False      couldBeItalianA6Resolution    True                          [<music21.pitch.Pitch C3>, <music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>], True
     
         
         Now, a modified fbRules is provided, allowing hidden octaves and
@@ -188,7 +188,7 @@ class Segment(object):
         True       parallelOctaves               False                         None
         True       hiddenFifth                   False                         None
         False      hiddenOctave                  False                         None
-        False      couldBeItalianA6Resolution    True                          [C3, C3, E3, G3], True
+        False      couldBeItalianA6Resolution    True                          [<music21.pitch.Pitch C3>, <music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>], True
         '''
         isItalianAugmentedSixth = self.segmentChord.isItalianAugmentedSixth()
             
@@ -298,11 +298,15 @@ class Segment(object):
         >>> len(allDomPossibList)
         8
         >>> allDomPossibList[2]
-        (D4, B3, F3, G2)
+        (<music21.pitch.Pitch D4>, <music21.pitch.Pitch B3>, <music21.pitch.Pitch F3>, <music21.pitch.Pitch G2>)
         >>> allDomPossibList[5]
-        (D5, B4, F4, G2)
-        >>> allDomPossibList[7] # Soprano pitch of resolution (C6) exceeds default maxPitch of B5, filtered out.
-        (B5, F5, D5, G2)
+        (<music21.pitch.Pitch D5>, <music21.pitch.Pitch B4>, <music21.pitch.Pitch F4>, <music21.pitch.Pitch G2>)
+        
+        Here, the Soprano pitch of resolution (C6) exceeds default maxPitch of B5, so
+        it's filtered out.
+        
+        >>> [p.nameWithOctave for p in allDomPossibList[7]] 
+        ['B5', 'F5', 'D5', 'G2']
         
         
         >>> segmentB = segment.Segment(bassNote = note.Note('C3'), notationString = "")
@@ -311,9 +315,9 @@ class Segment(object):
         >>> len(domResPairsList)
         7
         >>> domResPairsList[2]
-        ((D4, B3, F3, G2), (C4, C4, E3, C3))
+        ((<music21.pitch.Pitch D4>, <...B3>, <...F3>, <...G2>), (<...C4>, <...C4>, <...E3>, <...C3>))
         >>> domResPairsList[5]
-        ((D5, B4, F4, G2), (C5, C5, E4, C3))
+        ((<...D5>, <...B4>, <...F4>, <...G2>), (<...C5>, <...C5>, <...E4>, <...C3>))
         '''
         domChord = self.segmentChord
         if not domChord.isDominantSeventh():
@@ -365,10 +369,10 @@ class Segment(object):
         >>> allDimPossibList = list(allDimPossib)
         >>> len(allDimPossibList)
         7
-        >>> allDimPossibList[4]
-        (D5, A-4, F4, B2)
-        >>> allDimPossibList[6]
-        (A-5, F5, D5, B2)
+        >>> [p.nameWithOctave for p in allDimPossibList[4]]
+        ['D5', 'A-4', 'F4', 'B2']
+        >>> [p.nameWithOctave for p in allDimPossibList[6]]
+        ['A-5', 'F5', 'D5', 'B2']
         
         
         >>> segmentB = segment.Segment(bassNote = note.Note('C3'), notationString = "")
@@ -377,9 +381,9 @@ class Segment(object):
         >>> len(dimResPairsList)
         7
         >>> dimResPairsList[4]
-        ((D5, A-4, F4, B2), (E5, G4, E4, C3))
+        ((<...D5>, <...A-4>, <...F4>, <...B2>), (<...E5>, <...G4>, <...E4>, <...C3>))
         >>> dimResPairsList[6]
-        ((A-5, F5, D5, B2), (G5, E5, E5, C3))
+        ((<...A-5>, <...F5>, <...D5>, <...B2>), (<...G5>, <...E5>, <...E5>, <...C3>))
         '''
         dimChord = self.segmentChord
         if not dimChord.isDiminishedSeventh():
@@ -429,10 +433,11 @@ class Segment(object):
         >>> allAugSixthPossibList = list(allAugSixthPossib)
         >>> len(allAugSixthPossibList)
         7
+        
         >>> allAugSixthPossibList[1]
-        (C4, F#3, E-3, A-2)
+        (<music21.pitch.Pitch C4>, <music21.pitch.Pitch F#3>, <...E-3>, <...A-2>)
         >>> allAugSixthPossibList[4]
-        (C5, F#4, E-4, A-2)
+        (<music21.pitch.Pitch C5>, <music21.pitch.Pitch F#4>, <...E-4>, <...A-2>)
         
         
         >>> segmentB = segment.Segment(bassNote = note.Note("G2"), notationString = "")
@@ -441,9 +446,9 @@ class Segment(object):
         >>> len(allAugResPossibPairsList)
         7
         >>> allAugResPossibPairsList[1]
-        ((C4, F#3, E-3, A-2), (B3, G3, D3, G2))
+        ((<...C4>, <...F#3>, <...E-3>, <...A-2>), (<...B3>, <...G3>, <...D3>, <...G2>))
         >>> allAugResPossibPairsList[4]
-        ((C5, F#4, E-4, A-2), (B4, G4, D4, G2))
+        ((<...C5>, <...F#4>, <...E-4>, <...A-2>), (<...B4>, <...G4>, <...D4>, <...G2>))
         '''
         augSixthChord = self.segmentChord
         if not augSixthChord.isAugmentedSixth():
@@ -508,12 +513,12 @@ class Segment(object):
         729
         >>> len(allPossibList)
         729
-        >>> allPossibList[81]
-        (E3, C3, C3, C3)
-        >>> allPossibList[275]
-        (C4, C4, G4, C3)
-        >>> allPossibList[426]
-        (G4, G3, C4, C3)
+        
+        >>> for i in (81, 275, 426):
+        ...    [str(p) for p in allPossibList[i]]
+        ['E3', 'C3', 'C3', 'C3']
+        ['C4', 'C4', 'G4', 'C3']
+        ['G4', 'G3', 'C4', 'C3']
         '''
         iterables = [self.allPitchesAboveBass] * (self.numParts - 1)
         iterables.append([fbPitch.HashablePitch(self.bassNote.pitch.nameWithOctave)])
@@ -543,12 +548,12 @@ class Segment(object):
         >>> allCorrectPossibList = list(allCorrectPossib)
         >>> len(allCorrectPossibList)
         21
-        >>> allCorrectPossibList[5]
-        (E4, G3, G3, C3)
-        >>> allCorrectPossibList[12]
-        (C5, G4, E4, C3)
-        >>> allCorrectPossibList[20]
-        (G5, G5, E5, C3)
+        
+        >>> for i in (5, 12, 20):
+        ...   [str(p) for p in allCorrectPossibList[i]]
+        ['E4', 'G3', 'G3', 'C3']
+        ['C5', 'G4', 'E4', 'C3']
+        ['G5', 'G5', 'E5', 'C3']
         '''
         self._singlePossibilityRuleChecking = _compileRules(self.singlePossibilityRules(self.fbRules))
         allA = self.allSinglePossibilities()
@@ -594,7 +599,7 @@ class Segment(object):
         >>> len(consecPairsList1)
         31
         >>> consecPairsList1[29]
-        ((G5, G5, E5, C3), (G5, F5, B4, D3))
+        ((<...G5>, <...G5>, <...E5>, <...C3>), (<...G5>, <...F5>, <...B4>, <...D3>))
 
 
         Here, a special resolution is being executed, because segmentA below is a
@@ -608,7 +613,7 @@ class Segment(object):
         >>> len(consecPairsList2)
         6
         >>> consecPairsList2[5]
-        ((G5, F5, B4, D3), (G5, E5, C5, C3))
+        ((<...G5>, <...F5>, <...B4>, <...D3>), (<...G5>, <...E5>, <...C5>, <...C3>))
         '''
         if not (self.numParts == segmentB.numParts):
             raise SegmentException("Two segments with unequal numParts cannot be compared.")
@@ -715,12 +720,18 @@ def getPitches(pitchNames = ['C','E','G'], bassPitch = pitch.Pitch('C3'), maxPit
     
     >>> from music21.figuredBass import segment
     >>> from music21 import pitch
-    >>> segment.getPitches()
-    [C3, E3, G3, C4, E4, G4, C5, E5, G5, C6, E6, G6, C7, E7, G7, C8]
-    >>> segment.getPitches(['G', 'B', 'D', 'F'], bassPitch = pitch.Pitch('B2'))
-    [B2, D3, F3, G3, B3, D4, F4, G4, B4, D5, F5, G5, B5, D6, F6, G6, B6, D7, F7, G7, B7]
-    >>> segment.getPitches(['F##','A#','C#'], bassPitch = pitch.Pitch('A#3'))
-    [A#3, C#4, F##4, A#4, C#5, F##5, A#5, C#6, F##6, A#6, C#7, F##7, A#7]
+    
+    >>> pitches = segment.getPitches()
+    >>> print ', '.join([p.nameWithOctave for p in pitches])
+    C3, E3, G3, C4, E4, G4, C5, E5, G5, C6, E6, G6, C7, E7, G7, C8
+    
+    >>> pitches = segment.getPitches(['G', 'B', 'D', 'F'], bassPitch = pitch.Pitch('B2'))
+    >>> print ', '.join([p.nameWithOctave for p in pitches])
+    B2, D3, F3, G3, B3, D4, F4, G4, B4, D5, F5, G5, B5, D6, F6, G6, B6, D7, F7, G7, B7
+    
+    >>> pitches = segment.getPitches(['F##','A#','C#'], bassPitch = pitch.Pitch('A#3'))
+    >>> print ', '.join([p.nameWithOctave for p in pitches])
+    A#3, C#4, F##4, A#4, C#5, F##5, A#5, C#6, F##6, A#6, C#7, F##7, A#7
     '''
     iter1 = itertools.product(pitchNames, range(maxPitch.octave + 1))
     iter2 = itertools.imap(lambda x: fbPitch.HashablePitch(x[0] + str(x[1])), iter1)

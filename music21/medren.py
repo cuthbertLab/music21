@@ -997,8 +997,8 @@ class Ligature(base.Music21Object):
     >>> l2 = medren.Ligature(['F4','G4','A4','B-4','D5'])
     >>> l2.setStem(4, 'down', 'left')
     >>> l2.setReverse(4, True)
-    >>> print [(n.mensuralType, n.pitch) for n in l2.notes]
-    [('brevis', F4), ('brevis', G4), ('brevis', A4), ('brevis', B-4), ('longa', D5)]
+    >>> print [(n.mensuralType, n.pitch.nameWithOctave) for n in l2.notes]
+    [('brevis', 'F4'), ('brevis', 'G4'), ('brevis', 'A4'), ('brevis', 'B-4'), ('longa', 'D5')]
     
     Note that ligatures cannot be displayed yet. 
     '''

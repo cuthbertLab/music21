@@ -52,27 +52,27 @@ the data to make a histogram of scale degree usage within a key:
 ...                   degreeDictionary[degreeString] = 1
 ...              else:
 ...                   degreeDictionary[degreeString] += 1
-...              print (p, degreeString)
+...              print (str(p), degreeString)
     vi F major
-    (D5, '6')
-    (F5, '1')
-    (A5, '3')
+    ('D5', '6')
+    ('F5', '1')
+    ('A5', '3')
     V[no3] F major
-    (C5, '5')
-    (G5, '2')
+    ('C5', '5')
+    ('G5', '2')
     I F major
-    (F4, '1')
-    (A4, '3')
-    (C5, '5')
+    ('F4', '1')
+    ('A4', '3')
+    ('C5', '5')
     ...
     V6 g minor
-    (F#5, '7#')
-    (A5, '2')
-    (D6, '5')
+    ('F#5', '7#')
+    ('A5', '2')
+    ('D6', '5')
     i g minor
-    (G4, '1')
-    (B-4, '3')
-    (D5, '5')
+    ('G4', '1')
+    ('B-4', '3')
+    ('D5', '5')
     ...
 
 Now if we'd like we can get a Histogram of the data.
@@ -108,15 +108,15 @@ Now generate the histogram:
     
 OMIT_FROM_DOCS
 >>> x = converter.parse('romantext: m1 a: VI')
->>> x.flat.getElementsByClass('RomanNumeral')[0].pitches
-[F5, A5, C6]
+>>> [str(p) for p in x.flat.getElementsByClass('RomanNumeral')[0].pitches]
+['F5', 'A5', 'C6']
 
 >>> x = converter.parse('romantext: m1 a: vi')
->>> x.flat.getElementsByClass('RomanNumeral')[0].pitches
-[F#5, A5, C#6]
+>>> [str(p) for p in x.flat.getElementsByClass('RomanNumeral')[0].pitches]
+['F#5', 'A5', 'C#6']
 
->>> converter.parse('romantext: m1 a: vio').flat.getElementsByClass('RomanNumeral')[0].pitches
-[F#5, A5, C6]
+>>> [str(p) for p in converter.parse('romantext: m1 a: vio').flat.getElementsByClass('RomanNumeral')[0].pitches]
+['F#5', 'A5', 'C6']
 '''
 import unittest
 import copy
@@ -919,14 +919,14 @@ m6-7 = m4-5
 
         for elementNumber in [0, 6, 12]:
             self.assertEqual(rnStream[elementNumber + 4].figure, 'III6')
-            self.assertEqual(str(rnStream[elementNumber + 4].pitches), '[A4, C5, F5]')
+            self.assertEqual(str([str(p) for p in rnStream[elementNumber + 4].pitches]), "['A4', 'C5', 'F5']")
 
             x = rnStream[elementNumber + 4].pitches[2].accidental
             if x == None: x = pitch.Accidental('natural')
             self.assertEqual(x.alter, 0)
 
             self.assertEqual(rnStream[elementNumber + 5].figure, 'iv6')
-            self.assertEqual(str(rnStream[elementNumber + 5].pitches), '[B-4, D5, G5]')
+            self.assertEqual(str([str(p) for p in rnStream[elementNumber + 5].pitches]), "['B-4', 'D5', 'G5']")
 
             self.assertEqual(rnStream[elementNumber + 5].pitches[0].accidental.displayStatus, True)
 

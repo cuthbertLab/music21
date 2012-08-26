@@ -54,15 +54,20 @@ def augmentedSixthToDominant(augSixthPossib, augSixthType = None, augSixthChordI
     >>> frAug6 = (Gs4, E4, D4, Bb2)
     >>> grAug6 = (Gs4, F4, D4, Bb2)
     >>> swAug6 = (Gs4, Es4, D4, Bb2)
+
     >>> frRes = resolution.augmentedSixthToDominant(frAug6)
     >>> frRes
-    (A4, E4, C#4, A2)
+    (<music21.pitch.Pitch A4>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch C#4>, <music21.pitch.Pitch A2>)    
+    >>> [str(p) for p in frRes]
+    ['A4', 'E4', 'C#4', 'A2']
+
     >>> grRes = resolution.augmentedSixthToDominant(grAug6)
-    >>> grRes
-    (A4, E4, C#4, A2)
+    >>> [str(p) for p in grRes]
+    ['A4', 'E4', 'C#4', 'A2']
+
     >>> swRes = resolution.augmentedSixthToDominant(swAug6)
-    >>> swRes
-    (A4, E4, C#4, A2)
+    >>> [str(p) for p in swRes]
+    ['A4', 'E4', 'C#4', 'A2']
     >>> #_DOCS_SHOW resolution.showResolutions(frAug6, frRes, grAug6, grRes, swAug6, swRes)
     
         .. image:: images/figuredBass/fbResolution_a6toV.*
@@ -124,14 +129,14 @@ def augmentedSixthToMajorTonic(augSixthPossib, augSixthType = None, augSixthChor
     >>> grAug6 = (Gs4, F4, D4, Bb2)
     >>> swAug6 = (Gs4, Es4, D4, Bb2)
     >>> frRes = resolution.augmentedSixthToMajorTonic(frAug6)
-    >>> frRes
-    (A4, F#4, D4, A2)
+    >>> [str(p) for p in frRes]
+    ['A4', 'F#4', 'D4', 'A2']
     >>> grRes = resolution.augmentedSixthToMajorTonic(grAug6)
-    >>> grRes
-    (A4, F#4, D4, A2)    
+    >>> [str(p) for p in grRes]
+    ['A4', 'F#4', 'D4', 'A2']
     >>> swRes = resolution.augmentedSixthToMajorTonic(swAug6)
-    >>> swRes
-    (A4, F#4, D4, A2)
+    >>> [str(p) for p in swRes]
+    ['A4', 'F#4', 'D4', 'A2']
     >>> #_DOCS_SHOW resolution.showResolutions(frAug6, frRes, grAug6, grRes, swAug6, swRes)
     
         .. image:: images/figuredBass/fbResolution_a6toI.*
@@ -194,14 +199,14 @@ def augmentedSixthToMinorTonic(augSixthPossib, augSixthType = None, augSixthChor
     >>> grAug6 = (Gs4, F4, D4, Bb2)
     >>> swAug6 = (Gs4, Es4, D4, Bb2)
     >>> frRes = resolution.augmentedSixthToMinorTonic(frAug6)
-    >>> frRes
-    (A4, F4, D4, A2)
+    >>> [str(p) for p in frRes]
+    ['A4', 'F4', 'D4', 'A2']
     >>> grRes = resolution.augmentedSixthToMinorTonic(grAug6)
-    >>> grRes
-    (A4, F4, D4, A2)
+    >>> [str(p) for p in grRes]
+    ['A4', 'F4', 'D4', 'A2']
     >>> swRes = resolution.augmentedSixthToMinorTonic(swAug6)
-    >>> swRes
-    (A4, F4, D4, A2)  
+    >>> [str(p) for p in swRes]
+    ['A4', 'F4', 'D4', 'A2']
     >>> #_DOCS_SHOW resolution.showResolutions(frAug6, frRes, grAug6, grRes, swAug6, swRes)
 
         .. image:: images/figuredBass/fbResolution_a6toIm.*
@@ -269,7 +274,7 @@ def dominantSeventhToMajorTonic(domPossib, resolveV43toI6 = False, domChordInfo 
     >>> domPossibA1 = (D5, F4, B3, G2)
     >>> resPossibA1 = resolution.dominantSeventhToMajorTonic(domPossibA1)
     >>> resPossibA1
-    (C5, E4, C4, C3)
+    (<music21.pitch.Pitch C5>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch C4>, <music21.pitch.Pitch C3>)
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA1, resPossibA1)
 
     .. image:: images/figuredBass/fbResolution_V7toI_1.*
@@ -277,8 +282,8 @@ def dominantSeventhToMajorTonic(domPossib, resolveV43toI6 = False, domChordInfo 
 
     >>> domPossibA2 = (Bb3, G3, E3, C3)
     >>> resPossibA2 = resolution.dominantSeventhToMajorTonic(domPossibA2)
-    >>> resPossibA2
-    (A3, F3, F3, F3)
+    >>> [str(p) for p in resPossibA2]
+    ['A3', 'F3', 'F3', 'F3']
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA2, resPossibA2)
 
     .. image:: images/figuredBass/fbResolution_V7toI_2.*
@@ -286,11 +291,11 @@ def dominantSeventhToMajorTonic(domPossib, resolveV43toI6 = False, domChordInfo 
 
     >>> domPossibA3 = (E5, Bb4, C4, G3)
     >>> resPossibA3a = resolution.dominantSeventhToMajorTonic(domPossibA3, False)
-    >>> resPossibA3a
-    (F5, A4, C4, F3)
+    >>> [str(p) for p in resPossibA3a]
+    ['F5', 'A4', 'C4', 'F3']
     >>> resPossibA3b = resolution.dominantSeventhToMajorTonic(domPossibA3, True)
-    >>> resPossibA3b    
-    (F5, C5, C4, A3)
+    >>> [str(p) for p in resPossibA3b]
+    ['F5', 'C5', 'C4', 'A3']
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA3, resPossibA3a, domPossibA3, resPossibA3b)
 
     .. image:: images/figuredBass/fbResolution_V7toI_3.*
@@ -342,8 +347,8 @@ def dominantSeventhToMinorTonic(domPossib, resolveV43toi6 = False, domChordInfo 
     >>> E5 = pitch.Pitch('E5')
     >>> domPossibA1 = (D5, F4, B3, G2)
     >>> resPossibA1 = resolution.dominantSeventhToMinorTonic(domPossibA1)
-    >>> resPossibA1
-    (C5, E-4, C4, C3)
+    >>> [str(p) for p in resPossibA1]
+    ['C5', 'E-4', 'C4', 'C3']
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA1, resPossibA1)
 
     .. image:: images/figuredBass/fbResolution_V7toIm_1.*
@@ -351,8 +356,8 @@ def dominantSeventhToMinorTonic(domPossib, resolveV43toi6 = False, domChordInfo 
 
     >>> domPossibA2 = (Bb3, G3, E3, C3)
     >>> resPossibA2 = resolution.dominantSeventhToMinorTonic(domPossibA2)
-    >>> resPossibA2
-    (A-3, F3, F3, F3)
+    >>> ', '.join([str(p) for p in resPossibA2])
+    'A-3, F3, F3, F3'
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA2, resPossibA2)
     
     .. image:: images/figuredBass/fbResolution_V7toIm_2.*
@@ -360,11 +365,11 @@ def dominantSeventhToMinorTonic(domPossib, resolveV43toi6 = False, domChordInfo 
 
     >>> domPossibA3 = (E5, Bb4, C4, G3)
     >>> resPossibA3a = resolution.dominantSeventhToMinorTonic(domPossibA3, False)
-    >>> resPossibA3a
-    (F5, A-4, C4, F3)
+    >>> [str(p) for p in resPossibA3a]
+    ['F5', 'A-4', 'C4', 'F3']
     >>> resPossibA3b = resolution.dominantSeventhToMinorTonic(domPossibA3, True)
-    >>> resPossibA3b
-    (F5, C5, C4, A-3)
+    >>> [str(p) for p in resPossibA3b]
+    ['F5', 'C5', 'C4', 'A-3']
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA3, resPossibA3a, domPossibA3, resPossibA3b)
 
     .. image:: images/figuredBass/fbResolution_V7toIm_3.*
@@ -400,8 +405,8 @@ def dominantSeventhToMajorSubmediant(domPossib, domChordInfo = None):
     >>> D5 = pitch.Pitch('D5')
     >>> domPossibA1 = (D5, F4, B3, G2)
     >>> resPossibA1 = resolution.dominantSeventhToMajorSubmediant(domPossibA1)
-    >>> resPossibA1
-    (C5, E-4, C4, A-2)
+    >>> [p.nameWithOctave for p in resPossibA1]
+    ['C5', 'E-4', 'C4', 'A-2']
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA1, resPossibA1)
 
     .. image:: images/figuredBass/fbResolution_V7toVI.*
@@ -437,8 +442,8 @@ def dominantSeventhToMinorSubmediant(domPossib, domChordInfo = None):
     >>> D5 = pitch.Pitch('D5')
     >>> domPossibA1 = (D5, F4, B3, G2)
     >>> resPossibA1 = resolution.dominantSeventhToMinorSubmediant(domPossibA1)
-    >>> resPossibA1
-    (C5, E4, C4, A2)
+    >>> [p.nameWithOctave for p in resPossibA1]
+    ['C5', 'E4', 'C4', 'A2']
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA1, resPossibA1)   
 
     .. image:: images/figuredBass/fbResolution_V7toVIm.*
@@ -474,8 +479,8 @@ def dominantSeventhToMajorSubdominant(domPossib, domChordInfo = None):
     >>> D5 = pitch.Pitch('D5')
     >>> domPossibA1 = (D5, F4, B3, G2)
     >>> resPossibA1 = resolution.dominantSeventhToMajorSubdominant(domPossibA1)
-    >>> resPossibA1
-    (C5, F4, C4, A2)
+    >>> [p.nameWithOctave for p in resPossibA1]
+    ['C5', 'F4', 'C4', 'A2']
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA1, resPossibA1)    
 
     .. image:: images/figuredBass/fbResolution_V7toIV.*
@@ -510,8 +515,8 @@ def dominantSeventhToMinorSubdominant(domPossib, domChordInfo = None):
     >>> D5 = pitch.Pitch('D5')
     >>> domPossibA1 = (D5, F4, B3, G2)
     >>> resPossibA1 = resolution.dominantSeventhToMinorSubdominant(domPossibA1)
-    >>> resPossibA1
-    (C5, F4, C4, A-2)
+    >>> [p.nameWithOctave for p in resPossibA1]
+    ['C5', 'F4', 'C4', 'A-2']
     >>> #_DOCS_SHOW resolution.showResolutions(domPossibA1, resPossibA1)
 
     .. image:: images/figuredBass/fbResolution_V7toIVm.*
@@ -554,11 +559,11 @@ def diminishedSeventhToMajorTonic(dimPossib, doubledRoot = False, dimChordInfo =
     >>> Bb4 = pitch.Pitch('B-4')
     >>> dimPossibA = (Bb4, E4, G3, Cs3)
     >>> resPossibAa = resolution.diminishedSeventhToMajorTonic(dimPossibA, False)
-    >>> resPossibAa
-    (A4, F#4, F#3, D3)
+    >>> [str(p) for p in resPossibAa]
+    ['A4', 'F#4', 'F#3', 'D3']
     >>> resPossibAb = resolution.diminishedSeventhToMajorTonic(dimPossibA, True)
-    >>> resPossibAb
-    (A4, D4, F#3, D3)
+    >>> [p.nameWithOctave for p in resPossibAb]
+    ['A4', 'D4', 'F#3', 'D3']
     >>> #_DOCS_SHOW resolution.showResolutions(dimPossibA, resPossibAa, dimPossibA, resPossibAb)
     
     .. image:: images/figuredBass/fbResolution_vii7toI.*
@@ -601,11 +606,11 @@ def diminishedSeventhToMinorTonic(dimPossib, doubledRoot = False, dimChordInfo =
     >>> Bb4 = pitch.Pitch('B-4')
     >>> dimPossibA = (Bb4, E4, G3, Cs3)
     >>> resPossibAa = resolution.diminishedSeventhToMinorTonic(dimPossibA, False)
-    >>> resPossibAa
-    (A4, F4, F3, D3)
+    >>> [p.nameWithOctave for p in resPossibAa]
+    ['A4', 'F4', 'F3', 'D3']
     >>> resPossibAb = resolution.diminishedSeventhToMinorTonic(dimPossibA, True)
-    >>> resPossibAb
-    (A4, D4, F3, D3)
+    >>> [p.nameWithOctave for p in resPossibAb]
+    ['A4', 'D4', 'F3', 'D3']
     >>> #_DOCS_SHOW resolution.showResolutions(dimPossibA, resPossibAa, dimPossibA, resPossibAb)
 
     .. image:: images/figuredBass/fbResolution_vii7toIm.*
@@ -640,8 +645,8 @@ def diminishedSeventhToMajorSubdominant(dimPossib, dimChordInfo = None):
     >>> Bb4 = pitch.Pitch('B-4')
     >>> dimPossibA = (Bb4, E4, G3, Cs3)
     >>> resPossibA = resolution.diminishedSeventhToMajorSubdominant(dimPossibA)
-    >>> resPossibA
-    (B4, D4, G3, D3)
+    >>> [str(p) for p in resPossibA]
+    ['B4', 'D4', 'G3', 'D3']
     >>> #_DOCS_SHOW resolution.showResolutions(dimPossibA, resPossibA)
 
     .. image:: images/figuredBass/fbResolution_vii7toIV.*
@@ -674,8 +679,8 @@ def diminishedSeventhToMinorSubdominant(dimPossib, dimChordInfo = None):
     >>> Bb4 = pitch.Pitch('B-4')
     >>> dimPossibA = (Bb4, E4, G3, Cs3)
     >>> resPossibA = resolution.diminishedSeventhToMinorSubdominant(dimPossibA)
-    >>> resPossibA
-    (B-4, D4, G3, D3)
+    >>> [str(p) for p in resPossibA]
+    ['B-4', 'D4', 'G3', 'D3']
     >>> #_DOCS_SHOW resolution.showResolutions(dimPossibA, resPossibA)
 
     .. image:: images/figuredBass/fbResolution_vii7toIVm.*

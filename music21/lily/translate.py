@@ -1334,7 +1334,7 @@ class LilypondConverter(object):
         \time 3/4
         '''
         lpEmbeddedScm = lyo.LyEmbeddedScm()
-        keyScheme = lpEmbeddedScm.backslash + 'time ' + str(ts) + lpEmbeddedScm.newlineIndent
+        keyScheme = lpEmbeddedScm.backslash + 'time ' + ts.ratioString + lpEmbeddedScm.newlineIndent
         lpEmbeddedScm.content = keyScheme
         return lpEmbeddedScm
 

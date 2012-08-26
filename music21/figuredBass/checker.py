@@ -694,7 +694,7 @@ def generalNoteToPitch(music21GeneralNote):
     >>> c1 = chord.Chord(['C3','E3','G3'])
     >>> from music21.figuredBass import checker
     >>> checker.generalNoteToPitch(n1)
-    G5
+    <music21.pitch.Pitch G5>
     >>> checker.generalNoteToPitch(c1)
     'RT'
     '''

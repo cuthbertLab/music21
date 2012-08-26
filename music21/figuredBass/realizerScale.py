@@ -106,18 +106,34 @@ class FiguredBassScale(object):
         
         >>> from music21.figuredBass import realizerScale
         >>> fbScale = realizerScale.FiguredBassScale()
+        
         >>> fbScale.getSamplePitches('D3', '6') # First inversion triad
-        [D3, F3, B3]
-        >>> fbScale.getSamplePitches('G3') # Root position triad
-        [G3, B3, D4]
-        >>> fbScale.getSamplePitches('B3', '6,5') # First inversion seventh chord
-        [B3, D4, F4, G4]
-        >>> fbScale.getSamplePitches('F3', '-6,-') # Neapolitan chord
-        [F3, A-3, D-4]
-        >>> fbScale.getSamplePitches('C5', '4,3') # Second inversion seventh chord
-        [C5, E5, F5, A5]
-        >>> fbScale.getSamplePitches('C#3', '-7') # Fully diminished seventh chord
-        [C#3, E3, G3, B-3]
+        [<music21.pitch.Pitch D3>, <music21.pitch.Pitch F3>, <music21.pitch.Pitch B3>]
+        
+        Root position triad
+        
+        >>> [str(p) for p in fbScale.getSamplePitches('G3') ] 
+        ['G3', 'B3', 'D4']
+        
+        First inversion seventh chord
+        
+        >>> [str(p) for p in fbScale.getSamplePitches('B3', '6,5') ] 
+        ['B3', 'D4', 'F4', 'G4']
+        
+        Neapolitan chord
+        
+        >>> [str(p) for p in fbScale.getSamplePitches('F3', '-6,-') ]
+        ['F3', 'A-3', 'D-4']
+        
+        Second inversion seventh chord
+        
+        >>> [str(p) for p in fbScale.getSamplePitches('C5', '4,3') ]
+        ['C5', 'E5', 'F5', 'A5']
+        
+        Fully diminished seventh chord
+        
+        >>> [str(p) for p in fbScale.getSamplePitches('C#3', '-7') ]
+        ['C#3', 'E3', 'G3', 'B-3']
         '''
         bassPitch = convertToPitch(bassPitch) #Convert string to pitch (if necessary)
         maxPitch = bassPitch.transpose('d8')
@@ -134,12 +150,21 @@ class FiguredBassScale(object):
 
         >>> from music21.figuredBass import realizerScale
         >>> fbScale = realizerScale.FiguredBassScale()
-        >>> fbScale.getPitches('C3') # Root position triad
-        [C3, E3, G3, C4, E4, G4, C5, E5, G5]
-        >>> fbScale.getPitches('D3', '6') # First inversion triad
-        [D3, F3, B3, D4, F4, B4, D5, F5, B5]
-        >>> fbScale.getPitches(pitch.Pitch('G3'), '7', 'F4') # Root position seventh chord
-        [G3, B3, D4, F4]
+        
+        Root position triad
+
+        >>> [str(p) for p in fbScale.getPitches('C3') ]
+        ['C3', 'E3', 'G3', 'C4', 'E4', 'G4', 'C5', 'E5', 'G5']
+
+        First inversion triad
+
+        >>> [str(p) for p in fbScale.getPitches('D3', '6') ]
+        ['D3', 'F3', 'B3', 'D4', 'F4', 'B4', 'D5', 'F5', 'B5']
+        
+        Root position seventh chord, showing MaxPitch
+        
+        >>> fbScale.getPitches(pitch.Pitch('G3'), '7', 'F4')
+        [<music21.pitch.Pitch G3>, <music21.pitch.Pitch B3>, <music21.pitch.Pitch D4>, <music21.pitch.Pitch F4>]
         '''
         bassPitch = convertToPitch(bassPitch)
         maxPitch = convertToPitch(maxPitch)
@@ -169,9 +194,9 @@ def convertToPitch(pitchString):
     >>> from music21.figuredBass import realizerScale
     >>> pitchString = 'C5'
     >>> realizerScale.convertToPitch(pitchString)
-    C5
+    <music21.pitch.Pitch C5>
     >>> realizerScale.convertToPitch(pitch.Pitch('E4')) # does nothing
-    E4
+    <music21.pitch.Pitch E4>
     '''
     if isinstance(pitchString, pitch.Pitch):
         return pitchString

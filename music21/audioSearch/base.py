@@ -215,7 +215,7 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
     
     >>> from music21 import *
     >>> audioSearch.normalizeInputFrequency(441.72)
-    (440.0, A4)
+    (440.0, <music21.pitch.Pitch A4>)
     
     
     If you will be doing this often, it's best to cache your thresholds and
@@ -225,10 +225,10 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
     >>> thresholds, pitches = audioSearch.prepareThresholds(scale.ChromaticScale('C4'))
     >>> for fq in [450, 510, 550, 600]:
     ...      print normalizeInputFrequency(fq, thresholds, pitches)
-    (440.0, A4)
-    (523.25113..., C5)
-    (277.18263..., C#5)
-    (293.66476..., D5)
+    (440.0, <music21.pitch.Pitch A4>)
+    (523.25113..., <music21.pitch.Pitch C5>)
+    (277.18263..., <music21.pitch.Pitch C#5>)
+    (293.66476..., <music21.pitch.Pitch D5>)
     '''
     if ((thresholds is None and pitches is not None)
          or (thresholds is not None and pitches is None)):
@@ -274,8 +274,8 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=None):
     >>> detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale=scale.ChromaticScale('C4'))
     >>> detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
     >>> (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))
-    >>> print detectedPitchObjects
-    [A5, A5, A5, D5, D4, B4, A4, F4, E-4, C#3, B3, B3, B3, A3, G3, F3, F3, E3, F#3, F#3,...]   
+    >>> [str(p) for p in detectedPitchObjects]
+    ['A5', 'A5', 'A5', 'D5', 'D4', 'B4', 'A4', 'F4', 'E-4', 'C#3', 'B3', 'B3', 'B3', 'A3', 'G3',...]   
     '''
     if useScale is None:
         useScale = scale.MajorScale('C4')

@@ -16,7 +16,7 @@ import sys
 # stored in StringIO.StringIO, this update is necessary
 # http://stackoverflow.com/questions/857597/setting-the-encoding-for-sax-parser-in-python
 
-# N.B. This breaks IDLE!
+# N.B. Without this change reload(sys) breaks IDLE!
 currentStdOut = sys.stdout
 currentStdIn = sys.stdin
 currentStdErr = sys.stderr

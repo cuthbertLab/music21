@@ -75,21 +75,21 @@ def sharpsToPitch(sharpCount):
 
     >>> from music21 import *
     >>> key.sharpsToPitch(1)
-    G
+    <music21.pitch.Pitch G>
     >>> key.sharpsToPitch(1)
-    G
+    <music21.pitch.Pitch G>
     >>> key.sharpsToPitch(2)
-    D
+    <music21.pitch.Pitch D>
     >>> key.sharpsToPitch(-2)
-    B-
+    <music21.pitch.Pitch B->
     >>> key.sharpsToPitch(-6)
-    G-
+    <music21.pitch.Pitch G->
     
     Note that these are :class:`music21.pitch.Pitch` objects not just names:
     
     >>> k1 = key.sharpsToPitch(6)
     >>> k1
-    F#
+    <music21.pitch.Pitch F#>
     >>> k1.step
     'F'
     >>> k1.accidental
@@ -329,8 +329,13 @@ class KeySignature(base.Music21Object):
     >>> Eflat
     <music21.key.KeySignature of 3 flats>
 
+    Some specification of mode can go into the KeySignature object:
 
-    If you want to get a real Key, then use the :class:`~music21.key.Key` object instead:
+    >>> Eflat.mode = 'phrygian'
+    >>> Eflat
+    <music21.key.KeySignature of 3 flats, mode phrygian>
+
+    But if you want to get a real Key, then use the :class:`~music21.key.Key` object instead:
 
     >>> illegal = key.KeySignature('c#')
     Traceback (most recent call last):
@@ -381,28 +386,31 @@ class KeySignature(base.Music21Object):
 
 
     def _strDescription(self):
+        output = ""
         ns = self.sharps
         if ns == None:
-            return 'None'
+            output = 'None'
         elif ns > 1:
-            return "%s sharps" % str(ns)
+            output = "%s sharps" % str(ns)
         elif ns == 1:
-            return "1 sharp"
+            output = "1 sharp"
         elif ns == 0:
-            return "no sharps or flats"
+            output = "no sharps or flats"
         elif ns == -1:
-            return "1 flat"
+            output = "1 flat"
         else:
-            return "%s flats" % str(abs(ns))
+            output = "%s flats" % str(abs(ns))
+        if self.mode is None:
+            return output
+        else:
+            output += ", mode %s" % (self.mode)
+            return output
         
     def __repr__(self):
         return "<music21.key.KeySignature of %s>" % self._strDescription()
 
     def __str__(self):
-        # string representation needs to be complete, as is used
-        # for metadata comparisons
-        return "sharps %s, mode %s" % (self.sharps, self.mode)
-        
+        return self.__repr__()
 
     def _getPitchAndMode(self):
         '''Returns a a two value list containing 
@@ -412,19 +420,19 @@ class KeySignature(base.Music21Object):
         >>> from music21 import *
        
         >>> key.KeySignature(-7).pitchAndMode
-        (C-, None)
+        (<music21.pitch.Pitch C->, None)
         >>> key.KeySignature(-6).pitchAndMode
-        (G-, None)
+        (<music21.pitch.Pitch G->, None)
         >>> key.KeySignature(-3).pitchAndMode
-        (E-, None)
+        (<music21.pitch.Pitch E->, None)
         >>> key.KeySignature(0).pitchAndMode
-        (C, None)
+        (<music21.pitch.Pitch C>, None)
         >>> key.KeySignature(1).pitchAndMode
-        (G, None)
+        (<music21.pitch.Pitch G>, None)
         >>> csharp = key.KeySignature(4)
         >>> csharp.mode = "minor"
         >>> csharp.pitchAndMode
-        (C#, 'minor')
+        (<music21.pitch.Pitch C#>, 'minor')
         >>> csharpPitch = csharp.pitchAndMode[0]
         >>> csharpPitch.accidental
         <accidental sharp>
@@ -478,30 +486,30 @@ class KeySignature(base.Music21Object):
 
         >>> a = key.KeySignature(3)
         >>> a.alteredPitches
-        [F#, C#, G#]
+        [<music21.pitch.Pitch F#>, <music21.pitch.Pitch C#>, <music21.pitch.Pitch G#>]
         >>> b = key.KeySignature(1)
         >>> b.alteredPitches
-        [F#]
+        [<music21.pitch.Pitch F#>]
 
         >>> c = key.KeySignature(9)
-        >>> c.alteredPitches
-        [F#, C#, G#, D#, A#, E#, B#, F##, C##]
+        >>> [str(p) for p in c.alteredPitches]
+        ['F#', 'C#', 'G#', 'D#', 'A#', 'E#', 'B#', 'F##', 'C##']
 
         >>> d = key.KeySignature(-3)
         >>> d.alteredPitches
-        [B-, E-, A-]
+        [<music21.pitch.Pitch B->, <music21.pitch.Pitch E->, <music21.pitch.Pitch A->]
 
         >>> e = key.KeySignature(-1)
         >>> e.alteredPitches
-        [B-]
+        [<music21.pitch.Pitch B->]
 
         >>> f = key.KeySignature(-6)
-        >>> f.alteredPitches
-        [B-, E-, A-, D-, G-, C-]
+        >>> [str(p) for p in f.alteredPitches]
+        ['B-', 'E-', 'A-', 'D-', 'G-', 'C-']
 
         >>> g = key.KeySignature(-8)
-        >>> g.alteredPitches
-        [B-, E-, A-, D-, G-, C-, F-, B--]
+        >>> [str(p) for p in g.alteredPitches]
+        ['B-', 'E-', 'A-', 'D-', 'G-', 'C-', 'F-', 'B--']
         ''')
 
     def accidentalByStep(self, step):
@@ -614,21 +622,21 @@ class KeySignature(base.Music21Object):
 
         >>> a = KeySignature(2)
         >>> a.pitchAndMode
-        (D, None)
+        (<music21.pitch.Pitch D>, None)
         >>> b = a.transpose('p5')
         >>> b.pitchAndMode
-        (A, None)
+        (<music21.pitch.Pitch A>, None)
         >>> b.sharps
         3
         >>> c = b.transpose('-m2')
         >>> c.pitchAndMode
-        (G#, None)
+        (<music21.pitch.Pitch G#>, None)
         >>> c.sharps
         8
         
         >>> d = c.transpose('-a3')
         >>> d.pitchAndMode
-        (E-, None)
+        (<music21.pitch.Pitch E->, None)
         >>> d.sharps
         -3
         '''
@@ -823,9 +831,9 @@ class Key(KeySignature, scale.DiatonicScale):
     >>> cm.sharps
     -3
     >>> cm.pitchFromDegree(3)
-    E-4
+    <music21.pitch.Pitch E-4>
     >>> cm.pitchFromDegree(7)
-    B-4
+    <music21.pitch.Pitch B-4>
 
     >>> Csharpmaj = key.Key('C#')
     >>> Csharpmaj
@@ -847,6 +855,18 @@ class Key(KeySignature, scale.DiatonicScale):
 
     def __init__(self, tonic = None, mode = None):
         if tonic is not None:
+            if hasattr(tonic, 'classes') and 'Music21Object' in tonic.classes:
+                if hasattr(tonic, 'name'):
+                    tonic = tonic.name
+                elif hasattr(tonic, 'pitches') and len(tonic.pitches) > 0: # chord
+                    if mode is None:
+                        if tonic.isMinorTriad() is True:
+                            mode = 'minor'
+                        else:
+                            mode = 'major'
+                    tonic = tonic.root().name
+                    
+            
             if mode is None:
                 if 'm' in tonic:
                     mode = 'minor'
@@ -858,6 +878,8 @@ class Key(KeySignature, scale.DiatonicScale):
                     mode = 'minor'
                 else:
                     mode = 'major'
+            else:
+                mode = mode.lower()
             sharps = pitchToSharps(tonic, mode)
             KeySignature.__init__(self, sharps, mode)
 

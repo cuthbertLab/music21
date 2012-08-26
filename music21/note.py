@@ -1212,19 +1212,22 @@ class Note(NotRest):
             raise NoteException('cannot set pitches with provided object: %s' % value)
 
     pitches = property(_getPitches, _setPitches, 
-        doc = '''Return the :class:`~music21.pitch.Pitch` object in a list. This property is designed to provide an interface analogous to that found on :class:`~music21.chord.Chord`.
+        doc = '''
+        Return the :class:`~music21.pitch.Pitch` object in a list. 
+        This property is designed to provide an interface analogous to 
+        that found on :class:`~music21.chord.Chord`.
 
         >>> from music21 import *
         >>> n = note.Note('g#')
         >>> n.nameWithOctave
         'G#'
         >>> n.pitches
-        [G#]
+        [<music21.pitch.Pitch G#>]
         >>> n.pitches = [pitch.Pitch('c2'), pitch.Pitch('g2')]
         >>> n.nameWithOctave
         'C2'
         >>> n.pitches
-        [C2]
+        [<music21.pitch.Pitch C2>]
         ''')
 
 

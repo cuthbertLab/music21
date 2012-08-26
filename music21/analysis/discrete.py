@@ -499,12 +499,12 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
     def _bestKeyEnharmonic(self, pitchObj, mode, sStream=None):
         '''
         >>> from music21 import *
-        >>> p = analysis.discrete.KrumhanslSchmuckler()
+        >>> ks = analysis.discrete.KrumhanslSchmuckler()
         >>> s = converter.parse('b-4 e- f g-', '4/4')
-        >>> p._bestKeyEnharmonic(pitch.Pitch('e#'), 'minor', s)
-        F
-        >>> p._bestKeyEnharmonic(pitch.Pitch('f-'), 'major', s)
-        E
+        >>> ks._bestKeyEnharmonic(pitch.Pitch('e#'), 'minor', s)
+        <music21.pitch.Pitch F>
+        >>> ks._bestKeyEnharmonic(pitch.Pitch('f-'), 'major', s)
+        <music21.pitch.Pitch E>
 
         '''
         if pitchObj == None:

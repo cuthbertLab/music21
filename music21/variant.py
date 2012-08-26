@@ -2341,6 +2341,14 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+    def pitchOut(self, listIn):
+        out = "["
+        for p in listIn:
+            out += str(p) + ', '
+        out = out[0:len(out)-2]
+        out += "]"
+        return out
+
     def testBasicA(self):
         from music21 import variant, stream, note
 
@@ -2421,19 +2429,19 @@ class Test(unittest.TestCase):
     
         # normal in-place variant functionality
         s.insert(5, v1)
-        self.assertEqual(str([p for p in s.pitches]), 
+        self.assertEqual(self.pitchOut([p for p in s.pitches]), 
             '[G4, G4, G4, G4, G4, G4, G4, G4]')
         sv = s.activateVariants(inPlace=False)
-        self.assertEqual(str([p for p in sv.pitches]), 
+        self.assertEqual(self.pitchOut([p for p in sv.pitches]), 
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
     
         # test functionality on a deepcopy    
         sCopy = copy.deepcopy(s)
         self.assertEqual(len(sCopy.variants), 1)
-        self.assertEqual(str([p for p in sCopy.pitches]), 
+        self.assertEqual(self.pitchOut([p for p in sCopy.pitches]), 
             '[G4, G4, G4, G4, G4, G4, G4, G4]')
         sCopy.activateVariants(inPlace=True)
-        self.assertEqual(str([p for p in sCopy.pitches]), 
+        self.assertEqual(self.pitchOut([p for p in sCopy.pitches]), 
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
 
@@ -2450,11 +2458,11 @@ class Test(unittest.TestCase):
         # as we deepcopy the elements in the variants, we have new Notes
         sCopy = copy.deepcopy(s)
         sCopy.activateVariants(inPlace=True)
-        self.assertEqual(str([p for p in sCopy.pitches]), 
+        self.assertEqual(self.pitchOut([p for p in sCopy.pitches]), 
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
         # can transpose the note in place
         sCopy.notes[5].transpose(12, inPlace=True)
-        self.assertEqual(str([p for p in sCopy.pitches]), 
+        self.assertEqual(self.pitchOut([p for p in sCopy.pitches]), 
             '[G4, G4, G4, G4, G4, F#5, A-4, G4, G4]')
     
         # however, if the the Variant deepcopy still references the original
@@ -2462,7 +2470,7 @@ class Test(unittest.TestCase):
         # in original Stream, we would get unexpected results (the octave shift)
     
         s.activateVariants(inPlace=True)
-        self.assertEqual(str([p for p in s.pitches]), 
+        self.assertEqual(self.pitchOut([p for p in s.pitches]), 
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
 

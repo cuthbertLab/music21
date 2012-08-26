@@ -2219,10 +2219,10 @@ class TimeSignature(base.Music21Object):
     ratioString = property(_getRatioString)
 
     def __str__(self):
-        return self.ratioString
+        return self.__repr__()
     
     def __repr__(self):
-        return "<music21.meter.TimeSignature %s>" % self.__str__()
+        return "<music21.meter.TimeSignature %s>" % self.ratioString
 
 
     def ratioEqual(self, other):

@@ -206,14 +206,14 @@ def base40ToPitch(base40Num):
     
     >>> from music21 import *
     >>> musedata.base40.base40ToPitch(1)
-    C--1
+    <music21.pitch.Pitch C--1>
     >>> musedata.base40.base40ToPitch(40)
-    B##1
+    <music21.pitch.Pitch B##1>
     >>> musedata.base40.base40ToPitch(23)
     Traceback (most recent call last):
     Base40Exception: Pitch name not assigned to this Base40 number 23
     >>> musedata.base40.base40ToPitch(186)
-    G5
+    <music21.pitch.Pitch G5>
     '''
     p = pitch.Pitch()
     p.octave = ((base40Num - 1) / 40) + 1

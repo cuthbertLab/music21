@@ -37,8 +37,9 @@ A :class:`music21.sieve.CompressionSegment` can be used to derive a Sieve from a
 The :class:`music21.sieve.PitchSieve` class provides a quick generation of :class:`music21.pitch.Pitch` lists from Sieves.
 
 >>> a = sieve.PitchSieve('13@3|13@6|13@9', 'c1', 'c10', 'f#4')
->>> a()
-[F#1, A1, C2, G2, B-2, C#3, G#3, B3, D4, A4, C5, E-5, B-5, C#6, E6, B6, D7, F7, C8, E-8, F#8, C#9, E9, G9]
+>>> pitches = a()
+>>> ', '.join([str(p) for p in pitches])
+'F#1, A1, C2, G2, B-2, C#3, G#3, B3, D4, A4, C5, E-5, B-5, C#6, E6, B6, D7, F7, C8, E-8, F#8, C#9, E9, G9'
 
 '''
 
@@ -1709,8 +1710,8 @@ class PitchSieve(object):
 
     >>> from music21 import *
     >>> ps = sieve.PitchSieve('6@0', 'c4', 'c8')
-    >>> ps()
-    [C4, F#4, C5, F#5, C6, F#6, C7, F#7, C8]
+    >>> [str(p) for p in ps()]
+    ['C4', 'F#4', 'C5', 'F#5', 'C6', 'F#6', 'C7', 'F#7', 'C8']
     """
     
     def __init__(self, sieveString, pitchLower=None, 
@@ -1718,8 +1719,8 @@ class PitchSieve(object):
         """
         >>> from music21 import *
         >>> a = sieve.PitchSieve('4@7')
-        >>> a()
-        [E-3, G3, B3, E-4, G4, B4]
+        >>> [str(p) for p in a()]
+        ['E-3', 'G3', 'B3', 'E-4', 'G4', 'B4']
         """
         self.pitchLower = None #'c3'
         self.pitchUpper = None #'c5' # default ps Range
@@ -1757,26 +1758,30 @@ class PitchSieve(object):
         >>> from music21 import *
         >>> a = sieve.PitchSieve('4@7&5@4')
         >>> a()
-        [G4]
+        [<music21.pitch.Pitch G4>]
 
         >>> a = sieve.PitchSieve('13@3|13@6|13@9', 'c1', 'c10')
-        >>> a()
-        [E-1, F#1, A1, E2, G2, B-2, F3, G#3, B3, F#4, A4, C5, G5, B-5, C#6, G#6, B6, D7, A7, C8, E-8, B-8, C#9, E9, B9]
+        >>> ', '.join([str(p) for p in a()])
+        'E-1, F#1, A1, E2, G2, B-2, F3, G#3, B3, F#4, A4, C5, G5, B-5, C#6, G#6, B6, D7, A7, C8, E-8, B-8, C#9, E9, B9'
 
         >>> a = sieve.PitchSieve('3@0', 'c4', 'c5', 'c4', .5)
         >>> a.eld
         0.5
 
-        >>> # the following is a microtonal pitch sieve; presently these are not 
-        >>> # displayed; true values are 
-        >>> # [0, 1.5, 3.0, 4.5, 6.0, 7.5, 9.0, 10.5, 12.0]
-        >>> a()
-        [C4, C#~4, E-4, E~4, F#4, G~4, A4, B`4, C5]
+        The following is a microtonal pitch sieve; presently these are not 
+        displayed; true values are 
+        [0, 1.5, 3.0, 4.5, 6.0, 7.5, 9.0, 10.5, 12.0]
+        
+        >>> pitches = a()
+        >>> ', '.join([str(p) for p in pitches])
+        'C4, C#~4, E-4, E~4, F#4, G~4, A4, B`4, C5'
 
+        True values: [0.5, 2.0, 3.5, 5.0, 6.5, 8.0, 9.5, 11.0]
+        
         >>> a = sieve.PitchSieve('3@0', 'c4', 'c5', 'c#4', .5)
-        >>> a()
-        [C~4, D4, E`4, F4, F#~4, G#4, A~4, B4]
-        >>> # [0.5, 2.0, 3.5, 5.0, 6.5, 8.0, 9.5, 11.0]
+        >>> pitches = a()
+        >>> ', '.join([str(p) for p in pitches])
+        'C~4, D4, E`4, F4, F#~4, G#4, A~4, B4'
         """
         min = self.pitchLower.ps
         max = self.pitchUpper.ps
@@ -1891,6 +1896,15 @@ class Test(unittest.TestCase):
     def testDummy(self):
         self.assertEqual(True, True)
 
+    def pitchOut(self, listIn):
+        out = "["
+        for p in listIn:
+            out += str(p) + ', '
+        out = out[0:len(out)-2]
+        out += "]"
+        return out
+
+
 
     def testIntersection(self):
         a = Residual(3)
@@ -1968,21 +1982,21 @@ class Test(unittest.TestCase):
         from music21 import sieve
 
         s1 = sieve.PitchSieve('3@0|7@0', 'c2', 'c6')
-        self.assertEqual(str(s1()), '[C2, E-2, F#2, G2, A2, C3, D3, E-3, F#3, A3, C4, E-4, E4, F#4, A4, B4, C5, E-5, F#5, A5, C6]')
+        self.assertEqual(self.pitchOut(s1()), '[C2, E-2, F#2, G2, A2, C3, D3, E-3, F#3, A3, C4, E-4, E4, F#4, A4, B4, C5, E-5, F#5, A5, C6]')
 
         s1 = sieve.PitchSieve('3@0|7@0', 'c2', 'c6', eld=2)
-        self.assertEqual(str(s1()), '[C2, D2, F#2, C3, E3, F#3, C4, F#4, C5, F#5, G#5, C6]')
+        self.assertEqual(self.pitchOut(s1()), '[C2, D2, F#2, C3, E3, F#3, C4, F#4, C5, F#5, G#5, C6]')
 
     def testPitchSieveB(self):
         from music21 import sieve
 
         # mirotonal elds
         s1 = sieve.PitchSieve('1@0', 'c2', 'c6', eld=.5)
-        self.assertEqual(str(s1()), '[C2, C~2, C#2, C#~2, D2, D~2, E-2, E`2, E2, E~2, F2, F~2, F#2, F#~2, G2, G~2, G#2, G#~2, A2, A~2, B-2, B`2, B2, B~2, C3, C~3, C#3, C#~3, D3, D~3, E-3, E`3, E3, E~3, F3, F~3, F#3, F#~3, G3, G~3, G#3, G#~3, A3, A~3, B-3, B`3, B3, B~3, C4, C~4, C#4, C#~4, D4, D~4, E-4, E`4, E4, E~4, F4, F~4, F#4, F#~4, G4, G~4, G#4, G#~4, A4, A~4, B-4, B`4, B4, B~4, C5, C~5, C#5, C#~5, D5, D~5, E-5, E`5, E5, E~5, F5, F~5, F#5, F#~5, G5, G~5, G#5, G#~5, A5, A~5, B-5, B`5, B5, B~5, C6]')
+        self.assertEqual(self.pitchOut(s1()), '[C2, C~2, C#2, C#~2, D2, D~2, E-2, E`2, E2, E~2, F2, F~2, F#2, F#~2, G2, G~2, G#2, G#~2, A2, A~2, B-2, B`2, B2, B~2, C3, C~3, C#3, C#~3, D3, D~3, E-3, E`3, E3, E~3, F3, F~3, F#3, F#~3, G3, G~3, G#3, G#~3, A3, A~3, B-3, B`3, B3, B~3, C4, C~4, C#4, C#~4, D4, D~4, E-4, E`4, E4, E~4, F4, F~4, F#4, F#~4, G4, G~4, G#4, G#~4, A4, A~4, B-4, B`4, B4, B~4, C5, C~5, C#5, C#~5, D5, D~5, E-5, E`5, E5, E~5, F5, F~5, F#5, F#~5, G5, G~5, G#5, G#~5, A5, A~5, B-5, B`5, B5, B~5, C6]')
 
 
         s1 = sieve.PitchSieve('3@0', 'c2', 'c6', eld=.5)
-        self.assertEqual(str(s1()), '[C2, C#~2, E-2, E~2, F#2, G~2, A2, B`2, C3, C#~3, E-3, E~3, F#3, G~3, A3, B`3, C4, C#~4, E-4, E~4, F#4, G~4, A4, B`4, C5, C#~5, E-5, E~5, F#5, G~5, A5, B`5, C6]')
+        self.assertEqual(self.pitchOut(s1()), '[C2, C#~2, E-2, E~2, F#2, G~2, A2, B`2, C3, C#~3, E-3, E~3, F#3, G~3, A3, B`3, C4, C#~4, E-4, E~4, F#4, G~4, A4, B`4, C5, C#~5, E-5, E~5, F#5, G~5, A5, B`5, C6]')
 
 
         

@@ -207,14 +207,14 @@ class WindowedAnalysis(object):
         >>> y[0][0].startswith('#') # for each window, we get a solution and a color
         True
         >>> x[0][0][0] 
-        B
+        <music21.pitch.Pitch B>
 
         >>> x, y, z = wa.process(1, 2, includeTotalWindow=False)
         >>> len(x) # we have two series of windows
         2
 
         >>> x[0][0] # the data returned is processor dependent; here we get
-        (B, 'major', 0.6868258874056411)
+        (<music21.pitch.Pitch B>, 'major', 0.6868258874056411)
         >>> y[0][0].startswith('#') # a color is returned for each matching data position
         True
         '''

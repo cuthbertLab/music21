@@ -1638,7 +1638,7 @@ def hdStringToNote(contents):
     
     >>> n = humdrum.spineParser.hdStringToNote("e-00.")
     >>> n.pitch
-    E-4
+    <music21.pitch.Pitch E-4>
     >>> n.duration.quarterLength
     24.0
     >>> n.duration.fullName

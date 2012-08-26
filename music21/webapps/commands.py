@@ -401,11 +401,11 @@ def checkLeadSheetPitches(worksheet, returnType=''):
 
     >>> answerKey = checkLeadSheetPitches( worksheet, returnType = 'answerkey' )
     >>> for x in answerKey.notes:
-    ...  x.pitches
-    [C3, E3, G3]
-    [G2, B2, D3, F3]
-    [B2, D#3, F#3]
-    [A2, C3, D3, F#3]
+    ...     [str(p) for p in x.pitches]
+    ['C3', 'E3', 'G3']
+    ['G2', 'B2', 'D3', 'F3']
+    ['B2', 'D#3', 'F#3']
+    ['A2', 'C3', 'D3', 'F#3']
     '''
     from music21 import chord
     from music21 import harmony

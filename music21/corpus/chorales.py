@@ -22,6 +22,7 @@ import copy
 
 
 from music21 import environment
+from music21 import metadata
 _MOD = "corpus.chorales.py"
 environLocal = environment.Environment(_MOD)
 
@@ -1141,7 +1142,7 @@ class Iterator(object):
             {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.KeySignature of 1 sharp>
+                {0.0} <music21.key.KeySignature of 1 sharp, mode major>
                 {0.0} <music21.meter.TimeSignature 3/4>
                 {0.0} <music21.note.Note G>
         ...
@@ -1159,7 +1160,7 @@ class Iterator(object):
             {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.KeySignature of 1 sharp>
+                {0.0} <music21.key.KeySignature of 1 sharp, mode minor>
                 {0.0} <music21.meter.TimeSignature 4/4>
                 {0.0} <music21.note.Note B>
         ...
@@ -1184,7 +1185,7 @@ class Iterator(object):
             {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.KeySignature of 1 sharp>
+                {0.0} <music21.key.KeySignature of 1 sharp, mode minor>
                 {0.0} <music21.meter.TimeSignature 4/4>
                 {0.0} <music21.note.Note B>
         ...
@@ -1202,7 +1203,7 @@ class Iterator(object):
             {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.KeySignature of 1 sharp>
+                {0.0} <music21.key.KeySignature of 1 sharp, mode major>
                 {0.0} <music21.meter.TimeSignature 3/4>
                 {0.0} <music21.note.Note G>
         ...
@@ -1260,7 +1261,7 @@ class Iterator(object):
                     pass
             # Store the correct title in metadata (replacing the chorale number as it is parsed)
             if chorale.metadata is None:
-                chorale.metadata = music21.metadata.Metadata()
+                chorale.metadata = metadata.Metadata()
             chorale.metadata.title = title
             return chorale
         elif self._returnType is 'filename':
@@ -1644,4 +1645,4 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(TestExternal)
+    music21.mainTest(Test) #External)

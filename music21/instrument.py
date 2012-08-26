@@ -351,31 +351,24 @@ class StringInstrument(Instrument):
             
             >>> from music21 import *
             >>> vln1 = instrument.Violin()
-            >>> vln1.stringPitches
-            [G3, D4, A4, E5]
-            
+            >>> [str(p) for p in vln1.stringPitches]
+            ['G3', 'D4', 'A4', 'E5']
             
             instrument.stringPitches are full pitch objects, not just names:
 
-
             >>> [x.octave for x in vln1.stringPitches]
             [3, 4, 4, 5]
-            
             
             Scordatura for Scelsi's violin concerto *Anahit*.
             (N.B. that string to pitch conversion is happening automatically)
             
             
             >>> vln1.stringPitches = ["G3","G4","B4","D4"]
-            >>> vln1.stringPitches
-            [G3, G4, B4, D4]
-            
             
             (`[*]In some tuning methods such as reentrant tuning on the ukulele,
             lute, or five-string banjo the order might not strictly be from lowest to
             highest.  The same would hold true for certain violin scordatura pieces, such
             as some of Biber's *Mystery Sonatas*`)
-            
             ''')
                        
 class Violin(StringInstrument):   

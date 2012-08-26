@@ -21,8 +21,6 @@ from copy import deepcopy
 import itertools
 from collections import defaultdict
 
-#import music21 # needed to do fully-qualified isinstance name checking
-
 from operator import attrgetter
 from music21 import base
 from music21 import bar
@@ -544,14 +542,14 @@ class Stream(base.Music21Object):
 
         >>> from music21 import *
         >>> a = stream.Part()
-        >>> a.repeatInsert(note.Note("C"), range(10))
+        >>> a.repeatInsert(note.Note("C"), range(5))
         >>> b = stream.Stream()
-        >>> b.repeatInsert(note.Note("G"), range(10))
+        >>> b.repeatInsert(note.Note("G"), range(5))
         >>> c = a + b   
-        >>> c.pitches # autoSort is True, thus a sorted version results
-        [C, G, C, G, C, G, C, G, C, G, C, G, C, G, C, G, C, G, C, G]
+        >>> c.pitches[0:4] # autoSort is True, thus a sorted version results
+        [<music21.pitch.Pitch C>, <music21.pitch.Pitch G>, <music21.pitch.Pitch C>, <music21.pitch.Pitch G>]
         >>> len(c.notes)
-        20
+        10
 
 
         The autoSort of the first stream becomes the autoSort of the
@@ -560,8 +558,8 @@ class Stream(base.Music21Object):
 
         >>> a.autoSort = False
         >>> d = a + b
-        >>> d.pitches
-        [C, C, C, C, C, C, C, C, C, C, G, G, G, G, G, G, G, G, G, G]
+        >>> [str(p) for p in d.pitches]
+        ['C', 'C', 'C', 'C', 'C', 'G', 'G', 'G', 'G', 'G']
         >>> d.__class__.__name__
         'Part'
                 
@@ -4086,7 +4084,7 @@ class Stream(base.Music21Object):
         {0.0} <music21.instrument.Instrument P1: MusicXML Part: Grand Piano>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.Treble8vbClef>
-            {0.0} <music21.key.KeySignature of 1 flat>
+            {0.0} <music21.key.KeySignature of 1 flat, mode major>
             {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.layout.SystemLayout>
             {0.0} <music21.note.Note C>
@@ -4790,7 +4788,7 @@ class Stream(base.Music21Object):
         >>> c = f2.chordify()
         >>> cn = c.notes
         >>> cn[0].pitches
-        [C4, D#4]
+        [<music21.pitch.Pitch C4>, <music21.pitch.Pitch D#4>]
 
         
         '''
@@ -7849,20 +7847,25 @@ class Stream(base.Music21Object):
         
         >>> aStream = corpus.parse('bach/bwv324.xml')
         >>> part = aStream.parts[0]
-        >>> aStream.parts[0].pitches[:10]
-        [B4, D5, B4, B4, B4, B4, C5, B4, A4, A4]
+        >>> [str(p) for p in aStream.parts[0].pitches[:10]]
+        ['B4', 'D5', 'B4', 'B4', 'B4', 'B4', 'C5', 'B4', 'A4', 'A4']
+        
         >>> bStream = aStream.parts[0].flat.transpose('d5')
-        >>> bStream.pitches[:10]
-        [F5, A-5, F5, F5, F5, F5, G-5, F5, E-5, E-5]
-        >>> aStream.parts[0].pitches[:10]
-        [B4, D5, B4, B4, B4, B4, C5, B4, A4, A4]
+        >>> [str(p) for p in bStream.pitches[:10]]
+        ['F5', 'A-5', 'F5', 'F5', 'F5', 'F5', 'G-5', 'F5', 'E-5', 'E-5']
+
+        Test that aStream hasn't been changed:
+
+        >>> [str(p) for p in aStream.parts[0].pitches[:10]]
+        ['B4', 'D5', 'B4', 'B4', 'B4', 'B4', 'C5', 'B4', 'A4', 'A4']
+
         >>> cStream = bStream.flat.transpose('a4')
-        >>> cStream.pitches[:10]
-        [B5, D6, B5, B5, B5, B5, C6, B5, A5, A5]
+        >>> [str(p) for p in cStream.pitches[:10]]
+        ['B5', 'D6', 'B5', 'B5', 'B5', 'B5', 'C6', 'B5', 'A5', 'A5']
         
         >>> cStream.flat.transpose(aInterval, inPlace=True)
-        >>> cStream.pitches[:10]
-        [F6, A-6, F6, F6, F6, F6, G-6, F6, E-6, E-6]
+        >>> [str(p) for p in cStream.pitches[:10]]
+        ['F6', 'A-6', 'F6', 'F6', 'F6', 'F6', 'G-6', 'F6', 'E-6', 'E-6']
         '''
         # only change the copy
         if not inPlace:
@@ -8784,28 +8787,23 @@ class Stream(base.Music21Object):
         >>> partOnePitches = a.parts[0].pitches
         >>> len(partOnePitches)
         25
-        >>> partOnePitches[0:10]
-        [B4, D5, B4, B4, B4, B4, C5, B4, A4, A4]
+        >>> [str(p) for p in partOnePitches[0:10]]
+        ['B4', 'D5', 'B4', 'B4', 'B4', 'B4', 'C5', 'B4', 'A4', 'A4']
 
         
         Note that the pitches returned above are 
         objects, not text:
-
         
         >>> partOnePitches[0].octave
         4
         
-
         Since pitches are found from within internal objects,
         flattening the stream is not required:
 
-        
         >>> len(a.pitches)
         104
 
-
         Pitch objects are also retrieved when stored directly on a Stream.
-
 
         >>> from music21 import *
         >>> pitch1 = pitch.Pitch()
@@ -8817,8 +8815,7 @@ class Stream(base.Music21Object):
         >>> foundPitches[0] is pitch1
         True
         
-        
-        
+                
         Chords get their pitches found as well:
         
         >>> c = chord.Chord(['C4','E4','G4'])
@@ -8827,8 +8824,8 @@ class Stream(base.Music21Object):
         >>> m.append(n)
         >>> m.append(c)
         >>> m.pitches
-        [F#4, C4, E4, G4]
-        
+        [<music21.pitch.Pitch F#4>, <music21.pitch.Pitch C4>, 
+         <music21.pitch.Pitch E4>, <music21.pitch.Pitch G4>]        
         ''')
 
 
@@ -9743,9 +9740,9 @@ class Stream(base.Music21Object):
         >>> len(s.voices)
         2
         >>> [n.pitch for n in s.voices[0].notes]
-        [C4]
-        >>> [n.pitch for n in s.voices[1].notes]
-        [B-4, B-4, B-4, B-4, B-4, B-4, B-4, B-4]
+        [<music21.pitch.Pitch C4>]
+        >>> [str(n.pitch) for n in s.voices[1].notes]
+        ['B-4', 'B-4', 'B-4', 'B-4', 'B-4', 'B-4', 'B-4', 'B-4']
         '''
         # this method may not always 
         # produce the optimal voice assignment based on context (register
@@ -10103,13 +10100,22 @@ class Stream(base.Music21Object):
 
         >>> from music21 import *
         >>> s = stream.Stream()
-        >>> s.repeatAppend(note.Note(), 8)
+        >>> s.repeatAppend(note.Note('C4'), 8)
         >>> v1 = variant.Variant([note.Note('D#4'), note.Note('F#4')])
         >>> s.insert(3, v1)
-        >>> [p for p in s.pitches]
-        [C4, C4, C4, C4, C4, C4, C4, C4]
+
+        >>> varStream = s.variants
+        >>> len(varStream)
+        1
+        >>> varStream[0] is v1
+        True
         >>> len(s.variants[0])
         2
+
+        Note that the D# and F# aren't found in the original Stream's pitches
+
+        >>> [str(p) for p in s.pitches]
+        ['C4', 'C4', 'C4', 'C4', 'C4', 'C4', 'C4', 'C4']
         ''')
 
 

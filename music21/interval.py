@@ -1178,10 +1178,10 @@ class ChromaticInterval(base.Music21Object):
         >>> p = pitch.Pitch("E#4")
         >>> p2 = ci.transposePitch(p)
         >>> p2
-        B4
+        <music21.pitch.Pitch B4>
         >>> p3 = ci.transposePitch(p2)
         >>> p3
-        F5
+        <music21.pitch.Pitch F5>
         '''
         pps = p.ps
         newPitch = copy.deepcopy(p)
@@ -1785,12 +1785,12 @@ class Interval(base.Music21Object):
         >>> i = interval.Interval('m3')
         >>> p2 = i.transposePitch(p1)
         >>> p2
-        C#5
+        <music21.pitch.Pitch C#5>
         >>> p2 = i.transposePitch(p1, reverse=True)
         >>> p2
-        F##4
+        <music21.pitch.Pitch F##4>
         >>> i.transposePitch(p1, reverse=True, maxAccidental=1)
-        G4
+        <music21.pitch.Pitch G4>
 
         OMIT_FROM_DOCS
         TODO: More tests here
@@ -2074,11 +2074,11 @@ def transposePitch(pitch1, interval1):
     >>> aInterval = interval.Interval('P5')
     >>> bPitch = interval.transposePitch(aPitch, aInterval)
     >>> bPitch
-    G4
+    <music21.pitch.Pitch G4>
     >>> bInterval = interval.Interval('P-5')
     >>> cPitch = interval.transposePitch(aPitch, bInterval)
     >>> cPitch
-    F3
+    <music21.pitch.Pitch F3>
     ''' 
 
     # check if interval1 is a string,
@@ -2115,7 +2115,7 @@ def transposeNote(note1, intervalString):
     >>> bNote
     <music21.note.Note G>
     >>> bNote.pitch
-    G4
+    <music21.pitch.Pitch G4>
 
     >>> aNote = note.Note('f#4')
     >>> bNote = interval.transposeNote(aNote, 'm2')

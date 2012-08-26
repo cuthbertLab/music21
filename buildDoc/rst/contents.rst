@@ -10,6 +10,7 @@ Music21 Documentation
 
    what
    quickStart
+   usersGuide_02_notes
    overviewNotes
    overviewStreams
    overviewFormats

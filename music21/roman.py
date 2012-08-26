@@ -107,7 +107,8 @@ def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = Fa
     The pitches remain the same with the same octaves:
     
     >>> rn.pitches
-    [E-3, C4, G-6]
+    [<music21.pitch.Pitch E-3>, <music21.pitch.Pitch C4>, <music21.pitch.Pitch G-6>]
+
     
     
     >>> rn2 = roman.romanNumeralFromChord(chord.Chord(['E3','C4','G4','B-4','E5','G5']), key.Key('F'))
@@ -235,10 +236,16 @@ def figureTuplets(chordObj, keyObj):
 
     >>> from music21 import *
     >>> figureTuplets(chord.Chord(['F#2','D3','A-3','C#4']), key.Key('C'))
-    [(1, 1.0, '#', F#2), (6, 0.0, '', D3), (3, -1.0, 'b', A-3), (5, 1.0, '#', C#4)]
+    [(1, 1.0, '#', <music21.pitch.Pitch F#2>), 
+     (6, 0.0, '', <music21.pitch.Pitch D3>), 
+     (3, -1.0, 'b', <music21.pitch.Pitch A-3>), 
+     (5, 1.0, '#', <music21.pitch.Pitch C#4>)]
 
     >>> figureTuplets(chord.Chord(['E3','C4','G4','B-5']), key.Key('C'))
-    [(1, 0.0, '', E3), (6, 0.0, '', C4), (3, 0.0, '', G4), (5, -1.0, 'b', B-5)]
+    [(1, 0.0, '', <music21.pitch.Pitch E3>), 
+     (6, 0.0, '', <music21.pitch.Pitch C4>), 
+     (3, 0.0, '', <music21.pitch.Pitch G4>), 
+     (5, -1.0, 'b', <music21.pitch.Pitch B-5>)]
     '''
     retList = []
     bass = chordObj.bass()
@@ -258,7 +265,7 @@ def figureTupletSolo(pitchObj, keyObj, bass):
 
     >>> from music21 import *
     >>> figureTupletSolo(pitch.Pitch('A-3'), key.Key('C'), pitch.Pitch('F#2'))
-    (3, -1.0, 'b', A-3)
+    (3, -1.0, 'b', <music21.pitch.Pitch A-3>)
     '''
     (scaleStep, scaleAccidental) = keyObj.getScaleDegreeAndAccidentalFromPitch(pitchObj)
     
@@ -423,7 +430,7 @@ class RomanNumeral(harmony.Harmony):
     >>> V.scaleDegree
     5
     >>> V.pitches  # default key-- C Major
-    [G4, B4, D5]
+    [<music21.pitch.Pitch G4>, <music21.pitch.Pitch B4>, <music21.pitch.Pitch D5>]
     
     
     >>> neapolitan = roman.RomanNumeral('N6', 'c#') # could also use "bII6"
@@ -435,49 +442,47 @@ class RomanNumeral(harmony.Harmony):
     >>> neapolitan.scaleDegreeWithAlteration
     (2, <accidental flat>)
     >>> neapolitan.pitches  # default octaves
-    [F#4, A4, D5]
+    [<music21.pitch.Pitch F#4>, <music21.pitch.Pitch A4>, <music21.pitch.Pitch D5>]
 
     >>> neapolitan2 = roman.RomanNumeral('bII6', 'g#') 
-    >>> neapolitan2.pitches
-    [C#5, E5, A5]
+    >>> [str(p) for p in neapolitan2.pitches]
+    ['C#5', 'E5', 'A5']
     >>> neapolitan2.scaleDegree
     2
    
     >>> em = key.Key('e')
     >>> dominantV = roman.RomanNumeral('V7', em)
-    >>> dominantV.pitches
-    [B4, D#5, F#5, A5]
+    >>> [str(p) for p in dominantV.pitches]
+    ['B4', 'D#5', 'F#5', 'A5']
     
     >>> minorV = roman.RomanNumeral('V43', em, caseMatters = False) 
-    >>> minorV.pitches
-    [F#4, A4, B4, D5]
+    >>> [str(p) for p in minorV.pitches]
+    ['F#4', 'A4', 'B4', 'D5']
 
 
     >>> majorFlatSeven = roman.RomanNumeral('VII', em)
-    >>> majorFlatSeven.pitches
-    [D5, F#5, A5]
+    >>> [str(p) for p in majorFlatSeven.pitches]
+    ['D5', 'F#5', 'A5']
     >>> diminishedSharpSeven = roman.RomanNumeral('vii', em)
-    >>> diminishedSharpSeven.pitches
-    [D#5, F#5, A5]
+    >>> [str(p) for p in diminishedSharpSeven.pitches]
+    ['D#5', 'F#5', 'A5']
     >>> majorFlatSix = roman.RomanNumeral('VI', em)
-    >>> majorFlatSix.pitches
-    [C5, E5, G5]
+    >>> [str(p) for p in majorFlatSix.pitches]
+    ['C5', 'E5', 'G5']
     >>> minorSharpSix = roman.RomanNumeral('vi', em)
-    >>> minorSharpSix.pitches
-    [C#5, E5, G#5]
+    >>> [str(p) for p in minorSharpSix.pitches]
+    ['C#5', 'E5', 'G#5']
 
 
     Either of these is the same way of getting a minor iii in a minor key:
 
-
-
     >>> minoriii = roman.RomanNumeral('iii', em, caseMatters = True)
-    >>> minoriii.pitches
-    [G4, B-4, D5]
+    >>> [str(p) for p in minoriii.pitches]
+    ['G4', 'B-4', 'D5']
 
     >>> minoriiiB = roman.RomanNumeral('IIIb', em, caseMatters = False)
-    >>> minoriiiB.pitches
-    [G4, B-4, D5]
+    >>> [str(p) for p in minoriiiB.pitches]
+    ['G4', 'B-4', 'D5']
     
    
     Can also take a scale object, here we build a first-inversion chord
@@ -488,45 +493,45 @@ class RomanNumeral(harmony.Harmony):
     >>> sharp3 = roman.RomanNumeral('#III6', scale.MajorScale('D-'))
     >>> sharp3.scaleDegreeWithAlteration
     (3, <accidental sharp>)
-    >>> sharp3.pitches
-    [A#4, C#5, F#5]
+    >>> [str(p) for p in sharp3.pitches]
+    ['A#4', 'C#5', 'F#5']
     >>> sharp3.figure
     '#III6'
     
     Figures can be changed
     
     >>> sharp3.figure = "V"
-    >>> sharp3.pitches
-    [A-4, C5, E-5]
+    >>> [str(p) for p in sharp3.pitches]
+    ['A-4', 'C5', 'E-5']
     
 
    
    
     >>> leadingToneSeventh = roman.RomanNumeral('viio', scale.MajorScale('F'))
-    >>> leadingToneSeventh.pitches
-    [E5, G5, B-5]
+    >>> [str(p) for p in leadingToneSeventh.pitches]
+    ['E5', 'G5', 'B-5']
     
     A little modal mixture:
     
     >>> lessObviousDiminished = roman.RomanNumeral('vio', scale.MajorScale('c'))
     >>> lessObviousDiminished.pitches
-    [A4, C5, E-5]
+    [<music21.pitch.Pitch A4>, <music21.pitch.Pitch C5>, <music21.pitch.Pitch E-5>]
 
     >>> diminished7th = roman.RomanNumeral('vio7', scale.MajorScale('c'))
     >>> diminished7th.pitches
-    [A4, C5, E-5, G-5]
+    [<music21.pitch.Pitch A4>, <music21.pitch.Pitch C5>, <music21.pitch.Pitch E-5>, <music21.pitch.Pitch G-5>]
     
     >>> diminished7th1stInv = roman.RomanNumeral('vio65', scale.MajorScale('c'))
     >>> diminished7th1stInv.pitches
-    [C4, E-4, G-4, A4]
+    [<music21.pitch.Pitch C4>, <music21.pitch.Pitch E-4>, <music21.pitch.Pitch G-4>, <music21.pitch.Pitch A4>]
     
     >>> halfDim7th2ndInv = roman.RomanNumeral('iv/o43', scale.MajorScale('F'))
     >>> halfDim7th2ndInv.pitches
-    [F-4, A-4, B-4, D-5]
+    [<music21.pitch.Pitch F-4>, <music21.pitch.Pitch A-4>, <music21.pitch.Pitch B-4>, <music21.pitch.Pitch D-5>]
 
     >>> alteredChordHalfDim3rdInv = roman.RomanNumeral('bii/o42', scale.MajorScale('F'))
-    >>> alteredChordHalfDim3rdInv.pitches
-    [F-4, G-4, B--4, D--5]
+    >>> [str(p) for p in alteredChordHalfDim3rdInv.pitches]
+    ['F-4', 'G-4', 'B--4', 'D--5']
     >>> alteredChordHalfDim3rdInv.intervalVector
     [0, 1, 2, 1, 1, 1]
     >>> alteredChordHalfDim3rdInv.commonName
@@ -538,29 +543,27 @@ class RomanNumeral(harmony.Harmony):
 
     >>> openFifth = roman.RomanNumeral('V[no3]', key.Key('F'))
     >>> openFifth.pitches
-    [C5, G5]
+    [<music21.pitch.Pitch C5>, <music21.pitch.Pitch G5>]
 
     
     Some theoretical traditions express a viio7 as a V9 chord with omitted root.  Music21 allows that:
 
 
     >>> fiveOhNine = roman.RomanNumeral('V9[no1]', key.Key('g'))
-    >>> fiveOhNine.pitches
-    [F#5, A5, C6, E-6]
+    >>> [str(p) for p in fiveOhNine.pitches]
+    ['F#5', 'A5', 'C6', 'E-6']
 
 
     
     Just for kicks (no worries if this is goobley-gook):
     
-    
-    
     >>> ots = scale.OctatonicScale("C2")
     >>> rn = roman.RomanNumeral('I9', ots, caseMatters=False)
-    >>> rn.pitches
-    [C2, E-2, G-2, A2, C3]
+    >>> [str(p) for p in rn.pitches]
+    ['C2', 'E-2', 'G-2', 'A2', 'C3']
     >>> rn2 = roman.RomanNumeral('V7#5b3', ots, caseMatters = False)
-    >>> rn2.pitches
-    [G-2, A-2, C#3, E-3] 
+    >>> [str(p) for p in rn2.pitches]
+    ['G-2', 'A-2', 'C#3', 'E-3'] 
     
     >>> r = roman.RomanNumeral('v64/V', key.Key('e'))
     >>> r
@@ -568,8 +571,8 @@ class RomanNumeral(harmony.Harmony):
 
     >>> r.figure
     'v64/V'
-    >>> r.pitches
-    [C#5, F#5, A5]
+    >>> [str(p) for p in r.pitches]
+    ['C#5', 'F#5', 'A5']
     >>> r.secondaryRomanNumeral
     <music21.roman.RomanNumeral V in e minor>
 
@@ -579,56 +582,56 @@ class RomanNumeral(harmony.Harmony):
     >>> r = roman.RomanNumeral('bVIId7', key.Key('B-'))
     >>> r.figure
     'bVIId7'
-    >>> r.pitches
-    [A-5, C6, E-6, G-6]
+    >>> [str(p) for p in r.pitches]
+    ['A-5', 'C6', 'E-6', 'G-6']
     >>> r = roman.RomanNumeral('VId7')
     >>> r.figure
     'VId7'
     >>> r.key = key.Key('B-')
-    >>> r.pitches
-    [G5, B5, D6, F6]
+    >>> [str(p) for p in r.pitches]
+    ['G5', 'B5', 'D6', 'F6']
 
 
 
     >>> r2 = roman.RomanNumeral('V42/V7/vi', key.Key('C'))
-    >>> r2.pitches
-    [A4, B4, D#5, F#5]
+    >>> [str(p) for p in r2.pitches]
+    ['A4', 'B4', 'D#5', 'F#5']
 
     
     OMIT_FROM_DOCS
     Things that were giving us trouble
     >>> dminor = key.Key('d')
     >>> rn = roman.RomanNumeral('ii/o65', dminor)
-    >>> rn.pitches
-    [G4, B-4, D5, E5]
+    >>> [str(p) for p in rn.pitches]
+    ['G4', 'B-4', 'D5', 'E5']
     >>> rn.romanNumeral
     'ii'
     
     >>> rn3 = roman.RomanNumeral('III', dminor)
-    >>> rn3.pitches
-    [F4, A4, C5]
+    >>> [str(p) for p in rn3.pitches]
+    ['F4', 'A4', 'C5']
 
 
     Should be the same as above no matter when the key is set:
     
     >>> r = roman.RomanNumeral('VId7', key.Key('B-'))
-    >>> r.pitches
-    [G5, B5, D6, F6]
+    >>> [str(p) for p in r.pitches]
+    ['G5', 'B5', 'D6', 'F6']
     >>> r.key = key.Key('B-')
-    >>> r.pitches
-    [G5, B5, D6, F6]
+    >>> [str(p) for p in r.pitches]
+    ['G5', 'B5', 'D6', 'F6']
     
 
     This was getting B-flat.
 
     >>> r = roman.RomanNumeral('VId7')
     >>> r.key = key.Key('B-')
-    >>> r.pitches
-    [G5, B5, D6, F6]
+    >>> [str(p) for p in r.pitches]
+    ['G5', 'B5', 'D6', 'F6']
 
     >>> r = roman.RomanNumeral('vio', em)
-    >>> r.pitches
-    [C#5, E5, G5]
+    >>> [str(p) for p in r.pitches]
+    ['C#5', 'E5', 'G5']
     '''
 
     frontFlat = re.compile('^(b+)')
@@ -1052,11 +1055,17 @@ class RomanNumeral(harmony.Harmony):
         
         >>> from music21 import *
         >>> r1 = RomanNumeral('V')
-        >>> r1.pitches
-        [G4, B4, D5]
+        
+        (implicit C-major)
+        
+        >>> [str(p) for p in r1.pitches]
+        ['G4', 'B4', 'D5']
+
+        Change to A major
+
         >>> r1.key = key.Key('A')
-        >>> r1.pitches
-        [E5, G#5, B5]
+        >>> [str(p) for p in r1.pitches]
+        ['E5', 'G#5', 'B5']
         >>> r1
         <music21.roman.RomanNumeral V in A major>
         >>> r1.key
@@ -1064,8 +1073,8 @@ class RomanNumeral(harmony.Harmony):
         
         
         >>> r1.key = key.Key('e')
-        >>> r1.pitches
-        [B4, D#5, F#5]
+        >>> [str(p) for p in r1.pitches]
+        ['B4', 'D#5', 'F#5']
         >>> r1
         <music21.roman.RomanNumeral V in e minor>
         ''')
@@ -1471,7 +1480,7 @@ class Test(unittest.TestCase):
         k = key.Key('f#')  # 3-sharps minor
         rn = roman.RomanNumeral('V', k)
         self.assertEqual(str(rn.key), 'f# minor')
-        self.assertEqual(str(rn.pitches), '[C#5, E#5, G#5]')
+        self.assertEqual(str(rn.pitches), '[<music21.pitch.Pitch C#5>, <music21.pitch.Pitch E#5>, <music21.pitch.Pitch G#5>]')
         self.assertEqual(str(rn.scaleDegrees), '[(5, None), (7, <accidental sharp>), (2, None)]')
                 
 

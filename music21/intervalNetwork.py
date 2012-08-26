@@ -460,21 +460,21 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
-        >>> net.realizePitch('g4')
-        [G4, A4, B4, C5, D5, E5, F#5, G5]
+        >>> [str(p) for p in net.realizePitch('g4')]
+        ['G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F#5', 'G5']
         >>> net.degreeMin, net.degreeMax
         (1, 8)
 
         >>> # using another fill method creates a new network
         >>> net.fillBiDirectedEdges(['M3', 'M3', 'M3'])
-        >>> net.realizePitch('g4')
-        [G4, B4, D#5, G5]
+        >>> [str(p) for p in net.realizePitch('g4')]
+        ['G4', 'B4', 'D#5', 'G5']
         >>> net.degreeMin, net.degreeMax
         (1, 4)
 
         >>> net.fillBiDirectedEdges([interval.Interval('M3'), interval.Interval('M3'), interval.Interval('M3')])
-        >>> net.realizePitch('c2')
-        [C2, E2, G#2, B#2]
+        >>> [str(p) for p in net.realizePitch('c2')]
+        ['C2', 'E2', 'G#2', 'B#2']
         '''
         self.clear()
 
@@ -616,7 +616,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net.fillArbitrary(nodes, edges)
         >>> net.realizePitch('c4', 1)
-        [C4, D-4, F4]
+        [<music21.pitch.Pitch C4>, <music21.pitch.Pitch D-4>, <music21.pitch.Pitch F4>]
         '''
 
         self.clear()
@@ -649,8 +649,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> from music21 import *
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net.fillMelodicMinor()
-        >>> net.realizePitch('c4')
-        [C4, D4, E-4, F4, G4, A4, B4, C5]
+        >>> [str(p) for p in net.realizePitch('c4')]
+        ['C4', 'D4', 'E-4', 'F4', 'G4', 'A4', 'B4', 'C5']
 
         '''
         nodes = ({'id':'terminusLow', 'degree':1}, # a
@@ -1143,16 +1143,16 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net.nextPitch('g', 1, 'f#5', 'ascending')
-        G5
+        <music21.pitch.Pitch G5>
         >>> net.nextPitch('g', 1, 'f#5', 'descending')
-        E5
+        <music21.pitch.Pitch E5>
         >>> net.nextPitch('g', 1, 'f#5', 'ascending', 2) # two steps
-        A5
+        <music21.pitch.Pitch A5>
         >>> alteredDegrees = {2:{'direction':'bi', 'interval':interval.Interval('-a1')}}
         >>> net.nextPitch('g', 1, 'g2', 'ascending', alteredDegrees=alteredDegrees)
-        A-2
+        <music21.pitch.Pitch A-2>
         >>> net.nextPitch('g', 1, 'a-2', 'ascending', alteredDegrees=alteredDegrees)
-        B2
+        <music21.pitch.Pitch B2>
         '''
         if pitchOrigin is None:
             raise Exception("No pitch origin for calling next on this pitch!")
@@ -1262,15 +1262,22 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         >>> from music21 import *
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
-        >>> net._realizeAscending('c2', 1, 'c5', 'c6')
-        ([C5, D5, E5, F5, G5, A5, B5, C6], ['terminusHigh', 0, 1, 2, 3, 4, 5, 'terminusHigh'])
+        >>> (pitches, nodeKeys) = net._realizeAscending('c2', 1, 'c5', 'c6')
+        >>> [str(p) for p in pitches]
+        ['C5', 'D5', 'E5', 'F5', 'G5', 'A5', 'B5', 'C6']
+        >>> nodeKeys
+        ['terminusHigh', 0, 1, 2, 3, 4, 5, 'terminusHigh']
 
         >>> net = intervalNetwork.BoundIntervalNetwork(octaveDuplicating=True)
         >>> net.fillBiDirectedEdges(edgeList)
-        >>> net._realizeAscending('c2', 1, 'c5', 'c6')
-        ([C5, D5, E5, F5, G5, A5, B5, C6], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])
+        >>> (pitches, nodeKeys) = net._realizeAscending('c2', 1, 'c5', 'c6')
+        >>> [str(p) for p in pitches]
+        ['C5', 'D5', 'E5', 'F5', 'G5', 'A5', 'B5', 'C6']
+        >>> nodeKeys
+        ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh']
         '''
         # get first node if no node is provided
         if isinstance(nodeId, Node):
@@ -1391,7 +1398,8 @@ class BoundIntervalNetwork(IntervalNetwork):
     def _realizeDescending(self, pitchReference, nodeId=None, 
         minPitch=None, maxPitch=None, alteredDegrees={}, 
         includeFirst=False, fillMinMaxIfNone=False, reverse=True):
-        '''Given a reference pitch, realize downward to a minimum.
+        '''
+        Given a reference pitch, realize downward to a minimum.
 
         If no minimum is is given, the terminus is used.
 
@@ -1405,20 +1413,36 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net._realizeDescending('c2', 1, 'c3') # minimum is above ref
         ([], [])
-        >>> net._realizeDescending('c3', 1, 'c2')
-        ([C2, D2, E2, F2, G2, A2, B2], ['terminusLow', 0, 1, 2, 3, 4, 5])
-        >>> net._realizeDescending('c3', 1, 'c2', includeFirst=True)
-        ([C2, D2, E2, F2, G2, A2, B2, C3], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusLow'])
+        >>> (pitches, nodeKeys) = net._realizeDescending('c3', 1, 'c2')
+        >>> [str(p) for p in pitches]
+        ['C2', 'D2', 'E2', 'F2', 'G2', 'A2', 'B2']
+        >>> nodeKeys
+        ['terminusLow', 0, 1, 2, 3, 4, 5]
+        >>> (pitches, nodeKeys) = net._realizeDescending('c3', 1, 'c2', includeFirst=True)
+        >>> [str(p) for p in pitches]
+        ['C2', 'D2', 'E2', 'F2', 'G2', 'A2', 'B2', 'C3']
+        >>> nodeKeys
+        ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusLow']
 
-        >>> net._realizeDescending('a6', 'high')
-        ([A5, B5, C#6, D6, E6, F#6, G#6], ['terminusLow', 0, 1, 2, 3, 4, 5])
-        >>> net._realizeDescending('a6', 'high', includeFirst=True)
-        ([A5, B5, C#6, D6, E6, F#6, G#6, A6], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])
+        >>> (pitches, nodeKeys) = net._realizeDescending('a6', 'high')
+        >>> [str(p) for p in pitches]
+        ['A5', 'B5', 'C#6', 'D6', 'E6', 'F#6', 'G#6']
+        >>> nodeKeys
+        ['terminusLow', 0, 1, 2, 3, 4, 5]
+
+        >>> (pitches, nodeKeys) = net._realizeDescending('a6', 'high', includeFirst=True)
+        >>> [str(p) for p in pitches]
+        ['A5', 'B5', 'C#6', 'D6', 'E6', 'F#6', 'G#6', 'A6'] 
+        >>> nodeKeys        
+        ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh']
 
         >>> net = intervalNetwork.BoundIntervalNetwork(octaveDuplicating=True)
         >>> net.fillBiDirectedEdges(edgeList)
-        >>> net._realizeDescending('c2', 1, 'c0', 'c1')
-        ([C0, D0, E0, F0, G0, A0, B0], ['terminusLow', 0, 1, 2, 3, 4, 5])
+        >>> (pitches, nodeKeys) = net._realizeDescending('c2', 1, 'c0', 'c1')
+        >>> [str(p) for p in pitches]
+        ['C0', 'D0', 'E0', 'F0', 'G0', 'A0', 'B0']
+        >>> nodeKeys        
+        ['terminusLow', 0, 1, 2, 3, 4, 5]
         '''
 
         # get first node if no node is provided
@@ -1562,11 +1586,19 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
-        >>> net.realize('c2', 1, 'c2', 'c3')
-        ([C2, D2, E2, F2, G2, A2, B2, C3], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])
+        >>> (pitches, nodeKeys) = net.realize('c2', 1, 'c2', 'c3')
+        >>> [str(p) for p in pitches]
+        ['C2', 'D2', 'E2', 'F2', 'G2', 'A2', 'B2', 'C3']
+        >>> nodeKeys
+        ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh']
+        
+        
         >>> alteredDegrees = {7:{'direction':'bi', 'interval':interval.Interval('-a1')}}
-        >>> net.realize('c2', 1, 'c2', 'c4', alteredDegrees=alteredDegrees)
-        ([C2, D2, E2, F2, G2, A2, B-2, C3, D3, E3, F3, G3, A3, B-3, C4], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh', 0, 1, 2, 3, 4, 5, 'terminusHigh'])
+        >>> (pitches, nodeKeys) = net.realize('c2', 1, 'c2', 'c4', alteredDegrees=alteredDegrees)
+        >>> [str(p) for p in pitches]
+        ['C2', 'D2', 'E2', 'F2', 'G2', 'A2', 'B-2', 'C3', 'D3', 'E3', 'F3', 'G3', 'A3', 'B-3', 'C4']
+        >>> nodeKeys
+        ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh', 0, 1, 2, 3, 4, 5, 'terminusHigh']
 
         '''
         # get first node if no node is provided
@@ -1714,20 +1746,24 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
-        >>> net.realizePitch(pitch.Pitch('G3'))
-        [G3, A3, B3, C4, D4, E4, F#4, G4]
+        >>> [str(p) for p in net.realizePitch(pitch.Pitch('G3'))]
+        ['G3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F#4', 'G4']
 
-        >>> net.realizePitch(pitch.Pitch('G3'), 5) # G3 is the fifth (scale) degree
-        [C3, D3, E3, F3, G3, A3, B3, C4]
+        G3 is the fifth (scale) degree
+        
+        >>> [str(p) for p in net.realizePitch(pitch.Pitch('G3'), 5)]
+        ['C3', 'D3', 'E3', 'F3', 'G3', 'A3', 'B3', 'C4']
 
-        >>> net.realizePitch(pitch.Pitch('G3'), 7) # G3 is the seventh (scale) degree
-        [A-2, B-2, C3, D-3, E-3, F3, G3, A-3]
+        G3 is the seventh (scale) degree
+        
+        >>> [str(p) for p in net.realizePitch(pitch.Pitch('G3'), 7) ]
+        ['A-2', 'B-2', 'C3', 'D-3', 'E-3', 'F3', 'G3', 'A-3']
 
-        >>> net.realizePitch(pitch.Pitch('f#3'), 1, 'f2', 'f3') 
-        [E#2, F#2, G#2, A#2, B2, C#3, D#3, E#3]
+        >>> [str(p) for p in net.realizePitch(pitch.Pitch('f#3'), 1, 'f2', 'f3') ]
+        ['E#2', 'F#2', 'G#2', 'A#2', 'B2', 'C#3', 'D#3', 'E#3']
 
-        >>> net.realizePitch(pitch.Pitch('a#2'), 7, 'c6', 'c7') 
-        [C#6, D#6, E6, F#6, G#6, A#6, B6]
+        >>> [str(p) for p in net.realizePitch(pitch.Pitch('a#2'), 7, 'c6', 'c7')]
+        ['C#6', 'D#6', 'E6', 'F#6', 'G#6', 'A#6', 'B6']
 
 
         Circle of fifths
@@ -1736,10 +1772,10 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> edgeList = ['P5', 'P5', 'P5', 'P5', 'P5', 'P5', 'd6', 'P5', 'P5', 'P5', 'P5', 'P5']
         >>> net5ths = intervalNetwork.BoundIntervalNetwork()
         >>> net5ths.fillBiDirectedEdges(edgeList)
-        >>> net5ths.realizePitch(pitch.Pitch('C1'))
-        [C1, G1, D2, A2, E3, B3, F#4, D-5, A-5, E-6, B-6, F7, C8]
-        >>> net5ths.realizePitch(pitch.Pitch('C2'))
-        [C2, G2, D3, A3, E4, B4, F#5, D-6, A-6, E-7, B-7, F8, C9]
+        >>> [str(p) for p in net5ths.realizePitch(pitch.Pitch('C1'))]
+        ['C1', 'G1', 'D2', 'A2', 'E3', 'B3', 'F#4', 'D-5', 'A-5', 'E-6', 'B-6', 'F7', 'C8']
+        >>> [str(p) for p in net5ths.realizePitch(pitch.Pitch('C2'))]
+        ['C2', 'G2', 'D3', 'A3', 'E4', 'B4', 'F#5', 'D-6', 'A-6', 'E-7', 'B-7', 'F8', 'C9']
 
         '''
         return self.realize(pitchReference=pitchReference, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch, direction=direction, alteredDegrees=alteredDegrees, reverse=reverse)[0] # just return first component
@@ -1780,7 +1816,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 
     def realizeTermini(self, pitchReference, nodeId=None, alteredDegrees={}):
-        '''Realize the pithches of the 'natural' terminus of a network. This (presently) must be done by ascending, and assumes only one valid terminus for both extremes. 
+        '''Realize the pitches of the 'natural' terminus of a network. This (presently) must be done by ascending, and assumes only one valid terminus for both extremes. 
 
         This suggests that in practice termini should not be affected by directionality. 
 
@@ -1789,9 +1825,9 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net.realizeTermini(pitch.Pitch('G3'))
-        (G3, G4)
+        (<music21.pitch.Pitch G3>, <music21.pitch.Pitch G4>)
         >>> net.realizeTermini(pitch.Pitch('a6'))
-        (A6, A7)
+        (<music21.pitch.Pitch A6>, <music21.pitch.Pitch A7>)
         '''
         # must do a non-directed realization with no min/max
         # will go up from reference, then down from refernce, stopping
@@ -1917,14 +1953,14 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
 
-        >>> net.realizePitchByDegree('g', 5, [1,5], 'c2', 'c4') 
-        [C2, G2, C3, G3, C4]
+        >>> [str(p) for p in net.realizePitchByDegree('g', 5, [1,5], 'c2', 'c4') ]
+        ['C2', 'G2', 'C3', 'G3', 'C4']
 
-        >>> net.realizePitchByDegree('g', 5, [1,2,3], 'c1', 'c6') 
-        [C1, D1, E1, C2, D2, E2, C3, D3, E3, C4, D4, E4, C5, D5, E5, C6]
+        >>> [str(p) for p in net.realizePitchByDegree('g', 5, [1,2,3], 'c1', 'c6') ] 
+        ['C1', 'D1', 'E1', 'C2', 'D2', 'E2', 'C3', 'D3', 'E3', 'C4', 'D4', 'E4', 'C5', 'D5', 'E5', 'C6']
 
-        >>> net.realizePitchByDegree('c', 1, [1,5], 'c3', 'c6') 
-        [C3, G3, C4, G4, C5, G5, C6]
+        >>> [str(p) for p in net.realizePitchByDegree('c', 1, [1,5], 'c3', 'c6') ]
+        ['C3', 'G3', 'C4', 'G4', 'C5', 'G5', 'C6']
 
         '''
         realizedPitch, realizedNode = self.realize(
@@ -2149,8 +2185,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> from music21 import *
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = intervalNetwork.BoundIntervalNetwork(edgeList)
-        >>> net.realizePitch(pitch.Pitch('e-2'))
-        [E-2, F2, G2, A-2, B-2, C3, D3, E-3]
+        >>> [str(p) for p in net.realizePitch(pitch.Pitch('e-2')) ]
+        ['E-2', 'F2', 'G2', 'A-2', 'B-2', 'C3', 'D3', 'E-3']
 
         >>> net.getRelativeNodeDegree('e-2', 1, 'd3') # if e- is tonic, what is d3
         7
@@ -2178,10 +2214,10 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         >>> edgeList = ['p4', 'p4', 'p4'] # a non octave-repeating scale
         >>> net = intervalNetwork.BoundIntervalNetwork(edgeList)
-        >>> net.realizePitch('f2')
-        [F2, B-2, E-3, A-3]
-        >>> net.realizePitch('f2', 1, 'f2', 'f6')
-        [F2, B-2, E-3, A-3, D-4, G-4, C-5, F-5, A5, D6]
+        >>> [str(p) for p in net.realizePitch('f2')]
+        ['F2', 'B-2', 'E-3', 'A-3']
+        >>> [str(p) for p in net.realizePitch('f2', 1, 'f2', 'f6')]
+        ['F2', 'B-2', 'E-3', 'A-3', 'D-4', 'G-4', 'C-5', 'F-5', 'A5', 'D6']
 
         >>> net.getRelativeNodeDegree('f2', 1, 'a-3') # could be 4 or 1
         1
@@ -2194,8 +2230,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net.getRelativeNodeDegree('f2', 1, 'e--6') # could be 4 or 1
         1
 
-        >>> net.realizePitch('f6', 1, 'f2', 'f6')
-        [G#2, C#3, F#3, B3, E4, A4, D5, G5, C6, F6]
+        >>> [str(p) for p in net.realizePitch('f6', 1, 'f2', 'f6')]
+        ['G#2', 'C#3', 'F#3', 'B3', 'E4', 'A4', 'D5', 'G5', 'C6', 'F6']
 
         >>> net.getRelativeNodeDegree('f6', 1, 'd5') 
         1
@@ -2228,32 +2264,32 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> from music21 import *
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = intervalNetwork.BoundIntervalNetwork(edgeList)
-        >>> net.realizePitch(pitch.Pitch('e-2'))
-        [E-2, F2, G2, A-2, B-2, C3, D3, E-3]
+        >>> [str(p) for p in net.realizePitch(pitch.Pitch('e-2')) ]
+        ['E-2', 'F2', 'G2', 'A-2', 'B-2', 'C3', 'D3', 'E-3']
         >>> net.getPitchFromNodeDegree('e4', 1, 1)
-        E4
+        <music21.pitch.Pitch E4>
         >>> net.getPitchFromNodeDegree('e4', 1, 7) # seventh scale degree
-        D#5
+        <music21.pitch.Pitch D#5>
         >>> net.getPitchFromNodeDegree('e4', 1, 8) 
-        E4
+        <music21.pitch.Pitch E4>
         >>> net.getPitchFromNodeDegree('e4', 1, 9) 
-        F#4
+        <music21.pitch.Pitch F#4>
         >>> net.getPitchFromNodeDegree('e4', 1, 3, minPitch='c2', maxPitch='c3') 
-        G#2
+        <music21.pitch.Pitch G#2>
         
         
         This will always get the lowest pitch:
         
         >>> net.getPitchFromNodeDegree('e4', 1, 3, minPitch='c2', maxPitch='c10') 
-        G#2
+        <music21.pitch.Pitch G#2>
 
         >>> net.fillMelodicMinor()
         >>> net.getPitchFromNodeDegree('c', 1, 5)
-        G4
+        <music21.pitch.Pitch G4>
         >>> net.getPitchFromNodeDegree('c', 1, 6, 'ascending')
-        A4
+        <music21.pitch.Pitch A4>
         >>> net.getPitchFromNodeDegree('c', 1, 6, 'descending')
-        A-4
+        <music21.pitch.Pitch A-4>
 
         '''
         # this is the reference node
@@ -2333,10 +2369,10 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> from music21 import *
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net._filterPitchList('c#')
-        ([C#], C#, C#)
+        ([<music21.pitch.Pitch C#>], <music21.pitch.Pitch C#>, <music21.pitch.Pitch C#>)
 
         >>> net._filterPitchList(['c#4', 'f5', 'd3'])
-        ([C#4, F5, D3], D3, F5)
+        ([<music21.pitch.Pitch C#4>, <music21.pitch.Pitch F5>, <music21.pitch.Pitch D3>], <music21.pitch.Pitch D3>, <music21.pitch.Pitch F5>)
         '''
         if not common.isListLike(pitchTarget):
             if common.isStr(pitchTarget):
@@ -2362,33 +2398,37 @@ class BoundIntervalNetwork(IntervalNetwork):
 
     def match(self, pitchReference, nodeId, pitchTarget, 
         comparisonAttribute='pitchClass', alteredDegrees={}):
-        '''Given one or more pitches in `pitchTarget`, return a list of matched pitches, and unmatched pitches. 
+        '''Given one or more pitches in `pitchTarget`, return a 
+        tuple of a list of matched pitches, and a list of unmatched pitches. 
 
         >>> from music21 import *
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = intervalNetwork.BoundIntervalNetwork(edgeList)
-        >>> net.realizePitch('e-2')
-        [E-2, F2, G2, A-2, B-2, C3, D3, E-3]
+        >>> [str(p) for p in net.realizePitch('e-2')]
+        ['E-2', 'F2', 'G2', 'A-2', 'B-2', 'C3', 'D3', 'E-3']
 
         >>> net.match('e-2', 1, 'c3') # if e- is tonic, is 'c3' in the scale?
-        ([C3], [])
+        ([<music21.pitch.Pitch C3>], [])
 
         >>> net.match('e-2', 1, 'd3')
-        ([D3], [])
+        ([<music21.pitch.Pitch D3>], [])
 
         >>> net.match('e-2', 1, 'd#3')
-        ([D#3], [])
+        ([<music21.pitch.Pitch D#3>], [])
 
         >>> net.match('e-2', 1, 'e3')
-        ([], [E3])
+        ([], [<music21.pitch.Pitch E3>])
 
         >>> pitchTarget = [pitch.Pitch('b-2'), pitch.Pitch('b2'), pitch.Pitch('c3')]
         >>> net.match('e-2', 1, pitchTarget)
-        ([B-2, C3], [B2])
+        ([<music21.pitch.Pitch B-2>, <music21.pitch.Pitch C3>], [<music21.pitch.Pitch B2>])
 
         >>> pitchTarget = ['b-2', 'b2', 'c3', 'e-3', 'e#3', 'f2', 'e--2']
-        >>> net.match('e-2', 1, pitchTarget)
-        ([B-2, C3, E-3, E#3, F2, E--2], [B2])
+        >>> (matched, unmatched) = net.match('e-2', 1, pitchTarget)
+        >>> [str(p) for p in matched]
+        ['B-2', 'C3', 'E-3', 'E#3', 'F2', 'E--2']
+        >>> unmatched
+        [<music21.pitch.Pitch B2>]
 
         '''
         # these return a Node, not a nodeId
@@ -2434,10 +2474,10 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> from music21 import *
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = intervalNetwork.BoundIntervalNetwork(edgeList)
-        >>> net.realizePitch('G3')
-        [G3, A3, B3, C4, D4, E4, F#4, G4]
+        >>> [str(p) for p in net.realizePitch('G3')]
+        ['G3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F#4', 'G4']
         >>> net.findMissing('g', 1, ['g', 'a', 'b', 'd', 'f#'])
-        [C5, E5]
+        [<music21.pitch.Pitch C5>, <music21.pitch.Pitch E5>]
         '''
             
         # these return a Node, not a nodeId
@@ -2478,11 +2518,10 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net = intervalNetwork.BoundIntervalNetwork(edgeList)
         >>> # a network built on G or D as 
         >>> net.find(['g', 'a', 'b', 'd', 'f#'])
-        [(5, G), (5, D), (4, A), (4, C)]
+        [(5, <music21.pitch.Pitch G>), (5, <music21.pitch.Pitch D>), (4, <music21.pitch.Pitch A>), (4, <music21.pitch.Pitch C>)]
 
         >>> net.find(['g', 'a', 'b', 'c', 'd', 'e', 'f#'])
-        [(7, G), (6, D), (6, C), (5, A)]
-
+        [(7, <music21.pitch.Pitch G>), (6, <music21.pitch.Pitch D>), (6, <music21.pitch.Pitch C>), (5, <music21.pitch.Pitch A>)]
         '''
 
         nodeId = self._getTerminusLowNodes()[0]
@@ -2534,9 +2573,9 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> allPitches = []
         >>> for j in range(15):
         ...    p = b.transposePitchAndApplySimplification(i, p)
-        ...    allPitches.append(p)
+        ...    allPitches.append(p.nameWithOctave)
         >>> allPitches
-        [D-4, D4, E-4, F-4, F4, G-4, G4, A-4, A4, B-4, C-5, C5, D-5, D5, E-5]
+        ['D-4', 'D4', 'E-4', 'F-4', 'F4', 'G-4', 'G4', 'A-4', 'A4', 'B-4', 'C-5', 'C5', 'D-5', 'D5', 'E-5']
         
         
         >>> b.pitchSimplification = 'mostCommon'
@@ -2544,9 +2583,9 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> allPitches = []
         >>> for j in range(15):
         ...    p = b.transposePitchAndApplySimplification(i, p)
-        ...    allPitches.append(p)
+        ...    allPitches.append(p.nameWithOctave)
         >>> allPitches
-        [C#4, D4, E-4, E4, F4, F#4, G4, A-4, A4, B-4, B4, C5, C#5, D5, E-5]
+        ['C#4', 'D4', 'E-4', 'E4', 'F4', 'F#4', 'G4', 'A-4', 'A4', 'B-4', 'B4', 'C5', 'C#5', 'D5', 'E-5']
 
 
         PitchSimplifcation can also be specified in the creation of the BoundIntervalNetwork object
@@ -2557,9 +2596,9 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> allPitches = []
         >>> for j in range(5):
         ...    p = b.transposePitchAndApplySimplification(i, p)
-        ...    allPitches.append(p)
+        ...    allPitches.append(p.nameWithOctave)
         >>> allPitches
-        [D-4, E--4, F--4, G---4, A----4]
+        ['D-4', 'E--4', 'F--4', 'G---4', 'A----4']
 
 
 
@@ -2567,10 +2606,9 @@ class BoundIntervalNetwork(IntervalNetwork):
         
         
         >>> p
-        A----4
+        <music21.pitch.Pitch A----4>
         >>> b.transposePitchAndApplySimplification(i, p)
-        F#4
-
+        <music21.pitch.Pitch F#4>
 
         '''
         if self.pitchSimplification == 'maxAccidental':
@@ -2598,6 +2636,23 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
     
+    def pitchOut(self, listIn):
+        out = "["
+        for p in listIn:
+            out += str(p) + ', '
+        if len(listIn) > 0:
+            out = out[0:len(out)-2]
+        out += "]"
+        return out
+
+    def realizePitchOut(self, tuple):
+        out = "("
+        out += self.pitchOut(tuple[0])
+        out += ", "
+        out += str(tuple[1])
+        out += ")"
+        return out
+
 
     def testScaleModel(self):
 
@@ -2608,12 +2663,12 @@ class Test(unittest.TestCase):
         # get this scale for any pitch at any degree over any range
         # need a major scale with c# as the third degree
         match = net.realizePitch('c#', 3)        
-        self.assertEqual(str(match), '[A3, B3, C#4, D4, E4, F#4, G#4, A4]')
+        self.assertEqual(self.pitchOut(match), '[A3, B3, C#4, D4, E4, F#4, G#4, A4]')
         
 
         # need a major scale with c# as the leading tone in a high octave
         match = net.realizePitch('c#', 7, 'c8', 'c9')        
-        self.assertEqual(str(match), '[C#8, D8, E8, F#8, G8, A8, B8]')
+        self.assertEqual(self.pitchOut(match), '[C#8, D8, E8, F#8, G8, A8, B8]')
         
 
 
@@ -2630,9 +2685,9 @@ class Test(unittest.TestCase):
         edgeList = ['P5', 'P5', 'P5']
         net = BoundIntervalNetwork(edgeList)
         match = net.realizePitch('c4', 1)        
-        self.assertEqual(str(match), '[C4, G4, D5, A5]')
+        self.assertEqual(self.pitchOut(match), '[C4, G4, D5, A5]')
         match = net.realizePitch('c4', 1, 'c4', 'c11')        
-        self.assertEqual(str(match), '[C4, G4, D5, A5, E6, B6, F#7, C#8, G#8, D#9, A#9, E#10, B#10]')
+        self.assertEqual(self.pitchOut(match), '[C4, G4, D5, A5, E6, B6, F#7, C#8, G#8, D#9, A#9, E#10, B#10]')
         
         # based on the original interval list, can get information on scale steps, even for non-octave repeating scales
         self.assertEqual(net.getRelativeNodeDegree('c4', 1, 'e#10'), 3)
@@ -2645,13 +2700,13 @@ class Test(unittest.TestCase):
         # if we know a realized version, we can test if pitches match in that version; returns matched, not found, and no match lists
         # f i s found in a scale where e- is the tonic
         matched, noMatch = net.match('e-', 1, 'f')
-        self.assertEqual(str(matched), '[F]')
+        self.assertEqual(self.pitchOut(matched), '[F]')
         
         # can search a list of pitches, isolating non-scale tones
         # if e- is the tonic, which pitches are part of the scale
         matched, noMatch = net.match('e-', 1, ['b-', 'd-', 'f'])
-        self.assertEqual(str(matched), '[B-, F]')
-        self.assertEqual(str(noMatch), '[D-]')
+        self.assertEqual(self.pitchOut(matched), '[B-, F]')
+        self.assertEqual(self.pitchOut(noMatch), '[D-]')
         
         # finally, can search the unrealized network; all possible realizations
         # are tested, and the matched score is returned
@@ -2659,11 +2714,11 @@ class Test(unittest.TestCase):
         
         # in this case, the nearest major keys are G and D
         results = net.find(['g', 'a', 'b', 'd', 'f#'])
-        self.assertEqual(str(results), '[(5, G), (5, D), (4, A), (4, C)]')
+        self.assertEqual(str(results), '[(5, <music21.pitch.Pitch G>), (5, <music21.pitch.Pitch D>), (4, <music21.pitch.Pitch A>), (4, <music21.pitch.Pitch C>)]')
         
         # with an f#, D is the most-matched first node pitch
         results = net.find(['g', 'a', 'b', 'c#', 'd', 'f#'])
-        self.assertEqual(str(results), '[(6, D), (5, A), (5, G), (4, E)]')
+        self.assertEqual(str(results), '[(6, <music21.pitch.Pitch D>), (5, <music21.pitch.Pitch A>), (5, <music21.pitch.Pitch G>), (4, <music21.pitch.Pitch E>)]')
 
 
     def testHarmonyModel(self):
@@ -2677,30 +2732,30 @@ class Test(unittest.TestCase):
         
         # if g# is the root, or first node
         match = net.realizePitch('g#', 1)        
-        self.assertEqual(str(match), '[G#4, B#4, D#5, G#5]')
+        self.assertEqual(self.pitchOut(match), '[G#4, B#4, D#5, G#5]')
         
         # if g# is the fifth, or third node
         # a specialzied subclass can handle this mapping
         match = net.realizePitch('g#', 3)        
-        self.assertEqual(str(match), '[C#4, E#4, G#4, C#5]')
+        self.assertEqual(self.pitchOut(match), '[C#4, E#4, G#4, C#5]')
         
         # if g# is the third, or second node, across a wide range
         match = net.realizePitch('g#', 2, 'c2', 'c5')        
-        self.assertEqual(str(match), '[E2, G#2, B2, E3, G#3, B3, E4, G#4, B4]')
+        self.assertEqual(self.pitchOut(match), '[E2, G#2, B2, E3, G#3, B3, E4, G#4, B4]')
         
         # can match pitches to a realization of this chord
         # given a chord built form node 2 as g#, are e2 and b6 in this network
         matched, noMatch = net.match('g#', 2, ['e2', 'b6'])
-        self.assertEqual(str(matched), '[E2, B6]')
+        self.assertEqual(self.pitchOut(matched), '[E2, B6]')
         
         # can find a first node (root) that match any provided pitches
         # this is independent of any realization
         results = net.find(['c', 'e', 'g'])
-        self.assertEqual(str(results), '[(3, C), (1, A), (1, G#), (1, G)]')
+        self.assertEqual(str(results), '[(3, <music21.pitch.Pitch C>), (1, <music21.pitch.Pitch A>), (1, <music21.pitch.Pitch G#>), (1, <music21.pitch.Pitch G>)]')
         
         # in this case, most likely an e triad
         results = net.find(['e', 'g#'])
-        self.assertEqual(str(results), '[(2, E), (1, A), (1, G#), (1, D-)]')
+        self.assertEqual(str(results), '[(2, <music21.pitch.Pitch E>), (1, <music21.pitch.Pitch A>), (1, <music21.pitch.Pitch G#>), (1, <music21.pitch.Pitch D->)]')
         
         
         # we can do the same with larger or more complicated chords
@@ -2708,16 +2763,16 @@ class Test(unittest.TestCase):
         edgeList = ['M3', 'm3', 'M3', 'm3', 'm7']
         net = BoundIntervalNetwork(edgeList)
         match = net.realizePitch('c4', 1)        
-        self.assertEqual(str(match), '[C4, E4, G4, B4, D5, C6]')
+        self.assertEqual(self.pitchOut(match), '[C4, E4, G4, B4, D5, C6]')
         
         # if we want the same chord where c4 is the 5th node, or the ninth
         match = net.realizePitch('c4', 5)        
-        self.assertEqual(str(match), '[B-2, D3, F3, A3, C4, B-4]')
+        self.assertEqual(self.pitchOut(match), '[B-2, D3, F3, A3, C4, B-4]')
         
         # we can of course provide any group of pitches and find the value
         # of the lowest node that provides the best fit
         results = net.find(['e', 'g#', 'b', 'd#'])
-        self.assertEqual(str(results), '[(3, E), (2, C), (1, B), (1, G#)]')
+        self.assertEqual(str(results), '[(3, <music21.pitch.Pitch E>), (2, <music21.pitch.Pitch C>), (1, <music21.pitch.Pitch B>), (1, <music21.pitch.Pitch G#>)]')
 
 
     def testScaleAndHarmony(self):
@@ -2730,14 +2785,14 @@ class Test(unittest.TestCase):
         edgeList = ['m3', 'm3', 'M3', 'M2']
         netHarmony = BoundIntervalNetwork(edgeList)
         match = netHarmony.realizePitch('b4', 1)        
-        self.assertEqual(str(match), '[B4, D5, F5, A5, B5]')
+        self.assertEqual(self.pitchOut(match), '[B4, D5, F5, A5, B5]')
         
         
         # given a half dim seventh chord built on c#, what scale contains
         # these pitches?
         results = netScale.find(netHarmony.realizePitch('c#', 1))
         # most likely, a  D
-        self.assertEqual(str(results), '[(5, D), (4, B), (4, A), (4, E)]')
+        self.assertEqual(str(results), '[(5, <music21.pitch.Pitch D>), (4, <music21.pitch.Pitch B>), (4, <music21.pitch.Pitch A>), (4, <music21.pitch.Pitch E>)]')
         # what scale degree is c# in this scale? the seventh
         self.assertEqual(netScale.getRelativeNodeDegree('d', 1, 'c#'), 7)
 
@@ -2782,25 +2837,25 @@ class Test(unittest.TestCase):
         self.assertEqual(net._getNext(net._nodes['terminusLow'], 'descending'), ( [net._edges[6]], [net._nodes[5]]))
 
 
-        self.assertEqual(str(net.realizePitch('c4', 1)), '[C4, D4, E4, F4, G4, A4, B4, C5]')
+        self.assertEqual(self.pitchOut(net.realizePitch('c4', 1)), '[C4, D4, E4, F4, G4, A4, B4, C5]')
 
-        self.assertEqual(str(net.realizePitch('c4', 1, maxPitch='c6')), '[C4, D4, E4, F4, G4, A4, B4, C5, D5, E5, F5, G5, A5, B5, C6]')
+        self.assertEqual(self.pitchOut(net.realizePitch('c4', 1, maxPitch='c6')), '[C4, D4, E4, F4, G4, A4, B4, C5, D5, E5, F5, G5, A5, B5, C6]')
 
-        self.assertEqual(str(net.realizePitch('c4', 1, minPitch='c3')), '[C3, D3, E3, F3, G3, A3, B3, C4, D4, E4, F4, G4, A4, B4, C5]')
+        self.assertEqual(self.pitchOut(net.realizePitch('c4', 1, minPitch='c3')), '[C3, D3, E3, F3, G3, A3, B3, C4, D4, E4, F4, G4, A4, B4, C5]')
 
-        self.assertEqual(str(net.realizePitch('c4', 1, minPitch='c3', maxPitch='c6')), '[C3, D3, E3, F3, G3, A3, B3, C4, D4, E4, F4, G4, A4, B4, C5, D5, E5, F5, G5, A5, B5, C6]')
+        self.assertEqual(self.pitchOut(net.realizePitch('c4', 1, minPitch='c3', maxPitch='c6')), '[C3, D3, E3, F3, G3, A3, B3, C4, D4, E4, F4, G4, A4, B4, C5, D5, E5, F5, G5, A5, B5, C6]')
 
-        self.assertEqual(str(net.realizePitch('f4', 1, minPitch='c3', maxPitch='c6')), '[C3, D3, E3, F3, G3, A3, B-3, C4, D4, E4, F4, G4, A4, B-4, C5, D5, E5, F5, G5, A5, B-5, C6]')
-
-
-        self.assertEqual(str(net.realizePitch('C#', 7)), '[D3, E3, F#3, G3, A3, B3, C#4, D4]')
-
-        self.assertEqual(str(net.realizePitch('C#4', 7, 'c8', 'c9')), '[C#8, D8, E8, F#8, G8, A8, B8]')
-
-        self.assertEqual(str(net.realize('c4', 1)), "([C4, D4, E4, F4, G4, A4, B4, C5], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])")
+        self.assertEqual(self.pitchOut(net.realizePitch('f4', 1, minPitch='c3', maxPitch='c6')), '[C3, D3, E3, F3, G3, A3, B-3, C4, D4, E4, F4, G4, A4, B-4, C5, D5, E5, F5, G5, A5, B-5, C6]')
 
 
-        self.assertEqual(str(net.realize('c#4', 7)), "([D3, E3, F#3, G3, A3, B3, C#4, D4], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])")
+        self.assertEqual(self.pitchOut(net.realizePitch('C#', 7)), '[D3, E3, F#3, G3, A3, B3, C#4, D4]')
+
+        self.assertEqual(self.pitchOut(net.realizePitch('C#4', 7, 'c8', 'c9')), '[C#8, D8, E8, F#8, G8, A8, B8]')
+
+        self.assertEqual(self.realizePitchOut(net.realize('c4', 1)), "([C4, D4, E4, F4, G4, A4, B4, C5], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])")
+
+
+        self.assertEqual(self.realizePitchOut(net.realize('c#4', 7)), "([D3, E3, F#3, G3, A3, B3, C#4, D4], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])")
 
 
     def testDirectedA(self):
@@ -2830,15 +2885,15 @@ class Test(unittest.TestCase):
 
         # this is ascending from a4 to a5, then descending from a4 to a3
         # this seems like the right thing to do
-        self.assertEqual(str(net.realize('a4', 1, 'a3', 'a5')), "([A3, B3, C4, D4, E4, F4, G4, A4, B4, C5, D5, E5, F#5, G#5, A5], ['terminusLow', 6, 7, 8, 9, 10, 11, 'terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])")
+        self.assertEqual(self.realizePitchOut(net.realize('a4', 1, 'a3', 'a5')), "([A3, B3, C4, D4, E4, F4, G4, A4, B4, C5, D5, E5, F#5, G#5, A5], ['terminusLow', 6, 7, 8, 9, 10, 11, 'terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])")
 
 
         # can get a descending form by setting reference pitch to top of range
-        self.assertEqual(str(net.realizePitch('a5', 1, 'a4', 'a5')), 
+        self.assertEqual(self.pitchOut(net.realizePitch('a5', 1, 'a4', 'a5')), 
         "[A4, B4, C5, D5, E5, F5, G5, A5]")
 
         # can get a descending form by setting reference pitch to top of range
-        self.assertEqual(str(net.realizePitch('a4', 1, 'a4', 'a5')), 
+        self.assertEqual(self.pitchOut(net.realizePitch('a4', 1, 'a4', 'a5')), 
         "[A4, B4, C5, D5, E5, F#5, G#5, A5]")
     
         # if we try to get a node by a name that is a degree, we will get
@@ -2882,7 +2937,7 @@ class Test(unittest.TestCase):
         self.assertEqual(net.degreeMax, 3)
         self.assertEqual(net.degreeMaxUnique, 2)
 
-        self.assertEqual(str(net.realizePitch('c4', 1)), '[C4, D-4, F4]')
+        self.assertEqual(self.pitchOut(net.realizePitch('c4', 1)), '[C4, D-4, F4]')
 
 
 
@@ -2891,32 +2946,36 @@ class Test(unittest.TestCase):
         net = BoundIntervalNetwork()
         net.fillBiDirectedEdges(edgeList)
 
-        self.assertEqual(str(net._realizeDescending('c3', 1, 'c2')), 
-        "([C2, D2, E2, F2, G2, A2, B2], ['terminusLow', 0, 1, 2, 3, 4, 5])")
+        pitches, nodes = net._realizeDescending('c3', 1, 'c2')
+        self.assertEqual(self.pitchOut(pitches), 
+        "[C2, D2, E2, F2, G2, A2, B2]")
+        self.assertEqual(str(nodes), "['terminusLow', 0, 1, 2, 3, 4, 5]")
 
-
-        self.assertEqual(str(net._realizeDescending('c3', 'high', minPitch='c2')), 
+        self.assertEqual(self.realizePitchOut(net._realizeDescending('c3', 'high', minPitch='c2')), 
         "([C2, D2, E2, F2, G2, A2, B2], ['terminusLow', 0, 1, 2, 3, 4, 5])")
 
         # this only gets one pitch as this is descending and includes reference 
         # pitch
         self.assertEqual(str(net._realizeDescending('c3', 1, includeFirst=True)), 
-        "([C3], ['terminusLow'])")
+        "([<music21.pitch.Pitch C3>], ['terminusLow'])")
 
-        self.assertEqual(str(net._realizeDescending('g3', 1, 'g0', includeFirst=True)), 
+        self.assertEqual(self.realizePitchOut(net._realizeDescending('g3', 1, 'g0', includeFirst=True)), 
         "([G0, A0, B0, C1, D1, E1, F#1, G1, A1, B1, C2, D2, E2, F#2, G2, A2, B2, C3, D3, E3, F#3, G3], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusLow', 0, 1, 2, 3, 4, 5, 'terminusLow', 0, 1, 2, 3, 4, 5, 'terminusLow'])")
 
 
-        self.assertEqual(str(net._realizeDescending('d6', 5, 'd4', includeFirst=True)), 
+        self.assertEqual(self.realizePitchOut(net._realizeDescending('d6', 5, 'd4', includeFirst=True)), 
         "([D4, E4, F#4, G4, A4, B4, C5, D5, E5, F#5, G5, A5, B5, C6, D6], [3, 4, 5, 'terminusLow', 0, 1, 2, 3, 4, 5, 'terminusLow', 0, 1, 2, 3])"
         )
 
 
-        self.assertEqual(str(net._realizeAscending('c3', 1)), "([C3, D3, E3, F3, G3, A3, B3, C4], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])"), 
+        self.assertEqual(self.realizePitchOut(net._realizeAscending('c3', 1)), 
+                         "([C3, D3, E3, F3, G3, A3, B3, C4], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])"), 
 
-        self.assertEqual(str(net._realizeAscending('g#2', 3)), "([G#2, A2, B2, C#3, D#3, E3], [1, 2, 3, 4, 5, 'terminusHigh'])"), 
+        self.assertEqual(self.realizePitchOut(net._realizeAscending('g#2', 3)), 
+                         "([G#2, A2, B2, C#3, D#3, E3], [1, 2, 3, 4, 5, 'terminusHigh'])"), 
 
-        self.assertEqual(str(net._realizeAscending('g#2', 3, maxPitch='e4')), "([G#2, A2, B2, C#3, D#3, E3, F#3, G#3, A3, B3, C#4, D#4, E4], [1, 2, 3, 4, 5, 'terminusHigh', 0, 1, 2, 3, 4, 5, 'terminusHigh'])"), 
+        self.assertEqual(self.realizePitchOut(net._realizeAscending('g#2', 3, maxPitch='e4')), 
+                         "([G#2, A2, B2, C#3, D#3, E3, F#3, G#3, A3, B3, C#4, D#4, E4], [1, 2, 3, 4, 5, 'terminusHigh', 0, 1, 2, 3, 4, 5, 'terminusHigh'])"), 
 
 
 
@@ -2925,32 +2984,33 @@ class Test(unittest.TestCase):
         net = BoundIntervalNetwork()
         net.fillMelodicMinor()
 
-        self.assertEqual(str(net.realize('g4')), "([G4, A4, B-4, C5, D5, E5, F#5, G5], ['terminusLow', 0, 1, 2, 3, 4, 6, 'terminusHigh'])")
+        self.assertEqual(self.realizePitchOut(net.realize('g4')), 
+                         "([G4, A4, B-4, C5, D5, E5, F#5, G5], ['terminusLow', 0, 1, 2, 3, 4, 6, 'terminusHigh'])")
 
 
         # here, min and max pitches are assumed based on ascending scale
         # otherwise, only a single pitch would be returned (the terminus low)
-        self.assertEqual(str(net.realize('g4', 1, 
+        self.assertEqual(self.realizePitchOut(net.realize('g4', 1, 
         direction=DIRECTION_DESCENDING)), "([G4, A4, B-4, C5, D5, E-5, F5, G5], ['terminusLow', 0, 1, 2, 3, 5, 7, 'terminusLow'])")
 
 
         # if explicitly set terminus to high, we get the expected range, 
         # but now the reference pitch is the highest pitch
-        self.assertEqual(str(net.realize('g4', 'high', direction=DIRECTION_DESCENDING)), "([G3, A3, B-3, C4, D4, E-4, F4, G4], ['terminusLow', 0, 1, 2, 3, 5, 7, 'terminusHigh'])" )
+        self.assertEqual(self.realizePitchOut(net.realize('g4', 'high', direction=DIRECTION_DESCENDING)), "([G3, A3, B-3, C4, D4, E-4, F4, G4], ['terminusLow', 0, 1, 2, 3, 5, 7, 'terminusHigh'])" )
 
         # get nothing from if try to request a descending scale from the 
         # lower terminus
         self.assertEqual(str(net._realizeDescending('g4', 'low', fillMinMaxIfNone=False)), "([], [])" )
 
 
-        self.assertEqual(str(net._realizeDescending('g4', 'low', fillMinMaxIfNone=True)), "([G4, A4, B-4, C5, D5, E-5, F5], ['terminusLow', 0, 1, 2, 3, 5, 7])")
+        self.assertEqual(self.realizePitchOut(net._realizeDescending('g4', 'low', fillMinMaxIfNone=True)), "([G4, A4, B-4, C5, D5, E-5, F5], ['terminusLow', 0, 1, 2, 3, 5, 7])")
 
         # if we include first, we get all values
-        self.assertEqual(str(net._realizeDescending('g4', 'low', includeFirst=True, fillMinMaxIfNone=True)), "([G4, A4, B-4, C5, D5, E-5, F5, G5], ['terminusLow', 0, 1, 2, 3, 5, 7, 'terminusLow'])")
+        self.assertEqual(self.realizePitchOut(net._realizeDescending('g4', 'low', includeFirst=True, fillMinMaxIfNone=True)), "([G4, A4, B-4, C5, D5, E-5, F5, G5], ['terminusLow', 0, 1, 2, 3, 5, 7, 'terminusLow'])")
 
         # because this is octave repeating, we can get a range when min 
         # and max are defined
-        self.assertEqual(str(net._realizeDescending('g4', 'low', 'g4', 'g5')), "([G4, A4, B-4, C5, D5, E-5, F5], ['terminusLow', 0, 1, 2, 3, 5, 7])"  )
+        self.assertEqual(self.realizePitchOut(net._realizeDescending('g4', 'low', 'g4', 'g5')), "([G4, A4, B-4, C5, D5, E-5, F5], ['terminusLow', 0, 1, 2, 3, 5, 7])"  )
 
 
 

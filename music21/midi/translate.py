@@ -204,7 +204,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
 
     >>> n = midiEventsToNote([dt1, me1, dt2, me2])
     >>> n.pitch
-    A2
+    <music21.pitch.Pitch A2>
     >>> n.duration.quarterLength
     1.0
     >>> n.volume.velocity
@@ -215,7 +215,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     >>> m = note.Note()
     >>> dummy = midiEventsToNote([dt1, me1, dt2, me2], inputM21=m)
     >>> m.pitch
-    A2
+    <music21.pitch.Pitch A2>
     >>> m.duration.quarterLength
     1.0
     >>> m.volume.velocity
@@ -715,7 +715,7 @@ def midiEventsToKeySignature(eventList):
     >>> me1.data = midi.putNumbersAsList([2, 0]) # d major
     >>> ks = midi.translate.midiEventsToKeySignature(me1)
     >>> ks
-    <music21.key.KeySignature of 2 sharps>
+    <music21.key.KeySignature of 2 sharps, mode major>
     >>> ks.mode
     'major'
 
@@ -728,7 +728,7 @@ def midiEventsToKeySignature(eventList):
     [254, 1]
     >>> ks = midi.translate.midiEventsToKeySignature(me2)
     >>> ks
-    <music21.key.KeySignature of 2 flats>
+    <music21.key.KeySignature of 2 flats, mode minor>
     >>> ks.mode
     'minor'
 
@@ -775,7 +775,7 @@ def keySignatureToMidiEvents(ks, includeDeltaTime=True):
     >>> ks = key.KeySignature(-5)
     >>> ks.mode = 'minor'
     >>> ks
-    <music21.key.KeySignature of 5 flats>
+    <music21.key.KeySignature of 5 flats, mode minor>
     >>> eventList = midi.translate.keySignatureToMidiEvents(ks)
     >>> eventList[1]
     <MidiEvent KEY_SIGNATURE, t=None, track=None, channel=1, data='\\xfb\\x01'>

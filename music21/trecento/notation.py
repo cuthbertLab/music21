@@ -11,7 +11,9 @@
 #-------------------------------------------------------------------------------
 
 ''' 
-Tools for creating Punctus and Divisione objects unique to Trecento notation. Other objects found in medieval and renaissance music (such as rests, notes, and clef) can be found in the module `music21.medren`.
+Tools for creating Punctus and Divisione objects unique to Trecento notation. 
+Other objects found in medieval and renaissance music (such as rests, notes, and clef) 
+can be found in the module `music21.medren`.
 Also contains functions for converting Trecento notation to modern notation.
 '''
 
@@ -69,7 +71,7 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
     >>> from music21 import *
     >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(M)')
     >>> tTNN.note.pitch
-    A4
+    <music21.pitch.Pitch A4>
     >>> tTNN.note.mensuralType
     'minima'
     

@@ -167,8 +167,8 @@ Key Signature 2 flat(s) ⠣⠣
 Time Signature 3/8 ⠼⠉⠦
 <BLANKLINE>
 Measure 1 Left, Signature Grouping 1:
-sharps -2, mode major
-3/8
+<music21.key.KeySignature of 2 flats, mode major>
+<music21.meter.TimeSignature 3/8>
 ====
 Measure 1 Right, Note Grouping 1:
 <music21.clef.TrebleClef>
@@ -1058,8 +1058,8 @@ Key Signature 0 flat(s)
 Time Signature 4/4 ⠼⠙⠲
 <BLANKLINE>
 Measure 1 Left, Signature Grouping 1:
-sharps 0, mode major
-4/4
+<music21.key.KeySignature of no sharps or flats, mode major>
+<music21.meter.TimeSignature 4/4>
 ====
 Measure 1 Right, Note Grouping 1:
 <music21.clef.TrebleClef>

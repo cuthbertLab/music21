@@ -27,7 +27,7 @@ available after importing music21.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'1.2.0'
+'1.3.0'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -39,7 +39,7 @@ under the module "base":
 
 #-------------------------------------------------------------------------------
 # string and tuple must be the same
-VERSION = (1, 2, 0)
+VERSION = (1, 3, 0)
 VERSION_STR = "%s.%s.%s" % (VERSION[0], VERSION[1], VERSION[2])
 #-------------------------------------------------------------------------------
 
@@ -5823,10 +5823,10 @@ class Test(unittest.TestCase):
         n1 = m2[-1] # last element is a note
         n2 = m4[-1] # last element is a note
 
-        #environLocal.pd(['getContexByClass()'])
-        #self.assertEqual(str(n1.getContextByClass('TimeSignature')), '3/4') 
-        environLocal.pd(['getContexByClass()'])
-        self.assertEqual(str(n2.getContextByClass('TimeSignature')), '3/4') 
+        #environLocal.pd(['getContextByClass()'])
+        #self.assertEqual(str(n1.getContextByClass('TimeSignature')), '<music21.meter.TimeSignature 3/4>') 
+        environLocal.pd(['getContextByClass()'])
+        self.assertEqual(str(n2.getContextByClass('TimeSignature')), '<music21.meter.TimeSignature 3/4>') 
 
 
     def testNextA(self):
@@ -5881,9 +5881,9 @@ class Test(unittest.TestCase):
         # getting time signature and key sig
         p1 = s.parts[0]
         nLast = p1.flat.notes[-1]
-        self.assertEqual(str(nLast.previous('TimeSignature')), '4/4')
+        self.assertEqual(str(nLast.previous('TimeSignature')), '<music21.meter.TimeSignature 4/4>')
         self.assertEqual(str(nLast.previous('KeySignature')), 
-            'sharps 3, mode minor')
+            '<music21.key.KeySignature of 3 sharps, mode minor>')
         
         # iterating at the Measure level, showing usage of flattenLocalSites
         measures = s.parts[0].getElementsByClass('Measure')
