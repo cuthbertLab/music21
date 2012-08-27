@@ -27,6 +27,8 @@ import random, math, sys, os
 
 from music21 import note
 from music21 import dynamics
+from music21 import exceptions21
+
 from music21 import duration
 from music21 import pitch
 from music21 import common
@@ -83,10 +85,10 @@ if len(_missingImport) > 0:
 
 
 #-------------------------------------------------------------------------------
-class GraphException(Exception):
+class GraphException(exceptions21.Music21Exception):
     pass
 
-class PlotStreamException(Exception):
+class PlotStreamException(exceptions21.Music21Exception):
     pass
 
 # temporary

@@ -20,6 +20,7 @@ import types, inspect
 import codecs
 
 import music21
+from music21 import exceptions21
 
 from music21.abc import base as abc
 from music21.abc import translate as abcTranslate
@@ -1888,7 +1889,7 @@ class Documentation(RestructuredWriter):
                     pathLaunch = 'file://' + pathLaunch
             webbrowser.open(pathLaunch)
 
-class BuildException(Exception):
+class BuildException(exceptions21.Music21Exception):
     pass
 
 

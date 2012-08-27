@@ -42,10 +42,10 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class EnumerationException(Exception): 
+class EnumerationException(exceptions21.Music21Exception): 
     pass 
 
-class MidiException(Exception): 
+class MidiException(exceptions21.Music21Exception): 
     pass 
 
 

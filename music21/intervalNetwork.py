@@ -32,7 +32,7 @@ finals, or other attributes of the network.
 
 import unittest, doctest
 import copy
-
+from music21 import exceptions21
 from music21 import interval
 from music21 import common
 from music21 import pitch
@@ -60,7 +60,7 @@ DIRECTION_DESCENDING = 'descending'
 
 
 
-class EdgeException(Exception):
+class EdgeException(exceptions21.Music21Exception):
     pass
 
 
@@ -320,7 +320,7 @@ class Node(object):
 
 
 #-------------------------------------------------------------------------------
-class IntervalNetworkException(Exception):
+class IntervalNetworkException(exceptions21.Music21Exception):
     pass
 
 

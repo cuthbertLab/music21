@@ -26,6 +26,7 @@ import tempfile
 import doctest, unittest
 import xml.sax
 
+from music21 import exceptions21
 from music21 import common
 from music21 import xmlnode
 
@@ -34,7 +35,7 @@ _MOD = 'environment.py'
 
 
 #-------------------------------------------------------------------------------
-class EnvironmentException(Exception):
+class EnvironmentException(exceptions21.Music21Exception):
     pass
 
 class UserSettingsException(EnvironmentException):

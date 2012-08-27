@@ -21,9 +21,10 @@ this replaces (April 2012) the old LilyString() conversion methods.
 The Grammar for Lilypond comes from http://lilypond.org/doc/v2.14/Documentation/notation/lilypond-grammar
 '''
 import unittest, doctest
+from music21 import exceptions21
 from music21 import common
 
-class LilyObjectsException(Exception):
+class LilyObjectsException(exceptions21.Music21Exception):
     pass
 
 class LyObject(object):

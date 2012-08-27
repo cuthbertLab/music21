@@ -20,12 +20,10 @@ import unittest, doctest
 
 from music21 import base
 from music21 import common
-from music21 import exceptions21
-from music21 import musicxml
-musicxmlMod = musicxml # alias as to avoid name conflict below
 from music21 import defaults
-from music21 import interval
+from music21 import exceptions21
 from music21.musicxml import translate as musicxmlTranslate
+from music21 import interval
 
 
 from music21 import environment
@@ -794,14 +792,15 @@ class Accidental(base.Music21Object):
 
     def set(self, name):
         '''
-        Provide a value to the Accidental. Strings values, numbers, and Lilypond
-        Abbreviations are all accepted.  
+        Change the type of the Accidental. Strings values, numbers, and Lilypond
+        Abbreviations are all accepted.  All other values will change
+        after setting.
 
         >>> from music21 import *
         >>> a = pitch.Accidental()
         >>> a.set('sharp')
-        >>> a.alter == 1
-        True
+        >>> a.alter
+        1.0
 
         >>> a = pitch.Accidental()
         >>> a.set(2)
@@ -1065,73 +1064,6 @@ class Accidental(base.Music21Object):
                         'displayStyle', 'displaySize', 'displayLocation']:
                 value = getattr(other, attr)
                 setattr(self, attr, value)
-
-
-    def _getMx(self):
-        """From music21 to MusicXML
-
-        >>> from music21 import *
-        >>> a = pitch.Accidental()
-        >>> a.set('half-sharp')
-        >>> a.alter == .5
-        True
-        >>> mxAccidental = a.mx
-        >>> mxAccidental.get('content')
-        'quarter-sharp'
-        """
-        if self.name == "half-sharp": 
-            mxName = "quarter-sharp"
-        elif self.name == "one-and-a-half-sharp": 
-            mxName = "three-quarters-sharp"
-        elif self.name == "half-flat": 
-            mxName = "quarter-flat"
-        elif self.name == "one-and-a-half-flat": 
-            mxName = "three-quarters-flat"
-        else: # all others are the same
-            mxName = self.name
-
-        mxAccidental = musicxmlMod.Accidental()
-# need to remove display in this case and return None
-#         if self.displayStatus == False:
-#             pass
-        mxAccidental.set('charData', mxName)
-        return mxAccidental
-
-
-    def _setMx(self, mxAccidental):
-        """From MusicXML to Music21
-        
-        >>> from music21 import *
-        >>> a = musicxml.Accidental()
-        >>> a.set('content', 'half-flat')
-        >>> a.get('content')
-        'half-flat'
-        >>> b = pitch.Accidental()
-        >>> b.mx = a
-        >>> b.name
-        'half-flat'
-        """
-        mxName = mxAccidental.get('charData')
-        if mxName == "quarter-sharp": 
-            name = "half-sharp"
-        elif mxName == "three-quarters-sharp": 
-            name = "one-and-a-half-sharp"
-        elif mxName == "quarter-flat": 
-            name = "half-flat"
-        elif mxName == "three-quarters-flat": 
-            name = "one-and-a-half-flat"
-        elif mxName == "flat-flat": 
-            name = "double-flat"
-        elif mxName == "sharp-sharp": 
-            name = "double-sharp"
-        else:
-            name = mxName
-        # need to use set her to get all attributes up to date
-        self.set(name)
-
-    # property
-    mx = property(_getMx, _setMx)
-
 
 
 
@@ -2682,12 +2614,9 @@ class Pitch(base.Music21Object):
     context where A4 = 440hz.  The same as .frequency so long
     as no other temperments are currently being used.
     
-    
     Since we don't have any other temperament objects as
-    of alpha 7, this is the same as .frequency always.
-    
+    of v1.3, this is the same as .frequency always.
     ''')
-
 
     def _getMX(self):
         return musicxmlTranslate.pitchToMx(self)
@@ -2696,16 +2625,6 @@ class Pitch(base.Music21Object):
         return musicxmlTranslate.mxToPitch(mxNote, self)
 
     mx = property(_getMX, _setMX)
-
-
-
-    def _getMusicXML(self):
-        '''Provide a complete MusicXML representation. Presently, this is based on 
-        '''
-        return musicxmlTranslate.pitchToMusicXML(self)
-
-    musicxml = property(_getMusicXML)
-
 
 
     #---------------------------------------------------------------------------
@@ -4675,12 +4594,13 @@ class Test(unittest.TestCase):
 
     def testQuarterToneA(self):
         from music21 import stream, note, scale
+        from music21.musicxml import translate as musicxmlTranslate
 
         p1 = Pitch('D#~')
         #environLocal.printDebug([p1, p1.accidental])
         self.assertEqual(str(p1), 'D#~')
         # test generation of raw musicxml output
-        xmlout = p1.musicxml
+        xmlout = musicxmlTranslate.music21ObjectToMusicXML(p1)
         #p1.show()
         match = '<step>D</step><alter>1.5</alter><octave>4</octave>'
         xmlout = xmlout.replace(' ', '')

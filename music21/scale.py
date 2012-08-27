@@ -64,8 +64,6 @@ from music21 import intervalNetwork
 from music21 import sieve
 from music21 import scala
 
-from music21.musicxml import translate as musicxmlTranslate
-
 from music21 import environment
 _MOD = "scale.py"
 environLocal = environment.Environment(_MOD)
@@ -2119,34 +2117,6 @@ class ConcreteScale(Scale):
         Scale.show(self, fmt=fmt, app=app)
 
 
-    def _getMusicXML(self):
-        '''Return a complete musicxml representation as an xml string. This must call _getMX to get basic mxNote objects
-
-        >>> from music21 import *
-        '''
-        from music21 import stream, note
-        m = stream.Measure()
-        for i in range(1, self._abstract.getDegreeMaxUnique()+1):
-            p = self.pitchFromDegree(i)
-            n = note.Note()
-            n.pitch = p
-            if i == 1:
-                n.addLyric(self.name)
-
-            if p.name == self.getTonic().name:
-                n.quarterLength = 4 # set longer
-            else:
-                n.quarterLength = 1
-            m.append(n)
-        m.timeSignature = m.bestTimeSignature()
-        return musicxmlTranslate.measureToMusicXML(m)
-
-    musicxml = property(_getMusicXML, 
-        doc = '''Return a complete musicxml representation.
-        ''')    
-
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -2273,38 +2243,6 @@ class DiatonicScale(ConcreteScale):
         ['C5', 'D5', 'E5', 'F5', 'G5', 'A5', 'B5', 'C6']
         '''
         return MajorScale(self.pitchFromDegree(self.abstract.relativeMajorDegree))
-
-
-
-    def _getMusicXML(self):
-        '''Return a complete musicxml representation as an xml string. This must call _getMX to get basic mxNote objects
-
-        >>> from music21 import *
-        '''
-        # note: overidding behavior on 
-        from music21 import stream, note
-        m = stream.Measure()
-        for i in range(1, self._abstract.getDegreeMaxUnique()+1):
-            p = self.pitchFromDegree(i)
-            n = note.Note()
-            n.pitch = p
-            if i == 1:
-                n.addLyric(self.name)
-
-            if p.name == self.getTonic().name:
-                n.quarterLength = 4 # set longer
-            elif p.name == self.getDominant().name:
-                n.quarterLength = 2 # set longer
-            else:
-                n.quarterLength = 1
-            m.append(n)
-        m.timeSignature = m.bestTimeSignature()
-        return musicxmlTranslate.measureToMusicXML(m)
-
-    musicxml = property(_getMusicXML, 
-        doc = '''Return a complete musicxml representation.
-        ''')    
-
 
 
 #-------------------------------------------------------------------------------

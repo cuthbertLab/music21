@@ -234,7 +234,7 @@ class Dynamic(base.Music21Object):
 
         int(volumeScalar \* 127) gives the MusicXML <sound dynamics="x"/> tag 
 
-        >>> print d.musicxml
+        >>> print musicxml.translate.music21ObjectToMusicXML(d)
         <?xml...
         <direction>
             <direction-type>
@@ -284,18 +284,6 @@ class Dynamic(base.Music21Object):
 
 
     mx = property(_getMX, _setMX)
-
-    def _getMusicXML(self):
-        '''Provide a complete MusicXML representation.
-        '''
-        from music21 import stream, note
-        dCopy = copy.deepcopy(self)
-        out = stream.Stream()
-        out.append(dCopy)
-        # call the musicxml property on Stream
-        return out.musicxml
- 
-    musicxml = property(_getMusicXML)
 
 
 
@@ -461,8 +449,9 @@ class Test(unittest.TestCase):
 
     def testMusicxmlOutput(self):
         # test direct rendering of musicxml
+        from music21.musicxml import translate as musicxmlTranslate        
         d = Dynamic('p')
-        xmlout = d.musicxml
+        xmlout = musicxmlTranslate.music21ObjectToMusicXML(d)
         match = '<p/>'
         self.assertEquals(xmlout.find(match), 885)
 

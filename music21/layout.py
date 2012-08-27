@@ -508,6 +508,7 @@ class Test(unittest.TestCase):
     def testBasic(self):
         import music21
         from music21 import stream, note
+        from music21.musicxml import translate as musicxmlTranslate
         s = stream.Stream()
         
         for i in range(1,11):
@@ -553,8 +554,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(len(systemLayoutList), 4)
 
         #s.show()
-    
-        mx = s.musicxml
+        raw = musicxmlTranslate.music21ObjectToMusicXML(s)
 
     def testGetPageMeasureNumbers(self):
         from music21 import corpus

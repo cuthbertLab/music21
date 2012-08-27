@@ -54,8 +54,6 @@ from music21 import base
 from music21 import defaults
 from music21 import common
 from music21 import exceptions21
-from music21 import musicxml as musicxmlMod
-from music21.musicxml import translate as musicxmlTranslate
 
 from music21 import environment
 _MOD = "duration.py"  
@@ -65,7 +63,7 @@ environLocal = environment.Environment(_MOD)
 #-------------------------------------------------------------------------------
 # duration constants and reference
 
-# MusicXML uses long instead of longa
+# N.B.: MusicXML uses long instead of longa
 typeToDuration = {'duplex-maxima': 64.0, 'maxima': 32.0, 'longa': 16.0,
                   'breve': 8.0, 'whole': 4.0,
                   'half': 2.0, 'quarter': 1.0, 'eighth': 0.5,
@@ -212,41 +210,6 @@ def quarterLengthToClosestType(qLen):
             return (None, False)
         raise DurationException("Cannot return types greater than double duplex-maxima, your length was %s : remove this when we are sure this works..." % qLen)
 
-def musicXMLTypeToType(value):
-    '''Convert a MusicXML type to an music21 type.
-
-    >>> from music21 import *
-    >>> duration.musicXMLTypeToType('long')
-    'longa'
-    >>> duration.musicXMLTypeToType('quarter')
-    'quarter'
-    >>> duration.musicXMLTypeToType(None)
-    Traceback (most recent call last):
-    DurationException...
-    '''
-    # MusicXML uses long instead of longa
-    if value not in typeToDuration.keys():
-        if value == 'long':
-            return 'longa'
-        else:
-            raise DurationException('found unknown MusicXML type: %s' % value)
-    else:
-        return value
-
-def typeToMusicXMLType(value):
-    '''Convert a music21 type to a MusicXML type.
-
-    >>> from music21 import *
-    >>> duration.typeToMusicXMLType('longa')
-    'long'
-    >>> duration.typeToMusicXMLType('quarter')
-    'quarter'
-    '''
-    # MusicXML uses long instead of longa
-    if value == 'longa': 
-        return 'long'
-    else:
-        return value
 
 
 def convertQuarterLengthToType(qLen):
@@ -949,8 +912,10 @@ class Tuplet(object):
         else:
             self.durationNormal = DurationUnit("eighth") 
 
-        # Type is start, stop, or startStop: determines whether to start or stop the bracket/group drawing 
-        # startStop is not used in musicxml, it will be encoded as two notations (start + stop) in musicxml
+        # Type is start, stop, or startStop: determines whether to start or stop 
+        # the bracket/group drawing 
+        # startStop is not used in musicxml, it will be encoded 
+        # as two notations (start + stop) in musicxml
         self.type = None   
         self.bracket = True # true or false
         self.placement = "above" # above or below
@@ -1183,99 +1148,7 @@ class Tuplet(object):
         >>> t = duration.Tuplet(numberNotesActual = 3, numberNotesNormal = 2)
         >>> t.fullName
         'Triplet'
-
         ''')
-
-
-
-
-
-    #---------------------------------------------------------------------------
-    def _getMX(self):
-        '''From this object return both an mxTimeModification object and an mxTuplet object configured for this Triplet.
-        mxTuplet needs to be on the Notes mxNotations field
-
-        >>> from music21 import *
-        >>> a = duration.Tuplet()
-        >>> a.bracket = True
-        >>> b, c = a.mx
-        '''
-        mxTimeModification = musicxmlMod.TimeModification()
-        mxTimeModification.set('actual-notes', self.numberNotesActual)
-        mxTimeModification.set('normal-notes', self.numberNotesNormal)
-        mxTimeModification.set('normal-type', self.durationNormal.type)
-        if self.durationNormal.dots > 0: # only one dot supported...
-            mxTimeModification.set('normal-dot', True)
-        
-        # need to permit a tuplet type that is startStop, that
-        # create two mxTuplet objects, one for starting and one
-        # for stopping
-        # can have type 'start' with bracket 'no'
-        mxTupletList = []
-        if self.type not in [None, '']:
-            if self.type not in ['start', 'stop', 'startStop']:
-                raise TupletException("Cannot create music XML from a tuplet of type " + self.type)
-
-            if self.type == 'startStop': # need two mxObjects
-                localType = ['start', 'stop']
-            else:
-                localType = [self.type] # place in list
-
-            for type in localType:
-                mxTuplet = musicxmlMod.Tuplet()
-                # start/stop; needs to bet set by group
-                mxTuplet.set('type', type) 
-                # only provide other parameters if this tuplet is a start
-                if type == 'start':
-                    mxTuplet.set('bracket', musicxmlMod.booleanToYesNo(
-                                 self.bracket)) 
-                    mxTuplet.set('placement', self.placement)
-                    if self.tupletActualShow == 'none':
-                        mxTuplet.set('show-number', 'none') 
-                # append each
-                mxTupletList.append(mxTuplet)
-
-        return mxTimeModification, mxTupletList
-
-    def _setMX(self, mxNote):
-        '''Given an mxNote, based on mxTimeModification and mxTuplet objects, return a Tuplet object
-        ''' 
-        if self.frozen == True:
-            raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
-
-        mxTimeModification = mxNote.get('timeModificationObj')
-        #environLocal.printDebug(['got mxTimeModification', mxTimeModification])
-
-        self.numberNotesActual = int(mxTimeModification.get('actual-notes'))
-        self.numberNotesNormal = int(mxTimeModification.get('normal-notes'))
-        mxNormalType = mxTimeModification.get('normal-type')
-        # TODO: implement dot
-        mxNormalDot = mxTimeModification.get('normal-dot')
-
-        if mxNormalType != None:
-            # this value does not seem to frequently be supplied by mxl
-            # encodings, unless it is different from the main duration
-            # this sets both actual and noraml types to the same type
-            self.setDurationType(musicXMLTypeToType(
-                mxTimeModification.get('normal-type')))
-        else: # set to type of duration
-            self.setDurationType(musicXMLTypeToType(mxNote.get('type')))
-
-        mxNotations = mxNote.get('notationsObj')
-        #environLocal.printDebug(['got mxNotations', mxNotations])
-
-        if mxNotations != None and len(mxNotations.getTuplets()) > 0:
-            mxTuplet = mxNotations.getTuplets()[0] # a list, but only use first
-            #environLocal.printDebug(['got mxTuplet', mxTuplet])
-
-            self.type = mxTuplet.get('type') 
-            self.bracket = musicxmlMod.yesNoToBoolean(mxTuplet.get('bracket'))
-            #environLocal.printDebug(['got bracket', self.bracket])
-
-            self.placement = mxTuplet.get('placement') 
-
-    mx = property(_getMX, _setMX)
-
 
 
 
@@ -1304,7 +1177,7 @@ class DurationCommon(base.JSONSerializer):
         in non-nested tuplets. Returns a tuple representing the tuplet(!).  In the case of 3:2 under 5:4,
         it will return (15, 8).
 
-        This tuple is needed for MusicXML time-modification among other places
+        This method is needed for MusicXML time-modification among other places.
 
         >>> from music21 import *
         >>> complexDur = duration.Duration('eighth')
@@ -2501,9 +2374,8 @@ class Duration(DurationCommon):
         splits a dotGroup-duration (of 1 component) into a new duration of two
         components.  Returns a new duration
         
-        
-        Probably does not handle properly tuplets of dot-groups.  Never seen one, so probably okay.
-
+        Probably does not handle properly tuplets of dot-groups.  
+        Never seen one, so probably okay.
 
         >>> from music21 import *
         >>> d1 = duration.Duration(type = 'half')
@@ -2516,12 +2388,9 @@ class Duration(DurationCommon):
         >>> d2.quarterLength
         4.5
         
-        
-        
         Here's how a system that does not support dotGroups can still display
         the notes accurately.  N.B. MusicXML does this automatically, so 
         no need.
-        
         
         >>> n1 = note.Note()
         >>> n1.duration = d1
@@ -2534,14 +2403,12 @@ class Duration(DurationCommon):
         >>> #_DOCS_SHOW s1.show('lily.png')
         .. image:: images/duration_splitDotGroups.*
 
-
         >>> n2 = note.Note()
         >>> n2.duration.type = 'quarter'
         >>> n2.duration.dotGroups = [1,1]
         >>> n2.quarterLength
         2.25
         >>> #_DOCS_SHOW n2.show() # generates a dotted-quarter tied to dotted-eighth
-        
         '''
         dG = self.dotGroups
         if len(dG) < 2:
@@ -2556,10 +2423,6 @@ class Duration(DurationCommon):
                 newComponent.dots = dG[i]
                 newDuration.components.append(newComponent)
             return newDuration
-            
-
-
-
 
     def _getTuplets(self):
         '''
@@ -2593,14 +2456,14 @@ class Duration(DurationCommon):
         self.tuplets = self.tuplets + (newTuplet,)
 
     def _getOrdinal(self):
-        '''Get the ordinal value of the Duration.
+        '''
+        Get the ordinal value of the Duration.
         
         >>> from music21 import *
         >>> d = duration.Duration()
         >>> d.quarterLength = 2.0
         >>> d.ordinal
         5
-        
         '''
         if self._componentsNeedUpdating:
             self._updateComponents()
@@ -2614,7 +2477,6 @@ class Duration(DurationCommon):
 #            raise DurationException("zero DurationUnits in components")
 
     ordinal = property(_getOrdinal)
-
 
     def _getFullName(self):
         if len(self.components) > 1:
@@ -2630,7 +2492,9 @@ class Duration(DurationCommon):
             return 'Zero Duration (0 total QL)'
 
     fullName = property(_getFullName, 
-        doc = '''Return the most complete representation of this Duration, providing dots, type, tuplet, and quarter length representation. 
+        doc = '''
+        Return the most complete representation of this Duration, 
+        providing dots, type, tuplet, and quarter length representation. 
 
         >>> from music21 import *
         >>> d = duration.Duration(quarterLength=1.5)
@@ -2666,17 +2530,8 @@ class Duration(DurationCommon):
         'Zero Duration (0 total QL)'
         ''')
 
-
     #---------------------------------------------------------------------------
     # output formats
-
-    def _getMusicXML(self):
-        '''Return a complete MusicXML string with defaults.
-        '''
-        return musicxmlTranslate.durationToMusicXML(self)
-
-    musicxml = property(_getMusicXML)
-
 
     def write(self, fmt='musicxml', fp=None):
         '''
@@ -3291,6 +3146,7 @@ class Test(unittest.TestCase):
 
 
     def testMxLoading(self):
+        from music21.musicxml import translate as musicxmlTranslate
         from music21 import musicxml
         a = musicxml.Note()
         a.setDefaults()
@@ -3298,9 +3154,8 @@ class Test(unittest.TestCase):
         m.setDefaults()
         a.external['measure'] = m # assign measure for divisions ref
         a.external['divisions'] = m.external['divisions']
-        c = Duration()
-        c.mx = a
-
+        c = musicxmlTranslate.mxToDuration(a)
+        self.assertEqual(c.quarterLength, 1.0)
 
     def testTupletTypeComplete(self):
         '''Test settinf of tuplet type when durations sum to expected completion
@@ -3412,18 +3267,6 @@ class Test(unittest.TestCase):
         a.augmentOrDiminish(.25)
         self.assertAlmostEqual(a.tuplets[0].tupletMultiplier(), .666666, 5)
         self.assertEqual(repr(a.tuplets[0].durationNormal), '<music21.duration.Duration 0.25>')
-
-#     def xtestTupletAddition(self):
-#         from music21 import stream
-#         from music21 import note
-#         import random
-#         a = stream.Stream()
-#         for i in range(100):
-#             ql = random.choice([.2, .25, .33333333333333333])
-#             n = note.Note()
-#             n.quarterLength = ql
-#             a.append(n)
-#         a.musicxml
 
 
     def testUnlinkedTypeA(self):

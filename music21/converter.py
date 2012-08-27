@@ -90,16 +90,16 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class ArchiveManagerException(Exception):
+class ArchiveManagerException(exceptions21.Music21Exception):
     pass
 
-class PickleFilterException(Exception):
+class PickleFilterException(exceptions21.Music21Exception):
     pass
 
-class ConverterException(Exception):
+class ConverterException(exceptions21.Music21Exception):
     pass
 
-class ConverterFileException(Exception):
+class ConverterFileException(exceptions21.Music21Exception):
     pass
 
 
@@ -1639,6 +1639,8 @@ class Test(unittest.TestCase):
     def testConversionMXArticulations(self):
         from music21 import note
         from music21.musicxml import testPrimitive
+        from music21.musicxml import translate as musicxmlTranslate
+        
         mxString = testPrimitive.articulations01
         a = parse(mxString)
         part = a.parts[0]
@@ -1655,7 +1657,7 @@ class Test(unittest.TestCase):
         self.assertEqual(post, match)
 
         # try to go the other way
-        post = a.musicxml
+        post = musicxmlTranslate.music21ObjectToMusicXML(a)
         #a.show()        
 
     def testConversionMXKey(self):

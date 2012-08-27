@@ -26,6 +26,8 @@ import random
 import inspect
 import unicodedata
 
+from music21 import exceptions21
+
 
 # define file extensions for various formats
 # keys are assumed to be formats
@@ -2028,7 +2030,7 @@ class Timer(object):
         return str(round(t,3))
 
 
-class Music21CommonException(Exception):
+class Music21CommonException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------

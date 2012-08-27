@@ -19,6 +19,8 @@ including :class:`~music21.serial.ToneRow` subclasses.
 import unittest, doctest
 import copy
 
+from music21 import exceptions21
+
 from music21 import base
 from music21 import note
 from music21 import chord
@@ -35,7 +37,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class SerialException(Exception):
+class SerialException(exceptions21.Music21Exception):
     pass
 
 

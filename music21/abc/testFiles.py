@@ -459,6 +459,7 @@ class Test(unittest.TestCase):
     def testBasic(self):
         from music21 import abc
         from music21.abc import translate
+        from music21.musicxml import translate as musicxmlTranslate
 
         af = abc.ABCFile()
 
@@ -467,7 +468,7 @@ class Test(unittest.TestCase):
             environLocal.printDebug([ah.getTitle()])
             s = translate.abcToStreamScore(ah)
             # run musicxml processing to look for internal errors
-            out = s.musicxml
+            out = musicxmlTranslate.music21ObjectToMusicXML(s)
 
 
 if __name__ == "__main__":

@@ -25,6 +25,8 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 import unittest
 import sys
 
+from music21 import exceptions21
+
 from music21 import meter
 from music21 import pitch
 from music21 import stream 
@@ -40,7 +42,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #------------------------------------------------------------------------------
-class DiscreteAnalysisException(Exception):
+class DiscreteAnalysisException(exceptions21.Music21Exception):
     pass
 
 class DiscreteAnalysis(object):

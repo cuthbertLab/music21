@@ -602,24 +602,8 @@ class GeneralNote(base.Music21Object):
         return e
 
 
-    #---------------------------------------------------------------------------
-    def _getMusicXML(self):
-        '''Return a complete musicxml representation as an xml string. This must call _getMX to get basic mxNote objects
-
-        >>> from music21 import *
-        >>> n = note.Note()
-        >>> post = n._getMusicXML()
-        '''
-        return musicxmlTranslate.generalNoteToMusicXML(self)
-
-    musicxml = property(_getMusicXML, 
-        doc = '''Return a complete musicxml representation.
-        ''')    
-
-
-
 #-------------------------------------------------------------------------------
-class NotRestException(Exception):
+class NotRestException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
@@ -804,7 +788,7 @@ class NotRest(GeneralNote):
 
 
 #-------------------------------------------------------------------------------
-class NoteException(Exception):
+class NoteException(exceptions21.Music21Exception):
     pass
 
 
@@ -1610,7 +1594,7 @@ class Test(unittest.TestCase):
 
 
     def testMusicXMLOutput(self):
-        from music21 import musicxml
+        from music21.musicxml import translate
         mxNotes = []
         for pitchName, durType in [('g#', 'quarter'), ('g#', 'half'), 
                 ('g#', 'quarter'), ('g#', 'quarter'), ('g#', 'quarter')]:
@@ -1620,7 +1604,7 @@ class Test(unittest.TestCase):
 
             # a lost of one ore more notes (tied groups)
             # returns a list of mxNote objs
-            for mxNote in musicxml.translate.durationToMx(dur): 
+            for mxNote in translate.durationToMx(dur): 
             #for mxNote in dur.mx: # returns a list of mxNote objs
                 # merger returns a new object
                 mxNotes.append(mxNote.merge(p.mx))
@@ -1641,7 +1625,6 @@ class Test(unittest.TestCase):
 
 
     def testNoteBeatProperty(self):
-
         from music21 import stream, meter, note
 
         data = [
@@ -1722,7 +1705,6 @@ class Test(unittest.TestCase):
 
 
     def testNoteBeatPropertyCorpus(self):
-
         data = [['bach/bwv255', [4.0, 1.0, 2.0, 2.5, 3.0, 4.0, 4.5, 1.0, 1.5]], 
                 ['bach/bwv153.9', [1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 3.0, 1.0]]
                 ]
@@ -1848,8 +1830,6 @@ class Test(unittest.TestCase):
 
             self.assertEqual([n.beatStrength for n in m.notesAndRests], match)
             
-
-
 
     def testTieContinue(self):
         from music21 import stream

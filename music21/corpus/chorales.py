@@ -20,7 +20,7 @@ from music21.corpus import base
 import unittest, doctest
 import copy
 
-
+from music21 import exceptions21
 from music21 import environment
 from music21 import metadata
 _MOD = "corpus.chorales.py"
@@ -1623,7 +1623,7 @@ class Iterator(object):
     
 
 
-class BachException(Exception):
+class BachException(exceptions21.Music21Exception):
     pass
 
 

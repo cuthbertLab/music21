@@ -24,6 +24,7 @@ import xml.dom.minidom
 import doctest, unittest
 import re
 from music21 import common
+from music21 import exceptions21
 
 _MOD = 'xmlnode.py'
 
@@ -70,7 +71,7 @@ def fixed_writexml(self, writer, indent="", addindent="", newl=""):
 
 
 #-------------------------------------------------------------------------------
-class XMLNodeException(Exception):
+class XMLNodeException(exceptions21.Music21Exception):
     pass
 
 class XMLNode(object):

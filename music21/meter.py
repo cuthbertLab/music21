@@ -24,7 +24,6 @@ from music21 import beam
 from music21 import common
 from music21 import exceptions21
 from music21 import duration
-from music21 import musicxml
 from music21.musicxml import translate as musicxmlTranslate
 from music21 import environment
 _MOD = 'meter.py'
@@ -3584,50 +3583,6 @@ class TimeSignature(base.Music21Object):
     mx = property(_getMX, _setMX)
 
 
-    def _getMusicXML(self):
-        return musicxmlTranslate.timeSignatureToMusicXML(self)
-
-#         from music21 import stream, note
-#         tsCopy = copy.deepcopy(self)
-# #         m = stream.Measure()
-# #         m.timeSignature = tsCopy
-# #         m.append(note.Rest())
-#         out = stream.Stream()
-#         out.append(tsCopy)
-#         return out.musicxml
-
-#         mxAttributes = musicxml.Attributes()
-#         # need a lost of time 
-#         mxAttributes.set('time', [self._getMX()])
-# 
-#         mxMeasure = musicxml.Measure()
-#         mxMeasure.setDefaults()
-#         mxMeasure.set('attributes', mxAttributes)
-# 
-#         mxPart = musicxml.Part()
-#         mxPart.setDefaults()
-#         mxPart.append(mxMeasure)
-# 
-#         mxScorePart = musicxml.ScorePart()
-#         mxScorePart.setDefaults()
-#         mxPartList = musicxml.PartList()
-#         mxPartList.append(mxScorePart)
-# 
-#         mxIdentification = musicxml.Identification()
-#         mxIdentification.setDefaults() # will create a composer
-# 
-#         mxScore = musicxml.Score()
-#         mxScore.setDefaults()
-#         mxScore.set('partList', mxPartList)
-#         mxScore.set('identification', mxIdentification)
-#         mxScore.append(mxPart)
-#         return mxScore.xmlStr()
-
-    musicxml = property(_getMusicXML)
-
-
-
-
 
 #-------------------------------------------------------------------------------
 
@@ -4041,8 +3996,9 @@ class Test(unittest.TestCase):
 
     def testMusicxmlDirectOut(self):
         # test rendering musicxml directly from meter
+        from music21.musicxml import translate
         ts = TimeSignature('3/8')
-        xmlout = ts.musicxml
+        xmlout = translate.timeSignatureToMusicXML(ts)
 
         match = '<time><beats>3</beats><beat-type>8</beat-type></time>'
         xmlout = xmlout.replace(' ', '')

@@ -17,6 +17,8 @@
 import doctest, unittest
 import copy
 
+from music21 import exceptions21
+
 from music21 import stream, note, expressions
 from music21 import instrument
 from music21 import pitch
@@ -30,7 +32,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class ReductiveEventException(Exception):
+class ReductiveEventException(exceptions21.Music21Exception):
     pass
 
 
@@ -168,7 +170,7 @@ class ReductiveNote(object):
 
 
 #-------------------------------------------------------------------------------
-class ScoreReductionException(Exception):
+class ScoreReductionException(exceptions21.Music21Exception):
     pass
 
 
@@ -380,7 +382,7 @@ class ScoreReduction(object):
 
 
 #-------------------------------------------------------------------------------
-class PartReductionException(Exception):
+class PartReductionException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------

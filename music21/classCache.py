@@ -12,13 +12,14 @@
 import unittest
 import collections
 
+from music21 import exceptions21
 
 
 from music21 import environment
 _MOD = "classCache.py"  
 environLocal = environment.Environment(_MOD)
 
-class ClassCacheException(Exception):
+class ClassCacheException(exceptions21.Music21Exception):
     pass
 
 

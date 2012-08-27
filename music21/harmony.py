@@ -301,7 +301,7 @@ class Harmony(chord.Chord):
         ''')
 
 #-------------------------------------------------------------------------------
-class ChordStepModificationException(Exception):
+class ChordStepModificationException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------

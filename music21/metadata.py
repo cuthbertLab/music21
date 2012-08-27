@@ -1710,18 +1710,6 @@ class Metadata(base.Music21Object):
 
     mx = property(_getMX, _setMX)    
 
-
-#     def _getMusicXML(self):
-#         '''Provide a complete MusicXML representation. 
-#         '''
-#         mxScore = self._getMX()
-#         return mxScore.xmlStr()
-# 
-#     musicxml = property(_getMusicXML,
-#         doc = '''Return a complete MusicXML reprsentatoin as a string. 
-#         ''')
-# 
-
 #-------------------------------------------------------------------------------
 class RichMetadata(Metadata):
     '''RichMetadata adds to Metadata information about the contents of the Score 
@@ -1887,23 +1875,32 @@ class RichMetadata(Metadata):
 
 #-------------------------------------------------------------------------------
 class MetadataBundle(base.JSONSerializer):
-    '''An object that provides access to, searches within, and storage and loading of multiple Metadata objects.
-
-    Additionally, multiple MetadataBundles can be merged for additional processing
     '''
+    An object that provides access to, searches within, 
+    and stores and loads multiple Metadata objects.
+
+    Additionally, multiple MetadataBundles can be merged for 
+    additional processing.  See corpus.metadata.metadataCache
+    for the module that builds these.
+    '''
+    _DOC_ATTR = {
+        'storage': 'A dictionary containing the Metadata objects that have been parsed.  Keys are strings',
+        'name': 'The name of the type of MetadataBundle being made, can be "default", "corpus", or "virtual".  Possibly also "local".'
+        }
+    
     def __init__(self, name='default'):
         base.JSONSerializer.__init__(self)
 
         # all keys are strings, all value are Metadata
         # there is apparently a performance boost for using all-string keys
-        self._storage = {}
+        self.storage = {}
         
-        # name is used to write storage file and acess this bundle from multiple # bundles
-        self._name = name
+        # name is used to write storage file and access this bundle from multiple # bundles
+        self.name = name
 
         # need to store local abs file path of each component
         # this will need to be refreshed after loading json data
-        # keys are the same for self._storage
+        # keys are the same for self.storage
         self._accessPaths = {}
 
     #---------------------------------------------------------------------------
@@ -1912,7 +1909,7 @@ class MetadataBundle(base.JSONSerializer):
     def jsonAttributes(self):
         '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
         '''
-        return ['_storage', '_name']
+        return ['storage', 'name']
 
     def jsonComponentFactory(self, idStr):
         if '.Metadata' in idStr:
@@ -1954,16 +1951,25 @@ class MetadataBundle(base.JSONSerializer):
     
     
 
-    def addFromPaths(self, pathList):
+    def addFromPaths(self, pathList, printDebugAfter = 0):
         '''Parse and store metadata from numerous files.
 
-        If any files cannot be loaded, their file paths will be collected in a list that is returned
+        If any files cannot be loaded, their file paths 
+        will be collected in a list that is returned
+
+        Returns a list of file paths with errors and stores
+        the extracted metadata in `self.storage`.
+        
+        if `printDebugAfter` is set to an int, say 100, then
+        after every 100 files are parsed a message will be
+        printed to stderr giving an update on progress.
+
 
         >>> from music21 import *
         >>> mb = metadata.MetadataBundle()
         >>> mb.addFromPaths(corpus.getWorkList('bwv66.6'))
         []
-        >>> len(mb._storage)
+        >>> len(mb.storage)
         1
         '''
         import gc # get a garbage collector
@@ -1971,8 +1977,13 @@ class MetadataBundle(base.JSONSerializer):
 
         # converter imports modules that import metadata
         from music21 import converter
+        numberConverted = 0
         for fp in pathList:
             environLocal.printDebug(['updateMetadataCache: examining:', fp])
+            if printDebugAfter > 0 and numberConverted % printDebugAfter == 0 and numberConverted > 0:
+                environLocal.warn("updated %d files, %d to go; total errors: %d" %
+                                  (numberConverted, len(pathList) - numberConverted, len(fpError)))
+            numberConverted += 1
             cp = self.corpusPathToKey(fp)
             try:
                 post = converter.parse(fp, forceSource=True)
@@ -1997,7 +2008,7 @@ class MetadataBundle(base.JSONSerializer):
                         # update path to include work number
                         cp = self.corpusPathToKey(fp, number=md.number)
                         environLocal.printDebug(['addFromPaths: storing:', cp])
-                        self._storage[cp] = rmd
+                        self.storage[cp] = rmd
                     del s # for memory conservation
             else:
                 md = post.metadata
@@ -2007,7 +2018,7 @@ class MetadataBundle(base.JSONSerializer):
                 rmd.merge(md)
                 rmd.update(post) # update based on Stream
                 environLocal.printDebug(['updateMetadataCache: storing:', cp])
-                self._storage[cp] = rmd
+                self.storage[cp] = rmd
     
             # explicitly delete the imported object for memory conservation
             del post
@@ -2016,16 +2027,16 @@ class MetadataBundle(base.JSONSerializer):
         return fpError
 
     def _getFilePath(self):
-        if self._name in ['virtual', 'core']:
+        if self.name in ['virtual', 'core']:
             fp = os.path.join(common.getMetadataCacheFilePath(), 
-                self._name + '.json')
-        elif self._name == 'local':
+                self.name + '.json')
+        elif self.name == 'local':
             # write in temporary dir
             fp = os.path.join(environLocal.getRootTempDir(), 
-                self._name + '.json')
+                self.name + '.json')
         else:
             raise MetadataException('unknown metadata name passed: %s' % 
-                self._name)
+                self.name)
         return fp
 
 
@@ -2038,17 +2049,17 @@ class MetadataBundle(base.JSONSerializer):
 
 
     def read(self, fp=None):
-        '''Load self from the file path suggested by the _name of this MetadataBundle
+        '''Load self from the file path suggested by the name of this MetadataBundle
         '''
         t = common.Timer()
         t.start()
         if fp is None:
             fp = self._getFilePath()
         if not os.path.exists(fp):
-            environLocal.warn('no metadata found for: %s; try building cache with corpus.cacheMetadata("%s")' % (self._name, self._name))
+            environLocal.warn('no metadata found for: %s; try building cache with corpus.cacheMetadata("%s")' % (self.name, self.name))
             return
         self.jsonRead(fp)
-        environLocal.printDebug(['MetadataBundle: loading time:', self._name, t, 'md items:', len(self._storage)])
+        environLocal.printDebug(['MetadataBundle: loading time:', self.name, t, 'md items:', len(self.storage)])
 
 
     def updateAccessPaths(self, pathList):
@@ -2069,7 +2080,7 @@ class MetadataBundle(base.JSONSerializer):
         # always clear first
         self._accessPaths = {}
         # create a copy to manipulate
-        keyOptions = self._storage.keys()
+        keyOptions = self.storage.keys()
 
         for fp in pathList:
     
@@ -2082,7 +2093,7 @@ class MetadataBundle(base.JSONSerializer):
     
             match = False
             try:
-                md = self._storage[cp]
+                md = self.storage[cp]
                 self._accessPaths[cp] = fp
                 match = True
             except KeyError:
@@ -2118,8 +2129,8 @@ class MetadataBundle(base.JSONSerializer):
         11
         '''
         post = []
-        for key in self._storage.keys():
-            md = self._storage[key]
+        for key in self.storage.keys():
+            md = self.storage[key]
             match, fieldPost = md.search(query, field)
             if match:
                 # returns a pair of file path, work number

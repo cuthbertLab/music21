@@ -20,6 +20,8 @@ import unittest, doctest, random
 import sys
 import math
 
+from music21 import exceptions21
+
 from music21 import common
 from music21 import meter
 from music21.pitch import Pitch
@@ -32,7 +34,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #------------------------------------------------------------------------------
-class WindowedAnalysisException(Exception):
+class WindowedAnalysisException(exceptions21.Music21Exception):
     pass
 
 

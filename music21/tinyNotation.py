@@ -72,6 +72,7 @@ import re
 from music21 import note
 from music21 import duration
 from music21 import common
+from music21 import exceptions21
 from music21 import stream
 from music21 import tie
 from music21 import expressions
@@ -614,7 +615,7 @@ class HarmonyNote(TinyNotationNote):
             m21NoteObject.editorial.misc['harmony'] = harmony
 
 
-class TinyNotationException(Exception):
+class TinyNotationException(exceptions21.Music21Exception):
     pass
 
 

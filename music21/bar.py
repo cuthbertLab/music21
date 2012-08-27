@@ -16,6 +16,8 @@
 import unittest, doctest
 
 from music21 import base
+from music21 import exceptions21
+
 from music21 import expressions
 from music21 import repeat
 from music21 import musicxml
@@ -28,7 +30,7 @@ environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------
 
-class BarException(Exception):
+class BarException(exceptions21.Music21Exception):
     pass
 
 
@@ -167,7 +169,7 @@ class Barline(base.Music21Object):
         return mxBarline
 
     def _setMX(self, mxBarline):
-        '''Given an mxBarline, fille the necessary parameters
+        '''Given an mxBarline, fill the necessary parameters
 
         >>> from music21 import musicxml
         >>> mxBarline = musicxml.Barline()

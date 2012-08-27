@@ -122,6 +122,7 @@ import unittest
 import copy
 
 from music21 import base
+from music21 import exceptions21
 from music21 import common
 from music21 import repeat
 from music21 import bar
@@ -133,7 +134,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class RomanTextTranslateException(Exception):
+class RomanTextTranslateException(exceptions21.Music21Exception):
     pass
 
 class RomanTextUnprocessedToken(base.ElementWrapper):

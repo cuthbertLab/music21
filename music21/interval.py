@@ -28,6 +28,8 @@ import unittest, doctest
 
 from music21 import base
 from music21 import common 
+from music21 import exceptions21
+
 
 #from music21 import pitch # SHOULD NOT, b/c of enharmonics
 
@@ -94,7 +96,7 @@ semitonesAdjustImperf = {"M":0, "m":-1, "A":1, "AA":2, "AAA":3, "AAAA": 4,
 
 
 #-------------------------------------------------------------------------------
-class IntervalException(Exception):
+class IntervalException(exceptions21.Music21Exception):
     pass
 
 

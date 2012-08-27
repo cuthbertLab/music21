@@ -12,6 +12,8 @@
 
 import unittest
 
+from music21 import exceptions21
+
 from music21 import scale
 from music21 import stream
 from music21 import chord
@@ -24,7 +26,7 @@ environLocal = environment.Environment(_MOD)
 
 
 
-class SearchModuleException(Exception):
+class SearchModuleException(exceptions21.Music21Exception):
     pass
 
 

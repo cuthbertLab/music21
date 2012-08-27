@@ -644,7 +644,7 @@ def deleteMeasures(s, toDelete, inPlace=False):
 
 
 
-class ExpanderException(Exception):
+class ExpanderException(exceptions21.Music21Exception):
     pass
 
 class Expander(object):
@@ -3199,6 +3199,7 @@ class Test(unittest.TestCase):
 
     def testRepeatExpressionOnStream(self):
         from music21 import stream, repeat, expressions, musicxml, meter
+        from music21.musicxml import translate as musicxmlTranslate
 
         template = stream.Stream()
         for i in range(5):
@@ -3207,7 +3208,10 @@ class Test(unittest.TestCase):
         s = copy.deepcopy(template)
         s[3].insert(0, repeat.DaCapo())
         self.assertEqual(len(s.flat.getElementsByClass(repeat.DaCapo)), 1)
-        raw = s.musicxml
+
+
+        raw = musicxmlTranslate.music21ObjectToMusicXML(s)
+
         self.assertEqual(raw.find('Da Capo') > 0, True)
 
         # can do the same thing starting form a text expression
@@ -3215,7 +3219,8 @@ class Test(unittest.TestCase):
         s[0].timeSignature = meter.TimeSignature('4/4')
         s[3].insert(0, expressions.TextExpression('da capo'))
         self.assertEqual(len(s.flat.getElementsByClass(repeat.DaCapo)), 0)
-        raw = s.musicxml
+        
+        raw = musicxmlTranslate.music21ObjectToMusicXML(s)
         self.assertEqual(raw.find('da capo') > 0, True)
             
         mxlDocument = musicxml.Document()
@@ -3763,6 +3768,7 @@ class Test(unittest.TestCase):
     def testRepeatsEndingsA(self):
         from music21 import converter
         from music21.musicxml import testPrimitive
+        from music21.musicxml import translate as musicxmlTranslate
         #from music21.musicxml import testPrimitive
         # this has repeat brackets
         # these are stored in bar objects as ending tags, 
@@ -3771,7 +3777,8 @@ class Test(unittest.TestCase):
 
         s = converter.parse(testPrimitive.repeatBracketsA)
 
-        raw = s.musicxml
+        raw = musicxmlTranslate.music21ObjectToMusicXML(s)
+
         self.assertEqual(raw.find("<repeat direction=")>1, True)    
         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="1" type="stop"/>""")>1, True)    
@@ -3780,7 +3787,8 @@ class Test(unittest.TestCase):
  
         # TODO: after calling .musicxml, repeat brackets are getting lost
         #s.show()        
-        raw = s.musicxml
+        raw = musicxmlTranslate.music21ObjectToMusicXML(s)
+
         self.assertEqual(raw.find("<repeat direction=")>1, True)    
         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="1" type="stop"/>""")>1, True)    
@@ -3791,7 +3799,7 @@ class Test(unittest.TestCase):
         #s.show()
 
         #s1.show()
-        raw = s1.musicxml
+        raw = musicxmlTranslate.music21ObjectToMusicXML(s1)
         ex = Expander(s1.parts[0])
         self.assertEqual(len(ex._repeatBrackets), 2)
 

@@ -22,6 +22,7 @@ import unittest
 from music21.musedata import base as museDataModule
 
 from music21 import environment
+from music21 import exceptions21
 _MOD = 'musedata.translate.py'
 environLocal = environment.Environment(_MOD)
 
@@ -29,7 +30,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class MuseDataTranslateException(Exception):
+class MuseDataTranslateException(exceptions21.Music21Exception):
     pass
 
 
@@ -365,6 +366,7 @@ class Test(unittest.TestCase):
     def testBasic(self):
         from music21 import musedata
         from music21.musedata import testFiles
+        from music21.musicxml import translate as musicxmlTranslate
 
 
         mdw = musedata.MuseDataWork()
@@ -394,7 +396,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].flat.notesAndRests), 291)
         self.assertEqual(len(s.parts[1].flat.notesAndRests), 293)
 
-        post = s.musicxml
+        raw = musicxmlTranslate.music21ObjectToMusicXML(s)
       
 
 

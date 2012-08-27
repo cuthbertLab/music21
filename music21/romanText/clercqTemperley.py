@@ -19,6 +19,8 @@ information may be located at http://theory.esm.rochester.edu/rock_corpus/
 import re
 import copy
 import unittest
+from music21 import exceptions21
+
 
 #clercqTemperley test files used as tests throughout this module
 BlitzkriegBopCT = '''
@@ -79,7 +81,7 @@ def _convertTextFileToCTString(fileName):
     
     return pieceString
 
-class CTSongException(Exception):
+class CTSongException(exceptions21.Music21Exception):
     pass
 
 class CTSong(object):
@@ -1038,7 +1040,7 @@ class CTSong(object):
 
         return scoreObj
 
-class CTRuleException(Exception):
+class CTRuleException(exceptions21.Music21Exception):
     pass
         
 class CTRule(object):

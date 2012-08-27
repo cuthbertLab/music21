@@ -123,16 +123,16 @@ def booleanToYesNo(value):
     return 'no'
 
 #-------------------------------------------------------------------------------
-class TagException(Exception):
+class TagException(exceptions21.Music21Exception):
     pass
 
-class TagLibException(Exception):
+class TagLibException(exceptions21.Music21Exception):
     pass
 
-class MusicXMLException(Exception):
+class MusicXMLException(exceptions21.Music21Exception):
     pass
 
-class DocumentException(Exception):
+class DocumentException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
@@ -4799,6 +4799,7 @@ class Test(unittest.TestCase):
     def testUnicodeCharsA(self):
         from music21.musicxml import testPrimitive
         from music21 import converter
+        from music21.musicxml import translate as musicxmlTranslate
         
         # low level musicxml object test
         d = Document()
@@ -4809,7 +4810,7 @@ class Test(unittest.TestCase):
         
         # the ultimate round trip test
         s = converter.parse(testPrimitive.unicodeStrWithNonAscii)
-        raw = s.musicxml
+        raw = musicxmlTranslate.music21ObjectToMusicXML(s)
         s = converter.parse(raw)
         self.assertEqual(u'© Someone Else', s.metadata.composer)
 

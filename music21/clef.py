@@ -16,6 +16,8 @@ import unittest
 
 from music21 import base
 from music21 import common
+from music21 import exceptions21
+
 from music21 import musicxml
 
 from music21 import environment
@@ -23,7 +25,7 @@ _MOD = "clef.py"
 environLocal = environment.Environment(_MOD)
 
 
-class ClefException(Exception):
+class ClefException(exceptions21.Music21Exception):
     pass
 
 

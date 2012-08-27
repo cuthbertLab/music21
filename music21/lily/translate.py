@@ -2204,7 +2204,7 @@ class LilypondConverter(object):
         return lilyFile
         
 
-class LilyTranslateException(Exception):
+class LilyTranslateException(exceptions21.Music21Exception):
     pass
 
 

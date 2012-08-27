@@ -70,8 +70,7 @@ def pitchedPhase(cycles=None, show=False):
         sPost.show('midi')
         sPost.show()
     else: # get musicxml
-        post = sPost.musicxml
-
+        pass
 
 
 def partPari(show = True):

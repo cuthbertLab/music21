@@ -54,7 +54,7 @@ environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------
 
-class StreamException(Exception):
+class StreamException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
@@ -8603,22 +8603,6 @@ class Stream(base.Music21Object):
         musicxmlTranslate.mxToScore(mxScore, inputM21=self)
     
     mx = property(_getMX, _setMX)
-        
-    def _getMusicXML(self):
-        '''Provide a complete MusicXML representation. 
-        '''
-        # always make a deepcopy before processing musicxml
-        # this should only be done once
-        post = copy.deepcopy(self)
-        post.makeImmutable()
-        mxScore = post._getMX()
-        del post
-        return mxScore.xmlStr()
-
-    musicxml = property(_getMusicXML,
-        doc = '''Return a complete MusicXML reprsentation as a string. 
-        ''')
-
 
 
     #---------------------------------------------------------------------------
@@ -11706,14 +11690,6 @@ class Measure(Stream):
         return m
 
     mx = property(_getMX, _setMX)    
-
-    def _getMusicXML(self):
-        '''Provide a complete MusicXML representation of the measure. 
-        '''
-        post = copy.deepcopy(self)
-        return musicxmlTranslate.measureToMusicXML(post)
-
-    musicxml = property(_getMusicXML)
 
    
 class Part(Stream):

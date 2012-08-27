@@ -34,6 +34,8 @@ except:
 # all modules before installation
 from music21 import common
 from music21 import environment
+from music21 import exceptions21
+
 _MOD = "configure.py"
 environLocal = environment.Environment(_MOD)
 
@@ -295,7 +297,7 @@ class BadConditions(DialogError):
 
 
 #-------------------------------------------------------------------------------
-class DialogException(Exception):
+class DialogException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------

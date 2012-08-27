@@ -19,6 +19,8 @@ import sys
 
 from music21 import common
 from music21 import converter
+from music21 import exceptions21
+
 from music21 import stream
 from music21 import note
 from music21 import chord
@@ -34,7 +36,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class CorrelateException(Exception):
+class CorrelateException(exceptions21.Music21Exception):
     pass
 
 

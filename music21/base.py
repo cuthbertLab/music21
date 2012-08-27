@@ -55,6 +55,7 @@ import unittest, doctest
 import inspect
 
 #-----all exceptions are in the exceptions21 package.
+from music21 import exceptions21
 from music21.exceptions21 import *
 
 
@@ -115,7 +116,7 @@ WEAKREF_ACTIVE = True
 
 
 #-------------------------------------------------------------------------------
-class JSONSerializerException(Exception):
+class JSONSerializerException(exceptions21.Music21Exception):
     pass
 
 class JSONSerializer(object):
@@ -394,6 +395,7 @@ class JSONSerializer(object):
                                 else:
                                     subDict[subKey] = attrValueSub
                             #setattr(self, key, subDict)
+                            
                             dst = getattr(self, key)
                             # updating the dictionary preserves default 
                             # values created at init
@@ -3640,7 +3642,8 @@ class Music21Object(JSONSerializer):
             elif format == 'textline':
                 dataStr = self._reprTextLine()
             elif format == 'musicxml':
-                dataStr = self.musicxml
+                from music21.musicxml import translate as musicxmlTranslate
+                dataStr = musicxmlTranslate.music21ObjectToMusicXML(self)
             elif format.startswith('vexflow'):
                 import music21.vexflow
                 dataStr = music21.vexflow.fromObject(self, mode='html')

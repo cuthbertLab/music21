@@ -83,7 +83,7 @@ for name in dir(virtual): # look over virtual module
 
 
 #-------------------------------------------------------------------------------
-class CorpusException(Exception):
+class CorpusException(exceptions21.Music21Exception):
     pass
 
 

@@ -16,6 +16,8 @@ import unittest, doctest
 from music21.note import Note
 from music21 import converter
 from music21 import duration
+from music21 import exceptions21
+
 from music21 import interval
 from music21 import meter
 from music21 import scale
@@ -31,7 +33,7 @@ environLocal = environment.Environment(_MOD)
 
 
 
-class ModalCounterpointException(Exception):
+class ModalCounterpointException(exceptions21.Music21Exception):
     pass
 
 class ModalCounterpoint(object):

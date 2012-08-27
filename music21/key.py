@@ -21,6 +21,8 @@ import doctest, unittest
 import copy
 
 from music21 import base
+from music21 import exceptions21
+
 from music21 import pitch
 from music21 import note
 from music21 import interval
@@ -289,9 +291,9 @@ def pitchToSharps(value, mode=None):
 #    return match
 
 
-class KeySignatureException(Exception):
+class KeySignatureException(exceptions21.Music21Exception):
     pass
-class KeyException(Exception):
+class KeyException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------

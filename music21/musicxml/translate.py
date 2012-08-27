@@ -10,20 +10,23 @@
 # License:      LGPL
 #-------------------------------------------------------------------------------
 
-'''Low-level conversion routines between MusicXML and music21.
+'''
+Low-level conversion routines between MusicXML and music21.
 '''
 
 
 import unittest
 import copy
 
-from music21 import musicxml as musicxmlMod
-from music21 import defaults
+from music21.musicxml import base as musicxmlMod
 from music21 import common
+from music21 import defaults
+from music21 import exceptions21
 from music21 import xmlnode
 
 # modules that import this include stream.py, chord.py, note.py
 # thus, cannot import these here
+from music21 import duration
 
 from music21 import environment
 _MOD = "musicxml.translate.py"
@@ -34,7 +37,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class TranslateException(Exception):
+class TranslateException(exceptions21.Music21Exception):
     pass
 
 class NoteheadException(TranslateException):
@@ -42,6 +45,173 @@ class NoteheadException(TranslateException):
 
 class XMLBarException(TranslateException):
     pass
+
+#------------------------------------------------
+# general conversion
+
+def music21ObjectToMusicXML(m21Object):
+    '''
+    translate an arbitrary music21 object to a musicxml
+    string and return it
+    
+    this is called by music21.base.write()
+    '''
+    classes = m21Object.classes
+    if 'Measure' in classes: # must go before Stream
+        post = copy.deepcopy(m21Object)        
+        return measureToMusicXML(m21Object)
+    elif 'Stream' in classes:
+        return streamToMusicXML(m21Object)
+    elif 'GeneralNote' in classes:
+        return generalNoteToMusicXML(m21Object)
+    elif 'Pitch' in classes:
+        return pitchToMusicXML(m21Object)
+    elif 'Duration' in classes:
+        return durationToMusicXML(m21Object)
+    elif 'Dynamic' in classes:
+        return dynamicToMusicXML(m21Object)
+    elif 'DiatonicScale' in classes:
+        return diatonicScaleToMusicXML(m21Object)
+    elif 'Scale' in classes:
+        return scaleToMusicXML(m21Object)
+    elif 'TimeSignature' in classes:
+        return timeSignatureToMusicXML(m21Object)
+    else:
+        raise TranslateException("Cannot translate the object %s to a complete musicXML document; put it in a Stream first!" % m21Object)
+
+def streamToMusicXML(streamObject):
+    '''
+    return a complete musicxml string
+    from a music21 Stream object
+    '''
+    # always make a deepcopy before processing musicxml
+    # this should only be done once
+    post = copy.deepcopy(streamObject)
+    post.makeImmutable()
+    mxScore = post._getMX()
+    del post
+    return mxScore.xmlStr()
+
+def durationToMusicXML(d):
+    '''
+    Translate a music21 :class:`~music21.duration.Duration` into 
+    a complete MusicXML representation.
+    
+    Rarely rarely used.  Only if you call .show() on a duration object
+    
+    >>> from music21 import *
+    >>> d = duration.Duration(4.0)
+    >>> dxml = musicxml.translate.durationToMusicXML(d)
+    >>> print dxml
+    <?xml version="1.0" encoding="utf-8"?>
+    <!DOCTYPE score-partwise
+      PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
+      'http://www.musicxml.org/dtds/partwise.dtd'>
+    <score-partwise>
+      <movement-title>Music21 Fragment</movement-title>
+      <identification>
+        <creator type="composer">Music21</creator>
+      </identification>
+      <part-list>
+      ...
+      </part-list>
+      <part id="...">
+        <measure number="1">
+          <attributes>
+            <divisions>10080</divisions>
+            <time>
+              <beats>4</beats>
+              <beat-type>4</beat-type>
+            </time>
+            <clef>
+              <sign>G</sign>
+              <line>2</line>
+            </clef>
+          </attributes>
+          <note>
+            <pitch>
+              <step>C</step>
+              <octave>4</octave>
+            </pitch>
+            <duration>40320</duration>
+            <type>whole</type>
+            <notations/>
+          </note>
+          <barline location="right">
+            <bar-style>light-heavy</bar-style>
+          </barline>
+        </measure>
+      </part>
+    </score-partwise>
+
+    Or, more simply
+    
+    >>> #_DOCS_SHOW d.show('musicxml')
+    '''
+    from music21 import note
+
+    # make a copy, as we this process will change tuple types
+    # not needed, since generalNoteToMusicXML does it too.  but so
+    # rarely used, it doesn't matter, and the extra safety is nice.
+    dCopy = copy.deepcopy(d)
+    n = note.Note()
+    n.duration = dCopy
+    # call the musicxml property on Stream
+    return generalNoteToMusicXML(n)
+
+def dynamicToMusicXML(dynamicObject):
+    '''
+    Provide a complete MusicXML representation.
+    '''
+    from music21 import stream
+    dCopy = copy.deepcopy(dynamicObject)
+    out = stream.Stream()
+    out.append(dCopy)
+    # call the musicxml property on Stream
+    return streamToMusicXML(out)
+ 
+def scaleToMusicXML(scaleObject):
+    from music21 import stream, note
+    m = stream.Measure()
+    for i in range(1, scaleObject._abstract.getDegreeMaxUnique()+1):
+        p = scaleObject.pitchFromDegree(i)
+        n = note.Note()
+        n.pitch = p
+        if i == 1:
+            n.addLyric(scaleObject.name)
+
+        if p.name == scaleObject.getTonic().name:
+            n.quarterLength = 4 # set longer
+        else:
+            n.quarterLength = 1
+        m.append(n)
+    m.timeSignature = m.bestTimeSignature()
+    return measureToMusicXML(m)
+
+def diatonicScaleToMusicXML(diatonicScaleObject):
+    '''
+    Return a complete musicxml of the DiatonicScale
+    '''
+    # note: overriding behavior on Scale 
+    from music21 import stream, note
+    m = stream.Measure()
+    for i in range(1, diatonicScaleObject._abstract.getDegreeMaxUnique()+1):
+        p = diatonicScaleObject.pitchFromDegree(i)
+        n = note.Note()
+        n.pitch = p
+        if i == 1:
+            n.addLyric(diatonicScaleObject.name)
+
+        if p.name == diatonicScaleObject.getTonic().name:
+            n.quarterLength = 4 # set longer
+        elif p.name == diatonicScaleObject.getDominant().name:
+            n.quarterLength = 2 # set longer
+        else:
+            n.quarterLength = 1
+        m.append(n)
+    m.timeSignature = m.bestTimeSignature()
+    return measureToMusicXML(m)
+
 
 # def mod6IdLocal(spannerObj):
 #     '''
@@ -273,7 +443,7 @@ def mxToTempoIndication(mxMetronome, mxWords=None):
     >>> musicxml.translate.mxToTempoIndication(m)
     <music21.tempo.MetronomeMark Half=125.0>
     '''
-    from music21 import tempo, duration
+    from music21 import tempo
     # get lists of durations and texts
     durations = []
     numbers = []
@@ -281,7 +451,7 @@ def mxToTempoIndication(mxMetronome, mxWords=None):
     dActive = None
     for mxObj in mxMetronome.componentList:
         if isinstance(mxObj, musicxmlMod.BeatUnit):
-            type = duration.musicXMLTypeToType(mxObj.charData)
+            type = musicXMLTypeToType(mxObj.charData)
             dActive = duration.Duration(type=type)
             durations.append(dActive)
         if isinstance(mxObj, musicxmlMod.BeatUnitDot):
@@ -337,8 +507,6 @@ def tempoIndicationToMx(ti):
     [<direction <direction-type <metronome parentheses=no <beat-unit charData=quarter> <beat-unit-dot > <per-minute charData=40>>> <sound tempo=60.0>>, <direction <direction-type <words default-y=45.0 font-weight=bold justify=left charData=slow>>>]
 
     '''
-    from music21 import duration
-
     # if writing just a sound tag, place an empty words tag in a durection type and then follow with sound declaration
 
     # storing lists to accomodate metric modulations
@@ -377,7 +545,7 @@ def tempoIndicationToMx(ti):
     mxComponents = []
     for i, d in enumerate(durs):
         # charData of BeatUnit is the type string
-        mxSub = musicxmlMod.BeatUnit(duration.typeToMusicXMLType(d.type))
+        mxSub = musicxmlMod.BeatUnit(typeToMusicXMLType(d.type))
         mxComponents.append(mxSub)
         for x in range(d.dots):
             mxComponents.append(musicxmlMod.BeatUnitDot())
@@ -558,6 +726,80 @@ def durationToMxGrace(d, mxNoteList):
 #-------------------------------------------------------------------------------
 # Pitch and pitch components
 
+def accidentalToMx(a):
+    '''
+    returns a `musicxml` :class:`~music21.musicxml.Accidental` object
+    from a music21 `pitch` :class:`~music21.pitch.Accidental` object
+    
+    >>> from music21 import *
+    >>> a = pitch.Accidental()
+    >>> a.set('half-sharp')
+    >>> a.alter == .5
+    True
+    >>> mxAccidental = musicxml.translate.accidentalToMx(a)
+    >>> mxAccidental.get('content')
+    'quarter-sharp'
+    '''
+    if a.name == "half-sharp": 
+        mxName = "quarter-sharp"
+    elif a.name == "one-and-a-half-sharp": 
+        mxName = "three-quarters-sharp"
+    elif a.name == "half-flat": 
+        mxName = "quarter-flat"
+    elif a.name == "one-and-a-half-flat": 
+        mxName = "three-quarters-flat"
+    else: # all others are the same
+        mxName = a.name
+
+    mxAccidental = musicxmlMod.Accidental()
+# need to remove display in this case and return None
+#         if self.displayStatus == False:
+#             pass
+    mxAccidental.set('charData', mxName)
+    return mxAccidental
+
+def mxToAccidental(mxAccidental, inputM21Object = None):
+    '''
+    >>> from music21 import *
+    >>> a = musicxml.Accidental()
+    >>> a.set('content', 'half-flat')
+    >>> a.get('content')
+    'half-flat'
+
+    >>> b = pitch.Accidental()
+    >>> bReference = musicxml.translate.mxToAccidental(a, b)
+    >>> b is bReference
+    True
+    >>> b.name
+    'half-flat'
+    '''    
+    from music21 import pitch
+    if inputM21Object == None:
+        acc = pitch.Accidental()
+    else:
+        acc = inputM21Object
+ 
+    mxName = mxAccidental.get('charData')
+    if mxName == "quarter-sharp": 
+        name = "half-sharp"
+    elif mxName == "three-quarters-sharp": 
+        name = "one-and-a-half-sharp"
+    elif mxName == "quarter-flat": 
+        name = "half-flat"
+    elif mxName == "three-quarters-flat": 
+        name = "one-and-a-half-flat"
+    elif mxName == "flat-flat": 
+        name = "double-flat"
+    elif mxName == "sharp-sharp": 
+        name = "double-sharp"
+    else:
+        name = mxName
+    # need to use set here to get all attributes up to date
+    acc.set(name)
+
+    return acc
+
+
 def pitchToMx(p):
     '''
     Returns a musicxml.Note() object
@@ -582,7 +824,8 @@ def pitchToMx(p):
 
     if (p.accidental is not None and
         p.accidental.displayStatus in [True, None]):
-        mxNote.set('accidental', p.accidental.mx)
+        mxAccidental = accidentalToMx(p.accidental)
+        mxNote.set('accidental', mxAccidental)
     # should this also return an xml accidental object
     return mxNote # return element object
 
@@ -625,8 +868,7 @@ def mxToPitch(mxNote, inputM21=None):
     # None is used in musicxml but not in music21
     if acc != None or mxAccidentalCharData != None:
         if mxAccidental is not None: # the source had wanted to show alter
-            accObj = pitch.Accidental()
-            accObj.mx = mxAccidental
+            accObj = mxToAccidental(mxAccidental)
         # used to to just use acc value
         #self.accidental = Accidental(float(acc))
         # better to use accObj if possible
@@ -651,7 +893,7 @@ def pitchToMusicXML(p):
     out = stream.Stream()
     out.append(n)
     # call the musicxml property on Stream
-    return out.musicxml
+    return streamToMusicXML(out)
 
 
 #-------------------------------------------------------------------------------
@@ -793,8 +1035,47 @@ def mxToLyric(mxLyric, inputM21=None):
 #-------------------------------------------------------------------------------
 # Durations
 
+def musicXMLTypeToType(value):
+    '''Convert a MusicXML type to an music21 type.
+
+    >>> from music21 import *
+    >>> musicxml.translate.musicXMLTypeToType('long')
+    'longa'
+    >>> musicxml.translate.musicXMLTypeToType('quarter')
+    'quarter'
+    >>> musicxml.translate.musicXMLTypeToType(None)
+    Traceback (most recent call last):
+    TranslateException...
+    '''
+    # MusicXML uses long instead of longa
+    if value not in duration.typeToDuration.keys():
+        if value == 'long':
+            return 'longa'
+        else:
+            raise TranslateException('found unknown MusicXML type: %s' % value)
+    else:
+        return value
+
+def typeToMusicXMLType(value):
+    '''Convert a music21 type to a MusicXML type.
+
+    >>> from music21 import *
+    >>> musicxml.translate.typeToMusicXMLType('longa')
+    'long'
+    >>> musicxml.translate.typeToMusicXMLType('quarter')
+    'quarter'
+    '''
+    # MusicXML uses long instead of longa
+    if value == 'longa': 
+        return 'long'
+    else:
+        return value
+
+
 def mxToDuration(mxNote, inputM21=None):
-    '''Translate a MusicXML :class:`~music21.musicxml.Note` object to a music21 :class:`~music21.duration.Duration` object.
+    '''
+    Translate a `MusicXML` :class:`~music21.musicxml.Note` object 
+    to a music21 :class:`~music21.duration.Duration` object.
 
     >>> from music21 import *
     >>> a = musicxml.Note()
@@ -803,16 +1084,15 @@ def mxToDuration(mxNote, inputM21=None):
     >>> m.setDefaults()
     >>> a.external['measure'] = m # assign measure for divisions ref
     >>> a.external['divisions'] = m.external['divisions']
+
     >>> c = duration.Duration()
     >>> musicxml.translate.mxToDuration(a, c)
     <music21.duration.Duration 1.0>
     >>> c.quarterLength
     1.0
-
     '''
-    from music21 import duration
     if inputM21 == None:
-        d = duration.Duration
+        d = duration.Duration()
     else:
         d = inputM21
 
@@ -823,7 +1103,7 @@ def mxToDuration(mxNote, inputM21=None):
     mxDivisions = mxNote.external['divisions']
     if mxNote.duration is not None:
         if mxNote.get('type') is not None:
-            type = duration.musicXMLTypeToType(mxNote.get('type'))
+            type = musicXMLTypeToType(mxNote.get('type'))
             forceRaw = False
         else: # some rests do not define type, and only define duration
             type = None # no type to get, must use raw
@@ -835,8 +1115,8 @@ def mxToDuration(mxNote, inputM21=None):
         mxTimeModification = mxNote.get('timeModificationObj')
 
         if mxTimeModification is not None:
-            tup = duration.Tuplet()
-            tup.mx = mxNote # get all necessary config from mxNote
+            tup = mxToTuplet(mxNote)
+            # get all necessary config from mxNote
             #environLocal.printDebug(['created Tuplet', tup])
             # need to see if there is more than one component
             #self.components[0]._tuplets.append(tup)
@@ -852,8 +1132,8 @@ def mxToDuration(mxNote, inputM21=None):
             try:
                 d.components = durRaw.components
             except duration.DurationException:
-                environLocal.warn(['Duration._setMX', 'supplying quarterLength of 1 as type is not defined and raw quarterlength (%s) is not a computable duration' % qLen])
-                environLocal.printDebug(['Duration._setMX', 'raw qLen', qLen, type, 'mxNote.duration:', mxNote.duration, 'last mxDivisions:', mxDivisions])
+                environLocal.warn(['mxToDuration', 'supplying quarterLength of 1 as type is not defined and raw quarterlength (%s) is not a computable duration' % qLen])
+                environLocal.printDebug(['mxToDuration', 'raw qLen', qLen, type, 'mxNote.duration:', mxNote.duration, 'last mxDivisions:', mxDivisions])
                 durRaw.quarterLength = 1.
         else: # a cooked version builds up from pieces
             durUnit = duration.DurationUnit()
@@ -871,7 +1151,7 @@ def mxToDuration(mxNote, inputM21=None):
     # is based entirely on type
     if mxNote.duration is None:
         durUnit = duration.DurationUnit()
-        durUnit.type = duration.musicXMLTypeToType(mxNote.get('type'))
+        durUnit.type = musicXMLTypeToType(mxNote.get('type'))
         durUnit.dots = len(mxNote.get('dotList'))
         d.components = [durUnit]
         #environLocal.pd(['got mx duration of None', d])
@@ -884,9 +1164,7 @@ def durationToMx(d):
     Translate a music21 :class:`~music21.duration.Duration` object to a list
     of one or more MusicXML :class:`~music21.musicxml.Note` objects.
 
-
     All rhythms and ties necessary in the MusicXML Notes are configured. The returned mxNote objects are incompletely specified, lacking full representation and information on pitch, etc.
-
 
     >>> from music21 import *
     >>> a = duration.Duration()
@@ -897,7 +1175,6 @@ def durationToMx(d):
     >>> isinstance(b[0], musicxmlMod.Note)
     True
 
-
     >>> a = duration.Duration()
     >>> a.quarterLength = .33333333
     >>> b = musicxml.translate.durationToMx(a)
@@ -905,8 +1182,6 @@ def durationToMx(d):
     True
     >>> isinstance(b[0], musicxmlMod.Note)
     True
-
-
 
     >>> a = duration.Duration()
     >>> a.quarterLength = .625
@@ -916,8 +1191,6 @@ def durationToMx(d):
     >>> isinstance(b[0], musicxmlMod.Note)
     True
 
-
-
     >>> a = duration.Duration()
     >>> a.type = 'half'
     >>> a.dotGroups = [1,1]
@@ -926,14 +1199,12 @@ def durationToMx(d):
     True
     >>> isinstance(b[0], musicxmlMod.Note)
     True
-
     '''
-    from music21 import duration
     post = [] # rename mxNoteList for consistencuy
 
     #environLocal.printDebug(['in _getMX', d, d.quarterLength, 'isGrace', d.isGrace])
 
-    if d.dotGroups is not None and len(d.dotGroups) > 1:
+    if d.quarterLength >0 and d.dotGroups is not None and len(d.dotGroups) > 1:
         d = d.splitDotGroups()
     # most common case...
     # a grace is not linked, but still needs to be processed as a grace
@@ -942,7 +1213,7 @@ def durationToMx(d):
         for dur in d.components:
             mxDivisions = int(defaults.divisionsPerQuarter *
                               dur.quarterLength)
-            mxType = duration.typeToMusicXMLType(dur.type)
+            mxType = typeToMusicXMLType(dur.type)
             # check if name is not in collection of MusicXML names, which does 
             # not have maxima, etc.
             mxDotList = []
@@ -961,7 +1232,7 @@ def durationToMx(d):
     else: # simple duration that is unlinked
         mxDivisions = int(defaults.divisionsPerQuarter *
                           d.quarterLength)
-        mxType = duration.typeToMusicXMLType(d.type)
+        mxType = typeToMusicXMLType(d.type)
         # check if name is not in collection of MusicXML names, which does 
         # not have maxima, etc.
         mxDotList = []
@@ -1014,7 +1285,7 @@ def durationToMx(d):
             mxNote.set('tieList', mxTieList)
         if len(dur.tuplets) > 0:
             # only getting first tuplet here
-            mxTimeModification, mxTupletList = dur.tuplets[0].mx
+            mxTimeModification, mxTupletList = tupletToMx(dur.tuplets[0])
             mxNote.set('timemodification', mxTimeModification)
             if mxTupletList != []:
                 mxNotations.componentList += mxTupletList
@@ -1032,21 +1303,6 @@ def durationToMx(d):
 #             #environLocal.pd(['final mxNote with mxGrace duration', mxNote.get('duration')])
     return post # a list of mxNotes
 
-
-def durationToMusicXML(d):
-    '''Translate a music21 :class:`~music21.duration.Duration` into a complete MusicXML representation.
-    '''
-    from music21 import duration, note
-
-    # make a copy, as we this process will change tuple types
-    dCopy = copy.deepcopy(d)
-    n = note.Note()
-    n.duration = dCopy
-    # call the musicxml property on Stream
-    return generalNoteToMusicXML(n)
-
-
-
 def mxToOffset(mxDirection, mxDivisions):
     '''Translate a MusicXML :class:`~music21.musicxml.Direction` with an offset value to an offset in music21.
     '''
@@ -1060,7 +1316,101 @@ def mxToOffset(mxDirection, mxDivisions):
         return float(mxDirection.offset) / float(mxDivisions)
 
 
+def tupletToMx(tuplet):
+    '''
+    return a tuple of mxTimeModification and mxTuplet from
+    a :class:`~music21.duration.Tuplet` object
+    
+    >>> from music21 import *
+    >>> a = duration.Tuplet(6, 4, "16th")
+    >>> a.type = 'start'
+    >>> a.bracket = True
+    >>> b, c = musicxml.translate.tupletToMx(a)
+    '''
+    mxTimeModification = musicxmlMod.TimeModification()
+    mxTimeModification.set('actual-notes', tuplet.numberNotesActual)
+    mxTimeModification.set('normal-notes', tuplet.numberNotesNormal)
+    mxTimeModification.set('normal-type', tuplet.durationNormal.type)
+    if tuplet.durationNormal.dots > 0: # only one dot supported...
+        mxTimeModification.set('normal-dot', True)
+        if tuplet.durationNormal.dots > 1:
+            environLocal.warn("Converting a tuplet based on notes with %d dots to a single dotted tuplet; musicxml does not support these tuplets" % tuplet.durationNormal.dots)
+    # need to permit a tuplet type that is startStop, that
+    # create two mxTuplet objects, one for starting and one
+    # for stopping
+    # can have type 'start' with bracket 'no'
+    mxTupletList = []
+    if tuplet.type not in [None, '']:
+        if tuplet.type not in ['start', 'stop', 'startStop']:
+            raise TranslateException("Cannot create music XML from a tuplet of type " + tuplet.type)
 
+        if tuplet.type == 'startStop': # need two mxObjects
+            localType = ['start', 'stop']
+        else:
+            localType = [tuplet.type] # place in list
+
+        for type in localType:
+            mxTuplet = musicxmlMod.Tuplet()
+            # start/stop; needs to bet set by group
+            mxTuplet.set('type', type) 
+            # only provide other parameters if this tuplet is a start
+            if type == 'start':
+                mxTuplet.set('bracket', musicxmlMod.booleanToYesNo(
+                             tuplet.bracket)) 
+                mxTuplet.set('placement', tuplet.placement)
+                if tuplet.tupletActualShow == 'none':
+                    mxTuplet.set('show-number', 'none') 
+            # append each
+            mxTupletList.append(mxTuplet)
+
+    return mxTimeModification, mxTupletList
+
+def mxToTuplet(mxNote, inputM21Object = None):
+    '''
+    Given an mxNote, based on mxTimeModification 
+    and mxTuplet objects, return a Tuplet object
+    (or alter the input object and then return it)
+
+    ''' 
+    if inputM21Object is None:
+        t = duration.Tuplet()
+    else:
+        t = inputM21Object
+    if t.frozen is True:
+        raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
+
+    mxTimeModification = mxNote.get('timeModificationObj')
+    #environLocal.printDebug(['got mxTimeModification', mxTimeModification])
+
+    t.numberNotesActual = int(mxTimeModification.get('actual-notes'))
+    t.numberNotesNormal = int(mxTimeModification.get('normal-notes'))
+    mxNormalType = mxTimeModification.get('normal-type')
+    # TODO: implement dot
+    mxNormalDot = mxTimeModification.get('normal-dot')
+
+    if mxNormalType != None:
+        # this value does not seem to frequently be supplied by mxl
+        # encodings, unless it is different from the main duration
+        # this sets both actual and noraml types to the same type
+        t.setDurationType(musicXMLTypeToType(
+                                mxTimeModification.get('normal-type')))
+    else: # set to type of duration
+        t.setDurationType(musicXMLTypeToType(mxNote.get('type')))
+
+    mxNotations = mxNote.get('notationsObj')
+    #environLocal.printDebug(['got mxNotations', mxNotations])
+
+    if mxNotations != None and len(mxNotations.getTuplets()) > 0:
+        mxTuplet = mxNotations.getTuplets()[0] # a list, but only use first
+        #environLocal.printDebug(['got mxTuplet', mxTuplet])
+
+        t.type = mxTuplet.get('type') 
+        t.bracket = musicxmlMod.yesNoToBoolean(mxTuplet.get('bracket'))
+        #environLocal.printDebug(['got bracket', self.bracket])
+
+        t.placement = mxTuplet.get('placement') 
+
+    return t
 
 #-------------------------------------------------------------------------------
 # Meters
@@ -1168,7 +1518,7 @@ def timeSignatureToMusicXML(ts):
 #         m.append(note.Rest())
     out = stream.Stream()
     out.append(tsCopy)
-    return out.musicxml
+    return music21ObjectToMusicXML(out)
 
 #-------------------------------------------------------------------------------
 # Dyanmics
@@ -2460,7 +2810,7 @@ def generalNoteToMusicXML(n):
     out.append(nCopy)
 
     # call the musicxml property on Stream
-    return out.musicxml
+    return music21ObjectToMusicXML(out)
 
 def noteheadToMxNotehead(obj, defaultColor=None):
     '''
@@ -2784,7 +3134,6 @@ def mxToRest(mxNote, inputM21=None):
     If an `inputM21` object reference is provided, this object will be configured; otherwise, a new :class:`~music21.note.Rest` object is created and returned.
     '''
     from music21 import note
-    from music21 import duration
 
     if inputM21 == None:
         r = note.Rest()
@@ -2812,7 +3161,6 @@ def mxToRest(mxNote, inputM21=None):
 def measureToMx(m, spannerBundle=None, mxTranspose=None):
     '''Translate a :class:`~music21.stream.Measure` to a MusicXML :class:`~music21.musicxml.Measure` object.
     '''
-    from music21 import duration
 
     #environLocal.printDebug(['measureToMx(): m.isSorted:', m.isSorted, 'm._mutable', m._mutable, 'len(spannerBundle)', len(spannerBundle)])
     if spannerBundle is not None:
@@ -3562,16 +3910,21 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     return m, staffReference, transposition
 
 def measureToMusicXML(m):
-    '''Translate a music21 Measure into a complete MusicXML string representation.
+    '''Translate a music21 Measure into a 
+    complete MusicXML string representation.
 
-    Note: this method is called for complete MusicXML representation of a Measure, not for partial solutions in Part or Stream production.
+    Note: this method is called for complete MusicXML 
+    representation of a Measure, not for partial 
+    solutions in Part or Stream production.
 
     >>> from music21 import *
     >>> m = stream.Measure()
     >>> m.repeatAppend(note.Note('g3'), 4)
     >>> post = musicxml.translate.measureToMusicXML(m)
+    >>> len(post) > 1000
+    True
     '''
-    from music21 import stream, duration
+    from music21 import stream
     # search for time signatures, either defined locally or in context
     #environLocal.printDebug(['measureToMusicXML', m]) 
     # we already have a deep copy passed in, which happens in 
@@ -3581,7 +3934,7 @@ def measureToMusicXML(m):
     out = stream.Part()
     out.append(m)
     # call the musicxml property on Stream
-    return out.musicxml
+    return music21ObjectToMusicXML(out)
 
 
 
@@ -4308,7 +4661,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual([e.offset for e in m1.voices[1]], [0.0, 2.0, 2.5, 3.0, 3.5])
         self.assertEqual([e.offset for e in m1.voices['2']], [0.0, 2.0, 2.5, 3.0, 3.5])
-        post = s.musicxml
+        raw = music21ObjectToMusicXML(s)
         #s.show()
 
 
@@ -4325,7 +4678,7 @@ class Test(unittest.TestCase):
 
         # try to get all spanners from the first note
         self.assertEqual(len(s.flat.notesAndRests[0].getAllContextsByClass('Spanner')), 5)
-        post = s.musicxml
+        post = music21ObjectToMusicXML(s)
         #s.show('t')
         #s.show()
 
@@ -4456,7 +4809,7 @@ class Test(unittest.TestCase):
         s.insert(0, p)
         #s.show()
 
-        musicxml = s.musicxml
+        musicxml = music21ObjectToMusicXML(s)
         #print musicxml
         match = """<direction>
         <direction-type>
@@ -4535,7 +4888,9 @@ spirit</words>
         self.assertEqual(len(s.flat.getElementsByClass(repeat.Fine)), 1)
         self.assertEqual(len(s.flat.getElementsByClass(repeat.DalSegnoAlFine)), 1)
 
-        raw = s.musicxml
+        # test roundtrip output
+        raw = music21ObjectToMusicXML(s)
+
         self.assertEqual(raw.find('<segno') > 0, True)
         self.assertEqual(raw.find('Fine') > 0, True)
         self.assertEqual(raw.find('D.S. al Fine') > 0, True)
@@ -4546,7 +4901,8 @@ spirit</words>
         # has one d.c.al coda
         self.assertEqual(len(s.flat.getElementsByClass(repeat.DaCapoAlCoda)), 1)
 
-        raw = s.musicxml
+        raw = music21ObjectToMusicXML(s)
+
         self.assertEqual(raw.find('<coda') > 0, True)
         self.assertEqual(raw.find('D.C. al Coda') > 0, True)
 
@@ -4558,7 +4914,10 @@ spirit</words>
         # there are 2 for each part, totaling 8
         self.assertEqual(len(s.flat.getElementsByClass('RepeatBracket')), 8)
         # can get for each part as spanners are stored in Part now
-        raw = s.parts[1].musicxml
+
+        # test roundtrip output
+        raw = music21ObjectToMusicXML(s.parts[1])
+
         self.assertEqual(raw.find("""<ending number="1" type="start"/>""") > 1, True)
         self.assertEqual(raw.find("""<ending number="1" type="stop"/>""") > 1, True)
 
@@ -4625,7 +4984,11 @@ spirit</words>
         mms = s.flat.getElementsByClass('TempoIndication')
         self.assertEqual(len(mms) > 3, True)
         #s.show()
-        raw = s.musicxml.replace(' ', '').replace('\n', '')
+
+        # test roundtrip output
+        raw = music21ObjectToMusicXML(s)
+
+        raw = raw.replace(' ', '').replace('\n', '')
         match = '<beat-unit>long</beat-unit><per-minute>100.0</per-minute>'
         self.assertEqual(raw.find(match) > 0, True)
 
@@ -4659,7 +5022,7 @@ spirit</words>
         # default quarter assumed
         p.insert(0, tempo.MetronomeMark(number=121.6))
 
-        raw = p.musicxml
+        raw = music21ObjectToMusicXML(p)
         match1 = '<beat-unit>quarter</beat-unit>'
         match2 = '<per-minute>121.6</per-minute>'
         self.assertEqual(raw.find(match1) > 0, True)
@@ -4674,7 +5037,7 @@ spirit</words>
         p.insert(0, tempo.MetronomeMark(number=222.2,
                 referent=duration.Duration(quarterLength=.75)))
         #p.show()
-        raw = p.musicxml
+        raw = music21ObjectToMusicXML(p)
         match1 = '<beat-unit>eighth</beat-unit>'
         match2 = '<beat-unit-dot/>'
         match3 = '<per-minute>222.2</per-minute>'
@@ -4695,7 +5058,7 @@ spirit</words>
                 referent=duration.Duration(quarterLength=.25)))
         #p.show()
 
-        raw = p.musicxml
+        raw = music21ObjectToMusicXML(p)
         match1 = '<beat-unit>eighth</beat-unit>'
         match2 = '<beat-unit-dot/>'
         match3 = '<per-minute>222.2</per-minute>'
@@ -4717,7 +5080,7 @@ spirit</words>
 
         match1 = '<words default-y="45.0" font-weight="bold" justify="left">super fast</words>'
         match2 = '<per-minute>222.2</per-minute>'
-        raw = p.musicxml
+        raw = music21ObjectToMusicXML(p)
         self.assertEqual(raw.find(match1) > 0, True)
         self.assertEqual(raw.find(match2) > 0, True)
 
@@ -4727,7 +5090,7 @@ spirit</words>
         p.insert(0, tempo.MetronomeMark(number=132))
         match1 = '<words default-y="45.0" font-weight="bold" justify="left">fast</words>'
         match2 = '<per-minute>132</per-minute>'
-        raw = p.musicxml
+        raw = music21ObjectToMusicXML(p)
         self.assertEqual(raw.find(match1) > 0, False)
         self.assertEqual(raw.find(match2) > 0, True)
 
@@ -4739,7 +5102,8 @@ spirit</words>
         # text but no number
         match1 = '<words default-y="45.0" font-weight="bold" justify="left">very slowly</words>'
         match2 = '<per-minute>'
-        raw = p.musicxml
+        
+        raw = music21ObjectToMusicXML(p)
         self.assertEqual(raw.find(match1) > 0, True)
         self.assertEqual(raw.find(match2) > 0, False)
 
@@ -4753,7 +5117,8 @@ spirit</words>
         # default quarter assumed
         p.insert(0, tempo.MetronomeMark('super slow', number=30.2))
 
-        raw = p.musicxml
+        raw = music21ObjectToMusicXML(p)
+
         match1 = '<sound tempo="30.2"/>'
         self.assertEqual(raw.find(match1) > 0, True)
         #p.show()
@@ -4772,7 +5137,7 @@ spirit</words>
         p.insert(12, tempo.MetronomeMark(number=240, referent=.25))
         #p.show()
 
-        raw = p.musicxml
+        raw = music21ObjectToMusicXML(p)
         match1 = '<sound tempo="30.0"/>'
         self.assertEqual(raw.find(match1) > 0, True)
         match2 = '<sound tempo="60.0"/>'
@@ -4815,7 +5180,7 @@ spirit</words>
         m3.insert(0, mmod2)
 
         s.append([m1, m2, m3])
-        raw = s.musicxml
+        raw = music21ObjectToMusicXML(s)
 
         match = '<sound tempo="60.0"/>'
         self.assertEqual(raw.find(match) > 0, True)
@@ -4846,7 +5211,7 @@ spirit</words>
         n = note.Note('c3')
         n.notehead = 'diamond'
 
-        out = n.musicxml
+        out = music21ObjectToMusicXML(n)
         match1 = '<notehead>diamond</notehead>'
         self.assertEqual(out.find(match1) > 0, True)
 
@@ -4899,7 +5264,8 @@ spirit</words>
             p.append(note)
 
         #p.show()
-        raw = p.musicxml
+        raw = music21ObjectToMusicXML(p)
+
         self.assertEqual(raw.find('<notehead>diamond</notehead>') > 0, True)
         self.assertEqual(raw.find('<notehead>square</notehead>') > 0, True)
         self.assertEqual(raw.find('<notehead>triangle</notehead>') > 0, True)
@@ -4922,7 +5288,7 @@ spirit</words>
 
         n = note.Note('c3')
         n.notehead = 'cross'
-        noteMusicXML = n.musicxml
+        noteMusicXML = music21ObjectToMusicXML(n)
         m = converter.parse(noteMusicXML)
         self.assertEqual(m.flat.notes[0].notehead, 'cross')
 
@@ -4944,7 +5310,7 @@ spirit</words>
         p.append(n1)
         p.append(n2)
 
-        xml = p.musicxml
+        xml = music21ObjectToMusicXML(p)
         m = converter.parse(xml)
         self.assertEqual(m.flat.notes[0].notehead, 'diamond')
         self.assertEqual(m.flat.notes[1].notehead, 'cross')
@@ -4962,7 +5328,7 @@ spirit</words>
         n1._setStemDirection('double')
         p = stream.Part()
         p.append(n1)
-        xml = p.musicxml
+        xml = music21ObjectToMusicXML(p)
         match1 = '<stem>double</stem>'
         self.assertEqual(xml.find(match1) > 0, True)
 
@@ -4977,7 +5343,7 @@ spirit</words>
         p = stream.Part()
         p.append(n1)
 
-        xml = p.musicxml
+        xml = music21ObjectToMusicXML(p)
         m = converter.parse(xml)
         self.assertEqual(m.flat.notes[0].stemDirection, 'double')
 
@@ -4996,7 +5362,8 @@ spirit</words>
         n2.stemDirection = 'noStem'
         c = chord.Chord([n1, n2])
         c.quarterLength = 2
-        xml = c.musicxml
+        
+        xml = music21ObjectToMusicXML(c)
         #c.show()
         input = converter.parse(xml)
         chordResult = input.flat.notes[0]
@@ -5045,7 +5412,8 @@ spirit</words>
         s.insert([0, p1, 0, p2, 0, p3, 0, p4, 0, p5, 0, p6, 0, p7, 0, p8, 0, sg1, 0, sg2, 0, sg3, 0, sg4])
         #s.show()
 
-        raw = s.musicxml
+        raw = music21ObjectToMusicXML(s)
+
         match = '<group-symbol>brace</group-symbol>'
         self.assertEqual(raw.find(match) > 0, True)
         match = '<group-symbol>bracket</group-symbol>'
@@ -5075,7 +5443,8 @@ spirit</words>
 
         #s.show()
         # check output
-        raw = s.musicxml
+        raw = music21ObjectToMusicXML(s)
+
         self.assertEqual(raw.find('<diatonic>-5</diatonic>') > 0, True)
         self.assertEqual(raw.find('<chromatic>-9</chromatic>') > 0, True)
         self.assertEqual(raw.find('<diatonic>-1</diatonic>') > 0, True)
@@ -5134,7 +5503,8 @@ spirit</words>
         self.assertEqual(len(s.flat.getElementsByClass('Instrument')), 7)
         #s.show()
 
-        raw = s.musicxml
+        raw = music21ObjectToMusicXML(s)
+
         self.assertEqual(raw.count('<transpose>'), 6)
 
 
@@ -5213,7 +5583,7 @@ spirit</words>
         s.append(h7)
 
         #s.show()
-        raw = s.musicxml
+        raw = music21ObjectToMusicXML(s)
         self.assertEqual(raw.find('<kind text="m7">minor-seventh</kind>') > 0, True)
         self.assertEqual(raw.find('<kind text="7">dominant</kind>') > 0, True)
         self.assertEqual(raw.find('<kind text="Maj7">major-seventh</kind>') > 0, True)
@@ -5245,7 +5615,7 @@ spirit</words>
         s = stream.Stream()
         s.append(h)
         #s.show()
-        raw = s.musicxml
+        raw = music21ObjectToMusicXML(s)
         self.assertEqual(raw.find('<root-alter>-1</root-alter>') > 0, True)
         self.assertEqual(raw.find('<degree-value>3</degree-value>') > 0, True)
         self.assertEqual(raw.find('<degree-type>alter</degree-type>') > 0, True)
@@ -5255,10 +5625,12 @@ spirit</words>
         from music21 import chord
         c = chord.Chord(['c4', 'g4'])
         c[0].noteheadFill = 'no'
-        raw = c.musicxml
+
+        raw = music21ObjectToMusicXML(c)
         self.assertEqual(raw.count('<notehead filled="no">normal</notehead>'), 1)
+        
         c[1].noteheadFill = 'no'
-        raw = c.musicxml
+        raw = music21ObjectToMusicXML(c)
         self.assertEqual(raw.count('<notehead filled="no">normal</notehead>'), 2)
 
     def testSummedNumerators(self):
@@ -5280,7 +5652,8 @@ spirit</words>
             n.quarterLength = 0.5
             m.repeatAppend(n, 5)
             s.append(m)
-        raw = s.musicxml
+        raw = music21ObjectToMusicXML(s)
+
 
 
     def testOrnamentA(self):
@@ -5298,7 +5671,7 @@ spirit</words>
         s.notes[7].expressions.append(expressions.Mordent())
         s.notes[5].expressions.append(expressions.InvertedMordent())
 
-        raw = s.musicxml
+        raw = music21ObjectToMusicXML(s)
         #s.show()
 
         self.assertEqual(raw.count('<trill-mark'), 2)
@@ -5378,7 +5751,7 @@ spirit</words>
         s.append([n1, n2, n3, r1, c1])
         #s.show()
 
-        raw = s.musicxml
+        raw = music21ObjectToMusicXML(s)
         # three color indications
         self.assertEqual(raw.count("color="), 8) #exports to notehead AND note, so increased from 6 to 8
         # color set at note level only for rest, so only 1
@@ -5391,7 +5764,7 @@ spirit</words>
 
         s = converter.parse(testPrimitive.colors01)
         #s.show()
-        raw = s.musicxml
+        raw = music21ObjectToMusicXML(s)
         expectedColors = 8
         self.assertEqual(raw.count("color="), expectedColors, 'did not find the correct number of color statements: %d != %d \n %s' % (raw.count("color="), expectedColors, raw)) #exports to notehead AND note, so increased from 6 to 8
         # color set at note level only for rest, so only 1
@@ -5445,7 +5818,7 @@ spirit</words>
         tb1.style = 'italic'
         s.append(tb1)
 
-        raw = s.musicxml
+        raw = music21ObjectToMusicXML(s)
         self.assertEqual(raw.count('</credit>'), 5)
         self.assertEqual(raw.count('font-size'), 5)
 
@@ -5466,7 +5839,8 @@ spirit</words>
         self.assertEqual(id(n2) == slurs[0].getComponentIds()[1], True)
 
         #environLocal.pd(['n2', n2, 'id(n2)', id(n2), slurs[0].getComponentIds()])
-        raw = s.musicxml
+        # test roundtrip output
+        raw = music21ObjectToMusicXML(s)
         self.assertEqual(raw.count('<slur'), 4) # 2 pairs of start/stop
         #s.show()
 
@@ -5480,7 +5854,8 @@ spirit</words>
         self.assertEqual(len(s.flat.getElementsByClass('Crescendo')), 1)
         self.assertEqual(len(s.flat.getElementsByClass('Diminuendo')), 1)
 
-        raw = s.musicxml # test roundtrip output
+        # test roundtrip output
+        raw = music21ObjectToMusicXML(s)
         self.assertEqual(raw.count('type="crescendo"'), 1)
         self.assertEqual(raw.count('type="diminuendo"'), 1)
         #s.show('t')
@@ -5494,7 +5869,9 @@ spirit</words>
         # this produces a single component cresc
         s = converter.parse(testPrimitive.directions31a)
         self.assertEqual(len(s.flat.getElementsByClass('Crescendo')), 2)
-        raw = s.musicxml # test roundtrip output
+
+        # test roundtrip output
+        raw = music21ObjectToMusicXML(s)
         self.assertEqual(raw.count('type="crescendo"'), 2)
 
         #s.show()
@@ -5507,7 +5884,7 @@ spirit</words>
         s = converter.parse(testPrimitive.directions31a)
         #s.show()
         self.assertEqual(len(s.flat.getElementsByClass('Line')), 2)
-        raw = s.musicxml # test roundtrip output
+        raw = music21ObjectToMusicXML(s)
         self.assertEqual(raw.count('<bracket'), 4)
 
 
@@ -5518,7 +5895,7 @@ spirit</words>
         s = converter.parse(testPrimitive.spanners33a)
         #s.show()
         self.assertEqual(len(s.flat.getElementsByClass('Line')), 6)
-        raw = s.musicxml # test roundtrip output
+        raw = music21ObjectToMusicXML(s) # test roundtrip output
         self.assertEqual(raw.count('<bracket'), 12)
 
 
@@ -5528,7 +5905,7 @@ spirit</words>
         s = converter.parse(testPrimitive.notations32a)
         #s.show()
         self.assertEqual(len(s.flat.getElementsByClass('TrillExtension')), 2)
-        raw = s.musicxml # test roundtrip output
+        raw = music21ObjectToMusicXML(s) # test roundtrip output
         self.assertEqual(raw.count('<wavy-line'), 4)
 
 
@@ -5538,7 +5915,7 @@ spirit</words>
         s = converter.parse(testPrimitive.spanners33a)
         #s.show()
         self.assertEqual(len(s.flat.getElementsByClass('Glissando')), 1)
-        raw = s.musicxml # test roundtrip output
+        raw = music21ObjectToMusicXML(s) # test roundtrip
         self.assertEqual(raw.count('<glissando'), 2)
 
 
@@ -5552,7 +5929,7 @@ spirit</words>
 
         #s.show()
 
-        raw = s.musicxml # test roundtrip output
+        raw = music21ObjectToMusicXML(s)
         self.assertEqual(raw.count('<bracket'), 12)
 
 
@@ -5566,7 +5943,8 @@ spirit</words>
         #print match
         self.assertEqual(match, ['D5', 'C5', 'E5', 'D5', 'C5', 'D5', 'C5', 'D5', 'C5', 'D5', 'C5', 'E5', 'D5', 'C5', 'D5', 'C5', 'D5', 'C5', 'E5', 'E5', 'F4', 'C5', 'D#5', 'C5', 'D-5', 'A-4', 'C5', 'C5'])
 
-        raw = s.musicxml
+        # test roundtrip output
+        raw = music21ObjectToMusicXML(s)
         self.assertEqual(raw.count('<grace'), 15)
 
 
@@ -5587,7 +5965,8 @@ spirit</words>
         s.append([ng1, n1, ng2, n2])
         #s.show()
 
-        raw = s.musicxml
+        # test roundtrip output
+        raw = music21ObjectToMusicXML(s)
         self.assertEqual(raw.count('slash="no"'), 1)
         self.assertEqual(raw.count('slash="yes"'), 1)
 
@@ -5613,9 +5992,75 @@ spirit</words>
 
 
 
+class TestExternal(unittest.TestCase):
+    pass
 
+    def runTest(self):
+        pass
+    
+    def testShowAllTypes(self):
+        '''
+        show all known types to display
+        
+        tests music21ObjectToMusicXML()
+        '''
+        from music21 import stream, note, duration, chord, dynamics, meter, scale, pitch
+        
+        m = stream.Measure()
+        n = note.Note("D#6")
+        m.repeatAppend(n, 6)
+        m.show()
 
+        s = stream.Stream()
+        s.repeatAppend(n, 6)
+        s.show()
+        
+        s = stream.Score()
+        s.repeatAppend(n, 6)
+        s.show()
+        
+        s = stream.Score()
+        p = stream.Part()
+        p.repeatAppend(n, 6)
+        p2 = stream.Part()
+        p2.repeatAppend(n, 6)
+        s.insert(0, p)
+        s.insert(0, p2)
+        s.show()
+        #emptyStream
+        s = stream.Stream()
+        s.show()
+        p2.show()
 
+        n.show()
+        
+        c = chord.Chord(['C3','D4','E5'])
+        c.show()
+        
+        r = note.Rest()
+        r.show()
+        
+        p = pitch.Pitch()
+        p.show()
+        
+        d = duration.Duration(2.0)
+        d.show()
+        
+        #empty duration!
+        d = duration.Duration()
+        d.show()
+
+        mf = dynamics.Dynamic('mf')
+        mf.show()
+        
+        cm = scale.MajorScale('C')
+        cm.show()
+        
+        o = scale.OctatonicScale("C#4")
+        o.show()
+        
+        ts = meter.TimeSignature('3/4')
+        ts.show()
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

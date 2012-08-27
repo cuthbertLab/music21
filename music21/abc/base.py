@@ -31,6 +31,8 @@ except:
 
 from music21 import common
 from music21 import environment
+from music21 import exceptions21
+
 _MOD = 'abc.base.py'
 environLocal = environment.Environment(_MOD)
 
@@ -69,14 +71,14 @@ reChord = re.compile('[.*?]') # non greedy
 
 
 #-------------------------------------------------------------------------------
-class ABCTokenException(Exception):
+class ABCTokenException(exceptions21.Music21Exception):
     pass
 
-class ABCHandlerException(Exception):
+class ABCHandlerException(exceptions21.Music21Exception):
     pass
 
 
-class ABCFileException(Exception):
+class ABCFileException(exceptions21.Music21Exception):
     pass
 
 
