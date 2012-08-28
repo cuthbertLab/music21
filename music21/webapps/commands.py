@@ -11,8 +11,7 @@ from music21 import stream
 from music21 import harmony
 from music21 import scale
 from music21 import clef
-
-from music21.demos.theoryAnalysis import theoryAnalyzer
+from music21.theoryAnalysis import theoryAnalyzer
 
 import random
 

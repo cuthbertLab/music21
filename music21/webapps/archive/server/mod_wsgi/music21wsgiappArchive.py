@@ -32,7 +32,7 @@
 #  - cmd is a string, delimited by spaces, determining which function(s) to execute
 
 from music21 import *
-import music21.demos.theoryAnalysis.theoryAnalyzer
+import music21.theoryAnalysis.theoryAnalyzer
 
 import json
 
@@ -43,15 +43,14 @@ import itertools
 import sys
 
 # Used for Music Theory Examples
-from music21.demos.theoryAnalysis import *
+from music21.theoryAnalysis import *
 
 # Used for Theory Analyzer And WWNorton
-from music21.demos.theoryAnalysis.theoryAnalyzer import *
-from music21.demos.theoryAnalysis.wwnortonMGTA import *
+from music21.theoryAnalysis.theoryAnalyzer import *
+from music21.theoryAnalysis.wwnortonMGTA import *
 
 # Used for previous demonstrations:
 from music21.figuredBass import checker
-from music21.demos.bhadley import hack
 
 # Emailing:
 import smtplib
@@ -588,44 +587,45 @@ def reduction(obj):
     obj['sc'] = sc
     obj['message'] = obj['message'] + "Score Reduced "
 
-# Beth's code for chord symbols: returns answer if returnType = 'answerkey'
-def checkLeadSheetPitches(obj):
-    sc = obj['sc'];
-    nicePiece = sc
-    incorrectPiece = sc
-    
-    #incorrectPiece = messageconverter.parse('C:\Users\sample.xml')
-    
-    sopranoLine = nicePiece.getElementsByClass(stream.Part)[0]
-    chordLine = nicePiece.getElementsByClass(stream.Part)[1]
-    #chordLine.show('text')
-    #bassLine = nicePiece.part(2)
-    s = harmony.getDuration(sopranoLine)
-    onlyChordSymbols = s.flat.getElementsByClass(harmony.ChordSymbol)
-    newStream = stream.PartStaff()
-    newStream.append(clef.BassClef())
-    answerKey = stream.Score()
-    answerKey.append(sopranoLine)
-    for chordSymbol in onlyChordSymbols:
-        newStream.append(hack.realizePitches(chordSymbol))
-    
-    answerKey.insert(0,newStream)
-    
-    correctedAssignment, numCorrect = hack.correctChordSymbols(answerKey, incorrectPiece)
-    correctedAssignment.show('text')
-    answerKey.show('text')
-    
-    if returnType == 'answerkey':
-        returnScore = answerKey
-        message = 'Answer key displayed '
-    else: 
-        returnScore = correctedAssignment
-        message = 'You got '+str(numCorrect)+' percent correct '
-
-    obj['sc'] = returnScore;
-    obj['message'] = obj['message'] + message
-    
-    return obj
+## Beth's code for chord symbols: returns answer if returnType = 'answerkey'
+# this is way too outdated to even try to fix it now...
+#def checkLeadSheetPitches(obj):
+#    sc = obj['sc'];
+#    nicePiece = sc
+#    incorrectPiece = sc
+#    
+#    #incorrectPiece = messageconverter.parse('C:\Users\sample.xml')
+#    
+#    sopranoLine = nicePiece.getElementsByClass(stream.Part)[0]
+#    chordLine = nicePiece.getElementsByClass(stream.Part)[1]
+#    #chordLine.show('text')
+#    #bassLine = nicePiece.part(2)
+#    s = harmony.getDuration(sopranoLine)
+#    onlyChordSymbols = s.flat.getElementsByClass(harmony.ChordSymbol)
+#    newStream = stream.PartStaff()
+#    newStream.append(clef.BassClef())
+#    answerKey = stream.Score()
+#    answerKey.append(sopranoLine)
+#    for chordSymbol in onlyChordSymbols:
+#        newStream.append(hack.realizePitches(chordSymbol))
+#    
+#    answerKey.insert(0,newStream)
+#    
+#    correctedAssignment, numCorrect = hack.correctChordSymbols(answerKey, incorrectPiece)
+#    correctedAssignment.show('text')
+#    answerKey.show('text')
+#    
+#    if returnType == 'answerkey':
+#        returnScore = answerKey
+#        message = 'Answer key displayed '
+#    else: 
+#        returnScore = correctedAssignment
+#        message = 'You got '+str(numCorrect)+' percent correct '
+#
+#    obj['sc'] = returnScore;
+#    obj['message'] = obj['message'] + message
+#    
+#    return obj
 
 # Jose's Methods for Theory Checking - result is an array of measure numbers where the errors occurred
 # Jose's methods modify sc in place, coloring the notes red.

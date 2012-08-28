@@ -66,7 +66,7 @@ __all__ = ['base',
            'noteworthy',
            'romanText', 
            'scala', 
-           'test', 'trecento',
+           'test', 'theoryAnalysis', 'trecento',
            'vexflow',
            'webapps', 
            

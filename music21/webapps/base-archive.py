@@ -29,8 +29,7 @@ from music21 import features
 from music21 import harmony
 from music21 import clef
 from music21 import tempo
-from music21.demos.bhadley import hack
-from music21.demos.theoryAnalysis import theoryAnalyzer
+from music21.theoryAnalysis import theoryAnalyzer
 
 import json
 import zipfile
@@ -654,42 +653,43 @@ def createMensuralCanon(sc):
     
     return canonStream
 
-def checkLeadSheetPitches(sc, returnType=''):
-    '''
-    Beth's code for chord symbols: returns answer if returnType = 'answerkey'
-    '''
-    nicePiece = sc
-    incorrectPiece = sc
-    
-    #incorrectPiece = messageconverter.parse('C:\Users\sample.xml')
-    
-    sopranoLine = nicePiece.getElementsByClass(stream.Part)[0]
-    chordLine = nicePiece.getElementsByClass(stream.Part)[1]
-    #chordLine.show('text')
-    #bassLine = nicePiece.part(2)
-    onlyChordSymbols = sopranoLine.flat.getElementsByClass(harmony.ChordSymbol)
-    newStream = stream.PartStaff()
-    newStream.append(clef.BassClef())
-    answerKey = stream.Score()
-    answerKey.append(sopranoLine)
-    for chordSymbol in onlyChordSymbols:
-        newStream.append(hack.realizePitches(chordSymbol))
-    
-    answerKey.insert(0,newStream)
-    
-    correctedAssignment, numCorrect = hack.correctChordSymbols(answerKey, incorrectPiece)
-    correctedAssignment.show('text')
-    answerKey.show('text')
-    
-    if returnType == 'answerkey':
-        returnScore = answerKey
-        message = 'answer key displayed'
-    else: 
-        returnScore = correctedAssignment
-        message = 'you got '+str(numCorrect)+' percent correct'
-
-    
-    return returnScore
+# not maintained for now
+#def checkLeadSheetPitches(sc, returnType=''):
+#    '''
+#    Beth's code for chord symbols: returns answer if returnType = 'answerkey'
+#    '''
+#    nicePiece = sc
+#    incorrectPiece = sc
+#    
+#    #incorrectPiece = messageconverter.parse('C:\Users\sample.xml')
+#    
+#    sopranoLine = nicePiece.getElementsByClass(stream.Part)[0]
+#    chordLine = nicePiece.getElementsByClass(stream.Part)[1]
+#    #chordLine.show('text')
+#    #bassLine = nicePiece.part(2)
+#    onlyChordSymbols = sopranoLine.flat.getElementsByClass(harmony.ChordSymbol)
+#    newStream = stream.PartStaff()
+#    newStream.append(clef.BassClef())
+#    answerKey = stream.Score()
+#    answerKey.append(sopranoLine)
+#    for chordSymbol in onlyChordSymbols:
+#        newStream.append(hack.realizePitches(chordSymbol))
+#    
+#    answerKey.insert(0,newStream)
+#    
+#    correctedAssignment, numCorrect = hack.correctChordSymbols(answerKey, incorrectPiece)
+#    correctedAssignment.show('text')
+#    answerKey.show('text')
+#    
+#    if returnType == 'answerkey':
+#        returnScore = answerKey
+#        message = 'answer key displayed'
+#    else: 
+#        returnScore = correctedAssignment
+#        message = 'you got '+str(numCorrect)+' percent correct'
+#
+#    
+#    return returnScore
 
 def colorAllNotes(sc, color):
     '''
