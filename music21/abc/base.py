@@ -988,6 +988,11 @@ class ABCNote(ABCToken):
         ('Cn5', True)
         >>> an._getPitchName("z4") 
         (None, None)
+        
+        Grace note
+        >>> an._getPitchName("{c}")
+        ('C5', None)
+
 
         >>> an.activeKeySignature = key.KeySignature(3)
         >>> an._getPitchName("c") # w/ key, change and set to false
@@ -1109,7 +1114,6 @@ class ABCNote(ABCToken):
 
         >>> an._getQuarterLength('A', forceDefaultQuarterLength=1)
         1.875
-
         '''
         if forceDefaultQuarterLength != None:
             activeDefaultQuarterLength = forceDefaultQuarterLength

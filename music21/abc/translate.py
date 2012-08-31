@@ -347,7 +347,8 @@ def abcToStreamScore(abcHandler, inputM21=None):
 def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     '''Convert a multi-work stream into one or more complete works packed into a an Opus Stream. 
 
-    If a `number` argument is given, and a work is defined by that number, that work is returned. 
+    If a `number` argument is given, and a work is defined by 
+    that number, that work is returned. 
     '''
     from music21 import stream
 
@@ -444,7 +445,10 @@ def reBar(music21Part, inPlace=True):
             m1, m2 = music21Measure.splitAtQuarterLength(tsEnd)
             m2.timeSignature = None
             if lastTimeSignature.barDuration.quarterLength != m2.highestTime:
-                m2.timeSignature = m2.bestTimeSignature()
+                try:
+                    m2.timeSignature = m2.bestTimeSignature()
+                except stream.StreamException as e:
+                    raise ABCTranslateException("Problem with measure %d (%r): %s" % (music21Measure.number, music21Measure, e))
                 if measureIndex != len(allMeasures) - 1:
                     if allMeasures[measureIndex+1].timeSignature is None:
                         allMeasures[measureIndex+1].timeSignature = lastTimeSignature

@@ -255,15 +255,15 @@ The `type` for these odd values is called "complex":
 >>> dottedQuarter.type
 'complex'
 
-*(There's one more strange `type` called "zero" for
+*(There's one more strange* `type` *called "zero" for
 Durations that don't have any Duration at all.  It's
 used for measuring the conceptual length of grace notes,
-spaceless objects like `Clefs`, Kim Kardashian's marriages,
+spaceless objects like* `Clefs`, *Kim Kardashian's marriages,
 etc.  We'll get to it later)*
 
 The :meth:`~music21.base.Music21Object.show` method 
-will show that weird 2.25 Duration, giving it a square `Notehead`
-and putting it at C4 so you can see it: 
+will show that weird `2.25` Duration, giving it a square `Notehead`
+and putting it at `C4` so you can see it: 
 
 >>> dottedQuarter.show()    
 

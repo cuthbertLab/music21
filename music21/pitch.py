@@ -4154,7 +4154,7 @@ class Pitch(base.Music21Object):
                 soundingPitch = pitchList[0]
             
         noteOut = note.Note(soundingPitch.nameWithOctave)
-        noteOut.noteheadParen = True
+        noteOut.noteheadParenthesis = True
         noteOut.noteheadFill = 'yes'
         noteOut.stemDirection = 'noStem'
         

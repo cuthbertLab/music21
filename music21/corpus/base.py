@@ -168,16 +168,19 @@ _pathsCache = {}
 _pathsLocalTemp = [] 
 
 def getCorePaths(extList=None, expandExtensions=True):    
-    '''Get all paths in the corpus that match a known extension, or an extenion
+    '''
+    Get all paths in the corpus that match a known extension, or an extenion
     provided by an argument.
 
-    If `expandExtensions` is True, a format for an extension, and related extensions, will replaced by all known input extensions. This is convenient when an input format might match for multiple extensions.
+    If `expandExtensions` is True, a format for an extension, 
+    and related extensions, will replaced by all known input extensions. 
+    This is convenient when an input format might match for multiple extensions.
 
     >>> from music21 import *
     
     >>> a = corpus.getCorePaths()
     >>> len(a) # the current number of paths; update when adding to corpus
-    2331
+    2330
     >>> a = corpus.getCorePaths('krn')
     >>> len(a) >= 4
     True
@@ -897,6 +900,34 @@ def compressXML(filename, deleteOriginal=False):
         #os.remove(newFilename)
         myZip.write(filename = filename, arcname = arcname)
         myZip.writestr(zinfo_or_arcname = 'META-INF{0}container.xml'.format(os.path.sep), bytes = container)
+
+    # Delete uncompressed xml file from system
+    if deleteOriginal:
+        os.remove(filename)
+
+def uncompressMXL(filename, deleteOriginal=False):
+    '''
+    Takes a filename, and if the filename corresponds to a 
+    compressed musicXML file with an .mxl extension,
+    creates a corresponding uncompressed .xml file in the same directory. 
+    If deleteOriginal is set
+    to True, the original compressed musicXML file is deleted from the system.
+    '''
+    if not filename.endswith(".mxl"):
+        return # not a musicXML file
+    environLocal.warn("Updating file: {0}".format(filename))
+    fnList = filename.split(os.path.sep)
+    arcname = fnList.pop() # find the archive name (name w/out filepath)
+    unarcname = arcname[0:len(arcname)-4] + ".xml"
+    extractPath = os.path.sep.join(fnList)
+    
+    fnList.append(unarcname) # new archive name
+    newFilename = os.path.sep.join(fnList) # new filename
+
+    # Export container and original xml file to system as a compressed XML.
+    with zipfile.ZipFile(filename, 'r', compression=zipfile.ZIP_DEFLATED) as myZip:
+        #os.remove(newFilename)
+        myZip.extract(member = unarcname, path = extractPath)
 
     # Delete uncompressed xml file from system
     if deleteOriginal:

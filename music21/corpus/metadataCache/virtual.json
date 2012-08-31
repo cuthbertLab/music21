@@ -1,7 +1,7 @@
 {
   "__attr__": {
-    "_name": "virtual", 
-    "_storage": {
+    "name": "virtual", 
+    "storage": {
       "http:__kern_ccarh_org_cgi-bin_ksdata?l=cc_bach_cello&file=bwv1007-01_krn&f=xml": {
         "__attr__": {
           "_contributors": [], 
@@ -17,7 +17,7 @@
           "keySignatureFirst": "<music21.key.KeySignature of 1 sharp>", 
           "noteCount": 656, 
           "quarterLength": 168.0, 
-          "timeSignatureFirst": "<music21.meter.TimeSignature 4/4>"
+          "timeSignatureFirst": "4/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
       }, 
@@ -36,7 +36,7 @@
           "keySignatureFirst": "<music21.key.KeySignature of 2 sharps>", 
           "noteCount": 2331, 
           "quarterLength": 228.0, 
-          "timeSignatureFirst": "<music21.meter.TimeSignature 4/4>"
+          "timeSignatureFirst": "4/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
       }, 
@@ -55,7 +55,7 @@
           "keySignatureFirst": "<music21.key.KeySignature of 3 sharps>", 
           "noteCount": 148, 
           "quarterLength": 34.0, 
-          "timeSignatureFirst": "<music21.meter.TimeSignature 2/4>"
+          "timeSignatureFirst": "2/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
       }, 
@@ -74,7 +74,7 @@
           "keySignatureFirst": "<music21.key.KeySignature of no sharps or flats>", 
           "noteCount": 484, 
           "quarterLength": 88.0, 
-          "timeSignatureFirst": "<music21.meter.TimeSignature 4/4>"
+          "timeSignatureFirst": "4/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
       }, 
@@ -93,7 +93,7 @@
           "keySignatureFirst": "<music21.key.KeySignature of 3 flats>", 
           "noteCount": 670, 
           "quarterLength": 108.0, 
-          "timeSignatureFirst": "<music21.meter.TimeSignature 4/4>"
+          "timeSignatureFirst": "4/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
       }, 
@@ -112,7 +112,7 @@
           "keySignatureFirst": "<music21.key.KeySignature of no sharps or flats>", 
           "noteCount": 173, 
           "quarterLength": 32.0, 
-          "timeSignatureFirst": "<music21.meter.TimeSignature 2/4>"
+          "timeSignatureFirst": "2/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
       }, 
@@ -131,7 +131,7 @@
           "keySignatureFirst": "<music21.key.KeySignature of no sharps or flats>", 
           "noteCount": 249, 
           "quarterLength": 32.0, 
-          "timeSignatureFirst": "<music21.meter.TimeSignature 2/4>"
+          "timeSignatureFirst": "2/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
       }, 
@@ -150,7 +150,7 @@
           "keySignatureFirst": "<music21.key.KeySignature of no sharps or flats>", 
           "noteCount": 194, 
           "quarterLength": 34.0, 
-          "timeSignatureFirst": "<music21.meter.TimeSignature 2/4>"
+          "timeSignatureFirst": "2/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
       }, 
@@ -226,10 +226,10 @@
               "__class__": "<class 'music21.metadata.Text'>"
             }
           }, 
-          "keySignatureFirst": "<music21.key.KeySignature of None>", 
+          "keySignatureFirst": "<music21.key.KeySignature of no sharps or flats, mode major>", 
           "noteCount": 67, 
           "quarterLength": 72.0, 
-          "timeSignatureFirst": "<music21.meter.TimeSignature 4/4>"
+          "timeSignatureFirst": "4/4"
         }, 
         "__class__": "<class 'music21.metadata.RichMetadata'>"
       }
@@ -238,7 +238,7 @@
   "__class__": "<class 'music21.metadata.MetadataBundle'>", 
   "__version__": [
     1, 
-    2, 
+    3, 
     0
   ]
 }

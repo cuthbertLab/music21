@@ -141,7 +141,7 @@ class JSONSerializer(object):
         >>> from music21 import *
         >>> n = note.Note()
         >>> n._autoGatherAttributes()
-        ['_activeSite', '_activeSiteId', '_definedContexts', '_duration', '_idLastDeepCopyOf', '_notehead', '_noteheadFill', '_noteheadParen', '_overriddenLily', '_priority', '_stemDirection', '_volume']
+        ['_activeSite', '_activeSiteId', '_definedContexts', '_duration', '_idLastDeepCopyOf', '_notehead', '_noteheadFill', '_noteheadParenthesis', '_overriddenLily', '_priority', '_stemDirection', '_volume']
         '''
         post = []
         # names that we always do not need
@@ -395,8 +395,14 @@ class JSONSerializer(object):
                                 else:
                                     subDict[subKey] = attrValueSub
                             #setattr(self, key, subDict)
+                            try:
+                                dst = getattr(self, key)
+                            except AttributeError as ae:
+                                if key == "_storage": # changed name; help older .json files...
+                                    dst = getattr(self, "storage")
+                                else:
+                                    raise JSONSerializerException("Problem with key: %s for object %s: %s" % (key, self, ae))
                             
-                            dst = getattr(self, key)
                             # updating the dictionary preserves default 
                             # values created at init
                             dst.update(subDict) 
@@ -464,7 +470,7 @@ class JSONSerializer(object):
             }, 
             "_notehead": "normal", 
             "_noteheadFill": "default", 
-            "_noteheadParen": false, 
+            "_noteheadParenthesis": false, 
             "_priority": 0, 
             "_stemDirection": "unspecified", 
             "articulations": [], 
@@ -1970,8 +1976,11 @@ class Music21Object(JSONSerializer):
     _DOC_ORDER = ['findAttributeInHierarchy', 'getContextAttr', 'setContextAttr']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
-    'id': 'Unique identification string.',
-    'groups': 'An instance of a Group object which describes arbitrary Groups that this object belongs to',
+    'id': 'A unique identification string (not to be confused with the default `.id()` method.',
+    'groups': 'An instance of a :class:`~music21.base.Group` object which describes arbitrary `Groups` that this object belongs to.',
+    'isStream': 'Boolean value for quickly identifying :class:`~music21.stream.Stream` objects (False by default).',
+    'isSpanner': 'Boolean value for quickly identifying :class:`~music21.spanner.Spanner` objects (False by default).',
+    'isVariant': 'Boolean value for quickly identifying :class:`~music21.variant.Variant` objects (False by default).',
     'classSortOrder' : '''Property which returns an number (int or otherwise)
         depending on the class of the Music21Object that
         represents a priority for an object based on its class alone --
@@ -2005,7 +2014,7 @@ class Music21Object(JSONSerializer):
         >>> ec1.classSortOrder
         5
         ''',
-        'hideObjectOnPrint': 'if set to True will not print upon output (only to MusicXML at this point)',
+        'hideObjectOnPrint': 'if set to `True` will not print upon output (only used in MusicXML output at this point).',
     }
 
     def __init__(self, *arguments, **keywords):
@@ -3368,11 +3377,49 @@ class Music21Object(JSONSerializer):
 
     
     offset = property(_getOffset, _setOffset, 
-        doc = '''The offset property returns the position of this object from 
-        the start of its most recently referenced container (a Stream or 
-        Stream sub-class found in activeSite) in quarter lengths.
+        doc = '''
+        The offset property sets or returns the position of this object 
+        (generally in `quarterLengths`) from the start of its `activeSite`,
+        that is, the most recently referenced `Stream` or `Stream` subclass such
+        as `Part`, `Measure`, or `Voice`.  It is a simpler
+        way of calling `o.getOffsetBySite(o.activeSite)`.
 
-        It can also set the offset for the object if no container has been
+        If we put a `Note` into a 
+
+        >>> from music21 import *
+        >>> n1 = note.Note("D#3")
+        >>> s1 = stream.Measure()
+        >>> s1.insert(10.0, n1)
+        >>> n1.offset
+        10.0
+        >>> n1.activeSite is s1
+        True
+        
+        The most recently referenced `Stream` becomes an object's
+        `activeSite` and thus the place where `.offset` looks to
+        find its number.  
+        
+        >>> s2 = stream.Measure()
+        >>> s2.insert(20.0, n1)
+        >>> n1.offset
+        20.0
+        >>> n1.activeSite is s2
+        True
+
+        Notice though that `.offset` depends on the `.activeSite`
+        which is the most recently accessed/referenced Stream.
+        
+        Here we will iterate over the `elements` in `s1` and we
+        will see that the `.offset` of `n1` now is its offset in
+        `s1` even though we haven't done anything directly to `n1`:
+        
+        >>> for element in s1:
+        ...     pass
+        >>> n1.offset
+        10.0 
+
+        
+        The property can also set the offset for the object if no container has been
         set
 
         >>> from music21 import *

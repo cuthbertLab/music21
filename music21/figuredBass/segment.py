@@ -14,6 +14,7 @@ import copy
 import itertools
 import unittest
 
+from music21 import common
 from music21 import chord
 from music21 import environment
 from music21 import exceptions21
@@ -28,6 +29,8 @@ from music21.figuredBass import resolution
 from music21.figuredBass import rules
 
 _MOD = 'segment.py'
+
+_defaultRealizerScale = None
 
 class Segment(object):
     _DOC_ORDER = ['allSinglePossibilities', 'singlePossibilityRules', 'allCorrectSinglePossibilities',
@@ -45,7 +48,7 @@ class Segment(object):
                  'fbRules': 'A deepcopy of the :class:`~music21.figuredBass.rules.Rules` object provided.',
                  }
 
-    def __init__(self, bassNote = note.Note('C3'), notationString = None, fbScale = realizerScale.FiguredBassScale(), fbRules = rules.Rules(), numParts = 4, maxPitch = pitch.Pitch('B5'), listOfPitches = None):
+    def __init__(self, bassNote = 'C3', notationString = None, fbScale = None, fbRules = rules.Rules(), numParts = 4, maxPitch = 'B5', listOfPitches = None):
         ''' 
         A Segment corresponds to a 1:1 realization of a bassNote and notationString of a :class:`~music21.figuredBass.realizer.FiguredBassLine`.
         It is created by passing six arguments: a :class:`~music21.figuredBass.realizerScale.FiguredBassScale`, a bassNote, a notationString,
@@ -55,6 +58,10 @@ class Segment(object):
         Methods in Python's `itertools <http://docs.python.org/library/itertools.html>`_ module are used extensively. Methods 
         which generate possibilities or possibility progressions return iterators, which are turned into lists in the examples 
         for display purposes only.
+        
+        if fbScale is None, a realizerScale.FiguredBassScale() is created
+
+        if fbRules is None, a rules.Rules() instance is created.  Each Segment gets its own deepcopy of the one given.
         
         
         Here, a Segment is created using the default values: a FiguredBassScale in C, a bassNote of C3, an empty notationString, and a default
@@ -73,8 +80,23 @@ class Segment(object):
         >>> s1.segmentChord
         <music21.chord.Chord C3 E3 G3 C4 E4 G4 C5 E5 G5>
         '''
+        if common.isStr(bassNote):
+            bassNote = note.Note(bassNote)
+        if common.isStr(maxPitch):
+            maxPitch = pitch.Pitch(maxPitch)
+        
+        if fbScale is None:
+            global _defaultRealizerScale
+            if _defaultRealizerScale is None:
+                _defaultRealizerScale = realizerScale.FiguredBassScale()
+            fbScale = _defaultRealizerScale # save making it
+        
+        if fbRules is None:
+            self.fbRules = rules.Rules()
+        else:
+            self.fbRules = copy.deepcopy(fbRules)
+        
         self.bassNote = bassNote
-        self.fbRules = copy.deepcopy(fbRules)
         self.numParts = numParts
         self._maxPitch = maxPitch
         if notationString == None and listOfPitches != None: #must be a chord symbol or roman numeral....
@@ -90,12 +112,12 @@ class Segment(object):
     #-------------------------------------------------------------------------------
     # EXTERNAL METHODS
     
-    def singlePossibilityRules(self, fbRules = rules.Rules()):
+    def singlePossibilityRules(self, fbRules = None):
         '''
         A framework for storing single possibility rules and methods to be applied
         in :meth:`~music21.figuredBass.segment.Segment.allCorrectSinglePossibilities`.
         Takes in a :class:`~music21.figuredBass.rules.Rules` object, fbRules.
-        
+        If None then a new rules object is created.
         
         Items are added within this method in the following form:
         
@@ -129,6 +151,9 @@ class Segment(object):
         True       upperPartsWithinLimit         True                          12
         True       voiceCrossing                 False                         None
         '''        
+        if fbRules is None:
+            fbRules = rules.Rules()
+
         singlePossibRules = \
         [(fbRules.forbidIncompletePossibilities, possibility.isIncomplete, False, [self.pitchNamesInChord]),
          (True, possibility.upperPartsWithinLimit, True, [fbRules.upperPartsMaxSemitoneSeparation]),
@@ -136,11 +161,12 @@ class Segment(object):
         
         return singlePossibRules
     
-    def consecutivePossibilityRules(self, fbRules = rules.Rules()):
+    def consecutivePossibilityRules(self, fbRules = None):
         '''
         A framework for storing consecutive possibility rules and methods to be applied
         in :meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`.
-        Takes in a :class:`~music21.figuredBass.rules.Rules` object, fbRules.
+        Takes in a :class:`~music21.figuredBass.rules.Rules` object, fbRules; if None
+        then a new rules.Rules() object is created.
         
         
         Items are added within this method in the following form:
@@ -190,6 +216,9 @@ class Segment(object):
         False      hiddenOctave                  False                         None
         False      couldBeItalianA6Resolution    True                          [<music21.pitch.Pitch C3>, <music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>], True
         '''
+        if fbRules is None:
+            fbRules = rules.Rules()
+
         isItalianAugmentedSixth = self.segmentChord.isItalianAugmentedSixth()
             
         consecPossibRules = \
@@ -205,7 +234,7 @@ class Segment(object):
         
         return consecPossibRules
     
-    def specialResolutionRules(self, fbRules = rules.Rules()):
+    def specialResolutionRules(self, fbRules = None):
         '''
         A framework for storing methods which perform special resolutions
         on Segments. Unlike the methods in 
@@ -215,6 +244,7 @@ class Segment(object):
         to resolve the individual possibilities accordingly depending on what
         the resolution Segment is. 
         
+        If fbRules is None, then a new rules.Rules() object is created.
         
         Items are added within this method in the following form:
    
@@ -271,6 +301,9 @@ class Segment(object):
         False      resolveDiminishedSeventhSegment  False
         True       resolveAugmentedSixthSegment     None
         '''
+        if fbRules is None:
+            fbRules = rules.Rules()
+
         isDominantSeventh = self.segmentChord.isDominantSeventh()
         isDiminishedSeventh = self.segmentChord.isDiminishedSeventh()
         isAugmentedSixth = self.segmentChord.isAugmentedSixth()
@@ -713,7 +746,7 @@ class OverlayedSegment(Segment):
     
 # HELPER METHODS
 # --------------
-def getPitches(pitchNames = ['C','E','G'], bassPitch = pitch.Pitch('C3'), maxPitch = pitch.Pitch('C8')):
+def getPitches(pitchNames = ['C','E','G'], bassPitch = 'C3', maxPitch = 'C8'):
     '''
     Given a list of pitchNames, a bassPitch, and a maxPitch, returns a sorted list of
     pitches between the two limits (inclusive) which correspond to items in pitchNames.
@@ -733,6 +766,11 @@ def getPitches(pitchNames = ['C','E','G'], bassPitch = pitch.Pitch('C3'), maxPit
     >>> print ', '.join([p.nameWithOctave for p in pitches])
     A#3, C#4, F##4, A#4, C#5, F##5, A#5, C#6, F##6, A#6, C#7, F##7, A#7
     '''
+    if isinstance(bassPitch, basestring):
+        bassPitch = pitch.Pitch(bassPitch)
+    if isinstance(maxPitch, basestring):
+        maxPitch = pitch.Pitch(maxPitch)
+    
     iter1 = itertools.product(pitchNames, range(maxPitch.octave + 1))
     iter2 = itertools.imap(lambda x: fbPitch.HashablePitch(x[0] + str(x[1])), iter1)
     iter3 = itertools.ifilterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)

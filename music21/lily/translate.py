@@ -364,7 +364,7 @@ class LilypondConverter(object):
         return lpScoreBlock
 
     def lyPartsAndOssiaInitFromScore(self, scoreIn):
-        '''
+        r'''
         Takes in a score and returns a block that starts each part context and variant context
         with an identifier and {\stopStaff s1*n} where n is the number of measures in the score.
         
@@ -383,10 +383,10 @@ class LilypondConverter(object):
         >>> s.append(p1)
         >>> s.append(p2)
         >>> print lpc.lyPartsAndOssiaInitFromScore(s)
-        \\new Staff  = pa { \stopStaff } 
-        \\new Staff  = londonpa
+        \new Staff  = pa { \stopStaff } 
+        \new Staff  = londonpa 
                     \with {
-                          \\remove "Time_signature_engraver"
+                          \remove "Time_signature_engraver"
                           alignAboveContext = #"pa"
                           fontSize = #-3
                           \override StaffSymbol #'staff-space = #(magstep -3)
@@ -394,11 +394,12 @@ class LilypondConverter(object):
                           \override TupletBracket #'bracket-visibility = ##f
                           \override TupletNumber #'stencil = ##f
                           \override Clef #'transparent = ##t
+                          \consists "Default_bar_line_engraver"
                         }
                  { \stopStaff } 
-        \\new Staff  = romepa 
+        \new Staff  = romepa 
                     \with {
-                          \\remove "Time_signature_engraver"
+                          \remove "Time_signature_engraver"
                           alignAboveContext = #"pa"
                           fontSize = #-3
                           \override StaffSymbol #'staff-space = #(magstep -3)
@@ -406,12 +407,13 @@ class LilypondConverter(object):
                           \override TupletBracket #'bracket-visibility = ##f
                           \override TupletNumber #'stencil = ##f
                           \override Clef #'transparent = ##t
+                          \consists "Default_bar_line_engraver"
                         }
                  { \stopStaff } 
-        \\new Staff  = pb { \stopStaff } 
-        \\new Staff  = londonpb 
+        \new Staff  = pb { \stopStaff } 
+        \new Staff  = londonpb 
                     \with {
-                          \\remove "Time_signature_engraver"
+                          \remove "Time_signature_engraver"
                           alignAboveContext = #"pb"
                           fontSize = #-3
                           \override StaffSymbol #'staff-space = #(magstep -3)
@@ -419,11 +421,12 @@ class LilypondConverter(object):
                           \override TupletBracket #'bracket-visibility = ##f
                           \override TupletNumber #'stencil = ##f
                           \override Clef #'transparent = ##t
+                          \consists "Default_bar_line_engraver"
                         }
                  { \stopStaff } 
-        \\new Staff  = romepb 
+        \new Staff  = romepb 
                     \with {
-                          \\remove "Time_signature_engraver"
+                          \remove "Time_signature_engraver"
                           alignAboveContext = #"pb"
                           fontSize = #-3
                           \override StaffSymbol #'staff-space = #(magstep -3)
@@ -431,9 +434,11 @@ class LilypondConverter(object):
                           \override TupletBracket #'bracket-visibility = ##f
                           \override TupletNumber #'stencil = ##f
                           \override Clef #'transparent = ##t
+                          \consists "Default_bar_line_engraver"
                         }
                  { \stopStaff } 
         <BLANKLINE>
+
         '''
         lpMusicList = lyo.LyMusicList()
 
@@ -545,39 +550,40 @@ class LilypondConverter(object):
         >>> lpGroupedMusicList = lpc.lyGroupedMusicListFromScoreWithParts(b, scoreInit = lpPartsAndOssiaInit)
         >>> print lpGroupedMusicList
         <BLANKLINE>
-        << \new Staff  = Soprano { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. } 
-          \new Staff  = Alto { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. } 
-          \new Staff  = Tenor { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. } 
-          \new Staff  = Bass { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. } 
+         << \new Staff  = Soprano { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. } 
+           \new Staff  = Alto { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. } 
+           \new Staff  = Tenor { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. } 
+           \new Staff  = Bass { \stopStaff s4 s1 s1 s1 s1 s1 s1 s1 s1 s2. } 
         <BLANKLINE>
-        \context Staff  = Soprano { \startStaff \partial 32*8 
-               \clef "treble" 
-               \key fis \minor 
-               \time 4/4
-               \once \override Stem #'direction = #DOWN 
-               cis'' 8  
-               \once \override Stem #'direction = #DOWN 
-               b' 8  
-               | %{ end measure 0 %} 
-               \once \override Stem #'direction = #UP 
-               a' 4  
-               \once \override Stem #'direction = #DOWN 
-               b' 4  
-               \once \override Stem #'direction = #DOWN 
-               cis'' 4  \fermata  
-               \once \override Stem #'direction = #DOWN 
-               e'' 4  
-               | %{ end measure 1 %} 
-               \once \override Stem #'direction = #DOWN 
-               cis'' 4  
-               ...
+          \context Staff  = Soprano { \startStaff \partial 32*8 
+                \clef "treble" 
+                \key fis \minor 
+                \time 4/4
+                \once \override Stem #'direction = #DOWN 
+                cis'' 8  
+                \once \override Stem #'direction = #DOWN 
+                b' 8  
+                \bar "|"  %{ end measure 0 %} 
+                \once \override Stem #'direction = #UP 
+                a' 4  
+                \once \override Stem #'direction = #DOWN 
+                b' 4  
+                \once \override Stem #'direction = #DOWN 
+                cis'' 4  \fermata  
+                \once \override Stem #'direction = #DOWN 
+                e'' 4  
+                \bar "|"  %{ end measure 1 %} 
+                \once \override Stem #'direction = #DOWN 
+                cis'' 4  
+                ...
         } 
+        <BLANKLINE>
         <BLANKLINE>
         \context Staff  = Alto { \startStaff \partial 32*8 
             \clef "treble"...
             \once \override Stem #'direction = #UP 
             e' 4  
-            | %{ end measure 0 %} 
+            \bar "|"  %{ end measure 0 %} 
             \once \override Stem #'direction = #UP 
             fis' 4  
             \once \override Stem #'direction = #UP 
@@ -585,7 +591,9 @@ class LilypondConverter(object):
         ...
         } 
         <BLANKLINE>
+        <BLANKLINE>
         >>
+        <BLANKLINE>
         '''
         
         compositeMusicList = []
@@ -1458,7 +1466,7 @@ class LilypondConverter(object):
 
     
     def lyPrefixCompositeMusicFromRelatedVariants(self, variantList, activeSite = None, coloredVariants = False):
-        '''
+        r'''
 
         >>> from music21 import *
         >>> s1 = converter.parse("a4 a a a  a1", "4/4")
@@ -1510,56 +1518,41 @@ class LilypondConverter(object):
         >>> lpc = lily.translate.LilypondConverter()
 
         >>> print lpc.lyPrefixCompositeMusicFromRelatedVariants(variantList, activeSite = activeSite)[0]
-        \\new Staff  = ... 
-                \with {
-                      \\remove "Time_signature_engraver"
-                      alignAboveContext = #"..."
-                      fontSize = #-3
-                      \override StaffSymbol #'staff-space = #(magstep -3)
-                      \override StaffSymbol #'thickness = #(magstep -3)
-                      \override TupletBracket #'bracket-visibility = ##f
-                      \override TupletNumber #'stencil = ##f
-                      \override Clef #'transparent = ##t
-                    } 
-                     { { \\times 1/2 {\startStaff \clef "treble" 
-            \\time 4/4
-            \clef "treble"
-            a' 4  
-            a' 4  
-            a' 4  
-            a' 4  
-            | %{ end measure 1 %}
-            a' 1
-            \\bar "|."  %{ end measure 2 %}
-             \stopStaff}
-             }
+        \new Staff  = london... { { \times 1/2 {\startStaff \clef "treble" 
+              \clef "treble" 
+              a' 4  
+              a' 4  
+              a' 4  
+              a' 4  
+              | %{ end measure 1 %} 
+              a' 1  
+              | %{ end measure 2 %} 
+               \stopStaff}
+               } 
         <BLANKLINE>
           {\startStaff \clef "treble" 
-            \\time 4/4
             b' 4  
             b' 4  
             b' 4  
             b' 4  
-            \\bar "|."  %{ end measure 1 %} 
+            | %{ end measure 1 %} 
              \stopStaff}
         <BLANKLINE>
           {\startStaff \clef "treble" 
-            \\time 4/4
             c' 4  
             c' 4  
             c' 4  
             c' 4  
-            \\bar "|."  %{ end measure 1 %} 
+            | %{ end measure 1 %} 
              \stopStaff}
         <BLANKLINE>
           s 1  
           {\startStaff \clef "treble" 
-            \\time 4/4
             d' 4  
             d' 4  
             d' 4  
             d' 4  
-            \\bar "|."  %{ end measure 1 %} 
+            | %{ end measure 1 %} 
              \stopStaff}
         <BLANKLINE>
            } 
@@ -1707,7 +1700,7 @@ class LilypondConverter(object):
 
 
     def lyPrefixCompositeMusicFromVariant(self, variantObject, replacedElements, coloredVariants = False):
-        '''
+        r'''
         
         >>> from music21 import *
         >>> pstream = converter.parse("a4 b c d   e4 f g a", "4/4")
@@ -1723,29 +1716,15 @@ class LilypondConverter(object):
         >>> replacedElements = v.replacedElements()
         >>> lpPrefixCompositeMusicVariant = lpc.lyPrefixCompositeMusicFromVariant(v, replacedElements)
         >>> print lpPrefixCompositeMusicVariant
-        \\new Staff  = londonpx 
-        \with {
-              \\remove "Time_signature_engraver"
-              alignAboveContext = #"px"
-              fontSize = #-3
-              \override StaffSymbol #'staff-space = #(magstep -3)
-              \override StaffSymbol #'thickness = #(magstep -3)
-              \override TupletBracket #'bracket-visibility = ##f
-              \override TupletNumber #'stencil = ##f
-              \override Clef #'transparent = ##t
-            } 
-            { {\startStaff \clef "treble" 
-          \clef "treble" 
-          \\time 4/4
-          a' 4.  
-          b' 8  
-          c' 4  
-          d' 4  
-          \\bar "|."  %{ end measure 1 %} 
-           \stopStaff} 
-        <BLANKLINE>
-           }
-        <BLANKLINE>
+        \new Staff  = londonpx { {\startStaff \clef "treble" 
+            \clef "treble" 
+            a' 4.  
+            b' 8  
+            c' 4  
+            d' 4  
+            | %{ end measure 1 %} 
+             \stopStaff}
+           } 
 
         >>> replacedElements.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>

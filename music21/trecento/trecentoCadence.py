@@ -5,6 +5,38 @@ import re
 
 from music21 import tinyNotation
 from music21.tinyNotation import *
+from music21 import note
+
+def _sendNoteInfo(music21noteObject):
+    '''
+    Debugging method to print information about a music21 note
+    called by trecento.trecentoCadence, among other places
+    '''
+    retstr = ""
+    a = music21noteObject
+    if (isinstance(a, note.Note)):
+        retstr += "Name: " + a.name + "\n"
+        retstr += "Step: " + a.step + "\n"
+        retstr += "Octave: " + str(a.octave) + "\n"
+        if (a.accidental is not None):
+            retstr += "Accidental: " + a.accidental.name + "\n"
+    else:
+        retstr += "Is a rest\n"
+    if (a.tie is not None):
+        retstr += "Tie: " + a.tie.type + "\n"
+    retstr += "Duration Type: " + a.duration.type + "\n"
+    retstr += "QuarterLength: " + str(a.duration.quarterLength) + "\n"
+    if len(a.duration.tuplets) > 0:
+        retstr += "Is a tuplet\n"
+        if a.duration.tuplets[0].type == "start":
+            retstr += "   in fact STARTS the tuplet group\n"
+        elif a.duration.tuplets[0].type == "stop":
+            retstr += "   in fact STOPS the tuplet group\n"
+    if len(a.expressions) > 0:
+        if (isinstance(a.expressions[0], expressions.Fermata)):
+            retstr += "Has a fermata on it\n"
+    return retstr
+
 
 class TrecentoCadenceStream(TinyNotationStream):
     '''
@@ -69,7 +101,7 @@ class Test(unittest.TestCase):
         from music21 import note
         cn = TrecentoCadenceNote('AA-4.~')
         a = cn.note # returns the stored music21 note.
-        self.assertEqual(note.sendNoteInfo(a),
+        self.assertEqual(_sendNoteInfo(a),
                           '''Name: A-
 Step: A
 Octave: 2
@@ -85,7 +117,7 @@ QuarterLength: 1.5
         a = cn.note # returns the stored music21 note.
 
         # TODO: FIX!  not working right now because dot groups aren't. should be QL 4.5
-        self.assertEqual(note.sendNoteInfo(a),
+        self.assertEqual(_sendNoteInfo(a),
                           '''Name: C#
 Step: C
 Octave: 4
@@ -108,7 +140,7 @@ class TestExternal(unittest.TestCase):
         '''
         st = TrecentoCadenceStream('e2 f8 e f trip{g16 f e} d8 c B trip{d16 c B}')
         #for thisNote in st:
-        #    print note.sendNoteInfo(thisNote)
+        #    print _sendNoteInfo(thisNote)
         #    print "--------"
         self.assertAlmostEqual(st.duration.quarterLength, 6.0)
         st.show()

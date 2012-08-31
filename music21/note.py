@@ -9,9 +9,11 @@
 # Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
-'''Classes and functions for creating and manipulating notes, ties, and durations.
+'''
+Classes and functions for creating Notes, Rests, and Lyrics.
 
-The :class:`~music21.pitch.Pitch` object is stored within, and used to configure, :class:`~music21.note.Note` objects.
+The :class:`~music21.pitch.Pitch` object is stored within, 
+and used to configure, :class:`~music21.note.Note` objects.
 '''
 
 import copy
@@ -222,9 +224,8 @@ class GeneralNote(base.Music21Object):
     '''
     A GeneralNote object is the base class object 
     for the :class:`~music21.note.Note`, 
-    :class:`~music21.note.Rest`, :class:`~music21.note.Chord`, 
+    :class:`~music21.note.Rest`, :class:`~music21.chord.Chord`, 
     and related objects. 
-    
     
     Keywords can be passed to
     a GeneralNote which are then passed to the
@@ -233,18 +234,15 @@ class GeneralNote(base.Music21Object):
     type='16th', dots=2 etc. to create a
     double-dotted sixteenth note.
     
-    
     In almost every circumstance, you should
     create note.Note() or note.Rest() or note.Chord()
     objects directly, and not use this underlying
     structure.
     
-    
     >>> from music21 import *
     >>> gn = note.GeneralNote(type = '16th', dots = 2)
     >>> gn.quarterLength
     0.4375
-    
     '''    
     isChord = False
 
@@ -256,7 +254,9 @@ class GeneralNote(base.Music21Object):
     #'expressions': 'a list of :class:`music21.expressions.TextExpression` objects to store note-attached expressions',
     'isChord': 'Boolean read-only value describing if this object is a Chord.',
     'lyrics': 'A list of :class:`~music21.note.Lyric` objects.',
-    'tie': 'either None or a :class:`~music21.note.Tie` object.'
+    'tie': 'either None or a :class:`~music21.note.Tie` object.',
+    'expressions': 'a list of expressions (such as :class:`~music21.expressions.Fermata`, etc.) that are stored on this Note.',
+    'articulations': 'a list of articulations (such as :class:`~music21.articulations.Staccato`, etc.) that are stored on this Note.'
     }    
     def __init__(self, *arguments, **keywords):
         if 'duration' not in keywords:
@@ -298,36 +298,6 @@ class GeneralNote(base.Music21Object):
         '''
         # will already get _duration
         return self._autoGatherAttributes() + ['lyrics', 'expressions', 'articulations', 'editorial', 'tie']
-
-
-    def compactNoteInfo(self):
-        '''A debugging info tool, returning information about a note
-        E- E 4 flat 16th 0.166666666667 & is a tuplet (in fact STOPS the tuplet)
-        '''
-        
-        ret = ""
-        if (self.isNote is True):
-            ret += self.name + " " + self.step + " " + str(self.octave)
-            if (self.accidental is not None):
-                ret += " " + self.accidental.name
-        elif (self.isRest is True):
-            ret += "rest"
-        else:
-            ret += "other note type"
-        if (self.tie is not None):
-            ret += " (Tie: " + self.tie.type + ")"
-        ret += " " + self.duration.type
-        ret += " " + str(self.duration.quarterLength)
-        if len(self.duration.tuplets) > 0:
-            ret += " & is a tuplet"
-            if self.duration.tuplets[0].type == "start":
-                ret += " (in fact STARTS the tuplet)"
-            elif self.duration.tuplets[0].type == "stop":
-                ret += " (in fact STOPS the tuplet)"
-        if len(self.expressions) > 0:
-            if (isinstance(self.expressions[0], expressions.Fermata)):
-                ret += " has Fermata"
-        return ret
 
 
     #---------------------------------------------------------------------------
@@ -609,8 +579,10 @@ class NotRestException(exceptions21.Music21Exception):
 #-------------------------------------------------------------------------------
 class NotRest(GeneralNote):
     '''
-    Parent class for objects that are not rests; or, an 
-    object with a stem that can be tied.
+    Parent class for Note-like objects that are not rests; that is to say
+    they have a stem, can be tied, and volume is important.  
+    Basically, that's a `Note` or
+    `Unpitched` object for now.
     '''
     
     # unspecified means that there may be a stem, but its orientation
@@ -620,7 +592,7 @@ class NotRest(GeneralNote):
         GeneralNote.__init__(self, **keywords)
         self._notehead = 'normal'
         self._noteheadFill = 'default'
-        self._noteheadParen = False
+        self._noteheadParenthesis = False
         self._stemDirection = 'unspecified'
         self._volume = None # created on demand
         self.duration.linkage = 'tie'
@@ -629,11 +601,13 @@ class NotRest(GeneralNote):
         '''Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic Python objects or :class:`~music21.base.JSONSerializer` subclasses, or dictionaries or lists that contain Python objects or :class:`~music21.base.JSONSerializer` subclasses, can be provided.
         '''
         # add to base class
-        return GeneralNote.jsonAttributes(self) + ['_notehead', '_noteheadFill', '_noteheadParen', '_stemDirection', '_volume']
+        return GeneralNote.jsonAttributes(self) + ['_notehead', '_noteheadFill', '_noteheadParenthesis', '_stemDirection', '_volume']
 
 
     def __deepcopy__(self, memo=None):
-        '''As NotRest objects have a Volume, objects, and Volume objects store weak refs to the to parent object, need to specialize deep copy handling
+        '''
+        As NotRest objects have a Volume, objects, and Volume objects 
+        store weak refs to the to parent object, need to specialize deep copy handling
         '''
         #environLocal.printDebug(['calling NotRest.__deepcopy__', self])
         new = GeneralNote.__deepcopy__(self, memo=memo)
@@ -683,7 +657,9 @@ class NotRest(GeneralNote):
         self._notehead = value
 
     notehead = property(_getNotehead, _setNotehead, doc=
-        '''Get or set the notehead of this NotRest object. Valid notehead type names are found in note.noteheadTypeNames (see below):
+        '''
+        Get or set the notehead type of this NotRest object. 
+        Valid notehead type names are found in note.noteheadTypeNames (see below):
 
         >>> from music21 import *
         >>> note.noteheadTypeNames
@@ -693,6 +669,7 @@ class NotRest(GeneralNote):
         >>> n.notehead = 'diamond'
         >>> n.notehead
         'diamond'
+        
         >>> n.notehead = 'junk'
         Traceback (most recent call last):
         NotRestException: not a valid notehead type name: 'junk'
@@ -717,25 +694,27 @@ class NotRest(GeneralNote):
         Get or set the note head fill status of this NotRest. Valid note head fill values are yes, no, default, and None.
 
         >>> from music21 import *
+        
         >>> n = note.Note()
         >>> n.noteheadFill = 'no'
         >>> n.noteheadFill
         'no'
+        
         >>> n.noteheadFill = 'junk'
         Traceback (most recent call last):
         NotRestException: not a valid notehead fill value: junk
         ''')
     
 
-    def _getNoteheadParen(self):
-        return self._noteheadParen
+    def _getNoteheadParenthesis(self):
+        return self._noteheadParenthesis
 
-    def _setNoteheadParen(self, value):
+    def _setNoteheadParenthesis(self, value):
         # TODO: check for valid values: yes and no?
-        self._noteheadParen = value
+        self._noteheadParenthesis = value
 
-    noteheadParen = property(_getNoteheadParen, _setNoteheadParen, doc='''
-        Get or set the note head fill status fo this NotRest.
+    noteheadParenthesis = property(_getNoteheadParenthesis, _setNoteheadParenthesis, doc='''
+        Get or set the note head parentheses for this Note/Unpitched/Chord object.
         ''')
     
     #---------------------------------------------------------------------------
@@ -831,9 +810,9 @@ class Note(NotRest):
     _DOC_ORDER = ['duration', 'quarterLength', 'nameWithOctave', 'pitchClass']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
-    'isNote': 'Boolean read-only value describing if this object is a Note (True).',
-    'isUnpitched': 'Boolean read-only value describing if this is Unpitched (False).',
-    'isRest': 'Boolean read-only value describing if this is a Rest (False).',
+    'isNote': 'Boolean read-only value describing if this Note is a Note (True).',
+    'isUnpitched': 'Boolean read-only value describing if this Note is Unpitched (False).',
+    'isRest': 'Boolean read-only value describing if this Note is a Rest (False).',
     'beams': 'A :class:`~music21.beam.Beams` object that contains information about the beaming of this note.',
     'pitch': 'A :class:`~music21.pitch.Pitch` object containing all the information about the note\'s pitch.  Many `.pitch` properties and methods are also made `Note` properties also',
     }
@@ -960,43 +939,9 @@ class Note(NotRest):
         See `Pitch`'s attribute :attr:`~music21.pitch.Pitch.nameWithOctave`.
         ''')
 
-
-    def _getPitchNames(self):
-        return [self.pitch.name]
-
-    def _setPitchNames(self, value):
-        if common.isListLike(value):
-            if 'Pitch' in value[0].classes:
-                self.pitch.name = value[0].name
-            else:
-                raise NoteException('must provide a list containing a Pitch, not: %s' % value)
-        else:
-            raise NoteException('cannot set pitch name with provided object: %s' % value)
-
-    pitchNames = property(_getPitchNames, _setPitchNames, 
-        doc = '''
-        Return a list of Pitch names from  :attr:`~music21.pitch.Pitch.name`. 
-        This property is designed to provide an interface analogous to 
-        that found on :class:`~music21.chord.Chord`: :attr:`~music21.chord.Chord.pitchNames`.
-
-        >>> from music21 import *
-        >>> n = note.Note('g#')
-        >>> n.name
-        'G#'
-        >>> n.pitchNames
-        ['G#']
-        >>> n.pitchNames = [pitch.Pitch('c2'), pitch.Pitch('g2')]
-        >>> n.name
-        'C'
-        >>> n.pitchNames
-        ['C']
-        ''')
-
-
     def _getAccidental(self): 
         return self.pitch.accidental
 
-    # do we no longer need setAccidental(), below?
     def _setAccidental(self, value):
         '''
         Adds an accidental to the Note, given as an Accidental object.
@@ -1008,7 +953,7 @@ class Note(NotRest):
         >>> a.name 
         'D'
         >>> b = pitch.Accidental("sharp")
-        >>> a.setAccidental(b)
+        >>> a.accidental = (b)
         >>> a.name 
         'D#'
         '''
@@ -1019,14 +964,9 @@ class Note(NotRest):
         self.pitch.accidental = accidental
 
 
-    # backwards compat; remove when possible
-    def setAccidental(self, accidental):
-        '''This method is obsolete: use the `accidental` property instead.
-        '''
-        self._setAccidental(accidental)
-
     accidental = property(_getAccidental, _setAccidental,
-        doc = '''Return or set the :class:`~music21.pitch.Accidental` object from the :class:`~music21.pitch.Pitch` object.
+        doc = '''
+        Return or set the :class:`~music21.pitch.Accidental` object from the :class:`~music21.pitch.Pitch` object.
         ''') 
 
 
@@ -1278,21 +1218,40 @@ class Note(NotRest):
 # convenience classes
 
 class EighthNote(Note):
+    '''
+    A simple way of creating an eighth note (used in testing and docs mostly)
+    Most eighth notes are not `EighthNote` objects
+    '''
     def __init__(self, *arguments, **keywords):
         Note.__init__(self, *arguments, **keywords)
         self.duration.type = "eighth"
 
 class QuarterNote(Note):
+    '''
+    A simple way of creating a quarter note (used in testing and docs mostly)
+    Most quarter notes are not `QuarterNote` objects
+
+    N.B. the default `Note` object is a quarter note, so this is only
+    needed for explicitly stating that a note is a quarter note.
+    '''
     def __init__(self, *arguments, **keywords):
         Note.__init__(self, *arguments, **keywords)
         self.duration.type = "quarter"
 
 class HalfNote(Note):
+    '''
+    A simple way of creating a half note (used in testing and docs mostly)
+    Most half notes are not `HalfNote` objects
+    '''
     def __init__(self, *arguments, **keywords):
         Note.__init__(self, *arguments, **keywords)
         self.duration.type = "half"
 
 class WholeNote(Note):
+    '''
+    A simple way of creating a whole note (used in testing and docs mostly)
+    Most whole notes are not `WholeNote` objects
+    '''
     def __init__(self, *arguments, **keywords):
         Note.__init__(self, *arguments, **keywords)
         self.duration.type = "whole"
@@ -1301,28 +1260,30 @@ class WholeNote(Note):
 
 
 #-------------------------------------------------------------------------------
-class Unpitched(GeneralNote):
+class Unpitched(NotRest):
     '''
-    General class of unpitched objects which appear at different places
-    on the staff.  Examples: percussion notation
+    A General class of unpitched objects which appear at different places
+    on the staff.  Examples: percussion notation.
+    
+    The `Unpitched` object does not currently do anything and should
+    not be used.
     '''    
     displayStep = "C"
     displayOctave = 4
     isNote = False
     isUnpitched = True
     isRest = False
-
-
+        
 #-------------------------------------------------------------------------------
 class Rest(GeneralNote):
     '''
     Rests are represented in music21 as GeneralNote objects that do not have
     a pitch object attached to them.  By default they have length 1.0 (Quarter Rest)
     
-    Calling stream.notes does not get rests.  However, the property
-    stream.notesAndRests gets rests as well.
-    
-    
+    Calling :attr:`~music21.stream.Stream.notes` on a Stream does not get rests.  
+    However, the property :attr:`~music21.stream.Stream.notesAndRests` of Streams
+    gets rests as well.
+        
     >>> from music21 import *
     >>> r = note.Rest()
     >>> r.isRest
@@ -1337,6 +1298,13 @@ class Rest(GeneralNote):
     isUnpitched = False
     isRest = True
     name = "rest"
+
+    _DOC_ATTR = {
+    'isNote': 'Boolean read-only value describing if this Rest is a Note (False).',
+    'isUnpitched': 'Boolean read-only value describing if this Rest is Unpitched (False -- only Unpitched objects are True).',
+    'isRest': 'Boolean read-only value describing if this Rest is a Rest (True, obviously).',
+    'name': 'returns "rest" always.  It is here so that you can get `x.name` on all `.notesAndRests` objects',
+    }
 
     # TODO: may need to set a display pitch, 
     # as this is necessary in mxl
@@ -1417,51 +1385,7 @@ class SpacerRest(Rest):
 
 
 #-------------------------------------------------------------------------------
-
-def noteFromDiatonicNumber(number):
-    octave = int(number / 7)
-    noteIndex = number % 7
-    noteNames = ['C','D','E','F','G','A','B']
-    thisName = noteNames[noteIndex]
-    note1 = Note()
-    note1.octave = octave
-    note1.name = thisName
-    return note1
-
-
-#-------------------------------------------------------------------------------
 # test methods and classes
-
-def sendNoteInfo(music21noteObject):
-    '''
-    Debugging method to print information about a music21 note
-    called by trecento.trecentoCadence, among other places
-    '''
-    retstr = ""
-    a = music21noteObject
-    if (isinstance(a, Note)):
-        retstr += "Name: " + a.name + "\n"
-        retstr += "Step: " + a.step + "\n"
-        retstr += "Octave: " + str(a.octave) + "\n"
-        if (a.accidental is not None):
-            retstr += "Accidental: " + a.accidental.name + "\n"
-    else:
-        retstr += "Is a rest\n"
-    if (a.tie is not None):
-        retstr += "Tie: " + a.tie.type + "\n"
-    retstr += "Duration Type: " + a.duration.type + "\n"
-    retstr += "QuarterLength: " + str(a.duration.quarterLength) + "\n"
-    if len(a.duration.tuplets) > 0:
-        retstr += "Is a tuplet\n"
-        if a.duration.tuplets[0].type == "start":
-            retstr += "   in fact STARTS the tuplet group\n"
-        elif a.duration.tuplets[0].type == "stop":
-            retstr += "   in fact STOPS the tuplet group\n"
-    if len(a.expressions) > 0:
-        if (isinstance(a.expressions[0], expressions.Fermata)):
-            retstr += "Has a fermata on it\n"
-    return retstr
-
 
 class TestExternal(unittest.TestCase):
     '''These are tests that open windows and rely on external software
@@ -1900,7 +1824,8 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Note, Rest]
+_DOC_ORDER = [Note,  WholeNote, HalfNote, QuarterNote,
+              EighthNote, Rest, SpacerRest, Unpitched, NotRest, GeneralNote, Lyric]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

@@ -626,16 +626,47 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
     
+    def compactNoteInfo(self, note):
+        '''
+        A debugging info tool, returning information about a note
+        E- E 4 flat 16th 0.166666666667 & is a tuplet (in fact STOPS the tuplet)
+        '''
+        from music21 import expressions
+        ret = ""
+        if (note.isNote is True):
+            ret += note.name + " " + note.step + " " + str(note.octave)
+            if (note.accidental is not None):
+                ret += " " + note.accidental.name
+        elif (note.isRest is True):
+            ret += "rest"
+        else:
+            ret += "other note type"
+        if (note.tie is not None):
+            ret += " (Tie: " + note.tie.type + ")"
+        ret += " " + note.duration.type
+        ret += " " + str(note.duration.quarterLength)
+        if len(note.duration.tuplets) > 0:
+            ret += " & is a tuplet"
+            if note.duration.tuplets[0].type == "start":
+                ret += " (in fact STARTS the tuplet)"
+            elif note.duration.tuplets[0].type == "stop":
+                ret += " (in fact STOPS the tuplet)"
+        if len(note.expressions) > 0:
+            if (isinstance(note.expressions[0], expressions.Fermata)):
+                ret += " has Fermata"
+        return ret
+    
+    
     def testTinyNotationNote(self):
         cn = TinyNotationNote('AA-4.~')
         a = cn.note
-        self.assertEqual(a.compactNoteInfo(), "A- A 2 flat (Tie: start) quarter 1.5")
+        self.assertEqual(self.compactNoteInfo(a), "A- A 2 flat (Tie: start) quarter 1.5")
     
     def testTinyNotationStream(self):
         st = TinyNotationStream('e2 f#8 r f trip{g16 f e-} d8 c B trip{d16 c B}')
         ret = ""
         for thisNote in st:
-            ret += thisNote.compactNoteInfo() + "\n"
+            ret += self.compactNoteInfo(thisNote) + "\n"
         
         d1 = st.duration
         l1 = d1.quarterLength

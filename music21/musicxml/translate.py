@@ -2826,7 +2826,7 @@ def noteheadToMxNotehead(obj, defaultColor=None):
 
     >>> n1 = note.Note('c3')
     >>> n1.notehead = 'diamond'
-    >>> n1.noteheadParen = 'yes'
+    >>> n1.noteheadParenthesis = 'yes'
     >>> n1.noteheadFill = 'no'
     >>> mxN4 = musicxml.translate.noteheadToMxNotehead(n1)
     >>> mxN4._attr['filled']
@@ -2848,8 +2848,8 @@ def noteheadToMxNotehead(obj, defaultColor=None):
     if hasattr(obj, 'noteheadFill'):
         nhFill = obj.noteheadFill
     nhParen = False
-    if hasattr(obj, 'noteheadParen'):
-        nhParen = obj.noteheadParen
+    if hasattr(obj, 'noteheadParenthesis'):
+        nhParen = obj.noteheadParenthesis
 
     if nh not in note.noteheadTypeNames:
         raise NoteheadException('This notehead type is not supported by MusicXML: "%s"' % nh)

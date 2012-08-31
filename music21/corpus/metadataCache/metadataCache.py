@@ -31,7 +31,7 @@ class MetadataCacheException(exceptions21.Music21Exception):
 
 
 
-def cacheMetadata(domainList=['core', 'virtual']): 
+def cacheMetadata(domainList=['local','core', 'virtual']): 
     '''The core cache is all locally-stored corpus files. 
     '''
     from music21 import corpus, metadata
