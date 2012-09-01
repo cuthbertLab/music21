@@ -3045,7 +3045,7 @@ class Chord(note.NotRest):
         '''
         msg = ['<']
         for e in vectorList: # should be numbers
-            eStr = pitch.convertPitchClassToStr(e)
+            eStr = pitch._convertPitchClassToStr(e)
             msg.append(eStr)
         msg.append('>')
         return ''.join(msg)

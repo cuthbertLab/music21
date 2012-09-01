@@ -1167,14 +1167,14 @@ class ChromaticInterval(base.Music21Object):
         '''Given a :class:`~music21.pitch.Pitch`  object, return a new, 
         transposed Pitch, that is transformed 
         according to this ChromaticInterval. 
-
+        
+        `reverse` and `clearAccidentalDisplay` do nothing and will be removed...
 
         Because ChromaticIntervals do not take into account diatonic spelling,
         the new Pitch is simplified to the most common intervals.  See
         :meth:`~music21.pitch.Pitch.simplifyEnharmonic` with mostCommon = True
         to see the results.
-        
-        
+                
         >>> from music21 import *
         >>> ci = interval.ChromaticInterval(6)
         >>> p = pitch.Pitch("E#4")
@@ -1184,10 +1184,27 @@ class ChromaticInterval(base.Music21Object):
         >>> p3 = ci.transposePitch(p2)
         >>> p3
         <music21.pitch.Pitch F5>
+
+        If no octave number is given then octaves "wrap around" and thus even
+        after transposing upward, you could end up with a pitch that is
+        displayed as lower than the original:
+
+        >>> p4 = pitch.Pitch("B")
+        >>> p4.ps
+        71.0
+        >>> p5 = ci.transposePitch(p4)
+        >>> p5.ps
+        65.0
         '''
+        if p.octave is None:
+            useImplicitOctave = True
+        else:
+            useImplicitOctave = False
         pps = p.ps
         newPitch = copy.deepcopy(p)
         newPitch.ps = pps + self.semitones
+        if useImplicitOctave is True:
+            newPitch.octave = None
         return newPitch
 
 
@@ -1780,10 +1797,15 @@ class Interval(base.Music21Object):
         according to this Interval. This is the main public interface to all 
         transposition routines found on higher-level objects. 
 
-        The `maxAccidental` parameter sets an integer number of half step alterations that will be accepted in the transposed pitch. For example, a value of 2 will permit double sharps but not triple sharps. 
+        The `maxAccidental` parameter sets an integer number of half step 
+        alterations that will be accepted in the transposed pitch before it
+        is simplified. For example, 
+        a value of 2 will permit double sharps but not triple sharps.  The
+        maxAccidental default is 4, because music21 does not support quintuple
+        sharps/flats.  Set to None to try anyhow.
         
         >>> from music21 import *
-        >>> p1 = pitch.Pitch('a#')
+        >>> p1 = pitch.Pitch('A#4')
         >>> i = interval.Interval('m3')
         >>> p2 = i.transposePitch(p1)
         >>> p2
@@ -1794,10 +1816,26 @@ class Interval(base.Music21Object):
         >>> i.transposePitch(p1, reverse=True, maxAccidental=1)
         <music21.pitch.Pitch G4>
 
+        `Pitch` objects without octaves are transposed also into
+        objects without octaves.  This might make them appear to be
+        lower than the original even if transposed up:
+        
+        >>> anyA = pitch.Pitch('A')
+        >>> anyC = i.transposePitch(anyA)
+        >>> anyC
+        <music21.pitch.Pitch C>
+        >>> anyC.ps < anyA.ps  # !!
+        True
+
         OMIT_FROM_DOCS
-        TODO: More tests here
+        TODO: More tests here, esp. on fundamental.
         '''
         # NOTE: this is a performance critical method
+        if p.octave is None:
+            useImplicitOctave = True
+        else:
+            useImplicitOctave = False
+        
         pitch1 = p
         pitch2 = copy.deepcopy(pitch1)
         oldDiatonicNum = pitch1.diatonicNoteNum
@@ -1845,13 +1883,19 @@ class Interval(base.Music21Object):
             else:
                 pitch2.accidental = halfStepsToFix
 
-            # inherit accidental display properties
-            pitch2.inheritDisplay(pitch1)
-            pitch2.setAccidentalDisplay(None) # set accidental display to None
+            # inherit accidental display type etc. but not current status
+            if pitch2.accidental is not None and pitch1.accidental is not None:
+                pitch2.accidental.inheritDisplay(pitch1.accidental)
+                pitch2.accidental.displayStatus = None # set accidental display to None
+
+        if useImplicitOctave is True:
+            pitch2.octave = None
 
         if pitch1.fundamental is not None:
             # recursively call method
             pitch2.fundamental = self.transposePitch(pitch1.fundamental, reverse=reverse, clearAccidentalDisplay=clearAccidentalDisplay, maxAccidental=maxAccidental)
+            if pitch1.fundamental.octave is None:
+                pitch2.fundamental.octave = None
 
         return pitch2
 
@@ -2069,7 +2113,10 @@ def getAbsoluteLowerNote(note1, note2):
     else: return note1
 
 def transposePitch(pitch1, interval1):
-    '''Given a :class:`~music21.pitch.Pitch` and a :class:`~music21.interval.Interval` object, return a new Pitch object at the appropriate pitch level. 
+    '''
+    Given a :class:`~music21.pitch.Pitch` 
+    and a :class:`~music21.interval.Interval` object, return a new 
+    Pitch object at the appropriate pitch level. 
 
     >>> from music21 import *
     >>> aPitch = pitch.Pitch('C4')
@@ -2081,6 +2128,13 @@ def transposePitch(pitch1, interval1):
     >>> cPitch = interval.transposePitch(aPitch, bInterval)
     >>> cPitch
     <music21.pitch.Pitch F3>
+    
+    Implicit Intervals should still work:
+    
+    >>> dPitch = pitch.Pitch('G')
+    >>> ePitch = interval.transposePitch(dPitch, aInterval)
+    >>> ePitch
+    <music21.pitch.Pitch D>
     ''' 
 
     # check if interval1 is a string,
@@ -2092,6 +2146,11 @@ def transposePitch(pitch1, interval1):
     else:
         pass # assuming it is an interval object
         #raise IntervalException('numeric intervals not yet defined')
+    
+    if pitch1.octave is None:
+        useImplicitOctave = True
+    else:
+        useImplicitOctave = False        
         
     newDiatonicNumber = (pitch1.diatonicNoteNum +
                          interval1.diatonic.generic.staffDistance)
@@ -2106,6 +2165,9 @@ def transposePitch(pitch1, interval1):
     halfStepsToFix = (interval1.chromatic.semitones -
                       interval2.chromatic.semitones)
     pitch2.accidental = halfStepsToFix
+    
+    if useImplicitOctave is True:
+        pitch2.octave = None
     return pitch2
 
 def transposeNote(note1, intervalString):
@@ -2204,7 +2266,6 @@ def add(intervalList):
     
     (Currently not particularly efficient for large lists...)
     
-    
     >>> from music21 import *
     >>> A2 = interval.Interval('A2')
     >>> P5 = interval.Interval('P5')
@@ -2216,9 +2277,7 @@ def add(intervalList):
     >>> interval.add(["W","W","H","W","W","W","H"])
     <music21.interval.Interval P8>
     
-    
     Direction does matter:
-    
     
     >>> interval.add([P5, "P-4"])
     <music21.interval.Interval M2>
@@ -2227,8 +2286,8 @@ def add(intervalList):
     if len(intervalList) == 0:
         raise IntervalException("Cannot add an empty set of intervals")
     
-    n1 = pitch.Pitch()
-    n2 = pitch.Pitch()
+    n1 = pitch.Pitch("C4") # need octave to not be implicit...
+    n2 = pitch.Pitch("C4")
     for i in intervalList:
         n2 = transposePitch(n2, i)
     return Interval(noteStart=n1, noteEnd=n2)

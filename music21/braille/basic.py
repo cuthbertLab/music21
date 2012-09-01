@@ -387,7 +387,7 @@ def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
     ⠩⠐⠱
     >>> print basic.noteToBraille(Ds4, showOctave = False)
     ⠩⠱
-    >>> Ds4.pitch.setAccidentalDisplay(False)
+    >>> Ds4.pitch.accidental.displayStatus = False
     >>> print basic.noteToBraille(Ds4)
     ⠐⠱
     >>> A2 = note.Note('A2')

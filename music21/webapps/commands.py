@@ -34,8 +34,8 @@ def generateIntervals(numIntervals,kind = None, octaveSpacing = None):
     
     sc = stream.Stream()
     for i in range(numIntervals):        
-        loPs = pitch.convertNameToPs("C3")
-        hiPs = pitch.convertNameToPs("C#5")        
+        loPs = pitch.Pitch("C3").ps
+        hiPs = pitch.Pitch("C#5").ps        
         startPs = random.randrange(loPs,hiPs)
         startPitch = pitch.Pitch(ps=startPs)
         numHalfSteps = random.randrange(-19,20)
@@ -123,8 +123,8 @@ def generateChords(numChords,kind=''):
         return sc
     else:
         for i in range(numChords):
-            loPs = pitch.convertNameToPs("C4")
-            hiPs = pitch.convertNameToPs("C#5")        
+            loPs = pitch.Pitch("C4").ps
+            hiPs = pitch.Pitch("C#5").ps        
             startPs = random.randrange(loPs,hiPs)
             startPitch = pitch.Pitch(ps=startPs)
             startPitchName = startPitch.name

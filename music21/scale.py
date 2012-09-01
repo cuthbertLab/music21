@@ -227,7 +227,6 @@ class AbstractScale(Scale):
         
         Here we treat the augmented triad as a scale:
         
-        
         >>> from music21 import *
         >>> p1 = pitch.Pitch("C4")
         >>> p2 = pitch.Pitch("E4")
@@ -377,7 +376,17 @@ class AbstractScale(Scale):
 
     def realizePitchByDegree(self, pitchReference, nodeId, nodeDegreeTargets, 
         direction=DIRECTION_ASCENDING, minPitch=None, maxPitch=None):        
-        '''Given one or more scale degrees, return a list of all matches over the entire range. 
+        '''
+        Given one or more scale degrees, return a list of 
+        all matches over the entire range.  See :meth:`~music21.intervalNetwork.BoundIntervalNetwork.realizePitchByDegree`.
+        in `intervalNetwork.BoundIntervalNetwork`.
+
+        Create an abstract pentatonic scale:
+
+        >>> from music21 import *
+        >>> pitchList = ["C#4","D#4","F#4","G#4","A#4"]
+        >>> absc = scale.AbstractScale()
+        >>> absc.buildNetworkFromPitches([pitch.Pitch(p) for p in pitchList])
         '''
         # TODO: rely here on intervalNetwork for caching
         post = self._net.realizePitchByDegree(
@@ -394,7 +403,10 @@ class AbstractScale(Scale):
 
     def getRelativeNodeDegree(self, pitchReference, nodeName, pitchTarget, 
             comparisonAttribute='pitchClass', direction=DIRECTION_ASCENDING):
-        '''Expose functionality from :class:`~music21.intervalNetwork.BoundIntervalNetwork`, passing on the stored alteredDegrees dictionary.
+        '''
+        Expose functionality from 
+        :class:`~music21.intervalNetwork.BoundIntervalNetwork`, passing on the 
+        stored alteredDegrees dictionary.
         '''
         post = self._net.getRelativeNodeDegree(
             pitchReference=pitchReference, 
@@ -1594,7 +1606,7 @@ class ConcreteScale(Scale):
         1
         >>> sc.getScaleDegreeFromPitch('d')
         7
-        >>> sc.getScaleDegreeFromPitch('d#', comparisonAttribute='name') == None
+        >>> sc.getScaleDegreeFromPitch('d#', comparisonAttribute='name') is None
         True
         >>> sc.getScaleDegreeFromPitch('d#', comparisonAttribute='pitchClass')
         1
@@ -1610,7 +1622,15 @@ class ConcreteScale(Scale):
         3
         >>> sc.getScaleDegreeFromPitch('g#')
         7
-        >>> sc.getScaleDegreeFromPitch('g')
+        >>> sc.getScaleDegreeFromPitch('g') is None
+        True
+
+
+
+        >>> cmaj = key.Key('C')
+        >>> cmaj.getScaleDegreeFromPitch(pitch.Pitch('E-'), direction=scale.DIRECTION_ASCENDING, comparisonAttribute = 'step')
+        3
+
         '''
 
         post = self._abstract.getRelativeNodeDegree(
@@ -1654,7 +1674,10 @@ class ConcreteScale(Scale):
             return (scaleStep, None)
         else:
             scaleStepNormal = self.getScaleDegreeFromPitch(pitchTarget, direction, comparisonAttribute='step')
+            if scaleStepNormal is None:
+                raise ScaleException("Cannot get any scale degree from getScaleDegreeFromPitch for pitchTarget %s, direction %s, comparisonAttribute='step'" % (pitchTarget, direction))
             pitchesFound = self.pitchesFromScaleDegrees([scaleStepNormal])
+            
             if len(pitchesFound) == 0:
                 return (None, None)
             else:

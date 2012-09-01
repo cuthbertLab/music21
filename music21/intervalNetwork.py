@@ -950,6 +950,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net._degreeModulus(0)
         7
         '''
+        if degree is None:
+            raise IntervalNetworkException('Degree of None given to _degreeModulus')
         # TODO: these need to be cached
         sMin = self._getDegreeMin()
         sMax = self._getDegreeMax()
@@ -1944,24 +1946,48 @@ class BoundIntervalNetwork(IntervalNetwork):
         nodeDegreeTargets=[1],
         minPitch=None, maxPitch=None, direction=DIRECTION_ASCENDING,
         alteredDegrees={}):
-        '''Realize the native nodes of this network based on a pitch assigned to a valid `nodeId`, where `nodeId` can be specified by integer (starting from 1) or key (a tuple of origin, destination keys). 
+        '''
+        Realize the native nodes of this network based on 
+        a pitch assigned to a valid `nodeId`, where `nodeId` can 
+        be specified by integer (starting from 1) or key 
+        (a tuple of origin, destination keys). 
 
-        The `nodeDegreeTargets` specifies the the degrees to be included within the specified range. 
+        The `nodeDegreeTargets` specifies the the degrees to be 
+        included within the specified range. 
+
+        Example: build a network of the Major scale:
 
         >>> from music21 import *
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
 
-        >>> [str(p) for p in net.realizePitchByDegree('g', 5, [1,5], 'c2', 'c4') ]
-        ['C2', 'G2', 'C3', 'G3', 'C4']
+        Now for every "scale" where G is the 3rd degree, give me the tonic if that note is between C2 and C3.
+        (There's only one such note: E-2).
 
-        >>> [str(p) for p in net.realizePitchByDegree('g', 5, [1,2,3], 'c1', 'c6') ] 
-        ['C1', 'D1', 'E1', 'C2', 'D2', 'E2', 'C3', 'D3', 'E3', 'C4', 'D4', 'E4', 'C5', 'D5', 'E5', 'C6']
+        >>> net.realizePitchByDegree('G', 3, [1], 'c2', 'c3')
+        [<music21.pitch.Pitch E-2>]
 
-        >>> [str(p) for p in net.realizePitchByDegree('c', 1, [1,5], 'c3', 'c6') ]
-        ['C3', 'G3', 'C4', 'G4', 'C5', 'G5', 'C6']
+        But between c2 and f3 there are two, E-2 and E-3 (it doesn't matter that the G
+        which is scale degree 3 for E-3 is above F3):
 
+        >>> net.realizePitchByDegree('G', 3, [1], 'c2', 'f3')
+        [<music21.pitch.Pitch E-2>, <music21.pitch.Pitch E-3>]
+
+        Give us nodes 1, 2, and 5 for scales where G is node 5 (e.g., C major's dominant)
+        where any pitch is between C2 and F4
+
+        >>> pitchList = net.realizePitchByDegree('G', 5, [1, 2, 5], 'c2', 'f4')
+        >>> for p in pitchList:
+        ...     print p,
+        C2 D2 G2 C3 D3 G3 C4 D4
+
+        There are no networks based on the major scale's edge-list where 
+        with node 1 (i.e. "tonic") between C2 and F2 where
+        G is scale degree 7
+        
+        >>> net.realizePitchByDegree('G', 7, [1], 'c2', 'f2')
+        []
         '''
         realizedPitch, realizedNode = self.realize(
             pitchReference=pitchReference, nodeId=nodeId, 
@@ -1969,7 +1995,7 @@ class BoundIntervalNetwork(IntervalNetwork):
             direction=direction, alteredDegrees=alteredDegrees)
 
         # take modulus of all
-        nodeDegreeTargets = [self._degreeModulus(s) for s in nodeDegreeTargets]
+        nodeDegreeTargetsModulus = [self._degreeModulus(s) for s in nodeDegreeTargets]
 
         #environLocal.printDebug(['realizePitchByDegree(); nodeDegreeTargets', nodeDegreeTargets])
 
@@ -1978,7 +2004,7 @@ class BoundIntervalNetwork(IntervalNetwork):
             # get the node
             n = self._nodes[realizedNode[i]]
             #environLocal.printDebug(['realizePitchByDegree(); p', p, n.degree])
-            if self._degreeModulus(n.degree) in nodeDegreeTargets:
+            if self._degreeModulus(n.degree) in nodeDegreeTargetsModulus:
                 post.append(p)
         return post
 
@@ -2066,21 +2092,34 @@ class BoundIntervalNetwork(IntervalNetwork):
     def getRelativeNodeId(self, pitchReference, nodeName, pitchTarget, 
         comparisonAttribute='ps', direction=DIRECTION_ASCENDING, 
         alteredDegrees={}):
-        '''Given a reference pitch assigned to node id, determine the relative node id of pitchTarget, even if displaced over multiple octaves
+        '''
+        Given a reference pitch assigned to node id, determine the 
+        relative node id of pitchTarget, even if displaced over multiple octaves
 
-        The `nodeName` parameter may be a :class:`~music21.intervalNetwork.Node` object, a node degree, a terminus string, or a None (indicating 'terminusLow'). 
+        The `nodeName` parameter may be 
+        a :class:`~music21.intervalNetwork.Node` object, a node degree, 
+        a terminus string, or a None (indicating 'terminusLow'). 
 
         Returns None if no match.
 
         If `getNeighbor` is True, or direction, the nearest node will be returned. 
 
-        If more than one node defines the same pitch, Node weights are used to select a single node.
+        If more than one node defines the same pitch, Node weights are used 
+        to select a single node.
 
         >>> from music21 import *
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = intervalNetwork.BoundIntervalNetwork(edgeList)
         >>> net.getRelativeNodeId('a', 1, 'a4')
         'terminusLow'
+        >>> net.getRelativeNodeId('a', 1, 'b4')
+        0
+        >>> net.getRelativeNodeId('a', 1, 'c#4')
+        1
+        >>> net.getRelativeNodeId('a', 1, 'c4', comparisonAttribute = 'step')
+        1
+        >>> net.getRelativeNodeId('a', 1, 'c', comparisonAttribute = 'step')
+        1
         >>> net.getRelativeNodeId('a', 1, 'b-4') == None
         True
         '''
@@ -2094,6 +2133,10 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         if common.isStr(pitchTarget):
             pitchTarget = pitch.Pitch(pitchTarget)
+
+        saveOctave = pitchTarget.octave
+        if saveOctave is None:
+            pitchTarget.octave = pitchTarget.implicitOctave
 
         # try an octave spread first
         # if a scale degree is larger than an octave this will fail
@@ -2117,6 +2160,9 @@ class BoundIntervalNetwork(IntervalNetwork):
             if match:
                 if realizedNode[i] not in post: # may be more than on ematch
                     post.append(realizedNode[i])
+
+        if saveOctave is None:
+            pitchTarget.octave = None
 
         if len(post) == 0:
             return None
@@ -2152,6 +2198,10 @@ class BoundIntervalNetwork(IntervalNetwork):
         if common.isStr(pitchTarget):
             pitchTarget = pitch.Pitch(pitchTarget)
 
+        savedOctave = pitchTarget.octave
+        if savedOctave is None:
+            # don't alter permanently, incase a Pitch object was passed in.
+            pitchTarget.octave = pitchTarget.implicitOctave
         # try an octave spread first
         # if a scale degree is larger than an octave this will fail
         minPitch = pitchTarget.transpose(-12, inPlace=False)
@@ -2172,15 +2222,23 @@ class BoundIntervalNetwork(IntervalNetwork):
                 # low neighbor may be a previously-encountered pitch
                 return lowNeighbor, highNeighbor
             lowNeighbor = realizedNode[i]
+
+        if savedOctave is None:
+            pitchTarget.octave = savedOctave
         return None
 
 
     def getRelativeNodeDegree(self, pitchReference, nodeName, pitchTarget, 
         comparisonAttribute='ps', direction=DIRECTION_ASCENDING, 
         alteredDegrees={}):
-        '''Given a reference pitch assigned to node id, determine the relative node id of pitchTarget, even if displaced over multiple octaves
+        '''
+        Given a reference pitch assigned to node id, 
+        determine the relative node degree of pitchTarget, 
+        even if displaced over multiple octaves
         
-        Need flags for pitch class and enharmonic comparison. 
+        Comparison Attribute determines what will be used to determine
+        equality.  Use `ps` (default) for post-tonal uses.  `name` for
+        tonal, and `step` for diatonic. 
 
         >>> from music21 import *
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
@@ -2190,8 +2248,21 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         >>> net.getRelativeNodeDegree('e-2', 1, 'd3') # if e- is tonic, what is d3
         7
+        
+        For an octave repeating network, the neither pitch's octave matters:
+        
+        >>> net.getRelativeNodeDegree('e-', 1, 'd5') # if e- is tonic, what is d3
+        7
+        >>> net.getRelativeNodeDegree('e-2', 1, 'd') # if e- is tonic, what is d3
+        7
+
         >>> net.getRelativeNodeDegree('e3', 1, 'd5') == None
         True
+        >>> net.getRelativeNodeDegree('e3', 1, 'd5', comparisonAttribute='step')
+        7
+        >>> net.getRelativeNodeDegree('e3', 1, 'd', comparisonAttribute='step')
+        7
+
         >>> net.getRelativeNodeDegree('e-3', 1, 'b-3')
         5
 

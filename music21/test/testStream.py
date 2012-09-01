@@ -6535,62 +6535,62 @@ class Test(unittest.TestCase):
         i2 = instrument.Clarinet()  # -M2
         
         p1 = stream.Part()
-        p1.repeatAppend(note.Note('C'), 20)
+        p1.repeatAppend(note.Note('C4'), 4)
         p1.insert(0, i1)
-        p1.insert(10, i2)
+        p1.insert(2, i2)
         p2 = stream.Part()
-        p2.repeatAppend(note.Note('C'), 20)
+        p2.repeatAppend(note.Note('C4'), 4)
         p2.insert(0, i2)
         s = stream.Score()
         s.insert(0, p1)
         s.insert(0, p2)
         
         
-        self.assertEqual([str(p) for p in p1.pitches], ['C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'])
+        self.assertEqual([str(p) for p in p1.pitches], ['C4', 'C4', 'C4', 'C4'])
         test = p1._transposeByInstrument(inPlace=False)
-        self.assertEqual([str(p) for p in test.pitches], ['F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3'])
-        
+        self.assertEqual([str(p) for p in test.pitches], ['F3', 'F3', 'B-3', 'B-3'])
+
         test = p1._transposeByInstrument(inPlace=False, reverse=True)
-        self.assertEqual([str(p) for p in test.pitches], ['G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4'])
+        self.assertEqual([str(p) for p in test.pitches], ['G4', 'G4', 'D4', 'D4'])
         
         # declare that at written pitch 
         p1.atSoundingPitch = False
         test = p1.toSoundingPitch(inPlace=False)
         # all transpositions should be downward
-        self.assertEqual([str(p) for p in test.pitches], ['F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3'])
+        self.assertEqual([str(p) for p in test.pitches], ['F3', 'F3', 'B-3', 'B-3'])
         
         # declare that at written pitch 
         p1.atSoundingPitch = False
         test = p1.toWrittenPitch(inPlace=False)
         # no change; already at written
-        self.assertEqual([str(p) for p in test.pitches], ['C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'])
+        self.assertEqual([str(p) for p in test.pitches], ['C4', 'C4', 'C4', 'C4'])
         
         # declare that at sounding pitch 
         p1.atSoundingPitch = True
         # no change happens
         test = p1.toSoundingPitch(inPlace=False)
-        self.assertEqual([str(p) for p in test.pitches], ['C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'])
+        self.assertEqual([str(p) for p in test.pitches], ['C4', 'C4', 'C4', 'C4'])
         
         # declare  at sounding pitch 
         p1.atSoundingPitch = True
         # reverse intervals; app pitches should be upward
         test = p1.toWrittenPitch(inPlace=False)
-        self.assertEqual([str(p) for p in test.pitches], ['G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'G4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4'])
+        self.assertEqual([str(p) for p in test.pitches], ['G4', 'G4', 'D4', 'D4'])
 
         
         # test on a complete score
         s.parts[0].atSoundingPitch = False
         s.parts[1].atSoundingPitch = False
         test = s.toSoundingPitch(inPlace=False)
-        self.assertEqual([str(p) for p in test.parts[0].pitches], ['F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3'])
-        self.assertEqual([str(p) for p in test.parts[1].pitches], ['B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3'])
+        self.assertEqual([str(p) for p in test.parts[0].pitches], ['F3', 'F3', 'B-3', 'B-3'])
+        self.assertEqual([str(p) for p in test.parts[1].pitches], ['B-3', 'B-3', 'B-3', 'B-3'])
 
         # test same in place
         s.parts[0].atSoundingPitch = False
         s.parts[1].atSoundingPitch = False
         s.toSoundingPitch(inPlace=True)
-        self.assertEqual([str(p) for p in s.parts[0].pitches], ['F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'F3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3'])
-        self.assertEqual([str(p) for p in test.parts[1].pitches], ['B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3', 'B-3'])
+        self.assertEqual([str(p) for p in s.parts[0].pitches], ['F3', 'F3', 'B-3', 'B-3'])
+        self.assertEqual([str(p) for p in test.parts[1].pitches], ['B-3', 'B-3', 'B-3', 'B-3'])
 
 
     def testTransposeByPitchB(self):

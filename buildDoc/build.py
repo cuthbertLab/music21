@@ -69,9 +69,7 @@ from music21.corpus import chorales as corpusChorales
 
 from music21.counterpoint import species as counterpointSpecies
 
-#demos
-from music21.demos.theoryAnalysis import theoryAnalyzer as demosTheoryAnalysisTheoryAnalyzer
-
+# demos
 # defaults
 # derivation
 # doc folder
@@ -157,6 +155,9 @@ from music21.test import test
 from music21.test import multiprocessTest as testMultiprocessTest
 
 from music21 import text
+
+from music21.theoryAnalysis import theoryAnalyzer as theoryAnalysisTheoryAnalyzer
+
 from music21 import tie
 from music21 import tinyNotation
 
@@ -249,8 +250,6 @@ MODULES = [
 
     counterpointSpecies,
 
-    demosTheoryAnalysisTheoryAnalyzer,
-
     duration, 
     dynamics,
 
@@ -333,8 +332,10 @@ MODULES = [
     testMultiprocessTest,
         
     text,
-    tie,
     
+    theoryAnalysisTheoryAnalyzer,
+    
+    tie,
     tinyNotation,
     # trecento
     trecentoCadencebook,

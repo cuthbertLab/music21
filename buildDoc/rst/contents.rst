@@ -80,7 +80,6 @@ Module Reference
    moduleCorpusBase
    moduleCorpusChorales
    moduleCounterpointSpecies
-   moduleDemosTheoryAnalysisTheoryAnalyzer
    moduleDuration
    moduleDynamics
    moduleEditorial
@@ -139,6 +138,7 @@ Module Reference
    moduleTestTest
    moduleTestMultiprocessTest
    moduleText
+   moduleTheoryAnalysisTheoryAnalyzer
    moduleTie
    moduleTinyNotation
    moduleTrecentoCadencebook
