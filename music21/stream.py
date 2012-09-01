@@ -8630,62 +8630,14 @@ class Stream(base.Music21Object):
 
     notesAndRests = property(_getNotesAndRests, doc='''
         The notesAndRests property of a Stream returns a new Stream object
-        that consists only of the notes and rests (including 
+        that consists only of the :class:`~music21.note.GeneralNote` objects found in
+        the stream.  The new Stream will contain  
+        mostly notes and rests (including 
         :class:`~music21.note.Note`, 
         :class:`~music21.chord.Chord`, 
-        :class:`~music21.note.Rest`, etc.) found 
-        in the stream.
+        :class:`~music21.note.Rest`) but also their subclasses, such as 
+        `Harmony` objects (`ChordSymbols`, `FiguredBass`), `SpacerRests` etc.
         
-        
-        In versions of music21 before alpha 6, the "notes" property
-        also returned rests.  Thus you may find some old programs that
-        use "notes" and expect to find rests.  These programs should
-        be converted to use notesAndRests
-        
-        
-
-        >>> from music21 import *
-        >>> s1 = stream.Stream()
-        >>> k1 = key.KeySignature(0) # key of C
-        >>> n1 = note.Note('B')
-        >>> c1 = chord.Chord(['A', 'B-'])
-        >>> s1.append([k1, n1, c1])
-        >>> s1.show('text')
-        {0.0} <music21.key.KeySignature of no sharps or flats>
-        {0.0} <music21.note.Note B>
-        {1.0} <music21.chord.Chord A B->
-
-        >>> notes1 = s1.notesAndRests
-        >>> notes1.show('text')
-        {0.0} <music21.note.Note B>
-        {1.0} <music21.chord.Chord A B->       
-        ''')
-
-
-    def _getNotes(self):
-        if 'notes' not in self._cache or self._cache['notes'] is None:
-           self._cache['notes'] = self.getElementsByClass('NotRest', 
-                                  returnStreamSubClass=False)
-        return self._cache['notes']
-
-        #Rests are a subclass of GeneralNote, and thus General Note cannot
-        # be used here
-        #return self.getElementsByClass(['NotRest'])
-
-    notes = property(_getNotes, doc='''
-        The notes property of a Stream returns a new Stream object
-        that consists only of the notes (including 
-        :class:`~music21.note.Note`, 
-        :class:`~music21.chord.Chord`, etc.) found 
-        in the stream. This excludes :class:`~music21.note.Rest` objects.
-
-
-        In versions of music21 before alpha 6, the "notes" property
-        also returned rests.  Thus you may find some old programs that
-        use "notes" and expect to find rests.  These programs should
-        be converted to use notesAndRests
-
-
         >>> from music21 import *
         >>> s1 = stream.Stream()
         >>> k1 = key.KeySignature(0) # key of C
@@ -8699,9 +8651,74 @@ class Stream(base.Music21Object):
         {1.0} <music21.note.Rest rest>
         {2.0} <music21.chord.Chord A B->
 
-        >>> s1.notes.show('text')
+        `.notesAndRests` removes the `KeySignature` object but keeps the `Rest`.
+
+        >>> notes1 = s1.notesAndRests
+        >>> notes1.show('text')
+        {0.0} <music21.note.Note B>
+        {1.0} <music21.note.Rest rest>
+        {2.0} <music21.chord.Chord A B->       
+        
+        The same caveats about `Stream` classes and `.flat` in `.notes` apply here.
+        ''')
+
+
+    def _getNotes(self):
+        if 'notes' not in self._cache or self._cache['notes'] is None:
+           self._cache['notes'] = self.getElementsByClass('NotRest', 
+                                  returnStreamSubClass=False)
+        return self._cache['notes']
+
+
+    notes = property(_getNotes, doc='''
+        The notes property of a Stream returns a new Stream object
+        that consists only of the notes (that is, 
+        :class:`~music21.note.Note`, 
+        :class:`~music21.chord.Chord`, etc.) found 
+        in the stream. This excludes :class:`~music21.note.Rest` objects.
+
+        >>> from music21 import *
+        >>> p1 = stream.Part()
+        >>> k1 = key.KeySignature(0) # key of C
+        >>> n1 = note.Note('B')
+        >>> r1 = note.Rest()
+        >>> c1 = chord.Chord(['A', 'B-'])
+        >>> p1.append([k1, n1, r1, c1])
+        >>> p1.show('text')
+        {0.0} <music21.key.KeySignature of no sharps or flats>
+        {0.0} <music21.note.Note B>
+        {1.0} <music21.note.Rest rest>
+        {2.0} <music21.chord.Chord A B->
+
+        >>> p1.notes.show('text')
         {0.0} <music21.note.Note B>
         {2.0} <music21.chord.Chord A B->       
+
+        Notice that though `p1` is a `Part` object, `.notes` returns
+        a generic `Stream` object.
+
+        >>> p1.notes
+        <music21.stream.Stream ...>
+        
+        Let's add a measure to `p1`:
+        
+        >>> m1 = stream.Measure()
+        >>> n2 = note.Note("D")
+        >>> m1.insert(0, n2)
+        >>> p1.append(m1)
+        
+        Now note that `n2` is *not* found in `p1.notes`
+
+        >>> p1.notes.show('text')
+        {0.0} <music21.note.Note B>
+        {2.0} <music21.chord.Chord A B->       
+
+        We need to call `p1.flat.notes` to find it:
+        
+        >>> p1.flat.notes.show('text')
+        {0.0} <music21.note.Note B>
+        {2.0} <music21.chord.Chord A B->       
+        {3.0} <music21.note.Note D>
         ''')
 
     def _getPitches(self):
@@ -8725,7 +8742,6 @@ class Stream(base.Music21Object):
         Streams, and Chords will have their Pitch objects accumulated as 
         well. For that reason, a flat representation is not required. 
 
-
         Pitch objects are returned in a List, not a Stream.  This usage
         differs from the .notes property, but makes sense since Pitch
         objects usually have by default a Duration of zero. This is an important difference
@@ -8737,6 +8753,8 @@ class Stream(base.Music21Object):
         >>> partOnePitches = a.parts[0].pitches
         >>> len(partOnePitches)
         25
+        >>> partOnePitches[0]
+        <music21.pitch.Pitch B4>
         >>> [str(p) for p in partOnePitches[0:10]]
         ['B4', 'D5', 'B4', 'B4', 'B4', 'B4', 'C5', 'B4', 'A4', 'A4']
 
@@ -8825,24 +8843,33 @@ class Stream(base.Music21Object):
         skipUnisons = False, skipOctaves = False,
         skipGaps = False, getOverlaps = False, noNone = False, **keywords):
         '''
-        Returns a list of consecutive *pitched* Notes in a Stream.  A single "None" is placed in the list 
-        at any point there is a discontinuity (such as if there is a rest between two pitches), unless the `noNone` parameter is True. 
+        Returns a list of consecutive *pitched* Notes in a Stream.  
         
-        How to determine consecutive pitches is a little tricky and there are many options.  
+        A single "None" is placed in the list 
+        at any point there is a discontinuity (such as if there is a 
+        rest between two pitches), unless the `noNone` parameter is True. 
+        
+        How to determine consecutive pitches is a little tricky and there are many options:  
 
-        The `skipUnison` parameter uses the midi-note value (.ps) to determine unisons, so enharmonic transitions (F# -> Gb) are
-        also skipped if skipUnisons is true.  We believe that this is the most common usage.  However, because
-        of this, you cannot completely be sure that the x.findConsecutiveNotes() - x.findConsecutiveNotes(skipUnisons = True)
-        will give you the number of P1s in the piece, because there could be d2's in there as well.
+            The `skipUnisons` parameter uses the midi-note value (.ps) to determine unisons, 
+            so enharmonic transitions (F# -> Gb) are
+            also skipped if `skipUnisons` is true.  We believe that this is the most common usage.  
+            However, because
+            of this, you cannot completely be sure that the 
+            x.findConsecutiveNotes() - x.findConsecutiveNotes(skipUnisons = True)
+            will give you the number of P1s in the piece, because there could be 
+            d2's in there as well.
                 
         See Test.testFindConsecutiveNotes() for usage details.
         
         
         OMIT_FROM_DOCS
 
-        N.B. for chords, currently, only the first pitch is tested for unison.  this is a bug TODO: FIX
+        N.B. for chords, currently, only the first pitch is tested for unison.  
+        this is a bug TODO: FIX
 
-        (**keywords is there so that other methods that pass along dicts to findConsecutiveNotes don't have to remove 
+        (**keywords is there so that other methods that pass along dicts to 
+        findConsecutiveNotes don't have to remove 
         their own args; this method is used in melodicIntervals.)
         '''
         sortedSelf = self.sorted
@@ -8932,7 +8959,8 @@ class Stream(base.Music21Object):
         return returnList
     
     def melodicIntervals(self, *skipArgs, **skipKeywords):
-        '''Returns a Stream of :class:`~music21.interval.Interval` objects
+        '''
+        Returns a Stream of :class:`~music21.interval.Interval` objects
         between Notes (and by default, Chords) that follow each other in a stream.
         the offset of the Interval is the offset of the beginning of the interval 
         (if two notes are adjacent, then this offset is equal to the offset of 
@@ -8940,12 +8968,10 @@ class Stream(base.Music21Object):
         in the Stream, then these two numbers
         will be different).
         
-        
         See :meth:`~music21.stream.Stream.findConsecutiveNotes` in this class for 
         a discussion of what is meant by default for "consecutive notes", and 
         which keywords such as skipChords, skipRests, skipUnisons, etc. can be
         used to change that behavior.
-        
         
         The interval between a Note and a Chord (or between two chords) is the 
         interval to the first pitch of the Chord (pitches[0]) which is usually the lowest. 
@@ -8953,7 +8979,6 @@ class Stream(base.Music21Object):
         run :meth:`~music21.stream.Stream.findConsecutiveNotes` and then calculate
         your own intervals directly.
         
-
         Returns an empty Stream if there are not at least two elements found by 
         findConsecutiveNotes.
 
@@ -8961,23 +8986,17 @@ class Stream(base.Music21Object):
         >>> from music21 import *  
         >>> s1 = tinyNotation.TinyNotationStream("c4 d' r b b'", "3/4")
         >>> #_DOCS_SHOW s1.show()    
-
-        
         
         .. image:: images/streamMelodicIntervals1.*
             :width: 246
-
-
 
         >>> intervalStream1 = s1.melodicIntervals()
         >>> intervalStream1.show('text')
         {1.0} <music21.interval.Interval M9>
         {4.0} <music21.interval.Interval P8>
-        
-        
+                
         Using the skip attributes from :meth:`~music21.stream.Stream.findConsecutiveNotes`, 
         we can alter which intervals are reported:
-        
         
         >>> intervalStream2 = s1.melodicIntervals(skipRests = True, skipOctaves=True)
         >>> intervalStream2.show('text')

@@ -1531,7 +1531,7 @@ class Test(unittest.TestCase):
             for mxNote in translate.durationToMx(dur): 
             #for mxNote in dur.mx: # returns a list of mxNote objs
                 # merger returns a new object
-                mxNotes.append(mxNote.merge(p.mx))
+                mxNotes.append(mxNote.merge(translate.pitchToMx(p)))
 
         self.assertEqual(len(mxNotes), 5)
         self.assertEqual(mxNotes[0].get('pitch').get('alter'), 1)

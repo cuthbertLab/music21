@@ -92,6 +92,34 @@ def streamToMusicXML(streamObject):
     del post
     return mxScore.xmlStr()
 
+def measureToMusicXML(m):
+    '''Translate a music21 Measure into a 
+    complete MusicXML string representation.
+
+    Note: this method is called for complete MusicXML 
+    representation of a Measure, not for partial 
+    solutions in Part or Stream production.
+
+    >>> from music21 import *
+    >>> m = stream.Measure()
+    >>> m.repeatAppend(note.Note('g3'), 4)
+    >>> post = musicxml.translate.measureToMusicXML(m)
+    >>> len(post) > 1000
+    True
+    '''
+    from music21 import stream
+    # search for time signatures, either defined locally or in context
+    #environLocal.printDebug(['measureToMusicXML', m]) 
+    # we already have a deep copy passed in, which happens in 
+    # stream.Measure._getMusicXML()
+    m.makeNotation(inPlace=True)
+
+    out = stream.Part()
+    out.append(m)
+    # call the musicxml property on Stream
+    return music21ObjectToMusicXML(out)
+
+
 def durationToMusicXML(d):
     '''
     Translate a music21 :class:`~music21.duration.Duration` into 
@@ -599,7 +627,7 @@ def repeatToMx(r):
     '''
     >>> from music21 import *
     >>> b = bar.Repeat(direction='end')
-    >>> mxBarline = b.mx
+    >>> mxBarline = repeatToMx(b)
     >>> mxBarline.get('barStyle')
     'light-heavy'
     '''
@@ -628,7 +656,9 @@ def repeatToMx(r):
     return mxBarline
 
 def mxToRepeat(mxBarline, inputM21=None):
-    '''Given an mxBarline, file the necessary parameters
+    '''
+    Given an mxBarline (not an mxRepeat object) with repeatObj as a parameter, 
+    file the necessary parameters and return a bar.Repeat() object
 
     >>> from music21 import *
     >>> mxRepeat = musicxml.Repeat()
@@ -638,8 +668,9 @@ def mxToRepeat(mxBarline, inputM21=None):
     >>> mxBarline = musicxml.Barline()
     >>> mxBarline.set('barStyle', 'light-heavy')
     >>> mxBarline.set('repeatObj', mxRepeat)
-    >>> b = bar.Repeat()
-    >>> b.mx = mxBarline
+    >>> b = musicxml.translate.mxToRepeat(mxBarline)
+    >>> b
+    <music21.bar.Repeat direction=end>
 
     Test that the music21 style for a backwards repeat is called "final"
     (because it resembles a final barline) but that the musicxml style
@@ -649,22 +680,23 @@ def mxToRepeat(mxBarline, inputM21=None):
     'final'
     >>> b.direction
     'end'
-    >>> b.mx.get('barStyle')
+    >>> mxBarline2 = musicxml.translate.repeatToMx(b)
+    >>> mxBarline2.get('barStyle')
     'light-heavy'
     '''
     from music21 import bar
-    if inputM21 == None:
+    if inputM21 is None:
         r = bar.Repeat()
     else:
         r = inputM21
 
     r.style = mxBarline.get('barStyle')
     location = mxBarline.get('location')
-    if location != None:
+    if location is not None:
         r.location = location
 
     mxRepeat = mxBarline.get('repeatObj')
-    if mxRepeat == None:
+    if mxRepeat is None:
         raise bar.BarException('attempting to create a Repeat from an MusicXML bar that does not define a repeat')
 
     mxDirection = mxRepeat.get('direction')
@@ -682,11 +714,59 @@ def mxToRepeat(mxBarline, inputM21=None):
         # make into a number
         r.times = int(mxRepeat.get('times'))
 
+    if inputM21 is None:
+        return r
+
+def barlineToMx(barObject):
+    '''
+    Translate a music21 bar.Bar object to an mxBar
+    while making two substitutions: double -> light-light
+    and final -> light-heavy as shown below.
+    
+    >>> from music21 import *
+    >>> b = bar.Barline('final')
+    >>> mxBarline = musicxml.translate.barlineToMx(b)
+    >>> mxBarline.get('barStyle')
+    'light-heavy'
+    '''
+    mxBarline = musicxmlMod.Barline()
+    mxBarline.set('barStyle', barObject.musicXMLBarStyle)
+    if barObject.location is not None:
+        mxBarline.set('location', barObject.location)
+    return mxBarline
 
 
+def mxToBarline(mxBarline, inputM21 = None):
+    '''Given an mxBarline, fill the necessary parameters
+
+    >>> from music21 import *
+    >>> mxBarline = musicxml.Barline()
+    >>> mxBarline.set('barStyle', 'light-light')
+    >>> mxBarline.set('location', 'right')
+    >>> b = musicxml.translate.mxToBarline(mxBarline)
+    >>> b.style  # different in music21 than musicxml
+    'double'
+    >>> b.location
+    'right'
+    '''
+    from music21 import bar
+    if inputM21 is None:
+        b = bar.Barline()
+    else:
+        b = inputM21
+    b.style = mxBarline.get('barStyle')
+    location = mxBarline.get('location')
+    if location is not None:
+        b.location = location
+
+    if inputM21 is None:
+        return b
+    
 #-------------------------------------------------------------------------------
 def mxGraceToGrace(noteOrChord, mxGrace=None):
-    '''Given a completely formed, non-grace Note or Chord, create and return a m21 grace version of the same.
+    '''
+    Given a completely formed, non-grace Note or Chord, create and 
+    return a m21 grace version of the same.
 
     If mxGrace is None, no change is made and the same object is returned.
     '''
@@ -707,7 +787,9 @@ def mxGraceToGrace(noteOrChord, mxGrace=None):
 
 
 def durationToMxGrace(d, mxNoteList):
-    '''Given a music21 duration and a list of mxNotes, edit the mxNotes in place if the duration is a GraceDuration
+    '''
+    Given a music21 duration and a list of mxNotes, edit the 
+    mxNotes in place if the duration is a GraceDuration
     '''
     if d.isGrace: # this is a class attribute, not a property/method
         for mxNote in mxNoteList:
@@ -906,6 +988,8 @@ def tieToMx(t):
     :class:`~music21.musicxml.Tied` (representing notation)
     objects as two component lists.
 
+
+
     '''
     mxTieList = []
     mxTie = musicxmlMod.Tie()
@@ -937,13 +1021,14 @@ def tieToMx(t):
 
 
 def mxToTie(mxNote, inputM21=None):
-    '''Translate a MusicXML :class:`~music21.musicxml.Note` to a music21 :class:`~music21.tie.Tie` object.
+    '''
+    Translate a MusicXML :class:`~music21.musicxml.Note` (!) to a music21 
+    :class:`~music21.tie.Tie` object according to its <tieList> parameter.
     '''
     from music21 import note
     from music21 import tie
 
     if inputM21 == None:
-        from music21 import note
         t = tie.Tie()
     else:
         t = inputM21
@@ -970,7 +1055,8 @@ def mxToTie(mxNote, inputM21=None):
 #             mxTiedList = mxNotations.getTieds()
             # should be sufficient to only get mxTieList
 
-
+    if inputM21 is None:
+        return t
 
 #-------------------------------------------------------------------------------
 # Lyrics
@@ -1000,15 +1086,16 @@ def mxToLyric(mxLyric, inputM21=None):
     >>> lyricObj
     <music21.note.Lyric number=4 syllabic=single text="word">
     
-    >>> mxLyric.set('number', 'part2verse1')
+    Non-numeric MusicXML lyric "number"s are converted to identifiers:
     
-    >>> mxToLyric(mxLyric, lyricObj)
-    >>> lyricObj
+    >>> mxLyric.set('number', 'part2verse1')    
+    >>> l2 = mxToLyric(mxLyric)
+    >>> l2
     <music21.note.Lyric number=0 identifier="part2verse1" syllabic=single text="word">
     
     '''
-    if inputM21 == None:
-        from music21 import note
+    from music21 import note
+    if inputM21 is None:
         l = note.Lyric()
     else:
         l = inputM21
@@ -1031,6 +1118,8 @@ def mxToLyric(mxLyric, inputM21=None):
     
     l.syllabic = mxLyric.get('syllabic')
 
+    if inputM21 is None:
+        return l
 
 #-------------------------------------------------------------------------------
 # Durations
@@ -2529,7 +2618,16 @@ def chordToMx(c, spannerBundle=None):
     True
     >>> mxNoteList[2].get('chord')
     True
+    >>> mxNoteList[0].get('pitch')
+    <pitch step=A alter=-1 octave=4>
+    >>> mxNoteList[1].get('pitch')
+    <pitch step=D alter=-1 octave=4>
+    >>> mxNoteList[2].get('pitch')
+    <pitch step=E alter=-1 octave=4>
+        
 
+    Test that notehead translation works:
+    
     >>> g = note.Note('c4')
     >>> g.notehead = 'diamond'
     >>> h = pitch.Pitch('g3')
@@ -2589,7 +2687,7 @@ def chordToMx(c, spannerBundle=None):
             #environLocal.pd(['final note stem', mxNote.stem])
             # only add beam to first note in group
             if c.beams is not None and chordPos == 0:
-                mxNote.beamList = c.beams.mx
+                mxNote.beamList = beamsToMx(c.beams)
 
             # if the durations included tuplets, there will be a tuplet
             # notations indication in each of the components of the chord; thus
@@ -2610,7 +2708,7 @@ def chordToMx(c, spannerBundle=None):
             tieObj = n.tie
             if tieObj is not None:
                 #environLocal.printDebug(['chordToMx: found tie for pitch', pitchObj])
-                mxTieList, mxTiedList = tieObj.mx
+                mxTieList, mxTiedList = tieToMx(tieObj)
                 # if starting a tie, add to all mxNotes in the chord
                 # but only add to the last duration in the dur group
                 if (tieObj.type in ['start', 'continue'] and
@@ -2678,7 +2776,11 @@ def mxToChord(mxNoteList, inputM21=None, spannerBundle=None):
 
     >>> from music21 import *
     >>> a = musicxml.Note()
+    >>> p = musicxml.Pitch()
+    >>> p.set('step', 'A')
+    >>> p.set('octave', 3)
     >>> a.setDefaults()
+    >>> a.set('pitch', p)
     >>> b = musicxml.Note()
     >>> b.setDefaults()
     >>> b.set('chord', True)
@@ -2688,10 +2790,11 @@ def mxToChord(mxNoteList, inputM21=None, spannerBundle=None):
     >>> a.external['divisions'] = m.external['divisions']
     >>> b.external['measure'] = m # assign measure for divisions ref
     >>> b.external['divisions'] = m.external['divisions']
-    >>> c = chord.Chord()
-    >>> c.mx = [a, b]
+    >>> c = musicxml.translate.mxToChord([a, b])
     >>> len(c.pitches)
     2
+    >>> c.pitches[0]
+    <music21.pitch.Pitch A3>
 
     >>> from music21 import *
     >>> a = musicxml.Note()
@@ -2731,7 +2834,6 @@ def mxToChord(mxNoteList, inputM21=None, spannerBundle=None):
         spannerBundle.freePendingComponentAssignment(c)
 
     # assume that first chord is the same duration for all parts
-    #c.duration.mx = mxNoteList[0]
     mxToDuration(mxNoteList[0], c.duration)
 
     # assume that first note in list has a grace object (and all do)
@@ -2744,8 +2846,7 @@ def mxToChord(mxNoteList, inputM21=None, spannerBundle=None):
 
     for mxNote in mxNoteList:
         # extract pitch pbjects     
-        p = pitch.Pitch()
-        p.mx = mxNote # will extract pitch info from mxNote
+        p = mxToPitch(mxNote)
         pitches.append(p)
         #extract notehead objects; may be None
         nh = mxNote.get('noteheadObj')
@@ -2755,8 +2856,7 @@ def mxToChord(mxNoteList, inputM21=None, spannerBundle=None):
         stemDirs.append(stemDir)
 
         if len(mxNote.tieList) > 0:
-            tieObj = tie.Tie() # m21 tie object
-            tieObj.mx = mxNote # provide entire Note
+            tieObj = mxToTie(mxNote)
             #environLocal.printDebug(['found tie in chord', tieObj])
             ties.append(tieObj)
         else: # need place holder for each pitch
@@ -2764,7 +2864,8 @@ def mxToChord(mxNoteList, inputM21=None, spannerBundle=None):
     # set all at once
     c.pitches = pitches
     # set beams from first note of chord
-    c.beams.mx = mxNoteList[0].beamList
+    beamsObj = mxToBeams(mxNoteList[0].beamList)
+    c.beams = beamsObj
 
     # set ties based on pitches
     for i, t in enumerate(ties):
@@ -2898,7 +2999,6 @@ def noteToMxNotes(n, spannerBundle=None):
         #environLocal.printDebug(['noteToMxNotes(): spannerBundle post-filter by component:', spannerBundle, n, id(n)])
 
     mxNoteList = []
-    #pitchMx = n.pitch.mx
     pitchMx = pitchToMx(n.pitch)
     noteColor = n.color
 
@@ -2907,7 +3007,6 @@ def noteToMxNotes(n, spannerBundle=None):
     #mxNotehead.set('charData', defaults.noteheadUnpitched)
 
     for mxNote in durationToMx(n.duration): # returns a list of mxNote objs
-    #for mxNote in n.duration.mx: # returns a list of mxNote objs
         # merge method returns a new object; but can use existing here
         mxNote = mxNote.merge(pitchMx, returnDeepcopy=False)
         if n.duration.isGrace:
@@ -2925,7 +3024,6 @@ def noteToMxNotes(n, spannerBundle=None):
 
     # note: lyric only applied to first note
     for lyricObj in n.lyrics:
-        #mxNoteList[0].lyricList.append(lyricObj.mx)
         mxNoteList[0].lyricList.append(lyricToMx(lyricObj))
 
     # if this note, not a component duration, but this note has a tie, 
@@ -2951,7 +3049,7 @@ def noteToMxNotes(n, spannerBundle=None):
     # more than one part
     nBeams = n.beams
     if nBeams:
-        nBeamsMx = n.beams.mx
+        nBeamsMx = beamsToMx(n.beams)
         for mxNote in mxNoteList:
             mxNote.beamList = nBeamsMx
 
@@ -3033,8 +3131,7 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
 
     mxGrace = mxNote.get('graceObj')
 
-    #n.pitch.mx = mxNote # required info will be taken from entire note
-    mxToPitch(mxNote, n.pitch)
+    mxToPitch(mxNote, n.pitch) # required info will be taken from entire note
 
     if mxGrace is not None:
         #environLocal.pd(['mxGrace', mxGrace, mxNote, n.duration])
@@ -3046,7 +3143,8 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
 
     # the n.duration object here will be configured based on mxNote
     mxToDuration(mxNote, n.duration)
-    n.beams.mx = mxNote.beamList
+    beamsObj = mxToBeams(mxNote.beamList)
+    n.beams = beamsObj 
 
     mxStem = mxNote.get('stem')
     if mxStem is not None:
@@ -3059,8 +3157,9 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
     # can use mxNote.tieList instead
     mxTieList = mxNote.get('tieList')
     if len(mxTieList) > 0:
-        tieObj = tie.Tie() # m21 tie object
-        tieObj.mx = mxNote # provide entire Note
+        
+        tieObj = mxToTie(mxNote) # m21 tie object
+                                 # provide entire Note
         # n.tie is defined in GeneralNote as None by default
         n.tie = tieObj
 
@@ -3141,7 +3240,6 @@ def mxToRest(mxNote, inputM21=None):
         r = inputM21
 
     try:
-        #r.duration.mx = mxNote
         mxToDuration(mxNote, r.duration)
     except duration.DurationException:
         #environLocal.printDebug(['failed extaction of duration from musicxml', 'mxNote:', mxNote, r])
@@ -3221,7 +3319,11 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
             # create a simple barline for storing ending
             mxBarline = musicxmlMod.Barline()
         else:
-            mxBarline = m.leftBarline.mx # this may be a repeat object
+            if 'Repeat' in m.leftBarline.classes:
+                mxBarline = repeatToMx(m.leftBarline)
+            else:
+                mxBarline = barlineToMx(m.leftBarline)
+
         # setting location outside of object based on that this attribute
         # is the leftBarline
         mxBarline.set('location', 'left')
@@ -3380,7 +3482,10 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
             # create a simple barline for storing ending
             mxBarline = musicxmlMod.Barline()
         else:
-            mxBarline = m.rightBarline.mx # this may be a repeat
+            if 'Repeat' in m.rightBarline.classes:
+                mxBarline = repeatToMx(m.rightBarline)
+            else:
+                mxBarline = barlineToMx(m.rightBarline)
         # setting location outside of object based on that this attribute
         # is the leftBarline
         mxBarline.set('location', 'right')
@@ -3505,24 +3610,18 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             ts.mx = mxSub
             _addToStaffReference(mxSub, ts, staffReference)
             m._insertCore(0, ts)
-            #m.timeSignature = meter.TimeSignature()
-            #m.timeSignature.mx = mxSub
     if mxAttributesInternal and len(mxAttributes.clefList) != 0:
         for mxSub in mxAttributes.clefList:
             cl = clef.Clef()
             cl.mx = mxSub
             _addToStaffReference(mxSub, cl, staffReference)
             m._insertCore(0, cl)
-            #m.clef = clef.Clef()
-            #m.clef.mx = mxSub
     if mxAttributesInternal and len(mxAttributes.keyList) != 0:
         for mxSub in mxAttributes.keyList:
             ks = key.KeySignature()
             ks.mx = mxSub
             _addToStaffReference(mxSub, ks, staffReference)
             m._insertCore(0, ks)
-            #m.keySignature = key.KeySignature()
-            #m.keySignature.mx = mxSub
 
     # transposition may be defined for a Part in the Measure attributes
     transposition = None
@@ -3643,9 +3742,9 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             mxBarline = mxObj
             mxRepeatObj = mxBarline.get('repeatObj')
             if mxRepeatObj is not None:
-                barline = bar.Repeat()
+                barline = mxToRepeat(mxBarline)
             else:
-                barline = bar.Barline()
+                barline = mxToBarline(mxBarline)
 
             # barline objects also store ending objects, that mark begin
             # and end of repeat bracket designations
@@ -3681,7 +3780,6 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                     else:
                         raise TranslateException('found mx Ending object that is not stop message, even though there is still an open start message.')
 
-            barline.mx = mxBarline # configure
             if barline.location == 'left':
                 #environLocal.printDebug(['setting left barline', barline])
                 m.leftBarline = barline
@@ -3751,9 +3849,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
 
                     currentLyricNumber = 1
                     for mxLyric in mxNote.lyricList:
-                        lyricObj = note.Lyric()
-                        #lyricObj.mx = mxLyric
-                        mxToLyric(mxLyric, lyricObj)
+                        lyricObj = mxToLyric(mxLyric)
                         if lyricObj.number == 0:
                             lyricObj.number = currentLyricNumber
                         n.lyrics.append(lyricObj)
@@ -3768,7 +3864,6 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                 restAndNoteCount['rest'] += 1
                 n = note.Rest()
                 mxToRest(mxNote, inputM21=n)
-                #n.mx = mxNote # assign mxNote to rest obj
                 _addToStaffReference(mxNote, n, staffReference)
                 #m.insert(offsetMeasureNote, n)
                 if useVoices:
@@ -3783,15 +3878,11 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             # have a complete chord
             if len(mxNoteList) > 0 and (mxNoteNext is None
                 or mxNoteNext.get('chord') is False):
-                #c = chord.Chord()
-                #c.mx = mxNoteList
                 c = mxToChord(mxNoteList, spannerBundle=spannerBundle)
                 # add any accumulated lyrics
                 currentLyricNumber = 1
                 for mxLyric in mxLyricList:
-                    lyricObj = note.Lyric()
-                    #lyricObj.mx = mxLyric
-                    mxToLyric(mxLyric, lyricObj)
+                    lyricObj = mxToLyric(mxLyric)
                     if lyricObj.number == 0:
                         lyricObj.number = currentLyricNumber
                     c.lyrics.append(lyricObj)
@@ -3826,17 +3917,15 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
         elif isinstance(mxObj, musicxmlMod.Direction):
             offsetDirection = mxToOffset(mxObj, divisions)
             if mxObj.getDynamicMark() is not None:
-                #d = dynamics.Dynamic()
-                #d.mx = mxObj
                 # in rare cases there may be more than one dynamic in the same
-                # direction
+                # direction, so we iterate
                 for d in mxToDynamicList(mxObj):
                     _addToStaffReference(mxObj, d, staffReference)
                     #m.insert(offsetMeasureNote, d)
                     m._insertCore(offsetMeasureNote + offsetDirection, d)
 
             mxDirectionToSpanners(nLast, mxObj, spannerBundle)
-            # TODO: a spanner
+            # TODO: multiple spanners
 #             if mxObj.getWedge() is not None:
 #                 w = dynamics.Wedge()
 #                 w.mx = mxObj     
@@ -3909,32 +3998,6 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
 
     return m, staffReference, transposition
 
-def measureToMusicXML(m):
-    '''Translate a music21 Measure into a 
-    complete MusicXML string representation.
-
-    Note: this method is called for complete MusicXML 
-    representation of a Measure, not for partial 
-    solutions in Part or Stream production.
-
-    >>> from music21 import *
-    >>> m = stream.Measure()
-    >>> m.repeatAppend(note.Note('g3'), 4)
-    >>> post = musicxml.translate.measureToMusicXML(m)
-    >>> len(post) > 1000
-    True
-    '''
-    from music21 import stream
-    # search for time signatures, either defined locally or in context
-    #environLocal.printDebug(['measureToMusicXML', m]) 
-    # we already have a deep copy passed in, which happens in 
-    # stream.Measure._getMusicXML()
-    m.makeNotation(inPlace=True)
-
-    out = stream.Part()
-    out.append(m)
-    # call the musicxml property on Stream
-    return music21ObjectToMusicXML(out)
 
 
 
@@ -4324,7 +4387,6 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     if mxInstrument is not None: # mxInstrument is a ScorePart
         # need an mxScorePart here   
         mxToInstrument(mxInstrument, instrumentObj)
-        #instrumentObj.mx = mxInstrument
     # add part id as group
     instrumentObj.groups.append(partId)
 
@@ -4605,8 +4667,179 @@ def mxToScore(mxScore, spannerBundle=None, inputM21=None):
     s._elementsChanged()
     return s
 
+#------------------------------------------------------------------------------
+# beam and beams
+
+def beamToMx(beamObject):
+    '''
+
+    >>> from music21 import *
+    >>> a = beam.Beam()
+    >>> a.type = 'start'
+    >>> a.number = 1
+    >>> b = musicxml.translate.beamToMx(a)
+    >>> b.get('charData')
+    'begin'
+    >>> b.get('number')
+    1
+
+    >>> a.type = 'continue'
+    >>> b = musicxml.translate.beamToMx(a)
+    >>> b.get('charData')
+    'continue'
+
+    >>> a.type = 'stop'
+    >>> b = musicxml.translate.beamToMx(a)
+    >>> b.get('charData')
+    'end'
+
+    >>> a.type = 'partial'
+    >>> a.direction = 'left'
+    >>> b = musicxml.translate.beamToMx(a)
+    >>> b.get('charData')
+    'backward hook'
+
+    >>> a.direction = 'right'
+    >>> b = musicxml.translate.beamToMx(a)
+    >>> b.get('charData')
+    'forward hook'
+
+    >>> a.direction = None
+    >>> b = musicxml.translate.beamToMx(a)
+    Traceback (most recent call last):
+    TranslateException: partial beam defined without a proper direction set (set to None)
+
+    >>> a.type = 'crazy'
+    >>> b = musicxml.translate.beamToMx(a)
+    Traceback (most recent call last):
+    TranslateException: unexpected beam type encountered (crazy)
+    '''
+    mxBeam = musicxmlMod.Beam()
+    if beamObject.type == 'start':
+        mxBeam.set('charData', 'begin') 
+    elif beamObject.type == 'continue':
+        mxBeam.set('charData', 'continue') 
+    elif beamObject.type == 'stop':
+        mxBeam.set('charData', 'end') 
+    elif beamObject.type == 'partial':
+        if beamObject.direction == 'left':
+            mxBeam.set('charData', 'backward hook')
+        elif beamObject.direction == 'right':
+            mxBeam.set('charData', 'forward hook') 
+        else:
+            raise TranslateException('partial beam defined without a proper direction set (set to %s)' % beamObject.direction)
+    else:
+        raise TranslateException('unexpected beam type encountered (%s)' % beamObject.type)
+
+    mxBeam.set('number', beamObject.number)
+    return mxBeam
+
+def mxToBeam(mxBeam, inputM21 = None):
+    '''
+    given an mxBeam object return a :class:`~music21.beam.Beam` object
+
+    >>> from music21 import *
+    >>> mxBeam = musicxml.Beam()
+    >>> mxBeam.set('charData', 'begin')
+    >>> a = musicxml.translate.mxToBeam(mxBeam)
+    >>> a.type
+    'start'
+
+    >>> mxBeam.set('charData', 'continue')
+    >>> a = musicxml.translate.mxToBeam(mxBeam)
+    >>> a.type
+    'continue'
+
+    >>> mxBeam.set('charData', 'end')
+    >>> a = musicxml.translate.mxToBeam(mxBeam)
+    >>> a.type
+    'stop'
+
+    >>> mxBeam.set('charData', 'forward hook')
+    >>> a = musicxml.translate.mxToBeam(mxBeam)
+    >>> a.type
+    'partial'
+    >>> a.direction
+    'right'
+
+    >>> mxBeam.set('charData', 'backward hook')
+    >>> a = musicxml.translate.mxToBeam(mxBeam)
+    >>> a.type
+    'partial'
+    >>> a.direction
+    'left'
+
+    >>> mxBeam.set('charData', 'crazy')
+    >>> a = musicxml.translate.mxToBeam(mxBeam)
+    Traceback (most recent call last):
+    TranslateException: unexpected beam type encountered (crazy)
+    '''
+    from music21 import beam
+    if inputM21 is None:
+        beamOut = beam.Beam()
+    else:
+        beamOut = inputM21
+    mxType = mxBeam.get('charData')
+    if mxType == 'begin':
+        beamOut.type = 'start'
+    elif mxType == 'continue':
+        beamOut.type = 'continue'
+    elif mxType == 'end':
+        beamOut.type = 'stop'
+    elif mxType == 'forward hook':
+        beamOut.type = 'partial'
+        beamOut.direction = 'right'
+    elif mxType == 'backward hook':
+        beamOut.type = 'partial'
+        beamOut.direction = 'left'
+    else:
+        raise TranslateException('unexpected beam type encountered (%s)' % mxType)
+
+    return beamOut
 
 
+def beamsToMx(beamsObj):
+    '''
+    Returns a list of mxBeam objects from a :class:`~music21.beam.Beams` object
+
+    >>> from music21 import *
+    >>> a = beam.Beams()
+    >>> a.fill(2, type='start')
+    >>> mxBeamList = musicxml.translate.beamsToMx(a)
+    >>> len(mxBeamList)
+    2
+    >>> mxBeamList[0]
+    <beam number=1 charData=begin>
+    >>> mxBeamList[1]
+    <beam number=2 charData=begin>
+    '''
+    mxBeamList = []
+    for beamObj in beamsObj.beamsList:
+        mxBeamList.append(beamToMx(beamObj))
+    return mxBeamList
+
+def mxToBeams(mxBeamList, inputM21 = None):
+    '''given a list of mxBeam objects, sets the beamsList
+
+    >>> from music21 import *
+    >>> a = beam.Beams()
+    >>> a.fill(2, type='start')
+    >>> mxBeamList = musicxml.translate.beamsToMx(a)
+    >>> b = mxToBeams(mxBeamList)
+    >>> b
+    <music21.beam.Beams <music21.beam.Beam None/start>/<music21.beam.Beam None/start>>
+    '''
+    from music21 import beam
+    if inputM21 is None:
+        beamsOut = beam.Beams()
+    else:
+        beamsOut = inputM21
+    
+    for mxBeam in mxBeamList:
+        beamObj = mxToBeam(mxBeam)
+        beamsOut.beamsList.append(beamObj)
+
+    return beamsOut
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):

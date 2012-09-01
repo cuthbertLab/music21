@@ -9,7 +9,11 @@
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
-'''This module defines numerous subclasses of :class:`~music21.clef.Clef`, providing object representations for all commonly used clefs. Clef objects are often found within :class:`~music21.stream.Measure` objects.  
+'''
+This module defines numerous subclasses of 
+:class:`~music21.clef.Clef`, providing object representations for all 
+commonly used clefs. Clef objects are often found 
+within :class:`~music21.stream.Measure` objects.  
 '''
  
 import unittest
@@ -18,7 +22,7 @@ from music21 import base
 from music21 import common
 from music21 import exceptions21
 
-from music21 import musicxml
+from music21.musicxml import base as musicxmlMod
 
 from music21 import environment
 _MOD = "clef.py"
@@ -27,8 +31,6 @@ environLocal = environment.Environment(_MOD)
 
 class ClefException(exceptions21.Music21Exception):
     pass
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -48,15 +50,13 @@ class Clef(base.Music21Object):
     'G'
     >>> tc.line
     2
-    
-    
+        
     Most clefs also have a "lowest note" function which represents the
     :attr:`~music21.pitch.Pitch.diatonicNoteNum` of the note. (Where C4,C#4,C##4,C-4
     etc. = 29, all types of D4 = 30, etc.)
     
     >>> tc.lowestLine
     31
-    
     '''
     
     classSortOrder = 0
@@ -99,7 +99,7 @@ class Clef(base.Music21Object):
         -1
         '''
 
-        mxClef = musicxml.Clef()
+        mxClef = musicxmlMod.Clef()
         mxClef.set('sign', self.sign)
         mxClef.set('line', self.line)
         if self.octaveChange != 0:
@@ -116,9 +116,17 @@ class Clef(base.Music21Object):
         >>> a.set('sign', 'G')
         >>> a.set('line', 2)
         >>> b = clef.Clef()
+        >>> b
+        <music21.clef.Clef>
+        >>> 'TrebleClef' in b.classes
+        False
         >>> b.mx = a
         >>> b.sign
         'G'
+        >>> 'TrebleClef' in b.classes
+        True
+        >>> b
+        <music21.clef.TrebleClef>
         '''
         if not common.isListLike(mxClefList):
             mxClef = mxClefList # its not a list
@@ -176,23 +184,35 @@ class Clef(base.Music21Object):
                 self.__class__ = SubBassClef
             else:
                 raise ClefException('cannot match clef parameters (%s/%s/%s) to a Clef subclass' % (params[0], params[1], params[2]))
-
+        
+        self._classes = None
     mx = property(_getMX, _setMX)
 
 
 
 #-------------------------------------------------------------------------------
 class PercussionClef(Clef):
+    '''
+    represents a Percussion clef. 
+    '''    
     pass
 
 class NoClef(Clef):
+    '''
+    represents the absence of a Clef. 
+    '''
     pass
 
 class TabClef(Clef):
+    '''
+    represents a Tablature clef (not used). 
+    '''
     pass
 
 class PitchClef(Clef):
-
+    '''
+    superclass for all other clef subclasses. 
+    '''
     def __init__(self):
         Clef.__init__(self)
 
@@ -388,7 +408,6 @@ class FBaritoneClef(FClef):
 class BassClef(FClef):
     def __init__(self):
         '''
-
         >>> from music21 import *
         >>> a = clef.BassClef()
         >>> a.sign
@@ -429,6 +448,8 @@ class Bass8vaClef(FClef):
 class SubBassClef(FClef):
     def __init__(self):
         '''
+        An F clef on the top line.
+        
         >>> from music21 import *
         >>> a = clef.SubBassClef()
         >>> a.sign
@@ -437,8 +458,6 @@ class SubBassClef(FClef):
         FClef.__init__(self)
         self.line = 5
         self.lowestLine = (7*2) + 3
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -542,7 +561,7 @@ class Test(unittest.TestCase):
         ]
 
         for params, className in src:
-            mxClef = musicxml.Clef()
+            mxClef = musicxmlMod.Clef()
             mxClef.set('sign', params[0])
             mxClef.set('line', params[1])
             mxClef.set('octaveChange', params[2])

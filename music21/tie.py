@@ -56,19 +56,6 @@ class Tie(object):
 
     # investigate using weak-refs for .to and .from
 
-    def _getMX(self):
-        '''Return a MusicXML object representation. 
-        '''
-        return musicxmlTranslate.tieToMx(self)
-
-    def _setMX(self, mxNote):
-        '''Load a MusicXML object representation. 
-        '''
-        musicxmlTranslate.mxToTie(mxNote, self)
-
-    mx = property(_getMX, _setMX)
-
-
     def __eq__(self, other):
         '''Equality. Based on attributes (such as pitch, accidental, duration, articulations, and ornaments) that are  not dependent on the wider context of a note (such as offset, beams, stem direction).
 

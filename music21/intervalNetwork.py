@@ -2133,6 +2133,8 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         if common.isStr(pitchTarget):
             pitchTarget = pitch.Pitch(pitchTarget)
+        elif 'Note' in pitchTarget.classes:
+            pitchTarget = pitchTarget.pitch
 
         saveOctave = pitchTarget.octave
         if saveOctave is None:

@@ -20,11 +20,8 @@ import unittest
 from music21 import duration
 from music21 import interval
 from music21 import exceptions21
-#from music21.note import Note
-from music21 import musicxml
 from music21 import midi as midiModule
 from music21.midi import translate as midiTranslate
-from music21.musicxml import translate as musicxmlTranslate
 from music21 import note
 from music21 import defaults
 from music21 import tie
@@ -345,17 +342,6 @@ class Chord(note.NotRest):
                 return self._components[key] # must be a number
             except KeyError:
                 raise KeyError('cannot access component with: %s' % key)
-
-
-    # moved to musicxml.translate
-    def _getMX(self):
-        return musicxmlTranslate.chordToMx(self)
-
-    def _setMX(self, mxNoteList):
-        # build parameters into self
-        musicxmlTranslate.mxToChord(mxNoteList, self)
-
-    mx = property(_getMX, _setMX)
 
     #---------------------------------------------------------------------------
     # manage pitches property and chordTablesAddress

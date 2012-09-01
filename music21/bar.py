@@ -20,8 +20,6 @@ from music21 import exceptions21
 
 from music21 import expressions
 from music21 import repeat
-from music21 import musicxml
-from music21.musicxml import translate as musicxmlTranslate
 
 from music21 import environment
 _MOD = 'bar.py'
@@ -147,44 +145,22 @@ class Barline(base.Music21Object):
     style = property(_getStyle, _setStyle, 
         doc = '''Get and set the Barline style property.
 
-        >>> b = Barline()
+        >>> from music21 import *
+        >>> b = bar.Barline()
+        >>> b.style = 'tick'
+        >>> b.style
+        'tick'
+        
+        Synonyms are given for some styles:
+        
+        >>> b.style = 'light-light'
+        >>> b.style
+        'double'
         ''')
     def _musicXMLBarStyle(self):
         return styleToMusicXMLBarStyle(self.style)
     
     musicXMLBarStyle = property(_musicXMLBarStyle)
-
-    def _getMX(self):
-        '''
-        >>> b = Barline('final')
-        >>> mxBarline = b.mx
-        >>> mxBarline.get('barStyle')
-        'light-heavy'
-
-        '''
-        mxBarline = musicxml.Barline()
-        mxBarline.set('barStyle', self.musicXMLBarStyle)
-        if self.location != None:
-            mxBarline.set('location', self.location)
-        return mxBarline
-
-    def _setMX(self, mxBarline):
-        '''Given an mxBarline, fill the necessary parameters
-
-        >>> from music21 import musicxml
-        >>> mxBarline = musicxml.Barline()
-        >>> mxBarline.set('barStyle', 'light-light')
-        >>> b = Barline()
-        >>> b.mx = mxBarline
-        >>> b.style
-        'double'
-        '''
-        self.style = mxBarline.get('barStyle')
-        location = mxBarline.get('location')
-        if location != None:
-            self.location = location
-
-    mx = property(_getMX, _setMX)    
 
 
 
@@ -340,20 +316,6 @@ class Repeat(repeat.RepeatMark, Barline):
         '''
         value = '%s%s%s' % (prefix, self._times, postfix)
         return expressions.TextExpression(value)
-
-
-    def _getMX(self):
-        return musicxmlTranslate.repeatToMx(self)
-
-    def _setMX(self, mxBarline):
-        # provide self to configure
-        musicxmlTranslate.mxToRepeat(mxBarline, self)
-
-    mx = property(_getMX, _setMX)    
-
-
-
-
 
 
 #-------------------------------------------------------------------------------

@@ -934,7 +934,6 @@ class Contributor(base.JSONSerializer):
         'Chopin, Fryderyk'
         >>> td.names
         ['Chopin, Fryderyk', 'Chopin, Frederick']
-
         ''')
 
     def _getNames(self):
@@ -954,7 +953,9 @@ class Contributor(base.JSONSerializer):
         ''')
 
     def age(self):
-        '''Calculate the age at death of the Contributor, returning a datetime.timedelta object.
+        '''
+        Calculate the age at death of the Contributor, 
+        returning a datetime.timedelta object.
 
         >>> from music21 import *
         >>> a = metadata.Contributor(name='Beethoven, Ludwig van', role='composer', birth='1770/12/17', death='1827/3/26')
@@ -974,7 +975,6 @@ class Contributor(base.JSONSerializer):
         else:
             return None
 
-
     #---------------------------------------------------------------------------
     # overridden methods for json processing 
 
@@ -990,11 +990,7 @@ class Contributor(base.JSONSerializer):
         else:
             raise MetadataException('cannot instantiate an object from id string: %s' % idStr)
 
-
-
-
     #---------------------------------------------------------------------------
-
     def _getMX(self):
         '''Return a mxCreator object based on this object. 
 

@@ -2649,15 +2649,6 @@ class Pitch(base.Music21Object):
     of v1.3, this is the same as .frequency always.
     ''')
 
-    def _getMX(self):
-        return musicxmlTranslate.pitchToMx(self)
-
-    def _setMX(self, mxNote):
-        return musicxmlTranslate.mxToPitch(mxNote, self)
-
-    mx = property(_getMX, _setMX)
-
-
     #---------------------------------------------------------------------------
     def getHarmonic(self, number):
         '''Return a Pitch object representing the harmonic found above this Pitch.
