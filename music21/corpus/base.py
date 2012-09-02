@@ -241,7 +241,7 @@ def getLocalPaths(extList=None, expandExtensions=True):
         # append successive matches into one list
         matched = []
         for fp in validPaths:
-            #environLocal.pd(['finding paths in:', fp])
+            #environLocal.printDebug(['finding paths in:', fp])
             matched += _findPaths(fp, extList)
         _pathsCache[cacheKey] = matched
     return _pathsCache[cacheKey]

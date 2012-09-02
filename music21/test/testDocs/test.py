@@ -59,7 +59,7 @@ class DocTester(object):
             try:
                 os.remove(os.path.join(self.dstDirRst, fn))
             except OSError:
-                environLocal.pd(['cannot remove temporary file:', fn])
+                environLocal.printDebug(['cannot remove temporary file:', fn])
 
     def run(self):
         self._transferDocFiles()

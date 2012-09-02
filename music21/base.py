@@ -153,11 +153,11 @@ class JSONSerializer(object):
             if (bundle.name.startswith('_') and not 
                 bundle.name.startswith('__')):
                 classNames.append(bundle.name)
-        #environLocal.pd(['classNames', classNames])
+        #environLocal.printDebug(['classNames', classNames])
         for name in dir(self):
             if name.startswith('_') and not name.startswith('__'):
                 attr = getattr(self, name)
-                #environLocal.pd(['inspect.isroutine()', attr, inspect.isroutine(attr)])
+                #environLocal.printDebug(['inspect.isroutine()', attr, inspect.isroutine(attr)])
                 if (not inspect.ismethod(attr) and not 
                     inspect.isfunction(attr) and not inspect.isroutine(attr)): 
                     # class names stored are class attrs, not needed for 
@@ -165,7 +165,7 @@ class JSONSerializer(object):
                     if name not in classNames and name not in exclude:
                         # store the name, not the attr
                         post.append(name)
-        #environLocal.pd(['auto-derived jsonAttributes', post])
+        #environLocal.printDebug(['auto-derived jsonAttributes', post])
         return post
 
     def jsonAttributes(self):
@@ -272,7 +272,7 @@ class JSONSerializer(object):
 
             # if, stored on this object, is an object w/ a json method
             if hasattr(attrValue, 'json'):
-                #environLocal.pd(['attrValue', attrValue])
+                #environLocal.printDebug(['attrValue', attrValue])
                 flatData[attr] = attrValue._getJSONDict()
 
             # handle lists; look for objects that have json attributes
@@ -729,7 +729,7 @@ class DefinedContexts(JSONSerializer):
 
         new = self.__class__()
         locations = [] #self._locationKeys[:]
-        #environLocal.pd(['DefinedContexts.__deepcopy__', 'self._definedContexts.keys()', self._definedContexts.keys()])
+        #environLocal.printDebug(['DefinedContexts.__deepcopy__', 'self._definedContexts.keys()', self._definedContexts.keys()])
         for idKey in self._definedContexts.keys():
             dict = self._definedContexts[idKey]
             if dict['isDead']:
@@ -781,7 +781,7 @@ class DefinedContexts(JSONSerializer):
         '''
         self.purgeLocations(rescanIsDead=True)
 
-        #environLocal.pd(['self', self, 'self._definedContexts.keys()', self._definedContexts.keys()])
+        #environLocal.printDebug(['self', self, 'self._definedContexts.keys()', self._definedContexts.keys()])
         for idKey in self._definedContexts.keys():
             if WEAKREF_ACTIVE:
             #if common.isWeakref(self._definedContexts[idKey]['obj']):
@@ -1035,14 +1035,14 @@ class DefinedContexts(JSONSerializer):
             siteId = id(site)
         try:
             del self._definedContexts[siteId]
-            #environLocal.pd(['removed site w/o exception:', siteId, 'self._definedContexts.keys()', self._definedContexts.keys()])
+            #environLocal.printDebug(['removed site w/o exception:', siteId, 'self._definedContexts.keys()', self._definedContexts.keys()])
         except:    
             raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % site)
         # also delete from location keys
         if siteId in self._locationKeys:
             self._locationKeys.pop(self._locationKeys.index(siteId))
 
-        #environLocal.pd(['removed site:', 'self._definedContexts.getSites()', self.getSites()])
+        #environLocal.printDebug(['removed site:', 'self._definedContexts.getSites()', self.getSites()])
         
 
     def removeById(self, idKey):
@@ -1057,7 +1057,7 @@ class DefinedContexts(JSONSerializer):
         if idKey is None:
             raise Exception('trying to remove None idKey')
 
-        #environLocal.pd(['removeById', idKey, 'self._definedContexts.keys()', self._definedContexts.keys()])
+        #environLocal.printDebug(['removeById', idKey, 'self._definedContexts.keys()', self._definedContexts.keys()])
         del self._definedContexts[idKey]
         if idKey in self._locationKeys:
             self._locationKeys.pop(self._locationKeys.index(idKey))
@@ -1558,7 +1558,7 @@ class DefinedContexts(JSONSerializer):
                 dict['isDead'] = True
                 continue
             if id(compareObj) == id(obj):
-                #environLocal.pd(['found object as site', obj, id(obj), 'idKey', idKey])
+                #environLocal.printDebug(['found object as site', obj, id(obj), 'idKey', idKey])
                 return self._getOffsetBySiteId(idKey) #dict['offset']
         raise DefinedContextsException('an entry for this object (%s) is not stored in DefinedContexts' % obj)
 
@@ -1787,7 +1787,7 @@ class DefinedContexts(JSONSerializer):
             if (classNameIsStr and obj.isFlat and 
                 obj._definedContexts.getSiteCount() == 1):
                 #if DEBUG_CONTEXT: print '\tY: skipping flat stream that does not contain object:', id(obj), obj
-                #environLocal.pd(['\tY: skipping flat stream that does not contain object:'])
+                #environLocal.printDebug(['\tY: skipping flat stream that does not contain object:'])
                 if not obj.hasElementOfClass(className, forceFlat=True):
                     continue # skip, not in this stream
 
@@ -2118,7 +2118,7 @@ class Music21Object(JSONSerializer):
 
         # call class to get a new, empty instance
         new = self.__class__()
-        #environLocal.pd(['Music21Object.__deepcopy__', self, id(self)])
+        #environLocal.printDebug(['Music21Object.__deepcopy__', self, id(self)])
         #for name in dir(self):
         for name in self.__dict__.keys():
             if name.startswith('__'):
@@ -2140,7 +2140,7 @@ class Music21Object(JSONSerializer):
             # use _definedContexts own __deepcopy__, but set contained by id
             elif name == '_definedContexts':
                 newValue = copy.deepcopy(part, memo)
-                #environLocal.pd(['copied definedContexts:', newValue._locationKeys])
+                #environLocal.printDebug(['copied definedContexts:', newValue._locationKeys])
                 newValue.containedById = id(new)
                 setattr(new, name, newValue)
             else: # use copy.deepcopy, will call __deepcopy__ if available
@@ -2190,9 +2190,9 @@ class Music21Object(JSONSerializer):
 
 
     def _getClasses(self):
-        #environLocal.pd(['calling _getClasses'])
+        #environLocal.printDebug(['calling _getClasses'])
         if self._classes is None:
-            #environLocal.pd(['setting self._classes', id(self), self])
+            #environLocal.printDebug(['setting self._classes', id(self), self])
             self._classes = [x.__name__ for x in self.__class__.mro()] 
         return self._classes    
 
@@ -2627,7 +2627,7 @@ class Music21Object(JSONSerializer):
         '''
         if not self._definedContexts.isSite(site):
             raise Music21ObjectException('supplied site (%s) is not a site in this object: %s' % (site, self))
-        #environLocal.pd(['removed location by site:', 'self', self, 'site', site])
+        #environLocal.printDebug(['removed location by site:', 'self', self, 'site', site])
         self._definedContexts.remove(site)
 
         # if activeSite is set to that site, reassign to None
@@ -2659,7 +2659,7 @@ class Music21Object(JSONSerializer):
 
         The `excludeStorageStreams` are SpannerStorage and VariantStorage.
         '''
-        #environLocal.pd(['purging orphans'])
+        #environLocal.printDebug(['purging orphans'])
         orphans = []
         # TODO: how can this be optimized to not use getSites, so as to 
         # not unwrap weakrefs?
@@ -2674,7 +2674,7 @@ class Music21Object(JSONSerializer):
                     # only get those that are not Storage Streams
                     if ('SpannerStorage' not in s.classes 
                         and 'VariantStorage' not in s.classes):
-                        #environLocal.pd(['removing orphan:', s])
+                        #environLocal.printDebug(['removing orphan:', s])
                         orphans.append(id(s))
                 else: # get all 
                     orphans.append(id(s))
@@ -2705,13 +2705,13 @@ class Music21Object(JSONSerializer):
                     # only get those that are not Storage Streams
                     if ('SpannerStorage' not in s.classes 
                         and 'VariantStorage' not in s.classes):
-                        #environLocal.pd(['removing orphan:', s])
+                        #environLocal.printDebug(['removing orphan:', s])
                         orphans.append(idTarget)
                 else: # get all 
                     orphans.append(idTarget)
 
         for i in orphans:   
-            #environLocal.pd(['purgeingUndeclaredIds', i])     
+            #environLocal.printDebug(['purgeingUndeclaredIds', i])     
             self.removeLocationBySiteId(i)        
 
 
@@ -3322,7 +3322,7 @@ class Music21Object(JSONSerializer):
         #there is a problem if a new activeSite is being set and no offsets have 
         # been provided for that activeSite; when self.offset is called, 
         # the first case here would match
-        #environLocal.pd(['Music21Object._getOffset', 'self.id', self.id, 'id(self)', id(self), self.__class__])
+        #environLocal.printDebug(['Music21Object._getOffset', 'self.id', self.id, 'id(self)', id(self), self.__class__])
 
         activeSiteId = None
         if self.activeSite is not None:
@@ -3340,8 +3340,8 @@ class Music21Object(JSONSerializer):
         else:
             # try to look for it in all objects
             environLocal.printDebug(['doing a manual activeSite search: probably means that id(self.activeSite) (%s) is not equal to self._activeSiteId (%r)' % (id(self.activeSite), self._activeSiteId)])
-            #environLocal.pd(['activeSite', self.activeSite, 'self._definedContexts.hasSiteId(activeSiteId)', self._definedContexts.hasSiteId(activeSiteId)])
-            #environLocal.pd(['self.hasSite(self.activeSite)', self.hasSite(self.activeSite)])
+            #environLocal.printDebug(['activeSite', self.activeSite, 'self._definedContexts.hasSiteId(activeSiteId)', self._definedContexts.hasSiteId(activeSiteId)])
+            #environLocal.printDebug(['self.hasSite(self.activeSite)', self.hasSite(self.activeSite)])
 
             offset = self._definedContexts.getOffsetByObjectMatch(
                     self.activeSite)
@@ -5874,9 +5874,9 @@ class Test(unittest.TestCase):
         n1 = m2[-1] # last element is a note
         n2 = m4[-1] # last element is a note
 
-        #environLocal.pd(['getContextByClass()'])
+        #environLocal.printDebug(['getContextByClass()'])
         #self.assertEqual(str(n1.getContextByClass('TimeSignature')), '<music21.meter.TimeSignature 3/4>') 
-        environLocal.pd(['getContextByClass()'])
+        environLocal.printDebug(['getContextByClass()'])
         self.assertEqual(str(n2.getContextByClass('TimeSignature')), '<music21.meter.TimeSignature 3/4>') 
 
 

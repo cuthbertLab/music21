@@ -1858,7 +1858,7 @@ class Variant(base.Music21Object):
     def __getattr__(self, attr):
         '''This defers all calls not defined in this Class to calls on the privately contained Stream.
         '''
-        #environLocal.pd(['relaying unmatched attribute request to private Stream'])
+        #environLocal.printDebug(['relaying unmatched attribute request to private Stream'])
 
         # must mask pitches so as not to recurse
         # TODO: check tt recurse does not go into this

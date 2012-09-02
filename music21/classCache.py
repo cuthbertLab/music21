@@ -199,7 +199,7 @@ class ClassCache(object):
         ClassCacheException: can only process single class names given as a string
         '''
         matchKeys = []
-        #environLocal.pd(['getElementsByClass', 'classFilterList', classFilterList])
+        #environLocal.printDebug(['getElementsByClass', 'classFilterList', classFilterList])
 
         # for now, can only match a single class, as this will be in the 
         # correct order
@@ -221,7 +221,7 @@ class ClassCache(object):
 
 #         if matchKeys == []:
 #             for classNameOrStr in classFilterList:
-#                 #environLocal.pd(['classNameOrStr', classNameOrStr])
+#                 #environLocal.printDebug(['classNameOrStr', classNameOrStr])
 #                 if isinstance(classNameOrStr, str):
 #                     for r in self.repositories.values(): 
 #                         if classNameOrStr in r.classes:
@@ -234,7 +234,7 @@ class ClassCache(object):
 #                         if issubclass(classNameOrStr, r.classObj):
 #                             # they key is always the first class
 #                             matchKeys.append(r.classes[0])
-        #environLocal.pd(['matchKeys', matchKeys, 'self.repositories.keys()', self.repositories.keys()])
+        #environLocal.printDebug(['matchKeys', matchKeys, 'self.repositories.keys()', self.repositories.keys()])
 
 #         for key in matchKeys:
 #             # rather than directly assign, can build list of offset/value?

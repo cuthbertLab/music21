@@ -104,39 +104,39 @@ base40Representation = {'C--': 1,
 #Key => Base40 delta (difference between two Base40 pitch numbers)
 #Value => Corresponding music21 Interval
 base40IntervalTable = \
-                 {0: interval.Interval('P1'),
-                  1: interval.Interval('A1'),
+                 {0: 'P1',
+                  1: 'A1',
                   
-                  4: interval.Interval('d2'),
-                  5: interval.Interval('m2'),
-                  6: interval.Interval('M2'),
-                  7: interval.Interval('A2'),
+                  4: 'd2',
+                  5: 'm2',
+                  6: 'M2',
+                  7: 'A2',
                   
-                  10: interval.Interval('d3'),
-                  11: interval.Interval('m3'),
-                  12: interval.Interval('M3'),
-                  13: interval.Interval('A3'),
+                  10: 'd3',
+                  11: 'm3',
+                  12: 'M3',
+                  13: 'A3',
                   
-                  16: interval.Interval('d4'),
-                  17: interval.Interval('P4'),
-                  18: interval.Interval('A4'),
+                  16: 'd4',
+                  17: 'P4',
+                  18: 'A4',
                   
-                  22: interval.Interval('d5'),
-                  23: interval.Interval('P5'),
-                  24: interval.Interval('A5'),
+                  22: 'd5',
+                  23: 'P5',
+                  24: 'A5',
 
-                  27: interval.Interval('d6'),
-                  28: interval.Interval('m6'),
-                  29: interval.Interval('M6'),
-                  30: interval.Interval('A6'),
+                  27: 'd6',
+                  28: 'm6',
+                  29: 'M6',
+                  30: 'A6',
 
-                  33: interval.Interval('d7'),
-                  34: interval.Interval('m7'),
-                  35: interval.Interval('M7'),
-                  36: interval.Interval('A7'),
+                  33: 'd7',
+                  34: 'm7',
+                  35: 'M7',
+                  36: 'A7',
 
-                  39: interval.Interval('d8'),
-                  40: interval.Interval('P8')
+                  39: 'd8',
+                  40: 'P8',
                   }
 
 
@@ -180,7 +180,8 @@ def base40DeltaToInterval(delta):
     simpleDelta = abs(delta) % 40
     
     try:
-        simpleInterval = base40IntervalTable[simpleDelta]
+        simpleIntervalName = base40IntervalTable[simpleDelta]
+        simpleInterval = interval.Interval(simpleIntervalName)
     except KeyError:
         raise Base40Exception('Interval not handled by Base40 ' + str(simpleDelta))
 

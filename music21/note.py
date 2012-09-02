@@ -28,8 +28,6 @@ from music21 import exceptions21
 from music21 import instrument
 from music21 import interval
 from music21 import editorial
-from music21 import musicxml as musicxmlMod
-from music21.musicxml import translate as musicxmlTranslate
 #from music21 import midi as midiModule
 from music21.midi import translate as midiTranslate
 from music21 import expressions

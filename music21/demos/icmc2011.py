@@ -304,7 +304,7 @@ class Test(unittest.TestCase):
                 nStart = None; nEnd = None
         
         for sp in ex.spanners.getElementsByClass('Slur'):  
-            #environLocal.pd(['sp', n.nameWithOctave, sp])
+            #environLocal.printDebug(['sp', n.nameWithOctave, sp])
             dur = sp.getDurationBySite(exFlatNotes)
             n = sp.getFirst()
             

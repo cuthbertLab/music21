@@ -115,10 +115,10 @@ class Derivation(base.JSONSerializer):
         >>> common.isWeakref(d1._container)
         False
         '''
-        #environLocal.pd(['derivation pre unwrap: self._container', self._container])
+        #environLocal.printDebug(['derivation pre unwrap: self._container', self._container])
         post = common.unwrapWeakref(self._container)
         self._container = post
-        #environLocal.pd(['derivation post unwrap: self._container', self._container])
+        #environLocal.printDebug(['derivation post unwrap: self._container', self._container])
 
     def wrapWeakref(self):
         '''Wrap all stored objects with weakrefs.

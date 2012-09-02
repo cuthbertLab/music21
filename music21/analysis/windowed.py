@@ -135,7 +135,7 @@ class WindowedAnalysis(object):
             for i in windowCountIndices:
                 current = stream.Stream()
                 for j in range(i, i+windowSize):
-                    #environLocal.pd(['self._windowedStream[j]', self._windowedStream[j]])
+                    #environLocal.printDebug(['self._windowedStream[j]', self._windowedStream[j]])
                     current.append(self._windowedStream[j])
                 data[i], color[i] = self.processor.process(current)
 

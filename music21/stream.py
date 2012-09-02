@@ -722,7 +722,7 @@ class Stream(base.Music21Object):
         >>> s.hasElementOfClass('Measure')
         False
         '''
-        #environLocal.pd(['calling hasElementOfClass()', className])
+        #environLocal.printDebug(['calling hasElementOfClass()', className])
         for e in self._elements:
             if e.isClassOrSubclass([className]): 
                 return True
@@ -1150,7 +1150,7 @@ class Stream(base.Music21Object):
             elif name == '_elements':
                 # must manually add elements to new Stream
                 for e in self._elements: 
-                    #environLocal.pd(['deepcopy()', e, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e), 'e.activeSite', e.activeSite, 'e.getSites()', e.getSites(), 'e.getSiteIds()', e.getSiteIds()], format='block')
+                    #environLocal.printDebug(['deepcopy()', e, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e), 'e.activeSite', e.activeSite, 'e.getSites()', e.getSites(), 'e.getSiteIds()', e.getSiteIds()], format='block')
                     # this will work for all with __deepcopy___
                     # get the old offset from the activeSite Stream     
                     # user here to provide new offset
@@ -1209,7 +1209,7 @@ class Stream(base.Music21Object):
                     continue # we never update Spanners
                 # update based on id of old object, and ref to new object
                 if e.hasSpannerSite():
-                    #environLocal.pd(['Stream.__deepcopy__', 'replacing component to', e])
+                    #environLocal.printDebug(['Stream.__deepcopy__', 'replacing component to', e])
                     # this will clear and replace the proper locations on 
                     # the SpannerStorage Stream
                     spannerBundle.replaceComponent(e._idLastDeepCopyOf, e)
@@ -1441,7 +1441,7 @@ class Stream(base.Music21Object):
                 mustFinishInSpan=False, mustBeginInSpan=True)
         targets = match.notesAndRests
         removeTarget = None
-        #environLocal.pd(['insertIntoNoteOrChord', [e for e in targets]])
+        #environLocal.printDebug(['insertIntoNoteOrChord', [e for e in targets]])
         if len(targets) == 1:
             target = targets[0] # assume first
             removeTarget = target
@@ -1576,7 +1576,7 @@ class Stream(base.Music21Object):
 
             # TODO: may need to be replaced with a common almost equal
             if e.duration.quarterLength != 0: 
-                #environLocal.pd(['incrementing highest time', 'e.duration.quarterLength', e.duration.quarterLength])
+                #environLocal.printDebug(['incrementing highest time', 'e.duration.quarterLength', e.duration.quarterLength])
                 highestTime += e.duration.quarterLength
 
         # does not change sorted state
@@ -1932,7 +1932,7 @@ class Stream(base.Music21Object):
             else:
                 targetMove.append(t)
 
-        #environLocal.pd(['split', targetSplit, 'move', targetMove])
+        #environLocal.printDebug(['split', targetSplit, 'move', targetMove])
 
         for t in targetSplit:
             # must retain origina, as a deepcopy, if necessary, has
@@ -2065,7 +2065,7 @@ class Stream(base.Music21Object):
             # TODO: a similar routine need to be done for Variants, getting
             # ids of contained Stream and passing them to purgeUndeclaredIds
 
-            #environLocal.pd(['setupSerializationScaffold', streamIdsFound])
+            #environLocal.printDebug(['setupSerializationScaffold', streamIdsFound])
         if streamIdsFound is not None:
             # excludeStorageStreams is False as we have spanner storage ids
             self.purgeUndeclaredIds(streamIdsFound, excludeStorageStreams=False)
@@ -3292,7 +3292,7 @@ class Stream(base.Music21Object):
         # if end not specified, get last
         if numberEnd is None:
             numberEnd = max([x for x,y in mapCooked])
-        #environLocal.pd(['numberStart', numberStart, 'numberEnd', numberEnd])
+        #environLocal.printDebug(['numberStart', numberStart, 'numberEnd', numberEnd])
 
         for i in range(numberStart, numberEnd+1):
             match = None
@@ -3308,7 +3308,7 @@ class Stream(base.Music21Object):
                 continue 
             # need to make offsets relative to this new Stream
             for m in match:
-                #environLocal.pd(['startMeasure', startMeasure, 'm', m])
+                #environLocal.printDebug(['startMeasure', startMeasure, 'm', m])
                 # this assumes measure are in offset order
                 # this may not always be the case
                 if startOffset is None: # only set on first
@@ -4627,7 +4627,7 @@ class Stream(base.Music21Object):
                     break
         else: # useExactOffsets is True:        
             onAndOffOffsets = self.flat.notesAndRests._uniqueOffsetsAndEndTimes()
-            #environLocal.pd(['makeChords: useExactOffsets=True; onAndOffOffsets:', onAndOffOffsets])
+            #environLocal.printDebug(['makeChords: useExactOffsets=True; onAndOffOffsets:', onAndOffOffsets])
             
             for i in range(len(onAndOffOffsets) - 1):
                 # get all notes within the start and the minwindow size
@@ -5339,7 +5339,7 @@ class Stream(base.Music21Object):
         for ob in offsetMap:
             start, end, e, voiceIndex = ob['offset'], ob['endTime'], ob['element'], ob['voiceIndex']
             
-            #environLocal.pd(['makeMeasures()', start, end, e, voiceIndex])
+            #environLocal.printDebug(['makeMeasures()', start, end, e, voiceIndex])
             # iterate through all measures, finding a measure that 
             # can contain this element
 
@@ -6533,7 +6533,7 @@ class Stream(base.Music21Object):
                          ignoreRests=ignoreRests):
             # need to find next event that start at the appropriate offset
             if currentIndex == len(srcStream) - 1: # assume flat
-                #environLocal.pd(['_getNextElements: nothing to process', currentIndex, len(srcStream.notes) ])
+                #environLocal.printDebug(['_getNextElements: nothing to process', currentIndex, len(srcStream.notes) ])
                 return [] # nothing left
             # iterate over all possible elements
             if ignoreRests:
@@ -6565,10 +6565,10 @@ class Stream(base.Music21Object):
                 pSrc = [n for n in e] # get components
             else:
                 continue
-            #environLocal.pd(['examining', i, e])
+            #environLocal.printDebug(['examining', i, e])
             connections = _getNextElements(srcFlat, i, 
                 e.getOffsetBySite(srcFlat)+e.duration.quarterLength)
-            #environLocal.pd(['possible conections', connections])
+            #environLocal.printDebug(['possible conections', connections])
 
             for p in pSrc: 
                 # for each p, see if there is match in the next position
@@ -6621,7 +6621,7 @@ class Stream(base.Music21Object):
         # trust if this is sorted: do not sort again
         # experimental
         if (not self.isSorted and self._mutable) or force:
-            #environLocal.pd(['sorting _elements, _endElements'])
+            #environLocal.printDebug(['sorting _elements, _endElements'])
             self._elements.sort(
                 cmp=lambda x, y: cmp(
                     x.getOffsetBySite(self), y.getOffsetBySite(self)) 
@@ -6637,7 +6637,7 @@ class Stream(base.Music21Object):
             # need to clear cache, but flat status is the same
             self._elementsChanged(updateIsFlat=False, clearIsSorted=False)
             self.isSorted = True
-            #environLocal.pd(['_elements', self._elements])
+            #environLocal.printDebug(['_elements', self._elements])
 
     def _getSorted(self):
         if 'sorted' not in self._cache or self._cache['sorted'] is None:
@@ -7026,7 +7026,7 @@ class Stream(base.Music21Object):
 
     def _getSemiFlat(self):
         if 'semiFlat' not in self._cache or self._cache['semiFlat'] is None:
-            #environLocal.pd(['using cached semiFlat', self])
+            #environLocal.printDebug(['using cached semiFlat', self])
             self._cache['semiFlat'] = self._getFlatOrSemiFlat(
                                     retainContainers=True)
         return self._cache['semiFlat']
@@ -9725,7 +9725,7 @@ class Stream(base.Music21Object):
             returnObj.sort() 
         olDict = returnObj.notes.getOverlaps(
                  includeDurationless=False, includeEndBoundary=False)
-        #environLocal.pd(['makeVoices(): olDict', olDict])
+        #environLocal.printDebug(['makeVoices(): olDict', olDict])
         # find the max necessary voices by finding the max number 
         # of elements in each group; these may not all be necessary
         maxVoiceCount = 1
@@ -10408,7 +10408,7 @@ class Stream(base.Music21Object):
                     targetsMatched += 1
                     # always assume we just want the first one?
                     targetToReplace = targets[0]
-                    #environLocal.pd(['matchBySpan', matchBySpan, 'found target to replace:', targetToReplace])
+                    #environLocal.printDebug(['matchBySpan', matchBySpan, 'found target to replace:', targetToReplace])
                     # remove the target, place in removed Variant
                     removed.append(targetToReplace)
                     self.remove(targetToReplace)
@@ -10438,7 +10438,7 @@ class Stream(base.Music21Object):
                 # need to get time relative to variant container's position
                 oInVariant = e.getOffsetBySite(self) - vStart
                 removed.insert(oInVariant, e)
-                #environLocal.pd(['matchBySpan', matchBySpan, 'activateVariants', 'removing', e])
+                #environLocal.printDebug(['matchBySpan', matchBySpan, 'activateVariants', 'removing', e])
                 self.remove(e)
                 if "Measure" in e.classes: #Save deleted measure numbers.
                     deletedMeasures.append(e.number)
@@ -12523,7 +12523,7 @@ class VariantStorage(Stream):
 #         for e in others:
 #             e = copy.deepcopy(e) 
 #             e.duration = e.duration.getGraceDuration()
-#             #environLocal.pd(['appending GraceStream, before calling base class', e.quarterLength, e.duration.quarterLength])
+#             #environLocal.printDebug(['appending GraceStream, before calling base class', e.quarterLength, e.duration.quarterLength])
 #             othersEdited.append(e)
 # 
 #         # call bass class append with elements modified durations

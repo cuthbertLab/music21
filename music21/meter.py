@@ -24,7 +24,6 @@ from music21 import beam
 from music21 import common
 from music21 import exceptions21
 from music21 import duration
-from music21.musicxml import translate as musicxmlTranslate
 from music21 import environment
 _MOD = 'meter.py'
 environLocal = environment.Environment(_MOD)
@@ -3493,95 +3492,6 @@ class TimeSignature(base.Music21Object):
         '''
         #return ((currentQtrPosition * self.quarterLengthToBeatLengthRatio) + 1)
         return self.getBeat(currentQtrPosition)
-    
-
-
-
-
-    def _getMX(self):
-        return musicxmlTranslate.timeSignatureToMx(self)
-        
-#         '''Returns a single mxTime object.
-#         
-#         Compound meters are represented as multiple pairs of beat
-#         and beat-type elements
-# 
-#         >>> from music21 import *
-#         >>> a = TimeSignature('3/4')
-#         >>> b = a.mx
-#         >>> a = TimeSignature('3/4+2/4')
-#         >>> b = a.mx
-# 
-#         '''
-#         #mxTimeList = []
-#         mxTime = musicxml.Time()
-#         
-#         # always get a flat version to display any subivisions created
-#         fList = [(mt.numerator, mt.denominator) for mt in self.displaySequence.flat._partition]
-#         if self.summedNumerator:
-#             # this will try to reduce any common denominators into 
-#             # a common group
-#             fList = fractionToSlashMixed(fList)
-# 
-#         for n,d in fList:
-#             mxBeats = musicxml.Beats(n)
-#             mxBeatType = musicxml.BeatType(d)
-#             mxTime.componentList.append(mxBeats)
-#             mxTime.componentList.append(mxBeatType)
-# 
-#         # can set this to common when necessary
-#         mxTime.set('symbol', None)
-#         # for declaring no time signature present
-#         mxTime.set('senza-misura', None)
-#         #mxTimeList.append(mxTime)
-#         #return mxTimeList
-#         return mxTime
-
-    def _setMX(self, mxTimeList):
-        return musicxmlTranslate.mxToTimeSignature(mxTimeList, self)
-
-#         '''Given an mxTimeList, load this object 
-# 
-#         >>> from music21 import *
-#         >>> a = musicxml.Time()
-#         >>> a.setDefaults()
-#         >>> b = musicxml.Attributes()
-#         >>> b.timeList.append(a)
-#         >>> c = TimeSignature()
-#         >>> c.mx = b.timeList
-#         >>> c.numerator
-#         4
-#         '''
-#         if not common.isListLike(mxTimeList): # if just one
-#             mxTime = mxTimeList
-#         else: # there may be more than one if we have more staffs per part
-#             mxTime = mxTimeList[0]
-# 
-# #         if len(mxTimeList) == 0:
-# #             raise MeterException('cannot create a TimeSignature from an empty MusicXML timeList: %s' % musicxml.Attributes() )
-# #         mxTime = mxTimeList[0] # only one for now
-# 
-#         n = []
-#         d = []
-#         for obj in mxTime.componentList:
-#             if isinstance(obj, musicxml.Beats):
-#                 n.append(obj.charData) # may be 3+2
-#             if isinstance(obj, musicxml.BeatType):
-#                 d.append(obj.charData)
-#         assert len(n) == len(d)
-# 
-#         #n = mxTime.get('beats')
-#         #d = mxTime.get('beat-type')
-#         # convert into a string
-#         msg = []
-#         for i in range(len(n)):
-#             msg.append('%s/%s' % (n[i], d[i]))
-# 
-#         #environLocal.printDebug(['loading meter string:', '+'.join(msg)])
-#         self.load('+'.join(msg))
-
-    mx = property(_getMX, _setMX)
-
 
 
 #-------------------------------------------------------------------------------
@@ -3595,23 +3505,6 @@ class DurationDenominatorTimeSignature(TimeSignature):
 
 class NonPowerOfTwoTimeSignature(TimeSignature):
     pass
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #-------------------------------------------------------------------------------

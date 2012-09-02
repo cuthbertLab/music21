@@ -68,7 +68,7 @@ def _musedataBeamToBeams(beamSymbol):
             direction='left'
         else:
             #MuseDataTranslateException('cannot interprete beams char: %s' % char)
-            environLocal.pd(['cannot interprete beams char:',  char])
+            environLocal.printDebug(['cannot interprete beams char:',  char])
             continue
         # will automatically increment number        
         # note that this does not permit defining 16th and not defining 8th

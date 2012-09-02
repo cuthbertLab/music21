@@ -519,7 +519,7 @@ class MuseDataRecord(object):
                 post.append(dynamics.Dynamic('sf'))
             elif t == 'R': # rfz
                 post.append(dynamics.Dynamic('sf'))
-        #environLocal.pd(['got dynamics', post])
+        #environLocal.printDebug(['got dynamics', post])
         return post
 
 
@@ -1510,7 +1510,7 @@ class MuseDataFile(object):
     def readstr(self, str): 
         '''Read a string, dividing it into individual parts.
         '''
-        #environLocal.pd(['readstr()', 'len(str)', len(str)])
+        #environLocal.printDebug(['readstr()', 'len(str)', len(str)])
         # need to split the string into individual parts, as more than 
         # one part might be defined
         commentToggle = False
@@ -1588,7 +1588,7 @@ class MuseDataWork(object):
         >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
 
         '''
-        #environLocal.pd(['addString str', str])
+        #environLocal.printDebug(['addString str', str])
 #         if str.strip() == '':
 #             raise MuseDataException('passed in empty string to add string')
         if not common.isListLike(str):

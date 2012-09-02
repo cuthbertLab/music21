@@ -527,7 +527,7 @@ class ABCMetadata(ABCToken):
                     if dur.count('/') > 0:                
                         n, d = dur.split('/')
                     else: # this is an error case
-                        environLocal.pd(['incorrectly encoded / unparsable duration:', dur])
+                        environLocal.printDebug(['incorrectly encoded / unparsable duration:', dur])
                         n, d = 1, 1
                     referent += (float(n) / float(d)) * 4
             else: # assume we just have a quarter definition, e.g., Q:90
@@ -571,7 +571,7 @@ class ABCMetadata(ABCToken):
         0.5
 
         '''
-        #environLocal.pd(['getDefaultQuarterLength', self.data])
+        #environLocal.printDebug(['getDefaultQuarterLength', self.data])
         if self.isDefaultNoteLength() and '/' in self.data:
             # should be in L:1/4 form
             n, d = self.data.split('/')
@@ -1130,7 +1130,7 @@ class ABCNote(ABCToken):
         numStr = ''.join(numStr)
         numStr = numStr.strip()
 
-        #environLocal.pd(['numStr', numStr])
+        #environLocal.printDebug(['numStr', numStr])
 
         # get default
         if numStr == '':
@@ -1152,7 +1152,7 @@ class ABCNote(ABCToken):
             ql = activeDefaultQuarterLength * (float(n) / d)
         # if we have two, this is usually an error
         elif numStr.count('/') == 2:
-            environLocal.pd(['incorrectly encoded / unparsable duration:', numStr])
+            environLocal.printDebug(['incorrectly encoded / unparsable duration:', numStr])
             ql = 1 # provide a default
 
         # assume we have a complete fraction
@@ -1197,7 +1197,7 @@ class ABCNote(ABCToken):
 
     def parse(self, forceDefaultQuarterLength=None, 
                     forceKeySignature=None):
-        #environLocal.pd(['parse', self.src])
+        #environLocal.printDebug(['parse', self.src])
         self.chordSymbols, nonChordSymStr = self._splitChordSymbols(self.src)        
         # get pitch name form remaining string
         # rests will have a pitch name of None
@@ -1644,7 +1644,7 @@ class ABCHandler(object):
                     tPrev.brokenRhythmMarker = (t.data, 'left')
                     tNext.brokenRhythmMarker = (t.data, 'right')
                 else:
-                    environLocal.pd(['broken rhythm marker (%s) not positioned between two notes or chords' % t.src])
+                    environLocal.printDebug(['broken rhythm marker (%s) not positioned between two notes or chords' % t.src])
 
             # need to update tuplets with currently active meter
             if isinstance(t, ABCTuplet):

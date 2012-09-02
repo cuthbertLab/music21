@@ -28,7 +28,6 @@ import doctest, unittest
 from music21 import interval
 from music21 import base
 from music21 import exceptions21
-from music21 import musicxml
 from music21 import text
 from music21 import common
 from music21 import spanner
@@ -388,16 +387,6 @@ class Mordent(GeneralMordent):
         GeneralMordent.__init__(self)
         self.direction = "down" # up or down
 
-#     def _getMX(self):
-#         mxMordent = musicxml.Mordent()
-#         return mxMordent
-# 
-#     def _setMX(self, mxMordent):
-#         pass
-# 
-#     mx = property(_getMX, _setMX)
-
-
 class HalfStepMordent(Mordent):
     '''A half step normal Mordent.
 
@@ -441,17 +430,6 @@ class InvertedMordent(GeneralMordent):
     def __init__(self):
         GeneralMordent.__init__(self)
         self.direction = "up"
-
-#     def _getMX(self):
-#         mxInvertedMordent = musicxml.InvertedMordent()
-#         return mxInvertedMordent
-# 
-#     def _setMX(self, mxInvertedMordent):
-#         pass
-# 
-#     mx = property(_getMX, _setMX)
-
-
 
 class HalfStepInvertedMordent(InvertedMordent):
     '''A half-step inverted Mordent.
@@ -589,37 +567,6 @@ class Trill(Ornament):
         else:
             return (trillNotes, None, [])
 
-# 
-#     def _getMX(self):
-#         '''
-#         Returns a musicxml.TrillMark object
-#         >>> a = Trill()
-#         >>> a.placement = 'above'
-#         >>> mxTrillMark = a.mx
-#         >>> mxTrillMark.get('placement')
-#         'above'
-#         '''
-#         mxTrillMark = musicxml.TrillMark()
-#         mxTrillMark.set('placement', self.placement)
-#         return mxTrillMark
-# 
-# 
-#     def _setMX(self, mxTrillMark):
-#         '''
-#         Given an mxTrillMark, load instance
-# 
-#         >>> mxTrillMark = musicxml.TrillMark()
-#         >>> mxTrillMark.set('placement', 'above')
-#         >>> a = Trill()
-#         >>> a.mx = mxTrillMark
-#         >>> a.placement
-#         'above'
-#         '''
-#         self.placement = mxTrillMark.get('placement')
-# 
-#     mx = property(_getMX, _setMX)
-
-
 class HalfStepTrill(Trill):
     '''A basic trill marker.
 
@@ -651,7 +598,7 @@ class WholeStepTrill(Trill):
 
 class Shake(Trill):
     def __init__(self):
-        Ornament.__init__(self)
+        Trill.__init__(self)
         self.size = interval.Interval("M2")
         self.quarterLength = 0.25
 
@@ -892,42 +839,8 @@ class Fermata(Expression):
          :width: 193
     '''
     shape = "normal"
-    type  = "upright" # for musicmxml, can be upright, upright-inverted
+    type  = "upright" # for musicmxml, can be upright or inverted
     tieAttach = 'last'
-
-#     def _getMX(self):
-#         '''
-#         Advanced feature: 
-#         
-#         As a getter gives the music21.musicxml object for the Fermata
-#         or as a setter changes the current fermata to have
-#         the characteristics of the musicxml object to fit this
-#         type:
-#         
-#         >>> from music21 import *
-#         >>> a = Fermata()
-#         >>> mxFermata = a.mx
-#         >>> mxFermata.get('type')
-#         'upright'
-# 
-#   
-#         >>> mxFermata2 = musicxml.Fermata()
-#         >>> mxFermata2.set('type', 'upright-inverted')
-#         >>> a.mx = mxFermata2
-#         >>> a.type
-#         'upright-inverted'
-# 
-#         '''
-#         mxFermata = musicxml.Fermata()
-#         mxFermata.set('type', self.type)
-#         return mxFermata
-# 
-#     def _setMX(self, mxFermata):
-#         self.type = mxFermata.get('type')
-# 
-#     mx = property(_getMX, _setMX)
-
-
 
 #-------------------------------------------------------------------------------
 # spanner expressions

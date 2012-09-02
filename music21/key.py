@@ -26,7 +26,6 @@ from music21 import exceptions21
 from music21 import pitch
 from music21 import note
 from music21 import interval
-from music21 import musicxml
 from music21 import common
 from music21 import scale
 
@@ -532,9 +531,7 @@ class KeySignature(base.Music21Object):
         >>> f.accidentalByStep(bbNote.step)
         <accidental flat>     
 
-
         Fix a wrong note in F-major:
-
         
         >>> wrongBNote = note.Note("B#4")
         >>> if f.accidentalByStep(wrongBNote.step) != wrongBNote.accidental:
@@ -542,10 +539,8 @@ class KeySignature(base.Music21Object):
         >>> wrongBNote
         <music21.note.Note B->
 
-
         Set all notes to the correct notes for a key using the 
-        note's Key Context.  Before:        
-      
+        note's Key Context.  Before:              
         
         >>> from music21 import *
         >>> s1 = stream.Stream()
@@ -557,27 +552,17 @@ class KeySignature(base.Music21Object):
         >>> s1.append(note.WholeNote("F#"))
         >>> #_DOCS_SHOW s1.show()
 
-
-
         .. image:: images/keyAccidentalByStep_Before.*
             :width: 400
-
   
         After:
-
 
         >>> for n in s1.notes:
         ...    n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
         >>> #_DOCS_SHOW s1.show()
 
-
-
         .. image:: images/keyAccidentalByStep.*
             :width: 400
-
-  
-
-
 
         OMIT_FROM_DOCS
         >>> s1.show('text')
@@ -587,8 +572,7 @@ class KeySignature(base.Music21Object):
         {4.0} <music21.key.KeySignature of 4 flats>
         {4.0} <music21.note.Note A->
         {8.0} <music21.note.Note F>
-        
-        
+                
         Test to make sure there are not linked accidentals (fixed bug 22 Nov. 2010)
         
         >>> nB1 = note.WholeNote("B")
@@ -664,10 +648,10 @@ class KeySignature(base.Music21Object):
         else:
             return None
 
-
-
     def getScale(self):
-        '''Return a scale that is representative of this key.
+        '''
+        Return a scale that is representative of this key signature
+        and mode.
 
         >>> from music21 import *
         >>> ks = key.KeySignature(3)
@@ -675,6 +659,9 @@ class KeySignature(base.Music21Object):
         <music21.key.KeySignature of 3 sharps>
         >>> ks.getScale()
         <music21.scale.MajorScale A major>
+        >>> ks.mode = 'minor'
+        >>> ks.getScale()
+        <music21.scale.MinorScale F# minor>
         '''
         from music21 import scale
         pitchObj, mode = self._getPitchAndMode()
@@ -698,7 +685,18 @@ class KeySignature(base.Music21Object):
             self._attributesChanged()
 
     sharps = property(_getSharps, _setSharps, 
-        doc = '''Get or set the number of sharps.
+        doc = '''
+        Get or set the number of sharps.  If the number is negative
+        then it sets the number of flats.  Equivalent to musicxml's 'fifths'
+        feature
+        
+        >>> from music21 import *
+        >>> ks1 = key.KeySignature(2)
+        >>> ks1.sharps
+        2
+        >>> ks1.sharps = -4
+        >>> ks1
+        <music21.key.KeySignature of 4 flats>
         ''')
 
 
@@ -711,49 +709,17 @@ class KeySignature(base.Music21Object):
             self._attributesChanged()
 
     mode = property(_getMode, _setMode,
-        doc = '''Get or set the mode.
+        doc = '''
+        Get or set the mode.
+        
+        Mode is supported in a very rough manner for `KeySignature`
+        objects, but for more sophisticated use of modes use the 
+        :class:`~music21.key.Key` object.
+
+        Mode may disappear in future releases so if you are counting
+        on this for major or minor, consider supporting the `Key` object
+        instead.
         ''')
-
-
-
-
-    def _getMX(self):
-        '''Returns a musicxml.KeySignature object
-       
-        >>> a = KeySignature(3)
-        >>> a.sharps = -3
-        >>> mxKey = a.mx
-        >>> mxKey.get('fifths')
-        -3
-        '''
-        mxKey = musicxml.Key()
-        mxKey.set('fifths', self.sharps)
-        if self.mode != None:
-            mxKey.set('mode', self.mode)
-        return mxKey
-
-
-    def _setMX(self, mxKeyList):
-        '''Given a mxKey object or keyList, load internal attributes
-        >>> a = musicxml.Key()
-        >>> a.set('fifths', 5)
-        >>> b = KeySignature()
-        >>> b.mx = [a]
-        >>> b.sharps
-        5 
-        '''
-        if not common.isListLike(mxKeyList):
-            mxKey = mxKeyList
-        else: # there may be more than one if we have more staffs per part
-            mxKey = mxKeyList[0]
-
-        self.sharps = int(mxKey.get('fifths'))
-        mxMode = mxKey.get('mode')
-        if mxMode != None:
-            self.mode = mxMode
-
-    mx = property(_getMX, _setMX)
-
 
     #---------------------------------------------------------------------------
     # override these methods for json functionality

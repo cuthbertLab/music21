@@ -261,7 +261,7 @@ class Volume(object):
                 elif self.parent is not None:
                     dm = self.getDynamicContext() # dm may be None
                 else:
-                    environLocal.pd(['getRealized():', 
+                    environLocal.printDebug(['getRealized():', 
                     'useDynamicContext is True but no dynamic supplied or found in context'])
                 if dm is not None:
                     # double scalare (so range is between 0 and 1) and scale 

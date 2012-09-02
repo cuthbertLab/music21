@@ -772,9 +772,10 @@ class Environment(object):
     # methods local to each instance that is created in each module
 
     def printDebug(self, msg, statusLevel=common.DEBUG_USER, format=None):
-        '''Format one or more data elements into string, and print it 
-        to stderr. The first arg can be a list of string; lists are 
-        concatenated with common.formatStr(). 
+        '''
+        Format one or more data elements into string, and print it 
+        to stderr. The first arg can be a list of strings or a string; 
+        lists are concatenated with common.formatStr(). 
         '''
         #if not common.isNum(statusLevel):
         #    raise EnvironmentException('bad statusLevel argument given: %s' % statusLevel)
@@ -795,12 +796,6 @@ class Environment(object):
             # pass list to common.formatStr
             msg = common.formatStr(*msg, format=format)
             sys.stderr.write(msg)
-
-
-    def pd(self, msg, statusLevel=common.DEBUG_USER, format=None):
-        '''Shortcut for printDebug. Useful as is typed frequently.
-        '''
-        self.printDebug(msg=msg, statusLevel=statusLevel, format=format)
 
     def warn(self, msg, header=None):
         '''To print a warning to the user, send a list of strings to this

@@ -25,13 +25,11 @@ import unittest, doctest
 import sys
 
 from music21 import base
-from music21 import musicxml
 from music21 import exceptions21
 from music21 import common
 from music21 import defaults
-from music21 import pitch
 from music21 import interval
-from music21.musicxml import translate as musicxmlTranslate
+from music21 import pitch
 
 from music21 import environment
 _MOD = "instrument.py"
@@ -176,24 +174,6 @@ class Instrument(base.Music21Object):
                     return ch
             return 0
             #raise InstrumentException("we are out of midi channels and this was not already detected PROGRAM BUG!")
-            
-
-
-    #---------------------------------------------------------------------------
-#     def _getMX(self):
-#         '''Return a mxScorePart based on this instrument.
-#         '''
-#         return musicxmlTranslate.instrumentToMx(self)
-# 
-#     def _setMX(self, mxScorePart):
-#         '''
-#         provide a score part object
-#         '''
-#         # load an instrument from a ScorePart into self
-#         musicxmlTranslate.mxToInstrument(mxScorePart, self)
-# 
-#     mx = property(_getMX, _setMX)
-
 
 
 #-------------------------------------------------------------------------------

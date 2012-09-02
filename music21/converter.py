@@ -180,7 +180,7 @@ class ArchiveManager(object):
                 for subFp in mdd.getPaths():
                     component = f.open(subFp, 'rU')
                     lines = component.readlines()
-                    #environLocal.pd(['subFp', subFp, len(lines)]) 
+                    #environLocal.printDebug(['subFp', subFp, len(lines)]) 
                     post.append(''.join(lines))    
                     
                     # note: the following methods do not properly employ
@@ -213,7 +213,7 @@ class PickleFilter(object):
         '''
         self.fp = fp
         self.forceSource = forceSource
-        #environLocal.pd(['creating pickle filter'])
+        #environLocal.printDebug(['creating pickle filter'])
 
     def _getPickleFp(self, dir):
         if dir == None:
@@ -1009,7 +1009,7 @@ class Converter(object):
             format = 'tinyNotation'
 
 #         if type(dataStr) == unicode:
-#             environLocal.pd(['Converter.parseData: got a unicode string'])
+#             environLocal.printDebug(['Converter.parseData: got a unicode string'])
 
         # get from data in string if not specified        
         if format is None: # its a string

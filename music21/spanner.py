@@ -317,7 +317,7 @@ class Spanner(base.Music21Object):
         # call base method: this gets defined contexts and active site
         base.Music21Object.unwrapWeakref(self)
         # for contained objects that have weak refs
-        #environLocal.pd(['spanner unwrapping contained stream'])
+        #environLocal.printDebug(['spanner unwrapping contained stream'])
         self._components.unwrapWeakref()
         # this presently is not a weakref but in case of future changes
 
@@ -1066,11 +1066,11 @@ class SpannerBundle(object):
 
         remove = None
         for i, ref in enumerate(self._pendingComponentAssignment):
-            #environLocal.pd(['calling freePendingComponentAssignment()', self._pendingComponentAssignment])
+            #environLocal.printDebug(['calling freePendingComponentAssignment()', self._pendingComponentAssignment])
             if componentCandidate.isClassOrSubclass([ref['className']]):
                 ref['spanner'].addComponents(componentCandidate)
                 remove = i      
-                #environLocal.pd(['freePendingComponentAssignment()', 'added component', ref['spanner']])
+                #environLocal.printDebug(['freePendingComponentAssignment()', 'added component', ref['spanner']])
                 break
         if remove is not None:
             self._pendingComponentAssignment.pop(remove)

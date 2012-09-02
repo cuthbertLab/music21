@@ -2116,17 +2116,20 @@ class DisplayOctave(MusicXMLElement):
 class Notations(MusicXMLElementList):
     '''
     Notations contains many elements, including Ornaments.
+    Most of these are stored in the .componentList
     '''
     def __init__(self, type=None):
         MusicXMLElementList.__init__(self)
         self._tag = 'notations'
-        self.componentList = []  # objects tt are part of this node
+        self.componentList = []  # objects that are part of this node
 
     def _getComponents(self):
         return self.componentList 
 
     def getTuplets(self):
-        '''A quick way to get all tuplets; there is likely only one
+        '''
+        A quick way to get all tuplets; there is likely only one, but
+        we return a list anyhow.
         '''
         post = []        
         for part in self.componentList:
@@ -2135,7 +2138,9 @@ class Notations(MusicXMLElementList):
         return post
 
     def getTieds(self):
-        '''A quick way to get all tied objects; there is likely only one
+        '''
+        A quick way to get all tied objects; there is likely only one,
+        but we return a list anyhow.
         '''
         post = []        
         for part in self.componentList:
@@ -2157,7 +2162,8 @@ class Notations(MusicXMLElementList):
         return post
 
     def getFermatas(self):
-        '''Get a fermata.
+        '''
+        Get all Fermatas from the componentList as a list
         '''
         post = []        
         for part in self.componentList:
@@ -2166,7 +2172,8 @@ class Notations(MusicXMLElementList):
         return post
 
     def getSlurs(self):
-        '''Get a slurs.
+        '''
+        Get all Slurs from the componentList as a list
         '''
         post = []        
         for part in self.componentList:
@@ -2175,7 +2182,9 @@ class Notations(MusicXMLElementList):
         return post
 
     def getOrnaments(self):
-        '''Get all ornament objects stored on a components. There can be more than one.
+        '''
+        Get all ornament objects stored on componentList. 
+        There can be more than one.
         '''
         post = []        
         for part in self.componentList:
@@ -2184,14 +2193,18 @@ class Notations(MusicXMLElementList):
         return post
 
     def getGlissandi(self):
-        '''Get all glissandi objects stored on components. There can be more than one.
+        '''
+        Get all glissandi objects stored on components. 
+        There can be more than one.
 
         >>> from music21 import *
-        >>> g = musicxml.Glissando()
+        >>> g1 = musicxml.Glissando()
+        >>> g2 = musicxml.Glissando()
         >>> n = musicxml.Notations()
-        >>> n.append(g)
+        >>> n.append(g1)
+        >>> n.append(g2)
         >>> n.getGlissandi()
-        [<glissando >]
+        [<glissando >, <glissando >]
         '''
         post = []        
         for part in self.componentList:
@@ -3003,7 +3016,7 @@ class Handler(xml.sax.ContentHandler):
             self.t = TagLib()
         else:
             self.t = tagLib
-        #environLocal.pd(['creating Handler'])
+        #environLocal.printDebug(['creating Handler'])
 
         # this is in use in characters()
         self._currentTag = None # store current tag object
@@ -3081,7 +3094,7 @@ class Handler(xml.sax.ContentHandler):
         try:
             self._currentTag = self.t[name]
         except KeyError:
-            #environLocal.pd(['unhandled start element', name])
+            #environLocal.printDebug(['unhandled start element', name])
             return 
 
         self._currentTag.start() 
@@ -3149,7 +3162,7 @@ class Handler(xml.sax.ContentHandler):
         try: # just test to return if not handling
             self.t[name]
         except KeyError:
-            #environLocal.pd(['unhandled end element', name])
+            #environLocal.printDebug(['unhandled end element', name])
             return 
 
         # place most commonly used tags first
@@ -3719,7 +3732,7 @@ class Handler(xml.sax.ContentHandler):
 
         # formerly part of handler part
         elif name == 'part':
-            #environLocal.pd(['got part:', self._mxObjs['part']])
+            #environLocal.printDebug(['got part:', self._mxObjs['part']])
             self._parts.append(self._mxObjs['part']) # outermost container
 
         elif name == 'key':
@@ -3849,7 +3862,7 @@ class Handler(xml.sax.ContentHandler):
 
     #---------------------------------------------------------------------------
     def getContent(self):
-        #environLocal.pd(["self._mxObjs['part-list']", self._mxObjs['part-list']])
+        #environLocal.printDebug(["self._mxObjs['part-list']", self._mxObjs['part-list']])
 
         self._mxObjs['score'].partListObj = self._mxObjs['part-list']
         self._mxObjs['score'].componentList = self._parts

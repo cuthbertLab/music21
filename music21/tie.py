@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         tie.py
-# Purpose:      music21 classes for representing notes
+# Purpose:      music21 classes for representing ties (visual and conceptual)
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
@@ -9,12 +9,13 @@
 # Copyright:    Copyright © 2009-2010, 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
+'''
+The `tie` module contains a single class, `Tie` that represents the visual and
+conceptual idea of tied notes.
+'''
+
 
 import unittest, doctest
-
-from music21.musicxml import translate as musicxmlTranslate
-
-
 
 #-------------------------------------------------------------------------------
 class Tie(object):
@@ -29,7 +30,6 @@ class Tie(object):
     >>> note1.tie
     <music21.tie.Tie start>
 
-
     Differences from MusicXML:
        notes do not need to know if they are tied from a
        previous note.  i.e., you can tie n1 to n2 just with
@@ -37,13 +37,11 @@ class Tie(object):
        you need a tie stop on n2
        one tie with "continue" implies tied from and tied to
 
-
+    OMIT_FROM_DOCS
        optional (to know what notes are next:)
           .to = note()   # not implimented yet, b/c of garbage coll.
           .from = note()
 
-
-    OMIT_FROM_DOCS
     (question: should notes be able to be tied to multiple notes
     for the case where a single note is tied both voices of a
     two-note-head unison?)

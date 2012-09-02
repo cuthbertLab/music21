@@ -100,7 +100,6 @@ import doctest, unittest
 
 from music21 import base
 from music21 import exceptions21
-from music21 import musicxml
 from music21 import environment
 _MOD = "articulations.py"
 environLocal = environment.Environment(_MOD)
@@ -211,90 +210,32 @@ class Articulation(base.Music21Object):
         True
         ''')
 
-    def _getMX(self):
-        '''
-        Advanced method for musicxml output.  Not needed by most users.
-
-        As a getter: Returns a class (mxArticulationMark) that represents the
-        MusicXML structure of an articulation mark.
-
-        >>> from music21 import *
-        >>> a = articulations.Accent()
-        >>> mxArticulationMark = a.mx
-        >>> mxArticulationMark
-        <accent placement=above>
-
-
-        As a setter: Provided an musicxml.ArticulationMark object (not an mxArticulations object)
-        configure the music21 object.
-
-        Create both a musicxml.ArticulationMark object and a conflicting music21 object:
-        
-        
-        
-        >>> from music21 import *
-        >>> mxArticulationMark = musicxml.ArticulationMark('accent')
-        >>> mxArticulationMark.set('placement', 'below')
-        >>> a = articulations.Tenuto()
-        >>> a.placement = 'above'
-
-
-        Now override the music21 object with the mxArticulationMark object's characteristics
-
-
-        >>> a.mx = mxArticulationMark
-        >>> a._mxName
-        'accent'
-        >>> 'Tenuto' in a.classes
-        False
-        >>> 'Accent' in a.classes
-        True
-        >>> a.placement
-        'below'
-        '''
-        #mxArticulations = musicxml.Articulations()
-        mxArticulationMark = musicxml.ArticulationMark(self._mxName)
-        mxArticulationMark.set('placement', self.placement)
-        #mxArticulations.append(mxArticulationMark)
-        return mxArticulationMark
-
-
-    def _setMX(self, mxArticulationMark):
-        self.placement = mxArticulationMark.get('placement')
-        self._mxName = mxArticulationMark.tag
-        if self._mxName == 'accent':
-            self.__class__ = Accent
-        elif self._mxName == 'strong-accent':
-            self.__class__ = StrongAccent
-        elif self._mxName == 'staccato':
-            self.__class__ = Staccato
-        elif self._mxName == 'staccatissimo':
-            self.__class__ = Staccatissimo
-        elif self._mxName == 'spiccato':
-            self.__class__ = Spiccato
-        elif self._mxName == 'tenuto':
-            self.__class__ = Tenuto
-        elif self._mxName == 'detached-legato':
-            self.__class__ = DetachedLegato
-        # add more, below
-
-    mx = property(_getMX, _setMX)
-
-
 #-------------------------------------------------------------------------------
 class LengthArticulation(Articulation):
+    '''
+    Superclass for all articulations that change the length of a note.
+    '''
     def __init__(self):
         Articulation.__init__(self)
 
 class DynamicArticulation(Articulation):
+    '''
+    Superclass for all articulations that change the dynamic of a note.
+    '''
     def __init__(self):
         Articulation.__init__(self)
 
 class PitchArticulation(Articulation):
+    '''
+    Superclass for all articulations that change the pitch of a note.
+    '''
     def __init__(self):
         Articulation.__init__(self)
 
 class TimbreArticulation(Articulation):
+    '''
+    Superclass for all articulations that change the timbre of a note.
+    '''
     def __init__(self):
         Articulation.__init__(self)
 
@@ -382,28 +323,69 @@ class IndeterminantSlide(PitchArticulation):
         PitchArticulation.__init__(self)
 
 class Scoop(IndeterminantSlide):
-    pass
+    def __init__(self):
+        '''
+        >>> from music21 import *
+        >>> a = articulations.Scoop()
+        '''
+        IndeterminantSlide.__init__(self)
+
 
 class Plop(IndeterminantSlide):
-    pass
+    def __init__(self):
+        '''
+        >>> from music21 import *
+        >>> a = articulations.Plop()
+        '''
+        IndeterminantSlide.__init__(self)
 
 class Doit(IndeterminantSlide):
-    pass
+    def __init__(self):
+        '''
+        >>> from music21 import *
+        >>> a = articulations.Doit()
+        '''
+        IndeterminantSlide.__init__(self)
 
 class Falloff(IndeterminantSlide):
-    pass
+    def __init__(self):
+        '''
+        >>> from music21 import *
+        >>> a = articulations.Falloff()
+        '''
+        IndeterminantSlide.__init__(self)
 
 class BreathMark(LengthArticulation):
-    pass
+    def __init__(self):
+        '''
+        >>> from music21 import *
+        >>> a = articulations.BreathMark()
+        '''
+        LengthArticulation.__init__(self)
 
 class Caesura(Articulation):
-    pass
+    def __init__(self):
+        '''
+        >>> from music21 import *
+        >>> a = articulations.Caesura()
+        '''
+        Articulation.__init__(self)
 
 class Stress(DynamicArticulation):
-    pass
+    def __init__(self):
+        '''
+        >>> from music21 import *
+        >>> a = articulations.Stress()
+        '''
+        DynamicArticulation.__init__(self)
 
 class Unstress(DynamicArticulation):
-    pass
+    def __init__(self):
+        '''
+        >>> from music21 import *
+        >>> a = articulations.Unstress()
+        '''
+        DynamicArticulation.__init__(self)
 
 
 
@@ -417,18 +399,38 @@ class TechnicalIndication(Articulation):
     pass
 
 class Harmonic(TechnicalIndication):
-    pass
+    def __init__(self):
+        '''
+        >>> from music21 import *
+        >>> a = articulations.Harmonic()
+        '''
+        TechnicalIndication.__init__(self)
 
 class Bowing(TechnicalIndication):  
-    pass
+    def __init__(self):
+        '''
+        >>> from music21 import *
+        >>> a = articulations.Bowing()
+        '''
+        TechnicalIndication.__init__(self)
 
 
 #-------------------------------------------------------------------------------
 class UpBow(Bowing):
-    pass
+    def __init__(self):
+        '''
+        >>> from music21 import *
+        >>> a = articulations.UpBow()
+        '''
+        Bowing.__init__(self)
 
 class DownBow(Bowing):
-    pass
+    def __init__(self):
+        '''
+        >>> from music21 import *
+        >>> a = articulations.DownBow()
+        '''
+        Bowing.__init__(self)
 
 class StringHarmonic(Bowing, Harmonic):
     pass

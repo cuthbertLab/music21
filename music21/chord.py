@@ -17,19 +17,19 @@ as well as other methods, functions, and objects related to chords.
 import copy
 import unittest
 
+from music21 import beam
+from music21 import chordTables
+from music21 import common
+from music21 import defaults
 from music21 import duration
-from music21 import interval
 from music21 import exceptions21
+from music21 import interval
 from music21 import midi as midiModule
 from music21.midi import translate as midiTranslate
 from music21 import note
-from music21 import defaults
+from music21 import pitch
 from music21 import tie
 from music21 import volume
-from music21 import pitch
-from music21 import beam
-from music21 import common
-from music21 import chordTables
 
 from music21 import environment
 _MOD = "chord.py"

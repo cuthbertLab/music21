@@ -114,7 +114,7 @@ FORMATS = ['horizontalbar', 'histogram', 'scatter', 'scatterweighted',
 def userFormatsToFormat(value):
     '''Replace possible user format strings with defined format names as used herein. Returns string unaltered if no match.
     '''
-    #environLocal.pd(['calling user userFormatsToFormat:', value])
+    #environLocal.printDebug(['calling user userFormatsToFormat:', value])
     value = value.lower()
     value = value.replace(' ', '')
     if value in ['bar', 'horizontal', 'horizontalbar', 'pianoroll', 'piano']:
@@ -1156,7 +1156,7 @@ class GraphHorizontalBarWeighted(Graph):
 #                            rangeStep):
 #                 xTicks.append([x, '%s' % x])
 #                 self.setTicks('x', xTicks)  
-#         environLocal.pd(['xTicks', xTicks])
+#         environLocal.printDebug(['xTicks', xTicks])
 
         self._adjustAxisSpines(ax)
         self._applyFormatting(ax)
@@ -3319,7 +3319,7 @@ class PlotHorizontalBarWeighted(PlotStream):
                 normalizeByPart=self.normalizeByPart)
         pr.process()
         data = pr.getGraphHorizontalBarWeightedData()
-        #environLocal.pd(['data', data])
+        #environLocal.printDebug(['data', data])
         uniqueOffsets = []
         for key, value in data:
             for dataList in value:
@@ -4058,7 +4058,7 @@ def _getPlotsToMake(*args, **keywords):
                             break
                     if len(plotMake) > 0: # found a match
                         break
-    #environLocal.pd(['plotMake', plotMake])
+    #environLocal.printDebug(['plotMake', plotMake])
     return plotMake
 
 def plotStream(streamObj, *args, **keywords):

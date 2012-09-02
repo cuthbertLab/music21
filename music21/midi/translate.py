@@ -1400,7 +1400,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
         # events
         if e.isNoteOn():
             match = None
-            #environLocal.pd(['midiTrackToStream(): isNoteOn', e])
+            #environLocal.printDebug(['midiTrackToStream(): isNoteOn', e])
             for j in range(i+1, len(events)):
                 if j in memo: 
                     continue
@@ -1449,7 +1449,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     iGathered = [] # store a lost of indexes of gathered values put into chords
     voicesRequired = False
     if len(notes) > 1:
-        #environLocal.pd(['\nmidiTrackToStream(): notes', notes])
+        #environLocal.printDebug(['\nmidiTrackToStream(): notes', notes])
         while i < len(notes):
             if i in iGathered:
                 i += 1

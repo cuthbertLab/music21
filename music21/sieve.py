@@ -1749,7 +1749,7 @@ class PitchSieve(object):
             self.eld = float(eld)
         else: 
             self.eld = eld
-        #environLocal.pd(['PitchSieve', eld])
+        #environLocal.printDebug(['PitchSieve', eld])
 
 
     def __call__(self):
@@ -1838,7 +1838,7 @@ class PitchSieve(object):
 #         try:
 #             z = range(self.sieveObject.period()+1)
 #         except (OverflowError, MemoryError):
-#             environLocal.pd('failed to generates a z with period:', self.sieveObject.period())
+#             environLocal.printDebug('failed to generates a z with period:', self.sieveObject.period())
         p = self.sieveObject.period()
         if p < 999999999:
             z = range(p+1)
