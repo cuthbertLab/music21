@@ -27,6 +27,7 @@ from music21 import xmlnode
 # thus, cannot import these here
 from music21 import articulations 
 from music21 import chord
+from music21 import clef
 from music21 import duration
 from music21 import dynamics
 from music21 import expressions
@@ -1675,6 +1676,98 @@ def mxKeyListToKeySignature(mxKeyList, inputM21 = None):
 
     if inputM21 is None:
         return ks
+
+#--------------------------------------------------------
+# clefs
+
+def clefToMxClef(clefObj):
+    '''
+    Given a music21 Clef object, return a MusicXML Clef 
+    object.
+
+    >>> from music21 import *
+    >>> gc = clef.GClef()
+    >>> gc
+    <music21.clef.GClef>
+    >>> mxc = musicxml.translate.clefToMxClef(gc)
+    >>> mxc.get('sign')
+    'G'
+
+    >>> b = clef.Treble8vbClef()
+    >>> b.octaveChange
+    -1
+    >>> mxc2 = musicxml.translate.clefToMxClef(b)
+    >>> mxc2.get('sign')
+    'G'
+    >>> mxc2.get('clefOctaveChange')
+    -1
+    '''
+    mxClef = musicxmlMod.Clef()
+    mxClef.set('sign', clefObj.sign)
+    mxClef.set('line', clefObj.line)
+    if clefObj.octaveChange != 0:
+        mxClef.set('clefOctaveChange', clefObj.octaveChange)
+    return mxClef
+
+def mxClefToClef(mxClefList, inputM21 = None):
+    '''
+    Given a MusicXML Clef object, return a music21 
+    Clef object
+
+    >>> from music21 import *
+    >>> a = musicxml.Clef()   
+    >>> a.set('sign', 'G')
+    >>> a.set('line', 2)
+    >>> b = clef.Clef()
+    >>> b
+    <music21.clef.Clef>
+    >>> 'TrebleClef' in b.classes
+    False
+    >>> musicxml.translate.mxClefToClef(a, b)
+    >>> b.sign
+    'G'
+    >>> 'TrebleClef' in b.classes
+    True
+    >>> b
+    <music21.clef.TrebleClef>
+    
+    
+    Create a new clef from thin air:
+    
+    >>> a = musicxml.Clef()   
+    >>> a.set('sign', 'TAB')
+    >>> c = musicxml.translate.mxClefToClef(a)
+    >>> c
+    <music21.clef.TabClef>
+
+    '''
+
+    
+    if not common.isListLike(mxClefList):
+        mxClef = mxClefList # its not a list
+    else: # just get first for now
+        mxClef = mxClefList[0]
+
+    sign = mxClef.get('sign')
+    if sign in ['TAB', 'percussion', 'none']:
+        clefObj = clef.clefFromString(sign)
+    else:
+        line = mxClef.get('line')
+        mxOctaveChange = mxClef.get('clefOctaveChange')
+        if mxOctaveChange != None:
+            octaveChange = int(mxOctaveChange)
+        else:
+            octaveChange = 0
+        clefObj = clef.clefFromString(sign + str(line), octaveChange)
+
+    if inputM21 is None:
+        return clefObj
+    else:
+        inputM21._classes = None
+        inputM21.__class__ = clefObj.__class__
+        inputM21.sign = clefObj.sign
+        inputM21.line = clefObj.line
+        inputM21.octaveChange = clefObj.octaveChange
 #-------------------------------------------------------------------------------
 # Dyanmics
 
@@ -3505,7 +3598,7 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
     # the clef in the clef last defined in the parent
     # often m.clef will be None b/c a clef has already been defined
     if m.clef is not None:
-        mxAttributes.clefList = [m.clef.mx]
+        mxAttributes.clefList = [clefToMxClef(m.clef)]
     if m.keySignature is not None:
         # key.mx returns a Key ojbect, needs to be in a list
         mxAttributes.keyList = [keySignatureToMx(m.keySignature)]
@@ -3744,7 +3837,6 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     from music21 import harmony
     from music21 import layout
     from music21 import bar
-    from music21 import clef
     from music21 import spanner
 
     if inputM21 == None:
@@ -3807,10 +3899,9 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             _addToStaffReference(mxSub, ts, staffReference)
             m._insertCore(0, ts)
     if mxAttributesInternal and len(mxAttributes.clefList) != 0:
-        for mxSub in mxAttributes.clefList:
-            cl = clef.Clef()
-            cl.mx = mxSub
-            _addToStaffReference(mxSub, cl, staffReference)
+        for mxClef in mxAttributes.clefList:
+            cl = mxClefToClef(mxClef)
+            _addToStaffReference(mxClef, cl, staffReference)
             m._insertCore(0, cl)
     if mxAttributesInternal and len(mxAttributes.keyList) != 0:
         for mxSub in mxAttributes.keyList:
@@ -4551,7 +4642,6 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     #environLocal.printDebug(['calling Stream._setMXPart'])
     from music21 import layout
     from music21 import bar
-    from music21 import clef
     from music21 import stream
     from music21 import spanner
 

@@ -1984,7 +1984,7 @@ def kernTandemToObject(tandem):
             return clef.Bass8vbClef()
         else:
             try:
-                clefifier = clef.standardClefFromXN(clefType)
+                clefifier = clef.clefFromString(clefType)
                 return clefifier
             except clef.ClefException:
                 raise HumdrumException("Unknown clef type %s found", tandem)
