@@ -27,8 +27,6 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a :
     :width: 600
 
 '''
-
-
 import unittest, doctest
 import datetime
 import json
@@ -39,9 +37,7 @@ import re
 from music21 import base
 from music21 import common
 from music21 import exceptions21
-from music21 import musicxml
 from music21 import text
-
 
 from music21 import environment
 _MOD = "metadata.py"
@@ -988,58 +984,15 @@ class Contributor(base.JSONSerializer):
         if '.Text' in idStr:
             return Text()
         else:
-            raise MetadataException('cannot instantiate an object from id string: %s' % idStr)
-
-    #---------------------------------------------------------------------------
-    def _getMX(self):
-        '''Return a mxCreator object based on this object. 
-
-        >>> from music21 import *
-        >>> md = metadata.Metadata()
-        >>> md.composer = 'frank'
-        >>> mxCreator = md._contributors[0].mx
-        >>> mxCreator.get('charData')
-        'frank'
-        >>> mxCreator.get('type')
-        'composer'
-        '''
-        mxCreator = musicxml.Creator()
-        # not sure what do if we have multiple names
-        mxCreator.set('type', self.role)
-        mxCreator.set('charData', self.name)        
-        return mxCreator
-
-    def _setMX(self, mxCreator):
-        '''Given an mxCreator, fill the necessary parameters of a Contributor.
-
-        >>> from music21 import *
-        >>> mxCreator = musicxml.Creator()
-        >>> mxCreator.set('type', 'composer')
-        >>> mxCreator.set('charData', 'Beethoven, Ludwig van')
-
-        >>> c = metadata.Contributor()
-        >>> c.mx = mxCreator
-        >>> c.role
-        'composer'
-        >>> c.name
-        'Beethoven, Ludwig van'
-        '''
-        mxCreatorType = mxCreator.get('type')
-        if mxCreatorType != None and mxCreatorType in ROLES:
-            self.role = mxCreatorType
-        else: # roles are not defined in musicxml
-            pass
-            #environLocal.printDebug(['_setMX:', 'received unknown Contributor role: %s' % mxCreatorType])
-        # remove any whitespace found
-        self.name = mxCreator.get('charData').strip()
-
-
-    mx = property(_getMX, _setMX)    
-        
+            raise MetadataException('cannot instantiate an object from id string: %s' % idStr)        
 
 
 class Creator(Contributor):
-    '''A person that created a work. Can be a composer, lyricist, arranger, or other type of contributor. In MusicXML, these are "creator" elements.  
+    '''
+    A person that created a work. Can be a composer, 
+    lyricist, arranger, or other type of contributor. 
+    
+    In MusicXML, these are "creator" elements.
     '''
 
     relevance = 'creator'
@@ -1631,81 +1584,6 @@ class Metadata(base.Music21Object):
             raise MetadataException('cannot instantiate an object from id string: %s' % idStr)
 
 
-    #---------------------------------------------------------------------------
-    def _getMX(self):
-        '''Return a mxScore object, to be merged or used in final musicxml output
-        '''
-        mxScore = musicxml.Score()
-
-        # create and add work obj
-        mxWork = musicxml.Work()
-        match = False
-        if self.title not in [None, '']:
-            #environLocal.printDebug(['_getMX, got title', self.title])
-            match = True
-            mxWork.set('workTitle', str(self.title))
-            #mxWork.set('workNumber', None)
-        if match == True: # only attach if needed
-            mxScore.set('workObj', mxWork)
-
-        # musicxml often defaults to show only movement title       
-        # if no movement title is found, get the .title attr
-        if self.movementName not in [None, '']:
-            mxScore.set('movementTitle', str(self.movementName))
-        else: # it is none
-            if self.title != None:
-                mxScore.set('movementTitle', str(self.title))
-
-        if self.movementNumber not in [None, '']:
-            mxScore.set('movementNumber', str(self.movementNumber))
-
-        # create and add identification obj
-        mxId = musicxml.Identification()
-        match = False
-        mxCreatorList = []
-        for c in self._contributors: # look at each contributor
-            match = True # if more than zero
-            # get an mx object
-            mxCreatorList.append(c.mx)
-        if match == True: # only attach if needed
-            mxId.set('creatorList', mxCreatorList)        
-            mxScore.set('identificationObj', mxId)
-
-        return mxScore
-
-
-    def _setMX(self, mxScore):
-        '''Given an mxScore, fill the necessary parameters of a Metadata.
-        '''
-        mxMovementNumber = mxScore.get('movementNumber')
-        if mxMovementNumber != None:
-            self.movementNumber = mxMovementNumber
-
-        # xml calls this title not name
-        mxName = mxScore.get('movementTitle')
-        if mxName != None:
-            self.movementName = mxName
-
-        mxWork = mxScore.get('workObj')
-        if mxWork != None: # may be set to none
-            self.title = mxWork.get('workTitle')
-            #environLocal.printDebug(['_setMX, got title', self.title])
-            self.number = mxWork.get('workNumber')
-            self.opusNumber = mxWork.get('opus')
-
-        mxIdentification = mxScore.get('identificationObj')
-        if mxIdentification != None:
-            for mxCreator in mxIdentification.get('creatorList'):
-                # do an mx conversion for mxCreator to Contributor
-                c = Contributor()
-                c.mx = mxCreator
-                self._contributors.append(c)
-
-        # not yet supported; an encoding is also found in identification obj
-        mxEncoding = mxScore.get('encodingObj')
-
-    mx = property(_getMX, _setMX)    
-
 #-------------------------------------------------------------------------------
 class RichMetadata(Metadata):
     '''RichMetadata adds to Metadata information about the contents of the Score 
@@ -2164,12 +2042,12 @@ class Test(unittest.TestCase):
     def testMetadataLoadCorpus(self):
         from music21 import musicxml
         from music21.musicxml import testFiles
+        from music21.musicxml import translate as musicxmlTranslate
 
         d = musicxml.Document()
         d.read(testFiles.mozartTrioK581Excerpt)
         mxScore = d.score # get the mx score directly
-        md = Metadata()
-        md.mx = mxScore
+        md = musicxmlTranslate.mxScoreToMetadata(mxScore)
 
         self.assertEqual(md.movementNumber, '3')
         self.assertEqual(md.movementName, 'Menuetto (Excerpt from Second Trio)')
@@ -2181,8 +2059,7 @@ class Test(unittest.TestCase):
 
         d.read(testFiles.binchoisMagnificat)
         mxScore = d.score # get the mx score directly
-        md = Metadata()
-        md.mx = mxScore
+        md = musicxmlTranslate.mxScoreToMetadata(mxScore)
         self.assertEqual(md.composer, 'Gilles Binchois')
 
 
@@ -2306,8 +2183,9 @@ class Test(unittest.TestCase):
 
 
     def testJSONSerializationMetadata(self):
-
-        from music21 import musicxml, corpus
+        from music21 import corpus
+        from music21 import musicxml
+        from music21.musicxml import translate as musicxmlTranslate
         from music21.musicxml import testFiles
 
 
@@ -2330,8 +2208,8 @@ class Test(unittest.TestCase):
         d = musicxml.Document()
         d.read(testFiles.mozartTrioK581Excerpt)
         mxScore = d.score # get the mx score directly
-        md = Metadata()
-        md.mx = mxScore
+
+        md = musicxmlTranslate.mxScoreToMetadata(mxScore)
 
         self.assertEqual(md.movementNumber, '3')
         self.assertEqual(md.movementName, 'Menuetto (Excerpt from Second Trio)')

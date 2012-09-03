@@ -269,22 +269,6 @@ class Dynamic(base.Music21Object):
         10.0
         ''')
 
-#    def _getMX(self):
-#        raise Exception("HHHH")
-#
-#    def _setMX(self, mxDirection):
-#        raise Exception("HHHH")
-#
-#        # if applied in this fashion, only one dynamic can be set
-#        dynamicList = musicxmlTranslate.mxToDynamicList(mxDirection)
-#        target = dynamicList[0] # just get first in this case
-#        # manually transfer attrs to self
-#        for attr in ['value', '_positionPlacement', '_positionDefaultX', '_positionDefaultY', '_positionRelativeX', '_positionRelativeY']:
-#            setattr(self, attr, (getattr(target, attr)))
-#
-#
-#    mx = property(_getMX, _setMX)
-
 
 
 #-------------------------------------------------------------------------------

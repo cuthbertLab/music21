@@ -9,7 +9,6 @@
 # Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-
 '''
 Low-level conversion routines between MusicXML and music21.
 '''
@@ -23,19 +22,30 @@ from music21 import defaults
 from music21 import exceptions21
 from music21 import xmlnode
 
-# modules that import this include converter.py, stream.py
+# modules that import this include converter.py.
 # thus, cannot import these here
 from music21 import articulations 
+from music21 import bar
+from music21 import beam
 from music21 import chord
 from music21 import clef
 from music21 import duration
 from music21 import dynamics
 from music21 import expressions
+from music21 import harmony # for chord symbols
 from music21 import instrument
+from music21 import interval # for transposing instruments
 from music21 import key
+from music21 import layout
+from music21 import metadata
 from music21 import note
 from music21 import meter
 from music21 import pitch
+from music21 import repeat
+from music21 import spanner
+from music21 import stream
+from music21 import tempo
+from music21 import text # for text boxes
 from music21 import tie
 
 from music21 import environment
@@ -98,7 +108,7 @@ def streamToMusicXML(streamObject):
     # this should only be done once
     post = copy.deepcopy(streamObject)
     post.makeImmutable()
-    mxScore = post._getMX()
+    mxScore = streamToMx(post)
     del post
     return mxScore.xmlStr()
 
@@ -117,11 +127,10 @@ def measureToMusicXML(m):
     >>> len(post) > 1000
     True
     '''
-    from music21 import stream
     # search for time signatures, either defined locally or in context
     #environLocal.printDebug(['measureToMusicXML', m]) 
     # we already have a deep copy passed in, which happens in 
-    # stream.Measure._getMusicXML()
+    # measureToMusicXML(stream.Measure)
     m.makeNotation(inPlace=True)
 
     out = stream.Part()
@@ -199,7 +208,6 @@ def dynamicToMusicXML(dynamicObject):
     '''
     Provide a complete MusicXML representation.
     '''
-    from music21 import stream
     dCopy = copy.deepcopy(dynamicObject)
     out = stream.Stream()
     out.append(dCopy)
@@ -207,7 +215,6 @@ def dynamicToMusicXML(dynamicObject):
     return streamToMusicXML(out)
  
 def scaleToMusicXML(scaleObject):
-    from music21 import stream
     m = stream.Measure()
     for i in range(1, scaleObject._abstract.getDegreeMaxUnique()+1):
         p = scaleObject.pitchFromDegree(i)
@@ -229,7 +236,6 @@ def diatonicScaleToMusicXML(diatonicScaleObject):
     Return a complete musicxml of the DiatonicScale
     '''
     # note: overriding behavior on Scale 
-    from music21 import stream
     m = stream.Measure()
     for i in range(1, diatonicScaleObject._abstract.getDegreeMaxUnique()+1):
         p = diatonicScaleObject.pitchFromDegree(i)
@@ -356,7 +362,6 @@ def mxCreditToTextBox(mxCredit):
     >>> tb.content
     'testing'
     '''
-    from music21 import text
     tb = text.TextBox()
     tb.page = mxCredit.get('page')
     content = []
@@ -401,8 +406,6 @@ def mxTransposeToInterval(mxTranspose):
     <music21.interval.Interval A4>
 
     '''
-    from music21 import interval
-
     ds = None
     if mxTranspose.diatonic is not None:
         ds = int(mxTranspose.diatonic)
@@ -479,7 +482,6 @@ def mxToTempoIndication(mxMetronome, mxWords=None):
     >>> musicxml.translate.mxToTempoIndication(m)
     <music21.tempo.MetronomeMark Half=125.0>
     '''
-    from music21 import tempo
     # get lists of durations and texts
     durations = []
     numbers = []
@@ -639,7 +641,6 @@ def repeatToMx(r):
     >>> mxBarline.get('barStyle')
     'light-heavy'
     '''
-    from music21 import bar
     mxBarline = musicxmlMod.Barline()
     if r.style is not None:
         mxBarline.set('barStyle', r.musicXMLBarStyle)
@@ -692,7 +693,6 @@ def mxToRepeat(mxBarline, inputM21=None):
     >>> mxBarline2.get('barStyle')
     'light-heavy'
     '''
-    from music21 import bar
     if inputM21 is None:
         r = bar.Repeat()
     else:
@@ -757,7 +757,6 @@ def mxToBarline(mxBarline, inputM21 = None):
     >>> b.location
     'right'
     '''
-    from music21 import bar
     if inputM21 is None:
         b = bar.Barline()
     else:
@@ -975,7 +974,6 @@ def mxToPitch(mxNote, inputM21=None):
     return p
 
 def pitchToMusicXML(p):
-    from music21 import stream
     n = note.Note()
     n.pitch = copy.deepcopy(p)
     out = stream.Stream()
@@ -1293,7 +1291,7 @@ def durationToMx(d):
     '''
     post = [] # rename mxNoteList for consistencuy
 
-    #environLocal.printDebug(['in _getMX', d, d.quarterLength, 'isGrace', d.isGrace])
+    #environLocal.printDebug(['in durationToMx', d, d.quarterLength, 'isGrace', d.isGrace])
 
     if d.quarterLength >0 and d.dotGroups is not None and len(d.dotGroups) > 1:
         d = d.splitDotGroups()
@@ -1606,7 +1604,6 @@ def mxToTimeSignature(mxTimeList, inputM21=None):
 
 def timeSignatureToMusicXML(ts):
     # return a complete musicxml representation
-    from music21 import stream
     tsCopy = copy.deepcopy(ts)
 #         m = stream.Measure()
 #         m.timeSignature = tsCopy
@@ -1947,7 +1944,6 @@ def mxToTextExpression(mxDirection):
 def mxToCoda(mxCoda):
     '''Translate a MusicXML :class:`~music21.musicxml.Coda` object to a music21 :class:`~music21.repeat.Coda` object.
     '''
-    from music21 import repeat
     rm = repeat.Coda()
     rm._positionDefaultX = mxCoda.get('default-x')
     rm._positionDefaultY = mxCoda.get('default-y')
@@ -1980,7 +1976,6 @@ def codaToMx(rm):
 def mxToSegno(mxCoda):
     '''Translate a MusicXML :class:`~music21.musicxml.Coda` object to a music21 :class:`~music21.repeat.Coda` object.
     '''
-    from music21 import repeat
     rm = repeat.Segno()
     rm._positionDefaultX = mxCoda.get('default-x')
     rm._positionDefaultY = mxCoda.get('default-y')
@@ -2017,8 +2012,6 @@ def mxToRepeatExpression(mxDirection):
 
 def mxToChordSymbol(mxHarmony):
     #environLocal.printDebug(['mxToChordSymbol():', mxHarmony])
-    from music21 import harmony
-
     cs = harmony.ChordSymbol()
 
     mxKind = mxHarmony.get('kind')
@@ -2463,8 +2456,6 @@ def mxNotationsToSpanners(target, mxNotations, spannerBundle):
 
     The `target` object is a reference to the relevant music21 object this spanner is associated with.
     '''
-    from music21 import spanner
-
     mxSlurList = mxNotations.getSlurs()
     for mxObj in mxSlurList:
         # look at all spanners and see if we have an open, matching
@@ -2551,9 +2542,7 @@ def mxNotationsToSpanners(target, mxNotations, spannerBundle):
 
 def mxDirectionToSpanners(targetLast, mxDirection, spannerBundle):
     '''Some spanners, such as MusicXML octave-shift, are encoded as MusicXML directions.
-    '''
-    from music21 import spanner
-    
+    '''    
     mxWedge = mxDirection.getWedge()
     if mxWedge is not None:
         mxType = mxWedge.get('type')
@@ -2695,7 +2684,6 @@ def mxFermataToFermata(mxFermata, inputM21 = None):
     >>> fermata.type
     'inverted'
     '''
-
     if inputM21 is None:
         fermata = expressions.Fermata()
     else:
@@ -3044,27 +3032,6 @@ def chordToMx(c, spannerBundle=None):
     # our source target 
     articulationsAndExpressionsToMx(c, mxNoteList)
 
-#     mxArticulations = musicxmlMod.Articulations()
-#     for i in range(len(c.articulations)):
-#         obj = c.articulations[i]
-#         if hasattr(obj, 'mx'):
-#             mxArticulations.append(obj.mx)
-#     #if mxArticulations != None:
-#     if len(mxArticulations) > 0:
-#         mxNoteList[0].notationsObj.componentList.append(mxArticulations)
-# 
-#     # notations and articulations are mixed in musicxml
-#     for i in range(len(c.expressions)):
-#         obj = c.expressions[i]
-#         if hasattr(obj, 'mx'):
-#             # some expressions must be wrapped in a musicxml ornament
-#             if 'Ornament' in obj.classes:
-#                 ornamentsObj = musicxmlMod.Ornaments()
-#                 ornamentsObj.append(obj.mx)
-#                 mxNoteList[0].notationsObj.componentList.append(ornamentsObj)
-#             else: 
-#                 mxNoteList[0].notationsObj.componentList.append(obj.mx)
-
     # some spanner produce direction tags, and sometimes these need
     # to go before or after the notes of this element
     mxDirectionPre = []
@@ -3123,8 +3090,6 @@ def mxToChord(mxNoteList, inputM21=None, spannerBundle=None):
     'diamond'
 
     '''
-    from music21 import spanner
-
     if inputM21 == None:
         c = chord.Chord()
     else:
@@ -3204,7 +3169,6 @@ def generalNoteToMusicXML(n):
     >>> n.quarterLength = 3
     >>> post = musicxml.translate.generalNoteToMusicXML(n)
     '''
-    from music21 import stream, duration
     # make a copy, as we this process will change tuple types
     # this method is called infrequently, and only for display of a single 
     # note
@@ -3332,7 +3296,6 @@ def noteToMxNotes(n, spannerBundle=None):
     # if this note, not a component duration, but this note has a tie, 
     # need to add this to the last-encountered mxNote
     if n.tie is not None:
-        #mxTieList, mxTiedList = n.tie.mx # get mxl objs from tie obj
         mxTieList, mxTiedList = tieToMx(n.tie)
         # if starting or continuing tie, add to last mxNote in mxNote list
         if n.tie.type in ['start', 'continue']:
@@ -3344,7 +3307,7 @@ def noteToMxNotes(n, spannerBundle=None):
             mxNoteList[0].notationsObj.componentList += mxTiedList
 
     # need to apply beams to notes, but application needs to be
-    # reconfigured based on what is gotten from n.duration.mx
+    # reconfigured based on what is gotten from n.duration
     # likely, this means that many continue beams will need to be added
 
     # this is setting the same beams for each part of this 
@@ -3406,8 +3369,6 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
     >>> n
     <music21.note.Note C>
     '''
-    from music21 import spanner
-
     if inputM21 is None:
         n = note.Note()
     else:
@@ -3572,15 +3533,16 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
     mxPrint = None
     found = m.getElementsByClass('PageLayout')
     if len(found) > 0:
-        sl = found[0] # assume only one per measure
-        mxPrint = sl.mx
+        pl = found[0] # assume only one per measure
+        mxPrint = pageLayoutToMxPrint(pl)
     found = m.getElementsByClass('SystemLayout')
     if len(found) > 0:
         sl = found[0] # assume only one per measure
         if mxPrint is None:
-            mxPrint = sl.mx
+            mxPrint = systemLayoutToMxPrint(sl)
         else:
-            mxPrint.merge(sl.mx)
+            mxPrintTemp = systemLayoutToMxPrint(sl)
+            mxPrint.merge(mxPrintTemp)
 
     if mxPrint is not None:
         mxMeasure.componentList.append(mxPrint)
@@ -3600,11 +3562,11 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
     if m.clef is not None:
         mxAttributes.clefList = [clefToMxClef(m.clef)]
     if m.keySignature is not None:
-        # key.mx returns a Key ojbect, needs to be in a list
+        # keySignatureToMx returns a mxKey ojbect, needs to be in a list
         mxAttributes.keyList = [keySignatureToMx(m.keySignature)]
     if m.timeSignature is not None:
+        # timeSignatureToMx returns a mxTime ojbect, needs to be in a list
         mxAttributes.timeList = [timeSignatureToMx(m.timeSignature)]
-        #mxAttributes.timeList = m.timeSignature.mx
     mxMeasure.set('attributes', mxAttributes)
 
     # see if we have barlines
@@ -3767,7 +3729,7 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                 mxMeasure.insert(0, mxDirection)
             else: # other objects may have already been added
                 pass
-                #environLocal.printDebug(['_getMX of Measure is not processing', obj])
+                #environLocal.printDebug(['mesureToMx of Measure is not processing', obj])
 
     # TODO: create bar ending positions
     # right barline must follow all notes
@@ -3833,12 +3795,6 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     This Spanners are not inserted into the Stream here.
 
     '''
-    from music21 import stream
-    from music21 import harmony
-    from music21 import layout
-    from music21 import bar
-    from music21 import spanner
-
     if inputM21 == None:
         m = stream.Measure()
     else:
@@ -4009,13 +3965,11 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
                         addSystemLayout = True
                         break
             if addPageLayout:
-                pl = layout.PageLayout()
-                pl.mx = mxPrint
+                pl = mxPrintToPageLayout(mxPrint)
                 # store at zero position
                 m._insertCore(0, pl)
             if addSystemLayout or not addPageLayout:
-                sl = layout.SystemLayout()
-                sl.mx = mxPrint
+                sl = mxPrintToSystemLayout(mxPrint)
                 # store at zero position
                 m._insertCore(0, sl)
 
@@ -4213,8 +4167,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
             mxDirectionToSpanners(nLast, mxObj, spannerBundle)
             # TODO: multiple spanners
 #             if mxObj.getWedge() is not None:
-#                 w = dynamics.Wedge()
-#                 w.mx = mxObj     
+#                 w = mxToWedge(mxObj)
 #                 _addToStaffReference(mxObj, w, staffReference)
 #                 m._insertCore(offsetMeasureNote, w)
 
@@ -4285,9 +4238,6 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
     return m, staffReference, transposition
 
 
-
-
-
 #-------------------------------------------------------------------------------
 # Streams
 
@@ -4295,18 +4245,18 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None):
 def streamPartToMx(part, instStream=None, meterStream=None,
                    refStreamOrTimeRange=None, spannerBundle=None):
     '''
-    If there are Measures within this stream, use them to create and
-    return an MX Part and ScorePart.
+    Convert a Part object (or any Stream representing a Part)
+    to musicxml
+    
+    If there are Measures within this Stream, use them 
+    to create and return an mxPart and mxScorePart.
 
     An `instObj` may be assigned from caller; this Instrument is pre-collected
     from this Stream in order to configure id and midi-channel values.
 
     The `meterStream`, if given, provides a template of meters.
     '''
-    from music21 import spanner
-    from music21 import stream
-
-    #environLocal.printDebug(['calling Stream._getMXPart', 'len(spannerBundle)', len(spannerBundle)])
+    #environLocal.printDebug(['calling Stream.streamPartToMx', 'len(spannerBundle)', len(spannerBundle)])
     # note: meterStream may have TimeSignature objects from an unrelated
     # Stream.
     if instStream is None:
@@ -4321,7 +4271,7 @@ def streamPartToMx(part, instStream=None, meterStream=None,
         instObj.partIdRandomize()
     # returns an mxScorePart
     mxScorePart = instrumentToMx(instObj)
-    #environLocal.printDebug(['calling Stream._getMXPart', 'mxScorePart', mxScorePart, mxScorePart.get('id')])
+    #environLocal.printDebug(['calling Stream.streamPartToMx', 'mxScorePart', mxScorePart, mxScorePart.get('id')])
 
     mxPart = musicxmlMod.Part()
     #mxPart.setDefaults()
@@ -4340,7 +4290,7 @@ def streamPartToMx(part, instStream=None, meterStream=None,
                         inPlace=True)
         measureStream = part.getElementsByClass('Measure')
 
-        #environLocal.printDebug(['Stream._getMXPart: post makeNotation, length', len(measureStream)])
+        #environLocal.printDebug(['Stream.streamPartToMx: post makeNotation, length', len(measureStream)])
 
         # after calling measuresStream, need to update Spanners, as a deepcopy
         # has been made
@@ -4386,7 +4336,7 @@ def streamPartToMx(part, instStream=None, meterStream=None,
     # make sure that all instances of the same class have unique ids
     spannerBundle.setIdLocals()
 
-    # for each measure, call .mx to get the musicxml representation
+    # for each measure, call measureToMx to get the musicxml representation
     for obj in measureStream:
         # get instrument for every measure position
         moStart = obj.getOffsetBySite(measureStream)
@@ -4417,7 +4367,6 @@ def emptyObjectToMx():
     >>> musicxml.translate.emptyObjectToMx()
     <score-partwise <work work-title=This Page Intentionally Left Blank>...<measure number=0 <attributes divisions=10080> <note <rest > duration=40320 type=whole...>>>>    
     '''
-    from music21 import stream, metadata
     out = stream.Stream()
     m = stream.Measure()
     r = note.Rest(quarterLength=4)
@@ -4435,9 +4384,7 @@ def streamToMx(s, spannerBundle=None):
     Create and return a musicxml Score object from a Stream or Score
 
     This is the most common entry point for
-    conversion of a Stream to MusicXML. This method is
-    called on Stream from the musicxml property.
-
+    conversion of a Stream to MusicXML.
 
     >>> from music21 import *
     >>> n1 = note.Note()
@@ -4448,13 +4395,13 @@ def streamToMx(s, spannerBundle=None):
     >>> mxScore = musicxml.translate.streamToMx(s1)
     >>> mxPartList = mxScore.get('partList')
     '''
-    #environLocal.printDebug(['streamToMx:'])
-    from music21 import spanner
+    # returns an mxScore object; a deepcopy has already been made
 
+    #environLocal.printDebug(['streamToMx:'])
     if len(s) == 0:
         return emptyObjectToMx()
     
-    #environLocal.printDebug('calling Stream._getMX')
+    #environLocal.printDebug('calling streamToMx')
     # stores pairs of mxScorePart and mxScore
     mxComponents = []
     instList = []
@@ -4485,7 +4432,7 @@ def streamToMx(s, spannerBundle=None):
 
 
     if s.hasPartLikeStreams():
-        #environLocal.printDebug('Stream._getMX: interpreting multipart')
+        #environLocal.printDebug('streamToMx(): interpreting multipart')
         streamOfStreams = s.getElementsByClass('Stream')
         for obj in streamOfStreams:
             # may need to copy element here
@@ -4534,13 +4481,12 @@ def streamToMx(s, spannerBundle=None):
                         refStreamOrTimeRange=refStreamOrTimeRange,
                         spannerBundle=spannerBundle)
             mxComponents.append([mxScorePart, mxPart, obj])
-            #mxComponents.append(obj._getMXPart(inst, meterStream, refStreamOrTimeRange))
+            #mxComponents.append(obj.streamPartToMx(inst, meterStream, refStreamOrTimeRange))
 
     else: # assume this is the only part
-        #environLocal.printDebug('Stream._getMX(): handling single-part Stream')
+        #environLocal.printDebug('streamPartToMx: handling single-part Stream')
         # if no instrument is provided it will be obtained through s
-        # when _getMxPart is called
-        #mxComponents.append(s._getMXPart(None, meterStream))
+        # when streamPartToMx is called
         mxScorePart, mxPart = streamPartToMx(s, meterStream=meterStream,
                               spannerBundle=spannerBundle)
         mxComponents.append([mxScorePart, mxPart, s])
@@ -4549,7 +4495,7 @@ def streamToMx(s, spannerBundle=None):
     # create score and part list
     # try to get mxScore from lead meta data first
     if s.metadata != None:
-        mxScore = s.metadata.mx # returns an mx score
+        mxScore = metadataToMxScore(s.metadata) # returns an mx score
     else:
         mxScore = musicxmlMod.Score()
 
@@ -4632,22 +4578,21 @@ def _getStaffExclude(staffReference, targetKey):
 
 
 def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
-    '''Load a part into a new Stream or one provided by `inputM21` given an mxScore and a part name.
-
-    The `spannerBundle` reference, when passed in, is used to accumulate Spanners. These are not inserted here.
-
-    Though it is incorrect MusicXML, PDFtoMusic creates empty measures when it should create full
-    measures of rests (possibly hidden).  This routine fixes that bug.  See http://musescore.org/en/node/15129
     '''
-    #environLocal.printDebug(['calling Stream._setMXPart'])
-    from music21 import layout
-    from music21 import bar
-    from music21 import stream
-    from music21 import spanner
+    Load a part into a new Stream or one provided by 
+    `inputM21` given an mxScore and a part name.
 
+    The `spannerBundle` reference, when passed in, 
+    is used to accumulate Spanners. These are not inserted here.
+
+    Though it is incorrect MusicXML, PDFtoMusic creates 
+    empty measures when it should create full
+    measures of rests (possibly hidden).  This routine 
+    fixes that bug.  See http://musescore.org/en/node/15129
+    '''
+    #environLocal.printDebug(['calling Stream.mxToStreamPart'])
     if inputM21 == None:
         # need a Score to load parts into
-        from music21 import stream
         s = stream.Score()
     else:
         s = inputM21
@@ -4862,26 +4807,23 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
 
 def mxToScore(mxScore, spannerBundle=None, inputM21=None):
     '''
-    Translate an mxScore into a music21 Score object or puts it into the
-    given inputM21 object (which does not necessarily have to be a :class:`~music21.stream.Score`
-    object.  It can be any :class:`~music21.stream.Stream` object)
+    Translate an mxScore into a music21 Score object 
+    or puts it into the
+    given inputM21 object (which does not necessarily 
+    have to be a :class:`~music21.stream.Score`
+    object.  It can be any :class:`~music21.stream.Stream` 
+    object)
 
-    All spannerBundles accumulated at all lower levels are inserted here.
+    All spannerBundles accumulated at all lower levels 
+    are inserted here.
     '''
     # TODO: may not want to wait to this leve to insert spanners; may want to 
     # insert in lower positions if it makes sense
-
-    from music21 import metadata
-    from music21 import layout
-    from music21 import text
-
     if inputM21 == None:
-        from music21 import stream
         s = stream.Score()
     else:
         s = inputM21
     if spannerBundle == None:
-        from music21 import spanner
         spannerBundle = spanner.SpannerBundle()
 
     mxPartIds = mxScore.getPartIdsFromPartListObj()
@@ -4923,8 +4865,7 @@ def mxToScore(mxScore, spannerBundle=None, inputM21=None):
 
     # add metadata object; this is placed after all other parts now
     # these means that both Parts and other objects live on Stream.
-    md = metadata.Metadata()
-    md.mx = mxScore # TODO: this needs to be updated to normal translation
+    md = mxScoreToMetadata(mxScore)
     s._insertCore(0, md)
 
     # store credits on Score stream
@@ -5052,7 +4993,6 @@ def mxToBeam(mxBeam, inputM21 = None):
     Traceback (most recent call last):
     TranslateException: unexpected beam type encountered (crazy)
     '''
-    from music21 import beam
     if inputM21 is None:
         beamOut = beam.Beam()
     else:
@@ -5107,7 +5047,6 @@ def mxToBeams(mxBeamList, inputM21 = None):
     >>> b
     <music21.beam.Beams <music21.beam.Beam None/start>/<music21.beam.Beam None/start>>
     '''
-    from music21 import beam
     if inputM21 is None:
         beamsOut = beam.Beams()
     else:
@@ -5118,6 +5057,426 @@ def mxToBeams(mxBeamList, inputM21 = None):
         beamsOut.beamsList.append(beamObj)
 
     return beamsOut
+
+#---------------------------------------------------------
+# layout
+
+def pageLayoutToMxPrint(pageLayout):
+    '''
+    Return a :class:`~music21.musicxml.Print` (`mxPrint`) 
+    object for a 
+    :class:`~music21.layout.PageLayout` object.
+
+    the mxPrint object includes an :class:`~music21.musicxml.PageLayout` (`mxPageLayout`)
+    object inside it.
+    
+    >>> from music21 import *
+    >>> pl = layout.PageLayout(pageNumber = 5, leftMargin=234, rightMargin=124, pageHeight=4000, pageWidth=3000, isNew=True)
+    >>> mxPrint = musicxml.translate.pageLayoutToMxPrint(pl)
+    >>> mxPrint.get('new-page')
+    'yes'
+    >>> mxPrint.get('page-number')
+    5
+    '''
+    mxPrint = musicxmlMod.Print()
+    if pageLayout.isNew:
+        mxPrint.set('new-page', 'yes')
+    if pageLayout.pageNumber is not None:
+        mxPrint.set('page-number', pageLayout.pageNumber)
+    
+    mxPageLayout = musicxmlMod.PageLayout()
+    if pageLayout.pageHeight != None:
+        mxPageLayout.set('pageHeight', pageLayout.pageHeight)
+    if pageLayout.pageWidth != None:
+        mxPageLayout.set('pageWidth', pageLayout.pageWidth)
+
+    # TODO- set attribute PageMarginsType
+    mxPageMargins = musicxmlMod.PageMargins()
+
+    # musicxml requires both left and right defined
+    matchLeft = False
+    matchRight = False
+    if pageLayout.leftMargin != None:
+        mxPageMargins.set('leftMargin', pageLayout.leftMargin)
+        matchLeft = True
+    if pageLayout.rightMargin != None:
+        mxPageMargins.set('rightMargin', pageLayout.rightMargin)
+        matchRight = True
+
+    if matchLeft and not matchRight:
+        mxPageMargins.set('rightMargin', 0)
+    if matchRight and not matchLeft:
+        mxPageMargins.set('leftMargin', 0)
+
+    # stored on components list
+    if matchLeft or matchRight:
+        mxPageLayout.append(mxPageMargins)
+
+    mxPrint.append(mxPageLayout)
+
+    return mxPrint
+
+def mxPrintToPageLayout(mxPrint, inputM21 = None):
+    '''
+    Given an mxPrint object, set object data for 
+    the print section of a layout.PageLayout object
+
+    >>> from music21 import *
+    >>> mxPrint = musicxml.Print()
+    >>> mxPrint.set('new-page', 'yes')
+    >>> mxPrint.set('page-number', 5)
+    >>> mxPageLayout = musicxml.PageLayout()
+    >>> mxPageLayout.pageHeight = 4000
+    >>> mxPageMargins = musicxml.PageMargins()
+    >>> mxPageMargins.set('leftMargin', 20)
+    >>> mxPageMargins.set('rightMargin', 30.2)
+    >>> mxPageLayout.append(mxPageMargins) 
+    >>> mxPrint.append(mxPageLayout)
+
+    >>> pl = musicxml.translate.mxPrintToPageLayout(mxPrint)
+    >>> pl.isNew
+    True
+    >>> pl.rightMargin > 30.1 and pl.rightMargin < 30.3
+    True
+    >>> pl.leftMargin
+    20.0
+    >>> pl.pageNumber
+    5
+
+
+    Alternatively, pass a music21 object into this routine.
+
+    >>> plAlt = layout.PageLayout()
+    >>> musicxml.translate.mxPrintToPageLayout(mxPrint, plAlt)
+    >>> plAlt.pageNumber
+    5
+    >>> plAlt.pageHeight
+    4000.0
+    >>> plAlt.isNew
+    True
+    '''
+    if inputM21 is None:
+        pageLayout = layout.PageLayout()
+    else:
+        pageLayout = inputM21
+    
+    data = mxPrint.get('newPage')
+    if data == 'yes': # encoded as yes/no in musicxml
+        pageLayout.isNew = True
+    else:
+        pageLayout.isNew = False
+        
+    number = mxPrint.get('page-number')
+    if number is not None and number != "":
+        if common.isStr(number):
+            pageLayout.pageNumber = int(number)
+        else:
+            pageLayout.pageNumber = number
+
+    mxPageLayout = [] # blank
+    for x in mxPrint:
+        if isinstance(x, musicxmlMod.PageLayout):
+            mxPageLayout = x
+            break # find first and break
+
+    if mxPageLayout != []:
+        pageHeight = mxPageLayout.get('pageHeight')
+        if pageHeight is not None:
+            pageLayout.pageHeight = float(pageHeight)
+        pageWidth = mxPageLayout.get('pageWidth')
+        if pageWidth is not None:
+            pageLayout.pageWidth = float(pageWidth)
+
+    mxPageMargins = None
+    for x in mxPageLayout:
+        if isinstance(x, musicxmlMod.PageMargins):
+            mxPageMargins = x
+
+    if mxPageMargins != None:
+        data = mxPageMargins.get('leftMargin')
+        if data != None:
+            # may be floating point values
+            pageLayout.leftMargin = float(data)
+        data = mxPageMargins.get('rightMargin')
+        if data != None:
+            pageLayout.rightMargin = float(data)
+
+    if inputM21 is None:
+        return pageLayout
+
+
+def systemLayoutToMxPrint(systemLayout):
+    '''
+    Return a mxPrint object
+
+    >>> from music21 import *
+    >>> sl = layout.SystemLayout(leftmargin=234, rightmargin=124, distance=3, isNew=True)
+    >>> mxPrint = musicxml.translate.systemLayoutToMxPrint(sl)
+
+    Test conversion back using the parallel routine
+    
+    >>> slAlt = layout.SystemLayout()
+    >>> musicxml.translate.mxPrintToSystemLayout(mxPrint, slAlt)
+    >>> slAlt.leftMargin
+    234.0
+    >>> slAlt.rightMargin
+    124.0
+    >>> slAlt.distance
+    3.0
+    >>> slAlt.isNew
+    True
+    '''
+    mxPrint = musicxmlMod.Print()
+    if systemLayout.isNew:
+        mxPrint.set('new-system', 'yes')
+    
+    mxSystemLayout = musicxmlMod.SystemLayout()
+    mxSystemMargins = musicxmlMod.SystemMargins()
+
+    # musicxml requires both left and right defined
+    matchLeft = False
+    matchRight = False
+    if systemLayout.leftMargin != None:
+        mxSystemMargins.set('leftMargin', systemLayout.leftMargin)
+        matchLeft = True
+    if systemLayout.rightMargin != None:
+        mxSystemMargins.set('rightMargin', systemLayout.rightMargin)
+        matchRight = True
+
+    if matchLeft and not matchRight:
+        mxSystemMargins.set('rightMargin', 0)
+    if matchRight and not matchLeft:
+        mxSystemMargins.set('leftMargin', 0)
+
+    # stored on components list
+    if matchLeft or matchRight:
+        mxSystemLayout.append(mxSystemMargins) 
+
+    if systemLayout.distance != None:
+        #mxSystemDistance = musicxml.SystemDistance()
+        #mxSystemDistance.set('charData', systemLayout.distance)
+        # only append if defined
+        mxSystemLayout.systemDistance = systemLayout.distance
+
+    mxPrint.append(mxSystemLayout)
+
+    return mxPrint
+
+
+def mxPrintToSystemLayout(mxPrint, inputM21 = None):
+    '''
+    Given an mxPrint object, set object data
+
+    >>> from music21 import *
+    >>> mxPrint = musicxml.Print()
+    >>> mxPrint.set('new-system', 'yes')
+    >>> mxSystemLayout = musicxml.SystemLayout()
+    >>> mxSystemLayout.systemDistance = 55
+    >>> mxSystemMargins = musicxml.SystemMargins()
+    >>> mxSystemMargins.set('leftMargin', 20)
+    >>> mxSystemMargins.set('rightMargin', 30.2)
+    >>> mxSystemLayout.append(mxSystemMargins) 
+    >>> mxPrint.append(mxSystemLayout)
+
+    >>> sl = musicxml.translate.mxPrintToSystemLayout(mxPrint)
+    >>> sl.isNew
+    True
+    >>> sl.rightMargin > 30.1 and sl.rightMargin <= 30.2
+    True
+    >>> sl.leftMargin
+    20.0
+    >>> sl.distance
+    55.0
+    '''
+    if inputM21 is None:
+        systemLayout = layout.SystemLayout()
+    else:
+        systemLayout = inputM21
+
+    data = mxPrint.get('newSystem')
+    if data == 'yes': # encoded as yes/no in musicxml
+        systemLayout.isNew = True
+    elif data == 'no':
+        systemLayout.isNew = False
+
+    #mxSystemLayout = mxPrint.get('systemLayout')
+    mxSystemLayout = [] # blank
+    for x in mxPrint:
+        if isinstance(x, musicxmlMod.SystemLayout):
+            mxSystemLayout = x
+            break # find first and break
+
+    mxSystemMargins = None
+    for x in mxSystemLayout:
+        if isinstance(x, musicxmlMod.SystemMargins):
+            mxSystemMargins = x
+
+    if mxSystemMargins != None:
+        data = mxSystemMargins.get('leftMargin')
+        if data != None:
+            # may be floating point values
+            systemLayout.leftMargin = float(data)
+        data = mxSystemMargins.get('rightMargin')
+        if data != None:
+            systemLayout.rightMargin = float(data)
+    
+    if mxSystemLayout != [] and mxSystemLayout.systemDistance != None:
+        systemLayout.distance = float(mxSystemLayout.systemDistance)
+
+    if inputM21 is None:
+        return systemLayout
+
+#-----------------------------------------------------------------
+# metadata
+
+def metadataToMxScore(mdObj):
+    '''
+    Return a mxScore object from a :class:`~music21.metadata.Metadata` object.
+
+    Note that an mxScore object is also where all the music is
+    stored, so normally we call mxScore.merge(otherMxScore) where
+    otherMxScore comes from converting the rest of the stream.
+    
+    '''
+    mxScore = musicxmlMod.Score()
+
+    # create and add work obj
+    mxWork = musicxmlMod.Work()
+    match = False
+    if mdObj.title not in [None, '']:
+        #environLocal.printDebug(['metadataToMx, got title', mdObj.title])
+        match = True
+        mxWork.set('workTitle', str(mdObj.title))
+        #mxWork.set('workNumber', None)
+    if match == True: # only attach if needed
+        mxScore.set('workObj', mxWork)
+
+    # musicxml often defaults to show only movement title       
+    # if no movement title is found, get the .title attr
+    if mdObj.movementName not in [None, '']:
+        mxScore.set('movementTitle', str(mdObj.movementName))
+    else: # it is none
+        if mdObj.title != None:
+            mxScore.set('movementTitle', str(mdObj.title))
+
+    if mdObj.movementNumber not in [None, '']:
+        mxScore.set('movementNumber', str(mdObj.movementNumber))
+
+    # create and add identification obj
+    mxId = musicxmlMod.Identification()
+    hasContributor = False
+    mxCreatorList = []
+    for c in mdObj._contributors: # look at each contributor
+        hasContributor = True # if more than zero
+        # get an mx object
+        mxCreator = contributorToMxCreator(c)
+        mxCreatorList.append(mxCreator)
+    if hasContributor is True: # only attach if needed
+        mxId.set('creatorList', mxCreatorList)        
+        mxScore.set('identificationObj', mxId)
+
+    return mxScore
+
+def mxScoreToMetadata(mxScore, inputM21 = None):
+    '''
+    Use an mxScore, to fill in parameters of a 
+    :class:`~music21.metadata.Metadata` object.
+    
+    if `inputM21` is None, a new `Metadata` object
+    is created and returned at the end.
+    
+    Otherwise, the parameters of this Metadata object
+    are changed and nothing is returned.
+    '''
+    if inputM21 is not None:
+        md = inputM21
+    else:
+        md = metadata.Metadata()
+    
+    mxMovementNumber = mxScore.get('movementNumber')
+    if mxMovementNumber != None:
+        md.movementNumber = mxMovementNumber
+
+    # xml calls this title not name
+    mxName = mxScore.get('movementTitle')
+    if mxName != None:
+        md.movementName = mxName
+
+    mxWork = mxScore.get('workObj')
+    if mxWork != None: # may be set to none
+        md.title = mxWork.get('workTitle')
+        #environLocal.printDebug(['mxScoreToMetadata, got title', md.title])
+        md.number = mxWork.get('workNumber')
+        md.opusNumber = mxWork.get('opus')
+
+    mxIdentification = mxScore.get('identificationObj')
+    if mxIdentification != None:
+        for mxCreator in mxIdentification.get('creatorList'):
+            # do an mx conversion for mxCreator to Contributor
+            c = mxCreatorToContributor(mxCreator)
+            md._contributors.append(c)
+
+    # not yet supported; an encoding is also found in identification obj
+    mxEncoding = mxScore.get('encodingObj')
+    
+    if inputM21 is None:
+        return md
+
+def contributorToMxCreator(contribObj):
+    '''
+    Return a mxCreator object from a :class:`~music21.metadata.Contributor` object.
+    
+    >>> from music21 import *
+    >>> md = metadata.Metadata()
+    >>> md.composer = 'frank'
+    >>> contrib = md._contributors[0]
+    >>> contrib
+    <music21.metadata.Contributor object at 0x...>
+    >>> mxCreator = musicxml.translate.contributorToMxCreator(contrib)
+    >>> mxCreator.get('charData')
+    'frank'
+    >>> mxCreator.get('type')
+    'composer'
+    '''
+    mxCreator = musicxmlMod.Creator()
+    # not sure what do if we have multiple names
+    mxCreator.set('type', contribObj.role)
+    mxCreator.set('charData', contribObj.name)        
+    return mxCreator
+
+def mxCreatorToContributor(mxCreator, inputM21 = None):
+    '''
+    Given an mxCreator, fill the necessary parameters of a Contributor.
+
+    >>> from music21 import *
+    >>> mxCreator = musicxml.Creator()
+    >>> mxCreator.set('type', 'composer')
+    >>> mxCreator.set('charData', 'Beethoven, Ludwig van')
+
+    >>> c = mxCreatorToContributor(mxCreator)
+    >>> c
+    <music21.metadata.Contributor object at 0x...>
+    >>> c.role
+    'composer'
+    >>> c.name
+    'Beethoven, Ludwig van'
+    '''
+    if inputM21 is None:
+        c = metadata.Contributor()
+    else:
+        c = inputM21
+    
+    mxCreatorType = mxCreator.get('type')
+    if mxCreatorType != None and mxCreatorType in metadata.ROLES:
+        c.role = mxCreatorType
+    else: # roles are not defined in musicxml
+        pass
+        #environLocal.printDebug(['mxCreatorToContributor:', 'received unknown Contributor role: %s' % mxCreatorType])
+    # remove any whitespace found
+    c.name = mxCreator.get('charData').strip()
+
+    if inputM21 is None:
+        return c
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
@@ -5142,7 +5501,7 @@ class Test(unittest.TestCase):
 
 
     def testBarRepeatConversion(self):
-        from music21 import converter, corpus, bar
+        from music21 import converter, corpus
         from music21.musicxml import testPrimitive
 
 
@@ -5157,8 +5516,7 @@ class Test(unittest.TestCase):
         #s.show()
 
     def testVoices(self):
-
-        from music21 import converter, stream
+        from music21 import converter
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.voiceDouble)
@@ -5177,7 +5535,7 @@ class Test(unittest.TestCase):
 
 
     def testSlurInputA(self):
-        from music21 import converter, stream
+        from music21 import converter
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.spannersSlurs33c)
@@ -5195,7 +5553,7 @@ class Test(unittest.TestCase):
 
 
     def testMultipleStavesPerPartA(self):
-        from music21 import converter, stream
+        from music21 import converter
         from music21.musicxml import testPrimitive
         from music21.musicxml import testFiles
         from music21.musicxml import base
@@ -5218,7 +5576,7 @@ class Test(unittest.TestCase):
 
 
     def testMultipleStavesPerPartB(self):
-        from music21 import converter, stream
+        from music21 import converter
         from music21.musicxml import testPrimitive
         from music21.musicxml import testFiles
         from music21.musicxml import base
@@ -5237,7 +5595,6 @@ class Test(unittest.TestCase):
 
 
     def testMultipleStavesPerPartC(self):
-
         from music21 import corpus
         s = corpus.parse('schoenberg/opus19/movement2')
         self.assertEqual(len(s.parts), 2)
@@ -5249,8 +5606,7 @@ class Test(unittest.TestCase):
 
 
     def testSpannersA(self):
-
-        from music21 import converter, stream
+        from music21 import converter
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.spanners33a)
@@ -5273,8 +5629,7 @@ class Test(unittest.TestCase):
 
 
     def testTextExpressionsA(self):
-
-        from music21 import converter, stream, expressions
+        from music21 import converter
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.textExpressions)
@@ -5294,7 +5649,6 @@ class Test(unittest.TestCase):
         #s.show()
 
     def testTextExpressionsB(self):
-        from music21 import stream
         textSrc = ['loud', 'soft', 'with\nspirit', 'with\nless\nintensity']
         sizeSrc = [8, 10, 12, 18, 24]
         positionVerticalSrc = [20, -80, 20]
@@ -5333,7 +5687,7 @@ spirit</words>
 
 
     def testTextExpressionsC(self):
-        from music21 import corpus, expressions
+        from music21 import corpus
         s = corpus.parse('bwv66.6')
         p = s.parts[0]
         for m in p.getElementsByClass('Measure'):
@@ -5351,7 +5705,7 @@ spirit</words>
 
 
     def testTextExpressionsD(self):
-        from music21 import corpus, expressions
+        from music21 import corpus
         # test placing text expression in arbitrary locations
         s = corpus.parse('bwv66.6')
         p = s.parts[-1] # get bass
@@ -5366,7 +5720,6 @@ spirit</words>
 
     def testTextExpressionsE(self):
         import random
-        from music21 import stream, layout
         s = stream.Stream()
         for i in range(6):
             m = stream.Measure(number=i + 1)
@@ -5388,10 +5741,9 @@ spirit</words>
 
 
     def testImportRepeatExpressionsA(self):
-
         # test importing from muscixml
         from music21.musicxml import testPrimitive
-        from music21 import converter, repeat
+        from music21 import converter
 
         # has one segno
         s = converter.parse(testPrimitive.repeatExpressionsA)
@@ -5488,7 +5840,7 @@ spirit</words>
 
     def testImportMetronomeMarksA(self):
         from music21.musicxml import testPrimitive
-        from music21 import converter, repeat
+        from music21 import converter
         # has metronome marks defined, not with sound tag
         s = converter.parse(testPrimitive.metronomeMarks31c)
         # get all tempo indications
@@ -5527,7 +5879,6 @@ spirit</words>
 
 
     def testExportMetronomeMarksA(self):
-        from music21 import stream, tempo
         p = stream.Part()
         p.repeatAppend(note.Note('g#3'), 8)
         # default quarter assumed
@@ -5540,8 +5891,6 @@ spirit</words>
         self.assertEqual(raw.find(match2) > 0, True)
 
     def testExportMetronomeMarksB(self):
-        from music21 import stream, tempo, duration
-
         p = stream.Part()
         p.repeatAppend(note.Note('g#3'), 8)
         # default quarter assumed
@@ -5557,7 +5906,6 @@ spirit</words>
         self.assertEqual(raw.find(match3) > 0, True)
 
     def testExportMetronomeMarksC(self):
-        from music21 import stream, tempo, duration
         # set metronome positions at different offsets in a measure or part
         p = stream.Part()
         p.repeatAppend(note.Note('g#3'), 8)
@@ -5583,7 +5931,6 @@ spirit</words>
 
 
     def testExportMetronomeMarksD(self):
-        from music21 import stream, tempo
         p = stream.Part()
         p.repeatAppend(note.Note('g#3'), 8)
         # default quarter assumed
@@ -5622,7 +5969,6 @@ spirit</words>
     def testExportMetronomeMarksE(self):
         '''Test writing of sound tags
         '''
-        from music21 import stream, tempo
         p = stream.Part()
         p.repeatAppend(note.Note('g#3'), 8)
         # default quarter assumed
@@ -5663,8 +6009,6 @@ spirit</words>
 
 
     def testMetricModulationA(self):
-        from music21 import stream, tempo
-
         s = stream.Stream()
         m1 = stream.Measure()
         m1.repeatAppend(note.Note(quarterLength=1), 4)
@@ -5708,7 +6052,7 @@ spirit</words>
     def testImportGraceNotesA(self):
         # test importing from muscixml
         from music21.musicxml import testPrimitive
-        from music21 import converter, repeat
+        from music21 import converter
         s = converter.parse(testPrimitive.graceNotes24a)
 
         #s.show()
@@ -5724,7 +6068,6 @@ spirit</words>
 
     def testNoteheadSmorgasbord(self):
         # tests the of many different types of noteheads
-        from music21 import stream
 
         n = note.Note('c3')
         n.notehead = 'diamond'
@@ -5802,7 +6145,7 @@ spirit</words>
     def testNoteheadWithTies(self):
         #what happens when you have notes with two different noteheads tied together?
 
-        from music21 import converter, spanner, stream
+        from music21 import converter
 
         n1 = note.Note('c3')
         n1.notehead = 'diamond'
@@ -5824,7 +6167,7 @@ spirit</words>
     def testStemDirection(self):
         #testing the ability to changing stem directions
 
-        from music21 import converter, spanner, stream
+        from music21 import converter
 
         n1 = note.Note('c3')
         n1.notehead = 'diamond'
@@ -5837,7 +6180,7 @@ spirit</words>
 
     def testStemDirImport(self):
 
-        from music21 import converter, spanner, stream
+        from music21 import converter
 
         n1 = note.Note('c3')
         n1.notehead = 'diamond'
@@ -5854,7 +6197,7 @@ spirit</words>
         #NB: Finale apparently will not display a pitch that is a member of a chord without a stem
         #unless all chord members are without stems.
 
-        from music21 import converter, spanner, stream
+        from music21 import converter
 
         n1 = note.Note('f3')
         n1.notehead = 'diamond'
@@ -5865,6 +6208,7 @@ spirit</words>
         c.quarterLength = 2
         
         xml = music21ObjectToMusicXML(c)
+        #print xml
         #c.show()
         input = converter.parse(xml)
         chordResult = input.flat.notes[0]
@@ -5878,7 +6222,7 @@ spirit</words>
 
     def testStaffGroupsA(self):
         from music21.musicxml import testPrimitive
-        from music21 import converter, spanner
+        from music21 import converter
 
         s = converter.parse(testPrimitive.staffGroupsNested41d)
         self.assertEqual(len(s.getElementsByClass('StaffGroup')), 2)
@@ -5893,7 +6237,6 @@ spirit</words>
 
 
     def testStaffGroupsB(self):
-        from music21 import stream, spanner, layout
         p1 = stream.Part()
         p1.repeatAppend(note.Note(), 8)
         p2 = stream.Part()
@@ -5995,7 +6338,7 @@ spirit</words>
 
     def testInstrumentTranspositionC(self):
         # generate all transpositions on output
-        from music21 import converter, stream
+        from music21 import converter
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.transposing01)
@@ -6028,7 +6371,6 @@ spirit</words>
 
         #s.show()
     def testHarmonyB(self):
-        from music21 import stream, harmony
         s = stream.Stream()
         s.append(key.KeySignature(-2))
 
@@ -6094,7 +6436,6 @@ spirit</words>
 
 
     def testHarmonyC(self):
-        from music21 import harmony, stream
 
         h = harmony.ChordSymbol()
         h.root('E-')
@@ -6131,7 +6472,6 @@ spirit</words>
         self.assertEqual(raw.count('<notehead filled="no">normal</notehead>'), 2)
 
     def testSummedNumerators(self):
-        from music21 import stream
 
         # this forces a call to summed numerator translation
         ts1 = meter.TimeSignature('5/8') # assumes two partitions
@@ -6154,7 +6494,6 @@ spirit</words>
 
 
     def testOrnamentA(self):
-        from music21 import stream
         s = stream.Stream()
         s.repeatAppend(note.Note(), 4)
         s.repeatAppend(chord.Chord(['c4', 'g5']), 4)
@@ -6178,7 +6517,7 @@ spirit</words>
 
 
     def testOrnamentB(self):
-        from music21 import stream, corpus
+        from music21 import corpus
 
         s = corpus.parse('opus133')
         ex = s.parts[0]
@@ -6233,7 +6572,6 @@ spirit</words>
 
 
     def testNoteColorA(self):
-        from music21 import stream
         n1 = note.Note()
         n2 = note.Note()
         n2.color = '#ff1111'
@@ -6256,7 +6594,7 @@ spirit</words>
 
 
     def testNoteColorB(self):
-        from music21 import converter, stream
+        from music21 import converter
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.colors01)
@@ -6269,7 +6607,7 @@ spirit</words>
 
 
     def testTextBoxA(self):
-        from music21 import converter, stream
+        from music21 import converter
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.textBoxes01)
@@ -6282,7 +6620,7 @@ spirit</words>
         self.assertEqual(msg, [u'This is a text box!', u'pos 200/300 (lower left)', u'pos 1000/300 (lower right)', u'pos 200/1500 (upper left)', u'pos 1000/1500 (upper right)'])
 
     def testTextBoxB(self):
-        from music21 import converter, stream, text
+        from music21 import converter
         y = 1000
         s = stream.Stream()
 
@@ -6321,7 +6659,7 @@ spirit</words>
 
 
     def testImportSlursA(self):
-        from music21 import corpus, spanner
+        from music21 import corpus
         # this is a good test as this encoding uses staffs, not parts
         # to encode both parts; this requires special spanner handling
         s = corpus.parse('k545')
@@ -6343,7 +6681,7 @@ spirit</words>
 
 
     def testImportWedgeA(self):
-        from music21 import converter, stream
+        from music21 import converter
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.spanners33a)
@@ -6359,7 +6697,7 @@ spirit</words>
 
 
     def testImportWedgeB(self):
-        from music21 import converter, stream
+        from music21 import converter
         from music21.musicxml import testPrimitive
 
         # this produces a single component cresc
@@ -6374,7 +6712,7 @@ spirit</words>
 
 
     def testBracketImportA(self):
-        from music21 import converter, stream
+        from music21 import converter
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.directions31a)
@@ -6385,7 +6723,7 @@ spirit</words>
 
 
     def testBracketImportB(self):
-        from music21 import converter, stream
+        from music21 import converter
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.spanners33a)
@@ -6396,7 +6734,7 @@ spirit</words>
 
 
     def testTrillExtensionImportA(self):
-        from music21 import converter, stream
+        from music21 import converter
         from music21.musicxml import testPrimitive
         s = converter.parse(testPrimitive.notations32a)
         #s.show()
@@ -6406,7 +6744,7 @@ spirit</words>
 
 
     def testGlissandoImportA(self):
-        from music21 import converter, stream
+        from music21 import converter
         from music21.musicxml import testPrimitive
         s = converter.parse(testPrimitive.spanners33a)
         #s.show()
@@ -6417,7 +6755,7 @@ spirit</words>
 
     def testImportDashes(self):
         # dashes are imported as Lines (as are brackets)
-        from music21 import converter, stream
+        from music21 import converter
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.spanners33a)
@@ -6430,7 +6768,7 @@ spirit</words>
 
 
     def testImportGraceA(self):
-        from music21 import converter, stream
+        from music21 import converter
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.graceNotes24a)
@@ -6446,8 +6784,6 @@ spirit</words>
 
 
     def testImportGraceB(self):
-        from music21 import stream
-
         ng1 = note.Note('c4', quarterLength=.5).getGrace()
         ng1.duration.stealTimeFollowing = .5
         ng1.duration.slash = False
@@ -6469,7 +6805,6 @@ spirit</words>
 
     def testBarException(self):
         from music21 import musicxml
-        from music21 import bar
         mxBarline = musicxml.Barline()
         mxBarline.set('barStyle', 'light-heavy')
         #Rasing the BarException
@@ -6500,7 +6835,7 @@ class TestExternal(unittest.TestCase):
         
         tests music21ObjectToMusicXML()
         '''
-        from music21 import stream, scale
+        from music21 import scale
         
         m = stream.Measure()
         n = note.Note("D#6")

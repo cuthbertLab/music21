@@ -20,9 +20,10 @@ import sys
 from copy import deepcopy
 import itertools
 from collections import defaultdict
-
 from operator import attrgetter
+
 from music21 import base
+
 from music21 import bar
 from music21 import common
 #from music21 import classCache
@@ -39,7 +40,6 @@ from music21 import key
 from music21 import layout
 from music21 import metadata
 from music21 import meter
-from music21.musicxml import translate as musicxmlTranslate
 from music21 import note
 from music21 import spanner
 from music21 import tie
@@ -56,9 +56,6 @@ environLocal = environment.Environment(_MOD)
 
 class StreamException(exceptions21.Music21Exception):
     pass
-
-#-------------------------------------------------------------------------------
-
 
 
 #-------------------------------------------------------------------------------
@@ -3897,7 +3894,6 @@ class Stream(base.Music21Object):
         # if still not defined, get default
         if returnDefault and instObj is None:
             instObj = instrument.Instrument()
-            # now set with .mx call
             #instObj.partId = defaults.partId # give a default id
             instObj.partName = defaults.partName # give a default id
             post.insert(0, instObj)
@@ -8550,60 +8546,6 @@ class Stream(base.Music21Object):
         return False
 
 
-    #---------------------------------------------------------------------------
-    def _getMXPart(self, instStream=None, meterStream=None, 
-        refStreamOrTimeRange=None):
-        '''If there are Measures within this stream, use them to create and
-        return an MX Part and ScorePart. 
-
-        An `instObj` may be assigned from caller; this Instrument is pre-collected from this Stream in order to configure id and midi-channel values. 
-
-        meterStream can be provided to provide a template within which
-        these events are positioned; this is necessary for handling
-        cases where one part is shorter than another. 
-        '''
-        #environLocal.printDebug(['calling Stream._getMXPart'])
-        # note: meterStream may have TimeSignature objects from an unrelated
-        # Stream.
-
-        # pass self as Stream to use
-        return musicxmlTranslate.streamPartToMx(self, instStream=instStream,
-            meterStream=meterStream, refStreamOrTimeRange=refStreamOrTimeRange)
-
-
-    def _getMX(self):
-        '''Create and return a musicxml Score object. 
-
-        >>> from music21 import *
-        >>> n1 = note.Note()
-        >>> measure1 = stream.Measure()
-        >>> measure1.insert(n1)
-        >>> str1 = stream.Stream()
-        >>> str1.insert(measure1)
-        >>> mxScore = str1.mx
-        '''
-        #environLocal.printDebug('calling Stream._getMX')
-        # returns an mxScore object; a deepcopy has already been made
-        return musicxmlTranslate.streamToMx(self)
-
-    def _setMXPart(self, mxScore, partId):
-        '''Load a part given an mxScore and a part name.
-        '''
-        #environLocal.printDebug(['calling Stream._setMXPart'])
-        # pass reference to self for building into
-        musicxmlTranslate.mxToStreamPart(mxScore, partId, inputM21=self)
-
-    def _setMX(self, mxScore):
-        '''
-        Given an mxScore, build into this stream
-        
-        uses musicxml.translate.mxToScore even if the current Stream object is not
-        a stream.Score object.  But it always returns the right class.
-        '''
-        musicxmlTranslate.mxToScore(mxScore, inputM21=self)
-    
-    mx = property(_getMX, _setMX)
-
 
     #---------------------------------------------------------------------------
     def _getNotesAndRests(self):
@@ -11672,44 +11614,7 @@ class Measure(Stream):
             :width: 211
 
         
-        ''')   
-
-    #---------------------------------------------------------------------------
-    def _getMX(self):
-        '''
-        Return a music21.musicxml.Measure object, 
-        populated with notes, chords, rests
-        and a music21.musixcml.Attributes object, 
-        populated with time, meter, key, etc
-
-        Not needed for most users.  Call myMeasure.show('musicxml') or
-        myMeasure.write('musicxml') instead.
-
-        >>> from music21 import *
-
-        >>> a = note.Note()
-        >>> a.quarterLength = 4
-        >>> b = stream.Measure()
-        >>> b.insert(0, a)
-        >>> len(b) 
-        1
-        >>> mxMeasure = b.mx
-        >>> len(mxMeasure) 
-        1
-        '''
-        return musicxmlTranslate.measureToMx(self)
-
-    def _setMX(self, mxMeasure):
-        '''Given an mxMeasure, create a music21 measure
-        '''
-        # in just getting value for one measure, cannot create multiple parts
-        # for multi-staff presentation
-        m, staffReference, t = musicxmlTranslate.mxToMeasure(mxMeasure,
-                            inputM21=self)
-        return m
-
-    mx = property(_getMX, _setMX)    
-
+        ''')
    
 class Part(Stream):
     '''

@@ -171,9 +171,7 @@ def findHighestNotes(show=True, *arguments, **keywords):
         found.append(highestNote)
 
     if show:
-        print (found.write('musicxml'))
-    else:
-        mx = found.musicxml
+        found.show('musicxml')
 
 
 def ex1_revised(show=True, *arguments, **keywords):
@@ -209,7 +207,7 @@ def ex1_revised(show=True, *arguments, **keywords):
                 display.append(thisMeasure)
     
     if show:
-        display.write('musicxml')
+        display.show('musicxml')
     
 def findPotentialPassingTones(show = True):
     g = corpus.parseWork('gloria')
@@ -256,8 +254,6 @@ def demoJesse(show=True):
             n.lyric = n.pitch.german
     if show:   
         luca.show()
-    else:
-        mx = luca.musicxml
 
 #-------------------------------------------------------------------------------
 # new examples

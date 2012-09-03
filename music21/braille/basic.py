@@ -438,12 +438,12 @@ def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
         # it is brailled first."
         for artc in [articulations.Staccato(), articulations.Staccatissimo()]:                
             for i in range(music21Note.articulations.count(artc)):
-                noteTrans.append(beforeNoteExpr[artc._mxName])
-                music21Note._brailleEnglish.append(u"Articulation {0} {1}".format(artc._mxName, beforeNoteExpr[artc._mxName]))
+                noteTrans.append(beforeNoteExpr[artc.name])
+                music21Note._brailleEnglish.append(u"Articulation {0} {1}".format(artc.name, beforeNoteExpr[artc.name]))
         music21Note.articulations.sort()
         for artc in music21Note.articulations:
             try:
-                name = artc._mxName
+                name = artc.name
                 if not name == "staccato" or name == "staccatissimo":
                     noteTrans.append(beforeNoteExpr[name])
                     music21Note._brailleEnglish.append(u"Articulation {0} {1}".format(name, beforeNoteExpr[name]))

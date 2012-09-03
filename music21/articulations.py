@@ -121,7 +121,7 @@ class Articulation(base.Music21Object):
     '''
     def __init__(self):
         base.Music21Object.__init__(self)
-        self._mxName = None # specified in subclasses
+        self.name = None # specified in subclasses
         self.placement = 'above'
         # declare a unit interval shift for the performance of this articulation
         self._volumeShift = 0.0 
@@ -248,7 +248,7 @@ class Accent(DynamicArticulation):
         >>> a = articulations.Accent()
         '''
         DynamicArticulation.__init__(self)
-        self._mxName = 'accent'
+        self.name = 'accent'
         self._volumeShift = 0.1
 
 
@@ -259,7 +259,7 @@ class StrongAccent(Accent):
         >>> a = articulations.StrongAccent()
         '''
         Accent.__init__(self)
-        self._mxName = 'strong-accent'
+        self.name = 'strong accent'
         self._volumeShift = 0.15
 
 class Staccato(LengthArticulation):
@@ -269,7 +269,7 @@ class Staccato(LengthArticulation):
         >>> a = articulations.Staccato()
         '''
         LengthArticulation.__init__(self)
-        self._mxName = 'staccato'
+        self.name = 'staccato'
         self._volumeShift = 0.05
 
 class Staccatissimo(Staccato):
@@ -282,7 +282,7 @@ class Staccatissimo(Staccato):
         >>> a = articulations.Staccatissimo()
         '''
         Staccato.__init__(self)
-        self._mxName = 'staccatissimo'
+        self.name = 'staccatissimo'
         self._volumeShift = 0.05
 
 class Spiccato(Staccato):
@@ -294,7 +294,7 @@ class Spiccato(Staccato):
         >>> a = articulations.Spiccato()
         '''
         Staccato.__init__(self)
-        self._mxName = 'spiccato'
+        self.name = 'spiccato'
         self._volumeShift = 0.05
 
 class Tenuto(LengthArticulation):
@@ -304,7 +304,7 @@ class Tenuto(LengthArticulation):
         >>> a = articulations.Tenuto()
         '''
         LengthArticulation.__init__(self)
-        self._mxName = 'tenuto'
+        self.name = 'tenuto'
         self._volumeShift = -0.05
 
 class DetachedLegato(LengthArticulation):
@@ -314,7 +314,7 @@ class DetachedLegato(LengthArticulation):
         >>> a = articulations.DetachedLegato()
         '''
         LengthArticulation.__init__(self)
-        self._mxName = 'detached-legato'
+        self.name = 'detached legato'
         self._volumeShift = 0
 
 

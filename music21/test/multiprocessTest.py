@@ -16,7 +16,8 @@ each core of a multicore system.
 
 N.B. this gets a slightly different set of modules than test/test.py does
 because the `imp` module is not available for threaded processing.  Running
-both modules gives a great coverage.
+both modules gives great coverage of just about everything -- do that before
+building a new release.
 
 Run test/testDocumentation after this.
 '''

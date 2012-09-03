@@ -27,20 +27,13 @@ import string, copy, math
 import unittest, doctest
 
 from music21 import base
-from music21 import musicxml
 from music21 import common
 from music21 import spanner
 
-
 #-------------------------------------------------------------------------------
 class PageLayout(base.Music21Object):
-    '''Parameters for configuring a page's layout. -- covers both <print new-page> and <page-layout>
-    elements in musicxml
-
-
-    ## TODO -- make sure that the first pageLayout and systemLayout for each page are working together.
-
-
+    '''Parameters for configuring a page's layout.
+    
     PageLayout objects may be found on Measure or Part Streams.    
 
     >>> from music21 import *
@@ -53,6 +46,13 @@ class PageLayout(base.Music21Object):
     234
     >>> pl.isNew
     True
+
+    This object represents both <print new-page> and <page-layout>
+    elements in musicxml
+
+    ## TODO -- make sure that the first pageLayout and systemLayout 
+    for each page are working together.
+
     '''
     def __init__(self, *args, **keywords):
         base.Music21Object.__init__(self)
@@ -83,156 +83,18 @@ class PageLayout(base.Music21Object):
     def __repr__(self):
         return "<music21.layout.PageLayout>"
 
-    #---------------------------------------------------------------------------
-    def _getMX(self):
-        '''Used for musicxml conversion: Return a mxPrint object for a PageLayout object.
-        General users should not need to call this method.
-
-        >>> from music21 import *
-        >>> pl = layout.PageLayout(pageNumber = 5, leftMargin=234, rightMargin=124, pageHeight=4000, pageWidth=3000, isNew=True)
-        >>> mxPrint = pl.mx
-
-
-        >>> plAlt = layout.PageLayout()
-        >>> plAlt.mx = mxPrint # transfer
-        >>> plAlt.pageNumber
-        5
-        >>> plAlt.leftMargin
-        234.0
-        >>> plAlt.rightMargin
-        124.0
-        >>> plAlt.pageHeight
-        4000.0
-        >>> plAlt.pageWidth
-        3000.0
-        >>> plAlt.isNew
-        True
-        '''
-        mxPrint = musicxml.Print()
-        if self.isNew:
-            mxPrint.set('new-page', 'yes')
-        if self.pageNumber is not None:
-            mxPrint.set('page-number', self.pageNumber)
-        
-        mxPageLayout = musicxml.PageLayout()
-        if self.pageHeight != None:
-            mxPageLayout.set('pageHeight', self.pageHeight)
-        if self.pageWidth != None:
-            mxPageLayout.set('pageWidth', self.pageWidth)
-
-        
-        
-        # TODO- set attribute PageMarginsType
-        mxPageMargins = musicxml.PageMargins()
-
-        # musicxml requires both left and right defined
-        matchLeft = False
-        matchRight = False
-        if self.leftMargin != None:
-            mxPageMargins.set('leftMargin', self.leftMargin)
-            matchLeft = True
-        if self.rightMargin != None:
-            mxPageMargins.set('rightMargin', self.rightMargin)
-            matchRight = True
-
-        if matchLeft and not matchRight:
-            mxPageMargins.set('rightMargin', 0)
-        if matchRight and not matchLeft:
-            mxPageMargins.set('leftMargin', 0)
-
-        # stored on components list
-        if matchLeft or matchRight:
-            mxPageLayout.append(mxPageMargins)
-
-        mxPrint.append(mxPageLayout)
-
-        return mxPrint
-
-
-    def _setMX(self, mxPrint):
-        '''Given an mxPrint object, set object data for the print section of a page layout object
-
-        >>> from music21 import *
-        >>> mxPrint = musicxml.Print()
-        >>> mxPrint.set('new-page', 'yes')
-        >>> mxPrint.set('page-number', 5)
-        >>> mxPageLayout = musicxml.PageLayout()
-        >>> mxPageLayout.pageHeight = 4000
-        >>> mxPageMargins = musicxml.PageMargins()
-        >>> mxPageMargins.set('leftMargin', 20)
-        >>> mxPageMargins.set('rightMargin', 30.2)
-        >>> mxPageLayout.append(mxPageMargins) 
-        >>> mxPrint.append(mxPageLayout)
-
-        >>> pl = layout.PageLayout()
-        >>> pl.mx = mxPrint
-        >>> pl.isNew
-        True
-        >>> pl.rightMargin > 30.1 and pl.rightMargin < 30.3
-        True
-        >>> pl.leftMargin
-        20.0
-        >>> pl.pageNumber
-        5
-        '''
-        data = mxPrint.get('newPage')
-        if data == 'yes': # encoded as yes/no in musicxml
-            self.isNew = True
-        else:
-            self.isNew = False
-            
-
-        number = mxPrint.get('page-number')
-        if number is not None and number != "":
-            if common.isStr(number):
-                self.pageNumber = int(number)
-            else:
-                self.pageNumber = number
-
-        mxPageLayout = [] # blank
-        for x in mxPrint:
-            if isinstance(x, musicxml.PageLayout):
-                mxPageLayout = x
-                break # find first and break
-
-        if mxPageLayout != []:
-            pageHeight = mxPageLayout.get('pageHeight')
-            if pageHeight is not None:
-                self.pageHeight = float(pageHeight)
-            pageWidth = mxPageLayout.get('pageWidth')
-            if pageWidth is not None:
-                self.pageWidth = float(pageWidth)
-
-            
-
-
-        mxPageMargins = None
-        for x in mxPageLayout:
-            if isinstance(x, musicxml.PageMargins):
-                mxPageMargins = x
-
-        if mxPageMargins != None:
-            data = mxPageMargins.get('leftMargin')
-            if data != None:
-                # may be floating point values
-                self.leftMargin = float(data)
-            data = mxPageMargins.get('rightMargin')
-            if data != None:
-                self.rightMargin = float(data)
-        
-
-    mx = property(_getMX, _setMX)    
-
 
 #-------------------------------------------------------------------------------
 class SystemLayout(base.Music21Object):
-    '''Parameters for configuring a system's layout.
+    '''
+    Object that configures or alters a system's layout.
 
-    SystemLayout objects may be found on Measure or Part Streams.    
+    SystemLayout objects may be found on Measure or 
+    Part Streams.    
     
-    Importantly, if isNew is True then this object represents the start of a new system.
+    Importantly, if isNew is True then this object 
+    indicates that a new system should start here.
     
-
     >>> from music21 import *
     >>> sl = layout.SystemLayout(leftMargin=234, rightMargin=124, distance=3, isNew=True)
     >>> sl.distance
@@ -270,119 +132,6 @@ class SystemLayout(base.Music21Object):
 
     def __repr__(self):
         return "<music21.layout.SystemLayout>"
-
-    #---------------------------------------------------------------------------
-    def _getMX(self):
-        '''Return a mxPrint object
-
-        >>> from music21 import *
-        >>> sl = layout.SystemLayout(leftmargin=234, rightmargin=124, distance=3, isNew=True)
-        >>> mxPrint = sl.mx
-        
-        >>> slAlt = layout.SystemLayout()
-        >>> slAlt.mx = mxPrint # transfer
-        >>> slAlt.leftMargin
-        234.0
-        >>> slAlt.rightMargin
-        124.0
-        >>> slAlt.distance
-        3.0
-        >>> slAlt.isNew
-        True
-        '''
-        mxPrint = musicxml.Print()
-        if self.isNew:
-            mxPrint.set('new-system', 'yes')
-        
-        mxSystemLayout = musicxml.SystemLayout()
-        mxSystemMargins = musicxml.SystemMargins()
-
-        # musicxml requires both left and right defined
-        matchLeft = False
-        matchRight = False
-        if self.leftMargin != None:
-            mxSystemMargins.set('leftMargin', self.leftMargin)
-            matchLeft = True
-        if self.rightMargin != None:
-            mxSystemMargins.set('rightMargin', self.rightMargin)
-            matchRight = True
-
-        if matchLeft and not matchRight:
-            mxSystemMargins.set('rightMargin', 0)
-        if matchRight and not matchLeft:
-            mxSystemMargins.set('leftMargin', 0)
-
-        # stored on components list
-        if matchLeft or matchRight:
-            mxSystemLayout.append(mxSystemMargins) 
-
-        if self.distance != None:
-            #mxSystemDistance = musicxml.SystemDistance()
-            #mxSystemDistance.set('charData', self.distance)
-            # only append if defined
-            mxSystemLayout.systemDistance = self.distance
-
-        mxPrint.append(mxSystemLayout)
-
-        return mxPrint
-
-
-    def _setMX(self, mxPrint):
-        '''Given an mxPrint object, set object data
-
-        >>> from music21 import *
-        >>> mxPrint = musicxml.Print()
-        >>> mxPrint.set('new-system', 'yes')
-        >>> mxSystemLayout = musicxml.SystemLayout()
-        >>> mxSystemLayout.systemDistance = 55
-        >>> mxSystemMargins = musicxml.SystemMargins()
-        >>> mxSystemMargins.set('leftMargin', 20)
-        >>> mxSystemMargins.set('rightMargin', 30.2)
-        >>> mxSystemLayout.append(mxSystemMargins) 
-        >>> mxPrint.append(mxSystemLayout)
-
-        >>> sl = layout.SystemLayout()
-        >>> sl.mx = mxPrint
-        >>> sl.isNew
-        True
-        >>> sl.rightMargin > 30.1 and sl.rightMargin <= 30.2
-        True
-        >>> sl.leftMargin
-        20.0
-        >>> sl.distance
-        55.0
-        '''
-        data = mxPrint.get('newSystem')
-        if data == 'yes': # encoded as yes/no in musicxml
-            self.isNew = True
-        elif data == 'no':
-            self.isNew = False
-
-        #mxSystemLayout = mxPrint.get('systemLayout')
-        mxSystemLayout = [] # blank
-        for x in mxPrint:
-            if isinstance(x, musicxml.SystemLayout):
-                mxSystemLayout = x
-                break # find first and break
-
-        mxSystemMargins = None
-        for x in mxSystemLayout:
-            if isinstance(x, musicxml.SystemMargins):
-                mxSystemMargins = x
-
-        if mxSystemMargins != None:
-            data = mxSystemMargins.get('leftMargin')
-            if data != None:
-                # may be floating point values
-                self.leftMargin = float(data)
-            data = mxSystemMargins.get('rightMargin')
-            if data != None:
-                self.rightMargin = float(data)
-        
-        if mxSystemLayout != [] and mxSystemLayout.systemDistance != None:
-            self.distance = float(mxSystemLayout.systemDistance)
-
-    mx = property(_getMX, _setMX)    
 
 
 #-------------------------------------------------------------------------------

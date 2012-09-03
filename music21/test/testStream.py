@@ -808,11 +808,11 @@ class Test(unittest.TestCase):
         self.assertEqual(instObj.partName, defaults.partName)
 
         # test mx generation of parts
-        mx = q.mx
-        mx = r.mx
+        mx = musicxmlTranslate.streamToMx(q)
+        mx = musicxmlTranslate.streamToMx(r)
 
         # test mx generation of score
-        mx = s.mx
+        mx = musicxmlTranslate.streamToMx(s)
 
     def testMeasureAndTieCreation(self):
         '''A test of the automatic partitioning of notes in a measure and the creation of ties.
@@ -828,7 +828,7 @@ class Test(unittest.TestCase):
         a.insert(20, meter.TimeSignature("9/8")  )
         a.insert(40, meter.TimeSignature("10/4") )
 
-        mx = a.mx
+        mx = musicxmlTranslate.streamToMx(a)
 
     def testStreamCopy(self):
         '''Test copying a stream
@@ -2791,7 +2791,7 @@ class Test(unittest.TestCase):
             for n in ex.augmentOrDiminish(scalar, inPlace=False):
                 part.append(n)
             s.insert(0, part)
-        junkTest = s._getMX()
+        junkTest = musicxmlTranslate.streamToMx(s)
         #s.show()
     
         # second method: getting flattened stream
@@ -2803,7 +2803,7 @@ class Test(unittest.TestCase):
             part = ex.augmentOrDiminish(scalar, inPlace=False)
             s.insert(0, part)
         
-        junkTest = s._getMX()
+        junkTest = musicxmlTranslate.streamToMx(s)
         #s.show()
 
 

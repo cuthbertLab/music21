@@ -623,7 +623,9 @@ class ConverterMusicXML(object):
         '''
         #t = common.Timer()
         #t.start()
-        self._stream.mx = self._mxScore
+        from music21.musicxml import translate as musicxmlTranslate
+        musicxmlTranslate.mxToScore(self._mxScore, inputM21 = self._stream)
+        #self._stream._setMX(self._mxScore)
         #t.stop()
         #environLocal.printDebug(['music21 object creation time:', t])
 

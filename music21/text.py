@@ -301,39 +301,6 @@ class TextFormat(object):
         >>> tf.letterSpacing = 'normal'
         ''')
 
-
-#     def _getMxParameters(self):
-#         '''Return a dictionary with the attribute of this object notated as needed for MusicXML output
-# 
-#         >>> from music21 import *
-#         >>> tf = TextFormat()
-#         >>> tf.style = 'bolditalic'
-#         >>> tf._getMxParameters()['font-weight']
-#         'bold'
-#         >>> tf._getMxParameters()['font-style']
-#         'italic'
-#         '''
-#         post = {}
-#         post['justify'] = self._justify
-# 
-#         post['font-style'] = 'normal'
-#         post['font-weight'] = 'normal'
-#         if self._style == 'normal':
-#             pass            
-#         elif self._style == 'italic':
-#             post['font-style'] = 'italic'
-#         elif self._style == 'bold':
-#             post['font-weight'] = 'bold'
-#         elif self._style == 'bolditalic':
-#             post['font-weight'] = 'bold'
-#             post['font-style'] = 'italic'
-# 
-#         post['font-size'] = self._getSize()
-#         post['letter-spacing'] = self._getLetterSpacing()
-# 
-#         # font family not yet being specified
-#         return post
-
 #-------------------------------------------------------------------------------
 class TextBoxException(exceptions21.Music21Exception):
     pass

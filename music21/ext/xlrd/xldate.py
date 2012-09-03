@@ -33,7 +33,7 @@ _XLDAYS_TOO_LARGE = (2958466, 2958466 - 1462) # This is equivalent to 10000-01-0
 
 ##
 # Convert an Excel number (presumed to represent a date, a datetime or a time) into
-# a tuple suitable for feeding to datetime or mx.DateTime constructors.
+# a tuple suitable for feeding to datetime or musicxml.base.DateTime constructors.
 # @param xldate The Excel number
 # @param datemode 0: 1900-based, 1: 1904-based.
 # <br>WARNING: when using this function to
