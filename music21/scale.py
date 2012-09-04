@@ -310,6 +310,8 @@ class AbstractScale(Scale):
                 pitchListReal.append(p)
         pitchList = pitchListReal
 
+        self.fixDefaultOctaveForPitchList(pitchList)
+
         if not common.isListLike(pitchList) or len(pitchList) < 1:
             raise ScaleException("Cannot build a network from this pitch list: %s" % pitchList)
         intervalList = []
@@ -353,6 +355,59 @@ class AbstractScale(Scale):
         self._net = intervalNetwork.BoundIntervalNetwork(intervalList,
                     octaveDuplicating=self.octaveDuplicating)
 
+
+    def fixDefaultOctaveForPitchList(self, pitchList):
+        '''
+        Suppose you have a set of octaveless Pitches that you use to make a scale.
+        
+        Something like:
+        
+        >>> from music21 import *
+        >>> pitchListStrs = "a b c d e f g a".split()
+        >>> pitchList = [pitch.Pitch(p) for p in pitchListStrs]
+        
+        Here's the problem, between `pitchList[1]` and `pitchList[2]` the `.implicitOctave`
+        stays the same, so the `.ps` drops:
+
+        >>> (pitchList[1].implicitOctave, pitchList[2].implicitOctave)
+        (4, 4)        
+        >>> (pitchList[1].ps, pitchList[2].ps)
+        (71.0, 60.0)
+        
+        Hence this helper method that makes it so that for octaveless pitches ONLY, each
+        one has a .ps above the previous:
+        
+        >>> sc = scale.AbstractScale()
+        >>> pitchList2 = sc.fixDefaultOctaveForPitchList(pitchList)
+        >>> (pitchList2[1].implicitOctave, pitchList2[2].implicitOctave, pitchList2[3].implicitOctave)
+        (4, 5, 5)        
+        >>> (pitchList2[1].ps, pitchList2[2].ps)
+        (71.0, 72.0)
+
+        Note that the list is modified inPlace:
+        
+        >>> pitchList is pitchList2
+        True
+        >>> pitchList[2] is pitchList2[2]
+        True
+        '''
+        ## fix defaultOctave for pitchList
+        lastPs = 0
+        lastOctave = pitchList[0].implicitOctave
+        for p in pitchList:
+            if p.octave is None:
+                if lastPs > p.ps:
+                    p.defaultOctave = lastOctave
+                    p._pitchSpaceNeedsUpdating = True
+                while lastPs > p.ps:
+                    lastOctave += 1
+                    p.defaultOctave = lastOctave
+                    p._pitchSpaceNeedsUpdating = True                    
+            
+            lastPs = p.ps
+            lastOctave = p.implicitOctave
+        
+        return pitchList
 
 
     def getDegreeMaxUnique(self):
@@ -3760,6 +3815,15 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4')), '[C2, C2(+25c), C~2, C#2(-25c), D-2, D`2(-25c), D`2, D2(-25c), D2, D2(+25c), D~2, D#2(-25c), E-2, E`2(-25c), E`2, E2(-25c), F-2, F`2(-25c), F`2, F2(-25c), F2, F2(+25c), F~2, F#2(-25c), G-2, G`2(-25c), G`2, G2(-25c), G2, G2(+25c), G~2, G#2(-25c), A-2, A`2(-25c), A`2, A2(-25c), A2, A2(+25c), A~2, A#2(-25c), B-2, B`2(-25c), B`2, B2(-25c), C-3, C`3(-25c), C`3, C3(-25c), C3, C3(+25c), C~3, C#3(-25c), D-3, D`3(-25c), D`3, D3(-25c), D3, D3(+25c), D~3, D#3(-25c), E-3, E`3(-25c), E`3, E3(-25c), F-3, F`3(-25c), F`3, F3(-25c), F3, F3(+25c), F~3, F#3(-25c), G-3, G`3(-25c), G`3, G3(-25c), G3, G3(+25c), G~3, G#3(-25c), A-3, A`3(-25c), A`3, A3(-25c), A3, A3(+25c), A~3, A#3(-25c), B-3, B`3(-25c), B`3, B3(-25c), C-4, C`4(-25c), C`4, C4(-25c), C4]') 
 
 
+    def testDerivedScaleNoOctaves(self):
+        d = ConcreteScale(pitches = ['a', 'b', 'c', 'd', 'e', 'f', 'g#', 'a'])
+        e = d.deriveRanked(['C', 'E', 'G'], comparisonAttribute='name')
+        self.assertEqual(str(e), "[(3, <music21.scale.ConcreteScale F Concrete>), (3, <music21.scale.ConcreteScale E Concrete>), (2, <music21.scale.ConcreteScale B Concrete>), (2, <music21.scale.ConcreteScale A Concrete>)]")
+
+    def testDerivedScaleAbsurdOctaves(self):
+        e = ConcreteScale(pitches=['A4', 'B4', 'C4', 'D4', 'E4', 'F4', 'G4', 'A4'])
+        with self.assertRaises(intervalNetwork.IntervalNetworkException):
+            e.deriveRanked(['C4', 'E4', 'G4'], comparisonAttribute='name')
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -3769,7 +3833,7 @@ _DOC_ORDER = [ConcreteScale, AbstractScale]
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test, 'noDocTest')
 
 # store implicit tonic or Not
 # if not set, then comparisons fall to abstract

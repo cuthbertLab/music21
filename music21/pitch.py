@@ -1168,7 +1168,9 @@ class Pitch(base.Music21Object):
         self._accidental = None
         self._microtone = Microtone() 
 
-        # should this remain an attribute or only refer to value in defaults
+        # CA, Q: should this remain an attribute or only refer to value in defaults?
+        # MSC A: no, it's a useful attribute for cases such as scales where if there are
+        #        no octaves we give a defaultOctave higher than the previous
         self.defaultOctave = defaults.pitchOctave
         self._octave = None
         self._pitchSpaceNeedsUpdating = True
@@ -1715,15 +1717,44 @@ class Pitch(base.Music21Object):
         <music21.pitch.Pitch B`9>
         >>> b.ps
         130.5
+        
+        
+        Octaveless pitches use their .implicitOctave attributes:
+        
+        >>> d = pitch.Pitch("D#")
+        >>> d.octave is None
+        True
+        >>> d.implicitOctave
+        4
+        >>> d.ps
+        63.0
+        
+        If you change your default octave then you will need
+        to set the private ._pitchSpaceNeedsUpdating to True
+        
+        >>> d._pitchSpaceNeedsUpdating # 3
+        False
+        >>> d.defaultOctave = 5
+        >>> d._pitchSpaceNeedsUpdating # 4
+        False
+        >>> d.ps
+        63.0
+        >>> d._pitchSpaceNeedsUpdating = True
+        >>> d.ps
+        75.0        
         ''')
 
     def _updatePitchSpace(self):
         '''
         recalculates the pitchSpace number. Called when self.step, self.octave 
         or self.accidental are changed.
+        
+        should be called when .defaultOctave is changed if octave is None,
+        but isn't yet.
         '''
         self._ps = _convertStepToPs(self._step, self.implicitOctave,
                                    self.accidental, self.microtone)
+        self._pitchSpaceNeedsUpdating = False
 
 
     def _getMidi(self):
@@ -2252,8 +2283,10 @@ class Pitch(base.Music21Object):
     ''')
 
     def _getImplicitOctave(self):
-        if self.octave is None: return self.defaultOctave
-        else: return self.octave
+        if self.octave is None: 
+            return self.defaultOctave
+        else: 
+            return self.octave
         
     implicitOctave = property(_getImplicitOctave, doc='''
     Returns the octave of the Pitch, or defaultOctave if 

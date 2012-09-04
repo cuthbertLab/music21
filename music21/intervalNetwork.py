@@ -1296,7 +1296,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         # must set an octave for pitch reference, even if not given
         if pitchReference.octave is None:
-            pitchReference.octave = 4
+            pitchReference.octave = pitchReference.implicitOctave
 
         if common.isStr(minPitch):
             minPitch = pitch.Pitch(minPitch)
@@ -1334,7 +1334,10 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         #environLocal.printDebug(['_realizeAscending()', 'n', n])
 
-        while True:
+        attempts = 0
+        maxattempts = 100
+        while attempts < maxattempts:
+            attempts += 1
             #environLocal.printDebug(['_realizeAscending()', 'p', p])
             appendPitch = False
 
@@ -1387,6 +1390,9 @@ class BoundIntervalNetwork(IntervalNetwork):
             pCollect = self._processAlteredNodes(alteredDegrees=alteredDegrees, 
                        n=n, p=p, direction=DIRECTION_ASCENDING)
 
+        if attempts >= maxattempts:
+            raise IntervalNetworkException("Cannot realize these pitches; is your scale well-formed? (especially check if you're giving notes without octaves)")
+        
         # store in cache
         if self.deterministic:
             self._ascendingCache[ck] = post, postNodeId
@@ -1615,7 +1621,7 @@ class BoundIntervalNetwork(IntervalNetwork):
             raise IntervalNetworkException('pitchReference cannot be None')
         # must set an octave for pitch reference, even if not given
         if pitchReference.octave is None:
-            pitchReference.octave = 4
+            pitchReference.octave = pitchReference.implicitOctave
 
         if common.isStr(minPitch):
             minPitch = pitch.Pitch(minPitch)
@@ -2626,7 +2632,7 @@ class BoundIntervalNetwork(IntervalNetwork):
             sortList.append((len(matched), p))
 
         sortList.sort()
-        sortList.reverse() # want most amtches first
+        sortList.reverse() # want most matches first
         return sortList[:resultsReturned]  
 
     def transposePitchAndApplySimplification(self, intervalObj, pitchObj):
