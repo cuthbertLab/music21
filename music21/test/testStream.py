@@ -5703,7 +5703,7 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         # default
         rElements = s.recurse()
-        self.assertEqual(len(rElements), 236)
+        self.assertEqual(len(rElements), 240)
 
         rElements = s.recurse(streamsOnly=True)
         self.assertEqual(len(rElements), 45)
@@ -7355,25 +7355,6 @@ class Test(unittest.TestCase):
             "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
         #s.show()
 
-
-    def testSerializationScaffoldA(self):
-        from music21 import note, stream, pitch
-        n1 = note.Note()
-
-        s1 = stream.Stream()
-        s2 = stream.Stream()
-
-        s1.append(n1)
-        s2.append(n1)
-        
-        s2.setupSerializationScaffold()
-        s2.teardownSerializationScaffold()
-
-        self.assertEqual(s2.hasElement(n1), True)
-        # the scaffold has removes all non-conatined sites, so n1
-        # no longer has s1 as a site
-        self.assertEqual(s1 in n1.getSites(), False)
-        self.assertEqual(s2 in n1.getSites(), True)
 
 
 #------------------------------------------------------------------------------

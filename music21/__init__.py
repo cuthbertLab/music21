@@ -72,13 +72,14 @@ __all__ = ['base',
            
            # individual modules 
            # KEEP ALPHABETICAL unless necessary for load reasons, if so
-           # put a note
+           # put a note.  Keep one letter per line.
            'articulations', 
            'bar', 'beam', # base listed above...
            'chant', 'chord', 'chordTables', 
            'classCache', 'clef', 'common', 'configure', 'contour', 'converter',
            'defaults', 'derivation', 'duration', 'dynamics',
            'editorial', 'environment', 'exceptions21', 'expressions', 
+           'freezeThaw',
            'graph', 
            'harmony', 
            'instrument', 'interval', 'intervalNetwork', 

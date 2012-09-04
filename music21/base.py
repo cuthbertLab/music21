@@ -324,7 +324,8 @@ class JSONSerializer(object):
 
 
     def _getJSON(self):
-        '''Return the dictionary returned by _getJSONDict() as a JSON string.
+        '''
+        Return the dictionary returned by _getJSONDict() as a JSON string.
         '''
         # when called from json property, include version number;
         # this should mean that only the outermost object has a version number
@@ -676,7 +677,7 @@ class DefinedContexts(JSONSerializer):
         # the same key may be both in locationKeys and contextKeys
         self._locationKeys = []
         # store an index of numbers for tagging the time of defined contexts; 
-        # this is used to be able to descern the order of context as added
+        # this is used to be able to discern the order of context as added
         self._timeIndex = 0
         # pass a reference to the object that contains this
         self.containedById = containedById
@@ -758,7 +759,7 @@ class DefinedContexts(JSONSerializer):
     #---------------------------------------------------------------------------
     # utility conversions
 
-    def unwrapWeakref(self):
+    def unwrapWeakref(self, purgeLocations = True):
         '''
         Unwrap any and all weakrefs stored.
 
@@ -779,7 +780,9 @@ class DefinedContexts(JSONSerializer):
         >>> common.isWeakref(aContexts._definedContexts[id(bObj)]['obj'])
         False
         '''
-        self.purgeLocations(rescanIsDead=True)
+        if purgeLocations is True:
+            # might not be needed if you know they are all alive.
+            self.purgeLocations(rescanIsDead=True)
 
         #environLocal.printDebug(['self', self, 'self._definedContexts.keys()', self._definedContexts.keys()])
         for idKey in self._definedContexts.keys():
@@ -823,97 +826,97 @@ class DefinedContexts(JSONSerializer):
                 post = common.wrapWeakref(self._definedContexts[idKey]['obj'])
                 self._definedContexts[idKey]['obj'] = post
 
-    def freezeIds(self):
-        '''
-        Temporarily replace all stored keys (object ids) 
-        with a temporary values suitable for usage in pickling.
-
-        >>> class Mock(Music21Object): 
-        ...     pass
-        >>> aObj = Mock()
-        >>> bObj = Mock()
-        >>> aContexts = DefinedContexts()
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
-        >>> oldKeys = aContexts._definedContexts.keys()
-        >>> aContexts.freezeIds()
-        >>> newKeys = aContexts._definedContexts.keys()
-        >>> oldKeys == newKeys
-        False
-        '''
-        # need to store self._locationKeys as well
-        post = {}
-        postLocationKeys = []
-        counter = common.SingletonCounter()
-
-        for idKey in self._definedContexts.keys():
-            if idKey is not None:
-                newKey = counter() # uuid.uuid4()
-            else:
-                newKey = idKey # keep None
-            # might want to store old id?
-            #environLocal.printDebug(['freezing key:', idKey, newKey])
-            if idKey in self._locationKeys:
-                postLocationKeys.append(newKey)
-            post[newKey] = self._definedContexts[idKey]
-        self._definedContexts = post
-        self._locationKeys = postLocationKeys
-        #environLocal.printDebug(['post freezeids', self._definedContexts])
-
-        # clear this for setting later
-        self.containedById = counter()
-        self._lastID = -1 # set to inactive
-
-    def unfreezeIds(self):
-        '''
-        Restore keys to be the id() of the object they contain.
-
-        >>> class Mock(Music21Object): 
-        ...     pass
-        >>> aObj = Mock()
-        >>> bObj = Mock()
-        >>> cObj = Mock()
-        >>> aContexts = DefinedContexts()
-        >>> aContexts.add(aObj)
-        >>> aContexts.add(bObj)
-        >>> aContexts.add(cObj, 200) # a location
-
-        >>> oldKeys = aContexts._definedContexts.keys()
-        >>> oldLocations = aContexts._locationKeys[:]
-        >>> aContexts.freezeIds()
-        >>> newKeys = aContexts._definedContexts.keys()
-        >>> oldKeys == newKeys
-        False
-        >>> aContexts.unfreezeIds()
-        >>> postKeys = aContexts._definedContexts.keys()
-        >>> postKeys == newKeys
-        False
-        >>> # restored original ids b/c objs are alive
-        >>> sorted(postKeys) == sorted(oldKeys) 
-        True
-        >>> oldLocations == aContexts._locationKeys
-        True
-        '''
-        #environLocal.printDebug(['defined context entering unfreeze ids', self._definedContexts])
-
-        # for encoding to serial, this should be done after weakref unwrapping     
-        # for decoding to serial, this should be done before weakref wrapping
-
-        post = {}
-        postLocationKeys = []
-        for idKey in self._definedContexts.keys():
-            # check if unwrapped, unwrap
-            obj = common.unwrapWeakref(self._definedContexts[idKey]['obj'])
-            if obj is not None:
-                newKey = id(obj)
-            else:
-                newKey = None
-            #environLocal.printDebug(['unfreezing key:', idKey, newKey])
-            if idKey in self._locationKeys:
-                postLocationKeys.append(newKey)
-            post[newKey] = self._definedContexts[idKey]
-        self._definedContexts = post
-        self._locationKeys = postLocationKeys
+#    def freezeIds(self):
+#        '''
+#        Temporarily replace all stored keys (object ids) 
+#        with a temporary values suitable for usage in pickling.
+#
+#        >>> class Mock(Music21Object): 
+#        ...     pass
+#        >>> aObj = Mock()
+#        >>> bObj = Mock()
+#        >>> aContexts = DefinedContexts()
+#        >>> aContexts.add(aObj)
+#        >>> aContexts.add(bObj)
+#        >>> oldKeys = aContexts._definedContexts.keys()
+#        >>> aContexts.freezeIds()
+#        >>> newKeys = aContexts._definedContexts.keys()
+#        >>> oldKeys == newKeys
+#        False
+#        '''
+#        # need to store self._locationKeys as well
+#        post = {}
+#        postLocationKeys = []
+#        counter = common.SingletonCounter()
+#
+#        for idKey in self._definedContexts.keys():
+#            if idKey is not None:
+#                newKey = counter() # uuid.uuid4()
+#            else:
+#                newKey = idKey # keep None
+#            # might want to store old id?
+#            #environLocal.printDebug(['freezing key:', idKey, newKey])
+#            if idKey in self._locationKeys:
+#                postLocationKeys.append(newKey)
+#            post[newKey] = self._definedContexts[idKey]
+#        self._definedContexts = post
+#        self._locationKeys = postLocationKeys
+#        #environLocal.printDebug(['post freezeids', self._definedContexts])
+#
+#        # clear this for setting later
+#        self.containedById = counter()
+#        self._lastID = -1 # set to inactive
+#
+#    def unfreezeIds(self):
+#        '''
+#        Restore keys to be the id() of the object they contain.
+#
+#        >>> class Mock(Music21Object): 
+#        ...     pass
+#        >>> aObj = Mock()
+#        >>> bObj = Mock()
+#        >>> cObj = Mock()
+#        >>> aContexts = DefinedContexts()
+#        >>> aContexts.add(aObj)
+#        >>> aContexts.add(bObj)
+#        >>> aContexts.add(cObj, 200) # a location
+#
+#        >>> oldKeys = aContexts._definedContexts.keys()
+#        >>> oldLocations = aContexts._locationKeys[:]
+#        >>> aContexts.freezeIds()
+#        >>> newKeys = aContexts._definedContexts.keys()
+#        >>> oldKeys == newKeys
+#        False
+#        >>> aContexts.unfreezeIds()
+#        >>> postKeys = aContexts._definedContexts.keys()
+#        >>> postKeys == newKeys
+#        False
+#        >>> # restored original ids b/c objs are alive
+#        >>> sorted(postKeys) == sorted(oldKeys) 
+#        True
+#        >>> oldLocations == aContexts._locationKeys
+#        True
+#        '''
+#        #environLocal.printDebug(['defined context entering unfreeze ids', self._definedContexts])
+#
+#        # for encoding to serial, this should be done after weakref unwrapping     
+#        # for decoding to serial, this should be done before weakref wrapping
+#
+#        post = {}
+#        postLocationKeys = []
+#        for idKey in self._definedContexts.keys():
+#            # check if unwrapped, unwrap
+#            obj = common.unwrapWeakref(self._definedContexts[idKey]['obj'])
+#            if obj is not None:
+#                newKey = id(obj)
+#            else:
+#                newKey = None
+#            #environLocal.printDebug(['unfreezing key:', idKey, newKey])
+#            if idKey in self._locationKeys:
+#                postLocationKeys.append(newKey)
+#            post[newKey] = self._definedContexts[idKey]
+#        self._definedContexts = post
+#        self._locationKeys = postLocationKeys
 
 
     #---------------------------------------------------------------------------
@@ -930,7 +933,8 @@ class DefinedContexts(JSONSerializer):
 
     def _prepareObject(self, obj):
         '''
-        Prepare an object for storage. May be stored as a standard refernce or as a weak reference.
+        Prepare an object for storage. 
+        May be stored as a standard refernce or as a weak reference.
         '''
         # can have this perform differently based on domain
         if obj is None: # leave None alone
@@ -1481,7 +1485,10 @@ class DefinedContexts(JSONSerializer):
         try:
             value = self._definedContexts[idKey]['offset']
         except KeyError:
-            raise DefinedContextsException("Could not find the object with id %s in the Site marked with idKey %s" % (id(self), idKey))
+            errorMsg = "Could not find the object with id %s in the Site marked with idKey %s. " % (id(self), idKey)
+            errorMsg += "\n   object %r, definedContexts: %r" % (self, self._definedContexts)
+            errorMsg += "\n   containedById = %d" % (self.containedById)
+            raise DefinedContextsException(errorMsg)
         # stored string are assummed to be attributes of the stored object
         if isinstance(value, str):
             if value not in ['highestTime', 'lowestOffset', 'highestOffset']:
@@ -2684,11 +2691,15 @@ class Music21Object(JSONSerializer):
 
     def purgeUndeclaredIds(self, declaredIds, excludeStorageStreams=True):
         '''
-        Remove all sites except those that are declared with the `declaredIds` list. 
+        TODO- remove...
+        
+        Remove all sites except those that are declared with 
+        the `declaredIds` list. 
 
         The `excludeStorageStreams` are SpannerStorage and VariantStorage.
 
-        This method is used in Stream serialization to remove lingering sites that are the result of temporary Streams. 
+        This method is used in Stream serialization to remove 
+        lingering sites that are the result of temporary Streams. 
         
         TODO: Test!
         '''
@@ -3570,7 +3581,8 @@ class Music21Object(JSONSerializer):
         #environLocal.printDebug(['   self._activeSite:', self._activeSite])
 
     def wrapWeakref(self):
-        '''Public interface to operation on DefinedContexts.
+        '''
+        Public interface to operation on DefinedContexts.
 
         >>> import music21
         >>> aM21Obj = music21.Music21Object()
@@ -3590,65 +3602,71 @@ class Music21Object(JSONSerializer):
         # this is done both here and in unfreezeIds()
 
 
-    def freezeIds(self):
-        '''Temporarily replace are stored keys with a different value.
-
-        >>> import music21
-        >>> aM21Obj = music21.Music21Object()
-        >>> bM21Obj = music21.Music21Object()
-        >>> aM21Obj.offset = 30
-        >>> aM21Obj.getOffsetBySite(None)
-        30.0
-        >>> bM21Obj.addLocationAndActiveSite(50, aM21Obj)   
-        >>> bM21Obj.activeSite != None
-        True
-        >>> oldActiveSiteId = bM21Obj._activeSiteId
-        >>> bM21Obj.freezeIds()
-        >>> newActiveSiteId = bM21Obj._activeSiteId
-        >>> oldActiveSiteId == newActiveSiteId
-        False
-        '''
-        counter = common.SingletonCounter()
-
-        self._definedContexts.freezeIds()
-        # _activeSite could be a weak ref; may need to manage
-        self._activeSiteId = None # uuid.uuid4() # a place holder
-        self._idLastDeepCopyOf = None # clear
-
-
-    def unfreezeIds(self):
-        '''Restore keys to be the id() of the object they contain
-
-        >>> import music21
-        >>> aM21Obj = music21.Music21Object()
-        >>> bM21Obj = music21.Music21Object()
-        >>> aM21Obj.offset = 30
-        >>> aM21Obj.getOffsetBySite(None)
-        30.0
-        >>> bM21Obj.addLocationAndActiveSite(50, aM21Obj)   
-        >>> bM21Obj.activeSite != None
-        True
-        >>> oldActiveSiteId = bM21Obj._activeSiteId
-        >>> bM21Obj.freezeIds()
-        >>> newActiveSiteId = bM21Obj._activeSiteId
-        >>> oldActiveSiteId == newActiveSiteId
-        False
-        >>> bM21Obj.unfreezeIds()
-        >>> postActiveSiteId = bM21Obj._activeSiteId
-        >>> oldActiveSiteId == postActiveSiteId
-        True
-        '''
-        #environLocal.printDebug(['unfreezing ids', self])
-        self._definedContexts.unfreezeIds()
-
-        # restore contained by ide
-        self._definedContexts.containedById = id(self)
-
-        # assuming should be called before wrapping weakrefs
-        if self._activeSite is not None:
-            # this should not be necessary
-            obj = common.unwrapWeakref(self._activeSite)
-            self._activeSiteId = id(obj)
+#    def freezeIds(self):
+#        '''
+#        TODO: Cut me!
+#        
+#        Temporarily replace are stored keys with a different value.
+#
+#        >>> import music21
+#        >>> aM21Obj = music21.Music21Object()
+#        >>> bM21Obj = music21.Music21Object()
+#        >>> aM21Obj.offset = 30
+#        >>> aM21Obj.getOffsetBySite(None)
+#        30.0
+#        >>> bM21Obj.addLocationAndActiveSite(50, aM21Obj)   
+#        >>> bM21Obj.activeSite != None
+#        True
+#        >>> oldActiveSiteId = bM21Obj._activeSiteId
+#        >>> bM21Obj.freezeIds()
+#        >>> newActiveSiteId = bM21Obj._activeSiteId
+#        >>> oldActiveSiteId == newActiveSiteId
+#        False
+#        '''
+#        counter = common.SingletonCounter()
+#
+#        self._definedContexts.freezeIds()
+#        # _activeSite could be a weak ref; may need to manage
+#        self._activeSiteId = None # uuid.uuid4() # a place holder
+#        self._idLastDeepCopyOf = None # clear
+#
+#
+#    def unfreezeIds(self):
+#        '''
+#        TODO: Cut me!
+#        
+#        Restore keys to be the id() of the object they contain
+#
+#        >>> import music21
+#        >>> aM21Obj = music21.Music21Object()
+#        >>> bM21Obj = music21.Music21Object()
+#        >>> aM21Obj.offset = 30
+#        >>> aM21Obj.getOffsetBySite(None)
+#        30.0
+#        >>> bM21Obj.addLocationAndActiveSite(50, aM21Obj)   
+#        >>> bM21Obj.activeSite != None
+#        True
+#        >>> oldActiveSiteId = bM21Obj._activeSiteId
+#        >>> bM21Obj.freezeIds()
+#        >>> newActiveSiteId = bM21Obj._activeSiteId
+#        >>> oldActiveSiteId == newActiveSiteId
+#        False
+#        >>> bM21Obj.unfreezeIds()
+#        >>> postActiveSiteId = bM21Obj._activeSiteId
+#        >>> oldActiveSiteId == postActiveSiteId
+#        True
+#        '''
+#        #environLocal.printDebug(['unfreezing ids', self])
+#        self._definedContexts.unfreezeIds()
+#
+#        # restore contained by ide
+#        self._definedContexts.containedById = id(self)
+#
+#        # assuming should be called before wrapping weakrefs
+#        if self._activeSite is not None:
+#            # this should not be necessary
+#            obj = common.unwrapWeakref(self._activeSite)
+#            self._activeSiteId = id(obj)
 
 
 

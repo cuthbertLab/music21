@@ -50,7 +50,8 @@ class Unpickler(object):
         return value
 
     def restore(self, obj):
-        """Restores a flattened object to its original python state.
+        """
+        Restores a flattened object to its original python state.
 
         Simply returns any of the basic builtin types
 
@@ -63,8 +64,13 @@ class Unpickler(object):
         self._push()
 
         if has_tag(obj, tags.ID):
-            return self._pop(self._objs[obj[tags.ID]])
-
+            objNumber = obj[tags.ID]
+            try:
+                objRef = self._objs[objNumber]
+            except IndexError:
+                raise IndexError('Cannot find objRef %d in self._objs of len(%d), looking for obj %r' % (objNumber, len(self._objs), obj))
+            poppedValue = self._pop(objRef)
+            return poppedValue
         if has_tag(obj, tags.REF):
             return self._pop(self._namedict.get(obj[tags.REF]))
 

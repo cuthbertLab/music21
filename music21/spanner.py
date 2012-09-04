@@ -329,13 +329,13 @@ class Spanner(base.Music21Object):
         self._components.wrapWeakref()
 
 
-    def freezeIds(self):
-        base.Music21Object.freezeIds(self)
-        self._components.freezeIds()
-
-    def unfreezeIds(self):
-        base.Music21Object.unfreezeIds(self)
-        self._components.unfreezeIds()
+#    def freezeIds(self):
+#        base.Music21Object.freezeIds(self)
+#        self._components.freezeIds()
+#
+#    def unfreezeIds(self):
+#        base.Music21Object.unfreezeIds(self)
+#        self._components.unfreezeIds()
 
 
     def getSpannerStorageId(self):

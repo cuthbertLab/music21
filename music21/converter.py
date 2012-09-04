@@ -8,7 +8,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
 music21.converter contains tools for loading music from various file formats,
@@ -255,226 +255,8 @@ class PickleFilter(object):
 
 
 
-
-
-
-
 #-------------------------------------------------------------------------------
-class StreamFreezer(object):
-    '''This class is used to freeze a Stream, preparing it for serialization and providing conversion routines.
-
-    In general, use the :func:`~music21.converter.freeze` and :func:`~music21.converter.unfreeze` functions for serializing to a file. Use the :func:`~music21.converter.unfreeze`
-
-    >>> from music21 import *
-    >>> s = stream.Stream()
-    >>> s.repeatAppend(note.Note('C4'), 8) 
-    >>> temp = [s[n].transpose(n, inPlace=True) for n in range(len(s))]
-
-    >>> sf = converter.StreamFreezer(s) # provide a Stream at init
-    >>> data = sf.writeStr(fmt='pickle') # pickle is default format; jsonpickle
-    >>> sfOut = converter.StreamFreezer() 
-    >>> sfOut.openStr(data)
-    >>> s = sfOut.stream
-    >>> s.show('t')
-    {0.0} <music21.note.Note C>
-    {1.0} <music21.note.Note D->
-    {2.0} <music21.note.Note D>
-    {3.0} <music21.note.Note E->
-    {4.0} <music21.note.Note E>
-    {5.0} <music21.note.Note F>
-    {6.0} <music21.note.Note G->
-    {7.0} <music21.note.Note G>
-
-    '''
-    def __init__(self, streamObj=None):
-        # must make a deepcopy, as we will be altering DefinedContexts
-        self.stream = None
-        if streamObj is not None:
-            # deepcopy necessary because we mangle sites in the objects
-            # before serialization
-            self.stream = copy.deepcopy(streamObj)
-            #self.stream = streamObj
-
-    def _getPickleFp(self, dir):
-        if dir == None:
-            raise ValueError
-        # cannot get data from stream, as offsets are broken
-        streamStr = str(time.time())
-        return os.path.join(dir, 'm21-' + common.getMd5(streamStr) + '.p')
-
-    def _getJsonFp(self, dir):
-        if dir == None:
-            raise ValueError
-        # cannot get data from stream, as offsets are broken
-        streamStr = str(time.time())
-        return os.path.join(dir, 'm21-' + common.getMd5(streamStr) + '.json')
-
-
-    def _packStream(self, streamObj):
-        '''Prepare the passed in Stream in place, return storage dictionary format
-        '''        
-        # do all things necessary to setup the stream
-        streamObj.setupSerializationScaffold()
-        storage = {'stream': streamObj, 'm21Version': base.VERSION}
-        return storage
-
-    def _teardownStream(self, streamObj):
-        '''Call this after setting packing and writing
-        '''
-        streamObj.teardownSerializationScaffold()
-    
-    def _unpackStream(self, storage):
-        '''Convert from storage dictionary to Stream.
-        '''
-        version = storage['m21Version']
-        if version != base.VERSION:
-            environLocal.warn('this pickled file is out of data and my not function properly.')
-        streamObj = storage['stream']
-        streamObj.teardownSerializationScaffold()
-        return streamObj
-
-    #---------------------------------------------------------------------------
-    def _parseWriteFmt(self, fmt):
-        '''Parse a passed-in write format
-
-        >>> from music21 import *
-        >>> sf = converter.StreamFreezer()
-        >>> sf._parseWriteFmt(None)
-        'pickle'
-        >>> sf._parseWriteFmt('JSON')
-        'jsonpickle'
-        '''
-        if fmt is None: # this is the default
-            return 'pickle'
-        fmt = fmt.strip().lower()
-        if fmt in ['p', 'pickle']:
-            return 'pickle'
-        elif fmt in ['jsonpickle', 'json']:
-            return 'jsonpickle'            
-        elif fmt in ['jsonnative']:
-            return 'jsonnative'
-
-    def write(self, fmt=None, fp=None):
-        '''
-        For a supplied Stream, write a serialized version to
-        disk in either 'pickle' or 'jsonpickle' format and
-        return the filepath to the file.
-        
-        N.B. jsonpickle is the better format for transporting from
-        one computer to another, but still has some bugs.
-        '''
-        fmt = self._parseWriteFmt(fmt)
-
-        if fp is None:
-            dir = environLocal.getRootTempDir()
-            if fmt.startswith('json'):
-                fp = self._getJsonFp(dir)
-            else:
-                fp = self._getPickleFp(dir)
-        elif os.sep in fp: # assume its a complete path
-            fp = fp
-        else:
-            dir = environLocal.getRootTempDir()
-            fp = os.path.join(dir, fp)
-    
-        storage = self._packStream(self.stream)
-
-        environLocal.printDebug(['writing fp', fp])
-
-        if fmt == 'pickle':
-            f = open(fp, 'wb') # binary
-            # a negative protocal value will get the highest protocal; 
-            # this is generally desirable 
-            # packStream() returns a storage dictionary
-            pickleMod.dump(storage, f, protocol=-1)
-            f.close()
-        elif fmt == 'jsonpickle':
-            data = jsonpickle.encode(storage)
-            f = open(fp, 'w') 
-            f.write(data)
-            f.close()
-        else:
-            raise ConverterException('bad StreamFreezer format: %s' % fmt)
-
-
-        # must restore the passed-in Stream
-        self._teardownStream(self.stream)
-        return fp
-
-    def writeStr(self, fmt=None):
-        '''Return a pickled as String
-        '''
-        fmt = self._parseWriteFmt(fmt)
-        storage = self._packStream(self.stream)
-
-        if fmt == 'pickle':
-            out = pickleMod.dumps(storage, protocol=-1)
-        elif fmt == 'jsonpickle':
-            out = jsonpickle.encode(storage)
-        else:
-            raise ConverterException('bad StreamFreezer format: %s' % fmt)
-
-        # must restore the passed-in Stream
-        self._teardownStream(self.stream)
-        return out
-
-
-    def _parseOpenFmt(self, storage):
-        '''Look at the file and determine the format
-        '''
-        if storage.startswith('{"m21Version": {"py/tuple"'):
-            return 'jsonpickle'
-        else:
-            return 'pickle'
-
-
-    def open(self, fp):
-        '''For a supplied file path to a pickled stream, unpickle
-        '''
-        if os.sep in fp: # assume its a complete path
-            fp = fp
-        else:
-            dir = environLocal.getRootTempDir()
-            fp = os.path.join(dir, fp)
-
-        f = open(fp, 'r')
-        fileData = f.read() # TODO: do not read entire file
-        f.close()
-
-        fmt = self._parseOpenFmt(fileData)
-        if fmt == 'pickle':
-            #environLocal.printDebug(['opening fp', fp])
-            f = open(fp, 'rb')
-            storage = pickleMod.load(f)
-            f.close()
-        elif fmt == 'jsonpickle':
-            f = open(fp, 'r')
-            data = f.read()
-            f.close()
-            storage = jsonpickle.decode(data)
-        else:
-            raise ConverterException('bad StreamFreezer format: %s' % fmt)
-
-        self.stream = self._unpackStream(storage)
-
-
-    def openStr(self, fileData):
-        '''Open a String as a pickle
-        '''
-        fmt = self._parseOpenFmt(fileData)
-
-        if fmt == 'pickle':
-            storage = pickleMod.loads(fileData)
-        elif fmt == 'jsonpickle':
-            storage = jsonpickle.decode(fileData)
-        else:
-            raise ConverterException('bad StreamFreezer format: %s' % fmt)
-
-        self.stream = self._unpackStream(storage)
-
-
-#-------------------------------------------------------------------------------
-# Converters are associated classes; they are not subclasses, but all most define a pareData() method, a parseFile() method, and a .stream attribute or property. 
+# Converters are associated classes; they are not subclasses, but most define a pareData() method, a parseFile() method, and a .stream attribute or property. 
 
 
 #-------------------------------------------------------------------------------
@@ -918,19 +700,10 @@ class ConverterMuseData(object):
 
         musedataTranslate.museDataWorkToStreamScore(mdw, self._stream)
 
-
-
     def _getStream(self):
         return self._stream
 
     stream = property(_getStream)
-
-
-
-
-
-
-
 
 #-------------------------------------------------------------------------------
 class Converter(object):
@@ -1002,7 +775,9 @@ class Converter(object):
                      raise ConverterFileException('cannot find a format extensions for: %s' % fp)
         self._setConverter(format, forceSource=forceSource)
         self._converter.parseFile(fp, number=number)
-
+        self.stream.filePath = fp
+        self.stream.fileNumber = number        
+        self.stream.fileFormat = format
 
     def parseData(self, dataStr, number=None, format=None, forceSource=False):
         '''Given raw data, determine format and parse into a music21 Stream.
@@ -1109,6 +884,9 @@ class Converter(object):
             format = common.findFormatFile(fp) 
         self._setConverter(format, forceSource=False)
         self._converter.parseFile(fp, number=number)
+        self.stream.filePath = fp
+        self.stream.fileNumber = number        
+        self.stream.fileFormat = format
 
 
     validHeaderFormats = ['musicxml', 'midi', 'humdrum', 'tinyNotation', 'musedata', 'abc', 'romanText']
@@ -1298,9 +1076,9 @@ def freeze(streamObj, fmt=None, fp=None):
     >>> #_DOCS_SHOW fp
     '/tmp/music21/sjiwoe.p'
 
-    The file can then be "defrosted" back into a Stream using the :func:`~music21.converter.unfreeze` method.
+    The file can then be "thawed" back into a Stream using the :func:`~music21.converter.thaw` method.
 
-    >>> d = converter.unfreeze(fp)
+    >>> d = converter.thaw(fp)
     >>> d.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>
     {0.0} <music21.note.Note C>
@@ -1308,18 +1086,20 @@ def freeze(streamObj, fmt=None, fp=None):
     {2.0} <music21.note.Note E>
     {3.0} <music21.note.Note F>
     '''
-    v = StreamFreezer(streamObj)
+    from music21 import freezeThaw
+    v = freezeThaw.StreamFreezer(streamObj)
     return v.write(fmt=fmt, fp=fp) # returns fp
 
 
-def unfreeze(fp):
+def thaw(fp):
     '''Given a file path of a serialized Stream, defrost the file into a Stream.
     
     This function is based on the :class:`~music21.converter.StreamFreezer` object. 
     
     See the documentation for :meth:`~music21.converter.freeze` for demos.
     '''
-    v = StreamFreezer()
+    from music21 import freezeThaw
+    v = freezeThaw.StreamThawer()
     v.open(fp)
     return v.stream
 
@@ -1343,7 +1123,7 @@ def freezeStr(streamObj, fmt=None):
     >>> data = converter.freezeStr(c, fmt='pickle')
     >>> len(data) > 20 # pickle implementation dependent
     True
-    >>> d = converter.unfreezeStr(data)
+    >>> d = converter.thawStr(data)
     >>> d.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>
     {0.0} <music21.note.Note C>
@@ -1352,15 +1132,17 @@ def freezeStr(streamObj, fmt=None):
     {3.0} <music21.note.Note F>
 
     '''
-    v = StreamFreezer(streamObj)
+    from music21 import freezeThaw
+    v = freezeThaw.StreamFreezer(streamObj)
     return v.writeStr(fmt=fmt) # returns a string
 
-def unfreezeStr(strData):
+def thawStr(strData):
     '''Given a serialization string, defrost into a Stream.
 
     This function is based on the :class:`~music21.converter.StreamFreezer` object. 
     '''
-    v = StreamFreezer()
+    from music21 import freezeThaw
+    v = freezeThaw.StreamThawer()
     v.openStr(strData)
     return v.stream
 
@@ -1999,7 +1781,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [parse, parseFile, parseData, parseURL, freeze, unfreeze, freezeStr, unfreezeStr, Converter, ConverterMusicXML, ConverterHumdrum]
+_DOC_ORDER = [parse, parseFile, parseData, parseURL, freeze, thaw, freezeStr, thawStr, Converter, ConverterMusicXML, ConverterHumdrum]
 
 
 if __name__ == "__main__":

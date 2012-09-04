@@ -107,8 +107,40 @@ class Scale(base.Music21Object):
         without a defined tonic.
         ''')
 
-    def _extractPitchList(self, other, comparisonAttribute='nameWithOctave'):
-        '''Given a data format, extract all unique pitch space or pitch class values.
+    def extractPitchList(self, other, comparisonAttribute='nameWithOctave', removeDuplicates = True):
+        '''
+        Utility function:
+        
+        Given a data format as "other" (a ConcreteScale, Chord, Stream, List of Pitches, or single Pitch), 
+        extract all unique Pitches using comparisonAttribute to test for them.
+        
+        >>> from music21 import *
+        >>> pStrList = ['A4','D4','E4','F-4','D4','D5', 'A', 'D#4']
+        >>> pList = [pitch.Pitch(p) for p in pStrList]
+        >>> nList = [note.Note(p) for p in pStrList]
+        >>> s = stream.Stream()
+        >>> for n in nList:
+        ...     s.append(n)
+        >>> sc = scale.Scale()
+        
+        Here we only remove the second 'D4' because the default comparison is `nameWithOctave`
+        
+        >>> [str(p) for p in sc.extractPitchList(pList)]
+        ['A4', 'D4', 'E4', 'F-4', 'D5', 'A', 'D#4']
+
+        Now we remove the F-4, D5, and A also because we are working with 
+        `comparisonAttribute=pitchClass`.
+        Note that we're using a Stream as `other` now...
+        
+        >>> [str(p) for p in sc.extractPitchList(s, comparisonAttribute='pitchClass')]
+        ['A4', 'D4', 'E4', 'D#4']
+
+        Now let's get rid of all but one diatonic `D` by using :meth:`~music21.pitch.Pitch.step` as our
+        `comparisonAttribute`.  Note that we can just give a list of strings as well, and they become
+        :class:`~music21.pitch.Pitch` objects:        
+        
+        >>> [str(p) for p in sc.extractPitchList(pStrList, comparisonAttribute='step')]
+        ['A4', 'D4', 'E4', 'F-4']
         '''
         pre = []
         # if a ConcreteScale, Chord or Stream
@@ -117,10 +149,31 @@ class Scale(base.Music21Object):
         # if a list
         elif common.isListLike(other):
             # assume a list of pitches; possible permit conversions?
-            pre = other
+            pre = []
+            for p in other:
+                if hasattr(p, 'pitch'):
+                    pre.append(p.pitch)
+                elif hasattr(p, 'classes') and 'Pitch' in p.classes:
+                    pre.append(p)
+                else:
+                    pre.append(pitch.Pitch(p)) 
         elif hasattr(other, 'pitch'):
             pre = [other.pitch] # get pitch attribute
-        return pre
+
+        if removeDuplicates is False:
+            return pre
+
+        uniquePitches = {}
+        
+        post = []
+
+        for p in pre:
+            hashValue = getattr(p, comparisonAttribute)
+            if hashValue not in uniquePitches:
+                uniquePitches[hashValue] = True
+                post.append(p)            
+        
+        return post
 
 
 
@@ -536,7 +589,7 @@ class AbstractDiatonicScale(AbstractScale):
 
     def __init__(self, mode=None):
         AbstractScale.__init__(self)
-        self.type = 'Abstract Diatonic'
+        self.type = 'Abstract diatonic'
         self.tonicDegree = None # step of tonic
         self.dominantDegree = None # step of dominant
         # all diatonic scales are octave duplicating
@@ -713,7 +766,11 @@ class AbstractOctatonicScale(AbstractScale):
 
 
 class AbstractHarmonicMinorScale(AbstractScale):
-    '''A true bi-directional scale that with the augmented second to a leading tone. 
+    '''
+    A true bi-directional scale that with the augmented 
+    second to a leading tone.
+    
+    This is the only scale to use the "_alteredDegrees" property. 
     '''
     def __init__(self, mode=None):
         AbstractScale.__init__(self)
@@ -725,8 +782,7 @@ class AbstractHarmonicMinorScale(AbstractScale):
     def _buildNetwork(self):
         '''
         '''
-        srcList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        intervalList = srcList[5:] + srcList[:5] # a to A
+        intervalList = ['M2', 'm2', 'M2', 'M2', 'm2', 'M2', 'M2'] # a to A
         self.tonicDegree = 1
         self.dominantDegree = 5
         self._net = intervalNetwork.BoundIntervalNetwork(intervalList, 
@@ -1274,7 +1330,7 @@ class ConcreteScale(Scale):
         >>> from music21 import *
         >>> sc = scale.DiatonicScale() # abstract, as no defined tonic
         >>> sc.name
-        'Abstract Diatonic'
+        'Abstract diatonic'
         ''')
 
     def __repr__(self):
@@ -1961,8 +2017,11 @@ class ConcreteScale(Scale):
     #---------------------------------------------------------------------------
     # comparison and evaluation
 
-    def match(self, other, comparisonAttribute='pitchClass'):
-        '''Given another object of various forms (e.g., a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, a list of :class:`~music21.pitch.Pitch` objects), return a named dictionary of pitch lists with keys 'matched' and 'notMatched'.
+    def match(self, other, comparisonAttribute='name'):
+        '''
+        Given another object of the forms that `extractPitchList` can take,
+        (e.g., a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, a list of :class:`~music21.pitch.Pitch` objects), 
+        return a named dictionary of pitch lists with keys 'matched' and 'notMatched'.
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale('g')
@@ -1973,25 +2032,23 @@ class ConcreteScale(Scale):
         {'notMatched': [<music21.pitch.Pitch C#5>], 
          'matched': [<music21.pitch.Pitch D4>, <music21.pitch.Pitch E4>, 
                      <music21.pitch.Pitch F#4>, <music21.pitch.Pitch G4>, 
-                     <music21.pitch.Pitch A4>, <music21.pitch.Pitch B4>, 
-                     <music21.pitch.Pitch D5>]}
+                     <music21.pitch.Pitch A4>, <music21.pitch.Pitch B4>]}
+
         >>> sc2.match(sc3)
         {'notMatched': [<music21.pitch.Pitch G#5>], 
          'matched': [<music21.pitch.Pitch A4>, <music21.pitch.Pitch B4>, 
                      <music21.pitch.Pitch C#5>, <music21.pitch.Pitch D5>, 
-                     <music21.pitch.Pitch E5>, <music21.pitch.Pitch F#5>, 
-                     <music21.pitch.Pitch A5>]}
+                     <music21.pitch.Pitch E5>, <music21.pitch.Pitch F#5>]}
 
         >>> sc1.match(sc4)
         {'notMatched': [<music21.pitch.Pitch G#4>, 
                         <music21.pitch.Pitch C#5>, 
                         <music21.pitch.Pitch D#5>], 
          'matched': [<music21.pitch.Pitch E4>, <music21.pitch.Pitch F#4>, 
-                     <music21.pitch.Pitch A4>, <music21.pitch.Pitch B4>, 
-                     <music21.pitch.Pitch E5>]}
+                     <music21.pitch.Pitch A4>, <music21.pitch.Pitch B4>]}
         '''
         # strip out unique pitches in a list
-        otherPitches = self._extractPitchList(other,
+        otherPitches = self.extractPitchList(other,
                         comparisonAttribute=comparisonAttribute)
 
         # need to deal with direction here? or get an aggregate scale
@@ -2011,7 +2068,10 @@ class ConcreteScale(Scale):
     def findMissing(self, other, comparisonAttribute='pitchClass', 
         minPitch=None, maxPitch=None, direction=DIRECTION_ASCENDING,
         alteredDegrees={}):
-        '''Given another object of various forms (e.g., a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, a list of :class:`~music21.pitch.Pitch` objects), return a list of pitches that are found in this Scale but are not found in the provided object. 
+        '''
+        Given another object of the forms that `extractPitches` takes (e.g., a :class:`~music21.stream.Stream`, 
+        a :class:`~music21.scale.ConcreteScale`, a list of :class:`~music21.pitch.Pitch` objects), 
+        return a list of pitches that are found in this Scale but are not found in the provided object. 
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale('g4')
@@ -2019,7 +2079,7 @@ class ConcreteScale(Scale):
         ['G4', 'A4', 'B4', 'C5', 'E5', 'F#5', 'G5']
         '''
         # strip out unique pitches in a list
-        otherPitches = self._extractPitchList(other,
+        otherPitches = self.extractPitchList(other,
                         comparisonAttribute=comparisonAttribute)
         post = self._abstract._net.findMissing(
             pitchReference=self.tonic, 
@@ -2034,13 +2094,22 @@ class ConcreteScale(Scale):
 
 
     def deriveRanked(self, other, resultsReturned=4,
-         comparisonAttribute='pitchClass'):
-        '''Return a list of closest-matching :class:`~music21.scale.ConcreteScale` objects based on this :class:`~music21.scale.AbstractScale`, provided as a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, or a list of :class:`~music21.pitch.Pitch` objects. Returned integer values represent the number of mathces. 
+        comparisonAttribute='pitchClass', removeDuplicates = False):
+        '''
+        Return a list of closest-matching :class:`~music21.scale.ConcreteScale` objects based on this 
+        :class:`~music21.scale.AbstractScale`, provided as a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, 
+        or a list of :class:`~music21.pitch.Pitch` objects. Returned integer values represent the number of mathces. 
+
+        If you are working with Diatonic Scales, you will probably want to change the `comparisonAttribute` to `name`.
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale()
         >>> sc1.deriveRanked(['c', 'e', 'b'])
         [(3, <music21.scale.MajorScale G major>), (3, <music21.scale.MajorScale C major>), (2, <music21.scale.MajorScale B major>), (2, <music21.scale.MajorScale A major>)]
+        >>> sc1.deriveRanked(['d-', 'e', 'b'])
+        [(3, <music21.scale.MajorScale B major>), (3, <music21.scale.MajorScale A major>), (3, <music21.scale.MajorScale E major>), (3, <music21.scale.MajorScale D major>)]        
+        >>> sc1.deriveRanked(['d-', 'e', 'b'], comparisonAttribute='name')
+        [(2, <music21.scale.MajorScale B major>), (2, <music21.scale.MajorScale A major>), (2, <music21.scale.MajorScale G major>), (2, <music21.scale.MajorScale E major>)]
 
         >>> sc1.deriveRanked(['c', 'e', 'e', 'e', 'b'])
         [(5, <music21.scale.MajorScale G major>), (5, <music21.scale.MajorScale C major>), (4, <music21.scale.MajorScale B major>), (4, <music21.scale.MajorScale A major>)]
@@ -2053,12 +2122,13 @@ class ConcreteScale(Scale):
         # possibly return dictionary with named parameters
         # default return all scales that match all provided pitches
         # instead of results returned, define how many matched pitches necessary
-        otherPitches = self._extractPitchList(other,
-                        comparisonAttribute=comparisonAttribute)
+        otherPitches = self.extractPitchList(other,
+                        comparisonAttribute=comparisonAttribute, removeDuplicates=removeDuplicates)
 
         pairs = self._abstract._net.find(pitchTarget=otherPitches,
                              resultsReturned=resultsReturned,
-                             comparisonAttribute=comparisonAttribute)
+                             comparisonAttribute=comparisonAttribute,
+                             alteredDegrees=self._abstract._alteredDegrees)
         post = []
         for weight, p in pairs:
             sc = self.__class__(tonic=p)
@@ -2076,7 +2146,7 @@ class ConcreteScale(Scale):
         >>> sc1.derive(['e-', 'b-', 'd'], comparisonAttribute='name')
         <music21.scale.MajorScale B- major>
         '''
-        otherPitches = self._extractPitchList(other,
+        otherPitches = self.extractPitchList(other,
                         comparisonAttribute=comparisonAttribute)
 
         # weight target membership
@@ -2147,12 +2217,14 @@ class ConcreteScale(Scale):
 
 
 class DiatonicScale(ConcreteScale):
-    '''A concrete diatonic scale. Each DiatonicScale has one instance of a  :class:`~music21.scale.AbstractDiatonicScale`.
+    '''
+    A concrete diatonic scale. Each DiatonicScale 
+    has one instance of a  :class:`~music21.scale.AbstractDiatonicScale`.
     '''
     def __init__(self, tonic=None):
         ConcreteScale.__init__(self, tonic=tonic)
         self._abstract = AbstractDiatonicScale()
-        self.type = 'Diatonic'
+        self.type = 'diatonic'
 
     def getTonic(self):
         '''Return the tonic. 
@@ -2208,7 +2280,7 @@ class DiatonicScale(ConcreteScale):
 
 
     def getParallelMinor(self):
-        '''Return a parallel minor scale based on this concrete major scale.
+        '''Return a parallel minor scale based on this concrete scale.
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale(pitch.Pitch('a'))
@@ -2216,6 +2288,12 @@ class DiatonicScale(ConcreteScale):
         ['A4', 'B4', 'C#5', 'D5', 'E5', 'F#5', 'G#5', 'A5']
         >>> sc2 = sc1.getParallelMinor()
         >>> [str(p) for p in sc2.pitches]
+        ['A4', 'B4', 'C5', 'D5', 'E5', 'F5', 'G5', 'A5']
+
+        Running getParallelMinor() again doesn't change anything
+        
+        >>> sc3 = sc2.getParallelMinor()
+        >>> [str(p) for p in sc3.pitches]
         ['A4', 'B4', 'C5', 'D5', 'E5', 'F5', 'G5', 'A5']
         '''
         return MinorScale(self.tonic)
@@ -2238,9 +2316,10 @@ class DiatonicScale(ConcreteScale):
 
 
     def getRelativeMinor(self):
-        '''Return a relative minor scale based on this concrete major scale.
+        '''Return a relative minor scale based on this concrete scale.
 
-        >>> sc1 = MajorScale(pitch.Pitch('a'))
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale(pitch.Pitch('a'))
         >>> [str(p) for p in sc1.pitches]
         ['A4', 'B4', 'C#5', 'D5', 'E5', 'F#5', 'G#5', 'A5']
         >>> sc2 = sc1.getRelativeMinor()
@@ -2253,7 +2332,9 @@ class DiatonicScale(ConcreteScale):
     def getRelativeMajor(self):
         '''Return a concrete relative major scale
 
-        >>> sc1 = MinorScale(pitch.Pitch('g'))
+        >>> from music21 import *
+
+        >>> sc1 = scale.MinorScale(pitch.Pitch('g'))
         >>> [str(p) for p in sc1.pitches]
         ['G4', 'A4', 'B-4', 'C5', 'D5', 'E-5', 'F5', 'G5']
         
@@ -2261,7 +2342,14 @@ class DiatonicScale(ConcreteScale):
         >>> [str(p) for p in sc2.pitches]
         ['B-4', 'C5', 'D5', 'E-5', 'F5', 'G5', 'A5', 'B-5']
 
-        >>> sc2 = DorianScale('d')
+        Though it's unlikely you would want to do it,
+        `getRelativeMajor` works on other diatonic scales than
+        just Major and Minor.
+
+        >>> sc2 = scale.DorianScale('d')
+        >>> [str(p) for p in sc2.pitches]
+        ['D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5']
+
         >>> [str(p) for p in sc2.getRelativeMajor().pitches]
         ['C5', 'D5', 'E5', 'F5', 'G5', 'A5', 'B5', 'C6']
         '''
@@ -2495,6 +2583,10 @@ class HarmonicMinorScale(DiatonicScale):
     <music21.pitch.Pitch B4>
     >>> sc.pitchFromDegree(1) # scale degree 1 is treated as lowest
     <music21.pitch.Pitch E4>
+
+    >>> sc = HarmonicMinorScale()
+    >>> sc.deriveRanked(['C', 'E', 'G'], comparisonAttribute='name')
+    [(3, <music21.scale.HarmonicMinorScale F harmonic minor>), (3, <music21.scale.HarmonicMinorScale E harmonic minor>), (2, <music21.scale.HarmonicMinorScale B harmonic minor>), (2, <music21.scale.HarmonicMinorScale A harmonic minor>)]    
     '''
     def __init__(self, tonic=None):
         DiatonicScale.__init__(self, tonic=tonic)
@@ -3037,7 +3129,7 @@ class Test(unittest.TestCase):
         self.assertEqual(sc1.abstract == sc3.abstract, False)
 
         # getting details on comparison
-        self.assertEqual(str(sc1.match(sc2)), "{'notMatched': [<music21.pitch.Pitch C#5>, <music21.pitch.Pitch G#5>], 'matched': [<music21.pitch.Pitch A4>, <music21.pitch.Pitch B4>, <music21.pitch.Pitch D5>, <music21.pitch.Pitch E5>, <music21.pitch.Pitch F#5>, <music21.pitch.Pitch A5>]}")
+        self.assertEqual(str(sc1.match(sc2)), "{'notMatched': [<music21.pitch.Pitch C#5>, <music21.pitch.Pitch G#5>], 'matched': [<music21.pitch.Pitch A4>, <music21.pitch.Pitch B4>, <music21.pitch.Pitch D5>, <music21.pitch.Pitch E5>, <music21.pitch.Pitch F#5>]}")
 
 
     def testCyclicalScales(self):

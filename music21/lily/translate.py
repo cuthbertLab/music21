@@ -1424,7 +1424,10 @@ class LilypondConverter(object):
             longestReplacementLength = -1
             variantDict = {}
             for variantObject in variantObjectOrList:
-                variantName = variantObject.groups[0]
+                if len(variantObject.groups) > 0:
+                    variantName = variantObject.groups[0]
+                else:
+                    variantName = "variant"
                 if variantName in variantDict:
                     variantDict[variantName].append(variantObject)
                 else:
@@ -1745,10 +1748,14 @@ class LilypondConverter(object):
         if variantContainerStream is None:
             variantContainerStream = variantObject.getContextByClass('Stream')
 
-        if not replacedElementsClef in variantObject.elements:
-            variantObject.insert(0, replacedElementsClef)
+        if replacedElementsClef is not None:
+            if not replacedElementsClef in variantObject.elements:
+                variantObject.insert(0, replacedElementsClef)
 
-        variantName = variantObject.groups[0]
+        if len(variantObject.groups) > 0:
+            variantName = variantObject.groups[0]
+        else:
+            variantName = 'variant'
         if variantName in self.addedVariants:
             newVariant = False
         else:

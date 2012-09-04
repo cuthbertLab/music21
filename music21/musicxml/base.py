@@ -72,7 +72,11 @@ VERSION_MINIMUM = (0, 6, 4)
 
 # problem with element tree:
 # http://effbot.org/zone/element.htm
-# Note that the standard element writer creates a compact output. There is no built-in support for pretty printing or user-defined namespace prefixes in the current version, so the output may not always be suitable for human consumption (to the extent XML is suitable for human consumption, that is).
+# Note that the standard element writer creates a compact output. 
+# There is no built-in support for pretty printing or user-defined 
+# namespace prefixes in the current version, so the output may not 
+# always be suitable for human consumption (to the extent XML is 
+# suitable for human consumption, that is).
 
 # unicode and python issues
 # http://evanjones.ca/python-utf8.html

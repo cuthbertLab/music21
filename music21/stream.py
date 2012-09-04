@@ -1380,13 +1380,19 @@ class Stream(base.Music21Object):
             item = offsetOrItemOrList
             #offset = item.offset       
             # this is equivalent to:
-            offset = item.getOffsetBySite(item.activeSite)
+            try:
+                offset = item.getOffsetBySite(item.activeSite)
+            except AttributeError:
+                raise StreamException("Cannot insert item %s to stream -- is it a music21 object?" % item)
 
         #if not common.isNum(offset):
         try: # using float conversion instead of isNum for performance
             offset = float(offset)
-        except ValueError:
-            raise StreamException("offset %s must be a number", offset)
+        except (ValueError, TypeError):
+            if offset is None:
+                offset = 0.0
+            else:
+                raise StreamException("offset %s must be a number", offset)
 
         # if not a Music21Object, embed
         if not isinstance(item, base.Music21Object): 
@@ -2005,7 +2011,8 @@ class Stream(base.Music21Object):
     #---------------------------------------------------------------------------
     # temporary storage
     def unwrapWeakref(self):
-        '''Overridden method for unwrapping all Weakrefs.
+        '''
+        Overridden method for unwrapping all Weakrefs.
         '''
         self._derivation.unwrapWeakref()
         # call base method: this gets defined contexts and active site
@@ -2018,111 +2025,118 @@ class Stream(base.Music21Object):
 
 
     def wrapWeakref(self):
-        '''Overridden method for unwrapping all Weakrefs.
+        '''
+        Overridden method for unwrapping all Weakrefs.
         '''
         # call base method: this gets defined contexts and active site
         base.Music21Object.wrapWeakref(self)
-        self._derivation.wrapWeakref()
+        if self._derivation is not None:
+            self._derivation.wrapWeakref()
 #         if not common.isWeakref(self.flattenedRepresentationOf):
 #             post = common.wrapWeakref(objRef)
 #             self.flattenedRepresentationOf = post
 
-    def setupSerializationScaffold(self, topLevel=True, streamIdsFound=None):
-        '''
-        Prepare this stream and all of its contents for pickle/pickling, that
-        is, serializing and storing an object representation on file or as a string.
+#    def setupSerializationScaffold(self, topLevel=True, streamIdsFound=None):
+#        '''
+#        TODO: CUT ME
+#
+#        Prepare this stream and all of its contents for pickle/pickling, that
+#        is, serializing and storing an object representation on file or as a string.
+#
+#        The `topLevel` and `streamIdsFound` arguments are used to keep track of recursive calls. 
+#
+#        Note that this is a destructive process: elements contained within this Stream 
+#        will have their sites cleared of all contents not in the hierarchy 
+#        of the Streams. Thus, a deepcopy of the Stream may be necessary before 
+#        calling this method. 
+#
+#        >>> from music21 import *
+#
+#        >>> a = stream.Stream()
+#        >>> n = note.Note()
+#        >>> n.duration.type = "whole"
+#        >>> a.repeatAppend(n, 10)
+#        >>> a.setupSerializationScaffold()
+#        '''
+#
+#        # get all Stream that are in this hiearchy
+#        if topLevel:
+#            # get all Streams in this hierarchy
+#            streamsFound = self._yieldElementsDownward(streamsOnly=True, 
+#                       restoreActiveSites=True)
+#            streamIdsFound = [id(s) for s in streamsFound]
+#
+#            # get all ids in Spanners
+#            spannerBundle = self.spannerBundle
+#            streamIdsFound += spannerBundle.getSpannerStorageIds()
+#
+#            # TODO: a similar routine need to be done for Variants, getting
+#            # ids of contained Stream and passing them to purgeUndeclaredIds
+#
+#            #environLocal.printDebug(['setupSerializationScaffold', streamIdsFound])
+#        if streamIdsFound is not None:
+#            # excludeStorageStreams is False as we have spanner storage ids
+#            self.purgeUndeclaredIds(streamIdsFound, excludeStorageStreams=False)
+#
+#        # remove all caches again; the spanner bundle will be here
+#        self._elementsChanged()
+#
+#        #environLocal.printDebug(['calling setupSerializationScaffold()', self])
+#        for e in self._elements + self._endElements:
+#            #if hasattr(element, "elements"): # recurse time:
+#            if e.isStream:
+#                e.setupSerializationScaffold(topLevel=False, 
+#                    streamIdsFound=streamIdsFound) # recurse
+#            else:
+#                # this is done here for all elements
+#                e.purgeUndeclaredIds(streamIdsFound, 
+#                                    excludeStorageStreams=False)
+#                e.unwrapWeakref()
+#                e.freezeIds()
+#                    
+#        # this must be done for all Streams
+#        # this calls overridden method
+#        self.unwrapWeakref()
+#        self.freezeIds()
+#
+#    def teardownSerializationScaffold(self):
+#        '''
+#        TODO: REMOVE ME
+#
+#        After rebuilding this stream from pickled storage, prepare this as a normal Stream.
+#
+#        >>> from music21 import *
+#
+#        >>> a = stream.Stream()
+#        >>> n = note.Note()
+#        >>> n.duration.type = "whole"
+#        >>> a.repeatAppend(n, 10)
+#        >>> a.setupSerializationScaffold()
+#        >>> a.teardownSerializationScaffold()
+#        '''
+#        #environLocal.printDebug(['calling teardownSerializationScaffold', self])
+#
+#        # turn off sorting before teardown
+#        storedAutoSort = self.autoSort
+#        self.autoSort = False
+#
+#        self._derivation.wrapWeakref()
+#
+#        self.unfreezeIds()
+#        self.wrapWeakref()
+#
+#        for e in self._elements + self._endElements:
+#            if e.isStream:
+#                e.teardownSerializationScaffold()
+#            else:
+#                #environLocal.printDebug(['   processing music21 obj', e])
+#                e.unfreezeIds()
+#                e.wrapWeakref()
+#
+#        # restore to whatever it was
+#        self.autoSort = storedAutoSort
+#        self._elementsChanged()
 
-        The `topLevel` and `streamIdsFound` arguments are used to keep track of recursive calls. 
-
-        Note that this is a destructive process: elements contained within this Stream 
-        will have their sites cleared of all contents not in the hierarchy 
-        of the Streams. Thus, a deepcopy of the Stream may be necessary before 
-        calling this method. 
-
-        >>> from music21 import *
-
-        >>> a = stream.Stream()
-        >>> n = note.Note()
-        >>> n.duration.type = "whole"
-        >>> a.repeatAppend(n, 10)
-        >>> a.setupSerializationScaffold()
-        '''
-
-        # get all Stream that are in this hiearchy
-        if topLevel:
-            # get all Streams in this hierarchy
-            streamsFound = self._yieldElementsDownward(streamsOnly=True, 
-                       restoreActiveSites=True)
-            streamIdsFound = [id(s) for s in streamsFound]
-
-            # get all ids in Spanners
-            spannerBundle = self.spannerBundle
-            streamIdsFound += spannerBundle.getSpannerStorageIds()
-
-            # TODO: a similar routine need to be done for Variants, getting
-            # ids of contained Stream and passing them to purgeUndeclaredIds
-
-            #environLocal.printDebug(['setupSerializationScaffold', streamIdsFound])
-        if streamIdsFound is not None:
-            # excludeStorageStreams is False as we have spanner storage ids
-            self.purgeUndeclaredIds(streamIdsFound, excludeStorageStreams=False)
-
-        # remove all caches again; the spanner bundle will be here
-        self._elementsChanged()
-
-        #environLocal.printDebug(['calling setupSerializationScaffold()', self])
-        for e in self._elements + self._endElements:
-            #if hasattr(element, "elements"): # recurse time:
-            if e.isStream:
-                e.setupSerializationScaffold(topLevel=False, 
-                    streamIdsFound=streamIdsFound) # recurse
-            else:
-                # this is done here for all elements
-                e.purgeUndeclaredIds(streamIdsFound, 
-                                    excludeStorageStreams=False)
-                e.unwrapWeakref()
-                e.freezeIds()
-                    
-        # this must be done for all Streams
-        # this calls overridden method
-        self.unwrapWeakref()
-        self.freezeIds()
-
-    def teardownSerializationScaffold(self):
-        '''
-        After rebuilding this stream from pickled storage, prepare this as a normal Stream.
-
-        >>> from music21 import *
-
-        >>> a = stream.Stream()
-        >>> n = note.Note()
-        >>> n.duration.type = "whole"
-        >>> a.repeatAppend(n, 10)
-        >>> a.setupSerializationScaffold()
-        >>> a.teardownSerializationScaffold()
-        '''
-        #environLocal.printDebug(['calling teardownSerializationScaffold', self])
-
-        # turn off sorting before teardown
-        storedAutoSort = self.autoSort
-        self.autoSort = False
-
-        self._derivation.wrapWeakref()
-
-        self.unfreezeIds()
-        self.wrapWeakref()
-
-        for e in self._elements + self._endElements:
-            if e.isStream:
-                e.teardownSerializationScaffold()
-            else:
-                #environLocal.printDebug(['   processing music21 obj', e])
-                e.unfreezeIds()
-                e.wrapWeakref()
-
-        # restore to whatever it was
-        self.autoSort = storedAutoSort
-        self._elementsChanged()
 
     #---------------------------------------------------------------------------
     # display methods; in the same manner as show() and write()
@@ -7066,7 +7080,9 @@ class Stream(base.Music21Object):
 
     def _yieldElementsDownward(self, streamsOnly=False, 
             restoreActiveSites=True, classFilter=[]):
-        '''Yield all containers (Stream subclasses), including self, and going downward.
+        '''
+        Yield all containers (Stream subclasses), including self, 
+        and going downward.
         '''
         def isOfClass(e, classes):
             if not common.isListLike(classes):
@@ -7091,6 +7107,38 @@ class Stream(base.Music21Object):
             # not using __getitem__, also to avoid new locations/activeSites
             try:
                 e = self._elements[i]
+            except IndexError:
+                # this may happen in the number of elements has changed
+                continue
+            if restoreActiveSites:
+                e.activeSite = self
+            #if hasattr(e, 'elements'):
+            if e.isStream:
+                # this returns a generator, so need to iterate over it
+                # to get results
+                for y in e._yieldElementsDownward(streamsOnly=streamsOnly, restoreActiveSites=restoreActiveSites, classFilter=classFilter):
+                    #yield y
+                    if len(classFilter) > 0:
+                        if isOfClass(y, classFilter):
+                            yield y
+                    else:
+                        yield y
+            # its an element on the Stream that is not a Stream
+            else:
+                if not streamsOnly:
+                    #environLocal.printDebug(['_yieldElementsDownward', 'e', e, 'e.activeSite', e.activeSite,]) #'e.getSites()', e.getSites()])
+                    #yield e
+                    if len(classFilter) > 0:
+                        if isOfClass(e, classFilter):
+                            yield e
+                    else:
+                        yield e
+
+        # do the same for _endElements
+        for i in range(len(self._endElements)):
+            # not using __getitem__, also to avoid new locations/activeSites
+            try:
+                e = self._endElements[i]
             except IndexError:
                 # this may happen in the number of elements has changed
                 continue
@@ -10962,11 +11010,7 @@ class Stream(base.Music21Object):
 
     def makeVariantBlocks(self):
         '''
-
         from music21 import *
-
-
-
         '''
         #forDeletion = []
         variantsToBeDone = self.variants.elements
@@ -10984,12 +11028,15 @@ class Stream(base.Music21Object):
                                                     includeEndBoundary = False,
                                                     mustFinishInSpan = False,
                                                     mustBeginInSpan = True,
-                                                    classList = [music21.variant.Variant])
+                                                    classList = ['Variant'])
             for cV in conflictingVariants:
                 #if cV in forDeletion:
                 #    continue
                 oldReplacementDuration = cV.replacementDuration
-                cVname = cV.groups[0]
+                if len(cV.groups) > 0:
+                    cVname = cV.groups[0]
+                else:
+                    cVname = None
                 cVoffset = cV.getOffsetBySite(self)
                 
                 #if cVname in highestVariant:
@@ -12388,7 +12435,10 @@ class SpannerStorage(Stream):
 
 class VariantStorage(Stream):
     '''
-    For advanced use. This Stream subclass is only used inside of a Variant object to provide object storage of connected elements (things the Variant defines).
+    For advanced use. This Stream subclass is only 
+    used inside of a Variant object to provide object 
+    storage of connected elements (things the Variant 
+    defines).
 
     This subclass name can be used to search in an object's DefinedContexts and find any and all locations that are VariantStorage objects.
 

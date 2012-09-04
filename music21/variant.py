@@ -5,6 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #               Evan Lynch
+#               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL
@@ -29,7 +30,7 @@ from music21 import environment
 from music21 import note
 from music21 import search
 
-_MOD = "variant.py" # TODO: call variant
+_MOD = "variant.py"
 environLocal = environment.Environment(_MOD)
 
 
@@ -725,7 +726,7 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByM
 
 #------ Public Helper Functions
 
-def addVariant(s,startOffset, sVariant, variantName = None, variantGroups = None, replacementDuration = None):
+def addVariant(s, startOffset, sVariant, variantName = None, variantGroups = None, replacementDuration = None):
     '''
     Takes a stream, the location of the variant to be added to that stream (startOffset), the content of the
     variant to be added (sVariant), and the duration of the section of the stream which the variant
@@ -736,11 +737,9 @@ def addVariant(s,startOffset, sVariant, variantName = None, variantGroups = None
     >>> data1M1 = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter')]
     >>> data1M3 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
     >>> data1M2 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
-    >>> data2M2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
     >>> data1 = [data1M1, data1M2, data1M3]
     >>> tempPart = stream.Part()
     >>> stream1 = stream.Stream()
-    >>> stream2 = stream.Stream()
     >>> for d in data1:
     ...    m = stream.Measure()
     ...    for pitchName,durType in d:
@@ -748,6 +747,9 @@ def addVariant(s,startOffset, sVariant, variantName = None, variantGroups = None
     ...        n.duration.type = durType
     ...        m.append(n)
     ...    stream1.append(m)
+
+    >>> data2M2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
+    >>> stream2 = stream.Stream()
     >>> m = stream.Measure()
     >>> for pitchName,durType in data2M2:
     ...    n = note.Note(pitchName)
@@ -1842,13 +1844,13 @@ class Variant(base.Music21Object):
         self._stream.wrapWeakref()
 
 
-    def freezeIds(self):
-        base.Music21Object.freezeIds(self)
-        self._stream.freezeIds()
-
-    def unfreezeIds(self):
-        base.Music21Object.unfreezeIds(self)
-        self._stream.unfreezeIds()
+#    def freezeIds(self):
+#        base.Music21Object.freezeIds(self)
+#        self._stream.freezeIds()
+#
+#    def unfreezeIds(self):
+#        base.Music21Object.unfreezeIds(self)
+#        self._stream.unfreezeIds()
 
 
     def __repr__(self):
@@ -1865,7 +1867,11 @@ class Variant(base.Music21Object):
         if attr in ['flat', 'pitches']: 
             raise AttributeError
         try:
-            return getattr(self._stream, attr)
+            ## needed for unpickling where ._stream doesn't exist until later...
+            if hasattr(self, '_stream'):
+                return getattr(self._stream, attr)
+            else:
+                raise AttributeError
         except: ## make better -- should not say 'VariantStorage has no attribute...'
             raise
         
