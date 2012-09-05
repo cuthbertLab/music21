@@ -119,7 +119,7 @@ The standard word-counting map-reduce algorithm, as given on the mrjob website, 
 
 A skeleton mrjob for music21 purposes might look like this:
 	
-	fro music21 import *
+	from music21 import *
 	from mrjob.job import MRJob
 	
 	class myMusic21Process(MRJob):
@@ -161,13 +161,13 @@ full specifications for running on EMR. See conf.rst for documentation on how to
 7. Now you're ready to deploy your job! Enter into command line
 `python nameOfMRJOB.py -r emr < NAME_OF_INPUT_FILE.txt > NAME_OF_DESIRED_OUTPUT_FILE`
 
-	Your terminal will show a brief, summary, log of what's happending with your job:
+	Your terminal will show a brief, summary, log of what's happening with your job:
 
 	* `Uploading input to ..., creating tmp directory...., writing master bootstrap script, Copying non-input files into`
-		The first step that mrjob does is uplad your scripts, bootstrapping files, data input, etc. to a folder in s3 (Amazon's
+		The first step that mrjob does is upload your scripts, bootstrapping files, data input, etc. to a folder in s3 (Amazon's
 		online cloud storage system.) This won't take long.
 	* `Creating Elastic MapReduce job flow`, `Job flow created with ID: .....` Now your job
-	has been created! You will be able to view your job and its status realtime if you log into
+	has been created! You will be able to view your job and its status real-time if you log into
 	your aws account, click on AWS Management Console, then Amazon Elastic MapReduce tab. 
 	You should see your job there with a status such as "STARTING". If at any time you'd like to t
 	erminate your taks, you can easily do this through this window.
@@ -176,11 +176,11 @@ full specifications for running on EMR. See conf.rst for documentation on how to
 	* `Job launched 273.1s ago, status BOOTSTRAPPING: Running bootstrap actions`: now mrjob is configuring all those
 	instances with the specific bootstrapping files you'd like them to have. In our case, this includes installing
 	music21. You may also install Python 2.7 at this time (because Python 2.6 is default if running with ami version 2.1.0)
-	The timeout (maximum time that mrjob will run bootstrapping before quiting) is 45 minutes. I surely hope your bootstrapping
+	The timeout (maximum time that mrjob will run bootstrapping before quitting) is 45 minutes. I surely hope your bootstrapping
 doesn't take that long! Regardless, you're not charged for the time you spend bootstrapping =)
 	* `Opening ssh tunnel to Hadoop job tracker`
 	Yeah! This means your bootstrapping worked, and your jobs are about to be deployed. You now have the capability to ssh
-	directlying into your instances, if you'd like.
+	directly into your instances, if you'd like.
 	* `Connect to job tracker at: http://localhost:#####/jobtracker.jsp` This is a very important line! This gives the url
 	you can go to to view the status of your job. open this window now and you'll get much better status updates about the
 	health of your job than in the terminal.
@@ -192,7 +192,7 @@ doesn't take that long! Regardless, you're not charged for the time you spend bo
 		* as your job runs, you can calculate how much it's costing and view how much has finished processing. When your job finishes,
 		regardless of the end status (terminated, failed, successfully quit), any output from your mappers/reducers will be located
 		in s3 in the appropriate bucket. This prevents you from losing valuable data if many of our mappers execute fine, 
-		but just a few take forevor and you terminate the job before they've completed.
+		but just a few take forever and you terminate the job before they've completed.
 	* if the job finished successfully, you'd see final data printed to the screen about counters, number of successful
 	mappers/reducers/etc, and your final output will be streamed to the output file you specified. Your output will
 	also be available on s3 permanently.
@@ -213,4 +213,4 @@ with a small number of instances and m1.small instances.
 11. While you're on your amazon account, click on the Elastic MapReduce tab and view the stats of your recent jobs.
 You can also view your account details and history by navigating to account settings.
 
-12. now...explore! The possibilities are endless....
+12. now...explore! The possibilities are endless....and much more complex than the examples provided here.

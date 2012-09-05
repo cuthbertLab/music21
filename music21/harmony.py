@@ -24,7 +24,6 @@ from music21 import duration
 #from music21 import roman
 from music21 import interval
 from music21 import chord
-from sets import Set
 from music21 import key
 
 import re
@@ -1037,8 +1036,8 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
             cs = inChord.root().name + kindStr + '/' + inChord.bass().name
         else:
             cs = inChord.root().name + kindStr
-        perfect = Set([p.name for p in ChordSymbol(cs).pitches])
-        inPitches = Set([p.name for p in inChord.pitches])
+        perfect = set([p.name for p in ChordSymbol(cs).pitches])
+        inPitches = set([p.name for p in inChord.pitches])
         if not perfect.issuperset(inPitches): #must be subtraction or deletion....
             additions = inPitches.difference(perfect)
             subtractions = perfect.difference(inPitches)
