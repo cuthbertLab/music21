@@ -9,6 +9,12 @@
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
+'''
+Base routines used throughout audioSearching and score-folling.
+
+Requires numpy, scipy, and matplotlib.
+'''
+
 
 import copy
 import math
@@ -112,7 +118,8 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
     143.6276...
 
     '''
-
+    if len(_missingImport) > 0:
+        raise AudioSearchException("Cannot run autocorrelationFunction without all of numpy, scipy, and matplotlib installed.  Missing %s" % _missingImport)
     recordedSignal = numpy.array(recordedSignal)
     correlation = scipy.signal.fftconvolve(recordedSignal, recordedSignal[::-1], mode='full')
     lengthCorrelation = len(correlation) / 2
@@ -317,6 +324,10 @@ def getFrequenciesFromMicrophone(length=10.0, storeWaveFilename=None):
     
     TODO -- find a way to test... or at least demo
     '''
+    if "numpy" in _missingImport:
+        raise AudioSearchException("Cannot run getFrequenciesFromMicrophone without numpy installed")
+
+    
     from music21.audioSearch import recording
     storedWaveSampleList = []
     environLocal.printDebug("* start recording")
@@ -346,6 +357,9 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     >>> print freq
     [143.627689055..., 99.083545201..., 211.004784688..., 4700.313479623..., ...]
     '''
+    if "numpy" in _missingImport:
+        raise AudioSearchException("Cannot run getFrequenciesFromAudioFile without numpy installed")
+
     storedWaveSampleList = []
     environLocal.printDebug("* reading entire file from disk")
     try:
@@ -406,6 +420,10 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
 
 
     '''
+    if "numpy" in _missingImport:
+        raise AudioSearchException("Cannot run getFrequenciesFromPartialAudioFile without numpy installed")
+
+    
     if waveFilenameOrHandle == 'temp':
         waveFilenameOrHandle = environLocal.getRootTempDir() + os.path.sep + 'temp.wav'
         

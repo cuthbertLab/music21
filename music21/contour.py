@@ -15,16 +15,33 @@ This module defines the ContourFinder and AggregateContour objects.
 '''
 
 import random
-import scipy.stats as sp
-import matplotlib.pyplot as plt
-import numpy
+
+_missingImport = []
+try:
+    import matplotlib.pyplot as plt
+
+except ImportError:
+    plt = None
+    _missingImport.append('matplotlib')
+
+try:
+    import numpy
+except ImportError:
+    numpy = None
+    _missingImport.append('numpy')
+
+try:
+    import scipy.stats as sp
+except ImportError:
+    sp = None
+    _missingImport.append('scipy')
+
 import doctest, unittest
 
 from music21 import base
 from music21 import repeat
 from music21 import exceptions21
 from music21 import corpus
-
 
 from music21 import environment
 _MOD = 'contour.py'

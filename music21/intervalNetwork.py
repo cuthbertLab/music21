@@ -2601,8 +2601,9 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         >>> net.find(['g', 'a', 'b', 'c', 'd', 'e', 'f#'])
         [(7, <music21.pitch.Pitch G>), (6, <music21.pitch.Pitch D>), (6, <music21.pitch.Pitch C>), (5, <music21.pitch.Pitch A>)]
-        '''
 
+        If resultsReturned is None then return every such scale.
+        '''
         nodeId = self._getTerminusLowNodes()[0]
         sortList = []
 
@@ -2633,7 +2634,10 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         sortList.sort()
         sortList.reverse() # want most matches first
-        return sortList[:resultsReturned]  
+        if resultsReturned is not None:       
+            return sortList[:resultsReturned]  
+        else:
+            return sortList
 
     def transposePitchAndApplySimplification(self, intervalObj, pitchObj):
         '''

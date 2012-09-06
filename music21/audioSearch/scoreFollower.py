@@ -70,7 +70,11 @@ class ScoreFollower(object):
             self.result = self.repeatTranscription()    
 
         if plot == True:
-            import matplotlib.pyplot
+            try:
+                import matplotlib.pyplot # for find
+            except ImportError:
+                raise AudioSearchException("Cannot plot without matplotlib installed.")
+                
             matplotlib.pyplot.plot(listplot)
             matplotlib.pyplot.show()
         environLocal.printDebug("* END")
@@ -509,6 +513,7 @@ class TestExternal(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    import music21
     music21.mainTest(TestExternal)
 
 

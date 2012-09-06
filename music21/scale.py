@@ -564,7 +564,9 @@ class AbstractScale(Scale):
 
     #---------------------------------------------------------------------------
     def getScalaStorage(self, direction=DIRECTION_ASCENDING):
-        '''Get interval sequence
+        '''
+        Get the interval sequence as a :class:~music21.scala.ScalaStorage object
+        for a particular scale:
         '''
         # get one octave of intervals
         ss = scala.ScalaStorage()
@@ -1542,7 +1544,6 @@ class ConcreteScale(Scale):
         '''
         Return a list of Pitch objects, using a 
         deepcopy of a cached version if available. 
-
         '''
         # get from interval network of abstract scale
 
@@ -2151,7 +2152,8 @@ class ConcreteScale(Scale):
     def deriveRanked(self, other, resultsReturned=4,
         comparisonAttribute='pitchClass', removeDuplicates = False):
         '''
-        Return a list of closest-matching :class:`~music21.scale.ConcreteScale` objects based on this 
+        Return a list of closest-matching 
+        :class:`~music21.scale.ConcreteScale` objects based on this 
         :class:`~music21.scale.AbstractScale`, provided as a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, 
         or a list of :class:`~music21.pitch.Pitch` objects. Returned integer values represent the number of mathces. 
 
@@ -2173,6 +2175,19 @@ class ConcreteScale(Scale):
         [(3, <music21.scale.MajorScale B major>), (3, <music21.scale.MajorScale A major>), (3, <music21.scale.MajorScale E major>), (3, <music21.scale.MajorScale C- major>)]
 
 
+        Test that a Concrete Scale (that is, with no _abstract defined) still has similar
+        characteristics to the original.
+        
+        Create a scale like a Harmonic minor but with flat 2 and sharp 4
+        
+        >>> e = scale.ConcreteScale(pitches=['A4', 'B-4', 'C5', 'D#5', 'E5', 'F5', 'G#5', 'A5'])
+        >>> f = e.deriveRanked(['C','E','G'])
+        >>> f
+        [(3, <music21.scale.ConcreteScale E Concrete>), (3, <music21.scale.ConcreteScale D- Concrete>), (3, <music21.scale.ConcreteScale C# Concrete>), (2, <music21.scale.ConcreteScale B Concrete>)]
+        >>> ' '.join([str(p) for p in f[0][1].pitches])
+        'E4 F4 G4 A#4 B4 C5 D#5 E5'
+        
+
         '''
         # possibly return dictionary with named parameters
         # default return all scales that match all provided pitches
@@ -2187,17 +2202,27 @@ class ConcreteScale(Scale):
         post = []
         for weight, p in pairs:
             sc = self.__class__(tonic=p)
+            if sc._abstract is None:
+                sc._abstract = copy.deepcopy(self._abstract)
+
             post.append((weight, sc))
         return post
 
 
     def derive(self, other, comparisonAttribute='pitchClass'):
-        '''Return the closest-matching :class:`~music21.scale.ConcreteScale` based on the pitch collection provided as a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, or a list of :class:`~music21.pitch.Pitch` objects.
+        '''
+        Return the closest-matching :class:`~music21.scale.ConcreteScale` 
+        based on the pitch collection provided as a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, 
+        or a list of :class:`~music21.pitch.Pitch` objects.
+
+        How the "closest-matching" scale is defined still needs to be
+        refined and will probably change in the future.
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale()
         >>> sc1.derive(['c#', 'e', 'g#'])
         <music21.scale.MajorScale B major>
+        
         >>> sc1.derive(['e-', 'b-', 'd'], comparisonAttribute='name')
         <music21.scale.MajorScale B- major>
         '''
@@ -2208,27 +2233,87 @@ class ConcreteScale(Scale):
         pairs = self._abstract._net.find(pitchTarget=otherPitches,
                             comparisonAttribute=comparisonAttribute)
 
-        return self.__class__(tonic=pairs[0][1])
+        newScale = self.__class__(tonic=pairs[0][1])
+        if newScale._abstract is None:
+            newScale._abstract = copy.deepcopy(self._abstract)
+        return newScale
+    
+    def deriveAll(self, other, comparisonAttribute='pitchClass'):
+        '''
+        Return a list of all Scales of the same class as `self`
+        where all the pitches in `other` are contained.
 
+        Similar to "deriveRanked" but only returns those scales
+        no matter how many which contain all the pitches.
+        
+        Just returns a list in order.
 
-
-    def deriveByDegree(self, degree, pitch):
-        '''Given a scale degree and a pitch, return a new :class:`~music21.scale.ConcreteScale` that satisfies that condition.
+        If you are working with Diatonic Scales, you will 
+        probably want to change the `comparisonAttribute` to `name`.
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale()
-        >>> sc1.deriveByDegree(7, 'c') # what scale has c as its 7th degree
+        >>> sc1.deriveAll(['c', 'e', 'b'])
+        [<music21.scale.MajorScale G major>, <music21.scale.MajorScale C major>]
+
+        >>> [sc.name for sc in sc1.deriveAll(['d-', 'e', 'b'])]
+        ['B major', 'A major', 'E major', 'D major', 'C- major']
+
+        >>> sc1.deriveAll(['d-', 'e', 'b'], comparisonAttribute='name')
+        []
+        
+        Find all instances of this pentatonic scale in major scales:
+        
+        >>> scList = sc1.deriveAll(['c#', 'd#', 'f#', 'g#', 'a#'], comparisonAttribute = 'name')
+        >>> [sc.name for sc in scList]
+        ['B major', 'F# major', 'C# major']
+        '''
+        # possibly return dictionary with named parameters
+        # default return all scales that match all provided pitches
+        # instead of results returned, define how many matched pitches necessary
+        otherPitches = self.extractPitchList(other,
+                        comparisonAttribute=comparisonAttribute)
+
+        pairs = self._abstract._net.find(pitchTarget=otherPitches,
+                             resultsReturned=None,
+                             comparisonAttribute=comparisonAttribute,
+                             alteredDegrees=self._abstract._alteredDegrees)
+        post = []
+        numPitches = len(otherPitches)
+        
+        for weight, p in pairs:
+            if weight == numPitches: # only want matches where all notes match
+                sc = self.__class__(tonic=p)
+                if sc._abstract is None:
+                    sc._abstract = copy.deepcopy(self._abstract)    
+                post.append(sc)
+        return post
+    
+    
+    def deriveByDegree(self, degree, pitch):
+        '''
+        Given a scale degree and a pitch, return a 
+        new :class:`~music21.scale.ConcreteScale` that satisfies 
+        that condition.
+
+        Find a major scale with C as the 7th degree:
+
+        >>> from music21 import *
+        >>> sc1 = scale.MajorScale()
+        >>> sc1.deriveByDegree(7, 'c')
         <music21.scale.MajorScale D- major>
 
+        TODO: Does not yet work for directional scales
         '''
-        # TODO: this does not work for directional scales yet
-        # weight target membership
         p = self._abstract.getNewTonicPitch(pitchReference=pitch, 
             nodeName=degree)
         if p is None:
             raise ScaleException('cannot derive new tonic')
         
-        return self.__class__(tonic=p)
+        newScale = self.__class__(tonic=p)
+        if newScale._abstract is None:
+            newScale._abstract = copy.deepcopy(self._abstract)
+        return newScale
 
 
     #---------------------------------------------------------------------------
@@ -2236,7 +2321,10 @@ class ConcreteScale(Scale):
 
 
     def getScalaStorage(self):
-        '''Return a configured scale scale object
+        '''
+        Return a configured :class:`~music21.scala.ScalaStorage` 
+        Object for this scale.  It can be used to find interval
+        distances in cents between degrees.
         '''
         ss = self.abstract.getScalaStorage()
         # customize with more specific representation
@@ -2245,7 +2333,9 @@ class ConcreteScale(Scale):
 
 
     def write(self, fmt=None, fp=None, direction=DIRECTION_ASCENDING):
-        '''Write the scale in a format. Here, prepare scala format if requested.
+        '''
+        Write the scale in a format. 
+        Here, prepare scala format if requested.
         '''
         if fmt is not None:
             format, ext = common.findFormat(fmt)
@@ -2253,9 +2343,10 @@ class ConcreteScale(Scale):
                 return self.abstract.write(fmt=fmt, fp=fp, direction=direction)
         return Scale.write(self, fmt=fmt, fp=fp)
 
-
     def show(self, fmt=None, app=None, direction=DIRECTION_ASCENDING):
-        '''Show the scale in a format. Here, prepare scala format if requested.
+        '''
+        Show the scale in a format. Here, prepare scala format 
+        if requested.
         '''
         if fmt is not None:
             format, ext = common.findFormat(fmt)
@@ -2274,7 +2365,7 @@ class ConcreteScale(Scale):
 class DiatonicScale(ConcreteScale):
     '''
     A concrete diatonic scale. Each DiatonicScale 
-    has one instance of a  :class:`~music21.scale.AbstractDiatonicScale`.
+    has one instance of a :class:`~music21.scale.AbstractDiatonicScale`.
     '''
     def __init__(self, tonic=None):
         ConcreteScale.__init__(self, tonic=tonic)
@@ -2282,7 +2373,8 @@ class DiatonicScale(ConcreteScale):
         self.type = 'diatonic'
 
     def getTonic(self):
-        '''Return the tonic. 
+        '''
+        Return the tonic of the diatonic scale. 
 
         >>> from music21 import *
         >>> sc = scale.MajorScale('e-')
@@ -2291,12 +2383,22 @@ class DiatonicScale(ConcreteScale):
         >>> sc = scale.MajorScale('F#')
         >>> sc.getTonic()
         <music21.pitch.Pitch F#4>
+
+
+        If no tonic has been defined, it will return an Exception.
+        (same is true for `getDominant`, `getLeadingTone`, etc.)        
+        
+        >>> sc = scale.DiatonicScale()
+        >>> sc.getTonic()
+        Traceback (most recent call last):
+        IntervalNetworkException: pitchReference cannot be None
         '''
         # NOTE: override method on ConcreteScale that simply returns _tonic
         return self.pitchFromDegree(self._abstract.tonicDegree)
 
     def getDominant(self):
-        '''Return the dominant. 
+        '''
+        Return the dominant. 
 
         >>> from music21 import *
         >>> sc = scale.MajorScale('e-')
@@ -2310,7 +2412,8 @@ class DiatonicScale(ConcreteScale):
     
 
     def getLeadingTone(self):
-        '''Return the leading tone. 
+        '''
+        Return the leading tone. 
 
         >>> from music21 import *
         >>> sc = scale.MinorScale('c')
@@ -2322,7 +2425,6 @@ class DiatonicScale(ConcreteScale):
 
         >>> sc.pitchFromDegree(7)
         <music21.pitch.Pitch B-4>
-
         '''
         # NOTE: must be adjust for modes that do not have a proper leading tone
         interval1to7 = interval.notesToInterval(self.tonic, 
@@ -2335,7 +2437,9 @@ class DiatonicScale(ConcreteScale):
 
 
     def getParallelMinor(self):
-        '''Return a parallel minor scale based on this concrete scale.
+        '''
+        Return a parallel minor scale based on this 
+        concrete scale.
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale(pitch.Pitch('a'))
@@ -2371,7 +2475,8 @@ class DiatonicScale(ConcreteScale):
 
 
     def getRelativeMinor(self):
-        '''Return a relative minor scale based on this concrete scale.
+        '''
+        Return a relative minor scale based on this concrete scale.
 
         >>> from music21 import *
         >>> sc1 = scale.MajorScale(pitch.Pitch('a'))
@@ -2385,7 +2490,8 @@ class DiatonicScale(ConcreteScale):
 
 
     def getRelativeMajor(self):
-        '''Return a concrete relative major scale
+        '''
+        Return a concrete relative major scale
 
         >>> from music21 import *
 
@@ -3601,7 +3707,6 @@ class Test(unittest.TestCase):
 
 
     def testScalaScaleA(self):
-
         msg = '''! fj-12tet.scl
 !  
 Franck Jedrzejewski continued fractions approx. of 12-tet 
@@ -3619,7 +3724,6 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 98/55
 15/8
 2/1
-
 '''
         # provide a raw scala string
         sc = ScalaScale('c4', msg)
@@ -3833,7 +3937,7 @@ _DOC_ORDER = [ConcreteScale, AbstractScale]
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(Test, 'noDocTest')
+    music21.mainTest(Test)
 
 # store implicit tonic or Not
 # if not set, then comparisons fall to abstract

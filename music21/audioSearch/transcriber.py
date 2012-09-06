@@ -78,7 +78,10 @@ def runTranscribe(show=True, plot=True, useMic=True,
         myScore.show()        
     
     if plot == True:
-        import matplotlib.pyplot
+        try:
+            import matplotlib.pyplot # for find
+        except ImportError:
+            raise audioSearchBase.AudioSearchException("Cannot plot without matplotlib installed.")
         matplotlib.pyplot.plot(listplot)
         matplotlib.pyplot.show()
     environLocal.printDebug("* END")    

@@ -370,7 +370,8 @@ class StreamFreezer(StreamFreezeThawBase):
     >>> st = freezeThaw.StreamThawer()
     >>> st.openStr(data)
     >>> s = st.stream
-    >>> s.show('t')
+    >>> len(s.parts[0].measure(7).notes) == 6
+    True
     '''
     def __init__(self, streamObj=None, fastButUnsafe=False):
         # must make a deepcopy, as we will be altering DefinedContexts
@@ -896,7 +897,7 @@ class StreamThawer(StreamFreezeThawBase):
     >>> temp = [s[n].transpose(n, inPlace=True) for n in range(len(s))]
 
     >>> sf = freezeThaw.StreamFreezer(s) # provide a Stream at init
-    >>> data = sf.writeStr(fmt='jsonpickle') # pickle is default format
+    >>> data = sf.writeStr(fmt='pickle') # pickle is default format
 
     >>> sfOut = freezeThaw.StreamThawer() 
     >>> sfOut.openStr(data)
@@ -1249,7 +1250,7 @@ class Test(unittest.TestCase):
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
-    base.mainTest(Test, 'noDocTest')
+    base.mainTest(Test)
 
 
 #------------------------------------------------------------------------------
