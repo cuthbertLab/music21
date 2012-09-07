@@ -232,7 +232,7 @@ class Dynamic(base.Music21Object):
 
         int(volumeScalar \* 127) gives the MusicXML <sound dynamics="x"/> tag 
 
-        >>> print musicxml.translate.music21ObjectToMusicXML(d)
+        >>> print musicxml.m21ToString.music21ObjectToMusicXML(d)
         <?xml...
         <direction>
             <direction-type>
@@ -433,9 +433,9 @@ class Test(unittest.TestCase):
 
     def testMusicxmlOutput(self):
         # test direct rendering of musicxml
-        from music21.musicxml import translate as musicxmlTranslate        
+        from music21.musicxml import m21ToString
         d = Dynamic('p')
-        xmlout = musicxmlTranslate.music21ObjectToMusicXML(d)
+        xmlout = m21ToString.music21ObjectToMusicXML(d)
         match = '<p/>'
         self.assertEquals(xmlout.find(match), 885)
 

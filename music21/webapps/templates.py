@@ -57,8 +57,8 @@ def musicxmlText(outputStream):
     >>> 'score-partwise' in output
     True
     '''
-    from music21.musicxml import translate
-    musicxmlString = translate.music21ObjectToMusicXML(outputStream)
+    from music21.musicxml import m21ToString
+    musicxmlString = m21ToString.music21ObjectToMusicXML(outputStream)
     return (musicxmlString.encode('utf-8'), 'text/plain; charset=utf-8')   
 
 def musicxmlFile(outputStream):
@@ -73,8 +73,8 @@ def musicxmlFile(outputStream):
     >>> 'score-partwise' in output
     True
     '''
-    from music21.musicxml import translate
-    musicxmlString = translate.music21ObjectToMusicXML(outputStream)
+    from music21.musicxml import m21ToString
+    musicxmlString = m21ToString.music21ObjectToMusicXML(outputStream)
     return (musicxmlString.encode('utf-8'), 'application/vnd.recordare.musicxml+xml; charset=utf-8')
     
 def vexflow(outputStream):
@@ -122,8 +122,8 @@ def noteflightEmbed(outputStream):
     >>> contentType
     'text/html; charset=utf-8'
     '''
-    from music21.musicxml import translate
-    musicxmlString = translate.music21ObjectToMusicXML(outputStream)    
+    from music21.musicxml import m21ToString
+    musicxmlString = m21ToString.music21ObjectToMusicXML(outputStream)    
     musicxmlString = musicxmlString.replace('\n','')
     musicxmlString = musicxmlString.replace('\'','\\\'')
     htmlStr = """

@@ -548,7 +548,6 @@ class JSONSerializer(object):
                   "__class__": "<class 'music21.pitch.Microtone'>"
                 }, 
                 "_octave": 4, 
-                "_pitchSpaceNeedsUpdating": true, 
                 "_priority": 0, 
                 "_step": "C"
               }, 
@@ -3707,8 +3706,8 @@ class Music21Object(JSONSerializer):
             elif format == 'textline':
                 dataStr = self._reprTextLine()
             elif format == 'musicxml':
-                from music21.musicxml import translate as musicxmlTranslate
-                dataStr = musicxmlTranslate.music21ObjectToMusicXML(self)
+                from music21.musicxml import m21ToString
+                dataStr = m21ToString.music21ObjectToMusicXML(self)
             elif format.startswith('vexflow'):
                 import music21.vexflow
                 dataStr = music21.vexflow.fromObject(self, mode='html')

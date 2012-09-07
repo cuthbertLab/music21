@@ -82,8 +82,6 @@ from music21 import base
 from music21 import common
 from music21 import exceptions21
 from music21 import duration
-from music21 import musicxml
-musicxmlMod = musicxml # alias
 
 
 class BeamException(exceptions21.Music21Exception):

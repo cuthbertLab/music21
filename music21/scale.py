@@ -398,11 +398,9 @@ class AbstractScale(Scale):
             if p.octave is None:
                 if lastPs > p.ps:
                     p.defaultOctave = lastOctave
-                    p._pitchSpaceNeedsUpdating = True
                 while lastPs > p.ps:
                     lastOctave += 1
                     p.defaultOctave = lastOctave
-                    p._pitchSpaceNeedsUpdating = True                    
             
             lastPs = p.ps
             lastOctave = p.implicitOctave

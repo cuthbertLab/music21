@@ -38,6 +38,7 @@ from music21 import bar
 from music21 import metadata
 
 from music21.midi import translate as midiTranslate
+from music21.musicxml import m21ToString
 from music21.musicxml import translate as musicxmlTranslate
 
 from music21 import environment
@@ -1420,7 +1421,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(p.lowestOffset, 0)
         self.assertEqual(p.highestTime, 100.0)
-        post = musicxmlTranslate.music21ObjectToMusicXML(p)
+        post = m21ToString.music21ObjectToMusicXML(p)
 
 
         # can only recreate problem in the context of two Streams
@@ -1438,7 +1439,7 @@ class Test(unittest.TestCase):
             partOffset += partOffsetShift
 
         #s.show()
-        post = musicxmlTranslate.music21ObjectToMusicXML(s)
+        post = m21ToString.music21ObjectToMusicXML(s)
 
 
     def testMusicXMLGenerationViaPropertyB(self):
@@ -1454,7 +1455,7 @@ class Test(unittest.TestCase):
         a.insert( 3, meter.TimeSignature("3/16") )
         a.insert(20, meter.TimeSignature("9/8")  )
         a.insert(40, meter.TimeSignature("10/4") )
-        post = musicxmlTranslate.music21ObjectToMusicXML(a)
+        post = m21ToString.music21ObjectToMusicXML(a)
 
 
     def testMusicXMLGenerationViaPropertyC(self):
@@ -1475,7 +1476,7 @@ class Test(unittest.TestCase):
             s.insert(p)
             partOffset += partOffsetShift
         #s.show()
-        post = musicxmlTranslate.music21ObjectToMusicXML(s)
+        post = m21ToString.music21ObjectToMusicXML(s)
 
 
 
@@ -1811,7 +1812,7 @@ class Test(unittest.TestCase):
         match = str([(n, n.duration) for n in s.flat.notesAndRests])
         self.assertEqual(match, '[(<music21.note.Rest rest>, <music21.duration.Duration 2.0>), (<music21.note.Note C>, <music21.duration.Duration 1.0>), (<music21.note.Rest rest>, <music21.duration.Duration 1.0>), (<music21.note.Rest rest>, <music21.duration.Duration 1.0>), (<music21.note.Note C>, <music21.duration.Duration 1.0>), (<music21.note.Rest rest>, <music21.duration.Duration 2.0>)]')
 
-        raw = musicxmlTranslate.music21ObjectToMusicXML(s)
+        raw = m21ToString.music21ObjectToMusicXML(s)
         #s.show('text')
         #s.show()
 
@@ -3007,7 +3008,7 @@ class Test(unittest.TestCase):
         s.metadata.composer = 'Frank the Composer'
         s.metadata.title = 'work title' # will get as movement name if not set
         #s.metadata.movementName = 'movement name'
-        post = musicxmlTranslate.music21ObjectToMusicXML(s)
+        post = m21ToString.music21ObjectToMusicXML(s)
         #s.show()
 
 
@@ -3080,7 +3081,7 @@ class Test(unittest.TestCase):
             s.append(m)
 
         #s.show()
-        post = musicxmlTranslate.music21ObjectToMusicXML(s)
+        post = m21ToString.music21ObjectToMusicXML(s)
 
 
     def testYieldContainers(self):
@@ -4996,7 +4997,7 @@ class Test(unittest.TestCase):
         self.assertEqual([e.offset for e in oMeasures[0].voices[0]], [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5])
         self.assertEqual([e.offset for e in oMeasures[0].voices[1]], [0.0, 1.0, 2.0, 3.0])
 
-        post = musicxmlTranslate.music21ObjectToMusicXML(s)
+        post = m21ToString.music21ObjectToMusicXML(s)
 
 
         # try version longer than 1 measure, more than 2 voices
@@ -5043,7 +5044,7 @@ class Test(unittest.TestCase):
 
 
 
-        post = musicxmlTranslate.music21ObjectToMusicXML(s)
+        post = m21ToString.music21ObjectToMusicXML(s)
         #s.show()
 
 
@@ -5368,7 +5369,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(s2.spanners[0].getComponents(), [s2.notesAndRests[0], s2.notesAndRests[-1]])
 
-        post = musicxmlTranslate.music21ObjectToMusicXML(s2)
+        post = m21ToString.music21ObjectToMusicXML(s2)
         #s2.show('t')
         #s2.show()
 
@@ -5831,7 +5832,7 @@ class Test(unittest.TestCase):
                         ['<accidental sharp>', '<accidental sharp>', '<accidental sharp>', '<accidental sharp>', '<accidental natural>', 'None', 'None', 'None', 'None', 'None'])
         self.assertEqual([n.pitch.accidental.displayStatus for n in m.notes[:5]], [True, False, False, False, True])
         
-        raw = musicxmlTranslate.music21ObjectToMusicXML(m)
+        raw = m21ToString.music21ObjectToMusicXML(m)
         self.assertEqual(raw.find('<beam number="1">begin</beam>') > 0, True)
         self.assertEqual(raw.find('<tuplet bracket="yes" placement="above"') > 0, True)
 
@@ -5840,7 +5841,7 @@ class Test(unittest.TestCase):
         m = stream.Measure()
         m.repeatAppend(note.Note('c#', quarterLength=.5), 4)
         m.repeatAppend(note.Note('c', quarterLength=1/3.), 6)
-        raw = musicxmlTranslate.music21ObjectToMusicXML(m)
+        raw = m21ToString.music21ObjectToMusicXML(m)
         self.assertEqual(raw.find('<beam number="1">begin</beam>') > 0, True)
         self.assertEqual(raw.find('<tuplet bracket="yes" placement="above"') > 0, True)
 
@@ -5866,7 +5867,7 @@ class Test(unittest.TestCase):
         p.append([m1, m2])
         #p.show()
         # test result of xml output to make sure a natural has been hadded
-        raw = musicxmlTranslate.music21ObjectToMusicXML(p)
+        raw = m21ToString.music21ObjectToMusicXML(p)
         self.assertEqual(raw.find('<accidental>natural</accidental>') > 0, True)
         # make sure original is not chagned
         self.assertEqual(p.haveAccidentalsBeenMade(), False)
@@ -5895,7 +5896,7 @@ class Test(unittest.TestCase):
         p = stream.Part()
         p.append([m1, m2])
         self.assertEqual(p.haveBeamsBeenMade(), False)
-        raw = musicxmlTranslate.music21ObjectToMusicXML(p)
+        raw = m21ToString.music21ObjectToMusicXML(p)
         # after getting musicxml, make sure that we have not changed the source
         #p.show()
         self.assertEqual(p.haveBeamsBeenMade(), False)
@@ -6729,7 +6730,7 @@ class Test(unittest.TestCase):
         <notations/>
       </note>
       <note>"""
-        raw = musicxmlTranslate.music21ObjectToMusicXML(p)
+        raw = m21ToString.music21ObjectToMusicXML(p)
         match = match.replace(' ', '')
         match = match.replace('\n', '')
         raw = raw.replace(' ', '')
@@ -6781,7 +6782,7 @@ class Test(unittest.TestCase):
             y.parts[0].flat.getElementsByClass('TimeSignature')), 2)
         # make sure that ts is being found in musicxml score generation
         # as it is in the Part, and not the Measure, this req an extra check
-        raw = musicxmlTranslate.music21ObjectToMusicXML(y.parts[0])
+        raw = m21ToString.music21ObjectToMusicXML(y.parts[0])
         match = """        <time>
           <beats>2</beats>
           <beat-type>4</beat-type>
@@ -6829,7 +6830,7 @@ class Test(unittest.TestCase):
                                      "(['A4', 'B-2'], '2.0', '2.0')]")
 
         #chords.show()
-        raw = musicxmlTranslate.music21ObjectToMusicXML(m1[0])
+        raw = m21ToString.music21ObjectToMusicXML(m1[0])
         # there should only be 2 tuplet indications in the produced chords
         self.assertEqual(raw.count('<tuplet'), 2)
         # pitch grouping in measure index 1 was not allocated properly
@@ -7078,12 +7079,12 @@ class Test(unittest.TestCase):
         from music21 import stream, note, key
         s = stream.Stream()
         s.append(key.Key('G'))
-        raw = musicxmlTranslate.music21ObjectToMusicXML(s)
+        raw = m21ToString.music21ObjectToMusicXML(s)
         self.assertEqual(raw.find('<fifths>1</fifths>') > 0, True)
         
         s = stream.Score()
         s.append(key.Key('G'))
-        raw = musicxmlTranslate.music21ObjectToMusicXML(s)
+        raw = m21ToString.music21ObjectToMusicXML(s)
         self.assertEqual(raw.find('<fifths>1</fifths>') > 0, True)
 
 

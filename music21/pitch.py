@@ -249,35 +249,6 @@ def _convertPsToStep(ps):
 
     return name, acc, micro, octShift
 
-def _convertStepToPs(step, oct, acc=None, microtone=None):
-    '''Utility conversion; does not process internals.
-    Takes in a note name string, octave number, and optional 
-    Accidental object.
-
-    Returns a pitch space value as a floating point MIDI note number.
-
-    >>> from music21 import *
-    >>> pitch._convertStepToPs('c', 4, pitch.Accidental('sharp'))
-    61.0
-    >>> pitch._convertStepToPs('d', 2, pitch.Accidental(-2))
-    36.0
-    >>> pitch._convertStepToPs('b', 3, pitch.Accidental(3))
-    62.0
-    >>> pitch._convertStepToPs('c', 4, pitch.Accidental('half-flat'))
-    59.5
-    '''
-    step = step.strip().upper()
-    ps = float(((oct + 1) * 12) + STEPREF[step])
-
-    if acc is not None:
-        # assume that this is an accidental object
-        ps = ps + acc.alter
-    if microtone is not None:
-        # assume that this is an accidental object
-        ps = ps + microtone.alter
-    return ps
-
-
 def _convertCentsToAlterAndCents(shift):
     '''
     Given any floating point value, split into accidental and microtone components. 
@@ -1155,8 +1126,6 @@ class Pitch(base.Music21Object):
         base.Music21Object.__init__(self, **keywords)
 
         # this should not be set, as will be updated when needed
-        self._ps = None # pitch space representation, w C4=60 (midi)
-        # self._ps must correspond to combination of step and alter
         self._step = defaults.pitchStep # this is only the pitch step
         # keep an accidental object based on self._alter
         
@@ -1173,7 +1142,6 @@ class Pitch(base.Music21Object):
         #        no octaves we give a defaultOctave higher than the previous
         self.defaultOctave = defaults.pitchOctave
         self._octave = None
-        self._pitchSpaceNeedsUpdating = True
 
         # if True, accidental is not known; is determined algorithmically
         # likely due to pitch data from midi or pitch space/class numbers
@@ -1340,7 +1308,6 @@ class Pitch(base.Music21Object):
                 self._setMicrotone(cents)
         else: # assume an accidental object
             self._accidental = value
-        self._pitchSpaceNeedsUpdating = True
     
     accidental = property(_getAccidental, _setAccidental,
         doc='''
@@ -1395,7 +1362,6 @@ class Pitch(base.Music21Object):
 #         if common.almostEquals(self._microtone.cents, 0.0):
 #             self._microtone = None
 
-        self._pitchSpaceNeedsUpdating = True
     
     microtone = property(_getMicrotone, _setMicrotone,
         doc='''
@@ -1621,9 +1587,32 @@ class Pitch(base.Music21Object):
     #---------------------------------------------------------------------------
 
     def _getPs(self):
-        if self._pitchSpaceNeedsUpdating:
-            self._updatePitchSpace()
-        return self._ps
+        '''
+        recalculates the pitchSpace number. Called when self.step, self.octave 
+        or self.accidental are changed.
+        
+        should be called when .defaultOctave is changed if octave is None,
+        but isn't yet.
+        
+        Returns a pitch space value as a floating point MIDI note number.
+
+        >>> from music21 import *
+        >>> pitch.Pitch('c#4')._getPs()
+        61.0
+        >>> pitch.Pitch('d--2')._getPs()
+        36.0
+        >>> pitch.Pitch('b###3')._getPs()
+        62.0
+        >>> pitch.Pitch('c`4')._getPs()
+        59.5
+        '''
+        step = self._step.upper()
+        ps = float(((self.implicitOctave + 1) * 12) + STEPREF[step])
+        if self.accidental is not None:        
+            ps = ps + self.accidental.alter
+        if self.microtone is not None:
+            ps = ps + self.microtone.alter
+        return ps        
     
     def _setPs(self, value):
         '''
@@ -1643,17 +1632,7 @@ class Pitch(base.Music21Object):
         >>> p.ps = 61.4 # set a microtone
         >>> print(p)
         C#~4(-10c)
-
         '''
-        # set default enharmonics to minor key names
-
-        self._ps = float(value)
-        #environLocal.printDebug(['_setPs(): self._ps', self._ps])
-        self._pitchSpaceNeedsUpdating = False
-
-        ### this should eventually change to "stepEtcNeedsUpdating"
-        ### but we'll see if it's a bottleneck
-
         # can assign microtone here; will be either None or a Microtone object
         self.step, acc, self._microtone, octShift = _convertPsToStep(value)
         # replace a natural with a None
@@ -1709,7 +1688,7 @@ class Pitch(base.Music21Object):
         >>> a.implicitAccidental
         True
         
-        Microtones are allowed, as are extreme ranges:
+        Microtonal accidentals and pure Microtones are allowed, as are extreme ranges:
         
         >>> b = pitch.Pitch('B9')
         >>> b.accidental = pitch.Accidental('half-flat')
@@ -1718,6 +1697,12 @@ class Pitch(base.Music21Object):
         >>> b.ps
         130.5
         
+
+        >>> p = pitch.Pitch('c4')
+        >>> p.microtone = 20
+        >>> p._getPs()
+        60.2
+
         
         Octaveless pitches use their .implicitOctave attributes:
         
@@ -1729,41 +1714,16 @@ class Pitch(base.Music21Object):
         >>> d.ps
         63.0
         
-        If you change your default octave then you will need
-        to set the private ._pitchSpaceNeedsUpdating to True
-        
-        >>> d._pitchSpaceNeedsUpdating # 3
-        False
         >>> d.defaultOctave = 5
-        >>> d._pitchSpaceNeedsUpdating # 4
-        False
-        >>> d.ps
-        63.0
-        >>> d._pitchSpaceNeedsUpdating = True
         >>> d.ps
         75.0        
         ''')
-
-    def _updatePitchSpace(self):
-        '''
-        recalculates the pitchSpace number. Called when self.step, self.octave 
-        or self.accidental are changed.
-        
-        should be called when .defaultOctave is changed if octave is None,
-        but isn't yet.
-        '''
-        self._ps = _convertStepToPs(self._step, self.implicitOctave,
-                                   self.accidental, self.microtone)
-        self._pitchSpaceNeedsUpdating = False
 
 
     def _getMidi(self):
         '''
         see docs below, under property midi
         '''
-        if self._pitchSpaceNeedsUpdating:
-            self._updatePitchSpace()
-            self._pitchSpaceNeedsUpdating = False
         roundedPS = int(round(self.ps))
         if roundedPS > 127:
             value = (12 * 9) + (roundedPS % 12)
@@ -1806,7 +1766,6 @@ class Pitch(base.Music21Object):
         elif value < 0:
             value = 0 + (value % 12) # lowest oct plus modulus            
         self._setPs(value)
-        self._pitchSpaceNeedsUpdating = True
 
         # all midi settings must set implicit to True, as we do not know
         # what accidental this is
@@ -1916,8 +1875,6 @@ class Pitch(base.Music21Object):
 
         # when setting by name, we assume that the accidental intended
         self.implicitAccidental = False
-
-        self._pitchSpaceNeedsUpdating = True
     
     name = property(_getName, _setName, doc='''
         Gets or sets the name (pitch name with accidental but
@@ -2104,7 +2061,6 @@ class Pitch(base.Music21Object):
             self._step = usrStr
         else:
             raise PitchException("Cannot make a step out of '%s'" % usrStr)
-        self._pitchSpaceNeedsUpdating = True
 
     step = property(_getStep, _setStep,
         doc='''The diatonic name of the note; i.e. does not give the 
@@ -2175,7 +2131,6 @@ class Pitch(base.Music21Object):
         value = _convertPitchClassToNumber(value)
         # get step and accidental w/o octave
         self._step, self._accidental, self._microtone, octShift = _convertPsToStep(value)  
-        self._pitchSpaceNeedsUpdating = True
 
         # do not know what accidental is
         self.implicitAccidental = True
@@ -2252,7 +2207,6 @@ class Pitch(base.Music21Object):
             self._octave = int(value)
         else:
             self._octave = None
-        self._pitchSpaceNeedsUpdating = True
 
     octave = property(_getOctave, _setOctave, doc='''
         Returns or sets the octave of the note.  
@@ -4562,13 +4516,13 @@ class Test(unittest.TestCase):
 
     def testQuarterToneA(self):
         from music21 import stream, note, scale
-        from music21.musicxml import translate as musicxmlTranslate
+        from music21.musicxml import m21ToString
 
         p1 = Pitch('D#~')
         #environLocal.printDebug([p1, p1.accidental])
         self.assertEqual(str(p1), 'D#~')
         # test generation of raw musicxml output
-        xmlout = musicxmlTranslate.music21ObjectToMusicXML(p1)
+        xmlout = m21ToString.music21ObjectToMusicXML(p1)
         #p1.show()
         match = '<step>D</step><alter>1.5</alter><octave>4</octave>'
         xmlout = xmlout.replace(' ', '')

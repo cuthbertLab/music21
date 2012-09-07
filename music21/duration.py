@@ -2543,10 +2543,10 @@ class Duration(DurationCommon):
         if format == None:
             raise DurationException('bad format (%s) provided to write()' % fmt)
         elif format == 'musicxml':
-            from music21.musicxml import translate as musicxmlTranslate
+            from music21.musicxml import m21ToString
             if fp == None:
                 fp = environLocal.getTempFile(ext)
-            dataStr = musicxmlTranslate.durationToMusicXML(self)
+            dataStr = m21ToString.durationToMusicXML(self)
         else:
             raise DurationException('cannot support writing in this format, %s yet' % format)
         f = open(fp, 'w')

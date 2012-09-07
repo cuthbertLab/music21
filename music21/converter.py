@@ -1423,7 +1423,7 @@ class Test(unittest.TestCase):
     def testConversionMXArticulations(self):
         from music21 import note
         from music21.musicxml import testPrimitive
-        from music21.musicxml import translate as musicxmlTranslate
+        from music21.musicxml import m21ToString
         
         mxString = testPrimitive.articulations01
         a = parse(mxString)
@@ -1441,7 +1441,7 @@ class Test(unittest.TestCase):
         self.assertEqual(post, match)
 
         # try to go the other way
-        post = musicxmlTranslate.music21ObjectToMusicXML(a)
+        post = m21ToString.music21ObjectToMusicXML(a)
         #a.show()        
 
     def testConversionMXKey(self):

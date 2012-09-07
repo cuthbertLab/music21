@@ -1484,6 +1484,16 @@ class Test(unittest.TestCase):
         self.assertEqual(str(rn.scaleDegrees), '[(5, None), (7, <accidental sharp>), (2, None)]')
                 
 
+    def testNeapolitanAndHalfDiminished(self):
+        from music21 import key, roman
+        alteredChordHalfDim3rdInv = roman.RomanNumeral('bii/o42', scale.MajorScale('F'))
+        self.assertEqual([str(p) for p in alteredChordHalfDim3rdInv.pitches],
+                         ['F-4', 'G-4', 'B--4', 'D--5'])
+        iv = alteredChordHalfDim3rdInv.intervalVector
+        self.assertEqual([0, 1, 2, 1, 1, 1], iv)
+        cn = alteredChordHalfDim3rdInv.commonName
+        self.assertEqual(cn, 'half-diminished seventh chord')
+
 
 class TestExternal(unittest.TestCase):
 

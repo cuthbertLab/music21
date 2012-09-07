@@ -366,7 +366,7 @@ class Test(unittest.TestCase):
     def testBasic(self):
         from music21 import musedata
         from music21.musedata import testFiles
-        from music21.musicxml import translate as musicxmlTranslate
+        from music21.musicxml import m21ToString
 
 
         mdw = musedata.MuseDataWork()
@@ -396,7 +396,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].flat.notesAndRests), 291)
         self.assertEqual(len(s.parts[1].flat.notesAndRests), 293)
 
-        raw = musicxmlTranslate.music21ObjectToMusicXML(s)
+        raw = m21ToString.music21ObjectToMusicXML(s)
       
 
 

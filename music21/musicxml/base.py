@@ -4816,7 +4816,7 @@ class Test(unittest.TestCase):
     def testUnicodeCharsA(self):
         from music21.musicxml import testPrimitive
         from music21 import converter
-        from music21.musicxml import translate as musicxmlTranslate
+        from music21.musicxml import m21ToString
         
         # low level musicxml object test
         d = Document()
@@ -4827,7 +4827,7 @@ class Test(unittest.TestCase):
         
         # the ultimate round trip test
         s = converter.parse(testPrimitive.unicodeStrWithNonAscii)
-        raw = musicxmlTranslate.music21ObjectToMusicXML(s)
+        raw = m21ToString.music21ObjectToMusicXML(s)
         s = converter.parse(raw)
         self.assertEqual(u'© Someone Else', s.metadata.composer)
 
