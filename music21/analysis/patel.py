@@ -9,7 +9,7 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
-import unittest, doctest
+import unittest
 import math
 
 from music21 import exceptions21
@@ -93,7 +93,7 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     totalElements = len(intervalStream)
     if totalElements < 2:
         raise PatelException('need at least three notes to have a std-deviation of intervals (and thus a MIV)')
-    summation = 0
+    #summation = 0
     semitoneList = [myInt.chromatic.undirected for myInt in intervalStream]
     mean = 0 
     std = 0

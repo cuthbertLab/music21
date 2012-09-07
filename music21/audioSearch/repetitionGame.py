@@ -12,11 +12,8 @@
 #-------------------------------------------------------------------------------
 
 
-from music21 import environment
-from music21 import scale, stream, note, pitch
-from music21.audioSearch.base import *
-from music21.audioSearch import recording
-import time
+from music21 import scale
+from music21.audioSearch import base
 
 
 class repetitionGame():
@@ -43,11 +40,11 @@ class repetitionGame():
     #        print self.gameNotes[k].fullName
         
         seconds = 2 + self.round
-        freqFromAQList = getFrequenciesFromMicrophone(length=seconds, storeWaveFilename=None)
-        detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, self.useScale)
-        detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
-        (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, self.useScale)
-        (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
+        freqFromAQList = base.getFrequenciesFromMicrophone(length=seconds, storeWaveFilename=None)
+        detectedPitchesFreq = base.detectPitchFrequencies(freqFromAQList, self.useScale)
+        detectedPitchesFreq = base.smoothFrequencies(detectedPitchesFreq)
+        (detectedPitchObjects, unused_listplot) = base.pitchFrequenciesToObjects(detectedPitchesFreq, self.useScale)
+        (notesList, unused_durationList) = base.joinConsecutiveIdenticalPitches(detectedPitchObjects)
         j = 0
         i = 0
         while i < len(notesList) and j < len(self.gameNotes) and self.good == True:

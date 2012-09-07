@@ -3736,15 +3736,16 @@ class Test(unittest.TestCase):
     def xtestBasic(self):
         from music21 import musedata
         from music21.musedata import translate
+        from music21.musicxml import m21ToString
 
         af = musedata.MuseDataFile()
 
         for tf in ALL:
             ah = af.readstr(tf)
             environLocal.printDebug([ah.getTitle()])
-            s = translate.museDataToStreamScore(ah)
+            s = translate.museDataWorkToStreamScore(ah)
             # run musicxml processing to look for internal errors
-            out = s.musicxml
+            dummy = m21ToString.music21ObjectToMusicXML(s)
 
 if __name__ == "__main__":
     import music21

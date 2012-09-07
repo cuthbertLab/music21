@@ -244,7 +244,7 @@ class StreamFreezeThawBase(object):
             #    self.thawIds(e._stream)
         except AttributeError:
             pass # not having isSpanner or isVariant defined
-                 # isn't enough to throw an exception for.
+                    # isn't enough to throw an exception for.
 
     def findAllM21Objects(self, streamObj):
         allEls = streamObj.recurse()
@@ -636,7 +636,7 @@ class StreamFreezer(StreamFreezeThawBase):
             if el.isVariant is True:
                 continue
             for site in el._definedContexts.getSites():
-                 # TODO: this can be optimized to get actually get sites
+                # TODO: this can be optimized to get actually get sites
 
                 if site is None: 
                     continue
@@ -700,7 +700,7 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> oldActiveSiteId == newActiveSiteId
         False
         '''
-        counter = common.SingletonCounter()
+        dummy_counter = common.SingletonCounter()
 
         self.freezeContextIds(e._definedContexts)
         try:
@@ -711,7 +711,7 @@ class StreamFreezer(StreamFreezeThawBase):
             #    self.freezeIds(e._stream)
         except AttributeError:
             pass # not having isSpanner or isVariant defined
-                 # isn't enough to throw an exception for.
+                    # isn't enough to throw an exception for.
         
         # _activeSite could be a weak ref; may need to manage
         e._activeSiteId = None # uuid.uuid4() # a place holder
@@ -857,7 +857,7 @@ class StreamFreezer(StreamFreezeThawBase):
             f.write(data)
             f.close()
         else:
-            raise ConverterException('bad StreamFreezer format: %s' % fmt)
+            raise FreezeThawException('bad StreamFreezer format: %s' % fmt)
 
 
         # must restore the passed-in Stream
@@ -878,7 +878,7 @@ class StreamFreezer(StreamFreezeThawBase):
         elif fmt == 'jsonpickle':
             out = jsonpickle.encode(storage)
         else:
-            raise ConverterException('bad StreamFreezer format: %s' % fmt)
+            raise FreezeThawException('bad StreamFreezer format: %s' % fmt)
 
         self.teardownStream(self.stream)
         return out
@@ -1020,7 +1020,7 @@ class StreamThawer(StreamFreezeThawBase):
             f.close()
             storage = jsonpickle.decode(data)
         else:
-            raise ConverterException('bad StreamFreezer format: %s' % fmt)
+            raise FreezeThawException('bad StreamFreezer format: %s' % fmt)
 
         self.stream = self.unpackStream(storage)
 
@@ -1042,7 +1042,7 @@ class StreamThawer(StreamFreezeThawBase):
         elif fmt == 'jsonpickle':
             storage = jsonpickle.decode(fileData)
         else:
-            raise ConverterException('bad StreamFreezer format: %s' % fmt)
+            raise FreezeThawException('bad StreamFreezer format: %s' % fmt)
         environLocal.printDebug("StreamThawer:openStr: storage is: %s" % storage)
         self.stream = self.unpackStream(storage)
 
@@ -1066,14 +1066,11 @@ class Test(unittest.TestCase):
         d = jsp.encode(c)
         ddecode = json.loads(d)
         print json.dumps(ddecode, sort_keys=True, indent=2)
-        e = jsp.decode(d)
+        junk = jsp.decode(d)
         
     def xtestSimplePickle(self):
         from music21 import freezeThaw
         from music21 import corpus
-        
-        storedIds = []
-        storedDefinedContextsIds = []
         
         c = corpus.parse('bwv66.6').parts[0].measure(0).notes
         #c.show('t')
@@ -1083,22 +1080,21 @@ class Test(unittest.TestCase):
 #            storedDefinedContextsIds.append(id(el._definedContexts))
 #            
 #        return
-        from music21 import note,stream
         
         n1 = c[0]
         n2 = c[1]
         sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
         sf.setupSerializationScaffold()
-        for idKey in n1._definedContexts._definedContexts.keys():
+        for dummy in n1._definedContexts._definedContexts.keys():
             pass
             #print idKey
             #print n1._definedContexts._definedContexts[idKey]['obj']
-        for idKey in n2._definedContexts._definedContexts.keys():
+        for dummy in n2._definedContexts._definedContexts.keys():
             pass
             #print idKey
             #print n2._definedContexts._definedContexts[idKey]['obj']
 
-        data = pickleMod.dumps(c, protocol=-1)
+        dummy_data = pickleMod.dumps(c, protocol=-1)
         
         
         #data = sf.writeStr(fmt='pickle')
@@ -1130,7 +1126,7 @@ class Test(unittest.TestCase):
         s = st.stream
         
         # test to see if we can find everything
-        for i in s.recurse():
+        for dummy in s.recurse():
             pass
         
         #s.show()
@@ -1141,8 +1137,6 @@ class Test(unittest.TestCase):
         from music21 import variant
         from music21 import stream
         from music21 import note
-
-        import pickle
         
         s = stream.Stream()
         m = stream.Measure()
@@ -1226,7 +1220,7 @@ class Test(unittest.TestCase):
         #v2.show('t')
 
     def testSerializationScaffoldA(self):
-        from music21 import note, stream, pitch
+        from music21 import note, stream
         from music21 import freezeThaw
         
         n1 = note.Note()

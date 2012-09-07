@@ -16,10 +16,8 @@ Each :class:`~music21.note.Note` object has a `Pitch` object embedded in it.
 Some of the methods below, such as `Pitch.name`, `Pitch.step`, etc. are
 made available directly in the `Note` object, so they will seem familiar.
 '''
-
-import os
-import string, copy, math
-import unittest, doctest
+import copy, math
+import unittest
 
 from music21 import base
 from music21 import common
@@ -419,13 +417,13 @@ class Microtone(base.JSONSerializer):
 
         if value[0] in ['+'] or value[0].isdigit():
             # positive cent representation
-            num, junk = common.getNumFromStr(value, numbers='0123456789.')
+            num, unused_nonNum = common.getNumFromStr(value, numbers='0123456789.')
             if num == '':
                 raise MicrotoneException('no numbers found in string value: %s' % value)
             else:
                 centValue = float(num)
         elif value[0] in ['-']:
-            num, junk = common.getNumFromStr(value[1:], numbers='0123456789.')
+            num, unused_nonNum = common.getNumFromStr(value[1:], numbers='0123456789.')
             centValue = float(num) * -1
         
         self._centShift = centValue
@@ -2130,7 +2128,7 @@ class Pitch(base.Music21Object):
         # permit the submission of strings, like A an dB
         value = _convertPitchClassToNumber(value)
         # get step and accidental w/o octave
-        self._step, self._accidental, self._microtone, octShift = _convertPsToStep(value)  
+        self._step, self._accidental, self._microtone, unused_octShift = _convertPsToStep(value)  
 
         # do not know what accidental is
         self.implicitAccidental = True
@@ -3234,7 +3232,6 @@ class Pitch(base.Music21Object):
         >>> p.getEnharmonic()
         <music21.pitch.Pitch C>
         '''
-        psRef = self.ps
         if inPlace:
             post = self
         else:
@@ -4059,7 +4056,7 @@ class Pitch(base.Music21Object):
         [<music21.pitch.Pitch D3>, <music21.pitch.Pitch G3>, <music21.pitch.Pitch D5>]
         '''
         #Takes in a chord, finds the interval between the notes
-        from music21 import note, pitch, chord
+        from music21 import note, chord
         
         pitchList = chordIn.pitches
         isStringHarmonic = False
@@ -4124,7 +4121,7 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types, copy
+        import sys, types
         for part in sys.modules[self.__module__].__dict__.keys():
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -4138,8 +4135,8 @@ class Test(unittest.TestCase):
                     obj = name()
                 except TypeError:
                     continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                copy.copy(obj)
+                copy.deepcopy(obj)
 
         p1 = Pitch("C#3")
         p2 = copy.deepcopy(p1)
@@ -4634,7 +4631,6 @@ class Test(unittest.TestCase):
 
 
     def testMicrotoneC(self):
-        import copy
         from music21 import pitch
 
         match = []

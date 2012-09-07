@@ -5,14 +5,11 @@
 
 
 from music21 import metadata
-from music21.note import Note, Rest
 from music21 import interval
-from music21 import search
-from music21 import lily
+from music21 import note
+from music21 import stream
 
 from music21.trecento import cadencebook
-from music21.trecento import trecentoCadence
-from re import match
 
 class IntervalSearcher(object):
     def __init__(self, intervalList = []):
@@ -80,15 +77,15 @@ def searchForNotes(notesStr):
     for tN in notesArr:
         tNName = tN[0]
         if tNName.lower() != "r":
-            tNObj = Note()
+            tNObj = note.Note()
             tNObj.name = tN[0]
             tNObj.octave = int(tN[1])
         else:
-            tNObj = Rest()
+            tNObj = note.Rest()
         noteObjArr.append(tNObj)
     ballataObj  = cadencebook.BallataSheet()
     searcher1 = NoteSearcher(noteObjArr) 
-    streamLily = ""
+    streamOpus = stream.Opus()
 
     for thisWork in ballataObj:
         for thisCadence in thisWork.snippets:
@@ -96,29 +93,32 @@ def searchForNotes(notesStr):
                 continue
             for i in range(len(thisCadence.parts)):
                 if searcher1.compareToStream(thisCadence.parts[i].flat) is True:
-                    notesList = ""
+                    notesStr = ""
                     for thisNote in thisCadence.parts[i].flat.notesAndRests:
                         #thisNote.editorial.color = "blue"
-                        if hasattr(thisNote.lily, "value"):
-                            notesList += thisNote.lily.value + " "
-                    streamLily += "\\score {" + \
-                            "<< \\time " + str(thisCadence.timeSig) + \
-                            "\n \\new Staff {" + str(thisCadence.parts[i].lily) + "} >>" + \
-                            thisCadence.header() + "\n}\n"
-                    print("In piece %r found in stream %d: %s" % (thisWork.title, i, notesList))
-    if streamLily:
-        lS = lily.lilyString.LilyString(streamLily)
-        lS.showPNG()
+                        if thisNote.isRest is False:
+                            notesStr += thisNote.nameWithOctave + " "
+                        else:
+                            notesStr += "r "
+                    streamOpus.insert(0, thisCadence)
+#                    streamLily += "\\score {" + \
+#                            "<< \\time " + str(thisCadence.timeSig) + \
+#                            "\n \\new Staff {" + str(thisCadence.parts[i].lily) + "} >>" + \
+#                            thisCadence.header() + "\n}\n"
+                    print(u"In piece %r found in stream %d: %s" % (thisWork.title, i, notesStr))
+    if len(streamOpus) > 0:
+        streamOpus.show('lily.png')
 
 def searchForIntervals(notesStr):
-    '''notesStr is the same as above.  Now however we check to see
+    '''
+    notesStr is the same as above.  Now however we check to see
     if the generic intervals are the same, rather than the note names.
     Useful if the clef is missing.
     '''
     notesArr = notesStr.split()
     noteObjArr = []
     for tN in notesArr:
-        tNObj = Note()
+        tNObj = note.Note()
         tNObj.name = tN[0]
         tNObj.octave = int(tN[1])
         noteObjArr.append(tNObj)
@@ -131,27 +131,31 @@ def searchForIntervals(notesStr):
 
     searcher1 = IntervalSearcher(interObjArr) 
     ballataObj  = cadencebook.BallataSheet()
-    streamLily = ""
+
+    streamOpus = stream.Opus()
 
     for thisWork in ballataObj:
+        print thisWork.title
         for thisCadence in thisWork.snippets:
-            if (thisCadence is None):
+            if thisCadence is None:
                 continue
             for i in range(len(thisCadence.parts)):
                 if searcher1.compareToStream(thisCadence.parts[i].flat) is True:
-                    notesList = ""
-                    for thisNote in thisCadence.parts[i].flat.notes:
-                        notesList += thisNote.name + " "
+                    notesStr = ""
+                    for thisNote in thisCadence.parts[i].flat.notesAndRests:
                         #thisNote.editorial.color = "blue"
-                    streamLily += "\\score {" + \
-                            "<< \\time " + str(thisCadence.timeSig) + \
-                            "\n \\new Staff {" + str(thisCadence.parts[i].lily) + "} >>" + \
-                            str(thisCadence.header()) + "\n}\n"
-                    print("In piece %r found in stream %d: %s" % (thisWork.title, i, notesList))
-
-    if streamLily:
-        print(streamLily)
-        lily.lilyString.LilyString(streamLily).showPDF()
+                        if thisNote.isRest is False:
+                            notesStr += thisNote.nameWithOctave + " "
+                        else:
+                            notesStr += "r "
+                    streamOpus.insert(0, thisCadence)
+#                    streamLily += "\\score {" + \
+#                            "<< \\time " + str(thisCadence.timeSig) + \
+#                            "\n \\new Staff {" + str(thisCadence.parts[i].lily) + "} >>" + \
+#                            thisCadence.header() + "\n}\n"
+                    print(u"In piece %r found in stream %d: %s" % (thisWork.title, i, notesStr))
+    if len(streamOpus) > 0:
+        streamOpus.show('lily.png')
 
 def findRandomVerona():
     searchForNotes("A4 F4 G4 E4 F4 G4")  #p. 4 cadence 1
@@ -194,7 +198,7 @@ def findUpDown(n1, n2, n3):
     return True
 
 def audioVirelaiSearch():
-    from music21 import audioSearch
+    #from music21 import audioSearch
     from music21.audioSearch import transcriber
     from music21 import search
     virelaisSheet = cadencebook.TrecentoSheet(sheetname = 'virelais')
@@ -209,10 +213,10 @@ def audioVirelaiSearch():
                 virelaiCantuses.append(vc)
             except IndexError:
                 pass
-    #searchScore = transcriber.runTranscribe(show = False, plot = False, seconds = 10.0, saveFile = False)
-    from music21 import converter
-    searchScore = converter.parse("c'4 a8 a4 g8 b4. d'4. c8 b a g f4", '6/8')
-    searchScore.show()
+    searchScore = transcriber.runTranscribe(show = False, plot = False, seconds = 10.0, saveFile = False)
+    #from music21 import converter
+    #searchScore = converter.parse("c'4 a8 a4 g8 b4. d'4. c8 b a g f4", '6/8')
+    #searchScore.show()
     l = search.approximateNoteSearch(searchScore, virelaiCantuses)
     for i in l:
         print i.metadata.title, i.matchProbability
@@ -229,8 +233,8 @@ def findSimilarGloriaParts():
 def savedSearches():
 #    searchForIntervals("E4 C4 C4 B3") # Assisi 187.1
 #    searchForIntervals("D4 C4 C4 C4")   # Assisi 187.2
-#    searchForIntervals("D4 A3 A3 A3 B3 C4") # Donna si to fallito TEST
-    searchForNotes("G3 D3 R D3 D3 E3 F3") # Donna si to fallito TEST - last note = F#
+    searchForIntervals("D4 A3 A3 A3 B3 C4") # Donna si to fallito TEST
+#    searchForNotes("G3 D3 R D3 D3 E3 F3") # Donna si to fallito TEST - last note = F#
 #    searchForIntervals("F3 C3 C3 F3 G3") # Bologna Archivio: Per seguirla TEST
 #    searchForNotes("D4 D4 C4 D4") # Fortuna Rira Seville 25 TEST! CANNOT FIND    
 #    searchForNotes("D4 C4 B3 A3 G3") # Tenor de monaco so tucto Seville 25

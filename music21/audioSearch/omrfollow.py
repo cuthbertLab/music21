@@ -1,4 +1,12 @@
-from music21 import *
+from music21 import audioSearch
+from music21 import converter
+from music21 import search
+from music21 import stream
+
+
+from music21 import environment
+_MOD = "audioSearch.omrfollow"
+environLocal = environment.Environment(_MOD)
 
 _missingImport = []
 
@@ -68,12 +76,12 @@ def recognizeScore(scorePart, pageMeasureNumbers, iterations = 1):
 
     for loopy in range(iterations):
         if loopy > 0:
-           print "\n\nstarting again in 3 seconds"
-           time.sleep(3) 
+            print "\n\nstarting again in 3 seconds"
+            time.sleep(3) 
         searchScore = audioSearch.transcriber.runTranscribe(show = False, plot = False, seconds = 15.0, saveFile = False)
         l = search.approximateNoteSearch(searchScore, allStreams)
     
-        scores = [0 for x in range(len(pages))]
+        scores = [0 for j in range(len(pages))]
         for i in range(8): # top 8 searches
             topStream = l[i]
             scorePage = topStream.pageNumber - 1

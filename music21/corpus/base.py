@@ -25,14 +25,13 @@ from __future__ import unicode_literals
 
 import re
 import os
-import doctest, unittest
+import unittest
 import zipfile
 
 from music21 import common
 from music21 import converter
 from music21 import exceptions21
 from music21 import metadata
-from music21 import musicxml
 from music21.corpus import virtual
 from music21.corpus.metadataCache import metadataCache
 
@@ -461,7 +460,7 @@ def _noCorpus():
     '''Return True or False if this is a corpus or noCoprus distrubution. 
     '''
     if _NO_CORPUS is None:
-        if corpus.getComposerDir('bach') is None:
+        if getComposerDir('bach') is None:
             _NO_CORPUS = True
         else:
             _NO_CORPUS = False

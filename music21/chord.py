@@ -20,12 +20,9 @@ import unittest
 from music21 import beam
 from music21 import chordTables
 from music21 import common
-from music21 import defaults
 from music21 import duration
 from music21 import exceptions21
 from music21 import interval
-from music21 import midi as midiModule
-from music21.midi import translate as midiTranslate
 from music21 import note
 from music21 import pitch
 from music21 import tie
@@ -1015,9 +1012,9 @@ class Chord(note.NotRest):
                 for name in value:
                     self._components.append(note.Note(name))
             else:
-                raise NoteException('must provide a list containing a Pitch, not: %s' % value)
+                raise ChordException('must provide a list containing a Pitch, not: %s' % value)
         else:
-            raise NoteException('cannot set pitch name with provided object: %s' % value)
+            raise ChordException('cannot set pitch name with provided object: %s' % value)
 
         self._chordTablesAddressNeedsUpdating = True
 

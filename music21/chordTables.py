@@ -13,7 +13,7 @@
 '''This module stores numerous data lists used in deriving set-class values and other post-tonal chord representations. All features of this module are made available through :class:`~music21.chord.Chord` objects. Use of this module directly is thus not necessary.
 '''
 
-import unittest, doctest 
+import unittest 
 
 from music21 import exceptions21
 
@@ -2662,7 +2662,7 @@ def addressToZAddress(address):
     >>> addressToZAddress((8,29))
     (8, 15, 1)
     '''
-    card, index, inversion = _validateAddress(address)
+    card, index, unused_inversion = _validateAddress(address)
     z = FORTE[card][index][3]
     if z == 0:
         return None
@@ -2746,9 +2746,9 @@ class Test(unittest.TestCase):
 
     def testScDict(self):
         for key, value in SCDICT.items():
-            max = TNMAX[key]
+            maxVal = TNMAX[key]
             # make sure the max value is the length of all keys for each size
-            self.assertEqual(max, len(value.keys()))
+            self.assertEqual(maxVal, len(value.keys()))
 
     def testForte(self):
         for setSize, setCount in TNIMAX.items(): # look at tni structures

@@ -16,15 +16,13 @@ Modular analysis procedures inherit from :class:`music21.analysis.discrete.Discr
 '''
 
 
-import unittest, doctest, random
+import unittest
 import sys
-import math
 
 from music21 import exceptions21
 
 from music21 import common
 from music21 import meter
-from music21.pitch import Pitch
 from music21 import stream 
 
 
@@ -322,7 +320,7 @@ class Test(unittest.TestCase):
         '''
         p = TestMockProcesor()
 
-        from music21 import stream, note
+        from music21 import note
         s1 = stream.Stream()
         s1.append(note.Note('c'))
         s1.append(note.Note('c'))

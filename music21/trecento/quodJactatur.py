@@ -42,20 +42,21 @@ without any problems.  Working on this problem also gave a great test
 of music21's ability to manipulate diatonic Streams.
 '''
 
-from music21 import exceptions21
-from music21 import key
-from music21 import meter
 from music21 import clef
+#from music21 import common
 from music21 import corpus
-from music21 import common
-from music21 import stream
-from music21 import note
+from music21 import exceptions21
 from music21 import instrument
-from music21 import metadata
+from music21 import interval
+from music21 import key
 from music21 import layout
+from music21 import metadata
+from music21 import meter
+from music21 import note
+from music21 import stream
 
 import copy
-import doctest, unittest
+import unittest
 
 def reverse(self, inPlace = False, 
                 classesToMove = (key.KeySignature, meter.TimeSignature, clef.Clef, metadata.Metadata, instrument.Instrument, layout.SystemLayout), 
@@ -81,7 +82,7 @@ def reverse(self, inPlace = False,
             returnObj = stream.Part()
 
 
-        currentContexts = common.DefaultHash()
+        #currentContexts = common.DefaultHash()
         sf = self.flat
         for myEl in sf:
             if isinstance(myEl, classesToMove):
@@ -145,7 +146,7 @@ def prependBlankMeasures(myStream, measuresToAppend = 1, inPlace = True):
     else:
         ms = copy.deepcopy(myStream)
     
-    for i in range(measuresToAppend):
+    for dummy in range(measuresToAppend):
         qjBlankM = stream.Measure()
         hr = note.Rest()
         hr.duration.quarterLength = measureDuration
@@ -336,7 +337,7 @@ def bentWolfSolution():
     ct = (1, 5, False, False)
     tenor = (-5, 0, False, False)
 
-    qjChords, avgScore, fullScore = prepareSolution(triplum, ct, tenor)
+    unused_qjChords, avgScore, fullScore = prepareSolution(triplum, ct, tenor)
     fullScore.show('musicxml')
     print avgScore
     print cachedParts
@@ -348,7 +349,7 @@ def possibleSolution():
     ct = (-5, 5, True, True)
     tenor = (5, 5, False, False)
     
-    qjChords, avgScore, qjSolved = prepareSolution(tenor, triplum, ct)
+    unused_qjChords, avgScore, qjSolved = prepareSolution(tenor, triplum, ct)
     print avgScore
 #    qjSolved.insert(0, stream.Part())
 #    qjSolved.insert(0, qjChords)
@@ -367,126 +368,56 @@ def multipleSolve():
     maxScore = -100
     i = 0
     for lowestTrans in range(len(transposeIntervals)):
-     for middleTrans in range(lowestTrans, len(transposeIntervals)):
-      for highestTrans in range(middleTrans, len(transposeIntervals)):
-       transLowest = transposeIntervals[lowestTrans]
-       transMiddle = transposeIntervals[middleTrans]
-       transHighest = transposeIntervals[highestTrans]
-       if transLowest != 1 and transMiddle != 1 and transHighest != 1:
-           continue
-       
-       for delayLowest in delayAmounts:
-        for delayMiddle in delayAmounts:
-         for delayHighest in delayAmounts:
-          if delayLowest != 0 and delayMiddle != 0 and delayHighest != 0:
-              continue
-          for lowestInvert in [False, True]:
-           for middleInvert in [False, True]:
-            for highestInvert in [False, True]:
-             if lowestInvert is True and middleInvert is True and highestInvert is True:
-                 continue  # very low probability
-             for lowestRetro in [False, True]:
-              for middleRetro in [False, True]:
-               for highestRetro in [False, True]:
-                if lowestRetro is True and middleRetro is True and highestRetro is True:
+        for middleTrans in range(lowestTrans, len(transposeIntervals)):
+            for highestTrans in range(middleTrans, len(transposeIntervals)):
+                transLowest = transposeIntervals[lowestTrans]
+                transMiddle = transposeIntervals[middleTrans]
+                transHighest = transposeIntervals[highestTrans]
+                if transLowest != 1 and transMiddle != 1 and transHighest != 1:
                     continue
-                if ((delayLowest == delayMiddle and lowestInvert == middleInvert and lowestRetro == middleRetro) or
-                    (delayLowest == delayHighest and lowestInvert == highestInvert and lowestRetro == highestRetro) or
-                    (delayMiddle == delayHighest and middleInvert == highestInvert and middleRetro == highestRetro)):
-                        continue # no continuous parallel motion            
-                if (transLowest == transMiddle and delayLowest == delayMiddle and lowestRetro == False and middleRetro == True):
-                    continue # same as lowestRetro == True and middleRetro == False
-                if (transLowest == transMiddle and delayLowest == delayMiddle and lowestInvert == False and middleInvert == True):
-                    continue # same as lowestInvert == True and middleInvert == False
-                if (transLowest == 1 and transMiddle == 1):
-                    continue # if transHighest == 4 then it's the same as (-4, -4, 1) except for a few tritones
-                             # if transHighest == 5 then it's the same as (-5, -5, 1) except for a few tritones 
                 
-                
-                i += 1
-                triplum = (transHighest, delayHighest, highestInvert, highestRetro)
-                ct = (transMiddle, delayMiddle, middleInvert, middleRetro)
-                tenor = (transLowest, delayLowest, lowestInvert, lowestRetro)
-                qjSolved, avgScore, fullScore = prepareSolution(triplum, ct, tenor)
-                #writeLine = (tripT, ctT, tenT, tripDelay, ctDelay, tenDelay, tripInvert, ctInvert, tenInvert, tripRetro, ctRetro, tenRetro, avgScore)
-                writeLine = (transHighest, delayHighest, highestInvert, highestRetro, transMiddle, delayMiddle, middleInvert, middleRetro, transLowest, delayLowest, lowestInvert, lowestRetro, avgScore)
-                if avgScore > 0:
-                    print ""
-                    if avgScore > maxScore:
-                        maxScore = avgScore
-                        print "***** ",
-                    print writeLine
-                else:
-                    print str(i) + " ",
-                csvFile.writerow(writeLine)
-
-
-def multipleSolveRetro():
-    import csv
-    csvFile = csv.writer(open('d:/desktop/quodJ3.csv', 'wb'))
-
-    getQJ()
-    
-    transposeIntervals = [-5, -4, 1, 4, 5]
-    delayAmounts = [0, 5, 10]
-
-    maxScore = -100
-    i = 0
-    for lowestTrans in range(len(transposeIntervals)):
-     for middleTrans in range(lowestTrans, len(transposeIntervals)):
-      for highestTrans in range(middleTrans, len(transposeIntervals)):
-       transLowest = transposeIntervals[lowestTrans]
-       transMiddle = transposeIntervals[middleTrans]
-       transHighest = transposeIntervals[highestTrans]
-       if transLowest != 1 and transMiddle != 1 and transHighest != 1:
-           continue
-       
-       for delayLowest in delayAmounts:
-        for delayMiddle in delayAmounts:
-         for delayHighest in delayAmounts:
-          if delayLowest != 0 and delayMiddle != 0 and delayHighest != 0:
-              continue
-          for lowestInvert in [False, True]:
-           for middleInvert in [False, True]:
-            for highestInvert in [False, True]:
-             if lowestInvert is True and middleInvert is True and highestInvert is True:
-                 continue  # very low probability
-             for lowestRetro in [False, True]:
-              for middleRetro in [False, True]:
-               for highestRetro in [False, True]:
-                if lowestRetro is True and middleRetro is True and highestRetro is True:
-                    continue
-                if ((delayLowest == delayMiddle and lowestInvert == middleInvert and lowestRetro == middleRetro) or
-                    (delayLowest == delayHighest and lowestInvert == highestInvert and lowestRetro == highestRetro) or
-                    (delayMiddle == delayHighest and middleInvert == highestInvert and middleRetro == highestRetro)):
-                        continue # no continuous parallel motion            
-                if (transLowest == transMiddle and delayLowest == delayMiddle and lowestRetro == False and middleRetro == True):
-                    continue # same as lowestRetro == True and middleRetro == False
-                if (transLowest == transMiddle and delayLowest == delayMiddle and lowestInvert == False and middleInvert == True):
-                    continue # same as lowestInvert == True and middleInvert == False
-                if (transLowest == 1 and transMiddle == 1):
-                    continue # if transHighest == 4 then it's the same as (-4, -4, 1) except for a few tritones
-                             # if transHighest == 5 then it's the same as (-5, -5, 1) except for a few tritones 
-                
-                
-                i += 1
-                triplum = (transHighest, delayHighest, highestInvert, highestRetro)
-                ct = (transMiddle, delayMiddle, middleInvert, middleRetro)
-                tenor = (transLowest, delayLowest, lowestInvert, lowestRetro)
-                qjSolved, avgScore, fullScore = prepareSolution(triplum, ct, tenor)
-                #writeLine = (tripT, ctT, tenT, tripDelay, ctDelay, tenDelay, tripInvert, ctInvert, tenInvert, tripRetro, ctRetro, tenRetro, avgScore)
-                writeLine = (transHighest, delayHighest, highestInvert, highestRetro, transMiddle, delayMiddle, middleInvert, middleRetro, transLowest, delayLowest, lowestInvert, lowestRetro, avgScore)
-                if avgScore > 0:
-                    print ""
-                    if avgScore > maxScore:
-                        maxScore = avgScore
-                        print "***** ",
-                    print writeLine
-                else:
-                    print str(i) + " ",
-                csvFile.writerow(writeLine)
-
-
+                for delayLowest in delayAmounts:
+                    for delayMiddle in delayAmounts:
+                        for delayHighest in delayAmounts:
+                            if delayLowest != 0 and delayMiddle != 0 and delayHighest != 0:
+                                continue
+                            for lowestInvert in [False, True]:
+                                for middleInvert in [False, True]:
+                                    for highestInvert in [False, True]:
+                                        if lowestInvert is True and middleInvert is True and highestInvert is True:
+                                            continue  # very low probability
+                                        for lowestRetro in [False, True]:
+                                            for middleRetro in [False, True]:
+                                                for highestRetro in [False, True]:
+                                                    if lowestRetro is True and middleRetro is True and highestRetro is True:
+                                                        continue
+                                                    if ((delayLowest == delayMiddle and lowestInvert == middleInvert and lowestRetro == middleRetro) or
+                                                        (delayLowest == delayHighest and lowestInvert == highestInvert and lowestRetro == highestRetro) or
+                                                        (delayMiddle == delayHighest and middleInvert == highestInvert and middleRetro == highestRetro)):
+                                                            continue # no continuous parallel motion            
+                                                    if (transLowest == transMiddle and delayLowest == delayMiddle and lowestRetro == False and middleRetro == True):
+                                                        continue # same as lowestRetro == True and middleRetro == False
+                                                    if (transLowest == transMiddle and delayLowest == delayMiddle and lowestInvert == False and middleInvert == True):
+                                                        continue # same as lowestInvert == True and middleInvert == False
+                                                    if (transLowest == 1 and transMiddle == 1):
+                                                        continue # if transHighest == 4 then it's the same as (-4, -4, 1) except for a few tritones
+                                                                    # if transHighest == 5 then it's the same as (-5, -5, 1) except for a few tritones 
+                                                    i += 1
+                                                    triplum = (transHighest, delayHighest, highestInvert, highestRetro)
+                                                    ct = (transMiddle, delayMiddle, middleInvert, middleRetro)
+                                                    tenor = (transLowest, delayLowest, lowestInvert, lowestRetro)
+                                                    unused_qjSolved, avgScore, unused_fullScore = prepareSolution(triplum, ct, tenor)
+                                                    #writeLine = (tripT, ctT, tenT, tripDelay, ctDelay, tenDelay, tripInvert, ctInvert, tenInvert, tripRetro, ctRetro, tenRetro, avgScore)
+                                                    writeLine = (transHighest, delayHighest, highestInvert, highestRetro, transMiddle, delayMiddle, middleInvert, middleRetro, transLowest, delayLowest, lowestInvert, lowestRetro, avgScore)
+                                                    if avgScore > 0:
+                                                        print ""
+                                                        if avgScore > maxScore:
+                                                            maxScore = avgScore
+                                                            print "***** ",
+                                                        print writeLine
+                                                    else:
+                                                        print str(i) + " ",
+                                                    csvFile.writerow(writeLine)
 
 class QuodJactaturException(exceptions21.Music21Exception):
     pass

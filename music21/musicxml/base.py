@@ -27,8 +27,8 @@ sys.stdin = currentStdIn
 sys.stderr = currentStdErr
 
 import os, copy
-import unittest, doctest
-import codecs
+import unittest
+#import codecs
 import StringIO # this module is not supported in python3
 # use io.StringIO  in python 3, avail in 2.6, not 2.5
 

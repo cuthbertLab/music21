@@ -16,10 +16,9 @@ from music21 import exceptions21
 
 from music21 import scale
 from music21 import stream
-from music21 import chord
 
 from music21 import environment
-_MOD = 'analysis/search.py'
+_MOD = 'analysis.search'
 environLocal = environment.Environment(_MOD)
 
 
@@ -254,7 +253,7 @@ class Test(unittest.TestCase):
         pass
 
     def testfindConsecutiveScaleA(self):
-        from music21 import corpus, scale, note
+        from music21 import note
 
         sc = scale.MajorScale('a4')
 
@@ -388,7 +387,7 @@ class Test(unittest.TestCase):
 
 
     def xtestfindConsecutiveScaleB(self):
-        from music21 import corpus, scale, note
+        from music21 import corpus
 
         scGMajor = scale.MajorScale('g4')
         scAMajor = scale.MajorScale('a4')

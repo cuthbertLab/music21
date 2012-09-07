@@ -574,7 +574,7 @@ class Dialog(object):
 
         If simulate is True, no action will be taken.
         '''
-        result = self.getResult()
+        dummy = self.getResult()
         if isinstance(self._result, DialogError):
             environLocal.printDebug('performAction() called, but result is an error: %s' % self._result)
             self._writeToUser(['No action taken.', ' '])
@@ -1297,7 +1297,7 @@ class SelectMusicXMLReader(SelectFilePath):
             # if user selected to open webpage, give them time to download
             # and install; so ask if ready to continue
             if post is True: 
-                for x in range(self._maxAttempts):
+                for dummy in range(self._maxAttempts):
                     d = YesOrNo(default=True, tryAgain=False, 
                         promptHeader='Are you ready to continue?')
                     d.askUser(force=force)
@@ -1547,7 +1547,7 @@ class TestExternal(unittest.TestCase):
         d.performAction()
 
 
-    def testSelectMusicXMLReader(self):
+    def testSelectMusicXMLReader2(self):
         print 
         environLocal.printDebug(['starting: SelectMusicXMLReader()'])
         d = SelectMusicXMLReader()
@@ -1656,7 +1656,7 @@ class Test(unittest.TestCase):
 #         d.performAction()
 
         
-    def testGetUserData(self):
+    def testGetUserData2(self):
 
         d = AskAutoDownload()
 #         d.askUser()

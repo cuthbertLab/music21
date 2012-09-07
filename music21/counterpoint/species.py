@@ -11,11 +11,10 @@ by VoiceLeadingQuartet, and that module should be used for future work
 
 import copy
 import random
-import unittest, doctest
+import unittest
 
 from music21.note import Note
 from music21 import converter
-from music21 import duration
 from music21 import exceptions21
 
 from music21 import interval
@@ -1797,8 +1796,6 @@ class TestExternal(unittest.TestCase):
     def runTest(self):
         pass
 
-    def runTest(self):
-        pass
    
     def testGenerateFirstSpecies(self):
         '''

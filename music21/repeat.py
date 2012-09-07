@@ -3429,17 +3429,16 @@ class Test(unittest.TestCase):
 
     def testExpandRepeatExpressionC(self):
         import stream, note
-        import music21.repeat as repeat
 
         # da capo al fine
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4', type='half'), 2)
         m2 = stream.Measure()
         m2.repeatAppend(note.Note('e4', type='half'), 2)
-        m2.append(repeat.Fine())
+        m2.append(Fine())
         m3 = stream.Measure()
         m3.repeatAppend(note.Note('g4', type='half'), 2)
-        m3.append(repeat.DaCapoAlFine())
+        m3.append(DaCapoAlFine())
         m4 = stream.Measure()
         m4.repeatAppend(note.Note('a4', type='half'), 2)
         s = stream.Part()
@@ -3457,19 +3456,18 @@ class Test(unittest.TestCase):
 
     def testExpandRepeatExpressionD(self):
         from music21 import stream, note
-        import music21.repeat as repeat
 
         # da capo al coda
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4', type='half'), 2)
         m2 = stream.Measure()
         m2.repeatAppend(note.Note('e4', type='half'), 2)
-        m2.append(repeat.Coda('to coda'))
+        m2.append(Coda('to coda'))
         m3 = stream.Measure()
         m3.repeatAppend(note.Note('g4', type='half'), 2)
-        m3.append(repeat.DaCapoAlCoda())
+        m3.append(DaCapoAlCoda())
         m4 = stream.Measure()
-        m4.append(repeat.Coda())
+        m4.append(Coda())
         m4.repeatAppend(note.Note('a4', type='half'), 2)
         m5 = stream.Measure()
         m5.repeatAppend(note.Note('b4', type='half'), 2)
@@ -3487,8 +3485,7 @@ class Test(unittest.TestCase):
 
     def testExpandRepeatExpressionE(self):
         import stream, note
-        import music21.repeat as repeat
-
+        from music21 import repeat
         # dal segno simple
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4', type='half'), 2)
@@ -3516,7 +3513,7 @@ class Test(unittest.TestCase):
 
     def testExpandRepeatExpressionF(self):
         from music21 import stream, note
-        import music21.repeat as repeat
+        from music21 import repeat
         # dal segno al fine
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4', type='half'), 2)
@@ -3546,7 +3543,7 @@ class Test(unittest.TestCase):
 
     def testExpandRepeatExpressionG(self):
         from music21 import stream, note
-        import music21.repeat as repeat
+        from music21 import repeat
         # dal segno al coda
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4', type='half'), 2)

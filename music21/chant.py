@@ -12,14 +12,11 @@
 from __future__ import unicode_literals
 
 import re
-import unittest, doctest, copy
-import os, sys
+import unittest
 import os.path
 
 from music21 import clef
 from music21 import common
-from music21 import duration
-from music21 import expressions
 from music21 import exceptions21
 from music21 import note
 from music21 import stream
@@ -239,14 +236,14 @@ class GregorianNote(note.Note):
        
         if asciiNote < asciiA:
             if usedDefaultClef is True:
-                raise GregorianChantException("note is too low for the default clef (AltoClef), choose a lower one")
+                raise ChantException("note is too low for the default clef (AltoClef), choose a lower one")
             else:
-                raise GregorianChantException("note is too low for the clef (%s), choose a lower one" % str(useClef))
+                raise ChantException("note is too low for the clef (%s), choose a lower one" % str(useClef))
         elif asciiNote > asciiM:
             if usedDefaultClef is True:
-                raise GregorianChantException("note is too high for the default clef (AltoClef), choose a higher one")
+                raise ChantException("note is too high for the default clef (AltoClef), choose a higher one")
             else:
-                raise GregorianChantException("note is too high for the clef (%s), choose a higher one" % str(useClef))
+                raise ChantException("note is too high for the clef (%s), choose a higher one" % str(useClef))
         else:
             return unichr(asciiNote)
 

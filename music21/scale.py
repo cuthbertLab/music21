@@ -52,8 +52,7 @@ next pitch. In all cases :class:`~music21.pitch.Pitch` objects are returned.
 '''
 
 import copy
-import unittest, doctest
-import re
+import unittest
 
 from music21 import base
 from music21 import common
@@ -576,10 +575,10 @@ class AbstractScale(Scale):
         '''Write the scale in a format. Here, prepare scala format if requested.
         '''
         if fmt is not None:
-            format, ext = common.findFormat(fmt)
+            fileFormat, ext = common.findFormat(fmt)
             if fp is None:
                 fpLocal = environLocal.getTempFile(ext)
-            if format in ['scala']:
+            if fileFormat in ['scala']:
                 ss = self.getScalaStorage(direction=direction)
                 sf = scala.ScalaFile(ss) # pass storage to the file
                 sf.open(fpLocal, 'w')
@@ -593,8 +592,8 @@ class AbstractScale(Scale):
         '''Show the scale in a format. Here, prepare scala format if requested.
         '''
         if fmt is not None:
-            format, ext = common.findFormat(fmt)
-            if format in ['scala']:
+            fileFormat, unused_ext = common.findFormat(fmt)
+            if fileFormat in ['scala']:
                 returnedFilePath = self.write(format, direction=direction)
                 environLocal.launch(format, returnedFilePath, app=app)
                 return
@@ -2336,8 +2335,8 @@ class ConcreteScale(Scale):
         Here, prepare scala format if requested.
         '''
         if fmt is not None:
-            format, ext = common.findFormat(fmt)
-            if format in ['scala']:
+            fileFormat, unused_ext = common.findFormat(fmt)
+            if fileFormat in ['scala']:
                 return self.abstract.write(fmt=fmt, fp=fp, direction=direction)
         return Scale.write(self, fmt=fmt, fp=fp)
 
@@ -2347,8 +2346,8 @@ class ConcreteScale(Scale):
         if requested.
         '''
         if fmt is not None:
-            format, ext = common.findFormat(fmt)
-            if format in ['scala']:
+            fileFormat, unused_ext = common.findFormat(fmt)
+            if fileFormat in ['scala']:
                 self.abstract.show(fmt=fmt, app=app, direction=direction)
                 return
         Scale.show(self, fmt=fmt, app=app)
@@ -3178,8 +3177,7 @@ class Test(unittest.TestCase):
     def testBasic(self):
         # deriving a scale from a Stream
 
-        # just get default, c-major, as derive will check all tonics
-        sc1 = MajorScale()
+        # just get default, c-minor, as derive will check all tonics
         sc2 = MinorScale()
 
         # we can get a range of pitches
@@ -3336,7 +3334,7 @@ class Test(unittest.TestCase):
          '<music21.scale.MajorScale A major>')
 
         sc1 = scale.HarmonicMinorScale()
-         # what scale has g# as its 7th degree
+        # what scale has g# as its 7th degree
         self.assertEqual(str(sc1.deriveByDegree(7, 'G#')), 
         '<music21.scale.HarmonicMinorScale A harmonic minor>')
         self.assertEqual(str(sc1.deriveByDegree(2, 'E')), 
@@ -3571,7 +3569,7 @@ class Test(unittest.TestCase):
         # either b or c; this selection is determined by weighted random
         # selection.
         post = []
-        for x in range(100):
+        for unused_x in range(100):
             post.append(sc.getScaleDegreeFromPitch('A1', 'ascending'))
         self.assertEqual(post.count(5) > 30, True)
         self.assertEqual(post.count(7) > 30, True)
@@ -3581,7 +3579,7 @@ class Test(unittest.TestCase):
         # either b or c; this selection is determined by weighted random
         # selection; can be 2 or 7
         post = []
-        for x in range(100):
+        for unused_x in range(100):
             post.append(sc.getScaleDegreeFromPitch('D-3', 'descending'))
         self.assertEqual(post.count(2) > 30, True)
         self.assertEqual(post.count(7) > 30, True)
@@ -3596,7 +3594,7 @@ class Test(unittest.TestCase):
 
         # descending from d-2, we can either go to c2 or b1
         post = []
-        for x in range(100):
+        for unused_x in range(100):
             post.append(str(sc.next('D-2', 'descending')))
         self.assertEqual(post.count('C2') > 30, True)
         self.assertEqual(post.count('B1') > 30, True)
@@ -3608,7 +3606,7 @@ class Test(unittest.TestCase):
 
         i = 0
         j = 0
-        for x in range(50):
+        for dummy in range(50):
             # over 50 iterations, it must be one of these two options
             match = self.pitchOut(sc.getPitches('c3', 'c4'))
             if match == '[C3, E-3, F3, G3, B-3, C4]':
@@ -3627,7 +3625,7 @@ class Test(unittest.TestCase):
         # test descending
         i = 0
         j = 0
-        for x in range(50):
+        for dummy in range(50):
             # over 50 iterations, it must be one of these two options
             match = self.pitchOut(sc.getPitches('c3', 'c4', direction='descending'))
             if match == '[C4, B-3, G3, F3, E-3, C3]':
@@ -3652,7 +3650,7 @@ class Test(unittest.TestCase):
 
         # this should always work, regardless of what scale is 
         # realized
-        for trial in range(30):
+        for unused_trial in range(30):
             self.assertEqual(str(sc.next('f#3', 'ascending')) in ['G3', 'F#3'], True)
             # presently this might return the same note, if the
             # F# is taken as out of the scale and then found back in the Scale
@@ -3693,7 +3691,7 @@ class Test(unittest.TestCase):
         # an exception may be raised for step that may not exist
         sc = WeightedHexatonicBlues('g3')
         exceptCount = 0
-        for x in range(10):
+        for dummy in range(10):
             post = None
             try:
                 post = sc.intervalBetweenDegrees(3, 4)
@@ -3828,7 +3826,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         
         # fokker_12.scl  Fokker's 7-limit 12-tone just scale
         # pyth_12.scl                    12  12-tone Pythagorean scale
-        from music21 import corpus, scale
+        from music21 import corpus
 
         s = corpus.parse('bwv66.6')
         p1 = s.parts[0]
@@ -3850,7 +3848,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         
         # fokker_12.scl  Fokker's 7-limit 12-tone just scale
         # pyth_12.scl                    12  12-tone Pythagorean scale
-        from music21 import corpus, scale
+        from music21 import corpus
 
         s = corpus.parse('bwv66.6')
         sc = ScalaScale('C4', 'fokker_12.scl')
@@ -3869,7 +3867,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         flats (except B-flat) to inflect the accidentals
         '''
         
-        from music21 import corpus, scale, instrument
+        from music21 import corpus, instrument
 
         s = corpus.parse('luca/gloria').measures(70,79)
         for p in s.parts:

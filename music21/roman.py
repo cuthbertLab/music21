@@ -161,14 +161,14 @@ def romanNumeralFromChord(chordObj, keyObj = None, preferSecondaryDominants = Fa
         isMajorThird = True
     else:
         isMajorThird = False
-    
+
     if isMajorThird is True:
         rootkeyObj = key.Key(root.name, mode='major')
     else:
         rootkeyObj = key.Key(root.name.lower(), mode='minor')
 
     if keyObj is None:
-        keyObj = rootKeyObj
+        keyObj = rootkeyObj
 
     fifthType = chordObjSemiclosed.semitonesFromChordStep(5)
     if fifthType == 6:

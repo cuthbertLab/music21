@@ -13,7 +13,7 @@
 '''Object models of bars and repeats. 
 '''
 
-import unittest, doctest
+import unittest
 
 from music21 import base
 from music21 import exceptions21

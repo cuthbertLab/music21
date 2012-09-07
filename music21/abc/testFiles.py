@@ -468,7 +468,7 @@ class Test(unittest.TestCase):
             environLocal.printDebug([ah.getTitle()])
             s = translate.abcToStreamScore(ah)
             # run musicxml processing to look for internal errors
-            out = m21ToString.music21ObjectToMusicXML(s)
+            dummy = m21ToString.music21ObjectToMusicXML(s)
 
 
 if __name__ == "__main__":

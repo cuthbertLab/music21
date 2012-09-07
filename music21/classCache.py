@@ -160,7 +160,7 @@ class ClassCache(object):
         '''Return True/False if this class is found. 
         '''
         try: # for performance, try a direct match first
-            r = self.repositories[className]
+            unused_r = self.repositories[className]
             return True
         except KeyError: # string match not possible
             return False
@@ -198,7 +198,7 @@ class ClassCache(object):
         Traceback (most recent call last):
         ClassCacheException: can only process single class names given as a string
         '''
-        matchKeys = []
+        #matchKeys = []
         #environLocal.printDebug(['getElementsByClass', 'classFilterList', classFilterList])
 
         # for now, can only match a single class, as this will be in the 
@@ -361,7 +361,7 @@ class Test(unittest.TestCase):
 
     def testBasicB(self):
         from music21.musicxml import testPrimitive
-        from music21 import converter, clef
+        from music21 import converter
 
         mxString = testPrimitive.clefs12a
         a = converter.parse(mxString)

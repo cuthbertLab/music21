@@ -13,16 +13,11 @@
 
 import unittest
 
-import copy
-import math
 import os
-import random
-import sys
-from time import time
+#from time import time
 
-from music21 import scale, stream, note, pitch
+from music21 import scale
 from music21.audioSearch import base as audioSearchBase
-from music21.audioSearch import recording
 from music21 import environment
 _MOD = 'audioSearch/transcriber.py'
 environLocal = environment.Environment(_MOD)
@@ -62,7 +57,6 @@ def runTranscribe(show=True, plot=True, useMic=True,
         WAVE_FILENAME = False
     
     # the rest of the score
-    time_start = time()
     if useMic is True:
         freqFromAQList = audioSearchBase.getFrequenciesFromMicrophone(length=seconds, storeWaveFilename=WAVE_FILENAME)
     else:
@@ -72,7 +66,7 @@ def runTranscribe(show=True, plot=True, useMic=True,
     detectedPitchesFreq = audioSearchBase.smoothFrequencies(detectedPitchesFreq)
     (detectedPitchObjects, listplot) = audioSearchBase.pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
     (notesList, durationList) = audioSearchBase.joinConsecutiveIdenticalPitches(detectedPitchObjects)
-    myScore, length_part = audioSearchBase.notesAndDurationsToStream(notesList, durationList, removeRestsAtBeginning=True)    
+    myScore, unused_length_part = audioSearchBase.notesAndDurationsToStream(notesList, durationList, removeRestsAtBeginning=True)    
 
     if show == True:
         myScore.show()        
@@ -122,9 +116,9 @@ def monophonicStreamFromFile(fileName, useScale=None):
         
     detectedPitchesFreq = audioSearchBase.detectPitchFrequencies(freqFromAQList, useScale)
     detectedPitchesFreq = audioSearchBase.smoothFrequencies(detectedPitchesFreq)
-    (detectedPitchObjects, listplot) = audioSearchBase.pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
+    (detectedPitchObjects, unused_listplot) = audioSearchBase.pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
     (notesList, durationList) = audioSearchBase.joinConsecutiveIdenticalPitches(detectedPitchObjects)
-    myScore, length_part = audioSearchBase.notesAndDurationsToStream(notesList, durationList, removeRestsAtBeginning=True)    
+    myScore, unused_length_part = audioSearchBase.notesAndDurationsToStream(notesList, durationList, removeRestsAtBeginning=True)    
     return myScore.parts[0]
 
 
@@ -141,7 +135,7 @@ class TestExternal(unittest.TestCase):
     
     def xtestTranscribePachelbel(self):
         saveFile = environLocal.getRootTempDir() + os.path.sep + 'pachelbel.wav'
-        myScore = runTranscribe(useMic=False, saveFile=saveFile, plot=False, show=False)
+        unused_myScore = runTranscribe(useMic=False, saveFile=saveFile, plot=False, show=False)
         #myScore.show()
 
 

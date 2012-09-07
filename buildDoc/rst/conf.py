@@ -10,8 +10,7 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
-import sys, os
-import unittest, doctest
+import unittest
 import music21
 
 

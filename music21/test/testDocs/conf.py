@@ -8,9 +8,6 @@
 # Copyright:    (c) 2011 The music21 Project
 # License:      LGPL
 #-------------------------------------------------------------------------------
-
-import sys, os
-import unittest, doctest
 import music21
 
 

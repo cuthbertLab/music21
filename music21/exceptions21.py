@@ -13,14 +13,5 @@ class Music21Exception(Exception):
     pass
 
 # should be renamed:
-class DefinedContextsException(Music21Exception):
-    pass
-
-class Music21ObjectException(Music21Exception):
-    pass
-
-class ElementException(Music21Exception):
-    pass
-
 class GroupException(Music21Exception):
     pass

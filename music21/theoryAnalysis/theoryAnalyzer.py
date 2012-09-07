@@ -137,14 +137,12 @@ can easily be written (reference getPassingTones for example)
 import music21
 
 from music21 import common
-from music21 import converter
 from music21 import corpus
 from music21 import interval
 from music21 import voiceLeading
 from music21 import roman
 from music21 import chord
 from music21 import key
-import copy
 from music21.theoryAnalysis import theoryResult
 
 import string
@@ -782,7 +780,8 @@ def _identifyBasedOnNote(score, partNum, color, dictKey, testFunction, textFunct
 def _identifyBasedOnVerticalSlice(score, color, dictKey, testFunction, textFunction, responseOffsetMap=[]):
     addAnalysisData(score)
     if 'VerticalSlices' not in score.analysisData.keys():
-        vslist = getVerticalSlices(score)
+        unused_vslist = getVerticalSlices(score)
+    
     for vs in score.analysisData['VerticalSlices']:
         if responseOffsetMap and vs.offset(leftAlign=True) not in responseOffsetMap:
             continue
@@ -2123,12 +2122,11 @@ class TestExternal(unittest.TestCase):
         
         #sc.show()
     def removeNHTones(self):
-        from music21 import corpus
         from music21.theoryAnalysis import theoryAnalyzer
         p = corpus.parse('bwv6.6').measures(0,20)
         p.show()
-        theoryAnalysis.theoryAnalyzerremovePassingTones(p)
-        theoryAnalysis.theoryAnalyzerremoveNeighborTones(p)
+        theoryAnalyzer.removePassingTones(p)
+        theoryAnalyzer.removeNeighborTones(p)
         p.show()
         
 if __name__ == "__main__":

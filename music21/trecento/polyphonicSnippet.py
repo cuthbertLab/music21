@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import copy
-import unittest, doctest
+import unittest
 
 from music21 import clef
 from music21 import metadata
@@ -121,7 +121,6 @@ class PolyphonicSnippet(stream.Score):
 
 
     def _padParts(self):
-        foundTs = False
         for thisVoice in self.parts:        
             # thisVoice is a type of stream.Stream()
             
@@ -374,7 +373,7 @@ class Test(unittest.TestCase):
                 continue
             elif callable(part):
                 #environLocal.printDebug(['testing copying on', part])
-                obj = getattr(module, part)()
+                obj = getattr([self.__module__, part])()
                 a = copy.copy(obj)
                 b = copy.deepcopy(obj)
                 self.assertNotEqual(a, obj)

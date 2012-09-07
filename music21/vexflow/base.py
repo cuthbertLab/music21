@@ -2125,8 +2125,8 @@ class VexflowContext(object):
         self.canvasHTML = '<canvas '
 
         if applyAttributes:
-            for (parameter, value) in params.items():
-                if not common.isnum(value) and not value.isdigit():
+            for (parameter, value) in self.params.items():
+                if not common.isNum(value) and not value.isdigit():
                     value = '"' + str(value) + '"'
                 self.canvasHTML += str(parameter) + '=' + str(value) + ' '
 

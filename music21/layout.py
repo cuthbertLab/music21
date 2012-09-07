@@ -23,11 +23,9 @@
 
 # may need to have object to convert between size units
 
-import string, copy, math
-import unittest, doctest
+import unittest
 
 from music21 import base
-from music21 import common
 from music21 import spanner
 
 #-------------------------------------------------------------------------------
@@ -303,7 +301,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(len(systemLayoutList), 4)
 
         #s.show()
-        raw = m21ToString.music21ObjectToMusicXML(s)
+        unused_raw = m21ToString.music21ObjectToMusicXML(s)
 
     def testGetPageMeasureNumbers(self):
         from music21 import corpus

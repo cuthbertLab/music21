@@ -27,11 +27,11 @@ users of 64-bit windows and 64-bit python should download the amd64 port
 
 '''
 import os
-import sys
-import time
-import unittest, doctest
+import unittest
 import wave
 
+
+from music21 import exceptions21
 from music21 import common
 from music21 import environment
 _MOD = "audiosearch.recording.py"
@@ -72,7 +72,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
         recordFormat = recordFormatDefault
 
     if recordFormat == pyaudio.paInt8:
-        raise AudioSearchException("cannot perform freq_from_autocorr on 8-bit samples")
+        raise RecordingException("cannot perform freq_from_autocorr on 8-bit samples")
     
     p_audio = pyaudio.PyAudio()
     st = p_audio.open(format=recordFormat,
@@ -108,10 +108,12 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
             wf.writeframes(data)
             wf.close()
         except IOError:
-            raise AudioSearchException("Cannot open %s for writing." % waveFilename)
+            raise RecordingException("Cannot open %s for writing." % waveFilename)
     return storedWaveSampleList
 
 
+class RecordingException(exceptions21.Music21Exception):
+    pass
 
 
 #------------------------------------------

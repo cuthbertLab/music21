@@ -1,21 +1,23 @@
 # -*- coding: utf-8 -*-
 
 from music21 import *
-from music21 import lily
 from music21.trecento import cadencebook
 #this is a terrible way of doing this...
 from music21.trecento import find_vatican1790 
 from music21.trecento.find_vatican1790 import *
-from music21.lily import *
+
+from music21 import stream
+
 
 def find():
+    opus = stream.Opus()
     ballatas = cadencebook.BallataSheet()
     alllily = ''
     for ballata in ballatas:
         #print ballata.fischerNum
 #        try:
             if findinwork(ballata):
-                alllily = alllily + ballata.getAllLily()
+                
                 print(ballata.title + ' has a seventh somewhere')
 #        except:
 #            pass

@@ -23,12 +23,6 @@ Low level ABC conversion is facilitated by the objects in this module and :func:
 import unittest
 import re, codecs
 
-try:
-    import StringIO # python 2 
-except:
-    from io import StringIO # python3 (also in python 2.6+)
-
-
 from music21 import common
 from music21 import environment
 from music21 import exceptions21
@@ -313,7 +307,7 @@ class ABCMetadata(ABCToken):
         if parameters == None:
             return None
         else:
-            n, d, symbol = parameters
+            n, d, unused_symbol = parameters
             return meter.TimeSignature('%s/%s' % (n,d))
 
 
@@ -497,15 +491,15 @@ class ABCMetadata(ABCToken):
         if '"' in self.data:
             tempoStr = []
             nonText = []
-            open = False
+            isOpen = False
             for char in self.data:
-                if char == '"' and not open:
-                    open = True
+                if char == '"' and not isOpen:
+                    isOpen = True
                     continue
-                if char == '"' and open:
-                    open = False
+                if char == '"' and isOpen:
+                    isOpen = False
                     continue
-                if open:
+                if isOpen:
                     tempoStr.append(char)
                 else: # gather all else
                     nonText.append(char) 
@@ -590,7 +584,7 @@ class ABCMetadata(ABCToken):
             parameters = self._getTimeSignatureParameters()
             if parameters == None:
                 return .5 # TODO: assume default, need to configure
-            n, d, symbol = parameters
+            n, d, unused_symbol = parameters
             if float(n) / d < .75:
                 return .25 # less than 0.75 the default is a sixteenth note
             else:
@@ -1035,11 +1029,11 @@ class ABCNote(ABCToken):
 
         # get an accidental string
         accString = ''
-        for x in range(strSrc.count("_")):
+        for i in range(strSrc.count("_")):
             accString += '-' # m21 symbols
-        for x in range(strSrc.count("^")):
+        for i in range(strSrc.count("^")):
             accString += '#' # m21 symbols
-        for x in range(strSrc.count("=")):
+        for i in range(strSrc.count("=")):
             accString += 'n' # m21 symbols
 
         # if there is an explicit accidental, regardless of key, it should
@@ -1405,7 +1399,7 @@ class ABCHandler(object):
                 break
 
             q = self._getLinearContext(strSrc, i)
-            cPrev, c, cNext, cNextNext = q
+            unused_cPrev, c, cNext, cNextNext = q
             #cPrevNotSpace, cPrev, c, cNext, cNextNotSpace, cNextNext = q
             
             # comment lines, also encoding defs
@@ -1608,7 +1602,7 @@ class ABCHandler(object):
 
         # pre-parse : call on objects that need preliminary processing
         # metadata, for example, is parsed
-        lastTimeSignature = None
+        #lastTimeSignature = None
         for t in self._tokens:
             #environLocal.printDebug(['tokenProcess: calling preParse()', t.src])
             t.preParse()
@@ -1622,7 +1616,7 @@ class ABCHandler(object):
         for i in range(len(self._tokens)):
             # get context of tokens
             q = self._getLinearContext(self._tokens, i)
-            tPrev, t, tNext, tNextNext = q
+            tPrev, t, tNext, unused_tNextNext = q
             #tPrevNotSpace, tPrev, t, tNext, tNextNotSpace, tNextNext = q
             #environLocal.printDebug(['tokenProcess: calling parse()', t])
             
@@ -2261,7 +2255,8 @@ class ABCFile(object):
     def openFileLike(self, fileLike):
         '''Assign a file-like object, such as those provided by StringIO, as an open file object.
 
-        >>> fileLikeOpen = StringIO.StringIO()
+        >>> from io import StringIO
+        >>> fileLikeOpen = StringIO()
         '''
         self.file = fileLike # already 'open'
     

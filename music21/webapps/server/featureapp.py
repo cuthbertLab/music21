@@ -27,12 +27,8 @@ where the contents of the POST is a POST from a form containing a zip file.
 
 '''
 
-from music21 import webapps
-
 from music21 import common
 from music21 import converter
-from music21 import note
-from music21 import interval
 from music21 import features
 
 import zipfile

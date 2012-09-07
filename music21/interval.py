@@ -24,7 +24,7 @@ Numerous utility functions are provided for processing and generating intervals.
 
 import copy
 import math
-import unittest, doctest
+import unittest
 
 from music21 import base
 from music21 import common 

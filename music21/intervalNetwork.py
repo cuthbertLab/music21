@@ -30,7 +30,7 @@ Both nodes and edges can be weighted to suggest tonics, dominants,
 finals, or other attributes of the network. 
 '''
 
-import unittest, doctest
+import unittest
 import copy
 from music21 import exceptions21
 from music21 import interval

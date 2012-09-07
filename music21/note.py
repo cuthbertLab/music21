@@ -20,20 +20,15 @@ import copy
 import unittest
 
 from music21 import base
-from music21 import articulations
 from music21 import common
-from music21 import defaults
 from music21 import duration
 from music21 import exceptions21
-from music21 import instrument
 from music21 import interval
 from music21 import editorial
 #from music21 import midi as midiModule
-from music21.midi import translate as midiTranslate
 from music21 import expressions
 from music21 import pitch
 from music21 import beam
-from music21 import meter
 from music21 import tie
 from music21 import volume
 
@@ -1428,7 +1423,7 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types, copy
+        import sys, types
         for part in sys.modules[self.__module__].__dict__.keys():
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -1647,7 +1642,7 @@ class Test(unittest.TestCase):
 
 
     def testNoteEquality(self):
-        from music21 import articulations, tie
+        from music21 import articulations
 
         n1 = Note('a#')
         n2 = Note('g')
@@ -1778,8 +1773,7 @@ class Test(unittest.TestCase):
     def testVolumeA(self):
         from music21 import note, volume
         v1 = volume.Volume()
-        v2 = volume.Volume()
-
+        
         n1 = note.Note()
         n2 = note.Note()
         
@@ -1795,9 +1789,8 @@ class Test(unittest.TestCase):
     def testVolumeB(self):
         # manage deepcopying properly
 
-        from music21 import note, volume
+        from music21 import note
         n1 = note.Note()
-        n2 = note.Note()
 
         n1.volume.velocity = 100
         self.assertEqual(n1.volume.velocity, 100)
@@ -1808,17 +1801,17 @@ class Test(unittest.TestCase):
         self.assertEqual(n1Copy.volume.parent, n1Copy)
 
 
-    def testSerializationA(self):
-        from music21 import note
-
-        gn = note.GeneralNote()
-        #print gn.json
-
-        nr = note.NotRest()
-        #print nr.json
-
-        n = note.Note()
-        #print n.json
+#    def testSerializationA(self):
+#        from music21 import note
+#
+#        gn = note.GeneralNote()
+#        #print gn.json
+#
+#        nr = note.NotRest()
+#        #print nr.json
+#
+#        n = note.Note()
+#        #print n.json
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

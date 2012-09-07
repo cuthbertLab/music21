@@ -19,9 +19,7 @@ specific to a given application as well as a set of commands specific to the var
 '''
 
 import unittest
-import doctest
 
-from music21 import converter
 
 import templates
 

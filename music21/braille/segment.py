@@ -330,7 +330,7 @@ class BrailleSegment(collections.defaultdict):
                     if isinstance(keyOrTimeSig, key.KeySignature):
                         keySignature = keyOrTimeSig
                     else:
-                         timeSignature = keyOrTimeSig
+                        timeSignature = keyOrTimeSig
             elif self._currentGroupingKey % 10 == AFFINITY_TTEXT:
                 tempoText = self.get(self._currentGroupingKey)[0]
             elif self._currentGroupingKey % 10 == AFFINITY_MMARK:
@@ -579,7 +579,7 @@ class BrailleGrandSegment():
                     if isinstance(useElement, key.KeySignature):
                         keySignature = useElement[0]
                     else:
-                         timeSignature = useElement[0]
+                        timeSignature = useElement[0]
             elif useKey % 10 == AFFINITY_TTEXT:
                 tempoText = useElement[0]
             elif useKey % 10 == AFFINITY_MMARK:

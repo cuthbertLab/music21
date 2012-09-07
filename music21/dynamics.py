@@ -15,8 +15,7 @@ Classes and functions for creating and manipulating dynamic symbols. Rather than
 subclasses, the :class:`~music21.dynamics.Dynamic` object is often specialized by parameters. 
 '''
 
-import unittest, doctest
-import copy
+import unittest
 
 from music21 import base
 from music21 import exceptions21
@@ -256,7 +255,7 @@ class Dynamic(base.Music21Object):
             try:
                 value = float(value)
             except (ValueError):
-                raise TextExpressionException('Not a supported size: %s' % value)
+                raise DynamicException('Not a supported size: %s' % value)
             self._positionDefaultY = value
     
     positionVertical = property(_getPositionVertical, _setPositionVertical,
@@ -406,8 +405,8 @@ class Test(unittest.TestCase):
                     obj = name()
                 except TypeError:
                     continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                unused_a = copy.copy(obj)
+                unused_b = copy.deepcopy(obj)
 
 
     def testBasic(self):
@@ -422,7 +421,6 @@ class Test(unittest.TestCase):
 
     def testCorpusDyanmicsWedge(self):
         from music21 import corpus
-        import music21
         a = corpus.parse('opus41no1/movement2') # has dynamics!
         b = a.parts[0].flat.getElementsByClass("Dynamic")
         self.assertEquals(len(b), 35)
@@ -444,7 +442,7 @@ class Test(unittest.TestCase):
         from music21 import stream, note, dynamics
         s = stream.Stream()
         selections = ['pp', 'f', 'mf', 'fff']
-        positions = [-20, 0, 20]
+        #positions = [-20, 0, 20]
         for i in range(10):
             d = dynamics.Dynamic(selections[i % len(selections)])
             #d.positionVertical = positions[i%len(positions)]
@@ -454,7 +452,7 @@ class Test(unittest.TestCase):
 
     def testDynamicsPositionB(self):
         import random
-        from music21 import stream, note, expressions, layout, dynamics
+        from music21 import stream, note, layout, dynamics
         s = stream.Stream()
         for i in range(6):
             m = stream.Measure(number=i + 1)

@@ -118,8 +118,11 @@ Module Reference
    moduleMusedataBase
    moduleMusedataTranslate
    moduleMusedataBase40
+   moduleMusicxmlBase
+   moduleMusicxmlM21ToString
    moduleMusicxmlTranslate
    moduleNote
+   moduleNoteworthyBase
    moduleNoteworthyTranslate
    modulePitch
    moduleRepeat

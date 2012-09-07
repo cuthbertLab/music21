@@ -17,13 +17,13 @@ import getpass, os
 def getDirBuildHtml():
     '''Return the html directory
     '''
-    dir = os.getcwd()
-    parentDir = os.path.dirname(dir)
+    cwdir = os.getcwd()
+    parentDir = os.path.dirname(cwdir)
     parentContents = os.listdir(parentDir)
     # make sure we are in the the proper directory
-    if (not dir.endswith("buildDoc") or 
+    if (not cwdir.endswith("buildDoc") or 
         'music21' not in parentContents):
-        raise Exception("not in the music21%sbuildDoc directory: %s" % (os.sep, dir))
+        raise Exception("not in the music21%sbuildDoc directory: %s" % (os.sep, cwdir))
     dirBuild = os.path.join(parentDir, 'music21', 'doc')
     dirBuildHtml = os.path.join(dirBuild, 'html')
     return dirBuildHtml

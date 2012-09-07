@@ -13,18 +13,18 @@
 from __future__ import unicode_literals
 
 
-import unittest, doctest
+import unittest
 import os, sys, webbrowser, re
 import shutil
 import types, inspect
-import codecs
+#import codecs
 
 import music21
 from music21 import exceptions21
 
 from music21.abc import base as abc
 from music21.abc import translate as abcTranslate
-from music21 import abj
+#from music21 import abj
 from music21.abj import translate as abjTranslate
 
 from music21.analysis import correlate as analysisCorrelate
@@ -58,7 +58,7 @@ from music21 import chord
 from music21 import clef
 from music21 import common
 
-from music21 import composition
+#from music21 import composition
 from music21.composition import phasing as compositionPhasing
 
 from music21 import contour
@@ -124,12 +124,14 @@ from music21.musedata import base as musedata
 from music21.musedata import translate as musedataTranslate
 from music21.musedata import base40 as musedataBase40
 
-from music21.musicxml import base as musicxml
+from music21.musicxml import base as musicxmlBase
+from music21.musicxml import m21ToString as musicxmlM21ToString
 from music21.musicxml import translate as musicxmlTranslate
 
 from music21 import note
 
-from music21.noteworthy import base as noteworthy
+#no docs
+#from music21.noteworthy import base as noteworthyBase
 from music21.noteworthy import translate as noteworthyTranslate
 
 from music21.romanText import base as romanText
@@ -174,11 +176,6 @@ from music21 import volume
 from music21.webapps import base as webapps
 #from music21.webapps import music21wsgiapp as webappsMusic21WsgiApp
 from music21 import xmlnode
-
-
-
-from music21.webapps import base as webapps
-
 
 
 #from music21 import environment #redundant
@@ -302,10 +299,13 @@ MODULES = [
     musedataTranslate,
     musedataBase40,
     
+    musicxmlBase,
+    musicxmlM21ToString,
     musicxmlTranslate,
 
     note, 
     
+#    noteworthyBase,
     noteworthyTranslate,
 
     pitch,
@@ -779,7 +779,7 @@ class PartitionedClass(PartitionedName):
         1
         '''        
         i = self.names.index(partName)
-        name, mroIndex = self.namesMroIndex[i]
+        unused_name, mroIndex = self.namesMroIndex[i]
         return mroIndex
 
     def mroIndices(self):
@@ -816,7 +816,7 @@ class PartitionedClass(PartitionedName):
 
 
     def getDefiningClass(self, partName):
-        element = getElement(partName)
+        element = self.getElement(partName)
         return element.defining_class
 
     def getClassFromMroIndex(self, mroIndex):
@@ -1393,7 +1393,7 @@ class ClassDoc(RestructuredWriter):
 
 
     def _fmtRstAttribute(self, name):
-        signature = self.partitionedClass.getSignature(name)
+        #signature = self.partitionedClass.getSignature(name)
         msg = []
         msg.append('%s.. attribute:: %s\n\n' %  (INDENT*2, name))
         #msg.append('**%s%s**\n\n' % (nameFound, postfix))   
@@ -1573,8 +1573,8 @@ class ModuleDoc(RestructuredWriter):
         self.docCooked = self.formatDocString(modNameEval.__doc__, 
                          modName=self.modName)
 
-        def capFirst(str): # not the same as .title()
-            return str[0].upper() + str[1:]
+        def capFirst(stringVar): # not the same as .title()
+            return stringVar[0].upper() + stringVar[1:]
 
         # file name for this module; leave off music21 part
         fn = self.modName.split('.')
@@ -1632,7 +1632,7 @@ class ModuleDoc(RestructuredWriter):
                     signature = self.partitionedModule.getSignature(partName)
                     subMsg.append(self._fmtRstFunction(partName, signature))
                     #msg += '.. function:: %s()\n\n' % partName
-                     #msg.append('%s\n' % self.functions[funcName]['doc'])
+                    #msg.append('%s\n' % self.functions[funcName]['doc'])
                 if group == 'classes':
                     qualifiedName = '%s.%s' % (self.modName, partName)
                     classDoc = ClassDoc(qualifiedName, modName=self.modName)
@@ -1751,7 +1751,7 @@ class Documentation(RestructuredWriter):
         for fp in [self.dirBuild, self.dirBuildHtml, 
                   #self.dirBuildLatex,
                   self.dirBuildDoctrees]:
-                  #self.dirBuildPdf]:
+                    #self.dirBuildPdf]:
             if os.path.exists(fp):
                 # delete old paths?
                 pass
@@ -1846,10 +1846,10 @@ class Documentation(RestructuredWriter):
 
 
     #---------------------------------------------------------------------------
-    def main(self, format):
+    def main(self, buildFormat):
         '''Create the documentation. 
         '''
-        if format not in FORMATS:
+        if buildFormat not in FORMATS:
             raise Exception, 'bad format'
         print ("Copying static documentation")
         self.copyStaticDocumentation()
@@ -1860,16 +1860,16 @@ class Documentation(RestructuredWriter):
         print ("Writing contents")
         self.writeContents()    
 
-        if format == 'html':
+        if buildFormat == 'html':
             dirOut = self.dirBuildHtml
             pathLaunch = os.path.join(self.dirBuildHtml, 'contents.html')
-        elif format == 'latex':
+        elif buildFormat == 'latex':
             dirOut = self.dirBuildLatex
             #pathLaunch = os.path.join(dirBuildHtml, 'contents.html')
-        elif format == 'pdf':
+        elif buildFormat == 'pdf':
             dirOut = self.dirBuildPdf
         else:
-            raise Exception('undefined format %s' % format)
+            raise Exception('undefined format %s' % buildFormat)
 
         if common.getPlatform() in ['darwin', 'nix', 'win']:
             # -b selects the builder
@@ -1877,12 +1877,12 @@ class Documentation(RestructuredWriter):
                 import sphinx
             except ImportError:
                 raise BuildException("Building documentation requires the Sphinx toolkit. Download it by typing 'easy_install -U Sphinx' at the command line or at http://sphinx.pocoo.org/")
-            sphinxList = ['sphinx', '-E', '-b', format, 
+            sphinxList = ['sphinx', '-E', '-b', buildFormat, 
                          '-d', self.dirBuildDoctrees,
                          self.dirRst, dirOut] 
-            statusCode = sphinx.main(sphinxList)
+            unused_statusCode = sphinx.main(sphinxList)
 
-        if format == 'html':
+        if buildFormat == 'html':
             if pathLaunch.find('\\'):
                 pass
             else:
@@ -2065,13 +2065,13 @@ if __name__ == '__main__':
         music21.mainTest(Test)
         buildDoc = False
     elif len(sys.argv) == 2 and sys.argv[1] in FORMATS:
-        format = [sys.argv[1]]
+        formatList = [sys.argv[1]]
         buildDoc = True
     else:
-        format = ['html']#, 'pdf']
+        formatList = ['html']#, 'pdf']
         buildDoc = True
 
     if buildDoc:
-        for fmt in format:
+        for fmt in formatList:
             a = Documentation()
             a.main(fmt)

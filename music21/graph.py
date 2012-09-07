@@ -22,14 +22,13 @@ to graphing data and structures in
 :class:`~music21.stream.Stream` objects.
 '''
 
-import unittest, doctest
-import random, math, sys, os
+import unittest
+import random, math, os
 
 from music21 import note
 from music21 import dynamics
 from music21 import exceptions21
 
-from music21 import duration
 from music21 import pitch
 from music21 import common
 from music21 import chord

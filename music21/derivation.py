@@ -11,7 +11,7 @@
 '''This module defines objects for tracking the derivation of one :class:`~music21.stream.Stream` from another.
 '''
 
-import doctest, unittest
+import unittest
 
 from music21 import base
 from music21 import common

@@ -175,7 +175,7 @@ def base40DeltaToInterval(delta):
     
     direction = 1
     if delta < 0:
-       direction = -1
+        direction = -1
        
     simpleDelta = abs(delta) % 40
     

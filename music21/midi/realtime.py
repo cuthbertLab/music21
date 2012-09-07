@@ -19,7 +19,7 @@ From an idea of Joe "Codeswell":
 
 Requires pygame: http://www.pygame.org/download.shtml
 '''
-from music21.base import Music21Exception
+from music21.exceptions21 import Music21Exception
 from music21.midi import translate as midiTranslate
 
 import unittest
@@ -68,8 +68,8 @@ class StreamPlayer(object):
     
     def __init__(self, streamIn, **keywords):
         try:
-           import pygame
-           self.pygame = pygame
+            import pygame
+            self.pygame = pygame
         except ImportError:
             raise StreamPlayerException("StreamPlayer requires pygame.  Install first")
         if self.mixerInitialized is False or ("reinitMixer" in keywords and keywords["reinitMixer"] != False):

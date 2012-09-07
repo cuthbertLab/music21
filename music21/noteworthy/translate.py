@@ -59,8 +59,7 @@ Module to translate Noteworthy Composer's NWCTXT format to music21.
 # Pos2? Dur2?
 # |Chord|Dur:8th|Pos:-4,n-3,b-2,#-1,x0,v1,2x|Opts:Stem=Down,Crescendo|Dur2:8th,DblDotted|Pos2:3x
 
-
-from music21.base import Music21Exception
+from music21.exceptions21 import Music21Exception
 from music21 import duration
 from music21 import note
 from music21 import pitch
@@ -81,7 +80,7 @@ environLocal = environment.Environment(_MOD)
 
 from music21.noteworthy import base as noteworthyModule
 
-import unittest, doctest
+import unittest
 
 
 # initializations
@@ -577,7 +576,7 @@ class NoteworthyTranslator(object):
             elif attributes['OctaveShift'] == 'Octave Up':
                 octaveShift = 1
             else:
-                raise NoteworthyTranslateException('Did not get a proper octave shift from %s' % parseElements[3])
+                raise NoteworthyTranslateException('Did not get a proper octave shift from %s' % attributes[3])
         else:
             octaveShift = 0
  
@@ -606,12 +605,12 @@ class NoteworthyTranslator(object):
     
         elif cl == "Alto":
             if octaveShift != 0: 
-                raise NoteWorthyTranslateException('cannot shift octaves on an alto clef')
+                raise NoteworthyTranslateException('cannot shift octaves on an alto clef')
             self.currentMeasure.append(clef.AltoClef())
             currentClef = "ALTO" 
         elif cl == "Tenor":
             if octaveShift != 0: 
-                raise NoteWorthyTranslateException('cannot shift octaves on a tenor clef')
+                raise NoteworthyTranslateException('cannot shift octaves on a tenor clef')
             self.currentMeasure.append(clef.TenorClef())
             currentClef = "TENOR" 
         if currentClef is None:

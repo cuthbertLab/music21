@@ -13,8 +13,9 @@
 Utility routines for processing text in scores and other musical objects. 
 '''
 
-import doctest, unittest
+import unittest
 import os
+import random
 
 #import music21 # needed to properly do isinstance checking
 

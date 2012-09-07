@@ -23,7 +23,7 @@ TODO: replace .size with a string representing interval and then
 create interval.Interval objects only when necessary.
 '''
 import copy
-import doctest, unittest
+import unittest
 
 from music21 import interval
 from music21 import base
@@ -527,7 +527,7 @@ class Trill(Ornament):
             numberOfTrillNotes = int(srcObject.duration.quarterLength / self.quarterLength)
             
         trillNotes = []
-        for i in range(numberOfTrillNotes / 2):
+        for unused_counter in range(numberOfTrillNotes / 2):
             firstNote = copy.deepcopy(srcObject)
             #TODO: remove expressions
             firstNote.duration.quarterLength = self.quarterLength
@@ -939,7 +939,7 @@ class Test(unittest.TestCase):
         
 
     def testGetRepeatExpression(self):
-        from music21 import stream, expressions, repeat
+        from music21 import expressions
 
         te = expressions.TextExpression('lightly')
         # no repeat expression is possible
@@ -1017,7 +1017,7 @@ class Test(unittest.TestCase):
         '''Test basic wave line creation and output, as well as passing
         objects through make measure calls. 
         '''
-        from music21 import stream, note, spanner, chord, expressions
+        from music21 import stream, note, chord, expressions
         from music21.musicxml import m21ToString
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)

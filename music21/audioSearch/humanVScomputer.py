@@ -12,18 +12,17 @@
 #-------------------------------------------------------------------------------
 
 
-from music21 import environment
-from music21 import scale, stream, note, pitch
-from music21.audioSearch.base import *
+from music21 import scale, note
+from music21.audioSearch import base
+#from music21.audioSearch.base import *
 import time
 import random
 
 
 
 def runGame():
-    from music21.audioSearch import recording 
     useScale = scale.ChromaticScale('C4')
-    round = 0
+    roundNumber = 0
     good = True
     gameNotes = []
     
@@ -40,18 +39,18 @@ def runGame():
         fullNameNote = "%s%d" % (nameNotes[randomNumber], octaveNumber)
         gameNotes.append(note.Note(fullNameNote))   
         
-        round = round + 1
-        print "ROUND %d" % round
+        roundNumber = roundNumber + 1
+        print "ROUND %d" % roundNumber
         print "NOTES UNTIL NOW: (this will not be shown in the final version)"
         for k in range(len(gameNotes)):
             print gameNotes[k].fullName
         
-        seconds = 2 * round + 2
-        freqFromAQList = getFrequenciesFromMicrophone(length=seconds, storeWaveFilename=None)
-        detectedPitchesFreq = detectPitchFrequencies(freqFromAQList, useScale)
-        detectedPitchesFreq = smoothFrequencies(detectedPitchesFreq)
-        (detectedPitchObjects, listplot) = pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
-        (notesList, durationList) = joinConsecutiveIdenticalPitches(detectedPitchObjects)
+        seconds = 2 * roundNumber + 2
+        freqFromAQList = base.getFrequenciesFromMicrophone(length=seconds, storeWaveFilename=None)
+        detectedPitchesFreq = base.detectPitchFrequencies(freqFromAQList, useScale)
+        detectedPitchesFreq = base.smoothFrequencies(detectedPitchesFreq)
+        (detectedPitchObjects, unused_listplot) = base.pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
+        (notesList, unused_durationList) = base.joinConsecutiveIdenticalPitches(detectedPitchObjects)
         j = 0
         i = 0
         while i < len(notesList) and j < len(gameNotes) and good == True:
@@ -69,7 +68,7 @@ def runGame():
             print "YOU ARE VERY SLOW!!! PLAY FASTER NEXT TIME!"
             
         if good == False:
-            print "GAME OVER! TOTAL ROUNDS: %d" % round
+            print "GAME OVER! TOTAL ROUNDS: %d" % roundNumber
 
 if __name__ == "__main__":
     runGame()

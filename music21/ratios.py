@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------------------
 
 import math
-import doctest, unittest
+import unittest
 from decimal import Decimal
 import fractions
 

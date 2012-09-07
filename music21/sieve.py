@@ -45,7 +45,7 @@ The :class:`music21.sieve.PitchSieve` class provides a quick generation of :clas
 
 
 import copy, string, random
-import unittest, doctest
+import unittest
 
 from music21 import exceptions21
 from music21 import pitch

@@ -29,7 +29,7 @@ from music21 import stream
 from music21 import tempo
 from music21 import trecento
 
-import unittest, doctest
+import unittest
 
 allowableStrettoIntervals = { 
         -8: [(3, True), 
@@ -1206,7 +1206,7 @@ class Ligature(base.Music21Object):
                 for note in self.notes:
                     note._setNoteheadFill(value)
             else:
-                raise MedRenException('color %s not supported for ligatures' % color)
+                raise MedRenException('fillStatus %s not supported for ligatures' % value)
                     
     
     def getNoteheadShape(self, index):
@@ -1285,7 +1285,7 @@ class Ligature(base.Music21Object):
             else:
                 pass #Already square
         else:
-            raise MedRenException('no note exists at index %d' % startIndex)
+            raise MedRenException('no note exists at index %d' % index)
         self._notes = []
     
     def isMaxima(self, index):
@@ -1434,7 +1434,7 @@ class Ligature(base.Music21Object):
         
     def setReverse(self, endIndex, value):
         '''
-        Takes two arguments: startIndex, value.
+        Takes two arguments: endIndex, value.
         
         endIndex designates the note to be reversed. value may be True or False.
         Setting value to True reverses the note at endIndex. Setting value to false 'de-reverses' the note at endIndex.
@@ -1467,7 +1467,7 @@ class Ligature(base.Music21Object):
         if endIndex < self._ligatureLength():
             if value in [True, False]:
                 if not value:
-                    self.reversedNotes[index] = value
+                    self.reversedNotes[endIndex] = value
                 else:
                     if endIndex > 0:
                         tempPitchCurrent = copy.copy(self.pitches[endIndex])

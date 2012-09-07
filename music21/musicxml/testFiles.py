@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #-------------------------------------------------------------------------------
 
-import doctest, unittest
+import unittest
 
 
 
@@ -15992,7 +15992,7 @@ class Test(unittest.TestCase):
     def testBasic(self):
         from music21 import converter
         for testMaterial in ALL[:1]:
-            a = converter.parse(testMaterial)
+            unused = converter.parse(testMaterial)
 
 
 

@@ -45,8 +45,6 @@ VERSION_STR = "%s.%s.%s" % (VERSION[0], VERSION[1], VERSION[2])
 
 import codecs
 import copy
-import inspect
-import math
 import json
 import sys
 import types
@@ -56,8 +54,7 @@ import inspect
 
 #-----all exceptions are in the exceptions21 package.
 from music21 import exceptions21
-from music21.exceptions21 import *
-
+Music21Exception = exceptions21.Music21Exception
 
 from music21 import common
 from music21 import environment
@@ -112,6 +109,15 @@ if len(_missingImport) > 0:
 WEAKREF_ACTIVE = True
 
 #DEBUG_CONTEXT = False
+
+class DefinedContextsException(exceptions21.Music21Exception):
+    pass
+
+class Music21ObjectException(exceptions21.Music21Exception):
+    pass
+
+class ElementException(exceptions21.Music21Exception):
+    pass
 
 
 
@@ -231,9 +237,9 @@ class JSONSerializer(object):
                    '.Beam': beam.Beam,
                    '.Beams': beam.Beams,
                     }
-        for map in mapping:
-            if map in idStr:
-                objClass = mapping[map]
+        for jsonMap in mapping:
+            if jsonMap in idStr:
+                objClass = mapping[jsonMap]
                 obj = objClass()
                 return obj        
         raise JSONSerializerException('cannot instantiate an object from id string: %s' % idStr)
@@ -561,7 +567,7 @@ class JSONSerializer(object):
         print(json.dumps(self._getJSONDict(includeVersion=True), 
             sort_keys=True, indent=2))
 
-    def jsonWrite(self, fp, format=True):
+    def jsonWrite(self, fp, unused_format=True):
         '''
         Given a file path, write JSON to a file for this object. 
         File extension should be .json. File is opened and closed within this method call. 
@@ -614,13 +620,13 @@ class Groups(list):
             if not list.__contains__(self, value): 
                 list.append(self, value)
         else:
-            raise GroupException("Only strings can be used as list names")
+            raise exceptions21.GroupException("Only strings can be used as list names")
             
     def __setitem__(self, i, y):
         if isinstance(y, basestring):
             list.__setitem__(self, i, y)
         else:
-            raise GroupException("Only strings can be used as list names")
+            raise exceptions21.GroupException("Only strings can be used as list names")
         
     def __eq__(self, other):
         '''Test Group equality. In normal lists, order matters; here it does not. 
@@ -1104,7 +1110,7 @@ class DefinedContexts(JSONSerializer):
         post.sort()
         if newFirst:
             post.reverse()
-        return [k for t, k in post]
+        return [k for unused_time, k in post]
 
 
     def get(self, locationsTrail=False, sortByCreationTime=False,
@@ -1763,7 +1769,7 @@ class DefinedContexts(JSONSerializer):
         if memo is None:
             memo = {} # intialize
         post = None
-        count = 0
+        #count = 0
 
         # search any defined contexts first
         # need to sort: look at most-recently added objs are first
@@ -1938,7 +1944,7 @@ class DefinedContexts(JSONSerializer):
         >>> aContexts.getAttrByName('attr1') == 'test'
         True
         '''
-        post = None
+        #post = None
         for obj in self.get():
             if obj is None: continue # in case the reference is dead
             try:
@@ -2822,7 +2828,6 @@ class Music21Object(JSONSerializer):
         get elements for searching. The strings 'getElementAtOrBefore' and 'getElementBeforeOffset' are currently accepted. 
         '''
         #if DEBUG_CONTEXT: print 'X: first call; looking for:', className, id(self), self
-        from music21 import stream # needed for exception matching
 
         #environLocal.printDebug(['call getContextByClass from:', self, 'activeSite:', self.activeSite, 'callerFirst:', callerFirst, 'prioritizeActiveSite', prioritizeActiveSite])
     
@@ -2989,7 +2994,7 @@ class Music21Object(JSONSerializer):
         if idFound == None:
             idFound = []
 
-        post = None
+        #post = None
         # if this obj is a Stream
         if self.isStream:
         #if hasattr(self, "elements"): 
@@ -3047,47 +3052,47 @@ class Music21Object(JSONSerializer):
         if ascend and beginNearest:
             currentIndex = site.index(self) + 1 # start with next
             while (currentIndex < siteLength):
-                next = siteElements[currentIndex]
+                nextObj = siteElements[currentIndex]
                 if classFilterList is not None: 
-                    if next.isClassOrSubclass(classFilterList):
-                        return next
+                    if nextObj.isClassOrSubclass(classFilterList):
+                        return nextObj
                 else:
-                    return next
+                    return nextObj
                 currentIndex += 1
         # go to right, start at righmost
         elif ascend and not beginNearest:
             lastIndex = site.index(self) + 1 # end with next
             currentIndex = siteLength
             while (currentIndex >= lastIndex):
-                next = siteElements[currentIndex]
+                nextObj = siteElements[currentIndex]
                 if classFilterList is not None:
-                    if next.isClassOrSubclass(classFilterList):
-                        return next
+                    if nextObj.isClassOrSubclass(classFilterList):
+                        return nextObj
                 else:
-                    return next
+                    return nextObj
                 currentIndex -= 1
         # go to left, start at nearest
         elif not ascend and beginNearest:
             currentIndex = site.index(self) - 1 # start with next
             while (currentIndex >= 0):
-                next = siteElements[currentIndex]
+                nextObj = siteElements[currentIndex]
                 if classFilterList is not None: 
-                    if next.isClassOrSubclass(classFilterList):
-                        return next
+                    if nextObj.isClassOrSubclass(classFilterList):
+                        return nextObj
                 else:
-                    return next
+                    return nextObj
                 currentIndex -= 1
         # go to left, start at leftmost
         elif not ascend and not beginNearest:
             lastIndex = site.index(self) - 1 # start with next
             currentIndex = 0
             while (currentIndex <= lastIndex):
-                next = siteElements[currentIndex]
+                nextObj = siteElements[currentIndex]
                 if classFilterList is not None:
-                    if next.isClassOrSubclass(classFilterList):
-                        return next
+                    if nextObj.isClassOrSubclass(classFilterList):
+                        return nextObj
                 else:
-                    return next
+                    return nextObj
                 currentIndex += 1
         else:
             raise Music21ObjectException('bad organization of ascend and beginNearest parameters')
@@ -3690,25 +3695,25 @@ class Music21Object(JSONSerializer):
         elif fmt.startswith('.'):
             fmt = fmt[1:]
  
-        format, ext = common.findFormat(fmt)
-        if format not in common.VALID_WRITE_FORMATS:
-            raise Music21ObjectException('cannot support showing in this format yet: %s' % format)
+        fileFormat, ext = common.findFormat(fmt)
+        if fileFormat not in common.VALID_WRITE_FORMATS:
+            raise Music21ObjectException('cannot support showing in this format yet: %s' % fileFormat)
 
-        if format is None:
+        if fileFormat is None:
             raise Music21ObjectException('bad format (%s) provided to write()' % fmt)
 
         if fp is None:
             fp = environLocal.getTempFile(ext)
 
-        if format in ['text', 'textline', 'musicxml', 'vexflow', 'vexflow.html']:        
-            if format == 'text':
+        if fileFormat in ['text', 'textline', 'musicxml', 'vexflow', 'vexflow.html']:        
+            if fileFormat == 'text':
                 dataStr = self._reprText()
-            elif format == 'textline':
+            elif fileFormat == 'textline':
                 dataStr = self._reprTextLine()
-            elif format == 'musicxml':
+            elif fileFormat == 'musicxml':
                 from music21.musicxml import m21ToString
                 dataStr = m21ToString.music21ObjectToMusicXML(self)
-            elif format.startswith('vexflow'):
+            elif fileFormat.startswith('vexflow'):
                 import music21.vexflow
                 dataStr = music21.vexflow.fromObject(self, mode='html')
 
@@ -3717,15 +3722,15 @@ class Music21Object(JSONSerializer):
             f.close()
             return fp
 
-        elif format in ['braille', 'lily', 'lilypond']:
-            if format in ['lilypond', 'lily']:
+        elif fileFormat in ['braille', 'lily', 'lilypond']:
+            if fileFormat in ['lilypond', 'lily']:
                 import music21.lily.translate
                 conv = music21.lily.translate.LilypondConverter()
                 if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
                     conv.coloredVariants = True
                 dataStr = conv.textFromMusic21Object(self).encode('utf-8')
             
-            elif format == 'braille':
+            elif fileFormat == 'braille':
                 import music21.braille
                 dataStr = music21.braille.translate.objectToBraille(self)
             
@@ -3734,7 +3739,7 @@ class Music21Object(JSONSerializer):
             f.close()
             return fp
 
-        elif format == 'midi':
+        elif fileFormat == 'midi':
             # returns a midi.MidiFile object
             from music21.midi import translate as midiTranslate
             mf = midiTranslate.music21ObjectToMidiFile(self)
@@ -3743,7 +3748,7 @@ class Music21Object(JSONSerializer):
             mf.close()
             return fp
 
-        elif format in ['pdf', 'lily.pdf',]:
+        elif fileFormat in ['pdf', 'lily.pdf',]:
             if fp.endswith('.pdf'):
                 fp = fp[:-4]
             import music21.lily.translate
@@ -3752,7 +3757,7 @@ class Music21Object(JSONSerializer):
                 conv.coloredVariants = True
             conv.loadFromMusic21Object(self)
             return conv.createPDF(fp)
-        elif format in ['png', 'lily.png']:
+        elif fileFormat in ['png', 'lily.png']:
             if fp.endswith('.png'):
                 fp = fp[:-4]
             import music21.lily.translate
@@ -3761,7 +3766,7 @@ class Music21Object(JSONSerializer):
                 conv.coloredVariants = True
             conv.loadFromMusic21Object(self)
             return conv.createPNG(fp)
-        elif format in ['svg', 'lily.svg']:
+        elif fileFormat in ['svg', 'lily.svg']:
             if fp.endswith('.svg'):
                 fp = fp[:-4]
             import music21.lily.translate
@@ -3771,7 +3776,7 @@ class Music21Object(JSONSerializer):
             conv.loadFromMusic21Object(self)
             return conv.createSVG(fp)
         else:
-            raise Music21ObjectException('cannot yet support writing in the %s format' % format)
+            raise Music21ObjectException('cannot yet support writing in the %s format' % fileFormat)
 
 
 
@@ -3823,16 +3828,16 @@ class Music21Object(JSONSerializer):
         if common.isStr(fmt) != True:
             raise Music21ObjectException('format must be a string, not whatever this is: %s' % fmt)
 
-        format, ext = common.findFormat(fmt)
-        if format not in common.VALID_SHOW_FORMATS:
-            raise Music21ObjectException('cannot support showing in this format yet: %s' % format)
+        fileFormat, unused_ext = common.findFormat(fmt)
+        if fileFormat not in common.VALID_SHOW_FORMATS:
+            raise Music21ObjectException('cannot support showing in this format yet: %s' % fileFormat)
 
         # standard text presentation has line breaks, is printed
-        if format == 'text':
+        if fileFormat == 'text':
             print(self._reprText())
         # a text line compacts the complete recursive representation into a 
         # single line of text; most for debugging. returned, not printed
-        elif format == 'textline': 
+        elif fileFormat == 'textline': 
             return self._reprTextLine()
 
         # TODO: these need to be updated to write files
@@ -3863,16 +3868,16 @@ class Music21Object(JSONSerializer):
             return conv.showSVG()
 
         elif fmt in ['musicxml', 'midi']: # a format that writes a file
-            returnedFilePath = self.write(format)
-            environLocal.launch(format, returnedFilePath, app=app)
+            returnedFilePath = self.write(fileFormat)
+            environLocal.launch(fileFormat, returnedFilePath, app=app)
 
         elif fmt == 'braille':
-            returnedFilePath = self.write(format)
-            environLocal.launch(format, returnedFilePath, app=app)
+            returnedFilePath = self.write(fileFormat)
+            environLocal.launch(fileFormat, returnedFilePath, app=app)
 
         elif fmt.startswith('vexflow'):
-            returnedFilePath = self.write(format)
-            environLocal.launch(format, returnedFilePath, app=app)
+            returnedFilePath = self.write(fileFormat)
+            environLocal.launch(fileFormat, returnedFilePath, app=app)
 
 
         else:
@@ -4020,7 +4025,7 @@ class Music21Object(JSONSerializer):
                     eRemain.expressions.append(thisExpression)
 
         if quarterLength < delta:
-            quarterLength == 0
+            quarterLength = 0
         elif abs(quarterLength - self.duration.quarterLength) < delta:
             quarterLength = self.duration.quarterLength
 
@@ -4931,7 +4936,6 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types, copy
         for part in sys.modules[self.__module__].__dict__.keys():
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -4945,8 +4949,8 @@ class Test(unittest.TestCase):
                     obj = name()
                 except TypeError:
                     continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                i = copy.copy(obj)
+                j = copy.deepcopy(obj)
 
 
     def testObjectCreation(self):
@@ -4970,7 +4974,7 @@ class Test(unittest.TestCase):
         assert (a != b)
 
     def testNoteCreation(self):
-        from music21 import note, duration
+        from music21 import note
         n = note.Note('A')
         n.offset = 1.0 #duration.Duration("quarter")
         n.groups.append("flute")
@@ -4999,7 +5003,7 @@ class Test(unittest.TestCase):
         note1.duration.type = "whole"
         stream1 = stream.Stream()
         stream1.append(note1)
-        subStream = stream1.notes
+        unused_subStream = stream1.notes
 
     def testLocationsRefs(self):
         aMock = TestMock()
@@ -5087,7 +5091,7 @@ class Test(unittest.TestCase):
 
         # have two locations: None, and that set by assigning activeSite
         self.assertEqual(len(b._definedContexts), 2)
-        g = post[-1]._definedContexts
+        dummy = post[-1]._definedContexts
         self.assertEqual(len(post[-1]._definedContexts), 2)
 
         # the active site of a deepcopy should not be the same?
@@ -5114,7 +5118,7 @@ class Test(unittest.TestCase):
 
 
     def testDefinedContexts(self):
-        from music21 import base, note, stream, corpus, clef
+        from music21 import note, stream, corpus, clef
 
         m = stream.Measure()
         m.number = 34
@@ -5232,7 +5236,7 @@ class Test(unittest.TestCase):
 
 
     def testDefinedContextsClef(self):
-        from music21 import base, note, stream, clef
+        from music21 import note, stream, clef
         s1 = stream.Stream()
         s2 = stream.Stream()
         n = note.Note()
@@ -5255,7 +5259,7 @@ class Test(unittest.TestCase):
 
     def testDefinedContextsPitch(self):
         # TODO: this form does not yet work
-        from music21 import base, note, stream, clef
+        from music21 import note, stream
         m = stream.Measure()
         m.number = 34
         n = note.Note()
@@ -5340,7 +5344,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.insert(0, meter.TimeSignature('4/4'))
         s.repeatAppend(n, 8)
-        match = []
+        #match = []
         self.assertEqual([e.beatStrength for e in s.notes], [1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25])
 
         n = note.QuarterNote("E--3")
@@ -5384,7 +5388,6 @@ class Test(unittest.TestCase):
 
 
     def testPickupMeauresBuilt(self):
-        import music21
         from music21 import stream, meter, note
     
         s = stream.Score()
@@ -5491,7 +5494,7 @@ class Test(unittest.TestCase):
         s.append(n1)
         self.assertEqual(s.highestTime, 20)
 
-        offset = None
+        #offset = None
 
         # this would be in a note
         dc = DefinedContexts()
@@ -5586,7 +5589,7 @@ class Test(unittest.TestCase):
 
 
     def testGetAllContextsByClass(self):
-        from music21 import base, note, stream, clef
+        from music21 import note, stream, clef
         s1 = stream.Stream()
         s2 = stream.Stream()
         s3 = stream.Stream()
@@ -5665,7 +5668,7 @@ class Test(unittest.TestCase):
 
 
     def testGetContextByClassA(self):
-        from music21 import stream, note, clef, tempo
+        from music21 import stream, note, tempo
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -5690,7 +5693,7 @@ class Test(unittest.TestCase):
 
     def testElementWrapperOffsetAccess(self):
         import music21
-        from music21 import stream, meter, note
+        from music21 import stream, meter
 
         class Mock(object): pass
 
@@ -5715,7 +5718,7 @@ class Test(unittest.TestCase):
 
     def testGetActiveSiteTimeSignature(self):
         import music21
-        from music21 import stream, meter, note
+        from music21 import stream, meter
         class Wave_read(object): #_DOCS_HIDE
             def getnchannels(self): return 2 #_DOCS_HIDE
     
@@ -5888,7 +5891,7 @@ class Test(unittest.TestCase):
         s.insert(0, p4)
 
         #self.targetMeasures = m4
-        n1 = m2[-1] # last element is a note
+        #n1 = m2[-1] # last element is a note
         n2 = m4[-1] # last element is a note
 
         #environLocal.printDebug(['getContextByClass()'])
@@ -5902,7 +5905,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         sc = scale.MajorScale()
         notes = []
-        for p in sc.pitches:
+        for i in sc.pitches:
             n = note.Note()
             s.append(n)
             notes.append(n) # keep for reference and testing
@@ -5974,14 +5977,13 @@ class Test(unittest.TestCase):
 
     def testActiveSiteCopyingA(self):
         from music21 import note, stream
-        import copy
 
         n1 = note.Note()
         s1 = stream.Stream()
         s1.append(n1)
         self.assertEqual(n1.activeSite, s1)
 
-        n2 = copy.deepcopy(n1)
+        unused_n2 = copy.deepcopy(n1)
         #self.assertEqual(n2._activeSite, s1)
         
 
@@ -6072,7 +6074,7 @@ def mainTest(*testClasses):
     if runAllTests:
         runner = unittest.TextTestRunner()
         runner.verbosity = verbosity
-        testResult = runner.run(s1) 
+        unused_testResult = runner.run(s1) 
 
 
 #------------------------------------------------------------------------------

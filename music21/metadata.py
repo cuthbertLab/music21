@@ -27,11 +27,11 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a :
     :width: 600
 
 '''
-import unittest, doctest
+import unittest
 import datetime
-import json
+#import json
 import os
-import inspect
+#import inspect
 import re
 
 from music21 import base

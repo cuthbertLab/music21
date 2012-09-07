@@ -16,9 +16,7 @@ See the chapter :ref:`overviewMeters` for more information on defining metrical 
 
 
 import music21.stream
-import music21.meter
-import unittest, doctest
-
+import unittest
 
 from music21 import environment
 _MOD = "analysis.metrical.py"
@@ -59,7 +57,7 @@ def labelBeatDepth(streamIn):
                 environLocal.printDebug(['note, tie', n, n.tie, n.tie.type])
                 if n.tie.type == 'stop':
                     continue
-            for i in range(ts.getBeatDepth(n.offset)):
+            for unused_i in range(ts.getBeatDepth(n.offset)):
                 n.addLyric('*')
 
     return streamIn

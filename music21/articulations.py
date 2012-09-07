@@ -96,7 +96,7 @@ A longer test showing the utility of the module:
 
 '''
 
-import doctest, unittest
+import unittest
 
 from music21 import base
 from music21 import exceptions21

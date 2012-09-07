@@ -17,7 +17,7 @@ class for easily iterating through the chorale collection.
 '''
 
 from music21.corpus import base
-import unittest, doctest
+import unittest
 import copy
 
 from music21 import exceptions21

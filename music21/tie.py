@@ -15,7 +15,7 @@ conceptual idea of tied notes.
 '''
 
 
-import unittest, doctest
+import unittest
 
 #-------------------------------------------------------------------------------
 class Tie(object):

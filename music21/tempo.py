@@ -15,7 +15,8 @@
 
 from __future__ import unicode_literals
 
-import unittest, doctest, copy
+import unittest
+import copy
 
 from music21 import base
 from music21 import exceptions21
@@ -229,7 +230,7 @@ class TempoText(TempoIndication):
             self.applyTextFormatting(numberImplicit=numberImplicit)
             return copy.deepcopy(self._textExpression)
 
-    def setTextExpression(self, vale):
+    def setTextExpression(self, value):
         '''Given a TextExpression, set it in this object.
         '''
         self._textExpression = value
@@ -1160,20 +1161,20 @@ def interpolateElements(element1, element2, sourceStream,
     '''
     try:
         startOffsetSrc = element1.getOffsetBySite(sourceStream)
-    except StreamException:
+    except exceptions21.Music21Exception:
         raise TempoException("could not find element1 in sourceStream")
     try:
         startOffsetDest = element1.getOffsetBySite(destinationStream)
-    except StreamException:
+    except exceptions21.Music21Exception:
         raise TempoException("could not find element1 in destinationStream")
     
     try:
         endOffsetSrc = element2.getOffsetBySite(sourceStream)
-    except StreamException:
+    except exceptions21.Music21Exception:
         raise TempoException("could not find element2 in sourceStream")
     try:
         endOffsetDest = element2.getOffsetBySite(destinationStream)
-    except StreamException:
+    except exceptions21.Music21Exception:
         raise TempoException("could not find element2 in destinationStream")
     
     scaleAmount = ((endOffsetDest - startOffsetDest + 0.0)/(endOffsetSrc - startOffsetSrc + 0.0))

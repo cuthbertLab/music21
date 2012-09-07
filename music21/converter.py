@@ -1040,7 +1040,7 @@ def parse(value, *args, **keywords):
         if len(args) > 0: # add additional args to a list
             value = [value] + list(args)
         return parseData(value, number=number)
-     # a midi string, must come before os.path.exists test
+    # a midi string, must come before os.path.exists test
     elif value.startswith('MThd'):
         return parseData(value, number=number, format=format)
     elif os.path.exists(value):
@@ -1188,14 +1188,14 @@ class TestExternal(unittest.TestCase):
 
 
     def testFreezer(self):
-        from music21 import stream, note, corpus
+        from music21 import stream, note, corpus, freezeThaw
         s = stream.Stream()
         n = note.Note()
         s.append(n)
 
         s = corpus.parse('bach')
 
-        aConverter = StreamFreezer(s)
+        aConverter = freezeThaw.StreamFreezer(s)
         fp = aConverter.write()
 
         aConverter.openPickle(fp)
@@ -1211,7 +1211,7 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types, copy
+        import sys, types
         for part in sys.modules[self.__module__].__dict__.keys():
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -1227,8 +1227,6 @@ class Test(unittest.TestCase):
 
     def testConversionMX(self):
         from music21.musicxml import testPrimitive
-        from music21.musicxml import testFiles
-        from music21 import corpus
         from music21 import dynamics
         from music21 import note
 

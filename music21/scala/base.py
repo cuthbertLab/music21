@@ -40,7 +40,7 @@ For most people you'll want to do something like this:
 '''
 
 import os
-import unittest, doctest
+import unittest
 import math, codecs
 try:
     import StringIO # python 2 
@@ -470,11 +470,6 @@ class TestExternal(unittest.TestCase):
     def runTest(self):
         pass
     
-    def testSingle(self):
-        a = Pitch()
-        a.name = 'c#'
-        a.show()
-
 
 
 class Test(unittest.TestCase):

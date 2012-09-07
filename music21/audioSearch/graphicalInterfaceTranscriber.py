@@ -12,19 +12,11 @@
 #-------------------------------------------------------------------------------
 
 
-from music21 import corpus
-from music21 import converter
-from music21 import environment
-from music21 import scale, stream, note, pitch
+from music21 import scale
 import threading
 import Queue as queue
-from music21.audioSearch.base import *
-from music21.audioSearch import recording
 from music21.audioSearch import transcriber
-import Tkinter
-import time
-import math
- 
+import Tkinter 
  
  
 class SFApp():

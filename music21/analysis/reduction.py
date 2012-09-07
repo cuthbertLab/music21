@@ -14,7 +14,7 @@
 '''
 
 
-import doctest, unittest
+import unittest
 import copy
 
 from music21 import exceptions21
@@ -22,11 +22,10 @@ from music21 import exceptions21
 from music21 import stream, note, expressions
 from music21 import instrument
 from music21 import pitch
-from music21 import clef
 from music21 import common
 
 from music21 import environment
-_MOD = "analysis/reduction.py"
+_MOD = "analysis.reduction"
 environLocal = environment.Environment(_MOD)
 
 

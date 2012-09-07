@@ -15,7 +15,7 @@
 
 from __future__ import unicode_literals
 
-import doctest, unittest
+import unittest
 from music21 import exceptions21
 from music21 import base
 
@@ -255,8 +255,8 @@ class Test(unittest.TestCase):
                     obj = name()
                 except TypeError:
                     continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                unused_a = copy.copy(obj)
+                unused_b = copy.deepcopy(obj)
 
 
 

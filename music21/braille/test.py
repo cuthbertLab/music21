@@ -9,9 +9,8 @@
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
-from music21 import articulations, bar, chord, clef, converter, dynamics, \
+from music21 import articulations, bar, chord, clef, dynamics, \
     expressions, key, meter, note, pitch, spanner, stream, tempo, tinyNotation
-from music21.braille import translate
 import unittest
 
 
@@ -50,7 +49,7 @@ def example2_2():
     bm = tinyNotation.TinyNotationStream("r8 r8 r8 d8 d8 c8 B8 d8 c8 B8 A8 c8 B8 A8 G8 B8 A8 A8 D8 r8 E8 E8 G8 E8 \
     D8 E8 G8 B8 d8 c8 B8 A8 G8 G8 G8 r8", "4/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    for numRest in range(3):
+    for unused_numRest in range(3):
         bm[0].pop(2)
     bm[0].padAsAnacrusis()
     for measure in bm:
@@ -98,7 +97,7 @@ def example2_5():
     bm = tinyNotation.TinyNotationStream("r8 r8 d'8 e'8 f'8 c'8 a8 c'8 d'8 c'8 a8 c'8 a8 c'8 a8 g8 e8 g8 f8 r8 \
     d8 e8 f8 d8 c8 d8 e8 f8 g8 e8 c8 e8 f8 r8", "4/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    for numRest in range(2):
+    for unused_numRest in range(2):
         bm[0].pop(2)
     bm[0].padAsAnacrusis()
     for measure in bm:
@@ -861,7 +860,7 @@ def example7_11():
     bm = tinyNotation.TinyNotationStream("r2 r8 GG8 C4 GG8 C4 E-8 D4 GG8 D4 G8 C4 G8 c4 B-8 A-4 F8 C4 A-8\
     G8 E-8 A-8 G8 C8 F8 E-8 GG8 D8 C8 GG8 EE-8 FF8 D8 C8 BBn8 GG8 GG8 CC4. r4", "6/8")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    for numRest in range(2):
+    for unused_numRest in range(2):
         bm[0].pop(2)
     bm[0].padAsAnacrusis()
     bm[0].pop(0)

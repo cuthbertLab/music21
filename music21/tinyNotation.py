@@ -65,7 +65,7 @@ take 0 for the note length.  But expect this to disappear from the
 TinyNotation specification soon, as it's too Trecento specific.)
 '''
 
-import unittest, doctest
+import unittest
 import copy
 import re
 
@@ -631,7 +631,6 @@ class Test(unittest.TestCase):
         A debugging info tool, returning information about a note
         E- E 4 flat 16th 0.166666666667 & is a tuplet (in fact STOPS the tuplet)
         '''
-        from music21 import expressions
         ret = ""
         if (note.isNote is True):
             ret += note.name + " " + note.step + " " + str(note.octave)

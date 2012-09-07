@@ -17,25 +17,19 @@ can be found in the module `music21.medren`.
 Also contains functions for converting Trecento notation to modern notation.
 '''
 
-import copy
-import re
 
 from music21 import base
 from music21 import clef
 from music21 import common
 from music21 import duration
 from music21 import exceptions21
-from music21 import interval
-from music21 import metadata
 from music21 import meter
 from music21 import note
 from music21 import pitch
 from music21 import stream
-from music21 import tempo
-from music21 import text
 from music21 import tie
 from music21 import tinyNotation
-import unittest, doctest
+import unittest
 
 _validDivisiones = {(None, None):0, ('quaternaria','.q.'):4, ('senaria imperfecta', '.i.'):6, ('senaria perfecta', '.p.'):6, ('novenaria', '.n.'):9, ('octonaria', '.o.'):8, ('duodenaria', '.d.'):12}
 
@@ -157,12 +151,10 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
             self.regularExpressions.update(tinyNotation.TinyNotationStream.regularExpressions)
         tinyNotation.TinyNotationStream.__init__(self)
         self.stringRep = stringRep
-        divisione, mensuralClef = None, None
         storedDict = {}
         objList = []
 
         
-        noteStrs  = []
         from music21 import medren
 
         def breakString(string, startBreakChar, endBreakChar, func = lambda s: s.split()):
@@ -191,8 +183,8 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
             
         noteStrs = breakString(stringRep, '<', '>', lambda s: breakString(s, '{', '}'))    
                 
-        if div is not None:
-            divisione = div
+#        if div is not None:
+#            divisione = div
         
         for ns in noteStrs:
             ns = ns.strip()
@@ -275,7 +267,7 @@ class TinyTrecentoNotationNote(tinyNotation.TinyNotationNote):
     def customPitchMatch(self, stringRep, storedDict):
         from music21 import medren
 
-        noteLikeObject = None
+        noteLikeObj = None
         storedDict['lastDuration'] = duration.ZeroDuration()
             
         if self.LIGATURE.search(stringRep) is not None:
@@ -513,7 +505,7 @@ def convertTrecentoStream(inpStream, inpDiv = None):
 
     div = inpDiv
     offset = 0
-    hierarchy = ['measure', 'part', 'score']
+    # hierarchy = ['measure', 'part', 'score']
 
     convertedStream = None
     if 'measure' in inpStream.classes:
@@ -564,9 +556,7 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv = None, measureNum
     inpDiv is a divisione possibly coming from a some higher context. measureNumOffset helps calculate measure number.
     
     This acts as a helper method to improve the efficiency of :meth:`music21.trecento.notation.convertTrecentoStream`.
-    '''
-    from music21 import medren
-    
+    '''    
     div = inpDiv
     m = stream.Measure(number = brevisLength.number + measureNumOffset)
     rem = None
@@ -583,7 +573,8 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv = None, measureNum
             if div is None:
                 div = item
             else:
-                raise TrecentoNotationException('divisione %s not consistent within heirarchy' % e) #Should already be caught by medren.breakMensuralStreamIntoBrevisLengths, but just in case...
+                raise TrecentoNotationException('divisione %s not consistent within heirarchy' % item) 
+                #Should already be caught by medren.breakMensuralStreamIntoBrevisLengths, but just in case...
     mDur = 0
     if div is not None:
         rem = div.barDuration.quarterLength
@@ -605,7 +596,7 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv = None, measureNum
         m.append(startNote)
         measureList.append(m)
         
-        for j in range(int(lenList[0]/div.minimaPerBrevis) - 2):
+        for dummy in range(int(lenList[0]/div.minimaPerBrevis) - 2):
             measureNumOffset += 1
             
             tempMeasure = stream.Measure(number = brevisLength.number + measureNumOffset)
@@ -699,9 +690,9 @@ class TranslateBrevisLength(object):
         
     def getKnownLengths(self):
         if 'Divisione' in self.div.classes:
-           self.knownLengthsList = self.translate()
+            self.knownLengthsList = self.translate()
         else:
-           raise TrecentoNotationException('%s not recognized as divisione' % divisione)
+            raise TrecentoNotationException('%s not recognized as divisione' % self.div)
         return self.knownLengthsList
     
     def getBreveStrength(self, lengths):
@@ -1040,15 +1031,15 @@ class TranslateBrevisLength(object):
             newDiv.minimaPerBrevis = 2*self.div.minimaPerBrevis
             return self.brevisLength
             tempTBL = TranslateBrevisLength(newDiv, self.brevisLength[:])
-            knownLengthList = tempTBL.getKnownLengths()
+            knownLengthsList = tempTBL.getKnownLengths()
             
         for i in range(len(knownLengthsList)): #Float errors
-         ml = knownLengthsList[i]
-         try:
-             if abs(ml - round(ml)) < 0.0001:
-                 knownLengthsList[i] = round(ml)
-         except TypeError:
-             raise TypeError('ml is screwed up! %s' % ml)
+            ml = knownLengthsList[i]
+            try:
+                if abs(ml - round(ml)) < 0.0001:
+                    knownLengthsList[i] = round(ml)
+            except TypeError:
+                raise TypeError('ml is screwed up! %s' % ml)
            
         return knownLengthsList
 
@@ -1633,8 +1624,8 @@ class TranslateBrevisLength(object):
                          
                         else:
                             knownLengthsList_changeable[ind] = 0.5
-                            extend_list.append(ind)
-                        extend_list = _removeRepeatedElements(extend_list_2)
+                            #extend_list.append(ind)  ### BUG: extend_list does not exist
+                        #extend_list = _removeRepeatedElements(extend_list_2)
                         
                 if self.numberOfDownstems > 0:
                                     
@@ -1716,7 +1707,7 @@ class TranslateBrevisLength(object):
                     
         return knownLengthsList
 
-def _allCombinations(list, num):
+def _allCombinations(combinationList, num):
     '''
     >>> _allCombinations(['a', 'b'], 2)
     [[], ['b'], ['a', 'b'], ['a']]
@@ -1728,9 +1719,9 @@ def _allCombinations(list, num):
     
     combs = []
     if num > 0:
-        for i in range(len(list)):
-            comb = [list[i]]
-            for c in _allCombinations(list[(i+1):], num-1):
+        for i in range(len(combinationList)):
+            comb = [combinationList[i]]
+            for c in _allCombinations(combinationList[(i+1):], num-1):
                 combs.append(comb + c)
     combs.reverse()
     combs.insert(0, [])
@@ -1755,10 +1746,9 @@ class TrecentoNotationException(exceptions21.Music21Exception):
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def testTinyTrecentoStream():
-    from music21 import trecento, duration, meter, stream, note, medren
-    from music21 import text, metadata, tinyNotation
-    import copy
-     
+    from music21 import trecento, medren
+    from music21 import text
+         
     SePerDureca = stream.Score()
     TinySePerDureca = stream.Score()
     SePerDureca.append(text.TextBox('Se Per Dureca'))

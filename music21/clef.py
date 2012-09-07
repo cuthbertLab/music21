@@ -471,8 +471,8 @@ class Test(unittest.TestCase):
                     obj = name()
                 except TypeError:
                     continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                unused_a = copy.copy(obj)
+                unused_b = copy.deepcopy(obj)
 
     def testConversionMX(self):
         from music21.musicxml import translate as musicxmlTranslate
@@ -482,7 +482,7 @@ class Test(unittest.TestCase):
                 TenorClef, CBaritoneClef, FBaritoneClef, BassClef, 
                 SubBassClef]:
             a = clefObjName()
-            mxClef = musicxmlTranslate.clefToMxClef(a)
+            unused_mxClef = musicxmlTranslate.clefToMxClef(a)
 
         # test specific clefs
         a = Treble8vbClef()
@@ -541,7 +541,7 @@ class Test(unittest.TestCase):
         s1 = stream.Stream([c1, n1])
         
         self.assertTrue(s1.getContextByClass(Clef) is c1)
-           ## equally good: getContextsByClass(Clef)[0]
+            ## equally good: getContextsByClass(Clef)[0]
 
         del(s1)
         

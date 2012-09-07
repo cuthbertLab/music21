@@ -19,11 +19,10 @@ For searching a group of scores see the search functions within
 import copy
 import difflib
 import math
-import unittest, doctest
+import unittest
 
 from music21 import base
 from music21 import exceptions21
-from music21 import note
 from music21 import duration
 
 class WildcardDuration(duration.Duration):

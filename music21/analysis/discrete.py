@@ -23,13 +23,10 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 '''
 
 import unittest
-import sys
 
 from music21 import exceptions21
 
-from music21 import meter
 from music21 import pitch
-from music21 import stream 
 from music21 import interval
 from music21 import key
 
@@ -1205,14 +1202,14 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         '''
         Find how many unique intervals are used in this Stream
         '''
-        uniqueIntervals = countMelodicIntervals(sStream, ignoreDirection)
+        uniqueIntervals = self.countMelodicIntervals(sStream, ignoreDirection)
         return len(uniqueIntervals), self.solutionToColor(len(uniqueIntervals))
 
 
     def getSolution(self, sStream):
         '''Solution is the number of unique intervals.
         '''
-        solution, color = self.process(sStream.flat)
+        solution, unused_color = self.process(sStream.flat)
         return solution
 
 

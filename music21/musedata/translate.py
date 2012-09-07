@@ -19,8 +19,6 @@ converter module's :func:`~music21.converter.parse` function.
 
 import unittest
 
-from music21.musedata import base as museDataModule
-
 from music21 import environment
 from music21 import exceptions21
 _MOD = 'musedata.translate.py'
@@ -55,16 +53,16 @@ def _musedataBeamToBeams(beamSymbol):
     for char in beamSymbol:
         direction = None
         if char == '[':
-            type='start'
+            beamType='start'
         elif char == ']':
-            type='stop'
+            beamType='stop'
         elif char == '=':
-            type='continue'
+            beamType='continue'
         elif char == '/': # forward is right
-            type='partial'
+            beamType='partial'
             direction='right'
         elif char == '\\' or char == r'\\': # backward is left
-            type='partial'
+            beamType='partial'
             direction='left'
         else:
             #MuseDataTranslateException('cannot interprete beams char: %s' % char)
@@ -72,7 +70,7 @@ def _musedataBeamToBeams(beamSymbol):
             continue
         # will automatically increment number        
         # note that this does not permit defining 16th and not defining 8th
-        beamsObj.append(type, direction)
+        beamsObj.append(beamType, direction)
 
     return beamsObj
 
@@ -157,8 +155,6 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
     '''Translate a musedata part to a :class:`~music21.stream.Part`.
     '''
     from music21 import stream
-    from music21 import meter
-    from music21 import key
     from music21 import note
     from music21 import tempo
 
@@ -396,21 +392,19 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].flat.notesAndRests), 291)
         self.assertEqual(len(s.parts[1].flat.notesAndRests), 293)
 
-        raw = m21ToString.music21ObjectToMusicXML(s)
+        unused_raw = m21ToString.music21ObjectToMusicXML(s)
       
 
 
 
-    def testGetMetaData(self):
-
-        from music21 import musedata
-        from music21.musedata import testFiles
+#    def testGetMetaData(self):
+#
+#        from music21 import musedata
+#        from music21.musedata import testFiles
 
 
 
     def testGetLyrics(self):
-        
-        from music21 import musedata
         from music21 import corpus
 
         s = corpus.parse('hwv56', '1-08')

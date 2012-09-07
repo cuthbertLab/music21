@@ -15,16 +15,13 @@
 # should NOT import music21 or anything like that, except in doctests.
 import re
 import copy
-import math, types, sys, os
-import unittest, doctest
+import math, sys, os
+import unittest
 import fractions
-import decimal
 import time
 import hashlib
-import imp
 import random
 import inspect
-import unicodedata
 
 from music21 import exceptions21
 
@@ -243,11 +240,11 @@ def findFormatExtFile(fp):
     >>> common.findFormatExtFile('\\\\long\\file\\path\\test.krn')
     ('humdrum', '.krn')
     '''
-    format, extOut = findFormat(fp.split('.')[-1])
-    if format == None:
+    fileFormat, extOut = findFormat(fp.split('.')[-1])
+    if fileFormat == None:
         return None, None
     else:
-        return format, '.'+fp.split('.')[-1] # may be None if no match
+        return fileFormat, '.'+fp.split('.')[-1] # may be None if no match
 
 
 def findFormatExtURL(url):
@@ -292,8 +289,8 @@ def findFormatExtURL(url):
     # presently, not keeping the extension returned from this function
     # reason: mxl is converted to xml; need to handle mxl files first
     if ext != None:
-        format, junk = findFormat(ext)
-        return format, ext
+        fileFormat, unused_junk = findFormat(ext)
+        return fileFormat, ext
     else:
         return None, None    
 
@@ -515,7 +512,7 @@ def isPowerOfTwo(n):
     if n <= 0:
         return False
     
-    (remainder, throwAway) = math.modf(math.log(n, 2))
+    (remainder, unused_throwAway) = math.modf(math.log(n, 2))
     if (almostEquals(remainder, 0.0)): 
         return True
     else: 
@@ -614,7 +611,7 @@ def isNum(usrData):
     '''
     try:
         # TODO: this may have unexpected consequences: find
-        x = usrData + 0
+        dummy = usrData + 0
         return True
     except:
         return False
@@ -903,7 +900,7 @@ def decimalToTuplet(decNum):
         flipNumerator = True
         decNum = 1.0/decNum
 
-    remainder, multiplier = math.modf(decNum)
+    unused_remainder, multiplier = math.modf(decNum)
     working = decNum/multiplier
 
     (jy, iy) = findSimpleFraction(working)
@@ -1041,7 +1038,7 @@ def approximateGCD(values, grain=1e-4):
     count = 0
     for x in values:
         # lowest is already a float
-        junk, floatingValue = divmod(x / lowest, 1.0)
+        unused_int, floatingValue = divmod(x / lowest, 1.0)
         # if almost an even division
         if almostEqual(floatingValue, 0.0, grain=grain):
             count += 1
@@ -1083,7 +1080,7 @@ def _lcm(a, b):
     # // forcers integer style division (no remainder)
     return abs(a*b) / euclidGCD(a,b) 
 
-def lcm(filter):
+def lcm(filterList):
     '''
     Find the least common multiple of a list of values
     
@@ -1100,8 +1097,8 @@ def lcm(filter):
     # derived from 
     # http://www.oreillynet.com/cs/user/view/cs_msg/41022
     lcmVal = 1
-    for i in range(len(filter)):
-        lcmVal = _lcm(lcmVal, filter[i])
+    for i in range(len(filterList)):
+        lcmVal = _lcm(lcmVal, filterList[i])
     return lcmVal
 
 
@@ -1185,22 +1182,22 @@ def fromRoman(num):
     ints = [1000, 500, 100, 50,  10,  5,   1]
     places = []
     for c in input:
-       if not c in nums:
-          raise Music21CommonException("input is not a valid roman numeral: %s" % input)
+        if not c in nums:
+            raise Music21CommonException("input is not a valid roman numeral: %s" % input)
     for i in range(len(input)):
-       c = input[i]
-       value = ints[nums.index(c)]
-       # If the next place holds a larger number, this value is negative.
-       try:
-           nextvalue = ints[nums.index(input[i +1])]
-           if nextvalue > value and value in [1, 10, 100]:
-               value *= -1
-           elif nextvalue > value:
-               raise Music21CommonException("input contains an invalid subtraction element: %s" % num)
-       except IndexError:
-          # there is no next place.
-          pass
-       places.append(value)
+        c = input[i]
+        value = ints[nums.index(c)]
+        # If the next place holds a larger number, this value is negative.
+        try:
+            nextvalue = ints[nums.index(input[i +1])]
+            if nextvalue > value and value in [1, 10, 100]:
+                value *= -1
+            elif nextvalue > value:
+                raise Music21CommonException("input contains an invalid subtraction element: %s" % num)
+        except IndexError:
+            # there is no next place.
+            pass
+        places.append(value)
     sum = 0
     for n in places: sum += n
     return sum
@@ -1228,9 +1225,9 @@ def toRoman(num):
     TypeError: expected integer, got <type 'str'>
     '''
     if type(num) != type(1):
-       raise TypeError("expected integer, got %s" % type(num))
+        raise TypeError("expected integer, got %s" % type(num))
     if not 0 < num < 4000:
-       raise ValueError, "Argument must be between 1 and 3999"   
+        raise ValueError, "Argument must be between 1 and 3999"   
     ints = (1000, 900,  500, 400, 100,  90, 50,  40, 10,  9,   5,  4,   1)
     nums = ('M',  'CM', 'D', 'CD','C', 'XC','L','XL','X','IX','V','IV','I')
     result = ""
@@ -1331,7 +1328,7 @@ def sortFilesRecent(fileList):
     sort.sort()
     sort.reverse()
     # just return 
-    return [y for x, y in sort] 
+    return [y for dummy, y in sort] 
 
 
 def getMd5(value=None):
@@ -1359,13 +1356,13 @@ def formatStr(msg, *arguments, **keywords):
     <BLANKLINE>
     '''
     if 'format' in keywords.keys():
-        format = keywords['format']
+        formatType = keywords['format']
     else:
-        format = None
+        formatType = None
 
     msg = [msg] + list(arguments)
     msg = [str(x) for x in msg]
-    if format == 'block':
+    if formatType == 'block':
         return '\n*** '.join(msg)+'\n'
     else: # catch all others
         return ' '.join(msg)+'\n'
@@ -1480,11 +1477,11 @@ def getCorpusContentDirs():
     'josquin', 'leadSheet', 'license.txt', 'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'ryansMammoth', 
     'schoenberg', 'schumann', 'theoryExercises', 'trecento', 'verdi']
     '''
-    dir = getCorpusFilePath()
+    dirName = getCorpusFilePath()
     post = []
     # dirs to exclude; all files will be retained
     exclude = ['__init__.py', 'base.py', 'metadataCache', 'virtual.py', 'chorales.py'] 
-    for fn in os.listdir(dir):
+    for fn in os.listdir(dirName):
         if fn not in exclude:
             if not fn.endswith('.pyc') and not fn.startswith('.'):
                 post.append(fn)
@@ -1511,7 +1508,7 @@ def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
     #fpCorpus = os.path.join(fpMusic21, 'corpus')
     fpParent = os.path.dirname(fpMusic21)
     match = []
-    for dirpath, dirnames, filenames in os.walk(fpMusic21):
+    for dirpath, unused_dirnames, filenames in os.walk(fpMusic21):
         # remove hidden directories
         if ('%s.' % os.sep) in dirpath:
             continue
@@ -2015,7 +2012,7 @@ class Timer(object):
     def __call__(self):
         '''Reports current time or, if stopped, stopped time.
         '''
-       # if stopped, gets _tDif; if not stopped, gets current time
+        # if stopped, gets _tDif; if not stopped, gets current time
         if self._tStop == None: # if not stoped yet
             t = time.time() - self._tStart
         else:
@@ -2121,7 +2118,7 @@ class Test(unittest.TestCase):
         self.assertEqual(inspect.isdatadescriptor(a.property1), False)
         
 
-        methods, attributes, properties = dirPartitioned(a)
+        unused_methods, attributes, unused_properties = dirPartitioned(a)
         self.assertEqual(('attr1' in attributes), True)
 
 
@@ -2186,7 +2183,7 @@ class Test(unittest.TestCase):
             self.assertEqual(980 <= x < 1020, True)
 
 
-        for j in range(10):
+        for unused_j in range(10):
             x = 0
             for i in range(1000):
                 x += weightedSelection([0, 1], [1, 0])

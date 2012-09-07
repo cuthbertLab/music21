@@ -14,8 +14,6 @@ import re
 
 from music21 import exceptions21
 from music21 import pitch
-from music21 import key
-from music21 import note
 
 shorthandNotation = {(None,) : (5,3),
                      (5,) : (5,3),

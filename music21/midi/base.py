@@ -18,7 +18,7 @@ This module uses routines from Will Ware's public domain midi.py from 2001
 see http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e
 '''
 
-import unittest, doctest
+import unittest
 import unicodedata
 import sys, os, string, types
 import struct
@@ -1461,7 +1461,7 @@ class Test(unittest.TestCase):
         mf.close()
 
     def testImportWithRunningStatus(self):
-        from music21 import converter, common
+        from music21 import converter
 
         dir = common.getPackageDir(relative=False, remapSep=os.sep)
         for fp in dir:

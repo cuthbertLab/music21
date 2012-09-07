@@ -14,19 +14,13 @@ See the chapter :ref:`overviewFormats` for more information and examples of conv
 '''
 
 
-import unittest, doctest, random
-import sys
+import unittest
 
-from music21 import common
-from music21 import converter
 from music21 import exceptions21
 
-from music21 import stream
 from music21 import note
 from music21 import chord
 from music21 import dynamics
-from music21 import pitch
-from music21 import duration
 
 from music21 import environment
 _MOD = 'correlate.py'
@@ -202,8 +196,8 @@ class Test(unittest.TestCase):
                     obj = name()
                 except TypeError:
                     continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
+                dummy_a = copy.copy(obj)
+                dummy_b = copy.deepcopy(obj)
 
 
 

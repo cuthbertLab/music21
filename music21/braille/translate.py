@@ -198,7 +198,7 @@ def measureToBraille(music21Measure, **keywords):
     """
     Translates a :class:`~music21.stream.Measure` to braille.
     """
-    (inPlace, debug) = _translateArgs(**keywords)
+    (inPlace, unused_debug) = _translateArgs(**keywords)
     if not 'showHeading' in keywords:
         keywords['showHeading'] = False
     if not 'showFirstMeasureNumber' in keywords:

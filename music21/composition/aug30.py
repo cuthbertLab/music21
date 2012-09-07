@@ -7,13 +7,18 @@ aug30.py -- Short algorithmic composition demo in music21
 written on August 30, 2008
 converted to new system on Dec. 26, 2010
 '''
-
-from music21 import *
-from music21.instrument import *
+from music21 import articulations
+from music21 import duration
+from music21 import meter
+from music21 import note
+from music21 import tempo
+from music21 import stream
 import copy
 import random
 
-def rhythmLine(baseNote = note.QuarterNote(), minLength = 8.0, maxProbability = 0.5):
+def rhythmLine(baseNote = None, minLength = 8.0, maxProbability = 0.5):
+    if baseNote is None:
+        baseNote = note.QuarterNote()
     newStream = stream.Part()
     while newStream.duration.quarterLength < minLength:
         currentProbability = (newStream.duration.quarterLength / minLength) * maxProbability
@@ -97,9 +102,11 @@ def addPart(minLength = 80, maxProbability = 0.7, instrument = None):
     
 
 def test():
+    from music21 import instrument as j
     sc1 = stream.Score()
 #    instruments = [Piccolo(), Glockenspiel(), 72, 69, 41, 27, 47, 1, 1, 1, 1, 34]
-    instrument = [Piccolo(),Xylophone(),Clarinet(),Oboe(),Violin(),ElectricGuitar(),Harp(),Piano(),Piano(),Piano(),Piano(),ElectricBass()]
+    instrument = [j.Piccolo(), j.Xylophone(), j.Clarinet(), j.Oboe(), j.Violin(),
+                  j.ElectricGuitar(), j.Harp(), j.Piano(), j.Piano(), j.Piano(), j.Piano(), j.ElectricBass()]
     instrumentOctave = [3, 2, 2, 2, 1, 1, 1, 2, 1, 0, -1, -2]
     
     for i in range(12):

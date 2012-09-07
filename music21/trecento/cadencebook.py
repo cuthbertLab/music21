@@ -16,22 +16,19 @@ for working with this encoding, including transforming it into music21 Streams.
 
 '''
 
-import doctest
 import unittest
-import random
 import re
 import os
+import copy
 
 from music21 import duration
 from music21 import expressions
 from music21 import metadata
-from music21 import meter
-from music21 import note
+from music21 import stream
 
 from music21.ext import xlrd
 from music21.trecento import trecentoCadence
 from music21.trecento import polyphonicSnippet
-from music21.trecento.polyphonicSnippet import *
 
 class TrecentoSheet(object):
     '''
@@ -65,7 +62,7 @@ class TrecentoSheet(object):
             try:
                 xbook = xlrd.open_workbook(self.filename)        
             except IOError:
-                import music21
+                import music21.trecento
                 xbook = xlrd.open_workbook(music21.trecento.__path__[0] + os.sep + self.filename)
 
             
@@ -361,7 +358,7 @@ class TrecentoCadenceWork(object):
 
     def asOpus(self):
         '''
-        returns all snippets as a music21 opus object
+        returns all snippets as a :class:`~music21.stream.Opus` object
 
         >>> from music21 import *
         >>> deduto = trecento.cadencebook.BallataSheet().workByTitle('deduto')
@@ -379,7 +376,6 @@ class TrecentoCadenceWork(object):
         o.metadata.composer = self.composer
         o.metadata.title = self.title   
         
-        currentTs = None
         bs = self.snippets
         for thisSnippet in bs:
             if thisSnippet is None:
@@ -387,10 +383,9 @@ class TrecentoCadenceWork(object):
             if thisSnippet.tenor is None and thisSnippet.cantus is None and thisSnippet.contratenor is None:
                 continue
             s = stream.Score()
-            for j in range(self.totalVoices):
+            for dummy in range(self.totalVoices):
                 s.insert(0, stream.Part())
 
-            timeSig = thisSnippet.flat.getElementsByClass(meter.TimeSignature)[0]
             for partNumber, snippetPart in enumerate(thisSnippet.getElementsByClass('TrecentoCadenceStream')):
                 if thisSnippet.snippetName != "" and partNumber == self.totalVoices - 1:
                     textEx = expressions.TextExpression(thisSnippet.snippetName)
@@ -425,7 +420,6 @@ class TrecentoCadenceWork(object):
         '''
         returns all snippets as a score chunk
 
-
         >>> from music21 import *
         >>> deduto = trecento.cadencebook.BallataSheet().workByTitle('deduto')
         >>> deduto.title
@@ -442,16 +436,14 @@ class TrecentoCadenceWork(object):
         s.metadata.composer = self.composer
         s.metadata.title = self.title   
         
-        for j in range(self.totalVoices):
+        for dummy in range(self.totalVoices):
             s.insert(0, stream.Part())
-        currentTs = None
         bs = self.snippets
         for thisSnippet in bs:
             if thisSnippet is None:
                 continue
             if thisSnippet.tenor is None and thisSnippet.cantus is None and thisSnippet.contratenor is None:
                 continue
-            timeSig = thisSnippet.flat.getElementsByClass(meter.TimeSignature)[0]
             for partNumber, snippetPart in enumerate(thisSnippet.getElementsByClass('TrecentoCadenceStream')):
                 if thisSnippet.snippetName != "" and partNumber == self.totalVoices - 1:
                     textEx = expressions.TextExpression(thisSnippet.snippetName)
@@ -508,7 +500,7 @@ class TrecentoCadenceWork(object):
             return None
         else: 
             blockOut = self.convertBlockToStreams(rowBlock)
-            return Incipit(blockOut, self)
+            return polyphonicSnippet.Incipit(blockOut, self)
 
     incipit = property(_getIncipit)
  
@@ -536,14 +528,14 @@ class TrecentoCadenceWork(object):
         for i in beginSnippetPositions:
             if i == beginSnippetPositions[0]:
                 continue
-            thisSnippet = self.getSnippetAtPosition(i, type="begin")
+            thisSnippet = self.getSnippetAtPosition(i, snippetType="begin")
             if thisSnippet is not None:
                 thisSnippet.snippetName = self.rowDescriptions[i]
                 thisSnippet.snippetName = re.sub('cad\b','cadence', thisSnippet.snippetName)
                 thisSnippet.snippetName = re.sub('\s*C$','', thisSnippet.snippetName)
                 returnSnips.append(thisSnippet)
         for i in endSnippetPositions:
-            thisSnippet = self.getSnippetAtPosition(i, type="end")
+            thisSnippet = self.getSnippetAtPosition(i, snippetType="end")
             if thisSnippet is not None:
                 thisSnippet.snippetName = self.rowDescriptions[i]
                 thisSnippet.snippetName = re.sub('cad ','cadence ', thisSnippet.snippetName)
@@ -551,7 +543,7 @@ class TrecentoCadenceWork(object):
                 returnSnips.append(thisSnippet)
         return returnSnips
 
-    def getSnippetAtPosition(self, snippetPosition, type="end"):
+    def getSnippetAtPosition(self, snippetPosition, snippetType="end"):
         '''
         gets a "snippet" which is a collection of up to 3 lines of music, a timeSignature
         and a description of the cadence.
@@ -570,10 +562,10 @@ class TrecentoCadenceWork(object):
                     return None  ## need a timesig
                 thisBlock[4] = self.timeSigBegin
             blockOut = self.convertBlockToStreams(thisBlock)
-            if type == 'begin':
-                return Incipit(blockOut, self)
+            if snippetType == 'begin':
+                return polyphonicSnippet.Incipit(blockOut, self)
             else:
-                return FrontPaddedSnippet(blockOut, self)
+                return polyphonicSnippet.FrontPaddedSnippet(blockOut, self)
 
     def convertBlockToStreams(self, thisBlock):
         '''
@@ -750,7 +742,7 @@ class Test(unittest.TestCase):
                 continue
             elif callable(part):
                 #environLocal.printDebug(['testing copying on', part])
-                obj = getattr(module, part)()
+                obj = getattr(self.__module__, part)()
                 a = copy.copy(obj)
                 b = copy.deepcopy(obj)
                 self.assertNotEqual(a, obj)
@@ -758,13 +750,13 @@ class Test(unittest.TestCase):
 
     def testTrecentoCadenceWorkCopying(self):
         w = TrecentoCadenceWork()
-        w1 = copy.copy(w)
-        w2 = copy.deepcopy(w)
+        unused_w1 = copy.copy(w)
+        unused_w2 = copy.deepcopy(w)
 
     def testTrecentoCadenceWorkFromSheetCopying(self):
         w = BallataSheet().makeWork(331)
-        w1 = copy.copy(w)
-        w2 = copy.deepcopy(w)
+        unused_w1 = copy.copy(w)
+        unused_w2 = copy.deepcopy(w)
 
 
     def testGetSnippets(self):
@@ -817,7 +809,7 @@ class TestExternal(unittest.TestCase):
         bs = BallataSheet()
         dummyPiece = bs.makeWork(2)
         block2 = dummyPiece.convertBlockToStreams(block1)
-        fpc1 = FrontPaddedSnippet(block2, dummyPiece)
+        unused_fpc1 = polyphonicSnippet.FrontPaddedSnippet(block2, dummyPiece)
 #        fpc1.show()
 
     def xtestVirelais(self):

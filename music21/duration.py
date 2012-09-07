@@ -47,11 +47,10 @@ Example usage:
 
 '''
 
-import unittest, doctest
+import unittest
 import copy
 
 from music21 import base
-from music21 import defaults
 from music21 import common
 from music21 import exceptions21
 
@@ -430,9 +429,7 @@ def quarterLengthToDurations(qLen, link=True):
 
     '''
     post = []
-    typeLargest = None # largest found type that is less than
-    match = False
-
+    
     if qLen < 0:
         raise DurationException("qLen cannot be less than Zero.  Read Lewin, GMIT for more details...")
 
@@ -2075,7 +2072,7 @@ class Duration(DurationCommon):
 #        for dur in self.components:
             #environLocal.printDebug(['dur in components', dur])
             # any one unlinked component means this is complex
-            if dur._link == False:
+            if self._link == False:
                 return True
         else: return False
     

@@ -21,13 +21,12 @@ ensembles is also included here though it may later be separated out into its ow
 ensemble.py module. 
 '''
 
-import unittest, doctest
+import unittest
 import sys
 
 from music21 import base
 from music21 import exceptions21
 from music21 import common
-from music21 import defaults
 from music21 import interval
 from music21 import pitch
 
@@ -829,15 +828,7 @@ class TubularBells(PitchedPercussion):
         self.instrumentName = 'Tubular Bells'
         #TODO: self.instrumentAbbreviation = ''
         self.midiProgram = 14
-        
-class Celesta(PitchedPercussion):   
-    def __init__(self):
-        PitchedPercussion.__init__(self)
-
-        self.instrumentName = 'Celesta'
-        self.instrumentAbbreviation = 'Clst'
-        self.midiProgram = 8
-        
+                
 class Gong(PitchedPercussion):
     def __init__(self):
         PitchedPercussion.__init__(self)

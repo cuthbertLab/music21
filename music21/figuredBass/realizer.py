@@ -410,7 +410,6 @@ class FiguredBassLine(object):
         if fbRules is None:
             fbRules = rules.Rules()
         if maxPitch is None:
-            from music21 import pitch
             maxPitch = pitch.Pitch('B5')
                     
         segmentList = []
@@ -431,8 +430,8 @@ class FiguredBassLine(object):
         if listOfHarmonyObjects:
             for harmonyObject in self._fbList:                
                 listofpitchesjustnames = []
-                for pitch in harmonyObject.pitches:
-                    listofpitchesjustnames.append(pitch.name)
+                for thisPitch in harmonyObject.pitches:
+                    listofpitchesjustnames.append(thisPitch.name)
                 #remove duplicates just in case...
                 d = {}
                 for x in listofpitchesjustnames: 

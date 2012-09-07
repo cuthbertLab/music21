@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import unittest, doctest
+import unittest
 import re
+import copy
 
 from music21 import tinyNotation
-from music21.tinyNotation import *
 from music21 import note
+from music21 import expressions
 
 def _sendNoteInfo(music21noteObject):
     '''
@@ -38,7 +39,7 @@ def _sendNoteInfo(music21noteObject):
     return retstr
 
 
-class TrecentoCadenceStream(TinyNotationStream):
+class TrecentoCadenceStream(tinyNotation.TinyNotationStream):
     '''
     Subclass of Tiny Notation that calls TrecentoCadenceNote instead of TinyNotationNote    
     
@@ -53,10 +54,10 @@ class TrecentoCadenceStream(TinyNotationStream):
         try:
             tcN = TrecentoCadenceNote(stringRep, storedDict)
             return tcN
-        except TinyNotationException, inst:
-            raise TinyNotationException(inst.args[0] + "\nLarger context: " + self.stringRep)
+        except tinyNotation.TinyNotationException, inst:
+            raise tinyNotation.TinyNotationException(inst.args[0] + "\nLarger context: " + self.stringRep)
 
-class TrecentoCadenceNote(TinyNotationNote):
+class TrecentoCadenceNote(tinyNotation.TinyNotationNote):
     '''
     Subclass of TinyNotationNote where 2.. represents a dotted dotted half note (that is, a dotted
     half tied to a dotted quarter) instead of a double dotted note.  This makes entering Trecento
@@ -90,7 +91,7 @@ class Test(unittest.TestCase):
                 continue
             elif callable(part):
                 #environLocal.printDebug(['testing copying on', part])
-                obj = getattr(module, part)()
+                obj = getattr(self.__module__, part)()
                 a = copy.copy(obj)
                 b = copy.deepcopy(obj)
                 self.assertNotEqual(a, obj)
@@ -98,7 +99,6 @@ class Test(unittest.TestCase):
 
 
     def testTrecentoNote(self):
-        from music21 import note
         cn = TrecentoCadenceNote('AA-4.~')
         a = cn.note # returns the stored music21 note.
         self.assertEqual(_sendNoteInfo(a),
@@ -112,11 +112,9 @@ QuarterLength: 1.5
 ''')
 
     def testDotGroups(self):
-        from music21 import note
         cn = TrecentoCadenceNote('c#2..')
         a = cn.note # returns the stored music21 note.
 
-        # TODO: FIX!  not working right now because dot groups aren't. should be QL 4.5
         self.assertEqual(_sendNoteInfo(a),
                           '''Name: C#
 Step: C

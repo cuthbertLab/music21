@@ -1,7 +1,6 @@
-import unittest, doctest
+import unittest
 import copy
 
-from music21 import corpus
 from music21 import key
 from music21 import metadata
 from music21 import interval
@@ -10,7 +9,6 @@ from music21 import chord
 from music21 import stream
 from music21 import harmony
 from music21 import scale
-from music21 import clef
 from music21.theoryAnalysis import theoryAnalyzer
 
 import random
@@ -52,8 +50,6 @@ def generateIntervals(numIntervals,kind = None, octaveSpacing = None):
         endPitch = intv.transposePitch(startPitch)
         
         if kind == 'diatonic':
-            startPitchName = random.choice('abcdefg')
-            endPitchName = random.choice('abcdefg')
             startPitch = pitch.Pitch(random.choice('abcdefg'))
             endPitch = pitch.Pitch(random.choice('abcdefg'))
 

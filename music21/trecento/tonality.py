@@ -23,13 +23,8 @@ crash -- the numbers are not checked because the underlying data is changing
 too often.
 '''
 import unittest
-from re import match
 
-from music21.note import Note
-from music21 import interval
 from music21.trecento import cadencebook
-from music21.trecento import capua
-from music21.trecento import polyphonicSnippet
 from music21.common import DefaultHash
 
 ph = lambda h = {}: DefaultHash(h, default = False)
@@ -337,7 +332,7 @@ def testAll(show = True, fast = False):
         if fast is False:
             nonLandiniTonality(show)
             anonBallataTonality(show)
-            landiniTonality(show)
+            landiniTonality(show)            
 
 class Test(unittest.TestCase):
     pass

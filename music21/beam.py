@@ -76,7 +76,7 @@ To get rid of beams on a note do:
 
 '''
 
-import unittest, doctest
+import unittest
 
 from music21 import base
 from music21 import common

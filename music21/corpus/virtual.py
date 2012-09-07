@@ -11,7 +11,6 @@
 
 'The virtual.py module is a library of references to remotely stored music data files, as well as meta-data necessary to download and, if available, access an already downloaded file.'
 
-import doctest
 import unittest
 
 from music21 import common

@@ -20,7 +20,7 @@ import copy
 import math
 import os
 import wave
-import unittest, doctest
+import unittest
 
 from music21 import common
 from music21 import exceptions21
@@ -292,7 +292,7 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=None):
 
     for i in range(len(detectedPitchesFreq)):    
         inputPitchFrequency = detectedPitchesFreq[i]
-        freq, pitch_name = normalizeInputFrequency(inputPitchFrequency, thresholds, pitches)       
+        unused_freq, pitch_name = normalizeInputFrequency(inputPitchFrequency, thresholds, pitches)       
         detectedPitchObjects.append(pitch_name)
     
     listplot = []
@@ -480,7 +480,7 @@ def detectPitchFrequencies(freqFromAQList, useScale=None):
     
     for i in range(len(freqFromAQList)):    # to find thresholds and frequencies
         inputPitchFrequency = freqFromAQList[i]
-        freq, pitch_name = normalizeInputFrequency(inputPitchFrequency, thresholds, pitches)     
+        unused_freq, pitch_name = normalizeInputFrequency(inputPitchFrequency, thresholds, pitches)     
         detectedPitchesFreq.append(pitch_name.frequency)    
     return detectedPitchesFreq
 

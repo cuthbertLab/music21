@@ -31,7 +31,7 @@ The list of objects included here are:
         * :class:`~music21.voiceLeading.TwoChordLinearSegment` : 2 chord objects
 
 '''
-import unittest, doctest
+import unittest
 
 from music21 import base
 from music21 import exceptions21
@@ -1914,16 +1914,16 @@ class Test(unittest.TestCase):
                 b = copy.deepcopy(obj)
 
    
-    def unifiedTest(self):
-        C4 = Note(); C4.name = "C"
-        D4 = Note(); D4.name = "D"
-        E4 = Note(); E4.name = "E"
-        F4 = Note(); F4.name = "F"
-        G4 = Note(); G4.name = "G"  
-        A4 = Note(); A4.name = "A"
-        B4 = Note(); B4.name = "B"
-        C5 = Note(); C5.name = "C"; C5.octave = 5
-        D5 = Note(); D5.name = "D"; D5.octave = 5
+    def test_unifiedTest(self):
+        C4 = note.Note(); C4.name = "C"
+        D4 = note.Note(); D4.name = "D"
+        E4 = note.Note(); E4.name = "E"
+        F4 = note.Note(); F4.name = "F"
+        G4 = note.Note(); G4.name = "G"  
+        A4 = note.Note(); A4.name = "A"
+        B4 = note.Note(); B4.name = "B"
+        C5 = note.Note(); C5.name = "C"; C5.octave = 5
+        D5 = note.Note(); D5.name = "D"; D5.octave = 5
         
         a = VoiceLeadingQuartet(C4, D4, G4, A4)
         assert a.similarMotion() == True
@@ -1944,9 +1944,9 @@ class Test(unittest.TestCase):
         assert c.hiddenInterval(interval.Interval("P5")) == False
     
         d = VoiceLeadingQuartet(C4, D4, E4, A4)
-        assert d.hiddenInterval(Interval("P5")) == True
-        assert d.hiddenInterval(Interval("A4")) == False
-        assert d.hiddenInterval(Interval("AA4")) == False
+        assert d.hiddenInterval(interval.Interval("P5")) == True
+        assert d.hiddenInterval(interval.Interval("A4")) == False
+        assert d.hiddenInterval(interval.Interval("AA4")) == False
 
 class TestExternal(unittest.TestCase):
     def runTest(self):

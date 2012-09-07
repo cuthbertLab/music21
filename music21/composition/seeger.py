@@ -1,7 +1,14 @@
 '''
 Dynamically generating the 4th movement of Ruth Crawford Seeger's String Quartet 1931
 '''
-from music21 import *
+
+
+from music21 import converter
+from music21 import meter
+from music21 import note
+from music21 import stream
+
+
 import copy
 row = converter.parse('d8 e f e- f# a a- g d- c', '2/2')
 rowNotes = row.notes

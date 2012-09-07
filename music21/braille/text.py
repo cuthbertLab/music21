@@ -7,8 +7,6 @@
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
-
-import collections
 import unittest
 
 from music21.braille import lookup

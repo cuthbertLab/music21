@@ -4,9 +4,7 @@ Created on Nov 5, 2009
 
 @author: cuthbert
 '''
-
-from music21 import *
-from music21.analysis import correlate
+from music21 import stream
 from music21.trecento import cadencebook
 from music21 import graph
 

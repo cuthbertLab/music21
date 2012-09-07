@@ -20,15 +20,9 @@ from __future__ import unicode_literals
 
 import os
 import sys
-import tempfile
 import re
-import time
 # import threading
-import unittest, doctest
-import copy
-import random
-
-import re
+import unittest
 from music21 import common
 from music21 import duration
 from music21 import environment
@@ -514,8 +508,8 @@ class LilypondConverter(object):
         '''
 
         returnString = ''
-        mostRecentDur = ''
-        recentDurCount = 0
+        #mostRecentDur = ''
+        #recentDurCount = 0
         for el in streamIn:
             if not "Measure" in el.classes:
                 continue
@@ -534,7 +528,7 @@ class LilypondConverter(object):
             #    recentDurCount = 0
 
         #if recentDurCount != 0:
-         #   returnString = returnString + '*' + str(recentDurCount)
+        #    returnString = returnString + '*' + str(recentDurCount)
 
         return returnString
 
@@ -1369,6 +1363,7 @@ class LilypondConverter(object):
             numerator = str(int(inObj.duration.tuplets[0].tupletNormal[0]))
             denominator = str(int(inObj.duration.tuplets[0].tupletActual[0]))            
             lpMusicList = self.setContextForTimeFraction(numerator, denominator)
+            return lpMusicList
         else:
             return None
 
@@ -2012,7 +2007,7 @@ class LilypondConverter(object):
             barLength = ts.barDuration.quarterLength 
         remainingQL = barLength - pL
         if remainingQL <= 0:
-            raise LilypondTranslateException('your first pickup measure is non-existent!')
+            raise LilyTranslateException('your first pickup measure is non-existent!')
         remaining32s = int(remainingQL * 8)
         lyObject = lyo.LyEmbeddedScm()
         schemeStr = lyObject.backslash + 'partial 32*' + str(remaining32s) + ' ' 
@@ -2070,7 +2065,7 @@ class LilypondConverter(object):
             raise
         
         try:
-            os.remove(filename + ".eps")
+            os.remove(fileName + ".eps")
         except:
             pass
         fileform = fileName + '.' + format
@@ -2203,7 +2198,7 @@ class Test(unittest.TestCase):
         #print lpc.topLevelObject
 
     def testComplexDuration(self):
-        from music21 import stream, note, meter
+        from music21 import stream, meter
         s = stream.Stream()
         n1 = note.Note('C') # test no octave also!
         n1.duration.quarterLength = 2.5 # BUG 2.3333333333 doesn't work right
@@ -2225,7 +2220,6 @@ class TestExternal(unittest.TestCase):
 
 
     def xtestConvertNote(self):
-        from music21 import note
         n = note.Note("C5")
         n.show('lily.png')
     
@@ -2236,12 +2230,11 @@ class TestExternal(unittest.TestCase):
         b.parts[0].show('lily.svg')
 
     def xtestSlowConvertOpus(self):
-        from music21 import corpus
         fifeOpus = corpus.parse('miscFolk/americanfifeopus.abc')
         fifeOpus.show('lily.png')
 
     def xtestBreve(self):
-        from music21 import note, stream, meter
+        from music21 import stream, meter
         n = note.Note("C5")
         n.duration.quarterLength = 8.0
         m = stream.Measure()

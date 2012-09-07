@@ -13,18 +13,20 @@
 import sys
 import copy
 import unittest
-import random
+#import random
 
 from music21 import bar
+from music21 import chord
 from music21 import clef
 from music21 import converter
 from music21 import duration
 from music21 import key
 from music21 import instrument
-from music21 import meter
+from music21 import metadata
 from music21 import note
 from music21 import pitch
 from music21 import scale
+from music21 import tempo
 from music21 import stream
 # DOENST WORK from music21 import *
 
@@ -61,7 +63,7 @@ def pitchedPhase(cycles=None, show=False):
         # increment last note
         sMod.notesAndRests[-1].quarterLength += increment
         
-        randInterval = random.randint(-12,12)
+        #randInterval = random.randint(-12,12)
         #sMod.transpose(randInterval, inPlace=True)
         sPost.parts[1].append(sMod)
 
@@ -166,9 +168,7 @@ def pendulumMusic(show = True,
                   scaleStepSize = 3,
                   scaleType = scale.OctatonicScale,
                   startingPitch = 'C1'
-                  ):
-    from music21 import scale, pitch, stream, note, chord, clef, tempo, duration, metadata
-    
+                  ):    
     totalLoops = totalLoops * 1.01
     jMax = loopLength * totalLoops
     
