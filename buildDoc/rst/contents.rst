@@ -122,7 +122,6 @@ Module Reference
    moduleMusicxmlM21ToString
    moduleMusicxmlTranslate
    moduleNote
-   moduleNoteworthyBase
    moduleNoteworthyTranslate
    modulePitch
    moduleRepeat
