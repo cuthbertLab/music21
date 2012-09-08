@@ -21,7 +21,8 @@ First, download and install the appropriate version of Eclipse from the followin
 don't already have it: http://www.eclipse.org/downloads/packages/eclipse-classic-37/indigor
 
 You may use Juno (Eclipse 4.2) if you'd like -- it is just a little slower, but is the future of Eclipse.
-The docs below are for Eclipse 3.7, but the procedure is mostly the same for using 4.2.
+The docs below are for Eclipse 3.7, but the procedure is mostly the same for using 4.2.  If you're
+upgrading, you can delete your music21base project in your old version of Eclipse and then just follow the same steps below.
 
 For Windows users, we recommend installing the 32-bit version, regardless of your system's 
 capabilities. For Mac users, choose the version that complies with your system. If in 
@@ -155,6 +156,9 @@ Continue the process with `Creating a new PyDev Project`_.
 Checking Out music21 with Commit Access
 ----------------------------------------------
 
+If you've been given permission to contribute directly to the music21 project via SVN, follow these
+steps. (Otherwise, feel free to post patches, etc. to Cuthbert's email or to the list).
+
 In the "Checkout from SVN" window, enter https://music21.googlecode.com/svn/trunk into the "URL:" field. 
 
 .. warning::
@@ -164,7 +168,8 @@ Select the "Use the repository URL as the label" option. Under "Authentication,"
 address of the Google account that you will be using to which commit access has been granted by the 
 developers, and the password that you have been provided. Be sure to check the "Save authentication"
 box if you'd like to avoid being prompted for the same info in the future. Also, make sure the box next to
-"Validate Repository Location on Finish" is selected, and click on "Next."
+"Validate Repository Location on Finish" is selected, and click on "Next." (The image below has an error, it
+should say "/svn/trunk" not "/svn"
 
 .. image:: images/usingEclipse/checkingoutwithcommit.*
     :width: 650
@@ -199,7 +204,7 @@ under the trunk file called "music21," and if name your trunk directory "music21
 and the SVN will be very confused). "music21base," for instance, is a perfectly safe name. 
 
 For many users, you will need to click on the "Please configure an interpreter in the related preferences before proceeding" link.
-If it is not there, then you can skip ahead to the "When returning to the new PyDev Project box..." paragraph)
+(If it is not there, then you can skip ahead to the "When returning to the new PyDev Project box..." paragraph)
 
 .. image:: images/usingEclipse/creatingnewpydevproj2.*
     :width: 650

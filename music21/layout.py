@@ -301,7 +301,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(len(systemLayoutList), 4)
 
         #s.show()
-        unused_raw = m21ToString.music21ObjectToMusicXML(s)
+        unused_raw = m21ToString.fromMusic21Object(s)
 
     def testGetPageMeasureNumbers(self):
         from music21 import corpus

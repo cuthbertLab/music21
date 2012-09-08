@@ -2042,12 +2042,12 @@ class Test(unittest.TestCase):
     def testMetadataLoadCorpus(self):
         from music21 import musicxml
         from music21.musicxml import testFiles
-        from music21.musicxml import translate as musicxmlTranslate
+        from music21.musicxml import fromMxObjects
 
         d = musicxml.Document()
         d.read(testFiles.mozartTrioK581Excerpt)
         mxScore = d.score # get the mx score directly
-        md = musicxmlTranslate.mxScoreToMetadata(mxScore)
+        md = fromMxObjects.mxScoreToMetadata(mxScore)
 
         self.assertEqual(md.movementNumber, '3')
         self.assertEqual(md.movementName, 'Menuetto (Excerpt from Second Trio)')
@@ -2059,7 +2059,7 @@ class Test(unittest.TestCase):
 
         d.read(testFiles.binchoisMagnificat)
         mxScore = d.score # get the mx score directly
-        md = musicxmlTranslate.mxScoreToMetadata(mxScore)
+        md = fromMxObjects.mxScoreToMetadata(mxScore)
         self.assertEqual(md.composer, 'Gilles Binchois')
 
 
@@ -2185,7 +2185,7 @@ class Test(unittest.TestCase):
     def testJSONSerializationMetadata(self):
         from music21 import corpus
         from music21 import musicxml
-        from music21.musicxml import translate as musicxmlTranslate
+        from music21.musicxml import fromMxObjects
         from music21.musicxml import testFiles
 
 
@@ -2209,7 +2209,7 @@ class Test(unittest.TestCase):
         d.read(testFiles.mozartTrioK581Excerpt)
         mxScore = d.score # get the mx score directly
 
-        md = musicxmlTranslate.mxScoreToMetadata(mxScore)
+        md = fromMxObjects.mxScoreToMetadata(mxScore)
 
         self.assertEqual(md.movementNumber, '3')
         self.assertEqual(md.movementName, 'Menuetto (Excerpt from Second Trio)')

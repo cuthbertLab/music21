@@ -1025,7 +1025,7 @@ class Test(unittest.TestCase):
         n2 = s.notes[-1]
         sp1 = expressions.TrillExtension(n1, n2)
         s.append(sp1)
-        raw = m21ToString.music21ObjectToMusicXML(s)
+        raw = m21ToString.fromMusic21Object(s)
         self.assertEqual(raw.count('wavy-line'), 2)
 
         s = stream.Stream()
@@ -1034,7 +1034,7 @@ class Test(unittest.TestCase):
         n2 = s.notes[-1]
         sp1 = expressions.TrillExtension(n1, n2)
         s.append(sp1)
-        raw = m21ToString.music21ObjectToMusicXML(s)
+        raw = m21ToString.fromMusic21Object(s)
         #s.show()
         self.assertEqual(raw.count('wavy-line'), 2)
 

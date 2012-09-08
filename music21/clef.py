@@ -475,23 +475,23 @@ class Test(unittest.TestCase):
                 unused_b = copy.deepcopy(obj)
 
     def testConversionMX(self):
-        from music21.musicxml import translate as musicxmlTranslate
+        from music21.musicxml import toMxObjects
         # test basic creation
         for clefObjName in [FrenchViolinClef, TrebleClef, Treble8vbClef, 
                 GSopranoClef, SopranoClef, MezzoSopranoClef,
                 TenorClef, CBaritoneClef, FBaritoneClef, BassClef, 
                 SubBassClef]:
             a = clefObjName()
-            unused_mxClef = musicxmlTranslate.clefToMxClef(a)
+            unused_mxClef = toMxObjects.clefToMxClef(a)
 
         # test specific clefs
         a = Treble8vbClef()
-        mxClef = musicxmlTranslate.clefToMxClef(a)
+        mxClef = toMxObjects.clefToMxClef(a)
         self.assertEqual(mxClef.get('clefOctaveChange'), -1)
 
     def testConversionClassMatch(self):
         from music21 import musicxml as musicxmlMod
-        from music21.musicxml import translate as musicxmlTranslate
+        from music21.musicxml import fromMxObjects
         from music21 import clef
         # need to get music21.clef.X, not X, because
         # we are comparing the result to a translation outside
@@ -520,7 +520,7 @@ class Test(unittest.TestCase):
             mxClef.set('line', params[1])
             mxClef.set('octaveChange', params[2])
 
-            c = musicxmlTranslate.mxClefToClef(mxClef)
+            c = fromMxObjects.mxClefToClef(mxClef)
 
             #environLocal.printDebug([type(c).__name__])
 

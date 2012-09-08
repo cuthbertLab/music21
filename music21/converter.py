@@ -405,8 +405,8 @@ class ConverterMusicXML(object):
         '''
         #t = common.Timer()
         #t.start()
-        from music21.musicxml import translate as musicxmlTranslate
-        musicxmlTranslate.mxToScore(self._mxScore, inputM21 = self._stream)
+        from music21.musicxml import fromMxObjects
+        fromMxObjects.mxToScore(self._mxScore, inputM21 = self._stream)
         #self._stream._setMX(self._mxScore)
         #t.stop()
         #environLocal.printDebug(['music21 object creation time:', t])
@@ -1439,7 +1439,7 @@ class Test(unittest.TestCase):
         self.assertEqual(post, match)
 
         # try to go the other way
-        post = m21ToString.music21ObjectToMusicXML(a)
+        post = m21ToString.fromMusic21Object(a)
         #a.show()        
 
     def testConversionMXKey(self):

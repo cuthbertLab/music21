@@ -165,8 +165,6 @@ def oldAccent(show=True):
             m = m.sorted
     if show:
         partBass.measures(1,8).show('musicxml')
-    else:
-        post = partBass.musicxml
 
 
 class Test(unittest.TestCase):

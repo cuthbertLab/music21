@@ -58,7 +58,7 @@ def musicxmlText(outputStream):
     True
     '''
     from music21.musicxml import m21ToString
-    musicxmlString = m21ToString.music21ObjectToMusicXML(outputStream)
+    musicxmlString = m21ToString.fromMusic21Object(outputStream)
     return (musicxmlString.encode('utf-8'), 'text/plain; charset=utf-8')   
 
 def musicxmlFile(outputStream):
@@ -74,7 +74,7 @@ def musicxmlFile(outputStream):
     True
     '''
     from music21.musicxml import m21ToString
-    musicxmlString = m21ToString.music21ObjectToMusicXML(outputStream)
+    musicxmlString = m21ToString.fromMusic21Object(outputStream)
     return (musicxmlString.encode('utf-8'), 'application/vnd.recordare.musicxml+xml; charset=utf-8')
     
 def vexflow(outputStream):
@@ -123,7 +123,7 @@ def noteflightEmbed(outputStream):
     'text/html; charset=utf-8'
     '''
     from music21.musicxml import m21ToString
-    musicxmlString = m21ToString.music21ObjectToMusicXML(outputStream)    
+    musicxmlString = m21ToString.fromMusic21Object(outputStream)    
     musicxmlString = musicxmlString.replace('\n','')
     musicxmlString = musicxmlString.replace('\'','\\\'')
     htmlStr = """

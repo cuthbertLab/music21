@@ -120,7 +120,8 @@ Module Reference
    moduleMusedataBase40
    moduleMusicxmlBase
    moduleMusicxmlM21ToString
-   moduleMusicxmlTranslate
+   moduleMusicxmlFromMxObjects
+   moduleMusicxmlToMxObjects
    moduleNote
    moduleNoteworthyTranslate
    modulePitch

@@ -4336,7 +4336,7 @@ class Test(unittest.TestCase):
         self.assertEqual(chords[2].getTie(pitch.Pitch('c5')), None)
 
         #s.show()
-        out = m21ToString.music21ObjectToMusicXML(s)
+        out = m21ToString.fromMusic21Object(s)
         out = out.replace(' ', '')
         out = out.replace('\n', '')
         #print out

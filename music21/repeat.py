@@ -3210,7 +3210,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.flat.getElementsByClass(repeat.DaCapo)), 1)
 
 
-        raw = m21ToString.music21ObjectToMusicXML(s)
+        raw = m21ToString.fromMusic21Object(s)
 
         self.assertEqual(raw.find('Da Capo') > 0, True)
 
@@ -3220,12 +3220,12 @@ class Test(unittest.TestCase):
         s[3].insert(0, expressions.TextExpression('da capo'))
         self.assertEqual(len(s.flat.getElementsByClass(repeat.DaCapo)), 0)
         
-        raw = m21ToString.music21ObjectToMusicXML(s)
+        raw = m21ToString.fromMusic21Object(s)
         self.assertEqual(raw.find('da capo') > 0, True)
             
         mxlDocument = musicxml.Document()
         mxlDocument.read(raw)
-        s2 = musicxml.translate.mxToScore(mxlDocument.score)
+        s2 = musicxml.fromMxObjects.mxToScore(mxlDocument.score)
         # now, reconverted from the musicxml, we have a RepeatExpression
         self.assertEqual(len(s2.flat.getElementsByClass(repeat.DaCapo)), 1)
 
@@ -3774,7 +3774,7 @@ class Test(unittest.TestCase):
 
         s = converter.parse(testPrimitive.repeatBracketsA)
 
-        raw = m21ToString.music21ObjectToMusicXML(s)
+        raw = m21ToString.fromMusic21Object(s)
 
         self.assertEqual(raw.find("<repeat direction=")>1, True)    
         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
@@ -3784,7 +3784,7 @@ class Test(unittest.TestCase):
  
         # TODO: after calling .musicxml, repeat brackets are getting lost
         #s.show()        
-        raw = m21ToString.music21ObjectToMusicXML(s)
+        raw = m21ToString.fromMusic21Object(s)
 
         self.assertEqual(raw.find("<repeat direction=")>1, True)    
         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
@@ -3796,7 +3796,7 @@ class Test(unittest.TestCase):
         #s.show()
 
         #s1.show()
-        raw = m21ToString.music21ObjectToMusicXML(s1)
+        raw = m21ToString.fromMusic21Object(s1)
         ex = Expander(s1.parts[0])
         self.assertEqual(len(ex._repeatBrackets), 2)
 

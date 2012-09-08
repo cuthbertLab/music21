@@ -392,10 +392,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].flat.notesAndRests), 291)
         self.assertEqual(len(s.parts[1].flat.notesAndRests), 293)
 
-        unused_raw = m21ToString.music21ObjectToMusicXML(s)
-      
-
-
+        unused_raw = m21ToString.fromMusic21Object(s)
+             
 
 #    def testGetMetaData(self):
 #

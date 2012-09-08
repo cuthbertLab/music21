@@ -1511,7 +1511,7 @@ class Test(unittest.TestCase):
 
 
     def testMusicXMLOutput(self):
-        from music21.musicxml import translate
+        from music21.musicxml import toMxObjects
         mxNotes = []
         for pitchName, durType in [('g#', 'quarter'), ('g#', 'half'), 
                 ('g#', 'quarter'), ('g#', 'quarter'), ('g#', 'quarter')]:
@@ -1521,10 +1521,10 @@ class Test(unittest.TestCase):
 
             # a lost of one ore more notes (tied groups)
             # returns a list of mxNote objs
-            for mxNote in translate.durationToMx(dur): 
+            for mxNote in toMxObjects.durationToMx(dur): 
             #for mxNote in dur.mx: # returns a list of mxNote objs
                 # merger returns a new object
-                mxNotes.append(mxNote.merge(translate.pitchToMx(p)))
+                mxNotes.append(mxNote.merge(toMxObjects.pitchToMx(p)))
 
         self.assertEqual(len(mxNotes), 5)
         self.assertEqual(mxNotes[0].get('pitch').get('alter'), 1)

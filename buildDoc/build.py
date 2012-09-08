@@ -126,7 +126,8 @@ from music21.musedata import base40 as musedataBase40
 
 from music21.musicxml import base as musicxmlBase
 from music21.musicxml import m21ToString as musicxmlM21ToString
-from music21.musicxml import translate as musicxmlTranslate
+from music21.musicxml import fromMxObjects as musicxmlFromMxObjects
+from music21.musicxml import toMxObjects as musicxmlToMxObjects
 
 from music21 import note
 
@@ -301,7 +302,8 @@ MODULES = [
     
     musicxmlBase,
     musicxmlM21ToString,
-    musicxmlTranslate,
+    musicxmlFromMxObjects,
+    musicxmlToMxObjects,
 
     note, 
     

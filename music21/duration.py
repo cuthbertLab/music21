@@ -2543,7 +2543,7 @@ class Duration(DurationCommon):
             from music21.musicxml import m21ToString
             if fp == None:
                 fp = environLocal.getTempFile(ext)
-            dataStr = m21ToString.durationToMusicXML(self)
+            dataStr = m21ToString.fromDuration(self)
         else:
             raise DurationException('cannot support writing in this format, %s yet' % format)
         f = open(fp, 'w')
@@ -3143,7 +3143,7 @@ class Test(unittest.TestCase):
 
 
     def testMxLoading(self):
-        from music21.musicxml import translate as musicxmlTranslate
+        from music21.musicxml import fromMxObjects
         from music21 import musicxml
         a = musicxml.Note()
         a.setDefaults()
@@ -3151,7 +3151,7 @@ class Test(unittest.TestCase):
         m.setDefaults()
         a.external['measure'] = m # assign measure for divisions ref
         a.external['divisions'] = m.external['divisions']
-        c = musicxmlTranslate.mxToDuration(a)
+        c = fromMxObjects.mxToDuration(a)
         self.assertEqual(c.quarterLength, 1.0)
 
     def testTupletTypeComplete(self):

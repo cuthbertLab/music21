@@ -411,7 +411,7 @@ def ch1_writing_I_B_3(show=True, *arguments, **keywords):
     >>> a = True
     '''
 
-    from music21 import converter, clef, parse
+    from music21 import converter, clef
 
     # Purcell, "Music for a While"
     humdata = '''

@@ -4519,7 +4519,7 @@ class Test(unittest.TestCase):
         #environLocal.printDebug([p1, p1.accidental])
         self.assertEqual(str(p1), 'D#~')
         # test generation of raw musicxml output
-        xmlout = m21ToString.music21ObjectToMusicXML(p1)
+        xmlout = m21ToString.fromMusic21Object(p1)
         #p1.show()
         match = '<step>D</step><alter>1.5</alter><octave>4</octave>'
         xmlout = xmlout.replace(' ', '')

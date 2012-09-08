@@ -6,11 +6,11 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009-2010 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
-_all_ = ['base', 'm21ToString']
+_all_ = ['base', 'm21ToString', 'toMxObjects', 'fromMxObjects']
 
 from music21.musicxml.base import *
 
@@ -18,8 +18,8 @@ from music21.musicxml.base import *
 __doc__ = base.__doc__
 
 import m21ToString
-
-
+import toMxObjects
+import fromMxObjects
 #------------------------------------------------------------------------------
 # eof
 

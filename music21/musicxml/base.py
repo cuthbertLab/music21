@@ -4827,7 +4827,7 @@ class Test(unittest.TestCase):
         
         # the ultimate round trip test
         s = converter.parse(testPrimitive.unicodeStrWithNonAscii)
-        raw = m21ToString.music21ObjectToMusicXML(s)
+        raw = m21ToString.fromMusic21Object(s)
         s = converter.parse(raw)
         self.assertEqual(u'© Someone Else', s.metadata.composer)
 

@@ -3712,7 +3712,7 @@ class Music21Object(JSONSerializer):
                 dataStr = self._reprTextLine()
             elif fileFormat == 'musicxml':
                 from music21.musicxml import m21ToString
-                dataStr = m21ToString.music21ObjectToMusicXML(self)
+                dataStr = m21ToString.fromMusic21Object(self)
             elif fileFormat.startswith('vexflow'):
                 import music21.vexflow
                 dataStr = music21.vexflow.fromObject(self, mode='html')
