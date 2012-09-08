@@ -1988,13 +1988,17 @@ class Stream(base.Music21Object):
 
 
     def _reprText(self):
-        '''Retrun a text representation. This methods can be overridden by
+        '''
+        Return a text representation. This methods can be overridden by
         subclasses to provide alternative text representations.
         '''
         return self._recurseRepr(self)
 
     def _reprTextLine(self):
-        '''Retrun a text representation without line breaks. This methods can be overridden by subclasses to provide alternative text representations.
+        '''
+        Return a text representation without line breaks. 
+        This methods can be overridden by subclasses to 
+        provide alternative text representations.
         '''
         return self._recurseRepr(self, addBreaks=False, addIndent=False)
 
@@ -8496,7 +8500,9 @@ class Stream(base.Music21Object):
 
 
     def hasPartLikeStreams(self):
-        '''Return a boolean value showing if this Stream contains multiple Parts, or Part-like sub-Streams. Part-like sub-streams are Streams that contain Measures or Notes.
+        '''
+        Return a boolean value showing if this Stream contains multiple Parts, or Part-like sub-Streams. 
+        Part-like sub-streams are Streams that contain Measures or Notes.
         
         >>> from music21 import *
         >>> s = stream.Score()
@@ -8507,6 +8513,13 @@ class Stream(base.Music21Object):
         >>> s.insert(0, p1)
         >>> s.hasPartLikeStreams()
         True
+        
+        Flat objects do not have part-like Streams:
+        
+        >>> sf = s.flat
+        >>> sf.hasPartLikeStreams()
+        False
+        
         '''
         if 'hasPartLikeStreams' not in self._cache or self._cache['hasPartLikeStreams'] is None:
             multiPart = False

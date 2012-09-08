@@ -101,11 +101,11 @@ _MOD = "freezeThaw.py"
 environLocal = environment.Environment(_MOD)
 
 
-#try:
-#     import cPickle as pickleMod
-#except ImportError:
-#     import pickle as pickleMod
-import pickle as pickleMod
+try:
+     import cPickle as pickleMod
+except ImportError:
+     import pickle as pickleMod
+#import pickle as pickleMod
 
 #-------------------------------------------------------------------------------
 class FreezeThawException(exceptions21.Music21Exception):

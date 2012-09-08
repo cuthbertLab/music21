@@ -1712,7 +1712,7 @@ class Test(unittest.TestCase):
         self.assertEqual(isinstance(s2Measures[0].clef, clef.TenorClef), True)
         #s2Measures.show() # this shows the proper clef
 
-        #TODO: this still retruns tenor cleff for both parts
+        #TODO: this still returns tenor clef for both parts
         # need to examine
 
         # now we in sert a clef in s2; s2 will get this clef first

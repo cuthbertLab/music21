@@ -493,7 +493,7 @@ class PartitionedModule(PartitionedName):
         >>> len(a.names) == len(a._data)
         True
         >>> a.namesOrdered
-        ['Pitch', 'Accidental']
+        ['Pitch', 'Accidental', 'Microtone']
         >>> a.names[0]
         'Pitch'
         >>> a.names[0] == a._data[0].name
@@ -578,7 +578,7 @@ class PartitionedModule(PartitionedName):
         >>> a.getNames('classes')
         ['Pitch', 'Accidental', 'Microtone']
         >>> a.getNames('functions')    
-        ['convertCentsToAlterAndCents', 'convertFqToPs', 'convertHarmonicToCents', 'convertNameToPitchClass', 'convertNameToPs', 'convertPitchClassToNumber', 'convertPitchClassToStr', 'convertPsToFq', 'convertPsToOct', 'convertPsToStep', 'convertStepToPs']
+        []
         '''
         post = []
         if nameKind.lower() in ['classes', 'class']:
@@ -725,7 +725,7 @@ class PartitionedClass(PartitionedName):
         >>> len(a._createMroLive())
         4
         >>> print a._createMroLive()
-        [C, <music21.base.Music21Object object at 0x...>, <music21.base.JSONSerializer object at 0x...>, <object object at 0x...>]
+        [<music21.pitch.Pitch C>, <music21.base.Music21Object object at 0x...>, <music21.base.JSONSerializer object at 0x...>, <object object at 0x...>]
         '''
         post = []
         for entry in self.mro:
@@ -806,9 +806,9 @@ class PartitionedClass(PartitionedName):
         >>> a.getElement('midi')
         Attribute(name='midi', kind='property', defining_class=<class 'music21.pitch.Pitch'>, object=<property object...>)
         >>> a.getElement('id')
-        Attribute(name='id', kind='data', defining_class=<class 'music21.base.Music21Object'>, object=None)
+        Attribute(name='id', kind=u'data', defining_class=<class 'music21.base.Music21Object'>, object=...)
         >>> a.getElement('_getDiatonicNoteNum')
-        Attribute(name='_getDiatonicNoteNum', kind='method', defining_class=<class 'music21.pitch.Pitch'>, object=<function...>)
+        Attribute(name='_getDiatonicNoteNum', kind='method', defining_class=<class 'music21.pitch.Pitch'>, object=<unbound method Pitch._getDiatonicNoteNum>)
 
         '''
         if partName not in self.names:
@@ -834,8 +834,8 @@ class PartitionedClass(PartitionedName):
         
         >>> from music21 import pitch
         >>> a = PartitionedClass(pitch.Pitch)
-        >>> a.getDoc('__init__')[:15]
-        'Create a Pitch.'
+        >>> a.getDoc('__init__')
+        u'No documentation.'
 
 
         >>> from music21 import editorial
@@ -916,34 +916,36 @@ class PartitionedClass(PartitionedName):
         True
 
         >>> a.getNames('method', mroIndex=0)
-        ['__init__', 'convertMicrotonesToQuarterTones', 'convertQuarterTonesToMicrotones', 'getAllCommonEnharmonics', 'getCentShiftFromMidi', 'getEnharmonic', 'getHarmonic', 'getHarmonicChord', 'getHigherEnharmonic', 'getLowerEnharmonic', 'getMidiPreCentShift', 'harmonicAndFundamentalFromPitch', 'harmonicAndFundamentalStringFromPitch', 'harmonicFromFundamental', 'harmonicString', 'inheritDisplay', 'isEnharmonic', 'isTwelveTone', 'lilyNoOctave', 'setAccidentalDisplay', 'simplifyEnharmonic', 'transpose', 'transposeAboveTarget', 'transposeBelowTarget', 'updateAccidentalDisplay']
+        ['__init__', 'convertMicrotonesToQuarterTones', 'convertQuarterTonesToMicrotones', 'getAllCommonEnharmonics', 'getCentShiftFromMidi', 'getEnharmonic', 'getHarmonic', 'getHigherEnharmonic', 'getLowerEnharmonic', 'getMidiPreCentShift', 'getStringHarmonic', 'harmonicAndFundamentalFromPitch', 'harmonicAndFundamentalStringFromPitch', 'harmonicFromFundamental', 'harmonicString', 'isEnharmonic', 'isTwelveTone', 'simplifyEnharmonic', 'transpose', 'transposeAboveTarget', 'transposeBelowTarget', 'updateAccidentalDisplay']
         >>> a.getNames('data', mroIndex=0)
         ['fundamental', 'implicitAccidental', 'defaultOctave']
         >>> a.getNames('data', mroIndex=1)
-        ['classSortOrder', 'hideObjectOnPrint', 'id', 'isSpanner', 'isStream', 'groups']
+        ['classSortOrder', 'isSpanner', 'isStream', 'isVariant', 'hideObjectOnPrint', 'groups', 'id']
         >>> a.getNames('data', mroIndex=a.lastMroIndex())
         []
 
         >>> from music21 import converter
         >>> a = PartitionedClass(converter.Converter)
         >>> a.getNames('methods')
-        ['__init__', 'parseData', 'parseFile', 'parseURL']
+        ['__init__', 'formatFromHeader', 'parseData', 'parseFile', 'parseURL']
 
         >>> from music21 import meter
         >>> a = PartitionedClass(meter.TimeSignature)
         >>> len(a.getNames('methods')) > 10
         True
         >>> a.getNames('attributes', 1)
-        ['hideObjectOnPrint', 'id', 'isSpanner', 'isStream', 'groups']
+        ['isSpanner', 'isStream', 'isVariant', 'hideObjectOnPrint', 'groups', 'id']
 
         >>> from music21 import serial
-        >>> a = PartitionedClass(serial.RowSchoenbergOp23No5)
+        >>> a = PartitionedClass(serial.TwelveToneRow)
         >>> a.getNames('attributes', 0)
-        ['composer', 'opus', 'row', 'title']
-        >>> a.getNames('data', 1) # returns empty b/c defined here
         []
+        >>> a.getNames('attributes', 1)
+        ['row']
+        >>> a.getNames('data', 1)
+        ['row']
         >>> a.mroLive[1]
-        <music21.serial.HistoricalTwelveToneRow...>
+        <music21.serial.ToneRow...>
 
         '''
         post = []
