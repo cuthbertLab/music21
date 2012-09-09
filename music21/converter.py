@@ -215,10 +215,10 @@ class PickleFilter(object):
         self.forceSource = forceSource
         #environLocal.printDebug(['creating pickle filter'])
 
-    def _getPickleFp(self, dir):
-        if dir == None:
+    def _getPickleFp(self, directory):
+        if directory == None:
             raise ValueError
-        return os.path.join(dir, 'm21-' + common.getMd5(self.fp) + '.p')
+        return os.path.join(directory, 'm21-' + common.getMd5(self.fp) + '.p')
 
     def status(self):
         '''Given a file path specified with __init__, look for an up to date pickled version of this file path. If it exists, return its fp, other wise return the original file path.
